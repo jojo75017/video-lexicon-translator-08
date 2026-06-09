@@ -398,10 +398,15 @@ function CategoryHub({
                 {cat.description && (
                   <p className="mt-3 text-sm text-muted-foreground line-clamp-3 flex-1">{cat.description}</p>
                 )}
-                <div className="mt-4 flex items-center gap-2">
+                <div className="mt-4 flex flex-wrap items-center gap-2">
                   <Button size="sm" variant="outline" className="gap-1" onClick={(e) => { e.stopPropagation(); onSelect(cat.slug); }}>
                     <MessageSquare className="h-3.5 w-3.5" /> Voir les fils
                   </Button>
+                  {canPost && (
+                    <Button size="sm" className="gap-1" onClick={(e) => { e.stopPropagation(); onNewTopic(cat.id); }}>
+                      <Plus className="h-3.5 w-3.5" /> Nouveau sujet
+                    </Button>
+                  )}
                   {link && (
                     <Button
                       size="sm"
