@@ -644,6 +644,13 @@ export default function ForumPage() {
                             )}
                           </div>
                           <p className="text-sm text-muted-foreground line-clamp-1 mt-0.5">{post.content}</p>
+                          {post.tags?.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-1.5">
+                              {post.tags.map(tag => (
+                                <Badge key={tag} variant="outline" className="text-[10px] text-primary border-primary/30">#{tag}</Badge>
+                              ))}
+                            </div>
+                          )}
                           <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                             <span>{post.author_name}</span>
                             <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {formatDistanceToNow(new Date(post.created_at), { locale: fr, addSuffix: true })}</span>
