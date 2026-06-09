@@ -165,38 +165,69 @@ function PostDetail({ post, onBack }: { post: ForumPost; onBack: () => void }) {
   );
 }
 
-// ─── New Post Dialog ───
-function NewPostDialog({ categories, onCreated }: { categories: any[]; onCreated: () => void }) {
-  const [open, setOpen] = useState(false);
+// ─── New Post Dialog (contrôlé, avec tags) ───
+function NewPostDialog({
+  categories,
+  onCreated,
+  open,
+  onOpenChange,
+  defaultCategoryId,
+}: {
+  categories: any[];
+  onCreated: () => void;
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  defaultCategoryId?: string;
+}) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [postType, setPostType] = useState('discussion');
+  const [tagInput, setTagInput] = useState('');
+  const [tags, setTags] = useState<string[]>([]);
   const [creating, setCreating] = useState(false);
+
+  // Préselectionne la catégorie quand le dialog s'ouvre depuis une carte
+  useEffect(() => {
+    if (open) setCategoryId(defaultCategoryId || '');
+  }, [open, defaultCategoryId]);
+
+  const addTag = (raw: string) => {
+    const clean = raw.trim().replace(/^#/, '').slice(0, 24);
+    if (!clean) return;
+    setTags(prev => (prev.includes(clean) || prev.length >= 5 ? prev : [...prev, clean]));
+    setTagInput('');
+  };
+
+  const handleTagKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      addTag(tagInput);
+    } else if (e.key === 'Backspace' && !tagInput && tags.length) {
+      setTags(prev => prev.slice(0, -1));
+    }
+  };
 
   const handleCreate = async () => {
     if (!title.trim() || !content.trim() || !categoryId) return;
     setCreating(true);
-    const result = await createForumPost(categoryId, title, content, postType);
+    const result = await createForumPost(categoryId, title.trim(), content.trim(), postType, tags);
     setCreating(false);
     if (result) {
-      setOpen(false);
+      onOpenChange(false);
       setTitle('');
       setContent('');
+      setTags([]);
+      setTagInput('');
       onCreated();
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="gap-2 bg-gradient-to-r from-primary to-primary/80">
-          <Plus className="w-4 h-4" /> Nouvelle Discussion
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Créer une discussion</DialogTitle>
+          <DialogTitle>Nouveau sujet</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <Select value={categoryId} onValueChange={setCategoryId}>
@@ -215,18 +246,42 @@ function NewPostDialog({ categories, onCreated }: { categories: any[]; onCreated
               <SelectItem value="result">🏆 Partage de résultat</SelectItem>
             </SelectContent>
           </Select>
-          <Input placeholder="Titre de votre discussion" value={title} onChange={e => setTitle(e.target.value)} />
-          <Textarea placeholder="Écrivez votre message..." value={content} onChange={e => setContent(e.target.value)} rows={5} />
+          <div>
+            <Input placeholder="Titre du sujet" value={title} maxLength={140} onChange={e => setTitle(e.target.value)} />
+            <p className="mt-1 text-right text-[11px] text-muted-foreground">{title.length}/140</p>
+          </div>
+          <Textarea placeholder="Description : décrivez votre sujet ou votre blocage…" value={content} maxLength={5000} onChange={e => setContent(e.target.value)} rows={5} />
+          <div>
+            <div className="flex flex-wrap items-center gap-1.5 rounded-md border border-input bg-background px-2 py-1.5">
+              {tags.map(tag => (
+                <Badge key={tag} variant="secondary" className="gap-1">
+                  #{tag}
+                  <button type="button" onClick={() => setTags(prev => prev.filter(t => t !== tag))} className="text-muted-foreground hover:text-foreground">×</button>
+                </Badge>
+              ))}
+              <input
+                className="flex-1 min-w-[120px] bg-transparent px-1 py-0.5 text-sm outline-none placeholder:text-muted-foreground"
+                placeholder={tags.length >= 5 ? 'Max 5 tags' : 'Ajouter un tag puis Entrée…'}
+                value={tagInput}
+                disabled={tags.length >= 5}
+                onChange={e => setTagInput(e.target.value)}
+                onKeyDown={handleTagKey}
+                onBlur={() => addTag(tagInput)}
+              />
+            </div>
+            <p className="mt-1 text-[11px] text-muted-foreground">Jusqu'à 5 tags pour aider les membres à trouver votre sujet.</p>
+          </div>
         </div>
         <DialogFooter>
           <Button onClick={handleCreate} disabled={creating || !title.trim() || !content.trim() || !categoryId}>
-            {creating ? 'Publication...' : 'Publier'}
+            {creating ? 'Publication...' : 'Publier le sujet'}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
+
 
 // ─── Notifications Panel ───
 function NotificationsPanel() {
