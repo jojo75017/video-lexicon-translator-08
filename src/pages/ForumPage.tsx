@@ -102,6 +102,13 @@ function PostDetail({ post, onBack }: { post: ForumPost; onBack: () => void }) {
         </CardHeader>
         <CardContent>
           <p className="text-foreground whitespace-pre-wrap leading-relaxed">{post.content}</p>
+          {post.tags?.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-4">
+              {post.tags.map(tag => (
+                <Badge key={tag} variant="outline" className="text-primary border-primary/30">#{tag}</Badge>
+              ))}
+            </div>
+          )}
           <div className="flex items-center gap-4 mt-4 pt-4 border-t">
             <Button variant="ghost" size="sm" onClick={handleLike} disabled={!session} className={liked ? 'text-red-500' : ''}>
               <Heart className={`w-4 h-4 mr-1 ${liked ? 'fill-red-500' : ''}`} /> {likesCount}
@@ -165,38 +172,69 @@ function PostDetail({ post, onBack }: { post: ForumPost; onBack: () => void }) {
   );
 }
 
-// ─── New Post Dialog ───
-function NewPostDialog({ categories, onCreated }: { categories: any[]; onCreated: () => void }) {
-  const [open, setOpen] = useState(false);
+// ─── New Post Dialog (contrôlé, avec tags) ───
+function NewPostDialog({
+  categories,
+  onCreated,
+  open,
+  onOpenChange,
+  defaultCategoryId,
+}: {
+  categories: any[];
+  onCreated: () => void;
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  defaultCategoryId?: string;
+}) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [postType, setPostType] = useState('discussion');
+  const [tagInput, setTagInput] = useState('');
+  const [tags, setTags] = useState<string[]>([]);
   const [creating, setCreating] = useState(false);
+
+  // Préselectionne la catégorie quand le dialog s'ouvre depuis une carte
+  useEffect(() => {
+    if (open) setCategoryId(defaultCategoryId || '');
+  }, [open, defaultCategoryId]);
+
+  const addTag = (raw: string) => {
+    const clean = raw.trim().replace(/^#/, '').slice(0, 24);
+    if (!clean) return;
+    setTags(prev => (prev.includes(clean) || prev.length >= 5 ? prev : [...prev, clean]));
+    setTagInput('');
+  };
+
+  const handleTagKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      addTag(tagInput);
+    } else if (e.key === 'Backspace' && !tagInput && tags.length) {
+      setTags(prev => prev.slice(0, -1));
+    }
+  };
 
   const handleCreate = async () => {
     if (!title.trim() || !content.trim() || !categoryId) return;
     setCreating(true);
-    const result = await createForumPost(categoryId, title, content, postType);
+    const result = await createForumPost(categoryId, title.trim(), content.trim(), postType, tags);
     setCreating(false);
     if (result) {
-      setOpen(false);
+      onOpenChange(false);
       setTitle('');
       setContent('');
+      setTags([]);
+      setTagInput('');
       onCreated();
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="gap-2 bg-gradient-to-r from-primary to-primary/80">
-          <Plus className="w-4 h-4" /> Nouvelle Discussion
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Créer une discussion</DialogTitle>
+          <DialogTitle>Nouveau sujet</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <Select value={categoryId} onValueChange={setCategoryId}>
@@ -215,18 +253,42 @@ function NewPostDialog({ categories, onCreated }: { categories: any[]; onCreated
               <SelectItem value="result">🏆 Partage de résultat</SelectItem>
             </SelectContent>
           </Select>
-          <Input placeholder="Titre de votre discussion" value={title} onChange={e => setTitle(e.target.value)} />
-          <Textarea placeholder="Écrivez votre message..." value={content} onChange={e => setContent(e.target.value)} rows={5} />
+          <div>
+            <Input placeholder="Titre du sujet" value={title} maxLength={140} onChange={e => setTitle(e.target.value)} />
+            <p className="mt-1 text-right text-[11px] text-muted-foreground">{title.length}/140</p>
+          </div>
+          <Textarea placeholder="Description : décrivez votre sujet ou votre blocage…" value={content} maxLength={5000} onChange={e => setContent(e.target.value)} rows={5} />
+          <div>
+            <div className="flex flex-wrap items-center gap-1.5 rounded-md border border-input bg-background px-2 py-1.5">
+              {tags.map(tag => (
+                <Badge key={tag} variant="secondary" className="gap-1">
+                  #{tag}
+                  <button type="button" onClick={() => setTags(prev => prev.filter(t => t !== tag))} className="text-muted-foreground hover:text-foreground">×</button>
+                </Badge>
+              ))}
+              <input
+                className="flex-1 min-w-[120px] bg-transparent px-1 py-0.5 text-sm outline-none placeholder:text-muted-foreground"
+                placeholder={tags.length >= 5 ? 'Max 5 tags' : 'Ajouter un tag puis Entrée…'}
+                value={tagInput}
+                disabled={tags.length >= 5}
+                onChange={e => setTagInput(e.target.value)}
+                onKeyDown={handleTagKey}
+                onBlur={() => addTag(tagInput)}
+              />
+            </div>
+            <p className="mt-1 text-[11px] text-muted-foreground">Jusqu'à 5 tags pour aider les membres à trouver votre sujet.</p>
+          </div>
         </div>
         <DialogFooter>
           <Button onClick={handleCreate} disabled={creating || !title.trim() || !content.trim() || !categoryId}>
-            {creating ? 'Publication...' : 'Publier'}
+            {creating ? 'Publication...' : 'Publier le sujet'}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
+
 
 // ─── Notifications Panel ───
 function NotificationsPanel() {
@@ -303,11 +365,15 @@ function CategoryHub({
   counts,
   onSelect,
   onDeeplink,
+  onNewTopic,
+  canPost,
 }: {
   categories: any[];
   counts: Record<string, number>;
   onSelect: (slug: string) => void;
   onDeeplink: (to: string) => void;
+  onNewTopic: (categoryId: string) => void;
+  canPost: boolean;
 }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -339,10 +405,15 @@ function CategoryHub({
                 {cat.description && (
                   <p className="mt-3 text-sm text-muted-foreground line-clamp-3 flex-1">{cat.description}</p>
                 )}
-                <div className="mt-4 flex items-center gap-2">
+                <div className="mt-4 flex flex-wrap items-center gap-2">
                   <Button size="sm" variant="outline" className="gap-1" onClick={(e) => { e.stopPropagation(); onSelect(cat.slug); }}>
                     <MessageSquare className="h-3.5 w-3.5" /> Voir les fils
                   </Button>
+                  {canPost && (
+                    <Button size="sm" className="gap-1" onClick={(e) => { e.stopPropagation(); onNewTopic(cat.id); }}>
+                      <Plus className="h-3.5 w-3.5" /> Nouveau sujet
+                    </Button>
+                  )}
                   {link && (
                     <Button
                       size="sm"
@@ -374,6 +445,13 @@ export default function ForumPage() {
   const [session, setSession] = useState<any>(null);
   const [search, setSearch] = useState('');
   const [counts, setCounts] = useState<Record<string, number>>({});
+  const [newPostOpen, setNewPostOpen] = useState(false);
+  const [newPostCat, setNewPostCat] = useState<string | undefined>(undefined);
+
+  const openNewTopic = (categoryId?: string) => {
+    setNewPostCat(categoryId);
+    setNewPostOpen(true);
+  };
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
@@ -456,9 +534,23 @@ export default function ForumPage() {
             onChange={e => setSearch(e.target.value)}
             className="flex-1 min-w-[200px]"
           />
-          {session && <NewPostDialog categories={categories} onCreated={refetch} />}
+          {session && (
+            <Button className="gap-2 bg-gradient-to-r from-primary to-primary/80" onClick={() => openNewTopic(undefined)}>
+              <Plus className="w-4 h-4" /> Nouveau sujet
+            </Button>
+          )}
           {session && <NotificationsPanel />}
         </div>
+
+        {session && (
+          <NewPostDialog
+            categories={categories}
+            onCreated={refetch}
+            open={newPostOpen}
+            onOpenChange={setNewPostOpen}
+            defaultCategoryId={newPostCat}
+          />
+        )}
 
         {/* Category Hub (vue d'accueil façon forum KDP) */}
         {!activeCategory && !search && (
@@ -467,8 +559,11 @@ export default function ForumPage() {
             counts={counts}
             onSelect={(slug) => setSearchParams({ cat: slug })}
             onDeeplink={(to) => navigate(to)}
+            onNewTopic={(categoryId) => openNewTopic(categoryId)}
+            canPost={!!session}
           />
         )}
+
 
         {/* Categories tabs */}
         <div className="flex flex-wrap gap-2">
@@ -492,11 +587,22 @@ export default function ForumPage() {
           ))}
         </div>
 
-        <h2 className="text-lg font-bold text-foreground">
-          {activeCategory
-            ? (categories.find(c => c.slug === activeCategory)?.name || 'Discussions')
-            : search ? 'Résultats de recherche' : 'Discussions récentes'}
-        </h2>
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-lg font-bold text-foreground">
+            {activeCategory
+              ? (categories.find(c => c.slug === activeCategory)?.name || 'Discussions')
+              : search ? 'Résultats de recherche' : 'Discussions récentes'}
+          </h2>
+          {session && activeCategory && (
+            <Button
+              size="sm"
+              className="gap-1"
+              onClick={() => openNewTopic(categories.find(c => c.slug === activeCategory)?.id)}
+            >
+              <Plus className="h-4 w-4" /> Nouveau sujet
+            </Button>
+          )}
+        </div>
 
 
         {/* Posts */}
@@ -545,6 +651,13 @@ export default function ForumPage() {
                             )}
                           </div>
                           <p className="text-sm text-muted-foreground line-clamp-1 mt-0.5">{post.content}</p>
+                          {post.tags?.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-1.5">
+                              {post.tags.map(tag => (
+                                <Badge key={tag} variant="outline" className="text-[10px] text-primary border-primary/30">#{tag}</Badge>
+                              ))}
+                            </div>
+                          )}
                           <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                             <span>{post.author_name}</span>
                             <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {formatDistanceToNow(new Date(post.created_at), { locale: fr, addSuffix: true })}</span>

@@ -24,6 +24,7 @@ export interface ForumPost {
   likes_count: number;
   replies_count: number;
   is_pinned: boolean;
+  tags: string[];
   created_at: string;
   updated_at: string;
   category?: ForumCategory;
@@ -197,7 +198,7 @@ export function useForumNotifications() {
   return { notifications, unreadCount, markAsRead, markAllAsRead, refetch: fetchNotifications };
 }
 
-export async function createForumPost(categoryId: string, title: string, content: string, postType = 'discussion') {
+export async function createForumPost(categoryId: string, title: string, content: string, postType = 'discussion', tags: string[] = []) {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) { toast.error('Vous devez être connecté'); return null; }
 
@@ -209,6 +210,7 @@ export async function createForumPost(categoryId: string, title: string, content
     title,
     content,
     post_type: postType,
+    tags,
   } as any).select().single();
 
   if (error) { toast.error('Erreur lors de la création du post'); return null; }
