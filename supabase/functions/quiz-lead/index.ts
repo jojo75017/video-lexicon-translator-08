@@ -10,11 +10,11 @@ const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 
 const SYSTEMEIO_BASE = "https://api.systeme.io/api";
 
-// Crée (ou récupère) un contact Systeme.io puis lui assigne un tag.
+// Crée (ou récupère) un contact Systeme.io puis lui assigne un ou plusieurs tags.
 async function pushToSystemeIo(
   email: string,
   firstName: string,
-  tag: string,
+  tags: string[],
 ): Promise<{ ok: boolean; detail?: string }> {
   const apiKey = Deno.env.get("SYSTEMEIO_API_KEY");
   if (!apiKey) {
@@ -74,19 +74,21 @@ async function pushToSystemeIo(
   if (!contactId) return { ok: false, detail: "no_contact_id" };
 
 
-  // 2) Assigner le tag (Systeme.io attend un tag déjà créé côté compte ;
+  // 2) Assigner les tags (Systeme.io attend un tag déjà créé côté compte ;
   //    on tente par nom, l'API ignore proprement si non trouvé)
-  try {
-    const tagRes = await fetch(`${SYSTEMEIO_BASE}/contacts/${contactId}/tags`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ tagName: tag }),
-    });
-    if (!tagRes.ok) {
-      console.warn("Systeme.io tag warning", tagRes.status, await tagRes.text());
+  for (const tag of tags) {
+    try {
+      const tagRes = await fetch(`${SYSTEMEIO_BASE}/contacts/${contactId}/tags`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ tagName: tag }),
+      });
+      if (!tagRes.ok) {
+        console.warn("Systeme.io tag warning", tagRes.status, await tagRes.text());
+      }
+    } catch (e) {
+      console.warn("Systeme.io tag exception", (e as Error).message);
     }
-  } catch (e) {
-    console.warn("Systeme.io tag exception", (e as Error).message);
   }
 
   return { ok: true };
@@ -102,6 +104,7 @@ serve(async (req) => {
     const profile_key = String(body.profile_key || "").trim().slice(0, 32);
     const profile_title = String(body.profile_title || "").trim().slice(0, 120);
     const tag = String(body.tag || "quiz-auteur").trim().slice(0, 64);
+    const source = String(body.source || "").trim().slice(0, 32);
     const honeypot = String(body.website || "").trim();
 
     if (honeypot) {
@@ -157,7 +160,9 @@ serve(async (req) => {
     }
 
     // Envoi vers Systeme.io (non bloquant)
-    const sio = await pushToSystemeIo(email, first_name, tag);
+    const tags = [tag];
+    if (source) tags.push(`quiz-source-${source}`);
+    const sio = await pushToSystemeIo(email, first_name, tags);
 
     return new Response(
       JSON.stringify({ ok: true, lead_id: leadId, systemeio: sio.ok, systemeio_detail: sio.detail, profile_key, profile_title }),
