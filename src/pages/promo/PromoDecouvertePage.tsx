@@ -79,11 +79,23 @@ const PromoDecouvertePage = () => {
       )}
 
       {/* Quiz CTA Banner */}
-      <div className="bg-[#008296] text-white text-center py-2 px-4 text-sm font-semibold">
-        <span className="flex items-center justify-center gap-2 flex-wrap">
-          🎯 Découvrez votre profil d'auteur en 2 minutes —
-          <Link to="/quiz?source=promo" className="underline hover:text-[#FF9E2D] transition">Faire le quiz gratuit →</Link>
-        </span>
+      <div className="bg-foreground text-background border-y-8 border-primary shadow-2xl">
+        <div className="max-w-6xl mx-auto px-4 py-8 md:py-10 flex flex-col md:flex-row items-center justify-between gap-5 text-center md:text-left">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 text-sm md:text-base font-black uppercase tracking-wide rounded-full shadow-lg">
+              <Sparkles className="w-5 h-5" /> Quiz gratuit · 2 min
+            </div>
+            <div className="font-black text-2xl md:text-4xl leading-tight">
+              🎯 Découvrez votre profil d'auteur
+            </div>
+          </div>
+          <Link
+            to="/quiz?source=promo"
+            className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 font-black text-xl md:text-2xl px-9 py-5 rounded-md transition-colors shadow-xl min-w-[260px]"
+          >
+            Faire le quiz <ArrowRight className="w-6 h-6" />
+          </Link>
+        </div>
       </div>
 
       {/* HERO */}
