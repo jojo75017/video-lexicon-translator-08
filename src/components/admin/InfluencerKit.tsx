@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { Loader2, Copy, Check, FileText, Image as ImageIcon, Download, Link as LinkIcon } from 'lucide-react';
+import { Loader2, Copy, Check, FileText, Image as ImageIcon, Download, Link as LinkIcon, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import mockup from '@/assets/influenceurs-mockup.jpg';
 import {
