@@ -41,7 +41,11 @@ async function pushToSystemeIo(
 
     if (createRes.ok) {
       const data = await createRes.json().catch(() => ({}));
-      contactId = data?.id ?? null;
+      contactId = data?.id ?? data?.contact?.id ?? null;
+      if (!contactId) {
+        console.error("Systeme.io create OK but no id", createRes.status, JSON.stringify(data));
+        return { ok: false, detail: `created_noid_${createRes.status}:${JSON.stringify(data).slice(0, 200)}` };
+      }
     } else if (createRes.status === 422) {
       // Contact existe déjà — on le retrouve par email
       const findRes = await fetch(
@@ -51,11 +55,14 @@ async function pushToSystemeIo(
       if (findRes.ok) {
         const found = await findRes.json().catch(() => ({}));
         contactId = found?.items?.[0]?.id ?? null;
+        if (!contactId) return { ok: false, detail: `find_noid:${JSON.stringify(found).slice(0, 200)}` };
+      } else {
+        return { ok: false, detail: `find_${findRes.status}:${(await findRes.text()).slice(0, 150)}` };
       }
     } else {
       const txt = await createRes.text();
       console.error("Systeme.io create error", createRes.status, txt);
-      return { ok: false, detail: `create_${createRes.status}` };
+      return { ok: false, detail: `create_${createRes.status}:${txt.slice(0, 200)}` };
     }
   } catch (e) {
     console.error("Systeme.io create exception", (e as Error).message);
@@ -63,6 +70,7 @@ async function pushToSystemeIo(
   }
 
   if (!contactId) return { ok: false, detail: "no_contact_id" };
+
 
   // 2) Assigner le tag (Systeme.io attend un tag déjà créé côté compte ;
   //    on tente par nom, l'API ignore proprement si non trouvé)
