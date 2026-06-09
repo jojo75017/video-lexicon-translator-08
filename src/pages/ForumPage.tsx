@@ -434,11 +434,13 @@ export default function ForumPage() {
 
         {/* Header */}
         <div className="text-center space-y-3">
+          <Badge variant="secondary" className="mx-auto">Communauté Premium · Solutions KDP</Badge>
           <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
-            🏠 Communauté Ebookstudio Pro V2
+            🏠 Centre d'entraide KDP
           </h1>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            Échangez, partagez vos résultats et progressez ensemble avec la communauté des auteurs KDP.
+            Trouvez vite une solution : choisissez une rubrique façon KDP, lisez les fils,
+            et accédez directement à l'outil qui débloque votre situation.
           </p>
           <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
             <span className="flex items-center gap-1"><MessageSquare className="w-4 h-4" /> {totalPosts} discussions</span>
@@ -458,7 +460,17 @@ export default function ForumPage() {
           {session && <NotificationsPanel />}
         </div>
 
-        {/* Categories */}
+        {/* Category Hub (vue d'accueil façon forum KDP) */}
+        {!activeCategory && !search && (
+          <CategoryHub
+            categories={categories}
+            counts={counts}
+            onSelect={(slug) => setSearchParams({ cat: slug })}
+            onDeeplink={(to) => navigate(to)}
+          />
+        )}
+
+        {/* Categories tabs */}
         <div className="flex flex-wrap gap-2">
           <Button
             variant={!activeCategory ? 'default' : 'outline'}
@@ -479,6 +491,13 @@ export default function ForumPage() {
             </Button>
           ))}
         </div>
+
+        <h2 className="text-lg font-bold text-foreground">
+          {activeCategory
+            ? (categories.find(c => c.slug === activeCategory)?.name || 'Discussions')
+            : search ? 'Résultats de recherche' : 'Discussions récentes'}
+        </h2>
+
 
         {/* Posts */}
         {postsLoading ? (
