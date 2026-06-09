@@ -1,42 +1,27 @@
-# Cover Studio Pro — Module V3 premium « couvertures d'une beauté incomparable »
+# Compléter la V3 — modules KDP oubliés
 
-## Objectif
-Ajouter un **nouveau module V3 dédié** centré sur la qualité visuelle maximale des couvertures d'ebooks. Aujourd'hui le studio existant (`EbookAICoverStudio`) génère déjà via `generate-front-cover`, mais le rendu n'est pas poussé au niveau « premium maison d'édition ». On crée une expérience séparée, plus haut de gamme, branchée en priorité sur **OpenAI `gpt-image-2`** (clé déjà présente).
+On a repéré 4 fonctionnalités KDP importantes absentes de la V3. On commence par **les inscrire à la roadmap** (statut « à construire »), pour valider le périmètre avant de coder. Aucun outil n'est développé à cette étape.
 
-## Ce qu'on construit
+## Les 4 modules ajoutés
 
-### 1. Nouvelle edge function `generate-premium-cover`
-Une fonction dédiée, optimisée pour la qualité, indépendante de l'existante.
-- **Modèle prioritaire : `gpt-image-2`** via l'API OpenAI Images (`quality: "high"`, `size: 1024x1536` portrait), fallback `gpt-image-1` puis Gemini 3 Pro Image si OpenAI indisponible.
-- **Étape 1 — Direction artistique IA** : un appel texte (Gemini flash via Lovable AI) transforme titre + sous-titre + genre + niche en un *brief d'art-director* riche (palette, composition, éclairage, références éditoriales, typographie suggérée). Ce brief alimente le prompt image.
-- **Étape 2 — Génération image** avec un prompt « benchmark Penguin/HarperCollins », photoréalisme strict (respect de la règle mémoire : aucune image cartoon/basse fidélité).
-- **Variations** : paramètre `count` (1 à 4) pour générer plusieurs directions d'un coup.
-- Upload de chaque image dans le bucket `ebook-images` et renvoi des URLs publiques (évite de balader le base64).
-- CORS complet, validation Zod de l'entrée, gestion 401/402/429 explicite.
+### 📦 Publier
+- **Livres à contenu faible/nul** — Générateur de carnets, journaux, planners, agendas et cahiers (lignés, pointillés, vierges) : un énorme marché KDP « low/no-content » totalement absent aujourd'hui. Préparation des intérieurs PDF aux formats KDP.
 
-### 2. Nouveau composant `CoverStudioPro` (admin)
-`src/components/admin/CoverStudioPro.tsx`, affiché dans le dialog du Hub V3.
-- Formulaire : titre, sous-titre, auteur, genre, **niche/registre** (presets bestseller), nombre de variations.
-- **Presets premium par niche** (réutilise les `REGISTRES` déjà définis dans `EbookAICoverStudio` : thriller, business, fantasy, wellness, romance, mémoire…) présentés en cartes sélectionnables.
-- Bouton « Générer mes couvertures premium » → appelle `generate-premium-cover`.
-- Galerie de résultats : chaque variation en grand + **test miniature 200×300** (lisibilité Amazon) + bouton Télécharger + « Régénérer cette direction ».
-- Esthétique alignée sur le Hub V3 (noir & or luxe).
+### 💰 Monétiser
+- **Calculateur de redevances Print** — Coût d'impression KDP exact (nombre de pages, couleur/N&B, format broché/relié) et marge nette réelle par marché (US/UK/DE/FR), au-delà du simulateur 35%/70% existant qui ne couvre que l'ebook.
 
-### 3. Branchement V3
-- Ajouter le module dans `src/data/roadmapV3.ts` (pilier `publier`), id `cover-studio-pro`, statut `done`, titre « Cover Studio Pro — Couvertures Premium IA ».
-- Le mapper dans `src/components/admin/v3ModuleRegistry.tsx` (`V3_MODULE_COMPONENTS['cover-studio-pro'] = CoverStudioPro`) pour le rendre cliquable.
+### 📣 Marketing
+- **Optimiseur « Look Inside »** — Optimise les toutes premières pages (l'aperçu Amazon « Regard à l'intérieur ») pour maximiser la conversion : ordre des pages, accroche d'ouverture, ce qui doit apparaître avant le seuil de prévisualisation.
+- **Avis éditoriaux (Editorial Reviews)** — Génère des citations d'avis professionnelles pour la section « Editorial Reviews » de la fiche Amazon (distincte des avis lecteurs).
+
+## Ce qui sera modifié
+
+`src/data/roadmapV3.ts` uniquement : ajout d'un bloc « AJOUTS V3 — compléments KDP » avec ces 4 entrées en `status: 'todo'` (« à construire »), réparties dans les piliers Publier / Monétiser / Marketing. Elles apparaîtront automatiquement dans le Hub V3 grâce au code de rendu existant.
 
 ## Détails techniques
-- Réutilise le pattern d'upload existant vers `ebook-images` (bucket public déjà présent).
-- Secrets : `OPENAI_API_KEY` et `LOVABLE_API_KEY` déjà configurés — rien à demander.
-- Pas de modification de l'edge function `generate-front-cover` existante (zéro régression sur le studio actuel).
-- `verify_jwt = false` par défaut Lovable ; validation des entrées côté fonction.
+- Aucun nouveau composant ni edge function à cette étape.
+- Aucun mapping dans `v3ModuleRegistry.tsx` tant que les modules sont en `todo` (pas encore cliquables/fonctionnels).
+- Mise à jour de la mémoire roadmap V3 pour refléter le nouveau total de modules.
 
-## Hors périmètre (pour cette étape)
-- Éditeur de typographie manuel par-dessus l'image (overlay repositionnable).
-- Mockups 3D et export wrap PDF KDP (déjà couverts par `cover-pdf-exact` et `EbookBookMockup3D`).
-
-Ces deux points pourront constituer une itération « Cover Studio Pro v2 » si tu valides d'abord la qualité de génération.
-
-## Résultat attendu
-Un module V3 distinct qui produit, en quelques secondes, plusieurs couvertures photoréalistes haut de gamme avec direction artistique automatique et test de lisibilité miniature — au niveau visuel d'une vraie maison d'édition.
+## Étape suivante (après validation)
+Une fois la liste validée, on construit chaque module en vrai outil fonctionnel (composant + edge function IA si besoin) comme les autres modules V3, un par un.
