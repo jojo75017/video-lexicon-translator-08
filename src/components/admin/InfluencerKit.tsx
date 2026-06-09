@@ -94,6 +94,29 @@ Dis-moi si tu veux tester 🚀` : '';
     setTimeout(() => setCopied(null), 2000);
   };
 
+  const sendInvite = async () => {
+    if (!email.trim() || !email.includes('@')) return toast.error('Email invalide.');
+    if (!link) return toast.error('Génère d\'abord un lien de suivi.');
+    setSending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-influencer-invite', {
+        body: {
+          email: email.trim(),
+          name,
+          link,
+          commission: formatEuro(commission),
+          commissionV3: formatEuro(COMMISSION_V3),
+        },
+      });
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || 'Échec de l\'envoi.');
+      toast.success(`Invitation envoyée à ${email.trim()} ✓`);
+      setEmail('');
+    } catch (e: any) {
+      toast.error(e?.message || 'Échec de l\'envoi.');
+    } finally { setSending(false); }
+  };
+
   return (
     <div className="space-y-5">
       <p className="text-sm text-muted-foreground">
