@@ -1,27 +1,36 @@
-# Compléter la V3 — modules KDP oubliés
+# Communauté KDP Premium — Ajout à la Roadmap V3
 
-On a repéré 4 fonctionnalités KDP importantes absentes de la V3. On commence par **les inscrire à la roadmap** (statut « à construire »), pour valider le périmètre avant de coder. Aucun outil n'est développé à cette étape.
+## Objectif
+Transformer le forum existant en une **Communauté KDP Premium** façon forum officiel Amazon KDP : des **encarts par catégorie** (rubriques KDP officielles + outils du générateur), un **assistant IA de solutions** pour débloquer les abonnés, des **solutions/FAQ épinglées** par encart, et un **lien direct vers l'outil** qui résout chaque problème. Lecture publique (SEO), écriture réservée aux abonnés.
 
-## Les 4 modules ajoutés
+Pour cette étape, on **n'implémente pas la refonte** : on inscrit ces manques comme **nouveaux modules dans `src/data/roadmapV3.ts`** (pilier `marketing`/`ia`, statut `todo`).
 
-### 📦 Publier
-- **Livres à contenu faible/nul** — Générateur de carnets, journaux, planners, agendas et cahiers (lignés, pointillés, vierges) : un énorme marché KDP « low/no-content » totalement absent aujourd'hui. Préparation des intérieurs PDF aux formats KDP.
+## Ce qui est ajouté à `roadmapV3.ts`
 
-### 💰 Monétiser
-- **Calculateur de redevances Print** — Coût d'impression KDP exact (nombre de pages, couleur/N&B, format broché/relié) et marge nette réelle par marché (US/UK/DE/FR), au-delà du simulateur 35%/70% existant qui ne couvre que l'ebook.
+Nouveau bloc commenté `// ===== AJOUTS V3 — Communauté KDP Premium — à construire =====` avec ces modules :
 
-### 📣 Marketing
-- **Optimiseur « Look Inside »** — Optimise les toutes premières pages (l'aperçu Amazon « Regard à l'intérieur ») pour maximiser la conversion : ordre des pages, accroche d'ouverture, ce qui doit apparaître avant le seuil de prévisualisation.
-- **Avis éditoriaux (Editorial Reviews)** — Génère des citations d'avis professionnelles pour la section « Editorial Reviews » de la fiche Amazon (distincte des avis lecteurs).
+1. **`community-kdp-hub`** (pilier `marketing`)
+   « Communauté KDP Premium — Hub de Solutions »
+   Forum premium avec encarts combinés : rubriques KDP officielles (Marketing & Promotion, Page Amazon, Paiements & Ventes, Gestion du livre, Compte KDP, Mise en forme, Voix de l'auteur, Audiobooks Voix Virtuelle, Traduction Kindle) + encarts liés aux outils du générateur. Lecture publique, écriture réservée aux abonnés.
 
-## Ce qui sera modifié
+2. **`community-ai-unblock`** (pilier `ia`)
+   « Assistant IA Débloquage KDP »
+   Bouton « Débloquer avec l'IA » : à partir de la question/blocage de l'abonné, génère une solution KDP concrète (étapes, modèle d'email au support KDP si besoin) et propose l'outil interne adapté.
 
-`src/data/roadmapV3.ts` uniquement : ajout d'un bloc « AJOUTS V3 — compléments KDP » avec ces 4 entrées en `status: 'todo'` (« à construire »), réparties dans les piliers Publier / Monétiser / Marketing. Elles apparaîtront automatiquement dans le Hub V3 grâce au code de rendu existant.
+3. **`community-pinned-solutions`** (pilier `marketing`)
+   « Solutions & FAQ Épinglées »
+   Articles de solutions types épinglés en haut de chaque encart (problèmes KDP fréquents : compte suspendu, royalties retenues, blocage de contenu, conformité, etc.), éditables.
+
+4. **`community-tool-deeplinks`** (pilier `marketing`)
+   « Liens Directs vers l'Outil »
+   Chaque encart/problème renvoie vers le module du générateur qui résout le blocage (ex. conformité → Vérificateur de Conformité Contenu, couverture refusée → Couverture KDP Exacte, etc.).
+
+Les 4 modules sont créés avec `status: 'todo'`.
 
 ## Détails techniques
-- Aucun nouveau composant ni edge function à cette étape.
-- Aucun mapping dans `v3ModuleRegistry.tsx` tant que les modules sont en `todo` (pas encore cliquables/fonctionnels).
-- Mise à jour de la mémoire roadmap V3 pour refléter le nouveau total de modules.
+- Fichier modifié : `src/data/roadmapV3.ts` uniquement (ajout de 4 entrées `V3Module`).
+- Aucun changement de schéma, de page ou de logique pour cette étape.
+- Réutilisera, lors de la construction future : le forum existant (`ForumPage`, `useForum`, tables `forum_*`), `SubscriberGate` pour l'écriture abonnés, et le pattern Edge Function IA (Gemini BYOK) pour l'assistant.
 
-## Étape suivante (après validation)
-Une fois la liste validée, on construit chaque module en vrai outil fonctionnel (composant + edge function IA si besoin) comme les autres modules V3, un par un.
+## Étape suivante (hors de ce plan)
+Après validation, on pourra construire la refonte : nouveaux encarts combinés, gate lecture publique/écriture abonnés, assistant IA et solutions épinglées.
