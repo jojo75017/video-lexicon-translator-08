@@ -79,13 +79,13 @@ const PromoDecouvertePage = () => {
       )}
 
       {/* Quiz CTA Banner */}
-      <div className="bg-foreground text-background border-y-8 border-primary shadow-2xl">
+      <div className="bg-foreground text-primary-foreground border-y-8 border-primary shadow-2xl">
         <div className="max-w-6xl mx-auto px-4 py-8 md:py-10 flex flex-col md:flex-row items-center justify-between gap-5 text-center md:text-left">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 text-sm md:text-base font-black uppercase tracking-wide rounded-full shadow-lg">
               <Sparkles className="w-5 h-5" /> Quiz gratuit · 2 min
             </div>
-            <div className="font-black text-2xl md:text-4xl leading-tight">
+            <div className="font-black text-2xl md:text-4xl leading-tight text-primary-foreground">
               🎯 Découvrez votre profil d'auteur
             </div>
           </div>
