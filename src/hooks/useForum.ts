@@ -24,6 +24,7 @@ export interface ForumPost {
   likes_count: number;
   replies_count: number;
   is_pinned: boolean;
+  tags: string[];
   created_at: string;
   updated_at: string;
   category?: ForumCategory;
