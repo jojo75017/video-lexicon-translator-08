@@ -150,7 +150,7 @@ serve(async (req) => {
     const sio = await pushToSystemeIo(email, first_name, tag);
 
     return new Response(
-      JSON.stringify({ ok: true, lead_id: leadId, systemeio: sio.ok, profile_key, profile_title }),
+      JSON.stringify({ ok: true, lead_id: leadId, systemeio: sio.ok, systemeio_detail: sio.detail, profile_key, profile_title }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
