@@ -47,6 +47,8 @@ async function pushToSystemeIo(
         return { ok: false, detail: `created_noid_${createRes.status}:${JSON.stringify(data).slice(0, 200)}` };
       }
     } else if (createRes.status === 422) {
+      const cbody = await createRes.text();
+      console.warn("Systeme.io create 422", cbody);
       // Contact existe déjà — on le retrouve par email
       const findRes = await fetch(
         `${SYSTEMEIO_BASE}/contacts?email=${encodeURIComponent(email)}`,
@@ -55,7 +57,7 @@ async function pushToSystemeIo(
       if (findRes.ok) {
         const found = await findRes.json().catch(() => ({}));
         contactId = found?.items?.[0]?.id ?? null;
-        if (!contactId) return { ok: false, detail: `find_noid:${JSON.stringify(found).slice(0, 200)}` };
+        if (!contactId) return { ok: false, detail: `422body:${cbody.slice(0, 250)}` };
       } else {
         return { ok: false, detail: `find_${findRes.status}:${(await findRes.text()).slice(0, 150)}` };
       }
