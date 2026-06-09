@@ -358,11 +358,15 @@ function CategoryHub({
   counts,
   onSelect,
   onDeeplink,
+  onNewTopic,
+  canPost,
 }: {
   categories: any[];
   counts: Record<string, number>;
   onSelect: (slug: string) => void;
   onDeeplink: (to: string) => void;
+  onNewTopic: (categoryId: string) => void;
+  canPost: boolean;
 }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
