@@ -62,6 +62,7 @@ import UniverseBibleCheck from '@/components/admin/UniverseBibleCheck';
 import ClicheDetector from '@/components/admin/ClicheDetector';
 import ToneAdapter from '@/components/admin/ToneAdapter';
 import CommercialScore from '@/components/admin/CommercialScore';
+import InfluencerKit from '@/components/admin/InfluencerKit';
 
 /** Modules dont le dialog s'affiche en largeur réduite (max-w-2xl). */
 export const NARROW_MODULE_IDS: string[] = [
@@ -129,6 +130,7 @@ export const V3_MODULE_COMPONENTS: Record<string, React.ComponentType> = {
   'p24-cliche-detector': ClicheDetector,
   'p25-tone-adapter': ToneAdapter,
   'p26-commercial-score': CommercialScore,
+  'influencer-kit': InfluencerKit,
 };
 
 /** Tous les modules ouvrables (mode hors V3 / cockpit standard). */
