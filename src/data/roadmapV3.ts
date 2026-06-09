@@ -45,6 +45,8 @@ export const V3_MODULES: V3Module[] = [
     description: 'Aperçu visuel Kindle / tablette / phone avec rendu typographique fidèle.' },
   { id: 'cover-pdf-exact',     pillar: 'publier',   status: 'done', title: 'Couverture KDP Exacte (PDF)',
     description: 'Génère le PDF wrap complet (4e + dos + 1re) aux dimensions exactes KDP, bleed + zone ISBN, prêt à uploader.' },
+  { id: 'cover-studio-pro',    pillar: 'publier',   status: 'done', title: 'Cover Studio Pro — Couvertures Premium IA',
+    description: 'Génère des couvertures photoréalistes haut de gamme (qualité maison d’édition) avec direction artistique automatique, presets bestseller par niche, variations multiples et test de lisibilité miniature Amazon.' },
 
   // MONÉTISER
   { id: 'sales-tracker',       pillar: 'monetiser', status: 'done', title: 'Tracker Ventes KDP',

@@ -16,6 +16,7 @@ import ListingOptimizer from '@/components/admin/ListingOptimizer';
 import BookCreationStudio from '@/components/admin/BookCreationStudio';
 import LibraryModule from '@/components/admin/LibraryModule';
 import CoverPdfExact from '@/components/admin/CoverPdfExact';
+import CoverStudioPro from '@/components/admin/CoverStudioPro';
 import AuditPilotModule from '@/components/admin/AuditPilotModule';
 import KdpPackExport from '@/components/admin/KdpPackExport';
 import MultiFormatExport from '@/components/admin/MultiFormatExport';
@@ -82,6 +83,7 @@ export const V3_MODULE_COMPONENTS: Record<string, React.ComponentType> = {
   'book-creation-studio': BookCreationStudio,
   'library': LibraryModule,
   'cover-pdf-exact': CoverPdfExact,
+  'cover-studio-pro': CoverStudioPro,
   'cockpit-audit-pilot': AuditPilotModule,
   'kdp-pack-zip': KdpPackExport,
   'multi-format-express': MultiFormatExport,
