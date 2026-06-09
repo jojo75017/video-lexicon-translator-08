@@ -42,10 +42,7 @@ async function pushToSystemeIo(
     if (createRes.ok) {
       const data = await createRes.json().catch(() => ({}));
       contactId = data?.id ?? data?.contact?.id ?? null;
-      if (!contactId) {
-        console.error("Systeme.io create OK but no id", createRes.status, JSON.stringify(data));
-        return { ok: false, detail: `created_noid_${createRes.status}:${JSON.stringify(data).slice(0, 200)}` };
-      }
+      if (!contactId) return { ok: false, detail: "created_no_id" };
     } else if (createRes.status === 422) {
       const cbody = await createRes.text();
       // Cas 1 : email déjà présent → on récupère le contact existant
