@@ -68,6 +68,7 @@ const QuizPage = () => {
           profile_key: profile.key,
           profile_title: profile.title,
           tag: profile.tag,
+          source: quizSource,
           website,
           landing_url: window.location.href,
         },
