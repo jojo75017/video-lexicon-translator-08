@@ -155,6 +155,26 @@ Dis-moi si tu veux tester 🚀` : '';
                   {copied === 'dm' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />} Copier le message
                 </Button>
               </div>
+
+              <div className="pt-2 border-t">
+                <Label className="text-xs">Envoi automatique par email</Label>
+                <p className="text-[11px] text-muted-foreground mb-1.5">
+                  Envoie l'invitation (lien perso + kit + offre) directement dans la boîte mail de l'influenceur.
+                </p>
+                <div className="flex gap-2">
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="email@influenceur.com"
+                    className="text-xs"
+                  />
+                  <Button onClick={sendInvite} disabled={sending} style={{ background: '#FF9E2D', color: '#232F3E' }}>
+                    {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                    <span className="ml-1.5">Envoyer</span>
+                  </Button>
+                </div>
+              </div>
             </div>
           )}
         </CardContent>
