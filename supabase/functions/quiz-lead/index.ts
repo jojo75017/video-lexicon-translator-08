@@ -162,6 +162,7 @@ serve(async (req) => {
 
     // Envoi vers Systeme.io (non bloquant)
     const tags = [tag];
+    if (base_tag) tags.push(base_tag);
     if (source) tags.push(`quiz-source-${source}`);
     const sio = await pushToSystemeIo(email, first_name, tags);
 
