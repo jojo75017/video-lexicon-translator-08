@@ -224,7 +224,7 @@ const SalesPage = () => {
       <CoachingVipBanner />
 
       {/* TRUST TOP BAR */}
-      <div className="bg-foreground text-background text-xs">
+      <div className="bg-foreground text-primary-foreground text-xs">
         <div className="max-w-7xl mx-auto px-4 py-2 flex flex-wrap items-center justify-center gap-x-6 gap-y-1">
           <span className="flex items-center gap-1.5">
             <ShieldCheck className="w-3.5 h-3.5 text-accent" />
@@ -236,14 +236,14 @@ const SalesPage = () => {
       </div>
 
       {/* Quiz CTA Banner */}
-      <div className="bg-foreground text-background border-y-8 border-primary shadow-2xl">
+      <div className="bg-foreground text-primary-foreground border-y-8 border-primary shadow-2xl">
         <div className="max-w-7xl mx-auto px-4 py-8 md:py-10 flex flex-col lg:flex-row items-center justify-between gap-5 text-center lg:text-left">
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <span className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 text-sm md:text-base font-black uppercase tracking-wide rounded-full shadow-lg">
               <Sparkles className="w-5 h-5" />
               Quiz gratuit · 2 min
             </span>
-            <span className="flex items-center gap-3 font-black text-2xl md:text-4xl leading-tight">
+            <span className="flex items-center gap-3 font-black text-2xl md:text-4xl leading-tight text-primary-foreground">
               <Target className="w-8 h-8 md:w-10 md:h-10 text-primary" />
               Découvrez quel auteur vous êtes
             </span>
