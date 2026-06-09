@@ -41,6 +41,7 @@ import CountdownDeadline from "@/components/sales/CountdownDeadline";
 import KdpRoiCalculator from "@/components/sales/KdpRoiCalculator";
 import TravelConsultCTA from "@/components/sales/TravelConsultCTA";
 import BetaTesterBanner from "@/components/sales/BetaTesterBanner";
+import VideoPlaylistCarousel from "@/components/sales/VideoPlaylistCarousel";
 
 const LAUNCH_PRICE = 67;
 const NORMAL_PRICE = 197;
@@ -440,6 +441,11 @@ const SalesPage = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* ════════════════ 1b. PLAYLIST VIDÉOS ════════════════ */}
+      <VideoPlaylistCarousel />
+
+
 
       {/* ════════════════ 2. LOGOS / TRUST STRIP ════════════════ */}
       <section className="py-10 border-y border-border bg-secondary/40">
