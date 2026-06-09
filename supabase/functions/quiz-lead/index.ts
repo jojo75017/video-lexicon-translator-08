@@ -74,19 +74,21 @@ async function pushToSystemeIo(
   if (!contactId) return { ok: false, detail: "no_contact_id" };
 
 
-  // 2) Assigner le tag (Systeme.io attend un tag déjà créé côté compte ;
+  // 2) Assigner les tags (Systeme.io attend un tag déjà créé côté compte ;
   //    on tente par nom, l'API ignore proprement si non trouvé)
-  try {
-    const tagRes = await fetch(`${SYSTEMEIO_BASE}/contacts/${contactId}/tags`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ tagName: tag }),
-    });
-    if (!tagRes.ok) {
-      console.warn("Systeme.io tag warning", tagRes.status, await tagRes.text());
+  for (const tag of tags) {
+    try {
+      const tagRes = await fetch(`${SYSTEMEIO_BASE}/contacts/${contactId}/tags`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ tagName: tag }),
+      });
+      if (!tagRes.ok) {
+        console.warn("Systeme.io tag warning", tagRes.status, await tagRes.text());
+      }
+    } catch (e) {
+      console.warn("Systeme.io tag exception", (e as Error).message);
     }
-  } catch (e) {
-    console.warn("Systeme.io tag exception", (e as Error).message);
   }
 
   return { ok: true };
