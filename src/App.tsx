@@ -402,6 +402,7 @@ const App = () => {
             <Route path="/crm" element={<AdminGate><CrmPage /></AdminGate>} />
             <Route path="/resultat-en-5-min" element={<ResultatEn5MinPage />} />
             <Route path="/cadeau" element={<CadeauPage />} />
+            <Route path="/quiz" element={<QuizPage />} />
             <Route 
               path="/seo-generator" 
               element={
