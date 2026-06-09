@@ -103,7 +103,8 @@ serve(async (req) => {
     const first_name = String(body.first_name || "").trim().slice(0, 80);
     const profile_key = String(body.profile_key || "").trim().slice(0, 32);
     const profile_title = String(body.profile_title || "").trim().slice(0, 120);
-    const tag = String(body.tag || "quiz-auteur").trim().slice(0, 64);
+    const tag = String(body.tag || "Tag quiz Ebookstudio").trim().slice(0, 64);
+    const base_tag = String(body.base_tag || "").trim().slice(0, 64);
     const source = String(body.source || "").trim().slice(0, 32);
     const honeypot = String(body.website || "").trim();
 
@@ -161,6 +162,7 @@ serve(async (req) => {
 
     // Envoi vers Systeme.io (non bloquant)
     const tags = [tag];
+    if (base_tag) tags.push(base_tag);
     if (source) tags.push(`quiz-source-${source}`);
     const sio = await pushToSystemeIo(email, first_name, tags);
 
