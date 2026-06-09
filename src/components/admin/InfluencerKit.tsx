@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { Loader2, Copy, Check, FileText, Image as ImageIcon, Download, Link as LinkIcon } from 'lucide-react';
+import { Loader2, Copy, Check, FileText, Image as ImageIcon, Download, Link as LinkIcon, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import mockup from '@/assets/influenceurs-mockup.jpg';
 import {
@@ -20,6 +20,8 @@ const InfluencerKit: React.FC = () => {
   const [name, setName] = useState('');
   const [code, setCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [email, setEmail] = useState('');
   const [copied, setCopied] = useState<string | null>(null);
   const [rows, setRows] = useState<Tracking[]>([]);
 
@@ -92,6 +94,29 @@ Dis-moi si tu veux tester 🚀` : '';
     setTimeout(() => setCopied(null), 2000);
   };
 
+  const sendInvite = async () => {
+    if (!email.trim() || !email.includes('@')) return toast.error('Email invalide.');
+    if (!link) return toast.error('Génère d\'abord un lien de suivi.');
+    setSending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-influencer-invite', {
+        body: {
+          email: email.trim(),
+          name,
+          link,
+          commission: formatEuro(commission),
+          commissionV3: formatEuro(COMMISSION_V3),
+        },
+      });
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || 'Échec de l\'envoi.');
+      toast.success(`Invitation envoyée à ${email.trim()} ✓`);
+      setEmail('');
+    } catch (e: any) {
+      toast.error(e?.message || 'Échec de l\'envoi.');
+    } finally { setSending(false); }
+  };
+
   return (
     <div className="space-y-5">
       <p className="text-sm text-muted-foreground">
@@ -129,6 +154,26 @@ Dis-moi si tu veux tester 🚀` : '';
                 <Button variant="outline" size="sm" className="mt-2 gap-1.5" onClick={() => copy(dm, 'dm')}>
                   {copied === 'dm' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />} Copier le message
                 </Button>
+              </div>
+
+              <div className="pt-2 border-t">
+                <Label className="text-xs">Envoi automatique par email</Label>
+                <p className="text-[11px] text-muted-foreground mb-1.5">
+                  Envoie l'invitation (lien perso + kit + offre) directement dans la boîte mail de l'influenceur.
+                </p>
+                <div className="flex gap-2">
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="email@influenceur.com"
+                    className="text-xs"
+                  />
+                  <Button onClick={sendInvite} disabled={sending} style={{ background: '#FF9E2D', color: '#232F3E' }}>
+                    {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                    <span className="ml-1.5">Envoyer</span>
+                  </Button>
+                </div>
               </div>
             </div>
           )}
