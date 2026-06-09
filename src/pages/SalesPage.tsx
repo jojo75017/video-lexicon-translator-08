@@ -236,21 +236,23 @@ const SalesPage = () => {
       </div>
 
       {/* Quiz CTA Banner */}
-      <div className="bg-gradient-to-r from-[#FF9E2D] via-[#ff8a1f] to-[#FF9E2D] text-[#232F3E] shadow-md">
-        <div className="max-w-7xl mx-auto px-4 py-5 md:py-6 flex flex-col sm:flex-row flex-wrap items-center justify-center gap-x-6 gap-y-3 text-center">
-          <span className="inline-flex items-center gap-2 bg-[#232F3E] text-white px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider">
-            <Sparkles className="w-4 h-4" />
-            Gratuit · 2 min
-          </span>
-          <span className="flex items-center gap-2 font-extrabold text-lg md:text-2xl">
-            <Target className="w-6 h-6 md:w-7 md:h-7" />
-            🎯 Découvrez quel auteur vous êtes
-          </span>
+      <div className="bg-foreground text-background border-y-8 border-primary shadow-2xl">
+        <div className="max-w-7xl mx-auto px-4 py-8 md:py-10 flex flex-col lg:flex-row items-center justify-between gap-5 text-center lg:text-left">
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <span className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 text-sm md:text-base font-black uppercase tracking-wide rounded-full shadow-lg">
+              <Sparkles className="w-5 h-5" />
+              Quiz gratuit · 2 min
+            </span>
+            <span className="flex items-center gap-3 font-black text-2xl md:text-4xl leading-tight">
+              <Target className="w-8 h-8 md:w-10 md:h-10 text-primary" />
+              Découvrez quel auteur vous êtes
+            </span>
+          </div>
           <Link
             to="/quiz?source=offres"
-            className="inline-flex items-center gap-2 bg-[#232F3E] text-white hover:bg-black font-extrabold text-base md:text-lg px-6 py-3 rounded-full transition-colors shadow-lg"
+            className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 font-black text-xl md:text-2xl px-9 py-5 rounded-md transition-colors shadow-xl min-w-[260px]"
           >
-            Faire le quiz <ArrowRight className="w-5 h-5" />
+            Faire le quiz <ArrowRight className="w-6 h-6" />
           </Link>
         </div>
       </div>
