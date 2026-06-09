@@ -102,6 +102,13 @@ function PostDetail({ post, onBack }: { post: ForumPost; onBack: () => void }) {
         </CardHeader>
         <CardContent>
           <p className="text-foreground whitespace-pre-wrap leading-relaxed">{post.content}</p>
+          {post.tags?.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-4">
+              {post.tags.map(tag => (
+                <Badge key={tag} variant="outline" className="text-primary border-primary/30">#{tag}</Badge>
+              ))}
+            </div>
+          )}
           <div className="flex items-center gap-4 mt-4 pt-4 border-t">
             <Button variant="ghost" size="sm" onClick={handleLike} disabled={!session} className={liked ? 'text-red-500' : ''}>
               <Heart className={`w-4 h-4 mr-1 ${liked ? 'fill-red-500' : ''}`} /> {likesCount}
