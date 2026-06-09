@@ -580,11 +580,22 @@ export default function ForumPage() {
           ))}
         </div>
 
-        <h2 className="text-lg font-bold text-foreground">
-          {activeCategory
-            ? (categories.find(c => c.slug === activeCategory)?.name || 'Discussions')
-            : search ? 'Résultats de recherche' : 'Discussions récentes'}
-        </h2>
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-lg font-bold text-foreground">
+            {activeCategory
+              ? (categories.find(c => c.slug === activeCategory)?.name || 'Discussions')
+              : search ? 'Résultats de recherche' : 'Discussions récentes'}
+          </h2>
+          {session && activeCategory && (
+            <Button
+              size="sm"
+              className="gap-1"
+              onClick={() => openNewTopic(categories.find(c => c.slug === activeCategory)?.id)}
+            >
+              <Plus className="h-4 w-4" /> Nouveau sujet
+            </Button>
+          )}
+        </div>
 
 
         {/* Posts */}
