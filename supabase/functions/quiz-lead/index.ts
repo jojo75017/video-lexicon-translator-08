@@ -48,18 +48,21 @@ async function pushToSystemeIo(
       }
     } else if (createRes.status === 422) {
       const cbody = await createRes.text();
-      console.warn("Systeme.io create 422", cbody);
-      // Contact existe déjà — on le retrouve par email
-      const findRes = await fetch(
-        `${SYSTEMEIO_BASE}/contacts?email=${encodeURIComponent(email)}`,
-        { headers },
-      );
-      if (findRes.ok) {
-        const found = await findRes.json().catch(() => ({}));
-        contactId = found?.items?.[0]?.id ?? null;
-        if (!contactId) return { ok: false, detail: `422body:${cbody.slice(0, 250)}` };
+      // Cas 1 : email déjà présent → on récupère le contact existant
+      if (/exist|déjà|already/i.test(cbody)) {
+        const findRes = await fetch(
+          `${SYSTEMEIO_BASE}/contacts?email=${encodeURIComponent(email)}`,
+          { headers },
+        );
+        if (findRes.ok) {
+          const found = await findRes.json().catch(() => ({}));
+          contactId = found?.items?.[0]?.id ?? null;
+        }
+        if (!contactId) return { ok: false, detail: "existing_not_found" };
       } else {
-        return { ok: false, detail: `find_${findRes.status}:${(await findRes.text()).slice(0, 150)}` };
+        // Cas 2 : email invalide / non délivrable (rejeté par Systeme.io)
+        console.warn("Systeme.io email rejected", cbody);
+        return { ok: false, detail: "email_rejected" };
       }
     } else {
       const txt = await createRes.text();
