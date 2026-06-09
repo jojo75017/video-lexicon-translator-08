@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Helmet } from "react-helmet";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,8 @@ import { BookOpen, ArrowRight, CheckCircle2, Sparkles, Loader2 } from "lucide-re
 type Step = "intro" | "questions" | "capture" | "result";
 
 const QuizPage = () => {
+  const [searchParams] = useSearchParams();
+  const quizSource = searchParams.get("source") || "direct";
   const [step, setStep] = useState<Step>("intro");
   const [current, setCurrent] = useState(0);
   const [scores, setScores] = useState<Record<ProfileKey, number>>({
