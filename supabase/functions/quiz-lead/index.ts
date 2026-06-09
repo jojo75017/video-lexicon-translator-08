@@ -10,11 +10,11 @@ const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 
 const SYSTEMEIO_BASE = "https://api.systeme.io/api";
 
-// Crée (ou récupère) un contact Systeme.io puis lui assigne un tag.
+// Crée (ou récupère) un contact Systeme.io puis lui assigne un ou plusieurs tags.
 async function pushToSystemeIo(
   email: string,
   firstName: string,
-  tag: string,
+  tags: string[],
 ): Promise<{ ok: boolean; detail?: string }> {
   const apiKey = Deno.env.get("SYSTEMEIO_API_KEY");
   if (!apiKey) {
