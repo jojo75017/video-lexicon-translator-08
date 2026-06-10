@@ -408,6 +408,16 @@ export const exportEbookToPdf = async (opts: {
     }
   }
 
+  // Numérotation des pages (pied de page centré), sauf la page de couverture (page 1).
+  const totalPages = doc.getNumberOfPages();
+  for (let p = 2; p <= totalPages; p++) {
+    doc.setPage(p);
+    doc.setFont(pdfFont, 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(130, 130, 130);
+    doc.text(String(p - 1), pageW / 2, pageH - margin / 2, { align: 'center' });
+  }
+
   const fn = opts.filename.endsWith('.pdf') ? opts.filename : `${opts.filename}.pdf`;
   doc.save(fn);
 };
