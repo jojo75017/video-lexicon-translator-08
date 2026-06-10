@@ -16,6 +16,7 @@ interface Brief {
   subtitle?: string;
   author?: string;
   category?: string;
+  chapterCount?: string;
 }
 
 interface Body {
