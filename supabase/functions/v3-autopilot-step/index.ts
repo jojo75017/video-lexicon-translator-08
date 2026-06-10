@@ -37,13 +37,17 @@ serve(async (req) => {
       moduleDescription = "",
       theme = "",
       priorOutputs = [],
+      userApiKey = "",
     } = body;
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
+    const geminiKey = (userApiKey || "").trim();
+    if (!geminiKey) {
       return new Response(
-        JSON.stringify({ error: "Service IA non configuré (LOVABLE_API_KEY manquante)." }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        JSON.stringify({
+          error:
+            "Clé API Gemini requise. Configurez votre clé personnelle dans Paramètres > Clés API pour utiliser l'auto-pilote.",
+        }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
