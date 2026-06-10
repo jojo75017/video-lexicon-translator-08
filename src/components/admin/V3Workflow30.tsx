@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import {
   ArrowRight, Check, ChevronDown, RotateCcw, Trophy, Lock, Sparkles, Loader2, Wand2, AlertCircle,
-  Pencil, Save, X,
+  Pencil, Save, X, Upload,
 } from 'lucide-react';
 import { getModuleById, type V3Module } from '@/data/roadmapV3';
 import { isModuleClickable } from './v3ModuleRegistry';
@@ -458,6 +458,47 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   };
 
 
+  // Import d'un manuscrit existant (.txt / .md / .docx) — alternative à la rédaction IA.
+  const importInputRef = useRef<HTMLInputElement>(null);
+  const importTargetRef = useRef<string | null>(null);
+  const [importing, setImporting] = useState(false);
+
+  const triggerImport = (moduleId: string) => {
+    importTargetRef.current = moduleId;
+    importInputRef.current?.click();
+  };
+
+  const onImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    const moduleId = importTargetRef.current;
+    e.target.value = ''; // permet de réimporter le même fichier
+    if (!file || !moduleId) return;
+    setError(null);
+    setImporting(true);
+    try {
+      let text = '';
+      const name = file.name.toLowerCase();
+      if (name.endsWith('.docx')) {
+        const mammoth = await import('mammoth');
+        const arrayBuffer = await file.arrayBuffer();
+        const res = await mammoth.extractRawText({ arrayBuffer });
+        text = res.value || '';
+      } else {
+        text = await file.text();
+      }
+      text = text.trim();
+      if (text.length < 100) {
+        throw new Error('Le fichier semble vide ou trop court (min. 100 caractères).');
+      }
+      setResults((prev) => ({ ...prev, [moduleId]: text }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Impossible de lire ce fichier.");
+    } finally {
+      setImporting(false);
+      importTargetRef.current = null;
+    }
+  };
+
   const validate = (id: string) => setDone((prev) => new Set(prev).add(id));
 
   const startEdit = (id: string) => { setEditingId(id); setDraft(results[id] ?? ''); };
@@ -476,6 +517,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
 
   return (
     <section id="parcours" className="mb-12 scroll-mt-20">
+      <input ref={importInputRef} type="file" accept=".txt,.md,.markdown,.docx" className="hidden" onChange={onImportFile} />
       <div className="rounded-3xl border-2 bg-white overflow-hidden shadow-[0_10px_44px_-18px_rgba(232,149,30,0.45)]"
         style={{ borderColor: AMBER }}>
         {/* En-tête + progression */}
@@ -812,12 +854,21 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                               {(isActive || (isDone && result)) && editingId !== step.moduleId && (
                                 <div className="mt-2 flex flex-wrap items-center gap-2">
                                   {!isDone && (
-                                    <button onClick={() => generate(step)} disabled={isLoading}
+                                    <button onClick={() => generate(step)} disabled={isLoading || importing}
                                       className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5 disabled:opacity-60"
                                       style={{ background: `linear-gradient(90deg, ${AMBER}, #FFB44D)` }}>
                                       {isLoading
                                         ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> {isLoading && progress ? `Chapitre ${progress.current} / ${progress.total}…` : "L'IA travaille…"}</>
                                         : <><Sparkles className="h-3.5 w-3.5" /> {result ? 'Régénérer' : 'Générer avec l\'IA'}</>}
+                                    </button>
+                                  )}
+                                  {!isDone && step.moduleId === 'p20-chat-manuscript' && (
+                                    <button onClick={() => triggerImport(step.moduleId)} disabled={isLoading || importing}
+                                      className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold border transition-colors hover:bg-[#FFF3DF] disabled:opacity-60"
+                                      style={{ borderColor: '#eadfc9', color: AMBER_DEEP }}>
+                                      {importing
+                                        ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Import…</>
+                                        : <><Upload className="h-3.5 w-3.5" /> {result ? 'Réimporter un fichier' : 'Importer mon manuscrit'}</>}
                                     </button>
                                   )}
                                   {result && (
