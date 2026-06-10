@@ -1,13 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Sparkles, Crown, Compass } from 'lucide-react';
+import { ArrowLeft, Search, Sparkles, Crown, Compass, Lock } from 'lucide-react';
 import {
-  V3_MODULES, V3_PILLAR_META, type V3Pillar, type V3Module,
+  V3_MODULES, V3_PILLAR_META, getModuleTier, type V3Pillar, type V3Module,
 } from '@/data/roadmapV3';
 import { isModuleClickable, V3ModuleDialog } from '@/components/admin/v3ModuleRegistry';
 import { V3HubTour } from '@/components/admin/V3HubTour';
 import CreateBookHub from '@/components/admin/CreateBookHub';
 import V2V3Compare from '@/components/admin/V2V3Compare';
+import V3PricingTiers from '@/components/admin/V3PricingTiers';
 
 const TOUR_KEY = 'v3hub_tour_done';
 
