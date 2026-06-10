@@ -1,49 +1,66 @@
-# Plan — Refonte du /blog avec guides illustrés (SEO public)
-
 ## Objectif
-Transformer la page `/blog` (cartes à dégradé + icône) en blog de guides illustrés inspiré des captures de référence : grande illustration en haut de carte, badge catégorie en pastille orange clair, titre serif foncé, ligne auteur + date. Ajouter de nouveaux guides SEO complets pour attirer du trafic Google.
 
-## Décisions validées
-- **Auteur affiché : Georges Boubet** (sur toutes les cartes et en-têtes d'articles).
-- **Images : illustrations IA 100% originales** — inspiration du style général (ton orangé KDP, ambiance auteur/édition), mais **aucune copie** des images des captures. Compositions, cadrages et sujets différents pour éviter tout plagiat.
+Mettre en place la grille tarifaire V3 complète : **197€ = base**, **packs upsell à la carte (total = 400€)**, et un **Pack Tout Complet à 497€** qui débloque tout d'un coup. Acheter à la pièce coûte 597€ → le pack complet fait économiser 100€. Ajouter des facilités de paiement (échelonné). Ce lot prépare la donnée et l'affichage ; les produits/prix de paiement réels viendront ensuite.
 
-## Ce qui change
-
-### 1. Design des cartes (BlogPage.tsx)
-- Remplacer le bloc dégradé + icône par une **illustration originale** (ratio ~16:10), badge catégorie en pastille arrondie par-dessus.
-- Grille responsive 2/3 colonnes, hover léger (scale + ombre), titre serif foncé, ligne « Georges Boubet · date » sous le titre.
-- Charte KDP via tokens sémantiques : fond #FAFAFA, accent teal #008296, texte #232F3E, hover #FF9E2D (pas de couleurs en dur).
-- Conserver la bannière magazine ebookstudio.blog et le footer.
-
-### 2. Données enrichies (blogArticles.ts + liste BlogPage)
-- Ajout des champs `image` (illustration importée) et `author` à `BlogArticle`.
-- Catégories alignées : `Auto-édition`, `Ebook & IA`, `Amazon KDP`, `Marketing`, `Site web d'auteur`.
-- Fusion vers une seule source de vérité pour les cartes.
-
-### 3. Nouveaux guides SEO (proposition éditable)
-8 guides à fort potentiel KDP, chacun = article markdown complet + FAQ + table des matières + illustration IA originale :
+## 1. Grille tarifaire (somme calée sur 597€ / 497€)
 
 ```text
-1. Auto-édition Amazon KDP : combien gagne un auteur (et par livre) ?   [Auto-édition]
-2. 6 outils IA pour écrire un livre (gratuit et payant)                 [Ebook & IA]
-3. 7 mots-clés Amazon KDP : comment les utiliser correctement          [Amazon KDP]
-4. Fermeture / suspension de compte Amazon KDP : que faire ?            [Amazon KDP]
-5. KDP Select : mon avis tranché sur la question                       [Amazon KDP]
-6. Comment rédiger une biographie d'auteur (+ modèles)                  [Auto-édition]
-7. Comment créer un site web d'auteur en 45 minutes                     [Site web d'auteur]
-8. Gagner de l'argent avec les ebooks : stratégies rentables           [Marketing]
+BASE V3 — Publication Assistée Pro ............................ 197€ à vie
+  (Création/IA écriture + Publication : tout pour écrire et publier)
+
+UPSELLS À LA CARTE (optionnels)
+  Pack Couverture Pro ........................................  67€
+  Pack Marketing & Lancement ................................. 147€
+  Pack Réseaux Sociaux .......................................  87€
+  Pack Monétisation Pro ......................................  99€
+  ----------------------------------------------------------------
+  Total upsells ............................................. 400€
+
+PRIX SI ON PREND TOUT À LA PIÈCE .......... 197 + 400 = 597€
+PACK TOUT COMPLET (tout débloqué d'un coup) ............... 497€
+  → économie de 100€
 ```
 
-### 4. Illustrations IA (originales)
-- Une illustration par guide, générée via l'outil image, sauvegardée dans `src/assets/blog/`.
-- Style : illustration éditoriale premium, palette orangée KDP cohérente, ambiance bureau d'auteur / édition — **sujets et compositions inédits**, jamais des répliques des captures.
-- Import ES6 dans la carte et en tête d'article ; image OG par article ; alt text descriptif ; lazy-loading.
+### Contenu des packs (modules déjà dans roadmapV3.ts)
+- **Couverture Pro** : Cover Studio Pro (gpt-image-2, direction artistique IA, variantes, test miniature).
+- **Marketing & Lancement** : Optimiseur annonces, Séquence J-7, Amazon Ads, Pricing lancement, Media Kit, Look Inside, Editorial Reviews, BookBub/FB, Page auteur Amazon.
+- **Réseaux Sociaux** : Pinterest Auto-Pins, TikTok/Reels Hooks, Calendrier 30j, Visuels citations, Book Trailer IA, Kit Influenceurs.
+- **Monétisation Pro** : Auto-Pricing, Royalties Dashboard, Simulateur royalties, Bundles, KDP Select Planner, Lead Magnet, Back-catalogue, KU detector, Print royalties.
 
-### 5. SEO
-- Titres <60 car., meta description <160 car., un seul H1 par page, JSON-LD `BlogPosting` enrichi (`image`, `author: Georges Boubet`), canonical, alt text, lazy-loading.
+(Coaching VIP, Licence étendue, Pack templates restent des offres séparées avec leurs prix actuels — non comptés dans les 400€.)
+
+## 2. Facilités de paiement
+
+```text
+BASE 197€            → 1×197€  ou  3×69€
+PACK TOUT COMPLET 497€ → 1×497€  ou  4×129€  ou  6×85€
+```
+(Cohérent avec la mémoire « Échelle 497€ + échelonné ». Coupure d'accès 3 j après échec de prélèvement, comme déjà prévu.)
+
+## 3. Modélisation des données (préparation)
+
+Dans `src/data/roadmapV3.ts` :
+- Ajouter sur `V3Module` les champs optionnels `tier?: 'core' | 'upsell'` et `pack?: string`.
+- Marquer chaque module : `core` (base 197€) ou `upsell` + son `pack`.
+- Ajouter `V3_UPSELL_PACKS` : `id`, `title`, `desc`, `modules[]`, `price`, `installments?`.
+- Ajouter `V3_FULL_PACK` : `price: 497`, `compareAt: 597`, `saves: 100`, `installments: ['1×497€','4×129€','6×85€']`.
+- Garder `V3_PRICE = 197` (base) et ajouter `V3_BASE_INSTALLMENTS = ['1×197€','3×69€']`.
+
+## 4. Affichage Hub V3 (`V3HubPage.tsx`)
+
+- Modules `core` : affichés normalement par pilier.
+- Modules `upsell` : badge doré « PREMIUM / en option ».
+- Nouveau bloc « Tarifs » avec 3 niveaux de lecture :
+  1. **Base 197€** (ce qui est inclus),
+  2. **Packs à la carte** (4 cartes avec prix),
+  3. **Pack Tout Complet 497€** mis en avant (« −100€ », badge « LE PLUS MALIN »), avec les facilités de paiement.
+
+## 5. Hors périmètre (ce lot)
+- Pas encore de produits/prix de paiement réels créés ni de logique d'accès conditionnel par pack. CTA pointent vers le tunnel existant.
+- Étape suivante (à valider) : créer les produits/prix (base, 4 packs, pack complet, échéanciers) et brancher le déverrouillage par pack.
+
+## 6. Mise à jour mémoire
+- V3 : **197€ base + 4 packs upsell (total 400€) ; à la pièce = 597€ ; Pack Tout Complet = 497€ (−100€)** ; facilités base 3×69€, pack complet 4×129€ / 6×85€.
 
 ## Détails techniques
-- `BlogArticle` (blogArticles.ts) : ajout `image: string` et `author: string`.
-- Le tableau `articles` local de `BlogPage.tsx` est aligné sur `blogArticles.ts`.
-- `BlogArticleTemplate.tsx` : ajout illustration d'en-tête + ligne auteur/date.
-- Aucune dépendance nouvelle ; aucune logique backend.
+- Tout reste frontend + données statiques (`roadmapV3.ts`), champs optionnels rétrocompatibles. Aucun module existant ne casse, aucun backend modifié dans ce lot.
