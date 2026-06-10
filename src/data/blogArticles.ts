@@ -53,6 +53,8 @@ export const blogArticles: BlogArticle[] = [
     dateISO: '2025-01-14',
     gradient: 'from-rose-500 to-pink-500',
     iconName: 'PenTool',
+    image: imgAutoEdition,
+    author: BLOG_AUTHOR,
     content: `## Introduction
 
 L'auto-édition sur Amazon KDP (Kindle Direct Publishing) est devenue l'une des méthodes les plus accessibles pour publier un livre et générer des revenus passifs. En 2025, la plateforme offre des outils encore plus puissants pour les auteurs indépendants.
@@ -134,6 +136,8 @@ L'auto-édition sur Amazon KDP est une opportunité formidable en 2025. Avec les
     dateISO: '2025-01-14',
     gradient: 'from-emerald-500 to-teal-500',
     iconName: 'DollarSign',
+    image: imgGagnerArgent,
+    author: BLOG_AUTHOR,
     content: `## Introduction
 
 Gagner de l'argent avec les ebooks est une réalité pour des milliers d'auteurs indépendants. Que ce soit comme revenu complémentaire ou comme activité principale, la vente d'ebooks offre un potentiel de revenus passifs considérable.
@@ -206,6 +210,8 @@ La clé du succès dans la vente d'ebooks réside dans la combinaison d'un conte
     dateISO: '2025-01-14',
     gradient: 'from-indigo-500 to-blue-500',
     iconName: 'Lightbulb',
+    image: imgIdeesEbook,
+    author: BLOG_AUTHOR,
     content: `## Introduction
 
 Trouver la bonne idée d'ebook est souvent la première étape vers le succès. Voici 50 idées d'ebooks rentables classées par catégorie pour vous inspirer.
@@ -315,6 +321,8 @@ Ces 50 idées ne sont qu'un point de départ. Utilisez Ebookstudio Pro V2 pour v
     dateISO: '2026-05-01',
     gradient: 'from-amber-500 to-orange-500',
     iconName: 'Sparkles',
+    image: imgAvisProduit,
+    author: BLOG_AUTHOR,
     content: `## Introduction
 
 Ebookstudio Pro V2 est l'une des plateformes francophones les plus complètes pour créer et publier des ebooks sur Amazon KDP avec l'intelligence artificielle. Après plusieurs mois d'utilisation intensive, voici notre test complet et honnête.
@@ -422,6 +430,8 @@ Ebookstudio Pro V2 tient ses promesses : c'est un générateur d'ebooks IA profe
     dateISO: '2026-05-01',
     gradient: 'from-violet-500 to-purple-600',
     iconName: 'Target',
+    image: imgKdpPilot,
+    author: BLOG_AUTHOR,
     content: `## Introduction
 
 Publier un ebook sur Amazon KDP ne suffit plus. En 2026, la concurrence est telle qu'un livre lancé sans stratégie disparaît en 48h dans les profondeurs du catalogue. La méthode **KDP Pilot** structure votre lancement en 5 phases pour maximiser vos chances de percer.
@@ -536,6 +546,8 @@ KDP Pilot n'est pas une méthode magique. C'est une discipline de publication qu
     dateISO: '2026-05-01',
     gradient: 'from-cyan-500 to-blue-600',
     iconName: 'Headphones',
+    image: imgAudiobook,
+    author: BLOG_AUTHOR,
     content: `## Introduction
 
 Le marché de l'audiobook explose : +24% par an depuis 2022. En France, 1 lecteur sur 4 écoute désormais des livres audio. Et grâce à l'IA, produire un audiobook professionnel ne coûte plus 3 000€ de studio mais quelques minutes de calcul.
