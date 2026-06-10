@@ -161,15 +161,46 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   const activeRef = useRef<HTMLDivElement>(null);
 
   // Fournisseur IA + clé personnelle.
-  const [provider, setProvider] = useState<'gemini' | 'openai'>(
-    () => (localStorage.getItem('v3_workflow30_provider') as 'gemini' | 'openai') || 'gemini',
+  const [provider, setProvider] = useState<'gemini' | 'openai' | 'openrouter'>(
+    () => (localStorage.getItem('v3_workflow30_provider') as 'gemini' | 'openai' | 'openrouter') || 'gemini',
+  );
+  const [model, setModel] = useState<string>(
+    () => localStorage.getItem('v3_workflow30_model') || '',
   );
   const [customKey, setCustomKey] = useState<string>(
     () => localStorage.getItem('v3_workflow30_custom_key') || '',
   );
   useEffect(() => { localStorage.setItem('v3_workflow30_provider', provider); }, [provider]);
+  useEffect(() => { localStorage.setItem('v3_workflow30_model', model); }, [model]);
   useEffect(() => { localStorage.setItem('v3_workflow30_custom_key', customKey); }, [customKey]);
   const effectiveKey = (customKey.trim() || userGeminiKey || '').trim();
+  const MODELS: Record<string, { value: string; label: string }[]> = {
+    gemini: [
+      { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash (rapide)' },
+      { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro (qualité)' },
+      { value: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite (économique)' },
+    ],
+    openai: [
+      { value: 'gpt-4o-mini', label: 'GPT-4o mini (économique)' },
+      { value: 'gpt-4o', label: 'GPT-4o (qualité)' },
+      { value: 'gpt-4.1', label: 'GPT-4.1' },
+      { value: 'gpt-4.1-mini', label: 'GPT-4.1 mini' },
+    ],
+    openrouter: [
+      { value: 'anthropic/claude-3.5-sonnet', label: 'Claude 3.5 Sonnet' },
+      { value: 'anthropic/claude-3.7-sonnet', label: 'Claude 3.7 Sonnet' },
+      { value: 'anthropic/claude-3.5-haiku', label: 'Claude 3.5 Haiku (rapide)' },
+      { value: 'deepseek/deepseek-chat', label: 'DeepSeek V3' },
+      { value: 'deepseek/deepseek-r1', label: 'DeepSeek R1 (raisonnement)' },
+      { value: 'google/gemini-2.5-pro', label: 'Gemini 2.5 Pro' },
+      { value: 'openai/gpt-4o', label: 'GPT-4o' },
+      { value: 'meta-llama/llama-3.3-70b-instruct', label: 'Llama 3.3 70B' },
+      { value: 'mistralai/mistral-large', label: 'Mistral Large' },
+      { value: 'qwen/qwen-2.5-72b-instruct', label: 'Qwen 2.5 72B' },
+      { value: 'x-ai/grok-2', label: 'Grok 2' },
+    ],
+  };
+  const currentModel = model || MODELS[provider][0].value;
 
   // Sauvegarde cloud des projets.
   const [projects, setProjects] = useState<{ id: string; name: string; updated_at: string }[]>([]);
