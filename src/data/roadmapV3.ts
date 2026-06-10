@@ -225,4 +225,16 @@ export const V3_MODULES: V3Module[] = [
   // IA AVANCÉE
   { id: 'community-ai-unblock',     pillar: 'ia',        status: 'todo', title: 'Assistant IA Débloquage KDP',
     description: 'Bouton « Débloquer avec l’IA » : à partir de la question/blocage de l’abonné, génère une solution KDP concrète (étapes, modèle d’email au support KDP si besoin) et propose l’outil interne adapté.' },
+
+  // ===== AJOUTS V3 — Tunnel de prix 497€ + paiement échelonné — à construire (AOÛT) =====
+
+  // MONÉTISER
+  { id: 'pricing-ladder-497',       pillar: 'monetiser', status: 'todo', title: 'Échelle de Prix 497€ (Upsells + Pack Tout Inclus)',
+    description: 'Parcours commercial menant à 497€ : V3 197€ + order bump guides avancés 47€ + OTO1 visuels 97€ + OTO2 communauté/coaching 97€ + OTO3 licence étendue/traduction 59€ (= 497€), OU bouton unique « Pack Tout Inclus » à 497€. Source unique de vérité dans un module pricing dédié.' },
+  { id: 'installment-payments',     pillar: 'monetiser', status: 'todo', title: 'Paiement Échelonné Sécurisé (4×129€ / 6×85€)',
+    description: 'Pack payable en 1×, 4×129€ (516€) ou 6×85€ (510€). Géré par abonnement Stripe à durée limitée pour détecter les échecs. COUPURE AUTOMATIQUE de l’accès 3 JOURS après un paiement échoué (statut suspended → SubscriberGate bloque le lien) ; réactivation auto à la régularisation ; bascule en accès à vie une fois toutes les échéances payées. Relances email Resend à chaque échec + à la suspension.' },
+
+  // PUBLIER — Guides nouveaux abonnés (mix : base offerte + avancés payants)
+  { id: 'onboarding-guides',        pillar: 'publier',   status: 'todo', title: 'Guides Nouveaux Abonnés (Onboarding 7 jours)',
+    description: 'Mix : onboarding « Premiers pas KDP en 7 jours » + 2 guides de base OFFERTS pour activer les nouveaux abonnés ; guides avancés verrouillés avec CTA vers order bump / upsell. Mise en ligne prévue en août avec le tunnel 497€.' },
 ];
