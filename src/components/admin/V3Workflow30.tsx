@@ -147,6 +147,76 @@ function loadResults(): Record<string, string> {
   }
 }
 
+/**
+ * Affiche un résultat IA. Si le texte contient plusieurs sections (titres
+ * markdown # / ## ou « Chapitre »), il est découpé en blocs repliables
+ * façon FAQ pour éviter le « gros pavé ». Sinon il reste affiché tel quel.
+ */
+const ResultView: React.FC<{ text: string }> = ({ text }) => {
+  const sections = useMemo(() => {
+    const lines = text.split('\n');
+    const out: { title: string; body: string }[] = [];
+    let cur: { title: string; body: string } | null = null;
+    const isHeading = (l: string) =>
+      /^#{1,3}\s+/.test(l.trim()) ||
+      /^\s*(chapitre|chapter|partie|section)\b/i.test(l.trim());
+    for (const l of lines) {
+      if (isHeading(l)) {
+        if (cur) out.push(cur);
+        cur = { title: l.replace(/^#{1,3}\s+/, '').trim(), body: '' };
+      } else if (cur) {
+        cur.body += l + '\n';
+      } else if (l.trim()) {
+        cur = { title: 'Introduction', body: l + '\n' };
+      }
+    }
+    if (cur) out.push(cur);
+    return out;
+  }, [text]);
+
+  const [open, setOpen] = useState<Record<number, boolean>>({ 0: true });
+
+  // Pas de découpage utile → rendu direct dans un conteneur scrollable.
+  if (sections.length < 2) {
+    return (
+      <div className="mt-3 rounded-xl border p-4 text-[13px] leading-relaxed v3-md overflow-y-auto v3-scroll"
+        style={{ borderColor: '#eadfc9', background: '#FCFAF4', color: INK, maxHeight: '460px' }}>
+        <ReactMarkdown>{text}</ReactMarkdown>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-3 space-y-2">
+      <div className="flex items-center gap-2 mb-1">
+        <button onClick={() => setOpen(Object.fromEntries(sections.map((_, i) => [i, true])))}
+          className="text-[11px] font-semibold rounded-lg px-2.5 py-1 border transition-colors hover:bg-[#FFF3DF]"
+          style={{ borderColor: '#eadfc9', color: AMBER_DEEP }}>Tout déplier</button>
+        <button onClick={() => setOpen({})}
+          className="text-[11px] font-semibold rounded-lg px-2.5 py-1 border transition-colors hover:bg-[#FFF3DF]"
+          style={{ borderColor: '#eadfc9', color: AMBER_DEEP }}>Tout replier</button>
+        <span className="text-[11px]" style={{ color: '#a18a6c' }}>{sections.length} sections</span>
+      </div>
+      {sections.map((s, i) => (
+        <div key={i} className="rounded-xl border overflow-hidden" style={{ borderColor: '#eadfc9', background: '#FCFAF4' }}>
+          <button type="button" onClick={() => setOpen((p) => ({ ...p, [i]: !p[i] }))}
+            className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-[#FFF3DF]"
+            aria-expanded={!!open[i]}>
+            <span className="text-[13px] font-bold truncate" style={{ color: INK }}>{s.title}</span>
+            <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${open[i] ? 'rotate-180' : ''}`} style={{ color: AMBER_DEEP }} />
+          </button>
+          {open[i] && (
+            <div className="px-4 pb-4 text-[13px] leading-relaxed v3-md overflow-y-auto v3-scroll"
+              style={{ color: INK, maxHeight: '420px' }}>
+              <ReactMarkdown>{s.body.trim()}</ReactMarkdown>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpenModule }) => {
   const { apiKey: userGeminiKey } = useOpenAIConfig();
   const [done, setDone] = useState<Set<string>>(() => loadSet(PROGRESS_KEY));
