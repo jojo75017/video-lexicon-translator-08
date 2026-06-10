@@ -27,8 +27,9 @@ interface Brief {
   subtitle: string;
   author: string;
   category: string;
+  chapterCount: string;
 }
-const EMPTY_BRIEF: Brief = { title: '', subtitle: '', author: '', category: '' };
+const EMPTY_BRIEF: Brief = { title: '', subtitle: '', author: '', category: '', chapterCount: '' };
 function loadBrief(): Brief {
   try {
     const raw = localStorage.getItem(BRIEF_KEY);
