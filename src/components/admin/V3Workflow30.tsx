@@ -665,7 +665,9 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             <button type="button" onClick={() => toggleCfg('projects')}
               className="w-full flex items-center justify-between gap-3 px-4 sm:px-5 py-3.5 text-left transition-colors hover:bg-[#FCF8F0]"
               aria-expanded={openCfg === 'projects'}>
-              <span className="text-[12px] font-bold uppercase tracking-[0.2em]" style={{ color: AMBER_DEEP }}>💾 Mes projets (sauvegarde)</span>
+              <span className="text-[12px] font-bold uppercase tracking-[0.2em]" style={{ color: AMBER_DEEP }}>
+                💾 Mes projets (sauvegarde){projects.length > 0 ? ` · ${projects.length} enregistré${projects.length > 1 ? 's' : ''}` : ''}
+              </span>
               <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${openCfg === 'projects' ? 'rotate-180' : ''}`} style={{ color: AMBER_DEEP }} />
             </button>
             {openCfg === 'projects' && (
