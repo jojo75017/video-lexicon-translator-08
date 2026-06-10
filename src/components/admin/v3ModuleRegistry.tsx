@@ -67,6 +67,9 @@ import LookInsideOptimizer from '@/components/admin/LookInsideOptimizer';
 import EditorialReviews from '@/components/admin/EditorialReviews';
 import CommunityKdpHub from '@/components/admin/CommunityKdpHub';
 import CommunityAiUnblock from '@/components/admin/CommunityAiUnblock';
+import PrintRoyaltiesCalc from '@/components/admin/PrintRoyaltiesCalc';
+import PricingLadder497 from '@/components/admin/PricingLadder497';
+import InstallmentPayments from '@/components/admin/InstallmentPayments';
 
 /** Modules dont le dialog s'affiche en largeur réduite (max-w-2xl). */
 export const NARROW_MODULE_IDS: string[] = [
@@ -141,6 +144,9 @@ export const V3_MODULE_COMPONENTS: Record<string, React.ComponentType> = {
   'community-pinned-solutions': CommunityKdpHub,
   'community-tool-deeplinks': CommunityKdpHub,
   'community-ai-unblock': CommunityAiUnblock,
+  'print-royalties-calc': PrintRoyaltiesCalc,
+  'pricing-ladder-497': PricingLadder497,
+  'installment-payments': InstallmentPayments,
 };
 
 /** Tous les modules ouvrables (mode hors V3 / cockpit standard). */
