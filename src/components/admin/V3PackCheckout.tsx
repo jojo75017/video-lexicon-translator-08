@@ -8,21 +8,37 @@ import { toast } from 'sonner';
 const GOLD = '#c9a84c';
 const GOLD_LIGHT = '#f0d78c';
 
-type PlanId = 'full_1x' | 'full_4x' | 'full_6x';
+type PlanId = 'full_1x' | 'full_4x' | 'full_6x' | 'base_1x' | 'base_3x';
+type Product = 'full' | 'base';
 
-const PLAN_OPTIONS: { id: PlanId; label: string; sub: string }[] = [
-  { id: 'full_1x', label: '1 × 497€', sub: 'Paiement unique · le plus économique' },
-  { id: 'full_4x', label: '4 × 129€', sub: 'Échéancier mensuel (516€)' },
-  { id: 'full_6x', label: '6 × 85€', sub: 'Petit budget (510€)' },
-];
+const PLANS_BY_PRODUCT: Record<Product, { title: string; options: { id: PlanId; label: string; sub: string }[] }> = {
+  full: {
+    title: 'Pack Tout Complet V3',
+    options: [
+      { id: 'full_1x', label: '1 × 497€', sub: 'Paiement unique · le plus économique' },
+      { id: 'full_4x', label: '4 × 129€', sub: 'Échéancier mensuel (516€)' },
+      { id: 'full_6x', label: '6 × 85€', sub: 'Petit budget (510€)' },
+    ],
+  },
+  base: {
+    title: 'Base — Création & Publication',
+    options: [
+      { id: 'base_1x', label: '1 × 197€', sub: 'Paiement unique · le plus économique' },
+      { id: 'base_3x', label: '3 × 69€', sub: 'Échéancier mensuel (207€)' },
+    ],
+  },
+};
 
-/** Modale de paiement du Pack Tout Complet V3 avec choix des mensualités + checkout embarqué. */
-const V3PackCheckout: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onClose }) => {
+/** Modale de paiement V3 (Pack Tout Complet ou Base) avec choix des mensualités + checkout embarqué. */
+const V3PackCheckout: React.FC<{ open: boolean; onClose: () => void; product?: Product }> = ({ open, onClose, product = 'full' }) => {
+  const config = PLANS_BY_PRODUCT[product];
   const [step, setStep] = useState<'form' | 'pay'>('form');
   const [email, setEmail] = useState('');
-  const [plan, setPlan] = useState<PlanId>('full_1x');
+  const [plan, setPlan] = useState<PlanId>(config.options[0].id);
   const [loading, setLoading] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+
+  React.useEffect(() => { setPlan(config.options[0].id); }, [product]);
 
   const reset = useCallback(() => {
     setStep('form'); setClientSecret(null); setLoading(false);
