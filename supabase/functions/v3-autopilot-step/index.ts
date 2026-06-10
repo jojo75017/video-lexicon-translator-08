@@ -34,6 +34,8 @@ interface Body {
   provider?: "gemini" | "openai" | "openrouter";
   model?: string;
   userApiKey?: string;
+  chapterIndex?: number;
+  prevChapterTail?: string;
 }
 
 type CallResult =
