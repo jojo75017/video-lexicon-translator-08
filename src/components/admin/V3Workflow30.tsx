@@ -254,19 +254,56 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             </button>
           </div>
 
-          {/* Thème optionnel */}
-          <div className="mt-5">
-            <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>
-              Thème de départ (facultatif) — laisse vide pour que l'IA choisisse la niche
-            </label>
-            <input
-              value={theme}
-              onChange={(e) => setTheme(e.target.value)}
-              placeholder="Ex : développement personnel pour entrepreneurs débordés…"
-              className="w-full max-w-xl rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none transition-colors"
-              style={{ borderColor: '#eadfc9', color: INK }}
-            />
+          {/* Brief du livre */}
+          <div className="mt-5 rounded-2xl border p-4 sm:p-5" style={{ borderColor: '#eadfc9', background: '#fffdf8' }}>
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-1" style={{ color: AMBER_DEEP }}>
+              Ton projet de livre
+            </p>
+            <p className="text-xs mb-4" style={{ color: '#6f5e47' }}>
+              Renseigne ce que tu sais déjà. Laisse vide ce que tu veux que l'IA propose à ta place
+              (elle peut inventer le titre, le sous-titre et même choisir la niche).
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Titre du livre</label>
+                <input value={brief.title} onChange={(e) => setBriefField('title', e.target.value)} maxLength={150}
+                  placeholder="Ex : Reprendre le contrôle de ton temps"
+                  className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
+                  style={{ borderColor: '#eadfc9', color: INK }} />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Sous-titre</label>
+                <input value={brief.subtitle} onChange={(e) => setBriefField('subtitle', e.target.value)} maxLength={200}
+                  placeholder="Ex : La méthode en 7 étapes pour entrepreneurs débordés"
+                  className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
+                  style={{ borderColor: '#eadfc9', color: INK }} />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Nom de l'auteur</label>
+                <input value={brief.author} onChange={(e) => setBriefField('author', e.target.value)} maxLength={120}
+                  placeholder="Ex : Georges Boubet"
+                  className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
+                  style={{ borderColor: '#eadfc9', color: INK }} />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Catégorie / genre</label>
+                <input value={brief.category} onChange={(e) => setBriefField('category', e.target.value)} maxLength={120}
+                  placeholder="Ex : Développement personnel"
+                  className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
+                  style={{ borderColor: '#eadfc9', color: INK }} />
+              </div>
+            </div>
+            <div className="mt-3">
+              <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>
+                Thème / angle de départ (facultatif) — laisse vide pour que l'IA choisisse la niche
+              </label>
+              <input value={theme} onChange={(e) => setTheme(e.target.value)} maxLength={300}
+                placeholder="Ex : développement personnel pour entrepreneurs débordés…"
+                className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
+                style={{ borderColor: '#eadfc9', color: INK }} />
+            </div>
           </div>
+
 
           {/* Barre de progression */}
           <div className="mt-6">
