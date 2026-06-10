@@ -3,9 +3,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Search, ExternalLink, Users, Copy, Check, UserPlus, Send } from 'lucide-react';
+import { Loader2, Search, ExternalLink, Users, Copy, Check, UserPlus, Send, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   COMMISSION_V3, getActiveCommission, formatEuro, ORIGIN,
@@ -28,9 +29,12 @@ interface InviteState {
   code: string;
   link: string;
   dm: string;
+  niche: string;
   email: string;
   sending: boolean;
+  generating: boolean;
 }
+
 
 const PLATFORMS: { id: Platform; label: string }[] = [
   { id: 'tiktok', label: 'TikTok' },
@@ -118,7 +122,10 @@ Dis-moi si tu veux tester 🚀`;
       if (error) throw error;
       const link = `${ORIGIN}/promo/decouverte?ref=${ins.code}`;
       const dm = buildDm(inf, link);
-      setInvites((s) => ({ ...s, [inf.url]: { code: ins.code, link, dm, email: '', sending: false } }));
+      setInvites((s) => ({
+        ...s,
+        [inf.url]: { code: ins.code, link, dm, niche: keyword.trim(), email: '', sending: false, generating: false },
+      }));
       await navigator.clipboard.writeText(dm);
       // Ouvre le profil pour coller le message en DM en un clic
       window.open(inf.url, '_blank', 'noopener,noreferrer');
@@ -132,6 +139,38 @@ Dis-moi si tu veux tester 🚀`;
 
   const setEmail = (url: string, email: string) =>
     setInvites((s) => ({ ...s, [url]: { ...s[url], email } }));
+
+  const setNiche = (url: string, niche: string) =>
+    setInvites((s) => ({ ...s, [url]: { ...s[url], niche } }));
+
+  const setDm = (url: string, dm: string) =>
+    setInvites((s) => ({ ...s, [url]: { ...s[url], dm } }));
+
+  const generateAi = async (inf: Influencer) => {
+    const inv = invites[inf.url];
+    if (!inv) return;
+    setInvites((s) => ({ ...s, [inf.url]: { ...s[inf.url], generating: true } }));
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-influencer-message', {
+        body: {
+          name: inf.handle || inf.name,
+          niche: inv.niche || keyword.trim(),
+          platform: inf.platform,
+          link: inv.link,
+          commission: formatEuro(commission),
+          commissionV3: formatEuro(COMMISSION_V3),
+          kitUrl: `${ORIGIN}/influenceurs`,
+        },
+      });
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || 'Échec de la génération.');
+      setInvites((s) => ({ ...s, [inf.url]: { ...s[inf.url], dm: data.message || s[inf.url].dm, generating: false } }));
+      toast.success('Message personnalisé généré par IA ✓');
+    } catch (e: any) {
+      toast.error(e?.message || 'Échec de la génération IA.');
+      setInvites((s) => ({ ...s, [inf.url]: { ...s[inf.url], generating: false } }));
+    }
+  };
 
   const sendEmail = async (inf: Influencer) => {
     const inv = invites[inf.url];
@@ -273,10 +312,41 @@ Dis-moi si tu veux tester 🚀`;
                           </Button>
                         </div>
                       </div>
-                      <Button variant="outline" size="sm" className="h-7 gap-1.5" onClick={() => copyValue(inv.dm, inf.url + 'dm')}>
-                        {copied === inf.url + 'dm' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                        <span className="text-[11px]">Copier le message (DM)</span>
-                      </Button>
+                      <div>
+                        <Label className="text-[11px]">Niche / thématique (pour personnaliser)</Label>
+                        <Input
+                          value={inv.niche}
+                          onChange={(e) => setNiche(inf.url, e.target.value)}
+                          placeholder="ex: booktop romance, finances perso..."
+                          className="text-[11px] h-7 mt-1"
+                        />
+                      </div>
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <Label className="text-[11px]">Message d'invitation (éditable)</Label>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-6 gap-1 px-2"
+                            disabled={inv.generating}
+                            onClick={() => generateAi(inf)}
+                            title="Générer un message personnalisé avec l'IA"
+                          >
+                            {inv.generating ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3 text-[#FF9E2D]" />}
+                            <span className="text-[10px]">Générer avec IA</span>
+                          </Button>
+                        </div>
+                        <Textarea
+                          value={inv.dm}
+                          onChange={(e) => setDm(inf.url, e.target.value)}
+                          rows={8}
+                          className="text-[11px] mt-1 font-sans"
+                        />
+                        <Button variant="outline" size="sm" className="h-7 gap-1.5 mt-1.5" onClick={() => copyValue(inv.dm, inf.url + 'dm')}>
+                          {copied === inf.url + 'dm' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                          <span className="text-[11px]">Copier le message (DM)</span>
+                        </Button>
+                      </div>
                       <div>
                         <Label className="text-[11px]">Envoyer l'invitation par email</Label>
                         <div className="flex gap-1.5 mt-1">
