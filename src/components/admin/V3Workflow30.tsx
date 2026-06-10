@@ -19,6 +19,23 @@ const SERIF = "'Georgia', 'Times New Roman', serif";
 const PROGRESS_KEY = 'v3_workflow30_progress';
 const RESULTS_KEY = 'v3_workflow30_results';
 const THEME_KEY = 'v3_workflow30_theme';
+const BRIEF_KEY = 'v3_workflow30_brief';
+
+interface Brief {
+  title: string;
+  subtitle: string;
+  author: string;
+  category: string;
+}
+const EMPTY_BRIEF: Brief = { title: '', subtitle: '', author: '', category: '' };
+function loadBrief(): Brief {
+  try {
+    const raw = localStorage.getItem(BRIEF_KEY);
+    return raw ? { ...EMPTY_BRIEF, ...(JSON.parse(raw) as Partial<Brief>) } : EMPTY_BRIEF;
+  } catch {
+    return EMPTY_BRIEF;
+  }
+}
 
 interface Step {
   moduleId: string;
@@ -132,6 +149,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   const [done, setDone] = useState<Set<string>>(() => loadSet(PROGRESS_KEY));
   const [results, setResults] = useState<Record<string, string>>(() => loadResults());
   const [theme, setTheme] = useState<string>(() => localStorage.getItem(THEME_KEY) ?? '');
+  const [brief, setBrief] = useState<Brief>(() => loadBrief());
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [openPhase, setOpenPhase] = useState<string | null>(PHASES[0].key);
@@ -140,6 +158,8 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   useEffect(() => { localStorage.setItem(PROGRESS_KEY, JSON.stringify([...done])); }, [done]);
   useEffect(() => { localStorage.setItem(RESULTS_KEY, JSON.stringify(results)); }, [results]);
   useEffect(() => { localStorage.setItem(THEME_KEY, theme); }, [theme]);
+  useEffect(() => { localStorage.setItem(BRIEF_KEY, JSON.stringify(brief)); }, [brief]);
+  const setBriefField = (k: keyof Brief, v: string) => setBrief((p) => ({ ...p, [k]: v }));
 
   const completed = useMemo(() => FLAT.filter((s) => done.has(s.moduleId)).length, [done]);
   const pct = Math.round((completed / TOTAL) * 100);
@@ -175,6 +195,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
           moduleTitle: mod?.title ?? step.moduleId,
           moduleDescription: mod?.description ?? '',
           theme,
+          brief,
           priorOutputs,
           userApiKey: userGeminiKey.trim(),
         },
@@ -233,19 +254,56 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             </button>
           </div>
 
-          {/* Thème optionnel */}
-          <div className="mt-5">
-            <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>
-              Thème de départ (facultatif) — laisse vide pour que l'IA choisisse la niche
-            </label>
-            <input
-              value={theme}
-              onChange={(e) => setTheme(e.target.value)}
-              placeholder="Ex : développement personnel pour entrepreneurs débordés…"
-              className="w-full max-w-xl rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none transition-colors"
-              style={{ borderColor: '#eadfc9', color: INK }}
-            />
+          {/* Brief du livre */}
+          <div className="mt-5 rounded-2xl border p-4 sm:p-5" style={{ borderColor: '#eadfc9', background: '#fffdf8' }}>
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-1" style={{ color: AMBER_DEEP }}>
+              Ton projet de livre
+            </p>
+            <p className="text-xs mb-4" style={{ color: '#6f5e47' }}>
+              Renseigne ce que tu sais déjà. Laisse vide ce que tu veux que l'IA propose à ta place
+              (elle peut inventer le titre, le sous-titre et même choisir la niche).
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Titre du livre</label>
+                <input value={brief.title} onChange={(e) => setBriefField('title', e.target.value)} maxLength={150}
+                  placeholder="Ex : Reprendre le contrôle de ton temps"
+                  className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
+                  style={{ borderColor: '#eadfc9', color: INK }} />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Sous-titre</label>
+                <input value={brief.subtitle} onChange={(e) => setBriefField('subtitle', e.target.value)} maxLength={200}
+                  placeholder="Ex : La méthode en 7 étapes pour entrepreneurs débordés"
+                  className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
+                  style={{ borderColor: '#eadfc9', color: INK }} />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Nom de l'auteur</label>
+                <input value={brief.author} onChange={(e) => setBriefField('author', e.target.value)} maxLength={120}
+                  placeholder="Ex : Georges Boubet"
+                  className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
+                  style={{ borderColor: '#eadfc9', color: INK }} />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Catégorie / genre</label>
+                <input value={brief.category} onChange={(e) => setBriefField('category', e.target.value)} maxLength={120}
+                  placeholder="Ex : Développement personnel"
+                  className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
+                  style={{ borderColor: '#eadfc9', color: INK }} />
+              </div>
+            </div>
+            <div className="mt-3">
+              <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>
+                Thème / angle de départ (facultatif) — laisse vide pour que l'IA choisisse la niche
+              </label>
+              <input value={theme} onChange={(e) => setTheme(e.target.value)} maxLength={300}
+                placeholder="Ex : développement personnel pour entrepreneurs débordés…"
+                className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
+                style={{ borderColor: '#eadfc9', color: INK }} />
+            </div>
           </div>
+
 
           {/* Barre de progression */}
           <div className="mt-6">

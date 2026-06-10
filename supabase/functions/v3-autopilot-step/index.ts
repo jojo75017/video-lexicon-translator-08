@@ -11,6 +11,13 @@ interface PriorOutput {
   output: string;
 }
 
+interface Brief {
+  title?: string;
+  subtitle?: string;
+  author?: string;
+  category?: string;
+}
+
 interface Body {
   stepNumber?: number;
   stepTitle?: string;
@@ -18,6 +25,7 @@ interface Body {
   moduleTitle?: string;
   moduleDescription?: string;
   theme?: string;
+  brief?: Brief;
   priorOutputs?: PriorOutput[];
   userApiKey?: string;
 }
@@ -36,6 +44,7 @@ serve(async (req) => {
       moduleTitle = "",
       moduleDescription = "",
       theme = "",
+      brief = {},
       priorOutputs = [],
       userApiKey = "",
     } = body;
@@ -66,6 +75,18 @@ serve(async (req) => {
       ? `Thème / direction donnée par l'auteur : « ${theme.trim()} ».`
       : `Aucun thème imposé : si cette étape consiste à choisir une niche ou un sujet, choisis toi-même la niche la plus rentable et réaliste pour Amazon KDP (marché francophone), en t'appuyant sur des critères concrets (demande, concurrence, rentabilité).`;
 
+    const briefRows = [
+      ["Titre du livre", brief.title],
+      ["Sous-titre", brief.subtitle],
+      ["Nom de l'auteur", brief.author],
+      ["Catégorie / genre", brief.category],
+    ].filter(([, v]) => (v || "").toString().trim());
+    const briefBlock = briefRows.length
+      ? `## Brief fourni par l'auteur\n${briefRows
+          .map(([k, v]) => `- **${k}** : ${(v as string).trim()}`)
+          .join("\n")}\nUtilise ces informations telles quelles et reste cohérent avec elles. Pour les champs non fournis, propose toi-même une valeur pertinente et garde-la cohérente tout au long du parcours.`
+      : `## Brief fourni par l'auteur\nAucun champ rempli : c'est à toi de proposer le titre, le sous-titre, l'auteur (nom de plume si besoin) et la catégorie, puis de rester cohérent avec ces choix sur toutes les étapes.`;
+
     const system = `Tu es l'auto-pilote IA d'EbookStudio, un studio professionnel de publication de livres sur Amazon KDP.
 Tu exécutes UNE étape précise d'un parcours en 30 étapes qui mène de l'idée au livre publié et vendu.
 C'est TOI qui fais le travail concret à la place de l'auteur : tu produis un livrable directement utilisable, pas des conseils génériques ni des "voici comment faire".
@@ -84,6 +105,8 @@ Objectif de l'étape : ${stepHint || moduleDescription}
 Outil correspondant : ${moduleTitle} — ${moduleDescription}
 
 ${themeLine}
+
+${briefBlock}
 
 ## Contexte du projet (décisions des étapes précédentes)
 ${contextText}
