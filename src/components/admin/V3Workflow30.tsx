@@ -434,8 +434,32 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                                 </div>
                               )}
 
+                              {/* Mode brouillon : édition du texte */}
+                              {editingId === step.moduleId && (
+                                <div className="mt-3">
+                                  <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.15em] mb-2" style={{ color: AMBER_DEEP }}>
+                                    <Pencil className="h-3.5 w-3.5" /> Mode brouillon
+                                  </div>
+                                  <textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={14}
+                                    className="w-full rounded-xl border p-4 text-[13px] leading-relaxed font-mono focus:outline-none"
+                                    style={{ borderColor: '#eadfc9', background: '#fffdf8', color: INK }} />
+                                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                                    <button onClick={() => saveEdit(step.moduleId)}
+                                      className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5"
+                                      style={{ background: `linear-gradient(90deg, ${AMBER}, #FFB44D)` }}>
+                                      <Save className="h-3.5 w-3.5" /> Enregistrer le brouillon
+                                    </button>
+                                    <button onClick={cancelEdit}
+                                      className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold border transition-colors hover:bg-[#FFF3DF]"
+                                      style={{ borderColor: '#eadfc9', color: '#8a7860' }}>
+                                      <X className="h-3.5 w-3.5" /> Annuler
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+
                               {/* Résultat IA */}
-                              {result && (isActive || isDone) && (
+                              {result && (isActive || isDone) && editingId !== step.moduleId && (
                                 <div className="mt-3 rounded-xl border p-4 text-[13px] leading-relaxed v3-md"
                                   style={{ borderColor: '#eadfc9', background: '#FCFAF4', color: INK }}>
                                   <ReactMarkdown>{result}</ReactMarkdown>
