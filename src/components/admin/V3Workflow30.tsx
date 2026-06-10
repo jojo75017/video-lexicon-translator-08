@@ -6,6 +6,7 @@ import {
 import { getModuleById, type V3Module } from '@/data/roadmapV3';
 import { isModuleClickable } from './v3ModuleRegistry';
 import { supabase } from '@/integrations/supabase/client';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 // Palette « Clair Ambre » — cohérente avec V3HubPage.
 const AMBER = '#E8951E';
@@ -127,6 +128,7 @@ function loadResults(): Record<string, string> {
 }
 
 const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpenModule }) => {
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
   const [done, setDone] = useState<Set<string>>(() => loadSet(PROGRESS_KEY));
   const [results, setResults] = useState<Record<string, string>>(() => loadResults());
   const [theme, setTheme] = useState<string>(() => localStorage.getItem(THEME_KEY) ?? '');
@@ -155,6 +157,10 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
 
   const generate = async (step: FlatStep) => {
     setError(null);
+    if (!userGeminiKey || !userGeminiKey.trim()) {
+      setError("Configure d'abord ta clé API Gemini dans Paramètres > Clés API pour lancer l'auto-pilote.");
+      return;
+    }
     setLoadingId(step.moduleId);
     try {
       const mod = getModuleById(step.moduleId);
@@ -170,6 +176,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
           moduleDescription: mod?.description ?? '',
           theme,
           priorOutputs,
+          userApiKey: userGeminiKey.trim(),
         },
       });
 

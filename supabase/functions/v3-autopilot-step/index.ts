@@ -19,6 +19,7 @@ interface Body {
   moduleDescription?: string;
   theme?: string;
   priorOutputs?: PriorOutput[];
+  userApiKey?: string;
 }
 
 serve(async (req) => {
@@ -36,13 +37,17 @@ serve(async (req) => {
       moduleDescription = "",
       theme = "",
       priorOutputs = [],
+      userApiKey = "",
     } = body;
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
+    const geminiKey = (userApiKey || "").trim();
+    if (!geminiKey) {
       return new Response(
-        JSON.stringify({ error: "Service IA non configuré (LOVABLE_API_KEY manquante)." }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        JSON.stringify({
+          error:
+            "Clé API Gemini requise. Configurez votre clé personnelle dans Paramètres > Clés API pour utiliser l'auto-pilote.",
+        }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
@@ -87,40 +92,38 @@ ${contextText}
 Réalise concrètement cette étape maintenant et renvoie uniquement le livrable final.`;
 
     const response = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`,
       {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
-          messages: [
-            { role: "system", content: system },
-            { role: "user", content: user },
-          ],
-          temperature: 0.8,
-          max_tokens: 3000,
+          system_instruction: { parts: [{ text: system }] },
+          contents: [{ role: "user", parts: [{ text: user }] }],
+          generationConfig: { temperature: 0.8, maxOutputTokens: 3000 },
         }),
       },
     );
 
     if (response.status === 429) {
       return new Response(
-        JSON.stringify({ error: "Trop de demandes, réessaie dans un instant." }),
+        JSON.stringify({ error: "Limite Gemini atteinte. Réessaie dans un instant." }),
         { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
-    if (response.status === 402) {
+    if (response.status === 400 || response.status === 403) {
+      const t = await response.text();
+      console.error("Gemini auth error", response.status, t);
       return new Response(
-        JSON.stringify({ error: "Crédits IA épuisés. Recharge l'espace de travail pour continuer." }),
-        { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        JSON.stringify({
+          error:
+            "Clé API Gemini invalide ou refusée. Vérifie ta clé dans Paramètres > Clés API.",
+        }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
     if (!response.ok) {
       const t = await response.text();
-      console.error("AI gateway error", response.status, t);
+      console.error("Gemini error", response.status, t);
       return new Response(
         JSON.stringify({ error: "L'IA n'a pas pu générer cette étape. Réessaie." }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
@@ -128,7 +131,8 @@ Réalise concrètement cette étape maintenant et renvoie uniquement le livrable
     }
 
     const data = await response.json();
-    const result: string = data.choices?.[0]?.message?.content?.trim() || "";
+    const result: string =
+      (data.candidates?.[0]?.content?.parts?.[0]?.text || "").trim();
 
     if (!result) {
       return new Response(
