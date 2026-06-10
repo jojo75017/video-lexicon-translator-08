@@ -89,7 +89,7 @@ const V3PackCheckout: React.FC<{ open: boolean; onClose: () => void; product?: P
 
         {step === 'form' ? (
           <>
-            <h3 className="text-xl font-black mb-1" style={{ color: GOLD_LIGHT }}>Pack Tout Complet V3</h3>
+            <h3 className="text-xl font-black mb-1" style={{ color: GOLD_LIGHT }}>{config.title}</h3>
             <p className="text-white/55 text-sm mb-5">Choisis ta facilité de paiement.</p>
 
             <label className="block text-xs font-semibold text-white/60 mb-1">Email</label>
@@ -102,7 +102,7 @@ const V3PackCheckout: React.FC<{ open: boolean; onClose: () => void; product?: P
             />
 
             <div className="space-y-2 mb-6">
-              {PLAN_OPTIONS.map((opt) => {
+              {config.options.map((opt) => {
                 const active = plan === opt.id;
                 return (
                   <button
