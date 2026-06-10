@@ -144,14 +144,21 @@ const BlogArticleTemplate = () => {
               <div className="flex flex-wrap items-center gap-3 mb-4">
                 <Badge className="bg-primary/10 text-primary border-primary/30">{article.category}</Badge>
                 <span className="text-muted-foreground text-sm flex items-center gap-1"><Clock className="w-4 h-4" /> {article.readTime}</span>
-                <span className="text-muted-foreground text-sm">{article.date}</span>
               </div>
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">{article.title}</h1>
-              <p className="text-lg text-muted-foreground">{article.excerpt}</p>
-              <div className="flex items-center gap-2 mt-4">
-                <Badge variant="outline" className="text-xs border-green-500/30 text-green-600 bg-green-500/5"><Target className="w-3 h-3 mr-1" />{article.keyword}</Badge>
-                <Badge variant="outline" className="text-xs border-amber-500/30 text-amber-600 bg-amber-500/5"><TrendingUp className="w-3 h-3 mr-1" />{article.searchVolume}/mois</Badge>
+              <p className="text-lg text-muted-foreground mb-5">{article.excerpt}</p>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+                <span className="font-medium text-foreground">{article.author}</span>
+                <span>·</span>
+                <span>{article.date}</span>
               </div>
+              {article.image && (
+                <img
+                  src={article.image}
+                  alt={article.title}
+                  className="w-full aspect-[16/9] object-cover rounded-2xl border border-border"
+                />
+              )}
             </div>
 
             <TableOfContents items={article.tableOfContents} />
