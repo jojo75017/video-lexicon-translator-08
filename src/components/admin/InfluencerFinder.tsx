@@ -87,10 +87,13 @@ const InfluencerFinder: React.FC = () => {
     }
   };
 
-  const copyValue = async (txt: string, key: string) => {
+  const copyValue = async (txt: string, key: string, label?: string) => {
     await navigator.clipboard.writeText(txt);
     setCopied(key);
-    toast.success('Copié ✓');
+    toast.success('✅ Copié dans le presse-papier', {
+      description: label || 'Colle-le où tu veux avec Ctrl+V.',
+      duration: 3000,
+    });
     setTimeout(() => setCopied(null), 1500);
   };
 
