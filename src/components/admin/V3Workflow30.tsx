@@ -517,6 +517,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
 
   return (
     <section id="parcours" className="mb-12 scroll-mt-20">
+      <input ref={importInputRef} type="file" accept=".txt,.md,.markdown,.docx" className="hidden" onChange={onImportFile} />
       <div className="rounded-3xl border-2 bg-white overflow-hidden shadow-[0_10px_44px_-18px_rgba(232,149,30,0.45)]"
         style={{ borderColor: AMBER }}>
         {/* En-tête + progression */}
