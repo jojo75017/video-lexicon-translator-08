@@ -157,6 +157,10 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
 
   const generate = async (step: FlatStep) => {
     setError(null);
+    if (!userGeminiKey || !userGeminiKey.trim()) {
+      setError("Configure d'abord ta clé API Gemini dans Paramètres > Clés API pour lancer l'auto-pilote.");
+      return;
+    }
     setLoadingId(step.moduleId);
     try {
       const mod = getModuleById(step.moduleId);
