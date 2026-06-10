@@ -149,6 +149,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   const [done, setDone] = useState<Set<string>>(() => loadSet(PROGRESS_KEY));
   const [results, setResults] = useState<Record<string, string>>(() => loadResults());
   const [theme, setTheme] = useState<string>(() => localStorage.getItem(THEME_KEY) ?? '');
+  const [brief, setBrief] = useState<Brief>(() => loadBrief());
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [openPhase, setOpenPhase] = useState<string | null>(PHASES[0].key);
