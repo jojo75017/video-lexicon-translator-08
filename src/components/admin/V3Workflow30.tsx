@@ -501,6 +501,47 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
 
   const validate = (id: string) => setDone((prev) => new Set(prev).add(id));
 
+  // Export du livre généré (PDF KDP / DOCX) directement depuis le parcours.
+  const [exporting, setExporting] = useState<'pdf' | 'docx' | null>(null);
+  const exportBook = async (fmt: 'pdf' | 'docx') => {
+    const text = results['p20-chat-manuscript'] || '';
+    if (text.trim().length < 50) {
+      setError('Génère ou importe d\'abord ton manuscrit avant de l\'exporter.');
+      return;
+    }
+    setError(null);
+    setExporting(fmt);
+    try {
+      const { parseManuscript } = await import('@/lib/manuscriptParser');
+      const docTitle = brief.title?.trim() || theme.trim() || 'Mon livre';
+      const sections = parseManuscript(text, docTitle).map((s) => ({ title: s.title, blocks: s.blocks }));
+      const slug = docTitle
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9]+/g, '-').replace(/(^-|-$)/g, '').toLowerCase() || 'mon-livre';
+      if (fmt === 'pdf') {
+        const { exportEbookToPdf } = await import('@/lib/ebookPdfExporter');
+        await exportEbookToPdf({
+          filename: `${slug}.pdf`,
+          documentTitle: docTitle,
+          documentSubtitle: brief.subtitle?.trim() || undefined,
+          sections,
+        });
+      } else {
+        const { exportEbookToDocx } = await import('@/lib/ebookDocxExporter');
+        await exportEbookToDocx({
+          filename: `${slug}.docx`,
+          documentTitle: docTitle,
+          documentSubtitle: brief.subtitle?.trim() || undefined,
+          sections,
+        });
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Échec de l\'export.');
+    } finally {
+      setExporting(null);
+    }
+  };
+
   const startEdit = (id: string) => { setEditingId(id); setDraft(results[id] ?? ''); };
   const cancelEdit = () => { setEditingId(null); setDraft(''); };
   const saveEdit = (id: string) => {
