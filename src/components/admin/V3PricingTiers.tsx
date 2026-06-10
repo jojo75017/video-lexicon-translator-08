@@ -24,6 +24,7 @@ const V3PricingTiers: React.FC = () => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [baseCheckoutOpen, setBaseCheckoutOpen] = useState(false);
   const [openPack, setOpenPack] = useState<string | null>(null);
+  const [activeModule, setActiveModule] = useState<V3Module | null>(null);
 
   return (
     <section id="tarifs" className="mt-16 scroll-mt-20">
