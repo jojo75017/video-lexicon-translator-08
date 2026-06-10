@@ -226,7 +226,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
     setProjectId(data.id);
     setProjectName(data.name);
     setTheme(data.theme || '');
-    setBrief({ ...EMPTY_BRIEF, ...(data.brief || {}) });
+    setBrief({ ...EMPTY_BRIEF, ...((data.brief as Partial<Brief>) || {}) });
     setDone(new Set((data.done as string[]) || []));
     setResults((data.results as Record<string, string>) || {});
     setCloudMsg('Projet chargé ✓');
