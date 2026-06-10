@@ -652,7 +652,588 @@ L'audiobook IA n'est plus une expérimentation : c'est un canal de revenus matur
       { question: 'Faut-il payer ElevenLabs pour avoir une bonne qualité ?', answer: 'Non. Les voix Azure Neural intégrées dans Ebookstudio Pro V2 offrent une qualité comparable pour une fraction du coût.' },
     ],
   },
+  {
+    slug: 'combien-gagne-auteur-auto-edite',
+    title: 'Combien Gagne un Auteur Auto-Édité (et par Livre) ?',
+    metaTitle: 'Combien Gagne un Auteur Auto-Édité en 2026 ? | Ebookstudio Pro V2',
+    metaDescription: 'Revenus réels d\'un auteur auto-édité sur Amazon KDP : royalties par livre, moyennes mensuelles, exemples chiffrés et leviers pour gagner plus.',
+    excerpt: 'Royalties par livre, revenus mensuels réalistes et leviers concrets : le vrai chiffre des revenus d\'un auteur auto-édité sur Amazon KDP.',
+    category: 'Auto-édition',
+    readTime: '11 min',
+    keyword: 'combien gagne auteur auto-édité',
+    searchVolume: 720,
+    date: '30 Mai 2026',
+    dateISO: '2026-05-30',
+    gradient: 'from-amber-500 to-orange-500',
+    iconName: 'DollarSign',
+    image: imgRevenusAuteur,
+    author: BLOG_AUTHOR,
+    content: `## Introduction
+
+« Combien gagne réellement un auteur auto-édité ? » C'est LA question que tout le monde se pose avant de se lancer. La réponse honnête : cela dépend de votre catalogue, de votre niche et de votre stratégie. Mais on peut donner des chiffres concrets, vérifiables, loin des promesses marketing.
+
+## Comment fonctionnent les royalties Amazon KDP
+
+Sur Amazon KDP, vous touchez un pourcentage sur chaque vente, appelé **royalties**. Deux taux existent pour les ebooks :
+
+- **70 %** pour les ebooks vendus entre 2,99 € et 9,99 €
+- **35 %** en dessous de 2,99 € ou au-dessus de 9,99 €
+
+### Exemple concret par livre
+
+Pour un ebook vendu **6,99 €** en royalties 70 % : vous touchez environ **4,55 €** par vente (après déduction des frais de livraison numérique, minimes pour un ebook texte).
+
+Pour un livre broché vendu **14,99 €**, après coût d'impression, il reste souvent **2 à 4 €** de marge nette.
+
+## Les revenus mensuels réalistes
+
+Voici des fourchettes observées chez les auteurs francophones :
+
+- **Débutant (1 à 3 livres)** : 0 à 150 €/mois
+- **Intermédiaire (5 à 10 livres)** : 200 à 800 €/mois
+- **Confirmé (15 à 30 livres + séries)** : 1 500 à 5 000 €/mois
+- **Top auteurs (catalogue mature)** : 5 000 à 20 000 €/mois
+
+La différence ne vient presque jamais d'un livre miracle, mais du **volume du catalogue** et de la régularité de publication.
+
+## Pourquoi la majorité gagne peu
+
+Soyons lucides : 60 % des auteurs auto-édités gagnent moins de 100 €/mois. Les raisons sont presque toujours les mêmes :
+
+- Un seul livre publié, puis plus rien
+- Une niche choisie par passion et non par demande
+- Une couverture amateur qui ne convertit pas
+- Aucune liste email ni stratégie de lancement
+
+## Les leviers pour gagner plus
+
+### 1. Publier en série
+Un lecteur qui aime le tome 1 achète souvent les tomes 2, 3 et 4. La série multiplie la valeur par lecteur.
+
+### 2. Ajouter une version audio
+Un audiobook se vend 2 à 3 fois plus cher qu'un ebook et touche un public différent.
+
+### 3. Augmenter la cadence
+Avec un outil comme Ebookstudio Pro V2 et son workflow 15 agents, produire un manuscrit de qualité prend des heures, pas des mois. Plus de livres = plus de revenus.
+
+## Conclusion
+
+Un auteur auto-édité peut gagner de quelques euros à plusieurs milliers d'euros par mois. Le facteur décisif n'est pas le talent brut mais la **stratégie de catalogue** : publier régulièrement, en série, dans des niches porteuses, avec des couvertures professionnelles.`,
+    tableOfContents: [
+      { id: 'introduction', title: 'Introduction', level: 2 },
+      { id: 'comment-fonctionnent-les-royalties-amazon-kdp', title: 'Les royalties KDP', level: 2 },
+      { id: 'les-revenus-mensuels-realistes', title: 'Revenus mensuels réalistes', level: 2 },
+      { id: 'pourquoi-la-majorite-gagne-peu', title: 'Pourquoi la majorité gagne peu', level: 2 },
+      { id: 'les-leviers-pour-gagner-plus', title: 'Leviers pour gagner plus', level: 2 },
+      { id: 'conclusion', title: 'Conclusion', level: 2 },
+    ],
+    relatedSlugs: ['gagner-argent-ebook', 'auto-edition-amazon-kdp'],
+    faq: [
+      { question: 'Combien gagne un auteur auto-édité par livre vendu ?', answer: 'En royalties 70 % sur un ebook à 6,99 €, environ 4,55 € par vente. Sur un broché à 14,99 €, 2 à 4 € après coût d\'impression.' },
+      { question: 'Peut-on vivre de l\'auto-édition ?', answer: 'Oui, mais cela demande généralement un catalogue de 15 à 30 livres bien positionnés, idéalement en séries, et une publication régulière.' },
+      { question: 'Quel taux de royalties choisir sur KDP ?', answer: 'Le taux 70 % (prix entre 2,99 € et 9,99 €) est presque toujours le plus avantageux pour un ebook.' },
+      { question: 'Combien de temps avant les premiers revenus ?', answer: 'Souvent quelques semaines à quelques mois. Les premiers livres servent à apprendre ; les revenus significatifs viennent avec le volume.' },
+      { question: 'L\'audio augmente-t-il vraiment les revenus ?', answer: 'Oui. Un audiobook se vend 2 à 3 fois plus cher et touche des auditeurs qui ne lisent pas. C\'est un des meilleurs leviers de revenu additionnel.' },
+    ],
+  },
+  {
+    slug: 'outils-ia-ecrire-livre',
+    title: '6 Outils IA pour Écrire un Livre (Gratuit et Payant)',
+    metaTitle: '6 Outils IA pour Écrire un Livre en 2026 (Gratuit & Payant) | Ebookstudio',
+    metaDescription: 'Comparatif des meilleurs outils IA pour écrire un livre : rédaction, structure, couverture et audio. Solutions gratuites et payantes pour auteurs.',
+    excerpt: 'Comparatif des 6 meilleurs outils IA pour écrire un livre de A à Z : rédaction, plan, couverture, audio. Options gratuites et payantes.',
+    category: 'Ebook & IA',
+    readTime: '10 min',
+    keyword: 'outils ia écrire livre',
+    searchVolume: 880,
+    date: '27 Mai 2026',
+    dateISO: '2026-05-27',
+    gradient: 'from-orange-500 to-amber-500',
+    iconName: 'Sparkles',
+    image: imgOutilsIa,
+    author: BLOG_AUTHOR,
+    content: `## Introduction
+
+Écrire un livre avec l'IA n'est plus de la science-fiction. En 2026, des dizaines d'outils permettent de générer, structurer et illustrer un livre complet. Mais tous ne se valent pas. Voici 6 outils, du plus généraliste au plus spécialisé, pour passer de l'idée au manuscrit publié.
+
+## 1. Les modèles conversationnels (ChatGPT, Gemini)
+
+Parfaits pour le brainstorming, le plan et la rédaction chapitre par chapitre. **Gratuits** dans leurs versions de base.
+
+- **Forces** : flexibilité, rapidité, gratuité
+- **Limites** : aucune mémoire longue durée, cohérence difficile sur un livre entier, mise en page à faire soi-même
+
+## 2. Les assistants d'écriture créative
+
+Pensés pour la fiction : ils aident à maintenir le ton, les personnages et le rythme. **Payants** (abonnements mensuels).
+
+- **Forces** : continuité narrative, suggestions stylistiques
+- **Limites** : coût récurrent, peu adaptés à la non-fiction et au marché KDP
+
+## 3. Les générateurs de couverture IA
+
+La couverture décide jusqu'à 40 % de l'achat. Des outils génèrent des visuels professionnels en quelques secondes.
+
+- **Forces** : qualité visuelle, rapidité
+- **Limites** : il faut ensuite respecter les dimensions exactes KDP (dos, bleed, marges)
+
+## 4. Les voix IA pour audiobook
+
+Azure Neural Voices, ElevenLabs ou OpenAI TTS transforment un texte en narration de qualité studio.
+
+- **Forces** : production audio à coût quasi nul
+- **Limites** : nettoyage du texte requis, segmentation, fusion des fichiers
+
+## 5. Les correcteurs et humaniseurs
+
+Ils relisent, corrigent et suppriment les marqueurs typiques de l'IA pour un rendu naturel.
+
+- **Forces** : qualité finale, lisibilité
+- **Limites** : à utiliser sans dénaturer votre style
+
+## 6. Les plateformes tout-en-un (Ebookstudio Pro V2)
+
+Plutôt que de jongler entre 5 outils, une plateforme intégrée orchestre tout : niche, plan, rédaction multi-agents, humanisation, couverture aux normes KDP et audiobook.
+
+- **Forces** : workflow complet, cohérence garantie, conformité KDP, paiement unique à vie
+- **Limites** : prise en main initiale (formation incluse)
+
+## Gratuit ou payant : que choisir ?
+
+- **Petit budget / test** : modèles conversationnels gratuits + générateur de couverture
+- **Objectif business** : une plateforme tout-en-un évite les pertes de temps et garantit un résultat publiable
+
+## Conclusion
+
+Les outils IA gratuits suffisent pour expérimenter. Mais pour publier régulièrement et vendre, une solution intégrée comme Ebookstudio Pro V2 fait gagner un temps considérable en réunissant rédaction, couverture, audio et conformité KDP au même endroit.`,
+    tableOfContents: [
+      { id: 'introduction', title: 'Introduction', level: 2 },
+      { id: '1-les-modeles-conversationnels-chatgpt-gemini', title: '1. Modèles conversationnels', level: 2 },
+      { id: '2-les-assistants-decriture-creative', title: '2. Assistants d\'écriture', level: 2 },
+      { id: '3-les-generateurs-de-couverture-ia', title: '3. Couvertures IA', level: 2 },
+      { id: '4-les-voix-ia-pour-audiobook', title: '4. Voix IA audiobook', level: 2 },
+      { id: '5-les-correcteurs-et-humaniseurs', title: '5. Correcteurs', level: 2 },
+      { id: '6-les-plateformes-tout-en-un-ebookstudio-pro-v2', title: '6. Plateformes tout-en-un', level: 2 },
+      { id: 'conclusion', title: 'Conclusion', level: 2 },
+    ],
+    relatedSlugs: ['ebookstudio-pro-avis', 'auto-edition-amazon-kdp'],
+    faq: [
+      { question: 'Peut-on écrire un livre entier gratuitement avec l\'IA ?', answer: 'Oui, avec les versions gratuites des modèles conversationnels, mais la cohérence sur un livre entier et la mise en page demandent beaucoup de travail manuel.' },
+      { question: 'Quel est le meilleur outil IA pour la non-fiction KDP ?', answer: 'Une plateforme tout-en-un orientée KDP comme Ebookstudio Pro V2, car elle gère la structure, la conformité et la couverture aux normes Amazon.' },
+      { question: 'Les couvertures IA sont-elles acceptées par Amazon KDP ?', answer: 'Oui, à condition de respecter les dimensions exactes (bleed, marges, dos). Un outil dédié exporte le PDF aux bonnes cotes.' },
+      { question: 'Faut-il déclarer l\'usage de l\'IA ?', answer: 'Pour les audiobooks sur certaines plateformes, oui. Pour les ebooks, la transparence est recommandée mais les règles varient.' },
+      { question: 'L\'IA remplace-t-elle l\'auteur ?', answer: 'Non. L\'IA accélère la production, mais votre vision, votre relecture et votre stratégie restent indispensables.' },
+    ],
+  },
+  {
+    slug: 'mots-cles-amazon-kdp',
+    title: '7 Mots-Clés Amazon KDP : Comment les Utiliser Correctement',
+    metaTitle: '7 Mots-Clés Amazon KDP : Le Guide pour Bien les Utiliser | Ebookstudio',
+    metaDescription: 'Maîtrisez les 7 champs de mots-clés Amazon KDP : méthode de recherche, structure en couches et erreurs à éviter pour être trouvé et vendre plus.',
+    excerpt: 'Les 7 champs de mots-clés KDP sont un levier de visibilité sous-exploité. Méthode complète pour les remplir intelligemment et vendre plus.',
+    category: 'Amazon KDP',
+    readTime: '9 min',
+    keyword: 'mots clés amazon kdp',
+    searchVolume: 590,
+    date: '5 Mai 2026',
+    dateISO: '2026-05-05',
+    gradient: 'from-orange-500 to-amber-600',
+    iconName: 'Target',
+    image: imgMotsCles,
+    author: BLOG_AUTHOR,
+    content: `## Introduction
+
+Amazon KDP vous offre **7 champs de mots-clés** lors de la publication. La plupart des auteurs les remplissent au hasard ou les laissent vides. C'est une erreur coûteuse : ces mots-clés déterminent dans quelles recherches votre livre apparaît.
+
+## À quoi servent vraiment les mots-clés KDP
+
+Les mots-clés ne sont pas de simples tags. Ils indiquent à l'algorithme Amazon **pour quelles requêtes** votre livre doit remonter. Bien choisis, ils placent votre livre devant des acheteurs déjà intéressés.
+
+Chaque champ accepte plusieurs mots : vous pouvez donc cibler des **expressions de longue traîne**, pas seulement des mots isolés.
+
+## La méthode des 3 couches
+
+### Couche 1 — Le mot-clé principal (1 champ)
+Volume élevé, forte concurrence. Exemple : « développement personnel ». Indispensable mais difficile à dominer seul.
+
+### Couche 2 — La longue traîne ciblée (3 champs)
+Volume moyen, concurrence faible. Exemple : « confiance en soi exercices quotidiens ». C'est ici que se gagnent la plupart des ventes.
+
+### Couche 3 — Les niches connexes (3 champs)
+Élargissent votre portée. Exemple : « gestion du stress travail », « routine matinale ». Captent des lecteurs adjacents.
+
+## Comment trouver les bons mots-clés
+
+1. **L'autocomplétion Amazon** : tapez le début d'une requête, notez les suggestions
+2. **Les livres concurrents** : analysez leurs titres et sous-titres
+3. **Un outil dédié** : le module KDP Keyword Research d'Ebookstudio Pro V2 estime volume et concurrence en temps réel
+
+## Les erreurs à éviter
+
+- ❌ Répéter des mots déjà présents dans le titre (inutile, ils sont déjà indexés)
+- ❌ Utiliser des noms de marques ou d'auteurs concurrents (interdit par Amazon)
+- ❌ Mettre des mots non pertinents juste pour le volume
+- ❌ Laisser des champs vides
+- ❌ Oublier d'ajuster les mots-clés après 30 jours selon les performances
+
+## Mots-clés et catégories : le duo gagnant
+
+Les mots-clés travaillent main dans la main avec vos **catégories**. Certains mots-clés spécifiques débloquent même l'accès à des catégories de niche supplémentaires, plus faciles à dominer.
+
+## Conclusion
+
+Bien remplir les 7 champs de mots-clés KDP est l'un des leviers de visibilité les plus rentables — et gratuits. Avec la méthode des 3 couches et un outil de recherche fiable, vous placez votre livre devant les bons lecteurs dès le lancement.`,
+    tableOfContents: [
+      { id: 'introduction', title: 'Introduction', level: 2 },
+      { id: 'a-quoi-servent-vraiment-les-mots-cles-kdp', title: 'À quoi servent les mots-clés', level: 2 },
+      { id: 'la-methode-des-3-couches', title: 'La méthode des 3 couches', level: 2 },
+      { id: 'comment-trouver-les-bons-mots-cles', title: 'Trouver les bons mots-clés', level: 2 },
+      { id: 'les-erreurs-a-eviter', title: 'Erreurs à éviter', level: 2 },
+      { id: 'mots-cles-et-categories-le-duo-gagnant', title: 'Mots-clés et catégories', level: 2 },
+      { id: 'conclusion', title: 'Conclusion', level: 2 },
+    ],
+    relatedSlugs: ['kdp-pilot-strategie-publication', 'auto-edition-amazon-kdp'],
+    faq: [
+      { question: 'Combien de mots peut-on mettre par champ de mots-clés KDP ?', answer: 'Chaque champ accepte plusieurs mots (jusqu\'à 50 caractères). Utilisez-les pour cibler des expressions de longue traîne.' },
+      { question: 'Faut-il répéter les mots du titre dans les mots-clés ?', answer: 'Non, c\'est inutile : les mots du titre et du sous-titre sont déjà indexés. Utilisez les champs pour d\'autres expressions.' },
+      { question: 'Peut-on utiliser le nom d\'un auteur concurrent ?', answer: 'Non, c\'est interdit par Amazon et peut entraîner des sanctions. Restez sur des mots-clés descriptifs.' },
+      { question: 'Peut-on modifier les mots-clés après publication ?', answer: 'Oui, à tout moment. Il est même recommandé de les ajuster après 30 jours selon les performances.' },
+      { question: 'Les mots-clés influencent-ils les catégories ?', answer: 'Oui, certains mots-clés spécifiques débloquent l\'accès à des catégories de niche supplémentaires.' },
+    ],
+  },
+  {
+    slug: 'compte-kdp-suspendu-que-faire',
+    title: 'Fermeture et Suspension de Compte Amazon KDP : Que Faire ?',
+    metaTitle: 'Compte Amazon KDP Suspendu ou Fermé : Que Faire ? | Ebookstudio Pro V2',
+    metaDescription: 'Compte Amazon KDP suspendu ou fermé : causes fréquentes, comment réagir, modèle d\'email au support et prévention pour éviter le blocage.',
+    excerpt: 'Compte KDP suspendu ou fermé ? Causes réelles, étapes pour réagir efficacement, contact du support et prévention pour ne pas récidiver.',
+    category: 'Amazon KDP',
+    readTime: '10 min',
+    keyword: 'compte kdp suspendu',
+    searchVolume: 480,
+    date: '4 Mai 2026',
+    dateISO: '2026-05-04',
+    gradient: 'from-red-500 to-orange-500',
+    iconName: 'Target',
+    image: imgCompteSuspendu,
+    author: BLOG_AUTHOR,
+    content: `## Introduction
+
+Recevoir un email d'Amazon annonçant la **suspension** ou la **fermeture** de votre compte KDP est un choc. Vos revenus s'arrêtent, vos livres disparaissent. Mais dans de nombreux cas, la situation est récupérable si vous réagissez correctement et sans panique.
+
+## Suspension ou fermeture : quelle différence ?
+
+- **Suspension** : blocage temporaire, souvent lié à une vérification ou un doute. Récupérable.
+- **Fermeture (termination)** : décision plus grave, généralement après plusieurs violations. Plus difficile mais pas toujours définitive.
+
+## Les causes les plus fréquentes
+
+1. **Contenu non conforme** : liens externes, mentions promotionnelles, contenu trompeur
+2. **Suspicion de manipulation d'avis** : faux avis, échanges d'avis
+3. **Problème de droits** : contenu protégé, domaine public mal déclaré
+4. **Contenu dupliqué ou de faible qualité** (souvent lié à l'IA mal utilisée)
+5. **Informations fiscales/bancaires incohérentes**
+
+## Les étapes pour réagir
+
+### Étape 1 — Lire attentivement l'email
+Amazon précise (parfois vaguement) la raison. Identifiez la catégorie du problème.
+
+### Étape 2 — Ne pas créer un second compte
+C'est l'erreur fatale : ouvrir un nouveau compte aggrave définitivement la situation.
+
+### Étape 3 — Rassembler vos preuves
+Justificatifs de droits, captures, historique de publication, preuves de conformité.
+
+### Étape 4 — Contacter le support avec un email clair
+Restez factuel, poli, structuré. Demandez des précisions et apportez vos preuves.
+
+### Modèle d'email au support KDP
+
+> Objet : Demande de réexamen — Compte [email]
+>
+> Bonjour,
+> Mon compte a été suspendu le [date]. Je prends cette situation très au sérieux et souhaite me conformer pleinement à vos règles. Pourriez-vous préciser le ou les titres et la nature exacte du problème ? Vous trouverez ci-joint mes justificatifs ([liste]). Je m'engage à corriger immédiatement tout élément non conforme.
+> Cordialement, [Nom]
+
+## Comment éviter la suspension
+
+- ✅ Vérifier la conformité du contenu **avant** publication
+- ✅ Ne jamais acheter ni échanger d'avis
+- ✅ Déclarer correctement les droits et le domaine public
+- ✅ Humaniser et relire le contenu IA pour éviter le « faible valeur ajoutée »
+- ✅ Garder des informations fiscales cohérentes
+
+Le module de Vérification de Conformité d'Ebookstudio Pro V2 détecte les éléments à risque (liens, mentions interdites, contenu promotionnel) avant que vous ne soumettiez votre livre.
+
+## Conclusion
+
+Une suspension KDP n'est pas toujours une fin. Réagissez avec calme, méthode et transparence, sans jamais ouvrir de second compte. Et surtout, prévenez le problème en vérifiant systématiquement la conformité de vos livres avant publication.`,
+    tableOfContents: [
+      { id: 'introduction', title: 'Introduction', level: 2 },
+      { id: 'suspension-ou-fermeture-quelle-difference', title: 'Suspension ou fermeture', level: 2 },
+      { id: 'les-causes-les-plus-frequentes', title: 'Causes fréquentes', level: 2 },
+      { id: 'les-etapes-pour-reagir', title: 'Étapes pour réagir', level: 2 },
+      { id: 'comment-eviter-la-suspension', title: 'Comment éviter la suspension', level: 2 },
+      { id: 'conclusion', title: 'Conclusion', level: 2 },
+    ],
+    relatedSlugs: ['auto-edition-amazon-kdp', 'mots-cles-amazon-kdp'],
+    faq: [
+      { question: 'Mon compte KDP suspendu peut-il être réactivé ?', answer: 'Souvent oui, surtout en cas de suspension temporaire. Contactez le support avec un email factuel et vos preuves de conformité.' },
+      { question: 'Que ne faut-il surtout pas faire ?', answer: 'Ne jamais ouvrir un second compte KDP : c\'est l\'erreur qui rend le bannissement définitif.' },
+      { question: 'Pourquoi Amazon ferme-t-il des comptes ?', answer: 'Contenu non conforme, manipulation d\'avis, problèmes de droits, contenu de faible qualité ou informations fiscales incohérentes.' },
+      { question: 'Le contenu généré par IA peut-il causer une suspension ?', answer: 'Oui s\'il est publié brut, dupliqué ou de faible valeur. Humanisez et relisez systématiquement votre contenu.' },
+      { question: 'Comment éviter une suspension à l\'avenir ?', answer: 'Vérifiez la conformité avant publication, ne touchez pas aux avis et déclarez correctement vos droits.' },
+    ],
+  },
+  {
+    slug: 'kdp-select-avis',
+    title: 'KDP Select : Mon Avis Tranché sur la Question',
+    metaTitle: 'KDP Select : Avantages, Inconvénients et Avis Tranché 2026 | Ebookstudio',
+    metaDescription: 'KDP Select en vaut-il la peine ? Avantages, inconvénients de l\'exclusivité, Kindle Unlimited et quand l\'activer ou non. Avis franc et conseils.',
+    excerpt: 'Exclusivité, Kindle Unlimited, promotions : faut-il activer KDP Select ? Avis tranché, avantages, pièges et stratégie selon votre situation.',
+    category: 'Amazon KDP',
+    readTime: '9 min',
+    keyword: 'kdp select avis',
+    searchVolume: 390,
+    date: '4 Mai 2026',
+    dateISO: '2026-05-04',
+    gradient: 'from-amber-500 to-yellow-500',
+    iconName: 'Target',
+    image: imgKdpSelect,
+    author: BLOG_AUTHOR,
+    content: `## Introduction
+
+KDP Select divise les auteurs. Pour certains, c'est un accélérateur de visibilité ; pour d'autres, une cage dorée. Voici un avis tranché, basé sur les chiffres et l'expérience, pour décider si vous devez l'activer.
+
+## Qu'est-ce que KDP Select ?
+
+KDP Select est un programme **optionnel** d'Amazon. En échange de l'**exclusivité numérique** (votre ebook ne peut être vendu nulle part ailleurs pendant 90 jours), vous obtenez :
+
+- L'inclusion dans **Kindle Unlimited** (KU) et la rémunération aux pages lues
+- Des outils promotionnels : **promotion gratuite** (5 jours) et **Countdown Deals**
+- Un bonus de visibilité algorithmique
+
+## Les avantages réels
+
+### 1. Les revenus Kindle Unlimited
+Vous êtes payé pour chaque page lue par les abonnés KU. Pour un livre captivant, cela peut **dépasser les ventes classiques**.
+
+### 2. Les promotions qui boostent le BSR
+Une promo gratuite bien orchestrée propulse votre BSR, ce qui déclenche l'algorithme Amazon et génère des ventes organiques après la promo.
+
+### 3. Idéal pour démarrer
+Quand on part de zéro sans audience, la visibilité KU est précieuse.
+
+## Les inconvénients à connaître
+
+- ❌ **Exclusivité** : impossible de vendre sur Kobo, Apple Books, Google Play, votre site
+- ❌ **Dépendance totale à Amazon**
+- ❌ **Rémunération aux pages variable** (le taux par page fluctue chaque mois)
+- ❌ Renouvellement automatique tous les 90 jours si vous n'y prêtez pas attention
+
+## Mon avis tranché
+
+**Activez KDP Select si :**
+- Vous débutez sans audience
+- Votre livre est long et « page-turner » (la fiction en profite énormément)
+- Vous voulez profiter du boost de lancement
+
+**Évitez KDP Select si :**
+- Vous avez déjà une audience qui achète en direct (marge 100 %)
+- Vous voulez une distribution multi-plateformes
+- Votre non-fiction est courte (peu de pages lues = peu de revenus KU)
+
+## La stratégie hybride recommandée
+
+Beaucoup d'auteurs activent KDP Select **pour les 90 premiers jours** (boost de lancement + KU), puis évaluent : si KU rapporte, on prolonge ; sinon, on bascule en distribution élargie.
+
+## Conclusion
+
+KDP Select n'est ni un piège, ni une formule magique. C'est un **outil de lancement** excellent pour démarrer, à réévaluer tous les 90 jours selon vos chiffres réels. Gardez le contrôle et ne laissez jamais le renouvellement se faire à l'aveugle.`,
+    tableOfContents: [
+      { id: 'introduction', title: 'Introduction', level: 2 },
+      { id: 'quest-ce-que-kdp-select', title: 'Qu\'est-ce que KDP Select ?', level: 2 },
+      { id: 'les-avantages-reels', title: 'Avantages réels', level: 2 },
+      { id: 'les-inconvenients-a-connaitre', title: 'Inconvénients', level: 2 },
+      { id: 'mon-avis-tranche', title: 'Mon avis tranché', level: 2 },
+      { id: 'la-strategie-hybride-recommandee', title: 'Stratégie hybride', level: 2 },
+      { id: 'conclusion', title: 'Conclusion', level: 2 },
+    ],
+    relatedSlugs: ['kdp-pilot-strategie-publication', 'gagner-argent-ebook'],
+    faq: [
+      { question: 'KDP Select est-il obligatoire ?', answer: 'Non, c\'est un programme optionnel. Vous pouvez publier sur KDP sans l\'activer.' },
+      { question: 'Quelle est la contrepartie de KDP Select ?', answer: 'L\'exclusivité numérique pendant 90 jours : votre ebook ne peut être vendu sur aucune autre plateforme.' },
+      { question: 'Kindle Unlimited rapporte-t-il vraiment ?', answer: 'Oui pour les livres longs et captivants, où les pages lues peuvent dépasser les revenus de vente. Moins pour les non-fictions courtes.' },
+      { question: 'Peut-on quitter KDP Select ?', answer: 'Oui, à la fin de chaque période de 90 jours. Pensez à désactiver le renouvellement automatique si vous voulez sortir.' },
+      { question: 'Faut-il activer KDP Select au lancement ?', answer: 'Souvent oui pour profiter du boost de visibilité, puis réévaluer après 90 jours selon les performances.' },
+    ],
+  },
+  {
+    slug: 'rediger-biographie-auteur',
+    title: 'Comment Rédiger une Biographie d\'Auteur (+ Modèles)',
+    metaTitle: 'Rédiger une Biographie d\'Auteur : Méthode + Modèles 2026 | Ebookstudio',
+    metaDescription: 'Apprenez à rédiger une biographie d\'auteur qui inspire confiance et vend. Structure, ton, erreurs à éviter et modèles prêts à adapter.',
+    excerpt: 'Une bonne bio d\'auteur rassure et convertit. Méthode, structure, ton juste et modèles prêts à adapter pour fiction et non-fiction.',
+    category: 'Auto-édition',
+    readTime: '8 min',
+    keyword: 'biographie auteur',
+    searchVolume: 420,
+    date: '4 Mai 2026',
+    dateISO: '2026-05-04',
+    gradient: 'from-orange-400 to-amber-500',
+    iconName: 'PenTool',
+    image: imgBiographie,
+    author: BLOG_AUTHOR,
+    content: `## Introduction
+
+La biographie d'auteur est l'un des éléments les plus lus de votre fiche Amazon — et l'un des plus négligés. Une bonne bio rassure le lecteur, crédibilise votre livre et peut déclencher l'achat. Voici comment la rédiger, avec des modèles à adapter.
+
+## À quoi sert vraiment une bio d'auteur
+
+- **Crédibiliser** : pourquoi êtes-vous légitime sur ce sujet ?
+- **Créer du lien** : le lecteur achète aussi une personne
+- **Inciter à l'action** : suivre, s'inscrire à la newsletter, lire d'autres livres
+
+## La structure idéale
+
+1. **Accroche** : une phrase qui capte (votre angle, votre mission)
+2. **Légitimité** : expérience, parcours ou passion liée au sujet
+3. **Preuve** : réalisations, chiffres, publications (sans en faire trop)
+4. **Touche humaine** : un détail personnel qui rend mémorable
+5. **Appel à l'action** : site, newsletter, réseaux
+
+## Adapter le ton selon le genre
+
+- **Non-fiction** : misez sur l'expertise et les résultats concrets
+- **Fiction** : misez sur la personnalité, l'univers et le lien émotionnel
+- **Développement personnel** : équilibre entre expertise et vécu inspirant
+
+## Modèle non-fiction
+
+> [Prénom Nom] aide [public cible] à [bénéfice] depuis [durée/expérience]. Après [parcours/réalisation], il/elle partage des méthodes concrètes dans ses livres. [Détail humain]. Retrouvez ses ressources sur [site] et sa newsletter.
+
+## Modèle fiction
+
+> [Prénom Nom] écrit des [genre] qui [promesse émotionnelle]. Passionné(e) de [thème/univers], il/elle [détail personnel attachant]. Quand il/elle n'écrit pas, [anecdote]. Rejoignez ses lecteurs sur [réseau/newsletter].
+
+## Les erreurs à éviter
+
+- ❌ Une bio à la première personne ET à la troisième dans le même texte
+- ❌ Un CV exhaustif et ennuyeux
+- ❌ Aucune preuve ni légitimité
+- ❌ Oublier l'appel à l'action
+- ❌ Une bio trop longue (visez 80 à 150 mots pour Amazon)
+
+## Conclusion
+
+Une biographie d'auteur efficace tient en quelques lignes : une accroche, votre légitimité, une preuve, une touche humaine et un appel à l'action. Soignez-la autant que votre quatrième de couverture : c'est un vendeur silencieux.`,
+    tableOfContents: [
+      { id: 'introduction', title: 'Introduction', level: 2 },
+      { id: 'a-quoi-sert-vraiment-une-bio-dauteur', title: 'À quoi sert une bio', level: 2 },
+      { id: 'la-structure-ideale', title: 'La structure idéale', level: 2 },
+      { id: 'adapter-le-ton-selon-le-genre', title: 'Adapter le ton', level: 2 },
+      { id: 'modele-non-fiction', title: 'Modèle non-fiction', level: 2 },
+      { id: 'modele-fiction', title: 'Modèle fiction', level: 2 },
+      { id: 'les-erreurs-a-eviter', title: 'Erreurs à éviter', level: 2 },
+      { id: 'conclusion', title: 'Conclusion', level: 2 },
+    ],
+    relatedSlugs: ['auto-edition-amazon-kdp', 'creer-site-web-auteur'],
+    faq: [
+      { question: 'Quelle longueur pour une bio d\'auteur Amazon ?', answer: 'Visez 80 à 150 mots : assez pour crédibiliser, assez court pour être lu en entier.' },
+      { question: 'Première ou troisième personne ?', answer: 'Les deux fonctionnent, mais restez cohérent. La troisième personne fait souvent plus professionnel sur Amazon.' },
+      { question: 'Faut-il mettre des informations personnelles ?', answer: 'Un détail humain rend la bio mémorable et crée du lien. Inutile d\'en dire trop : une touche suffit.' },
+      { question: 'Que mettre si je débute sans réalisations ?', answer: 'Misez sur votre passion, votre angle unique et la promesse faite au lecteur plutôt que sur un CV.' },
+      { question: 'Faut-il un appel à l\'action dans la bio ?', answer: 'Oui : invitez à découvrir votre site ou à rejoindre votre newsletter pour construire votre audience.' },
+    ],
+  },
+  {
+    slug: 'creer-site-web-auteur',
+    title: 'Comment Créer un Site Web d\'Auteur en 45 Minutes',
+    metaTitle: 'Créer un Site Web d\'Auteur en 45 Minutes (Guide 2026) | Ebookstudio Pro V2',
+    metaDescription: 'Créez un site web d\'auteur professionnel en 45 minutes : pages essentielles, capture d\'emails, mise en avant des livres et bonnes pratiques.',
+    excerpt: 'Un site d\'auteur professionnel en 45 minutes : pages indispensables, capture d\'emails et mise en avant de vos livres, étape par étape.',
+    category: 'Site web d\'auteur',
+    readTime: '10 min',
+    keyword: 'créer site web auteur',
+    searchVolume: 510,
+    date: '3 Mai 2026',
+    dateISO: '2026-05-03',
+    gradient: 'from-teal-500 to-cyan-500',
+    iconName: 'BookOpen',
+    image: imgSiteAuteur,
+    author: BLOG_AUTHOR,
+    content: `## Introduction
+
+Un site web d'auteur est votre seul actif que vous **possédez vraiment** : Amazon peut suspendre un compte, un réseau social peut changer ses règles, mais votre site reste à vous. Bonne nouvelle : on peut en créer un, propre et efficace, en moins d'une heure.
+
+## Pourquoi un site d'auteur est indispensable
+
+- **Capturer des emails** : votre liste est votre meilleur levier de lancement
+- **Centraliser vos livres** : un seul lien à partager partout
+- **Crédibiliser** : un auteur avec un site inspire confiance
+- **Indépendance** : vous ne dépendez plus uniquement d'Amazon
+
+## Les pages essentielles
+
+1. **Accueil** : qui vous êtes, vos livres phares, un appel clair à s'inscrire
+2. **Livres** : chaque titre avec couverture, résumé et lien d'achat
+3. **À propos** : votre bio d'auteur (voir notre guide dédié)
+4. **Newsletter / Contact** : formulaire de capture d'emails
+5. **Blog (optionnel)** : pour le référencement et le lien avec vos lecteurs
+
+## La méthode en 45 minutes
+
+### Étape 1 (10 min) — Choisir l'outil
+Un constructeur no-code (ou une plateforme intégrée) suffit. Pas besoin de coder.
+
+### Étape 2 (10 min) — La page d'accueil
+Titre clair, votre photo ou un visuel, vos livres et un bouton « Recevoir un chapitre offert ».
+
+### Étape 3 (10 min) — La page Livres
+Importez couvertures, résumés et liens d'achat.
+
+### Étape 4 (10 min) — La capture d'emails
+Proposez un **lead magnet** (chapitre offert, guide PDF) en échange de l'email.
+
+### Étape 5 (5 min) — Vérification mobile
+Plus de 60 % des visites sont mobiles : vérifiez l'affichage sur téléphone.
+
+## Le lead magnet : le cœur du système
+
+Offrir un chapitre ou un guide PDF transforme un visiteur en abonné. C'est ce qui alimente votre liste email — et donc vos futurs lancements. Ebookstudio Pro V2 inclut un **Lead Magnet Builder** pour créer ce contenu offert et son tunnel de capture.
+
+## Les erreurs à éviter
+
+- ❌ Un site sans formulaire d'inscription
+- ❌ Trop de pages inutiles
+- ❌ Des liens d'achat cassés ou absents
+- ❌ Un design illisible sur mobile
+- ❌ Aucune mise à jour après la création
+
+## Conclusion
+
+Créer un site d'auteur ne demande ni budget ni compétences techniques. En 45 minutes, vous obtenez un actif durable qui capture des emails, met en avant vos livres et vous rend indépendant des plateformes. C'est l'un des meilleurs investissements de temps pour un auteur.`,
+    tableOfContents: [
+      { id: 'introduction', title: 'Introduction', level: 2 },
+      { id: 'pourquoi-un-site-dauteur-est-indispensable', title: 'Pourquoi un site d\'auteur', level: 2 },
+      { id: 'les-pages-essentielles', title: 'Les pages essentielles', level: 2 },
+      { id: 'la-methode-en-45-minutes', title: 'La méthode en 45 minutes', level: 2 },
+      { id: 'le-lead-magnet-le-coeur-du-systeme', title: 'Le lead magnet', level: 2 },
+      { id: 'les-erreurs-a-eviter', title: 'Erreurs à éviter', level: 2 },
+      { id: 'conclusion', title: 'Conclusion', level: 2 },
+    ],
+    relatedSlugs: ['rediger-biographie-auteur', 'gagner-argent-ebook'],
+    faq: [
+      { question: 'Faut-il savoir coder pour créer un site d\'auteur ?', answer: 'Non. Un constructeur no-code ou une plateforme intégrée permet de tout faire sans code.' },
+      { question: 'Quelle est la page la plus importante ?', answer: 'La capture d\'emails. Votre liste d\'abonnés est votre meilleur levier pour vos lancements.' },
+      { question: 'Qu\'est-ce qu\'un lead magnet ?', answer: 'Un contenu offert (chapitre, guide PDF) donné en échange de l\'email du visiteur pour construire votre liste.' },
+      { question: 'Combien coûte un site d\'auteur ?', answer: 'On peut démarrer gratuitement ou pour quelques euros par mois (nom de domaine + hébergement).' },
+      { question: 'Un site remplace-t-il Amazon ?', answer: 'Non, il le complète : Amazon vend, votre site capture les lecteurs et vous rend indépendant.' },
+    ],
+  },
 ];
+
 
 export const getArticleBySlug = (slug: string): BlogArticle | undefined => {
   return blogArticles.find(a => a.slug === slug);
