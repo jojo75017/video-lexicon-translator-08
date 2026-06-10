@@ -20,6 +20,7 @@ interface Brief {
 }
 
 interface Body {
+  moduleId?: string;
   stepNumber?: number;
   stepTitle?: string;
   stepHint?: string;
