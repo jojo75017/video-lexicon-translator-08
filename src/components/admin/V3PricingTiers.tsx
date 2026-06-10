@@ -124,10 +124,29 @@ const V3PricingTiers: React.FC = () => {
         </article>
       </div>
 
+      {/* Bandeau de transition : pourquoi des upsells si le livre est déjà publié */}
+      <div className="mt-10 rounded-2xl border p-5 sm:p-6"
+        style={{ borderColor: `${AMBER}55`, background: AMBER_SOFT }}>
+        <div className="flex items-start gap-3">
+          <CheckCircle2 className="h-6 w-6 shrink-0 mt-0.5" style={{ color: '#1f9d6b' }} />
+          <div>
+            <h3 className="text-base sm:text-lg font-bold mb-1" style={{ fontFamily: SERIF, color: INK }}>
+              Avec la Base, ton livre est déjà écrit, publié et prêt à la vente.
+            </h3>
+            <p className="text-sm leading-relaxed" style={{ color: '#6f5e47' }}>
+              Tu n'as <strong>rien d'autre à acheter</strong> pour lancer ton livre. Les packs ci-dessous
+              ne servent pas à « finir » ton livre — ils servent à <strong>vendre plus, plus vite et plus cher</strong> :
+              couvertures haut de gamme, audiobook, page de vente, séquences email, réseaux sociaux et
+              monétisation avancée. À ajouter quand tu veux, uniquement si tu veux accélérer tes ventes.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* 2. Packs à la carte */}
-      <div className="flex items-center gap-2 mb-4 mt-10">
+      <div className="flex items-center gap-2 mb-4 mt-8">
         <Lock className="h-4 w-4" style={{ color: AMBER }} />
-        <h3 className="text-base font-bold" style={{ fontFamily: SERIF, color: INK }}>Packs premium à la carte</h3>
+        <h3 className="text-base font-bold" style={{ fontFamily: SERIF, color: INK }}>Packs premium pour booster tes ventes</h3>
         <span className="text-xs" style={{ color: '#a18a6c' }}>total {V3_UPSELLS_TOTAL}€</span>
         <div className="flex-1 h-px ml-2" style={{ background: `linear-gradient(90deg, ${AMBER}44, transparent)` }} />
       </div>
