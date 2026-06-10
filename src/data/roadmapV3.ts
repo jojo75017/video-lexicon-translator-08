@@ -301,9 +301,9 @@ export const V3_MODULES: V3Module[] = [
     description: 'Coût d’impression KDP exact (pages, couleur/N&B, format broché/relié) et marge nette réelle par marché (US/UK/DE/FR), au-delà du simulateur ebook 35%/70%.' },
 
   // MARKETING
-  { id: 'look-inside-optimizer', pillar: 'marketing', status: 'todo', title: 'Optimiseur « Look Inside »',
+  { id: 'look-inside-optimizer', pillar: 'marketing', status: 'done', title: 'Optimiseur « Look Inside »',
     description: 'Optimise les premières pages de l’aperçu Amazon (« Regard à l’intérieur ») pour convertir : ordre des pages, accroche d’ouverture et ce qui doit apparaître avant le seuil de prévisualisation.' },
-  { id: 'editorial-reviews',     pillar: 'marketing', status: 'todo', title: 'Avis Éditoriaux (Editorial Reviews)',
+  { id: 'editorial-reviews',     pillar: 'marketing', status: 'done', title: 'Avis Éditoriaux (Editorial Reviews)',
     description: 'Génère des citations d’avis professionnelles pour la section « Editorial Reviews » de la fiche Amazon, distincte des avis lecteurs.' },
 
   // ===== AJOUTS V3 — Communauté KDP Premium — à construire =====
