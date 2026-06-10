@@ -458,6 +458,47 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   };
 
 
+  // Import d'un manuscrit existant (.txt / .md / .docx) — alternative à la rédaction IA.
+  const importInputRef = useRef<HTMLInputElement>(null);
+  const importTargetRef = useRef<string | null>(null);
+  const [importing, setImporting] = useState(false);
+
+  const triggerImport = (moduleId: string) => {
+    importTargetRef.current = moduleId;
+    importInputRef.current?.click();
+  };
+
+  const onImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    const moduleId = importTargetRef.current;
+    e.target.value = ''; // permet de réimporter le même fichier
+    if (!file || !moduleId) return;
+    setError(null);
+    setImporting(true);
+    try {
+      let text = '';
+      const name = file.name.toLowerCase();
+      if (name.endsWith('.docx')) {
+        const mammoth = await import('mammoth');
+        const arrayBuffer = await file.arrayBuffer();
+        const res = await mammoth.extractRawText({ arrayBuffer });
+        text = res.value || '';
+      } else {
+        text = await file.text();
+      }
+      text = text.trim();
+      if (text.length < 100) {
+        throw new Error('Le fichier semble vide ou trop court (min. 100 caractères).');
+      }
+      setResults((prev) => ({ ...prev, [moduleId]: text }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Impossible de lire ce fichier.");
+    } finally {
+      setImporting(false);
+      importTargetRef.current = null;
+    }
+  };
+
   const validate = (id: string) => setDone((prev) => new Set(prev).add(id));
 
   const startEdit = (id: string) => { setEditingId(id); setDraft(results[id] ?? ''); };
