@@ -88,7 +88,7 @@ const V3PricingTiers: React.FC = () => {
             <p className="text-sm font-bold mb-4" style={{ color: '#34d399' }}>
               Tu économises {V3_FULL_PACK.saves}€
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 mb-5">
               {V3_FULL_PACK.installments.map((opt) => (
                 <span key={opt} className="text-[11px] font-semibold rounded-full px-3 py-1"
                   style={{ background: `${GOLD}22`, color: GOLD_LIGHT }}>
@@ -96,6 +96,14 @@ const V3PricingTiers: React.FC = () => {
                 </span>
               ))}
             </div>
+            <button
+              onClick={() => setCheckoutOpen(true)}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm font-black transition-transform hover:-translate-y-0.5"
+              style={{ background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, color: '#1a1a1a' }}
+            >
+              <Crown className="h-4 w-4" />
+              Obtenir le Pack Tout Complet
+            </button>
           </div>
         </article>
       </div>
