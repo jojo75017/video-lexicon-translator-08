@@ -26,7 +26,7 @@ interface Influencer {
 const RESERVED = new Set([
   "tag", "video", "reel", "reels", "p", "explore", "channel", "c", "watch",
   "shorts", "hashtag", "discover", "music", "live", "about", "search", "pages",
-  "groups", "story", "stories", "user", "embed",
+  "groups", "story", "stories", "user", "embed", "popular", "directory", "topic",
 ]);
 
 /** Returns a clean profile {handle, url} or null if the URL is not a creator profile. */
