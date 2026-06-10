@@ -480,28 +480,46 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: AMBER_DEEP }}>
               Moteur IA & ta clé
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Fournisseur</label>
-                <select value={provider} onChange={(e) => setProvider(e.target.value as 'gemini' | 'openai')}
+                <select value={provider} onChange={(e) => { setProvider(e.target.value as 'gemini' | 'openai' | 'openrouter'); setModel(''); }}
                   className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none appearance-none"
                   style={{ borderColor: '#eadfc9', color: INK, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a18a6c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}>
                   <option value="gemini">Google Gemini (ta clé)</option>
                   <option value="openai">OpenAI</option>
+                  <option value="openrouter">OpenRouter (Claude, DeepSeek…)</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Modèle</label>
+                <select value={currentModel} onChange={(e) => setModel(e.target.value)}
+                  className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none appearance-none"
+                  style={{ borderColor: '#eadfc9', color: INK, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a18a6c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}>
+                  {MODELS[provider].map((m) => (
+                    <option key={m.value} value={m.value}>{m.label}</option>
+                  ))}
                 </select>
               </div>
               <div>
                 <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>
                   {provider === 'gemini'
-                    ? 'Clé Gemini (laisse vide pour utiliser celle des réglages)'
-                    : 'Clé OpenAI (facultative)'}
+                    ? 'Clé Gemini (vide = celle des réglages)'
+                    : provider === 'openrouter'
+                      ? 'Clé OpenRouter (sk-or-…)'
+                      : 'Clé OpenAI (facultative)'}
                 </label>
                 <input value={customKey} onChange={(e) => setCustomKey(e.target.value)} type="password"
-                  placeholder={provider === 'gemini' ? 'AIza…' : 'sk-…'}
+                  placeholder={provider === 'gemini' ? 'AIza…' : provider === 'openrouter' ? 'sk-or-…' : 'sk-…'}
                   className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
                   style={{ borderColor: '#eadfc9', color: INK }} />
               </div>
             </div>
+            {provider === 'openrouter' && (
+              <p className="mt-2 text-[11px]" style={{ color: '#a18a6c' }}>
+                Crée ta clé sur openrouter.ai → un seul compte donne accès à Claude, DeepSeek, Llama, Mistral, Grok, Qwen, etc.
+              </p>
+            )}
           </div>
 
           {/* Sauvegarde cloud */}
