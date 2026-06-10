@@ -319,6 +319,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
           brief,
           priorOutputs,
           provider,
+          model: currentModel,
           userApiKey: provider === 'gemini' ? effectiveKey : customKey.trim(),
         },
       });
