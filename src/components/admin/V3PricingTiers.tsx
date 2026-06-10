@@ -97,7 +97,7 @@ const V3PricingTiers: React.FC = () => {
             </p>
             <div className="flex items-end gap-3 mb-1">
               <span className="text-4xl font-black" style={{ color: AMBER_DEEP }}>{V3_FULL_PACK.price}€</span>
-              <span className="text-lg line-through pb-1" style={{ color: '#b9a casa'.slice(0,7) || '#bcaa8c' }}>{V3_FULL_PACK.compareAt}€</span>
+              <span className="text-lg line-through pb-1" style={{ color: '#bcaa8c' }}>{V3_FULL_PACK.compareAt}€</span>
             </div>
             <p className="text-sm font-bold mb-4" style={{ color: '#1f9d6b' }}>
               Tu économises {V3_FULL_PACK.saves}€
