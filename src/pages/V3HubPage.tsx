@@ -59,15 +59,20 @@ function ModuleCard({
       onMouseLeave={() => setTilt('')}
       disabled={!clickable}
       style={{ transform: tilt, transitionProperty: 'transform, box-shadow, border-color', animationDelay: `${Math.min(index * 40, 600)}ms` }}
-      className={`group relative animate-fade-in text-left rounded-2xl p-4 border bg-[#161616] border-[#c9a84c22] transition-all duration-300 overflow-hidden
-        ${clickable ? 'cursor-pointer hover:border-[#c9a84c] hover:shadow-[0_0_30px_-6px_rgba(201,168,76,0.45)]' : 'opacity-50 cursor-not-allowed'}`}
+      className={`group relative animate-fade-in text-left rounded-2xl p-px border border-[#c9a84c22] transition-all duration-300 overflow-hidden
+        ${clickable ? 'cursor-pointer hover:border-[#c9a84c]/80 hover:shadow-[0_18px_50px_-18px_rgba(201,168,76,0.55)]' : 'opacity-50 cursor-not-allowed'}`}
     >
+      {/* liseré doré supérieur */}
+      <span className="pointer-events-none absolute inset-x-6 top-0 h-px opacity-40 group-hover:opacity-100 transition-opacity"
+        style={{ background: `linear-gradient(90deg, transparent, ${GOLD_LIGHT}, transparent)` }} />
       {/* halo doré au survol */}
       <div className="pointer-events-none absolute -inset-px opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        style={{ background: `radial-gradient(120px 80px at 50% 0%, ${GOLD}22, transparent 70%)` }} />
-      <div className="relative">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-lg">{V3_PILLAR_META[module.pillar].emoji}</span>
+        style={{ background: `radial-gradient(160px 110px at 50% 0%, ${GOLD}26, transparent 70%)` }} />
+      <div className="relative h-full rounded-2xl p-4 bg-gradient-to-b from-[#1a1a1a] to-[#121212]">
+        <div className="flex items-center justify-between mb-2.5">
+          <span className="grid h-9 w-9 place-items-center rounded-xl text-lg border border-[#c9a84c22] bg-[#0d0d0d] group-hover:border-[#c9a84c]/50 transition-colors">
+            {V3_PILLAR_META[module.pillar].emoji}
+          </span>
           <div className="flex items-center gap-1.5">
             {getModuleTier(module.id) === 'upsell' && (
               <span className="inline-flex items-center gap-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
@@ -75,8 +80,9 @@ function ModuleCard({
                 <Lock className="h-2.5 w-2.5" /> Option
               </span>
             )}
-            <span data-tour={isFirst ? 'status' : undefined} className="text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
+            <span data-tour={isFirst ? 'status' : undefined} className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
               style={{ background: `${statusColor}1f`, color: statusColor }}>
+              <span className="h-1.5 w-1.5 rounded-full" style={{ background: statusColor }} />
               {statusLabel}
             </span>
           </div>
@@ -86,10 +92,17 @@ function ModuleCard({
           {module.title}
         </div>
         <p className="text-[11px] text-white/55 leading-snug line-clamp-3">{module.description}</p>
+        {clickable && (
+          <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-white/35 group-hover:text-[#f0d78c] transition-colors">
+            Ouvrir l'outil
+            <ArrowRight className="h-3 w-3 -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all" />
+          </span>
+        )}
       </div>
     </button>
   );
 }
+
 
 const V3HubPage: React.FC = () => {
   const navigate = useNavigate();
