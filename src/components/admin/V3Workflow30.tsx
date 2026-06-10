@@ -28,8 +28,9 @@ interface Brief {
   author: string;
   category: string;
   chapterCount: string;
+  wordsPerChapter: string;
 }
-const EMPTY_BRIEF: Brief = { title: '', subtitle: '', author: '', category: '', chapterCount: '' };
+const EMPTY_BRIEF: Brief = { title: '', subtitle: '', author: '', category: '', chapterCount: '', wordsPerChapter: '' };
 function loadBrief(): Brief {
   try {
     const raw = localStorage.getItem(BRIEF_KEY);
