@@ -332,3 +332,8 @@ export const V3_MODULES: V3Module[] = [
   { id: 'onboarding-guides',        pillar: 'publier',   status: 'done', title: 'Guides Nouveaux Abonnés (Onboarding 7 jours)',
     description: 'Mix : onboarding « Premiers pas KDP en 7 jours » + 2 guides de base OFFERTS pour activer les nouveaux abonnés ; guides avancés verrouillés avec CTA vers order bump / upsell. Mise en ligne prévue en août avec le tunnel 497€.' },
 ];
+
+/** Renvoie un module V3 par son id. */
+export function getModuleById(id: string): V3Module | undefined {
+  return V3_MODULES.find((m) => m.id === id);
+}
