@@ -329,6 +329,6 @@ export const V3_MODULES: V3Module[] = [
     description: 'Pack payable en 1×, 4×129€ (516€) ou 6×85€ (510€). Géré par abonnement Stripe à durée limitée pour détecter les échecs. COUPURE AUTOMATIQUE de l’accès 3 JOURS après un paiement échoué (statut suspended → SubscriberGate bloque le lien) ; réactivation auto à la régularisation ; bascule en accès à vie une fois toutes les échéances payées. Relances email Resend à chaque échec + à la suspension.' },
 
   // PUBLIER — Guides nouveaux abonnés (mix : base offerte + avancés payants)
-  { id: 'onboarding-guides',        pillar: 'publier',   status: 'todo', title: 'Guides Nouveaux Abonnés (Onboarding 7 jours)',
+  { id: 'onboarding-guides',        pillar: 'publier',   status: 'done', title: 'Guides Nouveaux Abonnés (Onboarding 7 jours)',
     description: 'Mix : onboarding « Premiers pas KDP en 7 jours » + 2 guides de base OFFERTS pour activer les nouveaux abonnés ; guides avancés verrouillés avec CTA vers order bump / upsell. Mise en ligne prévue en août avec le tunnel 497€.' },
 ];
