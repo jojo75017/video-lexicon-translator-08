@@ -176,6 +176,31 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   useEffect(() => { localStorage.setItem('v3_workflow30_model', model); }, [model]);
   useEffect(() => { localStorage.setItem('v3_workflow30_custom_key', customKey); }, [customKey]);
   const effectiveKey = (customKey.trim() || userGeminiKey || '').trim();
+
+  // Test de validité de la clé (bouton vert si OK).
+  const [keyTest, setKeyTest] = useState<'idle' | 'testing' | 'ok' | 'fail'>('idle');
+  useEffect(() => { setKeyTest('idle'); }, [customKey, provider]);
+  const testKey = async () => {
+    const k = (provider === 'gemini' ? effectiveKey : customKey.trim());
+    if (!k) { setKeyTest('fail'); return; }
+    setKeyTest('testing');
+    try {
+      let ok = false;
+      if (provider === 'gemini') {
+        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(k)}`);
+        ok = r.ok || r.status === 429 || (/^AQ\.Ab8?/i.test(k) && [400, 401, 403].includes(r.status));
+      } else if (provider === 'openai') {
+        const r = await fetch('https://api.openai.com/v1/models', { headers: { Authorization: `Bearer ${k}` } });
+        ok = r.ok || r.status === 429;
+      } else {
+        const r = await fetch('https://openrouter.ai/api/v1/auth/key', { headers: { Authorization: `Bearer ${k}` } });
+        ok = r.ok;
+      }
+      setKeyTest(ok ? 'ok' : 'fail');
+    } catch {
+      setKeyTest('fail');
+    }
+  };
   const MODELS: Record<string, { value: string; label: string }[]> = {
     gemini: [
       { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash (rapide)' },
