@@ -17,6 +17,7 @@ interface Brief {
   author?: string;
   category?: string;
   chapterCount?: string;
+  wordsPerChapter?: string;
 }
 
 interface Body {
@@ -29,7 +30,8 @@ interface Body {
   theme?: string;
   brief?: Brief;
   priorOutputs?: PriorOutput[];
-  provider?: "gemini" | "openai";
+  provider?: "gemini" | "openai" | "openrouter";
+  model?: string;
   userApiKey?: string;
 }
 
@@ -55,12 +57,14 @@ serve(async (req) => {
       brief = {},
       priorOutputs = [],
       provider = "gemini",
+      model = "",
       userApiKey = "",
     } = body;
 
     // === Sélection du fournisseur ===
     const geminiKey = (userApiKey || "").trim() || Deno.env.get("GEMINI_API_KEY") || "";
     const openaiKey = (userApiKey || "").trim() || Deno.env.get("OPENAI_API_KEY") || "";
+    const openrouterKey = (userApiKey || "").trim() || Deno.env.get("OPENROUTER_API_KEY") || "";
 
     if (provider === "gemini" && !geminiKey) {
       return new Response(
@@ -79,12 +83,43 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
+    if (provider === "openrouter" && !openrouterKey) {
+      return new Response(
+        JSON.stringify({
+          error: "Aucune clé OpenRouter disponible. Ajoute ta clé OpenRouter (sk-or-…) ou choisis un autre fournisseur.",
+        }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
 
     async function callAI(
       sys: string,
       usr: string,
       maxOutputTokens: number,
     ): Promise<CallResult> {
+      if (provider === "openrouter") {
+        const r = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${openrouterKey}`,
+            "HTTP-Referer": "https://ebookstudio.fr",
+            "X-Title": "EbookStudio",
+          },
+          body: JSON.stringify({
+            model: model || "anthropic/claude-3.5-sonnet",
+            messages: [
+              { role: "system", content: sys },
+              { role: "user", content: usr },
+            ],
+            temperature: 0.8,
+            max_tokens: maxOutputTokens,
+          }),
+        });
+        if (!r.ok) return { ok: false, status: r.status, body: await r.text() };
+        const d = await r.json();
+        return { ok: true, text: (d.choices?.[0]?.message?.content || "").trim() };
+      }
       if (provider === "openai") {
         const r = await fetch("https://api.openai.com/v1/chat/completions", {
           method: "POST",
@@ -93,7 +128,7 @@ serve(async (req) => {
             Authorization: `Bearer ${openaiKey}`,
           },
           body: JSON.stringify({
-            model: "gpt-4o-mini",
+            model: model || "gpt-4o-mini",
             messages: [
               { role: "system", content: sys },
               { role: "user", content: usr },
@@ -107,8 +142,9 @@ serve(async (req) => {
         return { ok: true, text: (d.choices?.[0]?.message?.content || "").trim() };
       }
       // Gemini par défaut
+      const gModel = model || "gemini-2.5-flash";
       const r = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/${gModel}:generateContent?key=${geminiKey}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -168,6 +204,7 @@ serve(async (req) => {
       ["Nom de l'auteur", brief.author],
       ["Catégorie / genre", brief.category],
       ["Nombre de chapitres visés", brief.chapterCount],
+      ["Nombre de mots par chapitre", brief.wordsPerChapter],
     ].filter(([, v]) => (v || "").toString().trim());
     const briefBlock = briefRows.length
       ? `## Brief fourni par l'auteur\n${briefRows
@@ -192,6 +229,11 @@ Règles :
     // === Étape « Développer le manuscrit » : rédaction chapitre par chapitre ===
     if (isManuscript) {
       const n = Math.min(Math.max(parseInt(brief.chapterCount || "", 10) || 8, 1), 40);
+      const targetWords = Math.min(Math.max(parseInt(brief.wordsPerChapter || "", 10) || 1500, 300), 6000);
+      const minWords = Math.round(targetWords * 0.85);
+      const maxWords = Math.round(targetWords * 1.15);
+      // ~1.6 tokens par mot en français + marge de sécurité.
+      const maxTok = Math.min(Math.max(Math.round(targetWords * 2.2), 2048), 16000);
       const chapters: string[] = [];
       for (let i = 1; i <= n; i++) {
         const prev = chapters.length
@@ -208,13 +250,13 @@ ${contextText}
 ${prev}
 
 ## Consignes de rédaction (IMPÉRATIVES)
-- Écris un VRAI chapitre complet, long et développé : entre 1200 et 2200 mots.
+- Écris un VRAI chapitre complet, long et développé : vise environ ${targetWords} mots (entre ${minWords} et ${maxWords} mots).
 - Commence par un titre de chapitre en Markdown : "## Chapitre ${i} — [titre]".
 - Développe plusieurs sous-parties avec des paragraphes pleins, des exemples concrets et des transitions.
 - INTERDIT : un résumé, un plan, une liste de puces sèche, ou seulement quelques lignes. Le lecteur doit pouvoir LIRE ce chapitre tel quel dans le livre publié.
 - Reste cohérent avec le plan et les chapitres précédents.
 - N'écris pas "voici le chapitre", ne commente pas : écris directement le contenu du chapitre.`;
-        const r = await callAI(system, chapUser, 8192);
+        const r = await callAI(system, chapUser, maxTok);
         if (!r.ok) return aiError(r.status, r.body);
         if (r.text) chapters.push(r.text);
       }

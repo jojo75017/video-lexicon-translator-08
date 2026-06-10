@@ -28,8 +28,9 @@ interface Brief {
   author: string;
   category: string;
   chapterCount: string;
+  wordsPerChapter: string;
 }
-const EMPTY_BRIEF: Brief = { title: '', subtitle: '', author: '', category: '', chapterCount: '' };
+const EMPTY_BRIEF: Brief = { title: '', subtitle: '', author: '', category: '', chapterCount: '', wordsPerChapter: '' };
 function loadBrief(): Brief {
   try {
     const raw = localStorage.getItem(BRIEF_KEY);
@@ -160,15 +161,46 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   const activeRef = useRef<HTMLDivElement>(null);
 
   // Fournisseur IA + clé personnelle.
-  const [provider, setProvider] = useState<'gemini' | 'openai'>(
-    () => (localStorage.getItem('v3_workflow30_provider') as 'gemini' | 'openai') || 'gemini',
+  const [provider, setProvider] = useState<'gemini' | 'openai' | 'openrouter'>(
+    () => (localStorage.getItem('v3_workflow30_provider') as 'gemini' | 'openai' | 'openrouter') || 'gemini',
+  );
+  const [model, setModel] = useState<string>(
+    () => localStorage.getItem('v3_workflow30_model') || '',
   );
   const [customKey, setCustomKey] = useState<string>(
     () => localStorage.getItem('v3_workflow30_custom_key') || '',
   );
   useEffect(() => { localStorage.setItem('v3_workflow30_provider', provider); }, [provider]);
+  useEffect(() => { localStorage.setItem('v3_workflow30_model', model); }, [model]);
   useEffect(() => { localStorage.setItem('v3_workflow30_custom_key', customKey); }, [customKey]);
   const effectiveKey = (customKey.trim() || userGeminiKey || '').trim();
+  const MODELS: Record<string, { value: string; label: string }[]> = {
+    gemini: [
+      { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash (rapide)' },
+      { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro (qualité)' },
+      { value: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite (économique)' },
+    ],
+    openai: [
+      { value: 'gpt-4o-mini', label: 'GPT-4o mini (économique)' },
+      { value: 'gpt-4o', label: 'GPT-4o (qualité)' },
+      { value: 'gpt-4.1', label: 'GPT-4.1' },
+      { value: 'gpt-4.1-mini', label: 'GPT-4.1 mini' },
+    ],
+    openrouter: [
+      { value: 'anthropic/claude-3.5-sonnet', label: 'Claude 3.5 Sonnet' },
+      { value: 'anthropic/claude-3.7-sonnet', label: 'Claude 3.7 Sonnet' },
+      { value: 'anthropic/claude-3.5-haiku', label: 'Claude 3.5 Haiku (rapide)' },
+      { value: 'deepseek/deepseek-chat', label: 'DeepSeek V3' },
+      { value: 'deepseek/deepseek-r1', label: 'DeepSeek R1 (raisonnement)' },
+      { value: 'google/gemini-2.5-pro', label: 'Gemini 2.5 Pro' },
+      { value: 'openai/gpt-4o', label: 'GPT-4o' },
+      { value: 'meta-llama/llama-3.3-70b-instruct', label: 'Llama 3.3 70B' },
+      { value: 'mistralai/mistral-large', label: 'Mistral Large' },
+      { value: 'qwen/qwen-2.5-72b-instruct', label: 'Qwen 2.5 72B' },
+      { value: 'x-ai/grok-2', label: 'Grok 2' },
+    ],
+  };
+  const currentModel = model || MODELS[provider][0].value;
 
   // Sauvegarde cloud des projets.
   const [projects, setProjects] = useState<{ id: string; name: string; updated_at: string }[]>([]);
@@ -262,7 +294,11 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   const generate = async (step: FlatStep) => {
     setError(null);
     if (provider === 'gemini' && !effectiveKey) {
-      setError("Choisis ta clé Gemini ci-dessus (ou bascule sur OpenAI) pour lancer l'auto-pilote.");
+      setError("Choisis ta clé Gemini ci-dessus (ou bascule sur un autre fournisseur) pour lancer l'auto-pilote.");
+      return;
+    }
+    if (provider === 'openrouter' && !customKey.trim()) {
+      setError("Ajoute ta clé OpenRouter (sk-or-…) ci-dessus pour utiliser Claude, DeepSeek, etc.");
       return;
     }
     setLoadingId(step.moduleId);
@@ -283,6 +319,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
           brief,
           priorOutputs,
           provider,
+          model: currentModel,
           userApiKey: provider === 'gemini' ? effectiveKey : customKey.trim(),
         },
       });
@@ -387,6 +424,15 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                   className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
                   style={{ borderColor: '#eadfc9', color: INK }} />
               </div>
+              <div>
+                <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Nombre de mots par chapitre</label>
+                <input value={brief.wordsPerChapter} onChange={(e) => setBriefField('wordsPerChapter', e.target.value)} maxLength={6}
+                  inputMode="numeric"
+                  placeholder="Ex : 1500"
+                  className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
+                  style={{ borderColor: '#eadfc9', color: INK }} />
+                <p className="mt-1 text-[10px]" style={{ color: '#a18a6c' }}>Entre 300 et 6000 mots. Par défaut ≈ 1500.</p>
+              </div>
             </div>
             <div className="mt-3">
               <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Catégorie / genre</label>
@@ -434,28 +480,46 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: AMBER_DEEP }}>
               Moteur IA & ta clé
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Fournisseur</label>
-                <select value={provider} onChange={(e) => setProvider(e.target.value as 'gemini' | 'openai')}
+                <select value={provider} onChange={(e) => { setProvider(e.target.value as 'gemini' | 'openai' | 'openrouter'); setModel(''); }}
                   className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none appearance-none"
                   style={{ borderColor: '#eadfc9', color: INK, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a18a6c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}>
                   <option value="gemini">Google Gemini (ta clé)</option>
                   <option value="openai">OpenAI</option>
+                  <option value="openrouter">OpenRouter (Claude, DeepSeek…)</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Modèle</label>
+                <select value={currentModel} onChange={(e) => setModel(e.target.value)}
+                  className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none appearance-none"
+                  style={{ borderColor: '#eadfc9', color: INK, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a18a6c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}>
+                  {MODELS[provider].map((m) => (
+                    <option key={m.value} value={m.value}>{m.label}</option>
+                  ))}
                 </select>
               </div>
               <div>
                 <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>
                   {provider === 'gemini'
-                    ? 'Clé Gemini (laisse vide pour utiliser celle des réglages)'
-                    : 'Clé OpenAI (facultative)'}
+                    ? 'Clé Gemini (vide = celle des réglages)'
+                    : provider === 'openrouter'
+                      ? 'Clé OpenRouter (sk-or-…)'
+                      : 'Clé OpenAI (facultative)'}
                 </label>
                 <input value={customKey} onChange={(e) => setCustomKey(e.target.value)} type="password"
-                  placeholder={provider === 'gemini' ? 'AIza…' : 'sk-…'}
+                  placeholder={provider === 'gemini' ? 'AIza…' : provider === 'openrouter' ? 'sk-or-…' : 'sk-…'}
                   className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
                   style={{ borderColor: '#eadfc9', color: INK }} />
               </div>
             </div>
+            {provider === 'openrouter' && (
+              <p className="mt-2 text-[11px]" style={{ color: '#a18a6c' }}>
+                Crée ta clé sur openrouter.ai → un seul compte donne accès à Claude, DeepSeek, Llama, Mistral, Grok, Qwen, etc.
+              </p>
+            )}
           </div>
 
           {/* Sauvegarde cloud */}
