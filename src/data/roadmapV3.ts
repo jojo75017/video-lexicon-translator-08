@@ -293,7 +293,7 @@ export const V3_MODULES: V3Module[] = [
   // ===== AJOUTS V3 — compléments KDP oubliés — à construire =====
 
   // PUBLIER
-  { id: 'low-content-books',     pillar: 'publier',   status: 'todo', title: 'Studio Livres à Contenu Faible/Nul',
+  { id: 'low-content-books',     pillar: 'publier',   status: 'done', title: 'Studio Livres à Contenu Faible/Nul',
     description: 'Générateur de carnets, journaux, planners, agendas et cahiers (lignés, pointillés, vierges) : le marché KDP « low/no-content ». Intérieurs PDF prêts aux formats KDP.' },
 
   // MONÉTISER
