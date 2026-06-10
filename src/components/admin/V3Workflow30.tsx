@@ -852,10 +852,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
 
                               {/* Résultat IA */}
                               {result && (isActive || isDone) && editingId !== step.moduleId && (
-                                <div className="mt-3 rounded-xl border p-4 text-[13px] leading-relaxed v3-md overflow-y-auto v3-scroll"
-                                  style={{ borderColor: '#eadfc9', background: '#FCFAF4', color: INK, maxHeight: '460px' }}>
-                                  <ReactMarkdown>{result}</ReactMarkdown>
-                                </div>
+                                <ResultView text={result} />
                               )}
                             </div>
                           </div>
