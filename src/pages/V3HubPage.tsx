@@ -67,10 +67,18 @@ function ModuleCard({
       <div className="relative">
         <div className="flex items-center justify-between mb-2">
           <span className="text-lg">{V3_PILLAR_META[module.pillar].emoji}</span>
-          <span data-tour={isFirst ? 'status' : undefined} className="text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
-            style={{ background: `${statusColor}1f`, color: statusColor }}>
-            {statusLabel}
-          </span>
+          <div className="flex items-center gap-1.5">
+            {getModuleTier(module.id) === 'upsell' && (
+              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
+                style={{ background: `${GOLD}1f`, color: GOLD_LIGHT, border: `1px solid ${GOLD}55` }}>
+                <Lock className="h-2.5 w-2.5" /> Option
+              </span>
+            )}
+            <span data-tour={isFirst ? 'status' : undefined} className="text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
+              style={{ background: `${statusColor}1f`, color: statusColor }}>
+              {statusLabel}
+            </span>
+          </div>
         </div>
         <div className="text-sm font-semibold leading-tight mb-1"
           style={{ background: `linear-gradient(90deg, ${GOLD_LIGHT}, #ffffff)`, WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent' }}>
