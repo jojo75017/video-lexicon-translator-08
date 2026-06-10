@@ -9,6 +9,17 @@ import { V3HubTour } from '@/components/admin/V3HubTour';
 import CreateBookHub from '@/components/admin/CreateBookHub';
 import V2V3Compare from '@/components/admin/V2V3Compare';
 import V3PricingTiers from '@/components/admin/V3PricingTiers';
+import pillarIa from '@/assets/v3/pillar-ia.jpg';
+import pillarPublier from '@/assets/v3/pillar-publier.jpg';
+import pillarMonetiser from '@/assets/v3/pillar-monetiser.jpg';
+import pillarMarketing from '@/assets/v3/pillar-marketing.jpg';
+
+const PILLAR_IMG: Record<V3Pillar, string> = {
+  ia: pillarIa,
+  publier: pillarPublier,
+  monetiser: pillarMonetiser,
+  marketing: pillarMarketing,
+};
 
 const TOUR_KEY = 'v3hub_tour_done';
 
