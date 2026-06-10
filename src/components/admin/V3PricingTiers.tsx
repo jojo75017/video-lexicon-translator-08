@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Check, Crown, Sparkles, Lock } from 'lucide-react';
 import {
   V3_PRICE, V3_BASE_INSTALLMENTS, V3_UPSELL_PACKS, V3_UPSELLS_TOTAL, V3_FULL_PACK,
 } from '@/data/roadmapV3';
+import V3PackCheckout from './V3PackCheckout';
 
 // Palette « Noir & Or luxe » — locale à cette page (cohérente avec V3HubPage).
 const GOLD = '#c9a84c';
