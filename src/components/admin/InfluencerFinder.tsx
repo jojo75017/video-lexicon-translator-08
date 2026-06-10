@@ -342,7 +342,7 @@ Dis-moi si tu veux tester 🚀`;
                         <Label className="text-[11px]">Lien de suivi ({inv.code})</Label>
                         <div className="flex gap-1.5 mt-1">
                           <Input readOnly value={inv.link} className="text-[11px] h-7" />
-                          <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => copyValue(inv.link, inf.url + 'link')}>
+                          <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => copyValue(inv.link, inf.url + 'link', `Lien de suivi ${inv.code} copié — partage-le à ${inf.handle || inf.name}.`)}>
                             {copied === inf.url + 'link' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
                           </Button>
                         </div>
@@ -377,7 +377,7 @@ Dis-moi si tu veux tester 🚀`;
                           rows={8}
                           className="text-[11px] mt-1 font-sans"
                         />
-                        <Button variant="outline" size="sm" className="h-7 gap-1.5 mt-1.5" onClick={() => copyValue(inv.dm, inf.url + 'dm')}>
+                        <Button variant="outline" size="sm" className="h-7 gap-1.5 mt-1.5" onClick={() => copyValue(inv.dm, inf.url + 'dm', `Message d'invitation copié — colle-le dans le DM de ${inf.handle || inf.name}.`)}>
                           {copied === inf.url + 'dm' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
                           <span className="text-[11px]">Copier le message (DM)</span>
                         </Button>
