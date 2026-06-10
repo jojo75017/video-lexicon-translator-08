@@ -4,7 +4,7 @@
 // Sends an access email via Resend.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { type StripeEnv, verifyWebhook } from "../_shared/stripe.ts";
+import { type StripeEnv, verifyWebhook, stripeRequest } from "../_shared/stripe.ts";
 
 let _supabase: ReturnType<typeof createClient> | null = null;
 function getSupabase() {
