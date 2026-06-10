@@ -579,6 +579,8 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
               </button>
             </div>
             {cloudMsg && <p className="mt-2 text-[12px] font-semibold" style={{ color: AMBER_DEEP }}>{cloudMsg}</p>}
+            </div>
+            )}
           </div>
 
 
