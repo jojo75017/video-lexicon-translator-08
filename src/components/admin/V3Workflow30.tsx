@@ -870,6 +870,8 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                                 </div>
                               )}
 
+                              {/* Mode brouillon : édition du texte */}
+                              {editingId === step.moduleId && (
                                 <div className="mt-3">
                                   <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.15em] mb-2" style={{ color: AMBER_DEEP }}>
                                     <Pencil className="h-3.5 w-3.5" /> Mode brouillon
