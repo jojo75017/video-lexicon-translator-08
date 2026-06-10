@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, Copy, Check, FileText, Image as ImageIcon, Download, Link as LinkIcon, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import mockup from '@/assets/influenceurs-mockup.jpg';
+import InfluencerFinder from '@/components/admin/InfluencerFinder';
 import {
   PRICE_NOW, PRICE_V3, COMMISSION_NOW, COMMISSION_V3,
   getActiveCommission, formatEuro, ORIGIN,
@@ -119,6 +120,8 @@ Dis-moi si tu veux tester 🚀` : '';
 
   return (
     <div className="space-y-5">
+      <InfluencerFinder />
+
       <p className="text-sm text-muted-foreground">
         Génère un lien + code de suivi unique par influenceur, copie le message d'approche prêt à coller,
         télécharge le kit, et suis les performances. Commission 30% : <strong>{formatEuro(COMMISSION_NOW)}</strong>/vente
