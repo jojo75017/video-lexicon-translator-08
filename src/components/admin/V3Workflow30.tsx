@@ -193,6 +193,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
 
       const { data, error: fnErr } = await supabase.functions.invoke('v3-autopilot-step', {
         body: {
+          moduleId: step.moduleId,
           stepNumber: step.globalIndex + 1,
           stepTitle: step.label ?? mod?.title ?? step.moduleId,
           stepHint: step.hint,
