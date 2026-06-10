@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Check, Crown, Sparkles, Lock, ChevronDown, CheckCircle2, Clock } from 'lucide-react';
 import {
   V3_PRICE, V3_BASE_INSTALLMENTS, V3_UPSELL_PACKS, V3_UPSELLS_TOTAL, V3_FULL_PACK,
-  getModuleById,
+  getModuleById, type V3Module,
 } from '@/data/roadmapV3';
-import { isModuleClickable } from './v3ModuleRegistry';
+import { isModuleClickable, V3ModuleDialog } from './v3ModuleRegistry';
 import V3PackCheckout from './V3PackCheckout';
 
 // Palette « Clair Ambre » — cohérente avec V3HubPage.
