@@ -19,9 +19,11 @@ const GOLD_LIGHT = '#f0d78c';
  */
 const V3PricingTiers: React.FC = () => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [baseCheckoutOpen, setBaseCheckoutOpen] = useState(false);
   return (
     <section id="tarifs" className="mt-16 scroll-mt-20">
-      <V3PackCheckout open={checkoutOpen} onClose={() => setCheckoutOpen(false)} />
+      <V3PackCheckout open={checkoutOpen} onClose={() => setCheckoutOpen(false)} product="full" />
+      <V3PackCheckout open={baseCheckoutOpen} onClose={() => setBaseCheckoutOpen(false)} product="base" />
       <div className="text-center mb-10">
         <div className="inline-flex items-center gap-2 mb-3">
           <Crown className="h-5 w-5" style={{ color: GOLD }} />
@@ -54,7 +56,7 @@ const V3PricingTiers: React.FC = () => {
             <span className="text-4xl font-black" style={{ color: GOLD_LIGHT }}>{V3_PRICE}€</span>
             <span className="text-white/45 text-sm pb-1">à vie</span>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 mb-5">
             {V3_BASE_INSTALLMENTS.map((opt) => (
               <span key={opt} className="text-[11px] font-semibold rounded-full px-3 py-1 border"
                 style={{ borderColor: `${GOLD}44`, color: 'rgba(255,255,255,0.7)' }}>
@@ -62,6 +64,14 @@ const V3PricingTiers: React.FC = () => {
               </span>
             ))}
           </div>
+          <button
+            onClick={() => setBaseCheckoutOpen(true)}
+            className="w-full inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm font-bold transition-transform hover:-translate-y-0.5 border"
+            style={{ borderColor: GOLD, color: GOLD_LIGHT, background: `${GOLD}14` }}
+          >
+            <Sparkles className="h-4 w-4" />
+            Démarrer avec la Base — {V3_PRICE}€
+          </button>
         </article>
 
         {/* 3. Pack Tout Complet (highlight) */}

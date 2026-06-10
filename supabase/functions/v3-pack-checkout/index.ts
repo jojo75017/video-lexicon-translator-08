@@ -28,6 +28,8 @@ const PLANS: Record<
   full_1x: { label: "Pack Tout Complet V3 — paiement unique", total: 49700, installments: 1, monthly: 49700 },
   full_4x: { label: "Pack Tout Complet V3 — 4× sans frais", total: 51600, installments: 4, monthly: 12900 },
   full_6x: { label: "Pack Tout Complet V3 — 6× sans frais", total: 51000, installments: 6, monthly: 8500 },
+  base_1x: { label: "Base Création & Publication V3 — paiement unique", total: 19700, installments: 1, monthly: 19700 },
+  base_3x: { label: "Base Création & Publication V3 — 3× sans frais", total: 20700, installments: 3, monthly: 6900 },
 };
 
 Deno.serve(async (req) => {
