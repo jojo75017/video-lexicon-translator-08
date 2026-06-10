@@ -254,7 +254,7 @@ const V3HubPage: React.FC = () => {
 
       <main className="mx-auto max-w-7xl px-4 py-8">
         {/* Recherche + filtres */}
-        <div className="sticky top-0 z-10 -mx-4 px-4 py-3 bg-[#0d0d0d]/80 backdrop-blur-md mb-6">
+        <div className="sticky top-0 z-20 -mx-4 px-4 py-3 bg-[#0a0a0a]/85 backdrop-blur-md border-b border-[#c9a84c1a] mb-6">
           <div className="relative max-w-md mb-3" data-tour="search">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
             <input
