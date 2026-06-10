@@ -134,7 +134,8 @@ Deno.serve(async (req) => {
         const resp = await fetch("https://api.firecrawl.dev/v2/search", {
           method: "POST",
           headers: { Authorization: `Bearer ${firecrawlKey}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ query, limit: perPlatform, lang: "fr", country: "fr" }),
+          // over-fetch since many results are videos/hashtags that get filtered out
+          body: JSON.stringify({ query, limit: Math.min(perPlatform * 3, 25), lang: "fr", country: "fr" }),
         });
         const data = await resp.json();
         if (!resp.ok) {
@@ -142,30 +143,36 @@ Deno.serve(async (req) => {
           continue;
         }
         const items: any[] = data?.data?.web || data?.data || data?.web || [];
+        let kept = 0;
         for (const it of items) {
+          if (kept >= perPlatform) break;
           const url: string = it.url || it.link || "";
           if (!url || !url.includes(site)) continue;
+          const profile = toProfile(url, platform);
+          if (!profile) continue;
           const title: string = (it.title || "").toString();
           const desc: string = (it.description || it.snippet || "").toString();
           results.push({
             platform,
-            name: title.replace(/\s*[|\-•].*$/, "").trim() || extractHandle(url, platform) || url,
-            handle: extractHandle(url, platform),
-            url,
+            name: title.replace(/\s*[|\-•(].*$/, "").trim() || profile.handle,
+            handle: profile.handle,
+            url: profile.url,
             description: desc.slice(0, 220),
             followers: extractFollowers(`${title} ${desc}`),
           });
+          kept++;
         }
       } catch (e) {
         console.error(`Search failed for ${platform}:`, e);
       }
     }
 
-    // dédoublonnage par URL
+    // dédoublonnage par profil (url)
     const seen = new Set<string>();
     const unique = results.filter((r) => {
-      if (seen.has(r.url)) return false;
-      seen.add(r.url);
+      const key = r.url.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
       return true;
     });
 
