@@ -4,10 +4,11 @@ import { supabase } from '@/integrations/supabase/client';
 import FunnelLayout from '@/components/funnel/FunnelLayout';
 import SeoHead from '@/components/funnel/SeoHead';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import {
   Copy, Check, TrendingUp, Euro, Download, Image as ImageIcon,
-  FileText, Sparkles, Gift, ShieldCheck, Zap,
+  FileText, Sparkles, Gift, ShieldCheck, Zap, MessageCircle, Link as LinkIcon,
 } from 'lucide-react';
 import mockup from '@/assets/influenceurs-mockup.jpg';
 import {
@@ -105,6 +106,68 @@ const InfluenceursPage = () => {
 
   const earnings = formatEuro(sales * commission);
   const earningsV3 = formatEuro(sales * COMMISSION_V3);
+
+  const shareLink = link || `${ORIGIN}/promo/decouverte?ref=TONCODE`;
+
+  const messages: { key: string; label: string; body: string }[] = [
+    {
+      key: 'dm',
+      label: 'DM TikTok / Insta',
+      body: `Hello 👋 J'utilise Ebookstudio Pro pour générer un livre complet (plan, chapitres, couverture Amazon KDP, SEO) en 30 min avec l'IA.
+
+Si ça t'intéresse, voici mon lien : ${shareLink}
+Paiement unique ${price}€ à vie, zéro abonnement. Dis-moi si tu veux que je te montre 🚀`,
+    },
+    {
+      key: 'bio',
+      label: 'Bio / Lien en bio',
+      body: `📚 Crée ton livre avec l'IA en 30 min → ${shareLink}`,
+    },
+    {
+      key: 'story',
+      label: 'Story Insta',
+      body: `J'ai testé Ebookstudio Pro pour écrire un livre sans savoir écrire 😱
+Plan + chapitres + couverture générés automatiquement.
+👉 Swipe up / lien : ${shareLink}
+${price}€ à vie (pas d'abonnement).`,
+    },
+    {
+      key: 'caption',
+      label: 'Légende Reel / Post',
+      body: `Comment publier ton premier livre Amazon ce week-end (même sans savoir écrire) 📖
+
+J'utilise Ebookstudio Pro : l'IA génère le plan, les chapitres, la couverture KDP et le SEO. Toi tu valides.
+
+🎁 Lien en bio / ${shareLink}
+💸 ${price}€ à vie, paiement unique.
+
+#ebook #amazonkdp #revenuPassif #ia #booktok`,
+    },
+    {
+      key: 'email',
+      label: 'Email / Newsletter',
+      body: `Objet : L'outil que j'utilise pour écrire mes livres avec l'IA
+
+Salut,
+
+Je voulais te partager Ebookstudio Pro : un outil qui génère un livre complet (plan, chapitres, couverture Amazon KDP, fiche SEO) en une trentaine de minutes grâce à l'IA.
+
+Tu peux le tester ici : ${shareLink}
+C'est un paiement unique de ${price}€ à vie, sans abonnement.
+
+À très vite !`,
+    },
+  ];
+
+  const TIPS: string[] = [
+    'Mets ton lien en bio ET dans la description de chaque vidéo : la majorité des ventes viennent de là.',
+    'Montre le produit en action à l\'écran (screen recording) : la preuve visuelle convertit mieux qu\'un discours.',
+    'Accroche les 3 premières secondes : pose une question ou un \u00ab POV \u00bb fort, sinon les gens scrollent.',
+    'Publie 3 à 5 contenus sur le sujet : une seule vidéo passe souvent inaperçue, la répétition crée la confiance.',
+    'Réponds en commentaire \u00ab lien en bio \u00bb quand on te demande l\'outil : ça booste l\'engagement et les clics.',
+    'Insiste sur \u00ab paiement unique, pas d\'abonnement \u00bb : c\'est l\'argument qui rassure le plus.',
+  ];
+
 
   return (
     <FunnelLayout>
@@ -237,26 +300,82 @@ const InfluenceursPage = () => {
       {/* MY LINK */}
       {code && (
         <section className="max-w-3xl mx-auto px-4 py-8">
-          <div className="bg-[#008296]/5 border border-[#008296]/30 rounded-2xl p-6 space-y-3">
+          <div className="bg-[#008296]/5 border border-[#008296]/30 rounded-2xl p-6 space-y-4">
             <h2 className="text-xl font-bold text-[#232F3E]">Ton lien ambassadeur</h2>
             <div className="flex gap-2">
               <input
                 readOnly value={link}
                 className="flex-1 bg-white border border-[#232F3E]/15 rounded-lg px-3 py-2 text-sm"
               />
-              <Button
-                onClick={() => copy(link, 'lien')}
-                style={{ background: TEAL, color: 'white' }}
-              >
-                {copied === 'lien' ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-              </Button>
             </div>
+            <Button
+              onClick={() => copy(link, 'lien')}
+              style={{ background: TEAL, color: 'white' }}
+              className="w-full font-semibold"
+            >
+              {copied === 'lien'
+                ? <><Check className="w-4 h-4 mr-1.5" /> Lien copié !</>
+                : <><LinkIcon className="w-4 h-4 mr-1.5" /> Copier mon lien</>}
+            </Button>
             <p className="text-xs text-[#232F3E]/60">
               Code de suivi : <strong>{code}</strong> — chaque vente via ce lien te rapporte 30%.
             </p>
           </div>
         </section>
       )}
+
+      {/* READY-TO-SEND MESSAGES */}
+      <section className="max-w-3xl mx-auto px-4 py-8">
+        <div className="bg-white border border-[#232F3E]/10 rounded-2xl p-6 space-y-4">
+          <h2 className="text-2xl font-bold flex items-center gap-2 text-[#232F3E]">
+            <MessageCircle className="w-6 h-6 text-[#008296]" /> Messages prêts à copier-coller
+          </h2>
+          <p className="text-sm text-[#232F3E]/65">
+            {code
+              ? 'Ton lien est déjà inséré dans chaque message. Choisis un format, copie et envoie.'
+              : 'Rejoins le programme pour insérer automatiquement ton lien. Tu peux déjà copier les modèles ci-dessous.'}
+          </p>
+          <Tabs defaultValue={messages[0].key}>
+            <TabsList className="flex flex-wrap h-auto">
+              {messages.map((m) => (
+                <TabsTrigger key={m.key} value={m.key}>{m.label}</TabsTrigger>
+              ))}
+            </TabsList>
+            {messages.map((m) => (
+              <TabsContent key={m.key} value={m.key} className="mt-3">
+                <pre className="whitespace-pre-wrap text-sm text-[#232F3E]/80 font-sans bg-[#FAFAFA] border border-[#232F3E]/10 rounded-xl p-4">{m.body}</pre>
+                <Button
+                  onClick={() => copy(m.body, `msg-${m.key}`)}
+                  style={{ background: TEAL, color: 'white' }}
+                  className="mt-3 font-semibold"
+                >
+                  {copied === `msg-${m.key}`
+                    ? <><Check className="w-4 h-4 mr-1.5" /> Copié !</>
+                    : <><Copy className="w-4 h-4 mr-1.5" /> Copier ce message</>}
+                </Button>
+              </TabsContent>
+            ))}
+          </Tabs>
+        </div>
+      </section>
+
+      {/* TIPS */}
+      <section className="max-w-3xl mx-auto px-4 py-8">
+        <div className="bg-[#FF9E2D]/5 border border-[#FF9E2D]/30 rounded-2xl p-6 space-y-3">
+          <h2 className="text-2xl font-bold flex items-center gap-2 text-[#232F3E]">
+            <Sparkles className="w-6 h-6 text-[#FF9E2D]" /> Conseils pour vendre plus
+          </h2>
+          <ul className="space-y-2">
+            {TIPS.map((t, i) => (
+              <li key={i} className="flex gap-2 text-sm text-[#232F3E]/80">
+                <span className="text-[#FF9E2D] font-bold">{i + 1}.</span>
+                <span>{t}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
 
       {/* DOWNLOADS */}
       <section className="max-w-3xl mx-auto px-4 py-8 pb-16 grid sm:grid-cols-2 gap-4">
