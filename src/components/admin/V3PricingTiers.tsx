@@ -19,9 +19,11 @@ const GOLD_LIGHT = '#f0d78c';
  */
 const V3PricingTiers: React.FC = () => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [baseCheckoutOpen, setBaseCheckoutOpen] = useState(false);
   return (
     <section id="tarifs" className="mt-16 scroll-mt-20">
-      <V3PackCheckout open={checkoutOpen} onClose={() => setCheckoutOpen(false)} />
+      <V3PackCheckout open={checkoutOpen} onClose={() => setCheckoutOpen(false)} product="full" />
+      <V3PackCheckout open={baseCheckoutOpen} onClose={() => setBaseCheckoutOpen(false)} product="base" />
       <div className="text-center mb-10">
         <div className="inline-flex items-center gap-2 mb-3">
           <Crown className="h-5 w-5" style={{ color: GOLD }} />
