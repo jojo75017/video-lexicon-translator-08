@@ -27,8 +27,9 @@ interface Brief {
   subtitle: string;
   author: string;
   category: string;
+  chapterCount: string;
 }
-const EMPTY_BRIEF: Brief = { title: '', subtitle: '', author: '', category: '' };
+const EMPTY_BRIEF: Brief = { title: '', subtitle: '', author: '', category: '', chapterCount: '' };
 function loadBrief(): Brief {
   try {
     const raw = localStorage.getItem(BRIEF_KEY);
@@ -297,12 +298,42 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                   style={{ borderColor: '#eadfc9', color: INK }} />
               </div>
               <div>
-                <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Catégorie / genre</label>
-                <input value={brief.category} onChange={(e) => setBriefField('category', e.target.value)} maxLength={120}
-                  placeholder="Ex : Développement personnel"
+                <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Nombre de chapitres visés</label>
+                <input value={brief.chapterCount} onChange={(e) => setBriefField('chapterCount', e.target.value)} maxLength={10}
+                  placeholder="Ex : 12"
                   className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
                   style={{ borderColor: '#eadfc9', color: INK }} />
               </div>
+            </div>
+            <div className="mt-3">
+              <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Catégorie / genre</label>
+              <select value={brief.category} onChange={(e) => setBriefField('category', e.target.value)}
+                className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none appearance-none"
+                style={{ borderColor: '#eadfc9', color: INK, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a18a6c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}>
+                <option value="">-- Laisser l'IA choisir --</option>
+                <option value="Fiction">Fiction</option>
+                <option value="Romance">Romance</option>
+                <option value="Thriller / Policier">Thriller / Policier</option>
+                <option value="Science-Fiction">Science-Fiction</option>
+                <option value="Fantasy">Fantasy</option>
+                <option value="Développement personnel">Développement personnel</option>
+                <option value="Business & Entreprise">Business & Entreprise</option>
+                <option value="Santé, Forme et Diététique">Santé, Forme et Diététique</option>
+                <option value="Famille et bien-être">Famille et bien-être</option>
+                <option value="Cuisine et Vins">Cuisine et Vins</option>
+                <option value="Histoire">Histoire</option>
+                <option value="Biographies et Mémoires">Biographies et Mémoires</option>
+                <option value="Religion et Spiritualité">Religion et Spiritualité</option>
+                <option value="Art, Musique et Photographie">Art, Musique et Photographie</option>
+                <option value="Science et Nature">Science et Nature</option>
+                <option value="Voyage">Voyage</option>
+                <option value="Humour">Humour</option>
+                <option value="Éducation et Enseignement">Éducation et Enseignement</option>
+                <option value="Informatique et Internet">Informatique et Internet</option>
+                <option value="Sports et Loisirs">Sports et Loisirs</option>
+                <option value="Jeunesse">Jeunesse</option>
+                <option value="Érotisme">Érotisme</option>
+              </select>
             </div>
             <div className="mt-3">
               <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>
