@@ -309,15 +309,15 @@ export const V3_MODULES: V3Module[] = [
   // ===== AJOUTS V3 — Communauté KDP Premium — à construire =====
 
   // MARKETING
-  { id: 'community-kdp-hub',        pillar: 'marketing', status: 'todo', title: 'Communauté KDP Premium — Hub de Solutions',
+  { id: 'community-kdp-hub',        pillar: 'marketing', status: 'done', title: 'Communauté KDP Premium — Hub de Solutions',
     description: 'Forum premium façon communauté officielle Amazon KDP : encarts combinés rubriques KDP (Marketing & Promotion, Page Amazon, Paiements & Ventes, Gestion du livre, Compte KDP, Mise en forme, Voix de l’auteur, Audiobooks Voix Virtuelle, Traduction Kindle) + encarts liés aux outils du générateur. Lecture publique (SEO), écriture réservée aux abonnés.' },
-  { id: 'community-pinned-solutions', pillar: 'marketing', status: 'todo', title: 'Solutions & FAQ Épinglées',
+  { id: 'community-pinned-solutions', pillar: 'marketing', status: 'done', title: 'Solutions & FAQ Épinglées',
     description: 'Articles de solutions types épinglés en haut de chaque encart (compte suspendu, royalties retenues, blocage de contenu, conformité, mise en forme refusée…), éditables par l’admin.' },
-  { id: 'community-tool-deeplinks',  pillar: 'marketing', status: 'todo', title: 'Liens Directs vers l’Outil',
+  { id: 'community-tool-deeplinks',  pillar: 'marketing', status: 'done', title: 'Liens Directs vers l’Outil',
     description: 'Chaque encart/problème renvoie vers le module du générateur qui résout le blocage (conformité → Vérificateur de Conformité Contenu, couverture refusée → Couverture KDP Exacte, prix → Auto-Pricing, etc.).' },
 
   // IA AVANCÉE
-  { id: 'community-ai-unblock',     pillar: 'ia',        status: 'todo', title: 'Assistant IA Débloquage KDP',
+  { id: 'community-ai-unblock',     pillar: 'ia',        status: 'done', title: 'Assistant IA Débloquage KDP',
     description: 'Bouton « Débloquer avec l’IA » : à partir de la question/blocage de l’abonné, génère une solution KDP concrète (étapes, modèle d’email au support KDP si besoin) et propose l’outil interne adapté.' },
 
   // ===== AJOUTS V3 — Tunnel de prix 497€ + paiement échelonné — à construire (AOÛT) =====
