@@ -297,7 +297,7 @@ export const V3_MODULES: V3Module[] = [
     description: 'Générateur de carnets, journaux, planners, agendas et cahiers (lignés, pointillés, vierges) : le marché KDP « low/no-content ». Intérieurs PDF prêts aux formats KDP.' },
 
   // MONÉTISER
-  { id: 'print-royalties-calc',  pillar: 'monetiser', status: 'todo', title: 'Calculateur de Redevances Print',
+  { id: 'print-royalties-calc',  pillar: 'monetiser', status: 'done', title: 'Calculateur de Redevances Print',
     description: 'Coût d’impression KDP exact (pages, couleur/N&B, format broché/relié) et marge nette réelle par marché (US/UK/DE/FR), au-delà du simulateur ebook 35%/70%.' },
 
   // MARKETING
