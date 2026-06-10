@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, Copy, Check, FileText, Image as ImageIcon, Download, Link as LinkIcon, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import mockup from '@/assets/influenceurs-mockup.jpg';
+import InfluencerFinder from '@/components/admin/InfluencerFinder';
 import {
   PRICE_NOW, PRICE_V3, COMMISSION_NOW, COMMISSION_V3,
   getActiveCommission, formatEuro, ORIGIN,
