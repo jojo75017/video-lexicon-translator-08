@@ -11,6 +11,13 @@ interface PriorOutput {
   output: string;
 }
 
+interface Brief {
+  title?: string;
+  subtitle?: string;
+  author?: string;
+  category?: string;
+}
+
 interface Body {
   stepNumber?: number;
   stepTitle?: string;
@@ -18,6 +25,7 @@ interface Body {
   moduleTitle?: string;
   moduleDescription?: string;
   theme?: string;
+  brief?: Brief;
   priorOutputs?: PriorOutput[];
   userApiKey?: string;
 }
