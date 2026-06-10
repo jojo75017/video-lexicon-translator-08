@@ -467,6 +467,14 @@ a:hover {
   -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 75%);
   mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 75%);
 }
+.v3-grid-overlay-light {
+  background-image:
+    linear-gradient(to right, rgba(232,149,30,0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(232,149,30,0.06) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 25%, transparent 75%);
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 25%, transparent 75%);
+}
 @media (prefers-reduced-motion: reduce) {
   .v3-aurora-a, .v3-aurora-b, .v3-sheen, .v3-rise { animation: none; }
 }
