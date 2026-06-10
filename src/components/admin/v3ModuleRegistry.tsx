@@ -137,6 +137,10 @@ export const V3_MODULE_COMPONENTS: Record<string, React.ComponentType> = {
   'influencer-kit': InfluencerKit,
   'look-inside-optimizer': LookInsideOptimizer,
   'editorial-reviews': EditorialReviews,
+  'community-kdp-hub': CommunityKdpHub,
+  'community-pinned-solutions': CommunityKdpHub,
+  'community-tool-deeplinks': CommunityKdpHub,
+  'community-ai-unblock': CommunityAiUnblock,
 };
 
 /** Tous les modules ouvrables (mode hors V3 / cockpit standard). */
