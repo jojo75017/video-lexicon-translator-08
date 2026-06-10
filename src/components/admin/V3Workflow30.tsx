@@ -761,6 +761,10 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
         .v3-md th{background:${AMBER_SOFT}}
         .v3-md code{background:#f0e7d4;border-radius:4px;padding:1px 4px;font-size:0.85em}
         .v3-md a{color:${AMBER_DEEP};text-decoration:underline}
+        .v3-scroll{scrollbar-width:thin;scrollbar-color:${AMBER} #f0e7d4}
+        .v3-scroll::-webkit-scrollbar{width:10px}
+        .v3-scroll::-webkit-scrollbar-track{background:#f0e7d4;border-radius:8px}
+        .v3-scroll::-webkit-scrollbar-thumb{background:${AMBER};border-radius:8px;border:2px solid #f0e7d4}
       `}</style>
     </section>
   );
