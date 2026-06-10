@@ -120,6 +120,8 @@ Dis-moi si tu veux tester 🚀` : '';
 
   return (
     <div className="space-y-5">
+      <InfluencerFinder />
+
       <p className="text-sm text-muted-foreground">
         Génère un lien + code de suivi unique par influenceur, copie le message d'approche prêt à coller,
         télécharge le kit, et suis les performances. Commission 30% : <strong>{formatEuro(COMMISSION_NOW)}</strong>/vente
