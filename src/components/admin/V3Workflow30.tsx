@@ -154,6 +154,8 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [openPhase, setOpenPhase] = useState<string | null>(PHASES[0].key);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [draft, setDraft] = useState<string>('');
   const activeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { localStorage.setItem(PROGRESS_KEY, JSON.stringify([...done])); }, [done]);
