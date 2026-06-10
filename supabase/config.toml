@@ -167,3 +167,6 @@ verify_jwt = false
 
 [functions.send-beta-code]
 verify_jwt = false
+
+[functions.v3-pack-checkout]
+verify_jwt = false
