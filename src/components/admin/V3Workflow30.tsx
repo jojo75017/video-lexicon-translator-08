@@ -156,6 +156,8 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [openPhase, setOpenPhase] = useState<string | null>(PHASES[0].key);
+  const [openCfg, setOpenCfg] = useState<'brief' | 'engine' | 'projects' | null>('brief');
+  const toggleCfg = (k: 'brief' | 'engine' | 'projects') => setOpenCfg((p) => (p === k ? null : k));
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<string>('');
   const activeRef = useRef<HTMLDivElement>(null);
@@ -387,10 +389,15 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
           </div>
 
           {/* Brief du livre */}
-          <div className="mt-5 rounded-2xl border p-4 sm:p-5" style={{ borderColor: '#eadfc9', background: '#fffdf8' }}>
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-1" style={{ color: AMBER_DEEP }}>
-              Ton projet de livre
-            </p>
+          <div className="mt-5 rounded-2xl border overflow-hidden" style={{ borderColor: '#eadfc9', background: '#fffdf8' }}>
+            <button type="button" onClick={() => toggleCfg('brief')}
+              className="w-full flex items-center justify-between gap-3 px-4 sm:px-5 py-3.5 text-left transition-colors hover:bg-[#FCF8F0]"
+              aria-expanded={openCfg === 'brief'}>
+              <span className="text-[12px] font-bold uppercase tracking-[0.2em]" style={{ color: AMBER_DEEP }}>📘 Ton projet de livre</span>
+              <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${openCfg === 'brief' ? 'rotate-180' : ''}`} style={{ color: AMBER_DEEP }} />
+            </button>
+            {openCfg === 'brief' && (
+            <div className="px-4 sm:px-5 pb-5">
             <p className="text-xs mb-4" style={{ color: '#6f5e47' }}>
               Renseigne ce que tu sais déjà. Laisse vide ce que tu veux que l'IA propose à ta place
               (elle peut inventer le titre, le sous-titre et même choisir la niche).
@@ -473,13 +480,20 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
                 style={{ borderColor: '#eadfc9', color: INK }} />
             </div>
+            </div>
+            )}
           </div>
 
           {/* Fournisseur IA + clé personnelle */}
-          <div className="mt-4 rounded-2xl border p-4 sm:p-5" style={{ borderColor: '#eadfc9', background: '#fffdf8' }}>
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: AMBER_DEEP }}>
-              Moteur IA & ta clé
-            </p>
+          <div className="mt-4 rounded-2xl border overflow-hidden" style={{ borderColor: '#eadfc9', background: '#fffdf8' }}>
+            <button type="button" onClick={() => toggleCfg('engine')}
+              className="w-full flex items-center justify-between gap-3 px-4 sm:px-5 py-3.5 text-left transition-colors hover:bg-[#FCF8F0]"
+              aria-expanded={openCfg === 'engine'}>
+              <span className="text-[12px] font-bold uppercase tracking-[0.2em]" style={{ color: AMBER_DEEP }}>🤖 Moteur IA & ta clé</span>
+              <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${openCfg === 'engine' ? 'rotate-180' : ''}`} style={{ color: AMBER_DEEP }} />
+            </button>
+            {openCfg === 'engine' && (
+            <div className="px-4 sm:px-5 pb-5">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Fournisseur</label>
@@ -520,13 +534,20 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 Crée ta clé sur openrouter.ai → un seul compte donne accès à Claude, DeepSeek, Llama, Mistral, Grok, Qwen, etc.
               </p>
             )}
+            </div>
+            )}
           </div>
 
           {/* Sauvegarde cloud */}
-          <div className="mt-4 rounded-2xl border p-4 sm:p-5" style={{ borderColor: '#eadfc9', background: '#fffdf8' }}>
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: AMBER_DEEP }}>
-              Mes projets (sauvegarde dans le compte)
-            </p>
+          <div className="mt-4 rounded-2xl border overflow-hidden" style={{ borderColor: '#eadfc9', background: '#fffdf8' }}>
+            <button type="button" onClick={() => toggleCfg('projects')}
+              className="w-full flex items-center justify-between gap-3 px-4 sm:px-5 py-3.5 text-left transition-colors hover:bg-[#FCF8F0]"
+              aria-expanded={openCfg === 'projects'}>
+              <span className="text-[12px] font-bold uppercase tracking-[0.2em]" style={{ color: AMBER_DEEP }}>💾 Mes projets (sauvegarde)</span>
+              <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${openCfg === 'projects' ? 'rotate-180' : ''}`} style={{ color: AMBER_DEEP }} />
+            </button>
+            {openCfg === 'projects' && (
+            <div className="px-4 sm:px-5 pb-5">
             <div className="flex flex-wrap items-end gap-3">
               <div className="flex-1 min-w-[180px]">
                 <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Nom du projet</label>
@@ -558,6 +579,8 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
               </button>
             </div>
             {cloudMsg && <p className="mt-2 text-[12px] font-semibold" style={{ color: AMBER_DEEP }}>{cloudMsg}</p>}
+            </div>
+            )}
           </div>
 
 
@@ -707,8 +730,8 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
 
                               {/* Résultat IA */}
                               {result && (isActive || isDone) && editingId !== step.moduleId && (
-                                <div className="mt-3 rounded-xl border p-4 text-[13px] leading-relaxed v3-md"
-                                  style={{ borderColor: '#eadfc9', background: '#FCFAF4', color: INK }}>
+                                <div className="mt-3 rounded-xl border p-4 text-[13px] leading-relaxed v3-md overflow-y-auto v3-scroll"
+                                  style={{ borderColor: '#eadfc9', background: '#FCFAF4', color: INK, maxHeight: '460px' }}>
                                   <ReactMarkdown>{result}</ReactMarkdown>
                                 </div>
                               )}
@@ -738,6 +761,10 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
         .v3-md th{background:${AMBER_SOFT}}
         .v3-md code{background:#f0e7d4;border-radius:4px;padding:1px 4px;font-size:0.85em}
         .v3-md a{color:${AMBER_DEEP};text-decoration:underline}
+        .v3-scroll{scrollbar-width:thin;scrollbar-color:${AMBER} #f0e7d4}
+        .v3-scroll::-webkit-scrollbar{width:10px}
+        .v3-scroll::-webkit-scrollbar-track{background:#f0e7d4;border-radius:8px}
+        .v3-scroll::-webkit-scrollbar-thumb{background:${AMBER};border-radius:8px;border:2px solid #f0e7d4}
       `}</style>
     </section>
   );
