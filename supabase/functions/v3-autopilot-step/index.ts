@@ -81,6 +81,7 @@ serve(async (req) => {
       ["Sous-titre", brief.subtitle],
       ["Nom de l'auteur", brief.author],
       ["Catégorie / genre", brief.category],
+      ["Nombre de chapitres visés", brief.chapterCount],
     ].filter(([, v]) => (v || "").toString().trim());
     const briefBlock = briefRows.length
       ? `## Brief fourni par l'auteur\n${briefRows
