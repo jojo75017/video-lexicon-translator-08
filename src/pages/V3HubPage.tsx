@@ -1,13 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Sparkles, Crown, Compass } from 'lucide-react';
+import { ArrowLeft, Search, Sparkles, Crown, Compass, Lock } from 'lucide-react';
 import {
-  V3_MODULES, V3_PILLAR_META, type V3Pillar, type V3Module,
+  V3_MODULES, V3_PILLAR_META, getModuleTier, type V3Pillar, type V3Module,
 } from '@/data/roadmapV3';
 import { isModuleClickable, V3ModuleDialog } from '@/components/admin/v3ModuleRegistry';
 import { V3HubTour } from '@/components/admin/V3HubTour';
 import CreateBookHub from '@/components/admin/CreateBookHub';
 import V2V3Compare from '@/components/admin/V2V3Compare';
+import V3PricingTiers from '@/components/admin/V3PricingTiers';
 
 const TOUR_KEY = 'v3hub_tour_done';
 
@@ -66,10 +67,18 @@ function ModuleCard({
       <div className="relative">
         <div className="flex items-center justify-between mb-2">
           <span className="text-lg">{V3_PILLAR_META[module.pillar].emoji}</span>
-          <span data-tour={isFirst ? 'status' : undefined} className="text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
-            style={{ background: `${statusColor}1f`, color: statusColor }}>
-            {statusLabel}
-          </span>
+          <div className="flex items-center gap-1.5">
+            {getModuleTier(module.id) === 'upsell' && (
+              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
+                style={{ background: `${GOLD}1f`, color: GOLD_LIGHT, border: `1px solid ${GOLD}55` }}>
+                <Lock className="h-2.5 w-2.5" /> Option
+              </span>
+            )}
+            <span data-tour={isFirst ? 'status' : undefined} className="text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
+              style={{ background: `${statusColor}1f`, color: statusColor }}>
+              {statusLabel}
+            </span>
+          </div>
         </div>
         <div className="text-sm font-semibold leading-tight mb-1"
           style={{ background: `linear-gradient(90deg, ${GOLD_LIGHT}, #ffffff)`, WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent' }}>
@@ -177,11 +186,11 @@ const V3HubPage: React.FC = () => {
           </p>
 
           <div className="mt-6 flex flex-wrap items-center gap-3">
-            <span data-tour="price" className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold"
+            <a href="#tarifs" data-tour="price" className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold transition-transform hover:-translate-y-0.5"
               style={{ background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, color: '#1a1a1a' }}>
-              <Sparkles className="h-4 w-4" /> 197€ à vie
-            </span>
-            <span className="text-xs text-white/40">{V3_MODULES.length} modules au total</span>
+              <Sparkles className="h-4 w-4" /> Dès 197€ à vie · 3× ou 6× sans frais
+            </a>
+            <span className="text-xs text-white/40">{V3_MODULES.length} modules · Pack Tout Complet 497€</span>
           </div>
         </div>
       </header>
@@ -249,6 +258,7 @@ const V3HubPage: React.FC = () => {
           </div>
         )}
 
+        <V3PricingTiers />
         <V2V3Compare />
       </main>
 
