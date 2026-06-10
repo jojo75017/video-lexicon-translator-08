@@ -279,6 +279,9 @@ const V3HubPage: React.FC = () => {
 
 
       <main className="mx-auto max-w-7xl px-4 py-8">
+        {/* Parcours en 30 étapes — entrée principale du Hub V3 */}
+        <V3Workflow30 onOpenModule={setSelected} />
+
         {/* Recherche + filtres */}
         <div className="sticky top-0 z-20 -mx-4 px-4 py-3 backdrop-blur-md border-b border-[#eadfc9] mb-6" style={{ background: 'rgba(251,246,236,0.85)' }}>
           <div className="relative max-w-md mb-3" data-tour="search">
