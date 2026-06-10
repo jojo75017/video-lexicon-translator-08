@@ -44,6 +44,7 @@ serve(async (req) => {
       moduleTitle = "",
       moduleDescription = "",
       theme = "",
+      brief = {},
       priorOutputs = [],
       userApiKey = "",
     } = body;
