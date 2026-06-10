@@ -229,6 +229,11 @@ Règles :
     // === Étape « Développer le manuscrit » : rédaction chapitre par chapitre ===
     if (isManuscript) {
       const n = Math.min(Math.max(parseInt(brief.chapterCount || "", 10) || 8, 1), 40);
+      const targetWords = Math.min(Math.max(parseInt(brief.wordsPerChapter || "", 10) || 1500, 300), 6000);
+      const minWords = Math.round(targetWords * 0.85);
+      const maxWords = Math.round(targetWords * 1.15);
+      // ~1.6 tokens par mot en français + marge de sécurité.
+      const maxTok = Math.min(Math.max(Math.round(targetWords * 2.2), 2048), 16000);
       const chapters: string[] = [];
       for (let i = 1; i <= n; i++) {
         const prev = chapters.length
@@ -245,13 +250,13 @@ ${contextText}
 ${prev}
 
 ## Consignes de rédaction (IMPÉRATIVES)
-- Écris un VRAI chapitre complet, long et développé : entre 1200 et 2200 mots.
+- Écris un VRAI chapitre complet, long et développé : vise environ ${targetWords} mots (entre ${minWords} et ${maxWords} mots).
 - Commence par un titre de chapitre en Markdown : "## Chapitre ${i} — [titre]".
 - Développe plusieurs sous-parties avec des paragraphes pleins, des exemples concrets et des transitions.
 - INTERDIT : un résumé, un plan, une liste de puces sèche, ou seulement quelques lignes. Le lecteur doit pouvoir LIRE ce chapitre tel quel dans le livre publié.
 - Reste cohérent avec le plan et les chapitres précédents.
 - N'écris pas "voici le chapitre", ne commente pas : écris directement le contenu du chapitre.`;
-        const r = await callAI(system, chapUser, 8192);
+        const r = await callAI(system, chapUser, maxTok);
         if (!r.ok) return aiError(r.status, r.body);
         if (r.text) chapters.push(r.text);
       }
