@@ -514,7 +514,8 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
     try {
       const { parseManuscript } = await import('@/lib/manuscriptParser');
       const docTitle = brief.title?.trim() || theme.trim() || 'Mon livre';
-      const sections = parseManuscript(text, docTitle).map((s) => ({ title: s.title, blocks: s.blocks }));
+      const cleaned = text.replace(/^\s*-{3,}\s*$/gm, '');
+      const sections = parseManuscript(cleaned, docTitle).map((s) => ({ title: s.title, blocks: s.blocks }));
       const slug = docTitle
         .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
         .replace(/[^a-zA-Z0-9]+/g, '-').replace(/(^-|-$)/g, '').toLowerCase() || 'mon-livre';
