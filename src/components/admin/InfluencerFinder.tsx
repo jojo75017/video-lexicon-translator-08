@@ -312,10 +312,41 @@ Dis-moi si tu veux tester 🚀`;
                           </Button>
                         </div>
                       </div>
-                      <Button variant="outline" size="sm" className="h-7 gap-1.5" onClick={() => copyValue(inv.dm, inf.url + 'dm')}>
-                        {copied === inf.url + 'dm' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                        <span className="text-[11px]">Copier le message (DM)</span>
-                      </Button>
+                      <div>
+                        <Label className="text-[11px]">Niche / thématique (pour personnaliser)</Label>
+                        <Input
+                          value={inv.niche}
+                          onChange={(e) => setNiche(inf.url, e.target.value)}
+                          placeholder="ex: booktop romance, finances perso..."
+                          className="text-[11px] h-7 mt-1"
+                        />
+                      </div>
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <Label className="text-[11px]">Message d'invitation (éditable)</Label>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-6 gap-1 px-2"
+                            disabled={inv.generating}
+                            onClick={() => generateAi(inf)}
+                            title="Générer un message personnalisé avec l'IA"
+                          >
+                            {inv.generating ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3 text-[#FF9E2D]" />}
+                            <span className="text-[10px]">Générer avec IA</span>
+                          </Button>
+                        </div>
+                        <Textarea
+                          value={inv.dm}
+                          onChange={(e) => setDm(inf.url, e.target.value)}
+                          rows={8}
+                          className="text-[11px] mt-1 font-sans"
+                        />
+                        <Button variant="outline" size="sm" className="h-7 gap-1.5 mt-1.5" onClick={() => copyValue(inv.dm, inf.url + 'dm')}>
+                          {copied === inf.url + 'dm' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                          <span className="text-[11px]">Copier le message (DM)</span>
+                        </Button>
+                      </div>
                       <div>
                         <Label className="text-[11px]">Envoyer l'invitation par email</Label>
                         <div className="flex gap-1.5 mt-1">
