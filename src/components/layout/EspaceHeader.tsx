@@ -44,7 +44,7 @@ const HIDE_TABBAR_ON = new Set([
 ]);
 
 // Sous-onglets contextuels par famille (les outils courants).
-const PLANNER_SUBTABS: Partial<Record<FamilyId, Array<{ id: string; label: string }>>> = {
+const PLANNER_SUBTABS: Partial<Record<FamilyId, Array<{ id: string; label: string; href?: string; isNew?: boolean }>>> = {
   planner: [
     { id: 'kdp-keywords-pro', label: '🔍 Mots-clés Amazon (KDSpy)' },
     { id: 'workflow-dashboard', label: 'Tableau de bord IA' },
@@ -53,6 +53,7 @@ const PLANNER_SUBTABS: Partial<Record<FamilyId, Array<{ id: string; label: strin
     { id: 'templates', label: 'Modèles' },
     { id: 'doc-transform', label: 'Importer un doc' },
     { id: 'projects', label: 'Mes projets' },
+    { id: 'guides', label: 'Guides', href: '/blog', isNew: true },
   ],
   writing: [
     { id: 'complete-workflow', label: 'Workflow complet' },
