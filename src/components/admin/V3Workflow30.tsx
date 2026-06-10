@@ -159,6 +159,85 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   const [draft, setDraft] = useState<string>('');
   const activeRef = useRef<HTMLDivElement>(null);
 
+  // Fournisseur IA + clé personnelle.
+  const [provider, setProvider] = useState<'gemini' | 'openai'>(
+    () => (localStorage.getItem('v3_workflow30_provider') as 'gemini' | 'openai') || 'gemini',
+  );
+  const [customKey, setCustomKey] = useState<string>(
+    () => localStorage.getItem('v3_workflow30_custom_key') || '',
+  );
+  useEffect(() => { localStorage.setItem('v3_workflow30_provider', provider); }, [provider]);
+  useEffect(() => { localStorage.setItem('v3_workflow30_custom_key', customKey); }, [customKey]);
+  const effectiveKey = (customKey.trim() || userGeminiKey || '').trim();
+
+  // Sauvegarde cloud des projets.
+  const [projects, setProjects] = useState<{ id: string; name: string; updated_at: string }[]>([]);
+  const [projectId, setProjectId] = useState<string | null>(null);
+  const [projectName, setProjectName] = useState<string>('Mon livre');
+  const [saving, setSaving] = useState(false);
+  const [cloudMsg, setCloudMsg] = useState<string | null>(null);
+
+  const refreshProjects = async () => {
+    const { data } = await supabase
+      .from('v3_workflow_projects')
+      .select('id,name,updated_at')
+      .order('updated_at', { ascending: false });
+    if (data) setProjects(data);
+  };
+  useEffect(() => { refreshProjects(); }, []);
+
+  const saveToCloud = async () => {
+    setCloudMsg(null);
+    setSaving(true);
+    try {
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) { setCloudMsg('Connecte-toi pour sauvegarder dans ton compte.'); return; }
+      const payload = {
+        user_id: auth.user.id,
+        name: projectName.trim() || 'Mon livre',
+        theme,
+        brief,
+        done: [...done],
+        results,
+      };
+      if (projectId) {
+        const { error: e } = await supabase.from('v3_workflow_projects').update(payload).eq('id', projectId);
+        if (e) throw e;
+      } else {
+        const { data, error: e } = await supabase.from('v3_workflow_projects').insert(payload).select('id').single();
+        if (e) throw e;
+        if (data) setProjectId(data.id);
+      }
+      setCloudMsg('Projet sauvegardé ✓');
+      await refreshProjects();
+    } catch (e) {
+      setCloudMsg(e instanceof Error ? e.message : 'Échec de la sauvegarde.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const loadFromCloud = async (id: string) => {
+    setCloudMsg(null);
+    if (!id) return;
+    const { data, error: e } = await supabase.from('v3_workflow_projects').select('*').eq('id', id).single();
+    if (e || !data) { setCloudMsg('Impossible de charger ce projet.'); return; }
+    setProjectId(data.id);
+    setProjectName(data.name);
+    setTheme(data.theme || '');
+    setBrief({ ...EMPTY_BRIEF, ...(data.brief || {}) });
+    setDone(new Set((data.done as string[]) || []));
+    setResults((data.results as Record<string, string>) || {});
+    setCloudMsg('Projet chargé ✓');
+  };
+
+  const newProject = () => {
+    setProjectId(null);
+    setProjectName('Mon livre');
+    setCloudMsg(null);
+  };
+
+
   useEffect(() => { localStorage.setItem(PROGRESS_KEY, JSON.stringify([...done])); }, [done]);
   useEffect(() => { localStorage.setItem(RESULTS_KEY, JSON.stringify(results)); }, [results]);
   useEffect(() => { localStorage.setItem(THEME_KEY, theme); }, [theme]);
