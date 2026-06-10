@@ -554,6 +554,25 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                   style={{ borderColor: '#eadfc9', color: INK }} />
               </div>
             </div>
+            <div className="mt-3 flex items-center gap-3 flex-wrap">
+              <button type="button" onClick={testKey} disabled={keyTest === 'testing'}
+                className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold text-white transition-colors disabled:opacity-60"
+                style={{ background: keyTest === 'ok' ? GREEN : keyTest === 'fail' ? '#d14343' : AMBER_DEEP }}>
+                {keyTest === 'testing' ? <Loader2 className="h-4 w-4 animate-spin" />
+                  : keyTest === 'ok' ? <Check className="h-4 w-4" />
+                  : keyTest === 'fail' ? <X className="h-4 w-4" />
+                  : <Sparkles className="h-4 w-4" />}
+                {keyTest === 'testing' ? 'Vérification…'
+                  : keyTest === 'ok' ? 'Clé valide ✓'
+                  : keyTest === 'fail' ? 'Clé invalide'
+                  : 'Tester ma clé'}
+              </button>
+              {keyTest === 'ok' && (
+                <span className="text-[12px] font-semibold" style={{ color: GREEN }}>
+                  Tu peux lancer la génération.
+                </span>
+              )}
+            </div>
             {provider === 'openrouter' && (
               <p className="mt-2 text-[11px]" style={{ color: '#a18a6c' }}>
                 Crée ta clé sur openrouter.ai → un seul compte donne accès à Claude, DeepSeek, Llama, Mistral, Grok, Qwen, etc.
