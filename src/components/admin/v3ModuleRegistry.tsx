@@ -65,6 +65,8 @@ import CommercialScore from '@/components/admin/CommercialScore';
 import InfluencerKit from '@/components/admin/InfluencerKit';
 import LookInsideOptimizer from '@/components/admin/LookInsideOptimizer';
 import EditorialReviews from '@/components/admin/EditorialReviews';
+import CommunityKdpHub from '@/components/admin/CommunityKdpHub';
+import CommunityAiUnblock from '@/components/admin/CommunityAiUnblock';
 
 /** Modules dont le dialog s'affiche en largeur réduite (max-w-2xl). */
 export const NARROW_MODULE_IDS: string[] = [
