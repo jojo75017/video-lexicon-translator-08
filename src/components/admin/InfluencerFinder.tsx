@@ -29,9 +29,12 @@ interface InviteState {
   code: string;
   link: string;
   dm: string;
+  niche: string;
   email: string;
   sending: boolean;
+  generating: boolean;
 }
+
 
 const PLATFORMS: { id: Platform; label: string }[] = [
   { id: 'tiktok', label: 'TikTok' },
