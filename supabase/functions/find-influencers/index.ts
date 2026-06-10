@@ -23,20 +23,43 @@ interface Influencer {
   followers: string | null;
 }
 
-function extractHandle(url: string, platform: Platform): string | null {
+const RESERVED = new Set([
+  "tag", "video", "reel", "reels", "p", "explore", "channel", "c", "watch",
+  "shorts", "hashtag", "discover", "music", "live", "about", "search", "pages",
+  "groups", "story", "stories", "user", "embed",
+]);
+
+/** Returns a clean profile {handle, url} or null if the URL is not a creator profile. */
+function toProfile(rawUrl: string, platform: Platform): { handle: string; url: string } | null {
   try {
-    const u = new URL(url);
+    const u = new URL(rawUrl);
     const parts = u.pathname.split("/").filter(Boolean);
+    if (!parts.length) return null;
+
     if (platform === "tiktok") {
       const at = parts.find((p) => p.startsWith("@"));
-      return at || (parts[0] ? `@${parts[0]}` : null);
+      if (!at || at.length < 3) return null;
+      const handle = at;
+      return { handle, url: `https://www.tiktok.com/${handle}` };
     }
-    if (platform === "instagram") return parts[0] ? `@${parts[0]}` : null;
     if (platform === "youtube") {
       const at = parts.find((p) => p.startsWith("@"));
-      return at || (parts[0] === "c" || parts[0] === "channel" ? parts[1] || null : parts[0] || null);
+      if (at) return { handle: at, url: `https://www.youtube.com/${at}` };
+      if ((parts[0] === "channel" || parts[0] === "c") && parts[1]) {
+        return { handle: parts[1], url: `https://www.youtube.com/${parts[0]}/${parts[1]}` };
+      }
+      return null;
     }
-    if (platform === "facebook") return parts[0] || null;
+    if (platform === "instagram") {
+      const first = parts[0];
+      if (!first || RESERVED.has(first.toLowerCase())) return null;
+      return { handle: `@${first}`, url: `https://www.instagram.com/${first}/` };
+    }
+    if (platform === "facebook") {
+      const first = parts[0];
+      if (!first || RESERVED.has(first.toLowerCase()) || first.includes(".php")) return null;
+      return { handle: first, url: `https://www.facebook.com/${first}` };
+    }
     return null;
   } catch {
     return null;
@@ -44,7 +67,6 @@ function extractHandle(url: string, platform: Platform): string | null {
 }
 
 function extractFollowers(text: string): string | null {
-  // ex: "1.2M followers", "350K abonnés", "12 k abonnés"
   const m = text.match(/([\d.,]+\s?[KkMm]?)\s*(followers|abonn|subscribers|fans|j['’]aime)/i);
   return m ? m[1].trim() : null;
 }
