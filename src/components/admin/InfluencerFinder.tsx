@@ -112,19 +112,35 @@ Dis-moi si tu veux tester 🚀`;
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) throw new Error('Session admin requise.');
-      const base = (inf.handle || inf.name).replace(/[^a-zA-Z0-9]/g, '').slice(0, 10).toUpperCase();
-      const newCode = `INF-${base || 'AMB'}${Math.floor(Math.random() * 1000)}`;
-      const { data: ins, error } = await supabase
+
+      // Réutilise le code de parrainage existant (1 seul code par utilisateur)
+      let code: string | null = null;
+      const { data: existing } = await supabase
         .from('referral_codes')
-        .insert({ user_id: session.user.id, code: newCode })
         .select('code')
-        .single();
-      if (error) throw error;
-      const link = `${ORIGIN}/promo/decouverte?ref=${ins.code}`;
+        .eq('user_id', session.user.id)
+        .limit(1)
+        .maybeSingle();
+
+      if (existing?.code) {
+        code = existing.code;
+      } else {
+        const base = (inf.handle || inf.name).replace(/[^a-zA-Z0-9]/g, '').slice(0, 10).toUpperCase();
+        const newCode = `INF-${base || 'AMB'}${Math.floor(Math.random() * 1000)}`;
+        const { data: ins, error } = await supabase
+          .from('referral_codes')
+          .insert({ user_id: session.user.id, code: newCode })
+          .select('code')
+          .single();
+        if (error) throw error;
+        code = ins.code;
+      }
+
+      const link = `${ORIGIN}/promo/decouverte?ref=${code}`;
       const dm = buildDm(inf, link);
       setInvites((s) => ({
         ...s,
-        [inf.url]: { code: ins.code, link, dm, niche: keyword.trim(), email: '', sending: false, generating: false },
+        [inf.url]: { code: code!, link, dm, niche: keyword.trim(), email: '', sending: false, generating: false },
       }));
       await navigator.clipboard.writeText(dm);
       // Ouvre le profil pour coller le message en DM en un clic
