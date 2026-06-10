@@ -63,6 +63,8 @@ serve(async (req) => {
       provider = "gemini",
       model = "",
       userApiKey = "",
+      chapterIndex,
+      prevChapterTail = "",
     } = body;
 
     // === Sélection du fournisseur ===
