@@ -107,6 +107,68 @@ const InfluenceursPage = () => {
   const earnings = formatEuro(sales * commission);
   const earningsV3 = formatEuro(sales * COMMISSION_V3);
 
+  const shareLink = link || `${ORIGIN}/promo/decouverte?ref=TONCODE`;
+
+  const messages: { key: string; label: string; body: string }[] = [
+    {
+      key: 'dm',
+      label: 'DM TikTok / Insta',
+      body: `Hello 👋 J'utilise Ebookstudio Pro pour générer un livre complet (plan, chapitres, couverture Amazon KDP, SEO) en 30 min avec l'IA.
+
+Si ça t'intéresse, voici mon lien : ${shareLink}
+Paiement unique ${price}€ à vie, zéro abonnement. Dis-moi si tu veux que je te montre 🚀`,
+    },
+    {
+      key: 'bio',
+      label: 'Bio / Lien en bio',
+      body: `📚 Crée ton livre avec l'IA en 30 min → ${shareLink}`,
+    },
+    {
+      key: 'story',
+      label: 'Story Insta',
+      body: `J'ai testé Ebookstudio Pro pour écrire un livre sans savoir écrire 😱
+Plan + chapitres + couverture générés automatiquement.
+👉 Swipe up / lien : ${shareLink}
+${price}€ à vie (pas d'abonnement).`,
+    },
+    {
+      key: 'caption',
+      label: 'Légende Reel / Post',
+      body: `Comment publier ton premier livre Amazon ce week-end (même sans savoir écrire) 📖
+
+J'utilise Ebookstudio Pro : l'IA génère le plan, les chapitres, la couverture KDP et le SEO. Toi tu valides.
+
+🎁 Lien en bio / ${shareLink}
+💸 ${price}€ à vie, paiement unique.
+
+#ebook #amazonkdp #revenuPassif #ia #booktok`,
+    },
+    {
+      key: 'email',
+      label: 'Email / Newsletter',
+      body: `Objet : L'outil que j'utilise pour écrire mes livres avec l'IA
+
+Salut,
+
+Je voulais te partager Ebookstudio Pro : un outil qui génère un livre complet (plan, chapitres, couverture Amazon KDP, fiche SEO) en une trentaine de minutes grâce à l'IA.
+
+Tu peux le tester ici : ${shareLink}
+C'est un paiement unique de ${price}€ à vie, sans abonnement.
+
+À très vite !`,
+    },
+  ];
+
+  const TIPS: string[] = [
+    'Mets ton lien en bio ET dans la description de chaque vidéo : la majorité des ventes viennent de là.',
+    'Montre le produit en action à l\'écran (screen recording) : la preuve visuelle convertit mieux qu\'un discours.',
+    'Accroche les 3 premières secondes : pose une question ou un \u00ab POV \u00bb fort, sinon les gens scrollent.',
+    'Publie 3 à 5 contenus sur le sujet : une seule vidéo passe souvent inaperçue, la répétition crée la confiance.',
+    'Réponds en commentaire \u00ab lien en bio \u00bb quand on te demande l\'outil : ça booste l\'engagement et les clics.',
+    'Insiste sur \u00ab paiement unique, pas d\'abonnement \u00bb : c\'est l\'argument qui rassure le plus.',
+  ];
+
+
   return (
     <FunnelLayout>
       <SeoHead
