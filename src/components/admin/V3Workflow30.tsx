@@ -912,6 +912,24 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                                         : <><Upload className="h-3.5 w-3.5" /> {result ? 'Réimporter un fichier' : 'Importer mon manuscrit'}</>}
                                     </button>
                                   )}
+                                  {step.moduleId === 'p20-chat-manuscript' && result && (
+                                    <>
+                                      <button onClick={() => exportBook('pdf')} disabled={!!exporting}
+                                        className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5 disabled:opacity-60"
+                                        style={{ background: `linear-gradient(90deg, ${GREEN}, #2fc488)` }}>
+                                        {exporting === 'pdf'
+                                          ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Export PDF…</>
+                                          : <><FileDown className="h-3.5 w-3.5" /> Exporter en PDF (KDP)</>}
+                                      </button>
+                                      <button onClick={() => exportBook('docx')} disabled={!!exporting}
+                                        className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold border transition-colors hover:bg-[#eafaf2] disabled:opacity-60"
+                                        style={{ borderColor: `${GREEN}66`, color: GREEN }}>
+                                        {exporting === 'docx'
+                                          ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Export DOCX…</>
+                                          : <><FileDown className="h-3.5 w-3.5" /> Exporter en DOCX</>}
+                                      </button>
+                                    </>
+                                  )}
                                   {result && (
                                     <button onClick={() => startEdit(step.moduleId)}
                                       className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold border transition-colors hover:bg-[#FFF3DF]"
