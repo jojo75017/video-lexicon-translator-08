@@ -294,7 +294,11 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   const generate = async (step: FlatStep) => {
     setError(null);
     if (provider === 'gemini' && !effectiveKey) {
-      setError("Choisis ta clé Gemini ci-dessus (ou bascule sur OpenAI) pour lancer l'auto-pilote.");
+      setError("Choisis ta clé Gemini ci-dessus (ou bascule sur un autre fournisseur) pour lancer l'auto-pilote.");
+      return;
+    }
+    if (provider === 'openrouter' && !customKey.trim()) {
+      setError("Ajoute ta clé OpenRouter (sk-or-…) ci-dessus pour utiliser Claude, DeepSeek, etc.");
       return;
     }
     setLoadingId(step.moduleId);
