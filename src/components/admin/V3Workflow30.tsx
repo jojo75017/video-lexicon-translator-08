@@ -424,6 +424,15 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                   className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
                   style={{ borderColor: '#eadfc9', color: INK }} />
               </div>
+              <div>
+                <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Nombre de mots par chapitre</label>
+                <input value={brief.wordsPerChapter} onChange={(e) => setBriefField('wordsPerChapter', e.target.value)} maxLength={6}
+                  inputMode="numeric"
+                  placeholder="Ex : 1500"
+                  className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
+                  style={{ borderColor: '#eadfc9', color: INK }} />
+                <p className="mt-1 text-[10px]" style={{ color: '#a18a6c' }}>Entre 300 et 6000 mots. Par défaut ≈ 1500.</p>
+              </div>
             </div>
             <div className="mt-3">
               <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Catégorie / genre</label>
