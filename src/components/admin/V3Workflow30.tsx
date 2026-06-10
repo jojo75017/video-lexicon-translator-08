@@ -176,6 +176,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
           moduleDescription: mod?.description ?? '',
           theme,
           priorOutputs,
+          userApiKey: userGeminiKey.trim(),
         },
       });
 
