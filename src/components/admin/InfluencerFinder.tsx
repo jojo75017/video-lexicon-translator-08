@@ -107,8 +107,18 @@ Kit complet (scripts vidéo + visuels) : ${ORIGIN}/influenceurs
 Dis-moi si tu veux tester 🚀`;
 
   const invite = async (inf: Influencer) => {
-    if (invites[inf.url]) return; // already generated
+    if (invites[inf.url]) {
+      toast.info('Invitation déjà générée', {
+        description: `Le bloc d'invitation pour ${inf.handle || inf.name} est déjà affiché ci-dessous. Tu peux copier le message ou l'envoyer par email.`,
+        duration: 5000,
+      });
+      return;
+    }
     setInviting(inf.url);
+    toast.info('Génération en cours...', {
+      description: `Création du lien de parrainage pour ${inf.handle || inf.name}...`,
+      duration: 3000,
+    });
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) throw new Error('Session admin requise.');
@@ -145,9 +155,15 @@ Dis-moi si tu veux tester 🚀`;
       await navigator.clipboard.writeText(dm);
       // Ouvre le profil pour coller le message en DM en un clic
       window.open(inf.url, '_blank', 'noopener,noreferrer');
-      toast.success('Message copié ✓ Le profil s\'ouvre — colle (Ctrl+V) dans le DM');
+      toast.success('✅ Invitation prête !', {
+        description: `Le message a été copié dans ton presse-papier et le profil de ${inf.handle || inf.name} s'est ouvert dans un nouvel onglet.\n\nColle le message (Ctrl+V) directement dans la messagerie de l'influenceur.`,
+        duration: 8000,
+      });
     } catch (e: any) {
-      toast.error(e?.message || 'Échec de la génération du lien.');
+      toast.error('❌ Échec de l\'invitation', {
+        description: e?.message || 'Impossible de générer le lien de parrainage. Vérifie ta connexion et réessaie.',
+        duration: 6000,
+      });
     } finally {
       setInviting(null);
     }
