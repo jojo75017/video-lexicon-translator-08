@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import {
   ArrowRight, Check, ChevronDown, RotateCcw, Trophy, Lock, Sparkles, Loader2, Wand2, AlertCircle,
-  Pencil, Save, X, Upload,
+  Pencil, Save, X, Upload, FileDown,
 } from 'lucide-react';
 import { getModuleById, type V3Module } from '@/data/roadmapV3';
 import { isModuleClickable } from './v3ModuleRegistry';
@@ -501,6 +501,47 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
 
   const validate = (id: string) => setDone((prev) => new Set(prev).add(id));
 
+  // Export du livre généré (PDF KDP / DOCX) directement depuis le parcours.
+  const [exporting, setExporting] = useState<'pdf' | 'docx' | null>(null);
+  const exportBook = async (fmt: 'pdf' | 'docx') => {
+    const text = results['p20-chat-manuscript'] || '';
+    if (text.trim().length < 50) {
+      setError('Génère ou importe d\'abord ton manuscrit avant de l\'exporter.');
+      return;
+    }
+    setError(null);
+    setExporting(fmt);
+    try {
+      const { parseManuscript } = await import('@/lib/manuscriptParser');
+      const docTitle = brief.title?.trim() || theme.trim() || 'Mon livre';
+      const sections = parseManuscript(text, docTitle).map((s) => ({ title: s.title, blocks: s.blocks }));
+      const slug = docTitle
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9]+/g, '-').replace(/(^-|-$)/g, '').toLowerCase() || 'mon-livre';
+      if (fmt === 'pdf') {
+        const { exportEbookToPdf } = await import('@/lib/ebookPdfExporter');
+        await exportEbookToPdf({
+          filename: `${slug}.pdf`,
+          documentTitle: docTitle,
+          documentSubtitle: brief.subtitle?.trim() || undefined,
+          sections,
+        });
+      } else {
+        const { exportEbookToDocx } = await import('@/lib/ebookDocxExporter');
+        await exportEbookToDocx({
+          filename: `${slug}.docx`,
+          documentTitle: docTitle,
+          documentSubtitle: brief.subtitle?.trim() || undefined,
+          sections,
+        });
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Échec de l\'export.');
+    } finally {
+      setExporting(null);
+    }
+  };
+
   const startEdit = (id: string) => { setEditingId(id); setDraft(results[id] ?? ''); };
   const cancelEdit = () => { setEditingId(null); setDraft(''); };
   const saveEdit = (id: string) => {
@@ -870,6 +911,24 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                                         ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Import…</>
                                         : <><Upload className="h-3.5 w-3.5" /> {result ? 'Réimporter un fichier' : 'Importer mon manuscrit'}</>}
                                     </button>
+                                  )}
+                                  {step.moduleId === 'p20-chat-manuscript' && result && (
+                                    <>
+                                      <button onClick={() => exportBook('pdf')} disabled={!!exporting}
+                                        className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5 disabled:opacity-60"
+                                        style={{ background: `linear-gradient(90deg, ${GREEN}, #2fc488)` }}>
+                                        {exporting === 'pdf'
+                                          ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Export PDF…</>
+                                          : <><FileDown className="h-3.5 w-3.5" /> Exporter en PDF (KDP)</>}
+                                      </button>
+                                      <button onClick={() => exportBook('docx')} disabled={!!exporting}
+                                        className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold border transition-colors hover:bg-[#eafaf2] disabled:opacity-60"
+                                        style={{ borderColor: `${GREEN}66`, color: GREEN }}>
+                                        {exporting === 'docx'
+                                          ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Export DOCX…</>
+                                          : <><FileDown className="h-3.5 w-3.5" /> Exporter en DOCX</>}
+                                      </button>
+                                    </>
                                   )}
                                   {result && (
                                     <button onClick={() => startEdit(step.moduleId)}
