@@ -40,15 +40,15 @@ export interface V3UpsellPack {
 export const V3_UPSELL_PACKS: V3UpsellPack[] = [
   {
     id: 'cover',
-    title: 'Pack Couverture Pro',
-    desc: 'Couvertures photoréalistes haut de gamme : direction artistique IA (gpt-image-2), presets bestseller, variantes multiples et test de lisibilité miniature Amazon.',
+    title: 'Pack Visuel & Conversion',
+    desc: 'Des couvertures qui convertissent : direction artistique IA (gpt-image-2), presets bestseller par niche, variantes multiples et test de lisibilité miniature Amazon pour maximiser les clics et les ventes.',
     price: 67,
     modules: ['cover-studio-pro', 'cover-variants-thumbnail'],
   },
   {
     id: 'marketing',
-    title: 'Pack Marketing & Lancement',
-    desc: 'Tout pour lancer et vendre : annonces optimisées, séquence J-7, Amazon Ads, prix de lancement, media kit, Look Inside, avis éditoriaux, BookBub/Facebook et page auteur.',
+    title: 'Pack Lancement & Visibilité',
+    desc: 'Ton plan de bataille pour vendre dès le premier jour : annonces optimisées, séquence J-7, Amazon Ads, prix de lancement, media kit, Look Inside, avis éditoriaux, BookBub/Facebook et page auteur.',
     price: 147,
     modules: [
       'listing-optimizer', 'launch-sequence-j7', 'amazon-ads', 'launch-pricing',
@@ -58,8 +58,8 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
   },
   {
     id: 'social',
-    title: 'Pack Réseaux Sociaux',
-    desc: 'La machine à contenu social : Pinterest auto-pins, hooks TikTok/Reels, calendrier 30 jours, visuels citations, book trailer IA et kit influenceurs.',
+    title: 'Pack Trafic Social & Viralité',
+    desc: 'Une machine à trafic gratuit : Pinterest auto-pins, hooks viraux TikTok/Reels, calendrier éditorial 30 jours, visuels citations, book trailer IA et kit influenceurs pour attirer des lecteurs sans dépenser en pub.',
     price: 87,
     modules: [
       'pinterest-pins', 'tiktok-hooks', 'social-calendar-30', 'quote-visuals',
@@ -68,8 +68,8 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
   },
   {
     id: 'monetisation',
-    title: 'Pack Monétisation Pro',
-    desc: 'Maximise les revenus : auto-pricing, royalties live, simulateur multi-prix, bundles, KDP Select, lead magnet, tunnel back-catalogue, détecteur KU et redevances print.',
+    title: 'Pack Revenus & Scaling',
+    desc: 'Maximise tes gains sur chaque vente : auto-pricing intelligent, royalties live, simulateur multi-prix, bundles, KDP Select, lead magnet, tunnel back-catalogue, détecteur KU et redevances print.',
     price: 99,
     modules: [
       'auto-pricing', 'royalties-dashboard', 'royalties-simulator', 'bundles-boxsets',
