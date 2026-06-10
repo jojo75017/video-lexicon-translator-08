@@ -480,6 +480,8 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
                 style={{ borderColor: '#eadfc9', color: INK }} />
             </div>
+            </div>
+            )}
           </div>
 
           {/* Fournisseur IA + clé personnelle */}
