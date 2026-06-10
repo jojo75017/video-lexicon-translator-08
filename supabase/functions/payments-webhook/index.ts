@@ -219,11 +219,26 @@ Deno.serve(async (req) => {
     console.log("Webhook event:", event.type, event.id);
 
     switch (event.type) {
-      case "checkout.session.completed":
-        await handleCheckoutCompleted(event.data.object);
+      case "checkout.session.completed": {
+        const session = event.data.object;
+        if (session.metadata?.kind === "v3_full_pack") {
+          await handleV3CheckoutCompleted(session);
+        } else {
+          await handleCheckoutCompleted(session);
+        }
+        break;
+      }
+      case "invoice.paid":
+      case "invoice.payment_succeeded":
+        await handleV3InvoicePaid(event.data.object, env);
+        break;
+      case "invoice.payment_failed":
+        await handleV3InvoiceFailed(event.data.object);
+        break;
+      case "customer.subscription.deleted":
+        await handleV3SubscriptionDeleted(event.data.object);
         break;
       default:
-        // Ignore subscription.* etc. — we only do one-time payment
         console.log("Unhandled event:", event.type);
     }
     return new Response(JSON.stringify({ received: true }), {
