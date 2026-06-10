@@ -4,7 +4,7 @@
 // Sends an access email via Resend.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { type StripeEnv, verifyWebhook } from "../_shared/stripe.ts";
+import { type StripeEnv, verifyWebhook, stripeRequest } from "../_shared/stripe.ts";
 
 let _supabase: ReturnType<typeof createClient> | null = null;
 function getSupabase() {
@@ -85,6 +85,123 @@ async function handleCheckoutCompleted(session: any) {
   await sendAccessEmail(order.email, order.first_name);
 }
 
+// ===== V3 Pack Tout Complet — paiement unique ou échéancier =====
+
+// Octroie l'accès à vie EbookStudio (statut actif, pas d'expiration).
+async function grantV3Lifetime(email: string) {
+  const supabase = getSupabase();
+  await supabase.from("subscribers").upsert({
+    email,
+    status: "active",
+    plan_type: "lifetime",
+    plan_tier: "pro",
+    expires_at: null,
+  }, { onConflict: "email" });
+}
+
+// Bloque l'accès (échéances en échec après la période de grâce).
+async function suspendAccess(email: string) {
+  const supabase = getSupabase();
+  await supabase.from("subscribers")
+    .update({ status: "cancelled", updated_at: new Date().toISOString() })
+    .eq("email", email);
+}
+
+async function handleV3CheckoutCompleted(session: any) {
+  const orderId = session.metadata?.order_id;
+  if (!orderId) return;
+  const supabase = getSupabase();
+  const installmentsTotal = Number(session.metadata?.installments_total || "1");
+  const email = (session.metadata?.email || session.customer_email || "").toLowerCase();
+  const subscriptionId = session.subscription || null;
+
+  if (installmentsTotal <= 1) {
+    // Paiement unique : accès à vie immédiat, commande terminée.
+    await supabase.from("v3_installment_orders").update({
+      status: "completed",
+      installments_paid: 1,
+      completed_at: new Date().toISOString(),
+    }).eq("id", orderId);
+    if (email) await grantV3Lifetime(email);
+  } else {
+    // Échéancier : 1re échéance encaissée, accès ouvert dès maintenant.
+    await supabase.from("v3_installment_orders").update({
+      status: "active",
+      installments_paid: 1,
+      stripe_subscription_id: subscriptionId,
+      grace_until: null,
+    }).eq("id", orderId);
+    if (email) await grantV3Lifetime(email);
+  }
+}
+
+async function handleV3InvoicePaid(invoice: any, env: StripeEnv) {
+  const subscriptionId = invoice.subscription;
+  if (!subscriptionId) return;
+  const supabase = getSupabase();
+  const { data: order } = await supabase
+    .from("v3_installment_orders")
+    .select("id, email, installments_total, installments_paid, status")
+    .eq("stripe_subscription_id", subscriptionId)
+    .maybeSingle();
+  if (!order) return;
+
+  // La 1re échéance est déjà comptée au checkout ; on ignore la facture initiale.
+  if (invoice.billing_reason === "subscription_create") return;
+
+  const paid = (order.installments_paid as number) + 1;
+  const total = order.installments_total as number;
+
+  if (paid >= total) {
+    // Toutes les échéances réglées → annuler l'abonnement + accès à vie définitif.
+    try {
+      await stripeRequest(env, "DELETE", `/subscriptions/${subscriptionId}`);
+    } catch (e) {
+      console.error("Cancel subscription failed:", e);
+    }
+    await supabase.from("v3_installment_orders").update({
+      status: "completed",
+      installments_paid: total,
+      grace_until: null,
+      completed_at: new Date().toISOString(),
+    }).eq("id", order.id);
+    if (order.email) await grantV3Lifetime(order.email as string);
+  } else {
+    await supabase.from("v3_installment_orders").update({
+      status: "active",
+      installments_paid: paid,
+      grace_until: null,
+    }).eq("id", order.id);
+  }
+}
+
+async function handleV3InvoiceFailed(invoice: any) {
+  const subscriptionId = invoice.subscription;
+  if (!subscriptionId) return;
+  const supabase = getSupabase();
+  const graceUntil = new Date();
+  graceUntil.setDate(graceUntil.getDate() + 3);
+  await supabase.from("v3_installment_orders").update({
+    status: "past_due",
+    grace_until: graceUntil.toISOString(),
+  }).eq("stripe_subscription_id", subscriptionId);
+}
+
+async function handleV3SubscriptionDeleted(subscription: any) {
+  const supabase = getSupabase();
+  const { data: order } = await supabase
+    .from("v3_installment_orders")
+    .select("id, email, status")
+    .eq("stripe_subscription_id", subscription.id)
+    .maybeSingle();
+  if (!order) return;
+  // Si la commande n'est pas déjà terminée, l'échéancier a échoué → coupure d'accès.
+  if (order.status !== "completed") {
+    await supabase.from("v3_installment_orders").update({ status: "cancelled" }).eq("id", order.id);
+    if (order.email) await suspendAccess(order.email as string);
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
 
@@ -102,11 +219,26 @@ Deno.serve(async (req) => {
     console.log("Webhook event:", event.type, event.id);
 
     switch (event.type) {
-      case "checkout.session.completed":
-        await handleCheckoutCompleted(event.data.object);
+      case "checkout.session.completed": {
+        const session = event.data.object;
+        if (session.metadata?.kind === "v3_full_pack") {
+          await handleV3CheckoutCompleted(session);
+        } else {
+          await handleCheckoutCompleted(session);
+        }
+        break;
+      }
+      case "invoice.paid":
+      case "invoice.payment_succeeded":
+        await handleV3InvoicePaid(event.data.object, env);
+        break;
+      case "invoice.payment_failed":
+        await handleV3InvoiceFailed(event.data.object);
+        break;
+      case "customer.subscription.deleted":
+        await handleV3SubscriptionDeleted(event.data.object);
         break;
       default:
-        // Ignore subscription.* etc. — we only do one-time payment
         console.log("Unhandled event:", event.type);
     }
     return new Response(JSON.stringify({ received: true }), {

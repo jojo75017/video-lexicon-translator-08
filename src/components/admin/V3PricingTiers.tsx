@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Check, Crown, Sparkles, Lock } from 'lucide-react';
 import {
   V3_PRICE, V3_BASE_INSTALLMENTS, V3_UPSELL_PACKS, V3_UPSELLS_TOTAL, V3_FULL_PACK,
 } from '@/data/roadmapV3';
+import V3PackCheckout from './V3PackCheckout';
 
 // Palette « Noir & Or luxe » — locale à cette page (cohérente avec V3HubPage).
 const GOLD = '#c9a84c';
@@ -17,8 +18,10 @@ const GOLD_LIGHT = '#f0d78c';
  * Pas de paiement réel branché : les CTA pointent vers le tunnel existant.
  */
 const V3PricingTiers: React.FC = () => {
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
   return (
     <section id="tarifs" className="mt-16 scroll-mt-20">
+      <V3PackCheckout open={checkoutOpen} onClose={() => setCheckoutOpen(false)} />
       <div className="text-center mb-10">
         <div className="inline-flex items-center gap-2 mb-3">
           <Crown className="h-5 w-5" style={{ color: GOLD }} />

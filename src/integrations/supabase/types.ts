@@ -1398,6 +1398,66 @@ export type Database = {
         }
         Relationships: []
       }
+      v3_installment_orders: {
+        Row: {
+          amount_total: number
+          completed_at: string | null
+          created_at: string
+          currency: string
+          email: string
+          environment: string
+          grace_until: string | null
+          id: string
+          installments_paid: number
+          installments_total: number
+          metadata: Json | null
+          plan: string
+          status: string
+          stripe_customer_id: string | null
+          stripe_session_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_total: number
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          email: string
+          environment?: string
+          grace_until?: string | null
+          id?: string
+          installments_paid?: number
+          installments_total?: number
+          metadata?: Json | null
+          plan: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_session_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_total?: number
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          email?: string
+          environment?: string
+          grace_until?: string | null
+          id?: string
+          installments_paid?: number
+          installments_total?: number
+          metadata?: Json | null
+          plan?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_session_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       workflow_results: {
         Row: {
           created_at: string
