@@ -4,6 +4,8 @@
 
 export type V3Pillar = 'publier' | 'monetiser' | 'marketing' | 'ia';
 export type V3Status = 'todo' | 'in_progress' | 'done';
+export type V3Tier = 'core' | 'upsell';
+export type V3PackId = 'cover' | 'marketing' | 'social' | 'monetisation';
 
 export interface V3Module {
   id: string;
@@ -11,10 +13,102 @@ export interface V3Module {
   pillar: V3Pillar;
   status: V3Status;
   description: string;
+  /** 'core' = inclus dans la base 197€, 'upsell' = vendu en pack optionnel. Dérivé si absent. */
+  tier?: V3Tier;
+  /** Pack upsell auquel le module appartient (si tier = 'upsell'). Dérivé si absent. */
+  pack?: V3PackId;
 }
 
 export const V3_PRICE = 197;
 export const V2_PRICE = 67;
+
+// ============= Grille tarifaire V3 =============
+// Base 197€ + 4 packs upsell (total 400€) → 597€ à la pièce.
+// Pack Tout Complet 497€ → débloque tout, économie de 100€.
+
+export interface V3UpsellPack {
+  id: V3PackId;
+  title: string;
+  desc: string;
+  price: number;
+  /** IDs des modules inclus dans ce pack. */
+  modules: string[];
+  /** Facilités de paiement affichées (optionnel). */
+  installments?: string[];
+}
+
+export const V3_UPSELL_PACKS: V3UpsellPack[] = [
+  {
+    id: 'cover',
+    title: 'Pack Couverture Pro',
+    desc: 'Couvertures photoréalistes haut de gamme : direction artistique IA (gpt-image-2), presets bestseller, variantes multiples et test de lisibilité miniature Amazon.',
+    price: 67,
+    modules: ['cover-studio-pro', 'cover-variants-thumbnail'],
+  },
+  {
+    id: 'marketing',
+    title: 'Pack Marketing & Lancement',
+    desc: 'Tout pour lancer et vendre : annonces optimisées, séquence J-7, Amazon Ads, prix de lancement, media kit, Look Inside, avis éditoriaux, BookBub/Facebook et page auteur.',
+    price: 147,
+    modules: [
+      'listing-optimizer', 'launch-sequence-j7', 'amazon-ads', 'launch-pricing',
+      'media-kit', 'look-inside-optimizer', 'editorial-reviews', 'bookbub-ad-builder',
+      'author-page-optimizer',
+    ],
+  },
+  {
+    id: 'social',
+    title: 'Pack Réseaux Sociaux',
+    desc: 'La machine à contenu social : Pinterest auto-pins, hooks TikTok/Reels, calendrier 30 jours, visuels citations, book trailer IA et kit influenceurs.',
+    price: 87,
+    modules: [
+      'pinterest-pins', 'tiktok-hooks', 'social-calendar-30', 'quote-visuals',
+      'book-trailer', 'influencer-kit',
+    ],
+  },
+  {
+    id: 'monetisation',
+    title: 'Pack Monétisation Pro',
+    desc: 'Maximise les revenus : auto-pricing, royalties live, simulateur multi-prix, bundles, KDP Select, lead magnet, tunnel back-catalogue, détecteur KU et redevances print.',
+    price: 99,
+    modules: [
+      'auto-pricing', 'royalties-dashboard', 'royalties-simulator', 'bundles-boxsets',
+      'kdp-select-planner', 'lead-magnet', 'back-catalog-funnel', 'ku-niche-detector',
+      'print-royalties-calc',
+    ],
+  },
+];
+
+/** Somme des packs à la carte (400€). */
+export const V3_UPSELLS_TOTAL = V3_UPSELL_PACKS.reduce((sum, p) => sum + p.price, 0);
+
+/** Facilités de paiement de la base 197€. */
+export const V3_BASE_INSTALLMENTS = ['1×197€', '3×69€'];
+
+/** Pack Tout Complet : tout débloqué d'un coup. */
+export const V3_FULL_PACK = {
+  title: 'Pack Tout Complet',
+  price: 497,
+  /** Prix si on prend la base + tous les packs séparément. */
+  compareAt: V3_PRICE + V3_UPSELLS_TOTAL, // 597
+  saves: V3_PRICE + V3_UPSELLS_TOTAL - 497, // 100
+  installments: ['1×497€', '4×129€', '6×85€'],
+};
+
+/** Map id de module → pack upsell (dérivé de V3_UPSELL_PACKS). */
+const MODULE_TO_PACK: Record<string, V3PackId> = Object.fromEntries(
+  V3_UPSELL_PACKS.flatMap((p) => p.modules.map((m) => [m, p.id])),
+) as Record<string, V3PackId>;
+
+/** Renvoie le pack d'un module (ou undefined s'il est dans la base). */
+export function getModulePack(moduleId: string): V3PackId | undefined {
+  return MODULE_TO_PACK[moduleId];
+}
+
+/** Renvoie le tier d'un module : 'upsell' s'il appartient à un pack, sinon 'core'. */
+export function getModuleTier(moduleId: string): V3Tier {
+  return MODULE_TO_PACK[moduleId] ? 'upsell' : 'core';
+}
 
 export const V3_PILLAR_META: Record<V3Pillar, { label: string; color: string; emoji: string }> = {
   publier:    { label: 'Publier',    color: '#008296', emoji: '📦' },
