@@ -224,10 +224,16 @@ Dis-moi si tu veux tester 🚀`;
       });
       if (error) throw error;
       if (!data?.success) throw new Error(data?.error || 'Échec de l\'envoi.');
-      toast.success(`Invitation envoyée à ${inv.email.trim()} ✓`);
+      toast.success(`✅ Invitation envoyée à ${inv.email.trim()}`, {
+        description: `${inf.handle || inf.name} recevra ton email d'invitation dans sa boîte mail.`,
+        duration: 6000,
+      });
       setInvites((s) => ({ ...s, [inf.url]: { ...s[inf.url], email: '', sending: false } }));
     } catch (e: any) {
-      toast.error(e?.message || 'Échec de l\'envoi.');
+      toast.error('❌ Échec de l\'envoi', {
+        description: e?.message || 'Impossible d\'envoyer l\'email. Vérifie l\'adresse et réessaie.',
+        duration: 6000,
+      });
       setInvites((s) => ({ ...s, [inf.url]: { ...s[inf.url], sending: false } }));
     }
   };
