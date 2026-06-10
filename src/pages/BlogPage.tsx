@@ -97,24 +97,25 @@ const BlogPage = () => {
               {articles.map((article, index) => (
                 <Link key={index} to={article.slug} className="group">
                   <Card className="h-full bg-card border-border hover:border-primary/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl overflow-hidden">
-                    <div className={`h-32 bg-gradient-to-br ${article.gradient} relative overflow-hidden`}>
-                      <div className="absolute inset-0 bg-black/20" />
-                      <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
-                        <Badge variant="secondary" className="bg-white/20 text-white border-0">{article.category}</Badge>
-                        <article.icon className="w-12 h-12 text-muted-foreground" />
-                      </div>
+                    <div className="relative aspect-[16/10] overflow-hidden">
+                      <img
+                        src={article.image}
+                        alt={article.title}
+                        loading="lazy"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                      <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground border-0">{article.category}</Badge>
                     </div>
                     <CardContent className="p-6">
                       <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                        <span className="flex items-center gap-1"><Clock className="w-4 h-4" />{article.readTime}</span>
+                        <span className="font-medium text-foreground">{article.author}</span>
+                        <span>·</span>
                         <span>{article.date}</span>
+                        <span className="flex items-center gap-1 ml-auto"><Clock className="w-4 h-4" />{article.readTime}</span>
                       </div>
                       <h2 className="text-xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors line-clamp-2">{article.title}</h2>
                       <p className="text-muted-foreground text-sm mb-4 line-clamp-3">{article.excerpt}</p>
-                      <div className="flex items-center gap-2 mb-4">
-                        <Badge variant="outline" className="text-xs border-green-500/30 text-green-600 bg-green-500/5"><Target className="w-3 h-3 mr-1" />{article.keyword}</Badge>
-                        <Badge variant="outline" className="text-xs border-amber-500/30 text-amber-600 bg-amber-500/5"><TrendingUp className="w-3 h-3 mr-1" />{article.searchVolume}/mois</Badge>
-                      </div>
                       <div className="flex items-center text-primary font-medium text-sm group-hover:text-primary/80">
                         Lire l'article <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                       </div>
