@@ -389,10 +389,15 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
           </div>
 
           {/* Brief du livre */}
-          <div className="mt-5 rounded-2xl border p-4 sm:p-5" style={{ borderColor: '#eadfc9', background: '#fffdf8' }}>
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-1" style={{ color: AMBER_DEEP }}>
-              Ton projet de livre
-            </p>
+          <div className="mt-5 rounded-2xl border overflow-hidden" style={{ borderColor: '#eadfc9', background: '#fffdf8' }}>
+            <button type="button" onClick={() => toggleCfg('brief')}
+              className="w-full flex items-center justify-between gap-3 px-4 sm:px-5 py-3.5 text-left transition-colors hover:bg-[#FCF8F0]"
+              aria-expanded={openCfg === 'brief'}>
+              <span className="text-[12px] font-bold uppercase tracking-[0.2em]" style={{ color: AMBER_DEEP }}>📘 Ton projet de livre</span>
+              <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${openCfg === 'brief' ? 'rotate-180' : ''}`} style={{ color: AMBER_DEEP }} />
+            </button>
+            {openCfg === 'brief' && (
+            <div className="px-4 sm:px-5 pb-5">
             <p className="text-xs mb-4" style={{ color: '#6f5e47' }}>
               Renseigne ce que tu sais déjà. Laisse vide ce que tu veux que l'IA propose à ta place
               (elle peut inventer le titre, le sous-titre et même choisir la niche).
