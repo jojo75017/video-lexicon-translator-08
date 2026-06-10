@@ -297,7 +297,7 @@ export const V3_MODULES: V3Module[] = [
     description: 'Générateur de carnets, journaux, planners, agendas et cahiers (lignés, pointillés, vierges) : le marché KDP « low/no-content ». Intérieurs PDF prêts aux formats KDP.' },
 
   // MONÉTISER
-  { id: 'print-royalties-calc',  pillar: 'monetiser', status: 'todo', title: 'Calculateur de Redevances Print',
+  { id: 'print-royalties-calc',  pillar: 'monetiser', status: 'done', title: 'Calculateur de Redevances Print',
     description: 'Coût d’impression KDP exact (pages, couleur/N&B, format broché/relié) et marge nette réelle par marché (US/UK/DE/FR), au-delà du simulateur ebook 35%/70%.' },
 
   // MARKETING
@@ -323,9 +323,9 @@ export const V3_MODULES: V3Module[] = [
   // ===== AJOUTS V3 — Tunnel de prix 497€ + paiement échelonné — à construire (AOÛT) =====
 
   // MONÉTISER
-  { id: 'pricing-ladder-497',       pillar: 'monetiser', status: 'todo', title: 'Échelle de Prix 497€ (Upsells + Pack Tout Inclus)',
+  { id: 'pricing-ladder-497',       pillar: 'monetiser', status: 'done', title: 'Échelle de Prix 497€ (Upsells + Pack Tout Inclus)',
     description: 'Parcours commercial menant à 497€ : V3 197€ + order bump guides avancés 47€ + OTO1 visuels 97€ + OTO2 communauté/coaching 97€ + OTO3 licence étendue/traduction 59€ (= 497€), OU bouton unique « Pack Tout Inclus » à 497€. Source unique de vérité dans un module pricing dédié.' },
-  { id: 'installment-payments',     pillar: 'monetiser', status: 'todo', title: 'Paiement Échelonné Sécurisé (4×129€ / 6×85€)',
+  { id: 'installment-payments',     pillar: 'monetiser', status: 'done', title: 'Paiement Échelonné Sécurisé (4×129€ / 6×85€)',
     description: 'Pack payable en 1×, 4×129€ (516€) ou 6×85€ (510€). Géré par abonnement Stripe à durée limitée pour détecter les échecs. COUPURE AUTOMATIQUE de l’accès 3 JOURS après un paiement échoué (statut suspended → SubscriberGate bloque le lien) ; réactivation auto à la régularisation ; bascule en accès à vie une fois toutes les échéances payées. Relances email Resend à chaque échec + à la suspension.' },
 
   // PUBLIER — Guides nouveaux abonnés (mix : base offerte + avancés payants)
