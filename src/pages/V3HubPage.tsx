@@ -9,6 +9,7 @@ import { V3HubTour } from '@/components/admin/V3HubTour';
 import CreateBookHub from '@/components/admin/CreateBookHub';
 import V2V3Compare from '@/components/admin/V2V3Compare';
 import V3PricingTiers from '@/components/admin/V3PricingTiers';
+import V3Workflow30 from '@/components/admin/V3Workflow30';
 import pillarIa from '@/assets/v3/pillar-ia.jpg';
 import pillarPublier from '@/assets/v3/pillar-publier.jpg';
 import pillarMonetiser from '@/assets/v3/pillar-monetiser.jpg';
@@ -278,6 +279,9 @@ const V3HubPage: React.FC = () => {
 
 
       <main className="mx-auto max-w-7xl px-4 py-8">
+        {/* Parcours en 30 étapes — entrée principale du Hub V3 */}
+        <V3Workflow30 onOpenModule={setSelected} />
+
         {/* Recherche + filtres */}
         <div className="sticky top-0 z-20 -mx-4 px-4 py-3 backdrop-blur-md border-b border-[#eadfc9] mb-6" style={{ background: 'rgba(251,246,236,0.85)' }}>
           <div className="relative max-w-md mb-3" data-tour="search">
