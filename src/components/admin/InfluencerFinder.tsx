@@ -140,7 +140,7 @@ Dis-moi si tu veux tester 🚀`;
       const dm = buildDm(inf, link);
       setInvites((s) => ({
         ...s,
-        [inf.url]: { code: ins.code, link, dm, niche: keyword.trim(), email: '', sending: false, generating: false },
+        [inf.url]: { code: code!, link, dm, niche: keyword.trim(), email: '', sending: false, generating: false },
       }));
       await navigator.clipboard.writeText(dm);
       // Ouvre le profil pour coller le message en DM en un clic
