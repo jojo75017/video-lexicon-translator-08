@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Check, Crown, Sparkles, Lock, ChevronDown, CheckCircle2, Clock } from 'lucide-react';
 import {
   V3_PRICE, V3_BASE_INSTALLMENTS, V3_UPSELL_PACKS, V3_UPSELLS_TOTAL, V3_FULL_PACK,
-  getModuleById,
+  getModuleById, type V3Module,
 } from '@/data/roadmapV3';
-import { isModuleClickable } from './v3ModuleRegistry';
+import { isModuleClickable, V3ModuleDialog } from './v3ModuleRegistry';
 import V3PackCheckout from './V3PackCheckout';
 
 // Palette « Clair Ambre » — cohérente avec V3HubPage.
@@ -24,11 +24,13 @@ const V3PricingTiers: React.FC = () => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [baseCheckoutOpen, setBaseCheckoutOpen] = useState(false);
   const [openPack, setOpenPack] = useState<string | null>(null);
+  const [activeModule, setActiveModule] = useState<V3Module | null>(null);
 
   return (
     <section id="tarifs" className="mt-16 scroll-mt-20">
       <V3PackCheckout open={checkoutOpen} onClose={() => setCheckoutOpen(false)} product="full" />
       <V3PackCheckout open={baseCheckoutOpen} onClose={() => setBaseCheckoutOpen(false)} product="base" />
+      <V3ModuleDialog module={activeModule} onClose={() => setActiveModule(null)} />
       <div className="text-center mb-10">
         <div className="inline-flex items-center gap-2 mb-3">
           <Crown className="h-5 w-5" style={{ color: AMBER }} />
@@ -159,20 +161,35 @@ const V3PricingTiers: React.FC = () => {
                     const mod = getModuleById(mid);
                     const ready = isModuleClickable(mid);
                     return (
-                      <li key={mid} className="flex items-start gap-2 px-4 py-2.5">
-                        {ready
-                          ? <CheckCircle2 className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: '#1f9d6b' }} />
-                          : <Clock className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: '#a18a6c' }} />}
-                        <div className="min-w-0">
-                          <div className="text-[12px] font-semibold leading-tight" style={{ color: INK }}>
-                            {mod?.title ?? mid}
-                          </div>
-                          {mod?.description && (
-                            <div className="text-[10.5px] leading-snug mt-0.5 line-clamp-2" style={{ color: '#8a7860' }}>
-                              {mod.description}
+                      <li key={mid}>
+                        <button
+                          type="button"
+                          disabled={!ready || !mod}
+                          onClick={() => mod && ready && setActiveModule(mod)}
+                          className={`w-full text-left flex items-start gap-2 px-4 py-2.5 transition-colors ${ready ? 'hover:bg-[#FFF3DF] cursor-pointer' : 'cursor-default'}`}
+                        >
+                          {ready
+                            ? <CheckCircle2 className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: '#1f9d6b' }} />
+                            : <Clock className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: '#a18a6c' }} />}
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[12px] font-semibold leading-tight" style={{ color: INK }}>
+                                {mod?.title ?? mid}
+                              </span>
+                              {ready && (
+                                <span className="text-[9px] font-bold uppercase tracking-wide rounded px-1.5 py-0.5 shrink-0"
+                                  style={{ background: AMBER_SOFT, color: AMBER_DEEP }}>
+                                  Ouvrir
+                                </span>
+                              )}
                             </div>
-                          )}
-                        </div>
+                            {mod?.description && (
+                              <div className="text-[10.5px] leading-snug mt-0.5 line-clamp-2" style={{ color: '#8a7860' }}>
+                                {mod.description}
+                              </div>
+                            )}
+                          </div>
+                        </button>
                       </li>
                     );
                   })}
