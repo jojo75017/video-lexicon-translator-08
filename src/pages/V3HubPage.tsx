@@ -9,6 +9,17 @@ import { V3HubTour } from '@/components/admin/V3HubTour';
 import CreateBookHub from '@/components/admin/CreateBookHub';
 import V2V3Compare from '@/components/admin/V2V3Compare';
 import V3PricingTiers from '@/components/admin/V3PricingTiers';
+import pillarIa from '@/assets/v3/pillar-ia.jpg';
+import pillarPublier from '@/assets/v3/pillar-publier.jpg';
+import pillarMonetiser from '@/assets/v3/pillar-monetiser.jpg';
+import pillarMarketing from '@/assets/v3/pillar-marketing.jpg';
+
+const PILLAR_IMG: Record<V3Pillar, string> = {
+  ia: pillarIa,
+  publier: pillarPublier,
+  monetiser: pillarMonetiser,
+  marketing: pillarMarketing,
+};
 
 const TOUR_KEY = 'v3hub_tour_done';
 
@@ -72,7 +83,19 @@ function ModuleCard({
       {/* halo ambré au survol */}
       <div className="pointer-events-none absolute -inset-px opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         style={{ background: `radial-gradient(160px 110px at 50% 0%, ${AMBER}1f, transparent 70%)` }} />
-      <div className="relative h-full rounded-2xl p-4">
+      {/* bannière illustrée du pilier */}
+      <div className="relative h-24 overflow-hidden">
+        <img
+          src={PILLAR_IMG[module.pillar]}
+          alt=""
+          loading="lazy"
+          width={768}
+          height={512}
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+        <span className="pointer-events-none absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 40%, rgba(255,255,255,0.85) 100%)' }} />
+      </div>
+      <div className="relative rounded-b-2xl p-4 -mt-1">
         <div className="flex items-center justify-between mb-2.5">
           <span className="grid h-9 w-9 place-items-center rounded-xl text-lg border border-[#eadfc9] bg-[#FCF8F0] group-hover:border-[#E8951E]/40 transition-colors">
             {V3_PILLAR_META[module.pillar].emoji}
