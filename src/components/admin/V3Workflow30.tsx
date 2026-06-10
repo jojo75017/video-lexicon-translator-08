@@ -19,6 +19,23 @@ const SERIF = "'Georgia', 'Times New Roman', serif";
 const PROGRESS_KEY = 'v3_workflow30_progress';
 const RESULTS_KEY = 'v3_workflow30_results';
 const THEME_KEY = 'v3_workflow30_theme';
+const BRIEF_KEY = 'v3_workflow30_brief';
+
+interface Brief {
+  title: string;
+  subtitle: string;
+  author: string;
+  category: string;
+}
+const EMPTY_BRIEF: Brief = { title: '', subtitle: '', author: '', category: '' };
+function loadBrief(): Brief {
+  try {
+    const raw = localStorage.getItem(BRIEF_KEY);
+    return raw ? { ...EMPTY_BRIEF, ...(JSON.parse(raw) as Partial<Brief>) } : EMPTY_BRIEF;
+  } catch {
+    return EMPTY_BRIEF;
+  }
+}
 
 interface Step {
   moduleId: string;
