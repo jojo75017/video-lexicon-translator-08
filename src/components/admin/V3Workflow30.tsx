@@ -176,6 +176,31 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   useEffect(() => { localStorage.setItem('v3_workflow30_model', model); }, [model]);
   useEffect(() => { localStorage.setItem('v3_workflow30_custom_key', customKey); }, [customKey]);
   const effectiveKey = (customKey.trim() || userGeminiKey || '').trim();
+
+  // Test de validité de la clé (bouton vert si OK).
+  const [keyTest, setKeyTest] = useState<'idle' | 'testing' | 'ok' | 'fail'>('idle');
+  useEffect(() => { setKeyTest('idle'); }, [customKey, provider]);
+  const testKey = async () => {
+    const k = (provider === 'gemini' ? effectiveKey : customKey.trim());
+    if (!k) { setKeyTest('fail'); return; }
+    setKeyTest('testing');
+    try {
+      let ok = false;
+      if (provider === 'gemini') {
+        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(k)}`);
+        ok = r.ok || r.status === 429 || (/^AQ\.Ab8?/i.test(k) && [400, 401, 403].includes(r.status));
+      } else if (provider === 'openai') {
+        const r = await fetch('https://api.openai.com/v1/models', { headers: { Authorization: `Bearer ${k}` } });
+        ok = r.ok || r.status === 429;
+      } else {
+        const r = await fetch('https://openrouter.ai/api/v1/auth/key', { headers: { Authorization: `Bearer ${k}` } });
+        ok = r.ok;
+      }
+      setKeyTest(ok ? 'ok' : 'fail');
+    } catch {
+      setKeyTest('fail');
+    }
+  };
   const MODELS: Record<string, { value: string; label: string }[]> = {
     gemini: [
       { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash (rapide)' },
@@ -425,11 +450,19 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                   style={{ borderColor: '#eadfc9', color: INK }} />
               </div>
               <div>
-                <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Nombre de chapitres visés</label>
-                <input value={brief.chapterCount} onChange={(e) => setBriefField('chapterCount', e.target.value)} maxLength={10}
-                  placeholder="Ex : 12"
-                  className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
-                  style={{ borderColor: '#eadfc9', color: INK }} />
+                <label className="flex items-center justify-between text-[11px] font-semibold mb-1.5" style={{ color: INK }}>
+                  <span>Nombre de chapitres visés</span>
+                  <span className="rounded-md px-2 py-0.5 text-[12px] font-bold" style={{ background: AMBER_SOFT, color: AMBER_DEEP }}>
+                    {brief.chapterCount || '12'}
+                  </span>
+                </label>
+                <input type="range" min={1} max={40} step={1}
+                  value={parseInt(brief.chapterCount) || 12}
+                  onChange={(e) => setBriefField('chapterCount', e.target.value)}
+                  className="w-full accent-[#C97A14] cursor-pointer" />
+                <div className="flex justify-between text-[10px] mt-1" style={{ color: '#a18a6c' }}>
+                  <span>1</span><span>Max 40</span>
+                </div>
               </div>
               <div>
                 <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Nombre de mots par chapitre</label>
@@ -528,6 +561,25 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                   className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
                   style={{ borderColor: '#eadfc9', color: INK }} />
               </div>
+            </div>
+            <div className="mt-3 flex items-center gap-3 flex-wrap">
+              <button type="button" onClick={testKey} disabled={keyTest === 'testing'}
+                className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold text-white transition-colors disabled:opacity-60"
+                style={{ background: keyTest === 'ok' ? GREEN : keyTest === 'fail' ? '#d14343' : AMBER_DEEP }}>
+                {keyTest === 'testing' ? <Loader2 className="h-4 w-4 animate-spin" />
+                  : keyTest === 'ok' ? <Check className="h-4 w-4" />
+                  : keyTest === 'fail' ? <X className="h-4 w-4" />
+                  : <Sparkles className="h-4 w-4" />}
+                {keyTest === 'testing' ? 'Vérification…'
+                  : keyTest === 'ok' ? 'Clé valide ✓'
+                  : keyTest === 'fail' ? 'Clé invalide'
+                  : 'Tester ma clé'}
+              </button>
+              {keyTest === 'ok' && (
+                <span className="text-[12px] font-semibold" style={{ color: GREEN }}>
+                  Tu peux lancer la génération.
+                </span>
+              )}
             </div>
             {provider === 'openrouter' && (
               <p className="mt-2 text-[11px]" style={{ color: '#a18a6c' }}>
