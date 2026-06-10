@@ -816,7 +816,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                                       className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5 disabled:opacity-60"
                                       style={{ background: `linear-gradient(90deg, ${AMBER}, #FFB44D)` }}>
                                       {isLoading
-                                        ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> L'IA travaille…</>
+                                        ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> {isLoading && progress ? `Chapitre ${progress.current} / ${progress.total}…` : "L'IA travaille…"}</>
                                         : <><Sparkles className="h-3.5 w-3.5" /> {result ? 'Régénérer' : 'Générer avec l\'IA'}</>}
                                     </button>
                                   )}
