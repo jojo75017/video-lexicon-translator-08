@@ -6,6 +6,7 @@ import {
 import { getModuleById, type V3Module } from '@/data/roadmapV3';
 import { isModuleClickable } from './v3ModuleRegistry';
 import { supabase } from '@/integrations/supabase/client';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 // Palette « Clair Ambre » — cohérente avec V3HubPage.
 const AMBER = '#E8951E';
