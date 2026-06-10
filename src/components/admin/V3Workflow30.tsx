@@ -450,11 +450,19 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                   style={{ borderColor: '#eadfc9', color: INK }} />
               </div>
               <div>
-                <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Nombre de chapitres visés</label>
-                <input value={brief.chapterCount} onChange={(e) => setBriefField('chapterCount', e.target.value)} maxLength={10}
-                  placeholder="Ex : 12"
-                  className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
-                  style={{ borderColor: '#eadfc9', color: INK }} />
+                <label className="flex items-center justify-between text-[11px] font-semibold mb-1.5" style={{ color: INK }}>
+                  <span>Nombre de chapitres visés</span>
+                  <span className="rounded-md px-2 py-0.5 text-[12px] font-bold" style={{ background: AMBER_SOFT, color: AMBER_DEEP }}>
+                    {brief.chapterCount || '12'}
+                  </span>
+                </label>
+                <input type="range" min={1} max={40} step={1}
+                  value={parseInt(brief.chapterCount) || 12}
+                  onChange={(e) => setBriefField('chapterCount', e.target.value)}
+                  className="w-full accent-[#C97A14] cursor-pointer" />
+                <div className="flex justify-between text-[10px] mt-1" style={{ color: '#a18a6c' }}>
+                  <span>1</span><span>Max 40</span>
+                </div>
               </div>
               <div>
                 <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Nombre de mots par chapitre</label>
