@@ -852,8 +852,24 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                                 </div>
                               )}
 
-                              {/* Mode brouillon : édition du texte */}
-                              {editingId === step.moduleId && (
+                              {/* Avancement de la rédaction (chapitre par chapitre) */}
+                              {isActive && isLoading && progress && (
+                                <div className="mt-2.5">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <span className="inline-flex items-center gap-1.5 text-[11px] font-bold" style={{ color: GREEN }}>
+                                      <Loader2 className="h-3 w-3 animate-spin" /> Rédaction du chapitre {progress.current} sur {progress.total}
+                                    </span>
+                                    <span className="text-[11px] font-black" style={{ color: GREEN }}>
+                                      {Math.round((progress.current / progress.total) * 100)}%
+                                    </span>
+                                  </div>
+                                  <div className="h-2 w-full rounded-full overflow-hidden" style={{ background: '#e7f6ee' }}>
+                                    <div className="h-full rounded-full transition-all duration-500"
+                                      style={{ width: `${Math.round((progress.current / progress.total) * 100)}%`, background: `linear-gradient(90deg, ${GREEN}, #2fc488)` }} />
+                                  </div>
+                                </div>
+                              )}
+
                                 <div className="mt-3">
                                   <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.15em] mb-2" style={{ color: AMBER_DEEP }}>
                                     <Pencil className="h-3.5 w-3.5" /> Mode brouillon
