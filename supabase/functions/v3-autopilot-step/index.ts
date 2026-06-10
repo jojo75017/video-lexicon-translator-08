@@ -20,6 +20,7 @@ interface Brief {
 }
 
 interface Body {
+  moduleId?: string;
   stepNumber?: number;
   stepTitle?: string;
   stepHint?: string;
@@ -39,6 +40,7 @@ serve(async (req) => {
   try {
     const body = (await req.json()) as Body;
     const {
+      moduleId = "",
       stepNumber = 1,
       stepTitle = "",
       stepHint = "",
@@ -116,48 +118,96 @@ ${contextText}
 ## Ta mission
 Réalise concrètement cette étape maintenant et renvoie uniquement le livrable final.`;
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: system }] },
-          contents: [{ role: "user", parts: [{ text: user }] }],
-          generationConfig: { temperature: 0.8, maxOutputTokens: 3000 },
-        }),
-      },
-    );
+    async function callGemini(
+      sys: string,
+      usr: string,
+      maxOutputTokens: number,
+    ): Promise<{ ok: true; text: string } | { ok: false; status: number; body: string }> {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            system_instruction: { parts: [{ text: sys }] },
+            contents: [{ role: "user", parts: [{ text: usr }] }],
+            generationConfig: { temperature: 0.8, maxOutputTokens },
+          }),
+        },
+      );
+      if (!response.ok) {
+        const t = await response.text();
+        return { ok: false, status: response.status, body: t };
+      }
+      const data = await response.json();
+      const text = (data.candidates?.[0]?.content?.parts?.[0]?.text || "").trim();
+      return { ok: true, text };
+    }
 
-    if (response.status === 429) {
-      return new Response(
-        JSON.stringify({ error: "Limite Gemini atteinte. Réessaie dans un instant." }),
-        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
-    }
-    if (response.status === 400 || response.status === 403) {
-      const t = await response.text();
-      console.error("Gemini auth error", response.status, t);
-      return new Response(
-        JSON.stringify({
-          error:
-            "Clé API Gemini invalide ou refusée. Vérifie ta clé dans Paramètres > Clés API.",
-        }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
-    }
-    if (!response.ok) {
-      const t = await response.text();
-      console.error("Gemini error", response.status, t);
+    function geminiError(status: number, logBody: string) {
+      console.error("Gemini error", status, logBody);
+      if (status === 429) {
+        return new Response(
+          JSON.stringify({ error: "Limite Gemini atteinte. Réessaie dans un instant." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+      if (status === 400 || status === 403) {
+        return new Response(
+          JSON.stringify({
+            error:
+              "Clé API Gemini invalide ou refusée. Vérifie ta clé dans Paramètres > Clés API.",
+          }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
       return new Response(
         JSON.stringify({ error: "L'IA n'a pas pu générer cette étape. Réessaie." }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    const data = await response.json();
-    const result: string =
-      (data.candidates?.[0]?.content?.parts?.[0]?.text || "").trim();
+    const isManuscript = moduleId === "p20-chat-manuscript";
+
+    // === Étape « Développer le manuscrit » : rédaction chapitre par chapitre ===
+    if (isManuscript) {
+      const n = Math.min(Math.max(parseInt(brief.chapterCount || "", 10) || 8, 1), 40);
+      const chapters: string[] = [];
+      for (let i = 1; i <= n; i++) {
+        const prev = chapters.length
+          ? `\n## Fin du chapitre précédent (pour la continuité)\n${chapters[chapters.length - 1].slice(-800)}`
+          : "";
+        const chapUser = `# Rédige intégralement le CHAPITRE ${i} sur ${n} du livre.
+
+${themeLine}
+
+${briefBlock}
+
+## Contexte du projet (concept, plan et décisions précédentes)
+${contextText}
+${prev}
+
+## Ta mission
+Rédige le chapitre ${i} EN ENTIER, prêt à publier (1200 à 2000 mots), avec un titre de chapitre clair en titre Markdown (## Chapitre ${i} — …), un contenu développé, fluide et cohérent avec le plan et les chapitres précédents. Ne résume pas, n'écris pas "voici le chapitre" : écris directement le chapitre complet.`;
+        const r = await callGemini(system, chapUser, 4000);
+        if (!r.ok) return geminiError(r.status, r.body);
+        if (r.text) chapters.push(r.text);
+      }
+      const result = chapters.join("\n\n---\n\n").trim();
+      if (!result) {
+        return new Response(
+          JSON.stringify({ error: "Réponse vide de l'IA. Réessaie." }),
+          { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+      return new Response(JSON.stringify({ result }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const r = await callGemini(system, user, 3000);
+    if (!r.ok) return geminiError(r.status, r.body);
+    const result = r.text;
 
     if (!result) {
       return new Response(
