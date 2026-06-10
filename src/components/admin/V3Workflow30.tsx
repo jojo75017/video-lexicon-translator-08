@@ -159,6 +159,86 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   const [draft, setDraft] = useState<string>('');
   const activeRef = useRef<HTMLDivElement>(null);
 
+  // Fournisseur IA + clé personnelle.
+  const [provider, setProvider] = useState<'gemini' | 'openai'>(
+    () => (localStorage.getItem('v3_workflow30_provider') as 'gemini' | 'openai') || 'gemini',
+  );
+  const [customKey, setCustomKey] = useState<string>(
+    () => localStorage.getItem('v3_workflow30_custom_key') || '',
+  );
+  useEffect(() => { localStorage.setItem('v3_workflow30_provider', provider); }, [provider]);
+  useEffect(() => { localStorage.setItem('v3_workflow30_custom_key', customKey); }, [customKey]);
+  const effectiveKey = (customKey.trim() || userGeminiKey || '').trim();
+
+  // Sauvegarde cloud des projets.
+  const [projects, setProjects] = useState<{ id: string; name: string; updated_at: string }[]>([]);
+  const [projectId, setProjectId] = useState<string | null>(null);
+  const [projectName, setProjectName] = useState<string>('Mon livre');
+  const [saving, setSaving] = useState(false);
+  const [cloudMsg, setCloudMsg] = useState<string | null>(null);
+
+  const refreshProjects = async () => {
+    const { data } = await supabase
+      .from('v3_workflow_projects')
+      .select('id,name,updated_at')
+      .order('updated_at', { ascending: false });
+    if (data) setProjects(data);
+  };
+  useEffect(() => { refreshProjects(); }, []);
+
+  const saveToCloud = async () => {
+    setCloudMsg(null);
+    setSaving(true);
+    try {
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) { setCloudMsg('Connecte-toi pour sauvegarder dans ton compte.'); return; }
+      const payload = {
+        user_id: auth.user.id,
+        name: projectName.trim() || 'Mon livre',
+        theme,
+        brief: brief as unknown as Record<string, unknown>,
+        done: [...done] as unknown as Record<string, unknown>,
+        results: results as unknown as Record<string, unknown>,
+      };
+      if (projectId) {
+        const { error: e } = await supabase.from('v3_workflow_projects').update(payload as never).eq('id', projectId);
+        if (e) throw e;
+      } else {
+        const { data, error: e } = await supabase.from('v3_workflow_projects').insert(payload as never).select('id').single();
+        if (e) throw e;
+        if (data) setProjectId((data as { id: string }).id);
+      }
+
+      setCloudMsg('Projet sauvegardé ✓');
+      await refreshProjects();
+    } catch (e) {
+      setCloudMsg(e instanceof Error ? e.message : 'Échec de la sauvegarde.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const loadFromCloud = async (id: string) => {
+    setCloudMsg(null);
+    if (!id) return;
+    const { data, error: e } = await supabase.from('v3_workflow_projects').select('*').eq('id', id).single();
+    if (e || !data) { setCloudMsg('Impossible de charger ce projet.'); return; }
+    setProjectId(data.id);
+    setProjectName(data.name);
+    setTheme(data.theme || '');
+    setBrief({ ...EMPTY_BRIEF, ...((data.brief as Partial<Brief>) || {}) });
+    setDone(new Set((data.done as string[]) || []));
+    setResults((data.results as Record<string, string>) || {});
+    setCloudMsg('Projet chargé ✓');
+  };
+
+  const newProject = () => {
+    setProjectId(null);
+    setProjectName('Mon livre');
+    setCloudMsg(null);
+  };
+
+
   useEffect(() => { localStorage.setItem(PROGRESS_KEY, JSON.stringify([...done])); }, [done]);
   useEffect(() => { localStorage.setItem(RESULTS_KEY, JSON.stringify(results)); }, [results]);
   useEffect(() => { localStorage.setItem(THEME_KEY, theme); }, [theme]);
@@ -181,8 +261,8 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
 
   const generate = async (step: FlatStep) => {
     setError(null);
-    if (!userGeminiKey || !userGeminiKey.trim()) {
-      setError("Configure d'abord ta clé API Gemini dans Paramètres > Clés API pour lancer l'auto-pilote.");
+    if (provider === 'gemini' && !effectiveKey) {
+      setError("Choisis ta clé Gemini ci-dessus (ou bascule sur OpenAI) pour lancer l'auto-pilote.");
       return;
     }
     setLoadingId(step.moduleId);
@@ -202,9 +282,11 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
           theme,
           brief,
           priorOutputs,
-          userApiKey: userGeminiKey.trim(),
+          provider,
+          userApiKey: provider === 'gemini' ? effectiveKey : customKey.trim(),
         },
       });
+
 
       if (fnErr) throw new Error(fnErr.message);
       if (data?.error) throw new Error(data.error);
@@ -346,6 +428,75 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 style={{ borderColor: '#eadfc9', color: INK }} />
             </div>
           </div>
+
+          {/* Fournisseur IA + clé personnelle */}
+          <div className="mt-4 rounded-2xl border p-4 sm:p-5" style={{ borderColor: '#eadfc9', background: '#fffdf8' }}>
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: AMBER_DEEP }}>
+              Moteur IA & ta clé
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Fournisseur</label>
+                <select value={provider} onChange={(e) => setProvider(e.target.value as 'gemini' | 'openai')}
+                  className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none appearance-none"
+                  style={{ borderColor: '#eadfc9', color: INK, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a18a6c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}>
+                  <option value="gemini">Google Gemini (ta clé)</option>
+                  <option value="openai">OpenAI</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>
+                  {provider === 'gemini'
+                    ? 'Clé Gemini (laisse vide pour utiliser celle des réglages)'
+                    : 'Clé OpenAI (facultative)'}
+                </label>
+                <input value={customKey} onChange={(e) => setCustomKey(e.target.value)} type="password"
+                  placeholder={provider === 'gemini' ? 'AIza…' : 'sk-…'}
+                  className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
+                  style={{ borderColor: '#eadfc9', color: INK }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Sauvegarde cloud */}
+          <div className="mt-4 rounded-2xl border p-4 sm:p-5" style={{ borderColor: '#eadfc9', background: '#fffdf8' }}>
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: AMBER_DEEP }}>
+              Mes projets (sauvegarde dans le compte)
+            </p>
+            <div className="flex flex-wrap items-end gap-3">
+              <div className="flex-1 min-w-[180px]">
+                <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Nom du projet</label>
+                <input value={projectName} onChange={(e) => setProjectName(e.target.value)} maxLength={120}
+                  className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
+                  style={{ borderColor: '#eadfc9', color: INK }} />
+              </div>
+              <div className="flex-1 min-w-[180px]">
+                <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Rouvrir un projet</label>
+                <select value={projectId ?? ''} onChange={(e) => loadFromCloud(e.target.value)}
+                  className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none appearance-none"
+                  style={{ borderColor: '#eadfc9', color: INK, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a18a6c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}>
+                  <option value="">-- Sélectionner --</option>
+                  {projects.map((p) => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
+                  ))}
+                </select>
+              </div>
+              <button onClick={saveToCloud} disabled={saving}
+                className="inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5 disabled:opacity-60"
+                style={{ background: `linear-gradient(90deg, ${AMBER}, #FFB44D)` }}>
+                {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                {projectId ? 'Enregistrer' : 'Créer & sauver'}
+              </button>
+              <button onClick={newProject}
+                className="inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-[12px] font-bold border transition-colors hover:bg-[#FFF3DF]"
+                style={{ borderColor: '#eadfc9', color: AMBER_DEEP }}>
+                Nouveau
+              </button>
+            </div>
+            {cloudMsg && <p className="mt-2 text-[12px] font-semibold" style={{ color: AMBER_DEEP }}>{cloudMsg}</p>}
+          </div>
+
+
 
 
           {/* Barre de progression */}

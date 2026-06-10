@@ -1458,6 +1458,42 @@ export type Database = {
         }
         Relationships: []
       }
+      v3_workflow_projects: {
+        Row: {
+          brief: Json
+          created_at: string
+          done: Json
+          id: string
+          name: string
+          results: Json
+          theme: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          brief?: Json
+          created_at?: string
+          done?: Json
+          id?: string
+          name?: string
+          results?: Json
+          theme?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          brief?: Json
+          created_at?: string
+          done?: Json
+          id?: string
+          name?: string
+          results?: Json
+          theme?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       workflow_results: {
         Row: {
           created_at: string
