@@ -261,8 +261,8 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
 
   const generate = async (step: FlatStep) => {
     setError(null);
-    if (!userGeminiKey || !userGeminiKey.trim()) {
-      setError("Configure d'abord ta clé API Gemini dans Paramètres > Clés API pour lancer l'auto-pilote.");
+    if (provider === 'gemini' && !effectiveKey) {
+      setError("Choisis ta clé Gemini ci-dessus (ou bascule sur OpenAI) pour lancer l'auto-pilote.");
       return;
     }
     setLoadingId(step.moduleId);
@@ -282,9 +282,11 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
           theme,
           brief,
           priorOutputs,
-          userApiKey: userGeminiKey.trim(),
+          provider,
+          userApiKey: provider === 'gemini' ? effectiveKey : customKey.trim(),
         },
       });
+
 
       if (fnErr) throw new Error(fnErr.message);
       if (data?.error) throw new Error(data.error);
