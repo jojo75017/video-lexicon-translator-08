@@ -40,6 +40,7 @@ serve(async (req) => {
   try {
     const body = (await req.json()) as Body;
     const {
+      moduleId = "",
       stepNumber = 1,
       stepTitle = "",
       stepHint = "",
