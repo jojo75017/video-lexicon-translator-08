@@ -19,6 +19,7 @@ interface Body {
   moduleDescription?: string;
   theme?: string;
   priorOutputs?: PriorOutput[];
+  userApiKey?: string;
 }
 
 serve(async (req) => {
