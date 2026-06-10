@@ -627,7 +627,7 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                   return (
                     <button
                       key={sub.id}
-                      onClick={() => onTabChange?.(sub.id)}
+                      onClick={() => (sub.href ? navigate(sub.href) : onTabChange?.(sub.id))}
                       className={cn(
                         'flex-shrink-0 inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] transition-colors',
                         active
@@ -637,6 +637,9 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                     >
                       {active && <span className="w-1.5 h-1.5 rounded-full bg-[#008296]" aria-hidden />}
                       {sub.label}
+                      {sub.isNew && (
+                        <span className="text-[8px] font-bold tracking-widest px-1 bg-[#008296] text-white">NEW</span>
+                      )}
                     </button>
                   );
                 })}
