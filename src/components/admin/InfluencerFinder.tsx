@@ -122,7 +122,10 @@ Dis-moi si tu veux tester 🚀`;
       if (error) throw error;
       const link = `${ORIGIN}/promo/decouverte?ref=${ins.code}`;
       const dm = buildDm(inf, link);
-      setInvites((s) => ({ ...s, [inf.url]: { code: ins.code, link, dm, email: '', sending: false } }));
+      setInvites((s) => ({
+        ...s,
+        [inf.url]: { code: ins.code, link, dm, niche: keyword.trim(), email: '', sending: false, generating: false },
+      }));
       await navigator.clipboard.writeText(dm);
       // Ouvre le profil pour coller le message en DM en un clic
       window.open(inf.url, '_blank', 'noopener,noreferrer');
@@ -136,6 +139,38 @@ Dis-moi si tu veux tester 🚀`;
 
   const setEmail = (url: string, email: string) =>
     setInvites((s) => ({ ...s, [url]: { ...s[url], email } }));
+
+  const setNiche = (url: string, niche: string) =>
+    setInvites((s) => ({ ...s, [url]: { ...s[url], niche } }));
+
+  const setDm = (url: string, dm: string) =>
+    setInvites((s) => ({ ...s, [url]: { ...s[url], dm } }));
+
+  const generateAi = async (inf: Influencer) => {
+    const inv = invites[inf.url];
+    if (!inv) return;
+    setInvites((s) => ({ ...s, [inf.url]: { ...s[inf.url], generating: true } }));
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-influencer-message', {
+        body: {
+          name: inf.handle || inf.name,
+          niche: inv.niche || keyword.trim(),
+          platform: inf.platform,
+          link: inv.link,
+          commission: formatEuro(commission),
+          commissionV3: formatEuro(COMMISSION_V3),
+          kitUrl: `${ORIGIN}/influenceurs`,
+        },
+      });
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || 'Échec de la génération.');
+      setInvites((s) => ({ ...s, [inf.url]: { ...s[inf.url], dm: data.message || s[inf.url].dm, generating: false } }));
+      toast.success('Message personnalisé généré par IA ✓');
+    } catch (e: any) {
+      toast.error(e?.message || 'Échec de la génération IA.');
+      setInvites((s) => ({ ...s, [inf.url]: { ...s[inf.url], generating: false } }));
+    }
+  };
 
   const sendEmail = async (inf: Influencer) => {
     const inv = invites[inf.url];
