@@ -57,12 +57,14 @@ serve(async (req) => {
       brief = {},
       priorOutputs = [],
       provider = "gemini",
+      model = "",
       userApiKey = "",
     } = body;
 
     // === Sélection du fournisseur ===
     const geminiKey = (userApiKey || "").trim() || Deno.env.get("GEMINI_API_KEY") || "";
     const openaiKey = (userApiKey || "").trim() || Deno.env.get("OPENAI_API_KEY") || "";
+    const openrouterKey = (userApiKey || "").trim() || Deno.env.get("OPENROUTER_API_KEY") || "";
 
     if (provider === "gemini" && !geminiKey) {
       return new Response(
@@ -81,12 +83,43 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
+    if (provider === "openrouter" && !openrouterKey) {
+      return new Response(
+        JSON.stringify({
+          error: "Aucune clé OpenRouter disponible. Ajoute ta clé OpenRouter (sk-or-…) ou choisis un autre fournisseur.",
+        }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
 
     async function callAI(
       sys: string,
       usr: string,
       maxOutputTokens: number,
     ): Promise<CallResult> {
+      if (provider === "openrouter") {
+        const r = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${openrouterKey}`,
+            "HTTP-Referer": "https://ebookstudio.fr",
+            "X-Title": "EbookStudio",
+          },
+          body: JSON.stringify({
+            model: model || "anthropic/claude-3.5-sonnet",
+            messages: [
+              { role: "system", content: sys },
+              { role: "user", content: usr },
+            ],
+            temperature: 0.8,
+            max_tokens: maxOutputTokens,
+          }),
+        });
+        if (!r.ok) return { ok: false, status: r.status, body: await r.text() };
+        const d = await r.json();
+        return { ok: true, text: (d.choices?.[0]?.message?.content || "").trim() };
+      }
       if (provider === "openai") {
         const r = await fetch("https://api.openai.com/v1/chat/completions", {
           method: "POST",
@@ -95,7 +128,7 @@ serve(async (req) => {
             Authorization: `Bearer ${openaiKey}`,
           },
           body: JSON.stringify({
-            model: "gpt-4o-mini",
+            model: model || "gpt-4o-mini",
             messages: [
               { role: "system", content: sys },
               { role: "user", content: usr },
@@ -109,8 +142,9 @@ serve(async (req) => {
         return { ok: true, text: (d.choices?.[0]?.message?.content || "").trim() };
       }
       // Gemini par défaut
+      const gModel = model || "gemini-2.5-flash";
       const r = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/${gModel}:generateContent?key=${geminiKey}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
