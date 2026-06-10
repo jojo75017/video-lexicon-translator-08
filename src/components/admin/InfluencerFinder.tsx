@@ -5,8 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Search, ExternalLink, Users, Copy, Check } from 'lucide-react';
+import { Loader2, Search, ExternalLink, Users, Copy, Check, UserPlus, Send } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  COMMISSION_V3, getActiveCommission, formatEuro, ORIGIN,
+} from '@/lib/influencerKit';
 
 const TEAL = '#008296';
 
@@ -19,6 +22,14 @@ interface Influencer {
   url: string;
   description: string;
   followers: string | null;
+}
+
+interface InviteState {
+  code: string;
+  link: string;
+  dm: string;
+  email: string;
+  sending: boolean;
 }
 
 const PLATFORMS: { id: Platform; label: string }[] = [
@@ -43,6 +54,10 @@ const InfluencerFinder: React.FC = () => {
   const [results, setResults] = useState<Influencer[]>([]);
   const [searched, setSearched] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
+  const [inviting, setInviting] = useState<string | null>(null);
+  const [invites, setInvites] = useState<Record<string, InviteState>>({});
+
+  const commission = getActiveCommission();
 
   const toggle = (p: Platform) =>
     setSelected((s) => (s.includes(p) ? s.filter((x) => x !== p) : [...s, p]));
@@ -68,12 +83,77 @@ const InfluencerFinder: React.FC = () => {
     }
   };
 
-  const copyHandle = async (inf: Influencer) => {
-    const txt = inf.handle || inf.url;
+  const copyValue = async (txt: string, key: string) => {
     await navigator.clipboard.writeText(txt);
-    setCopied(inf.url);
+    setCopied(key);
     toast.success('Copié ✓');
     setTimeout(() => setCopied(null), 1500);
+  };
+
+  const buildDm = (inf: Influencer, link: string) => `Salut ${inf.handle || inf.name} 👋
+
+J'adore ton contenu ! Je lance Ebookstudio Pro, un outil qui génère un ebook complet (plan, chapitres, couverture Amazon KDP, SEO) en 30 min.
+
+Je te propose mon programme ambassadeur : 30% de commission par vente, soit ${formatEuro(commission)} pour toi à chaque achat via ton lien (et ${formatEuro(COMMISSION_V3)}/vente dès octobre).
+
+Pas de cash en avance, suivi automatique. Voici ton lien perso :
+${link}
+
+Kit complet (scripts vidéo + visuels) : ${ORIGIN}/influenceurs
+Dis-moi si tu veux tester 🚀`;
+
+  const invite = async (inf: Influencer) => {
+    if (invites[inf.url]) return; // already generated
+    setInviting(inf.url);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) throw new Error('Session admin requise.');
+      const base = (inf.handle || inf.name).replace(/[^a-zA-Z0-9]/g, '').slice(0, 10).toUpperCase();
+      const newCode = `INF-${base || 'AMB'}${Math.floor(Math.random() * 1000)}`;
+      const { data: ins, error } = await supabase
+        .from('referral_codes')
+        .insert({ user_id: session.user.id, code: newCode })
+        .select('code')
+        .single();
+      if (error) throw error;
+      const link = `${ORIGIN}/promo/decouverte?ref=${ins.code}`;
+      const dm = buildDm(inf, link);
+      setInvites((s) => ({ ...s, [inf.url]: { code: ins.code, link, dm, email: '', sending: false } }));
+      await navigator.clipboard.writeText(dm);
+      toast.success('Lien généré + message copié ✓ Prêt à coller en DM');
+    } catch (e: any) {
+      toast.error(e?.message || 'Échec de la génération du lien.');
+    } finally {
+      setInviting(null);
+    }
+  };
+
+  const setEmail = (url: string, email: string) =>
+    setInvites((s) => ({ ...s, [url]: { ...s[url], email } }));
+
+  const sendEmail = async (inf: Influencer) => {
+    const inv = invites[inf.url];
+    if (!inv) return;
+    if (!inv.email.trim() || !inv.email.includes('@')) return toast.error('Email invalide.');
+    setInvites((s) => ({ ...s, [inf.url]: { ...s[inf.url], sending: true } }));
+    try {
+      const { data, error } = await supabase.functions.invoke('send-influencer-invite', {
+        body: {
+          email: inv.email.trim(),
+          name: inf.handle || inf.name,
+          link: inv.link,
+          commission: formatEuro(commission),
+          commissionV3: formatEuro(COMMISSION_V3),
+        },
+      });
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || 'Échec de l\'envoi.');
+      toast.success(`Invitation envoyée à ${inv.email.trim()} ✓`);
+      setInvites((s) => ({ ...s, [inf.url]: { ...s[inf.url], email: '', sending: false } }));
+    } catch (e: any) {
+      toast.error(e?.message || 'Échec de l\'envoi.');
+      setInvites((s) => ({ ...s, [inf.url]: { ...s[inf.url], sending: false } }));
+    }
   };
 
   return (
@@ -136,37 +216,95 @@ const InfluencerFinder: React.FC = () => {
 
         {results.length > 0 && (
           <div className="space-y-2 pt-1">
-            {results.map((inf) => (
-              <div key={inf.url} className="flex items-start gap-2 border rounded-md p-2.5">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="font-medium text-sm truncate">{inf.name}</span>
-                    <Badge variant="outline" className="text-[10px] py-0">{inf.platform}</Badge>
-                    {inf.followers && (
-                      <span className="text-[11px] text-[#008296] flex items-center gap-0.5">
-                        <Users className="h-3 w-3" />{inf.followers}
-                      </span>
-                    )}
+            {results.map((inf) => {
+              const inv = invites[inf.url];
+              return (
+                <div key={inf.url} className="border rounded-md p-2.5">
+                  <div className="flex items-start gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-medium text-sm truncate">{inf.name}</span>
+                        <Badge variant="outline" className="text-[10px] py-0">{inf.platform}</Badge>
+                        {inf.followers && (
+                          <span className="text-[11px] text-[#008296] flex items-center gap-0.5">
+                            <Users className="h-3 w-3" />{inf.followers}
+                          </span>
+                        )}
+                      </div>
+                      {inf.handle && <p className="text-[11px] text-muted-foreground">{inf.handle}</p>}
+                      {inf.description && (
+                        <p className="text-[11px] text-muted-foreground line-clamp-2 mt-0.5">{inf.description}</p>
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <Button
+                        size="sm"
+                        className="h-7 gap-1"
+                        style={{ background: TEAL, color: 'white' }}
+                        disabled={inviting === inf.url || !!inv}
+                        onClick={() => invite(inf)}
+                        title="Générer le lien et le message d'invitation"
+                      >
+                        {inviting === inf.url ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <UserPlus className="h-3.5 w-3.5" />
+                        )}
+                        <span className="text-[11px]">{inv ? 'Invité' : 'Inviter'}</span>
+                      </Button>
+                      <a href={inf.url} target="_blank" rel="noopener noreferrer">
+                        <Button variant="outline" size="sm" className="h-7 w-full px-0" title="Ouvrir le profil">
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </Button>
+                      </a>
+                    </div>
                   </div>
-                  {inf.handle && <p className="text-[11px] text-muted-foreground">{inf.handle}</p>}
-                  {inf.description && (
-                    <p className="text-[11px] text-muted-foreground line-clamp-2 mt-0.5">{inf.description}</p>
+
+                  {inv && (
+                    <div className="mt-2.5 pt-2.5 border-t space-y-2">
+                      <div>
+                        <Label className="text-[11px]">Lien de suivi ({inv.code})</Label>
+                        <div className="flex gap-1.5 mt-1">
+                          <Input readOnly value={inv.link} className="text-[11px] h-7" />
+                          <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => copyValue(inv.link, inf.url + 'link')}>
+                            {copied === inf.url + 'link' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                          </Button>
+                        </div>
+                      </div>
+                      <Button variant="outline" size="sm" className="h-7 gap-1.5" onClick={() => copyValue(inv.dm, inf.url + 'dm')}>
+                        {copied === inf.url + 'dm' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                        <span className="text-[11px]">Copier le message (DM)</span>
+                      </Button>
+                      <div>
+                        <Label className="text-[11px]">Envoyer l'invitation par email</Label>
+                        <div className="flex gap-1.5 mt-1">
+                          <Input
+                            type="email"
+                            value={inv.email}
+                            onChange={(e) => setEmail(inf.url, e.target.value)}
+                            placeholder="email@influenceur.com (si tu le connais)"
+                            className="text-[11px] h-7"
+                          />
+                          <Button
+                            size="sm"
+                            className="h-7"
+                            style={{ background: '#FF9E2D', color: '#232F3E' }}
+                            disabled={inv.sending}
+                            onClick={() => sendEmail(inf)}
+                          >
+                            {inv.sending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                            <span className="ml-1 text-[11px]">Envoyer</span>
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </div>
-                <div className="flex flex-col gap-1">
-                  <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => copyHandle(inf)} title="Copier le @">
-                    {copied === inf.url ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                  </Button>
-                  <a href={inf.url} target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" size="icon" className="h-7 w-7" title="Ouvrir le profil">
-                      <ExternalLink className="h-3.5 w-3.5" />
-                    </Button>
-                  </a>
-                </div>
-              </div>
-            ))}
+              );
+            })}
             <p className="text-[10px] text-muted-foreground">
-              Astuce : copie le @, puis génère son lien de suivi ci-dessous et envoie l'invitation.
+              Astuce : clique « Inviter » → le lien + message sont prêts. Sans email public, colle le message en DM ;
+              si tu as leur email, envoie l'invitation en un clic.
             </p>
           </div>
         )}
