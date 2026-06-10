@@ -1,3 +1,19 @@
+import imgAutoEdition from '@/assets/blog/auto-edition.jpg';
+import imgGagnerArgent from '@/assets/blog/gagner-argent.jpg';
+import imgIdeesEbook from '@/assets/blog/idees-ebook.jpg';
+import imgAvisProduit from '@/assets/blog/avis-produit.jpg';
+import imgKdpPilot from '@/assets/blog/kdp-pilot.jpg';
+import imgAudiobook from '@/assets/blog/audiobook.jpg';
+import imgRevenusAuteur from '@/assets/blog/revenus-auteur.jpg';
+import imgOutilsIa from '@/assets/blog/outils-ia.jpg';
+import imgMotsCles from '@/assets/blog/mots-cles.jpg';
+import imgCompteSuspendu from '@/assets/blog/compte-suspendu.jpg';
+import imgKdpSelect from '@/assets/blog/kdp-select.jpg';
+import imgBiographie from '@/assets/blog/biographie.jpg';
+import imgSiteAuteur from '@/assets/blog/site-auteur.jpg';
+
+export const BLOG_AUTHOR = 'Georges Boubet';
+
 export interface BlogArticle {
   slug: string;
   title: string;
@@ -12,6 +28,8 @@ export interface BlogArticle {
   dateISO: string;
   gradient: string;
   iconName: string;
+  image: string; // Illustration importée (carte + en-tête)
+  author: string;
   content: string; // Markdown content
   tableOfContents: { id: string; title: string; level: number }[];
   relatedSlugs: string[];
@@ -20,6 +38,7 @@ export interface BlogArticle {
 
 // Example article structure - content will be filled with real SEO content
 export const blogArticles: BlogArticle[] = [
+
   {
     slug: 'auto-edition-amazon-kdp',
     title: 'Auto-édition Amazon KDP : Le Guide Ultime 2025',
