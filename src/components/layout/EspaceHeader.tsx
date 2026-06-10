@@ -44,7 +44,7 @@ const HIDE_TABBAR_ON = new Set([
 ]);
 
 // Sous-onglets contextuels par famille (les outils courants).
-const PLANNER_SUBTABS: Partial<Record<FamilyId, Array<{ id: string; label: string }>>> = {
+const PLANNER_SUBTABS: Partial<Record<FamilyId, Array<{ id: string; label: string; href?: string; isNew?: boolean }>>> = {
   planner: [
     { id: 'kdp-keywords-pro', label: '🔍 Mots-clés Amazon (KDSpy)' },
     { id: 'workflow-dashboard', label: 'Tableau de bord IA' },
@@ -53,6 +53,7 @@ const PLANNER_SUBTABS: Partial<Record<FamilyId, Array<{ id: string; label: strin
     { id: 'templates', label: 'Modèles' },
     { id: 'doc-transform', label: 'Importer un doc' },
     { id: 'projects', label: 'Mes projets' },
+    { id: 'guides', label: 'Guides', href: '/blog', isNew: true },
   ],
   writing: [
     { id: 'complete-workflow', label: 'Workflow complet' },
@@ -626,7 +627,7 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                   return (
                     <button
                       key={sub.id}
-                      onClick={() => onTabChange?.(sub.id)}
+                      onClick={() => (sub.href ? navigate(sub.href) : onTabChange?.(sub.id))}
                       className={cn(
                         'flex-shrink-0 inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] transition-colors',
                         active
@@ -636,6 +637,9 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                     >
                       {active && <span className="w-1.5 h-1.5 rounded-full bg-[#008296]" aria-hidden />}
                       {sub.label}
+                      {sub.isNew && (
+                        <span className="text-[8px] font-bold tracking-widest px-1 bg-[#008296] text-white">NEW</span>
+                      )}
                     </button>
                   );
                 })}
