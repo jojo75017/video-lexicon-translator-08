@@ -70,6 +70,8 @@ import CommunityAiUnblock from '@/components/admin/CommunityAiUnblock';
 import PrintRoyaltiesCalc from '@/components/admin/PrintRoyaltiesCalc';
 import PricingLadder497 from '@/components/admin/PricingLadder497';
 import InstallmentPayments from '@/components/admin/InstallmentPayments';
+import LowContentBooks from '@/components/admin/LowContentBooks';
+import OnboardingGuides from '@/components/admin/OnboardingGuides';
 
 /** Modules dont le dialog s'affiche en largeur réduite (max-w-2xl). */
 export const NARROW_MODULE_IDS: string[] = [
@@ -147,6 +149,8 @@ export const V3_MODULE_COMPONENTS: Record<string, React.ComponentType> = {
   'print-royalties-calc': PrintRoyaltiesCalc,
   'pricing-ladder-497': PricingLadder497,
   'installment-payments': InstallmentPayments,
+  'low-content-books': LowContentBooks,
+  'onboarding-guides': OnboardingGuides,
 };
 
 /** Tous les modules ouvrables (mode hors V3 / cockpit standard). */
