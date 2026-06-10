@@ -17,6 +17,7 @@ interface Brief {
   author?: string;
   category?: string;
   chapterCount?: string;
+  wordsPerChapter?: string;
 }
 
 interface Body {
@@ -29,7 +30,8 @@ interface Body {
   theme?: string;
   brief?: Brief;
   priorOutputs?: PriorOutput[];
-  provider?: "gemini" | "openai";
+  provider?: "gemini" | "openai" | "openrouter";
+  model?: string;
   userApiKey?: string;
 }
 
