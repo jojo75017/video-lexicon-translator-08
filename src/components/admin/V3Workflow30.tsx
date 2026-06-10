@@ -218,6 +218,14 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
 
   const validate = (id: string) => setDone((prev) => new Set(prev).add(id));
 
+  const startEdit = (id: string) => { setEditingId(id); setDraft(results[id] ?? ''); };
+  const cancelEdit = () => { setEditingId(null); setDraft(''); };
+  const saveEdit = (id: string) => {
+    setResults((prev) => ({ ...prev, [id]: draft }));
+    setEditingId(null);
+    setDraft('');
+  };
+
   const reset = () => {
     setDone(new Set());
     setResults({});
