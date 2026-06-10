@@ -485,10 +485,15 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
           </div>
 
           {/* Fournisseur IA + clé personnelle */}
-          <div className="mt-4 rounded-2xl border p-4 sm:p-5" style={{ borderColor: '#eadfc9', background: '#fffdf8' }}>
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: AMBER_DEEP }}>
-              Moteur IA & ta clé
-            </p>
+          <div className="mt-4 rounded-2xl border overflow-hidden" style={{ borderColor: '#eadfc9', background: '#fffdf8' }}>
+            <button type="button" onClick={() => toggleCfg('engine')}
+              className="w-full flex items-center justify-between gap-3 px-4 sm:px-5 py-3.5 text-left transition-colors hover:bg-[#FCF8F0]"
+              aria-expanded={openCfg === 'engine'}>
+              <span className="text-[12px] font-bold uppercase tracking-[0.2em]" style={{ color: AMBER_DEEP }}>🤖 Moteur IA & ta clé</span>
+              <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${openCfg === 'engine' ? 'rotate-180' : ''}`} style={{ color: AMBER_DEEP }} />
+            </button>
+            {openCfg === 'engine' && (
+            <div className="px-4 sm:px-5 pb-5">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Fournisseur</label>
