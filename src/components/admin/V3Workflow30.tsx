@@ -397,28 +397,52 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
       return;
     }
     setLoadingId(step.moduleId);
+    setProgress(null);
     try {
       const mod = getModuleById(step.moduleId);
       const priorOutputs = FLAT.filter((s) => s.globalIndex < step.globalIndex && results[s.moduleId])
         .map((s) => ({ title: s.label ?? getModuleById(s.moduleId)?.title ?? s.moduleId, output: results[s.moduleId] }));
 
-      const { data, error: fnErr } = await supabase.functions.invoke('v3-autopilot-step', {
-        body: {
-          moduleId: step.moduleId,
-          stepNumber: step.globalIndex + 1,
-          stepTitle: step.label ?? mod?.title ?? step.moduleId,
-          stepHint: step.hint,
-          moduleTitle: mod?.title ?? step.moduleId,
-          moduleDescription: mod?.description ?? '',
-          theme,
-          brief,
-          priorOutputs,
-          provider,
-          model: currentModel,
-          userApiKey: provider === 'gemini' ? effectiveKey : customKey.trim(),
-        },
-      });
+      const baseBody = {
+        moduleId: step.moduleId,
+        stepNumber: step.globalIndex + 1,
+        stepTitle: step.label ?? mod?.title ?? step.moduleId,
+        stepHint: step.hint,
+        moduleTitle: mod?.title ?? step.moduleId,
+        moduleDescription: mod?.description ?? '',
+        theme,
+        brief,
+        priorOutputs,
+        provider,
+        model: currentModel,
+        userApiKey: provider === 'gemini' ? effectiveKey : customKey.trim(),
+      };
 
+      // === Manuscrit : on génère chapitre par chapitre (1 appel = 1 chapitre) ===
+      // Évite les timeouts d'Edge Function et affiche la progression en direct.
+      if (step.moduleId === 'p20-chat-manuscript') {
+        const total = Math.min(Math.max(parseInt(brief.chapterCount || '', 10) || 8, 1), 40);
+        const chapters: string[] = [];
+        let prevTail = '';
+        for (let i = 1; i <= total; i++) {
+          setProgress({ current: i, total });
+          const { data, error: fnErr } = await supabase.functions.invoke('v3-autopilot-step', {
+            body: { ...baseBody, chapterIndex: i, prevChapterTail: prevTail },
+          });
+          if (fnErr) throw new Error(fnErr.message);
+          if (data?.error) throw new Error(data.error);
+          if (!data?.result) throw new Error(`Chapitre ${i} : réponse vide de l'IA.`);
+          chapters.push(data.result as string);
+          prevTail = (data.result as string).slice(-1000);
+          // Sauvegarde incrémentale : on voit le manuscrit grandir chapitre par chapitre.
+          setResults((prev) => ({ ...prev, [step.moduleId]: chapters.join('\n\n---\n\n') }));
+        }
+        return;
+      }
+
+      const { data, error: fnErr } = await supabase.functions.invoke('v3-autopilot-step', {
+        body: baseBody,
+      });
 
       if (fnErr) throw new Error(fnErr.message);
       if (data?.error) throw new Error(data.error);
@@ -429,8 +453,10 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
       setError(e instanceof Error ? e.message : 'Une erreur est survenue.');
     } finally {
       setLoadingId(null);
+      setProgress(null);
     }
   };
+
 
   const validate = (id: string) => setDone((prev) => new Set(prev).add(id));
 
