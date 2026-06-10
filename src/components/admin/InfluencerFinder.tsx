@@ -87,10 +87,13 @@ const InfluencerFinder: React.FC = () => {
     }
   };
 
-  const copyValue = async (txt: string, key: string) => {
+  const copyValue = async (txt: string, key: string, label?: string) => {
     await navigator.clipboard.writeText(txt);
     setCopied(key);
-    toast.success('Copié ✓');
+    toast.success('✅ Copié dans le presse-papier', {
+      description: label || 'Colle-le où tu veux avec Ctrl+V.',
+      duration: 3000,
+    });
     setTimeout(() => setCopied(null), 1500);
   };
 
@@ -107,8 +110,18 @@ Kit complet (scripts vidéo + visuels) : ${ORIGIN}/influenceurs
 Dis-moi si tu veux tester 🚀`;
 
   const invite = async (inf: Influencer) => {
-    if (invites[inf.url]) return; // already generated
+    if (invites[inf.url]) {
+      toast.info('Invitation déjà générée', {
+        description: `Le bloc d'invitation pour ${inf.handle || inf.name} est déjà affiché ci-dessous. Tu peux copier le message ou l'envoyer par email.`,
+        duration: 5000,
+      });
+      return;
+    }
     setInviting(inf.url);
+    toast.info('Génération en cours...', {
+      description: `Création du lien de parrainage pour ${inf.handle || inf.name}...`,
+      duration: 3000,
+    });
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) throw new Error('Session admin requise.');
@@ -145,9 +158,15 @@ Dis-moi si tu veux tester 🚀`;
       await navigator.clipboard.writeText(dm);
       // Ouvre le profil pour coller le message en DM en un clic
       window.open(inf.url, '_blank', 'noopener,noreferrer');
-      toast.success('Message copié ✓ Le profil s\'ouvre — colle (Ctrl+V) dans le DM');
+      toast.success('✅ Invitation prête !', {
+        description: `Le message a été copié dans ton presse-papier et le profil de ${inf.handle || inf.name} s'est ouvert dans un nouvel onglet.\n\nColle le message (Ctrl+V) directement dans la messagerie de l'influenceur.`,
+        duration: 8000,
+      });
     } catch (e: any) {
-      toast.error(e?.message || 'Échec de la génération du lien.');
+      toast.error('❌ Échec de l\'invitation', {
+        description: e?.message || 'Impossible de générer le lien de parrainage. Vérifie ta connexion et réessaie.',
+        duration: 6000,
+      });
     } finally {
       setInviting(null);
     }
@@ -205,10 +224,16 @@ Dis-moi si tu veux tester 🚀`;
       });
       if (error) throw error;
       if (!data?.success) throw new Error(data?.error || 'Échec de l\'envoi.');
-      toast.success(`Invitation envoyée à ${inv.email.trim()} ✓`);
+      toast.success(`✅ Invitation envoyée à ${inv.email.trim()}`, {
+        description: `${inf.handle || inf.name} recevra ton email d'invitation dans sa boîte mail.`,
+        duration: 6000,
+      });
       setInvites((s) => ({ ...s, [inf.url]: { ...s[inf.url], email: '', sending: false } }));
     } catch (e: any) {
-      toast.error(e?.message || 'Échec de l\'envoi.');
+      toast.error('❌ Échec de l\'envoi', {
+        description: e?.message || 'Impossible d\'envoyer l\'email. Vérifie l\'adresse et réessaie.',
+        duration: 6000,
+      });
       setInvites((s) => ({ ...s, [inf.url]: { ...s[inf.url], sending: false } }));
     }
   };
@@ -323,7 +348,7 @@ Dis-moi si tu veux tester 🚀`;
                         <Label className="text-[11px]">Lien de suivi ({inv.code})</Label>
                         <div className="flex gap-1.5 mt-1">
                           <Input readOnly value={inv.link} className="text-[11px] h-7" />
-                          <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => copyValue(inv.link, inf.url + 'link')}>
+                          <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => copyValue(inv.link, inf.url + 'link', `Lien de suivi ${inv.code} copié — partage-le à ${inf.handle || inf.name}.`)}>
                             {copied === inf.url + 'link' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
                           </Button>
                         </div>
@@ -358,7 +383,7 @@ Dis-moi si tu veux tester 🚀`;
                           rows={8}
                           className="text-[11px] mt-1 font-sans"
                         />
-                        <Button variant="outline" size="sm" className="h-7 gap-1.5 mt-1.5" onClick={() => copyValue(inv.dm, inf.url + 'dm')}>
+                        <Button variant="outline" size="sm" className="h-7 gap-1.5 mt-1.5" onClick={() => copyValue(inv.dm, inf.url + 'dm', `Message d'invitation copié — colle-le dans le DM de ${inf.handle || inf.name}.`)}>
                           {copied === inf.url + 'dm' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
                           <span className="text-[11px]">Copier le message (DM)</span>
                         </Button>
