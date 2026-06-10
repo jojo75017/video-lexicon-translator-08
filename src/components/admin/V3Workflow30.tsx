@@ -391,7 +391,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                               <p className="text-[11px] leading-snug mt-0.5" style={{ color: '#8a7860' }}>{step.hint}</p>
 
                               {/* Actions de l'étape active */}
-                              {(isActive || (isDone && result)) && (
+                              {(isActive || (isDone && result)) && editingId !== step.moduleId && (
                                 <div className="mt-2 flex flex-wrap items-center gap-2">
                                   {!isDone && (
                                     <button onClick={() => generate(step)} disabled={isLoading}
@@ -400,6 +400,13 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                                       {isLoading
                                         ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> L'IA travaille…</>
                                         : <><Sparkles className="h-3.5 w-3.5" /> {result ? 'Régénérer' : 'Générer avec l\'IA'}</>}
+                                    </button>
+                                  )}
+                                  {result && (
+                                    <button onClick={() => startEdit(step.moduleId)}
+                                      className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold border transition-colors hover:bg-[#FFF3DF]"
+                                      style={{ borderColor: '#eadfc9', color: AMBER_DEEP }}>
+                                      <Pencil className="h-3.5 w-3.5" /> Modifier le brouillon
                                     </button>
                                   )}
                                   {result && !isDone && (
