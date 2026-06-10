@@ -4,10 +4,11 @@ import { supabase } from '@/integrations/supabase/client';
 import FunnelLayout from '@/components/funnel/FunnelLayout';
 import SeoHead from '@/components/funnel/SeoHead';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import {
   Copy, Check, TrendingUp, Euro, Download, Image as ImageIcon,
-  FileText, Sparkles, Gift, ShieldCheck, Zap,
+  FileText, Sparkles, Gift, ShieldCheck, Zap, MessageCircle, Link as LinkIcon,
 } from 'lucide-react';
 import mockup from '@/assets/influenceurs-mockup.jpg';
 import {
