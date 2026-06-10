@@ -120,7 +120,9 @@ Dis-moi si tu veux tester 🚀`;
       const dm = buildDm(inf, link);
       setInvites((s) => ({ ...s, [inf.url]: { code: ins.code, link, dm, email: '', sending: false } }));
       await navigator.clipboard.writeText(dm);
-      toast.success('Lien généré + message copié ✓ Prêt à coller en DM');
+      // Ouvre le profil pour coller le message en DM en un clic
+      window.open(inf.url, '_blank', 'noopener,noreferrer');
+      toast.success('Message copié ✓ Le profil s\'ouvre — colle (Ctrl+V) dans le DM');
     } catch (e: any) {
       toast.error(e?.message || 'Échec de la génération du lien.');
     } finally {
