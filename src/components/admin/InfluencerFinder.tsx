@@ -253,7 +253,7 @@ Dis-moi si tu veux tester 🚀`;
                         <span className="text-[11px]">{inv ? 'Invité' : 'Inviter'}</span>
                       </Button>
                       <a href={inf.url} target="_blank" rel="noopener noreferrer">
-                        <Button variant="outline" size="icon" className="h-7 w-7 w-full" title="Ouvrir le profil">
+                        <Button variant="outline" size="sm" className="h-7 w-full px-0" title="Ouvrir le profil">
                           <ExternalLink className="h-3.5 w-3.5" />
                         </Button>
                       </a>
