@@ -21,6 +21,7 @@ interface Brief {
 }
 
 interface Body {
+  action?: "generate" | "test-key";
   moduleId?: string;
   stepNumber?: number;
   stepTitle?: string;
@@ -56,6 +57,7 @@ serve(async (req) => {
       theme = "",
       brief = {},
       priorOutputs = [],
+      action = "generate",
       provider = "gemini",
       model = "",
       userApiKey = "",
@@ -65,6 +67,24 @@ serve(async (req) => {
     const geminiKey = (userApiKey || "").trim() || Deno.env.get("GEMINI_API_KEY") || "";
     const openaiKey = (userApiKey || "").trim() || Deno.env.get("OPENAI_API_KEY") || "";
     const openrouterKey = (userApiKey || "").trim() || Deno.env.get("OPENROUTER_API_KEY") || "";
+
+    if (action === "test-key") {
+      let ok = false;
+      if (provider === "gemini" && geminiKey) {
+        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(geminiKey)}`);
+        ok = r.ok || r.status === 429;
+      } else if (provider === "openai" && openaiKey) {
+        const r = await fetch("https://api.openai.com/v1/models", { headers: { Authorization: `Bearer ${openaiKey}` } });
+        ok = r.ok || r.status === 429;
+      } else if (provider === "openrouter" && openrouterKey) {
+        const r = await fetch("https://openrouter.ai/api/v1/auth/key", { headers: { Authorization: `Bearer ${openrouterKey}` } });
+        ok = r.ok || r.status === 429;
+      }
+      return new Response(JSON.stringify({ ok }), {
+        status: ok ? 200 : 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     if (provider === "gemini" && !geminiKey) {
       return new Response(
