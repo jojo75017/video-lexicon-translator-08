@@ -133,6 +133,8 @@ export const V3_MODULE_COMPONENTS: Record<string, React.ComponentType> = {
   'p25-tone-adapter': ToneAdapter,
   'p26-commercial-score': CommercialScore,
   'influencer-kit': InfluencerKit,
+  'look-inside-optimizer': LookInsideOptimizer,
+  'editorial-reviews': EditorialReviews,
 };
 
 /** Tous les modules ouvrables (mode hors V3 / cockpit standard). */
