@@ -1,90 +1,49 @@
+# Plan — Refonte du /blog avec guides illustrés (SEO public)
+
 ## Objectif
+Transformer la page `/blog` (cartes à dégradé + icône) en blog de guides illustrés inspiré des captures de référence : grande illustration en haut de carte, badge catégorie en pastille orange clair, titre serif foncé, ligne auteur + date. Ajouter de nouveaux guides SEO complets pour attirer du trafic Google.
 
-Te donner, dès maintenant, un **kit influenceurs prêt à envoyer** sur TikTok/Instagram, plus une **rémunération par parrainage à 30 %** qui réutilise ton système d'affiliation existant. Deux points d'accès : un **module admin** dans le Hub V3 et une **page publique `/influenceurs`** partageable directement.
+## Décisions validées
+- **Auteur affiché : Georges Boubet** (sur toutes les cartes et en-têtes d'articles).
+- **Images : illustrations IA 100% originales** — inspiration du style général (ton orangé KDP, ambiance auteur/édition), mais **aucune copie** des images des captures. Compositions, cadrages et sujets différents pour éviter tout plagiat.
 
-> **Prix en vigueur** : on est à **67 € maintenant** (jusqu'au 1er octobre). Le passage à **197 € (V3)** est prévu pour octobre. Le kit affiche donc le prix et la commission **actuels (67 €)** et est conçu pour basculer automatiquement à 197 € en octobre.
+## Ce qui change
 
----
+### 1. Design des cartes (BlogPage.tsx)
+- Remplacer le bloc dégradé + icône par une **illustration originale** (ratio ~16:10), badge catégorie en pastille arrondie par-dessus.
+- Grille responsive 2/3 colonnes, hover léger (scale + ombre), titre serif foncé, ligne « Georges Boubet · date » sous le titre.
+- Charte KDP via tokens sémantiques : fond #FAFAFA, accent teal #008296, texte #232F3E, hover #FF9E2D (pas de couleurs en dur).
+- Conserver la bannière magazine ebookstudio.blog et le footer.
 
-## 1. Le modèle financier (idée développée)
+### 2. Données enrichies (blogArticles.ts + liste BlogPage)
+- Ajout des champs `image` (illustration importée) et `author` à `BlogArticle`.
+- Catégories alignées : `Auto-édition`, `Ebook & IA`, `Amazon KDP`, `Marketing`, `Site web d'auteur`.
+- Fusion vers une seule source de vérité pour les cartes.
 
-On garde ton système actuel (tables `referral_codes`, `referrals`, `affiliate_clicks`, commission 30 %).
+### 3. Nouveaux guides SEO (proposition éditable)
+8 guides à fort potentiel KDP, chacun = article markdown complet + FAQ + table des matières + illustration IA originale :
 
 ```text
-MAINTENANT  : Vente 67 €   →  30 % = 20,10 € / vente
-DÈS OCTOBRE : Vente 197 €  →  30 % = 59,10 € / vente   (V3)
+1. Auto-édition Amazon KDP : combien gagne un auteur (et par livre) ?   [Auto-édition]
+2. 6 outils IA pour écrire un livre (gratuit et payant)                 [Ebook & IA]
+3. 7 mots-clés Amazon KDP : comment les utiliser correctement          [Amazon KDP]
+4. Fermeture / suspension de compte Amazon KDP : que faire ?            [Amazon KDP]
+5. KDP Select : mon avis tranché sur la question                       [Amazon KDP]
+6. Comment rédiger une biographie d'auteur (+ modèles)                  [Auto-édition]
+7. Comment créer un site web d'auteur en 45 minutes                     [Site web d'auteur]
+8. Gagner de l'argent avec les ebooks : stratégies rentables           [Marketing]
 ```
 
-Pour éviter de toucher au code en octobre, on centralise le prix et la date de bascule dans une petite constante (réutilisant `referralLaunch.ts` / une date `V3_PRICE_SWITCH = 1er octobre 2026`). Avant la date → 67 € / 20,10 € ; après → 197 € / 59,10 €. Tout le kit (page, PDF, simulateur, message d'approche) lit cette constante.
+### 4. Illustrations IA (originales)
+- Une illustration par guide, générée via l'outil image, sauvegardée dans `src/assets/blog/`.
+- Style : illustration éditoriale premium, palette orangée KDP cohérente, ambiance bureau d'auteur / édition — **sujets et compositions inédits**, jamais des répliques des captures.
+- Import ES6 dans la carte et en tête d'article ; image OG par article ; alt text descriptif ; lazy-loading.
 
-Argumentaire « gagnant-gagnant » à mettre en avant :
-
-- **30 % de commission** à vie sur chaque vente — bien au-dessus de la moyenne.
-- **Lien + code unique** par influenceur → suivi automatique clics + ventes (déjà géré).
-- **Pas de cash en avance** : zéro risque, tu ne paies que sur résultat réel.
-- **Bonus de palier** (texte d'incitation) : ex. à partir de 5 ventes, accès offert à l'influenceur → il devient ambassadeur authentique.
-- **Tableau de simulation** : « 10 ventes = 201 € (puis 591 € dès octobre) », etc.
-
-> Note : le programme de parrainage public reste cadré par `referralLaunch.ts`. Le kit est utilisable dès maintenant pour contacter/préparer les influenceurs ; les liens fonctionnent immédiatement.
-
----
-
-## 2. Le mockup visuel premium
-
-- Génération d'un **visuel mockup photoréaliste** (écran de l'app sur smartphone/tablette, fond premium, badge prix dynamique « 67 € à vie » → « 197 € » en octobre), charte respectée (fond clair, teal #008296, accent orange #FF9E2D, photoréalisme strict).
-- Stocké dans `src/assets/` et utilisé : (a) page `/influenceurs`, (b) intégré au PDF, (c) téléchargeable seul (format vertical 9:16 prêt pour story/Reel).
-
----
-
-## 3. Le PDF « Dossier Influenceur »
-
-Document pro d'1-2 pages dans `public/kit-influenceurs.pdf` (téléchargeable depuis l'app) :
-
-1. Pitch produit + mockup.
-2. L'offre : **30 % par vente** (20,10 € maintenant, 59,10 € dès octobre), tableau de simulation.
-3. Comment ça marche en 3 étapes (reçoit son lien → poste → gagne).
-4. **3 scripts vidéo TikTok/Reels** prêts à tourner (hook + corps + CTA).
-5. Conditions simples + contact + lien d'inscription.
-
----
-
-## 4. Page publique `/influenceurs`
-
-Landing partageable (style charte KDP) :
-
-- Hero : « Deviens ambassadeur Ebookstudio — gagne 30 % par vente ».
-- Mockup premium + bénéfices.
-- Simulateur de gains interactif (slider ventes → € gagnés), prix lu depuis la constante de bascule.
-- Les 3 scripts vidéo affichés + bouton copier.
-- Boutons : **Télécharger le kit (PDF)**, **Télécharger le visuel**, **Je rejoins le programme** (création/récupération du code via `referral_codes`, comme `PromoAffiliePage`).
-- SEO via `SeoHead` (titre < 60, meta < 160, H1 unique). Route ajoutée dans `App.tsx`.
-
----
-
-## 5. Module admin dans le Hub V3
-
-- Nouvelle entrée dans `src/data/roadmapV3.ts` : `influencer-kit` (pilier `marketing`, status `done`), titre « Kit Influenceurs TikTok/Insta ».
-- En complément, on **garde 197 € dans la roadmap** : note sur le module / mémoire que la commission passera de 20,10 € à 59,10 € au passage V3 en octobre.
-- Composant React rendu via `v3ModuleRegistry`, permettant de :
-  - Saisir le nom d'un influenceur → **générer un lien + code de suivi unique** (`referral_codes`).
-  - Copier un **message d'approche prêt à coller** (DM TikTok/Insta) avec lien injecté.
-  - Télécharger le PDF et le visuel.
-  - Mini-tableau de suivi (clics / ventes) depuis `affiliate_clicks` + `referrals`.
-
----
+### 5. SEO
+- Titres <60 car., meta description <160 car., un seul H1 par page, JSON-LD `BlogPosting` enrichi (`image`, `author: Georges Boubet`), canonical, alt text, lazy-loading.
 
 ## Détails techniques
-
-- **Réutilisation** maximale : `referral_codes`, `referrals`, `affiliate_clicks`, `useReferral`, logique `PromoAffiliePage`, `SeoHead`, `FunnelLayout`. Aucune nouvelle table.
-- **Prix dynamique** : une constante centrale (prix + date de bascule 1er octobre) pilote tout l'affichage (67 €/20,10 € → 197 €/59,10 €).
-- **Mockup** : généré via l'outil d'image (photoréaliste), asset importé ES6.
-- **PDF** : généré une fois (reportlab) et déposé dans `public/` ; QA visuelle avant livraison.
-- **Pas de logique de paiement modifiée** — flux de commission existant (`handle_funnel_order_paid`).
-- Fichiers touchés : `src/data/roadmapV3.ts`, `v3ModuleRegistry`, nouveau `InfluencerKit.tsx`, nouvelle page `InfluenceursPage.tsx`, `App.tsx`, asset mockup, `public/kit-influenceurs.pdf`, petite constante prix/bascule.
-
----
-
-## Hors périmètre
-
-- Pas de modification du taux de commission (reste 30 %).
-- Pas d'automatisation d'envoi de DM (message fourni à copier-coller).
+- `BlogArticle` (blogArticles.ts) : ajout `image: string` et `author: string`.
+- Le tableau `articles` local de `BlogPage.tsx` est aligné sur `blogArticles.ts`.
+- `BlogArticleTemplate.tsx` : ajout illustration d'en-tête + ligne auteur/date.
+- Aucune dépendance nouvelle ; aucune logique backend.
