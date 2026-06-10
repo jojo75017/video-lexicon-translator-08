@@ -34,6 +34,8 @@ interface Body {
   provider?: "gemini" | "openai" | "openrouter";
   model?: string;
   userApiKey?: string;
+  chapterIndex?: number;
+  prevChapterTail?: string;
 }
 
 type CallResult =
@@ -61,6 +63,8 @@ serve(async (req) => {
       provider = "gemini",
       model = "",
       userApiKey = "",
+      chapterIndex,
+      prevChapterTail = "",
     } = body;
 
     // === Sélection du fournisseur ===
@@ -247,6 +251,9 @@ Règles :
     const isManuscript = moduleId === "p20-chat-manuscript";
 
     // === Étape « Développer le manuscrit » : rédaction chapitre par chapitre ===
+    // Le client appelle cette fonction UNE fois par chapitre (chapterIndex 1..n)
+    // pour éviter les timeouts et afficher la progression. Sans chapterIndex,
+    // on génère uniquement le chapitre 1 (compat. ascendante).
     if (isManuscript) {
       const n = Math.min(Math.max(parseInt(brief.chapterCount || "", 10) || 8, 1), 40);
       const targetWords = Math.min(Math.max(parseInt(brief.wordsPerChapter || "", 10) || 1500, 300), 6000);
@@ -254,12 +261,11 @@ Règles :
       const maxWords = Math.round(targetWords * 1.15);
       // ~1.6 tokens par mot en français + marge de sécurité.
       const maxTok = Math.min(Math.max(Math.round(targetWords * 2.2), 2048), 16000);
-      const chapters: string[] = [];
-      for (let i = 1; i <= n; i++) {
-        const prev = chapters.length
-          ? `\n## Fin du chapitre précédent (pour la continuité)\n${chapters[chapters.length - 1].slice(-1000)}`
-          : "";
-        const chapUser = `# Rédige INTÉGRALEMENT le CHAPITRE ${i} sur ${n} du livre.
+      const i = Math.min(Math.max(Number(chapterIndex) || 1, 1), n);
+      const prev = prevChapterTail.trim()
+        ? `\n## Fin du chapitre précédent (pour la continuité)\n${prevChapterTail.slice(-1000)}`
+        : "";
+      const chapUser = `# Rédige INTÉGRALEMENT le CHAPITRE ${i} sur ${n} du livre.
 
 ${themeLine}
 
@@ -276,21 +282,19 @@ ${prev}
 - INTERDIT : un résumé, un plan, une liste de puces sèche, ou seulement quelques lignes. Le lecteur doit pouvoir LIRE ce chapitre tel quel dans le livre publié.
 - Reste cohérent avec le plan et les chapitres précédents.
 - N'écris pas "voici le chapitre", ne commente pas : écris directement le contenu du chapitre.`;
-        const r = await callAI(system, chapUser, maxTok);
-        if (!r.ok) return aiError(r.status, r.body);
-        if (r.text) chapters.push(r.text);
-      }
-      const result = chapters.join("\n\n---\n\n").trim();
-      if (!result) {
+      const r = await callAI(system, chapUser, maxTok);
+      if (!r.ok) return aiError(r.status, r.body);
+      if (!r.text) {
         return new Response(
           JSON.stringify({ error: "Réponse vide de l'IA. Réessaie." }),
           { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
-      return new Response(JSON.stringify({ result }), {
+      return new Response(JSON.stringify({ result: r.text, chapterIndex: i, totalChapters: n }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
 
     const user = `# Étape ${stepNumber} du parcours : ${stepTitle || moduleTitle}
 

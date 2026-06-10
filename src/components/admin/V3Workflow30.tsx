@@ -224,6 +224,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   const [theme, setTheme] = useState<string>(() => localStorage.getItem(THEME_KEY) ?? '');
   const [brief, setBrief] = useState<Brief>(() => loadBrief());
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [progress, setProgress] = useState<{ current: number; total: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [openPhase, setOpenPhase] = useState<string | null>(PHASES[0].key);
   const [openCfg, setOpenCfg] = useState<'brief' | 'engine' | 'projects' | null>('brief');
@@ -396,28 +397,52 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
       return;
     }
     setLoadingId(step.moduleId);
+    setProgress(null);
     try {
       const mod = getModuleById(step.moduleId);
       const priorOutputs = FLAT.filter((s) => s.globalIndex < step.globalIndex && results[s.moduleId])
         .map((s) => ({ title: s.label ?? getModuleById(s.moduleId)?.title ?? s.moduleId, output: results[s.moduleId] }));
 
-      const { data, error: fnErr } = await supabase.functions.invoke('v3-autopilot-step', {
-        body: {
-          moduleId: step.moduleId,
-          stepNumber: step.globalIndex + 1,
-          stepTitle: step.label ?? mod?.title ?? step.moduleId,
-          stepHint: step.hint,
-          moduleTitle: mod?.title ?? step.moduleId,
-          moduleDescription: mod?.description ?? '',
-          theme,
-          brief,
-          priorOutputs,
-          provider,
-          model: currentModel,
-          userApiKey: provider === 'gemini' ? effectiveKey : customKey.trim(),
-        },
-      });
+      const baseBody = {
+        moduleId: step.moduleId,
+        stepNumber: step.globalIndex + 1,
+        stepTitle: step.label ?? mod?.title ?? step.moduleId,
+        stepHint: step.hint,
+        moduleTitle: mod?.title ?? step.moduleId,
+        moduleDescription: mod?.description ?? '',
+        theme,
+        brief,
+        priorOutputs,
+        provider,
+        model: currentModel,
+        userApiKey: provider === 'gemini' ? effectiveKey : customKey.trim(),
+      };
 
+      // === Manuscrit : on génère chapitre par chapitre (1 appel = 1 chapitre) ===
+      // Évite les timeouts d'Edge Function et affiche la progression en direct.
+      if (step.moduleId === 'p20-chat-manuscript') {
+        const total = Math.min(Math.max(parseInt(brief.chapterCount || '', 10) || 8, 1), 40);
+        const chapters: string[] = [];
+        let prevTail = '';
+        for (let i = 1; i <= total; i++) {
+          setProgress({ current: i, total });
+          const { data, error: fnErr } = await supabase.functions.invoke('v3-autopilot-step', {
+            body: { ...baseBody, chapterIndex: i, prevChapterTail: prevTail },
+          });
+          if (fnErr) throw new Error(fnErr.message);
+          if (data?.error) throw new Error(data.error);
+          if (!data?.result) throw new Error(`Chapitre ${i} : réponse vide de l'IA.`);
+          chapters.push(data.result as string);
+          prevTail = (data.result as string).slice(-1000);
+          // Sauvegarde incrémentale : on voit le manuscrit grandir chapitre par chapitre.
+          setResults((prev) => ({ ...prev, [step.moduleId]: chapters.join('\n\n---\n\n') }));
+        }
+        return;
+      }
+
+      const { data, error: fnErr } = await supabase.functions.invoke('v3-autopilot-step', {
+        body: baseBody,
+      });
 
       if (fnErr) throw new Error(fnErr.message);
       if (data?.error) throw new Error(data.error);
@@ -428,8 +453,10 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
       setError(e instanceof Error ? e.message : 'Une erreur est survenue.');
     } finally {
       setLoadingId(null);
+      setProgress(null);
     }
   };
+
 
   const validate = (id: string) => setDone((prev) => new Set(prev).add(id));
 
@@ -789,7 +816,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                                       className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5 disabled:opacity-60"
                                       style={{ background: `linear-gradient(90deg, ${AMBER}, #FFB44D)` }}>
                                       {isLoading
-                                        ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> L'IA travaille…</>
+                                        ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> {isLoading && progress ? `Chapitre ${progress.current} / ${progress.total}…` : "L'IA travaille…"}</>
                                         : <><Sparkles className="h-3.5 w-3.5" /> {result ? 'Régénérer' : 'Générer avec l\'IA'}</>}
                                     </button>
                                   )}
@@ -822,6 +849,24 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                                 <div className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-semibold rounded-lg px-2.5 py-1.5"
                                   style={{ background: '#fdecec', color: '#c0392b' }}>
                                   <AlertCircle className="h-3.5 w-3.5" /> {error}
+                                </div>
+                              )}
+
+                              {/* Avancement de la rédaction (chapitre par chapitre) */}
+                              {isActive && isLoading && progress && (
+                                <div className="mt-2.5">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <span className="inline-flex items-center gap-1.5 text-[11px] font-bold" style={{ color: GREEN }}>
+                                      <Loader2 className="h-3 w-3 animate-spin" /> Rédaction du chapitre {progress.current} sur {progress.total}
+                                    </span>
+                                    <span className="text-[11px] font-black" style={{ color: GREEN }}>
+                                      {Math.round((progress.current / progress.total) * 100)}%
+                                    </span>
+                                  </div>
+                                  <div className="h-2 w-full rounded-full overflow-hidden" style={{ background: '#e7f6ee' }}>
+                                    <div className="h-full rounded-full transition-all duration-500"
+                                      style={{ width: `${Math.round((progress.current / progress.total) * 100)}%`, background: `linear-gradient(90deg, ${GREEN}, #2fc488)` }} />
+                                  </div>
                                 </div>
                               )}
 
