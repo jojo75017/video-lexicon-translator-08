@@ -196,18 +196,19 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
         user_id: auth.user.id,
         name: projectName.trim() || 'Mon livre',
         theme,
-        brief,
-        done: [...done],
-        results,
+        brief: brief as unknown as Record<string, unknown>,
+        done: [...done] as unknown as Record<string, unknown>,
+        results: results as unknown as Record<string, unknown>,
       };
       if (projectId) {
-        const { error: e } = await supabase.from('v3_workflow_projects').update(payload).eq('id', projectId);
+        const { error: e } = await supabase.from('v3_workflow_projects').update(payload as never).eq('id', projectId);
         if (e) throw e;
       } else {
-        const { data, error: e } = await supabase.from('v3_workflow_projects').insert(payload).select('id').single();
+        const { data, error: e } = await supabase.from('v3_workflow_projects').insert(payload as never).select('id').single();
         if (e) throw e;
-        if (data) setProjectId(data.id);
+        if (data) setProjectId((data as { id: string }).id);
       }
+
       setCloudMsg('Projet sauvegardé ✓');
       await refreshProjects();
     } catch (e) {
