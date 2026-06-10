@@ -534,13 +534,20 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 Crée ta clé sur openrouter.ai → un seul compte donne accès à Claude, DeepSeek, Llama, Mistral, Grok, Qwen, etc.
               </p>
             )}
+            </div>
+            )}
           </div>
 
           {/* Sauvegarde cloud */}
-          <div className="mt-4 rounded-2xl border p-4 sm:p-5" style={{ borderColor: '#eadfc9', background: '#fffdf8' }}>
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: AMBER_DEEP }}>
-              Mes projets (sauvegarde dans le compte)
-            </p>
+          <div className="mt-4 rounded-2xl border overflow-hidden" style={{ borderColor: '#eadfc9', background: '#fffdf8' }}>
+            <button type="button" onClick={() => toggleCfg('projects')}
+              className="w-full flex items-center justify-between gap-3 px-4 sm:px-5 py-3.5 text-left transition-colors hover:bg-[#FCF8F0]"
+              aria-expanded={openCfg === 'projects'}>
+              <span className="text-[12px] font-bold uppercase tracking-[0.2em]" style={{ color: AMBER_DEEP }}>💾 Mes projets (sauvegarde)</span>
+              <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${openCfg === 'projects' ? 'rotate-180' : ''}`} style={{ color: AMBER_DEEP }} />
+            </button>
+            {openCfg === 'projects' && (
+            <div className="px-4 sm:px-5 pb-5">
             <div className="flex flex-wrap items-end gap-3">
               <div className="flex-1 min-w-[180px]">
                 <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Nom du projet</label>
