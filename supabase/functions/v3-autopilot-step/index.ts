@@ -106,6 +106,8 @@ Outil correspondant : ${moduleTitle} — ${moduleDescription}
 
 ${themeLine}
 
+${briefBlock}
+
 ## Contexte du projet (décisions des étapes précédentes)
 ${contextText}
 
