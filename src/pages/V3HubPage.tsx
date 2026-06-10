@@ -186,11 +186,11 @@ const V3HubPage: React.FC = () => {
           </p>
 
           <div className="mt-6 flex flex-wrap items-center gap-3">
-            <span data-tour="price" className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold"
+            <a href="#tarifs" data-tour="price" className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold transition-transform hover:-translate-y-0.5"
               style={{ background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, color: '#1a1a1a' }}>
-              <Sparkles className="h-4 w-4" /> 197€ à vie
-            </span>
-            <span className="text-xs text-white/40">{V3_MODULES.length} modules au total</span>
+              <Sparkles className="h-4 w-4" /> Dès 197€ à vie · 3× ou 6× sans frais
+            </a>
+            <span className="text-xs text-white/40">{V3_MODULES.length} modules · Pack Tout Complet 497€</span>
           </div>
         </div>
       </header>
