@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Sparkles, Crown, Compass, Lock } from 'lucide-react';
+import { ArrowLeft, Search, Sparkles, Crown, Compass, Lock, ArrowRight, Wand2, CheckCircle2, Layers, Infinity as InfinityIcon } from 'lucide-react';
 import {
   V3_MODULES, V3_PILLAR_META, getModuleTier, type V3Pillar, type V3Module,
 } from '@/data/roadmapV3';
@@ -18,6 +18,7 @@ const GOLD_LIGHT = '#f0d78c';
 
 // L'écriture/rédaction (STUDIO de création) vit dans « IA avancée » : c'est le 1er palier.
 const PILLAR_ORDER: V3Pillar[] = ['ia', 'publier', 'monetiser', 'marketing'];
+
 
 /** Carte module premium avec tilt 3D + halo doré au survol. */
 function ModuleCard({
