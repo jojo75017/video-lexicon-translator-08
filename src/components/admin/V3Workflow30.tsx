@@ -593,7 +593,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 style={{ borderColor: `${AMBER}66`, background: '#fff' }}>
                 <Wand2 className="h-4 w-4" style={{ color: AMBER }} />
                 <span className="text-[11px] font-bold uppercase tracking-[0.3em]" style={{ color: AMBER_DEEP }}>
-                  Auto-pilote IA · 30 étapes
+                  Auto-pilote IA · {TOTAL} étapes
                 </span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: SERIF, color: INK }}>
