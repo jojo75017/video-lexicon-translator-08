@@ -160,7 +160,7 @@ function ModuleCard({
 const V3HubPage: React.FC = () => {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
-  const [pillar, setPillar] = useState<V3Pillar | 'all' | 'create' | 'mine'>('all');
+  const [pillar, setPillar] = useState<V3Pillar | 'all' | 'create' | 'mine' | 'roadmap'>('all');
   const [selected, setSelected] = useState<V3Module | null>(null);
   const [studioSource, setStudioSource] = useState<string | null>(null);
   const [tourOpen, setTourOpen] = useState(false);
