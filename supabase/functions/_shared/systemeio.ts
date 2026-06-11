@@ -39,7 +39,9 @@ export async function pushToSystemeIo(
       if (!contactId) return { ok: false, detail: "created_no_id" };
     } else if (createRes.status === 422) {
       const cbody = await createRes.text();
-      if (/exist|déjà|already/i.test(cbody)) {
+      const isUndeliverable = /n['’]existe pas|does not exist|n['’]est pas valide|invalid|non délivrable|undeliverable/i.test(cbody);
+      const isDuplicate = /déjà|already|existe déjà|already exists|duplicate/i.test(cbody);
+      if (isDuplicate && !isUndeliverable) {
         const findRes = await fetch(
           `${SYSTEMEIO_BASE}/contacts?email=${encodeURIComponent(email)}`,
           { headers },
