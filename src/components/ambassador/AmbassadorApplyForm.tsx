@@ -45,12 +45,43 @@ const AmbassadorApplyForm: React.FC = () => {
 
   if (done) {
     return (
-      <div className="bg-[#008296]/5 border border-[#008296]/30 rounded-2xl p-8 text-center space-y-3">
-        <CheckCircle2 className="w-12 h-12 mx-auto text-emerald-500" />
-        <h2 className="text-2xl font-bold text-[#232F3E]">Candidature reçue 🎉</h2>
-        <p className="text-[#232F3E]/70">
-          On vient de t'envoyer un email avec ton kit et le lien pour activer ton lien
-          ambassadeur. Pense à vérifier tes spams !
+      <div className="bg-white border-2 border-emerald-300 rounded-2xl p-8 space-y-6 text-center">
+        <div className="relative mx-auto w-20 h-20">
+          <div className="absolute inset-0 rounded-full bg-emerald-100 animate-pulse" />
+          <div className="relative w-full h-full rounded-full bg-emerald-50 flex items-center justify-center">
+            <CheckCircle2 className="w-10 h-10 text-emerald-500" />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold text-[#232F3E]">Candidature envoyée 🎉</h2>
+          <p className="text-[#232F3E]/70 max-w-md mx-auto">
+            Ton kit ambassadeur et ton lien de suivi personnalisé arrivent automatiquement par email.
+          </p>
+        </div>
+
+        <div className="bg-[#FAFAFA] border border-[#232F3E]/10 rounded-xl p-5 text-left space-y-3 max-w-md mx-auto">
+          <h3 className="font-bold text-[#232F3E] text-sm flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-[#FF9E2D]" /> Prochaines étapes
+          </h3>
+          <ul className="space-y-3 text-sm text-[#232F3E]/75">
+            <li className="flex items-start gap-3">
+              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#008296]/10 text-[#008296] text-xs font-bold shrink-0">1</span>
+              <span>Vérifie ta boîte email (et tes spams) dans les prochaines minutes.</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#008296]/10 text-[#008296] text-xs font-bold shrink-0">2</span>
+              <span>Télécharge le kit complet : mockups, scripts TikTok/Reels et visuels prêts à poster.</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#008296]/10 text-[#008296] text-xs font-bold shrink-0">3</span>
+              <span>Active ton lien de suivi perso pour commencer à tracker tes commissions (30% par vente).</span>
+            </li>
+          </ul>
+        </div>
+
+        <p className="text-xs text-[#232F3E]/50">
+          Une question ? Écris-nous à <a href="mailto:georges@ebookstudio.fr" className="text-[#008296] underline">georges@ebookstudio.fr</a>
         </p>
       </div>
     );
