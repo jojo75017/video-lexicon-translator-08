@@ -65,23 +65,23 @@ const InfluencerContactForm: React.FC = () => {
 
       <div className="grid sm:grid-cols-2 gap-3">
         <div>
-          <label className="text-xs text-[#232F3E]/60 mb-1 block">Prénom</label>
-          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ton prénom" />
+          <label className="text-xs text-[#232F3E]/60 mb-1 block">Prénom de l'influenceur</label>
+          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="ex : Sarah" />
         </div>
         <div>
-          <label className="text-xs text-[#232F3E]/60 mb-1 block">Email *</label>
-          <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="toi@email.com" />
+          <label className="text-xs text-[#232F3E]/60 mb-1 block">Email de l'influenceur *</label>
+          <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ex : sarah@gmail.com" />
         </div>
         <div className="sm:col-span-2">
-          <label className="text-xs text-[#232F3E]/60 mb-1 block">Pseudo / @handle</label>
-          <Input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder="@toncompte" />
+          <label className="text-xs text-[#232F3E]/60 mb-1 block">Pseudo / @handle de l'influenceur</label>
+          <Input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder="ex : @sarah_creates" />
         </div>
         <div className="sm:col-span-2">
-          <label className="text-xs text-[#232F3E]/60 mb-1 block">Ton message *</label>
+          <label className="text-xs text-[#232F3E]/60 mb-1 block">Message de l'influenceur *</label>
           <Textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Dis-moi ce dont tu as besoin…"
+            placeholder="L'influenceur écrit sa question ici…"
             rows={4}
           />
         </div>
