@@ -16,6 +16,7 @@ import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 import AmbassadorApplyForm from '@/components/ambassador/AmbassadorApplyForm';
 import InfluencerContactForm from '@/components/ambassador/InfluencerContactForm';
 import AmbassadorScripts from '@/components/ambassador/AmbassadorScripts';
+import AmbassadorEmailSequence from '@/components/ambassador/AmbassadorEmailSequence';
 import AmbassadorOutreachTracker from '@/components/ambassador/AmbassadorOutreachTracker';
 import InfluencerFinder from '@/components/admin/InfluencerFinder';
 import {
