@@ -193,19 +193,21 @@ const V3HubPage: React.FC = () => {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return V3_MODULES.filter((m) => {
-      if (pillar !== 'all' && m.pillar !== pillar) return false;
+      if (pillar === 'mine' && !isUnlocked(m)) return false;
+      if (pillar !== 'all' && pillar !== 'mine' && m.pillar !== pillar) return false;
       if (!q) return true;
       return m.title.toLowerCase().includes(q) || m.description.toLowerCase().includes(q);
     });
-  }, [query, pillar]);
+  }, [query, pillar, isUnlocked]);
 
   const readyCount = useMemo(() => V3_MODULES.filter((m) => isModuleClickable(m.id)).length, []);
+  const myToolsCount = useMemo(() => V3_MODULES.filter(isUnlocked).length, [isUnlocked]);
 
   const stats = [
     { icon: CheckCircle2, value: readyCount, label: 'Outils prêts' },
     { icon: Wand2, value: V3_MODULES.length, label: 'Modules V3' },
     { icon: Layers, value: PILLAR_ORDER.length, label: 'Piliers' },
-    { icon: InfinityIcon, value: '197€', label: 'Accès à vie' },
+    { icon: InfinityIcon, value: '197€', label: 'Livres illimités inclus' },
   ];
 
   return (
