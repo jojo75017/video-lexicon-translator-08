@@ -232,6 +232,13 @@ const ResultView: React.FC<{ text: string }> = ({ text }) => {
 
 const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpenModule }) => {
   const { apiKey: userGeminiKey } = useOpenAIConfig();
+  // Parcours actif : 'core' = offre 197€ (22 agents), 'full' = Pack Tout Complet 497€ (32 agents).
+  const [parcours, setParcours] = useState<Parcours>(
+    () => ((localStorage.getItem(PARCOURS_KEY) as Parcours) === 'full' ? 'full' : 'core'),
+  );
+  useEffect(() => { localStorage.setItem(PARCOURS_KEY, parcours); }, [parcours]);
+  const FLAT = useMemo(() => buildFlat(parcours), [parcours]);
+  const TOTAL = FLAT.length;
   const [done, setDone] = useState<Set<string>>(() => loadSet(PROGRESS_KEY));
   const [results, setResults] = useState<Record<string, string>>(() => loadResults());
   const [theme, setTheme] = useState<string>(() => localStorage.getItem(THEME_KEY) ?? '');
