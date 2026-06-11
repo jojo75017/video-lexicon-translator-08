@@ -621,7 +621,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             </button>
           </div>
 
-          {/* Sélecteur de parcours selon l'offre */}
+          {/* Sélecteur de parcours selon l'offre réellement réglée */}
           <div className="mt-5 rounded-2xl border p-4" style={{ borderColor: `${AMBER}55`, background: '#fffdf8' }}>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
@@ -630,8 +630,10 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 </div>
                 <p className="mt-1 text-[12px]" style={{ color: '#6f5e47' }}>
                   {parcours === 'full'
-                    ? 'Offre Pack Tout Complet 497€ : la suite complète d\'auto-édition, tous les agents avancés débloqués.'
-                    : 'Offre 197€ : les 22 agents essentiels pour aller de l\'idée au livre publié.'}
+                    ? 'Pack Tout Complet 497€ : la suite complète d\'auto-édition, tous les agents avancés débloqués.'
+                    : hasFull
+                      ? 'Offre 197€ : 22 agents essentiels. Tu peux basculer en Pro à tout moment.'
+                      : 'Offre 197€ : les 22 agents essentiels pour aller de l\'idée au livre publié.'}
                 </p>
               </div>
               <div className="inline-flex rounded-xl border overflow-hidden" style={{ borderColor: `${AMBER}55` }}>
@@ -642,22 +644,40 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                     : { background: '#fff', color: AMBER_DEEP }}>
                   Essentiel · 197€
                 </button>
-                <button onClick={() => setParcours('full')}
-                  className="px-3.5 py-2 text-[12px] font-bold transition-colors"
+                <button
+                  onClick={() => (hasFull ? setParcours('full') : setCheckoutOpen(true))}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-[12px] font-bold transition-colors"
                   style={parcours === 'full'
                     ? { background: `linear-gradient(90deg, ${GREEN}, #2fc488)`, color: '#fff' }
                     : { background: '#fff', color: GREEN }}>
-                  Pro · 497€
+                  {!hasFull && <Lock className="h-3 w-3" />} Pro · 497€
                 </button>
               </div>
             </div>
             {parcours === 'core' && (
-              <button onClick={() => setParcours('full')}
-                className="mt-3 inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5"
-                style={{ background: `linear-gradient(90deg, ${GREEN}, #2fc488)` }}>
-                <Sparkles className="h-3.5 w-3.5" /> Débloquer 10 agents avancés (Pack Tout Complet 497€)
-              </button>
+              hasFull ? (
+                <button onClick={() => setParcours('full')}
+                  className="mt-3 inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5"
+                  style={{ background: `linear-gradient(90deg, ${GREEN}, #2fc488)` }}>
+                  <Sparkles className="h-3.5 w-3.5" /> Activer les 32 agents (Pack Tout Complet)
+                </button>
+              ) : (
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-[12px] font-semibold border"
+                    style={{ borderColor: `${AMBER}55`, color: AMBER_DEEP, background: '#fff' }}>
+                    <Lock className="h-3.5 w-3.5" /> Parcours Pro verrouillé — réservé au Pack Tout Complet 497€
+                  </span>
+                  <button onClick={() => setCheckoutOpen(true)}
+                    className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5"
+                    style={{ background: `linear-gradient(90deg, ${GREEN}, #2fc488)` }}>
+                    <Sparkles className="h-3.5 w-3.5" /> Débloquer les 10 agents avancés (497€)
+                  </button>
+                </div>
+              )
             )}
+          </div>
+          <V3PackCheckout open={checkoutOpen} onClose={() => setCheckoutOpen(false)} product="full" />
+
           </div>
 
           {/* Brief du livre */}
