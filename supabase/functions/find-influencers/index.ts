@@ -137,43 +137,61 @@ Deno.serve(async (req) => {
 
     for (const platform of platforms) {
       const site = PLATFORM_SITE[platform];
-      const query = `${keyword} site:${site}`;
-      try {
-        const resp = await fetch("https://api.firecrawl.dev/v2/search", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${firecrawlKey}`, "Content-Type": "application/json" },
-          // over-fetch since many results are videos/hashtags that get filtered out
-          body: JSON.stringify({ query, limit: Math.min(perPlatform * 3, 25), lang: "fr", country: "fr" }),
-        });
-        const data = await resp.json();
-        if (!resp.ok) {
-          console.error(`Firecrawl ${platform} error:`, data?.error || resp.status);
-          continue;
-        }
-        const items: any[] = data?.data?.web || data?.data || data?.web || [];
-        let kept = 0;
-        for (const it of items) {
-          if (kept >= perPlatform) break;
-          const url: string = it.url || it.link || "";
-          if (!url || !url.includes(site)) continue;
-          const profile = toProfile(url, platform);
-          if (!profile) continue;
-          const title: string = (it.title || "").toString();
-          const desc: string = (it.description || it.snippet || "").toString();
-          results.push({
-            platform,
-            name: title.replace(/\s*[|\-•(].*$/, "").trim() || profile.handle,
-            handle: profile.handle,
-            url: profile.url,
-            description: desc.slice(0, 220),
-            followers: extractFollowers(`${title} ${desc}`),
+      // Several query angles per platform to surface real creator profiles
+      // (plain keyword search returns mostly posts/videos that have no handle).
+      const queries: string[] = [`${keyword} site:${site}`];
+      if (platform === "youtube") {
+        queries.unshift(`${keyword} site:youtube.com/@`);
+        queries.push(`${keyword} chaîne site:${site}`);
+      } else if (platform === "instagram") {
+        queries.push(`${keyword} compte créateur site:${site}`);
+        queries.push(`${keyword} autrice auteur site:${site}`);
+      } else if (platform === "tiktok") {
+        queries.push(`${keyword} créateur site:${site}/@`);
+      }
+
+      let kept = 0;
+      for (const query of queries) {
+        if (kept >= perPlatform) break;
+        try {
+          const resp = await fetch("https://api.firecrawl.dev/v2/search", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${firecrawlKey}`, "Content-Type": "application/json" },
+            // over-fetch since many results are videos/hashtags that get filtered out
+            body: JSON.stringify({ query, limit: Math.min(perPlatform * 3, 25), lang: "fr", country: "fr" }),
           });
-          kept++;
+          const data = await resp.json();
+          if (!resp.ok) {
+            console.error(`Firecrawl ${platform} error:`, data?.error || resp.status);
+            continue;
+          }
+          const items: any[] = data?.data?.web || data?.data || data?.web || [];
+          for (const it of items) {
+            if (kept >= perPlatform) break;
+            const url: string = it.url || it.link || "";
+            if (!url || !url.includes(site)) continue;
+            const profile = toProfile(url, platform);
+            if (!profile) continue;
+            const title: string = (it.title || "").toString();
+            const desc: string = (it.description || it.snippet || "").toString();
+            const name = title.replace(/\s*[|\-•(].*$/, "").trim() || profile.handle;
+            results.push({
+              platform,
+              name,
+              handle: profile.handle,
+              url: profile.url,
+              description: desc.slice(0, 220),
+              followers: extractFollowers(`${title} ${desc}`),
+              kind: classify(name, profile.handle),
+            });
+            kept++;
+          }
+        } catch (e) {
+          console.error(`Search failed for ${platform}:`, e);
         }
-      } catch (e) {
-        console.error(`Search failed for ${platform}:`, e);
       }
     }
+
 
     // dédoublonnage par profil (url)
     const seen = new Set<string>();
