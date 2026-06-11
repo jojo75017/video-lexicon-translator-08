@@ -355,7 +355,11 @@ const V3HubPage: React.FC = () => {
         {pillar === 'create' ? (
           <CreateBookHub onSelectSource={openStudio} />
         ) : filtered.length === 0 ? (
-          <div className="text-center py-20 text-sm" style={{ color: '#a18a6c' }}>Aucun outil ne correspond à « {query} ».</div>
+          <div className="text-center py-20 text-sm" style={{ color: '#a18a6c' }}>
+            {pillar === 'mine'
+              ? 'Aucun outil débloqué pour le moment. Démarrez avec la base 197€ pour accéder à la création de livres illimités.'
+              : `Aucun outil ne correspond à « ${query} ».`}
+          </div>
         ) : pillar === 'all' ? (
           (() => {
             const firstPillarWithItems = PILLAR_ORDER.find((p) => filtered.some((m) => m.pillar === p));
@@ -372,7 +376,7 @@ const V3HubPage: React.FC = () => {
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                     {items.map((m, i) => (
-                      <ModuleCard key={m.id} module={m} index={i} onOpen={setSelected} isFirst={p === firstPillarWithItems && i === 0} />
+                      <ModuleCard key={m.id} module={m} index={i} onOpen={setSelected} unlocked={isUnlocked(m)} isFirst={p === firstPillarWithItems && i === 0} />
                     ))}
                   </div>
                 </section>
@@ -382,7 +386,7 @@ const V3HubPage: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {filtered.map((m, i) => (
-              <ModuleCard key={m.id} module={m} index={i} onOpen={setSelected} isFirst={i === 0} />
+              <ModuleCard key={m.id} module={m} index={i} onOpen={setSelected} unlocked={isUnlocked(m)} isFirst={i === 0} />
             ))}
           </div>
         )}
