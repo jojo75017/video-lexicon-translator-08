@@ -49,7 +49,17 @@ serve(async (req) => {
 
     console.log("Contact email sent:", r);
 
-    return new Response(JSON.stringify({ success: true }), {
+    // Si le message vient de la page influenceurs, on inscrit le contact dans Systeme.io.
+    let systemeio: { ok: boolean; detail?: string } | undefined;
+    if (source === "influenceurs") {
+      systemeio = await pushToSystemeIo(email, name || handle || "", [
+        "promoteur-interesse",
+        "ambassadeur-ebookstudio",
+        "contact-influenceur",
+      ], handle ? [{ slug: "pseudo", value: String(handle) }] : []);
+    }
+
+    return new Response(JSON.stringify({ success: true, systemeio: systemeio?.ok }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e: any) {
