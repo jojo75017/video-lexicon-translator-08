@@ -15,7 +15,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { email, name, subject, category, message } = await req.json();
+    const { email, name, subject, category, message, source, handle } = await req.json();
 
     if (!email || !message) {
       return new Response(JSON.stringify({ error: "Email et message requis" }), {
