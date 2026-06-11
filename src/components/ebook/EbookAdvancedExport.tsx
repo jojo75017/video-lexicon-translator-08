@@ -52,7 +52,7 @@ const stripChapterPrefix = (title: string, i: number): string => {
 
 
 export const EbookAdvancedExport: React.FC<EbookAdvancedExportProps> = ({
-  ebookTitle, authorName, chapters, preface, conclusion, characters, coverImage,
+  ebookTitle, authorName, chapters, preface, conclusion, characters, coverImage, trimSize,
 }) => {
   const [selectedFormat, setSelectedFormat] = useState<ExportFormat>('docx-kdp');
   const [isExporting, setIsExporting] = useState(false);
