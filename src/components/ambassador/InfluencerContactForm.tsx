@@ -24,6 +24,8 @@ const InfluencerContactForm: React.FC = () => {
         body: {
           email,
           name: name || handle,
+          handle,
+          source: 'influenceurs',
           subject: handle ? `Influenceur ${handle}` : 'Contact influenceur',
           category: 'Programme Ambassadeur / Influenceur',
           message,
