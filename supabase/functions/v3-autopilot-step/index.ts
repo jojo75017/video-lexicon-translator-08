@@ -66,7 +66,9 @@ serve(async (req) => {
       userApiKey = "",
       chapterIndex,
       prevChapterTail = "",
+      quality = "core",
     } = body;
+    const isPro = quality === "pro";
 
     // === Sélection du fournisseur ===
     const geminiKey = (userApiKey || "").trim() || Deno.env.get("GEMINI_API_KEY") || "";
