@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Copy, Check, Mail } from 'lucide-react';
 import { toast } from 'sonner';
-import { PRICE_NOW, PRICE_V3, COMMISSION_NOW, COMMISSION_V3 } from '@/lib/influencerKit';
+import { PRICE_NOW, PRICE_V3, COMMISSION_NOW, COMMISSION_V3, ORIGIN } from '@/lib/influencerKit';
 
 const TEAL = '#008296';
 
@@ -18,7 +18,9 @@ interface EmailTemplate {
 const AmbassadorEmailSequence = ({ shareLink }: { shareLink: string }) => {
   const [copied, setCopied] = useState<string | null>(null);
 
-  const link = shareLink || 'https://www.ebookstudio.fr/influenceurs';
+  // Lien à diffuser dans les emails = la page publique d'inscription ambassadeur,
+  // PAS le lien de tracking promo. (shareLink reste accepté pour rétrocompat.)
+  const link = `${ORIGIN}/influenceurs`;
 
   const emails: EmailTemplate[] = useMemo(() => [
     {
