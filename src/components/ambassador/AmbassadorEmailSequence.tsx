@@ -30,20 +30,22 @@ const AmbassadorEmailSequence = ({ shareLink }: { shareLink: string }) => {
 
 Merci de ton intérêt pour faire connaître Ebookstudio, l'outil qui crée des livres complets (texte, couverture, audio) prêts pour Amazon KDP grâce à l'IA.
 
+👉 Ton lien : ${link}
+
 Concrètement, tu touches 30% de commission À VIE sur chaque vente : ${COMMISSION_NOW}€ sur l'offre actuelle à ${PRICE_NOW}€, et bientôt ${COMMISSION_V3}€ sur la V3 Pro à ${PRICE_V3}€.
 
-🎁 Ton kit prêt à l'emploi :
+🎁 Ton kit prêt à l'emploi (remplace [ton lien] par : ${link}) :
 
 — Post Insta/TikTok :
-« J'ai écrit et publié un livre complet en 1 week-end avec une IA 🤯 Couverture, texte, version audio… tout y était. L'outil est en bio 👉 [ton lien] »
+« J'ai écrit et publié un livre complet en 1 week-end avec une IA 🤯 Couverture, texte, version audio… tout y était. C'est par ici 👉 ${link} »
 
 — Story/Reels :
-« Écrire un livre te semble impossible ? Cet outil français fait 80% du boulot à ta place. Démo en story ⬆️ »
+« Écrire un livre te semble impossible ? Cet outil français fait 80% du boulot à ta place. Démo et lien 👉 ${link} »
 
 — Message à ta communauté :
-« Je te partage Ebookstudio, un outil qui crée des ebooks et livres audio complets avec l'IA, prêts pour Amazon. Si tu as toujours voulu publier ton livre, c'est le moment : [ton lien] »
+« Je te partage Ebookstudio, un outil qui crée des ebooks et livres audio complets avec l'IA, prêts pour Amazon. Si tu as toujours voulu publier ton livre, c'est le moment : ${link} »
 
-👉 Ton lien : ${link}
+👉 Ton lien (à mettre partout : bio, posts, stories) : ${link}
 
 Une question ? Réponds simplement à cet email, je te réponds personnellement.
 
