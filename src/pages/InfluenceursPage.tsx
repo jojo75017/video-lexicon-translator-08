@@ -323,12 +323,52 @@ C'est un paiement unique de ${price}€ à vie, sans abonnement.
         </section>
       )}
 
-      {/* APPLY — AUTO-SERVICE */}
+      {/* MODE D'EMPLOI ADMIN */}
+      {(isAdmin || forceRecruit) && (
+        <section className="max-w-3xl mx-auto px-4 pt-6">
+          <div className="bg-amber-50 border-2 border-amber-300 rounded-2xl p-6 space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">👋</span>
+              <h2 className="text-xl font-bold text-[#232F3E]">Mode d'emploi — Tu es sur ta page publique</h2>
+            </div>
+            <div className="space-y-2 text-sm text-[#232F3E]/80">
+              <p className="font-semibold text-amber-700">Cette page est FAITE pour être partagée avec tes influenceurs.</p>
+              <ul className="space-y-1 list-disc list-inside">
+                <li><strong>Les formulaires orange et bleu ci-dessous</strong> : ce sont tes influenceurs qui les remplissent (PAS toi).</li>
+                <li><strong>Ton rôle</strong> : envoie le lien <code className="bg-white px-1 py-0.5 rounded text-amber-700 font-mono text-xs">ebookstudio.fr/influenceurs</code> à tes prospects.</li>
+                <li>Ils s'inscrivent eux-mêmes, reçoivent leur kit auto, et tu les vois apparaître dans ton CRM.</li>
+              </ul>
+            </div>
+            <div className="bg-white rounded-xl p-4 border border-amber-200">
+              <p className="text-xs font-bold text-[#232F3E] mb-2">Lien à copier et envoyer à tes influenceurs :</p>
+              <div className="flex gap-2">
+                <input
+                  readOnly
+                  value={`${ORIGIN}/influenceurs`}
+                  className="flex-1 bg-[#FAFAFA] border border-[#232F3E]/15 rounded-lg px-3 py-2 text-sm font-mono"
+                />
+                <Button
+                  onClick={() => copy(`${ORIGIN}/influenceurs`, 'page-link')}
+                  variant="outline"
+                  className="border-amber-400 text-amber-700 hover:bg-amber-50"
+                >
+                  {copied === 'page-link' ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                </Button>
+              </div>
+            </div>
+            <p className="text-xs text-[#232F3E]/60">
+              Si tu veux ajouter toi-même un contact (tu as déjà son email), utilise l'onglet <strong>📋 Suivi des envois</strong> dans ton espace recrutement ci-dessus.
+            </p>
+          </div>
+        </section>
+      )}
+
+      {/* APPLY — AUTO-SERVICE PUBLIC */}
       <section className="max-w-3xl mx-auto px-4 py-8">
         <AmbassadorApplyForm />
       </section>
 
-      {/* CONTACT DIRECT */}
+      {/* CONTACT DIRECT PUBLIC */}
       <section className="max-w-3xl mx-auto px-4 py-8">
         <InfluencerContactForm />
       </section>

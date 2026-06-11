@@ -46,34 +46,42 @@ const InfluencerContactForm: React.FC = () => {
   return (
     <div className="bg-white border-2 border-[#008296] rounded-2xl p-8 space-y-5">
       <div>
+        <div className="flex items-center gap-2 mb-2">
+          <span className="inline-flex items-center gap-1 bg-[#008296]/15 text-[#008296] px-2.5 py-1 rounded-full text-xs font-bold">
+            🌐 Formulaire public
+          </span>
+          <span className="inline-flex items-center gap-1 bg-[#FF9E2D]/15 text-[#FF9E2D] px-2.5 py-1 rounded-full text-xs font-bold">
+            👤 L'influenceur t'écrit ici
+          </span>
+        </div>
         <h2 className="text-2xl font-bold flex items-center gap-2 text-[#232F3E]">
           <Mail className="w-6 h-6 text-[#008296]" /> Une question ? Contacte-moi directement
         </h2>
         <p className="text-sm text-[#232F3E]/65 mt-1">
-          Collaboration sur-mesure, question sur les commissions, partenariat… Écris-moi ici, je te
-          réponds personnellement par email.
+          Ce formulaire est destiné aux influenceurs qui ont des questions avant de s'inscrire.
+          Ils écrivent leur message ici et tu reçois leur demande par email.
         </p>
       </div>
 
       <div className="grid sm:grid-cols-2 gap-3">
         <div>
-          <label className="text-xs text-[#232F3E]/60 mb-1 block">Prénom</label>
-          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ton prénom" />
+          <label className="text-xs text-[#232F3E]/60 mb-1 block">Prénom de l'influenceur</label>
+          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="ex : Sarah" />
         </div>
         <div>
-          <label className="text-xs text-[#232F3E]/60 mb-1 block">Email *</label>
-          <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="toi@email.com" />
+          <label className="text-xs text-[#232F3E]/60 mb-1 block">Email de l'influenceur *</label>
+          <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ex : sarah@gmail.com" />
         </div>
         <div className="sm:col-span-2">
-          <label className="text-xs text-[#232F3E]/60 mb-1 block">Pseudo / @handle</label>
-          <Input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder="@toncompte" />
+          <label className="text-xs text-[#232F3E]/60 mb-1 block">Pseudo / @handle de l'influenceur</label>
+          <Input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder="ex : @sarah_creates" />
         </div>
         <div className="sm:col-span-2">
-          <label className="text-xs text-[#232F3E]/60 mb-1 block">Ton message *</label>
+          <label className="text-xs text-[#232F3E]/60 mb-1 block">Message de l'influenceur *</label>
           <Textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Dis-moi ce dont tu as besoin…"
+            placeholder="L'influenceur écrit sa question ici…"
             rows={4}
           />
         </div>
