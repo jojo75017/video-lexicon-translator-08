@@ -14,6 +14,7 @@ import {
 import mockup from '@/assets/influenceurs-mockup.jpg';
 import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 import AmbassadorApplyForm from '@/components/ambassador/AmbassadorApplyForm';
+import InfluencerContactForm from '@/components/ambassador/InfluencerContactForm';
 import AmbassadorScripts from '@/components/ambassador/AmbassadorScripts';
 import AmbassadorOutreachTracker from '@/components/ambassador/AmbassadorOutreachTracker';
 import InfluencerFinder from '@/components/admin/InfluencerFinder';
@@ -320,6 +321,11 @@ C'est un paiement unique de ${price}€ à vie, sans abonnement.
       {/* APPLY — AUTO-SERVICE */}
       <section className="max-w-3xl mx-auto px-4 py-8">
         <AmbassadorApplyForm />
+      </section>
+
+      {/* CONTACT DIRECT */}
+      <section className="max-w-3xl mx-auto px-4 py-8">
+        <InfluencerContactForm />
       </section>
 
 
