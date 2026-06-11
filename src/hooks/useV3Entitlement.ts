@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { getStripeEnvironment } from '@/lib/stripe';
-import { useAuth } from '@/contexts/AuthContext';
 import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 
 /**
@@ -17,7 +16,6 @@ import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 const PAID_STATUSES = new Set(['active', 'completed', 'paid']);
 
 export function useV3Entitlement() {
-  const { user, isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(true);
   const [hasBase, setHasBase] = useState(false);
   const [hasFull, setHasFull] = useState(false);
@@ -38,8 +36,10 @@ export function useV3Entitlement() {
         return;
       }
 
+      const { data: { user } } = await supabase.auth.getUser();
       const email = user?.email;
-      if (!isAuthenticated || !email) {
+      if (cancelled) return;
+      if (!email) {
         setHasBase(false);
         setHasFull(false);
         setLoading(false);
@@ -69,7 +69,7 @@ export function useV3Entitlement() {
       }
     })();
     return () => { cancelled = true; };
-  }, [user?.email, isAuthenticated]);
+  }, []);
 
   return { loading, hasBase, hasFull, isAdmin };
 }
