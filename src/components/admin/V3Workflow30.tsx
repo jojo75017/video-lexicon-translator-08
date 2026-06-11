@@ -235,10 +235,17 @@ const ResultView: React.FC<{ text: string }> = ({ text }) => {
 
 const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpenModule }) => {
   const { apiKey: userGeminiKey } = useOpenAIConfig();
+  // Droits réellement payés (197€ base / 497€ Pack Tout Complet). L'admin a tout.
+  const { hasFull, isAdmin: isV3Admin, loading: entLoading } = useV3Entitlement();
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
   // Parcours actif : 'core' = offre 197€ (22 agents), 'full' = Pack Tout Complet 497€ (32 agents).
   const [parcours, setParcours] = useState<Parcours>(
     () => ((localStorage.getItem(PARCOURS_KEY) as Parcours) === 'full' ? 'full' : 'core'),
   );
+  // Garde-fou : tant que le Pack 497€ n'est pas réglé, on ne peut pas démarrer en Pro.
+  useEffect(() => {
+    if (!entLoading && parcours === 'full' && !hasFull) setParcours('core');
+  }, [entLoading, parcours, hasFull]);
   useEffect(() => { localStorage.setItem(PARCOURS_KEY, parcours); }, [parcours]);
   const FLAT = useMemo(() => buildFlat(parcours), [parcours]);
   const TOTAL = FLAT.length;
