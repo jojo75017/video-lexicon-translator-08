@@ -678,7 +678,6 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
           </div>
           <V3PackCheckout open={checkoutOpen} onClose={() => setCheckoutOpen(false)} product="full" />
 
-          </div>
 
           {/* Brief du livre */}
           <div className="mt-5 rounded-2xl border overflow-hidden" style={{ borderColor: '#eadfc9', background: '#fffdf8' }}>
