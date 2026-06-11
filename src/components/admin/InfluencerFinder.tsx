@@ -23,6 +23,7 @@ interface Influencer {
   url: string;
   description: string;
   followers: string | null;
+  kind?: 'createur' | 'maison_edition';
 }
 
 interface InviteState {
@@ -60,6 +61,7 @@ const InfluencerFinder: React.FC = () => {
   const [copied, setCopied] = useState<string | null>(null);
   const [inviting, setInviting] = useState<string | null>(null);
   const [invites, setInvites] = useState<Record<string, InviteState>>({});
+  const [hideBrands, setHideBrands] = useState(false);
 
   const commission = getActiveCommission();
 
@@ -298,7 +300,19 @@ Dis-moi si tu veux tester 🚀`;
 
         {results.length > 0 && (
           <div className="space-y-2 pt-1">
-            {results.map((inf) => {
+            {results.some((r) => r.kind === 'maison_edition') && (
+              <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={hideBrands}
+                  onChange={(e) => setHideBrands(e.target.checked)}
+                />
+                Masquer les maisons d'édition / marques (afficher seulement les créateurs)
+              </label>
+            )}
+            {results
+              .filter((inf) => !(hideBrands && inf.kind === 'maison_edition'))
+              .map((inf) => {
               const inv = invites[inf.url];
               return (
                 <div key={inf.url} className="border rounded-md p-2.5">
@@ -307,6 +321,11 @@ Dis-moi si tu veux tester 🚀`;
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="font-medium text-sm truncate">{inf.name}</span>
                         <Badge variant="outline" className="text-[10px] py-0">{inf.platform}</Badge>
+                        {inf.kind === 'maison_edition' ? (
+                          <Badge className="text-[10px] py-0 bg-[#FF9E2D] text-[#232F3E] hover:bg-[#FF9E2D]">maison d'édition</Badge>
+                        ) : (
+                          <Badge className="text-[10px] py-0 bg-[#008296] text-white hover:bg-[#008296]">créateur</Badge>
+                        )}
                         {inf.followers && (
                           <span className="text-[11px] text-[#008296] flex items-center gap-0.5">
                             <Users className="h-3 w-3" />{inf.followers}
