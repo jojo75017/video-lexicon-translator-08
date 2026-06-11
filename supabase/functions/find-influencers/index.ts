@@ -219,9 +219,11 @@ Deno.serve(async (req) => {
     // créateurs individuels d'abord, maisons d'édition ensuite
     unique.sort((a, b) => (a.kind === b.kind ? 0 : a.kind === "createur" ? -1 : 1));
 
-    // Vérifie que chaque profil existe vraiment (évite les comptes inexistants/bloqués).
-    // On scrape l'URL du profil et on garde seulement les pages 200.
-    const verifyProfile = async (url: string): Promise<boolean> => {
+    // Vérifie l'existence du profil. Les réseaux (TikTok/Insta) bloquent souvent
+    // les scrapers : on ne retire un profil QUE si un signal clair "introuvable"
+    // est détecté. En cas d'échec/blocage du scrape, on garde le profil.
+    const NOT_FOUND_RX = /(couldn'?t find this account|page isn'?t available|compte introuvable|cette page n'?est pas disponible|content isn'?t available|sorry, this page isn'?t available|user not found|page not found)/i;
+    const profileExists = async (url: string): Promise<boolean> => {
       try {
         const r = await fetch("https://api.firecrawl.dev/v2/scrape", {
           method: "POST",
@@ -229,24 +231,21 @@ Deno.serve(async (req) => {
           body: JSON.stringify({ url, formats: ["markdown"], onlyMainContent: true, timeout: 15000 }),
         });
         const d = await r.json().catch(() => null);
-        if (!r.ok || !d) return false;
-        const status = d?.data?.metadata?.statusCode ?? d?.metadata?.statusCode;
-        const md: string = (d?.data?.markdown || d?.markdown || "").toString().toLowerCase();
-        if (status && Number(status) >= 400) return false;
-        // signaux de page introuvable / compte indisponible
-        if (/(couldn'?t find this account|page isn'?t available|compte introuvable|cette page n'?est pas disponible|content isn'?t available|video currently unavailable|404)/i.test(md)) {
-          return false;
-        }
+        if (!r.ok || !d) return true; // scrape bloque -> benefice du doute
+        const status = Number(d?.data?.metadata?.statusCode ?? d?.metadata?.statusCode ?? 0);
+        const md: string = (d?.data?.markdown || d?.markdown || "").toString();
+        if (status === 404) return false;
+        if (NOT_FOUND_RX.test(md)) return false;
         return true;
       } catch {
-        return false;
+        return true; // erreur reseau -> on garde
       }
     };
 
     const verified: Influencer[] = [];
     for (const inf of unique) {
       if (verified.length >= perPlatform * platforms.length) break;
-      if (await verifyProfile(inf.url)) verified.push(inf);
+      if (await profileExists(inf.url)) verified.push(inf);
     }
 
     return new Response(JSON.stringify({ success: true, keyword, count: verified.length, influencers: verified }), {
