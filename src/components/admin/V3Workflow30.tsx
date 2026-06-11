@@ -612,6 +612,45 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             </button>
           </div>
 
+          {/* Sélecteur de parcours selon l'offre */}
+          <div className="mt-5 rounded-2xl border p-4" style={{ borderColor: `${AMBER}55`, background: '#fffdf8' }}>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <div className="text-[12px] font-bold uppercase tracking-[0.2em]" style={{ color: AMBER_DEEP }}>
+                  {parcours === 'full' ? '🚀 Parcours Pro — 32 agents' : '📗 Parcours Essentiel — 22 agents'}
+                </div>
+                <p className="mt-1 text-[12px]" style={{ color: '#6f5e47' }}>
+                  {parcours === 'full'
+                    ? 'Offre Pack Tout Complet 497€ : la suite complète d\'auto-édition, tous les agents avancés débloqués.'
+                    : 'Offre 197€ : les 22 agents essentiels pour aller de l\'idée au livre publié.'}
+                </p>
+              </div>
+              <div className="inline-flex rounded-xl border overflow-hidden" style={{ borderColor: `${AMBER}55` }}>
+                <button onClick={() => setParcours('core')}
+                  className="px-3.5 py-2 text-[12px] font-bold transition-colors"
+                  style={parcours === 'core'
+                    ? { background: `linear-gradient(90deg, ${AMBER}, #FFB44D)`, color: '#fff' }
+                    : { background: '#fff', color: AMBER_DEEP }}>
+                  Essentiel · 197€
+                </button>
+                <button onClick={() => setParcours('full')}
+                  className="px-3.5 py-2 text-[12px] font-bold transition-colors"
+                  style={parcours === 'full'
+                    ? { background: `linear-gradient(90deg, ${GREEN}, #2fc488)`, color: '#fff' }
+                    : { background: '#fff', color: GREEN }}>
+                  Pro · 497€
+                </button>
+              </div>
+            </div>
+            {parcours === 'core' && (
+              <button onClick={() => setParcours('full')}
+                className="mt-3 inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5"
+                style={{ background: `linear-gradient(90deg, ${GREEN}, #2fc488)` }}>
+                <Sparkles className="h-3.5 w-3.5" /> Débloquer 10 agents avancés (Pack Tout Complet 497€)
+              </button>
+            )}
+          </div>
+
           {/* Brief du livre */}
           <div className="mt-5 rounded-2xl border overflow-hidden" style={{ borderColor: '#eadfc9', background: '#fffdf8' }}>
             <button type="button" onClick={() => toggleCfg('brief')}
