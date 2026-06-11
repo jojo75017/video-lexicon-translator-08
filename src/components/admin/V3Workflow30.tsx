@@ -855,36 +855,14 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             )}
           </div>
 
-          {/* Export du livre — toujours visible */}
-          <div className="mt-5 rounded-2xl border p-4 sm:p-5" style={{ borderColor: `${GREEN}40`, background: '#f3fbf7' }}>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="min-w-[200px]">
-                <div className="inline-flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-[0.2em]" style={{ color: GREEN }}>
-                  <FileDown className="h-4 w-4" /> Exporter ton livre
-                </div>
-                <p className="mt-1 text-[11px]" style={{ color: '#5f7a6c' }}>
-                  {results['p20-chat-manuscript']
-                    ? 'Ton manuscrit est prêt : télécharge-le en PDF (prêt KDP) ou en DOCX éditable.'
-                    : 'Génère ou importe ton manuscrit à l\'étape « Développer le manuscrit » pour activer l\'export.'}
-                </p>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <button onClick={() => exportBook('pdf')} disabled={!!exporting || !results['p20-chat-manuscript']}
-                  className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5 disabled:opacity-50"
-                  style={{ background: `linear-gradient(90deg, ${GREEN}, #2fc488)` }}>
-                  {exporting === 'pdf'
-                    ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Export PDF…</>
-                    : <><FileDown className="h-3.5 w-3.5" /> PDF (KDP)</>}
-                </button>
-                <button onClick={() => exportBook('docx')} disabled={!!exporting || !results['p20-chat-manuscript']}
-                  className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-[12px] font-bold border transition-colors hover:bg-[#e7f6ee] disabled:opacity-50"
-                  style={{ borderColor: `${GREEN}66`, color: GREEN, background: '#fff' }}>
-                  {exporting === 'docx'
-                    ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Export DOCX…</>
-                    : <><FileDown className="h-3.5 w-3.5" /> DOCX</>}
-                </button>
-              </div>
-            </div>
+          {/* Export du livre — moteur multi-format complet (toujours visible) */}
+          <div className="mt-5">
+            <V3ExportPanel
+              manuscript={results['p20-chat-manuscript'] || ''}
+              title={brief.title?.trim() || theme.trim() || 'Mon livre'}
+              subtitle={brief.subtitle?.trim() || undefined}
+              author={brief.author?.trim() || undefined}
+            />
           </div>
         </div>
 
