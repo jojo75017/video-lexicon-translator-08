@@ -973,12 +973,15 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 {isOpen && (
                   <div className="pb-3">
                     {phaseSteps.map((step) => {
-                      const n = step.globalIndex + 1;
                       const mod = getModuleById(step.moduleId);
                       const ready = isModuleClickable(step.moduleId);
+                      const accessible = isAccessible(step);
+                      const isTeaser = !accessible; // étape premium non débloquée → aperçu verrouillé
+                      const pos = accPos.get(step.moduleId);
+                      const n = pos != null ? pos + 1 : 0;
                       const isDone = done.has(step.moduleId);
-                      const isActive = step.globalIndex === activeIndex;
-                      const isLocked = step.globalIndex > activeIndex;
+                      const isActive = accessible && pos === activeAccIndex;
+                      const isLocked = accessible && pos != null && pos > activeAccIndex;
                       const isLoading = loadingId === step.moduleId;
                       const result = results[step.moduleId];
 
