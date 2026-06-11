@@ -13,6 +13,7 @@ import V3PricingTiers from '@/components/admin/V3PricingTiers';
 import V3Workflow30 from '@/components/admin/V3Workflow30';
 import V3AccessRecap from '@/components/admin/V3AccessRecap';
 import V3GuidesSection from '@/components/admin/V3GuidesSection';
+import V3RoadmapTab from '@/components/admin/V3RoadmapTab';
 import pillarIa from '@/assets/v3/pillar-ia.jpg';
 import pillarPublier from '@/assets/v3/pillar-publier.jpg';
 import pillarMonetiser from '@/assets/v3/pillar-monetiser.jpg';
@@ -159,7 +160,7 @@ function ModuleCard({
 const V3HubPage: React.FC = () => {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
-  const [pillar, setPillar] = useState<V3Pillar | 'all' | 'create' | 'mine'>('all');
+  const [pillar, setPillar] = useState<V3Pillar | 'all' | 'create' | 'mine' | 'roadmap'>('all');
   const [selected, setSelected] = useState<V3Module | null>(null);
   const [studioSource, setStudioSource] = useState<string | null>(null);
   const [tourOpen, setTourOpen] = useState(false);
@@ -333,6 +334,7 @@ const V3HubPage: React.FC = () => {
           </div>
           <div className="flex flex-wrap items-center gap-2" data-tour="filters">
             <CreateBookChip active={pillar === 'create'} onClick={() => setPillar('create')} />
+            <FilterChip active={pillar === 'roadmap'} onClick={() => setPillar('roadmap')} label="🗺️ Roadmap" />
             <span className="mx-1 h-6 w-px self-center" style={{ background: `${AMBER}44` }} aria-hidden />
             <FilterChip active={pillar === 'mine'} onClick={() => setPillar('mine')} label={`✅ Mes outils (${myToolsCount})`} />
             <FilterChip active={pillar === 'all'} onClick={() => setPillar('all')} label={`Tous (${V3_MODULES.length})`} />
@@ -359,6 +361,8 @@ const V3HubPage: React.FC = () => {
         {/* Onglet spécial : hub de création */}
         {pillar === 'create' ? (
           <CreateBookHub onSelectSource={openStudio} />
+        ) : pillar === 'roadmap' ? (
+          <V3RoadmapTab />
         ) : filtered.length === 0 ? (
           <div className="text-center py-20 text-sm" style={{ color: '#a18a6c' }}>
             {pillar === 'mine'
