@@ -201,6 +201,9 @@ Deno.serve(async (req) => {
       seen.add(key);
       return true;
     });
+    // créateurs individuels d'abord, maisons d'édition ensuite
+    unique.sort((a, b) => (a.kind === b.kind ? 0 : a.kind === "createur" ? -1 : 1));
+
 
     return new Response(JSON.stringify({ success: true, keyword, count: unique.length, influencers: unique }), {
       status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
