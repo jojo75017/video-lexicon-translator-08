@@ -58,13 +58,16 @@ function toProfile(rawUrl: string, platform: Platform): { handle: string; url: s
 
     if (platform === "tiktok") {
       const at = parts.find((p) => p.startsWith("@"));
-      if (!at || at.length < 3) return null;
-      const handle = at;
-      return { handle, url: `https://www.tiktok.com/${handle}` };
+      if (!at || at.length < 4) return null;
+      if (isOfficial(at)) return null;
+      return { handle: at, url: `https://www.tiktok.com/${at}` };
     }
     if (platform === "youtube") {
       const at = parts.find((p) => p.startsWith("@"));
-      if (at) return { handle: at, url: `https://www.youtube.com/${at}` };
+      if (at) {
+        if (isOfficial(at)) return null;
+        return { handle: at, url: `https://www.youtube.com/${at}` };
+      }
       if ((parts[0] === "channel" || parts[0] === "c") && parts[1]) {
         return { handle: parts[1], url: `https://www.youtube.com/${parts[0]}/${parts[1]}` };
       }
@@ -72,12 +75,12 @@ function toProfile(rawUrl: string, platform: Platform): { handle: string; url: s
     }
     if (platform === "instagram") {
       const first = parts[0];
-      if (!first || RESERVED.has(first.toLowerCase())) return null;
+      if (!first || RESERVED.has(first.toLowerCase()) || isOfficial(first)) return null;
       return { handle: `@${first}`, url: `https://www.instagram.com/${first}/` };
     }
     if (platform === "facebook") {
       const first = parts[0];
-      if (!first || RESERVED.has(first.toLowerCase()) || first.includes(".php")) return null;
+      if (!first || RESERVED.has(first.toLowerCase()) || isOfficial(first) || first.includes(".php")) return null;
       return { handle: first, url: `https://www.facebook.com/${first}` };
     }
     return null;
