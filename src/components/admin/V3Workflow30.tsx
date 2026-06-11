@@ -392,14 +392,14 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   useEffect(() => { localStorage.setItem(BRIEF_KEY, JSON.stringify(brief)); }, [brief]);
   const setBriefField = (k: keyof Brief, v: string) => setBrief((p) => ({ ...p, [k]: v }));
 
-  const completed = useMemo(() => FLAT.filter((s) => done.has(s.moduleId)).length, [done]);
+  const completed = useMemo(() => FLAT.filter((s) => done.has(s.moduleId)).length, [done, FLAT]);
   const pct = Math.round((completed / TOTAL) * 100);
 
   // Étape active = première non terminée.
   const activeIndex = useMemo(() => {
     const i = FLAT.findIndex((s) => !done.has(s.moduleId));
     return i === -1 ? TOTAL : i;
-  }, [done]);
+  }, [done, FLAT, TOTAL]);
 
   // Ouvre automatiquement la phase de l'étape active.
   useEffect(() => {
