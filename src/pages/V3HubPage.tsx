@@ -157,10 +157,17 @@ function ModuleCard({
 const V3HubPage: React.FC = () => {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
-  const [pillar, setPillar] = useState<V3Pillar | 'all' | 'create'>('all');
+  const [pillar, setPillar] = useState<V3Pillar | 'all' | 'create' | 'mine'>('all');
   const [selected, setSelected] = useState<V3Module | null>(null);
   const [studioSource, setStudioSource] = useState<string | null>(null);
   const [tourOpen, setTourOpen] = useState(false);
+  const { hasBase, hasFull, isAdmin } = useV3Entitlement();
+
+  // Un module est "débloqué" si l'abonné a la formule correspondante.
+  const isUnlocked = React.useCallback((m: V3Module) => {
+    if (isAdmin) return true;
+    return getModuleAccess(m.id) === 'pack' ? hasFull : hasBase;
+  }, [isAdmin, hasBase, hasFull]);
 
   useEffect(() => {
     if (!localStorage.getItem(TOUR_KEY)) {
