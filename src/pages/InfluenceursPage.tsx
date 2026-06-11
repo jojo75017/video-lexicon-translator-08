@@ -297,11 +297,15 @@ C'est un paiement unique de ${price}€ à vie, sans abonnement.
               Tes outils pour recruter des ambassadeurs : scripts DM qui déclenchent une réponse
               et suivi de qui tu as contacté.
             </p>
-            <Tabs defaultValue="tracker">
+            <Tabs defaultValue="finder">
               <TabsList>
+                <TabsTrigger value="finder">🔎 Trouver des influenceurs</TabsTrigger>
                 <TabsTrigger value="tracker">📋 Suivi des envois</TabsTrigger>
                 <TabsTrigger value="scripts">💬 Scripts DM 2 temps</TabsTrigger>
               </TabsList>
+              <TabsContent value="finder" className="mt-4">
+                <InfluencerFinder />
+              </TabsContent>
               <TabsContent value="tracker" className="mt-4">
                 <AmbassadorOutreachTracker />
               </TabsContent>
