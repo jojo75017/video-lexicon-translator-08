@@ -248,8 +248,11 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
     if (!entLoading && parcours === 'full' && !hasFull) setParcours('core');
   }, [entLoading, parcours, hasFull]);
   useEffect(() => { localStorage.setItem(PARCOURS_KEY, parcours); }, [parcours]);
-  const FLAT = useMemo(() => buildFlat(parcours), [parcours]);
-  const TOTAL = FLAT.length;
+  // On affiche TOUJOURS la liste complète (32 étapes). Les étapes premium non débloquées
+  // restent visibles en « teaser » verrouillé pour donner envie de passer au Pack 497€.
+  const FLAT = useMemo(() => buildFlat('full'), []);
+  const fullMode = parcours === 'full' && hasFull;
+  const isAccessible = (s: FlatStep) => (s.tier ?? 'core') !== 'premium' || fullMode;
   const [done, setDone] = useState<Set<string>>(() => loadSet(PROGRESS_KEY));
   const [results, setResults] = useState<Record<string, string>>(() => loadResults());
   const [theme, setTheme] = useState<string>(() => localStorage.getItem(THEME_KEY) ?? '');
