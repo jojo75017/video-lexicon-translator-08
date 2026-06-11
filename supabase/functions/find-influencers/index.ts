@@ -37,6 +37,18 @@ const RESERVED = new Set([
   "groups", "story", "stories", "user", "embed", "popular", "directory", "topic",
 ]);
 
+/** Comptes officiels / génériques des plateformes : jamais des influenceurs. */
+const OFFICIAL = new Set([
+  "tiktok", "instagram", "youtube", "facebook", "meta", "google", "shorts",
+  "creators", "creator", "business", "ads", "help", "support", "books", "booktok",
+  "foryou", "fyp", "trending", "official", "app",
+]);
+
+function isOfficial(handle: string): boolean {
+  const clean = handle.replace(/^@/, "").toLowerCase();
+  return OFFICIAL.has(clean);
+}
+
 /** Returns a clean profile {handle, url} or null if the URL is not a creator profile. */
 function toProfile(rawUrl: string, platform: Platform): { handle: string; url: string } | null {
   try {
@@ -46,13 +58,16 @@ function toProfile(rawUrl: string, platform: Platform): { handle: string; url: s
 
     if (platform === "tiktok") {
       const at = parts.find((p) => p.startsWith("@"));
-      if (!at || at.length < 3) return null;
-      const handle = at;
-      return { handle, url: `https://www.tiktok.com/${handle}` };
+      if (!at || at.length < 4) return null;
+      if (isOfficial(at)) return null;
+      return { handle: at, url: `https://www.tiktok.com/${at}` };
     }
     if (platform === "youtube") {
       const at = parts.find((p) => p.startsWith("@"));
-      if (at) return { handle: at, url: `https://www.youtube.com/${at}` };
+      if (at) {
+        if (isOfficial(at)) return null;
+        return { handle: at, url: `https://www.youtube.com/${at}` };
+      }
       if ((parts[0] === "channel" || parts[0] === "c") && parts[1]) {
         return { handle: parts[1], url: `https://www.youtube.com/${parts[0]}/${parts[1]}` };
       }
@@ -60,12 +75,12 @@ function toProfile(rawUrl: string, platform: Platform): { handle: string; url: s
     }
     if (platform === "instagram") {
       const first = parts[0];
-      if (!first || RESERVED.has(first.toLowerCase())) return null;
+      if (!first || RESERVED.has(first.toLowerCase()) || isOfficial(first)) return null;
       return { handle: `@${first}`, url: `https://www.instagram.com/${first}/` };
     }
     if (platform === "facebook") {
       const first = parts[0];
-      if (!first || RESERVED.has(first.toLowerCase()) || first.includes(".php")) return null;
+      if (!first || RESERVED.has(first.toLowerCase()) || isOfficial(first) || first.includes(".php")) return null;
       return { handle: first, url: `https://www.facebook.com/${first}` };
     }
     return null;
@@ -204,8 +219,36 @@ Deno.serve(async (req) => {
     // créateurs individuels d'abord, maisons d'édition ensuite
     unique.sort((a, b) => (a.kind === b.kind ? 0 : a.kind === "createur" ? -1 : 1));
 
+    // Vérifie l'existence du profil. Les réseaux (TikTok/Insta) bloquent souvent
+    // les scrapers : on ne retire un profil QUE si un signal clair "introuvable"
+    // est détecté. En cas d'échec/blocage du scrape, on garde le profil.
+    const NOT_FOUND_RX = /(couldn'?t find this account|page isn'?t available|compte introuvable|cette page n'?est pas disponible|content isn'?t available|sorry, this page isn'?t available|user not found|page not found)/i;
+    const profileExists = async (url: string): Promise<boolean> => {
+      try {
+        const r = await fetch("https://api.firecrawl.dev/v2/scrape", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${firecrawlKey}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ url, formats: ["markdown"], onlyMainContent: true, timeout: 15000 }),
+        });
+        const d = await r.json().catch(() => null);
+        if (!r.ok || !d) return true; // scrape bloque -> benefice du doute
+        const status = Number(d?.data?.metadata?.statusCode ?? d?.metadata?.statusCode ?? 0);
+        const md: string = (d?.data?.markdown || d?.markdown || "").toString();
+        if (status === 404) return false;
+        if (NOT_FOUND_RX.test(md)) return false;
+        return true;
+      } catch {
+        return true; // erreur reseau -> on garde
+      }
+    };
 
-    return new Response(JSON.stringify({ success: true, keyword, count: unique.length, influencers: unique }), {
+    const verified: Influencer[] = [];
+    for (const inf of unique) {
+      if (verified.length >= perPlatform * platforms.length) break;
+      if (await profileExists(inf.url)) verified.push(inf);
+    }
+
+    return new Response(JSON.stringify({ success: true, keyword, count: verified.length, influencers: verified }), {
       status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
