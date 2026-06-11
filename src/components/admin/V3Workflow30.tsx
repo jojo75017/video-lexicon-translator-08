@@ -458,6 +458,8 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
         priorOutputs,
         provider,
         model: currentModel,
+        // Palier de qualité IA : 'pro' (497€) = sorties plus longues + variantes ; 'core' (197€) = qualité enrichie.
+        quality: fullMode ? 'pro' : 'core',
         userApiKey: provider === 'gemini' ? effectiveKey : customKey.trim(),
       };
 
