@@ -12,6 +12,7 @@ import V2V3Compare from '@/components/admin/V2V3Compare';
 import V3PricingTiers from '@/components/admin/V3PricingTiers';
 import V3Workflow30 from '@/components/admin/V3Workflow30';
 import V3AccessRecap from '@/components/admin/V3AccessRecap';
+import V3GuidesSection from '@/components/admin/V3GuidesSection';
 import pillarIa from '@/assets/v3/pillar-ia.jpg';
 import pillarPublier from '@/assets/v3/pillar-publier.jpg';
 import pillarMonetiser from '@/assets/v3/pillar-monetiser.jpg';
@@ -395,6 +396,7 @@ const V3HubPage: React.FC = () => {
           </div>
         )}
 
+        <V3GuidesSection />
         <V3PricingTiers />
         <V2V3Compare />
       </main>
