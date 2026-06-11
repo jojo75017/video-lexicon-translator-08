@@ -16,6 +16,7 @@ import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 import AmbassadorApplyForm from '@/components/ambassador/AmbassadorApplyForm';
 import AmbassadorScripts from '@/components/ambassador/AmbassadorScripts';
 import AmbassadorOutreachTracker from '@/components/ambassador/AmbassadorOutreachTracker';
+import InfluencerFinder from '@/components/admin/InfluencerFinder';
 import {
   COMMISSION_RATE, PRICE_NOW, PRICE_V3, COMMISSION_NOW, COMMISSION_V3,
   getActivePrice, getActiveCommission, isV3PriceActive, formatEuro, ORIGIN,
