@@ -9,8 +9,13 @@ import { toast } from 'sonner';
 import {
   Copy, Check, TrendingUp, Euro, Download, Image as ImageIcon,
   FileText, Sparkles, Gift, ShieldCheck, Zap, MessageCircle, Link as LinkIcon,
+  Users,
 } from 'lucide-react';
 import mockup from '@/assets/influenceurs-mockup.jpg';
+import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
+import AmbassadorApplyForm from '@/components/ambassador/AmbassadorApplyForm';
+import AmbassadorScripts from '@/components/ambassador/AmbassadorScripts';
+import AmbassadorOutreachTracker from '@/components/ambassador/AmbassadorOutreachTracker';
 import {
   COMMISSION_RATE, PRICE_NOW, PRICE_V3, COMMISSION_NOW, COMMISSION_V3,
   getActivePrice, getActiveCommission, isV3PriceActive, formatEuro, ORIGIN,
@@ -46,10 +51,15 @@ const InfluenceursPage = () => {
   const [copied, setCopied] = useState<string | null>(null);
   const [joining, setJoining] = useState(false);
   const [sales, setSales] = useState(10);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const price = getActivePrice();
   const commission = getActiveCommission();
   const v3Live = isV3PriceActive();
+
+  useEffect(() => {
+    getIsCurrentSessionAdmin().then(setIsAdmin).catch(() => setIsAdmin(false));
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -243,6 +253,41 @@ C'est un paiement unique de ${price}€ à vie, sans abonnement.
           </div>
         ))}
       </section>
+
+      {/* ADMIN — RECRUTEMENT */}
+      {isAdmin && (
+        <section className="max-w-3xl mx-auto px-4 py-8">
+          <div className="bg-[#232F3E]/[0.03] border border-[#232F3E]/15 rounded-2xl p-5 space-y-4">
+            <div className="flex items-center gap-2">
+              <Users className="w-6 h-6 text-[#008296]" />
+              <h2 className="text-2xl font-bold text-[#232F3E]">Espace recrutement (toi seul)</h2>
+            </div>
+            <p className="text-sm text-[#232F3E]/65">
+              Tes outils pour recruter des ambassadeurs : scripts DM qui déclenchent une réponse
+              et suivi de qui tu as contacté.
+            </p>
+            <Tabs defaultValue="tracker">
+              <TabsList>
+                <TabsTrigger value="tracker">📋 Suivi des envois</TabsTrigger>
+                <TabsTrigger value="scripts">💬 Scripts DM 2 temps</TabsTrigger>
+              </TabsList>
+              <TabsContent value="tracker" className="mt-4">
+                <AmbassadorOutreachTracker />
+              </TabsContent>
+              <TabsContent value="scripts" className="mt-4">
+                <AmbassadorScripts shareLink={shareLink} kitUrl={`${ORIGIN}/influenceurs`} />
+              </TabsContent>
+            </Tabs>
+          </div>
+        </section>
+      )}
+
+      {/* APPLY — AUTO-SERVICE */}
+      <section className="max-w-3xl mx-auto px-4 py-8">
+        <AmbassadorApplyForm />
+      </section>
+
+
 
       {/* SIMULATOR */}
       <section className="max-w-3xl mx-auto px-4 py-8">
