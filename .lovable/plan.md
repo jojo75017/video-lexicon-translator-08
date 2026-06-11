@@ -1,58 +1,61 @@
-# Recaler la valeur 197€ / 497€ du générateur V3
+# Clarifier ce à quoi l'abonné V3 a droit
 
 ## Objectif
-Mettre des freins clairs pour que le 197€ ne donne plus tout. Le 197€ va **jusqu'à publier sur KDP** (sans marketing). Tout le **lancement / vente / monétisation** devient **visible mais bridé (teaser)** avec upsell 497€. Et la **qualité IA monte par palier** : V2 (67€) < Essentiel (197€) < Pro (497€).
+Rendre limpide, malgré le grand nombre d'onglets, ce que l'abonné peut utiliser selon ce qu'il a réellement payé.
 
-## 1. Nouvelle frontière des paliers (qui fait quoi)
+## Règles de droits (décidées)
 
-Re-tagger les étapes dans `V3Workflow30.tsx` (champ `tier`) selon ce principe :
+**Base 197€ — INCLUS (à volonté) :**
+- Écrire et publier autant de **livres / ebooks texte** que voulu (Studio, 30 agents IA, pipeline complet)
+- **Livres low-content** (carnets, journaux, planners)
+- Tous les outils KDP de publication : couverture exacte, pack KDP ZIP, conformité, métadonnées, export multi-format, checklist, etc. (= modules `tier: 'core'`)
 
-```text
-197€ (Essentiel) → Phases 1 à 5 : idée → écrire → réviser → mettre en page → PUBLIER sur KDP
-497€ (Pro)       → tout le 197€ + Phase 6 (Vente) + agents avancés + qualité max
-```
+**PAYANT — packs premium (497€ Tout Complet, ou pack à la carte) :**
+- **Audiobooks** (Audiobook Express) → déjà `tier: 'upsell'`
+- Couvertures premium IA, marketing/lancement, réseaux sociaux, monétisation avancée (les 4 packs existants)
 
-Concrètement, passent en **`premium`** (donc bridés dans le 197€) :
-- **Toute la Phase 6 — Lancer & vendre** : description vendeuse, optimiseur d'annonce, **séquence emails J-7**, suivi des ventes. (aujourd'hui 3 sur 4 sont en `core` → c'est la grosse fuite)
-- Restent premium comme aujourd'hui : radar de tendances, détecteur KU, architecte de série, nettoyeur clichés, adaptateur de ton, test miniature, audiobook.
+**Hors générateur (à part) :** Blog (BlogCluster) et guides avancés — ne font pas partie de la base, restent signalés comme externes.
 
-Pour garder ~22 agents au 197€, repassent en **`core`** (publication "propre" légitime à 197€) : aperçu Kindle et préparation du pack KDP ZIP.
+> La distinction technique existe déjà : `getModuleTier(id)` renvoie `'core'` (inclus 197€) ou `'upsell'` (pack). On s'appuie dessus, on ne refait pas la taxonomie.
 
-Le compteur d'agents et la barre de progression sont déjà recalculés dynamiquement (`buildFlat`), donc le nombre s'ajuste tout seul. La liste reste éditable.
+## Ce qu'on construit
 
-## 2. Teaser bridé au lieu de masquer (réponse "aperçu bridé")
+### 1. Source de vérité des droits (par module)
+Dans `src/data/roadmapV3.ts`, ajouter une petite fonction `getModuleAccess(moduleId)` qui renvoie :
+- `'included'` → module `core` (compris dans la base 197€)
+- `'pack'` → module `upsell` (nécessite un pack / le Tout Complet)
 
-Aujourd'hui, dans le parcours 197€, les étapes premium sont **purement masquées** (`buildFlat` les filtre). Nouveau comportement :
+(Dérivé de `getModuleTier`, aucune donnée dupliquée.)
 
-- En parcours **Essentiel**, les étapes premium **restent visibles** dans la liste, marquées d'un badge cadenas doré « Pro · 497€ ».
-- Au lieu du bouton « Générer », elles affichent un **aperçu bridé** : un court exemple généré (ou un extrait tronqué ~30 %) + un voile « flou » sur la suite, avec le CTA **« Débloquer avec le Pack Tout Complet 497€ »** qui ouvre `V3PackCheckout`.
-- Le clic « Générer » réel est bloqué tant que `hasFull` est faux.
-- Ça crée le manque : l'utilisateur voit la valeur (emails de lancement, ads…) mais ne peut pas l'exécuter.
+### 2. Hook de droits → décision d'affichage
+Réutiliser `useV3Entitlement()` (déjà existant : `hasBase`, `hasFull`, `isAdmin`).
+Règle d'« débloqué » par module :
+- module `included` → débloqué si `hasBase` (ou admin)
+- module `pack` → débloqué si `hasFull` (ou admin)
 
-## 3. Qualité IA par palier (réponse "plus performant")
+(Le suivi par pack individuel n'existe pas en base ; on traite `core` = base, `upsell` = Tout Complet, ce qui couvre les deux formules réelles.)
 
-Ajouter un niveau de qualité transmis à l'edge function `v3-autopilot-step`, dérivé du parcours actif :
+### 3. Badge clair sur chaque carte (`V3HubPage.tsx` → `ModuleCard`)
+Remplacer l'actuel badge « Option » par un badge explicite et systématique :
+- **« Inclus 197€ »** (vert) pour les modules `included`
+- **« Option / Pack »** (ambre, cadenas) pour les modules `pack`
+- Quand l'abonné a débloqué le module : pastille **« Débloqué »** ; sinon, sur un module pack non payé, **« À débloquer »** + clic ouvre le checkout (comportement déjà présent).
 
-| Palier | Modèle | Longueur sortie | Prompt | Variantes |
-|---|---|---|---|---|
-| V2 (67€) | rapide (flash) | standard | concis | 1 |
-| **197€** | qualité (pro) | +50 % de profondeur | prompt enrichi (exemples, structure pro) | 1 |
-| **497€** | top qualité | sortie maximale | prompt expert + checklist qualité | **plusieurs variantes / A-B / régénérations** |
+### 4. Filtre « Mes outils » (demande principale)
+Ajouter un chip de filtre dans la barre de filtres du Hub, à côté de « Tous » :
+- **« Mes outils »** → n'affiche que les modules réellement débloqués pour cet abonné (selon §2).
+- État dynamique via `useV3Entitlement`. Pour un visiteur non connecté / non payé : affiche les modules `included` en aperçu, le reste verrouillé.
+- Petite légende discrète sous la barre : « 🟢 Inclus dans votre formule · 🔒 Disponible en pack ».
 
-Côté code :
-- `V3Workflow30.tsx` envoie un champ `quality: 'core' | 'pro'` dans `baseBody` (et le sélecteur de modèle peut être pré-réglé selon le palier).
-- `v3-autopilot-step/index.ts` : selon `quality`, ajuste `maxOutputTokens` (ex. 8192 → 12288), choisit un modèle par défaut plus fort, injecte un bloc d'instructions « niveau expert » dans le `system`/`user`, et en `pro` demande **2–3 variantes** comparatives sur les livrables marketing (titres, descriptions, accroches).
+### 5. Cohérence des compteurs
+La carte stat « 197€ / Accès à vie » du hero gagne une ligne de contexte : « Livres & ebooks illimités inclus ». Le filtre « Mes outils » affiche le nombre d'outils réellement accessibles.
 
-## 4. Cohérence affichage Hub
-- Le bandeau du Hub annonce clairement : « 197€ : écris et publie ton livre sur Amazon. 497€ : lance-le et vends-le (emails, ads, social, audio, monétisation) + qualité IA maximale. »
-- Mettre à jour les libellés du sélecteur de parcours et le sous-texte d'upsell pour refléter la nouvelle frontière (publier vs vendre).
+## Fichiers touchés
+- `src/data/roadmapV3.ts` — ajout `getModuleAccess()` (dérivé, non destructif)
+- `src/pages/V3HubPage.tsx` — badges Inclus/Option/Débloqué sur `ModuleCard`, chip « Mes outils », légende, branchement `useV3Entitlement`
+- (lecture seule) `src/hooks/useV3Entitlement.ts`, `src/components/admin/V3PricingTiers.tsx`
 
-## Détails techniques
-- **Fichiers modifiés** : `src/components/admin/V3Workflow30.tsx` (re-tag `tier`, rendu teaser bridé, champ `quality`, libellés), `supabase/functions/v3-autopilot-step/index.ts` (modèle/tokens/prompt/variantes selon `quality`), éventuellement `src/components/admin/V3HubPage.tsx` (texte du bandeau).
-- **Déploiement** : redéployer `v3-autopilot-step` après modif.
-- **Pas de nouveau paiement** : on réutilise le gating `useV3Entitlement` + `V3PackCheckout` déjà en place.
-- **Mémoire** : enregistrer la nouvelle politique de paliers (197€ = jusqu'à publication, marketing = teaser 497€, qualité par palier) dans la mémoire projet.
-
-## Hors périmètre (à confirmer plus tard)
-- Brancher la même logique teaser/qualité sur les modules ouverts hors workflow (cartes du Hub).
-- Limites d'usage chiffrées (nombre de livres, de régénérations) — pas demandé ici.
+## Hors périmètre
+- Pas de nouvelle table ni de suivi d'achat par pack individuel (on garde base vs Tout Complet).
+- Pas de changement des prix ni de la logique de paiement.
+- Le blog et les guides restent hors générateur (simple mention « externe »).

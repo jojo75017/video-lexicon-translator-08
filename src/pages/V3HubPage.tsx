@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Sparkles, Crown, Compass, Lock, ArrowRight, Wand2, CheckCircle2, Layers, Infinity as InfinityIcon } from 'lucide-react';
+import { ArrowLeft, Search, Sparkles, Crown, Compass, Lock, ArrowRight, Wand2, CheckCircle2, Layers, Infinity as InfinityIcon, ShieldCheck } from 'lucide-react';
 import {
-  V3_MODULES, V3_PILLAR_META, getModuleTier, type V3Pillar, type V3Module,
+  V3_MODULES, V3_PILLAR_META, getModuleAccess, type V3Pillar, type V3Module,
 } from '@/data/roadmapV3';
 import { isModuleClickable, V3ModuleDialog } from '@/components/admin/v3ModuleRegistry';
 import { V3HubTour } from '@/components/admin/V3HubTour';
+import useV3Entitlement from '@/hooks/useV3Entitlement';
 import CreateBookHub from '@/components/admin/CreateBookHub';
 import V2V3Compare from '@/components/admin/V2V3Compare';
 import V3PricingTiers from '@/components/admin/V3PricingTiers';
@@ -42,15 +43,19 @@ function ModuleCard({
   index,
   onOpen,
   isFirst,
+  unlocked,
 }: {
   module: V3Module;
   index: number;
   onOpen: (m: V3Module) => void;
   isFirst?: boolean;
+  /** L'abonné a-t-il réellement débloqué ce module (selon son achat) ? */
+  unlocked?: boolean;
 }) {
   const ref = React.useRef<HTMLButtonElement>(null);
   const [tilt, setTilt] = useState('');
   const clickable = isModuleClickable(module.id);
+  const access = getModuleAccess(module.id);
 
   const handleMove = (e: React.MouseEvent) => {
     const el = ref.current;
@@ -101,13 +106,31 @@ function ModuleCard({
           <span className="grid h-9 w-9 place-items-center rounded-xl text-lg border border-[#eadfc9] bg-[#FCF8F0] group-hover:border-[#E8951E]/40 transition-colors">
             {V3_PILLAR_META[module.pillar].emoji}
           </span>
-          <div className="flex items-center gap-1.5">
-            {getModuleTier(module.id) === 'upsell' && (
+          <div className="flex flex-wrap items-center justify-end gap-1.5">
+            {/* Badge d'accès : Inclus 197€ vs Option payante */}
+            {access === 'included' ? (
+              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
+                style={{ background: '#e8f7ef', color: '#0b6e4c', border: '1px solid #0f8a5f55' }}>
+                <CheckCircle2 className="h-2.5 w-2.5" /> Inclus 197€
+              </span>
+            ) : (
               <span className="inline-flex items-center gap-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
                 style={{ background: AMBER_SOFT, color: AMBER_DEEP, border: `1px solid ${AMBER}55` }}>
-                <Lock className="h-2.5 w-2.5" /> Option
+                <Lock className="h-2.5 w-2.5" /> Pack
               </span>
             )}
+            {/* Statut de déblocage selon l'achat réel */}
+            {unlocked ? (
+              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
+                style={{ background: '#e8f7ef', color: '#0b6e4c' }}>
+                <ShieldCheck className="h-2.5 w-2.5" /> Débloqué
+              </span>
+            ) : access === 'pack' ? (
+              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
+                style={{ background: '#f3ece0', color: '#a18a6c' }}>
+                À débloquer
+              </span>
+            ) : null}
             <span data-tour={isFirst ? 'status' : undefined} className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
               style={{ background: `${statusColor}18`, color: statusColor }}>
               <span className="h-1.5 w-1.5 rounded-full" style={{ background: statusColor }} />
@@ -134,10 +157,17 @@ function ModuleCard({
 const V3HubPage: React.FC = () => {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
-  const [pillar, setPillar] = useState<V3Pillar | 'all' | 'create'>('all');
+  const [pillar, setPillar] = useState<V3Pillar | 'all' | 'create' | 'mine'>('all');
   const [selected, setSelected] = useState<V3Module | null>(null);
   const [studioSource, setStudioSource] = useState<string | null>(null);
   const [tourOpen, setTourOpen] = useState(false);
+  const { hasBase, hasFull, isAdmin } = useV3Entitlement();
+
+  // Un module est "débloqué" si l'abonné a la formule correspondante.
+  const isUnlocked = React.useCallback((m: V3Module) => {
+    if (isAdmin) return true;
+    return getModuleAccess(m.id) === 'pack' ? hasFull : hasBase;
+  }, [isAdmin, hasBase, hasFull]);
 
   useEffect(() => {
     if (!localStorage.getItem(TOUR_KEY)) {
@@ -163,19 +193,21 @@ const V3HubPage: React.FC = () => {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return V3_MODULES.filter((m) => {
-      if (pillar !== 'all' && m.pillar !== pillar) return false;
+      if (pillar === 'mine' && !isUnlocked(m)) return false;
+      if (pillar !== 'all' && pillar !== 'mine' && m.pillar !== pillar) return false;
       if (!q) return true;
       return m.title.toLowerCase().includes(q) || m.description.toLowerCase().includes(q);
     });
-  }, [query, pillar]);
+  }, [query, pillar, isUnlocked]);
 
   const readyCount = useMemo(() => V3_MODULES.filter((m) => isModuleClickable(m.id)).length, []);
+  const myToolsCount = useMemo(() => V3_MODULES.filter(isUnlocked).length, [isUnlocked]);
 
   const stats = [
     { icon: CheckCircle2, value: readyCount, label: 'Outils prêts' },
     { icon: Wand2, value: V3_MODULES.length, label: 'Modules V3' },
     { icon: Layers, value: PILLAR_ORDER.length, label: 'Piliers' },
-    { icon: InfinityIcon, value: '197€', label: 'Accès à vie' },
+    { icon: InfinityIcon, value: '197€', label: 'Livres illimités inclus' },
   ];
 
   return (
@@ -297,6 +329,7 @@ const V3HubPage: React.FC = () => {
           <div className="flex flex-wrap items-center gap-2" data-tour="filters">
             <CreateBookChip active={pillar === 'create'} onClick={() => setPillar('create')} />
             <span className="mx-1 h-6 w-px self-center" style={{ background: `${AMBER}44` }} aria-hidden />
+            <FilterChip active={pillar === 'mine'} onClick={() => setPillar('mine')} label={`✅ Mes outils (${myToolsCount})`} />
             <FilterChip active={pillar === 'all'} onClick={() => setPillar('all')} label={`Tous (${V3_MODULES.length})`} />
             {PILLAR_ORDER.map((p) => (
               <FilterChip
@@ -307,13 +340,26 @@ const V3HubPage: React.FC = () => {
               />
             ))}
           </div>
+          {/* Légende des droits */}
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px]" style={{ color: '#8a7860' }}>
+            <span className="inline-flex items-center gap-1">
+              <CheckCircle2 className="h-3 w-3" style={{ color: '#0f8a5f' }} /> Inclus dans la base 197€ (livres & ebooks illimités)
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Lock className="h-3 w-3" style={{ color: AMBER }} /> Disponible en pack premium (audiobooks, marketing, couvertures pro…)
+            </span>
+          </div>
         </div>
 
         {/* Onglet spécial : hub de création */}
         {pillar === 'create' ? (
           <CreateBookHub onSelectSource={openStudio} />
         ) : filtered.length === 0 ? (
-          <div className="text-center py-20 text-sm" style={{ color: '#a18a6c' }}>Aucun outil ne correspond à « {query} ».</div>
+          <div className="text-center py-20 text-sm" style={{ color: '#a18a6c' }}>
+            {pillar === 'mine'
+              ? 'Aucun outil débloqué pour le moment. Démarrez avec la base 197€ pour accéder à la création de livres illimités.'
+              : `Aucun outil ne correspond à « ${query} ».`}
+          </div>
         ) : pillar === 'all' ? (
           (() => {
             const firstPillarWithItems = PILLAR_ORDER.find((p) => filtered.some((m) => m.pillar === p));
@@ -330,7 +376,7 @@ const V3HubPage: React.FC = () => {
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                     {items.map((m, i) => (
-                      <ModuleCard key={m.id} module={m} index={i} onOpen={setSelected} isFirst={p === firstPillarWithItems && i === 0} />
+                      <ModuleCard key={m.id} module={m} index={i} onOpen={setSelected} unlocked={isUnlocked(m)} isFirst={p === firstPillarWithItems && i === 0} />
                     ))}
                   </div>
                 </section>
@@ -340,7 +386,7 @@ const V3HubPage: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {filtered.map((m, i) => (
-              <ModuleCard key={m.id} module={m} index={i} onOpen={setSelected} isFirst={i === 0} />
+              <ModuleCard key={m.id} module={m} index={i} onOpen={setSelected} unlocked={isUnlocked(m)} isFirst={i === 0} />
             ))}
           </div>
         )}
