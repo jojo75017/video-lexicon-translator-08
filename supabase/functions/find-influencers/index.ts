@@ -37,6 +37,18 @@ const RESERVED = new Set([
   "groups", "story", "stories", "user", "embed", "popular", "directory", "topic",
 ]);
 
+/** Comptes officiels / génériques des plateformes : jamais des influenceurs. */
+const OFFICIAL = new Set([
+  "tiktok", "instagram", "youtube", "facebook", "meta", "google", "shorts",
+  "creators", "creator", "business", "ads", "help", "support", "books", "booktok",
+  "foryou", "fyp", "trending", "official", "app",
+]);
+
+function isOfficial(handle: string): boolean {
+  const clean = handle.replace(/^@/, "").toLowerCase();
+  return OFFICIAL.has(clean);
+}
+
 /** Returns a clean profile {handle, url} or null if the URL is not a creator profile. */
 function toProfile(rawUrl: string, platform: Platform): { handle: string; url: string } | null {
   try {
