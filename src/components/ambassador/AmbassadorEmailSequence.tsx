@@ -18,7 +18,9 @@ interface EmailTemplate {
 const AmbassadorEmailSequence = ({ shareLink }: { shareLink: string }) => {
   const [copied, setCopied] = useState<string | null>(null);
 
-  const link = shareLink || 'https://www.ebookstudio.fr/influenceurs';
+  // Lien à diffuser dans les emails = la page publique d'inscription ambassadeur,
+  // PAS le lien de tracking promo. (shareLink reste accepté pour rétrocompat.)
+  const link = `${ORIGIN}/influenceurs`;
 
   const emails: EmailTemplate[] = useMemo(() => [
     {
