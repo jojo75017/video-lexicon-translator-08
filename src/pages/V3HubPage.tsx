@@ -334,6 +334,7 @@ const V3HubPage: React.FC = () => {
           </div>
           <div className="flex flex-wrap items-center gap-2" data-tour="filters">
             <CreateBookChip active={pillar === 'create'} onClick={() => setPillar('create')} />
+            <FilterChip active={pillar === 'roadmap'} onClick={() => setPillar('roadmap')} label="🗺️ Roadmap" />
             <span className="mx-1 h-6 w-px self-center" style={{ background: `${AMBER}44` }} aria-hidden />
             <FilterChip active={pillar === 'mine'} onClick={() => setPillar('mine')} label={`✅ Mes outils (${myToolsCount})`} />
             <FilterChip active={pillar === 'all'} onClick={() => setPillar('all')} label={`Tous (${V3_MODULES.length})`} />
