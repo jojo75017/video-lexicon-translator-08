@@ -106,20 +106,21 @@ const PHASES: Phase[] = [
     steps: [
       { moduleId: 'multi-format-express', label: 'Choisir les formats', hint: 'Ebook + broché prêts à l\'upload.' },
       { moduleId: 'cover-pdf-exact', label: 'Couverture KDP exacte', hint: 'Dos + 4e + fonds perdus aux bonnes cotes.' },
-      { moduleId: 'kindle-previewer', label: 'Vérifier le rendu', hint: 'Contrôle l\'affichage avant publication.', tier: 'premium' },
+      { moduleId: 'kindle-previewer', label: 'Vérifier le rendu', hint: 'Contrôle l\'affichage avant publication.' },
       { moduleId: 'isbn-metadata', label: 'Rédiger ISBN & métadonnées', hint: 'Titre, sous-titre, mots-clés et description.' },
       { moduleId: 'categories-manager-10', label: 'Choisir les 10 catégories', hint: 'Maximise la visibilité avec 10 catégories.' },
       { moduleId: 'prepub-checklist', label: 'Passer la checklist finale', hint: 'Vérifie tout avant de publier.' },
-      { moduleId: 'kdp-pack-zip', label: 'Préparer le pack KDP', hint: 'Récapitulatif des fichiers prêts à l\'upload.', tier: 'premium' },
+      { moduleId: 'kdp-pack-zip', label: 'Préparer le pack KDP', hint: 'Récapitulatif des fichiers prêts à l\'upload.' },
       { moduleId: 'audiobook-express', label: 'Créer la version audio', hint: 'Prépare la version audiobook du livre (script & plan TTS).', tier: 'premium' },
     ],
   },
   {
     key: 'vente', emoji: '📈', title: 'Phase 6 — Lancer & vendre',
     steps: [
-      { moduleId: 'sales-description', label: 'Écrire la description vendeuse', hint: 'Une fiche produit qui convertit.' },
-      { moduleId: 'listing-optimizer', label: 'Optimiser l\'annonce', hint: 'Titre et mots-clés optimisés pour Amazon.' },
-      { moduleId: 'launch-sequence-j7', label: 'Préparer la séquence J-7', hint: 'Plan de lancement jour par jour.' },
+      // Toute la phase Vente est réservée au Pack Tout Complet (497€) : le 197€ va jusqu'à publier, pas vendre.
+      { moduleId: 'sales-description', label: 'Écrire la description vendeuse', hint: 'Une fiche produit qui convertit.', tier: 'premium' },
+      { moduleId: 'listing-optimizer', label: 'Optimiser l\'annonce', hint: 'Titre et mots-clés optimisés pour Amazon.', tier: 'premium' },
+      { moduleId: 'launch-sequence-j7', label: 'Préparer la séquence J-7', hint: 'Plan de lancement jour par jour.', tier: 'premium' },
       { moduleId: 'sales-tracker', label: 'Mettre en place le suivi des ventes', hint: 'Plan de pilotage des ventes et royalties.', tier: 'premium' },
     ],
   },
