@@ -106,20 +106,21 @@ const PHASES: Phase[] = [
     steps: [
       { moduleId: 'multi-format-express', label: 'Choisir les formats', hint: 'Ebook + broché prêts à l\'upload.' },
       { moduleId: 'cover-pdf-exact', label: 'Couverture KDP exacte', hint: 'Dos + 4e + fonds perdus aux bonnes cotes.' },
-      { moduleId: 'kindle-previewer', label: 'Vérifier le rendu', hint: 'Contrôle l\'affichage avant publication.', tier: 'premium' },
+      { moduleId: 'kindle-previewer', label: 'Vérifier le rendu', hint: 'Contrôle l\'affichage avant publication.' },
       { moduleId: 'isbn-metadata', label: 'Rédiger ISBN & métadonnées', hint: 'Titre, sous-titre, mots-clés et description.' },
       { moduleId: 'categories-manager-10', label: 'Choisir les 10 catégories', hint: 'Maximise la visibilité avec 10 catégories.' },
       { moduleId: 'prepub-checklist', label: 'Passer la checklist finale', hint: 'Vérifie tout avant de publier.' },
-      { moduleId: 'kdp-pack-zip', label: 'Préparer le pack KDP', hint: 'Récapitulatif des fichiers prêts à l\'upload.', tier: 'premium' },
+      { moduleId: 'kdp-pack-zip', label: 'Préparer le pack KDP', hint: 'Récapitulatif des fichiers prêts à l\'upload.' },
       { moduleId: 'audiobook-express', label: 'Créer la version audio', hint: 'Prépare la version audiobook du livre (script & plan TTS).', tier: 'premium' },
     ],
   },
   {
     key: 'vente', emoji: '📈', title: 'Phase 6 — Lancer & vendre',
     steps: [
-      { moduleId: 'sales-description', label: 'Écrire la description vendeuse', hint: 'Une fiche produit qui convertit.' },
-      { moduleId: 'listing-optimizer', label: 'Optimiser l\'annonce', hint: 'Titre et mots-clés optimisés pour Amazon.' },
-      { moduleId: 'launch-sequence-j7', label: 'Préparer la séquence J-7', hint: 'Plan de lancement jour par jour.' },
+      // Toute la phase Vente est réservée au Pack Tout Complet (497€) : le 197€ va jusqu'à publier, pas vendre.
+      { moduleId: 'sales-description', label: 'Écrire la description vendeuse', hint: 'Une fiche produit qui convertit.', tier: 'premium' },
+      { moduleId: 'listing-optimizer', label: 'Optimiser l\'annonce', hint: 'Titre et mots-clés optimisés pour Amazon.', tier: 'premium' },
+      { moduleId: 'launch-sequence-j7', label: 'Préparer la séquence J-7', hint: 'Plan de lancement jour par jour.', tier: 'premium' },
       { moduleId: 'sales-tracker', label: 'Mettre en place le suivi des ventes', hint: 'Plan de pilotage des ventes et royalties.', tier: 'premium' },
     ],
   },
@@ -247,8 +248,11 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
     if (!entLoading && parcours === 'full' && !hasFull) setParcours('core');
   }, [entLoading, parcours, hasFull]);
   useEffect(() => { localStorage.setItem(PARCOURS_KEY, parcours); }, [parcours]);
-  const FLAT = useMemo(() => buildFlat(parcours), [parcours]);
-  const TOTAL = FLAT.length;
+  // On affiche TOUJOURS la liste complète (32 étapes). Les étapes premium non débloquées
+  // restent visibles en « teaser » verrouillé pour donner envie de passer au Pack 497€.
+  const FLAT = useMemo(() => buildFlat('full'), []);
+  const fullMode = parcours === 'full' && hasFull;
+  const isAccessible = (s: FlatStep) => (s.tier ?? 'core') !== 'premium' || fullMode;
   const [done, setDone] = useState<Set<string>>(() => loadSet(PROGRESS_KEY));
   const [results, setResults] = useState<Record<string, string>>(() => loadResults());
   const [theme, setTheme] = useState<string>(() => localStorage.getItem(THEME_KEY) ?? '');
@@ -402,19 +406,28 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   useEffect(() => { localStorage.setItem(BRIEF_KEY, JSON.stringify(brief)); }, [brief]);
   const setBriefField = (k: keyof Brief, v: string) => setBrief((p) => ({ ...p, [k]: v }));
 
-  const completed = useMemo(() => FLAT.filter((s) => done.has(s.moduleId)).length, [done, FLAT]);
-  const pct = Math.round((completed / TOTAL) * 100);
+  // Progression calculée uniquement sur les étapes ACCESSIBLES (débloquées).
+  // Les teasers premium ne comptent pas dans le total ni dans la progression.
+  const accessibleSteps = useMemo(() => FLAT.filter(isAccessible), [FLAT, fullMode]);
+  const TOTAL = accessibleSteps.length;
+  const accPos = useMemo(() => {
+    const m = new Map<string, number>();
+    accessibleSteps.forEach((s, i) => m.set(s.moduleId, i));
+    return m;
+  }, [accessibleSteps]);
+  const completed = useMemo(() => accessibleSteps.filter((s) => done.has(s.moduleId)).length, [done, accessibleSteps]);
+  const pct = Math.round((completed / Math.max(TOTAL, 1)) * 100);
 
-  // Étape active = première non terminée.
-  const activeIndex = useMemo(() => {
-    const i = FLAT.findIndex((s) => !done.has(s.moduleId));
+  // Étape active = première étape accessible non terminée.
+  const activeAccIndex = useMemo(() => {
+    const i = accessibleSteps.findIndex((s) => !done.has(s.moduleId));
     return i === -1 ? TOTAL : i;
-  }, [done, FLAT, TOTAL]);
+  }, [done, accessibleSteps, TOTAL]);
 
   // Ouvre automatiquement la phase de l'étape active.
   useEffect(() => {
-    if (activeIndex < TOTAL) setOpenPhase(FLAT[activeIndex].phaseKey);
-  }, [activeIndex]);
+    if (activeAccIndex < TOTAL) setOpenPhase(accessibleSteps[activeAccIndex].phaseKey);
+  }, [activeAccIndex]);
 
   const generate = async (step: FlatStep) => {
     setError(null);
@@ -445,6 +458,8 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
         priorOutputs,
         provider,
         model: currentModel,
+        // Palier de qualité IA : 'pro' (497€) = sorties plus longues + variantes ; 'core' (197€) = qualité enrichie.
+        quality: fullMode ? 'pro' : 'core',
         userApiKey: provider === 'gemini' ? effectiveKey : customKey.trim(),
       };
 
@@ -630,10 +645,10 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 </div>
                 <p className="mt-1 text-[12px]" style={{ color: '#6f5e47' }}>
                   {parcours === 'full'
-                    ? 'Pack Tout Complet 497€ : la suite complète d\'auto-édition, tous les agents avancés débloqués.'
+                    ? 'Pack Tout Complet 497€ : écris, publie ET vends (emails de lancement, annonces, suivi des ventes, audio…) avec une IA au niveau maximal (sorties plus longues, variantes A/B).'
                     : hasFull
-                      ? 'Offre 197€ : 22 agents essentiels. Tu peux basculer en Pro à tout moment.'
-                      : 'Offre 197€ : les 22 agents essentiels pour aller de l\'idée au livre publié.'}
+                      ? 'Offre 197€ : 22 agents pour aller de l\'idée jusqu\'à publier ton livre sur Amazon. La phase Lancer & vendre reste en aperçu. Tu peux basculer en Pro à tout moment.'
+                      : 'Offre 197€ : 22 agents pour aller de l\'idée jusqu\'à publier ton livre sur Amazon. La phase Lancer & vendre (emails, annonces, suivi des ventes) s\'affiche en aperçu — débloquée avec le Pack 497€.'}
                 </p>
               </div>
               <div className="inline-flex rounded-xl border overflow-hidden" style={{ borderColor: `${AMBER}55` }}>
@@ -960,35 +975,60 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 {isOpen && (
                   <div className="pb-3">
                     {phaseSteps.map((step) => {
-                      const n = step.globalIndex + 1;
                       const mod = getModuleById(step.moduleId);
                       const ready = isModuleClickable(step.moduleId);
+                      const accessible = isAccessible(step);
+                      const isTeaser = !accessible; // étape premium non débloquée → aperçu verrouillé
+                      const pos = accPos.get(step.moduleId);
+                      const n = pos != null ? pos + 1 : 0;
                       const isDone = done.has(step.moduleId);
-                      const isActive = step.globalIndex === activeIndex;
-                      const isLocked = step.globalIndex > activeIndex;
+                      const isActive = accessible && pos === activeAccIndex;
+                      const isLocked = accessible && pos != null && pos > activeAccIndex;
                       const isLoading = loadingId === step.moduleId;
                       const result = results[step.moduleId];
 
                       return (
                         <div key={step.moduleId} ref={isActive ? activeRef : undefined}
                           className="px-5 sm:px-7 py-3"
-                          style={isActive ? { background: '#FFFDF8' } : undefined}>
+                          style={isActive ? { background: '#FFFDF8' } : isTeaser ? { background: '#FBFEFC' } : undefined}>
                           <div className="flex items-start gap-3">
                             {/* Pastille numéro / état */}
                             <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full text-[11px] font-black border-2"
                               style={{
-                                borderColor: isDone ? GREEN : isActive ? AMBER : '#e3d6bd',
-                                background: isDone ? GREEN : isActive ? AMBER_SOFT : '#fff',
-                                color: isDone ? '#fff' : isActive ? AMBER_DEEP : '#bcaa8c',
+                                borderColor: isDone ? GREEN : isActive ? AMBER : isTeaser ? `${GREEN}66` : '#e3d6bd',
+                                background: isDone ? GREEN : isActive ? AMBER_SOFT : isTeaser ? '#eafaf2' : '#fff',
+                                color: isDone ? '#fff' : isActive ? AMBER_DEEP : isTeaser ? GREEN : '#bcaa8c',
                               }}>
-                              {isDone ? <Check className="h-3.5 w-3.5" /> : isLocked ? <Lock className="h-3 w-3" /> : n}
+                              {isDone ? <Check className="h-3.5 w-3.5" /> : (isLocked || isTeaser) ? <Lock className="h-3 w-3" /> : n}
                             </span>
 
                             <div className="flex-1 min-w-0">
-                              <div className={`text-sm font-semibold leading-tight ${isDone ? 'opacity-70' : ''}`} style={{ color: INK }}>
-                                {step.label ?? mod?.title ?? step.moduleId}
+                              <div className={`flex items-center gap-2 flex-wrap text-sm font-semibold leading-tight ${isDone ? 'opacity-70' : ''}`} style={{ color: INK }}>
+                                <span>{step.label ?? mod?.title ?? step.moduleId}</span>
+                                {isTeaser && (
+                                  <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold border"
+                                    style={{ borderColor: `${GREEN}66`, color: GREEN, background: '#eafaf2' }}>
+                                    <Lock className="h-2.5 w-2.5" /> Pro · 497€
+                                  </span>
+                                )}
                               </div>
                               <p className="text-[11px] leading-snug mt-0.5" style={{ color: '#8a7860' }}>{step.hint}</p>
+
+                              {/* Teaser verrouillé : on montre la valeur sans permettre l'exécution */}
+                              {isTeaser && (
+                                <div className="mt-2 rounded-xl border p-3" style={{ borderColor: `${GREEN}33`, background: '#f6fdf9' }}>
+                                  <p className="text-[11px] leading-snug" style={{ color: '#4a6a59' }}>
+                                    🔒 Cet agent fait partie de la phase <strong>Lancer & vendre</strong> (réservée au Pack Tout Complet 497€) :
+                                    séquences d'emails, optimisation d'annonce, suivi des ventes… Le parcours 197€ t'amène jusqu'à publier ton livre ;
+                                    le Pack 497€ le lance et le vend, avec une IA encore plus puissante (sorties plus longues, variantes A/B).
+                                  </p>
+                                  <button onClick={() => setCheckoutOpen(true)}
+                                    className="mt-2 inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5"
+                                    style={{ background: `linear-gradient(90deg, ${GREEN}, #2fc488)` }}>
+                                    <Sparkles className="h-3.5 w-3.5" /> Débloquer avec le Pack Tout Complet (497€)
+                                  </button>
+                                </div>
+                              )}
 
                               {/* Actions de l'étape active */}
                               {(isActive || (isDone && result)) && editingId !== step.moduleId && (

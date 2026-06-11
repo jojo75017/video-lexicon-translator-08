@@ -36,6 +36,7 @@ interface Body {
   userApiKey?: string;
   chapterIndex?: number;
   prevChapterTail?: string;
+  quality?: "core" | "pro";
 }
 
 type CallResult =
@@ -65,7 +66,9 @@ serve(async (req) => {
       userApiKey = "",
       chapterIndex,
       prevChapterTail = "",
+      quality = "core",
     } = body;
+    const isPro = quality === "pro";
 
     // === Sélection du fournisseur ===
     const geminiKey = (userApiKey || "").trim() || Deno.env.get("GEMINI_API_KEY") || "";
@@ -246,7 +249,16 @@ Règles :
 - Reste cohérent avec tout ce qui a été décidé dans les étapes précédentes (même niche, même titre, même ton, mêmes personnages).
 - Utilise du Markdown clair (titres, listes, tableaux si utile).
 - Pas de blabla d'introduction du type "Bien sûr, voici…". Va droit au livrable.
-- Aucune donnée inventée présentée comme une vérité chiffrée officielle : si tu estimes des chiffres (ventes, recherches), précise que ce sont des estimations.`;
+- Aucune donnée inventée présentée comme une vérité chiffrée officielle : si tu estimes des chiffres (ventes, recherches), précise que ce sont des estimations.
+
+${isPro
+  ? `## Niveau de qualité : PRO (Pack Tout Complet 497€) — niveau EXPERT
+- Vise le niveau d'un consultant senior en auto-édition Amazon : analyse plus fine, livrable plus long, plus détaillé et plus actionnable que la version standard.
+- Quand c'est pertinent pour un livrable marketing/commercial (titres, sous-titres, descriptions, accroches, emails, annonces), propose 2 à 3 VARIANTES clairement numérotées (Variante A / B / C) avec une courte note sur le positionnement de chacune et laquelle tu recommandes.
+- Termine par une mini-checklist qualité « À vérifier avant d'utiliser » (3 à 5 points).`
+  : `## Niveau de qualité : ESSENTIEL (offre 197€)
+- Produis un livrable complet, propre et directement utilisable, plus riche et structuré qu'une version de base.
+- Une seule version aboutie (pas de variantes multiples).`}`;
 
     const isManuscript = moduleId === "p20-chat-manuscript";
 
@@ -311,7 +323,7 @@ ${contextText}
 ## Ta mission
 Réalise concrètement cette étape maintenant et renvoie uniquement le livrable final, complet et développé.`;
 
-    const r = await callAI(system, user, 8192);
+    const r = await callAI(system, user, isPro ? 12288 : 8192);
     if (!r.ok) return aiError(r.status, r.body);
     const result = r.text;
 
