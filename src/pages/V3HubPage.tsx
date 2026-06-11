@@ -361,6 +361,8 @@ const V3HubPage: React.FC = () => {
         {/* Onglet spécial : hub de création */}
         {pillar === 'create' ? (
           <CreateBookHub onSelectSource={openStudio} />
+        ) : pillar === 'roadmap' ? (
+          <V3RoadmapTab />
         ) : filtered.length === 0 ? (
           <div className="text-center py-20 text-sm" style={{ color: '#a18a6c' }}>
             {pillar === 'mine'
