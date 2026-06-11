@@ -396,6 +396,7 @@ const V3HubPage: React.FC = () => {
           </div>
         )}
 
+        <V3GuidesSection />
         <V3PricingTiers />
         <V2V3Compare />
       </main>
