@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { CheckCircle2, Mail, ArrowLeft, MessageSquare, FileText } from 'lucide-react';
+import { CheckCircle2, Mail, ArrowLeft, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import FunnelLayout from '@/components/funnel/FunnelLayout';
 import SeoHead from '@/components/funnel/SeoHead';
