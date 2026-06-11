@@ -103,6 +103,36 @@ const AmbassadorOutreachTracker: React.FC = () => {
     setRows((r) => r.filter((x) => x.id !== id));
   };
 
+  const exportCSV = () => {
+    if (rows.length === 0) { toast.info('Aucune donnée à exporter'); return; }
+    const headers = ['Pseudo', 'Plateforme', 'Niche', 'Statut', 'Email', 'Dernier contact', 'Relance', 'Notes'];
+    const escape = (v: string | null) => {
+      const s = (v ?? '').replace(/"/g, '""');
+      return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s}"` : s;
+    };
+    const lines = rows.map((r) => [
+      escape(r.handle),
+      escape(platformLabel(r.platform)),
+      escape(r.niche),
+      escape(statusMeta(r.status).label),
+      escape(r.email),
+      escape(r.last_contact_at ? new Date(r.last_contact_at).toLocaleDateString('fr-FR') : ''),
+      escape(r.follow_up_at ? new Date(r.follow_up_at).toLocaleDateString('fr-FR') : ''),
+      escape(r.notes),
+    ].join(','));
+    const csv = [headers.join(','), ...lines].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `suivi-recrutement-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toast.success('Export CSV téléchargé');
+  };
+
   const stats = useMemo(() => {
     const total = rows.length;
     const contacted = rows.filter((r) => r.status !== 'a_contacter').length;
