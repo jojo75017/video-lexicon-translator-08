@@ -56,7 +56,7 @@ serve(async (req) => {
         "promoteur-interesse",
         "ambassadeur-ebookstudio",
         "contact-influenceur",
-      ], handle ? [{ slug: "pseudo", value: String(handle) }] : []);
+      ]);
     }
 
     return new Response(JSON.stringify({ success: true, systemeio: systemeio?.ok }), {
