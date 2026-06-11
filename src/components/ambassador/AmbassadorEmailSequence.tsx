@@ -59,6 +59,8 @@ Georges — Ebookstudio`,
       subject: 'Voici combien tu peux gagner concrètement 💰',
       body: `Salut [Prénom],
 
+👉 Ton lien : ${link}
+
 Parlons chiffres simplement. Comme la commission est à vie, chaque client reste à toi pour ses futurs achats.
 
 • 5 ventes/mois  → ${5 * COMMISSION_NOW}€  (et ${5 * COMMISSION_V3}€ avec la V3)
@@ -71,6 +73,8 @@ Le produit se vend bien parce qu'il résout un vrai problème : la page blanche 
 
 Une question sur les gains ou le suivi des ventes ? Réponds à cet email.
 
+👉 Ton lien (à partager partout) : ${link}
+
 Georges — Ebookstudio`,
     },
     {
@@ -80,13 +84,17 @@ Georges — Ebookstudio`,
       subject: 'La V3 arrive (et tes commissions montent à ' + COMMISSION_V3 + '€) 🚀',
       body: `Salut [Prénom],
 
+👉 Ton lien : ${link}
+
 La version Publication Assistée Pro à ${PRICE_V3}€ arrive bientôt avec 12 nouveaux modules. Pour toi, ça veut dire ${COMMISSION_V3}€ de commission par vente au lieu de ${COMMISSION_NOW}€.
 
-Les ambassadeurs qui construisent leur audience MAINTENANT sur le sujet seront les premiers à en profiter au lancement. Commence dès aujourd'hui avec l'offre actuelle à ${PRICE_NOW}€.
+Les ambassadeurs qui construisent leur audience MAINTENANT sur le sujet seront les premiers à en profiter au lancement. Commence dès aujourd'hui avec l'offre actuelle à ${PRICE_NOW}€ : ${link}
 
 👉 Ton lien : ${link}
 
 Tu veux qu'on prépare ta stratégie ensemble ? Réponds-moi, je t'aide à caler ta première campagne.
+
+👉 Ton lien (à mettre dans ta bio et tes posts) : ${link}
 
 Georges — Ebookstudio`,
     },
@@ -97,11 +105,13 @@ Georges — Ebookstudio`,
       subject: 'On en est où ? (j\'ai 3 accroches pour toi) 🤔',
       body: `Salut [Prénom],
 
-Je n'ai pas encore vu d'activité sur ton lien — pas de souci, se lancer est souvent le plus dur. Voici 3 accroches prêtes à publier :
+👉 Ton lien : ${link}
 
-1️⃣ « Tu as une idée de livre mais tu n'écris jamais ? Cette IA écrit, illustre et met en audio à ta place. »
-2️⃣ « Publier sur Amazon KDP fait peur ? J'ai trouvé l'outil qui rend ça simple. »
-3️⃣ « Un livre audio complet généré en quelques minutes, écoute le résultat 🎧 »
+Je n'ai pas encore vu d'activité sur ton lien — pas de souci, se lancer est souvent le plus dur. Voici 3 accroches prêtes à publier (mets ce lien à la fin de chacune : ${link}) :
+
+1️⃣ « Tu as une idée de livre mais tu n'écris jamais ? Cette IA écrit, illustre et met en audio à ta place. 👉 ${link} »
+2️⃣ « Publier sur Amazon KDP fait peur ? J'ai trouvé l'outil qui rend ça simple. 👉 ${link} »
+3️⃣ « Un livre audio complet généré en quelques minutes, écoute le résultat 🎧 👉 ${link} »
 
 Et si tu préfères qu'on en parle, je te propose un appel gratuit de 15 min pour caler ta première campagne ensemble.
 
@@ -120,12 +130,14 @@ Georges — Ebookstudio`,
 
 C'est officiel : tu viens de réaliser ta première vente via Ebookstudio ! 🎉
 
+👉 Ton lien : ${link}
+
 Ta commission de ${COMMISSION_NOW}€ est validée et sera payée sur ton compte. Et comme elle est à vie, ce client te rapportera aussi sur ses futurs achats (notamment la V3 Pro à ${PRICE_V3}€).
 
 💡 Pour en faire une habitude, voici 2 actions simples cette semaine :
 
-1️⃣ Partage un résultat concret : un chiffre, une timeline ou même un screenshot de ton tableau de bord.
-2️⃣ Pose une question à ton audience : « Tu t'es déjà demandé combien de temps ça prend d'écrire un livre ? »
+1️⃣ Partage un résultat concret : un chiffre, une timeline ou un screenshot, avec ton lien 👉 ${link}
+2️⃣ Pose une question à ton audience : « Tu t'es déjà demandé combien de temps ça prend d'écrire un livre ? » puis mets ${link}
 
 Les ambassadeurs qui postent régulièrement gagnent 3× plus. Tu as déjà prouvé que ça marche — maintenant, multiplie.
 
