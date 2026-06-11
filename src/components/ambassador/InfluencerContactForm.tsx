@@ -46,12 +46,20 @@ const InfluencerContactForm: React.FC = () => {
   return (
     <div className="bg-white border-2 border-[#008296] rounded-2xl p-8 space-y-5">
       <div>
+        <div className="flex items-center gap-2 mb-2">
+          <span className="inline-flex items-center gap-1 bg-[#008296]/15 text-[#008296] px-2.5 py-1 rounded-full text-xs font-bold">
+            🌐 Formulaire public
+          </span>
+          <span className="inline-flex items-center gap-1 bg-[#FF9E2D]/15 text-[#FF9E2D] px-2.5 py-1 rounded-full text-xs font-bold">
+            👤 L'influenceur t'écrit ici
+          </span>
+        </div>
         <h2 className="text-2xl font-bold flex items-center gap-2 text-[#232F3E]">
           <Mail className="w-6 h-6 text-[#008296]" /> Une question ? Contacte-moi directement
         </h2>
         <p className="text-sm text-[#232F3E]/65 mt-1">
-          Collaboration sur-mesure, question sur les commissions, partenariat… Écris-moi ici, je te
-          réponds personnellement par email.
+          Ce formulaire est destiné aux influenceurs qui ont des questions avant de s'inscrire.
+          Ils écrivent leur message ici et tu reçois leur demande par email.
         </p>
       </div>
 
