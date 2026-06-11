@@ -80,6 +80,54 @@ export type Database = {
         }
         Relationships: []
       }
+      ambassador_outreach: {
+        Row: {
+          created_at: string
+          email: string | null
+          follow_up_at: string | null
+          handle: string
+          id: string
+          last_contact_at: string | null
+          niche: string | null
+          notes: string | null
+          owner_id: string
+          platform: string
+          source: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          follow_up_at?: string | null
+          handle: string
+          id?: string
+          last_contact_at?: string | null
+          niche?: string | null
+          notes?: string | null
+          owner_id: string
+          platform?: string
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          follow_up_at?: string | null
+          handle?: string
+          id?: string
+          last_contact_at?: string | null
+          niche?: string | null
+          notes?: string | null
+          owner_id?: string
+          platform?: string
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       audiobooks: {
         Row: {
           audio_url: string | null
