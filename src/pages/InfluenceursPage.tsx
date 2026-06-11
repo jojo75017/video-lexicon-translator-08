@@ -52,6 +52,9 @@ const InfluenceursPage = () => {
   const [joining, setJoining] = useState(false);
   const [sales, setSales] = useState(10);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [forceRecruit, setForceRecruit] = useState(
+    () => typeof window !== 'undefined' && localStorage.getItem('show_recruit') === '1',
+  );
 
   const price = getActivePrice();
   const commission = getActiveCommission();
