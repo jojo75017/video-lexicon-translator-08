@@ -323,6 +323,11 @@ C'est un paiement unique de ${price}€ à vie, sans abonnement.
         <AmbassadorApplyForm />
       </section>
 
+      {/* CONTACT DIRECT */}
+      <section className="max-w-3xl mx-auto px-4 py-8">
+        <InfluencerContactForm />
+      </section>
+
 
 
       {/* SIMULATOR */}
