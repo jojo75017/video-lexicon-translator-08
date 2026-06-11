@@ -219,8 +219,37 @@ Deno.serve(async (req) => {
     // créateurs individuels d'abord, maisons d'édition ensuite
     unique.sort((a, b) => (a.kind === b.kind ? 0 : a.kind === "createur" ? -1 : 1));
 
+    // Vérifie que chaque profil existe vraiment (évite les comptes inexistants/bloqués).
+    // On scrape l'URL du profil et on garde seulement les pages 200.
+    const verifyProfile = async (url: string): Promise<boolean> => {
+      try {
+        const r = await fetch("https://api.firecrawl.dev/v2/scrape", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${firecrawlKey}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ url, formats: ["markdown"], onlyMainContent: true, timeout: 15000 }),
+        });
+        const d = await r.json().catch(() => null);
+        if (!r.ok || !d) return false;
+        const status = d?.data?.metadata?.statusCode ?? d?.metadata?.statusCode;
+        const md: string = (d?.data?.markdown || d?.markdown || "").toString().toLowerCase();
+        if (status && Number(status) >= 400) return false;
+        // signaux de page introuvable / compte indisponible
+        if (/(couldn'?t find this account|page isn'?t available|compte introuvable|cette page n'?est pas disponible|content isn'?t available|video currently unavailable|404)/i.test(md)) {
+          return false;
+        }
+        return true;
+      } catch {
+        return false;
+      }
+    };
 
-    return new Response(JSON.stringify({ success: true, keyword, count: unique.length, influencers: unique }), {
+    const verified: Influencer[] = [];
+    for (const inf of unique) {
+      if (verified.length >= perPlatform * platforms.length) break;
+      if (await verifyProfile(inf.url)) verified.push(inf);
+    }
+
+    return new Response(JSON.stringify({ success: true, keyword, count: verified.length, influencers: verified }), {
       status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
