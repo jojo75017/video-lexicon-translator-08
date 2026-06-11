@@ -1,5 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { Resend } from 'npm:resend@2.0.0';
+import { pushToSystemeIo } from '../_shared/systemeio.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
