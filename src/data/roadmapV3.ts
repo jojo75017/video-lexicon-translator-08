@@ -175,6 +175,8 @@ export const V3_MODULES: V3Module[] = [
   // PUBLIER
   { id: 'multi-format-express', pillar: 'publier',  status: 'done', title: 'Multi-format Express',
     description: 'Export simultané Kindle (.epub/.mobi), broché PDF KDP et grand format relié en un clic.' },
+  { id: 'audiobook-express',    pillar: 'publier',  status: 'done', title: 'Audiobook Express', tier: 'upsell',
+    description: 'Prépare la version audio du livre : script de narration, découpage par chapitre et plan TTS prêt à produire.' },
   { id: 'isbn-metadata',        pillar: 'publier',  status: 'done', title: 'ISBN & Métadonnées Manager',
     description: 'Centralise ISBN, BISAC, catégories, mots-clés, langue et droits par titre.' },
   { id: 'translation-markets',  pillar: 'publier',  status: 'done', title: 'Traduction Multi-Marchés',
