@@ -21,6 +21,8 @@ interface EbookAdvancedExportProps {
   conclusion?: string;
   characters?: any[];
   coverImage?: string;
+  /** Gabarit KDP du PDF Impression (en pouces). Par défaut 6×9. */
+  trimSize?: { w: number; h: number };
 }
 
 type ExportFormat = 'docx-kdp' | 'epub' | 'pdf-print' | 'pdf-digital' | 'txt' | 'html';
@@ -50,7 +52,7 @@ const stripChapterPrefix = (title: string, i: number): string => {
 
 
 export const EbookAdvancedExport: React.FC<EbookAdvancedExportProps> = ({
-  ebookTitle, authorName, chapters, preface, conclusion, characters, coverImage,
+  ebookTitle, authorName, chapters, preface, conclusion, characters, coverImage, trimSize,
 }) => {
   const [selectedFormat, setSelectedFormat] = useState<ExportFormat>('docx-kdp');
   const [isExporting, setIsExporting] = useState(false);
@@ -216,8 +218,8 @@ ${chapterFiles.map(cf => `<li><a href="${cf.filename}">${escapeXml(cf.title)}</a
 
   const exportPdfPrint = () => {
     const isDigital = selectedFormat === 'pdf-digital';
-    const pageW = isDigital ? 8.27 : 6;
-    const pageH = isDigital ? 11.69 : 9;
+    const pageW = isDigital ? 8.27 : (trimSize?.w ?? 6);
+    const pageH = isDigital ? 11.69 : (trimSize?.h ?? 9);
     const doc = new jsPDF({ unit: 'in', format: [pageW, pageH] });
     const marginOuter = isDigital ? 1 : 0.75;
     const marginInner = isDigital ? 1 : 0.875; // inner margin larger for binding

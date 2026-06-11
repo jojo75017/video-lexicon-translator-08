@@ -8,6 +8,7 @@ import { getModuleById, type V3Module } from '@/data/roadmapV3';
 import { isModuleClickable } from './v3ModuleRegistry';
 import { supabase } from '@/integrations/supabase/client';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
+import V3ExportPanel from './V3ExportPanel';
 
 // Palette « Clair Ambre » — cohérente avec V3HubPage.
 const AMBER = '#E8951E';
@@ -40,10 +41,14 @@ function loadBrief(): Brief {
   }
 }
 
+type Tier = 'core' | 'premium';
+
 interface Step {
   moduleId: string;
   label?: string;
   hint: string;
+  /** 'core' = parcours 197€ (22 agents) ; 'premium' = réservé au parcours 497€ (32 agents). */
+  tier?: Tier;
 }
 interface Phase {
   key: string;
@@ -57,10 +62,10 @@ const PHASES: Phase[] = [
   {
     key: 'idee', emoji: '🔎', title: 'Phase 1 — Trouver l\'idée gagnante',
     steps: [
-      { moduleId: 'p22-trend-radar', label: 'Repérer les tendances', hint: 'Détecte les sujets qui montent sur Amazon.' },
+      { moduleId: 'p22-trend-radar', label: 'Repérer les tendances', hint: 'Détecte les sujets qui montent sur Amazon.', tier: 'premium' },
       { moduleId: 'niche-intelligence', label: 'Choisir la niche', hint: 'L\'IA sélectionne la niche la plus rentable.' },
       { moduleId: 'p16-competitive', label: 'Analyser la concurrence', hint: 'Étudie les best-sellers de la niche.' },
-      { moduleId: 'ku-niche-detector', label: 'Vérifier la rentabilité (KU)', hint: 'Confirme le potentiel de revenus.' },
+      { moduleId: 'ku-niche-detector', label: 'Vérifier la rentabilité (KU)', hint: 'Confirme le potentiel de revenus.', tier: 'premium' },
       { moduleId: 'p26-commercial-score', label: 'Valider le potentiel', hint: 'Note le potentiel commercial avant d\'écrire.' },
     ],
   },
@@ -68,7 +73,7 @@ const PHASES: Phase[] = [
     key: 'ecriture', emoji: '✍️', title: 'Phase 2 — Concevoir & écrire le livre',
     steps: [
       { moduleId: 'book-creation-studio', label: 'Créer le concept & le plan', hint: 'Titre, sous-titre, structure et 1er chapitre.' },
-      { moduleId: 'p17-series', label: 'Architecturer la série', hint: 'Planifie les tomes si c\'est une saga.' },
+      { moduleId: 'p17-series', label: 'Architecturer la série', hint: 'Planifie les tomes si c\'est une saga.', tier: 'premium' },
       { moduleId: 'p19-author-voice', label: 'Fixer la voix d\'auteur', hint: 'Définit un style constant pour tout le livre.' },
       { moduleId: 'p20-chat-manuscript', label: 'Développer le manuscrit', hint: 'Rédige le cœur du contenu chapitre par chapitre.' },
       { moduleId: 'p23-universe-bible', label: 'Vérifier la cohérence', hint: 'Contrôle la cohérence de l\'univers et des persos.' },
@@ -78,8 +83,8 @@ const PHASES: Phase[] = [
     key: 'qualite', emoji: '🧪', title: 'Phase 3 — Réviser & garantir la qualité',
     steps: [
       { moduleId: 'p18-readability', label: 'Auditer la lisibilité', hint: 'Mesure et améliore la fluidité de lecture.' },
-      { moduleId: 'p24-cliche-detector', label: 'Nettoyer clichés & répétitions', hint: 'Supprime les tics d\'écriture et redites.' },
-      { moduleId: 'p25-tone-adapter', label: 'Adapter le ton', hint: 'Ajuste le ton à la cible de lecteurs.' },
+      { moduleId: 'p24-cliche-detector', label: 'Nettoyer clichés & répétitions', hint: 'Supprime les tics d\'écriture et redites.', tier: 'premium' },
+      { moduleId: 'p25-tone-adapter', label: 'Adapter le ton', hint: 'Ajuste le ton à la cible de lecteurs.', tier: 'premium' },
       { moduleId: 'ebook-anti-plagiat', label: 'Vérifier l\'originalité', hint: 'Contrôle l\'originalité et protège le texte.' },
       { moduleId: 'content-compliance', label: 'Contrôler la conformité KDP', hint: 'Évite les motifs de refus à la publication.' },
     ],
@@ -91,7 +96,7 @@ const PHASES: Phase[] = [
       { moduleId: 'back-matter-builder', label: 'Rédiger les pages de fin', hint: 'Remerciements, bio et appels à l\'action.' },
       { moduleId: 'copyright-page', label: 'Générer la page copyright', hint: 'Crée les mentions légales obligatoires.' },
       { moduleId: 'cover-studio-pro', label: 'Concevoir la couverture', hint: 'Direction artistique de couverture haut de gamme.' },
-      { moduleId: 'cover-variants-thumbnail', label: 'Tester la miniature Amazon', hint: 'Valide la lisibilité du titre en petit.' },
+      { moduleId: 'cover-variants-thumbnail', label: 'Tester la miniature Amazon', hint: 'Valide la lisibilité du titre en petit.', tier: 'premium' },
     ],
   },
   {
@@ -99,11 +104,12 @@ const PHASES: Phase[] = [
     steps: [
       { moduleId: 'multi-format-express', label: 'Choisir les formats', hint: 'Ebook + broché prêts à l\'upload.' },
       { moduleId: 'cover-pdf-exact', label: 'Couverture KDP exacte', hint: 'Dos + 4e + fonds perdus aux bonnes cotes.' },
-      { moduleId: 'kindle-previewer', label: 'Vérifier le rendu', hint: 'Contrôle l\'affichage avant publication.' },
+      { moduleId: 'kindle-previewer', label: 'Vérifier le rendu', hint: 'Contrôle l\'affichage avant publication.', tier: 'premium' },
       { moduleId: 'isbn-metadata', label: 'Rédiger ISBN & métadonnées', hint: 'Titre, sous-titre, mots-clés et description.' },
       { moduleId: 'categories-manager-10', label: 'Choisir les 10 catégories', hint: 'Maximise la visibilité avec 10 catégories.' },
       { moduleId: 'prepub-checklist', label: 'Passer la checklist finale', hint: 'Vérifie tout avant de publier.' },
-      { moduleId: 'kdp-pack-zip', label: 'Préparer le pack KDP', hint: 'Récapitulatif des fichiers prêts à l\'upload.' },
+      { moduleId: 'kdp-pack-zip', label: 'Préparer le pack KDP', hint: 'Récapitulatif des fichiers prêts à l\'upload.', tier: 'premium' },
+      { moduleId: 'audiobook-express', label: 'Créer la version audio', hint: 'Prépare la version audiobook du livre (script & plan TTS).', tier: 'premium' },
     ],
   },
   {
@@ -112,7 +118,7 @@ const PHASES: Phase[] = [
       { moduleId: 'sales-description', label: 'Écrire la description vendeuse', hint: 'Une fiche produit qui convertit.' },
       { moduleId: 'listing-optimizer', label: 'Optimiser l\'annonce', hint: 'Titre et mots-clés optimisés pour Amazon.' },
       { moduleId: 'launch-sequence-j7', label: 'Préparer la séquence J-7', hint: 'Plan de lancement jour par jour.' },
-      { moduleId: 'sales-tracker', label: 'Mettre en place le suivi des ventes', hint: 'Plan de pilotage des ventes et royalties.' },
+      { moduleId: 'sales-tracker', label: 'Mettre en place le suivi des ventes', hint: 'Plan de pilotage des ventes et royalties.', tier: 'premium' },
     ],
   },
 ];
@@ -124,11 +130,19 @@ interface FlatStep extends Step {
   globalIndex: number; // 0-based
 }
 
-const FLAT: FlatStep[] = PHASES.flatMap((p) =>
-  p.steps.map((s) => ({ ...s, phaseKey: p.key, phaseTitle: p.title, emoji: p.emoji, globalIndex: 0 })),
-).map((s, i) => ({ ...s, globalIndex: i }));
+type Parcours = 'core' | 'full';
 
-const TOTAL = FLAT.length;
+/** Construit la liste plate d'étapes pour un parcours donné (197€ = core, 497€ = full). */
+const buildFlat = (parcours: Parcours): FlatStep[] =>
+  PHASES.flatMap((p) =>
+    p.steps
+      .filter((s) => parcours === 'full' || (s.tier ?? 'core') === 'core')
+      .map((s) => ({ ...s, phaseKey: p.key, phaseTitle: p.title, emoji: p.emoji, globalIndex: 0 })),
+  ).map((s, i) => ({ ...s, globalIndex: i }));
+
+const CORE_TOTAL = buildFlat('core').length; // 22 agents (197€)
+const FULL_TOTAL = buildFlat('full').length; // 32 agents (497€)
+const PARCOURS_KEY = 'v3_workflow30_parcours';
 
 function loadSet(key: string): Set<string> {
   try {
@@ -219,6 +233,13 @@ const ResultView: React.FC<{ text: string }> = ({ text }) => {
 
 const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpenModule }) => {
   const { apiKey: userGeminiKey } = useOpenAIConfig();
+  // Parcours actif : 'core' = offre 197€ (22 agents), 'full' = Pack Tout Complet 497€ (32 agents).
+  const [parcours, setParcours] = useState<Parcours>(
+    () => ((localStorage.getItem(PARCOURS_KEY) as Parcours) === 'full' ? 'full' : 'core'),
+  );
+  useEffect(() => { localStorage.setItem(PARCOURS_KEY, parcours); }, [parcours]);
+  const FLAT = useMemo(() => buildFlat(parcours), [parcours]);
+  const TOTAL = FLAT.length;
   const [done, setDone] = useState<Set<string>>(() => loadSet(PROGRESS_KEY));
   const [results, setResults] = useState<Record<string, string>>(() => loadResults());
   const [theme, setTheme] = useState<string>(() => localStorage.getItem(THEME_KEY) ?? '');
@@ -372,14 +393,14 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   useEffect(() => { localStorage.setItem(BRIEF_KEY, JSON.stringify(brief)); }, [brief]);
   const setBriefField = (k: keyof Brief, v: string) => setBrief((p) => ({ ...p, [k]: v }));
 
-  const completed = useMemo(() => FLAT.filter((s) => done.has(s.moduleId)).length, [done]);
+  const completed = useMemo(() => FLAT.filter((s) => done.has(s.moduleId)).length, [done, FLAT]);
   const pct = Math.round((completed / TOTAL) * 100);
 
   // Étape active = première non terminée.
   const activeIndex = useMemo(() => {
     const i = FLAT.findIndex((s) => !done.has(s.moduleId));
     return i === -1 ? TOTAL : i;
-  }, [done]);
+  }, [done, FLAT, TOTAL]);
 
   // Ouvre automatiquement la phase de l'étape active.
   useEffect(() => {
@@ -572,7 +593,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 style={{ borderColor: `${AMBER}66`, background: '#fff' }}>
                 <Wand2 className="h-4 w-4" style={{ color: AMBER }} />
                 <span className="text-[11px] font-bold uppercase tracking-[0.3em]" style={{ color: AMBER_DEEP }}>
-                  Auto-pilote IA · 30 étapes
+                  Auto-pilote IA · {TOTAL} étapes
                 </span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: SERIF, color: INK }}>
@@ -589,6 +610,45 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
               style={{ borderColor: `${AMBER}55`, color: AMBER_DEEP }}>
               <RotateCcw className="h-3.5 w-3.5" /> Recommencer
             </button>
+          </div>
+
+          {/* Sélecteur de parcours selon l'offre */}
+          <div className="mt-5 rounded-2xl border p-4" style={{ borderColor: `${AMBER}55`, background: '#fffdf8' }}>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <div className="text-[12px] font-bold uppercase tracking-[0.2em]" style={{ color: AMBER_DEEP }}>
+                  {parcours === 'full' ? '🚀 Parcours Pro — 32 agents' : '📗 Parcours Essentiel — 22 agents'}
+                </div>
+                <p className="mt-1 text-[12px]" style={{ color: '#6f5e47' }}>
+                  {parcours === 'full'
+                    ? 'Offre Pack Tout Complet 497€ : la suite complète d\'auto-édition, tous les agents avancés débloqués.'
+                    : 'Offre 197€ : les 22 agents essentiels pour aller de l\'idée au livre publié.'}
+                </p>
+              </div>
+              <div className="inline-flex rounded-xl border overflow-hidden" style={{ borderColor: `${AMBER}55` }}>
+                <button onClick={() => setParcours('core')}
+                  className="px-3.5 py-2 text-[12px] font-bold transition-colors"
+                  style={parcours === 'core'
+                    ? { background: `linear-gradient(90deg, ${AMBER}, #FFB44D)`, color: '#fff' }
+                    : { background: '#fff', color: AMBER_DEEP }}>
+                  Essentiel · 197€
+                </button>
+                <button onClick={() => setParcours('full')}
+                  className="px-3.5 py-2 text-[12px] font-bold transition-colors"
+                  style={parcours === 'full'
+                    ? { background: `linear-gradient(90deg, ${GREEN}, #2fc488)`, color: '#fff' }
+                    : { background: '#fff', color: GREEN }}>
+                  Pro · 497€
+                </button>
+              </div>
+            </div>
+            {parcours === 'core' && (
+              <button onClick={() => setParcours('full')}
+                className="mt-3 inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5"
+                style={{ background: `linear-gradient(90deg, ${GREEN}, #2fc488)` }}>
+                <Sparkles className="h-3.5 w-3.5" /> Débloquer 10 agents avancés (Pack Tout Complet 497€)
+              </button>
+            )}
           </div>
 
           {/* Brief du livre */}
@@ -835,36 +895,14 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             )}
           </div>
 
-          {/* Export du livre — toujours visible */}
-          <div className="mt-5 rounded-2xl border p-4 sm:p-5" style={{ borderColor: `${GREEN}40`, background: '#f3fbf7' }}>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="min-w-[200px]">
-                <div className="inline-flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-[0.2em]" style={{ color: GREEN }}>
-                  <FileDown className="h-4 w-4" /> Exporter ton livre
-                </div>
-                <p className="mt-1 text-[11px]" style={{ color: '#5f7a6c' }}>
-                  {results['p20-chat-manuscript']
-                    ? 'Ton manuscrit est prêt : télécharge-le en PDF (prêt KDP) ou en DOCX éditable.'
-                    : 'Génère ou importe ton manuscrit à l\'étape « Développer le manuscrit » pour activer l\'export.'}
-                </p>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <button onClick={() => exportBook('pdf')} disabled={!!exporting || !results['p20-chat-manuscript']}
-                  className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5 disabled:opacity-50"
-                  style={{ background: `linear-gradient(90deg, ${GREEN}, #2fc488)` }}>
-                  {exporting === 'pdf'
-                    ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Export PDF…</>
-                    : <><FileDown className="h-3.5 w-3.5" /> PDF (KDP)</>}
-                </button>
-                <button onClick={() => exportBook('docx')} disabled={!!exporting || !results['p20-chat-manuscript']}
-                  className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-[12px] font-bold border transition-colors hover:bg-[#e7f6ee] disabled:opacity-50"
-                  style={{ borderColor: `${GREEN}66`, color: GREEN, background: '#fff' }}>
-                  {exporting === 'docx'
-                    ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Export DOCX…</>
-                    : <><FileDown className="h-3.5 w-3.5" /> DOCX</>}
-                </button>
-              </div>
-            </div>
+          {/* Export du livre — moteur multi-format complet (toujours visible) */}
+          <div className="mt-5">
+            <V3ExportPanel
+              manuscript={results['p20-chat-manuscript'] || ''}
+              title={brief.title?.trim() || theme.trim() || 'Mon livre'}
+              subtitle={brief.subtitle?.trim() || undefined}
+              author={brief.author?.trim() || undefined}
+            />
           </div>
         </div>
 
