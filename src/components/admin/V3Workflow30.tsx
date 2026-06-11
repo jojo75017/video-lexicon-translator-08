@@ -1001,10 +1001,32 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                             </span>
 
                             <div className="flex-1 min-w-0">
-                              <div className={`text-sm font-semibold leading-tight ${isDone ? 'opacity-70' : ''}`} style={{ color: INK }}>
-                                {step.label ?? mod?.title ?? step.moduleId}
+                              <div className={`flex items-center gap-2 flex-wrap text-sm font-semibold leading-tight ${isDone ? 'opacity-70' : ''}`} style={{ color: INK }}>
+                                <span>{step.label ?? mod?.title ?? step.moduleId}</span>
+                                {isTeaser && (
+                                  <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold border"
+                                    style={{ borderColor: `${GREEN}66`, color: GREEN, background: '#eafaf2' }}>
+                                    <Lock className="h-2.5 w-2.5" /> Pro · 497€
+                                  </span>
+                                )}
                               </div>
                               <p className="text-[11px] leading-snug mt-0.5" style={{ color: '#8a7860' }}>{step.hint}</p>
+
+                              {/* Teaser verrouillé : on montre la valeur sans permettre l'exécution */}
+                              {isTeaser && (
+                                <div className="mt-2 rounded-xl border p-3" style={{ borderColor: `${GREEN}33`, background: '#f6fdf9' }}>
+                                  <p className="text-[11px] leading-snug" style={{ color: '#4a6a59' }}>
+                                    🔒 Cet agent fait partie de la phase <strong>Lancer & vendre</strong> (réservée au Pack Tout Complet 497€) :
+                                    séquences d'emails, optimisation d'annonce, suivi des ventes… Le parcours 197€ t'amène jusqu'à publier ton livre ;
+                                    le Pack 497€ le lance et le vend, avec une IA encore plus puissante (sorties plus longues, variantes A/B).
+                                  </p>
+                                  <button onClick={() => setCheckoutOpen(true)}
+                                    className="mt-2 inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5"
+                                    style={{ background: `linear-gradient(90deg, ${GREEN}, #2fc488)` }}>
+                                    <Sparkles className="h-3.5 w-3.5" /> Débloquer avec le Pack Tout Complet (497€)
+                                  </button>
+                                </div>
+                              )}
 
                               {/* Actions de l'étape active */}
                               {(isActive || (isDone && result)) && editingId !== step.moduleId && (
