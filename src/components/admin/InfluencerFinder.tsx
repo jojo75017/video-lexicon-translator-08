@@ -23,6 +23,7 @@ interface Influencer {
   url: string;
   description: string;
   followers: string | null;
+  kind?: 'createur' | 'maison_edition';
 }
 
 interface InviteState {
