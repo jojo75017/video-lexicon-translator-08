@@ -40,10 +40,14 @@ function loadBrief(): Brief {
   }
 }
 
+type Tier = 'core' | 'premium';
+
 interface Step {
   moduleId: string;
   label?: string;
   hint: string;
+  /** 'core' = parcours 197€ (22 agents) ; 'premium' = réservé au parcours 497€ (32 agents). */
+  tier?: Tier;
 }
 interface Phase {
   key: string;
