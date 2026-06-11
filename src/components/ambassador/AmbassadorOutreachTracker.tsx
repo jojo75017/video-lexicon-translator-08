@@ -164,6 +164,12 @@ const AmbassadorOutreachTracker: React.FC = () => {
         ))}
       </div>
 
+      <div className="flex justify-end">
+        <Button variant="outline" onClick={exportCSV} className="text-xs border-[#232F3E]/20 text-[#232F3E]">
+          <Download className="w-4 h-4 mr-1" /> Exporter en CSV
+        </Button>
+      </div>
+
       {/* Add */}
       <div className="bg-white border border-[#232F3E]/10 rounded-xl p-4">
         <div className="grid sm:grid-cols-[1fr_140px_1fr_auto] gap-2 items-end">
