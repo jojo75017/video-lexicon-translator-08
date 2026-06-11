@@ -102,6 +102,24 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Pousse le contact dans Systeme.io avec des tags pour déclencher les automations.
+    // "promoteur-interesse" = candidat à la promotion ; "ambassadeur-{plateforme}" = segmentation réseau.
+    const sioTags = [
+      'promoteur-interesse',
+      'ambassadeur-ebookstudio',
+      `ambassadeur-${platform}`,
+    ];
+    if (niche) sioTags.push('client-prospect');
+    const systemeio = await pushToSystemeIo(
+      email,
+      name || handle,
+      sioTags,
+      [
+        ...(handle ? [{ slug: 'pseudo', value: handle }] : []),
+        ...(niche ? [{ slug: 'niche', value: niche }] : []),
+      ],
+    );
+
     const origin = req.headers.get('origin') || 'https://www.ebookstudio.fr';
     const kitUrl = `${origin}/influenceurs`;
     const joinUrl = `${origin}/influenceurs`;
