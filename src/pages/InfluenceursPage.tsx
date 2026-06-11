@@ -51,10 +51,15 @@ const InfluenceursPage = () => {
   const [copied, setCopied] = useState<string | null>(null);
   const [joining, setJoining] = useState(false);
   const [sales, setSales] = useState(10);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const price = getActivePrice();
   const commission = getActiveCommission();
   const v3Live = isV3PriceActive();
+
+  useEffect(() => {
+    getIsCurrentSessionAdmin().then(setIsAdmin).catch(() => setIsAdmin(false));
+  }, []);
 
   useEffect(() => {
     (async () => {
