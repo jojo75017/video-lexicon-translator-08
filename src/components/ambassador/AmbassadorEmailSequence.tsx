@@ -146,7 +146,7 @@ Georges — Ebookstudio`,
   return (
     <div className="space-y-4">
       <p className="text-sm text-[#232F3E]/65">
-        4 emails de relance pour convertir tes contacts intéressés en ambassadeurs actifs.
+        5 emails de relance pour convertir tes contacts intéressés en ambassadeurs actifs, puis les fidéliser après leur première vente.
         Remplace <strong>[Prénom]</strong> et copie-colle dans ton outil d'emailing (Systeme.io, Gmail…).
       </p>
       <Tabs defaultValue={emails[0].key}>
