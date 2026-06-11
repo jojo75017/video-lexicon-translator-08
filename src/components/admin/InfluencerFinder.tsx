@@ -61,6 +61,7 @@ const InfluencerFinder: React.FC = () => {
   const [copied, setCopied] = useState<string | null>(null);
   const [inviting, setInviting] = useState<string | null>(null);
   const [invites, setInvites] = useState<Record<string, InviteState>>({});
+  const [hideBrands, setHideBrands] = useState(false);
 
   const commission = getActiveCommission();
 
