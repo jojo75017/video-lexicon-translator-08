@@ -7,6 +7,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriberGate } from '@/components/auth/SubscriberGate';
 import { AdminGate } from '@/components/auth/AdminGate';
+import { V3Gate } from '@/components/auth/V3Gate';
 import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 import { Loader2 } from 'lucide-react';
 import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup';
@@ -315,9 +316,9 @@ const App = () => {
             <Route
               path="/tableau-de-bord"
               element={
-                <AdminGate>
+                <V3Gate>
                   <V3HubPage />
-                </AdminGate>
+                </V3Gate>
               }
             />
 
@@ -389,7 +390,7 @@ const App = () => {
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/admin-direct" element={<AdminDirectPage />} />
             <Route path="/admin-cockpit" element={<AdminGate><AdminCockpitPage /></AdminGate>} />
-            <Route path="/hub-v3" element={<AdminGate><V3HubPage /></AdminGate>} />
+            <Route path="/hub-v3" element={<V3Gate><V3HubPage /></V3Gate>} />
             <Route path="/ai-chat" element={<AiChatPage />} />
             <Route path="/niches" element={<NichesPage />} />
             <Route path="/niches-600" element={<Niches600Page />} />
