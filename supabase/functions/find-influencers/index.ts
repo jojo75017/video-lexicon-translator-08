@@ -21,6 +21,14 @@ interface Influencer {
   url: string;
   description: string;
   followers: string | null;
+  kind: "createur" | "maison_edition";
+}
+
+/** Heuristic: detect publishing houses / brands vs individual creators. */
+const BRAND_RX = /(\b|_|\.)(editions?|éditions?|edition|press|presse|publishing|maison|books|livres|magazine|media|m[ée]dias?|prod|productions?|studio|officiel|official|store|shop|boutique)(\b|_|\.|s\b)/i;
+function classify(name: string, handle: string | null): "createur" | "maison_edition" {
+  const t = `${name} ${handle || ""}`;
+  return BRAND_RX.test(t) ? "maison_edition" : "createur";
 }
 
 const RESERVED = new Set([
