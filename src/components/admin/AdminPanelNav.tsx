@@ -21,6 +21,7 @@ const adminNavItems: AdminNavItem[] = [
   { label: 'Emails', path: '/apercu-emails', icon: Mail, exact: true },
   { label: 'Posts', path: '/generateur-posts', icon: MessageSquare, exact: true },
   { label: 'Marketing', path: '/dashboard-marketing', icon: BarChart3, exact: true },
+  { label: 'Influenceurs', path: '/influenceurs', icon: Megaphone, exact: true },
   { label: 'CRM', path: '/crm', icon: Contact, exact: true },
 ];
 
