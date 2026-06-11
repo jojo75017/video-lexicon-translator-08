@@ -109,6 +109,31 @@ Réponds simplement à cet email, je lis tout.
 
 Georges — Ebookstudio`,
     },
+    {
+      key: 'vente',
+      tab: '5 · Première vente',
+      timing: 'À envoyer dès la première vente détectée',
+      subject: '🎉 Ta première commission Ebookstudio est validée !',
+      body: `Salut [Prénom],
+
+C'est officiel : tu viens de réaliser ta première vente via Ebookstudio ! 🎉
+
+Ta commission de ${COMMISSION_NOW}€ est validée et sera payée sur ton compte. Et comme elle est à vie, ce client te rapportera aussi sur ses futurs achats (notamment la V3 Pro à ${PRICE_V3}€).
+
+💡 Pour en faire une habitude, voici 2 actions simples cette semaine :
+
+1️⃣ Partage un résultat concret : un chiffre, une timeline ou même un screenshot de ton tableau de bord.
+2️⃣ Pose une question à ton audience : « Tu t'es déjà demandé combien de temps ça prend d'écrire un livre ? »
+
+Les ambassadeurs qui postent régulièrement gagnent 3× plus. Tu as déjà prouvé que ça marche — maintenant, multiplie.
+
+👉 Ton lien : ${link}
+
+Tu veux qu'on ajuste ta stratégie pour viser 10 ventes ce mois-ci ? Réponds-moi, je te montre comment.
+
+Félicitations encore,
+Georges — Ebookstudio`,
+    },
   ], [link]);
 
   const copy = async (value: string, key: string) => {
@@ -121,7 +146,7 @@ Georges — Ebookstudio`,
   return (
     <div className="space-y-4">
       <p className="text-sm text-[#232F3E]/65">
-        4 emails de relance pour convertir tes contacts intéressés en ambassadeurs actifs.
+        5 emails de relance pour convertir tes contacts intéressés en ambassadeurs actifs, puis les fidéliser après leur première vente.
         Remplace <strong>[Prénom]</strong> et copie-colle dans ton outil d'emailing (Systeme.io, Gmail…).
       </p>
       <Tabs defaultValue={emails[0].key}>
