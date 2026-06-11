@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Copy, Check, Mail } from 'lucide-react';
 import { toast } from 'sonner';
-import { PRICE_NOW, PRICE_V3, COMMISSION_NOW, COMMISSION_V3 } from '@/lib/influencerKit';
+import { PRICE_NOW, PRICE_V3, COMMISSION_NOW, COMMISSION_V3, ORIGIN } from '@/lib/influencerKit';
 
 const TEAL = '#008296';
 
