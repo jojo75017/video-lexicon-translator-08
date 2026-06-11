@@ -59,12 +59,20 @@ const AmbassadorApplyForm: React.FC = () => {
   return (
     <div className="bg-white border-2 border-[#FF9E2D] rounded-2xl p-8 space-y-5">
       <div>
+        <div className="flex items-center gap-2 mb-2">
+          <span className="inline-flex items-center gap-1 bg-[#FF9E2D]/15 text-[#FF9E2D] px-2.5 py-1 rounded-full text-xs font-bold">
+            🌐 Formulaire public
+          </span>
+          <span className="inline-flex items-center gap-1 bg-[#008296]/10 text-[#008296] px-2.5 py-1 rounded-full text-xs font-bold">
+            👤 Rempli par l'influenceur
+          </span>
+        </div>
         <h2 className="text-2xl font-bold flex items-center gap-2 text-[#232F3E]">
           <Sparkles className="w-6 h-6 text-[#FF9E2D]" /> Deviens ambassadeur en 30 secondes
         </h2>
         <p className="text-sm text-[#232F3E]/65 mt-1">
-          Remplis ce formulaire : tu reçois automatiquement par email ton kit complet et ton lien
-          de suivi. 30% de commission sur chaque vente.
+          Ce formulaire est destiné aux influenceurs qui visitent cette page. Ils remplissent leurs coordonnées,
+          reçoivent automatiquement par email leur kit complet et leur lien de suivi. 30% de commission sur chaque vente.
         </p>
       </div>
 
