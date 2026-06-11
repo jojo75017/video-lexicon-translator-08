@@ -61,10 +61,10 @@ const PHASES: Phase[] = [
   {
     key: 'idee', emoji: '🔎', title: 'Phase 1 — Trouver l\'idée gagnante',
     steps: [
-      { moduleId: 'p22-trend-radar', label: 'Repérer les tendances', hint: 'Détecte les sujets qui montent sur Amazon.' },
+      { moduleId: 'p22-trend-radar', label: 'Repérer les tendances', hint: 'Détecte les sujets qui montent sur Amazon.', tier: 'premium' },
       { moduleId: 'niche-intelligence', label: 'Choisir la niche', hint: 'L\'IA sélectionne la niche la plus rentable.' },
       { moduleId: 'p16-competitive', label: 'Analyser la concurrence', hint: 'Étudie les best-sellers de la niche.' },
-      { moduleId: 'ku-niche-detector', label: 'Vérifier la rentabilité (KU)', hint: 'Confirme le potentiel de revenus.' },
+      { moduleId: 'ku-niche-detector', label: 'Vérifier la rentabilité (KU)', hint: 'Confirme le potentiel de revenus.', tier: 'premium' },
       { moduleId: 'p26-commercial-score', label: 'Valider le potentiel', hint: 'Note le potentiel commercial avant d\'écrire.' },
     ],
   },
@@ -72,7 +72,7 @@ const PHASES: Phase[] = [
     key: 'ecriture', emoji: '✍️', title: 'Phase 2 — Concevoir & écrire le livre',
     steps: [
       { moduleId: 'book-creation-studio', label: 'Créer le concept & le plan', hint: 'Titre, sous-titre, structure et 1er chapitre.' },
-      { moduleId: 'p17-series', label: 'Architecturer la série', hint: 'Planifie les tomes si c\'est une saga.' },
+      { moduleId: 'p17-series', label: 'Architecturer la série', hint: 'Planifie les tomes si c\'est une saga.', tier: 'premium' },
       { moduleId: 'p19-author-voice', label: 'Fixer la voix d\'auteur', hint: 'Définit un style constant pour tout le livre.' },
       { moduleId: 'p20-chat-manuscript', label: 'Développer le manuscrit', hint: 'Rédige le cœur du contenu chapitre par chapitre.' },
       { moduleId: 'p23-universe-bible', label: 'Vérifier la cohérence', hint: 'Contrôle la cohérence de l\'univers et des persos.' },
@@ -82,8 +82,8 @@ const PHASES: Phase[] = [
     key: 'qualite', emoji: '🧪', title: 'Phase 3 — Réviser & garantir la qualité',
     steps: [
       { moduleId: 'p18-readability', label: 'Auditer la lisibilité', hint: 'Mesure et améliore la fluidité de lecture.' },
-      { moduleId: 'p24-cliche-detector', label: 'Nettoyer clichés & répétitions', hint: 'Supprime les tics d\'écriture et redites.' },
-      { moduleId: 'p25-tone-adapter', label: 'Adapter le ton', hint: 'Ajuste le ton à la cible de lecteurs.' },
+      { moduleId: 'p24-cliche-detector', label: 'Nettoyer clichés & répétitions', hint: 'Supprime les tics d\'écriture et redites.', tier: 'premium' },
+      { moduleId: 'p25-tone-adapter', label: 'Adapter le ton', hint: 'Ajuste le ton à la cible de lecteurs.', tier: 'premium' },
       { moduleId: 'ebook-anti-plagiat', label: 'Vérifier l\'originalité', hint: 'Contrôle l\'originalité et protège le texte.' },
       { moduleId: 'content-compliance', label: 'Contrôler la conformité KDP', hint: 'Évite les motifs de refus à la publication.' },
     ],
@@ -95,7 +95,7 @@ const PHASES: Phase[] = [
       { moduleId: 'back-matter-builder', label: 'Rédiger les pages de fin', hint: 'Remerciements, bio et appels à l\'action.' },
       { moduleId: 'copyright-page', label: 'Générer la page copyright', hint: 'Crée les mentions légales obligatoires.' },
       { moduleId: 'cover-studio-pro', label: 'Concevoir la couverture', hint: 'Direction artistique de couverture haut de gamme.' },
-      { moduleId: 'cover-variants-thumbnail', label: 'Tester la miniature Amazon', hint: 'Valide la lisibilité du titre en petit.' },
+      { moduleId: 'cover-variants-thumbnail', label: 'Tester la miniature Amazon', hint: 'Valide la lisibilité du titre en petit.', tier: 'premium' },
     ],
   },
   {
@@ -103,11 +103,12 @@ const PHASES: Phase[] = [
     steps: [
       { moduleId: 'multi-format-express', label: 'Choisir les formats', hint: 'Ebook + broché prêts à l\'upload.' },
       { moduleId: 'cover-pdf-exact', label: 'Couverture KDP exacte', hint: 'Dos + 4e + fonds perdus aux bonnes cotes.' },
-      { moduleId: 'kindle-previewer', label: 'Vérifier le rendu', hint: 'Contrôle l\'affichage avant publication.' },
+      { moduleId: 'kindle-previewer', label: 'Vérifier le rendu', hint: 'Contrôle l\'affichage avant publication.', tier: 'premium' },
       { moduleId: 'isbn-metadata', label: 'Rédiger ISBN & métadonnées', hint: 'Titre, sous-titre, mots-clés et description.' },
       { moduleId: 'categories-manager-10', label: 'Choisir les 10 catégories', hint: 'Maximise la visibilité avec 10 catégories.' },
       { moduleId: 'prepub-checklist', label: 'Passer la checklist finale', hint: 'Vérifie tout avant de publier.' },
-      { moduleId: 'kdp-pack-zip', label: 'Préparer le pack KDP', hint: 'Récapitulatif des fichiers prêts à l\'upload.' },
+      { moduleId: 'kdp-pack-zip', label: 'Préparer le pack KDP', hint: 'Récapitulatif des fichiers prêts à l\'upload.', tier: 'premium' },
+      { moduleId: 'audiobook-express', label: 'Créer la version audio', hint: 'Prépare la version audiobook du livre (script & plan TTS).', tier: 'premium' },
     ],
   },
   {
@@ -116,7 +117,7 @@ const PHASES: Phase[] = [
       { moduleId: 'sales-description', label: 'Écrire la description vendeuse', hint: 'Une fiche produit qui convertit.' },
       { moduleId: 'listing-optimizer', label: 'Optimiser l\'annonce', hint: 'Titre et mots-clés optimisés pour Amazon.' },
       { moduleId: 'launch-sequence-j7', label: 'Préparer la séquence J-7', hint: 'Plan de lancement jour par jour.' },
-      { moduleId: 'sales-tracker', label: 'Mettre en place le suivi des ventes', hint: 'Plan de pilotage des ventes et royalties.' },
+      { moduleId: 'sales-tracker', label: 'Mettre en place le suivi des ventes', hint: 'Plan de pilotage des ventes et royalties.', tier: 'premium' },
     ],
   },
 ];
