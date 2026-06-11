@@ -303,6 +303,7 @@ C'est un paiement unique de ${price}€ à vie, sans abonnement.
                 <TabsTrigger value="finder">🔎 Trouver des influenceurs</TabsTrigger>
                 <TabsTrigger value="tracker">📋 Suivi des envois</TabsTrigger>
                 <TabsTrigger value="scripts">💬 Scripts DM 2 temps</TabsTrigger>
+                <TabsTrigger value="emails">✉️ Emails de relance</TabsTrigger>
               </TabsList>
               <TabsContent value="finder" className="mt-4">
                 <InfluencerFinder />
@@ -312,6 +313,9 @@ C'est un paiement unique de ${price}€ à vie, sans abonnement.
               </TabsContent>
               <TabsContent value="scripts" className="mt-4">
                 <AmbassadorScripts shareLink={shareLink} kitUrl={`${ORIGIN}/influenceurs`} />
+              </TabsContent>
+              <TabsContent value="emails" className="mt-4">
+                <AmbassadorEmailSequence shareLink={shareLink} />
               </TabsContent>
             </Tabs>
           </div>
