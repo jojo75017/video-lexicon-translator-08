@@ -406,19 +406,28 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   useEffect(() => { localStorage.setItem(BRIEF_KEY, JSON.stringify(brief)); }, [brief]);
   const setBriefField = (k: keyof Brief, v: string) => setBrief((p) => ({ ...p, [k]: v }));
 
-  const completed = useMemo(() => FLAT.filter((s) => done.has(s.moduleId)).length, [done, FLAT]);
-  const pct = Math.round((completed / TOTAL) * 100);
+  // Progression calculée uniquement sur les étapes ACCESSIBLES (débloquées).
+  // Les teasers premium ne comptent pas dans le total ni dans la progression.
+  const accessibleSteps = useMemo(() => FLAT.filter(isAccessible), [FLAT, fullMode]);
+  const TOTAL = accessibleSteps.length;
+  const accPos = useMemo(() => {
+    const m = new Map<string, number>();
+    accessibleSteps.forEach((s, i) => m.set(s.moduleId, i));
+    return m;
+  }, [accessibleSteps]);
+  const completed = useMemo(() => accessibleSteps.filter((s) => done.has(s.moduleId)).length, [done, accessibleSteps]);
+  const pct = Math.round((completed / Math.max(TOTAL, 1)) * 100);
 
-  // Étape active = première non terminée.
-  const activeIndex = useMemo(() => {
-    const i = FLAT.findIndex((s) => !done.has(s.moduleId));
+  // Étape active = première étape accessible non terminée.
+  const activeAccIndex = useMemo(() => {
+    const i = accessibleSteps.findIndex((s) => !done.has(s.moduleId));
     return i === -1 ? TOTAL : i;
-  }, [done, FLAT, TOTAL]);
+  }, [done, accessibleSteps, TOTAL]);
 
   // Ouvre automatiquement la phase de l'étape active.
   useEffect(() => {
-    if (activeIndex < TOTAL) setOpenPhase(FLAT[activeIndex].phaseKey);
-  }, [activeIndex]);
+    if (activeAccIndex < TOTAL) setOpenPhase(accessibleSteps[activeAccIndex].phaseKey);
+  }, [activeAccIndex]);
 
   const generate = async (step: FlatStep) => {
     setError(null);
