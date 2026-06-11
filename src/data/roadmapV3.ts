@@ -110,6 +110,18 @@ export function getModuleTier(moduleId: string): V3Tier {
   return MODULE_TO_PACK[moduleId] ? 'upsell' : 'core';
 }
 
+/** Niveau d'accès commercial d'un module. */
+export type V3Access = 'included' | 'pack';
+
+/**
+ * Droit d'accès d'un module :
+ *   - 'included' = compris dans la base 197€ (modules `core`)
+ *   - 'pack'     = nécessite un pack premium / le Pack Tout Complet (modules `upsell`)
+ */
+export function getModuleAccess(moduleId: string): V3Access {
+  return getModuleTier(moduleId) === 'upsell' ? 'pack' : 'included';
+}
+
 export const V3_PILLAR_META: Record<V3Pillar, { label: string; color: string; emoji: string }> = {
   publier:    { label: 'Publier',    color: '#008296', emoji: '📦' },
   monetiser:  { label: 'Monétiser',  color: '#FF9E2D', emoji: '💰' },
