@@ -1,79 +1,58 @@
-# Plan — Deux parcours V3 (22 / 32 agents) + exports KDP complets
+# Recaler la valeur 197€ / 497€ du générateur V3
 
 ## Objectif
-Transformer le parcours V3 en **véritable suite d'auto-édition** différenciée par offre :
-- **197€** → parcours essentiel **22 agents**
-- **497€** → parcours complet **32 agents** (tout débloqué)
-- Remplacer les 2 boutons d'export A4 par le **moteur d'export v2 complet** (6 formats) + un **panneau d'infos KDP** (gabarits, marges, fonds perdus, DPI images).
+Mettre des freins clairs pour que le 197€ ne donne plus tout. Le 197€ va **jusqu'à publier sur KDP** (sans marketing). Tout le **lancement / vente / monétisation** devient **visible mais bridé (teaser)** avec upsell 497€. Et la **qualité IA monte par palier** : V2 (67€) < Essentiel (197€) < Pro (497€).
 
----
+## 1. Nouvelle frontière des paliers (qui fait quoi)
 
-## 1. Deux parcours séparés (22 vs 32)
+Re-tagger les étapes dans `V3Workflow30.tsx` (champ `tier`) selon ce principe :
 
-Aujourd'hui `V3Workflow30.tsx` contient un seul tableau `PHASES` (~31 étapes). On ajoute à chaque `Step` un champ `tier: 'core' | 'premium'` et on filtre le parcours selon l'offre de l'abonné.
+```text
+197€ (Essentiel) → Phases 1 à 5 : idée → écrire → réviser → mettre en page → PUBLIER sur KDP
+497€ (Pro)       → tout le 197€ + Phase 6 (Vente) + agents avancés + qualité max
+```
 
-### Répartition proposée
+Concrètement, passent en **`premium`** (donc bridés dans le 197€) :
+- **Toute la Phase 6 — Lancer & vendre** : description vendeuse, optimiseur d'annonce, **séquence emails J-7**, suivi des ventes. (aujourd'hui 3 sur 4 sont en `core` → c'est la grosse fuite)
+- Restent premium comme aujourd'hui : radar de tendances, détecteur KU, architecte de série, nettoyeur clichés, adaptateur de ton, test miniature, audiobook.
 
-**Parcours 197€ — 22 agents essentiels (`core`)**
-- Phase 1 Idée (3) : `niche-intelligence`, `p16-competitive`, `p26-commercial-score`
-- Phase 2 Écriture (4) : `book-creation-studio`, `p19-author-voice`, `p20-chat-manuscript`, `p23-universe-bible`
-- Phase 3 Qualité (3) : `p18-readability`, `ebook-anti-plagiat`, `content-compliance`
-- Phase 4 Mise en page (4) : `manuscript-converter`, `back-matter-builder`, `copyright-page`, `cover-studio-pro`
-- Phase 5 Publication (5) : `multi-format-express`, `cover-pdf-exact`, `isbn-metadata`, `categories-manager-10`, `prepub-checklist`
-- Phase 6 Vente (3) : `sales-description`, `listing-optimizer`, `launch-sequence-j7`
+Pour garder ~22 agents au 197€, repassent en **`core`** (publication "propre" légitime à 197€) : aperçu Kindle et préparation du pack KDP ZIP.
 
-**Parcours 497€ — 32 agents (les 22 + 10 `premium`)**
-- Idée : `p22-trend-radar`, `ku-niche-detector`
-- Écriture : `p17-series`
-- Qualité : `p24-cliche-detector`, `p25-tone-adapter`
-- Mise en page : `cover-variants-thumbnail`
-- Publication : `kindle-previewer`, `kdp-pack-zip`
-- Vente : `sales-tracker`
-- **+ 1 nouvel agent premium** : `audiobook-express` (génération audio du livre) pour atteindre 32
+Le compteur d'agents et la barre de progression sont déjà recalculés dynamiquement (`buildFlat`), donc le nombre s'ajuste tout seul. La liste reste éditable.
 
-### Sélection du parcours
-- Détection de l'offre via le statut abonné (réutilise la logique tier existante de `roadmapV3.ts` / contexte d'accès). Tant que la distinction d'offre n'est pas branchée côté compte, on expose un sélecteur d'aperçu pour l'admin (parcours 197 / 497) en s'appuyant sur `useV3Mode`.
-- Le 197€ ne voit que ses 22 étapes ; le 497€ voit les 32. La numérotation, la progression (localStorage) et le compteur de chapitres sont recalculés sur le parcours filtré.
-- Bandeau en tête indiquant clairement « Parcours Essentiel — 22 agents » ou « Parcours Pro — 32 agents » avec, sur le 197€, un encart « Passez au Pack Tout Complet 497€ pour débloquer 10 agents avancés ».
+## 2. Teaser bridé au lieu de masquer (réponse "aperçu bridé")
 
----
+Aujourd'hui, dans le parcours 197€, les étapes premium sont **purement masquées** (`buildFlat` les filtre). Nouveau comportement :
 
-## 2. Export complet façon v2 + infos KDP
+- En parcours **Essentiel**, les étapes premium **restent visibles** dans la liste, marquées d'un badge cadenas doré « Pro · 497€ ».
+- Au lieu du bouton « Générer », elles affichent un **aperçu bridé** : un court exemple généré (ou un extrait tronqué ~30 %) + un voile « flou » sur la suite, avec le CTA **« Débloquer avec le Pack Tout Complet 497€ »** qui ouvre `V3PackCheckout`.
+- Le clic « Générer » réel est bloqué tant que `hasFull` est faux.
+- Ça crée le manque : l'utilisateur voit la valeur (emails de lancement, ads…) mais ne peut pas l'exécuter.
 
-On remplace les 2 boutons PDF/DOCX A4 par un **bloc d'export riche** réutilisant le moteur de `EbookAdvancedExport.tsx`.
+## 3. Qualité IA par palier (réponse "plus performant")
 
-### Formats proposés (6, comme v2)
-DOCX KDP Pro · EPUB 3 · PDF Impression (KDP) · PDF Digital · TXT · HTML.
+Ajouter un niveau de qualité transmis à l'edge function `v3-autopilot-step`, dérivé du parcours actif :
 
-### Choix de gabarit (trim size) KDP
-Sélecteur de format de livre, par défaut **6×9 po (15,24 × 22,86 cm)**, avec les principaux gabarits KDP : 5×8, 5,25×8, 5,5×8,5, 6×9, 7×10, 8,5×11. Le format choisi pilote les dimensions de page du PDF Impression et du DOCX.
+| Palier | Modèle | Longueur sortie | Prompt | Variantes |
+|---|---|---|---|---|
+| V2 (67€) | rapide (flash) | standard | concis | 1 |
+| **197€** | qualité (pro) | +50 % de profondeur | prompt enrichi (exemples, structure pro) | 1 |
+| **497€** | top qualité | sortie maximale | prompt expert + checklist qualité | **plusieurs variantes / A-B / régénérations** |
 
-### Marges & options
-Marges intérieures (reliure) vs extérieures auto-calculées selon le nombre de pages (règle KDP), choix simple/standard/large, justification, interligne — réutilise `ebookExportOptions.ts` (presets typo déjà présents).
+Côté code :
+- `V3Workflow30.tsx` envoie un champ `quality: 'core' | 'pro'` dans `baseBody` (et le sélecteur de modèle peut être pré-réglé selon le palier).
+- `v3-autopilot-step/index.ts` : selon `quality`, ajuste `maxOutputTokens` (ex. 8192 → 12288), choisit un modèle par défaut plus fort, injecte un bloc d'instructions « niveau expert » dans le `system`/`user`, et en `pro` demande **2–3 variantes** comparatives sur les livrables marketing (titres, descriptions, accroches).
 
-### Panneau d'infos KDP (nouveau)
-Encart pédagogique repliable affichant :
-- Tableau des **gabarits** courants (po + cm).
-- **Marges KDP** : extérieures min. 6,4 mm (0,25"), intérieures selon pagination (jusqu'à 0,875" pour gros volumes).
-- **Fonds perdus (bleed)** : +3,2 mm pour les images pleine page de la couverture / intérieur illustré.
-- **DPI images** : 300 DPI mini pour l'impression, format conseillé.
-- **Couverture** : rappel calcul du dos (épaisseur × nb pages) → renvoi vers le module `cover-pdf-exact`.
-
-### Branchement technique
-Le manuscrit (`results['p20-chat-manuscript']`) est parsé en chapitres puis transmis au moteur d'export. Le bloc reste « toujours visible » et s'active dès qu'un manuscrit existe (≥ 50 caractères). Conserve titre/sous-titre/auteur du `brief`.
-
----
+## 4. Cohérence affichage Hub
+- Le bandeau du Hub annonce clairement : « 197€ : écris et publie ton livre sur Amazon. 497€ : lance-le et vends-le (emails, ads, social, audio, monétisation) + qualité IA maximale. »
+- Mettre à jour les libellés du sélecteur de parcours et le sous-texte d'upsell pour refléter la nouvelle frontière (publier vs vendre).
 
 ## Détails techniques
-- **Fichiers modifiés** :
-  - `src/components/admin/V3Workflow30.tsx` : champ `tier` sur les steps, filtrage par offre, bandeau d'offre, sélecteur d'aperçu admin, remplacement du bloc export.
-  - `src/data/roadmapV3.ts` : ajout de l'entrée module `audiobook-express` si absente + repérage core/premium si utile.
-- **Nouveaux fichiers** :
-  - `src/components/admin/V3ExportPanel.tsx` : bloc export 6 formats + sélecteur gabarit/marges + panneau infos KDP (extrait/adapté de `EbookAdvancedExport.tsx`).
-- **Réutilisé** : `ebookExportOptions.ts`, moteur d'export de `EbookAdvancedExport.tsx`, `manuscriptParser.ts`.
-- Progression et compteur de chapitres recalculés sur le tableau d'étapes filtré (évite les écarts de numérotation).
-- Aucune modification de base de données.
+- **Fichiers modifiés** : `src/components/admin/V3Workflow30.tsx` (re-tag `tier`, rendu teaser bridé, champ `quality`, libellés), `supabase/functions/v3-autopilot-step/index.ts` (modèle/tokens/prompt/variantes selon `quality`), éventuellement `src/components/admin/V3HubPage.tsx` (texte du bandeau).
+- **Déploiement** : redéployer `v3-autopilot-step` après modif.
+- **Pas de nouveau paiement** : on réutilise le gating `useV3Entitlement` + `V3PackCheckout` déjà en place.
+- **Mémoire** : enregistrer la nouvelle politique de paliers (197€ = jusqu'à publication, marketing = teaser 497€, qualité par palier) dans la mémoire projet.
 
-## Hors périmètre
-- Pas de branchement paiement/upgrade réel dans ce lot (le CTA 497€ pointe vers le tunnel existant `PricingLadder497`).
-- Génération audio = on relie le nouvel agent au workflow audio existant, sans nouveau moteur TTS.
+## Hors périmètre (à confirmer plus tard)
+- Brancher la même logique teaser/qualité sur les modules ouverts hors workflow (cartes du Hub).
+- Limites d'usage chiffrées (nombre de livres, de régénérations) — pas demandé ici.
