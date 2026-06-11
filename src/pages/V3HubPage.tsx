@@ -106,13 +106,31 @@ function ModuleCard({
           <span className="grid h-9 w-9 place-items-center rounded-xl text-lg border border-[#eadfc9] bg-[#FCF8F0] group-hover:border-[#E8951E]/40 transition-colors">
             {V3_PILLAR_META[module.pillar].emoji}
           </span>
-          <div className="flex items-center gap-1.5">
-            {getModuleTier(module.id) === 'upsell' && (
+          <div className="flex flex-wrap items-center justify-end gap-1.5">
+            {/* Badge d'accès : Inclus 197€ vs Option payante */}
+            {access === 'included' ? (
+              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
+                style={{ background: '#e8f7ef', color: '#0b6e4c', border: '1px solid #0f8a5f55' }}>
+                <CheckCircle2 className="h-2.5 w-2.5" /> Inclus 197€
+              </span>
+            ) : (
               <span className="inline-flex items-center gap-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
                 style={{ background: AMBER_SOFT, color: AMBER_DEEP, border: `1px solid ${AMBER}55` }}>
-                <Lock className="h-2.5 w-2.5" /> Option
+                <Lock className="h-2.5 w-2.5" /> Pack
               </span>
             )}
+            {/* Statut de déblocage selon l'achat réel */}
+            {unlocked ? (
+              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
+                style={{ background: '#e8f7ef', color: '#0b6e4c' }}>
+                <ShieldCheck className="h-2.5 w-2.5" /> Débloqué
+              </span>
+            ) : access === 'pack' ? (
+              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
+                style={{ background: '#f3ece0', color: '#a18a6c' }}>
+                À débloquer
+              </span>
+            ) : null}
             <span data-tour={isFirst ? 'status' : undefined} className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
               style={{ background: `${statusColor}18`, color: statusColor }}>
               <span className="h-1.5 w-1.5 rounded-full" style={{ background: statusColor }} />
