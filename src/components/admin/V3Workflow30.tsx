@@ -129,11 +129,19 @@ interface FlatStep extends Step {
   globalIndex: number; // 0-based
 }
 
-const FLAT: FlatStep[] = PHASES.flatMap((p) =>
-  p.steps.map((s) => ({ ...s, phaseKey: p.key, phaseTitle: p.title, emoji: p.emoji, globalIndex: 0 })),
-).map((s, i) => ({ ...s, globalIndex: i }));
+type Parcours = 'core' | 'full';
 
-const TOTAL = FLAT.length;
+/** Construit la liste plate d'étapes pour un parcours donné (197€ = core, 497€ = full). */
+const buildFlat = (parcours: Parcours): FlatStep[] =>
+  PHASES.flatMap((p) =>
+    p.steps
+      .filter((s) => parcours === 'full' || (s.tier ?? 'core') === 'core')
+      .map((s) => ({ ...s, phaseKey: p.key, phaseTitle: p.title, emoji: p.emoji, globalIndex: 0 })),
+  ).map((s, i) => ({ ...s, globalIndex: i }));
+
+const CORE_TOTAL = buildFlat('core').length; // 22 agents (197€)
+const FULL_TOTAL = buildFlat('full').length; // 32 agents (497€)
+const PARCOURS_KEY = 'v3_workflow30_parcours';
 
 function loadSet(key: string): Set<string> {
   try {
