@@ -52,6 +52,9 @@ const InfluenceursPage = () => {
   const [joining, setJoining] = useState(false);
   const [sales, setSales] = useState(10);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [forceRecruit, setForceRecruit] = useState(
+    () => typeof window !== 'undefined' && localStorage.getItem('show_recruit') === '1',
+  );
 
   const price = getActivePrice();
   const commission = getActiveCommission();
@@ -255,12 +258,39 @@ C'est un paiement unique de ${price}€ à vie, sans abonnement.
       </section>
 
       {/* ADMIN — RECRUTEMENT */}
-      {isAdmin && (
+      {!(isAdmin || forceRecruit) && (
+        <section className="max-w-3xl mx-auto px-4 pt-4 text-center">
+          <button
+            onClick={() => {
+              localStorage.setItem('show_recruit', '1');
+              setForceRecruit(true);
+            }}
+            className="text-sm text-[#008296] underline underline-offset-4 hover:text-[#FF9E2D]"
+          >
+            🔓 Ouvrir mon espace recrutement
+          </button>
+        </section>
+      )}
+
+      {(isAdmin || forceRecruit) && (
         <section className="max-w-3xl mx-auto px-4 py-8">
           <div className="bg-[#232F3E]/[0.03] border border-[#232F3E]/15 rounded-2xl p-5 space-y-4">
-            <div className="flex items-center gap-2">
-              <Users className="w-6 h-6 text-[#008296]" />
-              <h2 className="text-2xl font-bold text-[#232F3E]">Espace recrutement (toi seul)</h2>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Users className="w-6 h-6 text-[#008296]" />
+                <h2 className="text-2xl font-bold text-[#232F3E]">Espace recrutement (toi seul)</h2>
+              </div>
+              {!isAdmin && forceRecruit && (
+                <button
+                  onClick={() => {
+                    localStorage.removeItem('show_recruit');
+                    setForceRecruit(false);
+                  }}
+                  className="text-xs text-[#232F3E]/50 underline hover:text-[#232F3E]"
+                >
+                  Masquer
+                </button>
+              )}
             </div>
             <p className="text-sm text-[#232F3E]/65">
               Tes outils pour recruter des ambassadeurs : scripts DM qui déclenchent une réponse
