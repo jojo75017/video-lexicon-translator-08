@@ -988,16 +988,16 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                       return (
                         <div key={step.moduleId} ref={isActive ? activeRef : undefined}
                           className="px-5 sm:px-7 py-3"
-                          style={isActive ? { background: '#FFFDF8' } : undefined}>
+                          style={isActive ? { background: '#FFFDF8' } : isTeaser ? { background: '#FBFEFC' } : undefined}>
                           <div className="flex items-start gap-3">
                             {/* Pastille numéro / état */}
                             <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full text-[11px] font-black border-2"
                               style={{
-                                borderColor: isDone ? GREEN : isActive ? AMBER : '#e3d6bd',
-                                background: isDone ? GREEN : isActive ? AMBER_SOFT : '#fff',
-                                color: isDone ? '#fff' : isActive ? AMBER_DEEP : '#bcaa8c',
+                                borderColor: isDone ? GREEN : isActive ? AMBER : isTeaser ? `${GREEN}66` : '#e3d6bd',
+                                background: isDone ? GREEN : isActive ? AMBER_SOFT : isTeaser ? '#eafaf2' : '#fff',
+                                color: isDone ? '#fff' : isActive ? AMBER_DEEP : isTeaser ? GREEN : '#bcaa8c',
                               }}>
-                              {isDone ? <Check className="h-3.5 w-3.5" /> : isLocked ? <Lock className="h-3 w-3" /> : n}
+                              {isDone ? <Check className="h-3.5 w-3.5" /> : (isLocked || isTeaser) ? <Lock className="h-3 w-3" /> : n}
                             </span>
 
                             <div className="flex-1 min-w-0">
