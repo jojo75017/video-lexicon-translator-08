@@ -40,17 +40,6 @@ const InfluencerContactForm: React.FC = () => {
     }
   };
 
-  if (done) {
-    return (
-      <div className="bg-[#008296]/5 border border-[#008296]/30 rounded-2xl p-8 text-center space-y-3">
-        <CheckCircle2 className="w-12 h-12 mx-auto text-emerald-500" />
-        <h2 className="text-2xl font-bold text-[#232F3E]">Message reçu 🎉</h2>
-        <p className="text-[#232F3E]/70">
-          Merci ! Je te réponds personnellement par email dès que possible. Pense à vérifier tes spams.
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div className="bg-white border-2 border-[#008296] rounded-2xl p-8 space-y-5">
