@@ -254,6 +254,41 @@ C'est un paiement unique de ${price}€ à vie, sans abonnement.
         ))}
       </section>
 
+      {/* ADMIN — RECRUTEMENT */}
+      {isAdmin && (
+        <section className="max-w-3xl mx-auto px-4 py-8">
+          <div className="bg-[#232F3E]/[0.03] border border-[#232F3E]/15 rounded-2xl p-5 space-y-4">
+            <div className="flex items-center gap-2">
+              <Users className="w-6 h-6 text-[#008296]" />
+              <h2 className="text-2xl font-bold text-[#232F3E]">Espace recrutement (toi seul)</h2>
+            </div>
+            <p className="text-sm text-[#232F3E]/65">
+              Tes outils pour recruter des ambassadeurs : scripts DM qui déclenchent une réponse
+              et suivi de qui tu as contacté.
+            </p>
+            <Tabs defaultValue="tracker">
+              <TabsList>
+                <TabsTrigger value="tracker">📋 Suivi des envois</TabsTrigger>
+                <TabsTrigger value="scripts">💬 Scripts DM 2 temps</TabsTrigger>
+              </TabsList>
+              <TabsContent value="tracker" className="mt-4">
+                <AmbassadorOutreachTracker />
+              </TabsContent>
+              <TabsContent value="scripts" className="mt-4">
+                <AmbassadorScripts shareLink={shareLink} kitUrl={`${ORIGIN}/influenceurs`} />
+              </TabsContent>
+            </Tabs>
+          </div>
+        </section>
+      )}
+
+      {/* APPLY — AUTO-SERVICE */}
+      <section className="max-w-3xl mx-auto px-4 py-8">
+        <AmbassadorApplyForm />
+      </section>
+
+
+
       {/* SIMULATOR */}
       <section className="max-w-3xl mx-auto px-4 py-8">
         <div className="bg-white border-2 border-[#008296] rounded-2xl p-8 space-y-6">
