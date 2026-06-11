@@ -114,12 +114,46 @@ export function getModuleTier(moduleId: string): V3Tier {
 export type V3Access = 'included' | 'pack';
 
 /**
+ * Liste blanche des modules COMPRIS dans la base 197€.
+ * Frontière : de l'idée jusqu'à publier proprement sur KDP.
+ * Tout ce qui relève du marketing, de la vente, de la monétisation et de
+ * l'IA avancée passe en pack premium (débloqué via le Pack Tout Complet 497€).
+ * Source de vérité de l'inclusion : un module absent de ce set est premium par défaut.
+ */
+export const V3_BASE_MODULE_IDS = new Set<string>([
+  // PUBLIER — essentiels de publication
+  'library',
+  'kdp-pack-zip',
+  'cockpit-audit-pilot',
+  'prepub-checklist',
+  'kindle-previewer',
+  'cover-pdf-exact',
+  'multi-format-express',
+  'isbn-metadata',
+  'manuscript-converter',
+  'content-compliance',
+  'copyright-page',
+  'back-matter-builder',
+  'print-proof-checker',
+  'categories-manager-10',
+  'low-content-books',
+  'onboarding-guides',
+  // IA — création + recherche de niche essentielles
+  'book-creation-studio',
+  'niche-intelligence',
+  'p16-competitive',
+  // Infra (admin, non commerciale)
+  'pricing-ladder-497',
+  'installment-payments',
+]);
+
+/**
  * Droit d'accès d'un module :
- *   - 'included' = compris dans la base 197€ (modules `core`)
- *   - 'pack'     = nécessite un pack premium / le Pack Tout Complet (modules `upsell`)
+ *   - 'included' = compris dans la base 197€ (liste blanche `V3_BASE_MODULE_IDS`)
+ *   - 'pack'     = nécessite un pack premium / le Pack Tout Complet
  */
 export function getModuleAccess(moduleId: string): V3Access {
-  return getModuleTier(moduleId) === 'upsell' ? 'pack' : 'included';
+  return V3_BASE_MODULE_IDS.has(moduleId) ? 'included' : 'pack';
 }
 
 export const V3_PILLAR_META: Record<V3Pillar, { label: string; color: string; emoji: string }> = {
