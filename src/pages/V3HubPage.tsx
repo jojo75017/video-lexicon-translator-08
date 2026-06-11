@@ -329,6 +329,7 @@ const V3HubPage: React.FC = () => {
           <div className="flex flex-wrap items-center gap-2" data-tour="filters">
             <CreateBookChip active={pillar === 'create'} onClick={() => setPillar('create')} />
             <span className="mx-1 h-6 w-px self-center" style={{ background: `${AMBER}44` }} aria-hidden />
+            <FilterChip active={pillar === 'mine'} onClick={() => setPillar('mine')} label={`✅ Mes outils (${myToolsCount})`} />
             <FilterChip active={pillar === 'all'} onClick={() => setPillar('all')} label={`Tous (${V3_MODULES.length})`} />
             {PILLAR_ORDER.map((p) => (
               <FilterChip
@@ -338,6 +339,15 @@ const V3HubPage: React.FC = () => {
                 label={`${V3_PILLAR_META[p].emoji} ${V3_PILLAR_META[p].label}`}
               />
             ))}
+          </div>
+          {/* Légende des droits */}
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px]" style={{ color: '#8a7860' }}>
+            <span className="inline-flex items-center gap-1">
+              <CheckCircle2 className="h-3 w-3" style={{ color: '#0f8a5f' }} /> Inclus dans la base 197€ (livres & ebooks illimités)
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Lock className="h-3 w-3" style={{ color: AMBER }} /> Disponible en pack premium (audiobooks, marketing, couvertures pro…)
+            </span>
           </div>
         </div>
 
