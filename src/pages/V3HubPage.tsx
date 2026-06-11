@@ -11,6 +11,7 @@ import CreateBookHub from '@/components/admin/CreateBookHub';
 import V2V3Compare from '@/components/admin/V2V3Compare';
 import V3PricingTiers from '@/components/admin/V3PricingTiers';
 import V3Workflow30 from '@/components/admin/V3Workflow30';
+import V3AccessRecap from '@/components/admin/V3AccessRecap';
 import pillarIa from '@/assets/v3/pillar-ia.jpg';
 import pillarPublier from '@/assets/v3/pillar-publier.jpg';
 import pillarMonetiser from '@/assets/v3/pillar-monetiser.jpg';
@@ -313,6 +314,9 @@ const V3HubPage: React.FC = () => {
       <main className="mx-auto max-w-7xl px-4 py-8">
         {/* Parcours en 30 étapes — entrée principale du Hub V3 */}
         <V3Workflow30 onOpenModule={setSelected} />
+
+        {/* Récapitulatif global des droits : 197€ vs Pack 497€ */}
+        <V3AccessRecap onOpenModule={setSelected} />
 
         {/* Recherche + filtres */}
         <div className="sticky top-0 z-20 -mx-4 px-4 py-3 backdrop-blur-md border-b border-[#eadfc9] mb-6" style={{ background: 'rgba(251,246,236,0.85)' }}>
