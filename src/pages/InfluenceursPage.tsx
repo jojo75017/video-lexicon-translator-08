@@ -9,8 +9,13 @@ import { toast } from 'sonner';
 import {
   Copy, Check, TrendingUp, Euro, Download, Image as ImageIcon,
   FileText, Sparkles, Gift, ShieldCheck, Zap, MessageCircle, Link as LinkIcon,
+  Users,
 } from 'lucide-react';
 import mockup from '@/assets/influenceurs-mockup.jpg';
+import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
+import AmbassadorApplyForm from '@/components/ambassador/AmbassadorApplyForm';
+import AmbassadorScripts from '@/components/ambassador/AmbassadorScripts';
+import AmbassadorOutreachTracker from '@/components/ambassador/AmbassadorOutreachTracker';
 import {
   COMMISSION_RATE, PRICE_NOW, PRICE_V3, COMMISSION_NOW, COMMISSION_V3,
   getActivePrice, getActiveCommission, isV3PriceActive, formatEuro, ORIGIN,
