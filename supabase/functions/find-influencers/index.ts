@@ -166,43 +166,56 @@ Deno.serve(async (req) => {
       }
 
       let kept = 0;
-      for (const query of queries) {
+      // 1er passage : recherche FR. 2e passage (fallback) : recherche mondiale sans filtre de langue.
+      for (const pass of ["fr", "global"] as const) {
         if (kept >= perPlatform) break;
-        try {
-          const resp = await fetch("https://api.firecrawl.dev/v2/search", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${firecrawlKey}`, "Content-Type": "application/json" },
-            // over-fetch since many results are videos/hashtags that get filtered out
-            body: JSON.stringify({ query, limit: Math.min(perPlatform * 3, 25), lang: "fr", country: "fr" }),
-          });
-          const data = await resp.json();
-          if (!resp.ok) {
-            console.error(`Firecrawl ${platform} error:`, data?.error || resp.status);
-            continue;
-          }
-          const items: any[] = data?.data?.web || data?.data || data?.web || [];
-          for (const it of items) {
-            if (kept >= perPlatform) break;
-            const url: string = it.url || it.link || "";
-            if (!url || !url.includes(site)) continue;
-            const profile = toProfile(url, platform);
-            if (!profile) continue;
-            const title: string = (it.title || "").toString();
-            const desc: string = (it.description || it.snippet || "").toString();
-            const name = title.replace(/\s*[|\-•(].*$/, "").trim() || profile.handle;
-            results.push({
-              platform,
-              name,
-              handle: profile.handle,
-              url: profile.url,
-              description: desc.slice(0, 220),
-              followers: extractFollowers(`${title} ${desc}`),
-              kind: classify(name, profile.handle),
+        for (const query of queries) {
+          if (kept >= perPlatform) break;
+          try {
+            const payload: Record<string, unknown> = {
+              query,
+              // over-fetch since many results are videos/hashtags that get filtered out
+              limit: Math.min(perPlatform * 3, 25),
+            };
+            if (pass === "fr") {
+              payload.lang = "fr";
+              payload.country = "fr";
+            }
+            const resp = await fetch("https://api.firecrawl.dev/v2/search", {
+              method: "POST",
+              headers: { Authorization: `Bearer ${firecrawlKey}`, "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
             });
-            kept++;
+            const data = await resp.json();
+            if (!resp.ok) {
+              console.error(`Firecrawl ${platform} error (${pass}):`, data?.error || resp.status);
+              continue;
+            }
+            const items: any[] = data?.data?.web || data?.data || data?.web || [];
+            for (const it of items) {
+              if (kept >= perPlatform) break;
+              const url: string = it.url || it.link || "";
+              if (!url || !url.includes(site)) continue;
+              const profile = toProfile(url, platform);
+              if (!profile) continue;
+              if (results.some((r) => r.url.toLowerCase() === profile.url.toLowerCase())) continue;
+              const title: string = (it.title || "").toString();
+              const desc: string = (it.description || it.snippet || "").toString();
+              const name = title.replace(/\s*[|\-•(].*$/, "").trim() || profile.handle;
+              results.push({
+                platform,
+                name,
+                handle: profile.handle,
+                url: profile.url,
+                description: desc.slice(0, 220),
+                followers: extractFollowers(`${title} ${desc}`),
+                kind: classify(name, profile.handle),
+              });
+              kept++;
+            }
+          } catch (e) {
+            console.error(`Search failed for ${platform} (${pass}):`, e);
           }
-        } catch (e) {
-          console.error(`Search failed for ${platform}:`, e);
         }
       }
     }
@@ -228,7 +241,8 @@ Deno.serve(async (req) => {
         const r = await fetch("https://api.firecrawl.dev/v2/scrape", {
           method: "POST",
           headers: { Authorization: `Bearer ${firecrawlKey}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ url, formats: ["markdown"], onlyMainContent: true, timeout: 15000 }),
+          body: JSON.stringify({ url, formats: ["markdown"], onlyMainContent: true, timeout: 8000 }),
+          signal: AbortSignal.timeout(10000),
         });
         const d = await r.json().catch(() => null);
         if (!r.ok || !d) return true; // scrape bloque -> benefice du doute
@@ -238,15 +252,18 @@ Deno.serve(async (req) => {
         if (NOT_FOUND_RX.test(md)) return false;
         return true;
       } catch {
-        return true; // erreur reseau -> on garde
+        return true; // erreur reseau / timeout -> on garde
       }
     };
 
-    const verified: Influencer[] = [];
-    for (const inf of unique) {
-      if (verified.length >= perPlatform * platforms.length) break;
-      if (await profileExists(inf.url)) verified.push(inf);
-    }
+    // Vérification en PARALLÈLE (l'ancienne boucle séquentielle pouvait dépasser
+    // le temps max de la fonction et renvoyer 0 résultat).
+    const candidates = unique.slice(0, perPlatform * platforms.length);
+    const checks = await Promise.allSettled(candidates.map((inf) => profileExists(inf.url)));
+    const verified: Influencer[] = candidates.filter((_, i) => {
+      const c = checks[i];
+      return c.status === "fulfilled" ? c.value : true;
+    });
 
     return new Response(JSON.stringify({ success: true, keyword, count: verified.length, influencers: verified }), {
       status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
