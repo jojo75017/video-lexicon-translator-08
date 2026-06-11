@@ -645,10 +645,10 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 </div>
                 <p className="mt-1 text-[12px]" style={{ color: '#6f5e47' }}>
                   {parcours === 'full'
-                    ? 'Pack Tout Complet 497€ : la suite complète d\'auto-édition, tous les agents avancés débloqués.'
+                    ? 'Pack Tout Complet 497€ : écris, publie ET vends (emails de lancement, annonces, suivi des ventes, audio…) avec une IA au niveau maximal (sorties plus longues, variantes A/B).'
                     : hasFull
-                      ? 'Offre 197€ : 22 agents essentiels. Tu peux basculer en Pro à tout moment.'
-                      : 'Offre 197€ : les 22 agents essentiels pour aller de l\'idée au livre publié.'}
+                      ? 'Offre 197€ : 22 agents pour aller de l\'idée jusqu\'à publier ton livre sur Amazon. La phase Lancer & vendre reste en aperçu. Tu peux basculer en Pro à tout moment.'
+                      : 'Offre 197€ : 22 agents pour aller de l\'idée jusqu\'à publier ton livre sur Amazon. La phase Lancer & vendre (emails, annonces, suivi des ventes) s\'affiche en aperçu — débloquée avec le Pack 497€.'}
                 </p>
               </div>
               <div className="inline-flex rounded-xl border overflow-hidden" style={{ borderColor: `${AMBER}55` }}>
