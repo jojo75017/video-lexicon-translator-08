@@ -36,6 +36,7 @@ interface Body {
   userApiKey?: string;
   chapterIndex?: number;
   prevChapterTail?: string;
+  quality?: "core" | "pro";
 }
 
 type CallResult =
