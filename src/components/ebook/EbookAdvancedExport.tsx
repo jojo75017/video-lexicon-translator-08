@@ -21,6 +21,8 @@ interface EbookAdvancedExportProps {
   conclusion?: string;
   characters?: any[];
   coverImage?: string;
+  /** Gabarit KDP du PDF Impression (en pouces). Par défaut 6×9. */
+  trimSize?: { w: number; h: number };
 }
 
 type ExportFormat = 'docx-kdp' | 'epub' | 'pdf-print' | 'pdf-digital' | 'txt' | 'html';
