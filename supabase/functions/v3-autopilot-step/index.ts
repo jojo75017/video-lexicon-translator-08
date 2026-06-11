@@ -323,7 +323,7 @@ ${contextText}
 ## Ta mission
 Réalise concrètement cette étape maintenant et renvoie uniquement le livrable final, complet et développé.`;
 
-    const r = await callAI(system, user, 8192);
+    const r = await callAI(system, user, isPro ? 12288 : 8192);
     if (!r.ok) return aiError(r.status, r.body);
     const result = r.text;
 
