@@ -236,7 +236,7 @@ const ResultView: React.FC<{ text: string }> = ({ text }) => {
 const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpenModule }) => {
   const { apiKey: userGeminiKey } = useOpenAIConfig();
   // Droits réellement payés (197€ base / 497€ Pack Tout Complet). L'admin a tout.
-  const { hasFull, isAdmin: isV3Admin, loading: entLoading } = useV3Entitlement();
+  const { hasFull, loading: entLoading } = useV3Entitlement();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   // Parcours actif : 'core' = offre 197€ (22 agents), 'full' = Pack Tout Complet 497€ (32 agents).
   const [parcours, setParcours] = useState<Parcours>(
