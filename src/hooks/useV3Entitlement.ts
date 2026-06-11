@@ -69,7 +69,7 @@ export function useV3Entitlement() {
       }
     })();
     return () => { cancelled = true; };
-  }, [user?.email, isAuthenticated]);
+  }, []);
 
   return { loading, hasBase, hasFull, isAdmin };
 }
