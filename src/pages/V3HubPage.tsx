@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Sparkles, Crown, Compass, Lock, ArrowRight, Wand2, CheckCircle2, Layers, Infinity as InfinityIcon, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Search, Sparkles, Crown, Compass, Lock, ArrowRight, Wand2, CheckCircle2, Layers, Infinity as InfinityIcon, ShieldCheck, Map } from 'lucide-react';
 import {
   V3_MODULES, V3_PILLAR_META, getModuleAccess, type V3Pillar, type V3Module,
 } from '@/data/roadmapV3';
@@ -13,6 +13,7 @@ import V3PricingTiers from '@/components/admin/V3PricingTiers';
 import V3Workflow30 from '@/components/admin/V3Workflow30';
 import V3AccessRecap from '@/components/admin/V3AccessRecap';
 import V3GuidesSection from '@/components/admin/V3GuidesSection';
+import V3RoadmapTab from '@/components/admin/V3RoadmapTab';
 import pillarIa from '@/assets/v3/pillar-ia.jpg';
 import pillarPublier from '@/assets/v3/pillar-publier.jpg';
 import pillarMonetiser from '@/assets/v3/pillar-monetiser.jpg';
