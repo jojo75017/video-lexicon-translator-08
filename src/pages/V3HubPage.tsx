@@ -43,15 +43,19 @@ function ModuleCard({
   index,
   onOpen,
   isFirst,
+  unlocked,
 }: {
   module: V3Module;
   index: number;
   onOpen: (m: V3Module) => void;
   isFirst?: boolean;
+  /** L'abonné a-t-il réellement débloqué ce module (selon son achat) ? */
+  unlocked?: boolean;
 }) {
   const ref = React.useRef<HTMLButtonElement>(null);
   const [tilt, setTilt] = useState('');
   const clickable = isModuleClickable(module.id);
+  const access = getModuleAccess(module.id);
 
   const handleMove = (e: React.MouseEvent) => {
     const el = ref.current;
