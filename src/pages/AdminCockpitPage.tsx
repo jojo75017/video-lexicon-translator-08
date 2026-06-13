@@ -418,7 +418,7 @@ const AdminCockpitPage: React.FC = () => {
             <DialogContent className="max-w-6xl w-[95vw] h-[90vh] p-0 overflow-hidden flex flex-col">
               <DialogHeader className="px-4 py-3 border-b">
                 <DialogTitle className="flex items-center justify-between gap-3">
-                  <span>🎬 Formation EbookStudio Pro V2 — 24 slides</span>
+                  <span>🎬 Formation EbookStudio Pro V2 + teaser V3 — 30 slides</span>
                   <a
                     href={formationSlidesPdf}
                     download="Formation-EbookStudio-V2-Slides.pdf"
