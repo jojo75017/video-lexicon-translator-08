@@ -164,6 +164,7 @@ const AdminCockpitPage: React.FC = () => {
   const [cursor, setCursor] = useState<Date>(new Date());
   const [editing, setEditing] = useState<Launch | null>(null);
   const [draft, setDraft] = useState<Partial<Launch> | null>(null);
+  const [showFormation, setShowFormation] = useState(false);
   const { isAdmin, v3Mode, setV3Mode } = useV3Mode();
   const [selectedModule, setSelectedModule] = useState<V3Module | null>(null);
 
