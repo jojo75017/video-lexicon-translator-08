@@ -377,15 +377,16 @@ const AdminCockpitPage: React.FC = () => {
           <div className="flex items-center gap-2 mb-3">
             <Sparkles className="h-5 w-5" style={{ color: accent }} />
             <h2 className="text-lg font-bold">Formation V2 — présentation en slides</h2>
-            <span className="text-xs text-joy-ink/50">24 slides · script mot-à-mot · 22 min</span>
+            <span className="text-xs text-joy-ink/50">30 slides · script mot-à-mot · teaser V3</span>
           </div>
           <Card className="border border-joy-ink/8">
             <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center gap-4">
               <div className="flex-1">
                 <div className="font-semibold mb-1">🎬 EbookStudio Pro V2 — Formation Vidéo</div>
                 <div className="text-sm text-joy-ink/60 leading-snug">
-                  Présentation événementielle complète (24 slides), avec le script mot-à-mot
-                  prêt à présenter. Format PDF 16:9, couleurs de la marque.
+                  Présentation événementielle complète (24 slides V2 + 6 slides teaser V3
+                  pour le lancement du 1er octobre), avec le script mot-à-mot prêt à présenter.
+                  Format PDF 16:9, couleurs de la marque.
                 </div>
               </div>
               <div className="flex gap-2 shrink-0">
