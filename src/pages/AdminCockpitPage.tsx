@@ -387,7 +387,7 @@ const AdminCockpitPage: React.FC = () => {
               <div className="flex gap-2 shrink-0">
                 <Button
                   size="sm"
-                  onClick={() => window.open('/formation-v2-slides.pdf', '_blank', 'noopener,noreferrer')}
+                  onClick={() => setShowFormation(true)}
                   className="rounded-full px-4 gap-1.5"
                   style={{ background: teal, color: 'white' }}
                 >
@@ -401,13 +401,37 @@ const AdminCockpitPage: React.FC = () => {
                   className="rounded-full px-4"
                   style={{ borderColor: accent, color: accent }}
                 >
-                  <a href="/formation-v2-slides.pdf" download="Formation-EbookStudio-V2-Slides.pdf">
+                  <a href={formationSlidesPdf} download="Formation-EbookStudio-V2-Slides.pdf">
                     Télécharger
                   </a>
                 </Button>
               </div>
             </CardContent>
           </Card>
+
+          <Dialog open={showFormation} onOpenChange={setShowFormation}>
+            <DialogContent className="max-w-6xl w-[95vw] h-[90vh] p-0 overflow-hidden flex flex-col">
+              <DialogHeader className="px-4 py-3 border-b">
+                <DialogTitle className="flex items-center justify-between gap-3">
+                  <span>🎬 Formation EbookStudio Pro V2 — 24 slides</span>
+                  <a
+                    href={formationSlidesPdf}
+                    download="Formation-EbookStudio-V2-Slides.pdf"
+                    className="text-sm font-semibold underline"
+                    style={{ color: accent }}
+                  >
+                    Télécharger le PDF
+                  </a>
+                </DialogTitle>
+              </DialogHeader>
+              <iframe
+                src={formationSlidesPdf}
+                title="Formation EbookStudio Pro V2"
+                className="w-full flex-1 border-0"
+              />
+            </DialogContent>
+          </Dialog>
+
         </section>
 
         {/* Tunnel */}
