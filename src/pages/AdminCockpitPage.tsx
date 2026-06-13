@@ -74,6 +74,9 @@ import {
   parseISO, startOfMonth, startOfWeek, isAfter, differenceInCalendarDays,
 } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import formationSlidesPdf from '@/assets/formation-v2-slides.pdf';
+
+
 
 const TEAL = '#008296';
 const ORANGE = '#FF9E2D';
