@@ -118,6 +118,7 @@ const PromoBonusPage = lazy(() => import('./pages/promo/PromoBonusPage'));
 const PromoEspacePage = lazy(() => import('./pages/promo/PromoEspacePage'));
 const PromoAffiliePage = lazy(() => import('./pages/promo/PromoAffiliePage'));
 const InfluenceursPage = lazy(() => import('./pages/InfluenceursPage'));
+const GuideEbookPage = lazy(() => import('./pages/GuideEbookPage'));
 const InfluenceursConfirmationPage = lazy(() => import('./pages/InfluenceursConfirmationPage'));
 
 const PageLoader = () => (
@@ -369,6 +370,8 @@ const App = () => {
             <Route path="/promo/espace" element={<PromoEspacePage />} />
             <Route path="/promo/affilie" element={<PromoAffiliePage />} />
             <Route path="/influenceurs" element={<InfluenceursPage />} />
+            <Route path="/guide-ebook" element={<GuideEbookPage />} />
+
             <Route path="/influenceurs/merci" element={<InfluenceursConfirmationPage />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogArticleTemplate />} />

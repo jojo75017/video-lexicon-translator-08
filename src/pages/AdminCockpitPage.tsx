@@ -137,6 +137,7 @@ const TUNNEL_GROUPS: { name: string; tint: string; tiles: TunnelTile[] }[] = [
       { emoji: '📝', label: 'Posts sociaux',    caption: 'Générateur posts',    path: '/generateur-posts' },
       { emoji: '🎯', label: 'Prospects',        caption: 'Gestion prospects',   path: '/gestion-prospects' },
       { emoji: '📢', label: 'Influenceurs',     caption: 'Recrutement ambassadeurs', path: '/influenceurs' },
+      { emoji: '📘', label: 'Guide Ebook',      caption: 'PDF pour les curieux', path: '/guide-ebook' },
     ],
   },
 ];
