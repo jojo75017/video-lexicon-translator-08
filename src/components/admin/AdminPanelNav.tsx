@@ -22,6 +22,7 @@ const adminNavItems: AdminNavItem[] = [
   { label: 'Posts', path: '/generateur-posts', icon: MessageSquare, exact: true },
   { label: 'Marketing', path: '/dashboard-marketing', icon: BarChart3, exact: true },
   { label: 'Influenceurs', path: '/influenceurs', icon: Megaphone, exact: true },
+  { label: 'Guide Ebook', path: '/guide-ebook', icon: BookMarked, exact: true },
   { label: 'CRM', path: '/crm', icon: Contact, exact: true },
 ];
 
