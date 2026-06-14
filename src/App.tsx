@@ -118,6 +118,7 @@ const PromoBonusPage = lazy(() => import('./pages/promo/PromoBonusPage'));
 const PromoEspacePage = lazy(() => import('./pages/promo/PromoEspacePage'));
 const PromoAffiliePage = lazy(() => import('./pages/promo/PromoAffiliePage'));
 const InfluenceursPage = lazy(() => import('./pages/InfluenceursPage'));
+const GuideEbookPage = lazy(() => import('./pages/GuideEbookPage'));
 const InfluenceursConfirmationPage = lazy(() => import('./pages/InfluenceursConfirmationPage'));
 
 const PageLoader = () => (
