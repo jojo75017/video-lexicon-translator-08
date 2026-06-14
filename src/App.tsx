@@ -370,6 +370,8 @@ const App = () => {
             <Route path="/promo/espace" element={<PromoEspacePage />} />
             <Route path="/promo/affilie" element={<PromoAffiliePage />} />
             <Route path="/influenceurs" element={<InfluenceursPage />} />
+            <Route path="/guide-ebook" element={<GuideEbookPage />} />
+
             <Route path="/influenceurs/merci" element={<InfluenceursConfirmationPage />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogArticleTemplate />} />
