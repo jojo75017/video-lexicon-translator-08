@@ -458,6 +458,76 @@ const AdminCockpitPage: React.FC = () => {
 
         </section>
 
+        {/* Kit Influenceur — message prêt à l'envoi */}
+        <section>
+          <div className="flex items-center gap-2 mb-3">
+            <Send className="h-5 w-5" style={{ color: accent }} />
+            <h2 className="text-lg font-bold">Kit Influenceur — message prêt à l'envoi</h2>
+            <span className="text-xs text-joy-ink/50">3 liens à partager en 1 clic</span>
+          </div>
+          <Card className="border border-joy-ink/8">
+            <CardContent className="p-4 space-y-4">
+              <div className="flex flex-wrap gap-2">
+                <a
+                  href="https://ebookstudio.fr/guide-comprendre-ebook.pdf"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs font-semibold rounded-full px-3 py-1 border hover:opacity-80 transition-opacity"
+                  style={{ borderColor: `${teal}40`, color: teal }}
+                >
+                  📘 Guide PDF
+                </a>
+                <a
+                  href="https://ebookstudio.fr/formation-v2-slides.pdf"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs font-semibold rounded-full px-3 py-1 border hover:opacity-80 transition-opacity"
+                  style={{ borderColor: `${accent}40`, color: accent }}
+                >
+                  🎬 Formation V2 Slides
+                </a>
+                <a
+                  href="https://ebookstudio.fr/influenceurs"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs font-semibold rounded-full px-3 py-1 border hover:opacity-80 transition-opacity"
+                  style={{ borderColor: `${ink}40`, color: ink }}
+                >
+                  🤝 Page Influenceurs
+                </a>
+              </div>
+
+              <Textarea
+                value={influencerMessage}
+                onChange={(e) => setInfluencerMessage(e.target.value)}
+                rows={14}
+                className="text-sm leading-relaxed font-mono"
+              />
+
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  onClick={copyInfluencerMessage}
+                  className="rounded-full px-4 gap-1.5"
+                  style={{ background: teal, color: 'white' }}
+                >
+                  <Copy className="h-4 w-4" />
+                  {copied ? 'Copié !' : 'Copier le message'}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={resetInfluencerMessage}
+                  className="rounded-full px-4"
+                  style={{ borderColor: accent, color: accent }}
+                >
+                  Réinitialiser
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
         {/* Tunnel */}
         <section>
 
