@@ -554,6 +554,16 @@ const AdminCockpitPage: React.FC = () => {
                 <Button
                   size="sm"
                   variant="outline"
+                  onClick={saveCurrentTemplate}
+                  className="rounded-full px-4 gap-1.5"
+                  style={{ borderColor: teal, color: teal }}
+                >
+                  <Save className="h-4 w-4" />
+                  Enregistrer comme modèle
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
                   onClick={resetInfluencerMessage}
                   className="rounded-full px-4"
                   style={{ borderColor: accent, color: accent }}
@@ -561,6 +571,41 @@ const AdminCockpitPage: React.FC = () => {
                   Réinitialiser
                 </Button>
               </div>
+
+              {templates.length > 0 && (
+                <div className="space-y-2 pt-2 border-t border-joy-ink/8">
+                  <p className="text-xs font-semibold text-joy-ink/60 flex items-center gap-1.5">
+                    <FileText className="h-3.5 w-3.5" /> Mes modèles enregistrés ({templates.length})
+                  </p>
+                  <div className="space-y-1">
+                    {templates.map((tpl) => (
+                      <div
+                        key={tpl.id}
+                        className="flex items-center justify-between gap-2 rounded-lg border border-joy-ink/8 bg-joy-ink/[0.02] px-3 py-2"
+                      >
+                        <span className="text-sm font-medium truncate flex-1">{tpl.name}</span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => loadTemplate(tpl)}
+                          className="h-7 px-2 text-xs"
+                          style={{ color: teal }}
+                        >
+                          Charger
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => deleteTemplate(tpl.id, tpl.name)}
+                          className="h-7 w-7"
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </section>
