@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ArrowLeft, ChevronLeft, ChevronRight, Plus, Shield, Trash2, Calendar as CalendarIcon, Sparkles, Rocket, KeyRound } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Plus, Shield, Trash2, Calendar as CalendarIcon, Sparkles, Rocket, KeyRound, Copy, Send } from 'lucide-react';
 import { EbookSettingsPanel } from '@/components/ebook/EbookSettingsPanel';
 import { V3_MODULES, V3_PILLAR_META, V3_PILLAR_COLORS, V3_PRICE, V2_PRICE, type V3Pillar, type V3Module } from '@/data/roadmapV3';
 import { useV3Mode } from '@/hooks/useV3Mode';
