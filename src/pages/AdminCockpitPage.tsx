@@ -174,6 +174,43 @@ const AdminCockpitPage: React.FC = () => {
   const [influencerMessage, setInfluencerMessage] = useState(defaultInfluencerMessage);
   const [copied, setCopied] = useState(false);
 
+  const TEMPLATES_KEY = 'cockpit_message_templates';
+  type MsgTemplate = { id: string; name: string; content: string };
+  const [templates, setTemplates] = useState<MsgTemplate[]>(() => {
+    try {
+      const raw = localStorage.getItem(TEMPLATES_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(TEMPLATES_KEY, JSON.stringify(templates));
+    } catch {
+      /* ignore */
+    }
+  }, [templates]);
+
+  const saveCurrentTemplate = () => {
+    const name = window.prompt('Nom du modèle :', `Modèle ${templates.length + 1}`);
+    if (!name?.trim()) return;
+    const tpl: MsgTemplate = { id: crypto.randomUUID(), name: name.trim(), content: influencerMessage };
+    setTemplates((prev) => [...prev, tpl]);
+    toast.success(`Modèle "${tpl.name}" enregistré`);
+  };
+
+  const loadTemplate = (tpl: MsgTemplate) => {
+    setInfluencerMessage(tpl.content);
+    toast.success(`Modèle "${tpl.name}" chargé`);
+  };
+
+  const deleteTemplate = (id: string, name: string) => {
+    setTemplates((prev) => prev.filter((t) => t.id !== id));
+    toast.success(`Modèle "${name}" supprimé`);
+  };
+
   const copyInfluencerMessage = async () => {
     try {
       await navigator.clipboard.writeText(influencerMessage);
