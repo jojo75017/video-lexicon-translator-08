@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ArrowLeft, ChevronLeft, ChevronRight, Plus, Shield, Trash2, Calendar as CalendarIcon, Sparkles, Rocket, KeyRound, Copy, Send } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Plus, Shield, Trash2, Calendar as CalendarIcon, Sparkles, Rocket, KeyRound, Copy, Send, Save, FileText } from 'lucide-react';
 import { EbookSettingsPanel } from '@/components/ebook/EbookSettingsPanel';
 import { V3_MODULES, V3_PILLAR_META, V3_PILLAR_COLORS, V3_PRICE, V2_PRICE, type V3Pillar, type V3Module } from '@/data/roadmapV3';
 import { useV3Mode } from '@/hooks/useV3Mode';
@@ -173,6 +173,43 @@ const AdminCockpitPage: React.FC = () => {
 
   const [influencerMessage, setInfluencerMessage] = useState(defaultInfluencerMessage);
   const [copied, setCopied] = useState(false);
+
+  const TEMPLATES_KEY = 'cockpit_message_templates';
+  type MsgTemplate = { id: string; name: string; content: string };
+  const [templates, setTemplates] = useState<MsgTemplate[]>(() => {
+    try {
+      const raw = localStorage.getItem(TEMPLATES_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(TEMPLATES_KEY, JSON.stringify(templates));
+    } catch {
+      /* ignore */
+    }
+  }, [templates]);
+
+  const saveCurrentTemplate = () => {
+    const name = window.prompt('Nom du modèle :', `Modèle ${templates.length + 1}`);
+    if (!name?.trim()) return;
+    const tpl: MsgTemplate = { id: crypto.randomUUID(), name: name.trim(), content: influencerMessage };
+    setTemplates((prev) => [...prev, tpl]);
+    toast.success(`Modèle "${tpl.name}" enregistré`);
+  };
+
+  const loadTemplate = (tpl: MsgTemplate) => {
+    setInfluencerMessage(tpl.content);
+    toast.success(`Modèle "${tpl.name}" chargé`);
+  };
+
+  const deleteTemplate = (id: string, name: string) => {
+    setTemplates((prev) => prev.filter((t) => t.id !== id));
+    toast.success(`Modèle "${name}" supprimé`);
+  };
 
   const copyInfluencerMessage = async () => {
     try {
@@ -517,6 +554,16 @@ const AdminCockpitPage: React.FC = () => {
                 <Button
                   size="sm"
                   variant="outline"
+                  onClick={saveCurrentTemplate}
+                  className="rounded-full px-4 gap-1.5"
+                  style={{ borderColor: teal, color: teal }}
+                >
+                  <Save className="h-4 w-4" />
+                  Enregistrer comme modèle
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
                   onClick={resetInfluencerMessage}
                   className="rounded-full px-4"
                   style={{ borderColor: accent, color: accent }}
@@ -524,6 +571,41 @@ const AdminCockpitPage: React.FC = () => {
                   Réinitialiser
                 </Button>
               </div>
+
+              {templates.length > 0 && (
+                <div className="space-y-2 pt-2 border-t border-joy-ink/8">
+                  <p className="text-xs font-semibold text-joy-ink/60 flex items-center gap-1.5">
+                    <FileText className="h-3.5 w-3.5" /> Mes modèles enregistrés ({templates.length})
+                  </p>
+                  <div className="space-y-1">
+                    {templates.map((tpl) => (
+                      <div
+                        key={tpl.id}
+                        className="flex items-center justify-between gap-2 rounded-lg border border-joy-ink/8 bg-joy-ink/[0.02] px-3 py-2"
+                      >
+                        <span className="text-sm font-medium truncate flex-1">{tpl.name}</span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => loadTemplate(tpl)}
+                          className="h-7 px-2 text-xs"
+                          style={{ color: teal }}
+                        >
+                          Charger
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => deleteTemplate(tpl.id, tpl.name)}
+                          className="h-7 w-7"
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </section>
