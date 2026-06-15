@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ArrowLeft, ChevronLeft, ChevronRight, Plus, Shield, Trash2, Calendar as CalendarIcon, Sparkles, Rocket, KeyRound } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Plus, Shield, Trash2, Calendar as CalendarIcon, Sparkles, Rocket, KeyRound, Copy, Send } from 'lucide-react';
 import { EbookSettingsPanel } from '@/components/ebook/EbookSettingsPanel';
 import { V3_MODULES, V3_PILLAR_META, V3_PILLAR_COLORS, V3_PRICE, V2_PRICE, type V3Pillar, type V3Module } from '@/data/roadmapV3';
 import { useV3Mode } from '@/hooks/useV3Mode';
@@ -168,6 +168,24 @@ const AdminCockpitPage: React.FC = () => {
   const [showFormation, setShowFormation] = useState(false);
   const { isAdmin, v3Mode, setV3Mode } = useV3Mode();
   const [selectedModule, setSelectedModule] = useState<V3Module | null>(null);
+
+  const defaultInfluencerMessage = `Bonjour [Prénom],\n\nJe te contacte car je pense que ton audience pourrait adorer découvrir EbookStudio Pro — la plateforme qui transforme une idée en ebook professionnel prêt pour Amazon KDP, en quelques clics.\n\nPour te donner un aperçu concret, je te mets 2 ressources à disposition :\n\n📘 Le guide "Comprendre l'ebook en 5 minutes" (PDF) :\nhttps://ebookstudio.fr/guide-comprendre-ebook.pdf\n\n🎬 La formation V2 complète (30 slides + script mot-à-mot) :\nhttps://ebookstudio.fr/formation-v2-slides.pdf\n\nEt si tu veux en savoir plus sur le programme ambassadeur (30% de commission à vie) :\n🤝 https://ebookstudio.fr/influenceurs\n\nN'hésite pas si tu as des questions. Je suis dispo pour en parler !\n\nBien à toi,\nGeorges`;
+
+  const [influencerMessage, setInfluencerMessage] = useState(defaultInfluencerMessage);
+  const [copied, setCopied] = useState(false);
+
+  const copyInfluencerMessage = async () => {
+    try {
+      await navigator.clipboard.writeText(influencerMessage);
+      setCopied(true);
+      toast.success('Message copié dans le presse-papiers');
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error('Impossible de copier automatiquement');
+    }
+  };
+
+  const resetInfluencerMessage = () => setInfluencerMessage(defaultInfluencerMessage);
 
   // Thème conditionnel : V2 (KDP clair) par défaut, V3 (Midnight Indigo) quand v3Mode est actif.
   const skin = isAdmin && v3Mode;
@@ -438,6 +456,76 @@ const AdminCockpitPage: React.FC = () => {
             </DialogContent>
           </Dialog>
 
+        </section>
+
+        {/* Kit Influenceur — message prêt à l'envoi */}
+        <section>
+          <div className="flex items-center gap-2 mb-3">
+            <Send className="h-5 w-5" style={{ color: accent }} />
+            <h2 className="text-lg font-bold">Kit Influenceur — message prêt à l'envoi</h2>
+            <span className="text-xs text-joy-ink/50">3 liens à partager en 1 clic</span>
+          </div>
+          <Card className="border border-joy-ink/8">
+            <CardContent className="p-4 space-y-4">
+              <div className="flex flex-wrap gap-2">
+                <a
+                  href="https://ebookstudio.fr/guide-comprendre-ebook.pdf"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs font-semibold rounded-full px-3 py-1 border hover:opacity-80 transition-opacity"
+                  style={{ borderColor: `${teal}40`, color: teal }}
+                >
+                  📘 Guide PDF
+                </a>
+                <a
+                  href="https://ebookstudio.fr/formation-v2-slides.pdf"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs font-semibold rounded-full px-3 py-1 border hover:opacity-80 transition-opacity"
+                  style={{ borderColor: `${accent}40`, color: accent }}
+                >
+                  🎬 Formation V2 Slides
+                </a>
+                <a
+                  href="https://ebookstudio.fr/influenceurs"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs font-semibold rounded-full px-3 py-1 border hover:opacity-80 transition-opacity"
+                  style={{ borderColor: `${ink}40`, color: ink }}
+                >
+                  🤝 Page Influenceurs
+                </a>
+              </div>
+
+              <Textarea
+                value={influencerMessage}
+                onChange={(e) => setInfluencerMessage(e.target.value)}
+                rows={14}
+                className="text-sm leading-relaxed font-mono"
+              />
+
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  onClick={copyInfluencerMessage}
+                  className="rounded-full px-4 gap-1.5"
+                  style={{ background: teal, color: 'white' }}
+                >
+                  <Copy className="h-4 w-4" />
+                  {copied ? 'Copié !' : 'Copier le message'}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={resetInfluencerMessage}
+                  className="rounded-full px-4"
+                  style={{ borderColor: accent, color: accent }}
+                >
+                  Réinitialiser
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </section>
 
         {/* Tunnel */}
