@@ -169,6 +169,24 @@ const AdminCockpitPage: React.FC = () => {
   const { isAdmin, v3Mode, setV3Mode } = useV3Mode();
   const [selectedModule, setSelectedModule] = useState<V3Module | null>(null);
 
+  const defaultInfluencerMessage = `Bonjour [Prénom],\n\nJe te contacte car je pense que ton audience pourrait adorer découvrir EbookStudio Pro — la plateforme qui transforme une idée en ebook professionnel prêt pour Amazon KDP, en quelques clics.\n\nPour te donner un aperçu concret, je te mets 2 ressources à disposition :\n\n📘 Le guide "Comprendre l'ebook en 5 minutes" (PDF) :\nhttps://ebookstudio.fr/guide-comprendre-ebook.pdf\n\n🎬 La formation V2 complète (30 slides + script mot-à-mot) :\nhttps://ebookstudio.fr/formation-v2-slides.pdf\n\nEt si tu veux en savoir plus sur le programme ambassadeur (30% de commission à vie) :\n🤝 https://ebookstudio.fr/influenceurs\n\nN'hésite pas si tu as des questions. Je suis dispo pour en parler !\n\nBien à toi,\nGeorges`;
+
+  const [influencerMessage, setInfluencerMessage] = useState(defaultInfluencerMessage);
+  const [copied, setCopied] = useState(false);
+
+  const copyInfluencerMessage = async () => {
+    try {
+      await navigator.clipboard.writeText(influencerMessage);
+      setCopied(true);
+      toast.success('Message copié dans le presse-papiers');
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error('Impossible de copier automatiquement');
+    }
+  };
+
+  const resetInfluencerMessage = () => setInfluencerMessage(defaultInfluencerMessage);
+
   // Thème conditionnel : V2 (KDP clair) par défaut, V3 (Midnight Indigo) quand v3Mode est actif.
   const skin = isAdmin && v3Mode;
   const teal = skin ? '#4f46e5' : TEAL;
