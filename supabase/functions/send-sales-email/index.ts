@@ -324,7 +324,7 @@ Deno.serve(async (req) => {
           current_step: stepToSend,
           last_email_sent_at: new Date().toISOString(),
           next_email_at: nextSeq ? nextAt.toISOString() : null,
-          completed: stepToSend >= 5,
+          completed: stepToSend >= 6,
         }).eq("id", prospect.id);
 
         sent++;
