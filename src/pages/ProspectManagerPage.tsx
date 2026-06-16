@@ -100,12 +100,18 @@ const ProspectManagerPage = () => {
       setProspects(data || []);
     }
     fetchOpens();
+    fetchClicks();
     setLoading(false);
-  }, [fetchOpens]);
+  }, [fetchOpens, fetchClicks]);
 
   const hasOpened = useCallback(
     (email: string) => !!opensByEmail[(email || '').toLowerCase().trim()],
     [opensByEmail]
+  );
+
+  const hasClicked = useCallback(
+    (email: string) => !!clicksByEmail[(email || '').toLowerCase().trim()],
+    [clicksByEmail]
   );
 
   useEffect(() => {
