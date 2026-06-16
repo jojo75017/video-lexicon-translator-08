@@ -33,7 +33,7 @@ const OFFERS: Offer[] = [
     icon: Crown,
     badge: "Offre Fondateur - À VIE",
     title: "Accès À Vie 67€",
-    subtitle: "Payez une seule fois, accès illimité pour toujours (offre jusqu'au 15 septembre)",
+    subtitle: "Payez une seule fois, accès illimité pour toujours (offre jusqu'au 30 septembre)",
     score: 99,
     price: "67€",
     oldPrice: "197€",
@@ -41,10 +41,10 @@ const OFFERS: Offer[] = [
       "Paiement unique - aucun abonnement",
       "Accès à vie à tous les 15 agents IA",
       "Toutes les futures mises à jour incluses",
-      "⏰ Tarif de lancement jusqu'au 15 septembre (puis 197€ à vie)",
+      "⏰ Tarif de lancement jusqu'au 30 septembre (puis 197€ à vie)",
     ],
     longDescription:
-      "L'offre fondateur unique : payez 67€ une seule fois et accédez à Ebookstudio Pro V2 À VIE. Après le 15 septembre, le tarif passera définitivement à 197€ à vie. Aucun abonnement, aucun renouvellement, toutes les futures fonctionnalités incluses.",
+      "L'offre fondateur unique : payez 67€ une seule fois et accédez à Ebookstudio Pro V2 À VIE. Après le 30 septembre, le tarif passera définitivement à 197€ à vie. Aucun abonnement, aucun renouvellement, toutes les futures fonctionnalités incluses.",
     features: [
       "✅ Accès illimité À VIE (paiement unique)",
       "✅ Workflow complet 15 agents IA (P1 à P15)",
@@ -152,7 +152,7 @@ export default function OffresKdpRocket() {
             Une seule offre, <span className="text-[#FF6B1A]">claire et définitive</span>
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            <strong>67€ une seule fois = accès à vie.</strong> Tarif de lancement valable jusqu'au <strong>15 septembre</strong> - ensuite il passera à 197€ à vie.
+            <strong>67€ une seule fois = accès à vie.</strong> Tarif de lancement valable jusqu'au <strong>30 septembre</strong> - ensuite il passera à 197€ à vie.
           </p>
         </div>
 

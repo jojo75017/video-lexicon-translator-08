@@ -203,7 +203,7 @@ const PromoDecouvertePage = () => {
         <div className="bg-white border-2 border-[#008296] rounded-2xl p-8 mt-8 shadow-lg relative">
           {offerActive && (
             <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#EC4899] to-[#FF9E2D] text-white text-xs font-black px-4 py-1.5 rounded-full shadow-lg animate-pulse">
-              🎁 OFFRE FONDATEUR — JUSQU'AU 30 JUIN 2026
+              🎁 OFFRE FONDATEUR — JUSQU'AU 30 SEPTEMBRE 2026
             </div>
           )}
           <p className="text-sm font-semibold text-[#FF9E2D] uppercase">Accès à vie</p>

@@ -112,7 +112,7 @@ Comparez avec un ghostwriter à 500€... ou un designer à 150€ la couverture
 
 👉 **Découvrir Ebookstudio Pro V2** : [LIEN OFFRES]
 
-L'offre Fondateur à 67€ (au lieu de 197€) est disponible jusqu'au 1er juillet.
+L'offre Fondateur à 67€ (au lieu de 197€) est disponible jusqu'au 30 septembre 2026.
 
 Georges
 

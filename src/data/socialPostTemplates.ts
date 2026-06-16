@@ -120,7 +120,7 @@ Avec Ebookstudio Pro V2, un ebook par niche en ~47 min.
     visualDescription: 'Bandeau rouge "DERNIÈRE SEMAINE", prix barré 197€ → 67€, timer visuel.',
     content: `⏰ [DERNIÈRE SEMAINE] Offre Fondateur Ebookstudio Pro V2
 
-Le 1er juillet, le prix passe à 197€.
+Le 1er octobre, le prix passe à 197€.
 
 Pour 67€ (valeur 749€) :
 🔥 Générateur IA illimité

@@ -326,7 +326,7 @@ export const V3_MODULES: V3Module[] = [
   { id: 'goodreads-optimizer',   pillar: 'marketing', status: 'done', title: 'Optimiseur Goodreads',
     description: 'Fiche, description et plan d’animation lecteurs optimisés pour Goodreads.' },
   { id: 'influencer-kit',        pillar: 'marketing', status: 'done', title: 'Kit Influenceurs TikTok / Insta',
-    description: 'Génère un lien + code de suivi unique par influenceur, message d’approche prêt à coller, mockup premium et PDF "Dossier Influenceur" (scripts vidéo inclus). Commission 30% : 20,10€/vente maintenant (67€) → 59,10€/vente dès octobre (197€ V3). Page publique partageable : /influenceurs.' },
+    description: 'Génère un lien + code de suivi unique par influenceur, message d’approche prêt à coller, mockup premium et PDF "Dossier Influenceur" (scripts vidéo inclus). Commission 30% : 20,10€/vente maintenant (67€) → 59,10€/vente dès le 1er octobre (197€ V3). Page publique partageable : /influenceurs.' },
 
   // IA AVANCÉE
   { id: 'p23-universe-bible',    pillar: 'ia',        status: 'done', title: 'BIBLE — Cohérence Univers (P23)',
