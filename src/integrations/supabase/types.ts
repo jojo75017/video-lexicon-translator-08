@@ -617,6 +617,33 @@ export type Database = {
         }
         Relationships: []
       }
+      email_clicks: {
+        Row: {
+          clicked_at: string
+          clicked_url: string
+          email_step: number | null
+          id: string
+          prospect_email: string
+          user_agent: string | null
+        }
+        Insert: {
+          clicked_at?: string
+          clicked_url: string
+          email_step?: number | null
+          id?: string
+          prospect_email: string
+          user_agent?: string | null
+        }
+        Update: {
+          clicked_at?: string
+          clicked_url?: string
+          email_step?: number | null
+          id?: string
+          prospect_email?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       email_opens: {
         Row: {
           email_step: number
