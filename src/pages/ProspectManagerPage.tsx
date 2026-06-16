@@ -28,6 +28,7 @@ interface Prospect {
   last_email_sent_at: string | null;
   next_email_at: string | null;
   imported_at: string;
+  source?: string;
 }
 
 const STEPS = [
