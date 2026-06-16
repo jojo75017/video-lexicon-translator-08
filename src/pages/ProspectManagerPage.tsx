@@ -423,6 +423,21 @@ const ProspectManagerPage = () => {
                           <td className="px-3 py-2 text-foreground">{p.email}</td>
                           <td className="px-3 py-2 text-foreground">{p.first_name || '—'}</td>
                           <td className="px-3 py-2 text-center">
+                            {(() => {
+                              const o = opensByEmail[(p.email || '').toLowerCase().trim()];
+                              if (o) {
+                                return (
+                                  <Badge className="bg-orange-500/15 text-orange-400 border-orange-500/30">
+                                    🔥 Ouvert ×{o.count}
+                                  </Badge>
+                                );
+                              }
+                              return p.current_step > 0
+                                ? <Badge variant="outline" className="text-muted-foreground">Envoyé</Badge>
+                                : <span className="text-muted-foreground text-xs">—</span>;
+                            })()}
+                          </td>
+                          <td className="px-3 py-2 text-center">
                             <Badge variant="outline" className="border-gold/30 text-gold-light">
                               {p.current_step}/5
                             </Badge>
