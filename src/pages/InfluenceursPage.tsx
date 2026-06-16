@@ -128,11 +128,20 @@ const InfluenceursPage = () => {
   const messages: { key: string; label: string; body: string }[] = [
     {
       key: 'dm',
-      label: 'DM TikTok / Insta',
-      body: `Hello 👋 J'utilise Ebookstudio Pro pour générer un livre complet (plan, chapitres, couverture Amazon KDP, SEO) en 30 min avec l'IA.
+      label: 'DM TikTok / Insta (1er message SANS lien)',
+      body: `Hello 👋 j'adore ton contenu ! Je développe un outil qui génère un livre Amazon complet (plan, chapitres, couverture KDP) en 30 min avec l'IA, et je cherche 2-3 ambassadeurs (30% de commission par vente).
 
-Si ça t'intéresse, voici mon lien : ${shareLink}
-Paiement unique ${price}€ à vie, zéro abonnement. Dis-moi si tu veux que je te montre 🚀`,
+Ça t'intéresse d'en savoir plus ? Réponds-moi juste « LIVRE » et je t'envoie tout 📚
+
+⚠️ N'AJOUTE PAS de lien dans ce 1er message : Instagram/TikTok le cacheraient dans « Demandes » (personne ne le voit). Le lien part au 2e message, une fois qu'ils répondent.`,
+    },
+    {
+      key: 'dm2',
+      label: 'DM — 2e message AVEC le lien',
+      body: `Super ! Voilà tout 👇
+Mon lien perso : ${shareLink}
+
+Paiement unique ${price}€ à vie, zéro abonnement, et 30% de commission pour toi sur chaque vente. Dis-moi si tu veux que je t'aide à publier ton premier post ✨`,
     },
     {
       key: 'bio',
@@ -463,8 +472,8 @@ C'est un paiement unique de ${price}€ à vie, sans abonnement.
           </h2>
           <p className="text-sm text-[#232F3E]/65">
             {code
-              ? 'Ton lien est déjà inséré dans chaque message. Choisis un format, copie et envoie.'
-              : 'Rejoins le programme pour insérer automatiquement ton lien. Tu peux déjà copier les modèles ci-dessous.'}
+              ? 'Ton lien est déjà inséré dans les messages qui en ont besoin. En DM : envoie d\'abord le message SANS lien, puis le 2e message avec le lien quand la personne répond.'
+              : 'Rejoins le programme pour insérer automatiquement ton lien. En DM, envoie toujours le 1er message SANS lien (sinon il tombe dans « Demandes »), puis le lien quand on te répond.'}
           </p>
           <Tabs defaultValue={messages[0].key}>
             <TabsList className="flex flex-wrap h-auto">
