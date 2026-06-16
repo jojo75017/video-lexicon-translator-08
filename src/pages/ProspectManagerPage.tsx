@@ -47,6 +47,24 @@ const ProspectManagerPage = () => {
   const [sending, setSending] = useState(false);
   const [importing, setImporting] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  // Map email -> { count, last } pour les ouvertures d'emails (preuve de réception/lecture)
+  const [opensByEmail, setOpensByEmail] = useState<Record<string, { count: number; last: string }>>({});
+
+  const fetchOpens = useCallback(async () => {
+    const { data, error } = await (supabase as any)
+      .from('email_opens')
+      .select('prospect_email, opened_at');
+    if (error || !data) return;
+    const map: Record<string, { count: number; last: string }> = {};
+    for (const row of data as { prospect_email: string; opened_at: string }[]) {
+      const key = (row.prospect_email || '').toLowerCase().trim();
+      if (!key) continue;
+      if (!map[key]) map[key] = { count: 0, last: row.opened_at };
+      map[key].count += 1;
+      if (row.opened_at > map[key].last) map[key].last = row.opened_at;
+    }
+    setOpensByEmail(map);
+  }, []);
 
   const fetchProspects = useCallback(async () => {
     setLoading(true);
@@ -61,8 +79,14 @@ const ProspectManagerPage = () => {
     } else {
       setProspects(data || []);
     }
+    fetchOpens();
     setLoading(false);
-  }, []);
+  }, [fetchOpens]);
+
+  const hasOpened = useCallback(
+    (email: string) => !!opensByEmail[(email || '').toLowerCase().trim()],
+    [opensByEmail]
+  );
 
   useEffect(() => {
     let isMounted = true;
@@ -174,6 +198,35 @@ const ProspectManagerPage = () => {
     setSending(false);
   };
 
+  // Relancer uniquement les prospects "chauds" = ceux qui ont déjà ouvert un email
+  const handleRelancerChauds = async (step: number) => {
+    const ids = prospects
+      .filter(p => p.status === 'active' && !p.unsubscribed && !p.completed && hasOpened(p.email))
+      .map(p => p.id);
+
+    if (ids.length === 0) {
+      toast.error('Aucun prospect chaud (aucune ouverture détectée pour l\'instant)');
+      return;
+    }
+
+    setSending(true);
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      const { data, error } = await supabase.functions.invoke('send-sales-email', {
+        body: { mode: 'manual', step, prospect_ids: ids },
+        headers: { Authorization: `Bearer ${session.session?.access_token}` },
+      });
+      if (error) throw error;
+      toast.success(`🔥 ${data.sent} prospects chauds relancés (étape ${step})`);
+      fetchProspects();
+    } catch (err: any) {
+      toast.error('Erreur d\'envoi : ' + (err.message || ''));
+    }
+    setSending(false);
+  };
+
+
+
   const toggleAutoSend = async (id: string, value: boolean) => {
     await (supabase as any).from('sales_prospects').update({ auto_send: value }).eq('id', id);
     setProspects(prev => prev.map(p => p.id === id ? { ...p, auto_send: value } : p));
@@ -209,6 +262,7 @@ const ProspectManagerPage = () => {
   const active = prospects.filter(p => p.status === 'active' && !p.completed).length;
   const completed = prospects.filter(p => p.completed).length;
   const autoEnabled = prospects.filter(p => p.auto_send).length;
+  const hotCount = prospects.filter(p => p.status === 'active' && !p.completed && hasOpened(p.email)).length;
 
   const stepDistribution = STEPS.map(s => ({
     ...s,
@@ -230,7 +284,14 @@ const ProspectManagerPage = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+          <Card className="bg-card border-border ring-1 ring-orange-500/40">
+            <CardContent className="p-4 text-center">
+              <Zap className="h-6 w-6 mx-auto mb-2 text-orange-400" />
+              <div className="text-2xl font-bold text-orange-400">{hotCount}</div>
+              <div className="text-xs text-muted-foreground">🔥 Chauds (ont ouvert)</div>
+            </CardContent>
+          </Card>
           <Card className="bg-card border-border">
             <CardContent className="p-4 text-center">
               <Users className="h-6 w-6 mx-auto mb-2 text-gold-light" />
@@ -341,6 +402,7 @@ const ProspectManagerPage = () => {
                         <th className="px-3 py-2 text-left text-muted-foreground font-medium">✓</th>
                         <th className="px-3 py-2 text-left text-muted-foreground font-medium">Email</th>
                         <th className="px-3 py-2 text-left text-muted-foreground font-medium">Prénom</th>
+                        <th className="px-3 py-2 text-center text-muted-foreground font-medium">Reçu / Ouvert</th>
                         <th className="px-3 py-2 text-center text-muted-foreground font-medium">Étape</th>
                         <th className="px-3 py-2 text-center text-muted-foreground font-medium">Auto</th>
                         <th className="px-3 py-2 text-center text-muted-foreground font-medium">Statut</th>
@@ -360,6 +422,21 @@ const ProspectManagerPage = () => {
                           </td>
                           <td className="px-3 py-2 text-foreground">{p.email}</td>
                           <td className="px-3 py-2 text-foreground">{p.first_name || '—'}</td>
+                          <td className="px-3 py-2 text-center">
+                            {(() => {
+                              const o = opensByEmail[(p.email || '').toLowerCase().trim()];
+                              if (o) {
+                                return (
+                                  <Badge className="bg-orange-500/15 text-orange-400 border-orange-500/30">
+                                    🔥 Ouvert ×{o.count}
+                                  </Badge>
+                                );
+                              }
+                              return p.current_step > 0
+                                ? <Badge variant="outline" className="text-muted-foreground">Envoyé</Badge>
+                                : <span className="text-muted-foreground text-xs">—</span>;
+                            })()}
+                          </td>
                           <td className="px-3 py-2 text-center">
                             <Badge variant="outline" className="border-gold/30 text-gold-light">
                               {p.current_step}/5
@@ -403,6 +480,28 @@ const ProspectManagerPage = () => {
 
           {/* MANUAL SEND TAB */}
           <TabsContent value="send" className="space-y-4">
+            {/* Relance prioritaire des prospects chauds */}
+            <Card className="bg-card border-orange-500/40 ring-1 ring-orange-500/20">
+              <CardHeader>
+                <CardTitle className="text-orange-400 text-lg flex items-center gap-2">
+                  <Zap className="h-5 w-5" /> Relancer les prospects chauds
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  {hotCount} prospect(s) ont déjà <strong>ouvert</strong> un de vos emails. Ce sont vos meilleurs leads : relancez-les en priorité avec l'email d'urgence (étape 4).
+                </p>
+              </CardHeader>
+              <CardContent>
+                <Button
+                  onClick={() => handleRelancerChauds(4)}
+                  disabled={sending || hotCount === 0}
+                  className="bg-gradient-to-r from-orange-500 to-amber-500 text-black font-semibold hover:opacity-90"
+                >
+                  <Zap className="h-4 w-4 mr-2" />
+                  {sending ? 'Envoi...' : `🔥 Relancer les ${hotCount} chauds (étape 4 - Urgence)`}
+                </Button>
+              </CardContent>
+            </Card>
+
             <Card className="bg-card border-border">
               <CardHeader>
                 <CardTitle className="text-gradient-gold text-lg">Envoi Manuel par Vague</CardTitle>
