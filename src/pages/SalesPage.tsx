@@ -142,6 +142,7 @@ const SalesPage = () => {
   const location = useLocation();
   const [hasSubscriberAccess, setHasSubscriberAccess] = useState(false);
   const [hasAdminSession, setHasAdminSession] = useState(false);
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
