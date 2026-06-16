@@ -11,7 +11,7 @@ export function clearAdminCache() {
   try { localStorage.removeItem(LS_KEY); } catch {}
 }
 
-function readLocalCache(): boolean | null {
+export function readLocalCache(): boolean | null {
   try {
     const raw = localStorage.getItem(LS_KEY);
     if (!raw) return null;

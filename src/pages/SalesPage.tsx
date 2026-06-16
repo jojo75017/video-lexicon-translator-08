@@ -35,6 +35,7 @@ import {
   trackNewsletterSignup,
   trackPlanSelect,
 } from "@/utils/analytics";
+import { getIsCurrentSessionAdmin, readLocalCache } from "@/lib/adminAccess";
 
 import CoachingVipBanner from "@/components/sales/CoachingVipBanner";
 import CountdownDeadline from "@/components/sales/CountdownDeadline";
@@ -141,6 +142,7 @@ const SalesPage = () => {
   const location = useLocation();
   const [hasSubscriberAccess, setHasSubscriberAccess] = useState(false);
   const [hasAdminSession, setHasAdminSession] = useState(false);
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -166,11 +168,11 @@ const SalesPage = () => {
           subscriberAccess = false;
         }
       }
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const isAdmin = await getIsCurrentSessionAdmin();
+      const wasAdmin = !!readLocalCache();
       setHasSubscriberAccess(subscriberAccess);
-      setHasAdminSession(Boolean(session));
+      setHasAdminSession(isAdmin);
+      setShowAdminLogin(wasAdmin || isAdmin);
     };
     void refresh();
     const {
@@ -304,6 +306,11 @@ const SalesPage = () => {
             <a href="#resultats" className="text-muted-foreground hover:text-foreground transition">Résultats</a>
             <a href="#pricing" className="text-muted-foreground hover:text-foreground transition">Tarif</a>
             <Link to="/subscription" className="text-muted-foreground hover:text-foreground transition">Connexion</Link>
+            {showAdminLogin && (
+              <Link to="/auth" className="text-accent hover:text-accent/80 transition font-bold">
+                Connexion
+              </Link>
+            )}
           </nav>
 
           <Button
