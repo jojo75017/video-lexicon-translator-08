@@ -253,6 +253,67 @@ const ProspectManagerPage = () => {
 
 
 
+  // Rapatrier les prospects vers le CRM (table crm_contacts) pour alimenter le pipeline
+  const handleSyncToCrm = async () => {
+    if (prospects.length === 0) {
+      toast.error('Aucun prospect à rapatrier');
+      return;
+    }
+    setSyncing(true);
+    try {
+      // Emails déjà présents dans le CRM (pour éviter les doublons)
+      const { data: existing } = await (supabase as any)
+        .from('crm_contacts')
+        .select('email');
+      const existingEmails = new Set(
+        (existing || []).map((r: { email: string }) => (r.email || '').toLowerCase().trim())
+      );
+
+      const rows = prospects
+        .filter(p => p.email && !existingEmails.has(p.email.toLowerCase().trim()))
+        .map(p => {
+          const key = p.email.toLowerCase().trim();
+          const opens = opensByEmail[key];
+          const clicks = clicksByEmail[key];
+          const opened = opens?.count || 0;
+          const clicked = clicks?.count || 0;
+          let temperature = 'cold';
+          if (clicked > 0) temperature = 'hot';
+          else if (opened > 0) temperature = 'warm';
+          return {
+            email: p.email,
+            first_name: p.first_name || '',
+            source: p.source || 'prospects_import',
+            status: 'lead',
+            temperature,
+            total_emails_opened: opened,
+            total_clicks: clicked,
+            last_interaction_at: opens?.last || clicks ? (opens?.last || null) : null,
+            notes: `Importé depuis Prospects (étape ${p.current_step})`,
+          };
+        });
+
+      if (rows.length === 0) {
+        toast.info('Tous les prospects sont déjà dans le CRM ✅');
+        setSyncing(false);
+        return;
+      }
+
+      // Insertion par lots de 500
+      let inserted = 0;
+      for (let i = 0; i < rows.length; i += 500) {
+        const batch = rows.slice(i, i + 500);
+        const { error } = await (supabase as any).from('crm_contacts').insert(batch);
+        if (error) throw error;
+        inserted += batch.length;
+      }
+      toast.success(`✅ ${inserted} prospects rapatriés dans le CRM`);
+    } catch (err: any) {
+      toast.error('Erreur de rapatriement : ' + (err.message || ''));
+    }
+    setSyncing(false);
+  };
+
   const toggleAutoSend = async (id: string, value: boolean) => {
     await (supabase as any).from('sales_prospects').update({ auto_send: value }).eq('id', id);
     setProspects(prev => prev.map(p => p.id === id ? { ...p, auto_send: value } : p));
