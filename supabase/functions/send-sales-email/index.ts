@@ -313,7 +313,7 @@ Deno.serve(async (req) => {
             accept: "application/json",
           },
           body: JSON.stringify({
-            sender: { name: "Georges Boubet", email: "noreply@ebookstudio.fr" },
+            sender: { name: "Georges Boubet", email: "contact@trafic-affiliation.com" },
             to: [{ email: prospect.email, name: prospect.first_name || undefined }],
             subject: seqInfo.subject,
             htmlContent,
