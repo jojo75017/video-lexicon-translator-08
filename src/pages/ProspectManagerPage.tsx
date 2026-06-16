@@ -198,6 +198,35 @@ const ProspectManagerPage = () => {
     setSending(false);
   };
 
+  // Relancer uniquement les prospects "chauds" = ceux qui ont déjà ouvert un email
+  const handleRelancerChauds = async (step: number) => {
+    const ids = prospects
+      .filter(p => p.status === 'active' && !p.unsubscribed && !p.completed && hasOpened(p.email))
+      .map(p => p.id);
+
+    if (ids.length === 0) {
+      toast.error('Aucun prospect chaud (aucune ouverture détectée pour l\'instant)');
+      return;
+    }
+
+    setSending(true);
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      const { data, error } = await supabase.functions.invoke('send-sales-email', {
+        body: { mode: 'manual', step, prospect_ids: ids },
+        headers: { Authorization: `Bearer ${session.session?.access_token}` },
+      });
+      if (error) throw error;
+      toast.success(`🔥 ${data.sent} prospects chauds relancés (étape ${step})`);
+      fetchProspects();
+    } catch (err: any) {
+      toast.error('Erreur d\'envoi : ' + (err.message || ''));
+    }
+    setSending(false);
+  };
+
+
+
   const toggleAutoSend = async (id: string, value: boolean) => {
     await (supabase as any).from('sales_prospects').update({ auto_send: value }).eq('id', id);
     setProspects(prev => prev.map(p => p.id === id ? { ...p, auto_send: value } : p));
