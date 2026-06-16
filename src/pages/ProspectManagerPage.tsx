@@ -458,17 +458,30 @@ const ProspectManagerPage = () => {
                           <td className="px-3 py-2 text-foreground">{p.first_name || '—'}</td>
                           <td className="px-3 py-2 text-center">
                             {(() => {
-                              const o = opensByEmail[(p.email || '').toLowerCase().trim()];
-                              if (o) {
-                                return (
-                                  <Badge className="bg-orange-500/15 text-orange-400 border-orange-500/30">
-                                    🔥 Ouvert ×{o.count}
-                                  </Badge>
-                                );
-                              }
-                              return p.current_step > 0
-                                ? <Badge variant="outline" className="text-muted-foreground">Envoyé</Badge>
-                                : <span className="text-muted-foreground text-xs">—</span>;
+                              const key = (p.email || '').toLowerCase().trim();
+                              const o = opensByEmail[key];
+                              const c = clicksByEmail[key];
+                              return (
+                                <div className="flex flex-col items-center gap-1">
+                                  {o ? (
+                                    <Badge className="bg-orange-500/15 text-orange-400 border-orange-500/30">
+                                      🔥 Ouvert ×{o.count}
+                                    </Badge>
+                                  ) : p.current_step > 0 ? (
+                                    <Badge variant="outline" className="text-muted-foreground">Envoyé</Badge>
+                                  ) : (
+                                    <span className="text-muted-foreground text-xs">—</span>
+                                  )}
+                                  {c && (
+                                    <span
+                                      title={c.urls.join('\n')}
+                                      className="inline-flex items-center text-xs text-emerald-400 cursor-help"
+                                    >
+                                      👆 A cliqué ×{c.count}
+                                    </span>
+                                  )}
+                                </div>
+                              );
                             })()}
                           </td>
                           <td className="px-3 py-2 text-center">
