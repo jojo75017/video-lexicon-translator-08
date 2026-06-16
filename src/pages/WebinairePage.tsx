@@ -79,14 +79,7 @@ const WebinairePage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Webinaire gratuit : publiez votre 1er ebook en 7 jours | EbookStudio</title>
-        <meta
-          name="description"
-          content="Webinaire gratuit en ligne : la méthode pas-à-pas pour publier votre premier ebook rentable sur Amazon KDP en 7 jours, avec l'IA. Inscription gratuite."
-        />
-        <link rel="canonical" href="https://ebookstudio.fr/webinaire" />
-      </Helmet>
+
 
       <div className="max-w-5xl mx-auto px-4 py-12 md:py-20">
         <div className="grid lg:grid-cols-2 gap-10 items-center">
