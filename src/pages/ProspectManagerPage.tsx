@@ -49,6 +49,8 @@ const ProspectManagerPage = () => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   // Map email -> { count, last } pour les ouvertures d'emails (preuve de réception/lecture)
   const [opensByEmail, setOpensByEmail] = useState<Record<string, { count: number; last: string }>>({});
+  // Map email -> { count, urls } pour les clics sur les liens
+  const [clicksByEmail, setClicksByEmail] = useState<Record<string, { count: number; urls: string[] }>>({});
 
   const fetchOpens = useCallback(async () => {
     const { data, error } = await (supabase as any)
@@ -64,6 +66,24 @@ const ProspectManagerPage = () => {
       if (row.opened_at > map[key].last) map[key].last = row.opened_at;
     }
     setOpensByEmail(map);
+  }, []);
+
+  const fetchClicks = useCallback(async () => {
+    const { data, error } = await (supabase as any)
+      .from('email_clicks')
+      .select('prospect_email, clicked_url');
+    if (error || !data) return;
+    const map: Record<string, { count: number; urls: string[] }> = {};
+    for (const row of data as { prospect_email: string; clicked_url: string }[]) {
+      const key = (row.prospect_email || '').toLowerCase().trim();
+      if (!key) continue;
+      if (!map[key]) map[key] = { count: 0, urls: [] };
+      map[key].count += 1;
+      if (row.clicked_url && !map[key].urls.includes(row.clicked_url)) {
+        map[key].urls.push(row.clicked_url);
+      }
+    }
+    setClicksByEmail(map);
   }, []);
 
   const fetchProspects = useCallback(async () => {
