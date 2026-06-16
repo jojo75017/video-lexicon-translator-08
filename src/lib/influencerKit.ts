@@ -1,11 +1,11 @@
 // Kit Influenceurs — modèle financier centralisé
-// Prix actuel : 67€ (jusqu'au 1er octobre 2026). Bascule V3 : 197€ dès octobre.
+// Prix actuel : 67€ (jusqu'au 30 septembre 2026). Bascule V3 : 197€ dès le 1er octobre.
 // Tout le kit (page publique, simulateur, message d'approche, PDF) lit ces valeurs.
 
 export const COMMISSION_RATE = 0.30;
 
 // Date de bascule du prix V2 (67€) vers le prix V3 (197€).
-export const V3_PRICE_SWITCH_DATE = new Date('2026-10-01T00:00:00+02:00');
+export const V3_PRICE_SWITCH_DATE = new Date('2026-09-30T23:59:59+02:00');
 
 export const PRICE_NOW = 67;   // V2 actuelle
 export const PRICE_V3 = 197;   // V3 "Publication Assistée Pro" dès octobre

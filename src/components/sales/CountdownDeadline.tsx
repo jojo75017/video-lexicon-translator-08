@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Clock } from "lucide-react";
 
-// Vraie deadline de l'offre lancement : lundi 15 juin 2026 23h59 (heure Paris)
-const DEADLINE = new Date("2026-06-15T23:59:00+02:00").getTime();
+// Vraie deadline de l'offre lancement : mardi 30 septembre 2026 23h59 (heure Paris)
+const DEADLINE = new Date("2026-09-30T23:59:00+02:00").getTime();
 
 const pad = (n: number) => n.toString().padStart(2, "0");
 

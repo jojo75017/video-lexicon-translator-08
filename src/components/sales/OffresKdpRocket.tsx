@@ -152,7 +152,7 @@ export default function OffresKdpRocket() {
             Une seule offre, <span className="text-[#FF6B1A]">claire et définitive</span>
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            <strong>67€ une seule fois = accès à vie.</strong> Tarif de lancement valable jusqu'au <strong>15 septembre</strong> - ensuite il passera à 197€ à vie.
+            <strong>67€ une seule fois = accès à vie.</strong> Tarif de lancement valable jusqu'au <strong>30 septembre</strong> - ensuite il passera à 197€ à vie.
           </p>
         </div>
 
