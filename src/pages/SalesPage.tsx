@@ -168,11 +168,11 @@ const SalesPage = () => {
           subscriberAccess = false;
         }
       }
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const isAdmin = await getIsCurrentSessionAdmin();
+      const wasAdmin = !!readLocalCache();
       setHasSubscriberAccess(subscriberAccess);
-      setHasAdminSession(Boolean(session));
+      setHasAdminSession(isAdmin);
+      setShowAdminLogin(wasAdmin || isAdmin);
     };
     void refresh();
     const {
