@@ -238,11 +238,11 @@ Deno.serve(async (req) => {
     const authHeader = req.headers.get("Authorization");
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const resendKey = Deno.env.get("RESEND_API_KEY");
+    const brevoKey = Deno.env.get("BREVO_API_KEY");
     const supabase = createClient(supabaseUrl, serviceKey);
 
-    if (!resendKey) {
-      return new Response(JSON.stringify({ error: "RESEND_API_KEY manquante" }), {
+    if (!brevoKey) {
+      return new Response(JSON.stringify({ error: "BREVO_API_KEY manquante" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -286,9 +286,9 @@ Deno.serve(async (req) => {
     for (let i = 0; i < prospects.length; i++) {
       const prospect = prospects[i];
       
-      // Rate limit: max 2 emails/sec per Resend, use 600ms spacing
+      // Rate limit doux pour rester sous les limites Brevo
       if (i > 0) {
-        await new Promise(resolve => setTimeout(resolve, 600));
+        await new Promise(resolve => setTimeout(resolve, 400));
       }
 
       const stepToSend = mode === "manual" && targetStep
@@ -305,23 +305,25 @@ Deno.serve(async (req) => {
       const htmlContent = buildHtmlEmail(emailBody, prospect.email, stepToSend);
 
       try {
-        const res = await fetch("https://api.resend.com/emails", {
+        const res = await fetch("https://api.brevo.com/v3/smtp/email", {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${resendKey}`,
+            "api-key": brevoKey,
             "Content-Type": "application/json",
+            accept: "application/json",
           },
           body: JSON.stringify({
-            from: "Georges Boubet <noreply@ebookstudio.fr>",
-            to: [prospect.email],
+            sender: { name: "Georges Boubet", email: "contact@trafic-affiliation.com" },
+            to: [{ email: prospect.email, name: prospect.first_name || undefined }],
             subject: seqInfo.subject,
-            html: htmlContent,
+            htmlContent,
+            tags: [`sales-step-${stepToSend}`],
           }),
         });
 
         if (!res.ok) {
           const errData = await res.text();
-          console.error(`Resend error for ${prospect.email}:`, errData);
+          console.error(`Brevo error for ${prospect.email}:`, errData);
           errors++;
           continue;
         }
