@@ -52,27 +52,49 @@ const ProspectManagerPage = () => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   // Map email -> { count, last } pour les ouvertures d'emails (preuve de réception/lecture)
   const [opensByEmail, setOpensByEmail] = useState<Record<string, { count: number; last: string }>>({});
+  // Map email -> détail des ouvertures (date/heure + étape)
+  const [openDetails, setOpenDetails] = useState<Record<string, { at: string; step: number }[]>>({});
   // Map email -> { count, urls } pour les clics sur les liens
   const [clicksByEmail, setClicksByEmail] = useState<Record<string, { count: number; urls: string[] }>>({});
   // Map email -> détail des clics (url + date/heure + étape)
   const [clickDetails, setClickDetails] = useState<Record<string, { url: string; at: string; step: number }[]>>({});
-  // Prospect dont on affiche le détail des clics dans le panneau
+  // Ensemble des emails présents dans la table des abonnés
+  const [subscriberSet, setSubscriberSet] = useState<Set<string>>(new Set());
+  // Prospect dont on affiche la fiche détaillée dans le panneau
   const [detailEmail, setDetailEmail] = useState<string | null>(null);
 
   const fetchOpens = useCallback(async () => {
     const { data, error } = await (supabase as any)
       .from('email_opens')
-      .select('prospect_email, opened_at');
+      .select('prospect_email, opened_at, email_step')
+      .order('opened_at', { ascending: false });
     if (error || !data) return;
     const map: Record<string, { count: number; last: string }> = {};
-    for (const row of data as { prospect_email: string; opened_at: string }[]) {
+    const details: Record<string, { at: string; step: number }[]> = {};
+    for (const row of data as { prospect_email: string; opened_at: string; email_step: number }[]) {
       const key = (row.prospect_email || '').toLowerCase().trim();
       if (!key) continue;
       if (!map[key]) map[key] = { count: 0, last: row.opened_at };
       map[key].count += 1;
       if (row.opened_at > map[key].last) map[key].last = row.opened_at;
+      if (!details[key]) details[key] = [];
+      details[key].push({ at: row.opened_at, step: row.email_step });
     }
     setOpensByEmail(map);
+    setOpenDetails(details);
+  }, []);
+
+  const fetchSubscribers = useCallback(async () => {
+    const { data, error } = await (supabase as any)
+      .from('subscribers')
+      .select('email');
+    if (error || !data) return;
+    const set = new Set<string>();
+    for (const row of data as { email: string }[]) {
+      const key = (row.email || '').toLowerCase().trim();
+      if (key) set.add(key);
+    }
+    setSubscriberSet(set);
   }, []);
 
   const fetchClicks = useCallback(async () => {
