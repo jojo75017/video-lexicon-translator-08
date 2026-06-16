@@ -472,8 +472,8 @@ C'est un paiement unique de ${price}€ à vie, sans abonnement.
           </h2>
           <p className="text-sm text-[#232F3E]/65">
             {code
-              ? 'Ton lien est déjà inséré dans chaque message. Choisis un format, copie et envoie.'
-              : 'Rejoins le programme pour insérer automatiquement ton lien. Tu peux déjà copier les modèles ci-dessous.'}
+              ? 'Ton lien est déjà inséré dans les messages qui en ont besoin. En DM : envoie d\'abord le message SANS lien, puis le 2e message avec le lien quand la personne répond.'
+              : 'Rejoins le programme pour insérer automatiquement ton lien. En DM, envoie toujours le 1er message SANS lien (sinon il tombe dans « Demandes »), puis le lien quand on te répond.'}
           </p>
           <Tabs defaultValue={messages[0].key}>
             <TabsList className="flex flex-wrap h-auto">
