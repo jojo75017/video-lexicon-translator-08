@@ -15,6 +15,7 @@ export const AuthPage = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const navigate = useNavigate();
 
   // En mode édition/dev, on évite les toasts (popups) qui deviennent vite envahissants.
@@ -184,7 +185,7 @@ export const AuthPage = () => {
         sessionStorage.setItem('is_admin', 'true');
         if (shouldToast) toast.success('Connexion admin réussie');
         trackFormSubmit('admin_login', email);
-        navigate('/dashboard');
+        setShowSuccess(true);
       } else {
         const { error } = await supabase.auth.signUp({
           email,
@@ -258,6 +259,35 @@ export const AuthPage = () => {
                 Retour à la connexion
               </Button>
             </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (showSuccess) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md border-primary/20 shadow-xl shadow-primary/5">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-3 w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+              <span className="text-xl">✅</span>
+            </div>
+            <CardTitle className="text-xl">Connexion réussie !</CardTitle>
+            <CardDescription>
+              Bienvenue, admin. Où souhaitez-vous aller ?
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Button className="w-full" onClick={() => navigate('/dashboard')}>
+              Aller au Dashboard
+            </Button>
+            <Button variant="secondary" className="w-full" onClick={() => navigate('/ebook-planner')}>
+              Aller à EbookPlanner
+            </Button>
+            <Button variant="ghost" className="w-full" onClick={() => navigate('/')}>
+              Retour à l'accueil
+            </Button>
           </CardContent>
         </Card>
       </div>
