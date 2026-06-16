@@ -39,6 +39,8 @@ const SocialCalendar: React.FC<SocialCalendarProps> = ({ onSaveToDb }) => {
       tiktok: ALL_TEMPLATES.filter(t => t.platform === 'tiktok'),
       pinterest: ALL_TEMPLATES.filter(t => t.platform === 'pinterest'),
       x: ALL_TEMPLATES.filter(t => t.platform === 'x'),
+      reddit: ALL_TEMPLATES.filter(t => t.platform === 'reddit'),
+      instagram: ALL_TEMPLATES.filter(t => t.platform === 'instagram'),
     };
 
     let dayIndex = 0;

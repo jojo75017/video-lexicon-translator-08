@@ -72,6 +72,7 @@ const SeoGeneratorPage = lazy(() => import('./pages/SeoGeneratorPage'));
 const PracticalSheetsGeneratorPage = lazy(() => import('./pages/PracticalSheetsGeneratorPage'));
 const ResultatEn5MinPage = lazy(() => import('./pages/ResultatEn5MinPage'));
 const CadeauPage = lazy(() => import('./pages/CadeauPage'));
+const WebinairePage = lazy(() => import('./pages/WebinairePage'));
 const QuizPage = lazy(() => import('./pages/QuizPage'));
 const ChecklistTournagePage = lazy(() => import('./pages/ChecklistTournagePage'));
 const BDStudioPage = lazy(() => import('./pages/BDStudioPage'));
@@ -410,6 +411,8 @@ const App = () => {
             <Route path="/crm" element={<AdminGate><CrmPage /></AdminGate>} />
             <Route path="/resultat-en-5-min" element={<ResultatEn5MinPage />} />
             <Route path="/cadeau" element={<CadeauPage />} />
+            <Route path="/webinaire" element={<WebinairePage />} />
+
             <Route path="/quiz" element={<QuizPage />} />
             <Route 
               path="/seo-generator" 
