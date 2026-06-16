@@ -465,6 +465,16 @@ const ProspectManagerPage = () => {
                 <Pause className="h-3 w-3 mr-1" /> Auto OFF (tous)
               </Button>
               <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSyncToCrm}
+                disabled={syncing}
+                className="border-primary/30 text-primary hover:bg-primary/10"
+              >
+                <Users className="h-3 w-3 mr-1" />
+                {syncing ? 'Rapatriement...' : 'Rapatrier vers le CRM'}
+              </Button>
+              <Button
                 variant="ghost"
                 size="sm"
                 onClick={fetchProspects}
