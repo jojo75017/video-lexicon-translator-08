@@ -47,6 +47,24 @@ const ProspectManagerPage = () => {
   const [sending, setSending] = useState(false);
   const [importing, setImporting] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  // Map email -> { count, last } pour les ouvertures d'emails (preuve de réception/lecture)
+  const [opensByEmail, setOpensByEmail] = useState<Record<string, { count: number; last: string }>>({});
+
+  const fetchOpens = useCallback(async () => {
+    const { data, error } = await (supabase as any)
+      .from('email_opens')
+      .select('prospect_email, opened_at');
+    if (error || !data) return;
+    const map: Record<string, { count: number; last: string }> = {};
+    for (const row of data as { prospect_email: string; opened_at: string }[]) {
+      const key = (row.prospect_email || '').toLowerCase().trim();
+      if (!key) continue;
+      if (!map[key]) map[key] = { count: 0, last: row.opened_at };
+      map[key].count += 1;
+      if (row.opened_at > map[key].last) map[key].last = row.opened_at;
+    }
+    setOpensByEmail(map);
+  }, []);
 
   const fetchProspects = useCallback(async () => {
     setLoading(true);
@@ -61,8 +79,14 @@ const ProspectManagerPage = () => {
     } else {
       setProspects(data || []);
     }
+    fetchOpens();
     setLoading(false);
-  }, []);
+  }, [fetchOpens]);
+
+  const hasOpened = useCallback(
+    (email: string) => !!opensByEmail[(email || '').toLowerCase().trim()],
+    [opensByEmail]
+  );
 
   useEffect(() => {
     let isMounted = true;
