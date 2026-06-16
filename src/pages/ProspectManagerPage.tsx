@@ -311,12 +311,19 @@ const ProspectManagerPage = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
           <Card className="bg-card border-border ring-1 ring-orange-500/40">
             <CardContent className="p-4 text-center">
               <Zap className="h-6 w-6 mx-auto mb-2 text-orange-400" />
               <div className="text-2xl font-bold text-orange-400">{hotCount}</div>
               <div className="text-xs text-muted-foreground">🔥 Chauds (ont ouvert)</div>
+            </CardContent>
+          </Card>
+          <Card className="bg-card border-border ring-1 ring-emerald-500/40">
+            <CardContent className="p-4 text-center">
+              <Mail className="h-6 w-6 mx-auto mb-2 text-emerald-400" />
+              <div className="text-2xl font-bold text-emerald-400">{clickCount}</div>
+              <div className="text-xs text-muted-foreground">👆 Ont cliqué</div>
             </CardContent>
           </Card>
           <Card className="bg-card border-border">
