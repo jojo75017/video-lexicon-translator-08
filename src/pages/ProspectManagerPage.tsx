@@ -740,6 +740,58 @@ const ProspectManagerPage = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* PANNEAU DÉTAIL DES CLICS */}
+      {detailEmail && (() => {
+        const key = (detailEmail || '').toLowerCase().trim();
+        const rows = clickDetails[key] || [];
+        return (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+            onClick={() => setDetailEmail(null)}
+          >
+            <div
+              className="w-full max-w-lg max-h-[80vh] overflow-y-auto rounded-lg border border-emerald-500/30 bg-card p-5 shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-emerald-400 font-semibold">
+                  👆 Clics de {detailEmail}
+                </h3>
+                <Button variant="ghost" size="sm" onClick={() => setDetailEmail(null)} className="text-muted-foreground">
+                  ✕
+                </Button>
+              </div>
+              {rows.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Aucun clic enregistré.</p>
+              ) : (
+                <ul className="space-y-2">
+                  {rows.map((r, i) => (
+                    <li key={i} className="rounded-md border border-border/50 bg-background/50 p-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <Badge variant="outline" className="border-gold/30 text-gold-light">
+                          Étape {r.step ?? '—'}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {r.at ? new Date(r.at).toLocaleString('fr-FR') : '—'}
+                        </span>
+                      </div>
+                      <a
+                        href={r.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-1 block break-all text-xs text-emerald-400 hover:underline"
+                      >
+                        {r.url || '(lien inconnu)'}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };
