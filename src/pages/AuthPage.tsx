@@ -265,6 +265,35 @@ export const AuthPage = () => {
     );
   }
 
+  if (showSuccess) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md border-primary/20 shadow-xl shadow-primary/5">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-3 w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+              <span className="text-xl">✅</span>
+            </div>
+            <CardTitle className="text-xl">Connexion réussie !</CardTitle>
+            <CardDescription>
+              Bienvenue, admin. Où souhaitez-vous aller ?
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Button className="w-full" onClick={() => navigate('/dashboard')}>
+              Aller au Dashboard
+            </Button>
+            <Button variant="secondary" className="w-full" onClick={() => navigate('/ebook-planner')}>
+              Aller à EbookPlanner
+            </Button>
+            <Button variant="ghost" className="w-full" onClick={() => navigate('/')}>
+              Retour à l'accueil
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
       <Card className="w-full max-w-md border-primary/20 shadow-xl shadow-primary/5">
