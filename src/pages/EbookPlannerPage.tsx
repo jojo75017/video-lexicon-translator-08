@@ -87,7 +87,7 @@ import { WorkflowOnboarding } from '@/components/ebook/WorkflowOnboarding';
 import { WorkflowDashboard } from '@/components/ebook/WorkflowDashboard';
 import { EbookProgressDashboard } from '@/components/ebook/EbookProgressDashboard';
 import { EbookHeroDashboard } from '@/components/ebook/EbookHeroDashboard';
-import { EbookJourneyDashboard } from '@/components/ebook/EbookJourneyDashboard';
+
 import { ParcoursDebutant } from '@/components/ebook/ParcoursDebutant';
 import { AuthorBooksShowcase } from '@/components/ebook/AuthorBooksShowcase';
 import { KdpKeywordWidget } from '@/components/ebook/KdpKeywordWidget';
@@ -1651,24 +1651,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 onUpdateChapterTitle={updateChapterTitle}
                 onAddChapter={addChapter}
               />
-            ) : (
-              <EbookJourneyDashboard
-                ebookTitle={ebookTitle}
-                authorName={authorName}
-                bookDescription={bookDescription}
-                targetAudience={targetAudience}
-                genre={genre}
-                chapters={chapters}
-                preface={preface}
-                conclusion={conclusion}
-                coverImageUrl={coverConcepts ? 'generated' : undefined}
-                kdpDescription={kdpDescription}
-                kdpKeywords={kdpKeywords}
-                kdpCategories={kdpCategories}
-                onNavigateToTab={(tabId) => setActiveTab(tabId)}
-                onStartAutoWorkflow={() => setActiveTab('complete-workflow')}
-              />
-            )}
+            ) : null}
 
             {/* Sections secondaires repliables */}
             {viewMode === 'classic' && <details className="rounded-xl border bg-card p-4 group">
