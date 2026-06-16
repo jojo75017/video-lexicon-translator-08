@@ -262,6 +262,7 @@ const ProspectManagerPage = () => {
   const active = prospects.filter(p => p.status === 'active' && !p.completed).length;
   const completed = prospects.filter(p => p.completed).length;
   const autoEnabled = prospects.filter(p => p.auto_send).length;
+  const hotCount = prospects.filter(p => p.status === 'active' && !p.completed && hasOpened(p.email)).length;
 
   const stepDistribution = STEPS.map(s => ({
     ...s,
