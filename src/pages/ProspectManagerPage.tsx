@@ -291,6 +291,7 @@ const ProspectManagerPage = () => {
           if (clicked > 0) temperature = 'hot';
           else if (opened > 0) temperature = 'warm';
           return {
+            user_id: userId,
             email: p.email,
             first_name: p.first_name || '',
             source: p.source || 'prospects_import',
