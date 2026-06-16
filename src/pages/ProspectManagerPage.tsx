@@ -78,10 +78,12 @@ const ProspectManagerPage = () => {
   const fetchClicks = useCallback(async () => {
     const { data, error } = await (supabase as any)
       .from('email_clicks')
-      .select('prospect_email, clicked_url');
+      .select('prospect_email, clicked_url, clicked_at, email_step')
+      .order('clicked_at', { ascending: false });
     if (error || !data) return;
     const map: Record<string, { count: number; urls: string[] }> = {};
-    for (const row of data as { prospect_email: string; clicked_url: string }[]) {
+    const details: Record<string, { url: string; at: string; step: number }[]> = {};
+    for (const row of data as { prospect_email: string; clicked_url: string; clicked_at: string; email_step: number }[]) {
       const key = (row.prospect_email || '').toLowerCase().trim();
       if (!key) continue;
       if (!map[key]) map[key] = { count: 0, urls: [] };
@@ -89,8 +91,11 @@ const ProspectManagerPage = () => {
       if (row.clicked_url && !map[key].urls.includes(row.clicked_url)) {
         map[key].urls.push(row.clicked_url);
       }
+      if (!details[key]) details[key] = [];
+      details[key].push({ url: row.clicked_url, at: row.clicked_at, step: row.email_step });
     }
     setClicksByEmail(map);
+    setClickDetails(details);
   }, []);
 
   const fetchProspects = useCallback(async () => {
