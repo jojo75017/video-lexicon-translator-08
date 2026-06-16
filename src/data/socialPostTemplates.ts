@@ -432,4 +432,72 @@ Qui a une idée de livre depuis +6 mois mais n'a jamais commencé ? 🙋
 RT pour voir combien on est 😅`,
     hashtags: ['écriture', 'livre', 'KDP', 'procrastination']
   },
+
+  // === REDDIT ===
+  {
+    id: 'reddit-1', platform: 'reddit', type: 'Post r/selfpublish (valeur d\'abord)',
+    hook: 'Pas de lien dans le titre — apporter de la valeur, lien en commentaire',
+    visualDescription: 'Aucun visuel — Reddit privilégie le texte. Éventuellement une capture de données Amazon en commentaire.',
+    content: `My honest workflow to publish a non-fiction ebook in under an hour (process breakdown)
+
+I've published 35+ books on Amazon KDP. Here's the exact process I now use to go from idea to KDP-ready file fast:
+
+1. Pick a niche with proven demand (check Amazon Best Sellers Rank, not just gut feeling)
+2. Generate a structured outline (30 chapters max, ~250 words/page target)
+3. Draft each chapter keeping a consistent voice
+4. Create a clean cover that respects KDP spine/bleed specs
+5. Optimize 7 backend keywords + category
+6. Export to PDF/EPUB and validate dimensions
+
+Happy to answer questions on any step — the keyword research part is where most people lose money.`,
+    hashtags: []
+  },
+  {
+    id: 'reddit-2', platform: 'reddit', type: 'Commentaire utile (soft mention)',
+    hook: 'Répondre à un thread "how do you write faster" — jamais spammer',
+    visualDescription: 'Aucun.',
+    content: `The biggest unlock for me wasn't writing faster, it was removing the blank-page problem. I outline everything first, then fill chapter by chapter so I never stare at an empty doc.
+
+I eventually built an AI-assisted pipeline that does the outline + draft in my own tone for ~€0.30 per book. If you want the exact prompt structure I use for outlines, I can share it — it works in any AI tool, no purchase needed.`,
+    hashtags: []
+  },
+
+  // === INSTAGRAM ===
+  {
+    id: 'ig-1', platform: 'instagram', type: 'Carrousel "5 étapes"',
+    hook: 'Slide 1 = promesse forte, slides 2-6 = étapes, slide 7 = CTA',
+    visualDescription: 'Carrousel 1080x1350, 7 slides. Fond crème, accent doré. Gros chiffres par slide. Dernière slide : CTA "Lien en bio".',
+    content: `📚 Publier un ebook sur Amazon en 2026 (sans écrire pendant 3 semaines)
+
+Slide 1 → La méthode complète en 5 étapes 👉
+
+1️⃣ Choisir une niche rentable (données Amazon réelles)
+2️⃣ Générer un plan structuré en 30 sec
+3️⃣ Rédiger les chapitres dans TON style
+4️⃣ Couverture pro + mots-clés optimisés
+5️⃣ Export PDF/EPUB prêt pour KDP
+
+Coût : ~0,30€ par livre. Temps : 47 min.
+
+🔗 Démo gratuite en bio
+💬 Commente "EBOOK" pour le guide`,
+    hashtags: ['kdp', 'amazonkdp', 'ebook', 'revenuspassifs', 'business2026', 'iamarketing', 'autoedition']
+  },
+  {
+    id: 'ig-2', platform: 'instagram', type: 'Reel hook (script)',
+    hook: '3 premières secondes = pattern interrupt',
+    visualDescription: 'Reel vertical 1080x1920. Texte animé à l\'écran, montage rapide du dashboard. Musique tendance.',
+    content: `🎬 SCRIPT REEL
+
+[0-3s] "J'ai publié 35 livres sur Amazon. Voici combien de temps ça me prend aujourd'hui 👇"
+
+[3-10s] Montre le dashboard : plan généré, chapitres écrits, couverture.
+
+[10-20s] "47 minutes. 0,30€. Et c'est dans MON style, pas du texte robotique."
+
+[20-25s] "La démo est gratuite, lien en bio. Lance ton premier livre ce week-end."
+
+🔗 ebookstudio.fr/demo`,
+    hashtags: ['reels', 'kdp', 'ebook', 'sidehustle', 'revenuspassifs', 'ia']
+  },
 ];
