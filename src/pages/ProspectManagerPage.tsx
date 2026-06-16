@@ -290,7 +290,7 @@ const ProspectManagerPage = () => {
             temperature,
             total_emails_opened: opened,
             total_clicks: clicked,
-            last_interaction_at: opens?.last || clicks ? (opens?.last || null) : null,
+            last_interaction_at: opens?.last || null,
             notes: `Importé depuis Prospects (étape ${p.current_step})`,
           };
         });
