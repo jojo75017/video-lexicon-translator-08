@@ -185,7 +185,7 @@ export const AuthPage = () => {
         sessionStorage.setItem('is_admin', 'true');
         if (shouldToast) toast.success('Connexion admin réussie');
         trackFormSubmit('admin_login', email);
-        navigate('/dashboard');
+        setShowSuccess(true);
       } else {
         const { error } = await supabase.auth.signUp({
           email,
