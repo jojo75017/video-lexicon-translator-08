@@ -1651,24 +1651,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 onUpdateChapterTitle={updateChapterTitle}
                 onAddChapter={addChapter}
               />
-            ) : (
-              <EbookJourneyDashboard
-                ebookTitle={ebookTitle}
-                authorName={authorName}
-                bookDescription={bookDescription}
-                targetAudience={targetAudience}
-                genre={genre}
-                chapters={chapters}
-                preface={preface}
-                conclusion={conclusion}
-                coverImageUrl={coverConcepts ? 'generated' : undefined}
-                kdpDescription={kdpDescription}
-                kdpKeywords={kdpKeywords}
-                kdpCategories={kdpCategories}
-                onNavigateToTab={(tabId) => setActiveTab(tabId)}
-                onStartAutoWorkflow={() => setActiveTab('complete-workflow')}
-              />
-            )}
+            ) : null}
 
             {/* Sections secondaires repliables */}
             {viewMode === 'classic' && <details className="rounded-xl border bg-card p-4 group">
