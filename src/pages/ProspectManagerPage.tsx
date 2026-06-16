@@ -47,6 +47,7 @@ const ProspectManagerPage = () => {
   const [hasSession, setHasSession] = useState(false);
   const [sending, setSending] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   // Map email -> { count, last } pour les ouvertures d'emails (preuve de réception/lecture)
   const [opensByEmail, setOpensByEmail] = useState<Record<string, { count: number; last: string }>>({});
