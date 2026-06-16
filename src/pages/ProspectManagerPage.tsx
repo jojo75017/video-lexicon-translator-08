@@ -52,27 +52,49 @@ const ProspectManagerPage = () => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   // Map email -> { count, last } pour les ouvertures d'emails (preuve de réception/lecture)
   const [opensByEmail, setOpensByEmail] = useState<Record<string, { count: number; last: string }>>({});
+  // Map email -> détail des ouvertures (date/heure + étape)
+  const [openDetails, setOpenDetails] = useState<Record<string, { at: string; step: number }[]>>({});
   // Map email -> { count, urls } pour les clics sur les liens
   const [clicksByEmail, setClicksByEmail] = useState<Record<string, { count: number; urls: string[] }>>({});
   // Map email -> détail des clics (url + date/heure + étape)
   const [clickDetails, setClickDetails] = useState<Record<string, { url: string; at: string; step: number }[]>>({});
-  // Prospect dont on affiche le détail des clics dans le panneau
+  // Ensemble des emails présents dans la table des abonnés
+  const [subscriberSet, setSubscriberSet] = useState<Set<string>>(new Set());
+  // Prospect dont on affiche la fiche détaillée dans le panneau
   const [detailEmail, setDetailEmail] = useState<string | null>(null);
 
   const fetchOpens = useCallback(async () => {
     const { data, error } = await (supabase as any)
       .from('email_opens')
-      .select('prospect_email, opened_at');
+      .select('prospect_email, opened_at, email_step')
+      .order('opened_at', { ascending: false });
     if (error || !data) return;
     const map: Record<string, { count: number; last: string }> = {};
-    for (const row of data as { prospect_email: string; opened_at: string }[]) {
+    const details: Record<string, { at: string; step: number }[]> = {};
+    for (const row of data as { prospect_email: string; opened_at: string; email_step: number }[]) {
       const key = (row.prospect_email || '').toLowerCase().trim();
       if (!key) continue;
       if (!map[key]) map[key] = { count: 0, last: row.opened_at };
       map[key].count += 1;
       if (row.opened_at > map[key].last) map[key].last = row.opened_at;
+      if (!details[key]) details[key] = [];
+      details[key].push({ at: row.opened_at, step: row.email_step });
     }
     setOpensByEmail(map);
+    setOpenDetails(details);
+  }, []);
+
+  const fetchSubscribers = useCallback(async () => {
+    const { data, error } = await (supabase as any)
+      .from('subscribers')
+      .select('email');
+    if (error || !data) return;
+    const set = new Set<string>();
+    for (const row of data as { email: string }[]) {
+      const key = (row.email || '').toLowerCase().trim();
+      if (key) set.add(key);
+    }
+    setSubscriberSet(set);
   }, []);
 
   const fetchClicks = useCallback(async () => {
@@ -113,8 +135,9 @@ const ProspectManagerPage = () => {
     }
     fetchOpens();
     fetchClicks();
+    fetchSubscribers();
     setLoading(false);
-  }, [fetchOpens, fetchClicks]);
+  }, [fetchOpens, fetchClicks, fetchSubscribers]);
 
   const hasOpened = useCallback(
     (email: string) => !!opensByEmail[(email || '').toLowerCase().trim()],
@@ -567,8 +590,14 @@ const ProspectManagerPage = () => {
                               const key = (p.email || '').toLowerCase().trim();
                               const o = opensByEmail[key];
                               const c = clicksByEmail[key];
+                              const isSub = subscriberSet.has(key);
                               return (
                                 <div className="flex flex-col items-center gap-1">
+                                  {isSub && (
+                                    <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40">
+                                      ✅ Abonné
+                                    </Badge>
+                                  )}
                                   {o ? (
                                     <Badge className="bg-orange-500/15 text-orange-400 border-orange-500/30">
                                       🔥 Ouvert ×{o.count}
@@ -578,15 +607,20 @@ const ProspectManagerPage = () => {
                                   ) : (
                                     <span className="text-muted-foreground text-xs">—</span>
                                   )}
-                                  {c && (
-                                    <button
-                                      type="button"
-                                      onClick={() => setDetailEmail(p.email)}
-                                      className="inline-flex items-center text-xs text-emerald-400 underline decoration-dotted hover:text-emerald-300 cursor-pointer"
-                                    >
-                                      👆 A cliqué ×{c.count} · détails
-                                    </button>
+                                  {c ? (
+                                    <Badge className="bg-emerald-500/15 text-emerald-400 border-emerald-500/30">
+                                      👆 Cliqué ×{c.count}
+                                    </Badge>
+                                  ) : (
+                                    <span className="text-[10px] text-muted-foreground">Non cliqué</span>
                                   )}
+                                  <button
+                                    type="button"
+                                    onClick={() => setDetailEmail(p.email)}
+                                    className="inline-flex items-center text-xs text-gold-light underline decoration-dotted hover:text-gold cursor-pointer"
+                                  >
+                                    📋 Voir la fiche
+                                  </button>
                                 </div>
                               );
                             })()}
@@ -741,53 +775,120 @@ const ProspectManagerPage = () => {
         </Tabs>
       </div>
 
-      {/* PANNEAU DÉTAIL DES CLICS */}
+      {/* FICHE PROSPECT */}
       {detailEmail && (() => {
         const key = (detailEmail || '').toLowerCase().trim();
-        const rows = clickDetails[key] || [];
+        const prospect = prospects.find(p => (p.email || '').toLowerCase().trim() === key);
+        const isSub = subscriberSet.has(key);
+        const opens = openDetails[key] || [];
+        const clicks = clickDetails[key] || [];
+        const sentCount = prospect?.current_step || 0;
+        const stepLabel = (s: number) => STEPS.find(x => x.step === s)?.label || `Étape ${s}`;
+        // Construit la liste des emails envoyés à partir des étapes franchies
+        const sentList = Array.from({ length: sentCount }, (_, i) => i + 1);
+        // Timeline des événements (ouvertures + clics) triée du plus récent au plus ancien
+        const events = [
+          ...opens.map(o => ({ type: 'open' as const, at: o.at, step: o.step })),
+          ...clicks.map(c => ({ type: 'click' as const, at: c.at, step: c.step, url: c.url })),
+        ].sort((a, b) => (b.at || '').localeCompare(a.at || ''));
         return (
           <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
             onClick={() => setDetailEmail(null)}
           >
             <div
-              className="w-full max-w-lg max-h-[80vh] overflow-y-auto rounded-lg border border-emerald-500/30 bg-card p-5 shadow-xl"
+              className="w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-lg border border-gold/30 bg-card p-5 shadow-xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-emerald-400 font-semibold">
-                  👆 Clics de {detailEmail}
+                <h3 className="text-gold-light font-semibold truncate pr-2">
+                  📋 {detailEmail}
                 </h3>
                 <Button variant="ghost" size="sm" onClick={() => setDetailEmail(null)} className="text-muted-foreground">
                   ✕
                 </Button>
               </div>
-              {rows.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Aucun clic enregistré.</p>
-              ) : (
-                <ul className="space-y-2">
-                  {rows.map((r, i) => (
-                    <li key={i} className="rounded-md border border-border/50 bg-background/50 p-3">
-                      <div className="flex items-center justify-between gap-2">
-                        <Badge variant="outline" className="border-gold/30 text-gold-light">
-                          Étape {r.step ?? '—'}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          {r.at ? new Date(r.at).toLocaleString('fr-FR') : '—'}
-                        </span>
-                      </div>
-                      <a
-                        href={r.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-1 block break-all text-xs text-emerald-400 hover:underline"
-                      >
-                        {r.url || '(lien inconnu)'}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              )}
+
+              {/* Statuts */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {isSub ? (
+                  <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40">✅ Abonné</Badge>
+                ) : (
+                  <Badge variant="outline" className="text-muted-foreground">Prospect</Badge>
+                )}
+                {clicks.length > 0 ? (
+                  <Badge className="bg-emerald-500/15 text-emerald-400 border-emerald-500/30">👆 A cliqué ×{clicks.length}</Badge>
+                ) : (
+                  <Badge className="bg-red-500/15 text-red-400 border-red-500/30">Non cliqué</Badge>
+                )}
+                {opens.length > 0 && (
+                  <Badge className="bg-orange-500/15 text-orange-400 border-orange-500/30">🔥 Ouvert ×{opens.length}</Badge>
+                )}
+                {prospect?.unsubscribed && (
+                  <Badge className="bg-red-500/20 text-red-400 border-red-500/30">Désinscrit</Badge>
+                )}
+              </div>
+
+              {/* Emails reçus */}
+              <div className="mb-4">
+                <p className="text-sm font-medium text-foreground mb-2">
+                  📧 Emails envoyés : {sentCount}
+                </p>
+                {sentCount === 0 ? (
+                  <p className="text-sm text-muted-foreground">Aucun email envoyé pour l'instant.</p>
+                ) : (
+                  <ul className="space-y-1">
+                    {sentList.map(s => (
+                      <li key={s} className="flex items-center justify-between rounded-md border border-border/50 bg-background/50 px-3 py-1.5 text-xs">
+                        <span className="text-foreground">Étape {s} · {stepLabel(s)}</span>
+                        {s === sentCount && prospect?.last_email_sent_at && (
+                          <span className="text-muted-foreground">
+                            dernier envoi : {new Date(prospect.last_email_sent_at).toLocaleString('fr-FR')}
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {prospect?.next_email_at && !prospect.completed && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Prochain email prévu : {new Date(prospect.next_email_at).toLocaleString('fr-FR')}
+                  </p>
+                )}
+              </div>
+
+              {/* Historique des interactions */}
+              <div>
+                <p className="text-sm font-medium text-foreground mb-2">🕒 Interactions (dates)</p>
+                {events.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Aucune ouverture ni clic enregistré.</p>
+                ) : (
+                  <ul className="space-y-2">
+                    {events.map((e, i) => (
+                      <li key={i} className="rounded-md border border-border/50 bg-background/50 p-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <Badge variant="outline" className={e.type === 'click' ? 'border-emerald-500/40 text-emerald-400' : 'border-orange-500/40 text-orange-400'}>
+                            {e.type === 'click' ? '👆 Clic' : '🔥 Ouverture'} · Étape {e.step ?? '—'}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {e.at ? new Date(e.at).toLocaleString('fr-FR') : '—'}
+                          </span>
+                        </div>
+                        {e.type === 'click' && (e as any).url && (
+                          <a
+                            href={(e as any).url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-1 block break-all text-xs text-emerald-400 hover:underline"
+                          >
+                            {(e as any).url}
+                          </a>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
           </div>
         );
