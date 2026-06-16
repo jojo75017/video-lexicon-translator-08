@@ -402,6 +402,7 @@ const ProspectManagerPage = () => {
                         <th className="px-3 py-2 text-left text-muted-foreground font-medium">✓</th>
                         <th className="px-3 py-2 text-left text-muted-foreground font-medium">Email</th>
                         <th className="px-3 py-2 text-left text-muted-foreground font-medium">Prénom</th>
+                        <th className="px-3 py-2 text-center text-muted-foreground font-medium">Reçu / Ouvert</th>
                         <th className="px-3 py-2 text-center text-muted-foreground font-medium">Étape</th>
                         <th className="px-3 py-2 text-center text-muted-foreground font-medium">Auto</th>
                         <th className="px-3 py-2 text-center text-muted-foreground font-medium">Statut</th>
