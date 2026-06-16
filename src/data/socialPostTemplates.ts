@@ -4,7 +4,7 @@ export const DEMO_LINK = 'https://ebookstudio.fr/demo';
 export const OFFRES_LINK = 'https://ebookstudio.fr/offres';
 export const AMAZON_PROFILE = 'https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7';
 
-export type SocialPlatform = 'facebook' | 'linkedin' | 'tiktok' | 'pinterest' | 'x';
+export type SocialPlatform = 'facebook' | 'linkedin' | 'tiktok' | 'pinterest' | 'x' | 'reddit' | 'instagram';
 
 export interface SocialPostTemplate {
   id: string;
@@ -22,6 +22,8 @@ export const PLATFORM_CONFIG: Record<SocialPlatform, { label: string; color: str
   tiktok: { label: 'TikTok', color: 'bg-black text-white', icon: 'tiktok', bestTimes: ['07:00', '12:00', '19:00', '22:00'] },
   pinterest: { label: 'Pinterest', color: 'bg-red-600 text-white', icon: 'pinterest', bestTimes: ['14:00', '20:00', '21:00'] },
   x: { label: 'X (Twitter)', color: 'bg-zinc-900 text-white', icon: 'x', bestTimes: ['08:00', '12:00', '17:00'] },
+  reddit: { label: 'Reddit', color: 'bg-orange-600 text-white', icon: 'reddit', bestTimes: ['06:00', '12:00', '18:00'] },
+  instagram: { label: 'Instagram', color: 'bg-pink-600 text-white', icon: 'instagram', bestTimes: ['11:00', '13:00', '19:00'] },
 };
 
 export const ALL_TEMPLATES: SocialPostTemplate[] = [
