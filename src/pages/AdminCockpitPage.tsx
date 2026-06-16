@@ -386,6 +386,16 @@ const AdminCockpitPage: React.FC = () => {
             )}
             <Button
               size="sm"
+              onClick={() => navigate('/crm')}
+              className="rounded-full px-4 gap-1.5 hover:opacity-90 transition-all font-bold"
+              style={{ background: '#008296', color: 'white', boxShadow: '0 0 0 4px #00829622' }}
+              title="Mon CRM — contacts, prospects & leads (réservé admin)"
+            >
+              <Contact className="h-4 w-4" />
+              <span>Mon CRM</span>
+            </Button>
+            <Button
+              size="sm"
               onClick={() => navigate('/hub-v3')}
               className="rounded-full px-4 gap-1.5 hover:opacity-90 transition-all"
               style={{ background: 'linear-gradient(90deg, #c9a84c, #f0d78c)', color: '#1a1a1a' }}
