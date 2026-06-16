@@ -590,8 +590,14 @@ const ProspectManagerPage = () => {
                               const key = (p.email || '').toLowerCase().trim();
                               const o = opensByEmail[key];
                               const c = clicksByEmail[key];
+                              const isSub = subscriberSet.has(key);
                               return (
                                 <div className="flex flex-col items-center gap-1">
+                                  {isSub && (
+                                    <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40">
+                                      ✅ Abonné
+                                    </Badge>
+                                  )}
                                   {o ? (
                                     <Badge className="bg-orange-500/15 text-orange-400 border-orange-500/30">
                                       🔥 Ouvert ×{o.count}
@@ -601,15 +607,20 @@ const ProspectManagerPage = () => {
                                   ) : (
                                     <span className="text-muted-foreground text-xs">—</span>
                                   )}
-                                  {c && (
-                                    <button
-                                      type="button"
-                                      onClick={() => setDetailEmail(p.email)}
-                                      className="inline-flex items-center text-xs text-emerald-400 underline decoration-dotted hover:text-emerald-300 cursor-pointer"
-                                    >
-                                      👆 A cliqué ×{c.count} · détails
-                                    </button>
+                                  {c ? (
+                                    <Badge className="bg-emerald-500/15 text-emerald-400 border-emerald-500/30">
+                                      👆 Cliqué ×{c.count}
+                                    </Badge>
+                                  ) : (
+                                    <span className="text-[10px] text-muted-foreground">Non cliqué</span>
                                   )}
+                                  <button
+                                    type="button"
+                                    onClick={() => setDetailEmail(p.email)}
+                                    className="inline-flex items-center text-xs text-gold-light underline decoration-dotted hover:text-gold cursor-pointer"
+                                  >
+                                    📋 Voir la fiche
+                                  </button>
                                 </div>
                               );
                             })()}
