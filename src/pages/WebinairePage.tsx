@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Helmet } from "react-helmet-async";
+import { useState, useEffect } from "react";
 import { trackLeadMagnetDownload, trackCTAClick, trackFormSubmit } from "@/utils/analytics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +15,11 @@ const WebinairePage = () => {
   const [firstName, setFirstName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+
+  useEffect(() => {
+    document.title = "Webinaire gratuit : publiez votre 1er ebook en 7 jours | EbookStudio";
+  }, []);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,7 +60,7 @@ const WebinairePage = () => {
           <div className="space-y-3 mt-6">
             <a
               href="/demo"
-              onClick={() => trackCTAClick("webinaire_success_demo")}
+              onClick={() => trackCTAClick("webinaire_success_demo", "/demo")}
               className="block w-full py-4 px-6 bg-primary hover:opacity-90 text-primary-foreground font-semibold text-lg rounded-xl text-center transition-all"
             >
               <span className="flex items-center justify-center gap-2">
