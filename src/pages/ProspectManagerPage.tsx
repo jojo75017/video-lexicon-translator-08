@@ -480,6 +480,28 @@ const ProspectManagerPage = () => {
 
           {/* MANUAL SEND TAB */}
           <TabsContent value="send" className="space-y-4">
+            {/* Relance prioritaire des prospects chauds */}
+            <Card className="bg-card border-orange-500/40 ring-1 ring-orange-500/20">
+              <CardHeader>
+                <CardTitle className="text-orange-400 text-lg flex items-center gap-2">
+                  <Zap className="h-5 w-5" /> Relancer les prospects chauds
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  {hotCount} prospect(s) ont déjà <strong>ouvert</strong> un de vos emails. Ce sont vos meilleurs leads : relancez-les en priorité avec l'email d'urgence (étape 4).
+                </p>
+              </CardHeader>
+              <CardContent>
+                <Button
+                  onClick={() => handleRelancerChauds(4)}
+                  disabled={sending || hotCount === 0}
+                  className="bg-gradient-to-r from-orange-500 to-amber-500 text-black font-semibold hover:opacity-90"
+                >
+                  <Zap className="h-4 w-4 mr-2" />
+                  {sending ? 'Envoi...' : `🔥 Relancer les ${hotCount} chauds (étape 4 - Urgence)`}
+                </Button>
+              </CardContent>
+            </Card>
+
             <Card className="bg-card border-border">
               <CardHeader>
                 <CardTitle className="text-gradient-gold text-lg">Envoi Manuel par Vague</CardTitle>
