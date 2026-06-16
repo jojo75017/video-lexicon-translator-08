@@ -192,16 +192,23 @@ Georges
 }
 
 function buildHtmlEmail(body: string, email?: string, step?: number): string {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+
+  // Construit un lien traçable : passe par track-email-click qui enregistre le clic puis redirige
+  const trackedLink = (dest: string): string => {
+    if (!email || !supabaseUrl) return dest;
+    return `${supabaseUrl}/functions/v1/track-email-click?e=${encodeURIComponent(email)}&s=${step ?? ""}&u=${encodeURIComponent(dest)}`;
+  };
+
   const htmlBody = body
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/\n/g, "<br>")
     .replace(/→/g, "→")
-    .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" style="color:#D4A017;">$1</a>')
+    .replace(/(https?:\/\/[^\s<]+)/g, (m) => `<a href="${trackedLink(m)}" style="color:#D4A017;">${m}</a>`)
     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
 
-  const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
   const trackingPixel = email && step
     ? `<img src="${supabaseUrl}/functions/v1/track-email-open?e=${encodeURIComponent(email)}&s=${step}" width="1" height="1" alt="" style="display:none;" />`
     : "";
@@ -215,7 +222,7 @@ ${htmlBody}
 <hr style="border-color:#D4A017;margin-top:32px;">
 <p style="font-size:12px;color:#888;">
 Vous recevez cet email car vous avez manifesté un intérêt pour EbookStudio Pro.<br>
-<a href="${OFFRES_LINK}" style="color:#D4A017;">Voir l'offre</a> · <a href="${DEMO_LINK}" style="color:#D4A017;">Tester la démo</a><br>
+<a href="${trackedLink(OFFRES_LINK)}" style="color:#D4A017;">Voir l'offre</a> · <a href="${trackedLink(DEMO_LINK)}" style="color:#D4A017;">Tester la démo</a><br>
 Pour ne plus recevoir ces emails, répondez "STOP" à cet email.
 </p>
 ${trackingPixel}

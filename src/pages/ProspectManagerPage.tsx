@@ -49,6 +49,8 @@ const ProspectManagerPage = () => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   // Map email -> { count, last } pour les ouvertures d'emails (preuve de réception/lecture)
   const [opensByEmail, setOpensByEmail] = useState<Record<string, { count: number; last: string }>>({});
+  // Map email -> { count, urls } pour les clics sur les liens
+  const [clicksByEmail, setClicksByEmail] = useState<Record<string, { count: number; urls: string[] }>>({});
 
   const fetchOpens = useCallback(async () => {
     const { data, error } = await (supabase as any)
@@ -66,6 +68,24 @@ const ProspectManagerPage = () => {
     setOpensByEmail(map);
   }, []);
 
+  const fetchClicks = useCallback(async () => {
+    const { data, error } = await (supabase as any)
+      .from('email_clicks')
+      .select('prospect_email, clicked_url');
+    if (error || !data) return;
+    const map: Record<string, { count: number; urls: string[] }> = {};
+    for (const row of data as { prospect_email: string; clicked_url: string }[]) {
+      const key = (row.prospect_email || '').toLowerCase().trim();
+      if (!key) continue;
+      if (!map[key]) map[key] = { count: 0, urls: [] };
+      map[key].count += 1;
+      if (row.clicked_url && !map[key].urls.includes(row.clicked_url)) {
+        map[key].urls.push(row.clicked_url);
+      }
+    }
+    setClicksByEmail(map);
+  }, []);
+
   const fetchProspects = useCallback(async () => {
     setLoading(true);
     const { data, error } = await (supabase as any)
@@ -80,12 +100,18 @@ const ProspectManagerPage = () => {
       setProspects(data || []);
     }
     fetchOpens();
+    fetchClicks();
     setLoading(false);
-  }, [fetchOpens]);
+  }, [fetchOpens, fetchClicks]);
 
   const hasOpened = useCallback(
     (email: string) => !!opensByEmail[(email || '').toLowerCase().trim()],
     [opensByEmail]
+  );
+
+  const hasClicked = useCallback(
+    (email: string) => !!clicksByEmail[(email || '').toLowerCase().trim()],
+    [clicksByEmail]
   );
 
   useEffect(() => {
@@ -263,6 +289,7 @@ const ProspectManagerPage = () => {
   const completed = prospects.filter(p => p.completed).length;
   const autoEnabled = prospects.filter(p => p.auto_send).length;
   const hotCount = prospects.filter(p => p.status === 'active' && !p.completed && hasOpened(p.email)).length;
+  const clickCount = prospects.filter(p => hasClicked(p.email)).length;
 
   const stepDistribution = STEPS.map(s => ({
     ...s,
@@ -284,12 +311,19 @@ const ProspectManagerPage = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
           <Card className="bg-card border-border ring-1 ring-orange-500/40">
             <CardContent className="p-4 text-center">
               <Zap className="h-6 w-6 mx-auto mb-2 text-orange-400" />
               <div className="text-2xl font-bold text-orange-400">{hotCount}</div>
               <div className="text-xs text-muted-foreground">🔥 Chauds (ont ouvert)</div>
+            </CardContent>
+          </Card>
+          <Card className="bg-card border-border ring-1 ring-emerald-500/40">
+            <CardContent className="p-4 text-center">
+              <Mail className="h-6 w-6 mx-auto mb-2 text-emerald-400" />
+              <div className="text-2xl font-bold text-emerald-400">{clickCount}</div>
+              <div className="text-xs text-muted-foreground">👆 Ont cliqué</div>
             </CardContent>
           </Card>
           <Card className="bg-card border-border">
@@ -402,7 +436,7 @@ const ProspectManagerPage = () => {
                         <th className="px-3 py-2 text-left text-muted-foreground font-medium">✓</th>
                         <th className="px-3 py-2 text-left text-muted-foreground font-medium">Email</th>
                         <th className="px-3 py-2 text-left text-muted-foreground font-medium">Prénom</th>
-                        <th className="px-3 py-2 text-center text-muted-foreground font-medium">Reçu / Ouvert</th>
+                        <th className="px-3 py-2 text-center text-muted-foreground font-medium">Reçu / Ouvert / Cliqué</th>
                         <th className="px-3 py-2 text-center text-muted-foreground font-medium">Étape</th>
                         <th className="px-3 py-2 text-center text-muted-foreground font-medium">Auto</th>
                         <th className="px-3 py-2 text-center text-muted-foreground font-medium">Statut</th>
@@ -424,17 +458,30 @@ const ProspectManagerPage = () => {
                           <td className="px-3 py-2 text-foreground">{p.first_name || '—'}</td>
                           <td className="px-3 py-2 text-center">
                             {(() => {
-                              const o = opensByEmail[(p.email || '').toLowerCase().trim()];
-                              if (o) {
-                                return (
-                                  <Badge className="bg-orange-500/15 text-orange-400 border-orange-500/30">
-                                    🔥 Ouvert ×{o.count}
-                                  </Badge>
-                                );
-                              }
-                              return p.current_step > 0
-                                ? <Badge variant="outline" className="text-muted-foreground">Envoyé</Badge>
-                                : <span className="text-muted-foreground text-xs">—</span>;
+                              const key = (p.email || '').toLowerCase().trim();
+                              const o = opensByEmail[key];
+                              const c = clicksByEmail[key];
+                              return (
+                                <div className="flex flex-col items-center gap-1">
+                                  {o ? (
+                                    <Badge className="bg-orange-500/15 text-orange-400 border-orange-500/30">
+                                      🔥 Ouvert ×{o.count}
+                                    </Badge>
+                                  ) : p.current_step > 0 ? (
+                                    <Badge variant="outline" className="text-muted-foreground">Envoyé</Badge>
+                                  ) : (
+                                    <span className="text-muted-foreground text-xs">—</span>
+                                  )}
+                                  {c && (
+                                    <span
+                                      title={c.urls.join('\n')}
+                                      className="inline-flex items-center text-xs text-emerald-400 cursor-help"
+                                    >
+                                      👆 A cliqué ×{c.count}
+                                    </span>
+                                  )}
+                                </div>
+                              );
                             })()}
                           </td>
                           <td className="px-3 py-2 text-center">
