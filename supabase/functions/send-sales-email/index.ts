@@ -56,180 +56,101 @@ function getEmailBody(step: number, firstName: string): string {
   const bodies: Record<number, string> = {
     1: `Bonjour ${name},
 
-Je vais vous raconter quelque chose que très peu de personnes savent.
+Il y a 18 mois, j'avais une idée de livre... et la page blanche me bloquait à chaque fois.
 
-Il y a 18 mois, j'étais exactement comme vous. J'avais cette idée de livre qui me trottait dans la tête depuis des années. Je savais que le marché Amazon KDP pouvait changer ma vie. Mais à chaque fois que je m'y mettais... je butais sur le même mur.
+Le problème n'était pas moi. C'était la méthode.
 
-Le blanc. La page blanche. Cette satanée page blanche.
+Alors j'ai construit un outil qui gère tout : idée → plan → rédaction → illustrations → couverture → export Amazon KDP.
 
-Je passais des semaines à écrire 20 pages, puis j'abandonnais. Je recommençais. J'abandonnais encore. J'ai dû écrire — et jeter — l'équivalent de 8 livres entiers avant de comprendre quelque chose de fondamental :
+Résultat : mon dernier livre, 150 pages, généré en 47 minutes.
 
-Ce n'était pas moi le problème. C'était l'outil.
+Aujourd'hui c'est EbookStudio Pro, et il est accessible à **67€ à vie** (paiement unique).
 
-Quand vous écrivez à la main, vous faites face à une bataille psychologique épuisante. Votre cerveau doit gérer la structure, le style, la recherche, la mise en page... TOUT en même temps. C'est comme demander à un architecte de poser chaque brique lui-même.
+👉 Découvrir l'outil : ${OFFRES_LINK}
+👉 Tester la démo gratuitement : ${DEMO_LINK}
 
-Alors j'ai changé de stratégie. J'ai décidé de construire l'usine avant le produit.
-
-J'ai passé 6 mois à développer un système complet qui génère des ebooks professionnels de A à Z. Pas un simple générateur de texte. Une véritable chaîne de production : idée → plan → rédaction → illustrations → couverture → export KDP.
-
-Le résultat ? Mon 36ème livre publié en 47 minutes chrono. 150 pages. Structurées. Illustrées. Prêtes à vendre.
-
-Mais ce qui m'excite vraiment, ${name}, c'est ce qui arrive maintenant.
-
-🔥 EbookStudio Pro évolue. Et pas un petit pas. Une révolution.
-
-La V3 — que nous appelons "Publication Assistée Pro" — est en cours de finalisation. Ce n'est plus un simple générateur d'ebooks. C'est un écosystème complet pour devenir auteur entrepreneur sur Amazon.
-
-Voici ce qui change fondamentalement :
-
-→ Génération IA de nouvelle génération : des manuscrits encore plus naturels, avec une compréhension contextuelle approfondie de votre niche
-→ Studio de couvertures pro V3 : couvertures 3D, mockups réalistes, créations dignes des best-sellers
-→ Livre audio automatisé : convertissez votre ebook en audiobook professionnel avec voix IA premium
-→ Parcours guidé 30 étapes : de l'idée brute à la publication Amazon, étape par étape, sans jamais vous perdre
-→ 12 nouveaux modules : recherche de niches, mots-clés Amazon, stratégie de lancement, marketing, tout ce qu'il manquait
-→ Qualité industrielle : nous avons relevé le niveau. Chaque sortie est maintenant vérifiée, optimisée, prête à concurrencer les pros
-
-Cette V3 représente 18 mois de développement, des centaines de tests, et un investissement considérable. Le prix reflète cette valeur : elle sera proposée à 197€ (toujours paiement unique, à vie).
-
-Mais voici ce que je vous propose aujourd'hui :
-
-**Vous pouvez encore accéder à l'offre Fondateur actuelle à 67€.**
-
-Pourquoi ? Parce que les fondateurs actuels recevront la V3 en MISE À JOUR GRATUITE. Oui, vous avez bien lu. Les 67€ d'aujourd'hui = l'accès à la V3 de 197€ demain, sans débourser un centime de plus.
-
-C'est ma façon de récompenser ceux qui ont cru au projet avant tout le monde.
-
-Mais cette porte se ferme bientôt. Très bientôt.
-
-👉 Découvrir EbookStudio Pro et verrouiller votre accès Fondateur : ${OFFRES_LINK}
-
-Et si vous voulez tester avant d'engager quoi que ce soit :
-
-👉 Tester gratuitement la démo (aucune carte requise) : ${DEMO_LINK}
-
-${name}, laissez-moi être honnête avec vous. Dans 90 jours, deux scénarios s'offrent à vous :
-
-📍 Scénario A : Vous serez toujours en train de "préparer" votre livre. Encore un chapitre. Encore une réécriture. Encore une excuse.
-📍 Scénario B : Vous aurez déjà publié 5, 10, peut-être 15 livres sur Amazon. Vos premiers revenus passifs tomberont chaque mois. Vous aurez construit quelque chose qui vous appartient, vraiment.
-
-La différence entre ces deux scénarios ? Un clic. Aujourd'hui.
-
-Je ne vous demande pas de me croire sur parole. Mon parcours est public, mes livres sont sur Amazon, mon nom est vérifiable. Je suis Georges Boubet, 35+ livres publiés, et j'ai construit l'outil que j'aurais rêvé d'avoir il y a 18 mois.
-
-Maintenant, c'est à vous de décider de quel côté de l'histoire vous voulez être.
-
-À très bientôt,
-Georges
-
-P.S. — Si une petite voix vous dit "et si ça marchait pour moi ?", écoutez-la. C'est peut-être la voix qui changera votre vie. Mon profil Amazon avec mes livres publiés : https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7`,
+À demain pour la suite,
+Georges`,
 
     2: `${name},
 
-Savez-vous pourquoi 90% des gens qui veulent publier sur Amazon... n'y arrivent jamais ?
+Pourquoi 90% des gens qui veulent publier sur Amazon n'y arrivent jamais ?
 
-❌ ERREUR #1 : Écrire sans plan — abandon garanti à la page 12.
-❌ ERREUR #2 : Passer 3 semaines sur un seul livre — pendant que d'autres en publient 5.
-❌ ERREUR #3 : Négliger la couverture et les mots-clés — 0 vente.
+❌ Écrire sans plan → abandon à la page 12
+❌ Passer 3 semaines sur un seul livre
+❌ Négliger couverture et mots-clés → 0 vente
 
-EbookStudio Pro résout ces 3 problèmes en même temps :
-✅ Plan structuré automatiquement
-✅ Génération en 47 min
-✅ Couvertures pro + optimisation KDP intégrée
+EbookStudio Pro règle les 3 d'un coup : plan automatique, génération en 47 min, couvertures pro + optimisation KDP.
 
-Le tout pour ~0,30€ par livre.
+Coût : ~0,30€ par livre.
 
-📊 Le calcul : 1 ebook/semaine × 52 = 52 livres/an, pour ~15€ de production.
+👉 Voir l'outil : ${OFFRES_LINK}
 
-👉 Découvrir EbookStudio Pro : ${OFFRES_LINK}
-
-L'offre Fondateur à 67€ (au lieu de 147€) est disponible jusqu'au 1er juillet.
-
-Georges
-
-P.S: Testez d'abord gratuitement : ${DEMO_LINK}`,
+Georges`,
 
     3: `${name},
 
-Aujourd'hui, pas de pitch. Juste des faits.
+Pas de pitch aujourd'hui, juste mes vrais chiffres :
 
-📊 Mon parcours Amazon KDP :
 • 2023 : 0 livre publié
-• 2024 : 18 livres (méthode manuelle)
+• 2024 : 18 livres (à la main)
 • 2025-2026 : 35+ livres (avec EbookStudio)
 
-EbookStudio Pro 2026 inclut :
-📝 Générateur IA (Gemini 3 Flash)
-🎨 Créateur de couvertures pro
-🔊 Convertisseur en livre audio
-📊 Dashboard marketing complet
-📧 Système email marketing inclus
+Mon profil Amazon est public : https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7
 
-Le tout à 67€ (paiement unique).
-Ou en facilités : 2×35€ ou 3×25€.
+L'outil complet (générateur IA, couvertures, livre audio, marketing) est à **67€ à vie**.
 
-👉 Accéder à l'offre Fondateur : ${OFFRES_LINK}
+👉 Accéder à l'offre : ${OFFRES_LINK}
 
-Mes livres sont sur Amazon, mon nom est public, mes résultats sont transparents.
-
-Cordialement,
-Georges Boubet
-https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7`,
+Georges`,
 
     4: `${name},
 
-L'offre Fondateur EbookStudio Pro à 67€ se termine dans 48 heures.
+Une raison de ne pas attendre :
 
-Après ? Le prix passe à 147€.
+Aujourd'hui, EbookStudio Pro est à **67€ à vie**. Bientôt arrive la V3 "Publication Assistée Pro", qui sera vendue 197€.
 
-🧮 Ce que vous obtenez (valeur 749€) :
-- Générateur IA illimité (197€)
-- Créateur de couvertures (67€)
-- Convertisseur livre audio (147€)
-- Dashboard marketing (67€)
-- Outils réseaux sociaux (47€)
-- Templates email (67€)
-- Optimisateur KDP (67€)
+🎁 Et les membres actuels recevront la V3 en **mise à jour gratuite**.
 
-Votre prix aujourd'hui : 67€ (-66%)
-💳 Ou 2×35€ / 3×25€
+Autrement dit : 67€ aujourd'hui = l'accès à un outil qui en vaudra 197€ demain.
 
-🎁 BONUS inclus : Pack 300+ idées, Guide 10 Niches KDP 2026, Groupe privé, MAJ à vie, Support Zoom.
+👉 Verrouiller mon accès : ${OFFRES_LINK}
 
-⚡ Coût par ebook : ~0,30€. Rentabilisé dès le 1er livre vendu.
-
-👉 J'accède à l'offre Fondateur : ${OFFRES_LINK}
-
-Georges
-
-P.S: Je ne relancerai pas après cet email.`,
+Georges`,
 
     5: `${name},
 
-Dernier email. Dernier appel.
+Dernier rappel, je ne reviendrai pas dessus.
 
-Ce soir à minuit, l'offre Fondateur à 67€ se ferme définitivement.
+EbookStudio Pro, c'est :
+✅ Générateur IA illimité
+✅ Couvertures pro
+✅ Livre audio
+✅ Marketing & KDP intégrés
+✅ Mise à jour V3 incluse
 
-Où serez-vous dans 90 jours ?
+Le tout à **67€ à vie** (ou 2×35€ / 3×25€).
 
-📍 Scénario A : Toujours cette idée de livre dans un coin de votre tête.
-📍 Scénario B : 10, 15, 20 ebooks sur Amazon. Vos premiers revenus passifs tombent.
+👉 Rejoindre : ${OFFRES_LINK}
 
-La seule différence ? Un clic. Aujourd'hui.
+Merci de m'avoir lu cette semaine,
+Georges`,
 
-👉 Rejoindre les Fondateurs : ${OFFRES_LINK}
+    6: `${name},
 
-Merci d'avoir lu mes emails cette semaine, ${name}.
+Je vous ai écrit plusieurs fois et je n'ai pas eu de retour — c'est tout à fait OK.
 
-Si une petite voix vous dit "et si ça marchait pour moi ?"...
-Écoutez-la. Juste cette fois.
+Avant de vous laisser tranquille, juste une question honnête : qu'est-ce qui vous retient ?
 
-À bientôt de l'autre côté,
-Georges
+Le prix ? Le doute que ça marche pour vous ? Pas le temps ?
 
----
-📖 35+ livres publiés sur Amazon
-🛠️ Créateur d'EbookStudio Pro
-🔗 amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7`,
+Répondez-moi simplement à cet email, je lis tout personnellement. Et si vous préférez juste tester sans rien payer :
+
+👉 La démo gratuite est ici : ${DEMO_LINK}
+👉 Et l'offre à 67€ à vie reste là : ${OFFRES_LINK}
+
+Au plaisir d'échanger,
+Georges`,
   };
 
   return bodies[step] || "";
