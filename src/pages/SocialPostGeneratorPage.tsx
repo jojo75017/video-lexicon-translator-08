@@ -17,7 +17,7 @@ import SocialAnalytics from '@/components/social/SocialAnalytics';
 import {
   Copy, Check, Facebook, Linkedin, Sparkles,
   RefreshCw, Lightbulb, Calendar, BarChart3, Zap, Target,
-  Image, MessageSquare, Twitter
+  Image, MessageSquare, Twitter, Instagram
 } from 'lucide-react';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 
@@ -174,6 +174,8 @@ Réponds en texte simple, pas de JSON.`,
       case 'tiktok': return <Zap className="h-4 w-4" />;
       case 'pinterest': return <Target className="h-4 w-4" />;
       case 'x': return <Twitter className="h-4 w-4" />;
+      case 'reddit': return <MessageSquare className="h-4 w-4" />;
+      case 'instagram': return <Instagram className="h-4 w-4" />;
     }
   };
 
