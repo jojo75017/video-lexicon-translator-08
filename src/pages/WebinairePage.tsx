@@ -31,8 +31,13 @@ const WebinairePage = () => {
     setIsSubmitting(true);
     try {
       const emailLower = email.trim().toLowerCase();
+      const cleanFirstName = firstName.trim() || null;
       await supabase.functions.invoke("add-to-email-sequence", {
-        body: { email: emailLower, first_name: firstName.trim() || null },
+        body: { email: emailLower, first_name: cleanFirstName },
+      });
+      // Email de confirmation immédiat
+      await supabase.functions.invoke("send-webinaire-confirmation", {
+        body: { email: emailLower, first_name: cleanFirstName },
       });
       trackLeadMagnetDownload("webinaire_publier_ebook_7j");
       trackFormSubmit("webinaire_inscription", emailLower);
