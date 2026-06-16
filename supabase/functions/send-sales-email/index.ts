@@ -238,11 +238,11 @@ Deno.serve(async (req) => {
     const authHeader = req.headers.get("Authorization");
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const resendKey = Deno.env.get("RESEND_API_KEY");
+    const brevoKey = Deno.env.get("BREVO_API_KEY");
     const supabase = createClient(supabaseUrl, serviceKey);
 
-    if (!resendKey) {
-      return new Response(JSON.stringify({ error: "RESEND_API_KEY manquante" }), {
+    if (!brevoKey) {
+      return new Response(JSON.stringify({ error: "BREVO_API_KEY manquante" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
