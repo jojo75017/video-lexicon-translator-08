@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ArrowLeft, ChevronLeft, ChevronRight, Plus, Shield, Trash2, Calendar as CalendarIcon, Sparkles, Rocket, KeyRound, Copy, Send, Save, FileText } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Plus, Shield, Trash2, Calendar as CalendarIcon, Sparkles, Rocket, KeyRound, Copy, Send, Save, FileText, Contact } from 'lucide-react';
 import { EbookSettingsPanel } from '@/components/ebook/EbookSettingsPanel';
 import { V3_MODULES, V3_PILLAR_META, V3_PILLAR_COLORS, V3_PRICE, V2_PRICE, type V3Pillar, type V3Module } from '@/data/roadmapV3';
 import { useV3Mode } from '@/hooks/useV3Mode';
@@ -384,6 +384,16 @@ const AdminCockpitPage: React.FC = () => {
                 <span className={v3Mode ? 'font-black' : 'opacity-80'}>V3</span>
               </button>
             )}
+            <Button
+              size="sm"
+              onClick={() => navigate('/crm')}
+              className="rounded-full px-4 gap-1.5 hover:opacity-90 transition-all font-bold"
+              style={{ background: '#008296', color: 'white', boxShadow: '0 0 0 4px #00829622' }}
+              title="Mon CRM — contacts, prospects & leads (réservé admin)"
+            >
+              <Contact className="h-4 w-4" />
+              <span>Mon CRM</span>
+            </Button>
             <Button
               size="sm"
               onClick={() => navigate('/hub-v3')}
