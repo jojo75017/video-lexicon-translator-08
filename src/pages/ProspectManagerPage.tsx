@@ -135,8 +135,9 @@ const ProspectManagerPage = () => {
     }
     fetchOpens();
     fetchClicks();
+    fetchSubscribers();
     setLoading(false);
-  }, [fetchOpens, fetchClicks]);
+  }, [fetchOpens, fetchClicks, fetchSubscribers]);
 
   const hasOpened = useCallback(
     (email: string) => !!opensByEmail[(email || '').toLowerCase().trim()],
