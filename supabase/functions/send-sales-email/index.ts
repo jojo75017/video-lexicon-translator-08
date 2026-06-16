@@ -51,7 +51,7 @@ const OFFRES_LINK = "https://www.ebookstudio.fr/offres";
 function getEmailBody(step: number, firstName: string): string {
   const name = firstName || "cher lecteur";
 
-  const V3_LINK = "https://www.ebookstudio.fr/offres";
+
 
   const bodies: Record<number, string> = {
     1: `Bonjour ${name},
