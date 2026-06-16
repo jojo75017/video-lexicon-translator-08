@@ -260,14 +260,31 @@ Deno.serve(async (req) => {
         ? targetStep
         : prospect.current_step + 1;
 
-      if (stepToSend > 5) {
+      if (stepToSend > 6) {
         await supabase.from("sales_prospects").update({ completed: true }).eq("id", prospect.id);
         continue;
+      }
+
+      // Étape 6 = relance UNIQUEMENT pour ceux qui n'ont jamais cliqué.
+      // Ceux qui ont cliqué sont des leads chauds : on clôture la séquence sans les relancer.
+      if (stepToSend === 6) {
+        const { count: clickCount } = await supabase
+          .from("email_clicks")
+          .select("id", { count: "exact", head: true })
+          .ilike("prospect_email", prospect.email);
+        if ((clickCount || 0) > 0) {
+          await supabase.from("sales_prospects").update({
+            completed: true,
+            next_email_at: null,
+          }).eq("id", prospect.id);
+          continue;
+        }
       }
 
       const seqInfo = EMAIL_SEQUENCE[stepToSend - 1];
       const emailBody = getEmailBody(stepToSend, prospect.first_name);
       const htmlContent = buildHtmlEmail(emailBody, prospect.email, stepToSend);
+      const subject = seqInfo.subject.replace(/\{name\}/g, prospect.first_name || "vous");
 
       try {
         const res = await fetch("https://api.brevo.com/v3/smtp/email", {
@@ -280,7 +297,7 @@ Deno.serve(async (req) => {
           body: JSON.stringify({
             sender: { name: "Georges Boubet", email: "noreply@ebookstudio.fr" },
             to: [{ email: prospect.email, name: prospect.first_name || undefined }],
-            subject: seqInfo.subject,
+            subject,
             htmlContent,
             tags: [`sales-step-${stepToSend}`],
           }),
