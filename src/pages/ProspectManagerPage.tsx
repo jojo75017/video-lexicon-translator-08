@@ -263,6 +263,14 @@ const ProspectManagerPage = () => {
     }
     setSyncing(true);
     try {
+      const { data: auth } = await supabase.auth.getUser();
+      const userId = auth.user?.id;
+      if (!userId) {
+        toast.error('Session expirée, reconnecte-toi');
+        setSyncing(false);
+        return;
+      }
+
       // Emails déjà présents dans le CRM (pour éviter les doublons)
       const { data: existing } = await (supabase as any)
         .from('crm_contacts')
