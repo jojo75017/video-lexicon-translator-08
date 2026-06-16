@@ -579,12 +579,13 @@ const ProspectManagerPage = () => {
                                     <span className="text-muted-foreground text-xs">—</span>
                                   )}
                                   {c && (
-                                    <span
-                                      title={c.urls.join('\n')}
-                                      className="inline-flex items-center text-xs text-emerald-400 cursor-help"
+                                    <button
+                                      type="button"
+                                      onClick={() => setDetailEmail(p.email)}
+                                      className="inline-flex items-center text-xs text-emerald-400 underline decoration-dotted hover:text-emerald-300 cursor-pointer"
                                     >
-                                      👆 A cliqué ×{c.count}
-                                    </span>
+                                      👆 A cliqué ×{c.count} · détails
+                                    </button>
                                   )}
                                 </div>
                               );
