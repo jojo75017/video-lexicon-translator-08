@@ -306,6 +306,11 @@ const SalesPage = () => {
             <a href="#resultats" className="text-muted-foreground hover:text-foreground transition">Résultats</a>
             <a href="#pricing" className="text-muted-foreground hover:text-foreground transition">Tarif</a>
             <Link to="/subscription" className="text-muted-foreground hover:text-foreground transition">Connexion</Link>
+            {showAdminLogin && (
+              <Link to="/auth" className="text-accent hover:text-accent/80 transition font-bold">
+                Connexion
+              </Link>
+            )}
           </nav>
 
           <Button
