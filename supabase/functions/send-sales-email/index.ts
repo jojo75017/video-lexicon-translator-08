@@ -5,42 +5,48 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Email subjects and strategies for the 5-step sequence
+// Email subjects and strategies — séquence courte 5 étapes + 1 relance non-cliqueurs (étape 6)
 const EMAIL_SEQUENCE = [
   {
     step: 1,
     day_offset: 0,
-    subject: "📖 J'ai généré 150 pages en 47 minutes... voici comment",
-    preheader: "Le secret des auteurs qui publient un livre par semaine sur Amazon",
+    subject: "📖 150 pages générées en 47 minutes",
+    preheader: "Comment je publie un livre par semaine sur Amazon.",
   },
   {
     step: 2,
     day_offset: 2,
-    subject: "⚠️ Les 3 erreurs qui tuent 90% des auteurs KDP",
-    preheader: "Erreur #2 est celle que TOUT LE MONDE fait...",
+    subject: "⚠️ Les 3 erreurs qui bloquent 90% des auteurs KDP",
+    preheader: "La n°2, presque tout le monde la fait.",
   },
   {
     step: 3,
     day_offset: 4,
-    subject: "💰 De 0 à 35 livres Amazon — Mon parcours transparent",
-    preheader: "Chiffres réels, résultats réels, outil réel.",
+    subject: "💰 0 à 35 livres Amazon — mes vrais chiffres",
+    preheader: "Pas de pitch, juste des faits.",
   },
   {
     step: 4,
     day_offset: 6,
-    subject: "⏰ [Dernière chance] L'offre Fondateur disparaît dans 48h",
-    preheader: "Après ça, le prix passe à 147€. Point final.",
+    subject: "🎁 67€ aujourd'hui = la V3 à 197€ offerte",
+    preheader: "L'offre Fondateur inclut la future V3 gratuitement.",
   },
   {
     step: 5,
-    day_offset: 7,
-    subject: "🔒 C'est terminé ce soir à minuit",
-    preheader: "Votre dernière chance de rejoindre les fondateurs.",
+    day_offset: 8,
+    subject: "🔒 Dernier rappel sur l'offre Fondateur",
+    preheader: "67€ à vie, mise à jour V3 incluse.",
+  },
+  {
+    step: 6,
+    day_offset: 12,
+    subject: "👋 Une dernière chose, {name}",
+    preheader: "Je n'ai pas eu de nouvelles — on en reste là ?",
   },
 ];
 
-const DEMO_LINK = "https://video-lexicon-translator-08.lovable.app/demo";
-const OFFRES_LINK = "https://video-lexicon-translator-08.lovable.app/offres";
+const DEMO_LINK = "https://www.ebookstudio.fr/demo";
+const OFFRES_LINK = "https://www.ebookstudio.fr/offres";
 
 function getEmailBody(step: number, firstName: string): string {
   const name = firstName || "cher lecteur";
