@@ -48,6 +48,7 @@ const ProspectManagerPage = () => {
   const [sending, setSending] = useState(false);
   const [importing, setImporting] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [showClickedOnly, setShowClickedOnly] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   // Map email -> { count, last } pour les ouvertures d'emails (preuve de réception/lecture)
   const [opensByEmail, setOpensByEmail] = useState<Record<string, { count: number; last: string }>>({});
@@ -476,6 +477,18 @@ const ProspectManagerPage = () => {
               <Button
                 variant="outline"
                 size="sm"
+                onClick={() => setShowClickedOnly(v => !v)}
+                className={showClickedOnly
+                  ? 'border-emerald-500/50 text-emerald-400 bg-emerald-500/10'
+                  : 'border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10'
+                }
+              >
+                <Mail className="h-3 w-3 mr-1" />
+                {showClickedOnly ? '👆 Afficher tous' : `👆 Voir les ${clickCount} cliqueurs`}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={handleSyncToCrm}
                 disabled={syncing}
                 className="border-primary/30 text-primary hover:bg-primary/10"
@@ -526,7 +539,9 @@ const ProspectManagerPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {prospects.map(p => (
+                      {prospects
+                        .filter(p => !showClickedOnly || hasClicked(p.email))
+                        .map(p => (
                         <tr key={p.id} className="border-b border-border/50 hover:bg-card/50">
                           <td className="px-3 py-2">
                             <input
