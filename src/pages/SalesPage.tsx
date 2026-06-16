@@ -35,6 +35,7 @@ import {
   trackNewsletterSignup,
   trackPlanSelect,
 } from "@/utils/analytics";
+import { getIsCurrentSessionAdmin, readLocalCache } from "@/lib/adminAccess";
 
 import CoachingVipBanner from "@/components/sales/CoachingVipBanner";
 import CountdownDeadline from "@/components/sales/CountdownDeadline";
