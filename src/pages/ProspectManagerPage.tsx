@@ -54,6 +54,10 @@ const ProspectManagerPage = () => {
   const [opensByEmail, setOpensByEmail] = useState<Record<string, { count: number; last: string }>>({});
   // Map email -> { count, urls } pour les clics sur les liens
   const [clicksByEmail, setClicksByEmail] = useState<Record<string, { count: number; urls: string[] }>>({});
+  // Map email -> détail des clics (url + date/heure + étape)
+  const [clickDetails, setClickDetails] = useState<Record<string, { url: string; at: string; step: number }[]>>({});
+  // Prospect dont on affiche le détail des clics dans le panneau
+  const [detailEmail, setDetailEmail] = useState<string | null>(null);
 
   const fetchOpens = useCallback(async () => {
     const { data, error } = await (supabase as any)
