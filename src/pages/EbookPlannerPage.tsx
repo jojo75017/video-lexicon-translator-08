@@ -87,7 +87,7 @@ import { WorkflowOnboarding } from '@/components/ebook/WorkflowOnboarding';
 import { WorkflowDashboard } from '@/components/ebook/WorkflowDashboard';
 import { EbookProgressDashboard } from '@/components/ebook/EbookProgressDashboard';
 import { EbookHeroDashboard } from '@/components/ebook/EbookHeroDashboard';
-import { EbookJourneyDashboard } from '@/components/ebook/EbookJourneyDashboard';
+
 import { ParcoursDebutant } from '@/components/ebook/ParcoursDebutant';
 import { AuthorBooksShowcase } from '@/components/ebook/AuthorBooksShowcase';
 import { KdpKeywordWidget } from '@/components/ebook/KdpKeywordWidget';
