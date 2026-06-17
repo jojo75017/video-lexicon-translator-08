@@ -15,7 +15,7 @@ const EMAIL_SEQUENCE = [
   },
   {
     step: 2,
-    day_offset: 2,
+    day_offset: 1,
     subject: "⚠️ Les 3 erreurs qui bloquent 90% des auteurs KDP",
     preheader: "La n°2, presque tout le monde la fait.",
   },
