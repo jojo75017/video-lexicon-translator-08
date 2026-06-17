@@ -4,8 +4,12 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App.tsx";
 import "./index.css";
 import { installGlobalErrorHandlers } from "./lib/errorLogger";
+import { installChunkErrorRecovery } from "./lib/chunkErrorRecovery";
 import { purgeLegacyOffresCache } from "./lib/offresCachePurge";
 
+// Agent de contrôle : récupère automatiquement les pages cassées par un
+// chunk JS obsolète (post-déploiement) sur /offres, /demo, etc.
+installChunkErrorRecovery();
 installGlobalErrorHandlers();
 
 // 1) Purge spécifique /offres (versionnage UI)
