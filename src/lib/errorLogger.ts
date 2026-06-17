@@ -19,8 +19,19 @@ interface LogErrorParams {
 const recentErrors = new Map<string, number>();
 const DEDUPE_WINDOW_MS = 30_000;
 
+// Bruit connu sans impact réel : extensions wallet, erreurs cross-origin, etc.
+const NOISE_PATTERNS = [
+  "Failed to connect to MetaMask",
+  "MetaMask",
+  "Script error.",
+  "ResizeObserver loop",
+];
+
 export async function logError(params: LogErrorParams): Promise<void> {
   try {
+    const msg = params.message || "";
+    if (NOISE_PATTERNS.some((p) => msg.includes(p))) return;
+
     const key = `${params.type}::${params.message}`.slice(0, 300);
     const now = Date.now();
     const last = recentErrors.get(key);
