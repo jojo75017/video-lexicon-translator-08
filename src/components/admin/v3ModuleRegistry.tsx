@@ -72,6 +72,11 @@ import PricingLadder497 from '@/components/admin/PricingLadder497';
 import InstallmentPayments from '@/components/admin/InstallmentPayments';
 import LowContentBooks from '@/components/admin/LowContentBooks';
 import OnboardingGuides from '@/components/admin/OnboardingGuides';
+import ReadingCommittee from '@/components/admin/ReadingCommittee';
+import DevelopmentalEdit from '@/components/admin/DevelopmentalEdit';
+import CopyEditingLine from '@/components/admin/CopyEditingLine';
+import CollectionCharter from '@/components/admin/CollectionCharter';
+import QualityLabel from '@/components/admin/QualityLabel';
 
 /** Modules dont le dialog s'affiche en largeur réduite (max-w-2xl). */
 export const NARROW_MODULE_IDS: string[] = [
@@ -151,6 +156,11 @@ export const V3_MODULE_COMPONENTS: Record<string, React.ComponentType> = {
   'installment-payments': InstallmentPayments,
   'low-content-books': LowContentBooks,
   'onboarding-guides': OnboardingGuides,
+  'reading-committee': ReadingCommittee,
+  'developmental-edit': DevelopmentalEdit,
+  'copy-editing-line': CopyEditingLine,
+  'collection-charter': CollectionCharter,
+  'quality-label': QualityLabel,
 };
 
 /** Tous les modules ouvrables (mode hors V3 / cockpit standard). */
