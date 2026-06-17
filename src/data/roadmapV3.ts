@@ -439,13 +439,13 @@ export const V3_MODULES: V3Module[] = [
     description: 'Vue d\'ensemble du catalogue éditeur : titres, collections, statut de diffusion par canal, ISBN et dépôt légal en un coup d\'œil.' },
 
   // PROMOTION (Pack Promotion Éditeur 97€)
-  { id: 'press-service',         pillar: 'promotion',    status: 'todo', title: 'Service de Presse (SP)',
+  { id: 'press-service',         pillar: 'promotion',    status: 'done', title: 'Service de Presse (SP)',
     description: 'Génère le dossier de presse, le communiqué, une liste-type de journalistes/blogueurs littéraires par genre et les e-mails d\'envoi de service de presse.' },
-  { id: 'booksellers-fairs',     pillar: 'promotion',    status: 'todo', title: 'Libraires & Salons',
+  { id: 'booksellers-fairs',     pillar: 'promotion',    status: 'done', title: 'Libraires & Salons',
     description: 'Argumentaire libraire, fiche office, et préparation des salons et séances de dédicaces (pitch, supports, logistique).' },
-  { id: 'foreign-rights',        pillar: 'promotion',    status: 'todo', title: 'Droits Étrangers',
+  { id: 'foreign-rights',        pillar: 'promotion',    status: 'done', title: 'Droits Étrangers',
     description: 'Pitch de cession des droits de traduction (rights guide) et repérage des marchés porteurs par genre pour vendre le livre à l\'international.' },
-  { id: 'preorders-strategy',    pillar: 'promotion',    status: 'todo', title: 'Stratégie de Précommandes',
+  { id: 'preorders-strategy',    pillar: 'promotion',    status: 'done', title: 'Stratégie de Précommandes',
     description: 'Stratégie et calendrier de précommande multi-plateformes pour concentrer les ventes au lancement et booster le classement.' },
 ];
 

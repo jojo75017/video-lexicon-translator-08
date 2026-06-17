@@ -81,6 +81,10 @@ import WideDistribution from '@/components/admin/WideDistribution';
 import LegalDepositIsbn from '@/components/admin/LegalDepositIsbn';
 import EpubNormalizer from '@/components/admin/EpubNormalizer';
 import CatalogDashboard from '@/components/admin/CatalogDashboard';
+import PressService from '@/components/admin/PressService';
+import BooksellersFairs from '@/components/admin/BooksellersFairs';
+import ForeignRights from '@/components/admin/ForeignRights';
+import PreordersStrategy from '@/components/admin/PreordersStrategy';
 
 /** Modules dont le dialog s'affiche en largeur réduite (max-w-2xl). */
 export const NARROW_MODULE_IDS: string[] = [
@@ -169,6 +173,10 @@ export const V3_MODULE_COMPONENTS: Record<string, React.ComponentType> = {
   'legal-deposit-isbn': LegalDepositIsbn,
   'epub-normalizer': EpubNormalizer,
   'catalog-dashboard': CatalogDashboard,
+  'press-service': PressService,
+  'booksellers-fairs': BooksellersFairs,
+  'foreign-rights': ForeignRights,
+  'preorders-strategy': PreordersStrategy,
 };
 
 /** Tous les modules ouvrables (mode hors V3 / cockpit standard). */
