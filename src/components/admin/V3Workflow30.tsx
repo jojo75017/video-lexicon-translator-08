@@ -639,7 +639,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <div className="text-[12px] font-bold uppercase tracking-[0.2em]" style={{ color: AMBER_DEEP }}>
-                  {parcours === 'full' ? '🚀 Parcours Pro — 32 agents' : '📗 Parcours Essentiel — 22 agents'}
+                  {parcours === 'full' ? '🚀 Parcours Pro — 30 agents' : '📗 Parcours Essentiel — 22 agents'}
                 </div>
                 <p className="mt-1 text-[12px]" style={{ color: '#6f5e47' }}>
                   {parcours === 'full'
