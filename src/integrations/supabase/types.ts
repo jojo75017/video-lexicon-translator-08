@@ -1473,6 +1473,54 @@ export type Database = {
         }
         Relationships: []
       }
+      v3_gift_cards: {
+        Row: {
+          amount_paid: number
+          buyer_email: string
+          code: string
+          created_at: string
+          currency: string
+          environment: string
+          id: string
+          plan: string
+          recipient_email: string | null
+          redeemed_at: string | null
+          redeemed_by_email: string | null
+          status: string
+          stripe_session_id: string | null
+        }
+        Insert: {
+          amount_paid: number
+          buyer_email: string
+          code: string
+          created_at?: string
+          currency?: string
+          environment?: string
+          id?: string
+          plan?: string
+          recipient_email?: string | null
+          redeemed_at?: string | null
+          redeemed_by_email?: string | null
+          status?: string
+          stripe_session_id?: string | null
+        }
+        Update: {
+          amount_paid?: number
+          buyer_email?: string
+          code?: string
+          created_at?: string
+          currency?: string
+          environment?: string
+          id?: string
+          plan?: string
+          recipient_email?: string | null
+          redeemed_at?: string | null
+          redeemed_by_email?: string | null
+          status?: string
+          stripe_session_id?: string | null
+        }
+        Relationships: []
+      }
       v3_installment_orders: {
         Row: {
           amount_total: number
