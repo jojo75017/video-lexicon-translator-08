@@ -413,6 +413,40 @@ export const V3_MODULES: V3Module[] = [
   // PUBLIER — Guides nouveaux abonnés (mix : base offerte + avancés payants)
   { id: 'onboarding-guides',        pillar: 'publier',   status: 'done', title: 'Guides Nouveaux Abonnés (Onboarding 7 jours)',
     description: 'Mix : onboarding « Premiers pas KDP en 7 jours » + 2 guides de base OFFERTS pour activer les nouveaux abonnés ; guides avancés verrouillés avec CTA vers order bump / upsell. Mise en ligne prévue en août avec le tunnel 497€.' },
+
+  // ===== AJOUTS V3 — Maison d'édition — packs upsell — à construire =====
+
+  // ÉDITION PRO (Pack Qualité Éditoriale Pro 67€)
+  { id: 'reading-committee',     pillar: 'edition',      status: 'todo', title: 'Comité de Lecture IA',
+    description: 'Fiche de lecture professionnelle comme en maison d\'édition : synopsis, points forts/faibles, public cible, potentiel commercial et verdict argumenté « accepté / à retravailler / refusé ».' },
+  { id: 'developmental-edit',    pillar: 'edition',      status: 'todo', title: 'Édition Structurelle (Developmental Edit)',
+    description: 'Analyse de la structure narrative/argumentaire : rythme, cohérence des chapitres, promesses tenues, longueurs et suggestions concrètes de réorganisation.' },
+  { id: 'copy-editing-line',     pillar: 'edition',      status: 'todo', title: 'Copy-editing & Ligne Éditoriale',
+    description: 'Passe d\'édition phrase à phrase (style, registre, fluidité, répétitions) au-delà de la simple correction, dans le strict respect du fond et de la voix de l\'auteur.' },
+  { id: 'collection-charter',    pillar: 'edition',      status: 'todo', title: 'Charte de Collection',
+    description: 'Définit une collection éditoriale cohérente (ton, format, gabarit de couverture, mentions, promesse de lecture) réutilisable sur plusieurs titres pour bâtir un vrai catalogue.' },
+  { id: 'quality-label',         pillar: 'edition',      status: 'todo', title: 'Label Qualité Maison d\'Édition',
+    description: 'Checklist certifiante « niveau édition pro » couvrant éditorial, mise en forme et métadonnées ; appose un badge qualité une fois tous les contrôles validés.' },
+
+  // DISTRIBUTION (Pack Distribution Large 97€)
+  { id: 'wide-distribution',     pillar: 'distribution', status: 'todo', title: 'Assistant Distribution Multi-Plateformes',
+    description: 'Guide pas-à-pas + métadonnées formatées pour diffuser au-delà d\'Amazon : Kobo, Apple Books, Google Play, Fnac/ePagine, via agrégateurs (Draft2Digital / StreetLib).' },
+  { id: 'legal-deposit-isbn',    pillar: 'distribution', status: 'todo', title: 'Dépôt Légal & ISBN',
+    description: 'Accompagnement du dépôt légal BNF, gestion d\'un registre ISBN par titre et par collection, et ISSN pour les séries.' },
+  { id: 'epub-normalizer',       pillar: 'distribution', status: 'todo', title: 'Export EPUB Normé (EPUB 3)',
+    description: 'Vérifie et corrige la conformité EPUB 3 (table des matières, métadonnées, structure) exigée par les plateformes wide, au-delà du flux KDP actuel.' },
+  { id: 'catalog-dashboard',     pillar: 'distribution', status: 'todo', title: 'Tableau de Bord Catalogue',
+    description: 'Vue d\'ensemble du catalogue éditeur : titres, collections, statut de diffusion par canal, ISBN et dépôt légal en un coup d\'œil.' },
+
+  // PROMOTION (Pack Promotion Éditeur 97€)
+  { id: 'press-service',         pillar: 'promotion',    status: 'todo', title: 'Service de Presse (SP)',
+    description: 'Génère le dossier de presse, le communiqué, une liste-type de journalistes/blogueurs littéraires par genre et les e-mails d\'envoi de service de presse.' },
+  { id: 'booksellers-fairs',     pillar: 'promotion',    status: 'todo', title: 'Libraires & Salons',
+    description: 'Argumentaire libraire, fiche office, et préparation des salons et séances de dédicaces (pitch, supports, logistique).' },
+  { id: 'foreign-rights',        pillar: 'promotion',    status: 'todo', title: 'Droits Étrangers',
+    description: 'Pitch de cession des droits de traduction (rights guide) et repérage des marchés porteurs par genre pour vendre le livre à l\'international.' },
+  { id: 'preorders-strategy',    pillar: 'promotion',    status: 'todo', title: 'Stratégie de Précommandes',
+    description: 'Stratégie et calendrier de précommande multi-plateformes pour concentrer les ventes au lancement et booster le classement.' },
 ];
 
 /** Renvoie un module V3 par son id. */
