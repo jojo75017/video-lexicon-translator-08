@@ -1202,6 +1202,9 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
           })}
         </div>
       </div>
+      )}
+
+
 
       {/* Styles markdown locaux */}
       <style>{`
