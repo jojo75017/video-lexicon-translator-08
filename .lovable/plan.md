@@ -1,88 +1,67 @@
-# Proposition : 3 nouveaux packs upsell « Maison d'édition »
+# Carte Cadeau Noël — Base V3 à -20% (accès réservé au bénéficiaire)
 
-## Philosophie tarifaire
+## Objectif
+Offrir le générateur (Base V3, normalement 197€) sous forme de **carte cadeau de Noël** vendue avec **−20%**, soit **158€**. La carte est **mise en évidence** dans le bloc tarifs avec **1 ou 2 visuels de cartes cadeaux** (style Noël, cohérent avec l'image de référence fournie).
 
-La base 197€ et les 4 packs existants restent inchangés. On ajoute **3 nouveaux packs** en upsell pour les 3 pôles que tu as retenus. L'objectif : un auteur qui veut vraiment professionnaliser son catalogue paie à la pièce, ou prend le **Pack Tout Complet 497€** (ancrage) qui les débloque tous — créant un écart psychologique fort avec le prix à la pièce.
+La carte débloque **uniquement la Base** (création + publication). Les **packs premium restent payants** → aucune perte sur les ventes de modules.
 
----
+## Règle d'accès stricte (demande clé)
+**Seul le bénéficiaire qui active la carte obtient l'accès — personne d'autre.**
+- Code **à usage unique**, lié définitivement à **un seul email** lors de l'activation.
+- Accès Base via l'entitlement existant (`useV3Entitlement` → `hasBase`) + portail protégé (`SubscriberGate` / `V3Gate`). Un visiteur non connecté ou un autre email **n'accède à rien**.
+- Une fois `redeemed`, le code est **mort**.
 
-## Les 3 nouveaux packs
+```text
+Acheteur ──paie 158€──► reçoit 1 CODE unique (NOEL-XXXX-XXXX)
+                         │ (offre le code à un proche)
+                         ▼
+Bénéficiaire ─se connecte/crée son compte─► saisit code ► Base liée à SON email (à vie)
+   ▶ Accès verrouillé au seul email activé · Code mort après activation · Packs premium intacts
+```
 
-### Pack 5 — « Qualité Éditoriale Pro » — 67€
-**Positionnement** : ce que fait un éditeur avant d'accepter un manuscrit.
+## Visuels (mise en évidence)
+- Générer **2 images de cartes cadeaux** photoréalistes (esprit Noël élégant, palette ambre/teal de la marque), sauvegardées dans `src/assets/` :
+  1. Carte « cadeau » sombre festive avec ruban.
+  2. Carte « Ebookstudio — Carte Cadeau » posée près de livres/cadeaux.
+- Affichées dans un **encart dédié et mis en avant** (badge « −20% Noël », prix 197€ barré → 158€) en tête du bloc tarifs `V3PricingTiers.tsx`.
 
-| Module | Description |
-|--------|-------------|
-| Comité de lecture IA | Fiche de lecture pro : synopsis, forces/faiblesses, potentiel commercial, verdict « accepté / à retravailler / refusé » |
-| Édition structurelle (developmental edit) | Analyse de la structure narrative : rythme, cohérence, promesses tenues, suggestions de réorganisation |
-| Copy-editing & ligne éditoriale | Passe d'édition phrase à phrase (style, registre, répétitions) sans toucher au fond |
-| Charte de collection | Définition d'une collection éditoriale cohérente (ton, format, gabarit couverture, mentions) réutilisable sur plusieurs titres |
-| Label qualité maison d'édition | Checklist certifiante « niveau édition pro » + badge une fois tous les contrôles validés |
+## Étapes
 
-### Pack 6 — « Distribution Large (Wide) » — 97€
-**Positionnement** : sortir de l'exclusivité Amazon, diffuser comme un éditeur.
+### 1. Données / prix (`src/data/roadmapV3.ts`)
+- `V3_GIFT_DISCOUNT = 0.20`
+- `V3_GIFT_PRICE = 158` (Base 197€ −20%)
 
-| Module | Description |
-|--------|-------------|
-| Assistant distribution multi-plateformes | Guide + métadonnées formatées pour Kobo, Apple Books, Google Play, Fnac/ePagine, via Draft2Digital / StreetLib |
-| Dépôt légal & ISBN | Accompagnement dépôt légal BNF, gestion registre ISBN par titre/collection, ISSN pour séries |
-| Export EPUB normé | Vérification conformité EPUB 3 pour les plateformes wide (au-delà du flux KDP actuel) |
-| Tableau de bord catalogue | Vue d'ensemble du catalogue : titres, collections, statut de diffusion par canal, ISBN, dépôt légal |
+### 2. Table `v3_gift_cards` (migration)
+`id`, `code` (unique), `plan` (`'base'`), `amount_paid`, `currency`, `buyer_email`, `recipient_email` (nullable), `status` (`pending_payment` | `active` | `redeemed`), `stripe_session_id`, `redeemed_by_email`, `redeemed_at`, `environment`, `created_at`.
+RLS : aucun accès direct anon/authenticated (tout via edge functions service_role). GRANT `ALL` à `service_role` uniquement.
 
-### Pack 7 — « Promotion Éditeur » — 97€
-**Positionnement** : les leviers promo que seuls les éditeurs utilisent (hors marketing KDP déjà couvert).
+### 3. Edge function `v3-gift-checkout`
+- Reçoit `buyerEmail`, `recipientEmail?`, `environment`, `returnUrl`.
+- Montant figé serveur à `V3_GIFT_PRICE` (158€).
+- Crée la session Stripe embedded (pattern `v3-upsell-checkout`), insère la carte `pending_payment` + code unique.
+- `verify_jwt = false` dans `config.toml`.
 
-| Module | Description |
-|--------|-------------|
-| Service de presse (SP) | Génération dossier de presse, communiqué, liste-types journalistes/blogueurs littéraires, e-mails d'envoi SP |
-| Libraires & salons | Argumentaire libraire, fiche office, préparation salons/dédicaces |
-| Droits étrangers | Pitch de cession de droits de traduction, repérage marchés porteurs par genre |
-| Précommandes | Stratégie et calendrier de précommande multi-plateformes |
+### 4. Activation paiement
+Au paiement confirmé (session `kind='v3_gift'`) → carte `active` + envoi du code par email (Resend) si `recipient_email`.
 
----
+### 5. Edge function `v3-gift-redeem` (verrou d'accès)
+- Reçoit `code`, valide l'utilisateur via `supabase.auth.getUser()` (email tiré du JWT).
+- Refuse si carte absente, non `active` ou déjà `redeemed`.
+- Crée la commande `v3_installment_orders` `plan='base_gift'`, `status='paid'`, `email` = email authentifié.
+- Marque la carte `redeemed` → code mort. Seul cet email obtient `hasBase`.
 
-## Grille tarifaire complète mise à jour
+### 6. UI
+- **Encart « Offrir en carte cadeau »** mis en évidence dans `V3PricingTiers.tsx` avec les 2 visuels, prix barré → 158€, badge Noël, bouton ouvrant `V3GiftCheckout.tsx` (calqué sur `V3UpsellCheckout.tsx`).
+- **Page `/carte-cadeau`** (`GiftRedeemPage.tsx`) : **protégée, connexion obligatoire**. Champ code → `v3-gift-redeem`. Si non connecté → invite à se connecter/créer un compte (l'accès se lie à ce compte).
+- Après achat, le code s'affiche à l'acheteur (+ mention d'envoi email si bénéficiaire renseigné).
 
-| Offre | Prix | Économie |
-|-------|------|----------|
-| Base V3 (Publication Assistée Pro) | 197€ | — |
-| Pack Visuel & Conversion | 67€ | — |
-| Pack Lancement & Visibilité | 147€ | — |
-| Pack Trafic Social & Viralité | 87€ | — |
-| Pack Revenus & Scaling | 99€ | — |
-| **Pack Qualité Éditoriale Pro** | **67€** | — |
-| **Pack Distribution Large** | **97€** | — |
-| **Pack Promotion Éditeur** | **97€** | — |
-| **À la pièce (total)** | **761€** | — |
-| **Pack Tout Complet** | **497€** | **264€** |
+## Détails techniques
+- Code format `NOEL-XXXX-XXXX`, unicité vérifiée côté fonction.
+- Entitlement réutilise `v3_installment_orders` + `useV3Entitlement`.
+- Aucun changement aux packs premium ni à leur checkout.
 
-> Le Pack Tout Complet passe de 497€ (ancrage) vs 761€ à la pièce. Économie de 264€, message : « pour 300€ de plus que la base, tu as tout ».
-
----
-
-## Ce que ça implique techniquement (par phase)
-
-### Phase 1 — Grille tarifaire et roadmap (immédiat)
-- Ajouter les 3 `V3PackId` (`editorial`, `distribution`, `promotion`) dans `src/data/roadmapV3.ts`
-- Ajouter les modules avec `status: 'todo'` dans `V3_MODULES`
-- Mettre à jour `V3_UPSELL_PACKS`, `V3_FULL_PACK`, `MODULE_TO_PACK`, `V3_UPSELLS_TOTAL`
-- Mettre à jour `V3PricingTiers` et `PricingLadder497` pour afficher les 7 packs
-
-### Phase 2 — Packs à construire (priorisé)
-Je te recommande de lancer dans cet ordre :
-1. **Qualité Éditoriale Pro** (67€) — 100% génération IA, aucune base de données complexe, rapide à déployer
-2. **Distribution Large** (97€) — guides + métadonnées + tables légères (ISBN, dépôt légal)
-3. **Promotion Éditeur** (97€) — templates + stratégie IA, similaire aux séquences marketing déjà existantes
-
-### Phase 3 — Intégration V3 Hub
-- Nouvelles sections dans le cockpit V3 (Kanban ou liste) pour les 3 piliers `edition`, `distribution`, `promotion`
-- Couleurs de pilier : `edition` (bordeaux/rouge éditorial), `distribution` (bleu wide), `promotion` (or/jaune éditeur)
-- Droits d'accès via `useV3Entitlement` avec les nouveaux `plan` prefixes
-
----
-
-## Questions ouvertes
-
-1. **Nom du Pack Tout Complet** : on le garde à 497€ malgré les 3 nouveaux packs ? Ça crée une économie de 264€ (très vendeur). Ou tu veux remonter à 597€ pour aligner sur le coût réel ?
-2. **Qualité éditoriale dans la base ?** Mon choix est upsell (67€) car c'est un vrai service éditorial. Tu veux quand même le mettre en base 197€ pour différencier V3 ?
-3. **Par quoi on commence** : tu veux que je lance la Phase 1 (grille) + la construction du Pack Qualité Éditoriale Pro (le plus rapide) tout de suite ?
+## Hypothèses validées
+- Périmètre = **Base seule** (protège les modules).
+- Remise = **−20% → 158€**.
+- **Accès strictement réservé au bénéficiaire** (code single-use lié à un email authentifié).
+- **Mise en évidence avec 1–2 visuels de cartes cadeaux**.

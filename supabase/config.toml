@@ -173,3 +173,12 @@ verify_jwt = false
 
 [functions.v3-upsell-checkout]
 verify_jwt = false
+
+[functions.v3-gift-checkout]
+verify_jwt = false
+
+[functions.v3-gift-verify]
+verify_jwt = false
+
+[functions.v3-gift-redeem]
+verify_jwt = false

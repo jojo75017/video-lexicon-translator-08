@@ -22,6 +22,12 @@ export interface V3Module {
 export const V3_PRICE = 197;
 export const V2_PRICE = 67;
 
+// ============= Carte cadeau Noël =============
+// La Base 197€ offerte sous forme de carte cadeau avec -20% (158€).
+// Ne débloque QUE la Base — les packs premium restent payants (upsell intact).
+export const V3_GIFT_DISCOUNT = 0.20;
+export const V3_GIFT_PRICE = Math.round(V3_PRICE * (1 - V3_GIFT_DISCOUNT)); // 158€
+
 // ============= Grille tarifaire V3 =============
 // Base 197€ + 7 packs upsell (total 661€) → 858€ à la pièce.
 // Pack Tout Complet 497€ → débloque tout, économie de 361€.
