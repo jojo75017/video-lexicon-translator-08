@@ -49,7 +49,7 @@ interface Step {
   moduleId: string;
   label?: string;
   hint: string;
-  /** 'core' = parcours 197€ (22 agents) ; 'premium' = réservé au parcours 497€ (32 agents). */
+  /** 'core' = parcours 197€ (22 agents) ; 'premium' = réservé au parcours 497€ (30 agents). */
   tier?: Tier;
 }
 interface Phase {
@@ -67,7 +67,6 @@ const PHASES: Phase[] = [
       { moduleId: 'p22-trend-radar', label: 'Repérer les tendances', hint: 'Détecte les sujets qui montent sur Amazon.', tier: 'premium' },
       { moduleId: 'niche-intelligence', label: 'Choisir la niche', hint: 'L\'IA sélectionne la niche la plus rentable.' },
       { moduleId: 'p16-competitive', label: 'Analyser la concurrence', hint: 'Étudie les best-sellers de la niche.' },
-      { moduleId: 'ku-niche-detector', label: 'Vérifier la rentabilité (KU)', hint: 'Confirme le potentiel de revenus.', tier: 'premium' },
       { moduleId: 'p26-commercial-score', label: 'Valider le potentiel', hint: 'Note le potentiel commercial avant d\'écrire.' },
     ],
   },
@@ -86,7 +85,7 @@ const PHASES: Phase[] = [
     steps: [
       { moduleId: 'p18-readability', label: 'Auditer la lisibilité', hint: 'Mesure et améliore la fluidité de lecture.' },
       { moduleId: 'p24-cliche-detector', label: 'Nettoyer clichés & répétitions', hint: 'Supprime les tics d\'écriture et redites.', tier: 'premium' },
-      { moduleId: 'p25-tone-adapter', label: 'Adapter le ton', hint: 'Ajuste le ton à la cible de lecteurs.', tier: 'premium' },
+      { moduleId: 'cockpit-audit-pilot', label: 'Auditer la conformité KDP', hint: 'Score complet de conformité avant publication.' },
       { moduleId: 'ebook-anti-plagiat', label: 'Vérifier l\'originalité', hint: 'Contrôle l\'originalité et protège le texte.' },
       { moduleId: 'content-compliance', label: 'Contrôler la conformité KDP', hint: 'Évite les motifs de refus à la publication.' },
     ],
@@ -111,7 +110,6 @@ const PHASES: Phase[] = [
       { moduleId: 'categories-manager-10', label: 'Choisir les 10 catégories', hint: 'Maximise la visibilité avec 10 catégories.' },
       { moduleId: 'prepub-checklist', label: 'Passer la checklist finale', hint: 'Vérifie tout avant de publier.' },
       { moduleId: 'kdp-pack-zip', label: 'Préparer le pack KDP', hint: 'Récapitulatif des fichiers prêts à l\'upload.' },
-      { moduleId: 'audiobook-express', label: 'Créer la version audio', hint: 'Prépare la version audiobook du livre (script & plan TTS).', tier: 'premium' },
     ],
   },
   {
@@ -144,7 +142,7 @@ const buildFlat = (parcours: Parcours): FlatStep[] =>
   ).map((s, i) => ({ ...s, globalIndex: i }));
 
 const CORE_TOTAL = buildFlat('core').length; // 22 agents (197€)
-const FULL_TOTAL = buildFlat('full').length; // 32 agents (497€)
+const FULL_TOTAL = buildFlat('full').length; // 30 agents (497€)
 const PARCOURS_KEY = 'v3_workflow30_parcours';
 
 function loadSet(key: string): Set<string> {
@@ -239,7 +237,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   // Droits réellement payés (197€ base / 497€ Pack Tout Complet). L'admin a tout.
   const { hasFull, loading: entLoading } = useV3Entitlement();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
-  // Parcours actif : 'core' = offre 197€ (22 agents), 'full' = Pack Tout Complet 497€ (32 agents).
+  // Parcours actif : 'core' = offre 197€ (22 agents), 'full' = Pack Tout Complet 497€ (30 agents).
   const [parcours, setParcours] = useState<Parcours>(
     () => ((localStorage.getItem(PARCOURS_KEY) as Parcours) === 'full' ? 'full' : 'core'),
   );
@@ -641,7 +639,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <div className="text-[12px] font-bold uppercase tracking-[0.2em]" style={{ color: AMBER_DEEP }}>
-                  {parcours === 'full' ? '🚀 Parcours Pro — 32 agents' : '📗 Parcours Essentiel — 22 agents'}
+                  {parcours === 'full' ? '🚀 Parcours Pro — 30 agents' : '📗 Parcours Essentiel — 22 agents'}
                 </div>
                 <p className="mt-1 text-[12px]" style={{ color: '#6f5e47' }}>
                   {parcours === 'full'
@@ -674,7 +672,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 <button onClick={() => setParcours('full')}
                   className="mt-3 inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5"
                   style={{ background: `linear-gradient(90deg, ${GREEN}, #2fc488)` }}>
-                  <Sparkles className="h-3.5 w-3.5" /> Activer les 32 agents (Pack Tout Complet)
+                  <Sparkles className="h-3.5 w-3.5" /> Activer les 30 agents (Pack Tout Complet)
                 </button>
               ) : (
                 <div className="mt-3 flex flex-wrap items-center gap-2">

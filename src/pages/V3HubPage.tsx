@@ -317,7 +317,7 @@ const V3HubPage: React.FC = () => {
 
 
       <main className="mx-auto max-w-7xl px-4 py-8">
-        {/* Parcours en 30 étapes — entrée principale du Hub V3 */}
+        {/* Parcours guidé V3 — entrée principale du Hub V3 */}
         <V3Workflow30 onOpenModule={setSelected} />
 
         {/* Récapitulatif global des droits : 197€ vs Pack 497€ */}
