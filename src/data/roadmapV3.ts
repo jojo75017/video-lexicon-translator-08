@@ -429,13 +429,13 @@ export const V3_MODULES: V3Module[] = [
     description: 'Checklist certifiante « niveau édition pro » couvrant éditorial, mise en forme et métadonnées ; appose un badge qualité une fois tous les contrôles validés.' },
 
   // DISTRIBUTION (Pack Distribution Large 97€)
-  { id: 'wide-distribution',     pillar: 'distribution', status: 'todo', title: 'Assistant Distribution Multi-Plateformes',
+  { id: 'wide-distribution',     pillar: 'distribution', status: 'done', title: 'Assistant Distribution Multi-Plateformes',
     description: 'Guide pas-à-pas + métadonnées formatées pour diffuser au-delà d\'Amazon : Kobo, Apple Books, Google Play, Fnac/ePagine, via agrégateurs (Draft2Digital / StreetLib).' },
-  { id: 'legal-deposit-isbn',    pillar: 'distribution', status: 'todo', title: 'Dépôt Légal & ISBN',
+  { id: 'legal-deposit-isbn',    pillar: 'distribution', status: 'done', title: 'Dépôt Légal & ISBN',
     description: 'Accompagnement du dépôt légal BNF, gestion d\'un registre ISBN par titre et par collection, et ISSN pour les séries.' },
-  { id: 'epub-normalizer',       pillar: 'distribution', status: 'todo', title: 'Export EPUB Normé (EPUB 3)',
+  { id: 'epub-normalizer',       pillar: 'distribution', status: 'done', title: 'Export EPUB Normé (EPUB 3)',
     description: 'Vérifie et corrige la conformité EPUB 3 (table des matières, métadonnées, structure) exigée par les plateformes wide, au-delà du flux KDP actuel.' },
-  { id: 'catalog-dashboard',     pillar: 'distribution', status: 'todo', title: 'Tableau de Bord Catalogue',
+  { id: 'catalog-dashboard',     pillar: 'distribution', status: 'done', title: 'Tableau de Bord Catalogue',
     description: 'Vue d\'ensemble du catalogue éditeur : titres, collections, statut de diffusion par canal, ISBN et dépôt légal en un coup d\'œil.' },
 
   // PROMOTION (Pack Promotion Éditeur 97€)
