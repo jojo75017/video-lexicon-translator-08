@@ -258,6 +258,32 @@ const handler = async (req: Request): Promise<Response> => {
           nextEmailAt.setDate(nextEmailAt.getDate() + daysToAdd);
           // Ajouter 9h du matin
           nextEmailAt.setHours(9, 0, 0, 0);
+
+          // 🚀 Accélération : si le prospect n'a PAS cliqué l'email qu'il vient
+          // de recevoir, on avance l'envoi du prochain email (relance plus tôt).
+          try {
+            const { count: clickCount } = await supabaseAdmin
+              .from('email_clicks')
+              .select('id', { count: 'exact', head: true })
+              .eq('prospect_email', sequence.email);
+
+            const hasClicked = (clickCount || 0) > 0;
+
+            if (!hasClicked) {
+              // Programmer l'envoi pour le lendemain 9h00
+              const accelerated = new Date(now);
+              accelerated.setDate(accelerated.getDate() + 1);
+              accelerated.setHours(9, 0, 0, 0);
+
+              // On n'accélère que si c'est réellement plus tôt que le planning normal
+              if (accelerated < nextEmailAt) {
+                console.log(`[CRON] Non-cliqueur ${sequence.email} → relance accélérée pour l'étape ${nextStep + 1}`);
+                nextEmailAt = accelerated;
+              }
+            }
+          } catch (clickErr) {
+            console.error('Erreur vérification clics (accélération):', clickErr);
+          }
         } else {
           completed = true;
         }
