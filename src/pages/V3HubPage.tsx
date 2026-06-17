@@ -369,7 +369,7 @@ const V3HubPage: React.FC = () => {
         ) : pillar === 'roadmap' ? (
           <V3RoadmapTab />
         ) : pillar === 'maison-edition' ? (
-          <MaisonEditionTab onOpenModule={(id) => { const m = getModuleById(id); if (m) setSelected(m); }} />)
+          <MaisonEditionTab onOpenModule={(id) => { const m = getModuleById(id); if (m) setSelected(m); }} />
         ) : filtered.length === 0 ? (
           <div className="text-center py-20 text-sm" style={{ color: '#a18a6c' }}>
             {pillar === 'mine'
