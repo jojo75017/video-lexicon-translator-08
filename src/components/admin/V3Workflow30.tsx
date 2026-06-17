@@ -260,6 +260,8 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   const [error, setError] = useState<string | null>(null);
   const [openPhase, setOpenPhase] = useState<string | null>(PHASES[0].key);
   const [openCfg, setOpenCfg] = useState<'brief' | 'engine' | 'projects' | null>('brief');
+  // Le parcours complet est replié par défaut (« pack ») pour ne pas occuper tout l'écran.
+  const [sectionOpen, setSectionOpen] = useState(false);
   const toggleCfg = (k: 'brief' | 'engine' | 'projects') => setOpenCfg((p) => (p === k ? null : k));
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<string>('');
