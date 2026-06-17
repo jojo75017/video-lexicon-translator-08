@@ -72,6 +72,8 @@ const SeoGeneratorPage = lazy(() => import('./pages/SeoGeneratorPage'));
 const PracticalSheetsGeneratorPage = lazy(() => import('./pages/PracticalSheetsGeneratorPage'));
 const ResultatEn5MinPage = lazy(() => import('./pages/ResultatEn5MinPage'));
 const CadeauPage = lazy(() => import('./pages/CadeauPage'));
+const GiftRedeemPage = lazy(() => import('./pages/GiftRedeemPage'));
+const GiftThankYouPage = lazy(() => import('./pages/GiftThankYouPage'));
 const WebinairePage = lazy(() => import('./pages/WebinairePage'));
 const QuizPage = lazy(() => import('./pages/QuizPage'));
 const ChecklistTournagePage = lazy(() => import('./pages/ChecklistTournagePage'));
