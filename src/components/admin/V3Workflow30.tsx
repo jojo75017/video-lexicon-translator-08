@@ -715,14 +715,14 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <div className="text-[12px] font-bold uppercase tracking-[0.2em]" style={{ color: AMBER_DEEP }}>
-                  {parcours === 'full' ? '🚀 Parcours Pro — 30 agents' : '📗 Parcours Essentiel — 22 agents'}
+                  {parcours === 'full' ? `🚀 Parcours Pro — ${FULL_TOTAL} agents` : `📗 Parcours Essentiel — ${CORE_TOTAL} agents`}
                 </div>
                 <p className="mt-1 text-[12px]" style={{ color: '#6f5e47' }}>
                   {parcours === 'full'
                     ? 'Pack Tout Complet 497€ : écris, publie ET vends (emails de lancement, annonces, suivi des ventes, audio…) avec une IA au niveau maximal (sorties plus longues, variantes A/B).'
                     : hasFull
-                      ? 'Offre 197€ : 22 agents pour aller de l\'idée jusqu\'à publier ton livre sur Amazon. La phase Lancer & vendre reste en aperçu. Tu peux basculer en Pro à tout moment.'
-                      : 'Offre 197€ : 22 agents pour aller de l\'idée jusqu\'à publier ton livre sur Amazon. La phase Lancer & vendre (emails, annonces, suivi des ventes) s\'affiche en aperçu — débloquée avec le Pack 497€.'}
+                      ? `Offre 197€ : ${CORE_TOTAL} agents pour aller de l'idée jusqu'à publier ton livre sur Amazon, sans étape verrouillée en chemin. La phase « Aller plus loin » reste en aperçu. Tu peux basculer en Pro à tout moment.`
+                      : `Offre 197€ : ${CORE_TOTAL} agents pour aller de l'idée jusqu'à publier ton livre sur Amazon, sans étape verrouillée en chemin. La phase « Aller plus loin » (description vendeuse, annonces, lancement, suivi des ventes) s'affiche en aperçu — débloquée avec le Pack 497€.`}
                 </p>
               </div>
               <div className="inline-flex rounded-xl border overflow-hidden" style={{ borderColor: `${AMBER}55` }}>
