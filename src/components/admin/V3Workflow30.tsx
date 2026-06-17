@@ -67,7 +67,6 @@ const PHASES: Phase[] = [
       { moduleId: 'p22-trend-radar', label: 'Repérer les tendances', hint: 'Détecte les sujets qui montent sur Amazon.', tier: 'premium' },
       { moduleId: 'niche-intelligence', label: 'Choisir la niche', hint: 'L\'IA sélectionne la niche la plus rentable.' },
       { moduleId: 'p16-competitive', label: 'Analyser la concurrence', hint: 'Étudie les best-sellers de la niche.' },
-      { moduleId: 'ku-niche-detector', label: 'Vérifier la rentabilité (KU)', hint: 'Confirme le potentiel de revenus.', tier: 'premium' },
       { moduleId: 'p26-commercial-score', label: 'Valider le potentiel', hint: 'Note le potentiel commercial avant d\'écrire.' },
     ],
   },
