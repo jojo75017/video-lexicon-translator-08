@@ -417,15 +417,15 @@ export const V3_MODULES: V3Module[] = [
   // ===== AJOUTS V3 — Maison d'édition — packs upsell — à construire =====
 
   // ÉDITION PRO (Pack Qualité Éditoriale Pro 67€)
-  { id: 'reading-committee',     pillar: 'edition',      status: 'todo', title: 'Comité de Lecture IA',
+  { id: 'reading-committee',     pillar: 'edition',      status: 'done', title: 'Comité de Lecture IA',
     description: 'Fiche de lecture professionnelle comme en maison d\'édition : synopsis, points forts/faibles, public cible, potentiel commercial et verdict argumenté « accepté / à retravailler / refusé ».' },
-  { id: 'developmental-edit',    pillar: 'edition',      status: 'todo', title: 'Édition Structurelle (Developmental Edit)',
+  { id: 'developmental-edit',    pillar: 'edition',      status: 'done', title: 'Édition Structurelle (Developmental Edit)',
     description: 'Analyse de la structure narrative/argumentaire : rythme, cohérence des chapitres, promesses tenues, longueurs et suggestions concrètes de réorganisation.' },
-  { id: 'copy-editing-line',     pillar: 'edition',      status: 'todo', title: 'Copy-editing & Ligne Éditoriale',
+  { id: 'copy-editing-line',     pillar: 'edition',      status: 'done', title: 'Copy-editing & Ligne Éditoriale',
     description: 'Passe d\'édition phrase à phrase (style, registre, fluidité, répétitions) au-delà de la simple correction, dans le strict respect du fond et de la voix de l\'auteur.' },
-  { id: 'collection-charter',    pillar: 'edition',      status: 'todo', title: 'Charte de Collection',
+  { id: 'collection-charter',    pillar: 'edition',      status: 'done', title: 'Charte de Collection',
     description: 'Définit une collection éditoriale cohérente (ton, format, gabarit de couverture, mentions, promesse de lecture) réutilisable sur plusieurs titres pour bâtir un vrai catalogue.' },
-  { id: 'quality-label',         pillar: 'edition',      status: 'todo', title: 'Label Qualité Maison d\'Édition',
+  { id: 'quality-label',         pillar: 'edition',      status: 'done', title: 'Label Qualité Maison d\'Édition',
     description: 'Checklist certifiante « niveau édition pro » couvrant éditorial, mise en forme et métadonnées ; appose un badge qualité une fois tous les contrôles validés.' },
 
   // DISTRIBUTION (Pack Distribution Large 97€)
