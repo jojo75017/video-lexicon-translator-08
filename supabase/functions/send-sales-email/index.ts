@@ -39,7 +39,7 @@ const EMAIL_SEQUENCE = [
   },
   {
     step: 6,
-    day_offset: 12,
+    day_offset: 6,
     subject: "👋 Une dernière chose, {name}",
     preheader: "Je n'ai pas eu de nouvelles — on en reste là ?",
   },
