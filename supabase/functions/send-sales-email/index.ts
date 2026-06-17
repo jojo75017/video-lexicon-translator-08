@@ -21,7 +21,7 @@ const EMAIL_SEQUENCE = [
   },
   {
     step: 3,
-    day_offset: 4,
+    day_offset: 2,
     subject: "💰 0 à 35 livres Amazon — mes vrais chiffres",
     preheader: "Pas de pitch, juste des faits.",
   },
