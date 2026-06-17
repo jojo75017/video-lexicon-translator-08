@@ -85,6 +85,7 @@ import PressService from '@/components/admin/PressService';
 import BooksellersFairs from '@/components/admin/BooksellersFairs';
 import ForeignRights from '@/components/admin/ForeignRights';
 import PreordersStrategy from '@/components/admin/PreordersStrategy';
+import AudioVideoTranscriber from '@/components/admin/AudioVideoTranscriber';
 
 /** Modules dont le dialog s'affiche en largeur réduite (max-w-2xl). */
 export const NARROW_MODULE_IDS: string[] = [
@@ -177,6 +178,7 @@ export const V3_MODULE_COMPONENTS: Record<string, React.ComponentType> = {
   'booksellers-fairs': BooksellersFairs,
   'foreign-rights': ForeignRights,
   'preorders-strategy': PreordersStrategy,
+  'audio-video-transcription': AudioVideoTranscriber,
 };
 
 /** Tous les modules ouvrables (mode hors V3 / cockpit standard). */
