@@ -156,6 +156,11 @@ export const V3_MODULE_COMPONENTS: Record<string, React.ComponentType> = {
   'installment-payments': InstallmentPayments,
   'low-content-books': LowContentBooks,
   'onboarding-guides': OnboardingGuides,
+  'reading-committee': ReadingCommittee,
+  'developmental-edit': DevelopmentalEdit,
+  'copy-editing-line': CopyEditingLine,
+  'collection-charter': CollectionCharter,
+  'quality-label': QualityLabel,
 };
 
 /** Tous les modules ouvrables (mode hors V3 / cockpit standard). */
