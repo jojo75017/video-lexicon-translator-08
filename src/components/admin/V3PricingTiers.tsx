@@ -25,6 +25,7 @@ const V3PricingTiers: React.FC = () => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [baseCheckoutOpen, setBaseCheckoutOpen] = useState(false);
   const [openPack, setOpenPack] = useState<string | null>(null);
+  const [buyPack, setBuyPack] = useState<V3UpsellPack | null>(null);
   const [activeModule, setActiveModule] = useState<V3Module | null>(null);
 
   return (
