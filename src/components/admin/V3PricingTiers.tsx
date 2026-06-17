@@ -31,13 +31,59 @@ const V3PricingTiers: React.FC = () => {
   const [openPack, setOpenPack] = useState<string | null>(null);
   const [buyPack, setBuyPack] = useState<V3UpsellPack | null>(null);
   const [activeModule, setActiveModule] = useState<V3Module | null>(null);
+  const [giftOpen, setGiftOpen] = useState(false);
 
   return (
     <section id="tarifs" className="mt-16 scroll-mt-20">
       <V3PackCheckout open={checkoutOpen} onClose={() => setCheckoutOpen(false)} product="full" />
       <V3PackCheckout open={baseCheckoutOpen} onClose={() => setBaseCheckoutOpen(false)} product="base" />
       <V3UpsellCheckout pack={buyPack} onClose={() => setBuyPack(null)} />
+      <V3GiftCheckout open={giftOpen} onClose={() => setGiftOpen(false)} />
       <V3ModuleDialog module={activeModule} onClose={() => setActiveModule(null)} />
+
+      {/* 0. Carte cadeau Noël — mise en évidence */}
+      <div className="mb-10 rounded-3xl border-2 overflow-hidden shadow-[0_12px_40px_-16px_rgba(232,149,30,0.5)]"
+        style={{ borderColor: AMBER }}>
+        <div className="grid md:grid-cols-2 gap-0">
+          <div className="relative p-6 sm:p-8 flex flex-col justify-center" style={{ background: AMBER_SOFT }}>
+            <span className="inline-flex self-start items-center gap-1.5 text-[10px] font-black uppercase tracking-wider rounded-full px-3 py-1 mb-3"
+              style={{ background: `linear-gradient(90deg, ${AMBER}, #FFB44D)`, color: '#fff' }}>
+              <Gift className="h-3.5 w-3.5" /> Offre de Noël · −{Math.round(V3_GIFT_DISCOUNT * 100)}%
+            </span>
+            <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: SERIF, color: INK }}>
+              Offrez la création de livres en carte cadeau
+            </h3>
+            <p className="text-sm mb-4" style={{ color: '#6f5e47' }}>
+              Offrez à un proche l'accès à vie au générateur (Base — écrire & publier). Il reçoit un
+              <strong> code unique</strong> à activer sur son compte. Les packs premium restent à part.
+            </p>
+            <div className="flex items-end gap-3 mb-5">
+              <span className="text-lg line-through" style={{ color: '#bcaa8c' }}>{V3_PRICE}€</span>
+              <span className="text-4xl font-black" style={{ color: AMBER_DEEP }}>{V3_GIFT_PRICE}€</span>
+              <span className="text-sm pb-1" style={{ color: '#a18a6c' }}>à vie</span>
+            </div>
+            <button
+              onClick={() => setGiftOpen(true)}
+              className="w-full sm:w-auto self-start inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm font-black transition-transform hover:-translate-y-0.5"
+              style={{ background: `linear-gradient(90deg, ${AMBER}, #FFB44D)`, color: '#fff' }}
+            >
+              <Gift className="h-4 w-4" />
+              Offrir cette carte cadeau — {V3_GIFT_PRICE}€
+            </button>
+            <p className="text-[11px] mt-3" style={{ color: '#a18a6c' }}>
+              Déjà un code ? <a href="/carte-cadeau" className="font-semibold underline" style={{ color: AMBER_DEEP }}>Activez-le ici →</a>
+            </p>
+          </div>
+          <div className="relative flex items-center justify-center gap-3 p-6 sm:p-8 bg-white overflow-hidden">
+            <img src={giftCard1} alt="Carte cadeau EbookStudio Noël" loading="lazy" width={1024} height={1024}
+              className="w-1/2 max-w-[220px] rounded-xl shadow-lg rotate-[-6deg]" />
+            <img src={giftCard2} alt="Carte cadeau EbookStudio près de livres" loading="lazy" width={1024} height={1024}
+              className="w-1/2 max-w-[220px] rounded-xl shadow-lg rotate-[4deg] mt-6" />
+          </div>
+        </div>
+      </div>
+
+
       <div className="text-center mb-10">
         <div className="inline-flex items-center gap-2 mb-3">
           <Crown className="h-5 w-5" style={{ color: AMBER }} />
