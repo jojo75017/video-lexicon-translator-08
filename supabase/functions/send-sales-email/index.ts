@@ -27,7 +27,7 @@ const EMAIL_SEQUENCE = [
   },
   {
     step: 4,
-    day_offset: 6,
+    day_offset: 3,
     subject: "🎁 67€ aujourd'hui = la V3 à 197€ offerte",
     preheader: "L'offre Fondateur inclut la future V3 gratuitement.",
   },
