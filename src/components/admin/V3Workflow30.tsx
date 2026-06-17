@@ -1172,10 +1172,15 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                               {isLocked && !isDone && ready && mod && (
                                 <div className="mt-2">
                                   <button onClick={() => onOpenModule(mod)}
-                                    className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold border transition-colors hover:bg-[#FFF3DF]"
-                                    style={{ borderColor: '#eadfc9', color: AMBER_DEEP }}>
-                                    <Sparkles className="h-3.5 w-3.5" /> Ouvrir l'outil maintenant <ArrowRight className="h-3 w-3" />
+                                    className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-[13px] font-bold border-2 shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                    style={{ background: '#FF9E2D', borderColor: '#E0880B', color: '#FFFFFF' }}>
+                                    <Sparkles className="h-4 w-4" style={{ color: '#FFFFFF' }} />
+                                    Ouvrir l'outil maintenant
+                                    <ArrowRight className="h-4 w-4" style={{ color: '#FFFFFF' }} />
                                   </button>
+                                  <p className="mt-1.5 text-[11px] font-medium" style={{ color: '#C97A14' }}>
+                                    Clique ici pour créer ton image / couverture directement
+                                  </p>
                                 </div>
                               )}
 
