@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Check, Crown, Sparkles, Lock, ChevronDown, CheckCircle2, Clock } from 'lucide-react';
 import {
   V3_PRICE, V3_BASE_INSTALLMENTS, V3_UPSELL_PACKS, V3_UPSELLS_TOTAL, V3_FULL_PACK,
-  getModuleById, type V3Module,
+  V3_MODULES, getModuleAccess, getModuleById, type V3Module,
 } from '@/data/roadmapV3';
 import { isModuleClickable, V3ModuleDialog } from './v3ModuleRegistry';
 import V3PackCheckout from './V3PackCheckout';
@@ -95,8 +95,26 @@ const V3PricingTiers: React.FC = () => {
               <h3 className="text-lg font-bold" style={{ fontFamily: SERIF, color: INK }}>{V3_FULL_PACK.title}</h3>
             </div>
             <p className="text-sm mb-4" style={{ color: '#6f5e47' }}>
-              La base + les 4 packs premium débloqués d'un coup. Tout l'arsenal, sans rien à ajouter.
+              Tout débloqué : la base (197€) + les 7 packs premium (661€).<br />
+              Tu accèdes à <strong>tous les outils actuels et futurs</strong>, sans limitation.
             </p>
+            <div className="mb-3 rounded-xl border p-3" style={{ borderColor: `${AMBER}55`, background: AMBER_SOFT }}>
+              <p className="text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: AMBER_DEEP }}>
+                Les 7 packs inclus ({V3_UPSELL_PACKS.length} packs) :
+              </p>
+              <ul className="grid grid-cols-2 gap-x-3 gap-y-1 text-[11px]" style={{ color: '#6f5e47' }}>
+                {V3_UPSELL_PACKS.map((p) => (
+                  <li key={p.id} className="flex items-center gap-1.5">
+                    <Check className="h-3 w-3 shrink-0" style={{ color: '#1f9d6b' }} />
+                    <span className="font-semibold" style={{ color: INK }}>{p.title}</span>{' '}
+                    <span style={{ color: '#a18a6c' }}>({p.modules.length} modules)</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-2 text-[10px] font-medium" style={{ color: AMBER_DEEP }}>
+                + la base Création & Publication ({V3_MODULES.filter((m) => getModuleAccess(m.id) === 'included').length} modules)
+              </p>
+            </div>
             <div className="flex items-end gap-3 mb-1">
               <span className="text-4xl font-black" style={{ color: AMBER_DEEP }}>{V3_FULL_PACK.price}€</span>
               <span className="text-lg line-through pb-1" style={{ color: '#bcaa8c' }}>{V3_FULL_PACK.compareAt}€</span>
