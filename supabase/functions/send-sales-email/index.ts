@@ -156,6 +156,105 @@ Georges`,
   return bodies[step] || "";
 }
 
+// ===== Segment "intéressés" : prospects qui ont déjà manifesté un intérêt =====
+// Version plus directe, orientée DÉMO + OFFRE (moins de pédagogie, plus d'action)
+const INTERESSE_SUBJECTS: Record<number, string> = {
+  1: "🎬 Votre démo EbookStudio est prête",
+  2: "👀 Vous l'avez testé ? Voici l'offre Fondateur",
+  3: "💰 67€ à vie = la V3 (197€) offerte",
+  4: "🔥 Pourquoi maintenant et pas dans 3 mois",
+  5: "🔒 Dernier rappel : offre Fondateur 67€",
+  6: "👋 {name}, on en reste là ?",
+};
+
+function getInteresseEmailBody(step: number, firstName: string): string {
+  const name = firstName || "cher lecteur";
+
+  const bodies: Record<number, string> = {
+    1: `Bonjour ${name},
+
+Vous avez manifesté de l'intérêt pour EbookStudio Pro — alors allons droit au but.
+
+Le plus simple, c'est de voir l'outil en action :
+
+👉 Démo gratuite (idée → livre Amazon en quelques clics) : ${DEMO_LINK}
+
+Et si vous voulez déjà l'offre complète :
+👉 ${OFFRES_LINK} — **67€ à vie** (paiement unique).
+
+Testez, puis dites-moi ce que vous en pensez.
+Georges`,
+
+    2: `${name},
+
+Avez-vous pris 2 minutes pour regarder la démo ? 👉 ${DEMO_LINK}
+
+Si oui, vous avez vu de quoi l'outil est capable : plan automatique, rédaction IA, couvertures pro, export Amazon KDP.
+
+L'offre Fondateur est à **67€ à vie** (ou 2×35€ / 3×25€) :
+👉 ${OFFRES_LINK}
+
+Georges`,
+
+    3: `${name},
+
+Une vraie raison d'agir maintenant :
+
+Aujourd'hui = **67€ à vie**. La future V3 "Publication Assistée Pro" sera vendue 197€… et elle vous sera offerte en mise à jour.
+
+67€ aujourd'hui = un outil qui en vaudra 197€ demain.
+
+👉 Verrouiller mon accès : ${OFFRES_LINK}
+👉 Revoir la démo : ${DEMO_LINK}
+
+Georges`,
+
+    4: `${name},
+
+Pourquoi ne pas attendre :
+
+• Le prix Fondateur (67€) augmentera au lancement de la V3.
+• Chaque semaine sans outil = des livres non publiés.
+• La démo est gratuite, vous ne risquez rien à tester.
+
+👉 Tester : ${DEMO_LINK}
+👉 Rejoindre à 67€ : ${OFFRES_LINK}
+
+Georges`,
+
+    5: `${name},
+
+Dernier rappel sur l'offre Fondateur.
+
+EbookStudio Pro à **67€ à vie** :
+✅ Générateur IA illimité
+✅ Couvertures pro
+✅ Livre audio
+✅ Marketing & KDP intégrés
+✅ Mise à jour V3 incluse
+
+👉 Rejoindre : ${OFFRES_LINK}
+👉 Ou tester d'abord : ${DEMO_LINK}
+
+Georges`,
+
+    6: `${name},
+
+Je vous ai écrit plusieurs fois sans retour — c'est OK.
+
+Une question honnête : qu'est-ce qui vous retient ? Le prix, le doute, le temps ?
+
+Répondez-moi simplement, je lis tout. Et la démo reste gratuite :
+👉 ${DEMO_LINK}
+👉 L'offre 67€ à vie : ${OFFRES_LINK}
+
+Au plaisir d'échanger,
+Georges`,
+  };
+
+  return bodies[step] || "";
+}
+
 function buildHtmlEmail(body: string, email?: string, step?: number): string {
   const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
 
