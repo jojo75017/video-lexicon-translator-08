@@ -59,11 +59,11 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
   {
     id: 'social',
     title: 'Pack Trafic Social & Viralité',
-    desc: 'Une machine à trafic gratuit : Pinterest auto-pins, hooks viraux TikTok/Reels, calendrier éditorial 30 jours, visuels citations, book trailer IA et kit influenceurs pour attirer des lecteurs sans dépenser en pub.',
+    desc: 'Une machine à trafic gratuit : Pinterest auto-pins, hooks viraux TikTok/Reels, calendrier éditorial 30 jours, visuels citations, book trailer IA, kit influenceurs et transcription audio/vidéo → texte pour recycler podcasts et vidéos en chapitres.',
     price: 87,
     modules: [
       'pinterest-pins', 'tiktok-hooks', 'social-calendar-30', 'quote-visuals',
-      'book-trailer', 'influencer-kit',
+      'book-trailer', 'influencer-kit', 'audio-video-transcription',
     ],
   },
   {
@@ -287,6 +287,8 @@ export const V3_MODULES: V3Module[] = [
     description: 'Mémorise et applique le style signature sur toute une série.' },
   { id: 'p20-chat-manuscript',  pillar: 'ia',        status: 'done', title: 'ORACLE — Chat Manuscrit (P20)',
     description: 'Pose des questions à ton propre livre (cohérence, résumé, fiches persos).' },
+  { id: 'audio-video-transcription', pillar: 'ia', status: 'done', tier: 'upsell', title: 'Transcription Audio / Vidéo → Texte',
+    description: 'Convertit tes fichiers audio et vidéo (podcasts, interviews, conférences, YouTube, notes vocales) en texte propre, ponctué et éditable directement dans l\'interface — jusqu\'à 99 langues. Idéal pour transformer du contenu parlé en chapitres de livre.' },
 
   // ===== AJOUTS — issus du guide publication KDP (modules 03 → 08) — en attente =====
 
