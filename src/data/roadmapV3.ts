@@ -118,8 +118,8 @@ export const V3_FULL_PACK = {
   title: 'Pack Tout Complet',
   price: 497,
   /** Prix si on prend la base + tous les packs séparément. */
-  compareAt: V3_PRICE + V3_UPSELLS_TOTAL, // 597
-  saves: V3_PRICE + V3_UPSELLS_TOTAL - 497, // 100
+  compareAt: V3_PRICE + V3_UPSELLS_TOTAL, // 858
+  saves: V3_PRICE + V3_UPSELLS_TOTAL - 497, // 361
   installments: ['1×497€', '4×129€', '6×85€'],
 };
 
