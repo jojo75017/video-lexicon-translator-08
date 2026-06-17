@@ -260,8 +260,20 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   const [error, setError] = useState<string | null>(null);
   const [openPhase, setOpenPhase] = useState<string | null>(PHASES[0].key);
   const [openCfg, setOpenCfg] = useState<'brief' | 'engine' | 'projects' | null>('brief');
-  // Le parcours complet est replié par défaut (« pack ») pour ne pas occuper tout l'écran.
-  const [sectionOpen, setSectionOpen] = useState(false);
+  // Le parcours est ouvert par défaut (le workflow doit être visible). L'utilisateur
+  // peut le replier en « pack » compact ; son choix est mémorisé.
+  const [sectionOpen, setSectionOpen] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('v3_workflow30_section_open') !== '0';
+    } catch {
+      return true;
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem('v3_workflow30_section_open', sectionOpen ? '1' : '0');
+    } catch {}
+  }, [sectionOpen]);
   const toggleCfg = (k: 'brief' | 'engine' | 'projects') => setOpenCfg((p) => (p === k ? null : k));
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<string>('');
