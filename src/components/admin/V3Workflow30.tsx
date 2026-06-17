@@ -142,7 +142,7 @@ const buildFlat = (parcours: Parcours): FlatStep[] =>
   ).map((s, i) => ({ ...s, globalIndex: i }));
 
 const CORE_TOTAL = buildFlat('core').length; // 22 agents (197€)
-const FULL_TOTAL = buildFlat('full').length; // 32 agents (497€)
+const FULL_TOTAL = buildFlat('full').length; // 30 agents (497€)
 const PARCOURS_KEY = 'v3_workflow30_parcours';
 
 function loadSet(key: string): Set<string> {
