@@ -672,11 +672,18 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 est sauvegardée automatiquement.
               </p>
             </div>
-            <button onClick={reset}
-              className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold border transition-colors hover:bg-[#FFF3DF]"
-              style={{ borderColor: `${AMBER}55`, color: AMBER_DEEP }}>
-              <RotateCcw className="h-3.5 w-3.5" /> Recommencer
-            </button>
+            <div class-name="flex items-center gap-2" className="flex flex-wrap items-center gap-2">
+              <button onClick={() => setSectionOpen(false)}
+                className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold border transition-colors hover:bg-[#FFF3DF]"
+                style={{ borderColor: `${AMBER}55`, color: AMBER_DEEP }}>
+                <ChevronDown className="h-3.5 w-3.5 rotate-180" /> Réduire
+              </button>
+              <button onClick={reset}
+                className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold border transition-colors hover:bg-[#FFF3DF]"
+                style={{ borderColor: `${AMBER}55`, color: AMBER_DEEP }}>
+                <RotateCcw className="h-3.5 w-3.5" /> Recommencer
+              </button>
+            </div>
           </div>
 
           {/* Sélecteur de parcours selon l'offre réellement réglée */}
