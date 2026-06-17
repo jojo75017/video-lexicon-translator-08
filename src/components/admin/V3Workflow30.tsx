@@ -59,12 +59,20 @@ interface Phase {
   steps: Step[];
 }
 
-/** Le parcours complet : de l'idée au livre publié et vendu. 30 étapes. */
+/**
+ * Le parcours complet : de l'idée au livre publié, puis vendu.
+ *
+ * RÈGLE D'ORGANISATION (importante pour l'expérience 197€) :
+ *   - Les 5 premières phases ne contiennent QUE des étapes « core » (197€).
+ *     Un acheteur 197€ déroule donc tout le parcours « idée → publié » sans
+ *     jamais croiser une étape verrouillée au milieu de son travail.
+ *   - Toutes les étapes Pro (497€) sont regroupées dans une seule phase finale
+ *     « Aller plus loin » présentée comme un bonus après la publication.
+ */
 const PHASES: Phase[] = [
   {
     key: 'idee', emoji: '🔎', title: 'Phase 1 — Trouver l\'idée gagnante',
     steps: [
-      { moduleId: 'p22-trend-radar', label: 'Repérer les tendances', hint: 'Détecte les sujets qui montent sur Amazon.', tier: 'premium' },
       { moduleId: 'niche-intelligence', label: 'Choisir la niche', hint: 'L\'IA sélectionne la niche la plus rentable.' },
       { moduleId: 'p16-competitive', label: 'Analyser la concurrence', hint: 'Étudie les best-sellers de la niche.' },
       { moduleId: 'p26-commercial-score', label: 'Valider le potentiel', hint: 'Note le potentiel commercial avant d\'écrire.' },
@@ -74,7 +82,6 @@ const PHASES: Phase[] = [
     key: 'ecriture', emoji: '✍️', title: 'Phase 2 — Concevoir & écrire le livre',
     steps: [
       { moduleId: 'book-creation-studio', label: 'Créer le concept & le plan', hint: 'Titre, sous-titre, structure et 1er chapitre.' },
-      { moduleId: 'p17-series', label: 'Architecturer la série', hint: 'Planifie les tomes si c\'est une saga.', tier: 'premium' },
       { moduleId: 'p19-author-voice', label: 'Fixer la voix d\'auteur', hint: 'Définit un style constant pour tout le livre.' },
       { moduleId: 'p20-chat-manuscript', label: 'Développer le manuscrit', hint: 'Rédige le cœur du contenu chapitre par chapitre.' },
       { moduleId: 'p23-universe-bible', label: 'Vérifier la cohérence', hint: 'Contrôle la cohérence de l\'univers et des persos.' },
@@ -84,7 +91,6 @@ const PHASES: Phase[] = [
     key: 'qualite', emoji: '🧪', title: 'Phase 3 — Réviser & garantir la qualité',
     steps: [
       { moduleId: 'p18-readability', label: 'Auditer la lisibilité', hint: 'Mesure et améliore la fluidité de lecture.' },
-      { moduleId: 'p24-cliche-detector', label: 'Nettoyer clichés & répétitions', hint: 'Supprime les tics d\'écriture et redites.', tier: 'premium' },
       { moduleId: 'cockpit-audit-pilot', label: 'Auditer la conformité KDP', hint: 'Score complet de conformité avant publication.' },
       { moduleId: 'ebook-anti-plagiat', label: 'Vérifier l\'originalité', hint: 'Contrôle l\'originalité et protège le texte.' },
       { moduleId: 'content-compliance', label: 'Contrôler la conformité KDP', hint: 'Évite les motifs de refus à la publication.' },
@@ -97,7 +103,6 @@ const PHASES: Phase[] = [
       { moduleId: 'back-matter-builder', label: 'Rédiger les pages de fin', hint: 'Remerciements, bio et appels à l\'action.' },
       { moduleId: 'copyright-page', label: 'Générer la page copyright', hint: 'Crée les mentions légales obligatoires.' },
       { moduleId: 'cover-studio-pro', label: 'Concevoir la couverture', hint: 'Direction artistique de couverture haut de gamme.' },
-      { moduleId: 'cover-variants-thumbnail', label: 'Tester la miniature Amazon', hint: 'Valide la lisibilité du titre en petit.', tier: 'premium' },
     ],
   },
   {
@@ -113,13 +118,20 @@ const PHASES: Phase[] = [
     ],
   },
   {
-    key: 'vente', emoji: '📈', title: 'Phase 6 — Lancer & vendre',
+    // Phase finale entièrement Pro (497€). Regroupée ici pour que le parcours
+    // 197€ reste fluide : ce sont des bonus pour aller plus loin après publication.
+    key: 'aller-plus-loin', emoji: '📈', title: 'Phase 6 — Aller plus loin (Pack Tout Complet · 497€)',
     steps: [
-      // Toute la phase Vente est réservée au Pack Tout Complet (497€) : le 197€ va jusqu'à publier, pas vendre.
+      // Lancer & vendre : tout le marketing/ventes est réservé au Pack 497€.
       { moduleId: 'sales-description', label: 'Écrire la description vendeuse', hint: 'Une fiche produit qui convertit.', tier: 'premium' },
       { moduleId: 'listing-optimizer', label: 'Optimiser l\'annonce', hint: 'Titre et mots-clés optimisés pour Amazon.', tier: 'premium' },
       { moduleId: 'launch-sequence-j7', label: 'Préparer la séquence J-7', hint: 'Plan de lancement jour par jour.', tier: 'premium' },
       { moduleId: 'sales-tracker', label: 'Mettre en place le suivi des ventes', hint: 'Plan de pilotage des ventes et royalties.', tier: 'premium' },
+      // Raffinements avancés (sortis du parcours 197€ pour ne pas le bloquer).
+      { moduleId: 'p22-trend-radar', label: 'Repérer les tendances', hint: 'Détecte les sujets qui montent sur Amazon.', tier: 'premium' },
+      { moduleId: 'p17-series', label: 'Architecturer la série', hint: 'Planifie les tomes si c\'est une saga.', tier: 'premium' },
+      { moduleId: 'p24-cliche-detector', label: 'Nettoyer clichés & répétitions', hint: 'Supprime les tics d\'écriture et redites.', tier: 'premium' },
+      { moduleId: 'cover-variants-thumbnail', label: 'Tester la miniature Amazon', hint: 'Valide la lisibilité du titre en petit.', tier: 'premium' },
     ],
   },
 ];
@@ -703,14 +715,14 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <div className="text-[12px] font-bold uppercase tracking-[0.2em]" style={{ color: AMBER_DEEP }}>
-                  {parcours === 'full' ? '🚀 Parcours Pro — 30 agents' : '📗 Parcours Essentiel — 22 agents'}
+                  {parcours === 'full' ? `🚀 Parcours Pro — ${FULL_TOTAL} agents` : `📗 Parcours Essentiel — ${CORE_TOTAL} agents`}
                 </div>
                 <p className="mt-1 text-[12px]" style={{ color: '#6f5e47' }}>
                   {parcours === 'full'
                     ? 'Pack Tout Complet 497€ : écris, publie ET vends (emails de lancement, annonces, suivi des ventes, audio…) avec une IA au niveau maximal (sorties plus longues, variantes A/B).'
                     : hasFull
-                      ? 'Offre 197€ : 22 agents pour aller de l\'idée jusqu\'à publier ton livre sur Amazon. La phase Lancer & vendre reste en aperçu. Tu peux basculer en Pro à tout moment.'
-                      : 'Offre 197€ : 22 agents pour aller de l\'idée jusqu\'à publier ton livre sur Amazon. La phase Lancer & vendre (emails, annonces, suivi des ventes) s\'affiche en aperçu — débloquée avec le Pack 497€.'}
+                      ? `Offre 197€ : ${CORE_TOTAL} agents pour aller de l'idée jusqu'à publier ton livre sur Amazon, sans étape verrouillée en chemin. La phase « Aller plus loin » reste en aperçu. Tu peux basculer en Pro à tout moment.`
+                      : `Offre 197€ : ${CORE_TOTAL} agents pour aller de l'idée jusqu'à publier ton livre sur Amazon, sans étape verrouillée en chemin. La phase « Aller plus loin » (description vendeuse, annonces, lancement, suivi des ventes) s'affiche en aperçu — débloquée avec le Pack 497€.`}
                 </p>
               </div>
               <div className="inline-flex rounded-xl border overflow-hidden" style={{ borderColor: `${AMBER}55` }}>
@@ -736,7 +748,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 <button onClick={() => setParcours('full')}
                   className="mt-3 inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5"
                   style={{ background: `linear-gradient(90deg, ${GREEN}, #2fc488)` }}>
-                  <Sparkles className="h-3.5 w-3.5" /> Activer les 30 agents (Pack Tout Complet)
+                  <Sparkles className="h-3.5 w-3.5" /> Activer les {FULL_TOTAL} agents (Pack Tout Complet)
                 </button>
               ) : (
                 <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -1080,9 +1092,10 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                               {isTeaser && (
                                 <div className="mt-2 rounded-xl border p-3" style={{ borderColor: `${GREEN}33`, background: '#f6fdf9' }}>
                                   <p className="text-[11px] leading-snug" style={{ color: '#4a6a59' }}>
-                                    🔒 Cet agent fait partie de la phase <strong>Lancer & vendre</strong> (réservée au Pack Tout Complet 497€) :
-                                    séquences d'emails, optimisation d'annonce, suivi des ventes… Le parcours 197€ t'amène jusqu'à publier ton livre ;
-                                    le Pack 497€ le lance et le vend, avec une IA encore plus puissante (sorties plus longues, variantes A/B).
+                                    🔒 Cet agent fait partie de la phase <strong>Aller plus loin</strong> (réservée au Pack Tout Complet 497€) :
+                                    description vendeuse, optimisation d'annonce, séquence de lancement, suivi des ventes et raffinements avancés…
+                                    Le parcours 197€ t'amène jusqu'à publier ton livre ; le Pack 497€ le lance et le vend, avec une IA encore plus
+                                    puissante (sorties plus longues, variantes A/B).
                                   </p>
                                   <button onClick={() => setCheckoutOpen(true)}
                                     className="mt-2 inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5"
