@@ -32,6 +32,7 @@ const V3PricingTiers: React.FC = () => {
     <section id="tarifs" className="mt-16 scroll-mt-20">
       <V3PackCheckout open={checkoutOpen} onClose={() => setCheckoutOpen(false)} product="full" />
       <V3PackCheckout open={baseCheckoutOpen} onClose={() => setBaseCheckoutOpen(false)} product="base" />
+      <V3UpsellCheckout pack={buyPack} onClose={() => setBuyPack(null)} />
       <V3ModuleDialog module={activeModule} onClose={() => setActiveModule(null)} />
       <div className="text-center mb-10">
         <div className="inline-flex items-center gap-2 mb-3">
