@@ -381,9 +381,15 @@ Deno.serve(async (req) => {
       }
 
       const seqInfo = EMAIL_SEQUENCE[stepToSend - 1];
-      const emailBody = getEmailBody(stepToSend, prospect.first_name);
+      const isInteresse = prospect.source === "interesses";
+      const emailBody = isInteresse
+        ? getInteresseEmailBody(stepToSend, prospect.first_name)
+        : getEmailBody(stepToSend, prospect.first_name);
       const htmlContent = buildHtmlEmail(emailBody, prospect.email, stepToSend);
-      const subject = seqInfo.subject.replace(/\{name\}/g, prospect.first_name || "vous");
+      const rawSubject = isInteresse
+        ? (INTERESSE_SUBJECTS[stepToSend] || seqInfo.subject)
+        : seqInfo.subject;
+      const subject = rawSubject.replace(/\{name\}/g, prospect.first_name || "vous");
 
       try {
         const res = await fetch("https://api.brevo.com/v3/smtp/email", {
