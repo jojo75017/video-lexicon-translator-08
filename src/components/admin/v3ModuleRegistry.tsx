@@ -77,6 +77,10 @@ import DevelopmentalEdit from '@/components/admin/DevelopmentalEdit';
 import CopyEditingLine from '@/components/admin/CopyEditingLine';
 import CollectionCharter from '@/components/admin/CollectionCharter';
 import QualityLabel from '@/components/admin/QualityLabel';
+import WideDistribution from '@/components/admin/WideDistribution';
+import LegalDepositIsbn from '@/components/admin/LegalDepositIsbn';
+import EpubNormalizer from '@/components/admin/EpubNormalizer';
+import CatalogDashboard from '@/components/admin/CatalogDashboard';
 
 /** Modules dont le dialog s'affiche en largeur réduite (max-w-2xl). */
 export const NARROW_MODULE_IDS: string[] = [
@@ -161,6 +165,10 @@ export const V3_MODULE_COMPONENTS: Record<string, React.ComponentType> = {
   'copy-editing-line': CopyEditingLine,
   'collection-charter': CollectionCharter,
   'quality-label': QualityLabel,
+  'wide-distribution': WideDistribution,
+  'legal-deposit-isbn': LegalDepositIsbn,
+  'epub-normalizer': EpubNormalizer,
+  'catalog-dashboard': CatalogDashboard,
 };
 
 /** Tous les modules ouvrables (mode hors V3 / cockpit standard). */
