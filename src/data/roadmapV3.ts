@@ -157,18 +157,24 @@ export function getModuleAccess(moduleId: string): V3Access {
 }
 
 export const V3_PILLAR_META: Record<V3Pillar, { label: string; color: string; emoji: string }> = {
-  publier:    { label: 'Publier',    color: '#008296', emoji: '📦' },
-  monetiser:  { label: 'Monétiser',  color: '#FF9E2D', emoji: '💰' },
-  marketing:  { label: 'Marketing',  color: '#7C3AED', emoji: '📣' },
-  ia:         { label: 'IA avancée', color: '#10B981', emoji: '🧠' },
+  publier:      { label: 'Publier',         color: '#008296', emoji: '📦' },
+  monetiser:    { label: 'Monétiser',       color: '#FF9E2D', emoji: '💰' },
+  marketing:    { label: 'Marketing',       color: '#7C3AED', emoji: '📣' },
+  ia:           { label: 'IA avancée',      color: '#10B981', emoji: '🧠' },
+  edition:      { label: 'Édition Pro',     color: '#9B2335', emoji: '📕' },
+  distribution: { label: 'Distribution',    color: '#1D4ED8', emoji: '🌍' },
+  promotion:    { label: 'Promotion',       color: '#B8860B', emoji: '📰' },
 };
 
 // Variante "Midnight Indigo" — utilisée uniquement en mode V3 (cockpit admin).
 export const V3_PILLAR_COLORS: Record<V3Pillar, string> = {
-  publier:    '#6366f1',
-  monetiser:  '#818cf8',
-  marketing:  '#a5b4fc',
-  ia:         '#38bdf8',
+  publier:      '#6366f1',
+  monetiser:    '#818cf8',
+  marketing:    '#a5b4fc',
+  ia:           '#38bdf8',
+  edition:      '#f87171',
+  distribution: '#60a5fa',
+  promotion:    '#fbbf24',
 };
 
 export const V3_MODULES: V3Module[] = [
