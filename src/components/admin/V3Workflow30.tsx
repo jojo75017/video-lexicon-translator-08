@@ -1092,9 +1092,10 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                               {isTeaser && (
                                 <div className="mt-2 rounded-xl border p-3" style={{ borderColor: `${GREEN}33`, background: '#f6fdf9' }}>
                                   <p className="text-[11px] leading-snug" style={{ color: '#4a6a59' }}>
-                                    🔒 Cet agent fait partie de la phase <strong>Lancer & vendre</strong> (réservée au Pack Tout Complet 497€) :
-                                    séquences d'emails, optimisation d'annonce, suivi des ventes… Le parcours 197€ t'amène jusqu'à publier ton livre ;
-                                    le Pack 497€ le lance et le vend, avec une IA encore plus puissante (sorties plus longues, variantes A/B).
+                                    🔒 Cet agent fait partie de la phase <strong>Aller plus loin</strong> (réservée au Pack Tout Complet 497€) :
+                                    description vendeuse, optimisation d'annonce, séquence de lancement, suivi des ventes et raffinements avancés…
+                                    Le parcours 197€ t'amène jusqu'à publier ton livre ; le Pack 497€ le lance et le vend, avec une IA encore plus
+                                    puissante (sorties plus longues, variantes A/B).
                                   </p>
                                   <button onClick={() => setCheckoutOpen(true)}
                                     className="mt-2 inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5"
