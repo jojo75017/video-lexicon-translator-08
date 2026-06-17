@@ -404,7 +404,7 @@ Deno.serve(async (req) => {
             to: [{ email: prospect.email, name: prospect.first_name || undefined }],
             subject,
             htmlContent,
-            tags: [`sales-step-${stepToSend}`],
+            tags: [`sales-step-${stepToSend}`, isInteresse ? "segment-interesses" : "segment-froid"],
           }),
         });
 
