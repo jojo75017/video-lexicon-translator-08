@@ -1,67 +1,49 @@
-# Carte Cadeau Noël — Base V3 à -20% (accès réservé au bénéficiaire)
-
 ## Objectif
-Offrir le générateur (Base V3, normalement 197€) sous forme de **carte cadeau de Noël** vendue avec **−20%**, soit **158€**. La carte est **mise en évidence** dans le bloc tarifs avec **1 ou 2 visuels de cartes cadeaux** (style Noël, cohérent avec l'image de référence fournie).
 
-La carte débloque **uniquement la Base** (création + publication). Les **packs premium restent payants** → aucune perte sur les ventes de modules.
+Ajouter un **onglet dédié « Maison Édition »** dans le Hub V3 (`/hub-v3`), contenant un article éditorial soigné **« Réussir la mise en page d'un livre »**, illustré par une **belle image (bannière "Révolution")**, avec des **liens internes** dans le texte qui mènent vers les outils/onglets concernés du générateur.
 
-## Règle d'accès stricte (demande clé)
-**Seul le bénéficiaire qui active la carte obtient l'accès — personne d'autre.**
-- Code **à usage unique**, lié définitivement à **un seul email** lors de l'activation.
-- Accès Base via l'entitlement existant (`useV3Entitlement` → `hasBase`) + portail protégé (`SubscriberGate` / `V3Gate`). Un visiteur non connecté ou un autre email **n'accède à rien**.
-- Une fois `redeemed`, le code est **mort**.
+## Où ça s'intègre
 
-```text
-Acheteur ──paie 158€──► reçoit 1 CODE unique (NOEL-XXXX-XXXX)
-                         │ (offre le code à un proche)
-                         ▼
-Bénéficiaire ─se connecte/crée son compte─► saisit code ► Base liée à SON email (à vie)
-   ▶ Accès verrouillé au seul email activé · Code mort après activation · Packs premium intacts
-```
+Le Hub V3 (`src/pages/V3HubPage.tsx`) fonctionne déjà avec un système d'onglets via des `FilterChip` (Créer, Roadmap, Mes outils, Tous, + les piliers). J'ajoute un nouvel onglet **« 📕 Maison Édition »** à côté de la Roadmap, qui affiche un composant article au lieu de la grille de modules.
 
-## Visuels (mise en évidence)
-- Générer **2 images de cartes cadeaux** photoréalistes (esprit Noël élégant, palette ambre/teal de la marque), sauvegardées dans `src/assets/` :
-  1. Carte « cadeau » sombre festive avec ruban.
-  2. Carte « Ebookstudio — Carte Cadeau » posée près de livres/cadeaux.
-- Affichées dans un **encart dédié et mis en avant** (badge « −20% Noël », prix 197€ barré → 158€) en tête du bloc tarifs `V3PricingTiers.tsx`.
+## Ce que je vais construire
 
-## Étapes
+### 1. Image bannière « Révolution »
+Génération d'une image **photoréaliste premium** (respect de la charte : pas de cartoon) : un livre ouvert élégant sur un bureau d'éditeur, lumière chaude, typographie soignée visible, ambiance « maison d'édition » — avec un traitement permettant d'afficher le mot **« RÉVOLUTION »** en surimpression élégante (texte ajouté en overlay HTML pour rester net et éditable).
+Fichier : `src/assets/v3/maison-edition-revolution.jpg`.
 
-### 1. Données / prix (`src/data/roadmapV3.ts`)
-- `V3_GIFT_DISCOUNT = 0.20`
-- `V3_GIFT_PRICE = 158` (Base 197€ −20%)
+### 2. Nouveau composant `MaisonEditionTab.tsx`
+`src/components/admin/MaisonEditionTab.tsx` — reprend la charte ambre/crème + serif du Hub V3. Contenu :
 
-### 2. Table `v3_gift_cards` (migration)
-`id`, `code` (unique), `plan` (`'base'`), `amount_paid`, `currency`, `buyer_email`, `recipient_email` (nullable), `status` (`pending_payment` | `active` | `redeemed`), `stripe_session_id`, `redeemed_by_email`, `redeemed_at`, `environment`, `created_at`.
-RLS : aucun accès direct anon/authenticated (tout via edge functions service_role). GRANT `ALL` à `service_role` uniquement.
+- **Hero** avec l'image + badge/mot « Révolution » + titre *« Réussir la mise en page d'un livre »*.
+- L'intégralité du **texte fourni** (mise en page, corps du texte, marges, polices, images, gabarit), structuré en sections avec sous-titres (Le corps du texte, Les marges, Les polices, Les images, Télécharger un gabarit).
+- **Liens internes contextuels** insérés dans le texte, pointant vers les outils concernés du générateur :
 
-### 3. Edge function `v3-gift-checkout`
-- Reçoit `buyerEmail`, `recipientEmail?`, `environment`, `returnUrl`.
-- Montant figé serveur à `V3_GIFT_PRICE` (158€).
-- Crée la session Stripe embedded (pattern `v3-upsell-checkout`), insère la carte `pending_payment` + code unique.
-- `verify_jwt = false` dans `config.toml`.
+  | Passage du texte | Lien vers |
+  |---|---|
+  | « feuilleter une première fois » / aperçu rendu | **Kindle Previewer Simulé** (`kindle-previewer`) |
+  | couverture / premier contact | **Cover Studio Pro** (`cover-studio-pro`) + **Couverture KDP Exacte** (`cover-pdf-exact`) |
+  | marges techniques / gabarits intérieurs | **Checklist Prépublication** (`prepub-checklist`) + **Convertisseur Manuscrit Universel** (`manuscript-converter`) |
+  | polices / taille / conformité | **Cockpit Audit Pilot** (conformité KDP) (`cockpit-audit-pilot`) |
+  | enregistrer en PDF / publier | **Multi-format Express** (`multi-format-express`) |
+  | écrire / mettre en page le manuscrit | **STUDIO — Création de Livres** (`book-creation-studio`) |
 
-### 4. Activation paiement
-Au paiement confirmé (session `kind='v3_gift'`) → carte `active` + envoi du code par email (Resend) si `recipient_email`.
+  Les liens ouvrent directement la fiche-outil (dialogue module existant) via un callback `onOpenModule`. Quelques liens secondaires (formation, couverture) pointent vers les routes `/formation`, `/couverture-kdp`.
 
-### 5. Edge function `v3-gift-redeem` (verrou d'accès)
-- Reçoit `code`, valide l'utilisateur via `supabase.auth.getUser()` (email tiré du JWT).
-- Refuse si carte absente, non `active` ou déjà `redeemed`.
-- Crée la commande `v3_installment_orders` `plan='base_gift'`, `status='paid'`, `email` = email authentifié.
-- Marque la carte `redeemed` → code mort. Seul cet email obtient `hasBase`.
-
-### 6. UI
-- **Encart « Offrir en carte cadeau »** mis en évidence dans `V3PricingTiers.tsx` avec les 2 visuels, prix barré → 158€, badge Noël, bouton ouvrant `V3GiftCheckout.tsx` (calqué sur `V3UpsellCheckout.tsx`).
-- **Page `/carte-cadeau`** (`GiftRedeemPage.tsx`) : **protégée, connexion obligatoire**. Champ code → `v3-gift-redeem`. Si non connecté → invite à se connecter/créer un compte (l'accès se lie à ce compte).
-- Après achat, le code s'affiche à l'acheteur (+ mention d'envoi email si bénéficiaire renseigné).
+### 3. Branchement dans `V3HubPage.tsx`
+- Importer `MaisonEditionTab` et `getModuleById`.
+- Ajouter un `FilterChip` **« 📕 Maison Édition »** dans la barre de filtres (près de Roadmap).
+- Ajouter la branche d'affichage : `pillar === 'maison-edition'` → `<MaisonEditionTab onOpenModule={(id) => setSelected(getModuleById(id))} />`.
 
 ## Détails techniques
-- Code format `NOEL-XXXX-XXXX`, unicité vérifiée côté fonction.
-- Entitlement réutilise `v3_installment_orders` + `useV3Entitlement`.
-- Aucun changement aux packs premium ni à leur checkout.
 
-## Hypothèses validées
-- Périmètre = **Base seule** (protège les modules).
-- Remise = **−20% → 158€**.
-- **Accès strictement réservé au bénéficiaire** (code single-use lié à un email authentifié).
-- **Mise en évidence avec 1–2 visuels de cartes cadeaux**.
+- Aucune modification backend / base de données.
+- Réutilisation du dialogue module existant (`V3ModuleDialog` + `setSelected`) pour les liens internes → cohérent avec le reste du Hub.
+- Style 100 % aligné sur les tokens locaux du Hub (ambre `#E8951E`, crème `#FBF6EC`, serif) — pas de couleurs codées en dur hors charte de la page.
+- Le mot « Révolution » et le titre sont du texte HTML par-dessus l'image (netteté garantie, pas de texte gravé dans l'image).
+- Accessibilité : `alt` descriptif sur l'image, hiérarchie de titres (un seul H1 dans la section), liens explicites.
+
+## Fichiers touchés
+- **Créé** : `src/components/admin/MaisonEditionTab.tsx`
+- **Créé** : `src/assets/v3/maison-edition-revolution.jpg` (image générée)
+- **Édité** : `src/pages/V3HubPage.tsx` (import + chip + branche d'affichage)

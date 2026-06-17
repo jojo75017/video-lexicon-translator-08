@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Search, Sparkles, Crown, Compass, Lock, ArrowRight, Wand2, CheckCircle2, Layers, Infinity as InfinityIcon, ShieldCheck } from 'lucide-react';
 import {
-  V3_MODULES, V3_PILLAR_META, getModuleAccess, type V3Pillar, type V3Module,
+  V3_MODULES, V3_PILLAR_META, getModuleAccess, getModuleById, type V3Pillar, type V3Module,
 } from '@/data/roadmapV3';
 import { isModuleClickable, V3ModuleDialog } from '@/components/admin/v3ModuleRegistry';
 import { V3HubTour } from '@/components/admin/V3HubTour';
@@ -14,6 +14,7 @@ import V3Workflow30 from '@/components/admin/V3Workflow30';
 import V3AccessRecap from '@/components/admin/V3AccessRecap';
 import V3GuidesSection from '@/components/admin/V3GuidesSection';
 import V3RoadmapTab from '@/components/admin/V3RoadmapTab';
+import MaisonEditionTab from '@/components/admin/MaisonEditionTab';
 import pillarIa from '@/assets/v3/pillar-ia.jpg';
 import pillarPublier from '@/assets/v3/pillar-publier.jpg';
 import pillarMonetiser from '@/assets/v3/pillar-monetiser.jpg';
@@ -163,7 +164,7 @@ function ModuleCard({
 const V3HubPage: React.FC = () => {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
-  const [pillar, setPillar] = useState<V3Pillar | 'all' | 'create' | 'mine' | 'roadmap'>('all');
+  const [pillar, setPillar] = useState<V3Pillar | 'all' | 'create' | 'mine' | 'roadmap' | 'maison-edition'>('all');
   const [selected, setSelected] = useState<V3Module | null>(null);
   const [studioSource, setStudioSource] = useState<string | null>(null);
   const [tourOpen, setTourOpen] = useState(false);
@@ -338,6 +339,7 @@ const V3HubPage: React.FC = () => {
           <div className="flex flex-wrap items-center gap-2" data-tour="filters">
             <CreateBookChip active={pillar === 'create'} onClick={() => setPillar('create')} />
             <FilterChip active={pillar === 'roadmap'} onClick={() => setPillar('roadmap')} label="🗺️ Roadmap" />
+            <FilterChip active={pillar === 'maison-edition'} onClick={() => setPillar('maison-edition')} label="📕 Maison Édition" />
             <span className="mx-1 h-6 w-px self-center" style={{ background: `${AMBER}44` }} aria-hidden />
             <FilterChip active={pillar === 'mine'} onClick={() => setPillar('mine')} label={`✅ Mes outils (${myToolsCount})`} />
             <FilterChip active={pillar === 'all'} onClick={() => setPillar('all')} label={`Tous (${V3_MODULES.length})`} />
@@ -366,6 +368,8 @@ const V3HubPage: React.FC = () => {
           <CreateBookHub onSelectSource={openStudio} />
         ) : pillar === 'roadmap' ? (
           <V3RoadmapTab />
+        ) : pillar === 'maison-edition' ? (
+          <MaisonEditionTab onOpenModule={(id) => { const m = getModuleById(id); if (m) setSelected(m); }} />
         ) : filtered.length === 0 ? (
           <div className="text-center py-20 text-sm" style={{ color: '#a18a6c' }}>
             {pillar === 'mine'
