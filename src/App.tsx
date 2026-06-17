@@ -413,6 +413,8 @@ const App = () => {
             <Route path="/crm" element={<AdminGate><CrmPage /></AdminGate>} />
             <Route path="/resultat-en-5-min" element={<ResultatEn5MinPage />} />
             <Route path="/cadeau" element={<CadeauPage />} />
+            <Route path="/carte-cadeau" element={<GiftRedeemPage />} />
+            <Route path="/carte-cadeau-merci" element={<GiftThankYouPage />} />
             <Route path="/webinaire" element={<WebinairePage />} />
 
             <Route path="/quiz" element={<QuizPage />} />
