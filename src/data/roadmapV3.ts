@@ -77,6 +77,34 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
       'print-royalties-calc',
     ],
   },
+  {
+    id: 'editorial',
+    title: 'Pack Qualité Éditoriale Pro',
+    desc: 'Le travail d\'une vraie maison d\'édition AVANT publication : comité de lecture IA, édition structurelle, copy-editing & ligne éditoriale, charte de collection et label qualité certifiant.',
+    price: 67,
+    modules: [
+      'reading-committee', 'developmental-edit', 'copy-editing-line',
+      'collection-charter', 'quality-label',
+    ],
+  },
+  {
+    id: 'distribution',
+    title: 'Pack Distribution Large (Wide)',
+    desc: 'Sors de l\'exclusivité Amazon et diffuse comme un éditeur : assistant multi-plateformes (Kobo, Apple Books, Google Play, Fnac), dépôt légal & ISBN, export EPUB normé et tableau de bord catalogue.',
+    price: 97,
+    modules: [
+      'wide-distribution', 'legal-deposit-isbn', 'epub-normalizer', 'catalog-dashboard',
+    ],
+  },
+  {
+    id: 'promotion',
+    title: 'Pack Promotion Éditeur',
+    desc: 'Les leviers promo réservés aux éditeurs : service de presse (SP), argumentaire libraires & salons, cession de droits étrangers et stratégie de précommandes.',
+    price: 97,
+    modules: [
+      'press-service', 'booksellers-fairs', 'foreign-rights', 'preorders-strategy',
+    ],
+  },
 ];
 
 /** Somme des packs à la carte (400€). */
