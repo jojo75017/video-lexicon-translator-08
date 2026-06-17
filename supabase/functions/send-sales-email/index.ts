@@ -33,7 +33,7 @@ const EMAIL_SEQUENCE = [
   },
   {
     step: 5,
-    day_offset: 8,
+    day_offset: 4,
     subject: "🔒 Dernier rappel sur l'offre Fondateur",
     preheader: "67€ à vie, mise à jour V3 incluse.",
   },
