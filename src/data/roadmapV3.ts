@@ -23,8 +23,8 @@ export const V3_PRICE = 197;
 export const V2_PRICE = 67;
 
 // ============= Grille tarifaire V3 =============
-// Base 197€ + 4 packs upsell (total 400€) → 597€ à la pièce.
-// Pack Tout Complet 497€ → débloque tout, économie de 100€.
+// Base 197€ + 7 packs upsell (total 661€) → 858€ à la pièce.
+// Pack Tout Complet 497€ → débloque tout, économie de 361€.
 
 export interface V3UpsellPack {
   id: V3PackId;
