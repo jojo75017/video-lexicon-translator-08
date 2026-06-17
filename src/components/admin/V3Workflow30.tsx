@@ -237,7 +237,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   // Droits réellement payés (197€ base / 497€ Pack Tout Complet). L'admin a tout.
   const { hasFull, loading: entLoading } = useV3Entitlement();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
-  // Parcours actif : 'core' = offre 197€ (22 agents), 'full' = Pack Tout Complet 497€ (32 agents).
+  // Parcours actif : 'core' = offre 197€ (22 agents), 'full' = Pack Tout Complet 497€ (30 agents).
   const [parcours, setParcours] = useState<Parcours>(
     () => ((localStorage.getItem(PARCOURS_KEY) as Parcours) === 'full' ? 'full' : 'core'),
   );
