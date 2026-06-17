@@ -170,3 +170,6 @@ verify_jwt = false
 
 [functions.v3-pack-checkout]
 verify_jwt = false
+
+[functions.v3-upsell-checkout]
+verify_jwt = false
