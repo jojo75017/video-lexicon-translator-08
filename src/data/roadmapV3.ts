@@ -35,6 +35,8 @@ export interface V3UpsellPack {
   modules: string[];
   /** Facilités de paiement affichées (optionnel). */
   installments?: string[];
+  /** Badge marketing affiché (ex. « Opportunité »). */
+  badge?: string;
 }
 
 export const V3_UPSELL_PACKS: V3UpsellPack[] = [
