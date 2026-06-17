@@ -2,10 +2,10 @@
 // Prix cible : 197€ à vie (vs 67€ pour V2 actuelle)
 // La liste reste éditable : on peut ajouter/retirer des modules.
 
-export type V3Pillar = 'publier' | 'monetiser' | 'marketing' | 'ia';
+export type V3Pillar = 'publier' | 'monetiser' | 'marketing' | 'ia' | 'edition' | 'distribution' | 'promotion';
 export type V3Status = 'todo' | 'in_progress' | 'done';
 export type V3Tier = 'core' | 'upsell';
-export type V3PackId = 'cover' | 'marketing' | 'social' | 'monetisation';
+export type V3PackId = 'cover' | 'marketing' | 'social' | 'monetisation' | 'editorial' | 'distribution' | 'promotion';
 
 export interface V3Module {
   id: string;
@@ -23,8 +23,8 @@ export const V3_PRICE = 197;
 export const V2_PRICE = 67;
 
 // ============= Grille tarifaire V3 =============
-// Base 197€ + 4 packs upsell (total 400€) → 597€ à la pièce.
-// Pack Tout Complet 497€ → débloque tout, économie de 100€.
+// Base 197€ + 7 packs upsell (total 661€) → 858€ à la pièce.
+// Pack Tout Complet 497€ → débloque tout, économie de 361€.
 
 export interface V3UpsellPack {
   id: V3PackId;
@@ -77,6 +77,34 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
       'print-royalties-calc',
     ],
   },
+  {
+    id: 'editorial',
+    title: 'Pack Qualité Éditoriale Pro',
+    desc: 'Le travail d\'une vraie maison d\'édition AVANT publication : comité de lecture IA, édition structurelle, copy-editing & ligne éditoriale, charte de collection et label qualité certifiant.',
+    price: 67,
+    modules: [
+      'reading-committee', 'developmental-edit', 'copy-editing-line',
+      'collection-charter', 'quality-label',
+    ],
+  },
+  {
+    id: 'distribution',
+    title: 'Pack Distribution Large (Wide)',
+    desc: 'Sors de l\'exclusivité Amazon et diffuse comme un éditeur : assistant multi-plateformes (Kobo, Apple Books, Google Play, Fnac), dépôt légal & ISBN, export EPUB normé et tableau de bord catalogue.',
+    price: 97,
+    modules: [
+      'wide-distribution', 'legal-deposit-isbn', 'epub-normalizer', 'catalog-dashboard',
+    ],
+  },
+  {
+    id: 'promotion',
+    title: 'Pack Promotion Éditeur',
+    desc: 'Les leviers promo réservés aux éditeurs : service de presse (SP), argumentaire libraires & salons, cession de droits étrangers et stratégie de précommandes.',
+    price: 97,
+    modules: [
+      'press-service', 'booksellers-fairs', 'foreign-rights', 'preorders-strategy',
+    ],
+  },
 ];
 
 /** Somme des packs à la carte (400€). */
@@ -90,8 +118,8 @@ export const V3_FULL_PACK = {
   title: 'Pack Tout Complet',
   price: 497,
   /** Prix si on prend la base + tous les packs séparément. */
-  compareAt: V3_PRICE + V3_UPSELLS_TOTAL, // 597
-  saves: V3_PRICE + V3_UPSELLS_TOTAL - 497, // 100
+  compareAt: V3_PRICE + V3_UPSELLS_TOTAL, // 858
+  saves: V3_PRICE + V3_UPSELLS_TOTAL - 497, // 361
   installments: ['1×497€', '4×129€', '6×85€'],
 };
 
@@ -157,18 +185,24 @@ export function getModuleAccess(moduleId: string): V3Access {
 }
 
 export const V3_PILLAR_META: Record<V3Pillar, { label: string; color: string; emoji: string }> = {
-  publier:    { label: 'Publier',    color: '#008296', emoji: '📦' },
-  monetiser:  { label: 'Monétiser',  color: '#FF9E2D', emoji: '💰' },
-  marketing:  { label: 'Marketing',  color: '#7C3AED', emoji: '📣' },
-  ia:         { label: 'IA avancée', color: '#10B981', emoji: '🧠' },
+  publier:      { label: 'Publier',         color: '#008296', emoji: '📦' },
+  monetiser:    { label: 'Monétiser',       color: '#FF9E2D', emoji: '💰' },
+  marketing:    { label: 'Marketing',       color: '#7C3AED', emoji: '📣' },
+  ia:           { label: 'IA avancée',      color: '#10B981', emoji: '🧠' },
+  edition:      { label: 'Édition Pro',     color: '#9B2335', emoji: '📕' },
+  distribution: { label: 'Distribution',    color: '#1D4ED8', emoji: '🌍' },
+  promotion:    { label: 'Promotion',       color: '#B8860B', emoji: '📰' },
 };
 
 // Variante "Midnight Indigo" — utilisée uniquement en mode V3 (cockpit admin).
 export const V3_PILLAR_COLORS: Record<V3Pillar, string> = {
-  publier:    '#6366f1',
-  monetiser:  '#818cf8',
-  marketing:  '#a5b4fc',
-  ia:         '#38bdf8',
+  publier:      '#6366f1',
+  monetiser:    '#818cf8',
+  marketing:    '#a5b4fc',
+  ia:           '#38bdf8',
+  edition:      '#f87171',
+  distribution: '#60a5fa',
+  promotion:    '#fbbf24',
 };
 
 export const V3_MODULES: V3Module[] = [
@@ -379,6 +413,40 @@ export const V3_MODULES: V3Module[] = [
   // PUBLIER — Guides nouveaux abonnés (mix : base offerte + avancés payants)
   { id: 'onboarding-guides',        pillar: 'publier',   status: 'done', title: 'Guides Nouveaux Abonnés (Onboarding 7 jours)',
     description: 'Mix : onboarding « Premiers pas KDP en 7 jours » + 2 guides de base OFFERTS pour activer les nouveaux abonnés ; guides avancés verrouillés avec CTA vers order bump / upsell. Mise en ligne prévue en août avec le tunnel 497€.' },
+
+  // ===== AJOUTS V3 — Maison d'édition — packs upsell — à construire =====
+
+  // ÉDITION PRO (Pack Qualité Éditoriale Pro 67€)
+  { id: 'reading-committee',     pillar: 'edition',      status: 'todo', title: 'Comité de Lecture IA',
+    description: 'Fiche de lecture professionnelle comme en maison d\'édition : synopsis, points forts/faibles, public cible, potentiel commercial et verdict argumenté « accepté / à retravailler / refusé ».' },
+  { id: 'developmental-edit',    pillar: 'edition',      status: 'todo', title: 'Édition Structurelle (Developmental Edit)',
+    description: 'Analyse de la structure narrative/argumentaire : rythme, cohérence des chapitres, promesses tenues, longueurs et suggestions concrètes de réorganisation.' },
+  { id: 'copy-editing-line',     pillar: 'edition',      status: 'todo', title: 'Copy-editing & Ligne Éditoriale',
+    description: 'Passe d\'édition phrase à phrase (style, registre, fluidité, répétitions) au-delà de la simple correction, dans le strict respect du fond et de la voix de l\'auteur.' },
+  { id: 'collection-charter',    pillar: 'edition',      status: 'todo', title: 'Charte de Collection',
+    description: 'Définit une collection éditoriale cohérente (ton, format, gabarit de couverture, mentions, promesse de lecture) réutilisable sur plusieurs titres pour bâtir un vrai catalogue.' },
+  { id: 'quality-label',         pillar: 'edition',      status: 'todo', title: 'Label Qualité Maison d\'Édition',
+    description: 'Checklist certifiante « niveau édition pro » couvrant éditorial, mise en forme et métadonnées ; appose un badge qualité une fois tous les contrôles validés.' },
+
+  // DISTRIBUTION (Pack Distribution Large 97€)
+  { id: 'wide-distribution',     pillar: 'distribution', status: 'todo', title: 'Assistant Distribution Multi-Plateformes',
+    description: 'Guide pas-à-pas + métadonnées formatées pour diffuser au-delà d\'Amazon : Kobo, Apple Books, Google Play, Fnac/ePagine, via agrégateurs (Draft2Digital / StreetLib).' },
+  { id: 'legal-deposit-isbn',    pillar: 'distribution', status: 'todo', title: 'Dépôt Légal & ISBN',
+    description: 'Accompagnement du dépôt légal BNF, gestion d\'un registre ISBN par titre et par collection, et ISSN pour les séries.' },
+  { id: 'epub-normalizer',       pillar: 'distribution', status: 'todo', title: 'Export EPUB Normé (EPUB 3)',
+    description: 'Vérifie et corrige la conformité EPUB 3 (table des matières, métadonnées, structure) exigée par les plateformes wide, au-delà du flux KDP actuel.' },
+  { id: 'catalog-dashboard',     pillar: 'distribution', status: 'todo', title: 'Tableau de Bord Catalogue',
+    description: 'Vue d\'ensemble du catalogue éditeur : titres, collections, statut de diffusion par canal, ISBN et dépôt légal en un coup d\'œil.' },
+
+  // PROMOTION (Pack Promotion Éditeur 97€)
+  { id: 'press-service',         pillar: 'promotion',    status: 'todo', title: 'Service de Presse (SP)',
+    description: 'Génère le dossier de presse, le communiqué, une liste-type de journalistes/blogueurs littéraires par genre et les e-mails d\'envoi de service de presse.' },
+  { id: 'booksellers-fairs',     pillar: 'promotion',    status: 'todo', title: 'Libraires & Salons',
+    description: 'Argumentaire libraire, fiche office, et préparation des salons et séances de dédicaces (pitch, supports, logistique).' },
+  { id: 'foreign-rights',        pillar: 'promotion',    status: 'todo', title: 'Droits Étrangers',
+    description: 'Pitch de cession des droits de traduction (rights guide) et repérage des marchés porteurs par genre pour vendre le livre à l\'international.' },
+  { id: 'preorders-strategy',    pillar: 'promotion',    status: 'todo', title: 'Stratégie de Précommandes',
+    description: 'Stratégie et calendrier de précommande multi-plateformes pour concentrer les ventes au lancement et booster le classement.' },
 ];
 
 /** Renvoie un module V3 par son id. */

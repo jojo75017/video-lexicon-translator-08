@@ -13,7 +13,7 @@ const STATUS_META = {
   todo: { label: 'Bientôt', color: '#a18a6c', bg: '#f3ece0', icon: Circle },
 };
 
-const PILLAR_ORDER: V3Pillar[] = ['ia', 'publier', 'monetiser', 'marketing'];
+const PILLAR_ORDER: V3Pillar[] = ['ia', 'publier', 'monetiser', 'marketing', 'edition', 'distribution', 'promotion'];
 
 export function V3RoadmapTab() {
   const stats = useMemo(() => {
@@ -26,7 +26,7 @@ export function V3RoadmapTab() {
   }, []);
 
   const byPillar = useMemo(() => {
-    const map: Record<V3Pillar, V3Module[]> = { ia: [], publier: [], monetiser: [], marketing: [] };
+    const map: Record<V3Pillar, V3Module[]> = { ia: [], publier: [], monetiser: [], marketing: [], edition: [], distribution: [], promotion: [] };
     for (const m of V3_MODULES) {
       map[m.pillar].push(m);
     }

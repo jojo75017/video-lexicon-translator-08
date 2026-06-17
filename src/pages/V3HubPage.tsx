@@ -24,6 +24,9 @@ const PILLAR_IMG: Record<V3Pillar, string> = {
   publier: pillarPublier,
   monetiser: pillarMonetiser,
   marketing: pillarMarketing,
+  edition: pillarPublier,
+  distribution: pillarMarketing,
+  promotion: pillarMarketing,
 };
 
 const TOUR_KEY = 'v3hub_tour_done';
@@ -37,7 +40,7 @@ const INK = '#2A2118';          // texte sombre chaud
 const SERIF = "'Georgia', 'Times New Roman', serif";
 
 // L'écriture/rédaction (STUDIO de création) vit dans « IA avancée » : c'est le 1er palier.
-const PILLAR_ORDER: V3Pillar[] = ['ia', 'publier', 'monetiser', 'marketing'];
+const PILLAR_ORDER: V3Pillar[] = ['ia', 'publier', 'monetiser', 'marketing', 'edition', 'distribution', 'promotion'];
 
 
 /** Carte module premium claire avec léger tilt + halo ambré au survol. */
