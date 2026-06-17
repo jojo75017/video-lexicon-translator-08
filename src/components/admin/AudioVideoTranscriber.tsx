@@ -30,7 +30,7 @@ function words(t: string) {
 
 const AudioVideoTranscriber: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
-  const [lang, setLang] = useState('');
+  const [lang, setLang] = useState('auto');
   const [loading, setLoading] = useState(false);
   const [text, setText] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -50,7 +50,7 @@ const AudioVideoTranscriber: React.FC = () => {
     try {
       const fd = new FormData();
       fd.append('file', file);
-      if (lang) fd.append('language', lang);
+      if (lang && lang !== 'auto') fd.append('language', lang);
       const { data, error } = await supabase.functions.invoke('transcribe-media', { body: fd });
       if (error) throw new Error(error.message);
       if ((data as any)?.error) throw new Error((data as any).error);
@@ -120,7 +120,7 @@ const AudioVideoTranscriber: React.FC = () => {
           <Select value={lang} onValueChange={setLang}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
-              {LANGS.map((l) => <SelectItem key={l.value || 'auto'} value={l.value || 'auto'} onSelect={() => {}}>{l.label}</SelectItem>)}
+              {LANGS.map((l) => <SelectItem key={l.value} value={l.value}>{l.label}</SelectItem>)}
             </SelectContent>
           </Select>
         </div>
