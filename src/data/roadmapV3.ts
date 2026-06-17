@@ -61,12 +61,20 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
   {
     id: 'social',
     title: 'Pack Trafic Social & Viralité',
-    desc: 'Une machine à trafic gratuit : Pinterest auto-pins, hooks viraux TikTok/Reels, calendrier éditorial 30 jours, visuels citations, book trailer IA, kit influenceurs et transcription audio/vidéo → texte pour recycler podcasts et vidéos en chapitres.',
+    desc: 'Une machine à trafic gratuit : Pinterest auto-pins, hooks viraux TikTok/Reels, calendrier éditorial 30 jours, visuels citations, book trailer IA et kit influenceurs pour recycler ton livre partout.',
     price: 87,
     modules: [
       'pinterest-pins', 'tiktok-hooks', 'social-calendar-30', 'quote-visuals',
-      'book-trailer', 'influencer-kit', 'audio-video-transcription',
+      'book-trailer', 'influencer-kit',
     ],
+  },
+  {
+    id: 'transcription',
+    title: 'Transcription Audio / Vidéo → Texte',
+    desc: 'Transforme n\'importe quel podcast, vidéo YouTube, interview ou note vocale en texte éditable, prêt à devenir un chapitre ou un livre entier. Transcription IA ultra-précise dans 99 langues, directement dans l\'interface.',
+    price: 67,
+    badge: 'Opportunité',
+    modules: ['audio-video-transcription'],
   },
   {
     id: 'monetisation',
