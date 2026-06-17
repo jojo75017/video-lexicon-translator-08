@@ -7,7 +7,7 @@ import revolutionImg from '@/assets/v3/maison-edition-revolution.jpg';
 const AMBER = '#E8951E';
 const AMBER_DEEP = '#C97A14';
 const AMBER_SOFT = '#FFF3DF';
-const CREAM = '#FBF6EC';
+
 const INK = '#2A2118';
 const SERIF = "'Georgia', 'Times New Roman', serif";
 
