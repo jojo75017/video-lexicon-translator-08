@@ -605,6 +605,49 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   return (
     <section id="parcours" className="mb-12 scroll-mt-20">
       <input ref={importInputRef} type="file" accept=".txt,.md,.markdown,.docx" className="hidden" onChange={onImportFile} />
+
+      {/* Carte « pack » repliée — compacte tant que l'utilisateur ne l'ouvre pas */}
+      {!sectionOpen && (
+        <button
+          type="button"
+          onClick={() => setSectionOpen(true)}
+          className="group w-full text-left rounded-3xl border-2 bg-white overflow-hidden shadow-[0_10px_44px_-18px_rgba(232,149,30,0.45)] transition-transform hover:-translate-y-0.5"
+          style={{ borderColor: AMBER }}>
+          <div className="relative p-5 sm:p-6" style={{ background: `linear-gradient(135deg, ${AMBER_SOFT}, #ffffff 70%)` }}>
+            <span className="pointer-events-none absolute inset-x-10 top-0 h-px"
+              style={{ background: `linear-gradient(90deg, transparent, ${AMBER}, transparent)` }} />
+            <div className="flex items-center gap-4">
+              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-2xl border"
+                style={{ borderColor: `${AMBER}55`, background: '#fff' }}>📚</span>
+              <div className="flex-1 min-w-0">
+                <div className="inline-flex items-center gap-2 mb-1 rounded-full border px-2.5 py-0.5"
+                  style={{ borderColor: `${AMBER}66`, background: '#fff' }}>
+                  <Wand2 className="h-3 w-3" style={{ color: AMBER }} />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.25em]" style={{ color: AMBER_DEEP }}>
+                    Auto-pilote IA · {TOTAL} étapes
+                  </span>
+                </div>
+                <h2 className="text-lg sm:text-xl font-bold leading-tight" style={{ fontFamily: SERIF, color: INK }}>
+                  De l'idée au livre publié
+                </h2>
+                <div className="mt-2 flex items-center gap-3">
+                  <div className="h-2 flex-1 max-w-[260px] rounded-full overflow-hidden" style={{ background: '#f0e7d4' }}>
+                    <div className="h-full rounded-full transition-all"
+                      style={{ width: `${pct}%`, background: completed === TOTAL ? `linear-gradient(90deg, ${GREEN}, #2fc488)` : `linear-gradient(90deg, ${AMBER}, #FFB44D)` }} />
+                  </div>
+                  <span className="text-[11px] font-semibold" style={{ color: '#8a7860' }}>{completed} / {TOTAL}</span>
+                </div>
+              </div>
+              <span className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[12px] font-bold text-white shrink-0 transition-transform group-hover:translate-x-0.5"
+                style={{ background: `linear-gradient(90deg, ${AMBER}, #FFB44D)` }}>
+                Ouvrir le parcours <ArrowRight className="h-3.5 w-3.5" />
+              </span>
+            </div>
+          </div>
+        </button>
+      )}
+
+      {sectionOpen && (
       <div className="rounded-3xl border-2 bg-white overflow-hidden shadow-[0_10px_44px_-18px_rgba(232,149,30,0.45)]"
         style={{ borderColor: AMBER }}>
         {/* En-tête + progression */}
