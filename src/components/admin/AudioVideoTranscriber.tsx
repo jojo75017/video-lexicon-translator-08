@@ -11,7 +11,7 @@ const TEAL = '#008296';
 const MAX_BYTES = 25 * 1024 * 1024;
 
 const LANGS = [
-  { value: '', label: 'Détection automatique' },
+  { value: 'auto', label: 'Détection automatique' },
   { value: 'fr', label: 'Français' },
   { value: 'en', label: 'Anglais' },
   { value: 'es', label: 'Espagnol' },
