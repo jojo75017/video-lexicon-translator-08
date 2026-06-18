@@ -109,8 +109,9 @@ const V3PricingTiers: React.FC = () => {
             <h3 className="text-lg font-bold" style={{ fontFamily: SERIF, color: INK }}>Base — Création & Publication</h3>
           </div>
           <p className="text-sm mb-4" style={{ color: '#6f5e47' }}>
-            Tout pour écrire et publier ton livre : IA d'écriture, pipeline complet, export et
-            publication KDP. Accès à vie.
+            Tout pour écrire, publier <strong>ET lancer</strong> ton livre : IA d'écriture, pipeline complet,
+            export et publication KDP, <strong>couverture premium IA incluse</strong> et tout le
+            <strong> kit de lancement & visibilité</strong> (annonces, Amazon Ads, séquence J-7, page auteur…). Accès à vie.
           </p>
           <div className="flex items-end gap-2 mb-4">
             <span className="text-4xl font-black" style={{ color: AMBER_DEEP }}>{V3_PRICE}€</span>
