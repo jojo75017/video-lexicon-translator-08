@@ -175,6 +175,19 @@ export const V3_BASE_MODULE_IDS = new Set<string>([
   'categories-manager-10',
   'low-content-books',
   'onboarding-guides',
+  // COUVERTURE — désormais incluse dans la base 197€
+  'cover-studio-pro',
+  'cover-variants-thumbnail',
+  // LANCEMENT & VISIBILITÉ — ex-pack 147€, désormais inclus dans la base 197€
+  'listing-optimizer',
+  'launch-sequence-j7',
+  'amazon-ads',
+  'launch-pricing',
+  'media-kit',
+  'look-inside-optimizer',
+  'editorial-reviews',
+  'bookbub-ad-builder',
+  'author-page-optimizer',
   // IA — création + recherche de niche essentielles
   'book-creation-studio',
   'niche-intelligence',
