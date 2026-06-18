@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import {
   ArrowRight, Check, ChevronDown, RotateCcw, Trophy, Lock, Sparkles, Loader2, Wand2, AlertCircle,
-  Pencil, Save, X, Upload, FileDown,
+  Pencil, Save, X, Upload, FileDown, Image as ImageIcon, FolderOpen,
 } from 'lucide-react';
 import { getModuleById, type V3Module } from '@/data/roadmapV3';
 import { isModuleClickable } from './v3ModuleRegistry';
@@ -384,14 +384,16 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
     try {
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) { setCloudMsg('Connecte-toi pour sauvegarder dans ton compte.'); return; }
+      const safeName = (projectName.trim() || brief.title.trim() || theme.trim() || 'Mon livre').slice(0, 120);
       const payload = {
         user_id: auth.user.id,
-        name: projectName.trim() || 'Mon livre',
+        name: safeName,
         theme,
         brief: brief as unknown as Record<string, unknown>,
         done: [...done] as unknown as Record<string, unknown>,
         results: results as unknown as Record<string, unknown>,
       };
+      setProjectName(safeName);
       if (projectId) {
         const { error: e } = await supabase.from('v3_workflow_projects').update(payload as never).eq('id', projectId);
         if (e) throw e;
@@ -424,6 +426,15 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
     setCloudMsg('Projet chargé ✓');
   };
 
+  useEffect(() => {
+    const pendingId = localStorage.getItem('v3_workflow_open_project_id');
+    if (!pendingId) return;
+    localStorage.removeItem('v3_workflow_open_project_id');
+    setSectionOpen(true);
+    setOpenCfg('projects');
+    loadFromCloud(pendingId);
+  }, []);
+
   const newProject = () => {
     setProjectId(null);
     setProjectName('Mon livre');
@@ -435,6 +446,9 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   useEffect(() => { localStorage.setItem(RESULTS_KEY, JSON.stringify(results)); }, [results]);
   useEffect(() => { localStorage.setItem(THEME_KEY, theme); }, [theme]);
   useEffect(() => { localStorage.setItem(BRIEF_KEY, JSON.stringify(brief)); }, [brief]);
+  useEffect(() => {
+    if (projectName === 'Mon livre' && brief.title.trim()) setProjectName(brief.title.trim().slice(0, 120));
+  }, [brief.title, projectName]);
   const setBriefField = (k: keyof Brief, v: string) => setBrief((p) => ({ ...p, [k]: v }));
 
   // Progression calculée uniquement sur les étapes ACCESSIBLES (débloquées).
@@ -704,6 +718,12 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
+              <button onClick={saveToCloud} disabled={saving}
+                className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-black text-white transition-transform hover:-translate-y-0.5 disabled:opacity-60"
+                style={{ background: `linear-gradient(90deg, ${GREEN}, #2fc488)` }}>
+                {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                Sauvegarder mon projet
+              </button>
               <button onClick={() => setSectionOpen(false)}
                 className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold border transition-colors hover:bg-[#FFF3DF]"
                 style={{ borderColor: `${AMBER}55`, color: AMBER_DEEP }}>
@@ -773,6 +793,43 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             )}
           </div>
           <V3PackCheckout open={checkoutOpen} onClose={() => setCheckoutOpen(false)} product="full" />
+
+          <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-3">
+            <button type="button" onClick={saveToCloud} disabled={saving}
+              className="group rounded-2xl border-2 p-4 text-left transition-all hover:-translate-y-0.5 disabled:opacity-60"
+              style={{ borderColor: `${GREEN}66`, background: '#f6fdf9' }}>
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl mb-3" style={{ background: `${GREEN}18`, color: GREEN }}>
+                {saving ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
+              </span>
+              <div className="text-sm font-black" style={{ color: INK }}>Sauvegarder</div>
+              <div className="mt-1 text-[11px] leading-snug" style={{ color: '#4f725d' }}>{projectId ? 'Mettre à jour ce projet' : 'Créer un projet enregistré'}</div>
+            </button>
+            <button type="button" onClick={() => setOpenCfg('projects')}
+              className="group rounded-2xl border-2 p-4 text-left transition-all hover:-translate-y-0.5"
+              style={{ borderColor: `${AMBER}66`, background: '#fffdf8' }}>
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl mb-3" style={{ background: AMBER_SOFT, color: AMBER_DEEP }}>
+                <FolderOpen className="h-5 w-5" />
+              </span>
+              <div className="text-sm font-black" style={{ color: INK }}>Mes sauvegardes</div>
+              <div className="mt-1 text-[11px] leading-snug" style={{ color: '#8a7860' }}>{projects.length} projet{projects.length > 1 ? 's' : ''} enregistré{projects.length > 1 ? 's' : ''}</div>
+            </button>
+            <button type="button" onClick={() => { const m = getModuleById('cover-studio-pro'); if (m) onOpenModule(m); }}
+              className="group rounded-2xl border-2 p-4 text-left transition-all hover:-translate-y-0.5"
+              style={{ borderColor: `${AMBER}99`, background: `linear-gradient(135deg, ${AMBER_SOFT}, #ffffff 75%)` }}>
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl mb-3" style={{ background: '#fff', color: AMBER_DEEP }}>
+                <ImageIcon className="h-5 w-5" />
+              </span>
+              <div className="text-sm font-black" style={{ color: INK }}>Créer l'image / couverture</div>
+              <div className="mt-1 text-[11px] leading-snug" style={{ color: '#8a7860' }}>Ouvrir Cover Studio Pro</div>
+            </button>
+          </div>
+
+          {cloudMsg && (
+            <div className="mt-3 inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-[12px] font-bold"
+              style={{ borderColor: `${GREEN}44`, background: '#f6fdf9', color: GREEN }}>
+              <Save className="h-3.5 w-3.5" /> {cloudMsg}
+            </div>
+          )}
 
 
           {/* Brief du livre */}

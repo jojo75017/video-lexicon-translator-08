@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Sparkles, Crown, Compass, Lock, ArrowRight, Wand2, CheckCircle2, Layers, Infinity as InfinityIcon, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Search, Sparkles, Crown, Compass, Lock, ArrowRight, Wand2, CheckCircle2, Layers, Infinity as InfinityIcon, ShieldCheck, Save, Image as ImageIcon } from 'lucide-react';
 import {
   V3_MODULES, V3_PILLAR_META, getModuleAccess, getModuleById, type V3Pillar, type V3Module,
 } from '@/data/roadmapV3';
@@ -197,6 +197,11 @@ const V3HubPage: React.FC = () => {
     }
   };
 
+  const openModule = (id: string) => {
+    const mod = getModuleById(id);
+    if (mod) setSelected(mod);
+  };
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return V3_MODULES.filter((m) => {
@@ -292,6 +297,16 @@ const V3HubPage: React.FC = () => {
               style={{ background: `linear-gradient(90deg, ${AMBER}, #FFB44D)`, color: '#fff' }}>
               <Wand2 className="h-4 w-4" /> Créer un livre
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </button>
+            <button onClick={() => openModule('library')}
+              className="inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-sm font-bold border transition-colors hover:bg-[#FFF3DF]"
+              style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}>
+              <Save className="h-4 w-4" /> Mes sauvegardes
+            </button>
+            <button onClick={() => openModule('cover-studio-pro')}
+              className="inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-sm font-bold border transition-colors hover:bg-[#FFF3DF]"
+              style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}>
+              <ImageIcon className="h-4 w-4" /> Image / Couverture
             </button>
             <a href="#tarifs" data-tour="price" className="inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-sm font-semibold border transition-colors hover:bg-[#FFF3DF]"
               style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}>
