@@ -429,10 +429,10 @@ export const V3_MODULES: V3Module[] = [
   // ===== AJOUTS V3 — Tunnel de prix 497€ + paiement échelonné — à construire (AOÛT) =====
 
   // MONÉTISER
-  { id: 'pricing-ladder-497',       pillar: 'monetiser', status: 'done', title: 'Échelle de Prix 497€ (Upsells + Pack Tout Inclus)',
-    description: 'Parcours commercial menant à 497€ : V3 197€ + order bump guides avancés 47€ + OTO1 visuels 97€ + OTO2 communauté/coaching 97€ + OTO3 licence étendue/traduction 59€ (= 497€), OU bouton unique « Pack Tout Inclus » à 497€. Source unique de vérité dans un module pricing dédié.' },
-  { id: 'installment-payments',     pillar: 'monetiser', status: 'done', title: 'Paiement Échelonné Sécurisé (4×129€ / 6×85€)',
-    description: 'Pack payable en 1×, 4×129€ (516€) ou 6×85€ (510€). Géré par abonnement Stripe à durée limitée pour détecter les échecs. COUPURE AUTOMATIQUE de l’accès 3 JOURS après un paiement échoué (statut suspended → SubscriberGate bloque le lien) ; réactivation auto à la régularisation ; bascule en accès à vie une fois toutes les échéances payées. Relances email Resend à chaque échec + à la suspension.' },
+  { id: 'pricing-ladder-497',       pillar: 'monetiser', status: 'done', title: 'Échelle de Prix 347€ (Upsells + Pack Tout Inclus)',
+    description: 'Parcours commercial menant à 347€ : V3 197€ + order bump guides avancés 47€ + OTO1 visuels 67€ + OTO2 communauté/coaching 36€ (= 347€), OU bouton unique « Pack Pro Vendeur » à 347€. Source unique de vérité dans un module pricing dédié.' },
+  { id: 'installment-payments',     pillar: 'monetiser', status: 'done', title: 'Paiement Échelonné Sécurisé (3×119€ / 4×89€)',
+    description: 'Pack payable en 1×347€, 3×119€ (357€) ou 4×89€ (356€). Géré par abonnement Stripe à durée limitée pour détecter les échecs. COUPURE AUTOMATIQUE de l’accès 3 JOURS après un paiement échoué (statut suspended → SubscriberGate bloque le lien) ; réactivation auto à la régularisation ; bascule en accès à vie une fois toutes les échéances payées. Relances email Resend à chaque échec + à la suspension.' },
 
   // PUBLIER — Guides nouveaux abonnés (mix : base offerte + avancés payants)
   { id: 'onboarding-guides',        pillar: 'publier',   status: 'done', title: 'Guides Nouveaux Abonnés (Onboarding 7 jours)',
