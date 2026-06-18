@@ -147,6 +147,7 @@ export const V3HubTour: React.FC<V3HubTourProps> = ({ isOpen, onClose, onComplet
   return (
     <AnimatePresence>
       <motion.div
+        key="v3-tour-overlay"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -158,6 +159,7 @@ export const V3HubTour: React.FC<V3HubTourProps> = ({ isOpen, onClose, onComplet
       />
 
       <motion.div
+        key="v3-tour-highlight"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
@@ -173,7 +175,7 @@ export const V3HubTour: React.FC<V3HubTourProps> = ({ isOpen, onClose, onComplet
       />
 
       <motion.div
-        key={step}
+        key={`v3-tour-tooltip-${current.id}`}
         initial={{ opacity: 0, y: 12, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
