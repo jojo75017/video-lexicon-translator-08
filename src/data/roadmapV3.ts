@@ -30,7 +30,7 @@ export const V3_GIFT_PRICE = Math.round(V3_PRICE * (1 - V3_GIFT_DISCOUNT)); // 1
 
 // ============= Grille tarifaire V3 =============
 // Base 197€ + 7 packs upsell (total 661€) → 858€ à la pièce.
-// Pack Tout Complet 347€ → débloque tout, économie de 361€.
+// Pack Pro Vendeur 347€ → débloque tout, économie de 200€.
 
 export interface V3UpsellPack {
   id: V3PackId;

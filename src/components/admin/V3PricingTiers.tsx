@@ -24,7 +24,7 @@ const SERIF = "'Georgia', 'Times New Roman', serif";
  * Bloc Tarifs V3 — 3 niveaux de lecture :
  *   1. Base 197€ (ce qui est inclus)
  *   2. Packs upsell à la carte (total 400€) — dépliables pour voir les modules
- *   3. Pack Tout Complet 347€ (−100€) mis en avant
+ *   3. Pack Pro Vendeur 347€ (−200€) mis en avant
  */
 const V3PricingTiers: React.FC = () => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
