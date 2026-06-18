@@ -321,7 +321,7 @@ const V3HubPage: React.FC = () => {
         {/* Parcours guidé V3 — entrée principale du Hub V3 */}
         <V3Workflow30 onOpenModule={setSelected} />
 
-        {/* Récapitulatif global des droits : 197€ vs Pack 497€ */}
+        {/* Récapitulatif global des droits : 197€ vs Pack 347€ */}
         <V3AccessRecap onOpenModule={setSelected} />
 
         {/* Recherche + filtres */}

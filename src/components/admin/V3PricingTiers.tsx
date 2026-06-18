@@ -24,7 +24,7 @@ const SERIF = "'Georgia', 'Times New Roman', serif";
  * Bloc Tarifs V3 — 3 niveaux de lecture :
  *   1. Base 197€ (ce qui est inclus)
  *   2. Packs upsell à la carte (total 400€) — dépliables pour voir les modules
- *   3. Pack Tout Complet 497€ (−100€) mis en avant
+ *   3. Pack Pro Vendeur 347€ (−200€) mis en avant
  */
 const V3PricingTiers: React.FC = () => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -300,7 +300,7 @@ const V3PricingTiers: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. Packs premium inclus dans le Pack Pro 497€ */}
+      {/* 2. Packs premium inclus dans le Pack Pro 347€ */}
       <div className="flex items-center gap-2 mb-4 mt-8">
         <Lock className="h-4 w-4" style={{ color: AMBER }} />
         <h3 className="text-base font-bold" style={{ fontFamily: SERIF, color: INK }}>Packs premium pour vendre & scaler</h3>

@@ -8,16 +8,16 @@ import { toast } from 'sonner';
 const GOLD = '#c9a84c';
 const GOLD_LIGHT = '#f0d78c';
 
-type PlanId = 'full_1x' | 'full_4x' | 'full_6x' | 'base_1x' | 'base_3x';
+type PlanId = 'full_1x' | 'full_3x' | 'full_4x' | 'base_1x' | 'base_3x';
 type Product = 'full' | 'base';
 
 const PLANS_BY_PRODUCT: Record<Product, { title: string; options: { id: PlanId; label: string; sub: string }[] }> = {
   full: {
-    title: 'Pack Tout Complet V3',
+    title: 'Pack Pro Vendeur V3',
     options: [
-      { id: 'full_1x', label: '1 × 497€', sub: 'Paiement unique · le plus économique' },
-      { id: 'full_4x', label: '4 × 129€', sub: 'Échéancier mensuel (516€)' },
-      { id: 'full_6x', label: '6 × 85€', sub: 'Petit budget (510€)' },
+      { id: 'full_1x', label: '1 × 347€', sub: 'Paiement unique · le plus économique' },
+      { id: 'full_3x', label: '3 × 119€', sub: 'Échéancier mensuel (357€)' },
+      { id: 'full_4x', label: '4 × 89€', sub: 'Petit budget (356€)' },
     ],
   },
   base: {

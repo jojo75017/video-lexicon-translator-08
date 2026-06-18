@@ -30,7 +30,7 @@ export const V3_GIFT_PRICE = Math.round(V3_PRICE * (1 - V3_GIFT_DISCOUNT)); // 1
 
 // ============= Grille tarifaire V3 =============
 // Base 197€ + 7 packs upsell (total 661€) → 858€ à la pièce.
-// Pack Tout Complet 497€ → débloque tout, économie de 361€.
+// Pack Pro Vendeur 347€ → débloque tout, économie de 200€.
 
 export interface V3UpsellPack {
   id: V3PackId;
@@ -43,7 +43,7 @@ export interface V3UpsellPack {
   installments?: string[];
   /** Badge marketing affiché (ex. « Opportunité »). */
   badge?: string;
-  /** true = option spécialiste vendue uniquement à la carte (hors Pack Pro 497€). */
+  /** true = option spécialiste vendue uniquement à la carte (hors Pack Pro 347€). */
   alacarte?: boolean;
 }
 
@@ -88,7 +88,7 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
       'collection-charter', 'quality-label',
     ],
   },
-  // ===== Options spécialistes — vendues uniquement à la carte (hors Pack Pro 497€) =====
+  // ===== Options spécialistes — vendues uniquement à la carte (hors Pack Pro 347€) =====
   {
     id: 'promotion',
     title: 'Pack Promotion Éditeur',
@@ -110,7 +110,7 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
   },
 ];
 
-/** Packs inclus dans le Pack Pro 497€ (hors options à la carte). */
+/** Packs inclus dans le Pack Pro 347€ (hors options à la carte). */
 export const V3_ESSENTIAL_PACKS = V3_UPSELL_PACKS.filter((p) => !p.alacarte);
 
 /** Options spécialistes vendues uniquement à la carte. */
@@ -125,11 +125,11 @@ export const V3_BASE_INSTALLMENTS = ['1×197€', '3×69€'];
 /** Pack Pro : la base 197€ + les 4 packs essentiels d'un coup. */
 export const V3_FULL_PACK = {
   title: 'Pack Pro Vendeur',
-  price: 497,
+  price: 347,
   /** Prix si on prend la base + les packs essentiels séparément. */
   compareAt: V3_PRICE + V3_UPSELLS_TOTAL, // 547
-  saves: V3_PRICE + V3_UPSELLS_TOTAL - 497, // 50
-  installments: ['1×497€', '4×129€', '6×85€'],
+  saves: V3_PRICE + V3_UPSELLS_TOTAL - 347, // 200
+  installments: ['1×347€', '3×119€', '4×89€'],
 };
 
 /** Map id de module → pack upsell (dérivé de V3_UPSELL_PACKS). */
@@ -154,7 +154,7 @@ export type V3Access = 'included' | 'pack';
  * Liste blanche des modules COMPRIS dans la base 197€.
  * Frontière : de l'idée jusqu'à publier proprement sur KDP.
  * Tout ce qui relève du marketing, de la vente, de la monétisation et de
- * l'IA avancée passe en pack premium (débloqué via le Pack Tout Complet 497€).
+ * l'IA avancée passe en pack premium (débloqué via le Pack Tout Complet 347€).
  * Source de vérité de l'inclusion : un module absent de ce set est premium par défaut.
  */
 export const V3_BASE_MODULE_IDS = new Set<string>([
@@ -426,17 +426,17 @@ export const V3_MODULES: V3Module[] = [
   { id: 'community-ai-unblock',     pillar: 'ia',        status: 'done', title: 'Assistant IA Débloquage KDP',
     description: 'Bouton « Débloquer avec l’IA » : à partir de la question/blocage de l’abonné, génère une solution KDP concrète (étapes, modèle d’email au support KDP si besoin) et propose l’outil interne adapté.' },
 
-  // ===== AJOUTS V3 — Tunnel de prix 497€ + paiement échelonné — à construire (AOÛT) =====
+  // ===== AJOUTS V3 — Tunnel de prix 347€ + paiement échelonné — à construire (AOÛT) =====
 
   // MONÉTISER
-  { id: 'pricing-ladder-497',       pillar: 'monetiser', status: 'done', title: 'Échelle de Prix 497€ (Upsells + Pack Tout Inclus)',
-    description: 'Parcours commercial menant à 497€ : V3 197€ + order bump guides avancés 47€ + OTO1 visuels 97€ + OTO2 communauté/coaching 97€ + OTO3 licence étendue/traduction 59€ (= 497€), OU bouton unique « Pack Tout Inclus » à 497€. Source unique de vérité dans un module pricing dédié.' },
-  { id: 'installment-payments',     pillar: 'monetiser', status: 'done', title: 'Paiement Échelonné Sécurisé (4×129€ / 6×85€)',
-    description: 'Pack payable en 1×, 4×129€ (516€) ou 6×85€ (510€). Géré par abonnement Stripe à durée limitée pour détecter les échecs. COUPURE AUTOMATIQUE de l’accès 3 JOURS après un paiement échoué (statut suspended → SubscriberGate bloque le lien) ; réactivation auto à la régularisation ; bascule en accès à vie une fois toutes les échéances payées. Relances email Resend à chaque échec + à la suspension.' },
+  { id: 'pricing-ladder-497',       pillar: 'monetiser', status: 'done', title: 'Échelle de Prix 347€ (Upsells + Pack Tout Inclus)',
+    description: 'Parcours commercial menant à 347€ : V3 197€ + order bump guides avancés 47€ + OTO1 visuels 67€ + OTO2 communauté/coaching 36€ (= 347€), OU bouton unique « Pack Pro Vendeur » à 347€. Source unique de vérité dans un module pricing dédié.' },
+  { id: 'installment-payments',     pillar: 'monetiser', status: 'done', title: 'Paiement Échelonné Sécurisé (3×119€ / 4×89€)',
+    description: 'Pack payable en 1×347€, 3×119€ (357€) ou 4×89€ (356€). Géré par abonnement Stripe à durée limitée pour détecter les échecs. COUPURE AUTOMATIQUE de l’accès 3 JOURS après un paiement échoué (statut suspended → SubscriberGate bloque le lien) ; réactivation auto à la régularisation ; bascule en accès à vie une fois toutes les échéances payées. Relances email Resend à chaque échec + à la suspension.' },
 
   // PUBLIER — Guides nouveaux abonnés (mix : base offerte + avancés payants)
   { id: 'onboarding-guides',        pillar: 'publier',   status: 'done', title: 'Guides Nouveaux Abonnés (Onboarding 7 jours)',
-    description: 'Mix : onboarding « Premiers pas KDP en 7 jours » + 2 guides de base OFFERTS pour activer les nouveaux abonnés ; guides avancés verrouillés avec CTA vers order bump / upsell. Mise en ligne prévue en août avec le tunnel 497€.' },
+    description: 'Mix : onboarding « Premiers pas KDP en 7 jours » + 2 guides de base OFFERTS pour activer les nouveaux abonnés ; guides avancés verrouillés avec CTA vers order bump / upsell. Mise en ligne prévue en août avec le tunnel 347€.' },
 
   // ===== AJOUTS V3 — Maison d'édition — packs upsell — à construire =====
 
