@@ -125,11 +125,11 @@ export const V3_BASE_INSTALLMENTS = ['1×197€', '3×69€'];
 /** Pack Pro : la base 197€ + les 4 packs essentiels d'un coup. */
 export const V3_FULL_PACK = {
   title: 'Pack Pro Vendeur',
-  price: 497,
+  price: 347,
   /** Prix si on prend la base + les packs essentiels séparément. */
   compareAt: V3_PRICE + V3_UPSELLS_TOTAL, // 547
-  saves: V3_PRICE + V3_UPSELLS_TOTAL - 497, // 50
-  installments: ['1×497€', '4×129€', '6×85€'],
+  saves: V3_PRICE + V3_UPSELLS_TOTAL - 347, // 200
+  installments: ['1×347€', '3×119€', '4×89€'],
 };
 
 /** Map id de module → pack upsell (dérivé de V3_UPSELL_PACKS). */
