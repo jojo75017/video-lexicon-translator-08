@@ -1,0 +1,2 @@
+ALTER TABLE public.v3_installment_orders DROP CONSTRAINT IF EXISTS v3_installment_orders_plan_check;
+ALTER TABLE public.v3_installment_orders ADD CONSTRAINT v3_installment_orders_plan_check CHECK (plan = ANY (ARRAY['full_1x','full_3x','full_4x','base_1x','base_3x']));
