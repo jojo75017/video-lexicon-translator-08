@@ -43,6 +43,8 @@ export interface V3UpsellPack {
   installments?: string[];
   /** Badge marketing affiché (ex. « Opportunité »). */
   badge?: string;
+  /** true = option spécialiste vendue uniquement à la carte (hors Pack Pro 497€). */
+  alacarte?: boolean;
 }
 
 export const V3_UPSELL_PACKS: V3UpsellPack[] = [
