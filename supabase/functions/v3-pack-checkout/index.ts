@@ -25,9 +25,9 @@ const PLANS: Record<
   string,
   { label: string; total: number; installments: number; monthly: number }
 > = {
-  full_1x: { label: "Pack Tout Complet V3 — paiement unique", total: 49700, installments: 1, monthly: 49700 },
-  full_4x: { label: "Pack Tout Complet V3 — 4× sans frais", total: 51600, installments: 4, monthly: 12900 },
-  full_6x: { label: "Pack Tout Complet V3 — 6× sans frais", total: 51000, installments: 6, monthly: 8500 },
+  full_1x: { label: "Pack Pro Vendeur V3 — paiement unique", total: 34700, installments: 1, monthly: 34700 },
+  full_3x: { label: "Pack Pro Vendeur V3 — 3× sans frais", total: 35700, installments: 3, monthly: 11900 },
+  full_4x: { label: "Pack Pro Vendeur V3 — 4× sans frais", total: 35600, installments: 4, monthly: 8900 },
   base_1x: { label: "Base Création & Publication V3 — paiement unique", total: 19700, installments: 1, monthly: 19700 },
   base_3x: { label: "Base Création & Publication V3 — 3× sans frais", total: 20700, installments: 3, monthly: 6900 },
 };
