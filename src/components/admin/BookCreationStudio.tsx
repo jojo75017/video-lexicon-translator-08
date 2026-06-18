@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Loader2, Sparkles, Download, Copy } from 'lucide-react';
+import { Loader2, Sparkles, Download, Copy, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { callAIWriting } from '@/services/aiWritingService';
+import { supabase } from '@/integrations/supabase/client';
 
 const TEAL = '#008296';
 const INK = '#232F3E';
@@ -68,6 +69,7 @@ export default function BookCreationStudio({ initialSource }: { initialSource?: 
   const [audience, setAudience] = useState('');
   const [idea, setIdea] = useState('');
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [output, setOutput] = useState('');
 
   const selectType = (id: string) => {
@@ -120,6 +122,47 @@ Sois concret, orienté valeur lecteur et cohérent avec la niche.`;
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     toast.success('Plan téléchargé ✓');
+  };
+
+  const saveV3Project = async () => {
+    if (!title.trim()) return toast.error('Indique le titre avant de sauvegarder.');
+    if (!output.trim()) return toast.error('Génère le plan avant de sauvegarder.');
+    setSaving(true);
+    try {
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) throw new Error('Connecte-toi pour sauvegarder dans ton compte.');
+      const typeLabel = BOOK_TYPES.find((t) => t.id === bookType)?.title ?? 'Livre';
+      const { data, error } = await supabase
+        .from('v3_workflow_projects')
+        .insert({
+          user_id: auth.user.id,
+          name: title.trim().slice(0, 120),
+          theme: idea.trim(),
+          brief: {
+            title: title.trim(),
+            subtitle: subtitle.trim(),
+            author: '',
+            category: typeLabel,
+            chapterCount: '',
+            wordsPerChapter: '',
+            audience: audience.trim(),
+            keywords: keywords.trim(),
+            source: meta.label,
+          },
+          done: ['book-creation-studio'],
+          results: { 'book-creation-studio': output.trim() },
+        } as never)
+        .select('id')
+        .single();
+      if (error) throw error;
+      const savedId = (data as { id?: string } | null)?.id;
+      if (savedId) localStorage.setItem('v3_workflow_open_project_id', savedId);
+      toast.success('Projet sauvegardé dans Mes sauvegardes ✓');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Sauvegarde impossible.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -271,6 +314,10 @@ Sois concret, orienté valeur lecteur et cohérent avec la niche.`;
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" className="gap-1.5" onClick={() => { navigator.clipboard.writeText(output); toast.success('Copié ✓'); }} disabled={!output.trim()}>
                   <Copy className="h-3.5 w-3.5" /> Copier
+                </Button>
+                <Button variant="outline" size="sm" className="gap-1.5" onClick={saveV3Project} disabled={!output.trim() || saving}>
+                  {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                  Sauvegarder
                 </Button>
                 <Button size="sm" className="gap-1.5" style={{ background: TEAL, color: '#fff' }} onClick={downloadTxt} disabled={!output.trim()}>
                   <Download className="h-3.5 w-3.5" /> Télécharger (.txt)

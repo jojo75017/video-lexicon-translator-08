@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { BookOpen, Headphones, Pencil, Rocket, Download, Trash2, Loader2 } from 'lucide-react';
+import { BookOpen, Headphones, Pencil, Rocket, Download, Trash2, Loader2, Save, Image as ImageIcon } from 'lucide-react';
 
 const slugify = (s: string) =>
   (s || 'livre')
@@ -42,16 +42,30 @@ interface AudioRow {
   duration_seconds: number | null;
 }
 
+interface V3ProjectRow {
+  id: string;
+  name: string;
+  theme: string | null;
+  brief: any;
+  updated_at: string;
+}
+
 export default function LibraryModule() {
   const navigate = useNavigate();
-  const [tab, setTab] = useState<'numeriques' | 'audio'>('numeriques');
+  const [tab, setTab] = useState<'v3' | 'numeriques' | 'audio'>('v3');
   const [loading, setLoading] = useState(true);
+  const [v3Projects, setV3Projects] = useState<V3ProjectRow[]>([]);
   const [ebooks, setEbooks] = useState<EbookRow[]>([]);
   const [audios, setAudios] = useState<AudioRow[]>([]);
   const [deleting, setDeleting] = useState<string | null>(null);
 
   const openEditor = () => navigate('/ebook-planner');
   const goPublish = () => navigate('/couverture-kdp');
+  const openV3Project = (id: string) => {
+    localStorage.setItem('v3_workflow_open_project_id', id);
+    navigate('/hub-v3');
+    toast.success('Projet V3 prêt à rouvrir dans le parcours');
+  };
 
   const exportEbook = (b: EbookRow) => {
     const content = [
@@ -85,7 +99,11 @@ export default function LibraryModule() {
       setLoading(false);
       return;
     }
-    const [{ data: eb }, { data: au }] = await Promise.all([
+    const [{ data: v3 }, { data: eb }, { data: au }] = await Promise.all([
+      supabase
+        .from('v3_workflow_projects')
+        .select('id, name, theme, brief, updated_at')
+        .order('updated_at', { ascending: false }),
       supabase
         .from('ebook_projects')
         .select('id, title, target_audience, book_summary, project_type')
@@ -97,6 +115,7 @@ export default function LibraryModule() {
         .eq('user_id', user.id)
         .order('updated_at', { ascending: false }),
     ]);
+    setV3Projects((v3 as V3ProjectRow[]) ?? []);
     setEbooks((eb as EbookRow[]) ?? []);
     setAudios((au as AudioRow[]) ?? []);
     setLoading(false);
@@ -140,12 +159,42 @@ export default function LibraryModule() {
           Ma bibliothèque
         </h2>
         <p className="text-sm" style={{ color: `${INK}99` }}>
-          Toutes vos créations au même endroit.
+          Retrouvez vos projets V3 sauvegardés, vos livres numériques et vos livres audio.
         </p>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <button type="button" onClick={() => navigate('/hub-v3')}
+          className="rounded-xl border p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-sm"
+          style={{ borderColor: `${TEAL}40`, background: `${TEAL}0d` }}>
+          <Save className="h-5 w-5 mb-2" style={{ color: TEAL }} />
+          <div className="text-sm font-bold" style={{ color: INK }}>Sauvegarder / rouvrir un projet V3</div>
+          <div className="text-xs mt-1" style={{ color: `${INK}80` }}>Ouvre le parcours et le bouton “Sauvegarder mon projet”.</div>
+        </button>
+        <button type="button" onClick={goPublish}
+          className="rounded-xl border p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-sm"
+          style={{ borderColor: '#FF9E2D66', background: '#FFF3DF' }}>
+          <ImageIcon className="h-5 w-5 mb-2" style={{ color: '#C97A14' }} />
+          <div className="text-sm font-bold" style={{ color: INK }}>Faire l'image / la couverture</div>
+          <div className="text-xs mt-1" style={{ color: `${INK}80` }}>Accès direct aux outils de couverture KDP.</div>
+        </button>
       </div>
 
       {/* Tabs */}
       <div className="inline-flex rounded-lg border overflow-hidden" style={{ borderColor: '#E3E6E6' }}>
+        <button
+          onClick={() => setTab('v3')}
+          className="flex items-center gap-2 px-4 py-2 text-sm font-semibold transition-colors"
+          style={tab === 'v3' ? { background: TEAL, color: '#fff' } : { background: '#fff', color: `${INK}99` }}
+        >
+          <Save className="h-4 w-4" /> Projets V3
+          <span
+            className="text-xs rounded-full px-1.5"
+            style={tab === 'v3' ? { background: '#ffffff33' } : { background: '#F0F0F0' }}
+          >
+            {v3Projects.length}
+          </span>
+        </button>
         <button
           onClick={() => setTab('numeriques')}
           className="flex items-center gap-2 px-4 py-2 text-sm font-semibold transition-colors"
@@ -178,6 +227,24 @@ export default function LibraryModule() {
         <div className="flex items-center gap-2 py-12 justify-center" style={{ color: `${INK}80` }}>
           <Loader2 className="h-5 w-5 animate-spin" /> Chargement…
         </div>
+      ) : tab === 'v3' ? (
+        v3Projects.length === 0 ? (
+          <EmptyState label="Aucun projet V3 sauvegardé pour le moment." />
+        ) : (
+          <div className="space-y-4">
+            {v3Projects.map((p) => (
+              <V3ProjectCard
+                key={p.id}
+                name={p.name}
+                theme={p.theme}
+                brief={p.brief}
+                updatedAt={p.updated_at}
+                onOpen={() => openV3Project(p.id)}
+                onCover={goPublish}
+              />
+            ))}
+          </div>
+        )
       ) : tab === 'numeriques' ? (
         ebooks.length === 0 ? (
           <EmptyState label="Aucun livre numérique pour le moment." />
@@ -226,6 +293,52 @@ function EmptyState({ label }: { label: string }) {
   return (
     <div className="rounded-xl border border-dashed p-10 text-center text-sm" style={{ borderColor: '#E3E6E6', color: `${INK}80` }}>
       {label}
+    </div>
+  );
+}
+
+function V3ProjectCard({
+  name,
+  theme,
+  brief,
+  updatedAt,
+  onOpen,
+  onCover,
+}: {
+  name: string;
+  theme?: string | null;
+  brief?: any;
+  updatedAt: string;
+  onOpen: () => void;
+  onCover: () => void;
+}) {
+  const title = brief?.title || name;
+  const subtitle = brief?.subtitle || theme || 'Projet V3 sauvegardé';
+  const date = new Date(updatedAt).toLocaleDateString('fr-FR');
+
+  return (
+    <div className="rounded-xl border p-4 flex gap-4 items-start" style={{ borderColor: `${TEAL}40`, background: '#fff' }}>
+      <div className="h-20 w-16 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${TEAL}14`, color: TEAL }}>
+        <Save className="h-7 w-7" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-start gap-2">
+          <h3 className="font-bold text-sm truncate" style={{ color: INK }}>{title}</h3>
+          <span className="text-[10px] font-semibold rounded-md px-2 py-0.5 shrink-0" style={{ background: `${TEAL}10`, color: TEAL }}>
+            V3
+          </span>
+        </div>
+        <p className="text-xs mt-0.5 line-clamp-2" style={{ color: `${INK}99` }}>{subtitle}</p>
+        <p className="text-[11px] mt-1" style={{ color: `${INK}70` }}>Dernière sauvegarde : {date}</p>
+      </div>
+      <div className="flex flex-col gap-2 shrink-0">
+        <Button size="sm" className="justify-start" style={{ background: TEAL, color: '#fff' }} onClick={onOpen}>
+          <Pencil className="h-3.5 w-3.5 mr-1.5" /> Rouvrir
+        </Button>
+        <Button size="sm" className="justify-start" style={{ background: '#FF9E2D', color: INK }} onClick={onCover}>
+          <ImageIcon className="h-3.5 w-3.5 mr-1.5" /> Image
+        </Button>
+      </div>
     </div>
   );
 }
