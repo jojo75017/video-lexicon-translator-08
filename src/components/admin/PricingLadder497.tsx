@@ -12,7 +12,7 @@ const PricingLadder497: React.FC = () => {
     <div className="space-y-4">
       <p className="text-sm text-joy-ink/70">
         Le parcours commercial complet menant à <strong>347€</strong> : la base à 197€, les packs upsell
-        à la carte, ou le <strong>Pack Tout Complet</strong> en un seul clic (−100€). Chaque CTA ouvre le
+        à la carte, ou le <strong>Pack Pro Vendeur</strong> en un seul clic (−200€). Chaque CTA ouvre le
         tunnel de paiement avec choix des mensualités.
       </p>
       <V3PricingTiers />
