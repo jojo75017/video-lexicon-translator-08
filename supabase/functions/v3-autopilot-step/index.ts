@@ -252,7 +252,7 @@ Règles :
 - Aucune donnée inventée présentée comme une vérité chiffrée officielle : si tu estimes des chiffres (ventes, recherches), précise que ce sont des estimations.
 
 ${isPro
-  ? `## Niveau de qualité : PRO (Pack Tout Complet 497€) — niveau EXPERT
+  ? `## Niveau de qualité : PRO (Pack Tout Complet 347€) — niveau EXPERT
 - Vise le niveau d'un consultant senior en auto-édition Amazon : analyse plus fine, livrable plus long, plus détaillé et plus actionnable que la version standard.
 - Quand c'est pertinent pour un livrable marketing/commercial (titres, sous-titres, descriptions, accroches, emails, annonces), propose 2 à 3 VARIANTES clairement numérotées (Variante A / B / C) avec une courte note sur le positionnement de chacune et laquelle tu recommandes.
 - Termine par une mini-checklist qualité « À vérifier avant d'utiliser » (3 à 5 points).`

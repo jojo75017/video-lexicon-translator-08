@@ -30,7 +30,7 @@ export const V3_GIFT_PRICE = Math.round(V3_PRICE * (1 - V3_GIFT_DISCOUNT)); // 1
 
 // ============= Grille tarifaire V3 =============
 // Base 197€ + 7 packs upsell (total 661€) → 858€ à la pièce.
-// Pack Tout Complet 497€ → débloque tout, économie de 361€.
+// Pack Tout Complet 347€ → débloque tout, économie de 361€.
 
 export interface V3UpsellPack {
   id: V3PackId;
@@ -43,7 +43,7 @@ export interface V3UpsellPack {
   installments?: string[];
   /** Badge marketing affiché (ex. « Opportunité »). */
   badge?: string;
-  /** true = option spécialiste vendue uniquement à la carte (hors Pack Pro 497€). */
+  /** true = option spécialiste vendue uniquement à la carte (hors Pack Pro 347€). */
   alacarte?: boolean;
 }
 
@@ -88,7 +88,7 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
       'collection-charter', 'quality-label',
     ],
   },
-  // ===== Options spécialistes — vendues uniquement à la carte (hors Pack Pro 497€) =====
+  // ===== Options spécialistes — vendues uniquement à la carte (hors Pack Pro 347€) =====
   {
     id: 'promotion',
     title: 'Pack Promotion Éditeur',
@@ -110,7 +110,7 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
   },
 ];
 
-/** Packs inclus dans le Pack Pro 497€ (hors options à la carte). */
+/** Packs inclus dans le Pack Pro 347€ (hors options à la carte). */
 export const V3_ESSENTIAL_PACKS = V3_UPSELL_PACKS.filter((p) => !p.alacarte);
 
 /** Options spécialistes vendues uniquement à la carte. */
@@ -154,7 +154,7 @@ export type V3Access = 'included' | 'pack';
  * Liste blanche des modules COMPRIS dans la base 197€.
  * Frontière : de l'idée jusqu'à publier proprement sur KDP.
  * Tout ce qui relève du marketing, de la vente, de la monétisation et de
- * l'IA avancée passe en pack premium (débloqué via le Pack Tout Complet 497€).
+ * l'IA avancée passe en pack premium (débloqué via le Pack Tout Complet 347€).
  * Source de vérité de l'inclusion : un module absent de ce set est premium par défaut.
  */
 export const V3_BASE_MODULE_IDS = new Set<string>([
@@ -426,7 +426,7 @@ export const V3_MODULES: V3Module[] = [
   { id: 'community-ai-unblock',     pillar: 'ia',        status: 'done', title: 'Assistant IA Débloquage KDP',
     description: 'Bouton « Débloquer avec l’IA » : à partir de la question/blocage de l’abonné, génère une solution KDP concrète (étapes, modèle d’email au support KDP si besoin) et propose l’outil interne adapté.' },
 
-  // ===== AJOUTS V3 — Tunnel de prix 497€ + paiement échelonné — à construire (AOÛT) =====
+  // ===== AJOUTS V3 — Tunnel de prix 347€ + paiement échelonné — à construire (AOÛT) =====
 
   // MONÉTISER
   { id: 'pricing-ladder-497',       pillar: 'monetiser', status: 'done', title: 'Échelle de Prix 347€ (Upsells + Pack Tout Inclus)',

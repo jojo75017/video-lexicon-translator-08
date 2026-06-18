@@ -15,7 +15,7 @@ const PLANS_BY_PRODUCT: Record<Product, { title: string; options: { id: PlanId; 
   full: {
     title: 'Pack Tout Complet V3',
     options: [
-      { id: 'full_1x', label: '1 × 497€', sub: 'Paiement unique · le plus économique' },
+      { id: 'full_1x', label: '1 × 347€', sub: 'Paiement unique · le plus économique' },
       { id: 'full_4x', label: '4 × 129€', sub: 'Échéancier mensuel (516€)' },
       { id: 'full_6x', label: '6 × 85€', sub: 'Petit budget (510€)' },
     ],

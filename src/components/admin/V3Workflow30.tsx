@@ -49,7 +49,7 @@ interface Step {
   moduleId: string;
   label?: string;
   hint: string;
-  /** 'core' = parcours 197€ (22 agents) ; 'premium' = réservé au parcours 497€ (30 agents). */
+  /** 'core' = parcours 197€ (22 agents) ; 'premium' = réservé au parcours 347€ (30 agents). */
   tier?: Tier;
 }
 interface Phase {
@@ -66,7 +66,7 @@ interface Phase {
  *   - Les 5 premières phases ne contiennent QUE des étapes « core » (197€).
  *     Un acheteur 197€ déroule donc tout le parcours « idée → publié » sans
  *     jamais croiser une étape verrouillée au milieu de son travail.
- *   - Toutes les étapes Pro (497€) sont regroupées dans une seule phase finale
+ *   - Toutes les étapes Pro (347€) sont regroupées dans une seule phase finale
  *     « Aller plus loin » présentée comme un bonus après la publication.
  */
 const PHASES: Phase[] = [
@@ -131,8 +131,8 @@ const PHASES: Phase[] = [
     ],
   },
   {
-    // Phase finale Pro (497€) : scaler les ventes après le lancement.
-    key: 'aller-plus-loin', emoji: '📈', title: 'Phase 7 — Aller plus loin (Pack Pro · 497€)',
+    // Phase finale Pro (347€) : scaler les ventes après le lancement.
+    key: 'aller-plus-loin', emoji: '📈', title: 'Phase 7 — Aller plus loin (Pack Pro · 347€)',
     steps: [
       { moduleId: 'sales-description', label: 'Écrire la description vendeuse', hint: 'Une fiche produit qui convertit.', tier: 'premium' },
       { moduleId: 'sales-tracker', label: 'Mettre en place le suivi des ventes', hint: 'Plan de pilotage des ventes et royalties.', tier: 'premium' },
@@ -152,7 +152,7 @@ interface FlatStep extends Step {
 
 type Parcours = 'core' | 'full';
 
-/** Construit la liste plate d'étapes pour un parcours donné (197€ = core, 497€ = full). */
+/** Construit la liste plate d'étapes pour un parcours donné (197€ = core, 347€ = full). */
 const buildFlat = (parcours: Parcours): FlatStep[] =>
   PHASES.flatMap((p) =>
     p.steps
@@ -161,7 +161,7 @@ const buildFlat = (parcours: Parcours): FlatStep[] =>
   ).map((s, i) => ({ ...s, globalIndex: i }));
 
 const CORE_TOTAL = buildFlat('core').length; // 22 agents (197€)
-const FULL_TOTAL = buildFlat('full').length; // 30 agents (497€)
+const FULL_TOTAL = buildFlat('full').length; // 30 agents (347€)
 const PARCOURS_KEY = 'v3_workflow30_parcours';
 
 function loadSet(key: string): Set<string> {
@@ -253,20 +253,20 @@ const ResultView: React.FC<{ text: string }> = ({ text }) => {
 
 const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpenModule }) => {
   const { apiKey: userGeminiKey } = useOpenAIConfig();
-  // Droits réellement payés (197€ base / 497€ Pack Tout Complet). L'admin a tout.
+  // Droits réellement payés (197€ base / 347€ Pack Tout Complet). L'admin a tout.
   const { hasFull, loading: entLoading } = useV3Entitlement();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
-  // Parcours actif : 'core' = offre 197€ (22 agents), 'full' = Pack Tout Complet 497€ (30 agents).
+  // Parcours actif : 'core' = offre 197€ (22 agents), 'full' = Pack Tout Complet 347€ (30 agents).
   const [parcours, setParcours] = useState<Parcours>(
     () => ((localStorage.getItem(PARCOURS_KEY) as Parcours) === 'full' ? 'full' : 'core'),
   );
-  // Garde-fou : tant que le Pack 497€ n'est pas réglé, on ne peut pas démarrer en Pro.
+  // Garde-fou : tant que le Pack 347€ n'est pas réglé, on ne peut pas démarrer en Pro.
   useEffect(() => {
     if (!entLoading && parcours === 'full' && !hasFull) setParcours('core');
   }, [entLoading, parcours, hasFull]);
   useEffect(() => { localStorage.setItem(PARCOURS_KEY, parcours); }, [parcours]);
   // On affiche TOUJOURS la liste complète (32 étapes). Les étapes premium non débloquées
-  // restent visibles en « teaser » verrouillé pour donner envie de passer au Pack 497€.
+  // restent visibles en « teaser » verrouillé pour donner envie de passer au Pack 347€.
   const FLAT = useMemo(() => buildFlat('full'), []);
   const fullMode = parcours === 'full' && hasFull;
   const isAccessible = (s: FlatStep) => (s.tier ?? 'core') !== 'premium' || fullMode;
@@ -489,7 +489,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
         priorOutputs,
         provider,
         model: currentModel,
-        // Palier de qualité IA : 'pro' (497€) = sorties plus longues + variantes ; 'core' (197€) = qualité enrichie.
+        // Palier de qualité IA : 'pro' (347€) = sorties plus longues + variantes ; 'core' (197€) = qualité enrichie.
         quality: fullMode ? 'pro' : 'core',
         userApiKey: provider === 'gemini' ? effectiveKey : customKey.trim(),
       };
@@ -726,10 +726,10 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 </div>
                 <p className="mt-1 text-[12px]" style={{ color: '#6f5e47' }}>
                   {parcours === 'full'
-                    ? 'Pack Tout Complet 497€ : écris, publie ET vends (emails de lancement, annonces, suivi des ventes, audio…) avec une IA au niveau maximal (sorties plus longues, variantes A/B).'
+                    ? 'Pack Tout Complet 347€ : écris, publie ET vends (emails de lancement, annonces, suivi des ventes, audio…) avec une IA au niveau maximal (sorties plus longues, variantes A/B).'
                     : hasFull
                       ? `Offre 197€ : ${CORE_TOTAL} agents pour aller de l'idée jusqu'à publier ton livre sur Amazon, sans étape verrouillée en chemin. La phase « Aller plus loin » reste en aperçu. Tu peux basculer en Pro à tout moment.`
-                      : `Offre 197€ : ${CORE_TOTAL} agents pour aller de l'idée jusqu'à publier ton livre sur Amazon, sans étape verrouillée en chemin. La phase « Aller plus loin » (description vendeuse, annonces, lancement, suivi des ventes) s'affiche en aperçu — débloquée avec le Pack 497€.`}
+                      : `Offre 197€ : ${CORE_TOTAL} agents pour aller de l'idée jusqu'à publier ton livre sur Amazon, sans étape verrouillée en chemin. La phase « Aller plus loin » (description vendeuse, annonces, lancement, suivi des ventes) s'affiche en aperçu — débloquée avec le Pack 347€.`}
                 </p>
               </div>
               <div className="inline-flex rounded-xl border overflow-hidden" style={{ borderColor: `${AMBER}55` }}>
@@ -746,7 +746,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                   style={parcours === 'full'
                     ? { background: `linear-gradient(90deg, ${GREEN}, #2fc488)`, color: '#fff' }
                     : { background: '#fff', color: GREEN }}>
-                  {!hasFull && <Lock className="h-3 w-3" />} Pro · 497€
+                  {!hasFull && <Lock className="h-3 w-3" />} Pro · 347€
                 </button>
               </div>
             </div>
@@ -761,12 +761,12 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 <div className="mt-3 flex flex-wrap items-center gap-2">
                   <span className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-[12px] font-semibold border"
                     style={{ borderColor: `${AMBER}55`, color: AMBER_DEEP, background: '#fff' }}>
-                    <Lock className="h-3.5 w-3.5" /> Parcours Pro verrouillé — réservé au Pack Tout Complet 497€
+                    <Lock className="h-3.5 w-3.5" /> Parcours Pro verrouillé — réservé au Pack Tout Complet 347€
                   </span>
                   <button onClick={() => setCheckoutOpen(true)}
                     className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5"
                     style={{ background: `linear-gradient(90deg, ${GREEN}, #2fc488)` }}>
-                    <Sparkles className="h-3.5 w-3.5" /> Débloquer les 10 agents avancés (497€)
+                    <Sparkles className="h-3.5 w-3.5" /> Débloquer les 10 agents avancés (347€)
                   </button>
                 </div>
               )
@@ -1089,7 +1089,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                                 {isTeaser && (
                                   <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold border"
                                     style={{ borderColor: `${GREEN}66`, color: GREEN, background: '#eafaf2' }}>
-                                    <Lock className="h-2.5 w-2.5" /> Pro · 497€
+                                    <Lock className="h-2.5 w-2.5" /> Pro · 347€
                                   </span>
                                 )}
                               </div>
@@ -1099,15 +1099,15 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                               {isTeaser && (
                                 <div className="mt-2 rounded-xl border p-3" style={{ borderColor: `${GREEN}33`, background: '#f6fdf9' }}>
                                   <p className="text-[11px] leading-snug" style={{ color: '#4a6a59' }}>
-                                    🔒 Cet agent fait partie de la phase <strong>Aller plus loin</strong> (réservée au Pack Tout Complet 497€) :
+                                    🔒 Cet agent fait partie de la phase <strong>Aller plus loin</strong> (réservée au Pack Tout Complet 347€) :
                                     description vendeuse, optimisation d'annonce, séquence de lancement, suivi des ventes et raffinements avancés…
-                                    Le parcours 197€ t'amène jusqu'à publier ton livre ; le Pack 497€ le lance et le vend, avec une IA encore plus
+                                    Le parcours 197€ t'amène jusqu'à publier ton livre ; le Pack 347€ le lance et le vend, avec une IA encore plus
                                     puissante (sorties plus longues, variantes A/B).
                                   </p>
                                   <button onClick={() => setCheckoutOpen(true)}
                                     className="mt-2 inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5"
                                     style={{ background: `linear-gradient(90deg, ${GREEN}, #2fc488)` }}>
-                                    <Sparkles className="h-3.5 w-3.5" /> Débloquer avec le Pack Tout Complet (497€)
+                                    <Sparkles className="h-3.5 w-3.5" /> Débloquer avec le Pack Tout Complet (347€)
                                   </button>
                                 </div>
                               )}
