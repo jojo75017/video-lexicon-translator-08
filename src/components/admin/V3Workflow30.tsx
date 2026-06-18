@@ -118,20 +118,27 @@ const PHASES: Phase[] = [
     ],
   },
   {
-    // Phase finale entièrement Pro (497€). Regroupée ici pour que le parcours
-    // 197€ reste fluide : ce sont des bonus pour aller plus loin après publication.
-    key: 'aller-plus-loin', emoji: '📈', title: 'Phase 6 — Aller plus loin (Pack Tout Complet · 497€)',
+    // Lancement & visibilité — désormais INCLUS dans l'offre 197€.
+    key: 'lancement', emoji: '📣', title: 'Phase 6 — Lancer & rendre visible (inclus 197€)',
     steps: [
-      // Lancer & vendre : tout le marketing/ventes est réservé au Pack 497€.
+      { moduleId: 'listing-optimizer', label: 'Optimiser l\'annonce', hint: 'Titre et mots-clés optimisés pour Amazon.' },
+      { moduleId: 'launch-pricing', label: 'Fixer le prix de lancement', hint: 'Stratégie de prix montant les premiers jours.' },
+      { moduleId: 'launch-sequence-j7', label: 'Préparer la séquence J-7', hint: 'Plan de lancement jour par jour.' },
+      { moduleId: 'amazon-ads', label: 'Lancer les Amazon Ads', hint: 'Campagnes Sponsored Products ciblées.' },
+      { moduleId: 'look-inside-optimizer', label: 'Optimiser le « Look Inside »', hint: 'Convertis les premières pages de l\'aperçu.' },
+      { moduleId: 'author-page-optimizer', label: 'Optimiser la page auteur', hint: 'Author Central : bio, photo, mots-clés.' },
+      { moduleId: 'cover-variants-thumbnail', label: 'Tester la miniature Amazon', hint: 'Valide la lisibilité du titre en petit.' },
+    ],
+  },
+  {
+    // Phase finale Pro (497€) : scaler les ventes après le lancement.
+    key: 'aller-plus-loin', emoji: '📈', title: 'Phase 7 — Aller plus loin (Pack Pro · 497€)',
+    steps: [
       { moduleId: 'sales-description', label: 'Écrire la description vendeuse', hint: 'Une fiche produit qui convertit.', tier: 'premium' },
-      { moduleId: 'listing-optimizer', label: 'Optimiser l\'annonce', hint: 'Titre et mots-clés optimisés pour Amazon.', tier: 'premium' },
-      { moduleId: 'launch-sequence-j7', label: 'Préparer la séquence J-7', hint: 'Plan de lancement jour par jour.', tier: 'premium' },
       { moduleId: 'sales-tracker', label: 'Mettre en place le suivi des ventes', hint: 'Plan de pilotage des ventes et royalties.', tier: 'premium' },
-      // Raffinements avancés (sortis du parcours 197€ pour ne pas le bloquer).
       { moduleId: 'p22-trend-radar', label: 'Repérer les tendances', hint: 'Détecte les sujets qui montent sur Amazon.', tier: 'premium' },
       { moduleId: 'p17-series', label: 'Architecturer la série', hint: 'Planifie les tomes si c\'est une saga.', tier: 'premium' },
       { moduleId: 'p24-cliche-detector', label: 'Nettoyer clichés & répétitions', hint: 'Supprime les tics d\'écriture et redites.', tier: 'premium' },
-      { moduleId: 'cover-variants-thumbnail', label: 'Tester la miniature Amazon', hint: 'Valide la lisibilité du titre en petit.', tier: 'premium' },
     ],
   },
 ];

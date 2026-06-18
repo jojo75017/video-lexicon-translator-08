@@ -43,25 +43,29 @@ export interface V3UpsellPack {
   installments?: string[];
   /** Badge marketing affiché (ex. « Opportunité »). */
   badge?: string;
+  /** true = option spécialiste vendue uniquement à la carte (hors Pack Pro 497€). */
+  alacarte?: boolean;
 }
 
 export const V3_UPSELL_PACKS: V3UpsellPack[] = [
   {
-    id: 'cover',
-    title: 'Pack Visuel & Conversion',
-    desc: 'Des couvertures qui convertissent : direction artistique IA (gpt-image-2), presets bestseller par niche, variantes multiples et test de lisibilité miniature Amazon pour maximiser les clics et les ventes.',
-    price: 67,
-    modules: ['cover-studio-pro', 'cover-variants-thumbnail'],
+    id: 'monetisation',
+    title: 'Pack Revenus & Scaling',
+    desc: 'Maximise tes gains sur chaque vente : auto-pricing intelligent, royalties live, simulateur multi-prix, bundles, KDP Select, lead magnet, tunnel back-catalogue, détecteur KU et redevances print.',
+    price: 99,
+    modules: [
+      'auto-pricing', 'royalties-dashboard', 'royalties-simulator', 'bundles-boxsets',
+      'kdp-select-planner', 'lead-magnet', 'back-catalog-funnel', 'ku-niche-detector',
+      'print-royalties-calc',
+    ],
   },
   {
-    id: 'marketing',
-    title: 'Pack Lancement & Visibilité',
-    desc: 'Ton plan de bataille pour vendre dès le premier jour : annonces optimisées, séquence J-7, Amazon Ads, prix de lancement, media kit, Look Inside, avis éditoriaux, BookBub/Facebook et page auteur.',
-    price: 147,
+    id: 'distribution',
+    title: 'Pack Distribution Large (Wide)',
+    desc: 'Sors de l\'exclusivité Amazon et diffuse comme un éditeur : assistant multi-plateformes (Kobo, Apple Books, Google Play, Fnac), dépôt légal & ISBN, export EPUB normé et tableau de bord catalogue.',
+    price: 97,
     modules: [
-      'listing-optimizer', 'launch-sequence-j7', 'amazon-ads', 'launch-pricing',
-      'media-kit', 'look-inside-optimizer', 'editorial-reviews', 'bookbub-ad-builder',
-      'author-page-optimizer',
+      'wide-distribution', 'legal-deposit-isbn', 'epub-normalizer', 'catalog-dashboard',
     ],
   },
   {
@@ -75,25 +79,6 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
     ],
   },
   {
-    id: 'transcription',
-    title: 'Transcription Audio / Vidéo → Texte',
-    desc: 'Transforme n\'importe quel podcast, vidéo YouTube, interview ou note vocale en texte éditable, prêt à devenir un chapitre ou un livre entier. Transcription IA ultra-précise dans 99 langues, directement dans l\'interface.',
-    price: 67,
-    badge: 'Opportunité',
-    modules: ['audio-video-transcription'],
-  },
-  {
-    id: 'monetisation',
-    title: 'Pack Revenus & Scaling',
-    desc: 'Maximise tes gains sur chaque vente : auto-pricing intelligent, royalties live, simulateur multi-prix, bundles, KDP Select, lead magnet, tunnel back-catalogue, détecteur KU et redevances print.',
-    price: 99,
-    modules: [
-      'auto-pricing', 'royalties-dashboard', 'royalties-simulator', 'bundles-boxsets',
-      'kdp-select-planner', 'lead-magnet', 'back-catalog-funnel', 'ku-niche-detector',
-      'print-royalties-calc',
-    ],
-  },
-  {
     id: 'editorial',
     title: 'Pack Qualité Éditoriale Pro',
     desc: 'Le travail d\'une vraie maison d\'édition AVANT publication : comité de lecture IA, édition structurelle, copy-editing & ligne éditoriale, charte de collection et label qualité certifiant.',
@@ -103,39 +88,47 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
       'collection-charter', 'quality-label',
     ],
   },
-  {
-    id: 'distribution',
-    title: 'Pack Distribution Large (Wide)',
-    desc: 'Sors de l\'exclusivité Amazon et diffuse comme un éditeur : assistant multi-plateformes (Kobo, Apple Books, Google Play, Fnac), dépôt légal & ISBN, export EPUB normé et tableau de bord catalogue.',
-    price: 97,
-    modules: [
-      'wide-distribution', 'legal-deposit-isbn', 'epub-normalizer', 'catalog-dashboard',
-    ],
-  },
+  // ===== Options spécialistes — vendues uniquement à la carte (hors Pack Pro 497€) =====
   {
     id: 'promotion',
     title: 'Pack Promotion Éditeur',
     desc: 'Les leviers promo réservés aux éditeurs : service de presse (SP), argumentaire libraires & salons, cession de droits étrangers et stratégie de précommandes.',
     price: 97,
+    alacarte: true,
     modules: [
       'press-service', 'booksellers-fairs', 'foreign-rights', 'preorders-strategy',
     ],
   },
+  {
+    id: 'transcription',
+    title: 'Transcription Audio / Vidéo → Texte',
+    desc: 'Transforme n\'importe quel podcast, vidéo YouTube, interview ou note vocale en texte éditable, prêt à devenir un chapitre ou un livre entier. Transcription IA ultra-précise dans 99 langues, directement dans l\'interface.',
+    price: 67,
+    badge: 'Opportunité',
+    alacarte: true,
+    modules: ['audio-video-transcription'],
+  },
 ];
 
-/** Somme des packs à la carte (400€). */
-export const V3_UPSELLS_TOTAL = V3_UPSELL_PACKS.reduce((sum, p) => sum + p.price, 0);
+/** Packs inclus dans le Pack Pro 497€ (hors options à la carte). */
+export const V3_ESSENTIAL_PACKS = V3_UPSELL_PACKS.filter((p) => !p.alacarte);
+
+/** Options spécialistes vendues uniquement à la carte. */
+export const V3_ALACARTE_PACKS = V3_UPSELL_PACKS.filter((p) => p.alacarte);
+
+/** Somme des packs essentiels (inclus dans le Pack Pro). */
+export const V3_UPSELLS_TOTAL = V3_ESSENTIAL_PACKS.reduce((sum, p) => sum + p.price, 0);
 
 /** Facilités de paiement de la base 197€. */
 export const V3_BASE_INSTALLMENTS = ['1×197€', '3×69€'];
 
-/** Pack Tout Complet : tout débloqué d'un coup. */
+/** Pack Pro : la base 197€ + les 4 packs essentiels d'un coup. */
 export const V3_FULL_PACK = {
-  title: 'Pack Tout Complet',
+  title: 'Pack Pro Vendeur',
   price: 497,
-  /** Prix si on prend la base + tous les packs séparément. */
-  compareAt: V3_PRICE + V3_UPSELLS_TOTAL, // 858
-  saves: V3_PRICE + V3_UPSELLS_TOTAL - 497, // 361
+  /** Prix si on prend la base + les packs essentiels séparément. */
+  compareAt: V3_PRICE + V3_UPSELLS_TOTAL, // 547
+  saves: V3_PRICE + V3_UPSELLS_TOTAL - 497, // 50
   installments: ['1×497€', '4×129€', '6×85€'],
 };
 
@@ -182,6 +175,19 @@ export const V3_BASE_MODULE_IDS = new Set<string>([
   'categories-manager-10',
   'low-content-books',
   'onboarding-guides',
+  // COUVERTURE — désormais incluse dans la base 197€
+  'cover-studio-pro',
+  'cover-variants-thumbnail',
+  // LANCEMENT & VISIBILITÉ — ex-pack 147€, désormais inclus dans la base 197€
+  'listing-optimizer',
+  'launch-sequence-j7',
+  'amazon-ads',
+  'launch-pricing',
+  'media-kit',
+  'look-inside-optimizer',
+  'editorial-reviews',
+  'bookbub-ad-builder',
+  'author-page-optimizer',
   // IA — création + recherche de niche essentielles
   'book-creation-studio',
   'niche-intelligence',
