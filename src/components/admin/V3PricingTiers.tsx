@@ -217,101 +217,35 @@ const V3PricingTiers: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. Packs à la carte */}
+      {/* 2. Packs premium inclus dans le Pack Pro 497€ */}
       <div className="flex items-center gap-2 mb-4 mt-8">
         <Lock className="h-4 w-4" style={{ color: AMBER }} />
-        <h3 className="text-base font-bold" style={{ fontFamily: SERIF, color: INK }}>Packs premium pour booster tes ventes</h3>
-        <span className="text-xs" style={{ color: '#a18a6c' }}>total {V3_UPSELLS_TOTAL}€</span>
+        <h3 className="text-base font-bold" style={{ fontFamily: SERIF, color: INK }}>Packs premium pour vendre & scaler</h3>
+        <span className="text-xs" style={{ color: '#a18a6c' }}>tous inclus dans le Pack Pro</span>
         <div className="flex-1 h-px ml-2" style={{ background: `linear-gradient(90deg, ${AMBER}44, transparent)` }} />
       </div>
       <div className="grid sm:grid-cols-2 gap-3">
-        {V3_UPSELL_PACKS.map((pack) => {
-          const isOpen = openPack === pack.id;
-          return (
-            <article key={pack.id} className="rounded-2xl border bg-white border-[#eadfc9] flex flex-col overflow-hidden shadow-[0_2px_14px_-8px_rgba(180,140,60,0.25)]">
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <h4 className="text-sm font-bold leading-tight" style={{ fontFamily: SERIF, color: INK }}>{pack.title}</h4>
-                    {pack.badge && (
-                      <span className="text-[9px] font-black uppercase tracking-wider rounded-full px-2 py-0.5 shrink-0"
-                        style={{ background: `linear-gradient(90deg, ${AMBER}, #FFB44D)`, color: '#fff' }}>
-                        {pack.badge}
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-base font-black shrink-0 ml-2" style={{ color: AMBER_DEEP }}>{pack.price}€</span>
-                </div>
-                <p className="text-[11px] leading-snug mb-3" style={{ color: '#7c6b54' }}>{pack.desc}</p>
-                <button
-                  onClick={() => setOpenPack(isOpen ? null : pack.id)}
-                  className="w-full flex items-center justify-between gap-1.5 text-[11px] font-semibold rounded-lg px-3 py-2 border transition-colors hover:bg-[#FFF3DF] mb-2"
-                  style={{ borderColor: `${AMBER}40`, color: AMBER_DEEP }}
-                  aria-expanded={isOpen}
-                >
-                  <span className="inline-flex items-center gap-1.5">
-                    <Check className="h-3 w-3" style={{ color: '#1f9d6b' }} />
-                    {pack.modules.length} modules inclus
-                  </span>
-                  <ChevronDown className={`h-3.5 w-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-                </button>
-                <button
-                  onClick={() => setBuyPack(pack)}
-                  className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-2.5 text-[12px] font-bold transition-transform hover:-translate-y-0.5"
-                  style={{ background: `linear-gradient(90deg, ${AMBER}, #FFB44D)`, color: '#fff' }}
-                >
-                  <Sparkles className="h-3.5 w-3.5" />
-                  Acheter ce pack — {pack.price}€
-                </button>
-              </div>
-              {isOpen && (
-                <ul className="border-t border-[#f0e7d4] divide-y divide-[#f5efe2]">
-                  {pack.modules.map((mid) => {
-                    const mod = getModuleById(mid);
-                    const ready = isModuleClickable(mid);
-                    return (
-                      <li key={mid}>
-                        <button
-                          type="button"
-                          disabled={!ready || !mod}
-                          onClick={() => mod && ready && setActiveModule(mod)}
-                          className={`w-full text-left flex items-start gap-2 px-4 py-2.5 transition-colors ${ready ? 'hover:bg-[#FFF3DF] cursor-pointer' : 'cursor-default'}`}
-                        >
-                          {ready
-                            ? <CheckCircle2 className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: '#1f9d6b' }} />
-                            : <Clock className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: '#a18a6c' }} />}
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-[12px] font-semibold leading-tight" style={{ color: INK }}>
-                                {mod?.title ?? mid}
-                              </span>
-                              {ready && (
-                                <span className="text-[9px] font-bold uppercase tracking-wide rounded px-1.5 py-0.5 shrink-0"
-                                  style={{ background: AMBER_SOFT, color: AMBER_DEEP }}>
-                                  Ouvrir
-                                </span>
-                              )}
-                            </div>
-                            {mod?.description && (
-                              <div className="text-[10.5px] leading-snug mt-0.5 line-clamp-2" style={{ color: '#8a7860' }}>
-                                {mod.description}
-                              </div>
-                            )}
-                          </div>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </article>
-          );
-        })}
+        {V3_ESSENTIAL_PACKS.map((pack) => renderPackCard(pack))}
       </div>
+
+      {/* 3. Options spécialistes — à la carte uniquement */}
+      {V3_ALACARTE_PACKS.length > 0 && (
+        <>
+          <div className="flex items-center gap-2 mb-4 mt-10">
+            <Sparkles className="h-4 w-4" style={{ color: AMBER }} />
+            <h3 className="text-base font-bold" style={{ fontFamily: SERIF, color: INK }}>Options spécialistes (à la carte)</h3>
+            <span className="text-xs" style={{ color: '#a18a6c' }}>en plus, si besoin</span>
+            <div className="flex-1 h-px ml-2" style={{ background: `linear-gradient(90deg, ${AMBER}44, transparent)` }} />
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {V3_ALACARTE_PACKS.map((pack) => renderPackCard(pack))}
+          </div>
+        </>
+      )}
 
       <p className="text-center text-[11px] mt-6" style={{ color: '#a18a6c' }}>
         Pris séparément : {V3_PRICE}€ + {V3_UPSELLS_TOTAL}€ = {V3_FULL_PACK.compareAt}€.
-        Le Pack Tout Complet est à {V3_FULL_PACK.price}€ ({V3_FULL_PACK.saves}€ d'économie).
+        Le {V3_FULL_PACK.title} est à {V3_FULL_PACK.price}€ ({V3_FULL_PACK.saves}€ d'économie).
       </p>
     </section>
   );
