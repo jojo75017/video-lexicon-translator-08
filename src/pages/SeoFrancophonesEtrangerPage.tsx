@@ -241,6 +241,14 @@ const SeoFrancophonesEtrangerPage: React.FC = () => {
         </div>
       </section>
 
+      {/* Capture email — au-dessus de la ligne de flottaison */}
+      <section className="py-12 px-4 bg-background">
+        <div className="max-w-3xl mx-auto">
+          {captureCard}
+        </div>
+      </section>
+
+
       {/* Reassurances */}
       <section className="py-16 px-4 bg-card">
         <div className="max-w-6xl mx-auto">
