@@ -143,6 +143,7 @@ serve(async (req) => {
         .update({
           first_name: first_name || null,
           ref_code: ref_code,
+          lead_magnet: magnetKey,
           utm_source: body.utm_source || null,
           utm_medium: body.utm_medium || null,
           utm_campaign: body.utm_campaign || null,
@@ -158,6 +159,7 @@ serve(async (req) => {
           email,
           first_name: first_name || null,
           ref_code,
+          lead_magnet: magnetKey,
           utm_source: body.utm_source || null,
           utm_medium: body.utm_medium || null,
           utm_campaign: body.utm_campaign || null,
@@ -181,12 +183,21 @@ serve(async (req) => {
     }
 
     // Enroll in nurturing sequence (optional table)
+    // Le guide PDF est déjà envoyé immédiatement ci-dessus (sendLeadMagnetEmail).
+    // On choisit la séquence selon le lead magnet téléchargé.
+    const SEQUENCE_BY_MAGNET: Record<string, string> = {
+      "publier-kdp-etranger": "expat_funnel",
+    };
+    const sequenceName = SEQUENCE_BY_MAGNET[magnetKey] || "promo_funnel";
+    // expat_funnel : l'étape 0 (livraison du guide) vient d'être envoyée → on démarre à l'étape 1.
+    // promo_funnel : on conserve le comportement existant (démarre à l'étape 0).
+    const startStep = sequenceName === "expat_funnel" ? 1 : 0;
     try {
       await supabase.from("email_sequences").upsert(
         {
           email,
-          sequence_name: "promo_funnel",
-          current_step: 0,
+          sequence_name: sequenceName,
+          current_step: startStep,
           next_email_at: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
         },
         { onConflict: "email,sequence_name" },

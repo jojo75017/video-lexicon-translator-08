@@ -11,10 +11,11 @@ import { supabase } from '@/integrations/supabase/client';
 import {
   Upload, Users, Send, Play, Pause, Trash2,
   Mail, CheckCircle, Clock, AlertCircle, RefreshCw,
-  FileSpreadsheet, Zap, BarChart3
+  FileSpreadsheet, Zap, BarChart3, Globe
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
+import LeadsInscritsPanel from '@/components/admin/LeadsInscritsPanel';
 
 interface Prospect {
   id: string;
@@ -462,9 +463,12 @@ const ProspectManagerPage = () => {
         </div>
 
         <Tabs defaultValue="prospects" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 bg-card border border-border">
+          <TabsList className="grid w-full grid-cols-4 bg-card border border-border">
             <TabsTrigger value="prospects" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
               <Users className="h-4 w-4 mr-2" /> Prospects
+            </TabsTrigger>
+            <TabsTrigger value="inscrits" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
+              <Globe className="h-4 w-4 mr-2" /> Inscrits
             </TabsTrigger>
             <TabsTrigger value="send" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
               <Send className="h-4 w-4 mr-2" /> Envoi Manuel
@@ -473,6 +477,12 @@ const ProspectManagerPage = () => {
               <BarChart3 className="h-4 w-4 mr-2" /> Pipeline
             </TabsTrigger>
           </TabsList>
+
+          {/* INSCRITS (leads lead-magnet) TAB */}
+          <TabsContent value="inscrits" className="space-y-4">
+            <LeadsInscritsPanel />
+          </TabsContent>
+
 
           {/* PROSPECTS TAB */}
           <TabsContent value="prospects" className="space-y-4">

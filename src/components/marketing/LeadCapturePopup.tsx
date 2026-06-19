@@ -27,6 +27,7 @@ const LeadCapturePopup: React.FC = () => {
   const armed = useRef(false);
 
   const isExcluded = EXCLUDED_PREFIXES.some((p) => location.pathname.startsWith(p));
+  const isExpat = location.pathname.startsWith('/creer-ebook-kdp-etranger');
 
   useEffect(() => {
     if (isExcluded) return;
@@ -64,6 +65,7 @@ const LeadCapturePopup: React.FC = () => {
       await supabase.functions.invoke('funnel-capture-lead', {
         body: {
           email: email.trim().toLowerCase(),
+          lead_magnet: isExpat ? 'publier-kdp-etranger' : undefined,
           ref_code: getStoredRefCode(),
           utm_source: utm.utm_source || null,
           utm_medium: utm.utm_medium || null,
@@ -72,7 +74,7 @@ const LeadCapturePopup: React.FC = () => {
         },
       });
       trackFormSubmit('lead_popup', email);
-      trackLeadMagnetDownload('5-niches-rentables-2026');
+      trackLeadMagnetDownload(isExpat ? 'publier-kdp-etranger' : '5-niches-rentables-2026');
       localStorage.setItem(DONE_KEY, '1');
       toast.success('Parfait ! Votre guide arrive dans votre boîte mail. 📩');
       setOpen(false);
@@ -99,9 +101,13 @@ const LeadCapturePopup: React.FC = () => {
           <div className="mx-auto mb-3 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
             <Gift className="w-6 h-6 text-primary" />
           </div>
-          <h2 className="text-xl font-bold text-foreground">Avant de partir… 🎁</h2>
+          <h2 className="text-xl font-bold text-foreground">Avant de partir… {isExpat ? '🌍' : '🎁'}</h2>
           <p className="text-sm text-muted-foreground mt-2">
-            Recevez gratuitement <strong className="text-foreground">les 5 niches d'ebooks les plus rentables en 2026</strong> (données Amazon réelles) + un plan d'ebook prêt à l'emploi.
+            {isExpat ? (
+              <>Recevez gratuitement le guide <strong className="text-foreground">« Publier sur Amazon KDP depuis l'étranger »</strong> (Suisse, Belgique, Luxembourg, Allemagne, Canada) — 100% en français.</>
+            ) : (
+              <>Recevez gratuitement <strong className="text-foreground">les 5 niches d'ebooks les plus rentables en 2026</strong> (données Amazon réelles) + un plan d'ebook prêt à l'emploi.</>
+            )}
           </p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-3">
