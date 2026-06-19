@@ -369,6 +369,13 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
       const activePreset = COVER_PRESETS.find((preset) => preset.value === registre)?.value || 'business';
       const gradient = ctx.createLinearGradient(x, y, x + w, y + h);
 
+      // Couleurs de texte adaptées au fond : clair sur fonds sombres, foncé sur fonds clairs.
+      // Évite les titres noirs invisibles sur les couvertures sombres.
+      const darkBgPresets = ['thriller', 'fantasy', 'business'];
+      const isDarkBg = darkBgPresets.includes(activePreset);
+      const textColor = isDarkBg ? 'hsl(0 0% 100%)' : 'hsl(222 34% 10%)';
+      const textShadow = isDarkBg ? 'hsl(0 0% 0% / 0.55)' : 'hsl(0 0% 100% / 0.55)';
+
       if (activePreset === 'thriller') {
         gradient.addColorStop(0, 'hsl(222 34% 4%)');
         gradient.addColorStop(0.58, 'hsl(221 39% 11%)');
@@ -427,24 +434,30 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
       }
 
       ctx.textAlign = 'center';
-      ctx.fillStyle = foreground;
+      ctx.save();
+      ctx.shadowColor = textShadow;
+      ctx.shadowBlur = Math.max(6, w * 0.012);
+      ctx.shadowOffsetY = 2;
+
+      ctx.fillStyle = textColor;
       ctx.font = `800 ${Math.max(72, Math.floor(w * 0.095))}px Inter, Arial, sans-serif`;
       const titleHeight = fillWrappedText(title.toUpperCase(), x + w / 2, y + h * 0.32, w * 0.78, Math.floor(w * 0.12), 4);
 
       if (subtitle.trim()) {
         ctx.font = `500 ${Math.max(34, Math.floor(w * 0.042))}px Inter, Arial, sans-serif`;
-        ctx.fillStyle = foreground;
-        ctx.globalAlpha = 0.78;
+        ctx.fillStyle = textColor;
+        ctx.globalAlpha = 0.85;
         fillWrappedText(subtitle, x + w / 2, y + h * 0.32 + titleHeight + h * 0.045, w * 0.72, Math.floor(w * 0.06), 2);
         ctx.globalAlpha = 1;
       }
 
       ctx.font = `700 ${Math.max(34, Math.floor(w * 0.044))}px Inter, Arial, sans-serif`;
-      ctx.fillStyle = foreground;
+      ctx.fillStyle = textColor;
       ctx.fillText(author.trim() || 'Auteur', x + w / 2, y + h * 0.9);
+      ctx.restore();
 
       ctx.font = `600 ${Math.max(18, Math.floor(w * 0.025))}px Inter, Arial, sans-serif`;
-      ctx.fillStyle = primary;
+      ctx.fillStyle = isDarkBg ? 'hsl(36 100% 60%)' : primary;
       ctx.fillText((genre || 'KDP').replace('-', ' ').toUpperCase(), x + w / 2, y + h * 0.15);
     };
 
