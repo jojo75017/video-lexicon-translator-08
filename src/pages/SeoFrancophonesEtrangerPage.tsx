@@ -1,8 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { getStoredUtm } from '@/lib/utmTracking';
+import { getStoredRefCode } from '@/hooks/useReferralTracking';
 import {
   Sparkles,
   Globe,
@@ -12,10 +17,45 @@ import {
   MapPin,
   ShieldCheck,
   Languages,
+  Gift,
+  Download,
 } from 'lucide-react';
 
 const SeoFrancophonesEtrangerPage: React.FC = () => {
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [done, setDone] = useState(false);
+
+  const handleLeadSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.includes('@')) {
+      toast.error('Veuillez saisir une adresse email valide');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const utm = getStoredUtm();
+      await supabase.functions.invoke('funnel-capture-lead', {
+        body: {
+          email: email.trim().toLowerCase(),
+          lead_magnet: 'publier-kdp-etranger',
+          ref_code: getStoredRefCode(),
+          utm_source: utm.utm_source || null,
+          utm_medium: utm.utm_medium || null,
+          utm_campaign: utm.utm_campaign || null,
+          landing_url: typeof window !== 'undefined' ? window.location.href : null,
+        },
+      });
+      setDone(true);
+      toast.success('Parfait ! Votre guide arrive dans votre boîte mail. 📩');
+    } catch {
+      toast.error("Une erreur est survenue, réessayez dans un instant.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
 
   useEffect(() => {
     document.title = "Créer et vendre un ebook KDP depuis l'étranger | Francophones";
@@ -268,6 +308,62 @@ const SeoFrancophonesEtrangerPage: React.FC = () => {
               })),
             }),
           }} />
+        </div>
+      </section>
+
+      {/* Lead magnet — capture email */}
+      <section className="py-16 px-4 bg-card">
+        <div className="max-w-3xl mx-auto">
+          <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 shadow-lg">
+            <CardContent className="p-8 md:p-10">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
+                  <Gift className="w-7 h-7 text-primary" />
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
+                  Guide gratuit : publier sur KDP depuis l'étranger
+                </h2>
+                <p className="text-muted-foreground max-w-xl mb-6">
+                  Recevez par email notre <strong className="text-foreground">guide PDF complet</strong> pour
+                  créer un compte KDP, être payé sur votre compte local et publier votre ebook en français —
+                  où que vous viviez (Suisse, Belgique, Luxembourg, Allemagne, Canada).
+                </p>
+
+                {done ? (
+                  <div className="flex items-center gap-2 text-primary font-semibold">
+                    <CheckCircle className="w-5 h-5" />
+                    Votre guide arrive dans votre boîte mail. Vérifiez vos spams !
+                  </div>
+                ) : (
+                  <form onSubmit={handleLeadSubmit} className="w-full max-w-md flex flex-col sm:flex-row gap-3">
+                    <Input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="votre@email.com"
+                      className="text-base py-3 flex-1"
+                      required
+                    />
+                    <Button type="submit" disabled={submitting} className="font-semibold py-3 px-6">
+                      {submitting ? (
+                        <span className="flex items-center gap-2">
+                          <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          Envoi…
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-2">
+                          <Download className="w-4 h-4" /> Recevoir le guide
+                        </span>
+                      )}
+                    </Button>
+                  </form>
+                )}
+                <p className="text-[11px] text-muted-foreground mt-3">
+                  Pas de spam. Désinscription en 1 clic.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
