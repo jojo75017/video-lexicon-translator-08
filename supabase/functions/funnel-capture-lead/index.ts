@@ -172,7 +172,7 @@ serve(async (req) => {
     }
 
     // Send lead magnet email (non-blocking failure)
-    const sent = await sendLeadMagnetEmail(email, first_name);
+    const sent = await sendLeadMagnetEmail(email, first_name, magnetKey);
     if (sent) {
       await supabase
         .from("funnel_leads")
