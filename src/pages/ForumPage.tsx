@@ -263,7 +263,7 @@ function NewPostDialog({
               {tags.map(tag => (
                 <Badge key={tag} variant="secondary" className="gap-1">
                   #{tag}
-                  <button type="button" onClick={() => setTags(prev => prev.filter(t => t !== tag))} className="text-muted-foreground hover:text-foreground">×</button>
+                  <button type="button" aria-label={`Supprimer le tag ${tag}`} onClick={() => setTags(prev => prev.filter(t => t !== tag))} className="text-muted-foreground hover:text-foreground">×</button>
                 </Badge>
               ))}
               <input
