@@ -10,6 +10,10 @@ import { CrmKanban } from '@/components/crm/CrmKanban';
 import { CrmAnalytics } from '@/components/crm/CrmAnalytics';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Globe, RefreshCw, UserPlus } from 'lucide-react';
 
 export interface CrmContact {
   id: string;
@@ -40,6 +44,23 @@ export interface CrmActivity {
   created_at: string;
 }
 
+interface FunnelLeadRow {
+  id: string;
+  email: string;
+  first_name: string | null;
+  lead_magnet: string | null;
+  utm_source: string | null;
+  created_at: string;
+}
+
+interface SequenceRow {
+  email: string;
+  sequence_name: string;
+  current_step: number;
+  completed: boolean;
+  unsubscribed: boolean;
+}
+
 const CrmPage: React.FC = () => {
   const [contacts, setContacts] = useState<CrmContact[]>([]);
   const [activities, setActivities] = useState<CrmActivity[]>([]);
@@ -50,6 +71,9 @@ const CrmPage: React.FC = () => {
   const [selectedContact, setSelectedContact] = useState<CrmContact | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showActivityPanel, setShowActivityPanel] = useState(false);
+  const [funnelLeads, setFunnelLeads] = useState<FunnelLeadRow[]>([]);
+  const [leadSequences, setLeadSequences] = useState<Record<string, SequenceRow>>({});
+  const [syncingLeads, setSyncingLeads] = useState(false);
 
   const fetchContacts = useCallback(async () => {
     setLoading(true);
@@ -80,18 +104,44 @@ const CrmPage: React.FC = () => {
     }
   }, []);
 
+  const fetchFunnelLeads = useCallback(async () => {
+    const { data: leadsData } = await (supabase as any)
+      .from('funnel_leads')
+      .select('id, email, first_name, lead_magnet, utm_source, created_at')
+      .order('created_at', { ascending: false })
+      .limit(100);
+
+    setFunnelLeads((leadsData || []) as FunnelLeadRow[]);
+
+    const { data: seqData } = await (supabase as any)
+      .from('email_sequences')
+      .select('email, sequence_name, current_step, completed, unsubscribed');
+
+    const seqMap: Record<string, SequenceRow> = {};
+    for (const row of (seqData || []) as SequenceRow[]) {
+      seqMap[(row.email || '').toLowerCase().trim()] = row;
+    }
+    setLeadSequences(seqMap);
+  }, []);
+
   useEffect(() => {
     const init = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) fetchContacts();
+      if (session) {
+        fetchContacts();
+        fetchFunnelLeads();
+      }
     };
     init();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) fetchContacts();
+      if (session) {
+        fetchContacts();
+        fetchFunnelLeads();
+      }
     });
     return () => subscription.unsubscribe();
-  }, [fetchContacts]);
+  }, [fetchContacts, fetchFunnelLeads]);
 
   const importFromProspects = async () => {
     const { data: prospects, error } = await supabase
