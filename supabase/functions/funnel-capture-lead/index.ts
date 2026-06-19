@@ -196,7 +196,11 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ ok: true, lead_id: leadId, lead_magnet_url: LEAD_MAGNET_URL }),
+      JSON.stringify({
+        ok: true,
+        lead_id: leadId,
+        lead_magnet_url: (MAGNETS[magnetKey] || MAGNETS[DEFAULT_MAGNET]).url,
+      }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
