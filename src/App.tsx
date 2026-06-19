@@ -18,6 +18,9 @@ import AISosModal from '@/components/shared/AISosModal';
 import AICostBadge from '@/components/shared/AICostBadge';
 import { useBrandTitle } from '@/hooks/useBrandTitle';
 import V2V3FloatingSwitch from '@/components/admin/V2V3FloatingSwitch';
+import LeadCapturePopup from '@/components/marketing/LeadCapturePopup';
+import FloatingToolCTA from '@/components/marketing/FloatingToolCTA';
+import { captureUtmParams } from '@/lib/utmTracking';
 
 // Lazy-loaded pages for performance
 const EbookPlannerPage = lazy(() => import('./pages/EbookPlannerPage'));
@@ -243,6 +246,11 @@ const App = () => {
     setSubscriberEmail(email);
     setSubscriberData(data);
     setIsAuthenticated(true);
+  }, []);
+
+  // Capture des paramètres UTM dès l'arrivée (attribution des leads/sources)
+  useEffect(() => {
+    captureUtmParams();
   }, []);
 
   const handleLogout = useCallback(() => {
@@ -718,6 +726,9 @@ const App = () => {
           {isAuthenticated && <AISosModal />}
           {/* Badge coût IA cumulé par projet */}
           {isAuthenticated && <AICostBadge />}
+          {/* Acquisition : capture email visiteurs + CTA flottant vers l'outil (visiteurs non connectés uniquement) */}
+          {!isAuthenticated && <LeadCapturePopup />}
+          {!isAuthenticated && <FloatingToolCTA />}
           <Toaster />
         </div>
       </TooltipProvider>
