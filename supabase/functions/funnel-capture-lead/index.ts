@@ -103,6 +103,7 @@ serve(async (req) => {
     const email = String(body.email || "").trim().toLowerCase();
     const first_name = String(body.first_name || "").trim().slice(0, 80);
     const ref_code = String(body.ref_code || "").trim().slice(0, 64) || null;
+    const magnetKey = String(body.lead_magnet || "").trim() || DEFAULT_MAGNET;
     const honeypot = String(body.website || "").trim();
 
     if (honeypot) {
