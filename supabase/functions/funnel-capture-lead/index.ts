@@ -143,6 +143,7 @@ serve(async (req) => {
         .update({
           first_name: first_name || null,
           ref_code: ref_code,
+          lead_magnet: magnetKey,
           utm_source: body.utm_source || null,
           utm_medium: body.utm_medium || null,
           utm_campaign: body.utm_campaign || null,
