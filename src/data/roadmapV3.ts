@@ -1,5 +1,5 @@
 // Roadmap V3 — Ebookstudio Pro V2 "Publication Assistée Pro"
-// Prix cible : 197€ à vie (vs 67€ pour V2 actuelle)
+// Prix cible : 197€ à vie (vs 67€ pour V2 actuelle) — EN RÉFLEXION : ajouter un mensuel ~19€/mois + annuel ~149€/an.
 // La liste reste éditable : on peut ajouter/retirer des modules.
 
 export type V3Pillar = 'publier' | 'monetiser' | 'marketing' | 'ia' | 'edition' | 'distribution' | 'promotion';
@@ -291,6 +291,8 @@ export const V3_MODULES: V3Module[] = [
     description: 'Génère des offres groupées (séries) avec pricing optimisé et page de vente.' },
   { id: 'lead-magnet',          pillar: 'monetiser', status: 'done', title: 'Lead Magnet Builder',
     description: 'Crée un chapitre offert + tunnel de capture email pour bâtir une liste lecteurs.' },
+  { id: 'subscription-pricing', pillar: 'monetiser', status: 'todo', title: 'Modèle Tarifaire — Mensuel / Annuel / À vie',
+    description: 'Étudier et implémenter une offre d\'abonnement mensuel (~19€/mois) et annuel (~149€/an) à côté du paiement unique à vie (197€). Objectif : baisser la barrière psychologique et capter les hésitants tout en gardant le revenu récurrent.' },
 
   // MARKETING
   { id: 'book-trailer',         pillar: 'marketing', status: 'done', title: 'Book Trailer IA',
