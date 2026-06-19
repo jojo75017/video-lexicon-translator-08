@@ -10,6 +10,11 @@ import { CrmKanban } from '@/components/crm/CrmKanban';
 import { CrmAnalytics } from '@/components/crm/CrmAnalytics';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
+import LeadsInscritsPanel from '@/components/admin/LeadsInscritsPanel';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Globe, RefreshCw, UserPlus } from 'lucide-react';
 
 export interface CrmContact {
   id: string;
@@ -40,6 +45,23 @@ export interface CrmActivity {
   created_at: string;
 }
 
+interface FunnelLeadRow {
+  id: string;
+  email: string;
+  first_name: string | null;
+  lead_magnet: string | null;
+  utm_source: string | null;
+  created_at: string;
+}
+
+interface SequenceRow {
+  email: string;
+  sequence_name: string;
+  current_step: number;
+  completed: boolean;
+  unsubscribed: boolean;
+}
+
 const CrmPage: React.FC = () => {
   const [contacts, setContacts] = useState<CrmContact[]>([]);
   const [activities, setActivities] = useState<CrmActivity[]>([]);
@@ -50,6 +72,9 @@ const CrmPage: React.FC = () => {
   const [selectedContact, setSelectedContact] = useState<CrmContact | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showActivityPanel, setShowActivityPanel] = useState(false);
+  const [funnelLeads, setFunnelLeads] = useState<FunnelLeadRow[]>([]);
+  const [leadSequences, setLeadSequences] = useState<Record<string, SequenceRow>>({});
+  const [syncingLeads, setSyncingLeads] = useState(false);
 
   const fetchContacts = useCallback(async () => {
     setLoading(true);
@@ -80,18 +105,44 @@ const CrmPage: React.FC = () => {
     }
   }, []);
 
+  const fetchFunnelLeads = useCallback(async () => {
+    const { data: leadsData } = await (supabase as any)
+      .from('funnel_leads')
+      .select('id, email, first_name, lead_magnet, utm_source, created_at')
+      .order('created_at', { ascending: false })
+      .limit(100);
+
+    setFunnelLeads((leadsData || []) as FunnelLeadRow[]);
+
+    const { data: seqData } = await (supabase as any)
+      .from('email_sequences')
+      .select('email, sequence_name, current_step, completed, unsubscribed');
+
+    const seqMap: Record<string, SequenceRow> = {};
+    for (const row of (seqData || []) as SequenceRow[]) {
+      seqMap[(row.email || '').toLowerCase().trim()] = row;
+    }
+    setLeadSequences(seqMap);
+  }, []);
+
   useEffect(() => {
     const init = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) fetchContacts();
+      if (session) {
+        fetchContacts();
+        fetchFunnelLeads();
+      }
     };
     init();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) fetchContacts();
+      if (session) {
+        fetchContacts();
+        fetchFunnelLeads();
+      }
     });
     return () => subscription.unsubscribe();
-  }, [fetchContacts]);
+  }, [fetchContacts, fetchFunnelLeads]);
 
   const importFromProspects = async () => {
     const { data: prospects, error } = await supabase
@@ -203,6 +254,78 @@ const CrmPage: React.FC = () => {
     }
   };
 
+  const syncLeadMagnetsToCrm = async () => {
+    setSyncingLeads(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('Session admin non détectée');
+        return;
+      }
+
+      const existingEmails = new Set(contacts.map(c => (c.email || '').toLowerCase().trim()));
+
+      const [{ data: opens }, { data: clicks }] = await Promise.all([
+        (supabase as any).from('email_opens').select('prospect_email'),
+        (supabase as any).from('email_clicks').select('prospect_email'),
+      ]);
+
+      const openCounts = new Map<string, number>();
+      for (const row of (opens || []) as { prospect_email: string }[]) {
+        const key = (row.prospect_email || '').toLowerCase().trim();
+        if (key) openCounts.set(key, (openCounts.get(key) || 0) + 1);
+      }
+
+      const clickCounts = new Map<string, number>();
+      for (const row of (clicks || []) as { prospect_email: string }[]) {
+        const key = (row.prospect_email || '').toLowerCase().trim();
+        if (key) clickCounts.set(key, (clickCounts.get(key) || 0) + 1);
+      }
+
+      const rows = funnelLeads
+        .filter(lead => !existingEmails.has((lead.email || '').toLowerCase().trim()))
+        .map(lead => {
+          const key = (lead.email || '').toLowerCase().trim();
+          const seq = leadSequences[key];
+          const isExpat = lead.lead_magnet === 'publier-kdp-etranger' || seq?.sequence_name?.startsWith('expat');
+          const opened = openCounts.get(key) || 0;
+          const clicked = clickCounts.get(key) || 0;
+          const temperature = clicked > 0 ? 'hot' : opened > 0 || isExpat ? 'warm' : 'cold';
+
+          return {
+            user_id: session.user.id,
+            email: lead.email,
+            first_name: lead.first_name || '',
+            last_name: '',
+            source: lead.utm_source || lead.lead_magnet || 'lead_magnet',
+            status: seq?.completed ? 'qualified' : 'lead',
+            temperature,
+            tags: ['inscrit', isExpat ? 'expatrié' : 'général', lead.lead_magnet || 'guide'].filter(Boolean),
+            notes: `Inscrit via guide ${lead.lead_magnet || 'général'} · Séquence ${seq?.sequence_name || 'non démarrée'} · Étape ${seq?.current_step || 0}`,
+            total_emails_opened: opened,
+            total_clicks: clicked,
+            last_interaction_at: lead.created_at,
+          };
+        });
+
+      if (rows.length === 0) {
+        toast.info('Tous les inscrits sont déjà visibles dans le CRM ✅');
+        return;
+      }
+
+      const { error } = await (supabase as any).from('crm_contacts').insert(rows);
+      if (error) throw error;
+
+      toast.success(`✅ ${rows.length} inscrit(s) ajoutés au CRM`);
+      fetchContacts();
+      fetchFunnelLeads();
+    } catch (err: any) {
+      toast.error('Erreur synchro CRM : ' + (err.message || ''));
+    } finally {
+      setSyncingLeads(false);
+    }
+  };
+
   const updateContact = async (id: string, updates: Partial<CrmContact>) => {
     const { error } = await supabase
       .from('crm_contacts')
@@ -295,6 +418,14 @@ const CrmPage: React.FC = () => {
     totalRevenue: contacts.reduce((sum, c) => sum + (c.lifetime_value || 0), 0),
   };
 
+  const contactEmails = new Set(contacts.map(c => (c.email || '').toLowerCase().trim()));
+  const hiddenLeadCount = funnelLeads.filter(l => !contactEmails.has((l.email || '').toLowerCase().trim())).length;
+  const expatLeadCount = funnelLeads.filter(l => {
+    const key = (l.email || '').toLowerCase().trim();
+    return l.lead_magnet === 'publier-kdp-etranger' || leadSequences[key]?.sequence_name?.startsWith('expat');
+  }).length;
+  const latestLeads = funnelLeads.slice(0, 5);
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 pt-6">
@@ -310,10 +441,75 @@ const CrmPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
         <CrmStats stats={stats} />
 
+        <Card className="border-primary/30 bg-card ring-1 ring-primary/10">
+          <CardContent className="p-4">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex items-start gap-3">
+                <div className="rounded-lg bg-primary/10 p-2">
+                  <Globe className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-lg font-semibold text-foreground">Inscrits visibles dans le CRM</h2>
+                    <Badge className="bg-primary/15 text-primary border-primary/30">{funnelLeads.length} inscrits</Badge>
+                    <Badge variant="outline">🌍 {expatLeadCount} expatriés</Badge>
+                    {hiddenLeadCount > 0 && (
+                      <Badge className="bg-orange-500/15 text-orange-500 border-orange-500/30">{hiddenLeadCount} à rapatrier</Badge>
+                    )}
+                  </div>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Les visiteurs qui téléchargent les guides apparaissent ici, puis peuvent être ajoutés en contacts CRM.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" onClick={fetchFunnelLeads}>
+                  <RefreshCw className="mr-2 h-4 w-4" /> Actualiser
+                </Button>
+                <Button size="sm" onClick={syncLeadMagnetsToCrm} disabled={syncingLeads || funnelLeads.length === 0}>
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  {syncingLeads ? 'Synchro…' : 'Ajouter au CRM'}
+                </Button>
+              </div>
+            </div>
+
+            {latestLeads.length > 0 && (
+              <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-5">
+                {latestLeads.map((lead) => {
+                  const key = (lead.email || '').toLowerCase().trim();
+                  const seq = leadSequences[key];
+                  const inCrm = contactEmails.has(key);
+                  const isExpat = lead.lead_magnet === 'publier-kdp-etranger' || seq?.sequence_name?.startsWith('expat');
+                  return (
+                    <button
+                      key={lead.id}
+                      type="button"
+                      onClick={() => setSearchQuery(lead.email)}
+                      className="rounded-md border border-border bg-background/50 p-3 text-left transition hover:bg-muted/40"
+                    >
+                      <div className="truncate text-sm font-medium text-foreground">{lead.email}</div>
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        <Badge variant={isExpat ? 'default' : 'outline'} className="text-xs">
+                          {isExpat ? '🌍 Expatrié' : 'Général'}
+                        </Badge>
+                        <Badge variant="outline" className="text-xs">
+                          {inCrm ? 'Dans CRM' : 'À ajouter'}
+                        </Badge>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         <Tabs defaultValue="kanban" className="w-full">
           <TabsList>
             <TabsTrigger value="kanban">📋 Pipeline</TabsTrigger>
             <TabsTrigger value="list">📃 Liste</TabsTrigger>
+            <TabsTrigger value="inscrits">🌍 Inscrits</TabsTrigger>
             <TabsTrigger value="analytics">📊 Analytics</TabsTrigger>
           </TabsList>
 
@@ -374,6 +570,10 @@ const CrmPage: React.FC = () => {
 
           <TabsContent value="analytics" className="mt-4">
             <CrmAnalytics contacts={contacts} />
+          </TabsContent>
+
+          <TabsContent value="inscrits" className="mt-4">
+            <LeadsInscritsPanel />
           </TabsContent>
         </Tabs>
       </div>
