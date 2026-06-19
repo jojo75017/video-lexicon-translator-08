@@ -161,6 +161,15 @@ const BlogArticleTemplate = () => {
               )}
             </div>
 
+            <div className="mb-8 flex flex-col sm:flex-row items-center justify-between gap-3 bg-primary/5 border border-primary/20 rounded-xl p-4">
+              <p className="text-sm text-foreground font-medium">✍️ Créez votre ebook avec l'IA, sans attendre la fin de l'article.</p>
+              <Link to="/demo" onClick={() => { import('@/utils/analytics').then(m => m.trackCTAClick('article_top_cta', '/demo')); }}>
+                <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground whitespace-nowrap">
+                  Tester l'outil gratuitement <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+
             <TableOfContents items={article.tableOfContents} />
 
             <div className="prose prose-slate max-w-none prose-headings:scroll-mt-20 prose-h2:text-2xl prose-h2:font-bold prose-h2:text-foreground prose-h3:text-xl prose-h3:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-a:text-primary hover:prose-a:text-primary/80">
