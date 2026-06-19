@@ -305,6 +305,7 @@ const SalesPage = () => {
             <a href="#workflow" className="text-muted-foreground hover:text-foreground transition">Workflow</a>
             <a href="#resultats" className="text-muted-foreground hover:text-foreground transition">Résultats</a>
             <a href="#pricing" className="text-muted-foreground hover:text-foreground transition">Tarif</a>
+            <Link to="/creer-ebook-kdp-etranger" className="text-muted-foreground hover:text-foreground transition">À l'étranger</Link>
             <Link to="/subscription" className="text-muted-foreground hover:text-foreground transition">Connexion</Link>
             {showAdminLogin && (
               <Link to="/auth" className="text-accent hover:text-accent/80 transition font-bold">
@@ -878,6 +879,7 @@ const SalesPage = () => {
               <h4 className="font-bold mb-4 text-foreground text-xs uppercase tracking-wider">Produit</h4>
               <ul className="space-y-2.5 text-sm">
                 <li><Link to="/demo" className="text-muted-foreground hover:text-foreground">Démo gratuite</Link></li>
+                <li><Link to="/creer-ebook-kdp-etranger" className="text-muted-foreground hover:text-foreground">Francophones à l'étranger</Link></li>
                 <li><button onClick={() => navigate("/formation")} className="text-muted-foreground hover:text-foreground">Formation</button></li>
                 <li><button onClick={() => navigate("/extension-chrome")} className="text-muted-foreground hover:text-foreground">Extension Chrome</button></li>
               </ul>
