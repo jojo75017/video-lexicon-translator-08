@@ -21,7 +21,7 @@ const SeoGenerateurEbookPage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = "Générateur Ebook IA Gratuit | Créez votre Livre Automatiquement";
+    document.title = "Générateur Ebook IA Gratuit";
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
       metaDescription.setAttribute('content', "Générateur d'ebook IA professionnel. Créez un livre complet automatiquement avec intelligence artificielle. Essai gratuit, export Amazon KDP inclus.");
