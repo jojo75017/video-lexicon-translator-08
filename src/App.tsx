@@ -248,6 +248,11 @@ const App = () => {
     setIsAuthenticated(true);
   }, []);
 
+  // Capture des paramètres UTM dès l'arrivée (attribution des leads/sources)
+  useEffect(() => {
+    captureUtmParams();
+  }, []);
+
   const handleLogout = useCallback(() => {
     // IMPORTANT: always clear client cache, otherwise users can appear logged-in without a valid backend check
     localStorage.removeItem('subscriber_email');
