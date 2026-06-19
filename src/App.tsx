@@ -59,6 +59,7 @@ const SeoTutorialChatGptPage = lazy(() => import('./pages/SeoTutorialChatGptPage
 const SeoCreerEbookIaPage = lazy(() => import('./pages/SeoCreerEbookIaPage'));
 const SeoGenerateurEbookPage = lazy(() => import('./pages/SeoGenerateurEbookPage'));
 const SeoGuideKdpEnfantsPage = lazy(() => import('./pages/SeoGuideKdpEnfantsPage'));
+const SeoFrancophonesEtrangerPage = lazy(() => import('./pages/SeoFrancophonesEtrangerPage'));
 const BlogPage = lazy(() => import('./pages/BlogPage'));
 const BlogArticleTemplate = lazy(() => import('./components/blog/BlogArticleTemplate'));
 const LogoutTotalPage = lazy(() => import('./pages/LogoutTotalPage'));
@@ -391,6 +392,7 @@ const App = () => {
             <Route path="/creer-ebook-ia" element={<SeoCreerEbookIaPage />} />
             <Route path="/generateur-ebook" element={<SeoGenerateurEbookPage />} />
             <Route path="/guide-kdp-enfants" element={<SeoGuideKdpEnfantsPage />} />
+            <Route path="/creer-ebook-kdp-etranger" element={<SeoFrancophonesEtrangerPage />} />
             <Route path="/valeur-offre" element={<OfferValuePage />} />
             <Route path="/demo" element={<DemoPage />} />
             <Route path="/upsell" element={<UpsellPage />} />

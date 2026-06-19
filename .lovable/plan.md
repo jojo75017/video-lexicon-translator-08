@@ -1,45 +1,34 @@
-# Pack Pro Vendeur : 497€ → 347€ (partout)
+# Expansion francophone européenne (sans traduction)
 
-## Objectif
-Rendre l'offre haute plus cohérente et plus attractive : un écart maîtrisé avec la base 197€ et une vraie économie affichée (200€ au lieu de 50€). **Tous les endroits qui mentionnent 497€ doivent être mis à jour, sans exception.**
+## Décision
+Abandon de la version anglaise. À la place : viser les **francophones d'Europe** (Suisse, Belgique, Luxembourg, Allemagne, Canada) qui cherchent à créer et vendre des ebooks sur Amazon KDP. Tout le contenu reste **en français** — aucun support, email ou génération IA à traduire. C'est une expansion de marché, pas de langue.
 
-## Nouvelle structure tarifaire
-- **Base** : 197€ (inchangée) — écrire + publier + lancer.
-- **Pack Pro Vendeur** : **347€** (au lieu de 497€).
-  - Référence barrée (« à la carte ») : **547€** (197€ + 350€ de packs) — inchangée.
-  - **Économie affichée : 200€** (au lieu de 50€).
-- **Options à la carte** (Promotion, Transcription) : inchangées.
+## Pourquoi cette approche
+- Le créateur ne parle pas anglais → support/emails/mises à jour ingérables en EN.
+- L'IA est verrouillée en français (`Réponds en français` dans les edge functions) → un client anglophone serait déçu.
+- Les données Analytics montrent déjà du trafic DE/CH/BE : très probablement des francophones expatriés, public idéal.
+- Marchés CH/LU/BE = fort pouvoir d'achat pour l'offre 67€.
 
-## Étape 0 — Recensement global (obligatoire)
-Lancer `rg -n "497"` sur tout `src/` et `supabase/` pour lister **chaque** occurrence (data, composants, checkout, edge functions Stripe, textes marketing) avant de modifier, puis traiter chacune.
+## Périmètre — pages d'acquisition (en français)
+Adapter/créer des pages ciblant les francophones à l'étranger :
 
-## Modifications techniques
+1. **Nouvelle page** `/creer-ebook-kdp-etranger` (ou `/francophones`) — landing dédiée :
+   - Message : « Français expatrié ? Crée et vends ton ebook sur Amazon KDP depuis la Suisse, la Belgique, le Luxembourg, l'Allemagne ou le Canada. »
+   - Rassure : KDP accepte les auteurs hors de France, paiement international, fiscalité simple, le produit est 100% en français.
+   - CTA vers l'offre / la démo.
+2. **Bloc « depuis l'étranger »** sur la page d'accueil et `/offres` : mention que ça marche partout dans le monde francophone (lève l'objection « est-ce que ça marche depuis mon pays ? »).
+3. **FAQ** : ajouter 3-4 questions (« Puis-je publier sur KDP depuis la Suisse ? », « Comment suis-je payé à l'étranger ? », etc.).
 
-### `src/data/roadmapV3.ts`
-- `V3_FULL_PACK.price` : `497` → `347`.
-- `saves` : `V3_PRICE + V3_UPSELLS_TOTAL - 347` = **200**.
-- `installments` : `['1×497€', '4×129€', '6×85€']` → `['1×347€', '3×119€', '4×89€']`.
-- Module `pricing-ladder-497` (l.432) : titre + description « 497€ » → 347€ et recalcul du tunnel (order bump/OTO) pour retomber sur 347€.
-- Module `installment-payments` (l.434) : montants échelonnés alignés sur 347€.
+## SEO
+- Cibler des requêtes francophones géolocalisées (ex. « créer un ebook depuis la Suisse », « publier sur Amazon KDP depuis la Belgique », « gagner de l'argent ebook expatrié »).
+- `<head>` par page : title/description/canonical auto-référents (méthode déjà en place dans le projet).
+- Ajouter la/les nouvelle(s) URL(s) à `public/sitemap.xml`.
+- Vérification recommandée avant rédaction : un check Semrush rapide sur 3-4 requêtes francophones (bases `ch`, `be`, `fr`) pour confirmer les volumes et choisir les meilleurs mots-clés à intégrer dans les titres.
 
-### `src/components/admin/V3PricingTiers.tsx`
-- Prix / compareAt / économie / facilités déjà lus depuis `V3_FULL_PACK` → automatiques.
-- Commentaire d'en-tête (l.23-28) « 497€ » / « −100€ » → « 347€ » / « −200€ ».
-- Vérifier qu'aucun « 497 » n'est codé en dur dans les sous-titres.
+## Hors périmètre
+- Toute version anglaise du site.
+- Génération d'ebooks en anglais.
+- i18n (le projet reste mono-langue français).
 
-### Checkout & paiement
-- `V3PackCheckout`, `V3UpsellCheckout` : vérifier tout montant/texte « 497 » en dur → 347.
-- Edge functions Stripe / création de prix (si un montant 49700 centimes est codé) : aligner sur 34700, sinon créer/mettre à jour le price correspondant.
-
-### Autres mentions
-- Tout texte marketing, mémoire ou page publique citant « 497€ » → 347€.
-
-### Mémoire projet
-- Mettre à jour `mem://business/pricing/v3-ladder-497-august`, `mem://business/pricing/v3-base-packs-497` et `mem://index.md` : Pack Pro = 347€, économie 200€.
-
-## Vérification finale
-- Re-lancer `rg -n "497"` : il ne doit rester aucune référence au prix 497€ (sauf identifiants techniques type `pricing-ladder-497` conservés volontairement, à confirmer).
-- Contrôle visuel du bloc Tarifs : 347€, barré 547€, « Tu économises 200€ », facilités cohérentes.
-
-## Résultat
-- Base 197€ → Pack Pro 347€ : écart de 150€, économie réelle de 200€ vs achat séparé. Contenu des packs et options à la carte inchangés.
+## Étape suivante après mise en ligne
+Suivre dans Analytics les visites des pays francophones (CH, BE, LU, DE, CA) et les clics CTA pendant 2-3 semaines pour valider le filon avant d'aller plus loin.
