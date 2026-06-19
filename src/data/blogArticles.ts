@@ -11,6 +11,8 @@ import imgCompteSuspendu from '@/assets/blog/compte-suspendu.jpg';
 import imgKdpSelect from '@/assets/blog/kdp-select.jpg';
 import imgBiographie from '@/assets/blog/biographie.jpg';
 import imgSiteAuteur from '@/assets/blog/site-auteur.jpg';
+import imgLivresEnfants from '@/assets/blog/livres-enfants.jpg';
+
 
 export const BLOG_AUTHOR = 'Georges Boubet';
 
