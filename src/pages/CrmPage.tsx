@@ -440,10 +440,75 @@ const CrmPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
         <CrmStats stats={stats} />
 
+        <Card className="border-primary/30 bg-card ring-1 ring-primary/10">
+          <CardContent className="p-4">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex items-start gap-3">
+                <div className="rounded-lg bg-primary/10 p-2">
+                  <Globe className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-lg font-semibold text-foreground">Inscrits visibles dans le CRM</h2>
+                    <Badge className="bg-primary/15 text-primary border-primary/30">{funnelLeads.length} inscrits</Badge>
+                    <Badge variant="outline">🌍 {expatLeadCount} expatriés</Badge>
+                    {hiddenLeadCount > 0 && (
+                      <Badge className="bg-orange-500/15 text-orange-500 border-orange-500/30">{hiddenLeadCount} à rapatrier</Badge>
+                    )}
+                  </div>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Les visiteurs qui téléchargent les guides apparaissent ici, puis peuvent être ajoutés en contacts CRM.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" onClick={fetchFunnelLeads}>
+                  <RefreshCw className="mr-2 h-4 w-4" /> Actualiser
+                </Button>
+                <Button size="sm" onClick={syncLeadMagnetsToCrm} disabled={syncingLeads || funnelLeads.length === 0}>
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  {syncingLeads ? 'Synchro…' : 'Ajouter au CRM'}
+                </Button>
+              </div>
+            </div>
+
+            {latestLeads.length > 0 && (
+              <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-5">
+                {latestLeads.map((lead) => {
+                  const key = (lead.email || '').toLowerCase().trim();
+                  const seq = leadSequences[key];
+                  const inCrm = contactEmails.has(key);
+                  const isExpat = lead.lead_magnet === 'publier-kdp-etranger' || seq?.sequence_name?.startsWith('expat');
+                  return (
+                    <button
+                      key={lead.id}
+                      type="button"
+                      onClick={() => setSearchQuery(lead.email)}
+                      className="rounded-md border border-border bg-background/50 p-3 text-left transition hover:bg-muted/40"
+                    >
+                      <div className="truncate text-sm font-medium text-foreground">{lead.email}</div>
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        <Badge variant={isExpat ? 'default' : 'outline'} className="text-xs">
+                          {isExpat ? '🌍 Expatrié' : 'Général'}
+                        </Badge>
+                        <Badge variant="outline" className="text-xs">
+                          {inCrm ? 'Dans CRM' : 'À ajouter'}
+                        </Badge>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         <Tabs defaultValue="kanban" className="w-full">
           <TabsList>
             <TabsTrigger value="kanban">📋 Pipeline</TabsTrigger>
             <TabsTrigger value="list">📃 Liste</TabsTrigger>
+            <TabsTrigger value="inscrits">🌍 Inscrits</TabsTrigger>
             <TabsTrigger value="analytics">📊 Analytics</TabsTrigger>
           </TabsList>
 
@@ -504,6 +569,10 @@ const CrmPage: React.FC = () => {
 
           <TabsContent value="analytics" className="mt-4">
             <CrmAnalytics contacts={contacts} />
+          </TabsContent>
+
+          <TabsContent value="inscrits" className="mt-4">
+            <LeadsInscritsPanel />
           </TabsContent>
         </Tabs>
       </div>
