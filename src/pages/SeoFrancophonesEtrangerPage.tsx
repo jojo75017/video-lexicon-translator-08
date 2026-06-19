@@ -114,6 +114,62 @@ const SeoFrancophonesEtrangerPage: React.FC = () => {
     },
   ];
 
+  const captureCard = (
+    <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 shadow-lg">
+      <CardContent className="p-8 md:p-10">
+        <div className="flex flex-col items-center text-center">
+          <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
+            <Gift className="w-7 h-7 text-primary" />
+          </div>
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
+            Guide gratuit : publier sur KDP depuis l'étranger
+          </h2>
+          <p className="text-muted-foreground max-w-xl mb-4">
+            Recevez par email notre <strong className="text-foreground">guide PDF complet</strong> pour
+            créer un compte KDP, être payé sur votre compte local et publier votre ebook en français —
+            où que vous viviez (Suisse, Belgique, Luxembourg, Allemagne, Canada).
+          </p>
+          <p className="text-sm text-muted-foreground mb-6">
+            🇨🇭 🇧🇪 🇱🇺 🇩🇪 🇨🇦 &nbsp;Déjà rejoint par des auteurs francophones aux quatre coins du monde.
+          </p>
+
+          {done ? (
+            <div className="flex items-center gap-2 text-primary font-semibold">
+              <CheckCircle className="w-5 h-5" />
+              Votre guide arrive dans votre boîte mail. Vérifiez vos spams !
+            </div>
+          ) : (
+            <form onSubmit={handleLeadSubmit} className="w-full max-w-md flex flex-col sm:flex-row gap-3">
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="votre@email.com"
+                className="text-base py-3 flex-1"
+                required
+              />
+              <Button type="submit" disabled={submitting} className="font-semibold py-3 px-6">
+                {submitting ? (
+                  <span className="flex items-center gap-2">
+                    <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    Envoi…
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    <Download className="w-4 h-4" /> Recevoir le guide
+                  </span>
+                )}
+              </Button>
+            </form>
+          )}
+          <p className="text-[11px] text-muted-foreground mt-3">
+            Pas de spam. Désinscription en 1 clic.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <link rel="canonical" href="https://ebookstudio.fr/creer-ebook-kdp-etranger" />
