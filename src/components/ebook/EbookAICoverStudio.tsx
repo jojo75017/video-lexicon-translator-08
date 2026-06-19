@@ -369,6 +369,13 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
       const activePreset = COVER_PRESETS.find((preset) => preset.value === registre)?.value || 'business';
       const gradient = ctx.createLinearGradient(x, y, x + w, y + h);
 
+      // Couleurs de texte adaptées au fond : clair sur fonds sombres, foncé sur fonds clairs.
+      // Évite les titres noirs invisibles sur les couvertures sombres.
+      const darkBgPresets = ['thriller', 'fantasy', 'business'];
+      const isDarkBg = darkBgPresets.includes(activePreset);
+      const textColor = isDarkBg ? 'hsl(0 0% 100%)' : 'hsl(222 34% 10%)';
+      const textShadow = isDarkBg ? 'hsl(0 0% 0% / 0.55)' : 'hsl(0 0% 100% / 0.55)';
+
       if (activePreset === 'thriller') {
         gradient.addColorStop(0, 'hsl(222 34% 4%)');
         gradient.addColorStop(0.58, 'hsl(221 39% 11%)');
