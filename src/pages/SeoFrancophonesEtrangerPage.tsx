@@ -1,8 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { getStoredUtm } from '@/lib/utmTracking';
+import { getStoredRefCode } from '@/hooks/useReferralTracking';
 import {
   Sparkles,
   Globe,
@@ -12,6 +17,8 @@ import {
   MapPin,
   ShieldCheck,
   Languages,
+  Gift,
+  Download,
 } from 'lucide-react';
 
 const SeoFrancophonesEtrangerPage: React.FC = () => {
