@@ -64,6 +64,7 @@ const LeadCapturePopup: React.FC = () => {
       await supabase.functions.invoke('funnel-capture-lead', {
         body: {
           email: email.trim().toLowerCase(),
+          lead_magnet: isExpat ? 'publier-kdp-etranger' : undefined,
           ref_code: getStoredRefCode(),
           utm_source: utm.utm_source || null,
           utm_medium: utm.utm_medium || null,
@@ -72,7 +73,7 @@ const LeadCapturePopup: React.FC = () => {
         },
       });
       trackFormSubmit('lead_popup', email);
-      trackLeadMagnetDownload('5-niches-rentables-2026');
+      trackLeadMagnetDownload(isExpat ? 'publier-kdp-etranger' : '5-niches-rentables-2026');
       localStorage.setItem(DONE_KEY, '1');
       toast.success('Parfait ! Votre guide arrive dans votre boîte mail. 📩');
       setOpen(false);
