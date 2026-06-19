@@ -36,6 +36,14 @@ export interface BlogArticle {
   tableOfContents: { id: string; title: string; level: number }[];
   relatedSlugs: string[];
   faq: { question: string; answer: string }[];
+  cta?: {
+    title: string;
+    description: string;
+    buttonText: string;
+    buttonLink: string;
+    badge?: string;
+    highlight?: string;
+  };
 }
 
 // Example article structure - content will be filled with real SEO content
