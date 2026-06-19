@@ -23,6 +23,39 @@ import {
 
 const SeoFrancophonesEtrangerPage: React.FC = () => {
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [done, setDone] = useState(false);
+
+  const handleLeadSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.includes('@')) {
+      toast.error('Veuillez saisir une adresse email valide');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const utm = getStoredUtm();
+      await supabase.functions.invoke('funnel-capture-lead', {
+        body: {
+          email: email.trim().toLowerCase(),
+          lead_magnet: 'publier-kdp-etranger',
+          ref_code: getStoredRefCode(),
+          utm_source: utm.utm_source || null,
+          utm_medium: utm.utm_medium || null,
+          utm_campaign: utm.utm_campaign || null,
+          landing_url: typeof window !== 'undefined' ? window.location.href : null,
+        },
+      });
+      setDone(true);
+      toast.success('Parfait ! Votre guide arrive dans votre boîte mail. 📩');
+    } catch {
+      toast.error("Une erreur est survenue, réessayez dans un instant.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
 
   useEffect(() => {
     document.title = "Créer et vendre un ebook KDP depuis l'étranger | Francophones";
