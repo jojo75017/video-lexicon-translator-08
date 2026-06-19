@@ -305,7 +305,9 @@ const SalesPage = () => {
             <a href="#workflow" className="text-muted-foreground hover:text-foreground transition">Workflow</a>
             <a href="#resultats" className="text-muted-foreground hover:text-foreground transition">Résultats</a>
             <a href="#pricing" className="text-muted-foreground hover:text-foreground transition">Tarif</a>
-            <Link to="/creer-ebook-kdp-etranger" className="text-muted-foreground hover:text-foreground transition">À l'étranger</Link>
+            <Link to="/creer-ebook-kdp-etranger" className="flex items-center gap-1.5 bg-primary/10 text-primary hover:bg-primary/20 px-3 py-1.5 rounded-full font-semibold transition text-sm">
+              🌍 À l'étranger
+            </Link>
             <Link to="/subscription" className="text-muted-foreground hover:text-foreground transition">Connexion</Link>
             {showAdminLogin && (
               <Link to="/auth" className="text-accent hover:text-accent/80 transition font-bold">
