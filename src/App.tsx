@@ -726,6 +726,9 @@ const App = () => {
           {isAuthenticated && <AISosModal />}
           {/* Badge coût IA cumulé par projet */}
           {isAuthenticated && <AICostBadge />}
+          {/* Acquisition : capture email visiteurs + CTA flottant vers l'outil (visiteurs non connectés uniquement) */}
+          {!isAuthenticated && <LeadCapturePopup />}
+          {!isAuthenticated && <FloatingToolCTA />}
           <Toaster />
         </div>
       </TooltipProvider>
