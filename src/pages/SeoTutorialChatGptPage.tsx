@@ -12,7 +12,7 @@ const SeoTutorialChatGptPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = "Écrire un Livre avec ChatGPT - Guide Complet 2025 | Tutoriel Gratuit";
+    document.title = "Écrire un Livre avec ChatGPT";
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
       metaDescription.setAttribute("content", "Apprenez à écrire un livre avec ChatGPT étape par étape. Tutoriel complet : prompts efficaces, structure de roman, astuces d'écriture IA et publication Amazon KDP. Guide gratuit 2025.");

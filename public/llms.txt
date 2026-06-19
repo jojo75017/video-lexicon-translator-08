@@ -1,0 +1,26 @@
+# Ebookstudio Pro
+
+> Plateforme française pour créer, écrire et publier des ebooks professionnels avec l'intelligence artificielle, puis les vendre sur Amazon KDP.
+
+Ebookstudio Pro aide les auteurs et entrepreneurs à générer un livre complet grâce à un pipeline d'agents IA, à concevoir une couverture, à formater le manuscrit aux normes Amazon KDP et à le commercialiser, même sans expérience préalable.
+
+## Pages
+
+- [Offres](/offres) : Formules et tarifs de la plateforme.
+- [Démo](/demo) : Tester gratuitement le générateur d'ebook IA.
+- [Valeur de l'offre](/valeur-offre) : Ce qui est inclus et bénéfices.
+- [FAQ](/faq) : Réponses aux questions fréquentes.
+- [Nouveautés 2026](/nouveautes-2026) : Dernières fonctionnalités.
+
+## Guides
+
+- [Créer un ebook avec l'IA](/creer-ebook-ia) : Méthode pour générer un ebook automatiquement.
+- [Générateur d'ebook IA](/generateur-ebook) : Présentation de l'outil de génération.
+- [Écrire un livre avec ChatGPT](/ecrire-livre-chatgpt) : Tutoriel d'écriture assistée par IA.
+- [Bibliothèque de niches](/niches) : Idées de niches rentables pour ebooks.
+- [Blog](/blog) : Articles sur l'autoédition et la vente d'ebooks.
+
+## Communauté
+
+- [Formation](/formation) : Programme de formation à l'autoédition.
+- [Forum](/forum) : Échanges entre auteurs et solutions KDP.

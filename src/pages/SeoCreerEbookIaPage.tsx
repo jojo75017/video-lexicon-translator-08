@@ -23,7 +23,7 @@ const SeoCreerEbookIaPage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = "Créer un Ebook avec l'IA en 2025 | Générateur Automatique";
+    document.title = "Créer un Ebook avec l'IA";
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
       metaDescription.setAttribute('content', "Créez un ebook professionnel avec l'IA en quelques heures. Générateur automatique de livres avec workflow éditorial complet. Publiez sur Amazon KDP facilement.");

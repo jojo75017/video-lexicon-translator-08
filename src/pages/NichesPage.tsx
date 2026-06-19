@@ -201,6 +201,9 @@ const NichesPage = () => {
         </motion.div>
 
         {/* Category Tabs */}
+        <h2 className="text-2xl font-bold text-center text-foreground">
+          Explorez nos catégories de niches
+        </h2>
         <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full">
           <div className="overflow-x-auto pb-2">
             <TabsList className="inline-flex h-auto p-1 bg-muted/50 rounded-xl gap-1 min-w-max">
