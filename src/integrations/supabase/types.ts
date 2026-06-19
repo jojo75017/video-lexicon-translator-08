@@ -989,6 +989,7 @@ export type Database = {
           id: string
           ip: string | null
           landing_url: string | null
+          lead_magnet: string | null
           lead_magnet_sent_at: string | null
           ref_code: string | null
           sequence_started: boolean
@@ -1005,6 +1006,7 @@ export type Database = {
           id?: string
           ip?: string | null
           landing_url?: string | null
+          lead_magnet?: string | null
           lead_magnet_sent_at?: string | null
           ref_code?: string | null
           sequence_started?: boolean
@@ -1021,6 +1023,7 @@ export type Database = {
           id?: string
           ip?: string | null
           landing_url?: string | null
+          lead_magnet?: string | null
           lead_magnet_sent_at?: string | null
           ref_code?: string | null
           sequence_started?: boolean
