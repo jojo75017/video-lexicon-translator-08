@@ -474,7 +474,15 @@ const CrmPage: React.FC = () => {
               </div>
             </div>
 
-            {latestLeads.length > 0 && (
+            {funnelLeads.length === 0 ? (
+              <div className="mt-4 rounded-md border border-dashed border-border bg-background/40 p-6 text-center">
+                <Globe className="mx-auto mb-2 h-6 w-6 text-muted-foreground" />
+                <p className="text-sm font-medium text-foreground">Aucun inscrit pour le moment</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Les visiteurs qui téléchargent un guide (lead magnet) apparaîtront ici automatiquement.
+                </p>
+              </div>
+            ) : (
               <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-5">
                 {latestLeads.map((lead) => {
                   const key = (lead.email || '').toLowerCase().trim();
