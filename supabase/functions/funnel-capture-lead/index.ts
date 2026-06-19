@@ -187,13 +187,15 @@ serve(async (req) => {
       "publier-kdp-etranger": "expat_funnel",
     };
     const sequenceName = SEQUENCE_BY_MAGNET[magnetKey] || "promo_funnel";
-    // On démarre à l'étape 1 : l'étape 0 (livraison du guide) vient d'être envoyée.
+    // expat_funnel : l'étape 0 (livraison du guide) vient d'être envoyée → on démarre à l'étape 1.
+    // promo_funnel : on conserve le comportement existant (démarre à l'étape 0).
+    const startStep = sequenceName === "expat_funnel" ? 1 : 0;
     try {
       await supabase.from("email_sequences").upsert(
         {
           email,
           sequence_name: sequenceName,
-          current_step: 1,
+          current_step: startStep,
           next_email_at: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
         },
         { onConflict: "email,sequence_name" },
