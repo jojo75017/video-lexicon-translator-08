@@ -6,34 +6,69 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const LEAD_MAGNET_URL =
-  "https://ebookstudio.fr/lead-magnets/5-niches-rentables-2026.pdf";
+type Magnet = {
+  url: string;
+  title: string;
+  subject: string;
+  intro: string;
+  items: string[];
+};
+
+const MAGNETS: Record<string, Magnet> = {
+  "5-niches-rentables-2026": {
+    url: "https://ebookstudio.fr/lead-magnets/5-niches-rentables-2026.pdf",
+    title: "📘 Vos 5 niches rentables 2026",
+    subject: "📘 Vos 5 niches rentables 2026 (PDF à l'intérieur)",
+    intro:
+      "Merci pour votre inscription ! Voici votre guide gratuit, compilé à partir des données Amazon les plus récentes :",
+    items: [
+      "5 niches non saturées avec demande forte",
+      "Mots-clés Amazon à fort volume pour chaque niche",
+      "Plan d'ebook type pour démarrer",
+      "Prix moyens et top 3 best-sellers par niche",
+    ],
+  },
+  "publier-kdp-etranger": {
+    url: "https://ebookstudio.fr/lead-magnets/guide-publier-kdp-etranger.pdf",
+    title: "🌍 Publier sur Amazon KDP depuis l'étranger",
+    subject: "🌍 Votre guide : publier sur KDP depuis l'étranger (PDF)",
+    intro:
+      "Merci pour votre inscription ! Voici votre guide gratuit pour créer et vendre un ebook en français depuis votre pays de résidence :",
+    items: [
+      "Créer un compte KDP depuis la Suisse, la Belgique, le Canada…",
+      "Être payé sur votre compte bancaire local (CHF, EUR, CAD)",
+      "Le formulaire fiscal (tax interview) expliqué simplement",
+      "Checklist complète avant publication",
+    ],
+  },
+};
+
+const DEFAULT_MAGNET = "5-niches-rentables-2026";
+const LEAD_MAGNET_URL = MAGNETS[DEFAULT_MAGNET].url;
 
 const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 
-async function sendLeadMagnetEmail(email: string, firstName: string) {
+async function sendLeadMagnetEmail(email: string, firstName: string, magnetKey: string) {
   const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
   if (!RESEND_API_KEY) {
     console.warn("RESEND_API_KEY missing — skipping email");
     return false;
   }
+  const magnet = MAGNETS[magnetKey] || MAGNETS[DEFAULT_MAGNET];
   const greeting = firstName ? `Bonjour ${firstName},` : "Bonjour,";
   const html = `
   <div style="font-family:Inter,Arial,sans-serif;max-width:560px;margin:0 auto;color:#232F3E;background:#FAFAFA;padding:24px;border-radius:12px">
-    <h1 style="color:#008296;margin:0 0 12px">📘 Vos 5 niches rentables 2026</h1>
+    <h1 style="color:#008296;margin:0 0 12px">${magnet.title}</h1>
     <p>${greeting}</p>
-    <p>Merci pour votre inscription ! Voici votre guide gratuit, compilé à partir des données Amazon les plus récentes :</p>
+    <p>${magnet.intro}</p>
     <p style="text-align:center;margin:24px 0">
-      <a href="${LEAD_MAGNET_URL}" style="background:#FF9E2D;color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block">
+      <a href="${magnet.url}" style="background:#FF9E2D;color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block">
         📥 Télécharger le PDF
       </a>
     </p>
     <p>À l'intérieur :</p>
     <ul>
-      <li>5 niches non saturées avec demande forte</li>
-      <li>Mots-clés Amazon à fort volume pour chaque niche</li>
-      <li>Plan d'ebook type pour démarrer</li>
-      <li>Prix moyens et top 3 best-sellers par niche</li>
+      ${magnet.items.map((i) => `<li>${i}</li>`).join("")}
     </ul>
     <p>Bonne lecture,<br/>L'équipe EbookStudio</p>
     <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0"/>
@@ -49,7 +84,7 @@ async function sendLeadMagnetEmail(email: string, firstName: string) {
     body: JSON.stringify({
       from: "EbookStudio <contact@ebookstudio.fr>",
       to: [email],
-      subject: "📘 Vos 5 niches rentables 2026 (PDF à l'intérieur)",
+      subject: magnet.subject,
       html,
     }),
   });
