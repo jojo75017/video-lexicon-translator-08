@@ -11,6 +11,8 @@ import imgCompteSuspendu from '@/assets/blog/compte-suspendu.jpg';
 import imgKdpSelect from '@/assets/blog/kdp-select.jpg';
 import imgBiographie from '@/assets/blog/biographie.jpg';
 import imgSiteAuteur from '@/assets/blog/site-auteur.jpg';
+import imgLivresEnfants from '@/assets/blog/livres-enfants.jpg';
+
 
 export const BLOG_AUTHOR = 'Georges Boubet';
 
@@ -1232,7 +1234,115 @@ Créer un site d'auteur ne demande ni budget ni compétences techniques. En 45 m
       { question: 'Un site remplace-t-il Amazon ?', answer: 'Non, il le complète : Amazon vend, votre site capture les lecteurs et vous rend indépendant.' },
     ],
   },
+
+  {
+    slug: 'creer-livre-enfant-ia-kdp',
+    title: 'Créer un livre pour enfants avec l\'IA et le publier sur Amazon KDP',
+    metaTitle: 'Créer un livre pour enfants avec l\'IA | Guide Amazon KDP',
+    metaDescription: 'Méthode complète pour écrire, illustrer et publier un livre pour enfants avec l\'IA sur Amazon KDP : histoire, illustrations, format, prix et lancement.',
+    excerpt: 'Histoire, illustrations, mise en page et publication : la méthode complète pour créer un livre pour enfants avec l\'IA et le vendre sur Amazon KDP.',
+    category: 'Guide',
+    readTime: '14 min',
+    keyword: 'créer livre pour enfants',
+    searchVolume: 720,
+    date: '19 Juin 2026',
+    dateISO: '2026-06-19',
+    gradient: 'from-amber-400 to-teal-500',
+    iconName: 'BookOpen',
+    image: imgLivresEnfants,
+    author: BLOG_AUTHOR,
+    content: `## Introduction
+
+Les livres pour enfants sont l'une des niches les plus rentables et durables d'Amazon KDP. Les parents et grands-parents achètent toute l'année, les histoires se vendent dans toutes les langues et un bon livre peut générer des revenus pendant des années. Grâce à l'IA, vous pouvez désormais écrire l'histoire, créer les illustrations et mettre en page votre livre sans être ni écrivain ni illustrateur.
+
+## Pourquoi la niche enfants est si intéressante
+
+- **Demande constante** : anniversaires, Noël, rentrée, apprentissage de la lecture
+- **Textes courts** : un album illustré contient peu de mots, donc une production rapide
+- **Forte valeur émotionnelle** : les parents paient pour la qualité et les valeurs transmises
+- **Déclinable en séries** : un personnage attachant peut générer 10, 20 livres
+
+## Étape 1 — Choisir une idée et une tranche d'âge
+
+Définissez d'abord l'âge cible, car tout en découle (longueur, vocabulaire, format) :
+
+- **0–3 ans** : imagiers, livres d'éveil, très peu de texte
+- **3–6 ans** : albums illustrés, une histoire simple avec une morale
+- **6–9 ans** : premières lectures, chapitres courts, plus de texte
+- **9–12 ans** : romans illustrés, intrigues plus développées
+
+Choisissez ensuite un thème porteur : émotions, amitié, courage, sommeil, propreté, dinosaures, animaux, saisons…
+
+## Étape 2 — Écrire l'histoire avec l'IA
+
+L'IA est parfaite pour structurer une histoire pour enfants. Donnez-lui : la tranche d'âge, le thème, le nom du héros, la morale et le nombre de pages. Visez une structure claire :
+
+1. Présentation du héros et de son univers
+2. Un problème ou un défi
+3. Les tentatives et péripéties
+4. La résolution
+5. La morale ou la leçon
+
+Relisez toujours : vérifiez le vocabulaire adapté à l'âge, la répétition rassurante pour les plus petits et l'absence de contenu inadapté.
+
+## Étape 3 — Créer les illustrations
+
+C'est ici que l'IA change tout. Pour un rendu professionnel :
+
+- Définissez un **style cohérent** (aquarelle, dessin doux, pastel) et gardez-le sur tout le livre
+- Décrivez précisément le personnage pour qu'il reste identique d'une page à l'autre
+- Prévoyez une illustration par double-page
+- Vérifiez la résolution (300 DPI minimum pour l'impression)
+
+## Étape 4 — Mise en page et format KDP
+
+Pour un album illustré broché, les formats les plus courants sont :
+
+- **21,59 × 21,59 cm (8,5×8,5")** : format carré classique
+- **20,32 × 25,4 cm (8×10")** : format portrait
+
+Respectez les marges et fonds perdus exigés par KDP, placez le texte sur des zones lisibles et exportez en PDF haute qualité. Pour la version Kindle, privilégiez le format d'image fixe afin de préserver la mise en page.
+
+## Étape 5 — Couverture, prix et publication
+
+- **Couverture** : la plus belle illustration, un titre lisible et le nom de l'auteur
+- **Prix** : un album couleur broché se vend généralement entre 9,99 € et 14,99 €
+- **Mots-clés et catégories** : ciblez « livre enfant », l'âge et le thème
+- **Description** : parlez aux parents (ce que l'enfant va apprendre et ressentir)
+
+## Les erreurs à éviter
+
+- ❌ Un personnage qui change d'apparence à chaque page
+- ❌ Du texte trop long pour l'âge visé
+- ❌ Des illustrations basse résolution qui pixellisent à l'impression
+- ❌ Ignorer les fonds perdus (texte coupé au massicot)
+- ❌ Négliger la couverture, seul élément visible avant l'achat
+
+## Conclusion
+
+Créer un livre pour enfants avec l'IA est aujourd'hui à la portée de tous : l'IA écrit l'histoire, génère les illustrations et vous guide jusqu'à la publication. En soignant la cohérence du personnage, le format KDP et la couverture, vous pouvez bâtir une véritable collection qui se vend toute l'année. C'est l'une des niches les plus durables de l'auto-édition.`,
+    tableOfContents: [
+      { id: 'introduction', title: 'Introduction', level: 2 },
+      { id: 'pourquoi-la-niche-enfants-est-si-interessante', title: 'Pourquoi la niche enfants', level: 2 },
+      { id: 'etape-1-choisir-une-idee-et-une-tranche-dage', title: 'Idée et tranche d\'âge', level: 2 },
+      { id: 'etape-2-ecrire-lhistoire-avec-lia', title: 'Écrire l\'histoire', level: 2 },
+      { id: 'etape-3-creer-les-illustrations', title: 'Créer les illustrations', level: 2 },
+      { id: 'etape-4-mise-en-page-et-format-kdp', title: 'Mise en page et format KDP', level: 2 },
+      { id: 'etape-5-couverture-prix-et-publication', title: 'Couverture, prix, publication', level: 2 },
+      { id: 'les-erreurs-a-eviter', title: 'Erreurs à éviter', level: 2 },
+      { id: 'conclusion', title: 'Conclusion', level: 2 },
+    ],
+    relatedSlugs: ['outils-ia-ecrire-livre', 'auto-edition-amazon-kdp'],
+    faq: [
+      { question: 'Faut-il savoir dessiner pour créer un livre pour enfants ?', answer: 'Non. L\'IA génère des illustrations professionnelles ; il suffit de décrire le style et le personnage pour garder une cohérence sur tout le livre.' },
+      { question: 'Quel format choisir pour un album illustré ?', answer: 'Les formats carrés 21,59×21,59 cm ou portrait 20,32×25,4 cm sont les plus courants et bien adaptés aux albums illustrés sur KDP.' },
+      { question: 'Combien se vend un livre pour enfants sur Amazon ?', answer: 'Un album couleur broché se vend généralement entre 9,99 € et 14,99 € selon le nombre de pages et le format.' },
+      { question: 'Peut-on publier un livre illustré au format Kindle ?', answer: 'Oui, en utilisant le format d\'image fixe (fixed layout) pour préserver la mise en page et les illustrations.' },
+      { question: 'Comment garder le même personnage sur toutes les pages ?', answer: 'Décrivez précisément le personnage (couleurs, vêtements, traits) à chaque génération et conservez le même style graphique tout au long du livre.' },
+    ],
+  },
 ];
+
 
 
 export const getArticleBySlug = (slug: string): BlogArticle | undefined => {
