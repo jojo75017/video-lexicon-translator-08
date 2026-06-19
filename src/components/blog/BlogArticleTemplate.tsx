@@ -39,16 +39,37 @@ const FaqSection = ({ faq }: { faq: BlogArticle['faq'] }) => (
   </section>
 );
 
-const CtaBanner = () => (
-  <div className="my-10 bg-primary/5 border border-primary/20 rounded-xl p-6 text-center">
-    <h3 className="text-xl font-bold text-foreground mb-2">🚀 Prêt à créer votre ebook ?</h3>
-    <p className="text-muted-foreground mb-4 text-sm">Ebookstudio Pro V2 génère des ebooks professionnels avec l'IA en quelques minutes.</p>
-    <div className="flex flex-col sm:flex-row gap-3 justify-center">
-      <Link to="/demo"><Button variant="outline">Essai gratuit</Button></Link>
-      <Link to="/offres"><Button>Voir les offres <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
+const CtaBanner = ({ article }: { article: BlogArticle }) => {
+  const cta = article.cta;
+  return (
+    <div className="my-10 bg-primary/5 border border-primary/20 rounded-xl p-6 text-center">
+      {cta?.badge && (
+        <span className="inline-block bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full mb-3">
+          {cta.badge}
+        </span>
+      )}
+      <h3 className="text-xl font-bold text-foreground mb-2">{cta?.title ?? '🚀 Prêt à créer votre ebook ?'}</h3>
+      <p className="text-muted-foreground mb-4 text-sm">{cta?.description ?? 'Ebookstudio Pro V2 génère des ebooks professionnels avec l\'IA en quelques minutes.'}</p>
+      {cta?.highlight && (
+        <p className="text-primary font-semibold text-sm mb-4">{cta.highlight}</p>
+      )}
+      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+        {cta ? (
+          <Link to={cta.buttonLink} onClick={() => { import('@/utils/analytics').then(m => m.trackCTAClick('article_custom_cta', cta.buttonLink)); }}>
+            <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
+              {cta.buttonText} <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </Link>
+        ) : (
+          <>
+            <Link to="/demo"><Button variant="outline">Essai gratuit</Button></Link>
+            <Link to="/offres"><Button>Voir les offres <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
+          </>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const RelatedArticles = ({ slugs }: { slugs: string[] }) => {
   const related = getRelatedArticles(slugs);
@@ -183,7 +204,7 @@ const BlogArticleTemplate = () => {
               </ReactMarkdown>
             </div>
 
-            <CtaBanner />
+            <CtaBanner article={article} />
             <FaqSection faq={article.faq} />
             <RelatedArticles slugs={article.relatedSlugs} />
 

@@ -36,6 +36,14 @@ export interface BlogArticle {
   tableOfContents: { id: string; title: string; level: number }[];
   relatedSlugs: string[];
   faq: { question: string; answer: string }[];
+  cta?: {
+    title: string;
+    description: string;
+    buttonText: string;
+    buttonLink: string;
+    badge?: string;
+    highlight?: string;
+  };
 }
 
 // Example article structure - content will be filled with real SEO content
@@ -1333,6 +1341,14 @@ Créer un livre pour enfants avec l'IA est aujourd'hui à la portée de tous : l
       { id: 'conclusion', title: 'Conclusion', level: 2 },
     ],
     relatedSlugs: ['outils-ia-ecrire-livre', 'auto-edition-amazon-kdp'],
+    cta: {
+      title: '📖 Votre premier livre pour enfants en 10 minutes',
+      description: 'Ne passez pas des semaines à écrire et illustrer. Avec Ebookstudio Pro V2, générez l\'histoire complète et les illustrations de votre album en quelques clics.',
+      buttonText: 'Créer mon livre maintenant',
+      buttonLink: '/dashboard',
+      badge: 'OFFRE SPÉCIALE',
+      highlight: '🎁 Accès gratuit au générateur d\'histoires + 3 modèles d\'albums illustrés inclus',
+    },
     faq: [
       { question: 'Faut-il savoir dessiner pour créer un livre pour enfants ?', answer: 'Non. L\'IA génère des illustrations professionnelles ; il suffit de décrire le style et le personnage pour garder une cohérence sur tout le livre.' },
       { question: 'Quel format choisir pour un album illustré ?', answer: 'Les formats carrés 21,59×21,59 cm ou portrait 20,32×25,4 cm sont les plus courants et bien adaptés aux albums illustrés sur KDP.' },
