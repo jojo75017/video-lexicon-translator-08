@@ -27,6 +27,7 @@ const LeadCapturePopup: React.FC = () => {
   const armed = useRef(false);
 
   const isExcluded = EXCLUDED_PREFIXES.some((p) => location.pathname.startsWith(p));
+  const isExpat = location.pathname.startsWith('/creer-ebook-kdp-etranger');
 
   useEffect(() => {
     if (isExcluded) return;
