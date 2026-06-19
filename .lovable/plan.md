@@ -1,34 +1,64 @@
-# Expansion francophone européenne (sans traduction)
+# Exploiter les visiteurs francophones expatriés
 
-## Décision
-Abandon de la version anglaise. À la place : viser les **francophones d'Europe** (Suisse, Belgique, Luxembourg, Allemagne, Canada) qui cherchent à créer et vendre des ebooks sur Amazon KDP. Tout le contenu reste **en français** — aucun support, email ou génération IA à traduire. C'est une expansion de marché, pas de langue.
+Objectif : transformer le trafic SEO "expatriés" (CH/BE/LU/DE/CA) en inscrits, puis en clients, avec un message **pertinent** à chaque étape. Aujourd'hui tout le monde reçoit la même séquence générique "10 niches" — ce qui casse la conversion pour ce nouveau segment.
 
-## Pourquoi cette approche
-- Le créateur ne parle pas anglais → support/emails/mises à jour ingérables en EN.
-- L'IA est verrouillée en français (`Réponds en français` dans les edge functions) → un client anglophone serait déçu.
-- Les données Analytics montrent déjà du trafic DE/CH/BE : très probablement des francophones expatriés, public idéal.
-- Marchés CH/LU/BE = fort pouvoir d'achat pour l'offre 67€.
+## Constat technique
+- `funnel-capture-lead` capte l'email et inscrit le lead dans `email_sequences` (`sequence_name = "promo_funnel"`), **mais ne transmet pas quel lead magnet** a été téléchargé.
+- `email-sequence-cron` lit `email_sequences` mais **ignore `sequence_name`** : il applique une seule séquence codée en dur (10 niches, signée Georges) à tous.
+- Résultat : un expatrié qui télécharge le guide "KDP étranger" reçoit 6 emails parlant de niches → hors-sujet → faible conversion.
 
-## Périmètre — pages d'acquisition (en français)
-Adapter/créer des pages ciblant les francophones à l'étranger :
+---
 
-1. **Nouvelle page** `/creer-ebook-kdp-etranger` (ou `/francophones`) — landing dédiée :
-   - Message : « Français expatrié ? Crée et vends ton ebook sur Amazon KDP depuis la Suisse, la Belgique, le Luxembourg, l'Allemagne ou le Canada. »
-   - Rassure : KDP accepte les auteurs hors de France, paiement international, fiscalité simple, le produit est 100% en français.
-   - CTA vers l'offre / la démo.
-2. **Bloc « depuis l'étranger »** sur la page d'accueil et `/offres` : mention que ça marche partout dans le monde francophone (lève l'objection « est-ce que ça marche depuis mon pays ? »).
-3. **FAQ** : ajouter 3-4 questions (« Puis-je publier sur KDP depuis la Suisse ? », « Comment suis-je payé à l'étranger ? », etc.).
+## 1. Séquence email dédiée expatriés (priorité)
 
-## SEO
-- Cibler des requêtes francophones géolocalisées (ex. « créer un ebook depuis la Suisse », « publier sur Amazon KDP depuis la Belgique », « gagner de l'argent ebook expatrié »).
-- `<head>` par page : title/description/canonical auto-référents (méthode déjà en place dans le projet).
-- Ajouter la/les nouvelle(s) URL(s) à `public/sitemap.xml`.
-- Vérification recommandée avant rédaction : un check Semrush rapide sur 3-4 requêtes francophones (bases `ch`, `be`, `fr`) pour confirmer les volumes et choisir les meilleurs mots-clés à intégrer dans les titres.
+**Backend — `funnel-capture-lead`**
+- Mapper le `lead_magnet` reçu vers un `sequence_name` :
+  - `publier-kdp-etranger` → `expat_funnel`
+  - autres / défaut → `promo_funnel`
+- Enregistrer ce `sequence_name` dans l'upsert `email_sequences`.
+
+**Backend — `email-sequence-cron`**
+- Remplacer la séquence unique par un dictionnaire `SEQUENCES[sequence_name]`.
+- Lire `sequence.sequence_name` pour choisir la bonne suite d'emails et le bon contenu.
+- Sécuriser : si `sequence_name` inconnu → repli sur `promo_funnel`.
+
+**Contenu — nouvelle séquence `expat_funnel`** (6 emails, signés Georges, ton rassurant "depuis votre pays") :
+- J0 : livraison du guide PDF "Publier sur KDP depuis l'étranger" + bienvenue
+- J1 : « Oui, KDP fonctionne depuis la Suisse / Belgique / Canada » (lève l'objection n°1)
+- J3 : « Comment vous êtes payé à l'étranger (CHF, EUR, CAD) » + le tax interview simplifié
+- J5 : preuve / cas concret d'un auteur francophone expatrié + démo EbookStudio
+- J7 : l'offre 67€ à vie, pourquoi c'est adapté aux expatriés (100% français, pas de trad)
+- J14 : relance finale avec urgence douce
+
+Chaque email pointe vers `/creer-ebook-kdp-etranger` et `/offres`.
+
+## 2. Mieux convertir les curieux (anonymes → inscrits)
+- Sur `/creer-ebook-kdp-etranger`, rendre le bloc de capture plus visible : le remonter au-dessus de la ligne de flottaison (juste après le hero) en plus de sa position actuelle.
+- Adapter le pop-up de sortie (`LeadCapturePopup`) pour proposer le **guide expatriés** quand le visiteur est sur cette page (au lieu du guide générique 10 niches), via détection du `pathname`.
+- Ajouter une preuve sociale courte (drapeaux + « déjà X auteurs francophones à l'étranger ») près du formulaire.
+
+## 3. Tableau de bord prospects (page `/n`, admin)
+La page existe (`ProspectManagerPage`, protégée admin). Ajout d'une vue dédiée aux leads :
+- Lire `funnel_leads` joint à `email_sequences` : email, pays/segment (déduit du `sequence_name` + `lead_magnet`), date, source UTM, étape de séquence atteinte, guide envoyé ou non.
+- Filtres : segment (expatriés / général), statut séquence (en cours / terminée / désinscrit), période.
+- Stat cards : total inscrits, % expatriés, en cours de séquence, terminés sans achat.
+- Identifier les "prospects chauds" : ceux qui ont ouvert/cliqué (via `email_opens` / `email_clicks`).
+
+## 4. Relancer les non-acheteurs
+- À la fin de `expat_funnel` (après J14), au lieu de marquer `completed`, basculer le lead vers une mini-séquence de réactivation `expat_reactivation` (2 emails à J21 et J30) : offre limitée + témoignage, sinon arrêt.
+- Exclure automatiquement quiconque a une commande payée (`funnel_orders.status = 'paid'` pour cet email) pour ne pas relancer un client.
+
+---
+
+## Détails techniques
+- **Aucune migration lourde** : `email_sequences.sequence_name` existe déjà ; on l'utilise enfin. Optionnel : ajouter une colonne `lead_magnet` à `funnel_leads` pour le reporting (avec GRANT service_role/authenticated).
+- Fichiers touchés : `supabase/functions/funnel-capture-lead/index.ts`, `supabase/functions/email-sequence-cron/index.ts` (refactor en multi-séquences), page admin prospects, `LeadCapturePopup.tsx`, `SeoFrancophonesEtrangerPage.tsx`.
+- Déploiement des deux edge functions après modification.
+- Le cron existant continue de tourner sans changement de planification.
 
 ## Hors périmètre
-- Toute version anglaise du site.
-- Génération d'ebooks en anglais.
-- i18n (le projet reste mono-langue français).
+- Pas de version anglaise / i18n (le projet reste 100% français).
+- Pas de nouveau provider email (on garde Resend déjà en place).
 
-## Étape suivante après mise en ligne
-Suivre dans Analytics les visites des pays francophones (CH, BE, LU, DE, CA) et les clics CTA pendant 2-3 semaines pour valider le filon avant d'aller plus loin.
+## Étape de validation
+Inscrire un email test via la page expatriés, vérifier dans `email_sequences` que `sequence_name = expat_funnel`, et confirmer dans `email_send` / logs que le 1er email est le bon (guide expatriés, pas 10 niches).
