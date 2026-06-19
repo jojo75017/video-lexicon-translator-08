@@ -16,7 +16,9 @@ const FunnelLayout = ({ children, showFooter = true }: FunnelLayoutProps) => {
           </Link>
           <nav className="flex items-center gap-4 text-sm">
             <Link to="/promo/decouverte" className="hover:text-[#FF9E2D] transition">L'outil</Link>
-            <Link to="/creer-ebook-kdp-etranger" className="hover:text-[#FF9E2D] transition">Francophones à l'étranger</Link>
+            <Link to="/creer-ebook-kdp-etranger" className="flex items-center gap-1.5 bg-[#008296]/10 text-[#008296] hover:bg-[#008296]/20 px-3 py-1.5 rounded-full font-semibold transition text-sm">
+              🌍 Francophones à l'étranger
+            </Link>
             <Link to="/promo/affilie" className="hover:text-[#FF9E2D] transition">Affiliation</Link>
           </nav>
         </div>
