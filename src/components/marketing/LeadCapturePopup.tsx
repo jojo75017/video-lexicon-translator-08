@@ -28,6 +28,7 @@ const LeadCapturePopup: React.FC = () => {
 
   const isExcluded = isMarketingExcluded(location.pathname);
   const isExpat = isExpatPath(location.pathname);
+  const { variant, copy } = getAbCopy(isExpat);
 
   useEffect(() => {
     if (isExcluded) return;
