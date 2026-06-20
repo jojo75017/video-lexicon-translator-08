@@ -733,6 +733,7 @@ const App = () => {
           {/* Acquisition : capture email visiteurs + CTA flottant vers l'outil (visiteurs non connectés uniquement) */}
           {!isAuthenticated && <LeadCapturePopup />}
           {!isAuthenticated && <FloatingToolCTA />}
+          {!isAuthenticated && <StickySignupBar />}
           <Toaster />
         </div>
       </TooltipProvider>
