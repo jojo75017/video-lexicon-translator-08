@@ -124,6 +124,11 @@ const CrmPage: React.FC = () => {
       seqMap[(row.email || '').toLowerCase().trim()] = row;
     }
     setLeadSequences(seqMap);
+
+    const { count: clickCount } = await (supabase as any)
+      .from('email_clicks')
+      .select('id', { count: 'exact', head: true });
+    setGuideClicks(clickCount || 0);
   }, []);
 
   useEffect(() => {
