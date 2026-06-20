@@ -9,6 +9,7 @@ import { getStoredUtm } from '@/lib/utmTracking';
 import { getStoredRefCode } from '@/hooks/useReferralTracking';
 import { trackFormSubmit, trackLeadMagnetDownload } from '@/utils/analytics';
 import { isMarketingExcluded, isExpatPath } from '@/lib/marketingExclusions';
+import { getAbCopy } from '@/lib/abTest';
 
 const SESSION_KEY = 'ebs_lead_popup_shown';
 const DONE_KEY = 'ebs_lead_popup_done';
