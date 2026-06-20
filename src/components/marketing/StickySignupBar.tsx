@@ -88,11 +88,7 @@ const StickySignupBar: React.FC = () => {
       <div className="bg-primary text-primary-foreground shadow-lg">
         <div className="max-w-5xl mx-auto px-4 py-2.5 flex items-center gap-3">
           <Gift className="w-5 h-5 shrink-0" />
-          <p className="text-sm font-semibold flex-1 min-w-0 truncate">
-            {isExpat
-              ? 'Guide gratuit : publier sur Amazon KDP depuis l\'étranger 🌍'
-              : 'Recevez gratuitement les 5 niches d\'ebooks rentables 2026 🎁'}
-          </p>
+          <p className="text-sm font-semibold flex-1 min-w-0 truncate">{copy.stickyMessage}</p>
 
           {expanded ? (
             <form onSubmit={handleSubmit} className="flex items-center gap-2">
