@@ -432,6 +432,14 @@ const CrmPage: React.FC = () => {
   }).length;
   const latestLeads = funnelLeads.slice(0, 5);
 
+  const now = Date.now();
+  const leads30d = funnelLeads.filter(l => {
+    const t = l.created_at ? new Date(l.created_at).getTime() : 0;
+    return now - t <= 30 * 24 * 3600 * 1000;
+  }).length;
+  const engagedLeads = Object.values(leadSequences).filter(s => (s.current_step || 0) > 0).length;
+  const clickRate = funnelLeads.length > 0 ? Math.round((guideClicks / funnelLeads.length) * 100) : 0;
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 pt-6">
