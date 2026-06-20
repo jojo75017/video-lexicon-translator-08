@@ -441,6 +441,14 @@ const CrmPage: React.FC = () => {
   const engagedLeads = Object.values(leadSequences).filter(s => (s.current_step || 0) > 0).length;
   const clickRate = funnelLeads.length > 0 ? Math.round((guideClicks / funnelLeads.length) * 100) : 0;
 
+  // Comparatif test A/B (popup + sticky) : inscrits par variante
+  const variantA = funnelLeads.filter(l => l.ab_variant === 'A').length;
+  const variantB = funnelLeads.filter(l => l.ab_variant === 'B').length;
+  const variantTracked = variantA + variantB;
+  const variantAShare = variantTracked > 0 ? Math.round((variantA / variantTracked) * 100) : 0;
+  const variantBShare = variantTracked > 0 ? Math.round((variantB / variantTracked) * 100) : 0;
+  const abWinner = variantTracked === 0 ? null : variantA === variantB ? 'égalité' : variantA > variantB ? 'A' : 'B';
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 pt-6">
