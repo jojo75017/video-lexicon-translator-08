@@ -51,6 +51,7 @@ interface FunnelLeadRow {
   first_name: string | null;
   lead_magnet: string | null;
   utm_source: string | null;
+  ab_variant: string | null;
   created_at: string;
 }
 
