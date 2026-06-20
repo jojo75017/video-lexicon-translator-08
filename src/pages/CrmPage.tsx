@@ -455,6 +455,30 @@ const CrmPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
         <CrmStats stats={stats} />
 
+        <Card className="border-primary/30 bg-card">
+          <CardContent className="p-4">
+            <h2 className="mb-3 text-lg font-semibold text-foreground">Conversion visiteurs → abonnés</h2>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <div className="rounded-lg border border-border bg-background/40 p-3">
+                <p className="text-2xl font-bold text-foreground">{funnelLeads.length}</p>
+                <p className="text-xs text-muted-foreground">Inscrits (total)</p>
+              </div>
+              <div className="rounded-lg border border-border bg-background/40 p-3">
+                <p className="text-2xl font-bold text-primary">{leads30d}</p>
+                <p className="text-xs text-muted-foreground">Inscrits (30 jours)</p>
+              </div>
+              <div className="rounded-lg border border-border bg-background/40 p-3">
+                <p className="text-2xl font-bold text-foreground">{expatLeadCount}</p>
+                <p className="text-xs text-muted-foreground">🌍 Expatriés</p>
+              </div>
+              <div className="rounded-lg border border-border bg-background/40 p-3">
+                <p className="text-2xl font-bold text-foreground">{clickRate}%</p>
+                <p className="text-xs text-muted-foreground">{guideClicks} clics guide · {engagedLeads} relancés</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         <Card className="border-primary/30 bg-card ring-1 ring-primary/10">
           <CardContent className="p-4">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
