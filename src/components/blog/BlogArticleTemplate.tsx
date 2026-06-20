@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import ReactMarkdown from 'react-markdown';
 import { getArticleBySlug, getRelatedArticles, type BlogArticle } from '@/data/blogArticles';
+import InlineLeadCapture from '@/components/marketing/InlineLeadCapture';
 
 const TableOfContents = ({ items }: { items: BlogArticle['tableOfContents'] }) => (
   <nav className="bg-muted/50 border border-border rounded-xl p-6 mb-8">
