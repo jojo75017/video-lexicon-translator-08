@@ -488,6 +488,46 @@ const CrmPage: React.FC = () => {
           </CardContent>
         </Card>
 
+        <Card className="border-primary/30 bg-card">
+          <CardContent className="p-4">
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              <h2 className="text-lg font-semibold text-foreground">Test A/B — popup &amp; bandeau</h2>
+              {abWinner && abWinner !== 'égalité' && (
+                <Badge className="bg-primary/15 text-primary border-primary/30">Variante {abWinner} en tête</Badge>
+              )}
+              {abWinner === 'égalité' && <Badge variant="outline">Égalité pour l'instant</Badge>}
+            </div>
+            {variantTracked === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                Aucune inscription attribuée à une variante pour l'instant. Les nouveaux inscrits via le popup ou le bandeau seront répartis automatiquement entre la variante A (offre actuelle) et la variante B (nouvelle promesse).
+              </p>
+            ) : (
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className="rounded-lg border border-border bg-background/40 p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-foreground">Variante A · « niches rentables »</span>
+                    <span className="text-2xl font-bold text-foreground">{variantA}</span>
+                  </div>
+                  <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted">
+                    <div className="h-full rounded-full bg-primary" style={{ width: `${variantAShare}%` }} />
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground">{variantAShare}% des inscrits attribués</p>
+                </div>
+                <div className="rounded-lg border border-border bg-background/40 p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-foreground">Variante B · « 1er ebook en 7 jours »</span>
+                    <span className="text-2xl font-bold text-foreground">{variantB}</span>
+                  </div>
+                  <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted">
+                    <div className="h-full rounded-full bg-primary" style={{ width: `${variantBShare}%` }} />
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground">{variantBShare}% des inscrits attribués</p>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         <Card className="border-primary/30 bg-card ring-1 ring-primary/10">
           <CardContent className="p-4">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
