@@ -1,0 +1,1 @@
+ALTER TABLE public.funnel_leads ADD COLUMN IF NOT EXISTS ab_variant text;

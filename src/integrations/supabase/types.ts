@@ -983,6 +983,7 @@ export type Database = {
       }
       funnel_leads: {
         Row: {
+          ab_variant: string | null
           created_at: string
           email: string
           first_name: string | null
@@ -1000,6 +1001,7 @@ export type Database = {
           utm_source: string | null
         }
         Insert: {
+          ab_variant?: string | null
           created_at?: string
           email: string
           first_name?: string | null
@@ -1017,6 +1019,7 @@ export type Database = {
           utm_source?: string | null
         }
         Update: {
+          ab_variant?: string | null
           created_at?: string
           email?: string
           first_name?: string | null

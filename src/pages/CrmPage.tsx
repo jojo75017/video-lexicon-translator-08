@@ -51,6 +51,7 @@ interface FunnelLeadRow {
   first_name: string | null;
   lead_magnet: string | null;
   utm_source: string | null;
+  ab_variant: string | null;
   created_at: string;
 }
 
@@ -109,7 +110,7 @@ const CrmPage: React.FC = () => {
   const fetchFunnelLeads = useCallback(async () => {
     const { data: leadsData } = await (supabase as any)
       .from('funnel_leads')
-      .select('id, email, first_name, lead_magnet, utm_source, created_at')
+      .select('id, email, first_name, lead_magnet, utm_source, ab_variant, created_at')
       .order('created_at', { ascending: false })
       .limit(100);
 
@@ -440,6 +441,14 @@ const CrmPage: React.FC = () => {
   const engagedLeads = Object.values(leadSequences).filter(s => (s.current_step || 0) > 0).length;
   const clickRate = funnelLeads.length > 0 ? Math.round((guideClicks / funnelLeads.length) * 100) : 0;
 
+  // Comparatif test A/B (popup + sticky) : inscrits par variante
+  const variantA = funnelLeads.filter(l => l.ab_variant === 'A').length;
+  const variantB = funnelLeads.filter(l => l.ab_variant === 'B').length;
+  const variantTracked = variantA + variantB;
+  const variantAShare = variantTracked > 0 ? Math.round((variantA / variantTracked) * 100) : 0;
+  const variantBShare = variantTracked > 0 ? Math.round((variantB / variantTracked) * 100) : 0;
+  const abWinner = variantTracked === 0 ? null : variantA === variantB ? 'égalité' : variantA > variantB ? 'A' : 'B';
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 pt-6">
@@ -476,6 +485,46 @@ const CrmPage: React.FC = () => {
                 <p className="text-xs text-muted-foreground">{guideClicks} clics guide · {engagedLeads} relancés</p>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-primary/30 bg-card">
+          <CardContent className="p-4">
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              <h2 className="text-lg font-semibold text-foreground">Test A/B — popup &amp; bandeau</h2>
+              {abWinner && abWinner !== 'égalité' && (
+                <Badge className="bg-primary/15 text-primary border-primary/30">Variante {abWinner} en tête</Badge>
+              )}
+              {abWinner === 'égalité' && <Badge variant="outline">Égalité pour l'instant</Badge>}
+            </div>
+            {variantTracked === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                Aucune inscription attribuée à une variante pour l'instant. Les nouveaux inscrits via le popup ou le bandeau seront répartis automatiquement entre la variante A (offre actuelle) et la variante B (nouvelle promesse).
+              </p>
+            ) : (
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className="rounded-lg border border-border bg-background/40 p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-foreground">Variante A · « niches rentables »</span>
+                    <span className="text-2xl font-bold text-foreground">{variantA}</span>
+                  </div>
+                  <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted">
+                    <div className="h-full rounded-full bg-primary" style={{ width: `${variantAShare}%` }} />
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground">{variantAShare}% des inscrits attribués</p>
+                </div>
+                <div className="rounded-lg border border-border bg-background/40 p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-foreground">Variante B · « 1er ebook en 7 jours »</span>
+                    <span className="text-2xl font-bold text-foreground">{variantB}</span>
+                  </div>
+                  <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted">
+                    <div className="h-full rounded-full bg-primary" style={{ width: `${variantBShare}%` }} />
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground">{variantBShare}% des inscrits attribués</p>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 

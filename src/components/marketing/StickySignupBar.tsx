@@ -9,6 +9,7 @@ import { getStoredUtm } from '@/lib/utmTracking';
 import { getStoredRefCode } from '@/hooks/useReferralTracking';
 import { trackFormSubmit, trackLeadMagnetDownload } from '@/utils/analytics';
 import { isMarketingExcluded, isExpatPath } from '@/lib/marketingExclusions';
+import { getAbCopy } from '@/lib/abTest';
 
 const DISMISS_KEY = 'ebs_sticky_signup_dismissed';
 const DONE_KEY = 'ebs_lead_popup_done';
@@ -26,6 +27,7 @@ const StickySignupBar: React.FC = () => {
 
   const isExcluded = isMarketingExcluded(location.pathname);
   const isExpat = isExpatPath(location.pathname);
+  const { variant, copy } = getAbCopy(isExpat);
 
   useEffect(() => {
     if (isExcluded) {
@@ -55,13 +57,14 @@ const StickySignupBar: React.FC = () => {
           email: email.trim().toLowerCase(),
           lead_magnet: isExpat ? 'publier-kdp-etranger' : undefined,
           ref_code: getStoredRefCode(),
+          ab_variant: variant,
           utm_source: utm.utm_source || null,
           utm_medium: utm.utm_medium || null,
           utm_campaign: utm.utm_campaign || null,
           landing_url: utm.landing_url || (typeof window !== 'undefined' ? window.location.href : null),
         },
       });
-      trackFormSubmit('sticky_signup_bar', email);
+      trackFormSubmit(`sticky_signup_bar_${variant}`, email);
       trackLeadMagnetDownload(isExpat ? 'publier-kdp-etranger' : '5-niches-rentables-2026');
       localStorage.setItem(DONE_KEY, '1');
       toast.success('Parfait ! Votre guide arrive dans votre boîte mail. 📩');
@@ -85,11 +88,7 @@ const StickySignupBar: React.FC = () => {
       <div className="bg-primary text-primary-foreground shadow-lg">
         <div className="max-w-5xl mx-auto px-4 py-2.5 flex items-center gap-3">
           <Gift className="w-5 h-5 shrink-0" />
-          <p className="text-sm font-semibold flex-1 min-w-0 truncate">
-            {isExpat
-              ? 'Guide gratuit : publier sur Amazon KDP depuis l\'étranger 🌍'
-              : 'Recevez gratuitement les 5 niches d\'ebooks rentables 2026 🎁'}
-          </p>
+          <p className="text-sm font-semibold flex-1 min-w-0 truncate">{copy.stickyMessage}</p>
 
           {expanded ? (
             <form onSubmit={handleSubmit} className="flex items-center gap-2">
@@ -123,7 +122,7 @@ const StickySignupBar: React.FC = () => {
               onClick={() => setExpanded(true)}
               className="h-9 whitespace-nowrap font-semibold"
             >
-              Recevoir le guide
+              {copy.stickyCta}
             </Button>
           )}
 

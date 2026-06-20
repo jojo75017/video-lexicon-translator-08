@@ -9,6 +9,7 @@ import { getStoredUtm } from '@/lib/utmTracking';
 import { getStoredRefCode } from '@/hooks/useReferralTracking';
 import { trackFormSubmit, trackLeadMagnetDownload } from '@/utils/analytics';
 import { isMarketingExcluded, isExpatPath } from '@/lib/marketingExclusions';
+import { getAbCopy } from '@/lib/abTest';
 
 const SESSION_KEY = 'ebs_lead_popup_shown';
 const DONE_KEY = 'ebs_lead_popup_done';
@@ -27,6 +28,7 @@ const LeadCapturePopup: React.FC = () => {
 
   const isExcluded = isMarketingExcluded(location.pathname);
   const isExpat = isExpatPath(location.pathname);
+  const { variant, copy } = getAbCopy(isExpat);
 
   useEffect(() => {
     if (isExcluded) return;
@@ -73,13 +75,14 @@ const LeadCapturePopup: React.FC = () => {
           email: email.trim().toLowerCase(),
           lead_magnet: isExpat ? 'publier-kdp-etranger' : undefined,
           ref_code: getStoredRefCode(),
+          ab_variant: variant,
           utm_source: utm.utm_source || null,
           utm_medium: utm.utm_medium || null,
           utm_campaign: utm.utm_campaign || null,
           landing_url: utm.landing_url || (typeof window !== 'undefined' ? window.location.href : null),
         },
       });
-      trackFormSubmit('lead_popup', email);
+      trackFormSubmit(`lead_popup_${variant}`, email);
       trackLeadMagnetDownload(isExpat ? 'publier-kdp-etranger' : '5-niches-rentables-2026');
       localStorage.setItem(DONE_KEY, '1');
       toast.success('Parfait ! Votre guide arrive dans votre boîte mail. 📩');
@@ -107,14 +110,8 @@ const LeadCapturePopup: React.FC = () => {
           <div className="mx-auto mb-3 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
             <Gift className="w-6 h-6 text-primary" />
           </div>
-          <h2 className="text-xl font-bold text-foreground">Avant de partir… {isExpat ? '🌍' : '🎁'}</h2>
-          <p className="text-sm text-muted-foreground mt-2">
-            {isExpat ? (
-              <>Recevez gratuitement le guide <strong className="text-foreground">« Publier sur Amazon KDP depuis l'étranger »</strong> (Suisse, Belgique, Luxembourg, Allemagne, Canada) — 100% en français.</>
-            ) : (
-              <>Recevez gratuitement <strong className="text-foreground">les 5 niches d'ebooks les plus rentables en 2026</strong> (données Amazon réelles) + un plan d'ebook prêt à l'emploi.</>
-            )}
-          </p>
+          <h2 className="text-xl font-bold text-foreground">{copy.popupTitle}</h2>
+          <p className="text-sm text-muted-foreground mt-2">{copy.popupSubtitle}</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-3">
           <Input
@@ -133,7 +130,7 @@ const LeadCapturePopup: React.FC = () => {
               </span>
             ) : (
               <span className="flex items-center gap-2">
-                <Download className="w-4 h-4" /> Recevoir mon guide gratuit
+                <Download className="w-4 h-4" /> {copy.popupCta}
               </span>
             )}
           </Button>

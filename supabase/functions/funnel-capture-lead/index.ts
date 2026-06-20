@@ -104,6 +104,8 @@ serve(async (req) => {
     const first_name = String(body.first_name || "").trim().slice(0, 80);
     const ref_code = String(body.ref_code || "").trim().slice(0, 64) || null;
     const magnetKey = String(body.lead_magnet || "").trim() || DEFAULT_MAGNET;
+    const abVariantRaw = String(body.ab_variant || "").trim().toUpperCase();
+    const ab_variant = abVariantRaw === "A" || abVariantRaw === "B" ? abVariantRaw : null;
     const honeypot = String(body.website || "").trim();
 
     if (honeypot) {
@@ -132,7 +134,7 @@ serve(async (req) => {
     // Upsert by lowercase email
     const { data: existing } = await supabase
       .from("funnel_leads")
-      .select("id")
+      .select("id, ab_variant")
       .ilike("email", email)
       .maybeSingle();
 
@@ -144,6 +146,8 @@ serve(async (req) => {
           first_name: first_name || null,
           ref_code: ref_code,
           lead_magnet: magnetKey,
+          // On conserve la variante A/B d'origine si elle existe déjà
+          ab_variant: existing?.ab_variant || ab_variant,
           utm_source: body.utm_source || null,
           utm_medium: body.utm_medium || null,
           utm_campaign: body.utm_campaign || null,
@@ -160,6 +164,7 @@ serve(async (req) => {
           first_name: first_name || null,
           ref_code,
           lead_magnet: magnetKey,
+          ab_variant,
           utm_source: body.utm_source || null,
           utm_medium: body.utm_medium || null,
           utm_campaign: body.utm_campaign || null,
