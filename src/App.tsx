@@ -20,6 +20,7 @@ import { useBrandTitle } from '@/hooks/useBrandTitle';
 import V2V3FloatingSwitch from '@/components/admin/V2V3FloatingSwitch';
 import LeadCapturePopup from '@/components/marketing/LeadCapturePopup';
 import FloatingToolCTA from '@/components/marketing/FloatingToolCTA';
+import StickySignupBar from '@/components/marketing/StickySignupBar';
 import { captureUtmParams } from '@/lib/utmTracking';
 
 // Lazy-loaded pages for performance
@@ -733,6 +734,7 @@ const App = () => {
           {/* Acquisition : capture email visiteurs + CTA flottant vers l'outil (visiteurs non connectés uniquement) */}
           {!isAuthenticated && <LeadCapturePopup />}
           {!isAuthenticated && <FloatingToolCTA />}
+          {!isAuthenticated && <StickySignupBar />}
           <Toaster />
         </div>
       </TooltipProvider>

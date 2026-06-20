@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import InlineLeadCapture from '@/components/marketing/InlineLeadCapture';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
@@ -295,6 +296,7 @@ const SeoGenerateurEbookPage: React.FC = () => {
       </section>
 
       {/* Footer */}
+      <div className="px-4"><InlineLeadCapture /></div>
       <footer className="py-10 px-4 bg-background border-t border-border">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8 mb-8">

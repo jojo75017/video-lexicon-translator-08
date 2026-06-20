@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Sparkles, X } from 'lucide-react';
 import { trackCTAClick } from '@/utils/analytics';
+import { isMarketingExcluded } from '@/lib/marketingExclusions';
 
 const DISMISS_KEY = 'ebs_tool_cta_dismissed';
-const EXCLUDED_PREFIXES = ['/dashboard', '/ebook', '/admin', '/paiement', '/confirmation', '/merci', '/audit-pilot', '/gestion-prospects', '/crm', '/auth', '/demo'];
 
 /**
  * Bouton flottant global "Tester l'outil gratuitement" — visible sur toutes les
@@ -15,7 +15,7 @@ const FloatingToolCTA: React.FC = () => {
   const location = useLocation();
   const [visible, setVisible] = useState(false);
 
-  const isExcluded = EXCLUDED_PREFIXES.some((p) => location.pathname.startsWith(p));
+  const isExcluded = isMarketingExcluded(location.pathname);
 
   useEffect(() => {
     if (isExcluded) {

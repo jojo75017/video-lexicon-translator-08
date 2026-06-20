@@ -75,6 +75,7 @@ const CrmPage: React.FC = () => {
   const [funnelLeads, setFunnelLeads] = useState<FunnelLeadRow[]>([]);
   const [leadSequences, setLeadSequences] = useState<Record<string, SequenceRow>>({});
   const [syncingLeads, setSyncingLeads] = useState(false);
+  const [guideClicks, setGuideClicks] = useState(0);
 
   const fetchContacts = useCallback(async () => {
     setLoading(true);
@@ -123,6 +124,11 @@ const CrmPage: React.FC = () => {
       seqMap[(row.email || '').toLowerCase().trim()] = row;
     }
     setLeadSequences(seqMap);
+
+    const { count: clickCount } = await (supabase as any)
+      .from('email_clicks')
+      .select('id', { count: 'exact', head: true });
+    setGuideClicks(clickCount || 0);
   }, []);
 
   useEffect(() => {
@@ -426,6 +432,14 @@ const CrmPage: React.FC = () => {
   }).length;
   const latestLeads = funnelLeads.slice(0, 5);
 
+  const now = Date.now();
+  const leads30d = funnelLeads.filter(l => {
+    const t = l.created_at ? new Date(l.created_at).getTime() : 0;
+    return now - t <= 30 * 24 * 3600 * 1000;
+  }).length;
+  const engagedLeads = Object.values(leadSequences).filter(s => (s.current_step || 0) > 0).length;
+  const clickRate = funnelLeads.length > 0 ? Math.round((guideClicks / funnelLeads.length) * 100) : 0;
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 pt-6">
@@ -440,6 +454,30 @@ const CrmPage: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
         <CrmStats stats={stats} />
+
+        <Card className="border-primary/30 bg-card">
+          <CardContent className="p-4">
+            <h2 className="mb-3 text-lg font-semibold text-foreground">Conversion visiteurs → abonnés</h2>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <div className="rounded-lg border border-border bg-background/40 p-3">
+                <p className="text-2xl font-bold text-foreground">{funnelLeads.length}</p>
+                <p className="text-xs text-muted-foreground">Inscrits (total)</p>
+              </div>
+              <div className="rounded-lg border border-border bg-background/40 p-3">
+                <p className="text-2xl font-bold text-primary">{leads30d}</p>
+                <p className="text-xs text-muted-foreground">Inscrits (30 jours)</p>
+              </div>
+              <div className="rounded-lg border border-border bg-background/40 p-3">
+                <p className="text-2xl font-bold text-foreground">{expatLeadCount}</p>
+                <p className="text-xs text-muted-foreground">🌍 Expatriés</p>
+              </div>
+              <div className="rounded-lg border border-border bg-background/40 p-3">
+                <p className="text-2xl font-bold text-foreground">{clickRate}%</p>
+                <p className="text-xs text-muted-foreground">{guideClicks} clics guide · {engagedLeads} relancés</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <Card className="border-primary/30 bg-card ring-1 ring-primary/10">
           <CardContent className="p-4">

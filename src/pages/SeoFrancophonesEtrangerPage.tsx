@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import InlineLeadCapture from '@/components/marketing/InlineLeadCapture';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -405,6 +406,7 @@ const SeoFrancophonesEtrangerPage: React.FC = () => {
       </section>
 
       {/* Footer */}
+      <div className="px-4"><InlineLeadCapture leadMagnet="publier-kdp-etranger" /></div>
       <footer className="py-10 px-4 bg-background border-t border-border">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8 mb-8">
