@@ -130,7 +130,7 @@ const LeadCapturePopup: React.FC = () => {
               </span>
             ) : (
               <span className="flex items-center gap-2">
-                <Download className="w-4 h-4" /> Recevoir mon guide gratuit
+                <Download className="w-4 h-4" /> {copy.popupCta}
               </span>
             )}
           </Button>
