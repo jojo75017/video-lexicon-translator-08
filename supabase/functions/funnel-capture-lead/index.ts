@@ -134,7 +134,7 @@ serve(async (req) => {
     // Upsert by lowercase email
     const { data: existing } = await supabase
       .from("funnel_leads")
-      .select("id")
+      .select("id, ab_variant")
       .ilike("email", email)
       .maybeSingle();
 
@@ -146,6 +146,8 @@ serve(async (req) => {
           first_name: first_name || null,
           ref_code: ref_code,
           lead_magnet: magnetKey,
+          // On conserve la variante A/B d'origine si elle existe déjà
+          ab_variant: existing?.ab_variant || ab_variant,
           utm_source: body.utm_source || null,
           utm_medium: body.utm_medium || null,
           utm_campaign: body.utm_campaign || null,
@@ -162,6 +164,7 @@ serve(async (req) => {
           first_name: first_name || null,
           ref_code,
           lead_magnet: magnetKey,
+          ab_variant,
           utm_source: body.utm_source || null,
           utm_medium: body.utm_medium || null,
           utm_campaign: body.utm_campaign || null,
