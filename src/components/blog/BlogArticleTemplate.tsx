@@ -205,6 +205,8 @@ const BlogArticleTemplate = () => {
               </ReactMarkdown>
             </div>
 
+            <InlineLeadCapture />
+
             <CtaBanner article={article} />
             <FaqSection faq={article.faq} />
             <RelatedArticles slugs={article.relatedSlugs} />
