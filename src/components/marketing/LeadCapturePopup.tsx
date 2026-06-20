@@ -110,14 +110,8 @@ const LeadCapturePopup: React.FC = () => {
           <div className="mx-auto mb-3 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
             <Gift className="w-6 h-6 text-primary" />
           </div>
-          <h2 className="text-xl font-bold text-foreground">Avant de partir… {isExpat ? '🌍' : '🎁'}</h2>
-          <p className="text-sm text-muted-foreground mt-2">
-            {isExpat ? (
-              <>Recevez gratuitement le guide <strong className="text-foreground">« Publier sur Amazon KDP depuis l'étranger »</strong> (Suisse, Belgique, Luxembourg, Allemagne, Canada) — 100% en français.</>
-            ) : (
-              <>Recevez gratuitement <strong className="text-foreground">les 5 niches d'ebooks les plus rentables en 2026</strong> (données Amazon réelles) + un plan d'ebook prêt à l'emploi.</>
-            )}
-          </p>
+          <h2 className="text-xl font-bold text-foreground">{copy.popupTitle}</h2>
+          <p className="text-sm text-muted-foreground mt-2">{copy.popupSubtitle}</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-3">
           <Input
