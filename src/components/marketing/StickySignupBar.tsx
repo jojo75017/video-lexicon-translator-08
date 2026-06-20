@@ -122,7 +122,7 @@ const StickySignupBar: React.FC = () => {
               onClick={() => setExpanded(true)}
               className="h-9 whitespace-nowrap font-semibold"
             >
-              Recevoir le guide
+              {copy.stickyCta}
             </Button>
           )}
 
