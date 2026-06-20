@@ -75,6 +75,7 @@ const CrmPage: React.FC = () => {
   const [funnelLeads, setFunnelLeads] = useState<FunnelLeadRow[]>([]);
   const [leadSequences, setLeadSequences] = useState<Record<string, SequenceRow>>({});
   const [syncingLeads, setSyncingLeads] = useState(false);
+  const [guideClicks, setGuideClicks] = useState(0);
 
   const fetchContacts = useCallback(async () => {
     setLoading(true);
