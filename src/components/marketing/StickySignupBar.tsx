@@ -9,6 +9,7 @@ import { getStoredUtm } from '@/lib/utmTracking';
 import { getStoredRefCode } from '@/hooks/useReferralTracking';
 import { trackFormSubmit, trackLeadMagnetDownload } from '@/utils/analytics';
 import { isMarketingExcluded, isExpatPath } from '@/lib/marketingExclusions';
+import { getAbCopy } from '@/lib/abTest';
 
 const DISMISS_KEY = 'ebs_sticky_signup_dismissed';
 const DONE_KEY = 'ebs_lead_popup_done';
