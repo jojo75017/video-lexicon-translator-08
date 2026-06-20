@@ -1,64 +1,61 @@
-# Exploiter les visiteurs francophones expatriés
+## Objectif
 
-Objectif : transformer le trafic SEO "expatriés" (CH/BE/LU/DE/CA) en inscrits, puis en clients, avec un message **pertinent** à chaque étape. Aujourd'hui tout le monde reçoit la même séquence générique "10 niches" — ce qui casse la conversion pour ce nouveau segment.
+Augmenter le nombre de visiteurs qui laissent leur email (abonnés) et le nombre de clics vers l'inscription, sur toutes les pages publiques (SEO, blog, expatriés, accueil), avec un suivi clair du taux de conversion.
 
-## Constat technique
-- `funnel-capture-lead` capte l'email et inscrit le lead dans `email_sequences` (`sequence_name = "promo_funnel"`), **mais ne transmet pas quel lead magnet** a été téléchargé.
-- `email-sequence-cron` lit `email_sequences` mais **ignore `sequence_name`** : il applique une seule séquence codée en dur (10 niches, signée Georges) à tous.
-- Résultat : un expatrié qui télécharge le guide "KDP étranger" reçoit 6 emails parlant de niches → hors-sujet → faible conversion.
+On s'appuie sur l'existant : `LeadCapturePopup`, `FloatingToolCTA`, l'edge function `funnel-capture-lead`, les séquences `email-sequence-cron`, et la table `funnel_leads`. Aucune nouvelle dépendance lourde.
 
 ---
 
-## 1. Séquence email dédiée expatriés (priorité)
+## 1. Pop-up plus malin (`LeadCapturePopup.tsx`)
 
-**Backend — `funnel-capture-lead`**
-- Mapper le `lead_magnet` reçu vers un `sequence_name` :
-  - `publier-kdp-etranger` → `expat_funnel`
-  - autres / défaut → `promo_funnel`
-- Enregistrer ce `sequence_name` dans l'upsert `email_sequences`.
+- **Déclenchement plus efficace** : en plus de l'exit-intent et du timer 30s, ajouter un déclenchement au **scroll à 50 %** de la page (souvent plus rapide sur mobile où l'exit-intent ne marche pas).
+- **Délai réduit** : passer le timer de 30s à ~18s pour capter plus tôt.
+- **Offre adaptée à la page** : détecter le contexte (page expatrié vs reste) — déjà partiellement fait — et afficher le bon lead magnet + visuel.
+- **Champ prénom optionnel** pour personnaliser les emails (déjà géré côté edge function via `first_name`).
+- **Anti-frustration** : une seule fois par session, mémorisé (déjà en place), on garde.
 
-**Backend — `email-sequence-cron`**
-- Remplacer la séquence unique par un dictionnaire `SEQUENCES[sequence_name]`.
-- Lire `sequence.sequence_name` pour choisir la bonne suite d'emails et le bon contenu.
-- Sécuriser : si `sequence_name` inconnu → repli sur `promo_funnel`.
+## 2. Bandeau / CTA permanent (`StickySignupBar.tsx` — nouveau)
 
-**Contenu — nouvelle séquence `expat_funnel`** (6 emails, signés Georges, ton rassurant "depuis votre pays") :
-- J0 : livraison du guide PDF "Publier sur KDP depuis l'étranger" + bienvenue
-- J1 : « Oui, KDP fonctionne depuis la Suisse / Belgique / Canada » (lève l'objection n°1)
-- J3 : « Comment vous êtes payé à l'étranger (CHF, EUR, CAD) » + le tax interview simplifié
-- J5 : preuve / cas concret d'un auteur francophone expatrié + démo EbookStudio
-- J7 : l'offre 67€ à vie, pourquoi c'est adapté aux expatriés (100% français, pas de trad)
-- J14 : relance finale avec urgence douce
+- Barre fine, sticky en bas (mobile) / haut (desktop), toujours visible sur les pages publiques : « Recevez le guide gratuit » + bouton qui ouvre le même formulaire de capture (réutilise l'appel `funnel-capture-lead`).
+- Masquée sur l'app interne via la même liste `EXCLUDED_PREFIXES`.
+- Refermable (mémorisé en sessionStorage), réapparaît à la session suivante.
+- Montée dans `App.tsx` à côté de `LeadCapturePopup`, uniquement si `!isAuthenticated`.
 
-Chaque email pointe vers `/creer-ebook-kdp-etranger` et `/offres`.
+## 3. Bloc de capture réutilisable sur les pages clés (`InlineLeadCapture.tsx` — nouveau)
 
-## 2. Mieux convertir les curieux (anonymes → inscrits)
-- Sur `/creer-ebook-kdp-etranger`, rendre le bloc de capture plus visible : le remonter au-dessus de la ligne de flottaison (juste après le hero) en plus de sa position actuelle.
-- Adapter le pop-up de sortie (`LeadCapturePopup`) pour proposer le **guide expatriés** quand le visiteur est sur cette page (au lieu du guide générique 10 niches), via détection du `pathname`.
-- Ajouter une preuve sociale courte (drapeaux + « déjà X auteurs francophones à l'étranger ») près du formulaire.
+- Composant compact et réutilisable (titre, bénéfices, champ email, bouton) branché sur `funnel-capture-lead`, avec prop `leadMagnet` pour choisir l'offre.
+- Insertion sur les pages à fort trafic :
+  - Pages SEO (`SeoCreerEbookIaPage`, `SeoGenerateurEbookPage`, `SeoFrancophonesEtrangerPage`, `SeoGuideKdpEnfantsPage`)
+  - Blog (`BlogArticleTemplate` — bloc en milieu/fin d'article)
+  - Pages expatriés (offre `publier-kdp-etranger`)
+- Suit le thème KDP (fond #FAFAFA, accent teal #008296, hover orange #FF9E2D), pas de couleurs codées en dur hors tokens.
 
-## 3. Tableau de bord prospects (page `/n`, admin)
-La page existe (`ProspectManagerPage`, protégée admin). Ajout d'une vue dédiée aux leads :
-- Lire `funnel_leads` joint à `email_sequences` : email, pays/segment (déduit du `sequence_name` + `lead_magnet`), date, source UTM, étape de séquence atteinte, guide envoyé ou non.
-- Filtres : segment (expatriés / général), statut séquence (en cours / terminée / désinscrit), période.
-- Stat cards : total inscrits, % expatriés, en cours de séquence, terminés sans achat.
-- Identifier les "prospects chauds" : ceux qui ont ouvert/cliqué (via `email_opens` / `email_clicks`).
+## 4. Relance email automatique
 
-## 4. Relancer les non-acheteurs
-- À la fin de `expat_funnel` (après J14), au lieu de marquer `completed`, basculer le lead vers une mini-séquence de réactivation `expat_reactivation` (2 emails à J21 et J30) : offre limitée + témoignage, sinon arrêt.
-- Exclure automatiquement quiconque a une commande payée (`funnel_orders.status = 'paid'` pour cet email) pour ne pas relancer un client.
+- **Réutiliser les séquences existantes** (`promo_funnel`, `expat_funnel`, `expat_reactivation`) du cron `email-sequence-cron`.
+- Vérifier que chaque nouveau point de capture inscrit bien le lead dans la bonne séquence (paramètre `lead_magnet` → séquence) côté `funnel-capture-lead`.
+- Ajouter une **relance « curieux non-inscrits »** : pour les leads inscrits mais qui n'ont jamais cliqué le guide (`lead_magnet_sent_at` mais 0 clic), une étape de relance douce dans la séquence promo. Ajustement léger des STEPS, pas de nouvelle infra.
+
+## 5. Mini tableau de bord de conversion (CRM)
+
+- Dans `CrmPage.tsx`, ajouter une carte **« Conversion visiteurs → abonnés »** en haut :
+  - **Visiteurs** (30 derniers jours) via `analytics--read_project_analytics`.
+  - **Inscrits** = nombre de `funnel_leads` sur la période.
+  - **Taux de conversion** = inscrits / visiteurs.
+  - **Clics guide** = inscrits avec ouverture/clic (via `email_opens` / `email_clicks` ou `lead_magnet_sent_at`).
+  - Répartition par source (utm_source) et par lead magnet (général vs expatrié).
+- Affichage immédiat au chargement avec état vide clair (déjà mis en place pour les inscrits).
 
 ---
 
 ## Détails techniques
-- **Aucune migration lourde** : `email_sequences.sequence_name` existe déjà ; on l'utilise enfin. Optionnel : ajouter une colonne `lead_magnet` à `funnel_leads` pour le reporting (avec GRANT service_role/authenticated).
-- Fichiers touchés : `supabase/functions/funnel-capture-lead/index.ts`, `supabase/functions/email-sequence-cron/index.ts` (refactor en multi-séquences), page admin prospects, `LeadCapturePopup.tsx`, `SeoFrancophonesEtrangerPage.tsx`.
-- Déploiement des deux edge functions après modification.
-- Le cron existant continue de tourner sans changement de planification.
+
+- **Capture** : tous les points (pop-up, bandeau, bloc inline) appellent la même edge function `funnel-capture-lead` avec `utm`, `ref_code`, et `lead_magnet` adapté. Validation email côté client + déjà côté serveur.
+- **Tracking** : utiliser `trackFormSubmit`, `trackLeadMagnetDownload`, `trackCTAClick` (déjà présents) pour mesurer les clics.
+- **Exclusions** : factoriser la liste `EXCLUDED_PREFIXES` (partagée pop-up / bandeau / CTA flottant) pour ne jamais polluer l'app interne.
+- **Aucune migration DB requise** (réutilisation de `funnel_leads`, `email_sequences`, `email_opens`, `email_clicks`).
+- **Dashboard** : lecture seule (analytics + requêtes existantes), réservé à la page CRM déjà protégée.
 
 ## Hors périmètre
-- Pas de version anglaise / i18n (le projet reste 100% français).
-- Pas de nouveau provider email (on garde Resend déjà en place).
 
-## Étape de validation
-Inscrire un email test via la page expatriés, vérifier dans `email_sequences` que `sequence_name = expat_funnel`, et confirmer dans `email_send` / logs que le 1er email est le bon (guide expatriés, pas 10 niches).
+- Pas de refonte des pages, pas de nouveau provider email, pas de A/B testing avancé (peut venir plus tard).
