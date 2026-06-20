@@ -8,16 +8,15 @@ import { supabase } from '@/integrations/supabase/client';
 import { getStoredUtm } from '@/lib/utmTracking';
 import { getStoredRefCode } from '@/hooks/useReferralTracking';
 import { trackFormSubmit, trackLeadMagnetDownload } from '@/utils/analytics';
+import { isMarketingExcluded, isExpatPath } from '@/lib/marketingExclusions';
 
 const SESSION_KEY = 'ebs_lead_popup_shown';
 const DONE_KEY = 'ebs_lead_popup_done';
-// Pages où le pop-up n'a pas de sens (app interne, checkout, confirmation)
-const EXCLUDED_PREFIXES = ['/dashboard', '/ebook', '/admin', '/paiement', '/confirmation', '/merci', '/audit-pilot', '/gestion-prospects', '/crm', '/auth'];
 
 /**
  * Pop-up de capture email global (lead magnet "5 niches rentables 2026").
- * Déclenché sur intention de sortie OU après 30s, une seule fois par session.
- * N'apparaît que sur les pages publiques marketing.
+ * Déclenché sur intention de sortie, après 18s, OU au scroll à 50% de la page,
+ * une seule fois par session. N'apparaît que sur les pages publiques marketing.
  */
 const LeadCapturePopup: React.FC = () => {
   const location = useLocation();
@@ -26,8 +25,8 @@ const LeadCapturePopup: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const armed = useRef(false);
 
-  const isExcluded = EXCLUDED_PREFIXES.some((p) => location.pathname.startsWith(p));
-  const isExpat = location.pathname.startsWith('/creer-ebook-kdp-etranger');
+  const isExcluded = isMarketingExcluded(location.pathname);
+  const isExpat = isExpatPath(location.pathname);
 
   useEffect(() => {
     if (isExcluded) return;
@@ -45,11 +44,18 @@ const LeadCapturePopup: React.FC = () => {
     const onMouseLeave = (e: MouseEvent) => {
       if (e.clientY <= 0) trigger();
     };
-    const timer = window.setTimeout(trigger, 30000);
+    const onScroll = () => {
+      const scrolled = window.scrollY + window.innerHeight;
+      const total = document.documentElement.scrollHeight;
+      if (total > 0 && scrolled / total >= 0.5) trigger();
+    };
+    const timer = window.setTimeout(trigger, 18000);
     document.addEventListener('mouseleave', onMouseLeave);
+    window.addEventListener('scroll', onScroll, { passive: true });
     return () => {
       window.clearTimeout(timer);
       document.removeEventListener('mouseleave', onMouseLeave);
+      window.removeEventListener('scroll', onScroll);
     };
   }, [isExcluded, location.pathname]);
 
