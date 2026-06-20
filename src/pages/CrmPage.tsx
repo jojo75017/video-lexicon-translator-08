@@ -110,7 +110,7 @@ const CrmPage: React.FC = () => {
   const fetchFunnelLeads = useCallback(async () => {
     const { data: leadsData } = await (supabase as any)
       .from('funnel_leads')
-      .select('id, email, first_name, lead_magnet, utm_source, created_at')
+      .select('id, email, first_name, lead_magnet, utm_source, ab_variant, created_at')
       .order('created_at', { ascending: false })
       .limit(100);
 
