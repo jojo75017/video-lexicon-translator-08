@@ -5,8 +5,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Admin email permanent (ne dépend pas de la session)
-const PERMANENT_ADMIN_EMAIL = 'boubetgeorges@gmail.com';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
