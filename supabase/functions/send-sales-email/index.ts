@@ -514,15 +514,17 @@ Deno.serve(async (req) => {
         await new Promise(resolve => setTimeout(resolve, 400));
       }
 
-      // ===== Mode RELANCE : email dédié, n'incrémente pas l'étape =====
+      // ===== Mode RELANCE : 3 variantes tournantes, n'incrémente pas l'étape =====
       if (isRelance) {
-        const relanceStep = 7; // pour distinguer dans le tracking
+        const round = Math.min(prospect.relance_round ?? 0, RELANCE_MAX_ROUNDS - 1);
+        const variant = RELANCE_VARIANTS[round];
+        const relanceStep = 7 + round; // distingue chaque relance dans le tracking des clics
         const htmlContent = buildHtmlEmail(
-          getRelanceEmailBody(prospect.first_name),
+          variant.body(prospect.first_name),
           prospect.email,
           relanceStep,
         );
-        const subject = RELANCE_SUBJECT.replace(/\{name\}/g, prospect.first_name || "vous");
+        const subject = variant.subject.replace(/\{name\}/g, prospect.first_name || "vous");
         try {
           const res = await fetch("https://api.brevo.com/v3/smtp/email", {
             method: "POST",
@@ -536,7 +538,7 @@ Deno.serve(async (req) => {
               to: [{ email: prospect.email, name: prospect.first_name || undefined }],
               subject,
               htmlContent,
-              tags: ["sales-relance"],
+              tags: ["sales-relance", `relance-${round + 1}`],
             }),
           });
           if (!res.ok) {
@@ -553,6 +555,7 @@ Deno.serve(async (req) => {
             last_email_sent_at: nowIso,
             relance_sent_at: nowIso,
             relance_status: "sent",
+            relance_round: round + 1,
           }).eq("id", prospect.id);
           sent++;
         } catch (relErr) {
