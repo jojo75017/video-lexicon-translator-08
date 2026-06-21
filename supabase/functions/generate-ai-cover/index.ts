@@ -121,7 +121,12 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
+    const user = await requireUser(req);
+    if (!user) {
+      return new Response(JSON.stringify({ error: 'Non authentifié' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
     const body = await req.json();
+
     const {
       title,
       subtitle = '',
