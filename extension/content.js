@@ -425,7 +425,7 @@
       </div>
       <div class="ebk-pane ebk-pane-score">
         <div class="ebk-score-row">
-          <div class="ebk-score" style="--c:${verdict.color}">
+          <div class="ebk-score" style="--c:${verdict.color};--c-pct:${score}">
             <div class="ebk-score-num">${score}</div>
             <div class="ebk-score-lbl">/100</div>
           </div>
