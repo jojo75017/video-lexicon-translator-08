@@ -173,6 +173,69 @@ Et si ça vous plaît, l'offre Fondateur à **67€ à vie** (V3 à 197€ inclu
 Georges`;
 }
 
+// ===== 3 nouvelles relances supplémentaires (alternance démo / offre) =====
+// Tournent via sales_prospects.relance_round (0 → 1 → 2). Objectif : maximiser les clics.
+const RELANCE_VARIANTS: { subject: string; body: (name: string) => string }[] = [
+  // Variante 1 — Démo / curiosité
+  {
+    subject: "🎬 {name}, regardez un livre s'écrire en 2 min",
+    body: (name) => `Bonjour ${name},
+
+Je vais faire plus simple que tous mes emails : je vous montre.
+
+👀 En **2 minutes chrono**, vous voyez l'IA générer en direct :
+• le plan complet d'un livre
+• les premiers chapitres rédigés
+• une couverture professionnelle
+
+Aucune carte bancaire, aucun engagement. Juste pour voir si ça vous parle.
+
+[[ 🎬 Lancer la démo gratuite maintenant | ${DEMO_LINK} ]]
+
+À tout de suite,
+Georges`,
+  },
+  // Variante 2 — Offre / valeur
+  {
+    subject: "🎁 {name}, 67€ à vie = la V3 (197€) offerte",
+    body: (name) => `${name},
+
+Petit rappel important : l'offre Fondateur ne durera pas.
+
+Pour **67€ une seule fois**, vous obtenez :
+✅ Le générateur d'ebooks IA en illimité
+✅ Les couvertures pro incluses
+✅ Le livre audio + le marketing & KDP intégrés
+✅ Et surtout : la **V3 (197€) offerte** à son lancement
+
+Le prix Fondateur augmentera dès la sortie de la V3. Aujourd'hui, c'est le meilleur moment.
+
+[[ 👉 Rejoindre les Fondateurs (67€ à vie) | ${OFFRES_LINK} ]]
+
+À bientôt,
+Georges`,
+  },
+  // Variante 3 — Démo + dernière main tendue
+  {
+    subject: "👋 {name}, une dernière démo avant qu'on arrête",
+    body: (name) => `${name},
+
+C'est sans doute mon dernier email — je ne veux pas vous harceler.
+
+Avant de tourner la page, une question honnête : qu'est-ce qui vous retient ? Le prix, le doute, le temps ?
+
+Le plus simple pour trancher, c'est de voir l'outil travailler, sans rien payer 👇
+
+[[ 🎬 Voir la démo gratuite (sans carte) | ${DEMO_LINK} ]]
+
+Et si vous préférez m'écrire, répondez simplement à cet email : je lis tout.
+
+Au plaisir d'échanger,
+Georges`,
+  },
+];
+const RELANCE_MAX_ROUNDS = RELANCE_VARIANTS.length;
+
 
 // ===== Segment "intéressés" : prospects qui ont déjà manifesté un intérêt =====
 // Version plus directe, orientée DÉMO + OFFRE (moins de pédagogie, plus d'action)
