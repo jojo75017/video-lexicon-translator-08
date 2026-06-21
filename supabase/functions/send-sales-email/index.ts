@@ -193,24 +193,22 @@ function getInteresseEmailBody(step: number, firstName: string): string {
 
 Vous avez manifesté de l'intérêt pour EbookStudio Pro — alors allons droit au but.
 
-Le plus simple, c'est de voir l'outil en action :
+Le plus parlant, c'est de voir l'outil travailler en direct : un sujet → un plan → des chapitres → une couverture, prêt pour Amazon KDP.
 
-👉 Démo gratuite (idée → livre Amazon en quelques clics) : ${DEMO_LINK}
-
-Et si vous voulez déjà l'offre complète :
-👉 ${OFFRES_LINK} — **67€ à vie** (paiement unique).
+[[ 🎬 Voir la démo gratuite (sans carte) | ${DEMO_LINK} ]]
 
 Testez, puis dites-moi ce que vous en pensez.
 Georges`,
 
     2: `${name},
 
-Avez-vous pris 2 minutes pour regarder la démo ? 👉 ${DEMO_LINK}
+Avez-vous pris 2 minutes pour regarder la démo ?
 
-Si oui, vous avez vu de quoi l'outil est capable : plan automatique, rédaction IA, couvertures pro, export Amazon KDP.
+Si oui, vous avez vu de quoi l'outil est capable : plan automatique, rédaction IA, couvertures pro, export Amazon KDP. Il est temps de passer à l'action.
 
 L'offre Fondateur est à **67€ à vie** (ou 2×35€ / 3×25€) :
-👉 ${OFFRES_LINK}
+
+[[ 👉 Profiter de l'offre Fondateur | ${OFFRES_LINK} ]]
 
 Georges`,
 
@@ -218,12 +216,11 @@ Georges`,
 
 Une vraie raison d'agir maintenant :
 
-Aujourd'hui = **67€ à vie**. La future V3 "Publication Assistée Pro" sera vendue 197€… et elle vous sera offerte en mise à jour.
+Aujourd'hui = **67€ à vie**. La future V3 « Publication Assistée Pro » sera vendue **197€**… et elle vous sera offerte en mise à jour.
 
 67€ aujourd'hui = un outil qui en vaudra 197€ demain.
 
-👉 Verrouiller mon accès : ${OFFRES_LINK}
-👉 Revoir la démo : ${DEMO_LINK}
+[[ 🔒 Verrouiller mon accès à 67€ | ${OFFRES_LINK} ]]
 
 Georges`,
 
@@ -235,8 +232,7 @@ Pourquoi ne pas attendre :
 • Chaque semaine sans outil = des livres non publiés.
 • La démo est gratuite, vous ne risquez rien à tester.
 
-👉 Tester : ${DEMO_LINK}
-👉 Rejoindre à 67€ : ${OFFRES_LINK}
+[[ 🎬 Tester gratuitement maintenant | ${DEMO_LINK} ]]
 
 Georges`,
 
@@ -249,10 +245,9 @@ EbookStudio Pro à **67€ à vie** :
 ✅ Couvertures pro
 ✅ Livre audio
 ✅ Marketing & KDP intégrés
-✅ Mise à jour V3 incluse
+✅ Mise à jour V3 (197€) incluse
 
-👉 Rejoindre : ${OFFRES_LINK}
-👉 Ou tester d'abord : ${DEMO_LINK}
+[[ 👉 Rejoindre les Fondateurs | ${OFFRES_LINK} ]]
 
 Georges`,
 
@@ -262,15 +257,18 @@ Je vous ai écrit plusieurs fois sans retour — c'est OK.
 
 Une question honnête : qu'est-ce qui vous retient ? Le prix, le doute, le temps ?
 
-Répondez-moi simplement, je lis tout. Et la démo reste gratuite :
-👉 ${DEMO_LINK}
-👉 L'offre 67€ à vie : ${OFFRES_LINK}
+Le plus simple pour trancher, c'est d'essayer sans rien payer 👇
+
+[[ 🎬 Tester la démo gratuite | ${DEMO_LINK} ]]
+
+Et si vous préférez m'écrire, répondez simplement à cet email : je lis tout.
 
 Au plaisir d'échanger,
 Georges`,
   };
 
   return bodies[step] || "";
+
 }
 
 function buildHtmlEmail(body: string, email?: string, step?: number): string {
