@@ -496,7 +496,8 @@ Deno.serve(async (req) => {
     const { data: prospects, error: fetchErr } = await query;
     if (fetchErr) throw fetchErr;
 
-    if (!prospects || prospects.length === 0) {
+    // En mode auto on continue même sans prospect de séquence : la passe relance s'exécute ensuite.
+    if ((!prospects || prospects.length === 0) && mode !== "auto") {
       return new Response(
         JSON.stringify({ success: true, sent: 0, message: "Aucun prospect à traiter" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
