@@ -355,7 +355,7 @@ const ProspectManagerPage = () => {
   const handleRelancesSupplementaires = async () => {
     const ids = prospects
       .filter(p =>
-        p.status === 'active' && !p.unsubscribed && p.completed &&
+        p.status === 'active' && !p.unsubscribed && (p.completed || (p.current_step ?? 0) >= 5) &&
         !hasClicked(p.email) && (p.relance_round ?? 0) < RELANCE_MAX_ROUNDS
       )
       .map(p => p.id);
