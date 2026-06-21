@@ -514,6 +514,10 @@ const ProspectManagerPage = () => {
   // Vérification d'envoi : combien de non-cliqueurs ont bien reçu la relance / en échec
   const relanceSentCount = nonClickerOpeners.filter(p => p.relance_status === 'sent').length;
   const relanceErrorCount = nonClickerOpeners.filter(p => p.relance_status === 'error').length;
+  // Cibles des relances supplémentaires : prospects à 5/5 (completed), non-cliqueurs, avec encore des variantes
+  const relancesSupplTargets = prospects.filter(
+    p => p.status === 'active' && !p.unsubscribed && p.completed && !hasClicked(p.email) && (p.relance_round ?? 0) < 3
+  ).length;
 
   const stepDistribution = STEPS.map(s => ({
     ...s,
