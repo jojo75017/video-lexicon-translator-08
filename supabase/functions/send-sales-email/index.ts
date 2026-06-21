@@ -406,6 +406,48 @@ Deno.serve(async (req) => {
         await new Promise(resolve => setTimeout(resolve, 400));
       }
 
+      // ===== Mode RELANCE : email dédié, n'incrémente pas l'étape =====
+      if (isRelance) {
+        const relanceStep = 7; // pour distinguer dans le tracking
+        const htmlContent = buildHtmlEmail(
+          getRelanceEmailBody(prospect.first_name),
+          prospect.email,
+          relanceStep,
+        );
+        const subject = RELANCE_SUBJECT.replace(/\{name\}/g, prospect.first_name || "vous");
+        try {
+          const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+            method: "POST",
+            headers: {
+              "api-key": brevoKey,
+              "Content-Type": "application/json",
+              accept: "application/json",
+            },
+            body: JSON.stringify({
+              sender: { name: "Georges Boubet", email: "noreply@ebookstudio.fr" },
+              to: [{ email: prospect.email, name: prospect.first_name || undefined }],
+              subject,
+              htmlContent,
+              tags: ["sales-relance"],
+            }),
+          });
+          if (!res.ok) {
+            console.error(`Brevo relance error for ${prospect.email}:`, await res.text());
+            errors++;
+            continue;
+          }
+          await supabase.from("sales_prospects").update({
+            last_email_sent_at: new Date().toISOString(),
+          }).eq("id", prospect.id);
+          sent++;
+        } catch (relErr) {
+          console.error(`Relance send error for ${prospect.email}:`, relErr);
+          errors++;
+        }
+        continue;
+      }
+
+
       const stepToSend = mode === "manual" && targetStep
         ? targetStep
         : prospect.current_step + 1;
