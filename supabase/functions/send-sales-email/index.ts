@@ -727,7 +727,7 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ success: true, sent: sent + relanceAutoSent, relanceAutoSent, errors, total: prospects.length, batchSize }),
+      JSON.stringify({ success: true, sent: sent + relanceAutoSent, relanceAutoSent, errors, total: prospects?.length || 0, batchSize }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err) {
