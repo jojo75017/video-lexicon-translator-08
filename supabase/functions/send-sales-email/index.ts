@@ -478,10 +478,10 @@ Deno.serve(async (req) => {
       query = query.eq("completed", false);
     }
 
-    // Anti-doublon : on ne relance jamais deux fois un prospect déjà relancé avec succès,
-    // sauf si l'appel force explicitement (body.force === true).
+    // Anti-doublon par variante : on relance tant que les 3 variantes ne sont pas épuisées
+    // (relance_round < RELANCE_MAX_ROUNDS), sauf si l'appel force explicitement (body.force === true).
     if (isRelance && !body.force) {
-      query = query.is("relance_sent_at", null);
+      query = query.lt("relance_round", RELANCE_MAX_ROUNDS);
     }
 
     if ((mode === "manual" || isRelance) && prospectIds?.length) {
