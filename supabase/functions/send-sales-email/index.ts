@@ -653,8 +653,80 @@ Deno.serve(async (req) => {
       }
     }
 
+    // ===== Passe RELANCE AUTOMATIQUE (cron) =====
+    // Prospects ayant terminé la séquence, non-cliqueurs, non-clients,
+    // avec encore des relances disponibles, espacées d'au moins 3 jours.
+    let relanceAutoSent = 0;
+    if (mode === "auto") {
+      const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
+      const { data: relanceTargets } = await supabase
+        .from("sales_prospects")
+        .select("*")
+        .eq("status", "active")
+        .eq("unsubscribed", false)
+        .eq("completed", true)
+        .lt("relance_round", RELANCE_MAX_ROUNDS)
+        .or(`relance_sent_at.is.null,relance_sent_at.lte.${threeDaysAgo}`)
+        .order("relance_sent_at", { ascending: true, nullsFirst: true })
+        .limit(batchSize);
+
+      for (let i = 0; i < (relanceTargets?.length || 0); i++) {
+        const prospect = relanceTargets![i];
+        if (i > 0) await new Promise((r) => setTimeout(r, 400));
+
+        // Stop si le prospect a déjà cliqué (lead chaud) → on ne le relance plus
+        const { count: clickCount } = await supabase
+          .from("email_clicks")
+          .select("id", { count: "exact", head: true })
+          .ilike("prospect_email", prospect.email);
+        if ((clickCount || 0) > 0) {
+          await supabase.from("sales_prospects")
+            .update({ relance_round: RELANCE_MAX_ROUNDS })
+            .eq("id", prospect.id);
+          continue;
+        }
+
+        const round = Math.min(prospect.relance_round ?? 0, RELANCE_MAX_ROUNDS - 1);
+        const variant = RELANCE_VARIANTS[round];
+        const relanceStep = 7 + round;
+        const htmlContent = buildHtmlEmail(variant.body(prospect.first_name), prospect.email, relanceStep);
+        const subject = variant.subject.replace(/\{name\}/g, prospect.first_name || "vous");
+        try {
+          const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+            method: "POST",
+            headers: { "api-key": brevoKey, "Content-Type": "application/json", accept: "application/json" },
+            body: JSON.stringify({
+              sender: { name: "Georges Boubet", email: "noreply@ebookstudio.fr" },
+              to: [{ email: prospect.email, name: prospect.first_name || undefined }],
+              subject,
+              htmlContent,
+              tags: ["sales-relance", "relance-auto", `relance-${round + 1}`],
+            }),
+          });
+          if (!res.ok) {
+            console.error(`Brevo relance auto error for ${prospect.email}:`, await res.text());
+            await supabase.from("sales_prospects").update({ relance_status: "error" }).eq("id", prospect.id);
+            errors++;
+            continue;
+          }
+          const nowIso = new Date().toISOString();
+          await supabase.from("sales_prospects").update({
+            last_email_sent_at: nowIso,
+            relance_sent_at: nowIso,
+            relance_status: "sent",
+            relance_round: round + 1,
+          }).eq("id", prospect.id);
+          relanceAutoSent++;
+        } catch (relErr) {
+          console.error(`Relance auto send error for ${prospect.email}:`, relErr);
+          await supabase.from("sales_prospects").update({ relance_status: "error" }).eq("id", prospect.id);
+          errors++;
+        }
+      }
+    }
+
     return new Response(
-      JSON.stringify({ success: true, sent, errors, total: prospects.length, batchSize }),
+      JSON.stringify({ success: true, sent: sent + relanceAutoSent, relanceAutoSent, errors, total: prospects.length, batchSize }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err) {
