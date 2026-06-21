@@ -361,7 +361,9 @@ Deno.serve(async (req) => {
     const targetStep = body.step; // for manual: which step to send
     const prospectIds = body.prospect_ids; // for manual: specific prospects
 
-    const batchSize = body.batch_size || 50; // Increased batch for faster processing
+    // relance = email dédié aux non-cliqueurs (ne touche pas à l'étape de séquence)
+    const isRelance = mode === "relance";
+    const batchSize = body.batch_size || (isRelance ? 200 : 50);
 
     let query = supabase
       .from("sales_prospects")
@@ -370,11 +372,12 @@ Deno.serve(async (req) => {
       .eq("unsubscribed", false)
       .eq("completed", false);
 
-    if (mode === "manual" && prospectIds?.length) {
+    if ((mode === "manual" || isRelance) && prospectIds?.length) {
       query = query.in("id", prospectIds);
     } else if (mode === "auto") {
       query = query.eq("auto_send", true).lte("next_email_at", new Date().toISOString());
     }
+
 
     query = query.order("next_email_at", { ascending: true }).limit(batchSize);
 
