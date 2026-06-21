@@ -287,6 +287,35 @@ const ProspectManagerPage = () => {
     setSending(false);
   };
 
+  // Relancer les "tièdes" = ont OUVERT mais jamais CLIQUÉ (meilleur potentiel inexploité)
+  const handleRelancerNonCliqueurs = async () => {
+    const ids = prospects
+      .filter(p => p.status === 'active' && !p.unsubscribed && hasOpened(p.email) && !hasClicked(p.email))
+      .map(p => p.id);
+
+    if (ids.length === 0) {
+      toast.error('Aucun prospect tiède (ouvreurs non-cliqueurs) à relancer');
+      return;
+    }
+
+    if (!confirm(`Envoyer un email de relance dédié à ${ids.length} prospect(s) qui ont ouvert sans cliquer ?`)) return;
+
+    setSending(true);
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      const { data, error } = await supabase.functions.invoke('send-sales-email', {
+        body: { mode: 'relance', prospect_ids: ids },
+        headers: { Authorization: `Bearer ${session.session?.access_token}` },
+      });
+      if (error) throw error;
+      toast.success(`🔁 ${data.sent} relance(s) envoyée(s) aux non-cliqueurs`);
+      fetchProspects();
+    } catch (err: any) {
+      toast.error('Erreur d\'envoi : ' + (err.message || ''));
+    }
+    setSending(false);
+  };
+
 
 
   // Rapatrier les prospects vers le CRM (table crm_contacts) pour alimenter le pipeline
@@ -528,6 +557,16 @@ const ProspectManagerPage = () => {
                 <Mail className="h-3 w-3 mr-1" />
                 {showClickedOnly ? '👆 Afficher tous' : `👆 Voir les ${clickCount} cliqueurs`}
               </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRelancerNonCliqueurs}
+                disabled={sending}
+                className="border-orange-500/40 text-orange-400 hover:bg-orange-500/10 font-semibold"
+              >
+                <RefreshCw className="h-3 w-3 mr-1" /> 🔁 Relancer les non-cliqueurs
+              </Button>
+
               <Button
                 variant="outline"
                 size="sm"

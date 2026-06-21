@@ -56,65 +56,60 @@ function getEmailBody(step: number, firstName: string): string {
   const bodies: Record<number, string> = {
     1: `Bonjour ${name},
 
-Il y a 18 mois, j'avais une idée de livre... et la page blanche me bloquait à chaque fois.
+Et si vous pouviez voir un livre de 150 pages s'écrire **sous vos yeux**, en quelques minutes ?
 
-Le problème n'était pas moi. C'était la méthode.
+Pas une promesse. Une démo gratuite, en direct : vous tapez un sujet, l'IA génère le plan, puis les chapitres, puis la couverture. Prêt pour Amazon KDP.
 
-Alors j'ai construit un outil qui gère tout : idée → plan → rédaction → illustrations → couverture → export Amazon KDP.
+Mon dernier livre ? **150 pages, 47 minutes.** (J'en ai 35+ publiés, profil Amazon public.)
 
-Résultat : mon dernier livre, 150 pages, généré en 47 minutes.
+Le plus simple, c'est de le voir vous-même 👇
 
-Aujourd'hui c'est EbookStudio Pro, et il est accessible à **67€ à vie** (paiement unique).
-
-👉 Découvrir l'outil : ${OFFRES_LINK}
-👉 Tester la démo gratuitement : ${DEMO_LINK}
+[[ 🎬 Voir la démo gratuite (sans carte) | ${DEMO_LINK} ]]
 
 À demain pour la suite,
 Georges`,
 
     2: `${name},
 
-Pourquoi 90% des gens qui veulent publier sur Amazon n'y arrivent jamais ?
+90% des gens qui veulent publier sur Amazon n'y arrivent jamais. Pas par manque de talent — à cause de 3 erreurs :
 
 ❌ Écrire sans plan → abandon à la page 12
-❌ Passer 3 semaines sur un seul livre
-❌ Négliger couverture et mots-clés → 0 vente
+❌ Y passer 3 semaines → découragement
+❌ Couverture + mots-clés négligés → 0 vente
 
-EbookStudio Pro règle les 3 d'un coup : plan automatique, génération en 47 min, couvertures pro + optimisation KDP.
+EbookStudio Pro règle les 3 d'un coup : plan automatique, rédaction en quelques minutes, couvertures pro et optimisation KDP incluses.
 
-Coût : ~0,30€ par livre.
+Voyez à quoi ça ressemble en vrai 👇
 
-👉 Voir l'outil : ${OFFRES_LINK}
+[[ 🎬 Tester la démo gratuitement | ${DEMO_LINK} ]]
 
 Georges`,
 
     3: `${name},
 
-Pas de pitch aujourd'hui, juste mes vrais chiffres :
+Pas de pitch aujourd'hui. Juste mes vrais chiffres :
 
-• 2023 : 0 livre publié
-• 2024 : 18 livres (à la main)
+• 2023 : 0 livre
+• 2024 : 18 livres (écrits à la main)
 • 2025-2026 : 35+ livres (avec EbookStudio)
 
-Mon profil Amazon est public : https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7
+Tout est public et vérifiable sur mon profil Amazon. La même machine qui m'a permis ça est désormais accessible à **67€ à vie**.
 
-L'outil complet (générateur IA, couvertures, livre audio, marketing) est à **67€ à vie**.
-
-👉 Accéder à l'offre : ${OFFRES_LINK}
+[[ 👉 Découvrir l'offre Fondateur (67€) | ${OFFRES_LINK} ]]
 
 Georges`,
 
     4: `${name},
 
-Une raison de ne pas attendre :
+Une seule raison de ne pas attendre :
 
-Aujourd'hui, EbookStudio Pro est à **67€ à vie**. Bientôt arrive la V3 "Publication Assistée Pro", qui sera vendue 197€.
+Aujourd'hui, EbookStudio Pro est à **67€ à vie**. Bientôt, la V3 « Publication Assistée Pro » sera vendue **197€**.
 
-🎁 Et les membres actuels recevront la V3 en **mise à jour gratuite**.
+🎁 Les membres actuels la recevront en **mise à jour gratuite**.
 
-Autrement dit : 67€ aujourd'hui = l'accès à un outil qui en vaudra 197€ demain.
+Autrement dit : 67€ aujourd'hui = un outil qui en vaudra 197€ demain. Le calcul est vite fait.
 
-👉 Verrouiller mon accès : ${OFFRES_LINK}
+[[ 🔒 Verrouiller mon accès à 67€ | ${OFFRES_LINK} ]]
 
 Georges`,
 
@@ -122,39 +117,62 @@ Georges`,
 
 Dernier rappel, je ne reviendrai pas dessus.
 
-EbookStudio Pro, c'est :
+EbookStudio Pro, à **67€ à vie** :
 ✅ Générateur IA illimité
 ✅ Couvertures pro
 ✅ Livre audio
 ✅ Marketing & KDP intégrés
-✅ Mise à jour V3 incluse
+✅ Mise à jour V3 (197€) incluse
 
-Le tout à **67€ à vie** (ou 2×35€ / 3×25€).
+(Possible en 2×35€ ou 3×25€.)
 
-👉 Rejoindre : ${OFFRES_LINK}
+[[ 👉 Rejoindre les Fondateurs | ${OFFRES_LINK} ]]
 
 Merci de m'avoir lu cette semaine,
 Georges`,
 
     6: `${name},
 
-Je vous ai écrit plusieurs fois et je n'ai pas eu de retour — c'est tout à fait OK.
+Je vous ai écrit plusieurs fois sans retour — et c'est tout à fait OK.
 
-Avant de vous laisser tranquille, juste une question honnête : qu'est-ce qui vous retient ?
+Avant de vous laisser tranquille, une question honnête : qu'est-ce qui vous retient ? Le prix, le doute que ça marche pour vous, le temps ?
 
-Le prix ? Le doute que ça marche pour vous ? Pas le temps ?
+Le plus simple pour lever le doute, c'est d'essayer sans rien payer 👇
 
-Répondez-moi simplement à cet email, je lis tout personnellement. Et si vous préférez juste tester sans rien payer :
+[[ 🎬 Tester la démo gratuite | ${DEMO_LINK} ]]
 
-👉 La démo gratuite est ici : ${DEMO_LINK}
-👉 Et l'offre à 67€ à vie reste là : ${OFFRES_LINK}
+Et si vous préférez m'écrire, répondez simplement à cet email : je lis tout personnellement.
 
-Au plaisir d'échanger,
+Au plaisir,
 Georges`,
   };
 
   return bodies[step] || "";
 }
+
+// ===== Email de RELANCE dédié (non-cliqueurs) — curiosité forte + démo =====
+const RELANCE_SUBJECT = "🎬 {name}, regardez un livre s'écrire en 2 min";
+function getRelanceEmailBody(firstName: string): string {
+  const name = firstName || "cher lecteur";
+  return `Bonjour ${name},
+
+Je ne sais pas si mes derniers emails vous ont parlé, alors je vais faire plus simple : je vous montre.
+
+👀 En **2 minutes chrono**, vous allez voir l'IA générer, en direct :
+• le plan complet d'un livre
+• les premiers chapitres rédigés
+• une couverture professionnelle
+
+Aucune carte bancaire, aucun engagement. Juste pour voir si ça vous parle.
+
+[[ 🎬 Lancer la démo gratuite maintenant | ${DEMO_LINK} ]]
+
+Et si ça vous plaît, l'offre Fondateur à **67€ à vie** (V3 à 197€ incluse) vous attend juste après.
+
+À tout de suite,
+Georges`;
+}
+
 
 // ===== Segment "intéressés" : prospects qui ont déjà manifesté un intérêt =====
 // Version plus directe, orientée DÉMO + OFFRE (moins de pédagogie, plus d'action)
@@ -175,24 +193,22 @@ function getInteresseEmailBody(step: number, firstName: string): string {
 
 Vous avez manifesté de l'intérêt pour EbookStudio Pro — alors allons droit au but.
 
-Le plus simple, c'est de voir l'outil en action :
+Le plus parlant, c'est de voir l'outil travailler en direct : un sujet → un plan → des chapitres → une couverture, prêt pour Amazon KDP.
 
-👉 Démo gratuite (idée → livre Amazon en quelques clics) : ${DEMO_LINK}
-
-Et si vous voulez déjà l'offre complète :
-👉 ${OFFRES_LINK} — **67€ à vie** (paiement unique).
+[[ 🎬 Voir la démo gratuite (sans carte) | ${DEMO_LINK} ]]
 
 Testez, puis dites-moi ce que vous en pensez.
 Georges`,
 
     2: `${name},
 
-Avez-vous pris 2 minutes pour regarder la démo ? 👉 ${DEMO_LINK}
+Avez-vous pris 2 minutes pour regarder la démo ?
 
-Si oui, vous avez vu de quoi l'outil est capable : plan automatique, rédaction IA, couvertures pro, export Amazon KDP.
+Si oui, vous avez vu de quoi l'outil est capable : plan automatique, rédaction IA, couvertures pro, export Amazon KDP. Il est temps de passer à l'action.
 
 L'offre Fondateur est à **67€ à vie** (ou 2×35€ / 3×25€) :
-👉 ${OFFRES_LINK}
+
+[[ 👉 Profiter de l'offre Fondateur | ${OFFRES_LINK} ]]
 
 Georges`,
 
@@ -200,12 +216,11 @@ Georges`,
 
 Une vraie raison d'agir maintenant :
 
-Aujourd'hui = **67€ à vie**. La future V3 "Publication Assistée Pro" sera vendue 197€… et elle vous sera offerte en mise à jour.
+Aujourd'hui = **67€ à vie**. La future V3 « Publication Assistée Pro » sera vendue **197€**… et elle vous sera offerte en mise à jour.
 
 67€ aujourd'hui = un outil qui en vaudra 197€ demain.
 
-👉 Verrouiller mon accès : ${OFFRES_LINK}
-👉 Revoir la démo : ${DEMO_LINK}
+[[ 🔒 Verrouiller mon accès à 67€ | ${OFFRES_LINK} ]]
 
 Georges`,
 
@@ -217,8 +232,7 @@ Pourquoi ne pas attendre :
 • Chaque semaine sans outil = des livres non publiés.
 • La démo est gratuite, vous ne risquez rien à tester.
 
-👉 Tester : ${DEMO_LINK}
-👉 Rejoindre à 67€ : ${OFFRES_LINK}
+[[ 🎬 Tester gratuitement maintenant | ${DEMO_LINK} ]]
 
 Georges`,
 
@@ -231,10 +245,9 @@ EbookStudio Pro à **67€ à vie** :
 ✅ Couvertures pro
 ✅ Livre audio
 ✅ Marketing & KDP intégrés
-✅ Mise à jour V3 incluse
+✅ Mise à jour V3 (197€) incluse
 
-👉 Rejoindre : ${OFFRES_LINK}
-👉 Ou tester d'abord : ${DEMO_LINK}
+[[ 👉 Rejoindre les Fondateurs | ${OFFRES_LINK} ]]
 
 Georges`,
 
@@ -244,15 +257,18 @@ Je vous ai écrit plusieurs fois sans retour — c'est OK.
 
 Une question honnête : qu'est-ce qui vous retient ? Le prix, le doute, le temps ?
 
-Répondez-moi simplement, je lis tout. Et la démo reste gratuite :
-👉 ${DEMO_LINK}
-👉 L'offre 67€ à vie : ${OFFRES_LINK}
+Le plus simple pour trancher, c'est d'essayer sans rien payer 👇
+
+[[ 🎬 Tester la démo gratuite | ${DEMO_LINK} ]]
+
+Et si vous préférez m'écrire, répondez simplement à cet email : je lis tout.
 
 Au plaisir d'échanger,
 Georges`,
   };
 
   return bodies[step] || "";
+
 }
 
 function buildHtmlEmail(body: string, email?: string, step?: number): string {
@@ -264,34 +280,62 @@ function buildHtmlEmail(body: string, email?: string, step?: number): string {
     return `${supabaseUrl}/functions/v1/track-email-click?e=${encodeURIComponent(email)}&s=${step ?? ""}&u=${encodeURIComponent(dest)}`;
   };
 
+  // Gros bouton CTA centré (c'est lui qui fait grimper les clics)
+  const bigButton = (label: string, dest: string): string =>
+    `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:28px auto;">
+      <tr><td style="border-radius:10px;background:#FF9E2D;">
+        <a href="${trackedLink(dest)}" style="display:inline-block;padding:16px 34px;color:#ffffff;text-decoration:none;font-weight:bold;font-size:17px;border-radius:10px;">${label}</a>
+      </td></tr>
+    </table>`;
+
+  const esc = (s: string) =>
+    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+  // 1) Boutons via syntaxe [[ label | url ]]   2) gras **...**   3) liens nus
   const htmlBody = body
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/\n/g, "<br>")
-    .replace(/→/g, "→")
-    .replace(/(https?:\/\/[^\s<]+)/g, (m) => `<a href="${trackedLink(m)}" style="color:#D4A017;">${m}</a>`)
-    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+    .split(/\n/)
+    .map((line) => {
+      const btnMatch = line.match(/^\s*\[\[\s*(.+?)\s*\|\s*(\S+)\s*\]\]\s*$/);
+      if (btnMatch) return bigButton(esc(btnMatch[1]), btnMatch[2]);
+      const safe = esc(line)
+        .replace(/(https?:\/\/[^\s<]+)/g, (m) => `<a href="${trackedLink(m)}" style="color:#008296;">${m}</a>`)
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+      return safe;
+    })
+    .join("<br>")
+    // évite les <br> superflus autour des boutons
+    .replace(/<br>(<table)/g, "$1")
+    .replace(/(<\/table>)<br>/g, "$1");
 
   const trackingPixel = email && step
     ? `<img src="${supabaseUrl}/functions/v1/track-email-open?e=${encodeURIComponent(email)}&s=${step}" width="1" height="1" alt="" style="display:none;" />`
     : "";
 
   return `<!DOCTYPE html>
-<html><head><meta charset="utf-8"></head>
-<body style="font-family:Arial,sans-serif;background:#ffffff;color:#1a1a1a;padding:32px;max-width:600px;margin:0 auto;">
-<div style="border-top:3px solid #D4A017;padding-top:20px;">
-${htmlBody}
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#FAFAFA;">
+<div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+  <div style="background:#008296;padding:22px 32px;">
+    <span style="color:#ffffff;font-family:Arial,sans-serif;font-size:20px;font-weight:bold;">EbookStudio <span style="color:#FF9E2D;">Pro</span></span>
+    <div style="color:#cdeef0;font-family:Arial,sans-serif;font-size:12px;margin-top:4px;">Votre livre, écrit par l'IA — prêt pour Amazon KDP</div>
+  </div>
+  <div style="padding:30px 32px 8px 32px;font-family:Arial,sans-serif;color:#232F3E;font-size:16px;line-height:1.6;">
+    ${htmlBody}
+  </div>
+  <div style="margin:8px 32px 24px 32px;padding:14px 18px;background:#e6f4f5;border-left:4px solid #008296;border-radius:8px;font-family:Arial,sans-serif;font-size:13px;color:#1f5f63;">
+    ✅ 35+ livres publiés par le créateur · 📖 Profil Amazon public · ⏱️ Un livre généré en 47 min
+  </div>
+  <div style="background:#FAFAFA;padding:18px 32px;border-top:1px solid #eee;font-family:Arial,sans-serif;font-size:12px;color:#888;text-align:center;">
+    Vous recevez cet email car vous avez manifesté un intérêt pour EbookStudio Pro.<br>
+    <a href="${trackedLink(OFFRES_LINK)}" style="color:#008296;">Voir l'offre</a> ·
+    <a href="${trackedLink(DEMO_LINK)}" style="color:#008296;">Tester la démo</a><br>
+    Pour ne plus recevoir ces emails, répondez "STOP" à cet email.
+  </div>
 </div>
-<hr style="border-color:#D4A017;margin-top:32px;">
-<p style="font-size:12px;color:#888;">
-Vous recevez cet email car vous avez manifesté un intérêt pour EbookStudio Pro.<br>
-<a href="${trackedLink(OFFRES_LINK)}" style="color:#D4A017;">Voir l'offre</a> · <a href="${trackedLink(DEMO_LINK)}" style="color:#D4A017;">Tester la démo</a><br>
-Pour ne plus recevoir ces emails, répondez "STOP" à cet email.
-</p>
 ${trackingPixel}
 </body></html>`;
 }
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -317,20 +361,27 @@ Deno.serve(async (req) => {
     const targetStep = body.step; // for manual: which step to send
     const prospectIds = body.prospect_ids; // for manual: specific prospects
 
-    const batchSize = body.batch_size || 50; // Increased batch for faster processing
+    // relance = email dédié aux non-cliqueurs (ne touche pas à l'étape de séquence)
+    const isRelance = mode === "relance";
+    const batchSize = body.batch_size || (isRelance ? 200 : 50);
 
     let query = supabase
       .from("sales_prospects")
       .select("*")
       .eq("status", "active")
-      .eq("unsubscribed", false)
-      .eq("completed", false);
+      .eq("unsubscribed", false);
 
-    if (mode === "manual" && prospectIds?.length) {
+    // La relance vise aussi les prospects ayant terminé la séquence (sans avoir cliqué).
+    if (!isRelance) {
+      query = query.eq("completed", false);
+    }
+
+    if ((mode === "manual" || isRelance) && prospectIds?.length) {
       query = query.in("id", prospectIds);
     } else if (mode === "auto") {
       query = query.eq("auto_send", true).lte("next_email_at", new Date().toISOString());
     }
+
 
     query = query.order("next_email_at", { ascending: true }).limit(batchSize);
 
@@ -354,6 +405,48 @@ Deno.serve(async (req) => {
       if (i > 0) {
         await new Promise(resolve => setTimeout(resolve, 400));
       }
+
+      // ===== Mode RELANCE : email dédié, n'incrémente pas l'étape =====
+      if (isRelance) {
+        const relanceStep = 7; // pour distinguer dans le tracking
+        const htmlContent = buildHtmlEmail(
+          getRelanceEmailBody(prospect.first_name),
+          prospect.email,
+          relanceStep,
+        );
+        const subject = RELANCE_SUBJECT.replace(/\{name\}/g, prospect.first_name || "vous");
+        try {
+          const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+            method: "POST",
+            headers: {
+              "api-key": brevoKey,
+              "Content-Type": "application/json",
+              accept: "application/json",
+            },
+            body: JSON.stringify({
+              sender: { name: "Georges Boubet", email: "noreply@ebookstudio.fr" },
+              to: [{ email: prospect.email, name: prospect.first_name || undefined }],
+              subject,
+              htmlContent,
+              tags: ["sales-relance"],
+            }),
+          });
+          if (!res.ok) {
+            console.error(`Brevo relance error for ${prospect.email}:`, await res.text());
+            errors++;
+            continue;
+          }
+          await supabase.from("sales_prospects").update({
+            last_email_sent_at: new Date().toISOString(),
+          }).eq("id", prospect.id);
+          sent++;
+        } catch (relErr) {
+          console.error(`Relance send error for ${prospect.email}:`, relErr);
+          errors++;
+        }
+        continue;
+      }
+
 
       const stepToSend = mode === "manual" && targetStep
         ? targetStep

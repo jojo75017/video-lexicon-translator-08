@@ -1,61 +1,41 @@
-## Objectif
+# Objectif : faire passer le taux de clic de ~1% à un niveau sain et relancer les prospects
 
-Augmenter le nombre de visiteurs qui laissent leur email (abonnés) et le nombre de clics vers l'inscription, sur toutes les pages publiques (SEO, blog, expatriés, accueil), avec un suivi clair du taux de conversion.
+Le constat : 56% d'ouverture (très bon) mais ~1% de clic. Le contenu et surtout l'absence de **vrai bouton d'action** tuent les clics. On retravaille le rendu visuel + les textes, puis on relance.
 
-On s'appuie sur l'existant : `LeadCapturePopup`, `FloatingToolCTA`, l'edge function `funnel-capture-lead`, les séquences `email-sequence-cron`, et la table `funnel_leads`. Aucune nouvelle dépendance lourde.
+## 1. Nouveau design visuel des emails (`send-sales-email`)
 
----
+Refonte de `buildHtmlEmail` pour des emails qui donnent envie de cliquer :
+- **En-tête de marque** clair (EbookStudio Pro, couleurs KDP : teal #008296, accent orange #FF9E2D).
+- **Un seul bouton CTA dominant** (gros bouton orange centré) au lieu de liens-texte noyés — c'est LE changement qui fait grimper les clics.
+- Support d'une syntaxe bouton dans les textes (`[[texte|url]]`) rendue en gros bouton traçable.
+- **Encadré preuve sociale** (35+ livres publiés, profil Amazon public, "généré en 47 min").
+- Mise en forme aérée : titres, puces avec icônes, espacements.
+- On garde le pixel d'ouverture et les liens traçables existants (le tracking ne change pas).
 
-## 1. Pop-up plus malin (`LeadCapturePopup.tsx`)
+## 2. Réécriture des corps d'emails (plus courts, 1 seule action)
 
-- **Déclenchement plus efficace** : en plus de l'exit-intent et du timer 30s, ajouter un déclenchement au **scroll à 50 %** de la page (souvent plus rapide sur mobile où l'exit-intent ne marche pas).
-- **Délai réduit** : passer le timer de 30s à ~18s pour capter plus tôt.
-- **Offre adaptée à la page** : détecter le contexte (page expatrié vs reste) — déjà partiellement fait — et afficher le bon lead magnet + visuel.
-- **Champ prénom optionnel** pour personnaliser les emails (déjà géré côté edge function via `first_name`).
-- **Anti-frustration** : une seule fois par session, mémorisé (déjà en place), on garde.
+Réécrire les 6 étapes des deux segments (`getEmailBody` froid + `getInteresseEmailBody` intéressés) :
+- Accroche forte dès la 1re ligne, texte resserré (on lit en 15 sec).
+- **Une seule action par email** (soit la démo, soit l'offre — pas les deux côte à côte qui dispersent le clic).
+- Bénéfice concret + curiosité (« voir le plan se générer sous vos yeux »).
+- Bouton bien visible via la nouvelle syntaxe `[[ Voir la démo gratuite → | lien ]]`.
+- Objets conservés (ils marchent déjà), légers ajustements seulement si utile.
 
-## 2. Bandeau / CTA permanent (`StickySignupBar.tsx` — nouveau)
+## 3. Relance des prospects depuis /gestion-prospects
 
-- Barre fine, sticky en bas (mobile) / haut (desktop), toujours visible sur les pages publiques : « Recevez le guide gratuit » + bouton qui ouvre le même formulaire de capture (réutilise l'appel `funnel-capture-lead`).
-- Masquée sur l'app interne via la même liste `EXCLUDED_PREFIXES`.
-- Refermable (mémorisé en sessionStorage), réapparaît à la session suivante.
-- Montée dans `App.tsx` à côté de `LeadCapturePopup`, uniquement si `!isAuthenticated`.
+Ajout d'un bouton **« 🔁 Relancer les non-cliqueurs »** dans la page Gestion Prospects :
+- Cible automatiquement les prospects qui ont **ouvert mais jamais cliqué** (vos ~357 leads tièdes les plus prometteurs).
+- Leur envoie un **nouvel email de relance dédié** (nouveau contenu n°7, orienté curiosité + démo, avec gros bouton), via le mode manuel de `send-sales-email`.
+- Confirmation du nombre d'emails envoyés (toast existant).
+- Le bouton existant « Relancer les chauds » reste, mais on clarifie : chauds = ont cliqué, tièdes = ont ouvert sans cliquer.
 
-## 3. Bloc de capture réutilisable sur les pages clés (`InlineLeadCapture.tsx` — nouveau)
+## 4. Vérification
 
-- Composant compact et réutilisable (titre, bénéfices, champ email, bouton) branché sur `funnel-capture-lead`, avec prop `leadMagnet` pour choisir l'offre.
-- Insertion sur les pages à fort trafic :
-  - Pages SEO (`SeoCreerEbookIaPage`, `SeoGenerateurEbookPage`, `SeoFrancophonesEtrangerPage`, `SeoGuideKdpEnfantsPage`)
-  - Blog (`BlogArticleTemplate` — bloc en milieu/fin d'article)
-  - Pages expatriés (offre `publier-kdp-etranger`)
-- Suit le thème KDP (fond #FAFAFA, accent teal #008296, hover orange #FF9E2D), pas de couleurs codées en dur hors tokens.
-
-## 4. Relance email automatique
-
-- **Réutiliser les séquences existantes** (`promo_funnel`, `expat_funnel`, `expat_reactivation`) du cron `email-sequence-cron`.
-- Vérifier que chaque nouveau point de capture inscrit bien le lead dans la bonne séquence (paramètre `lead_magnet` → séquence) côté `funnel-capture-lead`.
-- Ajouter une **relance « curieux non-inscrits »** : pour les leads inscrits mais qui n'ont jamais cliqué le guide (`lead_magnet_sent_at` mais 0 clic), une étape de relance douce dans la séquence promo. Ajustement léger des STEPS, pas de nouvelle infra.
-
-## 5. Mini tableau de bord de conversion (CRM)
-
-- Dans `CrmPage.tsx`, ajouter une carte **« Conversion visiteurs → abonnés »** en haut :
-  - **Visiteurs** (30 derniers jours) via `analytics--read_project_analytics`.
-  - **Inscrits** = nombre de `funnel_leads` sur la période.
-  - **Taux de conversion** = inscrits / visiteurs.
-  - **Clics guide** = inscrits avec ouverture/clic (via `email_opens` / `email_clicks` ou `lead_magnet_sent_at`).
-  - Répartition par source (utm_source) et par lead magnet (général vs expatrié).
-- Affichage immédiat au chargement avec état vide clair (déjà mis en place pour les inscrits).
-
----
+- Déploiement de la fonction `send-sales-email` mise à jour.
+- Test d'envoi sur 1–2 adresses pour valider le rendu visuel (bouton, en-tête, preuve sociale) avant relance de masse.
 
 ## Détails techniques
 
-- **Capture** : tous les points (pop-up, bandeau, bloc inline) appellent la même edge function `funnel-capture-lead` avec `utm`, `ref_code`, et `lead_magnet` adapté. Validation email côté client + déjà côté serveur.
-- **Tracking** : utiliser `trackFormSubmit`, `trackLeadMagnetDownload`, `trackCTAClick` (déjà présents) pour mesurer les clics.
-- **Exclusions** : factoriser la liste `EXCLUDED_PREFIXES` (partagée pop-up / bandeau / CTA flottant) pour ne jamais polluer l'app interne.
-- **Aucune migration DB requise** (réutilisation de `funnel_leads`, `email_sequences`, `email_opens`, `email_clicks`).
-- **Dashboard** : lecture seule (analytics + requêtes existantes), réservé à la page CRM déjà protégée.
-
-## Hors périmètre
-
-- Pas de refonte des pages, pas de nouveau provider email, pas de A/B testing avancé (peut venir plus tard).
+- Fichiers : `supabase/functions/send-sales-email/index.ts` (refonte `buildHtmlEmail`, textes, ajout étape relance), `src/pages/ProspectManagerPage.tsx` (bouton relance non-cliqueurs + appel `send-sales-email` mode manual sur la liste filtrée ouvreurs-non-cliqueurs).
+- Aucune migration DB nécessaire (on réutilise `sales_prospects`, `email_opens`, `email_clicks`).
+- Envoi via Brevo (inchangé), tracking ouverture/clic inchangé.
