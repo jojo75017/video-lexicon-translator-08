@@ -1,8 +1,9 @@
-// EbookStudio Scanner — Analyse Amazon Kindle complète
+// EbookStudio Scanner — Analyse Amazon Kindle (données fiables via backend PA-API)
 (function () {
   const STORAGE_KEY = "ebkstudio_history";
   const MAX_HISTORY = 30;
 
+  // ============ DÉTECTION ============
   function detectMarketplace() {
     const host = location.hostname;
     if (host.includes("amazon.fr")) return "fr";
@@ -26,10 +27,9 @@
     return /\/(dp|gp\/product)\/[A-Z0-9]{10}/.test(location.pathname);
   }
 
-  // ============ PARSING FIABLE ============
+  // ============ PARSING DOM (fallback / affichage immédiat) ============
   function parseNumber(str) {
     if (!str) return null;
-    // Normalise: supprime espaces (insécables compris), points, virgules
     const cleaned = String(str).replace(/[\s\u00A0.,]/g, "");
     const n = parseInt(cleaned, 10);
     return isNaN(n) ? null : n;
@@ -37,19 +37,16 @@
 
   function parsePrice(str) {
     if (!str) return null;
-    // Cherche un nombre style 12,34 ou 12.34 (en évitant les milliers)
     const m = String(str).match(/(\d+)[.,](\d{2})(?!\d)/);
     if (!m) return null;
     return parseFloat(`${m[1]}.${m[2]}`);
   }
 
   function extractBsrFromProduct() {
-    // Stratégie 1: tableau de détails produit
     const detailRows = document.querySelectorAll("#detailBulletsWrapper_feature_div li, #productDetails_detailBullets_sections1 tr, #prodDetails tr");
     for (const row of detailRows) {
       const txt = row.innerText || "";
       if (/(Best\s*Sellers?\s*Rank|Classement|Amazon\s*Bestsellers?\s*Rank|Meilleurs?\s*ventes)/i.test(txt)) {
-        // Prend le PREMIER nombre suivi de "in/en/dans/Boutique/Kindle/Paid"
         const m = txt.match(/[#nN][°o]?\s*([\d\s.,\u00A0]{2,})\s+(?:in|en|dans|Paid)/);
         if (m) {
           const n = parseNumber(m[1]);
@@ -57,7 +54,6 @@
         }
       }
     }
-    // Stratégie 2: SalesRank explicite
     const rankEl = document.querySelector("#SalesRank, [data-feature-name='salesRank']");
     if (rankEl) {
       const m = rankEl.innerText.match(/[#nN][°o]?\s*([\d\s.,\u00A0]{2,})/);
@@ -118,8 +114,12 @@
     return null;
   }
 
+  function extractCover() {
+    const el = document.querySelector("#imgBlkFront, #ebooksImgBlkFront, #landingImage, #main-image");
+    return el ? (el.getAttribute("src") || el.getAttribute("data-old-hires") || null) : null;
+  }
+
   function extractFormatPages() {
-    // Cherche "Format Kindle" et "X pages"
     const txt = document.body.innerText || "";
     const pagesMatch = txt.match(/(\d{1,4})\s*pages/i);
     const formatEl = document.querySelector("#productSubtitle, #tmmSwatches .selected, [data-feature-name='kformat']");
@@ -130,7 +130,6 @@
   }
 
   function extractPublicationDate() {
-    // Cherche "Date de publication" dans les détails
     const detailRows = document.querySelectorAll("#detailBulletsWrapper_feature_div li, #productDetails_detailBullets_sections1 tr");
     for (const row of detailRows) {
       const txt = row.innerText || "";
@@ -159,7 +158,9 @@
       price: extractPriceFromProduct(),
       reviews: extractReviewsFromProduct(),
       description: extractDescription(),
+      cover: extractCover(),
       marketplace: detectMarketplace(),
+      source: "dom",
     };
   }
 
@@ -168,7 +169,6 @@
 
   function extractKeywords(title, description) {
     const text = `${title || ""} ${description || ""}`.toLowerCase();
-    // Mots simples (>= 4 lettres)
     const words = text.match(/[a-zàâäéèêëïîôöùûüç]{4,}/gi) || [];
     const freq = {};
     words.forEach(w => {
@@ -177,7 +177,6 @@
     });
     const top = Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, 8).map(e => e[0]);
 
-    // Bigrammes
     const tokens = text.match(/[a-zàâäéèêëïîôöùûüç]+/gi) || [];
     const bigrams = {};
     for (let i = 0; i < tokens.length - 1; i++) {
@@ -191,18 +190,18 @@
     return { single: top, longTail: topBigrams };
   }
 
-  // ============ SCORING ============
+  // ============ SCORING & ESTIMATIONS ============
   function estimateFromBsr(bsr) {
     if (!bsr || bsr <= 0) return { daily: 0, monthly: 0 };
     let daily;
-    if (bsr <= 100) daily = 800;
-    else if (bsr <= 1000) daily = 250;
-    else if (bsr <= 5000) daily = 60;
-    else if (bsr <= 20000) daily = 15;
-    else if (bsr <= 100000) daily = 4;
-    else if (bsr <= 500000) daily = 1;
-    else daily = 0.2;
-    return { daily: Math.round(daily), monthly: Math.round(daily * 30) };
+    if (bsr <= 100) daily = 50;
+    else if (bsr <= 1000) daily = 12;
+    else if (bsr <= 5000) daily = 5;
+    else if (bsr <= 20000) daily = 2;
+    else if (bsr <= 100000) daily = 1;
+    else if (bsr <= 500000) daily = 0.3;
+    else daily = 0.1;
+    return { daily: Math.round(daily * 10) / 10, monthly: Math.round(daily * 30) };
   }
 
   function scoreFromMetrics({ bsr, price, reviews }) {
@@ -244,24 +243,46 @@
     return { label: "Forte", color: "#ef4444" };
   }
 
+  // ============ RECOMMANDATIONS ============
+  function buildRecommendations(m) {
+    const recs = [];
+    if (m.reviews !== null && m.reviews !== undefined) {
+      if (m.reviews < 50) recs.push({ icon: "✅", t: "Peu d'avis : niche encore accessible, fenêtre d'opportunité." });
+      else if (m.reviews >= 500) recs.push({ icon: "⚠️", t: "Beaucoup d'avis : concurrence installée, différencie-toi fort." });
+    }
+    if (m.price !== null && m.price !== undefined) {
+      if (m.price < 2.99) recs.push({ icon: "💸", t: "Prix bas : marge faible, vise 4–9,99 € pour 70 % de royalties." });
+      else if (m.price > 15) recs.push({ icon: "💰", t: "Prix élevé : possible de se positionner moins cher." });
+      else recs.push({ icon: "👍", t: "Prix dans la zone saine (4–15 €)." });
+    }
+    if (m.bsr) {
+      if (m.bsr <= 20000) recs.push({ icon: "🔥", t: "BSR très bon : demande réelle et soutenue." });
+      else if (m.bsr > 200000) recs.push({ icon: "🐢", t: "BSR faible : peu de ventes, vérifie la demande globale." });
+    }
+    if (m.rating !== null && m.rating !== undefined && m.rating < 4 && m.reviews && m.reviews > 20) {
+      recs.push({ icon: "🎯", t: "Note moyenne : un livre mieux noté peut prendre la place." });
+    }
+    if (!recs.length) recs.push({ icon: "ℹ️", t: "Données partielles — ouvre la fiche complète pour plus de précision." });
+    return recs.slice(0, 4);
+  }
+
   // ============ HISTORIQUE ============
   function saveToHistory(entry) {
     if (!chrome?.storage?.local) return;
     chrome.storage.local.get([STORAGE_KEY], (res) => {
       const list = res[STORAGE_KEY] || [];
-      // Évite doublons (par ASIN)
       const filtered = list.filter(x => x.asin !== entry.asin);
       filtered.unshift({ ...entry, scannedAt: Date.now() });
       chrome.storage.local.set({ [STORAGE_KEY]: filtered.slice(0, MAX_HISTORY) });
     });
   }
 
-  // ============ ANALYSE PAGE DE RECHERCHE ============
+  // ============ PAGE DE RECHERCHE ============
   function scanSearchResults() {
     const results = document.querySelectorAll("[data-component-type='s-search-result']");
     const items = [];
     results.forEach((card, idx) => {
-      if (idx >= 10) return;
+      if (idx >= 12) return;
       const asin = card.getAttribute("data-asin");
       if (!asin || asin.length !== 10) return;
       const titleEl = card.querySelector("h2 span, h2 a span");
@@ -276,10 +297,7 @@
       items.push({
         asin,
         title: titleEl?.innerText?.trim()?.slice(0, 80) || "?",
-        price,
-        reviews,
-        rating,
-        card,
+        price, reviews, rating, card,
       });
     });
     return items;
@@ -287,7 +305,6 @@
 
   function highlightNuggets(items) {
     items.forEach(item => {
-      // Pépite = peu d'avis (<100) + bon prix (>=2.99)
       if (item.reviews !== null && item.reviews < 100 && item.price && item.price >= 2.99) {
         const badge = document.createElement("div");
         badge.className = "ebk-nugget-badge";
@@ -308,7 +325,6 @@
     const avgPrice = withPrice.length ? (withPrice.reduce((s, i) => s + i.price, 0) / withPrice.length) : null;
     const nuggets = items.filter(i => i.reviews !== null && i.reviews < 100 && i.price && i.price >= 2.99).length;
 
-    // Score niche : peu d'avis moyens = bon, prix moyen sain = bon
     let nicheScore = 0;
     if (avgReviews !== null) {
       if (avgReviews < 50) nicheScore += 50;
@@ -335,6 +351,7 @@
     box.innerHTML = content;
     document.body.appendChild(box);
     box.querySelector(".ebk-close")?.addEventListener("click", () => box.remove());
+    return box;
   }
 
   function copyText(text, btn) {
@@ -345,42 +362,70 @@
     });
   }
 
+  function headHtml() {
+    return `
+      <div class="ebk-head">
+        <span class="ebk-logo"><span class="ebk-logo-dot">📚</span> EbookStudio <em>Scanner</em></span>
+        <button class="ebk-close" aria-label="Fermer">×</button>
+      </div>`;
+  }
+
+  function skeletonBadge(title) {
+    return `
+      ${headHtml()}
+      <div class="ebk-book-info">
+        <div class="ebk-book-title">${title || "Analyse en cours…"}</div>
+      </div>
+      <div class="ebk-loading">
+        <div class="ebk-spinner"></div>
+        <div class="ebk-loading-txt">Récupération des données fiables (Amazon officiel)…</div>
+        <div class="ebk-skel"></div>
+        <div class="ebk-skel" style="width:70%"></div>
+        <div class="ebk-skel" style="width:85%"></div>
+      </div>`;
+  }
+
   function renderProductBadge(metrics, keywords) {
     const score = scoreFromMetrics(metrics);
     const verdict = verdictFromScore(score);
     const est = estimateFromBsr(metrics.bsr);
+    const monthly = metrics.estimatedMonthlySales ?? est.monthly;
+    const daily = metrics.estimatedDailySales ?? est.daily;
+    const revenue = metrics.estimatedMonthlyRevenue ?? Math.round(monthly * (metrics.price || 4.99) * 0.7);
     const comp = competitionFromReviews(metrics.reviews);
+    const recs = buildRecommendations(metrics);
 
     const mp = (metrics.marketplace || "fr").toUpperCase();
     const stars = metrics.rating ? "★".repeat(Math.round(metrics.rating)) + "☆".repeat(5 - Math.round(metrics.rating)) : "—";
     const titleSafe = (metrics.title || "(titre introuvable)").replace(/"/g, "&quot;");
+    const reliable = metrics.source && metrics.source.includes("paapi");
+    const fiab = reliable ? "Source officielle Amazon" : "Estimation (lecture page)";
 
     return `
-      <div class="ebk-head">
-        <span class="ebk-logo">📚 EbookStudio</span>
-        <button class="ebk-close" aria-label="Fermer">×</button>
-      </div>
+      ${headHtml()}
       <div class="ebk-book-info">
-        <div class="ebk-book-title" title="${titleSafe}">${metrics.title || "(titre introuvable)"}</div>
-        <div class="ebk-book-author">${metrics.author ? "par " + metrics.author : ""}</div>
-        <div class="ebk-book-meta">
-          <span class="ebk-asin" title="Cliquer pour copier">ASIN: <b>${metrics.asin || "—"}</b></span>
-          <span class="ebk-mp">🌍 .${mp.toLowerCase()}</span>
+        <div class="ebk-book-row">
+          ${metrics.cover ? `<img class="ebk-cover" src="${metrics.cover}" alt="" />` : ""}
+          <div class="ebk-book-text">
+            <div class="ebk-book-title" title="${titleSafe}">${metrics.title || "(titre introuvable)"}</div>
+            <div class="ebk-book-author">${metrics.author ? "par " + metrics.author : ""}</div>
+          </div>
         </div>
         <div class="ebk-book-meta">
-          <span>${metrics.format || "Format Kindle"}</span>
+          <span class="ebk-asin" title="Cliquer pour copier">ASIN <b>${metrics.asin || "—"}</b></span>
+          <span class="ebk-mp">🌍 .${mp.toLowerCase()}</span>
           ${metrics.pages ? `<span>📖 ${metrics.pages} p.</span>` : ""}
           ${metrics.rating ? `<span class="ebk-stars">${stars} ${metrics.rating.toFixed(1)}</span>` : ""}
         </div>
-        ${metrics.publishedAt ? `<div class="ebk-book-meta"><span>📅 ${metrics.publishedAt}</span></div>` : ""}
       </div>
       <div class="ebk-tabs">
         <button class="ebk-tab ebk-active" data-tab="score">Score</button>
+        <button class="ebk-tab" data-tab="niche">Niche</button>
         <button class="ebk-tab" data-tab="kw">Mots-clés</button>
       </div>
       <div class="ebk-pane ebk-pane-score">
         <div class="ebk-score-row">
-          <div class="ebk-score" style="--c:${verdict.color}">
+          <div class="ebk-score" style="--c:${verdict.color};--c-pct:${score}">
             <div class="ebk-score-num">${score}</div>
             <div class="ebk-score-lbl">/100</div>
           </div>
@@ -389,15 +434,22 @@
           </div>
         </div>
         <div class="ebk-stats">
-          <div class="ebk-stat"><span>Ventes/jour</span><b>~${est.daily}</b></div>
-          <div class="ebk-stat"><span>Ventes/mois</span><b>~${est.monthly}</b></div>
-          <div class="ebk-stat"><span>Concurrence</span><b style="color:${comp.color}">${comp.label}</b></div>
+          <div class="ebk-stat"><span>Ventes/jour</span><b>~${daily}</b></div>
+          <div class="ebk-stat"><span>Ventes/mois</span><b>~${monthly}</b></div>
           <div class="ebk-stat"><span>BSR</span><b>${metrics.bsr ? "#" + metrics.bsr.toLocaleString("fr-FR") : "—"}</b></div>
           <div class="ebk-stat"><span>Prix</span><b>${metrics.price ? metrics.price.toFixed(2) + " €" : "—"}</b></div>
-          <div class="ebk-stat"><span>Avis</span><b>${metrics.reviews !== null ? metrics.reviews.toLocaleString("fr-FR") : "—"}</b></div>
+          <div class="ebk-stat"><span>Avis</span><b>${metrics.reviews !== null && metrics.reviews !== undefined ? metrics.reviews.toLocaleString("fr-FR") : "—"}</b></div>
+          <div class="ebk-stat"><span>Concurrence</span><b style="color:${comp.color}">${comp.label}</b></div>
         </div>
         <div class="ebk-revenue">
-          💰 Revenus estimés/mois : <b>~${(est.monthly * (metrics.price || 4.99) * 0.7).toFixed(0)} €</b>
+          💰 Revenus estimés / mois : <b>~${revenue} €</b>
+          <div class="ebk-fiab ${reliable ? "ok" : ""}">${reliable ? "🟢" : "🟡"} ${fiab}</div>
+        </div>
+      </div>
+      <div class="ebk-pane ebk-pane-niche" style="display:none">
+        <div class="ebk-kw-label">Recommandations</div>
+        <div class="ebk-recs">
+          ${recs.map(r => `<div class="ebk-rec"><span class="ebk-rec-i">${r.icon}</span><span>${r.t}</span></div>`).join("")}
         </div>
       </div>
       <div class="ebk-pane ebk-pane-kw" style="display:none">
@@ -422,21 +474,15 @@
     `;
   }
 
-  function renderSearchBadge(analysis, items) {
+  function renderSearchBadge(analysis) {
     if (!analysis) {
-      return `
-        <div class="ebk-head"><span class="ebk-logo">📚 EbookStudio</span><button class="ebk-close">×</button></div>
-        <div class="ebk-search-msg">🔍 Analyse impossible (aucun résultat détecté).</div>
-      `;
+      return `${headHtml()}<div class="ebk-search-msg">🔍 Analyse impossible (aucun résultat détecté).</div>`;
     }
     const verdict = verdictFromScore(analysis.nicheScore);
     return `
-      <div class="ebk-head">
-        <span class="ebk-logo">📚 EbookStudio — Niche</span>
-        <button class="ebk-close" aria-label="Fermer">×</button>
-      </div>
+      ${headHtml()}
       <div class="ebk-score-row">
-        <div class="ebk-score" style="--c:${verdict.color}">
+        <div class="ebk-score" style="--c:${verdict.color};--c-pct:${analysis.nicheScore}">
           <div class="ebk-score-num">${analysis.nicheScore}</div>
           <div class="ebk-score-lbl">/100</div>
         </div>
@@ -450,8 +496,8 @@
         <div class="ebk-stat"><span>Avis moyen</span><b>${analysis.avgReviews !== null ? analysis.avgReviews.toLocaleString("fr-FR") : "—"}</b></div>
         <div class="ebk-stat"><span>Prix moyen</span><b>${analysis.avgPrice !== null ? analysis.avgPrice.toFixed(2) + " €" : "—"}</b></div>
       </div>
-      <div class="ebk-search-msg" style="font-size:11px">
-        💎 Les livres entourés en vert dans les résultats sont des opportunités (peu d'avis + prix sain).
+      <div class="ebk-search-msg">
+        💎 Les livres entourés en vert sont des opportunités (peu d'avis + prix sain).
       </div>
       <a class="ebk-cta" href="https://www.ebookstudio.fr/offres" target="_blank" rel="noopener">
         Analyse complète sur EbookStudio →
@@ -459,8 +505,7 @@
     `;
   }
 
-  function attachInteractions() {
-    const box = document.getElementById("ebkstudio-badge");
+  function attachInteractions(box) {
     if (!box) return;
     box.querySelectorAll(".ebk-tab").forEach(tab => {
       tab.addEventListener("click", () => {
@@ -468,6 +513,8 @@
         tab.classList.add("ebk-active");
         const target = tab.dataset.tab;
         box.querySelector(".ebk-pane-score").style.display = target === "score" ? "" : "none";
+        const niche = box.querySelector(".ebk-pane-niche");
+        if (niche) niche.style.display = target === "niche" ? "" : "none";
         box.querySelector(".ebk-pane-kw").style.display = target === "kw" ? "" : "none";
       });
     });
@@ -490,24 +537,65 @@
     }
   }
 
+  // Fusionne données backend fiables par-dessus le DOM
+  function mergeBackend(dom, data) {
+    const m = { ...dom };
+    const pick = (k) => { if (data[k] !== null && data[k] !== undefined) m[k] = data[k]; };
+    ["title", "author", "price", "rating", "reviews", "bsr", "pages",
+     "estimatedDailySales", "estimatedMonthlySales", "estimatedMonthlyRevenue"].forEach(pick);
+    if (!m.description && data.description) m.description = data.description;
+    if (data.source) m.source = data.source;
+    return m;
+  }
+
   // ============ MAIN ============
+  function renderProduct(metrics) {
+    const keywords = extractKeywords(metrics.title, metrics.description);
+    const box = injectBadge(renderProductBadge(metrics, keywords));
+    attachInteractions(box);
+    if (metrics.asin) {
+      saveToHistory({
+        asin: metrics.asin,
+        title: metrics.title,
+        bsr: metrics.bsr,
+        price: metrics.price,
+        reviews: metrics.reviews,
+        score: scoreFromMetrics(metrics),
+        marketplace: metrics.marketplace,
+        url: location.href,
+      });
+    }
+  }
+
   function run() {
     if (isProductPage()) {
-      const metrics = parseProductPage();
-      const keywords = extractKeywords(metrics.title, metrics.description);
-      injectBadge(renderProductBadge(metrics, keywords));
-      attachInteractions();
-      if (metrics.asin) {
-        saveToHistory({
-          asin: metrics.asin,
-          title: metrics.title,
-          bsr: metrics.bsr,
-          price: metrics.price,
-          reviews: metrics.reviews,
-          score: scoreFromMetrics(metrics),
-          marketplace: detectMarketplace(),
-          url: location.href,
-        });
+      const dom = parseProductPage();
+      // Affichage immédiat : skeleton
+      injectBadge(skeletonBadge(dom.title));
+
+      const asin = dom.asin;
+      if (asin && chrome?.runtime?.sendMessage) {
+        let answered = false;
+        const timer = setTimeout(() => {
+          if (!answered) renderProduct(dom); // fallback DOM si backend lent
+        }, 14000);
+
+        try {
+          chrome.runtime.sendMessage(
+            { type: "SCAN_ASIN", asin, marketplace: dom.marketplace },
+            (resp) => {
+              answered = true;
+              clearTimeout(timer);
+              if (resp && resp.ok && resp.data) renderProduct(mergeBackend(dom, resp.data));
+              else renderProduct(dom);
+            }
+          );
+        } catch {
+          clearTimeout(timer);
+          renderProduct(dom);
+        }
+      } else {
+        renderProduct(dom);
       }
       return;
     }
@@ -515,7 +603,7 @@
       const items = scanSearchResults();
       highlightNuggets(items);
       const analysis = analyzeSearchNiche(items);
-      injectBadge(renderSearchBadge(analysis, items));
+      injectBadge(renderSearchBadge(analysis));
       return;
     }
   }

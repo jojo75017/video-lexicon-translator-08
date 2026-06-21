@@ -194,15 +194,19 @@ const ExtensionChromePage = () => {
 
                   {/* THE REAL EXTENSION POPUP - floating top-right */}
                   <div className="absolute top-3 right-3 w-[260px] bg-[#FAFAFA] rounded-xl shadow-2xl border border-black/10 overflow-hidden">
-                    {/* Header gradient orange → teal */}
-                    <div className="px-3 py-2.5 text-white relative" style={{ background: 'linear-gradient(135deg, #FF9E2D, #008296)' }}>
+                    {/* Header sombre EbookStudio */}
+                    <div className="px-3 py-2.5 text-white relative bg-[#232F3E]">
                       <div className="flex items-start justify-between">
                         <div>
-                          <div className="font-bold text-[13px] flex items-center gap-1.5">📚 Ebookstudio Pro V2</div>
+                          <div className="font-bold text-[13px] flex items-center gap-1.5">
+                            <span className="inline-flex w-5 h-5 items-center justify-center rounded bg-[#008296] text-[10px]">📚</span>
+                            EbookStudio <span className="text-[#FF9E2D]">Scanner</span>
+                          </div>
                         </div>
-                        <button className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]">×</button>
+                        <button className="w-5 h-5 rounded-md bg-white/15 flex items-center justify-center text-[10px]">×</button>
                       </div>
                     </div>
+
 
                     {/* Book info */}
                     <div className="px-3 pt-2.5 pb-2 bg-white">

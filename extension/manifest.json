@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "EbookStudio Scanner — Niches KDP",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Analyse de niche KDP : score /100, ASIN, titre, auteur, BSR, prix, avis, ventes & revenus estimés, mots-clés, historique avec export CSV. Multi-marketplaces.",
   "permissions": ["activeTab", "storage", "scripting", "tabs"],
   "host_permissions": [
