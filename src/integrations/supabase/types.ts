@@ -128,6 +128,24 @@ export type Database = {
         }
         Relationships: []
       }
+      app_secrets: {
+        Row: {
+          created_at: string
+          key: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          key: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          key?: string
+          value?: string
+        }
+        Relationships: []
+      }
       audiobooks: {
         Row: {
           audio_url: string | null
