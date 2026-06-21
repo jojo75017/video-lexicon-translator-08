@@ -516,7 +516,7 @@ const ProspectManagerPage = () => {
   const relanceErrorCount = nonClickerOpeners.filter(p => p.relance_status === 'error').length;
   // Cibles des relances supplémentaires : prospects à 5/5 (completed), non-cliqueurs, avec encore des variantes
   const relancesSupplTargets = prospects.filter(
-    p => p.status === 'active' && !p.unsubscribed && p.completed && !hasClicked(p.email) && (p.relance_round ?? 0) < 3
+    p => p.status === 'active' && !p.unsubscribed && (p.completed || (p.current_step ?? 0) >= 5) && !hasClicked(p.email) && (p.relance_round ?? 0) < 3
   ).length;
 
   const stepDistribution = STEPS.map(s => ({
