@@ -16,53 +16,15 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 
-    // Parse request body for email-based check
-    let emailToCheck: string | null = null;
-    try {
-      const body = await req.json();
-      emailToCheck = body?.email?.toLowerCase()?.trim() || null;
-    } catch {
-      // No body or invalid JSON - continue with session-based check
-    }
-
-    // METHOD 1: Email-based permanent admin check (no session required)
-    if (emailToCheck) {
-      console.log('Checking permanent admin by email:', emailToCheck);
-      
-      if (emailToCheck === PERMANENT_ADMIN_EMAIL) {
-        // Verify in database using service role
-        const adminClient = createClient(supabaseUrl, supabaseServiceKey);
-        
-        const { data: hasRole, error: roleError } = await adminClient
-          .rpc('has_role', { _email: emailToCheck, _role: 'admin' });
-        
-        if (roleError) {
-          console.error('Error checking role by email:', roleError);
-        }
-        
-        if (hasRole === true) {
-          console.log('Permanent admin confirmed by email:', emailToCheck);
-          return new Response(
-            JSON.stringify({ isAdmin: true, permanent: true }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
-      }
-      
-      return new Response(
-        JSON.stringify({ isAdmin: false }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // METHOD 2: Session-based admin check (original logic)
+    // SECURITY: vérification basée UNIQUEMENT sur la session (JWT).
+    // Le chemin "par email" non authentifié a été supprimé (probe d'admin).
     const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
       global: {
         headers: { Authorization: req.headers.get('Authorization')! },
       },
     });
+
 
     // Get authenticated user
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
