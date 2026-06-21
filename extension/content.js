@@ -578,7 +578,7 @@
         let answered = false;
         const timer = setTimeout(() => {
           if (!answered) renderProduct(dom); // fallback DOM si backend lent
-        }, 9000);
+        }, 14000);
 
         try {
           chrome.runtime.sendMessage(
