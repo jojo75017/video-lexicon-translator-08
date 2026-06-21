@@ -369,8 +369,12 @@ Deno.serve(async (req) => {
       .from("sales_prospects")
       .select("*")
       .eq("status", "active")
-      .eq("unsubscribed", false)
-      .eq("completed", false);
+      .eq("unsubscribed", false);
+
+    // La relance vise aussi les prospects ayant terminé la séquence (sans avoir cliqué).
+    if (!isRelance) {
+      query = query.eq("completed", false);
+    }
 
     if ((mode === "manual" || isRelance) && prospectIds?.length) {
       query = query.in("id", prospectIds);
