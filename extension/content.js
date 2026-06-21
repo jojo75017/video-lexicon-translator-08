@@ -482,7 +482,7 @@
     return `
       ${headHtml()}
       <div class="ebk-score-row">
-        <div class="ebk-score" style="--c:${verdict.color}">
+        <div class="ebk-score" style="--c:${verdict.color};--c-pct:${analysis.nicheScore}">
           <div class="ebk-score-num">${analysis.nicheScore}</div>
           <div class="ebk-score-lbl">/100</div>
         </div>
