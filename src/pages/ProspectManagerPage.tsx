@@ -65,11 +65,24 @@ const ProspectManagerPage = () => {
   const [detailEmail, setDetailEmail] = useState<string | null>(null);
 
   const fetchOpens = useCallback(async () => {
-    const { data, error } = await (supabase as any)
-      .from('email_opens')
-      .select('prospect_email, opened_at, email_step')
-      .order('opened_at', { ascending: false });
-    if (error || !data) return;
+    // Pagination obligatoire : PostgREST plafonne à 1000 lignes par requête,
+    // or la table email_opens dépasse largement ce seuil. Sans cela, la plupart
+    // des ouvreurs ne sont pas détectés et la relance ne trouve personne.
+    const pageSize = 1000;
+    let from = 0;
+    const rows: { prospect_email: string; opened_at: string; email_step: number }[] = [];
+    while (true) {
+      const { data, error } = await (supabase as any)
+        .from('email_opens')
+        .select('prospect_email, opened_at, email_step')
+        .order('opened_at', { ascending: false })
+        .range(from, from + pageSize - 1);
+      if (error || !data || data.length === 0) break;
+      rows.push(...data);
+      if (data.length < pageSize) break;
+      from += pageSize;
+    }
+    const data = rows;
     const map: Record<string, { count: number; last: string }> = {};
     const details: Record<string, { at: string; step: number }[]> = {};
     for (const row of data as { prospect_email: string; opened_at: string; email_step: number }[]) {
