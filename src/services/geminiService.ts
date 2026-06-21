@@ -5,6 +5,12 @@
 
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 
+/** Modèles essayés dans l'ordre : si le 1er sature (429/503), on bascule
+ *  automatiquement sur un modèle moins chargé au lieu d'attendre 30s. */
+const MODEL_FALLBACKS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.5-flash-lite'];
+
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
 interface GeminiCallOptions {
   systemPrompt?: string;
   temperature?: number;
