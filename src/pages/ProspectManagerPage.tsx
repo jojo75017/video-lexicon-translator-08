@@ -459,9 +459,14 @@ const ProspectManagerPage = () => {
   const hotCount = prospects.filter(p => p.status === 'active' && !p.completed && hasOpened(p.email)).length;
   const clickCount = prospects.filter(p => hasClicked(p.email)).length;
   // Cibles de la relance non-cliqueurs : ouvreurs sans clic (toutes ouvertures paginées prises en compte)
-  const nonClickerTargets = prospects.filter(
+  const nonClickerOpeners = prospects.filter(
     p => p.status === 'active' && !p.unsubscribed && hasOpened(p.email) && !hasClicked(p.email)
-  ).length;
+  );
+  // Cibles à relancer = non-cliqueurs PAS encore relancés (anti-doublon)
+  const nonClickerTargets = nonClickerOpeners.filter(p => !p.relance_sent_at).length;
+  // Vérification d'envoi : combien de non-cliqueurs ont bien reçu la relance / en échec
+  const relanceSentCount = nonClickerOpeners.filter(p => p.relance_status === 'sent').length;
+  const relanceErrorCount = nonClickerOpeners.filter(p => p.relance_status === 'error').length;
 
   const stepDistribution = STEPS.map(s => ({
     ...s,
