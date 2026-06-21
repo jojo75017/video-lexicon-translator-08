@@ -30,6 +30,8 @@ interface Prospect {
   next_email_at: string | null;
   imported_at: string;
   source?: string;
+  relance_sent_at?: string | null;
+  relance_status?: string | null;
 }
 
 const STEPS = [
@@ -301,13 +303,17 @@ const ProspectManagerPage = () => {
   };
 
   // Relancer les "tièdes" = ont OUVERT mais jamais CLIQUÉ (meilleur potentiel inexploité)
+  // Anti-doublon : on exclut les prospects déjà relancés avec succès (relance_sent_at renseigné).
   const handleRelancerNonCliqueurs = async () => {
     const ids = prospects
-      .filter(p => p.status === 'active' && !p.unsubscribed && hasOpened(p.email) && !hasClicked(p.email))
+      .filter(p =>
+        p.status === 'active' && !p.unsubscribed &&
+        hasOpened(p.email) && !hasClicked(p.email) && !p.relance_sent_at
+      )
       .map(p => p.id);
 
     if (ids.length === 0) {
-      toast.error('Aucun prospect tiède (ouvreurs non-cliqueurs) à relancer');
+      toast.error('Aucun nouveau prospect tiède à relancer (tous déjà relancés)');
       return;
     }
 
@@ -319,6 +325,7 @@ const ProspectManagerPage = () => {
       // Envoi par lots de 150 pour rester sous le timeout de la fonction et tout couvrir
       const chunkSize = 150;
       let totalSent = 0;
+      let totalErrors = 0;
       for (let i = 0; i < ids.length; i += chunkSize) {
         const chunk = ids.slice(i, i + chunkSize);
         const { data, error } = await supabase.functions.invoke('send-sales-email', {
@@ -327,14 +334,20 @@ const ProspectManagerPage = () => {
         });
         if (error) throw error;
         totalSent += data?.sent || 0;
+        totalErrors += data?.errors || 0;
       }
-      toast.success(`🔁 ${totalSent} relance(s) envoyée(s) sur ${ids.length} cible(s)`);
+      if (totalErrors > 0) {
+        toast.warning(`🔁 ${totalSent}/${ids.length} relance(s) envoyée(s) · ${totalErrors} échec(s) — voir le statut par prospect`);
+      } else {
+        toast.success(`✅ ${totalSent}/${ids.length} relance(s) envoyée(s), aucun doublon`);
+      }
       fetchProspects();
     } catch (err: any) {
       toast.error('Erreur d\'envoi : ' + (err.message || ''));
     }
     setSending(false);
   };
+
 
 
 
@@ -446,9 +459,14 @@ const ProspectManagerPage = () => {
   const hotCount = prospects.filter(p => p.status === 'active' && !p.completed && hasOpened(p.email)).length;
   const clickCount = prospects.filter(p => hasClicked(p.email)).length;
   // Cibles de la relance non-cliqueurs : ouvreurs sans clic (toutes ouvertures paginées prises en compte)
-  const nonClickerTargets = prospects.filter(
+  const nonClickerOpeners = prospects.filter(
     p => p.status === 'active' && !p.unsubscribed && hasOpened(p.email) && !hasClicked(p.email)
-  ).length;
+  );
+  // Cibles à relancer = non-cliqueurs PAS encore relancés (anti-doublon)
+  const nonClickerTargets = nonClickerOpeners.filter(p => !p.relance_sent_at).length;
+  // Vérification d'envoi : combien de non-cliqueurs ont bien reçu la relance / en échec
+  const relanceSentCount = nonClickerOpeners.filter(p => p.relance_status === 'sent').length;
+  const relanceErrorCount = nonClickerOpeners.filter(p => p.relance_status === 'error').length;
 
   const stepDistribution = STEPS.map(s => ({
     ...s,
@@ -594,6 +612,16 @@ const ProspectManagerPage = () => {
                 <span className="text-xs font-semibold px-2 py-1 rounded-md bg-orange-500/10 text-orange-400 border border-orange-500/30 whitespace-nowrap">
                   🎯 {nonClickerTargets} cible{nonClickerTargets > 1 ? 's' : ''} sélectionnée{nonClickerTargets > 1 ? 's' : ''}
                 </span>
+                {relanceSentCount > 0 && (
+                  <span className="text-xs font-semibold px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 whitespace-nowrap">
+                    ✅ {relanceSentCount} relancé{relanceSentCount > 1 ? 's' : ''}
+                  </span>
+                )}
+                {relanceErrorCount > 0 && (
+                  <span className="text-xs font-semibold px-2 py-1 rounded-md bg-red-500/10 text-red-400 border border-red-500/30 whitespace-nowrap">
+                    ⚠️ {relanceErrorCount} échec{relanceErrorCount > 1 ? 's' : ''}
+                  </span>
+                )}
               </div>
 
 
