@@ -665,7 +665,7 @@ Deno.serve(async (req) => {
         .select("*")
         .eq("status", "active")
         .eq("unsubscribed", false)
-        .eq("completed", true)
+        .gte("current_step", 5)
         .lt("relance_round", RELANCE_MAX_ROUNDS)
         .or(`relance_sent_at.is.null,relance_sent_at.lte.${threeDaysAgo}`)
         .order("relance_sent_at", { ascending: true, nullsFirst: true })
