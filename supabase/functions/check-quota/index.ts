@@ -35,19 +35,35 @@ serve(async (req) => {
   }
 
   try {
-    const { email, action } = await req.json();
-    console.log('Quota check request:', { email, action });
+    const { action } = await req.json();
 
-    if (!email) {
+    // SECURITY: exiger un JWT valide et n'utiliser QUE l'email du token
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
       return new Response(
-        JSON.stringify({ error: 'Email requis' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'Non authentifié' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const authClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: authData, error: authErr } = await authClient.auth.getUser();
+    const email = authData?.user?.email;
+    if (authErr || !email) {
+      return new Response(
+        JSON.stringify({ error: 'Non authentifié' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    console.log('Quota check request:', { email, action });
+
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
+
 
     // Récupérer l'abonnement de l'utilisateur
     const { data: subscriber, error: subError } = await supabase
