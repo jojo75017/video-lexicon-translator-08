@@ -339,7 +339,39 @@ const V3HubPage: React.FC = () => {
         {/* Récapitulatif global des droits : 197€ vs Pack 347€ */}
         <V3AccessRecap onOpenModule={setSelected} />
 
+        {/* Extension Scanner KDP — GRATUITE pour tous (non gated) */}
+        <button
+          onClick={() => navigate('/extension-chrome')}
+          className="group w-full text-left mb-6 rounded-2xl border p-5 flex flex-wrap items-center gap-4 transition-all hover:-translate-y-0.5"
+          style={{ background: AMBER_SOFT, borderColor: `${AMBER}55` }}
+        >
+          <span
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-2xl"
+            style={{ background: '#fff', border: `1px solid ${AMBER}33` }}
+          >
+            🧩
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="flex items-center gap-2">
+              <span className="font-bold" style={{ color: INK }}>Extension Scanner KDP</span>
+              <span className="rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-white" style={{ background: '#1f9d6b' }}>
+                Gratuit pour tous
+              </span>
+            </span>
+            <span className="mt-1 block text-[13px]" style={{ color: '#8a7860' }}>
+              Analyse n'importe quelle fiche Amazon Kindle en 1 clic : score /100, BSR, ventes & revenus estimés (données officielles), concurrence, mots-clés et pépites.
+            </span>
+          </span>
+          <span
+            className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold text-white transition-colors"
+            style={{ background: AMBER_DEEP }}
+          >
+            <Sparkles className="h-4 w-4" /> Installer <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          </span>
+        </button>
+
         {/* Recherche + filtres */}
+
         <div className="sticky top-0 z-20 -mx-4 px-4 py-3 backdrop-blur-md border-b border-[#eadfc9] mb-6" style={{ background: 'rgba(251,246,236,0.85)' }}>
           <div className="relative max-w-md mb-3" data-tour="search">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: '#b29a72' }} />
