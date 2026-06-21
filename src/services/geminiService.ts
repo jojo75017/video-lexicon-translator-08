@@ -5,6 +5,12 @@
 
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 
+/** Modèles essayés dans l'ordre : si le 1er sature (429/503), on bascule
+ *  automatiquement sur un modèle moins chargé au lieu d'attendre 30s. */
+const MODEL_FALLBACKS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.5-flash-lite'];
+
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
 interface GeminiCallOptions {
   systemPrompt?: string;
   temperature?: number;
@@ -64,7 +70,6 @@ export async function callGemini(
     jsonMode = false,
   } = options;
 
-  const model = 'gemini-2.5-flash';
   const controller = new AbortController();
   const effectiveTimeout = Math.max(timeout, maxTokens >= 6000 ? 180000 : 90000);
   const timeoutId = setTimeout(() => controller.abort(), effectiveTimeout);
@@ -86,7 +91,7 @@ export async function callGemini(
     body.system_instruction = { parts: [{ text: systemPrompt }] };
   }
 
-  const doFetch = () => fetch(
+  const doFetch = (model: string) => fetch(
     `${GEMINI_API_BASE}/${model}:generateContent?key=${apiKey}`,
     {
       method: 'POST',
@@ -97,27 +102,43 @@ export async function callGemini(
   );
 
   try {
-    let response = await doFetch();
+    let response: Response | null = null;
+    let lastStatus = 0;
 
-    // Retry automatique en cas de 429 (quota momentané)
-    if (response.status === 429) {
-      console.warn('Gemini 429 - retry dans 30s...');
-      await new Promise(r => setTimeout(r, 30000));
-      response = await doFetch();
+    // On parcourt les modèles de secours ; backoff court (3s puis 8s) pour
+    // ne pas bloquer l'interface aussi longtemps qu'avant.
+    outer:
+    for (let m = 0; m < MODEL_FALLBACKS.length; m++) {
+      const model = MODEL_FALLBACKS[m];
+      const backoffs = [0, 3000, 8000];
+      for (let attempt = 0; attempt < backoffs.length; attempt++) {
+        if (backoffs[attempt] > 0) await sleep(backoffs[attempt]);
+        response = await doFetch(model);
+        lastStatus = response.status;
+        if (response.ok) break outer;
+        // Surcharge / quota → on tente le modèle suivant (ou un retry court)
+        if (response.status === 429 || response.status === 503) {
+          console.warn(`Gemini ${response.status} sur ${model} (tentative ${attempt + 1})`);
+          await response.text().catch(() => {});
+          continue;
+        }
+        // Erreur non récupérable → on sort pour la traiter ci-dessous
+        break outer;
+      }
     }
 
     clearTimeout(timeoutId);
 
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error('Gemini API error:', response.status, errText);
-      if (response.status === 429) {
-        throw new Error('Quota Gemini atteint. Patientez ~60s puis relancez la génération.');
+    if (!response || !response.ok) {
+      const errText = response ? await response.text().catch(() => '') : '';
+      console.error('Gemini API error:', lastStatus, errText);
+      if (lastStatus === 429 || lastStatus === 503) {
+        throw new Error('Service Google momentanément saturé. Patientez ~30s puis relancez.');
       }
-      if (response.status === 400 || response.status === 401 || response.status === 403) {
+      if (lastStatus === 400 || lastStatus === 401 || lastStatus === 403) {
         throw new Error('Clé API Gemini invalide. Vérifiez votre clé sur aistudio.google.com');
       }
-      throw new Error(`Erreur Gemini: ${response.status}`);
+      throw new Error(`Erreur Gemini: ${lastStatus || 'réseau'}`);
     }
 
     const data = await response.json();
@@ -170,7 +191,6 @@ export async function callGeminiWithHistory(
     timeout = 90000,
   } = options;
 
-  const model = 'gemini-2.5-flash';
   const controller = new AbortController();
   const effectiveTimeout = Math.max(timeout, maxTokens >= 6000 ? 180000 : 90000);
   const timeoutId = setTimeout(() => controller.abort(), effectiveTimeout);
@@ -187,7 +207,7 @@ export async function callGeminiWithHistory(
     body.system_instruction = { parts: [{ text: systemPrompt }] };
   }
 
-  const doFetch = () => fetch(
+  const doFetch = (model: string) => fetch(
     `${GEMINI_API_BASE}/${model}:generateContent?key=${apiKey}`,
     {
       method: 'POST',
@@ -198,26 +218,39 @@ export async function callGeminiWithHistory(
   );
 
   try {
-    let response = await doFetch();
+    let response: Response | null = null;
+    let lastStatus = 0;
 
-    if (response.status === 429) {
-      console.warn('Gemini 429 - retry dans 30s...');
-      await new Promise(r => setTimeout(r, 30000));
-      response = await doFetch();
+    outer:
+    for (let m = 0; m < MODEL_FALLBACKS.length; m++) {
+      const model = MODEL_FALLBACKS[m];
+      const backoffs = [0, 3000, 8000];
+      for (let attempt = 0; attempt < backoffs.length; attempt++) {
+        if (backoffs[attempt] > 0) await sleep(backoffs[attempt]);
+        response = await doFetch(model);
+        lastStatus = response.status;
+        if (response.ok) break outer;
+        if (response.status === 429 || response.status === 503) {
+          console.warn(`Gemini ${response.status} sur ${model} (tentative ${attempt + 1})`);
+          await response.text().catch(() => {});
+          continue;
+        }
+        break outer;
+      }
     }
 
     clearTimeout(timeoutId);
 
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error('Gemini API error:', response.status, errText);
-      if (response.status === 429) {
-        throw new Error('Quota Gemini atteint. Patientez ~60s puis relancez la génération.');
+    if (!response || !response.ok) {
+      const errText = response ? await response.text().catch(() => '') : '';
+      console.error('Gemini API error:', lastStatus, errText);
+      if (lastStatus === 429 || lastStatus === 503) {
+        throw new Error('Service Google momentanément saturé. Patientez ~30s puis relancez.');
       }
-      if (response.status === 400 || response.status === 401 || response.status === 403) {
+      if (lastStatus === 400 || lastStatus === 401 || lastStatus === 403) {
         throw new Error('Clé API Gemini invalide. Vérifiez votre clé sur aistudio.google.com');
       }
-      throw new Error(`Erreur Gemini: ${response.status}`);
+      throw new Error(`Erreur Gemini: ${lastStatus || 'réseau'}`);
     }
 
     const data = await response.json();
