@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,12 +14,30 @@ const errorResponse = (message: string, status = 500) =>
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
 
+// Vérifie qu'un utilisateur authentifié appelle la fonction (anti-abus des clés serveur)
+const requireUser = async (req: Request) => {
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  const supabase = createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_ANON_KEY')!,
+    { global: { headers: { Authorization: authHeader } } },
+  );
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data?.user) return null;
+  return data.user;
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    const user = await requireUser(req);
+    if (!user) return errorResponse('Non authentifié', 401);
+
+
     let body: any;
     try {
       body = await req.json();

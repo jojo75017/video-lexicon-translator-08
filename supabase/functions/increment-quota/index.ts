@@ -12,22 +12,43 @@ serve(async (req) => {
   }
 
   try {
-    const { email, access_code, action, count = 1 } = await req.json();
-    console.log('Increment quota request:', { email, action, count });
+    const { action, count = 1 } = await req.json();
 
-    // SECURITY: Require email, access_code and action
-    if (!email || !action) {
+    // SECURITY: exiger un JWT valide ; l'email provient UNIQUEMENT du token
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
       return new Response(
-        JSON.stringify({ error: 'Email et action requis' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'Non authentifié' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const authClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: authData, error: authErr } = await authClient.auth.getUser();
+    const email = authData?.user?.email;
+    if (authErr || !email) {
+      return new Response(
+        JSON.stringify({ error: 'Non authentifié' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!action) {
+      return new Response(
+        JSON.stringify({ error: 'Action requise' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    console.log('Increment quota request:', { email, action, count });
+
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // SECURITY: Validate subscription via email + access_code
+    // Valider l'abonnement à partir de l'email authentifié
     const { data: subscriber, error: fetchError } = await supabase
       .from('subscribers')
       .select('*')
@@ -43,14 +64,6 @@ serve(async (req) => {
       );
     }
 
-    // SECURITY: Verify access code matches
-    if (access_code && subscriber.access_code !== access_code) {
-      console.error('Invalid access code for:', email);
-      return new Response(
-        JSON.stringify({ error: 'Code d\'accès invalide' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
 
     // Mapper l'action vers le champ de la base de données
     const fieldMap: Record<string, string> = {

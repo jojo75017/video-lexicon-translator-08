@@ -15,6 +15,44 @@ function generateAccessCode(): string {
   return code;
 }
 
+// Envoi (best-effort) du code d'accès par e-mail — le code n'est JAMAIS renvoyé dans la réponse HTTP
+async function sendTrialEmail(toEmail: string, accessCode: string, trialEndsAt: string) {
+  const resendKey = Deno.env.get('RESEND_API_KEY');
+  if (!resendKey) return;
+  try {
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: 'EbookStudio <noreply@ebookstudio.fr>',
+        to: [toEmail],
+        subject: '🎉 Votre essai gratuit EbookStudio Pro est activé !',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h1 style="color: #0891b2; text-align: center;">🎉 Bienvenue sur EbookStudio Pro !</h1>
+            <p>Votre essai gratuit de <strong>7 jours</strong> est maintenant actif.</p>
+            <div style="background: #f0f9ff; border: 2px solid #0891b2; border-radius: 12px; padding: 20px; text-align: center; margin: 20px 0;">
+              <p style="margin: 0 0 8px; color: #666;">Votre code d'accès :</p>
+              <p style="font-size: 28px; font-weight: bold; font-family: monospace; color: #0891b2; margin: 0;">${accessCode}</p>
+            </div>
+            <p><strong>Email :</strong> ${toEmail}</p>
+            <p>Connectez-vous sur <a href="https://video-lexicon-translator-08.lovable.app/subscription">EbookStudio</a> avec votre email et ce code.</p>
+            <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+            <p style="color: #999; font-size: 12px; text-align: center;">
+              Votre essai expire le ${new Date(trialEndsAt).toLocaleDateString('fr-FR')}.
+              Pour continuer après l'essai, il suffira de régler 67€ (paiement unique, accès à vie).
+            </p>
+          </div>
+        `,
+      }),
+    });
+  } catch (emailErr) {
+    console.error('Email sending failed:', emailErr);
+  }
+}
+
+
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -45,14 +83,14 @@ serve(async (req) => {
     if (existing) {
       // Already has an active/trialing subscription
       if (existing.status === 'active' || existing.status === 'trialing') {
+        // SECURITY: ne jamais renvoyer le code d'accès à un appelant non authentifié
         return new Response(
           JSON.stringify({ 
             ok: true, 
             alreadyExists: true,
             email: existing.email,
-            accessCode: existing.access_code,
             status: existing.status,
-            message: 'Vous avez déjà un accès actif.'
+            message: 'Vous avez déjà un accès actif. Votre code d\'accès vous a été envoyé par e-mail.'
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
@@ -74,16 +112,20 @@ serve(async (req) => {
 
       if (updateError) throw updateError;
 
+      // Le code est envoyé par e-mail, jamais renvoyé dans la réponse
+      await sendTrialEmail(normalizedEmail, accessCode, trialEndsAt);
+
       return new Response(
         JSON.stringify({
           ok: true,
           email: normalizedEmail,
-          accessCode,
           trialEndsAt,
           status: 'trialing',
+          message: 'Votre essai est réactivé. Votre code d\'accès vous a été envoyé par e-mail.'
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+
     }
 
     // New subscriber — create trial
@@ -103,56 +145,22 @@ serve(async (req) => {
 
     if (insertError) throw insertError;
 
-    // Send welcome email with access code via Resend
-    const resendKey = Deno.env.get('RESEND_API_KEY');
-    if (resendKey) {
-      try {
-        await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${resendKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            from: 'EbookStudio <noreply@ebookstudio.fr>',
-            to: [normalizedEmail],
-            subject: '🎉 Votre essai gratuit EbookStudio Pro est activé !',
-            html: `
-              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h1 style="color: #0891b2; text-align: center;">🎉 Bienvenue sur EbookStudio Pro !</h1>
-                <p>Votre essai gratuit de <strong>7 jours</strong> est maintenant actif.</p>
-                <div style="background: #f0f9ff; border: 2px solid #0891b2; border-radius: 12px; padding: 20px; text-align: center; margin: 20px 0;">
-                  <p style="margin: 0 0 8px; color: #666;">Votre code d'accès :</p>
-                  <p style="font-size: 28px; font-weight: bold; font-family: monospace; color: #0891b2; margin: 0;">${accessCode}</p>
-                </div>
-                <p><strong>Email :</strong> ${normalizedEmail}</p>
-                <p>Connectez-vous sur <a href="https://video-lexicon-translator-08.lovable.app/subscription">EbookStudio</a> avec votre email et ce code.</p>
-                <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-                <p style="color: #999; font-size: 12px; text-align: center;">
-                  Votre essai expire le ${new Date(trialEndsAt).toLocaleDateString('fr-FR')}. 
-                  Pour continuer après l'essai, il suffira de régler 67€ (paiement unique, accès à vie).
-                </p>
-              </div>
-            `,
-          }),
-        });
-      } catch (emailErr) {
-        console.error('Email sending failed:', emailErr);
-      }
-    }
+    // Le code est envoyé par e-mail, jamais renvoyé dans la réponse
+    await sendTrialEmail(normalizedEmail, accessCode, trialEndsAt);
 
-    console.log('Trial started for:', normalizedEmail, 'Code:', accessCode);
+    console.log('Trial started for:', normalizedEmail);
 
     return new Response(
       JSON.stringify({
         ok: true,
         email: normalizedEmail,
-        accessCode,
         trialEndsAt,
         status: 'trialing',
+        message: 'Votre essai est activé. Votre code d\'accès vous a été envoyé par e-mail.'
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
+
 
   } catch (error) {
     console.error('Error in start-trial:', error);

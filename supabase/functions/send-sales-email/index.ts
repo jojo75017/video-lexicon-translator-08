@@ -365,6 +365,45 @@ Deno.serve(async (req) => {
     const isRelance = mode === "relance";
     const batchSize = body.batch_size || (isRelance ? 200 : 50);
 
+    // ===== SÉCURITÉ : empêcher tout déclenchement non autorisé d'une campagne =====
+    if (mode === "auto") {
+      // Le cron doit fournir le secret partagé (stocké côté serveur uniquement)
+      const provided = req.headers.get("x-cron-secret");
+      const { data: secretRow } = await supabase
+        .from("app_secrets").select("value").eq("key", "cron_secret").maybeSingle();
+      const cronSecret = secretRow?.value;
+      if (!cronSecret || provided !== cronSecret) {
+        return new Response(JSON.stringify({ error: "Non autorisé" }), {
+          status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    } else {
+
+      // manual / relance : réservé aux administrateurs authentifiés
+      const authHeader = req.headers.get("Authorization");
+      if (!authHeader?.startsWith("Bearer ")) {
+        return new Response(JSON.stringify({ error: "Non authentifié" }), {
+          status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const authClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const { data: authData } = await authClient.auth.getUser();
+      if (!authData?.user) {
+        return new Response(JSON.stringify({ error: "Non authentifié" }), {
+          status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const { data: isAdmin } = await authClient.rpc("has_role", { _user_id: authData.user.id, _role: "admin" });
+      if (isAdmin !== true) {
+        return new Response(JSON.stringify({ error: "Accès réservé aux administrateurs" }), {
+          status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+
     let query = supabase
       .from("sales_prospects")
       .select("*")

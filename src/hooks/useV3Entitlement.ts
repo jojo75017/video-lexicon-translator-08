@@ -47,18 +47,16 @@ export function useV3Entitlement() {
       }
 
       try {
-        const { data } = await supabase
-          .from('v3_installment_orders')
-          .select('plan, status')
-          .eq('environment', getStripeEnvironment())
-          .ilike('email', email);
+        const { data } = await supabase.rpc('get_my_v3_installment_orders');
 
         if (cancelled) return;
-        const rows = data ?? [];
-        const paid = rows.filter((r) => PAID_STATUSES.has((r.status ?? '').toLowerCase()));
-        const full = paid.some((r) => (r.plan ?? '').startsWith('full'));
+        const env = getStripeEnvironment();
+        const rows = (data ?? []).filter((r: any) => r.environment === env);
+        const paid = rows.filter((r: any) => PAID_STATUSES.has((r.status ?? '').toLowerCase()));
+        const full = paid.some((r: any) => (r.plan ?? '').startsWith('full'));
         setHasFull(full);
-        setHasBase(full || paid.some((r) => (r.plan ?? '').startsWith('base')));
+        setHasBase(full || paid.some((r: any) => (r.plan ?? '').startsWith('base')));
+
       } catch {
         if (!cancelled) {
           setHasBase(false);

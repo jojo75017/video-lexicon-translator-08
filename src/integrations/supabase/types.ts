@@ -128,6 +128,24 @@ export type Database = {
         }
         Relationships: []
       }
+      app_secrets: {
+        Row: {
+          created_at: string
+          key: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          key: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          key?: string
+          value?: string
+        }
+        Relationships: []
+      }
       audiobooks: {
         Row: {
           audio_url: string | null
@@ -1673,6 +1691,41 @@ export type Database = {
       can_create_vip: { Args: never; Returns: boolean }
       count_vip_subscribers: { Args: never; Returns: number }
       generate_referral_code: { Args: never; Returns: string }
+      get_my_funnel_orders: {
+        Args: never
+        Returns: {
+          amount: number
+          created_at: string
+          currency: string
+          email: string
+          first_name: string
+          id: string
+          paid_at: string
+          payment_method: string
+          product_key: string
+          ref_code: string
+          status: string
+          updated_at: string
+        }[]
+      }
+      get_my_v3_installment_orders: {
+        Args: never
+        Returns: {
+          amount_total: number
+          completed_at: string
+          created_at: string
+          currency: string
+          email: string
+          environment: string
+          grace_until: string
+          id: string
+          installments_paid: number
+          installments_total: number
+          plan: string
+          status: string
+          updated_at: string
+        }[]
+      }
       get_referral_stats: { Args: { p_user_id: string }; Returns: Json }
       has_role: {
         Args: {
