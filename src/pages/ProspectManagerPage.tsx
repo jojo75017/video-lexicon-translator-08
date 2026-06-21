@@ -671,6 +671,23 @@ const ProspectManagerPage = () => {
                 )}
               </div>
 
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRelancesSupplementaires}
+                  disabled={sending || relancesSupplTargets === 0}
+                  className="border-violet-500/40 text-violet-400 hover:bg-violet-500/10 font-semibold"
+                >
+                  <RefreshCw className="h-3 w-3 mr-1" /> ✨ Relances 5/5 (prochaine sur 3)
+                </Button>
+                <span className="text-xs font-semibold px-2 py-1 rounded-md bg-violet-500/10 text-violet-400 border border-violet-500/30 whitespace-nowrap">
+                  🎯 {relancesSupplTargets} prospect{relancesSupplTargets > 1 ? 's' : ''} à 5/5 relançable{relancesSupplTargets > 1 ? 's' : ''}
+                </span>
+              </div>
+
+
+
 
               <Button
                 variant="outline"
