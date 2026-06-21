@@ -581,15 +581,21 @@ const ProspectManagerPage = () => {
                 <Mail className="h-3 w-3 mr-1" />
                 {showClickedOnly ? '👆 Afficher tous' : `👆 Voir les ${clickCount} cliqueurs`}
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleRelancerNonCliqueurs}
-                disabled={sending}
-                className="border-orange-500/40 text-orange-400 hover:bg-orange-500/10 font-semibold"
-              >
-                <RefreshCw className="h-3 w-3 mr-1" /> 🔁 Relancer les non-cliqueurs
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRelancerNonCliqueurs}
+                  disabled={sending || nonClickerTargets === 0}
+                  className="border-orange-500/40 text-orange-400 hover:bg-orange-500/10 font-semibold"
+                >
+                  <RefreshCw className="h-3 w-3 mr-1" /> 🔁 Relancer les non-cliqueurs
+                </Button>
+                <span className="text-xs font-semibold px-2 py-1 rounded-md bg-orange-500/10 text-orange-400 border border-orange-500/30 whitespace-nowrap">
+                  🎯 {nonClickerTargets} cible{nonClickerTargets > 1 ? 's' : ''} sélectionnée{nonClickerTargets > 1 ? 's' : ''}
+                </span>
+              </div>
+
 
               <Button
                 variant="outline"
