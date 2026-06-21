@@ -372,6 +372,9 @@ const App = () => {
             <Route path="/mentions-legales" element={<MentionsLegales />} />
             <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
             <Route path="/cgv" element={<CGV />} />
+            <Route path="/securite" element={<Securite />} />
+            <Route path="/confiance" element={<Securite />} />
+            <Route path="/trust" element={<Securite />} />
             <Route path="/licence" element={<Licence />} />
             <Route path="/eula" element={<Licence />} />
             <Route path="/licence-etendue" element={<LicenceEtenduePage />} />
