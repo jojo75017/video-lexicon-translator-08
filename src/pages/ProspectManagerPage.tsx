@@ -560,6 +560,16 @@ const ProspectManagerPage = () => {
               <Button
                 variant="outline"
                 size="sm"
+                onClick={handleRelancerNonCliqueurs}
+                disabled={sending}
+                className="border-orange-500/40 text-orange-400 hover:bg-orange-500/10 font-semibold"
+              >
+                <RefreshCw className="h-3 w-3 mr-1" /> 🔁 Relancer les non-cliqueurs
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={handleSyncToCrm}
                 disabled={syncing}
                 className="border-primary/30 text-primary hover:bg-primary/10"
