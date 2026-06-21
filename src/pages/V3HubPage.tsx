@@ -333,13 +333,7 @@ const V3HubPage: React.FC = () => {
 
 
       <main className="mx-auto max-w-7xl px-4 py-8">
-        {/* Parcours guidé V3 — entrée principale du Hub V3 */}
-        <V3Workflow30 onOpenModule={setSelected} />
-
-        {/* Récapitulatif global des droits : 197€ vs Pack 347€ */}
-        <V3AccessRecap onOpenModule={setSelected} />
-
-        {/* Extension Scanner KDP — GRATUITE pour tous (non gated) */}
+        {/* Extension Scanner KDP — GRATUITE pour tous (non gated) — en tête pour visibilité immédiate */}
         <button
           onClick={() => navigate('/extension-chrome')}
           className="group w-full text-left mb-6 rounded-2xl border p-5 flex flex-wrap items-center gap-4 transition-all hover:-translate-y-0.5"
@@ -369,6 +363,14 @@ const V3HubPage: React.FC = () => {
             <Sparkles className="h-4 w-4" /> Installer <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </span>
         </button>
+
+        {/* Parcours guidé V3 — entrée principale du Hub V3 */}
+        <V3Workflow30 onOpenModule={setSelected} />
+
+        {/* Récapitulatif global des droits : 197€ vs Pack 347€ */}
+        <V3AccessRecap onOpenModule={setSelected} />
+
+
 
         {/* Recherche + filtres */}
 
