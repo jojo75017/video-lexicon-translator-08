@@ -376,6 +376,12 @@ Deno.serve(async (req) => {
       query = query.eq("completed", false);
     }
 
+    // Anti-doublon : on ne relance jamais deux fois un prospect déjà relancé avec succès,
+    // sauf si l'appel force explicitement (body.force === true).
+    if (isRelance && !body.force) {
+      query = query.is("relance_sent_at", null);
+    }
+
     if ((mode === "manual" || isRelance) && prospectIds?.length) {
       query = query.in("id", prospectIds);
     } else if (mode === "auto") {
