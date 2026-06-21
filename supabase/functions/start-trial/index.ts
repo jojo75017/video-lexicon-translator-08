@@ -83,14 +83,14 @@ serve(async (req) => {
     if (existing) {
       // Already has an active/trialing subscription
       if (existing.status === 'active' || existing.status === 'trialing') {
+        // SECURITY: ne jamais renvoyer le code d'accès à un appelant non authentifié
         return new Response(
           JSON.stringify({ 
             ok: true, 
             alreadyExists: true,
             email: existing.email,
-            accessCode: existing.access_code,
             status: existing.status,
-            message: 'Vous avez déjà un accès actif.'
+            message: 'Vous avez déjà un accès actif. Votre code d\'accès vous a été envoyé par e-mail.'
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
@@ -112,16 +112,20 @@ serve(async (req) => {
 
       if (updateError) throw updateError;
 
+      // Le code est envoyé par e-mail, jamais renvoyé dans la réponse
+      await sendTrialEmail(normalizedEmail, accessCode, trialEndsAt);
+
       return new Response(
         JSON.stringify({
           ok: true,
           email: normalizedEmail,
-          accessCode,
           trialEndsAt,
           status: 'trialing',
+          message: 'Votre essai est réactivé. Votre code d\'accès vous a été envoyé par e-mail.'
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+
     }
 
     // New subscriber — create trial
