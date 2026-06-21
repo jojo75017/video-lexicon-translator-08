@@ -367,15 +367,18 @@ Deno.serve(async (req) => {
 
     // ===== SÉCURITÉ : empêcher tout déclenchement non autorisé d'une campagne =====
     if (mode === "auto") {
-      // Le cron doit fournir le secret partagé
-      const cronSecret = Deno.env.get("EBS_CRON_SECRET");
+      // Le cron doit fournir le secret partagé (stocké côté serveur uniquement)
       const provided = req.headers.get("x-cron-secret");
+      const { data: secretRow } = await supabase
+        .from("app_secrets").select("value").eq("key", "cron_secret").maybeSingle();
+      const cronSecret = secretRow?.value;
       if (!cronSecret || provided !== cronSecret) {
         return new Response(JSON.stringify({ error: "Non autorisé" }), {
           status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
     } else {
+
       // manual / relance : réservé aux administrateurs authentifiés
       const authHeader = req.headers.get("Authorization");
       if (!authHeader?.startsWith("Bearer ")) {
