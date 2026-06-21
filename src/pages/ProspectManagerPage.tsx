@@ -349,6 +349,52 @@ const ProspectManagerPage = () => {
     setSending(false);
   };
 
+  // Relances supplémentaires : 3 variantes tournantes (démo / offre) pour les prospects
+  // qui ont TERMINÉ la séquence (5/5) sans jamais cliquer. Anti-doublon par variante (relance_round).
+  const RELANCE_MAX_ROUNDS = 3;
+  const handleRelancesSupplementaires = async () => {
+    const ids = prospects
+      .filter(p =>
+        p.status === 'active' && !p.unsubscribed && p.completed &&
+        !hasClicked(p.email) && (p.relance_round ?? 0) < RELANCE_MAX_ROUNDS
+      )
+      .map(p => p.id);
+
+    if (ids.length === 0) {
+      toast.error('Aucun prospect éligible (tous ont cliqué ou reçu les 3 relances)');
+      return;
+    }
+
+    if (!confirm(`Envoyer la prochaine relance (sur 3) à ${ids.length} prospect(s) à 5/5 non-cliqueurs ?`)) return;
+
+    setSending(true);
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      const chunkSize = 150;
+      let totalSent = 0;
+      let totalErrors = 0;
+      for (let i = 0; i < ids.length; i += chunkSize) {
+        const chunk = ids.slice(i, i + chunkSize);
+        const { data, error } = await supabase.functions.invoke('send-sales-email', {
+          body: { mode: 'relance', prospect_ids: chunk, batch_size: chunk.length },
+          headers: { Authorization: `Bearer ${session.session?.access_token}` },
+        });
+        if (error) throw error;
+        totalSent += data?.sent || 0;
+        totalErrors += data?.errors || 0;
+      }
+      if (totalErrors > 0) {
+        toast.warning(`🔁 ${totalSent}/${ids.length} relance(s) envoyée(s) · ${totalErrors} échec(s)`);
+      } else {
+        toast.success(`✅ ${totalSent}/${ids.length} relance(s) supplémentaire(s) envoyée(s)`);
+      }
+      fetchProspects();
+    } catch (err: any) {
+      toast.error('Erreur d\'envoi : ' + (err.message || ''));
+    }
+    setSending(false);
+  };
+
 
 
 
