@@ -30,6 +30,8 @@ interface Prospect {
   next_email_at: string | null;
   imported_at: string;
   source?: string;
+  relance_sent_at?: string | null;
+  relance_status?: string | null;
 }
 
 const STEPS = [
