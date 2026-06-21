@@ -507,8 +507,8 @@ Deno.serve(async (req) => {
     let sent = 0;
     let errors = 0;
 
-    for (let i = 0; i < prospects.length; i++) {
-      const prospect = prospects[i];
+    for (let i = 0; i < (prospects?.length || 0); i++) {
+      const prospect = prospects![i];
       
       // Rate limit doux pour rester sous les limites Brevo
       if (i > 0) {
