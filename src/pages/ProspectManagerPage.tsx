@@ -316,12 +316,19 @@ const ProspectManagerPage = () => {
     setSending(true);
     try {
       const { data: session } = await supabase.auth.getSession();
-      const { data, error } = await supabase.functions.invoke('send-sales-email', {
-        body: { mode: 'relance', prospect_ids: ids },
-        headers: { Authorization: `Bearer ${session.session?.access_token}` },
-      });
-      if (error) throw error;
-      toast.success(`🔁 ${data.sent} relance(s) envoyée(s) aux non-cliqueurs`);
+      // Envoi par lots de 150 pour rester sous le timeout de la fonction et tout couvrir
+      const chunkSize = 150;
+      let totalSent = 0;
+      for (let i = 0; i < ids.length; i += chunkSize) {
+        const chunk = ids.slice(i, i + chunkSize);
+        const { data, error } = await supabase.functions.invoke('send-sales-email', {
+          body: { mode: 'relance', prospect_ids: chunk, batch_size: chunk.length },
+          headers: { Authorization: `Bearer ${session.session?.access_token}` },
+        });
+        if (error) throw error;
+        totalSent += data?.sent || 0;
+      }
+      toast.success(`🔁 ${totalSent} relance(s) envoyée(s) sur ${ids.length} cible(s)`);
       fetchProspects();
     } catch (err: any) {
       toast.error('Erreur d\'envoi : ' + (err.message || ''));
@@ -438,6 +445,10 @@ const ProspectManagerPage = () => {
   const autoEnabled = prospects.filter(p => p.auto_send).length;
   const hotCount = prospects.filter(p => p.status === 'active' && !p.completed && hasOpened(p.email)).length;
   const clickCount = prospects.filter(p => hasClicked(p.email)).length;
+  // Cibles de la relance non-cliqueurs : ouvreurs sans clic (toutes ouvertures paginées prises en compte)
+  const nonClickerTargets = prospects.filter(
+    p => p.status === 'active' && !p.unsubscribed && hasOpened(p.email) && !hasClicked(p.email)
+  ).length;
 
   const stepDistribution = STEPS.map(s => ({
     ...s,
@@ -570,15 +581,21 @@ const ProspectManagerPage = () => {
                 <Mail className="h-3 w-3 mr-1" />
                 {showClickedOnly ? '👆 Afficher tous' : `👆 Voir les ${clickCount} cliqueurs`}
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleRelancerNonCliqueurs}
-                disabled={sending}
-                className="border-orange-500/40 text-orange-400 hover:bg-orange-500/10 font-semibold"
-              >
-                <RefreshCw className="h-3 w-3 mr-1" /> 🔁 Relancer les non-cliqueurs
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRelancerNonCliqueurs}
+                  disabled={sending || nonClickerTargets === 0}
+                  className="border-orange-500/40 text-orange-400 hover:bg-orange-500/10 font-semibold"
+                >
+                  <RefreshCw className="h-3 w-3 mr-1" /> 🔁 Relancer les non-cliqueurs
+                </Button>
+                <span className="text-xs font-semibold px-2 py-1 rounded-md bg-orange-500/10 text-orange-400 border border-orange-500/30 whitespace-nowrap">
+                  🎯 {nonClickerTargets} cible{nonClickerTargets > 1 ? 's' : ''} sélectionnée{nonClickerTargets > 1 ? 's' : ''}
+                </span>
+              </div>
+
 
               <Button
                 variant="outline"
