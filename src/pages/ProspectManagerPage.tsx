@@ -301,13 +301,17 @@ const ProspectManagerPage = () => {
   };
 
   // Relancer les "tièdes" = ont OUVERT mais jamais CLIQUÉ (meilleur potentiel inexploité)
+  // Anti-doublon : on exclut les prospects déjà relancés avec succès (relance_sent_at renseigné).
   const handleRelancerNonCliqueurs = async () => {
     const ids = prospects
-      .filter(p => p.status === 'active' && !p.unsubscribed && hasOpened(p.email) && !hasClicked(p.email))
+      .filter(p =>
+        p.status === 'active' && !p.unsubscribed &&
+        hasOpened(p.email) && !hasClicked(p.email) && !p.relance_sent_at
+      )
       .map(p => p.id);
 
     if (ids.length === 0) {
-      toast.error('Aucun prospect tiède (ouvreurs non-cliqueurs) à relancer');
+      toast.error('Aucun nouveau prospect tiède à relancer (tous déjà relancés)');
       return;
     }
 
@@ -319,6 +323,7 @@ const ProspectManagerPage = () => {
       // Envoi par lots de 150 pour rester sous le timeout de la fonction et tout couvrir
       const chunkSize = 150;
       let totalSent = 0;
+      let totalErrors = 0;
       for (let i = 0; i < ids.length; i += chunkSize) {
         const chunk = ids.slice(i, i + chunkSize);
         const { data, error } = await supabase.functions.invoke('send-sales-email', {
@@ -327,14 +332,20 @@ const ProspectManagerPage = () => {
         });
         if (error) throw error;
         totalSent += data?.sent || 0;
+        totalErrors += data?.errors || 0;
       }
-      toast.success(`🔁 ${totalSent} relance(s) envoyée(s) sur ${ids.length} cible(s)`);
+      if (totalErrors > 0) {
+        toast.warning(`🔁 ${totalSent}/${ids.length} relance(s) envoyée(s) · ${totalErrors} échec(s) — voir le statut par prospect`);
+      } else {
+        toast.success(`✅ ${totalSent}/${ids.length} relance(s) envoyée(s), aucun doublon`);
+      }
       fetchProspects();
     } catch (err: any) {
       toast.error('Erreur d\'envoi : ' + (err.message || ''));
     }
     setSending(false);
   };
+
 
 
 
