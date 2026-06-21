@@ -801,10 +801,18 @@ const ProspectManagerPage = () => {
                             })()}
                           </td>
                           <td className="px-3 py-2 text-center">
-                            <Badge variant="outline" className="border-gold/30 text-gold-light">
-                              {p.current_step}/5
-                            </Badge>
+                            <div className="flex flex-col items-center gap-1">
+                              <Badge variant="outline" className="border-gold/30 text-gold-light">
+                                {p.current_step}/5
+                              </Badge>
+                              {(p.relance_round ?? 0) > 0 && (
+                                <Badge className="bg-violet-500/15 text-violet-400 border-violet-500/30 text-[10px]">
+                                  ✨ Relance {p.relance_round}/3
+                                </Badge>
+                              )}
+                            </div>
                           </td>
+
                           <td className="px-3 py-2 text-center">
                             <input
                               type="checkbox"
