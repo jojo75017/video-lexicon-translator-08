@@ -316,12 +316,19 @@ const ProspectManagerPage = () => {
     setSending(true);
     try {
       const { data: session } = await supabase.auth.getSession();
-      const { data, error } = await supabase.functions.invoke('send-sales-email', {
-        body: { mode: 'relance', prospect_ids: ids },
-        headers: { Authorization: `Bearer ${session.session?.access_token}` },
-      });
-      if (error) throw error;
-      toast.success(`🔁 ${data.sent} relance(s) envoyée(s) aux non-cliqueurs`);
+      // Envoi par lots de 150 pour rester sous le timeout de la fonction et tout couvrir
+      const chunkSize = 150;
+      let totalSent = 0;
+      for (let i = 0; i < ids.length; i += chunkSize) {
+        const chunk = ids.slice(i, i + chunkSize);
+        const { data, error } = await supabase.functions.invoke('send-sales-email', {
+          body: { mode: 'relance', prospect_ids: chunk, batch_size: chunk.length },
+          headers: { Authorization: `Bearer ${session.session?.access_token}` },
+        });
+        if (error) throw error;
+        totalSent += data?.sent || 0;
+      }
+      toast.success(`🔁 ${totalSent} relance(s) envoyée(s) sur ${ids.length} cible(s)`);
       fetchProspects();
     } catch (err: any) {
       toast.error('Erreur d\'envoi : ' + (err.message || ''));
