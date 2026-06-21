@@ -438,16 +438,26 @@ Deno.serve(async (req) => {
             }),
           });
           if (!res.ok) {
-            console.error(`Brevo relance error for ${prospect.email}:`, await res.text());
+            const errText = await res.text();
+            console.error(`Brevo relance error for ${prospect.email}:`, errText);
+            await supabase.from("sales_prospects").update({
+              relance_status: "error",
+            }).eq("id", prospect.id);
             errors++;
             continue;
           }
+          const nowIso = new Date().toISOString();
           await supabase.from("sales_prospects").update({
-            last_email_sent_at: new Date().toISOString(),
+            last_email_sent_at: nowIso,
+            relance_sent_at: nowIso,
+            relance_status: "sent",
           }).eq("id", prospect.id);
           sent++;
         } catch (relErr) {
           console.error(`Relance send error for ${prospect.email}:`, relErr);
+          await supabase.from("sales_prospects").update({
+            relance_status: "error",
+          }).eq("id", prospect.id);
           errors++;
         }
         continue;
