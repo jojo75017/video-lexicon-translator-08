@@ -68,13 +68,13 @@ const PromoEspacePage = () => {
   useEffect(() => {
     if (!email) return;
     (async () => {
-      const { data } = await supabase
-        .from('funnel_orders')
-        .select('id, product_key, amount, status, created_at, payment_method')
-        .eq('email', email)
-        .order('created_at', { ascending: false });
-      setOrders((data as Order[]) || []);
+      const { data } = await supabase.rpc('get_my_funnel_orders');
+      const rows = ((data as Order[]) || []).sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+      setOrders(rows);
     })();
+
   }, [email]);
 
   useEffect(() => {
