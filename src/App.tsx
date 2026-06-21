@@ -51,6 +51,7 @@ const SalesPage = lazy(() => import('./pages/SalesPage'));
 const MentionsLegales = lazy(() => import('./pages/MentionsLegales'));
 const PolitiqueConfidentialite = lazy(() => import('./pages/PolitiqueConfidentialite'));
 const CGV = lazy(() => import('./pages/CGV'));
+const Securite = lazy(() => import('./pages/Securite'));
 const Licence = lazy(() => import('./pages/Licence'));
 const LicenceEtenduePage = lazy(() => import('./pages/LicenceEtenduePage'));
 const PaymentSuccessPage = lazy(() => import('./pages/PaymentSuccessPage'));
