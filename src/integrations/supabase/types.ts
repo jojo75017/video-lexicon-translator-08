@@ -1667,104 +1667,47 @@ export type Database = {
       }
     }
     Views: {
-      funnel_orders_self: {
-        Row: {
-          amount: number | null
-          created_at: string | null
-          currency: string | null
-          email: string | null
-          first_name: string | null
-          id: string | null
-          paid_at: string | null
-          payment_method: string | null
-          product_key: string | null
-          ref_code: string | null
-          status: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          amount?: number | null
-          created_at?: string | null
-          currency?: string | null
-          email?: string | null
-          first_name?: string | null
-          id?: string | null
-          paid_at?: string | null
-          payment_method?: string | null
-          product_key?: string | null
-          ref_code?: string | null
-          status?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          amount?: number | null
-          created_at?: string | null
-          currency?: string | null
-          email?: string | null
-          first_name?: string | null
-          id?: string | null
-          paid_at?: string | null
-          payment_method?: string | null
-          product_key?: string | null
-          ref_code?: string | null
-          status?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      v3_installment_orders_self: {
-        Row: {
-          amount_total: number | null
-          completed_at: string | null
-          created_at: string | null
-          currency: string | null
-          email: string | null
-          environment: string | null
-          grace_until: string | null
-          id: string | null
-          installments_paid: number | null
-          installments_total: number | null
-          plan: string | null
-          status: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          amount_total?: number | null
-          completed_at?: string | null
-          created_at?: string | null
-          currency?: string | null
-          email?: string | null
-          environment?: string | null
-          grace_until?: string | null
-          id?: string | null
-          installments_paid?: number | null
-          installments_total?: number | null
-          plan?: string | null
-          status?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          amount_total?: number | null
-          completed_at?: string | null
-          created_at?: string | null
-          currency?: string | null
-          email?: string | null
-          environment?: string | null
-          grace_until?: string | null
-          id?: string | null
-          installments_paid?: number | null
-          installments_total?: number | null
-          plan?: string | null
-          status?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       can_create_vip: { Args: never; Returns: boolean }
       count_vip_subscribers: { Args: never; Returns: number }
       generate_referral_code: { Args: never; Returns: string }
+      get_my_funnel_orders: {
+        Args: never
+        Returns: {
+          amount: number
+          created_at: string
+          currency: string
+          email: string
+          first_name: string
+          id: string
+          paid_at: string
+          payment_method: string
+          product_key: string
+          ref_code: string
+          status: string
+          updated_at: string
+        }[]
+      }
+      get_my_v3_installment_orders: {
+        Args: never
+        Returns: {
+          amount_total: number
+          completed_at: string
+          created_at: string
+          currency: string
+          email: string
+          environment: string
+          grace_until: string
+          id: string
+          installments_paid: number
+          installments_total: number
+          plan: string
+          status: string
+          updated_at: string
+        }[]
+      }
       get_referral_stats: { Args: { p_user_id: string }; Returns: Json }
       has_role: {
         Args: {
