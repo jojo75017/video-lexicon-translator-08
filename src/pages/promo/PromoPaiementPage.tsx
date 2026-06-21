@@ -18,16 +18,14 @@ const PromoPaiementPage = () => {
     (async () => {
       const email = (params.get('email') || localStorage.getItem('ebs_lead_email') || '').toLowerCase();
       if (!email) { setLoading(false); return; }
-      const { data } = await supabase
-        .from('funnel_orders')
-        .select('id, amount, payment_method, email')
-        .ilike('email', email)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (data) setOrder(data as any);
+      const { data } = await supabase.rpc('get_my_funnel_orders');
+      const rows = ((data as any[]) || []).sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+      if (rows.length > 0) setOrder(rows[0] as any);
       setLoading(false);
     })();
+
   }, [params]);
 
   const ref = order ? `EBS-${order.id.slice(0, 8).toUpperCase()}` : 'EBS-XXXXXXXX';
