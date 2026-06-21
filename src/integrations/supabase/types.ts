@@ -1667,7 +1667,99 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      funnel_orders_self: {
+        Row: {
+          amount: number | null
+          created_at: string | null
+          currency: string | null
+          email: string | null
+          first_name: string | null
+          id: string | null
+          paid_at: string | null
+          payment_method: string | null
+          product_key: string | null
+          ref_code: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string | null
+          currency?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          product_key?: string | null
+          ref_code?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string | null
+          currency?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          product_key?: string | null
+          ref_code?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      v3_installment_orders_self: {
+        Row: {
+          amount_total: number | null
+          completed_at: string | null
+          created_at: string | null
+          currency: string | null
+          email: string | null
+          environment: string | null
+          grace_until: string | null
+          id: string | null
+          installments_paid: number | null
+          installments_total: number | null
+          plan: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount_total?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          currency?: string | null
+          email?: string | null
+          environment?: string | null
+          grace_until?: string | null
+          id?: string | null
+          installments_paid?: number | null
+          installments_total?: number | null
+          plan?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount_total?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          currency?: string | null
+          email?: string | null
+          environment?: string | null
+          grace_until?: string | null
+          id?: string | null
+          installments_paid?: number | null
+          installments_total?: number | null
+          plan?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       can_create_vip: { Args: never; Returns: boolean }
