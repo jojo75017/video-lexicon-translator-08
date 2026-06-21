@@ -1,58 +1,57 @@
-# Refonte complète — Extension KDP « EbookStudio Scanner » + accès gratuit dans le Hub V3
+# 3 nouvelles relances pour faire cliquer les prospects à 5/5
 
-## Constat actuel
-L'extension lit le DOM Amazon en local (`content.js`) avec des sélecteurs fragiles :
-- **Données peu fiables** : BSR / prix / avis souvent vides ou faux, estimations de ventes en paliers grossiers codés en dur.
-- **UI moche** : badge flottant et popup au dégradé orange/teal basique, peu lisible.
-- **Pas assez d'infos** : ni saisonnalité, ni comparaison à la niche, ni vraie analyse de concurrence.
+## Problème actuel
+La séquence `sales_prospects` se termine à l'étape 5 (5/5), puis une **unique** relance "non-cliqueurs" existe. L'anti-doublon (`relance_sent_at IS NULL`) empêche d'envoyer plus d'une relance par prospect : ceux à 5/5 ne reçoivent donc plus rien. On ajoute **3 nouvelles relances** qui tournent (variantes 1→2→3), partent automatiquement par le cron ET manuellement depuis la page Prospects, en alternant l'angle démo / offre.
 
-Le backend a déjà ce qu'il faut : `kdp-asin-scraper` + `paapi.ts` (Amazon Product Advertising API : BSR, prix, avis, note, pages, catégories), et `background.js` sait déjà l'appeler.
+## Ce qui sera construit
 
-## Stratégie : données fiables d'abord
-On passe d'un mode « scraping DOM local » à un mode **hybride** :
-1. Lecture DOM rapide pour l'ASIN + affichage instantané (skeleton de chargement).
-2. Appel backend `kdp-asin-scraper` (PA-API officielle) → vraies métriques qui remplacent le DOM.
-3. Fallback DOM uniquement si le backend ne répond pas.
+### 1. Base de données (migration légère)
+Ajouter une colonne à `public.sales_prospects` :
+- `relance_round` (integer, défaut `0`) — compteur de relances déjà envoyées (0 = aucune, 3 = série terminée).
 
-## Plan d'exécution
+GRANT déjà en place sur la table ; on conserve l'accès `service_role`.
 
-### 1. Backend — fiabiliser & enrichir
-- `kdp-asin-scraper` renvoie un payload normalisé : `{ asin, title, author, bsr, price, reviews, rating, pages, categories, imageUrl, publishedAt }`.
-- Estimation ventes/revenus calculée **côté serveur**, calibrée par catégorie + marketplace, avec indice de fiabilité.
-- Bloc **analyse de niche** : score /100, niveau de concurrence, fourchette de prix saine, 2-3 recommandations.
+### 2. Les 3 nouvelles relances (dans `send-sales-email`)
+Un tableau `RELANCE_VARIANTS` remplace la relance unique. Chaque variante = `{ subject, body }`, angles alternés et 100% orientés clic (gros bouton CTA traçable déjà géré par `buildHtmlEmail`).
 
-### 2. Extension — couche données
-- Centraliser les appels backend (scan ASIN + niche) avec gestion d'erreur et cache court (`chrome.storage.local`).
-- `content.js` : garde la détection ASIN / page recherche, délègue les métriques au backend, DOM en fallback.
+````text
+Relance 1 — Démo / curiosité
+  Objet : "🎬 {name}, regardez un livre s'écrire en 2 min"
+  → voir l'IA générer plan + chapitres + couverture, sans CB.
 
-### 3. Extension — refonte UI « superbe »
-Direction visuelle pro et premium (charte EbookStudio : fond clair #FAFAFA, accent teal #008296, hover orange #FF9E2D, texte #232F3E), aérée, typographie nette, micro-animations discrètes, états de chargement soignés — fini le dégradé criard.
-- **Badge produit** : en-tête livre (miniature couverture + titre + auteur), score circulaire animé, verdict clair, grille de stats lisible, bloc « revenus estimés » avec indice de fiabilité, onglets Score / Mots-clés / Niche.
-- **Badge recherche** : synthèse de niche + pépites mises en valeur.
-- **Popup** : refonte `popup.html` (guide + historique + export CSV) au même langage visuel, états vides soignés.
-- Skeleton/spinner pendant l'attente backend.
+Relance 2 — Offre / valeur
+  Objet : "🎁 {name}, 67€ à vie = la V3 (197€) offerte"
+  → rappel offre Fondateur, bénéfices, urgence douce (prix monte à la V3).
 
-### 4. Analyses enrichies (onglet Niche + recherche)
-- Comparaison du livre à la moyenne de sa catégorie (BSR, prix, avis).
-- Concurrence détaillée (faible / moyenne / forte + nb d'acteurs dominants).
-- Recommandations actionnables (prix sous-évalué, peu d'avis = opportunité, etc.).
-- Mots-clés principaux + longue traîne (améliorés).
+Relance 3 — Démo + dernière main tendue
+  Objet : "👋 {name}, une dernière démo avant qu'on arrête"
+  → "qu'est-ce qui vous retient ?", relance émotionnelle + bouton démo,
+    invitation à répondre à l'email.
+````
 
-### 5. Accès gratuit dans le Hub V3
-- Nouveau module/carte **« Extension Scanner KDP — Gratuit pour tous »** dans le Hub V3 (zone création/outils KDP).
-- Page ou panneau de présentation : aperçu visuel, bénéfices, bouton **Télécharger l'extension** (fetch + blob du ZIP servi depuis `public/`), et instructions d'installation Chrome (mode développeur / load unpacked).
-- Accessible **sans abonnement** (pas derrière `V3Gate`/`SubscriberGate`) — visible et téléchargeable par tous les utilisateurs.
+### 3. Logique d'envoi (`send-sales-email`, mode `relance`)
+- La cible n'est plus filtrée sur `relance_sent_at IS NULL`, mais sur `relance_round < 3` (et non-cliqueurs / non-clients).
+- À chaque envoi : on choisit `RELANCE_VARIANTS[relance_round]`, on envoie, puis on incrémente `relance_round` et on met à jour `relance_sent_at` / `relance_status`.
+- Le `step` de tracking passe à `7 + relance_round` pour distinguer chaque relance dans `email_clicks`.
 
-### 6. Packaging
-- Re-zipper l'extension dans `public/ebookstudio-scanner.zip` et brancher le bouton de téléchargement.
+### 4. Envoi automatique (cron)
+Le cron `email-sequence-cron` (déjà planifié) gère la séquence principale. On ajoute une passe relance : pour les prospects `completed = true`, non-cliqueurs, non-clients, avec `relance_round < 3`, et dont la dernière relance date de **+3 jours** (espacement), on déclenche la variante suivante. Une relance s'arrête dès qu'un clic est détecté (`email_clicks`) ou un achat (`funnel_orders`/`sales_prospects.completed` payé).
+
+### 5. Page Prospects (`ProspectManagerPage.tsx`)
+- Nouveau bloc "Relances supplémentaires (3 variantes)" avec :
+  - un compteur de cibles disponibles (`completed`, non-cliqueurs, `relance_round < 3`),
+  - un bouton **"Envoyer la prochaine relance"** (envoie la variante suivante à tous les éligibles, par lots, comme l'existant),
+  - affichage par prospect du `relance_round` (ex. "Relance 2/3").
+- Réutilise le mécanisme `supabase.functions.invoke('send-sales-email', { mode: 'relance', prospect_ids })` déjà en place (chunking + toasts de succès/échec conservés).
 
 ## Détails techniques
-- `kdp-asin-scraper` appelé via l'`ANON_KEY` (déjà dans `background.js`) — aucune clé sensible côté client.
-- Estimations centralisées serveur pour rester cohérentes avec EbookStudio.
-- MV3 conservé (service worker, `chrome.storage.local`, pas de `localStorage`).
-- Téléchargement dans le Hub via `fetch('/ebookstudio-scanner.zip')` → blob (les liens `<a download>` directs échouent dans le preview).
-- Fallback DOM préservé pour ne jamais afficher un badge vide.
+- Aucun nouveau secret nécessaire (Brevo/Resend déjà configurés).
+- Liens 100% traçables via `track-email-click` (déjà implémenté) → les clics remontent dans la page.
+- Anti-doublon par variante grâce à `relance_round` : un prospect ne reçoit jamais deux fois la même relance.
+- Arrêt automatique dès clic ou achat, pour ne pas sur-solliciter les leads chauds.
 
-## Hors périmètre
-- Multi-marketplaces déjà supportés (juste normalisés).
-- Pas de login/compte ajouté dans l'extension.
+## Fichiers touchés
+- migration : `sales_prospects.relance_round`
+- `supabase/functions/send-sales-email/index.ts` (variantes + logique round)
+- `supabase/functions/email-sequence-cron/index.ts` (passe relance auto)
+- `src/pages/ProspectManagerPage.tsx` (bouton + compteur + affichage round)
