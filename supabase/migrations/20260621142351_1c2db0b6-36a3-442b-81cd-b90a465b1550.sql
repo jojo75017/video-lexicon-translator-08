@@ -1,0 +1,1 @@
+ALTER TABLE public.sales_prospects ADD COLUMN IF NOT EXISTS relance_round integer NOT NULL DEFAULT 0;

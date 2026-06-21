@@ -1266,6 +1266,7 @@ export type Database = {
           imported_at: string | null
           last_email_sent_at: string | null
           next_email_at: string | null
+          relance_round: number
           relance_sent_at: string | null
           relance_status: string | null
           source: string | null
@@ -1284,6 +1285,7 @@ export type Database = {
           imported_at?: string | null
           last_email_sent_at?: string | null
           next_email_at?: string | null
+          relance_round?: number
           relance_sent_at?: string | null
           relance_status?: string | null
           source?: string | null
@@ -1302,6 +1304,7 @@ export type Database = {
           imported_at?: string | null
           last_email_sent_at?: string | null
           next_email_at?: string | null
+          relance_round?: number
           relance_sent_at?: string | null
           relance_status?: string | null
           source?: string | null

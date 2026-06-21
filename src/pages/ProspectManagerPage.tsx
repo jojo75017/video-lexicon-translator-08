@@ -32,6 +32,7 @@ interface Prospect {
   source?: string;
   relance_sent_at?: string | null;
   relance_status?: string | null;
+  relance_round?: number | null;
 }
 
 const STEPS = [
@@ -348,6 +349,52 @@ const ProspectManagerPage = () => {
     setSending(false);
   };
 
+  // Relances supplémentaires : 3 variantes tournantes (démo / offre) pour les prospects
+  // qui ont TERMINÉ la séquence (5/5) sans jamais cliquer. Anti-doublon par variante (relance_round).
+  const RELANCE_MAX_ROUNDS = 3;
+  const handleRelancesSupplementaires = async () => {
+    const ids = prospects
+      .filter(p =>
+        p.status === 'active' && !p.unsubscribed && p.completed &&
+        !hasClicked(p.email) && (p.relance_round ?? 0) < RELANCE_MAX_ROUNDS
+      )
+      .map(p => p.id);
+
+    if (ids.length === 0) {
+      toast.error('Aucun prospect éligible (tous ont cliqué ou reçu les 3 relances)');
+      return;
+    }
+
+    if (!confirm(`Envoyer la prochaine relance (sur 3) à ${ids.length} prospect(s) à 5/5 non-cliqueurs ?`)) return;
+
+    setSending(true);
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      const chunkSize = 150;
+      let totalSent = 0;
+      let totalErrors = 0;
+      for (let i = 0; i < ids.length; i += chunkSize) {
+        const chunk = ids.slice(i, i + chunkSize);
+        const { data, error } = await supabase.functions.invoke('send-sales-email', {
+          body: { mode: 'relance', prospect_ids: chunk, batch_size: chunk.length },
+          headers: { Authorization: `Bearer ${session.session?.access_token}` },
+        });
+        if (error) throw error;
+        totalSent += data?.sent || 0;
+        totalErrors += data?.errors || 0;
+      }
+      if (totalErrors > 0) {
+        toast.warning(`🔁 ${totalSent}/${ids.length} relance(s) envoyée(s) · ${totalErrors} échec(s)`);
+      } else {
+        toast.success(`✅ ${totalSent}/${ids.length} relance(s) supplémentaire(s) envoyée(s)`);
+      }
+      fetchProspects();
+    } catch (err: any) {
+      toast.error('Erreur d\'envoi : ' + (err.message || ''));
+    }
+    setSending(false);
+  };
+
 
 
 
@@ -467,6 +514,10 @@ const ProspectManagerPage = () => {
   // Vérification d'envoi : combien de non-cliqueurs ont bien reçu la relance / en échec
   const relanceSentCount = nonClickerOpeners.filter(p => p.relance_status === 'sent').length;
   const relanceErrorCount = nonClickerOpeners.filter(p => p.relance_status === 'error').length;
+  // Cibles des relances supplémentaires : prospects à 5/5 (completed), non-cliqueurs, avec encore des variantes
+  const relancesSupplTargets = prospects.filter(
+    p => p.status === 'active' && !p.unsubscribed && p.completed && !hasClicked(p.email) && (p.relance_round ?? 0) < 3
+  ).length;
 
   const stepDistribution = STEPS.map(s => ({
     ...s,
@@ -624,6 +675,23 @@ const ProspectManagerPage = () => {
                 )}
               </div>
 
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRelancesSupplementaires}
+                  disabled={sending || relancesSupplTargets === 0}
+                  className="border-violet-500/40 text-violet-400 hover:bg-violet-500/10 font-semibold"
+                >
+                  <RefreshCw className="h-3 w-3 mr-1" /> ✨ Relances 5/5 (prochaine sur 3)
+                </Button>
+                <span className="text-xs font-semibold px-2 py-1 rounded-md bg-violet-500/10 text-violet-400 border border-violet-500/30 whitespace-nowrap">
+                  🎯 {relancesSupplTargets} prospect{relancesSupplTargets > 1 ? 's' : ''} à 5/5 relançable{relancesSupplTargets > 1 ? 's' : ''}
+                </span>
+              </div>
+
+
+
 
               <Button
                 variant="outline"
@@ -733,10 +801,18 @@ const ProspectManagerPage = () => {
                             })()}
                           </td>
                           <td className="px-3 py-2 text-center">
-                            <Badge variant="outline" className="border-gold/30 text-gold-light">
-                              {p.current_step}/5
-                            </Badge>
+                            <div className="flex flex-col items-center gap-1">
+                              <Badge variant="outline" className="border-gold/30 text-gold-light">
+                                {p.current_step}/5
+                              </Badge>
+                              {(p.relance_round ?? 0) > 0 && (
+                                <Badge className="bg-violet-500/15 text-violet-400 border-violet-500/30 text-[10px]">
+                                  ✨ Relance {p.relance_round}/3
+                                </Badge>
+                              )}
+                            </div>
                           </td>
+
                           <td className="px-3 py-2 text-center">
                             <input
                               type="checkbox"
