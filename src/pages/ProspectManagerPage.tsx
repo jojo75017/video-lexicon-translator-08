@@ -612,6 +612,16 @@ const ProspectManagerPage = () => {
                 <span className="text-xs font-semibold px-2 py-1 rounded-md bg-orange-500/10 text-orange-400 border border-orange-500/30 whitespace-nowrap">
                   🎯 {nonClickerTargets} cible{nonClickerTargets > 1 ? 's' : ''} sélectionnée{nonClickerTargets > 1 ? 's' : ''}
                 </span>
+                {relanceSentCount > 0 && (
+                  <span className="text-xs font-semibold px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 whitespace-nowrap">
+                    ✅ {relanceSentCount} relancé{relanceSentCount > 1 ? 's' : ''}
+                  </span>
+                )}
+                {relanceErrorCount > 0 && (
+                  <span className="text-xs font-semibold px-2 py-1 rounded-md bg-red-500/10 text-red-400 border border-red-500/30 whitespace-nowrap">
+                    ⚠️ {relanceErrorCount} échec{relanceErrorCount > 1 ? 's' : ''}
+                  </span>
+                )}
               </div>
 
 
