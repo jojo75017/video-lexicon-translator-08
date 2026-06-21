@@ -56,65 +56,60 @@ function getEmailBody(step: number, firstName: string): string {
   const bodies: Record<number, string> = {
     1: `Bonjour ${name},
 
-Il y a 18 mois, j'avais une idée de livre... et la page blanche me bloquait à chaque fois.
+Et si vous pouviez voir un livre de 150 pages s'écrire **sous vos yeux**, en quelques minutes ?
 
-Le problème n'était pas moi. C'était la méthode.
+Pas une promesse. Une démo gratuite, en direct : vous tapez un sujet, l'IA génère le plan, puis les chapitres, puis la couverture. Prêt pour Amazon KDP.
 
-Alors j'ai construit un outil qui gère tout : idée → plan → rédaction → illustrations → couverture → export Amazon KDP.
+Mon dernier livre ? **150 pages, 47 minutes.** (J'en ai 35+ publiés, profil Amazon public.)
 
-Résultat : mon dernier livre, 150 pages, généré en 47 minutes.
+Le plus simple, c'est de le voir vous-même 👇
 
-Aujourd'hui c'est EbookStudio Pro, et il est accessible à **67€ à vie** (paiement unique).
-
-👉 Découvrir l'outil : ${OFFRES_LINK}
-👉 Tester la démo gratuitement : ${DEMO_LINK}
+[[ 🎬 Voir la démo gratuite (sans carte) | ${DEMO_LINK} ]]
 
 À demain pour la suite,
 Georges`,
 
     2: `${name},
 
-Pourquoi 90% des gens qui veulent publier sur Amazon n'y arrivent jamais ?
+90% des gens qui veulent publier sur Amazon n'y arrivent jamais. Pas par manque de talent — à cause de 3 erreurs :
 
 ❌ Écrire sans plan → abandon à la page 12
-❌ Passer 3 semaines sur un seul livre
-❌ Négliger couverture et mots-clés → 0 vente
+❌ Y passer 3 semaines → découragement
+❌ Couverture + mots-clés négligés → 0 vente
 
-EbookStudio Pro règle les 3 d'un coup : plan automatique, génération en 47 min, couvertures pro + optimisation KDP.
+EbookStudio Pro règle les 3 d'un coup : plan automatique, rédaction en quelques minutes, couvertures pro et optimisation KDP incluses.
 
-Coût : ~0,30€ par livre.
+Voyez à quoi ça ressemble en vrai 👇
 
-👉 Voir l'outil : ${OFFRES_LINK}
+[[ 🎬 Tester la démo gratuitement | ${DEMO_LINK} ]]
 
 Georges`,
 
     3: `${name},
 
-Pas de pitch aujourd'hui, juste mes vrais chiffres :
+Pas de pitch aujourd'hui. Juste mes vrais chiffres :
 
-• 2023 : 0 livre publié
-• 2024 : 18 livres (à la main)
+• 2023 : 0 livre
+• 2024 : 18 livres (écrits à la main)
 • 2025-2026 : 35+ livres (avec EbookStudio)
 
-Mon profil Amazon est public : https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7
+Tout est public et vérifiable sur mon profil Amazon. La même machine qui m'a permis ça est désormais accessible à **67€ à vie**.
 
-L'outil complet (générateur IA, couvertures, livre audio, marketing) est à **67€ à vie**.
-
-👉 Accéder à l'offre : ${OFFRES_LINK}
+[[ 👉 Découvrir l'offre Fondateur (67€) | ${OFFRES_LINK} ]]
 
 Georges`,
 
     4: `${name},
 
-Une raison de ne pas attendre :
+Une seule raison de ne pas attendre :
 
-Aujourd'hui, EbookStudio Pro est à **67€ à vie**. Bientôt arrive la V3 "Publication Assistée Pro", qui sera vendue 197€.
+Aujourd'hui, EbookStudio Pro est à **67€ à vie**. Bientôt, la V3 « Publication Assistée Pro » sera vendue **197€**.
 
-🎁 Et les membres actuels recevront la V3 en **mise à jour gratuite**.
+🎁 Les membres actuels la recevront en **mise à jour gratuite**.
 
-Autrement dit : 67€ aujourd'hui = l'accès à un outil qui en vaudra 197€ demain.
+Autrement dit : 67€ aujourd'hui = un outil qui en vaudra 197€ demain. Le calcul est vite fait.
 
-👉 Verrouiller mon accès : ${OFFRES_LINK}
+[[ 🔒 Verrouiller mon accès à 67€ | ${OFFRES_LINK} ]]
 
 Georges`,
 
@@ -122,39 +117,62 @@ Georges`,
 
 Dernier rappel, je ne reviendrai pas dessus.
 
-EbookStudio Pro, c'est :
+EbookStudio Pro, à **67€ à vie** :
 ✅ Générateur IA illimité
 ✅ Couvertures pro
 ✅ Livre audio
 ✅ Marketing & KDP intégrés
-✅ Mise à jour V3 incluse
+✅ Mise à jour V3 (197€) incluse
 
-Le tout à **67€ à vie** (ou 2×35€ / 3×25€).
+(Possible en 2×35€ ou 3×25€.)
 
-👉 Rejoindre : ${OFFRES_LINK}
+[[ 👉 Rejoindre les Fondateurs | ${OFFRES_LINK} ]]
 
 Merci de m'avoir lu cette semaine,
 Georges`,
 
     6: `${name},
 
-Je vous ai écrit plusieurs fois et je n'ai pas eu de retour — c'est tout à fait OK.
+Je vous ai écrit plusieurs fois sans retour — et c'est tout à fait OK.
 
-Avant de vous laisser tranquille, juste une question honnête : qu'est-ce qui vous retient ?
+Avant de vous laisser tranquille, une question honnête : qu'est-ce qui vous retient ? Le prix, le doute que ça marche pour vous, le temps ?
 
-Le prix ? Le doute que ça marche pour vous ? Pas le temps ?
+Le plus simple pour lever le doute, c'est d'essayer sans rien payer 👇
 
-Répondez-moi simplement à cet email, je lis tout personnellement. Et si vous préférez juste tester sans rien payer :
+[[ 🎬 Tester la démo gratuite | ${DEMO_LINK} ]]
 
-👉 La démo gratuite est ici : ${DEMO_LINK}
-👉 Et l'offre à 67€ à vie reste là : ${OFFRES_LINK}
+Et si vous préférez m'écrire, répondez simplement à cet email : je lis tout personnellement.
 
-Au plaisir d'échanger,
+Au plaisir,
 Georges`,
   };
 
   return bodies[step] || "";
 }
+
+// ===== Email de RELANCE dédié (non-cliqueurs) — curiosité forte + démo =====
+const RELANCE_SUBJECT = "🎬 {name}, regardez un livre s'écrire en 2 min";
+function getRelanceEmailBody(firstName: string): string {
+  const name = firstName || "cher lecteur";
+  return `Bonjour ${name},
+
+Je ne sais pas si mes derniers emails vous ont parlé, alors je vais faire plus simple : je vous montre.
+
+👀 En **2 minutes chrono**, vous allez voir l'IA générer, en direct :
+• le plan complet d'un livre
+• les premiers chapitres rédigés
+• une couverture professionnelle
+
+Aucune carte bancaire, aucun engagement. Juste pour voir si ça vous parle.
+
+[[ 🎬 Lancer la démo gratuite maintenant | ${DEMO_LINK} ]]
+
+Et si ça vous plaît, l'offre Fondateur à **67€ à vie** (V3 à 197€ incluse) vous attend juste après.
+
+À tout de suite,
+Georges`;
+}
+
 
 // ===== Segment "intéressés" : prospects qui ont déjà manifesté un intérêt =====
 // Version plus directe, orientée DÉMO + OFFRE (moins de pédagogie, plus d'action)
