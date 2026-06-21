@@ -32,6 +32,7 @@ interface Prospect {
   source?: string;
   relance_sent_at?: string | null;
   relance_status?: string | null;
+  relance_round?: number | null;
 }
 
 const STEPS = [
