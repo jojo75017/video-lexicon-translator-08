@@ -280,34 +280,62 @@ function buildHtmlEmail(body: string, email?: string, step?: number): string {
     return `${supabaseUrl}/functions/v1/track-email-click?e=${encodeURIComponent(email)}&s=${step ?? ""}&u=${encodeURIComponent(dest)}`;
   };
 
+  // Gros bouton CTA centré (c'est lui qui fait grimper les clics)
+  const bigButton = (label: string, dest: string): string =>
+    `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:28px auto;">
+      <tr><td style="border-radius:10px;background:#FF9E2D;">
+        <a href="${trackedLink(dest)}" style="display:inline-block;padding:16px 34px;color:#ffffff;text-decoration:none;font-weight:bold;font-size:17px;border-radius:10px;">${label}</a>
+      </td></tr>
+    </table>`;
+
+  const esc = (s: string) =>
+    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+  // 1) Boutons via syntaxe [[ label | url ]]   2) gras **...**   3) liens nus
   const htmlBody = body
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/\n/g, "<br>")
-    .replace(/→/g, "→")
-    .replace(/(https?:\/\/[^\s<]+)/g, (m) => `<a href="${trackedLink(m)}" style="color:#D4A017;">${m}</a>`)
-    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+    .split(/\n/)
+    .map((line) => {
+      const btnMatch = line.match(/^\s*\[\[\s*(.+?)\s*\|\s*(\S+)\s*\]\]\s*$/);
+      if (btnMatch) return bigButton(esc(btnMatch[1]), btnMatch[2]);
+      const safe = esc(line)
+        .replace(/(https?:\/\/[^\s<]+)/g, (m) => `<a href="${trackedLink(m)}" style="color:#008296;">${m}</a>`)
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+      return safe;
+    })
+    .join("<br>")
+    // évite les <br> superflus autour des boutons
+    .replace(/<br>(<table)/g, "$1")
+    .replace(/(<\/table>)<br>/g, "$1");
 
   const trackingPixel = email && step
     ? `<img src="${supabaseUrl}/functions/v1/track-email-open?e=${encodeURIComponent(email)}&s=${step}" width="1" height="1" alt="" style="display:none;" />`
     : "";
 
   return `<!DOCTYPE html>
-<html><head><meta charset="utf-8"></head>
-<body style="font-family:Arial,sans-serif;background:#ffffff;color:#1a1a1a;padding:32px;max-width:600px;margin:0 auto;">
-<div style="border-top:3px solid #D4A017;padding-top:20px;">
-${htmlBody}
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#FAFAFA;">
+<div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+  <div style="background:#008296;padding:22px 32px;">
+    <span style="color:#ffffff;font-family:Arial,sans-serif;font-size:20px;font-weight:bold;">EbookStudio <span style="color:#FF9E2D;">Pro</span></span>
+    <div style="color:#cdeef0;font-family:Arial,sans-serif;font-size:12px;margin-top:4px;">Votre livre, écrit par l'IA — prêt pour Amazon KDP</div>
+  </div>
+  <div style="padding:30px 32px 8px 32px;font-family:Arial,sans-serif;color:#232F3E;font-size:16px;line-height:1.6;">
+    ${htmlBody}
+  </div>
+  <div style="margin:8px 32px 24px 32px;padding:14px 18px;background:#e6f4f5;border-left:4px solid #008296;border-radius:8px;font-family:Arial,sans-serif;font-size:13px;color:#1f5f63;">
+    ✅ 35+ livres publiés par le créateur · 📖 Profil Amazon public · ⏱️ Un livre généré en 47 min
+  </div>
+  <div style="background:#FAFAFA;padding:18px 32px;border-top:1px solid #eee;font-family:Arial,sans-serif;font-size:12px;color:#888;text-align:center;">
+    Vous recevez cet email car vous avez manifesté un intérêt pour EbookStudio Pro.<br>
+    <a href="${trackedLink(OFFRES_LINK)}" style="color:#008296;">Voir l'offre</a> ·
+    <a href="${trackedLink(DEMO_LINK)}" style="color:#008296;">Tester la démo</a><br>
+    Pour ne plus recevoir ces emails, répondez "STOP" à cet email.
+  </div>
 </div>
-<hr style="border-color:#D4A017;margin-top:32px;">
-<p style="font-size:12px;color:#888;">
-Vous recevez cet email car vous avez manifesté un intérêt pour EbookStudio Pro.<br>
-<a href="${trackedLink(OFFRES_LINK)}" style="color:#D4A017;">Voir l'offre</a> · <a href="${trackedLink(DEMO_LINK)}" style="color:#D4A017;">Tester la démo</a><br>
-Pour ne plus recevoir ces emails, répondez "STOP" à cet email.
-</p>
 ${trackingPixel}
 </body></html>`;
 }
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
