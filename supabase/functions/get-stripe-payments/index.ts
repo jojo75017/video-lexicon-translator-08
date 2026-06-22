@@ -59,9 +59,8 @@ async function loadEnv(env: StripeEnv): Promise<EnvSummary> {
     transactions: [],
   };
   try {
-    const stripe = createStripeClient(env);
-    const charges = await stripe.charges.list({ limit: 100 });
-    const txs: TxRow[] = charges.data.map((ch: any) => ({
+    const charges = await stripeRequest<{ data: any[] }>(env, "GET", "/charges", { limit: 100 });
+    const txs: TxRow[] = (charges.data ?? []).map((ch: any) => ({
       id: ch.id,
       email: ch.billing_details?.email ?? ch.receipt_email ?? null,
       amount: toMajor(ch.amount, ch.currency),
