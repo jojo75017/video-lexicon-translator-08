@@ -46,6 +46,10 @@ const InlineLeadCapture: React.FC<InlineLeadCaptureProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
 
+  useEffect(() => {
+    trackCaptureEvent('inline', 'view', { leadMagnet });
+  }, [leadMagnet]);
+
   const resolvedBullets = bullets ?? (isExpat ? DEFAULT_BULLETS_EXPAT : DEFAULT_BULLETS_GENERAL);
   const resolvedTitle =
     title ?? (isExpat ? 'Publier sur Amazon KDP depuis l\'étranger 🌍' : 'Recevez votre guide gratuit 🎁');
