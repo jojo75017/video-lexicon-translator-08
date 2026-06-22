@@ -1,5 +1,9 @@
 project_id = "xvdgazrewsuaqtalqxue"
 
+[functions.get-stripe-payments]
+verify_jwt = false
+
+
 [functions.redeem-beta-code]
 verify_jwt = false
 
