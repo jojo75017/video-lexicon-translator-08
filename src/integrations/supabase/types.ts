@@ -292,6 +292,45 @@ export type Database = {
           },
         ]
       }
+      capture_events: {
+        Row: {
+          ab_variant: string | null
+          created_at: string
+          event_type: string
+          id: string
+          lead_magnet: string | null
+          page_path: string | null
+          surface: string
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          ab_variant?: string | null
+          created_at?: string
+          event_type: string
+          id?: string
+          lead_magnet?: string | null
+          page_path?: string | null
+          surface: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          ab_variant?: string | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          lead_magnet?: string | null
+          page_path?: string | null
+          surface?: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: []
+      }
       comic_books: {
         Row: {
           age_group: string | null
