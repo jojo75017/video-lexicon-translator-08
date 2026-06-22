@@ -92,6 +92,9 @@ const MasterclassPage: React.FC = () => {
         <link rel="canonical" href="https://ebookstudio.fr/masterclass" />
       </Helmet>
 
+      {view === 'intro' ? (
+        <MasterclassIntro onStart={handleStart} />
+      ) : (
       <div className="flex min-h-screen">
         {/* Sidebar desktop */}
         <aside className="hidden lg:block w-[300px] shrink-0 border-r border-border bg-card/40">
