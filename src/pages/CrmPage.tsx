@@ -11,6 +11,7 @@ import { CrmAnalytics } from '@/components/crm/CrmAnalytics';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 import LeadsInscritsPanel from '@/components/admin/LeadsInscritsPanel';
+import AdminPaymentsDashboardPage from '@/pages/admin/AdminPaymentsDashboardPage';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
