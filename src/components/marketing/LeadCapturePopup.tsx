@@ -42,6 +42,10 @@ const LeadCapturePopup: React.FC = () => {
       armed.current = false;
       sessionStorage.setItem(SESSION_KEY, '1');
       setOpen(true);
+      trackCaptureEvent('popup', 'view', {
+        abVariant: variant,
+        leadMagnet: isExpat ? 'publier-kdp-etranger' : '5-niches-rentables-2026',
+      });
     };
 
     const onMouseLeave = (e: MouseEvent) => {
