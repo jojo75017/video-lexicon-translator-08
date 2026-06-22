@@ -11,6 +11,7 @@ import { CrmAnalytics } from '@/components/crm/CrmAnalytics';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 import LeadsInscritsPanel from '@/components/admin/LeadsInscritsPanel';
+import AdminPaymentsDashboardPage from '@/pages/admin/AdminPaymentsDashboardPage';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -605,6 +606,7 @@ const CrmPage: React.FC = () => {
             <TabsTrigger value="kanban">📋 Pipeline</TabsTrigger>
             <TabsTrigger value="list">📃 Liste</TabsTrigger>
             <TabsTrigger value="inscrits">🌍 Inscrits</TabsTrigger>
+            <TabsTrigger value="paiements">💳 Paiements</TabsTrigger>
             <TabsTrigger value="analytics">📊 Analytics</TabsTrigger>
           </TabsList>
 
@@ -669,6 +671,10 @@ const CrmPage: React.FC = () => {
 
           <TabsContent value="inscrits" className="mt-4">
             <LeadsInscritsPanel />
+          </TabsContent>
+
+          <TabsContent value="paiements" className="mt-4">
+            <AdminPaymentsDashboardPage />
           </TabsContent>
         </Tabs>
       </div>
