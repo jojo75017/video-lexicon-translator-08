@@ -606,6 +606,7 @@ const CrmPage: React.FC = () => {
             <TabsTrigger value="kanban">📋 Pipeline</TabsTrigger>
             <TabsTrigger value="list">📃 Liste</TabsTrigger>
             <TabsTrigger value="inscrits">🌍 Inscrits</TabsTrigger>
+            <TabsTrigger value="paiements">💳 Paiements</TabsTrigger>
             <TabsTrigger value="analytics">📊 Analytics</TabsTrigger>
           </TabsList>
 
