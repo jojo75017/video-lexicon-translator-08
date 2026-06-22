@@ -193,8 +193,10 @@ const MasterclassPage: React.FC = () => {
           </div>
         </main>
       </div>
+      )}
 
       <MasterclassOfferPopup open={popupOpen} onOpenChange={setPopupOpen} />
+
     </div>
   );
 };
