@@ -7,6 +7,7 @@ import MasterclassSidebar from '@/components/masterclass/MasterclassSidebar';
 import MasterclassPlayer from '@/components/masterclass/MasterclassPlayer';
 import MasterclassTabs from '@/components/masterclass/MasterclassTabs';
 import MasterclassOfferPopup from '@/components/masterclass/MasterclassOfferPopup';
+import MasterclassIntro from '@/components/masterclass/MasterclassIntro';
 import {
   MASTERCLASS_MODULES,
   MASTERCLASS_CTA_URL,
@@ -22,16 +23,26 @@ const MasterclassPage: React.FC = () => {
   const [activeId, setActiveId] = useState(1);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [popupOpen, setPopupOpen] = useState(false);
+  const [view, setView] = useState<'intro' | 'player'>('intro');
 
   useEffect(() => {
     try {
-      setUnlocked(localStorage.getItem(UNLOCK_KEY) === '1');
+      const isUnlocked = localStorage.getItem(UNLOCK_KEY) === '1';
+      setUnlocked(isUnlocked);
       const raw = localStorage.getItem(PROGRESS_KEY);
+      const hasProgress = !!raw && JSON.parse(raw)?.length > 0;
       if (raw) setCompleted(JSON.parse(raw));
+      // Visiteur déjà engagé → direct sur le lecteur, sinon intro
+      if (isUnlocked || hasProgress) setView('player');
     } catch {
       /* ignore */
     }
   }, []);
+
+  const handleStart = () => {
+    setActiveId(1);
+    setView('player');
+  };
 
   const activeModule = useMemo(
     () => MASTERCLASS_MODULES.find((m) => m.id === activeId) ?? MASTERCLASS_MODULES[0],
@@ -81,6 +92,9 @@ const MasterclassPage: React.FC = () => {
         <link rel="canonical" href="https://ebookstudio.fr/masterclass" />
       </Helmet>
 
+      {view === 'intro' ? (
+        <MasterclassIntro onStart={handleStart} />
+      ) : (
       <div className="flex min-h-screen">
         {/* Sidebar desktop */}
         <aside className="hidden lg:block w-[300px] shrink-0 border-r border-border bg-card/40">
@@ -114,7 +128,16 @@ const MasterclassPage: React.FC = () => {
               </SheetContent>
             </Sheet>
             <span className="text-sm font-semibold">Masterclass</span>
+            <Button variant="ghost" size="sm" onClick={() => setView('intro')}>
+              Intro
+            </Button>
           </header>
+
+          <div className="hidden lg:flex justify-end px-6 pt-4">
+            <Button variant="ghost" size="sm" onClick={() => setView('intro')}>
+              ← Revoir l'introduction
+            </Button>
+          </div>
 
           <div className="mx-auto max-w-4xl px-4 sm:px-6 py-6 space-y-6">
             <div>
@@ -170,8 +193,10 @@ const MasterclassPage: React.FC = () => {
           </div>
         </main>
       </div>
+      )}
 
       <MasterclassOfferPopup open={popupOpen} onOpenChange={setPopupOpen} />
+
     </div>
   );
 };
