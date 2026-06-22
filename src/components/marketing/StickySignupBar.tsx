@@ -126,7 +126,13 @@ const StickySignupBar: React.FC = () => {
             <Button
               size="sm"
               variant="secondary"
-              onClick={() => setExpanded(true)}
+              onClick={() => {
+                setExpanded(true);
+                trackCaptureEvent('sticky', 'click', {
+                  abVariant: variant,
+                  leadMagnet: isExpat ? 'publier-kdp-etranger' : '5-niches-rentables-2026',
+                });
+              }}
               className="h-9 whitespace-nowrap font-semibold"
             >
               {copy.stickyCta}
