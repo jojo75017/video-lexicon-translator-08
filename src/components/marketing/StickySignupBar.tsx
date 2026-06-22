@@ -40,7 +40,13 @@ const StickySignupBar: React.FC = () => {
       setVisible(false);
       return;
     }
-    const t = window.setTimeout(() => setVisible(true), 4000);
+    const t = window.setTimeout(() => {
+      setVisible(true);
+      trackCaptureEvent('sticky', 'view', {
+        abVariant: variant,
+        leadMagnet: isExpat ? 'publier-kdp-etranger' : '5-niches-rentables-2026',
+      });
+    }, 4000);
     return () => window.clearTimeout(t);
   }, [isExcluded, location.pathname]);
 
