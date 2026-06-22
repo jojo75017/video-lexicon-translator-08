@@ -1,57 +1,54 @@
-# 3 nouvelles relances pour faire cliquer les prospects à 5/5
+# Tableau de bord Paiements Stripe (Test vs Live)
 
-## Problème actuel
-La séquence `sales_prospects` se termine à l'étape 5 (5/5), puis une **unique** relance "non-cliqueurs" existe. L'anti-doublon (`relance_sent_at IS NULL`) empêche d'envoyer plus d'une relance par prospect : ceux à 5/5 ne reçoivent donc plus rien. On ajoute **3 nouvelles relances** qui tournent (variantes 1→2→3), partent automatiquement par le cron ET manuellement depuis la page Prospects, en alternant l'angle démo / offre.
+Nouveau tableau de bord admin, accessible à toi seul, qui combine les vraies transactions Stripe (environnement test ET live) avec les commandes/confirmations déjà enregistrées dans ta base, le tout mis à jour en temps réel.
 
-## Ce qui sera construit
+## Ce que la page affichera
 
-### 1. Base de données (migration légère)
-Ajouter une colonne à `public.sales_prospects` :
-- `relance_round` (integer, défaut `0`) — compteur de relances déjà envoyées (0 = aucune, 3 = série terminée).
+1. **Chiffres clés** (par environnement, deux colonnes Test / Live)
+   - Total encaissé, nombre de paiements réussis, paiements en attente, montant moyen.
+2. **Statut go-live Stripe** — un panneau qui montre où en est la mise en production (étapes franchies pour accepter les vrais paiements), via le statut Stripe.
+3. **Liste des transactions** — tableau détaillé : email, montant, statut, date, méthode, et un badge `TEST` (orange) ou `LIVE` (vert) pour chaque ligne.
+4. **Temps réel** — quand un nouveau paiement/confirmation arrive, la liste se rafraîchit automatiquement et une notification s'affiche.
 
-GRANT déjà en place sur la table ; on conserve l'accès `service_role`.
+## Sources de données combinées
 
-### 2. Les 3 nouvelles relances (dans `send-sales-email`)
-Un tableau `RELANCE_VARIANTS` remplace la relance unique. Chaque variante = `{ subject, body }`, angles alternés et 100% orientés clic (gros bouton CTA traçable déjà géré par `buildHtmlEmail`).
+- **Stripe API** (test + live) : transactions réelles, montants, statuts. Lecture via une nouvelle edge function sécurisée.
+- **Base interne** : `funnel_orders` (commandes) + `payment_confirmations` (confirmations manuelles) pour le suivi temps réel et les paiements en attente.
 
-````text
-Relance 1 — Démo / curiosité
-  Objet : "🎬 {name}, regardez un livre s'écrire en 2 min"
-  → voir l'IA générer plan + chapitres + couverture, sans CB.
-
-Relance 2 — Offre / valeur
-  Objet : "🎁 {name}, 67€ à vie = la V3 (197€) offerte"
-  → rappel offre Fondateur, bénéfices, urgence douce (prix monte à la V3).
-
-Relance 3 — Démo + dernière main tendue
-  Objet : "👋 {name}, une dernière démo avant qu'on arrête"
-  → "qu'est-ce qui vous retient ?", relance émotionnelle + bouton démo,
-    invitation à répondre à l'email.
-````
-
-### 3. Logique d'envoi (`send-sales-email`, mode `relance`)
-- La cible n'est plus filtrée sur `relance_sent_at IS NULL`, mais sur `relance_round < 3` (et non-cliqueurs / non-clients).
-- À chaque envoi : on choisit `RELANCE_VARIANTS[relance_round]`, on envoie, puis on incrémente `relance_round` et on met à jour `relance_sent_at` / `relance_status`.
-- Le `step` de tracking passe à `7 + relance_round` pour distinguer chaque relance dans `email_clicks`.
-
-### 4. Envoi automatique (cron)
-Le cron `email-sequence-cron` (déjà planifié) gère la séquence principale. On ajoute une passe relance : pour les prospects `completed = true`, non-cliqueurs, non-clients, avec `relance_round < 3`, et dont la dernière relance date de **+3 jours** (espacement), on déclenche la variante suivante. Une relance s'arrête dès qu'un clic est détecté (`email_clicks`) ou un achat (`funnel_orders`/`sales_prospects.completed` payé).
-
-### 5. Page Prospects (`ProspectManagerPage.tsx`)
-- Nouveau bloc "Relances supplémentaires (3 variantes)" avec :
-  - un compteur de cibles disponibles (`completed`, non-cliqueurs, `relance_round < 3`),
-  - un bouton **"Envoyer la prochaine relance"** (envoie la variante suivante à tous les éligibles, par lots, comme l'existant),
-  - affichage par prospect du `relance_round` (ex. "Relance 2/3").
-- Réutilise le mécanisme `supabase.functions.invoke('send-sales-email', { mode: 'relance', prospect_ids })` déjà en place (chunking + toasts de succès/échec conservés).
+```text
+┌─────────────────────────────┐
+│  Dashboard Paiements (admin) │
+├──────────────┬──────────────┤
+│  TEST         │  LIVE         │  ← chiffres clés par env
+├──────────────┴──────────────┤
+│  Statut go-live Stripe        │
+├──────────────────────────────┤
+│  Transactions (Stripe + base) │  ← badge TEST/LIVE, temps réel
+└──────────────────────────────┘
+```
 
 ## Détails techniques
-- Aucun nouveau secret nécessaire (Brevo/Resend déjà configurés).
-- Liens 100% traçables via `track-email-click` (déjà implémenté) → les clics remontent dans la page.
-- Anti-doublon par variante grâce à `relance_round` : un prospect ne reçoit jamais deux fois la même relance.
-- Arrêt automatique dès clic ou achat, pour ne pas sur-solliciter les leads chauds.
 
-## Fichiers touchés
-- migration : `sales_prospects.relance_round`
-- `supabase/functions/send-sales-email/index.ts` (variantes + logique round)
-- `supabase/functions/email-sequence-cron/index.ts` (passe relance auto)
-- `src/pages/ProspectManagerPage.tsx` (bouton + compteur + affichage round)
+### Edge function `get-stripe-payments`
+- Vérifie le JWT en code et confirme le rôle admin (`has_role`) avant toute lecture.
+- Utilise `createStripeClient(env)` du `_shared/stripe.ts` pour appeler Stripe en **sandbox** et **live** (le live ne renvoie rien tant que les clés live ne sont pas provisionnées — géré proprement).
+- Récupère les `charges`/`payment_intents` récents + agrège les totaux par environnement.
+- `verify_jwt = false` dans `config.toml`, validation faite en code.
+
+### Statut go-live
+- Réutilise le statut renvoyé par le système de go-live Stripe (étapes claim → setup → install → clés → readiness) affiché en lecture seule.
+
+### Frontend
+- Nouvelle page `src/pages/admin/AdminPaymentsDashboardPage.tsx`.
+- Route `/admin-paiements` protégée par `<AdminGate>` dans `App.tsx`.
+- Hook de chargement qui appelle l'edge function + lit `funnel_orders` et `payment_confirmations`.
+- Abonnement Realtime sur `funnel_orders` et `payment_confirmations` (souscription dans `useEffect`, nettoyage au démontage) pour le rafraîchissement live + toast.
+- Composants UI existants : `Card`, `Table`, `Badge` (badge `TEST` orange / `LIVE` vert), thème KDP existant.
+
+### Base de données
+- Activer Realtime sur `funnel_orders` (et confirmer sur `payment_confirmations`) via migration `ALTER PUBLICATION supabase_realtime ADD TABLE ...`.
+- Aucune nouvelle table nécessaire.
+
+## Hors périmètre
+- Pas de modification des flux de paiement existants.
+- Pas d'écriture/remboursement depuis le dashboard (lecture seule).
