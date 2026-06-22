@@ -33,6 +33,7 @@ const AdminPage = lazy(() => import('./pages/AdminPage').then(m => ({ default: m
 const AuthPage = lazy(() => import('./pages/AuthPage'));
 const AdminProfilePage = lazy(() => import('./pages/AdminProfilePage'));
 const AdminFunnelPage = lazy(() => import('./pages/admin/AdminFunnelPage'));
+const AdminPaymentsDashboardPage = lazy(() => import('./pages/admin/AdminPaymentsDashboardPage'));
 const AdminPdfGiftsPage = lazy(() => import('./pages/admin/AdminPdfGiftsPage'));
 const AdminBetaCodesPage = lazy(() => import('./pages/admin/AdminBetaCodesPage'));
 const ActivationBetaPage = lazy(() => import('./pages/ActivationBetaPage'));
