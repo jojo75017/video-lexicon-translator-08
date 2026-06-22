@@ -675,6 +675,11 @@ const CrmPage: React.FC = () => {
             <LeadsInscritsPanel />
           </TabsContent>
 
+          <TabsContent value="acquisition" className="mt-4">
+            <CrmAcquisition />
+          </TabsContent>
+
+
           <TabsContent value="paiements" className="mt-4">
             <AdminPaymentsDashboardPage />
           </TabsContent>
