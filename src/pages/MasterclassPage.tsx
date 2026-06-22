@@ -7,6 +7,7 @@ import MasterclassSidebar from '@/components/masterclass/MasterclassSidebar';
 import MasterclassPlayer from '@/components/masterclass/MasterclassPlayer';
 import MasterclassTabs from '@/components/masterclass/MasterclassTabs';
 import MasterclassOfferPopup from '@/components/masterclass/MasterclassOfferPopup';
+import MasterclassIntro from '@/components/masterclass/MasterclassIntro';
 import {
   MASTERCLASS_MODULES,
   MASTERCLASS_CTA_URL,
