@@ -8,6 +8,7 @@ import { CrmContactDialog } from '@/components/crm/CrmContactDialog';
 import { CrmActivityPanel } from '@/components/crm/CrmActivityPanel';
 import { CrmKanban } from '@/components/crm/CrmKanban';
 import { CrmAnalytics } from '@/components/crm/CrmAnalytics';
+import { CrmAcquisition } from '@/components/crm/CrmAcquisition';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 import LeadsInscritsPanel from '@/components/admin/LeadsInscritsPanel';
