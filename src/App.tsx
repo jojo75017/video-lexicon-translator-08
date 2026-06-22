@@ -33,6 +33,7 @@ const AdminPage = lazy(() => import('./pages/AdminPage').then(m => ({ default: m
 const AuthPage = lazy(() => import('./pages/AuthPage'));
 const AdminProfilePage = lazy(() => import('./pages/AdminProfilePage'));
 const AdminFunnelPage = lazy(() => import('./pages/admin/AdminFunnelPage'));
+const AdminPaymentsDashboardPage = lazy(() => import('./pages/admin/AdminPaymentsDashboardPage'));
 const AdminPdfGiftsPage = lazy(() => import('./pages/admin/AdminPdfGiftsPage'));
 const AdminBetaCodesPage = lazy(() => import('./pages/admin/AdminBetaCodesPage'));
 const ActivationBetaPage = lazy(() => import('./pages/ActivationBetaPage'));
@@ -428,6 +429,7 @@ const App = () => {
             <Route path="/gestion-prospects" element={<AdminGate><ProspectManagerPage /></AdminGate>} />
             <Route path="/dashboard-marketing" element={<AdminGate><UnifiedMarketingDashboard /></AdminGate>} />
             <Route path="/crm" element={<AdminGate><CrmPage /></AdminGate>} />
+            <Route path="/admin-paiements" element={<AdminGate><AdminPaymentsDashboardPage /></AdminGate>} />
             <Route path="/resultat-en-5-min" element={<ResultatEn5MinPage />} />
             <Route path="/cadeau" element={<CadeauPage />} />
             <Route path="/carte-cadeau" element={<GiftRedeemPage />} />
