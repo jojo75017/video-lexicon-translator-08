@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Gift, Download, CheckCircle2 } from 'lucide-react';
@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { getStoredUtm } from '@/lib/utmTracking';
 import { getStoredRefCode } from '@/hooks/useReferralTracking';
 import { trackFormSubmit, trackLeadMagnetDownload } from '@/utils/analytics';
+import { trackCaptureEvent } from '@/lib/captureTracking';
 
 interface InlineLeadCaptureProps {
   /** Lead magnet à délivrer : 'publier-kdp-etranger' (expatriés) ou guide général par défaut */
