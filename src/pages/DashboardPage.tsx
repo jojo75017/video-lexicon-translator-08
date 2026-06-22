@@ -8,7 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import {
   ArrowRight, Sparkles, LogOut, ChevronDown, LayoutDashboard, Shield,
   BookOpen, Rocket, Headphones, Activity, Search, PenTool, Image as ImageIcon,
-  Loader2,
+  Loader2, GraduationCap,
 } from 'lucide-react';
 import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 
@@ -161,6 +161,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ subscriberEmail, onLogout
     { emoji: '✍️', icon: PenTool, title: 'Générer un livre', desc: 'Écrivain IA', tint: 'bg-joy-lavender/40', action: () => goPlanner('workflow-dashboard') },
     { emoji: '🎨', icon: ImageIcon, title: 'Couverture du design', desc: 'Créateur de couvertures IA', tint: 'bg-joy-peach/40', action: () => goPlanner('cover') },
     { emoji: '🎧', icon: Headphones, title: 'Créer un livre audio', desc: 'Synthèse vocale par IA', tint: 'bg-joy-sun/40', action: () => goPlanner('audio') },
+    { emoji: '🎓', icon: GraduationCap, title: 'Masterclass', desc: 'Formation 5h + capture email', tint: 'bg-joy-lavender/40', action: () => navigate('/masterclass') },
   ];
 
   return (

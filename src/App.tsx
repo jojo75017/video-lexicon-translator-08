@@ -99,6 +99,7 @@ const FormationEmbedPage = lazy(() => import('./pages/FormationEmbedPage'));
 const Nouveautes2026Page = lazy(() => import('./pages/Nouveautes2026Page'));
 const InstallPage = lazy(() => import('./pages/InstallPage'));
 const ElementorExportPage = lazy(() => import('./pages/ElementorExportPage'));
+const MasterclassPage = lazy(() => import('./pages/MasterclassPage'));
 const SubscriptionAuth = lazy(() => import('@/components/SubscriptionAuth').then(m => ({ default: m.SubscriptionAuth })));
 
 // SaaS/marketing pages (admin-only tools)
@@ -367,6 +368,7 @@ const App = () => {
               }
             />
             <Route path="/offres" element={<SalesPage />} />
+            <Route path="/masterclass" element={<MasterclassPage />} />
             <Route path="/activer-beta" element={<ActivationBetaPage />} />
             <Route path="/extension-chrome" element={<ExtensionChromePage />} />
             <Route path="/ebookbot" element={<EbookbotPage />} />

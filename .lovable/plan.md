@@ -1,63 +1,71 @@
-# Plan : +d'inscrits email, et tout voir sans rien cacher
+# Masterclass EbookStudio Pro V2 — Page publique + accès cockpit
 
-Objectif n°1 : maximiser les inscriptions aux guides gratuits (lead magnets). Approche en 3 volets : (A) un tableau de bord d'acquisition 100% transparent, (B) des optimisations concrètes dans l'app pour convertir plus, (C) un plan marketing externe pour amener plus de monde sur les points de capture.
+Page publique `/masterclass` de type Netflix/Masterclass (Dark Mode), accessible à tous. Formation de 5h en 5 modules vidéo YouTube. **Module 1 gratuit (public), Modules 2-5 débloqués après saisie email** → génère des inscrits. Accès visible (non caché) depuis le cockpit et le dashboard.
 
-Aujourd'hui le site capture déjà des emails via le popup, le bandeau sticky, les pages /cadeau, /demo et l'A/B test A/B. **Le vrai problème : on ne mesure que les inscriptions réussies, jamais combien de personnes ont VU le popup/bandeau ni combien ont cliqué.** Impossible donc de savoir où ça coince. On corrige ça en premier.
+## Vidéos & CTA
 
----
+| Module | Titre | YouTube ID | Accès |
+|--------|-------|-----------|-------|
+| 1 | Fondations & Vision | `NF7H9wUyi9o` | 🟢 Public |
+| 2 | Génération de Contenu | `4h_ex9Amdus` | 🔒 Email |
+| 3 | Design & Mise en Page | `jV-40dkxQvw` | 🔒 Email |
+| 4 | Métadonnées & SEO Amazon KDP | `gtJPR_w3r7c` | 🔒 Email |
+| 5 | Automatisation & Stratégie Marketing | `k91fCwp2XZc` | 🔒 Email |
 
-## Volet A — Tableau de bord "Acquisition" (tout voir)
+CTA final → `https://ebookstudio.fr/offres`
 
-Nouvel onglet **"Acquisition"** dans le CRM (`/crm`), réservé admin, qui montre toute la chaîne sans rien masquer :
+## Mécanique email gate
+
+- Module 1 lisible librement, sans inscription.
+- Au clic sur un module verrouillé (non inscrit) : le lecteur est remplacé par un **écran de déblocage** (titre + champ email + bouton « Débloquer les 4 modules »).
+- Soumission → edge function existante `funnel-capture-lead` avec source `masterclass` (mêmes UTM / ref code / tracking) → déverrouillage immédiat des 5 modules.
+- État mémorisé en `localStorage` (`masterclass-unlocked`) → plus de mur ensuite.
+- Le lead remonte automatiquement dans le CRM / onglet Inscrits (segment `masterclass`).
+
+## Structure de la page
 
 ```text
-VUES popup/bandeau → CLICS (ouverture form) → INSCRITS → (plus tard) ACHATS
-   12 400              3 100                    640            18
-                       25% d'ouverture          20,6% conv.    2,8%
+┌──────────────────────────────────────────────────────┐
+│  SIDEBAR 25%          │   ZONE CONTENU 75%             │
+│  Logo EbookStudio     │   ┌──────────────────────┐    │
+│  Progression          │   │ Lecteur YouTube 16:9 │    │
+│  ▓▓░░░░ 0/5 - 0%      │   │  OU écran déblocage   │    │
+│  🟢 Module 1          │   └──────────────────────┘    │
+│  🔒 Module 2          │   [Notes][Ressources][FAQ]    │
+│  🔒 Module 3          │   contenu onglet actif         │
+│  🔒 Module 4          │   ┌──────────────────────┐    │
+│  🔒 Module 5          │   │ 🔥 Offre Spéciale CTA │    │
+└──────────────────────────────────────────────────────┘
 ```
 
-Contenu du tableau de bord :
-- **Entonnoir d'acquisition complet** : vues → clics → inscrits, avec le taux de conversion à chaque étape, par source (popup, bandeau, page /cadeau, /demo, inline).
-- **Comparatif A/B en clair** : variante A vs B, nombre d'inscrits ET taux de conversion réel de chaque variante, pour enfin trancher laquelle gagne.
-- **Courbe des inscrits par jour** (30 jours) + total, et répartition par lead magnet (5 niches / KDP étranger).
-- **Répartition par source UTM** (d'où viennent les inscrits : Google, Pinterest, email, direct…).
-- **Liste brute des inscrits** récents (email, source, variante, date, lead magnet) avec export CSV — rien de caché.
+## Comportement
 
-Pour rendre cela possible, on ajoute le **tracking des vues et clics** des éléments de capture (aujourd'hui absent) : chaque affichage du popup/bandeau et chaque ouverture du formulaire sont enregistrés. Sans ça, les taux de conversion seraient des estimations ; là ce seront des chiffres réels.
+- **Lecteur** : iframe YouTube embed (`/embed/<id>`), 16:9, change selon module.
+- **Sidebar** : logo, barre de progression animée (`x/5 - %`), liste des 5 modules avec état (gratuit / verrouillé / terminé / en cours).
+- **Onglets** : *Notes du Module*, *Ressources & Outils* (liens Cover Studio, KDP Keywords…), *FAQ* (accordéon).
+- **Carte CTA persistante** : bouton dégradé orange→rouge (pulsation) → `/offres`.
+- **Pop-up de fin** : à la complétion du Module 5 — confettis, offre flash + compte à rebours 15 min, bouton vers `/offres`.
+- **Progression** : `localStorage` (`masterclass-progress`).
 
-## Volet B — Optimisations dans l'app (plus d'inscrits)
+## Accès visible (cockpit + dashboard)
 
-1. **Popup plus malin** : autoriser un ré-affichage après quelques jours (au lieu de "jamais plus") pour les visiteurs qui ont fermé sans s'inscrire, et déclenchement légèrement plus tôt sur mobile.
-2. **Bandeau sticky avec preuve sociale** : ajouter un compteur réel ("déjà 1 200+ inscrits") et un champ email visible directement (1 clic de moins).
-3. **Aimant supplémentaire sur /demo** : après que le visiteur a testé le générateur, proposer de recevoir le guide par email — c'est le moment de plus forte intention.
-4. **Étendre l'A/B test** : tester aussi le moment de déclenchement et le visuel, pas seulement le texte, et afficher le gagnant directement dans le dashboard.
-5. **Capture inline en fin d'articles de blog** : insérer un bloc d'inscription au milieu/fin des articles (fort trafic SEO existant).
+- **Cockpit** (`AdminCockpitPage`) : nouvelle entrée `🎓 Masterclass` (caption « Formation 5h publique ») dans le groupe acquisition/marketing → `path: '/masterclass'`.
+- **Dashboard principal** (`DashboardPage`) : nouvelle carte d'action rapide `🎓 Masterclass` (« Formation 5h + capture email ») → `navigate('/masterclass')`.
 
-## Volet C — Plan marketing externe (plus de trafic vers la capture)
+## Responsive
 
-- **SEO** : pousser le trafic vers les pages capture via les articles de blog déjà bien référencés (maillage interne + bloc d'inscription).
-- **Pinterest / réseaux** : épingles qui pointent vers /cadeau (audience KDP très présente sur Pinterest).
-- **Lead magnets segmentés** : mettre en avant le bon guide selon l'audience (général vs expatriés), déjà supporté techniquement.
-- **Parrainage** : inciter les inscrits/clients existants à partager le guide (système de referral déjà en place).
-- **Séquence email d'accueil** optimisée pour transformer l'inscrit en client 67€ (déjà partiellement en place).
-
-> Note : les volets SEO/Pinterest/parrainage sont surtout des actions à mener (contenu, publications). Je peux préparer les supports dans l'app (blocs, pages, liens de partage) ; la diffusion reste manuelle.
-
----
-
-## Ordre de réalisation proposé
-
-1. **Tracking vues + clics** des éléments de capture (la base pour tout voir).
-2. **Tableau de bord Acquisition** dans le CRM (entonnoir, A/B, sources, export).
-3. **Optimisations popup / sticky / demo** pour augmenter le taux de conversion.
-4. **Blocs de capture blog + supports marketing** (Pinterest/parrainage).
+- Mobile : sidebar en `Sheet` shadcn, lecteur + onglets pleine largeur, CTA empilé.
 
 ## Détails techniques
 
-- Nouvelle table `capture_events` (type: `view` | `click`, surface: popup/sticky/demo/inline, variante A/B, source UTM, page) avec RLS + GRANT (lecture admin uniquement). Insertion publique anonyme autorisée uniquement pour ces 2 types d'événements.
-- Tracking ajouté dans `LeadCapturePopup.tsx`, `StickySignupBar.tsx`, `InlineLeadCapture.tsx` et `/demo` (impression au montage, clic à l'ouverture du form). Insertion non bloquante.
-- Nouveau composant `CrmAcquisition.tsx` + onglet dans `CrmPage.tsx`, requêtes agrégées sur `funnel_leads` (déjà: `ab_variant`, `utm_*`, `lead_magnet`, `created_at`) croisées avec `capture_events`.
-- Aucune modification du flux de paiement. Lecture seule côté dashboard, écriture seule (events) côté public.
-- A/B test étendu via `src/lib/abTest.ts` (ajout dimension de déclenchement) sans casser l'assignation stable existante.
+- `src/pages/MasterclassPage.tsx` + composants `src/components/masterclass/` (`MasterclassSidebar`, `MasterclassPlayer`, `MasterclassUnlockGate`, `MasterclassTabs`, `MasterclassOfferPopup`).
+- Données dans `src/data/masterclassModules.ts` (id, titre, durée, youtubeId, isFree, résumé, ressources[], faq[]).
+- Route `/masterclass` ajoutée dans `App.tsx` en lazy import, **hors `SubscriberGate`** (public).
+- Réutilisation de `funnel-capture-lead` + `captureTracking` + `utmTracking` + `useReferralTracking` (aucun backend, aucune migration).
+- Couleurs via tokens du thème (Dark Mode, accent teal/orange KDP) — aucune couleur codée en dur.
+- SEO : `<title>` < 60 car., meta description, H1 unique.
 
-Hors scope : refonte du design global, changement de l'offre 67€, intégration d'un outil emailing tiers.
+## Hors périmètre
+
+- Pas de modification des pages formation existantes.
+- Pas de changement base de données, paiement ou webinaire live.

@@ -41,6 +41,20 @@ const MAGNETS: Record<string, Magnet> = {
       "Checklist complète avant publication",
     ],
   },
+  "masterclass-ebookstudio": {
+    url: "https://ebookstudio.fr/masterclass",
+    title: "🎓 Votre accès à la Masterclass EbookStudio Pro",
+    subject: "🎓 Votre Masterclass EbookStudio Pro est débloquée",
+    intro:
+      "Merci ! Votre accès aux 5 modules de la Masterclass (5h de formation) est débloqué. Reprenez là où vous en étiez quand vous voulez :",
+    items: [
+      "Module 1 — Fondations & vision",
+      "Module 2 — Génération de contenu par IA",
+      "Module 3 — Design & couverture professionnelle",
+      "Module 4 — Métadonnées & SEO Amazon KDP",
+      "Module 5 — Automatisation & stratégie marketing",
+    ],
+  },
 };
 
 const DEFAULT_MAGNET = "5-niches-rentables-2026";
