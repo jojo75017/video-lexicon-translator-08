@@ -23,16 +23,26 @@ const MasterclassPage: React.FC = () => {
   const [activeId, setActiveId] = useState(1);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [popupOpen, setPopupOpen] = useState(false);
+  const [view, setView] = useState<'intro' | 'player'>('intro');
 
   useEffect(() => {
     try {
-      setUnlocked(localStorage.getItem(UNLOCK_KEY) === '1');
+      const isUnlocked = localStorage.getItem(UNLOCK_KEY) === '1';
+      setUnlocked(isUnlocked);
       const raw = localStorage.getItem(PROGRESS_KEY);
+      const hasProgress = !!raw && JSON.parse(raw)?.length > 0;
       if (raw) setCompleted(JSON.parse(raw));
+      // Visiteur déjà engagé → direct sur le lecteur, sinon intro
+      if (isUnlocked || hasProgress) setView('player');
     } catch {
       /* ignore */
     }
   }, []);
+
+  const handleStart = () => {
+    setActiveId(1);
+    setView('player');
+  };
 
   const activeModule = useMemo(
     () => MASTERCLASS_MODULES.find((m) => m.id === activeId) ?? MASTERCLASS_MODULES[0],
