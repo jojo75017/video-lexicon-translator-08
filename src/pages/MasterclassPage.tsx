@@ -128,7 +128,16 @@ const MasterclassPage: React.FC = () => {
               </SheetContent>
             </Sheet>
             <span className="text-sm font-semibold">Masterclass</span>
+            <Button variant="ghost" size="sm" onClick={() => setView('intro')}>
+              Intro
+            </Button>
           </header>
+
+          <div className="hidden lg:flex justify-end px-6 pt-4">
+            <Button variant="ghost" size="sm" onClick={() => setView('intro')}>
+              ← Revoir l'introduction
+            </Button>
+          </div>
 
           <div className="mx-auto max-w-4xl px-4 sm:px-6 py-6 space-y-6">
             <div>
