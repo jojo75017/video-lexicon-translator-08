@@ -10,6 +10,7 @@ import { getStoredRefCode } from '@/hooks/useReferralTracking';
 import { trackFormSubmit, trackLeadMagnetDownload } from '@/utils/analytics';
 import { isMarketingExcluded, isExpatPath } from '@/lib/marketingExclusions';
 import { getAbCopy } from '@/lib/abTest';
+import { trackCaptureEvent } from '@/lib/captureTracking';
 
 const SESSION_KEY = 'ebs_lead_popup_shown';
 const DONE_KEY = 'ebs_lead_popup_done';
@@ -41,6 +42,10 @@ const LeadCapturePopup: React.FC = () => {
       armed.current = false;
       sessionStorage.setItem(SESSION_KEY, '1');
       setOpen(true);
+      trackCaptureEvent('popup', 'view', {
+        abVariant: variant,
+        leadMagnet: isExpat ? 'publier-kdp-etranger' : '5-niches-rentables-2026',
+      });
     };
 
     const onMouseLeave = (e: MouseEvent) => {

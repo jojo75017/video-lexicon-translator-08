@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Gift, Download, CheckCircle2 } from 'lucide-react';
@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { getStoredUtm } from '@/lib/utmTracking';
 import { getStoredRefCode } from '@/hooks/useReferralTracking';
 import { trackFormSubmit, trackLeadMagnetDownload } from '@/utils/analytics';
+import { trackCaptureEvent } from '@/lib/captureTracking';
 
 interface InlineLeadCaptureProps {
   /** Lead magnet à délivrer : 'publier-kdp-etranger' (expatriés) ou guide général par défaut */
@@ -44,6 +45,10 @@ const InlineLeadCapture: React.FC<InlineLeadCaptureProps> = ({
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    trackCaptureEvent('inline', 'view', { leadMagnet });
+  }, [leadMagnet]);
 
   const resolvedBullets = bullets ?? (isExpat ? DEFAULT_BULLETS_EXPAT : DEFAULT_BULLETS_GENERAL);
   const resolvedTitle =
