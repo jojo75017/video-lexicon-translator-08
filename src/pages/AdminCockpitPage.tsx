@@ -112,6 +112,7 @@ const TUNNEL_GROUPS: { name: string; tint: string; tiles: TunnelTile[] }[] = [
       { emoji: '🙏', label: 'Merci',       caption: 'Étape 6 — confirmation',         path: '/promo/merci' },
       { emoji: '🚀', label: 'Espace promo',caption: 'Étape 7 — onboarding',           path: '/promo/espace' },
       { emoji: '🤝', label: 'Affilié',     caption: 'Étape 8 — programme partenaire', path: '/promo/affilie' },
+      { emoji: '🎓', label: 'Masterclass', caption: 'Formation 5h publique + capture', path: '/masterclass' },
     ],
   },
   {
