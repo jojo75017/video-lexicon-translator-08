@@ -1,54 +1,48 @@
-# Plan : envoyer les relances commerciales directement via Resend
+Plan : remplacer l'intégration Systeme.io par un envoi direct via Resend dans la séquence commerciale
 
-## Contexte
-La migration vers Systeme.io par tags demande de créer 15 automations manuellement dans l'interface Systeme.io. L'utilisateur trouve cela trop complexe. On revient à un envoi direct par notre edge function, mais en remplaçant Brevo par Resend.
+Objectif
+--------
+Réactiver automatiquement les 15 emails de la séquence commerciale (prospects froids + intéressés + relances) sans passer par Systeme.io. L'edge function `send-sales-email` enverra directement les emails via Resend.
 
-## Objectif
-Modifier `send-sales-email` pour envoyer les 6 emails de séquence + 3 relances directement via l'API Resend, sans passer par Systeme.io. Aucune automation externe n'est nécessaire.
+Actions
+-------
+1. Restaurer le contenu des 15 templates email
+   - 6 emails de la séquence standard
+   - 6 emails de la séquence "intéressés"
+   - 3 variantes de relance pour les non-cliqueurs
+   - Source : historique git de `supabase/functions/send-sales-email/index.ts`
 
-## Pourquoi Resend
-- Tu as déjà une clé `RESEND_API_KEY` configurée dans les secrets du projet.
-- Resend est conçu pour l'envoi d'emails par API, avec un endpoint simple `/emails`.
-- Aucune interface d'automation à configurer : notre code gère le timing, le contenu et l'envoi.
+2. Supprimer la logique Systeme.io
+   - Retirer `SYSTEMEIO_API_KEY`, l'import `pushToSystemeIo`, les helpers `seqTag` / `relanceTag`
+   - Retirer l'appel au endpoint Systeme.io
 
-## Étapes techniques
+3. Ajouter l'envoi via Resend
+   - Utiliser le gateway Lovable : `https://connector-gateway.lovable.dev/resend/emails`
+   - Headers : `Authorization: Bearer ${LOVABLE_API_KEY}` + `X-Connection-Api-Key: ${RESEND_API_KEY}`
+   - `from` : une adresse validée dans Resend
+   - Garder `to`, `subject`, `html`
 
-1. **Restaurer le contenu des emails**
-   - Récupérer depuis l'historique git les fonctions `getEmailBody`, `getInteresseEmailBody`, `getRelanceEmailBody`, `RELANCE_VARIANTS` et les sujets.
-   - Les réintégrer proprement dans `supabase/functions/send-sales-email/index.ts` (ou un fichier partagé `_shared/salesEmailContent.ts` si on veut alléger l'index).
+4. Conserver la logique métier existante
+   - Sélection des prospects selon `current_step` et `next_email_at`
+   - Avancement du `current_step` seulement si l'email est bien envoyé
+   - Relances automatiques après la dernière étape (`relance_round`)
+   - Tracking des ouvertures et clics
+   - Sécurité cron/admin
 
-2. **Remplacer l'appel Systeme.io par Resend**
-   - Supprimer l'import et l'appel à `pushToSystemeIo`.
-   - Ajouter un appel `fetch('https://api.resend.com/emails', ...)` avec la clé `RESEND_API_KEY`.
-   - Envoyer un email par prospect avec :
-     - `from` : une adresse vérifiée sur ton domaine Resend (à définir avec toi),
-     - `to` : l'email du prospect,
-     - `subject` : le sujet de l'étape,
-     - `html` : le contenu HTML de l'email,
-     - optionnel `text` : une version texte brut.
+5. Déployer l'edge function
+   - Déployer `send-sales-email` après les modifications
 
-3. **Conserver la logique métier**
-   - Garder la sélection des prospects, `current_step`, `next_email_at`, `completed`, `relance_round`.
-   - Garder la sécurité cron/admin.
-   - Si l'appel Resend échoue, compter une erreur et ne pas avancer l'étape (même comportement qu'avec Brevo).
+6. Vérifier en production
+   - Tester l'envoi d'un email via l'admin ou le cron
+   - Vérifier que les emails arrivent bien et que `current_step` avance
 
-4. **Nettoyer Systeme.io**
-   - Supprimer l'import de `pushToSystemeIo`.
-   - Supprimer les helpers de tags `seqTag`/`relanceTag` si inutiles.
-   - La clé `SYSTEMEIO_API_KEY` peut rester en place mais ne sera plus utilisée par cette fonction.
+Prérequis
+---------
+- `RESEND_API_KEY` doit être configuré dans les secrets de l'edge function
+- Un domaine d'envoi validé dans Resend (sinon les emails partiront depuis `onboarding@resend.dev` en test ou échoueront en prod)
 
-## Prérequis côté Resend
-
-- Avoir un domaine vérifié dans Resend (sinon les envois partiront depuis `onboarding@resend.dev` en test, ou seront refusés en production).
-- Confirmer l'adresse d'expéditeur à utiliser (ex. `contact@ebookstudio.fr`).
-
-## Livrables
-
-- `supabase/functions/send-sales-email/index.ts` mis à jour pour envoyer via Resend.
-- Contenu des 15 emails restauré et intégré.
-- Edge function déployée.
-
-## Hors périmètre
-
-- Aucune modification des automations Resend (il n'y en a pas besoin).
-- Les autres emails Resend existants (accès, support, audiobook) restent inchangés.
+Hors scope
+----------
+- Les autres emails Resend (accès, support, livre audio) restent inchangés
+- Pas de création d'automations dans Systeme.io
+- Pas de changement de base de données (pas de nouvelle table)
