@@ -1,404 +1,35 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.78.0";
+import { pushToSystemeIo } from "../_shared/systemeio.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Email subjects and strategies — séquence courte 5 étapes + 1 relance non-cliqueurs (étape 6)
+// Séquence courte 5 étapes + 1 relance non-cliqueurs (étape 6).
+// Le contenu des emails vit désormais dans les automations Systeme.io.
+// Ici on ne garde que le rythme (day_offset) pour savoir QUAND appliquer le tag.
 const EMAIL_SEQUENCE = [
-  {
-    step: 1,
-    day_offset: 0,
-    subject: "📖 150 pages générées en 47 minutes",
-    preheader: "Comment je publie un livre par semaine sur Amazon.",
-  },
-  {
-    step: 2,
-    day_offset: 1,
-    subject: "⚠️ Les 3 erreurs qui bloquent 90% des auteurs KDP",
-    preheader: "La n°2, presque tout le monde la fait.",
-  },
-  {
-    step: 3,
-    day_offset: 2,
-    subject: "💰 0 à 35 livres Amazon — mes vrais chiffres",
-    preheader: "Pas de pitch, juste des faits.",
-  },
-  {
-    step: 4,
-    day_offset: 3,
-    subject: "🎁 67€ aujourd'hui = la V3 à 197€ offerte",
-    preheader: "L'offre Fondateur inclut la future V3 gratuitement.",
-  },
-  {
-    step: 5,
-    day_offset: 4,
-    subject: "🔒 Dernier rappel sur l'offre Fondateur",
-    preheader: "67€ à vie, mise à jour V3 incluse.",
-  },
-  {
-    step: 6,
-    day_offset: 6,
-    subject: "👋 Une dernière chose, {name}",
-    preheader: "Je n'ai pas eu de nouvelles — on en reste là ?",
-  },
+  { step: 1, day_offset: 0 },
+  { step: 2, day_offset: 1 },
+  { step: 3, day_offset: 2 },
+  { step: 4, day_offset: 3 },
+  { step: 5, day_offset: 4 },
+  { step: 6, day_offset: 6 },
 ];
 
-const DEMO_LINK = "https://www.ebookstudio.fr/demo";
-const OFFRES_LINK = "https://www.ebookstudio.fr/offres";
+// Nombre de relances disponibles pour les non-cliqueurs (tags ebs-relance-1..3).
+const RELANCE_MAX_ROUNDS = 3;
 
-function getEmailBody(step: number, firstName: string): string {
-  const name = firstName || "cher lecteur";
-
-
-
-  const bodies: Record<number, string> = {
-    1: `Bonjour ${name},
-
-Et si vous pouviez voir un livre de 150 pages s'écrire **sous vos yeux**, en quelques minutes ?
-
-Pas une promesse. Une démo gratuite, en direct : vous tapez un sujet, l'IA génère le plan, puis les chapitres, puis la couverture. Prêt pour Amazon KDP.
-
-Mon dernier livre ? **150 pages, 47 minutes.** (J'en ai 35+ publiés, profil Amazon public.)
-
-Le plus simple, c'est de le voir vous-même 👇
-
-[[ 🎬 Voir la démo gratuite (sans carte) | ${DEMO_LINK} ]]
-
-À demain pour la suite,
-Georges`,
-
-    2: `${name},
-
-90% des gens qui veulent publier sur Amazon n'y arrivent jamais. Pas par manque de talent — à cause de 3 erreurs :
-
-❌ Écrire sans plan → abandon à la page 12
-❌ Y passer 3 semaines → découragement
-❌ Couverture + mots-clés négligés → 0 vente
-
-EbookStudio Pro règle les 3 d'un coup : plan automatique, rédaction en quelques minutes, couvertures pro et optimisation KDP incluses.
-
-Voyez à quoi ça ressemble en vrai 👇
-
-[[ 🎬 Tester la démo gratuitement | ${DEMO_LINK} ]]
-
-Georges`,
-
-    3: `${name},
-
-Pas de pitch aujourd'hui. Juste mes vrais chiffres :
-
-• 2023 : 0 livre
-• 2024 : 18 livres (écrits à la main)
-• 2025-2026 : 35+ livres (avec EbookStudio)
-
-Tout est public et vérifiable sur mon profil Amazon. La même machine qui m'a permis ça est désormais accessible à **67€ à vie**.
-
-[[ 👉 Découvrir l'offre Fondateur (67€) | ${OFFRES_LINK} ]]
-
-Georges`,
-
-    4: `${name},
-
-Une seule raison de ne pas attendre :
-
-Aujourd'hui, EbookStudio Pro est à **67€ à vie**. Bientôt, la V3 « Publication Assistée Pro » sera vendue **197€**.
-
-🎁 Les membres actuels la recevront en **mise à jour gratuite**.
-
-Autrement dit : 67€ aujourd'hui = un outil qui en vaudra 197€ demain. Le calcul est vite fait.
-
-[[ 🔒 Verrouiller mon accès à 67€ | ${OFFRES_LINK} ]]
-
-Georges`,
-
-    5: `${name},
-
-Dernier rappel, je ne reviendrai pas dessus.
-
-EbookStudio Pro, à **67€ à vie** :
-✅ Générateur IA illimité
-✅ Couvertures pro
-✅ Livre audio
-✅ Marketing & KDP intégrés
-✅ Mise à jour V3 (197€) incluse
-
-(Possible en 2×35€ ou 3×25€.)
-
-[[ 👉 Rejoindre les Fondateurs | ${OFFRES_LINK} ]]
-
-Merci de m'avoir lu cette semaine,
-Georges`,
-
-    6: `${name},
-
-Je vous ai écrit plusieurs fois sans retour — et c'est tout à fait OK.
-
-Avant de vous laisser tranquille, une question honnête : qu'est-ce qui vous retient ? Le prix, le doute que ça marche pour vous, le temps ?
-
-Le plus simple pour lever le doute, c'est d'essayer sans rien payer 👇
-
-[[ 🎬 Tester la démo gratuite | ${DEMO_LINK} ]]
-
-Et si vous préférez m'écrire, répondez simplement à cet email : je lis tout personnellement.
-
-Au plaisir,
-Georges`,
-  };
-
-  return bodies[step] || "";
+// Construit le tag Systeme.io de l'étape de séquence.
+function seqTag(step: number, isInteresse: boolean): string {
+  return isInteresse ? `ebs-seq-interesse-${step}` : `ebs-seq-${step}`;
 }
 
-// ===== Email de RELANCE dédié (non-cliqueurs) — curiosité forte + démo =====
-const RELANCE_SUBJECT = "🎬 {name}, regardez un livre s'écrire en 2 min";
-function getRelanceEmailBody(firstName: string): string {
-  const name = firstName || "cher lecteur";
-  return `Bonjour ${name},
-
-Je ne sais pas si mes derniers emails vous ont parlé, alors je vais faire plus simple : je vous montre.
-
-👀 En **2 minutes chrono**, vous allez voir l'IA générer, en direct :
-• le plan complet d'un livre
-• les premiers chapitres rédigés
-• une couverture professionnelle
-
-Aucune carte bancaire, aucun engagement. Juste pour voir si ça vous parle.
-
-[[ 🎬 Lancer la démo gratuite maintenant | ${DEMO_LINK} ]]
-
-Et si ça vous plaît, l'offre Fondateur à **67€ à vie** (V3 à 197€ incluse) vous attend juste après.
-
-À tout de suite,
-Georges`;
+// Construit le tag Systeme.io de relance (round 0 → ebs-relance-1).
+function relanceTag(round: number): string {
+  return `ebs-relance-${round + 1}`;
 }
-
-// ===== 3 nouvelles relances supplémentaires (alternance démo / offre) =====
-// Tournent via sales_prospects.relance_round (0 → 1 → 2). Objectif : maximiser les clics.
-const RELANCE_VARIANTS: { subject: string; body: (name: string) => string }[] = [
-  // Variante 1 — Démo / curiosité
-  {
-    subject: "🎬 {name}, regardez un livre s'écrire en 2 min",
-    body: (name) => `Bonjour ${name},
-
-Je vais faire plus simple que tous mes emails : je vous montre.
-
-👀 En **2 minutes chrono**, vous voyez l'IA générer en direct :
-• le plan complet d'un livre
-• les premiers chapitres rédigés
-• une couverture professionnelle
-
-Aucune carte bancaire, aucun engagement. Juste pour voir si ça vous parle.
-
-[[ 🎬 Lancer la démo gratuite maintenant | ${DEMO_LINK} ]]
-
-À tout de suite,
-Georges`,
-  },
-  // Variante 2 — Offre / valeur
-  {
-    subject: "🎁 {name}, 67€ à vie = la V3 (197€) offerte",
-    body: (name) => `${name},
-
-Petit rappel important : l'offre Fondateur ne durera pas.
-
-Pour **67€ une seule fois**, vous obtenez :
-✅ Le générateur d'ebooks IA en illimité
-✅ Les couvertures pro incluses
-✅ Le livre audio + le marketing & KDP intégrés
-✅ Et surtout : la **V3 (197€) offerte** à son lancement
-
-Le prix Fondateur augmentera dès la sortie de la V3. Aujourd'hui, c'est le meilleur moment.
-
-[[ 👉 Rejoindre les Fondateurs (67€ à vie) | ${OFFRES_LINK} ]]
-
-À bientôt,
-Georges`,
-  },
-  // Variante 3 — Démo + dernière main tendue
-  {
-    subject: "👋 {name}, une dernière démo avant qu'on arrête",
-    body: (name) => `${name},
-
-C'est sans doute mon dernier email — je ne veux pas vous harceler.
-
-Avant de tourner la page, une question honnête : qu'est-ce qui vous retient ? Le prix, le doute, le temps ?
-
-Le plus simple pour trancher, c'est de voir l'outil travailler, sans rien payer 👇
-
-[[ 🎬 Voir la démo gratuite (sans carte) | ${DEMO_LINK} ]]
-
-Et si vous préférez m'écrire, répondez simplement à cet email : je lis tout.
-
-Au plaisir d'échanger,
-Georges`,
-  },
-];
-const RELANCE_MAX_ROUNDS = RELANCE_VARIANTS.length;
-
-
-// ===== Segment "intéressés" : prospects qui ont déjà manifesté un intérêt =====
-// Version plus directe, orientée DÉMO + OFFRE (moins de pédagogie, plus d'action)
-const INTERESSE_SUBJECTS: Record<number, string> = {
-  1: "🎬 Votre démo EbookStudio est prête",
-  2: "👀 Vous l'avez testé ? Voici l'offre Fondateur",
-  3: "💰 67€ à vie = la V3 (197€) offerte",
-  4: "🔥 Pourquoi maintenant et pas dans 3 mois",
-  5: "🔒 Dernier rappel : offre Fondateur 67€",
-  6: "👋 {name}, on en reste là ?",
-};
-
-function getInteresseEmailBody(step: number, firstName: string): string {
-  const name = firstName || "cher lecteur";
-
-  const bodies: Record<number, string> = {
-    1: `Bonjour ${name},
-
-Vous avez manifesté de l'intérêt pour EbookStudio Pro — alors allons droit au but.
-
-Le plus parlant, c'est de voir l'outil travailler en direct : un sujet → un plan → des chapitres → une couverture, prêt pour Amazon KDP.
-
-[[ 🎬 Voir la démo gratuite (sans carte) | ${DEMO_LINK} ]]
-
-Testez, puis dites-moi ce que vous en pensez.
-Georges`,
-
-    2: `${name},
-
-Avez-vous pris 2 minutes pour regarder la démo ?
-
-Si oui, vous avez vu de quoi l'outil est capable : plan automatique, rédaction IA, couvertures pro, export Amazon KDP. Il est temps de passer à l'action.
-
-L'offre Fondateur est à **67€ à vie** (ou 2×35€ / 3×25€) :
-
-[[ 👉 Profiter de l'offre Fondateur | ${OFFRES_LINK} ]]
-
-Georges`,
-
-    3: `${name},
-
-Une vraie raison d'agir maintenant :
-
-Aujourd'hui = **67€ à vie**. La future V3 « Publication Assistée Pro » sera vendue **197€**… et elle vous sera offerte en mise à jour.
-
-67€ aujourd'hui = un outil qui en vaudra 197€ demain.
-
-[[ 🔒 Verrouiller mon accès à 67€ | ${OFFRES_LINK} ]]
-
-Georges`,
-
-    4: `${name},
-
-Pourquoi ne pas attendre :
-
-• Le prix Fondateur (67€) augmentera au lancement de la V3.
-• Chaque semaine sans outil = des livres non publiés.
-• La démo est gratuite, vous ne risquez rien à tester.
-
-[[ 🎬 Tester gratuitement maintenant | ${DEMO_LINK} ]]
-
-Georges`,
-
-    5: `${name},
-
-Dernier rappel sur l'offre Fondateur.
-
-EbookStudio Pro à **67€ à vie** :
-✅ Générateur IA illimité
-✅ Couvertures pro
-✅ Livre audio
-✅ Marketing & KDP intégrés
-✅ Mise à jour V3 (197€) incluse
-
-[[ 👉 Rejoindre les Fondateurs | ${OFFRES_LINK} ]]
-
-Georges`,
-
-    6: `${name},
-
-Je vous ai écrit plusieurs fois sans retour — c'est OK.
-
-Une question honnête : qu'est-ce qui vous retient ? Le prix, le doute, le temps ?
-
-Le plus simple pour trancher, c'est d'essayer sans rien payer 👇
-
-[[ 🎬 Tester la démo gratuite | ${DEMO_LINK} ]]
-
-Et si vous préférez m'écrire, répondez simplement à cet email : je lis tout.
-
-Au plaisir d'échanger,
-Georges`,
-  };
-
-  return bodies[step] || "";
-
-}
-
-function buildHtmlEmail(body: string, email?: string, step?: number): string {
-  const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
-
-  // Construit un lien traçable : passe par track-email-click qui enregistre le clic puis redirige
-  const trackedLink = (dest: string): string => {
-    if (!email || !supabaseUrl) return dest;
-    return `${supabaseUrl}/functions/v1/track-email-click?e=${encodeURIComponent(email)}&s=${step ?? ""}&u=${encodeURIComponent(dest)}`;
-  };
-
-  // Gros bouton CTA centré (c'est lui qui fait grimper les clics)
-  const bigButton = (label: string, dest: string): string =>
-    `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:28px auto;">
-      <tr><td style="border-radius:10px;background:#FF9E2D;">
-        <a href="${trackedLink(dest)}" style="display:inline-block;padding:16px 34px;color:#ffffff;text-decoration:none;font-weight:bold;font-size:17px;border-radius:10px;">${label}</a>
-      </td></tr>
-    </table>`;
-
-  const esc = (s: string) =>
-    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-  // 1) Boutons via syntaxe [[ label | url ]]   2) gras **...**   3) liens nus
-  const htmlBody = body
-    .split(/\n/)
-    .map((line) => {
-      const btnMatch = line.match(/^\s*\[\[\s*(.+?)\s*\|\s*(\S+)\s*\]\]\s*$/);
-      if (btnMatch) return bigButton(esc(btnMatch[1]), btnMatch[2]);
-      const safe = esc(line)
-        .replace(/(https?:\/\/[^\s<]+)/g, (m) => `<a href="${trackedLink(m)}" style="color:#008296;">${m}</a>`)
-        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-      return safe;
-    })
-    .join("<br>")
-    // évite les <br> superflus autour des boutons
-    .replace(/<br>(<table)/g, "$1")
-    .replace(/(<\/table>)<br>/g, "$1");
-
-  const trackingPixel = email && step
-    ? `<img src="${supabaseUrl}/functions/v1/track-email-open?e=${encodeURIComponent(email)}&s=${step}" width="1" height="1" alt="" style="display:none;" />`
-    : "";
-
-  return `<!DOCTYPE html>
-<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#FAFAFA;">
-<div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
-  <div style="background:#008296;padding:22px 32px;">
-    <span style="color:#ffffff;font-family:Arial,sans-serif;font-size:20px;font-weight:bold;">EbookStudio <span style="color:#FF9E2D;">Pro</span></span>
-    <div style="color:#cdeef0;font-family:Arial,sans-serif;font-size:12px;margin-top:4px;">Votre livre, écrit par l'IA — prêt pour Amazon KDP</div>
-  </div>
-  <div style="padding:30px 32px 8px 32px;font-family:Arial,sans-serif;color:#232F3E;font-size:16px;line-height:1.6;">
-    ${htmlBody}
-  </div>
-  <div style="margin:8px 32px 24px 32px;padding:14px 18px;background:#e6f4f5;border-left:4px solid #008296;border-radius:8px;font-family:Arial,sans-serif;font-size:13px;color:#1f5f63;">
-    ✅ 35+ livres publiés par le créateur · 📖 Profil Amazon public · ⏱️ Un livre généré en 47 min
-  </div>
-  <div style="background:#FAFAFA;padding:18px 32px;border-top:1px solid #eee;font-family:Arial,sans-serif;font-size:12px;color:#888;text-align:center;">
-    Vous recevez cet email car vous avez manifesté un intérêt pour EbookStudio Pro.<br>
-    <a href="${trackedLink(OFFRES_LINK)}" style="color:#008296;">Voir l'offre</a> ·
-    <a href="${trackedLink(DEMO_LINK)}" style="color:#008296;">Tester la démo</a><br>
-    Pour ne plus recevoir ces emails, répondez "STOP" à cet email.
-  </div>
-</div>
-${trackingPixel}
-</body></html>`;
-}
-
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -406,25 +37,16 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const authHeader = req.headers.get("Authorization");
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const brevoKey = Deno.env.get("BREVO_API_KEY");
     const supabase = createClient(supabaseUrl, serviceKey);
-
-    if (!brevoKey) {
-      return new Response(JSON.stringify({ error: "BREVO_API_KEY manquante" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
 
     const body = await req.json();
     const mode = body.mode || "auto"; // "auto" = cron, "manual" = admin trigger
     const targetStep = body.step; // for manual: which step to send
     const prospectIds = body.prospect_ids; // for manual: specific prospects
 
-    // relance = email dédié aux non-cliqueurs (ne touche pas à l'étape de séquence)
+    // relance = tag dédié aux non-cliqueurs (ne touche pas à l'étape de séquence)
     const isRelance = mode === "relance";
     const batchSize = body.batch_size || (isRelance ? 200 : 50);
 
@@ -441,7 +63,6 @@ Deno.serve(async (req) => {
         });
       }
     } else {
-
       // manual / relance : réservé aux administrateurs authentifiés
       const authHeader = req.headers.get("Authorization");
       if (!authHeader?.startsWith("Bearer ")) {
@@ -466,7 +87,6 @@ Deno.serve(async (req) => {
       }
     }
 
-
     let query = supabase
       .from("sales_prospects")
       .select("*")
@@ -490,7 +110,6 @@ Deno.serve(async (req) => {
       query = query.eq("auto_send", true).lte("next_email_at", new Date().toISOString());
     }
 
-
     query = query.order("next_email_at", { ascending: true }).limit(batchSize);
 
     const { data: prospects, error: fetchErr } = await query;
@@ -509,8 +128,8 @@ Deno.serve(async (req) => {
 
     for (let i = 0; i < (prospects?.length || 0); i++) {
       const prospect = prospects![i];
-      
-      // Rate limit doux pour rester sous les limites Brevo
+
+      // Rate limit doux pour rester sous les limites de l'API Systeme.io
       if (i > 0) {
         await new Promise(resolve => setTimeout(resolve, 400));
       }
@@ -518,57 +137,25 @@ Deno.serve(async (req) => {
       // ===== Mode RELANCE : 3 variantes tournantes, n'incrémente pas l'étape =====
       if (isRelance) {
         const round = Math.min(prospect.relance_round ?? 0, RELANCE_MAX_ROUNDS - 1);
-        const variant = RELANCE_VARIANTS[round];
-        const relanceStep = 7 + round; // distingue chaque relance dans le tracking des clics
-        const htmlContent = buildHtmlEmail(
-          variant.body(prospect.first_name),
-          prospect.email,
-          relanceStep,
-        );
-        const subject = variant.subject.replace(/\{name\}/g, prospect.first_name || "vous");
-        try {
-          const res = await fetch("https://api.brevo.com/v3/smtp/email", {
-            method: "POST",
-            headers: {
-              "api-key": brevoKey,
-              "Content-Type": "application/json",
-              accept: "application/json",
-            },
-            body: JSON.stringify({
-              sender: { name: "Georges Boubet", email: "noreply@ebookstudio.fr" },
-              to: [{ email: prospect.email, name: prospect.first_name || undefined }],
-              subject,
-              htmlContent,
-              tags: ["sales-relance", `relance-${round + 1}`],
-            }),
-          });
-          if (!res.ok) {
-            const errText = await res.text();
-            console.error(`Brevo relance error for ${prospect.email}:`, errText);
-            await supabase.from("sales_prospects").update({
-              relance_status: "error",
-            }).eq("id", prospect.id);
-            errors++;
-            continue;
-          }
-          const nowIso = new Date().toISOString();
-          await supabase.from("sales_prospects").update({
-            last_email_sent_at: nowIso,
-            relance_sent_at: nowIso,
-            relance_status: "sent",
-            relance_round: round + 1,
-          }).eq("id", prospect.id);
-          sent++;
-        } catch (relErr) {
-          console.error(`Relance send error for ${prospect.email}:`, relErr);
+        const result = await pushToSystemeIo(prospect.email, prospect.first_name, [relanceTag(round)]);
+        if (!result.ok) {
+          console.error(`Systeme.io relance error for ${prospect.email}:`, result.detail);
           await supabase.from("sales_prospects").update({
             relance_status: "error",
           }).eq("id", prospect.id);
           errors++;
+          continue;
         }
+        const nowIso = new Date().toISOString();
+        await supabase.from("sales_prospects").update({
+          last_email_sent_at: nowIso,
+          relance_sent_at: nowIso,
+          relance_status: "sent",
+          relance_round: round + 1,
+        }).eq("id", prospect.id);
+        sent++;
         continue;
       }
-
 
       const stepToSend = mode === "manual" && targetStep
         ? targetStep
@@ -597,61 +184,37 @@ Deno.serve(async (req) => {
 
       const seqInfo = EMAIL_SEQUENCE[stepToSend - 1];
       const isInteresse = prospect.source === "interesses";
-      const emailBody = isInteresse
-        ? getInteresseEmailBody(stepToSend, prospect.first_name)
-        : getEmailBody(stepToSend, prospect.first_name);
-      const htmlContent = buildHtmlEmail(emailBody, prospect.email, stepToSend);
-      const rawSubject = isInteresse
-        ? (INTERESSE_SUBJECTS[stepToSend] || seqInfo.subject)
-        : seqInfo.subject;
-      const subject = rawSubject.replace(/\{name\}/g, prospect.first_name || "vous");
 
-      try {
-        const res = await fetch("https://api.brevo.com/v3/smtp/email", {
-          method: "POST",
-          headers: {
-            "api-key": brevoKey,
-            "Content-Type": "application/json",
-            accept: "application/json",
-          },
-          body: JSON.stringify({
-            sender: { name: "Georges Boubet", email: "noreply@ebookstudio.fr" },
-            to: [{ email: prospect.email, name: prospect.first_name || undefined }],
-            subject,
-            htmlContent,
-            tags: [`sales-step-${stepToSend}`, isInteresse ? "segment-interesses" : "segment-froid"],
-          }),
-        });
+      const result = await pushToSystemeIo(
+        prospect.email,
+        prospect.first_name,
+        [seqTag(stepToSend, isInteresse)],
+      );
 
-        if (!res.ok) {
-          const errData = await res.text();
-          console.error(`Brevo error for ${prospect.email}:`, errData);
-          errors++;
-          continue;
-        }
-
-        // Calculate next email time
-        const nextStep = stepToSend + 1;
-        const nextSeq = EMAIL_SEQUENCE[nextStep - 1];
-        const daysBetween = nextSeq
-          ? nextSeq.day_offset - seqInfo.day_offset
-          : 0;
-
-        const nextAt = new Date();
-        nextAt.setDate(nextAt.getDate() + daysBetween);
-
-        await supabase.from("sales_prospects").update({
-          current_step: stepToSend,
-          last_email_sent_at: new Date().toISOString(),
-          next_email_at: nextSeq ? nextAt.toISOString() : null,
-          completed: stepToSend >= 6,
-        }).eq("id", prospect.id);
-
-        sent++;
-      } catch (sendErr) {
-        console.error(`Send error for ${prospect.email}:`, sendErr);
+      if (!result.ok) {
+        console.error(`Systeme.io error for ${prospect.email}:`, result.detail);
         errors++;
+        continue;
       }
+
+      // Calculate next email time
+      const nextStep = stepToSend + 1;
+      const nextSeq = EMAIL_SEQUENCE[nextStep - 1];
+      const daysBetween = nextSeq
+        ? nextSeq.day_offset - seqInfo.day_offset
+        : 0;
+
+      const nextAt = new Date();
+      nextAt.setDate(nextAt.getDate() + daysBetween);
+
+      await supabase.from("sales_prospects").update({
+        current_step: stepToSend,
+        last_email_sent_at: new Date().toISOString(),
+        next_email_at: nextSeq ? nextAt.toISOString() : null,
+        completed: stepToSend >= 6,
+      }).eq("id", prospect.id);
+
+      sent++;
     }
 
     // ===== Passe RELANCE AUTOMATIQUE (cron) =====
@@ -688,41 +251,21 @@ Deno.serve(async (req) => {
         }
 
         const round = Math.min(prospect.relance_round ?? 0, RELANCE_MAX_ROUNDS - 1);
-        const variant = RELANCE_VARIANTS[round];
-        const relanceStep = 7 + round;
-        const htmlContent = buildHtmlEmail(variant.body(prospect.first_name), prospect.email, relanceStep);
-        const subject = variant.subject.replace(/\{name\}/g, prospect.first_name || "vous");
-        try {
-          const res = await fetch("https://api.brevo.com/v3/smtp/email", {
-            method: "POST",
-            headers: { "api-key": brevoKey, "Content-Type": "application/json", accept: "application/json" },
-            body: JSON.stringify({
-              sender: { name: "Georges Boubet", email: "noreply@ebookstudio.fr" },
-              to: [{ email: prospect.email, name: prospect.first_name || undefined }],
-              subject,
-              htmlContent,
-              tags: ["sales-relance", "relance-auto", `relance-${round + 1}`],
-            }),
-          });
-          if (!res.ok) {
-            console.error(`Brevo relance auto error for ${prospect.email}:`, await res.text());
-            await supabase.from("sales_prospects").update({ relance_status: "error" }).eq("id", prospect.id);
-            errors++;
-            continue;
-          }
-          const nowIso = new Date().toISOString();
-          await supabase.from("sales_prospects").update({
-            last_email_sent_at: nowIso,
-            relance_sent_at: nowIso,
-            relance_status: "sent",
-            relance_round: round + 1,
-          }).eq("id", prospect.id);
-          relanceAutoSent++;
-        } catch (relErr) {
-          console.error(`Relance auto send error for ${prospect.email}:`, relErr);
+        const result = await pushToSystemeIo(prospect.email, prospect.first_name, [relanceTag(round)]);
+        if (!result.ok) {
+          console.error(`Systeme.io relance auto error for ${prospect.email}:`, result.detail);
           await supabase.from("sales_prospects").update({ relance_status: "error" }).eq("id", prospect.id);
           errors++;
+          continue;
         }
+        const nowIso = new Date().toISOString();
+        await supabase.from("sales_prospects").update({
+          last_email_sent_at: nowIso,
+          relance_sent_at: nowIso,
+          relance_status: "sent",
+          relance_round: round + 1,
+        }).eq("id", prospect.id);
+        relanceAutoSent++;
       }
     }
 
