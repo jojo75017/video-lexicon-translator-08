@@ -522,7 +522,7 @@ Deno.serve(async (req) => {
           const res = await fetch(`${RESEND_API_URL}/${row.message_id}`, {
             headers: { "Authorization": `Bearer ${resendKey}` },
           });
-          if (!res.ok) { await res.text(); continue; }
+          if (!res.ok) { const t = await res.text(); console.error(`Resend GET ${res.status}: ${t}`); counts[`http_${res.status}`] = (counts[`http_${res.status}`] || 0) + 1; continue; }
           const j = await res.json().catch(() => ({}));
           const ev = (j?.last_event || j?.status || "unknown") as string;
           counts[ev] = (counts[ev] || 0) + 1;
