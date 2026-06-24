@@ -14,7 +14,7 @@ async function sendResendEmail(
   name: string | undefined,
   subject: string,
   html: string,
-): Promise<{ ok: boolean; detail?: string }> {
+): Promise<{ ok: boolean; detail?: string; id?: string }> {
   const resendKey = Deno.env.get("RESEND_API_KEY");
   if (!resendKey) return { ok: false, detail: "RESEND_API_KEY manquante" };
 
@@ -36,9 +36,30 @@ async function sendResendEmail(
       const detail = await res.text();
       return { ok: false, detail: `HTTP ${res.status}: ${detail}` };
     }
-    return { ok: true };
+    const json = await res.json().catch(() => ({}));
+    return { ok: true, id: json?.id };
   } catch (err) {
     return { ok: false, detail: String(err) };
+  }
+}
+
+// Enregistre chaque envoi dans email_send_log (preuve de délivrabilité côté Resend)
+async function logSend(
+  supabase: any,
+  recipient: string,
+  templateName: string,
+  result: { ok: boolean; detail?: string; id?: string },
+): Promise<void> {
+  try {
+    await supabase.from("email_send_log").insert({
+      recipient_email: recipient,
+      template_name: templateName,
+      message_id: result.id ?? null,
+      status: result.ok ? "sent" : "error",
+      error_message: result.ok ? null : (result.detail ?? null),
+    });
+  } catch (e) {
+    console.error("logSend error:", e);
   }
 }
 
