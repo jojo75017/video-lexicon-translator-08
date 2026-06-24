@@ -14,7 +14,7 @@ async function sendResendEmail(
   name: string | undefined,
   subject: string,
   html: string,
-): Promise<{ ok: boolean; detail?: string }> {
+): Promise<{ ok: boolean; detail?: string; id?: string }> {
   const resendKey = Deno.env.get("RESEND_API_KEY");
   if (!resendKey) return { ok: false, detail: "RESEND_API_KEY manquante" };
 
@@ -36,9 +36,30 @@ async function sendResendEmail(
       const detail = await res.text();
       return { ok: false, detail: `HTTP ${res.status}: ${detail}` };
     }
-    return { ok: true };
+    const json = await res.json().catch(() => ({}));
+    return { ok: true, id: json?.id };
   } catch (err) {
     return { ok: false, detail: String(err) };
+  }
+}
+
+// Enregistre chaque envoi dans email_send_log (preuve de délivrabilité côté Resend)
+async function logSend(
+  supabase: any,
+  recipient: string,
+  templateName: string,
+  result: { ok: boolean; detail?: string; id?: string },
+): Promise<void> {
+  try {
+    await supabase.from("email_send_log").insert({
+      recipient_email: recipient,
+      template_name: templateName,
+      message_id: result.id ?? null,
+      status: result.ok ? "sent" : "error",
+      error_message: result.ok ? null : (result.detail ?? null),
+    });
+  } catch (e) {
+    console.error("logSend error:", e);
   }
 }
 
@@ -344,13 +365,14 @@ Georges`,
   return bodies[step] || "";
 }
 
-function buildHtmlEmail(body: string, email?: string, step?: number): string {
+function buildHtmlEmail(body: string, email?: string, step?: number, template?: string): string {
   const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+  const tParam = template ? `&t=${encodeURIComponent(template)}` : "";
 
   // Construit un lien traçable : passe par track-email-click qui enregistre le clic puis redirige
   const trackedLink = (dest: string): string => {
     if (!email || !supabaseUrl) return dest;
-    return `${supabaseUrl}/functions/v1/track-email-click?e=${encodeURIComponent(email)}&s=${step ?? ""}&u=${encodeURIComponent(dest)}`;
+    return `${supabaseUrl}/functions/v1/track-email-click?e=${encodeURIComponent(email)}&s=${step ?? ""}${tParam}&u=${encodeURIComponent(dest)}`;
   };
 
   // Gros bouton CTA centré (c'est lui qui fait grimper les clics)
@@ -381,7 +403,7 @@ function buildHtmlEmail(body: string, email?: string, step?: number): string {
     .replace(/(<\/table>)<br>/g, "$1");
 
   const trackingPixel = email && step
-    ? `<img src="${supabaseUrl}/functions/v1/track-email-open?e=${encodeURIComponent(email)}&s=${step}" width="1" height="1" alt="" style="display:none;" />`
+    ? `<img src="${supabaseUrl}/functions/v1/track-email-open?e=${encodeURIComponent(email)}&s=${step}${tParam}" width="1" height="1" alt="" style="display:none;" />`
     : "";
 
   return `<!DOCTYPE html>
@@ -471,6 +493,58 @@ Deno.serve(async (req) => {
         });
       }
     }
+
+    // ===== MODE VERIFY_DELIVERY : interroge Resend pour confirmer la livraison =====
+    // Récupère les derniers envois enregistrés (avec message_id) et lit leur statut réel
+    // via l'API Resend GET /emails/{id}, puis met à jour email_send_log.
+    if (mode === "verify_delivery") {
+      const resendKey = Deno.env.get("RESEND_API_KEY");
+      if (!resendKey) {
+        return new Response(JSON.stringify({ error: "RESEND_API_KEY manquante" }), {
+          status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const limit = Math.min(body.limit || 60, 150);
+      const { data: rows } = await supabase
+        .from("email_send_log")
+        .select("id, message_id, recipient_email, template_name, status")
+        .not("message_id", "is", null)
+        .order("created_at", { ascending: false })
+        .limit(limit);
+
+      let checked = 0;
+      let delivered = 0;
+      const counts: Record<string, number> = {};
+      for (let i = 0; i < (rows?.length || 0); i++) {
+        const row = rows![i];
+        if (i > 0) await new Promise((r) => setTimeout(r, 120));
+        try {
+          const res = await fetch(`${RESEND_API_URL}/${row.message_id}`, {
+            headers: { "Authorization": `Bearer ${resendKey}` },
+          });
+          if (!res.ok) { const t = await res.text(); console.error(`Resend GET ${res.status}: ${t}`); counts[`http_${res.status}`] = (counts[`http_${res.status}`] || 0) + 1; continue; }
+          const j = await res.json().catch(() => ({}));
+          const ev = (j?.last_event || j?.status || "unknown") as string;
+          counts[ev] = (counts[ev] || 0) + 1;
+          if (ev === "delivered") delivered++;
+          checked++;
+          await supabase.from("email_send_log").update({
+            last_event: ev,
+            status: ev === "delivered" ? "delivered"
+              : (ev === "bounced" || ev === "failed") ? "error"
+              : row.status,
+          }).eq("id", row.id);
+        } catch (e) {
+          console.error("verify_delivery error:", e);
+        }
+      }
+
+      return new Response(
+        JSON.stringify({ success: true, checked, delivered, breakdown: counts }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     // ===== MODE TEST : envoie les 15 templates à une adresse de test =====
     if (mode === "test") {
       const testEmail = (body.test_email || "").trim();
@@ -483,9 +557,10 @@ Deno.serve(async (req) => {
       const results: { template: string; subject: string; ok: boolean; detail?: string }[] = [];
 
       const runTest = async (template: string, step: number, subject: string, htmlBody: string) => {
-        const html = buildHtmlEmail(htmlBody, testEmail, step);
+        const html = buildHtmlEmail(htmlBody, testEmail, step, template);
         const subj = `[TEST] ${subject.replace(/\{name\}/g, testName)}`;
         const r = await sendResendEmail(testEmail, testName, subj, html);
+        await logSend(supabase, testEmail, template, r);
         results.push({ template, subject: subj, ok: r.ok, detail: r.detail });
         await new Promise((res) => setTimeout(res, 400));
       };
@@ -563,13 +638,16 @@ Deno.serve(async (req) => {
         const round = Math.min(prospect.relance_round ?? 0, RELANCE_MAX_ROUNDS - 1);
         const variant = RELANCE_VARIANTS[round];
         const relanceStep = 7 + round; // distingue chaque relance dans le tracking des clics
+        const relanceTemplate = `relance-${round + 1}`;
         const htmlContent = buildHtmlEmail(
           variant.body(prospect.first_name),
           prospect.email,
           relanceStep,
+          relanceTemplate,
         );
         const subject = variant.subject.replace(/\{name\}/g, prospect.first_name || "vous");
         const result = await sendResendEmail(prospect.email, prospect.first_name, subject, htmlContent);
+        await logSend(supabase, prospect.email, relanceTemplate, result);
         if (!result.ok) {
           console.error(`Resend relance error for ${prospect.email}:`, result.detail);
           await supabase.from("sales_prospects").update({
@@ -616,16 +694,18 @@ Deno.serve(async (req) => {
 
       const seqInfo = EMAIL_SEQUENCE[stepToSend - 1];
       const isInteresse = prospect.source === "interesses";
+      const templateName = `${isInteresse ? "interesse" : "standard"}-${stepToSend}`;
       const emailBody = isInteresse
         ? getInteresseEmailBody(stepToSend, prospect.first_name)
         : getEmailBody(stepToSend, prospect.first_name);
-      const htmlContent = buildHtmlEmail(emailBody, prospect.email, stepToSend);
+      const htmlContent = buildHtmlEmail(emailBody, prospect.email, stepToSend, templateName);
       const rawSubject = isInteresse
         ? (INTERESSE_SUBJECTS[stepToSend] || seqInfo.subject)
         : seqInfo.subject;
       const subject = rawSubject.replace(/\{name\}/g, prospect.first_name || "vous");
 
       const result = await sendResendEmail(prospect.email, prospect.first_name, subject, htmlContent);
+      await logSend(supabase, prospect.email, templateName, result);
       if (!result.ok) {
         console.error(`Resend error for ${prospect.email}:`, result.detail);
         errors++;
@@ -688,9 +768,11 @@ Deno.serve(async (req) => {
         const round = Math.min(prospect.relance_round ?? 0, RELANCE_MAX_ROUNDS - 1);
         const variant = RELANCE_VARIANTS[round];
         const relanceStep = 7 + round;
-        const htmlContent = buildHtmlEmail(variant.body(prospect.first_name), prospect.email, relanceStep);
+        const relanceTemplate = `relance-${round + 1}`;
+        const htmlContent = buildHtmlEmail(variant.body(prospect.first_name), prospect.email, relanceStep, relanceTemplate);
         const subject = variant.subject.replace(/\{name\}/g, prospect.first_name || "vous");
         const result = await sendResendEmail(prospect.email, prospect.first_name, subject, htmlContent);
+        await logSend(supabase, prospect.email, relanceTemplate, result);
         if (!result.ok) {
           console.error(`Resend relance auto error for ${prospect.email}:`, result.detail);
           await supabase.from("sales_prospects").update({ relance_status: "error" }).eq("id", prospect.id);

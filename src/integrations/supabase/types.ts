@@ -681,6 +681,7 @@ export type Database = {
           email_step: number | null
           id: string
           prospect_email: string
+          template_name: string | null
           user_agent: string | null
         }
         Insert: {
@@ -689,6 +690,7 @@ export type Database = {
           email_step?: number | null
           id?: string
           prospect_email: string
+          template_name?: string | null
           user_agent?: string | null
         }
         Update: {
@@ -697,6 +699,7 @@ export type Database = {
           email_step?: number | null
           id?: string
           prospect_email?: string
+          template_name?: string | null
           user_agent?: string | null
         }
         Relationships: []
@@ -708,6 +711,7 @@ export type Database = {
           ip_address: string | null
           opened_at: string
           prospect_email: string
+          template_name: string | null
           user_agent: string | null
         }
         Insert: {
@@ -716,6 +720,7 @@ export type Database = {
           ip_address?: string | null
           opened_at?: string
           prospect_email: string
+          template_name?: string | null
           user_agent?: string | null
         }
         Update: {
@@ -724,7 +729,44 @@ export type Database = {
           ip_address?: string | null
           opened_at?: string
           prospect_email?: string
+          template_name?: string | null
           user_agent?: string | null
+        }
+        Relationships: []
+      }
+      email_send_log: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          last_event: string | null
+          message_id: string | null
+          recipient_email: string
+          status: string
+          template_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          last_event?: string | null
+          message_id?: string | null
+          recipient_email: string
+          status?: string
+          template_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          last_event?: string | null
+          message_id?: string | null
+          recipient_email?: string
+          status?: string
+          template_name?: string | null
+          updated_at?: string
         }
         Relationships: []
       }

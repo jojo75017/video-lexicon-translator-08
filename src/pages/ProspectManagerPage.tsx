@@ -16,6 +16,7 @@ import {
 import * as XLSX from 'xlsx';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 import LeadsInscritsPanel from '@/components/admin/LeadsInscritsPanel';
+import TemplatePerformancePanel from '@/components/admin/TemplatePerformancePanel';
 
 interface Prospect {
   id: string;
@@ -585,7 +586,7 @@ const ProspectManagerPage = () => {
         </div>
 
         <Tabs defaultValue="prospects" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-card border border-border">
+          <TabsList className="grid w-full grid-cols-5 bg-card border border-border">
             <TabsTrigger value="prospects" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
               <Users className="h-4 w-4 mr-2" /> Prospects
             </TabsTrigger>
@@ -594,6 +595,9 @@ const ProspectManagerPage = () => {
             </TabsTrigger>
             <TabsTrigger value="send" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
               <Send className="h-4 w-4 mr-2" /> Envoi Manuel
+            </TabsTrigger>
+            <TabsTrigger value="templates" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
+              <Mail className="h-4 w-4 mr-2" /> Templates
             </TabsTrigger>
             <TabsTrigger value="stats" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
               <BarChart3 className="h-4 w-4 mr-2" /> Pipeline
@@ -907,6 +911,11 @@ const ProspectManagerPage = () => {
                 ))}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* TEMPLATES PERFORMANCE TAB */}
+          <TabsContent value="templates" className="space-y-4">
+            <TemplatePerformancePanel />
           </TabsContent>
 
           {/* PIPELINE TAB */}
