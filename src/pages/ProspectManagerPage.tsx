@@ -16,6 +16,7 @@ import {
 import * as XLSX from 'xlsx';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 import LeadsInscritsPanel from '@/components/admin/LeadsInscritsPanel';
+import TemplatePerformancePanel from '@/components/admin/TemplatePerformancePanel';
 
 interface Prospect {
   id: string;
