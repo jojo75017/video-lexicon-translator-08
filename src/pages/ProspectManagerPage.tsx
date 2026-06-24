@@ -188,6 +188,12 @@ const ProspectManagerPage = () => {
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!isMounted) return;
 
+      // On ignore TOKEN_REFRESHED : cet événement se déclenche régulièrement
+      // (rafraîchissement du jeton, retour d'onglet) et relancer fetchProspects
+      // à chaque fois re-paginait des milliers d'ouvertures + re-rendait les
+      // centaines de lignes, faisant saturer la mémoire et planter l'onglet.
+      if (_event === 'TOKEN_REFRESHED') return;
+
       const connected = !!session;
       setHasSession(connected);
       setAuthReady(true);
