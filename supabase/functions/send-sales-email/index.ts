@@ -5,8 +5,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// ===== Envoi via Resend (passerelle connecteur Lovable) =====
-const RESEND_GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
+// ===== Envoi via Resend (API directe) =====
+const RESEND_API_URL = "https://api.resend.com/emails";
 const FROM_ADDRESS = "Georges Boubet <noreply@ebookstudio.fr>";
 
 async function sendResendEmail(
@@ -15,18 +15,15 @@ async function sendResendEmail(
   subject: string,
   html: string,
 ): Promise<{ ok: boolean; detail?: string }> {
-  const lovableKey = Deno.env.get("LOVABLE_API_KEY");
   const resendKey = Deno.env.get("RESEND_API_KEY");
-  if (!lovableKey) return { ok: false, detail: "LOVABLE_API_KEY manquante" };
   if (!resendKey) return { ok: false, detail: "RESEND_API_KEY manquante" };
 
   try {
-    const res = await fetch(`${RESEND_GATEWAY_URL}/emails`, {
+    const res = await fetch(RESEND_API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${lovableKey}`,
-        "X-Connection-Api-Key": resendKey,
+        "Authorization": `Bearer ${resendKey}`,
       },
       body: JSON.stringify({
         from: FROM_ADDRESS,
@@ -44,6 +41,7 @@ async function sendResendEmail(
     return { ok: false, detail: String(err) };
   }
 }
+
 
 // Email subjects and strategies — séquence courte 5 étapes + 1 relance non-cliqueurs (étape 6)
 const EMAIL_SEQUENCE = [
@@ -421,7 +419,7 @@ Deno.serve(async (req) => {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceKey);
 
-    if (!Deno.env.get("LOVABLE_API_KEY") || !Deno.env.get("RESEND_API_KEY")) {
+    if (!Deno.env.get("RESEND_API_KEY")) {
       return new Response(JSON.stringify({ error: "Configuration email Resend manquante" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -473,6 +471,45 @@ Deno.serve(async (req) => {
         });
       }
     }
+    // ===== MODE TEST : envoie les 15 templates à une adresse de test =====
+    if (mode === "test") {
+      const testEmail = (body.test_email || "").trim();
+      if (!testEmail || !testEmail.includes("@")) {
+        return new Response(JSON.stringify({ error: "test_email invalide" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const testName = body.test_name || "Test";
+      const results: { template: string; subject: string; ok: boolean; detail?: string }[] = [];
+
+      const runTest = async (template: string, step: number, subject: string, htmlBody: string) => {
+        const html = buildHtmlEmail(htmlBody, testEmail, step);
+        const subj = `[TEST] ${subject.replace(/\{name\}/g, testName)}`;
+        const r = await sendResendEmail(testEmail, testName, subj, html);
+        results.push({ template, subject: subj, ok: r.ok, detail: r.detail });
+        await new Promise((res) => setTimeout(res, 400));
+      };
+
+      // 6 templates séquence standard
+      for (let s = 1; s <= 6; s++) {
+        await runTest(`standard-${s}`, s, EMAIL_SEQUENCE[s - 1].subject, getEmailBody(s, testName));
+      }
+      // 6 templates séquence intéressés
+      for (let s = 1; s <= 6; s++) {
+        await runTest(`interesse-${s}`, s, INTERESSE_SUBJECTS[s] || EMAIL_SEQUENCE[s - 1].subject, getInteresseEmailBody(s, testName));
+      }
+      // 3 relances tournantes
+      for (let r = 0; r < RELANCE_VARIANTS.length; r++) {
+        await runTest(`relance-${r + 1}`, 7 + r, RELANCE_VARIANTS[r].subject, RELANCE_VARIANTS[r].body(testName));
+      }
+
+      const okCount = results.filter((r) => r.ok).length;
+      return new Response(
+        JSON.stringify({ success: okCount === results.length, total: results.length, ok: okCount, failed: results.length - okCount, results }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
 
     let query = supabase
       .from("sales_prospects")
