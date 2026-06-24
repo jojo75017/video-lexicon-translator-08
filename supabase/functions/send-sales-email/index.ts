@@ -365,13 +365,14 @@ Georges`,
   return bodies[step] || "";
 }
 
-function buildHtmlEmail(body: string, email?: string, step?: number): string {
+function buildHtmlEmail(body: string, email?: string, step?: number, template?: string): string {
   const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+  const tParam = template ? `&t=${encodeURIComponent(template)}` : "";
 
   // Construit un lien traçable : passe par track-email-click qui enregistre le clic puis redirige
   const trackedLink = (dest: string): string => {
     if (!email || !supabaseUrl) return dest;
-    return `${supabaseUrl}/functions/v1/track-email-click?e=${encodeURIComponent(email)}&s=${step ?? ""}&u=${encodeURIComponent(dest)}`;
+    return `${supabaseUrl}/functions/v1/track-email-click?e=${encodeURIComponent(email)}&s=${step ?? ""}${tParam}&u=${encodeURIComponent(dest)}`;
   };
 
   // Gros bouton CTA centré (c'est lui qui fait grimper les clics)
