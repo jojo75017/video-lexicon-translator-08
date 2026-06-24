@@ -9,6 +9,7 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     const email = url.searchParams.get("e");
     const step = url.searchParams.get("s");
+    const template = url.searchParams.get("t");
 
     if (email && step) {
       const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -18,6 +19,7 @@ Deno.serve(async (req) => {
       await supabase.from("email_opens").insert({
         prospect_email: decodeURIComponent(email),
         email_step: parseInt(step, 10),
+        template_name: template ? decodeURIComponent(template) : null,
         user_agent: req.headers.get("user-agent") || null,
       });
     }
