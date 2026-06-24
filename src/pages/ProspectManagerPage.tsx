@@ -860,6 +860,33 @@ const ProspectManagerPage = () => {
                     </tbody>
                   </table>
                 </div>
+                {(() => {
+                  const total = prospects.filter(p => !showClickedOnly || hasClicked(p.email)).length;
+                  if (visibleCount >= total) return null;
+                  return (
+                    <div className="flex items-center justify-center gap-3 py-3 border-t border-border bg-card/40">
+                      <span className="text-xs text-muted-foreground">
+                        {Math.min(visibleCount, total)} / {total} affichés
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
+                        className="border-primary/30 text-primary hover:bg-primary/10"
+                      >
+                        Afficher plus
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setVisibleCount(total)}
+                        className="text-muted-foreground"
+                      >
+                        Tout afficher ({total})
+                      </Button>
+                    </div>
+                  );
+                })()}
               </div>
             )}
           </TabsContent>
