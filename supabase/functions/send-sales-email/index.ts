@@ -716,9 +716,11 @@ Deno.serve(async (req) => {
         const round = Math.min(prospect.relance_round ?? 0, RELANCE_MAX_ROUNDS - 1);
         const variant = RELANCE_VARIANTS[round];
         const relanceStep = 7 + round;
-        const htmlContent = buildHtmlEmail(variant.body(prospect.first_name), prospect.email, relanceStep);
+        const relanceTemplate = `relance-${round + 1}`;
+        const htmlContent = buildHtmlEmail(variant.body(prospect.first_name), prospect.email, relanceStep, relanceTemplate);
         const subject = variant.subject.replace(/\{name\}/g, prospect.first_name || "vous");
         const result = await sendResendEmail(prospect.email, prospect.first_name, subject, htmlContent);
+        await logSend(supabase, prospect.email, relanceTemplate, result);
         if (!result.ok) {
           console.error(`Resend relance auto error for ${prospect.email}:`, result.detail);
           await supabase.from("sales_prospects").update({ relance_status: "error" }).eq("id", prospect.id);
