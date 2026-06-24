@@ -642,16 +642,18 @@ Deno.serve(async (req) => {
 
       const seqInfo = EMAIL_SEQUENCE[stepToSend - 1];
       const isInteresse = prospect.source === "interesses";
+      const templateName = `${isInteresse ? "interesse" : "standard"}-${stepToSend}`;
       const emailBody = isInteresse
         ? getInteresseEmailBody(stepToSend, prospect.first_name)
         : getEmailBody(stepToSend, prospect.first_name);
-      const htmlContent = buildHtmlEmail(emailBody, prospect.email, stepToSend);
+      const htmlContent = buildHtmlEmail(emailBody, prospect.email, stepToSend, templateName);
       const rawSubject = isInteresse
         ? (INTERESSE_SUBJECTS[stepToSend] || seqInfo.subject)
         : seqInfo.subject;
       const subject = rawSubject.replace(/\{name\}/g, prospect.first_name || "vous");
 
       const result = await sendResendEmail(prospect.email, prospect.first_name, subject, htmlContent);
+      await logSend(supabase, prospect.email, templateName, result);
       if (!result.ok) {
         console.error(`Resend error for ${prospect.email}:`, result.detail);
         errors++;
