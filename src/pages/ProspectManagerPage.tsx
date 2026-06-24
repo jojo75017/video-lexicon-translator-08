@@ -762,6 +762,7 @@ const ProspectManagerPage = () => {
                     <tbody>
                       {prospects
                         .filter(p => !showClickedOnly || hasClicked(p.email))
+                        .slice(0, visibleCount)
                         .map(p => (
                         <tr key={p.id} className="border-b border-border/50 hover:bg-card/50">
                           <td className="px-3 py-2">
