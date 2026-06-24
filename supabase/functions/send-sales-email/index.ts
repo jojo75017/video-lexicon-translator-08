@@ -493,6 +493,58 @@ Deno.serve(async (req) => {
         });
       }
     }
+
+    // ===== MODE VERIFY_DELIVERY : interroge Resend pour confirmer la livraison =====
+    // Récupère les derniers envois enregistrés (avec message_id) et lit leur statut réel
+    // via l'API Resend GET /emails/{id}, puis met à jour email_send_log.
+    if (mode === "verify_delivery") {
+      const resendKey = Deno.env.get("RESEND_API_KEY");
+      if (!resendKey) {
+        return new Response(JSON.stringify({ error: "RESEND_API_KEY manquante" }), {
+          status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const limit = Math.min(body.limit || 60, 150);
+      const { data: rows } = await supabase
+        .from("email_send_log")
+        .select("id, message_id, recipient_email, template_name, status")
+        .not("message_id", "is", null)
+        .order("created_at", { ascending: false })
+        .limit(limit);
+
+      let checked = 0;
+      let delivered = 0;
+      const counts: Record<string, number> = {};
+      for (let i = 0; i < (rows?.length || 0); i++) {
+        const row = rows![i];
+        if (i > 0) await new Promise((r) => setTimeout(r, 120));
+        try {
+          const res = await fetch(`${RESEND_API_URL}/${row.message_id}`, {
+            headers: { "Authorization": `Bearer ${resendKey}` },
+          });
+          if (!res.ok) { await res.text(); continue; }
+          const j = await res.json().catch(() => ({}));
+          const ev = (j?.last_event || j?.status || "unknown") as string;
+          counts[ev] = (counts[ev] || 0) + 1;
+          if (ev === "delivered") delivered++;
+          checked++;
+          await supabase.from("email_send_log").update({
+            last_event: ev,
+            status: ev === "delivered" ? "delivered"
+              : (ev === "bounced" || ev === "failed") ? "error"
+              : row.status,
+          }).eq("id", row.id);
+        } catch (e) {
+          console.error("verify_delivery error:", e);
+        }
+      }
+
+      return new Response(
+        JSON.stringify({ success: true, checked, delivered, breakdown: counts }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     // ===== MODE TEST : envoie les 15 templates à une adresse de test =====
     if (mode === "test") {
       const testEmail = (body.test_email || "").trim();
