@@ -473,6 +473,45 @@ Deno.serve(async (req) => {
         });
       }
     }
+    // ===== MODE TEST : envoie les 15 templates à une adresse de test =====
+    if (mode === "test") {
+      const testEmail = (body.test_email || "").trim();
+      if (!testEmail || !testEmail.includes("@")) {
+        return new Response(JSON.stringify({ error: "test_email invalide" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const testName = body.test_name || "Test";
+      const results: { template: string; subject: string; ok: boolean; detail?: string }[] = [];
+
+      const runTest = async (template: string, step: number, subject: string, htmlBody: string) => {
+        const html = buildHtmlEmail(htmlBody, testEmail, step);
+        const subj = `[TEST] ${subject.replace(/\{name\}/g, testName)}`;
+        const r = await sendResendEmail(testEmail, testName, subj, html);
+        results.push({ template, subject: subj, ok: r.ok, detail: r.detail });
+        await new Promise((res) => setTimeout(res, 400));
+      };
+
+      // 6 templates séquence standard
+      for (let s = 1; s <= 6; s++) {
+        await runTest(`standard-${s}`, s, EMAIL_SEQUENCE[s - 1].subject, getEmailBody(s, testName));
+      }
+      // 6 templates séquence intéressés
+      for (let s = 1; s <= 6; s++) {
+        await runTest(`interesse-${s}`, s, INTERESSE_SUBJECTS[s] || EMAIL_SEQUENCE[s - 1].subject, getInteresseEmailBody(s, testName));
+      }
+      // 3 relances tournantes
+      for (let r = 0; r < RELANCE_VARIANTS.length; r++) {
+        await runTest(`relance-${r + 1}`, 7 + r, RELANCE_VARIANTS[r].subject, RELANCE_VARIANTS[r].body(testName));
+      }
+
+      const okCount = results.filter((r) => r.ok).length;
+      return new Response(
+        JSON.stringify({ success: okCount === results.length, total: results.length, ok: okCount, failed: results.length - okCount, results }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
 
     let query = supabase
       .from("sales_prospects")
