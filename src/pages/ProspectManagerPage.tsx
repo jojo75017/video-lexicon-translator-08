@@ -67,6 +67,10 @@ const ProspectManagerPage = () => {
   const [subscriberSet, setSubscriberSet] = useState<Set<string>>(new Set());
   // Prospect dont on affiche la fiche détaillée dans le panneau
   const [detailEmail, setDetailEmail] = useState<string | null>(null);
+  // Affichage progressif : éviter de monter 648+ lignes (17k nœuds DOM) d'un coup,
+  // ce qui saturait la mémoire et rendait l'onglet Chrome instable.
+  const PAGE_SIZE = 100;
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const fetchOpens = useCallback(async () => {
     // Pagination obligatoire : PostgREST plafonne à 1000 lignes par requête,
