@@ -913,6 +913,11 @@ const ProspectManagerPage = () => {
             </Card>
           </TabsContent>
 
+          {/* TEMPLATES PERFORMANCE TAB */}
+          <TabsContent value="templates" className="space-y-4">
+            <TemplatePerformancePanel />
+          </TabsContent>
+
           {/* PIPELINE TAB */}
           <TabsContent value="stats" className="space-y-4">
             <Card className="bg-card border-border">
