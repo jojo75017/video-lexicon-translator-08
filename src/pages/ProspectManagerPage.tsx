@@ -67,6 +67,10 @@ const ProspectManagerPage = () => {
   const [subscriberSet, setSubscriberSet] = useState<Set<string>>(new Set());
   // Prospect dont on affiche la fiche détaillée dans le panneau
   const [detailEmail, setDetailEmail] = useState<string | null>(null);
+  // Affichage progressif : éviter de monter 648+ lignes (17k nœuds DOM) d'un coup,
+  // ce qui saturait la mémoire et rendait l'onglet Chrome instable.
+  const PAGE_SIZE = 100;
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const fetchOpens = useCallback(async () => {
     // Pagination obligatoire : PostgREST plafonne à 1000 lignes par requête,
@@ -187,6 +191,12 @@ const ProspectManagerPage = () => {
 
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!isMounted) return;
+
+      // On ignore TOKEN_REFRESHED : cet événement se déclenche régulièrement
+      // (rafraîchissement du jeton, retour d'onglet) et relancer fetchProspects
+      // à chaque fois re-paginait des milliers d'ouvertures + re-rendait les
+      // centaines de lignes, faisant saturer la mémoire et planter l'onglet.
+      if (_event === 'TOKEN_REFRESHED') return;
 
       const connected = !!session;
       setHasSession(connected);
@@ -752,6 +762,7 @@ const ProspectManagerPage = () => {
                     <tbody>
                       {prospects
                         .filter(p => !showClickedOnly || hasClicked(p.email))
+                        .slice(0, visibleCount)
                         .map(p => (
                         <tr key={p.id} className="border-b border-border/50 hover:bg-card/50">
                           <td className="px-3 py-2">
@@ -849,6 +860,33 @@ const ProspectManagerPage = () => {
                     </tbody>
                   </table>
                 </div>
+                {(() => {
+                  const total = prospects.filter(p => !showClickedOnly || hasClicked(p.email)).length;
+                  if (visibleCount >= total) return null;
+                  return (
+                    <div className="flex items-center justify-center gap-3 py-3 border-t border-border bg-card/40">
+                      <span className="text-xs text-muted-foreground">
+                        {Math.min(visibleCount, total)} / {total} affichés
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
+                        className="border-primary/30 text-primary hover:bg-primary/10"
+                      >
+                        Afficher plus
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setVisibleCount(total)}
+                        className="text-muted-foreground"
+                      >
+                        Tout afficher ({total})
+                      </Button>
+                    </div>
+                  );
+                })()}
               </div>
             )}
           </TabsContent>
