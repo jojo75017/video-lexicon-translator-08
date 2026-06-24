@@ -403,7 +403,7 @@ function buildHtmlEmail(body: string, email?: string, step?: number, template?: 
     .replace(/(<\/table>)<br>/g, "$1");
 
   const trackingPixel = email && step
-    ? `<img src="${supabaseUrl}/functions/v1/track-email-open?e=${encodeURIComponent(email)}&s=${step}" width="1" height="1" alt="" style="display:none;" />`
+    ? `<img src="${supabaseUrl}/functions/v1/track-email-open?e=${encodeURIComponent(email)}&s=${step}${tParam}" width="1" height="1" alt="" style="display:none;" />`
     : "";
 
   return `<!DOCTYPE html>
