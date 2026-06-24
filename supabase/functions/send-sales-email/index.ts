@@ -419,7 +419,7 @@ Deno.serve(async (req) => {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceKey);
 
-    if (!Deno.env.get("LOVABLE_API_KEY") || !Deno.env.get("RESEND_API_KEY")) {
+    if (!Deno.env.get("RESEND_API_KEY")) {
       return new Response(JSON.stringify({ error: "Configuration email Resend manquante" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
