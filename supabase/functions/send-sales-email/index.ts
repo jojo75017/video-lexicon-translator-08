@@ -505,9 +505,10 @@ Deno.serve(async (req) => {
       const results: { template: string; subject: string; ok: boolean; detail?: string }[] = [];
 
       const runTest = async (template: string, step: number, subject: string, htmlBody: string) => {
-        const html = buildHtmlEmail(htmlBody, testEmail, step);
+        const html = buildHtmlEmail(htmlBody, testEmail, step, template);
         const subj = `[TEST] ${subject.replace(/\{name\}/g, testName)}`;
         const r = await sendResendEmail(testEmail, testName, subj, html);
+        await logSend(supabase, testEmail, template, r);
         results.push({ template, subject: subj, ok: r.ok, detail: r.detail });
         await new Promise((res) => setTimeout(res, 400));
       };
