@@ -186,3 +186,6 @@ verify_jwt = false
 
 [functions.v3-gift-redeem]
 verify_jwt = false
+
+[functions.resend-webhook]
+verify_jwt = false
