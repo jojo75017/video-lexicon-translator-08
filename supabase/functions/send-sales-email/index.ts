@@ -5,8 +5,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// ===== Envoi via Resend (passerelle connecteur Lovable) =====
-const RESEND_GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
+// ===== Envoi via Resend (API directe) =====
+const RESEND_API_URL = "https://api.resend.com/emails";
 const FROM_ADDRESS = "Georges Boubet <noreply@ebookstudio.fr>";
 
 async function sendResendEmail(
@@ -15,18 +15,15 @@ async function sendResendEmail(
   subject: string,
   html: string,
 ): Promise<{ ok: boolean; detail?: string }> {
-  const lovableKey = Deno.env.get("LOVABLE_API_KEY");
   const resendKey = Deno.env.get("RESEND_API_KEY");
-  if (!lovableKey) return { ok: false, detail: "LOVABLE_API_KEY manquante" };
   if (!resendKey) return { ok: false, detail: "RESEND_API_KEY manquante" };
 
   try {
-    const res = await fetch(`${RESEND_GATEWAY_URL}/emails`, {
+    const res = await fetch(RESEND_API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${lovableKey}`,
-        "X-Connection-Api-Key": resendKey,
+        "Authorization": `Bearer ${resendKey}`,
       },
       body: JSON.stringify({
         from: FROM_ADDRESS,
@@ -44,6 +41,7 @@ async function sendResendEmail(
     return { ok: false, detail: String(err) };
   }
 }
+
 
 // Email subjects and strategies — séquence courte 5 étapes + 1 relance non-cliqueurs (étape 6)
 const EMAIL_SEQUENCE = [
