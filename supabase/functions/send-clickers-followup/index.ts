@@ -8,37 +8,44 @@ const corsHeaders = {
 const RESEND_API_URL = "https://api.resend.com/emails";
 const FROM_ADDRESS = "Georges Boubet <noreply@ebookstudio.fr>";
 
-// Email à exclure de la relance (accès conservé)
-const EXCLUDED_EMAILS = ["rachel.mlm63@gmail.com"];
+// Adresses à exclure (compte propriétaire / tests)
+const EXCLUDED_EMAILS = ["boubetgeorges@gmail.com"];
 
-const SUBJECT = "⏰ Votre accès bêta EbookStudio se termine le 30 juin";
+const SUBJECT = "Vous aviez jeté un œil à EbookStudio 👀";
+
+const OFFRES_LINK = "https://video-lexicon-translator-08.lovable.app/offres";
 
 function buildHtml(): string {
   return `
   <div style="font-family: Arial, Helvetica, sans-serif; color:#232F3E; max-width:600px; margin:0 auto; line-height:1.6;">
     <p>Bonjour,</p>
 
-    <p>Vous faites partie des premiers bêta-testeurs d'<strong>EbookStudio Pro V2</strong>, et je vous en remercie sincèrement.</p>
+    <p>J'ai remarqué que vous aviez <strong>cliqué sur l'un de mes emails</strong> à propos d'<strong>EbookStudio</strong>
+    — l'outil qui vous permet d'écrire et de publier un ebook professionnel sur Amazon KDP grâce à l'IA, de A à Z.</p>
 
-    <p>Je reviens vers vous car <strong>votre accès bêta prend fin le 30 juin</strong>. Sans nouvelle de votre part,
-    je vais <strong>couper les accès bêta ce jour-là</strong> afin de libérer les places.</p>
+    <p>C'est plutôt bon signe&nbsp;: le sujet vous intéresse. Du coup, je voulais simplement savoir
+    <strong>ce qui vous a retenu de franchir le pas</strong>&nbsp;?</p>
 
-    <p>Avant cela, j'aimerais vraiment avoir votre retour&nbsp;:</p>
     <ul>
-      <li>Avez-vous pu tester la plateforme&nbsp;?</li>
-      <li>Qu'est-ce qui vous a plu ou bloqué&nbsp;?</li>
-      <li>Souhaitez-vous conserver votre accès&nbsp;?</li>
+      <li>Vous avez une question sur le fonctionnement&nbsp;?</li>
+      <li>Vous hésitez sur le type de livre à créer&nbsp;?</li>
+      <li>Vous voulez voir un exemple concret avant de vous lancer&nbsp;?</li>
     </ul>
 
-    <p>Il vous suffit de <strong>répondre à cet email</strong> avant le <strong>30 juin</strong> pour me dire où vous en êtes.
-    Sans réponse, l'accès sera désactivé le 30 juin.</p>
+    <p>Répondez-moi directement à cet email, je vous réponds personnellement.
+    Et si vous êtes prêt(e), tout est ici&nbsp;:</p>
 
-    <p>Merci encore pour votre participation, et au plaisir de vous lire.</p>
+    <p style="text-align:center; margin:28px 0;">
+      <a href="${OFFRES_LINK}"
+         style="background:#008296; color:#ffffff; text-decoration:none; padding:14px 28px; border-radius:8px; font-weight:bold; display:inline-block;">
+        Découvrir EbookStudio
+      </a>
+    </p>
 
     <p style="margin-top:24px;">
       Bien à vous,<br/>
       <strong>Georges Boubet</strong><br/>
-      EbookStudio Pro V2
+      EbookStudio
     </p>
   </div>`;
 }
@@ -77,18 +84,17 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
     );
 
-    // Récupère les bêta-testeurs (codes utilisés)
-    const { data: codes, error } = await supabase
-      .from("beta_promo_codes")
-      .select("used_by_email")
-      .eq("status", "used");
+    // Récupère tous les emails ayant cliqué au moins une fois
+    const { data: clicks, error } = await supabase
+      .from("email_clicks")
+      .select("prospect_email");
     if (error) throw error;
 
     const recipients = Array.from(
       new Set(
-        (codes ?? [])
-          .map((c: any) => (c.used_by_email ?? "").trim().toLowerCase())
-          .filter((e: string) => e && !EXCLUDED_EMAILS.includes(e)),
+        (clicks ?? [])
+          .map((c: any) => (c.prospect_email ?? "").trim().toLowerCase())
+          .filter((e: string) => e && e.includes("@") && !EXCLUDED_EMAILS.includes(e)),
       ),
     );
 
@@ -101,7 +107,7 @@ Deno.serve(async (req) => {
       try {
         await supabase.from("email_send_log").insert({
           recipient_email: to,
-          template_name: "beta-reminder",
+          template_name: "clickers-followup",
           message_id: result.id ?? null,
           status: result.ok ? "sent" : "error",
           error_message: result.ok ? null : (result.detail ?? null),
