@@ -20,8 +20,8 @@ function buildHtml(): string {
 
     <p>Vous faites partie des premiers bêta-testeurs d'<strong>EbookStudio Pro V2</strong>, et je vous en remercie sincèrement.</p>
 
-    <p>Je reviens vers vous car <strong>le mois d'accès bêta touche à sa fin</strong>. Sans nouvelle de votre part,
-    je vais prochainement <strong>couper les accès bêta</strong> afin de libérer les places.</p>
+    <p>Je reviens vers vous car <strong>votre accès bêta prend fin le 30 juin</strong>. Sans nouvelle de votre part,
+    je vais <strong>couper les accès bêta ce jour-là</strong> afin de libérer les places.</p>
 
     <p>Avant cela, j'aimerais vraiment avoir votre retour&nbsp;:</p>
     <ul>
@@ -30,8 +30,8 @@ function buildHtml(): string {
       <li>Souhaitez-vous conserver votre accès&nbsp;?</li>
     </ul>
 
-    <p>Il vous suffit de <strong>répondre à cet email</strong> pour me dire où vous en êtes.
-    Si je n'ai pas de réponse, l'accès sera désactivé à la fin du mois.</p>
+    <p>Il vous suffit de <strong>répondre à cet email</strong> avant le <strong>30 juin</strong> pour me dire où vous en êtes.
+    Sans réponse, l'accès sera désactivé le 30 juin.</p>
 
     <p>Merci encore pour votre participation, et au plaisir de vous lire.</p>
 
