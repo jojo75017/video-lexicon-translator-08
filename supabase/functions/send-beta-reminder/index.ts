@@ -11,7 +11,7 @@ const FROM_ADDRESS = "Georges Boubet <noreply@ebookstudio.fr>";
 // Email à exclure de la relance (accès conservé)
 const EXCLUDED_EMAILS = ["rachel.mlm63@gmail.com"];
 
-const SUBJECT = "⏰ Votre accès bêta EbookStudio se termine bientôt";
+const SUBJECT = "⏰ Votre accès bêta EbookStudio se termine le 30 juin";
 
 function buildHtml(): string {
   return `
