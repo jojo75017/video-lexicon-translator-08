@@ -117,6 +117,14 @@ Deno.serve(async (req) => {
     const norm = (e: string) => (e ?? "").trim().toLowerCase();
     const clickers = new Set((clicks ?? []).map((c: any) => norm(c.prospect_email)));
 
+    // Déjà envoyés avec succès pour ce template -> on ne renvoie pas (reprise après quota)
+    const { data: alreadySent } = await supabase
+      .from("email_send_log")
+      .select("recipient_email")
+      .eq("template_name", TEMPLATE_NAME)
+      .eq("status", "sent");
+    const sentSet = new Set((alreadySent ?? []).map((s: any) => norm(s.recipient_email)));
+
     let recipients = Array.from(
       new Set(
         (opens ?? [])
@@ -124,6 +132,7 @@ Deno.serve(async (req) => {
           .filter((e: string) =>
             e && e.includes("@") &&
             !clickers.has(e) &&
+            !sentSet.has(e) &&
             !EXCLUDED_EMAILS.includes(e)
           ),
       ),
