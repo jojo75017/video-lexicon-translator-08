@@ -1,48 +1,52 @@
-Plan : remplacer l'intégration Systeme.io par un envoi direct via Resend dans la séquence commerciale
+# Refonte du Hub V3 — Console pro à onglets
 
-Objectif
---------
-Réactiver automatiquement les 15 emails de la séquence commerciale (prospects froids + intéressés + relances) sans passer par Systeme.io. L'edge function `send-sales-email` enverra directement les emails via Resend.
+## Objectif
+Transformer la page `/hub-v3` (aujourd'hui une longue page qui empile tout : parcours, récap des droits, recherche/filtres par chips, guides, tarifs, comparatif) en une **console professionnelle organisée en onglets clairs**, prête pour le lancement V3 de juillet.
 
-Actions
--------
-1. Restaurer le contenu des 15 templates email
-   - 6 emails de la séquence standard
-   - 6 emails de la séquence "intéressés"
-   - 3 variantes de relance pour les non-cliqueurs
-   - Source : historique git de `supabase/functions/send-sales-email/index.ts`
+C'est une **réorganisation de présentation**, pas une refonte du moteur ni du contenu.
 
-2. Supprimer la logique Systeme.io
-   - Retirer `SYSTEMEIO_API_KEY`, l'import `pushToSystemeIo`, les helpers `seqTag` / `relanceTag`
-   - Retirer l'appel au endpoint Systeme.io
+## Règle absolue (non négociable)
+**On ne supprime AUCUN encart image ni aucun visuel.** Tout ce qui est présent aujourd'hui reste présent :
+- les bannières illustrées des piliers dans chaque carte module (`PILLAR_IMG` / `pillar-ia.jpg`, `pillar-publier.jpg`, `pillar-monetiser.jpg`, `pillar-marketing.jpg`),
+- l'encart « Extension Scanner KDP » (avec son visuel et son badge « Gratuit pour tous »),
+- le hero, la barre de stats, les halos/animations ambrés, les illustrations des composants (`CreateBookHub`, `V3GuidesSection`, `V3PricingTiers`, `MaisonEditionTab`, etc.).
 
-3. Ajouter l'envoi via Resend
-   - Utiliser le gateway Lovable : `https://connector-gateway.lovable.dev/resend/emails`
-   - Headers : `Authorization: Bearer ${LOVABLE_API_KEY}` + `X-Connection-Api-Key: ${RESEND_API_KEY}`
-   - `from` : une adresse validée dans Resend
-   - Garder `to`, `subject`, `html`
+Chaque élément visuel est simplement **déplacé dans le bon onglet**, jamais retiré. Vérification finale : comparer la liste des images/encarts avant et après pour garantir 0 perte.
 
-4. Conserver la logique métier existante
-   - Sélection des prospects selon `current_step` et `next_email_at`
-   - Avancement du `current_step` seulement si l'email est bien envoyé
-   - Relances automatiques après la dernière étape (`relance_round`)
-   - Tracking des ouvertures et clics
-   - Sécurité cron/admin
+## Constat actuel
+La page mélange dans un seul scroll : hero + stats, parcours guidé 30 étapes, récap des droits (197€ vs Pack 347€), barre sticky de recherche + ~12 chips de filtre, grille de modules, guides, tarifs, comparatif V2/V3. Résultat : beaucoup de scroll, hiérarchie peu lisible.
 
-5. Déployer l'edge function
-   - Déployer `send-sales-email` après les modifications
+## Nouvelle structure : 6 onglets principaux
 
-6. Vérifier en production
-   - Tester l'envoi d'un email via l'admin ou le cron
-   - Vérifier que les emails arrivent bien et que `current_step` avance
+```text
+┌──────────────────────────────────────────────────────────────┐
+│  HUB V3 · Publication Assistée Pro            [Visite guidée]  │
+│  Hero + barre de stats (conservés tels quels, visuels inclus) │
+├──────────────────────────────────────────────────────────────┤
+│ [🚀 Parcours] [🛠️ Outils] [📚 Mes livres] [🎓 Guides]        │
+│ [💎 Offres & Packs] [🗺️ Roadmap]                              │
+├──────────────────────────────────────────────────────────────┤
+│  Contenu de l'onglet actif                                    │
+└──────────────────────────────────────────────────────────────┘
+```
 
-Prérequis
----------
-- `RESEND_API_KEY` doit être configuré dans les secrets de l'edge function
-- Un domaine d'envoi validé dans Resend (sinon les emails partiront depuis `onboarding@resend.dev` en test ou échoueront en prod)
+1. **🚀 Parcours** (par défaut) — parcours guidé 30 étapes (`V3Workflow30`) + bouton « Créer un livre » + l'encart visuel « Extension Scanner KDP » (conservé, mis en tête pour visibilité).
+2. **🛠️ Outils** — catalogue de modules : recherche + sous-filtres par pilier (IA, Publier, Monétiser, Marketing, Édition, Distribution, Promotion) + grille de cartes `ModuleCard` **avec leurs bannières images de pilier intactes**. Inclut le sous-filtre « Mes outils ».
+3. **📚 Mes livres** — hub de création/sauvegardes (`CreateBookHub`, visuels inclus) + « Mes sauvegardes » + « Image / Couverture ».
+4. **🎓 Guides** — guides V3 (`V3GuidesSection`, visuels inclus).
+5. **💎 Offres & Packs** — récap des droits (`V3AccessRecap`), paliers tarifaires (`V3PricingTiers`), Maison d'Édition (`MaisonEditionTab`), comparatif V2/V3 (`V2V3Compare`). Tout le volet commercial et ses visuels regroupés.
+6. **🗺️ Roadmap** — la roadmap des modules (`V3RoadmapTab`).
 
-Hors scope
-----------
-- Les autres emails Resend (accès, support, livre audio) restent inchangés
-- Pas de création d'automations dans Systeme.io
-- Pas de changement de base de données (pas de nouvelle table)
+## Détails techniques
+- Réécriture de `src/pages/V3HubPage.tsx` : remplacer le système de chips `pillar`/`setPillar` qui pilote tout le rendu par un vrai composant à onglets `Tabs`/`TabsList`/`TabsTrigger`/`TabsContent` (déjà dans `@/components/ui/tabs`).
+- Conserver **intégralement** : la palette « Clair Ambre » (AMBER, CREAM, INK, SERIF…), les animations `v3-rise`, le hero, la barre de stats, **tous les imports d'images** (`pillar-*.jpg`), `ModuleCard` et ses bannières, l'encart Scanner KDP, la `V3ModuleDialog`, la `V3HubTour` et tous les composants déjà importés. Aucune logique interne ni asset modifié.
+- L'onglet « Outils » garde la recherche + les filtres par pilier (les chips existants y restent, cantonnés à cet onglet).
+- Barre d'onglets **sticky** sous le hero, état actif ambré, responsive (scroll horizontal sur mobile).
+- Persistance de l'onglet actif via l'URL (`?tab=`) ou `localStorage`.
+- Les boutons du hero (« Créer un livre », « Mes sauvegardes », « Image / Couverture », « Dès 197€ ») pointeront vers le bon onglet au lieu de `setPillar`.
+- Aucune modification de base de données, d'edge function ni de `roadmapV3.ts`.
+
+## Hors périmètre
+- Pas de changement des prix, des droits ni du contenu des modules.
+- Pas de refonte des autres pages (CRM, gestion-prospects).
+- Implémentation prévue en juillet — ceci est le plan de cadrage.
