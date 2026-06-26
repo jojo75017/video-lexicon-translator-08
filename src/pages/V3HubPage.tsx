@@ -38,7 +38,8 @@ const AMBER_DEEP = '#C97A14';   // ambre profond (texte accent)
 const AMBER_SOFT = '#FFF3DF';   // pastille douce
 const CREAM = '#FBF6EC';        // fond crème
 const INK = '#2A2118';          // texte sombre chaud
-const SERIF = "'Georgia', 'Times New Roman', serif";
+const SERIF = "'Instrument Serif', Georgia, 'Times New Roman', serif";
+const SANS = "'Inter', system-ui, sans-serif";
 
 // L'écriture/rédaction (STUDIO de création) vit dans « IA avancée » : c'est le 1er palier.
 const PILLAR_ORDER: V3Pillar[] = ['ia', 'publier', 'monetiser', 'marketing', 'edition', 'distribution', 'promotion'];
