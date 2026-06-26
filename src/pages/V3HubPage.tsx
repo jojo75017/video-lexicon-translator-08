@@ -75,12 +75,10 @@ function ModuleCard({
       ref={ref}
       data-tour={isFirst ? 'card' : undefined}
       onClick={() => clickable && onOpen(module)}
-      onMouseMove={handleMove}
-      onMouseLeave={() => setTilt('')}
       disabled={!clickable}
-      style={{ transform: tilt, transitionProperty: 'transform, box-shadow, border-color', animationDelay: `${Math.min(index * 40, 600)}ms` }}
-      className={`group relative animate-fade-in text-left rounded-2xl border border-[#eadfc9] bg-white transition-all duration-300 overflow-hidden shadow-[0_2px_14px_-8px_rgba(180,140,60,0.25)]
-        ${clickable ? 'cursor-pointer hover:border-[#E8951E]/70 hover:shadow-[0_18px_44px_-18px_rgba(232,149,30,0.5)]' : 'opacity-55 cursor-not-allowed'}`}
+      style={{ animationDelay: `${Math.min(index * 40, 600)}ms` }}
+      className={`group relative animate-fade-in text-left rounded-2xl border border-[#eadfc9] bg-white transition-all duration-300 overflow-hidden
+        ${clickable ? 'cursor-pointer hover:-translate-y-0.5 hover:border-[#E8951E]/50 hover:shadow-[0_10px_30px_-18px_rgba(232,149,30,0.45)]' : 'opacity-55 cursor-not-allowed'}`}
     >
       {/* liseré ambré supérieur */}
       <span className="pointer-events-none absolute inset-x-6 top-0 h-px opacity-50 group-hover:opacity-100 transition-opacity"
