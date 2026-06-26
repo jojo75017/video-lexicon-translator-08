@@ -238,38 +238,11 @@ const V3HubPage: React.FC = () => {
   ];
 
   return (
-    <div className="relative min-h-screen overflow-hidden" style={{ background: CREAM, color: INK }}>
-      {/* Fond aurora ambré global */}
-      <div className="pointer-events-none fixed inset-0 z-0">
-        <div className="absolute -top-1/4 left-1/2 -translate-x-1/2 h-[55vh] w-[80vw] rounded-full blur-[120px] v3-aurora-a"
-          style={{ background: `radial-gradient(circle, ${AMBER}24, transparent 60%)` }} />
-        <div className="absolute top-1/3 -left-1/4 h-[40vh] w-[50vw] rounded-full blur-[130px] v3-aurora-b"
-          style={{ background: `radial-gradient(circle, ${AMBER}18, transparent 60%)` }} />
-        <div className="absolute inset-0 v3-grid-overlay-light" />
-      </div>
-
+    <div className="relative min-h-screen" style={{ background: CREAM, color: INK, fontFamily: SANS }}>
       <div className="relative z-10">
       {/* Hero */}
       <header className="relative overflow-hidden border-b border-[#eadfc9]" data-tour="hero">
-        {/* particules ambrées */}
-        <div className="pointer-events-none absolute inset-0">
-          {Array.from({ length: 18 }).map((_, i) => (
-            <span
-              key={i}
-              className="absolute rounded-full animate-pulse"
-              style={{
-                left: `${(i * 53) % 100}%`,
-                top: `${(i * 37) % 100}%`,
-                width: `${2 + (i % 3)}px`,
-                height: `${2 + (i % 3)}px`,
-                background: AMBER,
-                opacity: 0.3,
-                animationDelay: `${(i % 6) * 0.4}s`,
-                animationDuration: `${3 + (i % 4)}s`,
-              }}
-            />
-          ))}
-        </div>
+
         <div className="relative mx-auto max-w-7xl px-4 py-12 sm:py-16">
           <div className="flex items-center justify-between mb-8">
             <button
