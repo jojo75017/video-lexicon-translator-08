@@ -320,22 +320,21 @@ const V3HubPage: React.FC = () => {
       {/* Barre d'onglets sticky */}
       <nav className="sticky top-0 z-30 border-b border-[#eadfc9] backdrop-blur-md" style={{ background: 'rgba(251,246,236,0.9)' }}>
         <div className="mx-auto max-w-7xl px-4">
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-2.5">
+          <div className="flex items-center gap-7 overflow-x-auto no-scrollbar">
             {HUB_TABS.map((t) => {
               const active = activeTab === t.id;
+              const Icon = t.icon;
               return (
                 <button
                   key={t.id}
                   onClick={() => setActiveTab(t.id)}
-                  className="shrink-0 inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold border transition-all"
+                  className="shrink-0 inline-flex items-center gap-2 py-4 text-sm font-medium border-b-2 transition-colors"
                   style={{
-                    borderColor: active ? AMBER : '#eadfc9',
-                    background: active ? `linear-gradient(90deg, ${AMBER}, #FFB44D)` : '#fff',
-                    color: active ? '#fff' : '#7c6b54',
-                    boxShadow: active ? `0 8px 22px -10px ${AMBER}` : 'none',
+                    borderColor: active ? AMBER : 'transparent',
+                    color: active ? INK : '#9a8666',
                   }}
                 >
-                  <span>{t.emoji}</span> {t.label}
+                  <Icon className="h-4 w-4" style={{ color: active ? AMBER_DEEP : '#b29a72' }} /> {t.label}
                 </button>
               );
             })}
