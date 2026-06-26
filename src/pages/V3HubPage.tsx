@@ -61,18 +61,9 @@ function ModuleCard({
   unlocked?: boolean;
 }) {
   const ref = React.useRef<HTMLButtonElement>(null);
-  const [tilt, setTilt] = useState('');
   const clickable = isModuleClickable(module.id);
   const access = getModuleAccess(module.id);
 
-  const handleMove = (e: React.MouseEvent) => {
-    const el = ref.current;
-    if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width - 0.5;
-    const py = (e.clientY - r.top) / r.height - 0.5;
-    setTilt(`perspective(800px) rotateX(${(-py * 5).toFixed(2)}deg) rotateY(${(px * 5).toFixed(2)}deg) translateY(-4px)`);
-  };
 
   const statusColor = module.status === 'done' ? '#1f9d6b'
     : module.status === 'in_progress' ? AMBER_DEEP : '#a18a6c';
