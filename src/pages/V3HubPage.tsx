@@ -161,14 +161,42 @@ function ModuleCard({
 }
 
 
+type HubTab = 'parcours' | 'outils' | 'livres' | 'guides' | 'offres' | 'roadmap';
+
+const HUB_TABS: { id: HubTab; label: string; emoji: string }[] = [
+  { id: 'parcours', label: 'Parcours', emoji: '🚀' },
+  { id: 'outils', label: 'Outils', emoji: '🛠️' },
+  { id: 'livres', label: 'Mes livres', emoji: '📚' },
+  { id: 'guides', label: 'Guides', emoji: '🎓' },
+  { id: 'offres', label: 'Offres & Packs', emoji: '💎' },
+  { id: 'roadmap', label: 'Roadmap', emoji: '🗺️' },
+];
+
+const TAB_STORAGE_KEY = 'v3hub_active_tab';
+
 const V3HubPage: React.FC = () => {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
-  const [pillar, setPillar] = useState<V3Pillar | 'all' | 'create' | 'mine' | 'roadmap' | 'maison-edition'>('all');
+  const [pillar, setPillar] = useState<V3Pillar | 'all' | 'mine'>('all');
+  const [activeTab, setActiveTab] = useState<HubTab>(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get('tab') as HubTab | null;
+    if (fromUrl && HUB_TABS.some((t) => t.id === fromUrl)) return fromUrl;
+    const stored = localStorage.getItem(TAB_STORAGE_KEY) as HubTab | null;
+    if (stored && HUB_TABS.some((t) => t.id === stored)) return stored;
+    return 'parcours';
+  });
   const [selected, setSelected] = useState<V3Module | null>(null);
   const [studioSource, setStudioSource] = useState<string | null>(null);
   const [tourOpen, setTourOpen] = useState(false);
   const { hasBase, hasFull, isAdmin } = useV3Entitlement();
+
+  // Persiste l'onglet actif (URL + localStorage).
+  useEffect(() => {
+    localStorage.setItem(TAB_STORAGE_KEY, activeTab);
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', activeTab);
+    window.history.replaceState({}, '', url);
+  }, [activeTab]);
 
   // Un module est "débloqué" si l'abonné a la formule correspondante.
   const isUnlocked = React.useCallback((m: V3Module) => {
@@ -292,7 +320,7 @@ const V3HubPage: React.FC = () => {
 
           <div className="v3-rise mt-8 flex flex-wrap items-center gap-3" style={{ animationDelay: '0.24s' }}>
             <button
-              onClick={() => setPillar('create')}
+              onClick={() => setActiveTab('livres')}
               className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_40px_-12px_rgba(232,149,30,0.6)]"
               style={{ background: `linear-gradient(90deg, ${AMBER}, #FFB44D)`, color: '#fff' }}>
               <Wand2 className="h-4 w-4" /> Créer un livre
@@ -308,10 +336,10 @@ const V3HubPage: React.FC = () => {
               style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}>
               <ImageIcon className="h-4 w-4" /> Image / Couverture
             </button>
-            <a href="#tarifs" data-tour="price" className="inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-sm font-semibold border transition-colors hover:bg-[#FFF3DF]"
+            <button onClick={() => setActiveTab('offres')} data-tour="price" className="inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-sm font-semibold border transition-colors hover:bg-[#FFF3DF]"
               style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}>
               <Sparkles className="h-4 w-4" /> Dès 197€ à vie · 3× ou 6×
-            </a>
+            </button>
           </div>
 
           {/* Barre de statistiques premium */}
@@ -331,134 +359,173 @@ const V3HubPage: React.FC = () => {
         </div>
       </header>
 
-
-      <main className="mx-auto max-w-7xl px-4 py-8">
-        {/* Extension Scanner KDP — GRATUITE pour tous (non gated) — en tête pour visibilité immédiate */}
-        <button
-          onClick={() => navigate('/extension-chrome')}
-          className="group w-full text-left mb-6 rounded-2xl border p-5 flex flex-wrap items-center gap-4 transition-all hover:-translate-y-0.5"
-          style={{ background: AMBER_SOFT, borderColor: `${AMBER}55` }}
-        >
-          <span
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-2xl"
-            style={{ background: '#fff', border: `1px solid ${AMBER}33` }}
-          >
-            🧩
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="flex items-center gap-2">
-              <span className="font-bold" style={{ color: INK }}>Extension Scanner KDP</span>
-              <span className="rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-white" style={{ background: '#1f9d6b' }}>
-                Gratuit pour tous
-              </span>
-            </span>
-            <span className="mt-1 block text-[13px]" style={{ color: '#8a7860' }}>
-              Analyse n'importe quelle fiche Amazon Kindle en 1 clic : score /100, BSR, ventes & revenus estimés (données officielles), concurrence, mots-clés et pépites.
-            </span>
-          </span>
-          <span
-            className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold text-white transition-colors"
-            style={{ background: AMBER_DEEP }}
-          >
-            <Sparkles className="h-4 w-4" /> Installer <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-          </span>
-        </button>
-
-        {/* Parcours guidé V3 — entrée principale du Hub V3 */}
-        <V3Workflow30 onOpenModule={setSelected} />
-
-        {/* Récapitulatif global des droits : 197€ vs Pack 347€ */}
-        <V3AccessRecap onOpenModule={setSelected} />
-
-
-
-        {/* Recherche + filtres */}
-
-        <div className="sticky top-0 z-20 -mx-4 px-4 py-3 backdrop-blur-md border-b border-[#eadfc9] mb-6" style={{ background: 'rgba(251,246,236,0.85)' }}>
-          <div className="relative max-w-md mb-3" data-tour="search">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: '#b29a72' }} />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Rechercher un outil…"
-              className="w-full rounded-full bg-white border border-[#eadfc9] pl-9 pr-4 py-2.5 text-sm placeholder:text-[#b29a72] focus:outline-none focus:border-[#E8951E] transition-colors"
-              style={{ color: INK }}
-            />
-          </div>
-          <div className="flex flex-wrap items-center gap-2" data-tour="filters">
-            <CreateBookChip active={pillar === 'create'} onClick={() => setPillar('create')} />
-            <FilterChip active={pillar === 'roadmap'} onClick={() => setPillar('roadmap')} label="🗺️ Roadmap" />
-            <FilterChip active={pillar === 'maison-edition'} onClick={() => setPillar('maison-edition')} label="📕 Maison Édition" />
-            <span className="mx-1 h-6 w-px self-center" style={{ background: `${AMBER}44` }} aria-hidden />
-            <FilterChip active={pillar === 'mine'} onClick={() => setPillar('mine')} label={`✅ Mes outils (${myToolsCount})`} />
-            <FilterChip active={pillar === 'all'} onClick={() => setPillar('all')} label={`Tous (${V3_MODULES.length})`} />
-            {PILLAR_ORDER.map((p) => (
-              <FilterChip
-                key={p}
-                active={pillar === p}
-                onClick={() => setPillar(p)}
-                label={`${V3_PILLAR_META[p].emoji} ${V3_PILLAR_META[p].label}`}
-              />
-            ))}
-          </div>
-          {/* Légende des droits */}
-          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px]" style={{ color: '#8a7860' }}>
-            <span className="inline-flex items-center gap-1">
-              <CheckCircle2 className="h-3 w-3" style={{ color: '#0f8a5f' }} /> Inclus dans la base 197€ (livres & ebooks illimités)
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <Lock className="h-3 w-3" style={{ color: AMBER }} /> Disponible en pack premium (audiobooks, marketing, couvertures pro…)
-            </span>
+      {/* Barre d'onglets sticky */}
+      <nav className="sticky top-0 z-30 border-b border-[#eadfc9] backdrop-blur-md" style={{ background: 'rgba(251,246,236,0.9)' }}>
+        <div className="mx-auto max-w-7xl px-4">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-2.5">
+            {HUB_TABS.map((t) => {
+              const active = activeTab === t.id;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => setActiveTab(t.id)}
+                  className="shrink-0 inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold border transition-all"
+                  style={{
+                    borderColor: active ? AMBER : '#eadfc9',
+                    background: active ? `linear-gradient(90deg, ${AMBER}, #FFB44D)` : '#fff',
+                    color: active ? '#fff' : '#7c6b54',
+                    boxShadow: active ? `0 8px 22px -10px ${AMBER}` : 'none',
+                  }}
+                >
+                  <span>{t.emoji}</span> {t.label}
+                </button>
+              );
+            })}
           </div>
         </div>
+      </nav>
 
-        {/* Onglet spécial : hub de création */}
-        {pillar === 'create' ? (
-          <CreateBookHub onSelectSource={openStudio} />
-        ) : pillar === 'roadmap' ? (
-          <V3RoadmapTab />
-        ) : pillar === 'maison-edition' ? (
-          <MaisonEditionTab onOpenModule={(id) => { const m = getModuleById(id); if (m) setSelected(m); }} />
-        ) : filtered.length === 0 ? (
-          <div className="text-center py-20 text-sm" style={{ color: '#a18a6c' }}>
-            {pillar === 'mine'
-              ? 'Aucun outil débloqué pour le moment. Démarrez avec la base 197€ pour accéder à la création de livres illimités.'
-              : `Aucun outil ne correspond à « ${query} ».`}
-          </div>
-        ) : pillar === 'all' ? (
-          (() => {
-            const firstPillarWithItems = PILLAR_ORDER.find((p) => filtered.some((m) => m.pillar === p));
-            return PILLAR_ORDER.map((p) => {
-              const items = filtered.filter((m) => m.pillar === p);
-              if (items.length === 0) return null;
-              return (
-                <section key={p} className="mb-10">
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className="text-xl">{V3_PILLAR_META[p].emoji}</span>
-                    <h2 className="text-lg font-bold" style={{ fontFamily: SERIF, color: INK }}>{V3_PILLAR_META[p].label}</h2>
-                    <span className="text-xs" style={{ color: '#b29a72' }}>{items.length}</span>
-                    <div className="flex-1 h-px ml-2" style={{ background: `linear-gradient(90deg, ${AMBER}44, transparent)` }} />
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                    {items.map((m, i) => (
-                      <ModuleCard key={m.id} module={m} index={i} onOpen={setSelected} unlocked={isUnlocked(m)} isFirst={p === firstPillarWithItems && i === 0} />
-                    ))}
-                  </div>
-                </section>
-              );
-            });
-          })()
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-            {filtered.map((m, i) => (
-              <ModuleCard key={m.id} module={m} index={i} onOpen={setSelected} unlocked={isUnlocked(m)} isFirst={i === 0} />
-            ))}
-          </div>
+      <main className="mx-auto max-w-7xl px-4 py-8">
+        {/* ===================== ONGLET PARCOURS ===================== */}
+        {activeTab === 'parcours' && (
+          <>
+            {/* Extension Scanner KDP — GRATUITE pour tous (non gated) */}
+            <button
+              onClick={() => navigate('/extension-chrome')}
+              className="group w-full text-left mb-6 rounded-2xl border p-5 flex flex-wrap items-center gap-4 transition-all hover:-translate-y-0.5"
+              style={{ background: AMBER_SOFT, borderColor: `${AMBER}55` }}
+            >
+              <span
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-2xl"
+                style={{ background: '#fff', border: `1px solid ${AMBER}33` }}
+              >
+                🧩
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="flex items-center gap-2">
+                  <span className="font-bold" style={{ color: INK }}>Extension Scanner KDP</span>
+                  <span className="rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-white" style={{ background: '#1f9d6b' }}>
+                    Gratuit pour tous
+                  </span>
+                </span>
+                <span className="mt-1 block text-[13px]" style={{ color: '#8a7860' }}>
+                  Analyse n'importe quelle fiche Amazon Kindle en 1 clic : score /100, BSR, ventes & revenus estimés (données officielles), concurrence, mots-clés et pépites.
+                </span>
+              </span>
+              <span
+                className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold text-white transition-colors"
+                style={{ background: AMBER_DEEP }}
+              >
+                <Sparkles className="h-4 w-4" /> Installer <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </span>
+            </button>
+
+            {/* Parcours guidé V3 — entrée principale du Hub V3 */}
+            <V3Workflow30 onOpenModule={setSelected} />
+          </>
         )}
 
-        <V3GuidesSection />
-        <V3PricingTiers />
-        <V2V3Compare />
+        {/* ===================== ONGLET OUTILS ===================== */}
+        {activeTab === 'outils' && (
+          <>
+            {/* Recherche + filtres par pilier */}
+            <div className="-mx-4 px-4 py-3 mb-6">
+              <div className="relative max-w-md mb-3" data-tour="search">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: '#b29a72' }} />
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Rechercher un outil…"
+                  className="w-full rounded-full bg-white border border-[#eadfc9] pl-9 pr-4 py-2.5 text-sm placeholder:text-[#b29a72] focus:outline-none focus:border-[#E8951E] transition-colors"
+                  style={{ color: INK }}
+                />
+              </div>
+              <div className="flex flex-wrap items-center gap-2" data-tour="filters">
+                <FilterChip active={pillar === 'mine'} onClick={() => setPillar('mine')} label={`✅ Mes outils (${myToolsCount})`} />
+                <FilterChip active={pillar === 'all'} onClick={() => setPillar('all')} label={`Tous (${V3_MODULES.length})`} />
+                {PILLAR_ORDER.map((p) => (
+                  <FilterChip
+                    key={p}
+                    active={pillar === p}
+                    onClick={() => setPillar(p)}
+                    label={`${V3_PILLAR_META[p].emoji} ${V3_PILLAR_META[p].label}`}
+                  />
+                ))}
+              </div>
+              {/* Légende des droits */}
+              <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px]" style={{ color: '#8a7860' }}>
+                <span className="inline-flex items-center gap-1">
+                  <CheckCircle2 className="h-3 w-3" style={{ color: '#0f8a5f' }} /> Inclus dans la base 197€ (livres & ebooks illimités)
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <Lock className="h-3 w-3" style={{ color: AMBER }} /> Disponible en pack premium (audiobooks, marketing, couvertures pro…)
+                </span>
+              </div>
+            </div>
+
+            {filtered.length === 0 ? (
+              <div className="text-center py-20 text-sm" style={{ color: '#a18a6c' }}>
+                {pillar === 'mine'
+                  ? 'Aucun outil débloqué pour le moment. Démarrez avec la base 197€ pour accéder à la création de livres illimités.'
+                  : `Aucun outil ne correspond à « ${query} ».`}
+              </div>
+            ) : pillar === 'all' ? (
+              (() => {
+                const firstPillarWithItems = PILLAR_ORDER.find((p) => filtered.some((m) => m.pillar === p));
+                return PILLAR_ORDER.map((p) => {
+                  const items = filtered.filter((m) => m.pillar === p);
+                  if (items.length === 0) return null;
+                  return (
+                    <section key={p} className="mb-10">
+                      <div className="flex items-center gap-2 mb-4">
+                        <span className="text-xl">{V3_PILLAR_META[p].emoji}</span>
+                        <h2 className="text-lg font-bold" style={{ fontFamily: SERIF, color: INK }}>{V3_PILLAR_META[p].label}</h2>
+                        <span className="text-xs" style={{ color: '#b29a72' }}>{items.length}</span>
+                        <div className="flex-1 h-px ml-2" style={{ background: `linear-gradient(90deg, ${AMBER}44, transparent)` }} />
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                        {items.map((m, i) => (
+                          <ModuleCard key={m.id} module={m} index={i} onOpen={setSelected} unlocked={isUnlocked(m)} isFirst={p === firstPillarWithItems && i === 0} />
+                        ))}
+                      </div>
+                    </section>
+                  );
+                });
+              })()
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                {filtered.map((m, i) => (
+                  <ModuleCard key={m.id} module={m} index={i} onOpen={setSelected} unlocked={isUnlocked(m)} isFirst={i === 0} />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* ===================== ONGLET MES LIVRES ===================== */}
+        {activeTab === 'livres' && (
+          <CreateBookHub onSelectSource={openStudio} />
+        )}
+
+        {/* ===================== ONGLET GUIDES ===================== */}
+        {activeTab === 'guides' && (
+          <V3GuidesSection />
+        )}
+
+        {/* ===================== ONGLET OFFRES & PACKS ===================== */}
+        {activeTab === 'offres' && (
+          <>
+            <V3AccessRecap onOpenModule={setSelected} />
+            <V3PricingTiers />
+            <MaisonEditionTab onOpenModule={(id) => { const m = getModuleById(id); if (m) setSelected(m); }} />
+            <V2V3Compare />
+          </>
+        )}
+
+        {/* ===================== ONGLET ROADMAP ===================== */}
+        {activeTab === 'roadmap' && (
+          <V3RoadmapTab />
+        )}
       </main>
 
 
