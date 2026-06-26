@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Sparkles, Crown, Compass, Lock, ArrowRight, Wand2, CheckCircle2, Layers, Infinity as InfinityIcon, ShieldCheck, Save, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Search, Sparkles, Compass, Lock, ArrowRight, Wand2, CheckCircle2, Layers, Infinity as InfinityIcon, ShieldCheck, Save, Image as ImageIcon, BookOpen, GraduationCap, Gem, Map as MapIcon, type LucideIcon } from 'lucide-react';
 import {
   V3_MODULES, V3_PILLAR_META, getModuleAccess, getModuleById, type V3Pillar, type V3Module,
 } from '@/data/roadmapV3';
@@ -38,7 +38,8 @@ const AMBER_DEEP = '#C97A14';   // ambre profond (texte accent)
 const AMBER_SOFT = '#FFF3DF';   // pastille douce
 const CREAM = '#FBF6EC';        // fond crème
 const INK = '#2A2118';          // texte sombre chaud
-const SERIF = "'Georgia', 'Times New Roman', serif";
+const SERIF = "'Instrument Serif', Georgia, 'Times New Roman', serif";
+const SANS = "'Inter', system-ui, sans-serif";
 
 // L'écriture/rédaction (STUDIO de création) vit dans « IA avancée » : c'est le 1er palier.
 const PILLAR_ORDER: V3Pillar[] = ['ia', 'publier', 'monetiser', 'marketing', 'edition', 'distribution', 'promotion'];
@@ -60,18 +61,9 @@ function ModuleCard({
   unlocked?: boolean;
 }) {
   const ref = React.useRef<HTMLButtonElement>(null);
-  const [tilt, setTilt] = useState('');
   const clickable = isModuleClickable(module.id);
   const access = getModuleAccess(module.id);
 
-  const handleMove = (e: React.MouseEvent) => {
-    const el = ref.current;
-    if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width - 0.5;
-    const py = (e.clientY - r.top) / r.height - 0.5;
-    setTilt(`perspective(800px) rotateX(${(-py * 5).toFixed(2)}deg) rotateY(${(px * 5).toFixed(2)}deg) translateY(-4px)`);
-  };
 
   const statusColor = module.status === 'done' ? '#1f9d6b'
     : module.status === 'in_progress' ? AMBER_DEEP : '#a18a6c';
@@ -83,19 +75,14 @@ function ModuleCard({
       ref={ref}
       data-tour={isFirst ? 'card' : undefined}
       onClick={() => clickable && onOpen(module)}
-      onMouseMove={handleMove}
-      onMouseLeave={() => setTilt('')}
       disabled={!clickable}
-      style={{ transform: tilt, transitionProperty: 'transform, box-shadow, border-color', animationDelay: `${Math.min(index * 40, 600)}ms` }}
-      className={`group relative animate-fade-in text-left rounded-2xl border border-[#eadfc9] bg-white transition-all duration-300 overflow-hidden shadow-[0_2px_14px_-8px_rgba(180,140,60,0.25)]
-        ${clickable ? 'cursor-pointer hover:border-[#E8951E]/70 hover:shadow-[0_18px_44px_-18px_rgba(232,149,30,0.5)]' : 'opacity-55 cursor-not-allowed'}`}
+      style={{ animationDelay: `${Math.min(index * 40, 600)}ms` }}
+      className={`group relative animate-fade-in text-left rounded-2xl border border-[#eadfc9] bg-white transition-all duration-300 overflow-hidden
+        ${clickable ? 'cursor-pointer hover:-translate-y-0.5 hover:border-[#E8951E]/50 hover:shadow-[0_10px_30px_-18px_rgba(232,149,30,0.45)]' : 'opacity-55 cursor-not-allowed'}`}
     >
       {/* liseré ambré supérieur */}
       <span className="pointer-events-none absolute inset-x-6 top-0 h-px opacity-50 group-hover:opacity-100 transition-opacity"
         style={{ background: `linear-gradient(90deg, transparent, ${AMBER}, transparent)` }} />
-      {/* halo ambré au survol */}
-      <div className="pointer-events-none absolute -inset-px opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        style={{ background: `radial-gradient(160px 110px at 50% 0%, ${AMBER}1f, transparent 70%)` }} />
       {/* bannière illustrée du pilier */}
       <div className="relative h-24 overflow-hidden">
         <img
@@ -163,13 +150,13 @@ function ModuleCard({
 
 type HubTab = 'parcours' | 'outils' | 'livres' | 'guides' | 'offres' | 'roadmap';
 
-const HUB_TABS: { id: HubTab; label: string; emoji: string }[] = [
-  { id: 'parcours', label: 'Parcours', emoji: '🚀' },
-  { id: 'outils', label: 'Outils', emoji: '🛠️' },
-  { id: 'livres', label: 'Mes livres', emoji: '📚' },
-  { id: 'guides', label: 'Guides', emoji: '🎓' },
-  { id: 'offres', label: 'Offres & Packs', emoji: '💎' },
-  { id: 'roadmap', label: 'Roadmap', emoji: '🗺️' },
+const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon }[] = [
+  { id: 'parcours', label: 'Parcours', icon: Compass },
+  { id: 'outils', label: 'Outils', icon: Wand2 },
+  { id: 'livres', label: 'Mes livres', icon: BookOpen },
+  { id: 'guides', label: 'Guides', icon: GraduationCap },
+  { id: 'offres', label: 'Offres & Packs', icon: Gem },
+  { id: 'roadmap', label: 'Roadmap', icon: MapIcon },
 ];
 
 const TAB_STORAGE_KEY = 'v3hub_active_tab';
@@ -251,38 +238,11 @@ const V3HubPage: React.FC = () => {
   ];
 
   return (
-    <div className="relative min-h-screen overflow-hidden" style={{ background: CREAM, color: INK }}>
-      {/* Fond aurora ambré global */}
-      <div className="pointer-events-none fixed inset-0 z-0">
-        <div className="absolute -top-1/4 left-1/2 -translate-x-1/2 h-[55vh] w-[80vw] rounded-full blur-[120px] v3-aurora-a"
-          style={{ background: `radial-gradient(circle, ${AMBER}24, transparent 60%)` }} />
-        <div className="absolute top-1/3 -left-1/4 h-[40vh] w-[50vw] rounded-full blur-[130px] v3-aurora-b"
-          style={{ background: `radial-gradient(circle, ${AMBER}18, transparent 60%)` }} />
-        <div className="absolute inset-0 v3-grid-overlay-light" />
-      </div>
-
+    <div className="relative min-h-screen" style={{ background: CREAM, color: INK, fontFamily: SANS }}>
       <div className="relative z-10">
       {/* Hero */}
       <header className="relative overflow-hidden border-b border-[#eadfc9]" data-tour="hero">
-        {/* particules ambrées */}
-        <div className="pointer-events-none absolute inset-0">
-          {Array.from({ length: 18 }).map((_, i) => (
-            <span
-              key={i}
-              className="absolute rounded-full animate-pulse"
-              style={{
-                left: `${(i * 53) % 100}%`,
-                top: `${(i * 37) % 100}%`,
-                width: `${2 + (i % 3)}px`,
-                height: `${2 + (i % 3)}px`,
-                background: AMBER,
-                opacity: 0.3,
-                animationDelay: `${(i % 6) * 0.4}s`,
-                animationDuration: `${3 + (i % 4)}s`,
-              }}
-            />
-          ))}
-        </div>
+
         <div className="relative mx-auto max-w-7xl px-4 py-12 sm:py-16">
           <div className="flex items-center justify-between mb-8">
             <button
@@ -302,16 +262,16 @@ const V3HubPage: React.FC = () => {
             </button>
           </div>
 
-          <div className="v3-rise inline-flex items-center gap-2 mb-5 rounded-full border px-4 py-1.5"
-            style={{ borderColor: `${AMBER}55`, background: AMBER_SOFT }}>
-            <Crown className="h-4 w-4" style={{ color: AMBER }} />
-            <span className="text-[11px] font-bold uppercase tracking-[0.35em]" style={{ color: AMBER_DEEP }}>
+          <div className="v3-rise inline-flex items-center gap-2 mb-5 rounded-full border px-3 py-1"
+            style={{ borderColor: `${AMBER}33`, background: `${AMBER}14` }}>
+            <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ background: AMBER }} />
+            <span className="text-[10px] font-semibold uppercase tracking-[0.3em]" style={{ color: AMBER_DEEP }}>
               Publication Assistée Pro
             </span>
           </div>
-          <h1 className="v3-rise text-4xl sm:text-6xl font-bold leading-[1.05] max-w-4xl tracking-tight"
+          <h1 className="v3-rise text-5xl sm:text-7xl font-medium leading-[1.05] max-w-4xl tracking-tight"
             style={{ animationDelay: '0.08s', fontFamily: SERIF, color: INK }}>
-            Le cockpit V3 de <span style={{ color: AMBER_DEEP }}>l'auteur à succès</span>
+            Le cockpit V3 de <span className="italic" style={{ color: AMBER_DEEP }}>l'auteur à succès</span>
           </h1>
           <p className="v3-rise mt-5 text-base sm:text-lg max-w-2xl leading-relaxed" style={{ animationDelay: '0.16s', color: '#6f5e47' }}>
             {readyCount} outils premium pour écrire, publier, monétiser et vendre vos livres —
@@ -343,16 +303,14 @@ const V3HubPage: React.FC = () => {
           </div>
 
           {/* Barre de statistiques premium */}
-          <div className="v3-rise mt-10 grid grid-cols-2 lg:grid-cols-4 gap-3 max-w-3xl" style={{ animationDelay: '0.32s' }}>
+          <div className="v3-rise mt-10 grid grid-cols-2 lg:grid-cols-4 gap-px rounded-2xl overflow-hidden border max-w-3xl" style={{ animationDelay: '0.32s', borderColor: `${AMBER}33`, background: `${AMBER}33` }}>
             {stats.map((s) => (
-              <div key={s.label} className="relative rounded-2xl border border-[#eadfc9] bg-white px-4 py-4 overflow-hidden shadow-[0_2px_14px_-8px_rgba(180,140,60,0.25)]">
-                <span className="pointer-events-none absolute inset-x-5 top-0 h-px"
-                  style={{ background: `linear-gradient(90deg, transparent, ${AMBER}66, transparent)` }} />
-                <s.icon className="h-4 w-4 mb-2" style={{ color: AMBER }} />
-                <div className="text-2xl font-black leading-none" style={{ fontFamily: SERIF, color: INK }}>
+              <div key={s.label} className="px-5 py-5" style={{ background: CREAM }}>
+                <s.icon className="h-4 w-4 mb-2.5" style={{ color: AMBER }} />
+                <div className="text-3xl font-semibold leading-none tabular-nums" style={{ fontFamily: SERIF, color: INK }}>
                   {s.value}
                 </div>
-                <div className="mt-1 text-[11px] uppercase tracking-wider" style={{ color: '#a18a6c' }}>{s.label}</div>
+                <div className="mt-1.5 text-[11px] uppercase tracking-wider font-medium" style={{ color: '#a18a6c' }}>{s.label}</div>
               </div>
             ))}
           </div>
@@ -362,22 +320,21 @@ const V3HubPage: React.FC = () => {
       {/* Barre d'onglets sticky */}
       <nav className="sticky top-0 z-30 border-b border-[#eadfc9] backdrop-blur-md" style={{ background: 'rgba(251,246,236,0.9)' }}>
         <div className="mx-auto max-w-7xl px-4">
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-2.5">
+          <div className="flex items-center gap-7 overflow-x-auto no-scrollbar">
             {HUB_TABS.map((t) => {
               const active = activeTab === t.id;
+              const Icon = t.icon;
               return (
                 <button
                   key={t.id}
                   onClick={() => setActiveTab(t.id)}
-                  className="shrink-0 inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold border transition-all"
+                  className="shrink-0 inline-flex items-center gap-2 py-4 text-sm font-medium border-b-2 transition-colors"
                   style={{
-                    borderColor: active ? AMBER : '#eadfc9',
-                    background: active ? `linear-gradient(90deg, ${AMBER}, #FFB44D)` : '#fff',
-                    color: active ? '#fff' : '#7c6b54',
-                    boxShadow: active ? `0 8px 22px -10px ${AMBER}` : 'none',
+                    borderColor: active ? AMBER : 'transparent',
+                    color: active ? INK : '#9a8666',
                   }}
                 >
-                  <span>{t.emoji}</span> {t.label}
+                  <Icon className="h-4 w-4" style={{ color: active ? AMBER_DEEP : '#b29a72' }} /> {t.label}
                 </button>
               );
             })}

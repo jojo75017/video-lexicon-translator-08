@@ -16,6 +16,8 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@ffmpeg/ffmpeg": "^0.12.7",
     "@ffmpeg/util": "^0.12.1",
+    "@fontsource/instrument-serif": "^5.2.8",
+    "@fontsource/inter": "^5.2.8",
     "@hookform/resolvers": "^4.1.1",
     "@mendable/firecrawl-js": "^1.16.0",
     "@radix-ui/react-accordion": "^1.2.12",
