@@ -262,16 +262,16 @@ const V3HubPage: React.FC = () => {
             </button>
           </div>
 
-          <div className="v3-rise inline-flex items-center gap-2 mb-5 rounded-full border px-4 py-1.5"
-            style={{ borderColor: `${AMBER}55`, background: AMBER_SOFT }}>
-            <Crown className="h-4 w-4" style={{ color: AMBER }} />
-            <span className="text-[11px] font-bold uppercase tracking-[0.35em]" style={{ color: AMBER_DEEP }}>
+          <div className="v3-rise inline-flex items-center gap-2 mb-5 rounded-full border px-3 py-1"
+            style={{ borderColor: `${AMBER}33`, background: `${AMBER}14` }}>
+            <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ background: AMBER }} />
+            <span className="text-[10px] font-semibold uppercase tracking-[0.3em]" style={{ color: AMBER_DEEP }}>
               Publication Assistée Pro
             </span>
           </div>
-          <h1 className="v3-rise text-4xl sm:text-6xl font-bold leading-[1.05] max-w-4xl tracking-tight"
+          <h1 className="v3-rise text-5xl sm:text-7xl font-medium leading-[1.05] max-w-4xl tracking-tight"
             style={{ animationDelay: '0.08s', fontFamily: SERIF, color: INK }}>
-            Le cockpit V3 de <span style={{ color: AMBER_DEEP }}>l'auteur à succès</span>
+            Le cockpit V3 de <span className="italic" style={{ color: AMBER_DEEP }}>l'auteur à succès</span>
           </h1>
           <p className="v3-rise mt-5 text-base sm:text-lg max-w-2xl leading-relaxed" style={{ animationDelay: '0.16s', color: '#6f5e47' }}>
             {readyCount} outils premium pour écrire, publier, monétiser et vendre vos livres —
