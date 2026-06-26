@@ -556,34 +556,4 @@ function FilterChip({ active, onClick, label }: { active: boolean; onClick: () =
   );
 }
 
-/** Chip spécial mis en évidence pour l'onglet de création (toujours ambré + halo animé). */
-function CreateBookChip({ active, onClick }: { active: boolean; onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className="group relative inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold border transition-all hover:-translate-y-0.5"
-      style={{
-        borderColor: AMBER,
-        background: `linear-gradient(90deg, ${AMBER}, #FFB44D)`,
-        color: '#fff',
-        boxShadow: active
-          ? `0 0 0 2px ${AMBER}55, 0 0 24px -4px ${AMBER}`
-          : `0 0 18px -6px ${AMBER}`,
-      }}
-    >
-      <span
-        className="pointer-events-none absolute -inset-1 rounded-full animate-pulse"
-        style={{ background: `radial-gradient(60% 60% at 50% 50%, ${AMBER}44, transparent 70%)`, opacity: 0.7 }}
-        aria-hidden
-      />
-      <Sparkles className="relative h-3.5 w-3.5" />
-      <span className="relative">Créer un livre</span>
-      <span className="relative ml-0.5 rounded-full bg-white/25 px-1.5 py-0.5 text-[9px] font-extrabold tracking-wider text-white">
-        NEW
-      </span>
-    </button>
-  );
-}
-
-
 export default V3HubPage;
