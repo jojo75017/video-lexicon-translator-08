@@ -83,9 +83,6 @@ function ModuleCard({
       {/* liseré ambré supérieur */}
       <span className="pointer-events-none absolute inset-x-6 top-0 h-px opacity-50 group-hover:opacity-100 transition-opacity"
         style={{ background: `linear-gradient(90deg, transparent, ${AMBER}, transparent)` }} />
-      {/* halo ambré au survol */}
-      <div className="pointer-events-none absolute -inset-px opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        style={{ background: `radial-gradient(160px 110px at 50% 0%, ${AMBER}1f, transparent 70%)` }} />
       {/* bannière illustrée du pilier */}
       <div className="relative h-24 overflow-hidden">
         <img
