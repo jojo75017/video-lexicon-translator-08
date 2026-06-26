@@ -303,16 +303,14 @@ const V3HubPage: React.FC = () => {
           </div>
 
           {/* Barre de statistiques premium */}
-          <div className="v3-rise mt-10 grid grid-cols-2 lg:grid-cols-4 gap-3 max-w-3xl" style={{ animationDelay: '0.32s' }}>
+          <div className="v3-rise mt-10 grid grid-cols-2 lg:grid-cols-4 gap-px rounded-2xl overflow-hidden border max-w-3xl" style={{ animationDelay: '0.32s', borderColor: `${AMBER}33`, background: `${AMBER}33` }}>
             {stats.map((s) => (
-              <div key={s.label} className="relative rounded-2xl border border-[#eadfc9] bg-white px-4 py-4 overflow-hidden shadow-[0_2px_14px_-8px_rgba(180,140,60,0.25)]">
-                <span className="pointer-events-none absolute inset-x-5 top-0 h-px"
-                  style={{ background: `linear-gradient(90deg, transparent, ${AMBER}66, transparent)` }} />
-                <s.icon className="h-4 w-4 mb-2" style={{ color: AMBER }} />
-                <div className="text-2xl font-black leading-none" style={{ fontFamily: SERIF, color: INK }}>
+              <div key={s.label} className="px-5 py-5" style={{ background: CREAM }}>
+                <s.icon className="h-4 w-4 mb-2.5" style={{ color: AMBER }} />
+                <div className="text-3xl font-semibold leading-none tabular-nums" style={{ fontFamily: SERIF, color: INK }}>
                   {s.value}
                 </div>
-                <div className="mt-1 text-[11px] uppercase tracking-wider" style={{ color: '#a18a6c' }}>{s.label}</div>
+                <div className="mt-1.5 text-[11px] uppercase tracking-wider font-medium" style={{ color: '#a18a6c' }}>{s.label}</div>
               </div>
             ))}
           </div>
