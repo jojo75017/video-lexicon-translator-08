@@ -150,13 +150,13 @@ function ModuleCard({
 
 type HubTab = 'parcours' | 'outils' | 'livres' | 'guides' | 'offres' | 'roadmap';
 
-const HUB_TABS: { id: HubTab; label: string; emoji: string }[] = [
-  { id: 'parcours', label: 'Parcours', emoji: '🚀' },
-  { id: 'outils', label: 'Outils', emoji: '🛠️' },
-  { id: 'livres', label: 'Mes livres', emoji: '📚' },
-  { id: 'guides', label: 'Guides', emoji: '🎓' },
-  { id: 'offres', label: 'Offres & Packs', emoji: '💎' },
-  { id: 'roadmap', label: 'Roadmap', emoji: '🗺️' },
+const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon }[] = [
+  { id: 'parcours', label: 'Parcours', icon: Compass },
+  { id: 'outils', label: 'Outils', icon: Wand2 },
+  { id: 'livres', label: 'Mes livres', icon: BookOpen },
+  { id: 'guides', label: 'Guides', icon: GraduationCap },
+  { id: 'offres', label: 'Offres & Packs', icon: Gem },
+  { id: 'roadmap', label: 'Roadmap', icon: MapIcon },
 ];
 
 const TAB_STORAGE_KEY = 'v3hub_active_tab';
