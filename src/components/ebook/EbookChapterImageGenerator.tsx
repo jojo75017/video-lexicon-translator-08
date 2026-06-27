@@ -16,6 +16,11 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { detectPlaceholderImage } from '@/lib/ebookImageValidation';
 import { persistEbookImageToLibrary } from '@/lib/ebookImageStorage';
 
+// Valide le format d'une clé OpenAI (doit commencer par "sk-").
+// Les clés Gemini (AIza..., AQ.Ab8...) ne sont PAS des clés OpenAI et
+// provoquent un 401 si on les envoie à generate-chapter-images.
+const isValidOpenAIKey = (key?: string): boolean => /^sk-[A-Za-z0-9_-]{20,}$/.test((key || '').trim());
+
 interface Chapter {
   id: string;
   title: string;
@@ -240,7 +245,13 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
     }
 
     const config = getConfig();
-    const useOpenAI = hasValidApiKey();
+    const rawKey = (config.apiKey || '').trim();
+    // On n'active OpenAI que si une vraie clé OpenAI (sk-...) est fournie.
+    // Une clé Gemini valide ne doit jamais être envoyée à OpenAI (sinon 401).
+    if (rawKey && hasValidApiKey() && !isValidOpenAIKey(rawKey)) {
+      toast.info("Clé OpenAI absente ou invalide (format attendu : sk-...). Génération via l'IA intégrée Lovable.");
+    }
+    const useOpenAI = hasValidApiKey() && isValidOpenAIKey(rawKey);
 
     setIsGenerating(true);
     setProgress(0);
@@ -423,7 +434,11 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
     }
 
     const config = getConfig();
-    const useOpenAI = hasValidApiKey();
+    const rawKey = (config.apiKey || '').trim();
+    if (rawKey && hasValidApiKey() && !isValidOpenAIKey(rawKey)) {
+      toast.info("Clé OpenAI absente ou invalide (format attendu : sk-...). Génération via l'IA intégrée Lovable.");
+    }
+    const useOpenAI = hasValidApiKey() && isValidOpenAIKey(rawKey);
 
     setIsGenerating(true);
 
