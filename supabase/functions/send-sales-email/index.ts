@@ -624,6 +624,7 @@ Deno.serve(async (req) => {
 
     let sent = 0;
     let errors = 0;
+    let quotaHit = false;
 
     for (let i = 0; i < (prospects?.length || 0); i++) {
       const prospect = prospects![i];
