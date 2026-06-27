@@ -774,6 +774,15 @@ Deno.serve(async (req) => {
         const result = await sendResendEmail(prospect.email, prospect.first_name, subject, htmlContent);
         await logSend(supabase, prospect.email, relanceTemplate, result);
         if (!result.ok) {
+          // Quota Resend atteint (429) : inutile de continuer, on s'arrête net pour
+          // ne pas marquer en "error" tous les prospects restants (ils seront repris
+          // au prochain passage du cron une fois le quota réinitialisé).
+          const isQuota = /\b429\b|quota|rate.?limit/i.test(result.detail || "");
+          if (isQuota) {
+            console.error(`Resend quota atteint, arrêt de la relance auto (${prospect.email}):`, result.detail);
+            quotaHit = true;
+            break;
+          }
           console.error(`Resend relance auto error for ${prospect.email}:`, result.detail);
           await supabase.from("sales_prospects").update({ relance_status: "error" }).eq("id", prospect.id);
           errors++;
