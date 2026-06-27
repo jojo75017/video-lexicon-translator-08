@@ -16,6 +16,11 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { detectPlaceholderImage } from '@/lib/ebookImageValidation';
 import { persistEbookImageToLibrary } from '@/lib/ebookImageStorage';
 
+// Valide le format d'une clé OpenAI (doit commencer par "sk-").
+// Les clés Gemini (AIza..., AQ.Ab8...) ne sont PAS des clés OpenAI et
+// provoquent un 401 si on les envoie à generate-chapter-images.
+const isValidOpenAIKey = (key?: string): boolean => /^sk-[A-Za-z0-9_-]{20,}$/.test((key || '').trim());
+
 interface Chapter {
   id: string;
   title: string;
