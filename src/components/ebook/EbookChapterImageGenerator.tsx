@@ -434,7 +434,11 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
     }
 
     const config = getConfig();
-    const useOpenAI = hasValidApiKey();
+    const rawKey = (config.apiKey || '').trim();
+    if (rawKey && hasValidApiKey() && !isValidOpenAIKey(rawKey)) {
+      toast.info("Clé OpenAI absente ou invalide (format attendu : sk-...). Génération via l'IA intégrée Lovable.");
+    }
+    const useOpenAI = hasValidApiKey() && isValidOpenAIKey(rawKey);
 
     setIsGenerating(true);
 
