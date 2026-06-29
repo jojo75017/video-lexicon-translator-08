@@ -28,6 +28,41 @@ const fade = {
   transition: { duration: 0.6 },
 };
 
+// Bonus = les PDF que l'on possède déjà (rien d'inventé).
+const BONUS_PDFS: { title: string; desc: string; href: string }[] = [
+  {
+    title: '50 niches KDP rentables 2026',
+    desc: 'Les niches porteuses à attaquer dès maintenant, avec mots-clés.',
+    href: '/lead-magnets/50-niches-rentables-kdp-2026.pdf',
+  },
+  {
+    title: 'Guide : publier sur KDP à l\'étranger',
+    desc: 'Vendre sur les marketplaces internationales sans se tromper.',
+    href: '/lead-magnets/guide-publier-kdp-etranger.pdf',
+  },
+  {
+    title: 'Guide du générateur EbookStudio',
+    desc: 'La prise en main complète de l\'outil, étape par étape.',
+    href: '/lead-magnets/guide-generateur-ebookstudio-principal.pdf',
+  },
+  {
+    title: 'Guide ebook audio',
+    desc: 'Transformer ton livre en audiobook vendable.',
+    href: '/lead-magnets/guide-ebook-audio-fonctionnement.pdf',
+  },
+  {
+    title: 'Guide clé API Gemini',
+    desc: 'Obtenir et configurer ta clé IA en 5 minutes.',
+    href: '/Guide_Cle_Gemini_API.pdf',
+  },
+  {
+    title: 'Kit influenceurs',
+    desc: 'Tout pour faire connaître ton livre via les créateurs.',
+    href: '/kit-influenceurs.pdf',
+  },
+];
+
+
 /** Compte à rebours réel (24h glissantes, persistées en localStorage). */
 function useCountdown() {
   const [left, setLeft] = useState(0);
