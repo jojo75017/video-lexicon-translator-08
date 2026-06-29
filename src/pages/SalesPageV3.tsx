@@ -257,7 +257,45 @@ const SalesPageV3: React.FC = () => {
         </div>
       </section>
 
+      {/* BONUS OFFERTS — PDF réels */}
+      <section className="px-4 py-16">
+        <div className="max-w-5xl mx-auto">
+          <motion.div {...fade} className="text-center mb-12">
+            <span className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider mb-4"
+              style={{ background: AMBER_SOFT, color: AMBER_DEEP }}>
+              <Gift className="w-3.5 h-3.5" /> Bonus offerts
+            </span>
+            <h2 className="text-3xl md:text-4xl" style={{ fontFamily: SERIF }}>
+              {BONUS_PDFS.length} guides PDF inclus
+            </h2>
+            <p className="text-[#6b5d49] mt-3">Des ressources concrètes, prêtes à télécharger — rien d'inventé.</p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {BONUS_PDFS.map((b) => (
+              <motion.a
+                key={b.href}
+                href={b.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                {...fade}
+                className="rounded-2xl p-6 border bg-white flex flex-col hover:shadow-lg transition-shadow"
+                style={{ borderColor: '#efe3cf' }}
+              >
+                <BookOpen className="w-7 h-7 mb-3" style={{ color: AMBER_DEEP }} />
+                <h3 className="font-bold mb-1.5">{b.title}</h3>
+                <p className="text-sm text-[#6b5d49] flex-1">{b.desc}</p>
+                <span className="mt-4 text-sm font-semibold inline-flex items-center gap-1.5" style={{ color: AMBER_DEEP }}>
+                  Télécharger le PDF <ArrowRight className="w-4 h-4" />
+                </span>
+              </motion.a>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* OFFRES — Base 197€ OU Pack Pro 347€ */}
+
       <section id="offre" className="px-4 py-16" style={{ background: '#fff' }}>
         <div className="max-w-5xl mx-auto">
           <motion.div {...fade} className="text-center mb-12">
