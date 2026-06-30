@@ -372,6 +372,7 @@ const App = () => {
             <Route path="/offres" element={<SalesPage />} />
             <Route path="/publication-pro" element={<SalesPageV3 />} />
             <Route path="/v3-offre" element={<SalesPageV3 />} />
+            <Route path="/v3-paiement" element={<V3PaiementPage />} />
             <Route path="/masterclass" element={<MasterclassPage />} />
             <Route path="/activer-beta" element={<ActivationBetaPage />} />
             <Route path="/extension-chrome" element={<ExtensionChromePage />} />
