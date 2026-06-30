@@ -23,6 +23,22 @@ const PRODUCT_CATALOG: Record<string, { name: string; description: string; amoun
     description: "Usage freelance / agence + projets clients illimités",
     amount: 6700,
   },
+  v3_base: {
+    name: "Publication Assistée Pro V3 — Base",
+    description: "Écrire, illustrer, formater et publier sur KDP (accès à vie)",
+    amount: 19700,
+  },
+  v3_pro: {
+    name: "Publication Assistée Pro V3 — Pack Pro Vendeur",
+    description: "La Base + les 4 packs essentiels (accès à vie)",
+    amount: 34700,
+  },
+};
+
+// Produit de base selon le plan choisi
+const PLAN_BASE_PRODUCT: Record<string, string> = {
+  "v3-base": "v3_base",
+  "v3-pro": "v3_pro",
 };
 
 serve(async (req) => {
