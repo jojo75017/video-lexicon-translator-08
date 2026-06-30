@@ -76,11 +76,12 @@ serve(async (req) => {
     }
 
     // Construire la liste des produits commandés
-    // Le produit principal "pro_lifetime" est toujours inclus
-    const requestedItems: string[] = ["pro_lifetime"];
+    // Le produit de base dépend du plan choisi (V3 = v3_base / v3_pro, sinon pro_lifetime V2)
+    const baseProduct = PLAN_BASE_PRODUCT[planId] || "pro_lifetime";
+    const requestedItems: string[] = [baseProduct];
     if (Array.isArray(addons)) {
       for (const addon of addons) {
-        if (typeof addon === "string" && PRODUCT_CATALOG[addon] && addon !== "pro_lifetime") {
+        if (typeof addon === "string" && PRODUCT_CATALOG[addon] && addon !== baseProduct) {
           requestedItems.push(addon);
         }
       }
