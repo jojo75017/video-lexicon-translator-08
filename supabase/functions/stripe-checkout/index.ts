@@ -23,6 +23,22 @@ const PRODUCT_CATALOG: Record<string, { name: string; description: string; amoun
     description: "Usage freelance / agence + projets clients illimités",
     amount: 6700,
   },
+  v3_base: {
+    name: "Publication Assistée Pro V3 — Base",
+    description: "Écrire, illustrer, formater et publier sur KDP (accès à vie)",
+    amount: 19700,
+  },
+  v3_pro: {
+    name: "Publication Assistée Pro V3 — Pack Pro Vendeur",
+    description: "La Base + les 4 packs essentiels (accès à vie)",
+    amount: 34700,
+  },
+};
+
+// Produit de base selon le plan choisi
+const PLAN_BASE_PRODUCT: Record<string, string> = {
+  "v3-base": "v3_base",
+  "v3-pro": "v3_pro",
 };
 
 serve(async (req) => {
@@ -60,11 +76,12 @@ serve(async (req) => {
     }
 
     // Construire la liste des produits commandés
-    // Le produit principal "pro_lifetime" est toujours inclus
-    const requestedItems: string[] = ["pro_lifetime"];
+    // Le produit de base dépend du plan choisi (V3 = v3_base / v3_pro, sinon pro_lifetime V2)
+    const baseProduct = PLAN_BASE_PRODUCT[planId] || "pro_lifetime";
+    const requestedItems: string[] = [baseProduct];
     if (Array.isArray(addons)) {
       for (const addon of addons) {
-        if (typeof addon === "string" && PRODUCT_CATALOG[addon] && addon !== "pro_lifetime") {
+        if (typeof addon === "string" && PRODUCT_CATALOG[addon] && addon !== baseProduct) {
           requestedItems.push(addon);
         }
       }
