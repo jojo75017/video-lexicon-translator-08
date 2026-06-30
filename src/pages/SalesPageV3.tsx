@@ -105,8 +105,8 @@ const SalesPageV3: React.FC = () => {
     return map;
   }, [baseModules]);
 
-  const goBase = () => navigate('/upsell-paiement?plan=v3-base');
-  const goPro = () => navigate('/upsell-paiement?plan=v3-pro');
+  const goBase = () => navigate('/v3-paiement?plan=v3-base');
+  const goPro = () => navigate('/v3-paiement?plan=v3-pro');
 
   return (
     <div style={{ background: CREAM, color: INK }} className="min-h-screen">
