@@ -20,6 +20,32 @@ export default function EspaceLancementPage() {
   const [refCode, setRefCode] = useState<string | null>(null);
   const [firstName, setFirstName] = useState<string>('');
   const [copied, setCopied] = useState<string | null>(null);
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [comment, setComment] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const submitFeedback = async () => {
+    if (rating === 0) {
+      toast.error('Choisis une note avant d\'envoyer 🙂');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      await supabase.from('capture_events').insert({
+        event_type: 'click',
+        surface: 'cadeau',
+        lead_magnet: `avis:${rating}/5${comment ? ` | ${comment.slice(0, 500)}` : ''}`,
+        page_path: '/espace-lancement',
+      });
+      void session;
+    } catch {
+      // non bloquant
+    }
+    toast.success('Merci pour ton avis ! 🎁 Voici ton cadeau…');
+    setTimeout(() => { window.location.href = GIFT_URL; }, 900);
+  };
 
   useEffect(() => {
     (async () => {
