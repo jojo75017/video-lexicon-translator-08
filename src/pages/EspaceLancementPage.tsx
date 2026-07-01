@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Gift, Calendar, Copy, Check, Share2, Sparkles, Heart } from 'lucide-react';
+import { ArrowLeft, Gift, Calendar, Copy, Check, Share2, Sparkles, Heart, Star, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 
 const TEAL = '#008296';
@@ -12,6 +12,7 @@ const ORANGE = '#FF9E2D';
 const INK = '#232F3E';
 const PROMO_CODE = 'MERCIVIP30';
 const CALENDLY_URL = 'https://calendly.com/boubetgeorges/nouvelle-reunion';
+const GIFT_URL = 'https://www.trafic-affiliation.com/niches_ebookstudio';
 const ORIGIN = typeof window !== 'undefined' ? window.location.origin : 'https://ebookstudio.fr';
 
 export default function EspaceLancementPage() {
