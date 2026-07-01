@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Gift, Calendar, Copy, Check, Share2, Sparkles, Heart } from 'lucide-react';
+import { ArrowLeft, Gift, Calendar, Copy, Check, Share2, Sparkles, Heart, Star, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 
 const TEAL = '#008296';
@@ -12,6 +12,7 @@ const ORANGE = '#FF9E2D';
 const INK = '#232F3E';
 const PROMO_CODE = 'MERCIVIP30';
 const CALENDLY_URL = 'https://calendly.com/boubetgeorges/nouvelle-reunion';
+const GIFT_URL = 'https://www.trafic-affiliation.com/niches_ebookstudio';
 const ORIGIN = typeof window !== 'undefined' ? window.location.origin : 'https://ebookstudio.fr';
 
 export default function EspaceLancementPage() {
@@ -19,6 +20,32 @@ export default function EspaceLancementPage() {
   const [refCode, setRefCode] = useState<string | null>(null);
   const [firstName, setFirstName] = useState<string>('');
   const [copied, setCopied] = useState<string | null>(null);
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [comment, setComment] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const submitFeedback = async () => {
+    if (rating === 0) {
+      toast.error('Choisis une note avant d\'envoyer 🙂');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      await supabase.from('capture_events').insert({
+        event_type: 'click',
+        surface: 'cadeau',
+        lead_magnet: `avis:${rating}/5${comment ? ` | ${comment.slice(0, 500)}` : ''}`,
+        page_path: '/espace-lancement',
+      });
+      void session;
+    } catch {
+      // non bloquant
+    }
+    toast.success('Merci pour ton avis ! 🎁 Voici ton cadeau…');
+    setTimeout(() => { window.location.href = GIFT_URL; }, 900);
+  };
 
   useEffect(() => {
     (async () => {
@@ -339,6 +366,82 @@ export default function EspaceLancementPage() {
           </CardContent>
         </Card>
       </section>
+
+      {/* Encart avis + cadeau 10 niches */}
+      <section className="mx-auto max-w-5xl px-4 mb-10">
+        <Card className="overflow-hidden border-2" style={{ borderColor: `${ORANGE}44` }}>
+          <CardContent
+            className="p-8 sm:p-10"
+            style={{ background: `linear-gradient(135deg, ${TEAL}08, ${ORANGE}0A)` }}
+          >
+            <div className="flex items-start gap-3 mb-5">
+              <div
+                className="inline-flex items-center justify-center rounded-2xl w-12 h-12 flex-shrink-0"
+                style={{ backgroundColor: `${ORANGE}18`, color: ORANGE }}
+              >
+                <MessageSquare className="h-6 w-6" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold mb-1" style={{ color: INK }}>
+                  💬 Ton avis compte — et il te rapporte un cadeau
+                </h2>
+                <p className="text-sm text-joy-ink/70">
+                  Dis-moi ce que tu penses de l'expérience. En échange, je t'offre le guide
+                  <strong> « 10 niches KDP rentables »</strong>. Plus la note est élevée, mieux c'est 😉
+                </p>
+              </div>
+            </div>
+
+            {/* Étoiles */}
+            <div className="flex items-center gap-2 mb-5">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => setRating(n)}
+                  onMouseEnter={() => setHoverRating(n)}
+                  onMouseLeave={() => setHoverRating(0)}
+                  className="transition-transform hover:scale-110"
+                  aria-label={`${n} étoile${n > 1 ? 's' : ''}`}
+                >
+                  <Star
+                    className="h-9 w-9"
+                    style={{
+                      color: (hoverRating || rating) >= n ? ORANGE : `${INK}22`,
+                      fill: (hoverRating || rating) >= n ? ORANGE : 'transparent',
+                    }}
+                  />
+                </button>
+              ))}
+              {rating > 0 && (
+                <span className="ml-2 text-sm font-semibold" style={{ color: ORANGE }}>
+                  {rating}/5
+                </span>
+              )}
+            </div>
+
+            <Textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Ton commentaire (facultatif) : qu'est-ce que tu aimes, qu'est-ce qu'on peut améliorer ?"
+              className="bg-white border-joy-ink/15 text-sm resize-none mb-4"
+              rows={4}
+            />
+
+            <Button
+              onClick={submitFeedback}
+              disabled={submitting}
+              className="rounded-xl w-full sm:w-auto px-6 py-3 text-white font-semibold shadow-md hover:shadow-lg transition-all"
+              style={{ backgroundColor: ORANGE }}
+            >
+              <Gift className="h-4 w-4 mr-2" />
+              {submitting ? 'Envoi…' : 'Envoyer mon avis et recevoir le cadeau'}
+            </Button>
+          </CardContent>
+        </Card>
+      </section>
+
+
 
       <p className="text-center text-xs text-joy-ink/45 max-w-md mx-auto px-4">
         Ces cadeaux te sont offerts en remerciement de ta confiance.
