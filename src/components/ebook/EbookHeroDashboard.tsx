@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import {
   Sparkles, Rocket, BookOpen, ArrowRight, TrendingUp, Star,
-  PenLine, ImageIcon, FileText, Wand2, Trophy, CheckCircle2
+  PenLine, ImageIcon, FileText, Wand2, Trophy, CheckCircle2, MessageCircle
 } from 'lucide-react';
 import { ebookExamples, type EbookExample } from '@/data/ebookExamples';
 import type { Chapter } from '@/hooks/useSubscriptionGeneration';
@@ -241,6 +241,46 @@ export const EbookHeroDashboard: React.FC<EbookHeroDashboardProps> = ({
           )}
         </div>
       </Card>
+
+      {/* ════════ A2. ASSISTANT IA CLICABLE ════════ */}
+      <button
+        onClick={() => window.dispatchEvent(new CustomEvent('open-ebookbot'))}
+        className="w-full text-left group"
+      >
+        <Card className="overflow-hidden border-2 border-orange-200 hover:border-orange-400 hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-orange-50 to-white">
+          <CardContent className="p-5 md:p-6">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-5">
+              <div className="shrink-0">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/20 text-2xl relative">
+                  <span className="relative z-10">🤖</span>
+                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white animate-pulse" />
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap mb-1">
+                  <span className="text-xs font-black uppercase tracking-wider text-orange-600 bg-orange-100 px-2 py-0.5 rounded-md">
+                    Assistant IA
+                  </span>
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" /> En ligne
+                  </span>
+                </div>
+                <h3 className="text-lg md:text-xl font-bold text-foreground mb-1">
+                  Parle à <span className="text-orange-600">EBOOKBOT</span>, ton copilote KDP
+                </h3>
+                <p className="text-sm text-muted-foreground max-w-2xl">
+                  Il répond à tes questions sur les niches, les mots-clés, la structure, le marketing KDP et l'utilisation de l'outil. Clique pour ouvrir le chat.
+                </p>
+              </div>
+              <div className="shrink-0 flex items-center gap-2 text-orange-600 font-semibold text-sm group-hover:gap-3 transition-all">
+                <MessageCircle className="w-5 h-5" />
+                Ouvrir
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </button>
 
       {/* ════════ B. INSPIREZ-VOUS - exemples concrets ════════ */}
       <Card>
