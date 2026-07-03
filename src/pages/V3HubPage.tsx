@@ -441,31 +441,6 @@ const V3HubPage: React.FC = () => {
         </div>
       </header>
 
-      {/* Barre d'onglets sticky */}
-      <nav className="sticky top-0 z-30 border-b border-[#eadfc9] backdrop-blur-md" style={{ background: 'rgba(251,246,236,0.9)' }}>
-        <div className="mx-auto max-w-7xl px-4">
-          <div className="flex items-center gap-7 overflow-x-auto no-scrollbar">
-            {HUB_TABS.map((t) => {
-              const active = activeTab === t.id;
-              const Icon = t.icon;
-              return (
-                <button
-                  key={t.id}
-                  onClick={() => setActiveTab(t.id)}
-                  className="shrink-0 inline-flex items-center gap-2 py-4 text-sm font-medium border-b-2 transition-colors"
-                  style={{
-                    borderColor: active ? AMBER : 'transparent',
-                    color: active ? INK : '#9a8666',
-                  }}
-                >
-                  <Icon className="h-4 w-4" style={{ color: active ? AMBER_DEEP : '#b29a72' }} /> {t.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </nav>
-
       <main className="mx-auto max-w-7xl px-4 py-8">
         {/* ===================== ONGLET PARCOURS ===================== */}
         {activeTab === 'parcours' && (
