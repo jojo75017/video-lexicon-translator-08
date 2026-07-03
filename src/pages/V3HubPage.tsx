@@ -596,7 +596,8 @@ const V3HubPage: React.FC = () => {
           <V3RoadmapTab />
         )}
       </main>
-
+      </div>
+      {/* fin colonne de contenu */}
 
       <V3ModuleDialog
         module={selected}
