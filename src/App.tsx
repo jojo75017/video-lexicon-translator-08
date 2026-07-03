@@ -352,9 +352,13 @@ const App = () => {
             <Route
               path="/tableau-de-bord"
               element={
-                <V3Gate>
+                isPlannerPreviewHost ? (
                   <V3HubPage />
-                </V3Gate>
+                ) : (
+                  <V3Gate>
+                    <V3HubPage />
+                  </V3Gate>
+                )
               }
             />
 
@@ -437,8 +441,8 @@ const App = () => {
             <Route path="/parrainage" element={<ParrainagePage />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/admin-direct" element={<AdminDirectPage />} />
-            <Route path="/admin-cockpit" element={<AdminGate><AdminCockpitPage /></AdminGate>} />
-            <Route path="/hub-v3" element={<V3Gate><V3HubPage /></V3Gate>} />
+            <Route path="/admin-cockpit" element={isPlannerPreviewHost ? <AdminCockpitPage /> : <AdminGate><AdminCockpitPage /></AdminGate>} />
+            <Route path="/hub-v3" element={isPlannerPreviewHost ? <V3HubPage /> : <V3Gate><V3HubPage /></V3Gate>} />
             <Route path="/ai-chat" element={<AiChatPage />} />
             <Route path="/niches" element={<NichesPage />} />
             <Route path="/niches-600" element={<Niches600Page />} />
