@@ -172,6 +172,8 @@ const ALL_TOOLS: Array<{ family: FamilyId; familyLabel: string; tools: Array<{ i
     family: 'writing',
     familyLabel: '📚 Formats spéciaux',
     tools: [
+      { id: 'cuisine', label: '🍳 Livre de cuisine / recettes' },
+      { id: 'voyage', label: '✈️ Guide de voyage' },
       { id: 'pedagogique', label: '📖 Livres pédagogiques (encadrés, schémas, tableaux)' },
       { id: 'agenda', label: '🗓️ Agendas & Planners' },
       { id: 'scolaire', label: '🎓 Scolaire & Parascolaire' },
