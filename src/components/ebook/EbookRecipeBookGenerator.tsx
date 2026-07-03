@@ -915,6 +915,17 @@ ${sheet.servingSuggestion}`;
       const margin = 15;
       const contentWidth = pageWidth - 2 * margin;
 
+      // Les polices jsPDF standard ne savent pas afficher les emojis (rendu en
+      // caractères parasites type "Ø<Ÿ"). On les retire de tout le texte.
+      const noEmoji = (s: string): string =>
+        (s || '')
+          .replace(
+            /[\u{1F000}-\u{1FAFF}\u{1F1E6}-\u{1F1FF}\u{2190}-\u{21FF}\u{2300}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FE0F}\u{200D}]/gu,
+            ''
+          )
+          .replace(/\s{2,}/g, ' ')
+          .trim();
+
       // Cover page
       if (coverImageUrl) {
         try {
@@ -935,7 +946,7 @@ ${sheet.servingSuggestion}`;
           pdf.rect(0, 0, pageWidth, pageHeight, 'F');
           pdf.setTextColor(255, 255, 255);
           pdf.setFontSize(32);
-          pdf.text(bookTitle, pageWidth / 2, pageHeight / 2, { align: 'center' });
+          pdf.text(noEmoji(bookTitle), pageWidth / 2, pageHeight / 2, { align: 'center' });
         }
       } else {
         // Title page without cover
@@ -943,10 +954,10 @@ ${sheet.servingSuggestion}`;
         pdf.rect(0, 0, pageWidth, pageHeight, 'F');
         pdf.setTextColor(255, 255, 255);
         pdf.setFontSize(32);
-        pdf.text(bookTitle, pageWidth / 2, pageHeight / 2, { align: 'center' });
+        pdf.text(noEmoji(bookTitle), pageWidth / 2, pageHeight / 2, { align: 'center' });
         if (authorName) {
           pdf.setFontSize(18);
-          pdf.text(authorName, pageWidth / 2, pageHeight / 2 + 20, { align: 'center' });
+          pdf.text(noEmoji(authorName), pageWidth / 2, pageHeight / 2 + 20, { align: 'center' });
         }
       }
 
@@ -964,21 +975,21 @@ ${sheet.servingSuggestion}`;
         pdf.rect(margin, yPos, contentWidth, 12, 'F');
         pdf.setTextColor(139, 69, 19);
         pdf.setFontSize(14);
-        pdf.text(`${sheet.countryFlag} ${sheet.country}`, margin + 5, yPos + 8);
+        pdf.text(noEmoji(`${sheet.country}`), margin + 5, yPos + 8);
         pdf.setFontSize(9);
-        pdf.text(`${sheet.portions}`, margin + contentWidth - 20, yPos + 8);
+        pdf.text(noEmoji(`${sheet.portions}`), margin + contentWidth - 20, yPos + 8);
         yPos += 16;
         
         // Dish name and time
         pdf.setTextColor(0, 0, 0);
         pdf.setFontSize(18);
-        const titleLines = pdf.splitTextToSize(sheet.dishName, contentWidth);
+        const titleLines = pdf.splitTextToSize(noEmoji(sheet.dishName), contentWidth);
         pdf.text(titleLines, margin, yPos);
         yPos += titleLines.length * 7 + 2;
         
         pdf.setFontSize(9);
         pdf.setTextColor(100, 100, 100);
-        pdf.text(`${sheet.difficulty} | ${sheet.cookingTime}`, margin, yPos);
+        pdf.text(noEmoji(`${sheet.difficulty} | ${sheet.cookingTime}`), margin, yPos);
         yPos += 8;
         
         // Left column - Image
@@ -1005,14 +1016,14 @@ ${sheet.servingSuggestion}`;
         let rightYPos = leftColStartY;
         pdf.setFontSize(10);
         pdf.setTextColor(60, 60, 60);
-        const descLines = pdf.splitTextToSize(sheet.description, rightColumnWidth);
+        const descLines = pdf.splitTextToSize(noEmoji(sheet.description), rightColumnWidth);
         pdf.text(descLines, rightColumnStart, rightYPos);
         rightYPos += descLines.length * 4 + 3;
         
         // History (italic style)
         pdf.setFontSize(9);
         pdf.setTextColor(100, 100, 100);
-        const historyLines = pdf.splitTextToSize(`📜 ${sheet.history}`, rightColumnWidth);
+        const historyLines = pdf.splitTextToSize(noEmoji(sheet.history), rightColumnWidth);
         pdf.text(historyLines, rightColumnStart, rightYPos);
         rightYPos += historyLines.length * 4 + 5;
         
@@ -1024,19 +1035,19 @@ ${sheet.servingSuggestion}`;
         pdf.rect(margin, yPos, leftColumnWidth, 25, 'F');
         pdf.setTextColor(128, 0, 128);
         pdf.setFontSize(9);
-        pdf.text('🍷 Accord Mets-Vins', margin + 3, yPos + 6);
+        pdf.text('Accord Mets-Vins', margin + 3, yPos + 6);
         pdf.setFontSize(8);
         pdf.setTextColor(100, 100, 100);
-        const wineName = pdf.splitTextToSize(sheet.winePairing, leftColumnWidth - 6);
+        const wineName = pdf.splitTextToSize(noEmoji(sheet.winePairing), leftColumnWidth - 6);
         pdf.text(wineName, margin + 3, yPos + 12);
-        const wineReason = pdf.splitTextToSize(sheet.wineReason, leftColumnWidth - 6);
+        const wineReason = pdf.splitTextToSize(noEmoji(sheet.wineReason), leftColumnWidth - 6);
         pdf.text(wineReason.slice(0, 2), margin + 3, yPos + 18);
         
         // Ingredients (next to wine box)
         let ingYPos = yPos;
         pdf.setFontSize(11);
         pdf.setTextColor(139, 69, 19);
-        pdf.text('📝 INGRÉDIENTS', rightColumnStart, ingYPos);
+        pdf.text('INGRÉDIENTS', rightColumnStart, ingYPos);
         ingYPos += 5;
         
         pdf.setFontSize(9);
@@ -1046,7 +1057,7 @@ ${sheet.servingSuggestion}`;
         sheet.ingredients.forEach((ing, i) => {
           const col = i < ingCols ? 0 : 1;
           const row = i < ingCols ? i : i - ingCols;
-          const ingText = pdf.splitTextToSize(`• ${ing}`, halfWidth - 2);
+          const ingText = pdf.splitTextToSize(noEmoji(`• ${ing}`), halfWidth - 2);
           pdf.text(ingText[0], rightColumnStart + col * halfWidth, ingYPos + row * 4);
         });
         
@@ -1055,14 +1066,14 @@ ${sheet.servingSuggestion}`;
         // Steps
         pdf.setFontSize(11);
         pdf.setTextColor(139, 69, 19);
-        pdf.text('👨‍🍳 PRÉPARATION', margin, yPos);
+        pdf.text('PRÉPARATION', margin, yPos);
         yPos += 5;
         
         pdf.setFontSize(9);
         pdf.setTextColor(0, 0, 0);
         sheet.steps.forEach((step, i) => {
           if (yPos > pageHeight - 30) return; // Prevent overflow
-          const stepLines = pdf.splitTextToSize(`${i + 1}. ${step}`, contentWidth - 8);
+          const stepLines = pdf.splitTextToSize(noEmoji(`${i + 1}. ${step}`), contentWidth - 8);
           pdf.text(stepLines, margin + 5, yPos);
           yPos += stepLines.length * 4;
         });
@@ -1077,10 +1088,10 @@ ${sheet.servingSuggestion}`;
           pdf.rect(margin, yPos, boxWidth, 18, 'F');
           pdf.setTextColor(180, 120, 0);
           pdf.setFontSize(8);
-          pdf.text('💡 Conseils du Chef', margin + 2, yPos + 4);
+          pdf.text('Conseils du Chef', margin + 2, yPos + 4);
           pdf.setFontSize(7);
           pdf.setTextColor(80, 80, 80);
-          const tipsLines = pdf.splitTextToSize(sheet.chefTips, boxWidth - 4);
+          const tipsLines = pdf.splitTextToSize(noEmoji(sheet.chefTips), boxWidth - 4);
           pdf.text(tipsLines.slice(0, 3), margin + 2, yPos + 9);
           
           // Variations
@@ -1088,10 +1099,10 @@ ${sheet.servingSuggestion}`;
           pdf.rect(margin + boxWidth + 5, yPos, boxWidth, 18, 'F');
           pdf.setTextColor(0, 128, 0);
           pdf.setFontSize(8);
-          pdf.text('🌍 Variantes', margin + boxWidth + 7, yPos + 4);
+          pdf.text('Variantes', margin + boxWidth + 7, yPos + 4);
           pdf.setFontSize(7);
           pdf.setTextColor(80, 80, 80);
-          const varLines = pdf.splitTextToSize(sheet.variations, boxWidth - 4);
+          const varLines = pdf.splitTextToSize(noEmoji(sheet.variations), boxWidth - 4);
           pdf.text(varLines.slice(0, 3), margin + boxWidth + 7, yPos + 9);
           
           yPos += 20;
@@ -1103,7 +1114,7 @@ ${sheet.servingSuggestion}`;
           pdf.rect(margin, yPos, contentWidth, 10, 'F');
           pdf.setTextColor(139, 69, 19);
           pdf.setFontSize(8);
-          pdf.text(`🍽️ Présentation: ${sheet.servingSuggestion}`, margin + 3, yPos + 6);
+          pdf.text(noEmoji(`Présentation: ${sheet.servingSuggestion}`), margin + 3, yPos + 6);
         }
       }
 
