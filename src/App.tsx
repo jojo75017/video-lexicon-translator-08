@@ -352,9 +352,13 @@ const App = () => {
             <Route
               path="/tableau-de-bord"
               element={
-                <V3Gate>
+                isPlannerPreviewHost ? (
                   <V3HubPage />
-                </V3Gate>
+                ) : (
+                  <V3Gate>
+                    <V3HubPage />
+                  </V3Gate>
+                )
               }
             />
 
