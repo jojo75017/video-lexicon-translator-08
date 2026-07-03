@@ -62,6 +62,8 @@ import { EbookColoringBookGenerator } from '@/components/ebook/EbookColoringBook
 import EbookAgendaGenerator from '@/components/ebook/EbookAgendaGenerator';
 import EbookScolaireGenerator from '@/components/ebook/EbookScolaireGenerator';
 import EbookPedagogiqueGenerator from '@/components/ebook/EbookPedagogiqueGenerator';
+import EbookRecipeBookGenerator from '@/components/ebook/EbookRecipeBookGenerator';
+import EbookTravelGuideGenerator from '@/components/ebook/EbookTravelGuideGenerator';
 import EbookMultiTranslator from '@/components/ebook/EbookMultiTranslator';
 import { KdpQuickTools } from '@/components/ebook/KdpQuickTools';
 import { EbookAudioGenerator } from '@/components/ebook/EbookAudioGenerator';
@@ -3652,6 +3654,12 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
 
       case 'pedagogique':
         return <EbookPedagogiqueGenerator ebookTitle={ebookTitle} />;
+
+      case 'cuisine':
+        return <EbookRecipeBookGenerator ebookTitle={ebookTitle} />;
+
+      case 'voyage':
+        return <EbookTravelGuideGenerator ebookTitle={ebookTitle} />;
 
       case 'subscription':
         // Rediriger vers la page Abonnement
