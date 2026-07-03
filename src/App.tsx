@@ -286,6 +286,21 @@ const App = () => {
   }, []);
 
   const showAccessDebug = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('debug') === '1';
+  const isPlannerPreviewHost =
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname.includes('id-preview--'));
+  const hasPlannerAccess = isPlannerPreviewHost || isAuthenticated || isAdmin;
+  const previewSubscriberEmail = 'preview@ebookstudio.fr';
+  const previewSubscriberData = {
+    email: previewSubscriberEmail,
+    plan_type: 'pro',
+    status: 'active',
+    access_code: 'PREVIEW-ACCESS',
+    ebook_plans_generated: 0,
+    chapters_generated: 0,
+    subchapters_generated: 0,
+    covers_generated: 0,
+  };
 
   if (isCheckingAuth) {
     return <PageLoader />;
@@ -320,7 +335,7 @@ const App = () => {
               }
             />
 
-            <Route path="/" element={<Navigate to={isAuthenticated || isAdmin ? '/ebook-planner' : '/offres'} replace />} />
+            <Route path="/" element={<Navigate to={hasPlannerAccess ? '/ebook-planner' : '/offres'} replace />} />
             <Route
               path="/espace"
               element={
@@ -369,7 +384,7 @@ const App = () => {
                 </SubscriberGate>
               }
             />
-            <Route path="/offres" element={isAuthenticated || isAdmin ? <Navigate to="/ebook-planner" replace /> : <SalesPage />} />
+            <Route path="/offres" element={hasPlannerAccess ? <Navigate to="/ebook-planner" replace /> : <SalesPage />} />
             <Route path="/publication-pro" element={<SalesPageV3 />} />
             <Route path="/v3-offre" element={<SalesPageV3 />} />
             <Route path="/v3-paiement" element={<V3PaiementPage />} />
@@ -481,20 +496,30 @@ const App = () => {
             <Route
               path="/ebook-planner"
               element={
-                <SubscriberGate
-                  isAdmin={isAdmin}
-                  subscriberEmail={subscriberEmail}
-                  subscriberData={subscriberData}
-                  onInvalid={handleLogout}
-                >
+                isPlannerPreviewHost && !isAuthenticated && !isAdmin ? (
                   <EbookPlannerPage
-                    subscriberEmail={subscriberEmail || ''}
-                    subscriberData={subscriberData}
+                    subscriberEmail={previewSubscriberEmail}
+                    subscriberData={previewSubscriberData}
                     isDemo={false}
-                    isAdmin={isAdmin}
+                    isAdmin={false}
                     onLogout={handleLogout}
                   />
-                </SubscriberGate>
+                ) : (
+                  <SubscriberGate
+                    isAdmin={isAdmin}
+                    subscriberEmail={subscriberEmail}
+                    subscriberData={subscriberData}
+                    onInvalid={handleLogout}
+                  >
+                    <EbookPlannerPage
+                      subscriberEmail={subscriberEmail || ''}
+                      subscriberData={subscriberData}
+                      isDemo={false}
+                      isAdmin={isAdmin}
+                      onLogout={handleLogout}
+                    />
+                  </SubscriberGate>
+                )
               }
             />
             <Route
@@ -727,7 +752,7 @@ const App = () => {
             <Route path="/mon-code" element={<RecuperationCodePage />} />
             
             {/* Catch-all : les utilisateurs connectés restent dans le planner */}
-            <Route path="*" element={<Navigate to={isAuthenticated || isAdmin ? "/ebook-planner" : "/offres"} replace />} />
+            <Route path="*" element={<Navigate to={hasPlannerAccess ? "/ebook-planner" : "/offres"} replace />} />
           </Routes>
           </Suspense>
           {/* Admin: popup flottant abonnés visible sur toutes les pages */}
