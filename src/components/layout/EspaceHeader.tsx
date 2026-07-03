@@ -574,7 +574,7 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-0 max-h-[60vh] overflow-y-auto">
                     {filteredTools.map((group) => (
                       <div
-                        key={group.family}
+                        key={group.familyLabel}
                         className="p-3 border-r border-b border-[#e8ecf1] last:border-r-0"
                       >
                         <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#008296] mb-2 px-1 flex items-center gap-1">
