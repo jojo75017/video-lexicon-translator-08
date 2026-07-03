@@ -44,6 +44,19 @@ const SANS = "'Inter', system-ui, sans-serif";
 // L'écriture/rédaction (STUDIO de création) vit dans « IA avancée » : c'est le 1er palier.
 const PILLAR_ORDER: V3Pillar[] = ['ia', 'publier', 'monetiser', 'marketing', 'edition', 'distribution', 'promotion'];
 
+// Phrase d'intro par pilier : donne un fil conducteur clair dans l'onglet Outils.
+const PILLAR_INTRO: Record<V3Pillar, string> = {
+  ia: 'Commencez ici : trouvez votre idée et rédigez votre livre avec l\'IA.',
+  publier: 'Mettez en forme et publiez votre livre sur Amazon KDP sans stress.',
+  monetiser: 'Transformez votre livre en revenus : audiobooks, formats premium.',
+  marketing: 'Faites connaître votre livre et déclenchez vos premières ventes.',
+  edition: 'Passez au niveau maison d\'édition : finitions et qualité pro.',
+  distribution: 'Élargissez votre diffusion au-delà d\'Amazon.',
+  promotion: 'Boostez la visibilité avec des campagnes et de la presse.',
+};
+
+
+
 
 /** Carte module premium claire avec léger tilt + halo ambré au survol. */
 function ModuleCard({
@@ -385,8 +398,13 @@ const V3HubPage: React.FC = () => {
         {/* ===================== ONGLET OUTILS ===================== */}
         {activeTab === 'outils' && (
           <>
+            {/* Aide : les outils suivent l'ordre logique des étapes */}
+            <div className="mb-4 rounded-xl border p-3 text-[13px]" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44`, color: '#6f5e47' }}>
+              <span className="font-semibold" style={{ color: AMBER_DEEP }}>💡 Suivez les étapes numérotées</span> — les outils sont rangés dans l'ordre logique&nbsp;: écrire → publier → monétiser → faire connaître. Pas sûr par où commencer&nbsp;? Ouvrez l'onglet <span className="font-semibold">Parcours</span>.
+            </div>
             {/* Recherche + filtres par pilier */}
             <div className="-mx-4 px-4 py-3 mb-6">
+
               <div className="relative max-w-md mb-3" data-tour="search">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: '#b29a72' }} />
                 <input
@@ -432,14 +450,22 @@ const V3HubPage: React.FC = () => {
                 return PILLAR_ORDER.map((p) => {
                   const items = filtered.filter((m) => m.pillar === p);
                   if (items.length === 0) return null;
+                  const stepNo = PILLAR_ORDER.filter((pp) => filtered.some((m) => m.pillar === pp)).indexOf(p) + 1;
                   return (
                     <section key={p} className="mb-10">
-                      <div className="flex items-center gap-2 mb-4">
+                      <div className="flex items-center gap-3 mb-1.5">
+                        <span
+                          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-black text-white"
+                          style={{ background: AMBER_DEEP }}
+                        >
+                          {stepNo}
+                        </span>
                         <span className="text-xl">{V3_PILLAR_META[p].emoji}</span>
                         <h2 className="text-lg font-bold" style={{ fontFamily: SERIF, color: INK }}>{V3_PILLAR_META[p].label}</h2>
                         <span className="text-xs" style={{ color: '#b29a72' }}>{items.length}</span>
                         <div className="flex-1 h-px ml-2" style={{ background: `linear-gradient(90deg, ${AMBER}44, transparent)` }} />
                       </div>
+                      <p className="mb-4 ml-10 text-[13px]" style={{ color: '#8a7860' }}>{PILLAR_INTRO[p]}</p>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                         {items.map((m, i) => (
                           <ModuleCard key={m.id} module={m} index={i} onOpen={setSelected} unlocked={isUnlocked(m)} isFirst={p === firstPillarWithItems && i === 0} />
