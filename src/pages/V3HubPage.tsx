@@ -44,6 +44,19 @@ const SANS = "'Inter', system-ui, sans-serif";
 // L'écriture/rédaction (STUDIO de création) vit dans « IA avancée » : c'est le 1er palier.
 const PILLAR_ORDER: V3Pillar[] = ['ia', 'publier', 'monetiser', 'marketing', 'edition', 'distribution', 'promotion'];
 
+// Phrase d'intro par pilier : donne un fil conducteur clair dans l'onglet Outils.
+const PILLAR_INTRO: Record<V3Pillar, string> = {
+  ia: 'Commencez ici : trouvez votre idée et rédigez votre livre avec l\'IA.',
+  publier: 'Mettez en forme et publiez votre livre sur Amazon KDP sans stress.',
+  monetiser: 'Transformez votre livre en revenus : audiobooks, formats premium.',
+  marketing: 'Faites connaître votre livre et déclenchez vos premières ventes.',
+  edition: 'Passez au niveau maison d\'édition : finitions et qualité pro.',
+  distribution: 'Élargissez votre diffusion au-delà d\'Amazon.',
+  promotion: 'Boostez la visibilité avec des campagnes et de la presse.',
+};
+
+
+
 
 /** Carte module premium claire avec léger tilt + halo ambré au survol. */
 function ModuleCard({
