@@ -154,11 +154,20 @@ const AdminDirectPage = () => {
                 placeholder="votre@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && sendMagicLink()}
               />
-              <Button onClick={sendMagicLink} className="w-full" size="lg">
-                <Send className="w-4 h-4 mr-2" />
-                Envoyer le lien de connexion
+              <Input
+                type="password"
+                placeholder="Mot de passe"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && loginWithPassword()}
+              />
+              <Button onClick={loginWithPassword} className="w-full" size="lg">
+                <Shield className="w-4 h-4 mr-2" />
+                Se connecter
+              </Button>
+              <Button variant="link" size="sm" className="text-xs" onClick={sendMagicLink}>
+                Recevoir plutôt un lien par email
               </Button>
             </div>
           )}
