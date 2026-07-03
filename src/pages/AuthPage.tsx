@@ -15,7 +15,7 @@ export const AuthPage = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
-  const [usePasswordMode, setUsePasswordMode] = useState(false);
+  const [usePasswordMode, setUsePasswordMode] = useState(true);
   const navigate = useNavigate();
 
   // En mode édition/dev, on évite les toasts (popups) qui deviennent vite envahissants.
