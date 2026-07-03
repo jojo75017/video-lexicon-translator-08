@@ -735,8 +735,8 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
           </CardTitle>
           <CardDescription style={{ color: 'hsl(var(--royal-purple) / 0.8)' }}>
             {hasValidApiKey() 
-              ? "Utilise votre clé Gemini personnelle pour générer des images" 
-              : "Créez des illustrations avec Lovable AI (crédits requis)"}
+              ? "1 image générée automatiquement par chapitre (avec votre clé Gemini), insérable directement dans le texte" 
+              : "1 image générée automatiquement par chapitre avec l'IA intégrée Lovable, insérable directement dans le texte"}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -1036,7 +1036,7 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
               style={{ background: 'linear-gradient(135deg, hsl(var(--coral-pink)) 0%, hsl(var(--royal-purple)) 100%)' }}
             >
               <Image className="h-4 w-4 mr-2" />
-              {isGenerating ? 'Génération en cours...' : `Générer toutes les images (${chapters.length})`}
+              {isGenerating ? 'Génération en cours...' : `Générer 1 image par chapitre (${chapters.length})`}
             </Button>
             <Button
               onClick={clearAllImageCache}
