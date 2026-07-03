@@ -798,6 +798,24 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
       const margin = 15;
       const contentWidth = pageWidth - (margin * 2);
 
+      // Les polices jsPDF standard ne savent pas afficher les emojis (rendu en
+      // caractères parasites type "Ø<Ÿ"). On les retire de tout le texte.
+      const noEmoji = (s: string): string =>
+        (s || '')
+          .replace(
+            /[\u{1F000}-\u{1FAFF}\u{1F1E6}-\u{1F1FF}\u{2190}-\u{21FF}\u{2300}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FE0F}\u{200D}]/gu,
+            ''
+          )
+          .replace(/\s{2,}/g, ' ')
+          .trim();
+      const oldText = pdf.text.bind(pdf);
+      (pdf as any).text = (text: any, ...rest: any[]) =>
+        oldText(
+          Array.isArray(text) ? text.map((t) => noEmoji(String(t))) : noEmoji(String(text)),
+          ...rest
+        );
+
+
       // Helper: Convert image URL to base64 for cross-origin support
       const loadImageAsBase64 = (url: string): Promise<string | null> => {
         return new Promise((resolve) => {
