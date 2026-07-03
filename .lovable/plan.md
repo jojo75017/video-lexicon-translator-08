@@ -1,53 +1,41 @@
-## Contexte
+# Réorganisation de la navigation du Hub V3 → sidebar latérale gauche
 
-Deux besoins :
-1. **Templates Voyage/Cuisine « introuvables »** dans l'onglet Modèles.
-2. **Une image par chapitre** pour illustrer les ebooks.
+Décision validée : on passe la navigation d'une **barre d'onglets horizontale** à une **sidebar verticale à gauche** (comme Notion / Linear / Vercel). Objectif : l'utilisateur cherche moins, tout est visible d'un coup d'œil, look plus moderne.
 
-## Constat après vérification
+## Ce que je vais construire
 
-**1. Templates** — Voyage et Cuisine sont bien présents (« Guide de Voyage Ultime », « L'Art de la Cuisine Gastronomique »), mais **invisibles à l'œil** : les 19 modèles partagent seulement **4 images génériques** (guide/business/fiction/memoir). Le modèle Cuisine affiche l'image « Business Strategy », le modèle Voyage un cadre manuscrit → impossible de les reconnaître.
-
-**2. Image par chapitre** — La fonctionnalité **existe déjà** : onglet Habiller → Images → « Générateur d'images » → « Générer toutes les images de chapitres » (1 image par chapitre, insertion dans le contenu, sauvegarde en bibliothèque). Elle fonctionne avec l'IA intégrée si aucune clé OpenAI n'est fournie. Elle est simplement **peu visible/mal expliquée**.
-
-## Plan
-
-### Partie A — Vignettes de templates dédiées (le vrai correctif visuel)
-
-1. Générer une image photoréaliste par catégorie dans `src/assets/templates/` (priorité Voyage + Cuisine, puis les 17 autres), fidèle à chaque thème :
-
+### 1. Structure en 2 colonnes
 ```text
-voyage → valise/passeport/carte    cuisine → plats dressés/ingrédients
-aquariophilie → aquarium planté     business → bureau moderne
-enfants → univers illustré doux     roman → ambiance littéraire
-devperso → lever de soleil          scifi → cosmos futuriste
-sante → bien-être/yoga              finance → graphiques/investissement
-parentalite → famille               marketing → écrans/croissance
-fitness → sport                     romance → ambiance chaleureuse
-thriller → atmosphère sombre        fantasy → paysage épique
-photographie → appareil photo       jardinage → potager
-spiritualite → méditation/lumière
+┌───────────┬─────────────────────────────┐
+│  SIDEBAR  │   HERO (compacté) + CONTENU │
+│  (gauche) │                             │
+│ ◆ Parcours│   [contenu de l'onglet]     │
+│ ◆ Outils  │                             │
+│ ◆ Livres  │                             │
+│ ◆ Guides  │                             │
+│ ◆ Offres  │                             │
+│ ◆ Roadmap │                             │
+│           │                             │
+│ [Créer]   │                             │
+└───────────┴─────────────────────────────┘
 ```
 
-2. Dans `src/data/ebookTemplates.ts` : importer chaque nouvelle image et remplacer le champ `image` de chaque template par sa vignette dédiée.
-3. Vérifier le rendu de l'onglet Modèles (chaque carte distincte et reconnaissable).
+- Sidebar `sticky` à gauche (~240px), charte « Clair Ambre » existante (AMBER `#E8951E`, CREAM `#FBF6EC`, INK `#2A2118`, Instrument Serif).
+- Chaque entrée = icône + libellé complet ; onglet actif souligné par un fond doux `#FFF3DF` + bord/pastille ambré.
+- Bouton **« Créer un livre »** mis en avant dans la sidebar.
+- Hero **compacté** (titre + sous-titre plus courts, barre de stats conservée) puisque la nav quitte le haut → plus d'air pour le contenu.
 
-### Partie B — Rendre « 1 image par chapitre » évident
+### 2. Rétractable + responsive
+- **Desktop** : sidebar visible par défaut, bouton pour la réduire en mini-rail d'icônes (~64px), état mémorisé dans `localStorage`.
+- **Mobile / tablette** : sidebar en **tiroir** (off-canvas) ouvert via un bouton hamburger, se referme après sélection.
 
-1. Vérifier que « Générer toutes les images de chapitres » produit bien 1 image/chapitre et l'insère (fonction déjà en place, à contrôler en conditions réelles).
-2. Améliorer la **découvrabilité** : texte d'intro clair dans le générateur (« 1 image générée automatiquement par chapitre, insérée dans le texte »), et rendre l'entrée de menu plus visible depuis le plan / l'onglet Habiller.
-3. Confirmer le fonctionnement **sans clé OpenAI** (fallback IA intégrée) pour que tous les abonnés puissent l'utiliser.
+### 3. Rien d'autre ne change
+- Les 6 onglets, leur contenu, le filtrage, la persistance `tab` (URL + localStorage), la visite guidée (`data-tour`) et les accès (197€ / Packs) restent identiques.
+- Seule la **présentation de la navigation** change.
 
 ## Détails techniques
-
-- Images via l'outil de génération d'images, `.jpg`, importées en ES6 (pas d'externalisation), respect de la charte (photoréalisme strict, ambiance KDP).
-- Partie A ne touche que les imports + champ `image` de `ebookTemplates.ts` ; `EbookTemplates.tsx` reste inchangé.
-- Partie B est surtout de la vérification + ajustements d'UI/texte ; aucune refonte de la logique de génération.
-
-## Hors-scope
-
-- Pas de changement aux titres, chapitres, ni au menu Genre (déjà corrects).
-- Option rapide possible : ne remplacer que les vignettes Voyage et Cuisine plutôt que les 19 — dites-le moi si vous préférez.
-</content>
-<summary>A) Créer des vignettes photoréalistes dédiées pour chaque template (priorité Voyage & Cuisine) et les câbler dans ebookTemplates.ts. B) Vérifier et rendre visible la génération existante « 1 image par chapitre » (déjà fonctionnelle, y compris sans clé OpenAI).</summary>
-</invoke>
+- Fichier : `src/pages/V3HubPage.tsx` — remplacement de la `<nav>` horizontale sticky (~l.333-356) par une sidebar + wrapper flex 2 colonnes ; hero et `<main>` réorganisés.
+- Réutilisation du tableau `HUB_TABS` (aucun changement de données).
+- Nouveaux états `sidebarCollapsed` (desktop) et `mobileNavOpen` (tiroir), persistance légère `localStorage`.
+- Conservation des ancres `data-tour` (`hero`, `back`, `price`, `card`, `status`) pour ne pas casser la visite guidée.
+- Styles Tailwind/inline alignés sur la palette actuelle — aucune régression de thème.

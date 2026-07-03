@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Sparkles, Compass, Lock, ArrowRight, Wand2, CheckCircle2, Layers, Infinity as InfinityIcon, ShieldCheck, Save, Image as ImageIcon, BookOpen, GraduationCap, Gem, Map as MapIcon, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, Search, Sparkles, Compass, Lock, ArrowRight, Wand2, CheckCircle2, Layers, Infinity as InfinityIcon, ShieldCheck, Save, Image as ImageIcon, BookOpen, GraduationCap, Gem, Map as MapIcon, Menu, X, PanelLeftClose, PanelLeftOpen, type LucideIcon } from 'lucide-react';
 import {
   V3_MODULES, V3_PILLAR_META, getModuleAccess, getModuleById, type V3Pillar, type V3Module,
 } from '@/data/roadmapV3';
@@ -188,7 +188,16 @@ const V3HubPage: React.FC = () => {
   const [selected, setSelected] = useState<V3Module | null>(null);
   const [studioSource, setStudioSource] = useState<string | null>(null);
   const [tourOpen, setTourOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(
+    () => localStorage.getItem('v3hub_sidebar_collapsed') === '1',
+  );
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const { hasBase, hasFull, isAdmin } = useV3Entitlement();
+
+  // Persiste l'état réduit de la sidebar.
+  useEffect(() => {
+    localStorage.setItem('v3hub_sidebar_collapsed', sidebarCollapsed ? '1' : '0');
+  }, [sidebarCollapsed]);
 
   // Persiste l'onglet actif (URL + localStorage).
   useEffect(() => {
@@ -250,9 +259,111 @@ const V3HubPage: React.FC = () => {
     { icon: InfinityIcon, value: '197€', label: 'Livres illimités inclus' },
   ];
 
+  // Liste de navigation partagée (sidebar desktop + tiroir mobile).
+  const navList = (collapsed: boolean, onNavigate?: () => void) => (
+    <div className="flex flex-col gap-1">
+      {HUB_TABS.map((t) => {
+        const active = activeTab === t.id;
+        const Icon = t.icon;
+        return (
+          <button
+            key={t.id}
+            onClick={() => { setActiveTab(t.id); onNavigate?.(); }}
+            title={collapsed ? t.label : undefined}
+            className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${collapsed ? 'justify-center' : ''}`}
+            style={{
+              background: active ? AMBER_SOFT : 'transparent',
+              color: active ? INK : '#9a8666',
+              border: active ? `1px solid ${AMBER}44` : '1px solid transparent',
+            }}
+          >
+            <Icon className="h-[18px] w-[18px] shrink-0" style={{ color: active ? AMBER_DEEP : '#b29a72' }} />
+            {!collapsed && <span>{t.label}</span>}
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  const createBtn = (collapsed: boolean, onNavigate?: () => void) => (
+    <button
+      onClick={() => { setActiveTab('livres'); onNavigate?.(); }}
+      title={collapsed ? 'Créer un livre' : undefined}
+      className={`w-full inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_30px_-12px_rgba(232,149,30,0.6)]`}
+      style={{ background: `linear-gradient(90deg, ${AMBER}, #FFB44D)` }}
+    >
+      <Wand2 className="h-4 w-4 shrink-0" />
+      {!collapsed && <span>Créer un livre</span>}
+    </button>
+  );
+
   return (
     <div className="relative min-h-screen" style={{ background: CREAM, color: INK, fontFamily: SANS }}>
-      <div className="relative z-10">
+      <div className="relative z-10 flex">
+      {/* ===================== SIDEBAR (desktop) ===================== */}
+      <aside
+        className="hidden lg:flex sticky top-0 h-screen shrink-0 flex-col border-r border-[#eadfc9] transition-[width] duration-300"
+        style={{ width: sidebarCollapsed ? 76 : 244, background: 'rgba(251,246,236,0.96)' }}
+      >
+        <div className="flex items-center gap-2 px-4 py-5">
+          {!sidebarCollapsed && (
+            <span className="text-xl font-medium leading-none" style={{ fontFamily: SERIF, color: INK }}>
+              Hub <span className="italic" style={{ color: AMBER_DEEP }}>V3</span>
+            </span>
+          )}
+          <button
+            onClick={() => setSidebarCollapsed((c) => !c)}
+            className="ml-auto grid h-8 w-8 place-items-center rounded-lg border transition-colors hover:bg-[#FFF3DF]"
+            style={{ borderColor: '#eadfc9', color: AMBER_DEEP }}
+            aria-label={sidebarCollapsed ? 'Déplier le menu' : 'Réduire le menu'}
+          >
+            {sidebarCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto px-3">{navList(sidebarCollapsed)}</div>
+        <div className="border-t border-[#eadfc9] p-3">{createBtn(sidebarCollapsed)}</div>
+      </aside>
+
+      {/* ===================== TIROIR (mobile) ===================== */}
+      {mobileNavOpen && (
+        <div className="lg:hidden fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setMobileNavOpen(false)} />
+          <div className="absolute left-0 top-0 h-full w-72 max-w-[80%] flex flex-col shadow-2xl" style={{ background: CREAM }}>
+            <div className="flex items-center justify-between px-4 py-5 border-b border-[#eadfc9]">
+              <span className="text-xl font-medium" style={{ fontFamily: SERIF, color: INK }}>
+                Hub <span className="italic" style={{ color: AMBER_DEEP }}>V3</span>
+              </span>
+              <button
+                onClick={() => setMobileNavOpen(false)}
+                className="grid h-8 w-8 place-items-center rounded-lg border transition-colors hover:bg-[#FFF3DF]"
+                style={{ borderColor: '#eadfc9', color: AMBER_DEEP }}
+                aria-label="Fermer le menu"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-3 py-3">{navList(false, () => setMobileNavOpen(false))}</div>
+            <div className="border-t border-[#eadfc9] p-3">{createBtn(false, () => setMobileNavOpen(false))}</div>
+          </div>
+        </div>
+      )}
+
+      {/* ===================== COLONNE DE CONTENU ===================== */}
+      <div className="flex-1 min-w-0">
+      {/* Barre supérieure mobile avec hamburger */}
+      <div className="lg:hidden sticky top-0 z-30 flex items-center gap-3 border-b border-[#eadfc9] px-4 py-3 backdrop-blur-md" style={{ background: 'rgba(251,246,236,0.9)' }}>
+        <button
+          onClick={() => setMobileNavOpen(true)}
+          className="grid h-9 w-9 place-items-center rounded-lg border transition-colors hover:bg-[#FFF3DF]"
+          style={{ borderColor: '#eadfc9', color: AMBER_DEEP }}
+          aria-label="Ouvrir le menu"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+        <span className="text-lg font-medium" style={{ fontFamily: SERIF, color: INK }}>
+          {HUB_TABS.find((t) => t.id === activeTab)?.label ?? 'Hub V3'}
+        </span>
+      </div>
       {/* Hero */}
       <header className="relative overflow-hidden border-b border-[#eadfc9]" data-tour="hero">
 
@@ -329,31 +440,6 @@ const V3HubPage: React.FC = () => {
           </div>
         </div>
       </header>
-
-      {/* Barre d'onglets sticky */}
-      <nav className="sticky top-0 z-30 border-b border-[#eadfc9] backdrop-blur-md" style={{ background: 'rgba(251,246,236,0.9)' }}>
-        <div className="mx-auto max-w-7xl px-4">
-          <div className="flex items-center gap-7 overflow-x-auto no-scrollbar">
-            {HUB_TABS.map((t) => {
-              const active = activeTab === t.id;
-              const Icon = t.icon;
-              return (
-                <button
-                  key={t.id}
-                  onClick={() => setActiveTab(t.id)}
-                  className="shrink-0 inline-flex items-center gap-2 py-4 text-sm font-medium border-b-2 transition-colors"
-                  style={{
-                    borderColor: active ? AMBER : 'transparent',
-                    color: active ? INK : '#9a8666',
-                  }}
-                >
-                  <Icon className="h-4 w-4" style={{ color: active ? AMBER_DEEP : '#b29a72' }} /> {t.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </nav>
 
       <main className="mx-auto max-w-7xl px-4 py-8">
         {/* ===================== ONGLET PARCOURS ===================== */}
@@ -510,7 +596,8 @@ const V3HubPage: React.FC = () => {
           <V3RoadmapTab />
         )}
       </main>
-
+      </div>
+      {/* fin colonne de contenu */}
 
       <V3ModuleDialog
         module={selected}
