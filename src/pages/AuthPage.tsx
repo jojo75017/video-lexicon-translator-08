@@ -279,59 +279,93 @@ export const AuthPage = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={isLoading}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Mot de passe</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={isLoading}
-                minLength={6}
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {isLogin ? 'Connexion...' : 'Création...'}
-                </>
-              ) : (
-                isLogin ? 'Se connecter' : 'Créer le compte'
-              )}
-            </Button>
-          </form>
+          {/* Champ email commun */}
+          <div className="space-y-2 mb-4">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={isLoading}
+              placeholder="votre@email.com"
+            />
+          </div>
 
-          {isLogin && (
-            <div className="mt-3">
-              <div className="text-center text-sm text-muted-foreground">ou</div>
-              <form onSubmit={handlePasswordlessLogin} className="mt-3">
-                <Button type="submit" variant="secondary" className="w-full" disabled={isLoading}>
+          {/* MODE CONNEXION : lien magique recommandé */}
+          {isLogin && !usePasswordMode && (
+            <div className="space-y-3">
+              <form onSubmit={handlePasswordlessLogin}>
+                <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Envoi...
+                      Envoi du lien...
                     </>
                   ) : (
-                    'Connexion sans mot de passe (lien email)'
+                    '✨ Recevoir mon lien de connexion'
                   )}
                 </Button>
               </form>
+              <p className="text-center text-xs text-muted-foreground">
+                Recommandé — aucun mot de passe à retenir. Cliquez sur le lien reçu par email.
+              </p>
+              <div className="text-center">
+                <Button
+                  type="button"
+                  variant="link"
+                  className="text-sm"
+                  onClick={() => setUsePasswordMode(true)}
+                  disabled={isLoading}
+                >
+                  Utiliser plutôt un mot de passe
+                </Button>
+              </div>
             </div>
           )}
+
+          {/* MODE MOT DE PASSE (connexion) ou création de compte */}
+          {(!isLogin || usePasswordMode) && (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="password">Mot de passe</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={isLoading}
+                  minLength={6}
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {isLogin ? 'Connexion...' : 'Création...'}
+                  </>
+                ) : (
+                  isLogin ? 'Se connecter' : 'Créer le compte'
+                )}
+              </Button>
+              {isLogin && usePasswordMode && (
+                <div className="text-center">
+                  <Button
+                    type="button"
+                    variant="link"
+                    className="text-sm"
+                    onClick={() => setUsePasswordMode(false)}
+                    disabled={isLoading}
+                  >
+                    ← Revenir au lien par email
+                  </Button>
+                </div>
+              )}
+            </form>
+          )}
+
           {isLogin && (
             <div className="mt-2 text-center">
               <Button
