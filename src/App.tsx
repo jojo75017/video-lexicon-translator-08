@@ -320,7 +320,7 @@ const App = () => {
               }
             />
 
-            <Route path="/" element={<Navigate to={isAuthenticated || isAdmin ? '/espace' : '/offres'} replace />} />
+            <Route path="/" element={<Navigate to={isAuthenticated || isAdmin ? '/ebook-planner' : '/offres'} replace />} />
             <Route
               path="/espace"
               element={
@@ -369,7 +369,7 @@ const App = () => {
                 </SubscriberGate>
               }
             />
-            <Route path="/offres" element={<SalesPage />} />
+            <Route path="/offres" element={isAuthenticated || isAdmin ? <Navigate to="/ebook-planner" replace /> : <SalesPage />} />
             <Route path="/publication-pro" element={<SalesPageV3 />} />
             <Route path="/v3-offre" element={<SalesPageV3 />} />
             <Route path="/v3-paiement" element={<V3PaiementPage />} />
@@ -726,8 +726,8 @@ const App = () => {
             {/* SaaS routes removed - orphan system */}
             <Route path="/mon-code" element={<RecuperationCodePage />} />
             
-            {/* Catch-all : redirige vers /offres */}
-            <Route path="*" element={<Navigate to="/offres" replace />} />
+            {/* Catch-all : les utilisateurs connectés restent dans le planner */}
+            <Route path="*" element={<Navigate to={isAuthenticated || isAdmin ? "/ebook-planner" : "/offres"} replace />} />
           </Routes>
           </Suspense>
           {/* Admin: popup flottant abonnés visible sur toutes les pages */}
