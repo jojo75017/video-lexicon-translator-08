@@ -188,7 +188,16 @@ const V3HubPage: React.FC = () => {
   const [selected, setSelected] = useState<V3Module | null>(null);
   const [studioSource, setStudioSource] = useState<string | null>(null);
   const [tourOpen, setTourOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(
+    () => localStorage.getItem('v3hub_sidebar_collapsed') === '1',
+  );
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const { hasBase, hasFull, isAdmin } = useV3Entitlement();
+
+  // Persiste l'état réduit de la sidebar.
+  useEffect(() => {
+    localStorage.setItem('v3hub_sidebar_collapsed', sidebarCollapsed ? '1' : '0');
+  }, [sidebarCollapsed]);
 
   // Persiste l'onglet actif (URL + localStorage).
   useEffect(() => {
