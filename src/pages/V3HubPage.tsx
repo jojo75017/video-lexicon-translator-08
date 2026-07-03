@@ -398,8 +398,13 @@ const V3HubPage: React.FC = () => {
         {/* ===================== ONGLET OUTILS ===================== */}
         {activeTab === 'outils' && (
           <>
+            {/* Aide : les outils suivent l'ordre logique des étapes */}
+            <div className="mb-4 rounded-xl border p-3 text-[13px]" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44`, color: '#6f5e47' }}>
+              <span className="font-semibold" style={{ color: AMBER_DEEP }}>💡 Suivez les étapes numérotées</span> — les outils sont rangés dans l'ordre logique&nbsp;: écrire → publier → monétiser → faire connaître. Pas sûr par où commencer&nbsp;? Ouvrez l'onglet <span className="font-semibold">Parcours</span>.
+            </div>
             {/* Recherche + filtres par pilier */}
             <div className="-mx-4 px-4 py-3 mb-6">
+
               <div className="relative max-w-md mb-3" data-tour="search">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: '#b29a72' }} />
                 <input
