@@ -445,14 +445,22 @@ const V3HubPage: React.FC = () => {
                 return PILLAR_ORDER.map((p) => {
                   const items = filtered.filter((m) => m.pillar === p);
                   if (items.length === 0) return null;
+                  const stepNo = PILLAR_ORDER.filter((pp) => filtered.some((m) => m.pillar === pp)).indexOf(p) + 1;
                   return (
                     <section key={p} className="mb-10">
-                      <div className="flex items-center gap-2 mb-4">
+                      <div className="flex items-center gap-3 mb-1.5">
+                        <span
+                          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-black text-white"
+                          style={{ background: AMBER_DEEP }}
+                        >
+                          {stepNo}
+                        </span>
                         <span className="text-xl">{V3_PILLAR_META[p].emoji}</span>
                         <h2 className="text-lg font-bold" style={{ fontFamily: SERIF, color: INK }}>{V3_PILLAR_META[p].label}</h2>
                         <span className="text-xs" style={{ color: '#b29a72' }}>{items.length}</span>
                         <div className="flex-1 h-px ml-2" style={{ background: `linear-gradient(90deg, ${AMBER}44, transparent)` }} />
                       </div>
+                      <p className="mb-4 ml-10 text-[13px]" style={{ color: '#8a7860' }}>{PILLAR_INTRO[p]}</p>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                         {items.map((m, i) => (
                           <ModuleCard key={m.id} module={m} index={i} onOpen={setSelected} unlocked={isUnlocked(m)} isFirst={p === firstPillarWithItems && i === 0} />
