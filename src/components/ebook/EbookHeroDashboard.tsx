@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import {
   Sparkles, Rocket, BookOpen, ArrowRight, TrendingUp, Star,
-  PenLine, ImageIcon, FileText, Wand2, Trophy, CheckCircle2
+  PenLine, ImageIcon, FileText, Wand2, Trophy, CheckCircle2, MessageCircle
 } from 'lucide-react';
 import { ebookExamples, type EbookExample } from '@/data/ebookExamples';
 import type { Chapter } from '@/hooks/useSubscriptionGeneration';
