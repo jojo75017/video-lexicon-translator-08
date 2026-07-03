@@ -1,7 +1,22 @@
-import templateBusiness from '@/assets/template-business.jpg';
-import templateGuide from '@/assets/template-guide.jpg';
-import templateFiction from '@/assets/template-fiction.jpg';
-import templateMemoir from '@/assets/template-memoir.jpg';
+import templateAquariophilie from '@/assets/templates/aquariophilie.jpg';
+import templateBusiness from '@/assets/templates/business.jpg';
+import templateTravel from '@/assets/templates/travel.jpg';
+import templateEnfants from '@/assets/templates/enfants.jpg';
+import templateRoman from '@/assets/templates/roman.jpg';
+import templateDevperso from '@/assets/templates/devperso.jpg';
+import templateCuisine from '@/assets/templates/cuisine.jpg';
+import templateScifi from '@/assets/templates/scifi.jpg';
+import templateSante from '@/assets/templates/sante.jpg';
+import templateFinance from '@/assets/templates/finance.jpg';
+import templateParentalite from '@/assets/templates/parentalite.jpg';
+import templateMarketing from '@/assets/templates/marketing.jpg';
+import templateFitness from '@/assets/templates/fitness.jpg';
+import templateRomance from '@/assets/templates/romance.jpg';
+import templateThriller from '@/assets/templates/thriller.jpg';
+import templateFantasy from '@/assets/templates/fantasy.jpg';
+import templatePhotographie from '@/assets/templates/photographie.jpg';
+import templateJardinage from '@/assets/templates/jardinage.jpg';
+import templateSpiritualite from '@/assets/templates/spiritualite.jpg';
 
 export interface EbookTemplate {
   id: string;
