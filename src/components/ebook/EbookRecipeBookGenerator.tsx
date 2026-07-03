@@ -946,7 +946,7 @@ ${sheet.servingSuggestion}`;
           pdf.rect(0, 0, pageWidth, pageHeight, 'F');
           pdf.setTextColor(255, 255, 255);
           pdf.setFontSize(32);
-          pdf.text(bookTitle, pageWidth / 2, pageHeight / 2, { align: 'center' });
+          pdf.text(noEmoji(bookTitle), pageWidth / 2, pageHeight / 2, { align: 'center' });
         }
       } else {
         // Title page without cover
@@ -954,10 +954,10 @@ ${sheet.servingSuggestion}`;
         pdf.rect(0, 0, pageWidth, pageHeight, 'F');
         pdf.setTextColor(255, 255, 255);
         pdf.setFontSize(32);
-        pdf.text(bookTitle, pageWidth / 2, pageHeight / 2, { align: 'center' });
+        pdf.text(noEmoji(bookTitle), pageWidth / 2, pageHeight / 2, { align: 'center' });
         if (authorName) {
           pdf.setFontSize(18);
-          pdf.text(authorName, pageWidth / 2, pageHeight / 2 + 20, { align: 'center' });
+          pdf.text(noEmoji(authorName), pageWidth / 2, pageHeight / 2 + 20, { align: 'center' });
         }
       }
 
