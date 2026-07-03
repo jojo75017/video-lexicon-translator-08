@@ -915,6 +915,17 @@ ${sheet.servingSuggestion}`;
       const margin = 15;
       const contentWidth = pageWidth - 2 * margin;
 
+      // Les polices jsPDF standard ne savent pas afficher les emojis (rendu en
+      // caractères parasites type "Ø<Ÿ"). On les retire de tout le texte.
+      const noEmoji = (s: string): string =>
+        (s || '')
+          .replace(
+            /[\u{1F000}-\u{1FAFF}\u{1F1E6}-\u{1F1FF}\u{2190}-\u{21FF}\u{2300}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FE0F}\u{200D}]/gu,
+            ''
+          )
+          .replace(/\s{2,}/g, ' ')
+          .trim();
+
       // Cover page
       if (coverImageUrl) {
         try {
