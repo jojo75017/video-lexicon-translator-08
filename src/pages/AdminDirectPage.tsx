@@ -12,6 +12,36 @@ const AdminDirectPage = () => {
   const [status, setStatus] = useState<"checking" | "idle" | "sending" | "sent" | "authenticating" | "error">("checking");
   const [message, setMessage] = useState("Vérification de la session...");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const loginWithPassword = async () => {
+    if (!email || !email.includes("@")) {
+      setStatus("error");
+      setMessage("Veuillez entrer une adresse email valide.");
+      return;
+    }
+    if (!password) {
+      setStatus("error");
+      setMessage("Veuillez entrer votre mot de passe.");
+      return;
+    }
+    setStatus("authenticating");
+    setMessage("Connexion en cours...");
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password,
+    });
+    if (error) {
+      setStatus("error");
+      setMessage(`Erreur: ${error.message || "Identifiants invalides"}`);
+      return;
+    }
+    const success = await checkAdminAndRedirect();
+    if (!success) {
+      setStatus("error");
+      setMessage("Accès refusé - Vous n'êtes pas administrateur.");
+    }
+  };
 
   const checkAdminAndRedirect = useCallback(async () => {
     try {
