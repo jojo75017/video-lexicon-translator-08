@@ -12,6 +12,36 @@ const AdminDirectPage = () => {
   const [status, setStatus] = useState<"checking" | "idle" | "sending" | "sent" | "authenticating" | "error">("checking");
   const [message, setMessage] = useState("Vérification de la session...");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const loginWithPassword = async () => {
+    if (!email || !email.includes("@")) {
+      setStatus("error");
+      setMessage("Veuillez entrer une adresse email valide.");
+      return;
+    }
+    if (!password) {
+      setStatus("error");
+      setMessage("Veuillez entrer votre mot de passe.");
+      return;
+    }
+    setStatus("authenticating");
+    setMessage("Connexion en cours...");
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password,
+    });
+    if (error) {
+      setStatus("error");
+      setMessage(`Erreur: ${error.message || "Identifiants invalides"}`);
+      return;
+    }
+    const success = await checkAdminAndRedirect();
+    if (!success) {
+      setStatus("error");
+      setMessage("Accès refusé - Vous n'êtes pas administrateur.");
+    }
+  };
 
   const checkAdminAndRedirect = useCallback(async () => {
     try {
@@ -124,11 +154,20 @@ const AdminDirectPage = () => {
                 placeholder="votre@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && sendMagicLink()}
               />
-              <Button onClick={sendMagicLink} className="w-full" size="lg">
-                <Send className="w-4 h-4 mr-2" />
-                Envoyer le lien de connexion
+              <Input
+                type="password"
+                placeholder="Mot de passe"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && loginWithPassword()}
+              />
+              <Button onClick={loginWithPassword} className="w-full" size="lg">
+                <Shield className="w-4 h-4 mr-2" />
+                Se connecter
+              </Button>
+              <Button variant="link" size="sm" className="text-xs" onClick={sendMagicLink}>
+                Recevoir plutôt un lien par email
               </Button>
             </div>
           )}
