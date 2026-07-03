@@ -1,7 +1,22 @@
-import templateBusiness from '@/assets/template-business.jpg';
-import templateGuide from '@/assets/template-guide.jpg';
-import templateFiction from '@/assets/template-fiction.jpg';
-import templateMemoir from '@/assets/template-memoir.jpg';
+import templateAquariophilie from '@/assets/templates/aquariophilie.jpg';
+import templateBusiness from '@/assets/templates/business.jpg';
+import templateTravel from '@/assets/templates/travel.jpg';
+import templateEnfants from '@/assets/templates/enfants.jpg';
+import templateRoman from '@/assets/templates/roman.jpg';
+import templateDevperso from '@/assets/templates/devperso.jpg';
+import templateCuisine from '@/assets/templates/cuisine.jpg';
+import templateScifi from '@/assets/templates/scifi.jpg';
+import templateSante from '@/assets/templates/sante.jpg';
+import templateFinance from '@/assets/templates/finance.jpg';
+import templateParentalite from '@/assets/templates/parentalite.jpg';
+import templateMarketing from '@/assets/templates/marketing.jpg';
+import templateFitness from '@/assets/templates/fitness.jpg';
+import templateRomance from '@/assets/templates/romance.jpg';
+import templateThriller from '@/assets/templates/thriller.jpg';
+import templateFantasy from '@/assets/templates/fantasy.jpg';
+import templatePhotographie from '@/assets/templates/photographie.jpg';
+import templateJardinage from '@/assets/templates/jardinage.jpg';
+import templateSpiritualite from '@/assets/templates/spiritualite.jpg';
 
 export interface EbookTemplate {
   id: string;
@@ -33,7 +48,7 @@ export const ebookTemplates: Record<string, EbookTemplate> = {
       { title: "Plantes et décoration", subChapters: ["Plantes aquatiques", "Hardscape", "Éclairage adapté"] },
       { title: "Problèmes et solutions", subChapters: ["Maladies courantes", "Algues", "Dépannage technique"] }
     ],
-    image: templateGuide,
+    image: templateAquariophilie,
     description: "Guide complet pour aquariophiles débutants et confirmés",
     borderColor: "border-l-cyan-500",
     icon: "🐠"
@@ -69,7 +84,7 @@ export const ebookTemplates: Record<string, EbookTemplate> = {
       { title: "Sécurité et santé", subChapters: ["Précautions sanitaires", "Sécurité personnelle", "Gestion des urgences"] },
       { title: "Optimiser son expérience", subChapters: ["Immersion culturelle", "Photography de voyage", "Carnet de voyage"] }
     ],
-    image: templateMemoir,
+    image: templateTravel,
     description: "Conseils et astuces pour voyageurs indépendants",
     borderColor: "border-l-emerald-500",
     icon: "✈️"
@@ -87,7 +102,7 @@ export const ebookTemplates: Record<string, EbookTemplate> = {
       { title: "L'épreuve finale", subChapters: ["Le courage du héros", "L'entraide", "La victoire du cœur"] },
       { title: "Le retour à la maison", subChapters: ["La joie du retour", "Les souvenirs précieux", "Et après..."] }
     ],
-    image: templateFiction,
+    image: templateEnfants,
     description: "Histoires enchantées pour les petits et grands enfants",
     borderColor: "border-l-yellow-400",
     icon: "🧸"
@@ -105,7 +120,7 @@ export const ebookTemplates: Record<string, EbookTemplate> = {
       { title: "Climax et confrontations", subChapters: ["Moment de vérité", "Choix décisifs", "Conséquences"] },
       { title: "Résolution et nouveaux horizons", subChapters: ["Dénouement", "Transformation des personnages", "Ouverture"] }
     ],
-    image: templateFiction,
+    image: templateRoman,
     description: "Structure narrative pour roman contemporain",
     borderColor: "border-l-rose-500",
     icon: "📚"
@@ -123,7 +138,7 @@ export const ebookTemplates: Record<string, EbookTemplate> = {
       { title: "Intelligence émotionnelle", subChapters: ["Comprendre ses émotions", "Empathie", "Communication assertive"] },
       { title: "Passage à l'action", subChapters: ["Surmonter la procrastination", "Sortir de sa zone de confort", "Célébrer les victoires"] }
     ],
-    image: templateGuide,
+    image: templateDevperso,
     description: "Transformez votre vie grâce au développement personnel",
     borderColor: "border-l-purple-500",
     icon: "🌟"
@@ -141,7 +156,7 @@ export const ebookTemplates: Record<string, EbookTemplate> = {
       { title: "Menus et occasions", subChapters: ["Entrées raffinées", "Plats signature", "Desserts spectaculaires"] },
       { title: "Organisation professionnelle", subChapters: ["Mise en place", "Gestion du temps", "Équipement pro"] }
     ],
-    image: templateBusiness,
+    image: templateCuisine,
     description: "Maîtrisez l'art culinaire comme un chef étoilé",
     borderColor: "border-l-amber-500",
     icon: "👨‍🍳"
@@ -159,7 +174,7 @@ export const ebookTemplates: Record<string, EbookTemplate> = {
       { title: "Conflits et alliances", subChapters: ["Tensions intergalactiques", "Choix moraux difficiles", "Batailles spatiales"] },
       { title: "Révélations finales", subChapters: ["Vérité cachée", "Sacrifice héroïque", "Nouvel équilibre galactique"] }
     ],
-    image: templateFiction,
+    image: templateScifi,
     description: "Aventure spatiale dans l'univers de demain",
     borderColor: "border-l-indigo-500",
     icon: "🚀"
@@ -177,7 +192,7 @@ export const ebookTemplates: Record<string, EbookTemplate> = {
       { title: "Gestion du stress", subChapters: ["Techniques de relaxation", "Méditation", "Équilibre vie pro/perso"] },
       { title: "Prévention et vitalité", subChapters: ["Check-ups réguliers", "Renforcement immunitaire", "Longévité active"] }
     ],
-    image: templateGuide,
+    image: templateSante,
     description: "Guide complet pour une santé optimale",
     borderColor: "border-l-green-500",
     icon: "💚"
@@ -195,7 +210,7 @@ export const ebookTemplates: Record<string, EbookTemplate> = {
       { title: "Cryptomonnaies et finance décentralisée", subChapters: ["Bitcoin et Ethereum", "DeFi", "Sécurité crypto"] },
       { title: "Stratégies long terme", subChapters: ["Retraite anticipée", "Revenus passifs", "Optimisation fiscale"] }
     ],
-    image: templateBusiness,
+    image: templateFinance,
     description: "Devenez autonome financièrement grâce aux investissements",
     borderColor: "border-l-yellow-500",
     icon: "💰"
@@ -213,7 +228,7 @@ export const ebookTemplates: Record<string, EbookTemplate> = {
       { title: "Vie quotidienne", subChapters: ["Sommeil", "Alimentation", "Autonomie"] },
       { title: "Défis et solutions", subChapters: ["Crises et colères", "Fratrie", "Écrans et digital"] }
     ],
-    image: templateGuide,
+    image: templateParentalite,
     description: "Accompagnez votre enfant avec bienveillance",
     borderColor: "border-l-pink-500",
     icon: "👶"
@@ -231,7 +246,7 @@ export const ebookTemplates: Record<string, EbookTemplate> = {
       { title: "Publicité en ligne", subChapters: ["Google Ads", "Facebook Ads", "Retargeting"] },
       { title: "Conversion et growth hacking", subChapters: ["CRO et A/B testing", "Email marketing", "Automation"] }
     ],
-    image: templateBusiness,
+    image: templateMarketing,
     description: "Développez votre business grâce au digital",
     borderColor: "border-l-red-500",
     icon: "📱"
@@ -249,7 +264,7 @@ export const ebookTemplates: Record<string, EbookTemplate> = {
       { title: "Techniques avancées", subChapters: ["Progressive overload", "Périodisation", "Récupération active"] },
       { title: "Mindset et progression", subChapters: ["Motivation durable", "Suivi des progrès", "Éviter les blessures"] }
     ],
-    image: templateGuide,
+    image: templateFitness,
     description: "Sculptez le corps de vos rêves",
     borderColor: "border-l-orange-500",
     icon: "💪"
@@ -267,7 +282,7 @@ export const ebookTemplates: Record<string, EbookTemplate> = {
       { title: "Révélations et vérités", subChapters: ["Confessions", "Vulnérabilité", "Choix du cœur"] },
       { title: "Happy ending", subChapters: ["Réunion émotionnelle", "Déclarations", "Avenir ensemble"] }
     ],
-    image: templateFiction,
+    image: templateRomance,
     description: "Histoire d'amour moderne et passionnée",
     borderColor: "border-l-fuchsia-500",
     icon: "💕"
@@ -285,7 +300,7 @@ export const ebookTemplates: Record<string, EbookTemplate> = {
       { title: "La vérité émerge", subChapters: ["Révélation choc", "Course contre la montre", "Confrontation finale"] },
       { title: "Épilogue troublant", subChapters: ["Arrestation", "Motivations révélées", "Fin ambiguë"] }
     ],
-    image: templateFiction,
+    image: templateThriller,
     description: "Suspense et frissons garantis",
     borderColor: "border-l-slate-500",
     icon: "🔍"
@@ -303,7 +318,7 @@ export const ebookTemplates: Record<string, EbookTemplate> = {
       { title: "La bataille finale", subChapters: ["Forces du mal", "Sacrifice héroïque", "Pouvoir ultime"] },
       { title: "Nouveau monde", subChapters: ["Victoire coûteuse", "Reconstruction", "Héritage légendaire"] }
     ],
-    image: templateFiction,
+    image: templateFantasy,
     description: "Aventure magique dans un monde fantastique",
     borderColor: "border-l-violet-500",
     icon: "🗡️"
@@ -321,7 +336,7 @@ export const ebookTemplates: Record<string, EbookTemplate> = {
       { title: "Genres photographiques", subChapters: ["Portrait", "Paysage", "Street photography"] },
       { title: "Post-traitement", subChapters: ["Lightroom essentials", "Retouche avancée", "Workflow professionnel"] }
     ],
-    image: templateGuide,
+    image: templatePhotographie,
     description: "Devenez un photographe accompli",
     borderColor: "border-l-sky-500",
     icon: "📷"
@@ -339,7 +354,7 @@ export const ebookTemplates: Record<string, EbookTemplate> = {
       { title: "Biodiversité et auxiliaires", subChapters: ["Attirer les pollinisateurs", "Lutte biologique", "Haies nourricières"] },
       { title: "Récoltes et autonomie", subChapters: ["Calendrier des récoltes", "Conservation", "Graines et reproductions"] }
     ],
-    image: templateGuide,
+    image: templateJardinage,
     description: "Créez un jardin abondant et écologique",
     borderColor: "border-l-lime-500",
     icon: "🌱"
@@ -357,7 +372,7 @@ export const ebookTemplates: Record<string, EbookTemplate> = {
       { title: "Développement intuitif", subChapters: ["Écoute intérieure", "Synchronicités", "Connexion spirituelle"] },
       { title: "Intégration quotidienne", subChapters: ["Rituels matinaux", "Gratitude", "Vivre en conscience"] }
     ],
-    image: templateGuide,
+    image: templateSpiritualite,
     description: "Trouvez la paix intérieure et l'éveil",
     borderColor: "border-l-purple-400",
     icon: "🧘"

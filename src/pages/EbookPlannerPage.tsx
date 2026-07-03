@@ -2704,7 +2704,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 </TabsTrigger>
                 <TabsTrigger value="generator">
                   <Sparkles className="w-4 h-4 mr-2" />
-                  Générateur IA
+                  Images par chapitre
                 </TabsTrigger>
                 <TabsTrigger value="library">
                   <ImageIcon className="w-4 h-4 mr-2" />

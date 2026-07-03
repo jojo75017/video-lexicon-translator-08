@@ -1,41 +1,53 @@
-# Plan — Connexion débloquée + Hub V3 plus lisible
+## Contexte
 
-Deux problèmes distincts à régler.
+Deux besoins :
+1. **Templates Voyage/Cuisine « introuvables »** dans l'onglet Modèles.
+2. **Une image par chapitre** pour illustrer les ebooks.
 
-## 1. Connexion impossible (page `/auth` admin — mot de passe refusé)
+## Constat après vérification
 
-**Diagnostic** : les logs confirment des refus « Invalid login credentials » sur `boubetgeorges@gmail.com`, suivis d'une demande de réinitialisation. Le mot de passe enregistré ne correspond plus. Je ne peux pas lire ni forcer un mot de passe côté serveur (zone protégée), mais le code contient déjà une **connexion par lien magique** (`signInWithOtp`) — elle est juste enfouie et peu visible.
+**1. Templates** — Voyage et Cuisine sont bien présents (« Guide de Voyage Ultime », « L'Art de la Cuisine Gastronomique »), mais **invisibles à l'œil** : les 19 modèles partagent seulement **4 images génériques** (guide/business/fiction/memoir). Le modèle Cuisine affiche l'image « Business Strategy », le modèle Voyage un cadre manuscrit → impossible de les reconnaître.
 
-**Ce que je vais faire :**
-- Mettre en **évidence le bouton « Recevoir un lien de connexion par email »** sur `/auth` : c'est la voie la plus fiable, aucun mot de passe à retenir.
-- Après clic sur le lien reçu, la page `/auth` détecte la session et vérifie automatiquement le rôle admin, puis redirige vers le tableau de bord (logique déjà en place).
-- Clarifier les 3 chemins sur `/auth` : lien magique (recommandé), mot de passe, mot de passe oublié.
-- Vérifier que le `redirectTo` du lien pointe bien vers l'URL utilisée (préview vs publié) pour éviter un lien mort.
+**2. Image par chapitre** — La fonctionnalité **existe déjà** : onglet Habiller → Images → « Générateur d'images » → « Générer toutes les images de chapitres » (1 image par chapitre, insertion dans le contenu, sauvegarde en bibliothèque). Elle fonctionne avec l'IA intégrée si aucune clé OpenAI n'est fournie. Elle est simplement **peu visible/mal expliquée**.
 
-Résultat : vous vous reconnectez immédiatement via le lien reçu par email, sans dépendre du mot de passe.
+## Plan
 
-> Option complémentaire (si vous préférez garder le mot de passe) : je peux aussi ajouter/soigner l'écran « Définir un nouveau mot de passe » après clic sur l'email de réinitialisation. À me confirmer.
+### Partie A — Vignettes de templates dédiées (le vrai correctif visuel)
 
-## 2. Hub V3 — « trop de modules en vrac, pas de fil conducteur, navigation confuse »
+1. Générer une image photoréaliste par catégorie dans `src/assets/templates/` (priorité Voyage + Cuisine, puis les 17 autres), fidèle à chaque thème :
 
-Le Hub (`/hub-v3`) a déjà un onglet **Parcours** (parcours guidé) et un onglet **Outils** (tous les modules), mais l'entrée n'est pas assez guidée et les outils apparaissent en vrac.
+```text
+voyage → valise/passeport/carte    cuisine → plats dressés/ingrédients
+aquariophilie → aquarium planté     business → bureau moderne
+enfants → univers illustré doux     roman → ambiance littéraire
+devperso → lever de soleil          scifi → cosmos futuriste
+sante → bien-être/yoga              finance → graphiques/investissement
+parentalite → famille               marketing → écrans/croissance
+fitness → sport                     romance → ambiance chaleureuse
+thriller → atmosphère sombre        fantasy → paysage épique
+photographie → appareil photo       jardinage → potager
+spiritualite → méditation/lumière
+```
 
-**Ce que je vais faire :**
+2. Dans `src/data/ebookTemplates.ts` : importer chaque nouvelle image et remplacer le champ `image` de chaque template par sa vignette dédiée.
+3. Vérifier le rendu de l'onglet Modèles (chaque carte distincte et reconnaissable).
 
-1. **Fil conducteur par défaut** : ouvrir systématiquement le Hub sur l'onglet **Parcours** (idée → écriture → couverture → publication → vente), pour que chacun sache par où commencer.
+### Partie B — Rendre « 1 image par chapitre » évident
 
-2. **Onglet « Outils » réorganisé clairement par étapes/piliers** : au lieu d'une grille en vrac, regrouper les modules sous des sections titrées et numérotées (1. Écrire · 2. Visuels · 3. Publier · 4. Monétiser · 5. Marketing), avec une courte phrase d'intro par section. Garder la recherche et les filtres existants.
-
-3. **Repères de navigation** : 
-   - Bandeau d'étapes cliquable en haut du Parcours indiquant clairement l'étape en cours.
-   - Bouton retour toujours visible et libellé explicite.
-   - Réduire le nombre d'onglets visibles au premier coup d'œil / hiérarchiser (Parcours et Outils en avant, Offres/Roadmap/Guides plus discrets).
-
-4. **Moins de bruit visuel** : titres de section plus lisibles, espacement, et badges d'accès (Inclus 197€ / Pack) homogènes pour qu'on comprenne d'un coup d'œil ce qui est débloqué.
+1. Vérifier que « Générer toutes les images de chapitres » produit bien 1 image/chapitre et l'insère (fonction déjà en place, à contrôler en conditions réelles).
+2. Améliorer la **découvrabilité** : texte d'intro clair dans le générateur (« 1 image générée automatiquement par chapitre, insérée dans le texte »), et rendre l'entrée de menu plus visible depuis le plan / l'onglet Habiller.
+3. Confirmer le fonctionnement **sans clé OpenAI** (fallback IA intégrée) pour que tous les abonnés puissent l'utiliser.
 
 ## Détails techniques
-- `src/pages/AuthPage.tsx` : promouvoir visuellement le bloc `handlePasswordlessLogin`, hiérarchiser les CTA, vérifier `emailRedirectTo`.
-- `src/pages/V3HubPage.tsx` : `activeTab` par défaut = `parcours` ; refonte du rendu de l'onglet `outils` (sections par pilier via `PILLAR_ORDER` / `V3_PILLAR_META`) ; en-têtes de section ; hiérarchie des `HUB_TABS`.
-- Aucun changement de base de données ni de logique de paiement/accès (badges d'accès inchangés, seulement présentés plus clairement).
 
-Ces deux chantiers sont indépendants — je peux livrer la connexion en premier si vous voulez la débloquer tout de suite.
+- Images via l'outil de génération d'images, `.jpg`, importées en ES6 (pas d'externalisation), respect de la charte (photoréalisme strict, ambiance KDP).
+- Partie A ne touche que les imports + champ `image` de `ebookTemplates.ts` ; `EbookTemplates.tsx` reste inchangé.
+- Partie B est surtout de la vérification + ajustements d'UI/texte ; aucune refonte de la logique de génération.
+
+## Hors-scope
+
+- Pas de changement aux titres, chapitres, ni au menu Genre (déjà corrects).
+- Option rapide possible : ne remplacer que les vignettes Voyage et Cuisine plutôt que les 19 — dites-le moi si vous préférez.
+</content>
+<summary>A) Créer des vignettes photoréalistes dédiées pour chaque template (priorité Voyage & Cuisine) et les câbler dans ebookTemplates.ts. B) Vérifier et rendre visible la génération existante « 1 image par chapitre » (déjà fonctionnelle, y compris sans clé OpenAI).</summary>
+</invoke>
