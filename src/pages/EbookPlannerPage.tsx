@@ -1505,6 +1505,32 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               <div className="absolute -right-20 -bottom-20 w-60 h-60 rounded-full bg-white/5" />
             </div>
 
+            {/* Bloc Assistant IA - EBOOKBOT */}
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent('open-ebookbot'))}
+              className="w-full flex items-center justify-between gap-3 rounded-xl border-2 border-orange-200 bg-gradient-to-r from-orange-50 to-white hover:border-orange-400 hover:shadow-lg px-4 py-3.5 transition-all text-left group"
+            >
+              <span className="flex items-center gap-3">
+                <span className="h-10 w-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 text-white flex items-center justify-center shadow-md relative">
+                  <span className="text-lg">🤖</span>
+                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white animate-pulse" />
+                </span>
+                <span>
+                  <span className="block text-sm font-bold text-foreground">
+                    💬 Besoin d'aide ? Parle à <span className="text-orange-600">EBOOKBOT</span>
+                  </span>
+                  <span className="block text-xs text-muted-foreground">
+                    Copilote KDP : niches, mots-clés, structure, marketing, utilisation de l'outil — réponses instantanées.
+                  </span>
+                </span>
+              </span>
+              <span className="text-xs font-bold text-orange-600 group-hover:text-orange-700 transition-colors flex items-center gap-1">
+                Ouvrir le chat
+                <span className="group-hover:translate-x-1 transition-transform">→</span>
+              </span>
+            </button>
+
             {/* Bloc 1bis - Moteur de mots-clés Amazon KDP (aimant) */}
             <KdpKeywordWidget defaultSeed={ebookTitle} onSubmit={(seed) => navigate(`/kdp-keywords${seed ? `?title=${encodeURIComponent(seed)}` : ''}`)} />
 
