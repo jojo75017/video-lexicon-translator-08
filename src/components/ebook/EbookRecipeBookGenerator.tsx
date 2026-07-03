@@ -975,21 +975,21 @@ ${sheet.servingSuggestion}`;
         pdf.rect(margin, yPos, contentWidth, 12, 'F');
         pdf.setTextColor(139, 69, 19);
         pdf.setFontSize(14);
-        pdf.text(`${sheet.countryFlag} ${sheet.country}`, margin + 5, yPos + 8);
+        pdf.text(noEmoji(`${sheet.country}`), margin + 5, yPos + 8);
         pdf.setFontSize(9);
-        pdf.text(`${sheet.portions}`, margin + contentWidth - 20, yPos + 8);
+        pdf.text(noEmoji(`${sheet.portions}`), margin + contentWidth - 20, yPos + 8);
         yPos += 16;
         
         // Dish name and time
         pdf.setTextColor(0, 0, 0);
         pdf.setFontSize(18);
-        const titleLines = pdf.splitTextToSize(sheet.dishName, contentWidth);
+        const titleLines = pdf.splitTextToSize(noEmoji(sheet.dishName), contentWidth);
         pdf.text(titleLines, margin, yPos);
         yPos += titleLines.length * 7 + 2;
         
         pdf.setFontSize(9);
         pdf.setTextColor(100, 100, 100);
-        pdf.text(`${sheet.difficulty} | ${sheet.cookingTime}`, margin, yPos);
+        pdf.text(noEmoji(`${sheet.difficulty} | ${sheet.cookingTime}`), margin, yPos);
         yPos += 8;
         
         // Left column - Image
