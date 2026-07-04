@@ -1173,7 +1173,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                               )}
 
                               {/* Actions de l'étape active */}
-                              {(isActive || (isDone && result)) && editingId !== step.moduleId && (
+                              {(canAct || (isDone && result)) && editingId !== step.moduleId && (
                                 <div className="mt-2 flex flex-wrap items-center gap-2">
                                   {!isDone && (
                                     <button onClick={() => generate(step)} disabled={isLoading || importing}
