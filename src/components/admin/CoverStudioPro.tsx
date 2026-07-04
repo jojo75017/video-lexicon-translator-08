@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Sparkles, Download, Crown, Wand2, Eye } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Loader2, Sparkles, Download, Crown, Wand2, Eye, BookOpen, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
-const GOLD = '#c9a84c';
+const GOLD = '#a8842c';
 
 const NICHES = [
   { value: 'auto', label: '✨ Auto (IA décide)', prompt: '' },
@@ -25,7 +26,21 @@ interface PremiumCover {
   url: string;
 }
 
+interface BookRow {
+  id: string;
+  title: string;
+  author_name: string | null;
+  book_summary: string | null;
+  target_audience: string | null;
+  tone: string | null;
+  kdp_categories: string | null;
+}
+
 const CoverStudioPro: React.FC = () => {
+  const [books, setBooks] = useState<BookRow[]>([]);
+  const [selectedBookId, setSelectedBookId] = useState<string>('');
+  const [loadingBooks, setLoadingBooks] = useState(true);
+
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
   const [author, setAuthor] = useState('');
@@ -36,6 +51,44 @@ const CoverStudioPro: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [covers, setCovers] = useState<PremiumCover[]>([]);
   const [artDirection, setArtDirection] = useState('');
+
+  const applyBook = (b: BookRow) => {
+    setTitle(b.title || '');
+    setAuthor((b.author_name || '').trim());
+    setGenre((b.kdp_categories?.split(/[,;•\n]/)[0] || b.target_audience || '').trim());
+    setCustomPrompt((b.book_summary || '').trim());
+  };
+
+  // Charge automatiquement les livres de l'utilisateur (données pré-remplies).
+  useEffect(() => {
+    (async () => {
+      setLoadingBooks(true);
+      try {
+        const { data, error } = await supabase
+          .from('ebook_projects')
+          .select('id, title, author_name, book_summary, target_audience, tone, kdp_categories')
+          .order('updated_at', { ascending: false })
+          .limit(30);
+        if (error) throw error;
+        const rows = (data || []).filter((b) => b.title?.trim()) as BookRow[];
+        setBooks(rows);
+        if (rows.length > 0) {
+          setSelectedBookId(rows[0].id);
+          applyBook(rows[0]);
+        }
+      } catch {
+        // silencieux : l'utilisateur peut toujours saisir manuellement
+      } finally {
+        setLoadingBooks(false);
+      }
+    })();
+  }, []);
+
+  const onSelectBook = (id: string) => {
+    setSelectedBookId(id);
+    const b = books.find((x) => x.id === id);
+    if (b) applyBook(b);
+  };
 
   const generate = async () => {
     if (!title.trim()) {
@@ -90,55 +143,92 @@ const CoverStudioPro: React.FC = () => {
   };
 
   return (
-    <div className="space-y-5 text-white">
-      <div
-        className="rounded-2xl p-5 border"
-        style={{ background: '#161616', borderColor: `${GOLD}33` }}
-      >
+    <div className="space-y-5">
+      <div className="rounded-2xl p-5 border border-border bg-muted/40">
         <div className="flex items-center gap-2 mb-1">
           <Crown className="h-5 w-5" style={{ color: GOLD }} />
           <h3 className="text-base font-semibold" style={{ color: GOLD }}>
             Cover Studio Pro — Couvertures Premium IA
           </h3>
         </div>
-        <p className="text-xs text-white/55">
+        <p className="text-xs text-muted-foreground">
           Direction artistique automatique + génération photoréaliste haut de gamme (OpenAI gpt-image-2).
           Plusieurs variations d'un coup, qualité « maison d'édition ».
         </p>
       </div>
 
+      {/* Sélecteur de livre — données pré-remplies automatiquement */}
+      <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+        <Label className="text-xs font-medium flex items-center gap-1.5">
+          <BookOpen className="h-3.5 w-3.5" style={{ color: GOLD }} />
+          Livre à habiller — les informations sont récupérées automatiquement
+        </Label>
+        {loadingBooks ? (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Loader2 className="h-3.5 w-3.5 animate-spin" /> Chargement de tes livres…
+          </div>
+        ) : books.length > 0 ? (
+          <>
+            <Select value={selectedBookId} onValueChange={onSelectBook}>
+              <SelectTrigger>
+                <SelectValue placeholder="Choisis un livre" />
+              </SelectTrigger>
+              <SelectContent>
+                {books.map((b) => (
+                  <SelectItem key={b.id} value={b.id}>{b.title}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-[11px] text-emerald-600 flex items-center gap-1">
+              <CheckCircle2 className="h-3 w-3" /> Titre, genre et résumé chargés. Vérifie juste le nom de l'auteur.
+            </p>
+          </>
+        ) : (
+          <p className="text-xs text-muted-foreground">
+            Aucun livre trouvé — saisis les informations manuellement ci-dessous.
+          </p>
+        )}
+      </div>
+
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label className="text-white/80 text-xs">Titre du livre *</Label>
-          <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Le secret des marées" className="bg-[#1c1c1c] border-white/10 text-white" />
+          <Label className="text-xs">Titre du livre *</Label>
+          <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Le secret des marées" />
         </div>
         <div className="space-y-1.5">
-          <Label className="text-white/80 text-xs">Sous-titre</Label>
-          <Input value={subtitle} onChange={(e) => setSubtitle(e.target.value)} placeholder="(optionnel)" className="bg-[#1c1c1c] border-white/10 text-white" />
+          <Label className="text-xs">Sous-titre</Label>
+          <Input value={subtitle} onChange={(e) => setSubtitle(e.target.value)} placeholder="(optionnel)" />
         </div>
         <div className="space-y-1.5">
-          <Label className="text-white/80 text-xs">Auteur</Label>
-          <Input value={author} onChange={(e) => setAuthor(e.target.value)} placeholder="(optionnel)" className="bg-[#1c1c1c] border-white/10 text-white" />
+          <Label className="text-xs flex items-center gap-1">
+            Nom de l'auteur
+            <span className="text-[10px]" style={{ color: GOLD }}>← à compléter</span>
+          </Label>
+          <Input value={author} onChange={(e) => setAuthor(e.target.value)} placeholder="Ton nom d'auteur" />
         </div>
         <div className="space-y-1.5">
-          <Label className="text-white/80 text-xs">Genre</Label>
-          <Input value={genre} onChange={(e) => setGenre(e.target.value)} placeholder="Thriller, Business, Romance…" className="bg-[#1c1c1c] border-white/10 text-white" />
+          <Label className="text-xs">Genre</Label>
+          <Input value={genre} onChange={(e) => setGenre(e.target.value)} placeholder="Thriller, Business, Romance…" />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label className="text-white/80 text-xs">Direction artistique (preset bestseller)</Label>
+        <Label className="text-xs">Direction artistique (preset bestseller)</Label>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {NICHES.map((n) => (
             <button
               key={n.value}
               onClick={() => setNiche(n.value)}
-              className="text-left rounded-xl px-3 py-2 text-xs border transition-all"
-              style={{
-                background: niche === n.value ? `${GOLD}1f` : '#1c1c1c',
-                borderColor: niche === n.value ? GOLD : 'rgba(255,255,255,0.08)',
-                color: niche === n.value ? GOLD : 'rgba(255,255,255,0.7)',
-              }}
+              className={`text-left rounded-xl px-3 py-2 text-xs border transition-all ${
+                niche === n.value
+                  ? 'border-transparent'
+                  : 'border-border bg-muted/40 text-muted-foreground hover:bg-muted'
+              }`}
+              style={
+                niche === n.value
+                  ? { background: `${GOLD}1f`, borderColor: GOLD, color: GOLD }
+                  : undefined
+              }
             >
               {n.label}
             </button>
@@ -147,32 +237,33 @@ const CoverStudioPro: React.FC = () => {
       </div>
 
       <div className="space-y-1.5">
-        <Label className="text-white/80 text-xs flex items-center gap-1">
-          <Wand2 className="h-3.5 w-3.5" /> Précisions créatives (optionnel)
+        <Label className="text-xs flex items-center gap-1">
+          <Wand2 className="h-3.5 w-3.5" /> Résumé / précisions créatives
         </Label>
         <Textarea
           value={customPrompt}
           onChange={(e) => setCustomPrompt(e.target.value)}
           placeholder="Ex: ambiance bord de mer breton, brume, phare au loin…"
-          rows={2}
-          className="bg-[#1c1c1c] border-white/10 text-white resize-none"
+          rows={3}
+          className="resize-none"
         />
+        <p className="text-[11px] text-muted-foreground">
+          Pré-rempli avec le résumé de ton livre — l'IA s'en sert pour la direction artistique.
+        </p>
       </div>
 
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="space-y-1.5">
-          <Label className="text-white/80 text-xs">Nombre de variations</Label>
+          <Label className="text-xs">Nombre de variations</Label>
           <div className="flex gap-2">
             {[1, 2, 3, 4].map((c) => (
               <button
                 key={c}
                 onClick={() => setCount(c)}
-                className="w-9 h-9 rounded-lg text-sm font-semibold border transition-all"
-                style={{
-                  background: count === c ? `${GOLD}1f` : '#1c1c1c',
-                  borderColor: count === c ? GOLD : 'rgba(255,255,255,0.08)',
-                  color: count === c ? GOLD : 'rgba(255,255,255,0.7)',
-                }}
+                className={`w-9 h-9 rounded-lg text-sm font-semibold border transition-all ${
+                  count === c ? 'border-transparent' : 'border-border bg-muted/40 text-muted-foreground hover:bg-muted'
+                }`}
+                style={count === c ? { background: `${GOLD}1f`, borderColor: GOLD, color: GOLD } : undefined}
               >
                 {c}
               </button>
@@ -184,7 +275,7 @@ const CoverStudioPro: React.FC = () => {
           onClick={generate}
           disabled={loading}
           className="ml-auto"
-          style={{ background: GOLD, color: '#161616' }}
+          style={{ background: GOLD, color: '#fff' }}
         >
           {loading ? (
             <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Génération…</>
@@ -195,7 +286,7 @@ const CoverStudioPro: React.FC = () => {
       </div>
 
       {artDirection && (
-        <div className="rounded-xl p-3 border text-xs text-white/60 italic" style={{ background: '#161616', borderColor: `${GOLD}22` }}>
+        <div className="rounded-xl p-3 border border-border bg-muted/40 text-xs text-muted-foreground italic">
           <span className="not-italic font-semibold" style={{ color: GOLD }}>Direction artistique : </span>
           {artDirection}
         </div>
@@ -204,13 +295,12 @@ const CoverStudioPro: React.FC = () => {
       {covers.length > 0 && (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {covers.map((c, idx) => (
-            <div key={idx} className="rounded-xl overflow-hidden border" style={{ background: '#161616', borderColor: `${GOLD}22` }}>
+            <div key={idx} className="rounded-xl overflow-hidden border border-border bg-card">
               <img src={c.url} alt={`Couverture premium ${idx + 1}`} className="w-full aspect-[2/3] object-cover" loading="lazy" />
               <div className="p-3 space-y-3">
                 <div className="flex items-center gap-3">
-                  {/* Test miniature 200x300 (lisibilité Amazon) */}
                   <img src={c.url} alt="Miniature Amazon" className="w-[60px] h-[90px] object-cover rounded shadow" />
-                  <div className="text-[10px] text-white/45 flex items-center gap-1">
+                  <div className="text-[10px] text-muted-foreground flex items-center gap-1">
                     <Eye className="h-3 w-3" /> Test miniature Amazon — le titre reste-t-il lisible ?
                   </div>
                 </div>
@@ -218,7 +308,7 @@ const CoverStudioPro: React.FC = () => {
                   size="sm"
                   variant="outline"
                   onClick={() => download(c.url, idx)}
-                  className="w-full border-white/15 text-white hover:bg-white/10"
+                  className="w-full"
                 >
                   <Download className="h-4 w-4 mr-2" /> Télécharger
                 </Button>
