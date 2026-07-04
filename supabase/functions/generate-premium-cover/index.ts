@@ -220,28 +220,28 @@ serve(async (req) => {
       ? await buildArtDirection(LOVABLE_API_KEY, body)
       : (body.registrePrompt || body.customPrompt || '');
 
-    const covers: string[] = [];
-    const errors: string[] = [];
+    // Génération EN PARALLÈLE des variations pour rester sous la limite de temps.
+    const results = await Promise.all(
+      Array.from({ length: count }, async (_v, i) => {
+        const prompt = buildImagePrompt(body, artDirection)
+          + `\n\nVARIATION ${i + 1}/${count}: propose une interprétation visuelle UNIQUE.`;
 
-    for (let i = 0; i < count; i++) {
-      const prompt = buildImagePrompt(body, artDirection)
-        + `\n\nVARIATION ${i + 1}/${count}: propose une interprétation visuelle UNIQUE.`;
+        let imageUrl: string | null = null;
+        if (OPENAI_API_KEY) {
+          imageUrl = await generateOpenAI(OPENAI_API_KEY, prompt);
+        }
+        if (!imageUrl && LOVABLE_API_KEY) {
+          imageUrl = await generateGemini(LOVABLE_API_KEY, prompt);
+        }
+        if (!imageUrl) return null;
+        return await uploadCover(SUPABASE_URL, SERVICE_KEY, imageUrl);
+      }),
+    );
 
-      let imageUrl: string | null = null;
-      if (OPENAI_API_KEY) {
-        imageUrl = await generateOpenAI(OPENAI_API_KEY, prompt);
-      }
-      if (!imageUrl && LOVABLE_API_KEY) {
-        imageUrl = await generateGemini(LOVABLE_API_KEY, prompt);
-      }
-
-      if (imageUrl) {
-        const publicUrl = await uploadCover(SUPABASE_URL, SERVICE_KEY, imageUrl);
-        covers.push(publicUrl);
-      } else {
-        errors.push(`Variation ${i + 1} échouée`);
-      }
-    }
+    const covers: string[] = results.filter((u): u is string => !!u);
+    const errors: string[] = results
+      .map((u, i) => (u ? null : `Variation ${i + 1} échouée`))
+      .filter((e): e is string => !!e);
 
     if (covers.length === 0) {
       return new Response(JSON.stringify({ error: 'Aucune couverture générée. Réessayez dans un instant.' }), {
