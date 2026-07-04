@@ -1121,7 +1121,10 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                       const n = pos != null ? pos + 1 : 0;
                       const isDone = done.has(step.moduleId);
                       const isActive = accessible && pos === activeAccIndex;
-                      const isLocked = accessible && pos != null && pos > activeAccIndex;
+                      // Toute étape accessible (non premium verrouillée) est actionnable :
+                      // on ne bloque plus les étapes suivantes, l'utilisateur génère librement.
+                      const isLocked = false;
+                      const canAct = accessible && !isTeaser;
                       const isLoading = loadingId === step.moduleId;
                       const result = results[step.moduleId];
 
