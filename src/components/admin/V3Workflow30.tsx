@@ -1222,6 +1222,13 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                                       <Check className="h-3.5 w-3.5" /> Valider & étape suivante
                                     </button>
                                   )}
+                                  {!result && !isDone && isActive && (
+                                    <button onClick={() => validate(step.moduleId)}
+                                      className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold border transition-colors hover:bg-[#eafaf2]"
+                                      style={{ borderColor: '#eadfc9', color: '#8a7860' }}>
+                                      <ArrowRight className="h-3.5 w-3.5" /> Passer cette étape
+                                    </button>
+                                  )}
                                   {ready && mod && (
                                     <button onClick={() => onOpenModule(mod)}
                                       className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-[11px] font-semibold border transition-colors hover:bg-[#FFF3DF]"
