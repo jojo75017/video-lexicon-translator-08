@@ -111,7 +111,9 @@ async function generateOpenAI(
       payload.quality = 'hd';
       payload.size = '1024x1792';
     } else {
-      payload.quality = 'high';
+      // "medium" est nettement plus rapide que "high" (évite les timeouts
+      // de la fonction quand on génère plusieurs variations).
+      payload.quality = 'medium';
       payload.output_format = 'png';
     }
     const resp = await fetch('https://api.openai.com/v1/images/generations', {
