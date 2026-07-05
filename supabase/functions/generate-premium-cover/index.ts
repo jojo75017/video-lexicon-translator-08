@@ -263,7 +263,7 @@ serve(async (req) => {
         let imageUrl: string | null = null;
         // BYOK OpenRouter prioritaire (économise les crédits) si fourni.
         if (openrouterKey) {
-          imageUrl = await generateOpenRouter(openrouterKey, prompt);
+          imageUrl = await generateOpenRouter(openrouterKey, prompt, body.openrouterModel);
         }
         if (!imageUrl && OPENAI_API_KEY) {
           imageUrl = await generateOpenAI(OPENAI_API_KEY, prompt);
