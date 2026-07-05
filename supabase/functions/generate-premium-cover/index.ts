@@ -17,6 +17,7 @@ interface CoverRequest {
   customPrompt?: string;
   count?: number;            // nombre de variations 1..4
   showAuthor?: boolean;
+  openrouterKey?: string;    // BYOK OpenRouter (sk-or-...) — prioritaire si fourni
 }
 
 async function buildArtDirection(
