@@ -166,6 +166,34 @@ async function generateGemini(lovableKey: string, prompt: string): Promise<strin
   return data.choices?.[0]?.message?.images?.[0]?.image_url?.url || null;
 }
 
+async function generateOpenRouter(openrouterKey: string, prompt: string): Promise<string | null> {
+  try {
+    const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openrouterKey}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://ebookstudio.fr',
+        'X-Title': 'EbookStudio',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash-image-preview',
+        messages: [{ role: 'user', content: prompt }],
+        modalities: ['image', 'text'],
+      }),
+    });
+    if (!resp.ok) {
+      console.error('OpenRouter image error:', resp.status, (await resp.text()).slice(0, 200));
+      return null;
+    }
+    const data = await resp.json();
+    return data.choices?.[0]?.message?.images?.[0]?.image_url?.url || null;
+  } catch (e) {
+    console.error('OpenRouter image exception:', (e as Error).message);
+    return null;
+  }
+}
+
 async function uploadCover(
   supabaseUrl: string,
   serviceKey: string,
