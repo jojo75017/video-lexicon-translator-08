@@ -17,6 +17,7 @@ interface CoverRequest {
   customPrompt?: string;
   count?: number;            // nombre de variations 1..4
   showAuthor?: boolean;
+  openrouterKey?: string;    // BYOK OpenRouter (sk-or-...) — prioritaire si fourni
 }
 
 async function buildArtDirection(
@@ -165,6 +166,34 @@ async function generateGemini(lovableKey: string, prompt: string): Promise<strin
   return data.choices?.[0]?.message?.images?.[0]?.image_url?.url || null;
 }
 
+async function generateOpenRouter(openrouterKey: string, prompt: string): Promise<string | null> {
+  try {
+    const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openrouterKey}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://ebookstudio.fr',
+        'X-Title': 'EbookStudio',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash-image-preview',
+        messages: [{ role: 'user', content: prompt }],
+        modalities: ['image', 'text'],
+      }),
+    });
+    if (!resp.ok) {
+      console.error('OpenRouter image error:', resp.status, (await resp.text()).slice(0, 200));
+      return null;
+    }
+    const data = await resp.json();
+    return data.choices?.[0]?.message?.images?.[0]?.image_url?.url || null;
+  } catch (e) {
+    console.error('OpenRouter image exception:', (e as Error).message);
+    return null;
+  }
+}
+
 async function uploadCover(
   supabaseUrl: string,
   serviceKey: string,
@@ -209,7 +238,11 @@ serve(async (req) => {
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
     const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-    if (!OPENAI_API_KEY && !LOVABLE_API_KEY) {
+    const openrouterKey = typeof body.openrouterKey === 'string' && body.openrouterKey.trim().startsWith('sk-or-')
+      ? body.openrouterKey.trim()
+      : null;
+
+    if (!OPENAI_API_KEY && !LOVABLE_API_KEY && !openrouterKey) {
       return new Response(JSON.stringify({ error: 'Aucune clé API image configurée.' }), {
         status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -227,7 +260,11 @@ serve(async (req) => {
           + `\n\nVARIATION ${i + 1}/${count}: propose une interprétation visuelle UNIQUE.`;
 
         let imageUrl: string | null = null;
-        if (OPENAI_API_KEY) {
+        // BYOK OpenRouter prioritaire (économise les crédits) si fourni.
+        if (openrouterKey) {
+          imageUrl = await generateOpenRouter(openrouterKey, prompt);
+        }
+        if (!imageUrl && OPENAI_API_KEY) {
           imageUrl = await generateOpenAI(OPENAI_API_KEY, prompt);
         }
         if (!imageUrl && LOVABLE_API_KEY) {

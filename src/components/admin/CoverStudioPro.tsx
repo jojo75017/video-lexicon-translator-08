@@ -4,9 +4,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Sparkles, Download, Crown, Wand2, Eye, BookOpen, CheckCircle2 } from 'lucide-react';
+import { Loader2, Sparkles, Download, Crown, Wand2, Eye, BookOpen, CheckCircle2, KeyRound } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { getOpenRouterImageKey, setOpenRouterImageKey } from '@/lib/ebookExportOptions';
 
 const GOLD = '#a8842c';
 
@@ -51,6 +52,8 @@ const CoverStudioPro: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [covers, setCovers] = useState<PremiumCover[]>([]);
   const [artDirection, setArtDirection] = useState('');
+  const [orKey, setOrKey] = useState(getOpenRouterImageKey());
+  const [useOpenRouter, setUseOpenRouter] = useState(!!getOpenRouterImageKey());
 
   const applyBook = (b: BookRow) => {
     setTitle(b.title || '');
@@ -111,6 +114,7 @@ const CoverStudioPro: React.FC = () => {
           customPrompt: customPrompt.trim(),
           count,
           showAuthor: !!author.trim(),
+          openrouterKey: useOpenRouter ? orKey.trim() : undefined,
         },
       });
       if (error) throw error;
@@ -130,15 +134,31 @@ const CoverStudioPro: React.FC = () => {
 
   const download = async (url: string, idx: number) => {
     try {
-      const res = await fetch(url);
-      const blob = await res.blob();
+      let href = url;
+      let isBlob = false;
+      if (url.startsWith('http')) {
+        // Ajoute un cache-buster pour éviter les soucis de cache CORS.
+        const res = await fetch(url, { mode: 'cors', cache: 'no-store' });
+        if (!res.ok) throw new Error('fetch failed');
+        const blob = await res.blob();
+        href = URL.createObjectURL(blob);
+        isBlob = true;
+      } else if (url.startsWith('data:')) {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        href = URL.createObjectURL(blob);
+        isBlob = true;
+      }
       const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
+      link.href = href;
       link.download = `couverture-premium-${idx + 1}.png`;
+      document.body.appendChild(link);
       link.click();
-      URL.revokeObjectURL(link.href);
+      document.body.removeChild(link);
+      if (isBlob) setTimeout(() => URL.revokeObjectURL(href), 4000);
     } catch {
       window.open(url, '_blank');
+      toast.info("Ouverture dans un nouvel onglet — clic droit puis « Enregistrer l'image ».");
     }
   };
 
@@ -187,6 +207,48 @@ const CoverStudioPro: React.FC = () => {
           <p className="text-xs text-muted-foreground">
             Aucun livre trouvé — saisis les informations manuellement ci-dessous.
           </p>
+        )}
+      </div>
+
+      {/* OpenRouter BYOK — génération d'images plus économique */}
+      <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <Label className="text-xs font-medium flex items-center gap-1.5">
+            <KeyRound className="h-3.5 w-3.5" style={{ color: GOLD }} />
+            Générer via OpenRouter (recommandé — plus économique)
+          </Label>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={useOpenRouter}
+            onClick={() => setUseOpenRouter((v) => !v)}
+            className={`relative h-6 w-11 rounded-full transition-colors ${useOpenRouter ? '' : 'bg-muted'}`}
+            style={useOpenRouter ? { background: GOLD } : undefined}
+          >
+            <span
+              className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                useOpenRouter ? 'translate-x-[22px]' : 'translate-x-0.5'
+              }`}
+            />
+          </button>
+        </div>
+        {useOpenRouter && (
+          <>
+            <Input
+              type="password"
+              value={orKey}
+              onChange={(e) => {
+                setOrKey(e.target.value);
+                setOpenRouterImageKey(e.target.value);
+              }}
+              placeholder="sk-or-..."
+              autoComplete="off"
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Colle ta clé OpenRouter (commence par <code>sk-or-</code>). Elle est enregistrée sur cet appareil
+              et utilisée en priorité pour générer tes couvertures. Sans clé valide, la génération standard prend le relais.
+            </p>
+          </>
         )}
       </div>
 
