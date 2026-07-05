@@ -4,9 +4,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Sparkles, Download, Crown, Wand2, Eye, BookOpen, CheckCircle2 } from 'lucide-react';
+import { Loader2, Sparkles, Download, Crown, Wand2, Eye, BookOpen, CheckCircle2, KeyRound } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { getOpenRouterImageKey, setOpenRouterImageKey } from '@/lib/ebookExportOptions';
 
 const GOLD = '#a8842c';
 
