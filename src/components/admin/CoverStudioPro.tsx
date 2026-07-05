@@ -210,6 +210,48 @@ const CoverStudioPro: React.FC = () => {
         )}
       </div>
 
+      {/* OpenRouter BYOK — génération d'images plus économique */}
+      <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <Label className="text-xs font-medium flex items-center gap-1.5">
+            <KeyRound className="h-3.5 w-3.5" style={{ color: GOLD }} />
+            Générer via OpenRouter (recommandé — plus économique)
+          </Label>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={useOpenRouter}
+            onClick={() => setUseOpenRouter((v) => !v)}
+            className={`relative h-6 w-11 rounded-full transition-colors ${useOpenRouter ? '' : 'bg-muted'}`}
+            style={useOpenRouter ? { background: GOLD } : undefined}
+          >
+            <span
+              className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                useOpenRouter ? 'translate-x-[22px]' : 'translate-x-0.5'
+              }`}
+            />
+          </button>
+        </div>
+        {useOpenRouter && (
+          <>
+            <Input
+              type="password"
+              value={orKey}
+              onChange={(e) => {
+                setOrKey(e.target.value);
+                setOpenRouterImageKey(e.target.value);
+              }}
+              placeholder="sk-or-..."
+              autoComplete="off"
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Colle ta clé OpenRouter (commence par <code>sk-or-</code>). Elle est enregistrée sur cet appareil
+              et utilisée en priorité pour générer tes couvertures. Sans clé valide, la génération standard prend le relais.
+            </p>
+          </>
+        )}
+      </div>
+
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <Label className="text-xs">Titre du livre *</Label>
