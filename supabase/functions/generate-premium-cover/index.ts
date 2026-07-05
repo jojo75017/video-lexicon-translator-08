@@ -18,6 +18,7 @@ interface CoverRequest {
   count?: number;            // nombre de variations 1..4
   showAuthor?: boolean;
   openrouterKey?: string;    // BYOK OpenRouter (sk-or-...) — prioritaire si fourni
+  openrouterModel?: string;  // modèle d'image OpenRouter choisi
 }
 
 async function buildArtDirection(
