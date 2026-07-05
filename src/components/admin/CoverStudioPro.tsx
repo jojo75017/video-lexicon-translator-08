@@ -163,6 +163,7 @@ const CoverStudioPro: React.FC = () => {
           count,
           showAuthor: !!author.trim(),
           openrouterKey: useOpenRouter ? orKey.trim() : undefined,
+          openrouterModel: useOpenRouter ? orModel : undefined,
         },
       });
       if (error) throw error;
