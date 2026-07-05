@@ -52,6 +52,8 @@ const CoverStudioPro: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [covers, setCovers] = useState<PremiumCover[]>([]);
   const [artDirection, setArtDirection] = useState('');
+  const [orKey, setOrKey] = useState(getOpenRouterImageKey());
+  const [useOpenRouter, setUseOpenRouter] = useState(!!getOpenRouterImageKey());
 
   const applyBook = (b: BookRow) => {
     setTitle(b.title || '');
