@@ -62,6 +62,46 @@ const CoverStudioPro: React.FC = () => {
   const [artDirection, setArtDirection] = useState('');
   const [orKey, setOrKey] = useState(getOpenRouterImageKey());
   const [useOpenRouter, setUseOpenRouter] = useState(!!getOpenRouterImageKey());
+  const [orModel, setOrModel] = useState<string>(
+    () => localStorage.getItem(OR_MODEL_LS) || OR_IMAGE_MODELS[0].id,
+  );
+  const [orStatus, setOrStatus] = useState<'idle' | 'testing' | 'valid' | 'invalid'>('idle');
+  const [orCredits, setOrCredits] = useState<string>('');
+
+  const testOpenRouterKey = async () => {
+    const key = orKey.trim();
+    if (!key.startsWith('sk-or-')) {
+      setOrStatus('invalid');
+      toast.error('La clé doit commencer par sk-or-');
+      return;
+    }
+    setOrStatus('testing');
+    setOrCredits('');
+    try {
+      const res = await fetch('https://openrouter.ai/api/v1/key', {
+        headers: { Authorization: `Bearer ${key}` },
+      });
+      if (!res.ok) {
+        setOrStatus('invalid');
+        toast.error('Clé OpenRouter invalide ou refusée.');
+        return;
+      }
+      const json = await res.json();
+      const limit = json?.data?.limit;
+      const usage = json?.data?.usage;
+      if (typeof limit === 'number' && typeof usage === 'number') {
+        setOrCredits(`$${Math.max(0, limit - usage).toFixed(2)} restants`);
+      } else if (json?.data?.is_free_tier) {
+        setOrCredits('Compte gratuit');
+      }
+      setOrStatus('valid');
+      toast.success('Clé OpenRouter valide ✔');
+    } catch {
+      setOrStatus('invalid');
+      toast.error('Impossible de vérifier la clé (réseau).');
+    }
+  };
+
 
   const applyBook = (b: BookRow) => {
     setTitle(b.title || '');
