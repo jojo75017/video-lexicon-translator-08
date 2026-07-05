@@ -23,6 +23,14 @@ const NICHES = [
   { value: 'horror', label: '👻 Horror / Mystère', prompt: 'Horror cover — unsettling symbolic object, deep blacks, blood red or sickly green accent, decaying texture, gothic atmosphere, Stephen King paperback feel.' },
 ];
 
+// Modèles d'images disponibles via OpenRouter (BYOK).
+const OR_IMAGE_MODELS = [
+  { id: 'google/gemini-2.5-flash-image-preview', label: '⭐ Gemini 2.5 Flash Image (recommandé)' },
+  { id: 'google/gemini-2.0-flash-exp:free', label: '🆓 Gemini 2.0 Flash (gratuit)' },
+  { id: 'openai/gpt-4o', label: '🎨 OpenAI GPT-4o' },
+];
+const OR_MODEL_LS = 'openrouter_image_model';
+
 interface PremiumCover {
   url: string;
 }
