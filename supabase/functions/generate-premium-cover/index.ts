@@ -167,7 +167,7 @@ async function generateGemini(lovableKey: string, prompt: string): Promise<strin
   return data.choices?.[0]?.message?.images?.[0]?.image_url?.url || null;
 }
 
-async function generateOpenRouter(openrouterKey: string, prompt: string): Promise<string | null> {
+async function generateOpenRouter(openrouterKey: string, prompt: string, model?: string): Promise<string | null> {
   try {
     const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
