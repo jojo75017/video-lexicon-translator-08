@@ -283,19 +283,70 @@ const CoverStudioPro: React.FC = () => {
         </div>
         {useOpenRouter && (
           <>
-            <Input
-              type="password"
-              value={orKey}
-              onChange={(e) => {
-                setOrKey(e.target.value);
-                setOpenRouterImageKey(e.target.value);
-              }}
-              placeholder="sk-or-..."
-              autoComplete="off"
-            />
+            <div className="space-y-1.5">
+              <Label className="text-[11px] text-muted-foreground">Modèle d'image</Label>
+              <Select
+                value={orModel}
+                onValueChange={(v) => {
+                  setOrModel(v);
+                  localStorage.setItem(OR_MODEL_LS, v);
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Choisis un modèle" />
+                </SelectTrigger>
+                <SelectContent>
+                  {OR_IMAGE_MODELS.map((m) => (
+                    <SelectItem key={m.id} value={m.id}>{m.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Input
+                type="password"
+                value={orKey}
+                onChange={(e) => {
+                  setOrKey(e.target.value);
+                  setOpenRouterImageKey(e.target.value);
+                  setOrStatus('idle');
+                }}
+                placeholder="sk-or-..."
+                autoComplete="off"
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={testOpenRouterKey}
+                disabled={orStatus === 'testing'}
+                className="shrink-0"
+              >
+                {orStatus === 'testing' ? (
+                  <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Test…</>
+                ) : (
+                  <>Tester</>
+                )}
+              </Button>
+            </div>
+
+            {orStatus === 'valid' && (
+              <p className="text-[11px] text-emerald-600 flex items-center gap-1.5 font-medium">
+                <span className="inline-block h-2.5 w-2.5 rounded-full bg-emerald-500 shadow-[0_0_6px] shadow-emerald-400" />
+                Clé valide {orCredits && `· ${orCredits}`}
+              </p>
+            )}
+            {orStatus === 'invalid' && (
+              <p className="text-[11px] text-red-600 flex items-center gap-1.5 font-medium">
+                <span className="inline-block h-2.5 w-2.5 rounded-full bg-red-500" />
+                Clé invalide ou refusée
+              </p>
+            )}
             <p className="text-[11px] text-muted-foreground">
-              Colle ta clé OpenRouter (commence par <code>sk-or-</code>). Elle est enregistrée sur cet appareil
-              et utilisée en priorité pour générer tes couvertures. Sans clé valide, la génération standard prend le relais.
+              Colle ta clé OpenRouter (commence par <code>sk-or-</code>) puis clique sur <b>Tester</b> pour
+              voir le voyant vert. Elle est enregistrée sur cet appareil et utilisée en priorité pour tes couvertures.
             </p>
           </>
         )}
