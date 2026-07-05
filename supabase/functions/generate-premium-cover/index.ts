@@ -238,7 +238,11 @@ serve(async (req) => {
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
     const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-    if (!OPENAI_API_KEY && !LOVABLE_API_KEY) {
+    const openrouterKey = typeof body.openrouterKey === 'string' && body.openrouterKey.trim().startsWith('sk-or-')
+      ? body.openrouterKey.trim()
+      : null;
+
+    if (!OPENAI_API_KEY && !LOVABLE_API_KEY && !openrouterKey) {
       return new Response(JSON.stringify({ error: 'Aucune clé API image configurée.' }), {
         status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -256,7 +260,11 @@ serve(async (req) => {
           + `\n\nVARIATION ${i + 1}/${count}: propose une interprétation visuelle UNIQUE.`;
 
         let imageUrl: string | null = null;
-        if (OPENAI_API_KEY) {
+        // BYOK OpenRouter prioritaire (économise les crédits) si fourni.
+        if (openrouterKey) {
+          imageUrl = await generateOpenRouter(openrouterKey, prompt);
+        }
+        if (!imageUrl && OPENAI_API_KEY) {
           imageUrl = await generateOpenAI(OPENAI_API_KEY, prompt);
         }
         if (!imageUrl && LOVABLE_API_KEY) {
