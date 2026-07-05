@@ -134,15 +134,31 @@ const CoverStudioPro: React.FC = () => {
 
   const download = async (url: string, idx: number) => {
     try {
-      const res = await fetch(url);
-      const blob = await res.blob();
+      let href = url;
+      let isBlob = false;
+      if (url.startsWith('http')) {
+        // Ajoute un cache-buster pour éviter les soucis de cache CORS.
+        const res = await fetch(url, { mode: 'cors', cache: 'no-store' });
+        if (!res.ok) throw new Error('fetch failed');
+        const blob = await res.blob();
+        href = URL.createObjectURL(blob);
+        isBlob = true;
+      } else if (url.startsWith('data:')) {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        href = URL.createObjectURL(blob);
+        isBlob = true;
+      }
       const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
+      link.href = href;
       link.download = `couverture-premium-${idx + 1}.png`;
+      document.body.appendChild(link);
       link.click();
-      URL.revokeObjectURL(link.href);
+      document.body.removeChild(link);
+      if (isBlob) setTimeout(() => URL.revokeObjectURL(href), 4000);
     } catch {
       window.open(url, '_blank');
+      toast.info("Ouverture dans un nouvel onglet — clic droit puis « Enregistrer l'image ».");
     }
   };
 
