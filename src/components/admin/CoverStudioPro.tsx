@@ -114,6 +114,7 @@ const CoverStudioPro: React.FC = () => {
           customPrompt: customPrompt.trim(),
           count,
           showAuthor: !!author.trim(),
+          openrouterKey: useOpenRouter ? orKey.trim() : undefined,
         },
       });
       if (error) throw error;
