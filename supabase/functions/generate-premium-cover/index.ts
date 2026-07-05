@@ -18,6 +18,7 @@ interface CoverRequest {
   count?: number;            // nombre de variations 1..4
   showAuthor?: boolean;
   openrouterKey?: string;    // BYOK OpenRouter (sk-or-...) — prioritaire si fourni
+  openrouterModel?: string;  // modèle d'image OpenRouter choisi
 }
 
 async function buildArtDirection(
@@ -166,7 +167,7 @@ async function generateGemini(lovableKey: string, prompt: string): Promise<strin
   return data.choices?.[0]?.message?.images?.[0]?.image_url?.url || null;
 }
 
-async function generateOpenRouter(openrouterKey: string, prompt: string): Promise<string | null> {
+async function generateOpenRouter(openrouterKey: string, prompt: string, model?: string): Promise<string | null> {
   try {
     const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -177,7 +178,7 @@ async function generateOpenRouter(openrouterKey: string, prompt: string): Promis
         'X-Title': 'EbookStudio',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash-image-preview',
+        model: model || 'google/gemini-2.5-flash-image-preview',
         messages: [{ role: 'user', content: prompt }],
         modalities: ['image', 'text'],
       }),
@@ -262,7 +263,7 @@ serve(async (req) => {
         let imageUrl: string | null = null;
         // BYOK OpenRouter prioritaire (économise les crédits) si fourni.
         if (openrouterKey) {
-          imageUrl = await generateOpenRouter(openrouterKey, prompt);
+          imageUrl = await generateOpenRouter(openrouterKey, prompt, body.openrouterModel);
         }
         if (!imageUrl && OPENAI_API_KEY) {
           imageUrl = await generateOpenAI(OPENAI_API_KEY, prompt);

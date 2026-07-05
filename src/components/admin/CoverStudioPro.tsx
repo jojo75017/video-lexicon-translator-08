@@ -23,6 +23,14 @@ const NICHES = [
   { value: 'horror', label: '👻 Horror / Mystère', prompt: 'Horror cover — unsettling symbolic object, deep blacks, blood red or sickly green accent, decaying texture, gothic atmosphere, Stephen King paperback feel.' },
 ];
 
+// Modèles d'images disponibles via OpenRouter (BYOK).
+const OR_IMAGE_MODELS = [
+  { id: 'google/gemini-2.5-flash-image-preview', label: '⭐ Gemini 2.5 Flash Image (recommandé)' },
+  { id: 'google/gemini-2.0-flash-exp:free', label: '🆓 Gemini 2.0 Flash (gratuit)' },
+  { id: 'openai/gpt-4o', label: '🎨 OpenAI GPT-4o' },
+];
+const OR_MODEL_LS = 'openrouter_image_model';
+
 interface PremiumCover {
   url: string;
 }
@@ -54,6 +62,46 @@ const CoverStudioPro: React.FC = () => {
   const [artDirection, setArtDirection] = useState('');
   const [orKey, setOrKey] = useState(getOpenRouterImageKey());
   const [useOpenRouter, setUseOpenRouter] = useState(!!getOpenRouterImageKey());
+  const [orModel, setOrModel] = useState<string>(
+    () => localStorage.getItem(OR_MODEL_LS) || OR_IMAGE_MODELS[0].id,
+  );
+  const [orStatus, setOrStatus] = useState<'idle' | 'testing' | 'valid' | 'invalid'>('idle');
+  const [orCredits, setOrCredits] = useState<string>('');
+
+  const testOpenRouterKey = async () => {
+    const key = orKey.trim();
+    if (!key.startsWith('sk-or-')) {
+      setOrStatus('invalid');
+      toast.error('La clé doit commencer par sk-or-');
+      return;
+    }
+    setOrStatus('testing');
+    setOrCredits('');
+    try {
+      const res = await fetch('https://openrouter.ai/api/v1/key', {
+        headers: { Authorization: `Bearer ${key}` },
+      });
+      if (!res.ok) {
+        setOrStatus('invalid');
+        toast.error('Clé OpenRouter invalide ou refusée.');
+        return;
+      }
+      const json = await res.json();
+      const limit = json?.data?.limit;
+      const usage = json?.data?.usage;
+      if (typeof limit === 'number' && typeof usage === 'number') {
+        setOrCredits(`$${Math.max(0, limit - usage).toFixed(2)} restants`);
+      } else if (json?.data?.is_free_tier) {
+        setOrCredits('Compte gratuit');
+      }
+      setOrStatus('valid');
+      toast.success('Clé OpenRouter valide ✔');
+    } catch {
+      setOrStatus('invalid');
+      toast.error('Impossible de vérifier la clé (réseau).');
+    }
+  };
+
 
   const applyBook = (b: BookRow) => {
     setTitle(b.title || '');
@@ -115,6 +163,7 @@ const CoverStudioPro: React.FC = () => {
           count,
           showAuthor: !!author.trim(),
           openrouterKey: useOpenRouter ? orKey.trim() : undefined,
+          openrouterModel: useOpenRouter ? orModel : undefined,
         },
       });
       if (error) throw error;
@@ -234,19 +283,70 @@ const CoverStudioPro: React.FC = () => {
         </div>
         {useOpenRouter && (
           <>
-            <Input
-              type="password"
-              value={orKey}
-              onChange={(e) => {
-                setOrKey(e.target.value);
-                setOpenRouterImageKey(e.target.value);
-              }}
-              placeholder="sk-or-..."
-              autoComplete="off"
-            />
+            <div className="space-y-1.5">
+              <Label className="text-[11px] text-muted-foreground">Modèle d'image</Label>
+              <Select
+                value={orModel}
+                onValueChange={(v) => {
+                  setOrModel(v);
+                  localStorage.setItem(OR_MODEL_LS, v);
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Choisis un modèle" />
+                </SelectTrigger>
+                <SelectContent>
+                  {OR_IMAGE_MODELS.map((m) => (
+                    <SelectItem key={m.id} value={m.id}>{m.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Input
+                type="password"
+                value={orKey}
+                onChange={(e) => {
+                  setOrKey(e.target.value);
+                  setOpenRouterImageKey(e.target.value);
+                  setOrStatus('idle');
+                }}
+                placeholder="sk-or-..."
+                autoComplete="off"
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={testOpenRouterKey}
+                disabled={orStatus === 'testing'}
+                className="shrink-0"
+              >
+                {orStatus === 'testing' ? (
+                  <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Test…</>
+                ) : (
+                  <>Tester</>
+                )}
+              </Button>
+            </div>
+
+            {orStatus === 'valid' && (
+              <p className="text-[11px] text-emerald-600 flex items-center gap-1.5 font-medium">
+                <span className="inline-block h-2.5 w-2.5 rounded-full bg-emerald-500 shadow-[0_0_6px] shadow-emerald-400" />
+                Clé valide {orCredits && `· ${orCredits}`}
+              </p>
+            )}
+            {orStatus === 'invalid' && (
+              <p className="text-[11px] text-red-600 flex items-center gap-1.5 font-medium">
+                <span className="inline-block h-2.5 w-2.5 rounded-full bg-red-500" />
+                Clé invalide ou refusée
+              </p>
+            )}
             <p className="text-[11px] text-muted-foreground">
-              Colle ta clé OpenRouter (commence par <code>sk-or-</code>). Elle est enregistrée sur cet appareil
-              et utilisée en priorité pour générer tes couvertures. Sans clé valide, la génération standard prend le relais.
+              Colle ta clé OpenRouter (commence par <code>sk-or-</code>) puis clique sur <b>Tester</b> pour
+              voir le voyant vert. Elle est enregistrée sur cet appareil et utilisée en priorité pour tes couvertures.
             </p>
           </>
         )}
