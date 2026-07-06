@@ -1430,14 +1430,39 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 <Lock className="h-3.5 w-3.5" /> Réservé au Pack Tout Complet 347€
               </span>
               <span className="text-[12px] font-semibold" style={{ color: '#3f6a55' }}>
-                5 phases « Aller plus loin » · 15 étapes marketing & ventes en plus
+                {PREMIUM_TOTAL} étapes exclusives en plus — un meilleur livre + tout le marketing
               </span>
             </div>
             <p className="text-[12px] leading-snug mb-3" style={{ color: '#4a6a59' }}>
-              Ton parcours 197€ te mène jusqu'à <strong>publier</strong> ton livre sur Amazon. Le Pack 347€ ajoute
-              tout ce qu'il faut pour le <strong>vendre et le faire grandir</strong> — sans que ces étapes viennent
-              alourdir ton parcours actuel :
+              Le Pack 347€ ne fait pas que « vendre » : il produit d'abord un <strong>livre de meilleure qualité</strong>
+              (édition structurelle, copy-editing, comité de lecture, label qualité et une <strong>couverture signature Pro</strong>),
+              puis il le lance et le fait grandir. Voici ce que tu débloques :
             </p>
+
+            {/* Bloc 1 — Qualité du LIVRE (étapes premium dans les phases de création) */}
+            <div className="text-[11px] font-bold uppercase tracking-wide mb-1.5" style={{ color: GREEN }}>
+              📖 Un livre plus abouti
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+              {PHASES.filter((p) => p.steps.some((s) => (s.tier ?? 'core') === 'premium')
+                && !p.steps.every((s) => (s.tier ?? 'core') === 'premium')).flatMap((p) =>
+                p.steps.filter((s) => (s.tier ?? 'core') === 'premium').map((s) => (
+                  <div key={s.moduleId} className="flex items-start gap-2 rounded-xl border px-3 py-2"
+                    style={{ borderColor: `${GREEN}26`, background: '#fff' }}>
+                    <span className="text-base leading-none mt-0.5">{p.emoji}</span>
+                    <div className="min-w-0">
+                      <div className="text-[12px] font-bold leading-tight" style={{ color: INK }}>{s.label}</div>
+                      <div className="text-[11px] leading-snug mt-0.5" style={{ color: '#8a7860' }}>{s.hint}</div>
+                    </div>
+                  </div>
+                )),
+              )}
+            </div>
+
+            {/* Bloc 2 — Lancement & ventes (phases 100% premium) */}
+            <div className="text-[11px] font-bold uppercase tracking-wide mb-1.5" style={{ color: GREEN }}>
+              🚀 Lancer & vendre
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
               {PHASES.filter((p) => p.steps.every((s) => (s.tier ?? 'core') === 'premium')).map((p) => (
                 <div key={p.key} className="flex items-start gap-2 rounded-xl border px-3 py-2"
