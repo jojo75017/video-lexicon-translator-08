@@ -1,56 +1,54 @@
-# Rendre le 347€ vraiment supérieur au 197€ (sur le LIVRE, pas juste le marketing)
+# Clôture des bêta-testeurs + email + script vidéo « Octobre »
 
-## Constat
-Dans `V3Workflow30.tsx`, les phases 1 à 11 (écriture, qualité, couverture, publication) sont **100 % identiques** entre les deux offres. Toutes les étapes `premium` du 347€ sont regroupées dans les phases marketing/scaling (12-16). Résultat : un acheteur 197€ a exactement le même *livre* qu'un acheteur 347€. Il ne perçoit aucune raison de payer 150€ de plus pour un meilleur livre.
-
-De plus, le 347€ n'a **pas** de couverture plus haut de gamme que le 197€.
+## Contexte (vérifié en base)
+- Les **bêta-testeurs = 7 abonnés** dont l'email correspond à un `beta_promo_codes.status = 'used'` (`subscribers` : `status='active'`, `plan_type='lifetime'`, `license_type='commercial'`).
+- L'accès est autorisé uniquement si `subscribers.status` vaut `active` ou `trialing` (voir `subscriber-auth`). Passer le statut à `expired` coupe donc proprement l'accès sans supprimer le compte.
+- Offre actuelle = **67€ à vie** (V2). La **V3 à 197€ / 347€ arrive en octobre** (ne pas mentionner 197€ comme prix actuel).
 
 ## Objectif
-Le 347€ doit produire un **meilleur livre** que le 197€ :
-1. des étapes de **qualité éditoriale premium** insérées dans les phases de création (visibles verrouillées pour le 197€, débloquées pour le 347€) ;
-2. une **couverture ultra-pro** exclusive au 347€.
-
-La qualité IA reste par palier (197€ = `core`, cap 3500 mots ; 347€ = `pro`, cap 6000 mots) — rien à changer côté moteur.
+Un **bouton admin** (page Codes Bêta) qui, en un clic :
+1. coupe l'accès de **tous** les bêta-testeurs ;
+2. leur envoie un **email** de clôture (remerciement + info : offre toujours à 67€ maintenant, V3 en octobre) ;
+Et en parallèle, préparer un **grand script écrit** pour ta vidéo « ce qui arrive en octobre ».
 
 ## Changements
 
-### 1. `src/components/admin/V3Workflow30.tsx` — étapes LIVRE premium intégrées
-Ajouter des étapes `tier: 'premium'` **à l'intérieur** des phases de création existantes (elles s'affichent alors comme aperçu verrouillé pour le 197€ grâce au filtre déjà en place) :
+### 1. Nouvelle edge function `revoke-beta-access`
+`supabase/functions/revoke-beta-access/index.ts` (service role, `verify_jwt=false` par défaut) :
+- Récupère les emails distincts depuis `beta_promo_codes` où `status='used'` (via `used_by_email`).
+- Pour chaque email trouvé dans `subscribers` : `UPDATE subscribers SET status='expired', updated_at=now()` (couper l'accès à **tous**, sans exclusion).
+- Envoie à chacun l'email de clôture via Resend (`from: EbookStudio <noreply@ebookstudio.fr>`) — sujet et contenu ci-dessous.
+- Journalise chaque envoi dans `email_send_log` (`template_name='beta-closure'`, `status` sent/error).
+- Renvoie `{ revoked, sent, errors, results }`.
+- Idempotent : ne traite que les statuts encore `active`/`trialing` pour éviter double envoi si recliqué.
 
-- **Phase 3 — Écrire le manuscrit** : ajouter
-  - `developmental-edit` — « Édition structurelle Pro » (structure, rythme, arcs) · `premium`
-  - `p25-tone-adapter` — « Affiner le ton sur mesure » · `premium`
-- **Phase 4 — Réviser & garantir la qualité** : ajouter
-  - `copy-editing-line` — « Copy-editing & ligne éditoriale » · `premium`
-  - `reading-committee` — « Comité de lecture IA » · `premium`
-- **Phase 5 — Originalité & conformité** : ajouter
-  - `p24-cliche-detector` — « Nettoyer clichés & répétitions » · `premium` (le déplacer ici depuis la phase 16)
-- **Phase 6 — Mise en page** : ajouter
-  - `quality-label` — « Label Qualité Maison d'Édition » · `premium`
+**Contenu de l'email de clôture** (HTML, charte teal #008296 / accent #FF9E2D) :
+- Remerciement chaleureux pour la participation bêta.
+- Annonce que la **phase bêta est terminée** et que l'accès gratuit prend fin.
+- Info clé : **EbookStudio est toujours disponible à 67€ à vie aujourd'hui** ; en **octobre**, la nouvelle version (Publication Assistée Pro, 197€ / 347€) sortira à un tarif plus élevé — c'est donc le bon moment pour rester à 67€.
+- CTA vers la page d'offre (67€).
+- Signé Georges.
 
-Ces étapes utilisent l'exécution IA générique (`stepLabel` + `stepHint`) — aucun module backend requis (fallback déjà géré par `getModuleById`).
+### 2. Bouton admin dans `src/pages/admin/AdminBetaCodesPage.tsx`
+- Ajouter une carte « Zone de clôture bêta » avec un bouton **« Couper l'accès + envoyer l'email de clôture »**.
+- Dialog de confirmation (action irréversible, X bêta-testeurs concernés).
+- À la confirmation : `supabase.functions.invoke('revoke-beta-access')`, toast avec `revoked` / `sent`, puis `fetchCodes()`.
+- État de chargement dédié (`revoking`).
 
-### 2. Couverture ultra-pro exclusive 347€ (Phase 7 — Couverture)
-Ajouter une étape `premium` dédiée :
-- `cover-studio-pro-v3` — « Couverture Signature Pro (IA gpt-image-2) » · `premium`
-  - direction artistique IA + variations, via l'edge `generate-premium-cover` (gpt-image-2 prioritaire, déjà en place).
+### 3. `supabase/config.toml`
+- Ajouter le bloc de la fonction `revoke-beta-access` si nécessaire (déploiement auto).
 
-Le 197€ garde `cover-studio-pro` (couverture standard) ; le 347€ ajoute par-dessus la couverture signature premium. La carte d'aperçu verrouillé du 197€ mettra ce module en avant comme argument fort.
-
-### 3. Cohérence des compteurs & messages
-- `buildFlat` / `CORE_TOTAL` / `FULL_TOTAL` se recalculent automatiquement — vérifier les nouveaux totaux (Core inchangé ~29, Full ~+8 étapes livre → ~53).
-- Mettre à jour les libellés « 29 vs 45 » dans `V3Workflow30.tsx` (intro, carte teaser) et dans `WritingEngineBadge.tsx` avec les nouveaux chiffres réels.
-- Reformuler la carte teaser 197€ pour insister sur la **qualité du livre** (édition structurelle, comité de lecture, label qualité, couverture signature), pas seulement le marketing.
-
-### 4. Filtre d'affichage — vérification
-Le filtre actuel masque une phase seulement si **toutes** ses étapes sont premium. Comme on insère des étapes premium dans des phases mixtes (core + premium), il faut vérifier que le rendu masque **chaque étape premium individuellement** en mode core (aperçu verrouillé), et pas la phase entière. Ajuster le rendu des étapes pour que, en mode `core`, les étapes premium apparaissent en version « verrouillée/floutée incitative » plutôt que d'être supprimées.
-
-### 5. Mémoire projet
-Mettre à jour `mem://features/workflow/v3-parcours-30-etapes` et `mem://business/pricing/v3-tier-value-split` : le 347€ se distingue désormais aussi sur la **qualité du livre** (édition Pro + couverture signature), pas uniquement marketing/vente.
+### 4. Grand script vidéo « Octobre »
+Nouveau fichier `SCRIPT_VIDEO_OCTOBRE_V3.md` à la racine (comme les autres scripts existants) :
+- Script long et structuré, prêt à lire face caméra : accroche, contexte (fin de la bêta, remerciements), ce qui arrive en octobre (V3 Publication Assistée Pro, paliers 197€ / 347€, principales nouveautés issues de `roadmapV3.ts`), pourquoi le prix actuel reste à 67€ aujourd'hui, appel à l'action / urgence douce.
+- Ton aligné sur la persona Georges Boubet (fondateur).
 
 ## Vérification
+- `revoke-beta-access` déployée ; test à blanc : confirmer qu'après clic, les 7 abonnés passent en `status='expired'` et que `email_send_log` contient les lignes `beta-closure`.
 - `npx tsgo --noEmit` sans erreur.
-- Contrôle visuel du Hub : en mode 197€, les nouvelles étapes livre premium apparaissent verrouillées (aperçu) ; en mode 347€, elles sont déverrouillées et exécutables.
+- Contrôle visuel du bouton + dialog dans l'admin.
 
 ## Hors périmètre
-Aucun changement de schéma, RLS, droits admin, ni du moteur d'écriture. `useV3Entitlement` reste la source de vérité des droits payés.
+- Pas de suppression de comptes (statut `expired` seulement, réversible).
+- Pas de changement de prix ni de tunnel V3.
+- Pas de refonte du système de codes bêta.
