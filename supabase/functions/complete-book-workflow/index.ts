@@ -357,6 +357,27 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
     ? `${systemPrompt}\n\n${activeLanguageDirective}`
     : systemPrompt;
 
+  // Providers non-Gemini (Claude / OpenAI / OpenRouter) : clé BYOK de l'abonné.
+  // En cas d'échec récupérable, on retombe sur le backend Lovable AI intégré.
+  if (userKey && activeProvider !== 'gemini') {
+    try {
+      switch (activeProvider) {
+        case 'openrouter':
+          return await callOpenRouter(finalSystemPrompt, userPrompt, maxTokens, userKey, activeOpenRouterModel);
+        case 'claude':
+          return await callClaudeDirect(finalSystemPrompt, userPrompt, maxTokens, userKey);
+        case 'openai':
+          return await callOpenAIDirect(finalSystemPrompt, userPrompt, maxTokens, userKey);
+      }
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      console.warn(`Provider ${activeProvider} failed, falling back to Lovable AI:`, msg);
+      // Erreurs terminales : on ne masque pas derrière le fallback.
+      if (/INVALID_API_KEY|CREDITS_EXHAUSTED/i.test(msg)) throw error;
+      return await callLovableAI(finalSystemPrompt, userPrompt, maxTokens);
+    }
+  }
+
   if (userKey) {
     try {
       return await callGeminiDirect(finalSystemPrompt, userPrompt, maxTokens, userKey);
@@ -383,6 +404,7 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
 
   return await callLovableAI(finalSystemPrompt, userPrompt, maxTokens);
 }
+
 
 // BOUCLE QUALITÉ : appelle l'IA, évalue le score, relance si < seuil
 async function callAIWithQualityLoop(
