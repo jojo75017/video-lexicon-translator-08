@@ -12,13 +12,14 @@ const INK = '#2A2118';
 const SERIF = "'Georgia', 'Times New Roman', serif";
 
 const V2_AGENTS = 15;
-const V3_AGENTS = 30;
+const V3_AGENTS = 22;
+const V3_PREMIUM_AGENTS = 30;
 const PREMIUM_PRICE = V3_FULL_PACK.price; // 497
 
 // Lignes du tableau comparatif (label, V2, V3, Premium).
 // false = absent, true = inclus, string = détail.
 const ROWS: { label: string; v2: string | false; v3: string | true; premium: string | true }[] = [
-  { label: 'Agents IA de rédaction', v2: `${V2_AGENTS} agents`, v3: `${V3_AGENTS} agents`, premium: `${V3_AGENTS} agents (qualité Pro)` },
+  { label: 'Agents IA de rédaction', v2: `${V2_AGENTS} agents`, v3: `${V3_AGENTS} agents`, premium: `${V3_PREMIUM_AGENTS} agents (qualité Pro)` },
   { label: 'Puissance IA', v2: '×1', v3: '×2 plus puissant', premium: '×4 plus puissant' },
   { label: 'Création de livres', v2: 'Manuelle + IA', v3: '8 sources d’import', premium: '8 sources d’import' },
   { label: 'Studio couverture KDP', v2: 'Basique', v3: 'Pro (dos + 4e + bleed)', premium: 'Pro + variations IA' },
@@ -158,9 +159,9 @@ export default function V2V3Compare() {
             <div className="text-xs uppercase tracking-widest mb-1 flex items-center justify-center gap-1" style={{ color: `${INK}70` }}>
               <Crown className="h-3 w-3" /> V3 Premium
             </div>
-            <div className="text-5xl font-black transition-transform duration-300 group-hover:scale-110" style={{ color: ROYAL_DEEP }}>{V3_AGENTS}</div>
+            <div className="text-5xl font-black transition-transform duration-300 group-hover:scale-110" style={{ color: ROYAL_DEEP }}>{V3_PREMIUM_AGENTS}</div>
             <div className="relative mt-1 text-sm font-semibold" style={{ color: ROYAL_DEEP }}>agents IA</div>
-            <div className="relative mt-1 text-[11px] font-medium" style={{ color: `${INK}80` }}>même nombre, qualité IA Pro</div>
+            <div className="relative mt-1 text-[11px] font-medium" style={{ color: `${INK}80` }}>qualité IA Pro</div>
             <div className="relative mt-2 inline-block rounded-full px-3 py-0.5 text-[11px] font-extrabold"
               style={{ background: `linear-gradient(90deg, ${ROYAL}, #9d76e8)`, color: '#fff' }}>
               ×4 plus puissant
