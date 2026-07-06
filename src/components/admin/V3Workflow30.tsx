@@ -1163,9 +1163,15 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
           </div>
         </div>
 
-        {/* Phases */}
+        {/* Phases.
+            En parcours 197€ (core), on MASQUE les phases 100% Pro pour que
+            l'acheteur ne les retrouve pas mélangées à son parcours : elles sont
+            résumées dans un unique encart « Aller plus loin » (voir plus bas). */}
         <div className="divide-y divide-[#f0e7d4]">
-          {PHASES.map((phase) => {
+          {PHASES.filter((phase) => {
+            const allPremium = phase.steps.every((s) => (s.tier ?? 'core') === 'premium');
+            return parcours === 'full' ? true : !allPremium;
+          }).map((phase) => {
             const isOpen = openPhase === phase.key;
             const phaseSteps = FLAT.filter((s) => s.phaseKey === phase.key);
             const phaseDone = phaseSteps.filter((s) => done.has(s.moduleId)).length;
@@ -1405,6 +1411,50 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             );
           })}
         </div>
+
+        {/* Encart récapitulatif Pro — visible UNIQUEMENT en parcours 197€.
+            Les phases Pro ne polluent plus la liste ; leur valeur est résumée ici. */}
+        {parcours === 'core' && (
+          <div className="mx-3 sm:mx-5 mb-4 mt-2 rounded-2xl border-2 p-4 sm:p-5"
+            style={{ borderColor: `${GREEN}40`, background: '#f6fdf9' }}>
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold text-white" style={{ background: GREEN }}>
+                <Lock className="h-3.5 w-3.5" /> Réservé au Pack Tout Complet 347€
+              </span>
+              <span className="text-[12px] font-semibold" style={{ color: '#3f6a55' }}>
+                5 phases « Aller plus loin » · 15 étapes marketing & ventes en plus
+              </span>
+            </div>
+            <p className="text-[12px] leading-snug mb-3" style={{ color: '#4a6a59' }}>
+              Ton parcours 197€ te mène jusqu'à <strong>publier</strong> ton livre sur Amazon. Le Pack 347€ ajoute
+              tout ce qu'il faut pour le <strong>vendre et le faire grandir</strong> — sans que ces étapes viennent
+              alourdir ton parcours actuel :
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+              {PHASES.filter((p) => p.steps.every((s) => (s.tier ?? 'core') === 'premium')).map((p) => (
+                <div key={p.key} className="flex items-start gap-2 rounded-xl border px-3 py-2"
+                  style={{ borderColor: `${GREEN}26`, background: '#fff' }}>
+                  <span className="text-base leading-none mt-0.5">{p.emoji}</span>
+                  <div className="min-w-0">
+                    <div className="text-[12px] font-bold leading-tight" style={{ color: INK }}>
+                      {p.title.replace(/^Phase \d+ — /, '').replace(/ \(Pack Pro · 347€\)$/, '')}
+                    </div>
+                    <div className="text-[11px] leading-snug mt-0.5" style={{ color: '#8a7860' }}>
+                      {p.steps.map((s) => s.label).join(' · ')}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {!hasFull && (
+              <button onClick={() => setCheckoutOpen(true)}
+                className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-[13px] font-bold text-white transition-transform hover:-translate-y-0.5"
+                style={{ background: `linear-gradient(90deg, ${GREEN}, #2fc488)` }}>
+                <Sparkles className="h-4 w-4" /> Débloquer les 5 phases Pro (Pack Tout Complet · 347€)
+              </button>
+            )}
+          </div>
+        )}
       </div>
       )}
 
