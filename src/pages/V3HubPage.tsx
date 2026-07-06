@@ -43,7 +43,7 @@ const SERIF = "'Instrument Serif', Georgia, 'Times New Roman', serif";
 const SANS = "'Inter', system-ui, sans-serif";
 
 // L'écriture/rédaction (STUDIO de création) vit dans « IA avancée » : c'est le 1er palier.
-const PILLAR_ORDER: V3Pillar[] = ['ia', 'publier', 'monetiser', 'marketing', 'edition', 'distribution', 'promotion'];
+const PILLAR_ORDER: V3Pillar[] = ['ia', 'publier', 'data', 'monetiser', 'marketing', 'edition', 'distribution', 'promotion'];
 
 // Phrase d'intro par pilier : donne un fil conducteur clair dans l'onglet Outils.
 const PILLAR_INTRO: Record<V3Pillar, string> = {
