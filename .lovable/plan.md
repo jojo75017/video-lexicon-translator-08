@@ -1,34 +1,44 @@
-## Problème constaté
+## Constats
 
-Dans le Hub (`/hub-v3` → onglet **Parcours**), c'est le composant `V3Workflow30.tsx` qui pilote les phases 1 à 7 et rédige le livre via l'edge function **`v3-autopilot-step`**.
+1. **Contradiction sur le nombre de mots** : dans `V3Workflow30.tsx` le champ « Nombre de mots par chapitre » accepte jusqu'à 6000 mots (`Entre 300 et 6000`), et l'edge function `v3-autopilot-step` clampe le mode `core` sur la valeur du brief (jusqu'à 6000). Donc un client 197€ peut déjà écrire des chapitres de 6000 mots → l'argument « ~3500 (197€) vs ~5000 (347€) » est faux et non défendable.
+2. **Le client ne voit pas la valeur** : l'encart actuel (`WritingEngineBadge`) est trop discret et pas assez "vendeur/informatif". Il ne montre pas noir sur blanc la comparaison 197€ vs 347€.
 
-Deux causes au "aucune différence 347€" :
+## Objectif
+Rendre la différence **vraie** (plafonds réellement distincts) ET **visible/pédagogique** (comparatif clair côte à côte que le client comprend d'un coup d'œil).
 
-1. **Le moteur ne différencie pas la rédaction.** Dans `v3-autopilot-step/index.ts`, l'étape manuscrit (`p20-chat-manuscript`) ignore complètement le flag `quality`/`isPro` : `targetWords`, le prompt et les tokens sont identiques pour 197€ et 347€. Le `isPro` n'agit que sur les étapes annexes (variantes + 12288 vs 8192 tokens), pas sur l'écriture du livre lui-même.
-2. **Rien n'est affiché.** L'encart `WritingEngineBadge` a été branché dans `EbookPlannerPage` (autre outil), pas dans `V3Workflow30`. Donc dans le Hub, l'utilisateur ne voit aucun repère visuel de ce que le 347€ apporte.
+## Correctifs
 
-(La différenciation faite précédemment reste valable, mais uniquement pour l'outil `complete-book-workflow` que le Hub n'utilise pas.)
+### 1. Plafonds réellement différenciés
+- **Frontend `V3Workflow30.tsx`** : le champ mots/chapitre est plafonné selon le palier.
+  - 197€ (core) : max **3500** mots. Si l'utilisateur saisit plus, on ramène à 3500 et un petit texte indique « Jusqu'à 3500 mots avec l'offre 197€ — passez au Pack Pro pour aller jusqu'à 6000 ».
+  - 347€ (Pro) : jusqu'à **6000** mots.
+  - Le texte d'aide sous le champ s'adapte au palier.
+- **Edge `v3-autopilot-step/index.ts`** : clamp serveur cohérent — `core` plafonné à 3500 mots/chapitre, `pro` jusqu'à 6000 (et cible ~5000 par défaut en Pro). Empêche tout contournement côté client.
 
-## Correctifs proposés
+### 2. Comparatif clair et vendeur (remplace/enrichit `WritingEngineBadge.tsx`)
+Transformer l'encart en **tableau comparatif à deux colonnes** « Essentiel 197€ » vs « Pack Pro 347€ », lisible et informatif, avec pour chaque ligne un ✓/✗ ou une valeur :
 
-### 1. Moteur — `supabase/functions/v3-autopilot-step/index.ts`
-Faire agir réellement `isPro` sur l'écriture du manuscrit (`p20-chat-manuscript`) :
-- **Chapitres plus longs en Pro** : viser ~5000 mots (au lieu de la valeur du brief ~3500) quand `isPro`, avec `maxTok` relevé en conséquence.
-- **Consignes de rédaction enrichies** en Pro : plus de sous-parties développées, exemples concrets, transitions, profondeur — bloc de consignes distinct core vs pro.
-- **Passe éditoriale automatique** en Pro : après génération d'un chapitre, un 2ᵉ appel IA de densification/fluidité/enrichissement (fallback silencieux sur le texte initial si l'appel échoue ou dépasse le temps).
-- Conserver le comportement core inchangé pour l'offre 197€.
+| Critère | Essentiel 197€ | Pack Pro 347€ |
+|---|---|---|
+| Longueur des chapitres | jusqu'à 3500 mots | jusqu'à ~5000-6000 mots |
+| Passe éditoriale automatique (densification, fluidité) | ✗ | ✓ |
+| Boucle qualité renforcée (score cible + tentatives) | standard | renforcée |
+| Variantes A/B (titres, descriptions, emails, annonces) | ✗ | ✓ |
+| Nombre d'agents du parcours | 22 (idée → publié) | 30 (+ lancement & ventes) |
+| Choix du modèle IA (Claude, Gemini, ChatGPT, DeepSeek, Mistral) | ✓ | ✓ |
 
-### 2. Interface Hub — `src/components/admin/V3Workflow30.tsx`
-- Afficher l'encart comparatif **`WritingEngineBadge`** (déjà existant) en tête du parcours, piloté par `fullMode`/`hasFull`, pour que l'acheteur 347€ voie noir sur blanc les gains rédaction (chapitres plus longs, passe éditoriale, boucle qualité renforcée) — et l'utilisateur 197€ l'incitation à l'upgrade.
-- Ajouter un petit repère "Moteur Pro" au niveau de l'étape d'écriture (`p20-chat-manuscript`) quand `fullMode` est actif, pour matérialiser la différence au moment clé.
+- Mise en avant visuelle de la colonne Pro (bordure/teal #008296), et pour un client 197€ un bouton clair « Passer au Pack Pro 347€ » qui ouvre le checkout existant (`setCheckoutOpen(true)`).
+- Pour un client déjà Pro : bandeau « Moteur Pro activé » + rappel des gains obtenus.
+- Le composant reçoit `isPro` (déjà le cas) + un callback `onUpgrade` pour ouvrir le checkout.
 
-### 3. Cohérence
-- Vérifier que le libellé du sélecteur de parcours (déjà présent) reste aligné avec les gains réels désormais livrés côté moteur.
+### 3. Placement plus visible
+- Afficher le comparatif **en haut du parcours** (au-dessus ou juste sous le sélecteur de parcours), pas noyé en bas, pour que le client le voie immédiatement.
+- Conserver le petit repère « Moteur Pro » sur l'étape d'écriture.
 
 ## Points techniques
-- Le palier `pro` n'affecte QUE la qualité/longueur/passe éditoriale ; le choix du modèle IA (Claude, Gemini, ChatGPT, DeepSeek, Mistral via OpenRouter BYOK) reste libre à tous les paliers.
-- Aucun changement de schéma, RLS ou droits. `useV3Entitlement` (admin = tout) reste la source des droits.
-- Redéploiement de `v3-autopilot-step` après modification ; vérification TypeScript.
+- Le palier Pro n'affecte QUE longueur/qualité/passe éditoriale/variantes ; le choix du modèle IA reste libre partout.
+- Aucun changement de schéma, RLS ou droits. `useV3Entitlement` reste la source des droits (admin = tout).
+- Redéploiement de `v3-autopilot-step` + vérification TypeScript après modification.
 </content>
-<summary>Corriger la différence 347€ dans le Hub : le moteur d'écriture (v3-autopilot-step) et l'affichage (V3Workflow30) ignoraient le palier Pro.</summary>
+<summary>Plafonner réellement le 197€ à 3500 mots (vs 6000 en Pro) et remplacer l'encart par un comparatif 197€/347€ clair et vendeur, placé en haut du parcours.</summary>
 </invoke>
