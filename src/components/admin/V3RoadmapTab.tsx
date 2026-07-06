@@ -26,7 +26,7 @@ export function V3RoadmapTab() {
   }, []);
 
   const byPillar = useMemo(() => {
-    const map: Record<V3Pillar, V3Module[]> = { ia: [], publier: [], monetiser: [], marketing: [], edition: [], distribution: [], promotion: [] };
+    const map: Record<V3Pillar, V3Module[]> = { ia: [], publier: [], monetiser: [], marketing: [], edition: [], distribution: [], promotion: [], data: [] };
     for (const m of V3_MODULES) {
       map[m.pillar].push(m);
     }
