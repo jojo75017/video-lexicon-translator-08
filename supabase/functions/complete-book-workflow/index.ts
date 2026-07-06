@@ -129,6 +129,164 @@ async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTok
   return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 }
 
+// Appel OpenRouter (multi-modèles : Claude, Gemini, DeepSeek, GPT, Mistral, etc.)
+// Clé BYOK de l'abonné (sk-or-...). Le modèle est choisi côté client.
+async function callOpenRouter(systemPrompt: string, userPrompt: string, maxTokens: number, apiKey: string, model: string, retryCount = 0): Promise<string> {
+  const MAX_RETRIES = 2;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 120000);
+  let response: Response | null = null;
+  try {
+    response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey.trim()}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://ebookstudio.fr',
+        'X-Title': 'EbookStudio',
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: 'system', content: `${systemPrompt}\n\n${EDITORIAL_PRO_RULES}` },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature: 0.7,
+        max_tokens: maxTokens,
+      }),
+      signal: controller.signal,
+    });
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('TIMEOUT: La génération OpenRouter a dépassé le délai sécurisé.');
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+
+  if (!response.ok) {
+    const status = response.status;
+    const errText = await response.text();
+    console.error(`OpenRouter error ${status}: ${errText}`);
+    if ((status === 429 || status === 503 || status === 500) && retryCount < MAX_RETRIES) {
+      const waitSeconds = Math.min(15 * Math.pow(2, retryCount), 45);
+      await new Promise((r) => setTimeout(r, waitSeconds * 1000));
+      return await callOpenRouter(systemPrompt, userPrompt, maxTokens, apiKey, model, retryCount + 1);
+    }
+    if (status === 401 || status === 403) throw new Error('INVALID_API_KEY: Clé OpenRouter invalide (sk-or-...).');
+    if (status === 402) throw new Error('CREDITS_EXHAUSTED: Crédits OpenRouter insuffisants.');
+    if (status === 429) throw new Error('RATE_LIMIT: Limite OpenRouter atteinte. Réessayez plus tard.');
+    throw new Error(`OpenRouter Error: ${status}`);
+  }
+
+  const data = await response.json();
+  const text = data?.choices?.[0]?.message?.content || '';
+  if (!text) throw new Error('OpenRouter: réponse vide.');
+  return text;
+}
+
+// Appel direct Anthropic Claude (clé sk-ant-...).
+async function callClaudeDirect(systemPrompt: string, userPrompt: string, maxTokens: number, apiKey: string, retryCount = 0): Promise<string> {
+  const MAX_RETRIES = 2;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 120000);
+  let response: Response | null = null;
+  try {
+    response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey.trim(),
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: Math.min(maxTokens, 8192),
+        temperature: 0.7,
+        system: `${systemPrompt}\n\n${EDITORIAL_PRO_RULES}`,
+        messages: [{ role: 'user', content: userPrompt }],
+      }),
+      signal: controller.signal,
+    });
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') throw new Error('TIMEOUT: Claude a dépassé le délai.');
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+  if (!response.ok) {
+    const status = response.status;
+    const errText = await response.text();
+    console.error(`Claude error ${status}: ${errText}`);
+    if ((status === 429 || status === 529 || status === 500) && retryCount < MAX_RETRIES) {
+      const waitSeconds = Math.min(15 * Math.pow(2, retryCount), 45);
+      await new Promise((r) => setTimeout(r, waitSeconds * 1000));
+      return await callClaudeDirect(systemPrompt, userPrompt, maxTokens, apiKey, retryCount + 1);
+    }
+    if (status === 401 || status === 403) throw new Error('INVALID_API_KEY: Clé Claude invalide (sk-ant-...).');
+    if (status === 429) throw new Error('RATE_LIMIT: Limite Claude atteinte.');
+    throw new Error(`Claude Error: ${status}`);
+  }
+  const data = await response.json();
+  const text = (data?.content || []).map((p: any) => p?.text || '').join('\n').trim();
+  if (!text) throw new Error('Claude: réponse vide.');
+  return text;
+}
+
+// Appel direct OpenAI ChatGPT (clé sk-...).
+async function callOpenAIDirect(systemPrompt: string, userPrompt: string, maxTokens: number, apiKey: string, retryCount = 0): Promise<string> {
+  const MAX_RETRIES = 2;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 120000);
+  let response: Response | null = null;
+  try {
+    response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey.trim()}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: `${systemPrompt}\n\n${EDITORIAL_PRO_RULES}` },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature: 0.7,
+        max_tokens: maxTokens,
+      }),
+      signal: controller.signal,
+    });
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') throw new Error('TIMEOUT: OpenAI a dépassé le délai.');
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+  if (!response.ok) {
+    const status = response.status;
+    const errText = await response.text();
+    console.error(`OpenAI error ${status}: ${errText}`);
+    if ((status === 429 || status === 503 || status === 500) && retryCount < MAX_RETRIES) {
+      const waitSeconds = Math.min(15 * Math.pow(2, retryCount), 45);
+      await new Promise((r) => setTimeout(r, waitSeconds * 1000));
+      return await callOpenAIDirect(systemPrompt, userPrompt, maxTokens, apiKey, retryCount + 1);
+    }
+    if (status === 401 || status === 403) throw new Error('INVALID_API_KEY: Clé OpenAI invalide (sk-...).');
+    if (status === 429) throw new Error('RATE_LIMIT: Limite OpenAI atteinte.');
+    throw new Error(`OpenAI Error: ${status}`);
+  }
+  const data = await response.json();
+  const text = data?.choices?.[0]?.message?.content || '';
+  if (!text) throw new Error('OpenAI: réponse vide.');
+  return text;
+}
+
+
 async function callLovableAI(systemPrompt: string, userPrompt: string, maxTokens: number, retryCount = 0): Promise<string> {
   const MAX_RETRIES = 2;
   const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
