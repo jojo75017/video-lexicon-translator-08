@@ -811,10 +811,10 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 </div>
                 <p className="mt-1 text-[12px]" style={{ color: '#6f5e47' }}>
                   {parcours === 'full'
-                    ? 'Pack Tout Complet 347€ : écris, publie ET vends (emails de lancement, annonces, suivi des ventes, audio…) avec une IA au niveau maximal (sorties plus longues, variantes A/B).'
+                    ? `Pack Tout Complet 347€ : un livre de meilleure qualité (édition structurelle, copy-editing, comité de lecture, label qualité, couverture signature) PUIS lancé et vendu (emails, annonces, suivi des ventes, audio…), avec une IA au niveau maximal (sorties plus longues, variantes A/B). ${PREMIUM_TOTAL} étapes exclusives en plus.`
                     : hasFull
-                      ? `Offre 197€ : ${CORE_TOTAL} agents pour aller de l'idée jusqu'à publier ton livre sur Amazon, sans étape verrouillée en chemin. Les 5 phases « Aller plus loin » (15 étapes marketing & ventes) restent en aperçu. Tu peux basculer en Pro à tout moment.`
-                      : `Offre 197€ : ${CORE_TOTAL} agents pour aller de l'idée jusqu'à publier ton livre sur Amazon, sans étape verrouillée en chemin. Les 5 phases « Aller plus loin » (description vendeuse, avis, séquences email, série, audio, traduction… 15 étapes) s'affichent en aperçu — débloquées avec le Pack 347€.`}
+                      ? `Offre 197€ : ${CORE_TOTAL} agents pour aller de l'idée jusqu'à publier ton livre. Le Pack 347€ ajoute ${PREMIUM_TOTAL} étapes exclusives : un livre plus abouti (édition pro, comité de lecture, couverture signature) + tout le marketing & la vente. Tu peux basculer en Pro à tout moment.`
+                      : `Offre 197€ : ${CORE_TOTAL} agents pour aller de l'idée jusqu'à publier ton livre. Le Pack 347€ débloque ${PREMIUM_TOTAL} étapes exclusives : édition structurelle, copy-editing, comité de lecture, label qualité, couverture signature Pro, puis toute la partie marketing & ventes.`}
                 </p>
               </div>
               <div className="inline-flex rounded-xl border overflow-hidden" style={{ borderColor: `${AMBER}55` }}>
