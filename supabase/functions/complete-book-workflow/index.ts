@@ -1185,7 +1185,12 @@ serve(async (req) => {
       useUserKey: _useUserKey,
       provider = 'gemini',
       openrouterModel = 'google/gemini-2.5-flash-lite',
+      quality = 'core',
     } = payload;
+
+    // Palier qualité : 'pro' = Pack 347€ (chapitres plus longs, boucle qualité renforcée,
+    // passe éditoriale auto). 'core' = offre 197€ (réglages standard).
+    const isProQuality = quality === 'pro';
 
     const LANGUAGE_NAMES: Record<string, string> = {
       fr: 'français (France)',
