@@ -219,6 +219,34 @@ const AdminBetaCodesPage: React.FC = () => {
           </div>
         </Card>
 
+        {/* Clôture bêta */}
+        <Card className="p-5 border-destructive/40">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex-1">
+              <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-destructive" />
+                Clôturer la phase bêta
+              </label>
+              <p className="text-xs text-muted-foreground mt-1">
+                Coupe l'accès de <strong>tous les bêta-testeurs</strong> ({usedCount} concerné{usedCount > 1 ? 's' : ''}) et
+                leur envoie l'email de clôture (offre toujours à 67€, V3 en octobre). Action réversible (statut « expiré »).
+              </p>
+            </div>
+            <Button
+              variant="destructive"
+              onClick={() => setClosureDialog(true)}
+              disabled={revoking || usedCount === 0}
+            >
+              {revoking ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Power className="h-4 w-4 mr-2" />
+              )}
+              Couper l'accès + envoyer l'email
+            </Button>
+          </div>
+        </Card>
+
         {/* Table */}
         <Card className="p-0 overflow-hidden">
           {loading ? (
