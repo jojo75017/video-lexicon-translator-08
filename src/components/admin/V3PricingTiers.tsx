@@ -236,30 +236,44 @@ const V3PricingTiers: React.FC = () => {
               <h3 className="text-lg font-bold" style={{ fontFamily: SERIF, color: INK }}>{V3_FULL_PACK.title}</h3>
             </div>
             <p className="text-sm mb-4" style={{ color: '#6f5e47' }}>
-              La base 197€ (écrire + publier + lancer) + les {V3_ESSENTIAL_PACKS.length} packs premium
-              pour vendre et scaler.<br />
-              Tu accèdes à <strong>tous les outils de croissance</strong>, sans limitation.
+              La base 197€ (écrire + publier + lancer) + <strong>tous les {V3_UPSELL_PACKS.length} packs premium</strong>
+              {' '}pour vendre et scaler.<br />
+              Tu débloques <strong>la totalité des {V3_TOTAL_COUNT} outils</strong>, sans aucune limitation.
             </p>
+
+            {/* Compteur global clair : 32 base + 68 premium = 100 */}
+            <div className="mb-3 flex items-center gap-2 rounded-xl border p-3" style={{ borderColor: `${AMBER}55`, background: '#fff' }}>
+              <Layers className="h-5 w-5 shrink-0" style={{ color: AMBER_DEEP }} />
+              <p className="text-[12px] leading-snug" style={{ color: INK }}>
+                <strong>{V3_TOTAL_COUNT} outils débloqués</strong>{' '}
+                <span style={{ color: '#a18a6c' }}>
+                  ({V3_INCLUDED_COUNT} de la base + {V3_PREMIUM_COUNT} premium)
+                </span>
+              </p>
+            </div>
+
             <div className="mb-3 rounded-xl border p-3" style={{ borderColor: `${AMBER}55`, background: AMBER_SOFT }}>
               <p className="text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: AMBER_DEEP }}>
-                Les {V3_ESSENTIAL_PACKS.length} packs inclus :
+                Les {V3_UPSELL_PACKS.length} packs inclus :
               </p>
               <ul className="grid grid-cols-2 gap-x-3 gap-y-1 text-[11px]" style={{ color: '#6f5e47' }}>
-                {V3_ESSENTIAL_PACKS.map((p) => (
+                {V3_UPSELL_PACKS.map((p) => (
                   <li key={p.id} className="flex items-center gap-1.5">
                     <Check className="h-3 w-3 shrink-0" style={{ color: '#1f9d6b' }} />
                     <span className="font-semibold" style={{ color: INK }}>{p.title}</span>{' '}
-                    <span style={{ color: '#a18a6c' }}>({p.modules.length} modules)</span>
+                    <span style={{ color: '#a18a6c' }}>({p.modules.length})</span>
                   </li>
                 ))}
               </ul>
               <p className="mt-2 text-[10px] font-medium" style={{ color: AMBER_DEEP }}>
-                + la base Création, Publication & Lancement ({V3_MODULES.filter((m) => getModuleAccess(m.id) === 'included').length} modules)
+                + {V3_FULL_PACK_EXTRA_IDS.length} outils supplémentaires (IA avancée, communauté, séries…)
+                + la base ({V3_INCLUDED_COUNT} modules)
               </p>
             </div>
             <div className="flex items-end gap-3 mb-1">
               <span className="text-4xl font-black" style={{ color: AMBER_DEEP }}>{V3_FULL_PACK.price}€</span>
               <span className="text-lg line-through pb-1" style={{ color: '#bcaa8c' }}>{V3_FULL_PACK.compareAt}€</span>
+
             </div>
             <p className="text-sm font-bold mb-4" style={{ color: '#1f9d6b' }}>
               Tu économises {V3_FULL_PACK.saves}€
