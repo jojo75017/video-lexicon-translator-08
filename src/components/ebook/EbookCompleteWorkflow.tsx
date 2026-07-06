@@ -1508,6 +1508,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
   return (
     <div className="space-y-6">
       {/* Input Card */}
+      <WritingEngineBadge isPro={hasFull} />
+
+      {/* Input Card */}
       <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-background to-amber-500/5">
         <CardHeader className="text-center pb-4">
           <div className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-amber-500 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4 mx-auto">
