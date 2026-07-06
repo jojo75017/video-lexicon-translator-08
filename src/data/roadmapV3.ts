@@ -2,7 +2,7 @@
 // Prix cible : 197€ à vie (vs 67€ pour V2 actuelle) — EN RÉFLEXION : ajouter un mensuel ~19€/mois + annuel ~149€/an.
 // La liste reste éditable : on peut ajouter/retirer des modules.
 
-export type V3Pillar = 'publier' | 'monetiser' | 'marketing' | 'ia' | 'edition' | 'distribution' | 'promotion';
+export type V3Pillar = 'publier' | 'monetiser' | 'marketing' | 'ia' | 'edition' | 'distribution' | 'promotion' | 'data';
 export type V3Status = 'todo' | 'in_progress' | 'done';
 export type V3Tier = 'core' | 'upsell';
 export type V3PackId = 'cover' | 'marketing' | 'social' | 'monetisation' | 'editorial' | 'distribution' | 'promotion' | 'transcription';
