@@ -12,6 +12,7 @@ import V2V3Compare from '@/components/admin/V2V3Compare';
 import V3PricingTiers from '@/components/admin/V3PricingTiers';
 import V3Workflow30 from '@/components/admin/V3Workflow30';
 import V3AccessRecap from '@/components/admin/V3AccessRecap';
+import V3LaunchLinks from '@/components/admin/V3LaunchLinks';
 import V3GuidesSection from '@/components/admin/V3GuidesSection';
 import V3RoadmapTab from '@/components/admin/V3RoadmapTab';
 import MaisonEditionTab from '@/components/admin/MaisonEditionTab';
@@ -625,6 +626,7 @@ const V3HubPage: React.FC = () => {
         {/* ===================== ONGLET OFFRES & PACKS ===================== */}
         {activeTab === 'offres' && (
           <>
+            <V3LaunchLinks />
             <V3AccessRecap onOpenModule={setSelected} />
             <V3PricingTiers />
             <MaisonEditionTab onOpenModule={(id) => { const m = getModuleById(id); if (m) setSelected(m); }} />
