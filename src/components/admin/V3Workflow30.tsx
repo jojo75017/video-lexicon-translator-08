@@ -891,12 +891,25 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
               </div>
               <div>
                 <label className="block text-[11px] font-semibold mb-1.5" style={{ color: INK }}>Nombre de mots par chapitre</label>
-                <input value={brief.wordsPerChapter} onChange={(e) => setBriefField('wordsPerChapter', e.target.value)} maxLength={6}
+                <input value={brief.wordsPerChapter} maxLength={6}
+                  onChange={(e) => {
+                    const raw = e.target.value.replace(/[^0-9]/g, '');
+                    if (raw === '') { setBriefField('wordsPerChapter', ''); return; }
+                    const cap = fullMode ? 6000 : 3500;
+                    const n = Math.min(parseInt(raw, 10), cap);
+                    setBriefField('wordsPerChapter', String(n));
+                  }}
                   inputMode="numeric"
                   placeholder="Ex : 1500"
                   className="w-full rounded-xl bg-white border px-4 py-2.5 text-sm focus:outline-none"
                   style={{ borderColor: '#eadfc9', color: INK }} />
-                <p className="mt-1 text-[10px]" style={{ color: '#a18a6c' }}>Entre 300 et 6000 mots. Par défaut ≈ 1500.</p>
+                {fullMode ? (
+                  <p className="mt-1 text-[10px]" style={{ color: '#a18a6c' }}>Entre 300 et 6000 mots (Pack Pro). Par défaut ≈ 1500.</p>
+                ) : (
+                  <p className="mt-1 text-[10px]" style={{ color: '#a18a6c' }}>
+                    Entre 300 et <strong>3500 mots</strong> avec l'offre 197€. Par défaut ≈ 1500 · <button type="button" onClick={() => setCheckoutOpen(true)} className="underline font-semibold" style={{ color: '#008296' }}>passez au Pack Pro pour aller jusqu'à 6000</button>.
+                  </p>
+                )}
               </div>
             </div>
             <div className="mt-3">
