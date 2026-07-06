@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Ticket, Plus, Copy, Check, RefreshCw, Loader2, Mail, Send } from 'lucide-react';
+import { Ticket, Plus, Copy, Check, RefreshCw, Loader2, Mail, Send, Power, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -43,6 +43,26 @@ const AdminBetaCodesPage: React.FC = () => {
   const [sendDialog, setSendDialog] = useState<BetaCode | null>(null);
   const [sendEmail, setSendEmail] = useState('');
   const [sending, setSending] = useState(false);
+  const [closureDialog, setClosureDialog] = useState(false);
+  const [revoking, setRevoking] = useState(false);
+
+  const handleRevokeBeta = async () => {
+    setRevoking(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('revoke-beta-access');
+      if (error) throw error;
+      toast.success(
+        `${data?.revoked ?? 0} accès coupé(s), ${data?.sent ?? 0} email(s) de clôture envoyé(s).`
+      );
+      setClosureDialog(false);
+      await fetchCodes();
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err?.message || "Impossible de clôturer la phase bêta");
+    } finally {
+      setRevoking(false);
+    }
+  };
 
   const handleSendEmail = async () => {
     if (!sendDialog) return;
@@ -199,6 +219,34 @@ const AdminBetaCodesPage: React.FC = () => {
           </div>
         </Card>
 
+        {/* Clôture bêta */}
+        <Card className="p-5 border-destructive/40">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex-1">
+              <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-destructive" />
+                Clôturer la phase bêta
+              </label>
+              <p className="text-xs text-muted-foreground mt-1">
+                Coupe l'accès de <strong>tous les bêta-testeurs</strong> ({usedCount} concerné{usedCount > 1 ? 's' : ''}) et
+                leur envoie l'email de clôture (offre toujours à 67€, V3 en octobre). Action réversible (statut « expiré »).
+              </p>
+            </div>
+            <Button
+              variant="destructive"
+              onClick={() => setClosureDialog(true)}
+              disabled={revoking || usedCount === 0}
+            >
+              {revoking ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Power className="h-4 w-4 mr-2" />
+              )}
+              Couper l'accès + envoyer l'email
+            </Button>
+          </div>
+        </Card>
+
         {/* Table */}
         <Card className="p-0 overflow-hidden">
           {loading ? (
@@ -322,6 +370,32 @@ const AdminBetaCodesPage: React.FC = () => {
                 <Send className="h-4 w-4 mr-2" />
               )}
               Envoyer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={closureDialog} onOpenChange={(o) => !o && setClosureDialog(false)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Clôturer la phase bêta ?</DialogTitle>
+            <DialogDescription>
+              L'accès de <strong>{usedCount} bêta-testeur{usedCount > 1 ? 's' : ''}</strong> va être coupé
+              (statut « expiré ») et un email de clôture leur sera envoyé. Vous pourrez réactiver un accès
+              manuellement plus tard si besoin.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setClosureDialog(false)} disabled={revoking}>
+              Annuler
+            </Button>
+            <Button variant="destructive" onClick={handleRevokeBeta} disabled={revoking}>
+              {revoking ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Power className="h-4 w-4 mr-2" />
+              )}
+              Confirmer la clôture
             </Button>
           </DialogFooter>
         </DialogContent>
