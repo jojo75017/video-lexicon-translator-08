@@ -50,7 +50,7 @@ interface Step {
   moduleId: string;
   label?: string;
   hint: string;
-  /** 'core' = parcours 197€ (29 étapes) ; 'premium' = réservé au parcours 347€ (45 étapes). */
+  /** 'core' = parcours 197€ ; 'premium' = réservé au parcours 347€ (livre + marketing enrichis). */
   tier?: Tier;
 }
 interface Phase {
