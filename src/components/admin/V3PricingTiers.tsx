@@ -294,6 +294,17 @@ const V3PricingTiers: React.FC = () => {
               <Crown className="h-4 w-4" />
               Obtenir le Pack Tout Complet
             </button>
+            {isPaymentsTestMode() && (
+              <button
+                onClick={() => setCheckoutOpen(true)}
+                className="mt-2 w-full inline-flex items-center justify-center gap-2 rounded-xl px-6 py-2.5 text-[12px] font-bold border transition-colors hover:bg-[#FFF3DF]"
+                style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}
+              >
+                <FlaskConical className="h-3.5 w-3.5" />
+                Tester le paiement 347€ · Mode test
+              </button>
+            )}
+
           </div>
         </article>
       </div>
