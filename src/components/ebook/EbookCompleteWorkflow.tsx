@@ -2663,6 +2663,47 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
                   </a>
                 </div>
               )}
+
+              {/* Écran d'aide : crédits IA épuisés */}
+              {isCreditsExhaustedError(error) && (
+                <div className="mt-3 p-4 bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CreditCard className="h-4 w-4 text-amber-700" />
+                    <p className="text-sm font-bold text-amber-900">Crédits IA épuisés</p>
+                  </div>
+                  <p className="text-xs text-amber-900 mb-3">
+                    La génération s'est arrêtée car il n'y a plus de crédits IA. Choisissez l'une des deux options ci-dessous pour reprendre là où vous en étiez :
+                  </p>
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-start gap-2">
+                      <span className="w-5 h-5 shrink-0 rounded-full bg-amber-500 text-white text-[11px] font-bold flex items-center justify-center">1</span>
+                      <p className="text-xs text-amber-900">
+                        <strong>Rechargez des crédits IA</strong> — immédiat, la génération repart aussitôt.
+                      </p>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="w-5 h-5 shrink-0 rounded-full bg-amber-500 text-white text-[11px] font-bold flex items-center justify-center">2</span>
+                      <p className="text-xs text-amber-900">
+                        <strong>Configurez votre clé Gemini personnelle</strong> (gratuite) dans les Réglages pour générer sans limite.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <a href="https://lovable.dev/settings/plans" target="_blank" rel="noopener noreferrer">
+                      <Button size="sm" className="gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600">
+                        <CreditCard className="h-4 w-4" />
+                        Recharger les crédits
+                      </Button>
+                    </a>
+                    {onNavigateToSettings && (
+                      <Button size="sm" variant="outline" className="gap-2 border-amber-300 text-amber-900 hover:bg-amber-100" onClick={onNavigateToSettings}>
+                        Configurer ma clé Gemini
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
+              
               
               <div className="flex flex-wrap gap-2 mt-3">
                 {/* Bouton principal : Reprendre */}
