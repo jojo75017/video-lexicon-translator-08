@@ -21,11 +21,15 @@ type Row = {
 const ROWS: Row[] = [
   { label: 'Longueur des chapitres', core: 'jusqu\u2019à 3 500 mots', pro: 'jusqu\u2019à ~6 000 mots' },
   { label: 'Passe éditoriale automatique (densification, fluidité, exemples)', core: false, pro: true },
+  { label: 'Édition structurelle Pro (structure, rythme, arcs)', core: false, pro: true },
+  { label: 'Copy-editing & comité de lecture IA', core: false, pro: true },
+  { label: 'Label Qualité « Maison d\u2019Édition »', core: false, pro: true },
+  { label: 'Couverture Signature Pro (IA gpt-image-2)', core: 'couverture standard', pro: 'couverture ultra-pro' },
   { label: 'Boucle qualité renforcée (score cible + tentatives)', core: 'standard', pro: 'renforcée' },
   { label: 'Sous-sections enrichies et détaillées', core: false, pro: true },
   { label: 'Variantes A/B (titres, descriptions, emails, annonces)', core: false, pro: true },
-  { label: 'Étapes du parcours guidé', core: '29 étapes · idée → publié', pro: '45 étapes · + marketing & ventes' },
-  { label: 'Phases exclusives (marketing, avis, séquences email, série, audio, traduction…)', core: false, pro: '5 phases Pro (15 étapes)' },
+  { label: 'Étapes du parcours guidé', core: 'idée → publié', pro: '+ livre pro & marketing' },
+  { label: 'Phases exclusives (avis, séquences email, série, audio, traduction…)', core: false, pro: 'incluses' },
   { label: 'Choix du modèle IA (Claude, Gemini, ChatGPT, DeepSeek, Mistral)', core: true, pro: true },
 ];
 
