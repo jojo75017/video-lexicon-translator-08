@@ -203,7 +203,6 @@ const PHASES: Phase[] = [
       { moduleId: 'audiobook-plan', label: 'Planifier l\'audiobook', hint: 'Plan de production de la version audio.', tier: 'premium' },
       { moduleId: 'translation-strategy', label: 'Ouvrir les marchés étrangers', hint: 'Stratégie de traduction & marchés internationaux.', tier: 'premium' },
       { moduleId: 'p22-trend-radar', label: 'Repérer les tendances', hint: 'Détecte les sujets qui montent sur Amazon.', tier: 'premium' },
-      { moduleId: 'p24-cliche-detector', label: 'Nettoyer clichés & répétitions', hint: 'Supprime les tics d\'écriture et redites.', tier: 'premium' },
     ],
   },
 ];
