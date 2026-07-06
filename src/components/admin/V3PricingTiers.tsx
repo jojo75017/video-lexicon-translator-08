@@ -339,13 +339,13 @@ const V3PricingTiers: React.FC = () => {
         {V3_ESSENTIAL_PACKS.map((pack) => renderPackCard(pack))}
       </div>
 
-      {/* 3. Options spécialistes — à la carte uniquement */}
+      {/* 3. Options spécialistes — incluses dans le Pack Pro, aussi vendables seules */}
       {V3_ALACARTE_PACKS.length > 0 && (
         <>
           <div className="flex items-center gap-2 mb-4 mt-10">
             <Sparkles className="h-4 w-4" style={{ color: AMBER }} />
-            <h3 className="text-base font-bold" style={{ fontFamily: SERIF, color: INK }}>Options spécialistes (à la carte)</h3>
-            <span className="text-xs" style={{ color: '#a18a6c' }}>en plus, si besoin</span>
+            <h3 className="text-base font-bold" style={{ fontFamily: SERIF, color: INK }}>Options spécialistes</h3>
+            <span className="text-xs" style={{ color: '#a18a6c' }}>incluses dans le Pack Pro · aussi disponibles seules</span>
             <div className="flex-1 h-px ml-2" style={{ background: `linear-gradient(90deg, ${AMBER}44, transparent)` }} />
           </div>
           <div className="grid sm:grid-cols-2 gap-3">
@@ -354,10 +354,54 @@ const V3PricingTiers: React.FC = () => {
         </>
       )}
 
+      {/* 4. Modules premium supplémentaires débloqués par le Pack Pro (non rattachés à un pack) */}
+      {V3_FULL_PACK_EXTRA_IDS.length > 0 && (
+        <>
+          <div className="flex items-center gap-2 mb-4 mt-10">
+            <Crown className="h-4 w-4" style={{ color: AMBER }} />
+            <h3 className="text-base font-bold" style={{ fontFamily: SERIF, color: INK }}>Inclus en plus dans le Pack Pro</h3>
+            <span className="text-xs" style={{ color: '#a18a6c' }}>{V3_FULL_PACK_EXTRA_IDS.length} outils premium débloqués par le 347€</span>
+            <div className="flex-1 h-px ml-2" style={{ background: `linear-gradient(90deg, ${AMBER}44, transparent)` }} />
+          </div>
+          <ul className="grid sm:grid-cols-2 gap-2">
+            {V3_FULL_PACK_EXTRA_IDS.map((mid) => {
+              const mod = getModuleById(mid);
+              const ready = isModuleClickable(mid);
+              return (
+                <li key={mid}>
+                  <button
+                    type="button"
+                    disabled={!ready || !mod}
+                    onClick={() => mod && ready && setActiveModule(mod)}
+                    className={`w-full text-left flex items-start gap-2 rounded-xl border px-3 py-2.5 bg-white transition-colors ${ready ? 'hover:bg-[#FFF3DF] cursor-pointer' : 'cursor-default'}`}
+                    style={{ borderColor: '#eadfc9' }}
+                  >
+                    {ready
+                      ? <CheckCircle2 className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: '#1f9d6b' }} />
+                      : <Clock className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: '#a18a6c' }} />}
+                    <div className="min-w-0 flex-1">
+                      <span className="text-[12px] font-semibold leading-tight" style={{ color: INK }}>
+                        {mod?.title ?? mid}
+                      </span>
+                      {mod?.description && (
+                        <div className="text-[10.5px] leading-snug mt-0.5 line-clamp-2" style={{ color: '#8a7860' }}>
+                          {mod.description}
+                        </div>
+                      )}
+                    </div>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </>
+      )}
+
       <p className="text-center text-[11px] mt-6" style={{ color: '#a18a6c' }}>
-        Pris séparément : {V3_PRICE}€ + {V3_UPSELLS_TOTAL}€ = {V3_FULL_PACK.compareAt}€.
-        Le {V3_FULL_PACK.title} est à {V3_FULL_PACK.price}€ ({V3_FULL_PACK.saves}€ d'économie).
+        Pris séparément : {V3_PRICE}€ + {V3_ALL_PACKS_TOTAL}€ (tous les packs) = {V3_FULL_PACK.compareAt}€.
+        Le {V3_FULL_PACK.title} est à {V3_FULL_PACK.price}€ ({V3_FULL_PACK.saves}€ d'économie) et débloque les {V3_TOTAL_COUNT} outils.
       </p>
+
     </section>
   );
 };
