@@ -206,10 +206,9 @@ const V3PaiementPage = () => {
                   planId={planKey}
                   successPath="/paiement-succes"
                   cancelPath={`/v3-paiement?plan=${planKey}`}
-                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl px-6 py-6 text-lg font-bold transition-all hover:scale-[1.02] disabled:opacity-60"
+                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl px-6 py-6 text-lg font-bold text-white shadow-lg bg-gradient-to-r from-orange-500 to-amber-500 transition-all hover:scale-[1.02] hover:shadow-xl disabled:opacity-60"
                 >
                   <>
-                    <CreditCard className="w-5 h-5" />
                     Payer {plan.price}€ par carte
                     <ArrowRight className="w-5 h-5" />
                   </>
