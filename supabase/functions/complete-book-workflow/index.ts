@@ -1105,11 +1105,11 @@ function getP3GenerationSettings(numberOfChapters: number) {
   };
 }
 
-function getP4GenerationSettings(numberOfChapters: number) {
+function getP4GenerationSettings(numberOfChapters: number, isPro = false) {
   const isLargeProject = numberOfChapters >= 16;
   const isVeryLargeProject = numberOfChapters >= 30;
 
-  return {
+  const base = {
     isLargeProject,
     isVeryLargeProject,
     maxTokens: isVeryLargeProject ? 2400 : isLargeProject ? 4200 : 6000,
@@ -1120,6 +1120,20 @@ function getP4GenerationSettings(numberOfChapters: number) {
     maxRetries: 0,
     previousChapterChars: isVeryLargeProject ? 400 : 800,
     segmentCount: 2,
+  };
+
+  if (!isPro) return base;
+
+  // Pack Pro 347€ : chapitres plus longs et plus denses, boucle qualité renforcée.
+  return {
+    ...base,
+    maxTokens: isVeryLargeProject ? 3600 : isLargeProject ? 6000 : 8000,
+    minWords: isVeryLargeProject ? 1800 : 3500,
+    targetWords: isVeryLargeProject ? 2400 : 5000,
+    maxWords: isVeryLargeProject ? 2800 : 6000,
+    minScore: isVeryLargeProject ? 8 : 9,
+    maxRetries: isVeryLargeProject ? 0 : 1,
+    previousChapterChars: isVeryLargeProject ? 600 : 1000,
   };
 }
 
@@ -1185,7 +1199,12 @@ serve(async (req) => {
       useUserKey: _useUserKey,
       provider = 'gemini',
       openrouterModel = 'google/gemini-2.5-flash-lite',
+      quality = 'core',
     } = payload;
+
+    // Palier qualité : 'pro' = Pack 347€ (chapitres plus longs, boucle qualité renforcée,
+    // passe éditoriale auto). 'core' = offre 197€ (réglages standard).
+    const isProQuality = quality === 'pro';
 
     const LANGUAGE_NAMES: Record<string, string> = {
       fr: 'français (France)',
@@ -1251,7 +1270,7 @@ CHAPITRES PRÉVUS : ${numberOfChapters}${introContext}${charactersContext}${lang
 
     console.log(`Step ${step} for: "${fullTitle}" (Category: ${category}, Lang: ${language}, Characters: ${characters.length})`);
 
-    const wordsPerChapter = DEFAULT_WORDS_PER_CHAPTER;
+    const wordsPerChapter = isProQuality ? 5000 : DEFAULT_WORDS_PER_CHAPTER;
     let result: any = {};
     let displayContent = '';
 
@@ -1649,7 +1668,7 @@ Format JSON :
       case 'P4': {
         // RÉDACTION PRO AVEC BOUCLE QUALITÉ
         const structure = previousContext.P3?.chapitres || [];
-        const p4Settings = getP4GenerationSettings(structure.length || numberOfChapters);
+        const p4Settings = getP4GenerationSettings(structure.length || numberOfChapters, isProQuality);
         const useSegmentedMode = p4Settings.segmentCount > 1;
         const descriptionGeneree = previousContext.P1?.descriptionGeneree || '';
         const tonEditorial = previousContext.P1?.tonEditorial || '';
@@ -1847,6 +1866,30 @@ Retourne en JSON :
             nombreMots: chapterContent.split(/\s+/).filter(Boolean).length,
             _fallbackTitle: chapitre.titre,
           } : fallbackChapter));
+
+          // PACK PRO 347€ — passe éditoriale automatique : on reprend le chapitre
+          // généré pour le densifier, fluidifier et enrichir les exemples.
+          if (isProQuality && typeof chapitreGenere?.contenu === 'string' && chapitreGenere.contenu.trim().length > 300) {
+            try {
+              const original = chapitreGenere.contenu;
+              const refined = await callAI(
+                `Tu es un ÉDITEUR-RÉÉCRIVAIN de maison d'édition premium. Tu améliores un chapitre déjà écrit SANS en changer le fond ni la structure : tu densifies les idées, fluidifies le style, enrichis les exemples concrets, supprimes les redites et le remplissage, et renforces le rythme. Tu conserves la même langue et le même titre. Tu ne raccourcis jamais le chapitre.`,
+                `Améliore ce chapitre pour une qualité publication professionnelle (garde ou augmente la longueur, vise ${p4Settings.targetWords} mots) :\n\nTITRE : "${chapitreGenere.titre}"\n\nCHAPITRE ACTUEL :\n${original}\n\nRetourne UNIQUEMENT du JSON :\n{"numero": ${chapitreGenere.numero}, "titre": "${chapitreGenere.titre}", "contenu": "LE CHAPITRE AMÉLIORÉ, PLUS DENSE ET PLUS FLUIDE", "nombreMots": ${p4Settings.targetWords}}`,
+                p4Settings.maxTokens,
+              );
+              const refinedParsed = parseJSON(refined);
+              const refinedContent = typeof refinedParsed?.contenu === 'string' ? refinedParsed.contenu : '';
+              // On ne garde l'affinage que s'il ne dégrade pas (>= 80% de la longueur d'origine).
+              if (refinedContent && refinedContent.trim().length >= original.length * 0.8) {
+                const cleaned = cleanGeneratedText(refinedContent);
+                chapitreGenere.contenu = cleaned;
+                chapitreGenere.nombreMots = cleaned.split(/\s+/).filter(Boolean).length;
+                console.log(`✨ P4-Ch${chapitreGenere.numero} — passe éditoriale Pro appliquée (${chapitreGenere.nombreMots} mots)`);
+              }
+            } catch (refineErr) {
+              console.warn(`Passe éditoriale Pro ignorée pour Ch.${chapitreGenere.numero}:`, refineErr instanceof Error ? refineErr.message : refineErr);
+            }
+          }
 
           result = totalParts > 1
             ? {

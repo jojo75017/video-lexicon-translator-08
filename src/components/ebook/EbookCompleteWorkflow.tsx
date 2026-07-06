@@ -24,6 +24,8 @@ import { useWorkflowResults } from '@/hooks/useWorkflowResults';
 import { useWorkflowCloudSync } from '@/hooks/useWorkflowCloudSync';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 import { getProvider, getOpenRouterModel, validateKeyFormat, isAIConfigured } from '@/services/aiWritingService';
+import { useV3Entitlement } from '@/hooks/useV3Entitlement';
+import WritingEngineBadge from './WritingEngineBadge';
 import { WORKFLOW_STEPS, WORKFLOW_STEP_COUNT } from './workflow/workflowAgents';
 
 interface Character {
@@ -110,6 +112,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
 }) => {
   // Hook pour sauvegarder les résultats P1-P14 globalement
   const { saveStepResult } = useWorkflowResults();
+  const { hasFull } = useV3Entitlement();
   const { saveStepToCloud } = useWorkflowCloudSync();
   
   // Hook pour récupérer la clé API utilisateur
@@ -786,6 +789,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
             useUserKey: hasUsableApiKey,
             provider: getProvider(),
             openrouterModel: getOpenRouterModel(),
+            quality: hasFull ? 'pro' : 'core',
             ...extraBody,
           }
         });
@@ -826,6 +830,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
               useUserKey: hasUsableApiKey,
               provider: getProvider(),
               openrouterModel: getOpenRouterModel(),
+              quality: hasFull ? 'pro' : 'core',
               ...extraBody,
               forceFallback: true,
             }
@@ -1504,6 +1509,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Input Card */}
+      <WritingEngineBadge isPro={hasFull} />
+
       {/* Input Card */}
       <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-background to-amber-500/5">
         <CardHeader className="text-center pb-4">
