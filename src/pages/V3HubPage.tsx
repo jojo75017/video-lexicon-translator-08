@@ -54,6 +54,7 @@ const PILLAR_INTRO: Record<V3Pillar, string> = {
   edition: 'Passez au niveau maison d\'édition : finitions et qualité pro.',
   distribution: 'Élargissez votre diffusion au-delà d\'Amazon.',
   promotion: 'Boostez la visibilité avec des campagnes et de la presse.',
+  data: 'Étudiez le marché Amazon : niches rentables, ventes estimées et mots-clés.',
 };
 
 
