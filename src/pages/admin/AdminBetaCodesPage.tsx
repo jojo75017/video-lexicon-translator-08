@@ -43,6 +43,26 @@ const AdminBetaCodesPage: React.FC = () => {
   const [sendDialog, setSendDialog] = useState<BetaCode | null>(null);
   const [sendEmail, setSendEmail] = useState('');
   const [sending, setSending] = useState(false);
+  const [closureDialog, setClosureDialog] = useState(false);
+  const [revoking, setRevoking] = useState(false);
+
+  const handleRevokeBeta = async () => {
+    setRevoking(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('revoke-beta-access');
+      if (error) throw error;
+      toast.success(
+        `${data?.revoked ?? 0} accès coupé(s), ${data?.sent ?? 0} email(s) de clôture envoyé(s).`
+      );
+      setClosureDialog(false);
+      await fetchCodes();
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err?.message || "Impossible de clôturer la phase bêta");
+    } finally {
+      setRevoking(false);
+    }
+  };
 
   const handleSendEmail = async () => {
     if (!sendDialog) return;
