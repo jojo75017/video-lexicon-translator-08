@@ -795,9 +795,9 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
           </div>
           <V3PackCheckout open={checkoutOpen} onClose={() => setCheckoutOpen(false)} product="full" />
 
-          {/* Encart : ce que le Pack Pro 347€ apporte concrètement à la rédaction */}
+          {/* Comparatif : ce que chaque offre débloque pour la rédaction */}
           <div className="mt-5">
-            <WritingEngineBadge isPro={fullMode} />
+            <WritingEngineBadge isPro={fullMode} onUpgrade={() => setCheckoutOpen(true)} />
           </div>
 
           <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-3">
