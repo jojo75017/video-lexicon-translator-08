@@ -86,6 +86,17 @@ import BooksellersFairs from '@/components/admin/BooksellersFairs';
 import ForeignRights from '@/components/admin/ForeignRights';
 import PreordersStrategy from '@/components/admin/PreordersStrategy';
 import AudioVideoTranscriber from '@/components/admin/AudioVideoTranscriber';
+import AmazonBookDatabase from '@/components/admin/market/AmazonBookDatabase';
+import SalesEstimatorBsr from '@/components/admin/market/SalesEstimatorBsr';
+import KeywordExplorerAmazon from '@/components/admin/market/KeywordExplorerAmazon';
+import KeywordRankTracker from '@/components/admin/market/KeywordRankTracker';
+import ReverseAsin from '@/components/admin/market/ReverseAsin';
+import NicheScorecard from '@/components/admin/market/NicheScorecard';
+import CategoryBsrExplorer from '@/components/admin/market/CategoryBsrExplorer';
+import CompetitorReviewAnalyzer from '@/components/admin/market/CompetitorReviewAnalyzer';
+import CompetitorTracker from '@/components/admin/market/CompetitorTracker';
+import AmazonAdsKeywordResearch from '@/components/admin/market/AmazonAdsKeywordResearch';
+import TrademarkChecker from '@/components/admin/market/TrademarkChecker';
 
 /** Modules dont le dialog s'affiche en largeur réduite (max-w-2xl). */
 export const NARROW_MODULE_IDS: string[] = [
