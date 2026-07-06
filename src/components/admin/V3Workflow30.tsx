@@ -1163,9 +1163,15 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
           </div>
         </div>
 
-        {/* Phases */}
+        {/* Phases.
+            En parcours 197€ (core), on MASQUE les phases 100% Pro pour que
+            l'acheteur ne les retrouve pas mélangées à son parcours : elles sont
+            résumées dans un unique encart « Aller plus loin » (voir plus bas). */}
         <div className="divide-y divide-[#f0e7d4]">
-          {PHASES.map((phase) => {
+          {PHASES.filter((phase) => {
+            const allPremium = phase.steps.every((s) => (s.tier ?? 'core') === 'premium');
+            return parcours === 'full' ? true : !allPremium;
+          }).map((phase) => {
             const isOpen = openPhase === phase.key;
             const phaseSteps = FLAT.filter((s) => s.phaseKey === phase.key);
             const phaseDone = phaseSteps.filter((s) => done.has(s.moduleId)).length;
