@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Sparkles, Compass, Lock, ArrowRight, Wand2, CheckCircle2, Layers, Infinity as InfinityIcon, ShieldCheck, Save, Image as ImageIcon, BookOpen, GraduationCap, Gem, Map as MapIcon, Menu, X, PanelLeftClose, PanelLeftOpen, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, Search, Sparkles, Compass, Lock, ArrowRight, Wand2, CheckCircle2, Layers, Infinity as InfinityIcon, ShieldCheck, Save, Image as ImageIcon, BookOpen, GraduationCap, Gem, Map as MapIcon, FileText, Copy, Check, Menu, X, PanelLeftClose, PanelLeftOpen, type LucideIcon } from 'lucide-react';
 import {
   V3_MODULES, V3_PILLAR_META, getModuleAccess, getModuleById, type V3Pillar, type V3Module,
 } from '@/data/roadmapV3';
@@ -20,6 +20,7 @@ import pillarIa from '@/assets/v3/pillar-ia.jpg';
 import pillarPublier from '@/assets/v3/pillar-publier.jpg';
 import pillarMonetiser from '@/assets/v3/pillar-monetiser.jpg';
 import pillarMarketing from '@/assets/v3/pillar-marketing.jpg';
+import videoOctoberScript from '../../SCRIPT_VIDEO_OCTOBRE_V3.md?raw';
 
 const PILLAR_IMG: Record<V3Pillar, string> = {
   ia: pillarIa,
@@ -164,7 +165,7 @@ function ModuleCard({
 }
 
 
-type HubTab = 'parcours' | 'outils' | 'livres' | 'guides' | 'offres' | 'roadmap';
+type HubTab = 'parcours' | 'outils' | 'livres' | 'guides' | 'offres' | 'roadmap' | 'script';
 
 const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon }[] = [
   { id: 'parcours', label: 'Parcours', icon: Compass },
@@ -173,6 +174,7 @@ const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon }[] = [
   { id: 'guides', label: 'Guides', icon: GraduationCap },
   { id: 'offres', label: 'Offres & Packs', icon: Gem },
   { id: 'roadmap', label: 'Roadmap', icon: MapIcon },
+  { id: 'script', label: 'Script vidéo', icon: FileText },
 ];
 
 const TAB_STORAGE_KEY = 'v3hub_active_tab';
@@ -191,6 +193,7 @@ const V3HubPage: React.FC = () => {
   const [selected, setSelected] = useState<V3Module | null>(null);
   const [studioSource, setStudioSource] = useState<string | null>(null);
   const [tourOpen, setTourOpen] = useState(false);
+  const [scriptCopied, setScriptCopied] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(
     () => localStorage.getItem('v3hub_sidebar_collapsed') === '1',
   );
@@ -251,6 +254,12 @@ const V3HubPage: React.FC = () => {
   const openModule = (id: string) => {
     const mod = getModuleById(id);
     if (mod) setSelected(mod);
+  };
+
+  const copyVideoScript = async () => {
+    await navigator.clipboard.writeText(videoOctoberScript);
+    setScriptCopied(true);
+    window.setTimeout(() => setScriptCopied(false), 1800);
   };
 
   const filtered = useMemo(() => {
@@ -637,6 +646,41 @@ const V3HubPage: React.FC = () => {
         {/* ===================== ONGLET ROADMAP ===================== */}
         {activeTab === 'roadmap' && (
           <V3RoadmapTab />
+        )}
+
+        {/* ===================== ONGLET SCRIPT VIDÉO ===================== */}
+        {activeTab === 'script' && (
+          <section className="space-y-5">
+            <div className="rounded-2xl border p-5 sm:p-6" style={{ background: '#fff', borderColor: `${AMBER}44` }}>
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-wider" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44`, color: AMBER_DEEP }}>
+                    <FileText className="h-3.5 w-3.5" /> Script visible
+                  </div>
+                  <h2 className="mt-4 text-3xl sm:text-4xl font-medium leading-tight" style={{ fontFamily: SERIF, color: INK }}>
+                    Grand script vidéo — octobre V3
+                  </h2>
+                  <p className="mt-2 max-w-2xl text-sm leading-relaxed" style={{ color: '#6f5e47' }}>
+                    Version longue prête à lire au prompteur pour expliquer la fin de la bêta, le prix actuel à 67€ et l'arrivée de Publication Assistée Pro en octobre.
+                  </p>
+                </div>
+                <button
+                  onClick={copyVideoScript}
+                  className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-bold transition-all hover:-translate-y-0.5"
+                  style={{ background: scriptCopied ? '#1f9d6b' : AMBER_DEEP, color: '#fff' }}
+                >
+                  {scriptCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                  {scriptCopied ? 'Copié' : 'Copier le script'}
+                </button>
+              </div>
+            </div>
+
+            <article className="rounded-2xl border bg-white p-5 sm:p-8" style={{ borderColor: '#eadfc9' }}>
+              <pre className="whitespace-pre-wrap break-words text-[15px] leading-7" style={{ color: INK, fontFamily: SANS }}>
+                {videoOctoberScript}
+              </pre>
+            </article>
+          </section>
         )}
       </main>
       </div>
