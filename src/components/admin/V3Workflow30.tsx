@@ -50,7 +50,7 @@ interface Step {
   moduleId: string;
   label?: string;
   hint: string;
-  /** 'core' = parcours 197€ (25 étapes) ; 'premium' = réservé au parcours 347€ (40 étapes). */
+  /** 'core' = parcours 197€ (29 étapes) ; 'premium' = réservé au parcours 347€ (45 étapes). */
   tier?: Tier;
 }
 interface Phase {
@@ -218,8 +218,8 @@ const buildFlat = (parcours: Parcours): FlatStep[] =>
       .map((s) => ({ ...s, phaseKey: p.key, phaseTitle: p.title, emoji: p.emoji, globalIndex: 0 })),
   ).map((s, i) => ({ ...s, globalIndex: i }));
 
-const CORE_TOTAL = buildFlat('core').length; // 25 étapes (197€)
-const FULL_TOTAL = buildFlat('full').length; // 40 étapes (347€)
+const CORE_TOTAL = buildFlat('core').length; // 29 étapes (197€)
+const FULL_TOTAL = buildFlat('full').length; // 45 étapes (347€)
 const PARCOURS_KEY = 'v3_workflow30_parcours';
 
 function loadSet(key: string): Set<string> {
@@ -314,7 +314,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   // Droits réellement payés (197€ base / 347€ Pack Tout Complet). L'admin a tout.
   const { hasFull, loading: entLoading } = useV3Entitlement();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
-  // Parcours actif : 'core' = offre 197€ (25 étapes), 'full' = Pack Tout Complet 347€ (40 étapes).
+  // Parcours actif : 'core' = offre 197€ (29 étapes), 'full' = Pack Tout Complet 347€ (45 étapes).
   const [parcours, setParcours] = useState<Parcours>(
     () => ((localStorage.getItem(PARCOURS_KEY) as Parcours) === 'full' ? 'full' : 'core'),
   );
