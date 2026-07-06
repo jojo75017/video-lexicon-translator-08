@@ -226,6 +226,7 @@ export const V3_PILLAR_COLORS: Record<V3Pillar, string> = {
   edition:      '#f87171',
   distribution: '#60a5fa',
   promotion:    '#fbbf24',
+  data:         '#2dd4bf',
 };
 
 export const V3_MODULES: V3Module[] = [
