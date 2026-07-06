@@ -50,6 +50,7 @@ interface EbookCompleteWorkflowProps {
   initialAuthorName?: string;
   initialBookIntroduction?: string;
   initialNumberOfChapters?: number;
+  onNavigateToSettings?: () => void;
 }
 
 const STORAGE_KEY = 'ebook_workflow_progress';
