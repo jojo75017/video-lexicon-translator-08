@@ -1183,6 +1183,8 @@ serve(async (req) => {
       userApiKey,
       forceFallback = false,
       useUserKey: _useUserKey,
+      provider = 'gemini',
+      openrouterModel = 'google/gemini-2.5-flash-lite',
     } = payload;
 
     const LANGUAGE_NAMES: Record<string, string> = {
