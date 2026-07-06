@@ -110,6 +110,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
 }) => {
   // Hook pour sauvegarder les résultats P1-P14 globalement
   const { saveStepResult } = useWorkflowResults();
+  const { hasFull } = useV3Entitlement();
   const { saveStepToCloud } = useWorkflowCloudSync();
   
   // Hook pour récupérer la clé API utilisateur
