@@ -374,6 +374,32 @@ const AdminBetaCodesPage: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={closureDialog} onOpenChange={(o) => !o && setClosureDialog(false)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Clôturer la phase bêta ?</DialogTitle>
+            <DialogDescription>
+              L'accès de <strong>{usedCount} bêta-testeur{usedCount > 1 ? 's' : ''}</strong> va être coupé
+              (statut « expiré ») et un email de clôture leur sera envoyé. Vous pourrez réactiver un accès
+              manuellement plus tard si besoin.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setClosureDialog(false)} disabled={revoking}>
+              Annuler
+            </Button>
+            <Button variant="destructive" onClick={handleRevokeBeta} disabled={revoking}>
+              {revoking ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Power className="h-4 w-4 mr-2" />
+              )}
+              Confirmer la clôture
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
