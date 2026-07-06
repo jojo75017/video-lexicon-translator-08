@@ -86,6 +86,7 @@ import BooksellersFairs from '@/components/admin/BooksellersFairs';
 import ForeignRights from '@/components/admin/ForeignRights';
 import PreordersStrategy from '@/components/admin/PreordersStrategy';
 import AudioVideoTranscriber from '@/components/admin/AudioVideoTranscriber';
+import { V3OrderPageModule, V3SalesPageModule, V3LaunchBonusesModule } from '@/components/admin/V3LaunchModules';
 import AmazonBookDatabase from '@/components/admin/market/AmazonBookDatabase';
 import SalesEstimatorBsr from '@/components/admin/market/SalesEstimatorBsr';
 import KeywordExplorerAmazon from '@/components/admin/market/KeywordExplorerAmazon';
