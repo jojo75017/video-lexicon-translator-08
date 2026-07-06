@@ -328,6 +328,31 @@ const V3PricingTiers: React.FC = () => {
         </div>
       </div>
 
+      {/* Encart : moteur de rédaction renforcé au Pack Pro 347€ */}
+      <div className="mt-6 rounded-2xl border-2 p-5 sm:p-6"
+        style={{ borderColor: '#008296', background: '#00829611' }}>
+        <div className="flex items-start gap-3">
+          <Sparkles className="h-6 w-6 shrink-0 mt-0.5" style={{ color: '#008296' }} />
+          <div>
+            <h3 className="text-base sm:text-lg font-bold mb-1" style={{ fontFamily: SERIF, color: INK }}>
+              Le Pack Pro écrit aussi de meilleurs livres — pas seulement plus d'outils.
+            </h3>
+            <p className="text-sm leading-relaxed mb-2" style={{ color: '#5a6b6e' }}>
+              Le 347€ active un <strong>Moteur de Rédaction Pro</strong> directement dans l'outil d'écriture :
+            </p>
+            <ul className="grid sm:grid-cols-2 gap-1.5 text-sm" style={{ color: INK }}>
+              <li className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5" style={{ color: '#008296' }} />Chapitres plus longs et denses (~5000 mots vs ~3500)</li>
+              <li className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5" style={{ color: '#008296' }} />Passe éditoriale automatique sur chaque chapitre</li>
+              <li className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5" style={{ color: '#008296' }} />Boucle qualité renforcée (score cible plus élevé)</li>
+              <li className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5" style={{ color: '#008296' }} />Sous-sections enrichies et plus détaillées</li>
+            </ul>
+            <p className="text-xs mt-2" style={{ color: '#6f5e47' }}>
+              Le choix du modèle IA (Claude, Gemini, ChatGPT, DeepSeek, Mistral…) reste libre dans tous les paliers.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* 2. Packs premium inclus dans le Pack Pro 347€ */}
       <div className="flex items-center gap-2 mb-4 mt-8">
         <Lock className="h-4 w-4" style={{ color: AMBER }} />
