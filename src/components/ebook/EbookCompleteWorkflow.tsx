@@ -789,6 +789,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
             useUserKey: hasUsableApiKey,
             provider: getProvider(),
             openrouterModel: getOpenRouterModel(),
+            quality: hasFull ? 'pro' : 'core',
             ...extraBody,
           }
         });
