@@ -92,6 +92,8 @@ const PHASES: Phase[] = [
       { moduleId: 'p19-author-voice', label: 'Fixer la voix d\'auteur', hint: 'Définit un style constant pour tout le livre.' },
       { moduleId: 'p20-chat-manuscript', label: 'Développer le manuscrit', hint: 'Rédige le cœur du contenu chapitre par chapitre.' },
       { moduleId: 'p23-universe-bible', label: 'Vérifier la cohérence', hint: 'Contrôle la cohérence de l\'univers et des persos.' },
+      { moduleId: 'developmental-edit', label: 'Édition structurelle Pro', hint: 'Retravaille structure, rythme et arcs comme un éditeur pro.', tier: 'premium' },
+      { moduleId: 'p25-tone-adapter', label: 'Affiner le ton sur mesure', hint: 'Ajuste le ton exact attendu par ton lectorat.', tier: 'premium' },
     ],
   },
   {
@@ -99,6 +101,8 @@ const PHASES: Phase[] = [
     steps: [
       { moduleId: 'p18-readability', label: 'Auditer la lisibilité', hint: 'Mesure et améliore la fluidité de lecture.' },
       { moduleId: 'cockpit-audit-pilot', label: 'Auditer la conformité KDP', hint: 'Score complet de conformité avant publication.' },
+      { moduleId: 'copy-editing-line', label: 'Copy-editing & ligne éditoriale', hint: 'Correction fine phrase par phrase + cohérence de style.', tier: 'premium' },
+      { moduleId: 'reading-committee', label: 'Comité de lecture IA', hint: 'Un panel d\'IA critique ton livre avant publication.', tier: 'premium' },
     ],
   },
   {
@@ -106,6 +110,7 @@ const PHASES: Phase[] = [
     steps: [
       { moduleId: 'ebook-anti-plagiat', label: 'Vérifier l\'originalité', hint: 'Contrôle l\'originalité et protège le texte.' },
       { moduleId: 'content-compliance', label: 'Contrôler la conformité KDP', hint: 'Évite les motifs de refus à la publication.' },
+      { moduleId: 'p24-cliche-detector', label: 'Nettoyer clichés & répétitions', hint: 'Supprime les tics d\'écriture et redites.', tier: 'premium' },
     ],
   },
   {
@@ -114,6 +119,7 @@ const PHASES: Phase[] = [
       { moduleId: 'manuscript-converter', label: 'Préparer le manuscrit', hint: 'Met le fichier au bon format KDP.' },
       { moduleId: 'back-matter-builder', label: 'Rédiger les pages de fin', hint: 'Remerciements, bio et appels à l\'action.' },
       { moduleId: 'copyright-page', label: 'Générer la page copyright', hint: 'Crée les mentions légales obligatoires.' },
+      { moduleId: 'quality-label', label: 'Label Qualité Maison d\'Édition', hint: 'Certifie un niveau de finition digne d\'un éditeur.', tier: 'premium' },
     ],
   },
   {
@@ -122,6 +128,7 @@ const PHASES: Phase[] = [
       { moduleId: 'cover-studio-pro', label: 'Concevoir la couverture', hint: 'Direction artistique de couverture haut de gamme.' },
       { moduleId: 'cover-pdf-exact', label: 'Couverture KDP exacte', hint: 'Dos + 4e + fonds perdus aux bonnes cotes.' },
       { moduleId: 'cover-variants-thumbnail', label: 'Tester la miniature Amazon', hint: 'Valide la lisibilité du titre en petit.' },
+      { moduleId: 'cover-studio-pro-v3', label: 'Couverture Signature Pro (gpt-image-2)', hint: 'Couverture ultra-pro : direction artistique IA + variations premium.', tier: 'premium' },
     ],
   },
   {
