@@ -51,6 +51,10 @@ STANDARDS ÉDITORIAUX PROFESSIONNELS (niveau maison d'édition) :
 // Variable globale pour stocker la clé API utilisateur optionnelle
 let activeApiKey: string | null = null;
 let activeLanguageDirective = '';
+// Provider IA choisi par l'abonné : 'gemini' | 'claude' | 'openai' | 'openrouter'
+let activeProvider: string = 'gemini';
+// Modèle OpenRouter sélectionné (slug ex. anthropic/claude-sonnet-4.5)
+let activeOpenRouterModel: string = 'google/gemini-2.5-flash-lite';
 
 // Token tracking global
 let totalTokenUsage = {
@@ -125,6 +129,164 @@ async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTok
   return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 }
 
+// Appel OpenRouter (multi-modèles : Claude, Gemini, DeepSeek, GPT, Mistral, etc.)
+// Clé BYOK de l'abonné (sk-or-...). Le modèle est choisi côté client.
+async function callOpenRouter(systemPrompt: string, userPrompt: string, maxTokens: number, apiKey: string, model: string, retryCount = 0): Promise<string> {
+  const MAX_RETRIES = 2;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 120000);
+  let response: Response | null = null;
+  try {
+    response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey.trim()}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://ebookstudio.fr',
+        'X-Title': 'EbookStudio',
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: 'system', content: `${systemPrompt}\n\n${EDITORIAL_PRO_RULES}` },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature: 0.7,
+        max_tokens: maxTokens,
+      }),
+      signal: controller.signal,
+    });
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('TIMEOUT: La génération OpenRouter a dépassé le délai sécurisé.');
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+
+  if (!response.ok) {
+    const status = response.status;
+    const errText = await response.text();
+    console.error(`OpenRouter error ${status}: ${errText}`);
+    if ((status === 429 || status === 503 || status === 500) && retryCount < MAX_RETRIES) {
+      const waitSeconds = Math.min(15 * Math.pow(2, retryCount), 45);
+      await new Promise((r) => setTimeout(r, waitSeconds * 1000));
+      return await callOpenRouter(systemPrompt, userPrompt, maxTokens, apiKey, model, retryCount + 1);
+    }
+    if (status === 401 || status === 403) throw new Error('INVALID_API_KEY: Clé OpenRouter invalide (sk-or-...).');
+    if (status === 402) throw new Error('CREDITS_EXHAUSTED: Crédits OpenRouter insuffisants.');
+    if (status === 429) throw new Error('RATE_LIMIT: Limite OpenRouter atteinte. Réessayez plus tard.');
+    throw new Error(`OpenRouter Error: ${status}`);
+  }
+
+  const data = await response.json();
+  const text = data?.choices?.[0]?.message?.content || '';
+  if (!text) throw new Error('OpenRouter: réponse vide.');
+  return text;
+}
+
+// Appel direct Anthropic Claude (clé sk-ant-...).
+async function callClaudeDirect(systemPrompt: string, userPrompt: string, maxTokens: number, apiKey: string, retryCount = 0): Promise<string> {
+  const MAX_RETRIES = 2;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 120000);
+  let response: Response | null = null;
+  try {
+    response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey.trim(),
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: Math.min(maxTokens, 8192),
+        temperature: 0.7,
+        system: `${systemPrompt}\n\n${EDITORIAL_PRO_RULES}`,
+        messages: [{ role: 'user', content: userPrompt }],
+      }),
+      signal: controller.signal,
+    });
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') throw new Error('TIMEOUT: Claude a dépassé le délai.');
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+  if (!response.ok) {
+    const status = response.status;
+    const errText = await response.text();
+    console.error(`Claude error ${status}: ${errText}`);
+    if ((status === 429 || status === 529 || status === 500) && retryCount < MAX_RETRIES) {
+      const waitSeconds = Math.min(15 * Math.pow(2, retryCount), 45);
+      await new Promise((r) => setTimeout(r, waitSeconds * 1000));
+      return await callClaudeDirect(systemPrompt, userPrompt, maxTokens, apiKey, retryCount + 1);
+    }
+    if (status === 401 || status === 403) throw new Error('INVALID_API_KEY: Clé Claude invalide (sk-ant-...).');
+    if (status === 429) throw new Error('RATE_LIMIT: Limite Claude atteinte.');
+    throw new Error(`Claude Error: ${status}`);
+  }
+  const data = await response.json();
+  const text = (data?.content || []).map((p: any) => p?.text || '').join('\n').trim();
+  if (!text) throw new Error('Claude: réponse vide.');
+  return text;
+}
+
+// Appel direct OpenAI ChatGPT (clé sk-...).
+async function callOpenAIDirect(systemPrompt: string, userPrompt: string, maxTokens: number, apiKey: string, retryCount = 0): Promise<string> {
+  const MAX_RETRIES = 2;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 120000);
+  let response: Response | null = null;
+  try {
+    response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey.trim()}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: `${systemPrompt}\n\n${EDITORIAL_PRO_RULES}` },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature: 0.7,
+        max_tokens: maxTokens,
+      }),
+      signal: controller.signal,
+    });
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') throw new Error('TIMEOUT: OpenAI a dépassé le délai.');
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+  if (!response.ok) {
+    const status = response.status;
+    const errText = await response.text();
+    console.error(`OpenAI error ${status}: ${errText}`);
+    if ((status === 429 || status === 503 || status === 500) && retryCount < MAX_RETRIES) {
+      const waitSeconds = Math.min(15 * Math.pow(2, retryCount), 45);
+      await new Promise((r) => setTimeout(r, waitSeconds * 1000));
+      return await callOpenAIDirect(systemPrompt, userPrompt, maxTokens, apiKey, retryCount + 1);
+    }
+    if (status === 401 || status === 403) throw new Error('INVALID_API_KEY: Clé OpenAI invalide (sk-...).');
+    if (status === 429) throw new Error('RATE_LIMIT: Limite OpenAI atteinte.');
+    throw new Error(`OpenAI Error: ${status}`);
+  }
+  const data = await response.json();
+  const text = data?.choices?.[0]?.message?.content || '';
+  if (!text) throw new Error('OpenAI: réponse vide.');
+  return text;
+}
+
+
 async function callLovableAI(systemPrompt: string, userPrompt: string, maxTokens: number, retryCount = 0): Promise<string> {
   const MAX_RETRIES = 2;
   const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
@@ -195,6 +357,27 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
     ? `${systemPrompt}\n\n${activeLanguageDirective}`
     : systemPrompt;
 
+  // Providers non-Gemini (Claude / OpenAI / OpenRouter) : clé BYOK de l'abonné.
+  // En cas d'échec récupérable, on retombe sur le backend Lovable AI intégré.
+  if (userKey && activeProvider !== 'gemini') {
+    try {
+      switch (activeProvider) {
+        case 'openrouter':
+          return await callOpenRouter(finalSystemPrompt, userPrompt, maxTokens, userKey, activeOpenRouterModel);
+        case 'claude':
+          return await callClaudeDirect(finalSystemPrompt, userPrompt, maxTokens, userKey);
+        case 'openai':
+          return await callOpenAIDirect(finalSystemPrompt, userPrompt, maxTokens, userKey);
+      }
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      console.warn(`Provider ${activeProvider} failed, falling back to Lovable AI:`, msg);
+      // Erreurs terminales : on ne masque pas derrière le fallback.
+      if (/INVALID_API_KEY|CREDITS_EXHAUSTED/i.test(msg)) throw error;
+      return await callLovableAI(finalSystemPrompt, userPrompt, maxTokens);
+    }
+  }
+
   if (userKey) {
     try {
       return await callGeminiDirect(finalSystemPrompt, userPrompt, maxTokens, userKey);
@@ -221,6 +404,7 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
 
   return await callLovableAI(finalSystemPrompt, userPrompt, maxTokens);
 }
+
 
 // BOUCLE QUALITÉ : appelle l'IA, évalue le score, relance si < seuil
 async function callAIWithQualityLoop(
@@ -999,6 +1183,8 @@ serve(async (req) => {
       userApiKey,
       forceFallback = false,
       useUserKey: _useUserKey,
+      provider = 'gemini',
+      openrouterModel = 'google/gemini-2.5-flash-lite',
     } = payload;
 
     const LANGUAGE_NAMES: Record<string, string> = {
@@ -1010,19 +1196,35 @@ serve(async (req) => {
     const langName = LANGUAGE_NAMES[language] || LANGUAGE_NAMES.fr;
     const languageDirective = `\n\n🌍 LANGUE OBLIGATOIRE DE RÉDACTION : ${langName.toUpperCase()}.\nTout le contenu (titres, sous-titres, chapitres, introduction, conclusion, dialogues, descriptions, JSON values texte) DOIT être rédigé EXCLUSIVEMENT en ${langName}. Ne mélange JAMAIS les langues. Si le titre fourni est dans une autre langue, traduis-le naturellement en ${langName} dans tes sorties textuelles. Les CLÉS JSON restent en français comme dans le schéma demandé, mais les VALEURS textuelles sont en ${langName}.`;
 
-    // La clé utilisateur devient optionnelle ; sinon on utilise le backend IA intégré
+    // La clé utilisateur devient optionnelle ; sinon on utilise le backend IA intégré.
+    // Selon le provider choisi, on valide le format de clé correspondant.
     const cleanedApiKey = typeof userApiKey === 'string' ? userApiKey.trim() : '';
-    const hasValidUserKeyFormat = cleanedApiKey.length >= 20 && cleanedApiKey.startsWith('AIza');
-    activeApiKey = hasValidUserKeyFormat ? cleanedApiKey : null;
+    const normalizedProvider = ['gemini', 'claude', 'openai', 'openrouter'].includes(provider) ? provider : 'gemini';
+    const keyFormatOk = (() => {
+      if (cleanedApiKey.length < 20) return false;
+      switch (normalizedProvider) {
+        case 'gemini': return cleanedApiKey.startsWith('AIza') || /^AQ\.Ab/i.test(cleanedApiKey);
+        case 'claude': return cleanedApiKey.startsWith('sk-ant-');
+        case 'openai': return cleanedApiKey.startsWith('sk-');
+        case 'openrouter': return cleanedApiKey.startsWith('sk-or-');
+        default: return false;
+      }
+    })();
+
+    activeProvider = normalizedProvider;
+    activeOpenRouterModel = typeof openrouterModel === 'string' && openrouterModel.trim()
+      ? openrouterModel.trim()
+      : 'google/gemini-2.5-flash-lite';
+    activeApiKey = keyFormatOk ? cleanedApiKey : null;
     activeLanguageDirective = languageDirective;
 
-    if (cleanedApiKey && !hasValidUserKeyFormat) {
-      console.warn(`Ignoring invalid user Gemini key for step ${step}; using Lovable AI fallback instead.`);
+    if (cleanedApiKey && !keyFormatOk) {
+      console.warn(`Ignoring invalid user ${normalizedProvider} key for step ${step}; using Lovable AI fallback instead.`);
     }
 
     console.log(
       activeApiKey
-        ? `Using USER API key for step ${step} (length=${cleanedApiKey.length}, prefix=${cleanedApiKey.substring(0, 4)})`
+        ? `Using USER ${normalizedProvider} key for step ${step}${normalizedProvider === 'openrouter' ? ` (model=${activeOpenRouterModel})` : ''} (length=${cleanedApiKey.length})`
         : `Using Lovable AI backend for step ${step}`
     );
 
