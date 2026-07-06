@@ -106,6 +106,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
   initialAuthorName = '',
   initialBookIntroduction = '',
   initialNumberOfChapters = 8,
+  onNavigateToSettings,
 }) => {
   // Hook pour sauvegarder les résultats P1-P14 globalement
   const { saveStepResult } = useWorkflowResults();
