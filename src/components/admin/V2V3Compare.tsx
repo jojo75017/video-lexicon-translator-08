@@ -159,9 +159,9 @@ export default function V2V3Compare() {
             <div className="text-xs uppercase tracking-widest mb-1 flex items-center justify-center gap-1" style={{ color: `${INK}70` }}>
               <Crown className="h-3 w-3" /> V3 Premium
             </div>
-            <div className="text-5xl font-black transition-transform duration-300 group-hover:scale-110" style={{ color: ROYAL_DEEP }}>{V3_AGENTS}</div>
+            <div className="text-5xl font-black transition-transform duration-300 group-hover:scale-110" style={{ color: ROYAL_DEEP }}>{V3_PREMIUM_AGENTS}</div>
             <div className="relative mt-1 text-sm font-semibold" style={{ color: ROYAL_DEEP }}>agents IA</div>
-            <div className="relative mt-1 text-[11px] font-medium" style={{ color: `${INK}80` }}>même nombre, qualité IA Pro</div>
+            <div className="relative mt-1 text-[11px] font-medium" style={{ color: `${INK}80` }}>qualité IA Pro</div>
             <div className="relative mt-2 inline-block rounded-full px-3 py-0.5 text-[11px] font-extrabold"
               style={{ background: `linear-gradient(90deg, ${ROYAL}, #9d76e8)`, color: '#fff' }}>
               ×4 plus puissant
