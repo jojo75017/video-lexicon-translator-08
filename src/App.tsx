@@ -394,6 +394,8 @@ const App = () => {
             <Route path="/publication-pro" element={<SalesPageV3 />} />
             <Route path="/v3-offre" element={<SalesPageV3 />} />
             <Route path="/v3-paiement" element={<V3PaiementPage />} />
+            <Route path="/commande-v3" element={<V3CommandePage />} />
+            <Route path="/vente-v3" element={<SalesPageV3Launch />} />
             <Route path="/masterclass" element={<MasterclassPage />} />
             <Route path="/activer-beta" element={<ActivationBetaPage />} />
             <Route path="/extension-chrome" element={<ExtensionChromePage />} />
