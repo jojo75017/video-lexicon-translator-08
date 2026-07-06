@@ -625,6 +625,7 @@ const V3HubPage: React.FC = () => {
         {/* ===================== ONGLET OFFRES & PACKS ===================== */}
         {activeTab === 'offres' && (
           <>
+            <V3LaunchLinks />
             <V3AccessRecap onOpenModule={setSelected} />
             <V3PricingTiers />
             <MaisonEditionTab onOpenModule={(id) => { const m = getModuleById(id); if (m) setSelected(m); }} />
