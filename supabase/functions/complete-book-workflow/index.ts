@@ -51,6 +51,10 @@ STANDARDS ÉDITORIAUX PROFESSIONNELS (niveau maison d'édition) :
 // Variable globale pour stocker la clé API utilisateur optionnelle
 let activeApiKey: string | null = null;
 let activeLanguageDirective = '';
+// Provider IA choisi par l'abonné : 'gemini' | 'claude' | 'openai' | 'openrouter'
+let activeProvider: string = 'gemini';
+// Modèle OpenRouter sélectionné (slug ex. anthropic/claude-sonnet-4.5)
+let activeOpenRouterModel: string = 'google/gemini-2.5-flash-lite';
 
 // Token tracking global
 let totalTokenUsage = {
