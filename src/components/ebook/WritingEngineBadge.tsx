@@ -104,7 +104,7 @@ export const WritingEngineBadge: React.FC<WritingEngineBadgeProps> = ({ isPro, o
       ) : (
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-5 py-3.5" style={{ background: `${AMBER}12` }}>
           <span className="text-[12px] text-foreground max-w-md">
-            <strong>Passez au Pack Pro 347€</strong> pour des chapitres plus longs, une passe éditoriale automatique et le lancement de votre livre.
+            <strong>Passez au Pack Pro 347€</strong> pour un livre de meilleure qualité (édition pro, comité de lecture, couverture signature) et son lancement complet.
           </span>
           {onUpgrade && (
             <button
