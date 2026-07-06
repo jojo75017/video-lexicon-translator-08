@@ -214,6 +214,7 @@ export const V3_PILLAR_META: Record<V3Pillar, { label: string; color: string; em
   edition:      { label: 'Édition Pro',     color: '#9B2335', emoji: '📕' },
   distribution: { label: 'Distribution',    color: '#1D4ED8', emoji: '🌍' },
   promotion:    { label: 'Promotion',       color: '#B8860B', emoji: '📰' },
+  data:         { label: 'Étude de Marché',  color: '#0F766E', emoji: '📊' },
 };
 
 // Variante "Midnight Indigo" — utilisée uniquement en mode V3 (cockpit admin).
