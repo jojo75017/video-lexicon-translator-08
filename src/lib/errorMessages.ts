@@ -19,6 +19,23 @@ export function isFreeTierQuotaError(error: any): boolean {
   );
 }
 
+/**
+ * Détecte si l'erreur correspond aux crédits IA (Lovable AI) épuisés — HTTP 402.
+ * Dans ce cas l'abonné doit recharger des crédits OU configurer une clé Gemini personnelle.
+ */
+export function isCreditsExhaustedError(error: any): boolean {
+  const raw = (error?.message || error?.toString() || '').toString().toLowerCase();
+  if (!raw) return false;
+  return (
+    raw.includes('402') ||
+    raw.includes('credits_exhausted') ||
+    raw.includes('crédits épuisés') ||
+    raw.includes('credits epuises') ||
+    raw.includes('payment_required') ||
+    (raw.includes('not enough') && raw.includes('credit'))
+  );
+}
+
 export function getFriendlyError(error: any, fallback = 'Une erreur est survenue. Réessayez.'): string {
   const raw = (error?.message || error?.toString() || '').toString();
   const msg = raw.toLowerCase();
@@ -33,6 +50,16 @@ export function getFriendlyError(error: any, fallback = 'Une erreur est survenue
       'Google offre 300$ de crédit gratuit et le coût réel d\'un ebook complet est ~0,01€.\n\n' +
       '👉 Allez sur https://aistudio.google.com/app/apikey → cliquez sur votre clé → "Set up Billing" → liez une carte. ' +
       'Votre clé passe de "Free" à "Paid" (1000 req/min) immédiatement.'
+    );
+  }
+
+  // Crédits IA (Lovable AI) épuisés — HTTP 402
+  if (isCreditsExhaustedError(error)) {
+    return (
+      '💳 Crédits IA épuisés.\n\n' +
+      'Deux solutions pour continuer :\n' +
+      '• Rechargez des crédits IA (recommandé, immédiat).\n' +
+      '• OU configurez votre propre clé Gemini gratuite dans les Réglages pour générer sans limite.'
     );
   }
 

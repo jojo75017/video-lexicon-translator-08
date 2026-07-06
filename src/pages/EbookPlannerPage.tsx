@@ -1781,6 +1781,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         return (
           <div className="space-y-6">
             <EbookCompleteWorkflow
+              onNavigateToSettings={() => setActiveTab('settings')}
               characters={characters}
               initialTitle={ebookTitle}
               initialSubtitle={bookSubtitle}
