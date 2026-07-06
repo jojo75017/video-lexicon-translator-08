@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Check, Crown, Sparkles, Lock, ChevronDown, CheckCircle2, Clock, Gift, Layers, FlaskConical } from 'lucide-react';
 import {
   V3_PRICE, V3_BASE_INSTALLMENTS, V3_UPSELL_PACKS, V3_ESSENTIAL_PACKS, V3_ALACARTE_PACKS,
-  V3_UPSELLS_TOTAL, V3_ALL_PACKS_TOTAL, V3_FULL_PACK,
-  V3_MODULES, getModuleAccess, getModuleById, type V3Module, type V3UpsellPack,
+  V3_ALL_PACKS_TOTAL, V3_FULL_PACK,
+  getModuleById, type V3Module, type V3UpsellPack,
   V3_GIFT_PRICE, V3_GIFT_DISCOUNT,
   V3_INCLUDED_COUNT, V3_PREMIUM_COUNT, V3_TOTAL_COUNT, V3_FULL_PACK_EXTRA_IDS,
 } from '@/data/roadmapV3';
