@@ -125,10 +125,9 @@ const PHASES: Phase[] = [
   {
     key: 'couverture', emoji: '🖼️', title: 'Phase 7 — Couverture',
     steps: [
-      { moduleId: 'cover-studio-pro', label: 'Concevoir la couverture', hint: 'Direction artistique de couverture haut de gamme.' },
-      { moduleId: 'cover-pdf-exact', label: 'Couverture KDP exacte', hint: 'Dos + 4e + fonds perdus aux bonnes cotes.' },
-      { moduleId: 'cover-variants-thumbnail', label: 'Tester la miniature Amazon', hint: 'Valide la lisibilité du titre en petit.' },
-      { moduleId: 'cover-studio-pro-v3', label: 'Couverture Signature Pro (gpt-image-2)', hint: 'Couverture ultra-pro : direction artistique IA + variations premium.', tier: 'premium' },
+      { moduleId: 'cover-pdf-exact', label: 'Couverture KDP exacte', hint: 'Recto + dos + 4e aux bonnes cotes KDP.' },
+      { moduleId: 'cover-variants-thumbnail', label: 'Concevoir & tester la couverture', hint: 'Variantes de couverture + test de la miniature Amazon.' },
+      { moduleId: 'cover-studio-pro', label: 'Couverture Signature Pro (IA gpt-image-2)', hint: 'Couverture ultra-pro : direction artistique IA + variations premium.', tier: 'premium' },
     ],
   },
   {
