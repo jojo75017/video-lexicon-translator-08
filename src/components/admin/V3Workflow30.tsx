@@ -1483,7 +1483,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
               <button onClick={() => setCheckoutOpen(true)}
                 className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-[13px] font-bold text-white transition-transform hover:-translate-y-0.5"
                 style={{ background: `linear-gradient(90deg, ${GREEN}, #2fc488)` }}>
-                <Sparkles className="h-4 w-4" /> Débloquer les 5 phases Pro (Pack Tout Complet · 347€)
+                <Sparkles className="h-4 w-4" /> Débloquer les {PREMIUM_TOTAL} étapes Pro (Pack Tout Complet · 347€)
               </button>
             )}
           </div>
