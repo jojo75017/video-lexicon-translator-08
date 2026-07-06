@@ -88,6 +88,18 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
       'collection-charter', 'quality-label',
     ],
   },
+  {
+    id: 'market-research',
+    title: 'Pack Étude de Marché Pro',
+    desc: 'La data façon BookBeam, adaptée au marché francophone : recherche de produits Amazon, estimateur de ventes (BSR → revenus), recherche & suivi de mots-clés, reverse ASIN, analyse de niche, explorateur de catégories/BSR, analyse d\'avis concurrents, suivi de concurrents, mots-clés Amazon Ads et vérification de marques déposées. Données Amazon réelles + estimations IA clairement étiquetées.',
+    price: 97,
+    modules: [
+      'amazon-book-database', 'sales-estimator-bsr', 'keyword-explorer-amazon',
+      'keyword-rank-tracker', 'reverse-asin', 'niche-scorecard',
+      'category-bsr-explorer', 'competitor-review-analyzer', 'competitor-tracker',
+      'amazon-ads-keyword-research', 'trademark-checker',
+    ],
+  },
   // ===== Options spécialistes — vendues uniquement à la carte (hors Pack Pro 347€) =====
   {
     id: 'promotion',
