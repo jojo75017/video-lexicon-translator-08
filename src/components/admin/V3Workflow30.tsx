@@ -1152,6 +1152,12 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                             <div className="flex-1 min-w-0">
                               <div className={`flex items-center gap-2 flex-wrap text-sm font-semibold leading-tight ${isDone ? 'opacity-70' : ''}`} style={{ color: INK }}>
                                 <span>{step.label ?? mod?.title ?? step.moduleId}</span>
+                                {step.moduleId === 'p20-chat-manuscript' && fullMode && (
+                                  <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold text-white"
+                                    style={{ background: '#008296' }}>
+                                    <Sparkles className="h-2.5 w-2.5" /> Moteur Pro · chapitres ~5000 mots + passe éditoriale
+                                  </span>
+                                )}
                                 {isTeaser && (
                                   <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold border"
                                     style={{ borderColor: `${GREEN}66`, color: GREEN, background: '#eafaf2' }}>
