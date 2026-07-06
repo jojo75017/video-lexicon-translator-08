@@ -19,6 +19,23 @@ export function isFreeTierQuotaError(error: any): boolean {
   );
 }
 
+/**
+ * Détecte si l'erreur correspond aux crédits IA (Lovable AI) épuisés — HTTP 402.
+ * Dans ce cas l'abonné doit recharger des crédits OU configurer une clé Gemini personnelle.
+ */
+export function isCreditsExhaustedError(error: any): boolean {
+  const raw = (error?.message || error?.toString() || '').toString().toLowerCase();
+  if (!raw) return false;
+  return (
+    raw.includes('402') ||
+    raw.includes('credits_exhausted') ||
+    raw.includes('crédits épuisés') ||
+    raw.includes('credits epuises') ||
+    raw.includes('payment_required') ||
+    (raw.includes('not enough') && raw.includes('credit'))
+  );
+}
+
 export function getFriendlyError(error: any, fallback = 'Une erreur est survenue. Réessayez.'): string {
   const raw = (error?.message || error?.toString() || '').toString();
   const msg = raw.toLowerCase();
