@@ -12,13 +12,14 @@ const INK = '#2A2118';
 const SERIF = "'Georgia', 'Times New Roman', serif";
 
 const V2_AGENTS = 15;
-const V3_AGENTS = 30;
+const V3_AGENTS = 22;
+const V3_PREMIUM_AGENTS = 30;
 const PREMIUM_PRICE = V3_FULL_PACK.price; // 497
 
 // Lignes du tableau comparatif (label, V2, V3, Premium).
 // false = absent, true = inclus, string = détail.
 const ROWS: { label: string; v2: string | false; v3: string | true; premium: string | true }[] = [
-  { label: 'Agents IA de rédaction', v2: `${V2_AGENTS} agents`, v3: `${V3_AGENTS} agents`, premium: `${V3_AGENTS} agents (qualité Pro)` },
+  { label: 'Agents IA de rédaction', v2: `${V2_AGENTS} agents`, v3: `${V3_AGENTS} agents`, premium: `${V3_PREMIUM_AGENTS} agents (qualité Pro)` },
   { label: 'Puissance IA', v2: '×1', v3: '×2 plus puissant', premium: '×4 plus puissant' },
   { label: 'Création de livres', v2: 'Manuelle + IA', v3: '8 sources d’import', premium: '8 sources d’import' },
   { label: 'Studio couverture KDP', v2: 'Basique', v3: 'Pro (dos + 4e + bleed)', premium: 'Pro + variations IA' },
