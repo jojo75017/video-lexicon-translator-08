@@ -11,6 +11,7 @@ import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 import { useV3Entitlement } from '@/hooks/useV3Entitlement';
 import V3ExportPanel from './V3ExportPanel';
 import V3PackCheckout from './V3PackCheckout';
+import WritingEngineBadge from '@/components/ebook/WritingEngineBadge';
 
 // Palette « Clair Ambre » — cohérente avec V3HubPage.
 const AMBER = '#E8951E';
