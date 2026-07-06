@@ -1196,19 +1196,35 @@ serve(async (req) => {
     const langName = LANGUAGE_NAMES[language] || LANGUAGE_NAMES.fr;
     const languageDirective = `\n\n🌍 LANGUE OBLIGATOIRE DE RÉDACTION : ${langName.toUpperCase()}.\nTout le contenu (titres, sous-titres, chapitres, introduction, conclusion, dialogues, descriptions, JSON values texte) DOIT être rédigé EXCLUSIVEMENT en ${langName}. Ne mélange JAMAIS les langues. Si le titre fourni est dans une autre langue, traduis-le naturellement en ${langName} dans tes sorties textuelles. Les CLÉS JSON restent en français comme dans le schéma demandé, mais les VALEURS textuelles sont en ${langName}.`;
 
-    // La clé utilisateur devient optionnelle ; sinon on utilise le backend IA intégré
+    // La clé utilisateur devient optionnelle ; sinon on utilise le backend IA intégré.
+    // Selon le provider choisi, on valide le format de clé correspondant.
     const cleanedApiKey = typeof userApiKey === 'string' ? userApiKey.trim() : '';
-    const hasValidUserKeyFormat = cleanedApiKey.length >= 20 && cleanedApiKey.startsWith('AIza');
-    activeApiKey = hasValidUserKeyFormat ? cleanedApiKey : null;
+    const normalizedProvider = ['gemini', 'claude', 'openai', 'openrouter'].includes(provider) ? provider : 'gemini';
+    const keyFormatOk = (() => {
+      if (cleanedApiKey.length < 20) return false;
+      switch (normalizedProvider) {
+        case 'gemini': return cleanedApiKey.startsWith('AIza') || /^AQ\.Ab/i.test(cleanedApiKey);
+        case 'claude': return cleanedApiKey.startsWith('sk-ant-');
+        case 'openai': return cleanedApiKey.startsWith('sk-');
+        case 'openrouter': return cleanedApiKey.startsWith('sk-or-');
+        default: return false;
+      }
+    })();
+
+    activeProvider = normalizedProvider;
+    activeOpenRouterModel = typeof openrouterModel === 'string' && openrouterModel.trim()
+      ? openrouterModel.trim()
+      : 'google/gemini-2.5-flash-lite';
+    activeApiKey = keyFormatOk ? cleanedApiKey : null;
     activeLanguageDirective = languageDirective;
 
-    if (cleanedApiKey && !hasValidUserKeyFormat) {
-      console.warn(`Ignoring invalid user Gemini key for step ${step}; using Lovable AI fallback instead.`);
+    if (cleanedApiKey && !keyFormatOk) {
+      console.warn(`Ignoring invalid user ${normalizedProvider} key for step ${step}; using Lovable AI fallback instead.`);
     }
 
     console.log(
       activeApiKey
-        ? `Using USER API key for step ${step} (length=${cleanedApiKey.length}, prefix=${cleanedApiKey.substring(0, 4)})`
+        ? `Using USER ${normalizedProvider} key for step ${step}${normalizedProvider === 'openrouter' ? ` (model=${activeOpenRouterModel})` : ''} (length=${cleanedApiKey.length})`
         : `Using Lovable AI backend for step ${step}`
     );
 
