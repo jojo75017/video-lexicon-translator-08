@@ -24,7 +24,8 @@ const ROWS: Row[] = [
   { label: 'Boucle qualité renforcée (score cible + tentatives)', core: 'standard', pro: 'renforcée' },
   { label: 'Sous-sections enrichies et détaillées', core: false, pro: true },
   { label: 'Variantes A/B (titres, descriptions, emails, annonces)', core: false, pro: true },
-  { label: 'Parcours complet', core: '22 agents · idée → publié', pro: '30 agents · + lancement & ventes' },
+  { label: 'Étapes du parcours guidé', core: '29 étapes · idée → publié', pro: '45 étapes · + marketing & ventes' },
+  { label: 'Phases exclusives (marketing, avis, séquences email, série, audio, traduction…)', core: false, pro: '5 phases Pro (15 étapes)' },
   { label: 'Choix du modèle IA (Claude, Gemini, ChatGPT, DeepSeek, Mistral)', core: true, pro: true },
 ];
 
