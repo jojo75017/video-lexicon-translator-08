@@ -11,6 +11,7 @@ import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 import { useV3Entitlement } from '@/hooks/useV3Entitlement';
 import V3ExportPanel from './V3ExportPanel';
 import V3PackCheckout from './V3PackCheckout';
+import WritingEngineBadge from '@/components/ebook/WritingEngineBadge';
 
 // Palette « Clair Ambre » — cohérente avec V3HubPage.
 const AMBER = '#E8951E';
@@ -794,6 +795,11 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
           </div>
           <V3PackCheckout open={checkoutOpen} onClose={() => setCheckoutOpen(false)} product="full" />
 
+          {/* Encart : ce que le Pack Pro 347€ apporte concrètement à la rédaction */}
+          <div className="mt-5">
+            <WritingEngineBadge isPro={fullMode} />
+          </div>
+
           <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-3">
             <button type="button" onClick={saveToCloud} disabled={saving}
               className="group rounded-2xl border-2 p-4 text-left transition-all hover:-translate-y-0.5 disabled:opacity-60"
@@ -1146,6 +1152,12 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                             <div className="flex-1 min-w-0">
                               <div className={`flex items-center gap-2 flex-wrap text-sm font-semibold leading-tight ${isDone ? 'opacity-70' : ''}`} style={{ color: INK }}>
                                 <span>{step.label ?? mod?.title ?? step.moduleId}</span>
+                                {step.moduleId === 'p20-chat-manuscript' && fullMode && (
+                                  <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold text-white"
+                                    style={{ background: '#008296' }}>
+                                    <Sparkles className="h-2.5 w-2.5" /> Moteur Pro · chapitres ~5000 mots + passe éditoriale
+                                  </span>
+                                )}
                                 {isTeaser && (
                                   <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold border"
                                     style={{ borderColor: `${GREEN}66`, color: GREEN, background: '#eafaf2' }}>

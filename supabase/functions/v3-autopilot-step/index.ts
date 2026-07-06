@@ -268,7 +268,9 @@ ${isPro
     // on génère uniquement le chapitre 1 (compat. ascendante).
     if (isManuscript) {
       const n = Math.min(Math.max(parseInt(brief.chapterCount || "", 10) || 8, 1), 40);
-      const targetWords = Math.min(Math.max(parseInt(brief.wordsPerChapter || "", 10) || 1500, 300), 6000);
+      const briefWords = Math.min(Math.max(parseInt(brief.wordsPerChapter || "", 10) || 1500, 300), 6000);
+      // Palier Pro (347€) : chapitres nettement plus longs et denses (~5000 mots).
+      const targetWords = isPro ? Math.max(briefWords, 5000) : briefWords;
       const minWords = Math.round(targetWords * 0.85);
       const maxWords = Math.round(targetWords * 1.15);
       // ~1.6 tokens par mot en français + marge de sécurité.
@@ -277,6 +279,20 @@ ${isPro
       const prev = prevChapterTail.trim()
         ? `\n## Fin du chapitre précédent (pour la continuité)\n${prevChapterTail.slice(-1000)}`
         : "";
+      const proGuidelines = `- Écris un chapitre PREMIUM, long et très développé : vise environ ${targetWords} mots (entre ${minWords} et ${maxWords} mots).
+- Commence par un titre de chapitre en Markdown : "## Chapitre ${i} — [titre]".
+- Structure en 4 à 6 sous-parties titrées (###), chacune développée en profondeur avec plusieurs paragraphes pleins.
+- Intègre systématiquement : exemples concrets, cas pratiques ou anecdotes, données/chiffres crédibles, et une mise en application actionnable.
+- Soigne les transitions entre sous-parties et termine par une ouverture vers le chapitre suivant.
+- INTERDIT : un résumé, un plan, une liste de puces sèche, ou quelques lignes. Le lecteur doit pouvoir LIRE ce chapitre tel quel dans le livre publié.
+- Reste cohérent avec le plan et les chapitres précédents.
+- N'écris pas "voici le chapitre", ne commente pas : écris directement le contenu du chapitre.`;
+      const coreGuidelines = `- Écris un VRAI chapitre complet, long et développé : vise environ ${targetWords} mots (entre ${minWords} et ${maxWords} mots).
+- Commence par un titre de chapitre en Markdown : "## Chapitre ${i} — [titre]".
+- Développe plusieurs sous-parties avec des paragraphes pleins, des exemples concrets et des transitions.
+- INTERDIT : un résumé, un plan, une liste de puces sèche, ou seulement quelques lignes. Le lecteur doit pouvoir LIRE ce chapitre tel quel dans le livre publié.
+- Reste cohérent avec le plan et les chapitres précédents.
+- N'écris pas "voici le chapitre", ne commente pas : écris directement le contenu du chapitre.`;
       const chapUser = `# Rédige INTÉGRALEMENT le CHAPITRE ${i} sur ${n} du livre.
 
 ${themeLine}
@@ -288,12 +304,7 @@ ${contextText}
 ${prev}
 
 ## Consignes de rédaction (IMPÉRATIVES)
-- Écris un VRAI chapitre complet, long et développé : vise environ ${targetWords} mots (entre ${minWords} et ${maxWords} mots).
-- Commence par un titre de chapitre en Markdown : "## Chapitre ${i} — [titre]".
-- Développe plusieurs sous-parties avec des paragraphes pleins, des exemples concrets et des transitions.
-- INTERDIT : un résumé, un plan, une liste de puces sèche, ou seulement quelques lignes. Le lecteur doit pouvoir LIRE ce chapitre tel quel dans le livre publié.
-- Reste cohérent avec le plan et les chapitres précédents.
-- N'écris pas "voici le chapitre", ne commente pas : écris directement le contenu du chapitre.`;
+${isPro ? proGuidelines : coreGuidelines}`;
       const r = await callAI(system, chapUser, maxTok);
       if (!r.ok) return aiError(r.status, r.body);
       if (!r.text) {
@@ -302,7 +313,33 @@ ${prev}
           { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
-      return new Response(JSON.stringify({ result: r.text, chapterIndex: i, totalChapters: n }), {
+
+      let finalChapter = r.text;
+      // === Passe éditoriale automatique (Pack Pro 347€ uniquement) ===
+      // 2ᵉ appel IA : densifie, fluidifie et enrichit le chapitre.
+      // Fallback silencieux sur le texte initial en cas d'échec.
+      if (isPro) {
+        try {
+          const editUser = `Tu es un éditeur professionnel. Améliore le CHAPITRE ci-dessous SANS le raccourcir.
+
+Objectifs :
+- Densifie et enrichis (exemples supplémentaires, précisions concrètes, nuances) pour atteindre au moins ${minWords} mots.
+- Fluidifie le style, supprime les répétitions et les tics d'IA, varie la longueur des phrases.
+- Conserve la structure Markdown (titre "## Chapitre ${i} — …" et sous-parties "###").
+- Renvoie UNIQUEMENT le chapitre final réécrit, sans commentaire ni préambule.
+
+## Chapitre à améliorer
+${finalChapter}`;
+          const edited = await callAI(system, editUser, maxTok);
+          if (edited.ok && edited.text && edited.text.length >= finalChapter.length * 0.8) {
+            finalChapter = edited.text;
+          }
+        } catch (_) {
+          // on garde finalChapter tel quel
+        }
+      }
+
+      return new Response(JSON.stringify({ result: finalChapter, chapterIndex: i, totalChapters: n }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
