@@ -28,6 +28,7 @@ const PILLAR_IMG: Record<V3Pillar, string> = {
   edition: pillarPublier,
   distribution: pillarMarketing,
   promotion: pillarMarketing,
+  data: pillarMarketing,
 };
 
 const TOUR_KEY = 'v3hub_tour_done';
