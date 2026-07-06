@@ -10,6 +10,9 @@ verify_jwt = false
 [functions.beta-slots]
 verify_jwt = false
 
+[functions.revoke-beta-access]
+verify_jwt = false
+
 [functions.generate-content]
 verify_jwt = false
 
