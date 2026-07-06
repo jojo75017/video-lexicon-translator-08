@@ -1254,10 +1254,11 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                               {isTeaser && (
                                 <div className="mt-2 rounded-xl border p-3" style={{ borderColor: `${GREEN}33`, background: '#f6fdf9' }}>
                                   <p className="text-[11px] leading-snug" style={{ color: '#4a6a59' }}>
-                                    🔒 Cette étape fait partie des <strong>5 phases « Aller plus loin »</strong> (15 étapes réservées au Pack Tout Complet 347€) :
-                                    description vendeuse, premiers avis, séquences email, tunnel de vente, série & coffret, audiobook, traduction et raffinements avancés…
-                                    Le parcours 197€ t'amène jusqu'à publier ton livre ; le Pack 347€ le lance et le vend, avec une IA encore plus
-                                    puissante (sorties plus longues, variantes A/B).
+                                    🔒 Étape exclusive au <strong>Pack Tout Complet 347€</strong> ({PREMIUM_TOTAL} étapes en plus).
+                                    Le 347€ produit un <strong>livre de meilleure qualité</strong> (édition structurelle, copy-editing,
+                                    comité de lecture, label qualité, <strong>couverture signature Pro</strong>) PUIS le lance et le vend
+                                    (description vendeuse, avis, séquences email, tunnel, série, audiobook, traduction…) — le tout avec une IA
+                                    au niveau maximal (sorties plus longues, variantes A/B).
                                   </p>
                                   <button onClick={() => setCheckoutOpen(true)}
                                     className="mt-2 inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5"
