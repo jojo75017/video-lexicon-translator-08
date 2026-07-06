@@ -190,6 +190,18 @@ export const V3_MODULE_COMPONENTS: Record<string, React.ComponentType> = {
   'foreign-rights': ForeignRights,
   'preorders-strategy': PreordersStrategy,
   'audio-video-transcription': AudioVideoTranscriber,
+  // Pack Étude de Marché Pro (BookBeam-like)
+  'amazon-book-database': AmazonBookDatabase,
+  'sales-estimator-bsr': SalesEstimatorBsr,
+  'keyword-explorer-amazon': KeywordExplorerAmazon,
+  'keyword-rank-tracker': KeywordRankTracker,
+  'reverse-asin': ReverseAsin,
+  'niche-scorecard': NicheScorecard,
+  'category-bsr-explorer': CategoryBsrExplorer,
+  'competitor-review-analyzer': CompetitorReviewAnalyzer,
+  'competitor-tracker': CompetitorTracker,
+  'amazon-ads-keyword-research': AmazonAdsKeywordResearch,
+  'trademark-checker': TrademarkChecker,
 };
 
 /** Tous les modules ouvrables (mode hors V3 / cockpit standard). */
