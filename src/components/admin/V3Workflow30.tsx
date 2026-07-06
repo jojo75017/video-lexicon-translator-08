@@ -64,63 +64,89 @@ interface Phase {
  * Le parcours complet : de l'idée au livre publié, puis vendu.
  *
  * RÈGLE D'ORGANISATION (importante pour l'expérience 197€) :
- *   - Les 5 premières phases ne contiennent QUE des étapes « core » (197€).
- *     Un acheteur 197€ déroule donc tout le parcours « idée → publié » sans
- *     jamais croiser une étape verrouillée au milieu de son travail.
- *   - Toutes les étapes Pro (347€) sont regroupées dans une seule phase finale
- *     « Aller plus loin » présentée comme un bonus après la publication.
+ *   - Les phases « core » (197€) viennent EN PREMIER. Un acheteur 197€ déroule
+ *     tout le parcours « idée → publié → lancé » sans jamais croiser une étape
+ *     verrouillée au milieu de son travail.
+ *   - Toutes les étapes Pro (347€) sont regroupées dans les phases FINALES
+ *     (« Aller plus loin »), présentées comme un bonus marketing & scaling.
  */
 const PHASES: Phase[] = [
+  // ============ CORE (197€) — inclus ============
   {
     key: 'idee', emoji: '🔎', title: 'Phase 1 — Trouver l\'idée gagnante',
     steps: [
       { moduleId: 'niche-intelligence', label: 'Choisir la niche', hint: 'L\'IA sélectionne la niche la plus rentable.' },
       { moduleId: 'p16-competitive', label: 'Analyser la concurrence', hint: 'Étudie les best-sellers de la niche.' },
-      { moduleId: 'p26-commercial-score', label: 'Valider le potentiel', hint: 'Note le potentiel commercial avant d\'écrire.' },
     ],
   },
   {
-    key: 'ecriture', emoji: '✍️', title: 'Phase 2 — Concevoir & écrire le livre',
+    key: 'valider', emoji: '📊', title: 'Phase 2 — Valider le potentiel',
     steps: [
+      { moduleId: 'p26-commercial-score', label: 'Valider le potentiel', hint: 'Note le potentiel commercial avant d\'écrire.' },
       { moduleId: 'book-creation-studio', label: 'Créer le concept & le plan', hint: 'Titre, sous-titre, structure et 1er chapitre.' },
+    ],
+  },
+  {
+    key: 'ecriture', emoji: '✍️', title: 'Phase 3 — Écrire le manuscrit',
+    steps: [
       { moduleId: 'p19-author-voice', label: 'Fixer la voix d\'auteur', hint: 'Définit un style constant pour tout le livre.' },
       { moduleId: 'p20-chat-manuscript', label: 'Développer le manuscrit', hint: 'Rédige le cœur du contenu chapitre par chapitre.' },
       { moduleId: 'p23-universe-bible', label: 'Vérifier la cohérence', hint: 'Contrôle la cohérence de l\'univers et des persos.' },
     ],
   },
   {
-    key: 'qualite', emoji: '🧪', title: 'Phase 3 — Réviser & garantir la qualité',
+    key: 'qualite', emoji: '🧪', title: 'Phase 4 — Réviser & garantir la qualité',
     steps: [
       { moduleId: 'p18-readability', label: 'Auditer la lisibilité', hint: 'Mesure et améliore la fluidité de lecture.' },
       { moduleId: 'cockpit-audit-pilot', label: 'Auditer la conformité KDP', hint: 'Score complet de conformité avant publication.' },
+    ],
+  },
+  {
+    key: 'originalite', emoji: '🛡️', title: 'Phase 5 — Originalité & conformité',
+    steps: [
       { moduleId: 'ebook-anti-plagiat', label: 'Vérifier l\'originalité', hint: 'Contrôle l\'originalité et protège le texte.' },
       { moduleId: 'content-compliance', label: 'Contrôler la conformité KDP', hint: 'Évite les motifs de refus à la publication.' },
     ],
   },
   {
-    key: 'mise-en-page', emoji: '🎨', title: 'Phase 4 — Mise en page & couverture',
+    key: 'mise-en-page', emoji: '🎨', title: 'Phase 6 — Mise en page',
     steps: [
       { moduleId: 'manuscript-converter', label: 'Préparer le manuscrit', hint: 'Met le fichier au bon format KDP.' },
       { moduleId: 'back-matter-builder', label: 'Rédiger les pages de fin', hint: 'Remerciements, bio et appels à l\'action.' },
       { moduleId: 'copyright-page', label: 'Générer la page copyright', hint: 'Crée les mentions légales obligatoires.' },
-      { moduleId: 'cover-studio-pro', label: 'Concevoir la couverture', hint: 'Direction artistique de couverture haut de gamme.' },
     ],
   },
   {
-    key: 'publication', emoji: '🚀', title: 'Phase 5 — Préparer & publier sur KDP',
+    key: 'couverture', emoji: '🖼️', title: 'Phase 7 — Couverture',
+    steps: [
+      { moduleId: 'cover-studio-pro', label: 'Concevoir la couverture', hint: 'Direction artistique de couverture haut de gamme.' },
+      { moduleId: 'cover-pdf-exact', label: 'Couverture KDP exacte', hint: 'Dos + 4e + fonds perdus aux bonnes cotes.' },
+      { moduleId: 'cover-variants-thumbnail', label: 'Tester la miniature Amazon', hint: 'Valide la lisibilité du titre en petit.' },
+    ],
+  },
+  {
+    key: 'formats', emoji: '📦', title: 'Phase 8 — Formats & rendu',
     steps: [
       { moduleId: 'multi-format-express', label: 'Choisir les formats', hint: 'Ebook + broché prêts à l\'upload.' },
-      { moduleId: 'cover-pdf-exact', label: 'Couverture KDP exacte', hint: 'Dos + 4e + fonds perdus aux bonnes cotes.' },
       { moduleId: 'kindle-previewer', label: 'Vérifier le rendu', hint: 'Contrôle l\'affichage avant publication.' },
+    ],
+  },
+  {
+    key: 'metadonnees', emoji: '🏷️', title: 'Phase 9 — Métadonnées & catégories',
+    steps: [
       { moduleId: 'isbn-metadata', label: 'Rédiger ISBN & métadonnées', hint: 'Titre, sous-titre, mots-clés et description.' },
       { moduleId: 'categories-manager-10', label: 'Choisir les 10 catégories', hint: 'Maximise la visibilité avec 10 catégories.' },
+    ],
+  },
+  {
+    key: 'publication', emoji: '🚀', title: 'Phase 10 — Publier sur KDP',
+    steps: [
       { moduleId: 'prepub-checklist', label: 'Passer la checklist finale', hint: 'Vérifie tout avant de publier.' },
       { moduleId: 'kdp-pack-zip', label: 'Préparer le pack KDP', hint: 'Récapitulatif des fichiers prêts à l\'upload.' },
     ],
   },
   {
-    // Lancement & visibilité — désormais INCLUS dans l'offre 197€.
-    key: 'lancement', emoji: '📣', title: 'Phase 6 — Lancer & rendre visible (inclus 197€)',
+    key: 'lancement', emoji: '📣', title: 'Phase 11 — Lancer & rendre visible (inclus 197€)',
     steps: [
       { moduleId: 'listing-optimizer', label: 'Optimiser l\'annonce', hint: 'Titre et mots-clés optimisés pour Amazon.' },
       { moduleId: 'launch-pricing', label: 'Fixer le prix de lancement', hint: 'Stratégie de prix montant les premiers jours.' },
@@ -128,17 +154,48 @@ const PHASES: Phase[] = [
       { moduleId: 'amazon-ads', label: 'Lancer les Amazon Ads', hint: 'Campagnes Sponsored Products ciblées.' },
       { moduleId: 'look-inside-optimizer', label: 'Optimiser le « Look Inside »', hint: 'Convertis les premières pages de l\'aperçu.' },
       { moduleId: 'author-page-optimizer', label: 'Optimiser la page auteur', hint: 'Author Central : bio, photo, mots-clés.' },
-      { moduleId: 'cover-variants-thumbnail', label: 'Tester la miniature Amazon', hint: 'Valide la lisibilité du titre en petit.' },
+    ],
+  },
+
+  // ============ PRO (347€) — exclusif, verrouillé pour le 197€ (aperçu) ============
+  {
+    key: 'fiche-avis', emoji: '💰', title: 'Phase 12 — Fiche qui convertit & premiers avis (Pack Pro · 347€)',
+    steps: [
+      { moduleId: 'sales-description', label: 'Écrire la description vendeuse', hint: 'Une fiche produit qui convertit vraiment.', tier: 'premium' },
+      { moduleId: 'review-generation', label: 'Obtenir les premiers avis', hint: 'Plan ARC & bêta-lecteurs pour lancer les avis.', tier: 'premium' },
+      { moduleId: 'look-inside-pro', label: 'Perfectionner l\'aperçu', hint: 'Optimisation avancée du « Look Inside » pour convertir.', tier: 'premium' },
     ],
   },
   {
-    // Phase finale Pro (347€) : scaler les ventes après le lancement.
-    key: 'aller-plus-loin', emoji: '📈', title: 'Phase 7 — Aller plus loin (Pack Pro · 347€)',
+    key: 'piloter-ventes', emoji: '📈', title: 'Phase 13 — Piloter & optimiser les ventes (Pack Pro · 347€)',
     steps: [
-      { moduleId: 'sales-description', label: 'Écrire la description vendeuse', hint: 'Une fiche produit qui convertit.', tier: 'premium' },
-      { moduleId: 'sales-tracker', label: 'Mettre en place le suivi des ventes', hint: 'Plan de pilotage des ventes et royalties.', tier: 'premium' },
-      { moduleId: 'p22-trend-radar', label: 'Repérer les tendances', hint: 'Détecte les sujets qui montent sur Amazon.', tier: 'premium' },
+      { moduleId: 'sales-tracker', label: 'Suivre les ventes', hint: 'Plan de pilotage des ventes et royalties.', tier: 'premium' },
+      { moduleId: 'pricing-ads-pro', label: 'Optimiser prix & pubs', hint: 'Optimisation avancée du prix et des campagnes Amazon Ads.', tier: 'premium' },
+      { moduleId: 'kdp-select-strategy', label: 'Activer KDP Select', hint: 'Stratégie promos gratuites & Kindle Countdown Deals.', tier: 'premium' },
+    ],
+  },
+  {
+    key: 'etendre-audience', emoji: '🌍', title: 'Phase 14 — Étendre l\'audience (Pack Pro · 347€)',
+    steps: [
+      { moduleId: 'email-sequence-auteur', label: 'Bâtir la séquence email', hint: 'Séquence d\'auteur pour vendre en direct à ta liste.', tier: 'premium' },
+      { moduleId: 'social-launch-kit', label: 'Créer le kit réseaux sociaux', hint: 'Posts prêts à publier pour le lancement.', tier: 'premium' },
+      { moduleId: 'book-funnel', label: 'Monter un tunnel de vente', hint: 'Lead magnet + page pour vendre hors Amazon.', tier: 'premium' },
+    ],
+  },
+  {
+    key: 'catalogue', emoji: '📚', title: 'Phase 15 — Développer le catalogue (Pack Pro · 347€)',
+    steps: [
       { moduleId: 'p17-series', label: 'Architecturer la série', hint: 'Planifie les tomes si c\'est une saga.', tier: 'premium' },
+      { moduleId: 'bundle-boxset', label: 'Créer un coffret / box set', hint: 'Assemble tes tomes en offre groupée rentable.', tier: 'premium' },
+      { moduleId: 'backlist-scaling', label: 'Scaler la backlist', hint: 'Plan pour multiplier les titres et le chiffre.', tier: 'premium' },
+    ],
+  },
+  {
+    key: 'decliner', emoji: '🎧', title: 'Phase 16 — Décliner & rayonner (Pack Pro · 347€)',
+    steps: [
+      { moduleId: 'audiobook-plan', label: 'Planifier l\'audiobook', hint: 'Plan de production de la version audio.', tier: 'premium' },
+      { moduleId: 'translation-strategy', label: 'Ouvrir les marchés étrangers', hint: 'Stratégie de traduction & marchés internationaux.', tier: 'premium' },
+      { moduleId: 'p22-trend-radar', label: 'Repérer les tendances', hint: 'Détecte les sujets qui montent sur Amazon.', tier: 'premium' },
       { moduleId: 'p24-cliche-detector', label: 'Nettoyer clichés & répétitions', hint: 'Supprime les tics d\'écriture et redites.', tier: 'premium' },
     ],
   },
