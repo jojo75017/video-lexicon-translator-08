@@ -1267,7 +1267,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                               )}
 
                               {/* Avancement de la rédaction (chapitre par chapitre) */}
-                              {isActive && isLoading && progress && (
+                              {(isActive || canAct) && isLoading && progress && (
                                 <div className="mt-2.5">
                                   <div className="flex items-center justify-between mb-1">
                                     <span className="inline-flex items-center gap-1.5 text-[11px] font-bold" style={{ color: GREEN }}>
