@@ -268,7 +268,10 @@ ${isPro
     // on génère uniquement le chapitre 1 (compat. ascendante).
     if (isManuscript) {
       const n = Math.min(Math.max(parseInt(brief.chapterCount || "", 10) || 8, 1), 40);
-      const briefWords = Math.min(Math.max(parseInt(brief.wordsPerChapter || "", 10) || 1500, 300), 6000);
+      // Plafond serveur par palier : 197€ (core) limité à 3500 mots/chapitre,
+      // 347€ (pro) jusqu'à 6000. Empêche tout contournement côté client.
+      const wordCap = isPro ? 6000 : 3500;
+      const briefWords = Math.min(Math.max(parseInt(brief.wordsPerChapter || "", 10) || 1500, 300), wordCap);
       // Palier Pro (347€) : chapitres nettement plus longs et denses (~5000 mots).
       const targetWords = isPro ? Math.max(briefWords, 5000) : briefWords;
       const minWords = Math.round(targetWords * 0.85);
