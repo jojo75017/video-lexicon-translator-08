@@ -447,6 +447,10 @@ const V3HubPage: React.FC = () => {
               style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}>
               <Sparkles className="h-4 w-4" /> Dès 197€ à vie · 3× ou 6×
             </button>
+            <button onClick={() => setActiveTab('script')} className="inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-sm font-bold border transition-colors hover:bg-[#FFF3DF]"
+              style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}>
+              <FileText className="h-4 w-4" /> Voir le script vidéo
+            </button>
           </div>
 
           {/* Barre de statistiques premium */}
