@@ -806,8 +806,8 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                   {parcours === 'full'
                     ? 'Pack Tout Complet 347€ : écris, publie ET vends (emails de lancement, annonces, suivi des ventes, audio…) avec une IA au niveau maximal (sorties plus longues, variantes A/B).'
                     : hasFull
-                      ? `Offre 197€ : ${CORE_TOTAL} agents pour aller de l'idée jusqu'à publier ton livre sur Amazon, sans étape verrouillée en chemin. La phase « Aller plus loin » reste en aperçu. Tu peux basculer en Pro à tout moment.`
-                      : `Offre 197€ : ${CORE_TOTAL} agents pour aller de l'idée jusqu'à publier ton livre sur Amazon, sans étape verrouillée en chemin. La phase « Aller plus loin » (description vendeuse, annonces, lancement, suivi des ventes) s'affiche en aperçu — débloquée avec le Pack 347€.`}
+                      ? `Offre 197€ : ${CORE_TOTAL} agents pour aller de l'idée jusqu'à publier ton livre sur Amazon, sans étape verrouillée en chemin. Les 5 phases « Aller plus loin » (15 étapes marketing & ventes) restent en aperçu. Tu peux basculer en Pro à tout moment.`
+                      : `Offre 197€ : ${CORE_TOTAL} agents pour aller de l'idée jusqu'à publier ton livre sur Amazon, sans étape verrouillée en chemin. Les 5 phases « Aller plus loin » (description vendeuse, avis, séquences email, série, audio, traduction… 15 étapes) s'affichent en aperçu — débloquées avec le Pack 347€.`}
                 </p>
               </div>
               <div className="inline-flex rounded-xl border overflow-hidden" style={{ borderColor: `${AMBER}55` }}>
