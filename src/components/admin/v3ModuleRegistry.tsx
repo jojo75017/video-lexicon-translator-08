@@ -86,6 +86,17 @@ import BooksellersFairs from '@/components/admin/BooksellersFairs';
 import ForeignRights from '@/components/admin/ForeignRights';
 import PreordersStrategy from '@/components/admin/PreordersStrategy';
 import AudioVideoTranscriber from '@/components/admin/AudioVideoTranscriber';
+import AmazonBookDatabase from '@/components/admin/market/AmazonBookDatabase';
+import SalesEstimatorBsr from '@/components/admin/market/SalesEstimatorBsr';
+import KeywordExplorerAmazon from '@/components/admin/market/KeywordExplorerAmazon';
+import KeywordRankTracker from '@/components/admin/market/KeywordRankTracker';
+import ReverseAsin from '@/components/admin/market/ReverseAsin';
+import NicheScorecard from '@/components/admin/market/NicheScorecard';
+import CategoryBsrExplorer from '@/components/admin/market/CategoryBsrExplorer';
+import CompetitorReviewAnalyzer from '@/components/admin/market/CompetitorReviewAnalyzer';
+import CompetitorTracker from '@/components/admin/market/CompetitorTracker';
+import AmazonAdsKeywordResearch from '@/components/admin/market/AmazonAdsKeywordResearch';
+import TrademarkChecker from '@/components/admin/market/TrademarkChecker';
 
 /** Modules dont le dialog s'affiche en largeur réduite (max-w-2xl). */
 export const NARROW_MODULE_IDS: string[] = [
@@ -179,6 +190,18 @@ export const V3_MODULE_COMPONENTS: Record<string, React.ComponentType> = {
   'foreign-rights': ForeignRights,
   'preorders-strategy': PreordersStrategy,
   'audio-video-transcription': AudioVideoTranscriber,
+  // Pack Étude de Marché Pro (BookBeam-like)
+  'amazon-book-database': AmazonBookDatabase,
+  'sales-estimator-bsr': SalesEstimatorBsr,
+  'keyword-explorer-amazon': KeywordExplorerAmazon,
+  'keyword-rank-tracker': KeywordRankTracker,
+  'reverse-asin': ReverseAsin,
+  'niche-scorecard': NicheScorecard,
+  'category-bsr-explorer': CategoryBsrExplorer,
+  'competitor-review-analyzer': CompetitorReviewAnalyzer,
+  'competitor-tracker': CompetitorTracker,
+  'amazon-ads-keyword-research': AmazonAdsKeywordResearch,
+  'trademark-checker': TrademarkChecker,
 };
 
 /** Tous les modules ouvrables (mode hors V3 / cockpit standard). */
