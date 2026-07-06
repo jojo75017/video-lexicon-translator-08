@@ -224,8 +224,9 @@ const buildFlat = (parcours: Parcours): FlatStep[] =>
       .map((s) => ({ ...s, phaseKey: p.key, phaseTitle: p.title, emoji: p.emoji, globalIndex: 0 })),
   ).map((s, i) => ({ ...s, globalIndex: i }));
 
-const CORE_TOTAL = buildFlat('core').length; // 29 étapes (197€)
-const FULL_TOTAL = buildFlat('full').length; // 45 étapes (347€)
+const CORE_TOTAL = buildFlat('core').length; // 197€
+const FULL_TOTAL = buildFlat('full').length; // 347€ (livre + marketing enrichis)
+const PREMIUM_TOTAL = FULL_TOTAL - CORE_TOTAL; // étapes exclusives Pack Pro 347€
 const PARCOURS_KEY = 'v3_workflow30_parcours';
 
 function loadSet(key: string): Set<string> {
