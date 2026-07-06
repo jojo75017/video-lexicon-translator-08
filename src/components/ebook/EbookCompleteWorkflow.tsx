@@ -824,6 +824,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
               previousContext,
               userApiKey: hasUsableApiKey ? normalizedUserApiKey : undefined,
               useUserKey: hasUsableApiKey,
+              provider: getProvider(),
+              openrouterModel: getOpenRouterModel(),
               ...extraBody,
               forceFallback: true,
             }
