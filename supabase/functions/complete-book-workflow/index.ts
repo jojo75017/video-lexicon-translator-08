@@ -1105,11 +1105,11 @@ function getP3GenerationSettings(numberOfChapters: number) {
   };
 }
 
-function getP4GenerationSettings(numberOfChapters: number) {
+function getP4GenerationSettings(numberOfChapters: number, isPro = false) {
   const isLargeProject = numberOfChapters >= 16;
   const isVeryLargeProject = numberOfChapters >= 30;
 
-  return {
+  const base = {
     isLargeProject,
     isVeryLargeProject,
     maxTokens: isVeryLargeProject ? 2400 : isLargeProject ? 4200 : 6000,
@@ -1120,6 +1120,20 @@ function getP4GenerationSettings(numberOfChapters: number) {
     maxRetries: 0,
     previousChapterChars: isVeryLargeProject ? 400 : 800,
     segmentCount: 2,
+  };
+
+  if (!isPro) return base;
+
+  // Pack Pro 347€ : chapitres plus longs et plus denses, boucle qualité renforcée.
+  return {
+    ...base,
+    maxTokens: isVeryLargeProject ? 3600 : isLargeProject ? 6000 : 8000,
+    minWords: isVeryLargeProject ? 1800 : 3500,
+    targetWords: isVeryLargeProject ? 2400 : 5000,
+    maxWords: isVeryLargeProject ? 2800 : 6000,
+    minScore: isVeryLargeProject ? 8 : 9,
+    maxRetries: isVeryLargeProject ? 0 : 1,
+    previousChapterChars: isVeryLargeProject ? 600 : 1000,
   };
 }
 
