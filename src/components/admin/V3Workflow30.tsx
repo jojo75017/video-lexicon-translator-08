@@ -1241,8 +1241,8 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                               {isTeaser && (
                                 <div className="mt-2 rounded-xl border p-3" style={{ borderColor: `${GREEN}33`, background: '#f6fdf9' }}>
                                   <p className="text-[11px] leading-snug" style={{ color: '#4a6a59' }}>
-                                    🔒 Cet agent fait partie de la phase <strong>Aller plus loin</strong> (réservée au Pack Tout Complet 347€) :
-                                    description vendeuse, optimisation d'annonce, séquence de lancement, suivi des ventes et raffinements avancés…
+                                    🔒 Cette étape fait partie des <strong>5 phases « Aller plus loin »</strong> (15 étapes réservées au Pack Tout Complet 347€) :
+                                    description vendeuse, premiers avis, séquences email, tunnel de vente, série & coffret, audiobook, traduction et raffinements avancés…
                                     Le parcours 197€ t'amène jusqu'à publier ton livre ; le Pack 347€ le lance et le vend, avec une IA encore plus
                                     puissante (sorties plus longues, variantes A/B).
                                   </p>
