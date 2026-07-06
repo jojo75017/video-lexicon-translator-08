@@ -1,53 +1,34 @@
-## Objectif
+## Problème constaté
 
-Rendre la **rédaction du livre réellement plus performante au Pack Pro 347€** qu'à la Base 197€ (sans réserver de modèle IA — « tous les modèles pour tous » conservé), ET **l'afficher clairement via un encart comparatif** pour que l'acheteur 347€ comprenne exactement ce qu'il a en plus.
+Dans le Hub (`/hub-v3` → onglet **Parcours**), c'est le composant `V3Workflow30.tsx` qui pilote les phases 1 à 7 et rédige le livre via l'edge function **`v3-autopilot-step`**.
 
-## Constat actuel
+Deux causes au "aucune différence 347€" :
 
-- `src/hooks/useV3Entitlement.ts` expose déjà `hasFull` (347€) / `hasBase` (197€).
-- `EbookCompleteWorkflow.tsx` appelle `complete-book-workflow` **sans transmettre le palier** → réglages identiques pour tous.
-- Serveur (`complete-book-workflow/index.ts`) : `DEFAULT_WORDS_PER_CHAPTER = 3500` figé, `minScore` fixe, une seule passe par chapitre.
+1. **Le moteur ne différencie pas la rédaction.** Dans `v3-autopilot-step/index.ts`, l'étape manuscrit (`p20-chat-manuscript`) ignore complètement le flag `quality`/`isPro` : `targetWords`, le prompt et les tokens sont identiques pour 197€ et 347€. Le `isPro` n'agit que sur les étapes annexes (variantes + 12288 vs 8192 tokens), pas sur l'écriture du livre lui-même.
+2. **Rien n'est affiché.** L'encart `WritingEngineBadge` a été branché dans `EbookPlannerPage` (autre outil), pas dans `V3Workflow30`. Donc dans le Hub, l'utilisateur ne voit aucun repère visuel de ce que le 347€ apporte.
 
-## Leviers de différenciation 347€ (validés)
+(La différenciation faite précédemment reste valable, mais uniquement pour l'outil `complete-book-workflow` que le Hub n'utilise pas.)
 
-| Levier | Base 197€ | Pro 347€ |
-|---|---|---|
-| Densité / longueur chapitre | ~3500 mots | ~5000 mots |
-| Boucle qualité (score cible) | seuil standard | seuil relevé + tentatives supplémentaires |
-| Passe éditoriale auto sur chaque chapitre (P4) | non | oui (réécriture d'affinage) |
-| Profondeur des sous-sections | standard | enrichie |
+## Correctifs proposés
 
-Le modèle IA reste au libre choix dans les deux paliers.
+### 1. Moteur — `supabase/functions/v3-autopilot-step/index.ts`
+Faire agir réellement `isPro` sur l'écriture du manuscrit (`p20-chat-manuscript`) :
+- **Chapitres plus longs en Pro** : viser ~5000 mots (au lieu de la valeur du brief ~3500) quand `isPro`, avec `maxTok` relevé en conséquence.
+- **Consignes de rédaction enrichies** en Pro : plus de sous-parties développées, exemples concrets, transitions, profondeur — bloc de consignes distinct core vs pro.
+- **Passe éditoriale automatique** en Pro : après génération d'un chapitre, un 2ᵉ appel IA de densification/fluidité/enrichissement (fallback silencieux sur le texte initial si l'appel échoue ou dépasse le temps).
+- Conserver le comportement core inchangé pour l'offre 197€.
 
-## Implémentation
+### 2. Interface Hub — `src/components/admin/V3Workflow30.tsx`
+- Afficher l'encart comparatif **`WritingEngineBadge`** (déjà existant) en tête du parcours, piloté par `fullMode`/`hasFull`, pour que l'acheteur 347€ voie noir sur blanc les gains rédaction (chapitres plus longs, passe éditoriale, boucle qualité renforcée) — et l'utilisateur 197€ l'incitation à l'upgrade.
+- Ajouter un petit repère "Moteur Pro" au niveau de l'étape d'écriture (`p20-chat-manuscript`) quand `fullMode` est actif, pour matérialiser la différence au moment clé.
 
-### 1. Encart comparatif dans l'outil de rédaction (NOUVEAU — priorité UX)
-- Créer un composant `src/components/ebook/WritingEngineBadge.tsx` (ou encart inline) affiché en haut de `EbookCompleteWorkflow`, qui montre :
-  - **Si Pack Pro 347€** : bandeau valorisant « Moteur Rédaction Pro activé » listant les gains concrets (chapitres ~5000 mots vs 3500, passe éditoriale automatique, boucle qualité renforcée, sous-sections enrichies) → l'acheteur voit noir sur blanc ce qu'il obtient de plus.
-  - **Si Base 197€** : encart « Moteur Standard » + rappel discret « Passez au Pack Pro 347€ pour des chapitres plus longs et une passe éditoriale automatique » (incitation, non bloquant).
-- Style aligné charte KDP (teal #008296, accent orange #FF9E2D), tableau/liste comparatif court et lisible.
-
-### 2. Frontend — `src/components/ebook/EbookCompleteWorkflow.tsx`
-- Importer `useV3Entitlement`, lire `hasFull`.
-- Afficher l'encart de l'étape 1.
-- Ajouter `quality: hasFull ? 'pro' : 'core'` au `body` des **deux** appels `invoke('complete-book-workflow', ...)`.
-- Pendant la génération, indiquer le moteur actif (« Moteur Pro · chapitre dense + affinage éditorial »).
-
-### 3. Serveur — `supabase/functions/complete-book-workflow/index.ts`
-- Lire `quality` depuis `payload` (défaut `'core'`).
-- `wordsPerChapter` selon palier : `pro → 5000`, `core → 3500`.
-- Relever `minScore` et le nombre de tentatives de la boucle qualité en `pro`.
-- P4 en `pro` : ajouter une **passe d'affinage éditorial** (2ᵉ appel IA par chapitre pour densifier / fluidifier / enrichir les exemples) avant renvoi.
-- Consignes de sous-sections enrichies en `pro`.
-
-### 4. Cohérence commerciale
-- Vérifier que `SalesPageV3.tsx` / `V3PricingTiers.tsx` décrivent les mêmes gains rédaction pour le 347€, pour un message cohérent entre vente et outil.
+### 3. Cohérence
+- Vérifier que le libellé du sélecteur de parcours (déjà présent) reste aligné avec les gains réels désormais livrés côté moteur.
 
 ## Points techniques
-
-- Mode `pro` = plus de volume → garder la segmentation P4 existante, n'ajouter la passe d'affinage que par chapitre (pas sur tout le livre d'un coup) pour éviter les timeouts.
-- Aucun changement de RLS / schéma. `hasFull` inclut déjà l'admin (démo).
-- Fallback Lovable AI et routage BYOK OpenRouter/Claude/OpenAI inchangés : le palier n'agit que sur les réglages qualité.
+- Le palier `pro` n'affecte QUE la qualité/longueur/passe éditoriale ; le choix du modèle IA (Claude, Gemini, ChatGPT, DeepSeek, Mistral via OpenRouter BYOK) reste libre à tous les paliers.
+- Aucun changement de schéma, RLS ou droits. `useV3Entitlement` (admin = tout) reste la source des droits.
+- Redéploiement de `v3-autopilot-step` après modification ; vérification TypeScript.
 </content>
-<summary>Ajouter un moteur qualité Pro (chapitres plus longs, seuil qualité relevé, passe éditoriale auto) réservé au Pack 347€, PLUS un encart comparatif visible dans l'outil de rédaction pour justifier concrètement le 347€ face au 197€.</summary>
+<summary>Corriger la différence 347€ dans le Hub : le moteur d'écriture (v3-autopilot-step) et l'affichage (V3Workflow30) ignoraient le palier Pro.</summary>
 </invoke>
