@@ -203,6 +203,10 @@ export const V3_MODULE_COMPONENTS: Record<string, React.ComponentType> = {
   'competitor-tracker': CompetitorTracker,
   'amazon-ads-keyword-research': AmazonAdsKeywordResearch,
   'trademark-checker': TrademarkChecker,
+  // Lancement V3
+  'v3-order-page': V3OrderPageModule,
+  'v3-sales-page': V3SalesPageModule,
+  'v3-launch-bonuses': V3LaunchBonusesModule,
 };
 
 /** Tous les modules ouvrables (mode hors V3 / cockpit standard). */
