@@ -1256,7 +1256,7 @@ CHAPITRES PRÉVUS : ${numberOfChapters}${introContext}${charactersContext}${lang
 
     console.log(`Step ${step} for: "${fullTitle}" (Category: ${category}, Lang: ${language}, Characters: ${characters.length})`);
 
-    const wordsPerChapter = DEFAULT_WORDS_PER_CHAPTER;
+    const wordsPerChapter = isProQuality ? 5000 : DEFAULT_WORDS_PER_CHAPTER;
     let result: any = {};
     let displayContent = '';
 
