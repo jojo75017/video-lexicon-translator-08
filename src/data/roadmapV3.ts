@@ -493,11 +493,11 @@ export const V3_MODULES: V3Module[] = [
     description: 'Stratégie et calendrier de précommande multi-plateformes pour concentrer les ventes au lancement et booster le classement.' },
 
   // ============= LANCEMENT V3 — Page de vente "obsession" (Hypnova) =============
-  { id: 'v3-sales-page',         pillar: 'promotion',    status: 'todo', title: 'Page de vente V3 haute conversion (style Hypnova)',
+  { id: 'v3-sales-page',         pillar: 'promotion',    status: 'done', title: 'Page de vente V3 haute conversion (style Hypnova)',
     description: 'Page commerciale longue type "moteur d\'obsession" : hero accrocheur, storytelling, preuves chiffrées réelles du marché ebook/KDP, démonstration produit, garantie 7 jours, FAQ et compte à rebours. Bloc VALEUR "Voici ce que tu obtiens" présentant DEUX choix : Base 197€ OU Pack Pro 347€ (un OU exclusif, jamais l\'addition des deux).' },
-  { id: 'v3-order-page',         pillar: 'promotion',    status: 'todo', title: 'Page de commande V3 + order bump',
+  { id: 'v3-order-page',         pillar: 'promotion',    status: 'done', title: 'Page de commande V3 + order bump',
     description: 'Tunnel de paiement dédié avec case order bump optionnelle, choix de l\'offre Base 197€ OU Pack Pro 347€, paiement Stripe + PayPal. Aucune addition automatique : l\'acheteur sélectionne une seule offre.' },
-  { id: 'v3-launch-bonuses',     pillar: 'promotion',    status: 'todo', title: 'Bonus de lancement V3',
+  { id: 'v3-launch-bonuses',     pillar: 'promotion',    status: 'done', title: 'Bonus de lancement V3',
     description: 'Bonus offerts mis en avant dans l\'offre V3 pour augmenter la valeur perçue et déclencher l\'achat (à définir précisément au moment de la construction).' },
 
   // ===== AJOUTS V3 — Suite « Étude de Marché » (équivalent BookBeam) — Pack 347€ — à construire =====

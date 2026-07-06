@@ -43,6 +43,8 @@ const AdminCockpitPage = lazy(() => import('./pages/AdminCockpitPage'));
 const V3HubPage = lazy(() => import('./pages/V3HubPage'));
 const SalesPageV3 = lazy(() => import('./pages/SalesPageV3'));
 const V3PaiementPage = lazy(() => import('./pages/V3PaiementPage'));
+const V3CommandePage = lazy(() => import('./pages/V3CommandePage'));
+const SalesPageV3Launch = lazy(() => import('./pages/SalesPageV3Launch'));
 const AffiliationFormationPage = lazy(() => import('./pages/AffiliationFormationPage'));
 const ParrainagePage = lazy(() => import('./pages/ParrainagePage'));
 const FormationPage = lazy(() => import('./pages/FormationPage'));
@@ -392,6 +394,8 @@ const App = () => {
             <Route path="/publication-pro" element={<SalesPageV3 />} />
             <Route path="/v3-offre" element={<SalesPageV3 />} />
             <Route path="/v3-paiement" element={<V3PaiementPage />} />
+            <Route path="/commande-v3" element={<V3CommandePage />} />
+            <Route path="/vente-v3" element={<SalesPageV3Launch />} />
             <Route path="/masterclass" element={<MasterclassPage />} />
             <Route path="/activer-beta" element={<ActivationBetaPage />} />
             <Route path="/extension-chrome" element={<ExtensionChromePage />} />

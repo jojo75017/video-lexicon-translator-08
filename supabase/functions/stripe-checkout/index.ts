@@ -33,6 +33,11 @@ const PRODUCT_CATALOG: Record<string, { name: string; description: string; amoun
     description: "La Base + les 4 packs essentiels (accès à vie)",
     amount: 34700,
   },
+  v3_order_bump: {
+    name: "Pack Guides Avancés KDP (Order Bump)",
+    description: "3 guides avancés : Ads rentables, scaling multi-livres & niches cachées",
+    amount: 4700,
+  },
 };
 
 // Produit de base selon le plan choisi
