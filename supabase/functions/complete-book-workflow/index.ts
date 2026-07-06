@@ -1668,7 +1668,7 @@ Format JSON :
       case 'P4': {
         // RÉDACTION PRO AVEC BOUCLE QUALITÉ
         const structure = previousContext.P3?.chapitres || [];
-        const p4Settings = getP4GenerationSettings(structure.length || numberOfChapters);
+        const p4Settings = getP4GenerationSettings(structure.length || numberOfChapters, isProQuality);
         const useSegmentedMode = p4Settings.segmentCount > 1;
         const descriptionGeneree = previousContext.P1?.descriptionGeneree || '';
         const tonEditorial = previousContext.P1?.tonEditorial || '';
