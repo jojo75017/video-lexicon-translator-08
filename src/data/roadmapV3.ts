@@ -2,10 +2,10 @@
 // Prix cible : 197€ à vie (vs 67€ pour V2 actuelle) — EN RÉFLEXION : ajouter un mensuel ~19€/mois + annuel ~149€/an.
 // La liste reste éditable : on peut ajouter/retirer des modules.
 
-export type V3Pillar = 'publier' | 'monetiser' | 'marketing' | 'ia' | 'edition' | 'distribution' | 'promotion';
+export type V3Pillar = 'publier' | 'monetiser' | 'marketing' | 'ia' | 'edition' | 'distribution' | 'promotion' | 'data';
 export type V3Status = 'todo' | 'in_progress' | 'done';
 export type V3Tier = 'core' | 'upsell';
-export type V3PackId = 'cover' | 'marketing' | 'social' | 'monetisation' | 'editorial' | 'distribution' | 'promotion' | 'transcription';
+export type V3PackId = 'cover' | 'marketing' | 'social' | 'monetisation' | 'editorial' | 'distribution' | 'promotion' | 'transcription' | 'market-research';
 
 export interface V3Module {
   id: string;
@@ -86,6 +86,18 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
     modules: [
       'reading-committee', 'developmental-edit', 'copy-editing-line',
       'collection-charter', 'quality-label',
+    ],
+  },
+  {
+    id: 'market-research',
+    title: 'Pack Étude de Marché Pro',
+    desc: 'La data façon BookBeam, adaptée au marché francophone : recherche de produits Amazon, estimateur de ventes (BSR → revenus), recherche & suivi de mots-clés, reverse ASIN, analyse de niche, explorateur de catégories/BSR, analyse d\'avis concurrents, suivi de concurrents, mots-clés Amazon Ads et vérification de marques déposées. Données Amazon réelles + estimations IA clairement étiquetées.',
+    price: 97,
+    modules: [
+      'amazon-book-database', 'sales-estimator-bsr', 'keyword-explorer-amazon',
+      'keyword-rank-tracker', 'reverse-asin', 'niche-scorecard',
+      'category-bsr-explorer', 'competitor-review-analyzer', 'competitor-tracker',
+      'amazon-ads-keyword-research', 'trademark-checker',
     ],
   },
   // ===== Options spécialistes — vendues uniquement à la carte (hors Pack Pro 347€) =====
@@ -214,6 +226,7 @@ export const V3_PILLAR_META: Record<V3Pillar, { label: string; color: string; em
   edition:      { label: 'Édition Pro',     color: '#9B2335', emoji: '📕' },
   distribution: { label: 'Distribution',    color: '#1D4ED8', emoji: '🌍' },
   promotion:    { label: 'Promotion',       color: '#B8860B', emoji: '📰' },
+  data:         { label: 'Étude de Marché',  color: '#0F766E', emoji: '📊' },
 };
 
 // Variante "Midnight Indigo" — utilisée uniquement en mode V3 (cockpit admin).
@@ -225,6 +238,7 @@ export const V3_PILLAR_COLORS: Record<V3Pillar, string> = {
   edition:      '#f87171',
   distribution: '#60a5fa',
   promotion:    '#fbbf24',
+  data:         '#2dd4bf',
 };
 
 export const V3_MODULES: V3Module[] = [
@@ -481,6 +495,31 @@ export const V3_MODULES: V3Module[] = [
     description: 'Tunnel de paiement dédié avec case order bump optionnelle, choix de l\'offre Base 197€ OU Pack Pro 347€, paiement Stripe + PayPal. Aucune addition automatique : l\'acheteur sélectionne une seule offre.' },
   { id: 'v3-launch-bonuses',     pillar: 'promotion',    status: 'todo', title: 'Bonus de lancement V3',
     description: 'Bonus offerts mis en avant dans l\'offre V3 pour augmenter la valeur perçue et déclencher l\'achat (à définir précisément au moment de la construction).' },
+
+  // ===== AJOUTS V3 — Suite « Étude de Marché » (équivalent BookBeam) — Pack 347€ — à construire =====
+  // Données Amazon réelles (Firecrawl / Amazon PA-API) + estimations IA clairement étiquetées.
+  { id: 'amazon-book-database',        pillar: 'data', status: 'todo', title: 'Base de Données Livres Amazon',
+    description: 'Recherche de produits dans le catalogue Amazon avec filtres (BSR, prix, nombre d\'avis, date de sortie, format, catégorie). Récupération des données de fiches réelles via Firecrawl pour repérer les livres qui marchent dans une niche.' },
+  { id: 'sales-estimator-bsr',         pillar: 'data', status: 'todo', title: 'Estimateur de Ventes (BSR → revenus)',
+    description: 'Conversion du Best Sellers Rank en estimation de ventes mensuelles et de revenus par marché (FR/US/UK/DE). S\'appuie sur le BSR réel Amazon + un modèle d\'estimation IA présenté comme une estimation, jamais comme une donnée officielle.' },
+  { id: 'keyword-explorer-amazon',     pillar: 'data', status: 'todo', title: 'Recherche de Mots-clés Amazon',
+    description: 'Explore les mots-clés Amazon : suggestions réelles d\'autocomplétion, volume estimé, niveau de concurrence et opportunités, pour optimiser titre, sous-titre et 7 mots-clés KDP.' },
+  { id: 'keyword-rank-tracker',        pillar: 'data', status: 'todo', title: 'Suivi de Positions (Rank Tracker)',
+    description: 'Suivi dans le temps du classement d\'un livre (ASIN) sur ses mots-clés cibles pour mesurer l\'effet des optimisations et campagnes.' },
+  { id: 'reverse-asin',                pillar: 'data', status: 'todo', title: 'Reverse ASIN',
+    description: 'À partir de l\'ASIN d\'un livre concurrent, retrouve les mots-clés sur lesquels il est susceptible de se positionner, pour s\'en inspirer sur sa propre fiche.' },
+  { id: 'niche-scorecard',             pillar: 'data', status: 'todo', title: 'Analyse & Score de Niche',
+    description: 'Note une niche sur la rentabilité, la demande, la saturation et le niveau de concurrence, avec un verdict chiffré « à foncer / prudence / à éviter » basé sur les données Amazon réelles + analyse IA.' },
+  { id: 'category-bsr-explorer',       pillar: 'data', status: 'todo', title: 'Explorateur de Catégories & BSR',
+    description: 'Parcourt l\'arborescence des catégories Amazon et affiche les seuils de BSR des bestsellers par catégorie pour choisir les meilleures catégories de placement.' },
+  { id: 'competitor-review-analyzer',  pillar: 'data', status: 'todo', title: 'Analyse d\'Avis Concurrents',
+    description: 'Extrait et synthétise les avis des livres concurrents (Firecrawl + IA) pour révéler les points de douleur, attentes non comblées et angles à exploiter dans son propre livre.' },
+  { id: 'competitor-tracker',          pillar: 'data', status: 'todo', title: 'Suivi de Concurrents',
+    description: 'Surveille une liste de titres concurrents et suit l\'évolution de leur prix, rang et nombre d\'avis dans le temps.' },
+  { id: 'amazon-ads-keyword-research', pillar: 'data', status: 'todo', title: 'Recherche Mots-clés Amazon Ads',
+    description: 'Génère et évalue des mots-clés publicitaires pour les campagnes Amazon Ads avec estimation d\'enchères et de pertinence, pour dépenser moins et cibler mieux.' },
+  { id: 'trademark-checker',           pillar: 'data', status: 'todo', title: 'Vérification Marques Déposées',
+    description: 'Contrôle qu\'un titre, sous-titre ou nom de collection n\'entre pas en conflit avec une marque déposée (INPI/EUIPO/USPTO), pour éviter un blocage ou un retrait KDP.' },
 ];
 
 /** Renvoie un module V3 par son id. */

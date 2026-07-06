@@ -28,6 +28,7 @@ const PILLAR_IMG: Record<V3Pillar, string> = {
   edition: pillarPublier,
   distribution: pillarMarketing,
   promotion: pillarMarketing,
+  data: pillarMarketing,
 };
 
 const TOUR_KEY = 'v3hub_tour_done';
@@ -42,7 +43,7 @@ const SERIF = "'Instrument Serif', Georgia, 'Times New Roman', serif";
 const SANS = "'Inter', system-ui, sans-serif";
 
 // L'écriture/rédaction (STUDIO de création) vit dans « IA avancée » : c'est le 1er palier.
-const PILLAR_ORDER: V3Pillar[] = ['ia', 'publier', 'monetiser', 'marketing', 'edition', 'distribution', 'promotion'];
+const PILLAR_ORDER: V3Pillar[] = ['ia', 'publier', 'data', 'monetiser', 'marketing', 'edition', 'distribution', 'promotion'];
 
 // Phrase d'intro par pilier : donne un fil conducteur clair dans l'onglet Outils.
 const PILLAR_INTRO: Record<V3Pillar, string> = {
@@ -53,6 +54,7 @@ const PILLAR_INTRO: Record<V3Pillar, string> = {
   edition: 'Passez au niveau maison d\'édition : finitions et qualité pro.',
   distribution: 'Élargissez votre diffusion au-delà d\'Amazon.',
   promotion: 'Boostez la visibilité avec des campagnes et de la presse.',
+  data: 'Étudiez le marché Amazon : niches rentables, ventes estimées et mots-clés.',
 };
 
 
