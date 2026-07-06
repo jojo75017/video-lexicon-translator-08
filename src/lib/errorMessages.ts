@@ -53,6 +53,16 @@ export function getFriendlyError(error: any, fallback = 'Une erreur est survenue
     );
   }
 
+  // Crédits IA (Lovable AI) épuisés — HTTP 402
+  if (isCreditsExhaustedError(error)) {
+    return (
+      '💳 Crédits IA épuisés.\n\n' +
+      'Deux solutions pour continuer :\n' +
+      '• Rechargez des crédits IA (recommandé, immédiat).\n' +
+      '• OU configurez votre propre clé Gemini gratuite dans les Réglages pour générer sans limite.'
+    );
+  }
+
   // Quotas / rate limiting génériques
   if (msg.includes('429') || msg.includes('quota') || msg.includes('rate limit')) {
     return '⚠️ Quota IA atteint. Patientez ~60s puis relancez la génération.';
