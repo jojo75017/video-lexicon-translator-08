@@ -50,7 +50,7 @@ interface Step {
   moduleId: string;
   label?: string;
   hint: string;
-  /** 'core' = parcours 197€ (29 étapes) ; 'premium' = réservé au parcours 347€ (45 étapes). */
+  /** 'core' = parcours 197€ ; 'premium' = réservé au parcours 347€ (livre + marketing enrichis). */
   tier?: Tier;
 }
 interface Phase {
@@ -92,6 +92,8 @@ const PHASES: Phase[] = [
       { moduleId: 'p19-author-voice', label: 'Fixer la voix d\'auteur', hint: 'Définit un style constant pour tout le livre.' },
       { moduleId: 'p20-chat-manuscript', label: 'Développer le manuscrit', hint: 'Rédige le cœur du contenu chapitre par chapitre.' },
       { moduleId: 'p23-universe-bible', label: 'Vérifier la cohérence', hint: 'Contrôle la cohérence de l\'univers et des persos.' },
+      { moduleId: 'developmental-edit', label: 'Édition structurelle Pro', hint: 'Retravaille structure, rythme et arcs comme un éditeur pro.', tier: 'premium' },
+      { moduleId: 'p25-tone-adapter', label: 'Affiner le ton sur mesure', hint: 'Ajuste le ton exact attendu par ton lectorat.', tier: 'premium' },
     ],
   },
   {
@@ -99,6 +101,8 @@ const PHASES: Phase[] = [
     steps: [
       { moduleId: 'p18-readability', label: 'Auditer la lisibilité', hint: 'Mesure et améliore la fluidité de lecture.' },
       { moduleId: 'cockpit-audit-pilot', label: 'Auditer la conformité KDP', hint: 'Score complet de conformité avant publication.' },
+      { moduleId: 'copy-editing-line', label: 'Copy-editing & ligne éditoriale', hint: 'Correction fine phrase par phrase + cohérence de style.', tier: 'premium' },
+      { moduleId: 'reading-committee', label: 'Comité de lecture IA', hint: 'Un panel d\'IA critique ton livre avant publication.', tier: 'premium' },
     ],
   },
   {
@@ -106,6 +110,7 @@ const PHASES: Phase[] = [
     steps: [
       { moduleId: 'ebook-anti-plagiat', label: 'Vérifier l\'originalité', hint: 'Contrôle l\'originalité et protège le texte.' },
       { moduleId: 'content-compliance', label: 'Contrôler la conformité KDP', hint: 'Évite les motifs de refus à la publication.' },
+      { moduleId: 'p24-cliche-detector', label: 'Nettoyer clichés & répétitions', hint: 'Supprime les tics d\'écriture et redites.', tier: 'premium' },
     ],
   },
   {
@@ -114,14 +119,15 @@ const PHASES: Phase[] = [
       { moduleId: 'manuscript-converter', label: 'Préparer le manuscrit', hint: 'Met le fichier au bon format KDP.' },
       { moduleId: 'back-matter-builder', label: 'Rédiger les pages de fin', hint: 'Remerciements, bio et appels à l\'action.' },
       { moduleId: 'copyright-page', label: 'Générer la page copyright', hint: 'Crée les mentions légales obligatoires.' },
+      { moduleId: 'quality-label', label: 'Label Qualité Maison d\'Édition', hint: 'Certifie un niveau de finition digne d\'un éditeur.', tier: 'premium' },
     ],
   },
   {
     key: 'couverture', emoji: '🖼️', title: 'Phase 7 — Couverture',
     steps: [
-      { moduleId: 'cover-studio-pro', label: 'Concevoir la couverture', hint: 'Direction artistique de couverture haut de gamme.' },
-      { moduleId: 'cover-pdf-exact', label: 'Couverture KDP exacte', hint: 'Dos + 4e + fonds perdus aux bonnes cotes.' },
-      { moduleId: 'cover-variants-thumbnail', label: 'Tester la miniature Amazon', hint: 'Valide la lisibilité du titre en petit.' },
+      { moduleId: 'cover-pdf-exact', label: 'Couverture KDP exacte', hint: 'Recto + dos + 4e aux bonnes cotes KDP.' },
+      { moduleId: 'cover-variants-thumbnail', label: 'Concevoir & tester la couverture', hint: 'Variantes de couverture + test de la miniature Amazon.' },
+      { moduleId: 'cover-studio-pro', label: 'Couverture Signature Pro (IA gpt-image-2)', hint: 'Couverture ultra-pro : direction artistique IA + variations premium.', tier: 'premium' },
     ],
   },
   {
@@ -196,7 +202,6 @@ const PHASES: Phase[] = [
       { moduleId: 'audiobook-plan', label: 'Planifier l\'audiobook', hint: 'Plan de production de la version audio.', tier: 'premium' },
       { moduleId: 'translation-strategy', label: 'Ouvrir les marchés étrangers', hint: 'Stratégie de traduction & marchés internationaux.', tier: 'premium' },
       { moduleId: 'p22-trend-radar', label: 'Repérer les tendances', hint: 'Détecte les sujets qui montent sur Amazon.', tier: 'premium' },
-      { moduleId: 'p24-cliche-detector', label: 'Nettoyer clichés & répétitions', hint: 'Supprime les tics d\'écriture et redites.', tier: 'premium' },
     ],
   },
 ];
@@ -218,8 +223,9 @@ const buildFlat = (parcours: Parcours): FlatStep[] =>
       .map((s) => ({ ...s, phaseKey: p.key, phaseTitle: p.title, emoji: p.emoji, globalIndex: 0 })),
   ).map((s, i) => ({ ...s, globalIndex: i }));
 
-const CORE_TOTAL = buildFlat('core').length; // 29 étapes (197€)
-const FULL_TOTAL = buildFlat('full').length; // 45 étapes (347€)
+const CORE_TOTAL = buildFlat('core').length; // 197€
+const FULL_TOTAL = buildFlat('full').length; // 347€ (livre + marketing enrichis)
+const PREMIUM_TOTAL = FULL_TOTAL - CORE_TOTAL; // étapes exclusives Pack Pro 347€
 const PARCOURS_KEY = 'v3_workflow30_parcours';
 
 function loadSet(key: string): Set<string> {
@@ -804,10 +810,10 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 </div>
                 <p className="mt-1 text-[12px]" style={{ color: '#6f5e47' }}>
                   {parcours === 'full'
-                    ? 'Pack Tout Complet 347€ : écris, publie ET vends (emails de lancement, annonces, suivi des ventes, audio…) avec une IA au niveau maximal (sorties plus longues, variantes A/B).'
+                    ? `Pack Tout Complet 347€ : un livre de meilleure qualité (édition structurelle, copy-editing, comité de lecture, label qualité, couverture signature) PUIS lancé et vendu (emails, annonces, suivi des ventes, audio…), avec une IA au niveau maximal (sorties plus longues, variantes A/B). ${PREMIUM_TOTAL} étapes exclusives en plus.`
                     : hasFull
-                      ? `Offre 197€ : ${CORE_TOTAL} agents pour aller de l'idée jusqu'à publier ton livre sur Amazon, sans étape verrouillée en chemin. Les 5 phases « Aller plus loin » (15 étapes marketing & ventes) restent en aperçu. Tu peux basculer en Pro à tout moment.`
-                      : `Offre 197€ : ${CORE_TOTAL} agents pour aller de l'idée jusqu'à publier ton livre sur Amazon, sans étape verrouillée en chemin. Les 5 phases « Aller plus loin » (description vendeuse, avis, séquences email, série, audio, traduction… 15 étapes) s'affichent en aperçu — débloquées avec le Pack 347€.`}
+                      ? `Offre 197€ : ${CORE_TOTAL} agents pour aller de l'idée jusqu'à publier ton livre. Le Pack 347€ ajoute ${PREMIUM_TOTAL} étapes exclusives : un livre plus abouti (édition pro, comité de lecture, couverture signature) + tout le marketing & la vente. Tu peux basculer en Pro à tout moment.`
+                      : `Offre 197€ : ${CORE_TOTAL} agents pour aller de l'idée jusqu'à publier ton livre. Le Pack 347€ débloque ${PREMIUM_TOTAL} étapes exclusives : édition structurelle, copy-editing, comité de lecture, label qualité, couverture signature Pro, puis toute la partie marketing & ventes.`}
                 </p>
               </div>
               <div className="inline-flex rounded-xl border overflow-hidden" style={{ borderColor: `${AMBER}55` }}>
@@ -1247,10 +1253,11 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                               {isTeaser && (
                                 <div className="mt-2 rounded-xl border p-3" style={{ borderColor: `${GREEN}33`, background: '#f6fdf9' }}>
                                   <p className="text-[11px] leading-snug" style={{ color: '#4a6a59' }}>
-                                    🔒 Cette étape fait partie des <strong>5 phases « Aller plus loin »</strong> (15 étapes réservées au Pack Tout Complet 347€) :
-                                    description vendeuse, premiers avis, séquences email, tunnel de vente, série & coffret, audiobook, traduction et raffinements avancés…
-                                    Le parcours 197€ t'amène jusqu'à publier ton livre ; le Pack 347€ le lance et le vend, avec une IA encore plus
-                                    puissante (sorties plus longues, variantes A/B).
+                                    🔒 Étape exclusive au <strong>Pack Tout Complet 347€</strong> ({PREMIUM_TOTAL} étapes en plus).
+                                    Le 347€ produit un <strong>livre de meilleure qualité</strong> (édition structurelle, copy-editing,
+                                    comité de lecture, label qualité, <strong>couverture signature Pro</strong>) PUIS le lance et le vend
+                                    (description vendeuse, avis, séquences email, tunnel, série, audiobook, traduction…) — le tout avec une IA
+                                    au niveau maximal (sorties plus longues, variantes A/B).
                                   </p>
                                   <button onClick={() => setCheckoutOpen(true)}
                                     className="mt-2 inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5"
@@ -1422,14 +1429,39 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 <Lock className="h-3.5 w-3.5" /> Réservé au Pack Tout Complet 347€
               </span>
               <span className="text-[12px] font-semibold" style={{ color: '#3f6a55' }}>
-                5 phases « Aller plus loin » · 15 étapes marketing & ventes en plus
+                {PREMIUM_TOTAL} étapes exclusives en plus — un meilleur livre + tout le marketing
               </span>
             </div>
             <p className="text-[12px] leading-snug mb-3" style={{ color: '#4a6a59' }}>
-              Ton parcours 197€ te mène jusqu'à <strong>publier</strong> ton livre sur Amazon. Le Pack 347€ ajoute
-              tout ce qu'il faut pour le <strong>vendre et le faire grandir</strong> — sans que ces étapes viennent
-              alourdir ton parcours actuel :
+              Le Pack 347€ ne fait pas que « vendre » : il produit d'abord un <strong>livre de meilleure qualité</strong>
+              (édition structurelle, copy-editing, comité de lecture, label qualité et une <strong>couverture signature Pro</strong>),
+              puis il le lance et le fait grandir. Voici ce que tu débloques :
             </p>
+
+            {/* Bloc 1 — Qualité du LIVRE (étapes premium dans les phases de création) */}
+            <div className="text-[11px] font-bold uppercase tracking-wide mb-1.5" style={{ color: GREEN }}>
+              📖 Un livre plus abouti
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+              {PHASES.filter((p) => p.steps.some((s) => (s.tier ?? 'core') === 'premium')
+                && !p.steps.every((s) => (s.tier ?? 'core') === 'premium')).flatMap((p) =>
+                p.steps.filter((s) => (s.tier ?? 'core') === 'premium').map((s) => (
+                  <div key={s.moduleId} className="flex items-start gap-2 rounded-xl border px-3 py-2"
+                    style={{ borderColor: `${GREEN}26`, background: '#fff' }}>
+                    <span className="text-base leading-none mt-0.5">{p.emoji}</span>
+                    <div className="min-w-0">
+                      <div className="text-[12px] font-bold leading-tight" style={{ color: INK }}>{s.label}</div>
+                      <div className="text-[11px] leading-snug mt-0.5" style={{ color: '#8a7860' }}>{s.hint}</div>
+                    </div>
+                  </div>
+                )),
+              )}
+            </div>
+
+            {/* Bloc 2 — Lancement & ventes (phases 100% premium) */}
+            <div className="text-[11px] font-bold uppercase tracking-wide mb-1.5" style={{ color: GREEN }}>
+              🚀 Lancer & vendre
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
               {PHASES.filter((p) => p.steps.every((s) => (s.tier ?? 'core') === 'premium')).map((p) => (
                 <div key={p.key} className="flex items-start gap-2 rounded-xl border px-3 py-2"
@@ -1450,7 +1482,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
               <button onClick={() => setCheckoutOpen(true)}
                 className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-[13px] font-bold text-white transition-transform hover:-translate-y-0.5"
                 style={{ background: `linear-gradient(90deg, ${GREEN}, #2fc488)` }}>
-                <Sparkles className="h-4 w-4" /> Débloquer les 5 phases Pro (Pack Tout Complet · 347€)
+                <Sparkles className="h-4 w-4" /> Débloquer les {PREMIUM_TOTAL} étapes Pro (Pack Tout Complet · 347€)
               </button>
             )}
           </div>
