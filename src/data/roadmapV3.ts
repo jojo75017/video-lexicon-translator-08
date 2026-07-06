@@ -530,3 +530,24 @@ export const V3_MODULES: V3Module[] = [
 export function getModuleById(id: string): V3Module | undefined {
   return V3_MODULES.find((m) => m.id === id);
 }
+
+// ============= Décomptes dérivés (source unique pour tous les visuels) =============
+
+/** Modules compris dans la base 197€. */
+export const V3_INCLUDED_MODULES = V3_MODULES.filter((m) => getModuleAccess(m.id) === 'included');
+/** Modules premium (débloqués par le Pack Pro 347€). */
+export const V3_PREMIUM_MODULES = V3_MODULES.filter((m) => getModuleAccess(m.id) === 'pack');
+
+export const V3_INCLUDED_COUNT = V3_INCLUDED_MODULES.length; // 32
+export const V3_PREMIUM_COUNT = V3_PREMIUM_MODULES.length;   // 68
+export const V3_TOTAL_COUNT = V3_MODULES.length;             // 100
+
+/**
+ * Modules premium « orphelins » : débloqués par le Pack Pro 347€ mais rattachés
+ * à aucun pack thématique. Affichés dans le bloc « Inclus en plus dans le Pack Pro ».
+ * Calcul automatique → robuste aux futurs ajouts.
+ */
+export const V3_FULL_PACK_EXTRA_IDS: string[] = V3_PREMIUM_MODULES
+  .filter((m) => !getModulePack(m.id))
+  .map((m) => m.id);
+
