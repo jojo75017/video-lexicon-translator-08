@@ -23,7 +23,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { useWorkflowResults } from '@/hooks/useWorkflowResults';
 import { useWorkflowCloudSync } from '@/hooks/useWorkflowCloudSync';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
-import { getProvider, validateKeyFormat, isAIConfigured } from '@/services/aiWritingService';
+import { getProvider, getOpenRouterModel, validateKeyFormat, isAIConfigured } from '@/services/aiWritingService';
 import { WORKFLOW_STEPS, WORKFLOW_STEP_COUNT } from './workflow/workflowAgents';
 
 interface Character {
