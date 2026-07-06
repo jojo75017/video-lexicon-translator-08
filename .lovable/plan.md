@@ -1,39 +1,47 @@
-# Enrichir le Pack 347€ avec une suite « Étude de Marché » (équivalent BookBeam)
+## Objectif
+Rendre le **347€ « net »** : montrer *tout* ce qu'il débloque réellement (68 modules premium, pas seulement 35), inclure les options à la carte, corriger les compteurs, et permettre de **tester** le Pack Pro (aperçu + paiement test).
 
-## Constat
-Le Pack Pro 347€ paraît vide car la base 197€ a absorbé la couverture, le lancement, l'IA de création, etc. Le 347€ ne rajoute aujourd'hui que 4 packs (Revenus, Distribution, Social, Édition). Il manque tout le volet **data / étude de marché façon BookBeam** — c'est justement ce qui justifie un tier « Pro ».
+## Constat (état actuel du code)
+- 100 modules au total. Base 197€ = **32 inclus**. Premium = **68**.
+- La carte tarifaire n'affiche que **5 packs (35 modules)** → **28 modules premium sont orphelins** (rattachés à aucun pack) donc invisibles, alors qu'ils sont débloqués par le 347€.
+- Incohérence : les options « à la carte » (Promotion 97€, Transcription 67€) sont dites *hors 347€* dans le texte, mais `useV3Entitlement` (`hasFull`) les débloque déjà.
 
-Décision retenue : **d'abord enrichir le catalogue** (ajout des modules comme cartes dans le hub, statut « à construire »), source de données prévue = **Amazon réel (Firecrawl / Amazon PA-API déjà configurés) + estimation IA clairement étiquetée**. Aucun code d'outil fonctionnel dans cette étape ; on rééquilibre la valeur perçue, puis on codera chaque outil ensuite.
+## Décisions validées
+- **Tester le 347€** : aperçu de tous les outils débloqués **ET** test du tunnel de paiement.
+- **28 orphelins** : regroupés dans un bloc **« Inclus dans le Pack Pro »**.
+- **Options à la carte** : **incluses** dans le 347€ (texte ajusté).
+- **Graphiques à mettre à jour** : V3AccessRecap, V3PricingTiers, compteurs page de vente.
 
-## Ce que j'ajoute
-Un nouveau pilier **« Étude de Marché »** et un nouveau pack essentiel **« Pack Étude de Marché Pro »**, inclus dans le Pack Pro 347€ (donc débloqué automatiquement par l'achat 347€, comme les autres packs essentiels).
+---
 
-### Nouveaux modules (inspirés de BookBeam, sans plagiat, adaptés au marché francophone)
-1. **Base de Données Livres Amazon** — recherche de produits avec filtres (BSR, prix, avis, date, format) via Firecrawl.
-2. **Estimateur de Ventes (BSR → ventes/revenus)** — conversion BSR → ventes mensuelles + revenus estimés (données Amazon réelles + modèle d'estimation IA étiqueté).
-3. **Recherche de Mots-clés Amazon** — volume, concurrence, suggestions autocomplétion Amazon réelles.
-4. **Suivi de Positions (Rank Tracker)** — suivi dans le temps du classement d'un livre sur ses mots-clés.
-5. **Reverse ASIN** — extraire les mots-clés sur lesquels un livre concurrent se positionne.
-6. **Analyse & Score de Niche** — rentabilité, saturation, demande vs offre, verdict chiffré.
-7. **Explorateur de Catégories & BSR** — arborescence des catégories Amazon + seuils de BSR par bestseller.
-8. **Analyse d'Avis Concurrents** — extraction des points de douleur / attentes récurrentes depuis les avis (Firecrawl + IA).
-9. **Suivi de Concurrents** — évolution prix / rang / avis d'une liste de titres surveillés.
-10. **Recherche Mots-clés Amazon Ads** — mots-clés publicitaires et estimation d'enchères.
-11. **Vérification Marques Déposées** — contrôle qu'un titre/nom n'est pas une marque protégée.
+## Étapes d'implémentation
+
+### 1. `src/data/roadmapV3.ts` — source de vérité
+- Ajouter un dérivé **`V3_FULL_PACK_EXTRA_IDS`** : tous les modules dont `getModuleAccess === 'pack'` qui ne figurent dans **aucun** pack (les 28 orphelins) → liste calculée automatiquement (aucune saisie manuelle, robuste aux futurs ajouts).
+- **Inclure les options à la carte dans le 347€** : le Pack Pro débloque désormais *tous* les packs. Concrètement, `V3_FULL_PACK.compareAt` = 197€ + somme de **tous** les packs (essentiels + promotion + transcription) ; `saves` recalculé. On garde `alacarte` uniquement comme indication « aussi vendable seule », mais elles comptent dans le 347€.
+- Ajouter des dérivés de comptage exportés : `V3_INCLUDED_COUNT` (32), `V3_PREMIUM_COUNT` (68), `V3_TOTAL_COUNT` (100) pour alimenter tous les visuels depuis une seule source.
+
+### 2. `src/components/admin/V3PricingTiers.tsx` — carte tarifaire
+- Sur la carte **Pack Pro 347€** : afficher le compteur réel **« 100 outils débloqués (32 base + 68 premium) »** au lieu du sous-total actuel.
+- Ajouter un bloc dépliable **« Inclus en plus dans le Pack Pro »** listant les 28 modules `V3_FULL_PACK_EXTRA_IDS` (même rendu que les packs : titre + description + état prêt/à venir).
+- Déplacer Promotion + Transcription de la section « à la carte » vers **« Packs premium inclus dans le Pack Pro »** (badge « aussi disponible seule »). Ajuster la ligne de comparaison de prix (`compareAt` / `saves`) automatiquement.
+
+### 3. `src/components/admin/V3AccessRecap.tsx` — récapitulatif des droits
+- Utiliser les compteurs dérivés : colonne gauche **« Inclus 197€ » = 32**, colonne droite **« Pack 347€ » = 68**.
+- S'assurer que les 28 orphelins + options à la carte apparaissent bien dans la colonne 347€ (déjà le cas via `getModuleAccess`, mais vérifier le sous-titre/décompte affiché).
+
+### 4. Compteurs page de vente
+- `src/components/sales/AgentsShowcase.tsx` et `src/pages/V3HubPage.tsx` : remplacer les nombres codés en dur (« 22 », « 30/32 », `TOTAL_TOOLS` local) par les compteurs dérivés de `roadmapV3.ts` pour cohérence : **197€ → 32 outils**, **347€ → 100 outils**.
+
+### 5. Tester le 347€
+- **Aperçu** : ajouter dans le Hub V3 (admin uniquement) un interrupteur **« Mode démo Pack Pro »** qui force `hasFull` côté UI (via un flag local passé aux gates/registre) pour parcourir les 68 outils premium comme un acheteur 347€, sans paiement. N'affecte pas les droits réels.
+- **Paiement test** : rendre le bouton **« Tester le paiement 347€ »** visible quand `isPaymentsTestMode()` est vrai (env sandbox), ouvrant `V3PackCheckout product="full"` (déjà branché sur `v3-pack-checkout`). Ajout d'un petit badge « Mode test » pour lever l'ambiguïté (« pas de voyant vert »).
 
 ## Détails techniques
-Tout se fait dans **`src/data/roadmapV3.ts`** (source unique de vérité), donc les hubs (`V3AccessRecap`, `V3PricingTiers`, workflow, gates) se mettent à jour automatiquement.
+- Aucune migration DB nécessaire ; `useV3Entitlement` inchangé (le mode démo est un override UI local, non persisté).
+- Tous les décomptes proviennent de dérivés dans `roadmapV3.ts` → un seul endroit à maintenir.
+- Vérification finale : build + lecture des 3 visuels pour confirmer les nombres.
 
-1. **Type** : ajouter `'data'` à `V3Pillar` et `'market-research'` à `V3PackId`.
-2. **`V3_PILLAR_META`** et **`V3_PILLAR_COLORS`** : entrée `data` (label « Étude de Marché », emoji 📊, couleur cohérente KDP + variante indigo).
-3. **`V3_UPSELL_PACKS`** : ajouter l'objet pack `market-research` (non `alacarte` → inclus dans le Pack Pro 347€) listant les 11 IDs ci-dessus, avec un prix indicatif (ex. 97€) et un `desc`.
-4. **`V3_MODULES`** : ajouter les 11 modules avec `status: 'todo'`, `pillar: 'data'`, titres/descriptions ci-dessus. Comme ils appartiennent à un pack et ne sont PAS dans `V3_BASE_MODULE_IDS`, `getModuleAccess` les classe automatiquement en `pack` → ils s'affichent bien côté 347€, pas 197€.
-
-### Effets automatiques (aucune autre modif nécessaire)
-- `V3_UPSELLS_TOTAL`, `V3_FULL_PACK.compareAt` et `.saves` se recalculent : le Pack Pro 347€ affiche une valeur barrée plus élevée (meilleure perception).
-- `V3AccessRecap` affiche les 11 nouveaux outils dans la colonne « Pack premium 347€ ».
-- Le compteur « X/Y outils débloqués » et les gates fonctionnent sans changement.
-
-## Hors périmètre (étapes suivantes)
-- Codage réel de chaque outil (edge functions Firecrawl/PA-API + UI). On les branchera un par un après validation du catalogue.
-- Aucun changement de prix du Pack Pro (reste 347€) ni de la base 197€.
+## Hors périmètre
+- Pas de refonte des edge functions de paiement (le tunnel 347€ existe déjà).
+- Pas de nouveaux modules fonctionnels (les 11 du Pack Étude de Marché sont déjà livrés).

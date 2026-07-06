@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
-import { Check, Crown, Sparkles, Lock, ChevronDown, CheckCircle2, Clock, Gift } from 'lucide-react';
+import { Check, Crown, Sparkles, Lock, ChevronDown, CheckCircle2, Clock, Gift, Layers, FlaskConical } from 'lucide-react';
 import {
   V3_PRICE, V3_BASE_INSTALLMENTS, V3_UPSELL_PACKS, V3_ESSENTIAL_PACKS, V3_ALACARTE_PACKS,
-  V3_UPSELLS_TOTAL, V3_FULL_PACK,
-  V3_MODULES, getModuleAccess, getModuleById, type V3Module, type V3UpsellPack,
+  V3_ALL_PACKS_TOTAL, V3_FULL_PACK,
+  getModuleById, type V3Module, type V3UpsellPack,
   V3_GIFT_PRICE, V3_GIFT_DISCOUNT,
+  V3_INCLUDED_COUNT, V3_PREMIUM_COUNT, V3_TOTAL_COUNT, V3_FULL_PACK_EXTRA_IDS,
 } from '@/data/roadmapV3';
 import { isModuleClickable, V3ModuleDialog } from './v3ModuleRegistry';
+import { isPaymentsTestMode } from '@/lib/stripe';
 import V3PackCheckout from './V3PackCheckout';
 import V3UpsellCheckout from './V3UpsellCheckout';
 import V3GiftCheckout from './V3GiftCheckout';
 import giftCard1 from '@/assets/gift-card-noel-1.jpg';
 import giftCard2 from '@/assets/gift-card-noel-2.jpg';
+
 
 // Palette « Clair Ambre » — cohérente avec V3HubPage.
 const AMBER = '#E8951E';
@@ -233,30 +236,44 @@ const V3PricingTiers: React.FC = () => {
               <h3 className="text-lg font-bold" style={{ fontFamily: SERIF, color: INK }}>{V3_FULL_PACK.title}</h3>
             </div>
             <p className="text-sm mb-4" style={{ color: '#6f5e47' }}>
-              La base 197€ (écrire + publier + lancer) + les {V3_ESSENTIAL_PACKS.length} packs premium
-              pour vendre et scaler.<br />
-              Tu accèdes à <strong>tous les outils de croissance</strong>, sans limitation.
+              La base 197€ (écrire + publier + lancer) + <strong>tous les {V3_UPSELL_PACKS.length} packs premium</strong>
+              {' '}pour vendre et scaler.<br />
+              Tu débloques <strong>la totalité des {V3_TOTAL_COUNT} outils</strong>, sans aucune limitation.
             </p>
+
+            {/* Compteur global clair : 32 base + 68 premium = 100 */}
+            <div className="mb-3 flex items-center gap-2 rounded-xl border p-3" style={{ borderColor: `${AMBER}55`, background: '#fff' }}>
+              <Layers className="h-5 w-5 shrink-0" style={{ color: AMBER_DEEP }} />
+              <p className="text-[12px] leading-snug" style={{ color: INK }}>
+                <strong>{V3_TOTAL_COUNT} outils débloqués</strong>{' '}
+                <span style={{ color: '#a18a6c' }}>
+                  ({V3_INCLUDED_COUNT} de la base + {V3_PREMIUM_COUNT} premium)
+                </span>
+              </p>
+            </div>
+
             <div className="mb-3 rounded-xl border p-3" style={{ borderColor: `${AMBER}55`, background: AMBER_SOFT }}>
               <p className="text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: AMBER_DEEP }}>
-                Les {V3_ESSENTIAL_PACKS.length} packs inclus :
+                Les {V3_UPSELL_PACKS.length} packs inclus :
               </p>
               <ul className="grid grid-cols-2 gap-x-3 gap-y-1 text-[11px]" style={{ color: '#6f5e47' }}>
-                {V3_ESSENTIAL_PACKS.map((p) => (
+                {V3_UPSELL_PACKS.map((p) => (
                   <li key={p.id} className="flex items-center gap-1.5">
                     <Check className="h-3 w-3 shrink-0" style={{ color: '#1f9d6b' }} />
                     <span className="font-semibold" style={{ color: INK }}>{p.title}</span>{' '}
-                    <span style={{ color: '#a18a6c' }}>({p.modules.length} modules)</span>
+                    <span style={{ color: '#a18a6c' }}>({p.modules.length})</span>
                   </li>
                 ))}
               </ul>
               <p className="mt-2 text-[10px] font-medium" style={{ color: AMBER_DEEP }}>
-                + la base Création, Publication & Lancement ({V3_MODULES.filter((m) => getModuleAccess(m.id) === 'included').length} modules)
+                + {V3_FULL_PACK_EXTRA_IDS.length} outils supplémentaires (IA avancée, communauté, séries…)
+                + la base ({V3_INCLUDED_COUNT} modules)
               </p>
             </div>
             <div className="flex items-end gap-3 mb-1">
               <span className="text-4xl font-black" style={{ color: AMBER_DEEP }}>{V3_FULL_PACK.price}€</span>
               <span className="text-lg line-through pb-1" style={{ color: '#bcaa8c' }}>{V3_FULL_PACK.compareAt}€</span>
+
             </div>
             <p className="text-sm font-bold mb-4" style={{ color: '#1f9d6b' }}>
               Tu économises {V3_FULL_PACK.saves}€
@@ -277,6 +294,17 @@ const V3PricingTiers: React.FC = () => {
               <Crown className="h-4 w-4" />
               Obtenir le Pack Tout Complet
             </button>
+            {isPaymentsTestMode() && (
+              <button
+                onClick={() => setCheckoutOpen(true)}
+                className="mt-2 w-full inline-flex items-center justify-center gap-2 rounded-xl px-6 py-2.5 text-[12px] font-bold border transition-colors hover:bg-[#FFF3DF]"
+                style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}
+              >
+                <FlaskConical className="h-3.5 w-3.5" />
+                Tester le paiement 347€ · Mode test
+              </button>
+            )}
+
           </div>
         </article>
       </div>
@@ -311,13 +339,13 @@ const V3PricingTiers: React.FC = () => {
         {V3_ESSENTIAL_PACKS.map((pack) => renderPackCard(pack))}
       </div>
 
-      {/* 3. Options spécialistes — à la carte uniquement */}
+      {/* 3. Options spécialistes — incluses dans le Pack Pro, aussi vendables seules */}
       {V3_ALACARTE_PACKS.length > 0 && (
         <>
           <div className="flex items-center gap-2 mb-4 mt-10">
             <Sparkles className="h-4 w-4" style={{ color: AMBER }} />
-            <h3 className="text-base font-bold" style={{ fontFamily: SERIF, color: INK }}>Options spécialistes (à la carte)</h3>
-            <span className="text-xs" style={{ color: '#a18a6c' }}>en plus, si besoin</span>
+            <h3 className="text-base font-bold" style={{ fontFamily: SERIF, color: INK }}>Options spécialistes</h3>
+            <span className="text-xs" style={{ color: '#a18a6c' }}>incluses dans le Pack Pro · aussi disponibles seules</span>
             <div className="flex-1 h-px ml-2" style={{ background: `linear-gradient(90deg, ${AMBER}44, transparent)` }} />
           </div>
           <div className="grid sm:grid-cols-2 gap-3">
@@ -326,10 +354,54 @@ const V3PricingTiers: React.FC = () => {
         </>
       )}
 
+      {/* 4. Modules premium supplémentaires débloqués par le Pack Pro (non rattachés à un pack) */}
+      {V3_FULL_PACK_EXTRA_IDS.length > 0 && (
+        <>
+          <div className="flex items-center gap-2 mb-4 mt-10">
+            <Crown className="h-4 w-4" style={{ color: AMBER }} />
+            <h3 className="text-base font-bold" style={{ fontFamily: SERIF, color: INK }}>Inclus en plus dans le Pack Pro</h3>
+            <span className="text-xs" style={{ color: '#a18a6c' }}>{V3_FULL_PACK_EXTRA_IDS.length} outils premium débloqués par le 347€</span>
+            <div className="flex-1 h-px ml-2" style={{ background: `linear-gradient(90deg, ${AMBER}44, transparent)` }} />
+          </div>
+          <ul className="grid sm:grid-cols-2 gap-2">
+            {V3_FULL_PACK_EXTRA_IDS.map((mid) => {
+              const mod = getModuleById(mid);
+              const ready = isModuleClickable(mid);
+              return (
+                <li key={mid}>
+                  <button
+                    type="button"
+                    disabled={!ready || !mod}
+                    onClick={() => mod && ready && setActiveModule(mod)}
+                    className={`w-full text-left flex items-start gap-2 rounded-xl border px-3 py-2.5 bg-white transition-colors ${ready ? 'hover:bg-[#FFF3DF] cursor-pointer' : 'cursor-default'}`}
+                    style={{ borderColor: '#eadfc9' }}
+                  >
+                    {ready
+                      ? <CheckCircle2 className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: '#1f9d6b' }} />
+                      : <Clock className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: '#a18a6c' }} />}
+                    <div className="min-w-0 flex-1">
+                      <span className="text-[12px] font-semibold leading-tight" style={{ color: INK }}>
+                        {mod?.title ?? mid}
+                      </span>
+                      {mod?.description && (
+                        <div className="text-[10.5px] leading-snug mt-0.5 line-clamp-2" style={{ color: '#8a7860' }}>
+                          {mod.description}
+                        </div>
+                      )}
+                    </div>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </>
+      )}
+
       <p className="text-center text-[11px] mt-6" style={{ color: '#a18a6c' }}>
-        Pris séparément : {V3_PRICE}€ + {V3_UPSELLS_TOTAL}€ = {V3_FULL_PACK.compareAt}€.
-        Le {V3_FULL_PACK.title} est à {V3_FULL_PACK.price}€ ({V3_FULL_PACK.saves}€ d'économie).
+        Pris séparément : {V3_PRICE}€ + {V3_ALL_PACKS_TOTAL}€ (tous les packs) = {V3_FULL_PACK.compareAt}€.
+        Le {V3_FULL_PACK.title} est à {V3_FULL_PACK.price}€ ({V3_FULL_PACK.saves}€ d'économie) et débloque les {V3_TOTAL_COUNT} outils.
       </p>
+
     </section>
   );
 };

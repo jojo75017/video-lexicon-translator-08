@@ -196,6 +196,11 @@ const V3HubPage: React.FC = () => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const { hasBase, hasFull, isAdmin } = useV3Entitlement();
 
+  // Aperçu admin : simuler la vue d'un acheteur d'un palier (sans quitter ses droits réels).
+  // 'real' = mes droits · 'base' = vue 197€ · 'full' = vue Pack Pro 347€.
+  const [previewTier, setPreviewTier] = useState<'real' | 'base' | 'full'>('real');
+  const previewing = isAdmin && previewTier !== 'real';
+
   // Persiste l'état réduit de la sidebar.
   useEffect(() => {
     localStorage.setItem('v3hub_sidebar_collapsed', sidebarCollapsed ? '1' : '0');
@@ -211,9 +216,15 @@ const V3HubPage: React.FC = () => {
 
   // Un module est "débloqué" si l'abonné a la formule correspondante.
   const isUnlocked = React.useCallback((m: V3Module) => {
+    // Mode aperçu admin : on simule le palier choisi (197€ ou 347€).
+    if (previewing) {
+      const isPremium = getModuleAccess(m.id) === 'pack';
+      return previewTier === 'full' ? true : !isPremium;
+    }
     if (isAdmin) return true;
     return getModuleAccess(m.id) === 'pack' ? hasFull : hasBase;
-  }, [isAdmin, hasBase, hasFull]);
+  }, [isAdmin, hasBase, hasFull, previewing, previewTier]);
+
 
   useEffect(() => {
     if (!localStorage.getItem(TOUR_KEY)) {
@@ -490,8 +501,36 @@ const V3HubPage: React.FC = () => {
             <div className="mb-4 rounded-xl border p-3 text-[13px]" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44`, color: '#6f5e47' }}>
               <span className="font-semibold" style={{ color: AMBER_DEEP }}>💡 Suivez les étapes numérotées</span> — les outils sont rangés dans l'ordre logique&nbsp;: écrire → publier → monétiser → faire connaître. Pas sûr par où commencer&nbsp;? Ouvrez l'onglet <span className="font-semibold">Parcours</span>.
             </div>
+            {/* Aperçu admin : simuler la vue d'un acheteur 197€ / 347€ (QA sans payer) */}
+            {isAdmin && (
+              <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border p-3" style={{ background: '#fff', borderColor: `${AMBER}44` }}>
+                <span className="text-[12px] font-bold" style={{ color: AMBER_DEEP }}>🧪 Aperçu acheteur (admin) :</span>
+                {[
+                  { id: 'real', label: 'Mes droits (admin)' },
+                  { id: 'base', label: 'Vue 197€ (base)' },
+                  { id: 'full', label: 'Vue 347€ (Pack Pro)' },
+                ].map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setPreviewTier(opt.id as 'real' | 'base' | 'full')}
+                    className="rounded-full px-3 py-1.5 text-[12px] font-semibold border transition-colors"
+                    style={previewTier === opt.id
+                      ? { background: AMBER, color: '#fff', borderColor: AMBER }
+                      : { background: 'transparent', color: '#6f5e47', borderColor: '#eadfc9' }}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+                {previewing && (
+                  <span className="text-[11px]" style={{ color: '#a18a6c' }}>
+                    Simulation : {myToolsCount}/{V3_MODULES.length} outils débloqués pour ce palier.
+                  </span>
+                )}
+              </div>
+            )}
             {/* Recherche + filtres par pilier */}
             <div className="-mx-4 px-4 py-3 mb-6">
+
 
               <div className="relative max-w-md mb-3" data-tour="search">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: '#b29a72' }} />
