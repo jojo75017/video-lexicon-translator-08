@@ -700,6 +700,14 @@ const App = () => {
                 </AdminGate>
               }
             />
+            <Route 
+              path="/admin/beta-testeurs" 
+              element={
+                <AdminGate>
+                  <AdminBetaTestersPage />
+                </AdminGate>
+              }
+            />
 
             <Route 
               path="/formation" 
