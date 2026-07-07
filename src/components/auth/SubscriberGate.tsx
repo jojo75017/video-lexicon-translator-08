@@ -98,11 +98,7 @@ export function SubscriberGate({
       const code = (accessCode || "").trim().toUpperCase();
 
       if (!email || !email.includes("@") || !code) {
-        if (!cancelled) {
-          onInvalid();
-          setAllowed(false);
-          setChecking(false);
-        }
+        await denyAccess();
         return;
       }
 
