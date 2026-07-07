@@ -703,6 +703,7 @@ const V3HubPage: React.FC = () => {
         toolProps={selected?.id === 'book-creation-studio' ? { initialSource: studioSource } : undefined}
       />
       <V3HubTour isOpen={tourOpen} onClose={finishTour} onComplete={finishTour} />
+      <HubAiChat />
       </div>
     </div>
   );
