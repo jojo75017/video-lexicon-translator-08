@@ -64,18 +64,10 @@ export function SubscriberGate({
           }
           return;
         }
-
-        // Fallback: if a real Supabase session exists, allow access
-        // (admin check may have failed transiently - App.tsx will re-verify in background)
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          console.log('SubscriberGate: Active Supabase session found, allowing access');
-          if (!cancelled) {
-            setAllowed(true);
-            setChecking(false);
-          }
-          return;
-        }
+        // Note: on ne se contente PAS d'une session Supabase active pour
+        // autoriser l'accès — le statut de l'abonné est revérifié plus bas
+        // via validate-subscription (sinon un abonné « expired » resterait
+        // connecté tant que sa session est valide).
       } catch {
         // Continue with subscriber validation
       }
