@@ -115,10 +115,8 @@ export function SubscriberGate({
         if (cancelled) return;
 
         if (error || !data?.valid) {
-          // Explicit rejection from the server → deny access
-          onInvalid();
-          setAllowed(false);
-          setChecking(false);
+          // Explicit rejection from the server (e.g. expired) → deny + redirect
+          await denyAccess();
           return;
         }
 
