@@ -16,6 +16,7 @@ const adminNavItems: AdminNavItem[] = [
   { label: 'Tunnel', path: '/admin/funnel', icon: TrendingUp, exact: true },
   { label: 'Cadeaux PDF', path: '/admin/cadeaux-pdf', icon: FileText, exact: true },
   { label: 'Codes Bêta', path: '/admin/codes-beta', icon: Ticket, exact: true },
+  { label: 'Bêta-testeurs', path: '/admin/beta-testeurs', icon: Users, exact: true },
   { label: 'Profil', path: '/admin/profile', icon: User, exact: true },
   { label: 'Prospects', path: '/gestion-prospects', icon: Users, exact: true },
   { label: 'Emails', path: '/apercu-emails', icon: Mail, exact: true },
