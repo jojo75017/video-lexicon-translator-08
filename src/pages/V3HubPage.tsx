@@ -695,6 +695,26 @@ const V3HubPage: React.FC = () => {
             </article>
           </section>
         )}
+
+        {/* ===================== ONGLET PARLER AVEC L'IA ===================== */}
+        {activeTab === 'assistant' && (
+          <section className="space-y-5">
+            <div className="rounded-2xl border p-5 sm:p-6" style={{ background: '#fff', borderColor: `${AMBER}44` }}>
+              <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-wider" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44`, color: AMBER_DEEP }}>
+                <Bot className="h-3.5 w-3.5" /> Assistant IA
+              </div>
+              <h2 className="mt-4 text-3xl sm:text-4xl font-medium leading-tight" style={{ fontFamily: SERIF, color: INK }}>
+                Parler avec l'IA
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed" style={{ color: '#6f5e47' }}>
+                Posez vos questions sur la création, la publication et la vente de vos livres. L'IA vous répond en direct.
+              </p>
+            </div>
+            <div className="rounded-2xl border bg-white overflow-hidden" style={{ borderColor: '#eadfc9' }}>
+              <HubAiChat />
+            </div>
+          </section>
+        )}
       </main>
       </div>
       {/* fin colonne de contenu */}
