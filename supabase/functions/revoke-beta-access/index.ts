@@ -83,11 +83,14 @@ Deno.serve(async (req) => {
       .eq('status', 'used');
     if (codesErr) throw codesErr;
 
+    // Bêta-testeurs à conserver (accès maintenu)
+    const EXCLUDED = new Set(['rachel.mlm63@gmail.com']);
+
     const emails = Array.from(
       new Set(
         (codes ?? [])
           .map((c: any) => (c.used_by_email ?? '').trim().toLowerCase())
-          .filter((e: string) => e && e.includes('@'))
+          .filter((e: string) => e && e.includes('@') && !EXCLUDED.has(e))
       )
     );
 
