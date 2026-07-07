@@ -578,21 +578,53 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
         const total = Math.min(Math.max(parseInt(brief.chapterCount || '', 10) || 8, 1), 40);
         const chapters: string[] = [];
         let prevTail = '';
+        const failures: number[] = [];
         for (let i = 1; i <= total; i++) {
           setProgress({ current: i, total });
-          const { data, error: fnErr } = await supabase.functions.invoke('v3-autopilot-step', {
-            body: { ...baseBody, chapterIndex: i, prevChapterTail: prevTail },
-          });
-          if (fnErr) throw new Error(fnErr.message);
-          if (data?.error) throw new Error(data.error);
-          if (!data?.result) throw new Error(`Chapitre ${i} : réponse vide de l'IA.`);
-          chapters.push(data.result as string);
-          prevTail = (data.result as string).slice(-1000);
+          // Résilience : jusqu'à 3 tentatives par chapitre (timeouts / réponses vides
+          // transitoires) pour ne JAMAIS perdre les chapitres suivants sur un seul échec.
+          let chapterText = '';
+          let lastErr: string | null = null;
+          for (let attempt = 1; attempt <= 3; attempt++) {
+            try {
+              const { data, error: fnErr } = await supabase.functions.invoke('v3-autopilot-step', {
+                body: { ...baseBody, chapterIndex: i, prevChapterTail: prevTail },
+              });
+              if (fnErr) throw new Error(fnErr.message);
+              if (data?.error) throw new Error(data.error);
+              if (!data?.result) throw new Error(`Chapitre ${i} : réponse vide de l'IA.`);
+              chapterText = data.result as string;
+              lastErr = null;
+              break;
+            } catch (err) {
+              lastErr = err instanceof Error ? err.message : 'Erreur inconnue';
+              if (attempt < 3) {
+                await new Promise((r) => setTimeout(r, 1500 * attempt)); // backoff
+              }
+            }
+          }
+
+          if (!chapterText) {
+            // Échec après 3 tentatives : on continue avec les chapitres suivants
+            // plutôt que d'abandonner tout le manuscrit.
+            failures.push(i);
+            chapters.push(`## Chapitre ${i}\n\n_(Ce chapitre n'a pas pu être généré automatiquement. Relance sa génération ou rédige-le manuellement.)_`);
+            setResults((prev) => ({ ...prev, [step.moduleId]: chapters.join('\n\n---\n\n') }));
+            continue;
+          }
+
+          chapters.push(chapterText);
+          prevTail = chapterText.slice(-1000);
           // Sauvegarde incrémentale : on voit le manuscrit grandir chapitre par chapitre.
           setResults((prev) => ({ ...prev, [step.moduleId]: chapters.join('\n\n---\n\n') }));
         }
+        if (failures.length > 0) {
+          setError(`Manuscrit généré, mais ${failures.length} chapitre(s) ont échoué (n° ${failures.join(', ')}). Relance l'étape pour les régénérer.`);
+        }
         return;
       }
+
+
 
       const { data, error: fnErr } = await supabase.functions.invoke('v3-autopilot-step', {
         body: baseBody,
