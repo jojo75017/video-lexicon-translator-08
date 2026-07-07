@@ -138,8 +138,8 @@ const DemoPage = () => {
     setIsSubmittingEmail(true);
     try {
       const emailLower = captureEmail.trim().toLowerCase();
-      await supabase.from("subscribers").insert({ email: emailLower, plan_type: "demo", status: "demo_lead" });
-      await supabase.functions.invoke("send-welcome-email", { body: { email: emailLower } });
+      const { error } = await supabase.functions.invoke("capture-demo-lead", { body: { email: emailLower } });
+      if (error) throw error;
       localStorage.setItem(EMAIL_CAPTURED_KEY, "true");
       setEmailCaptured(true);
       setShowEmailPopup(false);
