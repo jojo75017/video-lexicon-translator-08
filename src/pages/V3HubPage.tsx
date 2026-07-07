@@ -166,7 +166,7 @@ function ModuleCard({
 }
 
 
-type HubTab = 'parcours' | 'outils' | 'livres' | 'guides' | 'offres' | 'roadmap' | 'script';
+type HubTab = 'parcours' | 'outils' | 'livres' | 'guides' | 'offres' | 'roadmap' | 'script' | 'assistant';
 
 const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon }[] = [
   { id: 'parcours', label: 'Parcours', icon: Compass },
@@ -176,6 +176,7 @@ const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon }[] = [
   { id: 'offres', label: 'Offres & Packs', icon: Gem },
   { id: 'roadmap', label: 'Roadmap', icon: MapIcon },
   { id: 'script', label: 'Script vidéo', icon: FileText },
+  { id: 'assistant', label: "Parler avec l'IA", icon: Bot },
 ];
 
 const TAB_STORAGE_KEY = 'v3hub_active_tab';
