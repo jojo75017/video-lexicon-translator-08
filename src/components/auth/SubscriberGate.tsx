@@ -163,9 +163,7 @@ export function SubscriberGate({
             }
           } catch { /* invalid cache */ }
         }
-        onInvalid();
-        setAllowed(false);
-        setChecking(false);
+        await denyAccess();
       }
     };
 
