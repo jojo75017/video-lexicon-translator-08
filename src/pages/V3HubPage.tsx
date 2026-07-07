@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Sparkles, Compass, Lock, ArrowRight, Wand2, CheckCircle2, Layers, Infinity as InfinityIcon, ShieldCheck, Save, Image as ImageIcon, BookOpen, GraduationCap, Gem, Map as MapIcon, FileText, Copy, Check, Menu, X, PanelLeftClose, PanelLeftOpen, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, Search, Sparkles, Compass, Lock, ArrowRight, Wand2, CheckCircle2, Layers, Bot, Infinity as InfinityIcon, ShieldCheck, Save, Image as ImageIcon, BookOpen, GraduationCap, Gem, Map as MapIcon, FileText, Copy, Check, Menu, X, PanelLeftClose, PanelLeftOpen, type LucideIcon } from 'lucide-react';
 import {
   V3_MODULES, V3_PILLAR_META, getModuleAccess, getModuleById, type V3Pillar, type V3Module,
 } from '@/data/roadmapV3';
@@ -166,7 +166,7 @@ function ModuleCard({
 }
 
 
-type HubTab = 'parcours' | 'outils' | 'livres' | 'guides' | 'offres' | 'roadmap' | 'script';
+type HubTab = 'parcours' | 'outils' | 'livres' | 'guides' | 'offres' | 'roadmap' | 'script' | 'assistant';
 
 const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon }[] = [
   { id: 'parcours', label: 'Parcours', icon: Compass },
@@ -176,6 +176,7 @@ const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon }[] = [
   { id: 'offres', label: 'Offres & Packs', icon: Gem },
   { id: 'roadmap', label: 'Roadmap', icon: MapIcon },
   { id: 'script', label: 'Script vidéo', icon: FileText },
+  { id: 'assistant', label: "Parler avec l'IA", icon: Bot },
 ];
 
 const TAB_STORAGE_KEY = 'v3hub_active_tab';
@@ -453,10 +454,10 @@ const V3HubPage: React.FC = () => {
               <FileText className="h-4 w-4" /> Voir le script vidéo
             </button>
             <button
-              onClick={() => window.dispatchEvent(new Event('open-hub-ai'))}
+              onClick={() => setActiveTab('assistant')}
               className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_40px_-12px_rgba(232,149,30,0.6)]"
               style={{ background: `linear-gradient(90deg, ${AMBER_DEEP}, ${AMBER})`, color: '#fff' }}>
-              <span className="text-base leading-none">🤖</span> Parler avec l'IA
+              <Bot className="h-4 w-4" /> Parler avec l'IA
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </button>
           </div>
@@ -694,6 +695,26 @@ const V3HubPage: React.FC = () => {
             </article>
           </section>
         )}
+
+        {/* ===================== ONGLET PARLER AVEC L'IA ===================== */}
+        {activeTab === 'assistant' && (
+          <section className="space-y-5">
+            <div className="rounded-2xl border p-5 sm:p-6" style={{ background: '#fff', borderColor: `${AMBER}44` }}>
+              <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-wider" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44`, color: AMBER_DEEP }}>
+                <Bot className="h-3.5 w-3.5" /> Assistant IA
+              </div>
+              <h2 className="mt-4 text-3xl sm:text-4xl font-medium leading-tight" style={{ fontFamily: SERIF, color: INK }}>
+                Parler avec l'IA
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed" style={{ color: '#6f5e47' }}>
+                Posez vos questions sur la création, la publication et la vente de vos livres. L'IA vous répond en direct.
+              </p>
+            </div>
+            <div className="rounded-2xl border bg-white overflow-hidden" style={{ borderColor: '#eadfc9' }}>
+              <HubAiChat />
+            </div>
+          </section>
+        )}
       </main>
       </div>
       {/* fin colonne de contenu */}
@@ -704,7 +725,6 @@ const V3HubPage: React.FC = () => {
         toolProps={selected?.id === 'book-creation-studio' ? { initialSource: studioSource } : undefined}
       />
       <V3HubTour isOpen={tourOpen} onClose={finishTour} onComplete={finishTour} />
-      <HubAiChat />
       </div>
     </div>
   );
