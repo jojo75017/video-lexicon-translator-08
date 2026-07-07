@@ -37,6 +37,28 @@ export function SubscriberGate({
   useEffect(() => {
     let cancelled = false;
 
+    // Explicit rejection (expired / invalid subscription, missing creds):
+    // purge any lingering auth session + cached subscriber data so a stale
+    // Supabase session can't re-grant access, then let the component redirect
+    // to /subscription via <Navigate> below (do NOT call onInvalid, which does
+    // a hard logout redirect to /offres).
+    const denyAccess = async () => {
+      try {
+        await Promise.race([
+          supabase.auth.signOut(),
+          new Promise((resolve) => setTimeout(resolve, 1500)),
+        ]);
+      } catch { /* ignore */ }
+      try {
+        localStorage.removeItem("subscriber_email");
+        localStorage.removeItem("subscriber_data");
+      } catch { /* ignore */ }
+      if (!cancelled) {
+        setAllowed(false);
+        setChecking(false);
+      }
+    };
+
     const run = async () => {
       // Admins bypass subscriber validation (already confirmed by App.tsx)
       if (isAdmin) {
