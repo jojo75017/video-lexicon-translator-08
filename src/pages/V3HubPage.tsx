@@ -452,10 +452,10 @@ const V3HubPage: React.FC = () => {
               <FileText className="h-4 w-4" /> Voir le script vidéo
             </button>
             <button
-              onClick={() => window.dispatchEvent(new Event('open-ebookbot'))}
+              onClick={() => window.dispatchEvent(new Event('open-hub-ai'))}
               className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_40px_-12px_rgba(232,149,30,0.6)]"
               style={{ background: `linear-gradient(90deg, ${AMBER_DEEP}, ${AMBER})`, color: '#fff' }}>
-              <span className="text-base leading-none">🤖</span> Demander à l'IA
+              <span className="text-base leading-none">🤖</span> Parler avec l'IA
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </button>
           </div>
