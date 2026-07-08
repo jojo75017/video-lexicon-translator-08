@@ -666,6 +666,11 @@ const V3HubPage: React.FC = () => {
           </>
         )}
 
+        {/* ===================== ONGLET DOCUMENTATION STUDIO ===================== */}
+        {activeTab === 'documentation' && (
+          <DocumentationStudio />
+        )}
+
         {/* ===================== ONGLET MES LIVRES ===================== */}
         {activeTab === 'livres' && (
           <CreateBookHub onSelectSource={openStudio} />
