@@ -208,12 +208,14 @@ export default function DocumentationStudio() {
                 Suivant <ChevronRight className="h-4 w-4" />
               </AmberButton>
             ) : (
-              <AmberButton disabled={estimation.deliverables === 0} title={estimation.deliverables === 0 ? 'Sélectionnez au moins un livrable' : undefined}>
-                <FileStack className="h-4 w-4" /> Générer la documentation
+              <AmberButton onClick={runGenerate} disabled={estimation.deliverables === 0 || generating}
+                title={estimation.deliverables === 0 ? 'Sélectionnez au moins un livrable' : undefined}>
+                {generating ? <><Loader2 className="h-4 w-4 animate-spin" /> Génération…</> : <><FileStack className="h-4 w-4" /> Générer la documentation</>}
               </AmberButton>
             )}
           </div>
-        </div>
+          {genError && <div className="mt-3 text-[12px] rounded-lg px-3 py-2" style={{ background: '#fdecea', color: '#b4443a' }}>{genError}</div>}
+          {generating && <p className="mt-2 text-[12px]" style={{ color: DS.MUTED }}>L'IA rédige vos documents un par un… cela peut prendre jusqu'à une minute.</p>}
 
         {/* Aperçu (desktop) */}
         <aside className="hidden lg:block lg:sticky lg:top-4 self-start">
