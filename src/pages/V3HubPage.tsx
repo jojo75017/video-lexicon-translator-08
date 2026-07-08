@@ -221,6 +221,13 @@ const V3HubPage: React.FC = () => {
     window.history.replaceState({}, '', url);
   }, [activeTab]);
 
+  // Rend le body transparent sur cette page pour que le fond illustré soit visible.
+  useEffect(() => {
+    const originalBg = document.body.style.background;
+    document.body.style.background = 'transparent';
+    return () => { document.body.style.background = originalBg; };
+  }, []);
+
   // Un module est "débloqué" si l'abonné a la formule correspondante.
   const isUnlocked = React.useCallback((m: V3Module) => {
     // Mode aperçu admin : on simule le palier choisi (197€ ou 347€).
@@ -325,16 +332,16 @@ const V3HubPage: React.FC = () => {
 
   return (
     <div className="relative min-h-screen" style={{ color: INK, fontFamily: SANS }}>
-      {/* Fond illustré jovial */}
+      {/* Fond illustré jovial fixé au viewport */}
       <div
-        className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${hubBackgroundAsset.url})` }}
+        className="pointer-events-none fixed inset-0 bg-cover bg-no-repeat"
+        style={{ backgroundImage: `url(${hubBackgroundAsset.url})`, backgroundPosition: 'center bottom' }}
         aria-hidden="true"
       />
-      {/* Overlay crème pour garantir la lisibilité du contenu */}
+      {/* Overlay très léger pour laisser l'image bien visible */}
       <div
         className="pointer-events-none absolute inset-0"
-        style={{ background: 'linear-gradient(180deg, rgba(251,246,236,0.78) 0%, rgba(251,246,236,0.60) 50%, rgba(251,246,236,0.78) 100%)' }}
+        style={{ background: 'rgba(251,246,236,0.12)' }}
         aria-hidden="true"
       />
       <div className="relative z-10 flex">
