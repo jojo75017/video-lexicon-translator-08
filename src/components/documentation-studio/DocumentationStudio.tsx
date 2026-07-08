@@ -10,6 +10,8 @@ import { AmberButton } from './ui';
 import { newModule, newFeature, newAgent } from './types';
 import DocPreview from './DocPreview';
 import Copilot from './Copilot';
+import Results from './Results';
+import type { GeneratedDoc } from './exporters';
 
 export default function DocumentationStudio() {
   const { project, patch, reset, scoreDetail, estimation } = useDocProject();
@@ -18,6 +20,39 @@ export default function DocumentationStudio() {
 
   const [step, setStep] = useState(0);
   const Current = STEP_COMPONENTS[step];
+
+  // Génération des livrables
+  const [view, setView] = useState<'editor' | 'results'>('editor');
+  const [generating, setGenerating] = useState(false);
+  const [genError, setGenError] = useState('');
+  const [docs, setDocs] = useState<GeneratedDoc[]>([]);
+  const [demoResult, setDemoResult] = useState(false);
+
+  const runGenerate = async () => {
+    if (generating || project.exports.length === 0) return;
+    setGenError('');
+    setGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('documentation-studio-generate', {
+        body: { project, deliverables: project.exports },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      const documents = (data as any)?.documents as GeneratedDoc[];
+      if (!documents?.length) throw new Error('Aucun document généré.');
+      setDocs(documents);
+      setDemoResult(Boolean((data as any)?.demo));
+      setView('results');
+    } catch (e: any) {
+      setGenError(e?.message || 'Génération indisponible pour le moment.');
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  if (view === 'results') {
+    return <Results project={project} documents={docs} demo={demoResult} onBack={() => setView('editor')} />;
+  }
 
   // Génération intelligente
   const [smartOpen, setSmartOpen] = useState(false);
