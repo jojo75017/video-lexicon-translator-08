@@ -1,54 +1,49 @@
-# Clôture des bêta-testeurs + email + script vidéo « Octobre »
+# Brand Book Premium — EbookStudio Publisher Suite
 
-## Contexte (vérifié en base)
-- Les **bêta-testeurs = 7 abonnés** dont l'email correspond à un `beta_promo_codes.status = 'used'` (`subscribers` : `status='active'`, `plan_type='lifetime'`, `license_type='commercial'`).
-- L'accès est autorisé uniquement si `subscribers.status` vaut `active` ou `trialing` (voir `subscriber-auth`). Passer le statut à `expired` coupe donc proprement l'accès sans supprimer le compte.
-- Offre actuelle = **67€ à vie** (V2). La **V3 à 197€ / 347€ arrive en octobre** (ne pas mentionner 197€ comme prix actuel).
+Ouvrage fondateur d'environ **120 pages** (densité premium, pas de remplissage), livré en **PDF mis en page** ET **DOCX éditable**, palette **Hub V3**, contenu mêlant **fonctionnalités réelles + récit de marque premium**, **visuels IA inclus**, et **accessible directement depuis le Hub V3** via un lien de téléchargement soigné.
 
-## Objectif
-Un **bouton admin** (page Codes Bêta) qui, en un clic :
-1. coupe l'accès de **tous** les bêta-testeurs ;
-2. leur envoie un **email** de clôture (remerciement + info : offre toujours à 67€ maintenant, V3 en octobre) ;
-Et en parallèle, préparer un **grand script écrit** pour ta vidéo « ce qui arrive en octobre ».
+## Identité visuelle (palette Hub V3 « Clair Ambre »)
 
-## Changements
+```text
+Ambre principal    #E8951E     Ambre profond   #C97A14
+Ambre doux         #FFF3DF     Crème           #FBF6EC
+Encre chaude       #2A2118     Vert éditorial  #0B6E4C / #0F8A5F
+```
 
-### 1. Nouvelle edge function `revoke-beta-access`
-`supabase/functions/revoke-beta-access/index.ts` (service role, `verify_jwt=false` par défaut) :
-- Récupère les emails distincts depuis `beta_promo_codes` où `status='used'` (via `used_by_email`).
-- Pour chaque email trouvé dans `subscribers` : `UPDATE subscribers SET status='expired', updated_at=now()` (couper l'accès à **tous**, sans exclusion).
-- Envoie à chacun l'email de clôture via Resend (`from: EbookStudio <noreply@ebookstudio.fr>`) — sujet et contenu ci-dessous.
-- Journalise chaque envoi dans `email_send_log` (`template_name='beta-closure'`, `status` sent/error).
-- Renvoie `{ revoked, sent, errors, results }`.
-- Idempotent : ne traite que les statuts encore `active`/`trialing` pour éviter double envoi si recliqué.
+- Titres : **Instrument Serif** · Corps : **Inter**.
+- Style Apple / Figma / Notion / Stripe / Linear : blancs généreux, filets ambre fins, encadrés teintés, numérotation soignée, pieds de page discrets.
 
-**Contenu de l'email de clôture** (HTML, charte teal #008296 / accent #FF9E2D) :
-- Remerciement chaleureux pour la participation bêta.
-- Annonce que la **phase bêta est terminée** et que l'accès gratuit prend fin.
-- Info clé : **EbookStudio est toujours disponible à 67€ à vie aujourd'hui** ; en **octobre**, la nouvelle version (Publication Assistée Pro, 197€ / 347€) sortira à un tarif plus élevé — c'est donc le bon moment pour rester à 67€.
-- CTA vers la page d'offre (67€).
-- Signé Georges.
+## Visuels générés (IA)
 
-### 2. Bouton admin dans `src/pages/admin/AdminBetaCodesPage.tsx`
-- Ajouter une carte « Zone de clôture bêta » avec un bouton **« Couper l'accès + envoyer l'email de clôture »**.
-- Dialog de confirmation (action irréversible, X bêta-testeurs concernés).
-- À la confirmation : `supabase.functions.invoke('revoke-beta-access')`, toast avec `revoked` / `sent`, puis `fetchCodes()`.
-- État de chargement dédié (`revoking`).
+- 1 **couverture** pleine page (livre ouvert + plume, ambiance ambre/crème premium).
+- **7 ouvertures de partie** (une ambiance par partie).
+- 2-3 **illustrations conceptuelles** (écosystème produit, pipeline d'agents).
+- Captures d'interface = **marqueurs de placement détaillés** `[Capture —…]` (pas d'UI factice).
 
-### 3. `supabase/config.toml`
-- Ajouter le bloc de la fonction `revoke-beta-access` si nécessaire (déploiement auto).
+## Structure
 
-### 4. Grand script vidéo « Octobre »
-Nouveau fichier `SCRIPT_VIDEO_OCTOBRE_V3.md` à la racine (comme les autres scripts existants) :
-- Script long et structuré, prêt à lire face caméra : accroche, contexte (fin de la bêta, remerciements), ce qui arrive en octobre (V3 Publication Assistée Pro, paliers 197€ / 347€, principales nouveautés issues de `roadmapV3.ts`), pourquoi le prix actuel reste à 67€ aujourd'hui, appel à l'action / urgence douce.
-- Ton aligné sur la persona Georges Boubet (fondateur).
+Front Matter (couverture, copyright, préface, lettre du fondateur, TOC) · **I Vision** · **II Le Produit** (Workspace, Publisher, AI Studio, Prompt Studio, Media Studio, Library, Dashboard, Marketplace) · **III Les Agents IA** (Mission, Compétences, Personnalité, Workflow, Prompt, Cas d'usage) · **IV Design System** · **V Product Blueprint** · **VI Prompt Studio** · **VII Vision Future** · Back Matter (glossaire, bibliographie, index, versions, à propos).
 
-## Vérification
-- `revoke-beta-access` déployée ; test à blanc : confirmer qu'après clic, les 7 abonnés passent en `status='expired'` et que `email_send_log` contient les lignes `beta-closure`.
-- `npx tsgo --noEmit` sans erreur.
-- Contrôle visuel du bouton + dialog dans l'admin.
+## Règles de rédaction (chaque chapitre)
 
-## Hors périmètre
-- Pas de suppression de comptes (statut `expired` seulement, réversible).
-- Pas de changement de prix ni de tunnel V3.
-- Pas de refonte du système de codes bêta.
+Ouverture par **citation** · **intro** par partie · **conclusion** par chapitre · encadrés **Principes fondateurs / Bonnes pratiques / Note UX / Note UI / Conseil produit / Recommandation de conception** · exemples, schémas textuels, marqueurs `[Illustration —…]` / `[Capture —…]` · hiérarchie stricte **H1/H2/H3**, ton premium, paragraphes courts.
+
+## Accès depuis le Hub V3 (nouvel élément app)
+
+- Ajout d'une **carte / bouton « Brand Book » élégant** dans `V3HubPage.tsx` (cohérent avec la charte Clair Ambre : fond crème, filet ambre, icône livre, micro-animation au survol).
+- Le bouton propose le **téléchargement direct du PDF** (et un lien secondaire DOCX), sans que l'utilisateur ait à chercher le fichier.
+- Les fichiers finaux sont **uploadés en assets Lovable (CDN)** ; le Hub référence ces URLs stables via des pointeurs `.asset.json`.
+- Emplacement : bloc dédié dans l'onglet approprié du Hub (visible et valorisé), design « très beau à regarder » aligné sur les cartes existantes.
+
+## Production (phase build)
+
+1. **Ancrage projet** : lecture du pipeline P1-P15, piliers/outils du Hub, `roadmapV3.ts`, `v3Launch.ts`.
+2. **Rédaction** FR complète en Markdown maître (~120 pages).
+3. **Génération des visuels** IA.
+4. **DOCX** (`docx` JS) : styles Instrument Serif / Inter, couverture image, TOC, encadrés colorés, citations en exergue, pieds de page numérotés.
+5. **PDF** : conversion soignée depuis le DOCX (LibreOffice), charte conservée.
+6. **QA visuelle obligatoire** : chaque page en image, inspection (débordements, contrastes, encadrés, pagination), corrections, re-vérification.
+7. **Upload assets CDN** + **ajout du bloc de téléchargement dans le Hub V3**, puis vérification build.
+8. **Livraison** dans `/mnt/documents/` : `EbookStudio-Brand-Book.pdf`, `EbookStudio-Brand-Book.docx`.
+
+Seule modification app : le bloc « Brand Book » dans le Hub V3 (frontend/présentation).
