@@ -324,7 +324,19 @@ const V3HubPage: React.FC = () => {
   );
 
   return (
-    <div className="relative min-h-screen" style={{ background: CREAM, color: INK, fontFamily: SANS }}>
+    <div className="relative min-h-screen" style={{ color: INK, fontFamily: SANS }}>
+      {/* Fond illustré jovial */}
+      <div
+        className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${hubBackgroundAsset.url})` }}
+        aria-hidden="true"
+      />
+      {/* Overlay crème pour garantir la lisibilité du contenu */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{ background: 'linear-gradient(180deg, rgba(251,246,236,0.9) 0%, rgba(251,246,236,0.8) 50%, rgba(251,246,236,0.88) 100%)' }}
+        aria-hidden="true"
+      />
       <div className="relative z-10 flex">
       {/* ===================== SIDEBAR (desktop) ===================== */}
       <aside
