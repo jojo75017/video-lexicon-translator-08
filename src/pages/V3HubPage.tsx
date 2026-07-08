@@ -338,10 +338,10 @@ const V3HubPage: React.FC = () => {
         style={{ backgroundImage: `url(${hubBackgroundAsset})`, backgroundPosition: 'center bottom' }}
         aria-hidden="true"
       />
-      {/* Overlay crème équilibré : lisibilité + image visible */}
+      {/* Overlay crème équilibré : lisibilité globale + image visible */}
       <div
         className="pointer-events-none fixed inset-0"
-        style={{ background: 'linear-gradient(180deg, rgba(251,246,236,0.55) 0%, rgba(251,246,236,0.28) 45%, rgba(251,246,236,0.28) 55%, rgba(251,246,236,0.55) 100%)' }}
+        style={{ background: 'linear-gradient(180deg, rgba(251,246,236,0.62) 0%, rgba(251,246,236,0.38) 45%, rgba(251,246,236,0.38) 55%, rgba(251,246,236,0.62) 100%)' }}
         aria-hidden="true"
       />
       <div className="relative z-10 flex">
@@ -411,20 +411,28 @@ const V3HubPage: React.FC = () => {
       </div>
       {/* Hero */}
       <header className="relative overflow-hidden border-b border-[#eadfc9]" data-tour="hero">
+        {/* Overlay local : le texte prime, l'image reste riche sur les zones libres */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: 'radial-gradient(ellipse 92% 140% at 18% 50%, rgba(251,246,236,0.94) 0%, rgba(251,246,236,0.76) 42%, rgba(251,246,236,0.44) 72%, rgba(251,246,236,0.08) 100%)',
+          }}
+          aria-hidden="true"
+        />
 
         <div className="relative mx-auto max-w-7xl px-4 py-12 sm:py-16">
           <div className="flex items-center justify-between mb-8">
             <button
               data-tour="back"
               onClick={() => navigate('/admin-cockpit')}
-              className="inline-flex items-center gap-1.5 text-xs transition-colors hover:text-[#C97A14]"
+              className="inline-flex items-center gap-1.5 text-xs transition-all duration-300 hover:text-[#C97A14] hover:-translate-y-0.5"
               style={{ color: '#9a8666' }}
             >
               <ArrowLeft className="h-4 w-4" /> Retour au cockpit
             </button>
             <button
               onClick={() => setTourOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold border transition-colors hover:bg-[#FFF3DF]"
+              className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold border transition-all duration-300 hover:bg-[#FFF3DF] hover:border-[#E8951E] hover:-translate-y-0.5 hover:shadow-sm"
               style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}
             >
               <Compass className="h-4 w-4" /> Visite guidée
@@ -438,59 +446,60 @@ const V3HubPage: React.FC = () => {
               Publication Assistée Pro
             </span>
           </div>
-          <h1 className="v3-rise text-5xl sm:text-7xl font-medium leading-[1.05] max-w-4xl tracking-tight"
-            style={{ animationDelay: '0.08s', fontFamily: SERIF, color: INK }}>
-            Le cockpit V3 de <span className="italic" style={{ color: AMBER_DEEP }}>l'auteur à succès</span>
+          <h1 className="v3-rise text-5xl sm:text-7xl font-semibold leading-[1.05] max-w-4xl tracking-tight"
+            style={{ animationDelay: '0.08s', fontFamily: SERIF, color: INK, textShadow: '0 2px 28px rgba(251,246,236,0.85)' }}>
+            Votre <span className="italic" style={{ color: AMBER_DEEP }}>maison d'édition numérique</span> commence ici.
           </h1>
           <p className="v3-rise mt-5 text-base sm:text-lg max-w-2xl leading-relaxed" style={{ animationDelay: '0.16s', color: '#6f5e47' }}>
-            {readyCount} outils premium pour écrire, publier, monétiser et vendre vos livres —
-            réunis dans une seule expérience taillée pour l'excellence.
+            98 outils professionnels pour écrire, illustrer, publier, narrer et vendre vos livres depuis une seule plateforme.
           </p>
 
           <div className="v3-rise mt-8 flex flex-wrap items-center gap-3" style={{ animationDelay: '0.24s' }}>
             <button
               onClick={() => setActiveTab('livres')}
-              className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_40px_-12px_rgba(232,149,30,0.6)]"
+              className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.02] hover:shadow-[0_20px_45px_-14px_rgba(232,149,30,0.55)] active:translate-y-0 active:scale-[0.99]"
               style={{ background: `linear-gradient(90deg, ${AMBER}, #FFB44D)`, color: '#fff' }}>
               <Wand2 className="h-4 w-4" /> Créer un livre
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
             </button>
             <button onClick={() => openModule('library')}
-              className="inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-sm font-bold border transition-colors hover:bg-[#FFF3DF]"
+              className="inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-sm font-bold border transition-all duration-300 ease-out hover:bg-[#FFF8F0] hover:border-[#E8951E] hover:-translate-y-1 hover:shadow-md active:translate-y-0 active:scale-[0.99]"
               style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}>
               <Save className="h-4 w-4" /> Mes sauvegardes
             </button>
             <button onClick={() => openModule('cover-studio-pro')}
-              className="inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-sm font-bold border transition-colors hover:bg-[#FFF3DF]"
+              className="inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-sm font-bold border transition-all duration-300 ease-out hover:bg-[#FFF8F0] hover:border-[#E8951E] hover:-translate-y-1 hover:shadow-md active:translate-y-0 active:scale-[0.99]"
               style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}>
               <ImageIcon className="h-4 w-4" /> Image / Couverture
             </button>
-            <button onClick={() => setActiveTab('offres')} data-tour="price" className="inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-sm font-semibold border transition-colors hover:bg-[#FFF3DF]"
+            <button onClick={() => setActiveTab('offres')} data-tour="price" className="inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-sm font-semibold border transition-all duration-300 ease-out hover:bg-[#FFF8F0] hover:border-[#E8951E] hover:-translate-y-1 hover:shadow-md active:translate-y-0 active:scale-[0.99]"
               style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}>
               <Sparkles className="h-4 w-4" /> Dès 197€ à vie · 3× ou 6×
             </button>
-            <button onClick={() => setActiveTab('script')} className="inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-sm font-bold border transition-colors hover:bg-[#FFF3DF]"
+            <button onClick={() => setActiveTab('script')} className="inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-sm font-bold border transition-all duration-300 ease-out hover:bg-[#FFF8F0] hover:border-[#E8951E] hover:-translate-y-1 hover:shadow-md active:translate-y-0 active:scale-[0.99]"
               style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}>
               <FileText className="h-4 w-4" /> Voir le script vidéo
             </button>
             <button
               onClick={() => setActiveTab('assistant')}
-              className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_40px_-12px_rgba(232,149,30,0.6)]"
+              className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.02] hover:shadow-[0_20px_45px_-14px_rgba(232,149,30,0.55)] active:translate-y-0 active:scale-[0.99]"
               style={{ background: `linear-gradient(90deg, ${AMBER_DEEP}, ${AMBER})`, color: '#fff' }}>
               <Bot className="h-4 w-4" /> Parler avec l'IA
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
             </button>
           </div>
 
           {/* Barre de statistiques premium */}
-          <div className="v3-rise mt-10 grid grid-cols-2 lg:grid-cols-4 gap-px rounded-2xl overflow-hidden border max-w-3xl" style={{ animationDelay: '0.32s', borderColor: `${AMBER}33`, background: `${AMBER}33` }}>
+          <div className="v3-rise mt-12 grid grid-cols-2 lg:grid-cols-4 gap-3 max-w-3xl" style={{ animationDelay: '0.32s' }}>
             {stats.map((s) => (
-              <div key={s.label} className="px-5 py-5" style={{ background: CREAM }}>
-                <s.icon className="h-4 w-4 mb-2.5" style={{ color: AMBER }} />
+              <div key={s.label} className="group rounded-2xl border px-6 py-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_12px_32px_-12px_rgba(232,149,30,0.22)]" style={{ background: CREAM, borderColor: `${AMBER}22` }}>
+                <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-105" style={{ background: AMBER_SOFT }}>
+                  <s.icon className="h-5 w-5" style={{ color: AMBER_DEEP }} />
+                </div>
                 <div className="text-3xl font-semibold leading-none tabular-nums" style={{ fontFamily: SERIF, color: INK }}>
                   {s.value}
                 </div>
-                <div className="mt-1.5 text-[11px] uppercase tracking-wider font-medium" style={{ color: '#a18a6c' }}>{s.label}</div>
+                <div className="mt-2 text-[11px] uppercase tracking-wider font-medium" style={{ color: '#a18a6c' }}>{s.label}</div>
               </div>
             ))}
           </div>
