@@ -169,11 +169,12 @@ function ModuleCard({
 }
 
 
-type HubTab = 'parcours' | 'outils' | 'livres' | 'guides' | 'offres' | 'roadmap' | 'script' | 'assistant';
+type HubTab = 'parcours' | 'outils' | 'documentation' | 'livres' | 'guides' | 'offres' | 'roadmap' | 'script' | 'assistant';
 
 const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon }[] = [
   { id: 'parcours', label: 'Parcours', icon: Compass },
   { id: 'outils', label: 'Outils', icon: Wand2 },
+  { id: 'documentation', label: 'Documentation Studio', icon: Sparkles },
   { id: 'livres', label: 'Mes livres', icon: BookOpen },
   { id: 'guides', label: 'Guides', icon: GraduationCap },
   { id: 'offres', label: 'Offres & Packs', icon: Gem },
