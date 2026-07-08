@@ -17,7 +17,7 @@ import V3GuidesSection from '@/components/admin/V3GuidesSection';
 import V3RoadmapTab from '@/components/admin/V3RoadmapTab';
 import MaisonEditionTab from '@/components/admin/MaisonEditionTab';
 import HubAiChat from '@/components/admin/HubAiChat';
-import hubBackgroundAsset from '@/assets/v3/hub-v3-background.jpg.asset.json';
+import hubBackgroundAsset from '@/assets/v3/hub-v3-background.jpg';
 import pillarIa from '@/assets/v3/pillar-ia.jpg';
 import pillarPublier from '@/assets/v3/pillar-publier.jpg';
 import pillarMonetiser from '@/assets/v3/pillar-monetiser.jpg';
@@ -221,6 +221,13 @@ const V3HubPage: React.FC = () => {
     window.history.replaceState({}, '', url);
   }, [activeTab]);
 
+  // Rend le body transparent sur cette page pour que le fond illustré soit visible.
+  useEffect(() => {
+    const originalBg = document.body.style.background;
+    document.body.style.background = 'transparent';
+    return () => { document.body.style.background = originalBg; };
+  }, []);
+
   // Un module est "débloqué" si l'abonné a la formule correspondante.
   const isUnlocked = React.useCallback((m: V3Module) => {
     // Mode aperçu admin : on simule le palier choisi (197€ ou 347€).
@@ -325,16 +332,16 @@ const V3HubPage: React.FC = () => {
 
   return (
     <div className="relative min-h-screen" style={{ color: INK, fontFamily: SANS }}>
-      {/* Fond illustré jovial */}
+      {/* Fond illustré jovial fixé au viewport */}
       <div
-        className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${hubBackgroundAsset.url})` }}
+        className="pointer-events-none fixed inset-0 bg-cover bg-no-repeat"
+        style={{ backgroundImage: `url(${hubBackgroundAsset})`, backgroundPosition: 'center bottom' }}
         aria-hidden="true"
       />
-      {/* Overlay crème pour garantir la lisibilité du contenu */}
+      {/* Overlay crème équilibré : lisibilité + image visible */}
       <div
-        className="pointer-events-none absolute inset-0"
-        style={{ background: 'linear-gradient(180deg, rgba(251,246,236,0.78) 0%, rgba(251,246,236,0.60) 50%, rgba(251,246,236,0.78) 100%)' }}
+        className="pointer-events-none fixed inset-0"
+        style={{ background: 'linear-gradient(180deg, rgba(251,246,236,0.55) 0%, rgba(251,246,236,0.28) 45%, rgba(251,246,236,0.28) 55%, rgba(251,246,236,0.55) 100%)' }}
         aria-hidden="true"
       />
       <div className="relative z-10 flex">
