@@ -673,7 +673,57 @@ const V3HubPage: React.FC = () => {
 
         {/* ===================== ONGLET GUIDES ===================== */}
         {activeTab === 'guides' && (
-          <V3GuidesSection />
+          <section className="space-y-5">
+            <div
+              className="relative overflow-hidden rounded-2xl border p-6 sm:p-8"
+              style={{ background: `linear-gradient(135deg, ${AMBER_SOFT} 0%, #ffffff 55%)`, borderColor: `${AMBER}55` }}
+            >
+              <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-4">
+                  <div
+                    className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl shadow-sm"
+                    style={{ background: '#fff', border: `1px solid ${AMBER}44`, color: AMBER_DEEP }}
+                  >
+                    <BookOpen className="h-7 w-7" />
+                  </div>
+                  <div>
+                    <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-wider" style={{ background: '#fff', borderColor: `${AMBER}44`, color: AMBER_DEEP }}>
+                      <Gem className="h-3.5 w-3.5" /> Document fondateur
+                    </div>
+                    <h2 className="mt-3 text-3xl sm:text-4xl font-medium leading-tight" style={{ fontFamily: SERIF, color: INK }}>
+                      Brand Book — EbookStudio Publisher Suite
+                    </h2>
+                    <p className="mt-2 max-w-2xl text-sm leading-relaxed" style={{ color: '#6f5e47' }}>
+                      L'ouvrage de référence (85 pages) : vision, produit, 10 agents IA, design system, blueprint et prompt studio. Prêt à consulter, ici même — pas besoin d'aller le chercher.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex shrink-0 flex-col gap-2 sm:min-w-[190px]">
+                  <a
+                    href={brandBookPdf.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download
+                    className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5"
+                    style={{ background: AMBER_DEEP }}
+                  >
+                    <FileText className="h-4 w-4" /> Télécharger le PDF
+                  </a>
+                  <a
+                    href={brandBookDocx.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download
+                    className="inline-flex items-center justify-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition-all hover:-translate-y-0.5"
+                    style={{ background: '#fff', borderColor: `${AMBER}55`, color: AMBER_DEEP }}
+                  >
+                    <FileText className="h-4 w-4" /> Version DOCX
+                  </a>
+                </div>
+              </div>
+            </div>
+            <V3GuidesSection />
+          </section>
         )}
 
         {/* ===================== ONGLET OFFRES & PACKS ===================== */}
