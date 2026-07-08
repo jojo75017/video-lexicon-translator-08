@@ -23,6 +23,8 @@ import pillarPublier from '@/assets/v3/pillar-publier.jpg';
 import pillarMonetiser from '@/assets/v3/pillar-monetiser.jpg';
 import pillarMarketing from '@/assets/v3/pillar-marketing.jpg';
 import videoOctoberScript from '../../SCRIPT_VIDEO_OCTOBRE_V3.md?raw';
+import brandBookPdf from '@/assets/brandbook/brandbook-pdf.asset.json';
+import brandBookDocx from '@/assets/brandbook/brandbook-docx.asset.json';
 
 const PILLAR_IMG: Record<V3Pillar, string> = {
   ia: pillarIa,
