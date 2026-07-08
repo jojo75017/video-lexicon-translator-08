@@ -415,7 +415,7 @@ const V3HubPage: React.FC = () => {
         <div
           className="pointer-events-none absolute inset-0"
           style={{
-            background: 'radial-gradient(ellipse 85% 130% at 22% 52%, rgba(251,246,236,0.97) 0%, rgba(251,246,236,0.82) 35%, rgba(251,246,236,0.52) 65%, rgba(251,246,236,0.18) 100%)',
+            background: 'radial-gradient(ellipse 92% 140% at 18% 50%, rgba(251,246,236,0.94) 0%, rgba(251,246,236,0.76) 42%, rgba(251,246,236,0.44) 72%, rgba(251,246,236,0.08) 100%)',
           }}
           aria-hidden="true"
         />
