@@ -17,6 +17,7 @@ import V3GuidesSection from '@/components/admin/V3GuidesSection';
 import V3RoadmapTab from '@/components/admin/V3RoadmapTab';
 import MaisonEditionTab from '@/components/admin/MaisonEditionTab';
 import HubAiChat from '@/components/admin/HubAiChat';
+import hubBackgroundAsset from '@/assets/v3/hub-v3-background.jpg.asset.json';
 import pillarIa from '@/assets/v3/pillar-ia.jpg';
 import pillarPublier from '@/assets/v3/pillar-publier.jpg';
 import pillarMonetiser from '@/assets/v3/pillar-monetiser.jpg';
@@ -323,7 +324,19 @@ const V3HubPage: React.FC = () => {
   );
 
   return (
-    <div className="relative min-h-screen" style={{ background: CREAM, color: INK, fontFamily: SANS }}>
+    <div className="relative min-h-screen" style={{ color: INK, fontFamily: SANS }}>
+      {/* Fond illustré jovial */}
+      <div
+        className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${hubBackgroundAsset.url})` }}
+        aria-hidden="true"
+      />
+      {/* Overlay crème pour garantir la lisibilité du contenu */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{ background: 'linear-gradient(180deg, rgba(251,246,236,0.78) 0%, rgba(251,246,236,0.60) 50%, rgba(251,246,236,0.78) 100%)' }}
+        aria-hidden="true"
+      />
       <div className="relative z-10 flex">
       {/* ===================== SIDEBAR (desktop) ===================== */}
       <aside
