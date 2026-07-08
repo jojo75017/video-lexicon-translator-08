@@ -5,7 +5,7 @@
 export type V3Pillar = 'publier' | 'monetiser' | 'marketing' | 'ia' | 'edition' | 'distribution' | 'promotion' | 'data';
 export type V3Status = 'todo' | 'in_progress' | 'done';
 export type V3Tier = 'core' | 'upsell';
-export type V3PackId = 'cover' | 'marketing' | 'social' | 'monetisation' | 'editorial' | 'distribution' | 'promotion' | 'transcription' | 'market-research';
+export type V3PackId = 'cover' | 'marketing' | 'social' | 'monetisation' | 'editorial' | 'distribution' | 'promotion' | 'transcription' | 'market-research' | 'documentation-studio';
 
 export interface V3Module {
   id: string;
@@ -119,6 +119,15 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
     badge: 'Opportunité',
     alacarte: true,
     modules: ['audio-video-transcription'],
+  },
+  {
+    id: 'documentation-studio',
+    title: 'Documentation Studio AI',
+    desc: 'La 1re plateforme IA qui produit TOUTE la documentation d\'un produit numérique (SaaS, plugin, app, outil IA, API…) : Brand Book, manuel utilisateur, doc technique, FAQ, centre d\'aide + kit marketing (landing, one page, Product Hunt, AppSumo, kits média/affiliés) et communication (scripts vidéo, posts LinkedIn/X/Facebook). Exports Word, PDF Premium, HTML, Markdown, PowerPoint.',
+    price: 197,
+    badge: 'Nouveau',
+    alacarte: true,
+    modules: ['documentation-studio'],
   },
 ];
 
@@ -524,6 +533,10 @@ export const V3_MODULES: V3Module[] = [
     description: 'Génère et évalue des mots-clés publicitaires pour les campagnes Amazon Ads avec estimation d\'enchères et de pertinence, pour dépenser moins et cibler mieux.' },
   { id: 'trademark-checker',           pillar: 'data', status: 'done', title: 'Vérification Marques Déposées',
     description: 'Contrôle qu\'un titre, sous-titre ou nom de collection n\'entre pas en conflit avec une marque déposée (INPI/EUIPO/USPTO), pour éviter un blocage ou un retrait KDP.' },
+
+  // DOCUMENTATION STUDIO — produit premium transversal (pack indépendant 197€)
+  { id: 'documentation-studio', pillar: 'edition', status: 'in_progress', title: 'Documentation Studio AI',
+    description: 'Générez automatiquement toute la documentation d\'un produit numérique (SaaS, plugin, app, outil IA, API…) : Brand Book, manuel, doc technique, FAQ, kit marketing et communication. Exports Word, PDF Premium, HTML, Markdown, PowerPoint.' },
 ];
 
 /** Renvoie un module V3 par son id. */

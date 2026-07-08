@@ -17,6 +17,7 @@ import V3GuidesSection from '@/components/admin/V3GuidesSection';
 import V3RoadmapTab from '@/components/admin/V3RoadmapTab';
 import MaisonEditionTab from '@/components/admin/MaisonEditionTab';
 import HubAiChat from '@/components/admin/HubAiChat';
+import DocumentationStudio from '@/components/documentation-studio/DocumentationStudio';
 import hubBackgroundAsset from '@/assets/v3/hub-v3-background.jpg';
 import pillarIa from '@/assets/v3/pillar-ia.jpg';
 import pillarPublier from '@/assets/v3/pillar-publier.jpg';
@@ -169,11 +170,12 @@ function ModuleCard({
 }
 
 
-type HubTab = 'parcours' | 'outils' | 'livres' | 'guides' | 'offres' | 'roadmap' | 'script' | 'assistant';
+type HubTab = 'parcours' | 'outils' | 'documentation' | 'livres' | 'guides' | 'offres' | 'roadmap' | 'script' | 'assistant';
 
 const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon }[] = [
   { id: 'parcours', label: 'Parcours', icon: Compass },
   { id: 'outils', label: 'Outils', icon: Wand2 },
+  { id: 'documentation', label: 'Documentation Studio', icon: Sparkles },
   { id: 'livres', label: 'Mes livres', icon: BookOpen },
   { id: 'guides', label: 'Guides', icon: GraduationCap },
   { id: 'offres', label: 'Offres & Packs', icon: Gem },
@@ -664,6 +666,11 @@ const V3HubPage: React.FC = () => {
               </div>
             )}
           </>
+        )}
+
+        {/* ===================== ONGLET DOCUMENTATION STUDIO ===================== */}
+        {activeTab === 'documentation' && (
+          <DocumentationStudio />
         )}
 
         {/* ===================== ONGLET MES LIVRES ===================== */}

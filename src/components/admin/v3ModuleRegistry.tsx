@@ -98,6 +98,7 @@ import CompetitorReviewAnalyzer from '@/components/admin/market/CompetitorReview
 import CompetitorTracker from '@/components/admin/market/CompetitorTracker';
 import AmazonAdsKeywordResearch from '@/components/admin/market/AmazonAdsKeywordResearch';
 import TrademarkChecker from '@/components/admin/market/TrademarkChecker';
+import DocumentationStudio from '@/components/documentation-studio/DocumentationStudio';
 
 /** Modules dont le dialog s'affiche en largeur réduite (max-w-2xl). */
 export const NARROW_MODULE_IDS: string[] = [
@@ -207,6 +208,8 @@ export const V3_MODULE_COMPONENTS: Record<string, React.ComponentType> = {
   'v3-order-page': V3OrderPageModule,
   'v3-sales-page': V3SalesPageModule,
   'v3-launch-bonuses': V3LaunchBonusesModule,
+  // Documentation Studio AI (produit premium transversal)
+  'documentation-studio': DocumentationStudio,
 };
 
 /** Tous les modules ouvrables (mode hors V3 / cockpit standard). */

@@ -1,49 +1,59 @@
-# Brand Book Premium — EbookStudio Publisher Suite
+# 📚 Documentation Studio AI — Spécification V1 officielle (prête au développement)
 
-Ouvrage fondateur d'environ **120 pages** (densité premium, pas de remplissage), livré en **PDF mis en page** ET **DOCX éditable**, palette **Hub V3**, contenu mêlant **fonctionnalités réelles + récit de marque premium**, **visuels IA inclus**, et **accessible directement depuis le Hub V3** via un lien de téléchargement soigné.
+Plateforme IA de documentation produit, intégrée à EbookStudio Publisher Suite mais **commercialisable indépendamment**. Un seul brief → toute la documentation, le marketing et la communication d'un produit numérique.
 
-## Identité visuelle (palette Hub V3 « Clair Ambre »)
+**Positionnement commercial (figé)** : Pack Premium indépendant à **197 €** + **démo gratuite** (1 génération courte). Cible : SaaS, plugins WordPress, apps mobiles, outils IA, API, extensions, CRM/ERP, e-learning, produits numériques. Périmètre gelé (nouveautés → V2).
 
-```text
-Ambre principal    #E8951E     Ambre profond   #C97A14
-Ambre doux         #FFF3DF     Crème           #FBF6EC
-Encre chaude       #2A2118     Vert éditorial  #0B6E4C / #0F8A5F
-```
+## Emplacement dans l'app & commercialisation
 
-- Titres : **Instrument Serif** · Corps : **Inter**.
-- Style Apple / Figma / Notion / Stripe / Linear : blancs généreux, filets ambre fins, encadrés teintés, numérotation soignée, pieds de page discrets.
+- **Onglet dédié « Documentation Studio »** ajouté dans `HUB_TABS` de `V3HubPage.tsx` (après *Outils*, icône `Sparkles`/`FileText`), ouvrant le module en pleine largeur.
+- Enregistré dans `v3ModuleRegistry.tsx` sous l'id `documentation-studio` → aussi visible dans la grille *Outils* et la *Roadmap*.
+- **Vente** : nouveau pack Premium **197 €** dans `V3_UPSELL_PACKS` (`roadmapV3.ts`), affiché dans l'onglet **Offres & Packs** et le tunnel de commande V3 existant ; paiement via le système de paiement Lovable intégré.
+- **Accès** : gating via `useV3Entitlement` (onglet + edge functions côté serveur). **Démo gratuite** = 1 génération courte (quota contrôlé serveur) avec CTA « Débloquer à 197 € ».
 
-## Visuels générés (IA)
+## Parcours utilisateur
 
-- 1 **couverture** pleine page (livre ouvert + plume, ambiance ambre/crème premium).
-- **7 ouvertures de partie** (une ambiance par partie).
-- 2-3 **illustrations conceptuelles** (écosystème produit, pipeline d'agents).
-- Captures d'interface = **marqueurs de placement détaillés** `[Capture —…]` (pas d'UI factice).
+**Étape 0 — Type de produit** : SaaS · Plugin WordPress · App mobile · Outil IA · Extension Chrome · API · Shopify · CRM/ERP · Plateforme e-learning · Produit numérique · Autre. Adapte questions & modèles.
 
-## Structure
+1. **Projet** — nom, version, entreprise, site, slogan, langue, logo
+2. **Positionnement** — vision, mission, valeurs, public cible, problème résolu, promesse, avantages
+3. **Identité visuelle** — logo, couleurs, typographies, style + **Templates** : Apple · Figma · Notion · Stripe · Startup Tech · Corporate · Minimaliste · Documentation API
+4. **Modules** — ajout/modif/suppression/réorg ; par module : nom, description, fonction, public, capture, icône
+5. **Fonctionnalités** — nom, description, exemple, astuce, capture
+6. **Agents IA** — nom, mission, personnalité, compétences, workflow, prompt système, cas d'usage
+7. **Exports** (3 groupes ci-dessous)
 
-Front Matter (couverture, copyright, préface, lettre du fondateur, TOC) · **I Vision** · **II Le Produit** (Workspace, Publisher, AI Studio, Prompt Studio, Media Studio, Library, Dashboard, Marketplace) · **III Les Agents IA** (Mission, Compétences, Personnalité, Workflow, Prompt, Cas d'usage) · **IV Design System** · **V Product Blueprint** · **VI Prompt Studio** · **VII Vision Future** · Back Matter (glossaire, bibliographie, index, versions, à propos).
+## Livrables (étape 7)
 
-## Règles de rédaction (chaque chapitre)
+**Documentation** : Brand Book · Manuel utilisateur · Documentation technique · FAQ · Centre d'aide
+**Formats** : Word · PDF Premium · HTML · Markdown · PowerPoint
+**Marketing** : Landing Page · One Page · Kit Média · Kit Affiliés · Kit Partenaires · Product Hunt · AppSumo · Présentation commerciale · Pitch investisseur · Emails de lancement
+**Communication** : Scripts vidéo · Publications LinkedIn · Facebook · X
 
-Ouverture par **citation** · **intro** par partie · **conclusion** par chapitre · encadrés **Principes fondateurs / Bonnes pratiques / Note UX / Note UI / Conseil produit / Recommandation de conception** · exemples, schémas textuels, marqueurs `[Illustration —…]` / `[Capture —…]` · hiérarchie stricte **H1/H2/H3**, ton premium, paragraphes courts.
+Structure Brand Book : Couverture → Copyright → Préface → Lettre du fondateur → Sommaire → Vision → Mission → Valeurs → Positionnement → Produit → Modules → Fonctionnalités → Agents IA → Design System → UX/UI → Product Blueprint → Roadmap → Glossaire → À propos.
 
-## Accès depuis le Hub V3 (nouvel élément app)
+## Fonctionnalités Premium
 
-- Ajout d'une **carte / bouton « Brand Book » élégant** dans `V3HubPage.tsx` (cohérent avec la charte Clair Ambre : fond crème, filet ambre, icône livre, micro-animation au survol).
-- Le bouton propose le **téléchargement direct du PDF** (et un lien secondaire DOCX), sans que l'utilisateur ait à chercher le fichier.
-- Les fichiers finaux sont **uploadés en assets Lovable (CDN)** ; le Hub référence ces URLs stables via des pointeurs `.asset.json`.
-- Emplacement : bloc dédié dans l'onglet approprié du Hub (visible et valorisé), design « très beau à regarder » aligné sur les cartes existantes.
+- **✨ Génération intelligente** : description en langage naturel → l'IA remplit toutes les sections → l'utilisateur valide/modifie.
+- **🤖 Documentation Copilot** : assistant flottant tout le wizard (améliorer, compléter, proposer, enrichir) sans remplacer le contrôle utilisateur.
+- **📊 Score de complétude** (style SEO) : progression, qualité, recommandations en temps réel.
+- **⏱️ Estimation** avant génération : temps, pages, mots, nombre de livrables.
+- **📁 Bibliothèque de projets** : projets, versions, score, exports ; actions Ouvrir · Dupliquer · Exporter · Archiver · Supprimer.
+- **🔄 Mise à jour intelligente** : un élément change (ex. nouveau module) → seuls les documents concernés sont régénérés.
 
-## Production (phase build)
+## Architecture technique
 
-1. **Ancrage projet** : lecture du pipeline P1-P15, piliers/outils du Hub, `roadmapV3.ts`, `v3Launch.ts`.
-2. **Rédaction** FR complète en Markdown maître (~120 pages).
-3. **Génération des visuels** IA.
-4. **DOCX** (`docx` JS) : styles Instrument Serif / Inter, couverture image, TOC, encadrés colorés, citations en exergue, pieds de page numérotés.
-5. **PDF** : conversion soignée depuis le DOCX (LibreOffice), charte conservée.
-6. **QA visuelle obligatoire** : chaque page en image, inspection (débordements, contrastes, encadrés, pagination), corrections, re-vérification.
-7. **Upload assets CDN** + **ajout du bloc de téléchargement dans le Hub V3**, puis vérification build.
-8. **Livraison** dans `/mnt/documents/` : `EbookStudio-Brand-Book.pdf`, `EbookStudio-Brand-Book.docx`.
+- Dossier dédié `src/components/documentation-studio/`, composants organisés par fonctionnalité, même architecture que les autres modules V3.
+- Réutilise exporteurs **DOCX** (`ebookDocxExporter`) et **PDF** (`ebookPdfExporter`) ; ajout **PowerPoint** (`pptxgenjs`).
+- Edge functions : `documentation-studio-assist` (génération intelligente + Copilot) et `documentation-studio-generate` (rédaction des livrables) via Lovable AI Gateway (`google/gemini-3-flash-preview`), auth `supabase.auth.getUser()`, gating entitlement + quota démo.
+- Table `documentation_projects` (RLS `auth.uid()`, GRANT authenticated/service_role) pour bibliothèque et mise à jour intelligente.
+- UX Premium, simple, responsive, palette **Clair Ambre**, respect des Design Tokens (aucune couleur en dur). Aucune donnée simulée.
 
-Seule modification app : le bloc « Brand Book » dans le Hub V3 (frontend/présentation).
+## Ordre de développement (V1)
+
+1. **Fondations UI** : onglet Hub + pack 197€ + registre, Étape 0 + wizard 7 étapes, templates, score de complétude, estimation, persistance locale. → 100 % testable.
+2. **Intelligence** : edge function `documentation-studio-assist` → Génération intelligente + Copilot flottant.
+3. **Génération & exports** : edge function `documentation-studio-generate` → livrables doc + marketing + communication ; assemblage Word/PDF/HTML/Markdown/PowerPoint ; page Résultats (aperçu + téléchargements + Régénérer + Modifier).
+4. **Bibliothèque de projets + Mise à jour intelligente** : table `documentation_projects`, page « Mes documentations », duplication/archivage, régénération ciblée.
+
+Je démarre par l'étape 1 dès validation, puis j'enchaîne dans cet ordre.
