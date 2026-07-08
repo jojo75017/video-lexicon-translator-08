@@ -338,10 +338,10 @@ const V3HubPage: React.FC = () => {
         style={{ backgroundImage: `url(${hubBackgroundAsset})`, backgroundPosition: 'center bottom' }}
         aria-hidden="true"
       />
-      {/* Overlay crème équilibré : lisibilité + image visible */}
+      {/* Overlay crème équilibré : lisibilité globale + image visible */}
       <div
         className="pointer-events-none fixed inset-0"
-        style={{ background: 'linear-gradient(180deg, rgba(251,246,236,0.55) 0%, rgba(251,246,236,0.28) 45%, rgba(251,246,236,0.28) 55%, rgba(251,246,236,0.55) 100%)' }}
+        style={{ background: 'linear-gradient(180deg, rgba(251,246,236,0.62) 0%, rgba(251,246,236,0.38) 45%, rgba(251,246,236,0.38) 55%, rgba(251,246,236,0.62) 100%)' }}
         aria-hidden="true"
       />
       <div className="relative z-10 flex">
