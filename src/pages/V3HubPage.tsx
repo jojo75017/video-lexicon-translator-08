@@ -335,7 +335,7 @@ const V3HubPage: React.FC = () => {
       {/* Fond illustré jovial fixé au viewport */}
       <div
         className="pointer-events-none fixed inset-0 bg-cover bg-no-repeat"
-        style={{ backgroundImage: `url(${hubBackgroundAsset.url})`, backgroundPosition: 'center bottom' }}
+        style={{ backgroundImage: `url(${hubBackgroundAsset})`, backgroundPosition: 'center bottom' }}
         aria-hidden="true"
       />
       {/* Overlay très léger pour laisser l'image bien visible */}
