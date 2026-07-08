@@ -216,6 +216,8 @@ export default function DocumentationStudio() {
           </div>
           {genError && <div className="mt-3 text-[12px] rounded-lg px-3 py-2" style={{ background: '#fdecea', color: '#b4443a' }}>{genError}</div>}
           {generating && <p className="mt-2 text-[12px]" style={{ color: DS.MUTED }}>L'IA rédige vos documents un par un… cela peut prendre jusqu'à une minute.</p>}
+        </div>
+
 
         {/* Aperçu (desktop) */}
         <aside className="hidden lg:block lg:sticky lg:top-4 self-start">
