@@ -147,16 +147,12 @@ Deno.serve(async (req) => {
     const toGenerate = isDemo ? requested.slice(0, 1) : requested.slice(0, 20);
 
     const context = buildContext(project);
-    const results: { id: string; label: string; content: string }[] = [];
+    const system = "Tu es un rédacteur expert en documentation produit, branding et marketing SaaS. Tu écris en français, dans un style premium, clair et structuré. Tu utilises le format Markdown (titres ##, listes, gras). Pas de préambule ni de conclusion méta.";
+    const lengthHint = isDemo
+      ? "Version DÉMO courte : environ 250 mots, un aperçu représentatif seulement."
+      : "Document complet, riche et professionnel (600 à 1200 mots selon le type).";
 
-    for (const id of toGenerate) {
-      const meta = DELIVERABLE_LABELS[id];
-      if (!meta) continue;
-      const lengthHint = isDemo
-        ? "Version DÉMO courte : environ 250 mots, un aperçu représentatif seulement."
-        : "Document complet, riche et professionnel (600 à 1200 mots selon le type).";
-      const system = "Tu es un rédacteur expert en documentation produit, branding et marketing SaaS. Tu écris en français, dans un style premium, clair et structuré. Tu utilises le format Markdown (titres ##, listes, gras). Pas de préambule ni de conclusion méta.";
-      const prompt = `Rédige le document suivant pour ce produit.
+    const buildPrompt = (meta: { label: string; brief: string }) => `Rédige le document suivant pour ce produit.
 
 DOCUMENT: ${meta.label}
 CONTENU ATTENDU: ${meta.brief}
@@ -166,15 +162,32 @@ Base-toi UNIQUEMENT sur les informations réelles ci-dessous. N'invente pas de c
 
 === FICHE PRODUIT ===
 ${context}`;
-      const r = await callLovableAI(system, prompt, isDemo ? 900 : 2600);
-      if (!r.ok) {
-        if (results.length === 0) return aiError(r.status);
-        break; // on renvoie ce qui a été généré
+
+    // Génération en parallèle (par lots) pour éviter les timeouts sur de nombreux livrables
+    const ids = toGenerate.filter((id) => DELIVERABLE_LABELS[id]);
+    const results: { id: string; label: string; content: string }[] = [];
+    let firstErrorStatus = 0;
+    const BATCH = 4;
+
+    for (let i = 0; i < ids.length; i += BATCH) {
+      const batch = ids.slice(i, i + BATCH);
+      const settled = await Promise.all(
+        batch.map(async (id) => {
+          const meta = DELIVERABLE_LABELS[id];
+          const r = await callLovableAI(system, buildPrompt(meta), isDemo ? 900 : 2600);
+          return { id, meta, r };
+        }),
+      );
+      for (const { id, meta, r } of settled) {
+        if (!r.ok) {
+          if (!firstErrorStatus) firstErrorStatus = r.status;
+          continue;
+        }
+        results.push({ id, label: meta.label, content: r.text.trim() });
       }
-      results.push({ id, label: meta.label, content: r.text.trim() });
     }
 
-    if (results.length === 0) return json(502, { error: "Aucun document généré." });
+    if (results.length === 0) return aiError(firstErrorStatus || 502);
 
     return json(200, {
       demo: isDemo,
