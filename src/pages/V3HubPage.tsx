@@ -334,7 +334,7 @@ const V3HubPage: React.FC = () => {
       {/* Overlay crème pour garantir la lisibilité du contenu */}
       <div
         className="pointer-events-none absolute inset-0"
-        style={{ background: 'linear-gradient(180deg, rgba(251,246,236,0.9) 0%, rgba(251,246,236,0.8) 50%, rgba(251,246,236,0.88) 100%)' }}
+        style={{ background: 'linear-gradient(180deg, rgba(251,246,236,0.78) 0%, rgba(251,246,236,0.60) 50%, rgba(251,246,236,0.78) 100%)' }}
         aria-hidden="true"
       />
       <div className="relative z-10 flex">
