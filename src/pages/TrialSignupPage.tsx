@@ -295,6 +295,7 @@ export default function TrialSignupPage() {
           )}
         </div>
       </div>
+      )}
     </div>
   );
 }
