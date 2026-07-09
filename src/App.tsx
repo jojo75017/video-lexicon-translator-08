@@ -99,6 +99,7 @@ const SeriesTomesPage = lazy(() => import('./pages/SeriesTomesPage'));
 const ForumPage = lazy(() => import('./pages/ForumPage'));
 const KdpKeywordResearchPage = lazy(() => import('./pages/KdpKeywordResearchPage'));
 const AuditPilotPage = lazy(() => import('./pages/AuditPilotPage'));
+const BookPerfectPage = lazy(() => import('./pages/BookPerfectPage'));
 const CouvertureKdpPage = lazy(() => import('./pages/CouvertureKdpPage'));
 const PublicAudiobookPage = lazy(() => import('./pages/PublicAudiobookPage'));
 const AudiobookEmbedPage = lazy(() => import('./pages/AudiobookEmbedPage'));
