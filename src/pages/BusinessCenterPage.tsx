@@ -253,23 +253,37 @@ const BusinessCenterPage = () => {
             <CardDescription>Snapshot en temps réel de votre journée</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
               {[
                 { label: 'Nouveaux essais', value: m.todayTrials, emoji: '👥' },
                 { label: 'Emails envoyés', value: m.todaySent, emoji: '📧' },
                 { label: 'Ouverts', value: m.todayOpens, emoji: '👀' },
                 { label: 'Clics', value: m.todayClicks, emoji: '🖱️' },
                 { label: 'Ventes', value: m.todaySales, emoji: '💳' },
+                { label: 'Revenu', value: `${m.todayRevenue.toLocaleString('fr-FR')} €`, emoji: '💰', isMoney: true },
               ].map((s) => (
                 <div key={s.label} className="text-center rounded-xl bg-card/70 border border-border p-4">
                   <div className="text-2xl mb-1">{s.emoji}</div>
-                  <div className={`text-3xl font-black ${s.value > 0 ? 'text-emerald-500' : 'text-muted-foreground'}`}>
+                  <div className={`text-3xl font-black ${(s.isMoney ? m.todayRevenue > 0 : (s.value as number) > 0) ? 'text-emerald-500' : 'text-muted-foreground'}`}>
                     {s.value}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">{s.label}</div>
                 </div>
               ))}
             </div>
+
+            {/* Synthèse du jour */}
+            <div
+              className={`flex items-center gap-3 rounded-xl p-4 ${
+                todaySummary.tone === 'good' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                : todaySummary.tone === 'warn' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                : 'bg-red-500/10 text-red-600 dark:text-red-400'
+              }`}
+            >
+              {todaySummary.stars && <span className="text-lg shrink-0">{todaySummary.stars}</span>}
+              <span className="font-semibold text-sm">{todaySummary.text}</span>
+            </div>
+
 
             <div className="space-y-2">
               {diagnostics.map((d, i) => (
