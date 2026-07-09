@@ -437,13 +437,24 @@ const V3HubPage: React.FC = () => {
             >
               <ArrowLeft className="h-4 w-4" /> Retour au cockpit
             </button>
-            <button
-              onClick={() => setTourOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold border transition-all duration-300 hover:bg-[#FFF3DF] hover:border-[#E8951E] hover:-translate-y-0.5 hover:shadow-sm"
-              style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}
-            >
-              <Compass className="h-4 w-4" /> Visite guidée
-            </button>
+            <div className="flex items-center gap-2">
+              {isAdmin && (
+                <button
+                  onClick={() => navigate('/business-center')}
+                  className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold border transition-all duration-300 hover:bg-[#FFF3DF] hover:border-[#E8951E] hover:-translate-y-0.5 hover:shadow-sm"
+                  style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}
+                >
+                  <Gauge className="h-4 w-4" /> Business Center
+                </button>
+              )}
+              <button
+                onClick={() => setTourOpen(true)}
+                className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold border transition-all duration-300 hover:bg-[#FFF3DF] hover:border-[#E8951E] hover:-translate-y-0.5 hover:shadow-sm"
+                style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}
+              >
+                <Compass className="h-4 w-4" /> Visite guidée
+              </button>
+            </div>
           </div>
 
           <div className="v3-rise inline-flex items-center gap-2 mb-5 rounded-full border px-3 py-1"
