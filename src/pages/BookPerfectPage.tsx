@@ -27,6 +27,13 @@ import type { Analysis, Manuscript } from '@/lib/bookperfect/types';
 
 const CURRENT_MANUSCRIPT_SCOPE = 'bookperfect_current_manuscript';
 
+const normalizeResumableAnalysis = (value: Analysis): Analysis => ({
+  ...value,
+  chapterResults: value.chapterResults.map((r) => (
+    r.status === 'running' ? { ...r, status: 'pending' as const } : r
+  )),
+});
+
 const BookPerfectPage: React.FC = () => {
   const navigate = useNavigate();
   const [manuscript, setManuscript] = useState<Manuscript | null>(null);
@@ -61,12 +68,7 @@ const BookPerfectPage: React.FC = () => {
     if (recovery?.manuscript?.id && recovery.analysis?.chapterResults?.some((r) => r.status !== 'done')) {
       setManuscript(recovery.manuscript);
       writeAutosave(CURRENT_MANUSCRIPT_SCOPE, recovery.manuscript);
-      setAnalysis({
-        ...recovery.analysis,
-        chapterResults: recovery.analysis.chapterResults.map((r) => (
-          r.status === 'running' ? { ...r, status: 'pending' } : r
-        )),
-      });
+      setAnalysis(normalizeResumableAnalysis(recovery.analysis));
       setPaused(true);
       setPausedMessage('Analyse interrompue : vous pouvez reprendre exactement où elle s’est arrêtée.');
     }
@@ -160,12 +162,7 @@ const BookPerfectPage: React.FC = () => {
   const restoreRecovery = () => {
     const recovery = recoverySnapshot || loadRecoverySnapshot();
     if (!recovery?.manuscript?.id) return;
-    const normalizedAnalysis = {
-      ...recovery.analysis,
-      chapterResults: recovery.analysis.chapterResults.map((r) => (
-        r.status === 'running' ? { ...r, status: 'pending' } : r
-      )),
-    };
+    const normalizedAnalysis = normalizeResumableAnalysis(recovery.analysis);
     setManuscript(recovery.manuscript);
     writeAutosave(CURRENT_MANUSCRIPT_SCOPE, recovery.manuscript);
     setAnalysis(normalizedAnalysis);
