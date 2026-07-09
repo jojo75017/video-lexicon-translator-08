@@ -572,9 +572,15 @@ const App = () => {
               path="/bookperfect"
               element={
                 <V3Gate>
-                  <BookPerfectPage />
+                  <BookPerfectGate>
+                    <BookPerfectPage />
+                  </BookPerfectGate>
                 </V3Gate>
               }
+            />
+            <Route
+              path="/bookperfect-offre"
+              element={<BookPerfectSalesPage />}
             />
             <Route
               path="/couverture-kdp"
