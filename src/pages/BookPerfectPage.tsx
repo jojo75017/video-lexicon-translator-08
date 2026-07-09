@@ -99,7 +99,7 @@ const BookPerfectPage: React.FC = () => {
   const onIgnore = (id: string) => setStatus(id, 'ignored');
   const onReset = (id: string) => setStatus(id, 'pending');
 
-  const reset = () => { setManuscript(null); setAnalysis(null); };
+  const reset = () => { setManuscript(null); setAnalysis(null); setPaused(false); setPausedMessage(null); setElapsedMs(null); setJustCompleted(false); };
 
   const hasResults = !!analysis && analysis.chapterResults.some((r) => r.status === 'done' || r.status === 'failed');
   const failedCount = analysis?.chapterResults.filter((r) => r.status === 'failed').length ?? 0;
