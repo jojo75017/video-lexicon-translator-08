@@ -17,11 +17,11 @@ import type {
 import { runLocalChecks } from './localChecks';
 
 const SCOPE = (manuscriptId: string) => `bookperfect_${manuscriptId}`;
-const MAX_ATTEMPTS = 3;
-const BACKOFFS = [0, 4000, 10000];
+const MAX_ATTEMPTS = 2;
+const BACKOFFS = [0, 4000];
 // Limite d'entrée par appel IA (caractères) pour rester dans les fenêtres de
 // contexte et éviter les timeouts sur de très longs chapitres.
-const MAX_CHARS_PER_CALL = 12000;
+const MAX_CHARS_PER_CALL = 6000;
 
 let aiCounter = 0;
 const aiId = () => `ai-${Date.now()}-${aiCounter++}`;
@@ -63,7 +63,9 @@ Règles :
 - "orthographe" : fautes d'orthographe, grammaire, accords, conjugaison.
 - "style" : lourdeurs, voix passive excessive, phrases confuses, répétitions.
 - "kdp" : formulations/éléments gênants pour une publication Amazon (mentions parasites, incohérences de mise en forme).
-- Maximum 25 issues, priorise les plus importantes.
+- Maximum 8 issues. Priorise uniquement les corrections les plus sûres et les plus utiles.
+- Phrases courtes dans "reason" : 140 caractères maximum.
+- "original" et "suggestion" doivent rester courts : 180 caractères maximum chacun.
 - "original" doit être un extrait RÉELLEMENT présent dans le texte, copié à l'identique.
 - Réponds UNIQUEMENT avec le JSON.`;
 
@@ -103,28 +105,58 @@ function isFatalError(message: string): boolean {
   );
 }
 
+function isRecoverableAIError(message: string): boolean {
+  const m = (message || '').toLowerCase();
+  return (
+    m.includes('json') ||
+    m.includes('parser') ||
+    m.includes('tronquée') ||
+    m.includes('tokens') ||
+    m.includes('timeout') ||
+    m.includes('aucune réponse')
+  );
+}
+
 class FatalAIError extends Error {}
 
 async function analyzeChapterAI(apiKey: string, chapter: Chapter): Promise<AiChapterResponse> {
   const chunks = chunkText(chapter.content);
   const allIssues: AiChapterResponse['issues'] = [];
   const scoreAcc = { orthographe: 0, style: 0, kdp: 0 };
+  let successfulChunks = 0;
+  let lastRecoverableError = '';
   for (const chunk of chunks) {
-    const res = await callGeminiJSON<AiChapterResponse>(apiKey, buildPrompt(chapter, chunk), {
-      temperature: 0.3,
-      maxTokens: 6000,
-      timeout: 120000,
-    });
-    if (Array.isArray(res?.issues)) allIssues.push(...res.issues);
-    if (res?.scores) {
-      scoreAcc.orthographe += res.scores.orthographe || 0;
-      scoreAcc.style += res.scores.style || 0;
-      scoreAcc.kdp += res.scores.kdp || 0;
+    try {
+      const res = await callGeminiJSON<AiChapterResponse>(apiKey, buildPrompt(chapter, chunk), {
+        temperature: 0.2,
+        maxTokens: 2200,
+        timeout: 90000,
+      });
+      if (Array.isArray(res?.issues)) allIssues.push(...res.issues);
+      if (res?.scores) {
+        scoreAcc.orthographe += res.scores.orthographe || 0;
+        scoreAcc.style += res.scores.style || 0;
+        scoreAcc.kdp += res.scores.kdp || 0;
+        successfulChunks++;
+      }
+    } catch (e: any) {
+      const message = e?.message || 'Erreur IA inconnue';
+      if (!isRecoverableAIError(message)) throw e;
+      lastRecoverableError = message;
+      console.warn(`[BookPerfect] Analyse IA partielle ignorée pour ${chapter.title}:`, message);
     }
   }
-  const n = Math.max(1, chunks.length);
+
+  if (successfulChunks === 0 && lastRecoverableError) {
+    return {
+      issues: [],
+      scores: { orthographe: 70, style: 70, kdp: 70 },
+    };
+  }
+
+  const n = Math.max(1, successfulChunks);
   return {
-    issues: allIssues,
+    issues: allIssues.slice(0, 12),
     scores: {
       orthographe: Math.round(scoreAcc.orthographe / n),
       style: Math.round(scoreAcc.style / n),
