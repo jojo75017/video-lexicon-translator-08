@@ -19,6 +19,8 @@ import MaisonEditionTab from '@/components/admin/MaisonEditionTab';
 import HubAiChat from '@/components/admin/HubAiChat';
 import DocumentationStudio from '@/components/documentation-studio/DocumentationStudio';
 import { DELIVERABLE_GROUPS, DOC_TEMPLATES, PRODUCT_TYPES } from '@/components/documentation-studio/constants';
+const DS_CREAM = '#FBF6EC';
+const ALL_DELIVERABLE_COUNT = DELIVERABLE_GROUPS.reduce((n, g) => n + g.items.length, 0);
 import hubBackgroundAsset from '@/assets/v3/hub-v3-background.jpg';
 import pillarIa from '@/assets/v3/pillar-ia.jpg';
 import pillarPublier from '@/assets/v3/pillar-publier.jpg';
