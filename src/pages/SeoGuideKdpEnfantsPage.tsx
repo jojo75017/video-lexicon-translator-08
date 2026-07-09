@@ -121,7 +121,7 @@ const SeoGuideKdpEnfantsPage: React.FC = () => {
                 size="lg"
                 variant="outline"
                 className="text-lg px-8 py-6 border-border text-foreground"
-                onClick={() => navigate('/demo')}
+                onClick={() => navigate('/essai-gratuit')}
               >
                 Essayer gratuitement
               </Button>

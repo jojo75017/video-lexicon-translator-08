@@ -62,6 +62,8 @@ const Licence = lazy(() => import('./pages/Licence'));
 const LicenceEtenduePage = lazy(() => import('./pages/LicenceEtenduePage'));
 const PaymentSuccessPage = lazy(() => import('./pages/PaymentSuccessPage'));
 const DemoPage = lazy(() => import('./pages/DemoPage'));
+const TrialSignupPage = lazy(() => import('./pages/TrialSignupPage'));
+const TrialDashboardPage = lazy(() => import('./pages/admin/TrialDashboardPage'));
 const OfferValuePage = lazy(() => import('./pages/OfferValuePage'));
 const SeoTutorialChatGptPage = lazy(() => import('./pages/SeoTutorialChatGptPage'));
 const SeoCreerEbookIaPage = lazy(() => import('./pages/SeoCreerEbookIaPage'));
@@ -432,6 +434,8 @@ const App = () => {
             <Route path="/creer-ebook-kdp-etranger" element={<SeoFrancophonesEtrangerPage />} />
             <Route path="/valeur-offre" element={<OfferValuePage />} />
             <Route path="/demo" element={<DemoPage />} />
+            <Route path="/essai-gratuit" element={<TrialSignupPage />} />
+            <Route path="/dashboard-essais" element={<AdminGate><TrialDashboardPage /></AdminGate>} />
             <Route path="/upsell" element={<UpsellPage />} />
             <Route path="/upsell-paiement" element={<UpsellPaiementPage />} />
             <Route path="/coaching-vip" element={<CoachingVipPage />} />
