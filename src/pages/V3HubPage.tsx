@@ -173,7 +173,7 @@ function ModuleCard({
 }
 
 
-type HubTab = 'parcours' | 'outils' | 'documentation' | 'livres' | 'guides' | 'offres' | 'roadmap' | 'script' | 'assistant';
+type HubTab = 'parcours' | 'outils' | 'documentation' | 'livres' | 'guides' | 'offres' | 'roadmap' | 'script' | 'assistant' | 'bookperfect';
 
 const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon }[] = [
   { id: 'parcours', label: 'Parcours', icon: Compass },
@@ -185,6 +185,7 @@ const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon }[] = [
   { id: 'roadmap', label: 'Roadmap', icon: MapIcon },
   { id: 'script', label: 'Script vidéo', icon: FileText },
   { id: 'assistant', label: "Parler avec l'IA", icon: Bot },
+  { id: 'bookperfect', label: 'BookPerfect AI', icon: BookOpen },
 ];
 
 const TAB_STORAGE_KEY = 'v3hub_active_tab';
@@ -1187,6 +1188,31 @@ const V3HubPage: React.FC = () => {
               <button
                 onClick={() => navigate('/bookperfect')}
                 className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white whitespace-nowrap"
+                style={{ background: `linear-gradient(90deg, ${AMBER}, #FFB44D)` }}
+              >
+                Ouvrir BookPerfect AI <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* ===================== ONGLET BOOKPERFECT AI ===================== */}
+        {activeTab === 'bookperfect' && (
+          <section className="space-y-5">
+            <div className="rounded-2xl border p-5 sm:p-6" style={{ background: '#fff', borderColor: `${AMBER}44` }}>
+              <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-wider" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44`, color: AMBER_DEEP }}>
+                <BookOpen className="h-3.5 w-3.5" /> Nouveau · Premium
+              </div>
+              <h2 className="mt-4 text-3xl sm:text-4xl font-medium leading-tight" style={{ fontFamily: SERIF, color: INK }}>
+                BookPerfect AI — Directeur éditorial
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed" style={{ color: '#6f5e47' }}>
+                Analysez votre roman Word chapitre par chapitre : traces d'IA, orthographe, style,
+                contrôle Amazon KDP et export Word corrigé — sans jamais altérer votre texte original.
+              </p>
+              <button
+                onClick={() => navigate('/bookperfect')}
+                className="mt-5 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold text-white whitespace-nowrap"
                 style={{ background: `linear-gradient(90deg, ${AMBER}, #FFB44D)` }}
               >
                 Ouvrir BookPerfect AI <ArrowRight className="h-4 w-4" />
