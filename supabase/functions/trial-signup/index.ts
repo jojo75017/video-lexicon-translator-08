@@ -201,6 +201,28 @@ serve(async (req) => {
     // 4) Synchronisation Brevo
     await addToBrevo(email, firstName);
 
+    // 5) Enrôlement dans la séquence d'onboarding automatique (8 emails)
+    try {
+      const { data: existingSeq } = await supabase
+        .from("email_sequences")
+        .select("id")
+        .ilike("email", email)
+        .eq("sequence_name", "onboarding")
+        .maybeSingle();
+      if (!existingSeq) {
+        await supabase.from("email_sequences").insert({
+          email,
+          sequence_name: "onboarding",
+          current_step: 0,
+          subscribed_at: new Date().toISOString(),
+          next_email_at: new Date().toISOString(), // 1er email dès le prochain passage du cron
+        });
+      }
+    } catch (e) {
+      console.warn("onboarding enroll skipped:", (e as Error).message);
+    }
+
+
     return new Response(
       JSON.stringify({ ok: true, email, alreadyActive, bonus_pdf_url: BONUS_PDF_URL }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
