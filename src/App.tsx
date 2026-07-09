@@ -65,6 +65,7 @@ const DemoPage = lazy(() => import('./pages/DemoPage'));
 const TrialSignupPage = lazy(() => import('./pages/TrialSignupPage'));
 const TrialDashboardPage = lazy(() => import('./pages/admin/TrialDashboardPage'));
 const BrevoOnboardingEmailsPage = lazy(() => import('./pages/admin/BrevoOnboardingEmailsPage'));
+const BrevoAutomationGuidePage = lazy(() => import('./pages/admin/BrevoAutomationGuidePage'));
 const OfferValuePage = lazy(() => import('./pages/OfferValuePage'));
 const SeoTutorialChatGptPage = lazy(() => import('./pages/SeoTutorialChatGptPage'));
 const SeoCreerEbookIaPage = lazy(() => import('./pages/SeoCreerEbookIaPage'));
