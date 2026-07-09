@@ -21,6 +21,7 @@ import { RapportFinalTab } from '@/components/bookperfect/tabs/RapportFinalTab';
 import {
   runAnalysis, loadAnalysis, loadRecoverySnapshot, updateIssueStatus, BOOKPERFECT_RECOVERY_SCOPE,
 } from '@/lib/bookperfect/analysisOrchestrator';
+import type { BookPerfectRecoverySnapshot } from '@/lib/bookperfect/analysisOrchestrator';
 import { readAutosave, writeAutosave } from '@/lib/ebookProjectStorage';
 import type { Analysis, Manuscript } from '@/lib/bookperfect/types';
 
@@ -37,11 +38,14 @@ const BookPerfectPage: React.FC = () => {
   const [pausedMessage, setPausedMessage] = useState<string | null>(null);
   const [elapsedMs, setElapsedMs] = useState<number | null>(null);
   const [justCompleted, setJustCompleted] = useState(false);
+  const [recoverySnapshot, setRecoverySnapshot] = useState<BookPerfectRecoverySnapshot | null>(null);
   const abortRef = useRef<{ aborted: boolean }>({ aborted: false });
   const startTimeRef = useRef<number>(0);
 
   useEffect(() => {
     setHasKey(isAIConfigured());
+    const recovery = loadRecoverySnapshot();
+    setRecoverySnapshot(recovery);
     const savedManuscript = readAutosave<Manuscript>(CURRENT_MANUSCRIPT_SCOPE);
     if (savedManuscript?.id) {
       setManuscript(savedManuscript);
@@ -54,7 +58,6 @@ const BookPerfectPage: React.FC = () => {
       }
     }
 
-    const recovery = loadRecoverySnapshot();
     if (recovery?.manuscript?.id && recovery.analysis?.chapterResults?.some((r) => r.status !== 'done')) {
       setManuscript(recovery.manuscript);
       writeAutosave(CURRENT_MANUSCRIPT_SCOPE, recovery.manuscript);
@@ -151,6 +154,24 @@ const BookPerfectPage: React.FC = () => {
     setJustCompleted(false);
     writeAutosave<Manuscript | null>(CURRENT_MANUSCRIPT_SCOPE, null);
     writeAutosave(BOOKPERFECT_RECOVERY_SCOPE, null);
+    setRecoverySnapshot(null);
+  };
+
+  const restoreRecovery = () => {
+    const recovery = recoverySnapshot || loadRecoverySnapshot();
+    if (!recovery?.manuscript?.id) return;
+    const normalizedAnalysis = {
+      ...recovery.analysis,
+      chapterResults: recovery.analysis.chapterResults.map((r) => (
+        r.status === 'running' ? { ...r, status: 'pending' } : r
+      )),
+    };
+    setManuscript(recovery.manuscript);
+    writeAutosave(CURRENT_MANUSCRIPT_SCOPE, recovery.manuscript);
+    setAnalysis(normalizedAnalysis);
+    setPaused(true);
+    setPausedMessage('Analyse retrouvée : cliquez sur Reprendre pour continuer exactement où elle s’est arrêtée.');
+    setRecoverySnapshot(recovery);
   };
 
   const hasResults = !!analysis && analysis.chapterResults.some((r) => r.status === 'done' || r.status === 'failed');
@@ -159,6 +180,7 @@ const BookPerfectPage: React.FC = () => {
   const failedCount = analysis?.chapterResults.filter((r) => r.status === 'failed').length ?? 0;
   const pendingCount = analysis?.chapterResults.filter((r) => r.status === 'pending' || r.status === 'running').length ?? 0;
   const remainingCount = failedCount + pendingCount;
+  const recoveryRemainingCount = recoverySnapshot?.analysis.chapterResults.filter((r) => r.status !== 'done').length ?? 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -197,7 +219,13 @@ const BookPerfectPage: React.FC = () => {
           </div>
         )}
 
-        {!manuscript && <BookPerfectDashboard onImported={onImported} />}
+        {!manuscript && (
+          <BookPerfectDashboard
+            onImported={onImported}
+            onResume={recoveryRemainingCount > 0 ? restoreRecovery : undefined}
+            resumeLabel={recoveryRemainingCount > 0 ? `Reprendre (${recoveryRemainingCount} restant${recoveryRemainingCount > 1 ? 's' : ''})` : undefined}
+          />
+        )}
 
         {manuscript && (
           <div className="space-y-6">
