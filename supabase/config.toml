@@ -195,3 +195,9 @@ verify_jwt = false
 
 [functions.resend-webhook]
 verify_jwt = false
+
+[functions.trial-signup]
+verify_jwt = false
+
+[functions.trial-stats]
+verify_jwt = false
