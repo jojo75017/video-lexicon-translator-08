@@ -14,6 +14,7 @@ import { AnalysisProgress } from '@/components/bookperfect/AnalysisProgress';
 import { ScoreDashboard } from '@/components/bookperfect/ScoreDashboard';
 import { IssueListTab } from '@/components/bookperfect/shared/IssueListTab';
 import { AmazonKdpTab } from '@/components/bookperfect/tabs/AmazonKdpTab';
+import { ComparaisonTab } from '@/components/bookperfect/tabs/ComparaisonTab';
 import { RapportFinalTab } from '@/components/bookperfect/tabs/RapportFinalTab';
 import {
   runAnalysis, loadAnalysis, updateIssueStatus,
