@@ -64,18 +64,14 @@ serve(async (req) => {
       .from("subscribers")
       .select("id", { count: "exact", head: true });
 
-    // Essais convertis en abonnements (payants)
-    const { count: converted } = await supabase
+    // Clients : essais convertis (payants) — statut actif OU accès à vie
+    const { count: customers } = await supabase
       .from("subscribers")
       .select("id", { count: "exact", head: true })
-      .in("status", ["active"]);
+      .or("status.eq.active,plan_type.eq.lifetime");
 
-    const { count: lifetime } = await supabase
-      .from("subscribers")
-      .select("id", { count: "exact", head: true })
-      .eq("plan_type", "lifetime");
+    const customersCount = customers || 0;
 
-    const customers = (converted || 0) + (lifetime || 0);
     const conversionRate = totalTrials && totalTrials > 0
       ? Math.round((customers / totalTrials) * 1000) / 10
       : 0;
