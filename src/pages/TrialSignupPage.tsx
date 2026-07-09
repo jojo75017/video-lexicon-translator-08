@@ -126,13 +126,40 @@ export default function TrialSignupPage() {
                 <CheckCircle2 className="w-9 h-9" style={{ color: TEAL }} />
               </div>
               <h2 className="text-2xl font-extrabold mb-3">C'est parti ! 🎉</h2>
+
+              {accessCode && (
+                <div
+                  className="rounded-2xl p-5 mb-5 text-center"
+                  style={{ background: "#fff", border: `2px solid ${TEAL}` }}
+                >
+                  <p className="text-xs font-semibold mb-2" style={{ color: "#5b6472" }}>
+                    ✅ Votre code d'accès (notez-le pour commencer tout de suite)
+                  </p>
+                  <p
+                    className="text-3xl font-black tracking-wider mb-3"
+                    style={{ fontFamily: "monospace", color: TEAL }}
+                  >
+                    {accessCode}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={copyCode}
+                    className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold"
+                    style={{ background: copied ? "#e6f4f1" : "#f1f5f7", color: TEAL }}
+                  >
+                    {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                    {copied ? "Copié !" : "Copier le code"}
+                  </button>
+                </div>
+              )}
+
               <p className="text-muted-foreground mb-6" style={{ color: "#5b6472" }}>
-                Votre accès gratuit et votre guide <strong>« Les 5 niches rentables 2026 »</strong> viennent d'être envoyés à <strong>{email}</strong>.
-                Pensez à vérifier vos spams.
+                Votre accès gratuit et votre guide <strong>« Les 5 niches rentables 2026 »</strong> viennent aussi d'être envoyés à <strong>{email}</strong>.
+                L'email contient votre code, le bonus PDF et votre lien de connexion. Pensez à vérifier vos spams.
               </p>
               <div className="rounded-2xl p-4 mb-6 text-sm" style={{ background: "#FFF7EC", border: `1px solid ${AMBER}55` }}>
                 <Gift className="inline w-4 h-4 mr-1" style={{ color: AMBER }} />
-                Ouvrez l'email et cliquez sur « Accéder au logiciel » pour commencer.
+                Cliquez sur « Me connecter maintenant » et saisissez votre code pour démarrer.
               </div>
               <Link
                 to="/subscription"
