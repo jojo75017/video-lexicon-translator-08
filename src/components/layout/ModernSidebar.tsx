@@ -210,6 +210,7 @@ const TOOL_TOOLTIPS: Record<string, string> = {
   'kdp-prepublish-checklist': 'Vérifie que tout est conforme avant de publier sur KDP.',
   'kdp-keywords-pro': 'Recherche avancée de mots-clés Amazon KDP avec volumes et concurrence.',
   'audit-pilot': 'Audite un livre par ASIN ou fichier KDP/Ads et obtiens un plan d\'action IA.',
+  'bookperfect': 'Directeur éditorial IA : analyse ton roman Word chapitre par chapitre (traces IA, orthographe, style, KDP) et exporte un Word corrigé.',
   'audiobook': 'Convertit ton ebook en livre audio avec voix IA professionnelle.',
   'audio-express': 'Pipeline rapide ebook → audio prêt à vendre.',
   // Vendre
