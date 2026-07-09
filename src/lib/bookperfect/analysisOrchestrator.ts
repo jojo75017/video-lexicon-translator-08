@@ -256,9 +256,23 @@ export async function runAnalysis(
     throw new Error(`Aucune clé API ${provider} configurée. Renseignez votre clé dans les réglages pour lancer l'analyse.`);
   }
 
-  const analysis: Analysis = opts.existing
-    ? { ...opts.existing }
-    : emptyAnalysis(manuscript);
+  const saved = opts.resumeOnly ? loadAnalysis(manuscript.id) : null;
+  const baseAnalysis = opts.resumeOnly ? (opts.existing || saved) : null;
+  let analysis: Analysis;
+  if (baseAnalysis) {
+    const previousAnalysis = baseAnalysis;
+    analysis = {
+      ...previousAnalysis,
+      chapterResults: manuscript.chapters.map((chapter) => {
+        const previous = previousAnalysis.chapterResults.find((r) => r.chapterId === chapter.id);
+        if (!previous) return { chapterId: chapter.id, status: 'pending', attempts: 0 };
+        return previous.status === 'running' ? { ...previous, status: 'pending' } : previous;
+      }),
+      issues: previousAnalysis.issues.filter((issue) => manuscript.chapters.some((chapter) => chapter.id === issue.chapterId)),
+    };
+  } else {
+    analysis = emptyAnalysis(manuscript);
+  }
 
   const total = manuscript.chapters.length;
 

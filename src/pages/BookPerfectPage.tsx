@@ -21,7 +21,10 @@ import { RapportFinalTab } from '@/components/bookperfect/tabs/RapportFinalTab';
 import {
   runAnalysis, loadAnalysis, updateIssueStatus,
 } from '@/lib/bookperfect/analysisOrchestrator';
+import { readAutosave, writeAutosave } from '@/lib/ebookProjectStorage';
 import type { Analysis, Manuscript } from '@/lib/bookperfect/types';
+
+const CURRENT_MANUSCRIPT_SCOPE = 'bookperfect_current_manuscript';
 
 const BookPerfectPage: React.FC = () => {
   const navigate = useNavigate();
@@ -37,12 +40,27 @@ const BookPerfectPage: React.FC = () => {
   const abortRef = useRef<{ aborted: boolean }>({ aborted: false });
   const startTimeRef = useRef<number>(0);
 
-  useEffect(() => { setHasKey(isAIConfigured()); }, []);
+  useEffect(() => {
+    setHasKey(isAIConfigured());
+    const savedManuscript = readAutosave<Manuscript>(CURRENT_MANUSCRIPT_SCOPE);
+    if (savedManuscript?.id) {
+      setManuscript(savedManuscript);
+      const savedAnalysis = loadAnalysis(savedManuscript.id);
+      setAnalysis(savedAnalysis);
+      if (savedAnalysis?.chapterResults.some((r) => r.status !== 'done')) {
+        setPaused(true);
+        setPausedMessage('Analyse interrompue : vous pouvez reprendre exactement où elle s’est arrêtée.');
+      }
+    }
+  }, []);
 
   const onImported = useCallback((m: Manuscript) => {
     setManuscript(m);
+    writeAutosave(CURRENT_MANUSCRIPT_SCOPE, m);
     const existing = loadAnalysis(m.id);
     setAnalysis(existing);
+    setPaused(!!existing?.chapterResults.some((r) => r.status !== 'done'));
+    setPausedMessage(existing?.chapterResults.some((r) => r.status !== 'done') ? 'Analyse précédente retrouvée : cliquez sur Reprendre.' : null);
   }, []);
 
   const start = useCallback(async (resumeOnly: boolean) => {
@@ -58,10 +76,12 @@ const BookPerfectPage: React.FC = () => {
     setJustCompleted(false);
     setRunning(true);
     startTimeRef.current = Date.now();
+    const resumeAnalysis = resumeOnly ? (analysis || loadAnalysis(manuscript.id)) : null;
+    if (resumeAnalysis) setAnalysis({ ...resumeAnalysis });
     try {
       const result = await runAnalysis(
         manuscript,
-        { resumeOnly, existing: resumeOnly ? analysis : null, signal: abortRef.current },
+        { resumeOnly, existing: resumeAnalysis, signal: abortRef.current },
         {
           onChapterStart: (_c, i) => setRunningIndex(i),
           onProgress: (a) => setAnalysis({ ...a }),
@@ -79,6 +99,8 @@ const BookPerfectPage: React.FC = () => {
       }
     } catch (e: any) {
       const msg = e?.message || 'Erreur pendant l\'analyse.';
+      const saved = loadAnalysis(manuscript.id);
+      if (saved) setAnalysis({ ...saved });
       // Erreur fatale : l'analyse est en pause, on propose « Reprendre ».
       setPaused(true);
       setPausedMessage(msg);
@@ -90,7 +112,13 @@ const BookPerfectPage: React.FC = () => {
   }, [manuscript, analysis]);
 
 
-  const stop = () => { abortRef.current.aborted = true; setRunning(false); toast.info('Analyse interrompue. Vous pourrez la reprendre.'); };
+  const stop = () => {
+    abortRef.current.aborted = true;
+    setRunning(false);
+    setPaused(true);
+    setPausedMessage('Analyse interrompue : cliquez sur Reprendre pour continuer sans repartir du début.');
+    toast.info('Analyse interrompue. Vous pourrez la reprendre.');
+  };
 
   const setStatus = useCallback((id: string, status: 'applied' | 'ignored' | 'pending') => {
     setAnalysis((prev) => (prev ? updateIssueStatus(prev, id, status) : prev));
@@ -99,10 +127,20 @@ const BookPerfectPage: React.FC = () => {
   const onIgnore = (id: string) => setStatus(id, 'ignored');
   const onReset = (id: string) => setStatus(id, 'pending');
 
-  const reset = () => { setManuscript(null); setAnalysis(null); setPaused(false); setPausedMessage(null); setElapsedMs(null); setJustCompleted(false); };
+  const reset = () => {
+    setManuscript(null);
+    setAnalysis(null);
+    setPaused(false);
+    setPausedMessage(null);
+    setElapsedMs(null);
+    setJustCompleted(false);
+    writeAutosave<Manuscript | null>(CURRENT_MANUSCRIPT_SCOPE, null);
+  };
 
   const hasResults = !!analysis && analysis.chapterResults.some((r) => r.status === 'done' || r.status === 'failed');
   const failedCount = analysis?.chapterResults.filter((r) => r.status === 'failed').length ?? 0;
+  const pendingCount = analysis?.chapterResults.filter((r) => r.status === 'pending' || r.status === 'running').length ?? 0;
+  const remainingCount = failedCount + pendingCount;
 
   return (
     <div className="min-h-screen bg-background">
@@ -165,9 +203,9 @@ const BookPerfectPage: React.FC = () => {
                         <Play className="h-4 w-4" /> Lancer l'analyse
                       </Button>
                     )}
-                    {hasResults && !paused && failedCount > 0 && (
+                    {hasResults && !paused && remainingCount > 0 && (
                       <Button onClick={() => start(true)} className="gap-2">
-                        <RotateCcw className="h-4 w-4" /> Reprendre ({failedCount} en échec)
+                        <RotateCcw className="h-4 w-4" /> Reprendre ({remainingCount} restant{remainingCount > 1 ? 's' : ''})
                       </Button>
                     )}
                     {hasResults && (
