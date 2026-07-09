@@ -16,6 +16,7 @@ import {
   BookOpen,
   Copy,
   Check,
+  Crown,
 } from "lucide-react";
 
 const TEAL = "#008296";
