@@ -154,7 +154,8 @@ serve(async (req) => {
             alreadyUsed: true,
             error: "Vous avez déjà utilisé votre essai gratuit. Pour continuer, passez à l'accès à vie (67€, paiement unique).",
           }),
-          { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+
         );
       }
 
