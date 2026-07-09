@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { IssueCard } from './IssueCard';
 import type { Analysis, Issue, IssueCategory } from '@/lib/bookperfect/types';
 import { CATEGORY_LABELS, SEVERITY_ORDER } from '@/lib/bookperfect/types';
