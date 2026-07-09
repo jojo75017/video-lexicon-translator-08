@@ -1,4 +1,4 @@
-import { BarChart3, BookOpen, Contact, FileText, Mail, Megaphone, MessageSquare, Shield, Ticket, TrendingUp, User, Users, BookMarked } from 'lucide-react';
+import { BarChart3, BookOpen, Contact, FileText, Gauge, Mail, Megaphone, MessageSquare, Shield, Ticket, TrendingUp, User, Users, BookMarked } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
