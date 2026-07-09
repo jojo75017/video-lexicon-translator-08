@@ -915,6 +915,145 @@ const V3HubPage: React.FC = () => {
                 </div>
               </div>
 
+              {/* Le problème que ça résout */}
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-wider" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44`, color: AMBER_DEEP }}>
+                  <ShieldCheck className="h-3.5 w-3.5" /> Le problème
+                </div>
+                <h3 className="mt-3 text-2xl sm:text-3xl font-medium leading-tight" style={{ fontFamily: SERIF, color: INK }}>
+                  Documenter un produit prend des semaines. Pas ici.
+                </h3>
+                <p className="mt-2 max-w-3xl text-sm leading-relaxed" style={{ color: '#6f5e47' }}>
+                  Rédiger un manuel utilisateur, une documentation technique, une FAQ, une landing page, un kit média et
+                  des posts pour les réseaux : c'est des dizaines d'heures de travail, souvent repoussées ou bâclées faute de temps.
+                  Résultat : des produits excellents mais mal présentés, difficiles à comprendre et compliqués à vendre.
+                  Documentation Studio AI supprime ce goulot d'étranglement. Vous décrivez votre produit une fois,
+                  et vous obtenez en quelques minutes un ensemble cohérent, professionnel et prêt à publier.
+                </p>
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {[
+                    { icon: '⏱️', t: 'Des semaines → des minutes', d: 'Ce qui prenait des jours de rédaction est généré et mis en page automatiquement.' },
+                    { icon: '🎯', t: 'Zéro page blanche', d: 'L\'IA propose une première version complète : vous corrigez au lieu de partir de rien.' },
+                    { icon: '🧩', t: 'Tout est cohérent', d: 'Même ton, même identité, même vocabulaire sur tous vos documents et supports.' },
+                  ].map((c) => (
+                    <div key={c.t} className="rounded-xl border p-4" style={{ borderColor: '#eadfc9', background: DS_CREAM }}>
+                      <div className="text-2xl">{c.icon}</div>
+                      <div className="mt-2 text-sm font-bold" style={{ color: INK }}>{c.t}</div>
+                      <p className="mt-1 text-[13px] leading-snug" style={{ color: '#8a7860' }}>{c.d}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Avant / Après */}
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-wider" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44`, color: AMBER_DEEP }}>
+                  <ArrowRight className="h-3.5 w-3.5" /> Avant / Après
+                </div>
+                <h3 className="mt-3 text-2xl sm:text-3xl font-medium leading-tight" style={{ fontFamily: SERIF, color: INK }}>
+                  La différence est immédiate
+                </h3>
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="rounded-xl border p-5" style={{ borderColor: '#e6d3d0', background: '#fdf4f2' }}>
+                    <div className="text-sm font-black" style={{ color: '#b4443a' }}>❌ Sans Documentation Studio</div>
+                    <ul className="mt-3 space-y-2 text-[13px]" style={{ color: '#7a5a56' }}>
+                      {[
+                        'Documentation reportée pendant des semaines',
+                        'Textes incohérents écrits à la va-vite',
+                        'Pas de kit marketing ni de supports de vente',
+                        'Chaque mise à jour = tout réécrire à la main',
+                        'Rendu amateur qui inspire peu confiance',
+                      ].map((x) => <li key={x} className="flex items-start gap-2"><span>•</span><span>{x}</span></li>)}
+                    </ul>
+                  </div>
+                  <div className="rounded-xl border p-5" style={{ borderColor: '#cfe6d6', background: '#f2faf5' }}>
+                    <div className="text-sm font-black" style={{ color: '#1f9d6b' }}>✅ Avec Documentation Studio</div>
+                    <ul className="mt-3 space-y-2 text-[13px]" style={{ color: '#4c6f5c' }}>
+                      {[
+                        'Documentation complète générée en minutes',
+                        'Ton et identité cohérents sur tous les documents',
+                        'Marketing, kit média et posts réseaux inclus',
+                        'Mise à jour intelligente : seuls les docs concernés changent',
+                        'Rendu premium prêt à publier et à vendre',
+                      ].map((x) => <li key={x} className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: '#1f9d6b' }} /><span>{x}</span></li>)}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Cas d'usage */}
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-wider" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44`, color: AMBER_DEEP }}>
+                  <Compass className="h-3.5 w-3.5" /> Cas d'usage
+                </div>
+                <h3 className="mt-3 text-2xl sm:text-3xl font-medium leading-tight" style={{ fontFamily: SERIF, color: INK }}>
+                  Ce que vous pouvez produire dès aujourd'hui
+                </h3>
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {[
+                    { t: 'Lancer un SaaS', d: 'Générez le manuel utilisateur, la doc technique, la FAQ, la landing page et les emails de lancement — le tout aligné, prêt pour le jour J.' },
+                    { t: 'Vendre un plugin ou une app', d: 'Kit média, page produit, fiche AppSumo / Product Hunt et posts LinkedIn pour maximiser vos ventes dès la sortie.' },
+                    { t: 'Structurer un outil IA', d: 'Documentez vos agents, leurs missions, leurs prompts et leurs cas d\'usage dans un Brand Book professionnel.' },
+                    { t: 'Recruter des affiliés & partenaires', d: 'Kit affiliés, kit partenaires et présentation commerciale pour développer votre réseau de distribution.' },
+                  ].map((c) => (
+                    <div key={c.t} className="rounded-xl border p-4" style={{ borderColor: '#eadfc9' }}>
+                      <div className="flex items-center gap-2 text-sm font-bold" style={{ color: INK }}>
+                        <CheckCircle2 className="h-4 w-4" style={{ color: AMBER }} /> {c.t}
+                      </div>
+                      <p className="mt-1.5 text-[13px] leading-snug" style={{ color: '#8a7860' }}>{c.d}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Comment ça marche */}
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-wider" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44`, color: AMBER_DEEP }}>
+                  <Wand2 className="h-3.5 w-3.5" /> Comment ça marche
+                </div>
+                <h3 className="mt-3 text-2xl sm:text-3xl font-medium leading-tight" style={{ fontFamily: SERIF, color: INK }}>
+                  Quatre étapes, un résultat professionnel
+                </h3>
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  {[
+                    { n: '1', t: 'Décrivez', d: 'Renseignez votre produit ou laissez la génération intelligente pré-remplir tout à partir de quelques phrases.' },
+                    { n: '2', t: 'Enrichissez', d: 'Modules, fonctionnalités, agents, identité visuelle : le Copilot vous aide à compléter chaque section.' },
+                    { n: '3', t: 'Générez', d: 'Sélectionnez vos livrables. L\'IA rédige et met en page chaque document, un par un.' },
+                    { n: '4', t: 'Exportez', d: 'Téléchargez en Word, PDF, HTML, Markdown ou PowerPoint, prêt à publier et à partager.' },
+                  ].map((c) => (
+                    <div key={c.n} className="rounded-xl border p-4" style={{ borderColor: '#eadfc9', background: DS_CREAM }}>
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-black text-white" style={{ background: AMBER_DEEP }}>{c.n}</div>
+                      <div className="mt-2 text-sm font-bold" style={{ color: INK }}>{c.t}</div>
+                      <p className="mt-1 text-[13px] leading-snug" style={{ color: '#8a7860' }}>{c.d}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* FAQ */}
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-wider" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44`, color: AMBER_DEEP }}>
+                  <BookOpen className="h-3.5 w-3.5" /> Questions fréquentes
+                </div>
+                <h3 className="mt-3 text-2xl sm:text-3xl font-medium leading-tight" style={{ fontFamily: SERIF, color: INK }}>
+                  Tout ce que vous devez savoir
+                </h3>
+                <div className="mt-4 space-y-3">
+                  {[
+                    { q: 'Ai-je besoin de compétences techniques ?', a: 'Non. Vous décrivez votre produit en français courant, l\'IA s\'occupe de la rédaction, de la structure et de la mise en page.' },
+                    { q: 'Puis-je modifier le contenu généré ?', a: 'Oui. Vous gardez le contrôle total : chaque section est éditable avant et après génération, et le Copilot vous aide à affiner.' },
+                    { q: 'Les documents sont-ils à mon image ?', a: 'Oui. Choisissez parmi 8 templates premium, définissez vos couleurs, typographies et logo pour un rendu cohérent avec votre marque.' },
+                    { q: 'Que se passe-t-il si mon produit évolue ?', a: 'La mise à jour intelligente régénère uniquement les documents concernés par le changement, sans tout refaire.' },
+                    { q: 'Puis-je essayer avant d\'acheter ?', a: 'Oui. Une première génération courte est offerte pour découvrir la qualité du rendu, sans engagement.' },
+                  ].map((f) => (
+                    <div key={f.q} className="rounded-xl border p-4" style={{ borderColor: '#eadfc9' }}>
+                      <div className="text-sm font-bold" style={{ color: INK }}>{f.q}</div>
+                      <p className="mt-1.5 text-[13px] leading-relaxed" style={{ color: '#8a7860' }}>{f.a}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               {/* Tarif + CTA */}
               <div className="rounded-2xl border p-6 sm:p-8 text-center" style={{ background: `linear-gradient(135deg, ${AMBER_SOFT}, #fff)`, borderColor: `${AMBER}55` }}>
                 <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-wider" style={{ background: '#fff', borderColor: `${AMBER}44`, color: AMBER_DEEP }}>
