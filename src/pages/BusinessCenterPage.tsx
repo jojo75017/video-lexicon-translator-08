@@ -101,6 +101,9 @@ const BusinessCenterPage = () => {
       const paidOrders = (fo || []).filter((o: any) => o.status === 'paid');
       const revenue = paidOrders.reduce((s: number, o: any) => s + Number(o.amount || 0), 0);
       const todaySales = paidOrders.filter((o: any) => (o.paid_at || '') >= today).length;
+      const todayRevenue = paidOrders
+        .filter((o: any) => (o.paid_at || '') >= today)
+        .reduce((s: number, o: any) => s + Number(o.amount || 0), 0);
 
       setM({
         emailsSent, emailsBounced,
@@ -108,7 +111,7 @@ const BusinessCenterPage = () => {
         unsubscribes, activeTrials, paidSubscribers, expired,
         revenue, orders: paidOrders.length,
         guidesDownloaded, documentsGenerated,
-        todayTrials, todaySent, todayOpens, todayClicks, todaySales,
+        todayTrials, todaySent, todayOpens, todayClicks, todaySales, todayRevenue,
       });
     } catch (err) {
       console.error('BusinessCenter fetch error:', err);
