@@ -38,12 +38,24 @@ const PRODUCT_CATALOG: Record<string, { name: string; description: string; amoun
     description: "3 guides avancés : Ads rentables, scaling multi-livres & niches cachées",
     amount: 4700,
   },
+  bookperfect: {
+    name: "BookPerfect AI — Directeur Éditorial",
+    description: "Analyse éditoriale IA de votre manuscrit + export Word corrigé (accès à vie)",
+    amount: 9700,
+  },
+  bookperfect_launch: {
+    name: "BookPerfect AI — Offre de lancement",
+    description: "BookPerfect AI, directeur éditorial IA (tarif de lancement, accès à vie)",
+    amount: 6700,
+  },
 };
 
 // Produit de base selon le plan choisi
 const PLAN_BASE_PRODUCT: Record<string, string> = {
   "v3-base": "v3_base",
   "v3-pro": "v3_pro",
+  "bookperfect": "bookperfect",
+  "bookperfect_launch": "bookperfect_launch",
 };
 
 serve(async (req) => {

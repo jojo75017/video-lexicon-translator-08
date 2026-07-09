@@ -80,6 +80,30 @@ serve(async (req) => {
 
         console.log("Checkout completed for:", email, "plan:", planId, "mode:", session.mode);
 
+        // --- Achat d'un module premium ponctuel (ex: BookPerfect AI) ---
+        // Ne crée PAS d'abonnement complet : enregistre seulement le droit d'accès au module.
+        if (email && typeof planId === "string" && planId.startsWith("bookperfect")) {
+          const environment =
+            (session.livemode ? "live" : "sandbox");
+          const amountTotal = typeof session.amount_total === "number"
+            ? session.amount_total / 100
+            : null;
+          const { error: entErr } = await supabase
+            .from("module_entitlements")
+            .insert({
+              email,
+              module: "bookperfect",
+              status: "active",
+              amount: amountTotal,
+              currency: session.currency || "eur",
+              environment,
+              stripe_session_id: session.id,
+            });
+          if (entErr) console.error("Error creating module entitlement:", entErr);
+          else console.log("Granted BookPerfect entitlement to:", email, environment);
+          break;
+        }
+
         if (email) {
           const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
           const accessCode = `EBK-${randomPart}`;

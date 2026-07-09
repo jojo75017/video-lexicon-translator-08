@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { SubscriberGate } from '@/components/auth/SubscriberGate';
 import { AdminGate } from '@/components/auth/AdminGate';
 import { V3Gate } from '@/components/auth/V3Gate';
+import { BookPerfectGate } from '@/components/auth/BookPerfectGate';
 import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 import { Loader2 } from 'lucide-react';
 import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup';
@@ -100,6 +101,7 @@ const ForumPage = lazy(() => import('./pages/ForumPage'));
 const KdpKeywordResearchPage = lazy(() => import('./pages/KdpKeywordResearchPage'));
 const AuditPilotPage = lazy(() => import('./pages/AuditPilotPage'));
 const BookPerfectPage = lazy(() => import('./pages/BookPerfectPage'));
+const BookPerfectSalesPage = lazy(() => import('./pages/BookPerfectSalesPage'));
 const CouvertureKdpPage = lazy(() => import('./pages/CouvertureKdpPage'));
 const PublicAudiobookPage = lazy(() => import('./pages/PublicAudiobookPage'));
 const AudiobookEmbedPage = lazy(() => import('./pages/AudiobookEmbedPage'));
@@ -572,9 +574,15 @@ const App = () => {
               path="/bookperfect"
               element={
                 <V3Gate>
-                  <BookPerfectPage />
+                  <BookPerfectGate>
+                    <BookPerfectPage />
+                  </BookPerfectGate>
                 </V3Gate>
               }
+            />
+            <Route
+              path="/bookperfect-offre"
+              element={<BookPerfectSalesPage />}
             />
             <Route
               path="/couverture-kdp"
