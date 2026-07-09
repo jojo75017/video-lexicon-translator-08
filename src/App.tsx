@@ -569,6 +569,14 @@ const App = () => {
               }
             />
             <Route
+              path="/bookperfect"
+              element={
+                <V3Gate>
+                  <BookPerfectPage />
+                </V3Gate>
+              }
+            />
+            <Route
               path="/couverture-kdp"
               element={
                 <SubscriberGate
