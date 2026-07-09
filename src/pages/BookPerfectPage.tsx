@@ -196,6 +196,10 @@ const BookPerfectPage: React.FC = () => {
                     icon={<Feather className="h-5 w-5 text-primary" />}
                     onApply={onApply} onIgnore={onIgnore} onReset={onReset} />
                 </TabsContent>
+                <TabsContent value="comparer" className="mt-4">
+                  <ComparaisonTab manuscript={manuscript} analysis={analysis} />
+                </TabsContent>
+
                 <TabsContent value="kdp" className="mt-4">
                   <AmazonKdpTab analysis={analysis} onApply={onApply} onIgnore={onIgnore} onReset={onReset} />
                 </TabsContent>
