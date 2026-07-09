@@ -170,23 +170,30 @@ serve(async (req) => {
     // 2) Enregistrer le lead (pour le tableau de bord / relances)
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || null;
     try {
-      await supabase.from("funnel_leads").upsert(
-        {
-          email,
-          first_name: firstName || null,
-          lead_magnet: "essai-gratuit",
-          utm_source: body.utm_source || null,
-          utm_medium: body.utm_medium || null,
-          utm_campaign: body.utm_campaign || null,
-          landing_url: body.landing_url || null,
-          user_agent: req.headers.get("user-agent") || null,
-          ip,
-        },
-        { onConflict: "email" },
-      );
+      const leadRow = {
+        first_name: firstName || null,
+        lead_magnet: "essai-gratuit",
+        utm_source: body.utm_source || null,
+        utm_medium: body.utm_medium || null,
+        utm_campaign: body.utm_campaign || null,
+        landing_url: body.landing_url || null,
+        user_agent: req.headers.get("user-agent") || null,
+        ip,
+      };
+      const { data: existingLead } = await supabase
+        .from("funnel_leads")
+        .select("id")
+        .ilike("email", email)
+        .maybeSingle();
+      if (existingLead?.id) {
+        await supabase.from("funnel_leads").update(leadRow).eq("id", existingLead.id);
+      } else {
+        await supabase.from("funnel_leads").insert({ email, ...leadRow });
+      }
     } catch (e) {
-      console.warn("funnel_leads upsert skipped:", (e as Error).message);
+      console.warn("funnel_leads record skipped:", (e as Error).message);
     }
+
 
     // 3) Email d'accès + bonus PDF
     await sendAccessEmail(email, firstName, accessCode, trialEndsAt);
