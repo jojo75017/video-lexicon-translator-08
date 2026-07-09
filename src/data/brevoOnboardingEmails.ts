@@ -1,4 +1,4 @@
-// Séquence d'onboarding EbookStudio — 7 emails prêts à coller dans Brevo (Automatisations).
+// Séquence d'onboarding EbookStudio — 8 emails prêts à coller dans Brevo (Automatisations).
 // Chaque email est un template HTML autonome, responsive et compatible clients mail.
 // Variables Brevo : {{ contact.PRENOM }} (fallback géré côté Brevo si vide).
 
@@ -152,4 +152,22 @@ export const BREVO_ONBOARDING_EMAILS: OnboardingEmail[] = [
       p("Merci de votre confiance,<br/>Georges")
     ),
   },
+  {
+    step: 8,
+    delayLabel: "J+30 (réactivation)",
+    subject: "Votre projet d'ebook est-il toujours d'actualité ?",
+    preheader: "On reprend contact : nouveautés, Documentation Studio et un bonus.",
+    html: shell(
+      h1("On reprend contact 👋") +
+      p("Bonjour {{ contact.PRENOM }},") +
+      p("Cela fait quelques semaines depuis votre essai d'EbookStudio. Je voulais simplement savoir : <strong>votre projet d'ebook est-il toujours d'actualité ?</strong>") +
+      p("Si oui, sachez qu'EbookStudio a beaucoup évolué. Voici ce qui pourrait vous relancer :") +
+      p("✨ <strong>Nouveautés</strong> : de nouveaux agents IA et un pipeline encore plus rapide pour passer de l'idée au livre publié.") +
+      p("📚 <strong>Documentation Studio</strong> : notre plateforme qui génère automatiquement toute la documentation, le marketing et la communication d'un produit numérique à partir d'un seul brief.") +
+      cta(`${SITE}/subscription`, "🔄 Reprendre mon projet") +
+      p("Et parce que je tiens à vous accompagner, je vous offre un <strong>bonus temporaire</strong> pour vous remettre le pied à l'étrier. Répondez simplement à cet email et je vous l'envoie.") +
+      p("Au plaisir de vous relire,<br/>Georges")
+    ),
+  },
 ];
+
