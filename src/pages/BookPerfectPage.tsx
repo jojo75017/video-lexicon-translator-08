@@ -138,6 +138,8 @@ const BookPerfectPage: React.FC = () => {
   };
 
   const hasResults = !!analysis && analysis.chapterResults.some((r) => r.status === 'done' || r.status === 'failed');
+  const hasIncompleteAnalysis = !!analysis && analysis.chapterResults.some((r) => r.status !== 'done');
+  const showResumeButton = !!manuscript && hasIncompleteAnalysis;
   const failedCount = analysis?.chapterResults.filter((r) => r.status === 'failed').length ?? 0;
   const pendingCount = analysis?.chapterResults.filter((r) => r.status === 'pending' || r.status === 'running').length ?? 0;
   const remainingCount = failedCount + pendingCount;
@@ -193,19 +195,14 @@ const BookPerfectPage: React.FC = () => {
                 </div>
                 {!running ? (
                   <div className="flex flex-wrap gap-2">
-                    {paused && (
+                    {showResumeButton && (
                       <Button onClick={() => start(true)} className="gap-2 bg-amber-600 hover:bg-amber-700 text-white">
-                        <RotateCcw className="h-4 w-4" /> Reprendre l'analyse
+                        <RotateCcw className="h-4 w-4" /> Reprendre ({remainingCount} restant{remainingCount > 1 ? 's' : ''})
                       </Button>
                     )}
-                    {!hasResults && !paused && (
+                    {!hasResults && !showResumeButton && (
                       <Button onClick={() => start(false)} className="gap-2">
                         <Play className="h-4 w-4" /> Lancer l'analyse
-                      </Button>
-                    )}
-                    {hasResults && !paused && remainingCount > 0 && (
-                      <Button onClick={() => start(true)} className="gap-2">
-                        <RotateCcw className="h-4 w-4" /> Reprendre ({remainingCount} restant{remainingCount > 1 ? 's' : ''})
                       </Button>
                     )}
                     {hasResults && (
@@ -223,14 +220,14 @@ const BookPerfectPage: React.FC = () => {
               </CardContent>
             </Card>
 
-            {paused && !running && (
+            {showResumeButton && !running && (
               <Card className="border-amber-500/40 bg-amber-500/5">
                 <CardContent className="p-4 flex flex-wrap items-center gap-3">
                   <span className="text-sm text-amber-700 dark:text-amber-400 flex-1 min-w-[200px]">
-                    ⏸️ Analyse en pause. {pausedMessage}
+                    ⏸️ Analyse incomplète. {pausedMessage || 'Cliquez sur Reprendre pour continuer exactement où elle s’est arrêtée.'}
                   </span>
                   <Button onClick={() => start(true)} className="gap-2 bg-amber-600 hover:bg-amber-700 text-white">
-                    <RotateCcw className="h-4 w-4" /> Reprendre
+                    <RotateCcw className="h-4 w-4" /> Reprendre ({remainingCount} restant{remainingCount > 1 ? 's' : ''})
                   </Button>
                 </CardContent>
               </Card>
