@@ -221,6 +221,28 @@ const BusinessCenterPage = () => {
           </div>
         </div>
 
+        {/* ═══ KPI ESSENTIELS ═══ */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card className="border-2 border-emerald-500/40 bg-gradient-to-br from-emerald-500/10 to-transparent">
+            <CardContent className="p-6 flex items-center gap-4">
+              <div className="text-4xl">💰</div>
+              <div>
+                <p className="text-4xl font-black text-emerald-500">{m.todayRevenue.toLocaleString('fr-FR')} €</p>
+                <p className="text-sm text-muted-foreground mt-1">Revenu généré aujourd'hui</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-2 border-amber-500/40 bg-gradient-to-br from-amber-500/10 to-transparent">
+            <CardContent className="p-6 flex items-center gap-4">
+              <div className="text-4xl">📈</div>
+              <div>
+                <p className="text-4xl font-black text-amber-500">{conversionRate.toFixed(1)}%</p>
+                <p className="text-sm text-muted-foreground mt-1">Taux Essai → Achat</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* ═══ SANTÉ DU BUSINESS (Aujourd'hui) ═══ */}
         <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-transparent">
           <CardHeader>
