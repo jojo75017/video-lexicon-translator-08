@@ -147,12 +147,17 @@ serve(async (req) => {
         alreadyActive = true;
         trialEndsAt = existing.trial_ends_at || new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
       } else {
-        trialEndsAt = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
-        await supabase
-          .from("subscribers")
-          .update({ status: "trialing", trial_ends_at: trialEndsAt, access_code: accessCode, updated_at: new Date().toISOString() })
-          .eq("id", existing.id);
+        // Un seul essai gratuit autorisé par email : ne pas réactiver un essai déjà utilisé
+        return new Response(
+          JSON.stringify({
+            ok: false,
+            alreadyUsed: true,
+            error: "Vous avez déjà utilisé votre essai gratuit. Pour continuer, passez à l'accès à vie (67€, paiement unique).",
+          }),
+          { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
       }
+
     } else {
       accessCode = generateAccessCode();
       trialEndsAt = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
