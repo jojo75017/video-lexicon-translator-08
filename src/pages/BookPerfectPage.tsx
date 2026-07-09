@@ -172,9 +172,11 @@ const BookPerfectPage: React.FC = () => {
                   <TabsTrigger value="traces-ia" className="gap-1"><Bug className="h-4 w-4" /> Traces IA</TabsTrigger>
                   <TabsTrigger value="orthographe" className="gap-1"><FileText className="h-4 w-4" /> Orthographe</TabsTrigger>
                   <TabsTrigger value="style" className="gap-1"><Feather className="h-4 w-4" /> Style</TabsTrigger>
+                  <TabsTrigger value="comparer" className="gap-1"><Columns className="h-4 w-4" /> Comparer</TabsTrigger>
                   <TabsTrigger value="kdp" className="gap-1"><ShoppingCart className="h-4 w-4" /> Amazon KDP</TabsTrigger>
                   <TabsTrigger value="rapport" className="gap-1"><FileText className="h-4 w-4" /> Rapport</TabsTrigger>
                 </TabsList>
+
 
                 <TabsContent value="traces-ia" className="mt-4">
                   <IssueListTab analysis={analysis} category="traces-ia"
