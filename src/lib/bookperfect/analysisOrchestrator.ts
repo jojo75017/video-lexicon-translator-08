@@ -87,6 +87,24 @@ const chunkText = (text: string): string[] => {
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+/**
+ * Erreur "fatale" = inutile de continuer les 95 chapitres (ça brûle les
+ * crédits pour rien). Clé invalide/quota épuisé/service saturé → on arrête
+ * tout de suite et on laisse l'utilisateur corriger puis reprendre.
+ */
+function isFatalError(message: string): boolean {
+  const m = (message || '').toLowerCase();
+  return (
+    m.includes('clé api') ||
+    m.includes('invalide') ||
+    m.includes('quota') ||
+    m.includes('saturé') ||
+    m.includes('aucune clé')
+  );
+}
+
+class FatalAIError extends Error {}
+
 async function analyzeChapterAI(apiKey: string, chapter: Chapter): Promise<AiChapterResponse> {
   const chunks = chunkText(chapter.content);
   const allIssues: AiChapterResponse['issues'] = [];
@@ -212,62 +230,86 @@ export async function runAnalysis(
 
   const total = manuscript.chapters.length;
 
-  for (let i = 0; i < total; i++) {
-    if (opts.signal?.aborted) break;
-    const chapter = manuscript.chapters[i];
-    const resultIdx = analysis.chapterResults.findIndex((r) => r.chapterId === chapter.id);
-    const current = analysis.chapterResults[resultIdx];
-
-    // Reprise : on saute les chapitres déjà réussis.
-    if (opts.resumeOnly && current?.status === 'done') continue;
-
-    cb.onChapterStart?.(chapter, i, total);
-    analysis.chapterResults[resultIdx] = { ...current, status: 'running' };
-    cb.onProgress?.(analysis);
-
-    // Nettoyer les issues précédentes de ce chapitre (relance propre).
-    analysis.issues = analysis.issues.filter((is) => is.chapterId !== chapter.id);
-
-    // 1. Vérifications locales (toujours, instantanées, jamais bloquantes).
-    const localIssues = runLocalChecks(chapter);
-    analysis.issues.push(...localIssues);
-
-    // 2. Analyse IA avec retry.
-    let aiOk = false;
-    let attempts = current?.attempts || 0;
-    let lastError = '';
-    for (let a = 0; a < MAX_ATTEMPTS; a++) {
+  try {
+    for (let i = 0; i < total; i++) {
       if (opts.signal?.aborted) break;
-      attempts++;
-      try {
-        if (BACKOFFS[a] > 0) await sleep(BACKOFFS[a]);
-        const res = await analyzeChapterAI(apiKey, chapter);
-        analysis.issues.push(...mapAiIssues(chapter, res));
-        analysis.chapterResults[resultIdx] = {
-          chapterId: chapter.id, status: 'done', attempts, scores: res.scores,
-        };
-        aiOk = true;
-        break;
-      } catch (e: any) {
-        lastError = e?.message || 'Erreur inconnue';
-        console.warn(`[BookPerfect] Chapitre ${chapter.title} tentative ${attempts} échouée:`, lastError);
+      const chapter = manuscript.chapters[i];
+      const resultIdx = analysis.chapterResults.findIndex((r) => r.chapterId === chapter.id);
+      const current = analysis.chapterResults[resultIdx];
+
+      // Reprise : on saute les chapitres déjà réussis.
+      if (opts.resumeOnly && current?.status === 'done') continue;
+
+      cb.onChapterStart?.(chapter, i, total);
+      analysis.chapterResults[resultIdx] = { ...current, status: 'running' };
+      cb.onProgress?.(analysis);
+
+      // Nettoyer les issues précédentes de ce chapitre (relance propre).
+      analysis.issues = analysis.issues.filter((is) => is.chapterId !== chapter.id);
+
+      // 1. Vérifications locales (toujours, instantanées, jamais bloquantes).
+      const localIssues = runLocalChecks(chapter);
+      analysis.issues.push(...localIssues);
+
+      // 2. Analyse IA avec retry.
+      let aiOk = false;
+      let attempts = current?.attempts || 0;
+      let lastError = '';
+      for (let a = 0; a < MAX_ATTEMPTS; a++) {
+        if (opts.signal?.aborted) break;
+        attempts++;
+        try {
+          if (BACKOFFS[a] > 0) await sleep(BACKOFFS[a]);
+          const res = await analyzeChapterAI(apiKey, chapter);
+          analysis.issues.push(...mapAiIssues(chapter, res));
+          analysis.chapterResults[resultIdx] = {
+            chapterId: chapter.id, status: 'done', attempts, scores: res.scores,
+          };
+          aiOk = true;
+          break;
+        } catch (e: any) {
+          lastError = e?.message || 'Erreur inconnue';
+          console.warn(`[BookPerfect] Chapitre ${chapter.title} tentative ${attempts} échouée:`, lastError);
+          // Erreur fatale (clé invalide, quota, service saturé) : inutile de
+          // réessayer ni de brûler les crédits sur les chapitres suivants.
+          if (isFatalError(lastError)) {
+            // On remet ce chapitre en "pending" pour qu'il soit repris tel quel
+            // après correction — surtout pas "failed" (ce n'est pas sa faute).
+            analysis.chapterResults[resultIdx] = {
+              chapterId: chapter.id, status: 'pending', attempts: current?.attempts || 0,
+            };
+            persist(analysis);
+            throw new FatalAIError(lastError);
+          }
+        }
       }
-    }
 
-    if (!aiOk) {
-      // Continue-on-failure : le chapitre est marqué failed, les issues
-      // locales restent conservées, l'analyse CONTINUE.
-      analysis.chapterResults[resultIdx] = {
-        chapterId: chapter.id, status: 'failed', attempts, error: lastError,
-      };
-    }
+      if (!aiOk) {
+        // Continue-on-failure : le chapitre est marqué failed, les issues
+        // locales restent conservées, l'analyse CONTINUE.
+        analysis.chapterResults[resultIdx] = {
+          chapterId: chapter.id, status: 'failed', attempts, error: lastError,
+        };
+      }
 
-    analysis.lastProcessedIndex = i;
-    analysis.scores = computeScores(analysis.chapterResults, analysis.issues, manuscript.chapters);
-    analysis.kdpReport = buildKdpReport(analysis.issues, manuscript);
-    persist(analysis);
-    cb.onChapterDone?.(analysis.chapterResults[resultIdx], analysis);
-    cb.onProgress?.(analysis);
+      analysis.lastProcessedIndex = i;
+      analysis.scores = computeScores(analysis.chapterResults, analysis.issues, manuscript.chapters);
+      analysis.kdpReport = buildKdpReport(analysis.issues, manuscript);
+      persist(analysis);
+      cb.onChapterDone?.(analysis.chapterResults[resultIdx], analysis);
+      cb.onProgress?.(analysis);
+    }
+  } catch (e) {
+    if (e instanceof FatalAIError) {
+      // On sauvegarde l'état atteint (chapitres déjà réussis conservés) puis
+      // on remonte une erreur claire. La reprise repartira EXACTEMENT là où
+      // ça s'est arrêté, sans réanalyser les chapitres déjà terminés.
+      analysis.scores = computeScores(analysis.chapterResults, analysis.issues, manuscript.chapters);
+      analysis.kdpReport = buildKdpReport(analysis.issues, manuscript);
+      persist(analysis);
+      throw new Error(`${e.message} L'analyse est en pause — corrigez le problème puis cliquez sur « Reprendre » (les chapitres déjà analysés sont conservés).`);
+    }
+    throw e;
   }
 
   analysis.scores = computeScores(analysis.chapterResults, analysis.issues, manuscript.chapters);
