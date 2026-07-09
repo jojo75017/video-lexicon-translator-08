@@ -87,6 +87,24 @@ const chunkText = (text: string): string[] => {
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+/**
+ * Erreur "fatale" = inutile de continuer les 95 chapitres (ça brûle les
+ * crédits pour rien). Clé invalide/quota épuisé/service saturé → on arrête
+ * tout de suite et on laisse l'utilisateur corriger puis reprendre.
+ */
+function isFatalError(message: string): boolean {
+  const m = (message || '').toLowerCase();
+  return (
+    m.includes('clé api') ||
+    m.includes('invalide') ||
+    m.includes('quota') ||
+    m.includes('saturé') ||
+    m.includes('aucune clé')
+  );
+}
+
+class FatalAIError extends Error {}
+
 async function analyzeChapterAI(apiKey: string, chapter: Chapter): Promise<AiChapterResponse> {
   const chunks = chunkText(chapter.content);
   const allIssues: AiChapterResponse['issues'] = [];
