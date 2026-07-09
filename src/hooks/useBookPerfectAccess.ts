@@ -47,20 +47,8 @@ export function useBookPerfectAccess() {
 
         const env = getStripeEnvironment();
 
-        // 1) Pack Pro V3 347€ inclut BookPerfect
-        try {
-          const { data } = await supabase.rpc('get_my_v3_installment_orders');
-          if (cancelled) return;
-          const rows = (data ?? []).filter((r: any) => r.environment === env);
-          const paid = rows.filter((r: any) => PAID_STATUSES.has((r.status ?? '').toLowerCase()));
-          const hasFull = paid.some((r: any) => (r.plan ?? '').startsWith('full'));
-          if (hasFull) {
-            setHasAccess(true);
-            setReason('pack-pro');
-            setLoading(false);
-            return;
-          }
-        } catch { /* ignore */ }
+        // Aucun accès gratuit via Pack Pro : BookPerfect doit être acheté.
+
 
         // 2) Achat direct BookPerfect
         try {
