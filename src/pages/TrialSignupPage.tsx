@@ -102,6 +102,52 @@ export default function TrialSignupPage() {
         <meta name="robots" content="noindex" />
       </Helmet>
 
+      {alreadyUsed ? (
+        <div
+          className="w-full max-w-lg rounded-3xl p-8 md:p-10 bg-white text-center"
+          style={{ boxShadow: "0 20px 60px -20px rgba(0,130,150,0.35)", border: "1px solid rgba(0,130,150,0.12)" }}
+        >
+          <div className="mx-auto mb-5 w-16 h-16 rounded-full flex items-center justify-center" style={{ background: "rgba(0,130,150,0.1)" }}>
+            <Sparkles className="w-9 h-9" style={{ color: TEAL }} />
+          </div>
+          <h1 className="text-2xl md:text-3xl font-extrabold mb-3">
+            🎉 Votre essai gratuit a déjà été utilisé
+          </h1>
+          <p className="text-muted-foreground mb-2" style={{ color: "#5b6472" }}>
+            Nous sommes heureux que vous ayez découvert EbookStudio.
+          </p>
+          <p className="font-medium mb-6">Votre période d'essai est terminée.</p>
+
+          <div className="rounded-2xl p-6 mb-6 text-left" style={{ background: "#F5FAFB", border: "1px solid rgba(0,130,150,0.15)" }}>
+            <p className="font-bold mb-4 text-center" style={{ color: TEAL }}>Continuez votre aventure</p>
+            <ul className="space-y-3">
+              {["Accès à vie", "Toutes les mises à jour V2", "Documentation Studio", "Business Center", "Support"].map((item) => (
+                <li key={item} className="flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 shrink-0" style={{ color: TEAL }} />
+                  <span className="font-medium">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="rounded-2xl p-5 mb-6" style={{ background: "#FFF7EC", border: `1px solid ${AMBER}55` }}>
+            <p className="flex items-center justify-center gap-2 font-semibold mb-1" style={{ color: AMBER }}>
+              <Gift className="w-5 h-5" /> Offre de lancement
+            </p>
+            <p className="text-3xl font-black" style={{ color: INK }}>
+              67 € <span className="text-lg font-medium line-through" style={{ color: "#9aa4b2" }}>197 €</span>
+            </p>
+          </div>
+
+          <Link
+            to="/offres"
+            className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-4 font-bold text-white text-lg w-full transition-transform hover:-translate-y-0.5"
+            style={{ background: AMBER }}
+          >
+            <Crown className="w-5 h-5" /> Débloquer mon accès à vie
+          </Link>
+        </div>
+      ) : (
       <div className="w-full max-w-5xl grid md:grid-cols-2 gap-8 items-center">
         {/* Colonne gauche — argumentaire */}
         <div className="hidden md:block">
