@@ -1210,6 +1210,9 @@ const V3HubPage: React.FC = () => {
                 Analysez votre roman Word chapitre par chapitre : traces d'IA, orthographe, style,
                 contrôle Amazon KDP et export Word corrigé — sans jamais altérer votre texte original.
               </p>
+              <p className="mt-3 inline-flex items-center gap-2 rounded-lg px-3 py-2 text-[13px] font-semibold" style={{ background: AMBER_SOFT, color: AMBER_DEEP }}>
+                97€ · offre de lancement 67€ · inclus gratuitement dans le Pack Pro V3
+              </p>
               <button
                 onClick={() => navigate('/bookperfect')}
                 className="mt-5 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold text-white whitespace-nowrap"
