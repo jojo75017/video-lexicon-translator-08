@@ -73,7 +73,7 @@ serve(async (req) => {
     const customersCount = customers || 0;
 
     const conversionRate = totalTrials && totalTrials > 0
-      ? Math.round((customers / totalTrials) * 1000) / 10
+      ? Math.round((customersCount / totalTrials) * 1000) / 10
       : 0;
 
     return new Response(
@@ -82,7 +82,7 @@ serve(async (req) => {
         trials_today: trialsToday || 0,
         emails_collected: emailsCollected || 0,
         total_trials: totalTrials || 0,
-        customers,
+        customers: customersCount,
         conversion_rate: conversionRate,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
