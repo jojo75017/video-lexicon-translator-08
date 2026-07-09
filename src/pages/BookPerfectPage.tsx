@@ -11,6 +11,8 @@ import { OpenAIConfigPanel } from '@/components/shared/OpenAIConfigPanel';
 import { isAIConfigured } from '@/services/aiWritingService';
 import { BookPerfectDashboard } from '@/components/bookperfect/BookPerfectDashboard';
 import { AnalysisProgress } from '@/components/bookperfect/AnalysisProgress';
+import { EditorAtWork } from '@/components/bookperfect/EditorAtWork';
+import { AnalysisSummary } from '@/components/bookperfect/AnalysisSummary';
 import { ScoreDashboard } from '@/components/bookperfect/ScoreDashboard';
 import { IssueListTab } from '@/components/bookperfect/shared/IssueListTab';
 import { AmazonKdpTab } from '@/components/bookperfect/tabs/AmazonKdpTab';
@@ -28,7 +30,12 @@ const BookPerfectPage: React.FC = () => {
   const [running, setRunning] = useState(false);
   const [runningIndex, setRunningIndex] = useState<number | null>(null);
   const [hasKey, setHasKey] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const [pausedMessage, setPausedMessage] = useState<string | null>(null);
+  const [elapsedMs, setElapsedMs] = useState<number | null>(null);
+  const [justCompleted, setJustCompleted] = useState(false);
   const abortRef = useRef<{ aborted: boolean }>({ aborted: false });
+  const startTimeRef = useRef<number>(0);
 
   useEffect(() => { setHasKey(isAIConfigured()); }, []);
 
@@ -46,7 +53,11 @@ const BookPerfectPage: React.FC = () => {
       return;
     }
     abortRef.current = { aborted: false };
+    setPaused(false);
+    setPausedMessage(null);
+    setJustCompleted(false);
     setRunning(true);
+    startTimeRef.current = Date.now();
     try {
       const result = await runAnalysis(
         manuscript,
@@ -58,17 +69,26 @@ const BookPerfectPage: React.FC = () => {
       );
       setAnalysis({ ...result });
       if (!abortRef.current.aborted) {
+        setElapsedMs(Date.now() - startTimeRef.current);
         const failed = result.chapterResults.filter((r) => r.status === 'failed').length;
         if (failed > 0) toast.warning(`Analyse terminée. ${failed} chapitre(s) en échec — relancez-les.`);
-        else toast.success('Analyse terminée ✓');
+        else {
+          setJustCompleted(true);
+          toast.success('Analyse terminée ✓');
+        }
       }
     } catch (e: any) {
-      toast.error(e?.message || 'Erreur pendant l\'analyse.');
+      const msg = e?.message || 'Erreur pendant l\'analyse.';
+      // Erreur fatale : l'analyse est en pause, on propose « Reprendre ».
+      setPaused(true);
+      setPausedMessage(msg);
+      toast.error(msg);
     } finally {
       setRunning(false);
       setRunningIndex(null);
     }
   }, [manuscript, analysis]);
+
 
   const stop = () => { abortRef.current.aborted = true; setRunning(false); toast.info('Analyse interrompue. Vous pourrez la reprendre.'); };
 
@@ -79,7 +99,7 @@ const BookPerfectPage: React.FC = () => {
   const onIgnore = (id: string) => setStatus(id, 'ignored');
   const onReset = (id: string) => setStatus(id, 'pending');
 
-  const reset = () => { setManuscript(null); setAnalysis(null); };
+  const reset = () => { setManuscript(null); setAnalysis(null); setPaused(false); setPausedMessage(null); setElapsedMs(null); setJustCompleted(false); };
 
   const hasResults = !!analysis && analysis.chapterResults.some((r) => r.status === 'done' || r.status === 'failed');
   const failedCount = analysis?.chapterResults.filter((r) => r.status === 'failed').length ?? 0;
@@ -135,12 +155,17 @@ const BookPerfectPage: React.FC = () => {
                 </div>
                 {!running ? (
                   <div className="flex flex-wrap gap-2">
-                    {!hasResults && (
+                    {paused && (
+                      <Button onClick={() => start(true)} className="gap-2 bg-amber-600 hover:bg-amber-700 text-white">
+                        <RotateCcw className="h-4 w-4" /> Reprendre l'analyse
+                      </Button>
+                    )}
+                    {!hasResults && !paused && (
                       <Button onClick={() => start(false)} className="gap-2">
                         <Play className="h-4 w-4" /> Lancer l'analyse
                       </Button>
                     )}
-                    {hasResults && failedCount > 0 && (
+                    {hasResults && !paused && failedCount > 0 && (
                       <Button onClick={() => start(true)} className="gap-2">
                         <RotateCcw className="h-4 w-4" /> Reprendre ({failedCount} en échec)
                       </Button>
@@ -160,9 +185,30 @@ const BookPerfectPage: React.FC = () => {
               </CardContent>
             </Card>
 
-            {running && analysis && (
-              <AnalysisProgress manuscript={manuscript} analysis={analysis} runningIndex={runningIndex} />
+            {paused && !running && (
+              <Card className="border-amber-500/40 bg-amber-500/5">
+                <CardContent className="p-4 flex flex-wrap items-center gap-3">
+                  <span className="text-sm text-amber-700 dark:text-amber-400 flex-1 min-w-[200px]">
+                    ⏸️ Analyse en pause. {pausedMessage}
+                  </span>
+                  <Button onClick={() => start(true)} className="gap-2 bg-amber-600 hover:bg-amber-700 text-white">
+                    <RotateCcw className="h-4 w-4" /> Reprendre
+                  </Button>
+                </CardContent>
+              </Card>
             )}
+
+            {running && analysis && (
+              <div className="grid gap-6 lg:grid-cols-[1fr_360px] items-start">
+                <AnalysisProgress manuscript={manuscript} analysis={analysis} runningIndex={runningIndex} />
+                <EditorAtWork manuscript={manuscript} analysis={analysis} runningIndex={runningIndex} />
+              </div>
+            )}
+
+            {justCompleted && !running && analysis && (
+              <AnalysisSummary manuscript={manuscript} analysis={analysis} elapsedMs={elapsedMs} />
+            )}
+
 
             {analysis?.scores && <ScoreDashboard scores={analysis.scores} />}
 
