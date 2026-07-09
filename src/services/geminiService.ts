@@ -130,10 +130,18 @@ export async function callGemini(
           await response.text().catch(() => {});
           continue;
         }
+        // Modèle retiré / introuvable (404) → inutile de réessayer, on passe
+        // directement au modèle de secours suivant.
+        if (response.status === 404) {
+          console.warn(`Gemini 404 : modèle ${model} indisponible, bascule sur le suivant.`);
+          await response.text().catch(() => {});
+          continue outer;
+        }
         // Erreur non récupérable → on sort pour la traiter ci-dessous
         break outer;
       }
     }
+
 
     clearTimeout(timeoutId);
 
