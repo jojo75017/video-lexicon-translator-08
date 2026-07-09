@@ -19,12 +19,20 @@ import { AmazonKdpTab } from '@/components/bookperfect/tabs/AmazonKdpTab';
 import { ComparaisonTab } from '@/components/bookperfect/tabs/ComparaisonTab';
 import { RapportFinalTab } from '@/components/bookperfect/tabs/RapportFinalTab';
 import {
-  runAnalysis, loadAnalysis, updateIssueStatus,
+  runAnalysis, loadAnalysis, loadRecoverySnapshot, updateIssueStatus, BOOKPERFECT_RECOVERY_SCOPE,
 } from '@/lib/bookperfect/analysisOrchestrator';
+import type { BookPerfectRecoverySnapshot } from '@/lib/bookperfect/analysisOrchestrator';
 import { readAutosave, writeAutosave } from '@/lib/ebookProjectStorage';
 import type { Analysis, Manuscript } from '@/lib/bookperfect/types';
 
 const CURRENT_MANUSCRIPT_SCOPE = 'bookperfect_current_manuscript';
+
+const normalizeResumableAnalysis = (value: Analysis): Analysis => ({
+  ...value,
+  chapterResults: value.chapterResults.map((r) => (
+    r.status === 'running' ? { ...r, status: 'pending' as const } : r
+  )),
+});
 
 const BookPerfectPage: React.FC = () => {
   const navigate = useNavigate();
@@ -37,11 +45,14 @@ const BookPerfectPage: React.FC = () => {
   const [pausedMessage, setPausedMessage] = useState<string | null>(null);
   const [elapsedMs, setElapsedMs] = useState<number | null>(null);
   const [justCompleted, setJustCompleted] = useState(false);
+  const [recoverySnapshot, setRecoverySnapshot] = useState<BookPerfectRecoverySnapshot | null>(null);
   const abortRef = useRef<{ aborted: boolean }>({ aborted: false });
   const startTimeRef = useRef<number>(0);
 
   useEffect(() => {
     setHasKey(isAIConfigured());
+    const recovery = loadRecoverySnapshot();
+    setRecoverySnapshot(recovery);
     const savedManuscript = readAutosave<Manuscript>(CURRENT_MANUSCRIPT_SCOPE);
     if (savedManuscript?.id) {
       setManuscript(savedManuscript);
@@ -50,7 +61,16 @@ const BookPerfectPage: React.FC = () => {
       if (savedAnalysis?.chapterResults.some((r) => r.status !== 'done')) {
         setPaused(true);
         setPausedMessage('Analyse interrompue : vous pouvez reprendre exactement où elle s’est arrêtée.');
+        return;
       }
+    }
+
+    if (recovery?.manuscript?.id && recovery.analysis?.chapterResults?.some((r) => r.status !== 'done')) {
+      setManuscript(recovery.manuscript);
+      writeAutosave(CURRENT_MANUSCRIPT_SCOPE, recovery.manuscript);
+      setAnalysis(normalizeResumableAnalysis(recovery.analysis));
+      setPaused(true);
+      setPausedMessage('Analyse interrompue : vous pouvez reprendre exactement où elle s’est arrêtée.');
     }
   }, []);
 
@@ -135,12 +155,29 @@ const BookPerfectPage: React.FC = () => {
     setElapsedMs(null);
     setJustCompleted(false);
     writeAutosave<Manuscript | null>(CURRENT_MANUSCRIPT_SCOPE, null);
+    writeAutosave(BOOKPERFECT_RECOVERY_SCOPE, null);
+    setRecoverySnapshot(null);
+  };
+
+  const restoreRecovery = () => {
+    const recovery = recoverySnapshot || loadRecoverySnapshot();
+    if (!recovery?.manuscript?.id) return;
+    const normalizedAnalysis = normalizeResumableAnalysis(recovery.analysis);
+    setManuscript(recovery.manuscript);
+    writeAutosave(CURRENT_MANUSCRIPT_SCOPE, recovery.manuscript);
+    setAnalysis(normalizedAnalysis);
+    setPaused(true);
+    setPausedMessage('Analyse retrouvée : cliquez sur Reprendre pour continuer exactement où elle s’est arrêtée.');
+    setRecoverySnapshot(recovery);
   };
 
   const hasResults = !!analysis && analysis.chapterResults.some((r) => r.status === 'done' || r.status === 'failed');
+  const hasIncompleteAnalysis = !!analysis && analysis.chapterResults.some((r) => r.status !== 'done');
+  const showResumeButton = !!manuscript && hasIncompleteAnalysis;
   const failedCount = analysis?.chapterResults.filter((r) => r.status === 'failed').length ?? 0;
   const pendingCount = analysis?.chapterResults.filter((r) => r.status === 'pending' || r.status === 'running').length ?? 0;
   const remainingCount = failedCount + pendingCount;
+  const recoveryRemainingCount = recoverySnapshot?.analysis.chapterResults.filter((r) => r.status !== 'done').length ?? 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -179,7 +216,13 @@ const BookPerfectPage: React.FC = () => {
           </div>
         )}
 
-        {!manuscript && <BookPerfectDashboard onImported={onImported} />}
+        {!manuscript && (
+          <BookPerfectDashboard
+            onImported={onImported}
+            onResume={recoveryRemainingCount > 0 ? restoreRecovery : undefined}
+            resumeLabel={recoveryRemainingCount > 0 ? `Reprendre (${recoveryRemainingCount} restant${recoveryRemainingCount > 1 ? 's' : ''})` : undefined}
+          />
+        )}
 
         {manuscript && (
           <div className="space-y-6">
@@ -193,19 +236,14 @@ const BookPerfectPage: React.FC = () => {
                 </div>
                 {!running ? (
                   <div className="flex flex-wrap gap-2">
-                    {paused && (
+                    {showResumeButton && (
                       <Button onClick={() => start(true)} className="gap-2 bg-amber-600 hover:bg-amber-700 text-white">
-                        <RotateCcw className="h-4 w-4" /> Reprendre l'analyse
+                        <RotateCcw className="h-4 w-4" /> Reprendre ({remainingCount} restant{remainingCount > 1 ? 's' : ''})
                       </Button>
                     )}
-                    {!hasResults && !paused && (
+                    {!hasResults && !showResumeButton && (
                       <Button onClick={() => start(false)} className="gap-2">
                         <Play className="h-4 w-4" /> Lancer l'analyse
-                      </Button>
-                    )}
-                    {hasResults && !paused && remainingCount > 0 && (
-                      <Button onClick={() => start(true)} className="gap-2">
-                        <RotateCcw className="h-4 w-4" /> Reprendre ({remainingCount} restant{remainingCount > 1 ? 's' : ''})
                       </Button>
                     )}
                     {hasResults && (
@@ -223,14 +261,14 @@ const BookPerfectPage: React.FC = () => {
               </CardContent>
             </Card>
 
-            {paused && !running && (
+            {showResumeButton && !running && (
               <Card className="border-amber-500/40 bg-amber-500/5">
                 <CardContent className="p-4 flex flex-wrap items-center gap-3">
                   <span className="text-sm text-amber-700 dark:text-amber-400 flex-1 min-w-[200px]">
-                    ⏸️ Analyse en pause. {pausedMessage}
+                    ⏸️ Analyse incomplète. {pausedMessage || 'Cliquez sur Reprendre pour continuer exactement où elle s’est arrêtée.'}
                   </span>
                   <Button onClick={() => start(true)} className="gap-2 bg-amber-600 hover:bg-amber-700 text-white">
-                    <RotateCcw className="h-4 w-4" /> Reprendre
+                    <RotateCcw className="h-4 w-4" /> Reprendre ({remainingCount} restant{remainingCount > 1 ? 's' : ''})
                   </Button>
                 </CardContent>
               </Card>

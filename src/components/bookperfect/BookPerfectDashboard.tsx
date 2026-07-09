@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { Upload, FileText, Loader2, BookOpen } from 'lucide-react';
+import { Upload, FileText, Loader2, BookOpen, RotateCcw } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -8,9 +8,11 @@ import type { Manuscript } from '@/lib/bookperfect/types';
 
 interface Props {
   onImported: (m: Manuscript) => void;
+  onResume?: () => void;
+  resumeLabel?: string;
 }
 
-export const BookPerfectDashboard: React.FC<Props> = ({ onImported }) => {
+export const BookPerfectDashboard: React.FC<Props> = ({ onImported, onResume, resumeLabel }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -57,10 +59,18 @@ export const BookPerfectDashboard: React.FC<Props> = ({ onImported }) => {
             className="hidden"
             onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
           />
-          <Button onClick={() => inputRef.current?.click()} disabled={loading} className="gap-2">
-            <Upload className="h-4 w-4" />
-            {loading ? 'Import en cours…' : 'Choisir un fichier'}
-          </Button>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {onResume && (
+              <Button onClick={onResume} className="gap-2 bg-amber-600 hover:bg-amber-700 text-white">
+                <RotateCcw className="h-4 w-4" />
+                {resumeLabel || "Reprendre l'analyse"}
+              </Button>
+            )}
+            <Button onClick={() => inputRef.current?.click()} disabled={loading} className="gap-2">
+              <Upload className="h-4 w-4" />
+              {loading ? 'Import en cours…' : 'Choisir un fichier'}
+            </Button>
+          </div>
           <div className="flex items-center gap-2 mt-6 text-xs text-muted-foreground">
             <FileText className="h-3.5 w-3.5" />
             Prise en charge des longs manuscrits (400+ pages) — analyse résiliente avec reprise.
