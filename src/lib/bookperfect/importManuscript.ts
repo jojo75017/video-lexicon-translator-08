@@ -11,7 +11,19 @@ const WORDS_PER_PAGE = 300;
 
 const countWords = (t: string) => (t || '').trim().split(/\s+/).filter(Boolean).length;
 
-const genId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+const stableManuscriptId = async (fileName: string, rawText: string) => {
+  const source = `${fileName}\n${rawText.slice(0, 20000)}\n${rawText.length}`;
+  try {
+    const data = new TextEncoder().encode(source);
+    const digest = await crypto.subtle.digest('SHA-256', data);
+    const hex = Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, '0')).join('');
+    return `manuscript-${hex.slice(0, 16)}`;
+  } catch {
+    let hash = 0;
+    for (let i = 0; i < source.length; i++) hash = Math.imul(31, hash) + source.charCodeAt(i) | 0;
+    return `manuscript-${Math.abs(hash).toString(36)}`;
+  }
+};
 
 /** Extrait le texte brut d'un fichier selon son extension. */
 export async function extractText(file: File): Promise<string> {
@@ -60,7 +72,7 @@ export async function importManuscript(file: File): Promise<Manuscript> {
   const title = (firstLine || file.name.replace(/\.(docx|md|txt)$/i, '')).replace(/^#+\s*/, '');
 
   return {
-    id: genId(),
+    id: await stableManuscriptId(file.name, rawText),
     fileName: file.name,
     title,
     rawText,

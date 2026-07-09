@@ -256,8 +256,18 @@ export async function runAnalysis(
     throw new Error(`Aucune clé API ${provider} configurée. Renseignez votre clé dans les réglages pour lancer l'analyse.`);
   }
 
-  const analysis: Analysis = opts.existing
-    ? { ...opts.existing }
+  const saved = opts.resumeOnly ? loadAnalysis(manuscript.id) : null;
+  const baseAnalysis = opts.resumeOnly ? (opts.existing || saved) : null;
+  const analysis: Analysis = baseAnalysis
+    ? {
+      ...baseAnalysis,
+      chapterResults: manuscript.chapters.map((chapter) => {
+        const previous = baseAnalysis.chapterResults.find((r) => r.chapterId === chapter.id);
+        if (!previous) return { chapterId: chapter.id, status: 'pending', attempts: 0 };
+        return previous.status === 'running' ? { ...previous, status: 'pending' } : previous;
+      }),
+      issues: baseAnalysis.issues.filter((issue) => manuscript.chapters.some((chapter) => chapter.id === issue.chapterId)),
+    }
     : emptyAnalysis(manuscript);
 
   const total = manuscript.chapters.length;
