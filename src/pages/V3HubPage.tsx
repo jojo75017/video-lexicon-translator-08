@@ -756,16 +756,29 @@ const V3HubPage: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex shrink-0 flex-col gap-2 sm:min-w-[190px]">
-                  <a
-                    href="/Documentation-Studio-AI-Presentation.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    download
+                  <button
+                    onClick={async () => {
+                      try {
+                        const res = await fetch('/Documentation-Studio-AI-Presentation.pdf', { credentials: 'same-origin' });
+                        if (!res.ok) throw new Error('fetch failed');
+                        const blob = await res.blob();
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'Documentation-Studio-AI-Presentation.pdf';
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        setTimeout(() => URL.revokeObjectURL(url), 2000);
+                      } catch {
+                        window.open('/Documentation-Studio-AI-Presentation.pdf', '_blank');
+                      }
+                    }}
                     className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5"
                     style={{ background: AMBER_DEEP }}
                   >
                     <FileText className="h-4 w-4" /> Télécharger le PDF
-                  </a>
+                  </button>
                   <button
                     onClick={() => setActiveTab('documentation')}
                     className="inline-flex items-center justify-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition-all hover:-translate-y-0.5"
