@@ -1170,6 +1170,28 @@ const V3HubPage: React.FC = () => {
             <div className="rounded-2xl border bg-white overflow-hidden" style={{ borderColor: '#eadfc9' }}>
               <HubAiChat />
             </div>
+
+            {/* Accès BookPerfect AI — directeur éditorial */}
+            <div className="rounded-2xl border p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center gap-4" style={{ background: '#fff', borderColor: `${AMBER}44` }}>
+              <div className="flex-1">
+                <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-wider" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44`, color: AMBER_DEEP }}>
+                  <BookOpen className="h-3.5 w-3.5" /> Nouveau · Premium
+                </div>
+                <h3 className="mt-3 text-2xl font-medium leading-tight" style={{ fontFamily: SERIF, color: INK }}>
+                  BookPerfect AI — Directeur éditorial
+                </h3>
+                <p className="mt-1 max-w-2xl text-sm leading-relaxed" style={{ color: '#6f5e47' }}>
+                  Analysez votre roman Word chapitre par chapitre : traces d'IA, orthographe, style, contrôle Amazon KDP et export Word corrigé.
+                </p>
+              </div>
+              <button
+                onClick={() => navigate('/bookperfect')}
+                className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white whitespace-nowrap"
+                style={{ background: `linear-gradient(90deg, ${AMBER}, #FFB44D)` }}
+              >
+                Ouvrir BookPerfect AI <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
           </section>
         )}
       </main>
