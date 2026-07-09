@@ -62,6 +62,8 @@ const Licence = lazy(() => import('./pages/Licence'));
 const LicenceEtenduePage = lazy(() => import('./pages/LicenceEtenduePage'));
 const PaymentSuccessPage = lazy(() => import('./pages/PaymentSuccessPage'));
 const DemoPage = lazy(() => import('./pages/DemoPage'));
+const TrialSignupPage = lazy(() => import('./pages/TrialSignupPage'));
+const TrialDashboardPage = lazy(() => import('./pages/admin/TrialDashboardPage'));
 const OfferValuePage = lazy(() => import('./pages/OfferValuePage'));
 const SeoTutorialChatGptPage = lazy(() => import('./pages/SeoTutorialChatGptPage'));
 const SeoCreerEbookIaPage = lazy(() => import('./pages/SeoCreerEbookIaPage'));
