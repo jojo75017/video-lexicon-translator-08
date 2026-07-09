@@ -791,6 +791,161 @@ const V3HubPage: React.FC = () => {
               </div>
             </div>
 
+            {/* ---- Contenu détaillé de la brochure Documentation Studio AI ---- */}
+            <div className="rounded-2xl border bg-white p-6 sm:p-8 space-y-10" style={{ borderColor: '#eadfc9' }}>
+
+              {/* Le concept */}
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-wider" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44`, color: AMBER_DEEP }}>
+                  <Sparkles className="h-3.5 w-3.5" /> Le concept
+                </div>
+                <h3 className="mt-3 text-2xl sm:text-3xl font-medium leading-tight" style={{ fontFamily: SERIF, color: INK }}>
+                  Un seul brief → toute la documentation de votre produit
+                </h3>
+                <p className="mt-2 max-w-3xl text-sm leading-relaxed" style={{ color: '#6f5e47' }}>
+                  Documentation Studio AI transforme une simple description en un écosystème complet de documents professionnels :
+                  documentation produit, supports marketing et publications de communication. Vous décrivez votre produit une seule
+                  fois, l'IA rédige, structure et met en page. Vous validez, ajustez et exportez au format de votre choix.
+                </p>
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {[
+                    { icon: '✨', t: 'Génération intelligente', d: 'Décrivez en langage naturel, l\'IA remplit chaque section. Vous gardez le contrôle total.' },
+                    { icon: '🤖', t: 'Documentation Copilot', d: 'Un assistant flottant vous aide à améliorer, compléter et enrichir tout au long du parcours.' },
+                    { icon: '🔄', t: 'Mise à jour intelligente', d: 'Un module change ? Seuls les documents concernés sont régénérés, pas tout le reste.' },
+                  ].map((c) => (
+                    <div key={c.t} className="rounded-xl border p-4" style={{ borderColor: '#eadfc9', background: DS_CREAM }}>
+                      <div className="text-2xl">{c.icon}</div>
+                      <div className="mt-2 text-sm font-bold" style={{ color: INK }}>{c.t}</div>
+                      <p className="mt-1 text-[13px] leading-snug" style={{ color: '#8a7860' }}>{c.d}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Les 19 livrables */}
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-wider" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44`, color: AMBER_DEEP }}>
+                  <Layers className="h-3.5 w-3.5" /> Les livrables
+                </div>
+                <h3 className="mt-3 text-2xl sm:text-3xl font-medium leading-tight" style={{ fontFamily: SERIF, color: INK }}>
+                  {ALL_DELIVERABLE_COUNT} documents générés à partir d'un seul brief
+                </h3>
+                <p className="mt-2 max-w-3xl text-sm leading-relaxed" style={{ color: '#6f5e47' }}>
+                  Répartis en trois familles : documentation, marketing et communication. Choisissez ceux dont vous avez besoin.
+                </p>
+                <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  {DELIVERABLE_GROUPS.map((g) => (
+                    <div key={g.id} className="rounded-xl border p-4" style={{ borderColor: '#eadfc9' }}>
+                      <div className="flex items-center gap-2 text-sm font-bold" style={{ color: INK }}>
+                        <span className="text-lg">{g.icon}</span> {g.label}
+                        <span className="ml-auto text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: AMBER_SOFT, color: AMBER_DEEP }}>{g.items.length}</span>
+                      </div>
+                      <ul className="mt-3 space-y-2">
+                        {g.items.map((it) => (
+                          <li key={it.id} className="flex items-start gap-2 text-[13px]" style={{ color: '#6f5e47' }}>
+                            <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: AMBER }} />
+                            <span><span className="font-semibold" style={{ color: INK }}>{it.label}</span> — {it.desc}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Templates */}
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-wider" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44`, color: AMBER_DEEP }}>
+                  <ImageIcon className="h-3.5 w-3.5" /> Modèles premium
+                </div>
+                <h3 className="mt-3 text-2xl sm:text-3xl font-medium leading-tight" style={{ fontFamily: SERIF, color: INK }}>
+                  8 templates de design inspirés des meilleures marques
+                </h3>
+                <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {DOC_TEMPLATES.map((t) => (
+                    <div key={t.id} className="rounded-xl border p-3" style={{ borderColor: '#eadfc9' }}>
+                      <div className="flex gap-1">
+                        {t.swatch.map((c, i) => (
+                          <span key={i} className="h-5 w-5 rounded-full border" style={{ background: c, borderColor: '#00000012' }} />
+                        ))}
+                      </div>
+                      <div className="mt-2 text-sm font-bold" style={{ color: INK }}>{t.label}</div>
+                      <p className="text-[12px] leading-snug" style={{ color: '#8a7860' }}>{t.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Types de produits */}
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-wider" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44`, color: AMBER_DEEP }}>
+                  <Compass className="h-3.5 w-3.5" /> Pour qui ?
+                </div>
+                <h3 className="mt-3 text-2xl sm:text-3xl font-medium leading-tight" style={{ fontFamily: SERIF, color: INK }}>
+                  Conçu pour tous les produits numériques
+                </h3>
+                <p className="mt-2 max-w-3xl text-sm leading-relaxed" style={{ color: '#6f5e47' }}>
+                  L'IA adapte automatiquement ses questions et ses modèles au type de produit sélectionné.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {PRODUCT_TYPES.map((p) => (
+                    <span key={p.id} className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[13px] font-medium" style={{ borderColor: '#eadfc9', color: '#6f5e47', background: DS_CREAM }}>
+                      <span>{p.icon}</span> {p.label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Formats d'export */}
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-wider" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44`, color: AMBER_DEEP }}>
+                  <FileText className="h-3.5 w-3.5" /> Exports
+                </div>
+                <h3 className="mt-3 text-2xl sm:text-3xl font-medium leading-tight" style={{ fontFamily: SERIF, color: INK }}>
+                  Exportez dans le format qui vous convient
+                </h3>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {['📝 Word (.docx)', '📄 PDF Premium', '🌐 HTML', '⬇️ Markdown', '📊 PowerPoint'].map((f) => (
+                    <span key={f} className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold" style={{ background: AMBER_SOFT, color: AMBER_DEEP }}>
+                      {f}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tarif + CTA */}
+              <div className="rounded-2xl border p-6 sm:p-8 text-center" style={{ background: `linear-gradient(135deg, ${AMBER_SOFT}, #fff)`, borderColor: `${AMBER}55` }}>
+                <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-wider" style={{ background: '#fff', borderColor: `${AMBER}44`, color: AMBER_DEEP }}>
+                  <Gem className="h-3.5 w-3.5" /> Pack Premium
+                </div>
+                <div className="mt-3 flex items-end justify-center gap-2">
+                  <span className="text-5xl font-bold" style={{ color: INK }}>197€</span>
+                  <span className="mb-1.5 text-sm" style={{ color: '#8a7860' }}>paiement unique</span>
+                </div>
+                <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed" style={{ color: '#6f5e47' }}>
+                  Accès complet au module, tous les livrables, tous les templates, tous les formats d'export et la bibliothèque de
+                  projets. Essayez gratuitement avec une première génération courte, sans engagement.
+                </p>
+                <div className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-2">
+                  <button
+                    onClick={() => setActiveTab('documentation')}
+                    className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5"
+                    style={{ background: AMBER_DEEP }}
+                  >
+                    <Sparkles className="h-4 w-4" /> Essayer gratuitement
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('offres')}
+                    className="inline-flex items-center justify-center gap-2 rounded-full border px-6 py-3 text-sm font-semibold transition-all hover:-translate-y-0.5"
+                    style={{ background: '#fff', borderColor: `${AMBER}55`, color: AMBER_DEEP }}
+                  >
+                    <Gem className="h-4 w-4" /> Voir les offres
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
             <V3GuidesSection />
           </section>
         )}
