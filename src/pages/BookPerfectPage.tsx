@@ -30,7 +30,12 @@ const BookPerfectPage: React.FC = () => {
   const [running, setRunning] = useState(false);
   const [runningIndex, setRunningIndex] = useState<number | null>(null);
   const [hasKey, setHasKey] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const [pausedMessage, setPausedMessage] = useState<string | null>(null);
+  const [elapsedMs, setElapsedMs] = useState<number | null>(null);
+  const [justCompleted, setJustCompleted] = useState(false);
   const abortRef = useRef<{ aborted: boolean }>({ aborted: false });
+  const startTimeRef = useRef<number>(0);
 
   useEffect(() => { setHasKey(isAIConfigured()); }, []);
 
