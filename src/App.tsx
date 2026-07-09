@@ -117,6 +117,7 @@ const EmailPreviewPage = lazy(() => import('@/pages/EmailPreviewPage'));
 const ProspectManagerPage = lazy(() => import('@/pages/ProspectManagerPage'));
 const SocialPostGeneratorPage = lazy(() => import('@/pages/SocialPostGeneratorPage'));
 const UnifiedMarketingDashboard = lazy(() => import('@/pages/UnifiedMarketingDashboard'));
+const BusinessCenterPage = lazy(() => import('@/pages/BusinessCenterPage'));
 const CrmPage = lazy(() => import('@/pages/CrmPage'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const KdpAdsGuidePage = lazy(() => import('./pages/KdpAdsGuidePage'));
