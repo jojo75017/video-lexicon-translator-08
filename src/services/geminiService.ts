@@ -251,6 +251,11 @@ export async function callGeminiWithHistory(
           await response.text().catch(() => {});
           continue;
         }
+        if (response.status === 404) {
+          console.warn(`Gemini 404 : modèle ${model} indisponible, bascule sur le suivant.`);
+          await response.text().catch(() => {});
+          continue outer;
+        }
         break outer;
       }
     }
