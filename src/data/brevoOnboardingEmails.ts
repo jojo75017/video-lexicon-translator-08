@@ -40,6 +40,17 @@ ${inner}
     Une question avant de vous lancer ? On en parle 👇<br/><br/>
     <a href="${SITE}/demo" style="display:inline-block;margin:4px 6px;padding:10px 18px;border:1px solid ${TEAL};border-radius:8px;color:${TEAL};text-decoration:none;font-weight:600;font-size:14px">📅 Réserver une démo privée avec Georges</a>
     <a href="mailto:contact@ebookstudio.fr" style="display:inline-block;margin:4px 6px;padding:10px 18px;border:1px solid #d8dee4;border-radius:8px;color:#5b6875;text-decoration:none;font-weight:600;font-size:14px">💬 Répondre directement à cet email</a>
+    <div style="margin-top:18px;font-size:13px;color:#7b8794;line-height:1.5">
+      ⭐⭐⭐⭐⭐<br/>
+      Chaque semaine, de nouveaux auteurs rejoignent EbookStudio pour publier plus rapidement.
+    </div>
+    <!--
+    TODO : activer ce témoignage dès qu'un client réel est disponible.
+    <div style="margin-top:14px;padding:12px 16px;background:#f8fafc;border-radius:8px;display:inline-block">
+      <span style="font-size:13px;color:#5b6875;font-style:italic">"Merci Georges, j'ai publié mon premier ebook en deux jours."</span><br/>
+      <span style="font-size:12px;color:#9aa4b0;font-weight:600">— Marie, auteure indépendante</span>
+    </div>
+    -->
   </td></tr>
   </table>
 </td></tr>
