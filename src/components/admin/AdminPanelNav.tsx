@@ -1,4 +1,4 @@
-import { BarChart3, BookOpen, Contact, FileText, Mail, Megaphone, MessageSquare, Shield, Ticket, TrendingUp, User, Users, BookMarked } from 'lucide-react';
+import { BarChart3, BookOpen, Contact, FileText, Gauge, Mail, Megaphone, MessageSquare, Shield, Ticket, TrendingUp, User, Users, BookMarked } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -12,6 +12,7 @@ type AdminNavItem = {
 
 const adminNavItems: AdminNavItem[] = [
   { label: 'Dashboard', path: '/dashboard', icon: BarChart3, exact: true },
+  { label: 'Business Center', path: '/business-center', icon: Gauge, exact: true },
   { label: 'Abonnés', path: '/admin', icon: Shield, exact: true },
   { label: 'Tunnel', path: '/admin/funnel', icon: TrendingUp, exact: true },
   { label: 'Cadeaux PDF', path: '/admin/cadeaux-pdf', icon: FileText, exact: true },
