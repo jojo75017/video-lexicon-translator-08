@@ -439,6 +439,7 @@ const App = () => {
             <Route path="/essai-gratuit" element={<TrialSignupPage />} />
             <Route path="/dashboard-essais" element={<AdminGate><TrialDashboardPage /></AdminGate>} />
             <Route path="/emails-onboarding" element={<AdminGate><BrevoOnboardingEmailsPage /></AdminGate>} />
+            <Route path="/guide-automatisation-brevo" element={<AdminGate><BrevoAutomationGuidePage /></AdminGate>} />
             <Route path="/upsell" element={<UpsellPage />} />
             <Route path="/upsell-paiement" element={<UpsellPaiementPage />} />
             <Route path="/coaching-vip" element={<CoachingVipPage />} />
