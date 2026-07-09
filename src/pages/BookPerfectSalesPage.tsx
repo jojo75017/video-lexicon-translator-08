@@ -142,8 +142,9 @@ const BookPerfectSalesPage: React.FC = () => {
             </div>
 
             <p className="mt-3 inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-[12px] font-semibold" style={{ background: '#fff', color: AMBER_DEEP }}>
-              <Crown className="h-3.5 w-3.5" /> D\u00e9j\u00e0 inclus gratuitement dans le Pack Pro V3 (347&euro;)
+              <Crown className="h-3.5 w-3.5" /> Module premium ind\u00e9pendant \u00b7 acc\u00e8s r\u00e9serv\u00e9 aux acheteurs
             </p>
+
           </div>
         </section>
 

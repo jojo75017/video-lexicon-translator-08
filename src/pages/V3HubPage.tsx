@@ -1211,7 +1211,7 @@ const V3HubPage: React.FC = () => {
                 contrôle Amazon KDP et export Word corrigé — sans jamais altérer votre texte original.
               </p>
               <p className="mt-3 inline-flex items-center gap-2 rounded-lg px-3 py-2 text-[13px] font-semibold" style={{ background: AMBER_SOFT, color: AMBER_DEEP }}>
-                97€ · offre de lancement 67€ · inclus gratuitement dans le Pack Pro V3
+                97€ · offre de lancement 67€ · module premium à acheter séparément
               </p>
               <button
                 onClick={() => navigate('/bookperfect')}

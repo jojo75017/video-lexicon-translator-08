@@ -6,19 +6,19 @@ import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 /**
  * Droits d'accès à BookPerfect AI.
  *
- * Accès accordé si :
+ * Accès accordé UNIQUEMENT si :
  *  - Admin (préparation / démonstration)
- *  - Acheteur du Pack Pro V3 347€ (BookPerfect inclus en bonus)
  *  - Achat direct de BookPerfect AI (module_entitlements)
  *
- * Les acheteurs Base 197€ / V2 / autres voient la page de vente (upsell 97€).
+ * Aucun accès gratuit : ni Base 197€, ni Pack Pro 347€, ni V2, ni aucun autre
+ * module. Tout le monde (sauf admin) doit acheter BookPerfect séparément.
  */
 const PAID_STATUSES = new Set(['active', 'completed', 'paid']);
 
 export function useBookPerfectAccess() {
   const [loading, setLoading] = useState(true);
   const [hasAccess, setHasAccess] = useState(false);
-  const [reason, setReason] = useState<'admin' | 'pack-pro' | 'purchased' | null>(null);
+  const [reason, setReason] = useState<'admin' | 'purchased' | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -47,20 +47,8 @@ export function useBookPerfectAccess() {
 
         const env = getStripeEnvironment();
 
-        // 1) Pack Pro V3 347€ inclut BookPerfect
-        try {
-          const { data } = await supabase.rpc('get_my_v3_installment_orders');
-          if (cancelled) return;
-          const rows = (data ?? []).filter((r: any) => r.environment === env);
-          const paid = rows.filter((r: any) => PAID_STATUSES.has((r.status ?? '').toLowerCase()));
-          const hasFull = paid.some((r: any) => (r.plan ?? '').startsWith('full'));
-          if (hasFull) {
-            setHasAccess(true);
-            setReason('pack-pro');
-            setLoading(false);
-            return;
-          }
-        } catch { /* ignore */ }
+        // Aucun accès gratuit via Pack Pro : BookPerfect doit être acheté.
+
 
         // 2) Achat direct BookPerfect
         try {
