@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet";
+import { Link } from "react-router-dom";
 import { BREVO_ONBOARDING_EMAILS } from "@/data/brevoOnboardingEmails";
-import { Copy, Check, Mail, Info } from "lucide-react";
+import { Copy, Check, Mail, Info, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 
 const TEAL = "#008296";
