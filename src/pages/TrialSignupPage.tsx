@@ -74,12 +74,11 @@ export default function TrialSignupPage() {
       });
       if (fnError) throw fnError;
       if (data && data.ok === false) {
-        setError(
-          data.alreadyUsed
-            ? (data.error as string) ||
-              "Vous avez déjà utilisé votre essai gratuit avec cet email."
-            : (data.error as string) || "Une erreur est survenue. Réessayez.",
-        );
+        if (data.alreadyUsed) {
+          setAlreadyUsed(true);
+          return;
+        }
+        setError((data.error as string) || "Une erreur est survenue. Réessayez.");
         return;
       }
       if (data && data.access_code) setAccessCode(data.access_code as string);
