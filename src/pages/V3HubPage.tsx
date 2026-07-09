@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Sparkles, Compass, Lock, ArrowRight, Wand2, CheckCircle2, Layers, Bot, Infinity as InfinityIcon, ShieldCheck, Save, Image as ImageIcon, BookOpen, GraduationCap, Gem, Map as MapIcon, FileText, Copy, Check, Menu, X, PanelLeftClose, PanelLeftOpen, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, Search, Sparkles, Compass, Lock, ArrowRight, Wand2, CheckCircle2, Layers, Bot, Infinity as InfinityIcon, ShieldCheck, Save, Image as ImageIcon, BookOpen, GraduationCap, Gem, Map as MapIcon, FileText, Copy, Check, Menu, X, PanelLeftClose, PanelLeftOpen, Gauge, type LucideIcon } from 'lucide-react';
 import {
   V3_MODULES, V3_PILLAR_META, getModuleAccess, getModuleById, type V3Pillar, type V3Module,
 } from '@/data/roadmapV3';
@@ -437,13 +437,24 @@ const V3HubPage: React.FC = () => {
             >
               <ArrowLeft className="h-4 w-4" /> Retour au cockpit
             </button>
-            <button
-              onClick={() => setTourOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold border transition-all duration-300 hover:bg-[#FFF3DF] hover:border-[#E8951E] hover:-translate-y-0.5 hover:shadow-sm"
-              style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}
-            >
-              <Compass className="h-4 w-4" /> Visite guidée
-            </button>
+            <div className="flex items-center gap-2">
+              {isAdmin && (
+                <button
+                  onClick={() => navigate('/business-center')}
+                  className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold border transition-all duration-300 hover:bg-[#FFF3DF] hover:border-[#E8951E] hover:-translate-y-0.5 hover:shadow-sm"
+                  style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}
+                >
+                  <Gauge className="h-4 w-4" /> Business Center
+                </button>
+              )}
+              <button
+                onClick={() => setTourOpen(true)}
+                className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold border transition-all duration-300 hover:bg-[#FFF3DF] hover:border-[#E8951E] hover:-translate-y-0.5 hover:shadow-sm"
+                style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}
+              >
+                <Compass className="h-4 w-4" /> Visite guidée
+              </button>
+            </div>
           </div>
 
           <div className="v3-rise inline-flex items-center gap-2 mb-5 rounded-full border px-3 py-1"
