@@ -5,9 +5,17 @@
 
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 
-/** Modèles essayés dans l'ordre : si le 1er sature (429/503), on bascule
- *  automatiquement sur un modèle moins chargé au lieu d'attendre 30s. */
-const MODEL_FALLBACKS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.5-flash-lite'];
+/** Modèles essayés dans l'ordre : si le 1er sature (429/503) OU n'est plus
+ *  disponible (404), on bascule automatiquement sur le suivant. Les alias
+ *  "-latest" pointent toujours vers une version servie par Google, ce qui
+ *  évite les 404 quand une version datée est retirée. */
+const MODEL_FALLBACKS = [
+  'gemini-flash-latest',
+  'gemini-2.5-flash',
+  'gemini-2.0-flash',
+  'gemini-2.5-flash-lite',
+  'gemini-flash-lite-latest',
+];
 
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
