@@ -38,6 +38,7 @@ export default function TrialSignupPage() {
   const [accessCode, setAccessCode] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [alreadyUsed, setAlreadyUsed] = useState(false);
 
   const copyCode = async () => {
     if (!accessCode) return;
