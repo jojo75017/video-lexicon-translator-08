@@ -34,6 +34,15 @@ const shell = (inner: string) => `<!doctype html>
 ${inner}
 </table>
 </td></tr>
+<tr><td style="padding:0 32px 26px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#5b6875;line-height:1.6">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #eef1f4;padding-top:18px">
+  <tr><td style="padding-top:18px;text-align:center">
+    Une question avant de vous lancer ? On en parle 👇<br/><br/>
+    <a href="${SITE}/demo" style="display:inline-block;margin:4px 6px;padding:10px 18px;border:1px solid ${TEAL};border-radius:8px;color:${TEAL};text-decoration:none;font-weight:600;font-size:14px">📅 Réserver une démo privée avec Georges</a>
+    <a href="mailto:contact@ebookstudio.fr" style="display:inline-block;margin:4px 6px;padding:10px 18px;border:1px solid #d8dee4;border-radius:8px;color:#5b6875;text-decoration:none;font-weight:600;font-size:14px">💬 Répondre directement à cet email</a>
+  </td></tr>
+  </table>
+</td></tr>
 <tr><td style="padding:20px 32px;background:#f3f5f7;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#9aa4b0;text-align:center">
   EbookStudio — Créez, publiez et vendez vos ebooks avec l'IA.<br/>
   <a href="{{ unsubscribe }}" style="color:#9aa4b0">Se désinscrire</a>
