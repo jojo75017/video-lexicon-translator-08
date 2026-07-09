@@ -32,14 +32,18 @@ interface Metrics {
   todayOpens: number;
   todayClicks: number;
   todaySales: number;
+  todayRevenue: number;
 }
 
 const EMPTY: Metrics = {
   emailsSent: 0, emailsBounced: 0, emailOpens: 0, emailOpensUnique: 0, emailClicks: 0,
   unsubscribes: 0, activeTrials: 0, paidSubscribers: 0, expired: 0, revenue: 0, orders: 0,
   guidesDownloaded: 0, documentsGenerated: 0,
-  todayTrials: 0, todaySent: 0, todayOpens: 0, todayClicks: 0, todaySales: 0,
+  todayTrials: 0, todaySent: 0, todayOpens: 0, todayClicks: 0, todaySales: 0, todayRevenue: 0,
 };
+
+// Volume minimum d'envois avant d'afficher des alertes basées sur des taux
+const MIN_VOLUME = 50;
 
 const startOfToday = () => {
   const d = new Date();
