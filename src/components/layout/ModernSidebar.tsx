@@ -118,6 +118,7 @@ const allToolGroups: ToolGroup[] = [
       { id: 'cover-design-editor', label: 'Éditeur Couverture', icon: Palette, isNew: true },
       { id: 'kdp', label: 'Fiche KDP & A+ Content', icon: TrendingUp },
       { id: 'audit-pilot', label: 'Audit Pilot KDP', icon: ClipboardCheck, isLink: true, href: '/audit-pilot', isNew: true },
+      { id: 'bookperfect', label: 'BookPerfect AI', icon: Sparkles, isLink: true, href: '/bookperfect', isNew: true, isPro: true },
       { id: 'workflow-export', label: 'Export Global Workflow', icon: Download },
       { id: 'calibre-epub', label: 'Export ePub (Calibre)', icon: Download },
       { id: 'cover', label: 'Couverture IA', icon: Sparkles },
