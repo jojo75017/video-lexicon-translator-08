@@ -1188,6 +1188,45 @@ export type Database = {
         }
         Relationships: []
       }
+      module_entitlements: {
+        Row: {
+          amount: number | null
+          created_at: string
+          currency: string | null
+          email: string
+          environment: string
+          id: string
+          module: string
+          status: string
+          stripe_session_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          currency?: string | null
+          email: string
+          environment?: string
+          id?: string
+          module: string
+          status?: string
+          stripe_session_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          currency?: string | null
+          email?: string
+          environment?: string
+          id?: string
+          module?: string
+          status?: string
+          stripe_session_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payment_confirmations: {
         Row: {
           created_at: string
@@ -1790,6 +1829,19 @@ export type Database = {
           ref_code: string
           status: string
           updated_at: string
+        }[]
+      }
+      get_my_module_entitlements: {
+        Args: never
+        Returns: {
+          amount: number
+          created_at: string
+          currency: string
+          email: string
+          environment: string
+          id: string
+          module: string
+          status: string
         }[]
       }
       get_my_v3_installment_orders: {
