@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { SubscriberGate } from '@/components/auth/SubscriberGate';
 import { AdminGate } from '@/components/auth/AdminGate';
 import { V3Gate } from '@/components/auth/V3Gate';
+import { BookPerfectGate } from '@/components/auth/BookPerfectGate';
 import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 import { Loader2 } from 'lucide-react';
 import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup';
