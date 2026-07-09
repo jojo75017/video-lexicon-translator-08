@@ -14,6 +14,8 @@ import {
   Sparkles,
   ArrowRight,
   BookOpen,
+  Copy,
+  Check,
 } from "lucide-react";
 
 const TEAL = "#008296";
