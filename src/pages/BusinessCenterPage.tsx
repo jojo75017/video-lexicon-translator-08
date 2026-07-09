@@ -128,25 +128,50 @@ const BusinessCenterPage = () => {
   const totalContacts = m.paidSubscribers + m.activeTrials + m.expired;
   const conversionRate = totalContacts > 0 ? (m.paidSubscribers / totalContacts) * 100 : 0;
 
-  // Health diagnostics
+  // Health diagnostics — les alertes basées sur des taux ne s'affichent
+  // qu'au-delà d'un volume significatif pour éviter les indicateurs trompeurs.
+  const hasVolume = m.emailsSent >= MIN_VOLUME;
   const diagnostics: { tone: 'good' | 'warn' | 'bad'; text: string }[] = [];
-  if (m.todaySent > 0 && m.todayOpens === 0) {
-    diagnostics.push({ tone: 'bad', text: "Des emails partent mais aucun n'est ouvert aujourd'hui. Vérifiez l'objet de vos emails." });
+
+  if (!hasVolume) {
+    diagnostics.push({
+      tone: 'good',
+      text: `📊 Volume encore trop faible pour des statistiques fiables (${m.emailsSent} email${m.emailsSent > 1 ? 's' : ''} envoyé${m.emailsSent > 1 ? 's' : ''}). Les alertes s'activeront à partir de ${MIN_VOLUME} envois.`,
+    });
+  } else {
+    if (m.todaySent > 0 && m.todayOpens === 0) {
+      diagnostics.push({ tone: 'bad', text: "Des emails partent mais aucun n'est ouvert aujourd'hui. Vérifiez l'objet de vos emails." });
+    }
+    if (openRate > 0 && openRate < 15) {
+      diagnostics.push({ tone: 'warn', text: `Taux d'ouverture faible (${openRate.toFixed(0)}%). Travaillez des objets plus accrocheurs.` });
+    }
+    if (m.emailOpensUnique > 20 && clickToOpen < 5) {
+      diagnostics.push({ tone: 'warn', text: `Beaucoup d'ouvertures mais peu de clics (${clickToOpen.toFixed(0)}%). Améliorez votre appel à l'action.` });
+    }
+    if (bounceRate > 10) {
+      diagnostics.push({ tone: 'warn', text: `Taux de rebond élevé (${bounceRate.toFixed(0)}%). Nettoyez votre liste d'emails.` });
+    }
+    if (conversionRate >= 5) {
+      diagnostics.push({ tone: 'good', text: `Excellent taux de conversion (${conversionRate.toFixed(1)}%). Votre tunnel fonctionne bien !` });
+    }
+    if (diagnostics.length === 0) {
+      diagnostics.push({ tone: 'good', text: 'Tous les indicateurs sont dans le vert. Continuez comme ça !' });
+    }
   }
-  if (openRate > 0 && openRate < 15) {
-    diagnostics.push({ tone: 'warn', text: `Taux d'ouverture faible (${openRate.toFixed(0)}%). Travaillez des objets plus accrocheurs.` });
-  }
-  if (m.emailOpensUnique > 20 && clickToOpen < 5) {
-    diagnostics.push({ tone: 'warn', text: `Beaucoup d'ouvertures mais peu de clics (${clickToOpen.toFixed(0)}%). Améliorez votre appel à l'action.` });
-  }
-  if (bounceRate > 10) {
-    diagnostics.push({ tone: 'warn', text: `Taux de rebond élevé (${bounceRate.toFixed(0)}%). Nettoyez votre liste d'emails.` });
-  }
-  if (conversionRate >= 5) {
-    diagnostics.push({ tone: 'good', text: `Excellent taux de conversion (${conversionRate.toFixed(1)}%). Votre tunnel fonctionne bien !` });
-  }
-  if (diagnostics.length === 0) {
-    diagnostics.push({ tone: 'good', text: 'Tous les indicateurs sont dans le vert. Continuez comme ça !' });
+
+  // Synthèse "Aujourd'hui" (ligne vivante avec note étoilée)
+  const todayActivity = m.todayTrials + m.todaySent + m.todayOpens + m.todayClicks + m.todaySales;
+  let todaySummary: { stars: string; text: string; tone: 'good' | 'warn' | 'bad' };
+  if (todayActivity === 0) {
+    todaySummary = { stars: '', text: "Pas encore d'activité aujourd'hui — les données s'afficheront dès les premières inscriptions.", tone: 'warn' };
+  } else if (m.todaySales > 0) {
+    todaySummary = { stars: '⭐⭐⭐⭐⭐', text: 'Tunnel en bonne santé — au moins une vente aujourd\'hui !', tone: 'good' };
+  } else if (m.todayTrials >= 3 && m.todayOpens === 0) {
+    todaySummary = { stars: '⭐⭐', text: "Beaucoup d'inscriptions mais peu d'ouvertures. Vérifiez l'objet de vos emails.", tone: 'warn' };
+  } else if (m.todayOpens > 0 && m.todayClicks === 0) {
+    todaySummary = { stars: '⭐⭐⭐', text: "Des ouvertures mais peu de clics. Améliorez votre appel à l'action.", tone: 'warn' };
+  } else {
+    todaySummary = { stars: '⭐⭐⭐⭐', text: 'Bonne dynamique aujourd\'hui, continuez comme ça !', tone: 'good' };
   }
 
   if (loading) {
