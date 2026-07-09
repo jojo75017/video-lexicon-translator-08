@@ -32,14 +32,18 @@ interface Metrics {
   todayOpens: number;
   todayClicks: number;
   todaySales: number;
+  todayRevenue: number;
 }
 
 const EMPTY: Metrics = {
   emailsSent: 0, emailsBounced: 0, emailOpens: 0, emailOpensUnique: 0, emailClicks: 0,
   unsubscribes: 0, activeTrials: 0, paidSubscribers: 0, expired: 0, revenue: 0, orders: 0,
   guidesDownloaded: 0, documentsGenerated: 0,
-  todayTrials: 0, todaySent: 0, todayOpens: 0, todayClicks: 0, todaySales: 0,
+  todayTrials: 0, todaySent: 0, todayOpens: 0, todayClicks: 0, todaySales: 0, todayRevenue: 0,
 };
+
+// Volume minimum d'envois avant d'afficher des alertes basées sur des taux
+const MIN_VOLUME = 50;
 
 const startOfToday = () => {
   const d = new Date();
@@ -97,6 +101,9 @@ const BusinessCenterPage = () => {
       const paidOrders = (fo || []).filter((o: any) => o.status === 'paid');
       const revenue = paidOrders.reduce((s: number, o: any) => s + Number(o.amount || 0), 0);
       const todaySales = paidOrders.filter((o: any) => (o.paid_at || '') >= today).length;
+      const todayRevenue = paidOrders
+        .filter((o: any) => (o.paid_at || '') >= today)
+        .reduce((s: number, o: any) => s + Number(o.amount || 0), 0);
 
       setM({
         emailsSent, emailsBounced,
@@ -104,7 +111,7 @@ const BusinessCenterPage = () => {
         unsubscribes, activeTrials, paidSubscribers, expired,
         revenue, orders: paidOrders.length,
         guidesDownloaded, documentsGenerated,
-        todayTrials, todaySent, todayOpens, todayClicks, todaySales,
+        todayTrials, todaySent, todayOpens, todayClicks, todaySales, todayRevenue,
       });
     } catch (err) {
       console.error('BusinessCenter fetch error:', err);
@@ -121,25 +128,50 @@ const BusinessCenterPage = () => {
   const totalContacts = m.paidSubscribers + m.activeTrials + m.expired;
   const conversionRate = totalContacts > 0 ? (m.paidSubscribers / totalContacts) * 100 : 0;
 
-  // Health diagnostics
+  // Health diagnostics — les alertes basées sur des taux ne s'affichent
+  // qu'au-delà d'un volume significatif pour éviter les indicateurs trompeurs.
+  const hasVolume = m.emailsSent >= MIN_VOLUME;
   const diagnostics: { tone: 'good' | 'warn' | 'bad'; text: string }[] = [];
-  if (m.todaySent > 0 && m.todayOpens === 0) {
-    diagnostics.push({ tone: 'bad', text: "Des emails partent mais aucun n'est ouvert aujourd'hui. Vérifiez l'objet de vos emails." });
+
+  if (!hasVolume) {
+    diagnostics.push({
+      tone: 'good',
+      text: `📊 Volume encore trop faible pour des statistiques fiables (${m.emailsSent} email${m.emailsSent > 1 ? 's' : ''} envoyé${m.emailsSent > 1 ? 's' : ''}). Les alertes s'activeront à partir de ${MIN_VOLUME} envois.`,
+    });
+  } else {
+    if (m.todaySent > 0 && m.todayOpens === 0) {
+      diagnostics.push({ tone: 'bad', text: "Des emails partent mais aucun n'est ouvert aujourd'hui. Vérifiez l'objet de vos emails." });
+    }
+    if (openRate > 0 && openRate < 15) {
+      diagnostics.push({ tone: 'warn', text: `Taux d'ouverture faible (${openRate.toFixed(0)}%). Travaillez des objets plus accrocheurs.` });
+    }
+    if (m.emailOpensUnique > 20 && clickToOpen < 5) {
+      diagnostics.push({ tone: 'warn', text: `Beaucoup d'ouvertures mais peu de clics (${clickToOpen.toFixed(0)}%). Améliorez votre appel à l'action.` });
+    }
+    if (bounceRate > 10) {
+      diagnostics.push({ tone: 'warn', text: `Taux de rebond élevé (${bounceRate.toFixed(0)}%). Nettoyez votre liste d'emails.` });
+    }
+    if (conversionRate >= 5) {
+      diagnostics.push({ tone: 'good', text: `Excellent taux de conversion (${conversionRate.toFixed(1)}%). Votre tunnel fonctionne bien !` });
+    }
+    if (diagnostics.length === 0) {
+      diagnostics.push({ tone: 'good', text: 'Tous les indicateurs sont dans le vert. Continuez comme ça !' });
+    }
   }
-  if (openRate > 0 && openRate < 15) {
-    diagnostics.push({ tone: 'warn', text: `Taux d'ouverture faible (${openRate.toFixed(0)}%). Travaillez des objets plus accrocheurs.` });
-  }
-  if (m.emailOpensUnique > 20 && clickToOpen < 5) {
-    diagnostics.push({ tone: 'warn', text: `Beaucoup d'ouvertures mais peu de clics (${clickToOpen.toFixed(0)}%). Améliorez votre appel à l'action.` });
-  }
-  if (bounceRate > 10) {
-    diagnostics.push({ tone: 'warn', text: `Taux de rebond élevé (${bounceRate.toFixed(0)}%). Nettoyez votre liste d'emails.` });
-  }
-  if (conversionRate >= 5) {
-    diagnostics.push({ tone: 'good', text: `Excellent taux de conversion (${conversionRate.toFixed(1)}%). Votre tunnel fonctionne bien !` });
-  }
-  if (diagnostics.length === 0) {
-    diagnostics.push({ tone: 'good', text: 'Tous les indicateurs sont dans le vert. Continuez comme ça !' });
+
+  // Synthèse "Aujourd'hui" (ligne vivante avec note étoilée)
+  const todayActivity = m.todayTrials + m.todaySent + m.todayOpens + m.todayClicks + m.todaySales;
+  let todaySummary: { stars: string; text: string; tone: 'good' | 'warn' | 'bad' };
+  if (todayActivity === 0) {
+    todaySummary = { stars: '', text: "Pas encore d'activité aujourd'hui — les données s'afficheront dès les premières inscriptions.", tone: 'warn' };
+  } else if (m.todaySales > 0) {
+    todaySummary = { stars: '⭐⭐⭐⭐⭐', text: 'Tunnel en bonne santé — au moins une vente aujourd\'hui !', tone: 'good' };
+  } else if (m.todayTrials >= 3 && m.todayOpens === 0) {
+    todaySummary = { stars: '⭐⭐', text: "Beaucoup d'inscriptions mais peu d'ouvertures. Vérifiez l'objet de vos emails.", tone: 'warn' };
+  } else if (m.todayOpens > 0 && m.todayClicks === 0) {
+    todaySummary = { stars: '⭐⭐⭐', text: "Des ouvertures mais peu de clics. Améliorez votre appel à l'action.", tone: 'warn' };
+  } else {
+    todaySummary = { stars: '⭐⭐⭐⭐', text: 'Bonne dynamique aujourd\'hui, continuez comme ça !', tone: 'good' };
   }
 
   if (loading) {
@@ -189,6 +221,28 @@ const BusinessCenterPage = () => {
           </div>
         </div>
 
+        {/* ═══ KPI ESSENTIELS ═══ */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card className="border-2 border-emerald-500/40 bg-gradient-to-br from-emerald-500/10 to-transparent">
+            <CardContent className="p-6 flex items-center gap-4">
+              <div className="text-4xl">💰</div>
+              <div>
+                <p className="text-4xl font-black text-emerald-500">{m.todayRevenue.toLocaleString('fr-FR')} €</p>
+                <p className="text-sm text-muted-foreground mt-1">Revenu généré aujourd'hui</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-2 border-amber-500/40 bg-gradient-to-br from-amber-500/10 to-transparent">
+            <CardContent className="p-6 flex items-center gap-4">
+              <div className="text-4xl">📈</div>
+              <div>
+                <p className="text-4xl font-black text-amber-500">{conversionRate.toFixed(1)}%</p>
+                <p className="text-sm text-muted-foreground mt-1">Taux Essai → Achat</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* ═══ SANTÉ DU BUSINESS (Aujourd'hui) ═══ */}
         <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-transparent">
           <CardHeader>
@@ -199,23 +253,37 @@ const BusinessCenterPage = () => {
             <CardDescription>Snapshot en temps réel de votre journée</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
               {[
                 { label: 'Nouveaux essais', value: m.todayTrials, emoji: '👥' },
                 { label: 'Emails envoyés', value: m.todaySent, emoji: '📧' },
                 { label: 'Ouverts', value: m.todayOpens, emoji: '👀' },
                 { label: 'Clics', value: m.todayClicks, emoji: '🖱️' },
                 { label: 'Ventes', value: m.todaySales, emoji: '💳' },
+                { label: 'Revenu', value: `${m.todayRevenue.toLocaleString('fr-FR')} €`, emoji: '💰', isMoney: true },
               ].map((s) => (
                 <div key={s.label} className="text-center rounded-xl bg-card/70 border border-border p-4">
                   <div className="text-2xl mb-1">{s.emoji}</div>
-                  <div className={`text-3xl font-black ${s.value > 0 ? 'text-emerald-500' : 'text-muted-foreground'}`}>
+                  <div className={`text-3xl font-black ${(s.isMoney ? m.todayRevenue > 0 : (s.value as number) > 0) ? 'text-emerald-500' : 'text-muted-foreground'}`}>
                     {s.value}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">{s.label}</div>
                 </div>
               ))}
             </div>
+
+            {/* Synthèse du jour */}
+            <div
+              className={`flex items-center gap-3 rounded-xl p-4 ${
+                todaySummary.tone === 'good' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                : todaySummary.tone === 'warn' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                : 'bg-red-500/10 text-red-600 dark:text-red-400'
+              }`}
+            >
+              {todaySummary.stars && <span className="text-lg shrink-0">{todaySummary.stars}</span>}
+              <span className="font-semibold text-sm">{todaySummary.text}</span>
+            </div>
+
 
             <div className="space-y-2">
               {diagnostics.map((d, i) => (
