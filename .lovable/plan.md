@@ -1,43 +1,48 @@
-# Améliorations Business Center + Code d'accès à l'écran
+## Objectif
 
-## 1. Alertes fiables (seuil de volume)
-Aujourd'hui, l'alerte « Taux de rebond élevé (92 %) » s'affiche même avec 1 seul email de test → trompeur.
+Rendre les corrections de BookPerfect AI transparentes pour l'auteur, en deux volets :
 
-**Correctif** (`src/pages/BusinessCenterPage.tsx`) : n'afficher les diagnostics basés sur des taux que si le volume est significatif.
-- Alertes rebond / ouverture / clic : seulement si `emailsSent >= 50`.
-- En dessous du seuil, afficher un message neutre : *« 📊 Volume encore trop faible pour des statistiques fiables (X emails envoyés). Les alertes s'activeront à partir de 50 envois. »*
-- Le taux de rebond affiché dans la grille KPI reste visible, mais sans déclencher d'alerte rouge tant que le seuil n'est pas atteint.
+1. **Voir corriger « en direct »** : pendant l'analyse, afficher au fil de l'eau les corrections trouvées chapitre par chapitre (comme si l'auteur regardait le directeur éditorial travailler).
+2. **Comparer avec l'original** : un onglet/bouton affichant, côte à côte, le texte original et le texte corrigé, avec les différences mises en évidence, avant que l'auteur ne valide.
 
-## 2. KPI essentiels en haut
-Ajouter deux cartes mises en avant, juste sous la section « Aujourd'hui » :
-- 💰 **Revenu généré aujourd'hui** : somme des `funnel_orders` payées avec `paid_at >= aujourd'hui` (nouveau calcul `todayRevenue`).
-- 📈 **Taux Essai → Achat** : `paidSubscribers / (paidSubscribers + activeTrials + expired)` — déjà calculé (`conversionRate`), mais remonté en carte majeure et renommé pour être explicite.
+Le tout reste **non destructif** (le texte original en mémoire n'est jamais muté) et 100 % frontend — aucune modification du backend, de la logique d'analyse IA, ni du modèle de prix.
 
-Ces deux cartes seront plus grandes et colorées (emerald / amber) pour marquer leur importance.
+---
 
-## 3. Section « Aujourd'hui » plus vivante
-La section existe déjà (essais, emails, ouverts, clics, ventes). Améliorations :
-- Ajouter le **revenu du jour** dans la rangée.
-- Ajouter une **ligne de synthèse dynamique** avec note étoilée selon la santé :
-  - Bonne activité + au moins 1 vente → *« ⭐⭐⭐⭐⭐ Tunnel en bonne santé »*
-  - Beaucoup d'essais mais peu d'ouvertures → conseil objet email
-  - Beaucoup d'ouvertures mais peu de clics → conseil call-to-action
-  - Aucune activité aujourd'hui → message neutre d'attente
+## Volet 1 — Analyse en direct (« live »)
 
-## 4. Afficher le code d'accès à l'écran (option choisie)
-Aujourd'hui le code `EBK-XXXXXX` n'est envoyé que par email. On l'affichera aussi immédiatement après l'inscription.
+Enrichir `src/components/bookperfect/AnalysisProgress.tsx` :
+- Sous la liste des chapitres, ajouter un **flux en temps réel** des dernières corrections détectées (`analysis.issues`, triées par ordre d'apparition, les plus récentes en haut, limité aux ~12 dernières).
+- Chaque ligne montre : le chapitre, la catégorie (badge coloré), l'extrait `original` barré → la `suggestion` en surbrillance verte, façon « diff inline » (réutilise le style déjà présent dans `IssueCard`).
+- Le chapitre en cours d'analyse est mis en évidence (« ✍️ Correction en cours… »).
+- Comme `onProgress` est déjà appelé après chaque chapitre dans l'orchestrateur, le flux se remplit automatiquement chapitre après chapitre, sans toucher à `analysisOrchestrator.ts`.
 
-**Backend** (`supabase/functions/trial-signup/index.ts`) :
-- Ajouter `access_code` et `trial_ends_at` dans la réponse JSON de succès.
+## Volet 2 — Onglet « Comparer avec l'original »
 
-**Frontend** (`src/pages/TrialSignupPage.tsx`) :
-- Stocker le code renvoyé et l'afficher dans l'écran de confirmation, dans un encadré bien visible (même style que l'email : grand, monospace, couleur teal).
-- Texte : *« Votre code d'accès (notez-le) »* + le code + bouton « Copier ».
-- Conserver le message expliquant que l'email contient aussi le code + le bonus PDF + le lien de connexion.
-- Garder le bouton « Me connecter maintenant » vers `/subscription`.
+Nouveau composant `src/components/bookperfect/tabs/ComparaisonTab.tsx` :
+- **Sélecteur de chapitre** (menu déroulant) en haut.
+- Affichage **côte à côte** (2 colonnes sur desktop, empilées sur mobile) :
+  - Colonne gauche : **texte original** du chapitre.
+  - Colonne droite : **texte corrigé** = `correctedChapterText(chapter, analysis, false)` (corrections `applied` uniquement, sans imposer la typo pour garder la lecture claire — option « voir avec typographie FR » cochable).
+- **Mise en évidence des différences** : les segments supprimés en rouge barré, les segments ajoutés en vert. Un petit utilitaire de diff mot-à-mot (`src/lib/bookperfect/textDiff.ts`) produit les segments à colorer ; pas de nouvelle dépendance, un diff LCS léger suffit.
+- **Bandeau de synthèse** : « X correction(s) appliquée(s), Y en attente » pour ce chapitre, avec rappel que seules les corrections validées apparaissent à droite.
+- Note explicative : « Validez ou ignorez les corrections dans les onglets Orthographe / Style / KDP ; cette vue reflète en direct vos choix. »
+
+## Intégration dans la page
+
+Dans `src/pages/BookPerfectPage.tsx` :
+- Ajouter un onglet **« Comparer »** (icône `Columns`/`GitCompare`) dans la `TabsList`, entre « Style » et « Amazon KDP » (ou après « Rapport »).
+- Câbler `ComparaisonTab` avec `manuscript` et `analysis`.
+
+---
 
 ## Détails techniques
-- Fichiers modifiés : `src/pages/BusinessCenterPage.tsx`, `src/pages/TrialSignupPage.tsx`, `supabase/functions/trial-signup/index.ts`.
-- Aucun changement de schéma de base de données.
-- La fonction edge sera redéployée après modification.
-- Le code d'accès est déjà généré côté serveur (aucune donnée sensible supplémentaire exposée : le visiteur reçoit uniquement son propre code).
+
+- `src/lib/bookperfect/textDiff.ts` (nouveau) : fonction `diffWords(original, corrected)` renvoyant un tableau de segments `{ type: 'equal' | 'removed' | 'added', text }` via un algorithme LCS simple sur les mots. Utilisé uniquement pour l'affichage.
+- `correctedChapterText` (déjà existant dans `exporters.ts`) est réutilisé tel quel pour produire le texte corrigé — cohérence garantie avec l'export Word.
+- Aucune modification de `analysisOrchestrator.ts`, des types, du backend ou de la tarification.
+- Fichiers touchés :
+  - créé : `src/lib/bookperfect/textDiff.ts`
+  - créé : `src/components/bookperfect/tabs/ComparaisonTab.tsx`
+  - édité : `src/components/bookperfect/AnalysisProgress.tsx` (flux live)
+  - édité : `src/pages/BookPerfectPage.tsx` (nouvel onglet)

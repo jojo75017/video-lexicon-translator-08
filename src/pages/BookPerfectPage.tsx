@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft, BookOpen, Play, RotateCcw, Sparkles, Bug, Feather, ShoppingCart, FileText, Square,
+  ArrowLeft, BookOpen, Play, RotateCcw, Sparkles, Bug, Feather, ShoppingCart, FileText, Square, Columns,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -14,6 +14,7 @@ import { AnalysisProgress } from '@/components/bookperfect/AnalysisProgress';
 import { ScoreDashboard } from '@/components/bookperfect/ScoreDashboard';
 import { IssueListTab } from '@/components/bookperfect/shared/IssueListTab';
 import { AmazonKdpTab } from '@/components/bookperfect/tabs/AmazonKdpTab';
+import { ComparaisonTab } from '@/components/bookperfect/tabs/ComparaisonTab';
 import { RapportFinalTab } from '@/components/bookperfect/tabs/RapportFinalTab';
 import {
   runAnalysis, loadAnalysis, updateIssueStatus,
@@ -171,9 +172,11 @@ const BookPerfectPage: React.FC = () => {
                   <TabsTrigger value="traces-ia" className="gap-1"><Bug className="h-4 w-4" /> Traces IA</TabsTrigger>
                   <TabsTrigger value="orthographe" className="gap-1"><FileText className="h-4 w-4" /> Orthographe</TabsTrigger>
                   <TabsTrigger value="style" className="gap-1"><Feather className="h-4 w-4" /> Style</TabsTrigger>
+                  <TabsTrigger value="comparer" className="gap-1"><Columns className="h-4 w-4" /> Comparer</TabsTrigger>
                   <TabsTrigger value="kdp" className="gap-1"><ShoppingCart className="h-4 w-4" /> Amazon KDP</TabsTrigger>
                   <TabsTrigger value="rapport" className="gap-1"><FileText className="h-4 w-4" /> Rapport</TabsTrigger>
                 </TabsList>
+
 
                 <TabsContent value="traces-ia" className="mt-4">
                   <IssueListTab analysis={analysis} category="traces-ia"
@@ -193,6 +196,10 @@ const BookPerfectPage: React.FC = () => {
                     icon={<Feather className="h-5 w-5 text-primary" />}
                     onApply={onApply} onIgnore={onIgnore} onReset={onReset} />
                 </TabsContent>
+                <TabsContent value="comparer" className="mt-4">
+                  <ComparaisonTab manuscript={manuscript} analysis={analysis} />
+                </TabsContent>
+
                 <TabsContent value="kdp" className="mt-4">
                   <AmazonKdpTab analysis={analysis} onApply={onApply} onIgnore={onIgnore} onReset={onReset} />
                 </TabsContent>
