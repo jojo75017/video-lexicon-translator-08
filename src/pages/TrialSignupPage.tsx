@@ -72,6 +72,7 @@ export default function TrialSignupPage() {
       });
       if (fnError) throw fnError;
       if (data && data.ok === false) throw new Error(data.error || "Erreur");
+      if (data && data.access_code) setAccessCode(data.access_code as string);
       setDone(true);
     } catch (err) {
       setError(
