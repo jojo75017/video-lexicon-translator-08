@@ -27,7 +27,7 @@ export const SIDEBAR_SUBSECTIONS: Record<string, SidebarSectionConfig[]> = {
   '3️⃣ Publier': [
     { label: 'Couverture', itemIds: ['cover-design-editor', 'cover', 'backcover'] },
     { label: 'Export', itemIds: ['export', 'workflow-export', 'calibre-epub'] },
-    { label: 'KDP', itemIds: ['kdp', 'kdp-prepublish-checklist', 'kdp-keywords-pro', 'audit-pilot'] },
+    { label: 'KDP', itemIds: ['kdp', 'kdp-prepublish-checklist', 'kdp-keywords-pro', 'audit-pilot', 'bookperfect'] },
     { label: 'Audio', itemIds: ['audiobook', 'audio-express'] },
   ],
   '4️⃣ Vendre': [
