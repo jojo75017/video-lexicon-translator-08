@@ -1,8 +1,9 @@
 import React from 'react';
-import { Loader2, CheckCircle2, XCircle, Circle } from 'lucide-react';
+import { Loader2, CheckCircle2, XCircle, Circle, Pencil } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import type { Analysis, Manuscript } from '@/lib/bookperfect/types';
+import { CATEGORY_LABELS } from '@/lib/bookperfect/types';
+import type { Analysis, IssueCategory, Manuscript } from '@/lib/bookperfect/types';
 
 interface Props {
   manuscript: Manuscript;
@@ -10,11 +11,22 @@ interface Props {
   runningIndex: number | null;
 }
 
+const CATEGORY_BADGE: Record<IssueCategory, string> = {
+  'traces-ia': 'bg-destructive/10 text-destructive border-destructive/30',
+  orthographe: 'bg-primary/10 text-primary border-primary/30',
+  style: 'bg-amber-500/10 text-amber-600 border-amber-500/30',
+  kdp: 'bg-purple-500/10 text-purple-600 border-purple-500/30',
+};
+
 export const AnalysisProgress: React.FC<Props> = ({ manuscript, analysis, runningIndex }) => {
   const total = manuscript.chapters.length;
   const done = analysis.chapterResults.filter((r) => r.status === 'done').length;
   const failed = analysis.chapterResults.filter((r) => r.status === 'failed').length;
   const pct = Math.round(((done + failed) / total) * 100);
+
+  const runningTitle = runningIndex != null ? manuscript.chapters[runningIndex]?.title : null;
+  // Flux "en direct" : les dernières corrections détectées, plus récentes en haut.
+  const liveIssues = [...analysis.issues].reverse().slice(0, 12);
 
   return (
     <Card>
