@@ -11,6 +11,8 @@ import { OpenAIConfigPanel } from '@/components/shared/OpenAIConfigPanel';
 import { isAIConfigured } from '@/services/aiWritingService';
 import { BookPerfectDashboard } from '@/components/bookperfect/BookPerfectDashboard';
 import { AnalysisProgress } from '@/components/bookperfect/AnalysisProgress';
+import { EditorAtWork } from '@/components/bookperfect/EditorAtWork';
+import { AnalysisSummary } from '@/components/bookperfect/AnalysisSummary';
 import { ScoreDashboard } from '@/components/bookperfect/ScoreDashboard';
 import { IssueListTab } from '@/components/bookperfect/shared/IssueListTab';
 import { AmazonKdpTab } from '@/components/bookperfect/tabs/AmazonKdpTab';
