@@ -155,12 +155,17 @@ const BookPerfectPage: React.FC = () => {
                 </div>
                 {!running ? (
                   <div className="flex flex-wrap gap-2">
-                    {!hasResults && (
+                    {paused && (
+                      <Button onClick={() => start(true)} className="gap-2 bg-amber-600 hover:bg-amber-700 text-white">
+                        <RotateCcw className="h-4 w-4" /> Reprendre l'analyse
+                      </Button>
+                    )}
+                    {!hasResults && !paused && (
                       <Button onClick={() => start(false)} className="gap-2">
                         <Play className="h-4 w-4" /> Lancer l'analyse
                       </Button>
                     )}
-                    {hasResults && failedCount > 0 && (
+                    {hasResults && !paused && failedCount > 0 && (
                       <Button onClick={() => start(true)} className="gap-2">
                         <RotateCcw className="h-4 w-4" /> Reprendre ({failedCount} en échec)
                       </Button>
@@ -180,9 +185,30 @@ const BookPerfectPage: React.FC = () => {
               </CardContent>
             </Card>
 
-            {running && analysis && (
-              <AnalysisProgress manuscript={manuscript} analysis={analysis} runningIndex={runningIndex} />
+            {paused && !running && (
+              <Card className="border-amber-500/40 bg-amber-500/5">
+                <CardContent className="p-4 flex flex-wrap items-center gap-3">
+                  <span className="text-sm text-amber-700 dark:text-amber-400 flex-1 min-w-[200px]">
+                    ⏸️ Analyse en pause. {pausedMessage}
+                  </span>
+                  <Button onClick={() => start(true)} className="gap-2 bg-amber-600 hover:bg-amber-700 text-white">
+                    <RotateCcw className="h-4 w-4" /> Reprendre
+                  </Button>
+                </CardContent>
+              </Card>
             )}
+
+            {running && analysis && (
+              <div className="grid gap-6 lg:grid-cols-[1fr_360px] items-start">
+                <AnalysisProgress manuscript={manuscript} analysis={analysis} runningIndex={runningIndex} />
+                <EditorAtWork manuscript={manuscript} analysis={analysis} runningIndex={runningIndex} />
+              </div>
+            )}
+
+            {justCompleted && !running && analysis && (
+              <AnalysisSummary manuscript={manuscript} analysis={analysis} elapsedMs={elapsedMs} />
+            )}
+
 
             {analysis?.scores && <ScoreDashboard scores={analysis.scores} />}
 
