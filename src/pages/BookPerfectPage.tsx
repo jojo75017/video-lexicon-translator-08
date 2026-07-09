@@ -19,7 +19,7 @@ import { AmazonKdpTab } from '@/components/bookperfect/tabs/AmazonKdpTab';
 import { ComparaisonTab } from '@/components/bookperfect/tabs/ComparaisonTab';
 import { RapportFinalTab } from '@/components/bookperfect/tabs/RapportFinalTab';
 import {
-  runAnalysis, loadAnalysis, updateIssueStatus,
+  runAnalysis, loadAnalysis, loadRecoverySnapshot, updateIssueStatus, BOOKPERFECT_RECOVERY_SCOPE,
 } from '@/lib/bookperfect/analysisOrchestrator';
 import { readAutosave, writeAutosave } from '@/lib/ebookProjectStorage';
 import type { Analysis, Manuscript } from '@/lib/bookperfect/types';
@@ -51,6 +51,21 @@ const BookPerfectPage: React.FC = () => {
         setPaused(true);
         setPausedMessage('Analyse interrompue : vous pouvez reprendre exactement où elle s’est arrêtée.');
       }
+      return;
+    }
+
+    const recovery = loadRecoverySnapshot();
+    if (recovery?.manuscript?.id && recovery.analysis?.chapterResults?.some((r) => r.status !== 'done')) {
+      setManuscript(recovery.manuscript);
+      writeAutosave(CURRENT_MANUSCRIPT_SCOPE, recovery.manuscript);
+      setAnalysis({
+        ...recovery.analysis,
+        chapterResults: recovery.analysis.chapterResults.map((r) => (
+          r.status === 'running' ? { ...r, status: 'pending' } : r
+        )),
+      });
+      setPaused(true);
+      setPausedMessage('Analyse interrompue : vous pouvez reprendre exactement où elle s’est arrêtée.');
     }
   }, []);
 
@@ -135,6 +150,7 @@ const BookPerfectPage: React.FC = () => {
     setElapsedMs(null);
     setJustCompleted(false);
     writeAutosave<Manuscript | null>(CURRENT_MANUSCRIPT_SCOPE, null);
+    writeAutosave(BOOKPERFECT_RECOVERY_SCOPE, null);
   };
 
   const hasResults = !!analysis && analysis.chapterResults.some((r) => r.status === 'done' || r.status === 'failed');
