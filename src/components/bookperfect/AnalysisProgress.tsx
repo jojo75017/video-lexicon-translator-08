@@ -57,7 +57,50 @@ export const AnalysisProgress: React.FC<Props> = ({ manuscript, analysis, runnin
             );
           })}
         </div>
+
+        {/* Flux en direct — "regardez le directeur éditorial corriger" */}
+        <div className="rounded-lg border bg-muted/30">
+          <div className="border-b px-3 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
+            <Pencil className="h-3.5 w-3.5 text-primary" />
+            Corrections en direct
+            {runningTitle && (
+              <span className="ml-auto normal-case font-normal text-primary flex items-center gap-1">
+                <Loader2 className="h-3 w-3 animate-spin" /> ✍️ {runningTitle}
+              </span>
+            )}
+          </div>
+          <div className="max-h-[280px] overflow-y-auto p-3 space-y-2">
+            {liveIssues.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-4 text-center">
+                Les corrections détectées s'afficheront ici au fil de l'analyse…
+              </p>
+            ) : (
+              liveIssues.map((issue) => (
+                <div key={issue.id} className="text-sm border-b border-border/50 pb-2 last:border-0 last:pb-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`text-[10px] uppercase tracking-wide border rounded px-1.5 py-0.5 ${CATEGORY_BADGE[issue.category]}`}>
+                      {CATEGORY_LABELS[issue.category]}
+                    </span>
+                    <span className="text-xs text-muted-foreground truncate">{issue.chapterTitle}</span>
+                  </div>
+                  {issue.original && (
+                    <p className="leading-relaxed">
+                      <span className="line-through decoration-destructive/60 bg-destructive/5 px-1 rounded">{issue.original}</span>
+                      {issue.suggestion && (
+                        <>
+                          {' → '}
+                          <span className="bg-green-500/10 text-green-700 dark:text-green-400 px-1 rounded font-medium">{issue.suggestion}</span>
+                        </>
+                      )}
+                    </p>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       </CardContent>
+
     </Card>
   );
 };
