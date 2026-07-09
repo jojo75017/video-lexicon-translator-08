@@ -258,17 +258,21 @@ export async function runAnalysis(
 
   const saved = opts.resumeOnly ? loadAnalysis(manuscript.id) : null;
   const baseAnalysis = opts.resumeOnly ? (opts.existing || saved) : null;
-  const analysis: Analysis = baseAnalysis
-    ? {
-      ...baseAnalysis,
+  let analysis: Analysis;
+  if (baseAnalysis) {
+    const previousAnalysis = baseAnalysis;
+    analysis = {
+      ...previousAnalysis,
       chapterResults: manuscript.chapters.map((chapter) => {
-        const previous = baseAnalysis.chapterResults.find((r) => r.chapterId === chapter.id);
+        const previous = previousAnalysis.chapterResults.find((r) => r.chapterId === chapter.id);
         if (!previous) return { chapterId: chapter.id, status: 'pending', attempts: 0 };
         return previous.status === 'running' ? { ...previous, status: 'pending' } : previous;
       }),
-      issues: baseAnalysis.issues.filter((issue) => manuscript.chapters.some((chapter) => chapter.id === issue.chapterId)),
-    }
-    : emptyAnalysis(manuscript);
+      issues: previousAnalysis.issues.filter((issue) => manuscript.chapters.some((chapter) => chapter.id === issue.chapterId)),
+    };
+  } else {
+    analysis = emptyAnalysis(manuscript);
+  }
 
   const total = manuscript.chapters.length;
 
