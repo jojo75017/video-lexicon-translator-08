@@ -50,8 +50,8 @@ const BookPerfectPage: React.FC = () => {
       if (savedAnalysis?.chapterResults.some((r) => r.status !== 'done')) {
         setPaused(true);
         setPausedMessage('Analyse interrompue : vous pouvez reprendre exactement où elle s’est arrêtée.');
+        return;
       }
-      return;
     }
 
     const recovery = loadRecoverySnapshot();
