@@ -43,13 +43,13 @@ export const IssueListTab: React.FC<Props> = ({ analysis, category, title, descr
             🎉 Aucun point détecté dans cette catégorie.
           </p>
         ) : (
-          <ScrollArea className="h-[520px] pr-3">
+          <div className="max-h-[520px] overflow-y-auto pr-3">
             <div className="space-y-2">
               {issues.map((issue) => (
                 <IssueCard key={issue.id} issue={issue} onApply={onApply} onIgnore={onIgnore} onReset={onReset} />
               ))}
             </div>
-          </ScrollArea>
+          </div>
         )}
       </CardContent>
     </Card>
