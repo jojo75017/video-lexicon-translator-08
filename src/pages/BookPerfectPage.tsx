@@ -53,7 +53,11 @@ const BookPerfectPage: React.FC = () => {
       return;
     }
     abortRef.current = { aborted: false };
+    setPaused(false);
+    setPausedMessage(null);
+    setJustCompleted(false);
     setRunning(true);
+    startTimeRef.current = Date.now();
     try {
       const result = await runAnalysis(
         manuscript,
@@ -65,17 +69,26 @@ const BookPerfectPage: React.FC = () => {
       );
       setAnalysis({ ...result });
       if (!abortRef.current.aborted) {
+        setElapsedMs(Date.now() - startTimeRef.current);
         const failed = result.chapterResults.filter((r) => r.status === 'failed').length;
         if (failed > 0) toast.warning(`Analyse terminée. ${failed} chapitre(s) en échec — relancez-les.`);
-        else toast.success('Analyse terminée ✓');
+        else {
+          setJustCompleted(true);
+          toast.success('Analyse terminée ✓');
+        }
       }
     } catch (e: any) {
-      toast.error(e?.message || 'Erreur pendant l\'analyse.');
+      const msg = e?.message || 'Erreur pendant l\'analyse.';
+      // Erreur fatale : l'analyse est en pause, on propose « Reprendre ».
+      setPaused(true);
+      setPausedMessage(msg);
+      toast.error(msg);
     } finally {
       setRunning(false);
       setRunningIndex(null);
     }
   }, [manuscript, analysis]);
+
 
   const stop = () => { abortRef.current.aborted = true; setRunning(false); toast.info('Analyse interrompue. Vous pourrez la reprendre.'); };
 
