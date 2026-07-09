@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet";
+import { Link } from "react-router-dom";
 import { BREVO_ONBOARDING_EMAILS } from "@/data/brevoOnboardingEmails";
-import { Copy, Check, Mail, Info } from "lucide-react";
+import { Copy, Check, Mail, Info, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 
 const TEAL = "#008296";
@@ -26,9 +27,18 @@ export default function BrevoOnboardingEmailsPage() {
       </Helmet>
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-extrabold mb-2">Séquence d'onboarding Brevo</h1>
-        <p className="text-muted-foreground mb-6" style={{ color: "#5b6472" }}>
+        <p className="text-muted-foreground mb-4" style={{ color: "#5b6472" }}>
           7 emails prêts à coller dans Brevo (Automatisations). Copiez le HTML de chaque email.
         </p>
+
+        <Link
+          to="/guide-automatisation-brevo"
+          className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-white mb-8"
+          style={{ background: TEAL }}
+        >
+          <BookOpen className="w-4 h-4" /> Voir le guide : configurer l'automatisation Brevo
+        </Link>
+
 
         <div
           className="rounded-xl p-4 mb-8 flex gap-3 items-start"
