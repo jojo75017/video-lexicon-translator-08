@@ -10,7 +10,7 @@
  */
 import { callGeminiJSON } from '@/services/geminiService';
 import { getActiveAIKey, getProvider } from '@/services/aiWritingService';
-import { writeAutosave, readAutosave } from '@/lib/ebookProjectStorage';
+import { writeAutosave, writeAutosaveAsync, readAutosave, readAutosaveAsync } from '@/lib/ebookProjectStorage';
 import type {
   Analysis, Chapter, ChapterResult, Issue, Manuscript, Scores, KdpCheck,
 } from './types';
@@ -224,6 +224,10 @@ export function loadAnalysis(manuscriptId: string): Analysis | null {
   return readAutosave<Analysis>(SCOPE(manuscriptId));
 }
 
+export function loadAnalysisAsync(manuscriptId: string): Promise<Analysis | null> {
+  return readAutosaveAsync<Analysis>(SCOPE(manuscriptId));
+}
+
 export interface BookPerfectRecoverySnapshot {
   manuscript: Manuscript;
   analysis: Analysis;
@@ -233,14 +237,27 @@ export function loadRecoverySnapshot(): BookPerfectRecoverySnapshot | null {
   return readAutosave<BookPerfectRecoverySnapshot>(BOOKPERFECT_RECOVERY_SCOPE);
 }
 
+export function loadRecoverySnapshotAsync(): Promise<BookPerfectRecoverySnapshot | null> {
+  return readAutosaveAsync<BookPerfectRecoverySnapshot>(BOOKPERFECT_RECOVERY_SCOPE);
+}
+
 /** Sauvegarde l'analyse (appelée après chaque chapitre). */
 function persist(analysis: Analysis) {
   analysis.updatedAt = Date.now();
   writeAutosave(SCOPE(analysis.manuscriptId), analysis);
 }
 
+async function persistAsync(analysis: Analysis) {
+  analysis.updatedAt = Date.now();
+  await writeAutosaveAsync(SCOPE(analysis.manuscriptId), analysis);
+}
+
 function persistRecovery(manuscript: Manuscript, analysis: Analysis) {
   writeAutosave<BookPerfectRecoverySnapshot>(BOOKPERFECT_RECOVERY_SCOPE, { manuscript, analysis });
+}
+
+async function persistRecoveryAsync(manuscript: Manuscript, analysis: Analysis) {
+  await writeAutosaveAsync<BookPerfectRecoverySnapshot>(BOOKPERFECT_RECOVERY_SCOPE, { manuscript, analysis });
 }
 
 function emptyAnalysis(manuscript: Manuscript): Analysis {
@@ -270,7 +287,7 @@ export async function runAnalysis(
     throw new Error(`Aucune clé API ${provider} configurée. Renseignez votre clé dans les réglages pour lancer l'analyse.`);
   }
 
-  const saved = opts.resumeOnly ? loadAnalysis(manuscript.id) : null;
+  const saved = opts.resumeOnly ? await loadAnalysisAsync(manuscript.id) : null;
   const baseAnalysis = opts.resumeOnly ? (opts.existing || saved) : null;
   let analysis: Analysis;
   if (baseAnalysis) {
@@ -289,10 +306,12 @@ export async function runAnalysis(
   }
 
   const total = manuscript.chapters.length;
-  const saveProgress = () => {
-    persist(analysis);
-    persistRecovery(manuscript, analysis);
+  const saveProgress = async () => {
+    await persistAsync(analysis);
+    await persistRecoveryAsync(manuscript, analysis);
   };
+
+  await saveProgress();
 
   try {
     for (let i = 0; i < total; i++) {
@@ -307,6 +326,7 @@ export async function runAnalysis(
       cb.onChapterStart?.(chapter, i, total);
       analysis.chapterResults[resultIdx] = { ...current, status: 'running' };
       cb.onProgress?.(analysis);
+      await saveProgress();
 
       // Nettoyer les issues précédentes de ce chapitre (relance propre).
       analysis.issues = analysis.issues.filter((is) => is.chapterId !== chapter.id);
@@ -342,7 +362,7 @@ export async function runAnalysis(
             analysis.chapterResults[resultIdx] = {
               chapterId: chapter.id, status: 'pending', attempts: current?.attempts || 0,
             };
-            saveProgress();
+            await saveProgress();
             throw new FatalAIError(lastError);
           }
         }
@@ -359,7 +379,7 @@ export async function runAnalysis(
       analysis.lastProcessedIndex = i;
       analysis.scores = computeScores(analysis.chapterResults, analysis.issues, manuscript.chapters);
       analysis.kdpReport = buildKdpReport(analysis.issues, manuscript);
-      saveProgress();
+      await saveProgress();
       cb.onChapterDone?.(analysis.chapterResults[resultIdx], analysis);
       cb.onProgress?.(analysis);
     }
@@ -370,7 +390,7 @@ export async function runAnalysis(
       // ça s'est arrêté, sans réanalyser les chapitres déjà terminés.
       analysis.scores = computeScores(analysis.chapterResults, analysis.issues, manuscript.chapters);
       analysis.kdpReport = buildKdpReport(analysis.issues, manuscript);
-      saveProgress();
+      await saveProgress();
       throw new Error(`${e.message} L'analyse est en pause — corrigez le problème puis cliquez sur « Reprendre » (les chapitres déjà analysés sont conservés).`);
     }
     throw e;
@@ -378,7 +398,7 @@ export async function runAnalysis(
 
   analysis.scores = computeScores(analysis.chapterResults, analysis.issues, manuscript.chapters);
   analysis.kdpReport = buildKdpReport(analysis.issues, manuscript);
-  saveProgress();
+  await saveProgress();
   return analysis;
 }
 

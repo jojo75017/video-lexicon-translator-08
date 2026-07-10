@@ -1,4 +1,6 @@
-// Simple localStorage-based project saver for the Scolaire & Agenda generators.
+// Simple project saver for the Scolaire & Agenda generators.
+// Small payloads are mirrored in localStorage; large autosaves also use
+// IndexedDB so long manuscripts do not disappear when localStorage quota is hit.
 
 export interface SavedProject<T> {
   id: string;
@@ -8,6 +10,64 @@ export interface SavedProject<T> {
 }
 
 const key = (scope: string) => `ebookstudio_projects_${scope}`;
+const DB_NAME = 'ebookstudio_native_storage';
+const DB_VERSION = 1;
+const AUTOSAVE_STORE = 'autosaves';
+
+interface AutosaveEnvelope<T> {
+  updatedAt: number;
+  data: T;
+}
+
+let dbPromise: Promise<IDBDatabase | null> | null = null;
+
+const canUseIndexedDb = () => typeof window !== 'undefined' && 'indexedDB' in window;
+
+const openNativeDb = (): Promise<IDBDatabase | null> => {
+  if (!canUseIndexedDb()) return Promise.resolve(null);
+  if (dbPromise) return dbPromise;
+
+  dbPromise = new Promise((resolve) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains(AUTOSAVE_STORE)) {
+        db.createObjectStore(AUTOSAVE_STORE);
+      }
+    };
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => resolve(null);
+    request.onblocked = () => resolve(null);
+  });
+
+  return dbPromise;
+};
+
+const writeNativeAutosave = async <T,>(scope: string, data: T) => {
+  try {
+    const db = await openNativeDb();
+    if (!db) return;
+    const envelope: AutosaveEnvelope<T> = { updatedAt: Date.now(), data };
+    await new Promise<void>((resolve) => {
+      const tx = db.transaction(AUTOSAVE_STORE, 'readwrite');
+      tx.objectStore(AUTOSAVE_STORE).put(envelope, autoKey(scope));
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => resolve();
+      tx.onabort = () => resolve();
+    });
+  } catch {}
+};
+
+export const requestPersistentStorage = async (): Promise<boolean> => {
+  try {
+    if (typeof navigator === 'undefined' || !navigator.storage?.persist) return false;
+    return await navigator.storage.persist();
+  } catch {
+    return false;
+  }
+};
 
 export const listProjects = <T,>(scope: string): SavedProject<T>[] => {
   try {
@@ -44,6 +104,7 @@ export const deleteProject = (scope: string, id: string) => {
 const autoKey = (scope: string) => `ebookstudio_autosave_${scope}`;
 export const writeAutosave = <T,>(scope: string, data: T) => {
   try { localStorage.setItem(autoKey(scope), JSON.stringify({ updatedAt: Date.now(), data })); } catch {}
+  void writeNativeAutosave(scope, data);
 };
 export const readAutosave = <T,>(scope: string): T | null => {
   try {
@@ -53,4 +114,26 @@ export const readAutosave = <T,>(scope: string): T | null => {
   } catch {
     return null;
   }
+};
+
+export const writeAutosaveAsync = async <T,>(scope: string, data: T): Promise<void> => {
+  try { localStorage.setItem(autoKey(scope), JSON.stringify({ updatedAt: Date.now(), data })); } catch {}
+  await writeNativeAutosave(scope, data);
+};
+
+export const readAutosaveAsync = async <T,>(scope: string): Promise<T | null> => {
+  try {
+    const raw = localStorage.getItem(autoKey(scope));
+    if (raw) return (JSON.parse(raw) as { data: T }).data ?? null;
+  } catch {}
+
+  const db = await openNativeDb();
+  if (!db) return null;
+
+  return new Promise<T | null>((resolve) => {
+    const tx = db.transaction(AUTOSAVE_STORE, 'readonly');
+    const request = tx.objectStore(AUTOSAVE_STORE).get(autoKey(scope));
+    request.onsuccess = () => resolve((request.result as AutosaveEnvelope<T> | undefined)?.data ?? null);
+    request.onerror = () => resolve(null);
+  });
 };
