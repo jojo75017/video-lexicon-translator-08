@@ -27,6 +27,30 @@ const MAX_CHARS_PER_CALL = 6000;
 let aiCounter = 0;
 const aiId = () => `ai-${Date.now()}-${aiCounter++}`;
 
+const normalizeIssueKeyPart = (value: string) => (value || '')
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .replace(/\s+/g, ' ')
+  .trim()
+  .toLowerCase();
+
+const issueKey = (issue: Issue) => [
+  issue.chapterId,
+  issue.category,
+  normalizeIssueKeyPart(issue.original).slice(0, 180),
+  normalizeIssueKeyPart(issue.suggestion).slice(0, 180),
+].join('|');
+
+const dedupeIssues = (issues: Issue[]): Issue[] => {
+  const seen = new Set<string>();
+  return issues.filter((issue) => {
+    const key = issueKey(issue);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+};
+
 interface AiChapterResponse {
   issues: {
     category: 'orthographe' | 'style' | 'kdp';
@@ -303,7 +327,7 @@ export async function runAnalysis(
         if (!previous) return { chapterId: chapter.id, status: 'pending', attempts: 0 };
         return previous.status === 'running' ? { ...previous, status: 'pending' } : previous;
       }),
-      issues: previousAnalysis.issues.filter((issue) => manuscript.chapters.some((chapter) => chapter.id === issue.chapterId)),
+      issues: dedupeIssues(previousAnalysis.issues.filter((issue) => manuscript.chapters.some((chapter) => chapter.id === issue.chapterId))),
     };
   } else {
     analysis = emptyAnalysis(manuscript);
@@ -337,7 +361,7 @@ export async function runAnalysis(
 
       // 1. Vérifications locales (toujours, instantanées, jamais bloquantes).
       const localIssues = runLocalChecks(chapter);
-      analysis.issues.push(...localIssues);
+      analysis.issues = dedupeIssues([...analysis.issues, ...localIssues]);
 
       // 2. Analyse IA avec retry.
       let aiOk = false;
@@ -349,7 +373,7 @@ export async function runAnalysis(
         try {
           if (BACKOFFS[a] > 0) await sleep(BACKOFFS[a]);
           const res = await analyzeChapterAI(apiKey, chapter);
-          analysis.issues.push(...mapAiIssues(chapter, res));
+          analysis.issues = dedupeIssues([...analysis.issues, ...mapAiIssues(chapter, res)]);
           analysis.chapterResults[resultIdx] = {
             chapterId: chapter.id, status: 'done', attempts, scores: res.scores,
           };
