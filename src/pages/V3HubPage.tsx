@@ -1263,6 +1263,37 @@ const V3HubPage: React.FC = () => {
             </div>
           </section>
         )}
+
+        {/* ===================== ONGLET EXPORT ===================== */}
+        {activeTab === 'export' && (
+          <section className="space-y-5">
+            <div className="rounded-2xl border p-5 sm:p-6" style={{ background: '#fff', borderColor: `${AMBER}44` }}>
+              <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-wider" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44`, color: AMBER_DEEP }}>
+                <Download className="h-3.5 w-3.5" /> Étape finale
+              </div>
+              <h2 className="mt-4 text-3xl sm:text-4xl font-medium leading-tight" style={{ fontFamily: SERIF, color: INK }}>
+                Exporter le livre
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed" style={{ color: '#6f5e47' }}>
+                Une fois le manuscrit terminé, téléchargez-le dans tous les formats prêts pour Amazon KDP
+                (DOCX, EPUB, PDF impression et digital, TXT, HTML). Le titre et l'auteur reprennent votre
+                Fiche du livre.
+              </p>
+            </div>
+            {(() => {
+              const cfg = readHubBookConfig();
+              return (
+                <V3ExportPanel
+                  manuscript={readHubManuscript()}
+                  title={cfg.title}
+                  subtitle={cfg.subtitle}
+                  author={cfg.author}
+                />
+              );
+            })()}
+          </section>
+        )}
+
       </main>
       </div>
       {/* fin colonne de contenu */}
