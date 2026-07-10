@@ -4,6 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { BookOpen, FileText, PenTool, Image, Download, BarChart3, Zap, CheckCircle2, Clock, AlertTriangle, Sparkles, ArrowRight } from 'lucide-react';
+import { useKdpFormat } from '@/hooks/useKdpFormat';
+import { estimatePages } from '@/utils/kdpPageDensity';
+import { KdpFormatSelect } from '@/components/ebook/KdpFormatSelect';
 
 interface Chapter {
   id: string;
@@ -27,6 +30,7 @@ interface EbookGlobalDashboardProps {
 export const EbookGlobalDashboard: React.FC<EbookGlobalDashboardProps> = ({
   ebookTitle, authorName, chapters, preface, conclusion, coverImage, kdpDescription, kdpKeywords, onNavigate
 }) => {
+  const { formatId } = useKdpFormat();
   const stats = useMemo(() => {
     const totalWords = chapters.reduce((sum, ch) => {
       const chWords = (ch.content || '').split(/\s+/).filter(Boolean).length;
@@ -40,7 +44,7 @@ export const EbookGlobalDashboard: React.FC<EbookGlobalDashboardProps> = ({
     const readingTime = Math.ceil(totalWords / 200);
 
     return { totalWords, chaptersWithContent, totalChapters: chapters.length, completionPercent, estimatedPages, readingTime };
-  }, [chapters, preface, conclusion]);
+  }, [chapters, preface, conclusion, formatId]);
 
   const checklist = useMemo(() => [
     { label: 'Titre défini', done: !!ebookTitle.trim(), tab: 'planner' },
