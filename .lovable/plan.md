@@ -1,68 +1,68 @@
-## Plan de correction
+## Contexte & clarification de la stratégie
 
-Je vais rendre la configuration IA impossible à manquer dans le Hub V3.
+Dans le code actuel, **« V4 » = le palier premium 347€** (30 agents `tier: 'v4'`), qui vient **au-dessus** de la V3 197€ (22 agents `tier: 'v3'`). Il n'y a donc pas de « faire la V3 avant » : l'accès direct au 347€ marche déjà (`useV3Entitlement.hasFull` s'active sur un plan `full_*` sans exiger la Base).
 
-## 1. Bloc visible « Clés API & Modèles » dans le Parcours
+Ce qui manque, ce n'est pas l'offre — c'est que le **workflow V4 n'est pas plus perfectionné** que la V3 : ce sont surtout des agents en plus, pas un vrai processus supérieur. Ce plan corrige cela, en se concentrant **d'abord sur le workflow** (pas sur le prix, laissé à 347€).
 
-Dans `src/components/admin/EditionWorkflow.tsx`, remplacer la simple carte actuelle par un bloc visible et clair qui affiche directement :
-
-- Le fournisseur actif : Gemini, Claude, OpenAI ou OpenRouter.
-- Le champ de clé API en accès direct, sans devoir chercher dans un popup.
-- Le bouton **Tester / Valider la clé** visible à côté du champ.
-- Le statut : clé manquante, format invalide, clé valide, test en cours, test échoué.
-- Si OpenRouter est choisi : le sélecteur de modèle OpenRouter visible sous la clé.
-
-## 2. Garder le deuxième emplacement demandé
-
-Conserver aussi :
-
-- Le popup actuel avec `EbookSettingsPanel` pour les réglages complets.
-- Le bouton flottant global `Choisir mon IA · Clés API`, déjà présent sur `/hub-v3`.
-
-Donc il y aura bien deux accès :
+Périmètre : `src/data/editionAgents.ts` (orchestration), `src/components/admin/EditionWorkflow.tsx` (présentation), et 1 nouveau composant frontend. **Aucun** changement backend, prix ou paiement.
 
 ```text
-Parcours Hub V3
-├─ Bloc visible : fournisseur + clé + modèle + test
-└─ Popup complet : tous les réglages avancés
+V3 (197€) ──► 22 agents, parcours linéaire simple
+V4 (347€) ──► V3 + processus premium :
+              • plus d'étapes structurées en phases
+              • révisions IA multi-passes par chapitre
+              • contrôle éditorial avancé (ton/style/longueur/persona)
+              • visuels & pack KDP poussés
 ```
 
-## 3. Factoriser pour éviter les doublons cassés
+## 1. Structurer le workflow V4 en phases claires (pas juste « plus d'agents »)
 
-Créer un petit composant réutilisable côté frontend, par exemple `ApiProviderQuickSettings`, qui reprend la logique déjà présente dans `EbookSettingsPanel` :
+Dans `editionAgents.ts`, ajouter un champ `phase` (ex : `Conception`, `Rédaction`, `Révision multi-passes`, `Enrichissement`, `Fabrication`, `Positionnement`, `Lancement`) à chaque agent, et une constante ordonnée `EDITION_PHASES`.
 
-- `getProvider`, `setProvider`
-- `getProviderKey`, `setProviderKey`
-- `validateKeyFormat`, `sanitizeKey`
-- `OPENROUTER_MODELS`, `getOpenRouterModel`, `setOpenRouterModel`
-- test réel des clés API, avec les mêmes endpoints déjà utilisés dans `EbookSettingsPanel`
+Dans `EditionWorkflow.tsx`, remplacer l'affichage « par département » du mode V4 par un **parcours séquentiel en phases numérotées** avec une barre de progression par phase, pour qu'on voie une vraie montée en puissance vs la V3.
 
-Ce composant sera utilisé dans `EditionWorkflow.tsx`, sans modifier la logique backend ni les secrets.
+## 2. Révisions IA multi-passes par chapitre
 
-## 4. Curseur chapitres + mots
+Ajouter, dans la section « Structure du livre » (déjà présente avec curseur chapitres + mots), un bloc **« Passes de révision IA »** visible uniquement en V4 :
 
-Dans la section **Structure du livre**, ajouter le vrai contrôle demandé :
+- Sélecteur du nombre de passes (1 à 3) : *Rédaction → Relecture stylistique → Polissage final*.
+- Description de ce que fait chaque passe.
+- Persistance en `localStorage` (comme `targetWords`) pour être reprise par les agents de rédaction/révision existants.
 
-- Curseur du nombre de chapitres de 3 à 40.
-- Valeur du nombre de chapitres visible et éditable.
-- Champ **mots / chapitre** juste à côté.
-- Total calculé automatiquement : `chapitres × mots/chapitre`.
-- Estimation de pages basée sur ce total.
+Cela matérialise le « multi-passes » demandé sans toucher aux générateurs : le réglage est lu par les modules de rédaction déjà branchés.
 
-Cela rendra clair où régler le nombre de chapitres et où mettre le nombre de mots.
+## 3. Contrôle éditorial avancé (nouveau composant `EditorialControlPanel`)
 
-## 5. Validation
+Créer `src/components/ebook/EditorialControlPanel.tsx`, affiché en V4 dans le parcours, offrant :
 
-Après implémentation :
+- **Ton** (ex : chaleureux, expert, narratif, direct) et **style** (ex : concret/exemples, académique, storytelling).
+- **Longueur cible par chapitre** (réutilise `targetWords`).
+- **Persona lecteur** (champ libre : à qui s'adresse le livre).
+- **Structure narrative** (linéaire / thématique / problème-solution).
 
-- Vérifier que le bloc clés/modèles apparaît directement dans `/hub-v3?tab=parcours`.
-- Vérifier qu’on peut sélectionner OpenRouter et voir le choix du modèle.
-- Vérifier que le bouton de test/validation est visible à côté de la clé.
-- Vérifier que le curseur chapitres et le champ mots/chapitre sont côte à côte et modifient le total visé.
+Tous ces réglages sont persistés en `localStorage` sous une clé unique et affichés en résumé au-dessus du parcours, pour cadrer les agents de rédaction et de ton (`p19-author-voice`, `p25-tone-adapter`) déjà existants.
+
+## 4. Visuels & pack KDP poussés — mise en avant dans le parcours
+
+Regrouper visuellement les agents V4 déjà présents (`cover-studio-pro`, `edition-variant-studio` illustrations, `multi-format-express`, pack KDP, `audio-video-transcription`) dans une **phase « Enrichissement & Fabrication »** clairement identifiée, avec un encart expliquant le livrable final (couverture pro + illustrations + pack KDP prêt à uploader + audiobook). Aucun nouveau module : uniquement mise en avant et regroupement.
+
+## 5. Clarifier l'accès direct au 347€
+
+Ajouter, en tête du mode V4, un court bandeau explicatif : « Offre premium accessible directement — pas besoin de la Base 197€ ». Confirme visuellement ce que le code fait déjà.
+
+## Validation
+
+Après implémentation, vérifier sur `/hub-v3?tab=parcours` (mode admin/V4) :
+
+- Le parcours V4 s'affiche en phases numérotées avec progression.
+- Le bloc « Passes de révision IA » (1–3) est visible et persistant.
+- Le panneau de contrôle éditorial (ton/style/persona/longueur) fonctionne et se sauvegarde.
+- La phase Enrichissement & Fabrication regroupe bien les visuels + pack KDP.
+- Le bandeau d'accès direct 347€ est présent.
 
 ## Hors périmètre
 
-- Pas de changement de prix V3/V4.
-- Pas de modification des agents.
-- Pas de stockage serveur des clés : on garde le fonctionnement BYOK actuel côté utilisateur.
-- Pas de nouvelle donnée fictive.
+- Pas de changement de prix ni de tunnel de paiement.
+- Pas de modification des générateurs/edge functions ni des secrets (BYOK conservé).
+- Pas de création d'une offre « au-dessus de 347€ » : V4 = le palier premium 347€ existant, rendu réellement supérieur à la V3.
+- Aucune donnée fictive.
