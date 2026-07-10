@@ -61,6 +61,7 @@ export const EbookStatisticsTools: React.FC<EbookStatisticsToolsProps> = ({
   isDemo = false,
   onTranslate
 }) => {
+  const { formatId } = useKdpFormat();
   const [targetLanguage, setTargetLanguage] = useState('anglais');
   const [isTranslating, setIsTranslating] = useState(false);
   const [translationProgress, setTranslationProgress] = useState(0);
