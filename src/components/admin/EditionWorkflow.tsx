@@ -306,6 +306,26 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
   const completed = tierAgents.filter((a) => done.has(a.order)).length;
   const pct = total ? Math.round((completed / total) * 100) : 0;
 
+  // Groupes affichés : V4 = phases séquentielles (processus premium), V3 = départements.
+  const agentGroups = useMemo(() => {
+    if (activeTier === 'v4') {
+      return EDITION_PHASES
+        .map((phase) => ({
+          label: phase,
+          intro: EDITION_PHASE_INTRO[phase],
+          agents: tierAgents.filter((a) => getPhaseForAgent(a) === phase),
+        }))
+        .filter((g) => g.agents.length > 0);
+    }
+    return EDITION_DEPARTMENTS
+      .map((dept) => ({
+        label: dept,
+        intro: '' as string,
+        agents: tierAgents.filter((a) => a.department === dept),
+      }))
+      .filter((g) => g.agents.length > 0);
+  }, [activeTier, tierAgents]);
+
   const chapterGoalTotal = Math.max(0, Math.round((Number(config.numberOfChapters) || 0) * targetWords));
   const chapterGoalPages = estimatePages(chapterGoalTotal);
 
