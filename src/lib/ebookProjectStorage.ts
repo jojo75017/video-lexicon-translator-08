@@ -46,16 +46,18 @@ const openNativeDb = (): Promise<IDBDatabase | null> => {
 };
 
 const writeNativeAutosave = async <T,>(scope: string, data: T) => {
-  const db = await openNativeDb();
-  if (!db) return;
-  const envelope: AutosaveEnvelope<T> = { updatedAt: Date.now(), data };
-  await new Promise<void>((resolve) => {
-    const tx = db.transaction(AUTOSAVE_STORE, 'readwrite');
-    tx.objectStore(AUTOSAVE_STORE).put(envelope, autoKey(scope));
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => resolve();
-    tx.onabort = () => resolve();
-  });
+  try {
+    const db = await openNativeDb();
+    if (!db) return;
+    const envelope: AutosaveEnvelope<T> = { updatedAt: Date.now(), data };
+    await new Promise<void>((resolve) => {
+      const tx = db.transaction(AUTOSAVE_STORE, 'readwrite');
+      tx.objectStore(AUTOSAVE_STORE).put(envelope, autoKey(scope));
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => resolve();
+      tx.onabort = () => resolve();
+    });
+  } catch {}
 };
 
 export const requestPersistentStorage = async (): Promise<boolean> => {
