@@ -378,8 +378,28 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
           </button>
         </div>
 
+        {/* Bandeau accès direct V4 (offre premium) */}
+        {activeTier === 'v4' && (
+          <div className="mt-3 rounded-xl border px-3.5 py-2.5 flex items-start gap-2" style={{ borderColor: `${AMBER}55`, background: AMBER_SOFT }}>
+            <Sparkles className="h-4 w-4 mt-0.5 shrink-0" style={{ color: AMBER_DEEP }} />
+            <p className="text-[12px]" style={{ color: '#6f5e47' }}>
+              <strong style={{ color: AMBER_DEEP }}>Offre premium accessible directement</strong> — pas besoin de posséder la Base 197€.
+              La V4 ajoute un vrai processus supérieur : phases structurées, révisions IA multi-passes, contrôle éditorial avancé et pack KDP poussé.
+            </p>
+          </div>
+        )}
+
         {/* Carte clé IA (BYOK Gemini / OpenRouter…) */}
         <ApiProviderQuickSettings key={keysOpen ? 'api-open' : 'api-closed'} onOpenAdvanced={() => setKeysOpen(true)} />
+
+        {/* Contrôle éditorial avancé (V4 uniquement) */}
+        {activeTier === 'v4' && (
+          <div className="mt-3">
+            <EditorialControlPanel />
+          </div>
+        )}
+
+
 
 
         {/* Progression */}
