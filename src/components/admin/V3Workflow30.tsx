@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import {
   ArrowRight, Check, ChevronDown, RotateCcw, Trophy, Lock, Sparkles, Loader2, Wand2, AlertCircle,
-  Pencil, Save, X, Upload, FileDown, Image as ImageIcon, FolderOpen,
+  Pencil, Save, X, Upload, FileDown, Image as ImageIcon, FolderOpen, FilePlus, BookOpen, FileText, Layers,
 } from 'lucide-react';
 import { getModuleById, type V3Module } from '@/data/roadmapV3';
 import { isModuleClickable } from './v3ModuleRegistry';
