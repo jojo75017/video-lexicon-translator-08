@@ -127,7 +127,7 @@ INSTRUCTIONS POUR LES PERSONNAGES:
 === FIN PERSONNAGES ===\n`;
   };
 
-  const generateChapterContent = async (chapter: Chapter, wordsPerChapter: number = 350, synopsis?: string, chapterIndex?: number, totalChapters?: number, previousChapterSummary?: string) => {
+  const generateChapterContent = async (chapter: Chapter, wordsPerChapter: number = 350, synopsis?: string, chapterIndex?: number, totalChapters?: number, previousChapterSummary?: string, allChapterTitles?: string[]) => {
     const contextLine = ebookTitle ? `\nCe chapitre fait partie de l'ebook intitulé "${ebookTitle}".` : '';
     const audienceLine = targetAudience ? `\nPublic cible : ${targetAudience}. Adapte le vocabulaire, le style d'écriture, la complexité des concepts et les exemples utilisés pour correspondre parfaitement à ce public.` : '';
     const tomeLine = tomeNumber ? `\nCeci est le Tome ${tomeNumber} d'une série.` : '';
