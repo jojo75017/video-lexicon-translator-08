@@ -20,7 +20,7 @@ import { ComparaisonTab } from '@/components/bookperfect/tabs/ComparaisonTab';
 import { RapportFinalTab } from '@/components/bookperfect/tabs/RapportFinalTab';
 import { exportKdpPackage, DEFAULT_KDP_OPTIONS } from '@/lib/bookperfect/exporters';
 import {
-  runAnalysis, loadAnalysisAsync, loadRecoverySnapshotAsync, updateIssueStatus, BOOKPERFECT_RECOVERY_SCOPE, saveAnalysisSnapshotAsync,
+  runAnalysis, loadAnalysisAsync, loadRecoverySnapshotAsync, updateIssueStatus, BOOKPERFECT_RECOVERY_SCOPE, saveAnalysisSnapshotAsync, sanitizeAnalysisIssues,
 } from '@/lib/bookperfect/analysisOrchestrator';
 import type { BookPerfectRecoverySnapshot } from '@/lib/bookperfect/analysisOrchestrator';
 import { readAutosaveAsync, requestPersistentStorage, writeAutosave, writeAutosaveAsync } from '@/lib/ebookProjectStorage';
@@ -28,12 +28,15 @@ import type { Analysis, Manuscript } from '@/lib/bookperfect/types';
 
 const CURRENT_MANUSCRIPT_SCOPE = 'bookperfect_current_manuscript';
 
-const normalizeResumableAnalysis = (value: Analysis): Analysis => ({
-  ...value,
-  chapterResults: value.chapterResults.map((r) => (
+const normalizeResumableAnalysis = (value: Analysis, manuscript?: Manuscript): Analysis => {
+  const cleaned = sanitizeAnalysisIssues(value, manuscript);
+  return {
+  ...cleaned,
+  chapterResults: cleaned.chapterResults.map((r) => (
     r.status === 'running' ? { ...r, status: 'pending' as const } : r
   )),
-});
+  };
+};
 
 const BookPerfectPage: React.FC = () => {
   const navigate = useNavigate();
@@ -105,7 +108,7 @@ const BookPerfectPage: React.FC = () => {
         setManuscript(savedManuscript);
         const savedAnalysis = await loadAnalysisAsync(savedManuscript.id);
         if (!mounted) return;
-        const normalizedAnalysis = savedAnalysis ? normalizeResumableAnalysis(savedAnalysis) : null;
+        const normalizedAnalysis = savedAnalysis ? normalizeResumableAnalysis(savedAnalysis, savedManuscript) : null;
         setAnalysis(normalizedAnalysis);
         const savedAt = normalizedAnalysis?.updatedAt || savedManuscript.importedAt || Date.now();
         setLastSavedAt(savedAt);
@@ -121,7 +124,7 @@ const BookPerfectPage: React.FC = () => {
         setManuscript(recovery.manuscript);
         await writeAutosaveAsync(CURRENT_MANUSCRIPT_SCOPE, recovery.manuscript);
         if (!mounted) return;
-        setAnalysis(normalizeResumableAnalysis(recovery.analysis));
+        setAnalysis(normalizeResumableAnalysis(recovery.analysis, recovery.manuscript));
         setLastSavedAt(recovery.analysis.updatedAt || Date.now());
         setSaveNote('Sauvegarde de reprise restaurée');
         setPaused(true);
@@ -139,7 +142,7 @@ const BookPerfectPage: React.FC = () => {
     setLastSavedAt(savedAt);
     setSaveNote(`Fichier sauvegardé à ${new Date(savedAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`);
     const existing = await loadAnalysisAsync(m.id);
-    const normalizedExisting = existing ? normalizeResumableAnalysis(existing) : null;
+    const normalizedExisting = existing ? normalizeResumableAnalysis(existing, m) : null;
     setAnalysis(normalizedExisting);
     setPaused(!!normalizedExisting?.chapterResults.some((r) => r.status !== 'done'));
     setPausedMessage(normalizedExisting?.chapterResults.some((r) => r.status !== 'done') ? 'Analyse précédente retrouvée : cliquez sur Reprendre.' : null);
@@ -235,7 +238,7 @@ const BookPerfectPage: React.FC = () => {
   const restoreRecovery = async () => {
     const recovery = recoverySnapshot || await loadRecoverySnapshotAsync();
     if (!recovery?.manuscript?.id) return;
-    const normalizedAnalysis = normalizeResumableAnalysis(recovery.analysis);
+    const normalizedAnalysis = normalizeResumableAnalysis(recovery.analysis, recovery.manuscript);
     setManuscript(recovery.manuscript);
     await writeAutosaveAsync(CURRENT_MANUSCRIPT_SCOPE, recovery.manuscript);
     setAnalysis(normalizedAnalysis);
