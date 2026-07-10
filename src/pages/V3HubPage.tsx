@@ -10,7 +10,7 @@ import useV3Entitlement from '@/hooks/useV3Entitlement';
 import CreateBookHub from '@/components/admin/CreateBookHub';
 import V2V3Compare from '@/components/admin/V2V3Compare';
 import V3PricingTiers from '@/components/admin/V3PricingTiers';
-import V3Workflow30 from '@/components/admin/V3Workflow30';
+import EditionWorkflow from '@/components/admin/EditionWorkflow';
 import V3AccessRecap from '@/components/admin/V3AccessRecap';
 import V3LaunchLinks from '@/components/admin/V3LaunchLinks';
 import V3GuidesSection from '@/components/admin/V3GuidesSection';
@@ -561,7 +561,7 @@ const V3HubPage: React.FC = () => {
             </button>
 
             {/* Parcours guidé V3 — entrée principale du Hub V3 */}
-            <V3Workflow30 onOpenModule={setSelected} />
+            <EditionWorkflow onOpenModule={setSelected} />
           </>
         )}
 
