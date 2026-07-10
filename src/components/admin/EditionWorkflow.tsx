@@ -346,38 +346,69 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
       </div>
 
 
-      {/* Structure du livre — titres de chapitres */}
+      {/* Structure du livre — comptage mots & chapitres */}
       <div className="border-t px-5 sm:px-7 py-4" style={{ borderColor: '#f0e7d4', background: '#FCF8F0' }}>
         <button onClick={() => setOpenChapters((v) => !v)}
           className="w-full flex items-center gap-2 text-left" aria-expanded={openChapters}>
           <BookOpen className="h-4 w-4" style={{ color: AMBER_DEEP }} />
           <span className="text-sm font-bold" style={{ color: INK }}>Structure du livre</span>
           <span className="text-[11px]" style={{ color: '#a18a6c' }}>
-            {chapters.length ? `${chapters.length} chapitres détectés` : 'aucun chapitre pour l\'instant'}
+            {stats.chapterCount ? `${stats.chapterCount} chapitres · ${stats.totalWords.toLocaleString('fr-FR')} mots` : 'aucun chapitre pour l\'instant'}
           </span>
           <ChevronDown className={`ml-auto h-4 w-4 transition-transform ${openChapters ? 'rotate-180' : ''}`} style={{ color: AMBER_DEEP }} />
         </button>
         {openChapters && (
           <div className="mt-3">
-            {chapters.length ? (
-              <ol className="grid gap-1 sm:grid-cols-2">
-                {chapters.map((t, i) => (
-                  <li key={i} className="flex items-start gap-2 text-[13px]" style={{ color: '#4a3f30' }}>
-                    <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full text-[10px] font-black"
-                      style={{ background: AMBER_SOFT, color: AMBER_DEEP }}>{i + 1}</span>
-                    <span className="min-w-0">{t}</span>
-                  </li>
-                ))}
-              </ol>
+            {stats.chapterCount ? (
+              <>
+                {/* Bandeau synthèse */}
+                <div className="mb-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {[
+                    { icon: FileTextIcon, value: stats.totalWords.toLocaleString('fr-FR'), label: 'mots' },
+                    { icon: BookOpen, value: stats.chapterCount, label: 'chapitres' },
+                    { icon: FileText, value: `~${stats.pages}`, label: 'pages' },
+                    { icon: Clock, value: `${stats.readingMin} min`, label: 'lecture' },
+                  ].map((m) => {
+                    const Icon = m.icon;
+                    return (
+                      <div key={m.label} className="rounded-xl border p-2.5 text-center" style={{ borderColor: '#eadfc9', background: '#fff' }}>
+                        <Icon className="h-4 w-4 mx-auto mb-1" style={{ color: AMBER_DEEP }} />
+                        <div className="text-base font-black leading-none" style={{ color: INK }}>{m.value}</div>
+                        <div className="text-[10px] mt-0.5" style={{ color: '#a18a6c' }}>{m.label}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+                {/* Tableau par chapitre */}
+                <ol className="grid gap-1.5">
+                  {stats.chapters.map((c, i) => {
+                    const ratio = Math.min(1, c.words / 2500);
+                    return (
+                      <li key={i} className="flex items-center gap-2.5 text-[13px]" style={{ color: '#4a3f30' }}>
+                        <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full text-[10px] font-black"
+                          style={{ background: AMBER_SOFT, color: AMBER_DEEP }}>{i + 1}</span>
+                        <span className="min-w-0 flex-1 truncate">{c.title}</span>
+                        <span className="hidden sm:block h-1.5 w-24 rounded-full overflow-hidden shrink-0" style={{ background: '#f0e7d4' }}>
+                          <span className="block h-full rounded-full" style={{ width: `${ratio * 100}%`, background: `linear-gradient(90deg, ${AMBER}, #FFB44D)` }} />
+                        </span>
+                        <span className="shrink-0 tabular-nums text-[12px] font-semibold w-20 text-right" style={{ color: AMBER_DEEP }}>
+                          {c.words.toLocaleString('fr-FR')} mots
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ol>
+              </>
             ) : (
               <p className="text-[12px]" style={{ color: '#8a7860' }}>
-                Lancez <strong>L'Architecte du Livre</strong> puis <strong>Le Romancier</strong> : les titres de vos
-                chapitres apparaîtront ici automatiquement.
+                Lancez <strong>L'Architecte du Livre</strong> puis <strong>Le Romancier</strong> : vos
+                chapitres et le comptage des mots apparaîtront ici automatiquement.
               </p>
             )}
           </div>
         )}
       </div>
+
 
       {/* Départements & agents */}
       <div className="divide-y" style={{ borderColor: '#f0e7d4' }}>
