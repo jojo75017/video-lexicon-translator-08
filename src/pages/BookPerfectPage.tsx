@@ -307,8 +307,21 @@ const BookPerfectPage: React.FC = () => {
 
             {analysis?.scores && <ScoreDashboard scores={analysis.scores} />}
 
+            {hasResults && !running && !showResumeButton && analysis && (
+              <Card className="border-primary/40 bg-primary/5">
+                <CardContent className="p-4 flex flex-wrap items-center gap-3">
+                  <span className="text-sm flex-1 min-w-[200px]">
+                    ✅ Analyse disponible. Vos corrections et l'export Word (Amazon KDP) sont prêts dans l'onglet <strong>Rapport</strong>.
+                  </span>
+                  <Button onClick={() => setActiveTab('rapport')} className="gap-2">
+                    <FileText className="h-4 w-4" /> Voir l'export
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
             {hasResults && analysis && (
-              <Tabs defaultValue="traces-ia">
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList className="flex flex-wrap h-auto">
                   <TabsTrigger value="traces-ia" className="gap-1"><Bug className="h-4 w-4" /> Traces IA</TabsTrigger>
                   <TabsTrigger value="orthographe" className="gap-1"><FileText className="h-4 w-4" /> Orthographe</TabsTrigger>
@@ -317,6 +330,7 @@ const BookPerfectPage: React.FC = () => {
                   <TabsTrigger value="kdp" className="gap-1"><ShoppingCart className="h-4 w-4" /> Amazon KDP</TabsTrigger>
                   <TabsTrigger value="rapport" className="gap-1"><FileText className="h-4 w-4" /> Rapport</TabsTrigger>
                 </TabsList>
+
 
 
                 <TabsContent value="traces-ia" className="mt-4">
