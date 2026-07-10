@@ -5,6 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Eye, Download, X, FileText, CheckCircle, AlertTriangle, XCircle, ShieldCheck, RefreshCw } from 'lucide-react';
 import { Chapter } from '@/hooks/useEbookGeneration';
+import { useKdpFormat } from '@/hooks/useKdpFormat';
+import { estimatePages } from '@/utils/kdpPageDensity';
 import { cleanGeneratedText } from '@/utils/textCleaner';
 import { Character } from './EbookCharacters';
 import { runDocxAudit, AuditReport } from '@/utils/docxAuditService';
@@ -36,6 +38,7 @@ export const EbookExportPreview: React.FC<EbookExportPreviewProps> = ({
   characters = [],
   isExporting = false
 }) => {
+  const { formatId } = useKdpFormat();
   const [auditReport, setAuditReport] = useState<AuditReport | null>(null);
 
   const cleanedContent = useMemo(() => {
@@ -86,11 +89,11 @@ export const EbookExportPreview: React.FC<EbookExportPreviewProps> = ({
     if (cleanedContent.conclusion) totalWords += cleanedContent.conclusion.split(/\s+/).filter(w => w).length;
     return {
       totalWords,
-      estimatedPages: Math.ceil(totalWords / 250),
+      estimatedPages: estimatePages(totalWords, formatId),
       chaptersCount: cleanedContent.chapters.length,
       subChaptersCount: cleanedContent.chapters.reduce((acc, ch) => acc + ch.subChapters.length, 0)
     };
-  }, [cleanedContent]);
+  }, [cleanedContent, formatId]);
 
   const truncateText = (text: string, maxLength: number = 300) => {
     if (!text || text.length <= maxLength) return text;
