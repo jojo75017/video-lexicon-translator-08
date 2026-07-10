@@ -1,13 +1,23 @@
-import React, { useState } from 'react';
-import { FileDown, FileText, RefreshCw, BookOpen, Star, Ruler, Hash } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { FileDown, FileText, RefreshCw, BookOpen, Star, Ruler, Hash, Rocket, Type, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { exportCorrectedDocx, exportReportDocx, KDP_FORMATS, getKdpFormat } from '@/lib/bookperfect/exporters';
-import type { KdpFormatId } from '@/lib/bookperfect/exporters';
+import {
+  exportCorrectedDocx, exportCorrectedPdf, exportKdpPackage, exportReportDocx,
+  KDP_FORMATS, KDP_FONTS, getKdpFormat, kdpInsideMarginInches, runKdpFinalCheck,
+  DEFAULT_KDP_OPTIONS,
+} from '@/lib/bookperfect/exporters';
+import type { KdpExportOptions, KdpFormatId } from '@/lib/bookperfect/exporters';
 import { CATEGORY_LABELS } from '@/lib/bookperfect/types';
 import type { Analysis, IssueCategory, Manuscript } from '@/lib/bookperfect/types';
 
@@ -21,25 +31,48 @@ export const RapportFinalTab: React.FC<Props> = ({ manuscript, analysis, onRelau
   const failed = analysis.chapterResults.filter((r) => r.status === 'failed').length;
   const appliedCount = analysis.issues.filter((i) => i.status === 'applied').length;
   const [kdpOpen, setKdpOpen] = useState(false);
-  const [selectedFormat, setSelectedFormat] = useState<KdpFormatId>('6x9');
+  const [options, setOptions] = useState<KdpExportOptions>(DEFAULT_KDP_OPTIONS);
+  const [busy, setBusy] = useState(false);
 
-  // Aperçu : conversions DXA (1 pouce = 1440 DXA ; 1 pouce = 25,4 mm).
+  const stat = (cat: IssueCategory) => analysis.issues.filter((i) => i.category === cat).length;
+
+  const check = useMemo(() => runKdpFinalCheck(manuscript, analysis), [manuscript, analysis]);
+  const preview = getKdpFormat(options.formatId);
+
   const dxaToInch = (v: number) => v / 1440;
   const dxaToMm = (v: number) => (v / 1440) * 25.4;
   const fmtIn = (v: number) => dxaToInch(v).toLocaleString('fr-FR', { maximumFractionDigits: 2 });
   const fmtMm = (v: number) => dxaToMm(v).toLocaleString('fr-FR', { maximumFractionDigits: 0 });
-  const preview = getKdpFormat(selectedFormat);
+  const insideIn = kdpInsideMarginInches(manuscript.pageEstimate);
 
-  const stat = (cat: IssueCategory) => analysis.issues.filter((i) => i.category === cat).length;
+  const setOpt = <K extends keyof KdpExportOptions>(k: K, v: KdpExportOptions[K]) =>
+    setOptions((o) => ({ ...o, [k]: v }));
 
-  const doExportDocx = async (formatId: KdpFormatId = '6x9') => {
+  const doPackage = async () => {
     try {
+      setBusy(true);
+      toast.loading('Préparation Amazon KDP (Word + PDF)…', { id: 'bp-kdp' });
+      await exportKdpPackage(manuscript, analysis, options, true);
+      toast.success('Version prête pour Amazon KDP exportée (Word + PDF) ✓', { id: 'bp-kdp' });
       setKdpOpen(false);
-      toast.loading('Génération du Word corrigé…', { id: 'bp-docx' });
-      await exportCorrectedDocx(manuscript, analysis, true, formatId);
-      toast.success('Manuscrit corrigé exporté (.docx) ✓', { id: 'bp-docx' });
     } catch (e: any) {
-      toast.error(e?.message || 'Échec de l\'export Word.', { id: 'bp-docx' });
+      toast.error(e?.message || 'Échec de la préparation KDP.', { id: 'bp-kdp' });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const doExportOne = async (kind: 'docx' | 'pdf') => {
+    try {
+      setBusy(true);
+      toast.loading(kind === 'docx' ? 'Génération du Word mis en page…' : 'Génération du PDF impression…', { id: 'bp-one' });
+      if (kind === 'docx') await exportCorrectedDocx(manuscript, analysis, true, options);
+      else await exportCorrectedPdf(manuscript, analysis, options, true);
+      toast.success(kind === 'docx' ? 'Word exporté ✓' : 'PDF exporté ✓', { id: 'bp-one' });
+    } catch (e: any) {
+      toast.error(e?.message || 'Échec de l\'export.', { id: 'bp-one' });
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -87,106 +120,191 @@ export const RapportFinalTab: React.FC<Props> = ({ manuscript, analysis, onRelau
             </div>
           )}
 
-          <div className="flex flex-wrap gap-3 pt-2">
-            <Button onClick={() => setKdpOpen(true)} className="gap-2">
-              <BookOpen className="h-4 w-4" /> Préparer pour Amazon KDP
-            </Button>
-            <Button onClick={() => doExportDocx('6x9')} variant="outline" className="gap-2">
-              <FileDown className="h-4 w-4" /> Exporter le manuscrit corrigé (Word)
+          <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
+            <div className="flex items-start gap-3">
+              <BookOpen className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <div className="font-semibold">Préparer pour Amazon KDP</div>
+                <div className="text-sm text-muted-foreground">
+                  En un clic : format 6 × 9, marges officielles, police roman, chapitres sur nouvelle page,
+                  table des matières, pagination — export <strong>Word mis en page</strong> + <strong>PDF prêt à imprimer</strong>.
+                </div>
+              </div>
+              <Button onClick={() => setKdpOpen(true)} className="gap-2 shrink-0">
+                <Rocket className="h-4 w-4" /> Préparer pour Amazon KDP
+              </Button>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-3 pt-1">
+            <Button onClick={() => doExportOne('docx')} variant="outline" className="gap-2" disabled={busy}>
+              <FileDown className="h-4 w-4" /> Word corrigé (6 × 9)
             </Button>
             <Button onClick={doExportReport} variant="outline" className="gap-2">
-              <FileText className="h-4 w-4" /> Exporter le rapport éditorial (Word)
+              <FileText className="h-4 w-4" /> Rapport éditorial (Word)
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      <Dialog open={kdpOpen} onOpenChange={setKdpOpen}>
-        <DialogContent>
+      <Dialog open={kdpOpen} onOpenChange={(o) => !busy && setKdpOpen(o)}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5 text-primary" /> Préparer pour Amazon KDP
             </DialogTitle>
             <DialogDescription>
-              Choisissez un format : marges, dimensions et pagination sont appliquées automatiquement.
+              Réglez la mise en page, puis obtenez en un clic une version prête à publier (Word + PDF).
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-2">
-            {KDP_FORMATS.map((f) => {
-              const active = selectedFormat === f.id;
-              return (
-                <button
-                  key={f.id}
-                  onClick={() => setSelectedFormat(f.id)}
-                  className={`w-full flex items-center justify-between rounded-lg border p-3 text-left transition-colors ${
-                    active ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'hover:border-primary hover:bg-primary/5'
-                  }`}
-                >
-                  <div>
-                    <div className="font-medium flex items-center gap-1.5">
-                      {f.label}
-                      {f.recommended && <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />}
-                    </div>
-                    <div className="text-xs text-muted-foreground">{f.description}</div>
-                  </div>
-                  <span className={`text-xs font-medium ${active ? 'text-primary' : 'text-muted-foreground'}`}>
-                    {active ? 'Sélectionné' : 'Choisir'}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
 
-          {/* Aperçu avant export */}
-          <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
-            <div className="text-sm font-semibold flex items-center gap-2">
-              <BookOpen className="h-4 w-4 text-primary" /> Aperçu — {preview.label}
+          <div className="space-y-4">
+            {/* Contrôle final KDP */}
+            <div className={`rounded-lg border p-3 ${check.ready && check.warnings.length === 0 ? 'border-emerald-500/40 bg-emerald-500/5' : 'border-amber-500/40 bg-amber-500/5'}`}>
+              <div className="flex items-center gap-2 text-sm font-medium">
+                {check.ready && check.warnings.length === 0
+                  ? <><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Aucune erreur KDP détectée — prêt à publier.</>
+                  : <><AlertTriangle className="h-4 w-4 text-amber-600" /> Contrôle final avant impression</>}
+              </div>
+              {(check.blockers.length > 0 || check.warnings.length > 0) && (
+                <ul className="mt-2 space-y-1 text-xs text-muted-foreground list-disc pl-5">
+                  {check.blockers.map((b) => <li key={b} className="text-red-600">{b}</li>)}
+                  {check.warnings.map((w) => <li key={w}>{w}</li>)}
+                </ul>
+              )}
             </div>
-            <div className="flex items-center gap-4">
-              {/* Schéma proportionnel de la page + marges */}
-              <div
-                className="relative shrink-0 rounded-sm border-2 border-foreground/40 bg-background"
-                style={{
-                  width: 72,
-                  height: 72 * (preview.height / preview.width),
-                }}
-              >
+
+            {/* Format */}
+            <div className="space-y-1.5">
+              <Label className="text-xs">Format de page</Label>
+              <div className="grid grid-cols-1 gap-2">
+                {KDP_FORMATS.map((f) => {
+                  const active = options.formatId === f.id;
+                  return (
+                    <button
+                      key={f.id}
+                      onClick={() => setOpt('formatId', f.id)}
+                      className={`w-full flex items-center justify-between rounded-lg border p-2.5 text-left transition-colors ${
+                        active ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'hover:border-primary hover:bg-primary/5'
+                      }`}
+                    >
+                      <div>
+                        <div className="font-medium text-sm flex items-center gap-1.5">
+                          {f.label}
+                          {f.recommended && <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />}
+                        </div>
+                        <div className="text-xs text-muted-foreground">{f.description}</div>
+                      </div>
+                      <span className={`text-xs font-medium ${active ? 'text-primary' : 'text-muted-foreground'}`}>
+                        {active ? 'Sélectionné' : 'Choisir'}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Police + taille */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs flex items-center gap-1"><Type className="h-3.5 w-3.5" /> Police (roman)</Label>
+                <Select value={options.fontFamily} onValueChange={(v) => setOpt('fontFamily', v)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {KDP_FONTS.map((f) => <SelectItem key={f} value={f}>{f}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Taille : {options.fontSize} pt</Label>
+                <div className="pt-2.5">
+                  <Slider
+                    min={9} max={14} step={0.5}
+                    value={[options.fontSize]}
+                    onValueChange={([v]) => setOpt('fontSize', v)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Options de mise en page */}
+            <div className="space-y-2 rounded-lg border p-3">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm">Table des matières</Label>
+                <Switch checked={options.toc} onCheckedChange={(v) => setOpt('toc', v)} />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label className="text-sm">Pagination (numéros de page)</Label>
+                <Switch checked={options.pageNumbers} onCheckedChange={(v) => setOpt('pageNumbers', v)} />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label className="text-sm">En-têtes (titre en haut de page)</Label>
+                <Switch checked={options.headers} onCheckedChange={(v) => setOpt('headers', v)} />
+              </div>
+            </div>
+
+            {/* Aperçu */}
+            <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+              <div className="text-sm font-semibold flex items-center gap-2">
+                <BookOpen className="h-4 w-4 text-primary" /> Aperçu — {preview.label}
+              </div>
+              <div className="flex items-center gap-4">
                 <div
-                  className="absolute border border-dashed border-primary/60 bg-primary/5"
-                  style={{
-                    inset: `${(preview.margin / preview.width) * 72}px`,
-                  }}
-                />
+                  className="relative shrink-0 rounded-sm border-2 border-foreground/40 bg-background"
+                  style={{ width: 72, height: 72 * (preview.height / preview.width) }}
+                >
+                  <div
+                    className="absolute border border-dashed border-primary/60 bg-primary/5"
+                    style={{ inset: `${(preview.margin / preview.width) * 72}px`, left: `${(preview.margin + kdpInsideMarginInches(manuscript.pageEstimate) * 1440) / preview.width * 72}px` }}
+                  />
+                </div>
+                <div className="grid grid-cols-1 gap-1.5 text-xs">
+                  <div className="flex items-center gap-2">
+                    <Ruler className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-muted-foreground">Taille (trim) :</span>
+                    <span className="font-medium">
+                      {fmtIn(preview.width)} × {fmtIn(preview.height)} po
+                      <span className="text-muted-foreground"> ({fmtMm(preview.width)} × {fmtMm(preview.height)} mm)</span>
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Ruler className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-muted-foreground">Marge reliure (KDP) :</span>
+                    <span className="font-medium">
+                      {insideIn.toLocaleString('fr-FR', { maximumFractionDigits: 3 })} po (~{manuscript.pageEstimate} pages)
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Hash className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-muted-foreground">Pagination :</span>
+                    <span className="font-medium">{options.pageNumbers ? 'Numéros centrés' : 'Désactivée'}</span>
+                  </div>
+                </div>
               </div>
-              <div className="grid grid-cols-1 gap-1.5 text-xs">
-                <div className="flex items-center gap-2">
-                  <Ruler className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span className="text-muted-foreground">Taille (trim) :</span>
-                  <span className="font-medium">
-                    {fmtIn(preview.width)} × {fmtIn(preview.height)} po
-                    <span className="text-muted-foreground"> ({fmtMm(preview.width)} × {fmtMm(preview.height)} mm)</span>
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Ruler className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span className="text-muted-foreground">Marges :</span>
-                  <span className="font-medium">
-                    {fmtIn(preview.margin)} po ({fmtMm(preview.margin)} mm) sur les 4 côtés
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Hash className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span className="text-muted-foreground">Pagination :</span>
-                  <span className="font-medium">Numéros centrés en pied de page</span>
-                </div>
+              <p className="text-[11px] text-muted-foreground">
+                Marge intérieure calculée automatiquement selon le barème officiel Amazon KDP.
+                Chaque chapitre démarre sur une nouvelle page. La police est conservée dans le Word ;
+                le PDF utilise un rendu serif équivalent pour l'impression.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Button onClick={doPackage} disabled={busy || !check.ready} className="w-full gap-2">
+                <Rocket className="h-4 w-4" /> Préparer (Word + PDF) en un clic
+              </Button>
+              {!check.ready && (
+                <p className="text-xs text-red-600 text-center">Corrigez les blocages ci-dessus avant l'export.</p>
+              )}
+              <div className="grid grid-cols-2 gap-2">
+                <Button onClick={() => doExportOne('docx')} variant="outline" size="sm" className="gap-1.5" disabled={busy || !check.ready}>
+                  <FileDown className="h-3.5 w-3.5" /> Word seul
+                </Button>
+                <Button onClick={() => doExportOne('pdf')} variant="outline" size="sm" className="gap-1.5" disabled={busy || !check.ready}>
+                  <FileDown className="h-3.5 w-3.5" /> PDF seul
+                </Button>
               </div>
             </div>
           </div>
-
-          <Button onClick={() => doExportDocx(selectedFormat)} className="w-full gap-2">
-            <FileDown className="h-4 w-4" /> Exporter en {preview.label}
-          </Button>
-
         </DialogContent>
       </Dialog>
     </div>
