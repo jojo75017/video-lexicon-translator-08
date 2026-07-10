@@ -282,6 +282,11 @@ const BookPerfectPage: React.FC = () => {
                       </Button>
                     )}
                     {hasResults && (
+                      <Button onClick={prepareForKdp} disabled={kdpBusy} className="gap-2 bg-primary text-primary-foreground">
+                        <BookOpen className="h-4 w-4" /> 📖 Préparer pour Amazon KDP (6 × 9)
+                      </Button>
+                    )}
+                    {hasResults && (
                       <Button variant="outline" onClick={() => start(false)} className="gap-2">
                         <RotateCcw className="h-4 w-4" /> Tout réanalyser
                       </Button>
