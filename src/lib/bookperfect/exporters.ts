@@ -85,6 +85,7 @@ export function kdpInsideMarginInches(pageCount: number): number {
 }
 
 const TWIPS_PER_INCH = 1440;
+const POINTS_PER_INCH = 72;
 const MM_PER_INCH = 25.4;
 const KDP_OUTSIDE_MARGIN_INCHES = 0.25;
 
