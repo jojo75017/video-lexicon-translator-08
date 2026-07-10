@@ -1,60 +1,40 @@
-# V4 renforcée : Studio A/B/C + Stratège de Positionnement
+Trois régressions à corriger dans le Hub V3 (`/hub-v3`). Tout reste en présentation, sans toucher aux moteurs ni aux prix.
 
-Objectif : la V4 (347€) apporte de vraies fonctions supplémentaires vs la V3 (197€), avec deux nouveaux moteurs IA et une expérience plus cohérente (onglets, versions A/B/C, bouton « Recommandé »).
+## 1. Onglets clairs 197€ / 347€ dans le Parcours (`EditionWorkflow.tsx`)
 
-## 1. Studio de versions A/B/C (nouvel agent V4)
+Aujourd'hui les 36 agents V3 + V4 sont empilés dans une seule liste → « du vrac ». Ajouter un **sélecteur segmenté** sous le titre :
 
-Nouveau module `edition-variant-studio` (composant `EditionVariantStudio.tsx`), avec **3 onglets** :
+```text
+[ V3 · 197€ (22 agents) ]   [ V4 · 347€ (+14 agents bonus) 🔒 ]
+▓▓▓▓▓░░░  8/22 agents validés · 36%
+```
 
-1. **Titre & sous-titre** — l'IA propose 3 couples titre + sous-titre (A / B / C).
-2. **4e de couverture** — 3 versions de la description de vente Amazon.
-3. **Couverture** — 3 pistes de couverture (visuel généré).
+- État `activeTier` (`'v3' | 'v4'`). Onglet V3 → agents `tier:'v3'` ; onglet V4 → agents `tier:'v4'` (bonus exclusifs).
+- Barre de progression recalculée par onglet.
+- Cadenas + bandeau upsell sur l'onglet V4 si l'abonné n'a pas la V4.
 
-Pour chaque onglet :
-- Boutons **Version A / B / C** en cartes côte à côte.
-- L'IA marque une version **« ⭐ Recommandé »** (avec une phrase de justification courte).
-- Bouton **« Choisir cette version »** qui enregistre le choix dans la fiche du livre (`edition_book_config_v1`) — titre/sous-titre alimentent aussi l'onglet Export.
-- Pré-remplissage à partir de la fiche du livre (titre, sujet, genre, public) déjà saisie dans le Parcours.
+## 2. Restaurer le comptage mots / chapitres (`EditionWorkflow.tsx`)
 
-Moteurs :
-- **Texte (titre + 4e)** : nouvelle edge function `edition-variants` (AI Gateway, `google/gemini-3-flash-preview`), sortie structurée { versions:[{label, titre?, sousTitre?, texte?, argument}], recommended:'A'|'B'|'C' }. Prompt en français, ton maison d'édition, aucune donnée fictive.
-- **Couverture** : réutilise la génération d'image existante (`aiImageInvoke` / moteur `cover-studio-pro`), 3 variations, photoréalisme strict conforme aux règles projet.
+La section « Structure du livre » ne montre plus que des titres. Reconstituer le manuscrit depuis `ebook_workflow_results` puis le découper avec `parseManuscript` + `countWords` (déjà dans `@/lib/manuscriptParser`) :
 
-## 2. Stratège de Positionnement (nouvel agent V4)
+- **Bandeau synthèse** : total mots · nb chapitres · pages estimées (`estimatePages`) · temps de lecture.
+- **Tableau par chapitre** : numéro, titre, **nombre de mots**, mini-barre vers une cible (~2 500 mots), style `EbookChapterWordCount`.
+- Message d'invitation conservé si aucun contenu rédigé.
+- Mise à jour auto via les listeners `ebook_workflow_results_updated` / `storage` déjà présents.
 
-Nouveau module `book-positioning` (composant `PositioningStrategist.tsx`) — « chercher les meilleures positions du livre », **3 volets combinés dans une seule vue** :
+## 3. Restaurer la config des clés modèles + OpenRouter dans le Hub
 
-1. **Meilleures catégories KDP** — sous-catégories Amazon les plus atteignables (rang cible + raison).
-2. **7 mots-clés KDP** — les 7 mots-clés porteurs pour le référencement Amazon.
-3. **Positionnement concurrentiel** — angle libre à prendre dans la niche, forces/faiblesses face aux best-sellers.
+Le bouton flottant `ApiKeysFloatingButton` n'apparaît que sur certains préfixes (`/ebook`, `/kdp`…) mais **pas sur `/hub-v3`** → dans le Hub, plus aucun moyen de saisir sa clé (Gemini `AIza…`) ni de choisir OpenRouter et son modèle (BYOK).
 
-Moteur : nouvelle edge function `book-positioning` (AI Gateway). Optionnellement enrichie par les données Amazon réelles déjà disponibles (`kdp-asin-scraper` / `market-research`) quand une niche est fournie ; sinon estimation IA. Sortie structurée (catégories[], keywords[7], competitive{angle, gaps[], watchouts[]}).
+Correctif en deux temps :
 
-## 3. Câblage dans l'atelier d'édition
+1. **Ajouter `/hub-v3` (et `/hub`) à `VISIBLE_PREFIXES`** dans `src/components/ebook/ApiKeysFloatingButton.tsx` → le bouton « Clés API » réapparaît sur le Hub avec le sélecteur de fournisseur (Gemini / Claude / OpenAI / **OpenRouter** + choix du modèle) et l'état « configuré ».
+2. **Point d'accès visible dans le Hub** : ajouter, en tête du Parcours, une petite carte/bandeau « Connectez votre clé IA » (fournisseur actif + statut valide/à configurer) qui ouvre le même panneau `EbookSettingsPanel` — pour que la configuration BYOK soit évidente sans dépendre uniquement du bouton flottant.
 
-Dans `src/data/editionAgents.ts`, ajouter deux agents `tier: 'v4'` :
+Le panneau réutilisé (`EbookSettingsPanel`) gère déjà Gemini + OpenRouter et la liste `OPENROUTER_MODELS` ; aucune logique IA n'est modifiée.
 
-| Agent | Département | Module |
-| --- | --- | --- |
-| Le Comparateur de versions (Studio A/B/C) | Studio Conception | `edition-variant-studio` |
-| Le Stratège de Positionnement | Publication | `book-positioning` |
+## Hors périmètre
 
-- V3 reste à **22 agents** (les nouveaux apparaissent verrouillés « Débloquer V4 »).
-- V4 passe de 34 à **36 agents** (`V3_AGENT_COUNT` / `V4_AGENT_COUNT` recalculés automatiquement).
-- `EditionWorkflow.tsx` : aucun changement de logique (rendu déjà filtré par tier). Le bandeau upsell V4 mentionne désormais aussi « Studio A/B/C + Stratège de Positionnement » pour rendre l'avantage V4 explicite.
-
-## 4. Enregistrement des modules
-
-- `src/data/roadmapV3.ts` : 2 nouvelles entrées modules (`edition-variant-studio`, `book-positioning`), pilier `edition`, accès `pack` (donc réservées V4).
-- `src/components/admin/v3ModuleRegistry.tsx` : mapping `moduleId → composant` pour les 2 nouveaux modules.
-- `src/data/v3Launch.ts` : libellé V4 mis à jour (36 agents) + mise en avant des nouveautés livre.
-
-## Détails techniques
-- Edge functions : CORS partagé, validation Zod des entrées, `Output`/JSON parse défensif (fallback sur `error.text`), gestion des erreurs 402/429 remontées à l'UI.
-- Aucun changement de paiement ni des générateurs existants ; on ajoute uniquement de nouveaux moteurs et l'orchestration.
-- Palette « Clair Ambre » et style identiques au Hub pour la cohérence visuelle.
-
-## Résultat attendu
-- **V4** visiblement supérieure : 2 agents exclusifs de plus (Studio A/B/C avec version recommandée + Stratège de Positionnement) en plus des enrichissements livre déjà en place.
-- Choix de version A/B/C fluide, avec recommandation IA, réinjecté dans la fiche livre et l'export.
-- Recherche des meilleures catégories, mots-clés et angle concurrentiel pour maximiser les ventes.
+- Aucun changement des agents, modules, edge functions, moteurs IA ou prix.
+- Aucun autre onglet du Hub modifié.
+- Pas de logique de paiement touchée.

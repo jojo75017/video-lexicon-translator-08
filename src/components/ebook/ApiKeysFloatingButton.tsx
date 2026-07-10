@@ -26,6 +26,9 @@ const VISIBLE_PREFIXES = [
   '/saas',
   '/admin-cockpit',
   '/tableau-de-bord',
+  '/hub-v3',
+  '/hub',
+
 ];
 const HIDDEN_PREFIXES = ['/auth', '/logout-total', '/ebookbot'];
 

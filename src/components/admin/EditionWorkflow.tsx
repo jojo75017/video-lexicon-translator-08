@@ -2,14 +2,24 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Check, ChevronDown, Lock, Play, Trophy, BookOpen, ArrowRight, Sparkles, FileText,
+  KeyRound, CheckCircle2, Clock, FileText as FileTextIcon,
 } from 'lucide-react';
 import { getModuleById, type V3Module } from '@/data/roadmapV3';
 import {
   EDITION_AGENTS, EDITION_DEPARTMENTS, getAgentsForTier,
-  V3_AGENT_COUNT, V4_AGENT_COUNT, type EditionAgent,
+  V3_AGENT_COUNT, V4_AGENT_COUNT, type EditionAgent, type EditionTier,
 } from '@/data/editionAgents';
 import WorkflowBookConfigForm from '@/components/ebook/WorkflowBookConfigForm';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { EbookSettingsPanel } from '@/components/ebook/EbookSettingsPanel';
+import { parseManuscript, countWords } from '@/lib/manuscriptParser';
+import { estimatePages } from '@/utils/kdpPageDensity';
+import {
+  getProvider, getProviderKey, validateKeyFormat, getOpenRouterModel,
+  PROVIDER_LABELS, OPENROUTER_MODELS,
+} from '@/services/aiWritingService';
+
 
 // Palette « Clair Ambre » (identique au Hub).
 const AMBER = '#E8951E';
@@ -93,6 +103,46 @@ function readChapterTitles(): string[] {
   }
 }
 
+interface ChapterStat { title: string; words: number; }
+interface ManuscriptStats {
+  chapters: ChapterStat[];
+  totalWords: number;
+  chapterCount: number;
+  pages: number;
+  readingMin: number;
+}
+
+/** Reconstitue le manuscrit rédigé (P20/P10, sinon plan P4/P3) puis compte les mots par chapitre. */
+function readManuscriptStats(): ManuscriptStats {
+  const empty: ManuscriptStats = { chapters: [], totalWords: 0, chapterCount: 0, pages: 0, readingMin: 0 };
+  try {
+    const raw = localStorage.getItem('ebook_workflow_results');
+    if (!raw) return empty;
+    const data = JSON.parse(raw);
+    let blob = '';
+    for (const key of ['P20', 'P10', 'P4', 'P3']) {
+      const c = data?.[key]?.displayContent;
+      if (typeof c === 'string' && c.trim().length >= 50) { blob = c; break; }
+    }
+    if (!blob) return empty;
+    const sections = parseManuscript(blob, 'Contenu');
+    const chapters: ChapterStat[] = sections.map((s) => {
+      const text = [s.title, ...s.blocks.map((b) => b.text)].join(' ');
+      return { title: s.title, words: countWords(text) };
+    }).filter((c) => c.words > 0);
+    const totalWords = chapters.reduce((n, c) => n + c.words, 0);
+    return {
+      chapters,
+      totalWords,
+      chapterCount: chapters.length,
+      pages: estimatePages(totalWords),
+      readingMin: Math.max(1, Math.ceil(totalWords / 230)),
+    };
+  } catch {
+    return empty;
+  }
+}
+
 const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpenModule }) => {
   const navigate = useNavigate();
   const { hasFull, isAdmin, loading } = useV3Entitlement();
@@ -100,9 +150,14 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
 
   const [done, setDone] = useState<Set<number>>(() => readDone());
   const [openChapters, setOpenChapters] = useState(true);
-  const [chapters, setChapters] = useState<string[]>(() => readChapterTitles());
+  const [stats, setStats] = useState<ManuscriptStats>(() => readManuscriptStats());
   const [config, setConfig] = useState<EditionBookConfig>(() => readConfig());
   const [openConfig, setOpenConfig] = useState(() => !readConfig().title.trim());
+  const [keysOpen, setKeysOpen] = useState(false);
+  const [aiTick, setAiTick] = useState(0);
+  // Onglet d'offre affiché : V3 (197€) ou V4 (347€).
+  const [activeTier, setActiveTier] = useState<EditionTier>('v3');
+
 
   const updateConfig = useCallback((patch: Partial<EditionBookConfig>) => {
     setConfig((prev) => {
@@ -114,7 +169,7 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
   }, []);
 
   useEffect(() => {
-    const refresh = () => setChapters(readChapterTitles());
+    const refresh = () => setStats(readManuscriptStats());
     window.addEventListener('ebook_workflow_results_updated', refresh);
     window.addEventListener('storage', refresh);
     return () => {
@@ -122,6 +177,12 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
       window.removeEventListener('storage', refresh);
     };
   }, []);
+
+  // Rafraîchit l'état de la clé IA (le panneau écrit dans le localStorage).
+  useEffect(() => {
+    if (!keysOpen) { setAiTick((n) => n + 1); }
+  }, [keysOpen]);
+
 
   const persist = useCallback((next: Set<number>) => {
     setDone(new Set(next));
@@ -134,17 +195,34 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
     persist(next);
   }, [done, persist]);
 
-  // Agents visibles : V4 voit tout, V3 voit les 22 mais les 8 Pro restent verrouillés (teaser).
-  const visibleAgents = useMemo(() => EDITION_AGENTS, []);
-  const activeAgents = useMemo(() => getAgentsForTier(canV4), [canV4]);
-  const total = activeAgents.length;
-  const completed = activeAgents.filter((a) => done.has(a.order)).length;
+  // Agents de l'onglet actif (V3 = 197€, V4 = bonus 347€).
+  const tierAgents = useMemo(() => EDITION_AGENTS.filter((a) => a.tier === activeTier), [activeTier]);
+  const v3Count = useMemo(() => EDITION_AGENTS.filter((a) => a.tier === 'v3').length, []);
+  const v4Count = useMemo(() => EDITION_AGENTS.filter((a) => a.tier === 'v4').length, []);
+  const total = tierAgents.length;
+  const completed = tierAgents.filter((a) => done.has(a.order)).length;
   const pct = total ? Math.round((completed / total) * 100) : 0;
+
+  // État de la clé IA (BYOK) — recalculé quand le panneau se ferme.
+  const aiStatus = useMemo(() => {
+    void aiTick;
+    const provider = getProvider();
+    const key = getProviderKey(provider);
+    const valid = !!key && validateKeyFormat(provider, key);
+    let label = PROVIDER_LABELS[provider];
+    if (provider === 'openrouter') {
+      const m = getOpenRouterModel();
+      const found = OPENROUTER_MODELS.find((x) => x.id === m);
+      label = `OpenRouter · ${found ? found.label.split(' ')[0] : 'modèle'}`;
+    }
+    return { valid, label };
+  }, [aiTick]);
 
   const openAgent = useCallback((agent: EditionAgent) => {
     const mod = getModuleById(agent.moduleId);
     if (mod) onOpenModule(mod);
   }, [onOpenModule]);
+
 
   return (
     <div className="rounded-3xl border shadow-sm overflow-hidden" style={{ background: '#fff', borderColor: '#eadfc9' }}>
@@ -165,6 +243,50 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
         <p className="mt-1 text-[13px]" style={{ color: '#6f5e47' }}>
           Suivez les agents dans l'ordre. Chaque métier fait avancer votre livre d'une étape claire.
         </p>
+
+        {/* Sélecteur d'offre : 197€ (V3) vs 347€ (V4) */}
+        <div className="mt-4 inline-flex rounded-xl p-1 border" style={{ background: '#fff', borderColor: '#eadfc9' }}>
+          <button
+            onClick={() => setActiveTier('v3')}
+            className="px-3.5 py-2 rounded-lg text-[12.5px] font-bold transition-colors"
+            style={{
+              background: activeTier === 'v3' ? AMBER : 'transparent',
+              color: activeTier === 'v3' ? '#fff' : '#8a7860',
+            }}>
+            V3 · 197€ <span className="opacity-80">({v3Count} agents)</span>
+          </button>
+          <button
+            onClick={() => setActiveTier('v4')}
+            className="ml-1 px-3.5 py-2 rounded-lg text-[12.5px] font-bold transition-colors inline-flex items-center gap-1.5"
+            style={{
+              background: activeTier === 'v4' ? AMBER_DEEP : 'transparent',
+              color: activeTier === 'v4' ? '#fff' : '#8a7860',
+            }}>
+            V4 · 347€ <span className="opacity-80">(+{v4Count} bonus)</span>
+            {!canV4 && <Lock className="h-3 w-3" />}
+          </button>
+        </div>
+
+        {/* Carte clé IA (BYOK Gemini / OpenRouter…) */}
+        <button
+          onClick={() => setKeysOpen(true)}
+          className="mt-4 w-full flex items-center gap-3 rounded-2xl border p-3.5 text-left transition-colors hover:bg-[#FFF9EF]"
+          style={{ borderColor: aiStatus.valid ? `${GREEN}55` : `${AMBER}66`, background: aiStatus.valid ? `${GREEN}0d` : AMBER_SOFT }}>
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl"
+            style={{ background: '#fff', color: aiStatus.valid ? GREEN : AMBER_DEEP, border: `1px solid ${aiStatus.valid ? GREEN : AMBER}44` }}>
+            {aiStatus.valid ? <CheckCircle2 className="h-4.5 w-4.5" /> : <KeyRound className="h-4.5 w-4.5" />}
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[13px] font-bold" style={{ color: INK }}>
+              {aiStatus.valid ? `IA connectée : ${aiStatus.label}` : 'Connectez votre clé IA (Gemini, OpenRouter…)'}
+            </span>
+            <span className="block text-[11.5px]" style={{ color: '#8a7860' }}>
+              Choisissez votre fournisseur et votre modèle (Gemini · Claude · ChatGPT · OpenRouter). Cliquez pour configurer.
+            </span>
+          </span>
+          <ArrowRight className="h-4 w-4 shrink-0" style={{ color: AMBER_DEEP }} />
+        </button>
+
 
         {/* Progression */}
         <div className="mt-4">
@@ -224,43 +346,74 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
       </div>
 
 
-      {/* Structure du livre — titres de chapitres */}
+      {/* Structure du livre — comptage mots & chapitres */}
       <div className="border-t px-5 sm:px-7 py-4" style={{ borderColor: '#f0e7d4', background: '#FCF8F0' }}>
         <button onClick={() => setOpenChapters((v) => !v)}
           className="w-full flex items-center gap-2 text-left" aria-expanded={openChapters}>
           <BookOpen className="h-4 w-4" style={{ color: AMBER_DEEP }} />
           <span className="text-sm font-bold" style={{ color: INK }}>Structure du livre</span>
           <span className="text-[11px]" style={{ color: '#a18a6c' }}>
-            {chapters.length ? `${chapters.length} chapitres détectés` : 'aucun chapitre pour l\'instant'}
+            {stats.chapterCount ? `${stats.chapterCount} chapitres · ${stats.totalWords.toLocaleString('fr-FR')} mots` : 'aucun chapitre pour l\'instant'}
           </span>
           <ChevronDown className={`ml-auto h-4 w-4 transition-transform ${openChapters ? 'rotate-180' : ''}`} style={{ color: AMBER_DEEP }} />
         </button>
         {openChapters && (
           <div className="mt-3">
-            {chapters.length ? (
-              <ol className="grid gap-1 sm:grid-cols-2">
-                {chapters.map((t, i) => (
-                  <li key={i} className="flex items-start gap-2 text-[13px]" style={{ color: '#4a3f30' }}>
-                    <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full text-[10px] font-black"
-                      style={{ background: AMBER_SOFT, color: AMBER_DEEP }}>{i + 1}</span>
-                    <span className="min-w-0">{t}</span>
-                  </li>
-                ))}
-              </ol>
+            {stats.chapterCount ? (
+              <>
+                {/* Bandeau synthèse */}
+                <div className="mb-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {[
+                    { icon: FileTextIcon, value: stats.totalWords.toLocaleString('fr-FR'), label: 'mots' },
+                    { icon: BookOpen, value: stats.chapterCount, label: 'chapitres' },
+                    { icon: FileText, value: `~${stats.pages}`, label: 'pages' },
+                    { icon: Clock, value: `${stats.readingMin} min`, label: 'lecture' },
+                  ].map((m) => {
+                    const Icon = m.icon;
+                    return (
+                      <div key={m.label} className="rounded-xl border p-2.5 text-center" style={{ borderColor: '#eadfc9', background: '#fff' }}>
+                        <Icon className="h-4 w-4 mx-auto mb-1" style={{ color: AMBER_DEEP }} />
+                        <div className="text-base font-black leading-none" style={{ color: INK }}>{m.value}</div>
+                        <div className="text-[10px] mt-0.5" style={{ color: '#a18a6c' }}>{m.label}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+                {/* Tableau par chapitre */}
+                <ol className="grid gap-1.5">
+                  {stats.chapters.map((c, i) => {
+                    const ratio = Math.min(1, c.words / 2500);
+                    return (
+                      <li key={i} className="flex items-center gap-2.5 text-[13px]" style={{ color: '#4a3f30' }}>
+                        <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full text-[10px] font-black"
+                          style={{ background: AMBER_SOFT, color: AMBER_DEEP }}>{i + 1}</span>
+                        <span className="min-w-0 flex-1 truncate">{c.title}</span>
+                        <span className="hidden sm:block h-1.5 w-24 rounded-full overflow-hidden shrink-0" style={{ background: '#f0e7d4' }}>
+                          <span className="block h-full rounded-full" style={{ width: `${ratio * 100}%`, background: `linear-gradient(90deg, ${AMBER}, #FFB44D)` }} />
+                        </span>
+                        <span className="shrink-0 tabular-nums text-[12px] font-semibold w-20 text-right" style={{ color: AMBER_DEEP }}>
+                          {c.words.toLocaleString('fr-FR')} mots
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ol>
+              </>
             ) : (
               <p className="text-[12px]" style={{ color: '#8a7860' }}>
-                Lancez <strong>L'Architecte du Livre</strong> puis <strong>Le Romancier</strong> : les titres de vos
-                chapitres apparaîtront ici automatiquement.
+                Lancez <strong>L'Architecte du Livre</strong> puis <strong>Le Romancier</strong> : vos
+                chapitres et le comptage des mots apparaîtront ici automatiquement.
               </p>
             )}
           </div>
         )}
       </div>
 
+
       {/* Départements & agents */}
       <div className="divide-y" style={{ borderColor: '#f0e7d4' }}>
         {EDITION_DEPARTMENTS.map((dept) => {
-          const agents = visibleAgents.filter((a) => a.department === dept);
+          const agents = tierAgents.filter((a) => a.department === dept);
           if (!agents.length) return null;
           const deptDone = agents.filter((a) => done.has(a.order)).length;
           const isPro = agents.every((a) => a.tier === 'v4');
@@ -328,8 +481,8 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
         })}
       </div>
 
-      {/* Bandeau upsell V4 si offre V3 */}
-      {!canV4 && !loading && (
+      {/* Bandeau upsell V4 — affiché dans l'onglet V4 quand l'abonné n'a pas la V4 */}
+      {activeTier === 'v4' && !canV4 && !loading && (
         <div className="border-t px-5 sm:px-7 py-5" style={{ borderColor: '#f0e7d4', background: AMBER_SOFT }}>
           <div className="flex flex-wrap items-center gap-3">
             <div className="min-w-0 flex-1">
@@ -347,8 +500,19 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
           </div>
         </div>
       )}
+
+      {/* Panneau clés IA (BYOK) */}
+      <Dialog open={keysOpen} onOpenChange={setKeysOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Choisir mon IA · Clés API & réglages</DialogTitle>
+          </DialogHeader>
+          <EbookSettingsPanel />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
+
 
 export default EditionWorkflow;
