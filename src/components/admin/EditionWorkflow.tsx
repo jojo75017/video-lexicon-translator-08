@@ -413,7 +413,7 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
       {/* Départements & agents */}
       <div className="divide-y" style={{ borderColor: '#f0e7d4' }}>
         {EDITION_DEPARTMENTS.map((dept) => {
-          const agents = visibleAgents.filter((a) => a.department === dept);
+          const agents = tierAgents.filter((a) => a.department === dept);
           if (!agents.length) return null;
           const deptDone = agents.filter((a) => done.has(a.order)).length;
           const isPro = agents.every((a) => a.tier === 'v4');
