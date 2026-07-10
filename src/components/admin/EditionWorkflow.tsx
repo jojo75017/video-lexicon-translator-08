@@ -529,9 +529,10 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
               </div>
 
               <div className="grid gap-2.5">
-                {agents.map((agent) => {
+                {agents.map((agent, agentIndex) => {
                   const isDone = done.has(agent.order);
                   const locked = agent.tier === 'v4' && !canV4;
+                  const tierLabel = agent.tier === 'v4' ? 'V4 · 347€' : 'V3 · 197€';
                   return (
                     <div key={agent.order}
                       className="flex items-start gap-3 rounded-2xl border p-3.5 transition-colors"
@@ -548,13 +549,23 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
                           background: isDone ? GREEN : '#fff',
                           color: isDone ? '#fff' : locked ? '#bcaa8c' : AMBER_DEEP,
                         }}>
-                        {isDone ? <Check className="h-4 w-4" /> : locked ? <Lock className="h-3.5 w-3.5" /> : agent.order}
+                        {isDone ? <Check className="h-4 w-4" /> : locked ? <Lock className="h-3.5 w-3.5" /> : agentIndex + 1}
                       </button>
 
                       <div className="flex-1 min-w-0">
-                        <div className={`text-sm font-bold leading-tight ${isDone ? 'opacity-70' : ''}`}
-                          style={{ fontFamily: SERIF, color: INK }}>
-                          {agent.role}
+                        <div className="flex flex-wrap items-center gap-2">
+                          <div className={`text-sm font-bold leading-tight ${isDone ? 'opacity-70' : ''}`}
+                            style={{ fontFamily: SERIF, color: INK }}>
+                            {agent.role}
+                          </div>
+                          <span
+                            className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wide"
+                            style={agent.tier === 'v4'
+                              ? { background: AMBER_SOFT, color: AMBER_DEEP, border: `1px solid ${AMBER}55` }
+                              : { background: `${GREEN}18`, color: GREEN, border: `1px solid ${GREEN}44` }}
+                          >
+                            {tierLabel}
+                          </span>
                         </div>
                         <p className="mt-0.5 text-[12.5px] leading-snug" style={{ color: '#6f5e47' }}>{agent.mission}</p>
                       </div>
