@@ -531,8 +531,8 @@ export async function generateCorrectedPdfBlob(
   const pageHeightMm = inchesToMm(twipsToInches(format.height));
 
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pageWidthMm, pageHeightMm], compress: true });
-  // Police PDF intégrée et uniforme pour éviter toute substitution fragile.
-  const pdfFont = 'times';
+  // Police PDF intégrée fiable pour les accents français dans les prévisualiseurs.
+  const pdfFont = 'helvetica';
   doc.setFont(pdfFont, 'normal');
 
   const insideMm = inchesToMm(margins.insideInches);
