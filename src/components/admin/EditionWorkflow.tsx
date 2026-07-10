@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { getModuleById, type V3Module } from '@/data/roadmapV3';
 import {
-  EDITION_AGENTS, EDITION_DEPARTMENTS, getAgentsForTier,
+  EDITION_AGENTS, EDITION_DEPARTMENTS,
   V3_AGENT_COUNT, V4_AGENT_COUNT, type EditionAgent, type EditionTier,
 } from '@/data/editionAgents';
 import WorkflowBookConfigForm from '@/components/ebook/WorkflowBookConfigForm';
@@ -31,6 +31,7 @@ const SERIF = "'Instrument Serif', Georgia, 'Times New Roman', serif";
 
 const DONE_KEY = 'edition_workflow_done_v1';
 const CONFIG_KEY = 'edition_book_config_v1';
+const TARGET_WORDS_KEY = 'edition_chapter_target_words_v1';
 
 interface EditionBookConfig {
   title: string;
@@ -64,6 +65,16 @@ function readDone(): Set<number> {
     return new Set<number>(JSON.parse(raw));
   } catch {
     return new Set();
+  }
+}
+
+function readTargetWords(): number {
+  try {
+    const raw = localStorage.getItem(TARGET_WORDS_KEY);
+    const n = raw ? Number(raw) : 2500;
+    return Number.isFinite(n) && n >= 250 ? Math.round(n) : 2500;
+  } catch {
+    return 2500;
   }
 }
 
@@ -103,33 +114,96 @@ function readChapterTitles(): string[] {
   }
 }
 
-interface ChapterStat { title: string; words: number; }
+interface ChapterStat { title: string; words: number; planned?: boolean; }
 interface ManuscriptStats {
   chapters: ChapterStat[];
   totalWords: number;
   chapterCount: number;
   pages: number;
   readingMin: number;
+  hasContent: boolean;
 }
 
-/** Reconstitue le manuscrit rédigé (P20/P10, sinon plan P4/P3) puis compte les mots par chapitre. */
-function readManuscriptStats(): ManuscriptStats {
-  const empty: ManuscriptStats = { chapters: [], totalWords: 0, chapterCount: 0, pages: 0, readingMin: 0 };
+interface TextCandidate { text: string; score: number; }
+
+function plannedChapters(config: EditionBookConfig): ChapterStat[] {
+  const count = Math.max(1, Math.min(60, Math.round(Number(config.numberOfChapters) || EMPTY_CONFIG.numberOfChapters)));
+  const titles = readChapterTitles();
+  return Array.from({ length: count }, (_, i) => ({
+    title: titles[i] || `Chapitre ${i + 1} · À rédiger`,
+    words: 0,
+    planned: true,
+  }));
+}
+
+function scoreText(text: string, keyPath: string): number {
+  const lowerPath = keyPath.toLowerCase();
+  const chapterSignals = (text.match(/(?:^|\n)\s*(?:#{1,3}\s*)?(?:chapitre|partie|prologue|épilogue|epilogue|introduction)\b/gim) || []).length;
+  let score = text.length + chapterSignals * 5000;
+  if (/p20|p10|manuscript|manuscrit|chapters|chapitres|displaycontent|content|result|texte|text|output/.test(lowerPath)) score += 3000;
+  if (/plan|brief|config|title|subtitle|author|description/.test(lowerPath)) score -= 1200;
+  return score;
+}
+
+function collectTextCandidates(value: unknown, keyPath = '', candidates: TextCandidate[] = [], depth = 0): TextCandidate[] {
+  if (depth > 7 || value == null) return candidates;
+  if (typeof value === 'string') {
+    const text = value.trim();
+    if (text.length >= 50) candidates.push({ text, score: scoreText(text, keyPath) });
+    return candidates;
+  }
+  if (Array.isArray(value)) {
+    const joinedParts = value
+      .map((item) => {
+        if (typeof item === 'string') return item;
+        if (item && typeof item === 'object') {
+          const obj = item as Record<string, unknown>;
+          return [obj.title, obj.heading, obj.content, obj.text, obj.body, obj.displayContent]
+            .filter((x): x is string => typeof x === 'string')
+            .join('\n');
+        }
+        return '';
+      })
+      .filter((part) => part.trim().length >= 20);
+    if (joinedParts.length >= 2) {
+      const joined = joinedParts.join('\n\n');
+      candidates.push({ text: joined, score: scoreText(joined, `${keyPath}.array`) + 2000 });
+    }
+    value.forEach((item, index) => collectTextCandidates(item, `${keyPath}.${index}`, candidates, depth + 1));
+    return candidates;
+  }
+  if (typeof value === 'object') {
+    Object.entries(value as Record<string, unknown>).forEach(([key, child]) => {
+      collectTextCandidates(child, keyPath ? `${keyPath}.${key}` : key, candidates, depth + 1);
+    });
+  }
+  return candidates;
+}
+
+/** Reconstitue le manuscrit depuis tout ebook_workflow_results, puis compte les mots par chapitre. */
+function readManuscriptStats(config: EditionBookConfig): ManuscriptStats {
+  const fallback = plannedChapters(config);
+  const empty: ManuscriptStats = {
+    chapters: fallback,
+    totalWords: 0,
+    chapterCount: fallback.length,
+    pages: 0,
+    readingMin: 0,
+    hasContent: false,
+  };
   try {
     const raw = localStorage.getItem('ebook_workflow_results');
     if (!raw) return empty;
     const data = JSON.parse(raw);
-    let blob = '';
-    for (const key of ['P20', 'P10', 'P4', 'P3']) {
-      const c = data?.[key]?.displayContent;
-      if (typeof c === 'string' && c.trim().length >= 50) { blob = c; break; }
-    }
+    const candidates = collectTextCandidates(data).sort((a, b) => b.score - a.score);
+    const blob = candidates[0]?.text ?? '';
     if (!blob) return empty;
     const sections = parseManuscript(blob, 'Contenu');
     const chapters: ChapterStat[] = sections.map((s) => {
       const text = [s.title, ...s.blocks.map((b) => b.text)].join(' ');
       return { title: s.title, words: countWords(text) };
     }).filter((c) => c.words > 0);
+    if (!chapters.length) return empty;
     const totalWords = chapters.reduce((n, c) => n + c.words, 0);
     return {
       chapters,
@@ -137,6 +211,7 @@ function readManuscriptStats(): ManuscriptStats {
       chapterCount: chapters.length,
       pages: estimatePages(totalWords),
       readingMin: Math.max(1, Math.ceil(totalWords / 230)),
+      hasContent: true,
     };
   } catch {
     return empty;
@@ -148,10 +223,11 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
   const { hasFull, isAdmin, loading } = useV3Entitlement();
   const canV4 = hasFull || isAdmin;
 
+  const [config, setConfig] = useState<EditionBookConfig>(() => readConfig());
   const [done, setDone] = useState<Set<number>>(() => readDone());
   const [openChapters, setOpenChapters] = useState(true);
-  const [stats, setStats] = useState<ManuscriptStats>(() => readManuscriptStats());
-  const [config, setConfig] = useState<EditionBookConfig>(() => readConfig());
+  const [stats, setStats] = useState<ManuscriptStats>(() => readManuscriptStats(readConfig()));
+  const [targetWords, setTargetWords] = useState(() => readTargetWords());
   const [openConfig, setOpenConfig] = useState(() => !readConfig().title.trim());
   const [keysOpen, setKeysOpen] = useState(false);
   const [aiTick, setAiTick] = useState(0);
@@ -169,13 +245,20 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
   }, []);
 
   useEffect(() => {
-    const refresh = () => setStats(readManuscriptStats());
+    const refresh = () => setStats(readManuscriptStats(config));
+    refresh();
     window.addEventListener('ebook_workflow_results_updated', refresh);
     window.addEventListener('storage', refresh);
     return () => {
       window.removeEventListener('ebook_workflow_results_updated', refresh);
       window.removeEventListener('storage', refresh);
     };
+  }, [config]);
+
+  const updateTargetWords = useCallback((value: number) => {
+    const next = Math.max(250, Math.min(20000, Math.round(value || 2500)));
+    setTargetWords(next);
+    try { localStorage.setItem(TARGET_WORDS_KEY, String(next)); } catch { /* ignore */ }
   }, []);
 
   // Rafraîchit l'état de la clé IA (le panneau écrit dans le localStorage).
@@ -262,7 +345,7 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
               background: activeTier === 'v4' ? AMBER_DEEP : 'transparent',
               color: activeTier === 'v4' ? '#fff' : '#8a7860',
             }}>
-            V4 · 347€ <span className="opacity-80">(+{v4Count} bonus)</span>
+            V4 · 347€ <span className="opacity-80">({v4Count} agents)</span>
             {!canV4 && <Lock className="h-3 w-3" />}
           </button>
         </div>
