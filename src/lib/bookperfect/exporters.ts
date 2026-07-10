@@ -8,11 +8,38 @@
  */
 import {
   Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, PageBreak,
+  Footer, PageNumber,
 } from 'docx';
 import { saveAs } from 'file-saver';
 import { applyFrenchTypography } from '@/utils/frenchTypography';
 import type { Analysis, Chapter, Issue, Manuscript } from './types';
 import { CATEGORY_LABELS } from './types';
+
+/** Formats de page pour l'export (Amazon KDP + formats de travail). */
+export type KdpFormatId = '5x8' | '5.5x8.5' | '6x9' | 'a4' | 'a5';
+
+export interface KdpFormat {
+  id: KdpFormatId;
+  label: string;
+  description: string;
+  recommended?: boolean;
+  /** Dimensions en DXA (1 pouce = 1440). */
+  width: number;
+  height: number;
+  /** Marge en DXA appliquée sur les 4 côtés. */
+  margin: number;
+}
+
+export const KDP_FORMATS: KdpFormat[] = [
+  { id: '5x8',     label: '5 × 8 pouces',     description: 'Format poche compact', width: 7200,  height: 11520, margin: 1080 },
+  { id: '5.5x8.5', label: '5,5 × 8,5 pouces', description: 'Format standard non-fiction', width: 7920,  height: 12240, margin: 1080 },
+  { id: '6x9',     label: '6 × 9 pouces',     description: 'Recommandé pour les romans', recommended: true, width: 8640, height: 12960, margin: 1152 },
+  { id: 'a4',      label: 'A4 (travail)',     description: 'Relecture / impression bureau', width: 11906, height: 16838, margin: 1440 },
+  { id: 'a5',      label: 'A5 (lecture)',     description: 'Format lecture agréable', width: 8419,  height: 11906, margin: 1080 },
+];
+
+export const getKdpFormat = (id: KdpFormatId): KdpFormat =>
+  KDP_FORMATS.find((f) => f.id === id) ?? KDP_FORMATS[2];
 
 /** Applique les corrections validées à un texte (1re occurrence par issue). */
 function applyCorrections(text: string, issues: Issue[]): string {
@@ -46,8 +73,15 @@ const paragraphsFrom = (text: string): Paragraph[] =>
       alignment: AlignmentType.JUSTIFIED,
     }));
 
-/** Exporte le manuscrit corrigé en .docx (prêt pour Amazon KDP). */
-export async function exportCorrectedDocx(manuscript: Manuscript, analysis: Analysis, applyTypography = true) {
+/** Exporte le manuscrit corrigé en .docx (prêt pour Amazon KDP).
+ *  Le format applique automatiquement dimensions, marges et pagination. */
+export async function exportCorrectedDocx(
+  manuscript: Manuscript,
+  analysis: Analysis,
+  applyTypography = true,
+  formatId: KdpFormatId = '6x9',
+) {
+  const format = getKdpFormat(formatId);
   const children: Paragraph[] = [];
 
   // Page de titre
@@ -69,16 +103,30 @@ export async function exportCorrectedDocx(manuscript: Manuscript, analysis: Anal
     children.push(...paragraphsFrom(corrected));
   });
 
+  // Pagination centrée en pied de page (numéro courant).
+  const footer = new Footer({
+    children: [new Paragraph({
+      alignment: AlignmentType.CENTER,
+      children: [new TextRun({ children: [PageNumber.CURRENT], size: 20, font: 'Georgia' })],
+    })],
+  });
+
   const doc = new Document({
     sections: [{
-      properties: { page: { size: { width: 12240, height: 15840 }, margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 } } },
+      properties: {
+        page: {
+          size: { width: format.width, height: format.height },
+          margin: { top: format.margin, right: format.margin, bottom: format.margin, left: format.margin },
+        },
+      },
+      footers: { default: footer },
       children,
     }],
   });
 
   const blob = await Packer.toBlob(doc);
   const safe = manuscript.title.replace(/[^\w\sÀ-ÿ-]/g, '').trim().slice(0, 60) || 'manuscrit';
-  saveAs(blob, `${safe} — corrigé (KDP).docx`);
+  saveAs(blob, `${safe} — ${format.label} (KDP).docx`);
 }
 
 /** Exporte un rapport d'analyse récapitulatif en .docx. */
