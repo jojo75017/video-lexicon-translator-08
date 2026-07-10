@@ -101,6 +101,17 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
   const [done, setDone] = useState<Set<number>>(() => readDone());
   const [openChapters, setOpenChapters] = useState(true);
   const [chapters, setChapters] = useState<string[]>(() => readChapterTitles());
+  const [config, setConfig] = useState<EditionBookConfig>(() => readConfig());
+  const [openConfig, setOpenConfig] = useState(() => !readConfig().title.trim());
+
+  const updateConfig = useCallback((patch: Partial<EditionBookConfig>) => {
+    setConfig((prev) => {
+      const next = { ...prev, ...patch };
+      try { localStorage.setItem(CONFIG_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+      try { window.dispatchEvent(new Event('edition_book_config_updated')); } catch { /* ignore */ }
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
     const refresh = () => setChapters(readChapterTitles());
