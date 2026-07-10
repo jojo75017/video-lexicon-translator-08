@@ -1498,7 +1498,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                       {authorName?.trim() && (
                         <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">✍️ {authorName}</span>
                       )}
-                      <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">📚 {chapters.length} chapitre{chapters.length > 1 ? 's' : ''}</span>
+                      <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">📚 {bookStats.totalChapters} chapitre{bookStats.totalChapters > 1 ? 's' : ''}</span>
+                      <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">📑 {bookStats.totalSubChapters} sous-chapitre{bookStats.totalSubChapters > 1 ? 's' : ''}</span>
+                      <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">📄 ~{bookStats.estimatedPages} page{bookStats.estimatedPages > 1 ? 's' : ''}</span>
+                      <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">✍️ {bookStats.totalWords.toLocaleString('fr-FR')} mots</span>
                     </div>
                   </>
                 ) : (
