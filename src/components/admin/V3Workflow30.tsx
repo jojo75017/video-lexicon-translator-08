@@ -552,7 +552,12 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   const newProject = () => {
     setProjectId(null);
     setProjectName('Mon livre');
+    setBrief({ ...EMPTY_BRIEF });
+    setTheme('');
+    setDone(new Set());
+    setResults({});
     setCloudMsg(null);
+    setOpenCfg('brief');
   };
 
   // Démarre un livre entièrement neuf : réinitialise le brief, le thème et le projet en cours.
@@ -561,11 +566,16 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
     setTheme('');
     setProjectId(null);
     setProjectName('Mon livre');
+    setDone(new Set());
+    setResults({});
+    setError(null);
     setCloudMsg('Nouveau livre prêt — remplis ton projet ci-dessous.');
     setOpenCfg('brief');
     try {
       localStorage.removeItem(BRIEF_KEY);
       localStorage.removeItem(THEME_KEY);
+      localStorage.removeItem(PROGRESS_KEY);
+      localStorage.removeItem(RESULTS_KEY);
     } catch { /* ignore */ }
   };
 
@@ -595,6 +605,11 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
     const readingMin = totalWords > 0 ? Math.max(1, Math.ceil(totalWords / 200)) : 0;
     return { chapters, totalWords, estimatedPages, readingMin, wordsPerPage, isEstimate: !hasManuscript };
   }, [brief.chapterCount, brief.wordsPerChapter, results, formatId]);
+
+  const exportManuscript = results['p20-chat-manuscript'] || '';
+  const exportTitle = brief.title?.trim() || theme.trim() || projectName.trim() || 'Mon livre';
+  const phase6CoreIds = ['manuscript-converter', 'back-matter-builder', 'copyright-page'];
+  const miseEnPageDone = phase6CoreIds.every((id) => done.has(id));
 
 
   // Progression calculée uniquement sur les étapes ACCESSIBLES (débloquées).
