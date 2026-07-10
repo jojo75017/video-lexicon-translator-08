@@ -93,7 +93,7 @@ export const EDITION_AGENTS: EditionAgent[] = [
     moduleId: 'reading-committee', tier: 'v3' },
   { order: 17, department: 'Enrichissement du livre', role: "L'Éditeur littéraire (premium)",
     mission: 'V4 : passe éditoriale approfondie et manuscrit enrichi.',
-    moduleId: 'editorial', tier: 'v4' },
+    moduleId: 'quality-label', tier: 'v4' },
 
   // ─────────── Fabrication ───────────
   { order: 18, department: 'Fabrication', role: 'Le Maquettiste',
@@ -110,7 +110,7 @@ export const EDITION_AGENTS: EditionAgent[] = [
     moduleId: 'print-proof-checker', tier: 'v3' },
   { order: 22, department: 'Enrichissement du livre', role: 'Le Directeur Audio',
     mission: 'V4 : version audio (audiobook) narrée, prête à publier.',
-    moduleId: 'audiobook-express', tier: 'v4' },
+    moduleId: 'audio-video-transcription', tier: 'v4' },
 
   // ─────────── Publication ───────────
   { order: 23, department: 'Publication', role: 'Le Responsable Métadonnées',
