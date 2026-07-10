@@ -1,9 +1,13 @@
-import React from 'react';
-import { FileDown, FileText, RefreshCw } from 'lucide-react';
+import React, { useState } from 'react';
+import { FileDown, FileText, RefreshCw, BookOpen, Star } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+} from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { exportCorrectedDocx, exportReportDocx } from '@/lib/bookperfect/exporters';
+import { exportCorrectedDocx, exportReportDocx, KDP_FORMATS } from '@/lib/bookperfect/exporters';
+import type { KdpFormatId } from '@/lib/bookperfect/exporters';
 import { CATEGORY_LABELS } from '@/lib/bookperfect/types';
 import type { Analysis, IssueCategory, Manuscript } from '@/lib/bookperfect/types';
 
@@ -16,13 +20,15 @@ interface Props {
 export const RapportFinalTab: React.FC<Props> = ({ manuscript, analysis, onRelaunchFailed }) => {
   const failed = analysis.chapterResults.filter((r) => r.status === 'failed').length;
   const appliedCount = analysis.issues.filter((i) => i.status === 'applied').length;
+  const [kdpOpen, setKdpOpen] = useState(false);
 
   const stat = (cat: IssueCategory) => analysis.issues.filter((i) => i.category === cat).length;
 
-  const doExportDocx = async () => {
+  const doExportDocx = async (formatId: KdpFormatId = '6x9') => {
     try {
+      setKdpOpen(false);
       toast.loading('Génération du Word corrigé…', { id: 'bp-docx' });
-      await exportCorrectedDocx(manuscript, analysis, true);
+      await exportCorrectedDocx(manuscript, analysis, true, formatId);
       toast.success('Manuscrit corrigé exporté (.docx) ✓', { id: 'bp-docx' });
     } catch (e: any) {
       toast.error(e?.message || 'Échec de l\'export Word.', { id: 'bp-docx' });
