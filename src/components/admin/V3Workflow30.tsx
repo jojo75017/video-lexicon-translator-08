@@ -1039,6 +1039,16 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             </div>
           )}
 
+          {/* Export du livre — moteur multi-format complet (toujours visible, en haut du parcours) */}
+          <div className="mt-5">
+            <V3ExportPanel
+              manuscript={exportManuscript}
+              title={exportTitle}
+              subtitle={brief.subtitle?.trim() || undefined}
+              author={brief.author?.trim() || undefined}
+            />
+          </div>
+
           {/* Tableau du volume — toujours visible sur la page */}
           <div className="mt-5 rounded-2xl border p-4 sm:p-5" style={{ borderColor: '#eadfc9', background: '#fffdf8' }}>
             <div className="flex items-center justify-between gap-3 mb-3">
@@ -1331,15 +1341,6 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             )}
           </div>
 
-          {/* Export du livre — moteur multi-format complet (toujours visible) */}
-          <div className="mt-5">
-            <V3ExportPanel
-              manuscript={results['p20-chat-manuscript'] || ''}
-              title={brief.title?.trim() || theme.trim() || 'Mon livre'}
-              subtitle={brief.subtitle?.trim() || undefined}
-              author={brief.author?.trim() || undefined}
-            />
-          </div>
         </div>
 
         {/* Phases.
@@ -1586,18 +1587,15 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                       );
                     })}
 
-                    {/* Export contextuel : apparaît dès qu'un manuscrit existe pour CE projet
-                        (ou quand toute la mise en page est validée). */}
-                    {phase.key === 'mise-en-page'
-                      && ((results['p20-chat-manuscript'] || '').trim().length >= 50
-                        || ['manuscript-converter', 'back-matter-builder', 'copyright-page'].every((id) => done.has(id))) && (
+                    {/* Export contextuel : apparaît après validation de toute la Phase 6 cœur. */}
+                    {phase.key === 'mise-en-page' && miseEnPageDone && (
                       <div className="px-5 sm:px-7 pt-2 pb-1">
                         <div className="mb-2 inline-flex items-center gap-1.5 text-[12px] font-bold" style={{ color: GREEN }}>
                           <Check className="h-4 w-4" /> Ta mise en page est prête — exporte ton livre
                         </div>
                         <V3ExportPanel
-                          manuscript={results['p20-chat-manuscript'] || ''}
-                          title={brief.title?.trim() || theme.trim() || 'Mon livre'}
+                          manuscript={exportManuscript}
+                          title={exportTitle}
                           subtitle={brief.subtitle?.trim() || undefined}
                           author={brief.author?.trim() || undefined}
                         />
