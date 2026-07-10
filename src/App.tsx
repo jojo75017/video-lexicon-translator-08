@@ -573,11 +573,9 @@ const App = () => {
             <Route
               path="/bookperfect"
               element={
-                <V3Gate>
-                  <BookPerfectGate>
-                    <BookPerfectPage />
-                  </BookPerfectGate>
-                </V3Gate>
+                <BookPerfectGate>
+                  <BookPerfectPage />
+                </BookPerfectGate>
               }
             />
             <Route

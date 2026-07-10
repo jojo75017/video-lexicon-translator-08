@@ -228,6 +228,10 @@ export function loadAnalysisAsync(manuscriptId: string): Promise<Analysis | null
   return readAutosaveAsync<Analysis>(SCOPE(manuscriptId));
 }
 
+export async function saveAnalysisSnapshotAsync(analysis: Analysis): Promise<void> {
+  await persistAsync(analysis);
+}
+
 export interface BookPerfectRecoverySnapshot {
   manuscript: Manuscript;
   analysis: Analysis;

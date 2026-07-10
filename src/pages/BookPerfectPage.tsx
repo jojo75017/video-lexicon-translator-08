@@ -20,7 +20,7 @@ import { ComparaisonTab } from '@/components/bookperfect/tabs/ComparaisonTab';
 import { RapportFinalTab } from '@/components/bookperfect/tabs/RapportFinalTab';
 import { exportKdpPackage, DEFAULT_KDP_OPTIONS } from '@/lib/bookperfect/exporters';
 import {
-  runAnalysis, loadAnalysisAsync, loadRecoverySnapshotAsync, updateIssueStatus, BOOKPERFECT_RECOVERY_SCOPE,
+  runAnalysis, loadAnalysisAsync, loadRecoverySnapshotAsync, updateIssueStatus, BOOKPERFECT_RECOVERY_SCOPE, saveAnalysisSnapshotAsync,
 } from '@/lib/bookperfect/analysisOrchestrator';
 import type { BookPerfectRecoverySnapshot } from '@/lib/bookperfect/analysisOrchestrator';
 import { readAutosaveAsync, requestPersistentStorage, writeAutosave, writeAutosaveAsync } from '@/lib/ebookProjectStorage';
@@ -48,6 +48,9 @@ const BookPerfectPage: React.FC = () => {
   const [justCompleted, setJustCompleted] = useState(false);
   const [activeTab, setActiveTab] = useState('traces-ia');
   const [kdpBusy, setKdpBusy] = useState(false);
+  const [savingNow, setSavingNow] = useState(false);
+  const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
+  const [saveNote, setSaveNote] = useState('Sauvegarde navigateur active');
 
   const prepareForKdp = useCallback(async () => {
     if (!manuscript || !analysis) return;
@@ -65,6 +68,26 @@ const BookPerfectPage: React.FC = () => {
   const [recoverySnapshot, setRecoverySnapshot] = useState<BookPerfectRecoverySnapshot | null>(null);
   const abortRef = useRef<{ aborted: boolean }>({ aborted: false });
   const startTimeRef = useRef<number>(0);
+
+  const saveCurrentWork = useCallback(async (silent = false) => {
+    if (!manuscript) return;
+    setSavingNow(true);
+    try {
+      await writeAutosaveAsync(CURRENT_MANUSCRIPT_SCOPE, manuscript);
+      if (analysis) {
+        await saveAnalysisSnapshotAsync(analysis);
+        await writeAutosaveAsync<BookPerfectRecoverySnapshot>(BOOKPERFECT_RECOVERY_SCOPE, { manuscript, analysis });
+      }
+      const now = Date.now();
+      setLastSavedAt(now);
+      setSaveNote(`Sauvegardé à ${new Date(now).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`);
+      if (!silent) toast.success('Travail sauvegardé. Vous pourrez reprendre sans réimporter le fichier.');
+    } catch (e: any) {
+      if (!silent) toast.error(e?.message || 'Impossible de sauvegarder le travail.');
+    } finally {
+      setSavingNow(false);
+    }
+  }, [manuscript, analysis]);
 
   useEffect(() => {
     let mounted = true;
@@ -84,6 +107,9 @@ const BookPerfectPage: React.FC = () => {
         if (!mounted) return;
         const normalizedAnalysis = savedAnalysis ? normalizeResumableAnalysis(savedAnalysis) : null;
         setAnalysis(normalizedAnalysis);
+        const savedAt = normalizedAnalysis?.updatedAt || savedManuscript.importedAt || Date.now();
+        setLastSavedAt(savedAt);
+        setSaveNote('Dernière sauvegarde retrouvée automatiquement');
         if (normalizedAnalysis?.chapterResults.some((r) => r.status !== 'done')) {
           setPaused(true);
           setPausedMessage('Analyse interrompue : vous pouvez reprendre exactement où elle s’est arrêtée.');
@@ -96,6 +122,8 @@ const BookPerfectPage: React.FC = () => {
         await writeAutosaveAsync(CURRENT_MANUSCRIPT_SCOPE, recovery.manuscript);
         if (!mounted) return;
         setAnalysis(normalizeResumableAnalysis(recovery.analysis));
+        setLastSavedAt(recovery.analysis.updatedAt || Date.now());
+        setSaveNote('Sauvegarde de reprise restaurée');
         setPaused(true);
         setPausedMessage('Analyse interrompue : vous pouvez reprendre exactement où elle s’est arrêtée.');
       }
@@ -107,6 +135,9 @@ const BookPerfectPage: React.FC = () => {
   const onImported = useCallback(async (m: Manuscript) => {
     setManuscript(m);
     await writeAutosaveAsync(CURRENT_MANUSCRIPT_SCOPE, m);
+    const savedAt = Date.now();
+    setLastSavedAt(savedAt);
+    setSaveNote(`Fichier sauvegardé à ${new Date(savedAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`);
     const existing = await loadAnalysisAsync(m.id);
     const normalizedExisting = existing ? normalizeResumableAnalysis(existing) : null;
     setAnalysis(normalizedExisting);
@@ -139,6 +170,8 @@ const BookPerfectPage: React.FC = () => {
         },
       );
       setAnalysis({ ...result });
+      setLastSavedAt(result.updatedAt || Date.now());
+      setSaveNote('Analyse sauvegardée automatiquement');
       if (!abortRef.current.aborted) {
         setElapsedMs(Date.now() - startTimeRef.current);
         const failed = result.chapterResults.filter((r) => r.status === 'failed').length;
@@ -152,7 +185,11 @@ const BookPerfectPage: React.FC = () => {
     } catch (e: any) {
       const msg = e?.message || 'Erreur pendant l\'analyse.';
       const saved = await loadAnalysisAsync(manuscript.id);
-      if (saved) setAnalysis({ ...saved });
+      if (saved) {
+        setAnalysis({ ...saved });
+        setLastSavedAt(saved.updatedAt || Date.now());
+        setSaveNote('Analyse en pause sauvegardée');
+      }
       // Erreur fatale : l'analyse est en pause, on propose « Reprendre ».
       setPaused(true);
       setPausedMessage(msg);
@@ -180,12 +217,16 @@ const BookPerfectPage: React.FC = () => {
   const onReset = (id: string) => setStatus(id, 'pending');
 
   const reset = () => {
+    const ok = window.confirm('Supprimer la sauvegarde actuelle et choisir un autre fichier ?');
+    if (!ok) return;
     setManuscript(null);
     setAnalysis(null);
     setPaused(false);
     setPausedMessage(null);
     setElapsedMs(null);
     setJustCompleted(false);
+    setLastSavedAt(null);
+    setSaveNote('Sauvegarde navigateur active');
     writeAutosave<Manuscript | null>(CURRENT_MANUSCRIPT_SCOPE, null);
     writeAutosave(BOOKPERFECT_RECOVERY_SCOPE, null);
     setRecoverySnapshot(null);
@@ -198,6 +239,8 @@ const BookPerfectPage: React.FC = () => {
     setManuscript(recovery.manuscript);
     await writeAutosaveAsync(CURRENT_MANUSCRIPT_SCOPE, recovery.manuscript);
     setAnalysis(normalizedAnalysis);
+    setLastSavedAt(normalizedAnalysis.updatedAt || Date.now());
+    setSaveNote('Sauvegarde de reprise restaurée');
     setPaused(true);
     setPausedMessage('Analyse retrouvée : cliquez sur Reprendre pour continuer exactement où elle s’est arrêtée.');
     setRecoverySnapshot(recovery);
@@ -266,11 +309,14 @@ const BookPerfectPage: React.FC = () => {
                     {manuscript.wordCount.toLocaleString('fr-FR')} mots · ~{manuscript.pageEstimate} pages · {manuscript.chapters.length} chapitres
                   </div>
                   <div className="mt-1 flex items-center gap-1 text-xs text-primary">
-                    <Save className="h-3.5 w-3.5" /> Fichier sauvegardé — reprise possible sans repartir de zéro.
+                    <Save className="h-3.5 w-3.5" /> {saveNote}{lastSavedAt ? ' — reprise possible sans repartir de zéro.' : ''}
                   </div>
                 </div>
                 {!running ? (
                   <div className="flex flex-wrap gap-2">
+                    <Button onClick={() => saveCurrentWork()} disabled={savingNow} variant="outline" className="gap-2 border-primary/50">
+                      <Save className="h-4 w-4" /> {savingNow ? 'Sauvegarde…' : '💾 Sauvegarder'}
+                    </Button>
                     {showResumeButton && (
                       <Button onClick={() => start(true)} className="gap-2 bg-amber-600 hover:bg-amber-700 text-white">
                         <RotateCcw className="h-4 w-4" /> Reprendre ({remainingCount} restant{remainingCount > 1 ? 's' : ''})
@@ -291,7 +337,7 @@ const BookPerfectPage: React.FC = () => {
                         <RotateCcw className="h-4 w-4" /> Tout réanalyser
                       </Button>
                     )}
-                    <Button variant="ghost" onClick={reset}>Changer de fichier</Button>
+                    <Button variant="ghost" onClick={reset}>Supprimer / changer</Button>
                   </div>
                 ) : (
                   <Button variant="outline" onClick={stop} className="gap-2">
