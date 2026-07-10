@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { getModuleById, type V3Module } from '@/data/roadmapV3';
 import {
-  EDITION_AGENTS, EDITION_DEPARTMENTS,
+  EDITION_AGENTS, EDITION_DEPARTMENTS, EDITION_PHASES, EDITION_PHASE_INTRO, getPhaseForAgent,
   V3_AGENT_COUNT, V4_AGENT_COUNT, type EditionAgent, type EditionTier,
 } from '@/data/editionAgents';
 import WorkflowBookConfigForm from '@/components/ebook/WorkflowBookConfigForm';
@@ -14,6 +14,7 @@ import useV3Entitlement from '@/hooks/useV3Entitlement';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { EbookSettingsPanel } from '@/components/ebook/EbookSettingsPanel';
 import { ApiProviderQuickSettings } from '@/components/ebook/ApiProviderQuickSettings';
+import { EditorialControlPanel } from '@/components/ebook/EditorialControlPanel';
 import { parseManuscript, countWords } from '@/lib/manuscriptParser';
 import { estimatePages } from '@/utils/kdpPageDensity';
 
