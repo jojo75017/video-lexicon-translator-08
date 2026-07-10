@@ -568,6 +568,41 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
               )}
             </div>
 
+            {/* Passes de révision IA (V4 uniquement) */}
+            {activeTier === 'v4' && (
+              <div className="mb-3 rounded-xl border p-3" style={{ borderColor: '#eadfc9', background: '#fff' }}>
+                <div className="flex items-center justify-between gap-3 mb-2">
+                  <span className="text-[12px] font-bold" style={{ color: INK }}>Passes de révision IA</span>
+                  <span className="text-[12px] font-black" style={{ color: AMBER_DEEP }}>{revisionPasses} passe{revisionPasses > 1 ? 's' : ''}</span>
+                </div>
+                <input
+                  type="range"
+                  min={1}
+                  max={3}
+                  step={1}
+                  value={revisionPasses}
+                  onChange={(e) => updateRevisionPasses(Number(e.target.value))}
+                  className="w-full accent-[#008296]"
+                  aria-label="Nombre de passes de révision IA"
+                />
+                <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  {REVISION_PASS_LABELS.map((p) => {
+                    const active = p.n <= revisionPasses;
+                    return (
+                      <div key={p.n} className="rounded-lg border p-2" style={{ borderColor: active ? `${AMBER}55` : '#eadfc9', background: active ? AMBER_SOFT : '#FCF8F0', opacity: active ? 1 : 0.55 }}>
+                        <div className="text-[11.5px] font-bold" style={{ color: active ? AMBER_DEEP : '#a18a6c' }}>{p.n}. {p.title}</div>
+                        <div className="text-[10.5px] mt-0.5" style={{ color: '#8a7860' }}>{p.desc}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="mt-2 text-[11px]" style={{ color: '#a18a6c' }}>
+                  Chaque chapitre est repris par les agents de révision autant de fois que de passes choisies.
+                </p>
+              </div>
+            )}
+
+
             {/* Tableau par chapitre */}
             <ol className="grid gap-1.5">
               {stats.chapters.map((c, i) => {
