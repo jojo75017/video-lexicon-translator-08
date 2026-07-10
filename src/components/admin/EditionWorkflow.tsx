@@ -243,6 +243,7 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
   const [openChapters, setOpenChapters] = useState(true);
   const [stats, setStats] = useState<ManuscriptStats>(() => readManuscriptStats(readConfig()));
   const [targetWords, setTargetWords] = useState(() => readTargetWords());
+  const [revisionPasses, setRevisionPasses] = useState(() => readRevisionPasses());
   const [openConfig, setOpenConfig] = useState(() => !readConfig().title.trim());
   const [keysOpen, setKeysOpen] = useState(false);
   // Onglet d'offre affiché : V3 (197€) ou V4 (347€).
