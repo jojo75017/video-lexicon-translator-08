@@ -18,6 +18,7 @@ import { IssueListTab } from '@/components/bookperfect/shared/IssueListTab';
 import { AmazonKdpTab } from '@/components/bookperfect/tabs/AmazonKdpTab';
 import { ComparaisonTab } from '@/components/bookperfect/tabs/ComparaisonTab';
 import { RapportFinalTab } from '@/components/bookperfect/tabs/RapportFinalTab';
+import { exportKdpPackage, DEFAULT_KDP_OPTIONS } from '@/lib/bookperfect/exporters';
 import {
   runAnalysis, loadAnalysisAsync, loadRecoverySnapshotAsync, updateIssueStatus, BOOKPERFECT_RECOVERY_SCOPE,
 } from '@/lib/bookperfect/analysisOrchestrator';
@@ -46,6 +47,21 @@ const BookPerfectPage: React.FC = () => {
   const [elapsedMs, setElapsedMs] = useState<number | null>(null);
   const [justCompleted, setJustCompleted] = useState(false);
   const [activeTab, setActiveTab] = useState('traces-ia');
+  const [kdpBusy, setKdpBusy] = useState(false);
+
+  const prepareForKdp = useCallback(async () => {
+    if (!manuscript || !analysis) return;
+    try {
+      setKdpBusy(true);
+      toast.loading('Conversion 6 × 9 pouces + marges Amazon KDP (Word + PDF)…', { id: 'bp-kdp-page' });
+      await exportKdpPackage(manuscript, analysis, { ...DEFAULT_KDP_OPTIONS, formatId: '6x9' }, true);
+      toast.success('Version 6 × 9 prête pour Amazon KDP exportée (Word + PDF) ✓', { id: 'bp-kdp-page' });
+    } catch (e: any) {
+      toast.error(e?.message || 'Échec de la préparation KDP.', { id: 'bp-kdp-page' });
+    } finally {
+      setKdpBusy(false);
+    }
+  }, [manuscript, analysis]);
   const [recoverySnapshot, setRecoverySnapshot] = useState<BookPerfectRecoverySnapshot | null>(null);
   const abortRef = useRef<{ aborted: boolean }>({ aborted: false });
   const startTimeRef = useRef<number>(0);
@@ -266,6 +282,11 @@ const BookPerfectPage: React.FC = () => {
                       </Button>
                     )}
                     {hasResults && (
+                      <Button onClick={prepareForKdp} disabled={kdpBusy} className="gap-2 bg-primary text-primary-foreground">
+                        <BookOpen className="h-4 w-4" /> 📖 Préparer pour Amazon KDP (6 × 9)
+                      </Button>
+                    )}
+                    {hasResults && (
                       <Button variant="outline" onClick={() => start(false)} className="gap-2">
                         <RotateCcw className="h-4 w-4" /> Tout réanalyser
                       </Button>
@@ -311,10 +332,13 @@ const BookPerfectPage: React.FC = () => {
               <Card className="border-primary/40 bg-primary/5">
                 <CardContent className="p-4 flex flex-wrap items-center gap-3">
                   <span className="text-sm flex-1 min-w-[200px]">
-                    ✅ Analyse disponible. Vos corrections et l'export Word (Amazon KDP) sont prêts dans l'onglet <strong>Rapport</strong>.
+                    ✅ Analyse terminée. Obtenez en un clic votre version prête à publier sur Amazon KDP (Word + PDF).
                   </span>
-                  <Button onClick={() => setActiveTab('rapport')} className="gap-2">
-                    <FileText className="h-4 w-4" /> Voir l'export
+                  <Button onClick={prepareForKdp} disabled={kdpBusy} className="gap-2">
+                    <BookOpen className="h-4 w-4" /> 📖 Préparer pour Amazon KDP (6 × 9)
+                  </Button>
+                  <Button variant="outline" onClick={() => setActiveTab('rapport')} className="gap-2">
+                    <FileText className="h-4 w-4" /> Personnaliser
                   </Button>
                 </CardContent>
               </Card>
