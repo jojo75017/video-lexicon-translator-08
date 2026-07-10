@@ -43,14 +43,19 @@ interface ManuscriptInput {
   }>;
 }
 
-const WORDS_PER_PAGE_KDP = 250;
+import { getWordsPerPage, DEFAULT_KDP_FORMAT, type KdpFormatId } from '@/utils/kdpPageDensity';
+
 const READING_WPM = 230; // Average adult reading speed (French)
 const LISTENING_WPM = 150;
 
 /**
  * Calcule toutes les statistiques professionnelles d'un manuscrit
  */
-export function computeManuscriptStats(input: ManuscriptInput): ManuscriptStats {
+export function computeManuscriptStats(
+  input: ManuscriptInput,
+  formatId: KdpFormatId = DEFAULT_KDP_FORMAT
+): ManuscriptStats {
+  const WORDS_PER_PAGE_KDP = getWordsPerPage(formatId);
   const chaptersStats: ChapterStat[] = [];
   let totalWords = 0;
   let totalChars = 0;
