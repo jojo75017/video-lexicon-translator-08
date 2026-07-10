@@ -25,7 +25,7 @@ export const parseManuscript = (raw: string, fallbackTitle = 'Contenu'): ParsedS
     buffer = [];
   };
 
-  const isChapterHeading = (line: string) => {
+  const isKeywordChapter = (line: string): string | null => {
     const l = line.trim();
     if (/^#\s+/.test(l)) return l.replace(/^#\s+/, '').trim();
     if (/^#{2,3}\s+(?:chapitre|partie|prologue|épilogue|epilogue|introduction)\b/i.test(l) && l.length < 120) {
@@ -35,13 +35,31 @@ export const parseManuscript = (raw: string, fallbackTitle = 'Contenu'): ParsedS
     return null;
   };
 
+  // Détecte si le manuscrit utilise des titres de chapitre explicites
+  // (« Chapitre X », « # Titre »…). Si OUI, les lignes courtes ordinaires
+  // sont des SOUS-titres. Si NON, ces mêmes lignes courtes sont considérées
+  // comme des TITRES DE CHAPITRE (évite de fusionner tous les chapitres).
+  const hasExplicitChapters = lines.some((l) => isKeywordChapter(l) !== null);
+
+  const isPlainTitleLine = (line: string) => {
+    const l = line.trim();
+    return l.length > 0 && l.length <= 90 && !/[.!?…]$/.test(l) && /^[A-ZÀ-Ÿ0-9][\wÀ-ÿ'’\-\s:;,]+$/.test(l);
+  };
+
+  const isChapterHeading = (line: string): string | null => {
+    const kw = isKeywordChapter(line);
+    if (kw) return kw;
+    // Pas de chapitres explicites → une ligne-titre isolée démarre un chapitre.
+    if (!hasExplicitChapters && isPlainTitleLine(line)) return line.trim();
+    return null;
+  };
+
   const isSubheading = (line: string): { text: string; level: 2 | 3 } | null => {
     const l = line.trim();
     const markdown = l.match(/^(#{2,3})\s+(.+)$/);
     if (markdown) return { text: markdown[2].trim(), level: markdown[1].length === 2 ? 2 : 3 };
-    if (l.length > 0 && l.length <= 90 && !/[.!?…]$/.test(l) && /^[A-ZÀ-Ÿ0-9][\wÀ-ÿ'’\-\s:;,]+$/.test(l)) {
-      return { text: l, level: 2 };
-    }
+    // Sous-titre en clair uniquement si le document a des chapitres explicites.
+    if (hasExplicitChapters && isPlainTitleLine(l)) return { text: l, level: 2 };
     return null;
   };
 
