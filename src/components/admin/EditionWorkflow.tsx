@@ -169,7 +169,7 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
   }, []);
 
   useEffect(() => {
-    const refresh = () => setChapters(readChapterTitles());
+    const refresh = () => setStats(readManuscriptStats());
     window.addEventListener('ebook_workflow_results_updated', refresh);
     window.addEventListener('storage', refresh);
     return () => {
@@ -177,6 +177,12 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
       window.removeEventListener('storage', refresh);
     };
   }, []);
+
+  // Rafraîchit l'état de la clé IA (le panneau écrit dans le localStorage).
+  useEffect(() => {
+    if (!keysOpen) { setAiTick((n) => n + 1); }
+  }, [keysOpen]);
+
 
   const persist = useCallback((next: Set<number>) => {
     setDone(new Set(next));
