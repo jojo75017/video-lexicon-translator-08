@@ -298,11 +298,23 @@ Format JSON attendu (réponds UNIQUEMENT avec le JSON, sans texte additionnel):
         const cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
         const parsed: { chapters?: Array<Record<string, unknown>> } & Record<string, unknown> = JSON.parse(cleanContent);
         if (Array.isArray(parsed?.chapters)) {
-          parsed.chapters = parsed.chapters.map((chapter) => ({
+          // Garde-fou anti-doublons : supprimer les titres identiques ou quasi identiques
+          const normalizeTitle = (s: string) => (s || '')
+            .toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]+/g, ' ').trim();
+          const seen = new Set<string>();
+          const deduped = parsed.chapters.filter((chapter) => {
+            const key = normalizeTitle(String((chapter as Record<string, unknown>).title || ''));
+            if (!key || seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          });
+          parsed.chapters = deduped.map((chapter) => ({
             ...chapter,
             subChapters: [],
           }));
         }
+
         // Toast supprimé - génération silencieuse
         return parsed;
       } catch (error) {
