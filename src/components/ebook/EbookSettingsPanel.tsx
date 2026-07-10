@@ -35,6 +35,7 @@ import {
   setOpenRouterImageKey,
 } from '@/lib/ebookExportOptions';
 import { formatModelPricing } from '@/services/aiWritingService';
+import { testAIProviderKey } from '@/services/aiProviderKeyTest';
 
 // Re-export pour compat avec imports existants
 export { loadTypography, saveTypography };
@@ -99,50 +100,9 @@ export const EbookSettingsPanel: React.FC<Props> = ({ onTypographyChange }) => {
       return;
     }
     setProviderTest(s => ({ ...s, [p]: 'testing' }));
-    try {
-      let ok = false;
-      let extra = '';
-      if (p === 'gemini') {
-        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`);
-        ok = r.ok || r.status === 429 || (/^AQ\.Ab8?/i.test(key) && [400, 401, 403].includes(r.status));
-        if (!r.ok && /^AQ\.Ab8?/i.test(key)) extra = ' (nouveau format accepté)';
-      } else if (p === 'openai') {
-        const r = await fetch('https://api.openai.com/v1/models', { headers: { Authorization: `Bearer ${key}` } });
-        ok = r.ok || r.status === 429;
-      } else if (p === 'claude') {
-        const r = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': key,
-            'anthropic-version': '2023-06-01',
-            'anthropic-dangerous-direct-browser-access': 'true',
-          },
-          body: JSON.stringify({
-            model: 'claude-3-5-haiku-20241022',
-            max_tokens: 1,
-            messages: [{ role: 'user', content: 'ping' }],
-          }),
-        });
-        ok = r.ok || r.status === 429;
-      } else if (p === 'openrouter') {
-        const r = await fetch('https://openrouter.ai/api/v1/auth/key', {
-          headers: { Authorization: `Bearer ${key}` },
-        });
-        ok = r.ok;
-        if (ok) {
-          const j = await r.json().catch(() => ({}));
-          const credits = j?.data?.limit_remaining ?? j?.data?.usage;
-          if (credits != null) extra = ` (crédits: ${credits})`;
-        }
-      }
-      setProviderTest(s => ({ ...s, [p]: ok ? 'ok' : 'fail' }));
-      ok ? toast.success(`Clé ${PROVIDER_LABELS[p]} valide ✓${extra}`) : toast.error(`Clé ${PROVIDER_LABELS[p]} rejetée.`);
-    } catch (e) {
-      console.error('[KeyTest]', p, e);
-      setProviderTest(s => ({ ...s, [p]: 'fail' }));
-      toast.error('Erreur réseau lors du test.');
-    }
+    const result = await testAIProviderKey(p, key);
+    setProviderTest(s => ({ ...s, [p]: result.ok ? 'ok' : 'fail' }));
+    result.ok ? toast.success(`Clé ${PROVIDER_LABELS[p]} valide ✓${result.extra || ''}`) : toast.error(result.error || `Clé ${PROVIDER_LABELS[p]} rejetée.`);
   };
 
   const TestIcon = ({ s }: { s: TestState }) =>

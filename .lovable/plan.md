@@ -1,166 +1,68 @@
-# Plan corrigé
+## Plan de correction
 
-## Objectif
+Je vais rendre la configuration IA impossible à manquer dans le Hub V3.
 
-Rendre le Parcours du Hub V3 compréhensible et utilisable :
+## 1. Bloc visible « Clés API & Modèles » dans le Parcours
 
-- **V3 197€ = 22 agents**.
-- **V4 347€ = 30 agents exclusifs**.
-- Les plans doivent être distinguables avec des **badges V3/V4 sur chaque agent**.
-- Le tableau **chapitres / nombre de mots** doit fonctionner même quand le texte n’est pas exactement stocké dans les anciennes étapes `P20/P10/P4/P3`.
-- Il faut un endroit visible pour renseigner ou ajuster le nombre de mots prévu par chapitre.
+Dans `src/components/admin/EditionWorkflow.tsx`, remplacer la simple carte actuelle par un bloc visible et clair qui affiche directement :
 
----
+- Le fournisseur actif : Gemini, Claude, OpenAI ou OpenRouter.
+- Le champ de clé API en accès direct, sans devoir chercher dans un popup.
+- Le bouton **Tester / Valider la clé** visible à côté du champ.
+- Le statut : clé manquante, format invalide, clé valide, test en cours, test échoué.
+- Si OpenRouter est choisi : le sélecteur de modèle OpenRouter visible sous la clé.
 
-## 1. Corriger la structure des plans V3/V4
+## 2. Garder le deuxième emplacement demandé
 
-### `src/data/editionAgents.ts`
+Conserver aussi :
 
-- Garder les 22 agents `tier: 'v3'` pour l’offre 197€.
-- Passer les agents `tier: 'v4'` de 14 à **30 agents exclusifs**.
-- Les 16 agents V4 ajoutés seront rattachés à des modules déjà existants dans le registre, par exemple :
-  - `aplus-generator`
-  - `look-inside-optimizer`
-  - `editorial-reviews`
-  - `author-newsletter`
-  - `bookbub-ad-builder`
-  - `pinterest-pins`
-  - `tiktok-hooks`
-  - `book-trailer`
-  - `arc-team-builder`
-  - `amazon-book-database`
-  - `sales-estimator-bsr`
-  - `keyword-explorer-amazon`
-  - `reverse-asin`
-  - `niche-scorecard`
-  - `back-catalog-funnel`
-  - `bundles-boxsets`
+- Le popup actuel avec `EbookSettingsPanel` pour les réglages complets.
+- Le bouton flottant global `Choisir mon IA · Clés API`, déjà présent sur `/hub-v3`.
 
-- Mettre les compteurs au clair :
-
-```ts
-V3_AGENT_COUNT = 22
-V4_AGENT_COUNT = 30
-```
-
-Ici, `V4_AGENT_COUNT` signifie **30 agents exclusifs dans l’onglet V4**, pas 22+30.
-
----
-
-## 2. Rendre les onglets plus lisibles dans le Parcours
-
-### `src/components/admin/EditionWorkflow.tsx`
-
-- Corriger les libellés d’onglets :
+Donc il y aura bien deux accès :
 
 ```text
-[V3 · 197€ · 22 agents]
-[V4 · 347€ · 30 agents]
+Parcours Hub V3
+├─ Bloc visible : fournisseur + clé + modèle + test
+└─ Popup complet : tous les réglages avancés
 ```
 
-- Supprimer le libellé confus du type `+14 bonus`.
-- Ajouter un **badge visible sur chaque agent** :
-  - `V3 · 197€` pour les agents du plan 197€.
-  - `V4 · 347€` pour les agents du plan 347€.
-- Garder la progression calculée par onglet :
-  - V3 : progression sur 22 agents.
-  - V4 : progression sur 30 agents.
-- Garder le cadenas et le bandeau d’upsell sur l’onglet V4 si la personne n’a pas accès à la V4.
+## 3. Factoriser pour éviter les doublons cassés
 
----
+Créer un petit composant réutilisable côté frontend, par exemple `ApiProviderQuickSettings`, qui reprend la logique déjà présente dans `EbookSettingsPanel` :
 
-## 3. Réparer le tableau mots / chapitres
+- `getProvider`, `setProvider`
+- `getProviderKey`, `setProviderKey`
+- `validateKeyFormat`, `sanitizeKey`
+- `OPENROUTER_MODELS`, `getOpenRouterModel`, `setOpenRouterModel`
+- test réel des clés API, avec les mêmes endpoints déjà utilisés dans `EbookSettingsPanel`
 
-Le code actuel ne lit que quelques anciennes clés (`P20`, `P10`, `P4`, `P3`). Si le manuscrit est stocké ailleurs dans `ebook_workflow_results`, le tableau reste vide.
+Ce composant sera utilisé dans `EditionWorkflow.tsx`, sans modifier la logique backend ni les secrets.
 
-### Nouvelle logique
+## 4. Curseur chapitres + mots
 
-Dans `EditionWorkflow.tsx`, remplacer la lecture trop limitée par une lecture plus robuste :
+Dans la section **Structure du livre**, ajouter le vrai contrôle demandé :
 
-1. Lire tout `ebook_workflow_results`.
-2. Parcourir toutes les entrées qui contiennent du texte exploitable :
-   - `displayContent`
-   - `content`
-   - `result`
-   - `text`
-   - `manuscript`
-   - objets ou tableaux contenant des chapitres.
-3. Prioriser les contenus longs de rédaction/manuscrit.
-4. Utiliser `parseManuscript` + `countWords` pour découper le texte et compter les mots.
-5. Si aucun chapitre explicite n’est détecté, utiliser la structure de la fiche livre (`numberOfChapters`) pour afficher des lignes de chapitre à compléter plutôt qu’un bloc vide.
+- Curseur du nombre de chapitres de 3 à 40.
+- Valeur du nombre de chapitres visible et éditable.
+- Champ **mots / chapitre** juste à côté.
+- Total calculé automatiquement : `chapitres × mots/chapitre`.
+- Estimation de pages basée sur ce total.
 
----
+Cela rendra clair où régler le nombre de chapitres et où mettre le nombre de mots.
 
-## 4. Ajouter un endroit visible pour le nombre de mots par chapitre
+## 5. Validation
 
-Dans la section **Structure du livre**, ajouter au-dessus du tableau :
+Après implémentation :
 
-```text
-Objectif mots / chapitre : [ 2500 ] mots
-```
-
-- Champ numérique modifiable.
-- Valeur par défaut : **2500 mots**.
-- Sauvegarde en localStorage.
-- Les mini-barres du tableau utilisent cette cible au lieu d’une valeur fixe codée en dur.
-
-Dans chaque ligne de chapitre, afficher :
-
-```text
-Chapitre 1 | Titre | 1 840 mots | barre vers objectif 2 500
-```
-
-Si les mots sont absents :
-
-```text
-Chapitre 1 | Titre prévu | 0 mot | à rédiger
-```
-
----
-
-## 5. Améliorer l’état vide du tableau
-
-Au lieu du simple message actuel, afficher un tableau préparé à partir de la fiche livre :
-
-- Si `numberOfChapters = 8`, afficher 8 lignes vides :
-
-```text
-Chapitre 1 | À rédiger | 0 mot
-Chapitre 2 | À rédiger | 0 mot
-...
-```
-
-- Dès qu’un manuscrit est généré ou collé dans les résultats, les lignes se remplissent automatiquement.
-- Les événements existants restent utilisés :
-  - `ebook_workflow_results_updated`
-  - `storage`
-
----
-
-## 6. Mettre les libellés commerciaux en cohérence
-
-### `src/data/v3Launch.ts`
-
-- Remplacer :
-
-```text
-V4 — Maison d'Édition (36 agents)
-```
-
-par :
-
-```text
-V4 — Maison d'Édition (30 agents)
-```
-
-Aucun prix ne change.
-
----
+- Vérifier que le bloc clés/modèles apparaît directement dans `/hub-v3?tab=parcours`.
+- Vérifier qu’on peut sélectionner OpenRouter et voir le choix du modèle.
+- Vérifier que le bouton de test/validation est visible à côté de la clé.
+- Vérifier que le curseur chapitres et le champ mots/chapitre sont côte à côte et modifient le total visé.
 
 ## Hors périmètre
 
-- Pas de changement de prix.
-- Pas de nouveau moteur IA.
-- Pas de modification paiement.
-- Pas de changement des clés Gemini/OpenRouter déjà restaurées.
-- Pas de fausses données : les agents V4 ajoutés ouvrent des modules existants.
+- Pas de changement de prix V3/V4.
+- Pas de modification des agents.
+- Pas de stockage serveur des clés : on garde le fonctionnement BYOK actuel côté utilisateur.
+- Pas de nouvelle donnée fictive.
