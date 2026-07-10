@@ -925,10 +925,20 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             <WritingEngineBadge isPro={fullMode} onUpgrade={() => setCheckoutOpen(true)} />
           </div>
 
-          <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+            <button type="button" onClick={startNewBook}
+              className="group rounded-2xl border-2 p-4 text-left transition-all hover:-translate-y-0.5"
+              style={{ borderColor: `${AMBER}99`, background: `linear-gradient(135deg, #fff, ${AMBER_SOFT} 90%)` }}>
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl mb-3" style={{ background: AMBER_SOFT, color: AMBER_DEEP }}>
+                <FilePlus className="h-5 w-5" />
+              </span>
+              <div className="text-sm font-black" style={{ color: INK }}>Nouveau livre</div>
+              <div className="mt-1 text-[11px] leading-snug" style={{ color: '#8a7860' }}>Repartir de zéro avec un projet vierge</div>
+            </button>
             <button type="button" onClick={saveToCloud} disabled={saving}
               className="group rounded-2xl border-2 p-4 text-left transition-all hover:-translate-y-0.5 disabled:opacity-60"
               style={{ borderColor: `${GREEN}66`, background: '#f6fdf9' }}>
+
               <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl mb-3" style={{ background: `${GREEN}18`, color: GREEN }}>
                 {saving ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
               </span>
