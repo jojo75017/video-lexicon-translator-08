@@ -157,7 +157,10 @@ export const RapportFinalTab: React.FC<Props> = ({ manuscript, analysis, onRelau
 
           <div className="flex flex-wrap gap-3 pt-1">
             <Button onClick={() => doExportOne('docx')} variant="outline" className="gap-2" disabled={busy}>
-              <FileDown className="h-4 w-4" /> Word corrigé (6 × 9)
+              <FileDown className="h-4 w-4" /> Word (DOCX 6 × 9)
+            </Button>
+            <Button onClick={() => doExportOne('pdf')} variant="outline" className="gap-2" disabled={busy}>
+              <FileDown className="h-4 w-4" /> PDF (6 × 9)
             </Button>
             <Button onClick={doExportReport} variant="outline" className="gap-2">
               <FileText className="h-4 w-4" /> Rapport éditorial (Word)
