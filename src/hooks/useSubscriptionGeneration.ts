@@ -164,9 +164,14 @@ INSTRUCTIONS POUR LES PERSONNAGES:
     const previousContext = previousChapterSummary 
       ? `\n\nRésumé du chapitre précédent (pour assurer la continuité):\n${previousChapterSummary}\n\nAssure une transition fluide depuis ce qui précède.` 
       : '';
-    
+
+    // Plan complet du livre : indispensable pour éviter les doublons entre chapitres
+    const planContext = (allChapterTitles && allChapterTitles.length > 0)
+      ? `\n\n=== PLAN COMPLET DU LIVRE (pour éviter toute répétition) ===\n${allChapterTitles.map((t, i) => `${i + 1}. ${t}`).join('\n')}\n=== FIN DU PLAN ===\n\n⚠️ ANTI-DOUBLONS (RÈGLE ABSOLUE):\n- Rédige UNIQUEMENT ce qui relève de CE chapitre ("${chapter.title}"). Les autres chapitres ci-dessus traitent leurs propres sujets : n'empiète JAMAIS dessus.\n- Ne réintroduis PAS le contexte, le décor, l'univers ni les personnages déjà présentés : suppose que le lecteur a lu les chapitres précédents.\n- Ne réutilise aucune phrase, formule d'accroche, description ni passage déjà écrits dans un autre chapitre. Chaque chapitre doit apporter du contenu NOUVEAU.`
+      : '';
+
     const finalWordTarget = chapterLength ? effectiveWordCount : wordsPerChapter;
-    const prompt = `Tu es un auteur expert. Rédige un chapitre complet de MINIMUM ${finalWordTarget} mots sur le sujet : "${chapter.title}".${contextLine}${audienceLine}${tomeLine}${genreLine}${styleLine}${lengthLine}${detailLine}${toneLine}${narrativeLine}${positionContext}${descriptionContext}${charactersContext}${synopsisContext}${previousContext}
+    const prompt = `Tu es un auteur expert. Rédige un chapitre complet de MINIMUM ${finalWordTarget} mots sur le sujet : "${chapter.title}".${contextLine}${audienceLine}${tomeLine}${genreLine}${styleLine}${lengthLine}${detailLine}${toneLine}${narrativeLine}${positionContext}${descriptionContext}${charactersContext}${synopsisContext}${previousContext}${planContext}
     
 ⚠️ CONTRAINTE DE LONGUEUR ABSOLUE:
 - Ce chapitre DOIT contenir AU MINIMUM ${finalWordTarget} mots.
