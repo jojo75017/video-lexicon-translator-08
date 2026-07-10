@@ -21,6 +21,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useKdpFormat } from '@/hooks/useKdpFormat';
+import { KdpFormatSelect } from '@/components/ebook/KdpFormatSelect';
 
 interface KdpRequirement {
   pages: number;
@@ -34,6 +36,7 @@ interface KdpRequirement {
 }
 
 const EbookPriceEstimator: React.FC = () => {
+  const { wordsPerPage } = useKdpFormat();
   const [customPages, setCustomPages] = useState<number>(100);
 
   // Calcul dynamique des exigences basé sur le nombre de pages
@@ -113,9 +116,9 @@ const EbookPriceEstimator: React.FC = () => {
       category = 'Ouvrage majeur';
     }
 
-    const totalWords = pages * 250; // ~250 mots par page
+    const totalWords = pages * wordsPerPage; // densité selon le format KDP
     const pagesPerChapter = Math.ceil(pages / minChapters);
-    const wordsPerChapter = pagesPerChapter * 250;
+    const wordsPerChapter = pagesPerChapter * wordsPerPage;
 
     return {
       pages,
@@ -129,7 +132,7 @@ const EbookPriceEstimator: React.FC = () => {
       pagesPerChapter,
       wordsPerChapter
     };
-  }, [customPages]);
+  }, [customPages, wordsPerPage]);
 
   // Exigences de référence
   const requirements: KdpRequirement[] = [
