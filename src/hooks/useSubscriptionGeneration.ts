@@ -274,6 +274,7 @@ INSTRUCTIONS CRITIQUES:
 3. Chaque chapitre doit avoir un objectif clair et s'enchaîner naturellement avec le suivant
 4. Ne crée AUCUN sous-chapitre : l'ebook simple doit contenir uniquement des chapitres principaux
 5. ${bookDescription ? 'RESPECTE IMPÉRATIVEMENT la description fournie ci-dessus' : 'Crée une structure originale et engageante basée sur le titre'}
+6. ANTI-DOUBLONS: tous les titres doivent être DIFFÉRENTS les uns des autres, sans recoupement thématique. Chaque chapitre couvre une ÉTAPE DISTINCTE de l'arc narratif (situation initiale → montée de tension → climax → résolution). N'aborde JAMAIS deux fois le même événement, le même thème ou la même idée dans des chapitres différents.
 
 Le plan doit contenir exactement ${numberOfChapters} chapitres principaux.
 
