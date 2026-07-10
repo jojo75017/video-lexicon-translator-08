@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { getModuleById, type V3Module } from '@/data/roadmapV3';
 import {
-  EDITION_AGENTS, EDITION_DEPARTMENTS,
+  EDITION_AGENTS, EDITION_DEPARTMENTS, EDITION_PHASES, EDITION_PHASE_INTRO, getPhaseForAgent,
   V3_AGENT_COUNT, V4_AGENT_COUNT, type EditionAgent, type EditionTier,
 } from '@/data/editionAgents';
 import WorkflowBookConfigForm from '@/components/ebook/WorkflowBookConfigForm';
@@ -14,6 +14,7 @@ import useV3Entitlement from '@/hooks/useV3Entitlement';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { EbookSettingsPanel } from '@/components/ebook/EbookSettingsPanel';
 import { ApiProviderQuickSettings } from '@/components/ebook/ApiProviderQuickSettings';
+import { EditorialControlPanel } from '@/components/ebook/EditorialControlPanel';
 import { parseManuscript, countWords } from '@/lib/manuscriptParser';
 import { estimatePages } from '@/utils/kdpPageDensity';
 
@@ -29,6 +30,23 @@ const SERIF = "'Instrument Serif', Georgia, 'Times New Roman', serif";
 const DONE_KEY = 'edition_workflow_done_v1';
 const CONFIG_KEY = 'edition_book_config_v1';
 const TARGET_WORDS_KEY = 'edition_chapter_target_words_v1';
+const REVISION_PASSES_KEY = 'edition_revision_passes_v1';
+
+const REVISION_PASS_LABELS = [
+  { n: 1, title: 'Rédaction', desc: 'Écriture du premier jet chapitre par chapitre.' },
+  { n: 2, title: 'Relecture stylistique', desc: 'Correction, cohérence et fluidité du texte.' },
+  { n: 3, title: 'Polissage final', desc: 'Voix d\'auteur, suppression des clichés, finitions.' },
+];
+
+function readRevisionPasses(): number {
+  try {
+    const raw = localStorage.getItem(REVISION_PASSES_KEY);
+    const n = raw ? Number(raw) : 2;
+    return Number.isFinite(n) && n >= 1 && n <= 3 ? Math.round(n) : 2;
+  } catch {
+    return 2;
+  }
+}
 
 interface EditionBookConfig {
   title: string;
@@ -225,6 +243,7 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
   const [openChapters, setOpenChapters] = useState(true);
   const [stats, setStats] = useState<ManuscriptStats>(() => readManuscriptStats(readConfig()));
   const [targetWords, setTargetWords] = useState(() => readTargetWords());
+  const [revisionPasses, setRevisionPasses] = useState(() => readRevisionPasses());
   const [openConfig, setOpenConfig] = useState(() => !readConfig().title.trim());
   const [keysOpen, setKeysOpen] = useState(false);
   // Onglet d'offre affiché : V3 (197€) ou V4 (347€).
@@ -257,6 +276,12 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
     try { localStorage.setItem(TARGET_WORDS_KEY, String(next)); } catch { /* ignore */ }
   }, []);
 
+  const updateRevisionPasses = useCallback((value: number) => {
+    const next = Math.max(1, Math.min(3, Math.round(value || 2)));
+    setRevisionPasses(next);
+    try { localStorage.setItem(REVISION_PASSES_KEY, String(next)); } catch { /* ignore */ }
+  }, []);
+
   const updateChapters = useCallback((value: number) => {
     const next = Math.max(3, Math.min(40, Math.round(value || EMPTY_CONFIG.numberOfChapters)));
     updateConfig({ numberOfChapters: next });
@@ -273,13 +298,39 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
     persist(next);
   }, [done, persist]);
 
-  // Agents de l'onglet actif (V3 = 197€, V4 = bonus 347€).
-  const tierAgents = useMemo(() => EDITION_AGENTS.filter((a) => a.tier === activeTier), [activeTier]);
+  // Agents de l'onglet actif.
+  // V3 (197€) = 22 agents de base uniquement.
+  // V4 (347€) = parcours COMPLET (base + premium), organisé en phases : un vrai
+  // processus supérieur de bout en bout, pas seulement les agents bonus.
+  const tierAgents = useMemo(
+    () => (activeTier === 'v4' ? EDITION_AGENTS : EDITION_AGENTS.filter((a) => a.tier === 'v3')),
+    [activeTier],
+  );
   const v3Count = useMemo(() => EDITION_AGENTS.filter((a) => a.tier === 'v3').length, []);
-  const v4Count = useMemo(() => EDITION_AGENTS.filter((a) => a.tier === 'v4').length, []);
+  const v4Count = EDITION_AGENTS.length;
   const total = tierAgents.length;
   const completed = tierAgents.filter((a) => done.has(a.order)).length;
   const pct = total ? Math.round((completed / total) * 100) : 0;
+
+  // Groupes affichés : V4 = phases séquentielles (processus premium), V3 = départements.
+  const agentGroups = useMemo(() => {
+    if (activeTier === 'v4') {
+      return EDITION_PHASES
+        .map((phase) => ({
+          label: phase,
+          intro: EDITION_PHASE_INTRO[phase],
+          agents: tierAgents.filter((a) => getPhaseForAgent(a) === phase),
+        }))
+        .filter((g) => g.agents.length > 0);
+    }
+    return EDITION_DEPARTMENTS
+      .map((dept) => ({
+        label: dept,
+        intro: '' as string,
+        agents: tierAgents.filter((a) => a.department === dept),
+      }))
+      .filter((g) => g.agents.length > 0);
+  }, [activeTier, tierAgents]);
 
   const chapterGoalTotal = Math.max(0, Math.round((Number(config.numberOfChapters) || 0) * targetWords));
   const chapterGoalPages = estimatePages(chapterGoalTotal);
@@ -333,8 +384,28 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
           </button>
         </div>
 
+        {/* Bandeau accès direct V4 (offre premium) */}
+        {activeTier === 'v4' && (
+          <div className="mt-3 rounded-xl border px-3.5 py-2.5 flex items-start gap-2" style={{ borderColor: `${AMBER}55`, background: AMBER_SOFT }}>
+            <Sparkles className="h-4 w-4 mt-0.5 shrink-0" style={{ color: AMBER_DEEP }} />
+            <p className="text-[12px]" style={{ color: '#6f5e47' }}>
+              <strong style={{ color: AMBER_DEEP }}>Offre premium accessible directement</strong> — pas besoin de posséder la Base 197€.
+              La V4 ajoute un vrai processus supérieur : phases structurées, révisions IA multi-passes, contrôle éditorial avancé et pack KDP poussé.
+            </p>
+          </div>
+        )}
+
         {/* Carte clé IA (BYOK Gemini / OpenRouter…) */}
         <ApiProviderQuickSettings key={keysOpen ? 'api-open' : 'api-closed'} onOpenAdvanced={() => setKeysOpen(true)} />
+
+        {/* Contrôle éditorial avancé (V4 uniquement) */}
+        {activeTier === 'v4' && (
+          <div className="mt-3">
+            <EditorialControlPanel />
+          </div>
+        )}
+
+
 
 
         {/* Progression */}
@@ -503,6 +574,41 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
               )}
             </div>
 
+            {/* Passes de révision IA (V4 uniquement) */}
+            {activeTier === 'v4' && (
+              <div className="mb-3 rounded-xl border p-3" style={{ borderColor: '#eadfc9', background: '#fff' }}>
+                <div className="flex items-center justify-between gap-3 mb-2">
+                  <span className="text-[12px] font-bold" style={{ color: INK }}>Passes de révision IA</span>
+                  <span className="text-[12px] font-black" style={{ color: AMBER_DEEP }}>{revisionPasses} passe{revisionPasses > 1 ? 's' : ''}</span>
+                </div>
+                <input
+                  type="range"
+                  min={1}
+                  max={3}
+                  step={1}
+                  value={revisionPasses}
+                  onChange={(e) => updateRevisionPasses(Number(e.target.value))}
+                  className="w-full accent-[#008296]"
+                  aria-label="Nombre de passes de révision IA"
+                />
+                <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  {REVISION_PASS_LABELS.map((p) => {
+                    const active = p.n <= revisionPasses;
+                    return (
+                      <div key={p.n} className="rounded-lg border p-2" style={{ borderColor: active ? `${AMBER}55` : '#eadfc9', background: active ? AMBER_SOFT : '#FCF8F0', opacity: active ? 1 : 0.55 }}>
+                        <div className="text-[11.5px] font-bold" style={{ color: active ? AMBER_DEEP : '#a18a6c' }}>{p.n}. {p.title}</div>
+                        <div className="text-[10.5px] mt-0.5" style={{ color: '#8a7860' }}>{p.desc}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="mt-2 text-[11px]" style={{ color: '#a18a6c' }}>
+                  Chaque chapitre est repris par les agents de révision autant de fois que de passes choisies.
+                </p>
+              </div>
+            )}
+
+
             {/* Tableau par chapitre */}
             <ol className="grid gap-1.5">
               {stats.chapters.map((c, i) => {
@@ -527,22 +633,37 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
       </div>
 
 
-      {/* Départements & agents */}
+      {/* Parcours : V4 = phases séquentielles, V3 = départements */}
       <div className="divide-y" style={{ borderColor: '#f0e7d4' }}>
-        {EDITION_DEPARTMENTS.map((dept) => {
-          const agents = tierAgents.filter((a) => a.department === dept);
-          if (!agents.length) return null;
+        {agentGroups.map((group, groupIndex) => {
+          const agents = group.agents;
           const deptDone = agents.filter((a) => done.has(a.order)).length;
           const isPro = agents.every((a) => a.tier === 'v4');
+          const groupPct = agents.length ? Math.round((deptDone / agents.length) * 100) : 0;
           return (
-            <div key={dept} className="px-5 sm:px-7 py-5">
-              <div className="flex items-center gap-2 mb-3">
-                <h3 className="text-sm font-black uppercase tracking-wide" style={{ color: AMBER_DEEP }}>{dept}</h3>
-                {isPro && (
+            <div key={group.label} className="px-5 sm:px-7 py-5">
+              <div className="flex items-center gap-2 mb-1">
+                {activeTier === 'v4' && (
+                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] font-black text-white" style={{ background: AMBER_DEEP }}>
+                    {groupIndex + 1}
+                  </span>
+                )}
+                <h3 className="text-sm font-black uppercase tracking-wide" style={{ color: AMBER_DEEP }}>{group.label}</h3>
+                {isPro && activeTier !== 'v4' && (
                   <span className="rounded-full px-2 py-0.5 text-[10px] font-bold text-white" style={{ background: AMBER_DEEP }}>V4 · 347€</span>
                 )}
                 <span className="ml-auto text-[11px]" style={{ color: '#a18a6c' }}>{deptDone}/{agents.length}</span>
               </div>
+              {group.intro && (
+                <p className="mb-2 text-[12px]" style={{ color: '#8a7860' }}>{group.intro}</p>
+              )}
+              {activeTier === 'v4' && (
+                <div className="mb-3 h-1.5 w-full rounded-full overflow-hidden" style={{ background: '#f0e7d4' }}>
+                  <div className="h-full rounded-full transition-all duration-500"
+                    style={{ width: `${groupPct}%`, background: `linear-gradient(90deg, ${AMBER}, #FFB44D)` }} />
+                </div>
+              )}
+
 
               <div className="grid gap-2.5">
                 {agents.map((agent) => {
