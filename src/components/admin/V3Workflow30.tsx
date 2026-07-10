@@ -1563,7 +1563,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
 
                               {/* Résultat IA */}
                               {result && (isActive || isDone || canAct) && editingId !== step.moduleId && (
-                                <ResultView text={result} />
+                                <ResultView text={result} stepId={step.moduleId} />
                               )}
                             </div>
                           </div>
