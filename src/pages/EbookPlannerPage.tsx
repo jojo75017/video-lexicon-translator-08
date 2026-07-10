@@ -2526,7 +2526,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                           </div>
                           <div>
                             <CardTitle className="text-xl">Structure des chapitres</CardTitle>
-                            <CardDescription>Organisez et rédigez vos chapitres ({chapters.length} chapitres)</CardDescription>
+                            <CardDescription>Organisez et rédigez vos chapitres ({bookStats.totalChapters} chapitre{bookStats.totalChapters > 1 ? 's' : ''} · {bookStats.totalSubChapters} sous-chapitre{bookStats.totalSubChapters > 1 ? 's' : ''} · ~{bookStats.estimatedPages} pages)</CardDescription>
                           </div>
                         </div>
                         <div className="flex gap-2">
