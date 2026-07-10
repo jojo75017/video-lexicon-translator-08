@@ -47,6 +47,21 @@ const BookPerfectPage: React.FC = () => {
   const [elapsedMs, setElapsedMs] = useState<number | null>(null);
   const [justCompleted, setJustCompleted] = useState(false);
   const [activeTab, setActiveTab] = useState('traces-ia');
+  const [kdpBusy, setKdpBusy] = useState(false);
+
+  const prepareForKdp = useCallback(async () => {
+    if (!manuscript || !analysis) return;
+    try {
+      setKdpBusy(true);
+      toast.loading('Conversion 6 × 9 pouces + marges Amazon KDP (Word + PDF)…', { id: 'bp-kdp-page' });
+      await exportKdpPackage(manuscript, analysis, { ...DEFAULT_KDP_OPTIONS, formatId: '6x9' }, true);
+      toast.success('Version 6 × 9 prête pour Amazon KDP exportée (Word + PDF) ✓', { id: 'bp-kdp-page' });
+    } catch (e: any) {
+      toast.error(e?.message || 'Échec de la préparation KDP.', { id: 'bp-kdp-page' });
+    } finally {
+      setKdpBusy(false);
+    }
+  }, [manuscript, analysis]);
   const [recoverySnapshot, setRecoverySnapshot] = useState<BookPerfectRecoverySnapshot | null>(null);
   const abortRef = useRef<{ aborted: boolean }>({ aborted: false });
   const startTimeRef = useRef<number>(0);
