@@ -96,6 +96,18 @@ const V3ExportPanel: React.FC<V3ExportPanelProps> = ({ manuscript, title, subtit
       <div className="inline-flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-[0.2em]" style={{ color: GREEN }}>
         <BookOpen className="h-4 w-4" /> Exporter ton livre — 6 formats prêts à publier
       </div>
+      {/* Rappel du livre réellement exporté : évite d'exporter le manuscrit d'un autre projet. */}
+      <div className="mt-1.5 rounded-lg border px-3 py-2 text-[12px]" style={{ borderColor: '#cfe6da', background: '#fff' }}>
+        <span style={{ color: '#5f7a6c' }}>Livre exporté : </span>
+        <strong style={{ color: INK }}>« {title || 'Mon livre'} »</strong>
+        {author ? <span style={{ color: '#5f7a6c' }}> — {author}</span> : null}
+        <span className="ml-2" style={{ color: '#5f7a6c' }}>
+          ({chapters.length} chapitre{chapters.length > 1 ? 's' : ''} · {manuscript.trim().split(/\s+/).filter(Boolean).length.toLocaleString('fr-FR')} mots détectés)
+        </span>
+        <div className="mt-1 text-[11px]" style={{ color: '#8a7a5c' }}>
+          Vérifie que c'est bien le bon livre. Sinon, recharge le projet voulu (section « Rouvrir un projet ») avant d'exporter.
+        </div>
+      </div>
 
       {/* Sélecteur de gabarit KDP */}
       <div className="mt-3 flex flex-wrap items-center gap-2">
