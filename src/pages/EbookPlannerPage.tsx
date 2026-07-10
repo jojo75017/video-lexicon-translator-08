@@ -304,6 +304,24 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [importText, setImportText] = useState('');
 
+  // Statistiques réelles du livre (calculées à partir du contenu réel, jamais un chiffre fixe)
+  const bookStats = useMemo(() => {
+    const totalChapters = chapters.length;
+    let totalSubChapters = 0;
+    let totalWords = 0;
+    for (const ch of chapters) {
+      totalWords += countWords(ch.content || '');
+      const subs = ch.subChapters || [];
+      totalSubChapters += subs.length;
+      for (const sub of subs) {
+        totalWords += countWords(sub.content || '');
+      }
+    }
+    const estimatedPages = totalWords > 0 ? Math.max(1, Math.ceil(totalWords / 300)) : 0;
+    return { totalChapters, totalSubChapters, totalWords, estimatedPages };
+  }, [chapters]);
+
+
   const normalizeEbookImages = (images: unknown): Array<{url: string; title: string; chapterId?: string; chapterIndex?: number}> => {
     if (!Array.isArray(images)) return [];
 
