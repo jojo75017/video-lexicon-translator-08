@@ -262,60 +262,108 @@ export const RapportFinalTab: React.FC<Props> = ({ manuscript, analysis, onRelau
               </div>
             </div>
 
-            {/* Aperçu */}
-            <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
-              <div className="text-sm font-semibold flex items-center gap-2">
-                <BookOpen className="h-4 w-4 text-primary" /> Aperçu — {preview.label}
-              </div>
-              <div className="flex items-center gap-4">
-                <div
-                  className="relative shrink-0 rounded-sm border-2 border-foreground/40 bg-background"
-                  style={{ width: 72, height: 72 * (preview.height / preview.width) }}
-                >
-                  <div
-                    className="absolute border border-dashed border-primary/60 bg-primary/5"
-                    style={{
-                      top: `${(margins.topTwips / preview.height) * (72 * (preview.height / preview.width))}px`,
-                      right: `${(margins.outsideTwips / preview.width) * 72}px`,
-                      bottom: `${(margins.bottomTwips / preview.height) * (72 * (preview.height / preview.width))}px`,
-                      left: `${(margins.insideTwips / preview.width) * 72}px`,
-                    }}
-                  />
+            {/* Aperçu visuel — planche double pages avec marges miroir */}
+            {(() => {
+              const pageW = 128;
+              const pageH = pageW * (preview.height / preview.width);
+              const top = (margins.topTwips / preview.height) * pageH;
+              const bottom = (margins.bottomTwips / preview.height) * pageH;
+              const inside = (margins.insideTwips / preview.width) * pageW;
+              const outside = (margins.outsideTwips / preview.width) * pageW;
+              const TextLines = () => (
+                <>
+                  {Array.from({ length: 9 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="h-[2px] rounded bg-foreground/25"
+                      style={{ width: i === 8 ? '55%' : '100%' }}
+                    />
+                  ))}
+                </>
+              );
+              return (
+                <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+                  <div className="text-sm font-semibold flex items-center gap-2">
+                    <BookOpen className="h-4 w-4 text-primary" /> Aperçu visuel — {preview.label}
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Planche double-pages telle qu'imprimée. La <span className="font-medium text-primary">marge de reliure (miroir)</span> est
+                    à l'intérieur (près du dos), les autres marges sont identiques des deux côtés.
+                  </p>
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="flex items-stretch justify-center">
+                      {/* Page gauche (verso, page paire) */}
+                      <div
+                        className="relative rounded-l-sm border-2 border-r border-foreground/40 bg-background shadow-sm"
+                        style={{ width: pageW, height: pageH }}
+                      >
+                        <div
+                          className="absolute flex flex-col justify-start gap-[3px] overflow-hidden"
+                          style={{ top, bottom, left: outside, right: inside }}
+                        >
+                          <TextLines />
+                        </div>
+                        {/* zone reliure */}
+                        <div className="absolute inset-y-0 right-0 bg-primary/10" style={{ width: inside }} />
+                        <span className="absolute bottom-1 left-1 text-[8px] text-muted-foreground">verso · pair</span>
+                      </div>
+                      {/* Page droite (recto, page impaire) */}
+                      <div
+                        className="relative rounded-r-sm border-2 border-l-0 border-foreground/40 bg-background shadow-sm"
+                        style={{ width: pageW, height: pageH }}
+                      >
+                        <div
+                          className="absolute flex flex-col justify-start gap-[3px] overflow-hidden"
+                          style={{ top, bottom, left: inside, right: outside }}
+                        >
+                          <TextLines />
+                        </div>
+                        {/* zone reliure */}
+                        <div className="absolute inset-y-0 left-0 bg-primary/10" style={{ width: inside }} />
+                        <span className="absolute bottom-1 right-1 text-[8px] text-muted-foreground">recto · impair</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                      <span className="inline-block h-2 w-3 rounded-sm bg-primary/10 border border-primary/30" />
+                      Marge de reliure (dos) · {margins.insideInches.toLocaleString('fr-FR', { maximumFractionDigits: 3 })} po
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 gap-1.5 text-xs pt-1">
+                    <div className="flex items-center gap-2">
+                      <Ruler className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-muted-foreground">Taille (trim) :</span>
+                      <span className="font-medium">
+                        {fmtIn(preview.width)} × {fmtIn(preview.height)} po
+                        <span className="text-muted-foreground"> ({fmtMm(preview.width)} × {fmtMm(preview.height)} mm)</span>
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Ruler className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-muted-foreground">Marge reliure (KDP) :</span>
+                      <span className="font-medium">
+                        {margins.insideInches.toLocaleString('fr-FR', { maximumFractionDigits: 3 })} po (~{kdpPageEstimate} pages)
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Ruler className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-muted-foreground">Extérieur / haut / bas :</span>
+                      <span className="font-medium">{margins.outsideInches.toLocaleString('fr-FR', { maximumFractionDigits: 3 })} po</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Hash className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-muted-foreground">Pagination :</span>
+                      <span className="font-medium">{options.pageNumbers ? 'Numéros centrés' : 'Désactivée'}</span>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Marges no-bleed Amazon KDP : intérieur selon nombre de pages, extérieur/haut/bas à 0,25 po pour les formats KDP.
+                    Chaque chapitre démarre sur une nouvelle page. La police est conservée dans le Word ;
+                    le PDF utilise un rendu serif équivalent pour l'impression.
+                  </p>
                 </div>
-                <div className="grid grid-cols-1 gap-1.5 text-xs">
-                  <div className="flex items-center gap-2">
-                    <Ruler className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="text-muted-foreground">Taille (trim) :</span>
-                    <span className="font-medium">
-                      {fmtIn(preview.width)} × {fmtIn(preview.height)} po
-                      <span className="text-muted-foreground"> ({fmtMm(preview.width)} × {fmtMm(preview.height)} mm)</span>
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Ruler className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="text-muted-foreground">Marge reliure (KDP) :</span>
-                    <span className="font-medium">
-                      {margins.insideInches.toLocaleString('fr-FR', { maximumFractionDigits: 3 })} po (~{kdpPageEstimate} pages)
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Ruler className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="text-muted-foreground">Extérieur / haut / bas :</span>
-                    <span className="font-medium">{margins.outsideInches.toLocaleString('fr-FR', { maximumFractionDigits: 3 })} po</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Hash className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="text-muted-foreground">Pagination :</span>
-                    <span className="font-medium">{options.pageNumbers ? 'Numéros centrés' : 'Désactivée'}</span>
-                  </div>
-                </div>
-              </div>
-              <p className="text-[11px] text-muted-foreground">
-                Marges no-bleed Amazon KDP : intérieur selon nombre de pages, extérieur/haut/bas à 0,25 po pour les formats KDP.
-                Chaque chapitre démarre sur une nouvelle page. La police est conservée dans le Word ;
-                le PDF utilise un rendu serif équivalent pour l'impression.
-              </p>
-            </div>
+              );
+            })()}
+
 
             <div className="space-y-2">
               <Button onClick={doPackage} disabled={busy || !check.ready} className="w-full gap-2">
