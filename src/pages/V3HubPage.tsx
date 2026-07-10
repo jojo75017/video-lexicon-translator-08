@@ -192,6 +192,34 @@ const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon }[] = [
 
 const TAB_STORAGE_KEY = 'v3hub_active_tab';
 
+/** Reconstitue le manuscrit depuis les résultats du workflow (rédaction P10/P20, sinon plan P4/P3). */
+function readHubManuscript(): string {
+  try {
+    const raw = localStorage.getItem('ebook_workflow_results');
+    if (!raw) return '';
+    const data = JSON.parse(raw);
+    for (const key of ['P20', 'P10', 'P4', 'P3']) {
+      const c = data?.[key]?.displayContent;
+      if (typeof c === 'string' && c.trim().length >= 50) return c;
+    }
+    return '';
+  } catch {
+    return '';
+  }
+}
+
+/** Lit la fiche du livre saisie dans le Parcours. */
+function readHubBookConfig(): { title: string; subtitle: string; author: string } {
+  try {
+    const raw = localStorage.getItem('edition_book_config_v1');
+    if (!raw) return { title: '', subtitle: '', author: '' };
+    const c = JSON.parse(raw);
+    return { title: c?.title || '', subtitle: c?.subtitle || '', author: c?.author || '' };
+  } catch {
+    return { title: '', subtitle: '', author: '' };
+  }
+}
+
 const V3HubPage: React.FC = () => {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
