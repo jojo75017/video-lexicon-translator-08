@@ -120,8 +120,10 @@ export const writeAutosaveAsync = async <T,>(scope: string, data: T): Promise<vo
 };
 
 export const readAutosaveAsync = async <T,>(scope: string): Promise<T | null> => {
-  const local = readAutosave<T>(scope);
-  if (local !== null) return local;
+  try {
+    const raw = localStorage.getItem(autoKey(scope));
+    if (raw) return (JSON.parse(raw) as { data: T }).data ?? null;
+  } catch {}
 
   const db = await openNativeDb();
   if (!db) return null;
