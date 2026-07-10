@@ -972,6 +972,37 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             </div>
           )}
 
+          {/* Tableau du volume — toujours visible sur la page */}
+          <div className="mt-5 rounded-2xl border p-4 sm:p-5" style={{ borderColor: '#eadfc9', background: '#fffdf8' }}>
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <span className="text-[12px] font-bold uppercase tracking-[0.2em]" style={{ color: AMBER_DEEP }}>📊 Volume du livre</span>
+              <span className="rounded-md px-2 py-0.5 text-[10px] font-bold" style={{ background: AMBER_SOFT, color: AMBER_DEEP }}>
+                {bookStats.isEstimate ? 'Estimation (brief)' : 'Manuscrit réel'}
+              </span>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              {[
+                { label: 'Chapitres', value: bookStats.chapters.toLocaleString('fr-FR'), icon: BookOpen },
+                { label: 'Pages (est.)', value: bookStats.estimatedPages > 0 ? `~${bookStats.estimatedPages.toLocaleString('fr-FR')}` : '—', icon: FileText },
+                { label: 'Mots', value: bookStats.totalWords > 0 ? bookStats.totalWords.toLocaleString('fr-FR') : '—', icon: Layers },
+                { label: 'Lecture', value: bookStats.readingMin > 0 ? `${bookStats.readingMin} min` : '—', icon: Sparkles },
+              ].map((s) => (
+                <div key={s.label} className="rounded-xl border bg-white px-3 py-3 text-center" style={{ borderColor: '#eadfc9' }}>
+                  <s.icon className="h-4 w-4 mx-auto mb-1" style={{ color: '#008296' }} />
+                  <div className="text-lg font-black" style={{ color: INK }}>{s.value}</div>
+                  <div className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: '#a18a6c' }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+            <p className="mt-2 text-[10px]" style={{ color: '#a18a6c' }}>
+              {bookStats.isEstimate
+                ? 'Estimation basée sur le nombre de chapitres × mots par chapitre (≈ 300 mots/page, format 6×9 KDP).'
+                : 'Calculé sur le manuscrit réellement généré (≈ 300 mots/page).'}
+            </p>
+          </div>
+
+
+
 
           {/* Brief du livre */}
           <div className="mt-5 rounded-2xl border overflow-hidden" style={{ borderColor: '#eadfc9', background: '#fffdf8' }}>
