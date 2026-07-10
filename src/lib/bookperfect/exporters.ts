@@ -386,8 +386,8 @@ export async function generateCorrectedPdfBlob(
     return topMm + lineH;
   };
 
-  const writeWrapped = (text: string, x: number, y: number, fontSize = bodyFontSize, style: 'normal' | 'bold' | 'italic' = 'normal') => {
-    doc.setFont(pdfFont, style);
+  const writeWrapped = (text: string, x: number, y: number, fontSize = bodyFontSize) => {
+    doc.setFont(pdfFont, 'normal');
     doc.setFontSize(fontSize);
     const localLineH = fontSize * 0.352778 * 1.45;
     const lines: string[] = doc.splitTextToSize(text, pageWidthMm - currentLeft - currentRight);
@@ -401,19 +401,19 @@ export async function generateCorrectedPdfBlob(
 
   // Page de titre
   newPage(true);
-  doc.setFont(pdfFont, 'bold');
-  doc.setFontSize(26);
+  doc.setFont(pdfFont, 'normal');
+  doc.setFontSize(24);
   doc.text(doc.splitTextToSize(manuscript.title, pageWidthMm - insideMm - outsideMm), pageWidthMm / 2, pageHeightMm / 2 - 8, { align: 'center' });
 
   // Table des matières
   if (options.toc) {
     newPage();
     let y = topMm + lineH;
-    y = writeWrapped('Table des matières', currentLeft, y, 16, 'bold') + titleGap * 0.3;
+    y = writeWrapped('Table des matières', currentLeft, y, 16) + titleGap * 0.3;
     doc.setFont(pdfFont, 'normal');
     doc.setFontSize(bodyFontSize);
     manuscript.chapters.forEach((c) => {
-      y = writeWrapped(c.title, currentLeft, y, bodyFontSize, 'normal') + lineH * 0.2;
+      y = writeWrapped(c.title, currentLeft, y, bodyFontSize) + lineH * 0.2;
     });
   }
 
@@ -421,14 +421,14 @@ export async function generateCorrectedPdfBlob(
   for (const chapter of manuscript.chapters) {
     newPage();
     let y = topMm + lineH;
-    y = writeWrapped(chapter.title, currentLeft, y, 16, 'bold') + titleGap;
+    y = writeWrapped(chapter.title, currentLeft, y, 16) + titleGap;
 
     doc.setFont(pdfFont, 'normal');
     doc.setFontSize(bodyFontSize);
     const corrected = correctedChapterText(chapter, analysis, applyTypography);
     const paras = corrected.split(/\n\s*\n/).map((p) => p.trim().replace(/\n/g, ' ')).filter(Boolean);
     for (const para of paras) {
-      y = writeWrapped(para, currentLeft, y, bodyFontSize, 'normal') + paraGap;
+      y = writeWrapped(para, currentLeft, y, bodyFontSize) + paraGap;
     }
   }
 
