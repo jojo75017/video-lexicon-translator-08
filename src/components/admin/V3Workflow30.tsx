@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import {
   ArrowRight, Check, ChevronDown, RotateCcw, Trophy, Lock, Sparkles, Loader2, Wand2, AlertCircle,
-  Pencil, Save, X, Upload, FileDown, Image as ImageIcon, FolderOpen,
+  Pencil, Save, X, Upload, FileDown, Image as ImageIcon, FolderOpen, FilePlus, BookOpen, FileText, Layers,
 } from 'lucide-react';
 import { getModuleById, type V3Module } from '@/data/roadmapV3';
 import { isModuleClickable } from './v3ModuleRegistry';
@@ -505,6 +505,21 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
     setCloudMsg(null);
   };
 
+  // Démarre un livre entièrement neuf : réinitialise le brief, le thème et le projet en cours.
+  const startNewBook = () => {
+    setBrief({ ...EMPTY_BRIEF });
+    setTheme('');
+    setProjectId(null);
+    setProjectName('Mon livre');
+    setCloudMsg('Nouveau livre prêt — remplis ton projet ci-dessous.');
+    setOpenCfg('brief');
+    try {
+      localStorage.removeItem(BRIEF_KEY);
+      localStorage.removeItem(THEME_KEY);
+    } catch { /* ignore */ }
+  };
+
+
 
   useEffect(() => { localStorage.setItem(PROGRESS_KEY, JSON.stringify([...done])); }, [done]);
   useEffect(() => { localStorage.setItem(RESULTS_KEY, JSON.stringify(results)); }, [results]);
@@ -514,6 +529,21 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
     if (projectName === 'Mon livre' && brief.title.trim()) setProjectName(brief.title.trim().slice(0, 120));
   }, [brief.title, projectName]);
   const setBriefField = (k: keyof Brief, v: string) => setBrief((p) => ({ ...p, [k]: v }));
+
+  // Compteur du volume du livre. Si un manuscrit a été généré, on compte les mots
+  // réels ; sinon on affiche une estimation à partir du brief (chapitres × mots/chapitre).
+  const bookStats = useMemo(() => {
+    const manuscript = results['p20-chat-manuscript'] || '';
+    const chapters = Math.max(0, parseInt(brief.chapterCount || '', 10) || 0);
+    const wordsPer = Math.max(0, parseInt(brief.wordsPerChapter || '', 10) || 0);
+    const realWords = manuscript.trim().split(/\s+/).filter(Boolean).length;
+    const hasManuscript = realWords > 50;
+    const totalWords = hasManuscript ? realWords : chapters * wordsPer;
+    const estimatedPages = totalWords > 0 ? Math.max(1, Math.ceil(totalWords / 300)) : 0;
+    const readingMin = totalWords > 0 ? Math.max(1, Math.ceil(totalWords / 200)) : 0;
+    return { chapters, totalWords, estimatedPages, readingMin, isEstimate: !hasManuscript };
+  }, [brief.chapterCount, brief.wordsPerChapter, results]);
+
 
   // Progression calculée uniquement sur les étapes ACCESSIBLES (débloquées).
   // Les teasers premium ne comptent pas dans le total ni dans la progression.
@@ -895,10 +925,20 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             <WritingEngineBadge isPro={fullMode} onUpgrade={() => setCheckoutOpen(true)} />
           </div>
 
-          <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+            <button type="button" onClick={startNewBook}
+              className="group rounded-2xl border-2 p-4 text-left transition-all hover:-translate-y-0.5"
+              style={{ borderColor: `${AMBER}99`, background: `linear-gradient(135deg, #fff, ${AMBER_SOFT} 90%)` }}>
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl mb-3" style={{ background: AMBER_SOFT, color: AMBER_DEEP }}>
+                <FilePlus className="h-5 w-5" />
+              </span>
+              <div className="text-sm font-black" style={{ color: INK }}>Nouveau livre</div>
+              <div className="mt-1 text-[11px] leading-snug" style={{ color: '#8a7860' }}>Repartir de zéro avec un projet vierge</div>
+            </button>
             <button type="button" onClick={saveToCloud} disabled={saving}
               className="group rounded-2xl border-2 p-4 text-left transition-all hover:-translate-y-0.5 disabled:opacity-60"
               style={{ borderColor: `${GREEN}66`, background: '#f6fdf9' }}>
+
               <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl mb-3" style={{ background: `${GREEN}18`, color: GREEN }}>
                 {saving ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
               </span>
@@ -931,6 +971,37 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
               <Save className="h-3.5 w-3.5" /> {cloudMsg}
             </div>
           )}
+
+          {/* Tableau du volume — toujours visible sur la page */}
+          <div className="mt-5 rounded-2xl border p-4 sm:p-5" style={{ borderColor: '#eadfc9', background: '#fffdf8' }}>
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <span className="text-[12px] font-bold uppercase tracking-[0.2em]" style={{ color: AMBER_DEEP }}>📊 Volume du livre</span>
+              <span className="rounded-md px-2 py-0.5 text-[10px] font-bold" style={{ background: AMBER_SOFT, color: AMBER_DEEP }}>
+                {bookStats.isEstimate ? 'Estimation (brief)' : 'Manuscrit réel'}
+              </span>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              {[
+                { label: 'Chapitres', value: bookStats.chapters.toLocaleString('fr-FR'), icon: BookOpen },
+                { label: 'Pages (est.)', value: bookStats.estimatedPages > 0 ? `~${bookStats.estimatedPages.toLocaleString('fr-FR')}` : '—', icon: FileText },
+                { label: 'Mots', value: bookStats.totalWords > 0 ? bookStats.totalWords.toLocaleString('fr-FR') : '—', icon: Layers },
+                { label: 'Lecture', value: bookStats.readingMin > 0 ? `${bookStats.readingMin} min` : '—', icon: Sparkles },
+              ].map((s) => (
+                <div key={s.label} className="rounded-xl border bg-white px-3 py-3 text-center" style={{ borderColor: '#eadfc9' }}>
+                  <s.icon className="h-4 w-4 mx-auto mb-1" style={{ color: '#008296' }} />
+                  <div className="text-lg font-black" style={{ color: INK }}>{s.value}</div>
+                  <div className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: '#a18a6c' }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+            <p className="mt-2 text-[10px]" style={{ color: '#a18a6c' }}>
+              {bookStats.isEstimate
+                ? 'Estimation basée sur le nombre de chapitres × mots par chapitre (≈ 300 mots/page, format 6×9 KDP).'
+                : 'Calculé sur le manuscrit réellement généré (≈ 300 mots/page).'}
+            </p>
+          </div>
+
+
 
 
           {/* Brief du livre */}
