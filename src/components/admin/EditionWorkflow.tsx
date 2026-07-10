@@ -572,22 +572,37 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
       </div>
 
 
-      {/* Départements & agents */}
+      {/* Parcours : V4 = phases séquentielles, V3 = départements */}
       <div className="divide-y" style={{ borderColor: '#f0e7d4' }}>
-        {EDITION_DEPARTMENTS.map((dept) => {
-          const agents = tierAgents.filter((a) => a.department === dept);
-          if (!agents.length) return null;
+        {agentGroups.map((group, groupIndex) => {
+          const agents = group.agents;
           const deptDone = agents.filter((a) => done.has(a.order)).length;
           const isPro = agents.every((a) => a.tier === 'v4');
+          const groupPct = agents.length ? Math.round((deptDone / agents.length) * 100) : 0;
           return (
-            <div key={dept} className="px-5 sm:px-7 py-5">
-              <div className="flex items-center gap-2 mb-3">
-                <h3 className="text-sm font-black uppercase tracking-wide" style={{ color: AMBER_DEEP }}>{dept}</h3>
-                {isPro && (
+            <div key={group.label} className="px-5 sm:px-7 py-5">
+              <div className="flex items-center gap-2 mb-1">
+                {activeTier === 'v4' && (
+                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] font-black text-white" style={{ background: AMBER_DEEP }}>
+                    {groupIndex + 1}
+                  </span>
+                )}
+                <h3 className="text-sm font-black uppercase tracking-wide" style={{ color: AMBER_DEEP }}>{group.label}</h3>
+                {isPro && activeTier !== 'v4' && (
                   <span className="rounded-full px-2 py-0.5 text-[10px] font-bold text-white" style={{ background: AMBER_DEEP }}>V4 · 347€</span>
                 )}
                 <span className="ml-auto text-[11px]" style={{ color: '#a18a6c' }}>{deptDone}/{agents.length}</span>
               </div>
+              {group.intro && (
+                <p className="mb-2 text-[12px]" style={{ color: '#8a7860' }}>{group.intro}</p>
+              )}
+              {activeTier === 'v4' && (
+                <div className="mb-3 h-1.5 w-full rounded-full overflow-hidden" style={{ background: '#f0e7d4' }}>
+                  <div className="h-full rounded-full transition-all duration-500"
+                    style={{ width: `${groupPct}%`, background: `linear-gradient(90deg, ${AMBER}, #FFB44D)` }} />
+                </div>
+              )}
+
 
               <div className="grid gap-2.5">
                 {agents.map((agent) => {
