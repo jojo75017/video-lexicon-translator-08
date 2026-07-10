@@ -45,6 +45,7 @@ const BookPerfectPage: React.FC = () => {
   const [pausedMessage, setPausedMessage] = useState<string | null>(null);
   const [elapsedMs, setElapsedMs] = useState<number | null>(null);
   const [justCompleted, setJustCompleted] = useState(false);
+  const [activeTab, setActiveTab] = useState('traces-ia');
   const [recoverySnapshot, setRecoverySnapshot] = useState<BookPerfectRecoverySnapshot | null>(null);
   const abortRef = useRef<{ aborted: boolean }>({ aborted: false });
   const startTimeRef = useRef<number>(0);
