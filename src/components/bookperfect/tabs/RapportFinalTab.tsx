@@ -48,6 +48,19 @@ export const RapportFinalTab: React.FC<Props> = ({ manuscript, analysis, onRelau
   const setOpt = <K extends keyof KdpExportOptions>(k: K, v: KdpExportOptions[K]) =>
     setOptions((o) => ({ ...o, [k]: v }));
 
+  const doOneClick69 = async () => {
+    try {
+      setBusy(true);
+      toast.loading('Conversion 6 × 9 pouces + marges Amazon KDP (Word + PDF)…', { id: 'bp-kdp1' });
+      await exportKdpPackage(manuscript, analysis, { ...DEFAULT_KDP_OPTIONS, formatId: '6x9' }, true);
+      toast.success('Version 6 × 9 prête pour Amazon KDP exportée (Word + PDF) ✓', { id: 'bp-kdp1' });
+    } catch (e: any) {
+      toast.error(e?.message || 'Échec de la préparation KDP.', { id: 'bp-kdp1' });
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const doPackage = async () => {
     try {
       setBusy(true);
