@@ -112,23 +112,81 @@ export const RapportFinalTab: React.FC<Props> = ({ manuscript, analysis, onRelau
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-2">
-            {KDP_FORMATS.map((f) => (
-              <button
-                key={f.id}
-                onClick={() => doExportDocx(f.id)}
-                className="w-full flex items-center justify-between rounded-lg border p-3 text-left hover:border-primary hover:bg-primary/5 transition-colors"
-              >
-                <div>
-                  <div className="font-medium flex items-center gap-1.5">
-                    {f.label}
-                    {f.recommended && <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />}
+            {KDP_FORMATS.map((f) => {
+              const active = selectedFormat === f.id;
+              return (
+                <button
+                  key={f.id}
+                  onClick={() => setSelectedFormat(f.id)}
+                  className={`w-full flex items-center justify-between rounded-lg border p-3 text-left transition-colors ${
+                    active ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'hover:border-primary hover:bg-primary/5'
+                  }`}
+                >
+                  <div>
+                    <div className="font-medium flex items-center gap-1.5">
+                      {f.label}
+                      {f.recommended && <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />}
+                    </div>
+                    <div className="text-xs text-muted-foreground">{f.description}</div>
                   </div>
-                  <div className="text-xs text-muted-foreground">{f.description}</div>
-                </div>
-                <FileDown className="h-4 w-4 text-muted-foreground shrink-0" />
-              </button>
-            ))}
+                  <span className={`text-xs font-medium ${active ? 'text-primary' : 'text-muted-foreground'}`}>
+                    {active ? 'Sélectionné' : 'Choisir'}
+                  </span>
+                </button>
+              );
+            })}
           </div>
+
+          {/* Aperçu avant export */}
+          <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+            <div className="text-sm font-semibold flex items-center gap-2">
+              <BookOpen className="h-4 w-4 text-primary" /> Aperçu — {preview.label}
+            </div>
+            <div className="flex items-center gap-4">
+              {/* Schéma proportionnel de la page + marges */}
+              <div
+                className="relative shrink-0 rounded-sm border-2 border-foreground/40 bg-background"
+                style={{
+                  width: 72,
+                  height: 72 * (preview.height / preview.width),
+                }}
+              >
+                <div
+                  className="absolute border border-dashed border-primary/60 bg-primary/5"
+                  style={{
+                    inset: `${(preview.margin / preview.height) * 72 * (preview.width / preview.width)}px`,
+                  }}
+                />
+              </div>
+              <div className="grid grid-cols-1 gap-1.5 text-xs">
+                <div className="flex items-center gap-2">
+                  <Ruler className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-muted-foreground">Taille (trim) :</span>
+                  <span className="font-medium">
+                    {fmtIn(preview.width)} × {fmtIn(preview.height)} po
+                    <span className="text-muted-foreground"> ({fmtMm(preview.width)} × {fmtMm(preview.height)} mm)</span>
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Ruler className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-muted-foreground">Marges :</span>
+                  <span className="font-medium">
+                    {fmtIn(preview.margin)} po ({fmtMm(preview.margin)} mm) sur les 4 côtés
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Hash className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-muted-foreground">Pagination :</span>
+                  <span className="font-medium">Numéros centrés en pied de page</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <Button onClick={() => doExportDocx(selectedFormat)} className="w-full gap-2">
+            <FileDown className="h-4 w-4" /> Exporter en {preview.label}
+          </Button>
+
         </DialogContent>
       </Dialog>
     </div>
