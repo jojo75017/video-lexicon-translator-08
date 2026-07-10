@@ -7,6 +7,9 @@ import {
   TrendingUp, Award, Flame, AlertTriangle
 } from 'lucide-react';
 import { Chapter } from '@/hooks/useSubscriptionGeneration';
+import { useKdpFormat } from '@/hooks/useKdpFormat';
+import { estimatePages } from '@/utils/kdpPageDensity';
+import { KdpFormatSelect } from '@/components/ebook/KdpFormatSelect';
 
 interface EbookManuscriptDashboardProps {
   ebookTitle: string;
@@ -31,6 +34,7 @@ export const EbookManuscriptDashboard: React.FC<EbookManuscriptDashboardProps> =
   kdpKeywords,
   kdpCategories,
 }) => {
+  const { formatId } = useKdpFormat();
   const stats = useMemo(() => {
     const chapterStats = chapters.map((ch, i) => {
       const chapterWords = ch.content ? ch.content.split(/\s+/).filter(Boolean).length : 0;
@@ -59,7 +63,7 @@ export const EbookManuscriptDashboard: React.FC<EbookManuscriptDashboardProps> =
 
     const targetTotal = chapters.length * targetWordsPerChapter;
     const globalProgress = targetTotal > 0 ? Math.min(100, (totalWords / targetTotal) * 100) : 0;
-    const estimatedPages = Math.ceil(totalWords / 250);
+    const estimatedPages = estimatePages(totalWords, formatId);
     const readingTime = Math.ceil(totalWords / 200);
     const chaptersComplete = chapterStats.filter(c => c.progress >= 80).length;
 
