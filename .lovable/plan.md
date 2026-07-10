@@ -1,63 +1,53 @@
-# Plan de reprise — manuscrit propre et uniforme
+# Compteur réel de chapitres, sous-chapitres, pages et mots
+
+## Problème
+Dans le Planificateur, le bandeau affiche seulement `📚 X chapitres`. Aucun décompte réel des sous-chapitres, ni des mots réellement rédigés, ni d'estimation de pages. On ne sait donc jamais le volume réel du livre (« on met 15 chapitres, on ne sait pas le nombre de pages »).
 
 ## Objectif
-Produire un export livre sobre, professionnel et livrable :
-- police uniforme à 12 pt ;
-- marges KDP réelles et visibles ;
-- format 6 × 9 correct ;
-- table des matières claire avec titres ;
-- chapitres propres, sans doublons ;
-- aucun élément décoratif, badge, emoji, bloc parasite ou mise en page fantaisiste dans le manuscrit.
+Afficher, en temps réel et calculé à partir du contenu réel (jamais un chiffre fixe) :
+- Nombre de chapitres
+- Nombre de sous-chapitres (somme sur tous les chapitres)
+- Nombre de mots (chapitres + sous-chapitres)
+- Estimation de pages (basée sur les mots réels, format livre)
 
-## Ce que je vais corriger
+À deux endroits :
+1. **Bandeau en haut du projet** (en-tête violet, à côté du titre)
+2. **Barre récap fixe** visible pendant qu'on structure/édite les chapitres
 
-### 1. Mise en page KDP réelle
-Dans l'export DOCX et PDF :
-- format 6 × 9 pouces strict ;
-- marges haut/bas/extérieur conformes ;
-- marge intérieure de reliure selon le nombre de pages ;
-- marges miroir conservées pour les pages gauche/droite ;
-- interligne régulier et confortable.
+## Implémentation
 
-### 2. Typographie uniforme
-- Corps du texte par défaut : 12 pt.
-- Une seule police sobre pour tout le manuscrit.
-- Titres de chapitres uniformes.
-- Sous-titres uniformes si présents.
-- Pas de style aléatoire, pas de mélange visuel.
+### 1. Helper de statistiques (dans `src/pages/EbookPlannerPage.tsx`)
+Ajouter un `useMemo` `bookStats` qui parcourt `chapters` :
 
-### 3. Table des matières lisible
-- Afficher le titre « Table des matières ».
-- Lister les chapitres avec leurs vrais titres, pas seulement des numéros.
-- Ajouter les sous-titres uniquement s'ils sont réellement détectés proprement.
-- Conserver les numéros de page à droite.
+```text
+totalChapters      = chapters.length
+totalSubChapters   = somme des chapter.subChapters.length
+totalWords         = mots de chaque chapter.content
+                     + mots de chaque subChapter.content
+estimatedPages     = max(1, ceil(totalWords / 300))   // 300 mots/page (cohérent KDP 6x9)
+```
+Comptage de mots : `text.trim().split(/\s+/).filter(Boolean).length` (même logique que `manuscriptParser.countWords`). On peut réutiliser `countWords` importé de `@/lib/manuscriptParser` pour rester cohérent.
 
-### 4. Chapitre 1 sans doublon
-- Supprimer le titre répété au début du contenu du chapitre.
-- Ne garder le titre qu'à deux endroits normaux :
-  - dans la table des matières ;
-  - en haut de la page du chapitre.
+### 2. Bandeau en haut du projet (~ligne 1478-1483)
+Remplacer le badge unique `📚 X chapitres` par une série de badges dans le même style (`rounded-full bg-white/20 px-3 py-1`) :
+- `📚 X chapitres`
+- `📑 Y sous-chapitres`
+- `📄 ~Z pages`
+- `✍️ N mots`
+Le badge auteur existant est conservé.
 
-### 5. Export minimal, sans tralala
-- Le fichier livre ne contiendra pas de rapport, score, badge, checklist, explication ou élément marketing.
-- Le rapport éditorial reste séparé.
-- Le DOCX/PDF livre doit être uniquement le manuscrit mis en page.
+### 3. Barre récap fixe pendant la structuration
+Ajouter un petit bandeau récapitulatif **sticky** (`sticky top-0 z-20`) juste au-dessus de la liste des chapitres, affiché seulement quand `chapters.length > 0`. Style cohérent avec le thème (fond `bg-card`/`bg-muted`, accent teal `#008296`, texte `#232F3E`), 4 cellules : Chapitres · Sous-chapitres · Pages (est.) · Mots. Il se met à jour automatiquement à chaque ajout/suppression/édition puisqu'il lit `bookStats`.
 
-### 6. Vérification obligatoire
-Après correction :
-- générer un DOCX test ;
-- inspecter le contenu XML pour confirmer les marges, la taille 12 pt, la table des matières et l'absence de doublon ;
-- générer un PDF test si possible ;
-- vérifier visuellement les pages PDF converties en images pour confirmer que les marges existent et que le texte n'est pas minuscule.
+## Détails techniques
+- Aucune donnée fictive : tout dérive de `chapters` en mémoire.
+- `estimatedPages` = `Math.max(1, Math.ceil(totalWords / 300))`. (Note : le dashboard global utilise 250 ; on unifie sur 300 mots/page, plus proche d'un livre 6×9 KDP. Pas d'autre changement au dashboard.)
+- Les libellés gèrent le pluriel (`chapitre(s)`, `sous-chapitre(s)`).
+- Modification limitée au front (présentation) dans `EbookPlannerPage.tsx` — pas de logique métier ni de backend.
 
-## Fichiers concernés
-- `src/lib/bookperfect/exporters.ts`
-- `src/lib/bookperfect/importManuscript.ts` si la détection des chapitres doit être durcie
-- éventuellement `src/lib/manuscriptParser.ts` si le découpage titre/sous-titre est la source du problème
+## Fichier touché
+- `src/pages/EbookPlannerPage.tsx` (ajout du `useMemo` + badges en-tête + barre récap sticky)
 
-## Non inclus dans cette reprise
-- Pas de nouvelle fonctionnalité.
-- Pas de refonte UI.
-- Pas de modification backend.
-- Pas de changement de prix/offres.
-- Le script vidéo sera repris après stabilisation de l'export livre, pour ne pas mélanger les problèmes.
+## Hors périmètre
+- Pas de changement de prix, de workflow V3, ni du moteur de génération.
+- Pas de modification des exports DOCX/PDF.

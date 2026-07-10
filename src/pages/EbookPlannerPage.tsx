@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { countWords } from '@/lib/manuscriptParser';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -302,6 +303,24 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const [targetWordsPerChapter, setTargetWordsPerChapter] = useState(savedData?.targetWordsPerChapter || 2500);
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [importText, setImportText] = useState('');
+
+  // Statistiques réelles du livre (calculées à partir du contenu réel, jamais un chiffre fixe)
+  const bookStats = useMemo(() => {
+    const totalChapters = chapters.length;
+    let totalSubChapters = 0;
+    let totalWords = 0;
+    for (const ch of chapters) {
+      totalWords += countWords(ch.content || '');
+      const subs = ch.subChapters || [];
+      totalSubChapters += subs.length;
+      for (const sub of subs) {
+        totalWords += countWords(sub.content || '');
+      }
+    }
+    const estimatedPages = totalWords > 0 ? Math.max(1, Math.ceil(totalWords / 300)) : 0;
+    return { totalChapters, totalSubChapters, totalWords, estimatedPages };
+  }, [chapters]);
+
 
   const normalizeEbookImages = (images: unknown): Array<{url: string; title: string; chapterId?: string; chapterIndex?: number}> => {
     if (!Array.isArray(images)) return [];
@@ -1479,7 +1498,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                       {authorName?.trim() && (
                         <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">✍️ {authorName}</span>
                       )}
-                      <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">📚 {chapters.length} chapitre{chapters.length > 1 ? 's' : ''}</span>
+                      <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">📚 {bookStats.totalChapters} chapitre{bookStats.totalChapters > 1 ? 's' : ''}</span>
+                      <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">📑 {bookStats.totalSubChapters} sous-chapitre{bookStats.totalSubChapters > 1 ? 's' : ''}</span>
+                      <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">📄 ~{bookStats.estimatedPages} page{bookStats.estimatedPages > 1 ? 's' : ''}</span>
+                      <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">✍️ {bookStats.totalWords.toLocaleString('fr-FR')} mots</span>
                     </div>
                   </>
                 ) : (
@@ -2504,7 +2526,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                           </div>
                           <div>
                             <CardTitle className="text-xl">Structure des chapitres</CardTitle>
-                            <CardDescription>Organisez et rédigez vos chapitres ({chapters.length} chapitres)</CardDescription>
+                            <CardDescription>Organisez et rédigez vos chapitres ({bookStats.totalChapters} chapitre{bookStats.totalChapters > 1 ? 's' : ''} · {bookStats.totalSubChapters} sous-chapitre{bookStats.totalSubChapters > 1 ? 's' : ''} · ~{bookStats.estimatedPages} pages)</CardDescription>
                           </div>
                         </div>
                         <div className="flex gap-2">
@@ -2540,6 +2562,23 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                       </div>
                     </CardHeader>
                     <CardContent className="p-6">
+                      {chapters.length > 0 && (
+                        <div className="sticky top-0 z-20 -mx-6 -mt-6 mb-6 border-b border-[#008296]/20 bg-[#FAFAFA]/95 px-6 py-3 backdrop-blur-sm">
+                          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                            {[
+                              { label: 'Chapitres', value: bookStats.totalChapters.toLocaleString('fr-FR') },
+                              { label: 'Sous-chapitres', value: bookStats.totalSubChapters.toLocaleString('fr-FR') },
+                              { label: 'Pages (est.)', value: `~${bookStats.estimatedPages.toLocaleString('fr-FR')}` },
+                              { label: 'Mots', value: bookStats.totalWords.toLocaleString('fr-FR') },
+                            ].map((s) => (
+                              <div key={s.label} className="rounded-xl bg-white px-3 py-2 text-center shadow-sm ring-1 ring-[#008296]/10">
+                                <div className="text-lg font-bold leading-none text-[#008296]">{s.value}</div>
+                                <div className="mt-1 text-[11px] font-medium uppercase tracking-wide text-[#232F3E]/60">{s.label}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                       {chapters.length === 0 ? (
                         <div className="text-center py-16 px-8">
                           <div className="w-20 h-20 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center animate-float">
