@@ -30,6 +30,23 @@ const SERIF = "'Instrument Serif', Georgia, 'Times New Roman', serif";
 const DONE_KEY = 'edition_workflow_done_v1';
 const CONFIG_KEY = 'edition_book_config_v1';
 const TARGET_WORDS_KEY = 'edition_chapter_target_words_v1';
+const REVISION_PASSES_KEY = 'edition_revision_passes_v1';
+
+const REVISION_PASS_LABELS = [
+  { n: 1, title: 'Rédaction', desc: 'Écriture du premier jet chapitre par chapitre.' },
+  { n: 2, title: 'Relecture stylistique', desc: 'Correction, cohérence et fluidité du texte.' },
+  { n: 3, title: 'Polissage final', desc: 'Voix d\'auteur, suppression des clichés, finitions.' },
+];
+
+function readRevisionPasses(): number {
+  try {
+    const raw = localStorage.getItem(REVISION_PASSES_KEY);
+    const n = raw ? Number(raw) : 2;
+    return Number.isFinite(n) && n >= 1 && n <= 3 ? Math.round(n) : 2;
+  } catch {
+    return 2;
+  }
+}
 
 interface EditionBookConfig {
   title: string;
