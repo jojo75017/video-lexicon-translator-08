@@ -1,48 +1,63 @@
+# Plan de reprise — manuscrit propre et uniforme
+
 ## Objectif
+Produire un export livre sobre, professionnel et livrable :
+- police uniforme à 12 pt ;
+- marges KDP réelles et visibles ;
+- format 6 × 9 correct ;
+- table des matières claire avec titres ;
+- chapitres propres, sans doublons ;
+- aucun élément décoratif, badge, emoji, bloc parasite ou mise en page fantaisiste dans le manuscrit.
 
-Rendre les corrections de BookPerfect AI transparentes pour l'auteur, en deux volets :
+## Ce que je vais corriger
 
-1. **Voir corriger « en direct »** : pendant l'analyse, afficher au fil de l'eau les corrections trouvées chapitre par chapitre (comme si l'auteur regardait le directeur éditorial travailler).
-2. **Comparer avec l'original** : un onglet/bouton affichant, côte à côte, le texte original et le texte corrigé, avec les différences mises en évidence, avant que l'auteur ne valide.
+### 1. Mise en page KDP réelle
+Dans l'export DOCX et PDF :
+- format 6 × 9 pouces strict ;
+- marges haut/bas/extérieur conformes ;
+- marge intérieure de reliure selon le nombre de pages ;
+- marges miroir conservées pour les pages gauche/droite ;
+- interligne régulier et confortable.
 
-Le tout reste **non destructif** (le texte original en mémoire n'est jamais muté) et 100 % frontend — aucune modification du backend, de la logique d'analyse IA, ni du modèle de prix.
+### 2. Typographie uniforme
+- Corps du texte par défaut : 12 pt.
+- Une seule police sobre pour tout le manuscrit.
+- Titres de chapitres uniformes.
+- Sous-titres uniformes si présents.
+- Pas de style aléatoire, pas de mélange visuel.
 
----
+### 3. Table des matières lisible
+- Afficher le titre « Table des matières ».
+- Lister les chapitres avec leurs vrais titres, pas seulement des numéros.
+- Ajouter les sous-titres uniquement s'ils sont réellement détectés proprement.
+- Conserver les numéros de page à droite.
 
-## Volet 1 — Analyse en direct (« live »)
+### 4. Chapitre 1 sans doublon
+- Supprimer le titre répété au début du contenu du chapitre.
+- Ne garder le titre qu'à deux endroits normaux :
+  - dans la table des matières ;
+  - en haut de la page du chapitre.
 
-Enrichir `src/components/bookperfect/AnalysisProgress.tsx` :
-- Sous la liste des chapitres, ajouter un **flux en temps réel** des dernières corrections détectées (`analysis.issues`, triées par ordre d'apparition, les plus récentes en haut, limité aux ~12 dernières).
-- Chaque ligne montre : le chapitre, la catégorie (badge coloré), l'extrait `original` barré → la `suggestion` en surbrillance verte, façon « diff inline » (réutilise le style déjà présent dans `IssueCard`).
-- Le chapitre en cours d'analyse est mis en évidence (« ✍️ Correction en cours… »).
-- Comme `onProgress` est déjà appelé après chaque chapitre dans l'orchestrateur, le flux se remplit automatiquement chapitre après chapitre, sans toucher à `analysisOrchestrator.ts`.
+### 5. Export minimal, sans tralala
+- Le fichier livre ne contiendra pas de rapport, score, badge, checklist, explication ou élément marketing.
+- Le rapport éditorial reste séparé.
+- Le DOCX/PDF livre doit être uniquement le manuscrit mis en page.
 
-## Volet 2 — Onglet « Comparer avec l'original »
+### 6. Vérification obligatoire
+Après correction :
+- générer un DOCX test ;
+- inspecter le contenu XML pour confirmer les marges, la taille 12 pt, la table des matières et l'absence de doublon ;
+- générer un PDF test si possible ;
+- vérifier visuellement les pages PDF converties en images pour confirmer que les marges existent et que le texte n'est pas minuscule.
 
-Nouveau composant `src/components/bookperfect/tabs/ComparaisonTab.tsx` :
-- **Sélecteur de chapitre** (menu déroulant) en haut.
-- Affichage **côte à côte** (2 colonnes sur desktop, empilées sur mobile) :
-  - Colonne gauche : **texte original** du chapitre.
-  - Colonne droite : **texte corrigé** = `correctedChapterText(chapter, analysis, false)` (corrections `applied` uniquement, sans imposer la typo pour garder la lecture claire — option « voir avec typographie FR » cochable).
-- **Mise en évidence des différences** : les segments supprimés en rouge barré, les segments ajoutés en vert. Un petit utilitaire de diff mot-à-mot (`src/lib/bookperfect/textDiff.ts`) produit les segments à colorer ; pas de nouvelle dépendance, un diff LCS léger suffit.
-- **Bandeau de synthèse** : « X correction(s) appliquée(s), Y en attente » pour ce chapitre, avec rappel que seules les corrections validées apparaissent à droite.
-- Note explicative : « Validez ou ignorez les corrections dans les onglets Orthographe / Style / KDP ; cette vue reflète en direct vos choix. »
+## Fichiers concernés
+- `src/lib/bookperfect/exporters.ts`
+- `src/lib/bookperfect/importManuscript.ts` si la détection des chapitres doit être durcie
+- éventuellement `src/lib/manuscriptParser.ts` si le découpage titre/sous-titre est la source du problème
 
-## Intégration dans la page
-
-Dans `src/pages/BookPerfectPage.tsx` :
-- Ajouter un onglet **« Comparer »** (icône `Columns`/`GitCompare`) dans la `TabsList`, entre « Style » et « Amazon KDP » (ou après « Rapport »).
-- Câbler `ComparaisonTab` avec `manuscript` et `analysis`.
-
----
-
-## Détails techniques
-
-- `src/lib/bookperfect/textDiff.ts` (nouveau) : fonction `diffWords(original, corrected)` renvoyant un tableau de segments `{ type: 'equal' | 'removed' | 'added', text }` via un algorithme LCS simple sur les mots. Utilisé uniquement pour l'affichage.
-- `correctedChapterText` (déjà existant dans `exporters.ts`) est réutilisé tel quel pour produire le texte corrigé — cohérence garantie avec l'export Word.
-- Aucune modification de `analysisOrchestrator.ts`, des types, du backend ou de la tarification.
-- Fichiers touchés :
-  - créé : `src/lib/bookperfect/textDiff.ts`
-  - créé : `src/components/bookperfect/tabs/ComparaisonTab.tsx`
-  - édité : `src/components/bookperfect/AnalysisProgress.tsx` (flux live)
-  - édité : `src/pages/BookPerfectPage.tsx` (nouvel onglet)
+## Non inclus dans cette reprise
+- Pas de nouvelle fonctionnalité.
+- Pas de refonte UI.
+- Pas de modification backend.
+- Pas de changement de prix/offres.
+- Le script vidéo sera repris après stabilisation de l'export livre, pour ne pas mélanger les problèmes.

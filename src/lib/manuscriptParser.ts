@@ -5,7 +5,7 @@
  */
 export interface ParsedSection {
   title: string;
-  blocks: { text: string }[];
+  blocks: { text: string; type?: 'paragraph' | 'heading'; level?: 2 | 3 }[];
 }
 
 export const parseManuscript = (raw: string, fallbackTitle = 'Contenu'): ParsedSection[] => {
@@ -21,20 +21,32 @@ export const parseManuscript = (raw: string, fallbackTitle = 'Contenu'): ParsedS
     if (!current) return;
     const joined = buffer.join('\n');
     const paras = joined.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
-    paras.forEach((p) => current!.blocks.push({ text: p.replace(/\n/g, ' ') }));
+    paras.forEach((p) => current!.blocks.push({ text: p.replace(/\n/g, ' '), type: 'paragraph' }));
     buffer = [];
   };
 
-  const isHeading = (line: string) => {
+  const isChapterHeading = (line: string) => {
     const l = line.trim();
-    if (/^#{1,3}\s+/.test(l)) return l.replace(/^#{1,3}\s+/, '').trim();
-    if (/^chapitre\s+/i.test(l) && l.length < 80) return l.trim();
-    if (/^partie\s+/i.test(l) && l.length < 80) return l.trim();
+    if (/^#\s+/.test(l)) return l.replace(/^#\s+/, '').trim();
+    if (/^#{2,3}\s+(?:chapitre|partie|prologue|épilogue|epilogue|introduction)\b/i.test(l) && l.length < 120) {
+      return l.replace(/^#{2,3}\s+/, '').trim();
+    }
+    if (/^(?:chapitre|partie|prologue|épilogue|epilogue|introduction)\b/i.test(l) && l.length < 120) return l.trim();
+    return null;
+  };
+
+  const isSubheading = (line: string): { text: string; level: 2 | 3 } | null => {
+    const l = line.trim();
+    const markdown = l.match(/^(#{2,3})\s+(.+)$/);
+    if (markdown) return { text: markdown[2].trim(), level: markdown[1].length === 2 ? 2 : 3 };
+    if (l.length > 0 && l.length <= 90 && !/[.!?…]$/.test(l) && /^[A-ZÀ-Ÿ0-9][\wÀ-ÿ'’\-\s:;,]+$/.test(l)) {
+      return { text: l, level: 2 };
+    }
     return null;
   };
 
   for (const line of lines) {
-    const heading = isHeading(line);
+    const heading = isChapterHeading(line);
     if (heading) {
       flushParagraphs();
       current = { title: heading, blocks: [] };
@@ -44,7 +56,13 @@ export const parseManuscript = (raw: string, fallbackTitle = 'Contenu'): ParsedS
         current = { title: fallbackTitle, blocks: [] };
         sections.push(current);
       }
-      buffer.push(line);
+      const subheading = isSubheading(line);
+      if (subheading) {
+        flushParagraphs();
+        current.blocks.push({ text: subheading.text, type: 'heading', level: subheading.level });
+      } else {
+        buffer.push(line);
+      }
     }
   }
   flushParagraphs();

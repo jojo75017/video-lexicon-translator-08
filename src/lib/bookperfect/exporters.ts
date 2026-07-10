@@ -45,8 +45,8 @@ export const KDP_FORMATS: KdpFormat[] = [
 export const getKdpFormat = (id: KdpFormatId): KdpFormat =>
   KDP_FORMATS.find((f) => f.id === id) ?? KDP_FORMATS[2];
 
-/** Polices adaptées aux romans (serif). La 1re est la valeur par défaut. */
-export const KDP_FONTS = ['Garamond', 'Georgia', 'Times New Roman', 'Book Antiqua', 'Palatino Linotype'];
+/** Polices sobres adaptées aux manuscrits KDP. La 1re est la valeur par défaut. */
+export const KDP_FONTS = ['Times New Roman', 'Georgia', 'Garamond', 'Book Antiqua', 'Palatino Linotype'];
 
 export interface KdpExportOptions {
   formatId: KdpFormatId;
@@ -64,8 +64,8 @@ export interface KdpExportOptions {
 
 export const DEFAULT_KDP_OPTIONS: KdpExportOptions = {
   formatId: '6x9',
-  fontFamily: 'Garamond',
-  fontSize: 11,
+  fontFamily: 'Times New Roman',
+  fontSize: 12,
   toc: true,
   pageNumbers: true,
   headers: false,
@@ -87,7 +87,7 @@ export function kdpInsideMarginInches(pageCount: number): number {
 const TWIPS_PER_INCH = 1440;
 const POINTS_PER_INCH = 72;
 const MM_PER_INCH = 25.4;
-const KDP_OUTSIDE_MARGIN_INCHES = 0.25;
+const KDP_OUTSIDE_MARGIN_INCHES = 0.5;
 
 const inchesToTwips = (inches: number) => Math.round(inches * TWIPS_PER_INCH);
 const twipsToInches = (twips: number) => twips / TWIPS_PER_INCH;
@@ -198,7 +198,13 @@ const isLikelyTocEntry = (line: string) => {
 };
 
 const exportChapterTitle = (chapter: Chapter) =>
-  chapter.title.replace(/\s*[.·•…]{2,}\s*\d{1,4}\s*$/, '').trim() || chapter.title;
+  chapter.title
+    .replace(/^#{1,3}\s+/, '')
+    .replace(/\s*[.·•…]{2,}\s*\d{1,4}\s*$/, '')
+    .replace(/\s+\d{1,4}\s*$/, (match) => (/[.·•…]{2,}/.test(chapter.title) ? '' : match))
+    .trim() || chapter.title.trim();
+
+const countWordsLocal = (text: string) => (text || '').trim().split(/\s+/).filter(Boolean).length;
 
 const stripTocBlock = (text: string) => {
   const lines = (text || '').replace(/\r\n/g, '\n').split('\n');
@@ -249,6 +255,46 @@ const exportableChapters = (manuscript: Manuscript) =>
 const correctedExportText = (chapter: Chapter, analysis: Analysis, applyTypography: boolean) =>
   stripDuplicatedChapterTitle(exportChapterTitle(chapter), stripTocBlock(correctedChapterText(chapter, analysis, applyTypography)));
 
+type ExportBlock = { text: string; type: 'paragraph' | 'heading'; level?: 2 | 3 };
+
+const isDuplicatedTitleText = (title: string, text: string) => {
+  const wanted = normalizeLine(title);
+  const current = normalizeLine(text);
+  return Boolean(current && wanted && (current === wanted || wanted.startsWith(current) || current.startsWith(wanted)));
+};
+
+const fallbackBlocksFromText = (text: string): ExportBlock[] => text
+  .split(/\n\s*\n/)
+  .map((p) => p.trim())
+  .filter(Boolean)
+  .map((p) => ({ text: p.replace(/\n/g, ' '), type: 'paragraph' as const }));
+
+const correctedExportBlocks = (chapter: Chapter, analysis: Analysis, applyTypography: boolean): ExportBlock[] => {
+  const title = exportChapterTitle(chapter);
+  const chapterIssues = analysis.issues.filter((i) => i.chapterId === chapter.id);
+  const sourceBlocks: ExportBlock[] = chapter.blocks?.length
+    ? chapter.blocks.map((b) => ({ text: b.text, type: b.type === 'heading' ? 'heading' : 'paragraph', level: b.level }))
+    : fallbackBlocksFromText(stripTocBlock(chapter.content));
+
+  const cleaned = sourceBlocks
+    .map((block) => {
+      let text = applyCorrections(block.text, chapterIssues).replace(/\r\n/g, '\n').trim();
+      if (applyTypography) text = applyFrenchTypography(text);
+      return { ...block, text: text.replace(/\n/g, ' ').trim() };
+    })
+    .filter((block) => block.text && !isTocTitle(block.text) && !isLikelyTocEntry(block.text));
+
+  while (cleaned.length > 0 && isDuplicatedTitleText(title, cleaned[0].text) && cleaned[0].text.length < 160) {
+    cleaned.shift();
+  }
+
+  return cleaned.length > 0
+    ? cleaned
+    : fallbackBlocksFromText(correctedExportText(chapter, analysis, applyTypography));
+};
+
+type TocItem = { text: string; level: 1 | 2 | 3; page: number };
+
 const estimateChapterStartPages = (chapters: Chapter[], manuscript: Manuscript, options: KdpExportOptions) => {
   const pageEstimate = estimateKdpPageCount(manuscript, options);
   const wordsPerPage = Math.max(180, Math.round(manuscript.wordCount / Math.max(1, pageEstimate)) || 260);
@@ -260,16 +306,43 @@ const estimateChapterStartPages = (chapters: Chapter[], manuscript: Manuscript, 
   });
 };
 
-const buildManualTocDocx = (chapters: Chapter[], startPages: number[], opts: KdpExportOptions): Paragraph[] => [
+const buildTocItems = (chapters: Chapter[], manuscript: Manuscript, opts: KdpExportOptions): TocItem[] => {
+  const startPages = estimateChapterStartPages(chapters, manuscript, opts);
+  const pageEstimate = estimateKdpPageCount(manuscript, opts);
+  const wordsPerPage = Math.max(180, Math.round(manuscript.wordCount / Math.max(1, pageEstimate)) || 260);
+
+  return chapters.flatMap((chapter, index) => {
+    const chapterPage = startPages[index] ?? index + 3;
+    let wordsBefore = 0;
+    const items: TocItem[] = [{ text: exportChapterTitle(chapter), level: 1, page: chapterPage }];
+    (chapter.blocks || []).forEach((block) => {
+      if (block.type === 'heading' && block.text.trim() && !isDuplicatedTitleText(exportChapterTitle(chapter), block.text)) {
+        items.push({
+          text: block.text.trim(),
+          level: block.level === 3 ? 3 : 2,
+          page: chapterPage + Math.max(0, Math.floor(wordsBefore / wordsPerPage)),
+        });
+      }
+      wordsBefore += countWordsLocal(block.text);
+    });
+    return items;
+  });
+};
+
+const buildManualTocDocx = (items: TocItem[], opts: KdpExportOptions): Paragraph[] => [
   new Paragraph({
     children: [new TextRun({ text: 'Table des matières', bold: true, size: fontSizeHalfPoints(18), font: opts.fontFamily })],
     spacing: { after: 280 },
   }),
-  ...chapters.map((chapter, index) => new Paragraph({
+  ...items.map((item) => new Paragraph({
     children: [
-      new TextRun({ text: exportChapterTitle(chapter), size: fontSizeHalfPoints(opts.fontSize), font: opts.fontFamily }),
       new TextRun({
-        size: fontSizeHalfPoints(opts.fontSize),
+        text: item.text,
+        size: fontSizeHalfPoints(item.level === 1 ? opts.fontSize : Math.max(10, opts.fontSize - 1)),
+        font: opts.fontFamily,
+      }),
+      new TextRun({
+        size: fontSizeHalfPoints(item.level === 1 ? opts.fontSize : Math.max(10, opts.fontSize - 1)),
         font: opts.fontFamily,
         children: [
           new PositionalTab({
@@ -277,11 +350,12 @@ const buildManualTocDocx = (chapters: Chapter[], startPages: number[], opts: Kdp
             relativeTo: PositionalTabRelativeTo.MARGIN,
             leader: PositionalTabLeader.DOT,
           }),
-          String(startPages[index] ?? ''),
+          String(item.page),
         ],
       }),
     ],
-    spacing: { after: 100 },
+    spacing: { after: item.level === 1 ? 110 : 70 },
+    indent: item.level > 1 ? { left: item.level === 2 ? 360 : 620 } : undefined,
   })),
 ];
 
@@ -302,16 +376,27 @@ async function patchDocxSettings(blob: Blob): Promise<Blob> {
   return await zip.generateAsync({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
 }
 
-const paragraphsFrom = (text: string, opts: KdpExportOptions): Paragraph[] =>
-  text
-    .split(/\n\s*\n/)
-    .map((p) => p.trim())
-    .filter(Boolean)
-    .map((p) => new Paragraph({
-      children: [new TextRun({ text: p.replace(/\n/g, ' '), size: fontSizeHalfPoints(opts.fontSize), font: opts.fontFamily })],
-      spacing: { after: 160, line: Math.round(opts.fontSize * 26) },
+const paragraphsFromBlocks = (blocks: ExportBlock[], opts: KdpExportOptions): Paragraph[] =>
+  blocks.map((block) => {
+    if (block.type === 'heading') {
+      return new Paragraph({
+        heading: block.level === 3 ? HeadingLevel.HEADING_3 : HeadingLevel.HEADING_2,
+        children: [new TextRun({
+          text: block.text,
+          bold: true,
+          size: fontSizeHalfPoints(block.level === 3 ? 13 : 14),
+          font: opts.fontFamily,
+        })],
+        spacing: { before: 220, after: 120, line: 288 },
+      });
+    }
+
+    return new Paragraph({
+      children: [new TextRun({ text: block.text, size: fontSizeHalfPoints(opts.fontSize), font: opts.fontFamily })],
+      spacing: { after: 120, line: 312 },
       alignment: AlignmentType.JUSTIFIED,
-    }));
+    });
+  });
 
 /** Exporte le manuscrit corrigé en .docx (mise en page Amazon KDP). */
 export async function generateCorrectedDocxBlob(
@@ -328,7 +413,7 @@ export async function generateCorrectedDocxBlob(
   const margins = getKdpMargins(options, pageEstimate);
   const { format } = margins;
   const chapters = exportableChapters(manuscript);
-  const chapterStartPages = estimateChapterStartPages(chapters, manuscript, options);
+  const tocItems = buildTocItems(chapters, manuscript, options);
   const children: Paragraph[] = [];
 
   // Page de titre
@@ -341,7 +426,7 @@ export async function generateCorrectedDocxBlob(
 
   // Table des matières visible immédiatement dans Word, sans dépendre d'une mise à jour de champs.
   if (options.toc) {
-    children.push(...buildManualTocDocx(chapters, chapterStartPages, options));
+    children.push(...buildManualTocDocx(tocItems, options));
     children.push(new Paragraph({ children: [new PageBreak()] }));
   }
 
@@ -350,10 +435,9 @@ export async function generateCorrectedDocxBlob(
     children.push(new Paragraph({
       heading: HeadingLevel.HEADING_1,
       children: [new TextRun({ text: exportChapterTitle(chapter), bold: true, size: fontSizeHalfPoints(18), font: options.fontFamily })],
-      spacing: { before: 240, after: 300 },
+      spacing: { before: 240, after: 300, line: 312 },
     }));
-    const corrected = correctedExportText(chapter, analysis, applyTypography);
-    children.push(...paragraphsFrom(corrected, options));
+    children.push(...paragraphsFromBlocks(correctedExportBlocks(chapter, analysis, applyTypography), options));
   });
 
   const footer = options.pageNumbers
@@ -376,11 +460,24 @@ export async function generateCorrectedDocxBlob(
 
   const doc = new Document({
     styles: {
-      paragraphStyles: [{
-        id: 'Heading1', name: 'Heading 1', basedOn: 'Normal', next: 'Normal', quickFormat: true,
-        run: { size: fontSizeHalfPoints(18), bold: true, font: options.fontFamily },
-        paragraph: { spacing: { before: 240, after: 300 }, outlineLevel: 0 },
-      }],
+      default: { document: { run: { font: options.fontFamily, size: fontSizeHalfPoints(options.fontSize) } } },
+      paragraphStyles: [
+        {
+          id: 'Heading1', name: 'Heading 1', basedOn: 'Normal', next: 'Normal', quickFormat: true,
+          run: { size: fontSizeHalfPoints(18), bold: true, font: options.fontFamily },
+          paragraph: { spacing: { before: 240, after: 300 }, outlineLevel: 0 },
+        },
+        {
+          id: 'Heading2', name: 'Heading 2', basedOn: 'Normal', next: 'Normal', quickFormat: true,
+          run: { size: fontSizeHalfPoints(14), bold: true, font: options.fontFamily },
+          paragraph: { spacing: { before: 220, after: 120 }, outlineLevel: 1 },
+        },
+        {
+          id: 'Heading3', name: 'Heading 3', basedOn: 'Normal', next: 'Normal', quickFormat: true,
+          run: { size: fontSizeHalfPoints(13), bold: true, font: options.fontFamily },
+          paragraph: { spacing: { before: 180, after: 100 }, outlineLevel: 2 },
+        },
+      ],
     },
     sections: [{
       properties: {
@@ -434,9 +531,7 @@ export async function generateCorrectedPdfBlob(
   const pageHeightMm = inchesToMm(twipsToInches(format.height));
 
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pageWidthMm, pageHeightMm], compress: true });
-  // Le PDF doit rester parfaitement lisible et stable dans les prévisualiseurs
-  // KDP. Le DOCX conserve Garamond ; le PDF utilise une police PDF intégrée
-  // fiable pour éviter les lettres capitales visuellement espacées/déformées.
+  // Police PDF intégrée fiable pour les accents français dans les prévisualiseurs.
   const pdfFont = 'helvetica';
   doc.setFont(pdfFont, 'normal');
 
@@ -444,7 +539,6 @@ export async function generateCorrectedPdfBlob(
   const outsideMm = inchesToMm(margins.outsideInches);
   const topMm = inchesToMm(margins.topInches);
   const bottomMm = inchesToMm(margins.bottomInches);
-  const contentW = pageWidthMm - insideMm - outsideMm;
   const bodyFontSize = options.fontSize;
   const lineH = bodyFontSize * 0.352778 * 1.45;
   const paraGap = lineH * 0.7;
@@ -491,17 +585,45 @@ export async function generateCorrectedPdfBlob(
     return topMm + lineH;
   };
 
-  const writeWrapped = (text: string, x: number, y: number, fontSize = bodyFontSize) => {
-    doc.setFont(pdfFont, 'normal');
+  const writeWrapped = (text: string, x: number, y: number, fontSize = bodyFontSize, style: 'normal' | 'bold' | 'italic' = 'normal') => {
+    doc.setFont(pdfFont, style === 'italic' ? 'italic' : 'normal');
     doc.setFontSize(fontSize);
     const localLineH = fontSize * 0.352778 * 1.45;
-    const lines: string[] = doc.splitTextToSize(text, pageWidthMm - currentLeft - currentRight);
+    const lines: string[] = doc.splitTextToSize(text, pageWidthMm - x - currentRight);
     for (const line of lines) {
       y = ensureSpace(y, localLineH);
       doc.text(line, x, y);
       y += localLineH;
     }
     return y;
+  };
+
+  const writeTocRow = (item: TocItem, y: number) => {
+    const fontSize = item.level === 1 ? bodyFontSize : Math.max(10, bodyFontSize - 1);
+    const indent = item.level === 1 ? 0 : item.level === 2 ? 5 : 9;
+    const x = currentLeft + indent;
+    const rightX = pageWidthMm - currentRight;
+    const localLineH = fontSize * 0.352778 * 1.35;
+    y = ensureSpace(y, localLineH);
+    doc.setFont(pdfFont, 'normal');
+    doc.setFontSize(fontSize);
+    const pageText = String(item.page);
+    const available = rightX - x - doc.getTextWidth(pageText) - 4;
+    const lines: string[] = doc.splitTextToSize(item.text, Math.max(20, available));
+    doc.text(lines[0] || item.text, x, y);
+    if (lines.length === 1) {
+      doc.text(pageText, rightX, y, { align: 'right' });
+    }
+    y += localLineH;
+    for (const extra of lines.slice(1)) {
+      y = ensureSpace(y, localLineH);
+      doc.text(extra, x, y);
+      y += localLineH;
+    }
+    if (lines.length > 1) {
+      doc.text(pageText, rightX, y - localLineH, { align: 'right' });
+    }
+    return y + lineH * 0.15;
   };
 
   // Page de titre
@@ -511,17 +633,17 @@ export async function generateCorrectedPdfBlob(
   doc.text(doc.splitTextToSize(manuscript.title, pageWidthMm - insideMm - outsideMm), pageWidthMm / 2, pageHeightMm / 2 - 8, { align: 'center' });
 
   const chapters = exportableChapters(manuscript);
-  const chapterStartPages = estimateChapterStartPages(chapters, manuscript, options);
+  const tocItems = buildTocItems(chapters, manuscript, options);
 
   // Table des matières
   if (options.toc) {
     newPage();
     let y = topMm + lineH;
-    y = writeWrapped('Table des matières', currentLeft, y, 16) + titleGap * 0.3;
+    y = writeWrapped('Table des matières', currentLeft, y, 18) + titleGap * 0.3;
     doc.setFont(pdfFont, 'normal');
     doc.setFontSize(bodyFontSize);
-    chapters.forEach((c, index) => {
-      y = writeWrapped(`${exportChapterTitle(c)}  ${chapterStartPages[index] ?? ''}`, currentLeft, y, bodyFontSize) + lineH * 0.2;
+    tocItems.forEach((item) => {
+      y = writeTocRow(item, y);
     });
   }
 
@@ -529,14 +651,17 @@ export async function generateCorrectedPdfBlob(
   for (const chapter of chapters) {
     newPage();
     let y = topMm + lineH;
-    y = writeWrapped(exportChapterTitle(chapter), currentLeft, y, 16) + titleGap;
+    y = writeWrapped(exportChapterTitle(chapter), currentLeft, y, 18) + titleGap;
 
     doc.setFont(pdfFont, 'normal');
     doc.setFontSize(bodyFontSize);
-    const corrected = correctedExportText(chapter, analysis, applyTypography);
-    const paras = corrected.split(/\n\s*\n/).map((p) => p.trim().replace(/\n/g, ' ')).filter(Boolean);
-    for (const para of paras) {
-      y = writeWrapped(para, currentLeft, y, bodyFontSize) + paraGap;
+    const blocks = correctedExportBlocks(chapter, analysis, applyTypography);
+    for (const block of blocks) {
+      if (block.type === 'heading') {
+        y = writeWrapped(block.text, currentLeft, y + lineH * 0.35, block.level === 3 ? 13 : 14) + lineH * 0.25;
+      } else {
+        y = writeWrapped(block.text, currentLeft, y, bodyFontSize) + paraGap;
+      }
     }
   }
 

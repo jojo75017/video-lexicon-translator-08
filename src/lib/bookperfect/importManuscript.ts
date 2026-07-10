@@ -99,6 +99,7 @@ export async function importManuscript(file: File): Promise<Manuscript> {
       index: i,
       title: s.title || `Chapitre ${i + 1}`,
       content,
+      blocks: s.blocks,
       wordCount: countWords(content),
     };
   }).filter((c) => c.wordCount > 0);
