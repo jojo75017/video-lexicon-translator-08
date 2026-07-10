@@ -184,6 +184,46 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
         </div>
       </div>
 
+      {/* Fiche du livre — infos du manuscrit à rédiger */}
+      <div className="border-t px-5 sm:px-7 py-4" style={{ borderColor: '#f0e7d4', background: '#fff' }}>
+        <button onClick={() => setOpenConfig((v) => !v)}
+          className="w-full flex items-center gap-2 text-left" aria-expanded={openConfig}>
+          <FileText className="h-4 w-4" style={{ color: AMBER_DEEP }} />
+          <span className="text-sm font-bold" style={{ color: INK }}>Fiche du livre</span>
+          {config.title.trim() ? (
+            <span className="text-[11px] truncate max-w-[55%]" style={{ color: '#a18a6c' }}>
+              Livre en cours : <strong style={{ color: AMBER_DEEP }}>{config.title.trim()}</strong>
+              {config.author.trim() ? ` — ${config.author.trim()}` : ''}
+            </span>
+          ) : (
+            <span className="text-[11px]" style={{ color: '#c0392b' }}>à remplir avant de lancer les agents</span>
+          )}
+          <ChevronDown className={`ml-auto h-4 w-4 transition-transform ${openConfig ? 'rotate-180' : ''}`} style={{ color: AMBER_DEEP }} />
+        </button>
+        {openConfig && (
+          <div className="mt-4">
+            <WorkflowBookConfigForm
+              variant="plain"
+              ebookTitle={config.title}
+              bookSubtitle={config.subtitle}
+              authorName={config.author}
+              bookDescription={config.description}
+              genre={config.genre}
+              targetAudience={config.targetAudience}
+              numberOfChapters={config.numberOfChapters}
+              onUpdateTitle={(v) => updateConfig({ title: v })}
+              onUpdateSubtitle={(v) => updateConfig({ subtitle: v })}
+              onUpdateAuthor={(v) => updateConfig({ author: v })}
+              onUpdateDescription={(v) => updateConfig({ description: v })}
+              onUpdateGenre={(v) => updateConfig({ genre: v })}
+              onUpdateTargetAudience={(v) => updateConfig({ targetAudience: v })}
+              onUpdateNumberOfChapters={(v) => updateConfig({ numberOfChapters: v })}
+            />
+          </div>
+        )}
+      </div>
+
+
       {/* Structure du livre — titres de chapitres */}
       <div className="border-t px-5 sm:px-7 py-4" style={{ borderColor: '#f0e7d4', background: '#FCF8F0' }}>
         <button onClick={() => setOpenChapters((v) => !v)}
