@@ -1067,7 +1067,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               synopsis || undefined,
               i,
               currentChapters.length,
-              previousChapterSummary || undefined
+              previousChapterSummary || undefined,
+              currentChapters.map((c) => c.title)
             );
             if (chapterContent) break;
 
