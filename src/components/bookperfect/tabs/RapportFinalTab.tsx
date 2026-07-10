@@ -173,7 +173,7 @@ export const RapportFinalTab: React.FC<Props> = ({ manuscript, analysis, onRelau
               <BookOpen className="h-5 w-5 text-primary" /> Préparer pour Amazon KDP
             </DialogTitle>
             <DialogDescription>
-              Réglez la mise en page, puis obtenez en un clic une version prête à publier (Word + PDF).
+              Réglez la mise en page, puis obtenez en un clic le pack prêt à publier : Word + PDF + fiche marges.
             </DialogDescription>
           </DialogHeader>
 
