@@ -37,6 +37,54 @@ export const EDITION_DEPARTMENTS: string[] = [
   'Département Commercial',
 ];
 
+// ============= Phases du parcours V4 (processus séquentiel premium) =============
+// La V4 n'est pas « juste plus d'agents » : elle organise tout le travail en
+// grandes phases claires, du cadrage au lancement. Chaque département est
+// rattaché à une phase.
+export type EditionPhase =
+  | 'Conception'
+  | 'Rédaction'
+  | 'Révision multi-passes'
+  | 'Enrichissement & Fabrication'
+  | 'Positionnement'
+  | 'Lancement';
+
+export const EDITION_PHASES: EditionPhase[] = [
+  'Conception',
+  'Rédaction',
+  'Révision multi-passes',
+  'Enrichissement & Fabrication',
+  'Positionnement',
+  'Lancement',
+];
+
+/** Sous-titre explicatif de chaque phase (livrable attendu). */
+export const EDITION_PHASE_INTRO: Record<EditionPhase, string> = {
+  'Conception': 'Cadrage de la promesse, du marché et du plan détaillé.',
+  'Rédaction': 'Écriture du manuscrit chapitre par chapitre, avec votre voix d\'auteur.',
+  'Révision multi-passes': 'Relectures IA successives : correction, cohérence, style et clichés.',
+  'Enrichissement & Fabrication': 'Couverture pro, illustrations, audiobook, mise en page et pack KDP prêt à uploader.',
+  'Positionnement': 'Métadonnées, catégories, mots-clés et étude de marché avancée.',
+  'Lancement': 'Presse, réseaux sociaux, Ads, distribution large et pilotage commercial.',
+};
+
+const DEPARTMENT_TO_PHASE: Record<string, EditionPhase> = {
+  'Studio Conception': 'Conception',
+  "Atelier d'Écriture": 'Rédaction',
+  'Bureau de Révision': 'Révision multi-passes',
+  'Enrichissement du livre': 'Enrichissement & Fabrication',
+  'Fabrication': 'Enrichissement & Fabrication',
+  'Publication': 'Positionnement',
+  'Positionnement & Métadonnées': 'Positionnement',
+  'Étude de marché avancée': 'Positionnement',
+  'Département Commercial': 'Lancement',
+};
+
+/** Phase du parcours à laquelle appartient un agent (dérivée du département). */
+export function getPhaseForAgent(agent: EditionAgent): EditionPhase {
+  return DEPARTMENT_TO_PHASE[agent.department] ?? 'Conception';
+}
+
 export const EDITION_AGENTS: EditionAgent[] = [
   // ─────────── Studio Conception ───────────
   { order: 1, department: 'Studio Conception', role: 'Le Directeur Éditorial',
