@@ -1586,21 +1586,21 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                         </div>
                       );
                     })}
+                  </div>
+                )}
 
-                    {/* Export contextuel : apparaît après validation de toute la Phase 6 cœur. */}
-                    {phase.key === 'mise-en-page' && miseEnPageDone && (
-                      <div className="px-5 sm:px-7 pt-2 pb-1">
-                        <div className="mb-2 inline-flex items-center gap-1.5 text-[12px] font-bold" style={{ color: GREEN }}>
-                          <Check className="h-4 w-4" /> Ta mise en page est prête — exporte ton livre
-                        </div>
-                        <V3ExportPanel
-                          manuscript={exportManuscript}
-                          title={exportTitle}
-                          subtitle={brief.subtitle?.trim() || undefined}
-                          author={brief.author?.trim() || undefined}
-                        />
-                      </div>
-                    )}
+                {/* Export contextuel : reste visible sous la Phase 6 même si la carte est repliée. */}
+                {phase.key === 'mise-en-page' && miseEnPageDone && (
+                  <div className="px-5 sm:px-7 pt-2 pb-4">
+                    <div className="mb-2 inline-flex items-center gap-1.5 text-[12px] font-bold" style={{ color: GREEN }}>
+                      <Check className="h-4 w-4" /> Ta mise en page est prête — exporte ton livre
+                    </div>
+                    <V3ExportPanel
+                      manuscript={exportManuscript}
+                      title={exportTitle}
+                      subtitle={brief.subtitle?.trim() || undefined}
+                      author={brief.author?.trim() || undefined}
+                    />
                   </div>
                 )}
               </div>
