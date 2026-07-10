@@ -8,6 +8,7 @@
  */
 import {
   Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, PageBreak,
+  Header, Footer, PageNumber,
 } from 'docx';
 import { saveAs } from 'file-saver';
 import { applyFrenchTypography } from '@/utils/frenchTypography';
