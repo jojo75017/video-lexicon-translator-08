@@ -1132,6 +1132,34 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       setGenerationProgress({ current: totalItems, total: totalItems, currentItem: '✅ Terminé !' });
       toast.success('🎉 Ebook complet généré avec cohérence !');
       fireStars();
+
+      // Détection non bloquante des paragraphes dupliqués entre chapitres
+      try {
+        const normalizePara = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+        const paraOwners = new Map<string, Set<string>>();
+        currentChapters.forEach((ch, idx) => {
+          (ch.content || '').split(/\n\s*\n/).forEach((para) => {
+            if (countWords(para) < 40) return;
+            const key = normalizePara(para);
+            if (!key) return;
+            if (!paraOwners.has(key)) paraOwners.set(key, new Set());
+            paraOwners.get(key)!.add(`Chapitre ${idx + 1}`);
+          });
+        });
+        const collisions = new Set<string>();
+        paraOwners.forEach((owners) => {
+          if (owners.size >= 2) owners.forEach((o) => collisions.add(o));
+        });
+        if (collisions.size > 0) {
+          toast.warning(
+            `⚠️ Passages répétés détectés dans : ${Array.from(collisions).join(', ')}. Relancez la rédaction de ces chapitres pour les rendre uniques.`,
+            { duration: 12000 }
+          );
+        }
+      } catch (e) {
+        console.warn('Détection de doublons ignorée:', e);
+      }
+
       
     } catch (error: any) {
       console.error('Erreur génération complète:', error);
