@@ -150,9 +150,14 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
 
   const [done, setDone] = useState<Set<number>>(() => readDone());
   const [openChapters, setOpenChapters] = useState(true);
-  const [chapters, setChapters] = useState<string[]>(() => readChapterTitles());
+  const [stats, setStats] = useState<ManuscriptStats>(() => readManuscriptStats());
   const [config, setConfig] = useState<EditionBookConfig>(() => readConfig());
   const [openConfig, setOpenConfig] = useState(() => !readConfig().title.trim());
+  const [keysOpen, setKeysOpen] = useState(false);
+  const [aiTick, setAiTick] = useState(0);
+  // Onglet d'offre affiché : V3 (197€) ou V4 (347€).
+  const [activeTier, setActiveTier] = useState<EditionTier>('v3');
+
 
   const updateConfig = useCallback((patch: Partial<EditionBookConfig>) => {
     setConfig((prev) => {
