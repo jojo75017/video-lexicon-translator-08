@@ -505,6 +505,21 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
     setCloudMsg(null);
   };
 
+  // Démarre un livre entièrement neuf : réinitialise le brief, le thème et le projet en cours.
+  const startNewBook = () => {
+    setBrief({ ...EMPTY_BRIEF });
+    setTheme('');
+    setProjectId(null);
+    setProjectName('Mon livre');
+    setCloudMsg('Nouveau livre prêt — remplis ton projet ci-dessous.');
+    setOpenCfg('brief');
+    try {
+      localStorage.removeItem(BRIEF_KEY);
+      localStorage.removeItem(THEME_KEY);
+    } catch { /* ignore */ }
+  };
+
+
 
   useEffect(() => { localStorage.setItem(PROGRESS_KEY, JSON.stringify([...done])); }, [done]);
   useEffect(() => { localStorage.setItem(RESULTS_KEY, JSON.stringify(results)); }, [results]);
