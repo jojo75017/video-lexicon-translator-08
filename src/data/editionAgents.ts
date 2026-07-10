@@ -159,7 +159,7 @@ export const EDITION_AGENTS: EditionAgent[] = [
 ];
 
 export const V3_AGENT_COUNT = EDITION_AGENTS.filter((a) => a.tier === 'v3').length; // 22
-export const V4_AGENT_COUNT = EDITION_AGENTS.length; // 34
+export const V4_AGENT_COUNT = EDITION_AGENTS.length; // 36
 
 /** Agents visibles selon l'offre détenue (V4 = tout, V3 = 22). */
 export function getAgentsForTier(hasFull: boolean): EditionAgent[] {
