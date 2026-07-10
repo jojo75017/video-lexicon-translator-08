@@ -329,9 +329,11 @@ export async function generateCorrectedPdfBlob(
   const pageHeightMm = inchesToMm(twipsToInches(format.height));
 
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pageWidthMm, pageHeightMm], compress: true });
-  // jsPDF ne fournit pas Garamond ; « times » (serif) est le rendu roman le
-  // plus proche pour l'impression. Le .docx, lui, conserve la police choisie.
-  doc.setFont('times', 'normal');
+  // Le PDF doit rester parfaitement lisible et stable dans les prévisualiseurs
+  // KDP. Le DOCX conserve Garamond ; le PDF utilise une police PDF intégrée
+  // fiable pour éviter les lettres capitales visuellement espacées/déformées.
+  const pdfFont = 'helvetica';
+  doc.setFont(pdfFont, 'normal');
 
   const insideMm = inchesToMm(margins.insideInches);
   const outsideMm = inchesToMm(margins.outsideInches);
@@ -361,14 +363,14 @@ export async function generateCorrectedPdfBlob(
     currentRight = pageNo % 2 === 0 ? insideMm : outsideMm;
     drawGuides();
     if (options.headers && pageNo > 1) {
-      doc.setFont('times', 'italic');
+      doc.setFont(pdfFont, 'italic');
       doc.setFontSize(9);
       doc.setTextColor(120);
       doc.text(manuscript.title, pageWidthMm / 2, Math.max(4, topMm - 2), { align: 'center', maxWidth: pageWidthMm - currentLeft - currentRight });
       doc.setTextColor(0);
     }
     if (options.pageNumbers && pageNo > 1) {
-      doc.setFont('times', 'normal');
+      doc.setFont(pdfFont, 'normal');
       doc.setFontSize(9);
       doc.setTextColor(120);
       doc.text(String(pageNo), pageWidthMm / 2, pageHeightMm - Math.max(3, bottomMm / 2), { align: 'center' });
@@ -379,13 +381,13 @@ export async function generateCorrectedPdfBlob(
   const ensureSpace = (y: number, needed = lineH) => {
     if (y + needed <= bottomLimit) return y;
     newPage();
-    doc.setFont('times', 'normal');
+    doc.setFont(pdfFont, 'normal');
     doc.setFontSize(bodyFontSize);
     return topMm + lineH;
   };
 
   const writeWrapped = (text: string, x: number, y: number, fontSize = bodyFontSize, style: 'normal' | 'bold' | 'italic' = 'normal') => {
-    doc.setFont('times', style);
+    doc.setFont(pdfFont, style);
     doc.setFontSize(fontSize);
     const localLineH = fontSize * 0.352778 * 1.45;
     const lines: string[] = doc.splitTextToSize(text, pageWidthMm - currentLeft - currentRight);
@@ -399,7 +401,7 @@ export async function generateCorrectedPdfBlob(
 
   // Page de titre
   newPage(true);
-  doc.setFont('times', 'bold');
+  doc.setFont(pdfFont, 'bold');
   doc.setFontSize(26);
   doc.text(doc.splitTextToSize(manuscript.title, pageWidthMm - insideMm - outsideMm), pageWidthMm / 2, pageHeightMm / 2 - 8, { align: 'center' });
 
@@ -408,7 +410,7 @@ export async function generateCorrectedPdfBlob(
     newPage();
     let y = topMm + lineH;
     y = writeWrapped('Table des matières', currentLeft, y, 16, 'bold') + titleGap * 0.3;
-    doc.setFont('times', 'normal');
+    doc.setFont(pdfFont, 'normal');
     doc.setFontSize(bodyFontSize);
     manuscript.chapters.forEach((c) => {
       y = writeWrapped(c.title, currentLeft, y, bodyFontSize, 'normal') + lineH * 0.2;
@@ -421,7 +423,7 @@ export async function generateCorrectedPdfBlob(
     let y = topMm + lineH;
     y = writeWrapped(chapter.title, currentLeft, y, 16, 'bold') + titleGap;
 
-    doc.setFont('times', 'normal');
+    doc.setFont(pdfFont, 'normal');
     doc.setFontSize(bodyFontSize);
     const corrected = correctedChapterText(chapter, analysis, applyTypography);
     const paras = corrected.split(/\n\s*\n/).map((p) => p.trim().replace(/\n/g, ' ')).filter(Boolean);
