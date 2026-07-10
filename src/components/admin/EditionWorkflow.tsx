@@ -227,7 +227,6 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
   const [targetWords, setTargetWords] = useState(() => readTargetWords());
   const [openConfig, setOpenConfig] = useState(() => !readConfig().title.trim());
   const [keysOpen, setKeysOpen] = useState(false);
-  const [aiTick, setAiTick] = useState(0);
   // Onglet d'offre affiché : V3 (197€) ou V4 (347€).
   const [activeTier, setActiveTier] = useState<EditionTier>('v3');
 
@@ -262,12 +261,6 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
     const next = Math.max(3, Math.min(40, Math.round(value || EMPTY_CONFIG.numberOfChapters)));
     updateConfig({ numberOfChapters: next });
   }, [updateConfig]);
-
-  // Rafraîchit l'état de la clé IA (le panneau écrit dans le localStorage).
-  useEffect(() => {
-    if (!keysOpen) { setAiTick((n) => n + 1); }
-  }, [keysOpen]);
-
 
   const persist = useCallback((next: Set<number>) => {
     setDone(new Set(next));
@@ -341,7 +334,7 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
         </div>
 
         {/* Carte clé IA (BYOK Gemini / OpenRouter…) */}
-        <ApiProviderQuickSettings onOpenAdvanced={() => setKeysOpen(true)} onStatusChange={() => setAiTick((n) => n + 1)} />
+        <ApiProviderQuickSettings key={keysOpen ? 'api-open' : 'api-closed'} onOpenAdvanced={() => setKeysOpen(true)} />
 
 
         {/* Progression */}
