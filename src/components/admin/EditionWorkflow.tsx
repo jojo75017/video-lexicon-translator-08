@@ -8,6 +8,7 @@ import {
   EDITION_AGENTS, EDITION_DEPARTMENTS, getAgentsForTier,
   V3_AGENT_COUNT, V4_AGENT_COUNT, type EditionAgent,
 } from '@/data/editionAgents';
+import WorkflowBookConfigForm from '@/components/ebook/WorkflowBookConfigForm';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
 
 // Palette « Clair Ambre » (identique au Hub).
