@@ -1571,10 +1571,11 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                       );
                     })}
 
-                    {/* Export contextuel : apparaît quand la mise en page (dont les pages
-                        de remerciements) est terminée. */}
+                    {/* Export contextuel : apparaît dès qu'un manuscrit existe pour CE projet
+                        (ou quand toute la mise en page est validée). */}
                     {phase.key === 'mise-en-page'
-                      && ['manuscript-converter', 'back-matter-builder', 'copyright-page'].every((id) => done.has(id)) && (
+                      && ((results['p20-chat-manuscript'] || '').trim().length >= 50
+                        || ['manuscript-converter', 'back-matter-builder', 'copyright-page'].every((id) => done.has(id))) && (
                       <div className="px-5 sm:px-7 pt-2 pb-1">
                         <div className="mb-2 inline-flex items-center gap-1.5 text-[12px] font-bold" style={{ color: GREEN }}>
                           <Check className="h-4 w-4" /> Ta mise en page est prête — exporte ton livre
