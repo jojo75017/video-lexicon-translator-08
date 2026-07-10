@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FileText, Image as ImageIcon, Plus, Trash2, Edit3, Check, Sparkles } from 'lucide-react';
+import { useKdpFormat } from '@/hooks/useKdpFormat';
+import { estimatePages } from '@/utils/kdpPageDensity';
 import { Chapter } from '@/hooks/useEbookGeneration';
 import { toast } from 'sonner';
 import EbookImageBank from './EbookImageBank';
@@ -116,6 +118,7 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
   targetWordsPerChapter = 2500,
   onCleanAllChapters
 }) => {
+  const { formatId } = useKdpFormat();
   const [chapterImages, setChapterImages] = useState<Record<string, ChapterImage[]>>({});
   const [imageUrl, setImageUrl] = useState('');
   const [imageAlt, setImageAlt] = useState('');
@@ -483,7 +486,7 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
                             {isComplete && ' ✓'}
                           </span>
                           <span className="text-muted-foreground text-xs">
-                            ~{Math.round(wordCount / 250)} pages • {chapter.content ? chapter.content.length.toLocaleString() : 0} caractères
+                            ~{estimatePages(wordCount, formatId)} pages • {chapter.content ? chapter.content.length.toLocaleString() : 0} caractères
                           </span>
                         </div>
                         <div className="h-2 bg-muted rounded-full overflow-hidden">
