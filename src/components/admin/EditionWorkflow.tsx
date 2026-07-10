@@ -20,6 +20,32 @@ const GREEN = '#1f9d6b';
 const SERIF = "'Instrument Serif', Georgia, 'Times New Roman', serif";
 
 const DONE_KEY = 'edition_workflow_done_v1';
+const CONFIG_KEY = 'edition_book_config_v1';
+
+interface EditionBookConfig {
+  title: string;
+  subtitle: string;
+  author: string;
+  description: string;
+  genre: string;
+  targetAudience: string;
+  numberOfChapters: number;
+}
+
+const EMPTY_CONFIG: EditionBookConfig = {
+  title: '', subtitle: '', author: '', description: '',
+  genre: '', targetAudience: '', numberOfChapters: 8,
+};
+
+function readConfig(): EditionBookConfig {
+  try {
+    const raw = localStorage.getItem(CONFIG_KEY);
+    if (!raw) return { ...EMPTY_CONFIG };
+    return { ...EMPTY_CONFIG, ...JSON.parse(raw) };
+  } catch {
+    return { ...EMPTY_CONFIG };
+  }
+}
 
 function readDone(): Set<number> {
   try {
