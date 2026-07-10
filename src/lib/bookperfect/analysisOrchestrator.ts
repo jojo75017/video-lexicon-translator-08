@@ -237,6 +237,15 @@ function buildKdpReport(issues: Issue[], manuscript: Manuscript): KdpCheck[] {
   ];
 }
 
+export function sanitizeAnalysisIssues(analysis: Analysis, manuscript?: Manuscript): Analysis {
+  const cleaned: Analysis = { ...analysis, issues: dedupeIssues(analysis.issues) };
+  if (manuscript) {
+    cleaned.scores = computeScores(cleaned.chapterResults, cleaned.issues, manuscript.chapters);
+    cleaned.kdpReport = buildKdpReport(cleaned.issues, manuscript);
+  }
+  return cleaned;
+}
+
 export interface OrchestratorCallbacks {
   onChapterStart?: (chapter: Chapter, index: number, total: number) => void;
   onChapterDone?: (result: ChapterResult, analysis: Analysis) => void;
