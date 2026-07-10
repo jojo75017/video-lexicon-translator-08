@@ -276,6 +276,12 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
     try { localStorage.setItem(TARGET_WORDS_KEY, String(next)); } catch { /* ignore */ }
   }, []);
 
+  const updateRevisionPasses = useCallback((value: number) => {
+    const next = Math.max(1, Math.min(3, Math.round(value || 2)));
+    setRevisionPasses(next);
+    try { localStorage.setItem(REVISION_PASSES_KEY, String(next)); } catch { /* ignore */ }
+  }, []);
+
   const updateChapters = useCallback((value: number) => {
     const next = Math.max(3, Math.min(40, Math.round(value || EMPTY_CONFIG.numberOfChapters)));
     updateConfig({ numberOfChapters: next });
