@@ -530,6 +530,21 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   }, [brief.title, projectName]);
   const setBriefField = (k: keyof Brief, v: string) => setBrief((p) => ({ ...p, [k]: v }));
 
+  // Compteur du volume du livre. Si un manuscrit a été généré, on compte les mots
+  // réels ; sinon on affiche une estimation à partir du brief (chapitres × mots/chapitre).
+  const bookStats = useMemo(() => {
+    const manuscript = results['p20-chat-manuscript'] || '';
+    const chapters = Math.max(0, parseInt(brief.chapterCount || '', 10) || 0);
+    const wordsPer = Math.max(0, parseInt(brief.wordsPerChapter || '', 10) || 0);
+    const realWords = manuscript.trim().split(/\s+/).filter(Boolean).length;
+    const hasManuscript = realWords > 50;
+    const totalWords = hasManuscript ? realWords : chapters * wordsPer;
+    const estimatedPages = totalWords > 0 ? Math.max(1, Math.ceil(totalWords / 300)) : 0;
+    const readingMin = totalWords > 0 ? Math.max(1, Math.ceil(totalWords / 200)) : 0;
+    return { chapters, totalWords, estimatedPages, readingMin, isEstimate: !hasManuscript };
+  }, [brief.chapterCount, brief.wordsPerChapter, results]);
+
+
   // Progression calculée uniquement sur les étapes ACCESSIBLES (débloquées).
   // Les teasers premium ne comptent pas dans le total ni dans la progression.
   const accessibleSteps = useMemo(() => FLAT.filter(isAccessible), [FLAT, fullMode]);
