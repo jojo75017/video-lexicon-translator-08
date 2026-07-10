@@ -85,7 +85,7 @@ export function kdpInsideMarginInches(pageCount: number): number {
 }
 
 const TWIPS_PER_INCH = 1440;
-const POINTS_PER_INCH = 72;
+const MM_PER_INCH = 25.4;
 const KDP_OUTSIDE_MARGIN_INCHES = 0.25;
 
 const inchesToTwips = (inches: number) => Math.round(inches * TWIPS_PER_INCH);
@@ -122,6 +122,8 @@ export function getKdpMargins(options: KdpExportOptions, pageCount: number) {
     bottomTwips: inchesToTwips(verticalInches),
   };
 }
+
+const inchesToMm = (inches: number) => inches * MM_PER_INCH;
 
 /** Applique les corrections validées à un texte (1re occurrence par issue). */
 function applyCorrections(text: string, issues: Issue[]): string {
@@ -322,87 +324,108 @@ export async function generateCorrectedPdfBlob(
   const pageEstimate = estimateKdpPageCount(manuscript, options);
   const margins = getKdpMargins(options, pageEstimate);
   const { format } = margins;
-  const wPt = (format.width / 1440) * 72;
-  const hPt = (format.height / 1440) * 72;
+  const pageWidthMm = inchesToMm(twipsToInches(format.width));
+  const pageHeightMm = inchesToMm(twipsToInches(format.height));
 
-  const doc = new jsPDF({ unit: 'pt', format: [wPt, hPt], compress: true });
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pageWidthMm, pageHeightMm], compress: true });
   // jsPDF ne fournit pas Garamond ; « times » (serif) est le rendu roman le
   // plus proche pour l'impression. Le .docx, lui, conserve la police choisie.
   doc.setFont('times', 'normal');
 
-  const insidePt = margins.insideInches * POINTS_PER_INCH;
-  const outsidePt = margins.outsideInches * POINTS_PER_INCH;
-  const topPt = margins.topInches * POINTS_PER_INCH;
-  const botPt = margins.bottomInches * POINTS_PER_INCH;
-  const contentW = wPt - insidePt - outsidePt;
-  const lineH = options.fontSize * 1.45;
+  const insideMm = inchesToMm(margins.insideInches);
+  const outsideMm = inchesToMm(margins.outsideInches);
+  const topMm = inchesToMm(margins.topInches);
+  const bottomMm = inchesToMm(margins.bottomInches);
+  const contentW = pageWidthMm - insideMm - outsideMm;
+  const bodyFontSize = options.fontSize;
+  const lineH = bodyFontSize * 0.352778 * 1.45;
+  const paraGap = lineH * 0.7;
+  const titleGap = lineH * 2;
 
   let pageNo = 0;
-  let currentLeft = insidePt;
+  let currentLeft = insideMm;
+  let currentRight = outsideMm;
+  const bottomLimit = pageHeightMm - bottomMm;
+
+  const drawGuides = () => {
+    // Repères invisibles désactivés volontairement : aucune image/canvas/rotation,
+    // uniquement du texte vectoriel dans une page 6×9 exacte.
+  };
+
   const newPage = (first = false) => {
-    if (!first) doc.addPage([wPt, hPt], 'portrait');
+    if (!first) doc.addPage([pageWidthMm, pageHeightMm], 'portrait');
     pageNo++;
-    currentLeft = pageNo % 2 === 0 ? outsidePt : insidePt;
+    // Pages impaires : page de droite, reliure à gauche. Pages paires : reliure à droite.
+    currentLeft = pageNo % 2 === 0 ? outsideMm : insideMm;
+    currentRight = pageNo % 2 === 0 ? insideMm : outsideMm;
+    drawGuides();
     if (options.headers && pageNo > 1) {
       doc.setFont('times', 'italic');
       doc.setFontSize(9);
       doc.setTextColor(120);
-      doc.text(manuscript.title, wPt / 2, topPt - 18, { align: 'center', maxWidth: contentW });
+      doc.text(manuscript.title, pageWidthMm / 2, Math.max(4, topMm - 2), { align: 'center', maxWidth: pageWidthMm - currentLeft - currentRight });
       doc.setTextColor(0);
     }
     if (options.pageNumbers && pageNo > 1) {
       doc.setFont('times', 'normal');
       doc.setFontSize(9);
       doc.setTextColor(120);
-      doc.text(String(pageNo), wPt / 2, hPt - botPt + 24, { align: 'center' });
+      doc.text(String(pageNo), pageWidthMm / 2, pageHeightMm - Math.max(3, bottomMm / 2), { align: 'center' });
       doc.setTextColor(0);
     }
+  };
+
+  const ensureSpace = (y: number, needed = lineH) => {
+    if (y + needed <= bottomLimit) return y;
+    newPage();
+    doc.setFont('times', 'normal');
+    doc.setFontSize(bodyFontSize);
+    return topMm + lineH;
+  };
+
+  const writeWrapped = (text: string, x: number, y: number, fontSize = bodyFontSize, style: 'normal' | 'bold' | 'italic' = 'normal') => {
+    doc.setFont('times', style);
+    doc.setFontSize(fontSize);
+    const localLineH = fontSize * 0.352778 * 1.45;
+    const lines: string[] = doc.splitTextToSize(text, pageWidthMm - currentLeft - currentRight);
+    for (const line of lines) {
+      y = ensureSpace(y, localLineH);
+      doc.text(line, x, y);
+      y += localLineH;
+    }
+    return y;
   };
 
   // Page de titre
   newPage(true);
   doc.setFont('times', 'bold');
   doc.setFontSize(26);
-  doc.text(doc.splitTextToSize(manuscript.title, contentW), wPt / 2, hPt / 2 - 20, { align: 'center' });
+  doc.text(doc.splitTextToSize(manuscript.title, pageWidthMm - insideMm - outsideMm), pageWidthMm / 2, pageHeightMm / 2 - 8, { align: 'center' });
 
   // Table des matières
   if (options.toc) {
     newPage();
-    let y = topPt + 10;
-    doc.setFont('times', 'bold');
-    doc.setFontSize(16);
-    doc.text('Table des matières', currentLeft, y);
-    y += lineH * 1.6;
+    let y = topMm + lineH;
+    y = writeWrapped('Table des matières', currentLeft, y, 16, 'bold') + titleGap * 0.3;
     doc.setFont('times', 'normal');
-    doc.setFontSize(options.fontSize);
+    doc.setFontSize(bodyFontSize);
     manuscript.chapters.forEach((c) => {
-      if (y > hPt - botPt) { newPage(); y = topPt + 10; }
-      doc.text(doc.splitTextToSize(c.title, contentW), currentLeft, y);
-      y += lineH;
+      y = writeWrapped(c.title, currentLeft, y, bodyFontSize, 'normal') + lineH * 0.2;
     });
   }
 
   // Chapitres (chacun sur une nouvelle page)
   for (const chapter of manuscript.chapters) {
     newPage();
-    let y = topPt + 10;
-    doc.setFont('times', 'bold');
-    doc.setFontSize(16);
-    doc.text(doc.splitTextToSize(chapter.title, contentW), currentLeft, y);
-    y += lineH * 1.8;
+    let y = topMm + lineH;
+    y = writeWrapped(chapter.title, currentLeft, y, 16, 'bold') + titleGap;
 
     doc.setFont('times', 'normal');
-    doc.setFontSize(options.fontSize);
+    doc.setFontSize(bodyFontSize);
     const corrected = correctedChapterText(chapter, analysis, applyTypography);
     const paras = corrected.split(/\n\s*\n/).map((p) => p.trim().replace(/\n/g, ' ')).filter(Boolean);
     for (const para of paras) {
-      const lines: string[] = doc.splitTextToSize(para, contentW);
-      for (const line of lines) {
-        if (y > hPt - botPt) { newPage(); y = topPt + 10; doc.setFont('times', 'normal'); doc.setFontSize(options.fontSize); }
-        doc.text(line, currentLeft, y);
-        y += lineH;
-      }
-      y += lineH * 0.5; // espace inter-paragraphe
+      y = writeWrapped(para, currentLeft, y, bodyFontSize, 'normal') + paraGap;
     }
   }
 
