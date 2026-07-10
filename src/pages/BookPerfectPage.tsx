@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft, BookOpen, Play, RotateCcw, Sparkles, Bug, Feather, ShoppingCart, FileText, Square, Columns,
+  ArrowLeft, BookOpen, Play, RotateCcw, Sparkles, Bug, Feather, ShoppingCart, FileText, Square, Columns, Save,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -19,10 +19,10 @@ import { AmazonKdpTab } from '@/components/bookperfect/tabs/AmazonKdpTab';
 import { ComparaisonTab } from '@/components/bookperfect/tabs/ComparaisonTab';
 import { RapportFinalTab } from '@/components/bookperfect/tabs/RapportFinalTab';
 import {
-  runAnalysis, loadAnalysis, loadRecoverySnapshot, updateIssueStatus, BOOKPERFECT_RECOVERY_SCOPE,
+  runAnalysis, loadAnalysisAsync, loadRecoverySnapshotAsync, updateIssueStatus, BOOKPERFECT_RECOVERY_SCOPE,
 } from '@/lib/bookperfect/analysisOrchestrator';
 import type { BookPerfectRecoverySnapshot } from '@/lib/bookperfect/analysisOrchestrator';
-import { readAutosave, writeAutosave } from '@/lib/ebookProjectStorage';
+import { readAutosaveAsync, requestPersistentStorage, writeAutosave, writeAutosaveAsync } from '@/lib/ebookProjectStorage';
 import type { Analysis, Manuscript } from '@/lib/bookperfect/types';
 
 const CURRENT_MANUSCRIPT_SCOPE = 'bookperfect_current_manuscript';
@@ -50,37 +50,52 @@ const BookPerfectPage: React.FC = () => {
   const startTimeRef = useRef<number>(0);
 
   useEffect(() => {
+    let mounted = true;
     setHasKey(isAIConfigured());
-    const recovery = loadRecoverySnapshot();
-    setRecoverySnapshot(recovery);
-    const savedManuscript = readAutosave<Manuscript>(CURRENT_MANUSCRIPT_SCOPE);
-    if (savedManuscript?.id) {
-      setManuscript(savedManuscript);
-      const savedAnalysis = loadAnalysis(savedManuscript.id);
-      setAnalysis(savedAnalysis);
-      if (savedAnalysis?.chapterResults.some((r) => r.status !== 'done')) {
-        setPaused(true);
-        setPausedMessage('Analyse interrompue : vous pouvez reprendre exactement où elle s’est arrêtée.');
+    void requestPersistentStorage();
+
+    (async () => {
+      const recovery = await loadRecoverySnapshotAsync();
+      if (!mounted) return;
+      setRecoverySnapshot(recovery);
+
+      const savedManuscript = await readAutosaveAsync<Manuscript>(CURRENT_MANUSCRIPT_SCOPE);
+      if (!mounted) return;
+      if (savedManuscript?.id) {
+        setManuscript(savedManuscript);
+        const savedAnalysis = await loadAnalysisAsync(savedManuscript.id);
+        if (!mounted) return;
+        const normalizedAnalysis = savedAnalysis ? normalizeResumableAnalysis(savedAnalysis) : null;
+        setAnalysis(normalizedAnalysis);
+        if (normalizedAnalysis?.chapterResults.some((r) => r.status !== 'done')) {
+          setPaused(true);
+          setPausedMessage('Analyse interrompue : vous pouvez reprendre exactement où elle s’est arrêtée.');
+        }
         return;
       }
-    }
 
-    if (recovery?.manuscript?.id && recovery.analysis?.chapterResults?.some((r) => r.status !== 'done')) {
-      setManuscript(recovery.manuscript);
-      writeAutosave(CURRENT_MANUSCRIPT_SCOPE, recovery.manuscript);
-      setAnalysis(normalizeResumableAnalysis(recovery.analysis));
-      setPaused(true);
-      setPausedMessage('Analyse interrompue : vous pouvez reprendre exactement où elle s’est arrêtée.');
-    }
+      if (recovery?.manuscript?.id && recovery.analysis?.chapterResults?.some((r) => r.status !== 'done')) {
+        setManuscript(recovery.manuscript);
+        await writeAutosaveAsync(CURRENT_MANUSCRIPT_SCOPE, recovery.manuscript);
+        if (!mounted) return;
+        setAnalysis(normalizeResumableAnalysis(recovery.analysis));
+        setPaused(true);
+        setPausedMessage('Analyse interrompue : vous pouvez reprendre exactement où elle s’est arrêtée.');
+      }
+    })();
+
+    return () => { mounted = false; };
   }, []);
 
-  const onImported = useCallback((m: Manuscript) => {
+  const onImported = useCallback(async (m: Manuscript) => {
     setManuscript(m);
-    writeAutosave(CURRENT_MANUSCRIPT_SCOPE, m);
-    const existing = loadAnalysis(m.id);
-    setAnalysis(existing);
-    setPaused(!!existing?.chapterResults.some((r) => r.status !== 'done'));
-    setPausedMessage(existing?.chapterResults.some((r) => r.status !== 'done') ? 'Analyse précédente retrouvée : cliquez sur Reprendre.' : null);
+    await writeAutosaveAsync(CURRENT_MANUSCRIPT_SCOPE, m);
+    const existing = await loadAnalysisAsync(m.id);
+    const normalizedExisting = existing ? normalizeResumableAnalysis(existing) : null;
+    setAnalysis(normalizedExisting);
+    setPaused(!!normalizedExisting?.chapterResults.some((r) => r.status !== 'done'));
+    setPausedMessage(normalizedExisting?.chapterResults.some((r) => r.status !== 'done') ? 'Analyse précédente retrouvée : cliquez sur Reprendre.' : null);
+    toast.success('Fichier sauvegardé automatiquement.');
   }, []);
 
   const start = useCallback(async (resumeOnly: boolean) => {
@@ -96,7 +111,7 @@ const BookPerfectPage: React.FC = () => {
     setJustCompleted(false);
     setRunning(true);
     startTimeRef.current = Date.now();
-    const resumeAnalysis = resumeOnly ? (analysis || loadAnalysis(manuscript.id)) : null;
+    const resumeAnalysis = resumeOnly ? (analysis || await loadAnalysisAsync(manuscript.id)) : null;
     if (resumeAnalysis) setAnalysis({ ...resumeAnalysis });
     try {
       const result = await runAnalysis(
@@ -119,7 +134,7 @@ const BookPerfectPage: React.FC = () => {
       }
     } catch (e: any) {
       const msg = e?.message || 'Erreur pendant l\'analyse.';
-      const saved = loadAnalysis(manuscript.id);
+      const saved = await loadAnalysisAsync(manuscript.id);
       if (saved) setAnalysis({ ...saved });
       // Erreur fatale : l'analyse est en pause, on propose « Reprendre ».
       setPaused(true);
@@ -159,12 +174,12 @@ const BookPerfectPage: React.FC = () => {
     setRecoverySnapshot(null);
   };
 
-  const restoreRecovery = () => {
-    const recovery = recoverySnapshot || loadRecoverySnapshot();
+  const restoreRecovery = async () => {
+    const recovery = recoverySnapshot || await loadRecoverySnapshotAsync();
     if (!recovery?.manuscript?.id) return;
     const normalizedAnalysis = normalizeResumableAnalysis(recovery.analysis);
     setManuscript(recovery.manuscript);
-    writeAutosave(CURRENT_MANUSCRIPT_SCOPE, recovery.manuscript);
+    await writeAutosaveAsync(CURRENT_MANUSCRIPT_SCOPE, recovery.manuscript);
     setAnalysis(normalizedAnalysis);
     setPaused(true);
     setPausedMessage('Analyse retrouvée : cliquez sur Reprendre pour continuer exactement où elle s’est arrêtée.');
@@ -232,6 +247,9 @@ const BookPerfectPage: React.FC = () => {
                   <div className="font-semibold truncate">{manuscript.title}</div>
                   <div className="text-xs text-muted-foreground">
                     {manuscript.wordCount.toLocaleString('fr-FR')} mots · ~{manuscript.pageEstimate} pages · {manuscript.chapters.length} chapitres
+                  </div>
+                  <div className="mt-1 flex items-center gap-1 text-xs text-primary">
+                    <Save className="h-3.5 w-3.5" /> Fichier sauvegardé — reprise possible sans repartir de zéro.
                   </div>
                 </div>
                 {!running ? (
