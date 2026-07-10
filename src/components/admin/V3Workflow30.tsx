@@ -985,6 +985,9 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 {bookStats.isEstimate ? 'Estimation (brief)' : 'Manuscrit réel'}
               </span>
             </div>
+            <div className="mb-3">
+              <KdpFormatSelect />
+            </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               {[
                 { label: 'Chapitres', value: bookStats.chapters.toLocaleString('fr-FR'), icon: BookOpen },
@@ -1001,8 +1004,8 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             </div>
             <p className="mt-2 text-[10px]" style={{ color: '#a18a6c' }}>
               {bookStats.isEstimate
-                ? 'Estimation basée sur le nombre de chapitres × mots par chapitre (≈ 300 mots/page, format 6×9 KDP).'
-                : 'Calculé sur le manuscrit réellement généré (≈ 300 mots/page).'}
+                ? `Estimation basée sur le nombre de chapitres × mots par chapitre (≈ ${bookStats.wordsPerPage} mots/page selon le format KDP sélectionné).`
+                : `Calculé sur le manuscrit réellement généré (≈ ${bookStats.wordsPerPage} mots/page selon le format KDP sélectionné).`}
             </p>
           </div>
 
