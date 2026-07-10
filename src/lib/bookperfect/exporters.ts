@@ -73,8 +73,15 @@ const paragraphsFrom = (text: string): Paragraph[] =>
       alignment: AlignmentType.JUSTIFIED,
     }));
 
-/** Exporte le manuscrit corrigé en .docx (prêt pour Amazon KDP). */
-export async function exportCorrectedDocx(manuscript: Manuscript, analysis: Analysis, applyTypography = true) {
+/** Exporte le manuscrit corrigé en .docx (prêt pour Amazon KDP).
+ *  Le format applique automatiquement dimensions, marges et pagination. */
+export async function exportCorrectedDocx(
+  manuscript: Manuscript,
+  analysis: Analysis,
+  applyTypography = true,
+  formatId: KdpFormatId = '6x9',
+) {
+  const format = getKdpFormat(formatId);
   const children: Paragraph[] = [];
 
   // Page de titre
@@ -96,16 +103,30 @@ export async function exportCorrectedDocx(manuscript: Manuscript, analysis: Anal
     children.push(...paragraphsFrom(corrected));
   });
 
+  // Pagination centrée en pied de page (numéro courant).
+  const footer = new Footer({
+    children: [new Paragraph({
+      alignment: AlignmentType.CENTER,
+      children: [new TextRun({ children: [PageNumber.CURRENT], size: 20, font: 'Georgia' })],
+    })],
+  });
+
   const doc = new Document({
     sections: [{
-      properties: { page: { size: { width: 12240, height: 15840 }, margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 } } },
+      properties: {
+        page: {
+          size: { width: format.width, height: format.height },
+          margin: { top: format.margin, right: format.margin, bottom: format.margin, left: format.margin },
+        },
+      },
+      footers: { default: footer },
       children,
     }],
   });
 
   const blob = await Packer.toBlob(doc);
   const safe = manuscript.title.replace(/[^\w\sÀ-ÿ-]/g, '').trim().slice(0, 60) || 'manuscrit';
-  saveAs(blob, `${safe} — corrigé (KDP).docx`);
+  saveAs(blob, `${safe} — ${format.label} (KDP).docx`);
 }
 
 /** Exporte un rapport d'analyse récapitulatif en .docx. */
