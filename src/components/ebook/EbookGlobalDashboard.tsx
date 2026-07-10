@@ -88,6 +88,12 @@ export const EbookGlobalDashboard: React.FC<EbookGlobalDashboardProps> = ({
         </CardContent>
       </Card>
 
+      {/* Format KDP → pilote l'estimation des pages */}
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-muted/30 px-3 py-2">
+        <KdpFormatSelect />
+        <span className="text-xs text-muted-foreground">Pagination estimée selon le format KDP sélectionné</span>
+      </div>
+
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
