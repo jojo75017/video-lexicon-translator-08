@@ -321,6 +321,11 @@ export const EbookStatisticsTools: React.FC<EbookStatisticsToolsProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Format KDP → pilote l'estimation des pages */}
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-muted/30 px-3 py-2">
+        <KdpFormatSelect />
+        <span className="text-xs text-muted-foreground">Pagination estimée selon le format KDP sélectionné</span>
+      </div>
       {/* Statistiques générales */}
       <Card>
         <CardHeader>
