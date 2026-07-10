@@ -2562,6 +2562,23 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                       </div>
                     </CardHeader>
                     <CardContent className="p-6">
+                      {chapters.length > 0 && (
+                        <div className="sticky top-0 z-20 -mx-6 -mt-6 mb-6 border-b border-[#008296]/20 bg-[#FAFAFA]/95 px-6 py-3 backdrop-blur-sm">
+                          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                            {[
+                              { label: 'Chapitres', value: bookStats.totalChapters.toLocaleString('fr-FR') },
+                              { label: 'Sous-chapitres', value: bookStats.totalSubChapters.toLocaleString('fr-FR') },
+                              { label: 'Pages (est.)', value: `~${bookStats.estimatedPages.toLocaleString('fr-FR')}` },
+                              { label: 'Mots', value: bookStats.totalWords.toLocaleString('fr-FR') },
+                            ].map((s) => (
+                              <div key={s.label} className="rounded-xl bg-white px-3 py-2 text-center shadow-sm ring-1 ring-[#008296]/10">
+                                <div className="text-lg font-bold leading-none text-[#008296]">{s.value}</div>
+                                <div className="mt-1 text-[11px] font-medium uppercase tracking-wide text-[#232F3E]/60">{s.label}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                       {chapters.length === 0 ? (
                         <div className="text-center py-16 px-8">
                           <div className="w-20 h-20 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center animate-float">
