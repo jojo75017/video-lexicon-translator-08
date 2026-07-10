@@ -480,6 +480,10 @@ export const V3_MODULES: V3Module[] = [
     description: 'Définit une collection éditoriale cohérente (ton, format, gabarit de couverture, mentions, promesse de lecture) réutilisable sur plusieurs titres pour bâtir un vrai catalogue.' },
   { id: 'quality-label',         pillar: 'edition',      status: 'done', title: 'Label Qualité Maison d\'Édition',
     description: 'Checklist certifiante « niveau édition pro » couvrant éditorial, mise en forme et métadonnées ; appose un badge qualité une fois tous les contrôles validés.' },
+  { id: 'edition-variant-studio', pillar: 'edition',     status: 'done', title: 'Studio A/B/C — Versions & Recommandation',
+    description: 'Compare 3 versions (A, B, C) du titre + sous-titre, de la 4e de couverture et de la couverture. L\'IA recommande la meilleure et le choix est réinjecté dans la fiche du livre.' },
+  { id: 'book-positioning',      pillar: 'edition',      status: 'done', title: 'Stratège de Positionnement',
+    description: 'Cherche les meilleures positions du livre : sous-catégories KDP atteignables, 7 mots-clés porteurs et angle concurrentiel pour maximiser les ventes.' },
 
   // DISTRIBUTION (Pack Distribution Large 97€)
   { id: 'wide-distribution',     pillar: 'distribution', status: 'done', title: 'Assistant Distribution Multi-Plateformes',
