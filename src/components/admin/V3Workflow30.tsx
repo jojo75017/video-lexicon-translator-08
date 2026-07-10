@@ -253,7 +253,7 @@ function loadResults(): Record<string, string> {
  * markdown # / ## ou « Chapitre »), il est découpé en blocs repliables
  * façon FAQ pour éviter le « gros pavé ». Sinon il reste affiché tel quel.
  */
-const ResultView: React.FC<{ text: string }> = ({ text }) => {
+const ResultView: React.FC<{ text: string; stepId?: string }> = ({ text, stepId }) => {
   const sections = useMemo(() => {
     const lines = text.split('\n');
     const out: { title: string; body: string }[] = [];
@@ -277,6 +277,26 @@ const ResultView: React.FC<{ text: string }> = ({ text }) => {
 
   const [open, setOpen] = useState<Record<number, boolean>>({ 0: true });
 
+  // Détecte si les sections ressemblent à des variantes proposées (titre/couverture/concept…)
+  const selectKey = stepId ? `v3_variant_choice_${stepId}` : null;
+  const looksLikeVariants = useMemo(
+    () =>
+      sections.length >= 2 &&
+      sections.some((s) => /variante|concept|option|version|proposition|titre/i.test(s.title)),
+    [sections],
+  );
+  const [chosen, setChosen] = useState<number | null>(() => {
+    if (!selectKey) return null;
+    const v = localStorage.getItem(selectKey);
+    return v !== null ? Number(v) : null;
+  });
+
+  const choose = (i: number, title: string) => {
+    setChosen(i);
+    if (selectKey) localStorage.setItem(selectKey, String(i));
+    toast.success(`Variante choisie : ${title}`);
+  };
+
   // Pas de découpage utile → rendu direct dans un conteneur scrollable.
   if (sections.length < 2) {
     return (
@@ -297,23 +317,49 @@ const ResultView: React.FC<{ text: string }> = ({ text }) => {
           className="text-[11px] font-semibold rounded-lg px-2.5 py-1 border transition-colors hover:bg-[#FFF3DF]"
           style={{ borderColor: '#eadfc9', color: AMBER_DEEP }}>Tout replier</button>
         <span className="text-[11px]" style={{ color: '#a18a6c' }}>{sections.length} sections</span>
+        {looksLikeVariants && (
+          <span className="text-[11px] font-semibold ml-auto" style={{ color: GREEN }}>
+            {chosen !== null ? '✓ Une variante est choisie' : 'Choisissez votre variante ci-dessous'}
+          </span>
+        )}
       </div>
-      {sections.map((s, i) => (
-        <div key={i} className="rounded-xl border overflow-hidden" style={{ borderColor: '#eadfc9', background: '#FCFAF4' }}>
-          <button type="button" onClick={() => setOpen((p) => ({ ...p, [i]: !p[i] }))}
-            className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-[#FFF3DF]"
-            aria-expanded={!!open[i]}>
-            <span className="text-[13px] font-bold truncate" style={{ color: INK }}>{s.title}</span>
-            <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${open[i] ? 'rotate-180' : ''}`} style={{ color: AMBER_DEEP }} />
-          </button>
-          {open[i] && (
-            <div className="px-4 pb-4 text-[13px] leading-relaxed v3-md overflow-y-auto v3-scroll"
-              style={{ color: INK, maxHeight: '420px' }}>
-              <ReactMarkdown>{s.body.trim()}</ReactMarkdown>
-            </div>
-          )}
-        </div>
-      ))}
+      {sections.map((s, i) => {
+        const isChosen = chosen === i;
+        return (
+          <div key={i} className="rounded-xl border overflow-hidden"
+            style={{ borderColor: isChosen ? GREEN : '#eadfc9', background: isChosen ? '#F1FBF6' : '#FCFAF4', borderWidth: isChosen ? 2 : 1 }}>
+            <button type="button" onClick={() => setOpen((p) => ({ ...p, [i]: !p[i] }))}
+              className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-[#FFF3DF]"
+              aria-expanded={!!open[i]}>
+              <span className="flex items-center gap-2 min-w-0">
+                <span className="text-[13px] font-bold truncate" style={{ color: INK }}>{s.title}</span>
+                {isChosen && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold rounded-full px-2 py-0.5 shrink-0"
+                    style={{ background: GREEN, color: '#fff' }}>
+                    <Check className="h-3 w-3" /> Choisie
+                  </span>
+                )}
+              </span>
+              <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${open[i] ? 'rotate-180' : ''}`} style={{ color: AMBER_DEEP }} />
+            </button>
+            {open[i] && (
+              <div className="px-4 pb-4 text-[13px] leading-relaxed v3-md overflow-y-auto v3-scroll"
+                style={{ color: INK, maxHeight: '420px' }}>
+                <ReactMarkdown>{s.body.trim()}</ReactMarkdown>
+                {looksLikeVariants && (
+                  <button onClick={() => choose(i, s.title)}
+                    className="mt-3 inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold border transition-colors"
+                    style={isChosen
+                      ? { background: GREEN, color: '#fff', borderColor: GREEN }
+                      : { borderColor: `${GREEN}66`, color: GREEN, background: '#fff' }}>
+                    <Check className="h-3.5 w-3.5" /> {isChosen ? 'Variante choisie' : 'Choisir cette variante'}
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };
