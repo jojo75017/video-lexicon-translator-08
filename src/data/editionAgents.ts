@@ -2,7 +2,9 @@
 //
 // Deux offres :
 //   - V3 (197€) : les 22 agents « tier: v3 » — de l'idée au livre publié sur KDP.
-//   - V4 (347€) : les 30 agents (v3 + les 8 « tier: v4 » du Département Commercial).
+//   - V4 (347€) : tous les agents (v3 + les agents « tier: v4 »). La V4 enrichit
+//     AUSSI le livre lui-même (illustrations intérieures, traduction, passe
+//     éditoriale premium, version audio) en plus du Département Commercial.
 //
 // Chaque agent est branché sur un module déjà présent dans le projet
 // (voir src/components/admin/v3ModuleRegistry.tsx → V3_MODULE_COMPONENTS).
