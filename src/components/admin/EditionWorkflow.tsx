@@ -195,17 +195,34 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
     persist(next);
   }, [done, persist]);
 
-  // Agents visibles : V4 voit tout, V3 voit les 22 mais les 8 Pro restent verrouillés (teaser).
-  const visibleAgents = useMemo(() => EDITION_AGENTS, []);
-  const activeAgents = useMemo(() => getAgentsForTier(canV4), [canV4]);
-  const total = activeAgents.length;
-  const completed = activeAgents.filter((a) => done.has(a.order)).length;
+  // Agents de l'onglet actif (V3 = 197€, V4 = bonus 347€).
+  const tierAgents = useMemo(() => EDITION_AGENTS.filter((a) => a.tier === activeTier), [activeTier]);
+  const v3Count = useMemo(() => EDITION_AGENTS.filter((a) => a.tier === 'v3').length, []);
+  const v4Count = useMemo(() => EDITION_AGENTS.filter((a) => a.tier === 'v4').length, []);
+  const total = tierAgents.length;
+  const completed = tierAgents.filter((a) => done.has(a.order)).length;
   const pct = total ? Math.round((completed / total) * 100) : 0;
+
+  // État de la clé IA (BYOK) — recalculé quand le panneau se ferme.
+  const aiStatus = useMemo(() => {
+    void aiTick;
+    const provider = getProvider();
+    const key = getProviderKey(provider);
+    const valid = !!key && validateKeyFormat(provider, key);
+    let label = PROVIDER_LABELS[provider];
+    if (provider === 'openrouter') {
+      const m = getOpenRouterModel();
+      const found = OPENROUTER_MODELS.find((x) => x.id === m);
+      label = `OpenRouter · ${found ? found.label.split(' ')[0] : 'modèle'}`;
+    }
+    return { valid, label };
+  }, [aiTick]);
 
   const openAgent = useCallback((agent: EditionAgent) => {
     const mod = getModuleById(agent.moduleId);
     if (mod) onOpenModule(mod);
   }, [onOpenModule]);
+
 
   return (
     <div className="rounded-3xl border shadow-sm overflow-hidden" style={{ background: '#fff', borderColor: '#eadfc9' }}>
