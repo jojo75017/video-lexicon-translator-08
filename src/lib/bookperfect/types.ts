@@ -39,6 +39,8 @@ export interface Chapter {
   title: string;
   /** Texte original INTACT (jamais muté). */
   content: string;
+  /** Blocs ordonnés conservant les sous-titres détectés pour l'export livre. */
+  blocks?: { text: string; type?: 'paragraph' | 'heading'; level?: 2 | 3 }[];
   wordCount: number;
 }
 
