@@ -103,6 +103,46 @@ function readChapterTitles(): string[] {
   }
 }
 
+interface ChapterStat { title: string; words: number; }
+interface ManuscriptStats {
+  chapters: ChapterStat[];
+  totalWords: number;
+  chapterCount: number;
+  pages: number;
+  readingMin: number;
+}
+
+/** Reconstitue le manuscrit rédigé (P20/P10, sinon plan P4/P3) puis compte les mots par chapitre. */
+function readManuscriptStats(): ManuscriptStats {
+  const empty: ManuscriptStats = { chapters: [], totalWords: 0, chapterCount: 0, pages: 0, readingMin: 0 };
+  try {
+    const raw = localStorage.getItem('ebook_workflow_results');
+    if (!raw) return empty;
+    const data = JSON.parse(raw);
+    let blob = '';
+    for (const key of ['P20', 'P10', 'P4', 'P3']) {
+      const c = data?.[key]?.displayContent;
+      if (typeof c === 'string' && c.trim().length >= 50) { blob = c; break; }
+    }
+    if (!blob) return empty;
+    const sections = parseManuscript(blob, 'Contenu');
+    const chapters: ChapterStat[] = sections.map((s) => {
+      const text = [s.title, ...s.blocks.map((b) => b.text)].join(' ');
+      return { title: s.title, words: countWords(text) };
+    }).filter((c) => c.words > 0);
+    const totalWords = chapters.reduce((n, c) => n + c.words, 0);
+    return {
+      chapters,
+      totalWords,
+      chapterCount: chapters.length,
+      pages: estimatePages(totalWords),
+      readingMin: Math.max(1, Math.ceil(totalWords / 230)),
+    };
+  } catch {
+    return empty;
+  }
+}
+
 const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpenModule }) => {
   const navigate = useNavigate();
   const { hasFull, isAdmin, loading } = useV3Entitlement();
