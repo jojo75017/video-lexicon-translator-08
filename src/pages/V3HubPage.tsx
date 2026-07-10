@@ -11,6 +11,7 @@ import CreateBookHub from '@/components/admin/CreateBookHub';
 import V2V3Compare from '@/components/admin/V2V3Compare';
 import V3PricingTiers from '@/components/admin/V3PricingTiers';
 import EditionWorkflow from '@/components/admin/EditionWorkflow';
+import V3ExportPanel from '@/components/admin/V3ExportPanel';
 import V3AccessRecap from '@/components/admin/V3AccessRecap';
 import V3LaunchLinks from '@/components/admin/V3LaunchLinks';
 import V3GuidesSection from '@/components/admin/V3GuidesSection';
