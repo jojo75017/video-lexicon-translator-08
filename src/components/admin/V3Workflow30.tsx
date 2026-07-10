@@ -552,7 +552,12 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   const newProject = () => {
     setProjectId(null);
     setProjectName('Mon livre');
+    setBrief({ ...EMPTY_BRIEF });
+    setTheme('');
+    setDone(new Set());
+    setResults({});
     setCloudMsg(null);
+    setOpenCfg('brief');
   };
 
   // Démarre un livre entièrement neuf : réinitialise le brief, le thème et le projet en cours.
@@ -561,11 +566,16 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
     setTheme('');
     setProjectId(null);
     setProjectName('Mon livre');
+    setDone(new Set());
+    setResults({});
+    setError(null);
     setCloudMsg('Nouveau livre prêt — remplis ton projet ci-dessous.');
     setOpenCfg('brief');
     try {
       localStorage.removeItem(BRIEF_KEY);
       localStorage.removeItem(THEME_KEY);
+      localStorage.removeItem(PROGRESS_KEY);
+      localStorage.removeItem(RESULTS_KEY);
     } catch { /* ignore */ }
   };
 
@@ -595,6 +605,11 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
     const readingMin = totalWords > 0 ? Math.max(1, Math.ceil(totalWords / 200)) : 0;
     return { chapters, totalWords, estimatedPages, readingMin, wordsPerPage, isEstimate: !hasManuscript };
   }, [brief.chapterCount, brief.wordsPerChapter, results, formatId]);
+
+  const exportManuscript = results['p20-chat-manuscript'] || '';
+  const exportTitle = brief.title?.trim() || theme.trim() || projectName.trim() || 'Mon livre';
+  const phase6CoreIds = ['manuscript-converter', 'back-matter-builder', 'copyright-page'];
+  const miseEnPageDone = phase6CoreIds.every((id) => done.has(id));
 
 
   // Progression calculée uniquement sur les étapes ACCESSIBLES (débloquées).
@@ -1024,6 +1039,16 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             </div>
           )}
 
+          {/* Export du livre — moteur multi-format complet (toujours visible, en haut du parcours) */}
+          <div className="mt-5">
+            <V3ExportPanel
+              manuscript={exportManuscript}
+              title={exportTitle}
+              subtitle={brief.subtitle?.trim() || undefined}
+              author={brief.author?.trim() || undefined}
+            />
+          </div>
+
           {/* Tableau du volume — toujours visible sur la page */}
           <div className="mt-5 rounded-2xl border p-4 sm:p-5" style={{ borderColor: '#eadfc9', background: '#fffdf8' }}>
             <div className="flex items-center justify-between gap-3 mb-3">
@@ -1316,15 +1341,6 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             )}
           </div>
 
-          {/* Export du livre — moteur multi-format complet (toujours visible) */}
-          <div className="mt-5">
-            <V3ExportPanel
-              manuscript={results['p20-chat-manuscript'] || ''}
-              title={brief.title?.trim() || theme.trim() || 'Mon livre'}
-              subtitle={brief.subtitle?.trim() || undefined}
-              author={brief.author?.trim() || undefined}
-            />
-          </div>
         </div>
 
         {/* Phases.
@@ -1570,24 +1586,21 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                         </div>
                       );
                     })}
+                  </div>
+                )}
 
-                    {/* Export contextuel : apparaît dès qu'un manuscrit existe pour CE projet
-                        (ou quand toute la mise en page est validée). */}
-                    {phase.key === 'mise-en-page'
-                      && ((results['p20-chat-manuscript'] || '').trim().length >= 50
-                        || ['manuscript-converter', 'back-matter-builder', 'copyright-page'].every((id) => done.has(id))) && (
-                      <div className="px-5 sm:px-7 pt-2 pb-1">
-                        <div className="mb-2 inline-flex items-center gap-1.5 text-[12px] font-bold" style={{ color: GREEN }}>
-                          <Check className="h-4 w-4" /> Ta mise en page est prête — exporte ton livre
-                        </div>
-                        <V3ExportPanel
-                          manuscript={results['p20-chat-manuscript'] || ''}
-                          title={brief.title?.trim() || theme.trim() || 'Mon livre'}
-                          subtitle={brief.subtitle?.trim() || undefined}
-                          author={brief.author?.trim() || undefined}
-                        />
-                      </div>
-                    )}
+                {/* Export contextuel : reste visible sous la Phase 6 même si la carte est repliée. */}
+                {phase.key === 'mise-en-page' && miseEnPageDone && (
+                  <div className="px-5 sm:px-7 pt-2 pb-4">
+                    <div className="mb-2 inline-flex items-center gap-1.5 text-[12px] font-bold" style={{ color: GREEN }}>
+                      <Check className="h-4 w-4" /> Ta mise en page est prête — exporte ton livre
+                    </div>
+                    <V3ExportPanel
+                      manuscript={exportManuscript}
+                      title={exportTitle}
+                      subtitle={brief.subtitle?.trim() || undefined}
+                      author={brief.author?.trim() || undefined}
+                    />
                   </div>
                 )}
               </div>
