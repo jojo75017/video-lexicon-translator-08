@@ -12,6 +12,7 @@ import {
   Footer, Header, PageNumber, TableOfContents,
 } from 'docx';
 import { saveAs } from 'file-saver';
+import JSZip from 'jszip';
 import jsPDF from 'jspdf';
 import { applyFrenchTypography } from '@/utils/frenchTypography';
 import type { Analysis, Chapter, Issue, Manuscript } from './types';
@@ -34,9 +35,9 @@ export interface KdpFormat {
 }
 
 export const KDP_FORMATS: KdpFormat[] = [
-  { id: '5x8',     label: '5 × 8 pouces',     description: 'Format poche compact', width: 7200,  height: 11520, margin: 1080 },
-  { id: '5.5x8.5', label: '5,5 × 8,5 pouces', description: 'Format standard non-fiction', width: 7920,  height: 12240, margin: 1080 },
-  { id: '6x9',     label: '6 × 9 pouces',     description: 'Recommandé pour les romans (15,24 × 22,86 cm)', recommended: true, width: 8640, height: 12960, margin: 1080 },
+  { id: '5x8',     label: '5 × 8 pouces',     description: 'Format poche compact', width: 7200,  height: 11520, margin: 360 },
+  { id: '5.5x8.5', label: '5,5 × 8,5 pouces', description: 'Format standard non-fiction', width: 7920,  height: 12240, margin: 360 },
+  { id: '6x9',     label: '6 × 9 pouces',     description: 'Recommandé pour les romans (15,24 × 22,86 cm)', recommended: true, width: 8640, height: 12960, margin: 360 },
   { id: 'a4',      label: 'A4 (travail)',     description: 'Relecture / impression bureau', width: 11906, height: 16838, margin: 1440 },
   { id: 'a5',      label: 'A5 (lecture)',     description: 'Format lecture agréable', width: 8419,  height: 11906, margin: 1080 },
 ];
@@ -81,6 +82,45 @@ export function kdpInsideMarginInches(pageCount: number): number {
   if (pageCount <= 500) return 0.625;
   if (pageCount <= 700) return 0.75;
   return 0.875;
+}
+
+const TWIPS_PER_INCH = 1440;
+const POINTS_PER_INCH = 72;
+const KDP_OUTSIDE_MARGIN_INCHES = 0.25;
+
+const inchesToTwips = (inches: number) => Math.round(inches * TWIPS_PER_INCH);
+const twipsToInches = (twips: number) => twips / TWIPS_PER_INCH;
+
+export function estimateKdpPageCount(manuscript: Manuscript, options: KdpExportOptions = DEFAULT_KDP_OPTIONS): number {
+  const format = getKdpFormat(options.formatId);
+  const inside = kdpInsideMarginInches(manuscript.pageEstimate);
+  const contentWidthIn = twipsToInches(format.width) - inside - KDP_OUTSIDE_MARGIN_INCHES;
+  const contentHeightIn = twipsToInches(format.height) - (KDP_OUTSIDE_MARGIN_INCHES * 2);
+  const avgCharsPerLine = Math.max(24, Math.floor((contentWidthIn * POINTS_PER_INCH) / (options.fontSize * 0.48)));
+  const linesPerPage = Math.max(12, Math.floor((contentHeightIn * POINTS_PER_INCH) / (options.fontSize * 1.45)));
+  const wordsPerLine = Math.max(4, avgCharsPerLine / 5.6);
+  const wordsPerPage = wordsPerLine * linesPerPage * 0.86;
+  const chapterBreakAllowance = Math.max(1, Math.ceil(manuscript.chapters.length * 0.45));
+  return Math.max(manuscript.pageEstimate, Math.ceil(manuscript.wordCount / Math.max(120, wordsPerPage)) + chapterBreakAllowance);
+}
+
+export function getKdpMargins(options: KdpExportOptions, pageCount: number) {
+  const format = getKdpFormat(options.formatId);
+  const insideInches = kdpInsideMarginInches(pageCount);
+  const outsideInches = options.formatId === 'a4' ? 1 : (options.formatId === 'a5' ? 0.75 : KDP_OUTSIDE_MARGIN_INCHES);
+  const verticalInches = options.formatId === 'a4' ? 1 : (options.formatId === 'a5' ? 0.75 : KDP_OUTSIDE_MARGIN_INCHES);
+  return {
+    format,
+    pageCount,
+    insideInches,
+    outsideInches,
+    topInches: verticalInches,
+    bottomInches: verticalInches,
+    insideTwips: inchesToTwips(insideInches),
+    outsideTwips: inchesToTwips(outsideInches),
+    topTwips: inchesToTwips(verticalInches),
+    bottomTwips: inchesToTwips(verticalInches),
+  };
 }
 
 /** Applique les corrections validées à un texte (1re occurrence par issue). */
@@ -132,6 +172,26 @@ export function runKdpFinalCheck(manuscript: Manuscript, analysis: Analysis): Kd
 
 const fontSizeHalfPoints = (pt: number) => Math.round(pt * 2);
 
+const safeFileBase = (title: string) =>
+  (title || 'manuscrit').replace(/[^\w\sÀ-ÿ-]/g, '').trim().replace(/\s+/g, ' ').slice(0, 60) || 'manuscrit';
+
+async function patchDocxSettings(blob: Blob): Promise<Blob> {
+  const zip = await JSZip.loadAsync(blob);
+  const settingsPath = 'word/settings.xml';
+  const current = await zip.file(settingsPath)?.async('string');
+  if (current) {
+    let settings = current;
+    if (!settings.includes('<w:mirrorMargins')) {
+      settings = settings.replace('</w:settings>', '<w:mirrorMargins/></w:settings>');
+    }
+    if (!settings.includes('<w:updateFields')) {
+      settings = settings.replace('</w:settings>', '<w:updateFields w:val="true"/></w:settings>');
+    }
+    zip.file(settingsPath, settings);
+  }
+  return await zip.generateAsync({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+}
+
 const paragraphsFrom = (text: string, opts: KdpExportOptions): Paragraph[] =>
   text
     .split(/\n\s*\n/)
@@ -144,18 +204,19 @@ const paragraphsFrom = (text: string, opts: KdpExportOptions): Paragraph[] =>
     }));
 
 /** Exporte le manuscrit corrigé en .docx (mise en page Amazon KDP). */
-export async function exportCorrectedDocx(
+export async function generateCorrectedDocxBlob(
   manuscript: Manuscript,
   analysis: Analysis,
   applyTypography = true,
   optionsOrFormat: KdpExportOptions | KdpFormatId = DEFAULT_KDP_OPTIONS,
-) {
+): Promise<Blob> {
   const options: KdpExportOptions = typeof optionsOrFormat === 'string'
     ? { ...DEFAULT_KDP_OPTIONS, formatId: optionsOrFormat }
     : optionsOrFormat;
 
-  const format = getKdpFormat(options.formatId);
-  const gutter = Math.round(kdpInsideMarginInches(manuscript.pageEstimate) * 1440);
+  const pageEstimate = estimateKdpPageCount(manuscript, options);
+  const margins = getKdpMargins(options, pageEstimate);
+  const { format } = margins;
   const children: (Paragraph | TableOfContents)[] = [];
 
   // Page de titre
@@ -218,11 +279,11 @@ export async function exportCorrectedDocx(
         page: {
           size: { width: format.width, height: format.height },
           margin: {
-            top: format.margin,
-            right: format.margin,
-            bottom: format.margin,
-            left: format.margin,
-            gutter,
+            top: margins.topTwips,
+            right: margins.outsideTwips,
+            bottom: margins.bottomTwips,
+            left: margins.insideTwips,
+            gutter: 0,
           },
         },
       },
@@ -233,18 +294,34 @@ export async function exportCorrectedDocx(
   });
 
   const blob = await Packer.toBlob(doc);
-  const safe = manuscript.title.replace(/[^\w\sÀ-ÿ-]/g, '').trim().slice(0, 60) || 'manuscrit';
-  saveAs(blob, `${safe} — ${format.label} (KDP).docx`);
+  return await patchDocxSettings(blob);
+}
+
+/** Exporte le manuscrit corrigé en .docx (mise en page Amazon KDP). */
+export async function exportCorrectedDocx(
+  manuscript: Manuscript,
+  analysis: Analysis,
+  applyTypography = true,
+  optionsOrFormat: KdpExportOptions | KdpFormatId = DEFAULT_KDP_OPTIONS,
+) {
+  const options: KdpExportOptions = typeof optionsOrFormat === 'string'
+    ? { ...DEFAULT_KDP_OPTIONS, formatId: optionsOrFormat }
+    : optionsOrFormat;
+  const format = getKdpFormat(options.formatId);
+  const blob = await generateCorrectedDocxBlob(manuscript, analysis, applyTypography, options);
+  saveAs(blob, `${safeFileBase(manuscript.title)} — WORD KDP ${format.label}.docx`);
 }
 
 /** Exporte le manuscrit corrigé en PDF prêt-à-imprimer Amazon KDP. */
-export async function exportCorrectedPdf(
+export async function generateCorrectedPdfBlob(
   manuscript: Manuscript,
   analysis: Analysis,
   options: KdpExportOptions = DEFAULT_KDP_OPTIONS,
   applyTypography = true,
-) {
-  const format = getKdpFormat(options.formatId);
+): Promise<Blob> {
+  const pageEstimate = estimateKdpPageCount(manuscript, options);
+  const margins = getKdpMargins(options, pageEstimate);
+  const { format } = margins;
   const wPt = (format.width / 1440) * 72;
   const hPt = (format.height / 1440) * 72;
 
@@ -253,18 +330,19 @@ export async function exportCorrectedPdf(
   // plus proche pour l'impression. Le .docx, lui, conserve la police choisie.
   doc.setFont('times', 'normal');
 
-  const insidePt = kdpInsideMarginInches(manuscript.pageEstimate) * 72; // reliure
-  const outsidePt = 0.5 * 72;
-  const topPt = 0.75 * 72;
-  const botPt = 0.75 * 72;
+  const insidePt = margins.insideInches * POINTS_PER_INCH;
+  const outsidePt = margins.outsideInches * POINTS_PER_INCH;
+  const topPt = margins.topInches * POINTS_PER_INCH;
+  const botPt = margins.bottomInches * POINTS_PER_INCH;
   const contentW = wPt - insidePt - outsidePt;
   const lineH = options.fontSize * 1.45;
-  const left = insidePt;
 
   let pageNo = 0;
+  let currentLeft = insidePt;
   const newPage = (first = false) => {
     if (!first) doc.addPage([wPt, hPt], 'portrait');
     pageNo++;
+    currentLeft = pageNo % 2 === 0 ? outsidePt : insidePt;
     if (options.headers && pageNo > 1) {
       doc.setFont('times', 'italic');
       doc.setFontSize(9);
@@ -293,13 +371,13 @@ export async function exportCorrectedPdf(
     let y = topPt + 10;
     doc.setFont('times', 'bold');
     doc.setFontSize(16);
-    doc.text('Table des matières', left, y);
+    doc.text('Table des matières', currentLeft, y);
     y += lineH * 1.6;
     doc.setFont('times', 'normal');
     doc.setFontSize(options.fontSize);
     manuscript.chapters.forEach((c) => {
       if (y > hPt - botPt) { newPage(); y = topPt + 10; }
-      doc.text(doc.splitTextToSize(c.title, contentW), left, y);
+      doc.text(doc.splitTextToSize(c.title, contentW), currentLeft, y);
       y += lineH;
     });
   }
@@ -310,7 +388,7 @@ export async function exportCorrectedPdf(
     let y = topPt + 10;
     doc.setFont('times', 'bold');
     doc.setFontSize(16);
-    doc.text(doc.splitTextToSize(chapter.title, contentW), left, y);
+    doc.text(doc.splitTextToSize(chapter.title, contentW), currentLeft, y);
     y += lineH * 1.8;
 
     doc.setFont('times', 'normal');
@@ -321,15 +399,26 @@ export async function exportCorrectedPdf(
       const lines: string[] = doc.splitTextToSize(para, contentW);
       for (const line of lines) {
         if (y > hPt - botPt) { newPage(); y = topPt + 10; doc.setFont('times', 'normal'); doc.setFontSize(options.fontSize); }
-        doc.text(line, left, y);
+        doc.text(line, currentLeft, y);
         y += lineH;
       }
       y += lineH * 0.5; // espace inter-paragraphe
     }
   }
 
-  const safe = manuscript.title.replace(/[^\w\sÀ-ÿ-]/g, '').trim().slice(0, 60) || 'manuscrit';
-  doc.save(`${safe} — ${format.label} (KDP impression).pdf`);
+  return doc.output('blob');
+}
+
+/** Exporte le manuscrit corrigé en PDF prêt-à-imprimer Amazon KDP. */
+export async function exportCorrectedPdf(
+  manuscript: Manuscript,
+  analysis: Analysis,
+  options: KdpExportOptions = DEFAULT_KDP_OPTIONS,
+  applyTypography = true,
+) {
+  const format = getKdpFormat(options.formatId);
+  const blob = await generateCorrectedPdfBlob(manuscript, analysis, options, applyTypography);
+  saveAs(blob, `${safeFileBase(manuscript.title)} — PDF KDP ${format.label}.pdf`);
 }
 
 /** Prépare pour Amazon KDP en un clic : exporte le .docx ET le PDF. */
@@ -339,8 +428,29 @@ export async function exportKdpPackage(
   options: KdpExportOptions = DEFAULT_KDP_OPTIONS,
   applyTypography = true,
 ) {
-  await exportCorrectedDocx(manuscript, analysis, applyTypography, options);
-  await exportCorrectedPdf(manuscript, analysis, options, applyTypography);
+  const format = getKdpFormat(options.formatId);
+  const pageEstimate = estimateKdpPageCount(manuscript, options);
+  const margins = getKdpMargins(options, pageEstimate);
+  const [docxBlob, pdfBlob] = await Promise.all([
+    generateCorrectedDocxBlob(manuscript, analysis, applyTypography, options),
+    generateCorrectedPdfBlob(manuscript, analysis, options, applyTypography),
+  ]);
+  const safe = safeFileBase(manuscript.title);
+  const zip = new JSZip();
+  zip.file(`${safe} — WORD KDP ${format.label}.docx`, docxBlob);
+  zip.file(`${safe} — PDF KDP ${format.label}.pdf`, pdfBlob);
+  zip.file('MARGES-KDP.txt', [
+    `Format trim : ${format.label}`,
+    `Estimation pages utilisée pour la reliure : ${pageEstimate}`,
+    `Marge intérieure (reliure) : ${margins.insideInches.toFixed(3)} po`,
+    `Marge extérieure : ${margins.outsideInches.toFixed(3)} po`,
+    `Marge haut : ${margins.topInches.toFixed(3)} po`,
+    `Marge bas : ${margins.bottomInches.toFixed(3)} po`,
+    'DOCX : marges miroir activées (intérieur/extérieur).',
+    'PDF : marges miroir appliquées page impaire/paire.',
+  ].join('\n'));
+  const zipBlob = await zip.generateAsync({ type: 'blob', mimeType: 'application/zip' });
+  saveAs(zipBlob, `${safe} — PACK KDP ${format.label} Word PDF.zip`);
 }
 
 /** Exporte un rapport d'analyse récapitulatif en .docx. */

@@ -14,7 +14,7 @@ import {
 import { toast } from 'sonner';
 import {
   exportCorrectedDocx, exportCorrectedPdf, exportKdpPackage, exportReportDocx,
-  KDP_FORMATS, KDP_FONTS, getKdpFormat, kdpInsideMarginInches, runKdpFinalCheck,
+  KDP_FORMATS, KDP_FONTS, getKdpFormat, getKdpMargins, estimateKdpPageCount, runKdpFinalCheck,
   DEFAULT_KDP_OPTIONS,
 } from '@/lib/bookperfect/exporters';
 import type { KdpExportOptions, KdpFormatId } from '@/lib/bookperfect/exporters';
@@ -43,7 +43,8 @@ export const RapportFinalTab: React.FC<Props> = ({ manuscript, analysis, onRelau
   const dxaToMm = (v: number) => (v / 1440) * 25.4;
   const fmtIn = (v: number) => dxaToInch(v).toLocaleString('fr-FR', { maximumFractionDigits: 2 });
   const fmtMm = (v: number) => dxaToMm(v).toLocaleString('fr-FR', { maximumFractionDigits: 0 });
-  const insideIn = kdpInsideMarginInches(manuscript.pageEstimate);
+  const kdpPageEstimate = estimateKdpPageCount(manuscript, options);
+  const margins = getKdpMargins(options, kdpPageEstimate);
 
   const setOpt = <K extends keyof KdpExportOptions>(k: K, v: KdpExportOptions[K]) =>
     setOptions((o) => ({ ...o, [k]: v }));
@@ -51,9 +52,9 @@ export const RapportFinalTab: React.FC<Props> = ({ manuscript, analysis, onRelau
   const doOneClick69 = async () => {
     try {
       setBusy(true);
-      toast.loading('Conversion 6 × 9 pouces + marges Amazon KDP (Word + PDF)…', { id: 'bp-kdp1' });
+      toast.loading('Création du pack KDP 6 × 9 (Word + PDF + fiche marges)…', { id: 'bp-kdp1' });
       await exportKdpPackage(manuscript, analysis, { ...DEFAULT_KDP_OPTIONS, formatId: '6x9' }, true);
-      toast.success('Version 6 × 9 prête pour Amazon KDP exportée (Word + PDF) ✓', { id: 'bp-kdp1' });
+      toast.success('Pack KDP 6 × 9 exporté : Word + PDF + fiche marges ✓', { id: 'bp-kdp1' });
     } catch (e: any) {
       toast.error(e?.message || 'Échec de la préparation KDP.', { id: 'bp-kdp1' });
     } finally {
@@ -64,9 +65,9 @@ export const RapportFinalTab: React.FC<Props> = ({ manuscript, analysis, onRelau
   const doPackage = async () => {
     try {
       setBusy(true);
-      toast.loading('Préparation Amazon KDP (Word + PDF)…', { id: 'bp-kdp' });
+      toast.loading('Préparation Amazon KDP (Word + PDF + fiche marges)…', { id: 'bp-kdp' });
       await exportKdpPackage(manuscript, analysis, options, true);
-      toast.success('Version prête pour Amazon KDP exportée (Word + PDF) ✓', { id: 'bp-kdp' });
+      toast.success('Pack Amazon KDP exporté : Word + PDF + fiche marges ✓', { id: 'bp-kdp' });
       setKdpOpen(false);
     } catch (e: any) {
       toast.error(e?.message || 'Échec de la préparation KDP.', { id: 'bp-kdp' });
@@ -140,7 +141,7 @@ export const RapportFinalTab: React.FC<Props> = ({ manuscript, analysis, onRelau
                 <div className="font-semibold">Préparer pour Amazon KDP</div>
                 <div className="text-sm text-muted-foreground">
                   En un clic : format 6 × 9, marges officielles, police roman, chapitres sur nouvelle page,
-                  table des matières, pagination — export <strong>Word mis en page</strong> + <strong>PDF prêt à imprimer</strong>.
+                  table des matières, pagination — export <strong>Word mis en page</strong> + <strong>PDF prêt à imprimer</strong> + fiche marges.
                 </div>
               </div>
               <div className="flex flex-col gap-2 shrink-0">
@@ -172,7 +173,7 @@ export const RapportFinalTab: React.FC<Props> = ({ manuscript, analysis, onRelau
               <BookOpen className="h-5 w-5 text-primary" /> Préparer pour Amazon KDP
             </DialogTitle>
             <DialogDescription>
-              Réglez la mise en page, puis obtenez en un clic une version prête à publier (Word + PDF).
+              Réglez la mise en page, puis obtenez en un clic le pack prêt à publier : Word + PDF + fiche marges.
             </DialogDescription>
           </DialogHeader>
 
@@ -273,7 +274,12 @@ export const RapportFinalTab: React.FC<Props> = ({ manuscript, analysis, onRelau
                 >
                   <div
                     className="absolute border border-dashed border-primary/60 bg-primary/5"
-                    style={{ inset: `${(preview.margin / preview.width) * 72}px`, left: `${(preview.margin + kdpInsideMarginInches(manuscript.pageEstimate) * 1440) / preview.width * 72}px` }}
+                    style={{
+                      top: `${(margins.topTwips / preview.height) * (72 * (preview.height / preview.width))}px`,
+                      right: `${(margins.outsideTwips / preview.width) * 72}px`,
+                      bottom: `${(margins.bottomTwips / preview.height) * (72 * (preview.height / preview.width))}px`,
+                      left: `${(margins.insideTwips / preview.width) * 72}px`,
+                    }}
                   />
                 </div>
                 <div className="grid grid-cols-1 gap-1.5 text-xs">
@@ -289,8 +295,13 @@ export const RapportFinalTab: React.FC<Props> = ({ manuscript, analysis, onRelau
                     <Ruler className="h-3.5 w-3.5 text-muted-foreground" />
                     <span className="text-muted-foreground">Marge reliure (KDP) :</span>
                     <span className="font-medium">
-                      {insideIn.toLocaleString('fr-FR', { maximumFractionDigits: 3 })} po (~{manuscript.pageEstimate} pages)
+                      {margins.insideInches.toLocaleString('fr-FR', { maximumFractionDigits: 3 })} po (~{kdpPageEstimate} pages)
                     </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Ruler className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-muted-foreground">Extérieur / haut / bas :</span>
+                    <span className="font-medium">{margins.outsideInches.toLocaleString('fr-FR', { maximumFractionDigits: 3 })} po</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Hash className="h-3.5 w-3.5 text-muted-foreground" />
@@ -300,7 +311,7 @@ export const RapportFinalTab: React.FC<Props> = ({ manuscript, analysis, onRelau
                 </div>
               </div>
               <p className="text-[11px] text-muted-foreground">
-                Marge intérieure calculée automatiquement selon le barème officiel Amazon KDP.
+                Marges no-bleed Amazon KDP : intérieur selon nombre de pages, extérieur/haut/bas à 0,25 po pour les formats KDP.
                 Chaque chapitre démarre sur une nouvelle page. La police est conservée dans le Word ;
                 le PDF utilise un rendu serif équivalent pour l'impression.
               </p>
@@ -308,7 +319,7 @@ export const RapportFinalTab: React.FC<Props> = ({ manuscript, analysis, onRelau
 
             <div className="space-y-2">
               <Button onClick={doPackage} disabled={busy || !check.ready} className="w-full gap-2">
-                <Rocket className="h-4 w-4" /> Préparer (Word + PDF) en un clic
+                <Rocket className="h-4 w-4" /> Préparer le pack (Word + PDF) en un clic
               </Button>
               {!check.ready && (
                 <p className="text-xs text-red-600 text-center">Corrigez les blocages ci-dessus avant l'export.</p>

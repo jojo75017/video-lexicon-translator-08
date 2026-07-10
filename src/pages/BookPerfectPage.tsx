@@ -56,9 +56,9 @@ const BookPerfectPage: React.FC = () => {
     if (!manuscript || !analysis) return;
     try {
       setKdpBusy(true);
-      toast.loading('Conversion 6 × 9 pouces + marges Amazon KDP (Word + PDF)…', { id: 'bp-kdp-page' });
+      toast.loading('Création du pack KDP 6 × 9 (Word + PDF + fiche marges)…', { id: 'bp-kdp-page' });
       await exportKdpPackage(manuscript, analysis, { ...DEFAULT_KDP_OPTIONS, formatId: '6x9' }, true);
-      toast.success('Version 6 × 9 prête pour Amazon KDP exportée (Word + PDF) ✓', { id: 'bp-kdp-page' });
+      toast.success('Pack KDP 6 × 9 exporté : Word + PDF + fiche marges ✓', { id: 'bp-kdp-page' });
     } catch (e: any) {
       toast.error(e?.message || 'Échec de la préparation KDP.', { id: 'bp-kdp-page' });
     } finally {
@@ -378,7 +378,7 @@ const BookPerfectPage: React.FC = () => {
               <Card className="border-primary/40 bg-primary/5">
                 <CardContent className="p-4 flex flex-wrap items-center gap-3">
                   <span className="text-sm flex-1 min-w-[200px]">
-                    ✅ Analyse terminée. Obtenez en un clic votre version prête à publier sur Amazon KDP (Word + PDF).
+                    ✅ Analyse terminée. Obtenez en un clic votre pack prêt pour Amazon KDP (Word + PDF + fiche marges).
                   </span>
                   <Button onClick={prepareForKdp} disabled={kdpBusy} className="gap-2">
                     <BookOpen className="h-4 w-4" /> 📖 Préparer pour Amazon KDP (6 × 9)
