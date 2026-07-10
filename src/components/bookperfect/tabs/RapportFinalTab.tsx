@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { FileDown, FileText, RefreshCw, BookOpen, Star } from 'lucide-react';
+import { FileDown, FileText, RefreshCw, BookOpen, Star, Ruler, Hash } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { exportCorrectedDocx, exportReportDocx, KDP_FORMATS } from '@/lib/bookperfect/exporters';
+import { exportCorrectedDocx, exportReportDocx, KDP_FORMATS, getKdpFormat } from '@/lib/bookperfect/exporters';
 import type { KdpFormatId } from '@/lib/bookperfect/exporters';
 import { CATEGORY_LABELS } from '@/lib/bookperfect/types';
 import type { Analysis, IssueCategory, Manuscript } from '@/lib/bookperfect/types';
