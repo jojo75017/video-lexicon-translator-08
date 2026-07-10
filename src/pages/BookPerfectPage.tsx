@@ -129,7 +129,8 @@ const BookPerfectPage: React.FC = () => {
         if (failed > 0) toast.warning(`Analyse terminée. ${failed} chapitre(s) en échec — relancez-les.`);
         else {
           setJustCompleted(true);
-          toast.success('Analyse terminée ✓');
+          setActiveTab('rapport');
+          toast.success('Analyse terminée ✓ Votre export est prêt dans l\'onglet Rapport.');
         }
       }
     } catch (e: any) {
