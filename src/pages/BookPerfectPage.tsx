@@ -95,7 +95,6 @@ const BookPerfectPage: React.FC = () => {
     setAnalysis(normalizedExisting);
     setPaused(!!normalizedExisting?.chapterResults.some((r) => r.status !== 'done'));
     setPausedMessage(normalizedExisting?.chapterResults.some((r) => r.status !== 'done') ? 'Analyse précédente retrouvée : cliquez sur Reprendre.' : null);
-    toast.success('Fichier sauvegardé automatiquement.');
   }, []);
 
   const start = useCallback(async (resumeOnly: boolean) => {
