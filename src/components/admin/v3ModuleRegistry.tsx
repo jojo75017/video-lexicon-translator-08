@@ -212,6 +212,8 @@ export const V3_MODULE_COMPONENTS: Record<string, React.ComponentType> = {
   'v3-launch-bonuses': V3LaunchBonusesModule,
   // Documentation Studio AI (produit premium transversal)
   'documentation-studio': DocumentationStudio,
+  'edition-variant-studio': EditionVariantStudio,
+  'book-positioning': PositioningStrategist,
 };
 
 /** Tous les modules ouvrables (mode hors V3 / cockpit standard). */
