@@ -15,6 +15,32 @@ import { applyFrenchTypography } from '@/utils/frenchTypography';
 import type { Analysis, Chapter, Issue, Manuscript } from './types';
 import { CATEGORY_LABELS } from './types';
 
+/** Formats de page pour l'export (Amazon KDP + formats de travail). */
+export type KdpFormatId = '5x8' | '5.5x8.5' | '6x9' | 'a4' | 'a5';
+
+export interface KdpFormat {
+  id: KdpFormatId;
+  label: string;
+  description: string;
+  recommended?: boolean;
+  /** Dimensions en DXA (1 pouce = 1440). */
+  width: number;
+  height: number;
+  /** Marge en DXA appliquée sur les 4 côtés. */
+  margin: number;
+}
+
+export const KDP_FORMATS: KdpFormat[] = [
+  { id: '5x8',     label: '5 × 8 pouces',     description: 'Format poche compact', width: 7200,  height: 11520, margin: 1080 },
+  { id: '5.5x8.5', label: '5,5 × 8,5 pouces', description: 'Format standard non-fiction', width: 7920,  height: 12240, margin: 1080 },
+  { id: '6x9',     label: '6 × 9 pouces',     description: 'Recommandé pour les romans', recommended: true, width: 8640, height: 12960, margin: 1152 },
+  { id: 'a4',      label: 'A4 (travail)',     description: 'Relecture / impression bureau', width: 11906, height: 16838, margin: 1440 },
+  { id: 'a5',      label: 'A5 (lecture)',     description: 'Format lecture agréable', width: 8419,  height: 11906, margin: 1080 },
+];
+
+export const getKdpFormat = (id: KdpFormatId): KdpFormat =>
+  KDP_FORMATS.find((f) => f.id === id) ?? KDP_FORMATS[2];
+
 /** Applique les corrections validées à un texte (1re occurrence par issue). */
 function applyCorrections(text: string, issues: Issue[]): string {
   let out = text;
