@@ -335,7 +335,8 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
             <div className="min-w-0 flex-1">
               <div className="text-sm font-black" style={{ color: INK }}>Passez en V4 — 347€ · {V4_AGENT_COUNT} agents</div>
               <p className="text-[12.5px]" style={{ color: '#6f5e47' }}>
-                Débloquez le Département Commercial (presse, social, Ads, distribution, avis…) pour vendre comme un éditeur.
+                Studio A/B/C (titre, 4e, couverture avec version recommandée), Stratège de Positionnement,
+                illustrations, audiobook, traductions + tout le Département Commercial (presse, social, Ads, distribution…).
               </p>
             </div>
             <button onClick={() => navigate('/publication-pro')}

@@ -99,6 +99,8 @@ import CompetitorTracker from '@/components/admin/market/CompetitorTracker';
 import AmazonAdsKeywordResearch from '@/components/admin/market/AmazonAdsKeywordResearch';
 import TrademarkChecker from '@/components/admin/market/TrademarkChecker';
 import DocumentationStudio from '@/components/documentation-studio/DocumentationStudio';
+import EditionVariantStudio from '@/components/admin/EditionVariantStudio';
+import PositioningStrategist from '@/components/admin/PositioningStrategist';
 
 /** Modules dont le dialog s'affiche en largeur réduite (max-w-2xl). */
 export const NARROW_MODULE_IDS: string[] = [
@@ -210,6 +212,8 @@ export const V3_MODULE_COMPONENTS: Record<string, React.ComponentType> = {
   'v3-launch-bonuses': V3LaunchBonusesModule,
   // Documentation Studio AI (produit premium transversal)
   'documentation-studio': DocumentationStudio,
+  'edition-variant-studio': EditionVariantStudio,
+  'book-positioning': PositioningStrategist,
 };
 
 /** Tous les modules ouvrables (mode hors V3 / cockpit standard). */
