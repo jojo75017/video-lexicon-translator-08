@@ -283,7 +283,7 @@ const buildManualTocDocx = (chapters: Chapter[], startPages: number[], opts: Kdp
 ];
 
 async function patchDocxSettings(blob: Blob): Promise<Blob> {
-  const zip = await JSZip.loadAsync(blob);
+  const zip = await JSZip.loadAsync(new Uint8Array(await blob.arrayBuffer()));
   const settingsPath = 'word/settings.xml';
   const current = await zip.file(settingsPath)?.async('string');
   if (current) {
