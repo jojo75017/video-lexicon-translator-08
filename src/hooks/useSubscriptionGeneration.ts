@@ -127,7 +127,7 @@ INSTRUCTIONS POUR LES PERSONNAGES:
 === FIN PERSONNAGES ===\n`;
   };
 
-  const generateChapterContent = async (chapter: Chapter, wordsPerChapter: number = 350, synopsis?: string, chapterIndex?: number, totalChapters?: number, previousChapterSummary?: string) => {
+  const generateChapterContent = async (chapter: Chapter, wordsPerChapter: number = 350, synopsis?: string, chapterIndex?: number, totalChapters?: number, previousChapterSummary?: string, allChapterTitles?: string[]) => {
     const contextLine = ebookTitle ? `\nCe chapitre fait partie de l'ebook intitulé "${ebookTitle}".` : '';
     const audienceLine = targetAudience ? `\nPublic cible : ${targetAudience}. Adapte le vocabulaire, le style d'écriture, la complexité des concepts et les exemples utilisés pour correspondre parfaitement à ce public.` : '';
     const tomeLine = tomeNumber ? `\nCeci est le Tome ${tomeNumber} d'une série.` : '';
@@ -164,9 +164,14 @@ INSTRUCTIONS POUR LES PERSONNAGES:
     const previousContext = previousChapterSummary 
       ? `\n\nRésumé du chapitre précédent (pour assurer la continuité):\n${previousChapterSummary}\n\nAssure une transition fluide depuis ce qui précède.` 
       : '';
-    
+
+    // Plan complet du livre : indispensable pour éviter les doublons entre chapitres
+    const planContext = (allChapterTitles && allChapterTitles.length > 0)
+      ? `\n\n=== PLAN COMPLET DU LIVRE (pour éviter toute répétition) ===\n${allChapterTitles.map((t, i) => `${i + 1}. ${t}`).join('\n')}\n=== FIN DU PLAN ===\n\n⚠️ ANTI-DOUBLONS (RÈGLE ABSOLUE):\n- Rédige UNIQUEMENT ce qui relève de CE chapitre ("${chapter.title}"). Les autres chapitres ci-dessus traitent leurs propres sujets : n'empiète JAMAIS dessus.\n- Ne réintroduis PAS le contexte, le décor, l'univers ni les personnages déjà présentés : suppose que le lecteur a lu les chapitres précédents.\n- Ne réutilise aucune phrase, formule d'accroche, description ni passage déjà écrits dans un autre chapitre. Chaque chapitre doit apporter du contenu NOUVEAU.`
+      : '';
+
     const finalWordTarget = chapterLength ? effectiveWordCount : wordsPerChapter;
-    const prompt = `Tu es un auteur expert. Rédige un chapitre complet de MINIMUM ${finalWordTarget} mots sur le sujet : "${chapter.title}".${contextLine}${audienceLine}${tomeLine}${genreLine}${styleLine}${lengthLine}${detailLine}${toneLine}${narrativeLine}${positionContext}${descriptionContext}${charactersContext}${synopsisContext}${previousContext}
+    const prompt = `Tu es un auteur expert. Rédige un chapitre complet de MINIMUM ${finalWordTarget} mots sur le sujet : "${chapter.title}".${contextLine}${audienceLine}${tomeLine}${genreLine}${styleLine}${lengthLine}${detailLine}${toneLine}${narrativeLine}${positionContext}${descriptionContext}${charactersContext}${synopsisContext}${previousContext}${planContext}
     
 ⚠️ CONTRAINTE DE LONGUEUR ABSOLUE:
 - Ce chapitre DOIT contenir AU MINIMUM ${finalWordTarget} mots.
@@ -269,6 +274,7 @@ INSTRUCTIONS CRITIQUES:
 3. Chaque chapitre doit avoir un objectif clair et s'enchaîner naturellement avec le suivant
 4. Ne crée AUCUN sous-chapitre : l'ebook simple doit contenir uniquement des chapitres principaux
 5. ${bookDescription ? 'RESPECTE IMPÉRATIVEMENT la description fournie ci-dessus' : 'Crée une structure originale et engageante basée sur le titre'}
+6. ANTI-DOUBLONS: tous les titres doivent être DIFFÉRENTS les uns des autres, sans recoupement thématique. Chaque chapitre couvre une ÉTAPE DISTINCTE de l'arc narratif (situation initiale → montée de tension → climax → résolution). N'aborde JAMAIS deux fois le même événement, le même thème ou la même idée dans des chapitres différents.
 
 Le plan doit contenir exactement ${numberOfChapters} chapitres principaux.
 
@@ -292,11 +298,23 @@ Format JSON attendu (réponds UNIQUEMENT avec le JSON, sans texte additionnel):
         const cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
         const parsed: { chapters?: Array<Record<string, unknown>> } & Record<string, unknown> = JSON.parse(cleanContent);
         if (Array.isArray(parsed?.chapters)) {
-          parsed.chapters = parsed.chapters.map((chapter) => ({
+          // Garde-fou anti-doublons : supprimer les titres identiques ou quasi identiques
+          const normalizeTitle = (s: string) => (s || '')
+            .toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]+/g, ' ').trim();
+          const seen = new Set<string>();
+          const deduped = parsed.chapters.filter((chapter) => {
+            const key = normalizeTitle(String((chapter as Record<string, unknown>).title || ''));
+            if (!key || seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          });
+          parsed.chapters = deduped.map((chapter) => ({
             ...chapter,
             subChapters: [],
           }));
         }
+
         // Toast supprimé - génération silencieuse
         return parsed;
       } catch (error) {
