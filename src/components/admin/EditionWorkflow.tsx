@@ -2,14 +2,24 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Check, ChevronDown, Lock, Play, Trophy, BookOpen, ArrowRight, Sparkles, FileText,
+  KeyRound, CheckCircle2, Clock, FileText as FileTextIcon,
 } from 'lucide-react';
 import { getModuleById, type V3Module } from '@/data/roadmapV3';
 import {
   EDITION_AGENTS, EDITION_DEPARTMENTS, getAgentsForTier,
-  V3_AGENT_COUNT, V4_AGENT_COUNT, type EditionAgent,
+  V3_AGENT_COUNT, V4_AGENT_COUNT, type EditionAgent, type EditionTier,
 } from '@/data/editionAgents';
 import WorkflowBookConfigForm from '@/components/ebook/WorkflowBookConfigForm';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { EbookSettingsPanel } from '@/components/ebook/EbookSettingsPanel';
+import { parseManuscript, countWords } from '@/lib/manuscriptParser';
+import { estimatePages } from '@/utils/kdpPageDensity';
+import {
+  getProvider, getProviderKey, validateKeyFormat, getOpenRouterModel,
+  PROVIDER_LABELS, OPENROUTER_MODELS,
+} from '@/services/aiWritingService';
+
 
 // Palette « Clair Ambre » (identique au Hub).
 const AMBER = '#E8951E';
