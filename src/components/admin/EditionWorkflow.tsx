@@ -529,10 +529,11 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
               </div>
 
               <div className="grid gap-2.5">
-                {agents.map((agent, agentIndex) => {
+                {agents.map((agent) => {
                   const isDone = done.has(agent.order);
                   const locked = agent.tier === 'v4' && !canV4;
                   const tierLabel = agent.tier === 'v4' ? 'V4 · 347€' : 'V3 · 197€';
+                  const visibleOrder = tierAgents.findIndex((a) => a.order === agent.order) + 1;
                   return (
                     <div key={agent.order}
                       className="flex items-start gap-3 rounded-2xl border p-3.5 transition-colors"
@@ -549,7 +550,7 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
                           background: isDone ? GREEN : '#fff',
                           color: isDone ? '#fff' : locked ? '#bcaa8c' : AMBER_DEEP,
                         }}>
-                        {isDone ? <Check className="h-4 w-4" /> : locked ? <Lock className="h-3.5 w-3.5" /> : agentIndex + 1}
+                        {isDone ? <Check className="h-4 w-4" /> : locked ? <Lock className="h-3.5 w-3.5" /> : visibleOrder}
                       </button>
 
                       <div className="flex-1 min-w-0">
