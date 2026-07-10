@@ -36,7 +36,7 @@ export const EbookGlobalDashboard: React.FC<EbookGlobalDashboardProps> = ({
 
     const chaptersWithContent = chapters.filter(ch => (ch.content && ch.content.length > 50) || (ch.subChapters || []).some(sc => sc.content && sc.content.length > 50)).length;
     const completionPercent = chapters.length > 0 ? Math.round((chaptersWithContent / chapters.length) * 100) : 0;
-    const estimatedPages = Math.ceil(totalWords / 250);
+    const estimatedPages = estimatePages(totalWords, formatId);
     const readingTime = Math.ceil(totalWords / 200);
 
     return { totalWords, chaptersWithContent, totalChapters: chapters.length, completionPercent, estimatedPages, readingTime };
