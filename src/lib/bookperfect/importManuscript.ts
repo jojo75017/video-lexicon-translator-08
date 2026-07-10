@@ -20,7 +20,7 @@ const isTocStartLine = (line: string) => /^(?:table des matières|table des mati
 
 const isLikelyTocEntry = (line: string) => {
   const l = line.trim();
-  return isChapterLikeLine(l) && (/[.·•…]{2,}\s*\d{1,4}$/.test(l) || /\s+\d{1,4}$/.test(l));
+  return /[.·•…]{2,}\s*\d{1,4}$/.test(l) || (isChapterLikeLine(l) && /\s+\d{1,4}$/.test(l));
 };
 
 const stripExistingTableOfContents = (text: string): string => {
