@@ -586,7 +586,7 @@ export async function generateCorrectedPdfBlob(
   };
 
   const writeWrapped = (text: string, x: number, y: number, fontSize = bodyFontSize, style: 'normal' | 'bold' | 'italic' = 'normal') => {
-    doc.setFont(pdfFont, style);
+    doc.setFont(pdfFont, style === 'italic' ? 'italic' : 'normal');
     doc.setFontSize(fontSize);
     const localLineH = fontSize * 0.352778 * 1.45;
     const lines: string[] = doc.splitTextToSize(text, pageWidthMm - x - currentRight);
@@ -639,7 +639,7 @@ export async function generateCorrectedPdfBlob(
   if (options.toc) {
     newPage();
     let y = topMm + lineH;
-    y = writeWrapped('Table des matières', currentLeft, y, 18, 'bold') + titleGap * 0.3;
+    y = writeWrapped('Table des matières', currentLeft, y, 18) + titleGap * 0.3;
     doc.setFont(pdfFont, 'normal');
     doc.setFontSize(bodyFontSize);
     tocItems.forEach((item) => {
@@ -651,14 +651,14 @@ export async function generateCorrectedPdfBlob(
   for (const chapter of chapters) {
     newPage();
     let y = topMm + lineH;
-    y = writeWrapped(exportChapterTitle(chapter), currentLeft, y, 18, 'bold') + titleGap;
+    y = writeWrapped(exportChapterTitle(chapter), currentLeft, y, 18) + titleGap;
 
     doc.setFont(pdfFont, 'normal');
     doc.setFontSize(bodyFontSize);
     const blocks = correctedExportBlocks(chapter, analysis, applyTypography);
     for (const block of blocks) {
       if (block.type === 'heading') {
-        y = writeWrapped(block.text, currentLeft, y + lineH * 0.35, block.level === 3 ? 13 : 14, 'bold') + lineH * 0.25;
+        y = writeWrapped(block.text, currentLeft, y + lineH * 0.35, block.level === 3 ? 13 : 14) + lineH * 0.25;
       } else {
         y = writeWrapped(block.text, currentLeft, y, bodyFontSize) + paraGap;
       }
