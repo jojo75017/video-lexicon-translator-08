@@ -481,8 +481,8 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
         })}
       </div>
 
-      {/* Bandeau upsell V4 si offre V3 */}
-      {!canV4 && !loading && (
+      {/* Bandeau upsell V4 — affiché dans l'onglet V4 quand l'abonné n'a pas la V4 */}
+      {activeTier === 'v4' && !canV4 && !loading && (
         <div className="border-t px-5 sm:px-7 py-5" style={{ borderColor: '#f0e7d4', background: AMBER_SOFT }}>
           <div className="flex flex-wrap items-center gap-3">
             <div className="min-w-0 flex-1">
@@ -500,8 +500,19 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
           </div>
         </div>
       )}
+
+      {/* Panneau clés IA (BYOK) */}
+      <Dialog open={keysOpen} onOpenChange={setKeysOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Choisir mon IA · Clés API & réglages</DialogTitle>
+          </DialogHeader>
+          <EbookSettingsPanel />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
+
 
 export default EditionWorkflow;
