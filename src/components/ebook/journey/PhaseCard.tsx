@@ -148,17 +148,23 @@ export const PhaseCard: React.FC<PhaseCardProps> = ({ phase, ctx, isActive, onNa
                       style={{ color: phase.color }}
                     />
                   </div>
-                  {step.highlight && !done && (
+                  {!done && (
                     <Button
                       size="sm"
-                      className="w-full mt-3 text-white hover:opacity-90"
-                      style={{ backgroundColor: phase.color }}
+                      variant={step.highlight ? 'default' : 'outline'}
+                      className={`w-full mt-3 ${step.highlight ? 'text-white hover:opacity-90' : ''}`}
+                      style={
+                        step.highlight
+                          ? { backgroundColor: phase.color }
+                          : { borderColor: phase.color, color: phase.color }
+                      }
                       onClick={(e) => {
                         e.stopPropagation();
                         onNavigate(step.tabId, step.externalRoute);
                       }}
                     >
-                      Ouvrir <ArrowRight className="w-3 h-3 ml-1" />
+                      {step.highlight ? 'Ouvrir (recommandé)' : 'Choisir cette option'}
+                      <ArrowRight className="w-3 h-3 ml-1" />
                     </Button>
                   )}
                 </div>
