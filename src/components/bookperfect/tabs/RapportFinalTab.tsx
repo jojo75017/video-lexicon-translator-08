@@ -154,7 +154,7 @@ export const RapportFinalTab: React.FC<Props> = ({ manuscript, analysis, onRelau
                 <div
                   className="absolute border border-dashed border-primary/60 bg-primary/5"
                   style={{
-                    inset: `${(preview.margin / preview.height) * 72 * (preview.width / preview.width)}px`,
+                    inset: `${(preview.margin / preview.width) * 72}px`,
                   }}
                 />
               </div>
