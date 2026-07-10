@@ -21,7 +21,7 @@ export interface V3Offer {
 export const V3_OFFERS: V3Offer[] = [
   {
     key: 'v3-base',
-    name: 'Publication Assistée Pro V3 — Base',
+    name: 'V3 — Publication Assistée Pro (22 agents)',
     price: V3_PRICE, // 197
     installments: ['1×197€', '3×69€'],
     tagline: 'Écrire, illustrer, formater et publier proprement sur KDP.',
