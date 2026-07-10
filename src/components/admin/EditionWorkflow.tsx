@@ -298,10 +298,16 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
     persist(next);
   }, [done, persist]);
 
-  // Agents de l'onglet actif (V3 = 197€, V4 = bonus 347€).
-  const tierAgents = useMemo(() => EDITION_AGENTS.filter((a) => a.tier === activeTier), [activeTier]);
+  // Agents de l'onglet actif.
+  // V3 (197€) = 22 agents de base uniquement.
+  // V4 (347€) = parcours COMPLET (base + premium), organisé en phases : un vrai
+  // processus supérieur de bout en bout, pas seulement les agents bonus.
+  const tierAgents = useMemo(
+    () => (activeTier === 'v4' ? EDITION_AGENTS : EDITION_AGENTS.filter((a) => a.tier === 'v3')),
+    [activeTier],
+  );
   const v3Count = useMemo(() => EDITION_AGENTS.filter((a) => a.tier === 'v3').length, []);
-  const v4Count = useMemo(() => EDITION_AGENTS.filter((a) => a.tier === 'v4').length, []);
+  const v4Count = EDITION_AGENTS.length;
   const total = tierAgents.length;
   const completed = tierAgents.filter((a) => done.has(a.order)).length;
   const pct = total ? Math.round((completed / total) * 100) : 0;
