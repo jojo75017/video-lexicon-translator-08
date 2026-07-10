@@ -173,7 +173,7 @@ function ModuleCard({
 }
 
 
-type HubTab = 'parcours' | 'outils' | 'documentation' | 'livres' | 'guides' | 'offres' | 'roadmap' | 'script' | 'assistant' | 'bookperfect';
+type HubTab = 'parcours' | 'outils' | 'documentation' | 'livres' | 'guides' | 'offres' | 'roadmap' | 'script' | 'assistant' | 'bookperfect' | 'export';
 
 const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon }[] = [
   { id: 'parcours', label: 'Parcours', icon: Compass },
@@ -186,6 +186,7 @@ const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon }[] = [
   { id: 'script', label: 'Script vidéo', icon: FileText },
   { id: 'assistant', label: "Parler avec l'IA", icon: Bot },
   { id: 'bookperfect', label: 'BookPerfect AI', icon: BookOpen },
+  { id: 'export', label: 'Exporter le livre', icon: Download },
 ];
 
 const TAB_STORAGE_KEY = 'v3hub_active_tab';
