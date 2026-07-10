@@ -7,7 +7,7 @@ import { importManuscript } from '@/lib/bookperfect/importManuscript';
 import type { Manuscript } from '@/lib/bookperfect/types';
 
 interface Props {
-  onImported: (m: Manuscript) => void;
+  onImported: (m: Manuscript) => void | Promise<void>;
   onResume?: () => void;
   resumeLabel?: string;
 }
@@ -21,8 +21,8 @@ export const BookPerfectDashboard: React.FC<Props> = ({ onImported, onResume, re
     setLoading(true);
     try {
       const m = await importManuscript(file);
-      toast.success(`Manuscrit importé : ${m.chapters.length} chapitres, ~${m.pageEstimate} pages.`);
-      onImported(m);
+      await onImported(m);
+      toast.success(`Manuscrit importé et sauvegardé : ${m.chapters.length} chapitres, ~${m.pageEstimate} pages.`);
     } catch (e: any) {
       toast.error(e?.message || "Impossible d'importer ce fichier.");
     } finally {
