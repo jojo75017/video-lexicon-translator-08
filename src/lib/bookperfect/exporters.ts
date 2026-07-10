@@ -531,17 +531,14 @@ export async function generateCorrectedPdfBlob(
   const pageHeightMm = inchesToMm(twipsToInches(format.height));
 
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pageWidthMm, pageHeightMm], compress: true });
-  // Le PDF doit rester parfaitement lisible et stable dans les prévisualiseurs
-  // KDP. Le DOCX conserve Garamond ; le PDF utilise une police PDF intégrée
-  // fiable pour éviter les lettres capitales visuellement espacées/déformées.
-  const pdfFont = 'helvetica';
+  // Police PDF intégrée et uniforme pour éviter toute substitution fragile.
+  const pdfFont = 'times';
   doc.setFont(pdfFont, 'normal');
 
   const insideMm = inchesToMm(margins.insideInches);
   const outsideMm = inchesToMm(margins.outsideInches);
   const topMm = inchesToMm(margins.topInches);
   const bottomMm = inchesToMm(margins.bottomInches);
-  const contentW = pageWidthMm - insideMm - outsideMm;
   const bodyFontSize = options.fontSize;
   const lineH = bodyFontSize * 0.352778 * 1.45;
   const paraGap = lineH * 0.7;
@@ -588,17 +585,45 @@ export async function generateCorrectedPdfBlob(
     return topMm + lineH;
   };
 
-  const writeWrapped = (text: string, x: number, y: number, fontSize = bodyFontSize) => {
-    doc.setFont(pdfFont, 'normal');
+  const writeWrapped = (text: string, x: number, y: number, fontSize = bodyFontSize, style: 'normal' | 'bold' | 'italic' = 'normal') => {
+    doc.setFont(pdfFont, style);
     doc.setFontSize(fontSize);
     const localLineH = fontSize * 0.352778 * 1.45;
-    const lines: string[] = doc.splitTextToSize(text, pageWidthMm - currentLeft - currentRight);
+    const lines: string[] = doc.splitTextToSize(text, pageWidthMm - x - currentRight);
     for (const line of lines) {
       y = ensureSpace(y, localLineH);
       doc.text(line, x, y);
       y += localLineH;
     }
     return y;
+  };
+
+  const writeTocRow = (item: TocItem, y: number) => {
+    const fontSize = item.level === 1 ? bodyFontSize : Math.max(10, bodyFontSize - 1);
+    const indent = item.level === 1 ? 0 : item.level === 2 ? 5 : 9;
+    const x = currentLeft + indent;
+    const rightX = pageWidthMm - currentRight;
+    const localLineH = fontSize * 0.352778 * 1.35;
+    y = ensureSpace(y, localLineH);
+    doc.setFont(pdfFont, 'normal');
+    doc.setFontSize(fontSize);
+    const pageText = String(item.page);
+    const available = rightX - x - doc.getTextWidth(pageText) - 4;
+    const lines: string[] = doc.splitTextToSize(item.text, Math.max(20, available));
+    doc.text(lines[0] || item.text, x, y);
+    if (lines.length === 1) {
+      doc.text(pageText, rightX, y, { align: 'right' });
+    }
+    y += localLineH;
+    for (const extra of lines.slice(1)) {
+      y = ensureSpace(y, localLineH);
+      doc.text(extra, x, y);
+      y += localLineH;
+    }
+    if (lines.length > 1) {
+      doc.text(pageText, rightX, y - localLineH, { align: 'right' });
+    }
+    return y + lineH * 0.15;
   };
 
   // Page de titre
@@ -608,17 +633,17 @@ export async function generateCorrectedPdfBlob(
   doc.text(doc.splitTextToSize(manuscript.title, pageWidthMm - insideMm - outsideMm), pageWidthMm / 2, pageHeightMm / 2 - 8, { align: 'center' });
 
   const chapters = exportableChapters(manuscript);
-  const chapterStartPages = estimateChapterStartPages(chapters, manuscript, options);
+  const tocItems = buildTocItems(chapters, manuscript, options);
 
   // Table des matières
   if (options.toc) {
     newPage();
     let y = topMm + lineH;
-    y = writeWrapped('Table des matières', currentLeft, y, 16) + titleGap * 0.3;
+    y = writeWrapped('Table des matières', currentLeft, y, 18, 'bold') + titleGap * 0.3;
     doc.setFont(pdfFont, 'normal');
     doc.setFontSize(bodyFontSize);
-    chapters.forEach((c, index) => {
-      y = writeWrapped(`${exportChapterTitle(c)}  ${chapterStartPages[index] ?? ''}`, currentLeft, y, bodyFontSize) + lineH * 0.2;
+    tocItems.forEach((item) => {
+      y = writeTocRow(item, y);
     });
   }
 
@@ -626,14 +651,17 @@ export async function generateCorrectedPdfBlob(
   for (const chapter of chapters) {
     newPage();
     let y = topMm + lineH;
-    y = writeWrapped(exportChapterTitle(chapter), currentLeft, y, 16) + titleGap;
+    y = writeWrapped(exportChapterTitle(chapter), currentLeft, y, 18, 'bold') + titleGap;
 
     doc.setFont(pdfFont, 'normal');
     doc.setFontSize(bodyFontSize);
-    const corrected = correctedExportText(chapter, analysis, applyTypography);
-    const paras = corrected.split(/\n\s*\n/).map((p) => p.trim().replace(/\n/g, ' ')).filter(Boolean);
-    for (const para of paras) {
-      y = writeWrapped(para, currentLeft, y, bodyFontSize) + paraGap;
+    const blocks = correctedExportBlocks(chapter, analysis, applyTypography);
+    for (const block of blocks) {
+      if (block.type === 'heading') {
+        y = writeWrapped(block.text, currentLeft, y + lineH * 0.35, block.level === 3 ? 13 : 14, 'bold') + lineH * 0.25;
+      } else {
+        y = writeWrapped(block.text, currentLeft, y, bodyFontSize) + paraGap;
+      }
     }
   }
 
