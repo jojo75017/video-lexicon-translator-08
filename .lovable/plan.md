@@ -1,75 +1,55 @@
-# Refonte : un vrai atelier d'édition, simple et carré
+# Fiche du livre + Onglet Export + Fonctions livre exclusives V4
 
-## Le problème actuel
-Le Hub 3 (`V3Workflow30.tsx`, 1706 lignes, ~100 modules répartis en phases repliables) est devenu une usine à gaz : trop d'étapes, trop d'erreurs, les gens se perdent. Et on ne voit jamais les titres des chapitres du livre.
+Trois chantiers, tous côté présentation/orchestration (aucun générateur IA ni logique de paiement modifié).
 
-## Ce qu'on construit
-Un **parcours unique, linéaire et lisible** qui reprend l'esprit du workflow V2 (une liste d'agents qu'on lance l'un après l'autre) mais en beaucoup plus propre, présenté comme une **maison d'édition** : chaque étape = un métier (agent) avec un nom clair. Deux niveaux :
+## 1. Fiche du livre (en haut du Parcours)
 
-- **V3 — 197€ : 22 agents** (de l'idée au livre publié sur KDP)
-- **V4 — 347€ : 30 agents** (les 22 + 8 métiers pour *vendre* comme un éditeur)
+Aujourd'hui l'onglet **Parcours** affiche directement les agents, sans endroit pour saisir les infos du livre. On ajoute un bloc **« Fiche du livre »** en tête de `EditionWorkflow.tsx`, avant la barre de progression.
 
-On abandonne l'appellation « Base / Pack Pro » au profit de **V3** et **V4**.
+- Réutilise `WorkflowBookConfigForm` (variant `plain`) : Titre*, Sous-titre, Auteur, Petite intro/sujet, Catégorie, Public cible, Nombre de chapitres.
+- Repliable (ouvert si aucun titre, replié une fois rempli).
+- Persistance `localStorage` sous `edition_book_config_v1`.
+- Émet `edition_book_config_updated` à chaque changement (structure + export se rafraîchissent).
+- Rappel visuel « Livre en cours : *Titre* — Auteur » pour éviter la confusion de projet (mauvais livre pris).
 
-## Les 22 agents V3 (197€)
+Le bloc « Structure du livre » (titres de chapitres auto-détectés) reste juste en dessous.
 
-**Studio Conception**
-1. Le Directeur Éditorial — cadre la promesse, le ton, l'angle
-2. L'Analyste de Marché — niche, catégories, 7 mots-clés KDP
-3. L'Architecte du Livre — **plan détaillé + titres de chapitres**
+## 2. Onglet « Export » sous BookPerfect
 
-**Atelier d'Écriture**
-4. Le Documentaliste — recherche & sources
-5. Le Romancier — rédige **chapitre par chapitre (titre affiché)**
-6. Le Styliste — humanise, donne votre voix
-7. Le Dialoguiste — dialogues & rythme
-8. Le Relieur — transitions et fil rouge
+Dans `src/pages/V3HubPage.tsx` :
+- Étendre `HubTab` avec `'export'`.
+- Ajouter l'entrée `HUB_TABS` **juste après `bookperfect`** : `{ id: 'export', label: 'Exporter le livre', icon: Download }`.
+- Rendu : composant existant `V3ExportPanel` (6 formats : DOCX KDP, EPUB, PDF impression/digital, TXT, HTML), alimenté par :
+  - `manuscript` : reconstitué depuis `ebook_workflow_results` (rédaction P10/P20, sinon P4/P3).
+  - `title` / `subtitle` / `author` : lus depuis `edition_book_config_v1`.
+- `V3ExportPanel` gère déjà l'état « manuscrit trop court » (message d'attente) et l'état « prêt ».
+- Pastille ambrée sur l'onglet quand le manuscrit détecté ≥ 50 caractères (= livre prêt à exporter).
 
-**Bureau de Révision**
-9. Le Correcteur — orthographe & grammaire
-10. Le Réviseur — cohérence & clarté
-11. Le Vérificateur des Faits
-12. Le Détecteur de clichés
-13. Le Comité de Lecture — avis bêta
+## 3. Fonctions livre exclusives V4 (347€)
 
-**Fabrication**
-14. Le Maquettiste — mise en page intérieure
-15. Le Rédacteur des pages liminaires — copyright, remerciements, fin
-16. Le Directeur Artistique — couverture (dos + 4e + bleed)
-17. Le Correcteur d'épreuves — BAT / bon à tirer
+La V4 n'ajoute plus seulement le Département Commercial : elle enrichit aussi **le livre lui‑même**. Ajout de nouveaux agents `tier: 'v4'` dans `src/data/editionAgents.ts`, placés dans les départements livre existants (visibles mais verrouillés « Débloquer V4 » pour les acheteurs V3) :
 
-**Publication**
-18. Le Responsable Métadonnées — titre, sous-titre, mots-clés, catégories KDP
-19. Le Rédacteur de 4e de couverture — description de vente
-20. Le Chef de Fabrication — export EPUB / PDF / DOCX
-21. Le Responsable Conformité KDP — checklist prépublication
-22. L'Humanisateur — bonus anti-détection IA
+| Agent (rôle) | Département | Mission | Module réel |
+| --- | --- | --- | --- |
+| L'Illustrateur | Atelier d'Écriture | Illustrations intérieures IA insérées dans les chapitres | moteur image de `cover-studio-pro` |
+| Le Traducteur | Atelier d'Écriture | Traduit le livre pour les marchés étrangers | `translation-markets` |
+| L'Éditeur littéraire (premium) | Bureau de Révision | Passe éditoriale approfondie + manuscrit enrichi (chapitres plus longs) | `developmental-edit` / `editorial` |
+| Le Directeur Audio | Fabrication | Version audio (audiobook) narrée + export | `audiobook-express` |
+| Le Directeur de Collection | Département Commercial | Sagas, séries & tomes (déjà V4) | `p17-series` |
 
-## Les 8 agents V4 en plus (347€) — « Département Commercial »
-23. L'Attaché de Presse — kit média & communiqués
-24. Le Community Manager — calendrier 30 j, TikTok, Pinterest
-25. Le Responsable Amazon Ads
-26. Le Responsable Partenariats & Influenceurs
-27. Le Responsable Distribution Large — wide, ISBN, dépôt légal
-28. Le Directeur Commercial — pricing, royalties, bundles
-29. Le Responsable Avis & Réputation — reviews, Goodreads
-30. Le Directeur de Collection — saga, séries, back-catalogue
+- V3 (197€) : reste à **22 agents** (les nouveaux V4 apparaissent verrouillés, en teaser).
+- V4 (347€) : passe à **~34 agents** (22 + livre premium + commercial).
+- `V3_AGENT_COUNT` / `V4_AGENT_COUNT` recalculés automatiquement (déjà dérivés du tableau).
+- Le bandeau upsell V4 et le badge d'en-tête reprennent le nouveau total.
 
-*(Les libellés exacts restent ajustables ; chaque agent est branché sur un module déjà existant du projet.)*
+### Détails techniques
+- `editionAgents.ts` : insérer les nouveaux agents avec `order` renumérotés proprement, `tier: 'v4'`, `department` = département livre concerné.
+- `EditionWorkflow.tsx` : aucune logique à changer (le rendu filtre déjà par `tier` et affiche « Débloquer V4 » sur les agents verrouillés). Ajout uniquement du bloc Fiche du livre en tête + lecture `edition_book_config_v1`.
+- `V3HubPage.tsx` : nouvel onglet Export + imports `V3ExportPanel` et `Download`.
+- Illustrations intérieures : réutilise la génération d'image existante (strict photoréalisme, conforme aux règles projet) ; aucun contenu fictif.
 
-## Correction « on ne voit pas les chapitres »
-- L'**Architecte** produit et affiche une **liste numérotée des titres de chapitres**.
-- Le **Romancier** affiche, pendant la rédaction, le titre du chapitre en cours et coche chaque chapitre terminé.
-- L'**export** (Chef de Fabrication) reprend ces mêmes titres.
+## Résultat attendu
 
-## Détails techniques
-
-1. **Nouveau composant propre** `src/components/admin/EditionWorkflow.tsx` — une seule liste d'étapes verticales (pas de phases repliables imbriquées), en-tête de progression, une carte par agent (nom métier, mission courte, bouton « Lancer », résultat déroulant, coche « fait »).
-2. **Source unique** `src/data/editionAgents.ts` : tableau des 30 agents `{ id, order, department, role, mission, moduleId, tier: 'v3' | 'v4' }`. Chaque `moduleId` pointe vers un composant/générateur déjà présent (`v3ModuleRegistry`).
-3. **Filtre par offre** : V3 affiche les agents `tier === 'v3'` (22) ; V4 affiche tout (30). L'entitlement est déjà géré par `useV3Entitlement` — on ajoute simplement la distinction V3/V4 (347€) via le pack déjà existant.
-4. **Titres de chapitres** : lire la structure produite par l'Architecte (résultat P3 / `results`) et afficher les titres ; réutiliser la même liste dans le Romancier et l'export (`V3ExportPanel`).
-5. **Nettoyage** : retirer `V3Workflow30.tsx` du Hub et le remplacer par `EditionWorkflow`. On garde les modules sous-jacents (couverture, export, conformité…) intacts — on ne change que l'orchestration/présentation.
-6. **Tarifs** : mettre à jour `roadmapV3.ts` / `v3Launch.ts` pour parler de **V3 197€ / V4 347€** au lieu de Base / Pack Pro (mêmes prix, nouveaux libellés).
-
-## Ce qu'on ne touche pas
-La logique d'appel IA, les générateurs de chaque module, l'export multi-format et le paiement restent inchangés : on refait uniquement l'orchestration et la présentation (frontend), pour un parcours clair et carré.
+- **Parcours** : Fiche du livre → Structure → Agents (V3 = 22, avec agents V4 en teaser) → progression.
+- **Exporter le livre** (sous BookPerfect) : export 6 formats reprenant le bon titre/auteur, actif dès que le manuscrit est prêt.
+- **V4** : en plus du commercial, apporte illustrations intérieures, audiobook, manuscrit premium et traductions/séries.

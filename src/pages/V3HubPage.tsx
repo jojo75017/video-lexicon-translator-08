@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Sparkles, Compass, Lock, ArrowRight, Wand2, CheckCircle2, Layers, Bot, Infinity as InfinityIcon, ShieldCheck, Save, Image as ImageIcon, BookOpen, GraduationCap, Gem, Map as MapIcon, FileText, Copy, Check, Menu, X, PanelLeftClose, PanelLeftOpen, Gauge, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, Search, Sparkles, Compass, Lock, ArrowRight, Wand2, CheckCircle2, Layers, Bot, Infinity as InfinityIcon, ShieldCheck, Save, Image as ImageIcon, BookOpen, GraduationCap, Gem, Map as MapIcon, FileText, Copy, Check, Menu, X, PanelLeftClose, PanelLeftOpen, Gauge, Download, type LucideIcon } from 'lucide-react';
 import {
   V3_MODULES, V3_PILLAR_META, getModuleAccess, getModuleById, type V3Pillar, type V3Module,
 } from '@/data/roadmapV3';
@@ -11,6 +11,7 @@ import CreateBookHub from '@/components/admin/CreateBookHub';
 import V2V3Compare from '@/components/admin/V2V3Compare';
 import V3PricingTiers from '@/components/admin/V3PricingTiers';
 import EditionWorkflow from '@/components/admin/EditionWorkflow';
+import V3ExportPanel from '@/components/admin/V3ExportPanel';
 import V3AccessRecap from '@/components/admin/V3AccessRecap';
 import V3LaunchLinks from '@/components/admin/V3LaunchLinks';
 import V3GuidesSection from '@/components/admin/V3GuidesSection';
@@ -173,7 +174,7 @@ function ModuleCard({
 }
 
 
-type HubTab = 'parcours' | 'outils' | 'documentation' | 'livres' | 'guides' | 'offres' | 'roadmap' | 'script' | 'assistant' | 'bookperfect';
+type HubTab = 'parcours' | 'outils' | 'documentation' | 'livres' | 'guides' | 'offres' | 'roadmap' | 'script' | 'assistant' | 'bookperfect' | 'export';
 
 const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon }[] = [
   { id: 'parcours', label: 'Parcours', icon: Compass },
@@ -186,9 +187,38 @@ const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon }[] = [
   { id: 'script', label: 'Script vidéo', icon: FileText },
   { id: 'assistant', label: "Parler avec l'IA", icon: Bot },
   { id: 'bookperfect', label: 'BookPerfect AI', icon: BookOpen },
+  { id: 'export', label: 'Exporter le livre', icon: Download },
 ];
 
 const TAB_STORAGE_KEY = 'v3hub_active_tab';
+
+/** Reconstitue le manuscrit depuis les résultats du workflow (rédaction P10/P20, sinon plan P4/P3). */
+function readHubManuscript(): string {
+  try {
+    const raw = localStorage.getItem('ebook_workflow_results');
+    if (!raw) return '';
+    const data = JSON.parse(raw);
+    for (const key of ['P20', 'P10', 'P4', 'P3']) {
+      const c = data?.[key]?.displayContent;
+      if (typeof c === 'string' && c.trim().length >= 50) return c;
+    }
+    return '';
+  } catch {
+    return '';
+  }
+}
+
+/** Lit la fiche du livre saisie dans le Parcours. */
+function readHubBookConfig(): { title: string; subtitle: string; author: string } {
+  try {
+    const raw = localStorage.getItem('edition_book_config_v1');
+    if (!raw) return { title: '', subtitle: '', author: '' };
+    const c = JSON.parse(raw);
+    return { title: c?.title || '', subtitle: c?.subtitle || '', author: c?.author || '' };
+  } catch {
+    return { title: '', subtitle: '', author: '' };
+  }
+}
 
 const V3HubPage: React.FC = () => {
   const navigate = useNavigate();
@@ -320,6 +350,9 @@ const V3HubPage: React.FC = () => {
           >
             <Icon className="h-[18px] w-[18px] shrink-0" style={{ color: active ? AMBER_DEEP : '#b29a72' }} />
             {!collapsed && <span>{t.label}</span>}
+            {t.id === 'export' && readHubManuscript().length >= 50 && (
+              <span className={`h-2 w-2 rounded-full ${collapsed ? '' : 'ml-auto'}`} style={{ background: AMBER_DEEP }} title="Manuscrit prêt à exporter" />
+            )}
           </button>
         );
       })}
@@ -1233,6 +1266,37 @@ const V3HubPage: React.FC = () => {
             </div>
           </section>
         )}
+
+        {/* ===================== ONGLET EXPORT ===================== */}
+        {activeTab === 'export' && (
+          <section className="space-y-5">
+            <div className="rounded-2xl border p-5 sm:p-6" style={{ background: '#fff', borderColor: `${AMBER}44` }}>
+              <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-wider" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44`, color: AMBER_DEEP }}>
+                <Download className="h-3.5 w-3.5" /> Étape finale
+              </div>
+              <h2 className="mt-4 text-3xl sm:text-4xl font-medium leading-tight" style={{ fontFamily: SERIF, color: INK }}>
+                Exporter le livre
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed" style={{ color: '#6f5e47' }}>
+                Une fois le manuscrit terminé, téléchargez-le dans tous les formats prêts pour Amazon KDP
+                (DOCX, EPUB, PDF impression et digital, TXT, HTML). Le titre et l'auteur reprennent votre
+                Fiche du livre.
+              </p>
+            </div>
+            {(() => {
+              const cfg = readHubBookConfig();
+              return (
+                <V3ExportPanel
+                  manuscript={readHubManuscript()}
+                  title={cfg.title}
+                  subtitle={cfg.subtitle}
+                  author={cfg.author}
+                />
+              );
+            })()}
+          </section>
+        )}
+
       </main>
       </div>
       {/* fin colonne de contenu */}

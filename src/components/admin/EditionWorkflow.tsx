@@ -1,13 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Check, ChevronDown, Lock, Play, Trophy, BookOpen, ArrowRight, Sparkles,
+  Check, ChevronDown, Lock, Play, Trophy, BookOpen, ArrowRight, Sparkles, FileText,
 } from 'lucide-react';
 import { getModuleById, type V3Module } from '@/data/roadmapV3';
 import {
   EDITION_AGENTS, EDITION_DEPARTMENTS, getAgentsForTier,
   V3_AGENT_COUNT, V4_AGENT_COUNT, type EditionAgent,
 } from '@/data/editionAgents';
+import WorkflowBookConfigForm from '@/components/ebook/WorkflowBookConfigForm';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
 
 // Palette « Clair Ambre » (identique au Hub).
@@ -19,6 +20,32 @@ const GREEN = '#1f9d6b';
 const SERIF = "'Instrument Serif', Georgia, 'Times New Roman', serif";
 
 const DONE_KEY = 'edition_workflow_done_v1';
+const CONFIG_KEY = 'edition_book_config_v1';
+
+interface EditionBookConfig {
+  title: string;
+  subtitle: string;
+  author: string;
+  description: string;
+  genre: string;
+  targetAudience: string;
+  numberOfChapters: number;
+}
+
+const EMPTY_CONFIG: EditionBookConfig = {
+  title: '', subtitle: '', author: '', description: '',
+  genre: '', targetAudience: '', numberOfChapters: 8,
+};
+
+function readConfig(): EditionBookConfig {
+  try {
+    const raw = localStorage.getItem(CONFIG_KEY);
+    if (!raw) return { ...EMPTY_CONFIG };
+    return { ...EMPTY_CONFIG, ...JSON.parse(raw) };
+  } catch {
+    return { ...EMPTY_CONFIG };
+  }
+}
 
 function readDone(): Set<number> {
   try {
@@ -74,6 +101,17 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
   const [done, setDone] = useState<Set<number>>(() => readDone());
   const [openChapters, setOpenChapters] = useState(true);
   const [chapters, setChapters] = useState<string[]>(() => readChapterTitles());
+  const [config, setConfig] = useState<EditionBookConfig>(() => readConfig());
+  const [openConfig, setOpenConfig] = useState(() => !readConfig().title.trim());
+
+  const updateConfig = useCallback((patch: Partial<EditionBookConfig>) => {
+    setConfig((prev) => {
+      const next = { ...prev, ...patch };
+      try { localStorage.setItem(CONFIG_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+      try { window.dispatchEvent(new Event('edition_book_config_updated')); } catch { /* ignore */ }
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
     const refresh = () => setChapters(readChapterTitles());
@@ -145,6 +183,46 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
           )}
         </div>
       </div>
+
+      {/* Fiche du livre — infos du manuscrit à rédiger */}
+      <div className="border-t px-5 sm:px-7 py-4" style={{ borderColor: '#f0e7d4', background: '#fff' }}>
+        <button onClick={() => setOpenConfig((v) => !v)}
+          className="w-full flex items-center gap-2 text-left" aria-expanded={openConfig}>
+          <FileText className="h-4 w-4" style={{ color: AMBER_DEEP }} />
+          <span className="text-sm font-bold" style={{ color: INK }}>Fiche du livre</span>
+          {config.title.trim() ? (
+            <span className="text-[11px] truncate max-w-[55%]" style={{ color: '#a18a6c' }}>
+              Livre en cours : <strong style={{ color: AMBER_DEEP }}>{config.title.trim()}</strong>
+              {config.author.trim() ? ` — ${config.author.trim()}` : ''}
+            </span>
+          ) : (
+            <span className="text-[11px]" style={{ color: '#c0392b' }}>à remplir avant de lancer les agents</span>
+          )}
+          <ChevronDown className={`ml-auto h-4 w-4 transition-transform ${openConfig ? 'rotate-180' : ''}`} style={{ color: AMBER_DEEP }} />
+        </button>
+        {openConfig && (
+          <div className="mt-4">
+            <WorkflowBookConfigForm
+              variant="plain"
+              ebookTitle={config.title}
+              bookSubtitle={config.subtitle}
+              authorName={config.author}
+              bookDescription={config.description}
+              genre={config.genre}
+              targetAudience={config.targetAudience}
+              numberOfChapters={config.numberOfChapters}
+              onUpdateTitle={(v) => updateConfig({ title: v })}
+              onUpdateSubtitle={(v) => updateConfig({ subtitle: v })}
+              onUpdateAuthor={(v) => updateConfig({ author: v })}
+              onUpdateDescription={(v) => updateConfig({ description: v })}
+              onUpdateGenre={(v) => updateConfig({ genre: v })}
+              onUpdateTargetAudience={(v) => updateConfig({ targetAudience: v })}
+              onUpdateNumberOfChapters={(v) => updateConfig({ numberOfChapters: v })}
+            />
+          </div>
+        )}
+      </div>
+
 
       {/* Structure du livre — titres de chapitres */}
       <div className="border-t px-5 sm:px-7 py-4" style={{ borderColor: '#f0e7d4', background: '#FCF8F0' }}>
