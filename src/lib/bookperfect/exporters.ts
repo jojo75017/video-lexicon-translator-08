@@ -194,8 +194,11 @@ const isChapterLikeLine = (line: string) =>
 
 const isLikelyTocEntry = (line: string) => {
   const l = line.trim();
-  return isChapterLikeLine(l) && (/[.·•…]{2,}\s*\d{1,4}$/.test(l) || /\s+\d{1,4}$/.test(l));
+  return /[.·•…]{2,}\s*\d{1,4}$/.test(l) || (isChapterLikeLine(l) && /\s+\d{1,4}$/.test(l));
 };
+
+const exportChapterTitle = (chapter: Chapter) =>
+  chapter.title.replace(/\s*[.·•…]{2,}\s*\d{1,4}\s*$/, '').trim() || chapter.title;
 
 const stripTocBlock = (text: string) => {
   const lines = (text || '').replace(/\r\n/g, '\n').split('\n');
@@ -244,7 +247,7 @@ const exportableChapters = (manuscript: Manuscript) =>
   manuscript.chapters.filter((chapter) => !isFrontMatterOrTocChapter(chapter, manuscript.chapters.length));
 
 const correctedExportText = (chapter: Chapter, analysis: Analysis, applyTypography: boolean) =>
-  stripDuplicatedChapterTitle(chapter.title, stripTocBlock(correctedChapterText(chapter, analysis, applyTypography)));
+  stripDuplicatedChapterTitle(exportChapterTitle(chapter), stripTocBlock(correctedChapterText(chapter, analysis, applyTypography)));
 
 const estimateChapterStartPages = (chapters: Chapter[], manuscript: Manuscript, options: KdpExportOptions) => {
   const pageEstimate = estimateKdpPageCount(manuscript, options);
@@ -264,7 +267,7 @@ const buildManualTocDocx = (chapters: Chapter[], startPages: number[], opts: Kdp
   }),
   ...chapters.map((chapter, index) => new Paragraph({
     children: [
-      new TextRun({ text: chapter.title, size: fontSizeHalfPoints(opts.fontSize), font: opts.fontFamily }),
+      new TextRun({ text: exportChapterTitle(chapter), size: fontSizeHalfPoints(opts.fontSize), font: opts.fontFamily }),
       new TextRun({
         size: fontSizeHalfPoints(opts.fontSize),
         font: opts.fontFamily,
@@ -346,7 +349,7 @@ export async function generateCorrectedDocxBlob(
     if (i > 0) children.push(new Paragraph({ children: [new PageBreak()] }));
     children.push(new Paragraph({
       heading: HeadingLevel.HEADING_1,
-      children: [new TextRun({ text: chapter.title, bold: true, size: fontSizeHalfPoints(18), font: options.fontFamily })],
+      children: [new TextRun({ text: exportChapterTitle(chapter), bold: true, size: fontSizeHalfPoints(18), font: options.fontFamily })],
       spacing: { before: 240, after: 300 },
     }));
     const corrected = correctedExportText(chapter, analysis, applyTypography);
@@ -518,7 +521,7 @@ export async function generateCorrectedPdfBlob(
     doc.setFont(pdfFont, 'normal');
     doc.setFontSize(bodyFontSize);
     chapters.forEach((c, index) => {
-      y = writeWrapped(`${c.title}  ${chapterStartPages[index] ?? ''}`, currentLeft, y, bodyFontSize) + lineH * 0.2;
+      y = writeWrapped(`${exportChapterTitle(c)}  ${chapterStartPages[index] ?? ''}`, currentLeft, y, bodyFontSize) + lineH * 0.2;
     });
   }
 
@@ -526,7 +529,7 @@ export async function generateCorrectedPdfBlob(
   for (const chapter of chapters) {
     newPage();
     let y = topMm + lineH;
-    y = writeWrapped(chapter.title, currentLeft, y, 16) + titleGap;
+    y = writeWrapped(exportChapterTitle(chapter), currentLeft, y, 16) + titleGap;
 
     doc.setFont(pdfFont, 'normal');
     doc.setFontSize(bodyFontSize);

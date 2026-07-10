@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft, BookOpen, Play, RotateCcw, Sparkles, Bug, Feather, ShoppingCart, FileText, Square, Columns, Save,
+  ArrowLeft, BookOpen, Play, RotateCcw, Sparkles, Bug, Feather, ShoppingCart, FileText, Square, Columns, Save, FileDown,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -18,7 +18,7 @@ import { IssueListTab } from '@/components/bookperfect/shared/IssueListTab';
 import { AmazonKdpTab } from '@/components/bookperfect/tabs/AmazonKdpTab';
 import { ComparaisonTab } from '@/components/bookperfect/tabs/ComparaisonTab';
 import { RapportFinalTab } from '@/components/bookperfect/tabs/RapportFinalTab';
-import { exportKdpPackage, DEFAULT_KDP_OPTIONS } from '@/lib/bookperfect/exporters';
+import { exportKdpPackage, exportCorrectedDocx, exportCorrectedPdf, DEFAULT_KDP_OPTIONS } from '@/lib/bookperfect/exporters';
 import {
   runAnalysis, loadAnalysisAsync, loadRecoverySnapshotAsync, updateIssueStatus, BOOKPERFECT_RECOVERY_SCOPE, saveAnalysisSnapshotAsync, sanitizeAnalysisIssues,
 } from '@/lib/bookperfect/analysisOrchestrator';
@@ -64,6 +64,34 @@ const BookPerfectPage: React.FC = () => {
       toast.success('Pack KDP 6 × 9 exporté : Word + PDF + fiche marges ✓', { id: 'bp-kdp-page' });
     } catch (e: any) {
       toast.error(e?.message || 'Échec de la préparation KDP.', { id: 'bp-kdp-page' });
+    } finally {
+      setKdpBusy(false);
+    }
+  }, [manuscript, analysis]);
+
+  const exportDocx69 = useCallback(async () => {
+    if (!manuscript || !analysis) return;
+    try {
+      setKdpBusy(true);
+      toast.loading('Génération du Word 6 × 9…', { id: 'bp-docx-page' });
+      await exportCorrectedDocx(manuscript, analysis, true, { ...DEFAULT_KDP_OPTIONS, formatId: '6x9' });
+      toast.success('Word DOCX 6 × 9 exporté ✓', { id: 'bp-docx-page' });
+    } catch (e: any) {
+      toast.error(e?.message || 'Échec de l’export DOCX.', { id: 'bp-docx-page' });
+    } finally {
+      setKdpBusy(false);
+    }
+  }, [manuscript, analysis]);
+
+  const exportPdf69 = useCallback(async () => {
+    if (!manuscript || !analysis) return;
+    try {
+      setKdpBusy(true);
+      toast.loading('Génération du PDF 6 × 9…', { id: 'bp-pdf-page' });
+      await exportCorrectedPdf(manuscript, analysis, { ...DEFAULT_KDP_OPTIONS, formatId: '6x9' }, true);
+      toast.success('PDF 6 × 9 exporté ✓', { id: 'bp-pdf-page' });
+    } catch (e: any) {
+      toast.error(e?.message || 'Échec de l’export PDF.', { id: 'bp-pdf-page' });
     } finally {
       setKdpBusy(false);
     }
@@ -402,6 +430,8 @@ const BookPerfectPage: React.FC = () => {
                   <TabsTrigger value="comparer" className="gap-1"><Columns className="h-4 w-4" /> Comparer</TabsTrigger>
                   <TabsTrigger value="kdp" className="gap-1"><ShoppingCart className="h-4 w-4" /> Amazon KDP</TabsTrigger>
                   <TabsTrigger value="rapport" className="gap-1"><FileText className="h-4 w-4" /> Rapport</TabsTrigger>
+                  <TabsTrigger value="docx" className="gap-1"><FileDown className="h-4 w-4" /> DOCX</TabsTrigger>
+                  <TabsTrigger value="pdf" className="gap-1"><FileDown className="h-4 w-4" /> PDF</TabsTrigger>
                 </TabsList>
 
 
@@ -433,6 +463,36 @@ const BookPerfectPage: React.FC = () => {
                 </TabsContent>
                 <TabsContent value="rapport" className="mt-4">
                   <RapportFinalTab manuscript={manuscript} analysis={analysis} onRelaunchFailed={() => start(true)} />
+                </TabsContent>
+                <TabsContent value="docx" className="mt-4">
+                  <Card>
+                    <CardContent className="p-5 flex flex-wrap items-center gap-4">
+                      <div className="flex-1 min-w-[220px]">
+                        <div className="font-semibold">Export Word DOCX 6 × 9</div>
+                        <div className="text-sm text-muted-foreground">
+                          Inclut la table des matières, les marges miroir KDP et les doublons de titres retirés à l’export.
+                        </div>
+                      </div>
+                      <Button onClick={exportDocx69} disabled={kdpBusy} className="gap-2">
+                        <FileDown className="h-4 w-4" /> Télécharger DOCX
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                <TabsContent value="pdf" className="mt-4">
+                  <Card>
+                    <CardContent className="p-5 flex flex-wrap items-center gap-4">
+                      <div className="flex-1 min-w-[220px]">
+                        <div className="font-semibold">Export PDF 6 × 9</div>
+                        <div className="text-sm text-muted-foreground">
+                          Génère le PDF impression avec pagination et marges miroir droite/gauche pour KDP.
+                        </div>
+                      </div>
+                      <Button onClick={exportPdf69} disabled={kdpBusy} className="gap-2">
+                        <FileDown className="h-4 w-4" /> Télécharger PDF
+                      </Button>
+                    </CardContent>
+                  </Card>
                 </TabsContent>
               </Tabs>
             )}
