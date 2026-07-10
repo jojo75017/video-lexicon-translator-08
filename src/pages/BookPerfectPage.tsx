@@ -332,10 +332,13 @@ const BookPerfectPage: React.FC = () => {
               <Card className="border-primary/40 bg-primary/5">
                 <CardContent className="p-4 flex flex-wrap items-center gap-3">
                   <span className="text-sm flex-1 min-w-[200px]">
-                    ✅ Analyse disponible. Vos corrections et l'export Word (Amazon KDP) sont prêts dans l'onglet <strong>Rapport</strong>.
+                    ✅ Analyse terminée. Obtenez en un clic votre version prête à publier sur Amazon KDP (Word + PDF).
                   </span>
-                  <Button onClick={() => setActiveTab('rapport')} className="gap-2">
-                    <FileText className="h-4 w-4" /> Voir l'export
+                  <Button onClick={prepareForKdp} disabled={kdpBusy} className="gap-2">
+                    <BookOpen className="h-4 w-4" /> 📖 Préparer pour Amazon KDP (6 × 9)
+                  </Button>
+                  <Button variant="outline" onClick={() => setActiveTab('rapport')} className="gap-2">
+                    <FileText className="h-4 w-4" /> Personnaliser
                   </Button>
                 </CardContent>
               </Card>
