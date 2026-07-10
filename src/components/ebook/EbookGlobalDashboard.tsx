@@ -4,6 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { BookOpen, FileText, PenTool, Image, Download, BarChart3, Zap, CheckCircle2, Clock, AlertTriangle, Sparkles, ArrowRight } from 'lucide-react';
+import { useKdpFormat } from '@/hooks/useKdpFormat';
+import { estimatePages } from '@/utils/kdpPageDensity';
+import { KdpFormatSelect } from '@/components/ebook/KdpFormatSelect';
 
 interface Chapter {
   id: string;
@@ -27,6 +30,7 @@ interface EbookGlobalDashboardProps {
 export const EbookGlobalDashboard: React.FC<EbookGlobalDashboardProps> = ({
   ebookTitle, authorName, chapters, preface, conclusion, coverImage, kdpDescription, kdpKeywords, onNavigate
 }) => {
+  const { formatId } = useKdpFormat();
   const stats = useMemo(() => {
     const totalWords = chapters.reduce((sum, ch) => {
       const chWords = (ch.content || '').split(/\s+/).filter(Boolean).length;
@@ -36,11 +40,11 @@ export const EbookGlobalDashboard: React.FC<EbookGlobalDashboardProps> = ({
 
     const chaptersWithContent = chapters.filter(ch => (ch.content && ch.content.length > 50) || (ch.subChapters || []).some(sc => sc.content && sc.content.length > 50)).length;
     const completionPercent = chapters.length > 0 ? Math.round((chaptersWithContent / chapters.length) * 100) : 0;
-    const estimatedPages = Math.ceil(totalWords / 250);
+    const estimatedPages = estimatePages(totalWords, formatId);
     const readingTime = Math.ceil(totalWords / 200);
 
     return { totalWords, chaptersWithContent, totalChapters: chapters.length, completionPercent, estimatedPages, readingTime };
-  }, [chapters, preface, conclusion]);
+  }, [chapters, preface, conclusion, formatId]);
 
   const checklist = useMemo(() => [
     { label: 'Titre défini', done: !!ebookTitle.trim(), tab: 'planner' },
@@ -83,6 +87,12 @@ export const EbookGlobalDashboard: React.FC<EbookGlobalDashboardProps> = ({
           <Progress value={overallProgress} className="mt-4 h-2" />
         </CardContent>
       </Card>
+
+      {/* Format KDP → pilote l'estimation des pages */}
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-muted/30 px-3 py-2">
+        <KdpFormatSelect />
+        <span className="text-xs text-muted-foreground">Pagination estimée selon le format KDP sélectionné</span>
+      </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

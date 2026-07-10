@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Download, FileText, BookOpen, Loader2, CheckCircle2, Settings, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { Chapter } from '@/hooks/useSubscriptionGeneration';
+import { useKdpFormat } from '@/hooks/useKdpFormat';
+import { estimatePages } from '@/utils/kdpPageDensity';
 import { cleanGeneratedText } from '@/utils/textCleaner';
 import { exportProfessionalDocx } from '@/utils/docxExportEngine';
 import jsPDF from 'jspdf';
@@ -54,6 +56,7 @@ const stripChapterPrefix = (title: string, i: number): string => {
 export const EbookAdvancedExport: React.FC<EbookAdvancedExportProps> = ({
   ebookTitle, authorName, chapters, preface, conclusion, characters, coverImage, trimSize,
 }) => {
+  const { formatId } = useKdpFormat();
   const [selectedFormat, setSelectedFormat] = useState<ExportFormat>('docx-kdp');
   const [isExporting, setIsExporting] = useState(false);
   const [includeToc, setIncludeToc] = useState(true);
@@ -70,8 +73,8 @@ export const EbookAdvancedExport: React.FC<EbookAdvancedExportProps> = ({
         totalWords += (sc.content || '').split(/\s+/).filter(Boolean).length;
       });
     });
-    return { totalWords, pages: Math.ceil(totalWords / 250), chapters: chapters.length };
-  }, [chapters]);
+    return { totalWords, pages: estimatePages(totalWords, formatId), chapters: chapters.length };
+  }, [chapters, formatId]);
 
   const buildFullContent = () => {
     const parts: string[] = [];

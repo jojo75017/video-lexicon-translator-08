@@ -13,6 +13,9 @@ import { Chapter } from '@/hooks/useSubscriptionGeneration';
 import EbookNarrativeChecker from './EbookNarrativeChecker';
 import { callGemini } from '@/services/geminiService';
 import { combineMp3Blobs, requestTtsAudioChunks } from '@/utils/ttsRequest';
+import { useKdpFormat } from '@/hooks/useKdpFormat';
+import { estimatePages } from '@/utils/kdpPageDensity';
+import { KdpFormatSelect } from '@/components/ebook/KdpFormatSelect';
 
 interface Character {
   id: string;
@@ -58,6 +61,7 @@ export const EbookStatisticsTools: React.FC<EbookStatisticsToolsProps> = ({
   isDemo = false,
   onTranslate
 }) => {
+  const { formatId } = useKdpFormat();
   const [targetLanguage, setTargetLanguage] = useState('anglais');
   const [isTranslating, setIsTranslating] = useState(false);
   const [translationProgress, setTranslationProgress] = useState(0);
@@ -96,8 +100,8 @@ export const EbookStatisticsTools: React.FC<EbookStatisticsToolsProps> = ({
     const avgWordsPerSentence = totalSentences > 0 ? Math.round(totalWords / totalSentences) : 0;
     const readingTimeMinutes = Math.ceil(totalWords / 250);
     
-    // Estimation des pages (250 mots/page en moyenne)
-    const estimatedPages = Math.ceil(totalWords / 250);
+    // Estimation des pages selon le format KDP sélectionné
+    const estimatedPages = estimatePages(totalWords, formatId);
 
     // Score de lisibilité simplifié (basé sur la longueur moyenne des phrases)
     let readabilityLevel = 'Moyen';
@@ -119,7 +123,7 @@ export const EbookStatisticsTools: React.FC<EbookStatisticsToolsProps> = ({
       chaptersCount: chapters.length,
       subChaptersCount: chapters.reduce((acc, c) => acc + c.subChapters.length, 0)
     };
-  }, [preface, conclusion, epilogue, chapters]);
+  }, [preface, conclusion, epilogue, chapters, formatId]);
 
   // Statistiques par chapitre
   const chapterStats = useMemo(() => {
@@ -317,6 +321,11 @@ export const EbookStatisticsTools: React.FC<EbookStatisticsToolsProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Format KDP → pilote l'estimation des pages */}
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-muted/30 px-3 py-2">
+        <KdpFormatSelect />
+        <span className="text-xs text-muted-foreground">Pagination estimée selon le format KDP sélectionné</span>
+      </div>
       {/* Statistiques générales */}
       <Card>
         <CardHeader>

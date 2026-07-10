@@ -1,41 +1,54 @@
-# Plan — Supprimer les doublons dans la génération d'ebook
+# Plan — Estimation de pages fiable via un sélecteur de format KDP
 
-## Problème constaté
-Les 4 types de doublons viennent tous de la même cause racine : **chaque chapitre est rédigé sans connaître le contenu des autres**. Aujourd'hui l'IA reçoit la synopsis + un résumé du chapitre précédent, mais pas la liste complète des chapitres ni de consigne anti-répétition. Elle réintroduit donc le contexte, les personnages et des passages déjà écrits ailleurs, et le plan peut contenir des titres qui se recoupent.
+## Problème
+Le nombre de pages affiché dans les tableaux/stats est faux car il est **figé à 250 mots/page** dans ~15 endroits (`manuscriptStats.ts`, `EbookGlobalDashboard.tsx`, `EbookManuscriptDashboard.tsx`, `EbookPriceEstimator.tsx`, etc.). Ta mise en page KDP réelle tourne plutôt à ~305 mots/page selon le format (trim size), la police et l'interligne. Résultat : 67 200 mots affichés en ~269 pages au lieu de ~220 réelles.
 
 ## Objectif
-Faire en sorte qu'un ebook regénéré (ex. ton thriller « Le Chuchoteur de l'Oubli ») n'ait plus : passages répétés, titres similaires, réintros de contexte, ni chapitres en double — sans toucher au backend, aux prix ni au workflow V3.
+Introduire un **sélecteur de format KDP** partagé qui pilote une densité mots/page réaliste, et brancher **tous** les tableaux/estimations dessus pour une pagination cohérente.
 
-## Corrections (toutes dans `src/hooks/useSubscriptionGeneration.ts`)
+## Densités par format (source de vérité)
+On s'appuie sur les formats déjà définis dans `src/lib/bookperfect/exporters.ts` (`KdpFormatId`: `5x8`, `5.5x8.5`, `6x9`, `a4`, `a5`). Densités cible (mots/page, police roman ~11pt, interligne standard) :
 
-### 1. Plan : titres uniques et périmètres distincts
-Renforcer le prompt de `generateEbookPlan` :
-- Exiger des **titres de chapitres tous différents**, sans recoupement thématique.
-- Demander que **chaque chapitre couvre une étape distincte** de l'arc narratif (situation → montée → climax → résolution), sans zone qui empiète sur une autre.
-- Interdire explicitement de répéter un même événement/thème dans plusieurs chapitres.
+```text
+5 x 8       →  240 mots/page
+5.5 x 8.5   →  280 mots/page
+6 x 9       →  305 mots/page   (défaut, correspond à ta mise en page réelle)
+A5          →  300 mots/page
+A4          →  480 mots/page
+```
 
-### 2. Chapitre : passer le plan complet + anti-répétition
-Modifier `generateChapterContent` pour recevoir et injecter la **liste de tous les titres de chapitres** (numérotés), avec des consignes :
-- « Rédige UNIQUEMENT ce qui relève de ce chapitre. Les autres chapitres traitent les sujets ci-dessus — n'empiète pas dessus. »
-- « Ne réintroduis PAS le contexte, le décor ou les personnages déjà présentés : suppose que le lecteur a lu les chapitres précédents. »
-- « Ne réutilise aucune phrase, formule d'accroche ni passage déjà écrit ailleurs. »
+## Implémentation
 
-Mettre à jour l'appel dans `src/pages/EbookPlannerPage.tsx` (boucle de génération, ~ligne 1064) pour transmettre `currentChapters` (tous les titres) à `generateChapterContent`.
+### 1. Utilitaire central `src/utils/kdpPageDensity.ts` (nouveau)
+- `KDP_PAGE_DENSITY: Record<KdpFormatId, number>` (table ci-dessus).
+- `DEFAULT_KDP_FORMAT: KdpFormatId = '6x9'`.
+- `getWordsPerPage(formatId)` et `estimatePages(words, formatId)` (= `Math.ceil(words / densité)`).
 
-### 3. Garde-fou de déduplication (après génération du plan)
-Dans `generateEbookPlan`, après le parsing JSON :
-- **Dédupliquer les titres** identiques ou quasi identiques (comparaison normalisée : minuscules, sans accents/ponctuation). Si un doublon est détecté, le renuméroter/renommer ou le retirer et compléter pour garder `numberOfChapters`.
-- Garantir qu'aucun chapitre en double ne subsiste dans la liste renvoyée.
+### 2. Réglage partagé persistant `src/hooks/useKdpFormat.ts` (nouveau)
+- Hook léger lisant/écrivant le format choisi dans `localStorage` (clé `kdp_page_format`), défaut `6x9`, avec event pour synchro entre composants.
+- Expose `{ formatId, setFormatId, wordsPerPage }`.
 
-### 4. Détection visuelle des passages répétés (léger, front)
-Dans `EbookPlannerPage.tsx`, ajouter une petite vérification en mémoire (après génération complète) qui repère les paragraphes quasi identiques présents dans ≥ 2 chapitres et affiche un `toast.warning` non bloquant listant les chapitres concernés, pour que l'auteur puisse relancer/corriger ces chapitres ciblés. Aucune modification automatique du texte.
+### 3. Sélecteur d'UI réutilisable `src/components/ebook/KdpFormatSelect.tsx` (nouveau)
+- Petit `Select` (shadcn) listant les formats + densité affichée (« 6×9 — ~305 mots/page »).
+- Branché sur `useKdpFormat`. À placer au-dessus des tableaux principaux (dashboard global, dashboard manuscrit, tableau mots/chapitre).
+
+### 4. Brancher les estimations existantes
+Remplacer les `/ 250` codés en dur par `estimatePages(words, formatId)` / `getWordsPerPage(formatId)` :
+- `src/utils/manuscriptStats.ts` : ajouter un paramètre `formatId` (défaut `6x9`) à `computeManuscriptStats`; `WORDS_PER_PAGE_KDP` devient dynamique pour `totalPages` et `pages` par chapitre.
+- `src/components/ebook/EbookGlobalDashboard.tsx` : `estimatedPages` via `useKdpFormat` + `estimatePages`.
+- `src/components/ebook/EbookManuscriptDashboard.tsx` : idem (ligne 62).
+- `src/components/ebook/EbookStatisticsTools.tsx` : passer `formatId` à `computeManuscriptStats`.
+- `src/components/ebook/EbookChapterWordCount.tsx` : afficher la cible mots/chapitre en cohérence (optionnel : ajuster `targetWordsPerChapter` par défaut selon densité).
+- `src/components/ebook/EbookPriceEstimator.tsx` (ligne 116, `pages * 250`) : utiliser la densité du format.
+- Autres composants listés avec `/250` (export, workflow V3, series) : rebrancher sur `estimatePages` pour rester cohérents « partout ».
+
+### 5. Affichage tableau
+Là où le tableau de répartition est montré (page courante incluse), afficher le `KdpFormatSelect` juste au-dessus, avec une légende « Pagination estimée selon le format KDP sélectionné ». Le tableau se recalcule en direct au changement de format.
 
 ## Hors périmètre
-- Aucun changement backend, base de données, tarifs ni workflow V3.
-- Pas de réécriture automatique du contenu existant (non destructif).
-- Le compteur chapitres/sous-chapitres/pages/mots déjà en place n'est pas modifié.
+- Aucun changement backend, base de données, tarifs, ni workflow de génération/anti-doublons.
+- Pas de recalcul de l'export DOCX/PDF lui-même (déjà géré par `exporters.ts`) — on aligne seulement les **estimations affichées** sur le format choisi.
 
 ## Détails techniques
-- `generateChapterContent(chapter, wordsPerChapter, synopsis, chapterIndex, totalChapters, previousChapterSummary, allChapterTitles?)` — ajout d'un paramètre optionnel `allChapterTitles: string[]` injecté dans le prompt.
-- Normalisation pour la dedup : `str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim()`.
-- Détection de paragraphes dupliqués : découpe par `\n\n`, ignore les paragraphes < 40 mots, compare les versions normalisées, signale les collisions inter-chapitres.
+- Densités choisies pour coller aux moyennes KDP réelles (roman, marges officielles) ; `6x9 = 305` reproduit ta mesure 67 200 ÷ 220.
+- Chaque composant qui affiche des pages consomme `useKdpFormat()` puis `estimatePages(words, formatId)` — une seule source de vérité, zéro constante dupliquée.

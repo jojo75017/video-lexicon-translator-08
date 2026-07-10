@@ -7,6 +7,9 @@ import {
   TrendingUp, Award, Flame, AlertTriangle
 } from 'lucide-react';
 import { Chapter } from '@/hooks/useSubscriptionGeneration';
+import { useKdpFormat } from '@/hooks/useKdpFormat';
+import { estimatePages } from '@/utils/kdpPageDensity';
+import { KdpFormatSelect } from '@/components/ebook/KdpFormatSelect';
 
 interface EbookManuscriptDashboardProps {
   ebookTitle: string;
@@ -31,6 +34,7 @@ export const EbookManuscriptDashboard: React.FC<EbookManuscriptDashboardProps> =
   kdpKeywords,
   kdpCategories,
 }) => {
+  const { formatId } = useKdpFormat();
   const stats = useMemo(() => {
     const chapterStats = chapters.map((ch, i) => {
       const chapterWords = ch.content ? ch.content.split(/\s+/).filter(Boolean).length : 0;
@@ -59,7 +63,7 @@ export const EbookManuscriptDashboard: React.FC<EbookManuscriptDashboardProps> =
 
     const targetTotal = chapters.length * targetWordsPerChapter;
     const globalProgress = targetTotal > 0 ? Math.min(100, (totalWords / targetTotal) * 100) : 0;
-    const estimatedPages = Math.ceil(totalWords / 250);
+    const estimatedPages = estimatePages(totalWords, formatId);
     const readingTime = Math.ceil(totalWords / 200);
     const chaptersComplete = chapterStats.filter(c => c.progress >= 80).length;
 
@@ -76,7 +80,7 @@ export const EbookManuscriptDashboard: React.FC<EbookManuscriptDashboardProps> =
     qualityScore += Math.round(contentScore);
 
     return { chapterStats, totalWords, targetTotal, globalProgress, estimatedPages, readingTime, chaptersComplete, qualityScore };
-  }, [chapters, preface, conclusion, targetWordsPerChapter, ebookTitle, authorName, kdpDescription, kdpKeywords, kdpCategories]);
+  }, [chapters, preface, conclusion, targetWordsPerChapter, ebookTitle, authorName, kdpDescription, kdpKeywords, kdpCategories, formatId]);
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-500';
@@ -108,6 +112,12 @@ export const EbookManuscriptDashboard: React.FC<EbookManuscriptDashboardProps> =
 
   return (
     <div className="space-y-6">
+      {/* Format KDP → pilote l'estimation des pages */}
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-muted/30 px-3 py-2">
+        <KdpFormatSelect />
+        <span className="text-xs text-muted-foreground">Pagination estimée selon le format KDP sélectionné</span>
+      </div>
+
       {/* Header */}
       <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
         <CardHeader>

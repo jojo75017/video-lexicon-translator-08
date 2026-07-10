@@ -12,6 +12,9 @@ import { useV3Entitlement } from '@/hooks/useV3Entitlement';
 import V3ExportPanel from './V3ExportPanel';
 import V3PackCheckout from './V3PackCheckout';
 import WritingEngineBadge from '@/components/ebook/WritingEngineBadge';
+import { useKdpFormat } from '@/hooks/useKdpFormat';
+import { getWordsPerPage } from '@/utils/kdpPageDensity';
+import { KdpFormatSelect } from '@/components/ebook/KdpFormatSelect';
 
 // Palette « Clair Ambre » — cohérente avec V3HubPage.
 const AMBER = '#E8951E';
@@ -532,6 +535,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
 
   // Compteur du volume du livre. Si un manuscrit a été généré, on compte les mots
   // réels ; sinon on affiche une estimation à partir du brief (chapitres × mots/chapitre).
+  const { formatId } = useKdpFormat();
   const bookStats = useMemo(() => {
     const manuscript = results['p20-chat-manuscript'] || '';
     const chapters = Math.max(0, parseInt(brief.chapterCount || '', 10) || 0);
@@ -539,10 +543,11 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
     const realWords = manuscript.trim().split(/\s+/).filter(Boolean).length;
     const hasManuscript = realWords > 50;
     const totalWords = hasManuscript ? realWords : chapters * wordsPer;
-    const estimatedPages = totalWords > 0 ? Math.max(1, Math.ceil(totalWords / 300)) : 0;
+    const wordsPerPage = getWordsPerPage(formatId);
+    const estimatedPages = totalWords > 0 ? Math.max(1, Math.ceil(totalWords / wordsPerPage)) : 0;
     const readingMin = totalWords > 0 ? Math.max(1, Math.ceil(totalWords / 200)) : 0;
-    return { chapters, totalWords, estimatedPages, readingMin, isEstimate: !hasManuscript };
-  }, [brief.chapterCount, brief.wordsPerChapter, results]);
+    return { chapters, totalWords, estimatedPages, readingMin, wordsPerPage, isEstimate: !hasManuscript };
+  }, [brief.chapterCount, brief.wordsPerChapter, results, formatId]);
 
 
   // Progression calculée uniquement sur les étapes ACCESSIBLES (débloquées).
@@ -980,6 +985,9 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 {bookStats.isEstimate ? 'Estimation (brief)' : 'Manuscrit réel'}
               </span>
             </div>
+            <div className="mb-3">
+              <KdpFormatSelect />
+            </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               {[
                 { label: 'Chapitres', value: bookStats.chapters.toLocaleString('fr-FR'), icon: BookOpen },
@@ -996,8 +1004,8 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             </div>
             <p className="mt-2 text-[10px]" style={{ color: '#a18a6c' }}>
               {bookStats.isEstimate
-                ? 'Estimation basée sur le nombre de chapitres × mots par chapitre (≈ 300 mots/page, format 6×9 KDP).'
-                : 'Calculé sur le manuscrit réellement généré (≈ 300 mots/page).'}
+                ? `Estimation basée sur le nombre de chapitres × mots par chapitre (≈ ${bookStats.wordsPerPage} mots/page selon le format KDP sélectionné).`
+                : `Calculé sur le manuscrit réellement généré (≈ ${bookStats.wordsPerPage} mots/page selon le format KDP sélectionné).`}
             </p>
           </div>
 

@@ -11,6 +11,8 @@ import {
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Text, Environment, PresentationControls } from '@react-three/drei';
 import { Chapter } from '@/hooks/useSubscriptionGeneration';
+import { useKdpFormat } from '@/hooks/useKdpFormat';
+import { estimatePages } from '@/utils/kdpPageDensity';
 import KdpPackButton from '@/components/shared/KdpPackButton';
 
 interface EbookDashboardProps {
@@ -166,6 +168,7 @@ export const EbookDashboard: React.FC<EbookDashboardProps> = ({
   kdpDescription,
   kdpKeywords,
 }) => {
+  const { formatId } = useKdpFormat();
   const [selectedDevice, setSelectedDevice] = useState<'mobile' | 'tablet' | 'kindle' | 'desktop'>('kindle');
   const [coverColor, setCoverColor] = useState('#6366f1');
   const [showAllDevices, setShowAllDevices] = useState(false);
@@ -196,7 +199,7 @@ export const EbookDashboard: React.FC<EbookDashboardProps> = ({
     const targetWords = totalChapters * targetWordsPerChapter;
     const progressPercent = targetWords > 0 ? Math.min(100, (grandTotalWords / targetWords) * 100) : 0;
     
-    const estimatedPages = Math.ceil(grandTotalWords / 250);
+    const estimatedPages = estimatePages(grandTotalWords, formatId);
     const estimatedReadingTime = Math.ceil(grandTotalWords / 200);
 
     return {
@@ -214,7 +217,7 @@ export const EbookDashboard: React.FC<EbookDashboardProps> = ({
       hasKdpDescription: (kdpDescription?.length || 0) > 50,
       hasKdpKeywords: (kdpKeywords?.length || 0) > 10,
     };
-  }, [chapters, preface, conclusion, targetWordsPerChapter, kdpDescription, kdpKeywords]);
+  }, [chapters, preface, conclusion, targetWordsPerChapter, kdpDescription, kdpKeywords, formatId]);
 
   // Contenu pour l'aperçu
   const previewContent = useMemo(() => {

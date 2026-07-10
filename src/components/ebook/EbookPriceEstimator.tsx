@@ -21,6 +21,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useKdpFormat } from '@/hooks/useKdpFormat';
+import { KdpFormatSelect } from '@/components/ebook/KdpFormatSelect';
 
 interface KdpRequirement {
   pages: number;
@@ -34,6 +36,7 @@ interface KdpRequirement {
 }
 
 const EbookPriceEstimator: React.FC = () => {
+  const { wordsPerPage } = useKdpFormat();
   const [customPages, setCustomPages] = useState<number>(100);
 
   // Calcul dynamique des exigences basé sur le nombre de pages
@@ -113,9 +116,9 @@ const EbookPriceEstimator: React.FC = () => {
       category = 'Ouvrage majeur';
     }
 
-    const totalWords = pages * 250; // ~250 mots par page
+    const totalWords = pages * wordsPerPage; // densité selon le format KDP
     const pagesPerChapter = Math.ceil(pages / minChapters);
-    const wordsPerChapter = pagesPerChapter * 250;
+    const wordsPerChapter = pagesPerChapter * wordsPerPage;
 
     return {
       pages,
@@ -129,7 +132,7 @@ const EbookPriceEstimator: React.FC = () => {
       pagesPerChapter,
       wordsPerChapter
     };
-  }, [customPages]);
+  }, [customPages, wordsPerPage]);
 
   // Exigences de référence
   const requirements: KdpRequirement[] = [
@@ -176,6 +179,11 @@ const EbookPriceEstimator: React.FC = () => {
   return (
     <TooltipProvider>
       <div className="space-y-6">
+        {/* Format KDP → pilote la densité mots/page */}
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-muted/30 px-3 py-2">
+          <KdpFormatSelect />
+          <span className="text-xs text-muted-foreground">Densité mots/page selon le format KDP sélectionné</span>
+        </div>
         {/* Header */}
         <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
           <CardHeader>

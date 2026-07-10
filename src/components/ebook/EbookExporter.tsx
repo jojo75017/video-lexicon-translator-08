@@ -7,6 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Download, FileText, Image, BookOpen, Printer, Settings, Eye } from 'lucide-react';
+import { useKdpFormat } from '@/hooks/useKdpFormat';
+import { estimatePages } from '@/utils/kdpPageDensity';
 import { toast } from 'sonner';
 import { Chapter } from '@/hooks/useEbookGeneration';
 import jsPDF from 'jspdf';
@@ -86,6 +88,7 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
   characters = [],
   kdpStructure
 }) => {
+  const { formatId } = useKdpFormat();
   // ✅ Nettoyage automatique de TOUT le contenu avant export
   const cleanedPreface = useMemo(() => cleanGeneratedText(preface), [preface]);
   const cleanedConclusion = useMemo(() => cleanGeneratedText(conclusion), [conclusion]);
@@ -1774,7 +1777,7 @@ Paperback: 9.99€ - 19.99€
 
     return {
       totalWords: totalWords + prefaceWords + conclusionWords,
-      estimatedPages: Math.ceil((totalWords + prefaceWords + conclusionWords) / 250),
+      estimatedPages: estimatePages(totalWords + prefaceWords + conclusionWords, formatId),
       readingTime: Math.ceil((totalWords + prefaceWords + conclusionWords) / 200)
     };
   };
