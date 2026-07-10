@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Check, ChevronDown, Lock, Play, Trophy, BookOpen, ArrowRight, Sparkles, FileText,
-  KeyRound, CheckCircle2, Clock, FileText as FileTextIcon,
+  Clock, FileText as FileTextIcon,
 } from 'lucide-react';
 import { getModuleById, type V3Module } from '@/data/roadmapV3';
 import {
@@ -13,12 +13,9 @@ import WorkflowBookConfigForm from '@/components/ebook/WorkflowBookConfigForm';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { EbookSettingsPanel } from '@/components/ebook/EbookSettingsPanel';
+import { ApiProviderQuickSettings } from '@/components/ebook/ApiProviderQuickSettings';
 import { parseManuscript, countWords } from '@/lib/manuscriptParser';
 import { estimatePages } from '@/utils/kdpPageDensity';
-import {
-  getProvider, getProviderKey, validateKeyFormat, getOpenRouterModel,
-  PROVIDER_LABELS, OPENROUTER_MODELS,
-} from '@/services/aiWritingService';
 
 
 // Palette « Clair Ambre » (identique au Hub).
@@ -261,6 +258,11 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
     try { localStorage.setItem(TARGET_WORDS_KEY, String(next)); } catch { /* ignore */ }
   }, []);
 
+  const updateChapters = useCallback((value: number) => {
+    const next = Math.max(3, Math.min(40, Math.round(value || EMPTY_CONFIG.numberOfChapters)));
+    updateConfig({ numberOfChapters: next });
+  }, [updateConfig]);
+
   // Rafraîchit l'état de la clé IA (le panneau écrit dans le localStorage).
   useEffect(() => {
     if (!keysOpen) { setAiTick((n) => n + 1); }
@@ -286,20 +288,8 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
   const completed = tierAgents.filter((a) => done.has(a.order)).length;
   const pct = total ? Math.round((completed / total) * 100) : 0;
 
-  // État de la clé IA (BYOK) — recalculé quand le panneau se ferme.
-  const aiStatus = useMemo(() => {
-    void aiTick;
-    const provider = getProvider();
-    const key = getProviderKey(provider);
-    const valid = !!key && validateKeyFormat(provider, key);
-    let label = PROVIDER_LABELS[provider];
-    if (provider === 'openrouter') {
-      const m = getOpenRouterModel();
-      const found = OPENROUTER_MODELS.find((x) => x.id === m);
-      label = `OpenRouter · ${found ? found.label.split(' ')[0] : 'modèle'}`;
-    }
-    return { valid, label };
-  }, [aiTick]);
+  const chapterGoalTotal = Math.max(0, Math.round((Number(config.numberOfChapters) || 0) * targetWords));
+  const chapterGoalPages = estimatePages(chapterGoalTotal);
 
   const openAgent = useCallback((agent: EditionAgent) => {
     const mod = getModuleById(agent.moduleId);
@@ -351,24 +341,7 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
         </div>
 
         {/* Carte clé IA (BYOK Gemini / OpenRouter…) */}
-        <button
-          onClick={() => setKeysOpen(true)}
-          className="mt-4 w-full flex items-center gap-3 rounded-2xl border p-3.5 text-left transition-colors hover:bg-[#FFF9EF]"
-          style={{ borderColor: aiStatus.valid ? `${GREEN}55` : `${AMBER}66`, background: aiStatus.valid ? `${GREEN}0d` : AMBER_SOFT }}>
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl"
-            style={{ background: '#fff', color: aiStatus.valid ? GREEN : AMBER_DEEP, border: `1px solid ${aiStatus.valid ? GREEN : AMBER}44` }}>
-            {aiStatus.valid ? <CheckCircle2 className="h-4.5 w-4.5" /> : <KeyRound className="h-4.5 w-4.5" />}
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block text-[13px] font-bold" style={{ color: INK }}>
-              {aiStatus.valid ? `IA connectée : ${aiStatus.label}` : 'Connectez votre clé IA (Gemini, OpenRouter…)'}
-            </span>
-            <span className="block text-[11.5px]" style={{ color: '#8a7860' }}>
-              Choisissez votre fournisseur et votre modèle (Gemini · Claude · ChatGPT · OpenRouter). Cliquez pour configurer.
-            </span>
-          </span>
-          <ArrowRight className="h-4 w-4 shrink-0" style={{ color: AMBER_DEEP }} />
-        </button>
+        <ApiProviderQuickSettings onOpenAdvanced={() => setKeysOpen(true)} onStatusChange={() => setAiTick((n) => n + 1)} />
 
 
         {/* Progression */}
@@ -463,27 +436,77 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
               })}
             </div>
 
-            {/* Objectif mots / chapitre */}
-            <div className="mb-3 flex flex-wrap items-center gap-2 rounded-xl border px-3 py-2" style={{ borderColor: '#eadfc9', background: '#fff' }}>
-              <label htmlFor="chapter-word-target" className="text-[12px] font-bold" style={{ color: INK }}>
-                Objectif mots / chapitre
-              </label>
-              <input
-                id="chapter-word-target"
-                type="number"
-                min={250}
-                max={20000}
-                step={100}
-                value={targetWords}
-                onChange={(e) => updateTargetWords(Number(e.target.value))}
-                className="h-8 w-28 rounded-lg border px-2 text-right text-[13px] font-bold outline-none"
-                style={{ borderColor: '#eadfc9', color: INK, background: '#FCF8F0' }}
-              />
-              <span className="text-[11px]" style={{ color: '#8a7860' }}>mots par chapitre</span>
+            {/* Curseur chapitres + objectif mots / chapitre */}
+            <div className="mb-3 rounded-xl border p-3" style={{ borderColor: '#eadfc9', background: '#fff' }}>
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <label htmlFor="chapter-count-slider" className="text-[12px] font-bold" style={{ color: INK }}>
+                      Nombre de chapitres
+                    </label>
+                    <input
+                      id="chapter-count-input"
+                      type="number"
+                      min={3}
+                      max={40}
+                      step={1}
+                      value={config.numberOfChapters}
+                      onChange={(e) => updateChapters(Number(e.target.value))}
+                      className="h-8 w-20 rounded-lg border px-2 text-right text-[13px] font-bold outline-none"
+                      style={{ borderColor: '#eadfc9', color: INK, background: '#FCF8F0' }}
+                    />
+                  </div>
+                  <input
+                    id="chapter-count-slider"
+                    type="range"
+                    min={3}
+                    max={40}
+                    step={1}
+                    value={config.numberOfChapters}
+                    onChange={(e) => updateChapters(Number(e.target.value))}
+                    className="w-full accent-[#008296]"
+                  />
+                  <div className="flex justify-between text-[10px]" style={{ color: '#a18a6c' }}>
+                    <span>3 chapitres</span>
+                    <span>40 chapitres max</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <label htmlFor="chapter-word-target" className="text-[12px] font-bold" style={{ color: INK }}>
+                      Mots par chapitre
+                    </label>
+                    <input
+                      id="chapter-word-target"
+                      type="number"
+                      min={250}
+                      max={20000}
+                      step={100}
+                      value={targetWords}
+                      onChange={(e) => updateTargetWords(Number(e.target.value))}
+                      className="h-8 w-28 rounded-lg border px-2 text-right text-[13px] font-bold outline-none"
+                      style={{ borderColor: '#eadfc9', color: INK, background: '#FCF8F0' }}
+                    />
+                  </div>
+                  <input
+                    type="range"
+                    min={500}
+                    max={8000}
+                    step={100}
+                    value={Math.min(8000, Math.max(500, targetWords))}
+                    onChange={(e) => updateTargetWords(Number(e.target.value))}
+                    className="w-full accent-[#008296]"
+                  />
+                  <div className="text-[11px]" style={{ color: '#8a7860' }}>
+                    Objectif total : <strong style={{ color: AMBER_DEEP }}>{chapterGoalTotal.toLocaleString('fr-FR')} mots</strong> · environ {chapterGoalPages} pages
+                  </div>
+                </div>
+              </div>
               {!stats.hasContent && (
-                <span className="ml-auto text-[11px]" style={{ color: '#8a7860' }}>
-                  Le tableau est prêt ; il se remplira dès que le manuscrit sera généré.
-                </span>
+                <p className="mt-3 text-[11px]" style={{ color: '#8a7860' }}>
+                  Le tableau est prêt ; il affiche les chapitres prévus et se remplira dès que le manuscrit sera généré.
+                </p>
               )}
             </div>
 
