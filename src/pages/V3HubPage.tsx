@@ -350,6 +350,9 @@ const V3HubPage: React.FC = () => {
           >
             <Icon className="h-[18px] w-[18px] shrink-0" style={{ color: active ? AMBER_DEEP : '#b29a72' }} />
             {!collapsed && <span>{t.label}</span>}
+            {t.id === 'export' && readHubManuscript().length >= 50 && (
+              <span className={`h-2 w-2 rounded-full ${collapsed ? '' : 'ml-auto'}`} style={{ background: AMBER_DEEP }} title="Manuscrit prêt à exporter" />
+            )}
           </button>
         );
       })}
