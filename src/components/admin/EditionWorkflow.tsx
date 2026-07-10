@@ -244,6 +244,50 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
           Suivez les agents dans l'ordre. Chaque métier fait avancer votre livre d'une étape claire.
         </p>
 
+        {/* Sélecteur d'offre : 197€ (V3) vs 347€ (V4) */}
+        <div className="mt-4 inline-flex rounded-xl p-1 border" style={{ background: '#fff', borderColor: '#eadfc9' }}>
+          <button
+            onClick={() => setActiveTier('v3')}
+            className="px-3.5 py-2 rounded-lg text-[12.5px] font-bold transition-colors"
+            style={{
+              background: activeTier === 'v3' ? AMBER : 'transparent',
+              color: activeTier === 'v3' ? '#fff' : '#8a7860',
+            }}>
+            V3 · 197€ <span className="opacity-80">({v3Count} agents)</span>
+          </button>
+          <button
+            onClick={() => setActiveTier('v4')}
+            className="ml-1 px-3.5 py-2 rounded-lg text-[12.5px] font-bold transition-colors inline-flex items-center gap-1.5"
+            style={{
+              background: activeTier === 'v4' ? AMBER_DEEP : 'transparent',
+              color: activeTier === 'v4' ? '#fff' : '#8a7860',
+            }}>
+            V4 · 347€ <span className="opacity-80">(+{v4Count} bonus)</span>
+            {!canV4 && <Lock className="h-3 w-3" />}
+          </button>
+        </div>
+
+        {/* Carte clé IA (BYOK Gemini / OpenRouter…) */}
+        <button
+          onClick={() => setKeysOpen(true)}
+          className="mt-4 w-full flex items-center gap-3 rounded-2xl border p-3.5 text-left transition-colors hover:bg-[#FFF9EF]"
+          style={{ borderColor: aiStatus.valid ? `${GREEN}55` : `${AMBER}66`, background: aiStatus.valid ? `${GREEN}0d` : AMBER_SOFT }}>
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl"
+            style={{ background: '#fff', color: aiStatus.valid ? GREEN : AMBER_DEEP, border: `1px solid ${aiStatus.valid ? GREEN : AMBER}44` }}>
+            {aiStatus.valid ? <CheckCircle2 className="h-4.5 w-4.5" /> : <KeyRound className="h-4.5 w-4.5" />}
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[13px] font-bold" style={{ color: INK }}>
+              {aiStatus.valid ? `IA connectée : ${aiStatus.label}` : 'Connectez votre clé IA (Gemini, OpenRouter…)'}
+            </span>
+            <span className="block text-[11.5px]" style={{ color: '#8a7860' }}>
+              Choisissez votre fournisseur et votre modèle (Gemini · Claude · ChatGPT · OpenRouter). Cliquez pour configurer.
+            </span>
+          </span>
+          <ArrowRight className="h-4 w-4 shrink-0" style={{ color: AMBER_DEEP }} />
+        </button>
+
+
         {/* Progression */}
         <div className="mt-4">
           <div className="flex items-center justify-between mb-1.5">
