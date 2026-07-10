@@ -21,6 +21,14 @@ export const RapportFinalTab: React.FC<Props> = ({ manuscript, analysis, onRelau
   const failed = analysis.chapterResults.filter((r) => r.status === 'failed').length;
   const appliedCount = analysis.issues.filter((i) => i.status === 'applied').length;
   const [kdpOpen, setKdpOpen] = useState(false);
+  const [selectedFormat, setSelectedFormat] = useState<KdpFormatId>('6x9');
+
+  // Aperçu : conversions DXA (1 pouce = 1440 DXA ; 1 pouce = 25,4 mm).
+  const dxaToInch = (v: number) => v / 1440;
+  const dxaToMm = (v: number) => (v / 1440) * 25.4;
+  const fmtIn = (v: number) => dxaToInch(v).toLocaleString('fr-FR', { maximumFractionDigits: 2 });
+  const fmtMm = (v: number) => dxaToMm(v).toLocaleString('fr-FR', { maximumFractionDigits: 0 });
+  const preview = getKdpFormat(selectedFormat);
 
   const stat = (cat: IssueCategory) => analysis.issues.filter((i) => i.category === cat).length;
 
