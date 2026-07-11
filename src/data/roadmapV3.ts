@@ -484,6 +484,8 @@ export const V3_MODULES: V3Module[] = [
     description: 'Compare 3 versions (A, B, C) du titre + sous-titre, de la 4e de couverture et de la couverture. L\'IA recommande la meilleure et le choix est réinjecté dans la fiche du livre.' },
   { id: 'book-positioning',      pillar: 'edition',      status: 'done', title: 'Stratège de Positionnement',
     description: 'Cherche les meilleures positions du livre : sous-catégories KDP atteignables, 7 mots-clés porteurs et angle concurrentiel pour maximiser les ventes.' },
+  { id: 'publisher-selection',   pillar: 'edition',      status: 'done', title: 'Sélection — Moteur de maisons d\'édition',
+    description: 'Le moteur de recherche de maisons d\'édition : à partir de la description de votre livre, identifie les éditeurs dont la ligne éditoriale correspond vraiment. Arrêtez d\'envoyer votre manuscrit à l\'aveugle.' },
 
   // DISTRIBUTION (Pack Distribution Large 97€)
   { id: 'wide-distribution',     pillar: 'distribution', status: 'done', title: 'Assistant Distribution Multi-Plateformes',
