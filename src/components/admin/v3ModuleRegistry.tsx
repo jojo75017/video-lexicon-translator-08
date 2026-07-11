@@ -214,6 +214,7 @@ export const V3_MODULE_COMPONENTS: Record<string, React.ComponentType> = {
   'documentation-studio': DocumentationStudio,
   'edition-variant-studio': EditionVariantStudio,
   'book-positioning': PositioningStrategist,
+  'publisher-selection': PublisherSelectionFinder,
 };
 
 /** Tous les modules ouvrables (mode hors V3 / cockpit standard). */
