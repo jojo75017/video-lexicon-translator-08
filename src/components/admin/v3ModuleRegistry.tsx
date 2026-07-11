@@ -101,6 +101,7 @@ import TrademarkChecker from '@/components/admin/market/TrademarkChecker';
 import DocumentationStudio from '@/components/documentation-studio/DocumentationStudio';
 import EditionVariantStudio from '@/components/admin/EditionVariantStudio';
 import PositioningStrategist from '@/components/admin/PositioningStrategist';
+import PublisherSelectionFinder from '@/components/admin/PublisherSelectionFinder';
 
 /** Modules dont le dialog s'affiche en largeur réduite (max-w-2xl). */
 export const NARROW_MODULE_IDS: string[] = [
@@ -214,6 +215,7 @@ export const V3_MODULE_COMPONENTS: Record<string, React.ComponentType> = {
   'documentation-studio': DocumentationStudio,
   'edition-variant-studio': EditionVariantStudio,
   'book-positioning': PositioningStrategist,
+  'publisher-selection': PublisherSelectionFinder,
 };
 
 /** Tous les modules ouvrables (mode hors V3 / cockpit standard). */

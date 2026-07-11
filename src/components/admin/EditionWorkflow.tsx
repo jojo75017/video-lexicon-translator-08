@@ -395,6 +395,24 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
           </div>
         )}
 
+        {/* Bouton Sélection — Moteur de maisons d'édition (V4) */}
+        {activeTier === 'v4' && (
+          <button
+            onClick={() => { const m = getModuleById('publisher-selection'); if (m) onOpenModule(m); }}
+            className="mt-3 w-full rounded-xl border px-4 py-3 flex items-center gap-3 text-left transition-transform hover:-translate-y-0.5"
+            style={{ borderColor: `${AMBER}66`, background: `linear-gradient(90deg, ${AMBER_SOFT}, #fff)` }}
+          >
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-white" style={{ background: `linear-gradient(135deg, ${AMBER}, ${AMBER_DEEP})` }}>
+              <BookOpen className="h-5 w-5" />
+            </span>
+            <span className="flex-1">
+              <span className="block text-sm font-black" style={{ color: INK }}>Sélection — le moteur de recherche de maisons d'édition</span>
+              <span className="block text-[12px]" style={{ color: '#6f5e47' }}>Trouvez les éditeurs les plus susceptibles d'éditer votre livre.</span>
+            </span>
+            <ArrowRight className="h-5 w-5 shrink-0" style={{ color: AMBER_DEEP }} />
+          </button>
+        )}
+
         {/* Carte clé IA (BYOK Gemini / OpenRouter…) */}
         <ApiProviderQuickSettings key={keysOpen ? 'api-open' : 'api-closed'} onOpenAdvanced={() => setKeysOpen(true)} />
 

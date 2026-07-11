@@ -190,6 +190,9 @@ export const EDITION_AGENTS: EditionAgent[] = [
   { order: 31, department: 'Positionnement & Métadonnées', role: 'Le Responsable Avis Éditoriaux',
     mission: 'V4 : prépare les avis éditoriaux et citations de crédibilité pour la fiche livre.',
     moduleId: 'editorial-reviews', tier: 'v4' },
+  { order: 31.5, department: 'Positionnement & Métadonnées', role: 'Sélection — Moteur de maisons d\'édition',
+    mission: 'V4 : trouve les maisons d\'édition dont la ligne éditoriale correspond à votre livre.',
+    moduleId: 'publisher-selection', tier: 'v4' },
   // ─────────── Étude de marché avancée (V4 uniquement) ───────────
   { order: 32, department: 'Étude de marché avancée', role: 'Le Cartographe Amazon',
     mission: 'V4 : explore les livres Amazon réels pour repérer les positions et opportunités.',
