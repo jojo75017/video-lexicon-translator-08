@@ -10,6 +10,7 @@ import {
   V3_AGENT_COUNT, V4_AGENT_COUNT, type EditionAgent, type EditionTier,
 } from '@/data/editionAgents';
 import WorkflowBookConfigForm from '@/components/ebook/WorkflowBookConfigForm';
+import { SPECIAL_BOOK_MODULES } from '@/components/admin/SpecialBookModules';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { EbookSettingsPanel } from '@/components/ebook/EbookSettingsPanel';
