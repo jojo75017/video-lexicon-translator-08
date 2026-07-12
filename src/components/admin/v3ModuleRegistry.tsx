@@ -222,6 +222,21 @@ export const V3_MODULE_COMPONENTS: Record<string, React.ComponentType> = {
   'edition-variant-studio': EditionVariantStudio,
   'book-positioning': PositioningStrategist,
   'publisher-selection': PublisherSelectionFinder,
+  // Livres spéciaux (onglets de types de livres V2 réintégrés en V3/V4)
+  'special-atlas': SpecialAtlas,
+  'special-encyclopedia': SpecialEncyclopedia,
+  'special-documentary': SpecialDocumentary,
+  'special-coloring-book': SpecialColoringBook,
+  'special-agenda': SpecialAgenda,
+  'special-scolaire': SpecialScolaire,
+  'special-pedagogique': SpecialPedagogique,
+  'special-recipe-book': SpecialRecipeBook,
+  'special-travel-guide': SpecialTravelGuide,
+  'special-comic-book': SpecialComicBook,
+  'special-diary': SpecialDiary,
+  'special-aquarium': SpecialAquarium,
+  'special-bird-sheet': SpecialBirdSheet,
+  'special-multi-tome': SpecialMultiTome,
 };
 
 /** Tous les modules ouvrables (mode hors V3 / cockpit standard). */
