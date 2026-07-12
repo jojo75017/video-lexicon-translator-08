@@ -102,6 +102,12 @@ import DocumentationStudio from '@/components/documentation-studio/Documentation
 import EditionVariantStudio from '@/components/admin/EditionVariantStudio';
 import PositioningStrategist from '@/components/admin/PositioningStrategist';
 import PublisherSelectionFinder from '@/components/admin/PublisherSelectionFinder';
+import {
+  SpecialAtlas, SpecialEncyclopedia, SpecialDocumentary, SpecialColoringBook,
+  SpecialAgenda, SpecialScolaire, SpecialPedagogique, SpecialRecipeBook,
+  SpecialTravelGuide, SpecialComicBook, SpecialDiary, SpecialAquarium,
+  SpecialBirdSheet, SpecialMultiTome,
+} from '@/components/admin/SpecialBookModules';
 
 /** Modules dont le dialog s'affiche en largeur réduite (max-w-2xl). */
 export const NARROW_MODULE_IDS: string[] = [
