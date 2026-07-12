@@ -10,6 +10,7 @@ import {
   V3_AGENT_COUNT, V4_AGENT_COUNT, type EditionAgent, type EditionTier,
 } from '@/data/editionAgents';
 import WorkflowBookConfigForm from '@/components/ebook/WorkflowBookConfigForm';
+import { SPECIAL_BOOK_MODULES } from '@/components/admin/SpecialBookModules';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { EbookSettingsPanel } from '@/components/ebook/EbookSettingsPanel';
@@ -422,6 +423,34 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ on
             <EditorialControlPanel />
           </div>
         )}
+
+        {/* Livres spéciaux — types de livres de la V2 réintégrés (V3 & V4) */}
+        <div className="mt-4 rounded-2xl border p-4" style={{ borderColor: '#eadfc9', background: AMBER_SOFT }}>
+          <div className="flex items-center gap-2 mb-1">
+            <BookOpen className="h-4 w-4" style={{ color: AMBER_DEEP }} />
+            <span className="text-sm font-black" style={{ color: INK }}>Livres spéciaux — plus de choix de livres</span>
+          </div>
+          <p className="text-[12px] mb-3" style={{ color: '#6f5e47' }}>
+            Créez des livres particuliers (cuisine, voyage, coloriage, BD, documentaire, scolaire, saga multi-tomes…)
+            avec les mêmes outils que la V2, désormais intégrés à votre parcours d'édition.
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+            {SPECIAL_BOOK_MODULES.map((sb) => (
+              <button
+                key={sb.id}
+                onClick={() => { const m = getModuleById(sb.id); if (m) onOpenModule(m); }}
+                className="text-left rounded-xl border bg-white px-3 py-2.5 transition-transform hover:-translate-y-0.5 hover:shadow-sm"
+                style={{ borderColor: '#eadfc9' }}
+              >
+                <span className="text-lg">{sb.emoji}</span>
+                <span className="mt-1 block text-[12.5px] font-bold leading-tight" style={{ color: INK }}>{sb.title}</span>
+                <span className="block text-[11px] leading-snug" style={{ color: '#a18a6c' }}>{sb.subtitle}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+
 
 
 
