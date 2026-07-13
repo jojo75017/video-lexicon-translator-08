@@ -47,7 +47,7 @@ import VideoPlaylistCarousel from "@/components/sales/VideoPlaylistCarousel";
 import { PROMO_PRICE, REGULAR_PRICE, PROMO_END } from "@/data/summerPromo";
 
 const LAUNCH_PRICE = PROMO_PRICE; // 59€ — promo d'été jusqu'au 31 août
-const NORMAL_PRICE = REGULAR_PRICE; // 67€ — prix barré
+const NORMAL_PRICE = REGULAR_PRICE; // 59€ — prix barré
 
 // ── Newsletter form (footer) ─────────────────────────────────────────────────
 const NewsletterForm = () => {
@@ -199,10 +199,10 @@ const SalesPage = () => {
         <title>Ebookstudio Pro V2 — Créez et monétisez vos eBooks avec l'IA</title>
         <meta
           name="description"
-          content="15 agents IA qui transforment votre idée en eBook publié sur Amazon KDP et en revenus passifs. Workflow complet, qualité pro, 67€ à vie. Garantie 30 jours."
+          content="15 agents IA qui transforment votre idée en eBook publié sur Amazon KDP et en revenus passifs. Workflow complet, qualité pro, 59€ à vie. Garantie 30 jours."
         />
         <meta property="og:title" content="Ebookstudio Pro V2 — Créez et monétisez vos eBooks avec l'IA" />
-        <meta property="og:description" content="15 agents IA pour publier vos eBooks rentables sur Amazon KDP. 67€ à vie." />
+        <meta property="og:description" content="15 agents IA pour publier vos eBooks rentables sur Amazon KDP. 59€ à vie." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://ebookstudio.fr/offres" />
         <link rel="canonical" href="https://ebookstudio.fr/offres" />
@@ -215,7 +215,7 @@ const SalesPage = () => {
           "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.9", "reviewCount": "212" },
           "offers": {
             "@type": "Offer",
-            "price": "67",
+            "price": "59",
             "priceCurrency": "EUR",
             "availability": "https://schema.org/InStock",
             "priceValidUntil": "2026-09-15",
@@ -322,7 +322,7 @@ const SalesPage = () => {
             onClick={scrollToPricing}
             className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-full px-5 h-10 shadow-sm shadow-primary/20"
           >
-            Démarrer · 67€
+            Démarrer · 59€
             <ArrowRight className="w-4 h-4 ml-1.5" />
           </Button>
         </div>
@@ -361,7 +361,7 @@ const SalesPage = () => {
                 onClick={handlePlanClick}
                 className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-base h-14 px-7 rounded-xl shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 transition-all hover:-translate-y-0.5"
               >
-                Démarrer pour 67€ à vie
+                Démarrer pour 59€ à vie
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
               <Button
@@ -720,7 +720,7 @@ const SalesPage = () => {
           <SectionTitle
             eyebrow="Offre fondateur"
             title={<>Un seul paiement, <span className="text-primary">accès à vie.</span></>}
-            subtitle="Pas d'abonnement. Pas de carte. Pas de surprise. 67€ aujourd'hui, et toutes les futures mises à jour incluses pour toujours."
+            subtitle="Pas d'abonnement. Pas de carte. Pas de surprise. 59€ aujourd'hui, et toutes les futures mises à jour incluses pour toujours."
           />
 
           <motion.div {...fadeUp} className="relative">
@@ -742,7 +742,7 @@ const SalesPage = () => {
                 </div>
 
                 <div className="flex items-end gap-3 mb-6 pb-6 border-b border-border">
-                  <span className="text-5xl md:text-6xl font-black text-foreground leading-none">67€</span>
+                  <span className="text-5xl md:text-6xl font-black text-foreground leading-none">59€</span>
                   <span className="text-2xl text-muted-foreground line-through pb-1">{NORMAL_PRICE}€</span>
                   <span className="ml-auto text-xs font-bold text-accent bg-accent/10 px-2.5 py-1 rounded-full">Économie 130€</span>
                 </div>
@@ -771,7 +771,7 @@ const SalesPage = () => {
                   onClick={handlePlanClick}
                   className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold h-14 rounded-xl text-base shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 transition-all"
                 >
-                  Verrouiller mon accès à vie · 67€
+                  Verrouiller mon accès à vie · 59€
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
 
@@ -815,7 +815,7 @@ const SalesPage = () => {
               { q: "Je n'écris pas bien. Le résultat sera publiable ?", a: "Vous n'écrivez rien. Les agents P1-P10 rédigent, P11 corrige, P15 humanise pour passer les détecteurs IA. Le résultat est indiscernable d'un livre écrit à la main." },
               { q: "Combien de temps pour publier mon premier eBook ?", a: "Entre 2 et 7 jours selon le niveau de finition que vous voulez. La majorité des utilisateurs publient en moins d'une semaine, à raison de 1 à 2h/jour." },
               { q: "Et si Amazon KDP refuse mon livre ?", a: "Nos exports sont 100% conformes aux exigences KDP (typographie, dimensions, ISBN optionnel, métadonnées). Si Amazon refuse, on corrige avec vous gratuitement." },
-              { q: "Le 67€ est vraiment à vie ?", a: "Oui. Paiement unique, accès illimité, toutes les futures mises à jour incluses. Pas d'abonnement caché. Le tarif passera à 197€ après le 30 septembre." },
+              { q: "Le 59€ est vraiment à vie ?", a: "Oui. Paiement unique, accès illimité, toutes les futures mises à jour incluses. Pas d'abonnement caché. Le tarif remontera à 67€ après le 31 août." },
               { q: "Si je ne suis pas satisfait, comment je récupère mon argent ?", a: "Un simple email dans les 30 jours et je rembourse intégralement sous 48h. Pas de question, pas de jugement. C'est dans les CGV." },
               { q: "Je suis débutant total en informatique. C'est compliqué ?", a: "Non. L'interface est en français, guidée pas à pas. Vous cliquez, l'IA travaille. Une formation vidéo complète (18 modules) est incluse." },
               { q: "Puis-je vendre en plusieurs langues ?", a: "Oui. Le module traduction couvre 30+ langues. 1 livre écrit = 30 marchés potentiels. Le même contenu, multiplié par 30." },
@@ -848,14 +848,14 @@ const SalesPage = () => {
             <span className="bg-gradient-to-r from-primary to-[#FFA873] bg-clip-text text-transparent">commence aujourd'hui.</span>
           </h2>
           <p className="text-lg md:text-xl text-white/70 mb-9 max-w-xl mx-auto">
-            67€ à vie. Garantie 30 jours. Accès immédiat. Aucune raison d'attendre.
+            59€ à vie. Garantie 30 jours. Accès immédiat. Aucune raison d'attendre.
           </p>
           <Button
             size="lg"
             onClick={handlePlanClick}
             className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-lg h-16 px-10 rounded-2xl shadow-2xl shadow-primary/40 hover:scale-[1.02] transition-all"
           >
-            Démarrer pour 67€ à vie
+            Démarrer pour 59€ à vie
             <ArrowRight className="w-6 h-6 ml-2" />
           </Button>
           <p className="mt-5 text-sm text-white/50">
@@ -915,7 +915,7 @@ const SalesPage = () => {
           className="w-full bg-primary text-primary-foreground font-bold py-6 rounded-2xl shadow-xl shadow-primary/30"
         >
           <Sparkles className="w-5 h-5 mr-2" />
-          67€ à vie · Garantie 30 jours
+          59€ à vie · Garantie 30 jours
         </Button>
       </div>
     </div>
