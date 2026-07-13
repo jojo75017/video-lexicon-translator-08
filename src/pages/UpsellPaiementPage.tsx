@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
-const LAUNCH_PRICE = 67;
+const LAUNCH_PRICE = 59; // promo d'été jusqu'au 31 août (tarif normal 67€)
 const NORMAL_PRICE = 197;
 const SERENITY_PRICE = 30;
 const EXTENDED_LICENSE_PRICE = 67;
