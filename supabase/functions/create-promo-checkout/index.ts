@@ -10,9 +10,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const PRICE_LOOKUP_KEY = "ebookstudio_lifetime_67";
+const PRICE_LOOKUP_KEY = "ebookstudio_lifetime_59";
 const PRODUCT_LABEL = "EbookStudio — Accès à vie";
-const AMOUNT_EUR = 67;
+// Promo d'été jusqu'au 31 août 2026 : 59€ (tarif normal 67€ à rétablir après).
+const AMOUNT_EUR = 59;
 
 const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 
