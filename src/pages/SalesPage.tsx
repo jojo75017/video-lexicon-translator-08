@@ -44,8 +44,10 @@ import TravelConsultCTA from "@/components/sales/TravelConsultCTA";
 import BetaTesterBanner from "@/components/sales/BetaTesterBanner";
 import VideoPlaylistCarousel from "@/components/sales/VideoPlaylistCarousel";
 
-const LAUNCH_PRICE = 67;
-const NORMAL_PRICE = 197;
+import { PROMO_PRICE, REGULAR_PRICE, PROMO_END } from "@/data/summerPromo";
+
+const LAUNCH_PRICE = PROMO_PRICE; // 59€ — promo d'été jusqu'au 31 août
+const NORMAL_PRICE = REGULAR_PRICE; // 67€ — prix barré
 
 // ── Newsletter form (footer) ─────────────────────────────────────────────────
 const NewsletterForm = () => {
