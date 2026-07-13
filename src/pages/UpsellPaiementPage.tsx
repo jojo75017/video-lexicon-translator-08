@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
-const LAUNCH_PRICE = 67;
+const LAUNCH_PRICE = 59; // promo d'été jusqu'au 31 août (tarif normal 67€)
 const NORMAL_PRICE = 197;
 const SERENITY_PRICE = 30;
 const EXTENDED_LICENSE_PRICE = 67;
@@ -445,7 +445,7 @@ const UpsellPaiementPage = () => {
         <div className="mt-8 space-y-3 text-sm">
           {[
             { q: "Quand est-ce que je reçois mon accès ?", a: "En quelques minutes après confirmation. 24h maximum." },
-            { q: "Est-ce vraiment un paiement unique ?", a: "Oui, 67€ une seule fois. Pas d'abonnement, pas de frais cachés. Accès à vie." },
+            { q: "Est-ce vraiment un paiement unique ?", a: "Oui, 59€ une seule fois. Pas d'abonnement, pas de frais cachés. Accès à vie." },
             { q: "Et si ça ne me convient pas ?", a: "Vous avez 30 jours pour tester. Remboursement intégral sans justification." },
           ].map((faq, i) => (
             <details key={i} className="group bg-card border border-border rounded-xl">

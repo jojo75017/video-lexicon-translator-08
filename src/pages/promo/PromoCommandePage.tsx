@@ -19,7 +19,7 @@ const schema = z.object({
   payment_method: z.enum(['stripe', 'paypal']),
 });
 
-const PRODUCT = { key: 'main', label: 'Ebookstudio Pro V2 - Accès à vie', amount: 67 };
+const PRODUCT = { key: 'main', label: 'Ebookstudio Pro V2 - Accès à vie', amount: 59 };
 
 const PromoCommandePage = () => {
   useReferralTracking();

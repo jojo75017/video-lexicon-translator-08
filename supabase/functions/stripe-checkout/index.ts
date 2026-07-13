@@ -11,7 +11,8 @@ const PRODUCT_CATALOG: Record<string, { name: string; description: string; amoun
   pro_lifetime: {
     name: "EbookStudio Pro — Accès à Vie",
     description: "Accès complet à EbookStudio Pro (paiement unique)",
-    amount: 6700,
+    // Promo d'été jusqu'au 31 août 2026 : 5900 (tarif normal 6700 à rétablir après).
+    amount: 5900,
   },
   serenity: {
     name: "Pack Sérénité",
