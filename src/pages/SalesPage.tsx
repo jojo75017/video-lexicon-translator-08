@@ -43,6 +43,7 @@ import KdpRoiCalculator from "@/components/sales/KdpRoiCalculator";
 import TravelConsultCTA from "@/components/sales/TravelConsultCTA";
 import BetaTesterBanner from "@/components/sales/BetaTesterBanner";
 import VideoPlaylistCarousel from "@/components/sales/VideoPlaylistCarousel";
+import SummerPromoCountdown from "@/components/sales/SummerPromoCountdown";
 
 import { PROMO_PRICE, REGULAR_PRICE, PROMO_END } from "@/data/summerPromo";
 
@@ -741,11 +742,16 @@ const SalesPage = () => {
                   </div>
                 </div>
 
-                <div className="flex items-end gap-3 mb-6 pb-6 border-b border-border">
-                  <span className="text-5xl md:text-6xl font-black text-foreground leading-none">59€</span>
+                <div className="flex items-end gap-3 mb-6">
+                  <span className="text-5xl md:text-6xl font-black text-foreground leading-none">{LAUNCH_PRICE}€</span>
                   <span className="text-2xl text-muted-foreground line-through pb-1">{NORMAL_PRICE}€</span>
-                  <span className="ml-auto text-xs font-bold text-accent bg-accent/10 px-2.5 py-1 rounded-full">Économie 130€</span>
+                  <span className="ml-auto text-xs font-bold text-accent bg-accent/10 px-2.5 py-1 rounded-full">Offre d'été</span>
                 </div>
+
+                <div className="mb-6 pb-6 border-b border-border">
+                  <SummerPromoCountdown />
+                </div>
+
 
                 <ul className="grid sm:grid-cols-2 gap-2.5 mb-8">
                   {[
