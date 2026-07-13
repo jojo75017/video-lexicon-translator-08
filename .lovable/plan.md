@@ -1,68 +1,47 @@
-## Contexte & clarification de la stratégie
+# Promo d'été : offre de base 67€ → 59€ jusqu'au 31 août
 
-Dans le code actuel, **« V4 » = le palier premium 347€** (30 agents `tier: 'v4'`), qui vient **au-dessus** de la V3 197€ (22 agents `tier: 'v3'`). Il n'y a donc pas de « faire la V3 avant » : l'accès direct au 347€ marche déjà (`useV3Entitlement.hasFull` s'active sur un plan `full_*` sans exiger la Base).
+## Objectif
+Baisser le prix de l'offre de base (accès à vie « EbookStudio Pro ») de 67€ à **59€**, en promo saisonnière **jusqu'au 31 août 2026 (23h59)**, avec un **compte à rebours** visible sur la page de vente. Prix barré 67€ → 59€. Après le 31 août, retour facile à 67€ (une seule constante à changer).
 
-Ce qui manque, ce n'est pas l'offre — c'est que le **workflow V4 n'est pas plus perfectionné** que la V3 : ce sont surtout des agents en plus, pas un vrai processus supérieur. Ce plan corrige cela, en se concentrant **d'abord sur le workflow** (pas sur le prix, laissé à 347€).
+## Principe : une source unique de vérité
+Aujourd'hui le prix « 67 » est écrit en dur dans plusieurs fichiers, ce qui rend tout changement risqué. On crée une petite config centrale pour le prix promo et sa date de fin, puis on l'utilise partout.
 
-Périmètre : `src/data/editionAgents.ts` (orchestration), `src/components/admin/EditionWorkflow.tsx` (présentation), et 1 nouveau composant frontend. **Aucun** changement backend, prix ou paiement.
-
+### Nouveau fichier `src/data/summerPromo.ts`
 ```text
-V3 (197€) ──► 22 agents, parcours linéaire simple
-V4 (347€) ──► V3 + processus premium :
-              • plus d'étapes structurées en phases
-              • révisions IA multi-passes par chapitre
-              • contrôle éditorial avancé (ton/style/longueur/persona)
-              • visuels & pack KDP poussés
+PROMO_PRICE = 59          // prix de vente actuel
+REGULAR_PRICE = 67        // prix barré
+PROMO_END = 2026-08-31 23:59 (Europe/Paris)
+isPromoActive()           // true tant qu'on est avant la date de fin
 ```
 
-## 1. Structurer le workflow V4 en phases claires (pas juste « plus d'agents »)
+## Changements côté paiement (montant réellement débité)
+1. **`supabase/functions/stripe-checkout/index.ts`** : `pro_lifetime.amount` passe de `6700` à `5900`.
+2. **`supabase/functions/create-promo-checkout/index.ts`** : `AMOUNT_EUR` passe de `67` à `59` (et le libellé/lookup key restent cohérents).
 
-Dans `editionAgents.ts`, ajouter un champ `phase` (ex : `Conception`, `Rédaction`, `Révision multi-passes`, `Enrichissement`, `Fabrication`, `Positionnement`, `Lancement`) à chaque agent, et une constante ordonnée `EDITION_PHASES`.
+Ces deux fonctions couvrent les deux tunnels d'achat existants (page de vente principale + tunnel /promo).
 
-Dans `EditionWorkflow.tsx`, remplacer l'affichage « par département » du mode V4 par un **parcours séquentiel en phases numérotées** avec une barre de progression par phase, pour qu'on voie une vraie montée en puissance vs la V3.
+## Changements côté affichage (prix montrés au client)
+Remplacer les « 67€ » de vente par le prix promo, avec 67€ barré, dans :
+- **`src/pages/SalesPage.tsx`** — hero, bloc pricing (#pricing), FAQ, CTA finaux, JSON-LD (`price`), meta description/OG.
+- **`src/pages/UpsellPaiementPage.tsx`** — `LAUNCH_PRICE`, récap, options de paiement, FAQ.
+- **`src/pages/UpsellPage.tsx`** — `LAUNCH_PRICE` et libellés.
+- **`src/pages/promo/PromoCommandePage.tsx`** — `PRODUCT.amount`.
 
-## 2. Révisions IA multi-passes par chapitre
+Tous ces fichiers importeront `PROMO_PRICE`/`REGULAR_PRICE` depuis `summerPromo.ts` au lieu de valeurs en dur (pour la partie « prix de vente » ; on ne touche pas aux mentions historiques dans les articles de blog/emails).
 
-Ajouter, dans la section « Structure du livre » (déjà présente avec curseur chapitres + mots), un bloc **« Passes de révision IA »** visible uniquement en V4 :
+## Compte à rebours
+Ajouter un **compte à rebours jusqu'au 31 août** dans le bloc pricing de `src/pages/SalesPage.tsx` (jours/heures/min/sec), avec le message « Offre d'été — se termine le 31 août ». Réutilisation du même style de countdown que celui déjà présent sur la page V3.
 
-- Sélecteur du nombre de passes (1 à 3) : *Rédaction → Relecture stylistique → Polissage final*.
-- Description de ce que fait chaque passe.
-- Persistance en `localStorage` (comme `targetWords`) pour être reprise par les agents de rédaction/révision existants.
+## Sécurité anti-oubli après le 31 août
+`isPromoActive()` calcule l'état à partir de la date. Après le 31 août, le compte à rebours affiche « Offre terminée » et l'affichage repasse automatiquement à 67€. Pour rétablir réellement le prix débité à 67€, il suffira de remettre `5900→6700` et `59→67` dans les 2 edge functions (indiqué en commentaire). On peut aussi automatiser ce retour si tu veux (optionnel, à décider).
 
-Cela matérialise le « multi-passes » demandé sans toucher aux générateurs : le réglage est lu par les modules de rédaction déjà branchés.
-
-## 3. Contrôle éditorial avancé (nouveau composant `EditorialControlPanel`)
-
-Créer `src/components/ebook/EditorialControlPanel.tsx`, affiché en V4 dans le parcours, offrant :
-
-- **Ton** (ex : chaleureux, expert, narratif, direct) et **style** (ex : concret/exemples, académique, storytelling).
-- **Longueur cible par chapitre** (réutilise `targetWords`).
-- **Persona lecteur** (champ libre : à qui s'adresse le livre).
-- **Structure narrative** (linéaire / thématique / problème-solution).
-
-Tous ces réglages sont persistés en `localStorage` sous une clé unique et affichés en résumé au-dessus du parcours, pour cadrer les agents de rédaction et de ton (`p19-author-voice`, `p25-tone-adapter`) déjà existants.
-
-## 4. Visuels & pack KDP poussés — mise en avant dans le parcours
-
-Regrouper visuellement les agents V4 déjà présents (`cover-studio-pro`, `edition-variant-studio` illustrations, `multi-format-express`, pack KDP, `audio-video-transcription`) dans une **phase « Enrichissement & Fabrication »** clairement identifiée, avec un encart expliquant le livrable final (couverture pro + illustrations + pack KDP prêt à uploader + audiobook). Aucun nouveau module : uniquement mise en avant et regroupement.
-
-## 5. Clarifier l'accès direct au 347€
-
-Ajouter, en tête du mode V4, un court bandeau explicatif : « Offre premium accessible directement — pas besoin de la Base 197€ ». Confirme visuellement ce que le code fait déjà.
+## Hors périmètre (volontairement)
+- Les mentions « 67€ » dans les articles de blog, emails Brevo et templates réseaux sociaux **ne sont pas modifiées** (contenu éditorial/historique). On pourra faire une passe séparée si tu veux les aligner.
+- La newsletter d'annonce de la promo : à faire dans un second temps une fois la promo en ligne.
 
 ## Validation
+- Typecheck.
+- Vérif visuelle de la page de vente : prix 59€ affiché, 67€ barré, compte à rebours qui tourne.
+- Test checkout en mode test (carte 4242…) : le montant présenté doit être **59,00 €**.
 
-Après implémentation, vérifier sur `/hub-v3?tab=parcours` (mode admin/V4) :
-
-- Le parcours V4 s'affiche en phases numérotées avec progression.
-- Le bloc « Passes de révision IA » (1–3) est visible et persistant.
-- Le panneau de contrôle éditorial (ton/style/persona/longueur) fonctionne et se sauvegarde.
-- La phase Enrichissement & Fabrication regroupe bien les visuels + pack KDP.
-- Le bandeau d'accès direct 347€ est présent.
-
-## Hors périmètre
-
-- Pas de changement de prix ni de tunnel de paiement.
-- Pas de modification des générateurs/edge functions ni des secrets (BYOK conservé).
-- Pas de création d'une offre « au-dessus de 347€ » : V4 = le palier premium 347€ existant, rendu réellement supérieur à la V3.
-- Aucune donnée fictive.
+Prêt à implémenter dès que tu valides.
