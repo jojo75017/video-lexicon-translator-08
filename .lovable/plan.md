@@ -22,7 +22,9 @@ V3_LAUNCH_START = 2026-10-01 00:00 (Europe/Paris)
 V3_LAUNCH_END   = 2026-10-31 23:59 (Europe/Paris)
 isV3LaunchActive()                // true dans la fenêtre
 currentV3Price()                  // 97 ou 197 selon la date
-v3Installments()                  // ex. 1×97€ / 2×49€ pendant lancement, sinon 1×197€ / 3×69€
+v3Installments()                  // paiements en plusieurs fois (1×, 2×, 3×), PAS d'abonnement mensuel
+                                  // ex. 1×97€ / 2×49€ / 3×33€ pendant lancement,
+                                  // sinon 1×197€ / 2×99€ / 3×66€ après le 1er novembre
 ```
 
 Après le 1er novembre, `currentV3Price()` renverra automatiquement 197 : rien à toucher côté affichage. Pour rebasculer le montant réellement débité, il suffira de changer **un seul chiffre** dans l'edge function `stripe-checkout`, commenté à côté.
