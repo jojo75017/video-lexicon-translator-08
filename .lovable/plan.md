@@ -54,11 +54,19 @@ Composant prévu `src/components/sales/V3LaunchCountdown.tsx` (calqué sur `Summ
 Affiché sur : `SalesPageV3Launch.tsx`, `V3CommandePage.tsx`, `V3PaiementPage.tsx`, et le hub admin.
 
 ## Changements côté paiement (montant réellement débité)
-Dans `supabase/functions/stripe-checkout/index.ts`, les lookup keys V3 (`v3_base_1x`, `v3_base_2x`, `v3_base_3x`, `v3_full_1x`, `v3_full_2x`, `v3_full_3x`) :
-- **Nouveau plan `v3_launch_1x` = 9700 cts** + option `v3_launch_2x` = 2× 4900 cts.
-- Les plans existants `v3_base_*` (197€) resteront en place pour l'après-lancement.
-- L'edge function choisira le lookup key à partir d'un paramètre `plan` envoyé par le front, qui dépendra de `isV3LaunchActive()`.
-- Le Pack Full 347€ sera **désactivé** (renvoie une erreur claire « offre indisponible ») : on ne veut plus vendre le bundle.
+
+**Important : paiements en plusieurs fois, PAS d'abonnement mensuel.** On utilise le
+mécanisme "installments" de Stripe Checkout (paiement fractionné one-shot), pas
+`mode: subscription`. Chaque option correspond à un `price` unique en `mode: payment`.
+
+Dans `supabase/functions/stripe-checkout/index.ts`, nouveaux lookup keys pour la fenêtre de lancement :
+- `v3_launch_1x` = 9700 cts (1 paiement de 97€)
+- `v3_launch_2x` = 2× 4900 cts (2 paiements de 49€)
+- `v3_launch_3x` = 3× 3300 cts (3 paiements de 33€)
+
+Après le 1er novembre, on repasse sur les lookup keys `v3_base_*` existants (1×197€ / 2×99€ / 3×66€), toujours en paiement fractionné one-shot — jamais d'abonnement récurrent.
+
+L'edge function choisira le lookup key à partir d'un paramètre `plan` envoyé par le front, qui dépendra de `isV3LaunchActive()`. Le Pack Full 347€ sera **désactivé** (renvoie une erreur claire « offre indisponible »).
 
 Commentaire dans le fichier : « Pour désactiver le tarif lancement, retirer les lookup keys `v3_launch_*` ci-dessous — le front repassera automatiquement sur `v3_base_*` (197€). »
 
