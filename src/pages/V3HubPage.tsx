@@ -16,6 +16,7 @@ import V3AccessRecap from '@/components/admin/V3AccessRecap';
 import V3LaunchLinks from '@/components/admin/V3LaunchLinks';
 import V3GuidesSection from '@/components/admin/V3GuidesSection';
 import V3RoadmapTab from '@/components/admin/V3RoadmapTab';
+import V3PendingLaunchTab from '@/components/admin/V3PendingLaunchTab';
 import MaisonEditionTab from '@/components/admin/MaisonEditionTab';
 import HubAiChat from '@/components/admin/HubAiChat';
 import DocumentationStudio from '@/components/documentation-studio/DocumentationStudio';
