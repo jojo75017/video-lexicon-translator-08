@@ -42,3 +42,13 @@
 ## Pourquoi rien n'est cliquable ni modifié aujourd'hui
 
 Tu as toi‑même demandé de **mettre ce chantier en attente jusqu'au mois prochain** ("on verra cela le mois prochain à mettre en place"). Le plan est donc **archivé dans la roadmap** (`mem://business/pricing/v3-launch-october`) et prêt à être déclenché dès que tu diras "on y va". Si tu veux au contraire que je l'exécute **dès maintenant**, dis‑le explicitement et je lance l'implémentation dans la foulée.
+
+## Piste alternative — 3 forfaits mensuels par volume (À DISCUTER, en attente)
+
+Inspirée du modèle ViviBook (Reader / Creator / Author), gardée en réserve :
+
+- **Forfait 1** — 10 livres / mois
+- **Forfait 2** — 20 livres / mois (le plus populaire, à confirmer)
+- **Forfait 3** — 50 livres / mois (Pro / Éditeur)
+
+Tout serait **mensuel récurrent**. ⚠️ Ce modèle est en **conflit direct** avec la décision actuelle « JAMAIS d'abonnement mensuel, uniquement paiement en 1×/2×/3× ». À trancher avant d'exécuter le plan de lancement. Rien à coder tant que la décision n'est pas prise — bloc ajouté à l'onglet « En attente » du Hub V3 pour référence.
