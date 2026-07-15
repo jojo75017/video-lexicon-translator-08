@@ -175,7 +175,7 @@ function ModuleCard({
 }
 
 
-type HubTab = 'parcours' | 'outils' | 'documentation' | 'livres' | 'guides' | 'offres' | 'roadmap' | 'script' | 'assistant' | 'bookperfect' | 'export';
+type HubTab = 'parcours' | 'outils' | 'documentation' | 'livres' | 'guides' | 'offres' | 'roadmap' | 'pending' | 'script' | 'assistant' | 'bookperfect' | 'export';
 
 const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon }[] = [
   { id: 'parcours', label: 'Parcours', icon: Compass },
@@ -185,6 +185,7 @@ const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon }[] = [
   { id: 'guides', label: 'Guides', icon: GraduationCap },
   { id: 'offres', label: 'Offres & Packs', icon: Gem },
   { id: 'roadmap', label: 'Roadmap', icon: MapIcon },
+  { id: 'pending', label: 'En attente', icon: Clock },
   { id: 'script', label: 'Script vidéo', icon: FileText },
   { id: 'assistant', label: "Parler avec l'IA", icon: Bot },
   { id: 'bookperfect', label: 'BookPerfect AI', icon: BookOpen },
