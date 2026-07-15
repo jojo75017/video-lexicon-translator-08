@@ -1154,6 +1154,12 @@ const V3HubPage: React.FC = () => {
           <V3RoadmapTab />
         )}
 
+        {/* ===================== ONGLET EN ATTENTE ===================== */}
+        {activeTab === 'pending' && (
+          <V3PendingLaunchTab />
+        )}
+
+
         {/* ===================== ONGLET SCRIPT VIDÉO ===================== */}
         {activeTab === 'script' && (
           <section className="space-y-5">
