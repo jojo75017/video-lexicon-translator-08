@@ -135,6 +135,55 @@ export default function V3PendingLaunchTab() {
         </div>
       </div>
 
+      {/* Piste tarifaire mensuelle (inspiration ViviBook) — À DISCUTER */}
+      <div className="rounded-2xl border-2 bg-white p-5 sm:p-6" style={{ borderColor: `${AMBER}66` }}>
+        <div className="flex items-center gap-2 mb-3">
+          <BookOpen className="h-5 w-5" style={{ color: AMBER_DEEP }} />
+          <h3 className="text-xl font-semibold" style={{ fontFamily: SERIF, color: INK }}>
+            Piste alternative — 3 forfaits mensuels par volume de livres
+          </h3>
+          <span
+            className="ml-2 rounded-full border px-2 py-0.5 text-[10px] font-black uppercase tracking-wider"
+            style={{ background: AMBER_SOFT, borderColor: `${AMBER}66`, color: AMBER_DEEP }}
+          >
+            À discuter
+          </span>
+        </div>
+        <p className="text-sm mb-4" style={{ color: '#6f5e47' }}>
+          Inspiré du modèle ViviBook (Reader / Creator / Author). Ici tout est <strong>mensuel</strong>,
+          la différence entre les 3 forfaits = <strong>nombre de livres créés par mois</strong>.
+          <em> À rediscuter — rien n'est décidé, ce bloc est juste conservé dans l'attente.</em>
+        </p>
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div className="rounded-xl border p-4 bg-neutral-50">
+            <div className="flex items-center gap-2 text-xs uppercase font-bold tracking-wider text-neutral-600">
+              <BookOpen className="h-3.5 w-3.5" /> Forfait 1
+            </div>
+            <div className="mt-2 text-2xl font-bold" style={{ color: INK }}>10 livres / mois</div>
+            <div className="text-xs mt-1" style={{ color: '#6f5e47' }}>Entrée de gamme</div>
+          </div>
+          <div className="rounded-xl border p-4" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44` }}>
+            <div className="flex items-center gap-2 text-xs uppercase font-bold tracking-wider" style={{ color: AMBER_DEEP }}>
+              <Sparkles className="h-3.5 w-3.5" /> Forfait 2
+            </div>
+            <div className="mt-2 text-2xl font-bold" style={{ color: INK }}>20 livres / mois</div>
+            <div className="text-xs mt-1" style={{ color: AMBER_DEEP }}>Le plus populaire (à confirmer)</div>
+          </div>
+          <div className="rounded-xl border p-4" style={{ background: '#141414', borderColor: '#c9a84c' }}>
+            <div className="flex items-center gap-2 text-xs uppercase font-bold tracking-wider" style={{ color: '#c9a84c' }}>
+              <Crown className="h-3.5 w-3.5" /> Forfait 3
+            </div>
+            <div className="mt-2 text-2xl font-bold text-white">50 livres / mois</div>
+            <div className="text-xs mt-1" style={{ color: '#c9a84c' }}>Pro / Éditeur</div>
+          </div>
+        </div>
+        <p className="mt-4 text-xs italic" style={{ color: '#6f5e47' }}>
+          ⚠️ Ce modèle mensuel serait <strong>en conflit direct</strong> avec la décision « JAMAIS d'abonnement mensuel, uniquement paiement en 1×/2×/3× ».
+          À trancher avant d'exécuter le plan de lancement.
+        </p>
+      </div>
+
+
       {/* Note finale */}
       <div className="rounded-2xl border-2 border-dashed p-5 text-sm" style={{ borderColor: `${AMBER}66`, background: AMBER_SOFT, color: AMBER_DEEP }}>
         💡 Dès que vous direz <strong>« on y va »</strong>, tout ce plan sera exécuté d'un bloc.
