@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Sparkles, Compass, Lock, ArrowRight, Wand2, CheckCircle2, Layers, Bot, Infinity as InfinityIcon, ShieldCheck, Save, Image as ImageIcon, BookOpen, GraduationCap, Gem, Map as MapIcon, FileText, Copy, Check, Menu, X, PanelLeftClose, PanelLeftOpen, Gauge, Download, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, Search, Sparkles, Compass, Lock, ArrowRight, Wand2, CheckCircle2, Layers, Bot, Infinity as InfinityIcon, ShieldCheck, Save, Image as ImageIcon, BookOpen, GraduationCap, Gem, Map as MapIcon, FileText, Copy, Check, Menu, X, PanelLeftClose, PanelLeftOpen, Gauge, Download, Clock, type LucideIcon } from 'lucide-react';
 import {
   V3_MODULES, V3_PILLAR_META, getModuleAccess, getModuleById, type V3Pillar, type V3Module,
 } from '@/data/roadmapV3';
@@ -16,6 +16,7 @@ import V3AccessRecap from '@/components/admin/V3AccessRecap';
 import V3LaunchLinks from '@/components/admin/V3LaunchLinks';
 import V3GuidesSection from '@/components/admin/V3GuidesSection';
 import V3RoadmapTab from '@/components/admin/V3RoadmapTab';
+import V3PendingLaunchTab from '@/components/admin/V3PendingLaunchTab';
 import MaisonEditionTab from '@/components/admin/MaisonEditionTab';
 import HubAiChat from '@/components/admin/HubAiChat';
 import DocumentationStudio from '@/components/documentation-studio/DocumentationStudio';
@@ -174,7 +175,7 @@ function ModuleCard({
 }
 
 
-type HubTab = 'parcours' | 'outils' | 'documentation' | 'livres' | 'guides' | 'offres' | 'roadmap' | 'script' | 'assistant' | 'bookperfect' | 'export';
+type HubTab = 'parcours' | 'outils' | 'documentation' | 'livres' | 'guides' | 'offres' | 'roadmap' | 'pending' | 'script' | 'assistant' | 'bookperfect' | 'export';
 
 const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon }[] = [
   { id: 'parcours', label: 'Parcours', icon: Compass },
@@ -184,6 +185,7 @@ const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon }[] = [
   { id: 'guides', label: 'Guides', icon: GraduationCap },
   { id: 'offres', label: 'Offres & Packs', icon: Gem },
   { id: 'roadmap', label: 'Roadmap', icon: MapIcon },
+  { id: 'pending', label: 'En attente', icon: Clock },
   { id: 'script', label: 'Script vidéo', icon: FileText },
   { id: 'assistant', label: "Parler avec l'IA", icon: Bot },
   { id: 'bookperfect', label: 'BookPerfect AI', icon: BookOpen },
@@ -1151,6 +1153,12 @@ const V3HubPage: React.FC = () => {
         {activeTab === 'roadmap' && (
           <V3RoadmapTab />
         )}
+
+        {/* ===================== ONGLET EN ATTENTE ===================== */}
+        {activeTab === 'pending' && (
+          <V3PendingLaunchTab />
+        )}
+
 
         {/* ===================== ONGLET SCRIPT VIDÉO ===================== */}
         {activeTab === 'script' && (
