@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, Calendar, CreditCard, Layers, XCircle, CheckCircle2 } from 'lucide-react';
+import { Clock, Calendar, CreditCard, Layers, XCircle, CheckCircle2, BookOpen, Crown, Sparkles } from 'lucide-react';
 
 const INK = '#2A2118';
 const SERIF = "'Georgia', 'Times New Roman', serif";
