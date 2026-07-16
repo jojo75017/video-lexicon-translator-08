@@ -1313,9 +1313,10 @@ const V3HubPage: React.FC = () => {
 
       <V3ModuleDialog
         module={selected}
-        onClose={() => { setSelected(null); setStudioSource(null); }}
-        toolProps={selected?.id === 'book-creation-studio' ? { initialSource: studioSource } : undefined}
+        onClose={() => { setSelected(null); setStudioSource(null); setLaunchOpts({}); }}
+        toolProps={selected?.id === 'book-creation-studio' ? { initialSource: studioSource, autoRun: launchOpts.autoRun } : undefined}
       />
+
       <V3HubTour isOpen={tourOpen} onClose={finishTour} onComplete={finishTour} />
       </div>
     </div>
