@@ -234,7 +234,7 @@ function readManuscriptStats(config: EditionBookConfig): ManuscriptStats {
   }
 }
 
-const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpenModule }) => {
+const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module, opts?: { autoRun?: boolean }) => void }> = ({ onOpenModule }) => {
   const navigate = useNavigate();
   const { hasFull, isAdmin, loading } = useV3Entitlement();
   const canV4 = hasFull || isAdmin;
