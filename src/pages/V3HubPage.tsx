@@ -235,6 +235,8 @@ const V3HubPage: React.FC = () => {
   });
   const [selected, setSelected] = useState<V3Module | null>(null);
   const [studioSource, setStudioSource] = useState<string | null>(null);
+  const [launchOpts, setLaunchOpts] = useState<{ autoRun?: boolean }>({});
+
   const [tourOpen, setTourOpen] = useState(false);
   const [scriptCopied, setScriptCopied] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(
