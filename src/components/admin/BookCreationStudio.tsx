@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -6,6 +6,39 @@ import { Loader2, Sparkles, Download, Copy, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { callAIWriting } from '@/services/aiWritingService';
 import { supabase } from '@/integrations/supabase/client';
+
+/** Lit la fiche livre du Parcours pour préremplir titre/sous-titre/auteur. */
+function readHubBookConfig(): { title: string; subtitle: string; author: string; genre?: string; description?: string } {
+  try {
+    const raw = localStorage.getItem('edition_book_config_v1');
+    if (!raw) return { title: '', subtitle: '', author: '' };
+    const c = JSON.parse(raw);
+    return {
+      title: c?.title || '',
+      subtitle: c?.subtitle || '',
+      author: c?.author || '',
+      genre: c?.genre || '',
+      description: c?.description || '',
+    };
+  } catch {
+    return { title: '', subtitle: '', author: '' };
+  }
+}
+
+/** Devine le type de livre à partir du genre libre saisi dans la fiche. */
+function guessBookType(genre?: string): string {
+  const g = (genre || '').toLowerCase();
+  if (/(roman|fiction|nouvelle|thriller|polar|fantasy|sf)/.test(g)) return 'fiction';
+  if (/(enfant|jeunesse|album)/.test(g)) return 'enfants';
+  if (/(journal|planificateur|carnet)/.test(g)) return 'journal';
+  if (/(activit|coloriage|puzzle)/.test(g)) return 'activites';
+  if (/(exercice|workbook)/.test(g)) return 'exercices';
+  if (/(po[ée]sie)/.test(g)) return 'poesie';
+  if (/(bd|comic|manga)/.test(g)) return 'comique';
+  if (/(cuisine|recette)/.test(g)) return 'cuisine';
+  return 'non-fiction';
+}
+
 
 const TEAL = '#008296';
 const INK = '#232F3E';
