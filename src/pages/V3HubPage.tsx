@@ -598,7 +598,7 @@ const V3HubPage: React.FC = () => {
             </button>
 
             {/* Parcours guidé V3 — entrée principale du Hub V3 */}
-            <EditionWorkflow onOpenModule={setSelected} />
+            <EditionWorkflow onOpenModule={(m, opts) => { setLaunchOpts(opts ?? {}); setSelected(m); }} />
           </>
         )}
 
