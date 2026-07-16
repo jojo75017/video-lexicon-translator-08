@@ -338,8 +338,9 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module, opts?: { autoRun?:
 
   const openAgent = useCallback((agent: EditionAgent) => {
     const mod = getModuleById(agent.moduleId);
-    if (mod) onOpenModule(mod);
+    if (mod) onOpenModule(mod, { autoRun: true });
   }, [onOpenModule]);
+
 
 
   return (
