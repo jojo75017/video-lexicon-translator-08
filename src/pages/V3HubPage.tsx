@@ -235,6 +235,8 @@ const V3HubPage: React.FC = () => {
   });
   const [selected, setSelected] = useState<V3Module | null>(null);
   const [studioSource, setStudioSource] = useState<string | null>(null);
+  const [launchOpts, setLaunchOpts] = useState<{ autoRun?: boolean }>({});
+
   const [tourOpen, setTourOpen] = useState(false);
   const [scriptCopied, setScriptCopied] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(
@@ -596,7 +598,7 @@ const V3HubPage: React.FC = () => {
             </button>
 
             {/* Parcours guidé V3 — entrée principale du Hub V3 */}
-            <EditionWorkflow onOpenModule={setSelected} />
+            <EditionWorkflow onOpenModule={(m, opts) => { setLaunchOpts(opts ?? {}); setSelected(m); }} />
           </>
         )}
 
@@ -1311,9 +1313,10 @@ const V3HubPage: React.FC = () => {
 
       <V3ModuleDialog
         module={selected}
-        onClose={() => { setSelected(null); setStudioSource(null); }}
-        toolProps={selected?.id === 'book-creation-studio' ? { initialSource: studioSource } : undefined}
+        onClose={() => { setSelected(null); setStudioSource(null); setLaunchOpts({}); }}
+        toolProps={selected?.id === 'book-creation-studio' ? { initialSource: studioSource, autoRun: launchOpts.autoRun } : undefined}
       />
+
       <V3HubTour isOpen={tourOpen} onClose={finishTour} onComplete={finishTour} />
       </div>
     </div>

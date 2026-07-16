@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -6,6 +6,39 @@ import { Loader2, Sparkles, Download, Copy, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { callAIWriting } from '@/services/aiWritingService';
 import { supabase } from '@/integrations/supabase/client';
+
+/** Lit la fiche livre du Parcours pour préremplir titre/sous-titre/auteur. */
+function readHubBookConfig(): { title: string; subtitle: string; author: string; genre?: string; description?: string } {
+  try {
+    const raw = localStorage.getItem('edition_book_config_v1');
+    if (!raw) return { title: '', subtitle: '', author: '' };
+    const c = JSON.parse(raw);
+    return {
+      title: c?.title || '',
+      subtitle: c?.subtitle || '',
+      author: c?.author || '',
+      genre: c?.genre || '',
+      description: c?.description || '',
+    };
+  } catch {
+    return { title: '', subtitle: '', author: '' };
+  }
+}
+
+/** Devine le type de livre à partir du genre libre saisi dans la fiche. */
+function guessBookType(genre?: string): string {
+  const g = (genre || '').toLowerCase();
+  if (/(roman|fiction|nouvelle|thriller|polar|fantasy|sf)/.test(g)) return 'fiction';
+  if (/(enfant|jeunesse|album)/.test(g)) return 'enfants';
+  if (/(journal|planificateur|carnet)/.test(g)) return 'journal';
+  if (/(activit|coloriage|puzzle)/.test(g)) return 'activites';
+  if (/(exercice|workbook)/.test(g)) return 'exercices';
+  if (/(po[ée]sie)/.test(g)) return 'poesie';
+  if (/(bd|comic|manga)/.test(g)) return 'comique';
+  if (/(cuisine|recette)/.test(g)) return 'cuisine';
+  return 'non-fiction';
+}
+
 
 const TEAL = '#008296';
 const INK = '#232F3E';
@@ -57,17 +90,21 @@ const slugify = (s: string) =>
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-zA-Z0-9]+/g, '-').replace(/(^-|-$)/g, '').toLowerCase() || 'mon-livre';
 
-export default function BookCreationStudio({ initialSource }: { initialSource?: string | null } = {}) {
+export default function BookCreationStudio(
+  { initialSource, autoRun }: { initialSource?: string | null; autoRun?: boolean } = {},
+) {
   const source = (initialSource && SOURCE_META[initialSource]) ? initialSource : 'scratch';
   const meta = SOURCE_META[source];
-  const [step, setStep] = useState(0);
+  const hub = readHubBookConfig();
+  const seededType = guessBookType(hub.genre);
+  const [step, setStep] = useState<number>(autoRun ? 2 : 0);
   const [importValue, setImportValue] = useState('');
-  const [bookType, setBookType] = useState<string | null>(null);
-  const [title, setTitle] = useState('');
-  const [subtitle, setSubtitle] = useState('');
+  const [bookType, setBookType] = useState<string | null>(autoRun ? seededType : null);
+  const [title, setTitle] = useState(autoRun ? (hub.title || 'Mon livre') : '');
+  const [subtitle, setSubtitle] = useState(autoRun ? hub.subtitle : '');
   const [keywords, setKeywords] = useState('');
   const [audience, setAudience] = useState('');
-  const [idea, setIdea] = useState('');
+  const [idea, setIdea] = useState(autoRun ? (hub.description || '') : '');
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [output, setOutput] = useState('');
@@ -77,8 +114,11 @@ export default function BookCreationStudio({ initialSource }: { initialSource?: 
     setStep(1);
   };
 
-  const generate = async () => {
-    if (!title.trim()) return toast.error('Indique au moins un titre.');
+  const generate = async (opts?: { silent?: boolean }) => {
+    if (!title.trim()) {
+      if (!opts?.silent) toast.error('Indique au moins un titre.');
+      return;
+    }
     setLoading(true);
     setOutput('');
     try {
@@ -108,6 +148,20 @@ Sois concret, orienté valeur lecteur et cohérent avec la niche.`;
       setLoading(false);
     }
   };
+
+  // Auto-lancement : quand l'utilisateur clique « Lancer » sur un agent du
+  // Parcours, on démarre directement la génération avec la fiche livre du Hub
+  // (ou des valeurs par défaut) sans afficher les étapes Type/Détails.
+  const autoRunTriggered = useRef(false);
+  useEffect(() => {
+    if (autoRun && !autoRunTriggered.current) {
+      autoRunTriggered.current = true;
+      generate({ silent: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoRun]);
+
+
 
   const downloadTxt = () => {
     if (!output.trim()) return;
@@ -294,7 +348,7 @@ Sois concret, orienté valeur lecteur et cohérent avec la niche.`;
               <div><strong>Public :</strong> {audience || '—'}</div>
               <div><strong>Mots-clés :</strong> {keywords || '—'}</div>
             </div>
-            <Button onClick={generate} disabled={loading} style={{ background: TEAL, color: '#fff' }}>
+            <Button onClick={() => generate()} disabled={loading} style={{ background: TEAL, color: '#fff' }}>
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
               <span className="ml-1.5">Générer le plan du livre</span>
             </Button>
