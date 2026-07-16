@@ -135,53 +135,92 @@ export default function V3PendingLaunchTab() {
         </div>
       </div>
 
-      {/* Piste tarifaire mensuelle (inspiration ViviBook) — À DISCUTER */}
+      {/* Piste tarifaire mensuelle/annuelle — modèle ViviBook simplifié, EN ATTENTE */}
       <div className="rounded-2xl border-2 bg-white p-5 sm:p-6" style={{ borderColor: `${AMBER}66` }}>
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-3 flex-wrap">
           <BookOpen className="h-5 w-5" style={{ color: AMBER_DEEP }} />
           <h3 className="text-xl font-semibold" style={{ fontFamily: SERIF, color: INK }}>
-            Piste alternative — 3 forfaits mensuels par volume de livres
+            Modèle ViviBook simplifié — 3 forfaits (mensuel ou annuel)
           </h3>
           <span
             className="ml-2 rounded-full border px-2 py-0.5 text-[10px] font-black uppercase tracking-wider"
             style={{ background: AMBER_SOFT, borderColor: `${AMBER}66`, color: AMBER_DEEP }}
           >
-            À discuter
+            En attente
           </span>
         </div>
         <p className="text-sm mb-4" style={{ color: '#6f5e47' }}>
-          Inspiré du modèle ViviBook (Reader / Creator / Author). Ici tout est <strong>mensuel</strong>,
-          la différence entre les 3 forfaits = <strong>nombre de livres créés par mois</strong>.
-          <em> À rediscuter — rien n'est décidé, ce bloc est juste conservé dans l'attente.</em>
+          Version <strong>plus réaliste et moins compliquée</strong> : 3 forfaits clairs,
+          au choix <strong>mensuel</strong> ou <strong>annuel</strong> (économie affichée).
+          Chaque forfait = un nombre de livres par mois.
         </p>
         <div className="grid gap-4 sm:grid-cols-3">
-          <div className="rounded-xl border p-4 bg-neutral-50">
+          {/* Débutants */}
+          <div className="rounded-xl border p-4 bg-neutral-50 flex flex-col">
             <div className="flex items-center gap-2 text-xs uppercase font-bold tracking-wider text-neutral-600">
-              <BookOpen className="h-3.5 w-3.5" /> Forfait 1
+              <BookOpen className="h-3.5 w-3.5" /> Débutants
             </div>
-            <div className="mt-2 text-2xl font-bold" style={{ color: INK }}>10 livres / mois</div>
-            <div className="text-xs mt-1" style={{ color: '#6f5e47' }}>Entrée de gamme</div>
+            <div className="mt-1 text-sm" style={{ color: '#6f5e47' }}>Lisez des histoires illimitées</div>
+            <div className="mt-3 text-2xl font-bold" style={{ color: INK }}>5 livres / mois</div>
+            <div className="mt-4 rounded-lg bg-white border p-3">
+              <div className="text-[11px] uppercase font-bold tracking-wider text-neutral-500">Mensuel</div>
+              <div className="text-lg font-bold" style={{ color: INK }}>6,99 € <span className="text-xs font-normal text-neutral-500">+ taxes / mois</span></div>
+            </div>
+            <div className="mt-2 rounded-lg border p-3" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44` }}>
+              <div className="text-[11px] uppercase font-bold tracking-wider" style={{ color: AMBER_DEEP }}>Annuel</div>
+              <div className="text-lg font-bold" style={{ color: INK }}>
+                <span className="line-through text-sm font-normal text-neutral-400 mr-1">83,88 €</span>
+                69,00 € <span className="text-xs font-normal text-neutral-500">+ taxes / an</span>
+              </div>
+            </div>
           </div>
-          <div className="rounded-xl border p-4" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44` }}>
+
+          {/* Expert */}
+          <div className="rounded-xl border p-4 flex flex-col" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44` }}>
             <div className="flex items-center gap-2 text-xs uppercase font-bold tracking-wider" style={{ color: AMBER_DEEP }}>
-              <Sparkles className="h-3.5 w-3.5" /> Forfait 2
+              <Sparkles className="h-3.5 w-3.5" /> Expert
             </div>
-            <div className="mt-2 text-2xl font-bold" style={{ color: INK }}>20 livres / mois</div>
-            <div className="text-xs mt-1" style={{ color: AMBER_DEEP }}>Le plus populaire (à confirmer)</div>
+            <div className="mt-1 text-sm" style={{ color: '#6f5e47' }}>Créez des histoires pour vous</div>
+            <div className="mt-3 text-2xl font-bold" style={{ color: INK }}>10 livres / mois</div>
+            <div className="mt-4 rounded-lg bg-white border p-3">
+              <div className="text-[11px] uppercase font-bold tracking-wider text-neutral-500">Mensuel</div>
+              <div className="text-lg font-bold" style={{ color: INK }}>9,99 € <span className="text-xs font-normal text-neutral-500">+ taxes / mois</span></div>
+            </div>
+            <div className="mt-2 rounded-lg border p-3 bg-white">
+              <div className="text-[11px] uppercase font-bold tracking-wider" style={{ color: AMBER_DEEP }}>Annuel</div>
+              <div className="text-lg font-bold" style={{ color: INK }}>
+                <span className="line-through text-sm font-normal text-neutral-400 mr-1">119,88 €</span>
+                79,00 € <span className="text-xs font-normal text-neutral-500">+ taxes / an</span>
+              </div>
+            </div>
           </div>
-          <div className="rounded-xl border p-4" style={{ background: '#141414', borderColor: '#c9a84c' }}>
+
+          {/* Auteur */}
+          <div className="rounded-xl border p-4 flex flex-col" style={{ background: '#141414', borderColor: '#c9a84c' }}>
             <div className="flex items-center gap-2 text-xs uppercase font-bold tracking-wider" style={{ color: '#c9a84c' }}>
-              <Crown className="h-3.5 w-3.5" /> Forfait 3
+              <Crown className="h-3.5 w-3.5" /> Auteur
             </div>
-            <div className="mt-2 text-2xl font-bold text-white">50 livres / mois</div>
-            <div className="text-xs mt-1" style={{ color: '#c9a84c' }}>Pro / Éditeur</div>
+            <div className="mt-1 text-sm text-neutral-300">Publiez vos propres livres</div>
+            <div className="mt-3 text-2xl font-bold text-white">20 livres / mois</div>
+            <div className="mt-4 rounded-lg p-3" style={{ background: '#1f1f1f', border: '1px solid #333' }}>
+              <div className="text-[11px] uppercase font-bold tracking-wider text-neutral-400">Mensuel</div>
+              <div className="text-lg font-bold text-white">59,00 € <span className="text-xs font-normal text-neutral-400">+ taxes / mois</span></div>
+            </div>
+            <div className="mt-2 rounded-lg p-3" style={{ background: '#1f1f1f', border: '1px solid #c9a84c' }}>
+              <div className="text-[11px] uppercase font-bold tracking-wider" style={{ color: '#c9a84c' }}>Annuel</div>
+              <div className="text-lg font-bold text-white">
+                <span className="line-through text-sm font-normal text-neutral-500 mr-1">708,00 €</span>
+                360,00 € <span className="text-xs font-normal text-neutral-400">+ taxes / an</span>
+              </div>
+            </div>
           </div>
         </div>
         <p className="mt-4 text-xs italic" style={{ color: '#6f5e47' }}>
-          ⚠️ Ce modèle mensuel serait <strong>en conflit direct</strong> avec la décision « JAMAIS d'abonnement mensuel, uniquement paiement en 1×/2×/3× ».
-          À trancher avant d'exécuter le plan de lancement.
+          ⚠️ Modèle par abonnement (mensuel/annuel) — <strong>en conflit</strong> avec la décision actuelle
+          « uniquement paiement en 1×/2×/3× ». À trancher avant exécution. Rien n'est codé pour l'instant.
         </p>
       </div>
+
 
 
       {/* Note finale */}
