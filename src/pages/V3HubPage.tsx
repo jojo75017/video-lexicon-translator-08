@@ -722,6 +722,11 @@ const V3HubPage: React.FC = () => {
           </>
         )}
 
+        {/* ===================== ONGLET TOUS LES OUTILS V2 ===================== */}
+        {activeTab === 'toolsV2' && (
+          <V3AllToolsTab />
+        )}
+
         {/* ===================== ONGLET DOCUMENTATION STUDIO ===================== */}
         {activeTab === 'documentation' && (
           <DocumentationStudio />
