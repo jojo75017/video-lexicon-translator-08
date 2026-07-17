@@ -4,7 +4,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Loader2, Sparkles, Download, Copy, Save } from 'lucide-react';
 import { toast } from 'sonner';
-import { callAIWriting } from '@/services/aiWritingService';
+import { callAIWriting, getProvider, getProviderKey, validateKeyFormat, PROVIDER_LABELS } from '@/services/aiWritingService';
 import { supabase } from '@/integrations/supabase/client';
 
 /** Lit la fiche livre du Parcours pour préremplir titre/sous-titre/auteur. */
