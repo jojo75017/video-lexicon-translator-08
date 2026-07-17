@@ -384,10 +384,15 @@ Sois concret, orienté valeur lecteur et cohérent avec la niche.`;
               <div><strong>Public :</strong> {audience || '—'}</div>
               <div><strong>Mots-clés :</strong> {keywords || '—'}</div>
             </div>
-            <Button onClick={() => generate()} disabled={loading} style={{ background: TEAL, color: '#fff' }}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-              <span className="ml-1.5">Générer le plan du livre</span>
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button onClick={() => generate()} disabled={loading} style={{ background: TEAL, color: '#fff' }}>
+                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                <span className="ml-1.5">{loading ? 'Génération en cours…' : 'Générer le plan du livre'}</span>
+              </Button>
+              {loading && (
+                <Button variant="outline" onClick={cancelGeneration}>Annuler</Button>
+              )}
+            </div>
           </div>
           <div className="flex justify-start">
             <Button variant="outline" onClick={() => setStep(1)}>Retour</Button>
