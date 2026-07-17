@@ -1,54 +1,49 @@
-# Plan V3 — Lancement Octobre 2026 (en attente, à exécuter fin septembre)
 
-**Statut : ROADMAP — aucune modification de code à faire maintenant.** Ce plan est prêt à être exécuté le moment venu. Rien ne sera cassé d'ici là. Tu peux l'approuver pour qu'il soit officialisé dans la roadmap, ou demander des ajustements.
+## 1. Débloquer le workflow V3 (blocage "Génération")
 
-## Décisions prises
+**Diagnostic** : `BookCreationStudio` ouvert en `autoRun` appelle `generate({ silent: true })` → `callAIWriting()`. Si le titre est vide ou si aucune clé BYOK n'est configurée, la fonction sort silencieusement → spinner infini sans aucun message.
 
-- **Un seul V3** avec **30 agents** (fusion de l'ancien V3 22 agents + 8 agents des packs Pro). Plus de "V4" ni de "Pack Pro Vendeur" à 347€.
-- **Prix de lancement : 97€** du **1er au 31 octobre 2026** (23h59).
-- **Prix normal : 197€** à partir du **1er novembre 2026**.
-- **Tous les modules premium** (Sélection éditeurs, Special Books, Revenus, Distribution, Social, Qualité, Étude de marché…) deviennent des **upsells** — visibles mais désactivés avec badge "Bientôt", à construire le mois suivant.
-- **Paiements en plusieurs fois — one‑shot, JAMAIS d'abonnement mensuel** :
-  - **Octobre (97€)** : 1×97€ · 2×49€ · 3×33€
-  - **Novembre+ (197€)** : 1×197€ · 2×99€ · 3×66€
-  - Stripe `mode: "payment"` uniquement. Chaque option = un prix distinct. Pas de `mode: "subscription"`.
-- **Pack Full 347€ : désactivé** (les clés `v3_full_*` renvoient une erreur claire).
+**Corrections dans `src/components/admin/BookCreationStudio.tsx`** :
 
-## Ce qui sera modifié le moment venu
+- Retirer `silent: true` de l'auto-run pour que les erreurs remontent en toast.
+- Avant `callAIWriting`, vérifier `getProviderKey(getProvider())` : si absent → toast « Configurez d'abord votre clé IA » + `window.dispatchEvent(new CustomEvent('open-api-keys'))` pour ouvrir le panneau clés + `setStep(1)` pour ne pas rester bloqué.
+- Si `autoRun` mais `!title.trim()` → toast « Renseignez au moins un titre » + `setStep(1)` (afficher les champs pour compléter, au lieu de bloquer).
+- Timer de sécurité : si `loading` reste `true` > 90 s → auto-reset avec toast « L'IA ne répond pas, réessayez » + `setStep(1)`.
+- Ajouter un bouton **« Annuler »** visible pendant `loading` pour permettre de sortir manuellement.
+- Ajouter un écouteur `open-api-keys` dans `ApiKeysFloatingButton.tsx` pour ouvrir automatiquement le dialog quand l'événement est émis.
 
-### Nouveaux fichiers
-- `src/data/v3LaunchPricing.ts` — `V3_LAUNCH_PRICE=97`, `V3_REGULAR_PRICE=197`, `currentV3Price()` basé sur la date, tableaux d'échéances.
-- `src/components/sales/V3LaunchCountdown.tsx` — compte à rebours 1er → 31 oct, renvoie `null` après.
+## 2. Réintégrer tous les outils V2 dans le Hub V3
 
-### Fichiers modifiés
-- `src/data/roadmapV3.ts` — 30 agents, prix dynamique.
-- `src/data/v3Launch.ts` — une seule offre V3 (plus de `v3-pro`).
-- `src/data/v3ModuleRegistry.tsx` — flag `upsell: true` + badge "Bientôt" côté client.
-- `src/components/sales/V3PricingTiers.tsx` / `PricingLadder497.tsx` — 1 seul tier + section "upsells à venir".
-- `supabase/functions/stripe-checkout/index.ts` — nouvelles clés `v3_launch_1x/2x/3x` (97€, 2×49€, 3×33€) et bascule automatique sur `v3_base_1x/2x/3x` (197€, 2×99€, 3×66€) après le 31/10. `v3_full_*` retourne 400.
+**Constat** : Vous dites « on n'a pas à chercher » — les outils V2 (KDP Analyzer, Cover Studio, Audiobook, BD Studio, Word Count, Ambiances, Niches 600, etc.) doivent être visibles et lançables directement depuis /hub-v3, pas éparpillés sur d'anciennes routes.
 
-### Hors périmètre (à faire plus tard)
-- Construction des tunnels upsell (le mois suivant).
-- Emails / séquence de lancement.
+**Approche** :
 
-## Validation prévue
+1. **Inventorier les outils V2** en scannant `src/pages/` (KDP, Cover, Audiobook, BD, Ambiances, WordCount, Niches600, EbookIdeas, PromptsGenerator, ProductGenerator, AuditPilot, PracticalSheets, AiChat, ToolsGuide, Suggestions, etc.).
 
-1. Typecheck OK.
-2. `/vente-v3` affiche 97€ (197€ barré) + countdown fonctionnel en octobre.
-3. Admin `PricingLadder497` : 1 seul tier + upsells "bientôt".
-4. Checkout test carte `4242…` → montant 97,00€ pendant octobre.
-5. Simulation date > 1er nov → prix revient à 197€ automatiquement.
+2. **Créer un registre unifié** `src/data/v3ToolsRegistry.ts` regroupant chaque outil avec :
+   ```ts
+   { id, label, icon, category: 'ecriture'|'visuel'|'audio'|'kdp'|'marketing'|'analyse', route?, moduleKey?, description, badge?: 'V2'|'V3'|'Nouveau' }
+   ```
 
-## Pourquoi rien n'est cliquable ni modifié aujourd'hui
+3. **Ajouter un onglet « Tous les outils »** dans `V3HubPage.tsx` (à côté de Parcours / Roadmap / etc.) affichant une grille catégorisée avec :
+   - Recherche par nom
+   - Filtre par catégorie
+   - Clic → soit ouvre le module V3 en dialog (si `moduleKey` existe), soit navigue vers la route V2 (`route`)
+   - Badge visuel V2 / V3 pour clarté
 
-Tu as toi‑même demandé de **mettre ce chantier en attente jusqu'au mois prochain** ("on verra cela le mois prochain à mettre en place"). Le plan est donc **archivé dans la roadmap** (`mem://business/pricing/v3-launch-october`) et prêt à être déclenché dès que tu diras "on y va". Si tu veux au contraire que je l'exécute **dès maintenant**, dis‑le explicitement et je lance l'implémentation dans la foulée.
+4. **Composant** : `src/components/admin/V3AllToolsTab.tsx` — cartes cliquables format Amazon KDP (fond #FAFAFA, accent #008296, hover #FF9E2D).
 
-## Piste alternative — 3 forfaits mensuels par volume (À DISCUTER, en attente)
+5. **Pas de duplication de code** : les outils V2 restent sur leurs routes actuelles, le nouvel onglet est juste un **launcher unifié** qui pointe vers eux (via `<Link to={route}>` ou `onOpenModule(moduleKey)`).
 
-Inspirée du modèle ViviBook (Reader / Creator / Author), gardée en réserve :
+## Fichiers touchés
 
-- **Forfait 1** — 10 livres / mois
-- **Forfait 2** — 20 livres / mois (le plus populaire, à confirmer)
-- **Forfait 3** — 50 livres / mois (Pro / Éditeur)
+- `src/components/admin/BookCreationStudio.tsx` — fix autoRun bloqué (garde-fous + timeout + annuler)
+- `src/components/ebook/ApiKeysFloatingButton.tsx` — écouter l'événement `open-api-keys`
+- `src/data/v3ToolsRegistry.ts` — **nouveau**, registre centralisé des outils V2+V3
+- `src/components/admin/V3AllToolsTab.tsx` — **nouveau**, onglet grille catégorisée
+- `src/pages/V3HubPage.tsx` — ajouter l'onglet « Tous les outils »
 
-Tout serait **mensuel récurrent**. ⚠️ Ce modèle est en **conflit direct** avec la décision actuelle « JAMAIS d'abonnement mensuel, uniquement paiement en 1×/2×/3× ». À trancher avant d'exécuter le plan de lancement. Rien à coder tant que la décision n'est pas prise — bloc ajouté à l'onglet « En attente » du Hub V3 pour référence.
+## Non fait volontairement
+
+- **Mailjet** : abandonné selon votre décision, on reste sur Resend + Brevo existants.
+- Pas de refactor des pages V2 elles-mêmes — juste un launcher unifié dans le Hub.

@@ -4,7 +4,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Loader2, Sparkles, Download, Copy, Save } from 'lucide-react';
 import { toast } from 'sonner';
-import { callAIWriting } from '@/services/aiWritingService';
+import { callAIWriting, getProvider, getProviderKey, validateKeyFormat, PROVIDER_LABELS } from '@/services/aiWritingService';
 import { supabase } from '@/integrations/supabase/client';
 
 /** Lit la fiche livre du Parcours pour préremplir titre/sous-titre/auteur. */
@@ -114,13 +114,33 @@ export default function BookCreationStudio(
     setStep(1);
   };
 
-  const generate = async (opts?: { silent?: boolean }) => {
+  const loadingTimerRef = useRef<number | null>(null);
+
+  const generate = async () => {
+    // Garde-fou 1 : titre requis, sinon on montre l'étape Détails au lieu de bloquer.
     if (!title.trim()) {
-      if (!opts?.silent) toast.error('Indique au moins un titre.');
+      toast.error('Renseignez au moins un titre pour lancer la génération.');
+      setStep(1);
+      return;
+    }
+    // Garde-fou 2 : clé BYOK indispensable, sinon on ouvre le panneau clés.
+    const provider = getProvider();
+    const key = getProviderKey(provider);
+    if (!key || !validateKeyFormat(provider, key)) {
+      toast.error(`Configurez d'abord votre clé ${PROVIDER_LABELS[provider]} pour lancer la génération.`);
+      window.dispatchEvent(new CustomEvent('open-api-keys'));
+      setStep(1);
       return;
     }
     setLoading(true);
     setOutput('');
+    // Filet de sécurité : si l'IA ne répond pas au bout de 90 s, on débloque l'UI.
+    if (loadingTimerRef.current) window.clearTimeout(loadingTimerRef.current);
+    loadingTimerRef.current = window.setTimeout(() => {
+      setLoading(false);
+      toast.error('L\'IA ne répond pas. Vérifiez votre clé et réessayez.');
+      setStep(1);
+    }, 90_000);
     try {
       const typeLabel = BOOK_TYPES.find((t) => t.id === bookType)?.title ?? 'Livre';
       const prompt = `Tu es un auteur professionnel KDP. Génère le PLAN STRUCTURÉ d'un livre de type "${typeLabel}" prêt à être développé via le pipeline éditorial.
@@ -144,9 +164,24 @@ Sois concret, orienté valeur lecteur et cohérent avec la niche.`;
       toast.success('Plan généré ✓');
     } catch (e: any) {
       toast.error(e?.message || 'Échec de la génération.');
+      setStep(1);
     } finally {
       setLoading(false);
+      if (loadingTimerRef.current) {
+        window.clearTimeout(loadingTimerRef.current);
+        loadingTimerRef.current = null;
+      }
     }
+  };
+
+  const cancelGeneration = () => {
+    if (loadingTimerRef.current) {
+      window.clearTimeout(loadingTimerRef.current);
+      loadingTimerRef.current = null;
+    }
+    setLoading(false);
+    setStep(1);
+    toast('Génération annulée.');
   };
 
   // Auto-lancement : quand l'utilisateur clique « Lancer » sur un agent du
@@ -156,10 +191,11 @@ Sois concret, orienté valeur lecteur et cohérent avec la niche.`;
   useEffect(() => {
     if (autoRun && !autoRunTriggered.current) {
       autoRunTriggered.current = true;
-      generate({ silent: true });
+      generate();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoRun]);
+
 
 
 
@@ -348,10 +384,15 @@ Sois concret, orienté valeur lecteur et cohérent avec la niche.`;
               <div><strong>Public :</strong> {audience || '—'}</div>
               <div><strong>Mots-clés :</strong> {keywords || '—'}</div>
             </div>
-            <Button onClick={() => generate()} disabled={loading} style={{ background: TEAL, color: '#fff' }}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-              <span className="ml-1.5">Générer le plan du livre</span>
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button onClick={() => generate()} disabled={loading} style={{ background: TEAL, color: '#fff' }}>
+                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                <span className="ml-1.5">{loading ? 'Génération en cours…' : 'Générer le plan du livre'}</span>
+              </Button>
+              {loading && (
+                <Button variant="outline" onClick={cancelGeneration}>Annuler</Button>
+              )}
+            </div>
           </div>
           <div className="flex justify-start">
             <Button variant="outline" onClick={() => setStep(1)}>Retour</Button>
