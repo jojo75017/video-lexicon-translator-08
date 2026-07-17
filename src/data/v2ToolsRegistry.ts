@@ -48,7 +48,7 @@ export const V2_TOOLS: V2Tool[] = [
   { id: 'ai-chat', label: 'Chat IA', description: 'Assistant conversationnel pour brainstormer et écrire.', route: '/ai-chat', icon: Bot, category: 'ecriture' },
   { id: 'ebookbot', label: 'Ebookbot', description: 'Bot spécialisé création d\'ebook pas à pas.', route: '/ebookbot', icon: Wand2, category: 'ecriture' },
   { id: 'quiz', label: 'Quiz Auteur', description: 'Identifiez votre profil d\'auteur en 2 minutes.', route: '/quiz', icon: Users, category: 'ecriture' },
-  { id: 'word-count', label: 'Compteur de mots', description: 'Estimez pages KDP, densité et volume de manuscrit.', route: '/mot-a-mot', icon: FileText, category: 'ecriture' },
+  
 
   // — Visuel & Couverture —
   { id: 'couverture-kdp', label: 'Cover Studio KDP', description: 'Générez des couvertures Kindle et poche prêtes à publier.', route: '/couverture-kdp', icon: ImageIcon, category: 'visuel', badge: 'Populaire' },
