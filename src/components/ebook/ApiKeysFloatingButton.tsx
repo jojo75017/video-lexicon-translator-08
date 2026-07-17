@@ -42,6 +42,14 @@ const ApiKeysFloatingButton = () => {
     return () => window.clearInterval(id);
   }, []);
 
+  // Permet aux autres composants (ex. BookCreationStudio) d'ouvrir ce dialog
+  // via window.dispatchEvent(new CustomEvent('open-api-keys')).
+  useEffect(() => {
+    const handler = () => setOpen(true);
+    window.addEventListener('open-api-keys', handler);
+    return () => window.removeEventListener('open-api-keys', handler);
+  }, []);
+
   if (HIDDEN_PREFIXES.some((r) => location.pathname.startsWith(r))) return null;
   if (!VISIBLE_PREFIXES.some((r) => location.pathname.startsWith(r))) return null;
 
