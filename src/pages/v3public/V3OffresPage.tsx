@@ -76,17 +76,28 @@ type Upsell = {
   name: string;
   price: string;
   suffix: string;
-  priceId: string;
+  priceId?: string;
+  href?: string;
   desc: string;
+  badge?: string;
 };
 
 const UPSELLS: Upsell[] = [
-  { id: 'selection', name: 'Sélection maisons d’édition', price: '19 €', suffix: '/ mois', priceId: 'v3_upsell_selection_month', desc: 'Trouvez les éditeurs susceptibles de publier votre livre.' },
-  { id: 'aplus', name: 'A+ Content Amazon', price: '9 €', suffix: '/ mois', priceId: 'v3_upsell_aplus_month', desc: 'Modules visuels optimisés pour vos fiches KDP.' },
-  { id: 'lookinside', name: 'Look Inside Optimizer', price: '7 €', suffix: '/ mois', priceId: 'v3_upsell_lookinside_month', desc: 'Optimise l’aperçu Amazon des premières pages.' },
-  { id: 'bookbub', name: 'BookBub Ad Builder', price: '9 €', suffix: '/ mois', priceId: 'v3_upsell_bookbub_month', desc: 'Générateur de visuels publicitaires BookBub.' },
-  { id: 'newsletter', name: 'Newsletter Auteur', price: '12 €', suffix: '/ mois', priceId: 'v3_upsell_newsletter_month', desc: 'Séquences email prêtes à l’emploi.' },
-  { id: 'relecture', name: 'Relecture éditoriale humaine', price: '49 €', suffix: '/ livre', priceId: 'v3_upsell_relecture_once', desc: 'Correction professionnelle par un relecteur humain.' },
+  {
+    id: 'bookperfect',
+    name: 'BookPerfect AI — Directeur éditorial',
+    price: '67 €',
+    suffix: '· au lieu de 97 €',
+    href: '/bookperfect-offre',
+    badge: 'Lancement',
+    desc: "Analyse votre roman Word chapitre par chapitre : traces d'IA, orthographe, style, contrôle Amazon KDP et export Word corrigé — sans jamais altérer votre texte original.",
+  },
+  { id: 'selection', name: 'Sélection maisons d’édition', price: '19 €', suffix: '+ taxes / mois', priceId: 'v3_upsell_selection_month', desc: 'Trouvez les éditeurs susceptibles de publier votre livre.' },
+  { id: 'aplus', name: 'A+ Content Amazon', price: '9 €', suffix: '+ taxes / mois', priceId: 'v3_upsell_aplus_month', desc: 'Modules visuels optimisés pour vos fiches KDP.' },
+  { id: 'lookinside', name: 'Look Inside Optimizer', price: '7 €', suffix: '+ taxes / mois', priceId: 'v3_upsell_lookinside_month', desc: 'Optimise l’aperçu Amazon des premières pages.' },
+  { id: 'bookbub', name: 'BookBub Ad Builder', price: '9 €', suffix: '+ taxes / mois', priceId: 'v3_upsell_bookbub_month', desc: 'Générateur de visuels publicitaires BookBub.' },
+  { id: 'newsletter', name: 'Newsletter Auteur', price: '12 €', suffix: '+ taxes / mois', priceId: 'v3_upsell_newsletter_month', desc: 'Séquences email prêtes à l’emploi.' },
+  { id: 'relecture', name: 'Relecture éditoriale humaine', price: '49 €', suffix: '+ taxes / livre', priceId: 'v3_upsell_relecture_once', desc: 'Correction professionnelle par un relecteur humain.' },
 ];
 
 export default function V3OffresPage() {
@@ -227,25 +238,39 @@ export default function V3OffresPage() {
             {UPSELLS.map((u) => (
               <div
                 key={u.id}
-                className="flex flex-col rounded-xl border border-black/10 bg-[#FFF9EF] p-4 hover:shadow-md transition-shadow"
+                className="relative flex flex-col rounded-xl border border-black/10 bg-[#FFF9EF] p-4 hover:shadow-md transition-shadow"
               >
+                {u.badge && (
+                  <span className="absolute -top-2 right-3 rounded-full bg-[var(--v3-orange)] px-2 py-0.5 text-[10px] font-bold text-white shadow">
+                    {u.badge}
+                  </span>
+                )}
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-[var(--v3-orange)]" />
                   <h4 className="font-semibold text-[var(--v3-ink)]">{u.name}</h4>
                 </div>
                 <p className="mt-1 text-xs text-[var(--v3-muted)] flex-1">{u.desc}</p>
-                <div className="mt-3 flex items-center justify-between">
+                <div className="mt-3 flex items-center justify-between gap-2">
                   <div className="text-sm">
                     <span className="text-lg font-bold text-[var(--v3-ink)]">{u.price}</span>
-                    <span className="text-[var(--v3-muted)] text-xs"> + taxes {u.suffix}</span>
+                    <span className="text-[var(--v3-muted)] text-xs"> {u.suffix}</span>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setCheckout({ priceId: u.priceId, planName: `${u.name} — ${u.price} ${u.suffix}` })}
-                    className="v3-btn v3-btn-outline text-xs px-3 py-1.5"
-                  >
-                    Ajouter
-                  </button>
+                  {u.href ? (
+                    <a href={u.href} className="v3-btn v3-btn-primary text-xs px-3 py-1.5">
+                      Découvrir
+                    </a>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        u.priceId &&
+                        setCheckout({ priceId: u.priceId, planName: `${u.name} — ${u.price} ${u.suffix}` })
+                      }
+                      className="v3-btn v3-btn-outline text-xs px-3 py-1.5"
+                    >
+                      Ajouter
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
