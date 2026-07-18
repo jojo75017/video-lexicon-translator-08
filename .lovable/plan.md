@@ -1,61 +1,109 @@
-
-# Audiobook unlock — 9,99 € par livre (BYOK TTS)
+# Plan de correction prioritaire V3
 
 ## Objectif
-Après génération d'un livre sur `/v3`, l'utilisateur peut payer **9,99 € une fois** pour ce livre précis, puis générer la version audio (MP3 unique) en utilisant **sa propre clé** Azure Speech, ElevenLabs, ou OpenAI TTS. Le coût de synthèse est à sa charge (BYOK), on n'utilise jamais nos propres clés serveur pour ce flux.
 
-## Produit Stripe
-- Nouveau produit `audiobook_unlock` — prix `audiobook_unlock_one` — 999 cents EUR, one-shot.
-- Créé via `payments--create_product` (test → sync auto en live).
+Stabiliser le parcours de création V3 pour que :
+- le livre soit réellement sauvegardé dans la bibliothèque,
+- le brouillon ne disparaisse plus,
+- le sommaire soit généré et validé avant le workflow,
+- le workflow ne produise plus de chapitres vides ou cassés.
 
-## Base de données
-Nouvelle table `audiobook_unlocks` :
+## Diagnostic confirmé
+
+- Le bouton « Sauvegarder brouillon » de `/v3/create` sauvegarde seulement dans le navigateur, pas dans la base.
+- La page `/v3/library` lit les livres depuis la table `ebook_projects`, donc les brouillons locaux n’y apparaissent pas.
+- La table `ebook_projects` a bien des règles par utilisateur, mais il manque les droits explicites d’accès côté application pour `authenticated`, ce qui peut bloquer la lecture/écriture même si les règles sont bonnes.
+- Le workflow final appelle `onComplete(bookData)`, mais la page V3 ne persiste pas automatiquement ce résultat dans `ebook_projects`.
+
+## Étape 1 — Réparer l’accès base pour les livres
+
+Créer une migration courte pour `ebook_projects` :
+
+- donner à l’utilisateur connecté les droits nécessaires pour créer, lire, modifier et supprimer ses propres livres,
+- donner au backend les droits complets nécessaires,
+- ne rien ouvrir au public anonyme.
+
+Aucune donnée personnelle ne sera rendue publique.
+
+## Étape 2 — Sauvegarder dès le brouillon
+
+Modifier `V3CreateWizard.tsx` pour que « Sauvegarder brouillon » crée ou mette à jour un vrai projet dans `ebook_projects` avec :
+
+- titre,
+- auteur,
+- synopsis/description,
+- catégorie,
+- ton,
+- nombre de chapitres,
+- mots par chapitre,
+- personnages,
+- statut brouillon via les champs existants.
+
+Le bouton affichera un retour clair :
+
+```text
+Sauvegardé dans Mes livres
 ```
-id, user_id, book_id (text), stripe_session_id, environment,
-paid_at, audio_url (nullable), provider_used, created_at
+
+## Étape 3 — Auto-sauvegarde avant lancement du workflow
+
+Quand l’utilisateur clique sur « Générer le livre » :
+
+1. sauvegarder immédiatement le projet en base,
+2. conserver l’identifiant du projet,
+3. lancer le workflow seulement après cette sauvegarde.
+
+Ainsi, même si la génération plante ou si la page est fermée, le livre reste visible dans « Mes livres ».
+
+## Étape 4 — Sauvegarder automatiquement le livre terminé
+
+Quand le workflow 30 agents se termine :
+
+- récupérer `completedBook`,
+- mettre à jour le même projet dans `ebook_projects`,
+- remplir les chapitres générés,
+- remplir la conclusion/préface si disponibles,
+- conserver la couverture si elle existe.
+
+Résultat : le livre final apparaît dans « Terminés » dans la bibliothèque.
+
+## Étape 5 — Ajouter une étape « Sommaire » avant génération
+
+Ajouter une étape visible dans `/v3/create` :
+
+```text
+Idée -> Style -> Sommaire -> Personnages -> Titre -> Génération
 ```
-RLS : user lit les siens, service_role écrit. Grants explicites `authenticated` + `service_role`.
 
-## Edge functions
-1. **`create-audiobook-checkout`** (`verify_jwt=false`)
-   - Input : `book_id`, `user_id`, `returnUrl`, `environment`.
-   - Stripe Checkout embedded, `mode: payment`, metadata `{ userId, bookId, kind: "audiobook_unlock" }`.
-   - Renvoie `clientSecret`.
+Dans cette étape :
+- bouton « Générer le sommaire »,
+- affichage de tous les chapitres,
+- modification manuelle des titres/objectifs,
+- ajout/suppression de chapitres,
+- validation obligatoire avant génération.
 
-2. **`payments-webhook`** (existant, à étendre)
-   - Sur `checkout.session.completed` avec `metadata.kind === "audiobook_unlock"` → insert dans `audiobook_unlocks`.
+Chaque chapitre devra avoir un vrai titre, pas « Chapitre 1 ».
 
-3. **`generate-audiobook-byok`** (verify_jwt actif)
-   - Input : `book_id`, `provider` (`azure` | `elevenlabs` | `openai`), credentials (clé + région Azure, voix), texte du manuscrit.
-   - Vérifie qu'il existe un `audiobook_unlocks` payé pour ce user + book.
-   - Découpe le texte (~4500 car / chunk pour Azure, ~2500 pour ElevenLabs, ~4000 pour OpenAI).
-   - Appelle le provider avec la **clé de l'utilisateur** (jamais stockée).
-   - Concatène les MP3, upload dans le bucket `audiobooks` (déjà existant) sous `user_id/book_id.mp3`.
-   - Met à jour `audio_url` + `provider_used`.
-   - Renvoie l'URL publique.
+## Étape 6 — Injecter le sommaire validé dans le workflow
 
-## Interface (front)
-- **`src/components/audiobook/AudiobookUnlockCard.tsx`** : bandeau dans le récap final du wizard et dans la fiche livre bibliothèque. Deux états :
-  - Non payé → bouton « Convertir en audiobook — 9,99 € » → ouvre Stripe Embedded Checkout.
-  - Payé → formulaire BYOK (choix provider, clé collée, voix, vitesse), bouton « Générer l'audio », barre de progression, lecteur MP3 + téléchargement.
-- Intégré dans `V3CreatePage.tsx` (fin du wizard) et `V3LibraryPage.tsx` (par livre).
-- Clés BYOK TTS stockées dans `localStorage` chiffré (même utilitaire que Gemini/OpenRouter), jamais envoyées ailleurs qu'à l'edge de génération pour le run en cours.
+Le sommaire validé sera transmis au workflow dans la configuration du livre, pour que les 30 agents suivent la structure choisie au lieu de la réinventer.
 
-## Sécurité
-- Vérification unlock côté serveur avant chaque génération (retour 402 sinon).
-- Clés TTS jamais loggées, jamais persistées côté serveur, effacées de la mémoire après le run.
-- Rate-limit simple : 1 génération en cours par user (verrou en table).
+## Étape 7 — Corriger la fonction de génération qui produit les sommaires cassés
 
-## Ce qui n'est PAS inclus (à confirmer plus tard)
-- Découpage par chapitres / ZIP → volontairement écarté (tu as choisi MP3 unique).
-- Publication ACX/Audible → hors scope.
-- Bundles multi-livres → hors scope.
+Dans `complete-book-workflow` :
 
-## Livrables
-- 1 migration SQL (table + RLS + grants).
-- 1 produit Stripe (`audiobook_unlock` / 9,99 €).
-- 3 edge functions (create-checkout, webhook étendu, generate-audiobook-byok).
-- 1 composant React `AudiobookUnlockCard` + intégration 2 pages.
-- Bouton visible sur le récap fin de génération et sur chaque tuile de la bibliothèque.
+- nettoyer les titres contenant des morceaux JSON cassés,
+- refuser les titres génériques,
+- arrêter les remplissages automatiques du type « À détailler »,
+- augmenter les limites de génération pour les livres longs,
+- utiliser un fallback propre basé sur le titre, le synopsis et la catégorie si l’IA renvoie une structure invalide.
 
-Confirme-moi que je lance et je le construis d'un bloc.
+## Résultat attendu
+
+Le parcours devient fiable :
+
+```text
+Assistant IA -> réglages -> sommaire validé -> sauvegarde base -> workflow -> livre terminé sauvegardé
+```
+
+Tu ne devras plus refaire un livre perdu, et la bibliothèque deviendra la source fiable de tous les projets.
