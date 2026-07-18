@@ -74,7 +74,13 @@ export default function V3Sidebar() {
             )}
             <ul className="space-y-0.5">
               {group.items.map((it) => {
-                const active = it.end ? pathname === it.to : pathname.startsWith(it.to);
+                const [itPath, itQuery] = it.to.split('?');
+                const itTab = itQuery ? new URLSearchParams(itQuery).get('tab') : null;
+                const active = it.end
+                  ? pathname === itPath
+                  : itTab
+                    ? pathname === itPath && currentTab === itTab
+                    : pathname.startsWith(itPath);
                 const Icon = it.icon;
                 return (
                   <li key={it.to}>
