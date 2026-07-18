@@ -124,6 +124,7 @@ const UPSELLS: Upsell[] = [
       "Cohérence garantie entre tous les livrables du même produit",
     ],
     useCase: "Idéal pour les indépendants et petites équipes qui vendent un SaaS, un plugin WordPress ou une app mobile et n'ont pas le temps de rédiger 200 pages de documentation professionnelle avant chaque release.",
+  },
   {
     id: 'selection',
     name: 'Sélection maisons d’édition',
