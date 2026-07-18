@@ -443,6 +443,70 @@ export default function V3OffresPage() {
           onClose={() => setCheckout(null)}
         />
       )}
+
+      <Dialog open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
+        <DialogContent className="max-w-lg">
+          {detail && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 text-[var(--v3-ink)]">
+                  <Sparkles className="w-5 h-5 text-[var(--v3-orange)]" />
+                  {detail.name}
+                </DialogTitle>
+                <DialogDescription className="text-sm leading-relaxed pt-2">
+                  {detail.longDesc}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="mt-2">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--v3-muted)] mb-2">
+                  Ce que vous obtenez
+                </h4>
+                <ul className="space-y-1.5">
+                  {detail.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2 text-sm text-[var(--v3-ink)]">
+                      <Check className="w-4 h-4 text-[var(--v3-orange)] mt-0.5 flex-shrink-0" />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="mt-4 rounded-lg bg-[#FFF9EF] border border-[var(--v3-orange)]/20 p-3">
+                <p className="text-xs font-semibold text-[var(--v3-ink)] mb-1">Pour qui&nbsp;?</p>
+                <p className="text-xs text-[var(--v3-muted)] leading-relaxed">{detail.useCase}</p>
+              </div>
+
+              <div className="mt-4 flex items-center justify-between gap-3 border-t pt-4">
+                <div>
+                  <span className="text-2xl font-bold text-[var(--v3-ink)]">{detail.price}</span>
+                  <span className="text-[var(--v3-muted)] text-xs ml-1">{detail.suffix}</span>
+                </div>
+                {detail.href ? (
+                  <a
+                    href={detail.href}
+                    className="v3-btn v3-btn-primary text-sm px-4 py-2"
+                  >
+                    Découvrir
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!detail.priceId) return;
+                      setCheckout({ priceId: detail.priceId, planName: `${detail.name} — ${detail.price} ${detail.suffix}` });
+                      setDetail(null);
+                    }}
+                    className="v3-btn v3-btn-primary text-sm px-4 py-2"
+                  >
+                    Ajouter — {detail.price}
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
