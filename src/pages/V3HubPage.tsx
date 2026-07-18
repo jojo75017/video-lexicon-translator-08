@@ -226,6 +226,9 @@ function readHubBookConfig(): { title: string; subtitle: string; author: string 
 
 const V3HubPage: React.FC = () => {
   const navigate = useNavigate();
+  // Quand le Hub est monté sous /v3/hub (site public), la V3Sidebar externe existe déjà :
+  // on masque la sidebar interne pour laisser le contenu prendre toute la largeur.
+  const embedded = useLocation().pathname.startsWith('/v3/');
   const [query, setQuery] = useState('');
   const [pillar, setPillar] = useState<V3Pillar | 'all' | 'mine'>('all');
   const [activeTab, setActiveTab] = useState<HubTab>(() => {
