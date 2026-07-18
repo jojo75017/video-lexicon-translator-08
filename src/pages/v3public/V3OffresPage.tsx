@@ -76,11 +76,22 @@ type Upsell = {
   name: string;
   price: string;
   suffix: string;
-  priceId: string;
+  priceId?: string;
+  href?: string;
   desc: string;
+  badge?: string;
 };
 
 const UPSELLS: Upsell[] = [
+  {
+    id: 'bookperfect',
+    name: 'BookPerfect AI — Directeur éditorial',
+    price: '67 €',
+    suffix: '· au lieu de 97 €',
+    href: '/bookperfect-offre',
+    badge: 'Lancement',
+    desc: "Analyse votre roman Word chapitre par chapitre : traces d'IA, orthographe, style, contrôle Amazon KDP et export Word corrigé — sans jamais altérer votre texte original.",
+  },
   { id: 'selection', name: 'Sélection maisons d’édition', price: '19 €', suffix: '/ mois', priceId: 'v3_upsell_selection_month', desc: 'Trouvez les éditeurs susceptibles de publier votre livre.' },
   { id: 'aplus', name: 'A+ Content Amazon', price: '9 €', suffix: '/ mois', priceId: 'v3_upsell_aplus_month', desc: 'Modules visuels optimisés pour vos fiches KDP.' },
   { id: 'lookinside', name: 'Look Inside Optimizer', price: '7 €', suffix: '/ mois', priceId: 'v3_upsell_lookinside_month', desc: 'Optimise l’aperçu Amazon des premières pages.' },
