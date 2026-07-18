@@ -581,7 +581,6 @@ Règles :
           initialSubtitle={subtitle.trim()}
           initialCategory={effectiveCategory}
           initialAuthorName={authorName.trim()}
-          initialBookIntroduction={description.trim()}
           initialNumberOfChapters={chapters}
           initialWordsPerChapter={wordsPerChapter}
           initialTone={tone}
