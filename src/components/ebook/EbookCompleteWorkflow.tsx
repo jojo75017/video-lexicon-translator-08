@@ -91,6 +91,7 @@ interface WorkflowProgress {
   bookIntroduction: string;
   hasReadSteps: boolean;
   numberOfChapters: number;
+  wordsPerChapter?: number;
   currentStepIndex: number;
   stepResults: Record<string, { result: any; displayContent: string }>;
   allContext: Record<string, any>;
@@ -159,6 +160,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
   // Workflow state
   const [isGenerating, setIsGenerating] = useState(false);
   const cancelRef = useRef(false);
+  const autoStartTriggeredRef = useRef(false);
   const autoResumeCountRef = useRef(0);
   const autoResumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [currentStepIndex, setCurrentStepIndex] = useState(-1);
@@ -369,6 +371,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
         setBookIntroduction(data.bookIntroduction || '');
         setHasReadSteps(Boolean(data.hasReadSteps));
         setNumberOfChapters(data.numberOfChapters || 8);
+        setWordsPerChapter(data.wordsPerChapter || initialWordsPerChapter || 3500);
         const restoredStepIndex = data.currentStepIndex === 0 && Boolean(data.stepResults?.P1 || data.allContext?.P1)
           ? 1
           : data.currentStepIndex;
@@ -421,6 +424,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
       bookIntroduction,
       hasReadSteps,
       numberOfChapters,
+      wordsPerChapter,
       currentStepIndex,
       stepResults,
       allContext,
@@ -444,7 +448,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
     } catch (e) {
       console.error('Error saving progress:', e);
     }
-  }, [title, subtitle, category, authorName, bookIntroduction, hasReadSteps, numberOfChapters, currentStepIndex, stepResults, allContext, generatedCharacters, waitingForCharacterValidation, waitingForTitleValidation, titleSuggestions, originalTitleScore, selectedTitleIndex]);
+  }, [title, subtitle, category, authorName, bookIntroduction, hasReadSteps, numberOfChapters, wordsPerChapter, currentStepIndex, stepResults, allContext, generatedCharacters, waitingForCharacterValidation, waitingForTitleValidation, titleSuggestions, originalTitleScore, selectedTitleIndex]);
 
   // Auto-save whenever stepResults changes
   useEffect(() => {
@@ -478,6 +482,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
     setBookIntroduction('');
     setAuthorName('');
     setNumberOfChapters(8);
+    setWordsPerChapter(3500);
     setCurrentStepIndex(-1);
     setStepResults({});
     setAllContext({});
@@ -507,6 +512,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
         setCategory(data.category);
         setAuthorName(data.authorName);
         setNumberOfChapters(data.numberOfChapters);
+        setWordsPerChapter(data.wordsPerChapter || initialWordsPerChapter || 3500);
         const restoredStepIndex = data.currentStepIndex === 0 && Boolean(data.stepResults?.P1 || data.allContext?.P1)
           ? 1
           : data.currentStepIndex;
