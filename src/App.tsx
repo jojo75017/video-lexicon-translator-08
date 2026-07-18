@@ -820,6 +820,7 @@ const App = () => {
               <Route path="mes-livres" element={<V3BookManagerPage />} />
               <Route path="parametres" element={<V3AuthorSettingsPage />} />
               <Route path="livres/:type" element={<V3SpecialBookPage />} />
+              <Route path="offres" element={<V3OffresPage />} />
             </Route>
 
             {/* Catch-all : les utilisateurs connectés restent dans le planner */}
