@@ -47,6 +47,19 @@ const SalesPageV3 = lazy(() => import('./pages/SalesPageV3'));
 const V3PaiementPage = lazy(() => import('./pages/V3PaiementPage'));
 const V3CommandePage = lazy(() => import('./pages/V3CommandePage'));
 const SalesPageV3Launch = lazy(() => import('./pages/SalesPageV3Launch'));
+// V3 public site (Pluméo-inspired) — sous /v3
+const V3PublicLayout = lazy(() => import('./components/v3public/V3PublicLayout'));
+const V3HomePage = lazy(() => import('./pages/v3public/V3HomePage'));
+const V3AuthPage = lazy(() => import('./pages/v3public/V3AuthPage'));
+const V3CreatePage = lazy(() => import('./pages/v3public/V3CreatePage'));
+const V3BookPage = lazy(() => import('./pages/v3public/V3BookPage'));
+const V3LibraryPage = lazy(() => import('./pages/v3public/V3LibraryPage'));
+const V3GalleryPage = lazy(() => import('./pages/v3public/V3GalleryPage'));
+const V3GuestAuthorPage = lazy(() => import('./pages/v3public/V3GuestAuthorPage'));
+const V3AuthorProfilePage = lazy(() => import('./pages/v3public/V3AuthorProfilePage'));
+const V3BookManagerPage = lazy(() => import('./pages/v3public/V3BookManagerPage'));
+const V3AuthorSettingsPage = lazy(() => import('./pages/v3public/V3AuthorSettingsPage'));
+const V3SpecialBookPage = lazy(() => import('./pages/v3public/V3SpecialBookPage'));
 const AffiliationFormationPage = lazy(() => import('./pages/AffiliationFormationPage'));
 const ParrainagePage = lazy(() => import('./pages/ParrainagePage'));
 const FormationPage = lazy(() => import('./pages/FormationPage'));
@@ -792,7 +805,22 @@ const App = () => {
             
             {/* SaaS routes removed - orphan system */}
             <Route path="/mon-code" element={<RecuperationCodePage />} />
-            
+
+            {/* V3 public site (Pluméo-inspired) */}
+            <Route path="/v3" element={<V3PublicLayout />}>
+              <Route index element={<V3HomePage />} />
+              <Route path="auth" element={<V3AuthPage />} />
+              <Route path="create" element={<V3CreatePage />} />
+              <Route path="book/:id" element={<V3BookPage />} />
+              <Route path="library" element={<V3LibraryPage />} />
+              <Route path="gallery" element={<V3GalleryPage />} />
+              <Route path="auteur" element={<V3GuestAuthorPage />} />
+              <Route path="u/:slug" element={<V3AuthorProfilePage />} />
+              <Route path="mes-livres" element={<V3BookManagerPage />} />
+              <Route path="parametres" element={<V3AuthorSettingsPage />} />
+              <Route path="livres/:type" element={<V3SpecialBookPage />} />
+            </Route>
+
             {/* Catch-all : les utilisateurs connectés restent dans le planner */}
             <Route path="*" element={<Navigate to={hasPlannerAccess ? "/ebook-planner" : "/offres"} replace />} />
           </Routes>
