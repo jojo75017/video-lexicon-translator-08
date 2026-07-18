@@ -391,6 +391,17 @@ const V3HubPage: React.FC = () => {
         style={{ background: 'linear-gradient(180deg, rgba(251,246,236,0.62) 0%, rgba(251,246,236,0.38) 45%, rgba(251,246,236,0.38) 55%, rgba(251,246,236,0.62) 100%)' }}
         aria-hidden="true"
       />
+      {/* Bouton flottant TOUJOURS visible : accès au site public V3 */}
+      <button
+        onClick={() => navigate('/v3')}
+        title="Ouvrir le nouveau site public Ebookstudio V3"
+        className="fixed top-4 right-4 z-[60] flex items-center gap-2 px-4 py-2.5 rounded-full shadow-xl hover:brightness-110 transition-all animate-pulse"
+        style={{ background: 'linear-gradient(90deg, #F97316, #EA580C)', color: 'white' }}
+      >
+        <ExternalLink className="h-4 w-4" />
+        <span className="text-sm font-bold">Site public V3</span>
+        <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-white text-[#EA580C]">NEW</span>
+      </button>
       <div className="relative z-10 flex">
       {/* ===================== SIDEBAR (desktop) ===================== */}
       <aside
