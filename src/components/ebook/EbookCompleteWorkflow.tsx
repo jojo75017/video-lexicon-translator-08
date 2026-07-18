@@ -46,12 +46,16 @@ interface GeneratedCharacter {
 interface EbookCompleteWorkflowProps {
   onComplete: (bookData: any) => void;
   characters?: Character[];
+  autoStart?: boolean;
+  hideInputForm?: boolean;
   initialTitle?: string;
   initialSubtitle?: string;
   initialCategory?: string;
   initialAuthorName?: string;
   initialBookIntroduction?: string;
   initialNumberOfChapters?: number;
+  initialWordsPerChapter?: number;
+  initialTone?: string;
   onNavigateToSettings?: () => void;
 }
 
@@ -102,12 +106,16 @@ interface WorkflowProgress {
 const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
   onComplete,
   characters: externalCharacters = [],
+  autoStart = false,
+  hideInputForm = false,
   initialTitle = '',
   initialSubtitle = '',
   initialCategory = '',
   initialAuthorName = '',
   initialBookIntroduction = '',
   initialNumberOfChapters = 8,
+  initialWordsPerChapter = 3500,
+  initialTone = '',
   onNavigateToSettings,
 }) => {
   // Hook pour sauvegarder les résultats P1-P14 globalement
@@ -126,11 +134,11 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
   }, []);
   
   // Form state
-  const [title, setTitle] = useState('');
-  const [subtitle, setSubtitle] = useState('');
-  const [category, setCategory] = useState('');
-  const [bookIntroduction, setBookIntroduction] = useState('');
-  const [authorName, setAuthorName] = useState('');
+  const [title, setTitle] = useState(initialTitle);
+  const [subtitle, setSubtitle] = useState(initialSubtitle);
+  const [category, setCategory] = useState(initialCategory);
+  const [bookIntroduction, setBookIntroduction] = useState(initialBookIntroduction);
+  const [authorName, setAuthorName] = useState(initialAuthorName);
   // Cible idéale (déroulant)
   const [cibleProfil, setCibleProfil] = useState('');
   const [cibleBesoins, setCibleBesoins] = useState('');
@@ -142,8 +150,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
   const [promesseDifferenciation, setPromesseDifferenciation] = useState('');
   const [promesseEmotion, setPromesseEmotion] = useState('');
   const [language, setLanguage] = useState<'fr' | 'en' | 'es' | 'it'>('fr');
-  const [numberOfChapters, setNumberOfChapters] = useState(8);
-  const [hasReadSteps, setHasReadSteps] = useState(false);
+  const [numberOfChapters, setNumberOfChapters] = useState(() => Math.max(3, Math.min(60, Math.round(initialNumberOfChapters || 8))));
+  const [wordsPerChapter, setWordsPerChapter] = useState(() => Math.max(500, Math.min(8000, Math.round(initialWordsPerChapter || 3500))));
+  const [hasReadSteps, setHasReadSteps] = useState(autoStart);
   const [autofillLoading, setAutofillLoading] = useState(false);
   const [openAccordions, setOpenAccordions] = useState<string[]>([]);
   
@@ -183,8 +192,12 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
     if (!authorName.trim() && initialAuthorName.trim()) setAuthorName(initialAuthorName);
     if (!bookIntroduction.trim() && initialBookIntroduction.trim()) setBookIntroduction(initialBookIntroduction);
     if (numberOfChapters === 8 && initialNumberOfChapters && initialNumberOfChapters !== 8) {
-      setNumberOfChapters(initialNumberOfChapters);
+      setNumberOfChapters(Math.max(3, Math.min(60, Math.round(initialNumberOfChapters))));
     }
+    if (wordsPerChapter === 3500 && initialWordsPerChapter && initialWordsPerChapter !== 3500) {
+      setWordsPerChapter(Math.max(500, Math.min(8000, Math.round(initialWordsPerChapter))));
+    }
+    if (autoStart && !hasReadSteps) setHasReadSteps(true);
   }, [
     isGenerating,
     currentStepIndex,
@@ -195,12 +208,16 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
     authorName,
     bookIntroduction,
     numberOfChapters,
+    wordsPerChapter,
+    hasReadSteps,
+    autoStart,
     initialTitle,
     initialSubtitle,
     initialCategory,
     initialAuthorName,
     initialBookIntroduction,
     initialNumberOfChapters,
+    initialWordsPerChapter,
   ]);
 
   const progress = currentStepIndex >= 0 ? ((currentStepIndex + 1) / WORKFLOW_STEP_COUNT) * 100 : 0;
@@ -237,6 +254,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
   const buildEnrichedIntroduction = useCallback(() => {
     const sections: string[] = [];
     if (bookIntroduction.trim()) sections.push(bookIntroduction.trim());
+    if (initialTone.trim()) sections.push(`=== STYLE DEMANDÉ ===\nTon : ${initialTone.trim()}`);
 
     const cibleLines: string[] = [];
     if (cibleProfil.trim()) cibleLines.push(`- Profil: ${cibleProfil.trim()}`);
@@ -253,7 +271,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
     if (promesseLines.length) sections.push(`=== PROMESSE CENTRALE ===\n${promesseLines.join('\n')}`);
 
     return sections.join('\n\n');
-  }, [bookIntroduction, cibleProfil, cibleBesoins, cibleFrustrations, cibleNiveau, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion]);
+  }, [bookIntroduction, initialTone, cibleProfil, cibleBesoins, cibleFrustrations, cibleNiveau, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion]);
 
   const buildSimpleTargetPromise = useCallback(() => {
     const cleanTitle = title.trim();
