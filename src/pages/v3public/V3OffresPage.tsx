@@ -214,7 +214,7 @@ export default function V3OffresPage() {
                     t.highlight ? 'v3-btn-primary' : 'v3-btn-outline'
                   }`}
                 >
-                  Choisir {t.name}
+                  Choisir {t.name} — {p.price} {billing === 'monthly' ? '/ mois' : '/ an'}
                 </button>
                 <p className="mt-2 text-[11px] text-center text-[var(--v3-muted)]">
                   Sans engagement — résiliable en 1 clic
