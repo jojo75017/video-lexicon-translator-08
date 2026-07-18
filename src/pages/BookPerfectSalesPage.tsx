@@ -125,14 +125,7 @@ const BookPerfectSalesPage: React.FC = () => {
                 placeholder="vous@email.com"
                 className="mb-3 bg-white"
               />
-              <StripeCheckoutButton
-                email={email}
-                planId="bookperfect_launch"
-                successPath="/paiement-succes"
-                cancelPath="/bookperfect"
-              >
-                Débloquer BookPerfect AI — 67&euro;
-              </StripeCheckoutButton>
+              <BookPerfectCheckout email={email} label="Débloquer BookPerfect AI — 67€" />
             </div>
 
             <div className="mt-4 flex flex-wrap items-center gap-4 text-[12px]" style={{ color: '#6f5e47' }}>
