@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react';
-import { ArrowLeft, ArrowRight, Check, Plus, Rocket, Sparkles, Trash2, UserRound } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowLeft, ArrowRight, Check, ImageIcon, Loader2, Plus, RefreshCw, Rocket, Sparkles, Trash2, UserRound } from 'lucide-react';
 import { toast } from 'sonner';
 import EbookCompleteWorkflow from '@/components/ebook/EbookCompleteWorkflow';
+import { invokeImageFunction } from '@/lib/aiImageInvoke';
 
 type WizardCharacter = {
   id: string;
