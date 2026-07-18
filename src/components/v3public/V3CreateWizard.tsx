@@ -61,6 +61,41 @@ export default function V3CreateWizard() {
   const [step, setStep] = useState(0);
   const [launched, setLaunched] = useState(false);
   const [completedBook, setCompletedBook] = useState<any>(null);
+  const [coverUrl, setCoverUrl] = useState<string | null>(null);
+  const [coverLoading, setCoverLoading] = useState(false);
+  const coverTriggeredRef = useRef(false);
+
+  const generateCover = async () => {
+    setCoverLoading(true);
+    try {
+      const openaiApiKey = (typeof localStorage !== 'undefined' && localStorage.getItem('openai_real_api_key')) || undefined;
+      const { data, error } = await invokeImageFunction<any>('generate-front-cover', {
+        ebookTitle: finalTitle.trim() || title.trim(),
+        authorName: authorName.trim(),
+        genre: effectiveCategory,
+        style: 'professional',
+        variation: 1,
+        coverType: 'front',
+        useOpenAI: !!openaiApiKey,
+        openaiApiKey,
+      });
+      if (error || !data?.imageUrl) throw new Error(error?.message || 'Génération échouée');
+      setCoverUrl(data.imageUrl);
+      toast.success('Couverture générée — tu peux la garder ou en refaire une.');
+    } catch (e: any) {
+      toast.error(e?.message || 'Impossible de générer la couverture.');
+    } finally {
+      setCoverLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (completedBook && !coverTriggeredRef.current) {
+      coverTriggeredRef.current = true;
+      generateCover();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [completedBook]);
 
   const [title, setTitle] = useState(hub.title || '');
   const [description, setDescription] = useState(hub.description || '');
