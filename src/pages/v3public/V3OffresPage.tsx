@@ -238,25 +238,39 @@ export default function V3OffresPage() {
             {UPSELLS.map((u) => (
               <div
                 key={u.id}
-                className="flex flex-col rounded-xl border border-black/10 bg-[#FFF9EF] p-4 hover:shadow-md transition-shadow"
+                className="relative flex flex-col rounded-xl border border-black/10 bg-[#FFF9EF] p-4 hover:shadow-md transition-shadow"
               >
+                {u.badge && (
+                  <span className="absolute -top-2 right-3 rounded-full bg-[var(--v3-orange)] px-2 py-0.5 text-[10px] font-bold text-white shadow">
+                    {u.badge}
+                  </span>
+                )}
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-[var(--v3-orange)]" />
                   <h4 className="font-semibold text-[var(--v3-ink)]">{u.name}</h4>
                 </div>
                 <p className="mt-1 text-xs text-[var(--v3-muted)] flex-1">{u.desc}</p>
-                <div className="mt-3 flex items-center justify-between">
+                <div className="mt-3 flex items-center justify-between gap-2">
                   <div className="text-sm">
                     <span className="text-lg font-bold text-[var(--v3-ink)]">{u.price}</span>
-                    <span className="text-[var(--v3-muted)] text-xs"> + taxes {u.suffix}</span>
+                    <span className="text-[var(--v3-muted)] text-xs"> {u.suffix}</span>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setCheckout({ priceId: u.priceId, planName: `${u.name} — ${u.price} ${u.suffix}` })}
-                    className="v3-btn v3-btn-outline text-xs px-3 py-1.5"
-                  >
-                    Ajouter
-                  </button>
+                  {u.href ? (
+                    <a href={u.href} className="v3-btn v3-btn-primary text-xs px-3 py-1.5">
+                      Découvrir
+                    </a>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        u.priceId &&
+                        setCheckout({ priceId: u.priceId, planName: `${u.name} — ${u.price} ${u.suffix}` })
+                      }
+                      className="v3-btn v3-btn-outline text-xs px-3 py-1.5"
+                    >
+                      Ajouter
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
