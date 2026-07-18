@@ -474,7 +474,8 @@ const App = () => {
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/admin-direct" element={<AdminDirectPage />} />
             <Route path="/admin-cockpit" element={isPlannerPreviewHost ? <AdminCockpitPage /> : <AdminGate><AdminCockpitPage /></AdminGate>} />
-            <Route path="/hub-v3" element={isPlannerPreviewHost ? <V3HubPage /> : <V3Gate><V3HubPage /></V3Gate>} />
+            {/* Ancien Hub V3 admin — migré sous /v3/hub (site public). On redirige en conservant le tab. */}
+            <Route path="/hub-v3" element={<Navigate to={`/v3/hub${window.location.search}`} replace />} />
             <Route path="/ai-chat" element={<AiChatPage />} />
             <Route path="/niches" element={<NichesPage />} />
             <Route path="/niches-600" element={<Niches600Page />} />
@@ -823,6 +824,8 @@ const App = () => {
               <Route path="livres/:type" element={<V3SpecialBookPage />} />
               <Route path="offres" element={<V3OffresPage />} />
               <Route path="offres/merci" element={<V3OffresMerciPage />} />
+              {/* Hub complet (ex /hub-v3) — accessible depuis le site public */}
+              <Route path="hub" element={<V3HubPage />} />
             </Route>
 
             {/* Catch-all : les utilisateurs connectés restent dans le planner */}
