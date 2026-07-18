@@ -196,33 +196,23 @@ export default function V3HomePage() {
 
 
 
-      {/* TOP 10 lectures */}
-      <section className="max-w-7xl mx-auto px-5 md:px-8 py-16">
-        <div className="flex items-end justify-between mb-8">
-          <div>
-            <h2 className="v3-serif text-3xl font-bold">Top 10 lectures</h2>
-            <p className="text-sm text-[var(--v3-muted)] mt-1">Les histoires les plus aimées de la communauté.</p>
+      {/* Vos sauvegardes */}
+      <section className="max-w-3xl mx-auto px-5 md:px-8 py-16 text-center">
+        <div className="v3-card">
+          <div className="w-12 h-12 rounded-xl bg-[var(--v3-cloud)] grid place-items-center mx-auto">
+            <Library className="w-6 h-6 text-[var(--v3-ink)]" />
           </div>
-          <Link to="/v3/gallery" className="v3-btn v3-btn-ghost">Voir tout <ArrowRight className="w-4 h-4" /></Link>
+          <h2 className="v3-serif mt-4 text-2xl font-bold">Vos sauvegardes</h2>
+          <p className="mt-2 text-sm text-[var(--v3-muted)]">
+            Retrouvez tous les livres que vous avez créés, mis en favori ou en cours de rédaction.
+          </p>
+          <button
+            onClick={() => nav('/v3/library')}
+            className="mt-6 v3-btn v3-btn-primary"
+          >
+            <BookOpen className="w-4 h-4" /> Voir mes sauvegardes
+          </button>
         </div>
-
-        {topBooks.length === 0 ? (
-          <div className="v3-card text-center text-[var(--v3-muted)] py-16">
-            Aucune histoire publiée pour l'instant. Sois le premier à écrire ton livre ✨
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            {topBooks.map((b) => (
-              <Link key={b.id} to={`/v3/book/${b.id}`} className="group">
-                <div className="aspect-[3/4] rounded-lg bg-[var(--v3-ink)] text-white p-4 flex flex-col justify-end shadow-lg group-hover:shadow-2xl transition-shadow">
-                  <BookOpen className="w-4 h-4 text-white/50 mb-2" />
-                  <div className="text-[13px] font-semibold leading-tight line-clamp-3">{b.title}</div>
-                </div>
-                <div className="mt-2 text-[12px] font-medium truncate">{b.title}</div>
-              </Link>
-            ))}
-          </div>
-        )}
       </section>
 
       {/* Comment ça marche (dark) */}
