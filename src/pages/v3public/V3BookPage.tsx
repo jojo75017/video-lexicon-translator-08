@@ -114,6 +114,10 @@ export default function V3BookPage() {
           {!current && activeChapter >= 0 && (
             <div className="text-[var(--v3-muted)] italic">Aucun chapitre à afficher.</div>
           )}
+
+          <div className="mt-10">
+            <AudiobookOfferCard bookId={book.id} bookTitle={book.title} />
+          </div>
         </article>
       </section>
     </>
