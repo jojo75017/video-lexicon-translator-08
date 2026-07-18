@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Feather, ArrowLeft, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import AudiobookOfferCard from '@/components/v3public/AudiobookOfferCard';
 
 type Book = {
   id: string;
@@ -114,6 +115,10 @@ export default function V3BookPage() {
           {!current && activeChapter >= 0 && (
             <div className="text-[var(--v3-muted)] italic">Aucun chapitre à afficher.</div>
           )}
+
+          <div className="mt-10">
+            <AudiobookOfferCard bookId={book.id} bookTitle={book.title} />
+          </div>
         </article>
       </section>
     </>
