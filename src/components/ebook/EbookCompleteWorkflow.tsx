@@ -2495,43 +2495,75 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            Les 15 étapes du Directeur Éditorial
+            Les 15 agents éditoriaux au travail
           </CardTitle>
-          
-          {/* Stepper P1 → P15 */}
+
+          {/* Bannière d'agent en cours - très visible */}
+          {currentStepIndex >= 0 && currentStepIndex < WORKFLOW_STEP_COUNT && (
+            <div className="mt-4 rounded-xl border-2 border-primary bg-primary/5 p-4">
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <div className="flex items-center gap-3 min-w-0">
+                  {isGenerating ? (
+                    <Loader2 className="h-6 w-6 animate-spin text-primary shrink-0" />
+                  ) : (
+                    <CheckCircle2 className="h-6 w-6 text-emerald-500 shrink-0" />
+                  )}
+                  <div className="min-w-0">
+                    <div className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">
+                      Agent {currentStepIndex + 1} / {WORKFLOW_STEP_COUNT} · {WORKFLOW_STEPS[currentStepIndex]?.id}
+                    </div>
+                    <div className="text-base font-bold text-foreground truncate">
+                      {WORKFLOW_STEPS[currentStepIndex]?.name}
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-primary leading-none">{Math.round(progress)}%</div>
+                  <div className="text-[11px] text-muted-foreground">progression globale</div>
+                </div>
+              </div>
+              <Progress value={progress} className="h-3 mt-3" />
+              <div className="flex justify-between text-[11px] text-muted-foreground mt-1.5">
+                <span>P1 · Démarrage</span>
+                <span>{isGenerating ? `Étape en cours : ${Math.round(activeStepProgress)}%` : 'En pause'}</span>
+                <span>P15 · Livre prêt</span>
+              </div>
+            </div>
+          )}
+
+          {/* Stepper P1 → P15 avec noms */}
           <div className="mt-4 mb-2">
-            <div className="flex flex-wrap items-center gap-1.5">
+            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
               {WORKFLOW_STEPS.map((step, idx) => {
                 const done = stepResults[step.id] !== undefined;
                 const active = isGenerating && idx === currentStepIndex;
                 const failed = failedStepIndex === idx;
                 return (
-                  <div key={step.id} className="flex items-center gap-1.5">
-                    <div
-                      title={`${step.id} – ${step.name}`}
-                      className={[
-                        'flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold transition-all',
-                        failed ? 'border-destructive bg-destructive/10 text-destructive' :
-                        done ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300' :
-                        active ? 'border-primary bg-primary text-primary-foreground shadow-sm animate-pulse' :
-                        'border-border bg-muted/30 text-muted-foreground',
-                      ].join(' ')}
-                    >
+                  <div
+                    key={step.id}
+                    title={`${step.id} – ${step.name}`}
+                    className={[
+                      'flex flex-col items-start gap-0.5 rounded-lg border px-2.5 py-2 text-xs transition-all',
+                      failed ? 'border-destructive bg-destructive/10 text-destructive' :
+                      done ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300' :
+                      active ? 'border-primary bg-primary text-primary-foreground shadow-sm animate-pulse' :
+                      'border-border bg-muted/30 text-muted-foreground',
+                    ].join(' ')}
+                  >
+                    <div className="flex items-center gap-1 font-bold">
                       {done ? <CheckCircle2 className="h-3 w-3" /> :
                        active ? <Loader2 className="h-3 w-3 animate-spin" /> :
-                       failed ? <AlertCircle className="h-3 w-3" /> : null}
+                       failed ? <AlertCircle className="h-3 w-3" /> : <span className="h-3 w-3" />}
                       <span>{step.id}</span>
                     </div>
-                    {idx < WORKFLOW_STEPS.length - 1 && (
-                      <span className={done ? 'text-emerald-500' : 'text-muted-foreground/40'}>→</span>
-                    )}
+                    <span className="text-[11px] leading-tight font-medium truncate w-full">{step.name}</span>
                   </div>
                 );
               })}
             </div>
           </div>
 
-          {/* Progress bar + bouton Stop */}
+          {/* Progress bar récap + bouton Stop */}
           {currentStepIndex >= 0 && (
             <div className="space-y-2 mt-4">
               <div className="flex justify-between text-sm">
@@ -2541,6 +2573,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
                 <span className="font-semibold text-primary">{Math.round(progress)}%</span>
               </div>
               <Progress value={progress} className="h-3" />
+
               {isGenerating && (
                 <div className="flex justify-end pt-1">
                   <Button
