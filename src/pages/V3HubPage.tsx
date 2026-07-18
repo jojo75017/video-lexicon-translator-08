@@ -407,6 +407,7 @@ const V3HubPage: React.FC = () => {
       </button>
       <div className="relative z-10 flex">
       {/* ===================== SIDEBAR (desktop) ===================== */}
+      {!embedded && (
       <aside
         className="hidden lg:flex sticky top-0 h-screen shrink-0 flex-col border-r border-[#eadfc9] transition-[width] duration-300"
         style={{ width: sidebarCollapsed ? 76 : 244, background: 'rgba(251,246,236,0.96)' }}
