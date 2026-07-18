@@ -214,7 +214,7 @@ export default function V3CreateWizard() {
           autoStart
           hideInputForm
           initialTitle={finalTitle.trim()}
-          initialSubtitle={hub.subtitle || ''}
+          initialSubtitle={subtitle.trim()}
           initialCategory={effectiveCategory}
           initialAuthorName={authorName.trim()}
           initialBookIntroduction={description.trim()}
