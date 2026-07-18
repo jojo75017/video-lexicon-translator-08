@@ -39,15 +39,20 @@ const FEATURES = [
   { icon: Palette, title: 'Couverture auto', text: 'Une couverture unique est générée pour chaque livre, inspirée de ton histoire.' },
 ];
 
-// Livres de l'auteur invité (Georges Boubet) — statique et éditable.
-const AUTHOR_BOOKS = [
-  { title: 'AXEL — Berlin, la peur invisible', cover: null },
-  { title: 'AXEL — Dubaï, la loi du désert', cover: null },
-  { title: 'AXEL — Rupture', cover: null },
-  { title: 'AXEL — Kiev, l\'origine du code', cover: null },
-  { title: 'AXEL — Normalisation', cover: null },
-  { title: 'AXEL — Valeur', cover: null },
+// Livres de l'auteur invité (Georges Boubet) — 6 vraies couvertures Amazon.
+const AUTHOR_AMAZON_URL = 'https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7';
+const AUTHOR_BOOKS: Array<{ asin: string; title: string }> = [
+  { asin: 'B0GXB3V5DJ', title: "L'Ancien Locataire" },
+  { asin: 'B0GG7QCFTZ', title: "Axel Kiev — L'Origine du Code" },
+  { asin: 'B0GY5K8GCS', title: 'Signal Zéro — Intégrale' },
+  { asin: 'B0GX2SVHY4', title: 'Le Loup en Vacances' },
+  { asin: 'B0GQQB7V1F', title: "Dans l'Ombre de la Villa" },
+  { asin: 'B0GN34WYMK', title: 'La Bible du Voyage' },
 ];
+const coverUrl = (asin: string) => `https://images-na.ssl-images-amazon.com/images/P/${asin}.01.LZZZZZZZ.jpg`;
+const fallbackCoverUrl = (asin: string) => `https://m.media-amazon.com/images/P/${asin}.jpg`;
+const amazonBookUrl = (asin: string) => `https://www.amazon.fr/dp/${asin}/`;
+
 
 export default function V3HomePage() {
   const nav = useNavigate();
