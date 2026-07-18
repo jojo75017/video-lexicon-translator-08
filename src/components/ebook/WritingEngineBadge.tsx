@@ -124,7 +124,7 @@ export const WritingEngineBadge: React.FC<WritingEngineBadgeProps> = ({ tier, is
       ) : (
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-5 py-3.5" style={{ background: `${AMBER}12` }}>
           <span className="text-[12px] text-foreground max-w-md">
-            <strong>Passez au palier Auteur (59 €/mois)</strong> pour débloquer les 30 agents, l'édition Pro, le comité de lecture et jusqu'à 20 livres/mois.
+            <strong>Passez au palier Auteur (59 €/mois)</strong> pour débloquer les 30 agents, l'édition Pro, le comité de lecture et des livres illimités.
           </span>
           {onUpgrade && (
             <button
