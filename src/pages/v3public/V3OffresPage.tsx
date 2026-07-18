@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { Check, Sparkles, Crown, Feather } from 'lucide-react';
+import V3SubscribeCheckout from '@/components/v3public/V3SubscribeCheckout';
 
 type Tier = {
   id: string;
@@ -11,6 +13,7 @@ type Tier = {
   icon: React.ReactNode;
   features: string[];
   cta: string;
+  priceId: string;
 };
 
 const TIERS: Tier[] = [
