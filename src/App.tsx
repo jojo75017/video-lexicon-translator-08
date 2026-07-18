@@ -824,6 +824,8 @@ const App = () => {
               <Route path="livres/:type" element={<V3SpecialBookPage />} />
               <Route path="offres" element={<V3OffresPage />} />
               <Route path="offres/merci" element={<V3OffresMerciPage />} />
+              {/* Hub complet (ex /hub-v3) — accessible depuis le site public */}
+              <Route path="hub" element={<V3HubPage />} />
             </Route>
 
             {/* Catch-all : les utilisateurs connectés restent dans le planner */}
