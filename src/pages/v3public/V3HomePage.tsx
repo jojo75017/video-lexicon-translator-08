@@ -58,27 +58,9 @@ export default function V3HomePage() {
   const nav = useNavigate();
   const [idea, setIdea] = useState('');
   const [phIdx, setPhIdx] = useState(0);
-  const [topBooks, setTopBooks] = useState<Array<{ id: string; title: string }>>([]);
-
   useEffect(() => {
     const id = window.setInterval(() => setPhIdx((n) => (n + 1) % IDEA_EXAMPLES.length), 3200);
     return () => window.clearInterval(id);
-  }, []);
-
-  useEffect(() => {
-    // Top lectures : lecture réelle depuis ebook_projects (RLS filtre à ce que l'auteur voit).
-    (async () => {
-      try {
-        const { data } = await supabase
-          .from('ebook_projects')
-          .select('id, title')
-          .order('created_at', { ascending: false })
-          .limit(10);
-        setTopBooks((data as any) || []);
-      } catch {
-        setTopBooks([]);
-      }
-    })();
   }, []);
 
   const submitIdea = () => {
