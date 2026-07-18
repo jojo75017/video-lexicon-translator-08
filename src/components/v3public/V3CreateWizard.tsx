@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, Check, ImageIcon, Loader2, Plus, RefreshCw, Rock
 import { toast } from 'sonner';
 import EbookCompleteWorkflow from '@/components/ebook/EbookCompleteWorkflow';
 import V3ExportPanel from '@/components/admin/V3ExportPanel';
+import { supabase } from '@/integrations/supabase/client';
 import { invokeImageFunction } from '@/lib/aiImageInvoke';
 import { callAIWriting, getProvider, getProviderKey, validateKeyFormat } from '@/services/aiWritingService';
 
@@ -12,6 +13,13 @@ type WizardCharacter = {
   name: string;
   role: string;
   traits: string;
+};
+
+type OutlineChapter = {
+  id: string;
+  numero: number;
+  titre: string;
+  objectif: string;
 };
 
 type HubConfig = {
@@ -27,6 +35,7 @@ type HubConfig = {
 const CONFIG_KEY = 'edition_book_config_v1';
 const TARGET_WORDS_KEY = 'edition_chapter_target_words_v1';
 const WIZARD_KEY = 'v3_create_wizard_config_v1';
+const PROJECT_ID_KEY = 'v3_create_current_project_id_v1';
 
 const CATEGORIES = [
   'Roman', 'Thriller / Policier', 'Romance', 'Fantasy / Fantastique', 'Science-fiction', 'Biographie / Mémoires',
@@ -59,6 +68,53 @@ function makeCharacter(): WizardCharacter {
   };
 }
 
+function makeId() {
+  return typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : String(Date.now() + Math.random());
+}
+
+function cleanText(value: unknown) {
+  return String(value || '')
+    .replace(/```(?:json)?/gi, '')
+    .replace(/[{}[\]`]/g, '')
+    .replace(/"(?:numero|titre|objectif|title|chapterTitle)"\s*:\s*/gi, '')
+    .replace(/^chapitre\s+\d+\s*[:–—-]?\s*/i, '')
+    .replace(/^chapter\s+\d+\s*[:–—-]?\s*/i, '')
+    .replace(/^['"«»“”]+|['"«»“”]+$/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function isGenericTitle(value: unknown) {
+  const normalized = cleanText(value).toLowerCase();
+  return !normalized || /^(chapitre|chapter|ch\.?)\s*\d+$/.test(normalized);
+}
+
+function buildFallbackOutline(title: string, category: string, count: number): OutlineChapter[] {
+  const subject = cleanText(title) || cleanText(category) || 'le projet';
+  const templates = [
+    ['Les fondations', 'Installer le contexte, la promesse et les enjeux du livre.'],
+    ['Le déclic initial', 'Faire comprendre pourquoi le sujet devient important maintenant.'],
+    ['Les erreurs à éviter', 'Clarifier les pièges qui empêchent le lecteur d’avancer.'],
+    ['La méthode pas à pas', 'Donner une progression simple, applicable et concrète.'],
+    ['Le premier résultat visible', 'Transformer la théorie en action mesurable.'],
+    ['Les cas réels', 'Ancrer les idées dans des situations proches du lecteur.'],
+    ['Le niveau avancé', 'Approfondir les notions essentielles sans perdre en clarté.'],
+    ['La consolidation', 'Aider le lecteur à stabiliser ses acquis.'],
+    ['Le plan d’action', 'Organiser les prochaines étapes de manière pratique.'],
+    ['L’aboutissement', 'Conclure sur une transformation claire et motivante.'],
+  ];
+
+  return Array.from({ length: count }, (_, index) => {
+    const [prefix, objectif] = templates[Math.min(index, templates.length - 1)];
+    return {
+      id: makeId(),
+      numero: index + 1,
+      titre: `${prefix} — ${subject}`,
+      objectif,
+    };
+  });
+}
+
 export default function V3CreateWizard() {
   const hub = useMemo(readHubConfig, []);
   const [step, setStep] = useState(0);
@@ -66,6 +122,12 @@ export default function V3CreateWizard() {
   const [completedBook, setCompletedBook] = useState<any>(null);
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [coverLoading, setCoverLoading] = useState(false);
+  const [savingCloud, setSavingCloud] = useState(false);
+  const [outlineLoading, setOutlineLoading] = useState(false);
+  const [projectId, setProjectId] = useState<string | null>(() => {
+    try { return localStorage.getItem(PROJECT_ID_KEY); } catch { return null; }
+  });
+  const projectIdRef = useRef<string | null>(projectId);
   const coverTriggeredRef = useRef(false);
 
   const generateCover = async () => {
@@ -85,6 +147,7 @@ export default function V3CreateWizard() {
       });
       if (error || !data?.imageUrl) throw new Error(error?.message || 'Génération échouée');
       setCoverUrl(data.imageUrl);
+      void saveProjectToCloud({ silent: true, coverUrlOverride: data.imageUrl });
       toast.success('Couverture générée — tu peux la garder ou en refaire une.');
     } catch (e: any) {
       toast.error(e?.message || 'Impossible de générer la couverture.');
@@ -109,6 +172,7 @@ export default function V3CreateWizard() {
   const [chapters, setChapters] = useState(clampNumber(Number(hub.numberOfChapters), 3, 60, 12));
   const [wordsPerChapter, setWordsPerChapter] = useState(2500);
   const [characters, setCharacters] = useState<WizardCharacter[]>([makeCharacter()]);
+  const [outline, setOutline] = useState<OutlineChapter[]>(() => buildFallbackOutline(hub.title || '', hub.genre || 'Roman', clampNumber(Number(hub.numberOfChapters), 3, 60, 12)));
   const [finalTitle, setFinalTitle] = useState(hub.title || '');
   const [subtitle, setSubtitle] = useState(hub.subtitle || '');
   const [authorName, setAuthorName] = useState(hub.author || 'Auteur Ebookstudio');
@@ -177,36 +241,6 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
     toast.success('Formulaire rempli — vérifie et continue vers l’étape suivante.');
   };
 
-  const saveDraft = () => {
-    try {
-      const draft = {
-        savedAt: new Date().toISOString(),
-        title, description, category, customCategory, tone, chapters, wordsPerChapter,
-        characters, finalTitle, subtitle, authorName,
-      };
-      const raw = localStorage.getItem('v3_wizard_drafts_v1');
-      const list = raw ? JSON.parse(raw) : [];
-      list.unshift({ id: crypto.randomUUID?.() || String(Date.now()), ...draft });
-      localStorage.setItem('v3_wizard_drafts_v1', JSON.stringify(list.slice(0, 20)));
-      localStorage.setItem(WIZARD_KEY, JSON.stringify(draft));
-      toast.success('Brouillon sauvegardé — retrouve-le dans « Ma bibliothèque ».');
-    } catch {
-      toast.error('Sauvegarde impossible.');
-    }
-  };
-
-  const resetWizard = () => {
-    if (!confirm('Recommencer un nouveau livre ? Le brouillon en cours sera effacé.')) return;
-    setTitle(''); setDescription(''); setCategory('Roman'); setCustomCategory('');
-    setTone('Inspirant'); setChapters(12); setWordsPerChapter(2500);
-    setCharacters([makeCharacter()]); setFinalTitle(''); setSubtitle('');
-    setAiTopic(''); setAiResult(null); setStep(0); setLaunched(false); setCompletedBook(null); setCoverUrl(null);
-    coverTriggeredRef.current = false;
-    ['ebook_workflow_progress', 'ebook_workflow_results', 'ebook_workflow_sync_data'].forEach((k) => localStorage.removeItem(k));
-    toast.success('Nouveau livre — formulaire réinitialisé.');
-  };
-
-
   const effectiveCategory = category === 'Autre' ? (customCategory.trim() || 'Autre') : category;
   const totalWords = chapters * wordsPerChapter;
   const estimatedPages = Math.ceil(totalWords / 250);
@@ -220,9 +254,211 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
       description: character.traits.trim() || 'Personnage à développer pendant le workflow.',
     }));
 
+  const normalizedOutline = outline
+    .slice(0, chapters)
+    .map((item, index) => ({ ...item, numero: index + 1, titre: cleanText(item.titre), objectif: cleanText(item.objectif) }))
+    .filter((item) => !isGenericTitle(item.titre));
+
+  const outlineText = normalizedOutline
+    .map((chapter) => `Chapitre ${chapter.numero} — ${chapter.titre}\nObjectif : ${chapter.objectif || 'Objectif éditorial à préciser.'}`)
+    .join('\n');
+
   const canStepOne = title.trim().length >= 3 && description.trim().length >= 30;
   const canStepTwo = Boolean(effectiveCategory.trim()) && chapters >= 3 && chapters <= 60 && wordsPerChapter >= 500;
+  const canStepOutline = normalizedOutline.length === chapters && normalizedOutline.every((item) => item.titre.length >= 4 && item.objectif.length >= 8);
   const canStepFour = finalTitle.trim().length >= 3 && authorName.trim().length >= 2;
+
+  const buildWorkflowDescription = () => [
+    description.trim(),
+    `Style demandé : ${tone}.`,
+    `Format prévu : ${chapters} chapitres d'environ ${wordsPerChapter} mots chacun.`,
+    outlineText ? `SOMMAIRE VALIDÉ PAR L'AUTEUR — à respecter strictement :\n${outlineText}` : '',
+    workflowCharacters.length
+      ? `Personnages fournis : ${workflowCharacters.map((character) => `${character.name} (${character.role}) — ${character.description}`).join(' | ')}`
+      : '',
+  ].filter(Boolean).join('\n\n');
+
+  const syncProjectId = (id: string | null) => {
+    projectIdRef.current = id;
+    setProjectId(id);
+    try {
+      if (id) localStorage.setItem(PROJECT_ID_KEY, id);
+      else localStorage.removeItem(PROJECT_ID_KEY);
+    } catch {}
+  };
+
+  const saveProjectToCloud = async (options: { silent?: boolean; completedBookOverride?: any; coverUrlOverride?: string | null } = {}) => {
+    const { silent = false, completedBookOverride, coverUrlOverride } = options;
+    const resolvedTitle = (finalTitle.trim() || title.trim() || 'Sans titre').slice(0, 180);
+    const activeCoverUrl = coverUrlOverride ?? coverUrl;
+    const completed = completedBookOverride || completedBook;
+    const completedChapters = Array.isArray(completed?.chapters)
+      ? completed.chapters.map((chapter: any, index: number) => ({
+          number: Number(chapter.number || chapter.numero || index + 1),
+          title: cleanText(chapter.title || chapter.titre || normalizedOutline[index]?.titre || `Partie ${index + 1}`),
+          content: String(chapter.content || chapter.contenu || '').trim(),
+          incomplete: Boolean(chapter.incomplete),
+        }))
+      : [];
+
+    const projectPayload = {
+      title: resolvedTitle,
+      author_name: authorName.trim() || 'Auteur Ebookstudio',
+      target_audience: hub.targetAudience || '',
+      writing_style: tone,
+      chapter_length: `${wordsPerChapter} mots par chapitre`,
+      detail_level: `${chapters} chapitres · ${totalWords.toLocaleString('fr-FR')} mots estimés`,
+      tone,
+      narrative_format: subtitle.trim() ? `Sous-titre : ${subtitle.trim()}` : 'Workflow V3 complet',
+      preface: description.trim(),
+      conclusion: completed?.conclusion || '',
+      chapters: completedChapters as any,
+      characters: workflowCharacters as any,
+      ebook_images: activeCoverUrl ? [{ type: 'front_cover', url: activeCoverUrl, title: resolvedTitle }] as any : [] as any,
+      number_of_chapters: chapters,
+      book_summary: [
+        description.trim(),
+        outlineText ? `\nTABLE DES MATIÈRES VALIDÉE\n${outlineText}` : '',
+      ].filter(Boolean).join('\n\n'),
+      cover_concepts: activeCoverUrl || '',
+      kdp_description: completed?.backCover?.description || '',
+      kdp_keywords: '',
+      kdp_categories: effectiveCategory,
+      project_type: 'ebook',
+      updated_at: new Date().toISOString(),
+    };
+
+    try {
+      setSavingCloud(true);
+      const { data: auth, error: authError } = await supabase.auth.getUser();
+      if (authError || !auth.user) {
+        toast.error('Connecte-toi pour sauvegarder le livre dans Mes livres.');
+        return null;
+      }
+
+      const idToUpdate = projectIdRef.current;
+      if (idToUpdate) {
+        const { data, error } = await supabase
+          .from('ebook_projects')
+          .update({ ...projectPayload, user_id: auth.user.id } as any)
+          .eq('id', idToUpdate)
+          .eq('user_id', auth.user.id)
+          .select('id')
+          .maybeSingle();
+        if (error) throw error;
+        if (data?.id) {
+          syncProjectId(data.id);
+          if (!silent) toast.success('Sauvegardé dans Mes livres.');
+          return data.id;
+        }
+      }
+
+      const { data, error } = await supabase
+        .from('ebook_projects')
+        .insert({ ...projectPayload, user_id: auth.user.id } as any)
+        .select('id')
+        .single();
+      if (error) throw error;
+      syncProjectId(data.id);
+      if (!silent) toast.success('Sauvegardé dans Mes livres.');
+      return data.id;
+    } catch (error: any) {
+      console.error('V3 project save failed:', error);
+      if (!silent) toast.error(error?.message || 'Sauvegarde impossible dans Mes livres.');
+      return null;
+    } finally {
+      setSavingCloud(false);
+    }
+  };
+
+  const saveDraft = async () => {
+    try {
+      const draft = {
+        savedAt: new Date().toISOString(),
+        title, description, category, customCategory, tone, chapters, wordsPerChapter,
+        characters, outline, finalTitle, subtitle, authorName,
+      };
+      const raw = localStorage.getItem('v3_wizard_drafts_v1');
+      const list = raw ? JSON.parse(raw) : [];
+      list.unshift({ id: crypto.randomUUID?.() || String(Date.now()), ...draft });
+      localStorage.setItem('v3_wizard_drafts_v1', JSON.stringify(list.slice(0, 20)));
+      localStorage.setItem(WIZARD_KEY, JSON.stringify(draft));
+    } catch {
+      toast.error('Sauvegarde locale impossible.');
+    }
+    await saveProjectToCloud();
+  };
+
+  const resetWizard = () => {
+    if (!confirm('Recommencer un nouveau livre ? Le brouillon en cours sera effacé.')) return;
+    setTitle(''); setDescription(''); setCategory('Roman'); setCustomCategory('');
+    setTone('Inspirant'); setChapters(12); setWordsPerChapter(2500);
+    setCharacters([makeCharacter()]); setOutline(buildFallbackOutline('', 'Roman', 12)); setFinalTitle(''); setSubtitle('');
+    setAiTopic(''); setAiResult(null); setStep(0); setLaunched(false); setCompletedBook(null); setCoverUrl(null);
+    syncProjectId(null);
+    coverTriggeredRef.current = false;
+    ['ebook_workflow_progress', 'ebook_workflow_results', 'ebook_workflow_sync_data'].forEach((k) => localStorage.removeItem(k));
+    toast.success('Nouveau livre — formulaire réinitialisé.');
+  };
+
+
+  const generateOutline = async () => {
+    if (!canStepOne || !canStepTwo) {
+      toast.error('Complète le titre, le synopsis, la catégorie et le format avant le sommaire.');
+      return;
+    }
+
+    const provider = getProvider();
+    const key = getProviderKey(provider);
+    if (!key || !validateKeyFormat(provider, key)) {
+      setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
+      toast.success('Sommaire préparé — tu peux modifier chaque chapitre.');
+      return;
+    }
+
+    setOutlineLoading(true);
+    try {
+      const prompt = `Tu es directeur éditorial KDP. Crée une table des matières professionnelle en français.
+Titre : ${finalTitle || title}
+Sous-titre : ${subtitle || 'Non défini'}
+Catégorie : ${effectiveCategory}
+Ton : ${tone}
+Synopsis : ${description}
+Nombre exact de chapitres : ${chapters}
+Mots par chapitre : ${wordsPerChapter}
+
+Réponds STRICTEMENT en JSON valide, sans markdown, avec ce schéma :
+{"chapters":[{"numero":1,"titre":"Titre spécifique non générique","objectif":"Objectif éditorial clair en une phrase"}]}
+
+Règles :
+- exactement ${chapters} chapitres ;
+- jamais de titre générique comme "Chapitre 1" ;
+- aucun bloc markdown, aucune balise json ;
+- titres courts, vendeurs, cohérents avec le synopsis.`;
+      const raw = await callAIWriting(prompt, { jsonMode: true, temperature: 0.55, maxTokens: Math.min(12000, 1800 + chapters * 180) });
+      let parsed: any = null;
+      try { parsed = JSON.parse(raw); } catch {
+        const match = raw.match(/\{[\s\S]*\}/);
+        if (match) parsed = JSON.parse(match[0]);
+      }
+      const aiChapters = Array.isArray(parsed?.chapters) ? parsed.chapters : [];
+      const nextOutline = aiChapters.map((item: any, index: number) => ({
+        id: makeId(),
+        numero: index + 1,
+        titre: cleanText(item.titre || item.title),
+        objectif: cleanText(item.objectif || item.goal || item.description),
+      })).filter((item: OutlineChapter) => !isGenericTitle(item.titre)).slice(0, chapters);
+      if (nextOutline.length !== chapters) throw new Error('Sommaire incomplet');
+      setOutline(nextOutline);
+      toast.success('Sommaire généré — relis puis valide avant de lancer.');
+    } catch (error) {
+      console.error('Outline generation failed:', error);
+      setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
+      toast.warning('Sommaire robuste préparé — tu peux le modifier avant génération.');
+    } finally {
+      setOutlineLoading(false);
+    }
+  };
 
   const goNext = () => {
     if (step === 0 && !canStepOne) {
@@ -233,8 +469,15 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
       toast.error('Vérifie la catégorie, le nombre de chapitres et les mots par chapitre.');
       return;
     }
-    if (step === 2 && !finalTitle.trim()) setFinalTitle(title);
-    setStep((value) => Math.min(3, value + 1));
+    if (step === 1 && outline.length !== chapters) {
+      setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
+    }
+    if (step === 2 && !canStepOutline) {
+      toast.error('Valide le sommaire : chaque chapitre doit avoir un titre et un objectif.');
+      return;
+    }
+    if (step === 3 && !finalTitle.trim()) setFinalTitle(title);
+    setStep((value) => Math.min(4, value + 1));
   };
 
   const updateCharacter = (id: string, field: keyof WizardCharacter, value: string) => {
@@ -245,20 +488,41 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
     setCharacters((items) => items.length <= 1 ? items : items.filter((item) => item.id !== id));
   };
 
-  const launchWorkflow = () => {
+  const updateOutline = (id: string, field: keyof Pick<OutlineChapter, 'titre' | 'objectif'>, value: string) => {
+    setOutline((items) => items.map((item) => item.id === id ? { ...item, [field]: value } : item));
+  };
+
+  const removeOutlineChapter = (id: string) => {
+    setOutline((items) => items.length <= 3 ? items : items.filter((item) => item.id !== id).map((item, index) => ({ ...item, numero: index + 1 })));
+    setChapters((value) => Math.max(3, value - 1));
+  };
+
+  const addOutlineChapter = () => {
+    setOutline((items) => {
+      const next = [...items, { id: makeId(), numero: items.length + 1, titre: `Nouvelle partie — ${title || effectiveCategory}`, objectif: 'Définir le rôle précis de ce chapitre dans la progression du livre.' }];
+      setChapters(clampNumber(next.length, 3, 60, 12));
+      return next;
+    });
+  };
+
+  const handleWorkflowComplete = async (bookData: any) => {
+    setCompletedBook(bookData);
+    await saveProjectToCloud({ silent: true, completedBookOverride: bookData });
+    toast.success('Livre terminé et sauvegardé dans Mes livres.');
+  };
+
+  const launchWorkflow = async () => {
     if (!canStepFour) {
       toast.error('Valide le titre final et le nom d’auteur avant de générer.');
       return;
     }
+    if (!canStepOutline) {
+      toast.error('Valide le sommaire avant de générer le livre.');
+      setStep(2);
+      return;
+    }
 
-    const workflowDescription = [
-      description.trim(),
-      `Style demandé : ${tone}.`,
-      `Format prévu : ${chapters} chapitres d'environ ${wordsPerChapter} mots chacun.`,
-      workflowCharacters.length
-        ? `Personnages fournis : ${workflowCharacters.map((character) => `${character.name} (${character.role}) — ${character.description}`).join(' | ')}`
-        : '',
-    ].filter(Boolean).join('\n\n');
+    const workflowDescription = buildWorkflowDescription();
 
     const config = {
       title: finalTitle.trim(),
@@ -271,6 +535,7 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
       tone,
       wordsPerChapter,
       characters: workflowCharacters,
+      outline: normalizedOutline,
     };
 
     try {
@@ -282,7 +547,9 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
       // The mounted workflow still receives props if localStorage is unavailable.
     }
 
-    toast.success('Le workflow complet démarre maintenant.');
+    const savedId = await saveProjectToCloud({ silent: true });
+    if (!savedId) return;
+    toast.success('Projet sauvegardé. Le workflow complet démarre maintenant.');
     setLaunched(true);
   };
 
