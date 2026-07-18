@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Check, Sparkles, Crown, Feather } from 'lucide-react';
+import { Check, Sparkles, Crown, Feather, Info, X } from 'lucide-react';
 import V3SubscribeCheckout from '@/components/v3public/V3SubscribeCheckout';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 type Billing = 'monthly' | 'annual';
 
@@ -80,6 +81,9 @@ type Upsell = {
   href?: string;
   desc: string;
   badge?: string;
+  longDesc: string;
+  features: string[];
+  useCase: string;
 };
 
 const UPSELLS: Upsell[] = [
@@ -91,18 +95,125 @@ const UPSELLS: Upsell[] = [
     href: '/bookperfect-offre',
     badge: 'Lancement',
     desc: "Analyse votre roman Word chapitre par chapitre : traces d'IA, orthographe, style, contrôle Amazon KDP et export Word corrigé — sans jamais altérer votre texte original.",
+    longDesc: "BookPerfect AI est votre directeur éditorial personnel. Vous importez votre manuscrit Word (jusqu'à 400+ pages), il découpe automatiquement en chapitres et analyse chaque chapitre séparément — avec reprise automatique si l'analyse est interrompue. Vous validez chaque correction proposée : rien n'est modifié sans votre accord.",
+    features: [
+      "Détection des traces d'IA (ChatGPT, Gemini…)",
+      'Orthographe, grammaire, style et lourdeurs',
+      'Contrôle de conformité Amazon KDP',
+      'Analyse chapitre par chapitre (400+ pages)',
+      'Reprise automatique en cas d\'interruption',
+      'Export Word corrigé prêt à publier',
+    ],
+    useCase: "Idéal si vous avez déjà un manuscrit terminé et voulez le publier proprement sur Amazon KDP sans risque de rejet ou de mauvaises critiques.",
   },
-  { id: 'selection', name: 'Sélection maisons d’édition', price: '19 €', suffix: '+ taxes / mois', priceId: 'v3_upsell_selection_month', desc: 'Trouvez les éditeurs susceptibles de publier votre livre.' },
-  { id: 'aplus', name: 'A+ Content Amazon', price: '9 €', suffix: '+ taxes / mois', priceId: 'v3_upsell_aplus_month', desc: 'Modules visuels optimisés pour vos fiches KDP.' },
-  { id: 'lookinside', name: 'Look Inside Optimizer', price: '7 €', suffix: '+ taxes / mois', priceId: 'v3_upsell_lookinside_month', desc: 'Optimise l’aperçu Amazon des premières pages.' },
-  { id: 'bookbub', name: 'BookBub Ad Builder', price: '9 €', suffix: '+ taxes / mois', priceId: 'v3_upsell_bookbub_month', desc: 'Générateur de visuels publicitaires BookBub.' },
-  { id: 'newsletter', name: 'Newsletter Auteur', price: '12 €', suffix: '+ taxes / mois', priceId: 'v3_upsell_newsletter_month', desc: 'Séquences email prêtes à l’emploi.' },
-  { id: 'relecture', name: 'Relecture éditoriale humaine', price: '49 €', suffix: '+ taxes / livre', priceId: 'v3_upsell_relecture_once', desc: 'Correction professionnelle par un relecteur humain.' },
+  {
+    id: 'selection',
+    name: 'Sélection maisons d’édition',
+    price: '19 €',
+    suffix: '+ taxes / mois',
+    priceId: 'v3_upsell_selection_month',
+    desc: 'Trouvez les éditeurs susceptibles de publier votre livre.',
+    longDesc: "Un moteur de recherche intelligent qui croise votre genre, votre univers et votre style avec une base de maisons d'édition françaises et francophones. Il ne vous propose que celles qui publient réellement des livres comme le vôtre.",
+    features: [
+      "Base d'éditeurs français mise à jour",
+      'Filtrage par genre, format, ligne éditoriale',
+      "Adresse email et procédure d'envoi de manuscrit",
+      "Score de compatibilité IA avec votre livre",
+      'Suivi de vos envois (accepté / refusé / en attente)',
+    ],
+    useCase: "Idéal si vous préférez l'édition traditionnelle à l'auto-édition Amazon, ou si vous voulez tenter les deux.",
+  },
+  {
+    id: 'aplus',
+    name: 'A+ Content Amazon',
+    price: '9 €',
+    suffix: '+ taxes / mois',
+    priceId: 'v3_upsell_aplus_month',
+    desc: 'Modules visuels optimisés pour vos fiches KDP.',
+    longDesc: "Le A+ Content transforme votre fiche produit Amazon en mini page de vente visuelle. Modules images, comparatifs, storytelling auteur : jusqu'à +20 % de conversion selon Amazon.",
+    features: [
+      'Modules A+ prêts à uploader (images HD)',
+      'Templates par genre (roman, non-fiction, jeunesse)',
+      "Bio auteur illustrée",
+      "Comparateur d'ouvrages de la même série",
+      'Compatible avec Kindle et broché',
+    ],
+    useCase: "Idéal dès votre 2e ou 3e livre publié, pour créer une identité d'auteur visuelle sur Amazon.",
+  },
+  {
+    id: 'lookinside',
+    name: 'Look Inside Optimizer',
+    price: '7 €',
+    suffix: '+ taxes / mois',
+    priceId: 'v3_upsell_lookinside_month',
+    desc: 'Optimise l’aperçu Amazon des premières pages.',
+    longDesc: "Le « Look Inside » d'Amazon est ce que voit un acheteur avant d'acheter. L'outil réécrit et remet en page vos 10 premières pages pour maximiser la conversion : accroche forte, mise en page aérée, cliffhanger de fin d'extrait.",
+    features: [
+      "Réécriture IA de l'accroche du chapitre 1",
+      'Mise en page KDP compatible',
+      'Suggestion de dédicace et exergue',
+      "Placement du cliffhanger en fin d'aperçu",
+      'Contrôle du taux de blanc / densité',
+    ],
+    useCase: "Idéal si vos livres ont du trafic mais peu de ventes : le problème est presque toujours dans le Look Inside.",
+  },
+  {
+    id: 'bookbub',
+    name: 'BookBub Ad Builder',
+    price: '9 €',
+    suffix: '+ taxes / mois',
+    priceId: 'v3_upsell_bookbub_month',
+    desc: 'Générateur de visuels publicitaires BookBub.',
+    longDesc: "BookBub est la plateforme n°1 de promotion de livres numériques. L'outil génère des visuels et des accroches optimisés pour leurs formats publicitaires — plus vous en avez, plus vous pouvez A/B tester.",
+    features: [
+      'Visuels aux 3 formats officiels BookBub',
+      "Accroches IA par genre (romance, thriller…)",
+      "Variations A/B automatiques",
+      "Compatible Amazon Ads et Facebook Ads",
+      "Export PNG / JPG haute résolution",
+    ],
+    useCase: "Idéal pour les auteurs qui font déjà de la pub payante et veulent réduire leur coût par clic.",
+  },
+  {
+    id: 'newsletter',
+    name: 'Newsletter Auteur',
+    price: '12 €',
+    suffix: '+ taxes / mois',
+    priceId: 'v3_upsell_newsletter_month',
+    desc: 'Séquences email prêtes à l’emploi.',
+    longDesc: "Un vrai auteur professionnel a une newsletter. On vous fournit toutes les séquences email prêtes à copier-coller : bienvenue, lancement de livre, relance des lecteurs inactifs, annonce de suite…",
+    features: [
+      "Séquence de bienvenue (5 emails)",
+      'Séquence de lancement de livre (7 emails)',
+      "Séquence de réactivation lecteurs",
+      'Templates HTML compatibles Brevo, Mailchimp, Systeme.io',
+      "Personnalisation IA à votre univers",
+    ],
+    useCase: "Idéal dès votre 1er livre : construire une liste d'emails est la seule manière stable de vivre de son écriture.",
+  },
+  {
+    id: 'relecture',
+    name: 'Relecture éditoriale humaine',
+    price: '49 €',
+    suffix: '+ taxes / livre',
+    priceId: 'v3_upsell_relecture_once',
+    desc: 'Correction professionnelle par un relecteur humain.',
+    longDesc: "Un relecteur humain professionnel relit intégralement votre manuscrit après l'IA. Ce n'est pas une simple correction orthographique : c'est une relecture éditoriale (rythme, cohérence, dialogues, incohérences).",
+    features: [
+      "Relecteur humain professionnel dédié",
+      "Corrections orthographe + style + cohérence",
+      'Notes éditoriales chapitre par chapitre',
+      "Délai moyen : 5 à 7 jours ouvrés",
+      "Fichier Word corrigé avec suivi des modifications",
+    ],
+    useCase: "Idéal juste avant publication, pour les livres auxquels vous tenez vraiment. À combiner avec BookPerfect AI pour un résultat professionnel.",
+  },
 ];
 
 export default function V3OffresPage() {
   const [billing, setBilling] = useState<Billing>('monthly');
   const [checkout, setCheckout] = useState<{ priceId: string; planName: string } | null>(null);
+  const [detail, setDetail] = useState<Upsell | null>(null);
 
   return (
     <div className="v3pub">
@@ -250,6 +361,13 @@ export default function V3OffresPage() {
                   <h4 className="font-semibold text-[var(--v3-ink)]">{u.name}</h4>
                 </div>
                 <p className="mt-1 text-xs text-[var(--v3-muted)] flex-1">{u.desc}</p>
+                <button
+                  type="button"
+                  onClick={() => setDetail(u)}
+                  className="mt-2 inline-flex items-center gap-1 self-start text-[11px] font-semibold text-[var(--v3-orange)] hover:underline"
+                >
+                  <Info className="w-3 h-3" /> En savoir plus
+                </button>
                 <div className="mt-3 flex items-center justify-between gap-2">
                   <div className="text-sm">
                     <span className="text-lg font-bold text-[var(--v3-ink)]">{u.price}</span>
@@ -325,6 +443,70 @@ export default function V3OffresPage() {
           onClose={() => setCheckout(null)}
         />
       )}
+
+      <Dialog open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
+        <DialogContent className="max-w-lg">
+          {detail && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 text-[var(--v3-ink)]">
+                  <Sparkles className="w-5 h-5 text-[var(--v3-orange)]" />
+                  {detail.name}
+                </DialogTitle>
+                <DialogDescription className="text-sm leading-relaxed pt-2">
+                  {detail.longDesc}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="mt-2">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--v3-muted)] mb-2">
+                  Ce que vous obtenez
+                </h4>
+                <ul className="space-y-1.5">
+                  {detail.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2 text-sm text-[var(--v3-ink)]">
+                      <Check className="w-4 h-4 text-[var(--v3-orange)] mt-0.5 flex-shrink-0" />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="mt-4 rounded-lg bg-[#FFF9EF] border border-[var(--v3-orange)]/20 p-3">
+                <p className="text-xs font-semibold text-[var(--v3-ink)] mb-1">Pour qui&nbsp;?</p>
+                <p className="text-xs text-[var(--v3-muted)] leading-relaxed">{detail.useCase}</p>
+              </div>
+
+              <div className="mt-4 flex items-center justify-between gap-3 border-t pt-4">
+                <div>
+                  <span className="text-2xl font-bold text-[var(--v3-ink)]">{detail.price}</span>
+                  <span className="text-[var(--v3-muted)] text-xs ml-1">{detail.suffix}</span>
+                </div>
+                {detail.href ? (
+                  <a
+                    href={detail.href}
+                    className="v3-btn v3-btn-primary text-sm px-4 py-2"
+                  >
+                    Découvrir
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!detail.priceId) return;
+                      setCheckout({ priceId: detail.priceId, planName: `${detail.name} — ${detail.price} ${detail.suffix}` });
+                      setDetail(null);
+                    }}
+                    className="v3-btn v3-btn-primary text-sm px-4 py-2"
+                  >
+                    Ajouter — {detail.price}
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
