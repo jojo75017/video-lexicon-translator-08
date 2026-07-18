@@ -81,6 +81,9 @@ type Upsell = {
   href?: string;
   desc: string;
   badge?: string;
+  longDesc: string;
+  features: string[];
+  useCase: string;
 };
 
 const UPSELLS: Upsell[] = [
@@ -92,13 +95,119 @@ const UPSELLS: Upsell[] = [
     href: '/bookperfect-offre',
     badge: 'Lancement',
     desc: "Analyse votre roman Word chapitre par chapitre : traces d'IA, orthographe, style, contrôle Amazon KDP et export Word corrigé — sans jamais altérer votre texte original.",
+    longDesc: "BookPerfect AI est votre directeur éditorial personnel. Vous importez votre manuscrit Word (jusqu'à 400+ pages), il découpe automatiquement en chapitres et analyse chaque chapitre séparément — avec reprise automatique si l'analyse est interrompue. Vous validez chaque correction proposée : rien n'est modifié sans votre accord.",
+    features: [
+      "Détection des traces d'IA (ChatGPT, Gemini…)",
+      'Orthographe, grammaire, style et lourdeurs',
+      'Contrôle de conformité Amazon KDP',
+      'Analyse chapitre par chapitre (400+ pages)',
+      'Reprise automatique en cas d\'interruption',
+      'Export Word corrigé prêt à publier',
+    ],
+    useCase: "Idéal si vous avez déjà un manuscrit terminé et voulez le publier proprement sur Amazon KDP sans risque de rejet ou de mauvaises critiques.",
   },
-  { id: 'selection', name: 'Sélection maisons d’édition', price: '19 €', suffix: '+ taxes / mois', priceId: 'v3_upsell_selection_month', desc: 'Trouvez les éditeurs susceptibles de publier votre livre.' },
-  { id: 'aplus', name: 'A+ Content Amazon', price: '9 €', suffix: '+ taxes / mois', priceId: 'v3_upsell_aplus_month', desc: 'Modules visuels optimisés pour vos fiches KDP.' },
-  { id: 'lookinside', name: 'Look Inside Optimizer', price: '7 €', suffix: '+ taxes / mois', priceId: 'v3_upsell_lookinside_month', desc: 'Optimise l’aperçu Amazon des premières pages.' },
-  { id: 'bookbub', name: 'BookBub Ad Builder', price: '9 €', suffix: '+ taxes / mois', priceId: 'v3_upsell_bookbub_month', desc: 'Générateur de visuels publicitaires BookBub.' },
-  { id: 'newsletter', name: 'Newsletter Auteur', price: '12 €', suffix: '+ taxes / mois', priceId: 'v3_upsell_newsletter_month', desc: 'Séquences email prêtes à l’emploi.' },
-  { id: 'relecture', name: 'Relecture éditoriale humaine', price: '49 €', suffix: '+ taxes / livre', priceId: 'v3_upsell_relecture_once', desc: 'Correction professionnelle par un relecteur humain.' },
+  {
+    id: 'selection',
+    name: 'Sélection maisons d’édition',
+    price: '19 €',
+    suffix: '+ taxes / mois',
+    priceId: 'v3_upsell_selection_month',
+    desc: 'Trouvez les éditeurs susceptibles de publier votre livre.',
+    longDesc: "Un moteur de recherche intelligent qui croise votre genre, votre univers et votre style avec une base de maisons d'édition françaises et francophones. Il ne vous propose que celles qui publient réellement des livres comme le vôtre.",
+    features: [
+      "Base d'éditeurs français mise à jour",
+      'Filtrage par genre, format, ligne éditoriale',
+      "Adresse email et procédure d'envoi de manuscrit",
+      "Score de compatibilité IA avec votre livre",
+      'Suivi de vos envois (accepté / refusé / en attente)',
+    ],
+    useCase: "Idéal si vous préférez l'édition traditionnelle à l'auto-édition Amazon, ou si vous voulez tenter les deux.",
+  },
+  {
+    id: 'aplus',
+    name: 'A+ Content Amazon',
+    price: '9 €',
+    suffix: '+ taxes / mois',
+    priceId: 'v3_upsell_aplus_month',
+    desc: 'Modules visuels optimisés pour vos fiches KDP.',
+    longDesc: "Le A+ Content transforme votre fiche produit Amazon en mini page de vente visuelle. Modules images, comparatifs, storytelling auteur : jusqu'à +20 % de conversion selon Amazon.",
+    features: [
+      'Modules A+ prêts à uploader (images HD)',
+      'Templates par genre (roman, non-fiction, jeunesse)',
+      "Bio auteur illustrée",
+      "Comparateur d'ouvrages de la même série",
+      'Compatible avec Kindle et broché',
+    ],
+    useCase: "Idéal dès votre 2e ou 3e livre publié, pour créer une identité d'auteur visuelle sur Amazon.",
+  },
+  {
+    id: 'lookinside',
+    name: 'Look Inside Optimizer',
+    price: '7 €',
+    suffix: '+ taxes / mois',
+    priceId: 'v3_upsell_lookinside_month',
+    desc: 'Optimise l’aperçu Amazon des premières pages.',
+    longDesc: "Le « Look Inside » d'Amazon est ce que voit un acheteur avant d'acheter. L'outil réécrit et remet en page vos 10 premières pages pour maximiser la conversion : accroche forte, mise en page aérée, cliffhanger de fin d'extrait.",
+    features: [
+      "Réécriture IA de l'accroche du chapitre 1",
+      'Mise en page KDP compatible',
+      'Suggestion de dédicace et exergue',
+      "Placement du cliffhanger en fin d'aperçu",
+      'Contrôle du taux de blanc / densité',
+    ],
+    useCase: "Idéal si vos livres ont du trafic mais peu de ventes : le problème est presque toujours dans le Look Inside.",
+  },
+  {
+    id: 'bookbub',
+    name: 'BookBub Ad Builder',
+    price: '9 €',
+    suffix: '+ taxes / mois',
+    priceId: 'v3_upsell_bookbub_month',
+    desc: 'Générateur de visuels publicitaires BookBub.',
+    longDesc: "BookBub est la plateforme n°1 de promotion de livres numériques. L'outil génère des visuels et des accroches optimisés pour leurs formats publicitaires — plus vous en avez, plus vous pouvez A/B tester.",
+    features: [
+      'Visuels aux 3 formats officiels BookBub',
+      "Accroches IA par genre (romance, thriller…)",
+      "Variations A/B automatiques",
+      "Compatible Amazon Ads et Facebook Ads",
+      "Export PNG / JPG haute résolution",
+    ],
+    useCase: "Idéal pour les auteurs qui font déjà de la pub payante et veulent réduire leur coût par clic.",
+  },
+  {
+    id: 'newsletter',
+    name: 'Newsletter Auteur',
+    price: '12 €',
+    suffix: '+ taxes / mois',
+    priceId: 'v3_upsell_newsletter_month',
+    desc: 'Séquences email prêtes à l’emploi.',
+    longDesc: "Un vrai auteur professionnel a une newsletter. On vous fournit toutes les séquences email prêtes à copier-coller : bienvenue, lancement de livre, relance des lecteurs inactifs, annonce de suite…",
+    features: [
+      "Séquence de bienvenue (5 emails)",
+      'Séquence de lancement de livre (7 emails)',
+      "Séquence de réactivation lecteurs",
+      'Templates HTML compatibles Brevo, Mailchimp, Systeme.io',
+      "Personnalisation IA à votre univers",
+    ],
+    useCase: "Idéal dès votre 1er livre : construire une liste d'emails est la seule manière stable de vivre de son écriture.",
+  },
+  {
+    id: 'relecture',
+    name: 'Relecture éditoriale humaine',
+    price: '49 €',
+    suffix: '+ taxes / livre',
+    priceId: 'v3_upsell_relecture_once',
+    desc: 'Correction professionnelle par un relecteur humain.',
+    longDesc: "Un relecteur humain professionnel relit intégralement votre manuscrit après l'IA. Ce n'est pas une simple correction orthographique : c'est une relecture éditoriale (rythme, cohérence, dialogues, incohérences).",
+    features: [
+      "Relecteur humain professionnel dédié",
+      "Corrections orthographe + style + cohérence",
+      'Notes éditoriales chapitre par chapitre',
+      "Délai moyen : 5 à 7 jours ouvrés",
+      "Fichier Word corrigé avec suivi des modifications",
+    ],
+    useCase: "Idéal juste avant publication, pour les livres auxquels vous tenez vraiment. À combiner avec BookPerfect AI pour un résultat professionnel.",
+  },
 ];
 
 export default function V3OffresPage() {
