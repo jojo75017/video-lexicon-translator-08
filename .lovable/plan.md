@@ -1,71 +1,61 @@
-# Plan validé + ajouts couverture & export
 
-## Bloc 1 — Studio Éditorial (15 agents, automatiques, inclus partout)
+# Audiobook unlock — 9,99 € par livre (BYOK TTS)
 
-Ils s'enchaînent tout seuls après "Générer mon livre". Barre de progression globale (0→15) + carte par agent (⏳ en attente → 🔄 en cours → ✅ terminé) avec le nom qui défile visiblement.
+## Objectif
+Après génération d'un livre sur `/v3`, l'utilisateur peut payer **9,99 € une fois** pour ce livre précis, puis générer la version audio (MP3 unique) en utilisant **sa propre clé** Azure Speech, ElevenLabs, ou OpenAI TTS. Le coût de synthèse est à sa charge (BYOK), on n'utilise jamais nos propres clés serveur pour ce flux.
 
-| # | Nom d'agent | Rôle |
-|---|---|---|
-| 1 | Architecte | Structure et fiche technique du livre |
-| 2 | Scénariste | Plan narratif détaillé chapitre par chapitre |
-| 3 | Documentaliste | Recherche et sources pour le contenu |
-| 4 | Rédacteur | Génération du manuscrit chapitre par chapitre |
-| 5 | Dialoguiste | Enrichissement des dialogues et scènes |
-| 6 | Continuiste | Vérification de la cohérence narrative |
-| 7 | Réviseur | Passe de révision stylistique |
-| 8 | Correcteur | Orthographe, grammaire, ponctuation |
-| 9 | Styliste | Harmonisation du ton et du rythme |
-| 10 | Éditeur | Coupes, ajouts, resserrage éditorial |
-| 11 | Metteur en page | Formatage, titres, hiérarchie |
-| 12 | Indexeur | Table des matières et navigation |
-| 13 | Préfacier | Introduction, préface, quatrième de couverture |
-| 14 | Résumeur | Synopsis court + long |
-| 15 | Contrôleur qualité | Passe finale et validation avant export |
+## Produit Stripe
+- Nouveau produit `audiobook_unlock` — prix `audiobook_unlock_one` — 999 cents EUR, one-shot.
+- Créé via `payments--create_product` (test → sync auto en live).
 
-## Bloc 2 — Studio Croissance (15 agents, à la demande)
+## Base de données
+Nouvelle table `audiobook_unlocks` :
+```
+id, user_id, book_id (text), stripe_session_id, environment,
+paid_at, audio_url (nullable), provider_used, created_at
+```
+RLS : user lit les siens, service_role écrit. Grants explicites `authenticated` + `service_role`.
 
-**Recherche & positionnement (4)** — Chasseur de niches, Mineur de mots-clés, Cartographe de catégories, Éclaireur concurrence
-**Habillage produit (4)** — Illustrateur (Cover Studio), Vitrine A+, Metteur en scène Look Inside, Rédacteur fiche produit
-**Marketing & acquisition (4)** — Publicitaire BookBub, Voix newsletter, Community manager, Page de vente
-**Distribution (3)** — Éclaireur éditeurs, Exportateur KDP, Exportateur WooCommerce
+## Edge functions
+1. **`create-audiobook-checkout`** (`verify_jwt=false`)
+   - Input : `book_id`, `user_id`, `returnUrl`, `environment`.
+   - Stripe Checkout embedded, `mode: payment`, metadata `{ userId, bookId, kind: "audiobook_unlock" }`.
+   - Renvoie `clientSecret`.
 
-Cadenas + "Débloquer" selon la formule.
+2. **`payments-webhook`** (existant, à étendre)
+   - Sur `checkout.session.completed` avec `metadata.kind === "audiobook_unlock"` → insert dans `audiobook_unlocks`.
 
-## Matrice des 3 formules d'octobre
+3. **`generate-audiobook-byok`** (verify_jwt actif)
+   - Input : `book_id`, `provider` (`azure` | `elevenlabs` | `openai`), credentials (clé + région Azure, voix), texte du manuscrit.
+   - Vérifie qu'il existe un `audiobook_unlocks` payé pour ce user + book.
+   - Découpe le texte (~4500 car / chunk pour Azure, ~2500 pour ElevenLabs, ~4000 pour OpenAI).
+   - Appelle le provider avec la **clé de l'utilisateur** (jamais stockée).
+   - Concatène les MP3, upload dans le bucket `audiobooks` (déjà existant) sous `user_id/book_id.mp3`.
+   - Met à jour `audio_url` + `provider_used`.
+   - Renvoie l'URL publique.
 
-| Formule | Éditorial (15) | Croissance |
-|---|---|---|
-| Débutant 6,99 €/mo | ✅ Tous | Mots-clés, Fiche produit, Illustrateur, Export KDP |
-| Expert 9,99 €/mo | ✅ Tous | + Chasseur niches, Cartographe, Vitrine A+, Look Inside, Newsletter, Community |
-| Auteur 59 €/mo | ✅ Tous | ✅ Les 15 |
+## Interface (front)
+- **`src/components/audiobook/AudiobookUnlockCard.tsx`** : bandeau dans le récap final du wizard et dans la fiche livre bibliothèque. Deux états :
+  - Non payé → bouton « Convertir en audiobook — 9,99 € » → ouvre Stripe Embedded Checkout.
+  - Payé → formulaire BYOK (choix provider, clé collée, voix, vitesse), bouton « Générer l'audio », barre de progression, lecteur MP3 + téléchargement.
+- Intégré dans `V3CreatePage.tsx` (fin du wizard) et `V3LibraryPage.tsx` (par livre).
+- Clés BYOK TTS stockées dans `localStorage` chiffré (même utilitaire que Gemini/OpenRouter), jamais envoyées ailleurs qu'à l'edge de génération pour le run en cours.
 
-## Nouveaux ajouts
+## Sécurité
+- Vérification unlock côté serveur avant chaque génération (retour 402 sinon).
+- Clés TTS jamais loggées, jamais persistées côté serveur, effacées de la mémoire après le run.
+- Rate-limit simple : 1 génération en cours par user (verrou en table).
 
-### Couverture — champs auteur + sous-titre
-Le wizard `V3CreateWizard` ne demande aujourd'hui que le titre. On ajoute à l'étape 4 (Titre) :
-- **Nom d'auteur** (obligatoire, pré-rempli avec le profil utilisateur si dispo)
-- **Sous-titre** (optionnel, ~80 caractères)
+## Ce qui n'est PAS inclus (à confirmer plus tard)
+- Découpage par chapitres / ZIP → volontairement écarté (tu as choisi MP3 unique).
+- Publication ACX/Audible → hors scope.
+- Bundles multi-livres → hors scope.
 
-Ces trois champs (titre, sous-titre, auteur) sont :
-- Passés à `generate-front-cover` (les paramètres existent déjà côté edge function, il suffit de les transmettre) pour figurer sur l'illustration.
-- Injectés dans le manuscrit : page de titre + entêtes + métadonnées d'export.
-- Éditables sur la carte "Refaire la couverture" après génération, sans devoir relancer tout le livre.
+## Livrables
+- 1 migration SQL (table + RLS + grants).
+- 1 produit Stripe (`audiobook_unlock` / 9,99 €).
+- 3 edge functions (create-checkout, webhook étendu, generate-audiobook-byok).
+- 1 composant React `AudiobookUnlockCard` + intégration 2 pages.
+- Bouton visible sur le récap fin de génération et sur chaque tuile de la bibliothèque.
 
-### Export — garantir tous les chapitres
-Bug connu du Hub V3 précédent : l'export DOCX/PDF sautait des chapitres quand la génération avait été partielle ou reprise.
-
-Corrections dans le flux d'export :
-- **Contrôle de complétude avant export** : vérifier que `chapters.length === totalChapters` configurés, sinon afficher un bandeau rouge listant les chapitres manquants avec bouton "Regénérer ce chapitre".
-- **Source unique de vérité** : lire tous les chapitres depuis `ebook_workflow_results` triés par `chapter_index ASC`, pas depuis un state React qui peut être partiel.
-- **Fallback texte** : si un chapitre est présent en base mais vide, insérer un placeholder visible `[Chapitre X — à regénérer]` plutôt que de le sauter silencieusement.
-- **Journal d'export** : afficher en fin d'export "X/Y chapitres exportés" pour que l'utilisateur voie immédiatement s'il en manque.
-
-## Fichiers modifiés
-
-- `src/components/ebook/EbookCompleteWorkflow.tsx` — renommage des 15 agents + barre de progression globale.
-- `src/components/v3public/V3CreateWizard.tsx` — étape 4 : ajout sous-titre + auteur ; passage à `generate-front-cover` ; carte "Refaire la couverture" avec champs éditables.
-- `src/components/v3public/V3GrowthAgents.tsx` (nouveau) — panneau 15 agents Croissance.
-- Module d'export (DOCX/PDF utilisé par le workflow) — contrôle de complétude, source unique, fallback, journal.
-- `src/components/admin/V3PendingLaunchTab.tsx` — matrice inclusion/verrouillage des 3 formules.
-
-Aucun changement backend requis — les edge functions concernées acceptent déjà auteur/sous-titre.
+Confirme-moi que je lance et je le construis d'un bloc.
