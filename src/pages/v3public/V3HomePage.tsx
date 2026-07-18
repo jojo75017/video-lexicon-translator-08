@@ -39,15 +39,20 @@ const FEATURES = [
   { icon: Palette, title: 'Couverture auto', text: 'Une couverture unique est générée pour chaque livre, inspirée de ton histoire.' },
 ];
 
-// Livres de l'auteur invité (Georges Boubet) — statique et éditable.
-const AUTHOR_BOOKS = [
-  { title: 'AXEL — Berlin, la peur invisible', cover: null },
-  { title: 'AXEL — Dubaï, la loi du désert', cover: null },
-  { title: 'AXEL — Rupture', cover: null },
-  { title: 'AXEL — Kiev, l\'origine du code', cover: null },
-  { title: 'AXEL — Normalisation', cover: null },
-  { title: 'AXEL — Valeur', cover: null },
+// Livres de l'auteur invité (Georges Boubet) — 6 vraies couvertures Amazon.
+const AUTHOR_AMAZON_URL = 'https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7';
+const AUTHOR_BOOKS: Array<{ asin: string; title: string }> = [
+  { asin: 'B0GXB3V5DJ', title: "L'Ancien Locataire" },
+  { asin: 'B0GG7QCFTZ', title: "Axel Kiev — L'Origine du Code" },
+  { asin: 'B0GY5K8GCS', title: 'Signal Zéro — Intégrale' },
+  { asin: 'B0GX2SVHY4', title: 'Le Loup en Vacances' },
+  { asin: 'B0GQQB7V1F', title: "Dans l'Ombre de la Villa" },
+  { asin: 'B0GN34WYMK', title: 'La Bible du Voyage' },
 ];
+const coverUrl = (asin: string) => `https://images-na.ssl-images-amazon.com/images/P/${asin}.01.LZZZZZZZ.jpg`;
+const fallbackCoverUrl = (asin: string) => `https://m.media-amazon.com/images/P/${asin}.jpg`;
+const amazonBookUrl = (asin: string) => `https://www.amazon.fr/dp/${asin}/`;
+
 
 export default function V3HomePage() {
   const nav = useNavigate();
@@ -160,7 +165,7 @@ export default function V3HomePage() {
               </p>
             </div>
             <a
-              href="https://www.amazon.fr/stores/author/B00J4G8QOE"
+              href={AUTHOR_AMAZON_URL}
               target="_blank" rel="noopener noreferrer"
               className="v3-btn"
               style={{ background: '#fff', color: '#000' }}
@@ -169,28 +174,45 @@ export default function V3HomePage() {
             </a>
           </div>
 
-          <div className="mt-8 flex gap-4 overflow-x-auto v3-scroll-x pb-4">
-            {AUTHOR_BOOKS.map((b, i) => (
-              <div key={i} className="shrink-0 w-40">
-                <div className="w-40 h-56 rounded-lg overflow-hidden bg-gradient-to-br from-orange-600 to-orange-900 grid place-items-end p-3">
-                  <div className="text-white text-[11px] font-bold uppercase tracking-wider leading-tight">
-                    AXEL
-                    <div className="text-white/70 text-[10px] font-normal mt-1 normal-case tracking-normal">
-                      {b.title.replace('AXEL — ', '')}
-                    </div>
-                  </div>
+          <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+            {AUTHOR_BOOKS.map((b) => (
+              <a
+                key={b.asin}
+                href={amazonBookUrl(b.asin)}
+                target="_blank" rel="noopener noreferrer"
+                className="group block"
+                title={b.title}
+              >
+                <div className="aspect-[2/3] rounded-lg overflow-hidden bg-black/40 shadow-lg ring-1 ring-white/10 transition-transform group-hover:-translate-y-1 group-hover:shadow-2xl">
+                  <img
+                    src={coverUrl(b.asin)}
+                    alt={`Couverture ${b.title}`}
+                    loading="lazy"
+                    onError={(e) => {
+                      const img = e.currentTarget;
+                      if (img.src !== fallbackCoverUrl(b.asin)) img.src = fallbackCoverUrl(b.asin);
+                    }}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-              </div>
+                <div className="mt-2 text-[11px] text-white/70 line-clamp-2 leading-tight">{b.title}</div>
+              </a>
             ))}
           </div>
 
-          <div className="mt-4 flex justify-center">
-            <Link to="/v3/auteur" className="v3-btn" style={{ background: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}>
-              Voir les 71 livres <ArrowRight className="w-4 h-4" />
-            </Link>
+          <div className="mt-8 flex justify-center">
+            <a
+              href={AUTHOR_AMAZON_URL}
+              target="_blank" rel="noopener noreferrer"
+              className="v3-btn v3-btn-primary"
+            >
+              Découvrir tous les livres sur Amazon <ArrowRight className="w-4 h-4" />
+            </a>
           </div>
         </div>
       </section>
+
+
 
       {/* TOP 10 lectures */}
       <section className="max-w-7xl mx-auto px-5 md:px-8 py-16">
