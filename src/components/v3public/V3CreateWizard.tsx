@@ -403,7 +403,83 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
 
   return (
     <div className="space-y-8">
+      {/* Barre d'actions rapides */}
+      <div className="flex flex-wrap gap-2 justify-end">
+        <button
+          type="button"
+          onClick={saveDraft}
+          className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold"
+          style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+        >
+          <Save className="h-3.5 w-3.5" /> Sauvegarder brouillon
+        </button>
+        <button
+          type="button"
+          onClick={resetWizard}
+          className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold"
+          style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-orange-600)', background: 'var(--v3-paper)' }}
+        >
+          <RotateCcw className="h-3.5 w-3.5" /> Nouveau livre
+        </button>
+      </div>
+
+      {/* Assistant IA : titre, sous-titre, synopsis, catégories */}
+      <div className="rounded-[24px] border p-5" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-orange-50)' }}>
+        <div className="flex items-center gap-2">
+          <span className="v3-chip v3-chip-orange"><Wand2 className="h-3.5 w-3.5" /> Assistant IA</span>
+          <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--v3-muted)' }}>
+            Trouve titre · sous-titre · synopsis · catégories
+          </span>
+        </div>
+        <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>
+          Décris ton idée, ton sujet ou une niche Amazon. L'IA te propose un titre commercial, un sous-titre, un synopsis de ~150 mots et jusqu'à 5 catégories pertinentes.
+        </p>
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+          <input
+            value={aiTopic}
+            onChange={(e) => setAiTopic(e.target.value)}
+            placeholder="Ex : livre pratique pour parents débordés, niche méditation pour ados, roman feel-good à Rome…"
+            className="flex-1 rounded-xl border px-3 py-2 text-sm outline-none"
+            style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+          />
+          <button
+            type="button"
+            onClick={runAIAssistant}
+            disabled={aiLoading}
+            className="inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-bold disabled:opacity-60"
+            style={{ background: 'var(--v3-orange-600)', color: '#fff' }}
+          >
+            {aiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            Trouver des idées
+          </button>
+        </div>
+        {aiResult && (
+          <div className="mt-4 rounded-xl border p-4 text-sm space-y-2" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)', color: 'var(--v3-ink)' }}>
+            <div><strong>Titre :</strong> {aiResult.title}</div>
+            {aiResult.subtitle && <div><strong>Sous-titre :</strong> {aiResult.subtitle}</div>}
+            <div><strong>Synopsis :</strong> {aiResult.synopsis}</div>
+            {aiResult.categories.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2">
+                <strong>Catégories :</strong>
+                {aiResult.categories.map((c) => (
+                  <span key={c} className="rounded-full border px-2 py-0.5 text-xs" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-muted)' }}>{c}</span>
+                ))}
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={applyAIResult}
+              className="mt-2 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold"
+              style={{ background: 'var(--v3-orange-600)', color: '#fff' }}
+            >
+              <Check className="h-3.5 w-3.5" /> Appliquer au formulaire
+            </button>
+          </div>
+        )}
+      </div>
+
       <div className="grid gap-2 sm:grid-cols-4">
+
         {steps.map((label, index) => {
           const active = index === step;
           const done = index < step;
