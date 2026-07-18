@@ -76,13 +76,27 @@ export default function V3LibraryPage() {
 }
 
 function BookCard({ r }: { r: Row }) {
+  const cover = (r as any).cover_url as string | undefined;
   return (
     <Link to={`/v3/book/${r.id}`} className="group">
-      <div className="aspect-[3/4] rounded-lg bg-[var(--v3-ink)] text-white p-4 flex flex-col justify-end shadow-md group-hover:shadow-xl transition-shadow">
-        <BookOpen className="w-4 h-4 text-white/40 mb-2" />
-        <div className="text-[13px] font-semibold leading-tight line-clamp-3">{r.title}</div>
+      <div
+        className="aspect-[3/4] rounded-lg overflow-hidden p-4 flex flex-col justify-end shadow-md group-hover:shadow-xl transition-shadow border border-[color:var(--v3-orange)]/20"
+        style={
+          cover
+            ? { backgroundImage: `url(${cover})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+            : { background: 'linear-gradient(160deg, #FFF6E8 0%, #FFE3B8 55%, #F5B871 100%)' }
+        }
+      >
+        {!cover && (
+          <>
+            <BookOpen className="w-5 h-5 text-[var(--v3-ink)]/60 mb-2" />
+            <div className="text-[13px] font-bold leading-tight line-clamp-3 text-[var(--v3-ink)]">
+              {r.title}
+            </div>
+          </>
+        )}
       </div>
-      <div className="mt-2 text-[12px] font-medium truncate">{r.title}</div>
+      <div className="mt-2 text-[12px] font-medium truncate text-[var(--v3-ink)]">{r.title}</div>
     </Link>
   );
 }
