@@ -430,6 +430,7 @@ const V3HubPage: React.FC = () => {
         <div className="flex-1 overflow-y-auto px-3">{navList(sidebarCollapsed)}</div>
         <div className="border-t border-[#eadfc9] p-3">{createBtn(sidebarCollapsed)}</div>
       </aside>
+      )}
 
       {/* ===================== TIROIR (mobile) ===================== */}
       {mobileNavOpen && (
