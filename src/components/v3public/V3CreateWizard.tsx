@@ -586,7 +586,8 @@ Règles :
           initialWordsPerChapter={wordsPerChapter}
           initialTone={tone}
           characters={workflowCharacters}
-          onComplete={setCompletedBook}
+          initialBookIntroduction={buildWorkflowDescription()}
+          onComplete={handleWorkflowComplete}
         />
 
         {completedBook && (
@@ -666,7 +667,7 @@ Règles :
   }
 
 
-  const steps = ['Idée', 'Style', 'Personnages', 'Titre'];
+  const steps = ['Idée', 'Style', 'Sommaire', 'Personnages', 'Titre'];
 
   return (
     <div className="space-y-8">
@@ -745,7 +746,7 @@ Règles :
         )}
       </div>
 
-      <div className="grid gap-2 sm:grid-cols-4">
+      <div className="grid gap-2 sm:grid-cols-5">
 
         {steps.map((label, index) => {
           const active = index === step;
@@ -853,6 +854,77 @@ Règles :
         <div className="space-y-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
+              <h2 className="v3-serif text-4xl font-bold" style={{ color: 'var(--v3-ink)' }}>Sommaire du livre</h2>
+              <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>Génère puis corrige les titres et objectifs avant de lancer les agents.</p>
+            </div>
+            <button
+              type="button"
+              onClick={generateOutline}
+              disabled={outlineLoading}
+              className="v3-btn v3-btn-primary"
+            >
+              {outlineLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              Générer le sommaire
+            </button>
+          </div>
+
+          <div className="rounded-[24px] border p-4" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-orange-50)' }}>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
+                <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Chapitres</span>
+                <strong className="mt-1 block text-lg" style={{ color: 'var(--v3-ink)' }}>{chapters}</strong>
+              </div>
+              <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
+                <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Mots / chapitre</span>
+                <strong className="mt-1 block text-lg" style={{ color: 'var(--v3-ink)' }}>{wordsPerChapter.toLocaleString('fr-FR')}</strong>
+              </div>
+              <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
+                <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Validation</span>
+                <strong className="mt-1 block text-lg" style={{ color: canStepOutline ? 'var(--v3-orange-600)' : 'var(--v3-muted)' }}>
+                  {normalizedOutline.length}/{chapters}
+                </strong>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {outline.slice(0, chapters).map((chapter, index) => (
+              <div key={chapter.id} className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <span className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>Chapitre {index + 1}</span>
+                  <button type="button" onClick={() => removeOutlineChapter(chapter.id)} className="rounded-full p-2" style={{ color: 'var(--v3-muted)' }} aria-label="Supprimer ce chapitre"><Trash2 className="h-4 w-4" /></button>
+                </div>
+                <input
+                  value={chapter.titre}
+                  onChange={(event) => updateOutline(chapter.id, 'titre', event.target.value)}
+                  placeholder="Titre précis du chapitre"
+                  className="w-full rounded-2xl border px-4 py-3 font-bold outline-none"
+                  style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+                />
+                <textarea
+                  value={chapter.objectif}
+                  onChange={(event) => updateOutline(chapter.id, 'objectif', event.target.value)}
+                  rows={2}
+                  placeholder="Objectif éditorial de ce chapitre"
+                  className="mt-3 w-full resize-none rounded-2xl border px-4 py-3 outline-none"
+                  style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+                />
+              </div>
+            ))}
+          </div>
+
+          {chapters < 60 && (
+            <button type="button" onClick={addOutlineChapter} className="v3-btn v3-btn-outline">
+              <Plus className="h-4 w-4" /> Ajouter un chapitre
+            </button>
+          )}
+        </div>
+      )}
+
+      {step === 3 && (
+        <div className="space-y-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
               <h2 className="v3-serif text-4xl font-bold" style={{ color: 'var(--v3-ink)' }}>Tes personnages</h2>
               <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>Ajoute ceux qui comptent. Tu peux aussi laisser vide pour un livre non-fiction.</p>
             </div>
@@ -876,7 +948,7 @@ Règles :
         </div>
       )}
 
-      {step === 3 && (
+      {step === 4 && (
         <div className="space-y-6">
           <div>
             <h2 className="v3-serif text-4xl font-bold" style={{ color: 'var(--v3-ink)' }}>Donne-lui un titre</h2>
@@ -919,7 +991,7 @@ Règles :
         <button type="button" onClick={() => setStep((value) => Math.max(0, value - 1))} disabled={step === 0} className="v3-btn v3-btn-ghost disabled:opacity-40">
           <ArrowLeft className="h-4 w-4" /> Retour
         </button>
-        {step < 3 ? (
+        {step < 4 ? (
           <button type="button" onClick={goNext} className="v3-btn v3-btn-primary">
             Continuer <ArrowRight className="h-4 w-4" />
           </button>
