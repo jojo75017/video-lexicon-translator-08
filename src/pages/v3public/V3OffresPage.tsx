@@ -92,12 +92,12 @@ const UPSELLS: Upsell[] = [
     badge: 'Lancement',
     desc: "Analyse votre roman Word chapitre par chapitre : traces d'IA, orthographe, style, contrôle Amazon KDP et export Word corrigé — sans jamais altérer votre texte original.",
   },
-  { id: 'selection', name: 'Sélection maisons d’édition', price: '19 €', suffix: '/ mois', priceId: 'v3_upsell_selection_month', desc: 'Trouvez les éditeurs susceptibles de publier votre livre.' },
-  { id: 'aplus', name: 'A+ Content Amazon', price: '9 €', suffix: '/ mois', priceId: 'v3_upsell_aplus_month', desc: 'Modules visuels optimisés pour vos fiches KDP.' },
-  { id: 'lookinside', name: 'Look Inside Optimizer', price: '7 €', suffix: '/ mois', priceId: 'v3_upsell_lookinside_month', desc: 'Optimise l’aperçu Amazon des premières pages.' },
-  { id: 'bookbub', name: 'BookBub Ad Builder', price: '9 €', suffix: '/ mois', priceId: 'v3_upsell_bookbub_month', desc: 'Générateur de visuels publicitaires BookBub.' },
-  { id: 'newsletter', name: 'Newsletter Auteur', price: '12 €', suffix: '/ mois', priceId: 'v3_upsell_newsletter_month', desc: 'Séquences email prêtes à l’emploi.' },
-  { id: 'relecture', name: 'Relecture éditoriale humaine', price: '49 €', suffix: '/ livre', priceId: 'v3_upsell_relecture_once', desc: 'Correction professionnelle par un relecteur humain.' },
+  { id: 'selection', name: 'Sélection maisons d’édition', price: '19 €', suffix: '+ taxes / mois', priceId: 'v3_upsell_selection_month', desc: 'Trouvez les éditeurs susceptibles de publier votre livre.' },
+  { id: 'aplus', name: 'A+ Content Amazon', price: '9 €', suffix: '+ taxes / mois', priceId: 'v3_upsell_aplus_month', desc: 'Modules visuels optimisés pour vos fiches KDP.' },
+  { id: 'lookinside', name: 'Look Inside Optimizer', price: '7 €', suffix: '+ taxes / mois', priceId: 'v3_upsell_lookinside_month', desc: 'Optimise l’aperçu Amazon des premières pages.' },
+  { id: 'bookbub', name: 'BookBub Ad Builder', price: '9 €', suffix: '+ taxes / mois', priceId: 'v3_upsell_bookbub_month', desc: 'Générateur de visuels publicitaires BookBub.' },
+  { id: 'newsletter', name: 'Newsletter Auteur', price: '12 €', suffix: '+ taxes / mois', priceId: 'v3_upsell_newsletter_month', desc: 'Séquences email prêtes à l’emploi.' },
+  { id: 'relecture', name: 'Relecture éditoriale humaine', price: '49 €', suffix: '+ taxes / livre', priceId: 'v3_upsell_relecture_once', desc: 'Correction professionnelle par un relecteur humain.' },
 ];
 
 export default function V3OffresPage() {
