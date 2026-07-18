@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   Sparkles, Feather, BookOpen, Palette, Library, Wand2, ArrowRight, Star,
 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 
 const IDEA_EXAMPLES = [
   'Deux rivaux en cuisine tombent amoureux lors d\'un…',
