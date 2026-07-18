@@ -213,6 +213,7 @@ const UPSELLS: Upsell[] = [
 export default function V3OffresPage() {
   const [billing, setBilling] = useState<Billing>('monthly');
   const [checkout, setCheckout] = useState<{ priceId: string; planName: string } | null>(null);
+  const [detail, setDetail] = useState<Upsell | null>(null);
 
   return (
     <div className="v3pub">
