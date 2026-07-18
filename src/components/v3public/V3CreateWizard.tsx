@@ -412,6 +412,12 @@ export default function V3CreateWizard() {
               <span className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>Nom d’auteur</span>
               <input value={authorName} onChange={(event) => setAuthorName(event.target.value)} className="w-full rounded-2xl border px-4 py-4 outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
             </label>
+            <label className="block space-y-2 md:col-span-2">
+              <span className="flex items-center justify-between gap-3 text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>
+                Sous-titre <span className="text-xs font-semibold" style={{ color: 'var(--v3-muted)' }}>optionnel · ~80 caractères</span>
+              </span>
+              <input value={subtitle} onChange={(event) => setSubtitle(event.target.value.slice(0, 120))} placeholder="Ex : Le guide pas-à-pas pour publier sur Amazon KDP" className="w-full rounded-2xl border px-4 py-4 outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
+            </label>
           </div>
           <div className="rounded-[28px] border p-5" style={{ borderColor: 'rgba(249, 115, 22, 0.35)', background: 'var(--v3-orange-50)' }}>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
