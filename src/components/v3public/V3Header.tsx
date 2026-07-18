@@ -6,6 +6,7 @@ const MAIN_NAV = [
   { to: '/v3', label: 'Accueil', end: true },
   { to: '/v3/gallery', label: 'Galerie' },
   { to: '/v3/auteur', label: 'Auteur' },
+  { to: '/v3/offres', label: 'Offres' },
   { to: '/v3#how', label: 'Comment ça marche' },
 ];
 
