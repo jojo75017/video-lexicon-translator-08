@@ -220,6 +220,14 @@ export default function V3OffresPage() {
           ))}
         </div>
       </section>
+
+      {checkout && (
+        <V3SubscribeCheckout
+          priceId={checkout.priceId}
+          planName={checkout.planName}
+          onClose={() => setCheckout(null)}
+        />
+      )}
     </div>
   );
 }
