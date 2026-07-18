@@ -147,9 +147,8 @@ export default function V3OffresPage() {
 
               <button
                 type="button"
-                disabled
-                title="Bientôt disponible — paiement non branché"
-                className={`mt-6 v3-btn justify-center w-full cursor-not-allowed opacity-90 ${
+                onClick={() => setCheckout({ priceId: t.priceId, planName: `${t.name} — ${t.price}${t.period}` })}
+                className={`mt-6 v3-btn justify-center w-full ${
                   t.highlight ? 'v3-btn-primary' : 'v3-btn-outline'
                 }`}
               >
