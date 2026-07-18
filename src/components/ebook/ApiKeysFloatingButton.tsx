@@ -28,6 +28,7 @@ const VISIBLE_PREFIXES = [
   '/tableau-de-bord',
   '/hub-v3',
   '/hub',
+  '/v3',
 
 ];
 const HIDDEN_PREFIXES = ['/auth', '/logout-total', '/ebookbot'];
