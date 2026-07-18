@@ -140,15 +140,18 @@ const BookPerfectSalesPage: React.FC = () => {
 
             <div className="mt-4 rounded-xl border bg-white p-4" style={{ borderColor: `${AMBER}44` }}>
               <p className="text-[12px] font-semibold" style={{ color: '#6f5e47' }}>
-                Déjà acheteur ? Importez votre manuscrit Word (.docx) directement dans l'atelier.
+                Après votre paiement, votre accès est débloqué automatiquement. Cliquez ci-dessous pour importer votre manuscrit Word (.docx).
               </p>
               <button
                 onClick={() => navigate('/bookperfect')}
                 className="mt-2 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold text-white transition hover:opacity-90"
                 style={{ background: AMBER_DEEP }}
               >
-                <FileText className="h-4 w-4" /> Ouvrir l'atelier & importer mon manuscrit
+                <FileText className="h-4 w-4" /> Accéder à l'atelier & importer mon manuscrit
               </button>
+              <p className="mt-2 text-[11px]" style={{ color: '#9c8a6f' }}>
+                Réservé aux acheteurs — l'accès est vérifié via votre email de paiement.
+              </p>
             </div>
 
           </div>
