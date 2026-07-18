@@ -1,0 +1,119 @@
+/* Ebookstudio V3 — public site tokens (Pluméo-inspired).
+   Scoped under .v3pub so admin/KDP theme stays untouched. */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;0,900;1,600;1,700&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+.v3pub {
+  --v3-orange: #F97316;
+  --v3-orange-600: #EA580C;
+  --v3-orange-50: #FFF7ED;
+  --v3-ink: #0A0A0A;
+  --v3-ink-2: #1a1a1a;
+  --v3-paper: #FFFFFF;
+  --v3-cloud: #F5F5F5;
+  --v3-muted: #6B6B6B;
+  --v3-border: rgba(10, 10, 10, 0.08);
+
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, sans-serif;
+  color: var(--v3-ink);
+  background: var(--v3-paper);
+}
+
+.v3pub .v3-serif {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-feature-settings: 'liga', 'kern';
+}
+
+/* halos radiaux orange pour hero */
+.v3pub .v3-halo {
+  background:
+    radial-gradient(60% 45% at 15% 20%, rgba(249, 115, 22, 0.18), transparent 60%),
+    radial-gradient(50% 40% at 85% 10%, rgba(249, 115, 22, 0.14), transparent 60%),
+    #fff;
+}
+
+.v3pub .v3-halo-soft {
+  background:
+    radial-gradient(45% 40% at 90% 30%, rgba(249, 115, 22, 0.10), transparent 60%),
+    #fff;
+}
+
+/* pill buttons */
+.v3pub .v3-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  white-space: nowrap;
+}
+.v3pub .v3-btn-primary {
+  background: var(--v3-orange);
+  color: #fff;
+  box-shadow: 0 10px 24px -12px rgba(249, 115, 22, 0.55);
+}
+.v3pub .v3-btn-primary:hover { background: var(--v3-orange-600); transform: translateY(-1px); }
+.v3pub .v3-btn-outline {
+  border: 1px solid var(--v3-ink);
+  color: var(--v3-ink);
+  background: transparent;
+}
+.v3pub .v3-btn-outline:hover { background: var(--v3-ink); color: #fff; }
+.v3pub .v3-btn-ghost {
+  color: var(--v3-ink);
+  background: transparent;
+}
+.v3pub .v3-btn-ghost:hover { color: var(--v3-orange); }
+
+/* chips */
+.v3pub .v3-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 999px;
+  background: #fff; border: 1px solid var(--v3-border);
+  font-size: 13px; font-weight: 500; color: var(--v3-ink);
+  transition: border-color .15s, color .15s;
+}
+.v3pub .v3-chip:hover { border-color: var(--v3-orange); color: var(--v3-orange); }
+.v3pub .v3-chip-orange {
+  background: var(--v3-orange-50);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  color: var(--v3-orange-600);
+}
+
+/* card */
+.v3pub .v3-card {
+  background: #fff;
+  border: 1px solid var(--v3-border);
+  border-radius: 20px;
+  padding: 24px;
+  transition: transform .2s, box-shadow .2s;
+}
+.v3pub .v3-card:hover { transform: translateY(-3px); box-shadow: 0 20px 40px -20px rgba(0,0,0,0.12); }
+
+/* section dark */
+.v3pub .v3-section-dark {
+  background: var(--v3-ink);
+  color: #fff;
+}
+.v3pub .v3-section-dark .v3-serif { color: #fff; }
+
+/* subtle animations */
+@keyframes v3-float {
+  0%, 100% { transform: translateY(0) rotate(-6deg); }
+  50%      { transform: translateY(-10px) rotate(-6deg); }
+}
+.v3pub .v3-float { animation: v3-float 5s ease-in-out infinite; }
+
+@keyframes v3-pulse-feather {
+  0%, 100% { transform: scale(1); opacity: .9; }
+  50%      { transform: scale(1.05); opacity: 1; }
+}
+.v3pub .v3-pulse { animation: v3-pulse-feather 2s ease-in-out infinite; }
+
+/* scrollbar horizontal discret */
+.v3pub .v3-scroll-x { scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.15) transparent; }
+.v3pub .v3-scroll-x::-webkit-scrollbar { height: 6px; }
+.v3pub .v3-scroll-x::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 6px; }
