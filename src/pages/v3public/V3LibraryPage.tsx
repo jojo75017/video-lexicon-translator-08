@@ -18,7 +18,7 @@ export default function V3LibraryPage() {
       setEmail(auth.user.email || null);
       const { data } = await supabase
         .from('ebook_projects')
-        .select('id,title,updated_at,chapters')
+        .select('id,title,updated_at,chapters,cover_url')
         .eq('user_id', auth.user.id)
         .order('updated_at', { ascending: false });
       setRows((data as Row[]) || []);
