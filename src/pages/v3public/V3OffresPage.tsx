@@ -73,6 +73,7 @@ const TIERS: Tier[] = [
       'Accès anticipé aux nouveautés',
     ],
     cta: 'Choisir Auteur',
+    priceId: 'v3_auteur_monthly',
   },
 ];
 
