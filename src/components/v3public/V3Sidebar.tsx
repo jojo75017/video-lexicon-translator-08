@@ -2,25 +2,40 @@ import { NavLink, useLocation } from 'react-router-dom';
 import {
   Home, Sparkles, Library, Users, BookOpen, User, Settings,
   Wand2, Palette, Package, ChevronLeft, ChevronRight,
+  Compass, GraduationCap, Gem, Map as MapIcon, Clock, FileText, Bot, Download,
 } from 'lucide-react';
 import { useState } from 'react';
 
+// Chaque entrée « Hub » cible /v3/hub avec un ?tab= pour ouvrir directement l'onglet correspondant.
 const NAV = [
   { section: 'Écrire', items: [
     { to: '/v3', label: 'Accueil', icon: Home, end: true },
     { to: '/v3/create', label: 'Créer un livre', icon: Sparkles },
     { to: '/v3/library', label: 'Ma bibliothèque', icon: Library },
   ]},
-  { section: 'Outils', items: [
-    { to: '/v3/books', label: 'Mes livres publiés', icon: BookOpen },
-    { to: '/hub-v3', label: 'Studio 30 agents', icon: Wand2 },
-    { to: '/v3/gallery', label: 'Galerie communauté', icon: Users },
+  { section: 'Hub 30 agents', items: [
+    { to: '/v3/hub?tab=parcours', label: 'Parcours', icon: Compass },
+    { to: '/v3/hub?tab=outils', label: 'Outils V3', icon: Wand2 },
+    { to: '/v3/hub?tab=toolsV2', label: 'Tous les outils (V2)', icon: Package },
+    { to: '/v3/hub?tab=documentation', label: 'Documentation Studio', icon: Sparkles },
+    { to: '/v3/hub?tab=livres', label: 'Mes livres', icon: BookOpen },
+    { to: '/v3/hub?tab=guides', label: 'Guides', icon: GraduationCap },
+    { to: '/v3/hub?tab=offres', label: 'Offres & Packs', icon: Gem },
+    { to: '/v3/hub?tab=roadmap', label: 'Roadmap', icon: MapIcon },
+    { to: '/v3/hub?tab=pending', label: 'En attente', icon: Clock },
+    { to: '/v3/hub?tab=script', label: 'Script vidéo', icon: FileText },
+    { to: '/v3/hub?tab=assistant', label: "Parler avec l'IA", icon: Bot },
+    { to: '/v3/hub?tab=bookperfect', label: 'BookPerfect AI', icon: BookOpen },
+    { to: '/v3/hub?tab=export', label: 'Exporter le livre', icon: Download },
   ]},
   { section: 'Livres spéciaux', items: [
     { to: '/v3/special/roman', label: 'Roman', icon: BookOpen },
     { to: '/v3/special/cuisine', label: 'Cuisine', icon: Palette },
     { to: '/v3/special/voyage', label: 'Voyage', icon: Package },
     { to: '/v3/special/jeunesse', label: 'Jeunesse', icon: Sparkles },
+  ]},
+  { section: 'Communauté', items: [
+    { to: '/v3/gallery', label: 'Galerie communauté', icon: Users },
   ]},
   { section: 'Compte', items: [
     { to: '/v3/auteur', label: 'Georges Boubet', icon: User },
