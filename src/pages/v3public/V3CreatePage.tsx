@@ -1,8 +1,8 @@
-import { lazy, Suspense, useEffect, useMemo } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Sparkles, Loader2 } from 'lucide-react';
 
-const BookCreationStudio = lazy(() => import('@/components/admin/BookCreationStudio'));
+const V3CreateWizard = lazy(() => import('@/components/v3public/V3CreateWizard'));
 
 /** Préremplit la fiche livre du hub à partir de query params afin que BookCreationStudio
  *  (qui lit `edition_book_config_v1`) parte avec le bon titre/genre/idée. */
@@ -27,8 +27,6 @@ export default function V3CreatePage() {
 
   useEffect(() => { seedHubConfig(idea, genre, type); }, [idea, genre, type]);
 
-  const autoRun = useMemo(() => !!(idea || genre || type), [idea, genre, type]);
-
   return (
     <section className="v3-halo-soft min-h-[calc(100vh-4rem)] py-14 px-5">
       <div className="max-w-4xl mx-auto">
@@ -42,7 +40,7 @@ export default function V3CreatePage() {
 
         <div className="v3-card">
           <Suspense fallback={<div className="py-16 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-[var(--v3-orange)]" /></div>}>
-            <BookCreationStudio autoRun={autoRun} />
+            <V3CreateWizard />
           </Suspense>
         </div>
       </div>
