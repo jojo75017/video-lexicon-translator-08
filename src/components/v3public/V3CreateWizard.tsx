@@ -366,9 +366,38 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
             </div>
           </div>
         )}
+
+        {completedBook && (
+          <V3ExportPanel
+            manuscript={(completedBook.chapters || []).map((c: any) => `# ${c.title || `Chapitre ${c.number}`}\n\n${c.content || ''}`).join('\n\n')}
+            title={finalTitle}
+            subtitle={subtitle}
+            author={authorName}
+          />
+        )}
+
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={saveDraft}
+            className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold"
+            style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+          >
+            <Save className="h-4 w-4" /> Sauvegarder le brouillon
+          </button>
+          <button
+            type="button"
+            onClick={resetWizard}
+            className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold"
+            style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-orange-600)', background: 'var(--v3-paper)' }}
+          >
+            <RotateCcw className="h-4 w-4" /> Nouveau livre
+          </button>
+        </div>
       </div>
     );
   }
+
 
   const steps = ['Idée', 'Style', 'Personnages', 'Titre'];
 
