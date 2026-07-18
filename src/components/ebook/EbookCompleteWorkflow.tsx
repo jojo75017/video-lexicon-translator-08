@@ -807,6 +807,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
             authorName,
             language,
             numberOfChapters,
+            wordsPerChapter,
             bookIntroduction: buildEnrichedIntroduction(),
             previousContext,
             userApiKey: hasUsableApiKey ? normalizedUserApiKey : undefined,
@@ -848,6 +849,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
               authorName,
               language,
               numberOfChapters,
+              wordsPerChapter,
               bookIntroduction: buildEnrichedIntroduction(),
               previousContext,
               userApiKey: hasUsableApiKey ? normalizedUserApiKey : undefined,
@@ -1493,8 +1495,16 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
     generateCompleteBook(resumeIndex, extraContext);
   };
 
-  // Estimation réaliste : 3000-4000 mots/chapitre = ~12-16 pages/chapitre
-  const estimatedPages = Math.round(numberOfChapters * 15);
+  useEffect(() => {
+    if (!autoStart || autoStartTriggeredRef.current || isGenerating || currentStepIndex >= 0) return;
+    if (!title.trim() || !authorName.trim() || !category || !bookIntroduction.trim()) return;
+    autoStartTriggeredRef.current = true;
+    setHasReadSteps(true);
+    generateCompleteBook(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoStart, isGenerating, currentStepIndex, title, authorName, category, bookIntroduction]);
+
+  const estimatedPages = Math.ceil((numberOfChapters * wordsPerChapter) / 250);
 
   const renderMarkdown = (content: string) => {
     // Simple markdown rendering
@@ -1536,7 +1546,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
       {/* Input Card */}
       <WritingEngineBadge isPro={hasFull} />
 
-      {/* Input Card */}
+      {!hideInputForm && (
       <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-background to-amber-500/5">
         <CardHeader className="text-center pb-4">
           <div className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-amber-500 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4 mx-auto">
@@ -1871,7 +1881,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
               value={[numberOfChapters]}
               onValueChange={(value) => setNumberOfChapters(value[0])}
               min={3}
-              max={50}
+              max={60}
               step={1}
               disabled={isGenerating}
               className="w-full"
@@ -2031,6 +2041,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
           )}
         </CardContent>
       </Card>
+      )}
 
       {/* Title Validation Card - After P1 */}
       {waitingForTitleValidation && (
