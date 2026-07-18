@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { Check, Sparkles, Crown, Feather } from 'lucide-react';
+import V3SubscribeCheckout from '@/components/v3public/V3SubscribeCheckout';
 
 type Tier = {
   id: string;
@@ -11,6 +13,7 @@ type Tier = {
   icon: React.ReactNode;
   features: string[];
   cta: string;
+  priceId: string;
 };
 
 const TIERS: Tier[] = [
@@ -31,6 +34,7 @@ const TIERS: Tier[] = [
       'Support par email',
     ],
     cta: 'Choisir Débutant',
+    priceId: 'v3_debutant_monthly',
   },
   {
     id: 'expert',
@@ -50,6 +54,7 @@ const TIERS: Tier[] = [
       'Support prioritaire',
     ],
     cta: 'Choisir Expert',
+    priceId: 'v3_expert_monthly',
   },
   {
     id: 'auteur',
@@ -68,6 +73,7 @@ const TIERS: Tier[] = [
       'Accès anticipé aux nouveautés',
     ],
     cta: 'Choisir Auteur',
+    priceId: 'v3_auteur_monthly',
   },
 ];
 
@@ -81,6 +87,7 @@ const UPSELLS = [
 ];
 
 export default function V3OffresPage() {
+  const [checkout, setCheckout] = useState<{ priceId: string; planName: string } | null>(null);
   return (
     <div className="v3pub">
       {/* Hero */}
@@ -140,9 +147,8 @@ export default function V3OffresPage() {
 
               <button
                 type="button"
-                disabled
-                title="Bientôt disponible — paiement non branché"
-                className={`mt-6 v3-btn justify-center w-full cursor-not-allowed opacity-90 ${
+                onClick={() => setCheckout({ priceId: t.priceId, planName: `${t.name} — ${t.price}${t.period}` })}
+                className={`mt-6 v3-btn justify-center w-full ${
                   t.highlight ? 'v3-btn-primary' : 'v3-btn-outline'
                 }`}
               >
@@ -214,6 +220,14 @@ export default function V3OffresPage() {
           ))}
         </div>
       </section>
+
+      {checkout && (
+        <V3SubscribeCheckout
+          priceId={checkout.priceId}
+          planName={checkout.planName}
+          onClose={() => setCheckout(null)}
+        />
+      )}
     </div>
   );
 }

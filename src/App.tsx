@@ -61,6 +61,7 @@ const V3BookManagerPage = lazy(() => import('./pages/v3public/V3BookManagerPage'
 const V3AuthorSettingsPage = lazy(() => import('./pages/v3public/V3AuthorSettingsPage'));
 const V3SpecialBookPage = lazy(() => import('./pages/v3public/V3SpecialBookPage'));
 const V3OffresPage = lazy(() => import('./pages/v3public/V3OffresPage'));
+const V3OffresMerciPage = lazy(() => import('./pages/v3public/V3OffresMerciPage'));
 const AffiliationFormationPage = lazy(() => import('./pages/AffiliationFormationPage'));
 const ParrainagePage = lazy(() => import('./pages/ParrainagePage'));
 const FormationPage = lazy(() => import('./pages/FormationPage'));
@@ -821,6 +822,7 @@ const App = () => {
               <Route path="parametres" element={<V3AuthorSettingsPage />} />
               <Route path="livres/:type" element={<V3SpecialBookPage />} />
               <Route path="offres" element={<V3OffresPage />} />
+              <Route path="offres/merci" element={<V3OffresMerciPage />} />
             </Route>
 
             {/* Catch-all : les utilisateurs connectés restent dans le planner */}
