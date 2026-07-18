@@ -71,6 +71,7 @@ export default function V3CreateWizard() {
       const openaiApiKey = (typeof localStorage !== 'undefined' && localStorage.getItem('openai_real_api_key')) || undefined;
       const { data, error } = await invokeImageFunction<any>('generate-front-cover', {
         ebookTitle: finalTitle.trim() || title.trim(),
+        subtitle: subtitle.trim(),
         authorName: authorName.trim(),
         genre: effectiveCategory,
         style: 'professional',
