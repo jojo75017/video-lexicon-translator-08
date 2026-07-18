@@ -2,9 +2,11 @@ import React from 'react';
 import { Sparkles, Check, X, ArrowUpRight, Crown } from 'lucide-react';
 
 interface WritingEngineBadgeProps {
-  /** true = Pack Pro 347€ (moteur Pro), false = Base 197€ (moteur Standard) */
-  isPro: boolean;
-  /** Ouvre le tunnel d'achat du Pack Pro 347€ (affiché uniquement en offre 197€) */
+  /** Palier actif : 'debutant' | 'expert' | 'auteur' */
+  tier?: 'debutant' | 'expert' | 'auteur';
+  /** @deprecated conservé pour compat : true = Auteur, false = Débutant */
+  isPro?: boolean;
+  /** Ouvre la page des offres pour upgrader */
   onUpgrade?: () => void;
 }
 
@@ -13,24 +15,27 @@ const AMBER = '#FF9E2D';
 
 type Row = {
   label: string;
-  core: string | boolean;
-  pro: string | boolean;
+  debutant: string | boolean;
+  expert: string | boolean;
+  auteur: string | boolean;
 };
 
-/** Comparatif concret 197€ vs 347€ pour la rédaction du livre. */
+/** Comparatif des 3 abonnements mensuels ebookstudio V3. */
 const ROWS: Row[] = [
-  { label: 'Longueur des chapitres', core: 'jusqu\u2019à 3 500 mots', pro: 'jusqu\u2019à ~6 000 mots' },
-  { label: 'Passe éditoriale automatique (densification, fluidité, exemples)', core: false, pro: true },
-  { label: 'Édition structurelle Pro (structure, rythme, arcs)', core: false, pro: true },
-  { label: 'Copy-editing & comité de lecture IA', core: false, pro: true },
-  { label: 'Label Qualité « Maison d\u2019Édition »', core: false, pro: true },
-  { label: 'Couverture Signature Pro (IA gpt-image-2)', core: 'couverture standard', pro: 'couverture ultra-pro' },
-  { label: 'Boucle qualité renforcée (score cible + tentatives)', core: 'standard', pro: 'renforcée' },
-  { label: 'Sous-sections enrichies et détaillées', core: false, pro: true },
-  { label: 'Variantes A/B (titres, descriptions, emails, annonces)', core: false, pro: true },
-  { label: 'Étapes du parcours guidé', core: 'idée → publié', pro: '+ livre pro & marketing' },
-  { label: 'Phases exclusives (avis, séquences email, série, audio, traduction…)', core: false, pro: 'incluses' },
-  { label: 'Choix du modèle IA (Claude, Gemini, ChatGPT, DeepSeek, Mistral)', core: true, pro: true },
+  { label: 'Livres par mois', debutant: '5', expert: '10', auteur: '20' },
+  { label: 'Chapitres maximum', debutant: '20', expert: '40', auteur: '60' },
+  { label: 'Longueur des chapitres', debutant: 'jusqu\u2019à 2 500 mots', expert: 'jusqu\u2019à 4 000 mots', auteur: 'jusqu\u2019à ~6 000 mots' },
+  { label: 'Studio 30 agents (rédaction + croissance)', debutant: '15 agents', expert: '22 agents', auteur: '30 agents' },
+  { label: 'Choix du modèle IA (Claude, Gemini, ChatGPT, DeepSeek, Mistral)', debutant: true, expert: true, auteur: true },
+  { label: 'Assistant IA (titre, sous-titre, synopsis, catégories)', debutant: true, expert: true, auteur: true },
+  { label: 'Couverture IA (gpt-image-2)', debutant: 'standard', expert: 'pro', auteur: 'signature ultra-pro' },
+  { label: 'Passe éditoriale automatique', debutant: false, expert: true, auteur: true },
+  { label: 'Édition structurelle Pro (structure, rythme, arcs)', debutant: false, expert: false, auteur: true },
+  { label: 'Copy-editing & comité de lecture IA', debutant: false, expert: false, auteur: true },
+  { label: 'Label Qualité « Maison d\u2019Édition »', debutant: false, expert: false, auteur: true },
+  { label: 'Variantes A/B (titres, descriptions, emails)', debutant: false, expert: true, auteur: true },
+  { label: 'Sélection éditeurs & phases marketing avancées', debutant: false, expert: false, auteur: true },
+  { label: 'Option audiobook (9,99 €/livre)', debutant: true, expert: true, auteur: true },
 ];
 
 const Cell: React.FC<{ value: string | boolean; accent?: boolean }> = ({ value, accent }) => {
@@ -49,10 +54,19 @@ const Cell: React.FC<{ value: string | boolean; accent?: boolean }> = ({ value, 
 
 /**
  * Encart comparatif affiché en tête du parcours de rédaction.
- * Montre noir sur blanc ce que le Pack Pro 347€ apporte de plus, pour que
- * l'acheteur comprenne exactement la valeur de chaque palier.
+ * Compare les 3 abonnements mensuels : Débutant 6,99 € · Expert 9,99 € · Auteur 59 €.
  */
-export const WritingEngineBadge: React.FC<WritingEngineBadgeProps> = ({ isPro, onUpgrade }) => {
+export const WritingEngineBadge: React.FC<WritingEngineBadgeProps> = ({ tier, isPro, onUpgrade }) => {
+  const activeTier: 'debutant' | 'expert' | 'auteur' =
+    tier ?? (isPro ? 'auteur' : 'debutant');
+
+  const tierLabel =
+    activeTier === 'auteur' ? 'Auteur 59 €/mois'
+    : activeTier === 'expert' ? 'Expert 9,99 €/mois'
+    : 'Débutant 6,99 €/mois';
+
+  const canUpgrade = activeTier !== 'auteur';
+
   return (
     <div className="rounded-2xl border-2 overflow-hidden" style={{ borderColor: `${TEAL}33`, background: '#fff' }}>
       {/* En-tête */}
@@ -60,24 +74,27 @@ export const WritingEngineBadge: React.FC<WritingEngineBadgeProps> = ({ isPro, o
         <div className="flex items-center gap-2">
           <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold text-white" style={{ background: TEAL }}>
             <Sparkles className="h-3.5 w-3.5" />
-            {isPro ? 'Moteur Rédaction Pro activé' : 'Ce que chaque offre débloque'}
+            Palier actif : {tierLabel}
           </span>
         </div>
         <span className="text-xs font-semibold" style={{ color: TEAL }}>
-          {isPro ? 'Pack Pro 347€' : 'Offre 197€ vs Pack Pro 347€'}
+          Comparatif des 3 abonnements
         </span>
       </div>
 
       {/* Tableau comparatif */}
-      <div className="px-2 sm:px-4 py-3">
-        <div className="grid grid-cols-[1fr_92px_100px] sm:grid-cols-[1fr_140px_150px] items-center gap-x-2 gap-y-0">
+      <div className="px-2 sm:px-4 py-3 overflow-x-auto">
+        <div className="grid grid-cols-[1fr_90px_90px_100px] sm:grid-cols-[1fr_130px_130px_150px] items-center gap-x-2 gap-y-0 min-w-[520px]">
           {/* En-têtes colonnes */}
           <div />
-          <div className="text-center text-[11px] font-bold uppercase tracking-wide text-muted-foreground py-2">
-            Essentiel<br />197€
+          <div className={`text-center text-[11px] font-bold uppercase tracking-wide py-2 ${activeTier === 'debutant' ? 'text-foreground' : 'text-muted-foreground'}`}>
+            Débutant<br />6,99 €/mois
+          </div>
+          <div className={`text-center text-[11px] font-bold uppercase tracking-wide py-2 ${activeTier === 'expert' ? 'text-foreground' : 'text-muted-foreground'}`}>
+            Expert<br />9,99 €/mois
           </div>
           <div className="text-center text-[11px] font-black uppercase tracking-wide py-2 rounded-t-lg" style={{ color: TEAL, background: `${TEAL}12` }}>
-            <span className="inline-flex items-center gap-1"><Crown className="h-3 w-3" />Pack Pro</span><br />347€
+            <span className="inline-flex items-center gap-1"><Crown className="h-3 w-3" />Auteur</span><br />59 €/mois
           </div>
 
           {ROWS.map((row, i) => (
@@ -86,10 +103,13 @@ export const WritingEngineBadge: React.FC<WritingEngineBadgeProps> = ({ isPro, o
                 {row.label}
               </div>
               <div className={`text-center py-2 ${i > 0 ? 'border-t border-border/50' : ''}`}>
-                <Cell value={row.core} />
+                <Cell value={row.debutant} />
+              </div>
+              <div className={`text-center py-2 ${i > 0 ? 'border-t border-border/50' : ''}`}>
+                <Cell value={row.expert} />
               </div>
               <div className={`text-center py-2 ${i > 0 ? 'border-t border-border/50' : ''}`} style={{ background: `${TEAL}08` }}>
-                <Cell value={row.pro} accent />
+                <Cell value={row.auteur} accent />
               </div>
             </React.Fragment>
           ))}
@@ -97,14 +117,14 @@ export const WritingEngineBadge: React.FC<WritingEngineBadgeProps> = ({ isPro, o
       </div>
 
       {/* Call to action / statut */}
-      {isPro ? (
+      {!canUpgrade ? (
         <div className="px-4 sm:px-5 py-3 text-[12px] font-semibold" style={{ background: `${TEAL}0d`, color: TEAL }}>
-          ✓ Toutes les capacités Pro ci-dessus sont actives sur votre parcours.
+          ✓ Vous êtes sur le palier <strong>Auteur</strong> — toutes les capacités ci-dessus sont actives.
         </div>
       ) : (
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-5 py-3.5" style={{ background: `${AMBER}12` }}>
           <span className="text-[12px] text-foreground max-w-md">
-            <strong>Passez au Pack Pro 347€</strong> pour un livre de meilleure qualité (édition pro, comité de lecture, couverture signature) et son lancement complet.
+            <strong>Passez au palier Auteur (59 €/mois)</strong> pour débloquer les 30 agents, l'édition Pro, le comité de lecture et jusqu'à 20 livres/mois.
           </span>
           {onUpgrade && (
             <button
@@ -113,7 +133,7 @@ export const WritingEngineBadge: React.FC<WritingEngineBadgeProps> = ({ isPro, o
               className="inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-bold text-white transition-transform hover:-translate-y-0.5"
               style={{ background: TEAL }}
             >
-              Passer au Pack Pro 347€ <ArrowUpRight className="h-4 w-4" />
+              Voir les offres <ArrowUpRight className="h-4 w-4" />
             </button>
           )}
         </div>
