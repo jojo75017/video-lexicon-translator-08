@@ -34,6 +34,7 @@ const TIERS: Tier[] = [
       'Support par email',
     ],
     cta: 'Choisir Débutant',
+    priceId: 'v3_debutant_monthly',
   },
   {
     id: 'expert',
