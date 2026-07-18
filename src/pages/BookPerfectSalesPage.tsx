@@ -138,6 +138,19 @@ const BookPerfectSalesPage: React.FC = () => {
               <Crown className="h-3.5 w-3.5" /> Module premium indépendant · accès réservé aux acheteurs
             </p>
 
+            <div className="mt-4 rounded-xl border bg-white p-4" style={{ borderColor: `${AMBER}44` }}>
+              <p className="text-[12px] font-semibold" style={{ color: '#6f5e47' }}>
+                Déjà acheteur ? Importez votre manuscrit Word (.docx) directement dans l'atelier.
+              </p>
+              <button
+                onClick={() => navigate('/bookperfect')}
+                className="mt-2 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold text-white transition hover:opacity-90"
+                style={{ background: AMBER_DEEP }}
+              >
+                <FileText className="h-4 w-4" /> Ouvrir l'atelier & importer mon manuscrit
+              </button>
+            </div>
+
           </div>
         </section>
 
