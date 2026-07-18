@@ -107,6 +107,7 @@ export default function V3CreateWizard() {
   const [wordsPerChapter, setWordsPerChapter] = useState(2500);
   const [characters, setCharacters] = useState<WizardCharacter[]>([makeCharacter()]);
   const [finalTitle, setFinalTitle] = useState(hub.title || '');
+  const [subtitle, setSubtitle] = useState(hub.subtitle || '');
   const [authorName, setAuthorName] = useState(hub.author || 'Auteur Ebookstudio');
 
   const effectiveCategory = category === 'Autre' ? (customCategory.trim() || 'Autre') : category;
