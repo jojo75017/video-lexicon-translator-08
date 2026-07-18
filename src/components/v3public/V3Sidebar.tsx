@@ -24,7 +24,7 @@ const NAV = [
   ]},
   { section: 'Compte', items: [
     { to: '/v3/auteur', label: 'Georges Boubet', icon: User },
-    { to: '/v3/settings', label: 'Paramètres auteur', icon: Settings },
+    { to: '/v3/settings', label: 'Version V2', icon: Settings },
   ]},
 ];
 
