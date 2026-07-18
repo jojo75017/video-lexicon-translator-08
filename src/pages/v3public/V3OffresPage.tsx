@@ -87,6 +87,7 @@ const UPSELLS = [
 ];
 
 export default function V3OffresPage() {
+  const [checkout, setCheckout] = useState<{ priceId: string; planName: string } | null>(null);
   return (
     <div className="v3pub">
       {/* Hero */}
