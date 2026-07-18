@@ -86,35 +86,23 @@ Deno.serve(async (req) => {
       limit: 1,
     });
     if (!prices?.data?.length) throw new Error("Prix Stripe introuvable");
-    const stripePriceId = prices.data[0].id;
+    const stripePrice = prices.data[0];
+    const stripePriceId = stripePrice.id;
+    const isRecurring = stripePrice.type === "recurring";
 
     const customerId = await resolveOrCreateCustomer(env, { email, userId });
 
-    const params: Record<string, any> = {
-      mode: "subscription",
-      ui_mode: "embedded",
-      return_url: returnUrl,
-      "line_items[0][price]": stripePriceId,
-      "line_items[0][quantity]": 1,
-    };
-    if (customerId) params.customer = customerId;
-    if (userId) {
-      params["metadata[userId]"] = userId;
-      params["subscription_data[metadata][userId]"] = userId;
-      params["metadata[plan]"] = priceId;
-    }
-
-    // Flatten in-place: stripeRequest already flattens objects, so we can
-    // rebuild a normal object graph for readability.
     const session = await stripeRequest<any>(env, "POST", "/checkout/sessions", {
-      mode: "subscription",
+      mode: isRecurring ? "subscription" : "payment",
       ui_mode: "embedded",
       return_url: returnUrl,
       line_items: [{ price: stripePriceId, quantity: 1 }],
       ...(customerId && { customer: customerId }),
       ...(userId && {
         metadata: { userId, plan: priceId },
-        subscription_data: { metadata: { userId, plan: priceId } },
+        ...(isRecurring && {
+          subscription_data: { metadata: { userId, plan: priceId } },
+        }),
       }),
     });
 
