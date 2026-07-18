@@ -575,6 +575,38 @@ const V3HubPage: React.FC = () => {
         </div>
       </header>
 
+      {/* ===================== BARRE D'ONGLETS HORIZONTALE (sous le header) ===================== */}
+      <nav
+        className="sticky top-0 z-30 border-b border-[#eadfc9] backdrop-blur-md"
+        style={{ background: 'rgba(251,246,236,0.94)' }}
+        aria-label="Sections du Hub V3"
+      >
+        <div className="mx-auto max-w-7xl px-4">
+          <div className="flex items-center gap-1.5 overflow-x-auto py-2 scrollbar-thin">
+            {HUB_TABS.map((t) => {
+              const active = activeTab === t.id;
+              const Icon = t.icon;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => setActiveTab(t.id)}
+                  className="group inline-flex items-center gap-1.5 shrink-0 rounded-full px-3.5 py-1.5 text-[12.5px] font-semibold whitespace-nowrap border transition-all"
+                  style={{
+                    background: active ? AMBER : '#fff',
+                    color: active ? '#fff' : '#6f5e47',
+                    borderColor: active ? AMBER : '#eadfc9',
+                    boxShadow: active ? '0 8px 20px -10px rgba(232,149,30,0.55)' : 'none',
+                  }}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  <span>{t.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </nav>
+
       <main className="mx-auto max-w-7xl px-4 py-8">
         {/* ===================== ONGLET PARCOURS ===================== */}
         {activeTab === 'parcours' && (
