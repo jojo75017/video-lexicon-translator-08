@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Search, Sparkles, Compass, Lock, ArrowRight, Wand2, CheckCircle2, Layers, Bot, Infinity as InfinityIcon, ShieldCheck, Save, Image as ImageIcon, BookOpen, GraduationCap, Gem, Map as MapIcon, FileText, Copy, Check, Menu, X, PanelLeftClose, PanelLeftOpen, Gauge, Download, Clock, Package, ExternalLink, type LucideIcon } from 'lucide-react';
 import {
   V3_MODULES, V3_PILLAR_META, getModuleAccess, getModuleById, type V3Pillar, type V3Module,
@@ -226,6 +226,9 @@ function readHubBookConfig(): { title: string; subtitle: string; author: string 
 
 const V3HubPage: React.FC = () => {
   const navigate = useNavigate();
+  // Quand le Hub est monté sous /v3/hub (site public), la V3Sidebar externe existe déjà :
+  // on masque la sidebar interne pour laisser le contenu prendre toute la largeur.
+  const embedded = useLocation().pathname.startsWith('/v3/');
   const [query, setQuery] = useState('');
   const [pillar, setPillar] = useState<V3Pillar | 'all' | 'mine'>('all');
   const [activeTab, setActiveTab] = useState<HubTab>(() => {
@@ -404,6 +407,7 @@ const V3HubPage: React.FC = () => {
       </button>
       <div className="relative z-10 flex">
       {/* ===================== SIDEBAR (desktop) ===================== */}
+      {!embedded && (
       <aside
         className="hidden lg:flex sticky top-0 h-screen shrink-0 flex-col border-r border-[#eadfc9] transition-[width] duration-300"
         style={{ width: sidebarCollapsed ? 76 : 244, background: 'rgba(251,246,236,0.96)' }}
@@ -426,6 +430,7 @@ const V3HubPage: React.FC = () => {
         <div className="flex-1 overflow-y-auto px-3">{navList(sidebarCollapsed)}</div>
         <div className="border-t border-[#eadfc9] p-3">{createBtn(sidebarCollapsed)}</div>
       </aside>
+      )}
 
       {/* ===================== TIROIR (mobile) ===================== */}
       {mobileNavOpen && (
