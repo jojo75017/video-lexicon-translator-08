@@ -165,7 +165,7 @@ export default function V3CreateWizard() {
 
     const config = {
       title: finalTitle.trim(),
-      subtitle: hub.subtitle || '',
+      subtitle: subtitle.trim(),
       author: authorName.trim(),
       description: workflowDescription,
       genre: effectiveCategory,
