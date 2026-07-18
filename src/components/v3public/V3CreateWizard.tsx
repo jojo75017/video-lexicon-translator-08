@@ -246,6 +246,16 @@ export default function V3CreateWizard() {
                 Refaire la couverture
               </button>
             </div>
+            <div className="mt-5 grid gap-3 md:grid-cols-2">
+              <label className="block space-y-1">
+                <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Nom d’auteur sur la couverture</span>
+                <input value={authorName} onChange={(e) => setAuthorName(e.target.value)} className="w-full rounded-xl border px-3 py-2 text-sm outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
+              </label>
+              <label className="block space-y-1">
+                <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Sous-titre</span>
+                <input value={subtitle} onChange={(e) => setSubtitle(e.target.value.slice(0, 120))} placeholder="Optionnel" className="w-full rounded-xl border px-3 py-2 text-sm outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
+              </label>
+            </div>
             <div className="mt-5 flex justify-center">
               <div className="w-56 aspect-[2/3] rounded-xl overflow-hidden border flex items-center justify-center" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-orange-50)' }}>
                 {coverLoading && !coverUrl ? (
