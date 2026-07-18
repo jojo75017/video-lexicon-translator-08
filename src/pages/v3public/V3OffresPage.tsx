@@ -111,7 +111,7 @@ const UPSELLS: Upsell[] = [
     name: 'Documentation Studio AI',
     price: '97 €',
     suffix: '· module premium (SaaS / logiciel)',
-    href: '/hub-v3?tab=documentation',
+    href: '/v3/hub?tab=documentation',
     badge: 'Pro',
     desc: "Générez toute la documentation professionnelle d'un SaaS, plugin ou app : README, docs technique, guide utilisateur, changelog, API reference, aide en ligne — prêt à publier.",
     longDesc: "Documentation Studio AI est un vrai atelier de rédaction technique pour créateurs de logiciels. Vous choisissez le type de produit (SaaS, plugin WordPress, app mobile, extension, API…) et l'IA génère l'ensemble des livrables attendus par vos utilisateurs et par les stores : README GitHub, guide de démarrage rapide, documentation utilisateur illustrée, référence API, changelog, page de vente, pack RGPD/CGU. Chaque livrable est structuré, cohérent avec les autres, et exportable en Markdown, PDF, DOCX ou HTML.",
