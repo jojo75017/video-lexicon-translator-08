@@ -94,7 +94,7 @@ Deno.serve(async (req) => {
 
     const session = await stripeRequest<any>(env, "POST", "/checkout/sessions", {
       mode: isRecurring ? "subscription" : "payment",
-      ui_mode: "embedded",
+      ui_mode: "embedded_page",
       return_url: returnUrl,
       line_items: [{ price: stripePriceId, quantity: 1 }],
       ...(customerId && { customer: customerId }),
