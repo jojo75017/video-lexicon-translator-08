@@ -56,7 +56,7 @@ const TIERS: Tier[] = [
     id: 'auteur',
     name: 'Auteur',
     tagline: 'Publiez vos propres livres, sérieusement.',
-    books: '20 livres / mois',
+    books: 'Livres illimités / mois',
     icon: <Crown className="w-5 h-5" />,
     features: [
       'Tout le plan Expert',
