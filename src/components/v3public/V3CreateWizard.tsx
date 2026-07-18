@@ -113,6 +113,100 @@ export default function V3CreateWizard() {
   const [subtitle, setSubtitle] = useState(hub.subtitle || '');
   const [authorName, setAuthorName] = useState(hub.author || 'Auteur Ebookstudio');
 
+  // Assistant IA — trouve titre / sous-titre / synopsis / catégories à partir d'une idée ou d'une niche.
+  const [aiTopic, setAiTopic] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiResult, setAiResult] = useState<{ title: string; subtitle: string; synopsis: string; categories: string[] } | null>(null);
+
+  const runAIAssistant = async () => {
+    if (aiTopic.trim().length < 4) {
+      toast.error('Décris ton idée, ton sujet ou ta niche (au moins quelques mots).');
+      return;
+    }
+    const provider = getProvider();
+    const key = getProviderKey(provider);
+    if (!key || !validateKeyFormat(provider, key)) {
+      toast.error('Ajoute et valide ta clé IA en haut de la page avant de lancer l’assistant.');
+      return;
+    }
+    setAiLoading(true);
+    try {
+      const prompt = `Tu es un éditeur senior spécialisé Amazon KDP. À partir de l'idée / niche ci-dessous, propose UN livre commercial percutant.
+Idée / niche : "${aiTopic.trim()}"
+
+Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce schéma :
+{
+  "title": "titre principal court et vendeur (max 70 caractères)",
+  "subtitle": "sous-titre bénéfice/promesse (max 120 caractères)",
+  "synopsis": "synopsis complet de 150 à 200 mots, style vendeur, en français, décrivant le contenu, le lecteur visé et la transformation obtenue",
+  "categories": ["3 à 5 catégories Amazon FR pertinentes, en français, séparées ici sous forme de tableau"]
+}`;
+      const raw = await callAIWriting(prompt, { jsonMode: true, temperature: 0.8, maxTokens: 1200 });
+      let parsed: any = null;
+      try { parsed = JSON.parse(raw); } catch {
+        const m = raw.match(/\{[\s\S]*\}/);
+        if (m) { try { parsed = JSON.parse(m[0]); } catch {} }
+      }
+      if (!parsed?.title) throw new Error('Réponse IA invalide.');
+      setAiResult({
+        title: String(parsed.title || '').slice(0, 120),
+        subtitle: String(parsed.subtitle || '').slice(0, 160),
+        synopsis: String(parsed.synopsis || '').trim(),
+        categories: Array.isArray(parsed.categories) ? parsed.categories.map(String).slice(0, 6) : [],
+      });
+      toast.success('Propositions IA prêtes — clique « Appliquer » pour remplir le formulaire.');
+    } catch (e: any) {
+      toast.error(e?.message || 'Impossible de générer les propositions.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const applyAIResult = () => {
+    if (!aiResult) return;
+    setTitle(aiResult.title);
+    setFinalTitle(aiResult.title);
+    setSubtitle(aiResult.subtitle);
+    setDescription(aiResult.synopsis);
+    const firstCat = aiResult.categories[0];
+    if (firstCat) {
+      const match = CATEGORIES.find((c) => c.toLowerCase() === firstCat.toLowerCase());
+      if (match) setCategory(match);
+      else { setCategory('Autre'); setCustomCategory(firstCat); }
+    }
+    toast.success('Formulaire rempli — vérifie et continue vers l’étape suivante.');
+  };
+
+  const saveDraft = () => {
+    try {
+      const draft = {
+        savedAt: new Date().toISOString(),
+        title, description, category, customCategory, tone, chapters, wordsPerChapter,
+        characters, finalTitle, subtitle, authorName,
+      };
+      const raw = localStorage.getItem('v3_wizard_drafts_v1');
+      const list = raw ? JSON.parse(raw) : [];
+      list.unshift({ id: crypto.randomUUID?.() || String(Date.now()), ...draft });
+      localStorage.setItem('v3_wizard_drafts_v1', JSON.stringify(list.slice(0, 20)));
+      localStorage.setItem(WIZARD_KEY, JSON.stringify(draft));
+      toast.success('Brouillon sauvegardé — retrouve-le dans « Ma bibliothèque ».');
+    } catch {
+      toast.error('Sauvegarde impossible.');
+    }
+  };
+
+  const resetWizard = () => {
+    if (!confirm('Recommencer un nouveau livre ? Le brouillon en cours sera effacé.')) return;
+    setTitle(''); setDescription(''); setCategory('Roman'); setCustomCategory('');
+    setTone('Inspirant'); setChapters(12); setWordsPerChapter(2500);
+    setCharacters([makeCharacter()]); setFinalTitle(''); setSubtitle('');
+    setAiTopic(''); setAiResult(null); setStep(0); setLaunched(false); setCompletedBook(null); setCoverUrl(null);
+    coverTriggeredRef.current = false;
+    ['ebook_workflow_progress', 'ebook_workflow_results', 'ebook_workflow_sync_data'].forEach((k) => localStorage.removeItem(k));
+    toast.success('Nouveau livre — formulaire réinitialisé.');
+  };
+
+
   const effectiveCategory = category === 'Autre' ? (customCategory.trim() || 'Autre') : category;
   const totalWords = chapters * wordsPerChapter;
   const estimatedPages = Math.ceil(totalWords / 250);
