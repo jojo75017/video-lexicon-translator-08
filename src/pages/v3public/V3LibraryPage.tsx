@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BookOpen, Sparkles, Settings } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import AudiobookOfferCard from '@/components/v3public/AudiobookOfferCard';
 
 type Row = { id: string; title: string; updated_at: string; chapters?: any[] | null };
 
@@ -58,6 +59,9 @@ export default function V3LibraryPage() {
               <h2 className="text-lg font-bold mb-4">Terminés</h2>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 {done.map((r) => <BookCard key={r.id} r={r} />)}
+              </div>
+              <div className="mt-6 max-w-2xl">
+                <AudiobookOfferCard compact />
               </div>
             </div>
           )}

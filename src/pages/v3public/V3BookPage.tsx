@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Feather, ArrowLeft, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import AudiobookOfferCard from '@/components/v3public/AudiobookOfferCard';
 
 type Book = {
   id: string;
