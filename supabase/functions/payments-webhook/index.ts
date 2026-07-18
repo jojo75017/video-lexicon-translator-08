@@ -221,6 +221,25 @@ Deno.serve(async (req) => {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object;
+        const plan = session.metadata?.plan;
+        if (plan === "bookperfect_launch_once") {
+          const email = (session.customer_email || session.customer_details?.email || "").toLowerCase();
+          if (email) {
+            const amount = typeof session.amount_total === "number" ? session.amount_total / 100 : null;
+            const { error } = await getSupabase().from("module_entitlements").insert({
+              email,
+              module: "bookperfect",
+              status: "active",
+              amount,
+              currency: session.currency || "eur",
+              environment: env,
+              stripe_session_id: session.id,
+            });
+            if (error) console.error("BookPerfect entitlement insert failed:", error);
+            else console.log("Granted BookPerfect entitlement to:", email);
+          }
+          break;
+        }
         if (session.metadata?.kind === "v3_full_pack") {
           await handleV3CheckoutCompleted(session);
         } else {

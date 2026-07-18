@@ -23,6 +23,7 @@ const ALLOWED_PRICES = new Set([
   "v3_upsell_newsletter_month",
   "v3_upsell_relecture_once",
   "v3_upsell_docstudio_once",
+  "bookperfect_launch_once",
 ]);
 
 async function resolveOrCreateCustomer(

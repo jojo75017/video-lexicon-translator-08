@@ -4,7 +4,7 @@ import {
   ArrowLeft, BookOpen, Sparkles, Bug, FileText, Feather, ShoppingCart,
   Check, ShieldCheck, Clock, Zap, FileCheck2, Crown, Star, RotateCcw,
 } from 'lucide-react';
-import StripeCheckoutButton from '@/components/StripeCheckoutButton';
+import BookPerfectCheckout from '@/components/bookperfect/BookPerfectCheckout';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
 
@@ -125,14 +125,7 @@ const BookPerfectSalesPage: React.FC = () => {
                 placeholder="vous@email.com"
                 className="mb-3 bg-white"
               />
-              <StripeCheckoutButton
-                email={email}
-                planId="bookperfect_launch"
-                successPath="/paiement-succes"
-                cancelPath="/bookperfect"
-              >
-                Débloquer BookPerfect AI — 67&euro;
-              </StripeCheckoutButton>
+              <BookPerfectCheckout email={email} label="Débloquer BookPerfect AI — 67€" />
             </div>
 
             <div className="mt-4 flex flex-wrap items-center gap-4 text-[12px]" style={{ color: '#6f5e47' }}>
@@ -220,14 +213,7 @@ const BookPerfectSalesPage: React.FC = () => {
               placeholder="vous@email.com"
               className="mb-3 bg-white"
             />
-            <StripeCheckoutButton
-              email={email}
-              planId="bookperfect_launch"
-              successPath="/paiement-succes"
-              cancelPath="/bookperfect"
-            >
-              Débloquer maintenant — 67&euro;
-            </StripeCheckoutButton>
+            <BookPerfectCheckout email={email} label="Débloquer maintenant — 67€" />
           </div>
           <ul className="mx-auto mt-5 flex max-w-md flex-col gap-1.5 text-left text-[13px]" style={{ color: '#6f5e47' }}>
             {['Import DOCX & découpage automatique des chapitres', 'Traces IA, orthographe, style & KDP', 'Export Word corrigé prêt pour Amazon', 'Accès à vie + mises à jour'].map((li) => (
