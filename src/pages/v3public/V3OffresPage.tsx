@@ -361,6 +361,13 @@ export default function V3OffresPage() {
                   <h4 className="font-semibold text-[var(--v3-ink)]">{u.name}</h4>
                 </div>
                 <p className="mt-1 text-xs text-[var(--v3-muted)] flex-1">{u.desc}</p>
+                <button
+                  type="button"
+                  onClick={() => setDetail(u)}
+                  className="mt-2 inline-flex items-center gap-1 self-start text-[11px] font-semibold text-[var(--v3-orange)] hover:underline"
+                >
+                  <Info className="w-3 h-3" /> En savoir plus
+                </button>
                 <div className="mt-3 flex items-center justify-between gap-2">
                   <div className="text-sm">
                     <span className="text-lg font-bold text-[var(--v3-ink)]">{u.price}</span>
