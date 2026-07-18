@@ -71,6 +71,7 @@ export default function V3CreateWizard() {
       const openaiApiKey = (typeof localStorage !== 'undefined' && localStorage.getItem('openai_real_api_key')) || undefined;
       const { data, error } = await invokeImageFunction<any>('generate-front-cover', {
         ebookTitle: finalTitle.trim() || title.trim(),
+        subtitle: subtitle.trim(),
         authorName: authorName.trim(),
         genre: effectiveCategory,
         style: 'professional',
@@ -106,6 +107,7 @@ export default function V3CreateWizard() {
   const [wordsPerChapter, setWordsPerChapter] = useState(2500);
   const [characters, setCharacters] = useState<WizardCharacter[]>([makeCharacter()]);
   const [finalTitle, setFinalTitle] = useState(hub.title || '');
+  const [subtitle, setSubtitle] = useState(hub.subtitle || '');
   const [authorName, setAuthorName] = useState(hub.author || 'Auteur Ebookstudio');
 
   const effectiveCategory = category === 'Autre' ? (customCategory.trim() || 'Autre') : category;
@@ -163,7 +165,7 @@ export default function V3CreateWizard() {
 
     const config = {
       title: finalTitle.trim(),
-      subtitle: hub.subtitle || '',
+      subtitle: subtitle.trim(),
       author: authorName.trim(),
       description: workflowDescription,
       genre: effectiveCategory,
@@ -212,7 +214,7 @@ export default function V3CreateWizard() {
           autoStart
           hideInputForm
           initialTitle={finalTitle.trim()}
-          initialSubtitle={hub.subtitle || ''}
+          initialSubtitle={subtitle.trim()}
           initialCategory={effectiveCategory}
           initialAuthorName={authorName.trim()}
           initialBookIntroduction={description.trim()}
@@ -243,6 +245,16 @@ export default function V3CreateWizard() {
                 {coverLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
                 Refaire la couverture
               </button>
+            </div>
+            <div className="mt-5 grid gap-3 md:grid-cols-2">
+              <label className="block space-y-1">
+                <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Nom d’auteur sur la couverture</span>
+                <input value={authorName} onChange={(e) => setAuthorName(e.target.value)} className="w-full rounded-xl border px-3 py-2 text-sm outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
+              </label>
+              <label className="block space-y-1">
+                <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Sous-titre</span>
+                <input value={subtitle} onChange={(e) => setSubtitle(e.target.value.slice(0, 120))} placeholder="Optionnel" className="w-full rounded-xl border px-3 py-2 text-sm outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
+              </label>
             </div>
             <div className="mt-5 flex justify-center">
               <div className="w-56 aspect-[2/3] rounded-xl overflow-hidden border flex items-center justify-center" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-orange-50)' }}>
@@ -409,6 +421,12 @@ export default function V3CreateWizard() {
             <label className="block space-y-2">
               <span className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>Nom d’auteur</span>
               <input value={authorName} onChange={(event) => setAuthorName(event.target.value)} className="w-full rounded-2xl border px-4 py-4 outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
+            </label>
+            <label className="block space-y-2 md:col-span-2">
+              <span className="flex items-center justify-between gap-3 text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>
+                Sous-titre <span className="text-xs font-semibold" style={{ color: 'var(--v3-muted)' }}>optionnel · ~80 caractères</span>
+              </span>
+              <input value={subtitle} onChange={(event) => setSubtitle(event.target.value.slice(0, 120))} placeholder="Ex : Le guide pas-à-pas pour publier sur Amazon KDP" className="w-full rounded-2xl border px-4 py-4 outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
             </label>
           </div>
           <div className="rounded-[28px] border p-5" style={{ borderColor: 'rgba(249, 115, 22, 0.35)', background: 'var(--v3-orange-50)' }}>
