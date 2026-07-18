@@ -22,6 +22,12 @@ const requireUser = async (req: Request) => {
 
 const DEFAULT_WORDS_PER_CHAPTER = 3500;
 
+function clampNumber(value: unknown, min: number, max: number, fallback: number) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.max(min, Math.min(max, Math.round(parsed)));
+}
+
 // STANDARDS ÉDITORIAUX PRO — Voix d'éditeur professionnel
 const EDITORIAL_PRO_RULES = `
 STANDARDS ÉDITORIAUX PROFESSIONNELS (niveau maison d'édition) :
@@ -1105,17 +1111,20 @@ function getP3GenerationSettings(numberOfChapters: number) {
   };
 }
 
-function getP4GenerationSettings(numberOfChapters: number, isPro = false) {
+function getP4GenerationSettings(numberOfChapters: number, isPro = false, requestedWordsPerChapter = DEFAULT_WORDS_PER_CHAPTER) {
   const isLargeProject = numberOfChapters >= 16;
   const isVeryLargeProject = numberOfChapters >= 30;
+  const targetWords = clampNumber(requestedWordsPerChapter, 500, 8000, isPro ? 5000 : DEFAULT_WORDS_PER_CHAPTER);
+  const minWords = Math.max(350, Math.round(targetWords * 0.82));
+  const maxWords = Math.max(targetWords + 150, Math.round(targetWords * 1.18));
 
   const base = {
     isLargeProject,
     isVeryLargeProject,
-    maxTokens: isVeryLargeProject ? 2400 : isLargeProject ? 4200 : 6000,
-    minWords: isVeryLargeProject ? 1200 : 2500,
-    targetWords: isVeryLargeProject ? 1600 : 3000,
-    maxWords: isVeryLargeProject ? 1900 : 3500,
+    maxTokens: isVeryLargeProject ? Math.max(2400, Math.min(7000, Math.round(targetWords * 1.4))) : isLargeProject ? Math.max(4200, Math.min(8000, Math.round(targetWords * 1.5))) : Math.max(6000, Math.min(9000, Math.round(targetWords * 1.6))),
+    minWords,
+    targetWords,
+    maxWords,
     minScore: isVeryLargeProject ? 7 : 8,
     maxRetries: 0,
     previousChapterChars: isVeryLargeProject ? 400 : 800,
@@ -1127,10 +1136,7 @@ function getP4GenerationSettings(numberOfChapters: number, isPro = false) {
   // Pack Pro 347€ : chapitres plus longs et plus denses, boucle qualité renforcée.
   return {
     ...base,
-    maxTokens: isVeryLargeProject ? 3600 : isLargeProject ? 6000 : 8000,
-    minWords: isVeryLargeProject ? 1800 : 3500,
-    targetWords: isVeryLargeProject ? 2400 : 5000,
-    maxWords: isVeryLargeProject ? 2800 : 6000,
+    maxTokens: isVeryLargeProject ? Math.max(base.maxTokens, Math.min(9000, Math.round(targetWords * 1.6))) : isLargeProject ? Math.max(base.maxTokens, Math.min(10000, Math.round(targetWords * 1.7))) : Math.max(base.maxTokens, Math.min(12000, Math.round(targetWords * 1.8))),
     minScore: isVeryLargeProject ? 8 : 9,
     maxRetries: isVeryLargeProject ? 0 : 1,
     previousChapterChars: isVeryLargeProject ? 600 : 1000,
@@ -1189,6 +1195,7 @@ serve(async (req) => {
       authorName,
       language = 'fr',
       numberOfChapters = 8,
+      wordsPerChapter: requestedWordsPerChapter,
       bookIntroduction = '',
       characters = [],
       previousContext = {},
@@ -1270,7 +1277,7 @@ CHAPITRES PRÉVUS : ${numberOfChapters}${introContext}${charactersContext}${lang
 
     console.log(`Step ${step} for: "${fullTitle}" (Category: ${category}, Lang: ${language}, Characters: ${characters.length})`);
 
-    const wordsPerChapter = isProQuality ? 5000 : DEFAULT_WORDS_PER_CHAPTER;
+    const wordsPerChapter = clampNumber(requestedWordsPerChapter, 500, 8000, isProQuality ? 5000 : DEFAULT_WORDS_PER_CHAPTER);
     let result: any = {};
     let displayContent = '';
 
@@ -1668,7 +1675,7 @@ Format JSON :
       case 'P4': {
         // RÉDACTION PRO AVEC BOUCLE QUALITÉ
         const structure = previousContext.P3?.chapitres || [];
-        const p4Settings = getP4GenerationSettings(structure.length || numberOfChapters, isProQuality);
+        const p4Settings = getP4GenerationSettings(structure.length || numberOfChapters, isProQuality, wordsPerChapter);
         const useSegmentedMode = p4Settings.segmentCount > 1;
         const descriptionGeneree = previousContext.P1?.descriptionGeneree || '';
         const tonEditorial = previousContext.P1?.tonEditorial || '';

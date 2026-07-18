@@ -46,12 +46,16 @@ interface GeneratedCharacter {
 interface EbookCompleteWorkflowProps {
   onComplete: (bookData: any) => void;
   characters?: Character[];
+  autoStart?: boolean;
+  hideInputForm?: boolean;
   initialTitle?: string;
   initialSubtitle?: string;
   initialCategory?: string;
   initialAuthorName?: string;
   initialBookIntroduction?: string;
   initialNumberOfChapters?: number;
+  initialWordsPerChapter?: number;
+  initialTone?: string;
   onNavigateToSettings?: () => void;
 }
 
@@ -87,6 +91,7 @@ interface WorkflowProgress {
   bookIntroduction: string;
   hasReadSteps: boolean;
   numberOfChapters: number;
+  wordsPerChapter?: number;
   currentStepIndex: number;
   stepResults: Record<string, { result: any; displayContent: string }>;
   allContext: Record<string, any>;
@@ -102,12 +107,16 @@ interface WorkflowProgress {
 const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
   onComplete,
   characters: externalCharacters = [],
+  autoStart = false,
+  hideInputForm = false,
   initialTitle = '',
   initialSubtitle = '',
   initialCategory = '',
   initialAuthorName = '',
   initialBookIntroduction = '',
   initialNumberOfChapters = 8,
+  initialWordsPerChapter = 3500,
+  initialTone = '',
   onNavigateToSettings,
 }) => {
   // Hook pour sauvegarder les résultats P1-P14 globalement
@@ -126,11 +135,11 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
   }, []);
   
   // Form state
-  const [title, setTitle] = useState('');
-  const [subtitle, setSubtitle] = useState('');
-  const [category, setCategory] = useState('');
-  const [bookIntroduction, setBookIntroduction] = useState('');
-  const [authorName, setAuthorName] = useState('');
+  const [title, setTitle] = useState(initialTitle);
+  const [subtitle, setSubtitle] = useState(initialSubtitle);
+  const [category, setCategory] = useState(initialCategory);
+  const [bookIntroduction, setBookIntroduction] = useState(initialBookIntroduction);
+  const [authorName, setAuthorName] = useState(initialAuthorName);
   // Cible idéale (déroulant)
   const [cibleProfil, setCibleProfil] = useState('');
   const [cibleBesoins, setCibleBesoins] = useState('');
@@ -142,14 +151,16 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
   const [promesseDifferenciation, setPromesseDifferenciation] = useState('');
   const [promesseEmotion, setPromesseEmotion] = useState('');
   const [language, setLanguage] = useState<'fr' | 'en' | 'es' | 'it'>('fr');
-  const [numberOfChapters, setNumberOfChapters] = useState(8);
-  const [hasReadSteps, setHasReadSteps] = useState(false);
+  const [numberOfChapters, setNumberOfChapters] = useState(() => Math.max(3, Math.min(60, Math.round(initialNumberOfChapters || 8))));
+  const [wordsPerChapter, setWordsPerChapter] = useState(() => Math.max(500, Math.min(8000, Math.round(initialWordsPerChapter || 3500))));
+  const [hasReadSteps, setHasReadSteps] = useState(autoStart);
   const [autofillLoading, setAutofillLoading] = useState(false);
   const [openAccordions, setOpenAccordions] = useState<string[]>([]);
   
   // Workflow state
   const [isGenerating, setIsGenerating] = useState(false);
   const cancelRef = useRef(false);
+  const autoStartTriggeredRef = useRef(false);
   const autoResumeCountRef = useRef(0);
   const autoResumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [currentStepIndex, setCurrentStepIndex] = useState(-1);
@@ -183,8 +194,12 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
     if (!authorName.trim() && initialAuthorName.trim()) setAuthorName(initialAuthorName);
     if (!bookIntroduction.trim() && initialBookIntroduction.trim()) setBookIntroduction(initialBookIntroduction);
     if (numberOfChapters === 8 && initialNumberOfChapters && initialNumberOfChapters !== 8) {
-      setNumberOfChapters(initialNumberOfChapters);
+      setNumberOfChapters(Math.max(3, Math.min(60, Math.round(initialNumberOfChapters))));
     }
+    if (wordsPerChapter === 3500 && initialWordsPerChapter && initialWordsPerChapter !== 3500) {
+      setWordsPerChapter(Math.max(500, Math.min(8000, Math.round(initialWordsPerChapter))));
+    }
+    if (autoStart && !hasReadSteps) setHasReadSteps(true);
   }, [
     isGenerating,
     currentStepIndex,
@@ -195,12 +210,16 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
     authorName,
     bookIntroduction,
     numberOfChapters,
+    wordsPerChapter,
+    hasReadSteps,
+    autoStart,
     initialTitle,
     initialSubtitle,
     initialCategory,
     initialAuthorName,
     initialBookIntroduction,
     initialNumberOfChapters,
+    initialWordsPerChapter,
   ]);
 
   const progress = currentStepIndex >= 0 ? ((currentStepIndex + 1) / WORKFLOW_STEP_COUNT) * 100 : 0;
@@ -237,6 +256,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
   const buildEnrichedIntroduction = useCallback(() => {
     const sections: string[] = [];
     if (bookIntroduction.trim()) sections.push(bookIntroduction.trim());
+    if (initialTone.trim()) sections.push(`=== STYLE DEMANDÉ ===\nTon : ${initialTone.trim()}`);
 
     const cibleLines: string[] = [];
     if (cibleProfil.trim()) cibleLines.push(`- Profil: ${cibleProfil.trim()}`);
@@ -253,7 +273,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
     if (promesseLines.length) sections.push(`=== PROMESSE CENTRALE ===\n${promesseLines.join('\n')}`);
 
     return sections.join('\n\n');
-  }, [bookIntroduction, cibleProfil, cibleBesoins, cibleFrustrations, cibleNiveau, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion]);
+  }, [bookIntroduction, initialTone, cibleProfil, cibleBesoins, cibleFrustrations, cibleNiveau, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion]);
 
   const buildSimpleTargetPromise = useCallback(() => {
     const cleanTitle = title.trim();
@@ -351,6 +371,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
         setBookIntroduction(data.bookIntroduction || '');
         setHasReadSteps(Boolean(data.hasReadSteps));
         setNumberOfChapters(data.numberOfChapters || 8);
+        setWordsPerChapter(data.wordsPerChapter || initialWordsPerChapter || 3500);
         const restoredStepIndex = data.currentStepIndex === 0 && Boolean(data.stepResults?.P1 || data.allContext?.P1)
           ? 1
           : data.currentStepIndex;
@@ -403,6 +424,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
       bookIntroduction,
       hasReadSteps,
       numberOfChapters,
+      wordsPerChapter,
       currentStepIndex,
       stepResults,
       allContext,
@@ -426,7 +448,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
     } catch (e) {
       console.error('Error saving progress:', e);
     }
-  }, [title, subtitle, category, authorName, bookIntroduction, hasReadSteps, numberOfChapters, currentStepIndex, stepResults, allContext, generatedCharacters, waitingForCharacterValidation, waitingForTitleValidation, titleSuggestions, originalTitleScore, selectedTitleIndex]);
+  }, [title, subtitle, category, authorName, bookIntroduction, hasReadSteps, numberOfChapters, wordsPerChapter, currentStepIndex, stepResults, allContext, generatedCharacters, waitingForCharacterValidation, waitingForTitleValidation, titleSuggestions, originalTitleScore, selectedTitleIndex]);
 
   // Auto-save whenever stepResults changes
   useEffect(() => {
@@ -460,6 +482,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
     setBookIntroduction('');
     setAuthorName('');
     setNumberOfChapters(8);
+    setWordsPerChapter(3500);
     setCurrentStepIndex(-1);
     setStepResults({});
     setAllContext({});
@@ -489,6 +512,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
         setCategory(data.category);
         setAuthorName(data.authorName);
         setNumberOfChapters(data.numberOfChapters);
+        setWordsPerChapter(data.wordsPerChapter || initialWordsPerChapter || 3500);
         const restoredStepIndex = data.currentStepIndex === 0 && Boolean(data.stepResults?.P1 || data.allContext?.P1)
           ? 1
           : data.currentStepIndex;
@@ -783,6 +807,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
             authorName,
             language,
             numberOfChapters,
+            wordsPerChapter,
             bookIntroduction: buildEnrichedIntroduction(),
             previousContext,
             userApiKey: hasUsableApiKey ? normalizedUserApiKey : undefined,
@@ -824,6 +849,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
               authorName,
               language,
               numberOfChapters,
+              wordsPerChapter,
               bookIntroduction: buildEnrichedIntroduction(),
               previousContext,
               userApiKey: hasUsableApiKey ? normalizedUserApiKey : undefined,
@@ -1469,8 +1495,16 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
     generateCompleteBook(resumeIndex, extraContext);
   };
 
-  // Estimation réaliste : 3000-4000 mots/chapitre = ~12-16 pages/chapitre
-  const estimatedPages = Math.round(numberOfChapters * 15);
+  useEffect(() => {
+    if (!autoStart || autoStartTriggeredRef.current || isGenerating || currentStepIndex >= 0) return;
+    if (!title.trim() || !authorName.trim() || !category || !bookIntroduction.trim()) return;
+    autoStartTriggeredRef.current = true;
+    setHasReadSteps(true);
+    generateCompleteBook(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoStart, isGenerating, currentStepIndex, title, authorName, category, bookIntroduction]);
+
+  const estimatedPages = Math.ceil((numberOfChapters * wordsPerChapter) / 250);
 
   const renderMarkdown = (content: string) => {
     // Simple markdown rendering
@@ -1512,7 +1546,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
       {/* Input Card */}
       <WritingEngineBadge isPro={hasFull} />
 
-      {/* Input Card */}
+      {!hideInputForm && (
       <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-background to-amber-500/5">
         <CardHeader className="text-center pb-4">
           <div className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-amber-500 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4 mx-auto">
@@ -1847,7 +1881,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
               value={[numberOfChapters]}
               onValueChange={(value) => setNumberOfChapters(value[0])}
               min={3}
-              max={50}
+              max={60}
               step={1}
               disabled={isGenerating}
               className="w-full"
@@ -2007,6 +2041,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
           )}
         </CardContent>
       </Card>
+      )}
 
       {/* Title Validation Card - After P1 */}
       {waitingForTitleValidation && (
