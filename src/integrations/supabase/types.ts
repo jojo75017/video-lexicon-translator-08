@@ -146,6 +146,48 @@ export type Database = {
         }
         Relationships: []
       }
+      audiobook_unlocks: {
+        Row: {
+          audio_url: string | null
+          book_id: string
+          created_at: string
+          environment: string
+          id: string
+          paid_at: string | null
+          provider_used: string | null
+          status: string
+          stripe_session_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          audio_url?: string | null
+          book_id: string
+          created_at?: string
+          environment?: string
+          id?: string
+          paid_at?: string | null
+          provider_used?: string | null
+          status?: string
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          audio_url?: string | null
+          book_id?: string
+          created_at?: string
+          environment?: string
+          id?: string
+          paid_at?: string | null
+          provider_used?: string | null
+          status?: string
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       audiobooks: {
         Row: {
           audio_url: string | null
