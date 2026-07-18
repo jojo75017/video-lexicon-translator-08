@@ -85,6 +85,10 @@ export async function callGemini(
   const generationConfig: any = {
     temperature,
     maxOutputTokens: maxTokens,
+    // Gemini 2.5 consomme des "thinking tokens" cachés dans maxOutputTokens.
+    // On désactive le budget de réflexion pour éviter les réponses vides /
+    // tronquées (MAX_TOKENS) sur des appels courts type JSON.
+    thinkingConfig: { thinkingBudget: 0 },
   };
   if (jsonMode) {
     generationConfig.responseMimeType = 'application/json';
