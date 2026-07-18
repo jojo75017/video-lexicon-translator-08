@@ -54,6 +54,7 @@ const TIERS: Tier[] = [
       'Support prioritaire',
     ],
     cta: 'Choisir Expert',
+    priceId: 'v3_expert_monthly',
   },
   {
     id: 'auteur',
