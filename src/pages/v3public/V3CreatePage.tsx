@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Sparkles, Loader2 } from 'lucide-react';
+import ApiProviderQuickSettings from '@/components/ebook/ApiProviderQuickSettings';
 
 const V3CreateWizard = lazy(() => import('@/components/v3public/V3CreateWizard'));
 
@@ -27,6 +28,8 @@ export default function V3CreatePage() {
 
   useEffect(() => { seedHubConfig(idea, genre, type); }, [idea, genre, type]);
 
+  const openFloating = () => window.dispatchEvent(new CustomEvent('open-api-keys'));
+
   return (
     <section className="v3-halo-soft min-h-[calc(100vh-4rem)] py-14 px-5">
       <div className="max-w-4xl mx-auto">
@@ -34,8 +37,13 @@ export default function V3CreatePage() {
           <span className="v3-chip v3-chip-orange"><Sparkles className="w-3.5 h-3.5" /> Écrire un livre</span>
           <h1 className="v3-serif text-4xl font-bold mt-4">Ton atelier d'écriture</h1>
           <p className="text-sm text-[var(--v3-muted)] mt-2 max-w-lg mx-auto">
-            Décris ton idée, choisis le style, et l'IA rédige ton livre. Pense à configurer ta clé IA (bouton orange en bas à droite) avant de lancer.
+            Choisis ton fournisseur d'IA (Gemini, Claude, OpenAI ou OpenRouter), colle ta clé et valide-la avant de lancer les 15 agents.
           </p>
+        </div>
+
+        {/* Panneau clés API & modèles — TOUJOURS visible ici, admin ou non */}
+        <div className="v3-card mb-6">
+          <ApiProviderQuickSettings onOpenAdvanced={openFloating} />
         </div>
 
         <div className="v3-card">

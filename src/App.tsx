@@ -831,8 +831,8 @@ const App = () => {
           {isAuthenticated && <FirstEbookOnboarding subscriberEmail={subscriberEmail} />}
           {/* EBOOKBOT - copilote IA flottant accessible sur tout le site */}
           <EbookbotFloatingButton />
-          {/* Bouton flottant Clés API & réglages (pages ebook / KDP) */}
-          {isAuthenticated && <ApiKeysFloatingButton />}
+          {/* Bouton flottant Clés API & réglages — visible pour tous (le composant filtre lui-même par route) */}
+          <ApiKeysFloatingButton />
           {/* Admin: bascule V2/V3 importante, toujours visible */}
           {(isAuthenticated || isAdmin) && <V2V3FloatingSwitch />}
           {/* SOS modal erreurs IA — humanise les erreurs Gemini/Claude/OpenAI/OpenRouter */}
