@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react';
-import { ArrowLeft, ArrowRight, Check, Plus, Rocket, Sparkles, Trash2, UserRound } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowLeft, ArrowRight, Check, ImageIcon, Loader2, Plus, RefreshCw, Rocket, Sparkles, Trash2, UserRound } from 'lucide-react';
 import { toast } from 'sonner';
 import EbookCompleteWorkflow from '@/components/ebook/EbookCompleteWorkflow';
+import { invokeImageFunction } from '@/lib/aiImageInvoke';
 
 type WizardCharacter = {
   id: string;
@@ -60,6 +61,41 @@ export default function V3CreateWizard() {
   const [step, setStep] = useState(0);
   const [launched, setLaunched] = useState(false);
   const [completedBook, setCompletedBook] = useState<any>(null);
+  const [coverUrl, setCoverUrl] = useState<string | null>(null);
+  const [coverLoading, setCoverLoading] = useState(false);
+  const coverTriggeredRef = useRef(false);
+
+  const generateCover = async () => {
+    setCoverLoading(true);
+    try {
+      const openaiApiKey = (typeof localStorage !== 'undefined' && localStorage.getItem('openai_real_api_key')) || undefined;
+      const { data, error } = await invokeImageFunction<any>('generate-front-cover', {
+        ebookTitle: finalTitle.trim() || title.trim(),
+        authorName: authorName.trim(),
+        genre: effectiveCategory,
+        style: 'professional',
+        variation: 1,
+        coverType: 'front',
+        useOpenAI: !!openaiApiKey,
+        openaiApiKey,
+      });
+      if (error || !data?.imageUrl) throw new Error(error?.message || 'Génération échouée');
+      setCoverUrl(data.imageUrl);
+      toast.success('Couverture générée — tu peux la garder ou en refaire une.');
+    } catch (e: any) {
+      toast.error(e?.message || 'Impossible de générer la couverture.');
+    } finally {
+      setCoverLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (completedBook && !coverTriggeredRef.current) {
+      coverTriggeredRef.current = true;
+      generateCover();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [completedBook]);
 
   const [title, setTitle] = useState(hub.title || '');
   const [description, setDescription] = useState(hub.description || '');
@@ -186,6 +222,41 @@ export default function V3CreateWizard() {
           characters={workflowCharacters}
           onComplete={setCompletedBook}
         />
+
+        {completedBook && (
+          <div className="rounded-[28px] border p-5 sm:p-7" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <span className="v3-chip v3-chip-orange"><ImageIcon className="h-3.5 w-3.5" /> Couverture</span>
+                <h3 className="v3-serif mt-3 text-2xl font-bold" style={{ color: 'var(--v3-ink)' }}>Ta couverture est prête</h3>
+                <p className="mt-1 text-sm" style={{ color: 'var(--v3-muted)' }}>
+                  Générée automatiquement après la fin du livre. Tu peux en refaire une autre ou la personnaliser depuis le Studio Couverture.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={generateCover}
+                disabled={coverLoading}
+                className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold disabled:opacity-60"
+                style={{ background: 'var(--v3-orange-600)', color: '#fff' }}
+              >
+                {coverLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                Refaire la couverture
+              </button>
+            </div>
+            <div className="mt-5 flex justify-center">
+              <div className="w-56 aspect-[2/3] rounded-xl overflow-hidden border flex items-center justify-center" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-orange-50)' }}>
+                {coverLoading && !coverUrl ? (
+                  <Loader2 className="h-6 w-6 animate-spin" style={{ color: 'var(--v3-orange-600)' }} />
+                ) : coverUrl ? (
+                  <img src={coverUrl} alt={`Couverture ${finalTitle}`} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-xs px-2 text-center" style={{ color: 'var(--v3-muted)' }}>Aucune couverture</span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
