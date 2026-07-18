@@ -214,7 +214,7 @@ export default function V3OffresPage() {
                     t.highlight ? 'v3-btn-primary' : 'v3-btn-outline'
                   }`}
                 >
-                  Choisir {t.name}
+                  Choisir {t.name} — {p.price} {billing === 'monthly' ? '/ mois' : '/ an'}
                 </button>
                 <p className="mt-2 text-[11px] text-center text-[var(--v3-muted)]">
                   Sans engagement — résiliable en 1 clic
@@ -256,8 +256,8 @@ export default function V3OffresPage() {
                     <span className="text-[var(--v3-muted)] text-xs"> {u.suffix}</span>
                   </div>
                   {u.href ? (
-                    <a href={u.href} className="v3-btn v3-btn-primary text-xs px-3 py-1.5">
-                      Découvrir
+                    <a href={u.href} className="v3-btn v3-btn-primary text-xs px-3 py-1.5 whitespace-nowrap">
+                      Découvrir — {u.price}
                     </a>
                   ) : (
                     <button
@@ -266,9 +266,9 @@ export default function V3OffresPage() {
                         u.priceId &&
                         setCheckout({ priceId: u.priceId, planName: `${u.name} — ${u.price} ${u.suffix}` })
                       }
-                      className="v3-btn v3-btn-outline text-xs px-3 py-1.5"
+                      className="v3-btn v3-btn-outline text-xs px-3 py-1.5 whitespace-nowrap"
                     >
-                      Ajouter
+                      Ajouter — {u.price}
                     </button>
                   )}
                 </div>
