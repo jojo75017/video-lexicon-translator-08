@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, Check, ImageIcon, Loader2, Plus, RefreshCw, Rocket, Sparkles, Trash2, UserRound } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, ImageIcon, Loader2, Plus, RefreshCw, Rocket, Save, Sparkles, Trash2, UserRound, Wand2, FileDown, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import EbookCompleteWorkflow from '@/components/ebook/EbookCompleteWorkflow';
+import V3ExportPanel from '@/components/admin/V3ExportPanel';
 import { invokeImageFunction } from '@/lib/aiImageInvoke';
+import { callAIWriting, getProvider, getProviderKey, validateKeyFormat } from '@/services/aiWritingService';
+
 
 type WizardCharacter = {
   id: string;
@@ -109,6 +112,100 @@ export default function V3CreateWizard() {
   const [finalTitle, setFinalTitle] = useState(hub.title || '');
   const [subtitle, setSubtitle] = useState(hub.subtitle || '');
   const [authorName, setAuthorName] = useState(hub.author || 'Auteur Ebookstudio');
+
+  // Assistant IA — trouve titre / sous-titre / synopsis / catégories à partir d'une idée ou d'une niche.
+  const [aiTopic, setAiTopic] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiResult, setAiResult] = useState<{ title: string; subtitle: string; synopsis: string; categories: string[] } | null>(null);
+
+  const runAIAssistant = async () => {
+    if (aiTopic.trim().length < 4) {
+      toast.error('Décris ton idée, ton sujet ou ta niche (au moins quelques mots).');
+      return;
+    }
+    const provider = getProvider();
+    const key = getProviderKey(provider);
+    if (!key || !validateKeyFormat(provider, key)) {
+      toast.error('Ajoute et valide ta clé IA en haut de la page avant de lancer l’assistant.');
+      return;
+    }
+    setAiLoading(true);
+    try {
+      const prompt = `Tu es un éditeur senior spécialisé Amazon KDP. À partir de l'idée / niche ci-dessous, propose UN livre commercial percutant.
+Idée / niche : "${aiTopic.trim()}"
+
+Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce schéma :
+{
+  "title": "titre principal court et vendeur (max 70 caractères)",
+  "subtitle": "sous-titre bénéfice/promesse (max 120 caractères)",
+  "synopsis": "synopsis complet de 150 à 200 mots, style vendeur, en français, décrivant le contenu, le lecteur visé et la transformation obtenue",
+  "categories": ["3 à 5 catégories Amazon FR pertinentes, en français, séparées ici sous forme de tableau"]
+}`;
+      const raw = await callAIWriting(prompt, { jsonMode: true, temperature: 0.8, maxTokens: 1200 });
+      let parsed: any = null;
+      try { parsed = JSON.parse(raw); } catch {
+        const m = raw.match(/\{[\s\S]*\}/);
+        if (m) { try { parsed = JSON.parse(m[0]); } catch {} }
+      }
+      if (!parsed?.title) throw new Error('Réponse IA invalide.');
+      setAiResult({
+        title: String(parsed.title || '').slice(0, 120),
+        subtitle: String(parsed.subtitle || '').slice(0, 160),
+        synopsis: String(parsed.synopsis || '').trim(),
+        categories: Array.isArray(parsed.categories) ? parsed.categories.map(String).slice(0, 6) : [],
+      });
+      toast.success('Propositions IA prêtes — clique « Appliquer » pour remplir le formulaire.');
+    } catch (e: any) {
+      toast.error(e?.message || 'Impossible de générer les propositions.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const applyAIResult = () => {
+    if (!aiResult) return;
+    setTitle(aiResult.title);
+    setFinalTitle(aiResult.title);
+    setSubtitle(aiResult.subtitle);
+    setDescription(aiResult.synopsis);
+    const firstCat = aiResult.categories[0];
+    if (firstCat) {
+      const match = CATEGORIES.find((c) => c.toLowerCase() === firstCat.toLowerCase());
+      if (match) setCategory(match);
+      else { setCategory('Autre'); setCustomCategory(firstCat); }
+    }
+    toast.success('Formulaire rempli — vérifie et continue vers l’étape suivante.');
+  };
+
+  const saveDraft = () => {
+    try {
+      const draft = {
+        savedAt: new Date().toISOString(),
+        title, description, category, customCategory, tone, chapters, wordsPerChapter,
+        characters, finalTitle, subtitle, authorName,
+      };
+      const raw = localStorage.getItem('v3_wizard_drafts_v1');
+      const list = raw ? JSON.parse(raw) : [];
+      list.unshift({ id: crypto.randomUUID?.() || String(Date.now()), ...draft });
+      localStorage.setItem('v3_wizard_drafts_v1', JSON.stringify(list.slice(0, 20)));
+      localStorage.setItem(WIZARD_KEY, JSON.stringify(draft));
+      toast.success('Brouillon sauvegardé — retrouve-le dans « Ma bibliothèque ».');
+    } catch {
+      toast.error('Sauvegarde impossible.');
+    }
+  };
+
+  const resetWizard = () => {
+    if (!confirm('Recommencer un nouveau livre ? Le brouillon en cours sera effacé.')) return;
+    setTitle(''); setDescription(''); setCategory('Roman'); setCustomCategory('');
+    setTone('Inspirant'); setChapters(12); setWordsPerChapter(2500);
+    setCharacters([makeCharacter()]); setFinalTitle(''); setSubtitle('');
+    setAiTopic(''); setAiResult(null); setStep(0); setLaunched(false); setCompletedBook(null); setCoverUrl(null);
+    coverTriggeredRef.current = false;
+    ['ebook_workflow_progress', 'ebook_workflow_results', 'ebook_workflow_sync_data'].forEach((k) => localStorage.removeItem(k));
+    toast.success('Nouveau livre — formulaire réinitialisé.');
+  };
+
 
   const effectiveCategory = category === 'Autre' ? (customCategory.trim() || 'Autre') : category;
   const totalWords = chapters * wordsPerChapter;
@@ -269,15 +366,120 @@ export default function V3CreateWizard() {
             </div>
           </div>
         )}
+
+        {completedBook && (
+          <V3ExportPanel
+            manuscript={(completedBook.chapters || []).map((c: any) => `# ${c.title || `Chapitre ${c.number}`}\n\n${c.content || ''}`).join('\n\n')}
+            title={finalTitle}
+            subtitle={subtitle}
+            author={authorName}
+          />
+        )}
+
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={saveDraft}
+            className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold"
+            style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+          >
+            <Save className="h-4 w-4" /> Sauvegarder le brouillon
+          </button>
+          <button
+            type="button"
+            onClick={resetWizard}
+            className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold"
+            style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-orange-600)', background: 'var(--v3-paper)' }}
+          >
+            <RotateCcw className="h-4 w-4" /> Nouveau livre
+          </button>
+        </div>
       </div>
     );
   }
+
 
   const steps = ['Idée', 'Style', 'Personnages', 'Titre'];
 
   return (
     <div className="space-y-8">
+      {/* Barre d'actions rapides */}
+      <div className="flex flex-wrap gap-2 justify-end">
+        <button
+          type="button"
+          onClick={saveDraft}
+          className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold"
+          style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+        >
+          <Save className="h-3.5 w-3.5" /> Sauvegarder brouillon
+        </button>
+        <button
+          type="button"
+          onClick={resetWizard}
+          className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold"
+          style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-orange-600)', background: 'var(--v3-paper)' }}
+        >
+          <RotateCcw className="h-3.5 w-3.5" /> Nouveau livre
+        </button>
+      </div>
+
+      {/* Assistant IA : titre, sous-titre, synopsis, catégories */}
+      <div className="rounded-[24px] border p-5" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-orange-50)' }}>
+        <div className="flex items-center gap-2">
+          <span className="v3-chip v3-chip-orange"><Wand2 className="h-3.5 w-3.5" /> Assistant IA</span>
+          <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--v3-muted)' }}>
+            Trouve titre · sous-titre · synopsis · catégories
+          </span>
+        </div>
+        <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>
+          Décris ton idée, ton sujet ou une niche Amazon. L'IA te propose un titre commercial, un sous-titre, un synopsis de ~150 mots et jusqu'à 5 catégories pertinentes.
+        </p>
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+          <input
+            value={aiTopic}
+            onChange={(e) => setAiTopic(e.target.value)}
+            placeholder="Ex : livre pratique pour parents débordés, niche méditation pour ados, roman feel-good à Rome…"
+            className="flex-1 rounded-xl border px-3 py-2 text-sm outline-none"
+            style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+          />
+          <button
+            type="button"
+            onClick={runAIAssistant}
+            disabled={aiLoading}
+            className="inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-bold disabled:opacity-60"
+            style={{ background: 'var(--v3-orange-600)', color: '#fff' }}
+          >
+            {aiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            Trouver des idées
+          </button>
+        </div>
+        {aiResult && (
+          <div className="mt-4 rounded-xl border p-4 text-sm space-y-2" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)', color: 'var(--v3-ink)' }}>
+            <div><strong>Titre :</strong> {aiResult.title}</div>
+            {aiResult.subtitle && <div><strong>Sous-titre :</strong> {aiResult.subtitle}</div>}
+            <div><strong>Synopsis :</strong> {aiResult.synopsis}</div>
+            {aiResult.categories.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2">
+                <strong>Catégories :</strong>
+                {aiResult.categories.map((c) => (
+                  <span key={c} className="rounded-full border px-2 py-0.5 text-xs" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-muted)' }}>{c}</span>
+                ))}
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={applyAIResult}
+              className="mt-2 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold"
+              style={{ background: 'var(--v3-orange-600)', color: '#fff' }}
+            >
+              <Check className="h-3.5 w-3.5" /> Appliquer au formulaire
+            </button>
+          </div>
+        )}
+      </div>
+
       <div className="grid gap-2 sm:grid-cols-4">
+
         {steps.map((label, index) => {
           const active = index === step;
           const done = index < step;
