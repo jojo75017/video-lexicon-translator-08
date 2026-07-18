@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Check, Sparkles, Crown, Feather } from 'lucide-react';
+import { Check, Sparkles, Crown, Feather, Info, X } from 'lucide-react';
 import V3SubscribeCheckout from '@/components/v3public/V3SubscribeCheckout';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 type Billing = 'monthly' | 'annual';
 
