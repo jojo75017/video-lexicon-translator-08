@@ -45,7 +45,8 @@ const NAV = [
 
 export default function V3Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
+  const currentTab = new URLSearchParams(search).get('tab');
 
   return (
     <aside
