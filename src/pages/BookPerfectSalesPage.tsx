@@ -4,7 +4,7 @@ import {
   ArrowLeft, BookOpen, Sparkles, Bug, FileText, Feather, ShoppingCart,
   Check, ShieldCheck, Clock, Zap, FileCheck2, Crown, Star, RotateCcw,
 } from 'lucide-react';
-import StripeCheckoutButton from '@/components/StripeCheckoutButton';
+import BookPerfectCheckout from '@/components/bookperfect/BookPerfectCheckout';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
 
