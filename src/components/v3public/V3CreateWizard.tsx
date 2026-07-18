@@ -141,7 +141,7 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
   "synopsis": "synopsis complet de 150 à 200 mots, style vendeur, en français, décrivant le contenu, le lecteur visé et la transformation obtenue",
   "categories": ["3 à 5 catégories Amazon FR pertinentes, en français, séparées ici sous forme de tableau"]
 }`;
-      const raw = await callAIWriting(prompt, { jsonMode: true, temperature: 0.8, maxTokens: 1200 });
+      const raw = await callAIWriting(prompt, { jsonMode: true, temperature: 0.8, maxTokens: 4096 });
       let parsed: any = null;
       try { parsed = JSON.parse(raw); } catch {
         const m = raw.match(/\{[\s\S]*\}/);
