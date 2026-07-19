@@ -688,6 +688,20 @@ Règles :
     <div className="space-y-8">
       {/* Barre d'actions rapides */}
       <div className="flex flex-wrap gap-2 justify-end">
+        <Link
+          to="/cover-studio"
+          className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold"
+          style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+        >
+          <Palette className="h-3.5 w-3.5" /> Couverture
+        </Link>
+        <Link
+          to="/ambiances"
+          className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold"
+          style={{ borderColor: 'var(--v3-orange-600)', color: 'var(--v3-orange-600)', background: 'var(--v3-paper)' }}
+        >
+          <Sparkles className="h-3.5 w-3.5" /> Ambiances
+        </Link>
         <button
           type="button"
           onClick={saveDraft}
@@ -705,6 +719,7 @@ Règles :
           <RotateCcw className="h-3.5 w-3.5" /> Nouveau livre
         </button>
       </div>
+
 
       {/* Assistant IA : titre, sous-titre, synopsis, catégories */}
       <div className="rounded-[24px] border p-5" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-orange-50)' }}>
