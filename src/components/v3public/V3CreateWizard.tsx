@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, Check, ImageIcon, Loader2, Plus, RefreshCw, Rocket, Save, Sparkles, Trash2, UserRound, Wand2, FileDown, RotateCcw } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowLeft, ArrowRight, Check, ImageIcon, Loader2, Palette, Plus, RefreshCw, Rocket, Save, Sparkles, Trash2, UserRound, Wand2, FileDown, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import EbookCompleteWorkflow from '@/components/ebook/EbookCompleteWorkflow';
 import V3ExportPanel from '@/components/admin/V3ExportPanel';
@@ -644,6 +645,20 @@ Règles :
         )}
 
         <div className="flex flex-wrap gap-3">
+          <Link
+            to="/cover-studio"
+            className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold"
+            style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+          >
+            <Palette className="h-4 w-4" /> Couverture
+          </Link>
+          <Link
+            to="/ambiances"
+            className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold"
+            style={{ borderColor: 'var(--v3-orange-600)', color: 'var(--v3-orange-600)', background: 'var(--v3-paper)' }}
+          >
+            <Sparkles className="h-4 w-4" /> Ambiances
+          </Link>
           <button
             type="button"
             onClick={saveDraft}
@@ -661,6 +676,7 @@ Règles :
             <RotateCcw className="h-4 w-4" /> Nouveau livre
           </button>
         </div>
+
       </div>
     );
   }
@@ -672,6 +688,20 @@ Règles :
     <div className="space-y-8">
       {/* Barre d'actions rapides */}
       <div className="flex flex-wrap gap-2 justify-end">
+        <Link
+          to="/cover-studio"
+          className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold"
+          style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+        >
+          <Palette className="h-3.5 w-3.5" /> Couverture
+        </Link>
+        <Link
+          to="/ambiances"
+          className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold"
+          style={{ borderColor: 'var(--v3-orange-600)', color: 'var(--v3-orange-600)', background: 'var(--v3-paper)' }}
+        >
+          <Sparkles className="h-3.5 w-3.5" /> Ambiances
+        </Link>
         <button
           type="button"
           onClick={saveDraft}
@@ -689,6 +719,7 @@ Règles :
           <RotateCcw className="h-3.5 w-3.5" /> Nouveau livre
         </button>
       </div>
+
 
       {/* Assistant IA : titre, sous-titre, synopsis, catégories */}
       <div className="rounded-[24px] border p-5" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-orange-50)' }}>
