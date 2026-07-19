@@ -98,8 +98,11 @@ export default function V3Header({ isAuthed = false }: { isAuthed?: boolean }) {
               {t.label}
             </NavLink>
           ))}
-        </div>
       </div>
+
+      {/* Ligne 3 — barre outils V2 catégorisés */}
+      <V3ToolsBar />
+
 
       {/* Mobile menu */}
       {open && (
