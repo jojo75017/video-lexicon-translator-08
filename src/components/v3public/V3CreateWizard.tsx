@@ -645,6 +645,20 @@ Règles :
         )}
 
         <div className="flex flex-wrap gap-3">
+          <Link
+            to="/cover-studio"
+            className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold"
+            style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+          >
+            <Palette className="h-4 w-4" /> Couverture
+          </Link>
+          <Link
+            to="/ambiances"
+            className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold"
+            style={{ borderColor: 'var(--v3-orange-600)', color: 'var(--v3-orange-600)', background: 'var(--v3-paper)' }}
+          >
+            <Sparkles className="h-4 w-4" /> Ambiances
+          </Link>
           <button
             type="button"
             onClick={saveDraft}
@@ -662,6 +676,7 @@ Règles :
             <RotateCcw className="h-4 w-4" /> Nouveau livre
           </button>
         </div>
+
       </div>
     );
   }
