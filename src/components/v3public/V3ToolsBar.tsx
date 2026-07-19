@@ -16,8 +16,8 @@ export default function V3ToolsBar() {
   }, []);
 
   return (
-    <div className="border-t border-black/5 bg-white/80" ref={ref}>
-      <div className="max-w-7xl mx-auto px-5 md:px-8 h-11 flex items-center gap-1 overflow-x-auto v3-scroll-x relative">
+    <div className="border-t border-black/5 bg-white/80 relative" ref={ref}>
+      <div className="max-w-7xl mx-auto px-5 md:px-8 py-2 flex items-center flex-wrap gap-1 relative">
         <span className="text-[11px] uppercase tracking-wider text-[var(--v3-muted)] mr-3 shrink-0">
           Tous les outils
         </span>
