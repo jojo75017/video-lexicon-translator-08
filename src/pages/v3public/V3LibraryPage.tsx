@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, Sparkles, Settings, Headphones, AlertCircle, RefreshCw, ImageIcon, Loader2 } from 'lucide-react';
+import { BookOpen, Sparkles, Settings, Headphones, AlertCircle, RefreshCw, ImageIcon, Loader2, Trash2, Filter } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import AudiobookOfferCard from '@/components/v3public/AudiobookOfferCard';
 import { toast } from 'sonner';
@@ -20,11 +20,13 @@ const WORKFLOW_RESULTS_KEY = 'ebook_workflow_results';
 
 export default function V3LibraryPage() {
   const nav = useNavigate();
-  const [rows, setRows] = useState<Row[]>([]);
+  
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState<string | null>(null);
   const [refreshTick, setRefreshTick] = useState(0);
   const [audioModal, setAudioModal] = useState<{ id: string; title: string } | null>(null);
+  const [dedup, setDedup] = useState<boolean>(() => localStorage.getItem('v3_lib_dedup') !== '0');
+  const [rawRows, setRawRows] = useState<Row[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -36,10 +38,56 @@ export default function V3LibraryPage() {
         .select('id,title,author_name,kdp_categories,updated_at,chapters,ebook_images')
         .eq('user_id', auth.user.id)
         .order('updated_at', { ascending: false });
-      setRows((data as Row[]) || []);
+      setRawRows((data as Row[]) || []);
       setLoading(false);
     })();
   }, [nav, refreshTick]);
+
+  useEffect(() => { localStorage.setItem('v3_lib_dedup', dedup ? '1' : '0'); }, [dedup]);
+
+  const rows = useMemo(() => {
+    if (!dedup) return rawRows;
+    // Dedup by normalized title: keep the "best" (most chapters, else most recent)
+    const groups = new Map<string, Row[]>();
+    for (const r of rawRows) {
+      const key = (r.title || '').trim().toLowerCase().replace(/\s+/g, ' ') || r.id;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(r);
+    }
+    const kept: Row[] = [];
+    for (const list of groups.values()) {
+      list.sort((a, b) => {
+        const ca = Array.isArray(a.chapters) ? a.chapters.length : 0;
+        const cb = Array.isArray(b.chapters) ? b.chapters.length : 0;
+        if (cb !== ca) return cb - ca;
+        return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+      });
+      kept.push(list[0]);
+    }
+    kept.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+    return kept;
+  }, [rawRows, dedup]);
+
+  const duplicateCount = rawRows.length - rows.length;
+
+  const cleanupDuplicates = async () => {
+    if (!confirm(`Supprimer définitivement ${duplicateCount} doublon(s) ? Le meilleur exemplaire de chaque titre est conservé.`)) return;
+    const keepIds = new Set(rows.map((r) => r.id));
+    const toDelete = rawRows.filter((r) => !keepIds.has(r.id)).map((r) => r.id);
+    if (toDelete.length === 0) return;
+    const { error } = await supabase.from('ebook_projects').delete().in('id', toDelete);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`${toDelete.length} doublon(s) supprimé(s).`);
+    setRefreshTick((t) => t + 1);
+  };
+
+  const deleteOne = async (id: string) => {
+    if (!confirm('Supprimer ce livre définitivement ?')) return;
+    const { error } = await supabase.from('ebook_projects').delete().eq('id', id);
+    if (error) { toast.error(error.message); return; }
+    toast.success('Livre supprimé.');
+    setRefreshTick((t) => t + 1);
+  };
 
   // Detect unsaved local workflow work
   const localUnsaved = useMemo(() => {
@@ -67,7 +115,19 @@ export default function V3LibraryPage() {
           <h1 className="v3-serif text-4xl font-bold">Ma bibliothèque</h1>
           <p className="text-sm text-[var(--v3-muted)] mt-1">{email}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          <button
+            onClick={() => setDedup((v) => !v)}
+            className={`v3-btn ${dedup ? 'v3-btn-primary' : 'v3-btn-outline'}`}
+            title="Regrouper automatiquement les livres portant le même titre"
+          >
+            <Filter className="w-4 h-4" /> {dedup ? 'Doublons masqués' : 'Afficher tout'}
+          </button>
+          {duplicateCount > 0 && (
+            <button onClick={cleanupDuplicates} className="v3-btn v3-btn-outline text-red-600 border-red-300 hover:bg-red-50" title="Supprimer les doublons">
+              <Trash2 className="w-4 h-4" /> Nettoyer {duplicateCount} doublon{duplicateCount > 1 ? 's' : ''}
+            </button>
+          )}
           <button onClick={() => setRefreshTick((t) => t + 1)} className="v3-btn v3-btn-outline" title="Rafraîchir">
             <RefreshCw className="w-4 h-4" /> Rafraîchir
           </button>
@@ -109,7 +169,7 @@ export default function V3LibraryPage() {
                 <span className="text-xs text-[var(--v3-muted)]">Chaque livre peut être converti en audio (option 9,99 €)</span>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-                {done.map((r) => <BookCard key={r.id} r={r} done onAudio={() => setAudioModal({ id: r.id, title: r.title })} onUpdated={() => setRefreshTick((t) => t + 1)} />)}
+                {done.map((r) => <BookCard key={r.id} r={r} done onAudio={() => setAudioModal({ id: r.id, title: r.title })} onUpdated={() => setRefreshTick((t) => t + 1)} onDelete={() => deleteOne(r.id)} />)}
               </div>
             </div>
           )}
@@ -117,7 +177,7 @@ export default function V3LibraryPage() {
             <div className="mt-12">
               <h2 className="text-lg font-bold mb-4">En cours <span className="text-sm font-normal text-[var(--v3-muted)]">· {started.length}</span></h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-                {started.map((r) => <BookCard key={r.id} r={r} onAudio={() => setAudioModal({ id: r.id, title: r.title })} onUpdated={() => setRefreshTick((t) => t + 1)} />)}
+                {started.map((r) => <BookCard key={r.id} r={r} onAudio={() => setAudioModal({ id: r.id, title: r.title })} onUpdated={() => setRefreshTick((t) => t + 1)} onDelete={() => deleteOne(r.id)} />)}
               </div>
             </div>
           )}
@@ -138,7 +198,7 @@ export default function V3LibraryPage() {
   );
 }
 
-function BookCard({ r, done, onAudio, onUpdated }: { r: Row; done?: boolean; onAudio: () => void; onUpdated: () => void }) {
+function BookCard({ r, done, onAudio, onUpdated, onDelete }: { r: Row; done?: boolean; onAudio: () => void; onUpdated: () => void; onDelete: () => void }) {
   const [cover, setCover] = useState<string | undefined>(
     (Array.isArray(r.ebook_images) && r.ebook_images[0]?.url) || undefined,
   );
@@ -246,6 +306,13 @@ function BookCard({ r, done, onAudio, onUpdated }: { r: Row; done?: boolean; onA
         title="Convertir ce livre en audiobook (option payante)"
       >
         <Headphones className="w-3.5 h-3.5" /> Audio · 9,99 €
+      </button>
+      <button
+        onClick={onDelete}
+        className="mt-1 inline-flex items-center justify-center gap-1.5 rounded-full border border-red-200 bg-white hover:bg-red-50 text-[11px] font-semibold text-red-600 py-1.5 px-2 transition"
+        title="Supprimer ce livre définitivement"
+      >
+        <Trash2 className="w-3.5 h-3.5" /> Supprimer
       </button>
     </div>
   );
