@@ -62,7 +62,7 @@ export default function V3PendingLaunchTab() {
           </li>
           <li className="flex gap-2">
             <XCircle className="h-4 w-4 mt-0.5 shrink-0" style={{ color: '#b04747' }} />
-            <span><strong>Abandonné :</strong> l'ancienne offre 97€ (octobre) / 197€ (novembre+) en 1×/2×/3× et le Pack Full 347€.</span>
+            <span><strong>Abandonné :</strong> les anciennes offres de paiement unique en 1×/2×/3× et les packs Full.</span>
           </li>
         </ul>
       </div>
