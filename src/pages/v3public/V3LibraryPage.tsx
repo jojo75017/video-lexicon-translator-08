@@ -20,7 +20,7 @@ const WORKFLOW_RESULTS_KEY = 'ebook_workflow_results';
 
 export default function V3LibraryPage() {
   const nav = useNavigate();
-  const [, setRows] = useState<Row[]>([]);
+  
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState<string | null>(null);
   const [refreshTick, setRefreshTick] = useState(0);
