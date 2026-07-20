@@ -533,6 +533,11 @@ function cleanGeneratedText(text: string): string {
   if (!text || typeof text !== 'string') return text;
   
   return text
+    // Strip markdown code fences (```json ... ```, ``` ... ```)
+    .replace(/```(?:json|javascript|js|ts|typescript|md|markdown)?/gi, '')
+    .replace(/```/g, '')
+    // Strip JSON key fragments like `numero": 2,` or `"titre":`
+    .replace(/\b(?:numero|number|numéro|titre|title|nom|chapterTitle|heading|objectif|goal|resume|summary|description|nombreMotsPrevu|sousSections|subSections|pointsCles|keyPoints|accroche|lienAvecPrecedent)\s*"?\s*:\s*"?\s*\d*\s*,?/gi, '')
     .replace(/\\"/g, '')
     .replace(/\\'/g, '')
     .replace(/\\\\/g, '')
@@ -550,6 +555,7 @@ function cleanGeneratedText(text: string): string {
     .replace(/^"+/gm, '')
     .replace(/"+$/gm, '')
     .replace(/(?<![a-zA-ZÀ-ÿ])"(?![a-zA-ZÀ-ÿ])/g, '')
+    .replace(/^[\s:–—\-,{}\[\]"']+|[\s:–—\-,{}\[\]"']+$/g, '')
     .replace(/  +/g, ' ')
     .replace(/ ([.,;:!?])/g, '$1')
     .replace(/\.([A-ZÀ-ÖØ-öø-ÿa-z])/g, '. $1')

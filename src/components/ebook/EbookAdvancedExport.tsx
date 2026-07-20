@@ -53,9 +53,34 @@ const stripChapterPrefix = (title: string, i: number): string => {
 };
 
 
+/** Nettoie un titre de chapitre : retire ```json et fragments JSON (`numero": 2,`, etc.). */
+const sanitizeChapterTitle = (raw: string, idx: number): string => {
+  if (!raw) return `Chapitre ${idx + 1}`;
+  let t = String(raw)
+    .replace(/```(?:json|javascript|js|ts|typescript|md|markdown)?/gi, '')
+    .replace(/```/g, '')
+    .replace(/\b(?:numero|number|numéro|titre|title|nom|chapterTitle|heading|objectif|goal|resume|summary|description)\s*"?\s*:\s*"?\s*\d*\s*,?/gi, '')
+    .replace(/[{}\[\]"«»“”]+/g, '')
+    .replace(/^[\s:–—\-,.]+|[\s:–—\-,.]+$/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+  if (!t || /^\d+[,.]?$/.test(t)) return `Chapitre ${idx + 1}`;
+  return t;
+};
+
 export const EbookAdvancedExport: React.FC<EbookAdvancedExportProps> = ({
-  ebookTitle, authorName, chapters, preface, conclusion, characters, coverImage, trimSize,
+  ebookTitle, authorName, chapters: rawChapters, preface, conclusion, characters, coverImage, trimSize,
 }) => {
+  // Sanitize toutes les entrées avant export (protège TOC + corps).
+  const chapters = useMemo(
+    () => (rawChapters || []).map((ch, i) => ({
+      ...ch,
+      title: sanitizeChapterTitle(ch.title, i),
+      subChapters: (ch.subChapters || []).map((s, j) => ({ ...s, title: sanitizeChapterTitle(s.title, j) })),
+    })),
+    [rawChapters]
+  );
+
   const { formatId } = useKdpFormat();
   const [selectedFormat, setSelectedFormat] = useState<ExportFormat>('docx-kdp');
   const [isExporting, setIsExporting] = useState(false);
