@@ -77,29 +77,8 @@ export default function V3Header({ isAuthed = false }: { isAuthed?: boolean }) {
         </button>
       </div>
 
-      {/* Ligne 2 — onglets livres spéciaux */}
-      <div className="border-t border-black/5 bg-white/60">
-        <div className="max-w-7xl mx-auto px-5 md:px-8 h-11 flex items-center gap-1 overflow-x-auto v3-scroll-x">
-          <span className="text-[11px] uppercase tracking-wider text-[var(--v3-muted)] mr-3 shrink-0">
-            Livres spéciaux
-          </span>
-          {SPECIAL_BOOK_TABS.map((t) => (
-            <NavLink
-              key={t.slug}
-              to={`/v3/livres/${t.slug}`}
-              className={({ isActive }) =>
-                `shrink-0 px-3 py-1.5 rounded-full text-[13px] font-medium transition-colors ${
-                  isActive
-                    ? 'bg-[var(--v3-orange)] text-white'
-                    : 'text-[var(--v3-ink)] hover:bg-[var(--v3-orange-50)] hover:text-[var(--v3-orange-600)]'
-                }`
-              }
-            >
-              {t.label}
-            </NavLink>
-          ))}
-        </div>
-      </div>
+      {/* Les onglets « Livres spéciaux » sont désormais dans la barre latérale */}
+
 
 
       {/* Ligne 3 — barre outils V2 catégorisés */}
