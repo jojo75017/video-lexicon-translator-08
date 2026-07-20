@@ -198,7 +198,7 @@ export default function V3LibraryPage() {
   );
 }
 
-function BookCard({ r, done, onAudio, onUpdated }: { r: Row; done?: boolean; onAudio: () => void; onUpdated: () => void }) {
+function BookCard({ r, done, onAudio, onUpdated, onDelete }: { r: Row; done?: boolean; onAudio: () => void; onUpdated: () => void; onDelete: () => void }) {
   const [cover, setCover] = useState<string | undefined>(
     (Array.isArray(r.ebook_images) && r.ebook_images[0]?.url) || undefined,
   );
