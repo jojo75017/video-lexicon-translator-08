@@ -307,6 +307,12 @@ function BookCard({ r, done, onAudio, onUpdated, onDelete }: { r: Row; done?: bo
       >
         <Headphones className="w-3.5 h-3.5" /> Audio · 9,99 €
       </button>
+      <button
+        onClick={onDelete}
+        className="mt-1 inline-flex items-center justify-center gap-1.5 rounded-full border border-red-200 bg-white hover:bg-red-50 text-[11px] font-semibold text-red-600 py-1.5 px-2 transition"
+        title="Supprimer ce livre définitivement"
+      >
+        <Trash2 className="w-3.5 h-3.5" /> Supprimer
     </div>
   );
 }
