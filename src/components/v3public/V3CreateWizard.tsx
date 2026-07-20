@@ -587,8 +587,9 @@ Règles :
                 Sauvegarder maintenant
               </button>
             </div>
-
+          </div>
         </div>
+
 
         <EbookCompleteWorkflow
           key={`${finalTitle}-${chapters}-${wordsPerChapter}`}
