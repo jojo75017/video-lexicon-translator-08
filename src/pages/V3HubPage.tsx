@@ -612,7 +612,7 @@ const V3HubPage: React.FC = () => {
         </div>
       </nav>
 
-      <main className="mx-auto max-w-7xl px-4 py-8">
+      <main className={`mx-auto px-4 md:px-8 py-8 ${activeTab === 'outils' || activeTab === 'guides' ? 'max-w-none' : 'max-w-7xl'}`}>
         {/* ===================== ONGLET PARCOURS ===================== */}
         {activeTab === 'parcours' && (
           <>
