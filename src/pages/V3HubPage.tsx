@@ -612,7 +612,7 @@ const V3HubPage: React.FC = () => {
         </div>
       </nav>
 
-      <main className="mx-auto max-w-7xl px-4 py-8">
+      <main className={`mx-auto px-4 md:px-8 py-8 ${activeTab === 'outils' || activeTab === 'guides' ? 'max-w-none' : 'max-w-7xl'}`}>
         {/* ===================== ONGLET PARCOURS ===================== */}
         {activeTab === 'parcours' && (
           <>
@@ -1158,18 +1158,16 @@ const V3HubPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Tarif + CTA */}
+              {/* CTA simplifié — le tarif détaillé vit dans l'onglet Offres */}
               <div className="rounded-2xl border p-6 sm:p-8 text-center" style={{ background: `linear-gradient(135deg, ${AMBER_SOFT}, #fff)`, borderColor: `${AMBER}55` }}>
                 <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-wider" style={{ background: '#fff', borderColor: `${AMBER}44`, color: AMBER_DEEP }}>
-                  <Gem className="h-3.5 w-3.5" /> Pack Premium
+                  <Gem className="h-3.5 w-3.5" /> Inclus dans Ebookstudio V3
                 </div>
-                <div className="mt-3 flex items-end justify-center gap-2">
-                  <span className="text-5xl font-bold" style={{ color: INK }}>197€</span>
-                  <span className="mb-1.5 text-sm" style={{ color: '#8a7860' }}>paiement unique</span>
-                </div>
+                <h4 className="mt-3 text-2xl font-medium leading-tight" style={{ fontFamily: SERIF, color: INK }}>
+                  Prêt à générer votre documentation ?
+                </h4>
                 <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed" style={{ color: '#6f5e47' }}>
-                  Accès complet au module, tous les livrables, tous les templates, tous les formats d'export et la bibliothèque de
-                  projets. Essayez gratuitement avec une première génération courte, sans engagement.
+                  Ouvrez le module Documentation Studio pour lancer une première génération, ou consultez les offres pour connaître les paliers d'accès et packs disponibles.
                 </p>
                 <div className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-2">
                   <button
@@ -1177,7 +1175,7 @@ const V3HubPage: React.FC = () => {
                     className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5"
                     style={{ background: AMBER_DEEP }}
                   >
-                    <Sparkles className="h-4 w-4" /> Essayer gratuitement
+                    <Sparkles className="h-4 w-4" /> Ouvrir le module
                   </button>
                   <button
                     onClick={() => setActiveTab('offres')}
@@ -1188,6 +1186,7 @@ const V3HubPage: React.FC = () => {
                   </button>
                 </div>
               </div>
+
 
             </div>
 
