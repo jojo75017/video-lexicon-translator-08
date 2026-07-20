@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, Sparkles, Settings, Headphones, AlertCircle, RefreshCw } from 'lucide-react';
+import { BookOpen, Sparkles, Settings, Headphones, AlertCircle, RefreshCw, ImageIcon, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import AudiobookOfferCard from '@/components/v3public/AudiobookOfferCard';
+import { toast } from 'sonner';
 
 type Row = {
   id: string;
   title: string;
+  author_name?: string | null;
+  kdp_categories?: string | null;
   updated_at: string;
   chapters?: any[] | null;
   ebook_images?: any[] | null;
