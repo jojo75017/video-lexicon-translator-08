@@ -534,7 +534,7 @@ const V3HubPage: React.FC = () => {
             </button>
             <button onClick={() => setActiveTab('offres')} data-tour="price" className="inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-sm font-semibold border transition-all duration-300 ease-out hover:bg-[#FFF8F0] hover:border-[#E8951E] hover:-translate-y-1 hover:shadow-md active:translate-y-0 active:scale-[0.99]"
               style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}>
-              <Sparkles className="h-4 w-4" /> Dès 197€ à vie · 3× ou 6×
+              <Sparkles className="h-4 w-4" /> Voir les offres & packs
             </button>
             <button onClick={() => setActiveTab('script')} className="inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-sm font-bold border transition-all duration-300 ease-out hover:bg-[#FFF8F0] hover:border-[#E8951E] hover:-translate-y-1 hover:shadow-md active:translate-y-0 active:scale-[0.99]"
               style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}>
