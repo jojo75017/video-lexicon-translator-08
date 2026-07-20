@@ -881,75 +881,108 @@ Règles :
       )}
 
       {step === 2 && (
-        <div className="space-y-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h2 className="v3-serif text-4xl font-bold" style={{ color: 'var(--v3-ink)' }}>Sommaire du livre</h2>
-              <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>Génère puis corrige les titres et objectifs avant de lancer les agents.</p>
-            </div>
-            <button
-              type="button"
-              onClick={generateOutline}
-              disabled={outlineLoading}
-              className="v3-btn v3-btn-primary"
-            >
-              {outlineLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-              Générer le sommaire
-            </button>
-          </div>
-
-          <div className="rounded-[24px] border p-4" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-orange-50)' }}>
-            <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
-                <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Chapitres</span>
-                <strong className="mt-1 block text-lg" style={{ color: 'var(--v3-ink)' }}>{chapters}</strong>
+        <div className="space-y-8">
+          {/* Hero header */}
+          <div className="relative overflow-hidden rounded-[28px] border p-8" style={{ borderColor: 'var(--v3-border)', background: 'linear-gradient(135deg, var(--v3-orange-50) 0%, var(--v3-paper) 100%)' }}>
+            <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full opacity-20" style={{ background: 'var(--v3-orange-600)' }} />
+            <div className="relative flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+              <div className="max-w-xl">
+                <span className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider" style={{ borderColor: 'var(--v3-orange-600)', color: 'var(--v3-orange-600)', background: 'var(--v3-paper)' }}>
+                  <Sparkles className="h-3 w-3" /> Étape 3 · Sommaire
+                </span>
+                <h2 className="v3-serif mt-3 text-4xl font-bold leading-tight sm:text-5xl" style={{ color: 'var(--v3-ink)' }}>
+                  L'architecture<br/>de votre récit
+                </h2>
+                <p className="mt-3 text-base leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
+                  Chaque chapitre est une promesse faite au lecteur. Génère un sommaire cohérent, puis affine les titres et les objectifs — les agents suivront ta ligne éditoriale à la lettre.
+                </p>
               </div>
-              <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
-                <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Mots / chapitre</span>
-                <strong className="mt-1 block text-lg" style={{ color: 'var(--v3-ink)' }}>{wordsPerChapter.toLocaleString('fr-FR')}</strong>
-              </div>
-              <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
-                <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Validation</span>
-                <strong className="mt-1 block text-lg" style={{ color: canStepOutline ? 'var(--v3-orange-600)' : 'var(--v3-muted)' }}>
-                  {normalizedOutline.length}/{chapters}
-                </strong>
-              </div>
+              <button
+                type="button"
+                onClick={generateOutline}
+                disabled={outlineLoading}
+                className="v3-btn v3-btn-primary shrink-0 shadow-lg"
+              >
+                {outlineLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                {outline.length && !outlineLoading ? 'Régénérer' : 'Générer le sommaire'}
+              </button>
             </div>
           </div>
 
-          <div className="space-y-3">
-            {outline.slice(0, chapters).map((chapter, index) => (
-              <div key={chapter.id} className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <span className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>Chapitre {index + 1}</span>
-                  <button type="button" onClick={() => removeOutlineChapter(chapter.id)} className="rounded-full p-2" style={{ color: 'var(--v3-muted)' }} aria-label="Supprimer ce chapitre"><Trash2 className="h-4 w-4" /></button>
-                </div>
-                <input
-                  value={chapter.titre}
-                  onChange={(event) => updateOutline(chapter.id, 'titre', event.target.value)}
-                  placeholder="Titre précis du chapitre"
-                  className="w-full rounded-2xl border px-4 py-3 font-bold outline-none"
-                  style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
-                />
-                <textarea
-                  value={chapter.objectif}
-                  onChange={(event) => updateOutline(chapter.id, 'objectif', event.target.value)}
-                  rows={2}
-                  placeholder="Objectif éditorial de ce chapitre"
-                  className="mt-3 w-full resize-none rounded-2xl border px-4 py-3 outline-none"
-                  style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
-                />
+          {/* Stats bar */}
+          <div className="grid gap-3 sm:grid-cols-4">
+            <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
+              <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--v3-muted)' }}>Chapitres</span>
+              <strong className="v3-serif mt-1 block text-3xl" style={{ color: 'var(--v3-ink)' }}>{chapters}</strong>
+            </div>
+            <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
+              <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--v3-muted)' }}>Mots / chapitre</span>
+              <strong className="v3-serif mt-1 block text-3xl" style={{ color: 'var(--v3-ink)' }}>{wordsPerChapter.toLocaleString('fr-FR')}</strong>
+            </div>
+            <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
+              <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--v3-muted)' }}>Total estimé</span>
+              <strong className="v3-serif mt-1 block text-3xl" style={{ color: 'var(--v3-ink)' }}>{totalWords.toLocaleString('fr-FR')}</strong>
+              <span className="text-[10px]" style={{ color: 'var(--v3-muted)' }}>mots · ~{Math.round(totalWords / 250)} pages</span>
+            </div>
+            <div className="rounded-2xl border p-4" style={{ borderColor: canStepOutline ? 'var(--v3-orange-600)' : 'var(--v3-border)', background: canStepOutline ? 'var(--v3-orange-50)' : 'var(--v3-paper)' }}>
+              <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--v3-muted)' }}>Validation</span>
+              <strong className="v3-serif mt-1 block text-3xl" style={{ color: canStepOutline ? 'var(--v3-orange-600)' : 'var(--v3-ink)' }}>
+                {normalizedOutline.length}<span className="text-lg" style={{ color: 'var(--v3-muted)' }}>/{chapters}</span>
+              </strong>
+              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full" style={{ background: 'var(--v3-border)' }}>
+                <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(100, (normalizedOutline.length / chapters) * 100)}%`, background: 'var(--v3-orange-600)' }} />
               </div>
-            ))}
+            </div>
+          </div>
+
+          {/* Chapter timeline */}
+          <div className="relative">
+            <div className="absolute bottom-4 left-[27px] top-4 w-px" style={{ background: 'var(--v3-border)' }} aria-hidden />
+            <div className="space-y-3">
+              {outline.slice(0, chapters).map((chapter, index) => {
+                const isValid = chapter.titre.length >= 4 && chapter.objectif.length >= 8;
+                return (
+                  <div key={chapter.id} className="group relative flex gap-4">
+                    <div className="relative z-10 flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 font-bold shadow-sm transition-all group-hover:scale-105" style={{ borderColor: isValid ? 'var(--v3-orange-600)' : 'var(--v3-border)', background: isValid ? 'var(--v3-orange-600)' : 'var(--v3-paper)', color: isValid ? 'var(--v3-paper)' : 'var(--v3-muted)' }}>
+                      <span className="v3-serif text-lg">{String(index + 1).padStart(2, '0')}</span>
+                    </div>
+                    <div className="flex-1 rounded-2xl border p-5 transition-all hover:shadow-md" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
+                      <div className="mb-2 flex items-center justify-between gap-3">
+                        <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--v3-muted)' }}>
+                          Chapitre {index + 1} · ~{wordsPerChapter.toLocaleString('fr-FR')} mots
+                        </span>
+                        <button type="button" onClick={() => removeOutlineChapter(chapter.id)} className="rounded-full p-2 opacity-0 transition hover:bg-red-50 hover:text-red-600 group-hover:opacity-100" style={{ color: 'var(--v3-muted)' }} aria-label="Supprimer ce chapitre"><Trash2 className="h-4 w-4" /></button>
+                      </div>
+                      <input
+                        value={chapter.titre}
+                        onChange={(event) => updateOutline(chapter.id, 'titre', event.target.value)}
+                        placeholder="Titre évocateur du chapitre…"
+                        className="v3-serif w-full border-0 border-b bg-transparent px-0 py-2 text-xl font-bold outline-none transition focus:border-current"
+                        style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)' }}
+                      />
+                      <textarea
+                        value={chapter.objectif}
+                        onChange={(event) => updateOutline(chapter.id, 'objectif', event.target.value)}
+                        rows={2}
+                        placeholder="Que doit vivre, comprendre ou ressentir le lecteur ici ?"
+                        className="mt-3 w-full resize-none rounded-xl border px-3 py-2 text-sm leading-relaxed outline-none transition focus:border-current"
+                        style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-orange-50)' }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           {chapters < 60 && (
-            <button type="button" onClick={addOutlineChapter} className="v3-btn v3-btn-outline">
+            <button type="button" onClick={addOutlineChapter} className="v3-btn v3-btn-outline mx-auto flex">
               <Plus className="h-4 w-4" /> Ajouter un chapitre
             </button>
           )}
         </div>
       )}
+
 
       {step === 3 && (
         <div className="space-y-6">
