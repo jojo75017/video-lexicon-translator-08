@@ -270,7 +270,7 @@ const V3HubPage: React.FC = () => {
   const isUnlocked = React.useCallback((m: V3Module) => {
     if (isAdmin) return true;
     return getModuleAccess(m.id) === 'pack' ? hasFull : hasBase;
-  }, [isAdmin, hasBase, hasFull, previewing, previewTier]);
+  }, [isAdmin, hasBase, hasFull]);
 
 
   useEffect(() => {
