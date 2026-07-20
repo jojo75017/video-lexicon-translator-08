@@ -232,6 +232,7 @@ const UPSELLS: Upsell[] = [
     ],
     useCase: "Obligatoire dès que vous vendez vos livres. Offerte automatiquement avec le plan Auteur — sinon 29 € une fois pour toutes.",
   },
+  {
 
     id: 'relecture',
     name: 'Relecture éditoriale humaine',
