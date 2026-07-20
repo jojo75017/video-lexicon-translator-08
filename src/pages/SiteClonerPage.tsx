@@ -91,22 +91,23 @@ const SiteClonerPage: React.FC = () => {
         setProgress(25);
         toast.info('Démarrage du clonage avancé...');
 
-        const crawlResponse = await firecrawl.crawlUrl(url, {
+        const crawlResponse: any = await firecrawl.crawlUrl(url, {
           limit: 50,
           scrapeOptions: {
             formats: ['markdown', 'html'],
             includeTags: ['title', 'meta', 'h1', 'h2', 'h3', 'p', 'a', 'img'],
             onlyMainContent: false
           }
-        });
+        } as any);
 
         setProgress(75);
 
-        if (!crawlResponse.success) {
+        if (!crawlResponse?.success) {
           throw new Error('Échec du clonage');
         }
 
         setCrawlResult(crawlResponse);
+
         
         // Traitement des données pour créer le site cloné
         const firstPage = crawlResponse.data?.[0];
