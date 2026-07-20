@@ -125,11 +125,11 @@ function ModuleCard({
             {V3_PILLAR_META[module.pillar].emoji}
           </span>
           <div className="flex flex-wrap items-center justify-end gap-1.5">
-            {/* Badge d'accès : Inclus 197€ vs Option payante */}
+            {/* Badge d'accès : Inclus dans l'abonnement vs Pack premium à la carte */}
             {access === 'included' ? (
               <span className="inline-flex items-center gap-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
                 style={{ background: '#e8f7ef', color: '#0b6e4c', border: '1px solid #0f8a5f55' }}>
-                <CheckCircle2 className="h-2.5 w-2.5" /> Inclus 197€
+                <CheckCircle2 className="h-2.5 w-2.5" /> Inclus
               </span>
             ) : (
               <span className="inline-flex items-center gap-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
