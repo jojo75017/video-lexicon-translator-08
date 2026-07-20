@@ -333,9 +333,10 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
       setSavingCloud(true);
       const { data: auth, error: authError } = await supabase.auth.getUser();
       if (authError || !auth.user) {
-        toast.error('Connecte-toi pour sauvegarder le livre dans Mes livres.');
+        if (!silent) toast.error('Connecte-toi pour sauvegarder le livre dans Mes livres.');
         return null;
       }
+
 
       const idToUpdate = projectIdRef.current;
       if (idToUpdate) {
