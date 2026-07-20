@@ -184,7 +184,7 @@ Ebookstudio V3 lance le **1er octobre 2026** avec 3 abonnements mensuels. Voici 
 *Pour qui ?* Vous publiez régulièrement sur Amazon KDP. Vous voulez de la constance, du SEO, et un vrai atelier éditorial.
 
 ### 7.3 Plan Auteur — **59 €/mois**
-- **20 livres par mois** jusqu'à 60 chapitres.
+- **Livres illimités** jusqu'à 60 chapitres.
 - Tout ce qui précède + **Cover Studio Pro (gpt-image-2)**.
 - **Livre audio inclus** (2 par mois offerts, ensuite 9,99 € l'unité).
 - Documentation Studio (dossiers de presse, kits médias).
