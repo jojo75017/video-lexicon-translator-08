@@ -32,209 +32,198 @@ type Sequence = {
 };
 
 // ══════════════════════════════════════════════
-// SÉQUENCE 1 — promo générique (10 niches)
+// Liens communs
+// ══════════════════════════════════════════════
+const OFFRE = "https://www.ebookstudio.fr/offres";
+const EXPAT_PAGE = "https://www.ebookstudio.fr/creer-ebook-kdp-etranger";
+const PDF_5_NICHES = "https://www.ebookstudio.fr/lead-magnets/5-niches-rentables-2026.pdf";
+const PDF_GUIDE_EBOOKSTUDIO = "https://www.ebookstudio.fr/lead-magnets/guide-generateur-ebookstudio-principal.pdf";
+const PDF_EXPAT = "https://www.ebookstudio.fr/lead-magnets/guide-publier-kdp-etranger.pdf";
+
+// ══════════════════════════════════════════════
+// SÉQUENCE 1 — promo générique (offre 59€ + 2 cadeaux)
 // ══════════════════════════════════════════════
 const PROMO_STEPS: SeqStep[] = [
-  { step: 0, daysAfter: 0, subject: "🎁 Votre cadeau : 10 Niches KDP Rentables (PDF 40 pages)" },
-  { step: 1, daysAfter: 1, subject: "Pourquoi 90% des auteurs abandonnent (et comment éviter ça)" },
-  { step: 2, daysAfter: 3, subject: "150 pages en 2 jours (mon dernier résultat)" },
-  { step: 3, daysAfter: 5, subject: "\"C'est trop beau pour être vrai ?\" (Ma réponse honnête)" },
-  { step: 4, daysAfter: 7, subject: "⏰ Dernière chance : le prix augmente bientôt" },
-  { step: 5, daysAfter: 14, subject: "🎯 Une opportunité exclusive pour vous (valable 48h)" },
+  { step: 0, daysAfter: 0, subject: "🎁 Vos 2 cadeaux : Guide EbookStudio + 5 Niches KDP rentables 2026" },
+  { step: 1, daysAfter: 1, subject: "Comment j'écris un livre complet en 2 heures (démo)" },
+  { step: 2, daysAfter: 3, subject: "150 pages en 2 jours — mon dernier résultat KDP" },
+  { step: 3, daysAfter: 5, subject: "\"C'est trop beau pour être vrai ?\" Ma réponse honnête" },
+  { step: 4, daysAfter: 7, subject: "⏰ Offre 59€ à vie — elle peut s'arrêter d'un jour à l'autre" },
+  { step: 5, daysAfter: 14, subject: "🎯 Dernière relance : 59€ à vie + garantie 30 jours" },
 ];
 
 const PROMO_EMAILS: string[] = [
-  // Email 1 - J+0
-  `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+  // Email 1 — J+0 : livraison des 2 cadeaux
+  wrap(`
     <p>Bonjour,</p>
-    <p>Merci de votre intérêt pour l'auto-édition sur Amazon KDP !</p>
-    <p>Pour vous remercier, j'ai préparé un cadeau spécial :</p>
-    <div style="background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); color: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
-      <h3 style="margin: 0 0 10px 0;">📘 "10 Niches KDP Rentables en 2025"</h3>
-      <p style="margin: 0;">Un guide PDF de 40+ pages avec les niches les plus lucratives et un plan d'action concret.</p>
+    <p>Merci de votre intérêt pour l'auto-édition sur Amazon KDP ! Pour vous remercier, voici <strong>2 cadeaux</strong> à télécharger tout de suite :</p>
+
+    <div style="background:#e6f4f5;border-left:4px solid #008296;padding:18px;border-radius:8px;margin:18px 0;">
+      <h3 style="margin:0 0 8px 0;color:#008296;">📘 Guide EbookStudio</h3>
+      <p style="margin:0 0 12px 0;">Comment créer et publier un livre complet sur Amazon KDP grâce à l'IA, de A à Z.</p>
+      <a href="${PDF_GUIDE_EBOOKSTUDIO}" style="color:#008296;font-weight:bold;">📥 Télécharger le guide EbookStudio</a>
     </div>
-    <p style="text-align: center;">
-      <a href="https://ebookstudio.fr/offres" style="display: inline-block; background: #8b5cf6; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">👉 Récupérez votre cadeau ici</a>
-    </p>
+
+    <div style="background:#fff7ed;border-left:4px solid #FF9E2D;padding:18px;border-radius:8px;margin:18px 0;">
+      <h3 style="margin:0 0 8px 0;color:#FF9E2D;">🎯 5 Niches KDP rentables en 2026</h3>
+      <p style="margin:0 0 12px 0;">Les 5 thématiques qui se vendent le mieux cette année, avec exemples concrets.</p>
+      <a href="${PDF_5_NICHES}" style="color:#FF9E2D;font-weight:bold;">📥 Télécharger les 5 niches rentables</a>
+    </div>
+
     <p>À très vite,<br><strong>Georges</strong></p>
-    <p style="color: #666; font-size: 14px;">PS : Ce guide m'a pris 3 semaines à créer. Il est offert, profitez-en !</p>
-  </div>`,
-  // Email 2 - J+1
-  `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <p style="color:#666;font-size:13px;">PS : Demain, je vous montre comment j'écris un livre complet en 2 heures.</p>
+  `),
+
+  // Email 2 — J+1 : démo méthode
+  wrap(`
     <p>Bonjour,</p>
-    <p>Hier, je vous ai envoyé le guide des 10 niches rentables. L'avez-vous téléchargé ?</p>
-    <p>👉 Si non : <a href="https://ebookstudio.fr/offres">https://ebookstudio.fr/offres</a></p>
-    <p>Aujourd'hui, parlons d'un problème que je connais trop bien...</p>
-    <ul style="color: #dc2626;">
-      <li>❌ La page blanche</li>
-      <li>❌ Les semaines de rédaction</li>
-      <li>❌ Les couvertures qui coûtent 100€+</li>
-      <li>❌ L'optimisation Amazon qu'on ne comprend pas</li>
-    </ul>
-    <p><strong>Résultat ?</strong> 90% des aspirants auteurs abandonnent avant de publier.</p>
-    <p>J'ai créé <strong>EbookStudio Pro</strong> pour résoudre ce problème.</p>
-    <ul style="color: #16a34a;">
-      <li>✅ Structurer votre livre automatiquement</li>
-      <li>✅ Rédiger chaque chapitre pour vous</li>
-      <li>✅ Créer des couvertures pro en 1 clic</li>
-      <li>✅ Optimiser vos mots-clés Amazon</li>
-    </ul>
-    <p>Le tout pour <strong>67€ une seule fois</strong> (accès à vie).</p>
-    <p style="text-align: center;">
-      <a href="https://ebookstudio.fr/offres" style="display: inline-block; background: #8b5cf6; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">👉 Découvrez comment ça marche</a>
-    </p>
-    <p>À demain pour un cas concret,<br><strong>Georges</strong></p>
-  </div>`,
-  // Email 3 - J+3
-  `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-    <p>Bonjour,</p>
-    <p>Je voulais vous montrer ce que j'ai fait la semaine dernière...</p>
-    <div style="background: #f3f4f6; padding: 20px; border-radius: 10px; margin: 20px 0; text-align: center;">
-      <h2 style="color: #8b5cf6; margin: 0;">📚 150 pages en 2 jours</h2>
-      <p style="margin: 10px 0 0 0;">Mon dernier ebook créé avec EbookStudio Pro</p>
-    </div>
-    <p>Pas en travaillant 12h/jour. En utilisant EbookStudio Pro pendant quelques heures.</p>
-    <p><strong>Voici le processus :</strong></p>
+    <p>Hier je vous ai envoyé le guide EbookStudio + les 5 niches rentables. Les avez-vous téléchargés ?</p>
+    <p>👉 Si non : <a href="${PDF_GUIDE_EBOOKSTUDIO}">Guide EbookStudio</a> · <a href="${PDF_5_NICHES}">5 Niches rentables</a></p>
+
+    <p>Aujourd'hui, je vous montre <strong>comment j'écris un livre complet en environ 2 heures</strong>, chapitre par chapitre :</p>
     <ol>
       <li>J'entre mon sujet et mon audience (5 min)</li>
       <li>L'IA génère un plan éditorial complet (2 min)</li>
-      <li>Chaque chapitre est rédigé automatiquement (1h)</li>
-      <li>Je génère une couverture pro (1 min)</li>
-      <li>Export au format Amazon KDP (1 clic)</li>
+      <li>Chaque chapitre est rédigé automatiquement</li>
+      <li>Je génère une couverture pro en 1 clic</li>
+      <li>Export au format Amazon KDP direct</li>
     </ol>
-    <p><strong>Total : 2 jours au lieu de 2 mois.</strong></p>
-    <p style="text-align: center;">
-      <a href="https://ebookstudio.fr/offres" style="display: inline-block; background: #8b5cf6; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">👉 Testez par vous-même</a>
-    </p>
-    <p>Le prix de lancement à 67€ ne durera pas éternellement.</p>
-    <p><strong>Georges</strong></p>
-    <p style="color: #666; font-size: 14px;">PS : N'oubliez pas de récupérer le guide gratuit sur la page !</p>
-  </div>`,
-  // Email 4 - J+5
-  `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+
+    <p>Tout ça est dans <strong>EbookStudio</strong>, actuellement à <strong>59€ à vie</strong> (offre limitée, peut s'arrêter d'un jour à l'autre).</p>
+
+    ${btn(OFFRE, "👉 Découvrir EbookStudio (59€ à vie)", "#008296")}
+
+    <p>À demain pour un cas concret,<br><strong>Georges</strong></p>
+  `),
+
+  // Email 3 — J+3 : cas concret
+  wrap(`
     <p>Bonjour,</p>
-    <p>Je reçois souvent cette question :<br><em>"Georges, c'est vraiment possible de créer un ebook si vite ?"</em></p>
-    <p><strong>Ma réponse honnête : OUI</strong>, mais avec les bons outils.</p>
-    <p>Avant EbookStudio Pro, je passais des semaines sur chaque livre. Maintenant, c'est une question de jours.</p>
-    <p>Mais je comprends vos doutes. C'est pourquoi j'offre :</p>
-    <div style="background: #ecfdf5; border: 2px solid #10b981; padding: 20px; border-radius: 10px; margin: 20px 0; text-align: center;">
-      <h3 style="color: #059669; margin: 0;">🛡️ GARANTIE 30 JOURS</h3>
-      <p style="margin: 10px 0 0 0;">Satisfait ou Remboursé - Sans question posée</p>
+    <p>Je voulais vous montrer ce que j'ai fait la semaine dernière :</p>
+
+    <div style="background:#fff7ed;border:2px solid #FF9E2D;padding:20px;border-radius:12px;margin:20px 0;text-align:center;">
+      <h2 style="color:#FF9E2D;margin:0;">📚 150 pages en 2 jours</h2>
+      <p style="margin:10px 0 0 0;">Mon dernier ebook créé de A à Z avec EbookStudio.</p>
     </div>
-    <p>Vous ne risquez absolument rien.</p>
-    <p style="text-align: center;">
-      <a href="https://ebookstudio.fr/offres" style="display: inline-block; background: #8b5cf6; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">👉 Essayez sans risque</a>
-    </p>
-    <p>À bientôt,<br><strong>Georges</strong></p>
-    <p style="color: #666; font-size: 14px;">PS : Le guide "10 Niches KDP Rentables" est toujours disponible gratuitement sur la page.</p>
-  </div>`,
-  // Email 5 - J+7
-  `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+
+    <p>Pas en travaillant 12h/jour. En utilisant EbookStudio quelques heures, laissant l'IA rédiger, puis relisant.</p>
+    <p><strong>Total : 2 jours au lieu de 2 mois.</strong></p>
+
+    ${btn(OFFRE, "👉 Tester EbookStudio (59€ à vie)", "#008296")}
+
+    <p>L'offre à 59€ est temporaire et peut s'arrêter d'un jour à l'autre.</p>
+    <p><strong>Georges</strong></p>
+  `),
+
+  // Email 4 — J+5 : lever les objections
+  wrap(`
     <p>Bonjour,</p>
-    <p>C'est mon dernier email de cette série.</p>
-    <p>Je voulais vous rappeler que le <strong>prix de lancement de 67€ est temporaire</strong>.</p>
-    <p>Après le lancement, le prix passera à 147€.</p>
-    <div style="background: #fef3c7; border: 2px solid #f59e0b; padding: 20px; border-radius: 10px; margin: 20px 0;">
-      <h3 style="color: #d97706; margin: 0 0 15px 0;">Pour 67€, vous obtenez :</h3>
-      <ul style="margin: 0; padding-left: 20px;">
-        <li>✅ Accès à vie au générateur d'ebooks</li>
-        <li>✅ Créations illimitées</li>
-        <li>✅ Couvertures pro incluses</li>
+    <p>Je reçois souvent cette question :<br><em>« Georges, c'est vraiment possible d'écrire un livre aussi vite ? »</em></p>
+    <p><strong>Ma réponse honnête : oui</strong>, mais avec les bons outils. Avant EbookStudio, je passais des semaines sur chaque livre. Maintenant, c'est une question de jours.</p>
+
+    <p>Pour lever tout doute, chaque achat est couvert par :</p>
+
+    <div style="background:#ecfdf5;border:2px solid #10b981;padding:20px;border-radius:10px;margin:20px 0;text-align:center;">
+      <h3 style="color:#059669;margin:0;">🛡️ GARANTIE 30 JOURS</h3>
+      <p style="margin:10px 0 0 0;">Satisfait ou remboursé, sans question posée.</p>
+    </div>
+
+    ${btn(OFFRE, "👉 Essayer sans risque (59€ à vie)", "#008296")}
+
+    <p>À bientôt,<br><strong>Georges</strong></p>
+    <p style="color:#666;font-size:13px;">PS : Les 2 cadeaux (Guide EbookStudio + 5 Niches) restent disponibles gratuitement.</p>
+  `),
+
+  // Email 5 — J+7 : urgence prix
+  wrap(`
+    <p>Bonjour,</p>
+    <p>Petit rappel important : l'offre à <strong>59€ à vie</strong> sur EbookStudio est <strong>temporaire</strong>. Elle peut s'arrêter d'un jour à l'autre — le tarif normal est de 197€.</p>
+
+    <div style="background:#fef3c7;border:2px solid #f59e0b;padding:20px;border-radius:10px;margin:20px 0;">
+      <h3 style="color:#d97706;margin:0 0 12px 0;">Pour 59€ (paiement unique, accès à vie) :</h3>
+      <ul style="margin:0;padding-left:20px;">
+        <li>✅ Générateur d'ebooks illimité</li>
+        <li>✅ Couvertures professionnelles incluses</li>
         <li>✅ Export Amazon KDP direct</li>
+        <li>✅ Optimisation mots-clés Amazon</li>
         <li>✅ Toutes les mises à jour futures</li>
         <li>✅ Support inclus</li>
-        <li>✅ + Le guide "10 Niches KDP" offert</li>
       </ul>
     </div>
-    <p style="text-align: center;">
-      <a href="https://ebookstudio.fr/offres" style="display: inline-block; background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 18px;">👉 Profitez du prix de lancement</a>
-    </p>
-    <p>Après ça, je ne vous embêterai plus avec des emails promotionnels.</p>
+
+    ${btn(OFFRE, "👉 Je profite de l'offre 59€ à vie", "#FF9E2D")}
+
     <p>Merci de m'avoir lu,<br><strong>Georges</strong></p>
-    <p style="color: #666; font-size: 14px;">PS : Si vous avez la moindre question, répondez simplement à cet email.</p>
-    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-    <p style="color: #9ca3af; font-size: 12px; text-align: center;">
-      <a href="https://ebookstudio.fr/faq" style="color: #9ca3af;">FAQ</a> | 
-      Pour ne plus recevoir ces emails, répondez avec "STOP"
-    </p>
-  </div>`,
-  // Email 6 - J+14
-  `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <p style="color:#666;font-size:13px;">PS : Une question ? Répondez simplement à cet email.</p>
+  `),
+
+  // Email 6 — J+14 : dernière relance
+  wrap(`
     <p>Bonjour,</p>
-    <p>Cela fait 2 semaines que vous avez téléchargé notre guide des niches KDP...</p>
-    <p>Et je me demandais : <strong>avez-vous enfin lancé votre premier ebook ?</strong></p>
-    <p>Si ce n'est pas encore fait, j'ai une offre exclusive pour vous :</p>
-    <div style="background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); color: white; padding: 25px; border-radius: 15px; margin: 20px 0; text-align: center;">
-      <h2 style="margin: 0 0 15px 0; font-size: 24px;">🎯 Offre VIP 48h</h2>
-      <p style="margin: 0 0 15px 0; font-size: 18px;">Accès à vie à EbookStudio Pro</p>
-      <div style="background: white; color: #8b5cf6; display: inline-block; padding: 10px 25px; border-radius: 10px; font-weight: bold;">
-        <span style="text-decoration: line-through; opacity: 0.6;">147€</span> → <span style="font-size: 28px;">67€</span>
-      </div>
-      <p style="margin: 15px 0 0 0; font-size: 14px; opacity: 0.9;">Cette offre expire dans 48 heures</p>
+    <p>Cela fait 2 semaines que vous avez récupéré mes cadeaux (guide EbookStudio + 5 niches).</p>
+    <p><strong>Avez-vous lancé votre premier ebook ?</strong> Si ce n'est pas encore fait, c'est vraiment le bon moment.</p>
+
+    <div style="background:#fff7ed;border:2px solid #FF9E2D;padding:22px;border-radius:12px;margin:20px 0;text-align:center;">
+      <h2 style="margin:0;color:#FF9E2D;">🎯 EbookStudio — 59€ à vie</h2>
+      <p style="margin:10px 0 0 0;">Offre limitée · Garantie 30 jours satisfait ou remboursé</p>
     </div>
-    <p><strong>Ce qui vous attend :</strong></p>
-    <ul style="color: #16a34a;">
-      <li>✅ Votre premier ebook créé en quelques heures</li>
-      <li>✅ Une couverture professionnelle générée par IA</li>
-      <li>✅ Tout optimisé pour Amazon KDP</li>
-      <li>✅ Formation complète incluse</li>
-    </ul>
-    <p style="text-align: center; margin: 30px 0;">
-      <a href="https://ebookstudio.fr/offres" style="display: inline-block; background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); color: white; padding: 18px 40px; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);">👉 Profiter de l'offre VIP</a>
-    </p>
-    <p>C'est vraiment ma dernière proposition à ce prix.</p>
+
+    ${btn(OFFRE, "👉 J'en profite maintenant", "#FF9E2D")}
+
+    <p>C'est ma dernière relance à ce prix. Après ça, je ne vous embêterai plus.</p>
     <p>À bientôt j'espère,<br><strong>Georges</strong></p>
-    <p style="color: #666; font-size: 14px;">PS : Garantie satisfait ou remboursé 30 jours, vous ne risquez rien.</p>
-    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-    <p style="color: #9ca3af; font-size: 12px; text-align: center;">
-      <a href="https://ebookstudio.fr/faq" style="color: #9ca3af;">FAQ</a> | 
-      Pour ne plus recevoir ces emails, répondez avec "STOP"
-    </p>
-  </div>`,
+  `),
 ];
 
 // ══════════════════════════════════════════════
 // SÉQUENCE 2 — francophones expatriés (CH/BE/LU/DE/CA)
 // ══════════════════════════════════════════════
-const EXPAT_PAGE = "https://ebookstudio.fr/creer-ebook-kdp-etranger";
-const OFFRE = "https://ebookstudio.fr/offres";
 
 const EXPAT_STEPS: SeqStep[] = [
   { step: 0, daysAfter: 0, subject: "🌍 Votre guide : publier sur Amazon KDP depuis l'étranger (PDF)" },
   { step: 1, daysAfter: 1, subject: "Oui, KDP fonctionne depuis la Suisse, la Belgique ou le Canada" },
   { step: 2, daysAfter: 3, subject: "Comment êtes-vous payé à l'étranger (CHF, EUR, CAD) ?" },
   { step: 3, daysAfter: 5, subject: "Un auteur francophone, expatrié comme vous (cas concret)" },
-  { step: 4, daysAfter: 7, subject: "100% en français, où que vous viviez — 67€ à vie" },
-  { step: 5, daysAfter: 14, subject: "⏰ Dernière chance avant la hausse de prix" },
+  { step: 4, daysAfter: 7, subject: "100% en français, où que vous viviez — 59€ à vie" },
+  { step: 5, daysAfter: 14, subject: "⏰ Dernière chance : l'offre 59€ peut s'arrêter" },
 ];
 
 const EXPAT_EMAILS: string[] = [
-  // J+0 — livraison du guide
+  // J+0 — livraison du guide + bonus 5 niches
   wrap(`
     <p>Bonjour,</p>
     <p>Merci ! Voici votre guide gratuit pour <strong>créer et vendre un ebook en français depuis votre pays de résidence</strong>.</p>
+
     <div style="background:#e6f4f5;border-left:4px solid #008296;padding:18px;border-radius:8px;margin:20px 0;">
       <h3 style="margin:0 0 8px 0;color:#008296;">🌍 Publier sur Amazon KDP depuis l'étranger</h3>
-      <p style="margin:0;">Créer votre compte KDP, être payé localement, le tax interview expliqué simplement, et la checklist avant publication.</p>
+      <p style="margin:0 0 12px 0;">Créer votre compte KDP, être payé localement, le tax interview expliqué simplement.</p>
+      <a href="${PDF_EXPAT}" style="color:#008296;font-weight:bold;">📥 Télécharger le guide</a>
     </div>
-    ${btn("https://ebookstudio.fr/lead-magnets/guide-publier-kdp-etranger.pdf", "📥 Télécharger mon guide")}
-    <p>Que vous viviez en Suisse, en Belgique, au Luxembourg, en Allemagne ou au Canada : la méthode est la même, et tout reste <strong>100% en français</strong>.</p>
-    <p>À très vite,<br><strong>Georges</strong></p>
+
+    <div style="background:#fff7ed;border-left:4px solid #FF9E2D;padding:18px;border-radius:8px;margin:20px 0;">
+      <h3 style="margin:0 0 8px 0;color:#FF9E2D;">🎁 BONUS : 5 Niches KDP rentables en 2026</h3>
+      <p style="margin:0 0 12px 0;">En cadeau supplémentaire, les niches qui marchent le mieux cette année.</p>
+      <a href="${PDF_5_NICHES}" style="color:#FF9E2D;font-weight:bold;">📥 Télécharger les 5 niches</a>
+    </div>
+
+    <p>100% en français, où que vous viviez.<br><strong>Georges</strong></p>
   `),
-  // J+1 — lever l'objection n°1
+
+  // J+1 — objection principale
   wrap(`
     <p>Bonjour,</p>
     <p>La question que me posent presque tous les francophones expatriés :</p>
     <p style="font-style:italic;font-size:18px;color:#008296;">« Est-ce que ça marche vraiment depuis mon pays ? »</p>
-    <p><strong>Oui.</strong> Amazon KDP accepte les auteurs du monde entier. Vous n'avez pas besoin d'être résident en France, ni d'avoir une entreprise française.</p>
+    <p><strong>Oui.</strong> Amazon KDP accepte les auteurs du monde entier — pas besoin d'être résident en France ni d'avoir une entreprise française.</p>
     <ul style="color:#16a34a;">
       <li>✅ Vous publiez depuis la Suisse, la Belgique, le Canada… sans contrainte</li>
-      <li>✅ Vous vendez à toute la francophonie (France incluse, le plus gros marché)</li>
+      <li>✅ Vous vendez à toute la francophonie (France incluse)</li>
       <li>✅ Vous gardez votre adresse et votre compte bancaire locaux</li>
     </ul>
     ${btn(EXPAT_PAGE, "👉 Voir comment ça marche")}
     <p>Demain, je vous explique comment vous êtes payé.<br><strong>Georges</strong></p>
   `),
+
   // J+3 — paiement + fiscalité
   wrap(`
     <p>Bonjour,</p>
@@ -245,10 +234,11 @@ const EXPAT_EMAILS: string[] = [
       <li>🇧🇪🇱🇺🇩🇪 En zone euro : virement en EUR</li>
       <li>🇨🇦 Au Canada : virement en CAD</li>
     </ul>
-    <p>Et le fameux <strong>« tax interview »</strong> ? C'est un simple formulaire en ligne (3 minutes) pour éviter la double imposition US. Mon guide vous montre exactement quoi cocher.</p>
-    ${btn("https://ebookstudio.fr/lead-magnets/guide-publier-kdp-etranger.pdf", "📥 Relire le guide")}
+    <p>Et le fameux <strong>« tax interview »</strong> ? Un simple formulaire en ligne (3 min) pour éviter la double imposition US. Le guide vous montre exactement quoi cocher.</p>
+    ${btn(PDF_EXPAT, "📥 Relire le guide")}
     <p>À bientôt,<br><strong>Georges</strong></p>
   `),
+
   // J+5 — preuve + démo
   wrap(`
     <p>Bonjour,</p>
@@ -257,16 +247,17 @@ const EXPAT_EMAILS: string[] = [
       <h2 style="margin:0;color:#FF9E2D;">📚 Un livre complet en quelques heures</h2>
       <p style="margin:10px 0 0 0;">Plan éditorial, chapitres rédigés, couverture pro, export Amazon KDP — le tout en français.</p>
     </div>
-    <p>EbookStudio fait le gros du travail à votre place. Vous gardez la main sur le contenu, l'IA s'occupe de la structure, de la rédaction et de la mise en forme.</p>
+    <p>EbookStudio fait le gros du travail à votre place. Vous gardez la main sur le contenu, l'IA s'occupe de la structure et de la rédaction.</p>
     ${btn(OFFRE, "👉 Voir la démonstration")}
     <p>Demain, je vous parle de l'offre.<br><strong>Georges</strong></p>
   `),
-  // J+7 — l'offre
+
+  // J+7 — offre 59€
   wrap(`
     <p>Bonjour,</p>
-    <p>Le plus gros avantage pour vous, expatrié francophone : <strong>tout est en français, de A à Z.</strong> Aucune traduction, aucun outil anglais à dompter.</p>
+    <p>Votre plus gros avantage, en tant qu'expatrié francophone : <strong>tout est en français, de A à Z.</strong></p>
     <div style="background:#e6f4f5;border:2px solid #008296;padding:20px;border-radius:12px;margin:20px 0;">
-      <h3 style="margin:0 0 12px 0;color:#008296;">Pour 67€ une seule fois (accès à vie) :</h3>
+      <h3 style="margin:0 0 12px 0;color:#008296;">Pour 59€ à vie (paiement unique) :</h3>
       <ul style="margin:0;padding-left:20px;">
         <li>✅ Générateur d'ebooks illimité, 100% français</li>
         <li>✅ Couvertures professionnelles incluses</li>
@@ -275,21 +266,22 @@ const EXPAT_EMAILS: string[] = [
         <li>✅ Mises à jour et support inclus</li>
       </ul>
     </div>
-    ${btn(OFFRE, "👉 Profiter du prix à vie (67€)", "#FF9E2D")}
+    ${btn(OFFRE, "👉 Profiter du prix à vie (59€)", "#FF9E2D")}
+    <p style="color:#666;font-size:13px;">Offre limitée — peut s'arrêter d'un jour à l'autre.</p>
     <p>Accessible où que vous viviez.<br><strong>Georges</strong></p>
   `),
+
   // J+14 — relance finale
   wrap(`
     <p>Bonjour,</p>
     <p>Cela fait deux semaines que vous avez récupéré le guide. <strong>Avez-vous lancé votre premier ebook ?</strong></p>
-    <p>Si ce n'est pas encore fait, c'est le bon moment : le tarif à vie de <strong>67€</strong> est temporaire et passera ensuite à 147€.</p>
+    <p>Si ce n'est pas encore fait, c'est le bon moment : l'accès à vie <strong>59€</strong> est temporaire et peut s'arrêter d'un jour à l'autre.</p>
     <div style="background:#fff7ed;border:2px solid #FF9E2D;padding:20px;border-radius:12px;margin:20px 0;text-align:center;">
-      <p style="margin:0;font-size:18px;">Accès à vie EbookStudio Pro</p>
-      <p style="margin:8px 0 0 0;font-weight:bold;font-size:24px;color:#FF9E2D;"><span style="text-decoration:line-through;opacity:.6;font-size:18px;">147€</span> → 67€</p>
+      <p style="margin:0;font-size:18px;">Accès à vie EbookStudio</p>
+      <p style="margin:8px 0 0 0;font-weight:bold;font-size:24px;color:#FF9E2D;">59€ · Garantie 30 jours</p>
     </div>
     ${btn(OFFRE, "👉 J'en profite maintenant", "#FF9E2D")}
     <p>À bientôt j'espère,<br><strong>Georges</strong></p>
-    <p style="color:#666;font-size:14px;">PS : Garantie satisfait ou remboursé 30 jours.</p>
   `),
 ];
 
@@ -298,7 +290,7 @@ const EXPAT_EMAILS: string[] = [
 // ══════════════════════════════════════════════
 const EXPAT_REACT_STEPS: SeqStep[] = [
   { step: 0, daysAfter: 0, subject: "Une dernière idée pour votre projet de livre 📖" },
-  { step: 1, daysAfter: 9, subject: "🎁 Offre privée 48h pour vous (puis c'est terminé)" },
+  { step: 1, daysAfter: 9, subject: "🎁 Offre 59€ à vie — elle peut s'arrêter" },
 ];
 
 const EXPAT_REACT_EMAILS: string[] = [
@@ -312,12 +304,13 @@ const EXPAT_REACT_EMAILS: string[] = [
   `),
   wrap(`
     <p>Bonjour,</p>
-    <p>Pour vous remercier de votre patience, voici une <strong>offre privée valable 48h</strong> :</p>
+    <p>Pour vous remercier de votre patience, un rappel de l'<strong>offre en cours</strong> :</p>
     <div style="background:#fff7ed;border:2px solid #FF9E2D;padding:22px;border-radius:12px;margin:20px 0;text-align:center;">
-      <h2 style="margin:0;color:#FF9E2D;">🎁 Accès à vie — 67€</h2>
-      <p style="margin:8px 0 0 0;">Tout EbookStudio Pro, 100% en français, où que vous viviez.</p>
+      <h2 style="margin:0;color:#FF9E2D;">🎁 Accès à vie — 59€</h2>
+      <p style="margin:8px 0 0 0;">Tout EbookStudio, 100% en français, où que vous viviez.</p>
+      <p style="margin:12px 0 0 0;font-size:13px;color:#C2410C;">⏳ Offre limitée — peut s'arrêter d'un jour à l'autre</p>
     </div>
-    ${btn(OFFRE, "👉 J'en profite (48h)", "#FF9E2D")}
+    ${btn(OFFRE, "👉 J'en profite (59€ à vie)", "#FF9E2D")}
     <p>Après ça, je ne reviendrai plus vers vous à ce sujet. Merci de m'avoir lu,<br><strong>Georges</strong></p>
   `),
 ];
