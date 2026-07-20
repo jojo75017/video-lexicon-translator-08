@@ -549,10 +549,19 @@ Règles :
       // The mounted workflow still receives props if localStorage is unavailable.
     }
 
-    const savedId = await saveProjectToCloud({ silent: true });
-    if (!savedId) return;
-    toast.success('Projet sauvegardé. Le workflow complet démarre maintenant.');
+    const { data: authData } = await supabase.auth.getUser();
+    if (authData?.user) {
+      const savedId = await saveProjectToCloud({ silent: true });
+      if (savedId) {
+        toast.success('Projet sauvegardé. Le workflow complet démarre maintenant.');
+      } else {
+        toast.message('Workflow lancé. La sauvegarde cloud a échoué mais tu peux continuer.');
+      }
+    } else {
+      toast.message('Workflow lancé en mode invité. Connecte-toi pour retrouver ton livre dans « Mes livres ».');
+    }
     setLaunched(true);
+
   };
 
   if (launched) {
