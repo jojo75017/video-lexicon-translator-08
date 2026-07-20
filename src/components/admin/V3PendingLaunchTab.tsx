@@ -58,7 +58,7 @@ export default function V3PendingLaunchTab() {
           </li>
           <li className="flex gap-2">
             <Layers className="h-4 w-4 mt-0.5 shrink-0" style={{ color: AMBER }} />
-            <span>Différence entre forfaits = <strong>nombre de livres créés par mois</strong> (5 / 10 / 20).</span>
+            <span>Différence entre forfaits = <strong>nombre de livres créés par mois</strong> (5 / 10 / illimités).</span>
           </li>
           <li className="flex gap-2">
             <XCircle className="h-4 w-4 mt-0.5 shrink-0" style={{ color: '#b04747' }} />
@@ -135,7 +135,7 @@ export default function V3PendingLaunchTab() {
               <Crown className="h-3.5 w-3.5" /> Auteur
             </div>
             <div className="mt-1 text-sm text-neutral-300">Publiez vos propres livres</div>
-            <div className="mt-3 text-2xl font-bold text-white">20 livres / mois</div>
+            <div className="mt-3 text-2xl font-bold text-white">Livres illimités / mois</div>
             <div className="mt-4 rounded-lg p-3" style={{ background: '#1f1f1f', border: '1px solid #333' }}>
               <div className="text-[11px] uppercase font-bold tracking-wider text-neutral-400">Mensuel</div>
               <div className="text-lg font-bold text-white">59,00 € <span className="text-xs font-normal text-neutral-400">+ taxes / mois</span></div>
@@ -144,7 +144,7 @@ export default function V3PendingLaunchTab() {
               <div className="text-[11px] uppercase font-bold tracking-wider" style={{ color: '#c9a84c' }}>Annuel</div>
               <div className="text-lg font-bold text-white">
                 <span className="line-through text-sm font-normal text-neutral-500 mr-1">708,00 €</span>
-                360,00 € <span className="text-xs font-normal text-neutral-400">+ taxes / an</span>
+                597,00 € <span className="text-xs font-normal text-neutral-400">+ taxes / an</span>
               </div>
             </div>
           </div>
