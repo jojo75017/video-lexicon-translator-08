@@ -566,13 +566,30 @@ Règles :
                 {finalTitle} · {chapters} chapitres · {totalWords.toLocaleString('fr-FR')} mots estimés
               </p>
             </div>
-            {completedBook && (
-              <span className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold" style={{ background: 'var(--v3-paper)', color: 'var(--v3-orange-600)' }}>
-                <Check className="h-4 w-4" /> Livre terminé
-              </span>
-            )}
+            <div className="flex flex-col items-end gap-2">
+              {completedBook && (
+                <span className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold" style={{ background: 'var(--v3-paper)', color: 'var(--v3-orange-600)' }}>
+                  <Check className="h-4 w-4" /> Livre terminé
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={async () => {
+                  const id = await saveProjectToCloud({ silent: false });
+                  if (id) toast.success('Sauvegardé dans Ma bibliothèque.');
+                }}
+                disabled={savingCloud}
+                className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold border shadow-sm disabled:opacity-60"
+                style={{ borderColor: 'var(--v3-orange-600)', color: 'var(--v3-orange-600)', background: 'var(--v3-paper)' }}
+                title="Force la sauvegarde immédiate dans Ma bibliothèque"
+              >
+                {savingCloud ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                Sauvegarder maintenant
+              </button>
+            </div>
           </div>
         </div>
+
 
         <EbookCompleteWorkflow
           key={`${finalTitle}-${chapters}-${wordsPerChapter}`}
