@@ -81,9 +81,9 @@ export default function V3HomePage() {
           </span>
 
           <h1 className="v3-serif mt-6 text-5xl md:text-6xl font-bold leading-[1.05] tracking-tight">
-            Ne te contente pas de lire.
+            Ton histoire mérite d'être écrite.
             <br />
-            <span className="text-[var(--v3-orange)] italic">Deviens l'Auteur.</span>
+            <span className="text-[var(--v3-orange)] italic">Ebookstudio la révèle en quelques minutes.</span>
           </h1>
 
           <p className="mt-5 text-[15px] text-[var(--v3-muted)] max-w-xl mx-auto">
