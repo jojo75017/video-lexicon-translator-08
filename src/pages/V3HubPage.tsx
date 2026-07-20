@@ -674,7 +674,7 @@ const V3HubPage: React.FC = () => {
               {/* Légende des droits */}
               <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px]" style={{ color: '#8a7860' }}>
                 <span className="inline-flex items-center gap-1">
-                  <CheckCircle2 className="h-3 w-3" style={{ color: '#0f8a5f' }} /> Inclus dans la base 197€ (livres & ebooks illimités)
+                  <CheckCircle2 className="h-3 w-3" style={{ color: '#0f8a5f' }} /> Inclus dans votre abonnement (livres & ebooks selon le forfait)
                 </span>
                 <span className="inline-flex items-center gap-1">
                   <Lock className="h-3 w-3" style={{ color: AMBER }} /> Disponible en pack premium (audiobooks, marketing, couvertures pro…)
