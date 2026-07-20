@@ -29,19 +29,27 @@ export default function V3LibraryPage() {
   const [rawRows, setRawRows] = useState<Row[]>([]);
 
   useEffect(() => {
+    let cancelled = false;
     (async () => {
+      setLoading(true);
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) { nav('/v3/auth'); return; }
+      if (cancelled) return;
       setEmail(auth.user.email || null);
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('ebook_projects')
         .select('id,title,author_name,kdp_categories,updated_at,chapters,ebook_images')
         .eq('user_id', auth.user.id)
         .order('updated_at', { ascending: false });
+      if (cancelled) return;
+      if (error) toast.error(`Rafraîchissement impossible : ${error.message}`);
       setRawRows((data as Row[]) || []);
       setLoading(false);
+      if (refreshTick > 0 && !error) toast.success(`Bibliothèque à jour · ${(data || []).length} livre(s)`);
     })();
+    return () => { cancelled = true; };
   }, [nav, refreshTick]);
+
 
   useEffect(() => { localStorage.setItem('v3_lib_dedup', dedup ? '1' : '0'); }, [dedup]);
 
