@@ -8,17 +8,12 @@ import { isModuleClickable, V3ModuleDialog } from '@/components/admin/v3ModuleRe
 import { V3HubTour } from '@/components/admin/V3HubTour';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
 import CreateBookHub from '@/components/admin/CreateBookHub';
-import V2V3Compare from '@/components/admin/V2V3Compare';
-import V3PricingTiers from '@/components/admin/V3PricingTiers';
 import EditionWorkflow from '@/components/admin/EditionWorkflow';
 import V3ExportPanel from '@/components/admin/V3ExportPanel';
-import V3AccessRecap from '@/components/admin/V3AccessRecap';
-import V3LaunchLinks from '@/components/admin/V3LaunchLinks';
 import V3GuidesSection from '@/components/admin/V3GuidesSection';
 import V3RoadmapTab from '@/components/admin/V3RoadmapTab';
 import V3PendingLaunchTab from '@/components/admin/V3PendingLaunchTab';
 import V3AllToolsTab from '@/components/admin/V3AllToolsTab';
-import MaisonEditionTab from '@/components/admin/MaisonEditionTab';
 import HubAiChat from '@/components/admin/HubAiChat';
 import DocumentationStudio from '@/components/documentation-studio/DocumentationStudio';
 import V3OffresPage from '@/pages/v3public/V3OffresPage';
