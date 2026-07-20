@@ -685,7 +685,7 @@ const V3HubPage: React.FC = () => {
             {filtered.length === 0 ? (
               <div className="text-center py-20 text-sm" style={{ color: '#a18a6c' }}>
                 {pillar === 'mine'
-                  ? 'Aucun outil débloqué pour le moment. Démarrez avec la base 197€ pour accéder à la création de livres illimités.'
+                  ? 'Aucun outil débloqué pour le moment. Souscrivez à un abonnement V3 pour accéder à la création de livres.'
                   : `Aucun outil ne correspond à « ${query} ».`}
               </div>
             ) : pillar === 'all' ? (
