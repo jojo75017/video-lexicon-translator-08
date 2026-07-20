@@ -169,7 +169,7 @@ export default function V3LibraryPage() {
                 <span className="text-xs text-[var(--v3-muted)]">Chaque livre peut être converti en audio (option 9,99 €)</span>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-                {done.map((r) => <BookCard key={r.id} r={r} done onAudio={() => setAudioModal({ id: r.id, title: r.title })} onUpdated={() => setRefreshTick((t) => t + 1)} />)}
+                {done.map((r) => <BookCard key={r.id} r={r} done onAudio={() => setAudioModal({ id: r.id, title: r.title })} onUpdated={() => setRefreshTick((t) => t + 1)} onDelete={() => deleteOne(r.id)} />)}
               </div>
             </div>
           )}
