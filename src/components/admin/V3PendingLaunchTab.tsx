@@ -147,6 +147,11 @@ export default function V3PendingLaunchTab() {
                 597,00 € <span className="text-xs font-normal text-neutral-400">+ taxes / an</span>
               </div>
             </div>
+            <div className="mt-3 rounded-lg p-2 text-center" style={{ background: '#c9a84c', color: '#141414' }}>
+              <div className="text-[11px] uppercase font-bold tracking-wider">🎁 Bonus inclus</div>
+              <div className="text-sm font-bold">Licence commerciale étendue OFFERTE</div>
+              <div className="text-[10px]">(vaut 29 € — revente illimitée)</div>
+            </div>
           </div>
         </div>
         <p className="mt-4 text-xs italic" style={{ color: '#6f5e47' }}>
