@@ -190,6 +190,7 @@ Ebookstudio V3 lance le **1er octobre 2026** avec 3 abonnements mensuels. Voici 
 - Documentation Studio (dossiers de presse, kits médias).
 - Multilingue FR/EN/ES.
 - Landing page auteur personnalisée.
+- **🎁 Licence commerciale étendue OFFERTE** (revente illimitée sur Amazon KDP, Kobo, Apple Books — normalement 29 €).
 - Onboarding 1-à-1 (30 min).
 
 *Pour qui ?* Vous vivez ou voulez vivre de vos livres. Vous produisez en volume, en plusieurs langues, avec un vrai catalogue.
