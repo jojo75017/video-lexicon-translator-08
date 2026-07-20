@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  Sparkles, Feather, BookOpen, Palette, Library, Wand2, ArrowRight, Star,
+  Sparkles, Feather, BookOpen, Palette, Library, Wand2, ArrowRight, Star, Quote,
 } from 'lucide-react';
 
 const IDEA_EXAMPLES = [
