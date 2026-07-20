@@ -1226,7 +1226,7 @@ const V3HubPage: React.FC = () => {
                     <FileText className="h-3.5 w-3.5" /> Script visible
                   </div>
                   <h2 className="mt-4 text-3xl sm:text-4xl font-medium leading-tight" style={{ fontFamily: SERIF, color: INK }}>
-                    Grand script vidéo — octobre V3
+                    Formation vidéo V3 — de A à Z (clés API, environnement, modules, tarifs)
                   </h2>
                   <p className="mt-2 max-w-2xl text-sm leading-relaxed" style={{ color: '#6f5e47' }}>
                     Version longue prête à lire au prompteur pour expliquer la fin de la bêta, le prix actuel à 67€ et l'arrivée de Publication Assistée Pro en octobre.

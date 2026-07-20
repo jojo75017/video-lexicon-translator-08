@@ -1,221 +1,235 @@
-# 🎬 Script vidéo — « Ce qui arrive en octobre » (V3 Publication Assistée Pro)
+# 🎬 Script vidéo — Ebookstudio V3 « Publication Assistée Pro »
+### Formation complète de A à Z : clés API, nouvel environnement, modules, plans & tarifs
 
-> Vidéo face caméra, ton chaleureux et direct, persona Georges Boubet.
-> Durée cible : 12 à 18 minutes. Prompteur prêt à lire.
+> Vidéo face caméra, ton chaleureux et pédagogique, persona Georges Boubet.
+> Durée cible : 25 à 35 minutes (formation).
+> Prompteur prêt à lire — les indications techniques sont en italique.
 
 ---
 
-## 1. Accroche (0:00 – 0:45)
+## 1. Accroche & promesse (0:00 – 1:30)
 
 Bonjour à tous, c'est Georges.
 
-Avant de commencer cette vidéo, je veux vous dire une chose : ce que je vais vous annoncer aujourd'hui, ça ne concerne pas seulement EbookStudio. Ça concerne votre projet d'auteur. Votre envie d'écrire. Votre objectif de publier un livre qui se vend. Et peut-être, si vous le souhaitez, de transformer ça en un revenu réel, régulier, sur du long terme.
+Aujourd'hui, je ne vais pas vous vendre quelque chose. Je vais vous **former**.
 
-Si vous regardez cette vidéo, c'est que vous faites partie des premiers à m'avoir fait confiance sur EbookStudio. Vous avez été là au début. Vous avez testé, conseillé, parfois critiqué — et c'est exactement ce dont j'avais besoin pour construire la suite.
+À la fin de cette vidéo, vous saurez exactement :
+- comment configurer vos **clés API** en 3 minutes (c'est ce qui coince 90 % des gens),
+- comment **naviguer dans le nouvel environnement Ebookstudio V3**,
+- à quoi sert **chacun des modules** de la plateforme,
+- et surtout **quel plan choisir** en fonction de votre projet — sans vous ruiner.
 
-Aujourd'hui, j'ai trois choses importantes à vous dire.
-
-Premièrement : la phase bêta est terminée. Et je vous remercie sincèrement pour ce que vous avez apporté.
-Deuxièmement : en octobre, une nouvelle version d'EbookStudio va arriver. Elle s'appelle **Publication Assistée Pro**. Et ce n'est pas une simple mise à jour. C'est un vrai changement de dimension.
-Troisièmement : aujourd'hui, vous pouvez encore prendre EbookStudio à **67€ à vie**. Et c'est là que je veux que vous prêtiez attention, parce que ce prix ne sera plus là très longtemps.
-
-Alors installez-vous bien. Je vais prendre le temps de tout vous expliquer, en toute transparence, sans langage marketing, sans promesse irréaliste. Juste les faits, mon ambition pour vous, et ce que vous pouvez faire dès maintenant.
+On va aller de A à Z, tranquillement, et vous pourrez repasser la vidéo aux moments qui vous concernent. Installez-vous, prenez de quoi noter.
 
 ---
 
-## 2. Remerciements & fin de la bêta (0:45 – 2:30)
+## 2. Ce qui change avec la V3 (1:30 – 4:00)
 
-D'abord, je veux remercier ceux qui ont participé à la bêta.
+Ebookstudio V3 s'appelle **Publication Assistée Pro**. Ce n'est plus un simple générateur de texte. C'est un **studio éditorial complet** qui vous accompagne de l'idée jusqu'à la publication Amazon KDP.
 
-Ces derniers mois, une poignée d'entre vous — je pense à ceux qui ont envoyé des messages, testé les agents, proposé des améliorations, signalé des bugs, parfois même des petits détails qui ne me plaisaient pas — ont fait avancer l'outil bien plus vite que je ne l'aurais fait seul.
+Concrètement, trois choses ont changé :
 
-Vos retours ont été précieux. Pas seulement parce qu'ils m'ont permis de corriger des choses. Mais surtout parce qu'ils m'ont aidé à comprendre ce dont vous avez vraiment besoin pour créer et publier vos livres.
+**1. Un moteur à 30 agents IA spécialisés.**
+Avant, une seule IA écrivait votre livre. Maintenant, 30 agents interviennent chacun sur leur métier : architecte du livre, chercheur de niche, plumes narratives, éditeur, correcteur, directeur artistique de couverture, spécialiste SEO Amazon, expert catégorisation KDP, générateur d'audio, community manager… Chacun fait UNE chose, et il la fait bien.
 
-Et au-delà des fonctionnalités, vous m'avez montré quelque chose d'encore plus important : la diversité de vos projets. Certains d'entre vous veulent écrire un livre de développement personnel. D'autres un guide pratique. D'autres encore une fiction, un recueil, un livre pour enfants, un manuel. Certains veulent publier sur Amazon KDP. D'autres veulent simplement tenir un objet fini entre leurs mains. D'autres encore veulent construire un business autour de leurs livres.
+**2. Un environnement public unifié.**
+Tout se passe sur **ebookstudio.fr/v3**. Vous n'avez plus à jongler entre un dashboard admin et un site public. La bibliothèque, la création, les outils, les guides, les offres — tout est au même endroit, avec une barre latérale claire.
 
-Tout ça, ça m'a fait comprendre qu'EbookStudio ne devait pas être qu'un générateur de texte. Il devait devenir un **compagnon de publication complet**.
-
-C'est pourquoi la phase bêta est maintenant terminée. Elle a rempli son rôle. Elle a été une étape indispensable. Mais maintenant, on passe à la suite. Et la suite, c'est plus ambitieuse. Plus structurée. Plus pro.
-
-Merci donc à tous les bêta-testeurs. Vous avez contribué à quelque chose de plus grand que vous ne le pensez.
-
----
-
-## 3. Le présent : ce que vous avez déjà avec EbookStudio (2:30 – 5:30)
-
-Avant de parler de ce qui arrive en octobre, laissez-moi prendre quelques minutes pour vous rappeler ce que vous avez déjà aujourd'hui.
-
-Parce que parfois, quand on annonce une nouvelle version, on a l'impression que l'ancienne n'était pas complète. Mais ce n'est pas le cas. Ce que vous avez aujourd'hui dans EbookStudio est déjà très puissant. Et si vous le prenez maintenant à 67€, vous gardez tout ça, à vie, sans augmenter votre tarif plus tard.
-
-Aujourd'hui, avec EbookStudio, vous pouvez :
-
-**Générer un manuscrit complet grâce au pipeline d'agents IA.**
-Ce n'est pas un simple bloc de texte généré d'un coup. C'est un processus en plusieurs étapes : idée, plan, chapitres, rédaction, relecture, mise en forme. Chaque étape est pilotée par un agent spécialisé. L'un s'occupe de la structure. L'autre du style. L'autre de la cohérence. L'autre de la qualité éditoriale. Le résultat, c'est un manuscrit qui ressemble à quelque chose de terminé, pas à un brouillon confus.
-
-**Créer vos couvertures.**
-Vous avez accès à des outils de génération d'image pour créer des couvertures adaptées à Amazon KDP. C'est important, parce qu'une couverture, c'est la première impression. Même avec un très bon texte, une mauvaise couverture peut tuer les ventes. Et inversement, une bonne couverture peut faire vendre un livre moyen.
-
-**Préparer vos fichiers pour la publication sur Amazon KDP.**
-Vous pouvez exporter vos manuscrits dans les formats nécessaires, avec une mise en page propre, des marges correctes, une typographie lisible. Ce sont des détails qui comptent énormément quand Amazon valide votre livre. Un fichier mal formaté, c'est un rejet. Un fichier bien formaté, c'est une validation rapide et un livre qui a l'air professionnel.
-
-**Explorer des idées, tester des niches, valider des concepts.**
-EbookStudio vous aide aussi à trouver quoi écrire. Pas seulement en vous donnant des idées au hasard, mais en analysant ce qui existe déjà, ce qui fonctionne, ce qui pourrait plaire à votre public. C'est un point très important : avant d'écrire, il faut savoir pour qui on écrit.
-
-Et tout ça, c'est déjà inclus dans la version actuelle.
-
-Alors pourquoi lancer une nouvelle version en octobre ?
-
-Parce que beaucoup d'entre vous m'ont dit la même chose : "Georges, l'outil m'aide à écrire, mais après, je suis seul. Je ne sais pas comment publier. Je ne sais pas comment faire la couverture. Je ne sais pas comment faire la description. Je ne sais pas comment lancer le livre. Je ne sais pas comment le vendre."
-
-Et c'est exactement ce que Publication Assistée Pro va résoudre.
+**3. Le principe « Bring Your Own Key » (BYOK).**
+Vous branchez **vos propres clés API IA** (Gemini gratuit ou OpenRouter). Vous ne payez donc **pas** un abonnement gonflé qui absorbe une marge sur les jetons IA. Vous payez la plateforme, l'IA vous appartient. C'est plus honnête et beaucoup moins cher sur le long terme.
 
 ---
 
-## 4. Ce qui arrive en octobre : Publication Assistée Pro (5:30 – 10:00)
+## 3. Étape 1 — Créer vos clés API (4:00 – 9:00)
 
-En octobre, je lance une toute nouvelle version d'EbookStudio : **Publication Assistée Pro**.
+*[À l'écran : capture de https://aistudio.google.com/apikey]*
 
-L'idée, c'est simple mais ambitieuse : ne plus seulement vous aider à écrire un livre, mais vous accompagner de l'idée initiale jusqu'à la vente finale, comme le ferait une vraie maison d'édition, mais pilotée par l'intelligence artificielle et par vos propres décisions.
+C'est l'étape que tout le monde redoute. Elle prend 3 minutes. Suivez-moi.
 
-Aujourd'hui, beaucoup d'outils d'IA vous aident à écrire. Mais très peu vous aident à publier. Presque aucun ne vous aide à vendre. Publication Assistée Pro, c'est cette rupture : un outil qui couvre tout le cycle de vie d'un livre, de la première idée jusqu'au premier revenu.
+### 3.1 Clé Gemini (Google) — recommandée, gratuite
 
-Et cette nouvelle version arrivera en **deux paliers**.
+Gemini, c'est l'IA de Google. Elle est puissante, rapide, et **gratuite** dans une limite très large qui suffit pour écrire plusieurs livres par mois.
 
-### ➡️ Le palier à 197€ — "Idée à Publication"
+1. Ouvrez **aistudio.google.com/apikey** dans votre navigateur.
+2. Connectez-vous avec un compte Google (le vôtre suffit).
+3. Cliquez sur **« Create API key »**.
+4. Copiez la clé — elle commence par **`AIza…`**.
+5. Retour sur Ebookstudio → **Paramètres → Clés API → Gemini**. Collez, enregistrez. C'est fait.
 
-Le premier palier s'appelle "Idée à Publication". C'est pour ceux qui veulent aller de l'idée jusqu'à un livre publié, avec une qualité éditoriale nettement supérieure à ce qu'on peut faire aujourd'hui avec des outils classiques.
+*[À l'écran : Ebookstudio → /v3/parametres]*
 
-À ce palier, vous aurez accès à :
+### 3.2 Clé OpenRouter — pour les modèles avancés (optionnelle)
 
-- **Une édition structurelle avancée.**
-  L'agent éditorial ne se contente plus de générer un plan. Il analyse la structure de votre livre, identifie les faiblesses narrative ou argumentatives, propose des renforcements, ajoute des transitions, équilibre les chapitres. Il travaille vraiment comme un éditeur professionnel qui lit votre manuscrit et vous dit : "ici il manque quelque chose, ici il faut creuser, ici il faut raccourcir".
+OpenRouter, c'est un « supermarché » qui vous donne accès à Claude, GPT-4, DeepSeek, Mistral et Gemini via **une seule clé**. Utile quand vous voulez un style d'écriture particulier.
 
-- **Des outils de révision et de mise en page renforcés.**
-  La révision ne se limite plus à corriger les fautes. Elle améliore le style, la fluidité, la clarté. La mise en page est plus précise, plus adaptée aux exigences d'Amazon KDP, avec des contrôles automatiques sur les marges, la typographie, les sauts de page, les en-têtes et pieds de page.
+1. Ouvrez **openrouter.ai/keys**.
+2. Créez un compte, générez une clé — elle commence par **`sk-or-…`**.
+3. Rechargez 5 ou 10 dollars la première fois (c'est du pay-as-you-go).
+4. Ebookstudio → **Paramètres → Clés API → OpenRouter**. Collez, enregistrez.
 
-- **Un livre plus abouti, du début à la fin.**
-  Le résultat, c'est un manuscrit qui ne ressemble plus à un texte généré par IA. Il ressemble à un livre écrit par un auteur qui sait ce qu'il fait. Et ça, c'est ce qui fera la différence sur Amazon : les lecteurs le sentent, les avis le montrent, les ventes suivent.
+### 3.3 Clé OpenAI — pour les couvertures haut de gamme (optionnelle)
 
-- **La préparation complète du fichier KDP.**
-  Vous ne sortez pas seulement un PDF. Vous sortez un fichier prêt à être accepté par Amazon, avec toutes les vérifications faites en amont : dimensions, police, interligne, table des matières, numérotation, couverture alignée. L'objectif, c'est que votre livre soit validé du premier coup, sans aller-retour frustrant.
+Si vous voulez générer des couvertures avec le nouveau modèle **gpt-image-2** (le meilleur du marché), il vous faut une clé OpenAI (`sk-…`) sur **platform.openai.com/api-keys**. Sinon, Ebookstudio bascule automatiquement sur son moteur d'images inclus.
 
-- **Un guide de publication pas à pas.**
-  Même si le livre est prêt, beaucoup d'auteurs bloquent sur les étapes techniques : créer la fiche Amazon, choisir les catégories, remplir les mots-clés, fixer le prix, gérer les droits. Ce palier inclut un guide pratique qui vous accompagne dans chacune de ces étapes.
+### 3.4 Règle d'or
 
-En résumé, le palier à 197€, c'est la promesse d'un livre publié, propre, cohérent, et qui donne envie d'être lu.
-
-### ➡️ Le palier à 347€ — "Publication Assistée Pro"
-
-Le deuxième palier, c'est pour ceux qui ne veulent pas seulement publier. Ils veulent lancer leur livre comme un vrai produit. Ils veulent qu'il se vende. Ils veulent qu'il soit visible. Ils veulent qu'il porte une marque de qualité.
-
-À ce palier, vous avez tout ce qui est inclus dans le palier 197€, plus des modules beaucoup plus puissants :
-
-- **Une couverture signature ultra-professionnelle.**
-  On ne parle pas ici d'une simple image générée. On parle d'un vrai travail de couverture : typographie soignée, composition équilibrée, rendu dos et tranche pour le paperback, formats multiples (ebook + paperback + hardcover), versions promotionnelles. La couverture devient un produit à part entière, conçu pour convertir, conçu pour être reconnaissable. Parce qu'une couverture de qualité maison d'édition, c'est ce qui sépare un livre amateur d'un livre qui vend.
-
-- **Un comité de lecture IA et un label qualité « maison d'édition ».**
-  Avant la publication, votre manuscrit passe entre les mains de plusieurs agents de lecture spécialisés : un analyse l'intrigue, un autre les personnages, un autre la crédibilité, un autre le potentiel commercial, un autre la lisibilité. Vous recevez un rapport complet, avec des recommandations concrètes. Et si votre livre atteint le niveau requis, il peut obtenir un label qualité qui le distingue.
-
-- **Tout l'arsenal marketing et vente pour lancer votre livre.**
-  C'est là que ça devient vraiment différent. Parce qu'un livre sans lancement, c'est un livre qui ne se vend pas. À ce palier, vous avez accès à des outils pour :
-  - Rédiger une description Amazon qui vend,
-  - Générer des pages de vente, des emails de lancement, des séquences de relance,
-  - Préparer des visuels promotionnels pour les réseaux sociaux,
-  - Identifier les mots-clés et les catégories les plus rentables,
-  - Créer des publicités, des posts, des vidéos de promotion,
-  - Construire une mini-stratégie de lancement sur 30 jours.
-
-  L'objectif, ce n'est pas seulement de publier. C'est de faire en sorte que votre livre soit trouvé, lu, recommandé, et acheté.
-
-- **Un accès prioritaire et un accompagnement renforcé.**
-  Les utilisateurs du palier 347€ bénéficient d'un traitement privilégié : nouveautés en avant-première, priorité sur les évolutions, accès à des formations et des ressources réservées. Vous n'êtes pas seulement un utilisateur. Vous êtes un auteur que l'on accompagne.
-
-En clair : le palier à 197€ vous donne un **meilleur livre**. Le palier à 347€ vous donne un **meilleur livre ET une machine à le vendre**.
-
-Et cette différence est fondamentale. Parce que dans le monde de l'édition, un bon livre qui n'est pas vendu reste invisible. Et un livre bien lancé, même s'il est moyen, peut trouver son public. Imaginez maintenant ce qui se passe quand vous avez les deux.
+Ces clés sont **à vous**. Elles restent dans **votre** navigateur, jamais partagées avec d'autres utilisateurs. Si vous les perdez, vous en régénérez. Simple.
 
 ---
 
-## 5. Pourquoi c'est le bon moment de passer à l'action (10:00 – 12:30)
+## 4. Étape 2 — Le nouvel environnement V3 (9:00 – 13:00)
 
-Maintenant, laissez-moi vous expliquer pourquoi aujourd'hui est un moment important.
+*[À l'écran : ebookstudio.fr/v3]*
 
-Comme je vous l'ai dit, en octobre, EbookStudio va passer à une nouvelle version. Et avec cette nouvelle version, les tarifs changent. Le palier "Idée à Publication" sera à 197€. Le palier "Publication Assistée Pro" sera à 347€. Ce seront les nouveaux tarifs de référence.
+Ouvrez **ebookstudio.fr/v3**. Vous arrivez sur la nouvelle page d'accueil. Regardez le haut : deux zones.
 
-Ces prix reflètent la valeur de ce qui est proposé. Ce ne sont pas des prix choisis au hasard. Ils correspondent à ce que coûte, en vrai, un accompagnement éditorial, une couverture pro, un lancement marketing. Si vous deviez payer des humains pour faire tout ça, vous parleriez de milliers d'euros, pas de centaines.
+### 4.1 Le header
+- **Ma bibliothèque** — tous vos livres sauvegardés.
+- **Nouveau livre** — le wizard de création en 4 étapes.
+- **Ambiances** & **Couverture** — outils visuels.
+- **Se connecter** — un compte suffit pour tout retrouver.
 
-Mais aujourd'hui, **EbookStudio est encore disponible à 67€ à vie.**
+### 4.2 La barre latérale (Sidebar)
+14 catégories de **Livres spéciaux** : Roman, Cuisine, Voyage, Coloriage, BD, Poésie, Développement personnel, Business, Enfants, Fantasy, Thriller, Biographie, Guide pratique, Manuel scolaire. Chaque catégorie déclenche un workflow adapté (nombre de chapitres, ton, structure, style d'image).
 
-Et ça, c'est une opportunité qui ne durera pas.
+### 4.3 Le Hub V3 — /v3/hub
+C'est votre **tableau de bord de professionnel**. Onglets principaux :
+- **Parcours** — les 30 agents à la chaîne.
+- **Outils V3** — les 27 outils spécialisés hérités de la V2, réorganisés.
+- **Documentation Studio** — l'atelier de packaging (fiches, guides, dossiers de presse).
+- **Guides** — la formation textuelle.
+- **Script vidéo** — vous y êtes.
+- **Offres & Tarifs** — souscription et upsells.
 
-Quand je dis 67€ à vie, je veux dire : vous payez une fois, et vous gardez l'accès sans jamais payer à nouveau. Pas d'abonnement. Pas de renouvellement. Pas de surprise. 67€, une fois, et l'outil est à vous.
-
-Si vous prenez votre accès maintenant, à 67€, vous sécurisez votre tarif avant la montée en puissance de la nouvelle version. Vous serez déjà dans le système. Vous aurez déjà accès aux outils actuels. Et quand les nouveaux paliers arriveront, vous pourrez décider en connaissance de cause si vous voulez monter de niveau — mais votre base restera à 67€.
-
-C'est ce que j'appelle "verrouiller son tarif". Vous entrez maintenant, vous bloquez le prix le plus bas, et vous continuez à bénéficier de tout ce qui est construit ensuite, sans avoir à payer le prix fort d'entrée.
-
-Je ne sais pas combien de temps cette offre à 67€ va encore tenir. Je peux vous dire qu'elle ne sera plus là quand la V3 sera officiellement lancée. Peut-être qu'elle sera retirée avant, quand on atteindra un certain nombre d'utilisateurs, peut-être qu'elle restera quelques semaines encore. Mais ce que je peux vous dire avec certitude, c'est que **plus vous attendez, plus vous risquez de payer plus cher.**
-
-Et ce n'est pas une technique de vente. C'est juste la logique d'une montée de version.
-
----
-
-## 6. Ce que je vous propose concrètement (12:30 – 14:30)
-
-Alors voilà ce que je vous propose de faire aujourd'hui.
-
-Premièrement, réfléchissez à votre projet. Vous avez un livre en tête ? Une idée qui traîne depuis des mois ? Un sujet que vous maîtrisez et que vous aimeriez partager ? Quel que soit votre niveau, quel que soit votre rythme, il y a une place pour vous.
-
-Deuxièmement, prenez votre accès à EbookStudio à **67€**, tant que c'est encore possible. C'est un paiement unique. Vous n'avez pas besoin de tout faire en une semaine. Vous n'avez pas besoin d'être prêt aujourd'hui. Vous avez juste besoin de rentrer maintenant pour verrouiller le tarif.
-
-Troisièmement, commencez à explorer. Lancez un premier projet. Testez les agents. Générez un premier plan. Même si ce n'est pas parfait du premier coup, l'important c'est de commencer. Et vous verrez que, très vite, l'outil vous entraîne. Vous passerez de "j'aimerais bien écrire un livre" à "j'ai un manuscrit en cours de finalisation".
-
-Quatrièmement, préparez-vous à octobre. Quand Publication Assistée Pro arrivera, vous pourrez décider si vous voulez monter en puissance. Mais déjà, avec votre accès à 67€, vous serez bien plus avancé que ceux qui commenceront à ce moment-là.
-
-Et enfin, cinquièmement : faites-moi confiance sur le long terme. EbookStudio n'est pas un gadget. C'est un outil que je construis, que j'améliore, que j'enrichis, avec une vraie vision. Je ne cherche pas à faire un lancement rapide et à disparaître. Je veux créer la meilleure plateforme possible pour les auteurs francophones. Et vous, en tant que premiers utilisateurs, vous faites partie de cette histoire.
+### 4.4 La bibliothèque — /v3/ln
+Chaque livre est une carte avec :
+- couverture (générée à la demande),
+- statut (Brouillon, En cours, Terminé),
+- boutons **Audio 9,99 €**, **Supprimer**, et un mode **Nettoyer les doublons**.
 
 ---
 
-## 7. Une dernière chose avant de conclure (14:30 – 16:00)
+## 5. Étape 3 — Créer son premier livre (13:00 – 18:00)
 
-Je voudrais ajouter une chose importante, parce que je sais qu'il y a beaucoup de promesses dans le monde des outils IA.
+*[À l'écran : /v3/create]*
 
-EbookStudio ne remplace pas l'auteur. Il ne remplace pas votre voix, votre histoire, votre expertise, votre point de vue. Ce que l'outil fait, c'est vous libérer de tout ce qui n'est pas du talent d'auteur : la structure, la mise en page, la répétition, le blocage, la partie technique, le marketing.
+Le wizard compte 4 étapes claires :
 
-Vous restez le créateur. Vous restez celui qui décide. Vous restez celui qui a quelque chose à dire.
+**Étape 1 — Le concept.** Titre + description de 150 mots (l'IA vous aide à formuler si vous manquez d'idées).
 
-L'IA, dans EbookStudio, c'est un assistant très compétent. Elle ne vous remplace pas. Elle vous amplifie.
+**Étape 2 — Le format.** Nombre de chapitres (jusqu'à 60), mots par chapitre (par défaut 3500, jusqu'à 6000 sur le plan Pro), catégorie KDP, ton (chaleureux, académique, thriller, humoristique…), personnages optionnels.
 
-Et c'est pour ça que je crois vraiment à cette version "Publication Assistée Pro" : parce qu'elle ne cherche pas à faire l'auteur à votre place. Elle cherche à vous donner les moyens de publier, lancer et vendre votre livre comme le ferait une équipe professionnelle, sans que vous ayez à embaucher cette équipe.
+**Étape 3 — Le sommaire.** L'IA propose une **table des matières éditable**. Vous modifiez chaque titre et chaque objectif. C'est ce qui garantit un livre cohérent — plus jamais de « chapitre 3 » vide.
 
-C'est un changement de paradigme. Et c'est celui-là que je vous propose d'embarquer maintenant.
+**Étape 4 — Génération.** Vous appuyez sur **« Générer le livre »**. Les 30 agents entrent en scène. Vous suivez la progression, chapitre par chapitre. Tout est **sauvegardé automatiquement dans le cloud**.
 
----
-
-## 8. Appel à l'action (16:00 – fin)
-
-Alors, voici ce que je vous propose de faire maintenant, tout de suite, avant de fermer cette vidéo :
-
-1. Cliquez sur le lien qui se trouve juste en dessous de cette vidéo.
-2. Prenez votre accès à vie à EbookStudio pour **67€**.
-3. Et commencez votre premier projet dès aujourd'hui.
-
-C'est le meilleur moment pour le faire. Pas demain, pas la semaine prochaine, pas "quand j'aurai le temps". Maintenant.
-
-Parce qu'en octobre, tout va changer. Les nouveaux paliers arriveront. Les prix monteront. Et ceux qui seront déjà à bord bénéficieront d'un avantage considérable.
-
-Merci encore pour votre confiance. Merci d'avoir été là au début de cette aventure. Je suis fier de ce qu'on a déjà construit ensemble, et j'ai hâte de vous montrer ce qui arrive ensuite.
-
-On se retrouve très vite dans l'outil. Et n'oubliez pas : chaque grand livre commence par une première ligne. Alors écrivez-la aujourd'hui.
-
-À très bientôt,
-**Georges**
+À la fin, vous pouvez :
+- éditer chapitre par chapitre,
+- générer la couverture (front + tranche + 4ᵉ),
+- exporter en DOCX, PDF, EPUB, KDP-ready,
+- lancer la conversion audio (option 9,99 €).
 
 ---
 
-### 📌 Notes de tournage
-- Insérer des captures d'écran de la plateforme pendant les parties 3 et 4 (pipeline, export, couverture).
-- Afficher un bandeau « 67€ à vie — jusqu'en octobre » pendant les parties 5, 6, 7 et 8.
-- Insérer un encart visuel comparatif 197€ vs 347€ pendant la partie 4.
-- Terminer sur un plan avec le lien / bouton d'offre bien visible et un compte à rebours doux si possible.
-- Ton : chaleureux, direct, pas agressif, pas trop technique. Georges parle à un auteur, pas à un développeur.
+## 6. Étape 4 — Les modules détaillés (18:00 – 23:00)
+
+Petit tour du propriétaire, module par module.
+
+### 6.1 Modules éditoriaux (inclus dans tous les plans)
+- **Architecte du livre** — structure et sommaire.
+- **Plume narrative multi-styles** — écriture des chapitres.
+- **Éditeur & correcteur IA** — passes de révision.
+- **Cover Studio** — couverture front + dos + tranche calibrée KDP.
+- **Ambiances** — banque d'images narratives.
+- **Import manuscrit** — DOCX / MD / TXT avec découpage automatique.
+- **Export KDP** — fichiers prêts pour Amazon (dimensions, marges, ISBN).
+
+### 6.2 Modules Growth (plan Expert & Auteur)
+- **Amazon Spy Niche** — analyse concurrentielle réelle via Firecrawl : ventes estimées, mots-clés, catégories rentables.
+- **KDP Keywords & Categories** — SEO Amazon optimisé.
+- **Sélection éditeurs** — moteur de recherche des maisons d'édition susceptibles de vous publier (inspiré de publiersonlivre.fr, base élargie).
+- **Landing page auteur** — page publique de votre profil (`/v3/auteur/...`).
+- **Documentation Studio** — dossiers de presse, kits médias, argumentaires.
+
+### 6.3 Modules Premium (plan Auteur)
+- **Livre audio complet** — narration IA (voix multiples, chapitres audio prêts pour ACX/Audible ou WooCommerce).
+- **Cover Studio Pro** — direction artistique IA + variations, moteur **gpt-image-2**.
+- **BD & Coloriage** — 14 workflows spéciaux (Roman jeunesse, Coloriage adulte, BD…).
+- **Multilingue** — traduction et adaptation FR ↔ EN ↔ ES.
+- **Assistant conversationnel** — un copilote posé sur votre livre pour re-générer, résumer, corriger à la voix.
+
+---
+
+## 7. Étape 5 — Plans et tarifs (23:00 – 28:00)
+
+Ebookstudio V3 lance le **1er octobre 2026** avec 3 abonnements mensuels. Voici la vérité, sans marketing.
+
+### 7.1 Plan Débutant — **6,99 €/mois**
+- **5 livres par mois** générés (jusqu'à 20 chapitres).
+- Éditeur, correcteur, export DOCX/PDF/EPUB.
+- 1 couverture par livre (moteur standard).
+- Support communauté.
+
+*Pour qui ?* Vous testez. Vous écrivez un livre de temps en temps. Vous voulez comprendre le workflow avant d'investir.
+
+### 7.2 Plan Expert — **9,99 €/mois** ⭐ *le plus populaire*
+- **10 livres par mois**, jusqu'à 40 chapitres, 6000 mots/chapitre.
+- **30 agents** activés au complet.
+- Amazon Spy Niche + KDP Keywords.
+- Cover Studio + Ambiances illimitées.
+- Sélection éditeurs.
+- Import manuscrit + retouche par chapitre.
+- Support prioritaire.
+
+*Pour qui ?* Vous publiez régulièrement sur Amazon KDP. Vous voulez de la constance, du SEO, et un vrai atelier éditorial.
+
+### 7.3 Plan Auteur — **59 €/mois**
+- **20 livres par mois** jusqu'à 60 chapitres.
+- Tout ce qui précède + **Cover Studio Pro (gpt-image-2)**.
+- **Livre audio inclus** (2 par mois offerts, ensuite 9,99 € l'unité).
+- Documentation Studio (dossiers de presse, kits médias).
+- Multilingue FR/EN/ES.
+- Landing page auteur personnalisée.
+- Onboarding 1-à-1 (30 min).
+
+*Pour qui ?* Vous vivez ou voulez vivre de vos livres. Vous produisez en volume, en plusieurs langues, avec un vrai catalogue.
+
+### 7.4 Ce qui n'est PAS dans les abonnements
+- Le **livre audio à l'unité** — 9,99 € par livre (pour Débutant et Expert).
+- Les **crédits IA** — vous utilisez **vos** clés API. Zéro marge cachée.
+- La **couverture premium à la demande** avec gpt-image-2 — comprise dans le plan Auteur, sinon payée au coût OpenAI direct via votre clé.
+
+### 7.5 Offres de lancement (jusqu'au 31 octobre 2026)
+- **-20 %** sur les 3 premiers mois de tout abonnement annuel.
+- **Pack Auteur annuel** : 12 mois payés 10 → 2 mois offerts.
+
+---
+
+## 8. Récap et passage à l'action (28:00 – 32:00)
+
+On récapitule ce qu'on a vu ensemble.
+
+1. **Créez vos clés** — Gemini (gratuit) minimum, OpenRouter et OpenAI si vous voulez plus.
+2. **Explorez /v3** — la nouvelle maison Ebookstudio, tout est réuni.
+3. **Testez le wizard /v3/create** — un premier livre en 4 étapes.
+4. **Choisissez votre plan** — commencez à 6,99 € pour tester, montez en gamme quand vous êtes prêt.
+5. **Publiez** — les exports KDP sont prêts, la couverture est calibrée, l'audio est disponible.
+
+Mon conseil personnel : **prenez le plan Expert à 9,99 €** dès le départ. C'est le meilleur rapport qualité/prix, et c'est celui qui vous fait vraiment goûter aux 30 agents.
+
+*[À l'écran : bouton /v3/offres]*
+
+Rendez-vous sur **ebookstudio.fr/v3/offres** pour souscrire. Si vous avez la moindre question, répondez à mon dernier email — je lis tout, personnellement.
+
+Merci d'être là depuis le début. On se retrouve dans le studio.
+
+— Georges
+
+---
+
+### 📌 Annexes prompteur
+
+- **Rythme** : 1 slide/écran toutes les 45–60 secondes.
+- **Coupures suggérées** : après §3 (clés), §5 (premier livre), §7 (tarifs).
+- **Call-to-action final** : lien épinglé + carte cliquable Offres.
+- **Sous-titres** : générés à l'export, revus avec la correction de style Ebookstudio.
