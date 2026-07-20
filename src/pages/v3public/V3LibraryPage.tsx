@@ -115,7 +115,19 @@ export default function V3LibraryPage() {
           <h1 className="v3-serif text-4xl font-bold">Ma bibliothèque</h1>
           <p className="text-sm text-[var(--v3-muted)] mt-1">{email}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          <button
+            onClick={() => setDedup((v) => !v)}
+            className={`v3-btn ${dedup ? 'v3-btn-primary' : 'v3-btn-outline'}`}
+            title="Regrouper automatiquement les livres portant le même titre"
+          >
+            <Filter className="w-4 h-4" /> {dedup ? 'Doublons masqués' : 'Afficher tout'}
+          </button>
+          {duplicateCount > 0 && (
+            <button onClick={cleanupDuplicates} className="v3-btn v3-btn-outline text-red-600 border-red-300 hover:bg-red-50" title="Supprimer les doublons">
+              <Trash2 className="w-4 h-4" /> Nettoyer {duplicateCount} doublon{duplicateCount > 1 ? 's' : ''}
+            </button>
+          )}
           <button onClick={() => setRefreshTick((t) => t + 1)} className="v3-btn v3-btn-outline" title="Rafraîchir">
             <RefreshCw className="w-4 h-4" /> Rafraîchir
           </button>
