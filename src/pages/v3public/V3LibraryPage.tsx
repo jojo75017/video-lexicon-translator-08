@@ -25,6 +25,8 @@ export default function V3LibraryPage() {
   const [email, setEmail] = useState<string | null>(null);
   const [refreshTick, setRefreshTick] = useState(0);
   const [audioModal, setAudioModal] = useState<{ id: string; title: string } | null>(null);
+  const [dedup, setDedup] = useState<boolean>(() => localStorage.getItem('v3_lib_dedup') !== '0');
+  const [rawRows, setRawRows] = useState<Row[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -36,10 +38,56 @@ export default function V3LibraryPage() {
         .select('id,title,author_name,kdp_categories,updated_at,chapters,ebook_images')
         .eq('user_id', auth.user.id)
         .order('updated_at', { ascending: false });
-      setRows((data as Row[]) || []);
+      setRawRows((data as Row[]) || []);
       setLoading(false);
     })();
   }, [nav, refreshTick]);
+
+  useEffect(() => { localStorage.setItem('v3_lib_dedup', dedup ? '1' : '0'); }, [dedup]);
+
+  const rows = useMemo(() => {
+    if (!dedup) return rawRows;
+    // Dedup by normalized title: keep the "best" (most chapters, else most recent)
+    const groups = new Map<string, Row[]>();
+    for (const r of rawRows) {
+      const key = (r.title || '').trim().toLowerCase().replace(/\s+/g, ' ') || r.id;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(r);
+    }
+    const kept: Row[] = [];
+    for (const list of groups.values()) {
+      list.sort((a, b) => {
+        const ca = Array.isArray(a.chapters) ? a.chapters.length : 0;
+        const cb = Array.isArray(b.chapters) ? b.chapters.length : 0;
+        if (cb !== ca) return cb - ca;
+        return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+      });
+      kept.push(list[0]);
+    }
+    kept.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+    return kept;
+  }, [rawRows, dedup]);
+
+  const duplicateCount = rawRows.length - rows.length;
+
+  const cleanupDuplicates = async () => {
+    if (!confirm(`Supprimer définitivement ${duplicateCount} doublon(s) ? Le meilleur exemplaire de chaque titre est conservé.`)) return;
+    const keepIds = new Set(rows.map((r) => r.id));
+    const toDelete = rawRows.filter((r) => !keepIds.has(r.id)).map((r) => r.id);
+    if (toDelete.length === 0) return;
+    const { error } = await supabase.from('ebook_projects').delete().in('id', toDelete);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`${toDelete.length} doublon(s) supprimé(s).`);
+    setRefreshTick((t) => t + 1);
+  };
+
+  const deleteOne = async (id: string) => {
+    if (!confirm('Supprimer ce livre définitivement ?')) return;
+    const { error } = await supabase.from('ebook_projects').delete().eq('id', id);
+    if (error) { toast.error(error.message); return; }
+    toast.success('Livre supprimé.');
+    setRefreshTick((t) => t + 1);
+  };
 
   // Detect unsaved local workflow work
   const localUnsaved = useMemo(() => {
