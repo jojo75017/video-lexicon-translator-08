@@ -30,6 +30,7 @@ const TIERS: Tier[] = [
       'Couverture IA incluse',
       'Export DOCX & PDF',
       'Jusqu’à 30 chapitres par livre',
+      'Licence commerciale étendue en option (29 €)',
       'Support par email',
     ],
     monthly: { price: '6,99 €', priceId: 'v3_debutant_monthly' },
