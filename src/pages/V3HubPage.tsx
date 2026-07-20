@@ -21,6 +21,7 @@ import V3AllToolsTab from '@/components/admin/V3AllToolsTab';
 import MaisonEditionTab from '@/components/admin/MaisonEditionTab';
 import HubAiChat from '@/components/admin/HubAiChat';
 import DocumentationStudio from '@/components/documentation-studio/DocumentationStudio';
+import V3OffresPage from '@/pages/v3public/V3OffresPage';
 import { DELIVERABLE_GROUPS, DOC_TEMPLATES, PRODUCT_TYPES } from '@/components/documentation-studio/constants';
 const DS_CREAM = '#FBF6EC';
 const ALL_DELIVERABLE_COUNT = DELIVERABLE_GROUPS.reduce((n, g) => n + g.items.length, 0);
@@ -1196,13 +1197,7 @@ const V3HubPage: React.FC = () => {
 
         {/* ===================== ONGLET OFFRES & PACKS ===================== */}
         {activeTab === 'offres' && (
-          <>
-            <V3LaunchLinks />
-            <V3AccessRecap onOpenModule={setSelected} />
-            <V3PricingTiers />
-            <MaisonEditionTab onOpenModule={(id) => { const m = getModuleById(id); if (m) setSelected(m); }} />
-            <V2V3Compare />
-          </>
+          <V3OffresPage />
         )}
 
         {/* ===================== ONGLET ROADMAP ===================== */}
