@@ -34,7 +34,7 @@ export default function V3PendingLaunchTab() {
         </h2>
         <p className="mt-2 max-w-3xl text-sm leading-relaxed" style={{ color: '#6f5e47' }}>
           Décision : on attaque <strong>directement</strong> le plan à 3 forfaits (mensuel/annuel)
-          le <strong>1er octobre 2026</strong>. Les anciennes offres 97€ / 197€ en 1×/2×/3×
+          le <strong>1er octobre 2026</strong>. Les anciennes offres de paiement unique en 1×/2×/3×
           sont <strong>abandonnées</strong>. Aucune modification de code d'ici là.
         </p>
       </div>
@@ -62,7 +62,7 @@ export default function V3PendingLaunchTab() {
           </li>
           <li className="flex gap-2">
             <XCircle className="h-4 w-4 mt-0.5 shrink-0" style={{ color: '#b04747' }} />
-            <span><strong>Abandonné :</strong> l'ancienne offre 97€ (octobre) / 197€ (novembre+) en 1×/2×/3× et le Pack Full 347€.</span>
+            <span><strong>Abandonné :</strong> les anciennes offres de paiement unique en 1×/2×/3× et les packs Full.</span>
           </li>
         </ul>
       </div>

@@ -8,17 +8,12 @@ import { isModuleClickable, V3ModuleDialog } from '@/components/admin/v3ModuleRe
 import { V3HubTour } from '@/components/admin/V3HubTour';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
 import CreateBookHub from '@/components/admin/CreateBookHub';
-import V2V3Compare from '@/components/admin/V2V3Compare';
-import V3PricingTiers from '@/components/admin/V3PricingTiers';
 import EditionWorkflow from '@/components/admin/EditionWorkflow';
 import V3ExportPanel from '@/components/admin/V3ExportPanel';
-import V3AccessRecap from '@/components/admin/V3AccessRecap';
-import V3LaunchLinks from '@/components/admin/V3LaunchLinks';
 import V3GuidesSection from '@/components/admin/V3GuidesSection';
 import V3RoadmapTab from '@/components/admin/V3RoadmapTab';
 import V3PendingLaunchTab from '@/components/admin/V3PendingLaunchTab';
 import V3AllToolsTab from '@/components/admin/V3AllToolsTab';
-import MaisonEditionTab from '@/components/admin/MaisonEditionTab';
 import HubAiChat from '@/components/admin/HubAiChat';
 import DocumentationStudio from '@/components/documentation-studio/DocumentationStudio';
 import V3OffresPage from '@/pages/v3public/V3OffresPage';
@@ -130,11 +125,11 @@ function ModuleCard({
             {V3_PILLAR_META[module.pillar].emoji}
           </span>
           <div className="flex flex-wrap items-center justify-end gap-1.5">
-            {/* Badge d'accès : Inclus 197€ vs Option payante */}
+            {/* Badge d'accès : Inclus dans l'abonnement vs Pack premium à la carte */}
             {access === 'included' ? (
               <span className="inline-flex items-center gap-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
                 style={{ background: '#e8f7ef', color: '#0b6e4c', border: '1px solid #0f8a5f55' }}>
-                <CheckCircle2 className="h-2.5 w-2.5" /> Inclus 197€
+                <CheckCircle2 className="h-2.5 w-2.5" /> Inclus
               </span>
             ) : (
               <span className="inline-flex items-center gap-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
@@ -251,11 +246,6 @@ const V3HubPage: React.FC = () => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const { hasBase, hasFull, isAdmin } = useV3Entitlement();
 
-  // Aperçu admin : simuler la vue d'un acheteur d'un palier (sans quitter ses droits réels).
-  // 'real' = mes droits · 'base' = vue 197€ · 'full' = vue Pack Pro 347€.
-  const [previewTier, setPreviewTier] = useState<'real' | 'base' | 'full'>('real');
-  const previewing = isAdmin && previewTier !== 'real';
-
   // Persiste l'état réduit de la sidebar.
   useEffect(() => {
     localStorage.setItem('v3hub_sidebar_collapsed', sidebarCollapsed ? '1' : '0');
@@ -278,14 +268,9 @@ const V3HubPage: React.FC = () => {
 
   // Un module est "débloqué" si l'abonné a la formule correspondante.
   const isUnlocked = React.useCallback((m: V3Module) => {
-    // Mode aperçu admin : on simule le palier choisi (197€ ou 347€).
-    if (previewing) {
-      const isPremium = getModuleAccess(m.id) === 'pack';
-      return previewTier === 'full' ? true : !isPremium;
-    }
     if (isAdmin) return true;
     return getModuleAccess(m.id) === 'pack' ? hasFull : hasBase;
-  }, [isAdmin, hasBase, hasFull, previewing, previewTier]);
+  }, [isAdmin, hasBase, hasFull]);
 
 
   useEffect(() => {
@@ -337,7 +322,7 @@ const V3HubPage: React.FC = () => {
     { icon: CheckCircle2, value: readyCount, label: 'Outils prêts' },
     { icon: Wand2, value: V3_MODULES.length, label: 'Modules V3' },
     { icon: Layers, value: PILLAR_ORDER.length, label: 'Piliers' },
-    { icon: InfinityIcon, value: '197€', label: 'Livres illimités inclus' },
+    { icon: InfinityIcon, value: '30', label: 'Agents IA du Studio' },
   ];
 
   // Liste de navigation partagée (sidebar desktop + tiroir mobile).
@@ -549,7 +534,7 @@ const V3HubPage: React.FC = () => {
             </button>
             <button onClick={() => setActiveTab('offres')} data-tour="price" className="inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-sm font-semibold border transition-all duration-300 ease-out hover:bg-[#FFF8F0] hover:border-[#E8951E] hover:-translate-y-1 hover:shadow-md active:translate-y-0 active:scale-[0.99]"
               style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}>
-              <Sparkles className="h-4 w-4" /> Dès 197€ à vie · 3× ou 6×
+              <Sparkles className="h-4 w-4" /> Voir les offres & packs
             </button>
             <button onClick={() => setActiveTab('script')} className="inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-sm font-bold border transition-all duration-300 ease-out hover:bg-[#FFF8F0] hover:border-[#E8951E] hover:-translate-y-1 hover:shadow-md active:translate-y-0 active:scale-[0.99]"
               style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}>
@@ -660,33 +645,6 @@ const V3HubPage: React.FC = () => {
             <div className="mb-4 rounded-xl border p-3 text-[13px]" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44`, color: '#6f5e47' }}>
               <span className="font-semibold" style={{ color: AMBER_DEEP }}>💡 Suivez les étapes numérotées</span> — les outils sont rangés dans l'ordre logique&nbsp;: écrire → publier → monétiser → faire connaître. Pas sûr par où commencer&nbsp;? Ouvrez l'onglet <span className="font-semibold">Parcours</span>.
             </div>
-            {/* Aperçu admin : simuler la vue d'un acheteur 197€ / 347€ (QA sans payer) */}
-            {isAdmin && (
-              <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border p-3" style={{ background: '#fff', borderColor: `${AMBER}44` }}>
-                <span className="text-[12px] font-bold" style={{ color: AMBER_DEEP }}>🧪 Aperçu acheteur (admin) :</span>
-                {[
-                  { id: 'real', label: 'Mes droits (admin)' },
-                  { id: 'base', label: 'Vue 197€ (base)' },
-                  { id: 'full', label: 'Vue 347€ (Pack Pro)' },
-                ].map((opt) => (
-                  <button
-                    key={opt.id}
-                    onClick={() => setPreviewTier(opt.id as 'real' | 'base' | 'full')}
-                    className="rounded-full px-3 py-1.5 text-[12px] font-semibold border transition-colors"
-                    style={previewTier === opt.id
-                      ? { background: AMBER, color: '#fff', borderColor: AMBER }
-                      : { background: 'transparent', color: '#6f5e47', borderColor: '#eadfc9' }}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-                {previewing && (
-                  <span className="text-[11px]" style={{ color: '#a18a6c' }}>
-                    Simulation : {myToolsCount}/{V3_MODULES.length} outils débloqués pour ce palier.
-                  </span>
-                )}
-              </div>
-            )}
             {/* Recherche + filtres par pilier */}
             <div className="-mx-4 px-4 py-3 mb-6">
 
@@ -716,7 +674,7 @@ const V3HubPage: React.FC = () => {
               {/* Légende des droits */}
               <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px]" style={{ color: '#8a7860' }}>
                 <span className="inline-flex items-center gap-1">
-                  <CheckCircle2 className="h-3 w-3" style={{ color: '#0f8a5f' }} /> Inclus dans la base 197€ (livres & ebooks illimités)
+                  <CheckCircle2 className="h-3 w-3" style={{ color: '#0f8a5f' }} /> Inclus dans votre abonnement (livres & ebooks selon le forfait)
                 </span>
                 <span className="inline-flex items-center gap-1">
                   <Lock className="h-3 w-3" style={{ color: AMBER }} /> Disponible en pack premium (audiobooks, marketing, couvertures pro…)
@@ -727,7 +685,7 @@ const V3HubPage: React.FC = () => {
             {filtered.length === 0 ? (
               <div className="text-center py-20 text-sm" style={{ color: '#a18a6c' }}>
                 {pillar === 'mine'
-                  ? 'Aucun outil débloqué pour le moment. Démarrez avec la base 197€ pour accéder à la création de livres illimités.'
+                  ? 'Aucun outil débloqué pour le moment. Souscrivez à un abonnement V3 pour accéder à la création de livres.'
                   : `Aucun outil ne correspond à « ${query} ».`}
               </div>
             ) : pillar === 'all' ? (
