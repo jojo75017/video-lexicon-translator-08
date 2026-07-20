@@ -11,8 +11,8 @@ const FROM_ADDRESS = "Georges Boubet <noreply@ebookstudio.fr>";
 // Adresses à exclure (compte propriétaire / tests)
 const EXCLUDED_EMAILS = ["boubetgeorges@gmail.com"];
 
-const TEMPLATE_NAME = "openers-reactivation";
-const SUBJECT = "Votre livre pourrait être sur Amazon ce week-end 📖";
+const TEMPLATE_NAME = "openers-reactivation-59";
+const SUBJECT = "⏳ EbookStudio à 59€ — offre temporaire (au lieu de 67€)";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const TRACK_CLICK = `${SUPABASE_URL}/functions/v1/track-email-click`;
