@@ -91,6 +91,12 @@ export default function V3HomePage() {
             Romans, nouvelles, ebooks — à toi l'histoire.
           </p>
 
+          <blockquote className="mt-6 mx-auto max-w-md text-[13px] italic text-[var(--v3-ink)]/80 border-l-2 border-[var(--v3-orange)] pl-4 text-left">
+            Le problème n'est pas d'écrire.<br />
+            C'est de ne jamais commencer.<br />
+            <span className="font-semibold not-italic">Commencez votre livre.</span>
+          </blockquote>
+
           {/* Champ idée */}
           <div className="mt-8 flex items-stretch gap-2 rounded-full border border-black/10 bg-white p-1.5 shadow-lg">
             <div className="pl-4 flex items-center text-[var(--v3-muted)]">
