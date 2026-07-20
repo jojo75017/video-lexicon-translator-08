@@ -67,6 +67,7 @@ const TIERS: Tier[] = [
       'Amazon Spy — analyse de niche',
       'Sélection maisons d’édition',
       'Jusqu’à 60 chapitres par livre',
+      '🎁 Licence commerciale étendue OFFERTE (revente illimitée)',
       'Accès anticipé aux nouveautés',
     ],
     monthly: { price: '59,00 €', priceId: 'v3_auteur_monthly' },
