@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  Sparkles, Feather, BookOpen, Palette, Library, Wand2, ArrowRight, Star,
+  Sparkles, Feather, BookOpen, Palette, Library, Wand2, ArrowRight, Star, Quote,
 } from 'lucide-react';
 
 const IDEA_EXAMPLES = [
@@ -80,10 +80,9 @@ export default function V3HomePage() {
             <Sparkles className="w-3.5 h-3.5" /> Atelier d'écriture par IA
           </span>
 
-          <h1 className="v3-serif mt-6 text-5xl md:text-6xl font-bold leading-[1.05] tracking-tight">
-            Ton histoire mérite d'être écrite.
-            <br />
-            <span className="text-[var(--v3-orange)] italic text-4xl md:text-5xl">Ebookstudio la révèle en quelques minutes.</span>
+          <h1 className="v3-serif mt-6 font-bold leading-[1.05] tracking-tight">
+            <span className="block text-4xl md:text-5xl whitespace-nowrap">Ton histoire mérite d'être écrite.</span>
+            <span className="block text-2xl md:text-3xl text-[var(--v3-orange)] italic mt-2">Ebookstudio la révèle en quelques minutes.</span>
           </h1>
 
           <p className="mt-5 text-[15px] text-[var(--v3-muted)] max-w-xl mx-auto">
@@ -91,11 +90,17 @@ export default function V3HomePage() {
             Romans, nouvelles, ebooks — à toi l'histoire.
           </p>
 
-          <blockquote className="mt-6 mx-auto max-w-md text-[13px] italic text-[var(--v3-ink)]/80 border-l-2 border-[var(--v3-orange)] pl-4 text-left">
-            Le problème n'est pas d'écrire.<br />
-            C'est de ne jamais commencer.<br />
-            <span className="font-semibold not-italic">Commencez votre livre.</span>
-          </blockquote>
+          <figure className="mt-6 mx-auto max-w-md text-left">
+            <div className="relative rounded-xl bg-white border border-black/5 shadow-sm p-4">
+              <Quote className="absolute left-3 top-3 w-5 h-5 text-[var(--v3-orange)]/40" />
+              <blockquote className="pl-6 text-[13px] italic leading-relaxed text-[var(--v3-ink)]/85">
+                Le problème n'est pas d'écrire.<br />
+                C'est de ne jamais commencer.<br />
+                <span className="font-semibold not-italic">Commencez votre livre.</span>
+              </blockquote>
+              <div className="absolute left-0 top-3 bottom-3 w-1 rounded-full bg-[var(--v3-orange)]" />
+            </div>
+          </figure>
 
           {/* Champ idée */}
           <div className="mt-8 flex items-stretch gap-2 rounded-full border border-black/10 bg-white p-1.5 shadow-lg">
