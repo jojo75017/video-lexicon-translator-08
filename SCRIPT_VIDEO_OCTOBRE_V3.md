@@ -199,6 +199,7 @@ Ebookstudio V3 lance le **1er octobre 2026** avec 3 abonnements mensuels. Voici 
 - Le **livre audio à l'unité** — 9,99 € par livre (pour Débutant et Expert).
 - Les **crédits IA** — vous utilisez **vos** clés API. Zéro marge cachée.
 - La **couverture premium à la demande** avec gpt-image-2 — comprise dans le plan Auteur, sinon payée au coût OpenAI direct via votre clé.
+- La **Licence commerciale étendue** — **OFFERTE** avec le plan Auteur, sinon **29 € une fois pour toutes** (paiement unique, à vie) pour les plans Débutant et Expert. Obligatoire dès que vous vendez vos livres.
 
 ### 7.5 Offres de lancement (jusqu'au 31 octobre 2026)
 - **-20 %** sur les 3 premiers mois de tout abonnement annuel.
