@@ -313,6 +313,7 @@ function BookCard({ r, done, onAudio, onUpdated, onDelete }: { r: Row; done?: bo
         title="Supprimer ce livre définitivement"
       >
         <Trash2 className="w-3.5 h-3.5" /> Supprimer
+      </button>
     </div>
   );
 }
