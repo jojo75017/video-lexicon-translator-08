@@ -11,8 +11,8 @@ const FROM_ADDRESS = "Georges Boubet <noreply@ebookstudio.fr>";
 // Adresses à exclure (compte propriétaire / tests)
 const EXCLUDED_EMAILS = ["boubetgeorges@gmail.com"];
 
-const TEMPLATE_NAME = "openers-reactivation";
-const SUBJECT = "Votre livre pourrait être sur Amazon ce week-end 📖";
+const TEMPLATE_NAME = "openers-reactivation-59";
+const SUBJECT = "⏳ EbookStudio à 59€ — offre temporaire (au lieu de 67€)";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const TRACK_CLICK = `${SUPABASE_URL}/functions/v1/track-email-click`;
@@ -34,18 +34,22 @@ function buildHtml(email: string): string {
   <div style="font-family: Arial, Helvetica, sans-serif; color:#232F3E; max-width:600px; margin:0 auto; line-height:1.6;">
     <p>Bonjour,</p>
 
-    <p>Vous aviez ouvert l'un de mes emails sur <strong>EbookStudio</strong>, sans aller plus loin.
-    Je comprends&nbsp;: écrire un livre, ça paraît énorme.</p>
+    <p>Vous aviez ouvert l'un de mes emails sur <strong>EbookStudio</strong> sans aller plus loin —
+    alors je reviens vers vous avec une <strong>bonne nouvelle</strong>.</p>
 
-    <p><strong>Sauf qu'avec EbookStudio, vous n'écrivez plus seul.</strong> L'IA rédige, met en page
-    et prépare votre livre prêt à publier sur Amazon KDP — vous gardez le contrôle à chaque étape.</p>
+    <p style="background:#FFF7E6; border-left:4px solid #FF9E2D; padding:14px 18px; border-radius:6px;">
+      🎁 <strong>Offre saisonnière : 59€</strong> au lieu de 67€ (accès complet à EbookStudio).<br/>
+      ⚠️ <strong>Elle peut s'arrêter d'un jour à l'autre</strong> — je ne garantis pas le tarif la semaine prochaine.
+    </p>
 
-    <p>👉 La plupart des utilisateurs ont un manuscrit complet en <strong>moins d'un week-end</strong>.</p>
+    <p>Avec EbookStudio, vous n'écrivez plus seul : l'IA rédige, met en page et prépare votre livre
+    prêt à publier sur Amazon KDP. La plupart des utilisateurs ont un manuscrit complet en
+    <strong>moins d'un week-end</strong>.</p>
 
     <p style="text-align:center; margin:30px 0;">
       <a href="${cta}"
          style="background:#FF9E2D; color:#232F3E; text-decoration:none; padding:16px 34px; border-radius:8px; font-weight:bold; font-size:17px; display:inline-block;">
-        Je veux écrire mon livre →
+        J'en profite à 59€ →
       </a>
     </p>
 
