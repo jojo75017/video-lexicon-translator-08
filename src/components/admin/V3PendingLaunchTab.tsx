@@ -34,7 +34,7 @@ export default function V3PendingLaunchTab() {
         </h2>
         <p className="mt-2 max-w-3xl text-sm leading-relaxed" style={{ color: '#6f5e47' }}>
           Décision : on attaque <strong>directement</strong> le plan à 3 forfaits (mensuel/annuel)
-          le <strong>1er octobre 2026</strong>. Les anciennes offres 97€ / 197€ en 1×/2×/3×
+          le <strong>1er octobre 2026</strong>. Les anciennes offres de paiement unique en 1×/2×/3×
           sont <strong>abandonnées</strong>. Aucune modification de code d'ici là.
         </p>
       </div>
