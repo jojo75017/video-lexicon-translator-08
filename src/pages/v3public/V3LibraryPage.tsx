@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, Sparkles, Settings, Headphones, AlertCircle, RefreshCw, ImageIcon, Loader2 } from 'lucide-react';
+import { BookOpen, Sparkles, Settings, Headphones, AlertCircle, RefreshCw, ImageIcon, Loader2, Trash2, Filter } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import AudiobookOfferCard from '@/components/v3public/AudiobookOfferCard';
 import { toast } from 'sonner';
