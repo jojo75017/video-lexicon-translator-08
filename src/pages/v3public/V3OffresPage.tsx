@@ -49,6 +49,7 @@ const TIERS: Tier[] = [
       'Livres spéciaux (Cuisine, Voyage, BD…)',
       'Cover Studio Pro (variations IA)',
       'Jusqu’à 45 chapitres par livre',
+      'Licence commerciale étendue en option (29 €)',
       'Support prioritaire',
     ],
     monthly: { price: '9,99 €', priceId: 'v3_expert_monthly' },
