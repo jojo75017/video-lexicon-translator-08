@@ -246,11 +246,6 @@ const V3HubPage: React.FC = () => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const { hasBase, hasFull, isAdmin } = useV3Entitlement();
 
-  // Aperçu admin : simuler la vue d'un acheteur d'un palier (sans quitter ses droits réels).
-  // 'real' = mes droits · 'base' = vue 197€ · 'full' = vue Pack Pro 347€.
-  const [previewTier, setPreviewTier] = useState<'real' | 'base' | 'full'>('real');
-  const previewing = isAdmin && previewTier !== 'real';
-
   // Persiste l'état réduit de la sidebar.
   useEffect(() => {
     localStorage.setItem('v3hub_sidebar_collapsed', sidebarCollapsed ? '1' : '0');
@@ -273,11 +268,6 @@ const V3HubPage: React.FC = () => {
 
   // Un module est "débloqué" si l'abonné a la formule correspondante.
   const isUnlocked = React.useCallback((m: V3Module) => {
-    // Mode aperçu admin : on simule le palier choisi (197€ ou 347€).
-    if (previewing) {
-      const isPremium = getModuleAccess(m.id) === 'pack';
-      return previewTier === 'full' ? true : !isPremium;
-    }
     if (isAdmin) return true;
     return getModuleAccess(m.id) === 'pack' ? hasFull : hasBase;
   }, [isAdmin, hasBase, hasFull, previewing, previewTier]);
