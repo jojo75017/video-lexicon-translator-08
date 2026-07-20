@@ -83,7 +83,7 @@ export default function V3HomePage() {
           <h1 className="v3-serif mt-6 text-5xl md:text-6xl font-bold leading-[1.05] tracking-tight">
             Ton histoire mérite d'être écrite.
             <br />
-            <span className="text-[var(--v3-orange)] italic">Ebookstudio la révèle en quelques minutes.</span>
+            <span className="text-[var(--v3-orange)] italic text-4xl md:text-5xl">Ebookstudio la révèle en quelques minutes.</span>
           </h1>
 
           <p className="mt-5 text-[15px] text-[var(--v3-muted)] max-w-xl mx-auto">
