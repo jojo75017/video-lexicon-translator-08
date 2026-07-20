@@ -80,10 +80,9 @@ export default function V3HomePage() {
             <Sparkles className="w-3.5 h-3.5" /> Atelier d'écriture par IA
           </span>
 
-          <h1 className="v3-serif mt-6 text-5xl md:text-6xl font-bold leading-[1.05] tracking-tight">
-            Ton histoire mérite d'être écrite.
-            <br />
-            <span className="text-[var(--v3-orange)] italic text-4xl md:text-5xl">Ebookstudio la révèle en quelques minutes.</span>
+          <h1 className="v3-serif mt-6 text-3xl md:text-4xl font-bold leading-tight tracking-tight">
+            Ton histoire mérite d'être écrite.{' '}
+            <span className="text-[var(--v3-orange)] italic text-sm md:text-base">Ebookstudio la révèle en quelques minutes.</span>
           </h1>
 
           <p className="mt-5 text-[15px] text-[var(--v3-muted)] max-w-xl mx-auto">
