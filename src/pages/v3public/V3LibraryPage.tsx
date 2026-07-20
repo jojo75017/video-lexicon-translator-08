@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, Sparkles, Settings, Headphones, AlertCircle, RefreshCw } from 'lucide-react';
+import { BookOpen, Sparkles, Settings, Headphones, AlertCircle, RefreshCw, ImageIcon, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import AudiobookOfferCard from '@/components/v3public/AudiobookOfferCard';
+import { toast } from 'sonner';
 
 type Row = {
   id: string;
   title: string;
+  author_name?: string | null;
+  kdp_categories?: string | null;
   updated_at: string;
   chapters?: any[] | null;
   ebook_images?: any[] | null;
@@ -30,7 +33,7 @@ export default function V3LibraryPage() {
       setEmail(auth.user.email || null);
       const { data } = await supabase
         .from('ebook_projects')
-        .select('id,title,updated_at,chapters,ebook_images')
+        .select('id,title,author_name,kdp_categories,updated_at,chapters,ebook_images')
         .eq('user_id', auth.user.id)
         .order('updated_at', { ascending: false });
       setRows((data as Row[]) || []);
@@ -106,7 +109,7 @@ export default function V3LibraryPage() {
                 <span className="text-xs text-[var(--v3-muted)]">Chaque livre peut être converti en audio (option 9,99 €)</span>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-                {done.map((r) => <BookCard key={r.id} r={r} done onAudio={() => setAudioModal({ id: r.id, title: r.title })} />)}
+                {done.map((r) => <BookCard key={r.id} r={r} done onAudio={() => setAudioModal({ id: r.id, title: r.title })} onUpdated={() => setRefreshTick((t) => t + 1)} />)}
               </div>
             </div>
           )}
@@ -114,7 +117,7 @@ export default function V3LibraryPage() {
             <div className="mt-12">
               <h2 className="text-lg font-bold mb-4">En cours <span className="text-sm font-normal text-[var(--v3-muted)]">· {started.length}</span></h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-                {started.map((r) => <BookCard key={r.id} r={r} onAudio={() => setAudioModal({ id: r.id, title: r.title })} />)}
+                {started.map((r) => <BookCard key={r.id} r={r} onAudio={() => setAudioModal({ id: r.id, title: r.title })} onUpdated={() => setRefreshTick((t) => t + 1)} />)}
               </div>
             </div>
           )}
@@ -135,33 +138,86 @@ export default function V3LibraryPage() {
   );
 }
 
-function BookCard({ r, done, onAudio }: { r: Row; done?: boolean; onAudio: () => void }) {
-  const cover = (Array.isArray(r.ebook_images) && r.ebook_images[0]?.url) || undefined;
+function BookCard({ r, done, onAudio, onUpdated }: { r: Row; done?: boolean; onAudio: () => void; onUpdated: () => void }) {
+  const [cover, setCover] = useState<string | undefined>(
+    (Array.isArray(r.ebook_images) && r.ebook_images[0]?.url) || undefined,
+  );
+  const [genLoading, setGenLoading] = useState(false);
   const nbChap = Array.isArray(r.chapters) ? r.chapters.length : 0;
   const date = new Date(r.updated_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+  const author = (r.author_name || '').trim() || 'Auteur Ebookstudio';
+
+  const generateCover = async () => {
+    if (genLoading) return;
+    setGenLoading(true);
+    try {
+      const openaiApiKey = (typeof localStorage !== 'undefined' && localStorage.getItem('openai_real_api_key')) || undefined;
+      const { data, error } = await supabase.functions.invoke('generate-front-cover', {
+        body: {
+          ebookTitle: r.title,
+          authorName: author,
+          genre: r.kdp_categories || 'fiction',
+          style: 'professional',
+          variation: 1,
+          coverType: 'front',
+          useOpenAI: !!openaiApiKey,
+          openaiApiKey,
+        },
+      });
+      if (error || !(data as any)?.imageUrl) throw new Error((error as any)?.message || 'Génération échouée');
+      const imageUrl = (data as any).imageUrl as string;
+      const newImages = [{ type: 'front_cover', url: imageUrl, title: r.title }];
+      const { error: upErr } = await supabase
+        .from('ebook_projects')
+        .update({ ebook_images: newImages as any, cover_concepts: imageUrl } as any)
+        .eq('id', r.id);
+      if (upErr) throw upErr;
+      setCover(imageUrl);
+      toast.success('Couverture générée et sauvegardée.');
+      onUpdated();
+    } catch (e: any) {
+      toast.error(e?.message || 'Impossible de générer la couverture.');
+    } finally {
+      setGenLoading(false);
+    }
+  };
+
   return (
     <div className="group flex flex-col">
       <Link to={`/v3/book/${r.id}`} className="block">
         <div
-          className="relative aspect-[3/4] rounded-xl overflow-hidden p-4 flex flex-col justify-end shadow-md group-hover:shadow-xl transition-all border border-[color:var(--v3-orange)]/20"
+          className="relative aspect-[3/4] rounded-xl overflow-hidden shadow-md group-hover:shadow-xl transition-all border border-[color:var(--v3-orange)]/20"
           style={
             cover
               ? { backgroundImage: `url(${cover})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-              : { background: 'linear-gradient(160deg, #FFF6E8 0%, #FFE3B8 55%, #F5B871 100%)' }
+              : {
+                  background:
+                    'linear-gradient(160deg, #2A1810 0%, #4A2818 45%, #6B3820 100%)',
+                }
           }
         >
           {done && (
-            <span className="absolute top-2 left-2 rounded-full bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 shadow">
+            <span className="absolute top-2 left-2 rounded-full bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 shadow z-10">
               Terminé
             </span>
           )}
           {!cover && (
-            <>
-              <BookOpen className="w-5 h-5 text-[var(--v3-ink)]/60 mb-2" />
-              <div className="text-[13px] font-bold leading-tight line-clamp-3 text-[var(--v3-ink)]">
-                {r.title}
+            <div className="absolute inset-0 flex flex-col justify-between p-4 text-white">
+              <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-amber-300/80">
+                <BookOpen className="w-3 h-3" /> Ebookstudio
               </div>
-            </>
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="v3-serif text-[15px] font-bold leading-tight line-clamp-4 drop-shadow">
+                    {r.title}
+                  </div>
+                  <div className="mt-2 mx-auto h-[2px] w-8 bg-amber-300/70 rounded" />
+                </div>
+              </div>
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-amber-200/90 text-center line-clamp-1">
+                {author}
+              </div>
+            </div>
           )}
         </div>
       </Link>
@@ -173,6 +229,17 @@ function BookCard({ r, done, onAudio }: { r: Row; done?: boolean; onAudio: () =>
           {nbChap > 0 ? `${nbChap} chap.` : 'Brouillon'} · {date}
         </div>
       </div>
+      {!cover && (
+        <button
+          onClick={generateCover}
+          disabled={genLoading}
+          className="mt-2 inline-flex items-center justify-center gap-1.5 rounded-full border border-[color:var(--v3-orange)]/40 bg-[var(--v3-orange)] hover:bg-[var(--v3-orange-600)] text-[11px] font-bold text-white py-1.5 px-2 transition disabled:opacity-60"
+          title="Générer une vraie couverture IA pour ce livre"
+        >
+          {genLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ImageIcon className="w-3.5 h-3.5" />}
+          {genLoading ? 'Génération…' : 'Générer la couverture'}
+        </button>
+      )}
       <button
         onClick={onAudio}
         className="mt-2 inline-flex items-center justify-center gap-1.5 rounded-full border border-[color:var(--v3-orange)]/40 bg-[#FFF6E8] hover:bg-[#FFE9C7] text-[11px] font-bold text-[var(--v3-orange-600)] py-1.5 px-2 transition"
