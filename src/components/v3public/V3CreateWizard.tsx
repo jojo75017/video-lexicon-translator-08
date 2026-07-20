@@ -333,9 +333,10 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
       setSavingCloud(true);
       const { data: auth, error: authError } = await supabase.auth.getUser();
       if (authError || !auth.user) {
-        toast.error('Connecte-toi pour sauvegarder le livre dans Mes livres.');
+        if (!silent) toast.error('Connecte-toi pour sauvegarder le livre dans Mes livres.');
         return null;
       }
+
 
       const idToUpdate = projectIdRef.current;
       if (idToUpdate) {
@@ -548,10 +549,19 @@ Règles :
       // The mounted workflow still receives props if localStorage is unavailable.
     }
 
-    const savedId = await saveProjectToCloud({ silent: true });
-    if (!savedId) return;
-    toast.success('Projet sauvegardé. Le workflow complet démarre maintenant.');
+    const { data: authData } = await supabase.auth.getUser();
+    if (authData?.user) {
+      const savedId = await saveProjectToCloud({ silent: true });
+      if (savedId) {
+        toast.success('Projet sauvegardé. Le workflow complet démarre maintenant.');
+      } else {
+        toast.message('Workflow lancé. La sauvegarde cloud a échoué mais tu peux continuer.');
+      }
+    } else {
+      toast.message('Workflow lancé en mode invité. Connecte-toi pour retrouver ton livre dans « Mes livres ».');
+    }
     setLaunched(true);
+
   };
 
   if (launched) {
