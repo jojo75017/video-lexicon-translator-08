@@ -18,6 +18,26 @@ export const KDP_TRIM_SIZES: { id: string; label: string; w: number; h: number; 
   { id: '8.5x11', label: '8,5 × 11 po', w: 8.5, h: 11, cm: '21,59 × 27,94 cm' },
 ];
 
+/** Nettoie un titre de chapitre : retire les code fences ```json, les fragments JSON `numero": 2,` etc. */
+function sanitizeTitle(raw: string): string {
+  if (!raw) return '';
+  let t = raw
+    // Retire les code fences markdown (```json, ```)
+    .replace(/```(?:json|javascript|js|ts|typescript|md|markdown)?/gi, '')
+    .replace(/```/g, '')
+    // Retire les fragments JSON type `numero": 2,` ou `"titre":`
+    .replace(/\b(?:numero|number|numéro|titre|title|nom|chapterTitle|heading|objectif|goal|resume|summary|description)\s*"?\s*:\s*"?\s*\d*\s*,?/gi, '')
+    // Retire les accolades / crochets orphelins et guillemets isolés
+    .replace(/[{}\[\]"«»“”]+/g, '')
+    // Ponctuation résiduelle en début/fin
+    .replace(/^[\s:–—\-,.]+|[\s:–—\-,.]+$/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+  // Si après nettoyage il ne reste qu'un numéro ou rien → titre vide
+  if (!t || /^\d+$/.test(t)) return '';
+  return t;
+}
+
 /** Découpe un manuscrit (texte brut / markdown) en chapitres exploitables par l'exporteur. */
 export function manuscriptToChapters(text: string): Chapter[] {
   const cleaned = (text || '').replace(/^\s*-{3,}\s*$/gm, ''); // retire les séparateurs ---
@@ -30,9 +50,10 @@ export function manuscriptToChapters(text: string): Chapter[] {
   let cur: { title: string; body: string[] } | null = null;
   const push = () => {
     if (cur && (cur.title.trim() || cur.body.join('').trim())) {
+      const cleanTitle = sanitizeTitle(cur.title);
       chapters.push({
         id: `ch-${chapters.length + 1}`,
-        title: cur.title.trim() || `Chapitre ${chapters.length + 1}`,
+        title: cleanTitle || `Chapitre ${chapters.length + 1}`,
         subChapters: [],
         content: cur.body.join('\n').trim(),
       });
