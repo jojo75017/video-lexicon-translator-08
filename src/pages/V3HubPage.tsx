@@ -322,7 +322,7 @@ const V3HubPage: React.FC = () => {
     { icon: CheckCircle2, value: readyCount, label: 'Outils prêts' },
     { icon: Wand2, value: V3_MODULES.length, label: 'Modules V3' },
     { icon: Layers, value: PILLAR_ORDER.length, label: 'Piliers' },
-    { icon: InfinityIcon, value: '197€', label: 'Livres illimités inclus' },
+    { icon: InfinityIcon, value: '30', label: 'Agents IA du Studio' },
   ];
 
   // Liste de navigation partagée (sidebar desktop + tiroir mobile).
