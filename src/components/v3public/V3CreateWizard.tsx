@@ -178,6 +178,56 @@ export default function V3CreateWizard() {
   const [subtitle, setSubtitle] = useState(hub.subtitle || '');
   const [authorName, setAuthorName] = useState(hub.author || 'Auteur Ebookstudio');
 
+  // Cible & Promesse (parité V2 — améliore drastiquement les résultats des agents)
+  const [cibleProfil, setCibleProfil] = useState('');
+  const [cibleNiveau, setCibleNiveau] = useState('tous');
+  const [cibleBesoins, setCibleBesoins] = useState('');
+  const [cibleFrustrations, setCibleFrustrations] = useState('');
+  const [promesseCentrale, setPromesseCentrale] = useState('');
+  const [promesseBenefices, setPromesseBenefices] = useState('');
+  const [promesseDifferenciation, setPromesseDifferenciation] = useState('');
+  const [promesseEmotion, setPromesseEmotion] = useState('');
+  const [autofillLoading, setAutofillLoading] = useState(false);
+  const [targetPromiseOpen, setTargetPromiseOpen] = useState(false);
+
+  const handleAutofillTargetPromise = async () => {
+    if (!title.trim() && !finalTitle.trim()) {
+      toast.error('Ajoute au moins un titre avant l’auto-remplissage.');
+      return;
+    }
+    setAutofillLoading(true);
+    try {
+      const provider = getProvider();
+      const userApiKey = provider === 'gemini' ? getProviderKey('gemini') : '';
+      const { data, error } = await supabase.functions.invoke('autofill-target-promise', {
+        body: {
+          title: finalTitle.trim() || title.trim(),
+          subtitle: subtitle.trim(),
+          category: effectiveCategory,
+          bookIntroduction: description.trim(),
+          language: 'fr',
+          userApiKey,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setCibleProfil(data?.cibleProfil || '');
+      setCibleNiveau(data?.cibleNiveau || 'tous');
+      setCibleBesoins(data?.cibleBesoins || '');
+      setCibleFrustrations(data?.cibleFrustrations || '');
+      setPromesseCentrale(data?.promesseCentrale || '');
+      setPromesseBenefices(data?.promesseBenefices || '');
+      setPromesseDifferenciation(data?.promesseDifferenciation || '');
+      setPromesseEmotion(data?.promesseEmotion || '');
+      setTargetPromiseOpen(true);
+      toast.success('Cible & Promesse remplies — relis puis lance la génération.');
+    } catch (e: any) {
+      toast.error(e?.message || 'Auto-remplissage indisponible.');
+    } finally {
+      setAutofillLoading(false);
+    }
+  };
+
   // Assistant IA — trouve titre / sous-titre / synopsis / catégories à partir d'une idée ou d'une niche.
   const [aiTopic, setAiTopic] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
