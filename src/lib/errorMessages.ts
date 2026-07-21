@@ -29,6 +29,9 @@ export function isCreditsExhaustedError(error: any): boolean {
   return (
     raw.includes('402') ||
     raw.includes('credits_exhausted') ||
+    raw.includes('credit_limit_reached') ||
+    raw.includes('workspace credit limit') ||
+    raw.includes('lovable_ai_error: 403') ||
     raw.includes('crédits épuisés') ||
     raw.includes('credits epuises') ||
     raw.includes('payment_required') ||
