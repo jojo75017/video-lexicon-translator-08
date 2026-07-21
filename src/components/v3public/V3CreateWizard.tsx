@@ -130,6 +130,8 @@ export default function V3CreateWizard() {
   });
   const projectIdRef = useRef<string | null>(projectId);
   const coverTriggeredRef = useRef(false);
+  const [resumeInfo, setResumeInfo] = useState<{ title: string; lastStep: string } | null>(null);
+  const restoreRef = useRef(false);
 
   const generateCover = async () => {
     setCoverLoading(true);
@@ -164,6 +166,81 @@ export default function V3CreateWizard() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [completedBook]);
+
+  // Reprise après crash : recharge le brouillon wizard + relance le workflow
+  // au bon step si `ebook_workflow_progress` / `ebook_workflow_results` existent.
+  useEffect(() => {
+    if (restoreRef.current) return;
+    restoreRef.current = true;
+    try {
+      const wizRaw = localStorage.getItem(WIZARD_KEY);
+      const progRaw = localStorage.getItem('ebook_workflow_progress');
+      const resRaw = localStorage.getItem('ebook_workflow_results');
+      if (!wizRaw) return;
+      const w = JSON.parse(wizRaw);
+
+      // Restaure les champs wizard
+      if (w.title) { setTitle(w.title); setFinalTitle(w.title); }
+      if (w.subtitle) setSubtitle(w.subtitle);
+      if (w.author) setAuthorName(w.author);
+      if (w.description) setDescription(w.description);
+      if (w.genre) {
+        const match = CATEGORIES.find((c) => c.toLowerCase() === String(w.genre).toLowerCase());
+        if (match) setCategory(match);
+        else { setCategory('Autre'); setCustomCategory(String(w.genre)); }
+      }
+      if (w.tone) setTone(w.tone);
+      if (w.numberOfChapters) setChapters(clampNumber(Number(w.numberOfChapters), 3, 60, 12));
+      if (w.wordsPerChapter) setWordsPerChapter(Number(w.wordsPerChapter));
+      if (Array.isArray(w.characters) && w.characters.length) {
+        setCharacters(w.characters.map((c: any) => ({
+          id: makeId(), name: c.name || '', role: c.role || 'Personnage principal', traits: c.description || c.traits || '',
+        })));
+      }
+      if (Array.isArray(w.outline) && w.outline.length) {
+        setOutline(w.outline.map((o: any, i: number) => ({
+          id: makeId(), numero: o.numero || i + 1, titre: o.titre || `Chapitre ${i + 1}`, objectif: o.objectif || '',
+        })));
+      }
+      if (w.cibleProfil) setCibleProfil(w.cibleProfil);
+      if (w.cibleNiveau) setCibleNiveau(w.cibleNiveau);
+      if (w.cibleBesoins) setCibleBesoins(w.cibleBesoins);
+      if (w.cibleFrustrations) setCibleFrustrations(w.cibleFrustrations);
+      if (w.promesseCentrale) setPromesseCentrale(w.promesseCentrale);
+      if (w.promesseBenefices) setPromesseBenefices(w.promesseBenefices);
+      if (w.promesseDifferenciation) setPromesseDifferenciation(w.promesseDifferenciation);
+      if (w.promesseEmotion) setPromesseEmotion(w.promesseEmotion);
+
+      // Détecte une progression workflow inachevée
+      let lastStep = '';
+      let hasProgress = false;
+      if (progRaw) {
+        try {
+          const p = JSON.parse(progRaw);
+          if (p?.currentStepIndex >= 0 || p?.stepResults) {
+            hasProgress = true;
+            lastStep = `P${(p.currentStepIndex ?? 0) + 1}`;
+          }
+        } catch {}
+      }
+      if (!hasProgress && resRaw) {
+        try {
+          const r = JSON.parse(resRaw);
+          const keys = Object.keys(r || {}).filter((k) => /^P\d+$/.test(k));
+          if (keys.length && keys.length < 15) {
+            hasProgress = true;
+            lastStep = keys.sort((a, b) => Number(b.slice(1)) - Number(a.slice(1)))[0];
+          }
+        } catch {}
+      }
+      if (hasProgress && w.title) {
+        setResumeInfo({ title: w.title, lastStep });
+      }
+    } catch (e) {
+      console.warn('V3 wizard restore skipped:', e);
+    }
+  }, []);
+
 
   const [title, setTitle] = useState(hub.title || '');
   const [description, setDescription] = useState(hub.description || '');
@@ -674,11 +751,27 @@ Règles :
       outline: normalizedOutline,
     };
 
+    // Reprise après crash : ne PAS effacer la progression si l'utilisateur
+    // relance le même livre (même titre). Le workflow V2 monté ci-dessous
+    // reprend alors automatiquement à l'étape échouée grâce à
+    // `ebook_workflow_progress` + `ebook_workflow_results`.
     try {
+      const prevRaw = localStorage.getItem(WIZARD_KEY);
+      const prevTitle = prevRaw ? (JSON.parse(prevRaw)?.title || '') : '';
+      const sameBook = prevTitle && prevTitle.toLowerCase() === finalTitle.trim().toLowerCase();
       localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
       localStorage.setItem(TARGET_WORDS_KEY, String(wordsPerChapter));
-      localStorage.setItem(WIZARD_KEY, JSON.stringify(config));
-      ['ebook_workflow_progress', 'ebook_workflow_results', 'ebook_workflow_sync_data'].forEach((key) => localStorage.removeItem(key));
+      localStorage.setItem(WIZARD_KEY, JSON.stringify({
+        ...config,
+        cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations,
+        promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion,
+      }));
+      if (!sameBook) {
+        ['ebook_workflow_progress', 'ebook_workflow_results', 'ebook_workflow_sync_data']
+          .forEach((key) => localStorage.removeItem(key));
+      } else {
+        toast.info('Reprise du livre en cours détectée — les agents redémarrent au dernier chapitre sauvegardé.');
+      }
     } catch {
       // The mounted workflow still receives props if localStorage is unavailable.
     }
@@ -847,6 +940,45 @@ Règles :
 
   return (
     <div className="space-y-8">
+      {resumeInfo && !launched && (
+        <div className="rounded-[24px] border p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between" style={{ borderColor: 'var(--v3-orange-600)', background: 'var(--v3-orange-50)' }}>
+          <div className="flex items-start gap-3">
+            <RotateCcw className="h-5 w-5 mt-0.5" style={{ color: 'var(--v3-orange-600)' }} />
+            <div>
+              <p className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>
+                Livre en cours détecté : « {resumeInfo.title} »
+              </p>
+              <p className="text-xs" style={{ color: 'var(--v3-muted)' }}>
+                Le workflow s'est arrêté à l'étape <strong>{resumeInfo.lastStep}</strong>. Reprends exactement là où tu t'étais arrêté — les chapitres déjà écrits sont conservés.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => { setLaunched(true); setResumeInfo(null); toast.success('Reprise du workflow — les agents redémarrent au dernier chapitre.'); }}
+              className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold"
+              style={{ background: 'var(--v3-orange-600)', color: '#fff' }}
+            >
+              <Rocket className="h-4 w-4" /> Reprendre le workflow
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (!confirm('Repartir de zéro effacera la progression enregistrée. Continuer ?')) return;
+                ['ebook_workflow_progress', 'ebook_workflow_results', 'ebook_workflow_sync_data'].forEach((k) => localStorage.removeItem(k));
+                setResumeInfo(null);
+                toast.info('Progression effacée — tu peux repartir de zéro.');
+              }}
+              className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold"
+              style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+            >
+              Effacer
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Barre d'actions rapides */}
       <div className="flex flex-wrap gap-2 justify-end">
         <Link
