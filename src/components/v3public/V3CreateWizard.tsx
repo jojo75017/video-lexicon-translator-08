@@ -167,6 +167,81 @@ export default function V3CreateWizard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [completedBook]);
 
+  // Reprise après crash : recharge le brouillon wizard + relance le workflow
+  // au bon step si `ebook_workflow_progress` / `ebook_workflow_results` existent.
+  useEffect(() => {
+    if (restoreRef.current) return;
+    restoreRef.current = true;
+    try {
+      const wizRaw = localStorage.getItem(WIZARD_KEY);
+      const progRaw = localStorage.getItem('ebook_workflow_progress');
+      const resRaw = localStorage.getItem('ebook_workflow_results');
+      if (!wizRaw) return;
+      const w = JSON.parse(wizRaw);
+
+      // Restaure les champs wizard
+      if (w.title) { setTitle(w.title); setFinalTitle(w.title); }
+      if (w.subtitle) setSubtitle(w.subtitle);
+      if (w.author) setAuthorName(w.author);
+      if (w.description) setDescription(w.description);
+      if (w.genre) {
+        const match = CATEGORIES.find((c) => c.toLowerCase() === String(w.genre).toLowerCase());
+        if (match) setCategory(match);
+        else { setCategory('Autre'); setCustomCategory(String(w.genre)); }
+      }
+      if (w.tone) setTone(w.tone);
+      if (w.numberOfChapters) setChapters(clampNumber(Number(w.numberOfChapters), 3, 60, 12));
+      if (w.wordsPerChapter) setWordsPerChapter(Number(w.wordsPerChapter));
+      if (Array.isArray(w.characters) && w.characters.length) {
+        setCharacters(w.characters.map((c: any) => ({
+          id: makeId(), name: c.name || '', role: c.role || 'Personnage principal', traits: c.description || c.traits || '',
+        })));
+      }
+      if (Array.isArray(w.outline) && w.outline.length) {
+        setOutline(w.outline.map((o: any, i: number) => ({
+          id: makeId(), numero: o.numero || i + 1, titre: o.titre || `Chapitre ${i + 1}`, objectif: o.objectif || '',
+        })));
+      }
+      if (w.cibleProfil) setCibleProfil(w.cibleProfil);
+      if (w.cibleNiveau) setCibleNiveau(w.cibleNiveau);
+      if (w.cibleBesoins) setCibleBesoins(w.cibleBesoins);
+      if (w.cibleFrustrations) setCibleFrustrations(w.cibleFrustrations);
+      if (w.promesseCentrale) setPromesseCentrale(w.promesseCentrale);
+      if (w.promesseBenefices) setPromesseBenefices(w.promesseBenefices);
+      if (w.promesseDifferenciation) setPromesseDifferenciation(w.promesseDifferenciation);
+      if (w.promesseEmotion) setPromesseEmotion(w.promesseEmotion);
+
+      // Détecte une progression workflow inachevée
+      let lastStep = '';
+      let hasProgress = false;
+      if (progRaw) {
+        try {
+          const p = JSON.parse(progRaw);
+          if (p?.currentStepIndex >= 0 || p?.stepResults) {
+            hasProgress = true;
+            lastStep = `P${(p.currentStepIndex ?? 0) + 1}`;
+          }
+        } catch {}
+      }
+      if (!hasProgress && resRaw) {
+        try {
+          const r = JSON.parse(resRaw);
+          const keys = Object.keys(r || {}).filter((k) => /^P\d+$/.test(k));
+          if (keys.length && keys.length < 15) {
+            hasProgress = true;
+            lastStep = keys.sort((a, b) => Number(b.slice(1)) - Number(a.slice(1)))[0];
+          }
+        } catch {}
+      }
+      if (hasProgress && w.title) {
+        setResumeInfo({ title: w.title, lastStep });
+      }
+    } catch (e) {
+      console.warn('V3 wizard restore skipped:', e);
+    }
+  }, []);
+
+
   const [title, setTitle] = useState(hub.title || '');
   const [description, setDescription] = useState(hub.description || '');
   const [category, setCategory] = useState(hub.genre || 'Roman');
