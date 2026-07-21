@@ -147,6 +147,11 @@ export const ApiProviderQuickSettings: React.FC<ApiProviderQuickSettingsProps> =
         </div>
       </div>
 
+      {provider === 'gemini' && (
+        <GeminiKeyManager onChange={onStatusChange} />
+      )}
+
+
       {provider === 'openrouter' && (
         <div className="mt-4 rounded-xl border bg-background p-3" style={{ borderColor: '#eadfc9' }}>
           <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
