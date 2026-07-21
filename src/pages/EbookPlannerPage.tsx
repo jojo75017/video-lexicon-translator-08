@@ -1347,23 +1347,26 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       toast.error('Ajoutez des chapitres pour générer la table des matières');
       return;
     }
-    let toc = `📚 TABLE DES MATIÈRES\n${'='.repeat(50)}\n\n`;
+    setTocDialogOpen(true);
+  };
+
+  const buildTocPlainText = () => {
+    let toc = `TABLE DES MATIÈRES\n\n`;
     let currentPage = preface ? 5 : 3;
-    if (preface) toc += `Préface ................................................ Page 3\n\n`;
+    if (preface) { toc += `Préface — p. 3\n`; }
     chapters.forEach((chapter, index) => {
-      const chapterNumber = index + 1;
-      toc += `${chapterNumber}. ${chapter.title}${'.'.repeat(Math.max(2, 45 - chapter.title.length - chapterNumber.toString().length))} Page ${currentPage}\n`;
-      chapter.subChapters.forEach((subChapter, subIndex) => {
-        const subNumber = `${chapterNumber}.${subIndex + 1}`;
-        toc += `   ${subNumber} ${subChapter.title}${'.'.repeat(Math.max(2, 42 - subChapter.title.length - subNumber.length))} Page ${currentPage + subIndex + 1}\n`;
+      toc += `${index + 1}. ${chapter.title || `Chapitre ${index + 1}`} — p. ${currentPage}\n`;
+      chapter.subChapters.forEach((sub, sIdx) => {
+        toc += `    ${index + 1}.${sIdx + 1} ${sub.title || 'Sous-chapitre'} — p. ${currentPage + sIdx + 1}\n`;
       });
-      toc += '\n';
       currentPage += Math.max(5, chapter.subChapters.length + 3);
     });
-    if (conclusion) toc += `Conclusion ................................ Page ${currentPage + 2}\n`;
-    toc += `\n${'='.repeat(50)}\nTotal estimé: ${currentPage + (conclusion ? 4 : 2)} pages\n`;
-    navigator.clipboard.writeText(toc);
-    toast.success('Table des matières copiée !');
+    if (conclusion) toc += `\nConclusion — p. ${currentPage + 2}\n`;
+    if (epilogue) toc += `Épilogue — p. ${currentPage + 4}\n`;
+    if (aboutAuthor) toc += `À propos de l'auteur — p. ${currentPage + 6}\n`;
+    if (acknowledgments) toc += `Remerciements — p. ${currentPage + 7}\n`;
+    if (reviewNote) toc += `Note pour avis — p. ${currentPage + 8}\n`;
+    return toc;
   };
 
   const clearCurrentEditorState = () => {
