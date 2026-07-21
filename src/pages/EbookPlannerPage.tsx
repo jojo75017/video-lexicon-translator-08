@@ -705,6 +705,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       preface: stripBase64ImagesFromContent(preface), 
       conclusion: stripBase64ImagesFromContent(conclusion), 
       epilogue: stripBase64ImagesFromContent(epilogue),
+      aboutAuthor, acknowledgments, reviewNote,
       chapters: stripBase64ImagesFromChapters(chapters), 
       numberOfChapters, targetWordsPerChapter, 
       ebookImages: [], // Ne pas sauvegarder les images dans localStorage
