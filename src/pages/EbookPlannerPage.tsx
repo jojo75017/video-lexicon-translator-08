@@ -3110,6 +3110,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             chapters={chapters}
             characters={characters}
             kdpStructure={kdpStructure}
+            aboutAuthor={aboutAuthor}
+            acknowledgments={acknowledgments}
+            reviewNote={reviewNote}
           />
         );
       
