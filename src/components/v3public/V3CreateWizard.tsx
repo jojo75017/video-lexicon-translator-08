@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check, ImageIcon, Loader2, Palette, Plus, RefreshCw, Rocket, Save, Sparkles, Trash2, UserRound, Wand2, FileDown, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import EbookCompleteWorkflow from '@/components/ebook/EbookCompleteWorkflow';
+import { ApiProviderQuickSettings } from '@/components/ebook/ApiProviderQuickSettings';
 import V3ExportPanel from '@/components/admin/V3ExportPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { invokeImageFunction } from '@/lib/aiImageInvoke';
