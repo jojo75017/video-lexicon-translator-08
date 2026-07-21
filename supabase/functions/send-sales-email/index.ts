@@ -1,46 +1,27 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.78.0";
+import { sendResendEmailThrottled, isQuotaExhausted } from "../_shared/resendThrottle.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// ===== Envoi via Resend (API directe) =====
+// ===== Envoi via Resend (API directe, throttlé à 8 req/s) =====
 const RESEND_API_URL = "https://api.resend.com/emails";
 const FROM_ADDRESS = "Georges Boubet <noreply@ebookstudio.fr>";
 
 async function sendResendEmail(
   to: string,
-  name: string | undefined,
+  _name: string | undefined,
   subject: string,
   html: string,
 ): Promise<{ ok: boolean; detail?: string; id?: string }> {
-  const resendKey = Deno.env.get("RESEND_API_KEY");
-  if (!resendKey) return { ok: false, detail: "RESEND_API_KEY manquante" };
-
-  try {
-    const res = await fetch(RESEND_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${resendKey}`,
-      },
-      body: JSON.stringify({
-        from: FROM_ADDRESS,
-        to: [to],
-        subject,
-        html,
-      }),
-    });
-    if (!res.ok) {
-      const detail = await res.text();
-      return { ok: false, detail: `HTTP ${res.status}: ${detail}` };
-    }
-    const json = await res.json().catch(() => ({}));
-    return { ok: true, id: json?.id };
-  } catch (err) {
-    return { ok: false, detail: String(err) };
-  }
+  const r = await sendResendEmailThrottled({ from: FROM_ADDRESS, to: [to], subject, html });
+  return {
+    ok: r.ok,
+    id: r.id,
+    detail: r.ok ? undefined : `HTTP ${r.status ?? ""}: ${r.detail ?? ""}`,
+  };
 }
 
 // Enregistre chaque envoi dans email_send_log (preuve de délivrabilité côté Resend)
@@ -731,6 +712,7 @@ Deno.serve(async (req) => {
       }).eq("id", prospect.id);
 
       sent++;
+      if (isQuotaExhausted()) { console.warn("[sales-email] Resend daily quota atteint, arrêt de la séquence"); quotaHit = true; break; }
     }
 
     // ===== Passe RELANCE AUTOMATIQUE (cron) =====
@@ -797,6 +779,7 @@ Deno.serve(async (req) => {
           relance_round: round + 1,
         }).eq("id", prospect.id);
         relanceAutoSent++;
+        if (isQuotaExhausted()) { console.warn("[sales-email] Resend daily quota atteint pendant la relance auto, arrêt"); quotaHit = true; break; }
       }
     }
 

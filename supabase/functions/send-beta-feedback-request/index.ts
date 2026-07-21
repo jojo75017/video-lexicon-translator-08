@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { sendResendEmailThrottled, isQuotaExhausted } from "../_shared/resendThrottle.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -57,33 +58,19 @@ serve(async (req) => {
     const results: { email: string; ok: boolean; error?: string }[] = [];
 
     for (const email of recipients) {
-      try {
-        const res = await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${RESEND_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            from: "Georges - EbookStudio <contact@ebookstudio.fr>",
-            to: [email],
-            reply_to: "boubetgeorges@gmail.com",
-            subject,
-            html: buildHtml(),
-          }),
-        });
-        if (!res.ok) {
-          const txt = await res.text();
-          console.error("Resend error", email, res.status, txt);
-          results.push({ email, ok: false, error: `${res.status}` });
-        } else {
-          results.push({ email, ok: true });
-        }
-      } catch (e: any) {
-        results.push({ email, ok: false, error: e.message });
+      const r = await sendResendEmailThrottled({
+        from: "Georges - EbookStudio <contact@ebookstudio.fr>",
+        to: [email],
+        reply_to: "boubetgeorges@gmail.com",
+        subject,
+        html: buildHtml(),
+      });
+      if (r.ok) results.push({ email, ok: true });
+      else {
+        console.error("Resend error", email, r.status, r.detail);
+        results.push({ email, ok: false, error: `${r.status ?? ""}` });
       }
-      // petit délai pour respecter le rate limit Resend
-      await new Promise((r) => setTimeout(r, 600));
+      if (isQuotaExhausted()) { console.warn("[beta-feedback] Resend daily quota atteint, arrêt"); break; }
     }
 
     const sent = results.filter((r) => r.ok).length;
