@@ -4055,6 +4055,99 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
       {/* Admin: Subscriber Activity Popup */}
       <SubscriberActivityPopup />
 
+      {/* Sommaire — Table des matières formatée */}
+      <Dialog open={tocDialogOpen} onOpenChange={setTocDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-serif tracking-wide text-[#232F3E]">
+              Table des matières
+            </DialogTitle>
+            <DialogDescription>
+              Aperçu propre du sommaire. Il sera intégré automatiquement dans les exports PDF, DOCX et TXT.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4 rounded-2xl border border-[#008296]/20 bg-white p-6 font-serif text-[#232F3E]">
+            <h2 className="mb-6 text-center text-xl font-bold uppercase tracking-[0.2em] text-[#008296]">
+              {ebookTitle || 'Votre livre'}
+            </h2>
+            <ol className="space-y-3">
+              {preface && (
+                <li className="flex items-baseline justify-between gap-4 border-b border-dashed border-[#008296]/20 pb-2">
+                  <span className="italic">Préface</span>
+                  <span className="text-sm text-[#008296]">p. 3</span>
+                </li>
+              )}
+              {chapters.map((chapter, index) => {
+                const startPage = (preface ? 5 : 3) + index * 6;
+                return (
+                  <li key={chapter.id || index} className="space-y-1">
+                    <div className="flex items-baseline justify-between gap-4 border-b border-dashed border-[#008296]/20 pb-1">
+                      <span className="font-semibold">
+                        <span className="mr-2 text-[#008296]">{String(index + 1).padStart(2, '0')}.</span>
+                        {chapter.title || `Chapitre ${index + 1}`}
+                      </span>
+                      <span className="text-sm text-[#008296]">p. {startPage}</span>
+                    </div>
+                    {chapter.subChapters?.length > 0 && (
+                      <ul className="ml-8 space-y-1 text-sm text-[#232F3E]/80">
+                        {chapter.subChapters.map((sub, sIdx) => (
+                          <li key={sub.id || sIdx} className="flex items-baseline justify-between gap-4">
+                            <span>{`${index + 1}.${sIdx + 1}  ${sub.title || 'Sous-chapitre'}`}</span>
+                            <span className="text-xs text-[#008296]/70">p. {startPage + sIdx + 1}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                );
+              })}
+              {conclusion && (
+                <li className="flex items-baseline justify-between gap-4 border-b border-dashed border-[#008296]/20 pb-2 pt-4">
+                  <span className="italic">Conclusion</span>
+                  <span className="text-sm text-[#008296]">—</span>
+                </li>
+              )}
+              {epilogue && (
+                <li className="flex items-baseline justify-between gap-4 border-b border-dashed border-[#008296]/20 pb-2">
+                  <span className="italic">Épilogue</span>
+                  <span className="text-sm text-[#008296]">—</span>
+                </li>
+              )}
+              {aboutAuthor && (
+                <li className="flex items-baseline justify-between gap-4 border-b border-dashed border-amber-500/30 pb-2">
+                  <span className="italic">À propos de l'auteur</span>
+                  <span className="text-sm text-amber-600">—</span>
+                </li>
+              )}
+              {acknowledgments && (
+                <li className="flex items-baseline justify-between gap-4 border-b border-dashed border-amber-500/30 pb-2">
+                  <span className="italic">Remerciements</span>
+                  <span className="text-sm text-amber-600">—</span>
+                </li>
+              )}
+              {reviewNote && (
+                <li className="flex items-baseline justify-between gap-4 pb-2">
+                  <span className="italic">Note pour avis</span>
+                  <span className="text-sm text-amber-600">—</span>
+                </li>
+              )}
+            </ol>
+          </div>
+          <DialogFooter className="mt-4 gap-2 sm:justify-between">
+            <Button
+              variant="outline"
+              onClick={() => {
+                navigator.clipboard.writeText(buildTocPlainText());
+                toast.success('Sommaire copié dans le presse-papier');
+              }}
+            >
+              Copier en texte
+            </Button>
+            <Button onClick={() => setTocDialogOpen(false)}>Fermer</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* FAB couverture supprimé : bouton intégré dans la barre d'actions du hero */}
     </div>
   );
