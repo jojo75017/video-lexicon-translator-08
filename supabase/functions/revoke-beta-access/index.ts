@@ -135,6 +135,7 @@ Deno.serve(async (req) => {
       } catch (_) { /* noop */ }
 
       results.push({ email, revoked: true, emailSent: mail.ok });
+      if (isQuotaExhausted()) { console.warn('[revoke-beta-access] Resend daily quota atteint, arrêt des envois'); break; }
     }
 
     return new Response(
