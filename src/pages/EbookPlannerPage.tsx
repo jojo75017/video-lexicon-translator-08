@@ -3911,6 +3911,10 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
           </div>
         </div>
 
+        {/* Clé API visible en permanence pour éviter que l'utilisateur ne la cherche */}
+        <div className="max-w-[1600px] mx-auto px-4 md:px-8 pt-4">
+          <ApiProviderQuickSettings onStatusChange={() => setTick((n) => n + 1)} />
+        </div>
 
         {/* Content */}
         <div ref={contentContainerRef} className="max-w-[1600px] mx-auto px-6 lg:px-10 py-8">
