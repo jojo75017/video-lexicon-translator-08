@@ -85,18 +85,7 @@ Deno.serve(async (req) => {
   if (req.method !== "POST") return json(405, { error: "Method not allowed" });
 
   try {
-    // Auth check
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) return json(401, { error: "Authentification requise" });
-
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } },
-    );
-    const { data: { user }, error: authErr } = await supabase.auth.getUser();
-    if (authErr || !user) return json(401, { error: "Session invalide" });
-
+    // Guest mode allowed (V3 public wizard) — auth optional
     const body = (await req.json()) as Body;
     const title = (body.title || "").trim();
     const subtitle = (body.subtitle || "").trim();
