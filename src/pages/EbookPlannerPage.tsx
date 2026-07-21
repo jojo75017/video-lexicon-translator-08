@@ -2555,6 +2555,74 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                     </CardContent>
                   </Card>
 
+                  {/* Pages de fin : À propos de l'auteur, Remerciements, Note pour avis */}
+                  <Card className="overflow-hidden border-0 shadow-xl bg-card/80 backdrop-blur-sm">
+                    <CardHeader className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-b border-border/50">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
+                          <BookOpen className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-xl">Pages de fin</CardTitle>
+                          <CardDescription>Trois pages ajoutées automatiquement à la fin de votre livre (PDF, DOCX, TXT).</CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-6 space-y-6">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-amber-500" />
+                          À propos de l'auteur
+                        </Label>
+                        <Textarea
+                          placeholder="Présentez-vous en quelques lignes : parcours, univers, autres livres..."
+                          value={aboutAuthor}
+                          onChange={(e) => setAboutAuthor(e.target.value)}
+                          rows={5}
+                          className="resize-y min-h-[100px] border-2 focus:border-amber-500 transition-colors"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-orange-500" />
+                          Remerciements
+                        </Label>
+                        <Textarea
+                          placeholder="Remerciez celles et ceux qui ont contribué à ce livre..."
+                          value={acknowledgments}
+                          onChange={(e) => setAcknowledgments(e.target.value)}
+                          rows={5}
+                          className="resize-y min-h-[100px] border-2 focus:border-orange-500 transition-colors"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-yellow-600" />
+                          Note pour avis
+                        </Label>
+                        <Textarea
+                          placeholder="Invitez les lecteurs à laisser un avis sur Amazon / Kobo, avec un mot chaleureux..."
+                          value={reviewNote}
+                          onChange={(e) => setReviewNote(e.target.value)}
+                          rows={4}
+                          className="resize-y min-h-[80px] border-2 focus:border-yellow-500 transition-colors"
+                        />
+                        {!reviewNote && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setReviewNote(`Merci d'avoir lu « ${ebookTitle || 'ce livre'} ».\n\nSi cette lecture vous a plu, un court avis sur Amazon aiderait énormément d'autres lecteurs à le découvrir. Quelques mots suffisent — et cela signifie beaucoup pour moi.\n\nMerci du fond du cœur.\n\n${authorName || 'L\'auteur'}`)}
+                            className="text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                          >
+                            <Sparkles className="h-3 w-3 mr-1" />
+                            Utiliser un modèle
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
                   {/* Chapters Card */}
                   <Card className="overflow-hidden border-0 shadow-xl bg-card/80 backdrop-blur-sm">
                     <CardHeader className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border-b border-border/50">
