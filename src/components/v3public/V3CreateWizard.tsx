@@ -663,6 +663,8 @@ Réponds STRICTEMENT en JSON valide, sans markdown, avec ce schéma :
 Règles :
 - exactement ${chapters} chapitres ;
 - jamais de titre générique comme "Chapitre 1" ;
+- jamais le même titre répété ;
+- interdiction de répéter "L'aboutissement" ou une formule de conclusion sur plusieurs chapitres ;
 - aucun bloc markdown, aucune balise json ;
 - titres courts, vendeurs, cohérents avec le synopsis.`;
       const raw = await callAIWriting(prompt, { jsonMode: true, temperature: 0.55, maxTokens: Math.min(12000, 1800 + chapters * 180) });
