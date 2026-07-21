@@ -76,6 +76,9 @@ interface EbookExporterProps {
   chapters: Chapter[];
   characters?: Character[];
   kdpStructure?: KdpStructure;
+  aboutAuthor?: string;
+  acknowledgments?: string;
+  reviewNote?: string;
 }
 
 export const EbookExporter: React.FC<EbookExporterProps> = ({
@@ -86,7 +89,10 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
   epilogue,
   chapters,
   characters = [],
-  kdpStructure
+  kdpStructure,
+  aboutAuthor = '',
+  acknowledgments = '',
+  reviewNote = '',
 }) => {
   const { formatId } = useKdpFormat();
   // ✅ Nettoyage automatique de TOUT le contenu avant export
