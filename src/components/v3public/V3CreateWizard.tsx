@@ -262,9 +262,13 @@ export default function V3CreateWizard() {
         })));
       }
       if (Array.isArray(w.outline) && w.outline.length) {
-        setOutline(w.outline.map((o: any, i: number) => ({
+        const restoredOutline = w.outline.map((o: any, i: number) => ({
           id: makeId(), numero: o.numero || i + 1, titre: o.titre || `Chapitre ${i + 1}`, objectif: o.objectif || '',
-        })));
+        }));
+        const restoredCount = clampNumber(Number(w.numberOfChapters || restoredOutline.length), 3, 60, restoredOutline.length || 12);
+        setOutline(hasRepeatedFallbackTitles(restoredOutline, restoredCount)
+          ? buildFallbackOutline(w.title || title, w.genre || effectiveCategory, restoredCount)
+          : restoredOutline);
       }
       if (w.cibleProfil) setCibleProfil(w.cibleProfil);
       if (w.cibleNiveau) setCibleNiveau(w.cibleNiveau);
@@ -447,12 +451,13 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
     }));
 
   const normalizedOutline = outline
+    .concat(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters).slice(outline.length))
     .slice(0, chapters)
     .map((item, index) => {
       const cleanedTitle = cleanText(item.titre);
       const fallbackTitle = cleanedTitle && !isGenericTitle(cleanedTitle)
         ? cleanedTitle
-        : `Chapitre ${index + 1} — à préciser`;
+        : buildFallbackOutline(finalTitle || title, effectiveCategory, chapters)[index]?.titre || `Chapitre ${index + 1} — ${cleanText(finalTitle || title || effectiveCategory)}`;
       return { ...item, numero: index + 1, titre: fallbackTitle, objectif: cleanText(item.objectif) };
     });
 
@@ -661,12 +666,18 @@ Règles :
         if (match) parsed = JSON.parse(match[0]);
       }
       const aiChapters = Array.isArray(parsed?.chapters) ? parsed.chapters : [];
+      const seenTitles = new Set<string>();
       const nextOutline = aiChapters.map((item: any, index: number) => ({
         id: makeId(),
         numero: index + 1,
         titre: cleanText(item.titre || item.title),
         objectif: cleanText(item.objectif || item.goal || item.description),
-      })).filter((item: OutlineChapter) => !isGenericTitle(item.titre)).slice(0, chapters);
+      })).filter((item: OutlineChapter) => {
+        const key = cleanText(item.titre).toLowerCase();
+        if (isGenericTitle(item.titre) || seenTitles.has(key)) return false;
+        seenTitles.add(key);
+        return true;
+      }).slice(0, chapters);
       if (nextOutline.length !== chapters) throw new Error('Sommaire incomplet');
       setOutline(nextOutline);
       toast.success('Sommaire généré — relis puis valide avant de lancer.');
@@ -690,6 +701,10 @@ Règles :
     }
     if (step === 1 && outline.length !== chapters) {
       setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
+    }
+    if (step === 1 && hasRepeatedFallbackTitles(outline, chapters)) {
+      setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
+      toast.warning('Ancien sommaire répétitif remplacé par un plan complet.');
     }
     if (step === 2 && !canStepOutline) {
       toast.error('Valide le sommaire : chaque chapitre doit avoir un titre et un objectif.');
