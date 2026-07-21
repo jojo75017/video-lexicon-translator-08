@@ -89,6 +89,7 @@ import { STEP_TO_TAB } from '@/components/ebook/WorkflowNavigation';
 import { WorkflowOnboarding } from '@/components/ebook/WorkflowOnboarding';
 import { WorkflowDashboard } from '@/components/ebook/WorkflowDashboard';
 import { EbookProgressDashboard } from '@/components/ebook/EbookProgressDashboard';
+import { ApiProviderQuickSettings } from '@/components/ebook/ApiProviderQuickSettings';
 import { EbookHeroDashboard } from '@/components/ebook/EbookHeroDashboard';
 
 import { ParcoursDebutant } from '@/components/ebook/ParcoursDebutant';
