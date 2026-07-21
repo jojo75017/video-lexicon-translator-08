@@ -3913,7 +3913,7 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
 
         {/* Clé API visible en permanence pour éviter que l'utilisateur ne la cherche */}
         <div className="max-w-[1600px] mx-auto px-4 md:px-8 pt-4">
-          <ApiProviderQuickSettings onStatusChange={() => setTick((n) => n + 1)} />
+          <ApiProviderQuickSettings />
         </div>
 
         {/* Content */}
