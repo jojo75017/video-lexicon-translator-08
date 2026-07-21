@@ -940,6 +940,45 @@ Règles :
 
   return (
     <div className="space-y-8">
+      {resumeInfo && !launched && (
+        <div className="rounded-[24px] border p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between" style={{ borderColor: 'var(--v3-orange-600)', background: 'var(--v3-orange-50)' }}>
+          <div className="flex items-start gap-3">
+            <RotateCcw className="h-5 w-5 mt-0.5" style={{ color: 'var(--v3-orange-600)' }} />
+            <div>
+              <p className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>
+                Livre en cours détecté : « {resumeInfo.title} »
+              </p>
+              <p className="text-xs" style={{ color: 'var(--v3-muted)' }}>
+                Le workflow s'est arrêté à l'étape <strong>{resumeInfo.lastStep}</strong>. Reprends exactement là où tu t'étais arrêté — les chapitres déjà écrits sont conservés.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => { setLaunched(true); setResumeInfo(null); toast.success('Reprise du workflow — les agents redémarrent au dernier chapitre.'); }}
+              className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold"
+              style={{ background: 'var(--v3-orange-600)', color: '#fff' }}
+            >
+              <Rocket className="h-4 w-4" /> Reprendre le workflow
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (!confirm('Repartir de zéro effacera la progression enregistrée. Continuer ?')) return;
+                ['ebook_workflow_progress', 'ebook_workflow_results', 'ebook_workflow_sync_data'].forEach((k) => localStorage.removeItem(k));
+                setResumeInfo(null);
+                toast.info('Progression effacée — tu peux repartir de zéro.');
+              }}
+              className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold"
+              style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+            >
+              Effacer
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Barre d'actions rapides */}
       <div className="flex flex-wrap gap-2 justify-end">
         <Link
