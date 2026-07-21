@@ -20,8 +20,24 @@ interface Body {
   userApiKey?: string;
 }
 
+function sanitizeApiKey(value: unknown): string {
+  return typeof value === "string"
+    ? value.replace(/[\u200B-\u200D\uFEFF\u00A0]/g, "").replace(/["'`]/g, "").replace(/\s+/g, "").trim()
+    : "";
+}
+
+function isValidGoogleKey(key: string): boolean {
+  const k = sanitizeApiKey(key);
+  if (!k) return false;
+  if (/^AIza[A-Za-z0-9_-]{20,}$/.test(k)) return true;
+  if (/^AQ\.Ab8?[A-Za-z0-9._-]{10,}$/i.test(k)) return true;
+  if (/^AQ\.[A-Za-z0-9._-]{15,}$/i.test(k)) return true;
+  return /^[A-Za-z0-9._-]{30,}$/.test(k);
+}
+
 async function callGemini(prompt: string, apiKey: string) {
-  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const cleanKey = sanitizeApiKey(apiKey);
+  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(cleanKey)}`;
   const response = await fetch(geminiUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -52,7 +68,8 @@ async function callLovableAI(prompt: string) {
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${lovableApiKey}`,
+      "Lovable-API-Key": lovableApiKey,
+      "X-Lovable-AIG-SDK": "edge-function-direct",
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -92,12 +109,12 @@ Deno.serve(async (req) => {
     const category = (body.category || "").trim();
     const intro = (body.bookIntroduction || "").trim();
     const language = body.language || "fr";
-    const userKey = (body.userApiKey || "").trim();
+    const userKey = sanitizeApiKey(body.userApiKey);
 
     if (!title) {
       return json(400, { error: "Titre requis" });
     }
-    const serverGeminiKey = (Deno.env.get("GEMINI_API_KEY") || "").trim();
+    const serverGeminiKey = sanitizeApiKey(Deno.env.get("GEMINI_API_KEY") || "");
 
     const langLabel = language === "en" ? "English" : language === "es" ? "Spanish" : language === "it" ? "Italian" : "French";
 
@@ -120,9 +137,12 @@ Renvoie uniquement cet objet JSON:
   "promesseEmotion": "string (3-5 mots: émotion visée)"
 }`;
 
-    let aiResult = userKey.startsWith("AIza") ? await callGemini(prompt, userKey) : null;
-    if (!aiResult?.ok && serverGeminiKey.startsWith("AIza")) aiResult = await callGemini(prompt, serverGeminiKey);
-    if (!aiResult?.ok) aiResult = await callLovableAI(prompt);
+    let aiResult = isValidGoogleKey(userKey) ? await callGemini(prompt, userKey) : null;
+    if (userKey && !isValidGoogleKey(userKey)) {
+      return json(400, { error: "Clé Gemini invalide ou incomplète. Collez la clé complète." });
+    }
+    if (!aiResult?.ok && !userKey && isValidGoogleKey(serverGeminiKey)) aiResult = await callGemini(prompt, serverGeminiKey);
+    if (!aiResult?.ok && !userKey) aiResult = await callLovableAI(prompt);
     if (!aiResult.ok) {
       const status = aiResult.status === 429 ? 429 : aiResult.status === 402 ? 402 : 502;
       const message = status === 429
