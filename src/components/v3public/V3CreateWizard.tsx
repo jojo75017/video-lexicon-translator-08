@@ -325,6 +325,25 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
   const canStepOutline = normalizedOutline.length >= 3;
   const canStepFour = finalTitle.trim().length >= 3 && authorName.trim().length >= 2;
 
+  const targetPromiseBlock = () => {
+    const cibleLines = [
+      cibleProfil && `Profil : ${cibleProfil}`,
+      cibleNiveau && `Niveau : ${cibleNiveau}`,
+      cibleBesoins && `Besoins : ${cibleBesoins}`,
+      cibleFrustrations && `Frustrations : ${cibleFrustrations}`,
+    ].filter(Boolean).join('\n');
+    const promLines = [
+      promesseCentrale && `Promesse centrale : ${promesseCentrale}`,
+      promesseBenefices && `Bénéfices :\n${promesseBenefices}`,
+      promesseDifferenciation && `Différenciation : ${promesseDifferenciation}`,
+      promesseEmotion && `Émotion visée : ${promesseEmotion}`,
+    ].filter(Boolean).join('\n');
+    const out: string[] = [];
+    if (cibleLines) out.push(`🎯 CIBLE IDÉALE\n${cibleLines}`);
+    if (promLines) out.push(`✨ PROMESSE\n${promLines}`);
+    return out.join('\n\n');
+  };
+
   const buildWorkflowDescription = () => [
     description.trim(),
     `Style demandé : ${tone}.`,
@@ -333,6 +352,7 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
     workflowCharacters.length
       ? `Personnages fournis : ${workflowCharacters.map((character) => `${character.name} (${character.role}) — ${character.description}`).join(' | ')}`
       : '',
+    targetPromiseBlock(),
   ].filter(Boolean).join('\n\n');
 
   const syncProjectId = (id: string | null) => {
