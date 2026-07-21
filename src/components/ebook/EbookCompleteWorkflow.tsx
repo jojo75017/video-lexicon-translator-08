@@ -23,7 +23,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { useWorkflowResults } from '@/hooks/useWorkflowResults';
 import { useWorkflowCloudSync } from '@/hooks/useWorkflowCloudSync';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
-import { getProvider, getOpenRouterModel, validateKeyFormat, isAIConfigured } from '@/services/aiWritingService';
+import { getProvider, getOpenRouterModel, validateKeyFormat, isAIConfigured, getActiveAIKey, sanitizeKey } from '@/services/aiWritingService';
 import { useV3Entitlement } from '@/hooks/useV3Entitlement';
 import WritingEngineBadge from './WritingEngineBadge';
 import { WORKFLOW_STEPS, WORKFLOW_STEP_COUNT } from './workflow/workflowAgents';
@@ -243,10 +243,11 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
     return () => clearInterval(interval);
   }, [currentStepIndex, isGenerating]);
 
-  const normalizedUserApiKey = typeof userApiKey === 'string' ? userApiKey.trim() : '';
+  const activeProvider = getProvider();
+  const normalizedUserApiKey = sanitizeKey(getActiveAIKey(userApiKey));
   const hasConfiguredApiKey = normalizedUserApiKey.length > 0;
   // Accepte n'importe quel provider IA valide (Gemini ancien/nouveau format, Claude, OpenAI, OpenRouter)
-  const hasPlausibleApiKeyFormat = isAIConfigured() || (hasConfiguredApiKey && validateKeyFormat(getProvider(), normalizedUserApiKey));
+  const hasPlausibleApiKeyFormat = isAIConfigured() || (hasConfiguredApiKey && validateKeyFormat(activeProvider, normalizedUserApiKey));
   const hasUsableApiKey = hasPlausibleApiKeyFormat;
   const hasStrictlyValidatedApiKey = hasUsableApiKey && isUserKeyValid === true;
   const hasApiKeyValidationWarning = hasConfiguredApiKey && !hasPlausibleApiKeyFormat;
@@ -812,7 +813,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
             previousContext,
             userApiKey: hasUsableApiKey ? normalizedUserApiKey : undefined,
             useUserKey: hasUsableApiKey,
-            provider: getProvider(),
+            provider: activeProvider,
             openrouterModel: getOpenRouterModel(),
             quality: hasFull ? 'pro' : 'core',
             ...extraBody,
@@ -854,7 +855,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
               previousContext,
               userApiKey: hasUsableApiKey ? normalizedUserApiKey : undefined,
               useUserKey: hasUsableApiKey,
-              provider: getProvider(),
+              provider: activeProvider,
               openrouterModel: getOpenRouterModel(),
               quality: hasFull ? 'pro' : 'core',
               ...extraBody,
