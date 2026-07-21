@@ -1255,18 +1255,10 @@ serve(async (req) => {
 
     // La clé utilisateur devient optionnelle ; sinon on utilise le backend IA intégré.
     // Selon le provider choisi, on valide le format de clé correspondant.
-    const cleanedApiKey = typeof userApiKey === 'string' ? userApiKey.trim() : '';
-    const normalizedProvider = ['gemini', 'claude', 'openai', 'openrouter'].includes(provider) ? provider : 'gemini';
-    const keyFormatOk = (() => {
-      if (cleanedApiKey.length < 20) return false;
-      switch (normalizedProvider) {
-        case 'gemini': return cleanedApiKey.startsWith('AIza') || /^AQ\.Ab/i.test(cleanedApiKey);
-        case 'claude': return cleanedApiKey.startsWith('sk-ant-');
-        case 'openai': return cleanedApiKey.startsWith('sk-');
-        case 'openrouter': return cleanedApiKey.startsWith('sk-or-');
-        default: return false;
-      }
-    })();
+    const cleanedApiKey = sanitizeApiKey(userApiKey);
+    const requestedProvider = ['gemini', 'claude', 'openai', 'openrouter'].includes(provider) ? provider : 'gemini';
+    const normalizedProvider = cleanedApiKey ? inferProviderFromKey(cleanedApiKey, requestedProvider) : requestedProvider;
+    const keyFormatOk = cleanedApiKey ? isValidProviderKey(normalizedProvider, cleanedApiKey) : false;
 
     activeProvider = normalizedProvider;
     activeOpenRouterModel = typeof openrouterModel === 'string' && openrouterModel.trim()
@@ -1276,7 +1268,13 @@ serve(async (req) => {
     activeLanguageDirective = languageDirective;
 
     if (cleanedApiKey && !keyFormatOk) {
-      console.warn(`Ignoring invalid user ${normalizedProvider} key for step ${step}; using Lovable AI fallback instead.`);
+      console.warn(`Invalid user ${normalizedProvider} key for step ${step}; refusing Lovable AI fallback to avoid hidden credit usage.`);
+      return new Response(
+        JSON.stringify({
+          error: `Clé ${normalizedProvider === 'gemini' ? 'Gemini' : normalizedProvider} invalide ou incomplète. Collez la clé complète puis relancez P1.`,
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     console.log(
