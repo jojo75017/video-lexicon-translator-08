@@ -471,6 +471,12 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
   const canStepOutline = normalizedOutline.length >= 3;
   const canStepFour = finalTitle.trim().length >= 3 && authorName.trim().length >= 2;
 
+  useEffect(() => {
+    if (hasRepeatedFallbackTitles(outline, chapters)) {
+      setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
+    }
+  }, [chapters, effectiveCategory, finalTitle, title, outline]);
+
   const targetPromiseBlock = () => {
     const cibleLines = [
       cibleProfil && `Profil : ${cibleProfil}`,
@@ -1322,7 +1328,7 @@ Règles :
           <div className="relative">
             <div className="absolute bottom-4 left-[27px] top-4 w-px" style={{ background: 'var(--v3-border)' }} aria-hidden />
             <div className="space-y-3">
-              {outline.slice(0, chapters).map((chapter, index) => {
+              {normalizedOutline.map((chapter, index) => {
                 const isValid = chapter.titre.length >= 4 && chapter.objectif.length >= 8;
                 return (
                   <div key={chapter.id} className="group relative flex gap-4">
