@@ -718,7 +718,31 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
       });
     }
 
-    // Numérotation des pages (skip cover + copyright = first 2 pages)
+    // ═══ PAGES DE FIN : Auteur / Remerciements / Note pour avis ═══
+    const addBackMatterPage = (title: string, body: string) => {
+      if (!body || !body.trim()) return;
+      pdf.addPage();
+      yPosition = 25;
+      pdf.setFontSize(18);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(stripEmojis(title).toUpperCase(), pageWidth / 2, yPosition, { align: 'center' });
+      yPosition += 6;
+      pdf.setDrawColor(180);
+      pdf.line(pageWidth * 0.3, yPosition, pageWidth * 0.7, yPosition);
+      yPosition += 15;
+      pdf.setFontSize(fontSize);
+      pdf.setFont('helvetica', 'normal');
+      const lines = splitTextToSize(body.trim(), usableWidth, fontSize);
+      lines.forEach((line: string) => {
+        checkPageBreak(lineHeight);
+        pdf.text(line, marginLeft, yPosition);
+        yPosition += lineHeight;
+      });
+    };
+    addBackMatterPage("À propos de l'auteur", aboutAuthor);
+    addBackMatterPage('Remerciements', acknowledgments);
+    addBackMatterPage('Note pour avis', reviewNote);
+
     if (includePageNumbers) {
       const totalPages = pdf.getNumberOfPages();
       const startPage = includeCoverPage ? 3 : 1; // Skip cover + copyright
