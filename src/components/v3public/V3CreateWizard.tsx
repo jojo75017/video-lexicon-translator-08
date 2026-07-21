@@ -674,11 +674,27 @@ Règles :
       outline: normalizedOutline,
     };
 
+    // Reprise après crash : ne PAS effacer la progression si l'utilisateur
+    // relance le même livre (même titre). Le workflow V2 monté ci-dessous
+    // reprend alors automatiquement à l'étape échouée grâce à
+    // `ebook_workflow_progress` + `ebook_workflow_results`.
     try {
+      const prevRaw = localStorage.getItem(WIZARD_KEY);
+      const prevTitle = prevRaw ? (JSON.parse(prevRaw)?.title || '') : '';
+      const sameBook = prevTitle && prevTitle.toLowerCase() === finalTitle.trim().toLowerCase();
       localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
       localStorage.setItem(TARGET_WORDS_KEY, String(wordsPerChapter));
-      localStorage.setItem(WIZARD_KEY, JSON.stringify(config));
-      ['ebook_workflow_progress', 'ebook_workflow_results', 'ebook_workflow_sync_data'].forEach((key) => localStorage.removeItem(key));
+      localStorage.setItem(WIZARD_KEY, JSON.stringify({
+        ...config,
+        cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations,
+        promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion,
+      }));
+      if (!sameBook) {
+        ['ebook_workflow_progress', 'ebook_workflow_results', 'ebook_workflow_sync_data']
+          .forEach((key) => localStorage.removeItem(key));
+      } else {
+        toast.info('Reprise du livre en cours détectée — les agents redémarrent au dernier chapitre sauvegardé.');
+      }
     } catch {
       // The mounted workflow still receives props if localStorage is unavailable.
     }
