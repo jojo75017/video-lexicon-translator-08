@@ -19,6 +19,14 @@ const MODEL_FALLBACKS = [
 
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
+function sanitizeGeminiApiKey(value: string): string {
+  return (value || '')
+    .replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '')
+    .replace(/["'`]/g, '')
+    .replace(/\s+/g, '')
+    .trim();
+}
+
 interface GeminiCallOptions {
   systemPrompt?: string;
   temperature?: number;
@@ -103,8 +111,9 @@ export async function callGemini(
     body.system_instruction = { parts: [{ text: systemPrompt }] };
   }
 
+  const cleanedApiKey = sanitizeGeminiApiKey(apiKey);
   const doFetch = (model: string) => fetch(
-    `${GEMINI_API_BASE}/${model}:generateContent?key=${apiKey}`,
+    `${GEMINI_API_BASE}/${model}:generateContent?key=${encodeURIComponent(cleanedApiKey)}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -227,8 +236,9 @@ export async function callGeminiWithHistory(
     body.system_instruction = { parts: [{ text: systemPrompt }] };
   }
 
+  const cleanedApiKey = sanitizeGeminiApiKey(apiKey);
   const doFetch = (model: string) => fetch(
-    `${GEMINI_API_BASE}/${model}:generateContent?key=${apiKey}`,
+    `${GEMINI_API_BASE}/${model}:generateContent?key=${encodeURIComponent(cleanedApiKey)}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

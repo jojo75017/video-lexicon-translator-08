@@ -62,6 +62,42 @@ let activeProvider: string = 'gemini';
 // Modèle OpenRouter sélectionné (slug ex. anthropic/claude-sonnet-4.5)
 let activeOpenRouterModel: string = 'google/gemini-2.5-flash-lite';
 
+function sanitizeApiKey(value: unknown): string {
+  return typeof value === 'string'
+    ? value.replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').replace(/["'`]/g, '').replace(/\s+/g, '').trim()
+    : '';
+}
+
+function isValidGoogleKey(key: string): boolean {
+  const k = sanitizeApiKey(key);
+  if (!k) return false;
+  if (/^AIza[A-Za-z0-9_-]{20,}$/.test(k)) return true;
+  if (/^AQ\.Ab8?[A-Za-z0-9._-]{10,}$/i.test(k)) return true;
+  if (/^AQ\.[A-Za-z0-9._-]{15,}$/i.test(k)) return true;
+  return /^[A-Za-z0-9._-]{30,}$/.test(k);
+}
+
+function inferProviderFromKey(key: string, requestedProvider: string): string {
+  const k = sanitizeApiKey(key);
+  if (k.startsWith('sk-or-')) return 'openrouter';
+  if (k.startsWith('sk-ant-')) return 'claude';
+  if (k.startsWith('sk-')) return 'openai';
+  if (isValidGoogleKey(k)) return 'gemini';
+  return ['gemini', 'claude', 'openai', 'openrouter'].includes(requestedProvider) ? requestedProvider : 'gemini';
+}
+
+function isValidProviderKey(provider: string, key: string): boolean {
+  const k = sanitizeApiKey(key);
+  if (k.length < 20) return false;
+  switch (provider) {
+    case 'gemini': return isValidGoogleKey(k);
+    case 'claude': return k.startsWith('sk-ant-');
+    case 'openai': return k.startsWith('sk-') && !k.startsWith('sk-or-') && !k.startsWith('sk-ant-');
+    case 'openrouter': return k.startsWith('sk-or-');
+    default: return false;
+  }
+}
+
 // Token tracking global
 let totalTokenUsage = {
   promptTokens: 0,
@@ -71,15 +107,15 @@ let totalTokenUsage = {
 
 async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTokens: number, apiKey: string, retryCount = 0): Promise<string> {
   const MAX_RETRIES = 1;
-  const cleanKey = apiKey.trim();
+  const cleanKey = sanitizeApiKey(apiKey);
   
   // Pre-flight: vérifier le format de la clé Gemini
-  if (!cleanKey || cleanKey.length < 20 || !cleanKey.startsWith('AIza')) {
-    throw new Error('INVALID_API_KEY: Clé API Gemini invalide. Utilisez une clé Google AI Studio commençant par AIza.');
+  if (!isValidGoogleKey(cleanKey)) {
+    throw new Error('INVALID_API_KEY: Clé API Gemini invalide. Collez la clé complète depuis Google AI Studio.');
   }
   
-  console.log(`[Gemini] Using key: length=${cleanKey.length}, prefix=${cleanKey.substring(0, 8)}..., retry=${retryCount}`);
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${cleanKey}`;
+  console.log(`[Gemini] Using subscriber key (length=${cleanKey.length}), retry=${retryCount}`);
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(cleanKey)}`;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), maxTokens >= 5000 ? 115000 : 90000);
   let response: Response | null = null;
@@ -125,9 +161,9 @@ async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTok
       return await callGeminiDirect(systemPrompt, userPrompt, maxTokens, apiKey, retryCount + 1);
     }
     
-    if (status === 429) throw new Error('RATE_LIMIT: Limite Gemini atteinte après 3 tentatives. Activez la facturation sur votre projet Google Cloud pour supprimer cette limite.');
+    if (status === 429) throw new Error('RATE_LIMIT: Limite Gemini atteinte après 2 tentatives. Vérifiez le plafond et la facturation du projet Google lié à cette clé.');
     if (status === 503 || status === 500) throw new Error('GEMINI_OVERLOAD: Le service Gemini est temporairement surchargé. Réessayez dans 1-2 minutes.');
-    if (status === 400 || status === 401 || status === 403) throw new Error('INVALID_API_KEY: Clé API Gemini invalide. Utilisez une clé Google AI Studio commençant par AIza.');
+    if (status === 400 || status === 401 || status === 403) throw new Error('INVALID_API_KEY: Clé API Gemini refusée par Google. Vérifiez que l’API Gemini est activée sur le bon projet.');
     throw new Error(`Gemini Error: ${status}`);
   }
 
@@ -308,7 +344,8 @@ async function callLovableAI(systemPrompt: string, userPrompt: string, maxTokens
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${lovableApiKey}`,
+        'Lovable-API-Key': lovableApiKey,
+        'X-Lovable-AIG-SDK': 'edge-function-direct',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -367,8 +404,9 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
     ? `${systemPrompt}\n\n${activeLanguageDirective}`
     : systemPrompt;
 
-  // Providers non-Gemini (Claude / OpenAI / OpenRouter) : clé BYOK de l'abonné.
-  // En cas d'échec récupérable, on retombe sur le backend Lovable AI intégré.
+  // Providers BYOK : si une clé utilisateur est configurée, on NE retombe jamais
+  // silencieusement sur Lovable AI. Sinon l'abonné croit utiliser sa clé alors
+  // que le workflow consomme les crédits workspace et échoue au mauvais endroit.
   if (userKey && activeProvider !== 'gemini') {
     try {
       switch (activeProvider) {
@@ -381,10 +419,8 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
       }
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
-      console.warn(`Provider ${activeProvider} failed, falling back to Lovable AI:`, msg);
-      // Erreurs terminales : on ne masque pas derrière le fallback.
-      if (/INVALID_API_KEY|CREDITS_EXHAUSTED/i.test(msg)) throw error;
-      return await callLovableAI(finalSystemPrompt, userPrompt, maxTokens);
+      console.warn(`Provider ${activeProvider} failed with user key:`, msg);
+      throw error;
     }
   }
 
@@ -393,22 +429,8 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
       return await callGeminiDirect(finalSystemPrompt, userPrompt, maxTokens, userKey);
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
-      console.warn('User Gemini key failed, falling back to Lovable AI:', msg);
-      if (/TIMEOUT|RATE_LIMIT|GEMINI_OVERLOAD|Gemini Error: 5/i.test(msg)) {
-        throw error;
-      }
-      try {
-        return await callLovableAI(finalSystemPrompt, userPrompt, maxTokens);
-      } catch (fallbackErr) {
-        const fbMsg = fallbackErr instanceof Error ? fallbackErr.message : String(fallbackErr);
-        console.warn('Lovable AI fallback failed, retrying Gemini after long wait:', fbMsg);
-        if (/TIMEOUT|RATE_LIMIT|GEMINI_OVERLOAD|CREDITS_EXHAUSTED|LOVABLE_AI_ERROR/i.test(fbMsg)) {
-          throw fallbackErr;
-        }
-        // Dernier recours : attendre 30s et retenter Gemini une fois
-        await new Promise((r) => setTimeout(r, 30000));
-        return await callGeminiDirect(finalSystemPrompt, userPrompt, maxTokens, userKey);
-      }
+      console.warn('User Gemini key failed:', msg);
+      throw error;
     }
   }
 
@@ -1234,18 +1256,10 @@ serve(async (req) => {
 
     // La clé utilisateur devient optionnelle ; sinon on utilise le backend IA intégré.
     // Selon le provider choisi, on valide le format de clé correspondant.
-    const cleanedApiKey = typeof userApiKey === 'string' ? userApiKey.trim() : '';
-    const normalizedProvider = ['gemini', 'claude', 'openai', 'openrouter'].includes(provider) ? provider : 'gemini';
-    const keyFormatOk = (() => {
-      if (cleanedApiKey.length < 20) return false;
-      switch (normalizedProvider) {
-        case 'gemini': return cleanedApiKey.startsWith('AIza') || /^AQ\.Ab/i.test(cleanedApiKey);
-        case 'claude': return cleanedApiKey.startsWith('sk-ant-');
-        case 'openai': return cleanedApiKey.startsWith('sk-');
-        case 'openrouter': return cleanedApiKey.startsWith('sk-or-');
-        default: return false;
-      }
-    })();
+    const cleanedApiKey = sanitizeApiKey(userApiKey);
+    const requestedProvider = ['gemini', 'claude', 'openai', 'openrouter'].includes(provider) ? provider : 'gemini';
+    const normalizedProvider = cleanedApiKey ? inferProviderFromKey(cleanedApiKey, requestedProvider) : requestedProvider;
+    const keyFormatOk = cleanedApiKey ? isValidProviderKey(normalizedProvider, cleanedApiKey) : false;
 
     activeProvider = normalizedProvider;
     activeOpenRouterModel = typeof openrouterModel === 'string' && openrouterModel.trim()
@@ -1255,7 +1269,13 @@ serve(async (req) => {
     activeLanguageDirective = languageDirective;
 
     if (cleanedApiKey && !keyFormatOk) {
-      console.warn(`Ignoring invalid user ${normalizedProvider} key for step ${step}; using Lovable AI fallback instead.`);
+      console.warn(`Invalid user ${normalizedProvider} key for step ${step}; refusing Lovable AI fallback to avoid hidden credit usage.`);
+      return new Response(
+        JSON.stringify({
+          error: `Clé ${normalizedProvider === 'gemini' ? 'Gemini' : normalizedProvider} invalide ou incomplète. Collez la clé complète puis relancez P1.`,
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     console.log(

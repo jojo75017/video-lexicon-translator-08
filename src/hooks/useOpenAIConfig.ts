@@ -4,8 +4,8 @@ import { toast } from 'sonner';
 const validateOpenAIApiKey = async (apiKey: string, _model: string): Promise<boolean> => {
   try {
     toast.loading("Validation de la clé API Gemini...", { id: "validate-openai-key" });
-    const normalizedKey = apiKey.trim();
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+    const normalizedKey = sanitizeKey(apiKey);
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(normalizedKey)}`);
     if (response.status === 429) {
       toast.warning("Clé API valide mais limite de requêtes atteinte", { id: "validate-openai-key" });
       return true;
@@ -33,7 +33,7 @@ import {
   maskApiKey, 
   getApiKeySecurityWarning 
 } from '@/utils/security/secureStorage';
-import { getProvider, getProviderKey, validateKeyFormat } from '@/services/aiWritingService';
+import { getProvider, getProviderKey, sanitizeKey, validateKeyFormat } from '@/services/aiWritingService';
 
 const GEMINI_API_KEY = 'openai_api_key'; // Keep same localStorage key for backward compat
 const GEMINI_MODEL = 'openai_model';
