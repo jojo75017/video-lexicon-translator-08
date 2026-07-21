@@ -47,14 +47,107 @@ export const sanitizeKey = (key: string): string => {
     .trim();
 };
 
+// ---------- Multi-clés Gemini (par projet) ----------
+export interface GeminiKeyEntry { id: string; label: string; key: string }
+const LS_GEMINI_KEYS = 'gemini_keys_v1';
+const LS_GEMINI_ACTIVE = 'gemini_active_key_id';
+
+export const getGeminiKeys = (): GeminiKeyEntry[] => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(LS_GEMINI_KEYS);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr.filter((e) => e && e.id && typeof e.key === 'string') : [];
+  } catch { return []; }
+};
+
+const writeGeminiKeys = (list: GeminiKeyEntry[]) => {
+  localStorage.setItem(LS_GEMINI_KEYS, JSON.stringify(list));
+};
+
+export const getActiveGeminiKeyId = (): string => {
+  if (typeof window === 'undefined') return '';
+  return localStorage.getItem(LS_GEMINI_ACTIVE) || '';
+};
+
+export const setActiveGeminiKeyId = (id: string) => {
+  if (typeof window === 'undefined') return;
+  const list = getGeminiKeys();
+  const entry = list.find((e) => e.id === id);
+  if (!entry) return;
+  localStorage.setItem(LS_GEMINI_ACTIVE, id);
+  // Sync legacy slot so tous les modules lisant openai_api_key voient la bonne clé
+  localStorage.setItem(LS_KEYS.gemini, sanitizeKey(entry.key));
+};
+
+export const addGeminiKey = (label: string, key: string): GeminiKeyEntry | null => {
+  const k = sanitizeKey(key);
+  if (!k) return null;
+  const list = getGeminiKeys();
+  const id = `gk_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
+  const entry: GeminiKeyEntry = { id, label: (label || 'Projet').slice(0, 40), key: k };
+  const next = [...list.filter((e) => e.key !== k), entry];
+  writeGeminiKeys(next);
+  setActiveGeminiKeyId(id);
+  return entry;
+};
+
+export const updateGeminiKey = (id: string, patch: Partial<Pick<GeminiKeyEntry, 'label' | 'key'>>) => {
+  const list = getGeminiKeys().map((e) =>
+    e.id === id ? { ...e, ...(patch.label !== undefined ? { label: patch.label.slice(0, 40) } : {}), ...(patch.key !== undefined ? { key: sanitizeKey(patch.key) } : {}) } : e
+  );
+  writeGeminiKeys(list);
+  if (getActiveGeminiKeyId() === id) {
+    const active = list.find((e) => e.id === id);
+    if (active) localStorage.setItem(LS_KEYS.gemini, sanitizeKey(active.key));
+  }
+};
+
+export const removeGeminiKey = (id: string) => {
+  const list = getGeminiKeys().filter((e) => e.id !== id);
+  writeGeminiKeys(list);
+  if (getActiveGeminiKeyId() === id) {
+    if (list[0]) setActiveGeminiKeyId(list[0].id);
+    else {
+      localStorage.removeItem(LS_GEMINI_ACTIVE);
+      localStorage.removeItem(LS_KEYS.gemini);
+    }
+  }
+};
+
 export const getProviderKey = (p: AIProvider): string => {
   if (typeof window === 'undefined') return '';
+  if (p === 'gemini') {
+    const activeId = getActiveGeminiKeyId();
+    if (activeId) {
+      const entry = getGeminiKeys().find((e) => e.id === activeId);
+      if (entry?.key) return sanitizeKey(entry.key);
+    }
+  }
   return sanitizeKey(localStorage.getItem(LS_KEYS[p]) || '');
 };
 
 export const setProviderKey = (p: AIProvider, key: string) => {
   if (typeof window === 'undefined') return;
   const k = sanitizeKey(key);
+  if (p === 'gemini') {
+    // Migre vers le système multi-clés : met à jour la clé active, ou en crée une.
+    if (!k) {
+      localStorage.removeItem(LS_KEYS.gemini);
+      return;
+    }
+    const list = getGeminiKeys();
+    const activeId = getActiveGeminiKeyId();
+    const active = list.find((e) => e.id === activeId);
+    if (active) {
+      updateGeminiKey(active.id, { key: k });
+    } else {
+      // migre l'ancienne clé unique en premier projet
+      addGeminiKey('Projet 1', k);
+    }
+    localStorage.setItem(LS_KEYS.gemini, k);
+    return;
+  }
   if (k) localStorage.setItem(LS_KEYS[p], k);
   else localStorage.removeItem(LS_KEYS[p]);
 };
