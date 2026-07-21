@@ -627,7 +627,15 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
     setAiTopic(''); setAiResult(null); setStep(0); setLaunched(false); setCompletedBook(null); setCoverUrl(null);
     syncProjectId(null);
     coverTriggeredRef.current = false;
-    ['ebook_workflow_progress', 'ebook_workflow_results', 'ebook_workflow_sync_data'].forEach((k) => localStorage.removeItem(k));
+    [
+      'ebook_workflow_progress',
+      'ebook_workflow_results',
+      'ebook_workflow_sync_data',
+      WIZARD_KEY,
+      CONFIG_KEY,
+      PROJECT_ID_KEY,
+    ].forEach((k) => localStorage.removeItem(k));
+    restoreRef.current = true; // évite qu'un effet de reprise ne recharge l'ancien brouillon
     toast.success('Nouveau livre — formulaire réinitialisé.');
   };
 
