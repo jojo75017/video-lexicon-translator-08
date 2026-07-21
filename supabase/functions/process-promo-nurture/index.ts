@@ -97,22 +97,19 @@ const STEPS: StepDef[] = [
   },
 ];
 
+import { sendResendEmailThrottled, isQuotaExhausted } from "../_shared/resendThrottle.ts";
+
 async function sendEmail(to: string, subject: string, html: string) {
-  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-  if (!RESEND_API_KEY) return false;
-  const r = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      from: "EbookStudio <contact@ebookstudio.fr>",
-      to: [to],
-      subject,
-      html,
-    }),
+  const r = await sendResendEmailThrottled({
+    from: "EbookStudio <contact@ebookstudio.fr>",
+    to: [to],
+    subject,
+    html,
   });
-  if (!r.ok) console.error("Resend fail", r.status, await r.text());
+  if (!r.ok) console.error("Resend fail", r.status, r.detail);
   return r.ok;
 }
+export { isQuotaExhausted };
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -167,6 +164,7 @@ serve(async (req) => {
         completed,
       }).eq("id", row.id);
       sent++;
+      if (isQuotaExhausted()) { console.warn("[promo-nurture] Resend daily quota atteint, arrêt"); break; }
     }
 
     return new Response(JSON.stringify({ ok: true, processed: rows?.length ?? 0, sent }), {

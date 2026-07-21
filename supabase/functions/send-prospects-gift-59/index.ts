@@ -47,21 +47,11 @@ function buildHtml(): string {
   </div>`;
 }
 
+import { sendResendEmailThrottled, isQuotaExhausted } from "../_shared/resendThrottle.ts";
+
 async function sendResendEmail(to: string, subject: string, html: string) {
-  const key = Deno.env.get("RESEND_API_KEY");
-  if (!key) return { ok: false, detail: "RESEND_API_KEY manquante" };
-  try {
-    const res = await fetch(RESEND_API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
-      body: JSON.stringify({ from: FROM_ADDRESS, to: [to], subject, html }),
-    });
-    if (!res.ok) return { ok: false, detail: `HTTP ${res.status}: ${await res.text()}` };
-    const j = await res.json().catch(() => ({}));
-    return { ok: true, id: j?.id };
-  } catch (e) {
-    return { ok: false, detail: String(e) };
-  }
+  const r = await sendResendEmailThrottled({ from: FROM_ADDRESS, to: [to], subject, html });
+  return { ok: r.ok, id: r.id, detail: r.ok ? undefined : `HTTP ${r.status ?? ""}: ${r.detail ?? ""}` };
 }
 
 Deno.serve(async (req) => {
@@ -102,7 +92,7 @@ Deno.serve(async (req) => {
           error_message: r.ok ? null : (r.detail ?? null),
         });
       } catch (_) {}
-      await new Promise((res) => setTimeout(res, 550));
+      if (isQuotaExhausted()) { console.warn("[prospects-gift-59] Resend daily quota atteint, arrêt"); break; }
     }
 
     const sent = results.filter((r) => r.ok).length;
