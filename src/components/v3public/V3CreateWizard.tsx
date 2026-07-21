@@ -178,6 +178,56 @@ export default function V3CreateWizard() {
   const [subtitle, setSubtitle] = useState(hub.subtitle || '');
   const [authorName, setAuthorName] = useState(hub.author || 'Auteur Ebookstudio');
 
+  // Cible & Promesse (parité V2 — améliore drastiquement les résultats des agents)
+  const [cibleProfil, setCibleProfil] = useState('');
+  const [cibleNiveau, setCibleNiveau] = useState('tous');
+  const [cibleBesoins, setCibleBesoins] = useState('');
+  const [cibleFrustrations, setCibleFrustrations] = useState('');
+  const [promesseCentrale, setPromesseCentrale] = useState('');
+  const [promesseBenefices, setPromesseBenefices] = useState('');
+  const [promesseDifferenciation, setPromesseDifferenciation] = useState('');
+  const [promesseEmotion, setPromesseEmotion] = useState('');
+  const [autofillLoading, setAutofillLoading] = useState(false);
+  const [targetPromiseOpen, setTargetPromiseOpen] = useState(false);
+
+  const handleAutofillTargetPromise = async () => {
+    if (!title.trim() && !finalTitle.trim()) {
+      toast.error('Ajoute au moins un titre avant l’auto-remplissage.');
+      return;
+    }
+    setAutofillLoading(true);
+    try {
+      const provider = getProvider();
+      const userApiKey = provider === 'gemini' ? getProviderKey('gemini') : '';
+      const { data, error } = await supabase.functions.invoke('autofill-target-promise', {
+        body: {
+          title: finalTitle.trim() || title.trim(),
+          subtitle: subtitle.trim(),
+          category: effectiveCategory,
+          bookIntroduction: description.trim(),
+          language: 'fr',
+          userApiKey,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setCibleProfil(data?.cibleProfil || '');
+      setCibleNiveau(data?.cibleNiveau || 'tous');
+      setCibleBesoins(data?.cibleBesoins || '');
+      setCibleFrustrations(data?.cibleFrustrations || '');
+      setPromesseCentrale(data?.promesseCentrale || '');
+      setPromesseBenefices(data?.promesseBenefices || '');
+      setPromesseDifferenciation(data?.promesseDifferenciation || '');
+      setPromesseEmotion(data?.promesseEmotion || '');
+      setTargetPromiseOpen(true);
+      toast.success('Cible & Promesse remplies — relis puis lance la génération.');
+    } catch (e: any) {
+      toast.error(e?.message || 'Auto-remplissage indisponible.');
+    } finally {
+      setAutofillLoading(false);
+    }
+  };
+
   // Assistant IA — trouve titre / sous-titre / synopsis / catégories à partir d'une idée ou d'une niche.
   const [aiTopic, setAiTopic] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
@@ -275,6 +325,25 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
   const canStepOutline = normalizedOutline.length >= 3;
   const canStepFour = finalTitle.trim().length >= 3 && authorName.trim().length >= 2;
 
+  const targetPromiseBlock = () => {
+    const cibleLines = [
+      cibleProfil && `Profil : ${cibleProfil}`,
+      cibleNiveau && `Niveau : ${cibleNiveau}`,
+      cibleBesoins && `Besoins : ${cibleBesoins}`,
+      cibleFrustrations && `Frustrations : ${cibleFrustrations}`,
+    ].filter(Boolean).join('\n');
+    const promLines = [
+      promesseCentrale && `Promesse centrale : ${promesseCentrale}`,
+      promesseBenefices && `Bénéfices :\n${promesseBenefices}`,
+      promesseDifferenciation && `Différenciation : ${promesseDifferenciation}`,
+      promesseEmotion && `Émotion visée : ${promesseEmotion}`,
+    ].filter(Boolean).join('\n');
+    const out: string[] = [];
+    if (cibleLines) out.push(`🎯 CIBLE IDÉALE\n${cibleLines}`);
+    if (promLines) out.push(`✨ PROMESSE\n${promLines}`);
+    return out.join('\n\n');
+  };
+
   const buildWorkflowDescription = () => [
     description.trim(),
     `Style demandé : ${tone}.`,
@@ -283,6 +352,7 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
     workflowCharacters.length
       ? `Personnages fournis : ${workflowCharacters.map((character) => `${character.name} (${character.role}) — ${character.description}`).join(' | ')}`
       : '',
+    targetPromiseBlock(),
   ].filter(Boolean).join('\n\n');
 
   const syncProjectId = (id: string | null) => {
@@ -518,6 +588,64 @@ Règles :
     await saveProjectToCloud({ silent: true, completedBookOverride: bookData });
     toast.success('Livre terminé et sauvegardé dans Mes livres.');
   };
+
+  // Auto-save cloud pendant que les agents avancent : lit `ebook_workflow_results`
+  // et reconstruit un `completedBook` partiel pour ne jamais perdre les chapitres.
+  const buildBookFromWorkflowResults = () => {
+    try {
+      const raw = localStorage.getItem('ebook_workflow_results');
+      if (!raw) return null;
+      const results = JSON.parse(raw) as Record<string, { result?: any; displayContent?: string }>;
+      const p4 = results.P4?.result;
+      const p5 = results.P5?.result;
+      const p3 = results.P3?.result;
+      const p1 = results.P1?.result;
+      const p7 = results.P7?.result;
+      const rawCh = (p4?.chapitres || p5?.chapitresFinal || []) as any[];
+      const p3Ch = Array.isArray(p3?.chapitres) ? p3.chapitres : [];
+      if (rawCh.length === 0 && p3Ch.length === 0) return null;
+      const byNum = new Map<number, any>();
+      rawCh.forEach((ch, i) => byNum.set(ch?.numero || ch?.number || i + 1, ch));
+      const total = Math.max(chapters || 0, rawCh.length, p3Ch.length);
+      const out: any[] = [];
+      for (let i = 1; i <= total; i++) {
+        const ch = byNum.get(i);
+        const p3m = p3Ch.find((p: any) => (p.numero || 0) === i) || p3Ch[i - 1];
+        const title = cleanText(ch?.titre || ch?.title || p3m?.titre || p3m?.title || `Chapitre ${i}`);
+        const content = String(ch?.contenu || ch?.content || '').trim();
+        out.push({ number: i, title, content, incomplete: !content });
+      }
+      return {
+        chapters: out,
+        conclusion: '',
+        backCover: { description: p7?.descriptionKDP || '', accroche: p7?.accroche4emeCouverture || '' },
+        bookSynopsis: p1?.promesseCentrale || '',
+      };
+    } catch {
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    if (!launched || completedBook) return;
+    let timer: any;
+    const trigger = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        const partial = buildBookFromWorkflowResults();
+        if (partial && partial.chapters.some((c: any) => !c.incomplete)) {
+          void saveProjectToCloud({ silent: true, completedBookOverride: partial });
+        }
+      }, 4000);
+    };
+    trigger();
+    window.addEventListener('ebook_workflow_results_updated', trigger);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('ebook_workflow_results_updated', trigger);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [launched, completedBook]);
 
   const launchWorkflow = async () => {
     if (!canStepFour) {
@@ -1088,6 +1216,79 @@ Règles :
             </div>
             <p className="mt-4 text-sm" style={{ color: 'var(--v3-muted)' }}>{description}</p>
           </div>
+
+          {/* Cible & Promesse — parité V2, améliore fortement la qualité des agents */}
+          <div className="rounded-[28px] border p-5" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <span className="v3-chip v3-chip-orange"><Sparkles className="h-3.5 w-3.5" /> Recommandé</span>
+                <h3 className="v3-serif mt-2 text-xl font-bold" style={{ color: 'var(--v3-ink)' }}>Cible &amp; Promesse</h3>
+                <p className="text-xs" style={{ color: 'var(--v3-muted)' }}>Renseigne (ou laisse l'IA remplir) pour un livre plus percutant.</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={handleAutofillTargetPromise}
+                  disabled={autofillLoading}
+                  className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold disabled:opacity-60"
+                  style={{ background: 'var(--v3-orange-600)', color: '#fff' }}
+                >
+                  {autofillLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+                  Auto-remplir Cible &amp; Promesse
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTargetPromiseOpen((v) => !v)}
+                  className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold"
+                  style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+                >
+                  {targetPromiseOpen ? 'Masquer' : 'Modifier'}
+                </button>
+              </div>
+            </div>
+            {targetPromiseOpen && (
+              <div className="mt-5 grid gap-4 md:grid-cols-2">
+                <label className="block space-y-1">
+                  <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>🎯 Profil du lecteur</span>
+                  <input value={cibleProfil} onChange={(e) => setCibleProfil(e.target.value)} placeholder="Ex : femmes 35-55 ans en quête de sens" className="w-full rounded-xl border px-3 py-2 text-sm outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
+                </label>
+                <label className="block space-y-1">
+                  <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Niveau</span>
+                  <select value={cibleNiveau} onChange={(e) => setCibleNiveau(e.target.value)} className="w-full rounded-xl border px-3 py-2 text-sm outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}>
+                    <option value="debutant">Débutant</option>
+                    <option value="intermediaire">Intermédiaire</option>
+                    <option value="avance">Avancé</option>
+                    <option value="tous">Tous niveaux</option>
+                  </select>
+                </label>
+                <label className="block space-y-1 md:col-span-2">
+                  <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Besoins / attentes</span>
+                  <textarea value={cibleBesoins} onChange={(e) => setCibleBesoins(e.target.value)} rows={2} placeholder="Ce que le lecteur cherche à obtenir…" className="w-full rounded-xl border px-3 py-2 text-sm outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
+                </label>
+                <label className="block space-y-1 md:col-span-2">
+                  <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Frustrations / douleurs</span>
+                  <textarea value={cibleFrustrations} onChange={(e) => setCibleFrustrations(e.target.value)} rows={2} placeholder="Ce qui ne marche pas pour lui aujourd'hui…" className="w-full rounded-xl border px-3 py-2 text-sm outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
+                </label>
+                <label className="block space-y-1 md:col-span-2">
+                  <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>✨ Promesse centrale (1 phrase)</span>
+                  <input value={promesseCentrale} onChange={(e) => setPromesseCentrale(e.target.value)} placeholder="Ex : Reprendre le contrôle de son temps en 30 jours" className="w-full rounded-xl border px-3 py-2 text-sm outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
+                </label>
+                <label className="block space-y-1 md:col-span-2">
+                  <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Bénéfices clés</span>
+                  <textarea value={promesseBenefices} onChange={(e) => setPromesseBenefices(e.target.value)} rows={3} placeholder={"- Bénéfice 1\n- Bénéfice 2\n- Bénéfice 3"} className="w-full rounded-xl border px-3 py-2 text-sm outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
+                </label>
+                <label className="block space-y-1">
+                  <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Différenciation</span>
+                  <textarea value={promesseDifferenciation} onChange={(e) => setPromesseDifferenciation(e.target.value)} rows={2} placeholder="Ce qui rend ce livre unique…" className="w-full rounded-xl border px-3 py-2 text-sm outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
+                </label>
+                <label className="block space-y-1">
+                  <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Émotion visée</span>
+                  <input value={promesseEmotion} onChange={(e) => setPromesseEmotion(e.target.value)} placeholder="Ex : rassurer, inspirer, faire rire" className="w-full rounded-xl border px-3 py-2 text-sm outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
+                </label>
+              </div>
+            )}
+          </div>
+
           <button type="button" onClick={launchWorkflow} className="v3-btn v3-btn-primary w-full justify-center py-5 text-base">
             <Rocket className="h-5 w-5" /> Générer mon livre avec le workflow complet
           </button>
