@@ -257,8 +257,13 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
 
   const normalizedOutline = outline
     .slice(0, chapters)
-    .map((item, index) => ({ ...item, numero: index + 1, titre: cleanText(item.titre), objectif: cleanText(item.objectif) }))
-    .filter((item) => !isGenericTitle(item.titre));
+    .map((item, index) => {
+      const cleanedTitle = cleanText(item.titre);
+      const fallbackTitle = cleanedTitle && !isGenericTitle(cleanedTitle)
+        ? cleanedTitle
+        : `Chapitre ${index + 1} — à préciser`;
+      return { ...item, numero: index + 1, titre: fallbackTitle, objectif: cleanText(item.objectif) };
+    });
 
   const outlineText = normalizedOutline
     .map((chapter) => `Chapitre ${chapter.numero} — ${chapter.titre}\nObjectif : ${chapter.objectif || 'Objectif éditorial à préciser.'}`)
@@ -266,7 +271,8 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
 
   const canStepOne = title.trim().length >= 3 && description.trim().length >= 30;
   const canStepTwo = Boolean(effectiveCategory.trim()) && chapters >= 3 && chapters <= 60 && wordsPerChapter >= 500;
-  const canStepOutline = normalizedOutline.length === chapters && normalizedOutline.every((item) => item.titre.length >= 4 && item.objectif.length >= 8);
+  // Sommaire non bloquant : les agents V2 (P3 « L'Architecte ») reconstruisent le plan si l'auteur ne l'a pas affiné.
+  const canStepOutline = normalizedOutline.length >= 3;
   const canStepFour = finalTitle.trim().length >= 3 && authorName.trim().length >= 2;
 
   const buildWorkflowDescription = () => [
