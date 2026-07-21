@@ -712,6 +712,7 @@ Deno.serve(async (req) => {
       }).eq("id", prospect.id);
 
       sent++;
+      if (isQuotaExhausted()) { console.warn("[sales-email] Resend daily quota atteint, arrêt de la séquence"); quotaHit = true; break; }
     }
 
     // ===== Passe RELANCE AUTOMATIQUE (cron) =====
@@ -778,6 +779,7 @@ Deno.serve(async (req) => {
           relance_round: round + 1,
         }).eq("id", prospect.id);
         relanceAutoSent++;
+        if (isQuotaExhausted()) { console.warn("[sales-email] Resend daily quota atteint pendant la relance auto, arrêt"); quotaHit = true; break; }
       }
     }
 
