@@ -114,7 +114,7 @@ async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTok
     throw new Error('INVALID_API_KEY: Clé API Gemini invalide. Collez la clé complète depuis Google AI Studio.');
   }
   
-  console.log(`[Gemini] Using key: length=${cleanKey.length}, prefix=${cleanKey.substring(0, 8)}..., retry=${retryCount}`);
+  console.log(`[Gemini] Using subscriber key (length=${cleanKey.length}), retry=${retryCount}`);
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(cleanKey)}`;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), maxTokens >= 5000 ? 115000 : 90000);
@@ -344,7 +344,8 @@ async function callLovableAI(systemPrompt: string, userPrompt: string, maxTokens
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${lovableApiKey}`,
+        'Lovable-API-Key': lovableApiKey,
+        'X-Lovable-AIG-SDK': 'edge-function-direct',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
