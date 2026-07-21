@@ -20,6 +20,7 @@ import {
   validateKeyFormat,
 } from '@/services/aiWritingService';
 import { testAIProviderKey } from '@/services/aiProviderKeyTest';
+import { GeminiKeyManager } from './GeminiKeyManager';
 
 type TestState = 'idle' | 'testing' | 'ok' | 'fail';
 
