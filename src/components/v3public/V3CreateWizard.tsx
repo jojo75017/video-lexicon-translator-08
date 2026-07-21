@@ -930,15 +930,26 @@ Règles :
                   Chaque chapitre est une promesse faite au lecteur. Génère un sommaire cohérent, puis affine les titres et les objectifs — les agents suivront ta ligne éditoriale à la lettre.
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={generateOutline}
-                disabled={outlineLoading}
-                className="v3-btn v3-btn-primary shrink-0 shadow-lg"
-              >
-                {outlineLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                {outline.length && !outlineLoading ? 'Régénérer' : 'Générer le sommaire'}
-              </button>
+              <div className="flex flex-col gap-2 shrink-0 sm:items-end">
+                <button
+                  type="button"
+                  onClick={generateOutline}
+                  disabled={outlineLoading}
+                  className="v3-btn v3-btn-primary shadow-lg"
+                >
+                  {outlineLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                  {outline.length && !outlineLoading ? 'Régénérer' : 'Générer le sommaire'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { if (!finalTitle.trim()) setFinalTitle(title); setStep(3); }}
+                  className="text-xs font-bold underline"
+                  style={{ color: 'var(--v3-muted)' }}
+                  title="L'agent P3 « L'Architecte » reconstruira le sommaire automatiquement."
+                >
+                  Passer cette étape — l'IA le fera pour moi
+                </button>
+              </div>
             </div>
           </div>
 
