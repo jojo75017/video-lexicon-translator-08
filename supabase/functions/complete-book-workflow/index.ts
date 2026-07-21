@@ -341,6 +341,10 @@ async function callLovableAI(systemPrompt: string, userPrompt: string, maxTokens
       }
 
       if (status === 402) throw new Error('CREDITS_EXHAUSTED');
+      // Lovable AI renvoie 403 "credit_limit_reached" quand le workspace a épuisé ses crédits.
+      if (status === 403 && /credit_limit_reached|credit limit reached|workspace credit/i.test(errText)) {
+        throw new Error('CREDITS_EXHAUSTED');
+      }
       if (status === 429) throw new Error('RATE_LIMIT: Limite IA atteinte. Réessayez dans quelques instants.');
       throw new Error(`LOVABLE_AI_ERROR: ${status}`);
     }
