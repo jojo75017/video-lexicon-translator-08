@@ -589,6 +589,64 @@ Règles :
     toast.success('Livre terminé et sauvegardé dans Mes livres.');
   };
 
+  // Auto-save cloud pendant que les agents avancent : lit `ebook_workflow_results`
+  // et reconstruit un `completedBook` partiel pour ne jamais perdre les chapitres.
+  const buildBookFromWorkflowResults = () => {
+    try {
+      const raw = localStorage.getItem('ebook_workflow_results');
+      if (!raw) return null;
+      const results = JSON.parse(raw) as Record<string, { result?: any; displayContent?: string }>;
+      const p4 = results.P4?.result;
+      const p5 = results.P5?.result;
+      const p3 = results.P3?.result;
+      const p1 = results.P1?.result;
+      const p7 = results.P7?.result;
+      const rawCh = (p4?.chapitres || p5?.chapitresFinal || []) as any[];
+      const p3Ch = Array.isArray(p3?.chapitres) ? p3.chapitres : [];
+      if (rawCh.length === 0 && p3Ch.length === 0) return null;
+      const byNum = new Map<number, any>();
+      rawCh.forEach((ch, i) => byNum.set(ch?.numero || ch?.number || i + 1, ch));
+      const total = Math.max(chapters || 0, rawCh.length, p3Ch.length);
+      const out: any[] = [];
+      for (let i = 1; i <= total; i++) {
+        const ch = byNum.get(i);
+        const p3m = p3Ch.find((p: any) => (p.numero || 0) === i) || p3Ch[i - 1];
+        const title = cleanText(ch?.titre || ch?.title || p3m?.titre || p3m?.title || `Chapitre ${i}`);
+        const content = String(ch?.contenu || ch?.content || '').trim();
+        out.push({ number: i, title, content, incomplete: !content });
+      }
+      return {
+        chapters: out,
+        conclusion: '',
+        backCover: { description: p7?.descriptionKDP || '', accroche: p7?.accroche4emeCouverture || '' },
+        bookSynopsis: p1?.promesseCentrale || '',
+      };
+    } catch {
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    if (!launched || completedBook) return;
+    let timer: any;
+    const trigger = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        const partial = buildBookFromWorkflowResults();
+        if (partial && partial.chapters.some((c: any) => !c.incomplete)) {
+          void saveProjectToCloud({ silent: true, completedBookOverride: partial });
+        }
+      }, 4000);
+    };
+    trigger();
+    window.addEventListener('ebook_workflow_results_updated', trigger);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('ebook_workflow_results_updated', trigger);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [launched, completedBook]);
+
   const launchWorkflow = async () => {
     if (!canStepFour) {
       toast.error('Valide le titre final et le nom d’auteur avant de générer.');
