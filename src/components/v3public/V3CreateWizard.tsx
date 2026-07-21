@@ -130,6 +130,8 @@ export default function V3CreateWizard() {
   });
   const projectIdRef = useRef<string | null>(projectId);
   const coverTriggeredRef = useRef(false);
+  const [resumeInfo, setResumeInfo] = useState<{ title: string; lastStep: string } | null>(null);
+  const restoreRef = useRef(false);
 
   const generateCover = async () => {
     setCoverLoading(true);
