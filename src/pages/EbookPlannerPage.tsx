@@ -89,6 +89,7 @@ import { STEP_TO_TAB } from '@/components/ebook/WorkflowNavigation';
 import { WorkflowOnboarding } from '@/components/ebook/WorkflowOnboarding';
 import { WorkflowDashboard } from '@/components/ebook/WorkflowDashboard';
 import { EbookProgressDashboard } from '@/components/ebook/EbookProgressDashboard';
+import { ApiProviderQuickSettings } from '@/components/ebook/ApiProviderQuickSettings';
 import { EbookHeroDashboard } from '@/components/ebook/EbookHeroDashboard';
 
 import { ParcoursDebutant } from '@/components/ebook/ParcoursDebutant';
@@ -3910,6 +3911,10 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
           </div>
         </div>
 
+        {/* Clé API visible en permanence pour éviter que l'utilisateur ne la cherche */}
+        <div className="max-w-[1600px] mx-auto px-4 md:px-8 pt-4">
+          <ApiProviderQuickSettings />
+        </div>
 
         {/* Content */}
         <div ref={contentContainerRef} className="max-w-[1600px] mx-auto px-6 lg:px-10 py-8">
