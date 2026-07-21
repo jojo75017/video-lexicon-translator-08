@@ -1158,6 +1158,79 @@ Règles :
             </div>
             <p className="mt-4 text-sm" style={{ color: 'var(--v3-muted)' }}>{description}</p>
           </div>
+
+          {/* Cible & Promesse — parité V2, améliore fortement la qualité des agents */}
+          <div className="rounded-[28px] border p-5" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <span className="v3-chip v3-chip-orange"><Sparkles className="h-3.5 w-3.5" /> Recommandé</span>
+                <h3 className="v3-serif mt-2 text-xl font-bold" style={{ color: 'var(--v3-ink)' }}>Cible &amp; Promesse</h3>
+                <p className="text-xs" style={{ color: 'var(--v3-muted)' }}>Renseigne (ou laisse l'IA remplir) pour un livre plus percutant.</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={handleAutofillTargetPromise}
+                  disabled={autofillLoading}
+                  className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold disabled:opacity-60"
+                  style={{ background: 'var(--v3-orange-600)', color: '#fff' }}
+                >
+                  {autofillLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+                  Auto-remplir Cible &amp; Promesse
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTargetPromiseOpen((v) => !v)}
+                  className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold"
+                  style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+                >
+                  {targetPromiseOpen ? 'Masquer' : 'Modifier'}
+                </button>
+              </div>
+            </div>
+            {targetPromiseOpen && (
+              <div className="mt-5 grid gap-4 md:grid-cols-2">
+                <label className="block space-y-1">
+                  <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>🎯 Profil du lecteur</span>
+                  <input value={cibleProfil} onChange={(e) => setCibleProfil(e.target.value)} placeholder="Ex : femmes 35-55 ans en quête de sens" className="w-full rounded-xl border px-3 py-2 text-sm outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
+                </label>
+                <label className="block space-y-1">
+                  <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Niveau</span>
+                  <select value={cibleNiveau} onChange={(e) => setCibleNiveau(e.target.value)} className="w-full rounded-xl border px-3 py-2 text-sm outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}>
+                    <option value="debutant">Débutant</option>
+                    <option value="intermediaire">Intermédiaire</option>
+                    <option value="avance">Avancé</option>
+                    <option value="tous">Tous niveaux</option>
+                  </select>
+                </label>
+                <label className="block space-y-1 md:col-span-2">
+                  <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Besoins / attentes</span>
+                  <textarea value={cibleBesoins} onChange={(e) => setCibleBesoins(e.target.value)} rows={2} placeholder="Ce que le lecteur cherche à obtenir…" className="w-full rounded-xl border px-3 py-2 text-sm outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
+                </label>
+                <label className="block space-y-1 md:col-span-2">
+                  <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Frustrations / douleurs</span>
+                  <textarea value={cibleFrustrations} onChange={(e) => setCibleFrustrations(e.target.value)} rows={2} placeholder="Ce qui ne marche pas pour lui aujourd'hui…" className="w-full rounded-xl border px-3 py-2 text-sm outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
+                </label>
+                <label className="block space-y-1 md:col-span-2">
+                  <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>✨ Promesse centrale (1 phrase)</span>
+                  <input value={promesseCentrale} onChange={(e) => setPromesseCentrale(e.target.value)} placeholder="Ex : Reprendre le contrôle de son temps en 30 jours" className="w-full rounded-xl border px-3 py-2 text-sm outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
+                </label>
+                <label className="block space-y-1 md:col-span-2">
+                  <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Bénéfices clés</span>
+                  <textarea value={promesseBenefices} onChange={(e) => setPromesseBenefices(e.target.value)} rows={3} placeholder={"- Bénéfice 1\n- Bénéfice 2\n- Bénéfice 3"} className="w-full rounded-xl border px-3 py-2 text-sm outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
+                </label>
+                <label className="block space-y-1">
+                  <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Différenciation</span>
+                  <textarea value={promesseDifferenciation} onChange={(e) => setPromesseDifferenciation(e.target.value)} rows={2} placeholder="Ce qui rend ce livre unique…" className="w-full rounded-xl border px-3 py-2 text-sm outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
+                </label>
+                <label className="block space-y-1">
+                  <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Émotion visée</span>
+                  <input value={promesseEmotion} onChange={(e) => setPromesseEmotion(e.target.value)} placeholder="Ex : rassurer, inspirer, faire rire" className="w-full rounded-xl border px-3 py-2 text-sm outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
+                </label>
+              </div>
+            )}
+          </div>
+
           <button type="button" onClick={launchWorkflow} className="v3-btn v3-btn-primary w-full justify-center py-5 text-base">
             <Rocket className="h-5 w-5" /> Générer mon livre avec le workflow complet
           </button>
