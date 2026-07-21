@@ -87,33 +87,97 @@ function cleanText(value: unknown) {
 
 function isGenericTitle(value: unknown) {
   const normalized = cleanText(value).toLowerCase();
-  return !normalized || /^(chapitre|chapter|ch\.?)\s*\d+$/.test(normalized);
+  return !normalized
+    || /^(chapitre|chapter|ch\.?)\s*\d+$/.test(normalized)
+    || /^l[’']aboutissement\b/i.test(normalized);
 }
 
 function buildFallbackOutline(title: string, category: string, count: number): OutlineChapter[] {
   const subject = cleanText(title) || cleanText(category) || 'le projet';
-  const templates = [
-    ['Les fondations', 'Installer le contexte, la promesse et les enjeux du livre.'],
-    ['Le déclic initial', 'Faire comprendre pourquoi le sujet devient important maintenant.'],
-    ['Les erreurs à éviter', 'Clarifier les pièges qui empêchent le lecteur d’avancer.'],
-    ['La méthode pas à pas', 'Donner une progression simple, applicable et concrète.'],
-    ['Le premier résultat visible', 'Transformer la théorie en action mesurable.'],
-    ['Les cas réels', 'Ancrer les idées dans des situations proches du lecteur.'],
-    ['Le niveau avancé', 'Approfondir les notions essentielles sans perdre en clarté.'],
-    ['La consolidation', 'Aider le lecteur à stabiliser ses acquis.'],
-    ['Le plan d’action', 'Organiser les prochaines étapes de manière pratique.'],
-    ['L’aboutissement', 'Conclure sur une transformation claire et motivante.'],
+  const isFiction = /roman|thriller|policier|romance|fantasy|fantastique|science|fiction|jeunesse|enfants/i.test(category);
+  const fictionTemplates = [
+    ['L’appel de Montferrand', 'Ouvrir le récit par une image forte, un lieu, une attente et une tension immédiate.'],
+    ['La première fissure', 'Faire apparaître le premier signe que l’équilibre du héros est menacé.'],
+    ['La promesse brisée', 'Installer une perte, un mensonge ou un engagement impossible à ignorer.'],
+    ['Le témoin silencieux', 'Introduire un indice humain ou matériel qui change la perception du lecteur.'],
+    ['Le chemin interdit', 'Pousser le protagoniste vers une décision qu’il aurait voulu éviter.'],
+    ['Les voix du passé', 'Relier l’intrigue actuelle à une blessure, une histoire familiale ou un secret ancien.'],
+    ['La chambre des indices', 'Rassembler des éléments concrets qui donnent envie de continuer.'],
+    ['Un allié incertain', 'Faire entrer un personnage utile mais ambigu dans la progression.'],
+    ['Le premier aveu', 'Révéler une vérité partielle qui soulève davantage de questions.'],
+    ['La piste qui déraille', 'Créer une fausse certitude puis la retourner contre le héros.'],
+    ['Le prix du silence', 'Montrer ce que chacun risque si la vérité sort.'],
+    ['La nuit des décisions', 'Faire basculer le héros dans une action irréversible.'],
+    ['Les portes closes', 'Augmenter les obstacles et isoler le protagoniste.'],
+    ['Le nom qu’on efface', 'Révéler un nom, un document ou une trace que quelqu’un veut faire disparaître.'],
+    ['La mémoire des pierres', 'Ancrer l’enquête ou le conflit dans un décor chargé de sens.'],
+    ['Le visage du doute', 'Faire douter le héros de ses alliés, de ses souvenirs ou de son jugement.'],
+    ['La lettre oubliée', 'Apporter une pièce nouvelle qui réoriente toute l’histoire.'],
+    ['Le pacte fragile', 'Forcer deux personnages à coopérer malgré leurs oppositions.'],
+    ['Le piège se referme', 'Créer une séquence de tension où chaque choix aggrave la situation.'],
+    ['Les ombres répondent', 'Donner au lecteur une réponse importante sans tout expliquer.'],
+    ['La vérité déplacée', 'Montrer que l’explication la plus évidente était incomplète.'],
+    ['Le cœur du mensonge', 'Atteindre le centre moral ou émotionnel du conflit.'],
+    ['Ce que l’on protège', 'Révéler les motivations profondes d’un personnage clé.'],
+    ['Le retour impossible', 'Faire comprendre que le héros ne peut plus revenir à son ancienne vie.'],
+    ['La faute originelle', 'Exposer l’événement déclencheur caché derrière l’intrigue.'],
+    ['La dernière piste', 'Conduire le lecteur vers le lieu, la preuve ou la personne décisive.'],
+    ['Le choix du héros', 'Placer le protagoniste devant un dilemme clair et coûteux.'],
+    ['La confrontation', 'Mettre face à face les forces qui se sont opposées tout au long du récit.'],
+    ['Ce qui demeure', 'Montrer les conséquences humaines de la révélation.'],
+    ['La lumière après l’ombre', 'Fermer l’arc principal avec émotion, résolution et ouverture maîtrisée.'],
   ];
+  const practicalTemplates = [
+    ['Le point de départ', 'Clarifier la situation actuelle, le besoin du lecteur et la promesse du livre.'],
+    ['Le vrai problème', 'Identifier l’obstacle central que le lecteur n’arrive pas encore à résoudre.'],
+    ['Les erreurs fréquentes', 'Montrer ce qui bloque les résultats et comment éviter ces pièges.'],
+    ['La méthode simple', 'Présenter une méthode claire, structurée et immédiatement compréhensible.'],
+    ['Le premier déclic', 'Aider le lecteur à obtenir une première compréhension concrète.'],
+    ['Le cadre de décision', 'Donner des critères pour choisir la bonne direction.'],
+    ['Les bases solides', 'Installer les fondamentaux indispensables avant de passer à l’action.'],
+    ['La mise en pratique', 'Transformer les notions en exercices, exemples ou actions visibles.'],
+    ['Le plan étape par étape', 'Organiser une progression logique que le lecteur peut suivre.'],
+    ['Les cas concrets', 'Illustrer la méthode avec des situations réalistes et parlantes.'],
+    ['Les outils essentiels', 'Présenter les outils, ressources ou habitudes qui facilitent l’application.'],
+    ['Le passage à l’action', 'Faire passer le lecteur de la compréhension à l’exécution.'],
+    ['Les blocages cachés', 'Identifier les résistances psychologiques, pratiques ou stratégiques.'],
+    ['La correction de trajectoire', 'Apprendre à ajuster son plan quand les premiers résultats ne suffisent pas.'],
+    ['Le niveau avancé', 'Approfondir les techniques sans perdre la clarté pédagogique.'],
+    ['La routine gagnante', 'Installer une répétition simple pour maintenir les progrès.'],
+    ['La mesure des résultats', 'Expliquer comment suivre les progrès et interpréter les signaux utiles.'],
+    ['Les raccourcis intelligents', 'Présenter des leviers qui font gagner du temps sans sacrifier la qualité.'],
+    ['Les pièges du perfectionnisme', 'Éviter l’immobilisme et favoriser une avancée régulière.'],
+    ['La consolidation', 'Stabiliser les acquis pour éviter le retour en arrière.'],
+    ['L’adaptation personnelle', 'Aider le lecteur à personnaliser la méthode selon son contexte.'],
+    ['Le système complet', 'Assembler toutes les pièces en une stratégie cohérente.'],
+    ['Les questions difficiles', 'Répondre aux objections et aux cas particuliers.'],
+    ['Le plan des 30 prochains jours', 'Proposer une feuille de route concrète et motivante.'],
+    ['La montée en puissance', 'Montrer comment amplifier les résultats obtenus.'],
+    ['L’autonomie du lecteur', 'Donner au lecteur les moyens de continuer sans dépendance.'],
+    ['Les ressources utiles', 'Orienter vers des supports, checklists ou références pratiques.'],
+    ['La transformation finale', 'Mettre en évidence le chemin parcouru et les bénéfices obtenus.'],
+    ['Le nouvel élan', 'Préparer la suite avec confiance et clarté.'],
+    ['La conclusion active', 'Terminer par une synthèse forte et un appel à appliquer immédiatement.'],
+  ];
+  const templates = isFiction ? fictionTemplates : practicalTemplates;
 
   return Array.from({ length: count }, (_, index) => {
-    const [prefix, objectif] = templates[Math.min(index, templates.length - 1)];
+    const [prefix, objectif] = templates[index % templates.length];
     return {
       id: makeId(),
       numero: index + 1,
-      titre: `${prefix} — ${subject}`,
+      titre: index < templates.length ? `${prefix} — ${subject}` : `${prefix} ${Math.floor(index / templates.length) + 1} — ${subject}`,
       objectif,
     };
   });
+}
+
+function hasRepeatedFallbackTitles(items: OutlineChapter[], expectedCount: number) {
+  if (items.length !== expectedCount) return true;
+  const titles = items.map((item) => cleanText(item.titre).toLowerCase()).filter(Boolean);
+  const repeatedAboutissement = titles.filter((title) => title.startsWith('l’aboutissement') || title.startsWith("l'aboutissement")).length;
+  const uniqueTitles = new Set(titles);
+  return repeatedAboutissement > 1 || uniqueTitles.size < Math.max(3, Math.ceil(expectedCount * 0.8));
 }
 
 export default function V3CreateWizard() {
