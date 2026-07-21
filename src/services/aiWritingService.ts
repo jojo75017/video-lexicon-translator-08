@@ -57,7 +57,18 @@ export const getGeminiKeys = (): GeminiKeyEntry[] => {
   try {
     const raw = localStorage.getItem(LS_GEMINI_KEYS);
     const arr = raw ? JSON.parse(raw) : [];
-    return Array.isArray(arr) ? arr.filter((e) => e && e.id && typeof e.key === 'string') : [];
+    let list: GeminiKeyEntry[] = Array.isArray(arr) ? arr.filter((e) => e && e.id && typeof e.key === 'string') : [];
+    // Migration : si aucune entrée mais une clé legacy existe, on la migre.
+    if (list.length === 0) {
+      const legacy = sanitizeKey(localStorage.getItem(LS_KEYS.gemini) || '');
+      if (legacy) {
+        const id = `gk_legacy_${Date.now().toString(36)}`;
+        list = [{ id, label: 'Projet 1', key: legacy }];
+        localStorage.setItem(LS_GEMINI_KEYS, JSON.stringify(list));
+        localStorage.setItem(LS_GEMINI_ACTIVE, id);
+      }
+    }
+    return list;
   } catch { return []; }
 };
 
