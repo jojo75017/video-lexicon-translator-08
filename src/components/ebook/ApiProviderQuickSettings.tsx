@@ -20,6 +20,7 @@ import {
   validateKeyFormat,
 } from '@/services/aiWritingService';
 import { testAIProviderKey } from '@/services/aiProviderKeyTest';
+import { GeminiKeyManager } from './GeminiKeyManager';
 
 type TestState = 'idle' | 'testing' | 'ok' | 'fail';
 
@@ -146,6 +147,11 @@ export const ApiProviderQuickSettings: React.FC<ApiProviderQuickSettingsProps> =
           </Button>
         </div>
       </div>
+
+      {provider === 'gemini' && (
+        <GeminiKeyManager onChange={onStatusChange} />
+      )}
+
 
       {provider === 'openrouter' && (
         <div className="mt-4 rounded-xl border bg-background p-3" style={{ borderColor: '#eadfc9' }}>
