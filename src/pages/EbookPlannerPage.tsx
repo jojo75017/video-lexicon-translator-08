@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
@@ -299,6 +300,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const [preface, setPreface] = useState(savedData?.preface || '');
   const [conclusion, setConclusion] = useState(savedData?.conclusion || '');
   const [epilogue, setEpilogue] = useState(savedData?.epilogue || '');
+  const [aboutAuthor, setAboutAuthor] = useState(savedData?.aboutAuthor || '');
+  const [acknowledgments, setAcknowledgments] = useState(savedData?.acknowledgments || '');
+  const [reviewNote, setReviewNote] = useState(savedData?.reviewNote || '');
+  const [tocDialogOpen, setTocDialogOpen] = useState(false);
   const [chapters, setChapters] = useState<Chapter[]>(savedData?.chapters || []);
   const [numberOfChapters, setNumberOfChapters] = useState(savedData?.numberOfChapters || 8);
   const [targetWordsPerChapter, setTargetWordsPerChapter] = useState(savedData?.targetWordsPerChapter || 2500);
@@ -701,6 +706,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       preface: stripBase64ImagesFromContent(preface), 
       conclusion: stripBase64ImagesFromContent(conclusion), 
       epilogue: stripBase64ImagesFromContent(epilogue),
+      aboutAuthor, acknowledgments, reviewNote,
       chapters: stripBase64ImagesFromChapters(chapters), 
       numberOfChapters, targetWordsPerChapter, 
       ebookImages: [], // Ne pas sauvegarder les images dans localStorage
@@ -724,7 +730,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       }
     }
 
-  }, [ebookTitle, authorName, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat, bookDescription, genre, preface, conclusion, epilogue, chapters, numberOfChapters, ebookImages, characters, bookSummary, coverConcepts, seoOptimization, kdpDescription, kdpKeywords, kdpCategories]);
+  }, [ebookTitle, authorName, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat, bookDescription, genre, preface, conclusion, epilogue, aboutAuthor, acknowledgments, reviewNote, chapters, numberOfChapters, ebookImages, characters, bookSummary, coverConcepts, seoOptimization, kdpDescription, kdpKeywords, kdpCategories]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -1342,23 +1348,26 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       toast.error('Ajoutez des chapitres pour générer la table des matières');
       return;
     }
-    let toc = `📚 TABLE DES MATIÈRES\n${'='.repeat(50)}\n\n`;
+    setTocDialogOpen(true);
+  };
+
+  const buildTocPlainText = () => {
+    let toc = `TABLE DES MATIÈRES\n\n`;
     let currentPage = preface ? 5 : 3;
-    if (preface) toc += `Préface ................................................ Page 3\n\n`;
+    if (preface) { toc += `Préface — p. 3\n`; }
     chapters.forEach((chapter, index) => {
-      const chapterNumber = index + 1;
-      toc += `${chapterNumber}. ${chapter.title}${'.'.repeat(Math.max(2, 45 - chapter.title.length - chapterNumber.toString().length))} Page ${currentPage}\n`;
-      chapter.subChapters.forEach((subChapter, subIndex) => {
-        const subNumber = `${chapterNumber}.${subIndex + 1}`;
-        toc += `   ${subNumber} ${subChapter.title}${'.'.repeat(Math.max(2, 42 - subChapter.title.length - subNumber.length))} Page ${currentPage + subIndex + 1}\n`;
+      toc += `${index + 1}. ${chapter.title || `Chapitre ${index + 1}`} — p. ${currentPage}\n`;
+      chapter.subChapters.forEach((sub, sIdx) => {
+        toc += `    ${index + 1}.${sIdx + 1} ${sub.title || 'Sous-chapitre'} — p. ${currentPage + sIdx + 1}\n`;
       });
-      toc += '\n';
       currentPage += Math.max(5, chapter.subChapters.length + 3);
     });
-    if (conclusion) toc += `Conclusion ................................ Page ${currentPage + 2}\n`;
-    toc += `\n${'='.repeat(50)}\nTotal estimé: ${currentPage + (conclusion ? 4 : 2)} pages\n`;
-    navigator.clipboard.writeText(toc);
-    toast.success('Table des matières copiée !');
+    if (conclusion) toc += `\nConclusion — p. ${currentPage + 2}\n`;
+    if (epilogue) toc += `Épilogue — p. ${currentPage + 4}\n`;
+    if (aboutAuthor) toc += `À propos de l'auteur — p. ${currentPage + 6}\n`;
+    if (acknowledgments) toc += `Remerciements — p. ${currentPage + 7}\n`;
+    if (reviewNote) toc += `Note pour avis — p. ${currentPage + 8}\n`;
+    return toc;
   };
 
   const clearCurrentEditorState = () => {
@@ -2546,6 +2555,74 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                     </CardContent>
                   </Card>
 
+                  {/* Pages de fin : À propos de l'auteur, Remerciements, Note pour avis */}
+                  <Card className="overflow-hidden border-0 shadow-xl bg-card/80 backdrop-blur-sm">
+                    <CardHeader className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-b border-border/50">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
+                          <BookOpen className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-xl">Pages de fin</CardTitle>
+                          <CardDescription>Trois pages ajoutées automatiquement à la fin de votre livre (PDF, DOCX, TXT).</CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-6 space-y-6">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-amber-500" />
+                          À propos de l'auteur
+                        </Label>
+                        <Textarea
+                          placeholder="Présentez-vous en quelques lignes : parcours, univers, autres livres..."
+                          value={aboutAuthor}
+                          onChange={(e) => setAboutAuthor(e.target.value)}
+                          rows={5}
+                          className="resize-y min-h-[100px] border-2 focus:border-amber-500 transition-colors"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-orange-500" />
+                          Remerciements
+                        </Label>
+                        <Textarea
+                          placeholder="Remerciez celles et ceux qui ont contribué à ce livre..."
+                          value={acknowledgments}
+                          onChange={(e) => setAcknowledgments(e.target.value)}
+                          rows={5}
+                          className="resize-y min-h-[100px] border-2 focus:border-orange-500 transition-colors"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-yellow-600" />
+                          Note pour avis
+                        </Label>
+                        <Textarea
+                          placeholder="Invitez les lecteurs à laisser un avis sur Amazon / Kobo, avec un mot chaleureux..."
+                          value={reviewNote}
+                          onChange={(e) => setReviewNote(e.target.value)}
+                          rows={4}
+                          className="resize-y min-h-[80px] border-2 focus:border-yellow-500 transition-colors"
+                        />
+                        {!reviewNote && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setReviewNote(`Merci d'avoir lu « ${ebookTitle || 'ce livre'} ».\n\nSi cette lecture vous a plu, un court avis sur Amazon aiderait énormément d'autres lecteurs à le découvrir. Quelques mots suffisent — et cela signifie beaucoup pour moi.\n\nMerci du fond du cœur.\n\n${authorName || 'L\'auteur'}`)}
+                            className="text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                          >
+                            <Sparkles className="h-3 w-3 mr-1" />
+                            Utiliser un modèle
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
                   {/* Chapters Card */}
                   <Card className="overflow-hidden border-0 shadow-xl bg-card/80 backdrop-blur-sm">
                     <CardHeader className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border-b border-border/50">
@@ -3033,6 +3110,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             chapters={chapters}
             characters={characters}
             kdpStructure={kdpStructure}
+            aboutAuthor={aboutAuthor}
+            acknowledgments={acknowledgments}
+            reviewNote={reviewNote}
           />
         );
       
@@ -3974,6 +4054,99 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
 
       {/* Admin: Subscriber Activity Popup */}
       <SubscriberActivityPopup />
+
+      {/* Sommaire — Table des matières formatée */}
+      <Dialog open={tocDialogOpen} onOpenChange={setTocDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-serif tracking-wide text-[#232F3E]">
+              Table des matières
+            </DialogTitle>
+            <DialogDescription>
+              Aperçu propre du sommaire. Il sera intégré automatiquement dans les exports PDF, DOCX et TXT.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4 rounded-2xl border border-[#008296]/20 bg-white p-6 font-serif text-[#232F3E]">
+            <h2 className="mb-6 text-center text-xl font-bold uppercase tracking-[0.2em] text-[#008296]">
+              {ebookTitle || 'Votre livre'}
+            </h2>
+            <ol className="space-y-3">
+              {preface && (
+                <li className="flex items-baseline justify-between gap-4 border-b border-dashed border-[#008296]/20 pb-2">
+                  <span className="italic">Préface</span>
+                  <span className="text-sm text-[#008296]">p. 3</span>
+                </li>
+              )}
+              {chapters.map((chapter, index) => {
+                const startPage = (preface ? 5 : 3) + index * 6;
+                return (
+                  <li key={chapter.id || index} className="space-y-1">
+                    <div className="flex items-baseline justify-between gap-4 border-b border-dashed border-[#008296]/20 pb-1">
+                      <span className="font-semibold">
+                        <span className="mr-2 text-[#008296]">{String(index + 1).padStart(2, '0')}.</span>
+                        {chapter.title || `Chapitre ${index + 1}`}
+                      </span>
+                      <span className="text-sm text-[#008296]">p. {startPage}</span>
+                    </div>
+                    {chapter.subChapters?.length > 0 && (
+                      <ul className="ml-8 space-y-1 text-sm text-[#232F3E]/80">
+                        {chapter.subChapters.map((sub, sIdx) => (
+                          <li key={sub.id || sIdx} className="flex items-baseline justify-between gap-4">
+                            <span>{`${index + 1}.${sIdx + 1}  ${sub.title || 'Sous-chapitre'}`}</span>
+                            <span className="text-xs text-[#008296]/70">p. {startPage + sIdx + 1}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                );
+              })}
+              {conclusion && (
+                <li className="flex items-baseline justify-between gap-4 border-b border-dashed border-[#008296]/20 pb-2 pt-4">
+                  <span className="italic">Conclusion</span>
+                  <span className="text-sm text-[#008296]">—</span>
+                </li>
+              )}
+              {epilogue && (
+                <li className="flex items-baseline justify-between gap-4 border-b border-dashed border-[#008296]/20 pb-2">
+                  <span className="italic">Épilogue</span>
+                  <span className="text-sm text-[#008296]">—</span>
+                </li>
+              )}
+              {aboutAuthor && (
+                <li className="flex items-baseline justify-between gap-4 border-b border-dashed border-amber-500/30 pb-2">
+                  <span className="italic">À propos de l'auteur</span>
+                  <span className="text-sm text-amber-600">—</span>
+                </li>
+              )}
+              {acknowledgments && (
+                <li className="flex items-baseline justify-between gap-4 border-b border-dashed border-amber-500/30 pb-2">
+                  <span className="italic">Remerciements</span>
+                  <span className="text-sm text-amber-600">—</span>
+                </li>
+              )}
+              {reviewNote && (
+                <li className="flex items-baseline justify-between gap-4 pb-2">
+                  <span className="italic">Note pour avis</span>
+                  <span className="text-sm text-amber-600">—</span>
+                </li>
+              )}
+            </ol>
+          </div>
+          <DialogFooter className="mt-4 gap-2 sm:justify-between">
+            <Button
+              variant="outline"
+              onClick={() => {
+                navigator.clipboard.writeText(buildTocPlainText());
+                toast.success('Sommaire copié dans le presse-papier');
+              }}
+            >
+              Copier en texte
+            </Button>
+            <Button onClick={() => setTocDialogOpen(false)}>Fermer</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* FAB couverture supprimé : bouton intégré dans la barre d'actions du hero */}
     </div>

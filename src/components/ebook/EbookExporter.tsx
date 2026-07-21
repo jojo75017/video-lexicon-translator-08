@@ -76,6 +76,9 @@ interface EbookExporterProps {
   chapters: Chapter[];
   characters?: Character[];
   kdpStructure?: KdpStructure;
+  aboutAuthor?: string;
+  acknowledgments?: string;
+  reviewNote?: string;
 }
 
 export const EbookExporter: React.FC<EbookExporterProps> = ({
@@ -86,7 +89,10 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
   epilogue,
   chapters,
   characters = [],
-  kdpStructure
+  kdpStructure,
+  aboutAuthor = '',
+  acknowledgments = '',
+  reviewNote = '',
 }) => {
   const { formatId } = useKdpFormat();
   // ✅ Nettoyage automatique de TOUT le contenu avant export
@@ -379,6 +385,29 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
         content += `\n`;
       });
       content += `${'='.repeat(50)}\n\n`;
+    }
+
+    // ═══ PAGES DE FIN ═══
+    // À propos de l'auteur
+    if (aboutAuthor && aboutAuthor.trim()) {
+      content += `👤 À PROPOS DE L'AUTEUR\n`;
+      content += `${'='.repeat(50)}\n\n`;
+      content += `${aboutAuthor.trim()}\n\n`;
+      content += `${'='.repeat(50)}\n\n\n`;
+    }
+    // Remerciements
+    if (acknowledgments && acknowledgments.trim()) {
+      content += `🙏 REMERCIEMENTS\n`;
+      content += `${'='.repeat(50)}\n\n`;
+      content += `${acknowledgments.trim()}\n\n`;
+      content += `${'='.repeat(50)}\n\n\n`;
+    }
+    // Note pour avis
+    if (reviewNote && reviewNote.trim()) {
+      content += `⭐ NOTE POUR AVIS\n`;
+      content += `${'='.repeat(50)}\n\n`;
+      content += `${reviewNote.trim()}\n\n`;
+      content += `${'='.repeat(50)}\n\n\n`;
     }
 
     // Pied de page
@@ -689,7 +718,31 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
       });
     }
 
-    // Numérotation des pages (skip cover + copyright = first 2 pages)
+    // ═══ PAGES DE FIN : Auteur / Remerciements / Note pour avis ═══
+    const addBackMatterPage = (title: string, body: string) => {
+      if (!body || !body.trim()) return;
+      pdf.addPage();
+      yPosition = 25;
+      pdf.setFontSize(18);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(stripEmojis(title).toUpperCase(), pageWidth / 2, yPosition, { align: 'center' });
+      yPosition += 6;
+      pdf.setDrawColor(180);
+      pdf.line(pageWidth * 0.3, yPosition, pageWidth * 0.7, yPosition);
+      yPosition += 15;
+      pdf.setFontSize(fontSize);
+      pdf.setFont('helvetica', 'normal');
+      const lines = splitTextToSize(body.trim(), usableWidth, fontSize);
+      lines.forEach((line: string) => {
+        checkPageBreak(lineHeight);
+        pdf.text(line, marginLeft, yPosition);
+        yPosition += lineHeight;
+      });
+    };
+    addBackMatterPage("À propos de l'auteur", aboutAuthor);
+    addBackMatterPage('Remerciements', acknowledgments);
+    addBackMatterPage('Note pour avis', reviewNote);
+
     if (includePageNumbers) {
       const totalPages = pdf.getNumberOfPages();
       const startPage = includeCoverPage ? 3 : 1; // Skip cover + copyright
