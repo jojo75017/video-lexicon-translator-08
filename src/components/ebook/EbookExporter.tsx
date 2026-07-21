@@ -387,6 +387,29 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
       content += `${'='.repeat(50)}\n\n`;
     }
 
+    // ═══ PAGES DE FIN ═══
+    // À propos de l'auteur
+    if (aboutAuthor && aboutAuthor.trim()) {
+      content += `👤 À PROPOS DE L'AUTEUR\n`;
+      content += `${'='.repeat(50)}\n\n`;
+      content += `${aboutAuthor.trim()}\n\n`;
+      content += `${'='.repeat(50)}\n\n\n`;
+    }
+    // Remerciements
+    if (acknowledgments && acknowledgments.trim()) {
+      content += `🙏 REMERCIEMENTS\n`;
+      content += `${'='.repeat(50)}\n\n`;
+      content += `${acknowledgments.trim()}\n\n`;
+      content += `${'='.repeat(50)}\n\n\n`;
+    }
+    // Note pour avis
+    if (reviewNote && reviewNote.trim()) {
+      content += `⭐ NOTE POUR AVIS\n`;
+      content += `${'='.repeat(50)}\n\n`;
+      content += `${reviewNote.trim()}\n\n`;
+      content += `${'='.repeat(50)}\n\n\n`;
+    }
+
     // Pied de page
     content += `\n\n${'='.repeat(50)}\n`;
     content += `Généré avec Ebookstudio Pro V2\n`;
