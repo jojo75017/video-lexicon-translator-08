@@ -1109,6 +1109,18 @@ Règles :
         </button>
       </div>
 
+      {/* Clé API IA — indispensable pour lancer les 30 agents */}
+      <div className="rounded-[24px] border p-5" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
+        <div className="flex items-center gap-2 mb-3">
+          <span className="v3-chip v3-chip-orange">🔑 Clés API & Modèles IA</span>
+          <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--v3-muted)' }}>
+            Colle ta clé Gemini (ou autre) avant de générer
+          </span>
+        </div>
+        <ApiProviderQuickSettings />
+      </div>
+
+
 
       {/* Assistant IA : titre, sous-titre, synopsis, catégories */}
       <div className="rounded-[24px] border p-5" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-orange-50)' }}>
