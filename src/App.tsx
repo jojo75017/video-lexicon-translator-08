@@ -62,6 +62,7 @@ const V3AuthorSettingsPage = lazy(() => import('./pages/v3public/V3AuthorSetting
 const V3SpecialBookPage = lazy(() => import('./pages/v3public/V3SpecialBookPage'));
 const V3OffresPage = lazy(() => import('./pages/v3public/V3OffresPage'));
 const V3OffresMerciPage = lazy(() => import('./pages/v3public/V3OffresMerciPage'));
+const V3TocUltimatePage = lazy(() => import('./pages/v3public/V3TocUltimatePage'));
 const AffiliationFormationPage = lazy(() => import('./pages/AffiliationFormationPage'));
 const ParrainagePage = lazy(() => import('./pages/ParrainagePage'));
 const FormationPage = lazy(() => import('./pages/FormationPage'));
@@ -824,6 +825,7 @@ const App = () => {
               <Route path="livres/:type" element={<V3SpecialBookPage />} />
               <Route path="offres" element={<V3OffresPage />} />
               <Route path="offres/merci" element={<V3OffresMerciPage />} />
+              <Route path="outils/sommaire-ultime" element={<V3TocUltimatePage />} />
               {/* Hub complet (ex /hub-v3) — accessible depuis le site public */}
               <Route path="hub" element={<V3HubPage />} />
             </Route>
