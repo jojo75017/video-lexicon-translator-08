@@ -1313,6 +1313,14 @@ Règles :
                 </button>
                 <button
                   type="button"
+                  onClick={() => setShowTocTool(true)}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-orange-300 bg-white px-3 py-1.5 text-xs font-bold text-orange-600 hover:bg-orange-50"
+                  title="Ouvrir le générateur avancé (genre, public, style, créativité)"
+                >
+                  <Wrench className="h-3 w-3" /> Générateur ultime
+                </button>
+                <button
+                  type="button"
                   onClick={() => { if (!finalTitle.trim()) setFinalTitle(title); setStep(3); }}
                   className="text-xs font-bold underline"
                   style={{ color: 'var(--v3-muted)' }}
