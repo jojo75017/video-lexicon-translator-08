@@ -1406,6 +1406,28 @@ Règles :
         </div>
       )}
 
+      <Dialog open={showTocTool} onOpenChange={setShowTocTool}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Wrench className="h-4 w-4 text-orange-500" /> Générateur Ultime de Sommaire
+            </DialogTitle>
+          </DialogHeader>
+          <TocUltimateGenerator
+            initialTheme={title}
+            initialDescription={description}
+            initialGenre={effectiveCategory}
+            initialChapters={chapters}
+            onApply={(chs: UltimateTocChapter[]) => {
+              setOutline(chs.map((c, i) => ({ id: c.id, numero: i + 1, titre: c.titre, objectif: c.objectif })));
+              setChapters(chs.length);
+              setShowTocTool(false);
+              toast.success(`Sommaire de ${chs.length} chapitres appliqué au wizard ✓`);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+
 
       {step === 3 && (
         <div className="space-y-6">
