@@ -102,6 +102,7 @@ import DocumentationStudio from '@/components/documentation-studio/Documentation
 import EditionVariantStudio from '@/components/admin/EditionVariantStudio';
 import PositioningStrategist from '@/components/admin/PositioningStrategist';
 import PublisherSelectionFinder from '@/components/admin/PublisherSelectionFinder';
+import TocUltimateGenerator from '@/components/tools/TocUltimateGenerator';
 import {
   SpecialAtlas, SpecialEncyclopedia, SpecialDocumentary, SpecialColoringBook,
   SpecialAgenda, SpecialScolaire, SpecialPedagogique, SpecialRecipeBook,
@@ -222,6 +223,7 @@ export const V3_MODULE_COMPONENTS: Record<string, React.ComponentType> = {
   'edition-variant-studio': EditionVariantStudio,
   'book-positioning': PositioningStrategist,
   'publisher-selection': PublisherSelectionFinder,
+  'toc-ultimate': TocUltimateGenerator,
   // Livres spéciaux (onglets de types de livres V2 réintégrés en V3/V4)
   'special-atlas': SpecialAtlas,
   'special-encyclopedia': SpecialEncyclopedia,

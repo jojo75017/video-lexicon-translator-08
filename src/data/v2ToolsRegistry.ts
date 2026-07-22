@@ -43,6 +43,7 @@ export const V2_TOOL_CATEGORIES: { id: V2ToolCategory; label: string; emoji: str
 export const V2_TOOLS: V2Tool[] = [
   // — Écriture & Idées —
   { id: 'ebook-planner', label: 'Ebook Planner (V2)', description: 'Le pipeline complet P1-P15 (15 agents) qui reste la référence.', route: '/ebook-planner', icon: BookOpen, category: 'ecriture', badge: 'Populaire' },
+  { id: 'toc-ultimate', label: 'Générateur Ultime de Sommaire', description: 'Table des matières pro : genre, public, style, créativité — éditable et exportable.', route: '/v3/outils/sommaire-ultime', icon: FileText, category: 'ecriture', badge: 'Nouveau' },
   { id: 'ebook-ideas', label: 'Générateur d\'idées', description: 'Trouvez rapidement des idées d\'ebooks rentables.', route: '/ebook-ideas', icon: Lightbulb, category: 'ecriture' },
   { id: 'ambiances', label: 'Ambiances d\'écriture', description: 'Décors sonores et visuels pour rédiger sans distraction.', route: '/ambiances', icon: Palette, category: 'ecriture' },
   { id: 'ai-chat', label: 'Chat IA', description: 'Assistant conversationnel pour brainstormer et écrire.', route: '/ai-chat', icon: Bot, category: 'ecriture' },

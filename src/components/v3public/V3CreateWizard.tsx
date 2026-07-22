@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Check, ImageIcon, Loader2, Palette, Plus, RefreshCw, Rocket, Save, Sparkles, Trash2, UserRound, Wand2, FileDown, RotateCcw } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, ImageIcon, Loader2, Palette, Plus, RefreshCw, Rocket, Save, Sparkles, Trash2, UserRound, Wand2, FileDown, RotateCcw, Wrench } from 'lucide-react';
 import { toast } from 'sonner';
 import EbookCompleteWorkflow from '@/components/ebook/EbookCompleteWorkflow';
 import { ApiProviderQuickSettings } from '@/components/ebook/ApiProviderQuickSettings';
@@ -8,6 +8,8 @@ import V3ExportPanel from '@/components/admin/V3ExportPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { invokeImageFunction } from '@/lib/aiImageInvoke';
 import { callAIWriting, getProvider, getProviderKey, validateKeyFormat } from '@/services/aiWritingService';
+import TocUltimateGenerator, { type UltimateTocChapter } from '@/components/tools/TocUltimateGenerator';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 
 type WizardCharacter = {
@@ -190,6 +192,7 @@ export default function V3CreateWizard() {
   const [coverLoading, setCoverLoading] = useState(false);
   const [savingCloud, setSavingCloud] = useState(false);
   const [outlineLoading, setOutlineLoading] = useState(false);
+  const [showTocTool, setShowTocTool] = useState(false);
   const [projectId, setProjectId] = useState<string | null>(() => {
     try { return localStorage.getItem(PROJECT_ID_KEY); } catch { return null; }
   });
@@ -1310,6 +1313,14 @@ Règles :
                 </button>
                 <button
                   type="button"
+                  onClick={() => setShowTocTool(true)}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-orange-300 bg-white px-3 py-1.5 text-xs font-bold text-orange-600 hover:bg-orange-50"
+                  title="Ouvrir le générateur avancé (genre, public, style, créativité)"
+                >
+                  <Wrench className="h-3 w-3" /> Générateur ultime
+                </button>
+                <button
+                  type="button"
                   onClick={() => { if (!finalTitle.trim()) setFinalTitle(title); setStep(3); }}
                   className="text-xs font-bold underline"
                   style={{ color: 'var(--v3-muted)' }}
@@ -1394,6 +1405,28 @@ Règles :
           )}
         </div>
       )}
+
+      <Dialog open={showTocTool} onOpenChange={setShowTocTool}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Wrench className="h-4 w-4 text-orange-500" /> Générateur Ultime de Sommaire
+            </DialogTitle>
+          </DialogHeader>
+          <TocUltimateGenerator
+            initialTheme={title}
+            initialDescription={description}
+            initialGenre={effectiveCategory}
+            initialChapters={chapters}
+            onApply={(chs: UltimateTocChapter[]) => {
+              setOutline(chs.map((c, i) => ({ id: c.id, numero: i + 1, titre: c.titre, objectif: c.objectif })));
+              setChapters(chs.length);
+              setShowTocTool(false);
+              toast.success(`Sommaire de ${chs.length} chapitres appliqué au wizard ✓`);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
 
 
       {step === 3 && (
