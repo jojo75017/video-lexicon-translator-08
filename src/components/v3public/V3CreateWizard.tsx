@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Check, ImageIcon, Loader2, Palette, Plus, RefreshCw, Rocket, Save, Sparkles, Trash2, UserRound, Wand2, FileDown, RotateCcw } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, ImageIcon, Loader2, Palette, Plus, RefreshCw, Rocket, Save, Sparkles, Trash2, UserRound, Wand2, FileDown, RotateCcw, Wrench } from 'lucide-react';
 import { toast } from 'sonner';
 import EbookCompleteWorkflow from '@/components/ebook/EbookCompleteWorkflow';
 import { ApiProviderQuickSettings } from '@/components/ebook/ApiProviderQuickSettings';
@@ -8,6 +8,8 @@ import V3ExportPanel from '@/components/admin/V3ExportPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { invokeImageFunction } from '@/lib/aiImageInvoke';
 import { callAIWriting, getProvider, getProviderKey, validateKeyFormat } from '@/services/aiWritingService';
+import TocUltimateGenerator, { type UltimateTocChapter } from '@/components/tools/TocUltimateGenerator';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 
 type WizardCharacter = {
@@ -190,6 +192,7 @@ export default function V3CreateWizard() {
   const [coverLoading, setCoverLoading] = useState(false);
   const [savingCloud, setSavingCloud] = useState(false);
   const [outlineLoading, setOutlineLoading] = useState(false);
+  const [showTocTool, setShowTocTool] = useState(false);
   const [projectId, setProjectId] = useState<string | null>(() => {
     try { return localStorage.getItem(PROJECT_ID_KEY); } catch { return null; }
   });
