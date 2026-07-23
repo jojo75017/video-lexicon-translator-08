@@ -583,10 +583,10 @@ const V3HubPage: React.FC = () => {
                   onClick={() => setActiveTab(t.id)}
                   className="group inline-flex items-center gap-1.5 shrink-0 rounded-full px-3.5 py-1.5 text-[12.5px] font-semibold whitespace-nowrap border transition-all"
                   style={{
-                    background: active ? AMBER : '#fff',
-                    color: active ? '#fff' : '#6f5e47',
-                    borderColor: active ? AMBER : '#eadfc9',
-                    boxShadow: active ? '0 8px 20px -10px rgba(232,149,30,0.55)' : 'none',
+                    background: active ? AMBER : t.highlight ? '#FFF3DF' : '#fff',
+                    color: active ? '#fff' : t.highlight ? '#B45309' : '#6f5e47',
+                    borderColor: active ? AMBER : t.highlight ? '#F59E0B' : '#eadfc9',
+                    boxShadow: active ? '0 8px 20px -10px rgba(232,149,30,0.55)' : t.highlight ? '0 4px 12px -6px rgba(245,158,11,0.4)' : 'none',
                   }}
                 >
                   <Icon className="h-3.5 w-3.5" />
