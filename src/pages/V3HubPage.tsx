@@ -174,16 +174,16 @@ function ModuleCard({
 
 type HubTab = 'parcours' | 'outils' | 'toolsV2' | 'documentation' | 'livres' | 'guides' | 'offres' | 'roadmap' | 'pending' | 'script' | 'assistant' | 'bookperfect' | 'export';
 
-const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon }[] = [
+const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon; highlight?: boolean }[] = [
   { id: 'parcours', label: 'Parcours', icon: Compass },
+  { id: 'pending', label: '⏳ En attente · Octobre', icon: Clock, highlight: true },
+  { id: 'roadmap', label: 'Roadmap', icon: MapIcon },
   { id: 'outils', label: 'Outils V3', icon: Wand2 },
   { id: 'toolsV2', label: 'Tous les outils (V2)', icon: Package },
   { id: 'documentation', label: 'Documentation Studio', icon: Sparkles },
   { id: 'livres', label: 'Mes livres', icon: BookOpen },
   { id: 'guides', label: 'Guides', icon: GraduationCap },
   { id: 'offres', label: 'Offres & Packs', icon: Gem },
-  { id: 'roadmap', label: 'Roadmap', icon: MapIcon },
-  { id: 'pending', label: 'En attente', icon: Clock },
   { id: 'script', label: 'Script vidéo', icon: FileText },
   { id: 'assistant', label: "Parler avec l'IA", icon: Bot },
   { id: 'bookperfect', label: 'BookPerfect AI', icon: BookOpen },
@@ -583,10 +583,10 @@ const V3HubPage: React.FC = () => {
                   onClick={() => setActiveTab(t.id)}
                   className="group inline-flex items-center gap-1.5 shrink-0 rounded-full px-3.5 py-1.5 text-[12.5px] font-semibold whitespace-nowrap border transition-all"
                   style={{
-                    background: active ? AMBER : '#fff',
-                    color: active ? '#fff' : '#6f5e47',
-                    borderColor: active ? AMBER : '#eadfc9',
-                    boxShadow: active ? '0 8px 20px -10px rgba(232,149,30,0.55)' : 'none',
+                    background: active ? AMBER : t.highlight ? '#FFF3DF' : '#fff',
+                    color: active ? '#fff' : t.highlight ? '#B45309' : '#6f5e47',
+                    borderColor: active ? AMBER : t.highlight ? '#F59E0B' : '#eadfc9',
+                    boxShadow: active ? '0 8px 20px -10px rgba(232,149,30,0.55)' : t.highlight ? '0 4px 12px -6px rgba(245,158,11,0.4)' : 'none',
                   }}
                 >
                   <Icon className="h-3.5 w-3.5" />
