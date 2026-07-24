@@ -16,14 +16,16 @@ const SUBJECT = "Votre livre publié sur Amazon en 7 jours (à 59€)";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const TRACK_CLICK = `${SUPABASE_URL}/functions/v1/track-email-click`;
-const OFFRES_LINK = "https://www.ebookstudio.fr/offres";
+const CHECKOUT_LINK = "https://www.ebookstudio.fr/promo/commande";
 
 function trackedUrl(email: string, dest: string): string {
   return `${TRACK_CLICK}?e=${encodeURIComponent(email)}&s=11&u=${encodeURIComponent(dest)}&t=${encodeURIComponent(TEMPLATE_NAME)}`;
 }
 
 function buildHtml(email: string): string {
-  const cta = trackedUrl(email, OFFRES_LINK);
+  // Direct-to-payment: prefill email + auto-open Stripe checkout on arrival.
+  const dest = `${CHECKOUT_LINK}?autopay=1&email=${encodeURIComponent(email)}`;
+  const cta = trackedUrl(email, dest);
   return `
   <div style="font-family: Arial, Helvetica, sans-serif; color:#232F3E; max-width:560px; margin:0 auto; line-height:1.6; font-size:16px;">
 
