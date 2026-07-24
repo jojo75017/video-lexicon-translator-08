@@ -24,6 +24,7 @@ const PRODUCT = { key: 'main', label: 'Ebookstudio Pro V2 - Accès à vie', amou
 const PromoCommandePage = () => {
   useReferralTracking();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [firstName, setFirstName] = useState('');
   const [email, setEmail] = useState('');
   const [method, setMethod] = useState<'stripe' | 'paypal'>('stripe');
@@ -32,15 +33,24 @@ const PromoCommandePage = () => {
   const [bonuses, setBonuses] = useState<Array<{ key: string; title: string; amount: number }>>([]);
 
   useEffect(() => {
+    // Prefill from URL first (email campaigns), then fallback to localStorage
+    const urlEmail = searchParams.get('email');
+    const autopay = searchParams.get('autopay') === '1';
     try {
-      const e = localStorage.getItem('ebs_lead_email');
+      const e = urlEmail || localStorage.getItem('ebs_lead_email');
       const f = localStorage.getItem('ebs_lead_first_name');
       if (e) setEmail(e);
       if (f) setFirstName(f);
       const b = localStorage.getItem('ebs_selected_bonuses');
       if (b) setBonuses(JSON.parse(b));
     } catch { /* ignore */ }
-  }, []);
+    // Direct-to-payment: if arriving from an email CTA with autopay=1 and a valid email,
+    // open the Stripe embedded checkout immediately (no re-clicking through the offer page).
+    if (autopay && urlEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(urlEmail)) {
+      setMethod('stripe');
+      setShowCheckout(true);
+    }
+  }, [searchParams]);
 
   const removeBonus = (key: string) => {
     const next = bonuses.filter((b) => b.key !== key);
