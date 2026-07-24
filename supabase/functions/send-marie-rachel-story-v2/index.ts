@@ -12,7 +12,7 @@ const FROM_ADDRESS = "Georges Boubet <noreply@ebookstudio.fr>";
 const EXCLUDED_EMAILS = ["boubetgeorges@gmail.com"];
 const TEMPLATE_NAME = "marie-rachel-story-v2";
 const PREVIOUS_TEMPLATE = "marie-rachel-story-v1";
-const SUBJECT = "Le premier chapitre est le plus dur (voici pourquoi)";
+const SUBJECT = "Votre livre publié sur Amazon en 7 jours (à 59€)";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const TRACK_CLICK = `${SUPABASE_URL}/functions/v1/track-email-click`;
