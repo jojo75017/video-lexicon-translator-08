@@ -127,28 +127,20 @@ Deno.serve(async (req) => {
       if (typeof body?.onlyPreviousSent === "boolean") onlyPreviousSent = body.onlyPreviousSent;
     } catch (_) {}
 
-    const { data: opens, error: oErr } = await supabase.from("email_opens").select("prospect_email");
-    if (oErr) throw oErr;
-    const { data: clicks, error: cErr } = await supabase.from("email_clicks").select("prospect_email");
-    if (cErr) throw cErr;
+    const opens = await fetchAll(supabase, "email_opens", "prospect_email");
+    const clicks = await fetchAll(supabase, "email_clicks", "prospect_email");
 
     const norm = (e: string) => (e ?? "").trim().toLowerCase();
     const clickers = new Set((clicks ?? []).map((c: any) => norm(c.prospect_email)));
 
     // Ceux qui ont reçu la v1
-    const { data: v1Sent } = await supabase
-      .from("email_send_log")
-      .select("recipient_email")
-      .eq("template_name", PREVIOUS_TEMPLATE)
-      .eq("status", "sent");
+    const v1Sent = await fetchAll(supabase, "email_send_log", "recipient_email", (q: any) =>
+      q.eq("template_name", PREVIOUS_TEMPLATE).eq("status", "sent"));
     const v1Set = new Set((v1Sent ?? []).map((s: any) => norm(s.recipient_email)));
 
     // Ceux qui ont déjà reçu la v2 (anti-doublon)
-    const { data: v2Sent } = await supabase
-      .from("email_send_log")
-      .select("recipient_email")
-      .eq("template_name", TEMPLATE_NAME)
-      .eq("status", "sent");
+    const v2Sent = await fetchAll(supabase, "email_send_log", "recipient_email", (q: any) =>
+      q.eq("template_name", TEMPLATE_NAME).eq("status", "sent"));
     const v2Set = new Set((v2Sent ?? []).map((s: any) => norm(s.recipient_email)));
 
     const openerPool = Array.from(new Set((opens ?? []).map((o: any) => norm(o.prospect_email))));
