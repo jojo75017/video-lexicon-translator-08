@@ -26,6 +26,7 @@ const adminNavItems: AdminNavItem[] = [
   { label: 'Influenceurs', path: '/influenceurs', icon: Megaphone, exact: true },
   { label: 'Guide Ebook', path: '/guide-ebook', icon: BookMarked, exact: true },
   { label: 'CRM', path: '/crm', icon: Contact, exact: true },
+  { label: 'Ménage', path: '/admin/cleanup', icon: Trash2, exact: true },
 ];
 
 interface AdminPanelNavProps {
