@@ -752,6 +752,14 @@ const App = () => {
                 </AdminGate>
               }
             />
+            <Route 
+              path="/admin/cleanup" 
+              element={
+                <AdminGate>
+                  <AdminCleanupPage />
+                </AdminGate>
+              }
+            />
 
             <Route 
               path="/formation" 
