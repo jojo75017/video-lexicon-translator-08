@@ -131,6 +131,8 @@ Deno.serve(async (req) => {
 
     const openerPool = Array.from(new Set((opens ?? []).map((o: any) => norm(o.prospect_email))));
 
+    console.log(`[marie-rachel-v2] debug: opens=${opens?.length ?? 0} unique=${openerPool.length} clicks=${clickers.size} v1=${v1Set.size} v2=${v2Set.size} onlyPreviousSent=${onlyPreviousSent}`);
+
     let recipients = openerPool.filter((e) =>
       e && e.includes("@") &&
       !clickers.has(e) &&
@@ -138,6 +140,8 @@ Deno.serve(async (req) => {
       !EXCLUDED_EMAILS.includes(e) &&
       (!onlyPreviousSent || v1Set.has(e)),
     );
+
+    console.log(`[marie-rachel-v2] debug: recipients=${recipients.length} sample=${recipients.slice(0, 3).join(",")}`);
 
     if (testMode) recipients = ["boubetgeorges@gmail.com"];
 
