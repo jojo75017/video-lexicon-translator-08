@@ -8,6 +8,28 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+async function fetchAll<T = any>(
+  supabase: any,
+  table: string,
+  columns: string,
+  filter?: (q: any) => any,
+): Promise<T[]> {
+  const pageSize = 1000;
+  let all: T[] = [];
+  let start = 0;
+  while (true) {
+    let q = supabase.from(table).select(columns).range(start, start + pageSize - 1);
+    if (filter) q = filter(q);
+    const { data, error } = await q;
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    all = all.concat(data);
+    if (data.length < pageSize) break;
+    start += pageSize;
+  }
+  return all;
+}
+
 const FROM_ADDRESS = "Georges Boubet <noreply@ebookstudio.fr>";
 const EXCLUDED_EMAILS = ["boubetgeorges@gmail.com"];
 const TEMPLATE_NAME = "marie-rachel-story-v2";
