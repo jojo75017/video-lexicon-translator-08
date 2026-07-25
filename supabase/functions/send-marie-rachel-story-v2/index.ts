@@ -12,7 +12,7 @@ const FROM_ADDRESS = "Georges Boubet <noreply@ebookstudio.fr>";
 const EXCLUDED_EMAILS = ["boubetgeorges@gmail.com"];
 const TEMPLATE_NAME = "marie-rachel-story-v2";
 const PREVIOUS_TEMPLATE = "marie-rachel-story-v1";
-const SUBJECT = "Votre livre publié sur Amazon en 7 jours (à 59€)";
+const SUBJECT = "Publiez votre livre sur Amazon en 7 jours";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const TRACK_CLICK = `${SUPABASE_URL}/functions/v1/track-email-click`;
@@ -29,47 +29,51 @@ function buildHtml(email: string): string {
   return `
   <div style="font-family: Arial, Helvetica, sans-serif; color:#232F3E; max-width:560px; margin:0 auto; line-height:1.6; font-size:16px;">
 
-    <p style="font-size:20px; font-weight:bold; margin:0 0 8px; color:#232F3E;">
-      Publiez votre livre sur Amazon KDP en <span style="color:#FF9E2D;">7 jours</span>, sans écrire une ligne.
+    <p style="margin:0 0 18px; color:#555; font-size:15px;">
+      Vous avez une idée de livre, mais ni le temps ni l’envie de passer des mois à l’écrire et à le mettre en page ?
     </p>
-    <p style="margin:0 0 22px; color:#555; font-size:15px;">
-      EbookStudio est à <strong>59&nbsp;€ à vie</strong> jusqu'au 31 août — puis le prix remonte.
-    </p>
-
-    <p style="text-align:center; margin:22px 0;">
-      <a href="${cta}"
-         style="background:#FF9E2D; color:#232F3E; text-decoration:none; padding:16px 36px; border-radius:8px; font-weight:bold; font-size:17px; display:inline-block;">
-        👉 J'accède à EbookStudio à 59&nbsp;€
-      </a>
+    <p style="margin:0 0 22px;">
+      EbookStudio vous accompagne de la première idée jusqu’au fichier prêt à publier sur Amazon KDP.
     </p>
 
-    <div style="background:#FAFAFA; border:1px solid #eee; border-radius:8px; padding:18px 22px; margin:26px 0;">
-      <p style="margin:0 0 10px; font-weight:bold; color:#008296;">Ce que vous obtenez concrètement :</p>
-      <p style="margin:6px 0;">✅ Un <strong>plan de livre structuré</strong> en 1 minute</p>
-      <p style="margin:6px 0;">✅ Des <strong>chapitres rédigés par IA</strong> dans votre style</p>
-      <p style="margin:6px 0;">✅ Une <strong>couverture Amazon KDP</strong> prête à publier</p>
-      <p style="margin:6px 0;">✅ Un <strong>fichier .docx / .pdf</strong> conforme KDP</p>
-      <p style="margin:10px 0 0; font-size:14px; color:#555;">Aucune compétence technique. Aucun logiciel à installer.</p>
+    <div style="background:#FAFAFA; border:1px solid #eee; border-radius:8px; padding:18px 22px; margin:20px 0;">
+      <p style="margin:0 0 10px; font-weight:bold; color:#008296;">Vous obtenez notamment :</p>
+      <p style="margin:6px 0;">✅ un <strong>plan de livre structuré</strong> en quelques minutes ;</p>
+      <p style="margin:6px 0;">✅ des <strong>chapitres générés et personnalisables</strong> ;</p>
+      <p style="margin:6px 0;">✅ une <strong>couverture adaptée à Amazon KDP</strong> ;</p>
+      <p style="margin:6px 0;">✅ des <strong>fichiers Word et PDF</strong> prêts à être utilisés ;</p>
+      <p style="margin:6px 0;">✅ un <strong>accompagnement étape par étape</strong>, sans logiciel à installer.</p>
     </div>
 
-    <p style="margin:0 0 6px;"><strong>Pourquoi 59 € et pas plus ?</strong></p>
-    <p style="margin:0 0 22px;">Parce que je préfère avoir 100 auteurs qui publient réellement leur livre cet été, plutôt que 10 qui hésitent. Après le 31 août, le tarif repart à son niveau normal.</p>
+    <p style="margin:20px 0 22px;">
+      Jusqu’au <strong>31 août</strong>, l’accès à vie est proposé à <strong>59&nbsp;€</strong>, en un seul paiement et sans abonnement.
+    </p>
+    <p style="margin:0 0 22px; color:#555; font-size:15px;">
+      Vous bénéficierez également automatiquement de la future <strong>V3</strong>, qui sera commercialisée <strong>120&nbsp;€</strong>, sans rien avoir à repayer.
+    </p>
 
-    <p style="text-align:center; margin:30px 0 10px;">
+    <p style="text-align:center; margin:28px 0;">
       <a href="${cta}"
-         style="background:#008296; color:#ffffff; text-decoration:none; padding:14px 30px; border-radius:8px; font-weight:bold; font-size:16px; display:inline-block;">
-        Commencer mon livre maintenant →
+         style="background:#FF9E2D; color:#232F3E; text-decoration:none; padding:16px 36px; border-radius:8px; font-weight:bold; font-size:17px; display:inline-block;">
+        Commencer mon livre maintenant
       </a>
     </p>
-    <p style="text-align:center; margin:0 0 24px; font-size:13px; color:#888;">
-      Accès à vie · Paiement unique · Sans abonnement
+
+    <p style="margin:0 0 22px;">
+      Vous pouvez ainsi commencer dès aujourd’hui, avancer à votre rythme et transformer enfin votre idée en un véritable livre publié.
     </p>
 
+    <div style="background:#f0fdfa; border:1px solid #99f6e4; border-radius:8px; padding:14px 18px; margin:20px 0;">
+      <p style="margin:0; font-size:14px; color:#0f766e;">
+        <strong>Garantie 30 jours.</strong> Vous testez EbookStudio, et si vous n’êtes pas satisfait, je vous rembourse intégralement. Aucun risque pour vous.
+      </p>
+    </div>
+
     <p style="margin:0;">À très vite,<br/>
-    <strong>Georges</strong> — EbookStudio</p>
+    <strong>Georges</strong><br/>EbookStudio</p>
 
     <p style="font-size:13px; color:#777; border-top:1px solid #eee; padding-top:14px; margin-top:24px;">
-      PS : Un livre publié ouvre des portes qu'aucun CV ne peut ouvrir. Crédibilité, réseau, revenus complémentaires. Tout commence par une décision.
+      PS : Vous avez une question avant de vous lancer ? Répondez simplement à cet email, je vous répondrai personnellement.
     </p>
   </div>`;
 }
