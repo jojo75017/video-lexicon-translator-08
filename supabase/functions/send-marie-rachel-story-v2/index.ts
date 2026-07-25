@@ -17,6 +17,7 @@ const SUBJECT = "Publiez votre livre sur Amazon en 7 jours";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const TRACK_CLICK = `${SUPABASE_URL}/functions/v1/track-email-click`;
 const CHECKOUT_LINK = "https://www.ebookstudio.fr/promo/commande";
+const SALES_TUNNEL_LINK = "https://www.trafic-affiliation.com/ebookstudiopv/";
 
 function trackedUrl(email: string, dest: string): string {
   return `${TRACK_CLICK}?e=${encodeURIComponent(email)}&s=11&u=${encodeURIComponent(dest)}&t=${encodeURIComponent(TEMPLATE_NAME)}`;
@@ -26,6 +27,7 @@ function buildHtml(email: string): string {
   // Direct-to-payment: prefill email + auto-open Stripe checkout on arrival.
   const dest = `${CHECKOUT_LINK}?autopay=1&email=${encodeURIComponent(email)}`;
   const cta = trackedUrl(email, dest);
+  const learnMore = trackedUrl(email, SALES_TUNNEL_LINK);
   return `
   <div style="font-family: Arial, Helvetica, sans-serif; color:#232F3E; max-width:560px; margin:0 auto; line-height:1.6; font-size:16px;">
 
@@ -56,6 +58,12 @@ function buildHtml(email: string): string {
       <a href="${cta}"
          style="background:#FF9E2D; color:#232F3E; text-decoration:none; padding:16px 36px; border-radius:8px; font-weight:bold; font-size:17px; display:inline-block;">
         Commencer mon livre maintenant
+      </a>
+    </p>
+
+    <p style="text-align:center; margin:0 0 22px; font-size:14px;">
+      <a href="${learnMore}" style="color:#008296; text-decoration:underline;">
+        Voir la présentation complète avant de commander
       </a>
     </p>
 
