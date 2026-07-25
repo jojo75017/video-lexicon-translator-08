@@ -169,6 +169,7 @@ Deno.serve(async (req) => {
         sent,
         testMode,
         template: TEMPLATE_NAME,
+        debug: { opensCount: opens?.length ?? 0, opensUnique: openerPool.length, clicks: clickers.size, v1: v1Set.size, v2: v2Set.size, excluded: EXCLUDED_EMAILS.length },
         results: results.slice(0, 30),
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 },
