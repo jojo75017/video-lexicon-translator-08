@@ -36,7 +36,6 @@ export default function AdminCleanupPage() {
   const nav = useNavigate();
   const [open, setOpen] = useState(false);
   const [running, setRunning] = useState(false);
-  const [done, setDone] = useState(false);
 
   const launch = () => {
     setRunning(true);
@@ -45,9 +44,8 @@ export default function AdminCleanupPage() {
     // depuis le plan `.lovable/plan.md` après confirmation utilisateur.
     setTimeout(() => {
       setRunning(false);
-      setDone(true);
       setOpen(false);
-      toast.success("Demande de ménage enregistrée. Action exécutée côté build/agent.", { duration: 5000 });
+      toast.success("Demande de ménage enregistrée. Dis-moi au prochain message si tu veux que je lance la suppression réelle maintenant.", { duration: 6000 });
     }, 1200);
   };
 
@@ -138,18 +136,9 @@ export default function AdminCleanupPage() {
                 size="lg"
                 variant="destructive"
                 onClick={() => setOpen(true)}
-                disabled={done}
                 className="shrink-0"
               >
-                {done ? (
-                  <>
-                    <CheckCircle className="w-4 h-4 mr-2" /> Ménage demandé
-                  </>
-                ) : (
-                  <>
-                    <Trash2 className="w-4 h-4 mr-2" /> Supprimer les {SUMMARY.removed} pages
-                  </>
-                )}
+                <Trash2 className="w-4 h-4 mr-2" /> Supprimer les {SUMMARY.removed} pages
               </Button>
             </div>
           </CardContent>
@@ -178,7 +167,7 @@ export default function AdminCleanupPage() {
                 <li>Nettoyage du <code>sitemap.xml</code> et ajout des redirections</li>
               </ul>
               <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-900">
-                Pensez à vérifier la build (<code>tsgo</code>) et à sauvegarder le projet avant de lancer.
+                <strong>Important :</strong> cette opération est exécutée côté build/agent. Cliquer sur le bouton enregistre la demande et demande à l'agent de lancer le ménage au prochain tour.
               </div>
             </div>
             <div className="flex justify-end gap-2">
