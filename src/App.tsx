@@ -38,6 +38,7 @@ const AdminPaymentsDashboardPage = lazy(() => import('./pages/admin/AdminPayment
 const AdminPdfGiftsPage = lazy(() => import('./pages/admin/AdminPdfGiftsPage'));
 const AdminBetaCodesPage = lazy(() => import('./pages/admin/AdminBetaCodesPage'));
 const AdminBetaTestersPage = lazy(() => import('./pages/admin/AdminBetaTestersPage'));
+const AdminCleanupPage = lazy(() => import('./pages/admin/AdminCleanupPage'));
 const ActivationBetaPage = lazy(() => import('./pages/ActivationBetaPage'));
 const ContactSupportPage = lazy(() => import('./pages/ContactSupportPage'));
 const AdminDirectPage = lazy(() => import('./pages/AdminDirectPage'));
@@ -748,6 +749,14 @@ const App = () => {
               element={
                 <AdminGate>
                   <AdminBetaTestersPage />
+                </AdminGate>
+              }
+            />
+            <Route 
+              path="/admin/cleanup" 
+              element={
+                <AdminGate>
+                  <AdminCleanupPage />
                 </AdminGate>
               }
             />

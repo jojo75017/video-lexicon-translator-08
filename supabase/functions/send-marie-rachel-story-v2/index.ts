@@ -8,6 +8,28 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+async function fetchAll<T = any>(
+  supabase: any,
+  table: string,
+  columns: string,
+  filter?: (q: any) => any,
+): Promise<T[]> {
+  const pageSize = 1000;
+  let all: T[] = [];
+  let start = 0;
+  while (true) {
+    let q = supabase.from(table).select(columns).range(start, start + pageSize - 1);
+    if (filter) q = filter(q);
+    const { data, error } = await q;
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    all = all.concat(data);
+    if (data.length < pageSize) break;
+    start += pageSize;
+  }
+  return all;
+}
+
 const FROM_ADDRESS = "Georges Boubet <noreply@ebookstudio.fr>";
 const EXCLUDED_EMAILS = ["boubetgeorges@gmail.com"];
 const TEMPLATE_NAME = "marie-rachel-story-v2";
@@ -105,31 +127,25 @@ Deno.serve(async (req) => {
       if (typeof body?.onlyPreviousSent === "boolean") onlyPreviousSent = body.onlyPreviousSent;
     } catch (_) {}
 
-    const { data: opens, error: oErr } = await supabase.from("email_opens").select("prospect_email");
-    if (oErr) throw oErr;
-    const { data: clicks, error: cErr } = await supabase.from("email_clicks").select("prospect_email");
-    if (cErr) throw cErr;
+    const opens = await fetchAll(supabase, "email_opens", "prospect_email");
+    const clicks = await fetchAll(supabase, "email_clicks", "prospect_email");
 
     const norm = (e: string) => (e ?? "").trim().toLowerCase();
     const clickers = new Set((clicks ?? []).map((c: any) => norm(c.prospect_email)));
 
     // Ceux qui ont reçu la v1
-    const { data: v1Sent } = await supabase
-      .from("email_send_log")
-      .select("recipient_email")
-      .eq("template_name", PREVIOUS_TEMPLATE)
-      .eq("status", "sent");
+    const v1Sent = await fetchAll(supabase, "email_send_log", "recipient_email", (q: any) =>
+      q.eq("template_name", PREVIOUS_TEMPLATE).eq("status", "sent"));
     const v1Set = new Set((v1Sent ?? []).map((s: any) => norm(s.recipient_email)));
 
     // Ceux qui ont déjà reçu la v2 (anti-doublon)
-    const { data: v2Sent } = await supabase
-      .from("email_send_log")
-      .select("recipient_email")
-      .eq("template_name", TEMPLATE_NAME)
-      .eq("status", "sent");
+    const v2Sent = await fetchAll(supabase, "email_send_log", "recipient_email", (q: any) =>
+      q.eq("template_name", TEMPLATE_NAME).eq("status", "sent"));
     const v2Set = new Set((v2Sent ?? []).map((s: any) => norm(s.recipient_email)));
 
     const openerPool = Array.from(new Set((opens ?? []).map((o: any) => norm(o.prospect_email))));
+
+    console.log(`[marie-rachel-v2] debug: opens=${opens?.length ?? 0} unique=${openerPool.length} clicks=${clickers.size} v1=${v1Set.size} v2=${v2Set.size} onlyPreviousSent=${onlyPreviousSent}`);
 
     let recipients = openerPool.filter((e) =>
       e && e.includes("@") &&
@@ -138,6 +154,8 @@ Deno.serve(async (req) => {
       !EXCLUDED_EMAILS.includes(e) &&
       (!onlyPreviousSent || v1Set.has(e)),
     );
+
+    console.log(`[marie-rachel-v2] debug: recipients=${recipients.length} sample=${recipients.slice(0, 3).join(",")}`);
 
     if (testMode) recipients = ["boubetgeorges@gmail.com"];
 
@@ -165,6 +183,7 @@ Deno.serve(async (req) => {
         sent,
         testMode,
         template: TEMPLATE_NAME,
+        debug: { opensCount: opens?.length ?? 0, opensUnique: openerPool.length, clicks: clickers.size, v1: v1Set.size, v2: v2Set.size, excluded: EXCLUDED_EMAILS.length },
         results: results.slice(0, 30),
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 },
