@@ -821,10 +821,26 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
         });
 
       if (fnError) {
-        const realMessage = (fnError as any)?.context?.json?.error || fnError.message;
+        // Extraire le vrai message renvoyé par l'edge function (sinon on n'a que "non-2xx status code")
+        let realMessage = fnError.message;
+        try {
+          const ctx: any = (fnError as any)?.context;
+          if (ctx && typeof ctx.text === 'function') {
+            const txt = await ctx.text();
+            try {
+              const parsed = JSON.parse(txt);
+              realMessage = parsed?.error || parsed?.message || txt || realMessage;
+            } catch {
+              if (txt) realMessage = txt;
+            }
+          } else if (ctx?.json?.error) {
+            realMessage = ctx.json.error;
+          }
+        } catch (_) { /* ignore */ }
         throw new Error(realMessage);
       }
       if (data?.error) throw new Error(data.error);
+
 
       return {
         result: data.result,
