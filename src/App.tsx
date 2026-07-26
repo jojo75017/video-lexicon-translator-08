@@ -15,6 +15,7 @@ import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup'
 import { FirstEbookOnboarding } from '@/components/onboarding/FirstEbookOnboarding';
 import EbookbotFloatingButton from '@/components/ebookbot/EbookbotFloatingButton';
 import ApiKeysFloatingButton from '@/components/ebook/ApiKeysFloatingButton';
+import GeminiKeyAlertBanner from '@/components/ebook/GeminiKeyAlertBanner';
 import AISosModal from '@/components/shared/AISosModal';
 import AICostBadge from '@/components/shared/AICostBadge';
 import { useBrandTitle } from '@/hooks/useBrandTitle';
