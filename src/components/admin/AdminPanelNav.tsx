@@ -1,4 +1,4 @@
-import { BarChart3, BookOpen, Contact, FileText, Gauge, Mail, Megaphone, MessageSquare, Shield, Ticket, Trash2, TrendingUp, User, Users, BookMarked } from 'lucide-react';
+import { BarChart3, BookOpen, Contact, FileText, Gauge, Mail, Megaphone, MessageSquare, Shield, Table, Ticket, Trash2, TrendingUp, User, Users, BookMarked } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -26,7 +26,7 @@ const adminNavItems: AdminNavItem[] = [
   { label: 'Influenceurs', path: '/influenceurs', icon: Megaphone, exact: true },
   { label: 'Guide Ebook', path: '/guide-ebook', icon: BookMarked, exact: true },
   { label: 'CRM', path: '/crm', icon: Contact, exact: true },
-  { label: 'Ménage', path: '/admin/cleanup', icon: Trash2, exact: true },
+  { label: 'Plans V3', path: '/admin/plans-v3', icon: Table, exact: true },
 ];
 
 interface AdminPanelNavProps {
