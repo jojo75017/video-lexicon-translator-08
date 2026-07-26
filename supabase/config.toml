@@ -208,3 +208,6 @@ verify_jwt = false
 [functions.stripe-list-webhooks]
 verify_jwt = false
 
+
+[functions.send-juanito-payment-check]
+verify_jwt = false
