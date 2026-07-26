@@ -105,24 +105,60 @@ serve(async (req) => {
       }
     }
 
-    // Construire les line items pour Stripe (price_data inline = simple et flexible)
-    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = requestedItems.map((key) => {
+    // Résolution via lookup_key : chaque item est un vrai Product + Price catalogué
+    // dans Stripe (visible dans le dashboard). Créé automatiquement au 1er passage,
+    // réutilisé ensuite. Si le montant change (ex: fin de la promo été), un nouveau
+    // Price est créé et le lookup_key est transféré dessus (l'ancien est désactivé).
+    async function resolveCatalogPrice(key: string): Promise<string> {
       const product = PRODUCT_CATALOG[key];
-      return {
-        price_data: {
-          currency: "eur",
-          unit_amount: product.amount,
-          product_data: {
-            name: product.name,
-            description: product.description,
-          },
-        },
-        quantity: 1,
-      };
-    });
+      // Suffixe le lookup_key avec le montant pour que la promo 59€ et le tarif
+      // normal 67€ soient DEUX prix distincts (les deux visibles dans le catalogue).
+      const lookupKey = `${key}_${product.amount}`;
+
+      const existing = await stripe.prices.list({
+        lookup_keys: [lookupKey],
+        active: true,
+        limit: 1,
+        expand: ["data.product"],
+      });
+      if (existing.data.length > 0) return existing.data[0].id;
+
+      // Créer le Product s'il n'existe pas (recherche par metadata.catalog_key)
+      let productId: string | undefined;
+      const products = await stripe.products.search({
+        query: `metadata['catalog_key']:'${key}' AND active:'true'`,
+        limit: 1,
+      });
+      if (products.data.length > 0) {
+        productId = products.data[0].id;
+      } else {
+        const created = await stripe.products.create({
+          name: product.name,
+          description: product.description,
+          metadata: { catalog_key: key },
+        });
+        productId = created.id;
+      }
+
+      const price = await stripe.prices.create({
+        product: productId,
+        currency: "eur",
+        unit_amount: product.amount,
+        lookup_key: lookupKey,
+        transfer_lookup_key: true,
+        nickname: product.name,
+      });
+      return price.id;
+    }
+
+    const resolvedPrices = await Promise.all(requestedItems.map(resolveCatalogPrice));
+    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = resolvedPrices.map((priceId) => ({
+      price: priceId,
+      quantity: 1,
+    }));
 
     const totalAmount = requestedItems.reduce((sum, key) => sum + PRODUCT_CATALOG[key].amount, 0);
-    console.log("Line items:", requestedItems, "Total:", totalAmount / 100, "€");
+    console.log("Line items:", requestedItems, "Prices:", resolvedPrices, "Total:", totalAmount / 100, "€");
 
     const sessionConfig: Stripe.Checkout.SessionCreateParams = {
       ...(customerId ? { customer: customerId } : { customer_email: email }),
