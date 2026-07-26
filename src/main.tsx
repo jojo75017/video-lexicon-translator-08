@@ -11,18 +11,22 @@ import "@fontsource/inter/600.css";
 import { installGlobalErrorHandlers } from "./lib/errorLogger";
 import { installChunkErrorRecovery } from "./lib/chunkErrorRecovery";
 import { purgeLegacyOffresCache } from "./lib/offresCachePurge";
+import { runSiteWidePurge } from "./lib/sitePurge";
 
 // Agent de contrôle : récupère automatiquement les pages cassées par un
 // chunk JS obsolète (post-déploiement) sur /offres, /demo, etc.
 installChunkErrorRecovery();
 installGlobalErrorHandlers();
 
-// 1) Purge spécifique /offres (versionnage UI)
+// 1) Purge globale une seule fois par navigateur (ménage août 2026 :
+//    suppression de ~45 pages, redirections SEO, SW/caches obsolètes).
+void runSiteWidePurge();
+
+// 2) Purge spécifique /offres (versionnage UI)
 void purgeLegacyOffresCache();
 
-// 2) Nettoyage best-effort des anciens service workers sans en réinstaller un
-//    à chaque chargement. Réenregistrer /sw.js ici provoquait une boucle de
-//    reload qui empêchait certaines pages, dont BookPerfect, de s'afficher.
+// 3) Nettoyage best-effort des anciens service workers sans en réinstaller un
+//    à chaque chargement.
 if (typeof window !== "undefined" && "serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
