@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { AlertTriangle, X, ExternalLink } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey, validateKeyFormat } from '@/services/aiWritingService';
 
 const DISMISS_KEY = 'gemini_alert_dismissed_at';
@@ -13,12 +13,12 @@ const VISIBLE_PREFIXES = [
 
 /**
  * Bandeau d'alerte global : affiché aux abonnés connectés qui n'ont
- * AUCUNE clé IA valide configurée (Gemini / Claude / OpenAI / OpenRouter).
- * Sans clé, les edge functions IA retournent une erreur non-2xx.
+ * AUCUNE clé IA valide configurée. Utilise supabase.auth directement pour
+ * ne pas dépendre de l'AuthProvider (le banner est monté en dehors).
  */
 const GeminiKeyAlertBanner = () => {
-  const { isAuthenticated } = useAuth();
   const location = useLocation();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const [, setTick] = useState(0);
 
@@ -26,11 +26,15 @@ const GeminiKeyAlertBanner = () => {
     const raw = localStorage.getItem(DISMISS_KEY);
     if (raw) {
       const ts = Number(raw);
-      // Réaffiche après 24h
       if (Date.now() - ts < 24 * 60 * 60 * 1000) setDismissed(true);
     }
+    supabase.auth.getSession().then(({ data }) => setIsAuthenticated(!!data.session));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setIsAuthenticated(!!s));
     const id = window.setInterval(() => setTick((n) => n + 1), 3000);
-    return () => window.clearInterval(id);
+    return () => {
+      window.clearInterval(id);
+      sub.subscription.unsubscribe();
+    };
   }, []);
 
   if (!isAuthenticated || dismissed) return null;
