@@ -15,6 +15,7 @@ import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup'
 import { FirstEbookOnboarding } from '@/components/onboarding/FirstEbookOnboarding';
 import EbookbotFloatingButton from '@/components/ebookbot/EbookbotFloatingButton';
 import ApiKeysFloatingButton from '@/components/ebook/ApiKeysFloatingButton';
+import GeminiKeyAlertBanner from '@/components/ebook/GeminiKeyAlertBanner';
 import AISosModal from '@/components/shared/AISosModal';
 import AICostBadge from '@/components/shared/AICostBadge';
 import { useBrandTitle } from '@/hooks/useBrandTitle';
@@ -851,6 +852,7 @@ const App = () => {
           <EbookbotFloatingButton />
           {/* Bouton flottant Clés API & réglages — visible pour tous (le composant filtre lui-même par route) */}
           <ApiKeysFloatingButton />
+          <GeminiKeyAlertBanner />
           {/* Admin: bascule V2/V3 importante, toujours visible */}
           {(isAuthenticated || isAdmin) && <V2V3FloatingSwitch />}
           {/* SOS modal erreurs IA — humanise les erreurs Gemini/Claude/OpenAI/OpenRouter */}
