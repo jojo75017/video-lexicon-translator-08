@@ -1,84 +1,65 @@
-## Objectif
+## Remplacer l'onglet "Ménage" par un "Plans V3" (récap A→Z)
 
-Ménage massif des pages du projet : ne conserver que V2 (Ebook Planner + outils satellites), V3 public, marketing actif (offres/démo/FAQ/promo été), blog/formation et légal/admin simplifié. Tout le reste (anciens tunnels, outils marketing obsolètes, SaaS demo, formation secondaire) est supprimé ou redirigé.
+### Objectif
+Dans le hub admin, remplacer l'onglet "Ménage" par un nouvel onglet "Plans V3" qui affiche la matrice complète des 3 forfaits (Débutant / Expert / Auteur) de A à Z, avec les quotas et les modules débloqués.
 
-**Statut : EN ATTENTE — à exécuter en août ou septembre 2026.**
+L'ancienne page de ménage reste accessible en archivée temporairement via `/admin/cleanup` pendant le développement, puis sera supprimée dans un second temps si tu le confirmes.
 
 ---
 
-## Aujourd'hui : 109 pages dans `src/pages/`
+### 1. Modifications prévues
 
-Objectif : descendre à **~45 pages** en supprimant ce qui n'est pas V2, V3 ou marketing actif.
+#### A. Navigation admin (`src/components/admin/AdminPanelNav.tsx`)
+- Remplacer l'item `{ label: 'Ménage', path: '/admin/cleanup', icon: Trash2 }` par `{ label: 'Plans V3', path: '/admin/plans-v3', icon: TableIcon }`.
+- Sous-titre actuel inchangé ("Tous les onglets utiles + retour rapide au générateur").
 
-## 1. Ce qu'on GARDE
+#### B. Nouvelle page admin (`src/pages/admin/AdminPlansV3Page.tsx`)
+Créer une page unique avec :
+- `AdminPanelNav` en haut.
+- Titre : "Plans V3 — Contenu A → Z".
+- Tableau comparatif 3 colonnes : Débutant / Expert / Auteur.
+- Lignes A → Z organisées par domaine fonctionnel (Accueil, Bibliothèque, Création, Dashboard, Édition, Export, Formatage, Génération couverture, Historique, Import, Journal IA, KDP Spy, Livres spéciaux, Marketing, Niches, Outils, Personnages, Quotas, Résiliation, Sélection éditeurs, TOC, Upgrades, Voix/Audiobook, Workflow, eXport, Yield, Zone support).
+- Badges visuels : ✅ inclus · 🔒 verrouillé · (nombre) quota.
+- Section récap des 8 modules Pro (P23→P30) réservés au forfait Auteur.
+- Section "Tarifs à définir" avec un champ éditable pour stocker les 6 prix (mensuel + annuel × 3 forfaits) dans un `useState` local, prêt à être envoyé vers Supabase/Stripe plus tard.
 
-### V2 — Ebook Planner complet + outils satellites
-- `EbookPlannerPage`, `EbookIdeasPage`, `EbookbotPage`
-- `AmbiancesPage`, `CouvertureKdpPage`, `Niches600Page`, `NichesPage`
-- `BookPerfectPage`, `AuditPilotPage`, `WordCountPage`
-- `SeriesTomesPage`, `PracticalSheetsGeneratorPage`, `BDStudioPage`, `KdpKeywordResearchPage`
-- `MasterclassPage`, `QuizPage`, `SignaturePage`
+#### C. Routage (`src/App.tsx`)
+- Ajouter la route `/admin/plans-v3` → `AdminPlansV3Page` (lazy import ou import statique).
+- Garder `/admin/cleanup` → `AdminCleanupPage` pour ne pas casser le lien si tu veux encore y accéder, mais sans navigation publique.
+- (Optionnel) Redirection `/admin/cleanup` → `/admin/plans-v3` si tu confirmes que le ménage ne doit plus être visible du tout.
 
-### V3 public (tout `src/pages/v3public/` + `V3HubPage`)
-- Aucune suppression dans ce dossier.
+#### D. Nettoyage
+- Si tu confirmes, supprimer `AdminCleanupPage.tsx` et sa route une fois la page "Plans V3" validée en preview.
+- Mettre à jour le sitemap si nécessaire (peu impactant en interne).
 
-### Marketing actif (offres + démo + FAQ + promo été)
-- `SubscriptionPage` (= /offres), `DemoPage`, `FaqAssistancePage`
-- Tunnel promo été : garder `src/pages/promo/*` en entier tant que 59€ actif
-- `PaymentSuccessPage`, `ConfirmationPaiementPage`, `PaiementManuelPage`, `UpsellPage`, `UpsellPaiementPage`
-- `V3CommandePage`, `V3PaiementPage`, `SalesPageV3Launch`
+---
 
-### Blog + Formation (SEO)
-- `BlogPage`, `FormationPage`, `FormationVideosPage`, `FormationAudioPage`, `FormationSeriesPage`, `FormationSeriesAudioPage`, `FormationEmbedPage`
-- Pages SEO blog : `SeoCreerEbookIaPage`, `SeoGenerateurEbookPage`, `SeoTutorialChatGptPage`, `SeoGuideKdpEnfantsPage`, `SeoFrancophonesEtrangerPage`
+### 2. Contenu affiché dans la page (source de vérité)
 
-### Légal / système
-- `MentionsLegales`, `PolitiqueConfidentialite`, `CGV`, `Licence`, `LicenceEtenduePage`, `Securite`
-- `AuthPage`, `LogoutTotalPage`, `InstallPage`, `RecuperationCodePage`, `ActivationBetaPage`
-- `CadeauPage`, `GiftRedeemPage`, `GiftThankYouPage`, `ContactSupportPage`
+Le contenu réutilisé sera le récap A→Z du plan précédent :
 
-### Admin simplifié
-- `AdminPage`, `AdminProfilePage`, `AdminDirectPage`, `AdminFunnelPage`, `AdminPdfGiftsPage`, `AdminBetaCodesPage`, `AdminBetaTestersPage`, `AdminPaymentsDashboardPage`, `CrmPage`, `ProspectManagerPage`, `EmailPreviewPage`, `InfluenceursPage`, `InfluenceursConfirmationPage`
+- **Débutant** : 15 livres/mois, 22 agents (P1→P22), max 20 chapitres / 3 500 mots/chapitre, modules Pro verrouillés.
+- **Expert** : 30 livres/mois, 22 agents (P1→P22), max 40 chapitres / 5 000 mots/chapitre, modules Pro verrouillés.
+- **Auteur** : livres illimités, **30 agents** (P1→P30), max 60 chapitres / 8 000 mots/chapitre, tous les modules Pro inclus.
 
-## 2. Ce qu'on SUPPRIME (~55 pages + routes)
+Modules Pro réservés Auteur : Cover Studio Pro (P23), Passe éditoriale (P24), Séries & Tomes (P25), Sélection éditeurs (P26), KDP Spy (P27), Amazon Spy (P28), Audiobook Studio (P29), BD Studio (P30).
 
-### Doublons / anciens dashboards
-`Dashboard.tsx`, `DashboardPage.tsx`, `AdminCockpitPage.tsx`, `BusinessCenterPage.tsx`, `EspacePage.tsx`, `EspaceLancementPage.tsx`, `ProductLandingPage.tsx`
+---
 
-### Anciennes pages de vente remplacées par V3
-`SalesPage.tsx`, `SalesPageV3.tsx`, `SalesCampaignPage.tsx`, `OfferValuePage.tsx`, `Nouveautes2026Page.tsx`, `WebinairePage.tsx`, `ArcSignupPage.tsx`, `TrialSignupPage.tsx`, `ResultatEn5MinPage.tsx`, `CoachingVipPage.tsx`, `AffiliationFormationPage.tsx`, `ParrainagePage.tsx`
+### 3. Vérification
 
-### Outils marketing/SEO obsolètes (hors périmètre V2/V3)
-`PinterestPage`, `HierarchyPage`, `ProductGeneratorPage`, `PromptsCapturePage`, `PromptsGeneratorPage`, `SeoGeneratorPage`, `SiteClonerPage`, `RobotsTxtPage`, `SuggestionsPage`, `SocialPostGeneratorPage`, `ElementorExportPage`, `ExtensionChromePage`, `MarketingPlanPage`, `UnifiedMarketingDashboard`, `AiChatPage`, `BookPerfectSalesPage`, `PublicAudiobookPage`, `AudiobookDemoPage`, `AudiobookEmbedPage`, `AudiobookThankYouPage`
+1. `tsgo` : pas d'erreur d'import.
+2. Preview admin : l'onglet "Plans V3" apparaît, cliquable, affichage correct desktop + mobile.
+3. L'ancien onglet "Ménage" n'apparaît plus dans la barre de navigation.
+4. Aucune route cassée.
 
-### Formation/guides secondaires
-`TutorielsPage`, `ToolsGuidePage`, `GuideEbookPage`, `KdpAdsGuidePage`, `ChecklistTournagePage`, `ForumPage`
+---
 
-### SaaS demo (tout `src/pages/saas/`)
-`SaasAnalytics`, `SaasAuthPage`, `SaasBilling`, `SaasDashboard`, `SaasSettings` + composant `SaasLayout`
+### 4. Livrables
 
-### Admin secondaire
-`BrevoAutomationGuidePage`, `BrevoOnboardingEmailsPage`, `TrialDashboardPage` (doublon avec funnel)
+- `src/pages/admin/AdminPlansV3Page.tsx` (nouveau)
+- `src/components/admin/AdminPanelNav.tsx` (modifié)
+- `src/App.tsx` (modifié, route ajoutée)
+- Optionnel : suppression de `AdminCleanupPage.tsx` et de la route `/admin/cleanup` si tu confirmes.
 
-## 3. Étapes d'exécution
-
-1. **Nettoyer `src/App.tsx`** : supprimer imports + `<Route>` de toutes les pages listées en §2.
-2. **Supprimer les fichiers pages** correspondants via `rm`.
-3. **Supprimer composants orphelins** rattachés : `src/components/saas/*`, `src/components/landing/*` inutilisés, `src/components/sales/*` non liés à V3Launch, `src/components/ambassador/*`, `src/components/documentation-studio/*` s'il n'est pas branché V3.
-4. **Nettoyer `AdminPanelNav.tsx`** (retirer : Business Center, Guide Ebook, Posts, retour au générateur).
-5. **Mettre à jour `V3Sidebar.tsx`** et `modernSidebarSections.ts` : retirer liens morts.
-6. **Nettoyer `public/sitemap.xml`** : retirer URLs des pages supprimées (formation-audio, kdp-ads-guide, tutoriels, guide-outils, communaute, parrainage, affiliation, nouveautes-2026, valeur-offre, etc.).
-7. **Redirections React Router** : `/dashboard` → `/ebook-planner`, `/sales` → `/offres`, `/coaching-vip` → `/offres`, `/parrainage` → `/offres`, `/tutoriels` → `/formation` (éviter 404 sur liens externes indexés).
-8. **Vérifier la build** (`tsgo`) et corriger les imports cassés au cas par cas.
-
-## 4. Détails techniques
-
-```text
-Avant : 109 pages
-Après : ~45 pages
-Suppression nette : ~55 pages + ~15 composants orphelins
-```
-
-Aucune modification de la logique métier (workflow, edge functions, DB). Uniquement suppression de fichiers, nettoyage de routes, redirections SEO, et sitemap. La V2 (`/ebook-planner`) et la V3 (`/v3/*`) restent 100% fonctionnelles.
-
-**N'exécuter ce plan qu'en août ou septembre 2026**, quand le lancement V3 sera finalisé et que la suppression des anciens tunnels/pages marketing ne perturbera plus les campagnes en cours.
+**Aucune base de données modifiée. Aucun edge function modifié. Uniquement UI admin.**
