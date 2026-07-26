@@ -25,31 +25,40 @@ import FloatingToolCTA from '@/components/marketing/FloatingToolCTA';
 import StickySignupBar from '@/components/marketing/StickySignupBar';
 import { captureUtmParams } from '@/lib/utmTracking';
 
-// Lazy-loaded pages for performance
+// V2 — Ebook Planner + outils satellites
 const EbookPlannerPage = lazy(() => import('./pages/EbookPlannerPage'));
 const EbookIdeasPage = lazy(() => import('./pages/EbookIdeasPage'));
+const EbookbotPage = lazy(() => import('./pages/EbookbotPage'));
 const AmbiancesPage = lazy(() => import('./pages/AmbiancesPage'));
-const AiChatPage = lazy(() => import('./pages/AiChatPage'));
+const CouvertureKdpPage = lazy(() => import('./pages/CouvertureKdpPage'));
+const Niches600Page = lazy(() => import('./pages/Niches600Page'));
+const NichesPage = lazy(() => import('./pages/NichesPage'));
+const BookPerfectPage = lazy(() => import('./pages/BookPerfectPage'));
+const AuditPilotPage = lazy(() => import('./pages/AuditPilotPage'));
+const WordCountPage = lazy(() => import('./pages/WordCountPage'));
+const SeriesTomesPage = lazy(() => import('./pages/SeriesTomesPage'));
+const PracticalSheetsGeneratorPage = lazy(() => import('./pages/PracticalSheetsGeneratorPage'));
+const BDStudioPage = lazy(() => import('./pages/BDStudioPage'));
+const KdpKeywordResearchPage = lazy(() => import('./pages/KdpKeywordResearchPage'));
+const MasterclassPage = lazy(() => import('./pages/MasterclassPage'));
+const QuizPage = lazy(() => import('./pages/QuizPage'));
+const SignaturePage = lazy(() => import('./pages/SignaturePage'));
+
+// Marketing actif
 const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'));
-const AdminPage = lazy(() => import('./pages/AdminPage').then(m => ({ default: m.AdminPage })));
-const AuthPage = lazy(() => import('./pages/AuthPage'));
-const AdminProfilePage = lazy(() => import('./pages/AdminProfilePage'));
-const AdminFunnelPage = lazy(() => import('./pages/admin/AdminFunnelPage'));
-const AdminPaymentsDashboardPage = lazy(() => import('./pages/admin/AdminPaymentsDashboardPage'));
-const AdminPdfGiftsPage = lazy(() => import('./pages/admin/AdminPdfGiftsPage'));
-const AdminBetaCodesPage = lazy(() => import('./pages/admin/AdminBetaCodesPage'));
-const AdminBetaTestersPage = lazy(() => import('./pages/admin/AdminBetaTestersPage'));
-const AdminCleanupPage = lazy(() => import('./pages/admin/AdminCleanupPage'));
-const ActivationBetaPage = lazy(() => import('./pages/ActivationBetaPage'));
-const ContactSupportPage = lazy(() => import('./pages/ContactSupportPage'));
-const AdminDirectPage = lazy(() => import('./pages/AdminDirectPage'));
-const AdminCockpitPage = lazy(() => import('./pages/AdminCockpitPage'));
-const V3HubPage = lazy(() => import('./pages/V3HubPage'));
-const SalesPageV3 = lazy(() => import('./pages/SalesPageV3'));
-const V3PaiementPage = lazy(() => import('./pages/V3PaiementPage'));
+const DemoPage = lazy(() => import('./pages/DemoPage'));
+const FaqAssistancePage = lazy(() => import('./pages/FaqAssistancePage'));
+const PaymentSuccessPage = lazy(() => import('./pages/PaymentSuccessPage'));
+const ConfirmationPaiementPage = lazy(() => import('./pages/ConfirmationPaiementPage'));
+const PaiementManuelPage = lazy(() => import('./pages/PaiementManuelPage'));
+const UpsellPage = lazy(() => import('./pages/UpsellPage'));
+const UpsellPaiementPage = lazy(() => import('./pages/UpsellPaiementPage'));
 const V3CommandePage = lazy(() => import('./pages/V3CommandePage'));
+const V3PaiementPage = lazy(() => import('./pages/V3PaiementPage'));
 const SalesPageV3Launch = lazy(() => import('./pages/SalesPageV3Launch'));
-// V3 public site (Pluméo-inspired) — sous /v3
+
+// V3 hub + public site
+const V3HubPage = lazy(() => import('./pages/V3HubPage'));
 const V3PublicLayout = lazy(() => import('./components/v3public/V3PublicLayout'));
 const V3HomePage = lazy(() => import('./pages/v3public/V3HomePage'));
 const V3AuthPage = lazy(() => import('./pages/v3public/V3AuthPage'));
@@ -65,93 +74,56 @@ const V3SpecialBookPage = lazy(() => import('./pages/v3public/V3SpecialBookPage'
 const V3OffresPage = lazy(() => import('./pages/v3public/V3OffresPage'));
 const V3OffresMerciPage = lazy(() => import('./pages/v3public/V3OffresMerciPage'));
 const V3TocUltimatePage = lazy(() => import('./pages/v3public/V3TocUltimatePage'));
-const AffiliationFormationPage = lazy(() => import('./pages/AffiliationFormationPage'));
-const ParrainagePage = lazy(() => import('./pages/ParrainagePage'));
+
+// Blog / Formation SEO
+const BlogPage = lazy(() => import('./pages/BlogPage'));
+const BlogArticleTemplate = lazy(() => import('./components/blog/BlogArticleTemplate'));
 const FormationPage = lazy(() => import('./pages/FormationPage'));
-const FormationSeriesPage = lazy(() => import('./pages/FormationSeriesPage'));
-const FormationAudioPage = lazy(() => import('./pages/FormationAudioPage'));
-const FormationSeriesAudioPage = lazy(() => import('./pages/FormationSeriesAudioPage'));
 const FormationVideosPage = lazy(() => import('./pages/FormationVideosPage'));
-const SalesPage = lazy(() => import('./pages/SalesPage'));
+const FormationAudioPage = lazy(() => import('./pages/FormationAudioPage'));
+const FormationSeriesPage = lazy(() => import('./pages/FormationSeriesPage'));
+const FormationSeriesAudioPage = lazy(() => import('./pages/FormationSeriesAudioPage'));
+const FormationEmbedPage = lazy(() => import('./pages/FormationEmbedPage'));
+const SeoCreerEbookIaPage = lazy(() => import('./pages/SeoCreerEbookIaPage'));
+const SeoGenerateurEbookPage = lazy(() => import('./pages/SeoGenerateurEbookPage'));
+const SeoTutorialChatGptPage = lazy(() => import('./pages/SeoTutorialChatGptPage'));
+const SeoGuideKdpEnfantsPage = lazy(() => import('./pages/SeoGuideKdpEnfantsPage'));
+const SeoFrancophonesEtrangerPage = lazy(() => import('./pages/SeoFrancophonesEtrangerPage'));
+
+// Légal / système
 const MentionsLegales = lazy(() => import('./pages/MentionsLegales'));
 const PolitiqueConfidentialite = lazy(() => import('./pages/PolitiqueConfidentialite'));
 const CGV = lazy(() => import('./pages/CGV'));
-const Securite = lazy(() => import('./pages/Securite'));
 const Licence = lazy(() => import('./pages/Licence'));
 const LicenceEtenduePage = lazy(() => import('./pages/LicenceEtenduePage'));
-const PaymentSuccessPage = lazy(() => import('./pages/PaymentSuccessPage'));
-const DemoPage = lazy(() => import('./pages/DemoPage'));
-const TrialSignupPage = lazy(() => import('./pages/TrialSignupPage'));
-const TrialDashboardPage = lazy(() => import('./pages/admin/TrialDashboardPage'));
-const BrevoOnboardingEmailsPage = lazy(() => import('./pages/admin/BrevoOnboardingEmailsPage'));
-const BrevoAutomationGuidePage = lazy(() => import('./pages/admin/BrevoAutomationGuidePage'));
-const OfferValuePage = lazy(() => import('./pages/OfferValuePage'));
-const SeoTutorialChatGptPage = lazy(() => import('./pages/SeoTutorialChatGptPage'));
-const SeoCreerEbookIaPage = lazy(() => import('./pages/SeoCreerEbookIaPage'));
-const SeoGenerateurEbookPage = lazy(() => import('./pages/SeoGenerateurEbookPage'));
-const SeoGuideKdpEnfantsPage = lazy(() => import('./pages/SeoGuideKdpEnfantsPage'));
-const SeoFrancophonesEtrangerPage = lazy(() => import('./pages/SeoFrancophonesEtrangerPage'));
-const BlogPage = lazy(() => import('./pages/BlogPage'));
-const BlogArticleTemplate = lazy(() => import('./components/blog/BlogArticleTemplate'));
+const Securite = lazy(() => import('./pages/Securite'));
+const AuthPage = lazy(() => import('./pages/AuthPage'));
 const LogoutTotalPage = lazy(() => import('./pages/LogoutTotalPage'));
-const PaiementManuelPage = lazy(() => import('./pages/PaiementManuelPage'));
-const ConfirmationPaiementPage = lazy(() => import('./pages/ConfirmationPaiementPage'));
-const FaqAssistancePage = lazy(() => import('./pages/FaqAssistancePage'));
-const NichesPage = lazy(() => import('./pages/NichesPage'));
-const Niches600Page = lazy(() => import('./pages/Niches600Page'));
-const ArcSignupPage = lazy(() => import('./pages/ArcSignupPage'));
-const MarketingPlanPage = lazy(() => import('./pages/MarketingPlanPage'));
-const UpsellPage = lazy(() => import('./pages/UpsellPage'));
-const UpsellPaiementPage = lazy(() => import('./pages/UpsellPaiementPage'));
-const CoachingVipPage = lazy(() => import('./pages/CoachingVipPage'));
-const SeoGeneratorPage = lazy(() => import('./pages/SeoGeneratorPage'));
-const PracticalSheetsGeneratorPage = lazy(() => import('./pages/PracticalSheetsGeneratorPage'));
-const ResultatEn5MinPage = lazy(() => import('./pages/ResultatEn5MinPage'));
+const InstallPage = lazy(() => import('./pages/InstallPage'));
+const RecuperationCodePage = lazy(() => import('./pages/RecuperationCodePage'));
+const ActivationBetaPage = lazy(() => import('./pages/ActivationBetaPage'));
 const CadeauPage = lazy(() => import('./pages/CadeauPage'));
 const GiftRedeemPage = lazy(() => import('./pages/GiftRedeemPage'));
 const GiftThankYouPage = lazy(() => import('./pages/GiftThankYouPage'));
-const WebinairePage = lazy(() => import('./pages/WebinairePage'));
-const QuizPage = lazy(() => import('./pages/QuizPage'));
-const ChecklistTournagePage = lazy(() => import('./pages/ChecklistTournagePage'));
-const BDStudioPage = lazy(() => import('./pages/BDStudioPage'));
-const SeriesTomesPage = lazy(() => import('./pages/SeriesTomesPage'));
-const ForumPage = lazy(() => import('./pages/ForumPage'));
-const KdpKeywordResearchPage = lazy(() => import('./pages/KdpKeywordResearchPage'));
-const AuditPilotPage = lazy(() => import('./pages/AuditPilotPage'));
-const BookPerfectPage = lazy(() => import('./pages/BookPerfectPage'));
-const BookPerfectSalesPage = lazy(() => import('./pages/BookPerfectSalesPage'));
-const CouvertureKdpPage = lazy(() => import('./pages/CouvertureKdpPage'));
-const PublicAudiobookPage = lazy(() => import('./pages/PublicAudiobookPage'));
-const AudiobookEmbedPage = lazy(() => import('./pages/AudiobookEmbedPage'));
-const AudiobookDemoPage = lazy(() => import('./pages/AudiobookDemoPage'));
-const AudiobookThankYouPage = lazy(() => import('./pages/AudiobookThankYouPage'));
-const FormationEmbedPage = lazy(() => import('./pages/FormationEmbedPage'));
-const Nouveautes2026Page = lazy(() => import('./pages/Nouveautes2026Page'));
-const InstallPage = lazy(() => import('./pages/InstallPage'));
-const ElementorExportPage = lazy(() => import('./pages/ElementorExportPage'));
-const MasterclassPage = lazy(() => import('./pages/MasterclassPage'));
-const SubscriptionAuth = lazy(() => import('@/components/SubscriptionAuth').then(m => ({ default: m.SubscriptionAuth })));
+const ContactSupportPage = lazy(() => import('./pages/ContactSupportPage'));
 
-// SaaS/marketing pages (admin-only tools)
-const SalesCampaignPage = lazy(() => import('@/pages/SalesCampaignPage'));
-const EmailPreviewPage = lazy(() => import('@/pages/EmailPreviewPage'));
-const ProspectManagerPage = lazy(() => import('@/pages/ProspectManagerPage'));
-const SocialPostGeneratorPage = lazy(() => import('@/pages/SocialPostGeneratorPage'));
-const UnifiedMarketingDashboard = lazy(() => import('@/pages/UnifiedMarketingDashboard'));
-const BusinessCenterPage = lazy(() => import('@/pages/BusinessCenterPage'));
-const CrmPage = lazy(() => import('@/pages/CrmPage'));
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const KdpAdsGuidePage = lazy(() => import('./pages/KdpAdsGuidePage'));
-const ToolsGuidePage = lazy(() => import('./pages/ToolsGuidePage'));
-const TutorielsPage = lazy(() => import('./pages/TutorielsPage'));
-const RecuperationCodePage = lazy(() => import('./pages/RecuperationCodePage'));
-const ExtensionChromePage = lazy(() => import('./pages/ExtensionChromePage'));
-const EbookbotPage = lazy(() => import('./pages/EbookbotPage'));
-const EspacePage = lazy(() => import('./pages/EspacePage'));
-const DashboardPage = lazy(() => import('./pages/DashboardPage'));
-const EspaceLancementPage = lazy(() => import('./pages/EspaceLancementPage'));
+// Admin simplifié
+const AdminPage = lazy(() => import('./pages/AdminPage').then(m => ({ default: m.AdminPage })));
+const AdminProfilePage = lazy(() => import('./pages/AdminProfilePage'));
+const AdminDirectPage = lazy(() => import('./pages/AdminDirectPage'));
+const AdminFunnelPage = lazy(() => import('./pages/admin/AdminFunnelPage'));
+const AdminPdfGiftsPage = lazy(() => import('./pages/admin/AdminPdfGiftsPage'));
+const AdminBetaCodesPage = lazy(() => import('./pages/admin/AdminBetaCodesPage'));
+const AdminBetaTestersPage = lazy(() => import('./pages/admin/AdminBetaTestersPage'));
+const AdminPaymentsDashboardPage = lazy(() => import('./pages/admin/AdminPaymentsDashboardPage'));
+const AdminCleanupPage = lazy(() => import('./pages/admin/AdminCleanupPage'));
+const CrmPage = lazy(() => import('./pages/CrmPage'));
+const ProspectManagerPage = lazy(() => import('./pages/ProspectManagerPage'));
+const EmailPreviewPage = lazy(() => import('./pages/EmailPreviewPage'));
+const InfluenceursPage = lazy(() => import('./pages/InfluenceursPage'));
+const InfluenceursConfirmationPage = lazy(() => import('./pages/InfluenceursConfirmationPage'));
 
-// Promo funnel pages
+// Promo funnel
 const PromoCapturePage = lazy(() => import('./pages/promo/PromoCapturePage'));
 const PromoMerciPage = lazy(() => import('./pages/promo/PromoMerciPage'));
 const PromoDecouvertePage = lazy(() => import('./pages/promo/PromoDecouvertePage'));
@@ -160,9 +132,8 @@ const PromoPaiementPage = lazy(() => import('./pages/promo/PromoPaiementPage'));
 const PromoBonusPage = lazy(() => import('./pages/promo/PromoBonusPage'));
 const PromoEspacePage = lazy(() => import('./pages/promo/PromoEspacePage'));
 const PromoAffiliePage = lazy(() => import('./pages/promo/PromoAffiliePage'));
-const InfluenceursPage = lazy(() => import('./pages/InfluenceursPage'));
-const GuideEbookPage = lazy(() => import('./pages/GuideEbookPage'));
-const InfluenceursConfirmationPage = lazy(() => import('./pages/InfluenceursConfirmationPage'));
+
+const SubscriptionAuth = lazy(() => import('@/components/SubscriptionAuth').then(m => ({ default: m.SubscriptionAuth })));
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-background">
@@ -176,23 +147,16 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [subscriberEmail, setSubscriberEmail] = useState('');
   const [subscriberData, setSubscriberData] = useState<any>(null);
-  // Admin status is ONLY set after server-side verification - never from client storage
   const [isAdmin, setIsAdmin] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-
-  // Admin email is checked server-side only (via check-admin edge function)
-
   useEffect(() => {
-    // Safety timeout FIRST: never leave the app stuck on loader
-    // 6s is enough - initial localStorage check is synchronous, only Supabase admin check is async
     const safetyTimer = setTimeout(() => {
       console.warn('Safety timer triggered – forcing auth check complete');
       setIsCheckingAuth(false);
     }, 6000);
 
     const initAuth = async () => {
-      // Check subscriber auth (client cache) - fast, localStorage only
       const savedEmail = localStorage.getItem('subscriber_email');
       const savedData = localStorage.getItem('subscriber_data');
 
@@ -216,49 +180,26 @@ const App = () => {
         }
       }
 
-      // Unblock rendering NOW - subscribers can proceed while admin check runs in background
       setIsCheckingAuth(false);
 
-      // Check admin session in background (non-blocking)
       try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
+        const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
-          console.log('Session admin trouvée dans App.tsx');
           const adminStatus = await getIsCurrentSessionAdmin();
-
-          if (adminStatus) {
-            console.log('Statut admin confirmé dans App.tsx');
-            setIsAdmin(true);
-          } else {
-            console.log('Utilisateur non-admin dans App.tsx');
-            setIsAdmin(false);
-          }
+          setIsAdmin(adminStatus);
         } else {
-          console.log('Aucune session Supabase');
           setIsAdmin(false);
         }
       } catch (error) {
-        console.error('Erreur lors de la vérification de la session admin:', error);
+        console.error('Erreur session admin:', error);
       }
     };
 
     initAuth();
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth state changed:', event);
-
-      // IMPORTANT: INITIAL_SESSION happens on refresh when a session already exists.
-      // We must treat it like SIGNED_IN to keep isAdmin in sync.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       const shouldRecheckAdmin =
-        (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') &&
-        !!session;
-
+        (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') && !!session;
       if (shouldRecheckAdmin && session?.user) {
         setTimeout(async () => {
           const adminStatus = await getIsCurrentSessionAdmin();
@@ -266,11 +207,7 @@ const App = () => {
         }, 0);
         return;
       }
-
-      if (!session || event === 'SIGNED_OUT') {
-        console.log('Déconnexion détectée');
-        setIsAdmin(false);
-      }
+      if (!session || event === 'SIGNED_OUT') setIsAdmin(false);
     });
 
     return () => {
@@ -285,13 +222,11 @@ const App = () => {
     setIsAuthenticated(true);
   }, []);
 
-  // Capture des paramètres UTM dès l'arrivée (attribution des leads/sources)
   useEffect(() => {
     captureUtmParams();
   }, []);
 
   const handleLogout = useCallback(() => {
-    // IMPORTANT: always clear client cache, otherwise users can appear logged-in without a valid backend check
     localStorage.removeItem('subscriber_email');
     localStorage.removeItem('subscriber_data');
     Object.keys(localStorage).forEach((key) => {
@@ -299,22 +234,13 @@ const App = () => {
         localStorage.removeItem(key);
       }
     });
-
     setIsAuthenticated(false);
     setSubscriberEmail('');
     setSubscriberData(null);
-
-    // CRITIQUE : terminer aussi la session Supabase, sinon SubscriberGate
-    // détecte la session active et ré-autorise l'accès (la déconnexion semble
-    // alors "ne rien faire"). On force ensuite une vraie sortie via /logout-total
-    // qui purge tout le cache et redirige proprement.
-    void supabase.auth.signOut().catch((error) => {
-      console.warn('[Logout] signOut non bloquant:', error);
-    });
+    void supabase.auth.signOut().catch(() => {});
     window.location.assign('/logout-total');
   }, []);
 
-  const showAccessDebug = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('debug') === '1';
   const isPlannerPreviewHost =
     typeof window !== 'undefined' &&
     (window.location.hostname === 'localhost' || window.location.hostname.includes('id-preview--'));
@@ -331,30 +257,26 @@ const App = () => {
     covers_generated: 0,
   };
 
-  if (isCheckingAuth) {
-    return <PageLoader />;
-  }
+  if (isCheckingAuth) return <PageLoader />;
+
+  // Helper wrapper for subscriber-gated routes
+  const gated = (node: React.ReactNode) => (
+    <SubscriberGate
+      isAdmin={isAdmin}
+      subscriberEmail={subscriberEmail}
+      subscriberData={subscriberData}
+      onInvalid={handleLogout}
+    >
+      {node}
+    </SubscriberGate>
+  );
 
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <div className="min-h-screen bg-background">
-          
-          {showAccessDebug && (
-            <div className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
-              <div className="mx-auto max-w-6xl px-4 py-2 text-xs text-muted-foreground flex flex-wrap gap-3">
-                <span><strong>host</strong>: {window.location.host}</span>
-                <span><strong>path</strong>: {window.location.pathname}</span>
-                <span><strong>isAdmin</strong>: {String(isAdmin)}</span>
-                <span><strong>isAuthenticated</strong>: {String(isAuthenticated)}</span>
-                <span><strong>subscriberEmail</strong>: {subscriberEmail ? 'yes' : 'no'}</span>
-                <span><strong>subscriberData.access_code</strong>: {subscriberData?.access_code ? 'yes' : 'no'}</span>
-              </div>
-            </div>
-          )}
           <Suspense fallback={<PageLoader />}>
           <Routes>
-            {/* Google Search Console verification (fallback if static file routing is rewritten) */}
             <Route
               path="/googleba4e4a3539729cd0.html"
               element={
@@ -365,68 +287,96 @@ const App = () => {
             />
 
             <Route path="/" element={<Navigate to={hasPlannerAccess ? '/ebook-planner' : '/offres'} replace />} />
-            <Route
-              path="/espace"
-              element={
-                <SubscriberGate
-                  isAdmin={isAdmin}
-                  subscriberEmail={subscriberEmail}
-                  subscriberData={subscriberData}
-                  onInvalid={handleLogout}
-                >
-                  <EspacePage subscriberEmail={subscriberEmail || ''} onLogout={handleLogout} />
-                </SubscriberGate>
-              }
-            />
-            <Route
-              path="/tableau-de-bord"
-              element={
-                isPlannerPreviewHost ? (
-                  <V3HubPage />
-                ) : (
-                  <V3Gate>
-                    <V3HubPage />
-                  </V3Gate>
-                )
-              }
-            />
 
-            <Route
-              path="/espace/lancement"
-              element={
-                <SubscriberGate
-                  isAdmin={isAdmin}
-                  subscriberEmail={subscriberEmail}
-                  subscriberData={subscriberData}
-                  onInvalid={handleLogout}
-                >
-                  <EspaceLancementPage />
-                </SubscriberGate>
-              }
-            />
-            <Route
-              path="/contact-support"
-              element={
-                <SubscriberGate
-                  isAdmin={isAdmin}
-                  subscriberEmail={subscriberEmail}
-                  subscriberData={subscriberData}
-                  onInvalid={handleLogout}
-                >
-                  <ContactSupportPage subscriberEmail={subscriberEmail || ''} />
-                </SubscriberGate>
-              }
-            />
-            <Route path="/offres" element={hasPlannerAccess ? <Navigate to="/ebook-planner" replace /> : <SalesPage />} />
-            <Route path="/publication-pro" element={<SalesPageV3 />} />
-            <Route path="/v3-offre" element={<SalesPageV3 />} />
-            <Route path="/v3-paiement" element={<V3PaiementPage />} />
+            {/* Marketing */}
+            <Route path="/offres" element={
+              hasPlannerAccess
+                ? <Navigate to="/ebook-planner" replace />
+                : (isAuthenticated
+                    ? <SubscriptionPage subscriberEmail={subscriberEmail} subscriberData={subscriberData} onLogout={handleLogout} />
+                    : <SubscriptionAuth onAuthenticated={handleAuthenticated} />)
+            } />
+            <Route path="/demo" element={<DemoPage />} />
+            <Route path="/faq" element={<FaqAssistancePage />} />
+            <Route path="/assistance" element={<FaqAssistancePage />} />
+            <Route path="/paiement-succes" element={<PaymentSuccessPage />} />
+            <Route path="/paiement-manuel" element={<PaiementManuelPage />} />
+            <Route path="/confirmation-paiement" element={<ConfirmationPaiementPage />} />
+            <Route path="/upsell" element={<UpsellPage />} />
+            <Route path="/upsell-paiement" element={<UpsellPaiementPage />} />
             <Route path="/commande-v3" element={<V3CommandePage />} />
+            <Route path="/v3-paiement" element={<V3PaiementPage />} />
             <Route path="/vente-v3" element={<SalesPageV3Launch />} />
-            <Route path="/masterclass" element={<MasterclassPage />} />
-            <Route path="/activer-beta" element={<ActivationBetaPage />} />
-            <Route path="/extension-chrome" element={<ExtensionChromePage />} />
-            <Route path="/ebookbot" element={<EbookbotPage />} />
+
+            {/* Promo été */}
+            <Route path="/promo" element={<PromoCapturePage />} />
+            <Route path="/promo/merci" element={<PromoMerciPage />} />
+            <Route path="/promo/decouverte" element={<PromoDecouvertePage />} />
+            <Route path="/promo/commande" element={<PromoCommandePage />} />
+            <Route path="/promo/paiement" element={<PromoPaiementPage />} />
+            <Route path="/promo/bonus" element={<PromoBonusPage />} />
+            <Route path="/promo/espace" element={<PromoEspacePage />} />
+            <Route path="/promo/affilie" element={<PromoAffiliePage />} />
+
+            {/* Redirections SEO (pages supprimées) */}
+            <Route path="/sales" element={<Navigate to="/offres" replace />} />
+            <Route path="/publication-pro" element={<Navigate to="/offres" replace />} />
+            <Route path="/v3-offre" element={<Navigate to="/offres" replace />} />
+            <Route path="/valeur-offre" element={<Navigate to="/offres" replace />} />
+            <Route path="/coaching-vip" element={<Navigate to="/offres" replace />} />
+            <Route path="/parrainage" element={<Navigate to="/offres" replace />} />
+            <Route path="/affiliation" element={<Navigate to="/offres" replace />} />
+            <Route path="/webinaire" element={<Navigate to="/offres" replace />} />
+            <Route path="/nouveautes-2026" element={<Navigate to="/offres" replace />} />
+            <Route path="/arc-signup" element={<Navigate to="/offres" replace />} />
+            <Route path="/essai-gratuit" element={<Navigate to="/offres" replace />} />
+            <Route path="/resultat-en-5-min" element={<Navigate to="/offres" replace />} />
+            <Route path="/bookperfect-offre" element={<Navigate to="/offres" replace />} />
+            <Route path="/tutoriels" element={<Navigate to="/formation" replace />} />
+            <Route path="/guide-outils" element={<Navigate to="/formation" replace />} />
+            <Route path="/guide-ebook" element={<Navigate to="/formation" replace />} />
+            <Route path="/kdp-ads-guide" element={<Navigate to="/formation" replace />} />
+            <Route path="/checklist-tournage" element={<Navigate to="/formation" replace />} />
+            <Route path="/communaute" element={<Navigate to="/offres" replace />} />
+            <Route path="/ai-chat" element={<Navigate to="/ebookbot" replace />} />
+            <Route path="/business-center" element={<Navigate to="/admin" replace />} />
+            <Route path="/plan-marketing" element={<Navigate to="/admin" replace />} />
+            <Route path="/campagne-vente" element={<Navigate to="/admin" replace />} />
+            <Route path="/dashboard-marketing" element={<Navigate to="/admin" replace />} />
+            <Route path="/generateur-posts" element={<Navigate to="/admin" replace />} />
+            <Route path="/dashboard" element={<Navigate to="/ebook-planner" replace />} />
+            <Route path="/espace" element={<Navigate to="/ebook-planner" replace />} />
+            <Route path="/espace/lancement" element={<Navigate to="/ebook-planner" replace />} />
+            <Route path="/tableau-de-bord" element={<Navigate to="/v3/hub" replace />} />
+            <Route path="/admin-cockpit" element={<Navigate to="/admin" replace />} />
+            <Route path="/extension-chrome" element={<Navigate to="/offres" replace />} />
+            <Route path="/elementor-export" element={<Navigate to="/admin" replace />} />
+            <Route path="/audiobook-demo" element={<Navigate to="/formation-audio" replace />} />
+            <Route path="/audiobook/:slug" element={<Navigate to="/formation-audio" replace />} />
+            <Route path="/audiobook-embed/:slug" element={<Navigate to="/formation-audio" replace />} />
+            <Route path="/audiobook-merci/:slug" element={<Navigate to="/formation-audio" replace />} />
+            <Route path="/hub-v3" element={<Navigate to="/v3/hub" replace />} />
+            <Route path="/dashboard-essais" element={<Navigate to="/admin" replace />} />
+            <Route path="/emails-onboarding" element={<Navigate to="/admin" replace />} />
+            <Route path="/guide-automatisation-brevo" element={<Navigate to="/admin" replace />} />
+            <Route path="/seo-generator" element={<Navigate to="/ebook-planner" replace />} />
+
+            {/* Blog + Formation */}
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:slug" element={<BlogArticleTemplate />} />
+            <Route path="/ecrire-livre-chatgpt" element={<SeoTutorialChatGptPage />} />
+            <Route path="/creer-ebook-ia" element={<SeoCreerEbookIaPage />} />
+            <Route path="/generateur-ebook" element={<SeoGenerateurEbookPage />} />
+            <Route path="/guide-kdp-enfants" element={<SeoGuideKdpEnfantsPage />} />
+            <Route path="/creer-ebook-kdp-etranger" element={<SeoFrancophonesEtrangerPage />} />
+            <Route path="/formation" element={<FormationPage />} />
+            <Route path="/formation-audio" element={isAdmin || isAuthenticated ? <FormationAudioPage /> : <SubscriptionAuth onAuthenticated={handleAuthenticated} />} />
+            <Route path="/formation-series" element={isAdmin || isAuthenticated ? <FormationSeriesPage /> : <SubscriptionAuth onAuthenticated={handleAuthenticated} />} />
+            <Route path="/formation-series-audio" element={isAdmin || isAuthenticated ? <FormationSeriesAudioPage /> : <SubscriptionAuth onAuthenticated={handleAuthenticated} />} />
+            <Route path="/formation-videos" element={isAdmin || isAuthenticated ? <FormationVideosPage /> : <SubscriptionAuth onAuthenticated={handleAuthenticated} />} />
+            <Route path="/formation-embed" element={<FormationEmbedPage />} />
+
+            {/* Légal / système */}
             <Route path="/mentions-legales" element={<MentionsLegales />} />
             <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
             <Route path="/cgv" element={<CGV />} />
@@ -436,104 +386,29 @@ const App = () => {
             <Route path="/licence" element={<Licence />} />
             <Route path="/eula" element={<Licence />} />
             <Route path="/licence-etendue" element={<LicenceEtenduePage />} />
-            <Route path="/logout-total" element={<LogoutTotalPage />} />
-            <Route path="/promo" element={<PromoCapturePage />} />
-            <Route path="/promo/merci" element={<PromoMerciPage />} />
-            <Route path="/promo/decouverte" element={<PromoDecouvertePage />} />
-            <Route path="/promo/commande" element={<PromoCommandePage />} />
-            <Route path="/promo/paiement" element={<PromoPaiementPage />} />
-            <Route path="/promo/bonus" element={<PromoBonusPage />} />
-            <Route path="/promo/espace" element={<PromoEspacePage />} />
-            <Route path="/promo/affilie" element={<PromoAffiliePage />} />
-            <Route path="/influenceurs" element={<InfluenceursPage />} />
-            <Route path="/guide-ebook" element={<GuideEbookPage />} />
-
-            <Route path="/influenceurs/merci" element={<InfluenceursConfirmationPage />} />
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/blog/:slug" element={<BlogArticleTemplate />} />
-            <Route path="/ecrire-livre-chatgpt" element={<SeoTutorialChatGptPage />} />
-            <Route path="/creer-ebook-ia" element={<SeoCreerEbookIaPage />} />
-            <Route path="/generateur-ebook" element={<SeoGenerateurEbookPage />} />
-            <Route path="/guide-kdp-enfants" element={<SeoGuideKdpEnfantsPage />} />
-            <Route path="/creer-ebook-kdp-etranger" element={<SeoFrancophonesEtrangerPage />} />
-            <Route path="/valeur-offre" element={<OfferValuePage />} />
-            <Route path="/demo" element={<DemoPage />} />
-            <Route path="/essai-gratuit" element={<TrialSignupPage />} />
-            <Route path="/dashboard-essais" element={<AdminGate><TrialDashboardPage /></AdminGate>} />
-            <Route path="/emails-onboarding" element={<AdminGate><BrevoOnboardingEmailsPage /></AdminGate>} />
-            <Route path="/guide-automatisation-brevo" element={<AdminGate><BrevoAutomationGuidePage /></AdminGate>} />
-            <Route path="/upsell" element={<UpsellPage />} />
-            <Route path="/upsell-paiement" element={<UpsellPaiementPage />} />
-            <Route path="/coaching-vip" element={<CoachingVipPage />} />
-            <Route path="/paiement-succes" element={<PaymentSuccessPage />} />
-            <Route path="/paiement-manuel" element={<PaiementManuelPage />} />
-            <Route path="/confirmation-paiement" element={<ConfirmationPaiementPage />} />
-            <Route path="/faq" element={<FaqAssistancePage />} />
-            <Route path="/checklist-tournage" element={<ChecklistTournagePage />} />
-            <Route path="/assistance" element={<FaqAssistancePage />} />
-            <Route path="/affiliation" element={<AffiliationFormationPage />} />
-            <Route path="/bd-studio" element={<BDStudioPage />} />
-            <Route path="/parrainage" element={<ParrainagePage />} />
             <Route path="/auth" element={<AuthPage />} />
-            <Route path="/admin-direct" element={<AdminDirectPage />} />
-            <Route path="/admin-cockpit" element={isPlannerPreviewHost ? <AdminCockpitPage /> : <AdminGate><AdminCockpitPage /></AdminGate>} />
-            {/* Ancien Hub V3 admin — migré sous /v3/hub (site public). On redirige en conservant le tab. */}
-            <Route path="/hub-v3" element={<Navigate to={`/v3/hub${window.location.search}`} replace />} />
-            <Route path="/ai-chat" element={<AiChatPage />} />
-            <Route path="/niches" element={<NichesPage />} />
-            <Route path="/niches-600" element={<Niches600Page />} />
-            <Route path="/arc-signup" element={<ArcSignupPage />} />
-            <Route path="/communaute" element={<ForumPage />} />
-            <Route path="/plan-marketing" element={<MarketingPlanPage />} />
-            <Route path="/campagne-vente" element={<SalesCampaignPage />} />
-            <Route path="/apercu-emails" element={<AdminGate><EmailPreviewPage /></AdminGate>} />
-            <Route path="/generateur-posts" element={<AdminGate><SocialPostGeneratorPage /></AdminGate>} />
-            <Route path="/gestion-prospects" element={<AdminGate><ProspectManagerPage /></AdminGate>} />
-            <Route path="/dashboard-marketing" element={<AdminGate><UnifiedMarketingDashboard /></AdminGate>} />
-            <Route path="/business-center" element={<AdminGate><BusinessCenterPage /></AdminGate>} />
-            <Route path="/crm" element={<AdminGate><CrmPage /></AdminGate>} />
-            <Route path="/admin-paiements" element={<AdminGate><AdminPaymentsDashboardPage /></AdminGate>} />
-            <Route path="/resultat-en-5-min" element={<ResultatEn5MinPage />} />
+            <Route path="/logout-total" element={<LogoutTotalPage />} />
+            <Route path="/install" element={<InstallPage />} />
+            <Route path="/mon-code" element={<RecuperationCodePage />} />
+            <Route path="/activer-beta" element={<ActivationBetaPage />} />
             <Route path="/cadeau" element={<CadeauPage />} />
             <Route path="/carte-cadeau" element={<GiftRedeemPage />} />
             <Route path="/carte-cadeau-merci" element={<GiftThankYouPage />} />
-            <Route path="/webinaire" element={<WebinairePage />} />
+            <Route path="/influenceurs" element={<InfluenceursPage />} />
+            <Route path="/influenceurs/merci" element={<InfluenceursConfirmationPage />} />
+            <Route path="/contact-support" element={gated(<ContactSupportPage subscriberEmail={subscriberEmail || ''} />)} />
 
+            {/* V2 tools */}
+            <Route path="/ebook-ideas" element={<EbookIdeasPage />} />
+            <Route path="/ambiances" element={<AmbiancesPage />} />
+            <Route path="/ebookbot" element={<EbookbotPage />} />
+            <Route path="/masterclass" element={<MasterclassPage />} />
+            <Route path="/niches" element={<NichesPage />} />
+            <Route path="/niches-600" element={<Niches600Page />} />
             <Route path="/quiz" element={<QuizPage />} />
-            <Route 
-              path="/seo-generator" 
-              element={
-                <SubscriberGate
-                  isAdmin={isAdmin}
-                  subscriberEmail={subscriberEmail}
-                  subscriberData={subscriberData}
-                  onInvalid={handleLogout}
-                >
-                  <SeoGeneratorPage />
-                </SubscriberGate>
-              }
-            />
-            <Route 
-              path="/fiches-pratiques" 
-              element={
-                <SubscriberGate
-                  isAdmin={isAdmin}
-                  subscriberEmail={subscriberEmail}
-                  subscriberData={subscriberData}
-                  onInvalid={handleLogout}
-                >
-                  <PracticalSheetsGeneratorPage />
-                </SubscriberGate>
-              }
-            />
-            <Route
-              path="/ebook-ideas"
-              element={<EbookIdeasPage />}
-            />
-            <Route
-              path="/ambiances"
-              element={<AmbiancesPage />}
-            />
+            <Route path="/signature" element={<SignaturePage />} />
+            <Route path="/bd-studio" element={<BDStudioPage />} />
+            <Route path="/word-count" element={<WordCountPage />} />
             <Route
               path="/ebook-planner"
               element={
@@ -545,282 +420,60 @@ const App = () => {
                     isAdmin={false}
                     onLogout={handleLogout}
                   />
-                ) : (
-                  <SubscriberGate
-                    isAdmin={isAdmin}
-                    subscriberEmail={subscriberEmail}
+                ) : gated(
+                  <EbookPlannerPage
+                    subscriberEmail={subscriberEmail || ''}
                     subscriberData={subscriberData}
-                    onInvalid={handleLogout}
-                  >
-                    <EbookPlannerPage
-                      subscriberEmail={subscriberEmail || ''}
-                      subscriberData={subscriberData}
-                      isDemo={false}
-                      isAdmin={isAdmin}
-                      onLogout={handleLogout}
-                    />
-                  </SubscriberGate>
+                    isDemo={false}
+                    isAdmin={isAdmin}
+                    onLogout={handleLogout}
+                  />
                 )
               }
             />
-            <Route
-              path="/kdp-keywords"
-              element={
-                <SubscriberGate
-                  isAdmin={isAdmin}
-                  subscriberEmail={subscriberEmail}
-                  subscriberData={subscriberData}
-                  onInvalid={handleLogout}
-                >
-                  <KdpKeywordResearchPage />
-                </SubscriberGate>
-              }
-            />
-            <Route
-              path="/audit-pilot"
-              element={
-                <SubscriberGate
-                  isAdmin={isAdmin}
-                  subscriberEmail={subscriberEmail}
-                  subscriberData={subscriberData}
-                  onInvalid={handleLogout}
-                >
-                  <AuditPilotPage />
-                </SubscriberGate>
-              }
-            />
-            <Route
-              path="/bookperfect"
-              element={
-                <BookPerfectGate>
-                  <BookPerfectPage />
-                </BookPerfectGate>
-              }
-            />
-            <Route
-              path="/bookperfect-offre"
-              element={<BookPerfectSalesPage />}
-            />
-            <Route
-              path="/couverture-kdp"
-              element={
-                <SubscriberGate
-                  isAdmin={isAdmin}
-                  subscriberEmail={subscriberEmail}
-                  subscriberData={subscriberData}
-                  onInvalid={handleLogout}
-                >
-                  <CouvertureKdpPage />
-                </SubscriberGate>
-              }
-            />
-            <Route
-              path="/series-tomes"
-              element={
-                <SubscriberGate
-                  isAdmin={isAdmin}
-                  subscriberEmail={subscriberEmail}
-                  subscriberData={subscriberData}
-                  onInvalid={handleLogout}
-                >
-                  <SeriesTomesPage />
-                </SubscriberGate>
-              }
-            />
-            <Route
-              path="/guide-outils"
-              element={
-                <SubscriberGate
-                  isAdmin={isAdmin}
-                  subscriberEmail={subscriberEmail}
-                  subscriberData={subscriberData}
-                  onInvalid={handleLogout}
-                >
-                  <ToolsGuidePage />
-                </SubscriberGate>
-              }
-            />
-            <Route
-              path="/tutoriels"
-              element={
-                <SubscriberGate
-                  isAdmin={isAdmin}
-                  subscriberEmail={subscriberEmail}
-                  subscriberData={subscriberData}
-                  onInvalid={handleLogout}
-                >
-                  <TutorielsPage />
-                </SubscriberGate>
-              }
-            />
-            <Route
-              path="/kdp-ads-guide"
-              element={
-                <SubscriberGate
-                  isAdmin={isAdmin}
-                  subscriberEmail={subscriberEmail}
-                  subscriberData={subscriberData}
-                  onInvalid={handleLogout}
-                >
-                  <KdpAdsGuidePage />
-                </SubscriberGate>
-              }
-            />
+            <Route path="/kdp-keywords" element={gated(<KdpKeywordResearchPage />)} />
+            <Route path="/audit-pilot" element={gated(<AuditPilotPage />)} />
+            <Route path="/bookperfect" element={<BookPerfectGate><BookPerfectPage /></BookPerfectGate>} />
+            <Route path="/couverture-kdp" element={gated(<CouvertureKdpPage />)} />
+            <Route path="/series-tomes" element={gated(<SeriesTomesPage />)} />
+            <Route path="/fiches-pratiques" element={gated(<PracticalSheetsGeneratorPage />)} />
+
+            {/* Abonnement */}
             <Route
               path="/subscription"
               element={
-              isAdmin ? (
+                isAdmin ? (
                   <SubscriptionPage
                     subscriberEmail={subscriberEmail || ''}
-                    subscriberData={subscriberData || { 
-                      plan_type: 'lifetime', 
-                      status: 'active', 
-                      access_code: 'ADMIN-ACCESS',
-                      ebook_plans_generated: 0,
-                      chapters_generated: 0,
-                      subchapters_generated: 0,
-                      covers_generated: 0
+                    subscriberData={subscriberData || {
+                      plan_type: 'lifetime', status: 'active', access_code: 'ADMIN-ACCESS',
+                      ebook_plans_generated: 0, chapters_generated: 0, subchapters_generated: 0, covers_generated: 0
                     }}
                     onLogout={handleLogout}
                   />
                 ) : isAuthenticated ? (
-                  <SubscriptionPage
-                    subscriberEmail={subscriberEmail}
-                    subscriberData={subscriberData}
-                    onLogout={handleLogout}
-                  />
+                  <SubscriptionPage subscriberEmail={subscriberEmail} subscriberData={subscriberData} onLogout={handleLogout} />
                 ) : (
                   <SubscriptionAuth onAuthenticated={handleAuthenticated} />
                 )
-              }
-            />
-            <Route 
-              path="/admin" 
-              element={
-                <AdminGate>
-                  <AdminPage />
-                </AdminGate>
-              }
-            />
-            {/* /dashboard = panel admin (stats globales). Les abonnés vont sur /ebook-planner via redirection. */}
-            <Route 
-              path="/dashboard" 
-              element={
-                isAdmin ? (
-                  <Dashboard />
-                ) : (
-                  <Navigate to="/ebook-planner" replace />
-                )
-              }
-            />
-            <Route 
-              path="/admin/profile" 
-              element={
-                <AdminGate>
-                  <AdminProfilePage />
-                </AdminGate>
-              }
-            />
-            <Route 
-              path="/admin/funnel" 
-              element={
-                <AdminGate>
-                  <AdminFunnelPage />
-                </AdminGate>
-              }
-            />
-            <Route 
-              path="/admin/cadeaux-pdf" 
-              element={
-                <AdminGate>
-                  <AdminPdfGiftsPage />
-                </AdminGate>
-              }
-            />
-            <Route 
-              path="/admin/codes-beta" 
-              element={
-                <AdminGate>
-                  <AdminBetaCodesPage />
-                </AdminGate>
-              }
-            />
-            <Route 
-              path="/admin/beta-testeurs" 
-              element={
-                <AdminGate>
-                  <AdminBetaTestersPage />
-                </AdminGate>
-              }
-            />
-            <Route 
-              path="/admin/cleanup" 
-              element={
-                <AdminGate>
-                  <AdminCleanupPage />
-                </AdminGate>
               }
             />
 
-            <Route 
-              path="/formation" 
-              element={<FormationPage />}
-            />
-            <Route 
-              path="/formation-audio" 
-              element={
-                isAdmin || isAuthenticated ? (
-                  <FormationAudioPage />
-                ) : (
-                  <SubscriptionAuth onAuthenticated={handleAuthenticated} />
-                )
-              }
-            />
-            <Route 
-              path="/formation-series" 
-              element={
-                isAdmin || isAuthenticated ? (
-                  <FormationSeriesPage />
-                ) : (
-                  <SubscriptionAuth onAuthenticated={handleAuthenticated} />
-                )
-              }
-            />
-            <Route 
-              path="/formation-series-audio" 
-              element={
-                isAdmin || isAuthenticated ? (
-                  <FormationSeriesAudioPage />
-                ) : (
-                  <SubscriptionAuth onAuthenticated={handleAuthenticated} />
-                )
-              }
-            />
-            <Route 
-              path="/formation-videos" 
-              element={
-                isAdmin || isAuthenticated ? (
-                  <FormationVideosPage />
-                ) : (
-                  <SubscriptionAuth onAuthenticated={handleAuthenticated} />
-                )
-              }
-            />
-            
-            {/* Public audiobook routes */}
-            <Route path="/audiobook-demo" element={<AudiobookDemoPage />} />
-            <Route path="/audiobook/:slug" element={<PublicAudiobookPage />} />
-            <Route path="/audiobook-embed/:slug" element={<AudiobookEmbedPage />} />
-            <Route path="/audiobook-merci/:slug" element={<AudiobookThankYouPage />} />
-            <Route path="/formation-embed" element={<FormationEmbedPage />} />
-            <Route path="/elementor-export" element={<ElementorExportPage />} />
-            <Route path="/nouveautes-2026" element={<Nouveautes2026Page />} />
-            <Route path="/install" element={<InstallPage />} />
-            
-            {/* SaaS routes removed - orphan system */}
-            <Route path="/mon-code" element={<RecuperationCodePage />} />
+            {/* Admin */}
+            <Route path="/admin" element={<AdminGate><AdminPage /></AdminGate>} />
+            <Route path="/admin-direct" element={<AdminDirectPage />} />
+            <Route path="/admin/profile" element={<AdminGate><AdminProfilePage /></AdminGate>} />
+            <Route path="/admin/funnel" element={<AdminGate><AdminFunnelPage /></AdminGate>} />
+            <Route path="/admin/cadeaux-pdf" element={<AdminGate><AdminPdfGiftsPage /></AdminGate>} />
+            <Route path="/admin/codes-beta" element={<AdminGate><AdminBetaCodesPage /></AdminGate>} />
+            <Route path="/admin/beta-testeurs" element={<AdminGate><AdminBetaTestersPage /></AdminGate>} />
+            <Route path="/admin/cleanup" element={<AdminGate><AdminCleanupPage /></AdminGate>} />
+            <Route path="/admin-paiements" element={<AdminGate><AdminPaymentsDashboardPage /></AdminGate>} />
+            <Route path="/crm" element={<AdminGate><CrmPage /></AdminGate>} />
+            <Route path="/gestion-prospects" element={<AdminGate><ProspectManagerPage /></AdminGate>} />
+            <Route path="/apercu-emails" element={<AdminGate><EmailPreviewPage /></AdminGate>} />
 
-            {/* V3 public site (Pluméo-inspired) */}
+            {/* V3 public site */}
             <Route path="/v3" element={<V3PublicLayout />}>
               <Route index element={<V3HomePage />} />
               <Route path="auth" element={<V3AuthPage />} />
@@ -836,30 +489,20 @@ const App = () => {
               <Route path="offres" element={<V3OffresPage />} />
               <Route path="offres/merci" element={<V3OffresMerciPage />} />
               <Route path="outils/sommaire-ultime" element={<V3TocUltimatePage />} />
-              {/* Hub complet (ex /hub-v3) — accessible depuis le site public */}
-              <Route path="hub" element={<V3HubPage />} />
+              <Route path="hub" element={isPlannerPreviewHost ? <V3HubPage /> : <V3Gate><V3HubPage /></V3Gate>} />
             </Route>
 
-            {/* Catch-all : les utilisateurs connectés restent dans le planner */}
             <Route path="*" element={<Navigate to={hasPlannerAccess ? "/ebook-planner" : "/offres"} replace />} />
           </Routes>
           </Suspense>
-          {/* Admin: popup flottant abonnés visible sur toutes les pages */}
           <SubscriberActivityPopup />
-          {/* Onboarding 1er ebook (modal one-shot après inscription) */}
           {isAuthenticated && <FirstEbookOnboarding subscriberEmail={subscriberEmail} />}
-          {/* EBOOKBOT - copilote IA flottant accessible sur tout le site */}
           <EbookbotFloatingButton />
-          {/* Bouton flottant Clés API & réglages — visible pour tous (le composant filtre lui-même par route) */}
           <ApiKeysFloatingButton />
           <GeminiKeyAlertBanner />
-          {/* Admin: bascule V2/V3 importante, toujours visible */}
           {(isAuthenticated || isAdmin) && <V2V3FloatingSwitch />}
-          {/* SOS modal erreurs IA — humanise les erreurs Gemini/Claude/OpenAI/OpenRouter */}
           {isAuthenticated && <AISosModal />}
-          {/* Badge coût IA cumulé par projet */}
           {isAuthenticated && <AICostBadge />}
-          {/* Acquisition : capture email visiteurs + CTA flottant vers l'outil (visiteurs non connectés uniquement) */}
           {!isAuthenticated && <LeadCapturePopup />}
           {!isAuthenticated && <FloatingToolCTA />}
           {!isAuthenticated && <StickySignupBar />}
