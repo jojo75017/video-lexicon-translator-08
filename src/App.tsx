@@ -852,6 +852,7 @@ const App = () => {
           <EbookbotFloatingButton />
           {/* Bouton flottant Clés API & réglages — visible pour tous (le composant filtre lui-même par route) */}
           <ApiKeysFloatingButton />
+          <GeminiKeyAlertBanner />
           {/* Admin: bascule V2/V3 importante, toujours visible */}
           {(isAuthenticated || isAdmin) && <V2V3FloatingSwitch />}
           {/* SOS modal erreurs IA — humanise les erreurs Gemini/Claude/OpenAI/OpenRouter */}
