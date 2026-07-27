@@ -95,27 +95,28 @@ export default function AdminPlansV3Page() {
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <Card className="border-l-4 border-l-blue-500">
-            <CardContent className="pt-6">
-              <div className="text-sm text-muted-foreground">Débutant</div>
-              <div className="text-3xl font-bold">15 livres/mois</div>
-              <div className="mt-2 text-sm text-muted-foreground">22 agents · 20 chapitres max</div>
-            </CardContent>
-          </Card>
-          <Card className="border-l-4 border-l-amber-500">
-            <CardContent className="pt-6">
-              <div className="text-sm text-muted-foreground">Expert</div>
-              <div className="text-3xl font-bold">30 livres/mois</div>
-              <div className="mt-2 text-sm text-muted-foreground">22 agents · 40 chapitres max</div>
-            </CardContent>
-          </Card>
-          <Card className="border-l-4 border-l-teal-500">
-            <CardContent className="pt-6">
-              <div className="text-sm text-muted-foreground">Auteur</div>
-              <div className="text-3xl font-bold">Illimité</div>
-              <div className="mt-2 text-sm text-muted-foreground">30 agents · 60 chapitres max + Pro</div>
-            </CardContent>
-          </Card>
+          {V3_PLANS.map((plan, idx) => {
+            const borderColor = idx === 0 ? "border-l-blue-500" : idx === 1 ? "border-l-amber-500" : "border-l-teal-500";
+            const savings = getYearlySavingsPercent(plan);
+            return (
+              <Card key={plan.id} className={`border-l-4 ${borderColor}`}>
+                <CardContent className="pt-6">
+                  <div className="text-sm text-muted-foreground">{plan.name}</div>
+                  <div className="text-3xl font-bold">{plan.booksPerMonth ? `${plan.booksPerMonth} livres/mois` : "Illimité"}</div>
+                  <div className="mt-2 text-sm text-muted-foreground">
+                    {plan.agentsCount} agents · {plan.chaptersMax} chapitres max
+                  </div>
+                  <div className="mt-3 flex items-baseline gap-2">
+                    <span className="text-xl font-bold">{formatPrice(plan.monthlyPrice)}/mois</span>
+                    <span className="text-xs text-muted-foreground">ou {formatPrice(plan.yearlyPrice)}/an</span>
+                  </div>
+                  <div className="mt-1 text-xs text-green-600 font-medium">
+                    Économie annuelle : {formatPrice(getYearlySavingsAmount(plan))} ({savings}%)
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
         <Card>
