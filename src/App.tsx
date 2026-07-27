@@ -502,7 +502,9 @@ const App = () => {
           <EbookbotFloatingButton />
           <ApiKeysFloatingButton />
           <GeminiKeyAlertBanner />
-          {(isAuthenticated || isAdmin) && <V2V3FloatingSwitch />}
+          {(isAuthenticated || isAdmin || isPlannerPreviewHost) && (
+            <V2V3FloatingSwitch forceVisible={isPlannerPreviewHost && !isAuthenticated && !isAdmin} />
+          )}
           {isAuthenticated && <AISosModal />}
           {isAuthenticated && <AICostBadge />}
           {!isAuthenticated && <LeadCapturePopup />}
