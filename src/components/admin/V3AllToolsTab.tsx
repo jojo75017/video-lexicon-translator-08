@@ -119,6 +119,9 @@ const V3AllToolsTab = () => {
             Afficher les verrouillés
           </label>
         </div>
+      </div>
+
+
 
 
       <div className="mb-4 flex flex-col gap-3">
