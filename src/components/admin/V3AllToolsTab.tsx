@@ -56,7 +56,7 @@ const V3AllToolsTab = () => {
   }, [withPlan]);
 
   const grouped = useMemo(() => {
-    const map = new Map<V2ToolCategory, typeof V2_TOOLS>();
+    const map = new Map<V2ToolCategory, typeof filtered>();
     for (const t of filtered) {
       if (!map.has(t.category)) map.set(t.category, []);
       map.get(t.category)!.push(t);
