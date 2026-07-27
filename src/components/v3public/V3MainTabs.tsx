@@ -3,6 +3,7 @@ import {
   BookOpen, PenLine, Palette, Rocket, Heart, Search, Users, Layers,
   LayoutDashboard, FileText, Upload, FolderOpen, GraduationCap, LayoutGrid,
 } from 'lucide-react';
+import { SPECIAL_BOOK_TABS } from '@/data/specialBookTabs';
 
 /** Onglets principaux V3 — style Vivlio */
 const PRIMARY_TABS = [
@@ -27,6 +28,23 @@ const QUICK_TOOLS = [
   { to: '/v3/library',        label: 'Mes projets',               icon: FolderOpen },
   { to: '/blog',              label: 'Guides',                    icon: GraduationCap },
 ];
+
+const SPECIAL_BOOK_EMOJIS: Record<string, string> = {
+  roman: '📖',
+  cuisine: '🍳',
+  voyage: '🧭',
+  coloriage: '🖍️',
+  bd: '💥',
+  documentaire: '🎬',
+  atlas: '🗺️',
+  encyclopedie: '📚',
+  agenda: '📅',
+  journal: '📝',
+  scolaire: '🎓',
+  aquariophilie: '🐠',
+  oiseaux: '🐦',
+  saga: '✨',
+};
 
 export default function V3MainTabs() {
   const tabCls = ({ isActive }: { isActive: boolean }) =>
@@ -73,6 +91,31 @@ export default function V3MainTabs() {
               {q.emoji ? <span>{q.emoji}</span> : <q.icon className="w-3.5 h-3.5" />}
               <span>{q.label}</span>
             </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* Ligne 3 — livres spéciaux V3 */}
+      <div className="border-t border-black/5 bg-[var(--v3-orange-50)]/60">
+        <div className="max-w-7xl mx-auto px-5 md:px-8 py-1.5 flex flex-wrap items-center gap-1">
+          <span className="mr-1 text-[11px] font-bold uppercase tracking-wider text-[var(--v3-orange-600)]">
+            Livres spéciaux
+          </span>
+          {SPECIAL_BOOK_TABS.map((tab) => (
+            <NavLink
+              key={tab.slug}
+              to={`/v3/livres/${tab.slug}`}
+              className={({ isActive }) =>
+                `flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[12px] font-medium whitespace-nowrap transition-colors ${
+                  isActive
+                    ? 'bg-[var(--v3-ink)] text-white'
+                    : 'text-[var(--v3-ink)] hover:bg-white hover:text-[var(--v3-orange-600)]'
+                }`
+              }
+            >
+              <span>{SPECIAL_BOOK_EMOJIS[tab.slug] ?? '📘'}</span>
+              <span>{tab.label}</span>
+            </NavLink>
           ))}
         </div>
       </div>
