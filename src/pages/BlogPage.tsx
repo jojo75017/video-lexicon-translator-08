@@ -109,11 +109,52 @@ const BlogPage = () => {
           </div>
         </section>
 
+        {/* Modules par catégorie */}
+        <section className="pb-6">
+          <div className="container mx-auto px-4">
+            <div className="flex items-end justify-between mb-6 flex-wrap gap-3">
+              <div>
+                <Badge className="mb-2 bg-primary/10 text-primary border-primary/30">Explorer par thème</Badge>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground">Modules & catégories</h2>
+              </div>
+              {activeCategory && (
+                <Button variant="ghost" size="sm" onClick={() => setActiveCategory(null)}>
+                  <LayoutGrid className="w-4 h-4 mr-2" /> Tout afficher
+                </Button>
+              )}
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {categoryModules.map((cat) => {
+                const active = activeCategory === cat.name;
+                return (
+                  <button
+                    key={cat.name}
+                    type="button"
+                    onClick={() => setActiveCategory(active ? null : cat.name)}
+                    className={`group relative rounded-2xl overflow-hidden border transition-all text-left ${
+                      active ? 'border-primary shadow-lg shadow-primary/20 ring-2 ring-primary/40' : 'border-border hover:border-primary/50 hover:shadow-lg'
+                    }`}
+                  >
+                    <div className="relative aspect-[4/3] overflow-hidden">
+                      <img src={cat.image} alt={cat.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent" />
+                      <div className="absolute inset-x-0 bottom-0 p-4">
+                        <div className="text-white font-semibold text-base md:text-lg leading-tight">{cat.name}</div>
+                        <div className="text-white/80 text-xs mt-1">{cat.count} article{cat.count > 1 ? 's' : ''}</div>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
         {/* Articles Grid */}
         <section className="py-12 pb-24">
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {articles.map((article, index) => (
+              {visibleArticles.map((article, index) => (
                 <Link key={index} to={article.slug} className="group">
                   <Card className="h-full bg-card border-border hover:border-primary/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl overflow-hidden">
                     <div className="relative aspect-[16/10] overflow-hidden">
