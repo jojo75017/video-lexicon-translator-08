@@ -37,7 +37,7 @@ const planRows: PlanRow[] = [
   { letter: "T", domain: "TOC / Sommaire Ultime", debutant: "20 chapitres", expert: "40 chapitres", auteur: "60 chapitres + éditeur avancé" },
   { letter: "U", domain: "Upgrades / Bascule", debutant: "Upgrade instantané", expert: "Upgrade instantané", auteur: "Downgrade fin de période" },
   { letter: "V", domain: "Voix & Audiobook (P29 Pro)", debutant: "🔒", expert: "1 chapitre démo", auteur: "Audiobook complet ACX-ready" },
-  { letter: "W", domain: "Workflow 30 agents", debutant: "P1 → P22 (22 agents)", expert: "P1 → P22 (22 agents) + priorité", auteur: "P1 → P30 (30 agents)" },
+  { letter: "W", domain: "Workflow 30 agents", debutant: "P1 → P18 (18 agents)", expert: "P1 → P22 (22 agents) + priorité", auteur: "P1 → P30 (30 agents)" },
   { letter: "X", domain: "eXport groupé & Bundle KDP", debutant: "Livre par livre", expert: "Lot max 5 livres", auteur: "Bundle illimité + ZIP KDP" },
   { letter: "Y", domain: "Yield / Suivi ventes", debutant: "🔒", expert: "🔒", auteur: "Dashboard royalties KDP (à venir)" },
   { letter: "Z", domain: "Zone support & Communauté", debutant: "Email 48h", expert: "Email 24h + forum", auteur: "12h + coaching mensuel + Discord" },
