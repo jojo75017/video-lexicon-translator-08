@@ -40,6 +40,8 @@ const planRows: PlanRow[] = [
   { letter: "X", domain: "eXport groupé & Bundle KDP", debutant: "Livre par livre", expert: "Lot max 5 livres", auteur: "Bundle illimité + ZIP KDP" },
   { letter: "Y", domain: "Yield / Suivi ventes", debutant: "🔒", expert: "🔒", auteur: "Dashboard royalties KDP (à venir)" },
   { letter: "Z", domain: "Zone support & Communauté", debutant: "Email 48h", expert: "Email 24h + forum", auteur: "12h + coaching mensuel + Discord" },
+  { letter: "★", domain: "KDP Pilot (audit & recommandations)", debutant: "Audit basique (score + top 3 axes)", expert: "Audit complet + suggestions mots-clés", auteur: "Pilot Pro : scoring avancé, BSR live, comparateur niches, plan d'action IA" },
+  { letter: "🌍", domain: "Traductions multilingues (10 langues)", debutant: "10 langues incluses", expert: "10 langues incluses", auteur: "10 langues + relecture IA premium" },
 ];
 
 const proModules = [
@@ -48,6 +50,7 @@ const proModules = [
   { code: "P25", name: "Séries & Tomes", desc: "Bibles multi-tomes, chronologies croisées" },
   { code: "P26", name: "Sélection éditeurs", desc: "Matching maisons d'édition FR" },
   { code: "P27", name: "KDP Spy", desc: "Analyse niches Amazon + BSR + mots-clés cachés" },
+  { code: "P27+", name: "KDP Pilot Pro", desc: "Audit avancé + scoring, BSR live, plan d'action IA (perf renforcée plan Auteur)" },
   { code: "P28", name: "Amazon Spy", desc: "Scraping concurrence + tendances" },
   { code: "P29", name: "Audiobook Studio", desc: "Conversion voix Azure + ElevenLabs" },
   { code: "P30", name: "BD Studio", desc: "Génération BD illustrée + bulles + planches" },
