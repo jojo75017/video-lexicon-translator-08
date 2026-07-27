@@ -99,11 +99,26 @@ const V3AllToolsTab = () => {
             );
           })}
         </div>
-        <label className="ml-auto flex items-center gap-2 text-[12px]" style={{ color: '#6f5e47' }}>
-          <input type="checkbox" checked={showLocked} onChange={(e) => setShowLocked(e.target.checked)} />
-          Afficher les outils verrouillés
-        </label>
-      </div>
+        <div className="ml-auto flex items-center gap-3">
+          <div className="flex items-center gap-1 rounded-full border border-[#eadfc9] bg-[#FCF8F0] p-0.5">
+            {(['plan','category'] as const).map((g) => (
+              <button
+                key={g}
+                onClick={() => setGroupBy(g)}
+                className="rounded-full px-3 py-1 text-[11px] font-semibold transition-colors"
+                style={groupBy === g
+                  ? { background: AMBER, color: '#fff' }
+                  : { background: 'transparent', color: '#6f5e47' }}
+              >
+                {g === 'plan' ? 'Par forfait' : 'Par catégorie'}
+              </button>
+            ))}
+          </div>
+          <label className="flex items-center gap-2 text-[12px]" style={{ color: '#6f5e47' }}>
+            <input type="checkbox" checked={showLocked} onChange={(e) => setShowLocked(e.target.checked)} />
+            Afficher les verrouillés
+          </label>
+        </div>
 
 
       <div className="mb-4 flex flex-col gap-3">
