@@ -16,6 +16,7 @@ const SERIF = "'Instrument Serif', Georgia, 'Times New Roman', serif";
 
 type Filter = 'all' | V2ToolCategory;
 type PlanView = V3Plan;
+type GroupBy = 'category' | 'plan';
 
 /**
  * Onglet « Outils V2 » : launcher unifié qui affiche tous les outils
@@ -29,6 +30,7 @@ const V3AllToolsTab = () => {
   // Vue par forfait : simule ce qui est débloqué pour chaque plan.
   const [planView, setPlanView] = useState<PlanView>('auteur');
   const [showLocked, setShowLocked] = useState(true);
+  const [groupBy, setGroupBy] = useState<GroupBy>('plan');
 
   const withPlan = useMemo(
     () => V2_TOOLS.map((t) => ({ ...t, plan: planForTool(t) })),
@@ -55,14 +57,33 @@ const V3AllToolsTab = () => {
     return c;
   }, [withPlan]);
 
-  const grouped = useMemo(() => {
-    const map = new Map<V2ToolCategory, typeof filtered>();
-    for (const t of filtered) {
-      if (!map.has(t.category)) map.set(t.category, []);
-      map.get(t.category)!.push(t);
+  const sections = useMemo(() => {
+    if (groupBy === 'plan') {
+      const order: V3Plan[] = ['debutant', 'expert', 'auteur'];
+      return order
+        .map((p) => {
+          const meta = PLAN_META[p];
+          const items = filtered.filter((t) => t.plan === p);
+          return {
+            key: p,
+            label: `Forfait ${meta.label}`,
+            emoji: p === 'debutant' ? '🌱' : p === 'expert' ? '⚡' : '👑',
+            accent: meta.color,
+            items,
+          };
+        })
+        .filter((s) => s.items.length > 0);
     }
-    return map;
-  }, [filtered]);
+    return V2_TOOL_CATEGORIES
+      .map((cat) => ({
+        key: cat.id,
+        label: cat.label,
+        emoji: cat.emoji,
+        accent: AMBER,
+        items: filtered.filter((t) => t.category === cat.id),
+      }))
+      .filter((s) => s.items.length > 0);
+  }, [filtered, groupBy]);
 
   const badgeStyle = (badge?: string) => {
     if (badge === 'Populaire') return { background: '#e8f7ef', color: '#0b6e4c', border: '1px solid #0f8a5f55' };
@@ -97,11 +118,29 @@ const V3AllToolsTab = () => {
             );
           })}
         </div>
-        <label className="ml-auto flex items-center gap-2 text-[12px]" style={{ color: '#6f5e47' }}>
-          <input type="checkbox" checked={showLocked} onChange={(e) => setShowLocked(e.target.checked)} />
-          Afficher les outils verrouillés
-        </label>
+        <div className="ml-auto flex items-center gap-3">
+          <div className="flex items-center gap-1 rounded-full border border-[#eadfc9] bg-[#FCF8F0] p-0.5">
+            {(['plan','category'] as const).map((g) => (
+              <button
+                key={g}
+                onClick={() => setGroupBy(g)}
+                className="rounded-full px-3 py-1 text-[11px] font-semibold transition-colors"
+                style={groupBy === g
+                  ? { background: AMBER, color: '#fff' }
+                  : { background: 'transparent', color: '#6f5e47' }}
+              >
+                {g === 'plan' ? 'Par forfait' : 'Par catégorie'}
+              </button>
+            ))}
+          </div>
+          <label className="flex items-center gap-2 text-[12px]" style={{ color: '#6f5e47' }}>
+            <input type="checkbox" checked={showLocked} onChange={(e) => setShowLocked(e.target.checked)} />
+            Afficher les verrouillés
+          </label>
+        </div>
       </div>
+
+
 
 
       <div className="mb-4 flex flex-col gap-3">
@@ -148,15 +187,15 @@ const V3AllToolsTab = () => {
           Aucun outil ne correspond à « {query} ».
         </div>
       ) : (
-        V2_TOOL_CATEGORIES.filter((c) => grouped.has(c.id)).map((cat) => {
-          const items = grouped.get(cat.id)!;
+        sections.map((sec) => {
+          const items = sec.items;
           return (
-            <section key={cat.id} className="mb-8">
+            <section key={sec.key} className="mb-8">
               <div className="flex items-center gap-3 mb-3">
-                <span className="text-xl">{cat.emoji}</span>
-                <h2 className="text-lg font-bold" style={{ fontFamily: SERIF, color: INK }}>{cat.label}</h2>
+                <span className="text-xl">{sec.emoji}</span>
+                <h2 className="text-lg font-bold" style={{ fontFamily: SERIF, color: INK }}>{sec.label}</h2>
                 <span className="text-xs" style={{ color: '#b29a72' }}>{items.length}</span>
-                <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, ${AMBER}44, transparent)` }} />
+                <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, ${sec.accent}44, transparent)` }} />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                 {items.map((t) => {
