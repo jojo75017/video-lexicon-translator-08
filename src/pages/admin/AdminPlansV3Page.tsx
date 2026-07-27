@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AdminPanelNav } from "@/components/admin/AdminPanelNav";
 import { KdpPilotTiersMatrix } from "@/components/admin/KdpPilotTiersMatrix";
+import { V3ToolsPlanMatrix } from "@/components/admin/V3ToolsPlanMatrix";
 
 interface PlanRow {
   letter: string;
@@ -172,6 +173,8 @@ export default function AdminPlansV3Page() {
         </Card>
 
         <KdpPilotTiersMatrix />
+
+        <V3ToolsPlanMatrix />
 
         <Card className="border-2 border-teal-500/50 bg-teal-50/30">
           <CardHeader>
