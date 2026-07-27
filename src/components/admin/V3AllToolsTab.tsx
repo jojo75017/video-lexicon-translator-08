@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ExternalLink } from 'lucide-react';
+import { Search, ExternalLink, Lock, Check } from 'lucide-react';
 import {
   V2_TOOLS,
   V2_TOOL_CATEGORIES,
   type V2ToolCategory,
 } from '@/data/v2ToolsRegistry';
+import { planForTool, PLAN_META, isUnlockedForPlan, type V3Plan } from '@/data/v3ToolPlans';
 
 const AMBER = '#E8951E';
 const AMBER_DEEP = '#C97A14';
@@ -14,6 +15,7 @@ const INK = '#2A2118';
 const SERIF = "'Instrument Serif', Georgia, 'Times New Roman', serif";
 
 type Filter = 'all' | V2ToolCategory;
+type PlanView = V3Plan;
 
 /**
  * Onglet « Outils V2 » : launcher unifié qui affiche tous les outils
@@ -24,18 +26,37 @@ const V3AllToolsTab = () => {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
+  // Vue par forfait : simule ce qui est débloqué pour chaque plan.
+  const [planView, setPlanView] = useState<PlanView>('auteur');
+  const [showLocked, setShowLocked] = useState(true);
+
+  const withPlan = useMemo(
+    () => V2_TOOLS.map((t) => ({ ...t, plan: planForTool(t) })),
+    [],
+  );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return V2_TOOLS.filter((t) => {
+    return withPlan.filter((t) => {
       if (filter !== 'all' && t.category !== filter) return false;
+      if (!showLocked && !isUnlockedForPlan(t.plan, planView)) return false;
       if (!q) return true;
       return t.label.toLowerCase().includes(q) || t.description.toLowerCase().includes(q);
     });
-  }, [query, filter]);
+  }, [query, filter, withPlan, planView, showLocked]);
+
+  const counts = useMemo(() => {
+    const c = { debutant: 0, expert: 0, auteur: 0 };
+    for (const t of withPlan) {
+      if (isUnlockedForPlan(t.plan, 'debutant')) c.debutant++;
+      if (isUnlockedForPlan(t.plan, 'expert')) c.expert++;
+      if (isUnlockedForPlan(t.plan, 'auteur')) c.auteur++;
+    }
+    return c;
+  }, [withPlan]);
 
   const grouped = useMemo(() => {
-    const map = new Map<V2ToolCategory, typeof V2_TOOLS>();
+    const map = new Map<V2ToolCategory, typeof filtered>();
     for (const t of filtered) {
       if (!map.has(t.category)) map.set(t.category, []);
       map.get(t.category)!.push(t);
@@ -52,8 +73,36 @@ const V3AllToolsTab = () => {
   return (
     <div>
       <div className="mb-4 rounded-xl border p-3 text-[13px]" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44`, color: '#6f5e47' }}>
-        <span className="font-semibold" style={{ color: AMBER_DEEP }}>🧰 Tous vos outils EbookStudio</span> — retrouvez ici l'ensemble des outils (KDP, couvertures, audiobook, BD, marketing, formation…) en un seul endroit. Un clic ouvre l'outil dans un nouvel onglet.
+        <span className="font-semibold" style={{ color: AMBER_DEEP }}>🧰 Tous vos outils EbookStudio</span> — chaque outil est étiqueté selon le forfait qui le débloque. Choisissez un forfait ci-dessous pour voir immédiatement ce qui est inclus et ce qui reste verrouillé.
       </div>
+
+      {/* Sélecteur de forfait — simule la vue « ce que je débloque » */}
+      <div className="mb-4 rounded-2xl border border-[#eadfc9] bg-white p-3 flex flex-col md:flex-row md:items-center gap-3">
+        <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: '#8a7860' }}>Vue par forfait</span>
+        <div className="flex flex-wrap gap-2">
+          {(['debutant','expert','auteur'] as const).map((p) => {
+            const meta = PLAN_META[p];
+            const active = planView === p;
+            return (
+              <button
+                key={p}
+                onClick={() => setPlanView(p)}
+                className="rounded-full px-3 py-1.5 text-[12px] font-semibold border transition-colors"
+                style={active
+                  ? { background: meta.color, color: '#fff', borderColor: meta.color }
+                  : { background: meta.bg, color: meta.color, borderColor: meta.border }}
+              >
+                {meta.short} · {counts[p]} outils débloqués
+              </button>
+            );
+          })}
+        </div>
+        <label className="ml-auto flex items-center gap-2 text-[12px]" style={{ color: '#6f5e47' }}>
+          <input type="checkbox" checked={showLocked} onChange={(e) => setShowLocked(e.target.checked)} />
+          Afficher les outils verrouillés
+        </label>
+      </div>
+
 
       <div className="mb-4 flex flex-col gap-3">
         <div className="relative max-w-md">
@@ -112,29 +161,54 @@ const V3AllToolsTab = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                 {items.map((t) => {
                   const Icon = t.icon;
+                  const planMeta = PLAN_META[t.plan];
+                  const unlocked = isUnlockedForPlan(t.plan, planView);
                   return (
                     <button
                       key={t.id}
                       onClick={() => navigate(t.route)}
-                      className="group relative text-left rounded-2xl border border-[#eadfc9] bg-white p-4 transition-all cursor-pointer hover:-translate-y-0.5 hover:border-[#E8951E]/50 hover:shadow-[0_10px_30px_-18px_rgba(232,149,30,0.45)]"
+                      className="group relative text-left rounded-2xl border bg-white p-4 transition-all cursor-pointer hover:-translate-y-0.5 hover:shadow-[0_10px_30px_-18px_rgba(232,149,30,0.45)]"
+                      style={{
+                        borderColor: unlocked ? '#eadfc9' : '#e8dcc4',
+                        opacity: unlocked ? 1 : 0.72,
+                      }}
+                      title={unlocked ? `${t.label} — ${planMeta.label}` : `Verrouillé — ${planMeta.label}`}
                     >
                       <div className="flex items-center justify-between mb-2.5">
                         <span className="grid h-10 w-10 place-items-center rounded-xl border border-[#eadfc9] bg-[#FCF8F0] group-hover:border-[#E8951E]/40 transition-colors">
                           <Icon className="h-5 w-5" style={{ color: AMBER_DEEP }} />
                         </span>
-                        {t.badge && (
-                          <span className="text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5" style={badgeStyle(t.badge)}>
-                            {t.badge}
+                        <div className="flex items-center gap-1">
+                          {t.badge && (
+                            <span className="text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5" style={badgeStyle(t.badge)}>
+                              {t.badge}
+                            </span>
+                          )}
+                          <span
+                            className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5 border"
+                            style={{ background: planMeta.bg, color: planMeta.color, borderColor: planMeta.border }}
+                          >
+                            {unlocked ? <Check className="h-2.5 w-2.5" /> : <Lock className="h-2.5 w-2.5" />}
+                            {planMeta.short}
                           </span>
-                        )}
+                        </div>
                       </div>
                       <div className="text-[15px] font-semibold leading-tight mb-1" style={{ fontFamily: SERIF, color: INK }}>
                         {t.label}
                       </div>
                       <p className="text-[11px] leading-snug line-clamp-3" style={{ color: '#7c6b54' }}>{t.description}</p>
-                      <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold" style={{ color: '#b29a72' }}>
-                        <span className="group-hover:text-[#C97A14] transition-colors">Ouvrir</span>
-                        <ExternalLink className="h-3 w-3 group-hover:text-[#C97A14] transition-colors" />
+                      <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold" style={{ color: unlocked ? '#b29a72' : '#a18a6c' }}>
+                        {unlocked ? (
+                          <>
+                            <span className="group-hover:text-[#C97A14] transition-colors">Ouvrir</span>
+                            <ExternalLink className="h-3 w-3 group-hover:text-[#C97A14] transition-colors" />
+                          </>
+                        ) : (
+                          <>
+                            <Lock className="h-3 w-3" />
+                            <span>Débloqué avec le forfait {planMeta.short}</span>
+                          </>
+                        )}
                       </span>
                     </button>
                   );
