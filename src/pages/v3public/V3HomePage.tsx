@@ -4,6 +4,7 @@ import {
   Sparkles, Feather, BookOpen, Library, ArrowRight, Star, Quote,
 } from 'lucide-react';
 import { V3_HEADER_MENU } from '@/data/v3HeaderMenu';
+import homeHero from '@/assets/v3/home-hero.jpg';
 
 const IDEA_EXAMPLES = [
   'Deux rivaux en cuisine tombent amoureux lors d\'un…',
@@ -57,67 +58,88 @@ export default function V3HomePage() {
             'var(--v3-paper)',
         }}
       >
-        <div className="max-w-4xl mx-auto px-5 pt-16 pb-20 text-center">
-          <span className="v3-chip v3-chip-gold">
-            <Sparkles className="w-3.5 h-3.5" /> Atelier d'écriture premium
-          </span>
+        <div className="max-w-7xl mx-auto px-5 md:px-8 pt-14 pb-20 grid lg:grid-cols-[1.05fr_1fr] gap-10 lg:gap-14 items-center">
+          {/* Colonne texte */}
+          <div className="text-center lg:text-left">
+            <span className="v3-chip v3-chip-gold">
+              <Sparkles className="w-3.5 h-3.5" /> Atelier d'écriture premium
+            </span>
 
-          <h1 className="v3-serif mt-6 font-semibold leading-[1.02] tracking-tight" style={{ color: 'var(--v3-emerald)' }}>
-            <span className="block text-4xl md:text-6xl">Publiez le livre que</span>
-            <span className="block text-4xl md:text-6xl italic" style={{ color: 'var(--v3-gold-600)' }}>vous avez en vous.</span>
-          </h1>
+            <h1 className="v3-serif mt-6 font-semibold leading-[1.02] tracking-tight" style={{ color: 'var(--v3-emerald)' }}>
+              <span className="block text-4xl md:text-5xl xl:text-6xl">Publiez le livre que</span>
+              <span className="block text-4xl md:text-5xl xl:text-6xl italic" style={{ color: 'var(--v3-gold-600)' }}>vous avez en vous.</span>
+            </h1>
 
-          <p className="mt-6 text-[15px] max-w-xl mx-auto" style={{ color: 'var(--v3-muted)' }}>
-            Un atelier éditorial complet : de l'idée à la couverture, du sommaire à la publication Amazon KDP.
-            Trente agents IA au service de votre livre.
-          </p>
+            <p className="mt-6 text-[15px] max-w-xl mx-auto lg:mx-0" style={{ color: 'var(--v3-muted)' }}>
+              Un atelier éditorial complet : de l'idée à la couverture, du sommaire à la publication Amazon KDP.
+              Trente agents IA au service de votre livre.
+            </p>
 
-          <figure className="mt-8 mx-auto max-w-md text-left">
+            {/* Champ idée */}
             <div
-              className="relative rounded-xl bg-white p-4 pl-6"
-              style={{ border: '1px solid var(--v3-line)', boxShadow: '0 2px 10px -4px rgba(6,78,59,0.08)' }}
+              className="mt-8 flex items-stretch gap-2 rounded-full bg-white p-1.5 max-w-xl mx-auto lg:mx-0"
+              style={{ border: '1px solid var(--v3-line)', boxShadow: '0 12px 32px -18px rgba(6,78,59,0.2)' }}
             >
-              <Quote className="absolute left-3 top-3 w-4 h-4" style={{ color: 'var(--v3-gold)' }} />
-              <blockquote className="text-[13px] italic leading-relaxed" style={{ color: 'var(--v3-ink)' }}>
-                Le problème n'est pas d'écrire.<br />
-                C'est de ne jamais commencer.<br />
-                <span className="v3-serif not-italic font-semibold text-[15px]" style={{ color: 'var(--v3-emerald)' }}>Commencez votre livre.</span>
-              </blockquote>
-              <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full" style={{ background: 'var(--v3-gold)' }} />
+              <div className="pl-4 flex items-center" style={{ color: 'var(--v3-gold)' }}>
+                <Feather className="w-4 h-4" />
+              </div>
+              <input
+                value={idea}
+                onChange={(e) => setIdea(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && submitIdea()}
+                placeholder={IDEA_EXAMPLES[phIdx]}
+                className="flex-1 min-w-0 bg-transparent outline-none text-sm px-2"
+              />
+              <button onClick={submitIdea} className="v3-btn v3-btn-primary whitespace-nowrap">
+                <Sparkles className="w-4 h-4" /> Écrire
+              </button>
             </div>
-          </figure>
 
-          {/* Champ idée */}
-          <div
-            className="mt-8 flex items-stretch gap-2 rounded-full bg-white p-1.5"
-            style={{ border: '1px solid var(--v3-line)', boxShadow: '0 12px 32px -18px rgba(6,78,59,0.2)' }}
-          >
-            <div className="pl-4 flex items-center" style={{ color: 'var(--v3-gold)' }}>
-              <Feather className="w-4 h-4" />
+            {/* Social proof */}
+            <div className="mt-8 flex items-center justify-center lg:justify-start gap-3">
+              <div className="flex -space-x-2">
+                {['#064e3b', '#0d7a5f', '#c9a84c', '#b0902f', '#064e3b'].map((c, i) => (
+                  <div key={i} className="w-8 h-8 rounded-full border-2 border-white" style={{ background: c }} />
+                ))}
+              </div>
+              <div className="flex items-center gap-0.5" style={{ color: 'var(--v3-gold)' }}>
+                {[0,1,2,3,4].map(i => <Star key={i} className="w-4 h-4 fill-current" />)}
+              </div>
+              <span className="text-xs" style={{ color: 'var(--v3-muted)' }}>Rejoignez les 1 247 auteurs</span>
             </div>
-            <input
-              value={idea}
-              onChange={(e) => setIdea(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && submitIdea()}
-              placeholder={IDEA_EXAMPLES[phIdx]}
-              className="flex-1 bg-transparent outline-none text-sm px-2"
-            />
-            <button onClick={submitIdea} className="v3-btn v3-btn-primary">
-              <Sparkles className="w-4 h-4" /> Écrire mon livre
-            </button>
           </div>
 
-          {/* Social proof */}
-          <div className="mt-8 flex items-center justify-center gap-3">
-            <div className="flex -space-x-2">
-              {['#064e3b', '#0d7a5f', '#c9a84c', '#b0902f', '#064e3b'].map((c, i) => (
-                <div key={i} className="w-8 h-8 rounded-full border-2 border-white" style={{ background: c }} />
-              ))}
+          {/* Colonne image */}
+          <div className="relative order-first lg:order-last">
+            <div
+              className="relative overflow-hidden rounded-3xl aspect-[4/5] max-w-md mx-auto lg:max-w-none"
+              style={{
+                border: '1px solid var(--v3-line)',
+                boxShadow: '0 30px 60px -30px rgba(6,78,59,0.4)',
+              }}
+            >
+              <img
+                src={homeHero}
+                alt="Atelier d'écriture premium — livre ouvert, plume et lampe verte sur bureau en chêne"
+                width={1024}
+                height={1280}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute top-0 inset-x-0 h-[3px]" style={{ background: 'linear-gradient(90deg, transparent, var(--v3-gold), transparent)' }} />
+              <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-[#053e2f]/85 to-transparent" />
+
+              {/* Citation intégrée */}
+              <figure className="absolute left-5 right-5 bottom-5 rounded-xl bg-white/95 backdrop-blur px-5 py-4"
+                style={{ border: '1px solid rgba(201,168,76,0.35)', boxShadow: '0 10px 30px -12px rgba(6,78,59,0.3)' }}>
+                <Quote className="absolute -top-2 -left-2 w-6 h-6 p-1 rounded-full" style={{ background: 'var(--v3-gold)', color: '#1a1408' }} />
+                <blockquote className="text-[13px] italic leading-relaxed" style={{ color: 'var(--v3-ink)' }}>
+                  Le problème n'est pas d'écrire. C'est de ne jamais commencer.
+                </blockquote>
+                <figcaption className="v3-serif text-[13px] font-semibold mt-1" style={{ color: 'var(--v3-emerald)' }}>
+                  Commencez votre livre.
+                </figcaption>
+              </figure>
             </div>
-            <div className="flex items-center gap-0.5" style={{ color: 'var(--v3-gold)' }}>
-              {[0,1,2,3,4].map(i => <Star key={i} className="w-4 h-4 fill-current" />)}
-            </div>
-            <span className="text-xs" style={{ color: 'var(--v3-muted)' }}>Rejoignez les 1 247 auteurs</span>
           </div>
         </div>
         <div className="v3-gold-rule" />
