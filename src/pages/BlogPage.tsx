@@ -185,10 +185,10 @@ const BlogPage = () => {
               ))}
             </div>
 
-            {/* Bannière vers le blog complet */}
+            {/* Bannière vers blogcluster.com */}
             <div className="mt-16 max-w-5xl mx-auto">
               <a
-                href="https://ebookstudio.blog/"
+                href="https://blogcluster.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group block relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 via-background to-amber-500/5 hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500"
@@ -203,13 +203,13 @@ const BlogPage = () => {
 
                   <div>
                     <Badge className="mb-3 bg-primary/10 text-primary border-primary/30 hover:bg-primary/15">
-                      ✨ Magazine officiel
+                      🎧 Livres audio & audio-clusters
                     </Badge>
                     <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
-                      Découvrez notre magazine ebookstudio.blog
+                      Découvrez BlogCluster.com
                     </h3>
                     <p className="text-muted-foreground text-sm md:text-base mb-2">
-                      Des dizaines d'articles supplémentaires : tendances KDP, niches rentables, stratégies IA, témoignages d'auteurs et études de cas. Le complément parfait pour aller plus loin.
+                      Le site de livres audio réalisé par Ebookstudio Pro V2. Écoutez, apprenez et développez votre business KDP avec des contenus audio exclusifs, études de cas et stratégies d'auteurs.
                     </p>
                     <p className="text-xs text-muted-foreground/80 italic">
                       💡 S'ouvre dans un nouvel onglet - votre session sur ebookstudio.fr reste active, fermez simplement l'onglet pour revenir.
@@ -217,13 +217,13 @@ const BlogPage = () => {
                   </div>
 
                   <div className="hidden md:flex items-center gap-2 text-primary font-semibold whitespace-nowrap group-hover:gap-3 transition-all">
-                    Visiter le blog
+                    Visiter BlogCluster
                     <ExternalLink className="w-5 h-5" />
                   </div>
                 </div>
 
                 <div className="md:hidden flex items-center justify-center gap-2 text-primary font-semibold pb-6">
-                  Visiter le blog <ExternalLink className="w-4 h-4" />
+                  Visiter BlogCluster <ExternalLink className="w-4 h-4" />
                 </div>
               </a>
             </div>
