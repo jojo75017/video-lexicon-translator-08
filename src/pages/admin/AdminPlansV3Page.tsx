@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Table2, Check, Lock, Infinity } from "lucide-react";
+import { V3_PLANS, getYearlySavingsPercent, getYearlySavingsAmount, formatPrice } from "@/data/v3Pricing";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
