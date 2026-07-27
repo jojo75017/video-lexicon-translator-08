@@ -73,8 +73,36 @@ const V3AllToolsTab = () => {
   return (
     <div>
       <div className="mb-4 rounded-xl border p-3 text-[13px]" style={{ background: AMBER_SOFT, borderColor: `${AMBER}44`, color: '#6f5e47' }}>
-        <span className="font-semibold" style={{ color: AMBER_DEEP }}>🧰 Tous vos outils EbookStudio</span> — retrouvez ici l'ensemble des outils (KDP, couvertures, audiobook, BD, marketing, formation…) en un seul endroit. Un clic ouvre l'outil dans un nouvel onglet.
+        <span className="font-semibold" style={{ color: AMBER_DEEP }}>🧰 Tous vos outils EbookStudio</span> — chaque outil est étiqueté selon le forfait qui le débloque. Choisissez un forfait ci-dessous pour voir immédiatement ce qui est inclus et ce qui reste verrouillé.
       </div>
+
+      {/* Sélecteur de forfait — simule la vue « ce que je débloque » */}
+      <div className="mb-4 rounded-2xl border border-[#eadfc9] bg-white p-3 flex flex-col md:flex-row md:items-center gap-3">
+        <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: '#8a7860' }}>Vue par forfait</span>
+        <div className="flex flex-wrap gap-2">
+          {(['debutant','expert','auteur'] as const).map((p) => {
+            const meta = PLAN_META[p];
+            const active = planView === p;
+            return (
+              <button
+                key={p}
+                onClick={() => setPlanView(p)}
+                className="rounded-full px-3 py-1.5 text-[12px] font-semibold border transition-colors"
+                style={active
+                  ? { background: meta.color, color: '#fff', borderColor: meta.color }
+                  : { background: meta.bg, color: meta.color, borderColor: meta.border }}
+              >
+                {meta.short} · {counts[p]} outils débloqués
+              </button>
+            );
+          })}
+        </div>
+        <label className="ml-auto flex items-center gap-2 text-[12px]" style={{ color: '#6f5e47' }}>
+          <input type="checkbox" checked={showLocked} onChange={(e) => setShowLocked(e.target.checked)} />
+          Afficher les outils verrouillés
+        </label>
+      </div>
+
 
       <div className="mb-4 flex flex-col gap-3">
         <div className="relative max-w-md">
