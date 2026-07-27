@@ -117,14 +117,15 @@ export default function V3ToolsIndexPage() {
                 </span>
                 <div className="flex-1 h-px ml-2" style={{ background: 'var(--v3-line)' }} />
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                 {tools.map((tool) => {
                   const Icon = tool.icon;
+                  const img = tool.image ?? cat.image;
                   return (
                     <Link
                       key={tool.id}
                       to={tool.route}
-                      className="group relative flex gap-3 p-4 rounded-2xl bg-white transition-all"
+                      className="group relative flex flex-col overflow-hidden rounded-2xl bg-white transition-all"
                       style={{
                         border: '1px solid var(--v3-line)',
                         boxShadow: '0 1px 2px rgba(6,78,59,0.03)',
@@ -142,27 +143,39 @@ export default function V3ToolsIndexPage() {
                         el.style.transform = '';
                       }}
                     >
-                      <div
-                        className="w-11 h-11 rounded-xl grid place-items-center shrink-0 transition-colors"
-                        style={{ background: 'var(--v3-emerald-50)' }}
-                      >
-                        <Icon className="w-5 h-5" style={{ color: 'var(--v3-emerald)' }} />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-[13.5px] truncate" style={{ color: 'var(--v3-ink)' }}>
-                            {tool.label}
-                          </h3>
-                          {tool.badge && <span className="v3-badge shrink-0">{tool.badge}</span>}
+                      <div className="relative h-32 overflow-hidden">
+                        <img
+                          src={img}
+                          alt={tool.label}
+                          loading="lazy"
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        <div
+                          className="absolute inset-0"
+                          style={{ background: 'linear-gradient(180deg, rgba(6,78,59,0) 40%, rgba(6,78,59,0.55) 100%)' }}
+                        />
+                        <div
+                          className="absolute top-2 left-2 w-9 h-9 rounded-lg grid place-items-center backdrop-blur"
+                          style={{ background: 'rgba(255,255,255,0.9)' }}
+                        >
+                          <Icon className="w-4 h-4" style={{ color: 'var(--v3-emerald)' }} />
                         </div>
-                        <p className="text-[11.5px] mt-1 line-clamp-2 leading-snug" style={{ color: 'var(--v3-muted)' }}>
+                        {tool.badge && (
+                          <span className="v3-badge absolute top-2 right-2 shrink-0">{tool.badge}</span>
+                        )}
+                      </div>
+                      <div className="p-4 flex-1 flex flex-col">
+                        <h3 className="font-semibold text-[13.5px] leading-snug" style={{ color: 'var(--v3-ink)' }}>
+                          {tool.label}
+                        </h3>
+                        <p className="text-[11.5px] mt-1 line-clamp-2 leading-snug flex-1" style={{ color: 'var(--v3-muted)' }}>
                           {tool.description}
                         </p>
+                        <div className="mt-3 flex items-center gap-1.5 text-[11.5px] font-semibold" style={{ color: 'var(--v3-gold-600)' }}>
+                          Ouvrir l'outil
+                          <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                        </div>
                       </div>
-                      <ArrowRight
-                        className="w-4 h-4 mt-1 opacity-0 group-hover:opacity-100 transition"
-                        style={{ color: 'var(--v3-gold-600)' }}
-                      />
                     </Link>
                   );
                 })}
