@@ -107,4 +107,17 @@ export const V3_HEADER_MENU: MenuCategory[] = [
       desc: `Modèle et workflow ${t.label.toLowerCase()}`,
     })),
   },
+  {
+    key: 'plans',
+    label: 'Forfaits',
+    emoji: '👑',
+    color: '#c9a84c',
+    tagline: 'Ce que débloque chaque plan',
+    links: [
+      { label: 'Débutant — 6,99 €/mois', to: '/v3/outils?plan=debutant', badge: '5 livres', desc: 'Les outils essentiels : création, écriture, KDP de base' },
+      { label: 'Expert — 9,99 €/mois', to: '/v3/outils?plan=expert', badge: '10 livres', desc: 'Tout Débutant + Audit Pilot, 600 niches, marketing, séries' },
+      { label: 'Auteur — 59 €/mois', to: '/v3/outils?plan=auteur', badge: 'Illimité', desc: 'Accès total : Business Center, CRM, BookPerfect, BD/Audio, VIP' },
+      { label: 'Comparer les 3 forfaits', to: '/v3/outils?plan=all', desc: 'Vue complète : quel outil est inclus dans quel plan' },
+    ],
+  },
 ];
