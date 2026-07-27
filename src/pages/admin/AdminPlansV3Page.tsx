@@ -40,6 +40,8 @@ const planRows: PlanRow[] = [
   { letter: "X", domain: "eXport groupé & Bundle KDP", debutant: "Livre par livre", expert: "Lot max 5 livres", auteur: "Bundle illimité + ZIP KDP" },
   { letter: "Y", domain: "Yield / Suivi ventes", debutant: "🔒", expert: "🔒", auteur: "Dashboard royalties KDP (à venir)" },
   { letter: "Z", domain: "Zone support & Communauté", debutant: "Email 48h", expert: "Email 24h + forum", auteur: "12h + coaching mensuel + Discord" },
+  { letter: "★", domain: "KDP Pilot (audit & recommandations)", debutant: "Audit basique (score + top 3 axes)", expert: "Audit complet + suggestions mots-clés", auteur: "Pilot Pro : scoring avancé, BSR live, comparateur niches, plan d'action IA" },
+  { letter: "🌍", domain: "Traductions multilingues (10 langues)", debutant: "10 langues incluses", expert: "10 langues incluses", auteur: "10 langues + relecture IA premium" },
 ];
 
 const proModules = [
