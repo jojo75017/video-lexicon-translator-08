@@ -1,5 +1,6 @@
 import { Crown, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { useV3Mode } from '@/hooks/useV3Mode';
 
 const GOLD = '#c9a84c';
