@@ -16,6 +16,7 @@ const SERIF = "'Instrument Serif', Georgia, 'Times New Roman', serif";
 
 type Filter = 'all' | V2ToolCategory;
 type PlanView = V3Plan;
+type GroupBy = 'category' | 'plan';
 
 /**
  * Onglet « Outils V2 » : launcher unifié qui affiche tous les outils
