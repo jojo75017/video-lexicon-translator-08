@@ -20,13 +20,13 @@ export default function V3Header({ isAuthed = false }: { isAuthed?: boolean }) {
 
   return (
     <header
-      className="sticky top-0 z-40"
+      className="sticky top-0 z-40 overflow-x-clip"
       style={{
         background: 'linear-gradient(180deg, #064e3b 0%, #053e2f 100%)',
         borderBottom: '1px solid rgba(201, 168, 76, 0.28)',
       }}
     >
-      <div className="max-w-7xl mx-auto px-5 md:px-8 h-16 flex items-center gap-6">
+      <div className="max-w-7xl mx-auto px-5 md:px-8 h-16 flex items-center gap-4 lg:gap-6">
         {/* Branding */}
         <Link to="/v3" className="flex items-center gap-3 shrink-0 group">
           <span
@@ -63,8 +63,8 @@ export default function V3Header({ isAuthed = false }: { isAuthed?: boolean }) {
           />
         </form>
 
-        {/* Actions droite */}
-        <nav className="hidden md:flex items-center gap-1 ml-auto">
+        {/* Actions droite (≥ lg) */}
+        <nav className="hidden lg:flex items-center gap-1 ml-auto">
           <Link to="/formation" className="v3-btn v3-btn-on-dark" title="Formation">
             <GraduationCap className="w-4 h-4" /> Formation
           </Link>
@@ -98,22 +98,32 @@ export default function V3Header({ isAuthed = false }: { isAuthed?: boolean }) {
           )}
         </nav>
 
-        {/* Trigger mobile */}
-        <button
-          className="md:hidden ml-auto p-2 text-white"
-          onClick={() => setOpen((o) => !o)}
-          aria-label="Menu"
-        >
-          {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
+        {/* CTA rapide + trigger mobile & tablette (< lg) */}
+        <div className="lg:hidden ml-auto flex items-center gap-2">
+          <Link
+            to={isAuthed ? '/v3/create' : '/v3/auth?mode=signup'}
+            className="v3-btn v3-btn-gold text-[12px] whitespace-nowrap"
+            style={{ padding: '7px 14px' }}
+          >
+            {isAuthed ? 'Écrire' : "S'inscrire"}
+          </Link>
+          <button
+            className="p-2 text-white"
+            onClick={() => setOpen((o) => !o)}
+            aria-label="Ouvrir le menu principal"
+            aria-expanded={open}
+          >
+            {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
       </div>
 
       {/* Filet or sous la barre */}
       <div className="v3-gold-rule" />
 
-      {/* Drawer mobile */}
+      {/* Drawer mobile & tablette */}
       {open && (
-        <div className="md:hidden" style={{ background: '#053e2f' }}>
+        <div className="lg:hidden" style={{ background: '#053e2f' }}>
           <div className="px-5 py-4 space-y-2">
             <form onSubmit={submitSearch} className="relative">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--v3-gold)' }} />
