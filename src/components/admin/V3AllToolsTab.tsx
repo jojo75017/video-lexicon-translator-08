@@ -161,29 +161,54 @@ const V3AllToolsTab = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                 {items.map((t) => {
                   const Icon = t.icon;
+                  const planMeta = PLAN_META[t.plan];
+                  const unlocked = isUnlockedForPlan(t.plan, planView);
                   return (
                     <button
                       key={t.id}
                       onClick={() => navigate(t.route)}
-                      className="group relative text-left rounded-2xl border border-[#eadfc9] bg-white p-4 transition-all cursor-pointer hover:-translate-y-0.5 hover:border-[#E8951E]/50 hover:shadow-[0_10px_30px_-18px_rgba(232,149,30,0.45)]"
+                      className="group relative text-left rounded-2xl border bg-white p-4 transition-all cursor-pointer hover:-translate-y-0.5 hover:shadow-[0_10px_30px_-18px_rgba(232,149,30,0.45)]"
+                      style={{
+                        borderColor: unlocked ? '#eadfc9' : '#e8dcc4',
+                        opacity: unlocked ? 1 : 0.72,
+                      }}
+                      title={unlocked ? `${t.label} — ${planMeta.label}` : `Verrouillé — ${planMeta.label}`}
                     >
                       <div className="flex items-center justify-between mb-2.5">
                         <span className="grid h-10 w-10 place-items-center rounded-xl border border-[#eadfc9] bg-[#FCF8F0] group-hover:border-[#E8951E]/40 transition-colors">
                           <Icon className="h-5 w-5" style={{ color: AMBER_DEEP }} />
                         </span>
-                        {t.badge && (
-                          <span className="text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5" style={badgeStyle(t.badge)}>
-                            {t.badge}
+                        <div className="flex items-center gap-1">
+                          {t.badge && (
+                            <span className="text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5" style={badgeStyle(t.badge)}>
+                              {t.badge}
+                            </span>
+                          )}
+                          <span
+                            className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5 border"
+                            style={{ background: planMeta.bg, color: planMeta.color, borderColor: planMeta.border }}
+                          >
+                            {unlocked ? <Check className="h-2.5 w-2.5" /> : <Lock className="h-2.5 w-2.5" />}
+                            {planMeta.short}
                           </span>
-                        )}
+                        </div>
                       </div>
                       <div className="text-[15px] font-semibold leading-tight mb-1" style={{ fontFamily: SERIF, color: INK }}>
                         {t.label}
                       </div>
                       <p className="text-[11px] leading-snug line-clamp-3" style={{ color: '#7c6b54' }}>{t.description}</p>
-                      <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold" style={{ color: '#b29a72' }}>
-                        <span className="group-hover:text-[#C97A14] transition-colors">Ouvrir</span>
-                        <ExternalLink className="h-3 w-3 group-hover:text-[#C97A14] transition-colors" />
+                      <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold" style={{ color: unlocked ? '#b29a72' : '#a18a6c' }}>
+                        {unlocked ? (
+                          <>
+                            <span className="group-hover:text-[#C97A14] transition-colors">Ouvrir</span>
+                            <ExternalLink className="h-3 w-3 group-hover:text-[#C97A14] transition-colors" />
+                          </>
+                        ) : (
+                          <>
+                            <Lock className="h-3 w-3" />
+                            <span>Débloqué avec le forfait {planMeta.short}</span>
+                          </>
+                        )}
                       </span>
                     </button>
                   );
