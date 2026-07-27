@@ -1,79 +1,62 @@
-# Plan : Grille tarifaire V3 finalisée — 3 forfaits mensuel/annuel
+# Plan V3 — 3 forfaits abonnement par nombre d'agents
 
-## Décisions validées
+## Objectif
+Transformer l'offre V3 actuelle (one-time Base/Pro) en 3 forfaits d'abonnement clairs : **18 agents**, **22 agents**, **30 agents**, chacun avec un quota mensuel de livres, des tarifs mensuels et annuels cohérents, et un accès immédiat par abonnement Stripe.
 
-| Forfait | Mensuel | Annuel | Livres/mois | Positionnement |
-|---|---|---|---|---|
-| **Débutant** | 9,99 € | 97 € | 20 | Entrée de gamme, essentiels V3 |
-| **Expert** | 12,99 € | 117 € | 50 | Régulier, outils avancés |
-| **Auteur** | 59 € | 547 € | Illimité | Tous les modules Pro + upsells inclus |
+## Grille proposée
 
-- Économie annuelle affichée : Débutant ~19 %, Expert ~25 %, Auteur ~23 %.
-- **Auteur** inclut tous les upsells Pro (Cover Studio Pro, KDP Pilot renforcé, Sélection éditeurs, Amazon Spy, BD Studio, Audiobook, etc.) et les 10 traductions.
-- Les modules "sas" restent payants à l'usage pour Débutant/Expert (ex : BookPerfect reste un achat/add-on séparé).
+| Forfait | Agents | Livres/mois | Chapitres max | Mots/ch | Tarif mensuel | Tarif annuel | Économie |
+|---|---|---|---|---|---|---|---|
+| **Débutant** | 18 | 20 | 20 | 3 500 | 9,99 € | 97 € | ~19 % |
+| **Expert** | 22 | 50 | 40 | 5 000 | 12,99 € | 117 € | ~25 % |
+| **Auteur** | 30 | Illimité | 60 | 8 000 | 59 € | 547 € | ~23 % |
 
-## Étapes d'implémentation
+Les modules Pro (Cover Studio Pro, KDP Pilot Pro, Sélection éditeurs, Amazon Spy, Audiobook, BD Studio) restent réservés au forfait **Auteur**.
 
-### 1. Centraliser les données tarifaires
-Créer/mettre à jour `src/data/v3Pricing.ts` avec :
-- Les 3 plans, leurs quotas, leurs prix mensuels/annuels, les économies.
-- Les `price_id` Stripe (lookup keys) pour chaque palier : `debutant_monthly`, `debutant_yearly`, `expert_monthly`, `expert_yearly`, `auteur_monthly`, `auteur_yearly`.
-- Les quotas de livres par mois (20 / 50 / illimité).
-- Les flags d'accès Pro (upsells inclus).
+---
 
-### 2. Mettre à jour la page admin `/admin/plans-v3`
-- Remplacer la grille tarifaire existante par les nouveaux montants confirmés.
-- Ajouter une colonne "Quota livres/mois".
-- Ajouter une ligne indiquant que BookPerfect/sas reste un add-on payant sauf pour Auteur si applicable.
-- Garder la matrice A → Z déjà présente.
+## Étape 1 — Refonte de la source unique et de l'admin
 
-### 3. Créer les produits et prix Stripe
-Utiliser `payments--batch_create_product` pour créer en sandbox les 3 produits avec leurs 2 prix chacun (mensuel et annuel récurrent).
+- Mettre à jour `src/data/v3Pricing.ts` avec les 3 plans, leurs quotas, leurs agents et leurs prix.
+- Actualiser la page admin `/admin/plans-v3` pour afficher la nouvelle grille et les tarifs mensuel/annuel.
+- Nettoyer les anciennes offres one-time (`V3_OFFERS` Base 197 € / Pro 347 €) pour ne plus les présenter comme le parcours par défaut.
+- Créer un objet `V3Plan` et les helpers (`priceId`, `économie annuelle`) pour être utilisé partout dans l'app.
 
-| Produit Stripe | lookup_key mensuel | lookup_key annuel | Montant |
-|---|---|---|---|
-| EbookStudio V3 — Débutant | `debutant_monthly` | `debutant_yearly` | 999 cts / 9700 cts |
-| EbookStudio V3 — Expert | `expert_monthly` | `expert_yearly` | 1299 cts / 11700 cts |
-| EbookStudio V3 — Auteur | `auteur_monthly` | `auteur_yearly` | 5900 cts / 54700 cts |
+**Livrable :** une page admin claire qui reflète la nouvelle stratégie et un fichier de données unique, prêt à être branché sur le checkout.
 
-Tax code : `txcd_10103001` (SaaS / services électroniques).
+---
 
-### 4. Adapter l'edge function de checkout
-- Étendre `create-promo-checkout` ou créer `create-subscription-checkout` pour accepter un `plan_id` (`debutant`, `expert`, `auteur`) et un intervalle (`month` / `year`).
-- Résoudre le prix Stripe via `lookup_key`.
-- Créer une session `mode: "subscription"` pour les forfaits mensuel/annuel.
-- Gérer l'order bump séparément si l'utilisateur ajoute BookPerfect/sas en plus.
-- Insérer une ligne `funnel_orders` ou `subscription_orders` en pending.
+## Étape 2 — Création des produits Stripe et du pipeline d'abonnement
 
-### 5. Mettre à jour la logique d'entitlement côté client
-- `useV3Entitlement.ts` : lire le statut d'abonnement actif (via `subscriptions` table) et le `price_id` pour mapper le plan.
-- Appliquer les quotas : blocage à 20 / 50 / illimité livres par mois (via table de tracking ou compteur existant).
-- Débloquer les modules Pro uniquement pour Auteur (ou selon les flags d'upsell achetés).
-- Gérer le plan actuel et le renouvellement annuel.
+- Créer les 3 produits Stripe et leurs 6 prix (mensuel + annuel) via les ID pérennes :
+  - `debutant_monthly` / `debutant_yearly`
+  - `expert_monthly` / `expert_yearly`
+  - `auteur_monthly` / `auteur_yearly`
+- Vérifier que la fonction `v3-subscription-checkout` résout bien ces prix via `lookup_key` et crée des sessions `mode: "subscription"` avec `ui_mode: "embedded_page"`.
+- S'assurer que `payments-webhook` écoute les événements `customer.subscription.created`, `updated`, `deleted` et écrit dans la table `subscriptions` (avec la bonne colonne `environment` et le `price_id` lisible).
 
-### 6. Mettre à jour les pages de vente
-- `/publication-pro` (ou `/v3/offres`) : afficher les 3 cartes avec mensuel/annuel toggle, économie, quotas.
-- `/commande-v3` : passer le `plan_id` et l'intervalle choisis à la fonction de checkout.
-- Mettre à jour `V3OrderForm.tsx` pour utiliser les nouveaux prix et forfaits.
+**Livrable :** un flux de paiement abonnement fonctionnel en sandbox, avec webhook actif et stockage fiable des abonnements.
 
-### 7. Webhook Stripe et suivi
-- `stripe-webhook` : écouter `checkout.session.completed` pour les abonnements et insérer/mettre à jour la table `subscriptions` avec `price_id`, `status`, `current_period_end`, `environment`.
-- Gérer `invoice.payment_failed` et `customer.subscription.deleted` pour mettre à jour le statut.
+---
 
-### 8. Tests
-- Vérifier que les 6 prix Stripe sont créés en sandbox.
-- Tester un checkout test pour chaque plan (mensuel + annuel).
-- Vérifier que l'entitlement bloque bien les modules Pro pour Débutant/Expert.
-- Vérifier que le quota de livres/mois est respecté.
+## Étape 3 — Câblage du parcours client et des droits d'accès
 
-## Livrables
-- `src/data/v3Pricing.ts` (source unique de vérité)
-- `src/pages/admin/AdminPlansV3Page.tsx` mis à jour
-- 3 produits + 6 prix Stripe créés
-- Edge function de checkout étendue ou créée
-- `useV3Entitlement.ts` et `V3OrderForm.tsx` mis à jour
-- Webhook `stripe-webhooks` gérant les subscriptions
+- Créer une page publique d'offres V3 (`/offres-v3`) présentant les 3 cartes avec bascule mensuel/annuel et économie affichée.
+- Remplacer le formulaire one-time `V3OrderForm.tsx` par un checkout d'abonnement (Stripe Embedded Checkout) qui passe le `priceId` et le `userId` à `v3-subscription-checkout`.
+- Mettre à jour `useV3Entitlement.ts` pour détecter un abonnement actif dans `subscriptions` (et non plus seulement dans `v3_installment_orders`), en filtrant par `environment` et `status`.
+- Adapter `V3Gate` / `SubscriberGate` pour autoriser les utilisateurs avec un abonnement V3 actif (Débutant, Expert ou Auteur).
+- Afficher le plan actuel dans le hub V3 et ajouter un lien « Gérer mon abonnement » vers le portail client Stripe.
 
-## Notes
-- Pas de changement de compte Stripe : on reste sur le compte Robustabarista déjà connecté.
-- Les anciens clients lifetime (promo 59 €) restent traités via `funnel_orders` existant ; ce plan ne concerne que les nouveaux abonnements V3.
+**Livrable :** un utilisateur peut choisir un plan, payer, accéder au hub V3, et son abonnement est vérifié côté serveur à chaque accès.
+
+---
+
+## Hors périmètre de ce plan (à traiter ensuite)
+
+- Migration des anciens clients one-time (Base/Pro) : ils conservent leur accès via un flag legacy ou une migration manuelle.
+- Upsells séparés (BookPerfect, Pack Sérénité) : restent des achats one-time à côté des abonnements.
+- Résiliation/upgrade/downgrade automatique : portail Stripe gère la résiliation ; l'upgrade sera traité dans un second temps.
+
+---
+
+**Validation :** une fois ces 3 étapes terminées, on teste un paiement sandbox sur chaque plan (Débutant mensuel, Expert annuel, Auteur mensuel) et on vérifie que l'accès au hub V3 s'ouvre bien après le retour de paiement.
