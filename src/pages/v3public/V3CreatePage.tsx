@@ -4,6 +4,7 @@ import { Sparkles, Loader2 } from 'lucide-react';
 import ApiProviderQuickSettings from '@/components/ebook/ApiProviderQuickSettings';
 
 const V3CreateWizard = lazy(() => import('@/components/v3public/V3CreateWizard'));
+const V3ImportStudio = lazy(() => import('@/components/v3public/V3ImportStudio'));
 
 /** Préremplit la fiche livre du hub à partir de query params afin que BookCreationStudio
  *  (qui lit `edition_book_config_v1`) parte avec le bon titre/genre/idée. */
@@ -22,6 +23,7 @@ function seedHubConfig(idea: string | null, genre: string | null, type: string |
 
 export default function V3CreatePage() {
   const [params] = useSearchParams();
+  const importMode = params.get('import') === '1';
   const idea = params.get('idea');
   const genre = params.get('genre');
   const type = params.get('type');
@@ -29,6 +31,16 @@ export default function V3CreatePage() {
   useEffect(() => { seedHubConfig(idea, genre, type); }, [idea, genre, type]);
 
   const openFloating = () => window.dispatchEvent(new CustomEvent('open-api-keys'));
+
+  if (importMode) {
+    return (
+      <section className="min-h-[calc(100vh-4rem)] py-14 px-5 bg-[var(--v3-paper,#fbfaf6)]">
+        <Suspense fallback={<div className="py-24 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-[var(--v3-emerald,#064e3b)]" /></div>}>
+          <V3ImportStudio />
+        </Suspense>
+      </section>
+    );
+  }
 
   return (
     <section className="v3-halo-soft min-h-[calc(100vh-4rem)] py-14 px-5">
