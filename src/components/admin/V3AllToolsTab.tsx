@@ -26,15 +26,34 @@ const V3AllToolsTab = () => {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
+  // Vue par forfait : simule ce qui est débloqué pour chaque plan.
+  const [planView, setPlanView] = useState<PlanView>('auteur');
+  const [showLocked, setShowLocked] = useState(true);
+
+  const withPlan = useMemo(
+    () => V2_TOOLS.map((t) => ({ ...t, plan: planForTool(t) })),
+    [],
+  );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return V2_TOOLS.filter((t) => {
+    return withPlan.filter((t) => {
       if (filter !== 'all' && t.category !== filter) return false;
+      if (!showLocked && !isUnlockedForPlan(t.plan, planView)) return false;
       if (!q) return true;
       return t.label.toLowerCase().includes(q) || t.description.toLowerCase().includes(q);
     });
-  }, [query, filter]);
+  }, [query, filter, withPlan, planView, showLocked]);
+
+  const counts = useMemo(() => {
+    const c = { debutant: 0, expert: 0, auteur: 0 };
+    for (const t of withPlan) {
+      if (isUnlockedForPlan(t.plan, 'debutant')) c.debutant++;
+      if (isUnlockedForPlan(t.plan, 'expert')) c.expert++;
+      if (isUnlockedForPlan(t.plan, 'auteur')) c.auteur++;
+    }
+    return c;
+  }, [withPlan]);
 
   const grouped = useMemo(() => {
     const map = new Map<V2ToolCategory, typeof V2_TOOLS>();
