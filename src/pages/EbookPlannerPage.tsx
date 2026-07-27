@@ -132,6 +132,69 @@ import { type Character as EbookCharacter } from '@/components/ebook/EbookCharac
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 import { getProvider, PROVIDER_LABELS, PROVIDER_KEY_HINT } from '@/services/aiWritingService';
 
+const SAFE_INITIAL_EBOOK_PLANNER_TABS = new Set([
+  'workflow-dashboard',
+  'complete-workflow',
+  'planner',
+  'projects',
+  'writing',
+  'images',
+  'images-cover',
+  'images-generator',
+  'images-library',
+  'cover',
+  'tools',
+  'kdp',
+  'export',
+  'settings',
+  'calibre-epub',
+  'marketing',
+  'templates',
+  'url-import',
+  'doc-transform',
+  'aichat',
+  'characters',
+  'backcover',
+  'audiobook',
+  'audio-express',
+  'ebook-library',
+  'series',
+  'launch-plan',
+  'editorial-director',
+  'market-analysis',
+  'content-architect',
+  'expert-writing',
+  'natural-rewrite',
+  'editorial-packaging',
+  'editorial-quality',
+  'final-diagnosis',
+  'editorial-memory',
+  'chapter-coherence',
+  'self-critique',
+  'iterative-loop',
+  'style-signature',
+  'ultimate-verdict',
+  'humanize-anti-ia',
+  'cover-design-editor',
+  'kdp-prepublish-checklist',
+  'strict-proofread',
+  'multi-translator',
+  'atlas',
+  'encyclopedia',
+  'coloring',
+  'documentary',
+  'agenda',
+  'scolaire',
+  'pedagogique',
+  'cuisine',
+  'voyage',
+]);
+
+const getSafeInitialEbookPlannerTab = (tab: string | null) => {
+  if (tab && SAFE_INITIAL_EBOOK_PLANNER_TABS.has(tab)) return tab;
+  return 'workflow-dashboard';
+};
+
 interface EbookPlannerPageProps {
   subscriberEmail?: string;
   subscriberData?: any;
@@ -371,9 +434,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     try {
       const params = new URLSearchParams(window.location.search);
       const tab = params.get('tab');
-      if (tab && tab !== 'onboarding' && tab !== 'subscription') return tab;
+      if (tab) return getSafeInitialEbookPlannerTab(tab);
       const saved = localStorage.getItem('ebook_planner_active_tab');
-      if (saved && saved !== 'onboarding' && saved !== 'subscription' && saved !== 'planner') return saved;
+      if (saved) return getSafeInitialEbookPlannerTab(saved);
     } catch {}
     return 'workflow-dashboard';
   });

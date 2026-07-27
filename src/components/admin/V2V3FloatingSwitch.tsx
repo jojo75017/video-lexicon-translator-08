@@ -5,6 +5,14 @@ import { useV3Mode } from '@/hooks/useV3Mode';
 const GOLD = '#c9a84c';
 const ORANGE = '#FF9E2D';
 
+function resetV2PlannerEntryPoint() {
+  try {
+    localStorage.setItem('ebook_planner_active_tab', 'workflow-dashboard');
+  } catch {
+    /* ignore */
+  }
+}
+
 export function V2V3FloatingSwitch() {
   const { isAdmin, checking, v3Mode, setV3Mode } = useV3Mode();
   const navigate = useNavigate();
@@ -17,9 +25,10 @@ export function V2V3FloatingSwitch() {
     if (next) {
       navigate('/hub-v3');
     } else {
-      // Retour V2 : forcer la sortie de toute route /v3/* et /hub-v3
-      // et atterrir directement sur le générateur V2.
-      navigate('/ebook-planner');
+      // Retour V2 : éviter qu'un ancien onglet sauvegardé (ex: "admin")
+      // renvoie immédiatement hors du générateur.
+      resetV2PlannerEntryPoint();
+      navigate('/ebook-planner?tab=workflow-dashboard', { replace: true });
     }
   };
 
