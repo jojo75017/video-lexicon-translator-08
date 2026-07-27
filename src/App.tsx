@@ -398,7 +398,9 @@ const App = () => {
             <Route path="/carte-cadeau-merci" element={<GiftThankYouPage />} />
             <Route path="/influenceurs" element={<InfluenceursPage />} />
             <Route path="/influenceurs/merci" element={<InfluenceursConfirmationPage />} />
-            <Route path="/contact-support" element={gated(<ContactSupportPage subscriberEmail={subscriberEmail || ''} />)} />
+            <Route path="/contact-support" element={<ContactSupportPage subscriberEmail={subscriberEmail || ''} />} />
+            <Route path="/contact" element={<ContactSupportPage subscriberEmail={subscriberEmail || ''} />} />
+
 
             {/* V2 tools */}
             <Route path="/ebook-ideas" element={<EbookIdeasPage />} />
