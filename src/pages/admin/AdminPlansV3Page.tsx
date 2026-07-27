@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Table2, Check, Lock, Infinity } from "lucide-react";
+import { V3_PLANS, getYearlySavingsPercent, getYearlySavingsAmount, formatPrice } from "@/data/v3Pricing";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +31,7 @@ const planRows: PlanRow[] = [
   { letter: "N", domain: "Niches & Étude de marché", debutant: "3/mois", expert: "20/mois", auteur: "Illimité + comparateur multi-niches" },
   { letter: "O", domain: "Outils annexes", debutant: "Sommaire, Word Count, Idées", expert: "+ Quiz, Audit, Keywords", auteur: "Tous les outils incl. Pro" },
   { letter: "P", domain: "Personnages & Bibles", debutant: "3 pers., bible simple", expert: "8 pers., bible étendue", auteur: "Illimité + générateur d'univers" },
-  { letter: "Q", domain: "Quotas & Compteurs", debutant: "15 livres/mois", expert: "30 livres/mois", auteur: "Illimité" },
+  { letter: "Q", domain: "Quotas & Compteurs", debutant: "20 livres/mois", expert: "50 livres/mois", auteur: "Illimité" },
   { letter: "R", domain: "Résiliation / Portail client", debutant: "✅", expert: "✅", auteur: "✅" },
   { letter: "S", domain: "Sélection éditeurs (P26 Pro)", debutant: "🔒", expert: "🔒", auteur: "Moteur maisons d'édition FR" },
   { letter: "T", domain: "TOC / Sommaire Ultime", debutant: "20 chapitres", expert: "40 chapitres", auteur: "60 chapitres + éditeur avancé" },
@@ -94,27 +95,28 @@ export default function AdminPlansV3Page() {
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <Card className="border-l-4 border-l-blue-500">
-            <CardContent className="pt-6">
-              <div className="text-sm text-muted-foreground">Débutant</div>
-              <div className="text-3xl font-bold">15 livres/mois</div>
-              <div className="mt-2 text-sm text-muted-foreground">22 agents · 20 chapitres max</div>
-            </CardContent>
-          </Card>
-          <Card className="border-l-4 border-l-amber-500">
-            <CardContent className="pt-6">
-              <div className="text-sm text-muted-foreground">Expert</div>
-              <div className="text-3xl font-bold">30 livres/mois</div>
-              <div className="mt-2 text-sm text-muted-foreground">22 agents · 40 chapitres max</div>
-            </CardContent>
-          </Card>
-          <Card className="border-l-4 border-l-teal-500">
-            <CardContent className="pt-6">
-              <div className="text-sm text-muted-foreground">Auteur</div>
-              <div className="text-3xl font-bold">Illimité</div>
-              <div className="mt-2 text-sm text-muted-foreground">30 agents · 60 chapitres max + Pro</div>
-            </CardContent>
-          </Card>
+          {V3_PLANS.map((plan, idx) => {
+            const borderColor = idx === 0 ? "border-l-blue-500" : idx === 1 ? "border-l-amber-500" : "border-l-teal-500";
+            const savings = getYearlySavingsPercent(plan);
+            return (
+              <Card key={plan.id} className={`border-l-4 ${borderColor}`}>
+                <CardContent className="pt-6">
+                  <div className="text-sm text-muted-foreground">{plan.name}</div>
+                  <div className="text-3xl font-bold">{plan.booksPerMonth ? `${plan.booksPerMonth} livres/mois` : "Illimité"}</div>
+                  <div className="mt-2 text-sm text-muted-foreground">
+                    {plan.agentsCount} agents · {plan.chaptersMax} chapitres max
+                  </div>
+                  <div className="mt-3 flex items-baseline gap-2">
+                    <span className="text-xl font-bold">{formatPrice(plan.monthlyPrice)}/mois</span>
+                    <span className="text-xs text-muted-foreground">ou {formatPrice(plan.yearlyPrice)}/an</span>
+                  </div>
+                  <div className="mt-1 text-xs text-green-600 font-medium">
+                    Économie annuelle : {formatPrice(getYearlySavingsAmount(plan))} ({savings}%)
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
         <Card>
@@ -193,39 +195,24 @@ export default function AdminPlansV3Page() {
           </CardContent>
         </Card>
 
-        <Card className="border-dashed border-amber-500/50 bg-amber-50/30">
+        <Card>
           <CardHeader>
-            <CardTitle>Tarifs à définir</CardTitle>
+            <CardTitle>Tarifs V3 — Mensuel & Annuel</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Les 6 prix (mensuel + annuel × 3 forfaits) seront saisis ici puis synchronisés avec Stripe.
+              6 prix synchronisés avec Stripe (sandbox → live automatique au publish). Tous les forfaits sont résiliables à tout moment.
             </p>
             <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-3">
-              <div className="rounded-lg border border-border bg-background p-3">
-                <div className="text-xs font-semibold text-muted-foreground">Débutant mensuel</div>
-                <div className="text-lg font-bold">—</div>
-              </div>
-              <div className="rounded-lg border border-border bg-background p-3">
-                <div className="text-xs font-semibold text-muted-foreground">Débutant annuel</div>
-                <div className="text-lg font-bold">—</div>
-              </div>
-              <div className="rounded-lg border border-border bg-background p-3">
-                <div className="text-xs font-semibold text-muted-foreground">Expert mensuel</div>
-                <div className="text-lg font-bold">—</div>
-              </div>
-              <div className="rounded-lg border border-border bg-background p-3">
-                <div className="text-xs font-semibold text-muted-foreground">Expert annuel</div>
-                <div className="text-lg font-bold">—</div>
-              </div>
-              <div className="rounded-lg border border-border bg-background p-3">
-                <div className="text-xs font-semibold text-muted-foreground">Auteur mensuel</div>
-                <div className="text-lg font-bold">59 €</div>
-              </div>
-              <div className="rounded-lg border border-border bg-background p-3">
-                <div className="text-xs font-semibold text-muted-foreground">Auteur annuel</div>
-                <div className="text-lg font-bold">547 €</div>
-              </div>
+              {V3_PLANS.flatMap((plan) => [
+                { label: `${plan.name} mensuel`, price: plan.monthlyPrice, interval: "mois" },
+                { label: `${plan.name} annuel`, price: plan.yearlyPrice, interval: "an" },
+              ]).map((item) => (
+                <div key={item.label} className="rounded-lg border border-border bg-background p-3">
+                  <div className="text-xs font-semibold text-muted-foreground">{item.label}</div>
+                  <div className="text-lg font-bold">{formatPrice(item.price)}/{item.interval}</div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
