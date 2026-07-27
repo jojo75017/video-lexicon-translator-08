@@ -40,15 +40,15 @@ export default function V3MainTabs() {
 
   return (
     <div
-      className="sticky top-16 z-30"
+      className="sticky top-16 z-30 overflow-x-clip"
       style={{
         background: 'var(--v3-paper)',
         borderBottom: '1px solid var(--v3-line)',
       }}
     >
       <div className="max-w-7xl mx-auto px-5 md:px-8 h-14 flex items-center gap-1">
-        {/* Desktop */}
-        <nav className="hidden md:flex items-center gap-0.5 flex-1">
+        {/* Desktop (≥ lg) */}
+        <nav className="hidden lg:flex items-center gap-0.5 flex-1 min-w-0">
           {V3_HEADER_MENU.map((cat) => {
             const active = openKey === cat.key || isCatActive(cat);
             const cols = cat.links.length > 8 ? 3 : cat.links.length > 4 ? 2 : 1;
@@ -145,28 +145,28 @@ export default function V3MainTabs() {
           </div>
         </nav>
 
-        {/* Mobile */}
+        {/* Mobile & tablette (< lg) */}
         <button
           onClick={() => setMobileOpen((o) => !o)}
-          className="md:hidden flex items-center gap-2 px-3 py-2 rounded-md text-[13px] font-semibold"
+          className="lg:hidden flex items-center gap-2 px-3 py-2 rounded-md text-[13px] font-semibold"
           style={{ color: 'var(--v3-emerald)' }}
-          aria-label="Ouvrir le menu"
+          aria-label="Ouvrir le menu des catégories"
         >
           {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
           Catégories
         </button>
         <Link
           to="/v3/outils"
-          className="md:hidden ml-auto v3-btn v3-btn-primary text-[12px]"
+          className="lg:hidden ml-auto v3-btn v3-btn-primary text-[12px] whitespace-nowrap"
           style={{ padding: '7px 14px' }}
         >
-          <LayoutGrid className="w-3.5 h-3.5" /> Outils
+          <LayoutGrid className="w-3.5 h-3.5" /> Tous les outils
         </Link>
       </div>
 
-      {/* Accordéon mobile */}
+      {/* Accordéon mobile & tablette */}
       {mobileOpen && (
-        <div className="md:hidden border-t bg-white max-h-[70vh] overflow-y-auto" style={{ borderColor: 'var(--v3-line)' }}>
+        <div className="lg:hidden border-t bg-white max-h-[70vh] overflow-y-auto" style={{ borderColor: 'var(--v3-line)' }}>
           <div className="px-4 py-3 space-y-2">
             {V3_HEADER_MENU.map((cat) => (
               <details key={cat.key} className="rounded-xl" style={{ border: '1px solid var(--v3-line)' }}>
