@@ -31,7 +31,7 @@ const planRows: PlanRow[] = [
   { letter: "N", domain: "Niches & Étude de marché", debutant: "3/mois", expert: "20/mois", auteur: "Illimité + comparateur multi-niches" },
   { letter: "O", domain: "Outils annexes", debutant: "Sommaire, Word Count, Idées", expert: "+ Quiz, Audit, Keywords", auteur: "Tous les outils incl. Pro" },
   { letter: "P", domain: "Personnages & Bibles", debutant: "3 pers., bible simple", expert: "8 pers., bible étendue", auteur: "Illimité + générateur d'univers" },
-  { letter: "Q", domain: "Quotas & Compteurs", debutant: "15 livres/mois", expert: "30 livres/mois", auteur: "Illimité" },
+  { letter: "Q", domain: "Quotas & Compteurs", debutant: "20 livres/mois", expert: "50 livres/mois", auteur: "Illimité" },
   { letter: "R", domain: "Résiliation / Portail client", debutant: "✅", expert: "✅", auteur: "✅" },
   { letter: "S", domain: "Sélection éditeurs (P26 Pro)", debutant: "🔒", expert: "🔒", auteur: "Moteur maisons d'édition FR" },
   { letter: "T", domain: "TOC / Sommaire Ultime", debutant: "20 chapitres", expert: "40 chapitres", auteur: "60 chapitres + éditeur avancé" },
