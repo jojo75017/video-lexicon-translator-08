@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Feather, Menu, X, LogIn, User } from 'lucide-react';
-import V3ToolsBar from './V3ToolsBar';
+import V3MainTabs from './V3MainTabs';
 
 const MAIN_NAV = [
   { to: '/v3', label: 'Accueil', end: true },
@@ -81,8 +81,8 @@ export default function V3Header({ isAuthed = false }: { isAuthed?: boolean }) {
 
 
 
-      {/* Ligne 3 — barre outils V2 catégorisés */}
-      <V3ToolsBar />
+      {/* Ligne 2/3 — onglets principaux + accès rapide */}
+      <V3MainTabs />
 
 
       {/* Mobile menu */}
