@@ -27,7 +27,7 @@ const QUICK_TOOLS = [
   { to: '/fiches-pratiques', label: 'Modèles',                 icon: FileText },
   { to: '/v3/create?import=1', label: 'Importer un doc',       icon: Upload },
   { to: '/v3/library',     label: 'Mes projets',               icon: FolderOpen },
-  { to: '/formation',      label: 'Guides',                    icon: GraduationCap },
+  { to: '/blog',           label: 'Guides',                    icon: GraduationCap },
 ];
 
 export default function V3MainTabs() {
