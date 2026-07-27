@@ -121,8 +121,53 @@ export default function V3ToolsIndexPage() {
               ))}
             </div>
           </div>
+
+          {/* Plan sub-tabs */}
+          <div className="mt-5 flex flex-wrap items-center gap-2">
+            <span className="text-[11px] uppercase tracking-wider font-semibold" style={{ color: 'var(--v3-muted)' }}>
+              Par forfait :
+            </span>
+            <button
+              onClick={() => setPlan(null)}
+              className="px-3 py-1.5 rounded-full text-[12px] font-semibold transition"
+              style={activePlan === null
+                ? { background: 'var(--v3-emerald)', color: '#fff' }
+                : { background: '#fff', color: 'var(--v3-ink)', border: '1px solid var(--v3-line)' }}
+            >
+              Tous
+            </button>
+            {(['debutant', 'expert', 'auteur'] as const).map((p) => {
+              const meta = PLAN_META[p];
+              const active = activePlan === p;
+              return (
+                <button
+                  key={p}
+                  onClick={() => setPlan(p)}
+                  className="px-3 py-1.5 rounded-full text-[12px] font-semibold transition"
+                  style={active
+                    ? { background: meta.color, color: '#fff', borderColor: meta.color }
+                    : { background: meta.bg, color: meta.color, border: `1px solid ${meta.border}` }}
+                >
+                  {p === 'debutant' && '🌱 '}
+                  {p === 'expert' && '⚡ '}
+                  {p === 'auteur' && '👑 '}
+                  {meta.short}
+                </button>
+              );
+            })}
+            <button
+              onClick={() => setPlan('all')}
+              className="px-3 py-1.5 rounded-full text-[12px] font-semibold transition"
+              style={activePlan === 'all'
+                ? { background: 'var(--v3-gold-600)', color: '#fff' }
+                : { background: '#fff', color: 'var(--v3-gold-600)', border: '1px solid var(--v3-line)' }}
+            >
+              Comparer les 3
+            </button>
+          </div>
         </div>
       </section>
+
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-5 md:px-8 py-10">
