@@ -1,26 +1,47 @@
 import { Link, useSearchParams } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import { V2_TOOLS, V2_TOOL_CATEGORIES } from '@/data/v2ToolsRegistry';
-import { Search, ArrowRight } from 'lucide-react';
+import { planForTool, PLAN_META, type V3Plan } from '@/data/v3ToolPlans';
+import { Search, ArrowRight, Lock, Check } from 'lucide-react';
+
+type PlanParam = V3Plan | 'all' | null;
 
 /**
  * Index premium de tous les outils EbookStudio V3.
  * Style Émeraude Prestige : fond papier, cartes blanches, badges or.
  */
 export default function V3ToolsIndexPage() {
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const initial = params.get('q') ?? '';
+  const planParam = (params.get('plan') as PlanParam) ?? null;
   const [q, setQ] = useState(initial);
   const [activeCat, setActiveCat] = useState<string | null>(null);
+  const [activePlan, setActivePlan] = useState<PlanParam>(planParam);
 
   useEffect(() => {
     setQ(initial);
   }, [initial]);
 
+  useEffect(() => {
+    setActivePlan(planParam);
+  }, [planParam]);
+
+  const setPlan = (p: PlanParam) => {
+    setActivePlan(p);
+    const next = new URLSearchParams(params);
+    if (p) next.set('plan', p);
+    else next.delete('plan');
+    setParams(next, { replace: true });
+  };
+
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
     let list = V2_TOOLS;
     if (activeCat) list = list.filter((t) => t.category === activeCat);
+    if (activePlan && activePlan !== 'all') {
+      const rank = { debutant: 0, expert: 1, auteur: 2 } as const;
+      list = list.filter((t) => rank[planForTool(t)] <= rank[activePlan]);
+    }
     if (s) {
       list = list.filter(
         (t) =>
@@ -29,7 +50,10 @@ export default function V3ToolsIndexPage() {
       );
     }
     return list;
-  }, [q, activeCat]);
+  }, [q, activeCat, activePlan]);
+
+  const groupByPlan = activePlan === 'all';
+
 
   return (
     <div style={{ background: 'var(--v3-paper)' }} className="min-h-screen">
