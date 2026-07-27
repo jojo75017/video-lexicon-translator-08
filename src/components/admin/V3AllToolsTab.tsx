@@ -30,6 +30,7 @@ const V3AllToolsTab = () => {
   // Vue par forfait : simule ce qui est débloqué pour chaque plan.
   const [planView, setPlanView] = useState<PlanView>('auteur');
   const [showLocked, setShowLocked] = useState(true);
+  const [groupBy, setGroupBy] = useState<GroupBy>('plan');
 
   const withPlan = useMemo(
     () => V2_TOOLS.map((t) => ({ ...t, plan: planForTool(t) })),
