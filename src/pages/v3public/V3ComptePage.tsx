@@ -27,13 +27,13 @@ export default function V3ComptePage() {
       if (user) {
         const { data } = await supabase
           .from("ebook_projects")
-          .select("id,title,updated_at,status")
+          .select("id,title,updated_at")
           .eq("user_id", user.id)
           .order("updated_at", { ascending: false })
           .limit(5);
-        setProjects((data ?? []) as ProjectRow[]);
+        setProjects(((data ?? []) as unknown) as ProjectRow[]);
 
-        const { data: sub } = await supabase
+        const { data: sub } = await (supabase as any)
           .from("subscribers")
           .select("plan_tier")
           .eq("user_id", user.id)
