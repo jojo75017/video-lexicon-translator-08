@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AdminPanelNav } from "@/components/admin/AdminPanelNav";
 import { KdpPilotTiersMatrix } from "@/components/admin/KdpPilotTiersMatrix";
+import { V3ToolsPlanMatrix } from "@/components/admin/V3ToolsPlanMatrix";
 
 interface PlanRow {
   letter: string;
