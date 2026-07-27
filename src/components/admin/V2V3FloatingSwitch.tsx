@@ -1,5 +1,6 @@
 import { Crown, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { useV3Mode } from '@/hooks/useV3Mode';
 
 const GOLD = '#c9a84c';
@@ -23,11 +24,19 @@ export function V2V3FloatingSwitch() {
     const next = !v3Mode;
     setV3Mode(next);
     if (next) {
+      toast.success('Bascule vers la V3', {
+        description: 'Ouverture du Hub V3 (mode admin).',
+        icon: '👑',
+      });
       navigate('/hub-v3');
     } else {
       // Retour V2 : éviter qu'un ancien onglet sauvegardé (ex: "admin")
       // renvoie immédiatement hors du générateur.
       resetV2PlannerEntryPoint();
+      toast.success('Retour à la V2', {
+        description: 'Générateur V2 — onglet Workflow.',
+        icon: '✨',
+      });
       navigate('/ebook-planner?tab=workflow-dashboard', { replace: true });
     }
   };
