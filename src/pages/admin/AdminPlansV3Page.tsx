@@ -195,39 +195,24 @@ export default function AdminPlansV3Page() {
           </CardContent>
         </Card>
 
-        <Card className="border-dashed border-amber-500/50 bg-amber-50/30">
+        <Card>
           <CardHeader>
-            <CardTitle>Tarifs à définir</CardTitle>
+            <CardTitle>Tarifs V3 — Mensuel & Annuel</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Les 6 prix (mensuel + annuel × 3 forfaits) seront saisis ici puis synchronisés avec Stripe.
+              6 prix synchronisés avec Stripe (sandbox → live automatique au publish). Tous les forfaits sont résiliables à tout moment.
             </p>
             <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-3">
-              <div className="rounded-lg border border-border bg-background p-3">
-                <div className="text-xs font-semibold text-muted-foreground">Débutant mensuel</div>
-                <div className="text-lg font-bold">—</div>
-              </div>
-              <div className="rounded-lg border border-border bg-background p-3">
-                <div className="text-xs font-semibold text-muted-foreground">Débutant annuel</div>
-                <div className="text-lg font-bold">—</div>
-              </div>
-              <div className="rounded-lg border border-border bg-background p-3">
-                <div className="text-xs font-semibold text-muted-foreground">Expert mensuel</div>
-                <div className="text-lg font-bold">—</div>
-              </div>
-              <div className="rounded-lg border border-border bg-background p-3">
-                <div className="text-xs font-semibold text-muted-foreground">Expert annuel</div>
-                <div className="text-lg font-bold">—</div>
-              </div>
-              <div className="rounded-lg border border-border bg-background p-3">
-                <div className="text-xs font-semibold text-muted-foreground">Auteur mensuel</div>
-                <div className="text-lg font-bold">59 €</div>
-              </div>
-              <div className="rounded-lg border border-border bg-background p-3">
-                <div className="text-xs font-semibold text-muted-foreground">Auteur annuel</div>
-                <div className="text-lg font-bold">547 €</div>
-              </div>
+              {V3_PLANS.flatMap((plan) => [
+                { label: `${plan.name} mensuel`, price: plan.monthlyPrice, interval: "mois" },
+                { label: `${plan.name} annuel`, price: plan.yearlyPrice, interval: "an" },
+              ]).map((item) => (
+                <div key={item.label} className="rounded-lg border border-border bg-background p-3">
+                  <div className="text-xs font-semibold text-muted-foreground">{item.label}</div>
+                  <div className="text-lg font-bold">{formatPrice(item.price)}/{item.interval}</div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
