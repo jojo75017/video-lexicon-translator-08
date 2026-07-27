@@ -1,65 +1,79 @@
-## Remplacer l'onglet "Ménage" par un "Plans V3" (récap A→Z)
+# Plan : Grille tarifaire V3 finalisée — 3 forfaits mensuel/annuel
 
-### Objectif
-Dans le hub admin, remplacer l'onglet "Ménage" par un nouvel onglet "Plans V3" qui affiche la matrice complète des 3 forfaits (Débutant / Expert / Auteur) de A à Z, avec les quotas et les modules débloqués.
+## Décisions validées
 
-L'ancienne page de ménage reste accessible en archivée temporairement via `/admin/cleanup` pendant le développement, puis sera supprimée dans un second temps si tu le confirmes.
+| Forfait | Mensuel | Annuel | Livres/mois | Positionnement |
+|---|---|---|---|---|
+| **Débutant** | 9,99 € | 97 € | 20 | Entrée de gamme, essentiels V3 |
+| **Expert** | 12,99 € | 117 € | 50 | Régulier, outils avancés |
+| **Auteur** | 59 € | 547 € | Illimité | Tous les modules Pro + upsells inclus |
 
----
+- Économie annuelle affichée : Débutant ~19 %, Expert ~25 %, Auteur ~23 %.
+- **Auteur** inclut tous les upsells Pro (Cover Studio Pro, KDP Pilot renforcé, Sélection éditeurs, Amazon Spy, BD Studio, Audiobook, etc.) et les 10 traductions.
+- Les modules "sas" restent payants à l'usage pour Débutant/Expert (ex : BookPerfect reste un achat/add-on séparé).
 
-### 1. Modifications prévues
+## Étapes d'implémentation
 
-#### A. Navigation admin (`src/components/admin/AdminPanelNav.tsx`)
-- Remplacer l'item `{ label: 'Ménage', path: '/admin/cleanup', icon: Trash2 }` par `{ label: 'Plans V3', path: '/admin/plans-v3', icon: TableIcon }`.
-- Sous-titre actuel inchangé ("Tous les onglets utiles + retour rapide au générateur").
+### 1. Centraliser les données tarifaires
+Créer/mettre à jour `src/data/v3Pricing.ts` avec :
+- Les 3 plans, leurs quotas, leurs prix mensuels/annuels, les économies.
+- Les `price_id` Stripe (lookup keys) pour chaque palier : `debutant_monthly`, `debutant_yearly`, `expert_monthly`, `expert_yearly`, `auteur_monthly`, `auteur_yearly`.
+- Les quotas de livres par mois (20 / 50 / illimité).
+- Les flags d'accès Pro (upsells inclus).
 
-#### B. Nouvelle page admin (`src/pages/admin/AdminPlansV3Page.tsx`)
-Créer une page unique avec :
-- `AdminPanelNav` en haut.
-- Titre : "Plans V3 — Contenu A → Z".
-- Tableau comparatif 3 colonnes : Débutant / Expert / Auteur.
-- Lignes A → Z organisées par domaine fonctionnel (Accueil, Bibliothèque, Création, Dashboard, Édition, Export, Formatage, Génération couverture, Historique, Import, Journal IA, KDP Spy, Livres spéciaux, Marketing, Niches, Outils, Personnages, Quotas, Résiliation, Sélection éditeurs, TOC, Upgrades, Voix/Audiobook, Workflow, eXport, Yield, Zone support).
-- Badges visuels : ✅ inclus · 🔒 verrouillé · (nombre) quota.
-- Section récap des 8 modules Pro (P23→P30) réservés au forfait Auteur.
-- Section "Tarifs à définir" avec un champ éditable pour stocker les 6 prix (mensuel + annuel × 3 forfaits) dans un `useState` local, prêt à être envoyé vers Supabase/Stripe plus tard.
+### 2. Mettre à jour la page admin `/admin/plans-v3`
+- Remplacer la grille tarifaire existante par les nouveaux montants confirmés.
+- Ajouter une colonne "Quota livres/mois".
+- Ajouter une ligne indiquant que BookPerfect/sas reste un add-on payant sauf pour Auteur si applicable.
+- Garder la matrice A → Z déjà présente.
 
-#### C. Routage (`src/App.tsx`)
-- Ajouter la route `/admin/plans-v3` → `AdminPlansV3Page` (lazy import ou import statique).
-- Garder `/admin/cleanup` → `AdminCleanupPage` pour ne pas casser le lien si tu veux encore y accéder, mais sans navigation publique.
-- (Optionnel) Redirection `/admin/cleanup` → `/admin/plans-v3` si tu confirmes que le ménage ne doit plus être visible du tout.
+### 3. Créer les produits et prix Stripe
+Utiliser `payments--batch_create_product` pour créer en sandbox les 3 produits avec leurs 2 prix chacun (mensuel et annuel récurrent).
 
-#### D. Nettoyage
-- Si tu confirmes, supprimer `AdminCleanupPage.tsx` et sa route une fois la page "Plans V3" validée en preview.
-- Mettre à jour le sitemap si nécessaire (peu impactant en interne).
+| Produit Stripe | lookup_key mensuel | lookup_key annuel | Montant |
+|---|---|---|---|
+| EbookStudio V3 — Débutant | `debutant_monthly` | `debutant_yearly` | 999 cts / 9700 cts |
+| EbookStudio V3 — Expert | `expert_monthly` | `expert_yearly` | 1299 cts / 11700 cts |
+| EbookStudio V3 — Auteur | `auteur_monthly` | `auteur_yearly` | 5900 cts / 54700 cts |
 
----
+Tax code : `txcd_10103001` (SaaS / services électroniques).
 
-### 2. Contenu affiché dans la page (source de vérité)
+### 4. Adapter l'edge function de checkout
+- Étendre `create-promo-checkout` ou créer `create-subscription-checkout` pour accepter un `plan_id` (`debutant`, `expert`, `auteur`) et un intervalle (`month` / `year`).
+- Résoudre le prix Stripe via `lookup_key`.
+- Créer une session `mode: "subscription"` pour les forfaits mensuel/annuel.
+- Gérer l'order bump séparément si l'utilisateur ajoute BookPerfect/sas en plus.
+- Insérer une ligne `funnel_orders` ou `subscription_orders` en pending.
 
-Le contenu réutilisé sera le récap A→Z du plan précédent :
+### 5. Mettre à jour la logique d'entitlement côté client
+- `useV3Entitlement.ts` : lire le statut d'abonnement actif (via `subscriptions` table) et le `price_id` pour mapper le plan.
+- Appliquer les quotas : blocage à 20 / 50 / illimité livres par mois (via table de tracking ou compteur existant).
+- Débloquer les modules Pro uniquement pour Auteur (ou selon les flags d'upsell achetés).
+- Gérer le plan actuel et le renouvellement annuel.
 
-- **Débutant** : 15 livres/mois, 22 agents (P1→P22), max 20 chapitres / 3 500 mots/chapitre, modules Pro verrouillés.
-- **Expert** : 30 livres/mois, 22 agents (P1→P22), max 40 chapitres / 5 000 mots/chapitre, modules Pro verrouillés.
-- **Auteur** : livres illimités, **30 agents** (P1→P30), max 60 chapitres / 8 000 mots/chapitre, tous les modules Pro inclus.
+### 6. Mettre à jour les pages de vente
+- `/publication-pro` (ou `/v3/offres`) : afficher les 3 cartes avec mensuel/annuel toggle, économie, quotas.
+- `/commande-v3` : passer le `plan_id` et l'intervalle choisis à la fonction de checkout.
+- Mettre à jour `V3OrderForm.tsx` pour utiliser les nouveaux prix et forfaits.
 
-Modules Pro réservés Auteur : Cover Studio Pro (P23), Passe éditoriale (P24), Séries & Tomes (P25), Sélection éditeurs (P26), KDP Spy (P27), Amazon Spy (P28), Audiobook Studio (P29), BD Studio (P30).
+### 7. Webhook Stripe et suivi
+- `stripe-webhook` : écouter `checkout.session.completed` pour les abonnements et insérer/mettre à jour la table `subscriptions` avec `price_id`, `status`, `current_period_end`, `environment`.
+- Gérer `invoice.payment_failed` et `customer.subscription.deleted` pour mettre à jour le statut.
 
----
+### 8. Tests
+- Vérifier que les 6 prix Stripe sont créés en sandbox.
+- Tester un checkout test pour chaque plan (mensuel + annuel).
+- Vérifier que l'entitlement bloque bien les modules Pro pour Débutant/Expert.
+- Vérifier que le quota de livres/mois est respecté.
 
-### 3. Vérification
+## Livrables
+- `src/data/v3Pricing.ts` (source unique de vérité)
+- `src/pages/admin/AdminPlansV3Page.tsx` mis à jour
+- 3 produits + 6 prix Stripe créés
+- Edge function de checkout étendue ou créée
+- `useV3Entitlement.ts` et `V3OrderForm.tsx` mis à jour
+- Webhook `stripe-webhooks` gérant les subscriptions
 
-1. `tsgo` : pas d'erreur d'import.
-2. Preview admin : l'onglet "Plans V3" apparaît, cliquable, affichage correct desktop + mobile.
-3. L'ancien onglet "Ménage" n'apparaît plus dans la barre de navigation.
-4. Aucune route cassée.
-
----
-
-### 4. Livrables
-
-- `src/pages/admin/AdminPlansV3Page.tsx` (nouveau)
-- `src/components/admin/AdminPanelNav.tsx` (modifié)
-- `src/App.tsx` (modifié, route ajoutée)
-- Optionnel : suppression de `AdminCleanupPage.tsx` et de la route `/admin/cleanup` si tu confirmes.
-
-**Aucune base de données modifiée. Aucun edge function modifié. Uniquement UI admin.**
+## Notes
+- Pas de changement de compte Stripe : on reste sur le compte Robustabarista déjà connecté.
+- Les anciens clients lifetime (promo 59 €) restent traités via `funnel_orders` existant ; ce plan ne concerne que les nouveaux abonnements V3.
