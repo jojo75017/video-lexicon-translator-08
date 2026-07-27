@@ -51,11 +51,14 @@ export function V2V3FloatingSwitch() {
       onClick={handleClick}
       aria-label={v3Mode ? 'Mode V3 actif — revenir en V2' : 'Basculer vers la V3'}
       title={v3Mode ? 'Mode V3 actif — cliquer pour revenir en V2' : 'Basculer vers la V3 (admin)'}
-      className="fixed left-4 bottom-4 z-[9998] inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold opacity-70 shadow-md transition-all duration-200 hover:opacity-100 hover:scale-[1.04]"
+      className="fixed left-4 top-24 z-[9998] inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold shadow-lg transition-all duration-200 hover:scale-[1.04] hover:shadow-xl"
       style={{
-        borderColor: v3Mode ? GOLD : ORANGE,
-        background: v3Mode ? '#141414' : '#ffffff',
-        color: v3Mode ? GOLD : ORANGE,
+        borderColor: 'rgba(255,255,255,0.45)',
+        background: v3Mode
+          ? '#141414'
+          : 'linear-gradient(90deg,#FF9E2D 0%,#FF6B35 100%)',
+        color: v3Mode ? GOLD : '#ffffff',
+        textShadow: v3Mode ? undefined : '0 1px 0 rgba(0,0,0,0.12)',
       }}
     >
       {v3Mode ? <Crown className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5" />}
