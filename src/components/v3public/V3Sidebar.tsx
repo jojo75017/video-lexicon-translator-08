@@ -37,9 +37,10 @@ const NAV: NavSection[] = [
   {
     section: 'Compte',
     items: [
+      { to: '/v3/compte', label: 'Mon compte', icon: User },
+      { to: '/v3/forfaits', label: 'Forfaits & tarifs', icon: Gem },
       { to: '/v3/auteur', label: 'Profil auteur', icon: User },
       { to: '/subscription', label: 'Mon abonnement', icon: Gem },
-      { to: '/v3/hub?tab=offres', label: 'Offres & Packs', icon: Gem },
       { to: '/v3/parametres', label: 'Paramètres', icon: Settings },
     ],
   },
