@@ -57,14 +57,33 @@ const V3AllToolsTab = () => {
     return c;
   }, [withPlan]);
 
-  const grouped = useMemo(() => {
-    const map = new Map<V2ToolCategory, typeof filtered>();
-    for (const t of filtered) {
-      if (!map.has(t.category)) map.set(t.category, []);
-      map.get(t.category)!.push(t);
+  const sections = useMemo(() => {
+    if (groupBy === 'plan') {
+      const order: V3Plan[] = ['debutant', 'expert', 'auteur'];
+      return order
+        .map((p) => {
+          const meta = PLAN_META[p];
+          const items = filtered.filter((t) => t.plan === p);
+          return {
+            key: p,
+            label: `Forfait ${meta.label}`,
+            emoji: p === 'debutant' ? '🌱' : p === 'expert' ? '⚡' : '👑',
+            accent: meta.color,
+            items,
+          };
+        })
+        .filter((s) => s.items.length > 0);
     }
-    return map;
-  }, [filtered]);
+    return V2_TOOL_CATEGORIES
+      .map((cat) => ({
+        key: cat.id,
+        label: cat.label,
+        emoji: cat.emoji,
+        accent: AMBER,
+        items: filtered.filter((t) => t.category === cat.id),
+      }))
+      .filter((s) => s.items.length > 0);
+  }, [filtered, groupBy]);
 
   const badgeStyle = (badge?: string) => {
     if (badge === 'Populaire') return { background: '#e8f7ef', color: '#0b6e4c', border: '1px solid #0f8a5f55' };
