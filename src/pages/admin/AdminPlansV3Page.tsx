@@ -165,6 +165,31 @@ export default function AdminPlansV3Page() {
           </CardContent>
         </Card>
 
+        <Card className="border-2 border-teal-500/50 bg-teal-50/30">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              📕 Couverture haut de gamme — À intégrer sur les 3 forfaits
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            <p className="font-medium">
+              Objectif : livrer sur Débutant, Expert et Auteur une couverture professionnelle
+              prête pour KDP, avec les 3 faces générées à partir des infos du livre.
+            </p>
+            <ul className="ml-5 list-disc space-y-1 text-muted-foreground">
+              <li><strong>Recto (1re de couverture)</strong> — titre, sous-titre, nom d'auteur, visuel IA haut de gamme.</li>
+              <li><strong>Tranche (dos)</strong> — calcul auto largeur selon nb de pages × facteur papier, titre + auteur verticaux.</li>
+              <li><strong>Verso (4e de couverture)</strong> — résumé, bio courte, réserve code-barres ISBN, logo/tag optionnel.</li>
+              <li><strong>Marges & bleed KDP</strong> — 0,125" fond perdu, safe zone 0,25", export PDF 300 DPI unit=in.</li>
+              <li><strong>Infos livre injectées</strong> — titre, sous-titre, auteur, genre, résumé, format trim, nb pages, type papier.</li>
+              <li><strong>Différenciation forfaits</strong> — Débutant/Expert = wrap PDF base, Auteur = Cover Studio Pro (P23) avec direction artistique IA + variations illimitées.</li>
+            </ul>
+            <p className="text-xs text-muted-foreground">
+              Base technique déjà en place : <code>KdpCoverStudio</code>, <code>generateKdpCoverPdf</code>, edge <code>generate-premium-cover</code> (gpt-image-2 + Gemini). À câbler dans le wizard V3 étape « Couverture » pour les 3 plans.
+            </p>
+          </CardContent>
+        </Card>
+
         <Card className="border-dashed border-amber-500/50 bg-amber-50/30">
           <CardHeader>
             <CardTitle>Tarifs à définir</CardTitle>
