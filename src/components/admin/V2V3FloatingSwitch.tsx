@@ -27,15 +27,19 @@ export function V2V3FloatingSwitch() {
       toast.success('Bascule vers la V3', {
         description: 'Ouverture du Hub V3 (mode admin).',
         icon: '👑',
+        position: 'top-center',
+        duration: 3500,
+        style: { zIndex: 99999 },
       });
       navigate('/hub-v3');
     } else {
-      // Retour V2 : éviter qu'un ancien onglet sauvegardé (ex: "admin")
-      // renvoie immédiatement hors du générateur.
       resetV2PlannerEntryPoint();
       toast.success('Retour à la V2', {
         description: 'Générateur V2 — onglet Workflow.',
         icon: '✨',
+        position: 'top-center',
+        duration: 3500,
+        style: { zIndex: 99999 },
       });
       navigate('/ebook-planner?tab=workflow-dashboard', { replace: true });
     }
