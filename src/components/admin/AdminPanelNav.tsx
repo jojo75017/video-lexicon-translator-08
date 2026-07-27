@@ -1,4 +1,4 @@
-import { BarChart3, BookOpen, Contact, FileText, Gauge, Mail, Megaphone, MessageSquare, Shield, Table, Ticket, TrendingUp, User, Users, BookMarked } from 'lucide-react';
+import { BarChart3, BookOpen, Contact, FileText, Gauge, Mail, Megaphone, MessageSquare, Rocket, Shield, Table, Ticket, TrendingUp, User, Users, BookMarked } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -52,10 +52,16 @@ export function AdminPanelNav({ className }: AdminPanelNavProps) {
           </h2>
         </div>
 
-        <Button type="button" onClick={() => navigate('/ebook-planner')} className="rounded-xl">
-          <BookOpen className="mr-2 h-4 w-4" />
-          Retour au générateur
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button type="button" variant="outline" onClick={() => navigate('/v3')} className="rounded-xl border-teal-500 text-teal-700 hover:bg-teal-50">
+            <Rocket className="mr-2 h-4 w-4" />
+            Ouvrir V3
+          </Button>
+          <Button type="button" onClick={() => navigate('/ebook-planner')} className="rounded-xl">
+            <BookOpen className="mr-2 h-4 w-4" />
+            Retour au générateur
+          </Button>
+        </div>
       </div>
 
       <div className="mt-3 overflow-x-auto">
