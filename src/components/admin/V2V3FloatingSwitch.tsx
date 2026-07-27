@@ -17,10 +17,9 @@ export function V2V3FloatingSwitch() {
     if (next) {
       navigate('/hub-v3');
     } else {
-      // Repasser en V2 : quitter toute route /v3/* pour éviter de rester bloqué
-      if (typeof window !== 'undefined' && window.location.pathname.startsWith('/v3')) {
-        navigate('/');
-      }
+      // Retour V2 : forcer la sortie de toute route /v3/* et /hub-v3
+      // et atterrir directement sur le générateur V2.
+      navigate('/ebook-planner');
     }
   };
 
