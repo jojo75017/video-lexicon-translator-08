@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ExternalLink } from 'lucide-react';
+import { Search, ExternalLink, Lock, Check } from 'lucide-react';
 import {
   V2_TOOLS,
   V2_TOOL_CATEGORIES,
   type V2ToolCategory,
 } from '@/data/v2ToolsRegistry';
+import { planForTool, PLAN_META, isUnlockedForPlan, type V3Plan } from '@/data/v3ToolPlans';
 
 const AMBER = '#E8951E';
 const AMBER_DEEP = '#C97A14';
@@ -14,6 +15,7 @@ const INK = '#2A2118';
 const SERIF = "'Instrument Serif', Georgia, 'Times New Roman', serif";
 
 type Filter = 'all' | V2ToolCategory;
+type PlanView = V3Plan;
 
 /**
  * Onglet « Outils V2 » : launcher unifié qui affiche tous les outils
