@@ -187,15 +187,15 @@ const V3AllToolsTab = () => {
           Aucun outil ne correspond à « {query} ».
         </div>
       ) : (
-        V2_TOOL_CATEGORIES.filter((c) => grouped.has(c.id)).map((cat) => {
-          const items = grouped.get(cat.id)!;
+        sections.map((sec) => {
+          const items = sec.items;
           return (
-            <section key={cat.id} className="mb-8">
+            <section key={sec.key} className="mb-8">
               <div className="flex items-center gap-3 mb-3">
-                <span className="text-xl">{cat.emoji}</span>
-                <h2 className="text-lg font-bold" style={{ fontFamily: SERIF, color: INK }}>{cat.label}</h2>
+                <span className="text-xl">{sec.emoji}</span>
+                <h2 className="text-lg font-bold" style={{ fontFamily: SERIF, color: INK }}>{sec.label}</h2>
                 <span className="text-xs" style={{ color: '#b29a72' }}>{items.length}</span>
-                <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, ${AMBER}44, transparent)` }} />
+                <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, ${sec.accent}44, transparent)` }} />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                 {items.map((t) => {
