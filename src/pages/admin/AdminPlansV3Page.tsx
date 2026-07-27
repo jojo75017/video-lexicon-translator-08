@@ -174,6 +174,8 @@ export default function AdminPlansV3Page() {
 
         <KdpPilotTiersMatrix />
 
+        <V3ToolsPlanMatrix />
+
         <Card className="border-2 border-teal-500/50 bg-teal-50/30">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
