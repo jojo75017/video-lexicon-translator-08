@@ -98,8 +98,20 @@ export default function V3HomePage() {
             {/* Social proof */}
             <div className="mt-8 flex items-center justify-center lg:justify-start gap-3">
               <div className="flex -space-x-2">
-                {['#064e3b', '#0d7a5f', '#c9a84c', '#b0902f', '#064e3b'].map((c, i) => (
-                  <div key={i} className="w-8 h-8 rounded-full border-2 border-white" style={{ background: c }} />
+                {[
+                  'https://randomuser.me/api/portraits/women/68.jpg',
+                  'https://randomuser.me/api/portraits/men/32.jpg',
+                  'https://randomuser.me/api/portraits/women/44.jpg',
+                  'https://randomuser.me/api/portraits/men/75.jpg',
+                  'https://randomuser.me/api/portraits/women/12.jpg',
+                ].map((src, i) => (
+                  <img
+                    key={i}
+                    src={src}
+                    alt={`Auteur ${i + 1}`}
+                    loading="lazy"
+                    className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm"
+                  />
                 ))}
               </div>
               <div className="flex items-center gap-0.5" style={{ color: 'var(--v3-gold)' }}>
