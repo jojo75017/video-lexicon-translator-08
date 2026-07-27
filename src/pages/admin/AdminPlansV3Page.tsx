@@ -20,7 +20,7 @@ const planRows: PlanRow[] = [
   { letter: "D", domain: "Dashboard / Hub V3", debutant: "✅", expert: "✅", auteur: "✅ + Studio Pro" },
   { letter: "E", domain: "Édition / Passe éditoriale", debutant: "Correction base", expert: "Lissage IA", auteur: "Passe multi-agent Pro (P24)" },
   { letter: "F", domain: "Formatage & Export", debutant: "PDF/DOCX/EPUB + TOC", expert: "Templates KDP standard", auteur: "Templates premium + KDP print-ready" },
-  { letter: "G", domain: "Génération de couverture", debutant: "Cover Base 5 var./mois", expert: "Cover Base 20 var./mois", auteur: "Cover Studio Pro (P23)" },
+  { letter: "G", domain: "Génération de couverture HAUT DE GAMME (recto + tranche + 4e)", debutant: "Wrap PDF pro · 5 var./mois", expert: "Wrap PDF pro · 20 var./mois + variantes", auteur: "Cover Studio Pro (P23) illimité + DA IA" },
   { letter: "H", domain: "Historique / Versioning", debutant: "5 versions", expert: "20 versions", auteur: "Illimité + comparateur" },
   { letter: "I", domain: "Import de manuscrit", debutant: "3/mois", expert: "15/mois", auteur: "Illimité + reformatage IA" },
   { letter: "J", domain: "Journal IA & Clés BYOK", debutant: "Multi-clés Gemini", expert: "Multi-clés Gemini", auteur: "Gemini + OpenAI/Claude/DeepSeek" },
