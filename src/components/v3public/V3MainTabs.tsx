@@ -1,124 +1,187 @@
-import { Link, NavLink } from 'react-router-dom';
-import {
-  BookOpen, PenLine, Palette, Rocket, Heart, Search, Users, Layers,
-  LayoutDashboard, FileText, Upload, FolderOpen, GraduationCap, LayoutGrid,
-} from 'lucide-react';
-import { SPECIAL_BOOK_TABS } from '@/data/specialBookTabs';
+import { useEffect, useRef, useState } from 'react';
+import { Link, NavLink, useLocation } from 'react-router-dom';
+import { ChevronDown, LayoutGrid, Menu, X } from 'lucide-react';
+import { V3_HEADER_MENU, type MenuCategory } from '@/data/v3HeaderMenu';
 
-/** Onglets principaux V3 — style Vivlio */
-const PRIMARY_TABS = [
-  { to: '/v3/create',       label: 'Plan',       emoji: '📘' },
-  { to: '/ebook-planner',   label: 'Écrire',     emoji: '✍️' },
-  { to: '/couverture-kdp',  label: 'Habiller',   emoji: '🎨' },
-  { to: '/audit-pilot',     label: 'Publier',    emoji: '🚀' },
-  { to: '/v3/gallery',      label: 'Vendre',     emoji: '💛' },
-  { to: '/kdp-keywords',    label: 'Audit ASIN', icon: Search },
-  { to: '/v3/auteur',       label: 'Communauté', icon: Users, badge: 'NEW' },
-  { to: '/niches-600',      label: '600 Niches', icon: Layers, badge: 'NEW' },
-];
-
-/** Ligne 2 : accès rapide */
-const QUICK_TOOLS = [
-  { to: '/kdp-keywords',      label: 'Mots-clés Amazon (KDSpy)', icon: Search, emoji: '🔍' },
-  { to: '/v3/hub',            label: 'Tableau de bord IA',        icon: LayoutDashboard },
-  { to: '/v3/create',         label: 'Plan du livre',             icon: BookOpen },
-  { to: '/v3/create?step=3',  label: 'Personnages',               icon: Users },
-  { to: '/fiches-pratiques',  label: 'Modèles',                   icon: FileText },
-  { to: '/v3/create?import=1', label: 'Importer un doc',          icon: Upload },
-  { to: '/v3/library',        label: 'Mes projets',               icon: FolderOpen },
-  { to: '/blog',              label: 'Guides',                    icon: GraduationCap },
-];
-
-const SPECIAL_BOOK_EMOJIS: Record<string, string> = {
-  roman: '📖',
-  cuisine: '🍳',
-  voyage: '🧭',
-  coloriage: '🖍️',
-  bd: '💥',
-  documentaire: '🎬',
-  atlas: '🗺️',
-  encyclopedie: '📚',
-  agenda: '📅',
-  journal: '📝',
-  scolaire: '🎓',
-  aquariophilie: '🐠',
-  oiseaux: '🐦',
-  saga: '✨',
-};
-
+/**
+ * V3 mega-menu principal — 1 seule ligne de catégories, chacune ouvre un panneau
+ * de sous-catégories au hover (desktop) ou click (mobile).
+ */
 export default function V3MainTabs() {
-  const tabCls = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center gap-1.5 px-3 py-2 rounded-full text-[13px] font-medium whitespace-nowrap transition-colors ${
-      isActive
-        ? 'bg-[var(--v3-orange)] text-white'
-        : 'text-[var(--v3-ink)] hover:bg-[var(--v3-orange-50)] hover:text-[var(--v3-orange-600)]'
-    }`;
+  const [openKey, setOpenKey] = useState<string | null>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const closeTimer = useRef<number | null>(null);
+  const { pathname, search } = useLocation();
+
+  const scheduleClose = () => {
+    if (closeTimer.current) window.clearTimeout(closeTimer.current);
+    closeTimer.current = window.setTimeout(() => setOpenKey(null), 150);
+  };
+  const cancelClose = () => {
+    if (closeTimer.current) window.clearTimeout(closeTimer.current);
+  };
+
+  // Ferme au changement de route
+  useEffect(() => {
+    setOpenKey(null);
+    setMobileOpen(false);
+  }, [pathname, search]);
+
+  const isCatActive = (cat: MenuCategory) =>
+    cat.links.some((l) => {
+      const [p] = l.to.split('?');
+      return pathname === p || (p.length > 1 && pathname.startsWith(p + '/'));
+    });
 
   return (
-    <div className="border-t border-black/5 bg-white/85 backdrop-blur">
-      {/* Ligne principale — wrap, pas d'ascenseur horizontal */}
-      <div className="max-w-7xl mx-auto px-5 md:px-8 py-2 flex flex-wrap items-center gap-1.5">
-        {PRIMARY_TABS.map((t) => (
-          <NavLink key={t.to + t.label} to={t.to} className={tabCls} end>
-            {t.emoji ? <span>{t.emoji}</span> : t.icon ? <t.icon className="w-4 h-4" /> : null}
-            <span>{t.label}</span>
-            {t.badge && (
-              <span className="ml-1 text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-emerald-500 text-white">
-                {t.badge}
-              </span>
-            )}
-          </NavLink>
-        ))}
+    <div className="sticky top-16 z-30 border-t border-b border-black/5 bg-white/90 backdrop-blur">
+      <div className="max-w-7xl mx-auto px-5 md:px-8 h-12 flex items-center gap-1">
+        {/* Desktop */}
+        <nav className="hidden md:flex items-center gap-1 flex-1">
+          {V3_HEADER_MENU.map((cat) => {
+            const active = openKey === cat.key || isCatActive(cat);
+            return (
+              <div
+                key={cat.key}
+                className="relative"
+                onMouseEnter={() => { cancelClose(); setOpenKey(cat.key); }}
+                onMouseLeave={scheduleClose}
+              >
+                <button
+                  type="button"
+                  onClick={() => setOpenKey((k) => (k === cat.key ? null : cat.key))}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[13px] font-medium transition-colors"
+                  style={
+                    active
+                      ? { background: cat.color, color: '#fff' }
+                      : { color: 'var(--v3-ink)' }
+                  }
+                  onMouseOver={(e) => {
+                    if (!active) (e.currentTarget as HTMLElement).style.background = 'rgba(0,0,0,0.04)';
+                  }}
+                  onMouseOut={(e) => {
+                    if (!active) (e.currentTarget as HTMLElement).style.background = '';
+                  }}
+                >
+                  <span aria-hidden>{cat.emoji}</span>
+                  <span>{cat.label}</span>
+                  <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+                </button>
 
+                {openKey === cat.key && (
+                  <div
+                    className="absolute left-0 top-full pt-2"
+                    onMouseEnter={cancelClose}
+                    onMouseLeave={scheduleClose}
+                  >
+                    <div
+                      className="min-w-[280px] max-w-[380px] rounded-xl border border-black/10 bg-white shadow-xl p-2"
+                      style={{ borderTopColor: cat.color, borderTopWidth: 3 }}
+                    >
+                      <ul className="grid grid-cols-1 gap-0.5">
+                        {cat.links.map((l) => (
+                          <li key={l.to + l.label}>
+                            <NavLink
+                              to={l.to}
+                              className="flex items-start gap-2 rounded-md px-3 py-2 text-[13px] text-[var(--v3-ink)] hover:bg-black/5 transition-colors"
+                            >
+                              <span className="flex-1 min-w-0">
+                                <span className="font-medium flex items-center gap-1.5">
+                                  {l.label}
+                                  {l.badge && (
+                                    <span
+                                      className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-full text-white"
+                                      style={{ background: cat.color }}
+                                    >
+                                      {l.badge}
+                                    </span>
+                                  )}
+                                </span>
+                                {l.desc && (
+                                  <span className="block text-[11px] text-[var(--v3-muted)] mt-0.5">
+                                    {l.desc}
+                                  </span>
+                                )}
+                              </span>
+                            </NavLink>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          <div className="ml-auto">
+            <Link
+              to="/v3/outils"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold border border-[var(--v3-orange)] bg-[var(--v3-orange)] text-white hover:bg-[var(--v3-orange-600)] transition-colors"
+            >
+              <LayoutGrid className="w-4 h-4" />
+              Tous les outils
+            </Link>
+          </div>
+        </nav>
+
+        {/* Mobile trigger */}
+        <button
+          onClick={() => setMobileOpen((o) => !o)}
+          className="md:hidden flex items-center gap-2 px-3 py-2 rounded-md text-[13px] font-medium text-[var(--v3-ink)] hover:bg-black/5"
+          aria-label="Ouvrir le menu"
+        >
+          {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+          Menu
+        </button>
         <Link
           to="/v3/outils"
-          className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap border border-[var(--v3-orange)] bg-[var(--v3-orange)] text-white hover:bg-[var(--v3-orange-600)] transition-colors"
+          className="md:hidden ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold border border-[var(--v3-orange)] bg-[var(--v3-orange)] text-white"
         >
-          <LayoutGrid className="w-4 h-4" />
-          Tous les outils
+          <LayoutGrid className="w-3.5 h-3.5" />
+          Outils
         </Link>
       </div>
 
-      {/* Ligne 2 — accès rapide (wrap aussi) */}
-      <div className="border-t border-black/5">
-        <div className="max-w-7xl mx-auto px-5 md:px-8 py-1.5 flex flex-wrap items-center gap-1">
-          {QUICK_TOOLS.map((q) => (
-            <Link
-              key={q.label}
-              to={q.to}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[12px] text-[var(--v3-muted)] hover:text-[var(--v3-orange-600)] hover:bg-[var(--v3-orange-50)] whitespace-nowrap transition-colors"
-            >
-              {q.emoji ? <span>{q.emoji}</span> : <q.icon className="w-3.5 h-3.5" />}
-              <span>{q.label}</span>
-            </Link>
-          ))}
+      {/* Panneau mobile — accordéons */}
+      {mobileOpen && (
+        <div className="md:hidden border-t border-black/5 bg-white max-h-[70vh] overflow-y-auto">
+          <div className="px-4 py-3 space-y-2">
+            {V3_HEADER_MENU.map((cat) => (
+              <details key={cat.key} className="rounded-lg border border-black/10">
+                <summary
+                  className="flex items-center gap-2 px-3 py-2 cursor-pointer text-[13px] font-semibold"
+                  style={{ color: cat.color }}
+                >
+                  <span>{cat.emoji}</span>
+                  <span className="flex-1">{cat.label}</span>
+                  <ChevronDown className="w-4 h-4 opacity-60" />
+                </summary>
+                <ul className="px-2 pb-2 space-y-0.5">
+                  {cat.links.map((l) => (
+                    <li key={l.to + l.label}>
+                      <NavLink
+                        to={l.to}
+                        className="block px-3 py-2 rounded-md text-[13px] text-[var(--v3-ink)] hover:bg-black/5"
+                      >
+                        {l.label}
+                        {l.badge && (
+                          <span
+                            className="ml-2 text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-full text-white"
+                            style={{ background: cat.color }}
+                          >
+                            {l.badge}
+                          </span>
+                        )}
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            ))}
+          </div>
         </div>
-      </div>
-
-      {/* Ligne 3 — livres spéciaux V3 */}
-      <div className="border-t border-black/5 bg-[var(--v3-orange-50)]/60">
-        <div className="max-w-7xl mx-auto px-5 md:px-8 py-1.5 flex flex-wrap items-center gap-1">
-          <span className="mr-1 text-[11px] font-bold uppercase tracking-wider text-[var(--v3-orange-600)]">
-            Livres spéciaux
-          </span>
-          {SPECIAL_BOOK_TABS.map((tab) => (
-            <NavLink
-              key={tab.slug}
-              to={`/v3/livres/${tab.slug}`}
-              className={({ isActive }) =>
-                `flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[12px] font-medium whitespace-nowrap transition-colors ${
-                  isActive
-                    ? 'bg-[var(--v3-ink)] text-white'
-                    : 'text-[var(--v3-ink)] hover:bg-white hover:text-[var(--v3-orange-600)]'
-                }`
-              }
-            >
-              <span>{SPECIAL_BOOK_EMOJIS[tab.slug] ?? '📘'}</span>
-              <span>{tab.label}</span>
-            </NavLink>
-          ))}
-        </div>
-      </div>
+      )}
     </div>
   );
 }

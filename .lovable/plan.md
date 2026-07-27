@@ -1,62 +1,91 @@
-# Plan V3 — 3 forfaits abonnement par nombre d'agents
-
 ## Objectif
-Transformer l'offre V3 actuelle (one-time Base/Pro) en 3 forfaits d'abonnement clairs : **18 agents**, **22 agents**, **30 agents**, chacun avec un quota mensuel de livres, des tarifs mensuels et annuels cohérents, et un accès immédiat par abonnement Stripe.
 
-## Grille proposée
+Refaire un header V3 clair, propre et hiérarchisé, avec **catégories principales + sous-catégories au survol (mega-menu)**, et supprimer les doublons avec la barre latérale (notamment "Livres spéciaux").
 
-| Forfait | Agents | Livres/mois | Chapitres max | Mots/ch | Tarif mensuel | Tarif annuel | Économie |
-|---|---|---|---|---|---|---|---|
-| **Débutant** | 18 | 20 | 20 | 3 500 | 9,99 € | 97 € | ~19 % |
-| **Expert** | 22 | 50 | 40 | 5 000 | 12,99 € | 117 € | ~25 % |
-| **Auteur** | 30 | Illimité | 60 | 8 000 | 59 € | 547 € | ~23 % |
+## Nouveau header — 2 lignes seulement
 
-Les modules Pro (Cover Studio Pro, KDP Pilot Pro, Sélection éditeurs, Amazon Spy, Audiobook, BD Studio) restent réservés au forfait **Auteur**.
+### Ligne 1 — Barre de marque (fine, sobre)
+```text
+[Logo ebookstudio V3]   [Recherche outils…]        [Passer V2] [Compte] [S'abonner]
+```
 
----
+### Ligne 2 — Menu principal (6 catégories, chacune avec sous-menu déroulant)
 
-## Étape 1 — Refonte de la source unique et de l'admin
+```text
+📘 Créer ▾   ✍️ Écrire ▾   🎨 Habiller ▾   🚀 Publier ▾   💛 Vendre ▾   📚 Livres spéciaux ▾
+                                                                          [ Tous les outils ]
+```
 
-- Mettre à jour `src/data/v3Pricing.ts` avec les 3 plans, leurs quotas, leurs agents et leurs prix.
-- Actualiser la page admin `/admin/plans-v3` pour afficher la nouvelle grille et les tarifs mensuel/annuel.
-- Nettoyer les anciennes offres one-time (`V3_OFFERS` Base 197 € / Pro 347 €) pour ne plus les présenter comme le parcours par défaut.
-- Créer un objet `V3Plan` et les helpers (`priceId`, `économie annuelle`) pour être utilisé partout dans l'app.
+Chaque catégorie ouvre un **panneau (mega-menu)** au hover/click, avec ses sous-catégories groupées :
 
-**Livrable :** une page admin claire qui reflète la nouvelle stratégie et un fichier de données unique, prêt à être branché sur le checkout.
+**📘 Créer**
+- Plan du livre → `/v3/create`
+- Personnages → `/v3/create?step=3`
+- Importer un document → `/v3/create?import=1`
+- Modèles / Templates → `/fiches-pratiques`
+- Sommaire ultime → `/v3/outils/sommaire-ultime`
 
----
+**✍️ Écrire**
+- Générateur V2 (Écrire) → `/ebook-planner`
+- Parcours 30 agents → `/v3/hub?tab=parcours`
+- Outils V3 → `/v3/hub?tab=outils`
+- BookPerfect AI → `/v3/hub?tab=bookperfect`
+- Assistant IA → `/v3/hub?tab=assistant`
 
-## Étape 2 — Création des produits Stripe et du pipeline d'abonnement
+**🎨 Habiller**
+- Couverture KDP Studio → `/couverture-kdp`
+- Cover Studio Pro V3 → `/v3/hub?tab=cover-pro`
+- Illustrations intérieures → `/v3/outils/illustrations`
+- Documentation Studio → `/v3/hub?tab=documentation`
 
-- Créer les 3 produits Stripe et leurs 6 prix (mensuel + annuel) via les ID pérennes :
-  - `debutant_monthly` / `debutant_yearly`
-  - `expert_monthly` / `expert_yearly`
-  - `auteur_monthly` / `auteur_yearly`
-- Vérifier que la fonction `v3-subscription-checkout` résout bien ces prix via `lookup_key` et crée des sessions `mode: "subscription"` avec `ui_mode: "embedded_page"`.
-- S'assurer que `payments-webhook` écoute les événements `customer.subscription.created`, `updated`, `deleted` et écrit dans la table `subscriptions` (avec la bonne colonne `environment` et le `price_id` lisible).
+**🚀 Publier**
+- KDP Pilot / Audit → `/audit-pilot`
+- Mots-clés Amazon (KDSpy) → `/kdp-keywords`
+- 600 Niches → `/niches-600`
+- Amazon Spy → `/v3/outils/amazon-spy`
+- Export livre → `/v3/hub?tab=export`
 
-**Livrable :** un flux de paiement abonnement fonctionnel en sandbox, avec webhook actif et stockage fiable des abonnements.
+**💛 Vendre**
+- Galerie communauté → `/v3/gallery`
+- Ma page auteur → `/v3/auteur`
+- Signature email → `/v3/outils/signature`
+- Marketing / Emails → `/v3/hub?tab=marketing`
 
----
+**📚 Livres spéciaux** (les 14 slugs de `specialBookTabs.ts`)
+- Roman · Cuisine · Voyage · Coloriage · BD / Manga · Documentaire · Atlas · Encyclopédie · Agenda · Journal · Scolaire · Aquariophilie · Fiches oiseaux · Saga multi-tomes
 
-## Étape 3 — Câblage du parcours client et des droits d'accès
+Bouton final compact **"Tous les outils"** → `/v3/outils` (grille complète, cherchable).
 
-- Créer une page publique d'offres V3 (`/offres-v3`) présentant les 3 cartes avec bascule mensuel/annuel et économie affichée.
-- Remplacer le formulaire one-time `V3OrderForm.tsx` par un checkout d'abonnement (Stripe Embedded Checkout) qui passe le `priceId` et le `userId` à `v3-subscription-checkout`.
-- Mettre à jour `useV3Entitlement.ts` pour détecter un abonnement actif dans `subscriptions` (et non plus seulement dans `v3_installment_orders`), en filtrant par `environment` et `status`.
-- Adapter `V3Gate` / `SubscriberGate` pour autoriser les utilisateurs avec un abonnement V3 actif (Débutant, Expert ou Auteur).
-- Afficher le plan actuel dans le hub V3 et ajouter un lien « Gérer mon abonnement » vers le portail client Stripe.
+## Suppression des doublons avec la sidebar
 
-**Livrable :** un utilisateur peut choisir un plan, payer, accéder au hub V3, et son abonnement est vérifié côté serveur à chaque accès.
+La sidebar `V3Sidebar.tsx` conserve UNIQUEMENT ce qui n'est pas dans le header :
+- Accueil / Tableau de bord / Ma bibliothèque / Mes livres
+- Formation & Guides (Formation vidéo, Blog, Script vidéo, Guides Hub)
+- Communauté (Galerie, Page auteur) *(gardés — accès rapide)*
+- Support (Contact, FAQ, Assistance)
+- Compte (Paramètres, Abonnement, Passer V2)
 
----
+À retirer de la sidebar :
+- **Toute la section "Livres spéciaux"** (déplacée dans le header)
+- Les entrées Outils V3 / Tous les outils / BookPerfect / Export (déjà dans header)
 
-## Hors périmètre de ce plan (à traiter ensuite)
+## Comportement UX
 
-- Migration des anciens clients one-time (Base/Pro) : ils conservent leur accès via un flag legacy ou une migration manuelle.
-- Upsells séparés (BookPerfect, Pack Sérénité) : restent des achats one-time à côté des abonnements.
-- Résiliation/upgrade/downgrade automatique : portail Stripe gère la résiliation ; l'upgrade sera traité dans un second temps.
+- Desktop : sous-menus au **hover** avec petit délai + fermeture au click à l'extérieur.
+- Mobile : le header se replie en **menu hamburger** avec accordéons par catégorie.
+- Onglet actif : pastille couleur de la catégorie (garde le codage : orange = Écrire/Créer, violet = Livres spéciaux, teal = Publier, etc.).
+- Aucun scroll horizontal, aucune ligne 3 additionnelle.
+- Badges "NEW" petits, à droite du label dans le sous-menu.
 
----
+## Fichiers impactés
 
-**Validation :** une fois ces 3 étapes terminées, on teste un paiement sandbox sur chaque plan (Débutant mensuel, Expert annuel, Auteur mensuel) et on vérifie que l'accès au hub V3 s'ouvre bien après le retour de paiement.
+- `src/components/v3public/V3MainTabs.tsx` → refonte complète en `V3Header` mega-menu (2 lignes).
+- `src/components/v3public/V3Header.tsx` → devient la ligne 1 (marque + recherche + actions).
+- `src/components/v3public/V3PublicLayout.tsx` → n'affiche plus les 3 lignes actuelles.
+- `src/components/v3public/V3Sidebar.tsx` → suppression du groupe "Livres spéciaux" + dédoublonnage Hub.
+- `src/data/v3HeaderMenu.ts` *(nouveau)* → source unique des catégories + sous-catégories.
+- Mobile : petit composant `V3HeaderMobile.tsx` avec accordéons.
+
+## Validation
+
+- Vérifier via Playwright sur `/v3` : header 2 lignes, hover sur chaque catégorie ouvre le bon panneau, tous les liens répondent, aucune duplication avec sidebar, mobile OK à 375px.
