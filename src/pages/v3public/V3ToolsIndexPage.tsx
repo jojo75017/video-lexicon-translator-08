@@ -1,26 +1,47 @@
 import { Link, useSearchParams } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import { V2_TOOLS, V2_TOOL_CATEGORIES } from '@/data/v2ToolsRegistry';
-import { Search, ArrowRight } from 'lucide-react';
+import { planForTool, PLAN_META, type V3Plan } from '@/data/v3ToolPlans';
+import { Search, ArrowRight, Lock, Check } from 'lucide-react';
+
+type PlanParam = V3Plan | 'all' | null;
 
 /**
  * Index premium de tous les outils EbookStudio V3.
  * Style Émeraude Prestige : fond papier, cartes blanches, badges or.
  */
 export default function V3ToolsIndexPage() {
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const initial = params.get('q') ?? '';
+  const planParam = (params.get('plan') as PlanParam) ?? null;
   const [q, setQ] = useState(initial);
   const [activeCat, setActiveCat] = useState<string | null>(null);
+  const [activePlan, setActivePlan] = useState<PlanParam>(planParam);
 
   useEffect(() => {
     setQ(initial);
   }, [initial]);
 
+  useEffect(() => {
+    setActivePlan(planParam);
+  }, [planParam]);
+
+  const setPlan = (p: PlanParam) => {
+    setActivePlan(p);
+    const next = new URLSearchParams(params);
+    if (p) next.set('plan', p);
+    else next.delete('plan');
+    setParams(next, { replace: true });
+  };
+
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
     let list = V2_TOOLS;
     if (activeCat) list = list.filter((t) => t.category === activeCat);
+    if (activePlan && activePlan !== 'all') {
+      const rank = { debutant: 0, expert: 1, auteur: 2 } as const;
+      list = list.filter((t) => rank[planForTool(t)] <= rank[activePlan]);
+    }
     if (s) {
       list = list.filter(
         (t) =>
@@ -29,7 +50,10 @@ export default function V3ToolsIndexPage() {
       );
     }
     return list;
-  }, [q, activeCat]);
+  }, [q, activeCat, activePlan]);
+
+  const groupByPlan = activePlan === 'all';
+
 
   return (
     <div style={{ background: 'var(--v3-paper)' }} className="min-h-screen">
@@ -97,92 +121,169 @@ export default function V3ToolsIndexPage() {
               ))}
             </div>
           </div>
+
+          {/* Plan sub-tabs */}
+          <div className="mt-5 flex flex-wrap items-center gap-2">
+            <span className="text-[11px] uppercase tracking-wider font-semibold" style={{ color: 'var(--v3-muted)' }}>
+              Par forfait :
+            </span>
+            <button
+              onClick={() => setPlan(null)}
+              className="px-3 py-1.5 rounded-full text-[12px] font-semibold transition"
+              style={activePlan === null
+                ? { background: 'var(--v3-emerald)', color: '#fff' }
+                : { background: '#fff', color: 'var(--v3-ink)', border: '1px solid var(--v3-line)' }}
+            >
+              Tous
+            </button>
+            {(['debutant', 'expert', 'auteur'] as const).map((p) => {
+              const meta = PLAN_META[p];
+              const active = activePlan === p;
+              return (
+                <button
+                  key={p}
+                  onClick={() => setPlan(p)}
+                  className="px-3 py-1.5 rounded-full text-[12px] font-semibold transition"
+                  style={active
+                    ? { background: meta.color, color: '#fff', borderColor: meta.color }
+                    : { background: meta.bg, color: meta.color, border: `1px solid ${meta.border}` }}
+                >
+                  {p === 'debutant' && '🌱 '}
+                  {p === 'expert' && '⚡ '}
+                  {p === 'auteur' && '👑 '}
+                  {meta.short}
+                </button>
+              );
+            })}
+            <button
+              onClick={() => setPlan('all')}
+              className="px-3 py-1.5 rounded-full text-[12px] font-semibold transition"
+              style={activePlan === 'all'
+                ? { background: 'var(--v3-gold-600)', color: '#fff' }
+                : { background: '#fff', color: 'var(--v3-gold-600)', border: '1px solid var(--v3-line)' }}
+            >
+              Comparer les 3
+            </button>
+          </div>
         </div>
       </section>
 
+
       {/* Content */}
       <div className="max-w-7xl mx-auto px-5 md:px-8 py-10">
-        {V2_TOOL_CATEGORIES.map((cat) => {
-          const tools = filtered.filter((t) => t.category === cat.id);
-          if (tools.length === 0) return null;
-          return (
-            <section key={cat.id} className="mb-12">
-              <div className="flex items-baseline gap-3 mb-4">
-                <h2 className="v3-serif text-[22px] font-semibold" style={{ color: 'var(--v3-emerald)' }}>
-                  <span className="mr-2">{cat.emoji}</span>
-                  {cat.label}
-                </h2>
-                <span className="text-[12px]" style={{ color: 'var(--v3-muted)' }}>
-                  {tools.length} outil{tools.length > 1 ? 's' : ''}
-                </span>
-                <div className="flex-1 h-px ml-2" style={{ background: 'var(--v3-line)' }} />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {tools.map((tool) => {
-                  const Icon = tool.icon;
-                  const img = tool.image ?? cat.image;
-                  return (
-                    <Link
-                      key={tool.id}
-                      to={tool.route}
-                      className="group relative flex flex-col overflow-hidden rounded-2xl bg-white transition-all"
-                      style={{
-                        border: '1px solid var(--v3-line)',
-                        boxShadow: '0 1px 2px rgba(6,78,59,0.03)',
-                      }}
-                      onMouseOver={(e) => {
-                        const el = e.currentTarget as HTMLElement;
-                        el.style.borderColor = 'rgba(201,168,76,0.5)';
-                        el.style.boxShadow = 'var(--v3-shadow-card)';
-                        el.style.transform = 'translateY(-2px)';
-                      }}
-                      onMouseOut={(e) => {
-                        const el = e.currentTarget as HTMLElement;
-                        el.style.borderColor = 'var(--v3-line)';
-                        el.style.boxShadow = '0 1px 2px rgba(6,78,59,0.03)';
-                        el.style.transform = '';
-                      }}
-                    >
-                      <div className="relative h-32 overflow-hidden">
-                        <img
-                          src={img}
-                          alt={tool.label}
-                          loading="lazy"
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                        <div
-                          className="absolute inset-0"
-                          style={{ background: 'linear-gradient(180deg, rgba(6,78,59,0) 40%, rgba(6,78,59,0.55) 100%)' }}
-                        />
-                        <div
-                          className="absolute top-2 left-2 w-9 h-9 rounded-lg grid place-items-center backdrop-blur"
-                          style={{ background: 'rgba(255,255,255,0.9)' }}
-                        >
-                          <Icon className="w-4 h-4" style={{ color: 'var(--v3-emerald)' }} />
-                        </div>
-                        {tool.badge && (
-                          <span className="v3-badge absolute top-2 right-2 shrink-0">{tool.badge}</span>
-                        )}
-                      </div>
-                      <div className="p-4 flex-1 flex flex-col">
-                        <h3 className="font-semibold text-[13.5px] leading-snug" style={{ color: 'var(--v3-ink)' }}>
-                          {tool.label}
-                        </h3>
-                        <p className="text-[11.5px] mt-1 line-clamp-2 leading-snug flex-1" style={{ color: 'var(--v3-muted)' }}>
-                          {tool.description}
-                        </p>
-                        <div className="mt-3 flex items-center gap-1.5 text-[11.5px] font-semibold" style={{ color: 'var(--v3-gold-600)' }}>
-                          Ouvrir l'outil
-                          <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-                        </div>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </section>
-          );
-        })}
+        {(() => {
+          const renderCard = (tool: typeof V2_TOOLS[number], catImg?: string) => {
+            const Icon = tool.icon;
+            const img = tool.image ?? catImg;
+            const p = planForTool(tool);
+            const meta = PLAN_META[p];
+            return (
+              <Link
+                key={tool.id}
+                to={tool.route}
+                className="group relative flex flex-col overflow-hidden rounded-2xl bg-white transition-all"
+                style={{ border: '1px solid var(--v3-line)', boxShadow: '0 1px 2px rgba(6,78,59,0.03)' }}
+                onMouseOver={(e) => {
+                  const el = e.currentTarget as HTMLElement;
+                  el.style.borderColor = 'rgba(201,168,76,0.5)';
+                  el.style.boxShadow = 'var(--v3-shadow-card)';
+                  el.style.transform = 'translateY(-2px)';
+                }}
+                onMouseOut={(e) => {
+                  const el = e.currentTarget as HTMLElement;
+                  el.style.borderColor = 'var(--v3-line)';
+                  el.style.boxShadow = '0 1px 2px rgba(6,78,59,0.03)';
+                  el.style.transform = '';
+                }}
+              >
+                <div className="relative h-32 overflow-hidden">
+                  {img && (
+                    <img src={img} alt={tool.label} loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  )}
+                  <div className="absolute inset-0"
+                    style={{ background: 'linear-gradient(180deg, rgba(6,78,59,0) 40%, rgba(6,78,59,0.55) 100%)' }} />
+                  <div className="absolute top-2 left-2 w-9 h-9 rounded-lg grid place-items-center backdrop-blur"
+                    style={{ background: 'rgba(255,255,255,0.9)' }}>
+                    <Icon className="w-4 h-4" style={{ color: 'var(--v3-emerald)' }} />
+                  </div>
+                  <span className="absolute top-2 right-2 shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                    style={{ background: meta.bg, color: meta.color, border: `1px solid ${meta.border}` }}>
+                    {p === 'debutant' && '🌱 '}
+                    {p === 'expert' && '⚡ '}
+                    {p === 'auteur' && '👑 '}
+                    {meta.short}
+                  </span>
+                  {tool.badge && (
+                    <span className="v3-badge absolute bottom-2 right-2 shrink-0">{tool.badge}</span>
+                  )}
+                </div>
+                <div className="p-4 flex-1 flex flex-col">
+                  <h3 className="font-semibold text-[13.5px] leading-snug" style={{ color: 'var(--v3-ink)' }}>
+                    {tool.label}
+                  </h3>
+                  <p className="text-[11.5px] mt-1 line-clamp-2 leading-snug flex-1" style={{ color: 'var(--v3-muted)' }}>
+                    {tool.description}
+                  </p>
+                  <div className="mt-3 flex items-center gap-1.5 text-[11.5px] font-semibold" style={{ color: 'var(--v3-gold-600)' }}>
+                    Ouvrir l'outil
+                    <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                  </div>
+                </div>
+              </Link>
+            );
+          };
+
+          if (groupByPlan) {
+            return (['debutant', 'expert', 'auteur'] as const).map((p) => {
+              const meta = PLAN_META[p];
+              const tools = filtered.filter((t) => planForTool(t) === p);
+              if (tools.length === 0) return null;
+              return (
+                <section key={p} className="mb-12">
+                  <div className="flex items-baseline gap-3 mb-4">
+                    <h2 className="v3-serif text-[22px] font-semibold flex items-center gap-2" style={{ color: meta.color }}>
+                      {p === 'debutant' && '🌱'}
+                      {p === 'expert' && '⚡'}
+                      {p === 'auteur' && '👑'}
+                      Forfait {meta.short}
+                    </h2>
+                    <span className="text-[12px]" style={{ color: 'var(--v3-muted)' }}>
+                      {tools.length} outil{tools.length > 1 ? 's' : ''} exclusifs à ce palier
+                    </span>
+                    <div className="flex-1 h-px ml-2" style={{ background: 'var(--v3-line)' }} />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                    {tools.map((t) => renderCard(t, V2_TOOL_CATEGORIES.find((c) => c.id === t.category)?.image))}
+                  </div>
+                </section>
+              );
+            });
+          }
+
+          return V2_TOOL_CATEGORIES.map((cat) => {
+            const tools = filtered.filter((t) => t.category === cat.id);
+            if (tools.length === 0) return null;
+            return (
+              <section key={cat.id} className="mb-12">
+                <div className="flex items-baseline gap-3 mb-4">
+                  <h2 className="v3-serif text-[22px] font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+                    <span className="mr-2">{cat.emoji}</span>
+                    {cat.label}
+                  </h2>
+                  <span className="text-[12px]" style={{ color: 'var(--v3-muted)' }}>
+                    {tools.length} outil{tools.length > 1 ? 's' : ''}
+                  </span>
+                  <div className="flex-1 h-px ml-2" style={{ background: 'var(--v3-line)' }} />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                  {tools.map((t) => renderCard(t, cat.image))}
+                </div>
+              </section>
+            );
+          });
+        })()}
+
 
         {filtered.length === 0 && (
           <div className="text-center py-20">
