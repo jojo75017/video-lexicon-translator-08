@@ -50,6 +50,7 @@ const proModules = [
   { code: "P25", name: "Séries & Tomes", desc: "Bibles multi-tomes, chronologies croisées" },
   { code: "P26", name: "Sélection éditeurs", desc: "Matching maisons d'édition FR" },
   { code: "P27", name: "KDP Spy", desc: "Analyse niches Amazon + BSR + mots-clés cachés" },
+  { code: "P27+", name: "KDP Pilot Pro", desc: "Audit avancé + scoring, BSR live, plan d'action IA (perf renforcée plan Auteur)" },
   { code: "P28", name: "Amazon Spy", desc: "Scraping concurrence + tendances" },
   { code: "P29", name: "Audiobook Studio", desc: "Conversion voix Azure + ElevenLabs" },
   { code: "P30", name: "BD Studio", desc: "Génération BD illustrée + bulles + planches" },
