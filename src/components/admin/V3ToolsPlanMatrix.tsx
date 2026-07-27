@@ -1,50 +1,13 @@
 import { V2_TOOLS, V2_TOOL_CATEGORIES, type V2Tool } from '@/data/v2ToolsRegistry';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check, Lock } from 'lucide-react';
+import { planForTool } from '@/data/v3ToolPlans';
 
 /**
- * Répartition des 63 outils V3 par forfait (Débutant / Expert / Auteur).
- * Règle : tout ce qui n'est pas listé « pro » ou « expert » est inclus dès Débutant.
+ * Répartition des outils V3 par forfait (Débutant / Expert / Auteur).
+ * Source de vérité : `src/data/v3ToolPlans.ts` (partagée avec le hub V3).
  */
-const PRO_ONLY = new Set<string>([
-  // Business & Pro
-  'business-center', 'crm', 'gestion-prospects', 'coaching-vip', 'influenceurs',
-  // KDP avancé
-  'publication-pro', 'kdp-etranger', 'kdp-ads-guide',
-  // Audio & BD Pro
-  'audiobook', 'bd-studio',
-  // Analyse Pro
-  'bookperfect',
-  // Marketing Pro
-  'affiliation', 'dashboard-marketing',
-  // Formation Pro
-  'masterclass', 'coaching-vip',
-  // Espace Pro
-  'v3-gallery',
-]);
-
-const EXPERT_MIN = new Set<string>([
-  // Visuel (sauf couverture qui reste base)
-  'generateur-posts',
-  // Audio non-pro
-  'formation-audio', 'formation-series-audio', 'checklist-tournage', 'audiobook-demo',
-  // KDP intermédiaire
-  'niches-600', 'series-tomes', 'guide-kdp-enfants',
-  // Analyse
-  'audit-pilot',
-  // Marketing
-  'plan-marketing', 'campagne-vente', 'apercu-emails', 'emails-onboarding',
-  // Business léger
-  'communaute', 'extension-chrome',
-  // Écriture avancée
-  'ai-chat', 'seo-generator', 'generateur-ebook',
-]);
-
-function planFor(tool: V2Tool): 'debutant' | 'expert' | 'auteur' {
-  if (PRO_ONLY.has(tool.id)) return 'auteur';
-  if (EXPERT_MIN.has(tool.id)) return 'expert';
-  return 'debutant';
-}
+const planFor = (tool: V2Tool) => planForTool(tool);
 
 const Cell = ({ ok }: { ok: boolean }) =>
   ok ? <Check className="h-4 w-4 text-green-600 inline" /> : <Lock className="h-4 w-4 text-muted-foreground inline" />;
