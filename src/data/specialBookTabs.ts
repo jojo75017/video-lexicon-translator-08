@@ -1,0 +1,16 @@
+export const SPECIAL_BOOK_TABS: { slug: string; label: string }[] = [
+  { slug: 'roman', label: 'Roman' },
+  { slug: 'cuisine', label: 'Cuisine' },
+  { slug: 'voyage', label: 'Voyage' },
+  { slug: 'coloriage', label: 'Coloriage' },
+  { slug: 'bd', label: 'BD / Manga' },
+  { slug: 'documentaire', label: 'Documentaire' },
+  { slug: 'atlas', label: 'Atlas' },
+  { slug: 'encyclopedie', label: 'Encyclopédie' },
+  { slug: 'agenda', label: 'Agenda' },
+  { slug: 'journal', label: 'Journal' },
+  { slug: 'scolaire', label: 'Scolaire' },
+  { slug: 'aquariophilie', label: 'Aquariophilie' },
+  { slug: 'oiseaux', label: 'Fiches oiseaux' },
+  { slug: 'saga', label: 'Saga multi-tomes' },
+];
