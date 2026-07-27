@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AdminPanelNav } from "@/components/admin/AdminPanelNav";
+import { KdpPilotTiersMatrix } from "@/components/admin/KdpPilotTiersMatrix";
 
 interface PlanRow {
   letter: string;
@@ -169,6 +170,8 @@ export default function AdminPlansV3Page() {
             </div>
           </CardContent>
         </Card>
+
+        <KdpPilotTiersMatrix />
 
         <Card className="border-2 border-teal-500/50 bg-teal-50/30">
           <CardHeader>
