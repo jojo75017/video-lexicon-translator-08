@@ -145,23 +145,25 @@ export default function V3MainTabs() {
           </div>
         </nav>
 
-        {/* Mobile & tablette (< lg) */}
-        <button
-          onClick={() => setMobileOpen((o) => !o)}
-          className="lg:hidden flex items-center gap-2 px-3 py-2 rounded-md text-[13px] font-semibold"
-          style={{ color: 'var(--v3-emerald)' }}
-          aria-label="Ouvrir le menu des catégories"
-        >
-          {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-          Catégories
-        </button>
-        <Link
-          to="/v3/outils"
-          className="lg:hidden ml-auto v3-btn v3-btn-primary text-[12px] whitespace-nowrap"
-          style={{ padding: '7px 14px' }}
-        >
-          <LayoutGrid className="w-3.5 h-3.5" /> Tous les outils
-        </Link>
+        {/* Mobile & tablette (< lg) — wrapper qui applique bien lg:hidden */}
+        <div className="lg:hidden flex items-center gap-2 flex-1">
+          <button
+            onClick={() => setMobileOpen((o) => !o)}
+            className="flex items-center gap-2 px-3 py-2 rounded-md text-[13px] font-semibold"
+            style={{ color: 'var(--v3-emerald)' }}
+            aria-label="Ouvrir le menu des catégories"
+          >
+            {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            Catégories
+          </button>
+          <Link
+            to="/v3/outils"
+            className="ml-auto v3-btn v3-btn-primary text-[12px] whitespace-nowrap"
+            style={{ padding: '7px 14px' }}
+          >
+            <LayoutGrid className="w-3.5 h-3.5" /> Tous les outils
+          </Link>
+        </div>
       </div>
 
       {/* Accordéon mobile & tablette */}
