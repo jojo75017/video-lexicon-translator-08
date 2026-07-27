@@ -1,6 +1,6 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Sparkles, ArrowRight } from 'lucide-react';
-import { SPECIAL_BOOK_TABS } from '@/components/v3public/V3Header';
+import { SPECIAL_BOOK_TABS } from '@/data/specialBookTabs';
 
 const META: Record<string, { emoji: string; title: string; hero: string; features: string[] }> = {
   roman:          { emoji: '📖', title: 'Roman',           hero: 'Écris un roman captivant en quelques minutes.', features: ['Structure narrative solide', 'Personnages vivants', 'Chapitres cohérents'] },
