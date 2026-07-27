@@ -50,22 +50,20 @@ describe('V2V3FloatingSwitch (E2E interaction)', () => {
     expect(localStorage.getItem('ebookstudio_v3_mode')).toBe('1');
   });
 
-  it('bascule V3 → V2 depuis /v3/... : sort de la route V3 vers /', async () => {
+  it('bascule V3 → V2 depuis /v3/... : atterrit sur /ebook-planner (générateur V2)', async () => {
     localStorage.setItem('ebookstudio_v3_mode', '1');
     const user = userEvent.setup();
     renderAt('/v3/hub');
 
     const btn = await screen.findByRole('button', { name: /Mode V3 actif/i });
-    expect(btn).toHaveTextContent('V3');
-
     await user.click(btn);
 
-    expect(screen.getByTestId('location')).toHaveTextContent('/');
+    expect(screen.getByTestId('location')).toHaveTextContent('/ebook-planner');
     expect(screen.getByRole('button', { name: /Basculer vers la V3/i })).toHaveTextContent('V2');
     expect(localStorage.getItem('ebookstudio_v3_mode')).toBeNull();
   });
 
-  it('bascule V3 → V2 hors route /v3 : ne navigue pas mais met à jour l’UI', async () => {
+  it('bascule V3 → V2 depuis /admin : redirige aussi vers /ebook-planner', async () => {
     localStorage.setItem('ebookstudio_v3_mode', '1');
     const user = userEvent.setup();
     renderAt('/admin');
@@ -73,7 +71,7 @@ describe('V2V3FloatingSwitch (E2E interaction)', () => {
     const btn = await screen.findByRole('button', { name: /Mode V3 actif/i });
     await user.click(btn);
 
-    expect(screen.getByTestId('location')).toHaveTextContent('/admin');
+    expect(screen.getByTestId('location')).toHaveTextContent('/ebook-planner');
     expect(screen.getByRole('button', { name: /Basculer vers la V3/i })).toHaveTextContent('V2');
   });
 
