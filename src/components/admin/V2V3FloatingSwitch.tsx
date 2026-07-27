@@ -14,7 +14,14 @@ export function V2V3FloatingSwitch() {
   const handleClick = () => {
     const next = !v3Mode;
     setV3Mode(next);
-    if (next) navigate('/hub-v3');
+    if (next) {
+      navigate('/hub-v3');
+    } else {
+      // Repasser en V2 : quitter toute route /v3/* pour éviter de rester bloqué
+      if (typeof window !== 'undefined' && window.location.pathname.startsWith('/v3')) {
+        navigate('/');
+      }
+    }
   };
 
   return (
