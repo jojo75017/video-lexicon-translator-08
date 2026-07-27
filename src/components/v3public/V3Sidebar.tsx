@@ -17,40 +17,15 @@ type NavSection = {
   items: NavItem[];
 };
 
+// Sidebar réduite : navigation transverse uniquement. Le header prend en charge
+// les catégories principales (Créer / Écrire / Habiller / Publier / Vendre /
+// Livres spéciaux) — ne pas dupliquer ici.
 const NAV: NavSection[] = [
-  { section: 'Écrire', color: '#F59E0B', activeBg: '#F59E0B', items: [
+  { section: 'Accueil', color: '#F59E0B', activeBg: '#F59E0B', items: [
     { to: '/v3', label: 'Accueil', icon: Home, end: true },
     { to: '/v3/create', label: 'Créer un livre', icon: Sparkles },
     { to: '/v3/library', label: 'Ma bibliothèque', icon: Library },
-  ]},
-  { section: 'Hub 30 agents', color: '#0EA5A4', activeBg: '#0EA5A4', items: [
-    { to: '/v3/hub?tab=parcours', label: 'Parcours', icon: Compass },
-    { to: '/v3/hub?tab=outils', label: 'Outils V3', icon: Wand2 },
-    { to: '/v3/outils', label: 'Tous les outils', icon: Package },
-    { to: '/v3/hub?tab=documentation', label: 'Documentation Studio', icon: Sparkles, paid: true },
     { to: '/v3/hub?tab=livres', label: 'Mes livres', icon: BookOpen },
-    { to: '/v3/hub?tab=offres', label: 'Offres & Packs', icon: Gem },
-    { to: '/v3/hub?tab=roadmap', label: 'Roadmap', icon: MapIcon },
-    { to: '/v3/hub?tab=pending', label: 'En attente', icon: Clock },
-    { to: '/v3/hub?tab=assistant', label: "Parler avec l'IA", icon: Bot },
-    { to: '/v3/hub?tab=bookperfect', label: 'BookPerfect AI', icon: BookOpen, paid: true },
-    { to: '/v3/hub?tab=export', label: 'Exporter le livre', icon: Download, paid: true },
-  ]},
-  { section: 'Livres spéciaux', color: '#8B5CF6', activeBg: '#8B5CF6', items: [
-    { to: '/v3/livres/roman', label: 'Roman', icon: BookOpen, paid: true },
-    { to: '/v3/livres/cuisine', label: 'Cuisine', icon: Palette, paid: true },
-    { to: '/v3/livres/voyage', label: 'Voyage', icon: Package, paid: true },
-    { to: '/v3/livres/coloriage', label: 'Coloriage', icon: Palette, paid: true },
-    { to: '/v3/livres/bd', label: 'BD / Manga', icon: BookOpen, paid: true },
-    { to: '/v3/livres/documentaire', label: 'Documentaire', icon: FileText, paid: true },
-    { to: '/v3/livres/atlas', label: 'Atlas', icon: MapIcon, paid: true },
-    { to: '/v3/livres/encyclopedie', label: 'Encyclopédie', icon: BookOpen, paid: true },
-    { to: '/v3/livres/agenda', label: 'Agenda', icon: Clock, paid: true },
-    { to: '/v3/livres/journal', label: 'Journal', icon: FileText, paid: true },
-    { to: '/v3/livres/scolaire', label: 'Scolaire', icon: GraduationCap, paid: true },
-    { to: '/v3/livres/aquariophilie', label: 'Aquariophilie', icon: Sparkles, paid: true },
-    { to: '/v3/livres/oiseaux', label: 'Fiches oiseaux', icon: Sparkles, paid: true },
-    { to: '/v3/livres/saga', label: 'Saga multi-tomes', icon: BookOpen, paid: true },
   ]},
   { section: 'Formation & Guides', color: '#3B82F6', activeBg: '#3B82F6', items: [
     { to: '/formation', label: 'Formation vidéo', icon: GraduationCap },
@@ -58,9 +33,10 @@ const NAV: NavSection[] = [
     { to: '/v3/hub?tab=script', label: 'Script vidéo', icon: FileText },
     { to: '/v3/hub?tab=guides', label: 'Guides Hub', icon: GraduationCap },
   ]},
-  { section: 'Communauté', color: '#10B981', activeBg: '#10B981', items: [
-    { to: '/v3/gallery', label: 'Galerie communauté', icon: Users },
-    { to: '/v3/auteur', label: 'Ma page auteur', icon: User },
+  { section: 'Offres', color: '#0EA5A4', activeBg: '#0EA5A4', items: [
+    { to: '/v3/hub?tab=offres', label: 'Offres & Packs', icon: Gem },
+    { to: '/v3/hub?tab=roadmap', label: 'Roadmap', icon: MapIcon },
+    { to: '/v3/hub?tab=pending', label: 'En attente', icon: Clock },
   ]},
   { section: 'Support', color: '#0284C7', activeBg: '#0284C7', items: [
     { to: '/contact-support', label: 'Contact', icon: Mail },
