@@ -1,44 +1,23 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  Sparkles, Feather, BookOpen, Palette, Library, Wand2, ArrowRight, Star, Quote,
+  Sparkles, Feather, BookOpen, Library, ArrowRight, Star, Quote,
 } from 'lucide-react';
+import { V3_HEADER_MENU } from '@/data/v3HeaderMenu';
 
 const IDEA_EXAMPLES = [
   'Deux rivaux en cuisine tombent amoureux lors d\'un…',
-  'Une héro·ïne hérité d\'un manoir au chagr…',
-  'Un détective insomniaque résout ses affaires…',
+  'Une héroïne hérite d\'un manoir au chagrin…',
+  'Un détective insomniaque résout ses affaires la nuit…',
 ];
 
-const GENRES = [
-  { label: 'Romance', emoji: '❤️' },
-  { label: 'Thriller', emoji: '🔪' },
-  { label: 'Polar', emoji: '🔎' },
-  { label: 'Fantasy', emoji: '🐉' },
-  { label: 'Science-Fiction', emoji: '🚀' },
-  { label: 'Historique', emoji: '🏛️' },
-  { label: 'Drame', emoji: '🎭' },
-  { label: 'Aventure', emoji: '🗺️' },
-  { label: 'Horreur', emoji: '👻' },
-  { label: 'Young Adult', emoji: '⭐' },
-  { label: 'Poésie', emoji: '🌸' },
-  { label: 'Jeunesse', emoji: '🎈' },
+const FEATURED_TOOLS = [
+  { emoji: '📘', title: 'Assistant V3', desc: 'Créez votre livre en 4 étapes guidées.', to: '/v3/create', badge: 'V3' },
+  { emoji: '🎨', title: 'Cover Studio Pro', desc: 'Couverture haut de gamme, direction artistique IA.', to: '/v3/hub?tab=cover-pro', badge: 'Pro' },
+  { emoji: '🚀', title: 'KDP Pilot', desc: 'Audit complet avant publication Amazon.', to: '/audit-pilot', badge: 'Populaire' },
+  { emoji: '📖', title: 'Sommaire Ultime', desc: 'Table des matières éditable et exportable.', to: '/v3/outils/sommaire-ultime', badge: 'Nouveau' },
 ];
 
-const STEPS = [
-  { emoji: '📝', title: 'Décris ton idée', text: 'Une phrase, un pitch, une intuition. L\'atelier fait le reste.' },
-  { emoji: '🎨', title: 'Choisis ton style', text: 'Genre, ton, longueur, personnages. L\'IA s\'adapte à ta vision.' },
-  { emoji: '📖', title: 'Lis & partage', text: 'Ton livre est généré en quelques minutes. Lis, exporte, partage.' },
-];
-
-const FEATURES = [
-  { icon: Sparkles, title: 'Génération intelligente', text: 'L\'IA structure ton récit en chapitres cohérents, avec un fil narratif solide et des personnages vivants.' },
-  { icon: Wand2, title: 'Ta voix, ton style', text: 'Poétique, punchy, sombre, humoristique — choisis le ton qui correspond à ton univers.' },
-  { icon: Library, title: 'Bibliothèque personnelle', text: 'Retrouve tous tes livres, reprends la lecture ou l\'écriture, garde tes brouillons.' },
-  { icon: Palette, title: 'Couverture auto', text: 'Une couverture unique est générée pour chaque livre, inspirée de ton histoire.' },
-];
-
-// Livres de l'auteur invité (Georges Boubet) — 6 vraies couvertures Amazon.
 const AUTHOR_AMAZON_URL = 'https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7';
 const AUTHOR_BOOKS: Array<{ asin: string; title: string }> = [
   { asin: 'B0GXB3V5DJ', title: "L'Ancien Locataire" },
@@ -51,7 +30,6 @@ const AUTHOR_BOOKS: Array<{ asin: string; title: string }> = [
 const coverUrl = (asin: string) => `https://images-na.ssl-images-amazon.com/images/P/${asin}.01.LZZZZZZZ.jpg`;
 const fallbackCoverUrl = (asin: string) => `https://m.media-amazon.com/images/P/${asin}.jpg`;
 const amazonBookUrl = (asin: string) => `https://www.amazon.fr/dp/${asin}/`;
-
 
 export default function V3HomePage() {
   const nav = useNavigate();
@@ -69,42 +47,52 @@ export default function V3HomePage() {
 
   return (
     <>
-      {/* HERO */}
-      <section className="v3-halo relative overflow-hidden">
-        {/* Decor livres flottants */}
-        <div className="hidden lg:block absolute left-6 top-32 w-24 h-32 rounded-md bg-[var(--v3-orange)] shadow-2xl v3-float" />
-        <div className="hidden lg:block absolute right-8 top-28 w-24 h-32 rounded-md bg-[var(--v3-ink)] shadow-2xl v3-float" style={{ animationDelay: '1.5s' }} />
-
-        <div className="max-w-3xl mx-auto px-5 pt-16 pb-20 text-center">
-          <span className="v3-chip v3-chip-orange">
-            <Sparkles className="w-3.5 h-3.5" /> Atelier d'écriture par IA
+      {/* HERO — éditorial Émeraude & Or */}
+      <section
+        className="relative overflow-hidden"
+        style={{
+          background:
+            'radial-gradient(60% 45% at 15% 15%, rgba(6,78,59,0.06), transparent 60%),' +
+            'radial-gradient(45% 40% at 88% 12%, rgba(201,168,76,0.16), transparent 60%),' +
+            'var(--v3-paper)',
+        }}
+      >
+        <div className="max-w-4xl mx-auto px-5 pt-16 pb-20 text-center">
+          <span className="v3-chip v3-chip-gold">
+            <Sparkles className="w-3.5 h-3.5" /> Atelier d'écriture premium
           </span>
 
-          <h1 className="v3-serif mt-6 font-bold leading-[1.05] tracking-tight">
-            <span className="block text-4xl md:text-5xl whitespace-nowrap">Ton histoire mérite d'être écrite.</span>
-            <span className="block text-2xl md:text-3xl text-[var(--v3-orange)] italic mt-2">Ebookstudio la révèle en quelques minutes.</span>
+          <h1 className="v3-serif mt-6 font-semibold leading-[1.02] tracking-tight" style={{ color: 'var(--v3-emerald)' }}>
+            <span className="block text-4xl md:text-6xl">Publiez le livre que</span>
+            <span className="block text-4xl md:text-6xl italic" style={{ color: 'var(--v3-gold-600)' }}>vous avez en vous.</span>
           </h1>
 
-          <p className="mt-5 text-[15px] text-[var(--v3-muted)] max-w-xl mx-auto">
-            Décris une idée, choisis ton style, et Ebookstudio écrit ton livre en quelques minutes.
-            Romans, nouvelles, ebooks — à toi l'histoire.
+          <p className="mt-6 text-[15px] max-w-xl mx-auto" style={{ color: 'var(--v3-muted)' }}>
+            Un atelier éditorial complet : de l'idée à la couverture, du sommaire à la publication Amazon KDP.
+            Trente agents IA au service de votre livre.
           </p>
 
-          <figure className="mt-6 mx-auto max-w-md text-left">
-            <div className="relative rounded-xl bg-white border border-black/5 shadow-sm p-4">
-              <Quote className="absolute left-3 top-3 w-5 h-5 text-[var(--v3-orange)]/40" />
-              <blockquote className="pl-6 text-[13px] italic leading-relaxed text-[var(--v3-ink)]/85">
+          <figure className="mt-8 mx-auto max-w-md text-left">
+            <div
+              className="relative rounded-xl bg-white p-4 pl-6"
+              style={{ border: '1px solid var(--v3-line)', boxShadow: '0 2px 10px -4px rgba(6,78,59,0.08)' }}
+            >
+              <Quote className="absolute left-3 top-3 w-4 h-4" style={{ color: 'var(--v3-gold)' }} />
+              <blockquote className="text-[13px] italic leading-relaxed" style={{ color: 'var(--v3-ink)' }}>
                 Le problème n'est pas d'écrire.<br />
                 C'est de ne jamais commencer.<br />
-                <span className="font-semibold not-italic">Commencez votre livre.</span>
+                <span className="v3-serif not-italic font-semibold text-[15px]" style={{ color: 'var(--v3-emerald)' }}>Commencez votre livre.</span>
               </blockquote>
-              <div className="absolute left-0 top-3 bottom-3 w-1 rounded-full bg-[var(--v3-orange)]" />
+              <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full" style={{ background: 'var(--v3-gold)' }} />
             </div>
           </figure>
 
           {/* Champ idée */}
-          <div className="mt-8 flex items-stretch gap-2 rounded-full border border-black/10 bg-white p-1.5 shadow-lg">
-            <div className="pl-4 flex items-center text-[var(--v3-muted)]">
+          <div
+            className="mt-8 flex items-stretch gap-2 rounded-full bg-white p-1.5"
+            style={{ border: '1px solid var(--v3-line)', boxShadow: '0 12px 32px -18px rgba(6,78,59,0.2)' }}
+          >
+            <div className="pl-4 flex items-center" style={{ color: 'var(--v3-gold)' }}>
               <Feather className="w-4 h-4" />
             </div>
             <input
@@ -119,49 +107,151 @@ export default function V3HomePage() {
             </button>
           </div>
 
-          {/* Exemples chips */}
-          <div className="mt-4 flex flex-wrap justify-center gap-2">
-            {IDEA_EXAMPLES.map((s) => (
-              <button key={s} onClick={() => setIdea(s)} className="v3-chip text-xs">
-                {s.slice(0, 42)}…
-              </button>
-            ))}
-          </div>
-
           {/* Social proof */}
           <div className="mt-8 flex items-center justify-center gap-3">
             <div className="flex -space-x-2">
-              {['#F97316', '#0A0A0A', '#EA580C', '#1a1a1a', '#F97316'].map((c, i) => (
+              {['#064e3b', '#0d7a5f', '#c9a84c', '#b0902f', '#064e3b'].map((c, i) => (
                 <div key={i} className="w-8 h-8 rounded-full border-2 border-white" style={{ background: c }} />
               ))}
             </div>
-            <div className="flex items-center gap-1 text-[var(--v3-orange)]">
-              <Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" />
+            <div className="flex items-center gap-0.5" style={{ color: 'var(--v3-gold)' }}>
+              {[0,1,2,3,4].map(i => <Star key={i} className="w-4 h-4 fill-current" />)}
             </div>
-            <span className="text-xs text-[var(--v3-muted)]">Rejoignez les 1 247 auteurs d'Ebookstudio</span>
+            <span className="text-xs" style={{ color: 'var(--v3-muted)' }}>Rejoignez les 1 247 auteurs</span>
+          </div>
+        </div>
+        <div className="v3-gold-rule" />
+      </section>
+
+      {/* 6 CATÉGORIES PREMIUM */}
+      <section className="max-w-7xl mx-auto px-5 md:px-8 py-16">
+        <div className="text-center mb-10">
+          <div className="text-[10px] uppercase tracking-[0.24em] font-semibold" style={{ color: 'var(--v3-gold-600)' }}>
+            L'atelier complet
+          </div>
+          <h2 className="v3-serif mt-2 text-3xl md:text-4xl font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+            Un studio éditorial, six univers
+          </h2>
+          <p className="mt-3 text-[14px] max-w-xl mx-auto" style={{ color: 'var(--v3-muted)' }}>
+            Chaque étape du parcours d'auteur a ses outils dédiés — et son moment.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {V3_HEADER_MENU.map((cat) => (
+            <Link
+              key={cat.key}
+              to={cat.links[0]?.to ?? '/v3/outils'}
+              className="group relative rounded-2xl bg-white p-6 transition-all"
+              style={{
+                border: '1px solid var(--v3-line)',
+                boxShadow: '0 1px 2px rgba(6,78,59,0.03)',
+              }}
+              onMouseOver={(e) => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.borderColor = 'rgba(201,168,76,0.5)';
+                el.style.boxShadow = 'var(--v3-shadow-card)';
+                el.style.transform = 'translateY(-3px)';
+              }}
+              onMouseOut={(e) => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.borderColor = 'var(--v3-line)';
+                el.style.boxShadow = '0 1px 2px rgba(6,78,59,0.03)';
+                el.style.transform = '';
+              }}
+            >
+              <div className="flex items-start justify-between">
+                <div className="text-3xl">{cat.emoji}</div>
+                <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition" style={{ color: 'var(--v3-gold-600)' }} />
+              </div>
+              <div className="text-[10px] uppercase tracking-[0.22em] font-semibold mt-4" style={{ color: 'var(--v3-gold-600)' }}>
+                {cat.tagline}
+              </div>
+              <h3 className="v3-serif text-[22px] font-semibold mt-1" style={{ color: 'var(--v3-emerald)' }}>
+                {cat.label}
+              </h3>
+              <ul className="mt-3 space-y-1">
+                {cat.links.slice(0, 3).map((l) => (
+                  <li key={l.to + l.label} className="text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
+                    · {l.label}
+                  </li>
+                ))}
+                {cat.links.length > 3 && (
+                  <li className="text-[12px] font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+                    + {cat.links.length - 3} outils
+                  </li>
+                )}
+              </ul>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* OUTILS VEDETTES */}
+      <section className="max-w-7xl mx-auto px-5 md:px-8 pb-16">
+        <div className="rounded-3xl p-10" style={{ background: 'var(--v3-cream)', border: '1px solid var(--v3-line)' }}>
+          <div className="text-center mb-8">
+            <div className="text-[10px] uppercase tracking-[0.24em] font-semibold" style={{ color: 'var(--v3-gold-600)' }}>
+              Les incontournables
+            </div>
+            <h2 className="v3-serif mt-2 text-3xl font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+              Quatre outils au cœur du studio
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {FEATURED_TOOLS.map((t) => (
+              <Link
+                key={t.title}
+                to={t.to}
+                className="group block rounded-2xl bg-white p-5 transition-all"
+                style={{ border: '1px solid var(--v3-line)' }}
+                onMouseOver={(e) => {
+                  const el = e.currentTarget as HTMLElement;
+                  el.style.borderColor = 'rgba(201,168,76,0.5)';
+                  el.style.transform = 'translateY(-3px)';
+                  el.style.boxShadow = 'var(--v3-shadow-card)';
+                }}
+                onMouseOut={(e) => {
+                  const el = e.currentTarget as HTMLElement;
+                  el.style.borderColor = 'var(--v3-line)';
+                  el.style.transform = '';
+                  el.style.boxShadow = '';
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-2xl">{t.emoji}</span>
+                  <span className="v3-badge">{t.badge}</span>
+                </div>
+                <div className="v3-serif text-[18px] font-semibold mt-3" style={{ color: 'var(--v3-emerald)' }}>
+                  {t.title}
+                </div>
+                <p className="text-[12.5px] mt-1 leading-snug" style={{ color: 'var(--v3-muted)' }}>{t.desc}</p>
+                <div className="flex items-center gap-1 mt-3 text-[12px] font-semibold" style={{ color: 'var(--v3-gold-600)' }}>
+                  Ouvrir <ArrowRight className="w-3.5 h-3.5" />
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* AUTEUR INVITÉ (dark) */}
+      {/* AUTEUR INVITÉ (émeraude nuit) */}
       <section className="v3-section-dark">
-        <div className="max-w-7xl mx-auto px-5 md:px-8 py-14">
+        <div className="max-w-7xl mx-auto px-5 md:px-8 py-16">
           <div className="flex items-start justify-between gap-6 flex-wrap">
             <div>
-              <span className="v3-chip" style={{ background: 'rgba(249,115,22,0.15)', color: '#F97316', borderColor: 'transparent' }}>
+              <span
+                className="v3-chip"
+                style={{ background: 'rgba(201,168,76,0.15)', color: 'var(--v3-gold)', borderColor: 'transparent' }}
+              >
                 ✨ Auteur invité
               </span>
-              <h2 className="v3-serif mt-4 text-3xl md:text-4xl font-bold">Mr Georges Boubet</h2>
+              <h2 className="v3-serif mt-4 text-3xl md:text-4xl font-semibold text-white">Mr Georges Boubet</h2>
               <p className="mt-2 text-white/60 max-w-xl text-sm">
-                71 livres publiés. Thrillers, sagas, jeunesse — découvrez le catalogue d'un auteur passionné.
+                71 livres publiés. Thrillers, sagas, jeunesse — le catalogue d'un auteur passionné.
               </p>
             </div>
-            <a
-              href={AUTHOR_AMAZON_URL}
-              target="_blank" rel="noopener noreferrer"
-              className="v3-btn"
-              style={{ background: '#fff', color: '#000' }}
-            >
+            <a href={AUTHOR_AMAZON_URL} target="_blank" rel="noopener noreferrer" className="v3-btn v3-btn-gold">
               Voir sur Amazon <ArrowRight className="w-4 h-4" />
             </a>
           </div>
@@ -191,111 +281,27 @@ export default function V3HomePage() {
               </a>
             ))}
           </div>
-
-          <div className="mt-8 flex justify-center">
-            <a
-              href={AUTHOR_AMAZON_URL}
-              target="_blank" rel="noopener noreferrer"
-              className="v3-btn v3-btn-primary"
-            >
-              Découvrir tous les livres sur Amazon <ArrowRight className="w-4 h-4" />
-            </a>
-          </div>
-        </div>
-      </section>
-
-
-
-      {/* Vos sauvegardes */}
-      <section className="max-w-3xl mx-auto px-5 md:px-8 py-16 text-center">
-        <div className="v3-card">
-          <div className="w-12 h-12 rounded-xl bg-[var(--v3-cloud)] grid place-items-center mx-auto">
-            <Library className="w-6 h-6 text-[var(--v3-ink)]" />
-          </div>
-          <h2 className="v3-serif mt-4 text-2xl font-bold">Vos sauvegardes</h2>
-          <p className="mt-2 text-sm text-[var(--v3-muted)]">
-            Retrouvez tous les livres que vous avez créés, mis en favori ou en cours de rédaction.
-          </p>
-          <button
-            onClick={() => nav('/v3/library')}
-            className="mt-6 v3-btn v3-btn-primary"
-          >
-            <BookOpen className="w-4 h-4" /> Voir mes sauvegardes
-          </button>
-        </div>
-      </section>
-
-      {/* Comment ça marche (dark) */}
-      <section id="how" className="v3-section-dark">
-        <div className="max-w-6xl mx-auto px-5 md:px-8 py-16 text-center">
-          <span className="v3-chip v3-chip-orange">✨ En 3 étapes</span>
-          <h2 className="v3-serif mt-4 text-4xl font-bold">De l'idée à la dernière page</h2>
-          <p className="mt-3 text-white/60 max-w-lg mx-auto text-sm">
-            Ebookstudio transforme ton intuition en livre complet. Pas de page blanche. Pas de blocage. Juste l'écriture.
-          </p>
-
-          <div className="mt-12 grid md:grid-cols-3 gap-8">
-            {STEPS.map((s) => (
-              <div key={s.title} className="text-left">
-                <div className="w-11 h-11 rounded-lg bg-white/10 grid place-items-center text-xl mb-4">{s.emoji}</div>
-                <div className="font-bold">{s.title}</div>
-                <p className="mt-1 text-sm text-white/60">{s.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Un atelier complet */}
-      <section className="max-w-6xl mx-auto px-5 md:px-8 py-16">
-        <div className="text-center">
-          <h2 className="v3-serif text-3xl font-bold">Un atelier complet</h2>
-          <p className="text-sm text-[var(--v3-muted)] mt-1">Tout ce qu'il faut pour donner vie à tes histoires.</p>
-        </div>
-
-        <div className="mt-10 grid md:grid-cols-2 gap-4">
-          {FEATURES.map((f) => {
-            const Icon = f.icon;
-            return (
-              <div key={f.title} className="v3-card">
-                <div className="w-10 h-10 rounded-lg bg-[var(--v3-cloud)] grid place-items-center">
-                  <Icon className="w-5 h-5 text-[var(--v3-ink)]" />
-                </div>
-                <div className="mt-4 font-bold">{f.title}</div>
-                <p className="mt-1 text-sm text-[var(--v3-muted)]">{f.text}</p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* Genres */}
-      <section className="max-w-5xl mx-auto px-5 md:px-8">
-        <div className="rounded-3xl bg-[var(--v3-cloud)] py-14 px-6 text-center">
-          <h2 className="v3-serif text-3xl font-bold">12 genres à explorer</h2>
-          <p className="text-sm text-[var(--v3-muted)] mt-1">Romance, thriller, fantasy, et bien plus. Quelle histoire vas-tu raconter ?</p>
-          <div className="mt-8 flex flex-wrap justify-center gap-2">
-            {GENRES.map((g) => (
-              <Link key={g.label} to={`/v3/create?genre=${encodeURIComponent(g.label)}`} className="v3-chip">
-                <span>{g.emoji}</span> {g.label}
-              </Link>
-            ))}
-          </div>
         </div>
       </section>
 
       {/* CTA final */}
-      <section className="max-w-5xl mx-auto px-5 md:px-8 mt-16">
-        <div className="rounded-3xl v3-section-dark text-center px-6 py-16 relative overflow-hidden">
-          <div className="absolute -top-20 -right-16 w-64 h-64 rounded-full bg-[var(--v3-orange)] blur-3xl opacity-30" />
-          <div className="relative">
-            <Feather className="w-8 h-8 text-[var(--v3-orange)] mx-auto v3-pulse" />
-            <h2 className="v3-serif mt-4 text-4xl font-bold">Ton histoire t'attend.</h2>
-            <p className="mt-3 text-white/60 text-sm max-w-md mx-auto">
-              Commence gratuitement. En quelques minutes, tu tiens ton premier livre entre les mains.
-            </p>
-            <button onClick={() => nav('/v3/create')} className="mt-8 v3-btn v3-btn-primary">
-              <Sparkles className="w-4 h-4" /> Écrire mon premier livre <ArrowRight className="w-4 h-4" />
+      <section className="max-w-5xl mx-auto px-5 md:px-8 py-20 text-center">
+        <div className="v3-card">
+          <div className="w-12 h-12 rounded-xl grid place-items-center mx-auto" style={{ background: 'var(--v3-gold-soft)' }}>
+            <Library className="w-6 h-6" style={{ color: 'var(--v3-emerald)' }} />
+          </div>
+          <h2 className="v3-serif mt-4 text-3xl font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+            Vos sauvegardes vous attendent
+          </h2>
+          <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>
+            Retrouvez tous les livres que vous avez créés, mis en favori ou en cours de rédaction.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3 justify-center">
+            <button onClick={() => nav('/v3/library')} className="v3-btn v3-btn-primary">
+              <BookOpen className="w-4 h-4" /> Ma bibliothèque
+            </button>
+            <button onClick={() => nav('/v3/create')} className="v3-btn v3-btn-gold">
+              <Sparkles className="w-4 h-4" /> Créer un livre
             </button>
           </div>
         </div>

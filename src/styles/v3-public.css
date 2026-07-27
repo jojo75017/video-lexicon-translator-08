@@ -1,18 +1,34 @@
-/* Ebookstudio V3 — public site tokens (Pluméo-inspired).
-   Scoped under .v3pub so admin/KDP theme stays untouched. */
+/* Ebookstudio V3 — Design system "Émeraude Prestige"
+   Palette éditoriale haut de gamme : émeraude profond + or.
+   Scoped sous .v3pub pour ne pas affecter l'admin/KDP. */
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;0,900;1,600;1,700&family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600;1,700&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 .v3pub {
-  --v3-orange: #F97316;
-  --v3-orange-600: #EA580C;
-  --v3-orange-50: #FFF7ED;
-  --v3-ink: #0A0A0A;
-  --v3-ink-2: #1a1a1a;
-  --v3-paper: #FFFFFF;
-  --v3-cloud: #F5F5F5;
-  --v3-muted: #6B6B6B;
-  --v3-border: rgba(10, 10, 10, 0.08);
+  /* Palette Émeraude Prestige */
+  --v3-emerald: #064e3b;
+  --v3-emerald-600: #0d7a5f;
+  --v3-emerald-50: #ecf5f1;
+  --v3-gold: #c9a84c;
+  --v3-gold-600: #b0902f;
+  --v3-gold-soft: #f5f0e0;
+  --v3-paper: #fbfaf6;
+  --v3-cream: #f5f3ee;
+  --v3-ink: #0a1f18;
+  --v3-ink-2: #1a2e26;
+  --v3-muted: #5b6b64;
+  --v3-line: rgba(6, 78, 59, 0.10);
+  --v3-border: rgba(6, 78, 59, 0.10);
+
+  /* Alias historiques (compatibilité descendante — mapent vers émeraude/or) */
+  --v3-orange: var(--v3-emerald);
+  --v3-orange-600: var(--v3-emerald-600);
+  --v3-orange-50: var(--v3-emerald-50);
+  --v3-cloud: var(--v3-cream);
+
+  /* Ombres éditoriales */
+  --v3-shadow-card: 0 1px 2px rgba(6,78,59,.04), 0 12px 32px -18px rgba(6,78,59,.18);
+  --v3-shadow-menu: 0 20px 60px -20px rgba(6,78,59,.28), 0 2px 6px rgba(6,78,59,.06);
 
   font-family: 'Inter', system-ui, -apple-system, Segoe UI, sans-serif;
   color: var(--v3-ink);
@@ -20,87 +36,141 @@
 }
 
 .v3pub .v3-serif {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
   font-feature-settings: 'liga', 'kern';
+  letter-spacing: -0.005em;
 }
 
-/* halos radiaux orange pour hero */
+/* Filet or décoratif */
+.v3pub .v3-gold-rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--v3-gold) 20%, var(--v3-gold) 80%, transparent);
+}
+
+/* Halos hero — émeraude/or discret */
 .v3pub .v3-halo {
   background:
-    radial-gradient(60% 45% at 15% 20%, rgba(249, 115, 22, 0.18), transparent 60%),
-    radial-gradient(50% 40% at 85% 10%, rgba(249, 115, 22, 0.14), transparent 60%),
-    #fff;
+    radial-gradient(55% 45% at 15% 15%, rgba(6, 78, 59, 0.10), transparent 60%),
+    radial-gradient(45% 40% at 88% 12%, rgba(201, 168, 76, 0.14), transparent 60%),
+    var(--v3-paper);
 }
-
 .v3pub .v3-halo-soft {
   background:
-    radial-gradient(45% 40% at 90% 30%, rgba(249, 115, 22, 0.10), transparent 60%),
-    #fff;
+    radial-gradient(45% 40% at 90% 30%, rgba(201, 168, 76, 0.10), transparent 60%),
+    var(--v3-paper);
 }
 
-/* pill buttons */
+/* Boutons premium */
 .v3pub .v3-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 22px;
+  padding: 11px 20px;
   border-radius: 999px;
   font-weight: 600;
-  font-size: 14px;
-  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  font-size: 13.5px;
+  letter-spacing: 0.01em;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease, border-color .18s ease;
   white-space: nowrap;
 }
 .v3pub .v3-btn-primary {
-  background: var(--v3-orange);
+  background: var(--v3-emerald);
   color: #fff;
-  box-shadow: 0 10px 24px -12px rgba(249, 115, 22, 0.55);
+  box-shadow: 0 10px 26px -12px rgba(6, 78, 59, 0.55);
 }
-.v3pub .v3-btn-primary:hover { background: var(--v3-orange-600); transform: translateY(-1px); }
+.v3pub .v3-btn-primary:hover {
+  background: var(--v3-emerald-600);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px -12px rgba(6, 78, 59, 0.6);
+}
+.v3pub .v3-btn-gold {
+  background: var(--v3-gold);
+  color: #1a1408;
+  box-shadow: 0 10px 24px -12px rgba(201, 168, 76, 0.5);
+}
+.v3pub .v3-btn-gold:hover { background: var(--v3-gold-600); color: #fff; transform: translateY(-1px); }
 .v3pub .v3-btn-outline {
-  border: 1px solid var(--v3-ink);
-  color: var(--v3-ink);
+  border: 1px solid var(--v3-emerald);
+  color: var(--v3-emerald);
   background: transparent;
 }
-.v3pub .v3-btn-outline:hover { background: var(--v3-ink); color: #fff; }
+.v3pub .v3-btn-outline:hover { background: var(--v3-emerald); color: #fff; }
 .v3pub .v3-btn-ghost {
   color: var(--v3-ink);
   background: transparent;
 }
-.v3pub .v3-btn-ghost:hover { color: var(--v3-orange); }
+.v3pub .v3-btn-ghost:hover { color: var(--v3-emerald); background: rgba(6,78,59,0.04); }
+.v3pub .v3-btn-on-dark {
+  color: #f5f0e0;
+  background: transparent;
+}
+.v3pub .v3-btn-on-dark:hover { color: var(--v3-gold); background: rgba(255,255,255,0.06); }
 
-/* chips */
+/* Chips premium */
 .v3pub .v3-chip {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 6px 14px; border-radius: 999px;
   background: #fff; border: 1px solid var(--v3-border);
-  font-size: 13px; font-weight: 500; color: var(--v3-ink);
+  font-size: 12.5px; font-weight: 500; color: var(--v3-ink);
   transition: border-color .15s, color .15s;
 }
-.v3pub .v3-chip:hover { border-color: var(--v3-orange); color: var(--v3-orange); }
-.v3pub .v3-chip-orange {
-  background: var(--v3-orange-50);
-  border: 1px solid rgba(249, 115, 22, 0.3);
-  color: var(--v3-orange-600);
+.v3pub .v3-chip:hover { border-color: var(--v3-gold); color: var(--v3-emerald); }
+.v3pub .v3-chip-gold {
+  background: var(--v3-gold-soft);
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  color: #6a4f10;
+}
+.v3pub .v3-chip-orange { /* alias legacy */
+  background: var(--v3-gold-soft);
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  color: #6a4f10;
 }
 
-/* card */
+/* Cartes éditoriales */
 .v3pub .v3-card {
   background: #fff;
   border: 1px solid var(--v3-border);
-  border-radius: 20px;
+  border-radius: 18px;
   padding: 24px;
-  transition: transform .2s, box-shadow .2s;
+  transition: transform .2s, box-shadow .2s, border-color .2s;
 }
-.v3pub .v3-card:hover { transform: translateY(-3px); box-shadow: 0 20px 40px -20px rgba(0,0,0,0.12); }
+.v3pub .v3-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--v3-shadow-card);
+  border-color: rgba(201, 168, 76, 0.4);
+}
 
-/* section dark */
-.v3pub .v3-section-dark {
-  background: var(--v3-ink);
+/* Badge premium (or) */
+.v3pub .v3-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--v3-gold);
+  color: #1a1408;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.v3pub .v3-badge-emerald {
+  background: var(--v3-emerald);
   color: #fff;
+}
+
+/* Section sombre — fond émeraude nuit */
+.v3pub .v3-section-dark {
+  background: linear-gradient(180deg, #052e23 0%, #041e18 100%);
+  color: #f5f0e0;
 }
 .v3pub .v3-section-dark .v3-serif { color: #fff; }
 
-/* subtle animations */
+/* Section papier */
+.v3pub .v3-section-paper {
+  background: var(--v3-paper);
+}
+
+/* Animations */
 @keyframes v3-float {
   0%, 100% { transform: translateY(0) rotate(-6deg); }
   50%      { transform: translateY(-10px) rotate(-6deg); }
@@ -113,7 +183,25 @@
 }
 .v3pub .v3-pulse { animation: v3-pulse-feather 2s ease-in-out infinite; }
 
-/* scrollbar horizontal discret */
-.v3pub .v3-scroll-x { scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.15) transparent; }
+/* Underline animée (mega-menu) */
+.v3pub .v3-nav-item {
+  position: relative;
+  transition: color .18s ease;
+}
+.v3pub .v3-nav-item::after {
+  content: '';
+  position: absolute;
+  left: 12px; right: 12px; bottom: 4px;
+  height: 1.5px;
+  background: var(--v3-gold);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform .25s ease;
+}
+.v3pub .v3-nav-item:hover::after,
+.v3pub .v3-nav-item[data-active="true"]::after { transform: scaleX(1); }
+
+/* Scrollbar horizontal discret */
+.v3pub .v3-scroll-x { scrollbar-width: thin; scrollbar-color: rgba(6,78,59,0.2) transparent; }
 .v3pub .v3-scroll-x::-webkit-scrollbar { height: 6px; }
-.v3pub .v3-scroll-x::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 6px; }
+.v3pub .v3-scroll-x::-webkit-scrollbar-thumb { background: rgba(6,78,59,0.2); border-radius: 6px; }

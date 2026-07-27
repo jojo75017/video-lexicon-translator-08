@@ -1,92 +1,109 @@
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import {
-  Home, Sparkles, Library, Users, BookOpen, User, Settings,
-  Wand2, Palette, Package, ChevronLeft, ChevronRight,
-  Compass, GraduationCap, Gem, Map as MapIcon, Clock, FileText, Bot, Download, Lock,
-  LifeBuoy, Mail, HelpCircle,
+  Home, Sparkles, Library, BookOpen, Settings,
+  ChevronLeft, ChevronRight,
+  GraduationCap, Gem, FileText, User,
+  LifeBuoy, Mail, HelpCircle, FolderOpen, Video, ListTree,
 } from 'lucide-react';
 import { useState } from 'react';
-import useV3Entitlement from '@/hooks/useV3Entitlement';
 
-// `paid: true` = module premium (upsell). Verrouillé pour tout le monde sauf l'admin.
-type NavItem = { to: string; label: string; icon: any; end?: boolean; paid?: boolean };
-type NavSection = {
-  section: string;
-  color: string;      // pastille + label
-  activeBg: string;   // bg de l'item actif
-  items: NavItem[];
-};
+/**
+ * Sidebar V3 — espace personnel uniquement (jamais les catégories du header).
+ * Style Émeraude Prestige : fond blanc, actif = fond or doux + barre or.
+ */
+type NavItem = { to: string; label: string; icon: any; end?: boolean };
+type NavSection = { section: string; items: NavItem[] };
 
-// Sidebar réduite : navigation transverse uniquement. Le header prend en charge
-// les catégories principales (Créer / Écrire / Habiller / Publier / Vendre /
-// Livres spéciaux) — ne pas dupliquer ici.
 const NAV: NavSection[] = [
-  { section: 'Accueil', color: '#F59E0B', activeBg: '#F59E0B', items: [
-    { to: '/v3', label: 'Accueil', icon: Home, end: true },
-    { to: '/v3/create', label: 'Créer un livre', icon: Sparkles },
-    { to: '/v3/library', label: 'Ma bibliothèque', icon: Library },
-    { to: '/v3/hub?tab=livres', label: 'Mes livres', icon: BookOpen },
-  ]},
-  { section: 'Formation & Guides', color: '#3B82F6', activeBg: '#3B82F6', items: [
-    { to: '/formation', label: 'Formation vidéo', icon: GraduationCap },
-    { to: '/blog', label: 'Guides & Blog', icon: FileText },
-    { to: '/v3/hub?tab=script', label: 'Script vidéo', icon: FileText },
-    { to: '/v3/hub?tab=guides', label: 'Guides Hub', icon: GraduationCap },
-  ]},
-  { section: 'Offres', color: '#0EA5A4', activeBg: '#0EA5A4', items: [
-    { to: '/v3/hub?tab=offres', label: 'Offres & Packs', icon: Gem },
-    { to: '/v3/hub?tab=roadmap', label: 'Roadmap', icon: MapIcon },
-    { to: '/v3/hub?tab=pending', label: 'En attente', icon: Clock },
-  ]},
-  { section: 'Support', color: '#0284C7', activeBg: '#0284C7', items: [
-    { to: '/contact-support', label: 'Contact', icon: Mail },
-    { to: '/faq', label: 'FAQ / Aide', icon: HelpCircle },
-    { to: '/assistance', label: 'Assistance', icon: LifeBuoy },
-  ]},
-  { section: 'Compte', color: '#64748B', activeBg: '#64748B', items: [
-    { to: '/v3/parametres', label: 'Paramètres', icon: Settings },
-    { to: '/subscription', label: 'Mon abonnement', icon: Gem },
-  ]},
+  {
+    section: 'Mon espace',
+    items: [
+      { to: '/v3', label: 'Accueil V3', icon: Home, end: true },
+      { to: '/v3/create', label: 'Créer un livre', icon: Sparkles },
+      { to: '/v3/library', label: 'Ma bibliothèque', icon: Library },
+      { to: '/v3/mes-livres', label: 'Mes livres', icon: BookOpen },
+      { to: '/v3/hub?tab=livres', label: 'Brouillons', icon: FolderOpen },
+      { to: '/v3/outils', label: 'Tous les outils', icon: ListTree },
+    ],
+  },
+  {
+    section: 'Formation',
+    items: [
+      { to: '/formation', label: 'Formation vidéo', icon: GraduationCap },
+      { to: '/masterclass', label: 'Masterclass', icon: Video },
+      { to: '/blog', label: 'Guides & Blog', icon: FileText },
+    ],
+  },
+  {
+    section: 'Compte',
+    items: [
+      { to: '/v3/auteur', label: 'Profil auteur', icon: User },
+      { to: '/subscription', label: 'Mon abonnement', icon: Gem },
+      { to: '/v3/hub?tab=offres', label: 'Offres & Packs', icon: Gem },
+      { to: '/v3/parametres', label: 'Paramètres', icon: Settings },
+    ],
+  },
+  {
+    section: 'Support',
+    items: [
+      { to: '/contact-support', label: 'Contact', icon: Mail },
+      { to: '/faq', label: 'FAQ / Aide', icon: HelpCircle },
+      { to: '/assistance', label: 'Assistance', icon: LifeBuoy },
+    ],
+  },
 ];
 
 export default function V3Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const { pathname, search } = useLocation();
-  const navigate = useNavigate();
   const currentTab = new URLSearchParams(search).get('tab');
-  const { isAdmin } = useV3Entitlement();
 
   return (
     <aside
-      className={`shrink-0 border-r border-black/10 bg-white transition-all duration-200 ${collapsed ? 'w-14' : 'w-60'}`}
-      style={{ position: 'sticky', top: 0, alignSelf: 'flex-start', height: '100vh', overflowY: 'auto' }}
+      className={`shrink-0 transition-all duration-200 ${collapsed ? 'w-14' : 'w-60'}`}
+      style={{
+        background: '#fff',
+        borderRight: '1px solid var(--v3-line)',
+        position: 'sticky',
+        top: 0,
+        alignSelf: 'flex-start',
+        height: '100vh',
+        overflowY: 'auto',
+      }}
     >
-      <div className="flex items-center justify-between px-3 py-3 border-b border-black/5">
+      <div
+        className="flex items-center justify-between px-3 py-3"
+        style={{ borderBottom: '1px solid var(--v3-line)' }}
+      >
         {!collapsed && (
-          <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--v3-muted)]">
-            Navigation
+          <span
+            className="text-[10px] font-bold uppercase tracking-[0.22em]"
+            style={{ color: 'var(--v3-gold-600)' }}
+          >
+            Espace auteur
           </span>
         )}
         <button
           onClick={() => setCollapsed((v) => !v)}
-          className="ml-auto rounded p-1 hover:bg-black/5 text-[var(--v3-muted)]"
+          className="ml-auto rounded p-1 hover:bg-black/5"
+          style={{ color: 'var(--v3-muted)' }}
           aria-label={collapsed ? 'Déplier' : 'Replier'}
         >
           {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
         </button>
       </div>
 
-      <nav className="p-2 space-y-4">
+      <nav className="p-2 space-y-5">
         {NAV.map((group) => (
           <div key={group.section}>
             {!collapsed && (
               <div
-                className="flex items-center gap-2 px-2 pb-1 text-[10px] font-bold uppercase tracking-wider"
-                style={{ color: group.color }}
+                className="flex items-center gap-2 px-2 pb-2 text-[10px] font-bold uppercase tracking-[0.22em]"
+                style={{ color: 'var(--v3-emerald)' }}
               >
                 <span
-                  className="inline-block w-1.5 h-1.5 rounded-full"
-                  style={{ background: group.color }}
+                  className="inline-block w-1 h-1 rounded-full"
+                  style={{ background: 'var(--v3-gold)' }}
                 />
                 {group.section}
               </div>
@@ -101,47 +118,40 @@ export default function V3Sidebar() {
                     ? pathname === itPath && currentTab === itTab
                     : pathname === itPath || (itPath.length > 1 && pathname.startsWith(itPath + '/'));
                 const Icon = it.icon;
-                const locked = !!it.paid && !isAdmin;
-                const title = locked ? `${it.label} — Réservé aux abonnés (voir Offres & Packs)` : it.label;
-
-                const baseCls = `flex items-center gap-2 rounded-md px-2 py-2 text-[13px] transition-colors ${
-                  locked ? 'text-[var(--v3-muted)] hover:bg-black/5' : 'text-[var(--v3-ink)] hover:bg-black/5'
-                }`;
-                const activeStyle = active
-                  ? { background: group.activeBg, color: '#fff', fontWeight: 600 }
-                  : undefined;
-
-                const content = (
-                  <>
-                    <Icon className="w-4 h-4 shrink-0" />
-                    {!collapsed && <span className="truncate flex-1">{it.label}</span>}
-                    {!collapsed && locked && <Lock className="w-3 h-3 shrink-0 opacity-70" />}
-                  </>
-                );
 
                 return (
                   <li key={it.to}>
-                    {locked ? (
-                      <button
-                        type="button"
-                        title={title}
-                        onClick={() => navigate('/v3/hub?tab=offres')}
-                        className={`${baseCls} w-full text-left`}
-                        style={activeStyle}
-                      >
-                        {content}
-                      </button>
-                    ) : (
-                      <NavLink
-                        to={it.to}
-                        end={(it as any).end}
-                        title={title}
-                        className={baseCls}
-                        style={activeStyle}
-                      >
-                        {content}
-                      </NavLink>
-                    )}
+                    <NavLink
+                      to={it.to}
+                      end={(it as any).end}
+                      title={it.label}
+                      className="relative flex items-center gap-2.5 rounded-md px-2.5 py-2 text-[13px] transition-colors"
+                      style={
+                        active
+                          ? {
+                              background: 'var(--v3-gold-soft)',
+                              color: 'var(--v3-emerald)',
+                              fontWeight: 600,
+                            }
+                          : { color: 'var(--v3-ink)' }
+                      }
+                      onMouseOver={(e) => {
+                        if (!active) (e.currentTarget as HTMLElement).style.background = 'rgba(6,78,59,0.04)';
+                      }}
+                      onMouseOut={(e) => {
+                        if (!active) (e.currentTarget as HTMLElement).style.background = '';
+                      }}
+                    >
+                      {active && (
+                        <span
+                          aria-hidden
+                          className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r"
+                          style={{ background: 'var(--v3-gold)' }}
+                        />
+                      )}
+                      <Icon className="w-4 h-4 shrink-0" />
+                      {!collapsed && <span className="truncate flex-1">{it.label}</span>}
+                    </NavLink>
                   </li>
                 );
               })}
