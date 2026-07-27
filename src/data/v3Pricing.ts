@@ -27,12 +27,12 @@ export const V3_PLANS: V3Plan[] = [
     chaptersMax: 20,
     wordsPerChapter: 3500,
     charactersMax: 3,
-    agentsCount: 22,
+    agentsCount: 18,
     proModulesIncluded: false,
     features: [
       "20 livres / mois",
       "20 chapitres max · 3 500 mots/ch",
-      "22 agents IA",
+      "18 agents IA",
       "Export PDF/DOCX/EPUB + TOC",
       "10 traductions incluses",
       "Couverture base (recto + tranche + 4e)",
@@ -93,7 +93,7 @@ export function getV3Plan(id: V3PlanId): V3Plan | undefined {
 }
 
 export function getV3PriceId(planId: V3PlanId, interval: V3BillingInterval): string {
-  return `${planId}_${interval === "month" ? "monthly" : "yearly"}`;
+  return `v3_${planId}_${interval === "month" ? "monthly" : "annual"}`;
 }
 
 export function getYearlySavingsPercent(plan: V3Plan): number {
