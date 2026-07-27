@@ -61,6 +61,7 @@ describe('V2V3FloatingSwitch (E2E interaction)', () => {
     expect(screen.getByTestId('location')).toHaveTextContent('/ebook-planner');
     expect(screen.getByRole('button', { name: /Basculer vers la V3/i })).toHaveTextContent('V2');
     expect(localStorage.getItem('ebookstudio_v3_mode')).toBeNull();
+    expect(localStorage.getItem('ebook_planner_active_tab')).toBe('workflow-dashboard');
   });
 
   it('bascule V3 → V2 depuis /admin : redirige aussi vers /ebook-planner', async () => {
@@ -73,6 +74,7 @@ describe('V2V3FloatingSwitch (E2E interaction)', () => {
 
     expect(screen.getByTestId('location')).toHaveTextContent('/ebook-planner');
     expect(screen.getByRole('button', { name: /Basculer vers la V3/i })).toHaveTextContent('V2');
+    expect(localStorage.getItem('ebook_planner_active_tab')).toBe('workflow-dashboard');
   });
 
   it('ne rend rien pour un non-admin', async () => {
