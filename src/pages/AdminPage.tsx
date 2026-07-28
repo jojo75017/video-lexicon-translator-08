@@ -388,6 +388,25 @@ export const AdminPage = () => {
           </div>
         </Card>
 
+        <Card className="border-blue-100 bg-blue-50/50 p-6">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-blue-600">Paiements</p>
+              <h2 className="text-2xl font-bold">Vérifier le bouton PayPal</h2>
+              <p className="text-muted-foreground">
+                Ouvrez un checkout de test de 1 € pour confirmer que PayPal s'affiche aux nouveaux clients.
+              </p>
+            </div>
+
+            <Button onClick={() => navigate('/admin/tester-paypal')} size="lg" variant="outline" className="w-full md:w-auto border-blue-300 text-blue-700 hover:bg-blue-100">
+              <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.064 1.193 1.378 2.64 1.085 4.154-.342 1.833-1.206 3.055-2.462 3.747-.578.32-1.19.52-1.83.62.374.428.6.91.72 1.45.262 1.105.13 2.53-.387 4.257-.602 2.03-1.55 3.465-2.815 4.267-1.163.733-2.683 1.104-4.526 1.104H7.68a.65.65 0 0 1-.604-.438z"/>
+              </svg>
+              Tester PayPal
+            </Button>
+          </div>
+        </Card>
+
         {/* Add Subscriber Card */}
         <Card className="p-6">
           <div className="flex items-center gap-2 mb-6">

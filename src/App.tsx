@@ -122,6 +122,7 @@ const AdminBetaTestersPage = lazy(() => import('./pages/admin/AdminBetaTestersPa
 const AdminPaymentsDashboardPage = lazy(() => import('./pages/admin/AdminPaymentsDashboardPage'));
 const AdminCleanupPage = lazy(() => import('./pages/admin/AdminCleanupPage'));
 const AdminPlansV3Page = lazy(() => import('./pages/admin/AdminPlansV3Page'));
+const AdminTestPayPalPage = lazy(() => import('./pages/admin/AdminTestPayPalPage'));
 const CrmPage = lazy(() => import('./pages/CrmPage'));
 const ProspectManagerPage = lazy(() => import('./pages/ProspectManagerPage'));
 const EmailPreviewPage = lazy(() => import('./pages/EmailPreviewPage'));
@@ -476,6 +477,7 @@ const App = () => {
             <Route path="/admin/beta-testeurs" element={<AdminGate><AdminBetaTestersPage /></AdminGate>} />
             <Route path="/admin/cleanup" element={<AdminGate><Navigate to="/admin/plans-v3" replace /></AdminGate>} />
             <Route path="/admin/plans-v3" element={<AdminGate><AdminPlansV3Page /></AdminGate>} />
+            <Route path="/admin/tester-paypal" element={<AdminGate><AdminTestPayPalPage /></AdminGate>} />
             <Route path="/admin-paiements" element={<AdminGate><AdminPaymentsDashboardPage /></AdminGate>} />
             <Route path="/crm" element={<AdminGate><CrmPage /></AdminGate>} />
             <Route path="/gestion-prospects" element={<AdminGate><ProspectManagerPage /></AdminGate>} />
