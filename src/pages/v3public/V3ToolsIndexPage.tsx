@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { V2_TOOLS, V2_TOOL_CATEGORIES } from '@/data/v2ToolsRegistry';
 import { planForTool, PLAN_META, type V3Plan } from '@/data/v3ToolPlans';
 import { Search, ArrowRight, Lock, Check } from 'lucide-react';
+import { FirecrawlNoticeBanner } from '@/components/ebook/FirecrawlNoticeBanner';
 
 type PlanParam = V3Plan | 'all' | null;
 
