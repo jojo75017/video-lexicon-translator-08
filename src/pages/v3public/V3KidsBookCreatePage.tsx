@@ -266,9 +266,32 @@ export default function V3KidsBookCreatePage() {
   const exportDocx = async () => {
     setExporting('docx');
     try {
+      // KDP square 21.59 x 21.59 cm = 8.5" x 8.5" = 12240 x 12240 DXA
+      const PAGE = 12240;
+      const MARGIN = 720; // 0.5"
       const children: Paragraph[] = [];
+
+      // ---- Couverture ----
+      if (draft.coverUrl) {
+        const coverBytes = await fetchImgBytes(draft.coverUrl);
+        if (coverBytes) {
+          children.push(new Paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [new ImageRun({
+              type: 'png',
+              data: coverBytes,
+              transformation: { width: 560, height: 560 },
+              altText: { title: 'Couverture', description: draft.title, name: 'cover' },
+            } as any)],
+          }));
+          children.push(new Paragraph({ children: [new PageBreak()] }));
+        }
+      }
+
+      // ---- Page de titre ----
       children.push(new Paragraph({
         alignment: AlignmentType.CENTER, heading: HeadingLevel.TITLE,
+        spacing: { before: 2400, after: 200 },
         children: [new TextRun({ text: draft.title, bold: true, size: 72 })],
       }));
       if (draft.subtitle) {
@@ -283,6 +306,20 @@ export default function V3KidsBookCreatePage() {
       }));
       children.push(new Paragraph({ children: [new PageBreak()] }));
 
+      // ---- Sommaire ----
+      children.push(new Paragraph({
+        heading: HeadingLevel.HEADING_1, alignment: AlignmentType.CENTER,
+        children: [new TextRun({ text: 'Sommaire', bold: true })],
+      }));
+      draft.stories.forEach((s, i) => {
+        children.push(new Paragraph({
+          alignment: AlignmentType.CENTER, spacing: { after: 120 },
+          children: [new TextRun({ text: `${i + 1}. ${s.title || 'Histoire'}`, size: 26 })],
+        }));
+      });
+      children.push(new Paragraph({ children: [new PageBreak()] }));
+
+      // ---- Histoires ----
       for (let i = 0; i < draft.stories.length; i++) {
         const s = draft.stories[i];
         if (s.illustrationUrl) {
@@ -294,16 +331,18 @@ export default function V3KidsBookCreatePage() {
                 type: 'png',
                 data: bytes,
                 transformation: { width: 500, height: 500 },
+                altText: { title: s.title || 'Illustration', description: s.synopsis || '', name: `story-${i + 1}` },
               } as any)],
             }));
+            children.push(new Paragraph({ children: [new PageBreak()] }));
           }
         }
         children.push(new Paragraph({
-          heading: HeadingLevel.HEADING_1,
+          heading: HeadingLevel.HEADING_1, alignment: AlignmentType.CENTER,
           children: [new TextRun({ text: `${i + 1}. ${s.title || 'Histoire'}`, bold: true })],
         }));
         children.push(new Paragraph({
-          spacing: { after: 200 },
+          alignment: AlignmentType.JUSTIFIED, spacing: { after: 200, line: 360 },
           children: [new TextRun({ text: s.content || s.synopsis || '', size: 28 })],
         }));
         children.push(new Paragraph({ children: [new PageBreak()] }));
@@ -358,16 +397,32 @@ export default function V3KidsBookCreatePage() {
         children: [new TextRun({ text: 'Merci du fond du cœur ❤️', italics: true, size: 30 })],
       }));
 
-      const doc = new Document({ sections: [{ children }] });
+      const doc = new Document({
+        creator: draft.authorName || 'Ebookstudio',
+        title: draft.title,
+        styles: {
+          default: { document: { run: { font: 'Georgia', size: 28 } } },
+        },
+        sections: [{
+          properties: {
+            page: {
+              size: { width: PAGE, height: PAGE, orientation: PageOrientation.PORTRAIT },
+              margin: { top: MARGIN, right: MARGIN, bottom: MARGIN, left: MARGIN },
+            },
+          },
+          children,
+        }],
+      });
       const blob = await Packer.toBlob(doc);
-      saveAs(blob, `${(draft.title || 'album').replace(/\s+/g, '-')}.docx`);
-      toast.success('Album Word téléchargé.');
+      saveAs(blob, `${(draft.title || 'album').replace(/\s+/g, '-')}-KDP-21x21.docx`);
+      toast.success('Album Word (format KDP 21×21 cm) téléchargé.');
     } catch (e: any) {
       toast.error(e.message || 'Erreur export Word');
     } finally {
       setExporting(null);
     }
   };
+
 
 
 
