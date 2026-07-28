@@ -52,10 +52,16 @@ type Phase = 'idle' | 'stories' | 'illustrations' | 'done';
 
 export default function V3KidsBookCreatePage() {
   const nav = useNavigate();
+  const [searchParams] = useSearchParams();
   const { saveSpecializedProject, updateSpecializedProject } = useProjectSave();
   const [plan, setPlan] = useState<V3Plan | null>(null);
   const [loadingPlan, setLoadingPlan] = useState(true);
   const [draft, setDraft] = useState<KidsBookDraft>(loadDraft);
+  const [preset, setPreset] = useState<KidsPresetId>(
+    (searchParams.get('preset') as KidsPresetId) === 'histoires-du-soir-3-7'
+      ? 'histoires-du-soir-3-7'
+      : 'maternelle-3-6'
+  );
   const [phase, setPhase] = useState<Phase>('idle');
   const [progress, setProgress] = useState<{ done: number; total: number }>({ done: 0, total: 0 });
   const [projectId, setProjectId] = useState<string | null>(() => {
@@ -66,6 +72,26 @@ export default function V3KidsBookCreatePage() {
   const [generatingCover, setGeneratingCover] = useState(false);
   const [generatingBack, setGeneratingBack] = useState(false);
   const [pageCount, setPageCount] = useState<number>(32);
+
+  const applyPreset = (id: KidsPresetId) => {
+    setPreset(id);
+    const p = KIDS_BOOK_PRESETS[id];
+    setDraft((d) => ({
+      ...d,
+      targetAge: p.targetAge,
+      chapterCount: p.chapterCount,
+      wordsPerStory: p.wordsPerStory,
+      style: p.defaultStyle,
+    }));
+  };
+
+  // Applique le preset venant de l'URL au 1er montage
+  useEffect(() => {
+    const q = searchParams.get('preset') as KidsPresetId | null;
+    if (q && KIDS_BOOK_PRESETS[q]) applyPreset(q);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
 
   const generateCover = async () => {
     if (!draft.title) return toast.error('Ajoute un titre avant de créer la couverture.');
