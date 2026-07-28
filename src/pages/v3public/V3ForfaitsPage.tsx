@@ -129,15 +129,18 @@ export default function V3ForfaitsPage() {
                 </ul>
 
                 <Link
-                  to={`/v3/offres?plan=${plan.id}&interval=${interval}`}
+                  to={`/contact-support?sujet=v3-${plan.id}-${interval}`}
                   className="block text-center py-3 rounded-lg font-semibold transition hover:opacity-90"
                   style={{
                     background: featured ? accent : "#232F3E",
                     color: "#fff",
                   }}
                 >
-                  Choisir {plan.name}
+                  Être prévenu au lancement
                 </Link>
+                <p className="text-[11px] text-center mt-2" style={{ color: "#9ca3af" }}>
+                  Ouverture des abonnements · octobre 2026
+                </p>
               </article>
             );
           })}
