@@ -80,6 +80,7 @@ export default function V3KidsBookCreatePage() {
   const [exporting, setExporting] = useState<'pdf' | 'docx' | null>(null);
   const [generatingCover, setGeneratingCover] = useState(false);
   const [generatingBack, setGeneratingBack] = useState(false);
+  const [generatingKdp, setGeneratingKdp] = useState(false);
   const [pageCount, setPageCount] = useState<number>(32);
 
   const applyPreset = (id: KidsPresetId) => {
