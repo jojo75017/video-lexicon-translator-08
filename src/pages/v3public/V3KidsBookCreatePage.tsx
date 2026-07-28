@@ -80,6 +80,7 @@ export default function V3KidsBookCreatePage() {
   const [exporting, setExporting] = useState<'pdf' | 'docx' | null>(null);
   const [generatingCover, setGeneratingCover] = useState(false);
   const [generatingBack, setGeneratingBack] = useState(false);
+  const [generatingKdp, setGeneratingKdp] = useState(false);
   const [pageCount, setPageCount] = useState<number>(32);
 
   const applyPreset = (id: KidsPresetId) => {
@@ -158,6 +159,103 @@ export default function V3KidsBookCreatePage() {
     } finally {
       setGeneratingBack(false);
     }
+  };
+
+  const generateKdpMetadata = async () => {
+    if (!draft.title) return toast.error('Ajoute au moins un titre.');
+    setGeneratingKdp(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('agent-kids-kdp-metadata', {
+        body: {
+          title: draft.title,
+          subtitle: draft.subtitle,
+          authorName: draft.authorName,
+          synopsis: draft.synopsis,
+          targetAge: draft.targetAge,
+          characterName: draft.character?.name,
+          storyTitles: (draft.stories || []).map((s) => s.title).filter(Boolean),
+        },
+      });
+      if (error) throw new Error(error.message || 'échec');
+      if (!data?.description) throw new Error(data?.error || 'Réponse vide');
+      setDraft((d) => ({
+        ...d,
+        kdpDescription: data.description,
+        kdpKeywords: Array.isArray(data.keywords) ? data.keywords : [],
+        kdpCategories: Array.isArray(data.categories) ? data.categories : [],
+      }));
+      toast.success('Fiche KDP générée ✨ (éditable ci-dessous)');
+    } catch (e: any) {
+      toast.error(e.message || 'Erreur génération fiche KDP');
+    } finally {
+      setGeneratingKdp(false);
+    }
+  };
+
+  const downloadImageUrl = async (url: string | undefined, filename: string) => {
+    if (!url) return toast.error('Aucune image à télécharger.');
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+      toast.success('Téléchargement lancé.');
+    } catch {
+      // fallback direct
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.click();
+    }
+  };
+
+  const exportKdp = () => {
+    const slug = (draft.title || 'kdp').replace(/\s+/g, '-').toLowerCase();
+    const kws = (draft.kdpKeywords || []).filter(Boolean);
+    const cats = (draft.kdpCategories || []).filter(Boolean);
+    const txt =
+`FICHE PRODUIT AMAZON KDP
+========================
+
+Titre : ${draft.title || ''}
+Sous-titre : ${draft.subtitle || ''}
+Auteur : ${draft.authorName || ''}
+Tranche d'âge : ${draft.targetAge || ''}
+Édition : ${draft.edition || ''}
+Année : ${draft.publicationYear || ''}
+Lieu : ${draft.publicationPlace || ''}
+ISBN : ${draft.isbn || '(fourni par KDP)'}
+
+--- DESCRIPTION (à coller dans le champ "Description" sur KDP) ---
+${draft.kdpDescription || '(non générée)'}
+
+--- 7 MOTS-CLÉS PERFORMANTS (à coller un par champ sur KDP) ---
+${kws.length ? kws.map((k, i) => `${i + 1}. ${k}`).join('\n') : '(non générés)'}
+
+--- 3 CATÉGORIES AMAZON (à sélectionner sur KDP) ---
+${cats.length ? cats.map((c, i) => `${i + 1}. ${c}`).join('\n') : '(non générées)'}
+
+--- MÉTADONNÉES COMPLÉMENTAIRES ---
+Catégorie BISAC : ${draft.bisacCategory || ''}
+Éditeur / Imprint : ${draft.publisher || draft.authorName || ''}
+Pays dépôt légal : ${draft.legalDepositCountry || ''}
+`;
+    const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${slug}-fiche-kdp.txt`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+    toast.success('Fiche KDP téléchargée.');
   };
 
   const spine = computeSpineWidth(pageCount);
@@ -910,6 +1008,14 @@ export default function V3KidsBookCreatePage() {
                   <span className="text-[11px] text-green-700 inline-flex items-center gap-1">
                     <Check className="w-3 h-3" /> Intégrée à l'export
                   </span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => downloadImageUrl(draft.coverUrl, `${(draft.title || 'couverture').replace(/\s+/g, '-')}-1ere-de-couverture.png`)}
+                    className="mt-1 h-7 text-[11px]"
+                  >
+                    <Download className="w-3 h-3 mr-1" /> Télécharger la 1ère
+                  </Button>
                 </div>
               )}
             </div>
@@ -939,7 +1045,17 @@ export default function V3KidsBookCreatePage() {
                 {draft.backCoverUrl ? 'Regénérer la 4e' : 'Créer la 4e de couverture'}
               </Button>
               {draft.backCoverUrl && (
-                <img src={draft.backCoverUrl} alt="4e de couverture" className="w-40 h-40 object-cover rounded border shadow-sm" />
+                <div className="flex flex-col items-center gap-1">
+                  <img src={draft.backCoverUrl} alt="4e de couverture" className="w-40 h-40 object-cover rounded border shadow-sm" />
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => downloadImageUrl(draft.backCoverUrl, `${(draft.title || 'couverture').replace(/\s+/g, '-')}-4e-de-couverture.png`)}
+                    className="mt-1 h-7 text-[11px]"
+                  >
+                    <Download className="w-3 h-3 mr-1" /> Télécharger la 4e
+                  </Button>
+                </div>
               )}
             </div>
           </div>
@@ -985,10 +1101,92 @@ export default function V3KidsBookCreatePage() {
         </div>
 
 
+        {/* Fiche produit KDP */}
+        <div className="v3-card mb-4 border-l-4 border-[#C97A14]">
+          <div className="flex items-start justify-between gap-3 mb-2 flex-wrap">
+            <div>
+              <h2 className="font-semibold">6. Fiche produit Amazon KDP</h2>
+              <p className="text-xs text-[var(--v3-muted)]">
+                Description Amazon + <strong>7 mots-clés performants</strong> + <strong>3 catégories</strong> — à copier/coller sur KDP.
+              </p>
+            </div>
+            <Button
+              onClick={generateKdpMetadata}
+              disabled={generatingKdp || !draft.title}
+              className="bg-[#C97A14] hover:opacity-90 text-white"
+            >
+              {generatingKdp ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Wand2 className="w-4 h-4 mr-2" />}
+              {draft.kdpDescription ? 'Regénérer la fiche KDP' : 'Générer la fiche KDP (IA)'}
+            </Button>
+          </div>
+
+          <label className="block text-xs text-[var(--v3-muted)] mt-3">
+            Description Amazon
+            <textarea
+              value={draft.kdpDescription || ''}
+              onChange={(e) => update({ kdpDescription: e.target.value })}
+              placeholder="La description sera générée ici. Éditable avant copie sur KDP."
+              rows={8}
+              className="mt-1 w-full rounded-lg border border-black/15 px-3 py-2 text-sm focus:border-[#C97A14] focus:outline-none"
+            />
+            <span className="text-[10px] text-[var(--v3-muted)]">
+              {(draft.kdpDescription || '').length} / 4000 caractères
+            </span>
+          </label>
+
+          <div className="mt-4">
+            <div className="text-xs font-semibold text-[#C97A14] uppercase tracking-wider mb-2">
+              7 mots-clés performants (1 par champ KDP)
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {Array.from({ length: 7 }).map((_, i) => (
+                <input
+                  key={i}
+                  value={(draft.kdpKeywords || [])[i] || ''}
+                  onChange={(e) => {
+                    const arr = [...(draft.kdpKeywords || Array(7).fill(''))];
+                    arr[i] = e.target.value;
+                    update({ kdpKeywords: arr });
+                  }}
+                  placeholder={`Mot-clé ${i + 1}`}
+                  maxLength={50}
+                  className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm"
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <div className="text-xs font-semibold text-[#C97A14] uppercase tracking-wider mb-2">
+              3 catégories Amazon (chemin complet)
+            </div>
+            <div className="grid grid-cols-1 gap-2">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <input
+                  key={i}
+                  value={(draft.kdpCategories || [])[i] || ''}
+                  onChange={(e) => {
+                    const arr = [...(draft.kdpCategories || Array(3).fill(''))];
+                    arr[i] = e.target.value;
+                    update({ kdpCategories: arr });
+                  }}
+                  placeholder={`Catégorie ${i + 1} — ex : Livres > Livres pour enfants > 3-5 ans > Histoires du soir`}
+                  className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm"
+                />
+              ))}
+            </div>
+          </div>
+
+          <p className="text-[11px] text-[var(--v3-muted)] mt-3">
+            💡 Les catégories proposées sont indicatives — vérifie leur disponibilité sur ton dashboard KDP au moment de la publication.
+          </p>
+        </div>
+
+
         {/* Sauvegarde & Export */}
 
         <div className="v3-card mb-4">
-          <h2 className="font-semibold mb-2">6. Sauvegarde</h2>
+          <h2 className="font-semibold mb-2">7. Sauvegarde</h2>
           <p className="text-xs text-[var(--v3-muted)] mb-3">
             Enregistre ton livre dans « Mes projets » pour le retrouver depuis n'importe quel appareil.
           </p>
@@ -1008,7 +1206,7 @@ export default function V3KidsBookCreatePage() {
         </div>
 
         <div className="v3-card mb-8">
-          <h2 className="font-semibold mb-2">7. Export album</h2>
+          <h2 className="font-semibold mb-2">8. Export album</h2>
           <p className="text-xs text-[var(--v3-muted)] mb-3">
             Format album carré 21,59 × 21,59 cm — prêt pour KDP.
           </p>
@@ -1036,11 +1234,37 @@ export default function V3KidsBookCreatePage() {
             >
               <Download className="w-4 h-4 mr-2" /> HTML
             </Button>
+            <Button
+              onClick={exportKdp}
+              disabled={!draft.title}
+              variant="outline"
+              className="border-[#C97A14] text-[#C97A14] hover:bg-[#C97A14]/10"
+              title="Télécharge la fiche produit à copier sur KDP"
+            >
+              <Download className="w-4 h-4 mr-2" /> KDP (.txt)
+            </Button>
+            {draft.coverUrl && (
+              <Button
+                onClick={() => downloadImageUrl(draft.coverUrl, `${(draft.title || 'couverture').replace(/\s+/g, '-')}-1ere-de-couverture.png`)}
+                variant="outline"
+              >
+                <ImageIcon className="w-4 h-4 mr-2" /> 1ère de couverture
+              </Button>
+            )}
+            {draft.backCoverUrl && (
+              <Button
+                onClick={() => downloadImageUrl(draft.backCoverUrl, `${(draft.title || 'couverture').replace(/\s+/g, '-')}-4e-de-couverture.png`)}
+                variant="outline"
+              >
+                <ImageIcon className="w-4 h-4 mr-2" /> 4e de couverture
+              </Button>
+            )}
           </div>
           <p className="text-[11px] text-[var(--v3-muted)] mt-3">
-            PDF : ouvre la boîte d'impression du navigateur → choisis <em>Enregistrer au format PDF</em>.
+            PDF : ouvre la boîte d'impression du navigateur → choisis <em>Enregistrer au format PDF</em>. Le bouton <strong>KDP (.txt)</strong> exporte la description, les 7 mots-clés et les 3 catégories à coller sur ton dashboard KDP.
           </p>
         </div>
+
 
         <div className="text-center text-xs text-[var(--v3-muted)] flex items-center justify-center gap-2">
           <Check className="w-3 h-3 text-green-600" />

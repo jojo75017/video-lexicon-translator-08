@@ -118,6 +118,10 @@ export interface KidsBookDraft {
   bisacCategory?: string;  // ex: "JUV002000 — JUVENILE FICTION / Animals"
   keywords?: string;       // 7 mots-clés KDP, séparés par virgules
   legalDepositCountry?: string; // "France", "Belgique", "Canada", etc.
+  // ---- Fiche produit KDP (générée par IA, éditable) ----
+  kdpDescription?: string;      // description longue Amazon (max ~4000 caractères)
+  kdpKeywords?: string[];       // exactement 7 mots-clés performants Amazon
+  kdpCategories?: string[];     // exactement 3 catégories Amazon (chemin complet)
 }
 
 /**
