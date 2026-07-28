@@ -14,6 +14,7 @@ import {
   SpecialAquarium,
   SpecialBirdSheet,
   SpecialMultiTome,
+  SpecialUniverseVolumes,
 } from '@/components/admin/SpecialBookModules';
 import V3CreatePage from './V3CreatePage';
 
@@ -32,6 +33,7 @@ const MAP: Record<string, { title: string; Comp: React.FC }> = {
   aquariophilie: { title: 'Aquariophilie', Comp: SpecialAquarium },
   oiseaux: { title: 'Fiches oiseaux', Comp: SpecialBirdSheet },
   saga: { title: 'Saga multi-tomes', Comp: SpecialMultiTome },
+  univers: { title: 'Univers multi-volumes', Comp: SpecialUniverseVolumes },
 };
 
 export default function V3SpecialBookPage() {

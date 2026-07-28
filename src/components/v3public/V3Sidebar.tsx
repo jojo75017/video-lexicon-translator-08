@@ -42,6 +42,7 @@ const NAV: NavSection[] = [
       { to: '/v3/create', label: 'Créer un livre', icon: Sparkles },
       { to: '/v3/create/illustre?preset=maternelle-3-6', label: 'Album maternelle 3-6 ans', icon: Sparkles, badge: 'Livré' },
       { to: '/v3/create/illustre?preset=histoires-du-soir-3-7', label: 'Histoires du soir 3-7 ans', icon: BookOpen, badge: 'Livré' },
+      { to: '/v3/livres/univers', label: 'Univers multi-volumes', icon: Library, badge: 'Nouveau' },
 
       { to: '/v3/library', label: 'Ma bibliothèque', icon: Library },
       { to: '/v3/mes-livres', label: 'Mes livres', icon: BookOpen },

@@ -14,7 +14,8 @@ export type ProBookModule =
   | 'diary'
   | 'aquarium'
   | 'bird'
-  | 'multitome';
+  | 'multitome'
+  | 'universe';
 
 export interface ProBookLimits {
   maxSections: number;
@@ -116,4 +117,5 @@ export const PRO_MODULE_LABELS: Record<ProBookModule, string> = {
   aquarium: 'Aquariophilie',
   bird: 'Fiches oiseaux',
   multitome: 'Saga multi-tomes',
+  universe: 'Univers narratif multi-volumes',
 };
