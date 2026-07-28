@@ -1,84 +1,87 @@
-# Mode "Livre illustré maternelle" — Studio & Éditeur uniquement
+## État des lieux — Pages V3 (aucune modification effectuée)
 
-Ajouter un nouveau parcours de création de livres jeunesse illustrés (type "28 histoires pour la maternelle") réservé aux forfaits **Studio (12,99 €)** et **Éditeur (59 €)**. Le forfait **Auteur (9,99 €)** ne l'a pas.
+Voici l'inventaire complet des pages sous `/v3` et leur statut d'utilisation réel dans la navigation. **Rien n'est supprimé** — c'est un audit pour décider ensemble.
 
-## 1. Preset "Livre illustré enfant" dans le wizard
+---
 
-Dans `src/components/v3public/V3CreateWizard.tsx`, ajouter un nouveau type de projet :
+### 1. Pages actives et visibles dans la nav (à garder)
 
-- **Nom d'auteur** : champ obligatoire, repris tel quel sur la couverture et la page de titre (ex: "Juliette K.Louzou"). Pré-rempli avec le nom d'auteur du profil V3 mais éditable par livre.
-- **Format** : recueil d'histoires courtes (10 à 30 histoires de 1-2 pages)
-- **Âge cible** : 3-6 ans (maternelle)
-- **Ton** : phrases simples, dialogues, morale douce
-- **Structure** : 1 illustration pleine page + 1 page de texte par histoire
-- **Dimensions KDP** : 21,59 × 21,59 cm (album carré standard)
+Liées depuis `V3Sidebar`, `V3Header`, `V3Footer`, `V3MainTabs` :
 
-Si l'utilisateur est sur le forfait Auteur, afficher un lock avec CTA "Passer à Studio pour débloquer".
+| Route | Fichier | Où c'est linké |
+|---|---|---|
+| `/v3` | `V3HomePage` | Header, Sidebar, Footer |
+| `/v3/auth` | `V3AuthPage` | Header, Footer |
+| `/v3/create` | `V3CreatePage` | Sidebar, Header, Footer |
+| `/v3/create/illustre` | `V3KidsBookCreatePage` | Sidebar (badge Nouveau) |
+| `/v3/library` | `V3LibraryPage` | Sidebar, Header, Footer |
+| `/v3/mes-livres` | `V3BookManagerPage` | Sidebar, Footer |
+| `/v3/hub` (+ `?tab=`) | `V3HubPage` | Sidebar (Brouillons, En attente) |
+| `/v3/outils` | `V3ToolsIndexPage` | Sidebar, MainTabs |
+| `/v3/compte` | `V3ComptePage` | Sidebar |
+| `/v3/forfaits` | `V3ForfaitsPage` | Sidebar |
+| `/v3/auteur` | `V3GuestAuthorPage` | Sidebar |
+| `/v3/parametres` | `V3AuthorSettingsPage` | Sidebar, Footer |
+| `/v3/gallery` | `V3GalleryPage` | Footer uniquement |
 
-## 2. Bible du personnage (cohérence visuelle)
+---
 
-Étendre l'étape "Personnages" du wizard pour capturer :
-- Nom, âge, description physique détaillée (cheveux, yeux, morphologie)
-- Vêtements signatures (ex: t-shirt vert, short bleu)
-- Style d'illustration global (Pixar 3D / aquarelle / crayonné)
+### 2. Pages routées mais absentes de toute nav (candidates à trier)
 
-Cette bible est injectée dans **chaque prompt d'image** pour garantir que le personnage reste identique d'une page à l'autre.
+Aucun `Link`/`navigate` ne pointe dessus depuis la sidebar/header/footer :
 
-## 3. Nouvel agent P31 "Illustrateur cohérent"
+| Route | Fichier | Statut probable | Reco |
+|---|---|---|---|
+| `/v3/book/:id` | `V3BookPage` | Détail livre — sûrement ouvert depuis Library/Gallery en dynamique | **Garder** (à vérifier usage dynamique) |
+| `/v3/u/:slug` | `V3AuthorProfilePage` | Profil auteur public — SEO / partage | **Garder** (lien externe possible) |
+| `/v3/livres/:type` | `V3SpecialBookPage` | Livres spéciaux — orphelin apparent | À **archiver** si plus au menu |
+| `/v3/offres` | `V3OffresPage` | Ancienne page offres (avant Forfaits V3) | **Doublon** avec `/v3/forfaits` → à archiver |
+| `/v3/offres/merci` | `V3OffresMerciPage` | Confirmation post-achat offres | Garder tant que `/v3/offres` existe, sinon archiver |
+| `/v3/outils/sommaire-ultime` | `V3TocUltimatePage` | Outil accessible depuis `/v3/outils` | **Garder** (lien via ToolsIndex) |
+| `/v3/outils/traduction` | `V3TranslatorPage` | Outil accessible depuis `/v3/outils` | **Garder** (lien via ToolsIndex) |
 
-Créer `supabase/functions/agent-illustrator/index.ts` :
-- Reçoit : bible du personnage + résumé du chapitre + style
-- Génère une image par chapitre via `google/gemini-3-pro-image` (qualité) ou `google/gemini-3.1-flash-image` (rapide)
-- Sauvegarde dans le bucket `ebook-images` (existant, public)
-- Retourne l'URL pour insertion dans l'export
+---
 
-Activé uniquement si `projectType === 'illustrated_kids'`.
+### 3. Pages V3 hors `v3public/` (routes séparées à revoir)
 
-## 4. Export "Album jeunesse"
+| Route | Fichier | Reco |
+|---|---|---|
+| `/v3-paiement` | `V3PaiementPage` | Legacy — vérifier si Stripe l'utilise encore |
+| `/v3-offre` → redirect `/offres` | — | OK (redirect) |
+| `/hub-v3` → redirect `/v3/hub` | — | OK (redirect) |
+| `/tableau-de-bord` → redirect `/v3/hub` | — | OK (redirect) |
+| `SalesPageV3Launch.tsx` | (pas trouvé de route active) | Vérifier si toujours routée |
+| `V3CommandePage.tsx` | (pas trouvé de route active) | Vérifier |
 
-Adapter `src/lib/export/pdfExporter.ts` :
-- Nouveau template "album-carre-21x21"
-- **Page de titre** : titre du livre + **nom de l'auteur saisi à l'étape 1**
-- **Couverture** : titre + nom d'auteur en bas (comme sur les albums KDP)
-- Alternance image pleine page / texte gros caractères (police 18-22 pt, interligne 1.5)
-- Marges enfant (2 cm)
-- Format carré compatible KDP
+---
 
-## 5. Gating par forfait
+### 4. Résumé propositions (à valider avant toute action)
 
-Dans `src/config/v3ToolPlans.ts` :
-```ts
-illustrated_kids_book: {
-  tiers: ['studio', 'editeur'],  // pas 'auteur'
-  imageQuotaPerBook: 30,
-}
-```
+**À archiver sans risque (aucun lien entrant + doublon fonctionnel) :**
+- `V3OffresPage` + `V3OffresMerciPage` → remplacées par `/v3/forfaits`
+- `V3SpecialBookPage` → plus dans le menu
+- `V3PaiementPage` (si non utilisée par Stripe checkout)
+- `SalesPageV3Launch`, `V3CommandePage` (à confirmer)
 
-Quotas d'images inclus :
-- **Studio** : 30 images/livre × 20 livres = 600 images/mois
-- **Éditeur** : illimité (fair-use ~2000/mois)
+**À garder (utilisées en dynamique ou SEO) :**
+- `V3BookPage` (`:id`), `V3AuthorProfilePage` (`:slug`), `V3GalleryPage`
+- Toutes les pages du bloc 1
 
-## 6. UI forfaits
+---
 
-Dans `src/pages/v3public/V3ForfaitsPage.tsx`, ajouter la ligne feature :
-- Auteur : ❌ Non inclus
-- Studio : ✅ Jusqu'à 30 illustrations/livre
-- Éditeur : ✅ Illustrations illimitées
+### Étapes à suivre (une fois en build mode, sur ton feu vert)
 
-## Détails techniques
+1. Vérifier que `V3BookPage` et `V3AuthorProfilePage` sont bien ouverts dynamiquement (grep sur les IDs/slug).
+2. Vérifier si `V3PaiementPage`, `SalesPageV3Launch`, `V3CommandePage` sont référencées dans Stripe/emails.
+3. Pour chaque page confirmée obsolète : **remplacer sa route par un `<Navigate>`** vers la remplaçante (au lieu de supprimer le fichier) — ainsi anciens liens/emails/SEO ne cassent pas.
+4. Déplacer les fichiers archivés dans `src/pages/_archive/` (comme déjà fait pour V2) sans les supprimer.
+5. Test Playwright sur toutes les routes de nav pour confirmer 0 régression.
 
-- Modèle image par défaut : `google/gemini-3.1-flash-image` (~0,02 €/image)
-- Modèle premium (Éditeur) : `google/gemini-3-pro-image` pour rendu photoréaliste
-- Stockage : bucket existant `ebook-images` (public)
-- Le prompt inclut systématiquement : `[CHARACTER BIBLE] + [SCENE] + [STYLE] + "consistent character, same face, same outfit across all images"`
-- Le champ `author_name` existe déjà sur `ebook_projects` — on le réutilise et on l'injecte dans la couverture + page de titre + métadonnées KDP.
+---
 
-## Ordre de livraison
+### Question pour toi
 
-1. Config forfaits + gating
-2. Preset wizard (avec champ auteur obligatoire) + bible personnage
-3. Agent illustrateur + upload bucket
-4. Export album carré avec couverture + page de titre auteur
-5. UI badges "Nouveau · Studio+" sur les forfaits
-
-Je livre les 5 étapes d'un coup si tu valides.
+Veux-tu que je :
+- **(A)** archive uniquement le bloc "sans risque" (offres V3 + livres spéciaux) avec redirects,
+- **(B)** fais d'abord une vérif complète des usages Stripe/emails avant de toucher `V3PaiementPage` etc.,
+- **(C)** ou un audit encore plus profond (composants admin V3 orphelins aussi) ?
