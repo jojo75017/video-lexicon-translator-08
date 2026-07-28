@@ -1008,6 +1008,14 @@ Pays dépôt légal : ${draft.legalDepositCountry || ''}
                   <span className="text-[11px] text-green-700 inline-flex items-center gap-1">
                     <Check className="w-3 h-3" /> Intégrée à l'export
                   </span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => downloadImageUrl(draft.coverUrl, `${(draft.title || 'couverture').replace(/\s+/g, '-')}-1ere-de-couverture.png`)}
+                    className="mt-1 h-7 text-[11px]"
+                  >
+                    <Download className="w-3 h-3 mr-1" /> Télécharger la 1ère
+                  </Button>
                 </div>
               )}
             </div>
