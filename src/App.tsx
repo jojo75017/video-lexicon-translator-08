@@ -31,6 +31,8 @@ const EbookIdeasPage = lazy(() => import('./pages/EbookIdeasPage'));
 const EbookbotPage = lazy(() => import('./pages/EbookbotPage'));
 const AmbiancesPage = lazy(() => import('./pages/AmbiancesPage'));
 const CouvertureKdpPage = lazy(() => import('./pages/CouvertureKdpPage'));
+const CoverStudioProHubPage = lazy(() => import('./pages/v3/cover-studio-pro/CoverStudioProHubPage'));
+const CoverEditorPage = lazy(() => import('./pages/v3/cover-studio-pro/CoverEditorPage'));
 const Niches600Page = lazy(() => import('./pages/Niches600Page'));
 const NichesPage = lazy(() => import('./pages/NichesPage'));
 const BookPerfectPage = lazy(() => import('./pages/BookPerfectPage'));
@@ -446,6 +448,8 @@ const App = () => {
             <Route path="/audit-pilot" element={gated(<AuditPilotPage />)} />
             <Route path="/bookperfect" element={<BookPerfectGate><BookPerfectPage /></BookPerfectGate>} />
             <Route path="/couverture-kdp" element={gated(<CouvertureKdpPage />)} />
+            <Route path="/v3/cover-studio-pro" element={gated(<CoverStudioProHubPage />)} />
+            <Route path="/v3/cover-studio-pro/edit" element={gated(<CoverEditorPage />)} />
             <Route path="/series-tomes" element={gated(<SeriesTomesPage />)} />
             <Route path="/fiches-pratiques" element={gated(<PracticalSheetsGeneratorPage />)} />
 
