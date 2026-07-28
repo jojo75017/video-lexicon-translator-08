@@ -5,14 +5,36 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const FIRECRAWL_V2 = "https://api.firecrawl.dev/v2";
+const GATEWAY_V2 = "https://connector-gateway.lovable.dev/firecrawl/v2";
+
+function firecrawlUrl(apiKey: string, endpoint: string) {
+  const base = apiKey.startsWith("lovc_") ? GATEWAY_V2 : FIRECRAWL_V2;
+  return `${base}${endpoint}`;
+}
+
+function firecrawlHeaders(apiKey: string) {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (apiKey.startsWith("lovc_")) {
+    const lovableKey = Deno.env.get("LOVABLE_API_KEY");
+    if (!lovableKey) {
+      throw new Error("LOVABLE_API_KEY manquant pour le mode gateway Firecrawl.");
+    }
+    headers["Authorization"] = `Bearer ${lovableKey}`;
+    headers["X-Connection-Api-Key"] = apiKey;
+  } else {
+    headers["Authorization"] = `Bearer ${apiKey}`;
+  }
+  return headers;
+}
+
 async function firecrawlSearch(query: string, apiKey: string, limit = 10) {
-  const response = await fetch("https://api.firecrawl.dev/v1/search", {
+  const response = await fetch(firecrawlUrl(apiKey, "/search"), {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ query, limit }),
+    headers: firecrawlHeaders(apiKey),
+    body: JSON.stringify({ query, limit, lang: "fr" }),
   });
 
   if (!response.ok) {
@@ -108,11 +130,9 @@ serve(async (req) => {
     const domain = marketplace === "us" ? "amazon.com" : marketplace === "uk" ? "amazon.co.uk" : marketplace === "de" ? "amazon.de" : "amazon.fr";
 
     if (action === "search" && keywords) {
-      // Use Firecrawl to search Google for Amazon Kindle results
-      // This gets titles, prices, ratings from Google's search result snippets
       const query = `${keywords} kindle ebook site:${domain}`;
       const searchResults = await firecrawlSearch(query, firecrawlKey, Math.min(maxResults || 10, 15));
-      
+
       const results = searchResults?.data || [];
       const items: BookResult[] = [];
       const seenAsins = new Set<string>();
@@ -120,23 +140,19 @@ serve(async (req) => {
       for (const result of results) {
         const url = result.url || "";
         const asin = extractAsinFromUrl(url);
-        
-        // Only keep Amazon product pages
+
         if (!url.includes(domain) || !asin || seenAsins.has(asin)) continue;
         seenAsins.add(asin);
 
         const text = `${result.title || ""} ${result.description || ""} ${result.markdown || ""}`;
-        
-        // Extract title from search result - Google usually shows "Title: Author: Books"
+
         let title = result.title || "N/A";
-        // Clean up Amazon title patterns
         title = title
           .replace(/\s*:\s*Amazon\.(fr|com|co\.uk|de).*$/i, "")
           .replace(/\s*-\s*Amazon\.(fr|com|co\.uk|de).*$/i, "")
           .replace(/\|\s*Amazon.*$/i, "")
           .trim();
 
-        // Try to extract author from title pattern "Book Title: Author Name"
         let author = "Inconnu";
         const authorPatterns = [
           /:\s*([^:]+?):\s*(?:Books|Livres|Amazon)/i,
@@ -151,12 +167,10 @@ serve(async (req) => {
         const price = extractPriceFromText(text);
         const { rating, reviewCount } = extractRatingFromText(text);
 
-        // Pages
         let pages: number | null = null;
         const pagesMatch = text.match(/(\d+)\s*(?:pages|p\.)/i);
         if (pagesMatch) pages = parseInt(pagesMatch[1], 10);
 
-        // BSR from search snippet (rare but possible)
         let bsr: number | null = null;
         const bsrMatch = text.match(/#?\s*([\d\s,.]+)\s*(?:in|dans|en)\s*(?:Kindle|Livres|Books)/i);
         if (bsrMatch) {
@@ -179,18 +193,16 @@ serve(async (req) => {
         });
       }
 
-      // Now enrich top results by scraping individual product pages via Firecrawl
-      // Use a second search specifically for BSR/details
       if (items.length > 0) {
         const enrichPromises = items.slice(0, 5).map(async (item) => {
           try {
             const detailQuery = `"${item.asin}" amazon BSR classement meilleures ventes`;
             const detailResults = await firecrawlSearch(detailQuery, firecrawlKey, 3);
             const detailData = detailResults?.data || [];
-            
+
             for (const d of detailData) {
               const dText = `${d.title || ""} ${d.description || ""} ${d.markdown || ""}`;
-              
+
               if (!item.bsr) {
                 const bsrM = dText.match(/#?\s*([\d\s,.]+)\s*(?:in|dans|en)\s*(?:Kindle|Livres|Books)/i);
                 if (bsrM) {
@@ -240,7 +252,7 @@ serve(async (req) => {
 
           for (const d of data) {
             const text = `${d.title || ""} ${d.description || ""} ${d.markdown || ""}`;
-            
+
             if (title === asin && d.title) {
               title = d.title.replace(/\s*[-:|]\s*Amazon.*$/i, "").trim();
             }
