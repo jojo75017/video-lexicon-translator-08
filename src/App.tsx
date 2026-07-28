@@ -506,6 +506,7 @@ const App = () => {
               <Route path="outils/traduction" element={<V3TranslatorPage />} />
               <Route path="compte" element={<V3ComptePage />} />
               <Route path="forfaits" element={<V3ForfaitsPage />} />
+              <Route path="pourquoi" element={<V3PourquoiPage />} />
               <Route path="hub" element={isPlannerPreviewHost ? <V3HubPage /> : <V3Gate><V3HubPage /></V3Gate>} />
             </Route>
 
