@@ -160,28 +160,7 @@ export default function V3KidsBookCreatePage() {
     );
   }
 
-  if (!canUseKidsBook(plan)) {
-    return (
-      <section className="min-h-[calc(100vh-4rem)] py-16 px-5 bg-[var(--v3-paper,#fbfaf6)]">
-        <div className="max-w-2xl mx-auto text-center v3-card p-10">
-          <Lock className="w-10 h-10 text-[#C97A14] mx-auto mb-4" />
-          <h1 className="v3-serif text-3xl font-bold mb-3">Livre illustré maternelle</h1>
-          <p className="text-[var(--v3-muted)] mb-6">
-            Ce mode est réservé aux forfaits <strong>Studio (12,99 €)</strong> et <strong>Éditeur (59 €)</strong>.
-            Il inclut la génération d'illustrations cohérentes pour ton personnage, page après page.
-          </p>
-          <Link to="/v3/forfaits">
-            <Button className="bg-[#C97A14] hover:bg-[#a8630f] text-white">
-              Voir les forfaits Studio & Éditeur
-            </Button>
-          </Link>
-          <div className="mt-6 text-xs text-[var(--v3-muted)]">
-            <Link to="/v3/create" className="underline">← Retour à l'écriture classique</Link>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  const planAllowed = canUseKidsBook(plan);
 
   return (
     <section className="v3-halo-soft min-h-[calc(100vh-4rem)] py-12 px-5">
@@ -198,6 +177,20 @@ export default function V3KidsBookCreatePage() {
             Format album carré, compatible KDP.
           </p>
         </div>
+
+        {!planAllowed && (
+          <div className="v3-card mb-4 border-l-4 border-[#C97A14] bg-[#fff7ec]">
+            <div className="flex items-start gap-3">
+              <Lock className="w-5 h-5 text-[#C97A14] shrink-0 mt-0.5" />
+              <div className="text-sm text-[var(--v3-ink)]">
+                <strong>Mode aperçu.</strong> La génération d'illustrations est incluse dans les forfaits{' '}
+                <strong>Studio</strong> et <strong>Éditeur</strong>. Tu peux tester le wizard librement ;
+                l'export d'album nécessite un forfait éligible.{' '}
+                <Link to="/v3/forfaits" className="underline text-[#C97A14]">Voir les forfaits</Link>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Étape 1 — Livre */}
         <div className="v3-card mb-4">
