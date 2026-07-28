@@ -3,7 +3,7 @@ import {
   Home, Sparkles, Library, BookOpen, Settings,
   ChevronLeft, ChevronRight,
   GraduationCap, Gem, FileText, User,
-  LifeBuoy, Mail, HelpCircle, FolderOpen, Video, ListTree,
+  LifeBuoy, Mail, HelpCircle, FolderOpen, Video, ListTree, Clock,
 } from 'lucide-react';
 import { useState } from 'react';
 
