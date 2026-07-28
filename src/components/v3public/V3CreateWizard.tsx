@@ -873,6 +873,7 @@ Règles :
         ...config,
         cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations,
         promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion,
+        bibleUnivers, arbreNarratif,
       }));
       if (!sameBook) {
         ['ebook_workflow_progress', 'ebook_workflow_results', 'ebook_workflow_sync_data']
