@@ -61,6 +61,8 @@ export default function V3KidsBookCreatePage() {
   const [saving, setSaving] = useState(false);
   const [exporting, setExporting] = useState<'pdf' | 'docx' | null>(null);
   const [generatingCover, setGeneratingCover] = useState(false);
+  const [generatingBack, setGeneratingBack] = useState(false);
+  const [pageCount, setPageCount] = useState<number>(32);
 
   const generateCover = async () => {
     if (!draft.title) return toast.error('Ajoute un titre avant de créer la couverture.');
