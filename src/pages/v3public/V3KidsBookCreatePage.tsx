@@ -45,6 +45,15 @@ function loadDraft(): KidsBookDraft {
     wordsPerStory: 120,
     character: { name: '', age: '4 ans', physical: '', outfit: '' },
     stories: [],
+    isbn: '',
+    publisher: '',
+    publicationYear: String(new Date().getFullYear()),
+    publicationPlace: 'France',
+    edition: 'Première édition',
+    dedication: '',
+    bisacCategory: 'JUV000000 — JUVENILE FICTION / General',
+    keywords: '',
+    legalDepositCountry: 'France',
   };
 }
 
