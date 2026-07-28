@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Sparkles, Loader2 } from 'lucide-react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { Sparkles, Loader2, ImageIcon, ArrowRight } from 'lucide-react';
 import ApiProviderQuickSettings from '@/components/ebook/ApiProviderQuickSettings';
 
 const V3CreateWizard = lazy(() => import('@/components/v3public/V3CreateWizard'));
@@ -52,6 +52,28 @@ export default function V3CreatePage() {
             Choisis ton fournisseur d'IA (Gemini, Claude, OpenAI ou OpenRouter), colle ta clé et valide-la avant de lancer les 15 agents.
           </p>
         </div>
+
+        {/* Carte "Livre illustré maternelle" — Studio & Éditeur */}
+        <Link
+          to="/v3/create/illustre"
+          className="block mb-6 v3-card border-2 border-[#C97A14]/40 bg-gradient-to-br from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 transition-colors"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-[#C97A14] text-white flex items-center justify-center flex-shrink-0">
+              <ImageIcon className="w-6 h-6" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="font-bold text-[#C97A14]">Nouveau · Livre illustré maternelle</h3>
+                <span className="text-[10px] uppercase tracking-wide bg-[#C97A14] text-white px-1.5 py-0.5 rounded">Studio & Éditeur</span>
+              </div>
+              <p className="text-xs text-[var(--v3-muted)]">
+                Album carré 21×21 cm avec illustrations IA cohérentes (même personnage sur toutes les pages). Type "28 histoires pour la maternelle".
+              </p>
+            </div>
+            <ArrowRight className="w-5 h-5 text-[#C97A14]" />
+          </div>
+        </Link>
 
         {/* Panneau clés API & modèles — TOUJOURS visible ici, admin ou non */}
         <div className="v3-card mb-6">
