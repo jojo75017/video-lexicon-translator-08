@@ -82,8 +82,23 @@ const MATRIX: Record<ProBookModule, Record<ProBookTier, ProBookLimits>> = {
   },
 };
 
+const GENERIC_STD: ProBookLimits = {
+  maxSections: 15,
+  wordsPerSection: [300, 600],
+  imagesPerSection: 1,
+  extras: ['Sommaire', 'Structure guidée'],
+};
+const GENERIC_PRO: ProBookLimits = {
+  maxSections: 60,
+  wordsPerSection: [1000, 2000],
+  imagesPerSection: 2,
+  extras: ['Sections avancées', 'Index', 'À propos de l\'auteur'],
+};
+
 export function getProBookLimits(module: ProBookModule, tier: ProBookTier): ProBookLimits {
-  return MATRIX[module][tier];
+  const entry = (MATRIX as Partial<Record<ProBookModule, Record<ProBookTier, ProBookLimits>>>)[module];
+  if (entry) return entry[tier];
+  return tier === 'pro' ? GENERIC_PRO : GENERIC_STD;
 }
 
 export const PRO_MODULE_LABELS: Record<ProBookModule, string> = {
@@ -91,4 +106,14 @@ export const PRO_MODULE_LABELS: Record<ProBookModule, string> = {
   atlas: 'Atlas',
   recipe: 'Livre de cuisine',
   travel: 'Guide de voyage',
+  encyclopedia: 'Encyclopédie',
+  coloring: 'Livre de coloriage',
+  agenda: 'Agenda / Planner',
+  scolaire: 'Manuel scolaire',
+  pedagogique: 'Livre pédagogique',
+  comic: 'BD / Manga',
+  diary: 'Journal intime',
+  aquarium: 'Aquariophilie',
+  bird: 'Fiches oiseaux',
+  multitome: 'Saga multi-tomes',
 };
