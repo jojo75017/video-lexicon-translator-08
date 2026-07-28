@@ -13,6 +13,7 @@ import EbookDiaryGenerator from '@/components/ebook/EbookDiaryGenerator';
 import EbookAquariumGenerator from '@/components/ebook/EbookAquariumGenerator';
 import EbookBirdSheetGenerator from '@/components/ebook/EbookBirdSheetGenerator';
 import { EbookMultiTomeHub } from '@/components/ebook/EbookMultiTomeHub';
+import EbookUniverseVolumesGenerator from '@/components/ebook/EbookUniverseVolumesGenerator';
 import ProBookShell from '@/components/ebook/pro/ProBookShell';
 
 const CONFIG_KEY = 'edition_book_config_v1';
@@ -134,6 +135,9 @@ export const SpecialBirdSheet: React.FC = () => {
 export const SpecialMultiTome: React.FC = () => (
   <ProBookShell module="multitome"><EbookMultiTomeHub /></ProBookShell>
 );
+export const SpecialUniverseVolumes: React.FC = () => (
+  <ProBookShell module="universe"><EbookUniverseVolumesGenerator /></ProBookShell>
+);
 
 /** Métadonnées des livres spéciaux — utilisées pour l'affichage en cartes. */
 export type SpecialBookMeta = { id: string; emoji: string; title: string; subtitle: string };
@@ -153,4 +157,5 @@ export const SPECIAL_BOOK_MODULES: SpecialBookMeta[] = [
   { id: 'special-aquarium', emoji: '🐠', title: 'Aquariophilie', subtitle: 'Fiches poissons et bacs' },
   { id: 'special-bird-sheet', emoji: '🐦', title: 'Fiches oiseaux', subtitle: 'Guide ornithologique illustré' },
   { id: 'special-multi-tome', emoji: '📚', title: 'Saga multi-tomes', subtitle: 'Série cohérente sur plusieurs tomes' },
+  { id: 'special-universe-volumes', emoji: '🌌', title: 'Univers multi-volumes', subtitle: 'Ajoute des volumes à ton univers (bible, règles, timeline, personnages)' },
 ];
