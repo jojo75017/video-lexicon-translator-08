@@ -13,6 +13,7 @@ type Row = {
   updated_at: string;
   chapters?: any[] | null;
   ebook_images?: any[] | null;
+  project_type?: string | null;
 };
 
 const PROJECT_ID_KEY = 'v3_wizard_project_id';
