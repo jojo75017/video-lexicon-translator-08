@@ -77,6 +77,7 @@ const V3TocUltimatePage = lazy(() => import('./pages/v3public/V3TocUltimatePage'
 const V3TranslatorPage = lazy(() => import('./pages/v3public/V3TranslatorPage'));
 const V3ToolsIndexPage = lazy(() => import('./pages/v3public/V3ToolsIndexPage'));
 const V3ComptePage = lazy(() => import('./pages/v3public/V3ComptePage'));
+const V3PourquoiPage = lazy(() => import('./pages/v3public/V3PourquoiPage'));
 const V3ForfaitsPage = lazy(() => import('./pages/v3public/V3ForfaitsPage'));
 
 // Blog / Formation SEO
@@ -505,6 +506,7 @@ const App = () => {
               <Route path="outils/traduction" element={<V3TranslatorPage />} />
               <Route path="compte" element={<V3ComptePage />} />
               <Route path="forfaits" element={<V3ForfaitsPage />} />
+              <Route path="pourquoi" element={<V3PourquoiPage />} />
               <Route path="hub" element={isPlannerPreviewHost ? <V3HubPage /> : <V3Gate><V3HubPage /></V3Gate>} />
             </Route>
 
