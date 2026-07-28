@@ -1,6 +1,20 @@
 import type { ProBookTier } from '@/hooks/useProBookTier';
 
-export type ProBookModule = 'documentary' | 'atlas' | 'recipe' | 'travel';
+export type ProBookModule =
+  | 'documentary'
+  | 'atlas'
+  | 'recipe'
+  | 'travel'
+  | 'encyclopedia'
+  | 'coloring'
+  | 'agenda'
+  | 'scolaire'
+  | 'pedagogique'
+  | 'comic'
+  | 'diary'
+  | 'aquarium'
+  | 'bird'
+  | 'multitome';
 
 export interface ProBookLimits {
   maxSections: number;
