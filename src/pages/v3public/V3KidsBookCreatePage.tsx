@@ -47,11 +47,18 @@ type Phase = 'idle' | 'stories' | 'illustrations' | 'done';
 
 export default function V3KidsBookCreatePage() {
   const nav = useNavigate();
+  const { saveSpecializedProject, updateSpecializedProject } = useProjectSave();
   const [plan, setPlan] = useState<V3Plan | null>(null);
   const [loadingPlan, setLoadingPlan] = useState(true);
   const [draft, setDraft] = useState<KidsBookDraft>(loadDraft);
   const [phase, setPhase] = useState<Phase>('idle');
   const [progress, setProgress] = useState<{ done: number; total: number }>({ done: 0, total: 0 });
+  const [projectId, setProjectId] = useState<string | null>(() => {
+    try { return localStorage.getItem(PROJECT_ID_KEY); } catch { return null; }
+  });
+  const [saving, setSaving] = useState(false);
+  const [exporting, setExporting] = useState<'pdf' | 'docx' | null>(null);
+
 
   useEffect(() => {
     (async () => {
