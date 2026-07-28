@@ -20,13 +20,12 @@ const NAV: NavSection[] = [
     items: [
       { to: '/v3', label: 'Accueil V3', icon: Home, end: true },
       { to: '/v3/create', label: 'Créer un livre', icon: Sparkles },
-      { to: '/v3/create/illustre', label: 'Livre illustré maternelle', icon: Sparkles, badge: 'Nouveau' },
-      { to: '/v3/create/illustre?preset=histoires-du-soir-3-7', label: 'Histoires du soir 3-7 ans', icon: Sparkles, badge: 'Nouveau' },
+      { to: '/v3/create/illustre?preset=maternelle-3-6', label: 'Album maternelle 3-6 ans', icon: Sparkles, badge: 'Livré' },
+      { to: '/v3/create/illustre?preset=histoires-du-soir-3-7', label: 'Histoires du soir 3-7 ans', icon: BookOpen, badge: 'Livré' },
 
       { to: '/v3/library', label: 'Ma bibliothèque', icon: Library },
       { to: '/v3/mes-livres', label: 'Mes livres', icon: BookOpen },
       { to: '/v3/hub?tab=livres', label: 'Brouillons', icon: FolderOpen },
-      { to: '/v3/hub?tab=pending', label: 'En attente · Octobre', icon: Clock, badge: 'Oct.' },
       { to: '/v3/pourquoi', label: 'Pourquoi EbookStudio', icon: Award, badge: 'À lire' },
       { to: '/v3/outils', label: 'Tous les outils', icon: ListTree },
     ],
