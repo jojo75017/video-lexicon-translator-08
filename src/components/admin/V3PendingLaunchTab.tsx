@@ -161,6 +161,48 @@ export default function V3PendingLaunchTab() {
       </div>
 
 
+      {/* Livres illustrés 3-7 ans — roadmap en attente */}
+      <div className="rounded-2xl border-2 bg-white p-5 sm:p-6" style={{ borderColor: `${AMBER}66` }}>
+        <div className="flex items-center gap-2 mb-3 flex-wrap">
+          <Sparkles className="h-5 w-5" style={{ color: AMBER_DEEP }} />
+          <h3 className="text-xl font-semibold" style={{ fontFamily: SERIF, color: INK }}>
+            Livres illustrés maternelle 3-7 ans — évolutions prévues
+          </h3>
+          <span
+            className="ml-2 rounded-full border px-2 py-0.5 text-[10px] font-black uppercase tracking-wider"
+            style={{ background: AMBER_SOFT, borderColor: `${AMBER}66`, color: AMBER_DEEP }}
+          >
+            En attente
+          </span>
+        </div>
+        <p className="text-sm mb-4" style={{ color: '#6f5e47' }}>
+          Le mode « Livre illustré maternelle » (<code>/v3/create/illustre</code>) est en ligne.
+          La phase suivante ajoutera un preset dédié <strong>3-7 ans</strong> inspiré de la référence
+          Amazon « Histoires du soir — Éclair le chat » et un studio de couvertures pro KDP.
+        </p>
+        <ul className="space-y-3 text-sm" style={{ color: '#4a3f2f' }}>
+          <li className="flex gap-2">
+            <BookOpen className="h-4 w-4 mt-0.5 shrink-0" style={{ color: AMBER }} />
+            <span><strong>Preset « Histoires du soir »</strong> — 20 histoires courtes (150-200 mots), mascotte récurrente, ton doux du soir, sommaire visuel numéroté.</span>
+          </li>
+          <li className="flex gap-2">
+            <Sparkles className="h-4 w-4 mt-0.5 shrink-0" style={{ color: AMBER }} />
+            <span><strong>Cover Studio Pro Kids</strong> — génération de couvertures pro KDP prêtes à imprimer : 1ère de couverture, 4ème de couverture (résumé + auteur) et calcul automatique de la tranche selon le nombre de pages.</span>
+          </li>
+          <li className="flex gap-2">
+            <Layers className="h-4 w-4 mt-0.5 shrink-0" style={{ color: AMBER }} />
+            <span><strong>Cohérence visuelle renforcée</strong> — la mascotte garde le même design sur les 20 pages (bible personnage + seed image partagé).</span>
+          </li>
+          <li className="flex gap-2">
+            <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0" style={{ color: AMBER }} />
+            <span>Format cible : <strong>album carré 21,59 × 21,59 cm</strong>, exports PDF / Word / HTML déjà en place.</span>
+          </li>
+        </ul>
+        <p className="mt-4 text-xs italic" style={{ color: '#6f5e47' }}>
+          Mis en attente après stabilisation de la V3 — sera déclenché en même temps que le lancement d'octobre.
+        </p>
+      </div>
+
 
       {/* Note finale */}
       <div className="rounded-2xl border-2 border-dashed p-5 text-sm" style={{ borderColor: `${AMBER}66`, background: AMBER_SOFT, color: AMBER_DEEP }}>
