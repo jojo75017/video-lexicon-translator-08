@@ -548,6 +548,7 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
         </Card>
 
         {/* Tabs */}
+        <FirecrawlNoticeBanner />
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsList className="grid grid-cols-2 sm:grid-cols-4 w-full max-w-2xl bg-orange-100/50 dark:bg-orange-900/20">
             <TabsTrigger value="research" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
