@@ -71,9 +71,8 @@ const V3GuestAuthorPage = lazy(() => import('./pages/v3public/V3GuestAuthorPage'
 const V3AuthorProfilePage = lazy(() => import('./pages/v3public/V3AuthorProfilePage'));
 const V3BookManagerPage = lazy(() => import('./pages/v3public/V3BookManagerPage'));
 const V3AuthorSettingsPage = lazy(() => import('./pages/v3public/V3AuthorSettingsPage'));
-const V3SpecialBookPage = lazy(() => import('./pages/v3public/V3SpecialBookPage'));
-const V3OffresPage = lazy(() => import('./pages/v3public/V3OffresPage'));
-const V3OffresMerciPage = lazy(() => import('./pages/v3public/V3OffresMerciPage'));
+// Archived V3 pages (no inbound links) — routes redirect to /v3/forfaits.
+// Files kept in src/pages/v3public/ for reference; remove after Oct 2026 launch if unused.
 const V3TocUltimatePage = lazy(() => import('./pages/v3public/V3TocUltimatePage'));
 const V3TranslatorPage = lazy(() => import('./pages/v3public/V3TranslatorPage'));
 const V3ToolsIndexPage = lazy(() => import('./pages/v3public/V3ToolsIndexPage'));
