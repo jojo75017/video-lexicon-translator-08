@@ -7,7 +7,18 @@ import { toast } from 'sonner';
 
 const SECTIONS: { title: string; duration: string; body: string }[] = [
   {
-    title: '0. Intro — Présentation (0:00 → 0:45)',
+    title: '0. Ouverture — La recherche KDP avec EbookStudio & KDP Pilot (0:00 → 0:45)',
+    duration: '~45 s',
+    body: `Avant même d'écrire une seule ligne, il y a une étape que 90 % des auteurs négligent — et c'est exactement celle qui fait la différence entre un livre qui dort et un livre qui se vend : la recherche KDP.
+
+Chez EbookStudio, nous avons intégré une véritable cellule de recherche Amazon KDP, pilotée par notre module KDP Pilot. Concrètement, avant de publier, vous savez déjà : quels mots-clés sont recherchés, quelles niches sont rentables, quels ASIN concurrents dominent, quelles catégories choisir, et quelle description convertit.
+
+KDP Pilot analyse votre projet, audite votre fiche produit, et vous dit noir sur blanc ce qui fonctionne et ce qu'il faut corriger. C'est l'assurance de publier un livre pensé pour Amazon, pas contre Amazon.
+
+Voilà pourquoi la V3 commence toujours par la recherche — et pourquoi nos auteurs vendent mieux, plus vite, et plus longtemps.`,
+  },
+  {
+    title: '1. Intro — Présentation (0:00 → 0:45)',
     duration: '~45 s',
     body: `Bonjour et bienvenue ! Je suis Georges, le fondateur d'EbookStudio.
 Depuis plusieurs années, j'accompagne des auteurs, des formateurs et des entrepreneurs qui veulent publier leurs livres sur Amazon KDP sans y passer des mois et sans se ruiner en outils.
@@ -17,7 +28,7 @@ Aujourd'hui, je suis très heureux de vous présenter la version 3 d'EbookStudio
 Prenez quelques minutes : je vais vous faire visiter, de A à Z, tout ce que la V3 peut faire pour vous.`,
   },
   {
-    title: '1. La promesse de la V3 (0:45 → 1:30)',
+    title: '2. La promesse de la V3 (0:45 → 1:30)',
     duration: '~45 s',
     body: `EbookStudio Pro V3, ce n'est pas un simple générateur de texte.
 C'est une suite d'édition complète : plus de 30 agents IA spécialisés qui travaillent ensemble — un pour le plan, un pour l'écriture, un pour la cohérence, un pour la couverture, un pour la traduction, un pour le marketing…
@@ -25,7 +36,7 @@ C'est une suite d'édition complète : plus de 30 agents IA spécialisés qui tr
 Notre promesse est simple : vous donnez une idée, un titre, un public visé — la V3 vous rend un livre prêt à publier sur Amazon KDP, avec sa couverture, sa fiche produit, ses mots-clés et ses catégories.`,
   },
   {
-    title: "2. De la V2 à la V3 : une maison d'édition en ligne (1:30 → 2:15)",
+    title: "3. De la V2 à la V3 : une maison d'édition en ligne (1:30 → 2:15)",
     duration: '~45 s',
     body: `Je tiens à être très clair : ce n'est pas une simple mise à jour.
 
@@ -34,7 +45,7 @@ EbookStudio V2 était un excellent outil pour écrire des livres. La V3 est autr
 C'est le passage de l'écriture isolée à la publication professionnelle. Si vous vouliez quelque chose de grandiose, c'est exactement ce que nous avons construit.`,
   },
   {
-    title: '3. Onglet PLAN — Structurer le livre (2:15 → 3:00)',
+    title: '4. Onglet PLAN — Structurer le livre (2:15 → 3:00)',
     duration: '~45 s',
     body: `Tout commence dans l'onglet Plan.
 Vous entrez le titre, le sous-titre, l'auteur, le synopsis, le public cible et le style souhaité.
@@ -43,7 +54,7 @@ Vous pouvez éditer le sommaire, réorganiser, ajouter, supprimer, et même int�
 C'est la fondation solide de votre livre.`,
   },
   {
-    title: '4. Onglet ÉCRIRE — Le manuscrit (3:00 → 3:55)',
+    title: '5. Onglet ÉCRIRE — Le manuscrit (3:00 → 3:55)',
     duration: '~55 s',
     body: `Une fois le plan validé, on passe à l'écriture.
 Les agents rédigent chaque chapitre en respectant le ton, le style et la cohérence globale.
@@ -53,7 +64,7 @@ Vous pouvez pauser, reprendre, régénérer un chapitre, et même utiliser votre
 Chaque projet est automatiquement sauvegardé dans le cloud, dans "Mes livres".`,
   },
   {
-    title: '5. Livre illustré maternelle & Histoires du soir (3:55 → 4:45)',
+    title: '6. Livre illustré maternelle & Histoires du soir (3:55 → 4:45)',
     duration: '~50 s',
     body: `La V3 va plus loin avec deux modules pensés pour les livres enfants.
 
@@ -64,7 +75,7 @@ Le second : "Histoires du soir 3-7 ans", avec un ton apaisant, des illustrations
 Dans les deux cas, les mentions légales KDP, la page de copyright, la dédicace, les remerciements et la note pour avis sont intégrées automatiquement.`,
   },
   {
-    title: '6. Onglet HABILLER — Couvertures & mise en page (4:45 → 5:35)',
+    title: '7. Onglet HABILLER — Couvertures & mise en page (4:45 → 5:35)',
     duration: '~50 s',
     body: `Un livre, c'est aussi une couverture qui donne envie.
 Le module Cover Studio Pro génère une première de couverture, une quatrième de couverture, et calcule automatiquement l'épaisseur du dos en fonction du nombre de pages, en millimètres, centimètres ou pouces.
@@ -74,7 +85,7 @@ Vous téléchargez chaque visuel en PNG haute qualité, prêt à être uploadé 
 Côté texte, les exports PDF et DOCX sont optimisés pour l'impression print-on-demand : marges intérieures, polices lisibles, sauts de page propres.`,
   },
   {
-    title: '7. Onglet PUBLIER — La fiche Amazon KDP (5:35 → 6:25)',
+    title: '8. Onglet PUBLIER — La fiche Amazon KDP (5:35 → 6:25)',
     duration: '~50 s',
     body: `Publier sur Amazon, ce n'est pas juste envoyer un fichier.
 Il faut un titre optimisé, un sous-titre, une description vendeuse, 7 mots-clés performants, et 3 catégories Amazon bien choisies.
@@ -85,7 +96,7 @@ Vous obtenez un fichier .txt prêt à copier-coller directement dans KDP — plu
 Résultat : votre fiche produit est propre, optimisée pour le référencement Amazon, et alignée avec les meilleures pratiques 2026.`,
   },
   {
-    title: '8. Onglet VENDRE — Marketing & lancement (6:25 → 7:05)',
+    title: '9. Onglet VENDRE — Marketing & lancement (6:25 → 7:05)',
     duration: '~40 s',
     body: `Un livre publié, c'est bien. Un livre qui se vend, c'est mieux.
 La V3 embarque un module marketing complet : séquences email de lancement, posts réseaux sociaux, pages de vente, script de challenge 7 jours…
@@ -93,7 +104,7 @@ La V3 embarque un module marketing complet : séquences email de lancement, post
 Vous pouvez aussi analyser vos concurrents avec "Audit ASIN", scanner 600 niches rentables, faire de la recherche de mots-clés Amazon avec KDSpy, et surveiller vos crédits Firecrawl en direct.`,
   },
   {
-    title: '9. Traductions & rayonnement international (7:05 → 7:40)',
+    title: '10. Traductions & rayonnement international (7:05 → 7:40)',
     duration: '~35 s',
     body: `Votre livre mérite d'être lu partout.
 Le module Traduction transforme votre manuscrit en 10 langues — anglais, espagnol, italien, allemand, portugais, néerlandais, et plus encore — en gardant le ton, le style et la cohérence.
@@ -101,7 +112,7 @@ Le module Traduction transforme votre manuscrit en 10 langues — anglais, espag
 Vous multipliez vos revenus KDP sans réécrire une seule ligne.`,
   },
   {
-    title: '10. Les 3 forfaits (7:40 → 8:55)',
+    title: '11. Les 3 forfaits (7:40 → 8:55)',
     duration: '~75 s',
     body: `Parlons tarifs — c'est clair, c'est transparent, sans surprise.
 
@@ -117,14 +128,14 @@ Livres illimités, 30 agents IA, traductions 10 langues, KDP Pilot, priorité de
 Et bien sûr, nous proposons aussi les forfaits annuels avec une économie affichée directement sur la page Forfaits.`,
   },
   {
-    title: '11. Sécurité, sauvegarde & clés API (8:55 → 9:15)',
+    title: '12. Sécurité, sauvegarde & clés API (8:55 → 9:15)',
     duration: '~20 s',
     body: `Vos projets sont sauvegardés dans le cloud, chiffrés, avec RLS — vous seul y avez accès.
 Vous pouvez à tout moment repartir d'un brouillon, réouvrir un livre depuis "Mes projets", ou repartir de zéro avec le bouton "Nouveau livre".
 Vous restez maître de vos données, de vos clés API, et de vos livres.`,
   },
   {
-    title: '12. Conclusion — Bienvenue chez EbookStudio (9:15 → 10:00)',
+    title: '13. Conclusion — Bienvenue chez EbookStudio (9:15 → 10:00)',
     duration: '~45 s',
     body: `Voilà, vous avez fait le tour de la V3.
 De l'idée au livre imprimé, de la couverture à la fiche Amazon, du français à 10 langues — tout est là, dans une seule maison d'édition numérique, pensée pour vous faire gagner du temps, de la qualité et de la sérénité.
