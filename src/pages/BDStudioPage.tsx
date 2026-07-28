@@ -149,20 +149,28 @@ const BDStudioPage: React.FC = () => {
               <motion.div variants={fadeUp} custom={3} className="flex flex-wrap gap-3">
                 <Button
                   size="lg"
-                  onClick={() => {
-                    setShowGenerator(true);
-                    setTimeout(() => document.getElementById('generator')?.scrollIntoView({ behavior: 'smooth' }), 100);
-                  }}
+              <motion.div variants={fadeUp} custom={3} className="flex flex-wrap gap-3">
+                <Button
+                  size="lg"
+                  onClick={handleLaunch}
                   className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-lg px-8 shadow-xl shadow-amber-500/25"
                 >
-                  <Zap className="mr-2 h-5 w-5" />
-                  Créer ma BD maintenant
+                  {isPro ? (
+                    <><Zap className="mr-2 h-5 w-5" /> Lancer BD Studio Pro</>
+                  ) : (
+                    <><Crown className="mr-2 h-5 w-5" /> Débloquer avec Éditeur — 59 €</>
+                  )}
                 </Button>
                 <Button
                   size="lg"
                   variant="outline"
                   onClick={() => document.getElementById('styles')?.scrollIntoView({ behavior: 'smooth' })}
                   className="border-amber-500/30 hover:bg-amber-500/10 text-lg"
+                >
+                  Voir les styles
+                  <ChevronDown className="ml-1 h-4 w-4" />
+                </Button>
+              </motion.div>
                 >
                   Voir les styles
                   <ChevronDown className="ml-1 h-4 w-4" />
