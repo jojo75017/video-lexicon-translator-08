@@ -275,10 +275,57 @@ export default function V3KidsBookCreatePage() {
           spacing: { after: 200 },
           children: [new TextRun({ text: s.content || s.synopsis || '', size: 28 })],
         }));
-        if (i < draft.stories.length - 1) {
-          children.push(new Paragraph({ children: [new PageBreak()] }));
-        }
+        children.push(new Paragraph({ children: [new PageBreak()] }));
       }
+
+      // Remerciements
+      children.push(new Paragraph({
+        heading: HeadingLevel.HEADING_1, alignment: AlignmentType.CENTER,
+        children: [new TextRun({ text: 'Remerciements', bold: true })],
+      }));
+      children.push(new Paragraph({
+        alignment: AlignmentType.CENTER, spacing: { after: 200 },
+        children: [new TextRun({
+          text: `Un immense merci à toi, petit lecteur, ainsi qu'aux parents, grands-parents et enseignants qui prennent le temps de partager ces histoires. Merci à tous ceux qui, de près ou de loin, ont soufflé sur les pages de ce livre pour lui donner vie.`,
+          size: 26,
+        })],
+      }));
+      children.push(new Paragraph({ children: [new PageBreak()] }));
+
+      // Mot de l'auteur
+      children.push(new Paragraph({
+        heading: HeadingLevel.HEADING_1, alignment: AlignmentType.CENTER,
+        children: [new TextRun({ text: "Le mot de l'auteur", bold: true })],
+      }));
+      children.push(new Paragraph({
+        alignment: AlignmentType.CENTER, spacing: { after: 200 },
+        children: [new TextRun({
+          text: `J'ai écrit ${draft.title} avec l'envie de faire grandir la curiosité, la tendresse et le sourire des plus petits. Chaque histoire est une petite graine à planter dans le cœur des enfants — j'espère qu'elles fleuriront longtemps dans le vôtre.`,
+          size: 26,
+        })],
+      }));
+      children.push(new Paragraph({
+        alignment: AlignmentType.CENTER,
+        children: [new TextRun({ text: `— ${draft.authorName}`, italics: true, size: 28 })],
+      }));
+      children.push(new Paragraph({ children: [new PageBreak()] }));
+
+      // Note pour avis
+      children.push(new Paragraph({
+        heading: HeadingLevel.HEADING_1, alignment: AlignmentType.CENTER,
+        children: [new TextRun({ text: 'Si ce livre vous a plu…', bold: true })],
+      }));
+      children.push(new Paragraph({
+        alignment: AlignmentType.CENTER, spacing: { after: 200 },
+        children: [new TextRun({
+          text: `Laisser un avis sur Amazon prend moins d'une minute et fait une immense différence pour un auteur indépendant. Votre retour aide d'autres familles à découvrir ce livre et me donne l'élan pour en écrire d'autres.`,
+          size: 26,
+        })],
+      }));
+      children.push(new Paragraph({
+        alignment: AlignmentType.CENTER,
+        children: [new TextRun({ text: 'Merci du fond du cœur ❤️', italics: true, size: 30 })],
+      }));
 
       const doc = new Document({ sections: [{ children }] });
       const blob = await Packer.toBlob(doc);
@@ -612,6 +659,11 @@ function buildAlbumHtml(d: KidsBookDraft): string {
   .text-page { padding: 3cm 2.5cm; justify-content: center; }
   .text-page h2 { font-size: 26pt; margin: 0 0 1cm; }
   .text-page p { font-size: 16pt; line-height: 1.6; margin: 0; white-space: pre-wrap; }
+  .end-page { padding: 3cm 2.5cm; justify-content: center; text-align: center; background: #fffdf7; }
+  .end-page h2 { font-size: 30pt; margin: 0 0 1cm; color: #C97A14; }
+  .end-page p { font-size: 15pt; line-height: 1.6; margin: 0 0 0.6cm; }
+  .end-page .signature { margin-top: 1.2cm; font-style: italic; font-size: 16pt; }
+  .end-page .thanks { margin-top: 1.5cm; font-size: 18pt; font-style: italic; color: #C97A14; }
 </style></head><body>
   <section class="page cover">
     <h1>${esc(d.title)}</h1>
@@ -624,6 +676,21 @@ function buildAlbumHtml(d: KidsBookDraft): string {
     <div class="author">${esc(d.authorName)}</div>
     <div class="age">${esc(d.targetAge)}</div>
   </section>
+  </section>
   ${stories}
+  <section class="page end-page">
+    <h2>Remerciements</h2>
+    <p>Un immense merci à toi, petit lecteur, ainsi qu'aux parents, grands-parents et enseignants qui prennent le temps de partager ces histoires. Merci à tous ceux qui, de près ou de loin, ont soufflé sur les pages de ce livre pour lui donner vie.</p>
+  </section>
+  <section class="page end-page">
+    <h2>Le mot de l'auteur</h2>
+    <p>J'ai écrit ${esc(d.title)} avec l'envie de faire grandir la curiosité, la tendresse et le sourire des plus petits. Chaque histoire est une petite graine à planter dans le cœur des enfants — j'espère qu'elles fleuriront longtemps dans le vôtre.</p>
+    <p class="signature">— ${esc(d.authorName)}</p>
+  </section>
+  <section class="page end-page review-page">
+    <h2>Si ce livre vous a plu…</h2>
+    <p>Laisser un avis sur Amazon prend moins d'une minute et fait une immense différence pour un auteur indépendant. Votre retour aide d'autres familles à découvrir ce livre et me donne l'élan pour en écrire d'autres.</p>
+    <p class="thanks">Merci du fond du cœur ❤️</p>
+  </section>
 </body></html>`;
 }
