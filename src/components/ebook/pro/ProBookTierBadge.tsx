@@ -58,9 +58,9 @@ export const ProBookTierBadge: React.FC<Props> = ({ module, compact }) => {
           {stdLimits.wordsPerSection[0]}–{stdLimits.wordsPerSection[1]} mots
         </div>
         <Button asChild size="sm" variant="outline" className="border-amber-400 text-amber-700 hover:bg-amber-50">
-          <Link to="/v3/forfaits">
+          <Link to="/v3/upsell-17">
             <Crown className="mr-1 h-3.5 w-3.5" />
-            Passer en PRO
+            Débloquer le pack — 17 €
             <ArrowRight className="ml-1 h-3.5 w-3.5" />
           </Link>
         </Button>

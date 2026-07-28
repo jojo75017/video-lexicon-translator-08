@@ -84,6 +84,7 @@ const V3PourquoiPage = lazy(() => import('./pages/v3public/V3PourquoiPage'));
 const V3ScriptHeygenPage = lazy(() => import('./pages/v3public/V3ScriptHeygenPage'));
 const V3ForfaitsPage = lazy(() => import('./pages/v3public/V3ForfaitsPage'));
 const V3RecherchePage = lazy(() => import('./pages/v3public/V3RecherchePage'));
+const V3Upsell17Page = lazy(() => import('./pages/v3public/V3Upsell17Page'));
 
 // Blog / Formation SEO
 const BlogPage = lazy(() => import('./pages/BlogPage'));
@@ -516,6 +517,7 @@ const App = () => {
               <Route path="forfaits" element={<V3ForfaitsPage />} />
               <Route path="pourquoi" element={<V3PourquoiPage />} />
               <Route path="script-heygen" element={<V3ScriptHeygenPage />} />
+              <Route path="upsell-17" element={<V3Upsell17Page />} />
               <Route path="hub" element={isPlannerPreviewHost ? <V3HubPage /> : <V3Gate><V3HubPage /></V3Gate>} />
             </Route>
 

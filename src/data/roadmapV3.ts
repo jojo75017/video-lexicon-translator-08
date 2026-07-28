@@ -5,7 +5,7 @@
 export type V3Pillar = 'publier' | 'monetiser' | 'marketing' | 'ia' | 'edition' | 'distribution' | 'promotion' | 'data';
 export type V3Status = 'todo' | 'in_progress' | 'done';
 export type V3Tier = 'core' | 'upsell';
-export type V3PackId = 'cover' | 'marketing' | 'social' | 'monetisation' | 'editorial' | 'distribution' | 'promotion' | 'transcription' | 'market-research' | 'documentation-studio';
+export type V3PackId = 'cover' | 'marketing' | 'social' | 'monetisation' | 'editorial' | 'distribution' | 'promotion' | 'transcription' | 'market-research' | 'documentation-studio' | 'boost_lancement';
 
 export interface V3Module {
   id: string;
@@ -128,6 +128,15 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
     badge: 'Nouveau',
     alacarte: true,
     modules: ['documentation-studio'],
+  },
+  {
+    id: 'boost_lancement',
+    title: 'Pack Boost de Lancement',
+    desc: '10 visuels Pinterest prêts à poster + 5 posts Instagram générés par IA + checklist ISBN/KDP premium + template métadonnées optimisées. Le kit minimal pour lancer ton livre avec un vrai coup d\'accélérateur.',
+    price: 17,
+    badge: 'Offre découverte',
+    alacarte: true,
+    modules: ['boost-lancement'],
   },
 ];
 
