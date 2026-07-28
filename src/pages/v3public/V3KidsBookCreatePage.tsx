@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useProjectSave } from '@/hooks/useProjectSave';
 import {
   Document, Packer, Paragraph, TextRun, ImageRun, HeadingLevel, AlignmentType, PageBreak,
+  PageOrientation,
 } from 'docx';
 import { saveAs } from 'file-saver';
 import {
