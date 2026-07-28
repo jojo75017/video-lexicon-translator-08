@@ -108,10 +108,10 @@ export function CoverToolbar({ canvas, onExportPNG, onExportPDF }: Props) {
       <Button variant="outline" size="sm" onClick={deleteSelected} disabled={!canvas}>
         <Trash2 className="w-4 h-4 mr-1" /> Supprimer
       </Button>
-      <Button variant="outline" size="sm" onClick={() => canvas?.undo?.()} disabled title="Undo (bientôt)">
+      <Button variant="outline" size="sm" disabled title="Undo (bientôt)">
         <Undo2 className="w-4 h-4" />
       </Button>
-      <Button variant="outline" size="sm" onClick={() => canvas?.redo?.()} disabled title="Redo (bientôt)">
+      <Button variant="outline" size="sm" disabled title="Redo (bientôt)">
         <Redo2 className="w-4 h-4" />
       </Button>
 
