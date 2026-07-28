@@ -82,6 +82,8 @@ export function computeSpineWidth(pageCount: number): { inches: number; mm: numb
   const inches = safe * 0.0025;
   const mm = inches * 25.4;
   return { inches, mm, cm: mm / 10 };
+}
+
 
 export function buildCharacterBibleText(c: CharacterBible): string {
   return [
