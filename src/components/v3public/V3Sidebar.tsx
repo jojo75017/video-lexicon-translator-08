@@ -24,6 +24,7 @@ const NAV: NavSection[] = [
       { to: '/v3/library', label: 'Ma bibliothèque', icon: Library },
       { to: '/v3/mes-livres', label: 'Mes livres', icon: BookOpen },
       { to: '/v3/hub?tab=livres', label: 'Brouillons', icon: FolderOpen },
+      { to: '/v3/hub?tab=pending', label: 'En attente · Octobre', icon: Clock, badge: 'Oct.' },
       { to: '/v3/outils', label: 'Tous les outils', icon: ListTree },
     ],
   },
