@@ -80,10 +80,10 @@ export default function V3ForfaitsPage() {
               >
                 {featured && (
                   <span
-                    className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold text-white"
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold text-white shadow-lg whitespace-nowrap"
                     style={{ background: accent }}
                   >
-                    ⭐ Le plus populaire
+                    ⭐ Le plus recommandé
                   </span>
                 )}
 
