@@ -523,6 +523,7 @@ const App = () => {
               <Route path="upsell-17" element={<V3Upsell17Page />} />
               <Route path="outils/ams-keywords" element={<V3AmsKeywordsPage />} />
               <Route path="outils/espion-concurrents" element={<V3CompetitorSpyPage />} />
+              <Route path="outils/categories" element={<V3CategoryFinderPage />} />
               <Route path="hub" element={isPlannerPreviewHost ? <V3HubPage /> : <V3Gate><V3HubPage /></V3Gate>} />
             </Route>
 
