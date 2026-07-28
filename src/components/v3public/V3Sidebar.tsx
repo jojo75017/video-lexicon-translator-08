@@ -20,6 +20,7 @@ const NAV: NavSection[] = [
     items: [
       { to: '/v3', label: 'Accueil V3', icon: Home, end: true },
       { to: '/v3/create', label: 'Créer un livre', icon: Sparkles },
+      { to: '/v3/create/illustre', label: 'Livre illustré maternelle', icon: Sparkles, badge: 'Nouveau' },
       { to: '/v3/library', label: 'Ma bibliothèque', icon: Library },
       { to: '/v3/mes-livres', label: 'Mes livres', icon: BookOpen },
       { to: '/v3/hub?tab=livres', label: 'Brouillons', icon: FolderOpen },
@@ -181,7 +182,19 @@ export default function V3Sidebar() {
                         />
                       )}
                       <Icon className="w-4 h-4 shrink-0" />
-                      {!collapsed && <span className="truncate flex-1">{it.label}</span>}
+                      {!collapsed && (
+                        <>
+                          <span className="truncate flex-1">{it.label}</span>
+                          {it.badge && (
+                            <span
+                              className="text-[9px] font-bold uppercase tracking-[0.15em] px-1.5 py-0.5 rounded"
+                              style={{ background: '#C97A14', color: '#fff' }}
+                            >
+                              {it.badge}
+                            </span>
+                          )}
+                        </>
+                      )}
                     </NavLink>
                     )}
                   </li>
