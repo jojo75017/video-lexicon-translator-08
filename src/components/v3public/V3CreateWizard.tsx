@@ -1463,8 +1463,45 @@ Règles :
               </div>
             ))}
           </div>
+
+          <div className="rounded-3xl border p-5" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
+            <div className="mb-2 flex items-center gap-2">
+              <span className="text-lg">📚</span>
+              <h3 className="v3-serif text-2xl font-bold" style={{ color: 'var(--v3-ink)' }}>Bible de l'univers</h3>
+            </div>
+            <p className="mb-3 text-sm" style={{ color: 'var(--v3-muted)' }}>
+              Décris ton univers : lieux, factions, règles, magie, chronologie, ambiance. Ce texte sera injecté dans TOUS les agents pour garantir la cohérence (idéal pour séries, sagas, mondes étendus).
+            </p>
+            <textarea
+              value={bibleUnivers}
+              onChange={(e) => setBibleUnivers(e.target.value)}
+              rows={8}
+              placeholder={"Ex :\n• Monde : Terre alternative après 2087, climat effondré, IA omniprésentes.\n• Factions : Concile de l'Aube (ordre), Nomades du Silex (résistance).\n• Règles : voyage temporel possible mais irréversible.\n• Ton : mélancolique, technologique, poétique."}
+              className="w-full resize-y rounded-2xl border px-4 py-3 outline-none text-sm"
+              style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-bg)' }}
+            />
+          </div>
+
+          <div className="rounded-3xl border p-5" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
+            <div className="mb-2 flex items-center gap-2">
+              <span className="text-lg">🌳</span>
+              <h3 className="v3-serif text-2xl font-bold" style={{ color: 'var(--v3-ink)' }}>Arbre narratif</h3>
+            </div>
+            <p className="mb-3 text-sm" style={{ color: 'var(--v3-muted)' }}>
+              Arcs, embranchements, choix, points de bascule, chronologie. Colle ton arbre narratif ici — les agents respecteront la structure lors de la génération.
+            </p>
+            <textarea
+              value={arbreNarratif}
+              onChange={(e) => setArbreNarratif(e.target.value)}
+              rows={8}
+              placeholder={"Ex :\nActe I → rencontre → révélation A\n  ├─ Choix 1 : accepte → arc trahison\n  └─ Choix 2 : refuse → arc exil\nActe II → point de bascule chapitre 12 (mort du mentor)\nActe III → convergence des arcs au chapitre 22\nFinal → épilogue ouvert sur tome 2."}
+              className="w-full resize-y rounded-2xl border px-4 py-3 outline-none text-sm"
+              style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-bg)' }}
+            />
+          </div>
         </div>
       )}
+
 
       {step === 4 && (
         <div className="space-y-6">
