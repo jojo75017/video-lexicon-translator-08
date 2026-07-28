@@ -642,7 +642,7 @@ export default function V3KidsBookCreatePage() {
         </div>
 
         <div className="v3-card mb-8">
-          <h2 className="font-semibold mb-2">6. Export album</h2>
+          <h2 className="font-semibold mb-2">7. Export album</h2>
           <p className="text-xs text-[var(--v3-muted)] mb-3">
             Format album carré 21,59 × 21,59 cm — prêt pour KDP.
           </p>
