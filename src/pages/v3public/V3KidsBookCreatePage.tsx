@@ -102,6 +102,70 @@ export default function V3KidsBookCreatePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
+  // Ré-ouvre un projet existant via ?projectId=... (depuis "Mes projets")
+  useEffect(() => {
+    const pid = searchParams.get('projectId');
+    if (!pid) return;
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from('ebook_projects')
+        .select('id,title,author_name,book_summary,target_audience,writing_style,characters,chapters,ebook_images,cover_concepts,kdp_description,kdp_keywords,kdp_categories,preface,seo_optimization,project_type')
+        .eq('id', pid)
+        .maybeSingle();
+      if (cancelled) return;
+      if (error || !data) { toast.error("Impossible de charger le projet."); return; }
+      // Priorité au snapshot JSON complet
+      let hydrated: KidsBookDraft | null = null;
+      try {
+        const parsed = data.seo_optimization ? JSON.parse(data.seo_optimization as string) : null;
+        if (parsed && parsed.kidsDraft && typeof parsed.kidsDraft === 'object') {
+          hydrated = parsed.kidsDraft as KidsBookDraft;
+        }
+      } catch { /* noop */ }
+      if (!hydrated) {
+        // Reconstruit depuis les colonnes
+        const imgs: any[] = Array.isArray(data.ebook_images) ? (data.ebook_images as any[]) : [];
+        const front = imgs.find((x) => x?.type === 'front_cover')?.url || data.cover_concepts || undefined;
+        const back = imgs.find((x) => x?.type === 'back_cover')?.url || undefined;
+        const ch: any[] = Array.isArray(data.chapters) ? (data.chapters as any[]) : [];
+        const chars: any[] = Array.isArray(data.characters) ? (data.characters as any[]) : [];
+        hydrated = {
+          ...loadDraft(),
+          title: data.title || '',
+          authorName: data.author_name || '',
+          synopsis: data.book_summary || '',
+          targetAge: data.target_audience || '3-6 ans',
+          style: (data.writing_style as any) || 'pixar-3d',
+          chapterCount: ch.length || 10,
+          character: chars[0] || loadDraft().character,
+          stories: ch.map((c, i) => ({
+            id: `s-${i + 1}`,
+            title: c.title || `Histoire ${i + 1}`,
+            synopsis: c.synopsis || '',
+            content: c.content || '',
+            illustrationUrl: c.illustration_url || undefined,
+          })) as KidsStory[],
+          coverUrl: front,
+          backCoverUrl: back,
+          backCoverText: (data.preface as string) || '',
+          kdpDescription: (data.kdp_description as string) || '',
+          kdpKeywords: (data.kdp_keywords as string || '').split(',').map((s) => s.trim()).filter(Boolean),
+          kdpCategories: (data.kdp_categories as string || '').split('|').map((s) => s.trim()).filter(Boolean),
+        };
+      }
+      setDraft(hydrated!);
+      setProjectId(pid);
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(hydrated));
+        localStorage.setItem(PROJECT_ID_KEY, pid);
+      } catch { /* noop */ }
+      toast.success('Projet chargé.');
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
 
   const generateCover = async () => {
     if (!draft.title) return toast.error('Ajoute un titre avant de créer la couverture.');
@@ -365,7 +429,13 @@ Pays dépôt légal : ${draft.legalDepositCountry || ''}
   const saveToCloud = async () => {
     if (!draft.title) return toast.error('Ajoute un titre avant de sauvegarder.');
     setSaving(true);
-    const payload = {
+    const images: any[] = [];
+    if (draft.coverUrl) images.push({ type: 'front_cover', url: draft.coverUrl, title: draft.title });
+    if (draft.backCoverUrl) images.push({ type: 'back_cover', url: draft.backCoverUrl });
+    for (const s of draft.stories) {
+      if (s.illustrationUrl) images.push({ story_id: s.id, url: s.illustrationUrl });
+    }
+    const payload: any = {
       title: draft.title,
       author_name: draft.authorName,
       project_type: 'kids_book' as any,
@@ -380,10 +450,15 @@ Pays dépôt légal : ${draft.legalDepositCountry || ''}
         synopsis: s.synopsis,
         illustration_url: s.illustrationUrl || null,
       })),
-      ebook_images: draft.stories
-        .filter((s) => s.illustrationUrl)
-        .map((s) => ({ story_id: s.id, url: s.illustrationUrl })),
+      ebook_images: images,
       writing_style: draft.style,
+      cover_concepts: draft.coverUrl || null,
+      kdp_description: draft.kdpDescription || null,
+      kdp_keywords: (draft.kdpKeywords || []).filter(Boolean).join(', ') || null,
+      kdp_categories: (draft.kdpCategories || []).filter(Boolean).join(' | ') || null,
+      preface: draft.backCoverText || null,
+      // Full source-of-truth for reopening the kids book editor
+      seo_optimization: JSON.stringify({ kidsDraft: draft }),
     };
     let id = projectId;
     if (id) {
@@ -398,6 +473,21 @@ Pays dépôt légal : ${draft.legalDepositCountry || ''}
       }
     }
     setSaving(false);
+  };
+
+  const startNewBook = () => {
+    if (!confirm('Créer un nouveau livre ? Le brouillon actuel sera effacé de cet appareil (les projets sauvegardés dans « Mes projets » restent intacts).')) return;
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(PROJECT_ID_KEY);
+    } catch { /* noop */ }
+    setProjectId(null);
+    setDraft(loadDraft());
+    setPhase('idle');
+    setProgress({ done: 0, total: 0 });
+    toast.success('Nouveau livre — formulaire réinitialisé.');
+    // Reset any preset param
+    nav('/v3/create/illustre', { replace: true });
   };
 
   const exportHtml = () => {
@@ -661,9 +751,28 @@ Pays dépôt légal : ${draft.legalDepositCountry || ''}
   return (
     <section className="v3-halo-soft min-h-[calc(100vh-4rem)] py-12 px-5">
       <div className="max-w-4xl mx-auto">
-        <button onClick={() => nav('/v3/create')} className="text-sm text-[var(--v3-muted)] hover:text-[var(--v3-ink)] inline-flex items-center gap-1 mb-6">
-          <ArrowLeft className="w-4 h-4" /> Retour à l'écriture classique
-        </button>
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+          <button onClick={() => nav('/v3/create')} className="text-sm text-[var(--v3-muted)] hover:text-[var(--v3-ink)] inline-flex items-center gap-1">
+            <ArrowLeft className="w-4 h-4" /> Retour à l'écriture classique
+          </button>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/v3/compte"
+              className="v3-btn v3-btn-outline text-sm"
+              title="Voir tous tes projets sauvegardés"
+            >
+              📚 Mes projets
+            </Link>
+            <Button
+              onClick={startNewBook}
+              variant="outline"
+              className="text-sm border-[#C97A14] text-[#C97A14] hover:bg-amber-50"
+              title="Effacer le brouillon et repartir de zéro"
+            >
+              <Sparkles className="w-4 h-4 mr-1" /> Nouveau livre
+            </Button>
+          </div>
+        </div>
 
         {(() => {
           const isNight = preset === 'histoires-du-soir-3-7';

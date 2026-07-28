@@ -13,6 +13,7 @@ type Row = {
   updated_at: string;
   chapters?: any[] | null;
   ebook_images?: any[] | null;
+  project_type?: string | null;
 };
 
 const PROJECT_ID_KEY = 'v3_wizard_project_id';
@@ -38,7 +39,7 @@ export default function V3LibraryPage() {
       setEmail(auth.user.email || null);
       const { data, error } = await supabase
         .from('ebook_projects')
-        .select('id,title,author_name,kdp_categories,updated_at,chapters,ebook_images')
+        .select('id,title,author_name,kdp_categories,updated_at,chapters,ebook_images,project_type')
         .eq('user_id', auth.user.id)
         .order('updated_at', { ascending: false });
       if (cancelled) return;
@@ -252,7 +253,7 @@ function BookCard({ r, done, onAudio, onUpdated, onDelete }: { r: Row; done?: bo
 
   return (
     <div className="group flex flex-col">
-      <Link to={`/v3/book/${r.id}`} className="block">
+      <Link to={r.project_type === 'kids_book' ? `/v3/create/illustre?projectId=${r.id}` : `/v3/book/${r.id}`} className="block">
         <div
           className="relative aspect-[3/4] rounded-xl overflow-hidden shadow-md group-hover:shadow-xl transition-all border border-[color:var(--v3-orange)]/20"
           style={
