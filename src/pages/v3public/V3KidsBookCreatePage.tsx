@@ -383,6 +383,52 @@ export default function V3KidsBookCreatePage() {
       }));
       children.push(new Paragraph({ children: [new PageBreak()] }));
 
+      // ---- Page de copyright / mentions légales KDP ----
+      const year = draft.publicationYear || String(new Date().getFullYear());
+      children.push(new Paragraph({
+        alignment: AlignmentType.CENTER, spacing: { before: 1200, after: 200 },
+        children: [new TextRun({ text: `${draft.title}${draft.subtitle ? ' — ' + draft.subtitle : ''}`, bold: true, size: 28 })],
+      }));
+      children.push(new Paragraph({
+        alignment: AlignmentType.CENTER, spacing: { after: 200 },
+        children: [new TextRun({ text: `© ${year} ${draft.authorName} — Tous droits réservés.`, size: 22 })],
+      }));
+      if (draft.edition) children.push(new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: draft.edition, size: 22 })] }));
+      if (draft.publisher) children.push(new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: `Éditeur : ${draft.publisher}`, size: 22 })] }));
+      if (draft.publicationPlace) children.push(new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: draft.publicationPlace, size: 22 })] }));
+      children.push(new Paragraph({
+        alignment: AlignmentType.CENTER, spacing: { before: 200, after: 200 },
+        children: [new TextRun({
+          text: draft.isbn ? `ISBN : ${draft.isbn}` : 'ISBN attribué par Amazon KDP à la publication',
+          size: 22, font: 'Courier New',
+        })],
+      }));
+      if (draft.legalDepositCountry) children.push(new Paragraph({
+        alignment: AlignmentType.CENTER,
+        children: [new TextRun({ text: `Dépôt légal : ${year} — ${draft.legalDepositCountry}`, size: 20 })],
+      }));
+      if (draft.bisacCategory) children.push(new Paragraph({
+        alignment: AlignmentType.CENTER,
+        children: [new TextRun({ text: `Catégorie : ${draft.bisacCategory}`, size: 18 })],
+      }));
+      children.push(new Paragraph({
+        alignment: AlignmentType.CENTER, spacing: { before: 400 },
+        children: [new TextRun({
+          text: "Toute reproduction, même partielle, par quelque procédé que ce soit, est strictement interdite sans l'autorisation écrite de l'auteur (art. L. 122-4 et L. 335-2 du Code de la propriété intellectuelle). Illustrations générées avec assistance IA — direction artistique et écriture par l'auteur. Imprimé à la demande via Amazon KDP.",
+          italics: true, size: 18,
+        })],
+      }));
+      children.push(new Paragraph({ children: [new PageBreak()] }));
+
+      // ---- Dédicace ----
+      if (draft.dedication && draft.dedication.trim()) {
+        children.push(new Paragraph({
+          alignment: AlignmentType.CENTER, spacing: { before: 3600, after: 200 },
+          children: [new TextRun({ text: draft.dedication, italics: true, size: 40 })],
+        }));
+        children.push(new Paragraph({ children: [new PageBreak()] }));
+      }
+
       // ---- Sommaire ----
       children.push(new Paragraph({
         heading: HeadingLevel.HEADING_1, alignment: AlignmentType.CENTER,
