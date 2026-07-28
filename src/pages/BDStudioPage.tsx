@@ -216,10 +216,7 @@ const BDStudioPage: React.FC = () => {
               {BD_STYLES.map((style, i) => (
                 <motion.div key={style.name} variants={fadeUp} custom={i}>
                   <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer border-border/50 hover:border-amber-500/40 overflow-hidden"
-                    onClick={() => {
-                      setShowGenerator(true);
-                      setTimeout(() => document.getElementById('generator')?.scrollIntoView({ behavior: 'smooth' }), 100);
-                    }}
+                    onClick={handleLaunch}
                   >
                     <CardContent className="p-5 text-center space-y-3">
                       <div className={`w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br ${style.color} flex items-center justify-center text-2xl shadow-lg`}>
