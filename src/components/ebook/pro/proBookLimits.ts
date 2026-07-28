@@ -23,7 +23,7 @@ export interface ProBookLimits {
   extras: string[];
 }
 
-const MATRIX: Record<ProBookModule, Record<ProBookTier, ProBookLimits>> = {
+const MATRIX: Partial<Record<ProBookModule, Record<ProBookTier, ProBookLimits>>> = {
   documentary: {
     standard: {
       maxSections: 15,
