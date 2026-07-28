@@ -36,12 +36,18 @@ function useCurrentBookTitle(): string {
  * à l'intérieur des parcours V3 et V4, pour offrir plus de choix de livres.
  */
 
-export const SpecialAtlas: React.FC = () => <EbookAtlas />;
+export const SpecialAtlas: React.FC = () => (
+  <ProBookShell module="atlas"><EbookAtlas /></ProBookShell>
+);
 export const SpecialEncyclopedia: React.FC = () => <EbookEncyclopedia />;
 
 export const SpecialDocumentary: React.FC = () => {
   const t = useCurrentBookTitle();
-  return <EbookDocumentaryGenerator ebookTitle={t} />;
+  return (
+    <ProBookShell module="documentary">
+      <EbookDocumentaryGenerator ebookTitle={t} />
+    </ProBookShell>
+  );
 };
 export const SpecialColoringBook: React.FC = () => {
   const t = useCurrentBookTitle();
@@ -61,11 +67,19 @@ export const SpecialPedagogique: React.FC = () => {
 };
 export const SpecialRecipeBook: React.FC = () => {
   const t = useCurrentBookTitle();
-  return <EbookRecipeBookGenerator ebookTitle={t} />;
+  return (
+    <ProBookShell module="recipe">
+      <EbookRecipeBookGenerator ebookTitle={t} />
+    </ProBookShell>
+  );
 };
 export const SpecialTravelGuide: React.FC = () => {
   const t = useCurrentBookTitle();
-  return <EbookTravelGuideGenerator ebookTitle={t} />;
+  return (
+    <ProBookShell module="travel">
+      <EbookTravelGuideGenerator ebookTitle={t} />
+    </ProBookShell>
+  );
 };
 export const SpecialComicBook: React.FC = () => {
   const t = useCurrentBookTitle();
