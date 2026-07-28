@@ -302,33 +302,77 @@ const BDStudioPage: React.FC = () => {
           </div>
         </section>
 
-        {/* ═══════════════════ CTA FINAL ═══════════════════ */}
+        {/* ═══════════════════ CTA FINAL / UPSELL ═══════════════════ */}
         {!showGenerator && (
           <section className="py-16 px-4">
-            <div className="max-w-3xl mx-auto text-center space-y-6">
-              <h2 className="text-3xl font-extrabold">
-                Prêt à créer votre première BD ?
-              </h2>
-              <p className="text-lg text-muted-foreground">
-                Choisissez un template, l'IA s'occupe du reste. Aucune compétence en dessin requise.
-              </p>
-              <Button
-                size="lg"
-                onClick={() => {
-                  setShowGenerator(true);
-                  setTimeout(() => document.getElementById('generator')?.scrollIntoView({ behavior: 'smooth' }), 100);
-                }}
-                className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-lg px-10 py-6 shadow-xl shadow-amber-500/25"
-              >
-                <Sparkles className="mr-2 h-5 w-5" />
-                Lancer le BD Studio
-              </Button>
+            <div className="max-w-3xl mx-auto">
+              {isPro === false ? (
+                <Card className="border-2 border-amber-500/40 bg-gradient-to-br from-amber-500/5 via-orange-500/5 to-transparent shadow-xl">
+                  <CardContent className="p-8 md:p-10 text-center space-y-5">
+                    <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
+                      <Lock className="h-8 w-8 text-white" />
+                    </div>
+                    <Badge className="bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 px-3 py-1">
+                      <Crown className="w-3.5 h-3.5 mr-1.5" /> Réservé au plan Éditeur — 59 €
+                    </Badge>
+                    <h2 className="text-3xl font-extrabold">
+                      BD Studio Pro — l'atelier des maisons d'édition
+                    </h2>
+                    <p className="text-muted-foreground">
+                      La création de bandes dessinées professionnelles (scénario IA, cases illustrées cohérentes, export KDP prêt à imprimer) est incluse exclusivement dans le plan <strong>Éditeur</strong>. Les autres formules gardent l'accès aux ebooks et livres illustrés.
+                    </p>
+                    <ul className="grid sm:grid-cols-2 gap-2 text-sm text-left max-w-xl mx-auto">
+                      {[
+                        'Scénario complet écrit par l\'IA',
+                        'Cases illustrées avec cohérence graphique',
+                        '6 styles franco-belges légendaires',
+                        'Export PDF haute résolution KDP',
+                        'Personnages persistants entre cases',
+                        'Jusqu\'à 24 pages par BD',
+                      ].map((f) => (
+                        <li key={f} className="flex items-start gap-2">
+                          <Check className="h-4 w-4 mt-0.5 text-amber-500 shrink-0" />
+                          <span>{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="flex flex-wrap gap-3 justify-center pt-2">
+                      <Button
+                        size="lg"
+                        onClick={() => navigate('/v3/forfaits?highlight=editeur&from=bd-studio')}
+                        className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-lg px-8 shadow-xl shadow-amber-500/25"
+                      >
+                        <Crown className="mr-2 h-5 w-5" />
+                        Passer à Éditeur — 59 €
+                      </Button>
+                      <Button size="lg" variant="outline" onClick={() => navigate('/v3/forfaits')} className="border-amber-500/30 hover:bg-amber-500/10">
+                        Comparer les formules
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="text-center space-y-6">
+                  <h2 className="text-3xl font-extrabold">Prêt à créer votre première BD ?</h2>
+                  <p className="text-lg text-muted-foreground">
+                    Choisissez un template, l'IA s'occupe du reste. Aucune compétence en dessin requise.
+                  </p>
+                  <Button
+                    size="lg"
+                    onClick={handleLaunch}
+                    className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-lg px-10 py-6 shadow-xl shadow-amber-500/25"
+                  >
+                    <Sparkles className="mr-2 h-5 w-5" />
+                    Lancer BD Studio Pro
+                  </Button>
+                </div>
+              )}
             </div>
           </section>
         )}
 
         {/* ═══════════════════ GENERATOR ═══════════════════ */}
-        {showGenerator && (
+        {showGenerator && isPro && (
           <section id="generator" className="max-w-6xl mx-auto px-4 py-8">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
               <EbookComicBookGenerator />
