@@ -88,13 +88,16 @@ export const WritingEngineBadge: React.FC<WritingEngineBadgeProps> = ({ tier, is
           {/* En-têtes colonnes */}
           <div />
           <div className={`text-center text-[11px] font-bold uppercase tracking-wide py-2 ${activeTier === 'debutant' ? 'text-foreground' : 'text-muted-foreground'}`}>
-            Débutant<br />6,99 €/mois
+            🌱 Auteur<br />9,99 €/mois
           </div>
-          <div className={`text-center text-[11px] font-bold uppercase tracking-wide py-2 ${activeTier === 'expert' ? 'text-foreground' : 'text-muted-foreground'}`}>
-            Expert<br />9,99 €/mois
+          <div
+            className="text-center text-[11px] font-black uppercase tracking-wide py-2 rounded-t-lg"
+            style={{ color: '#C97A14', background: '#C97A1412' }}
+          >
+            🚀 Studio ⭐<br />12,99 €/mois
           </div>
           <div className="text-center text-[11px] font-black uppercase tracking-wide py-2 rounded-t-lg" style={{ color: TEAL, background: `${TEAL}12` }}>
-            <span className="inline-flex items-center gap-1"><Crown className="h-3 w-3" />Auteur</span><br />59 €/mois
+            <span className="inline-flex items-center gap-1"><Crown className="h-3 w-3" />Éditeur</span><br />59 €/mois
           </div>
 
           {ROWS.map((row, i) => (
