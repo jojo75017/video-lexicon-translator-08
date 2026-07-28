@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Sparkles, Loader2, Lock, Check, Download, ArrowLeft, Wand2, Save, FileText, Printer, Image as ImageIcon } from 'lucide-react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Sparkles, Loader2, Lock, Check, Download, ArrowLeft, Wand2, Save, FileText, Printer, Image as ImageIcon, Moon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -16,11 +16,14 @@ import {
   canUseKidsBook,
   computeSpineWidth,
   KIDS_BOOK_IMAGE_MODEL,
+  KIDS_BOOK_PRESETS,
   type KidsBookDraft,
   type KidsStory,
   type IllustrationStyle,
+  type KidsPresetId,
 } from '@/config/kidsBookConfig';
 import type { V3Plan } from '@/data/v3ToolPlans';
+
 
 const STORAGE_KEY = 'v3_kids_book_draft_v2';
 const PROJECT_ID_KEY = 'v3_kids_book_project_id';
