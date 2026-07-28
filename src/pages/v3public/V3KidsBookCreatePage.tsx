@@ -587,7 +587,40 @@ export default function V3KidsBookCreatePage() {
           </div>
         )}
 
+        {/* Couverture pro */}
+        <div className="v3-card mb-4 border-2 border-[#C97A14]/30">
+          <h2 className="font-semibold mb-2 flex items-center gap-2">
+            <ImageIcon className="w-5 h-5 text-[#C97A14]" /> 5. Créer la couverture
+          </h2>
+          <p className="text-xs text-[var(--v3-muted)] mb-3">
+            Génère une couverture d'album professionnelle (format carré KDP) avec ton personnage, ton titre et ton nom d'auteur.
+          </p>
+          <div className="flex flex-wrap items-start gap-4">
+            <Button
+              onClick={generateCover}
+              disabled={generatingCover || !draft.title}
+              className="bg-[#C97A14] hover:opacity-90 text-white"
+            >
+              {generatingCover ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+              {draft.coverUrl ? 'Regénérer la couverture' : 'Créer la couverture'}
+            </Button>
+            {draft.coverUrl && (
+              <div className="flex flex-col items-center gap-1">
+                <img
+                  src={draft.coverUrl}
+                  alt="Couverture"
+                  className="w-40 h-40 object-cover rounded border shadow-sm"
+                />
+                <span className="text-[11px] text-green-700 inline-flex items-center gap-1">
+                  <Check className="w-3 h-3" /> Intégrée à l'export
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Sauvegarde & Export */}
+
         <div className="v3-card mb-4">
           <h2 className="font-semibold mb-2">5. Sauvegarde</h2>
           <p className="text-xs text-[var(--v3-muted)] mb-3">
