@@ -22,6 +22,7 @@ export const EXPERT_MIN = new Set<string>([
   'plan-marketing', 'campagne-vente', 'apercu-emails', 'emails-onboarding',
   'communaute', 'extension-chrome',
   'ai-chat', 'seo-generator', 'generateur-ebook',
+  'multi-translator',
 ]);
 
 export function planForTool(tool: Pick<V2Tool, 'id'>): V3Plan {

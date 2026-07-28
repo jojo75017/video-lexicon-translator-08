@@ -77,6 +77,7 @@ export const V2_TOOLS: V2Tool[] = [
   { id: 'quiz', label: 'Quiz Auteur', description: "Identifiez votre profil d'auteur en 2 minutes.", route: '/quiz', icon: Users, category: 'ecriture', image: IMG.ecriture },
   { id: 'signature', label: 'Ma signature auteur', description: 'Signature email et blocs auteurs prêts à coller.', route: '/signature', icon: Signature, category: 'ecriture', image: IMG.ecriture },
   { id: 'seo-generator', label: 'SEO Generator', description: 'Générez titres, méta-descriptions et keywords SEO.', route: '/seo-generator', icon: Search, category: 'ecriture', image: IMG.ecriture },
+  { id: 'multi-translator', label: 'Traduction 10 langues', description: 'Traduisez votre livre en 10 langues (EN, ES, DE, IT, PT, NL, PL, JA, ZH, AR) — IA + relecture.', route: '/ebook-planner?tab=multi-translator', icon: Globe, category: 'ecriture', badge: 'Nouveau', image: IMG.ecriture },
 
   // — Visuel & Couverture —
   { id: 'couverture-kdp', label: 'Cover Studio KDP', description: 'Couvertures Kindle et poche prêtes à publier.', route: '/couverture-kdp', icon: ImageIcon, category: 'visuel', badge: 'Populaire', image: IMG.visuel },
