@@ -56,9 +56,13 @@ export interface KidsStory {
 
 export interface KidsBookDraft {
   title: string;
+  subtitle?: string;
   authorName: string;      // OBLIGATOIRE — affiché sur couverture et page de titre
+  synopsis?: string;       // pitch du livre — sert de fil rouge à toutes les histoires
   targetAge: string;       // "3-6 ans"
   style: IllustrationStyle;
+  chapterCount?: number;   // nombre d'histoires à générer
+  wordsPerStory?: number;  // longueur cible par histoire
   character: CharacterBible;
   stories: KidsStory[];
 }
