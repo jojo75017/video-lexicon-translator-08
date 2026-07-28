@@ -1,9 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Sparkles, Loader2, Lock, Check, Download, ArrowLeft, Wand2 } from 'lucide-react';
+import { Sparkles, Loader2, Lock, Check, Download, ArrowLeft, Wand2, Save, FileText, Printer } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { useProjectSave } from '@/hooks/useProjectSave';
+import {
+  Document, Packer, Paragraph, TextRun, ImageRun, HeadingLevel, AlignmentType, PageBreak,
+} from 'docx';
+import { saveAs } from 'file-saver';
 import {
   ILLUSTRATION_STYLES,
   buildCharacterBibleText,
@@ -16,6 +21,8 @@ import {
 import type { V3Plan } from '@/data/v3ToolPlans';
 
 const STORAGE_KEY = 'v3_kids_book_draft_v2';
+const PROJECT_ID_KEY = 'v3_kids_book_project_id';
+
 
 function loadDraft(): KidsBookDraft {
   try {
@@ -40,11 +47,18 @@ type Phase = 'idle' | 'stories' | 'illustrations' | 'done';
 
 export default function V3KidsBookCreatePage() {
   const nav = useNavigate();
+  const { saveSpecializedProject, updateSpecializedProject } = useProjectSave();
   const [plan, setPlan] = useState<V3Plan | null>(null);
   const [loadingPlan, setLoadingPlan] = useState(true);
   const [draft, setDraft] = useState<KidsBookDraft>(loadDraft);
   const [phase, setPhase] = useState<Phase>('idle');
   const [progress, setProgress] = useState<{ done: number; total: number }>({ done: 0, total: 0 });
+  const [projectId, setProjectId] = useState<string | null>(() => {
+    try { return localStorage.getItem(PROJECT_ID_KEY); } catch { return null; }
+  });
+  const [saving, setSaving] = useState(false);
+  const [exporting, setExporting] = useState<'pdf' | 'docx' | null>(null);
+
 
   useEffect(() => {
     (async () => {
@@ -142,6 +156,44 @@ export default function V3KidsBookCreatePage() {
     }
   };
 
+  const saveToCloud = async () => {
+    if (!draft.title) return toast.error('Ajoute un titre avant de sauvegarder.');
+    setSaving(true);
+    const payload = {
+      title: draft.title,
+      author_name: draft.authorName,
+      project_type: 'kids_book' as any,
+      target_audience: draft.targetAge,
+      book_summary: draft.synopsis || '',
+      number_of_chapters: draft.stories.length || draft.chapterCount || 0,
+      characters: [draft.character],
+      chapters: draft.stories.map((s, i) => ({
+        chapter_number: i + 1,
+        title: s.title,
+        content: s.content || '',
+        synopsis: s.synopsis,
+        illustration_url: s.illustrationUrl || null,
+      })),
+      ebook_images: draft.stories
+        .filter((s) => s.illustrationUrl)
+        .map((s) => ({ story_id: s.id, url: s.illustrationUrl })),
+      writing_style: draft.style,
+    };
+    let id = projectId;
+    if (id) {
+      const ok = await updateSpecializedProject(id, payload);
+      if (!ok) id = null;
+    }
+    if (!id) {
+      id = await saveSpecializedProject(payload);
+      if (id) {
+        setProjectId(id);
+        try { localStorage.setItem(PROJECT_ID_KEY, id); } catch { /* noop */ }
+      }
+    }
+    setSaving(false);
+  };
+
   const exportHtml = () => {
     const html = buildAlbumHtml(draft);
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
@@ -151,8 +203,95 @@ export default function V3KidsBookCreatePage() {
     a.download = `${(draft.title || 'album').replace(/\s+/g, '-')}.html`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success('Album téléchargé — ouvre-le et imprime en PDF pour KDP.');
+    toast.success('Album HTML téléchargé.');
   };
+
+  const exportPdf = () => {
+    setExporting('pdf');
+    try {
+      const html = buildAlbumHtml(draft);
+      const w = window.open('', '_blank');
+      if (!w) { toast.error('Autorise les pop-ups pour imprimer.'); return; }
+      w.document.write(html);
+      w.document.close();
+      // Laisser le temps aux images de charger avant impression
+      const trigger = () => { try { w.focus(); w.print(); } catch { /* noop */ } };
+      w.onload = () => setTimeout(trigger, 800);
+      setTimeout(trigger, 2500);
+      toast.success('Boîte d\'impression ouverte — choisis "Enregistrer au format PDF".');
+    } finally {
+      setExporting(null);
+    }
+  };
+
+  const fetchImgBytes = async (url: string): Promise<Uint8Array | null> => {
+    try {
+      const r = await fetch(url);
+      const buf = await r.arrayBuffer();
+      return new Uint8Array(buf);
+    } catch { return null; }
+  };
+
+  const exportDocx = async () => {
+    setExporting('docx');
+    try {
+      const children: Paragraph[] = [];
+      children.push(new Paragraph({
+        alignment: AlignmentType.CENTER, heading: HeadingLevel.TITLE,
+        children: [new TextRun({ text: draft.title, bold: true, size: 72 })],
+      }));
+      if (draft.subtitle) {
+        children.push(new Paragraph({
+          alignment: AlignmentType.CENTER,
+          children: [new TextRun({ text: draft.subtitle, italics: true, size: 32 })],
+        }));
+      }
+      children.push(new Paragraph({
+        alignment: AlignmentType.CENTER, spacing: { before: 400 },
+        children: [new TextRun({ text: draft.authorName, size: 32 })],
+      }));
+      children.push(new Paragraph({ children: [new PageBreak()] }));
+
+      for (let i = 0; i < draft.stories.length; i++) {
+        const s = draft.stories[i];
+        if (s.illustrationUrl) {
+          const bytes = await fetchImgBytes(s.illustrationUrl);
+          if (bytes) {
+            children.push(new Paragraph({
+              alignment: AlignmentType.CENTER,
+              children: [new ImageRun({
+                type: 'png',
+                data: bytes,
+                transformation: { width: 500, height: 500 },
+              } as any)],
+            }));
+          }
+        }
+        children.push(new Paragraph({
+          heading: HeadingLevel.HEADING_1,
+          children: [new TextRun({ text: `${i + 1}. ${s.title || 'Histoire'}`, bold: true })],
+        }));
+        children.push(new Paragraph({
+          spacing: { after: 200 },
+          children: [new TextRun({ text: s.content || s.synopsis || '', size: 28 })],
+        }));
+        if (i < draft.stories.length - 1) {
+          children.push(new Paragraph({ children: [new PageBreak()] }));
+        }
+      }
+
+      const doc = new Document({ sections: [{ children }] });
+      const blob = await Packer.toBlob(doc);
+      saveAs(blob, `${(draft.title || 'album').replace(/\s+/g, '-')}.docx`);
+      toast.success('Album Word téléchargé.');
+    } catch (e: any) {
+      toast.error(e.message || 'Erreur export Word');
+    } finally {
+      setExporting(null);
+    }
+  };
+
+
 
   if (loadingPlan) {
     return (
@@ -371,21 +510,67 @@ export default function V3KidsBookCreatePage() {
           </div>
         )}
 
-        {/* Export */}
-        <div className="v3-card mb-8">
-          <h2 className="font-semibold mb-2">5. Export album</h2>
+        {/* Sauvegarde & Export */}
+        <div className="v3-card mb-4">
+          <h2 className="font-semibold mb-2">5. Sauvegarde</h2>
           <p className="text-xs text-[var(--v3-muted)] mb-3">
-            Fichier HTML au format album carré (21,59 × 21,59 cm). Ouvre-le dans Chrome et fais <em>Imprimer → PDF</em> pour un fichier prêt KDP.
+            Enregistre ton livre dans « Mes projets » pour le retrouver depuis n'importe quel appareil.
           </p>
-          <Button onClick={exportHtml} disabled={!draft.stories.length || !draft.title || !draft.authorName}>
-            <Download className="w-4 h-4 mr-2" /> Télécharger l'album (HTML)
+          <Button
+            onClick={saveToCloud}
+            disabled={saving || !draft.title}
+            className="bg-[var(--v3-emerald,#064e3b)] hover:opacity-90 text-white"
+          >
+            {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+            {projectId ? 'Mettre à jour dans mes projets' : 'Sauvegarder dans mes projets'}
           </Button>
+          {projectId && (
+            <span className="ml-3 text-xs text-green-700 inline-flex items-center gap-1">
+              <Check className="w-3 h-3" /> Projet lié
+            </span>
+          )}
+        </div>
+
+        <div className="v3-card mb-8">
+          <h2 className="font-semibold mb-2">6. Export album</h2>
+          <p className="text-xs text-[var(--v3-muted)] mb-3">
+            Format album carré 21,59 × 21,59 cm — prêt pour KDP.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              onClick={exportPdf}
+              disabled={!draft.stories.length || !draft.title || exporting === 'pdf'}
+              className="bg-[#C97A14] hover:opacity-90 text-white"
+            >
+              {exporting === 'pdf' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Printer className="w-4 h-4 mr-2" />}
+              Exporter en PDF
+            </Button>
+            <Button
+              onClick={exportDocx}
+              disabled={!draft.stories.length || !draft.title || exporting === 'docx'}
+              variant="outline"
+            >
+              {exporting === 'docx' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileText className="w-4 h-4 mr-2" />}
+              Exporter en Word (.docx)
+            </Button>
+            <Button
+              onClick={exportHtml}
+              disabled={!draft.stories.length || !draft.title}
+              variant="outline"
+            >
+              <Download className="w-4 h-4 mr-2" /> HTML
+            </Button>
+          </div>
+          <p className="text-[11px] text-[var(--v3-muted)] mt-3">
+            PDF : ouvre la boîte d'impression du navigateur → choisis <em>Enregistrer au format PDF</em>.
+          </p>
         </div>
 
         <div className="text-center text-xs text-[var(--v3-muted)] flex items-center justify-center gap-2">
           <Check className="w-3 h-3 text-green-600" />
-          Brouillon sauvegardé automatiquement dans ce navigateur
+          Brouillon aussi sauvegardé automatiquement dans ce navigateur
         </div>
+
       </div>
     </section>
   );
