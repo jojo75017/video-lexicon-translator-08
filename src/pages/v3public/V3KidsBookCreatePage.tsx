@@ -58,6 +58,36 @@ export default function V3KidsBookCreatePage() {
   });
   const [saving, setSaving] = useState(false);
   const [exporting, setExporting] = useState<'pdf' | 'docx' | null>(null);
+  const [generatingCover, setGeneratingCover] = useState(false);
+
+  const generateCover = async () => {
+    if (!draft.title) return toast.error('Ajoute un titre avant de créer la couverture.');
+    setGeneratingCover(true);
+    try {
+      const stylePrompt = ILLUSTRATION_STYLES.find((s) => s.id === draft.style)?.prompt || '';
+      const model = KIDS_BOOK_IMAGE_MODEL[plan || 'expert'];
+      const characterBible = buildCharacterBibleText(draft.character);
+      const coverScene = `Couverture professionnelle de livre jeunesse KDP, format album carré. Grand titre "${draft.title}" en typographie manuscrite enfantine, colorée et lisible, occupant le haut de la couverture. ${draft.subtitle ? `Sous-titre: "${draft.subtitle}". ` : ''}Nom de l'auteur "${draft.authorName}" en bas de la couverture, plus petit. Illustration centrale mettant en scène ${draft.character.name} de manière expressive et joyeuse, ambiance ${draft.synopsis || 'douce et magique'}. Composition professionnelle équilibrée, marges nettes, couleurs vives, style prêt à imprimer pour Amazon KDP.`;
+      const { data: img, error: imgErr } = await supabase.functions.invoke('agent-illustrator', {
+        body: {
+          bookId: 'draft-cover',
+          storyId: 'cover',
+          characterBible,
+          scene: coverScene,
+          stylePrompt,
+          model,
+        },
+      });
+      if (imgErr || !img?.url) throw new Error(imgErr?.message || img?.error || 'échec');
+      setDraft((d) => ({ ...d, coverUrl: img.url }));
+      toast.success('Couverture créée ✨');
+    } catch (e: any) {
+      toast.error(e.message || 'Erreur génération couverture');
+    } finally {
+      setGeneratingCover(false);
+    }
+  };
+
 
 
   useEffect(() => {
