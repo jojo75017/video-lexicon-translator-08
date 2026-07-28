@@ -1045,7 +1045,17 @@ Pays dépôt légal : ${draft.legalDepositCountry || ''}
                 {draft.backCoverUrl ? 'Regénérer la 4e' : 'Créer la 4e de couverture'}
               </Button>
               {draft.backCoverUrl && (
-                <img src={draft.backCoverUrl} alt="4e de couverture" className="w-40 h-40 object-cover rounded border shadow-sm" />
+                <div className="flex flex-col items-center gap-1">
+                  <img src={draft.backCoverUrl} alt="4e de couverture" className="w-40 h-40 object-cover rounded border shadow-sm" />
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => downloadImageUrl(draft.backCoverUrl, `${(draft.title || 'couverture').replace(/\s+/g, '-')}-4e-de-couverture.png`)}
+                    className="mt-1 h-7 text-[11px]"
+                  >
+                    <Download className="w-3 h-3 mr-1" /> Télécharger la 4e
+                  </Button>
+                </div>
               )}
             </div>
           </div>
