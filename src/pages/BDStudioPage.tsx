@@ -117,10 +117,14 @@ const BDStudioPage: React.FC = () => {
               variants={stagger}
               className="max-w-2xl space-y-6"
             >
-              <motion.div variants={fadeUp}>
-                <Badge className="bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30 px-4 py-1.5 text-sm font-semibold">
-                  <Sparkles className="w-3.5 h-3.5 mr-1.5" />
-                  BD Studio Pro - Nouveau
+              <motion.div variants={fadeUp} className="flex flex-wrap items-center gap-2">
+                <Badge className="bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 px-4 py-1.5 text-sm font-bold shadow-lg shadow-amber-500/30">
+                  <Crown className="w-3.5 h-3.5 mr-1.5" />
+                  Exclusif plan Éditeur — 59 €
+                </Badge>
+                <Badge variant="outline" className="border-amber-500/40 text-amber-700 dark:text-amber-300 px-3 py-1 text-xs font-semibold">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  BD Studio Pro
                 </Badge>
               </motion.div>
 
