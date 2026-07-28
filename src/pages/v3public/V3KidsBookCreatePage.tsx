@@ -727,8 +727,8 @@ function buildAlbumHtml(d: KidsBookDraft): string {
   .end-page p { font-size: 15pt; line-height: 1.6; margin: 0 0 0.6cm; }
   .end-page .signature { margin-top: 1.2cm; font-style: italic; font-size: 16pt; }
   .end-page .thanks { margin-top: 1.5cm; font-size: 18pt; font-style: italic; color: #C97A14; }
-  .cover-image { padding: 0; }
-  .cover-image .cover-illu { width: 100%; height: 100%; object-fit: cover; }
+  .cover-image { padding: 0 !important; background: #000 !important; display: block !important; }
+  .cover-image .cover-illu { width: 21.59cm; height: 21.59cm; object-fit: cover; display: block; }
 </style></head><body>
   <section class="page cover ${d.coverUrl ? 'cover-image' : ''}">
     ${d.coverUrl ? `<img class="cover-illu" src="${esc(d.coverUrl)}" alt="Couverture" />` : `
