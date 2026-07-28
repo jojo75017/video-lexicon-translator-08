@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const BRAND_SUFFIX = 'Ebookstudio Pro V2';
+const BRAND_SUFFIX = 'Ebookstudio Pro V3';
 const SEPARATOR = ' — ';
 
 /**
