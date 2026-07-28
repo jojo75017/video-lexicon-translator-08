@@ -503,6 +503,7 @@ const App = () => {
               <Route path="offres" element={<Navigate to="/v3/forfaits" replace />} />
               <Route path="offres/merci" element={<Navigate to="/v3/forfaits" replace />} />
 
+              <Route path="recherche" element={<V3RecherchePage />} />
               <Route path="outils" element={<V3ToolsIndexPage />} />
               <Route path="outils/sommaire-ultime" element={<V3TocUltimatePage />} />
               <Route path="outils/traduction" element={<V3TranslatorPage />} />
