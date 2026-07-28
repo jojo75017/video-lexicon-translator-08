@@ -191,6 +191,7 @@ export default function V3KidsBookCreatePage() {
       // 1) Génération des histoires (titre + synopsis + contenu)
       setPhase('stories');
       setProgress({ done: 0, total: count });
+      const presetCfg = KIDS_BOOK_PRESETS[preset];
       const { data, error } = await supabase.functions.invoke('agent-kids-stories', {
         body: {
           bookTitle: draft.title,
@@ -200,8 +201,11 @@ export default function V3KidsBookCreatePage() {
           characterBible: buildCharacterBibleText(draft.character),
           count,
           wordsPerStory: words,
+          preset: presetCfg.id,
+          tone: presetCfg.tone,
         },
       });
+
       if (error || !data?.stories?.length) {
         throw new Error(error?.message || data?.error || 'Aucune histoire générée');
       }
