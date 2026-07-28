@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { ExternalLink } from 'lucide-react';
+import { FirecrawlCreditsIndicator } from '@/components/ebook/FirecrawlCreditsIndicator';
 
 const KEY = 'v3_author_settings';
 
@@ -93,6 +94,11 @@ export default function V3AuthorSettingsPage() {
             {saving ? 'Enregistrement…' : 'Enregistrer'}
           </button>
         </div>
+      </div>
+
+      <div className="mt-8">
+        <h2 className="v3-serif text-2xl font-bold mb-3">Connecteurs & plafonds</h2>
+        <FirecrawlCreditsIndicator />
       </div>
     </section>
   );
