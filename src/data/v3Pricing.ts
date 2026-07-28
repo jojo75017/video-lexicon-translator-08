@@ -41,8 +41,8 @@ export const V3_PLANS: V3Plan[] = [
   },
   {
     id: "expert",
-    name: "Expert",
-    tagline: "Plus de livres, plus de contrôle, plus de conversions",
+    name: "Studio",
+    tagline: "🚀 Je produis efficacement — plus de livres, plus de contrôle, plus de conversions",
     monthlyPrice: 12.99,
     yearlyPrice: 117,
     booksPerMonth: 20,
