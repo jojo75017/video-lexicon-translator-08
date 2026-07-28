@@ -65,6 +65,8 @@ export interface KidsBookDraft {
   wordsPerStory?: number;  // longueur cible par histoire
   character: CharacterBible;
   stories: KidsStory[];
+  coverUrl?: string;       // couverture générée par IA
+
 }
 
 export function buildCharacterBibleText(c: CharacterBible): string {
