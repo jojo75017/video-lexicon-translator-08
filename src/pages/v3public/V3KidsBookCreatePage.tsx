@@ -85,12 +85,12 @@ export default function V3KidsBookCreatePage() {
     }));
   };
 
-  // Applique le preset venant de l'URL au 1er montage
+  // Applique le preset venant de l'URL (au montage + à chaque changement de ?preset=)
   useEffect(() => {
-    const q = searchParams.get('preset') as KidsPresetId | null;
-    if (q && KIDS_BOOK_PRESETS[q]) applyPreset(q);
+    const q = (searchParams.get('preset') as KidsPresetId | null) ?? 'maternelle-3-6';
+    if (KIDS_BOOK_PRESETS[q as KidsPresetId] && q !== preset) applyPreset(q as KidsPresetId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [searchParams]);
 
 
   const generateCover = async () => {
