@@ -751,9 +751,28 @@ Pays dépôt légal : ${draft.legalDepositCountry || ''}
   return (
     <section className="v3-halo-soft min-h-[calc(100vh-4rem)] py-12 px-5">
       <div className="max-w-4xl mx-auto">
-        <button onClick={() => nav('/v3/create')} className="text-sm text-[var(--v3-muted)] hover:text-[var(--v3-ink)] inline-flex items-center gap-1 mb-6">
-          <ArrowLeft className="w-4 h-4" /> Retour à l'écriture classique
-        </button>
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+          <button onClick={() => nav('/v3/create')} className="text-sm text-[var(--v3-muted)] hover:text-[var(--v3-ink)] inline-flex items-center gap-1">
+            <ArrowLeft className="w-4 h-4" /> Retour à l'écriture classique
+          </button>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/v3/compte"
+              className="v3-btn v3-btn-outline text-sm"
+              title="Voir tous tes projets sauvegardés"
+            >
+              📚 Mes projets
+            </Link>
+            <Button
+              onClick={startNewBook}
+              variant="outline"
+              className="text-sm border-[#C97A14] text-[#C97A14] hover:bg-amber-50"
+              title="Effacer le brouillon et repartir de zéro"
+            >
+              <Sparkles className="w-4 h-4 mr-1" /> Nouveau livre
+            </Button>
+          </div>
+        </div>
 
         {(() => {
           const isNight = preset === 'histoires-du-soir-3-7';
