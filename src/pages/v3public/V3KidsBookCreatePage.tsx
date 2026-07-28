@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Sparkles, Loader2, Lock, Check, Download, ArrowLeft, Wand2, Save, FileText, Printer, Image as ImageIcon } from 'lucide-react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Sparkles, Loader2, Lock, Check, Download, ArrowLeft, Wand2, Save, FileText, Printer, Image as ImageIcon, Moon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -16,11 +16,14 @@ import {
   canUseKidsBook,
   computeSpineWidth,
   KIDS_BOOK_IMAGE_MODEL,
+  KIDS_BOOK_PRESETS,
   type KidsBookDraft,
   type KidsStory,
   type IllustrationStyle,
+  type KidsPresetId,
 } from '@/config/kidsBookConfig';
 import type { V3Plan } from '@/data/v3ToolPlans';
+
 
 const STORAGE_KEY = 'v3_kids_book_draft_v2';
 const PROJECT_ID_KEY = 'v3_kids_book_project_id';
@@ -49,10 +52,16 @@ type Phase = 'idle' | 'stories' | 'illustrations' | 'done';
 
 export default function V3KidsBookCreatePage() {
   const nav = useNavigate();
+  const [searchParams] = useSearchParams();
   const { saveSpecializedProject, updateSpecializedProject } = useProjectSave();
   const [plan, setPlan] = useState<V3Plan | null>(null);
   const [loadingPlan, setLoadingPlan] = useState(true);
   const [draft, setDraft] = useState<KidsBookDraft>(loadDraft);
+  const [preset, setPreset] = useState<KidsPresetId>(
+    (searchParams.get('preset') as KidsPresetId) === 'histoires-du-soir-3-7'
+      ? 'histoires-du-soir-3-7'
+      : 'maternelle-3-6'
+  );
   const [phase, setPhase] = useState<Phase>('idle');
   const [progress, setProgress] = useState<{ done: number; total: number }>({ done: 0, total: 0 });
   const [projectId, setProjectId] = useState<string | null>(() => {
@@ -63,6 +72,26 @@ export default function V3KidsBookCreatePage() {
   const [generatingCover, setGeneratingCover] = useState(false);
   const [generatingBack, setGeneratingBack] = useState(false);
   const [pageCount, setPageCount] = useState<number>(32);
+
+  const applyPreset = (id: KidsPresetId) => {
+    setPreset(id);
+    const p = KIDS_BOOK_PRESETS[id];
+    setDraft((d) => ({
+      ...d,
+      targetAge: p.targetAge,
+      chapterCount: p.chapterCount,
+      wordsPerStory: p.wordsPerStory,
+      style: p.defaultStyle,
+    }));
+  };
+
+  // Applique le preset venant de l'URL au 1er montage
+  useEffect(() => {
+    const q = searchParams.get('preset') as KidsPresetId | null;
+    if (q && KIDS_BOOK_PRESETS[q]) applyPreset(q);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
 
   const generateCover = async () => {
     if (!draft.title) return toast.error('Ajoute un titre avant de créer la couverture.');
@@ -162,6 +191,7 @@ export default function V3KidsBookCreatePage() {
       // 1) Génération des histoires (titre + synopsis + contenu)
       setPhase('stories');
       setProgress({ done: 0, total: count });
+      const presetCfg = KIDS_BOOK_PRESETS[preset];
       const { data, error } = await supabase.functions.invoke('agent-kids-stories', {
         body: {
           bookTitle: draft.title,
@@ -171,8 +201,11 @@ export default function V3KidsBookCreatePage() {
           characterBible: buildCharacterBibleText(draft.character),
           count,
           wordsPerStory: words,
+          preset: presetCfg.id,
+          tone: presetCfg.tone,
         },
       });
+
       if (error || !data?.stories?.length) {
         throw new Error(error?.message || data?.error || 'Aucune histoire générée');
       }
@@ -479,14 +512,51 @@ export default function V3KidsBookCreatePage() {
           <ArrowLeft className="w-4 h-4" /> Retour à l'écriture classique
         </button>
 
-        <div className="text-center mb-8">
-          <span className="v3-chip v3-chip-orange"><Sparkles className="w-3.5 h-3.5" /> Livre illustré maternelle</span>
+        <div className="text-center mb-6">
+          <span className="v3-chip v3-chip-orange"><Sparkles className="w-3.5 h-3.5" /> Livre illustré</span>
           <h1 className="v3-serif text-4xl font-bold mt-4">Album jeunesse — 100% automatique</h1>
           <p className="text-sm text-[var(--v3-muted)] mt-2 max-w-xl mx-auto">
             Renseigne le titre, l'auteur, le synopsis et ton personnage.
-            L'IA écrit toutes les histoires et génère les illustrations cohérentes.
+            L'IA écrit toutes les histoires <strong>et génère les illustrations</strong> cohérentes.
           </p>
         </div>
+
+        {/* Preset — Maternelle 3-6 ans OU Histoires du soir 3-7 ans */}
+        <div className="grid md:grid-cols-2 gap-3 mb-6">
+          {(Object.values(KIDS_BOOK_PRESETS)).map((p) => {
+            const active = preset === p.id;
+            const isNight = p.id === 'histoires-du-soir-3-7';
+            return (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => applyPreset(p.id)}
+                className={`relative text-left rounded-xl border-2 p-4 transition-all ${
+                  active
+                    ? 'border-[#C97A14] bg-gradient-to-br from-amber-50 to-orange-100 shadow-md'
+                    : 'border-neutral-200 bg-white hover:border-[#C97A14]/50'
+                }`}
+              >
+                {p.badge && (
+                  <span className="absolute -top-2 -right-2 text-[10px] uppercase tracking-wide bg-[#C97A14] text-white px-2 py-0.5 rounded-full font-bold">
+                    {p.badge}
+                  </span>
+                )}
+                <div className="flex items-center gap-2 mb-1">
+                  <div className={`w-9 h-9 rounded-full flex items-center justify-center ${active ? 'bg-[#C97A14] text-white' : 'bg-neutral-100 text-[#C97A14]'}`}>
+                    {isNight ? <Moon className="w-4 h-4" /> : <ImageIcon className="w-4 h-4" />}
+                  </div>
+                  <h3 className="font-bold text-sm">{p.label}</h3>
+                  {active && <Check className="w-4 h-4 text-[#C97A14] ml-auto" />}
+                </div>
+                <p className="text-[11px] text-[var(--v3-muted)] leading-snug">
+                  {p.chapterCount} histoires · ~{p.wordsPerStory} mots · style {p.defaultStyle}
+                </p>
+              </button>
+            );
+          })}
+        </div>
+
 
         {!planAllowed && (
           <div className="v3-card mb-4 border-l-4 border-[#C97A14] bg-[#fff7ec]">
