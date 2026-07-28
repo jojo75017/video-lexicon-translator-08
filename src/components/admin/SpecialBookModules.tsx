@@ -39,7 +39,9 @@ function useCurrentBookTitle(): string {
 export const SpecialAtlas: React.FC = () => (
   <ProBookShell module="atlas"><EbookAtlas /></ProBookShell>
 );
-export const SpecialEncyclopedia: React.FC = () => <EbookEncyclopedia />;
+export const SpecialEncyclopedia: React.FC = () => (
+  <ProBookShell module="encyclopedia"><EbookEncyclopedia /></ProBookShell>
+);
 
 export const SpecialDocumentary: React.FC = () => {
   const t = useCurrentBookTitle();
@@ -51,19 +53,35 @@ export const SpecialDocumentary: React.FC = () => {
 };
 export const SpecialColoringBook: React.FC = () => {
   const t = useCurrentBookTitle();
-  return <EbookColoringBookGenerator ebookTitle={t || 'Mon livre de coloriage'} />;
+  return (
+    <ProBookShell module="coloring">
+      <EbookColoringBookGenerator ebookTitle={t || 'Mon livre de coloriage'} />
+    </ProBookShell>
+  );
 };
 export const SpecialAgenda: React.FC = () => {
   const t = useCurrentBookTitle();
-  return <EbookAgendaGenerator ebookTitle={t} />;
+  return (
+    <ProBookShell module="agenda">
+      <EbookAgendaGenerator ebookTitle={t} />
+    </ProBookShell>
+  );
 };
 export const SpecialScolaire: React.FC = () => {
   const t = useCurrentBookTitle();
-  return <EbookScolaireGenerator ebookTitle={t} />;
+  return (
+    <ProBookShell module="scolaire">
+      <EbookScolaireGenerator ebookTitle={t} />
+    </ProBookShell>
+  );
 };
 export const SpecialPedagogique: React.FC = () => {
   const t = useCurrentBookTitle();
-  return <EbookPedagogiqueGenerator ebookTitle={t} />;
+  return (
+    <ProBookShell module="pedagogique">
+      <EbookPedagogiqueGenerator ebookTitle={t} />
+    </ProBookShell>
+  );
 };
 export const SpecialRecipeBook: React.FC = () => {
   const t = useCurrentBookTitle();
@@ -83,21 +101,39 @@ export const SpecialTravelGuide: React.FC = () => {
 };
 export const SpecialComicBook: React.FC = () => {
   const t = useCurrentBookTitle();
-  return <EbookComicBookGenerator ebookTitle={t} />;
+  return (
+    <ProBookShell module="comic">
+      <EbookComicBookGenerator ebookTitle={t} />
+    </ProBookShell>
+  );
 };
 export const SpecialDiary: React.FC = () => {
   const t = useCurrentBookTitle();
-  return <EbookDiaryGenerator ebookTitle={t} />;
+  return (
+    <ProBookShell module="diary">
+      <EbookDiaryGenerator ebookTitle={t} />
+    </ProBookShell>
+  );
 };
 export const SpecialAquarium: React.FC = () => {
   const t = useCurrentBookTitle();
-  return <EbookAquariumGenerator ebookTitle={t} />;
+  return (
+    <ProBookShell module="aquarium">
+      <EbookAquariumGenerator ebookTitle={t} />
+    </ProBookShell>
+  );
 };
 export const SpecialBirdSheet: React.FC = () => {
   const t = useCurrentBookTitle();
-  return <EbookBirdSheetGenerator ebookTitle={t} />;
+  return (
+    <ProBookShell module="bird">
+      <EbookBirdSheetGenerator ebookTitle={t} />
+    </ProBookShell>
+  );
 };
-export const SpecialMultiTome: React.FC = () => <EbookMultiTomeHub />;
+export const SpecialMultiTome: React.FC = () => (
+  <ProBookShell module="multitome"><EbookMultiTomeHub /></ProBookShell>
+);
 
 /** Métadonnées des livres spéciaux — utilisées pour l'affichage en cartes. */
 export type SpecialBookMeta = { id: string; emoji: string; title: string; subtitle: string };
