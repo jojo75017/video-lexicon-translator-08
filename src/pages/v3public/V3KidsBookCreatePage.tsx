@@ -85,12 +85,12 @@ export default function V3KidsBookCreatePage() {
     }));
   };
 
-  // Applique le preset venant de l'URL au 1er montage
+  // Applique le preset venant de l'URL (au montage + à chaque changement de ?preset=)
   useEffect(() => {
-    const q = searchParams.get('preset') as KidsPresetId | null;
-    if (q && KIDS_BOOK_PRESETS[q]) applyPreset(q);
+    const q = (searchParams.get('preset') as KidsPresetId | null) ?? 'maternelle-3-6';
+    if (KIDS_BOOK_PRESETS[q as KidsPresetId] && q !== preset) applyPreset(q as KidsPresetId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [searchParams]);
 
 
   const generateCover = async () => {
@@ -512,14 +512,25 @@ export default function V3KidsBookCreatePage() {
           <ArrowLeft className="w-4 h-4" /> Retour à l'écriture classique
         </button>
 
-        <div className="text-center mb-6">
-          <span className="v3-chip v3-chip-orange"><Sparkles className="w-3.5 h-3.5" /> Livre illustré</span>
-          <h1 className="v3-serif text-4xl font-bold mt-4">Album jeunesse — 100% automatique</h1>
-          <p className="text-sm text-[var(--v3-muted)] mt-2 max-w-xl mx-auto">
-            Renseigne le titre, l'auteur, le synopsis et ton personnage.
-            L'IA écrit toutes les histoires <strong>et génère les illustrations</strong> cohérentes.
-          </p>
-        </div>
+        {(() => {
+          const isNight = preset === 'histoires-du-soir-3-7';
+          return (
+            <div className="text-center mb-6">
+              <span className={`v3-chip ${isNight ? 'v3-chip-indigo' : 'v3-chip-orange'}`}>
+                {isNight ? <Moon className="w-3.5 h-3.5" /> : <Sparkles className="w-3.5 h-3.5" />}
+                {isNight ? 'Histoires du soir · 3-7 ans' : 'Album maternelle · 3-6 ans'}
+              </span>
+              <h1 className="v3-serif text-4xl font-bold mt-4">
+                {isNight ? 'Histoires du soir — 20 récits apaisants' : 'Album maternelle — 10 histoires illustrées'}
+              </h1>
+              <p className="text-sm text-[var(--v3-muted)] mt-2 max-w-xl mx-auto">
+                {isNight
+                  ? 'Ton apaisant, fins rassurantes, style aquarelle. ~175 mots par histoire, illustrations cohérentes du même personnage.'
+                  : 'Style Pixar 3D par défaut, ~120 mots par histoire, illustrations cohérentes du même personnage.'}
+              </p>
+            </div>
+          );
+        })()}
 
         {/* Preset — Maternelle 3-6 ans OU Histoires du soir 3-7 ans */}
         <div className="grid md:grid-cols-2 gap-3 mb-6">
