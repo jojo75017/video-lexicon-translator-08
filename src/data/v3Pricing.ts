@@ -19,8 +19,8 @@ export interface V3Plan {
 export const V3_PLANS: V3Plan[] = [
   {
     id: "debutant",
-    name: "Débutant",
-    tagline: "Publiez vos premiers livres proprement sur KDP",
+    name: "Auteur",
+    tagline: "🌱 Je démarre — publier mes premiers livres proprement sur KDP",
     monthlyPrice: 9.99,
     yearlyPrice: 97,
     booksPerMonth: 10,
