@@ -22,6 +22,7 @@ import { EspaceHeader } from '@/components/layout/EspaceHeader';
 import { OnboardingGuide } from '@/components/onboarding/OnboardingGuide';
 import { FirstVisitBanner } from '@/components/onboarding/FirstVisitBanner';
 import { MissingApiKeyBanner } from '@/components/ebook/MissingApiKeyBanner';
+import { FirecrawlCreditsIndicator } from '@/components/ebook/FirecrawlCreditsIndicator';
 import { WorkflowAIProviderBadge } from '@/components/ebook/WorkflowAIProviderBadge';
 import { useEbookDatabase } from '@/hooks/useEbookDatabase';
 import { EbookMarketing } from '@/components/ebook/EbookMarketing';
@@ -3938,6 +3939,7 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
           }}
         />
         <FirstVisitBanner />
+        <FirecrawlCreditsIndicator className="mb-3" />
         {/* Back to board button in trello mode */}
         {viewMode === 'trello' && activeTab !== 'workflow-dashboard' && (
           <div className="bg-white border-b-2 border-[hsl(var(--joy-peach))] px-6 py-3 flex items-center gap-3">
