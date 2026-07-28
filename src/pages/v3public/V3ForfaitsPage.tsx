@@ -15,7 +15,6 @@ import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
-import { BackButton } from "@/components/v3/BackButton";
   V3_PLANS,
   formatPrice,
   getYearlySavingsPercent,
@@ -23,6 +22,7 @@ import { BackButton } from "@/components/v3/BackButton";
   type V3BillingInterval,
   type V3PlanId,
 } from "@/data/v3Pricing";
+import { BackButton } from "@/components/v3/BackButton";
 
 const PLAN_ICONS = {
   debutant: Sparkles,

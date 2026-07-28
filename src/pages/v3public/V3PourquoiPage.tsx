@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
 import {
-import { BackButton } from "@/components/v3/BackButton";
   Sparkles, ShieldCheck, Brain, PenTool, Palette, Rocket, BookOpen,
   Languages, Users, Clock, Gem, CheckCircle2, ArrowRight, Star, Zap,
   FileText, Layers, Wand2, Target, Award,
 } from 'lucide-react';
+import { BackButton } from "@/components/v3/BackButton";
 
 /**
  * Page éditoriale — "Pourquoi EbookStudio Pro V3".

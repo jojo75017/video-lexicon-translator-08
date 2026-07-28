@@ -8,9 +8,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { EbookKdpTools } from '@/components/ebook/EbookKdpTools';
 import {
-import { BackButton } from "@/components/v3/BackButton";
   Search, Target, BarChart3, Image as ImageIcon, FileText, Sparkles, Award, ExternalLink,
 } from 'lucide-react';
+import { BackButton } from "@/components/v3/BackButton";
 
 /**
  * V3 Recherche — Hub central de la recherche KDP.
