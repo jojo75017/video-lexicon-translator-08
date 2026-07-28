@@ -80,6 +80,7 @@ const V3ComptePage = lazy(() => import('./pages/v3public/V3ComptePage'));
 const V3PourquoiPage = lazy(() => import('./pages/v3public/V3PourquoiPage'));
 const V3ScriptHeygenPage = lazy(() => import('./pages/v3public/V3ScriptHeygenPage'));
 const V3ForfaitsPage = lazy(() => import('./pages/v3public/V3ForfaitsPage'));
+const V3RecherchePage = lazy(() => import('./pages/v3public/V3RecherchePage'));
 
 // Blog / Formation SEO
 const BlogPage = lazy(() => import('./pages/BlogPage'));
