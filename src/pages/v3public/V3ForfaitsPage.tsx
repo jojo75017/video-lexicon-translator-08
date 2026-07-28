@@ -15,6 +15,7 @@ import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
+import { BackButton } from "@/components/v3/BackButton";
   V3_PLANS,
   formatPrice,
   getYearlySavingsPercent,
@@ -84,7 +85,8 @@ function PayPalTestModal({ open, onClose }: { open: boolean; onClose: () => void
   }, [clientSecret]);
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+    <Dialog open={open} onOpenChange={(isOpen) =>
+      <div className="max-w-6xl mx-auto px-4 pt-4"><BackButton /></div> !isOpen && onClose()}>
       <DialogContent className="max-w-2xl max-h-[92vh] overflow-hidden p-0">
         <DialogHeader className="px-5 py-4 border-b border-black/5">
           <DialogTitle className="flex items-center gap-2">

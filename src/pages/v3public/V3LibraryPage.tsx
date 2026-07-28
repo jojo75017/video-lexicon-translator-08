@@ -4,6 +4,7 @@ import { BookOpen, Sparkles, Settings, Headphones, AlertCircle, RefreshCw, Image
 import { supabase } from '@/integrations/supabase/client';
 import AudiobookOfferCard from '@/components/v3public/AudiobookOfferCard';
 import { toast } from 'sonner';
+import { BackButton } from "@/components/v3/BackButton";
 
 type Row = {
   id: string;
@@ -119,6 +120,7 @@ export default function V3LibraryPage() {
 
   return (
     <section className="max-w-6xl mx-auto px-5 md:px-8 py-14">
+      <div className="max-w-6xl mx-auto px-4 pt-4"><BackButton /></div>
       <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
           <h1 className="v3-serif text-4xl font-bold">Ma bibliothèque</h1>

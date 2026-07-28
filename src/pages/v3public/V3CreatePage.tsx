@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Sparkles, Loader2, ImageIcon, ArrowRight } from 'lucide-react';
 import ApiProviderQuickSettings from '@/components/ebook/ApiProviderQuickSettings';
+import { BackButton } from "@/components/v3/BackButton";
 
 const V3CreateWizard = lazy(() => import('@/components/v3public/V3CreateWizard'));
 const V3ImportStudio = lazy(() => import('@/components/v3public/V3ImportStudio'));
@@ -35,6 +36,7 @@ export default function V3CreatePage() {
   if (importMode) {
     return (
       <section className="min-h-[calc(100vh-4rem)] py-14 px-5 bg-[var(--v3-paper,#fbfaf6)]">
+        <div className="max-w-6xl mx-auto px-4 pt-4"><BackButton /></div>
         <Suspense fallback={<div className="py-24 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-[var(--v3-emerald,#064e3b)]" /></div>}>
           <V3ImportStudio />
         </Suspense>

@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Download, Copy, Video } from 'lucide-react';
 import { toast } from 'sonner';
+import { BackButton } from "@/components/v3/BackButton";
 
 const SECTIONS: { title: string; duration: string; body: string }[] = [
   {
@@ -171,6 +172,7 @@ export default function V3ScriptHeygenPage() {
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] py-10 px-4">
+      <div className="max-w-6xl mx-auto px-4 pt-4"><BackButton /></div>
       <div className="max-w-4xl mx-auto space-y-6">
         <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>

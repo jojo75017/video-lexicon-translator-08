@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { EbookKdpTools } from '@/components/ebook/EbookKdpTools';
 import {
+import { BackButton } from "@/components/v3/BackButton";
   Search, Target, BarChart3, Image as ImageIcon, FileText, Sparkles, Award, ExternalLink,
 } from 'lucide-react';
 
@@ -35,6 +36,7 @@ export default function V3RecherchePage() {
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
+      <div className="max-w-6xl mx-auto px-4 pt-4"><BackButton /></div>
       <header className="space-y-2">
         <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-emerald-700">
           <Sparkles className="h-3.5 w-3.5" /> Recherche KDP

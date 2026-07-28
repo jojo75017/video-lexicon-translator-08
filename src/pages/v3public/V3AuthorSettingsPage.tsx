@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { ExternalLink } from 'lucide-react';
 import { FirecrawlCreditsIndicator } from '@/components/ebook/FirecrawlCreditsIndicator';
+import { BackButton } from "@/components/v3/BackButton";
 
 const KEY = 'v3_author_settings';
 
@@ -58,6 +59,7 @@ export default function V3AuthorSettingsPage() {
 
   return (
     <section className="max-w-3xl mx-auto px-5 md:px-8 py-14">
+      <div className="max-w-6xl mx-auto px-4 pt-4"><BackButton /></div>
       <h1 className="v3-serif text-4xl font-bold">Paramètres auteur</h1>
       <p className="text-sm text-[var(--v3-muted)] mt-1">{email}</p>
 

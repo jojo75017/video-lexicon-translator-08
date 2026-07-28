@@ -1,8 +1,10 @@
 import EbookMultiTranslator from '@/components/ebook/EbookMultiTranslator';
+import { BackButton } from "@/components/v3/BackButton";
 
 export default function V3TranslatorPage() {
   return (
     <div className="max-w-7xl mx-auto px-5 md:px-8 py-8">
+      <div className="max-w-6xl mx-auto px-4 pt-4"><BackButton /></div>
       <div className="mb-6">
         <div className="text-[10px] uppercase tracking-[0.22em] font-semibold" style={{ color: 'var(--v3-gold-600)' }}>
           Écrire · Nouveau
