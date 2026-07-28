@@ -1049,6 +1049,13 @@ function buildAlbumHtml(d: KidsBookDraft): string {
   .end-page .thanks { margin-top: 1.5cm; font-size: 18pt; font-style: italic; color: #C97A14; }
   .cover-image { padding: 0 !important; background: #000 !important; display: block !important; }
   .cover-image .cover-illu { width: 21.59cm; height: 21.59cm; object-fit: cover; display: block; }
+  .copyright-page { padding: 3cm 2.5cm; justify-content: center; text-align: center; font-size: 11pt; line-height: 1.5; color: #333; }
+  .copyright-page .title { font-size: 14pt; font-weight: bold; margin-bottom: 0.6cm; }
+  .copyright-page .block { margin-bottom: 0.5cm; }
+  .copyright-page .isbn { font-family: 'Courier New', monospace; letter-spacing: 1px; }
+  .copyright-page .legal { font-size: 9pt; color: #666; margin-top: 1cm; font-style: italic; }
+  .dedication-page { padding: 6cm 3cm; justify-content: center; text-align: center; font-family: 'Georgia', serif; font-style: italic; }
+  .dedication-page p { font-size: 20pt; line-height: 1.5; color: #4a3f2f; }
 </style></head><body>
   <section class="page cover ${d.coverUrl ? 'cover-image' : ''}">
     ${d.coverUrl ? `<img class="cover-illu" src="${esc(d.coverUrl)}" alt="Couverture" />` : `
@@ -1063,7 +1070,24 @@ function buildAlbumHtml(d: KidsBookDraft): string {
     <div class="author">${esc(d.authorName)}</div>
     <div class="age">${esc(d.targetAge)}</div>
   </section>
+  <section class="page copyright-page">
+    <div class="title">${esc(d.title)}${d.subtitle ? ' — ' + esc(d.subtitle) : ''}</div>
+    <div class="block">© ${esc(d.publicationYear || String(new Date().getFullYear()))} ${esc(d.authorName)}<br/>Tous droits réservés.</div>
+    <div class="block">
+      ${d.edition ? esc(d.edition) + '<br/>' : ''}
+      ${d.publisher ? 'Éditeur : ' + esc(d.publisher) + '<br/>' : ''}
+      ${d.publicationPlace ? esc(d.publicationPlace) + '<br/>' : ''}
+    </div>
+    ${d.isbn ? `<div class="block isbn">ISBN : ${esc(d.isbn)}</div>` : '<div class="block" style="color:#999">ISBN attribué par Amazon KDP à la publication</div>'}
+    ${d.legalDepositCountry ? `<div class="block">Dépôt légal : ${esc(d.publicationYear || '')} — ${esc(d.legalDepositCountry)}</div>` : ''}
+    ${d.bisacCategory ? `<div class="block" style="font-size:10pt">Catégorie : ${esc(d.bisacCategory)}</div>` : ''}
+    <div class="legal">
+      Toute reproduction, même partielle, par quelque procédé que ce soit, est strictement interdite sans l'autorisation écrite de l'auteur (art. L. 122-4 et L. 335-2 du Code de la propriété intellectuelle).
+      Illustrations générées avec assistance IA — direction artistique et écriture par l'auteur.
+      Imprimé à la demande via Amazon KDP.
+    </div>
   </section>
+  ${d.dedication ? `<section class="page dedication-page"><p>${esc(d.dedication)}</p></section>` : ''}
   ${stories}
   <section class="page end-page">
     <h2>Remerciements</h2>
