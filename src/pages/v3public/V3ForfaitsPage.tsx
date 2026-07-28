@@ -136,10 +136,122 @@ function PayPalTestModal({ open, onClose }: { open: boolean; onClose: () => void
   );
 }
 
+function V3PlanTestModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [planId, setPlanId] = useState<V3PlanId>("expert");
+  const [billing, setBilling] = useState<V3BillingInterval>("month");
+  const [step, setStep] = useState<"choose" | "checkout">("choose");
+  const [email, setEmail] = useState("");
+  const [userId, setUserId] = useState<string | undefined>();
+
+  useEffect(() => {
+    if (open) {
+      setClientSecret(null);
+      setStep("choose");
+      setLoading(false);
+      supabase.auth.getUser().then(({ data }) => {
+        if (data.user) {
+          setEmail(data.user.email || "");
+          setUserId(data.user.id);
+        }
+      });
+    }
+  }, [open]);
+
+  const start = async () => {
+    if (!email.includes("@")) return toast.error("Email invalide");
+    setLoading(true);
+    try {
+      const priceId = getV3PriceId(planId, billing);
+      const { data, error } = await supabase.functions.invoke("v3-subscription-checkout", {
+        body: {
+          priceId,
+          email,
+          userId,
+          environment: getStripeEnvironment(),
+          returnUrl: `${window.location.origin}/v3/forfaits?test=success`,
+        },
+      });
+      if (error || !data?.clientSecret) {
+        throw new Error(error?.message || data?.error || "Échec création session");
+      }
+      setClientSecret(data.clientSecret);
+      setStep("checkout");
+    } catch (e: any) {
+      toast.error(e.message || "Erreur");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Tester un forfait V3 (admin)</DialogTitle>
+          <DialogDescription>
+            Ouvre le vrai tunnel Stripe (test mode si sandbox) pour vérifier le flux d'abonnement.
+          </DialogDescription>
+        </DialogHeader>
+        {step === "choose" ? (
+          <div className="space-y-4">
+            <div>
+              <label className="text-xs font-semibold text-slate-600">Forfait</label>
+              <select
+                value={planId}
+                onChange={(e) => setPlanId(e.target.value as V3PlanId)}
+                className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              >
+                <option value="debutant">Auteur — 9,99€/mo · 97€/an</option>
+                <option value="expert">Studio — 12,99€/mo · 117€/an</option>
+                <option value="auteur">Éditeur — 59€/mo · 547€/an</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-slate-600">Facturation</label>
+              <div className="mt-1 flex gap-2">
+                <button
+                  onClick={() => setBilling("month")}
+                  className={`flex-1 py-2 rounded-lg text-sm ${billing === "month" ? "bg-slate-800 text-white" : "border border-slate-300"}`}
+                >Mensuel</button>
+                <button
+                  onClick={() => setBilling("year")}
+                  className={`flex-1 py-2 rounded-lg text-sm ${billing === "year" ? "bg-slate-800 text-white" : "border border-slate-300"}`}
+                >Annuel</button>
+              </div>
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-slate-600">Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              />
+            </div>
+            <p className="text-[11px] text-slate-500">
+              Price ID Stripe : <code className="bg-slate-100 px-1 rounded">{getV3PriceId(planId, billing)}</code>
+            </p>
+            <Button onClick={start} disabled={loading} className="w-full bg-blue-600 hover:bg-blue-700">
+              {loading ? "Création…" : "Ouvrir le checkout Stripe"}
+            </Button>
+          </div>
+        ) : clientSecret ? (
+          <EmbeddedCheckoutProvider stripe={getStripe()} options={{ clientSecret }}>
+            <EmbeddedCheckout />
+          </EmbeddedCheckoutProvider>
+        ) : null}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export default function V3ForfaitsPage() {
   const [interval, setInterval] = useState<V3BillingInterval>("month");
   const [isAdmin, setIsAdmin] = useState(false);
   const [showPayPalTest, setShowPayPalTest] = useState(false);
+  const [showPlanTest, setShowPlanTest] = useState(false);
 
   useEffect(() => {
     getIsCurrentSessionAdmin().then(setIsAdmin);
