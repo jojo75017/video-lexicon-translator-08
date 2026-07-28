@@ -624,6 +624,21 @@ function buildAlbumHtml(d: KidsBookDraft): string {
     <div class="author">${esc(d.authorName)}</div>
     <div class="age">${esc(d.targetAge)}</div>
   </section>
+  </section>
   ${stories}
+  <section class="page end-page">
+    <h2>Remerciements</h2>
+    <p>Un immense merci à toi, petit lecteur, ainsi qu'aux parents, grands-parents et enseignants qui prennent le temps de partager ces histoires. Merci à tous ceux qui, de près ou de loin, ont soufflé sur les pages de ce livre pour lui donner vie.</p>
+  </section>
+  <section class="page end-page">
+    <h2>Le mot de l'auteur</h2>
+    <p>J'ai écrit ${esc(d.title)} avec l'envie de faire grandir la curiosité, la tendresse et le sourire des plus petits. Chaque histoire est une petite graine à planter dans le cœur des enfants — j'espère qu'elles fleuriront longtemps dans le vôtre.</p>
+    <p class="signature">— ${esc(d.authorName)}</p>
+  </section>
+  <section class="page end-page review-page">
+    <h2>Si ce livre vous a plu…</h2>
+    <p>Laisser un avis sur Amazon prend moins d'une minute et fait une immense différence pour un auteur indépendant. Votre retour aide d'autres familles à découvrir ce livre et me donne l'élan pour en écrire d'autres.</p>
+    <p class="thanks">Merci du fond du cœur ❤️</p>
+  </section>
 </body></html>`;
 }
