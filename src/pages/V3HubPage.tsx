@@ -1155,7 +1155,7 @@ const V3HubPage: React.FC = () => {
 
         {/* ===================== ONGLET OFFRES & PACKS ===================== */}
         {activeTab === 'offres' && (
-          <V3OffresPage />
+          <V3ForfaitsPage />
         )}
 
         {/* ===================== ONGLET ROADMAP ===================== */}
