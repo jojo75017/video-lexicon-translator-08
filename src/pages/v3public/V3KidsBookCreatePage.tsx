@@ -161,6 +161,103 @@ export default function V3KidsBookCreatePage() {
     }
   };
 
+  const generateKdpMetadata = async () => {
+    if (!draft.title) return toast.error('Ajoute au moins un titre.');
+    setGeneratingKdp(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('agent-kids-kdp-metadata', {
+        body: {
+          title: draft.title,
+          subtitle: draft.subtitle,
+          authorName: draft.authorName,
+          synopsis: draft.synopsis,
+          targetAge: draft.targetAge,
+          characterName: draft.character?.name,
+          storyTitles: (draft.stories || []).map((s) => s.title).filter(Boolean),
+        },
+      });
+      if (error) throw new Error(error.message || 'échec');
+      if (!data?.description) throw new Error(data?.error || 'Réponse vide');
+      setDraft((d) => ({
+        ...d,
+        kdpDescription: data.description,
+        kdpKeywords: Array.isArray(data.keywords) ? data.keywords : [],
+        kdpCategories: Array.isArray(data.categories) ? data.categories : [],
+      }));
+      toast.success('Fiche KDP générée ✨ (éditable ci-dessous)');
+    } catch (e: any) {
+      toast.error(e.message || 'Erreur génération fiche KDP');
+    } finally {
+      setGeneratingKdp(false);
+    }
+  };
+
+  const downloadImageUrl = async (url: string | undefined, filename: string) => {
+    if (!url) return toast.error('Aucune image à télécharger.');
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+      toast.success('Téléchargement lancé.');
+    } catch {
+      // fallback direct
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.click();
+    }
+  };
+
+  const exportKdp = () => {
+    const slug = (draft.title || 'kdp').replace(/\s+/g, '-').toLowerCase();
+    const kws = (draft.kdpKeywords || []).filter(Boolean);
+    const cats = (draft.kdpCategories || []).filter(Boolean);
+    const txt =
+`FICHE PRODUIT AMAZON KDP
+========================
+
+Titre : ${draft.title || ''}
+Sous-titre : ${draft.subtitle || ''}
+Auteur : ${draft.authorName || ''}
+Tranche d'âge : ${draft.targetAge || ''}
+Édition : ${draft.edition || ''}
+Année : ${draft.publicationYear || ''}
+Lieu : ${draft.publicationPlace || ''}
+ISBN : ${draft.isbn || '(fourni par KDP)'}
+
+--- DESCRIPTION (à coller dans le champ "Description" sur KDP) ---
+${draft.kdpDescription || '(non générée)'}
+
+--- 7 MOTS-CLÉS PERFORMANTS (à coller un par champ sur KDP) ---
+${kws.length ? kws.map((k, i) => `${i + 1}. ${k}`).join('\n') : '(non générés)'}
+
+--- 3 CATÉGORIES AMAZON (à sélectionner sur KDP) ---
+${cats.length ? cats.map((c, i) => `${i + 1}. ${c}`).join('\n') : '(non générées)'}
+
+--- MÉTADONNÉES COMPLÉMENTAIRES ---
+Catégorie BISAC : ${draft.bisacCategory || ''}
+Éditeur / Imprint : ${draft.publisher || draft.authorName || ''}
+Pays dépôt légal : ${draft.legalDepositCountry || ''}
+`;
+    const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${slug}-fiche-kdp.txt`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+    toast.success('Fiche KDP téléchargée.');
+  };
+
   const spine = computeSpineWidth(pageCount);
 
 
