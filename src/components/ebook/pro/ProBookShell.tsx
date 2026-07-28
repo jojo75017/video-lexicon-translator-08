@@ -18,15 +18,18 @@ interface Props {
  *   visible et cliquable, en haut du module.
  */
 export const ProBookShell: React.FC<Props> = ({ module, children }) => {
-  const { tier } = useProBookTier();
+  const { tier, isAdmin } = useProBookTier();
   const label = PRO_MODULE_LABELS[module];
+  // Bandeau masqué uniquement pour les vrais abonnés Éditeur 59 € (inclus).
+  // Les admins voient le bandeau pour pouvoir prévisualiser l'upsell.
+  const showUpsell = isAdmin || tier !== 'pro';
 
   return (
     <div>
       <ProBookTierBadge module={module} />
 
       {/* Upsell 17 € — masqué pour le plan Éditeur 59 € (inclus) */}
-      {tier !== 'pro' && (
+      {showUpsell && (
         <div className="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-amber-300/70 bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 p-4 shadow-sm dark:from-amber-950/30 dark:via-yellow-950/20 dark:to-orange-950/20">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/15 text-amber-700">
             <Sparkles className="h-5 w-5" aria-hidden />
