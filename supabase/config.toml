@@ -214,3 +214,6 @@ verify_jwt = false
 
 [functions.firecrawl-credits]
 verify_jwt = false
+
+[functions.test-paypal-checkout]
+verify_jwt = false
