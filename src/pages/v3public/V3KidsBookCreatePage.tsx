@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Sparkles, Loader2, Lock, Check, Download, ArrowLeft, Wand2, Save, FileText, Printer } from 'lucide-react';
+import { Sparkles, Loader2, Lock, Check, Download, ArrowLeft, Wand2, Save, FileText, Printer, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -58,6 +58,36 @@ export default function V3KidsBookCreatePage() {
   });
   const [saving, setSaving] = useState(false);
   const [exporting, setExporting] = useState<'pdf' | 'docx' | null>(null);
+  const [generatingCover, setGeneratingCover] = useState(false);
+
+  const generateCover = async () => {
+    if (!draft.title) return toast.error('Ajoute un titre avant de créer la couverture.');
+    setGeneratingCover(true);
+    try {
+      const stylePrompt = ILLUSTRATION_STYLES.find((s) => s.id === draft.style)?.prompt || '';
+      const model = KIDS_BOOK_IMAGE_MODEL[plan || 'expert'];
+      const characterBible = buildCharacterBibleText(draft.character);
+      const coverScene = `Couverture professionnelle de livre jeunesse KDP, format album carré. Grand titre "${draft.title}" en typographie manuscrite enfantine, colorée et lisible, occupant le haut de la couverture. ${draft.subtitle ? `Sous-titre: "${draft.subtitle}". ` : ''}Nom de l'auteur "${draft.authorName}" en bas de la couverture, plus petit. Illustration centrale mettant en scène ${draft.character.name} de manière expressive et joyeuse, ambiance ${draft.synopsis || 'douce et magique'}. Composition professionnelle équilibrée, marges nettes, couleurs vives, style prêt à imprimer pour Amazon KDP.`;
+      const { data: img, error: imgErr } = await supabase.functions.invoke('agent-illustrator', {
+        body: {
+          bookId: 'draft-cover',
+          storyId: 'cover',
+          characterBible,
+          scene: coverScene,
+          stylePrompt,
+          model,
+        },
+      });
+      if (imgErr || !img?.url) throw new Error(imgErr?.message || img?.error || 'échec');
+      setDraft((d) => ({ ...d, coverUrl: img.url }));
+      toast.success('Couverture créée ✨');
+    } catch (e: any) {
+      toast.error(e.message || 'Erreur génération couverture');
+    } finally {
+      setGeneratingCover(false);
+    }
+  };
+
 
 
   useEffect(() => {
@@ -557,9 +587,42 @@ export default function V3KidsBookCreatePage() {
           </div>
         )}
 
+        {/* Couverture pro */}
+        <div className="v3-card mb-4 border-2 border-[#C97A14]/30">
+          <h2 className="font-semibold mb-2 flex items-center gap-2">
+            <ImageIcon className="w-5 h-5 text-[#C97A14]" /> 5. Créer la couverture
+          </h2>
+          <p className="text-xs text-[var(--v3-muted)] mb-3">
+            Génère une couverture d'album professionnelle (format carré KDP) avec ton personnage, ton titre et ton nom d'auteur.
+          </p>
+          <div className="flex flex-wrap items-start gap-4">
+            <Button
+              onClick={generateCover}
+              disabled={generatingCover || !draft.title}
+              className="bg-[#C97A14] hover:opacity-90 text-white"
+            >
+              {generatingCover ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+              {draft.coverUrl ? 'Regénérer la couverture' : 'Créer la couverture'}
+            </Button>
+            {draft.coverUrl && (
+              <div className="flex flex-col items-center gap-1">
+                <img
+                  src={draft.coverUrl}
+                  alt="Couverture"
+                  className="w-40 h-40 object-cover rounded border shadow-sm"
+                />
+                <span className="text-[11px] text-green-700 inline-flex items-center gap-1">
+                  <Check className="w-3 h-3" /> Intégrée à l'export
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Sauvegarde & Export */}
+
         <div className="v3-card mb-4">
-          <h2 className="font-semibold mb-2">5. Sauvegarde</h2>
+          <h2 className="font-semibold mb-2">6. Sauvegarde</h2>
           <p className="text-xs text-[var(--v3-muted)] mb-3">
             Enregistre ton livre dans « Mes projets » pour le retrouver depuis n'importe quel appareil.
           </p>
@@ -579,7 +642,7 @@ export default function V3KidsBookCreatePage() {
         </div>
 
         <div className="v3-card mb-8">
-          <h2 className="font-semibold mb-2">6. Export album</h2>
+          <h2 className="font-semibold mb-2">7. Export album</h2>
           <p className="text-xs text-[var(--v3-muted)] mb-3">
             Format album carré 21,59 × 21,59 cm — prêt pour KDP.
           </p>
@@ -664,11 +727,15 @@ function buildAlbumHtml(d: KidsBookDraft): string {
   .end-page p { font-size: 15pt; line-height: 1.6; margin: 0 0 0.6cm; }
   .end-page .signature { margin-top: 1.2cm; font-style: italic; font-size: 16pt; }
   .end-page .thanks { margin-top: 1.5cm; font-size: 18pt; font-style: italic; color: #C97A14; }
+  .cover-image { padding: 0; }
+  .cover-image .cover-illu { width: 100%; height: 100%; object-fit: cover; }
 </style></head><body>
-  <section class="page cover">
-    <h1>${esc(d.title)}</h1>
-    ${d.subtitle ? `<div class="subtitle">${esc(d.subtitle)}</div>` : ''}
-    <div class="author">${esc(d.authorName)}</div>
+  <section class="page cover ${d.coverUrl ? 'cover-image' : ''}">
+    ${d.coverUrl ? `<img class="cover-illu" src="${esc(d.coverUrl)}" alt="Couverture" />` : `
+      <h1>${esc(d.title)}</h1>
+      ${d.subtitle ? `<div class="subtitle">${esc(d.subtitle)}</div>` : ''}
+      <div class="author">${esc(d.authorName)}</div>
+    `}
   </section>
   <section class="page title-page">
     <h1>${esc(d.title)}</h1>
