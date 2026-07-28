@@ -1101,10 +1101,92 @@ Pays dépôt légal : ${draft.legalDepositCountry || ''}
         </div>
 
 
+        {/* Fiche produit KDP */}
+        <div className="v3-card mb-4 border-l-4 border-[#C97A14]">
+          <div className="flex items-start justify-between gap-3 mb-2 flex-wrap">
+            <div>
+              <h2 className="font-semibold">6. Fiche produit Amazon KDP</h2>
+              <p className="text-xs text-[var(--v3-muted)]">
+                Description Amazon + <strong>7 mots-clés performants</strong> + <strong>3 catégories</strong> — à copier/coller sur KDP.
+              </p>
+            </div>
+            <Button
+              onClick={generateKdpMetadata}
+              disabled={generatingKdp || !draft.title}
+              className="bg-[#C97A14] hover:opacity-90 text-white"
+            >
+              {generatingKdp ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Wand2 className="w-4 h-4 mr-2" />}
+              {draft.kdpDescription ? 'Regénérer la fiche KDP' : 'Générer la fiche KDP (IA)'}
+            </Button>
+          </div>
+
+          <label className="block text-xs text-[var(--v3-muted)] mt-3">
+            Description Amazon
+            <textarea
+              value={draft.kdpDescription || ''}
+              onChange={(e) => update({ kdpDescription: e.target.value })}
+              placeholder="La description sera générée ici. Éditable avant copie sur KDP."
+              rows={8}
+              className="mt-1 w-full rounded-lg border border-black/15 px-3 py-2 text-sm focus:border-[#C97A14] focus:outline-none"
+            />
+            <span className="text-[10px] text-[var(--v3-muted)]">
+              {(draft.kdpDescription || '').length} / 4000 caractères
+            </span>
+          </label>
+
+          <div className="mt-4">
+            <div className="text-xs font-semibold text-[#C97A14] uppercase tracking-wider mb-2">
+              7 mots-clés performants (1 par champ KDP)
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {Array.from({ length: 7 }).map((_, i) => (
+                <input
+                  key={i}
+                  value={(draft.kdpKeywords || [])[i] || ''}
+                  onChange={(e) => {
+                    const arr = [...(draft.kdpKeywords || Array(7).fill(''))];
+                    arr[i] = e.target.value;
+                    update({ kdpKeywords: arr });
+                  }}
+                  placeholder={`Mot-clé ${i + 1}`}
+                  maxLength={50}
+                  className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm"
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <div className="text-xs font-semibold text-[#C97A14] uppercase tracking-wider mb-2">
+              3 catégories Amazon (chemin complet)
+            </div>
+            <div className="grid grid-cols-1 gap-2">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <input
+                  key={i}
+                  value={(draft.kdpCategories || [])[i] || ''}
+                  onChange={(e) => {
+                    const arr = [...(draft.kdpCategories || Array(3).fill(''))];
+                    arr[i] = e.target.value;
+                    update({ kdpCategories: arr });
+                  }}
+                  placeholder={`Catégorie ${i + 1} — ex : Livres > Livres pour enfants > 3-5 ans > Histoires du soir`}
+                  className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm"
+                />
+              ))}
+            </div>
+          </div>
+
+          <p className="text-[11px] text-[var(--v3-muted)] mt-3">
+            💡 Les catégories proposées sont indicatives — vérifie leur disponibilité sur ton dashboard KDP au moment de la publication.
+          </p>
+        </div>
+
+
         {/* Sauvegarde & Export */}
 
         <div className="v3-card mb-4">
-          <h2 className="font-semibold mb-2">6. Sauvegarde</h2>
+          <h2 className="font-semibold mb-2">7. Sauvegarde</h2>
           <p className="text-xs text-[var(--v3-muted)] mb-3">
             Enregistre ton livre dans « Mes projets » pour le retrouver depuis n'importe quel appareil.
           </p>
@@ -1124,7 +1206,7 @@ Pays dépôt légal : ${draft.legalDepositCountry || ''}
         </div>
 
         <div className="v3-card mb-8">
-          <h2 className="font-semibold mb-2">7. Export album</h2>
+          <h2 className="font-semibold mb-2">8. Export album</h2>
           <p className="text-xs text-[var(--v3-muted)] mb-3">
             Format album carré 21,59 × 21,59 cm — prêt pour KDP.
           </p>
@@ -1152,11 +1234,37 @@ Pays dépôt légal : ${draft.legalDepositCountry || ''}
             >
               <Download className="w-4 h-4 mr-2" /> HTML
             </Button>
+            <Button
+              onClick={exportKdp}
+              disabled={!draft.title}
+              variant="outline"
+              className="border-[#C97A14] text-[#C97A14] hover:bg-[#C97A14]/10"
+              title="Télécharge la fiche produit à copier sur KDP"
+            >
+              <Download className="w-4 h-4 mr-2" /> KDP (.txt)
+            </Button>
+            {draft.coverUrl && (
+              <Button
+                onClick={() => downloadImageUrl(draft.coverUrl, `${(draft.title || 'couverture').replace(/\s+/g, '-')}-1ere-de-couverture.png`)}
+                variant="outline"
+              >
+                <ImageIcon className="w-4 h-4 mr-2" /> 1ère de couverture
+              </Button>
+            )}
+            {draft.backCoverUrl && (
+              <Button
+                onClick={() => downloadImageUrl(draft.backCoverUrl, `${(draft.title || 'couverture').replace(/\s+/g, '-')}-4e-de-couverture.png`)}
+                variant="outline"
+              >
+                <ImageIcon className="w-4 h-4 mr-2" /> 4e de couverture
+              </Button>
+            )}
           </div>
           <p className="text-[11px] text-[var(--v3-muted)] mt-3">
-            PDF : ouvre la boîte d'impression du navigateur → choisis <em>Enregistrer au format PDF</em>.
+            PDF : ouvre la boîte d'impression du navigateur → choisis <em>Enregistrer au format PDF</em>. Le bouton <strong>KDP (.txt)</strong> exporte la description, les 7 mots-clés et les 3 catégories à coller sur ton dashboard KDP.
           </p>
         </div>
+
 
         <div className="text-center text-xs text-[var(--v3-muted)] flex items-center justify-center gap-2">
           <Check className="w-3 h-3 text-green-600" />
