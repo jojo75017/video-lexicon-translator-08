@@ -510,21 +510,67 @@ export default function V3KidsBookCreatePage() {
           </div>
         )}
 
-        {/* Export */}
-        <div className="v3-card mb-8">
-          <h2 className="font-semibold mb-2">5. Export album</h2>
+        {/* Sauvegarde & Export */}
+        <div className="v3-card mb-4">
+          <h2 className="font-semibold mb-2">5. Sauvegarde</h2>
           <p className="text-xs text-[var(--v3-muted)] mb-3">
-            Fichier HTML au format album carré (21,59 × 21,59 cm). Ouvre-le dans Chrome et fais <em>Imprimer → PDF</em> pour un fichier prêt KDP.
+            Enregistre ton livre dans « Mes projets » pour le retrouver depuis n'importe quel appareil.
           </p>
-          <Button onClick={exportHtml} disabled={!draft.stories.length || !draft.title || !draft.authorName}>
-            <Download className="w-4 h-4 mr-2" /> Télécharger l'album (HTML)
+          <Button
+            onClick={saveToCloud}
+            disabled={saving || !draft.title}
+            className="bg-[var(--v3-emerald,#064e3b)] hover:opacity-90 text-white"
+          >
+            {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+            {projectId ? 'Mettre à jour dans mes projets' : 'Sauvegarder dans mes projets'}
           </Button>
+          {projectId && (
+            <span className="ml-3 text-xs text-green-700 inline-flex items-center gap-1">
+              <Check className="w-3 h-3" /> Projet lié
+            </span>
+          )}
+        </div>
+
+        <div className="v3-card mb-8">
+          <h2 className="font-semibold mb-2">6. Export album</h2>
+          <p className="text-xs text-[var(--v3-muted)] mb-3">
+            Format album carré 21,59 × 21,59 cm — prêt pour KDP.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              onClick={exportPdf}
+              disabled={!draft.stories.length || !draft.title || exporting === 'pdf'}
+              className="bg-[#C97A14] hover:opacity-90 text-white"
+            >
+              {exporting === 'pdf' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Printer className="w-4 h-4 mr-2" />}
+              Exporter en PDF
+            </Button>
+            <Button
+              onClick={exportDocx}
+              disabled={!draft.stories.length || !draft.title || exporting === 'docx'}
+              variant="outline"
+            >
+              {exporting === 'docx' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileText className="w-4 h-4 mr-2" />}
+              Exporter en Word (.docx)
+            </Button>
+            <Button
+              onClick={exportHtml}
+              disabled={!draft.stories.length || !draft.title}
+              variant="outline"
+            >
+              <Download className="w-4 h-4 mr-2" /> HTML
+            </Button>
+          </div>
+          <p className="text-[11px] text-[var(--v3-muted)] mt-3">
+            PDF : ouvre la boîte d'impression du navigateur → choisis <em>Enregistrer au format PDF</em>.
+          </p>
         </div>
 
         <div className="text-center text-xs text-[var(--v3-muted)] flex items-center justify-center gap-2">
           <Check className="w-3 h-3 text-green-600" />
-          Brouillon sauvegardé automatiquement dans ce navigateur
+          Brouillon aussi sauvegardé automatiquement dans ce navigateur
         </div>
+
       </div>
     </section>
   );
