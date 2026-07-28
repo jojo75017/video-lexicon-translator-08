@@ -282,6 +282,8 @@ export default function V3CreateWizard() {
       if (w.promesseBenefices) setPromesseBenefices(w.promesseBenefices);
       if (w.promesseDifferenciation) setPromesseDifferenciation(w.promesseDifferenciation);
       if (w.promesseEmotion) setPromesseEmotion(w.promesseEmotion);
+      if (w.bibleUnivers) setBibleUnivers(w.bibleUnivers);
+      if (w.arbreNarratif) setArbreNarratif(w.arbreNarratif);
 
       // Détecte une progression workflow inachevée
       let lastStep = '';
