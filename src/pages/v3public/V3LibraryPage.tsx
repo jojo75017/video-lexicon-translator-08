@@ -253,7 +253,7 @@ function BookCard({ r, done, onAudio, onUpdated, onDelete }: { r: Row; done?: bo
 
   return (
     <div className="group flex flex-col">
-      <Link to={`/v3/book/${r.id}`} className="block">
+      <Link to={r.project_type === 'kids_book' ? `/v3/create/illustre?projectId=${r.id}` : `/v3/book/${r.id}`} className="block">
         <div
           className="relative aspect-[3/4] rounded-xl overflow-hidden shadow-md group-hover:shadow-xl transition-all border border-[color:var(--v3-orange)]/20"
           style={
