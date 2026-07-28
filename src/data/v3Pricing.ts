@@ -95,7 +95,14 @@ export function getV3Plan(id: V3PlanId): V3Plan | undefined {
 }
 
 export function getV3PriceId(planId: V3PlanId, interval: V3BillingInterval): string {
-  return `v3_${planId}_${interval === "month" ? "monthly" : "annual"}`;
+  // Map internal plan IDs to Stripe price IDs (activation octobre 2026).
+  const suffix = interval === "month" ? "monthly" : "annual";
+  const map: Record<V3PlanId, { monthly: string; annual: string }> = {
+    debutant: { monthly: "v3_auteur_monthly", annual: "v3_auteur_annual" },
+    expert: { monthly: "v3_expert_monthly", annual: "v3_expert_annual" },
+    auteur: { monthly: "v3_auteur_monthly_pro", annual: "v3_auteur_annual_pro" },
+  };
+  return map[planId][suffix];
 }
 
 export function getYearlySavingsPercent(plan: V3Plan): number {

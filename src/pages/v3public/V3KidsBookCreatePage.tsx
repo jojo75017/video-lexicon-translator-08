@@ -14,6 +14,7 @@ import {
   ILLUSTRATION_STYLES,
   buildCharacterBibleText,
   canUseKidsBook,
+  computeSpineWidth,
   KIDS_BOOK_IMAGE_MODEL,
   type KidsBookDraft,
   type KidsStory,
@@ -60,6 +61,8 @@ export default function V3KidsBookCreatePage() {
   const [saving, setSaving] = useState(false);
   const [exporting, setExporting] = useState<'pdf' | 'docx' | null>(null);
   const [generatingCover, setGeneratingCover] = useState(false);
+  const [generatingBack, setGeneratingBack] = useState(false);
+  const [pageCount, setPageCount] = useState<number>(32);
 
   const generateCover = async () => {
     if (!draft.title) return toast.error('Ajoute un titre avant de créer la couverture.');
@@ -88,6 +91,38 @@ export default function V3KidsBookCreatePage() {
       setGeneratingCover(false);
     }
   };
+
+  const generateBackCover = async () => {
+    if (!draft.title) return toast.error('Ajoute un titre avant de créer la 4e de couverture.');
+    setGeneratingBack(true);
+    try {
+      const stylePrompt = ILLUSTRATION_STYLES.find((s) => s.id === draft.style)?.prompt || '';
+      const model = KIDS_BOOK_IMAGE_MODEL[plan || 'expert'];
+      const characterBible = buildCharacterBibleText(draft.character);
+      const backText = draft.backCoverText
+        || `Un livre tendre pour les enfants de ${draft.targetAge}. ${draft.synopsis || ''}`.trim();
+      const backScene = `4e de couverture professionnelle de livre jeunesse KDP, format album carré. Zone de texte lisible en haut ou au centre pour un résumé (laisser un large espace blanc/uniforme d'au moins 40% de la surface pour permettre l'ajout du texte). Petite illustration secondaire cohérente avec l'univers, montrant ${draft.character.name} de dos ou dans une scène calme, ambiance douce, ${draft.synopsis || 'univers du livre'}. Marges nettes, palette assortie à la 1ère de couverture. Pas de titre, pas de texte imprimé dans l'image — juste illustration + fond neutre pour texte.`;
+      const { data: img, error: imgErr } = await supabase.functions.invoke('agent-illustrator', {
+        body: {
+          bookId: 'draft-back',
+          storyId: 'back',
+          characterBible,
+          scene: backScene,
+          stylePrompt,
+          model,
+        },
+      });
+      if (imgErr || !img?.url) throw new Error(imgErr?.message || img?.error || 'échec');
+      setDraft((d) => ({ ...d, backCoverUrl: img.url, backCoverText: backText }));
+      toast.success('4e de couverture créée ✨');
+    } catch (e: any) {
+      toast.error(e.message || 'Erreur génération 4e de couverture');
+    } finally {
+      setGeneratingBack(false);
+    }
+  };
+
+  const spine = computeSpineWidth(pageCount);
 
 
 
@@ -643,37 +678,107 @@ export default function V3KidsBookCreatePage() {
           </div>
         )}
 
-        {/* Couverture pro */}
+        {/* Cover Studio Pro Kids : 1ère + 4ème + tranche */}
         <div className="v3-card mb-4 border-2 border-[#C97A14]/30">
-          <h2 className="font-semibold mb-2 flex items-center gap-2">
-            <ImageIcon className="w-5 h-5 text-[#C97A14]" /> 5. Créer la couverture
+          <h2 className="font-semibold mb-1 flex items-center gap-2">
+            <ImageIcon className="w-5 h-5 text-[#C97A14]" /> 5. Cover Studio Pro Kids — couverture complète KDP
           </h2>
-          <p className="text-xs text-[var(--v3-muted)] mb-3">
-            Génère une couverture d'album professionnelle (format carré KDP) avec ton personnage, ton titre et ton nom d'auteur.
+          <p className="text-xs text-[var(--v3-muted)] mb-4">
+            Génère la 1ère de couverture, la 4e de couverture et calcule automatiquement la tranche selon le nombre de pages — prêt à uploader sur KDP.
           </p>
-          <div className="flex flex-wrap items-start gap-4">
-            <Button
-              onClick={generateCover}
-              disabled={generatingCover || !draft.title}
-              className="bg-[#C97A14] hover:opacity-90 text-white"
-            >
-              {generatingCover ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
-              {draft.coverUrl ? 'Regénérer la couverture' : 'Créer la couverture'}
-            </Button>
-            {draft.coverUrl && (
-              <div className="flex flex-col items-center gap-1">
-                <img
-                  src={draft.coverUrl}
-                  alt="Couverture"
-                  className="w-40 h-40 object-cover rounded border shadow-sm"
+
+          {/* 1ère de couverture */}
+          <div className="mb-5">
+            <div className="text-xs font-semibold text-[#C97A14] uppercase tracking-wider mb-2">1ère de couverture</div>
+            <div className="flex flex-wrap items-start gap-4">
+              <Button
+                onClick={generateCover}
+                disabled={generatingCover || !draft.title}
+                className="bg-[#C97A14] hover:opacity-90 text-white"
+              >
+                {generatingCover ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+                {draft.coverUrl ? 'Regénérer la 1ère' : 'Créer la 1ère de couverture'}
+              </Button>
+              {draft.coverUrl && (
+                <div className="flex flex-col items-center gap-1">
+                  <img src={draft.coverUrl} alt="1ère de couverture" className="w-40 h-40 object-cover rounded border shadow-sm" />
+                  <span className="text-[11px] text-green-700 inline-flex items-center gap-1">
+                    <Check className="w-3 h-3" /> Intégrée à l'export
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 4e de couverture */}
+          <div className="mb-5 pt-4 border-t border-black/5">
+            <div className="text-xs font-semibold text-[#C97A14] uppercase tracking-wider mb-2">4e de couverture (dos)</div>
+            <label className="block text-xs text-[var(--v3-muted)] mb-2">
+              Résumé imprimé sur la 4e (optionnel — sinon on utilise ton synopsis)
+              <textarea
+                value={draft.backCoverText || ''}
+                onChange={(e) => update({ backCoverText: e.target.value })}
+                placeholder="Résumé accrocheur qui apparaîtra au dos du livre…"
+                rows={3}
+                className="mt-1 w-full rounded-lg border border-black/15 px-3 py-2 text-sm focus:border-[#C97A14] focus:outline-none"
+              />
+            </label>
+            <div className="flex flex-wrap items-start gap-4">
+              <Button
+                onClick={generateBackCover}
+                disabled={generatingBack || !draft.title}
+                variant="outline"
+                className="border-[#C97A14] text-[#C97A14] hover:bg-[#C97A14]/10"
+              >
+                {generatingBack ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+                {draft.backCoverUrl ? 'Regénérer la 4e' : 'Créer la 4e de couverture'}
+              </Button>
+              {draft.backCoverUrl && (
+                <img src={draft.backCoverUrl} alt="4e de couverture" className="w-40 h-40 object-cover rounded border shadow-sm" />
+              )}
+            </div>
+          </div>
+
+          {/* Tranche */}
+          <div className="pt-4 border-t border-black/5">
+            <div className="text-xs font-semibold text-[#C97A14] uppercase tracking-wider mb-2">Tranche (spine) — calcul KDP auto</div>
+            <div className="flex flex-wrap items-end gap-4">
+              <label className="text-xs text-[var(--v3-muted)]">
+                Nombre total de pages intérieures
+                <input
+                  type="number"
+                  min={24}
+                  max={828}
+                  value={pageCount}
+                  onChange={(e) => setPageCount(Math.max(24, Math.min(828, parseInt(e.target.value) || 24)))}
+                  className="mt-1 block w-28 rounded-lg border border-black/15 px-3 py-2 text-sm"
                 />
-                <span className="text-[11px] text-green-700 inline-flex items-center gap-1">
-                  <Check className="w-3 h-3" /> Intégrée à l'export
-                </span>
+              </label>
+              <div className="text-xs bg-[#C97A14]/10 border border-[#C97A14]/30 rounded-lg px-4 py-2">
+                <div className="font-semibold text-[#C97A14]">Largeur de tranche calculée</div>
+                <div className="text-[#232F3E] mt-1">
+                  {spine.mm.toFixed(2)} mm · {spine.cm.toFixed(3)} cm · {spine.inches.toFixed(4)} po
+                </div>
+                <div className="text-[10px] text-[var(--v3-muted)] mt-1">
+                  Formule KDP : pages × 0,0025 po (papier couleur 60#)
+                </div>
               </div>
-            )}
+              <label className="text-xs text-[var(--v3-muted)] flex-1 min-w-[220px]">
+                Texte imprimé sur la tranche (titre · auteur)
+                <input
+                  type="text"
+                  value={draft.spineText || `${draft.title}${draft.authorName ? ` — ${draft.authorName}` : ''}`}
+                  onChange={(e) => update({ spineText: e.target.value })}
+                  className="mt-1 block w-full rounded-lg border border-black/15 px-3 py-2 text-sm"
+                />
+              </label>
+            </div>
+            <p className="text-[11px] text-[var(--v3-muted)] mt-3">
+              💡 Sur KDP, uploade la <strong>1ère de couverture</strong> et la <strong>4e de couverture</strong> séparément, puis reporte cette largeur de tranche exacte dans le générateur de couverture Amazon.
+            </p>
           </div>
         </div>
+
 
         {/* Sauvegarde & Export */}
 

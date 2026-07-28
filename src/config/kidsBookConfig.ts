@@ -65,9 +65,25 @@ export interface KidsBookDraft {
   wordsPerStory?: number;  // longueur cible par histoire
   character: CharacterBible;
   stories: KidsStory[];
-  coverUrl?: string;       // couverture générée par IA
-
+  coverUrl?: string;       // 1ère de couverture générée par IA
+  backCoverUrl?: string;   // 4ème de couverture générée par IA
+  backCoverText?: string;  // résumé/pitch imprimé sur la 4e de couverture
+  spineText?: string;      // texte affiché sur la tranche (titre + auteur)
 }
+
+/**
+ * Calcul KDP de la largeur de tranche (spine) pour un livre couleur
+ * standard (papier 60#, blanc). Formule Amazon : pages × 0.0025 pouces.
+ * @param pageCount nombre total de pages intérieures du livre
+ * @returns { inches, mm, cm } — largeur de tranche
+ */
+export function computeSpineWidth(pageCount: number): { inches: number; mm: number; cm: number } {
+  const safe = Math.max(24, Math.min(828, Math.round(pageCount)));
+  const inches = safe * 0.0025;
+  const mm = inches * 25.4;
+  return { inches, mm, cm: mm / 10 };
+}
+
 
 export function buildCharacterBibleText(c: CharacterBible): string {
   return [
