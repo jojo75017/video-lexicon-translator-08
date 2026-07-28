@@ -9,7 +9,7 @@ const SECTIONS: { title: string; duration: string; body: string }[] = [
   {
     title: '0. Intro — Présentation (0:00 → 0:45)',
     duration: '~45 s',
-    body: `Bonjour et bienvenue ! Je suis Frédéric, le fondateur d'EbookStudio.
+    body: `Bonjour et bienvenue ! Je suis Georges, le fondateur d'EbookStudio.
 Depuis plusieurs années, j'accompagne des auteurs, des formateurs et des entrepreneurs qui veulent publier leurs livres sur Amazon KDP sans y passer des mois et sans se ruiner en outils.
 
 Aujourd'hui, je suis très heureux de vous présenter la version 3 d'EbookStudio — une plateforme complète, pensée comme une véritable maison d'édition en ligne, qui écrit, illustre, habille, traduit et prépare vos livres pour Amazon KDP.
@@ -123,7 +123,7 @@ De l'idée au livre imprimé, de la couverture à la fiche Amazon, du français 
 Si vous nous rejoignez aujourd'hui, sachez que vous êtes chez vous : notre équipe est disponible, notre communauté est bienveillante, et nous sommes là pour vous accompagner à chaque étape de votre aventure d'auteur.
 
 Merci de votre confiance, prenez soin de vous, et à très vite dans EbookStudio Pro V3.
-— Frédéric, fondateur d'EbookStudio.`,
+— Georges, fondateur d'EbookStudio.`,
   },
 ];
 
@@ -175,7 +175,7 @@ export default function V3ScriptHeygenPage() {
         <div className="flex flex-wrap gap-2">
           <Badge variant="secondary">Durée cible : 10 minutes</Badge>
           <Badge variant="secondary">Ton : chaleureux, professionnel</Badge>
-          <Badge variant="secondary">Voix : Frédéric — fondateur</Badge>
+          <Badge variant="secondary">Voix : Georges — fondateur</Badge>
           <Badge variant="secondary">Format HeyGen : avatar + slides</Badge>
         </div>
 
