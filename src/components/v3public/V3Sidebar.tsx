@@ -11,7 +11,7 @@ import { useState } from 'react';
  * Sidebar V3 — espace personnel uniquement (jamais les catégories du header).
  * Style Émeraude Prestige : fond blanc, actif = fond or doux + barre or.
  */
-type NavItem = { to: string; label: string; icon: any; end?: boolean };
+type NavItem = { to: string; label: string; icon: any; end?: boolean; external?: boolean; badge?: string };
 type NavSection = { section: string; items: NavItem[] };
 
 const NAV: NavSection[] = [
@@ -29,9 +29,9 @@ const NAV: NavSection[] = [
   {
     section: 'Formation',
     items: [
+      { to: 'https://ebookstudio.blog/#accueil', label: 'Blog EbookStudio', icon: FileText, external: true, badge: 'Nouveau' } as any,
       { to: '/formation', label: 'Formation vidéo', icon: GraduationCap },
       { to: '/masterclass', label: 'Masterclass', icon: Video },
-      { to: '/blog', label: 'Guides & Blog', icon: FileText },
     ],
   },
   {

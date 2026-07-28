@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, LogIn, User, Mail, GraduationCap, Menu, X } from 'lucide-react';
+import BlogExternalLink from './BlogExternalLink';
 
 /**
  * Header V3 — Ligne 1 (barre de marque premium).
@@ -65,6 +66,7 @@ export default function V3Header({ isAuthed = false }: { isAuthed?: boolean }) {
 
         {/* Actions droite (≥ lg) */}
         <nav className="hidden lg:flex items-center gap-1 ml-auto">
+          <BlogExternalLink variant="headerDark" />
           <Link to="/formation" className="v3-btn v3-btn-on-dark" title="Formation">
             <GraduationCap className="w-4 h-4" /> Formation
           </Link>
@@ -141,6 +143,7 @@ export default function V3Header({ isAuthed = false }: { isAuthed?: boolean }) {
             <Link to={isAuthed ? '/v3/library' : '/v3/auth'} onClick={() => setOpen(false)} className="v3-btn v3-btn-on-dark w-full justify-center">
               {isAuthed ? 'Ma bibliothèque' : 'Connexion'}
             </Link>
+            <BlogExternalLink variant="headerDark" className="w-full justify-center" onClick={() => setOpen(false)} />
             <Link to="/formation" onClick={() => setOpen(false)} className="v3-btn v3-btn-on-dark w-full justify-center">
               <GraduationCap className="w-4 h-4" /> Formation
             </Link>
