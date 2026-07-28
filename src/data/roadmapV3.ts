@@ -128,6 +128,7 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
     badge: 'Nouveau',
     alacarte: true,
     modules: ['documentation-studio'],
+  },
   {
     id: 'boost_lancement',
     title: 'Pack Boost de Lancement',
