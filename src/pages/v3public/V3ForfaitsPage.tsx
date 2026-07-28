@@ -261,6 +261,7 @@ export default function V3ForfaitsPage() {
   return (
     <div className="min-h-screen py-12 px-4" style={{ background: "#FAFAFA" }}>
       <div className="max-w-6xl mx-auto">
+        <BackButton className="mb-4" />
         <header className="text-center mb-10">
           <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: "#b45309" }}>
             EbookStudio V3 · Forfaits
