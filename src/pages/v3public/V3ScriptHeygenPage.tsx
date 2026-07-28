@@ -175,7 +175,7 @@ export default function V3ScriptHeygenPage() {
         <div className="flex flex-wrap gap-2">
           <Badge variant="secondary">Durée cible : 10 minutes</Badge>
           <Badge variant="secondary">Ton : chaleureux, professionnel</Badge>
-          <Badge variant="secondary">Voix : Frédéric — fondateur</Badge>
+          <Badge variant="secondary">Voix : Georges — fondateur</Badge>
           <Badge variant="secondary">Format HeyGen : avatar + slides</Badge>
         </div>
 
