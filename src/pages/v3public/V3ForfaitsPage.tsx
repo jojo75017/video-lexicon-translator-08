@@ -1,6 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { Check, Sparkles, Crown, Zap } from "lucide-react";
+import { Check, Sparkles, Crown, Zap, CreditCard, X } from "lucide-react";
+import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { getIsCurrentSessionAdmin } from "@/lib/adminAccess";
+import { getStripe, getStripeEnvironment } from "@/lib/stripe";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import {
   V3_PLANS,
   formatPrice,
@@ -20,8 +33,115 @@ const PLAN_ACCENTS: Record<string, string> = {
   auteur: "#5B21B6",     // Éditeur — pourpre édition
 };
 
+function PayPalTestModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [step, setStep] = useState<"email" | "checkout">("email");
+
+  useEffect(() => {
+    if (open) {
+      setClientSecret(null);
+      setStep("email");
+      setLoading(false);
+      supabase.auth.getUser().then(({ data }) => {
+        if (data.user?.email) setEmail(data.user.email);
+      });
+    }
+  }, [open]);
+
+  const startCheckout = async () => {
+    if (!email.includes("@")) {
+      toast.error("Email invalide");
+      return;
+    }
+    setLoading(true);
+    try {
+      const returnUrl = `${window.location.origin}/v3/offres/merci?session_id={CHECKOUT_SESSION_ID}&test=paypal`;
+      const { data, error } = await supabase.functions.invoke("test-paypal-checkout", {
+        body: {
+          email,
+          environment: getStripeEnvironment(),
+          returnUrl,
+        },
+      });
+      if (error || !data?.clientSecret) {
+        throw new Error(error?.message || data?.error || "Impossible de créer la session de test");
+      }
+      setClientSecret(data.clientSecret as string);
+      setStep("checkout");
+    } catch (err: any) {
+      toast.error(err.message || "Erreur lors de l'ouverture du checkout");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchClientSecret = useCallback(() => {
+    return Promise.resolve(clientSecret!);
+  }, [clientSecret]);
+
+  return (
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <DialogContent className="max-w-2xl max-h-[92vh] overflow-hidden p-0">
+        <DialogHeader className="px-5 py-4 border-b border-black/5">
+          <DialogTitle className="flex items-center gap-2">
+            <svg className="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.064 1.193 1.378 2.64 1.085 4.154-.342 1.833-1.206 3.055-2.462 3.747-.578.32-1.19.52-1.83.62.374.428.6.91.72 1.45.262 1.105.13 2.53-.387 4.257-.602 2.03-1.55 3.465-2.815 4.267-1.163.733-2.683 1.104-4.526 1.104H7.68a.65.65 0 0 1-.604-.438z" />
+            </svg>
+            Test PayPal — 1 € fictif
+          </DialogTitle>
+          <DialogDescription>
+            Aucun vrai prélèvement. Cette session sert uniquement à vérifier que le bouton PayPal s'affiche.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="p-4 overflow-y-auto">
+          {step === "email" ? (
+            <div className="max-w-md mx-auto py-6 space-y-4">
+              <label className="block text-sm font-medium text-slate-700">
+                Email de test
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="vous@exemple.com"
+                  className="mt-1 w-full rounded-lg border border-black/15 px-3 py-2 focus:border-[#008296] focus:outline-none"
+                />
+              </label>
+              <Button
+                onClick={startCheckout}
+                disabled={loading}
+                className="w-full bg-[#008296] hover:bg-[#006b7a]"
+              >
+                {loading ? "Ouverture..." : "Voir le checkout test"}
+              </Button>
+              <p className="text-xs text-center text-slate-500">
+                En preview, le checkout utilise Stripe en mode sandbox. En production, le montant serait de 1 € réel.
+              </p>
+            </div>
+          ) : clientSecret ? (
+            <EmbeddedCheckoutProvider
+              stripe={getStripe()}
+              options={{ fetchClientSecret }}
+            >
+              <EmbeddedCheckout />
+            </EmbeddedCheckoutProvider>
+          ) : null}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export default function V3ForfaitsPage() {
   const [interval, setInterval] = useState<V3BillingInterval>("month");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showPayPalTest, setShowPayPalTest] = useState(false);
+
+  useEffect(() => {
+    getIsCurrentSessionAdmin().then(setIsAdmin);
+  }, []);
 
   return (
     <div className="min-h-screen py-12 px-4" style={{ background: "#FAFAFA" }}>
@@ -146,7 +266,7 @@ export default function V3ForfaitsPage() {
           })}
         </div>
 
-        <div className="mt-12 text-center">
+        <div className="mt-12 text-center space-y-4">
           <p className="text-sm" style={{ color: "#6b7280" }}>
             Une question ?{" "}
             <Link to="/contact-support" className="underline" style={{ color: "#008296" }}>
@@ -154,8 +274,29 @@ export default function V3ForfaitsPage() {
             </Link>{" "}
             — réponse sous 24h.
           </p>
+
+          {isAdmin && (
+            <div className="inline-flex flex-col items-center gap-2 rounded-xl border border-dashed border-blue-300 bg-blue-50/50 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-blue-600">
+                Outil admin
+              </p>
+              <Button
+                variant="outline"
+                onClick={() => setShowPayPalTest(true)}
+                className="border-blue-300 text-blue-700 hover:bg-blue-100"
+              >
+                <CreditCard className="w-4 h-4 mr-2" />
+                Tester PayPal (1 € fictif)
+              </Button>
+              <p className="text-xs text-blue-600/80 max-w-xs">
+                Voir le bouton PayPal sans faire d'achat réel. Visible uniquement par vous.
+              </p>
+            </div>
+          )}
         </div>
       </div>
+
+      <PayPalTestModal open={showPayPalTest} onClose={() => setShowPayPalTest(false)} />
     </div>
   );
 }
