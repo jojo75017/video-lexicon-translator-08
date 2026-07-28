@@ -128,6 +128,14 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
     badge: 'Nouveau',
     alacarte: true,
     modules: ['documentation-studio'],
+  {
+    id: 'boost_lancement',
+    title: 'Pack Boost de Lancement',
+    desc: '10 visuels Pinterest prêts à poster + 5 posts Instagram générés par IA + checklist ISBN/KDP premium + template métadonnées optimisées. Le kit minimal pour lancer ton livre avec un vrai coup d\'accélérateur.',
+    price: 17,
+    badge: 'Offre découverte',
+    alacarte: true,
+    modules: ['boost-lancement'],
   },
 ];
 
