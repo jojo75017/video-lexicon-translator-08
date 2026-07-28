@@ -156,6 +156,44 @@ export default function V3KidsBookCreatePage() {
     }
   };
 
+  const saveToCloud = async () => {
+    if (!draft.title) return toast.error('Ajoute un titre avant de sauvegarder.');
+    setSaving(true);
+    const payload = {
+      title: draft.title,
+      author_name: draft.authorName,
+      project_type: 'kids_book' as any,
+      target_audience: draft.targetAge,
+      book_summary: draft.synopsis || '',
+      number_of_chapters: draft.stories.length || draft.chapterCount || 0,
+      characters: [draft.character],
+      chapters: draft.stories.map((s, i) => ({
+        chapter_number: i + 1,
+        title: s.title,
+        content: s.content || '',
+        synopsis: s.synopsis,
+        illustration_url: s.illustrationUrl || null,
+      })),
+      ebook_images: draft.stories
+        .filter((s) => s.illustrationUrl)
+        .map((s) => ({ story_id: s.id, url: s.illustrationUrl })),
+      writing_style: draft.style,
+    };
+    let id = projectId;
+    if (id) {
+      const ok = await updateSpecializedProject(id, payload);
+      if (!ok) id = null;
+    }
+    if (!id) {
+      id = await saveSpecializedProject(payload);
+      if (id) {
+        setProjectId(id);
+        try { localStorage.setItem(PROJECT_ID_KEY, id); } catch { /* noop */ }
+      }
+    }
+    setSaving(false);
+  };
+
   const exportHtml = () => {
     const html = buildAlbumHtml(draft);
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
@@ -165,8 +203,95 @@ export default function V3KidsBookCreatePage() {
     a.download = `${(draft.title || 'album').replace(/\s+/g, '-')}.html`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success('Album téléchargé — ouvre-le et imprime en PDF pour KDP.');
+    toast.success('Album HTML téléchargé.');
   };
+
+  const exportPdf = () => {
+    setExporting('pdf');
+    try {
+      const html = buildAlbumHtml(draft);
+      const w = window.open('', '_blank');
+      if (!w) { toast.error('Autorise les pop-ups pour imprimer.'); return; }
+      w.document.write(html);
+      w.document.close();
+      // Laisser le temps aux images de charger avant impression
+      const trigger = () => { try { w.focus(); w.print(); } catch { /* noop */ } };
+      w.onload = () => setTimeout(trigger, 800);
+      setTimeout(trigger, 2500);
+      toast.success('Boîte d\'impression ouverte — choisis "Enregistrer au format PDF".');
+    } finally {
+      setExporting(null);
+    }
+  };
+
+  const fetchImgBytes = async (url: string): Promise<Uint8Array | null> => {
+    try {
+      const r = await fetch(url);
+      const buf = await r.arrayBuffer();
+      return new Uint8Array(buf);
+    } catch { return null; }
+  };
+
+  const exportDocx = async () => {
+    setExporting('docx');
+    try {
+      const children: Paragraph[] = [];
+      children.push(new Paragraph({
+        alignment: AlignmentType.CENTER, heading: HeadingLevel.TITLE,
+        children: [new TextRun({ text: draft.title, bold: true, size: 72 })],
+      }));
+      if (draft.subtitle) {
+        children.push(new Paragraph({
+          alignment: AlignmentType.CENTER,
+          children: [new TextRun({ text: draft.subtitle, italics: true, size: 32 })],
+        }));
+      }
+      children.push(new Paragraph({
+        alignment: AlignmentType.CENTER, spacing: { before: 400 },
+        children: [new TextRun({ text: draft.authorName, size: 32 })],
+      }));
+      children.push(new Paragraph({ children: [new PageBreak()] }));
+
+      for (let i = 0; i < draft.stories.length; i++) {
+        const s = draft.stories[i];
+        if (s.illustrationUrl) {
+          const bytes = await fetchImgBytes(s.illustrationUrl);
+          if (bytes) {
+            children.push(new Paragraph({
+              alignment: AlignmentType.CENTER,
+              children: [new ImageRun({
+                type: 'png',
+                data: bytes,
+                transformation: { width: 500, height: 500 },
+              } as any)],
+            }));
+          }
+        }
+        children.push(new Paragraph({
+          heading: HeadingLevel.HEADING_1,
+          children: [new TextRun({ text: `${i + 1}. ${s.title || 'Histoire'}`, bold: true })],
+        }));
+        children.push(new Paragraph({
+          spacing: { after: 200 },
+          children: [new TextRun({ text: s.content || s.synopsis || '', size: 28 })],
+        }));
+        if (i < draft.stories.length - 1) {
+          children.push(new Paragraph({ children: [new PageBreak()] }));
+        }
+      }
+
+      const doc = new Document({ sections: [{ children }] });
+      const blob = await Packer.toBlob(doc);
+      saveAs(blob, `${(draft.title || 'album').replace(/\s+/g, '-')}.docx`);
+      toast.success('Album Word téléchargé.');
+    } catch (e: any) {
+      toast.error(e.message || 'Erreur export Word');
+    } finally {
+      setExporting(null);
+    }
+  };
+
+
 
   if (loadingPlan) {
     return (
