@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, Pencil, Trash2, ExternalLink, BookOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { BackButton } from "@/components/v3/BackButton";
 
 type Book = { id: string; title: string; author_name?: string | null; kdp_description?: string | null };
 
@@ -33,6 +34,7 @@ export default function V3BookManagerPage() {
 
   return (
     <section className="max-w-5xl mx-auto px-5 md:px-8 py-14">
+      <div className="max-w-6xl mx-auto px-4 pt-4"><BackButton /></div>
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
           <h1 className="v3-serif text-4xl font-bold">Mes livres publiés</h1>

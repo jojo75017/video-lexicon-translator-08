@@ -4,6 +4,7 @@ import {
   Languages, Users, Clock, Gem, CheckCircle2, ArrowRight, Star, Zap,
   FileText, Layers, Wand2, Target, Award,
 } from 'lucide-react';
+import { BackButton } from "@/components/v3/BackButton";
 
 /**
  * Page éditoriale — "Pourquoi EbookStudio Pro V3".
@@ -13,6 +14,7 @@ import {
 export default function V3PourquoiPage() {
   return (
     <div className="min-h-screen" style={{ background: '#FAFAFA', color: '#232F3E' }}>
+      <div className="max-w-6xl mx-auto px-4 pt-4"><BackButton /></div>
       {/* Bandeau lancement */}
       <div
         className="text-center py-2.5 px-4 text-sm font-semibold"

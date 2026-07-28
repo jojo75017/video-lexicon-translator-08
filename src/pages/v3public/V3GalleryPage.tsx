@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, BookOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { BackButton } from "@/components/v3/BackButton";
 
 type Row = { id: string; title: string; project_type?: string | null };
 
@@ -33,6 +34,7 @@ export default function V3GalleryPage() {
 
   return (
     <section className="max-w-7xl mx-auto px-5 md:px-8 py-14">
+      <div className="max-w-6xl mx-auto px-4 pt-4"><BackButton /></div>
       <h1 className="v3-serif text-4xl font-bold">Galerie</h1>
       <p className="text-sm text-[var(--v3-muted)] mt-1">Explore les histoires écrites dans l'atelier.</p>
 

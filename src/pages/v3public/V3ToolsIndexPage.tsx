@@ -5,6 +5,7 @@ import { planForTool, PLAN_META, type V3Plan } from '@/data/v3ToolPlans';
 import { Search, ArrowRight, Lock, Check } from 'lucide-react';
 import { FirecrawlNoticeBanner } from '@/components/ebook/FirecrawlNoticeBanner';
 import { FirecrawlCreditsIndicator } from '@/components/ebook/FirecrawlCreditsIndicator';
+import { BackButton } from "@/components/v3/BackButton";
 
 type PlanParam = V3Plan | 'all' | null;
 
@@ -59,6 +60,7 @@ export default function V3ToolsIndexPage() {
 
   return (
     <div style={{ background: 'var(--v3-paper)' }} className="min-h-screen">
+      <div className="max-w-6xl mx-auto px-4 pt-4"><BackButton /></div>
       {/* Hero */}
       <section
         className="relative overflow-hidden"

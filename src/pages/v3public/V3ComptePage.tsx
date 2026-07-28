@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { BookOpen, Crown, Key, CreditCard, Gauge, ArrowRight, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { V3_PLANS, formatPrice } from "@/data/v3Pricing";
+import { BackButton } from "@/components/v3/BackButton";
 
 type ProjectRow = {
   id: string;
@@ -67,6 +68,7 @@ export default function V3ComptePage() {
 
   return (
     <div className="min-h-screen py-10 px-4" style={{ background: "#FAFAFA" }}>
+      <div className="max-w-6xl mx-auto px-4 pt-4"><BackButton /></div>
       <div className="max-w-5xl mx-auto">
         <header className="mb-8">
           <p className="text-xs font-bold uppercase tracking-[0.3em] mb-2" style={{ color: "#b45309" }}>
