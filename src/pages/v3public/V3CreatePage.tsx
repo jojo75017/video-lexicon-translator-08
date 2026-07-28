@@ -44,6 +44,19 @@ export default function V3CreatePage() {
 
   return (
     <section className="v3-halo-soft min-h-[calc(100vh-4rem)] py-14 px-5">
+      {/* Bouton fixe d'accès rapide au mode illustré maternelle */}
+      <div className="sticky top-20 z-50 max-w-4xl mx-auto mb-6">
+        <Link
+          to="/v3/create/illustre"
+          className="flex items-center justify-center gap-2 w-full md:w-auto md:ml-auto rounded-full bg-gradient-to-r from-amber-500 to-orange-600 text-white px-5 py-3 text-sm font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all border-2 border-white"
+        >
+          <ImageIcon className="w-5 h-5" />
+          <span>Livre illustré maternelle</span>
+          <span className="text-[10px] uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">Nouveau</span>
+          <ArrowRight className="w-4 h-4" />
+        </Link>
+      </div>
+
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <span className="v3-chip v3-chip-orange"><Sparkles className="w-3.5 h-3.5" /> Choisis ton type de livre</span>
