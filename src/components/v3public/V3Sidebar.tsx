@@ -21,6 +21,8 @@ const NAV: NavSection[] = [
       { to: '/v3', label: 'Accueil V3', icon: Home, end: true },
       { to: '/v3/create', label: 'Créer un livre', icon: Sparkles },
       { to: '/v3/create/illustre', label: 'Livre illustré maternelle', icon: Sparkles, badge: 'Nouveau' },
+      { to: '/v3/create/illustre?preset=histoires-du-soir-3-7', label: 'Histoires du soir 3-7 ans', icon: Sparkles, badge: 'Nouveau' },
+
       { to: '/v3/library', label: 'Ma bibliothèque', icon: Library },
       { to: '/v3/mes-livres', label: 'Mes livres', icon: BookOpen },
       { to: '/v3/hub?tab=livres', label: 'Brouillons', icon: FolderOpen },
