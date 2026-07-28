@@ -7,6 +7,17 @@ import { toast } from 'sonner';
 
 const SECTIONS: { title: string; duration: string; body: string }[] = [
   {
+    title: '0. Ouverture — La recherche KDP avec EbookStudio & KDP Pilot (0:00 → 0:45)',
+    duration: '~45 s',
+    body: `Avant même d'écrire une seule ligne, il y a une étape que 90 % des auteurs négligent — et c'est exactement celle qui fait la différence entre un livre qui dort et un livre qui se vend : la recherche KDP.
+
+Chez EbookStudio, nous avons intégré une véritable cellule de recherche Amazon KDP, pilotée par notre module KDP Pilot. Concrètement, avant de publier, vous savez déjà : quels mots-clés sont recherchés, quelles niches sont rentables, quels ASIN concurrents dominent, quelles catégories choisir, et quelle description convertit.
+
+KDP Pilot analyse votre projet, audite votre fiche produit, et vous dit noir sur blanc ce qui fonctionne et ce qu'il faut corriger. C'est l'assurance de publier un livre pensé pour Amazon, pas contre Amazon.
+
+Voilà pourquoi la V3 commence toujours par la recherche — et pourquoi nos auteurs vendent mieux, plus vite, et plus longtemps.`,
+  },
+  {
     title: '0. Intro — Présentation (0:00 → 0:45)',
     duration: '~45 s',
     body: `Bonjour et bienvenue ! Je suis Georges, le fondateur d'EbookStudio.
