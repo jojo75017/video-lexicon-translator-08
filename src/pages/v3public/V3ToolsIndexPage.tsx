@@ -67,7 +67,9 @@ export default function V3ToolsIndexPage() {
         }}
       >
         <div className="max-w-7xl mx-auto px-5 md:px-8 py-12">
+          <div className="mb-6"><FirecrawlNoticeBanner /></div>
           <div className="text-[10px] uppercase tracking-[0.24em] font-semibold" style={{ color: 'var(--v3-gold-600)' }}>
+
             L'atelier complet
           </div>
           <h1 className="v3-serif mt-1 text-4xl md:text-5xl font-bold" style={{ color: 'var(--v3-emerald)' }}>
