@@ -514,6 +514,8 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
     workflowCharacters.length
       ? `Personnages fournis : ${workflowCharacters.map((character) => `${character.name} (${character.role}) — ${character.description}`).join(' | ')}`
       : '',
+    bibleUnivers.trim() ? `📚 BIBLE DE L'UNIVERS — cohérence obligatoire pour tous les agents :\n${bibleUnivers.trim()}` : '',
+    arbreNarratif.trim() ? `🌳 ARBRE NARRATIF — arcs, embranchements, chronologie :\n${arbreNarratif.trim()}` : '',
     targetPromiseBlock(),
   ].filter(Boolean).join('\n\n');
 
