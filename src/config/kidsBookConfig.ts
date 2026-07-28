@@ -108,6 +108,16 @@ export interface KidsBookDraft {
   backCoverUrl?: string;   // 4ème de couverture générée par IA
   backCoverText?: string;  // résumé/pitch imprimé sur la 4e de couverture
   spineText?: string;      // texte affiché sur la tranche (titre + auteur)
+  // ---- Métadonnées KDP ----
+  isbn?: string;           // ISBN-13 fourni par KDP (ou laisser vide)
+  publisher?: string;      // nom d'éditeur / imprint (auto-édition = nom de l'auteur)
+  publicationYear?: string; // ex: "2026"
+  publicationPlace?: string; // ex: "Paris, France"
+  edition?: string;        // "Première édition", "Édition revue", etc.
+  dedication?: string;     // "Pour Léa et Théo, mes étoiles."
+  bisacCategory?: string;  // ex: "JUV002000 — JUVENILE FICTION / Animals"
+  keywords?: string;       // 7 mots-clés KDP, séparés par virgules
+  legalDepositCountry?: string; // "France", "Belgique", "Canada", etc.
 }
 
 /**
