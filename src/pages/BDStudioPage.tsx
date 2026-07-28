@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, BookOpen, Sparkles, Palette, Download, Zap, Star, ChevronDown, Users, Trophy, Clock } from 'lucide-react';
+import { ArrowLeft, BookOpen, Sparkles, Palette, Download, Zap, Star, ChevronDown, Users, Trophy, Clock, Lock, Crown, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import { EbookComicBookGenerator } from '@/components/ebook/EbookComicBookGenerator';
 import { Helmet } from 'react-helmet';
+import { supabase } from '@/integrations/supabase/client';
 import bdHero from '@/assets/bd-studio-hero.jpg';
 
 const fadeUp = {
