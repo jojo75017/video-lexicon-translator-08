@@ -504,7 +504,7 @@ const App = () => {
               <Route path="u/:slug" element={<V3AuthorProfilePage />} />
               <Route path="mes-livres" element={<V3BookManagerPage />} />
               <Route path="parametres" element={<V3AuthorSettingsPage />} />
-              <Route path="livres/:type" element={<Navigate to="/v3/forfaits" replace />} />
+              <Route path="livres/:type" element={<V3SpecialBookPage />} />
               <Route path="offres" element={<Navigate to="/v3/forfaits" replace />} />
               <Route path="offres/merci" element={<Navigate to="/v3/forfaits" replace />} />
 
