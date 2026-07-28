@@ -17,11 +17,17 @@ export default function V3Footer() {
           </p>
         </div>
         <div>
-          <div className="text-xs uppercase tracking-wider text-white/40 mb-3">Explorer</div>
+          <div className="text-xs uppercase tracking-wider text-white/40 mb-3">Ressources</div>
           <ul className="space-y-2 text-sm text-white/80">
-            <li><Link to="/v3">Accueil</Link></li>
+            <li>
+              <a href="https://ebookstudio.blog/#accueil" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-white">
+                Blog EbookStudio
+                <span className="text-[9px] font-bold uppercase tracking-[0.15em] px-1.5 py-0.5 rounded" style={{ background: '#C97A14', color: '#fff' }}>Nouveau</span>
+              </a>
+            </li>
+            <li><Link to="/formation">Formation vidéo</Link></li>
+            <li><Link to="/v3">Accueil V3</Link></li>
             <li><Link to="/v3/gallery">Galerie</Link></li>
-            <li><Link to="/v3/auteur">Auteur invité</Link></li>
             <li><Link to="/v3/create">Créer un livre</Link></li>
           </ul>
         </div>
