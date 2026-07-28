@@ -32,6 +32,7 @@ const NAV: NavSection[] = [
       { to: '/niches', label: 'Niches rentables', icon: BarChart3 },
       { to: '/niches-600', label: '600 niches', icon: BarChart3, badge: 'Base' },
       { to: '/couverture-kdp', label: 'Couverture KDP', icon: ImageIcon },
+      { to: '/v3/cover-studio-pro', label: 'Cover Studio Pro', icon: ImageIcon, badge: 'PRO' },
     ],
   },
   {
