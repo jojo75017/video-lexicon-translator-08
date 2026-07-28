@@ -728,10 +728,12 @@ function buildAlbumHtml(d: KidsBookDraft): string {
   .end-page .signature { margin-top: 1.2cm; font-style: italic; font-size: 16pt; }
   .end-page .thanks { margin-top: 1.5cm; font-size: 18pt; font-style: italic; color: #C97A14; }
 </style></head><body>
-  <section class="page cover">
-    <h1>${esc(d.title)}</h1>
-    ${d.subtitle ? `<div class="subtitle">${esc(d.subtitle)}</div>` : ''}
-    <div class="author">${esc(d.authorName)}</div>
+  <section class="page cover ${d.coverUrl ? 'cover-image' : ''}">
+    ${d.coverUrl ? `<img class="cover-illu" src="${esc(d.coverUrl)}" alt="Couverture" />` : `
+      <h1>${esc(d.title)}</h1>
+      ${d.subtitle ? `<div class="subtitle">${esc(d.subtitle)}</div>` : ''}
+      <div class="author">${esc(d.authorName)}</div>
+    `}
   </section>
   <section class="page title-page">
     <h1>${esc(d.title)}</h1>
