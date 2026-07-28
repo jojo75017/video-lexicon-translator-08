@@ -38,6 +38,45 @@ export function canUseKidsBook(plan: V3Plan | null | undefined): boolean {
   return KIDS_BOOK_ALLOWED_PLANS.includes(plan);
 }
 
+// Presets — chaque preset pré-remplit les paramètres du livre illustré
+export type KidsPresetId = 'maternelle-3-6' | 'histoires-du-soir-3-7';
+
+export interface KidsPreset {
+  id: KidsPresetId;
+  label: string;
+  targetAge: string;
+  chapterCount: number;
+  wordsPerStory: number;
+  defaultStyle: IllustrationStyle;
+  tone: string; // injecté dans le prompt agent-kids-stories
+  titleHint?: string;
+  badge?: string;
+}
+
+export const KIDS_BOOK_PRESETS: Record<KidsPresetId, KidsPreset> = {
+  'maternelle-3-6': {
+    id: 'maternelle-3-6',
+    label: 'Maternelle 3-6 ans',
+    targetAge: '3-6 ans',
+    chapterCount: 10,
+    wordsPerStory: 120,
+    defaultStyle: 'pixar-3d',
+    tone: 'Ton joyeux, coloré, dynamique, adapté à des enfants de 3 à 6 ans en maternelle.',
+  },
+  'histoires-du-soir-3-7': {
+    id: 'histoires-du-soir-3-7',
+    label: 'Histoires du soir 3-7 ans',
+    targetAge: '3-7 ans',
+    chapterCount: 20,
+    wordsPerStory: 175,
+    defaultStyle: 'aquarelle',
+    tone: 'Ton doux, apaisant, propice au coucher. Chaque histoire se termine par une fin rassurante qui invite au sommeil (bâillement, doudou, câlin, lumière tamisée, rêves paisibles). Vocabulaire riche mais accessible aux 3-7 ans.',
+    titleHint: 'Histoires du soir',
+    badge: 'Nouveau',
+  },
+};
+
+
 export interface CharacterBible {
   name: string;
   age: string;
