@@ -176,24 +176,24 @@ export default function V3KidsBookCreatePage() {
               value={draft.title}
               onChange={(e) => update({ title: e.target.value })}
               placeholder="Titre du livre (ex: 5 minutes pour grandir en maternelle)"
-              className="v3-input"
+              className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#C97A14]/40"
             />
             <input
               value={draft.authorName}
               onChange={(e) => update({ authorName: e.target.value })}
               placeholder="Nom d'auteur (affiché sur la couverture) *"
-              className="v3-input"
+              className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#C97A14]/40"
             />
             <input
               value={draft.targetAge}
               onChange={(e) => update({ targetAge: e.target.value })}
               placeholder="Âge cible (ex: 3-6 ans)"
-              className="v3-input"
+              className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#C97A14]/40"
             />
             <select
               value={draft.style}
               onChange={(e) => update({ style: e.target.value as IllustrationStyle })}
-              className="v3-input"
+              className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#C97A14]/40"
             >
               {ILLUSTRATION_STYLES.map((s) => (
                 <option key={s.id} value={s.id}>{s.label}</option>
@@ -216,33 +216,33 @@ export default function V3KidsBookCreatePage() {
               value={draft.character.name}
               onChange={(e) => updateChar({ name: e.target.value })}
               placeholder="Prénom (ex: Jules)"
-              className="v3-input"
+              className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#C97A14]/40"
             />
             <input
               value={draft.character.age}
               onChange={(e) => updateChar({ age: e.target.value })}
               placeholder="Âge (ex: 4 ans)"
-              className="v3-input"
+              className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#C97A14]/40"
             />
             <textarea
               value={draft.character.physical}
               onChange={(e) => updateChar({ physical: e.target.value })}
               placeholder="Description physique — cheveux, yeux, morphologie (ex: cheveux bruns bouclés, yeux marron, joues rondes)"
-              className="v3-input md:col-span-2"
+              className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm md:col-span-2 focus:outline-none focus:ring-2 focus:ring-[#C97A14]/40"
               rows={2}
             />
             <textarea
               value={draft.character.outfit}
               onChange={(e) => updateChar({ outfit: e.target.value })}
               placeholder="Tenue signature — reprise sur TOUTES les images (ex: t-shirt vert, short bleu, baskets blanches)"
-              className="v3-input md:col-span-2"
+              className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm md:col-span-2 focus:outline-none focus:ring-2 focus:ring-[#C97A14]/40"
               rows={2}
             />
             <input
               value={draft.character.personality || ''}
               onChange={(e) => updateChar({ personality: e.target.value })}
               placeholder="Personnalité (optionnel — curieux, maladroit, gentil...)"
-              className="v3-input md:col-span-2"
+              className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm md:col-span-2 focus:outline-none focus:ring-2 focus:ring-[#C97A14]/40"
             />
           </div>
         </div>
@@ -262,7 +262,7 @@ export default function V3KidsBookCreatePage() {
                     value={story.title}
                     onChange={(e) => updateStory(story.id, { title: e.target.value })}
                     placeholder="Titre (ex: Oups, encore !)"
-                    className="v3-input flex-1"
+                    className="flex-1 px-3 py-2 rounded border border-neutral-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#C97A14]/40"
                   />
                   {draft.stories.length > 1 && (
                     <button
@@ -275,7 +275,7 @@ export default function V3KidsBookCreatePage() {
                   value={story.synopsis}
                   onChange={(e) => updateStory(story.id, { synopsis: e.target.value })}
                   placeholder="Synopsis en 1-2 phrases — ce que le personnage vit dans cette histoire. Sert de scène pour l'illustration."
-                  className="v3-input w-full mb-2"
+                  className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-[#C97A14]/40"
                   rows={2}
                 />
                 <div className="flex items-center gap-3">
