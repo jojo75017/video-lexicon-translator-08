@@ -365,7 +365,13 @@ Pays dépôt légal : ${draft.legalDepositCountry || ''}
   const saveToCloud = async () => {
     if (!draft.title) return toast.error('Ajoute un titre avant de sauvegarder.');
     setSaving(true);
-    const payload = {
+    const images: any[] = [];
+    if (draft.coverUrl) images.push({ type: 'front_cover', url: draft.coverUrl, title: draft.title });
+    if (draft.backCoverUrl) images.push({ type: 'back_cover', url: draft.backCoverUrl });
+    for (const s of draft.stories) {
+      if (s.illustrationUrl) images.push({ story_id: s.id, url: s.illustrationUrl });
+    }
+    const payload: any = {
       title: draft.title,
       author_name: draft.authorName,
       project_type: 'kids_book' as any,
@@ -380,10 +386,15 @@ Pays dépôt légal : ${draft.legalDepositCountry || ''}
         synopsis: s.synopsis,
         illustration_url: s.illustrationUrl || null,
       })),
-      ebook_images: draft.stories
-        .filter((s) => s.illustrationUrl)
-        .map((s) => ({ story_id: s.id, url: s.illustrationUrl })),
+      ebook_images: images,
       writing_style: draft.style,
+      cover_concepts: draft.coverUrl || null,
+      kdp_description: draft.kdpDescription || null,
+      kdp_keywords: (draft.kdpKeywords || []).filter(Boolean).join(', ') || null,
+      kdp_categories: (draft.kdpCategories || []).filter(Boolean).join(' | ') || null,
+      preface: draft.backCoverText || null,
+      // Full source-of-truth for reopening the kids book editor
+      seo_optimization: JSON.stringify({ kidsDraft: draft }),
     };
     let id = projectId;
     if (id) {
@@ -398,6 +409,21 @@ Pays dépôt légal : ${draft.legalDepositCountry || ''}
       }
     }
     setSaving(false);
+  };
+
+  const startNewBook = () => {
+    if (!confirm('Créer un nouveau livre ? Le brouillon actuel sera effacé de cet appareil (les projets sauvegardés dans « Mes projets » restent intacts).')) return;
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(PROJECT_ID_KEY);
+    } catch { /* noop */ }
+    setProjectId(null);
+    setDraft(loadDraft());
+    setPhase('idle');
+    setProgress({ done: 0, total: 0 });
+    toast.success('Nouveau livre — formulaire réinitialisé.');
+    // Reset any preset param
+    nav('/v3/create/illustre', { replace: true });
   };
 
   const exportHtml = () => {
