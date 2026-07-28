@@ -4,6 +4,7 @@ const corsHeaders = {
 };
 
 const FIRECRAWL_V2 = 'https://api.firecrawl.dev/v2';
+const GATEWAY_V2 = 'https://connector-gateway.lovable.dev/firecrawl/v2';
 
 interface SpyBook {
   title: string;
@@ -14,6 +15,29 @@ interface SpyBook {
   bestSeller?: boolean;
   format?: string;
   position: number;
+}
+
+function firecrawlHeaders(apiKey: string) {
+  if (apiKey.startsWith('lovc_')) {
+    const lovableKey = Deno.env.get('LOVABLE_API_KEY');
+    if (!lovableKey) {
+      throw new Error('LOVABLE_API_KEY manquant pour le mode gateway Firecrawl.');
+    }
+    return {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${lovableKey}`,
+      'X-Connection-Api-Key': apiKey,
+    };
+  }
+  return {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${apiKey}`,
+  };
+}
+
+function firecrawlUrl(apiKey: string, endpoint: string) {
+  const base = apiKey.startsWith('lovc_') ? GATEWAY_V2 : FIRECRAWL_V2;
+  return `${base}${endpoint}`;
 }
 
 Deno.serve(async (req) => {
@@ -73,9 +97,9 @@ Deno.serve(async (req) => {
       required: ['books'],
     };
 
-    const fcRes = await fetch(`${FIRECRAWL_V2}/scrape`, {
+    const fcRes = await fetch(firecrawlUrl(apiKey, '/scrape'), {
       method: 'POST',
-      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      headers: firecrawlHeaders(apiKey),
       body: JSON.stringify({
         url: searchUrl,
         onlyMainContent: true,
@@ -123,8 +147,7 @@ Deno.serve(async (req) => {
     const avgRating = Math.round(avg(ratings) * 10) / 10;
     const lowReviewCount = reviewsArr.filter((r) => r < 50).length;
 
-    // Score d'opportunité : faible concurrence (peu d'avis) + bon prix = bon score
-    let demandScore = Math.min(100, books.length * 5); // présence de résultats = demande
+    let demandScore = Math.min(100, books.length * 5);
     let competitionScore = avgReviews === 0 ? 20 : Math.min(100, Math.round((avgReviews / 500) * 100));
     const opportunity = Math.max(0, Math.min(100, Math.round(
       demandScore * 0.4 + (100 - competitionScore) * 0.5 + (lowReviewCount / Math.max(1, books.length)) * 100 * 0.1,
