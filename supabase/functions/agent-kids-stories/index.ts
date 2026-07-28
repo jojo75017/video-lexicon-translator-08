@@ -17,6 +17,8 @@ interface Body {
   count: number;
   wordsPerStory?: number;
   theme?: string;
+  tone?: string;
+  preset?: string;
 }
 
 Deno.serve(async (req) => {
@@ -39,9 +41,13 @@ Deno.serve(async (req) => {
     const count = Math.max(1, Math.min(30, Number(body.count) || 10));
     const words = Math.max(30, Math.min(400, Number(body.wordsPerStory) || 120));
 
+    const toneBlock = body.tone
+      ? `\nTON À RESPECTER STRICTEMENT: ${body.tone}`
+      : '';
+
     const sys = `Tu es un auteur jeunesse pour la maternelle (${body.targetAge || '3-6 ans'}).
 Tu écris des histoires courtes, rassurantes, positives, avec une petite leçon de vie douce.
-Chaque histoire fait environ ${words} mots (±15%), en phrases simples adaptées à l'âge.
+Chaque histoire fait environ ${words} mots (±15%), en phrases simples adaptées à l'âge.${toneBlock}
 Réponds UNIQUEMENT en JSON valide, sans texte autour, sous la forme:
 {"stories":[{"title":"...","synopsis":"...","content":"..."}, ...]}
 - title: court et vivant.
@@ -51,11 +57,13 @@ Réponds UNIQUEMENT en JSON valide, sans texte autour, sous la forme:
     const user = `Livre: "${body.bookTitle}"${body.subtitle ? ` — ${body.subtitle}` : ''}
 ${body.synopsis ? `Pitch/fil rouge du livre: ${body.synopsis}` : ''}
 ${body.theme ? `Thème: ${body.theme}` : ''}
+${body.preset ? `Preset éditorial: ${body.preset}` : ''}
 Personnage principal: ${body.characterBible}
 
 Génère ${count} histoires DIFFÉRENTES et cohérentes avec le pitch, mettant en scène ce personnage.
 Varie les lieux (école, parc, maison, plage, jardin, chambre...) et les émotions.
 Chaque histoire ≈ ${words} mots.`;
+
 
     const res = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
