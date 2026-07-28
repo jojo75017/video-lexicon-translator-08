@@ -612,6 +612,11 @@ function buildAlbumHtml(d: KidsBookDraft): string {
   .text-page { padding: 3cm 2.5cm; justify-content: center; }
   .text-page h2 { font-size: 26pt; margin: 0 0 1cm; }
   .text-page p { font-size: 16pt; line-height: 1.6; margin: 0; white-space: pre-wrap; }
+  .end-page { padding: 3cm 2.5cm; justify-content: center; text-align: center; background: #fffdf7; }
+  .end-page h2 { font-size: 30pt; margin: 0 0 1cm; color: #C97A14; }
+  .end-page p { font-size: 15pt; line-height: 1.6; margin: 0 0 0.6cm; }
+  .end-page .signature { margin-top: 1.2cm; font-style: italic; font-size: 16pt; }
+  .end-page .thanks { margin-top: 1.5cm; font-size: 18pt; font-style: italic; color: #C97A14; }
 </style></head><body>
   <section class="page cover">
     <h1>${esc(d.title)}</h1>
