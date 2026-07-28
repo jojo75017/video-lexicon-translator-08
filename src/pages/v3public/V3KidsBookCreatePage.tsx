@@ -92,6 +92,38 @@ export default function V3KidsBookCreatePage() {
     }
   };
 
+  const generateBackCover = async () => {
+    if (!draft.title) return toast.error('Ajoute un titre avant de créer la 4e de couverture.');
+    setGeneratingBack(true);
+    try {
+      const stylePrompt = ILLUSTRATION_STYLES.find((s) => s.id === draft.style)?.prompt || '';
+      const model = KIDS_BOOK_IMAGE_MODEL[plan || 'expert'];
+      const characterBible = buildCharacterBibleText(draft.character);
+      const backText = draft.backCoverText
+        || `Un livre tendre pour les enfants de ${draft.targetAge}. ${draft.synopsis || ''}`.trim();
+      const backScene = `4e de couverture professionnelle de livre jeunesse KDP, format album carré. Zone de texte lisible en haut ou au centre pour un résumé (laisser un large espace blanc/uniforme d'au moins 40% de la surface pour permettre l'ajout du texte). Petite illustration secondaire cohérente avec l'univers, montrant ${draft.character.name} de dos ou dans une scène calme, ambiance douce, ${draft.synopsis || 'univers du livre'}. Marges nettes, palette assortie à la 1ère de couverture. Pas de titre, pas de texte imprimé dans l'image — juste illustration + fond neutre pour texte.`;
+      const { data: img, error: imgErr } = await supabase.functions.invoke('agent-illustrator', {
+        body: {
+          bookId: 'draft-back',
+          storyId: 'back',
+          characterBible,
+          scene: backScene,
+          stylePrompt,
+          model,
+        },
+      });
+      if (imgErr || !img?.url) throw new Error(imgErr?.message || img?.error || 'échec');
+      setDraft((d) => ({ ...d, backCoverUrl: img.url, backCoverText: backText }));
+      toast.success('4e de couverture créée ✨');
+    } catch (e: any) {
+      toast.error(e.message || 'Erreur génération 4e de couverture');
+    } finally {
+      setGeneratingBack(false);
+    }
+  };
+
+  const spine = computeSpineWidth(pageCount);
+
 
 
   useEffect(() => {
