@@ -23,7 +23,6 @@ import { getIsCurrentSessionAdmin } from "@/lib/adminAccess";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { supabase } from "@/integrations/supabase/client";
 
-
 const LAUNCH_PRICE = 59; // promo d'été jusqu'au 31 août (tarif normal 67€)
 const NORMAL_PRICE = 197;
 const SERENITY_PRICE = 30;
@@ -51,18 +50,122 @@ const PLAN = {
   ],
 };
 
+function PayPalTestModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [testEmail, setTestEmail] = useState("");
+  const [step, setStep] = useState<"email" | "checkout">("email");
+
+  useEffect(() => {
+    if (open) {
+      setClientSecret(null);
+      setStep("email");
+      setLoading(false);
+      supabase.auth.getUser().then(({ data }) => {
+        if (data.user?.email) setTestEmail(data.user.email);
+      });
+    }
+  }, [open]);
+
+  const startCheckout = async () => {
+    if (!testEmail.includes("@")) {
+      toast.error("Email de test invalide");
+      return;
+    }
+    setLoading(true);
+    try {
+      const returnUrl = `${window.location.origin}/upsell-paiement?plan=pro&test=paypal&session_id={CHECKOUT_SESSION_ID}`;
+      const { data, error } = await supabase.functions.invoke("test-paypal-checkout", {
+        body: {
+          email: testEmail,
+          environment: getStripeEnvironment(),
+          returnUrl,
+        },
+      });
+      if (error || !data?.clientSecret) {
+        throw new Error(error?.message || data?.error || "Impossible de créer la session de test");
+      }
+      setClientSecret(data.clientSecret as string);
+      setStep("checkout");
+    } catch (err: any) {
+      toast.error(err.message || "Erreur lors de l'ouverture du checkout test");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchClientSecret = useCallback(() => {
+    return Promise.resolve(clientSecret!);
+  }, [clientSecret]);
+
+  return (
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <DialogContent className="max-w-2xl max-h-[92vh] overflow-hidden p-0 bg-card border-border">
+        <DialogHeader className="px-5 py-4 border-b border-border">
+          <DialogTitle className="flex items-center gap-2 text-white">
+            <svg className="w-5 h-5 text-blue-400" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.064 1.193 1.378 2.64 1.085 4.154-.342 1.833-1.206 3.055-2.462 3.747-.578.32-1.19.52-1.83.62.374.428.6.91.72 1.45.262 1.105.13 2.53-.387 4.257-.602 2.03-1.55 3.465-2.815 4.267-1.163.733-2.683 1.104-4.526 1.104H7.68a.65.65 0 0 1-.604-.438z" />
+            </svg>
+            Test PayPal — 1 € fictif
+          </DialogTitle>
+          <DialogDescription className="text-muted-foreground">
+            Aucun vrai prélèvement. Cette session vérifie uniquement que le bouton PayPal s'affiche dans le checkout Stripe.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="p-4 overflow-y-auto">
+          {step === "email" ? (
+            <div className="max-w-md mx-auto py-6 space-y-4">
+              <label className="block text-sm font-medium text-white">
+                Email de test
+                <input
+                  type="email"
+                  value={testEmail}
+                  onChange={(e) => setTestEmail(e.target.value)}
+                  placeholder="vous@exemple.com"
+                  className="mt-1 w-full rounded-xl border border-border bg-muted px-3 py-2 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none"
+                />
+              </label>
+              <Button
+                onClick={startCheckout}
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-900 font-bold"
+              >
+                {loading ? "Ouverture..." : "Voir le checkout test"}
+              </Button>
+              <p className="text-xs text-center text-slate-500">
+                Montant de test : 1 € en mode sandbox. En production, le checkout sera celui de l'offre V2 à 59 €.
+              </p>
+            </div>
+          ) : clientSecret ? (
+            <EmbeddedCheckoutProvider
+              stripe={getStripe()}
+              options={{ fetchClientSecret }}
+            >
+              <EmbeddedCheckout />
+            </EmbeddedCheckoutProvider>
+          ) : null}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 const UpsellPaiementPage = () => {
   const [email, setEmail] = useState("");
   const [selectedPayment, setSelectedPayment] = useState<'full' | 'installment2' | 'installment3'>('full');
   const [serenityAddon, setSerenityAddon] = useState(false);
   const [extendedLicense, setExtendedLicense] = useState(false);
   const [buyerCount, setBuyerCount] = useState(12);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showPayPalTest, setShowPayPalTest] = useState(false);
   const navigate = useNavigate();
 
   // Simulate live buyer count
   useEffect(() => {
     const base = new Date().getDate() % 8 + 9;
     setBuyerCount(base);
+    getIsCurrentSessionAdmin().then(setIsAdmin);
   }, []);
 
   const baseAmounts = { full: LAUNCH_PRICE, installment2: 35, installment3: 25 };
@@ -146,7 +249,7 @@ const UpsellPaiementPage = () => {
                 <span className="text-6xl font-black text-white">{PLAN.price}€</span>
               </div>
               <p className="text-sm text-muted-foreground mt-1">Paiement unique • Sans abonnement</p>
-              
+
               {/* Live social proof */}
               <div className="mt-4 inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-1.5 text-xs text-foreground/80">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -219,8 +322,8 @@ const UpsellPaiementPage = () => {
                       key={option.id}
                       onClick={() => setSelectedPayment(option.id)}
                       className={`w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all ${
-                        selectedPayment === option.id 
-                          ? 'border-cyan-400 bg-cyan-950/30 shadow-lg shadow-cyan-500/10' 
+                        selectedPayment === option.id
+                          ? 'border-cyan-400 bg-cyan-950/30 shadow-lg shadow-cyan-500/10'
                           : 'border-border hover:border-slate-600 bg-muted/50'
                       }`}
                     >
@@ -380,7 +483,7 @@ const UpsellPaiementPage = () => {
                     </>
                   </StripeCheckoutButton>
                 ) : (
-                  <a 
+                  <a
                     href={currentPaypalLink}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -412,8 +515,8 @@ const UpsellPaiementPage = () => {
                   <span className="bg-slate-700 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">4</span>
                   Après paiement
                 </label>
-                <Button 
-                  onClick={goToConfirmation} 
+                <Button
+                  onClick={goToConfirmation}
                   variant="outline"
                   className="w-full border-border text-white hover:bg-muted hover:border-slate-600 rounded-xl"
                   size="lg"
@@ -439,6 +542,24 @@ const UpsellPaiementPage = () => {
                 </div>
               </div>
 
+              {/* Admin test PayPal */}
+              {isAdmin && (
+                <div className="border border-dashed border-blue-400/40 bg-blue-950/20 rounded-xl p-4 text-center space-y-2">
+                  <p className="text-xs font-bold uppercase tracking-wider text-blue-400">Outil admin</p>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowPayPalTest(true)}
+                    className="border-blue-400/60 text-blue-300 hover:bg-blue-900/30 hover:text-blue-200"
+                  >
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Tester PayPal ici (1 € fictif)
+                  </Button>
+                  <p className="text-[11px] text-blue-300/80">
+                    Voir le bouton PayPal dans le checkout Stripe sans achat réel. Visible uniquement par vous.
+                  </p>
+                </div>
+              )}
+
               {/* Bottom social proof */}
               <div className="text-center space-y-2">
                 <div className="flex items-center justify-center gap-1">
@@ -452,6 +573,8 @@ const UpsellPaiementPage = () => {
             </CardContent>
           </Card>
         </motion.div>
+
+        <PayPalTestModal open={showPayPalTest} onClose={() => setShowPayPalTest(false)} />
 
         {/* FAQ mini */}
         <div className="mt-8 space-y-3 text-sm">
