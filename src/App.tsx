@@ -63,6 +63,7 @@ const V3PublicLayout = lazy(() => import('./components/v3public/V3PublicLayout')
 const V3HomePage = lazy(() => import('./pages/v3public/V3HomePage'));
 const V3AuthPage = lazy(() => import('./pages/v3public/V3AuthPage'));
 const V3CreatePage = lazy(() => import('./pages/v3public/V3CreatePage'));
+const V3KidsBookCreatePage = lazy(() => import('./pages/v3public/V3KidsBookCreatePage'));
 const V3BookPage = lazy(() => import('./pages/v3public/V3BookPage'));
 const V3LibraryPage = lazy(() => import('./pages/v3public/V3LibraryPage'));
 const V3GalleryPage = lazy(() => import('./pages/v3public/V3GalleryPage'));
@@ -488,6 +489,7 @@ const App = () => {
               <Route index element={<V3HomePage />} />
               <Route path="auth" element={<V3AuthPage />} />
               <Route path="create" element={<V3CreatePage />} />
+              <Route path="create/illustre" element={<V3KidsBookCreatePage />} />
               <Route path="book/:id" element={<V3BookPage />} />
               <Route path="library" element={<V3LibraryPage />} />
               <Route path="gallery" element={<V3GalleryPage />} />
