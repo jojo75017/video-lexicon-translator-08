@@ -705,8 +705,74 @@ export default function V3KidsBookCreatePage() {
                 ))}
               </select>
             </label>
+        </div>
+
+        {/* 3bis. Mentions KDP */}
+        <div className="v3-card mb-4">
+          <h2 className="font-semibold mb-1">3b. Mentions légales & KDP</h2>
+          <p className="text-xs text-[var(--v3-muted)] mb-3">
+            Toutes ces mentions apparaîtront sur les pages intérieures du livre (copyright, dédicace, ours éditorial) — obligatoires pour publier sur Amazon KDP.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <input
+              value={draft.publisher || ''}
+              onChange={(e) => update({ publisher: e.target.value })}
+              placeholder="Éditeur / imprint (auto-édition = ton nom)"
+              className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm"
+            />
+            <input
+              value={draft.isbn || ''}
+              onChange={(e) => update({ isbn: e.target.value })}
+              placeholder="ISBN-13 (laisser vide si KDP le fournit)"
+              className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm"
+            />
+            <input
+              value={draft.publicationYear || ''}
+              onChange={(e) => update({ publicationYear: e.target.value })}
+              placeholder="Année de publication (ex: 2026)"
+              className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm"
+            />
+            <input
+              value={draft.publicationPlace || ''}
+              onChange={(e) => update({ publicationPlace: e.target.value })}
+              placeholder="Lieu de publication (ex: Paris, France)"
+              className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm"
+            />
+            <input
+              value={draft.edition || ''}
+              onChange={(e) => update({ edition: e.target.value })}
+              placeholder="Édition (ex: Première édition)"
+              className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm"
+            />
+            <input
+              value={draft.legalDepositCountry || ''}
+              onChange={(e) => update({ legalDepositCountry: e.target.value })}
+              placeholder="Pays de dépôt légal"
+              className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm"
+            />
+            <textarea
+              value={draft.dedication || ''}
+              onChange={(e) => update({ dedication: e.target.value })}
+              placeholder="Dédicace (ex: « Pour Léa et Théo, mes petites étoiles. »)"
+              rows={2}
+              className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm md:col-span-2"
+            />
+            <input
+              value={draft.bisacCategory || ''}
+              onChange={(e) => update({ bisacCategory: e.target.value })}
+              placeholder="Catégorie BISAC (ex: JUV002000 — Animals)"
+              className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm md:col-span-2"
+            />
+            <textarea
+              value={draft.keywords || ''}
+              onChange={(e) => update({ keywords: e.target.value })}
+              placeholder="7 mots-clés KDP séparés par des virgules (aide à la découvrabilité Amazon)"
+              rows={2}
+              className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm md:col-span-2"
+            />
           </div>
         </div>
+
 
         {/* 4. Lancer */}
         <div className="v3-card mb-4 text-center bg-gradient-to-br from-[#fff7ec] to-white">
