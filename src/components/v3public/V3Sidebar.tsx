@@ -4,6 +4,7 @@ import {
   ChevronLeft, ChevronRight,
   GraduationCap, Gem, FileText, User,
   LifeBuoy, Mail, HelpCircle, FolderOpen, Video, ListTree, Award,
+  Search, Target, BarChart3, Image as ImageIcon,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -29,6 +30,18 @@ const NAV: NavSection[] = [
       { to: '/v3/pourquoi', label: 'Pourquoi EbookStudio', icon: Award, badge: 'À lire' },
       { to: '/v3/script-heygen', label: 'Script vidéo HeyGen', icon: Video, badge: 'Pour vous' },
       { to: '/v3/outils', label: 'Tous les outils', icon: ListTree },
+    ],
+  },
+  {
+    section: 'Recherche KDP',
+    items: [
+      { to: '/kdp-keywords', label: 'Recherche mots-clés', icon: Search, badge: 'KDP' },
+      { to: '/kdp-keywords?tab=spy', label: 'Espion Amazon (ASIN)', icon: Target },
+      { to: '/kdp-keywords?tab=longtail', label: 'Longue traîne', icon: BarChart3 },
+      { to: '/kdp-keywords?tab=backend7', label: '7 mots-clés backend', icon: Search },
+      { to: '/niches', label: 'Niches rentables', icon: BarChart3 },
+      { to: '/niches-600', label: '600 niches', icon: BarChart3, badge: 'Base' },
+      { to: '/couverture-kdp', label: 'Couverture KDP', icon: ImageIcon },
     ],
   },
   {
