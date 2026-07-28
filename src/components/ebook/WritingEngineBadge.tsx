@@ -61,9 +61,9 @@ export const WritingEngineBadge: React.FC<WritingEngineBadgeProps> = ({ tier, is
     tier ?? (isPro ? 'auteur' : 'debutant');
 
   const tierLabel =
-    activeTier === 'auteur' ? 'Auteur 59 €/mois'
-    : activeTier === 'expert' ? 'Expert 9,99 €/mois'
-    : 'Débutant 6,99 €/mois';
+    activeTier === 'auteur' ? 'Éditeur 59 €/mois'
+    : activeTier === 'expert' ? 'Studio 12,99 €/mois'
+    : 'Auteur 9,99 €/mois';
 
   const canUpgrade = activeTier !== 'auteur';
 
