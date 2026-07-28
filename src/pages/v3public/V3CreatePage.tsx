@@ -45,35 +45,37 @@ export default function V3CreatePage() {
   return (
     <section className="v3-halo-soft min-h-[calc(100vh-4rem)] py-14 px-5">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-10">
-          <span className="v3-chip v3-chip-orange"><Sparkles className="w-3.5 h-3.5" /> Écrire un livre</span>
+        <div className="text-center mb-8">
+          <span className="v3-chip v3-chip-orange"><Sparkles className="w-3.5 h-3.5" /> Choisis ton type de livre</span>
           <h1 className="v3-serif text-4xl font-bold mt-4">Ton atelier d'écriture</h1>
-          <p className="text-sm text-[var(--v3-muted)] mt-2 max-w-lg mx-auto">
-            Choisis ton fournisseur d'IA (Gemini, Claude, OpenAI ou OpenRouter), colle ta clé et valide-la avant de lancer les 15 agents.
-          </p>
         </div>
 
-        {/* Carte "Livre illustré maternelle" — Studio & Éditeur */}
-        <Link
-          to="/v3/create/illustre"
-          className="block mb-6 v3-card border-2 border-[#C97A14]/40 bg-gradient-to-br from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 transition-colors"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-[#C97A14] text-white flex items-center justify-center flex-shrink-0">
-              <ImageIcon className="w-6 h-6" />
+        {/* Sélecteur de mode — 2 gros choix visibles */}
+        <div className="grid md:grid-cols-2 gap-4 mb-8">
+          <div className="v3-card border-2 border-[var(--v3-emerald,#064e3b)]/40 bg-white">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-10 h-10 rounded-full bg-[var(--v3-emerald,#064e3b)] text-white flex items-center justify-center"><Sparkles className="w-5 h-5" /></div>
+              <h3 className="font-bold">Roman / non-fiction (texte)</h3>
             </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-bold text-[#C97A14]">Nouveau · Livre illustré maternelle</h3>
-                <span className="text-[10px] uppercase tracking-wide bg-[#C97A14] text-white px-1.5 py-0.5 rounded">Studio & Éditeur</span>
-              </div>
-              <p className="text-xs text-[var(--v3-muted)]">
-                Album carré 21×21 cm avec illustrations IA cohérentes (même personnage sur toutes les pages). Type "28 histoires pour la maternelle".
-              </p>
-            </div>
-            <ArrowRight className="w-5 h-5 text-[#C97A14]" />
+            <p className="text-xs text-[var(--v3-muted)] mb-3">Livre classique généré par les 15 agents. Chapitres longs, sans illustrations.</p>
+            <p className="text-[11px] text-[var(--v3-emerald,#064e3b)] font-semibold">↓ Utilise le wizard ci-dessous</p>
           </div>
-        </Link>
+
+          <Link
+            to="/v3/create/illustre"
+            className="v3-card border-2 border-[#C97A14] bg-gradient-to-br from-amber-50 to-orange-100 hover:shadow-lg transition-all block relative"
+          >
+            <span className="absolute -top-2 -right-2 text-[10px] uppercase tracking-wide bg-[#C97A14] text-white px-2 py-0.5 rounded-full font-bold">Nouveau</span>
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-10 h-10 rounded-full bg-[#C97A14] text-white flex items-center justify-center"><ImageIcon className="w-5 h-5" /></div>
+              <h3 className="font-bold text-[#C97A14]">Livre illustré maternelle</h3>
+            </div>
+            <p className="text-xs text-[var(--v3-muted)] mb-3">Album carré 21×21 cm, 3-6 ans, illustrations IA cohérentes (même personnage à chaque page). Style "28 histoires pour la maternelle".</p>
+            <p className="text-[11px] text-[#C97A14] font-semibold flex items-center gap-1">Ouvrir ce mode <ArrowRight className="w-3.5 h-3.5" /></p>
+            <p className="text-[10px] text-[var(--v3-muted)] mt-1">Réservé Studio & Éditeur</p>
+          </Link>
+        </div>
+
 
         {/* Panneau clés API & modèles — TOUJOURS visible ici, admin ou non */}
         <div className="v3-card mb-6">
