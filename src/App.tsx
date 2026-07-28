@@ -74,6 +74,7 @@ const V3SpecialBookPage = lazy(() => import('./pages/v3public/V3SpecialBookPage'
 const V3OffresPage = lazy(() => import('./pages/v3public/V3OffresPage'));
 const V3OffresMerciPage = lazy(() => import('./pages/v3public/V3OffresMerciPage'));
 const V3TocUltimatePage = lazy(() => import('./pages/v3public/V3TocUltimatePage'));
+const V3TranslatorPage = lazy(() => import('./pages/v3public/V3TranslatorPage'));
 const V3ToolsIndexPage = lazy(() => import('./pages/v3public/V3ToolsIndexPage'));
 const V3ComptePage = lazy(() => import('./pages/v3public/V3ComptePage'));
 const V3ForfaitsPage = lazy(() => import('./pages/v3public/V3ForfaitsPage'));
