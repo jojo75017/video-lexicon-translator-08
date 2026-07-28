@@ -122,6 +122,36 @@ export default function V3Sidebar() {
 
                 return (
                   <li key={it.to}>
+                    {it.external ? (
+                      <a
+                        href={it.to}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={it.label}
+                        className="relative flex items-center gap-2.5 rounded-md px-2.5 py-2 text-[13px] transition-colors"
+                        style={{ color: 'var(--v3-emerald)', fontWeight: 600, background: 'rgba(201,168,76,0.10)' }}
+                      >
+                        <span
+                          aria-hidden
+                          className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r"
+                          style={{ background: 'var(--v3-gold)' }}
+                        />
+                        <Icon className="w-4 h-4 shrink-0" />
+                        {!collapsed && (
+                          <>
+                            <span className="truncate flex-1">{it.label}</span>
+                            {it.badge && (
+                              <span
+                                className="text-[9px] font-bold uppercase tracking-[0.15em] px-1.5 py-0.5 rounded"
+                                style={{ background: '#C97A14', color: '#fff' }}
+                              >
+                                {it.badge}
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </a>
+                    ) : (
                     <NavLink
                       to={it.to}
                       end={(it as any).end}
@@ -153,6 +183,7 @@ export default function V3Sidebar() {
                       <Icon className="w-4 h-4 shrink-0" />
                       {!collapsed && <span className="truncate flex-1">{it.label}</span>}
                     </NavLink>
+                    )}
                   </li>
                 );
               })}

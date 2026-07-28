@@ -157,6 +157,58 @@ export default function V3HomePage() {
         <div className="v3-gold-rule" />
       </section>
 
+      {/* BANDE BLOG — mise en évidence */}
+      <section className="max-w-7xl mx-auto px-5 md:px-8 pt-10">
+        <a
+          href="https://ebookstudio.blog/#accueil"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group relative block overflow-hidden rounded-3xl transition-all"
+          style={{
+            background: 'linear-gradient(135deg, #064e3b 0%, #053e2f 60%, #0a5a45 100%)',
+            border: '1px solid rgba(201,168,76,0.45)',
+            boxShadow: '0 30px 60px -30px rgba(6,78,59,0.5)',
+          }}
+        >
+          <div className="absolute inset-x-0 top-0 h-[3px]" style={{ background: 'linear-gradient(90deg, transparent, var(--v3-gold), transparent)' }} />
+          <div className="grid md:grid-cols-[1fr_auto] items-center gap-6 px-6 md:px-10 py-8">
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-[10px] font-bold uppercase tracking-[0.24em]" style={{ color: 'var(--v3-gold)' }}>
+                  Nouveau · Blog refait
+                </span>
+                <span
+                  className="text-[9px] font-bold uppercase tracking-[0.15em] px-1.5 py-0.5 rounded"
+                  style={{ background: '#C97A14', color: '#fff' }}
+                >
+                  À lire
+                </span>
+              </div>
+              <h2 className="v3-serif text-2xl md:text-3xl font-semibold text-white leading-tight">
+                Le Blog EbookStudio — la méthode, en clair
+              </h2>
+              <p className="mt-2 text-[14px] text-white/75 max-w-2xl">
+                Articles, guides pratiques et retours d'expérience pour écrire, illustrer et publier
+                votre livre. Nouvelle édition entièrement repensée.
+              </p>
+            </div>
+            <div className="flex md:justify-end">
+              <span
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-[15px] whitespace-nowrap"
+                style={{
+                  background: 'var(--v3-gold)',
+                  color: '#1a1408',
+                  boxShadow: '0 10px 30px -10px rgba(201,168,76,0.7)',
+                }}
+              >
+                Ouvrir le blog
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </span>
+            </div>
+          </div>
+        </a>
+      </section>
+
       {/* 6 CATÉGORIES PREMIUM */}
       <section className="max-w-7xl mx-auto px-5 md:px-8 py-16">
         <div className="text-center mb-10">
