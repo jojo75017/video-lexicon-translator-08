@@ -46,6 +46,7 @@ export const V3_HEADER_MENU: MenuCategory[] = [
       { label: 'Ebookbot — Chat IA', to: '/ebookbot', desc: 'Assistant conversationnel pour brainstormer' },
       { label: 'Outils V3 (Hub)', to: '/v3/hub?tab=outils', desc: 'Tous les micro-outils IA regroupés' },
       { label: "Parler à l'assistant V3", to: '/v3/hub?tab=assistant', desc: 'Aide contextuelle sur votre livre' },
+      { label: 'Traduction 10 langues', to: '/ebook-planner?tab=multi-translator', badge: 'Nouveau', desc: 'EN, ES, DE, IT, PT, NL, PL, JA, ZH, AR — IA + relecture' },
     ],
   },
   {
