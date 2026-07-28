@@ -63,8 +63,8 @@ export const V3_PLANS: V3Plan[] = [
   },
   {
     id: "auteur",
-    name: "Auteur",
-    tagline: "L'atelier d'édition complet : tout, illimité, sans compromis",
+    name: "Éditeur",
+    tagline: "👑 Je pilote une vraie maison d'édition — tout, illimité, sans compromis",
     monthlyPrice: 59,
     yearlyPrice: 547,
     booksPerMonth: null,
