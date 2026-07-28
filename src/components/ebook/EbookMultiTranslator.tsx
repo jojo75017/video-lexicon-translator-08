@@ -342,7 +342,16 @@ const EbookMultiTranslator: React.FC<EbookMultiTranslatorProps> = ({
               >
                 <div className="flex items-center gap-3 mb-2">
                   <Flag code={lang.flag} className="h-6 w-8 rounded shadow-sm" />
-                  <Checkbox checked={selectedLanguages.includes(lang.code)} />
+                  <span
+                    aria-hidden
+                    className={`h-4 w-4 rounded border flex items-center justify-center text-[10px] ${
+                      selectedLanguages.includes(lang.code)
+                        ? 'bg-blue-500 border-blue-500 text-white'
+                        : 'border-border bg-background'
+                    }`}
+                  >
+                    {selectedLanguages.includes(lang.code) ? '✓' : ''}
+                  </span>
                 </div>
                 <p className="font-medium">{lang.name}</p>
                 <p className="text-xs text-muted-foreground mt-1">{lang.market}</p>
