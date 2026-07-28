@@ -339,6 +339,10 @@ export default function V3CreateWizard() {
   const [autofillLoading, setAutofillLoading] = useState(false);
   const [targetPromiseOpen, setTargetPromiseOpen] = useState(false);
 
+  // Bible de l'univers & Arbre narratif (fiction / séries / univers étendus)
+  const [bibleUnivers, setBibleUnivers] = useState('');
+  const [arbreNarratif, setArbreNarratif] = useState('');
+
   const handleAutofillTargetPromise = async () => {
     if (!title.trim() && !finalTitle.trim()) {
       toast.error('Ajoute au moins un titre avant l’auto-remplissage.');
