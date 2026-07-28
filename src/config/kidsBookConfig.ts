@@ -1,0 +1,74 @@
+// Configuration du mode "Livre illustré maternelle"
+// Réservé aux forfaits Studio (expert) et Éditeur (auteur).
+
+import type { V3Plan } from '@/data/v3ToolPlans';
+
+export const KIDS_BOOK_ALLOWED_PLANS: V3Plan[] = ['expert', 'auteur'];
+
+export type IllustrationStyle = 'pixar-3d' | 'aquarelle' | 'crayonne' | 'flat-vector' | 'storybook';
+
+export const ILLUSTRATION_STYLES: { id: IllustrationStyle; label: string; prompt: string }[] = [
+  { id: 'pixar-3d', label: 'Pixar 3D moderne', prompt: 'modern Pixar-style 3D render, soft lighting, cinematic, expressive character' },
+  { id: 'aquarelle', label: 'Aquarelle douce', prompt: 'soft watercolor illustration, gentle pastel colors, storybook feel, hand-painted texture' },
+  { id: 'crayonne', label: 'Crayonné coloré', prompt: 'colored pencil children book illustration, warm textures, hand-drawn' },
+  { id: 'flat-vector', label: 'Vectoriel plat', prompt: 'flat vector kids illustration, bold clean shapes, bright cheerful palette' },
+  { id: 'storybook', label: 'Album jeunesse classique', prompt: 'classic children storybook illustration, whimsical, detailed, warm palette' },
+];
+
+export const KIDS_BOOK_FORMATS = {
+  albumSquare: { label: 'Album carré 21,59 × 21,59 cm', width: 21.59, height: 21.59 },
+} as const;
+
+// Quotas d'illustrations par livre selon le forfait
+export const KIDS_BOOK_IMAGE_QUOTA: Record<V3Plan, number> = {
+  debutant: 0,
+  expert: 30,
+  auteur: 60,
+};
+
+// Modèle image par forfait
+export const KIDS_BOOK_IMAGE_MODEL: Record<V3Plan, string> = {
+  debutant: 'google/gemini-3.1-flash-image',
+  expert: 'google/gemini-3.1-flash-image',
+  auteur: 'google/gemini-3-pro-image',
+};
+
+export function canUseKidsBook(plan: V3Plan | null | undefined): boolean {
+  if (!plan) return false;
+  return KIDS_BOOK_ALLOWED_PLANS.includes(plan);
+}
+
+export interface CharacterBible {
+  name: string;
+  age: string;
+  physical: string;      // "garçon 4 ans, cheveux bruns bouclés, yeux marron, joues rondes"
+  outfit: string;        // "t-shirt vert, short bleu, baskets blanches"
+  personality?: string;
+}
+
+export interface KidsStory {
+  id: string;
+  title: string;
+  synopsis: string;      // 1-2 phrases servant à générer l'illustration
+  content?: string;      // texte final de l'histoire
+  illustrationUrl?: string;
+}
+
+export interface KidsBookDraft {
+  title: string;
+  authorName: string;      // OBLIGATOIRE — affiché sur couverture et page de titre
+  targetAge: string;       // "3-6 ans"
+  style: IllustrationStyle;
+  character: CharacterBible;
+  stories: KidsStory[];
+}
+
+export function buildCharacterBibleText(c: CharacterBible): string {
+  return [
+    `Personnage principal: ${c.name}, ${c.age}.`,
+    `Apparence: ${c.physical}.`,
+    `Tenue: ${c.outfit}.`,
+    c.personality ? `Personnalité: ${c.personality}.` : '',
+    'IMPORTANT: le personnage doit rester STRICTEMENT identique (même visage, mêmes vêtements) d\'une illustration à l\'autre.',
+  ].filter(Boolean).join(' ');
+}
