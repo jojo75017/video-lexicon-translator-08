@@ -18,6 +18,7 @@ const CATALOG = Array.from({ length: 24 }, (_, i) => ({
 export default function V3GuestAuthorPage() {
   return (
     <>
+      <div className="max-w-6xl mx-auto px-4 pt-4"><BackButton /></div>
       <section className="v3-section-dark">
         <div className="max-w-6xl mx-auto px-5 md:px-8 py-16 flex items-center gap-8 flex-wrap">
           <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[var(--v3-orange)] to-orange-700 grid place-items-center text-3xl font-bold">
