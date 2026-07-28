@@ -33,6 +33,18 @@ const NAV: NavSection[] = [
     ],
   },
   {
+    section: 'Recherche KDP',
+    items: [
+      { to: '/kdp-keywords', label: 'Recherche mots-clés', icon: Search, badge: 'KDP' },
+      { to: '/kdp-keywords?tab=spy', label: 'Espion Amazon (ASIN)', icon: Target },
+      { to: '/kdp-keywords?tab=longtail', label: 'Longue traîne', icon: BarChart3 },
+      { to: '/kdp-keywords?tab=backend7', label: '7 mots-clés backend', icon: Search },
+      { to: '/niches', label: 'Niches rentables', icon: BarChart3 },
+      { to: '/niches-600', label: '600 niches', icon: BarChart3, badge: 'Base' },
+      { to: '/couverture-kdp', label: 'Couverture KDP', icon: ImageIcon },
+    ],
+  },
+  {
     section: 'Formation',
     items: [
       { to: 'https://ebookstudio.blog/#accueil', label: 'Blog EbookStudio', icon: FileText, external: true, badge: 'Nouveau' } as any,
