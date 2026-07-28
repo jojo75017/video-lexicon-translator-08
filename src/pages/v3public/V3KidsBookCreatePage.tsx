@@ -622,7 +622,7 @@ export default function V3KidsBookCreatePage() {
         {/* Sauvegarde & Export */}
 
         <div className="v3-card mb-4">
-          <h2 className="font-semibold mb-2">5. Sauvegarde</h2>
+          <h2 className="font-semibold mb-2">6. Sauvegarde</h2>
           <p className="text-xs text-[var(--v3-muted)] mb-3">
             Enregistre ton livre dans « Mes projets » pour le retrouver depuis n'importe quel appareil.
           </p>
