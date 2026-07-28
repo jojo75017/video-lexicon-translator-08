@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Sparkles, Loader2, Lock, ImageIcon, Check, Download, ArrowLeft } from 'lucide-react';
+import { Sparkles, Loader2, Lock, Check, Download, ArrowLeft, Wand2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,7 @@ import {
 } from '@/config/kidsBookConfig';
 import type { V3Plan } from '@/data/v3ToolPlans';
 
-const STORAGE_KEY = 'v3_kids_book_draft_v1';
+const STORAGE_KEY = 'v3_kids_book_draft_v2';
 
 function loadDraft(): KidsBookDraft {
   try {
@@ -24,53 +24,27 @@ function loadDraft(): KidsBookDraft {
   } catch { /* noop */ }
   return {
     title: '',
+    subtitle: '',
     authorName: '',
+    synopsis: '',
     targetAge: '3-6 ans',
     style: 'pixar-3d',
+    chapterCount: 10,
+    wordsPerStory: 120,
     character: { name: '', age: '4 ans', physical: '', outfit: '' },
-    stories: [
-      { id: crypto.randomUUID(), title: '', synopsis: '' },
-    ],
+    stories: [],
   };
 }
+
+type Phase = 'idle' | 'stories' | 'illustrations' | 'done';
 
 export default function V3KidsBookCreatePage() {
   const nav = useNavigate();
   const [plan, setPlan] = useState<V3Plan | null>(null);
   const [loadingPlan, setLoadingPlan] = useState(true);
   const [draft, setDraft] = useState<KidsBookDraft>(loadDraft);
-  const [generating, setGenerating] = useState<string | null>(null);
-  const [storyCount, setStoryCount] = useState<number>(10);
-  const [generatingStories, setGeneratingStories] = useState(false);
-
-  const generateStoriesWithAI = async () => {
-    if (!draft.title) { toast.error('Ajoute d\'abord un titre au livre.'); return; }
-    if (!draft.character.name || !draft.character.physical) {
-      toast.error('Complète la bible du personnage avant de générer les histoires.');
-      return;
-    }
-    setGeneratingStories(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('agent-kids-stories', {
-        body: {
-          bookTitle: draft.title,
-          targetAge: draft.targetAge,
-          characterBible: buildCharacterBibleText(draft.character),
-          count: storyCount,
-        },
-      });
-      if (error || !data?.stories?.length) throw new Error(error?.message || data?.error || 'Aucune histoire générée');
-      const newStories: KidsStory[] = data.stories.map((s: { title: string; synopsis: string }) => ({
-        id: crypto.randomUUID(), title: s.title, synopsis: s.synopsis,
-      }));
-      setDraft((d) => ({ ...d, stories: newStories }));
-      toast.success(`${newStories.length} histoires générées ✨`);
-    } catch (e: any) {
-      toast.error(e.message || 'Erreur génération histoires');
-    } finally {
-      setGeneratingStories(false);
-    }
-  };
+  const [phase, setPhase] = useState<Phase>('idle');
+  const [progress, setProgress] = useState<{ done: number; total: number }>({ done: 0, total: 0 });
 
   useEffect(() => {
     (async () => {
@@ -94,49 +68,77 @@ export default function V3KidsBookCreatePage() {
   const updateChar = (patch: Partial<KidsBookDraft['character']>) =>
     setDraft((d) => ({ ...d, character: { ...d.character, ...patch } }));
 
-  const addStory = () =>
-    setDraft((d) => ({
-      ...d,
-      stories: [...d.stories, { id: crypto.randomUUID(), title: '', synopsis: '' }],
-    }));
-  const updateStory = (id: string, patch: Partial<KidsStory>) =>
-    setDraft((d) => ({
-      ...d,
-      stories: d.stories.map((s) => (s.id === id ? { ...s, ...patch } : s)),
-    }));
-  const removeStory = (id: string) =>
-    setDraft((d) => ({ ...d, stories: d.stories.filter((s) => s.id !== id) }));
-
-  const generateIllustration = async (story: KidsStory) => {
+  const generateAll = async () => {
+    if (!draft.title) return toast.error('Ajoute un titre.');
+    if (!draft.authorName) return toast.error('Le nom d\'auteur est obligatoire.');
+    if (!draft.synopsis) return toast.error('Ajoute un synopsis / pitch du livre.');
     if (!draft.character.name || !draft.character.physical) {
-      toast.error('Complète d\'abord la bible du personnage (nom + description physique).');
-      return;
+      return toast.error('Complète la bible du personnage (prénom + description physique).');
     }
-    if (!story.synopsis) {
-      toast.error('Ajoute un synopsis à cette histoire.');
-      return;
-    }
-    setGenerating(story.id);
+    const count = Math.max(1, Math.min(30, draft.chapterCount || 10));
+    const words = Math.max(30, Math.min(400, draft.wordsPerStory || 120));
+
     try {
-      const stylePrompt = ILLUSTRATION_STYLES.find((s) => s.id === draft.style)?.prompt || '';
-      const model = KIDS_BOOK_IMAGE_MODEL[plan || 'expert'];
-      const { data, error } = await supabase.functions.invoke('agent-illustrator', {
+      // 1) Génération des histoires (titre + synopsis + contenu)
+      setPhase('stories');
+      setProgress({ done: 0, total: count });
+      const { data, error } = await supabase.functions.invoke('agent-kids-stories', {
         body: {
-          bookId: 'draft',
-          storyId: story.id,
+          bookTitle: draft.title,
+          subtitle: draft.subtitle,
+          synopsis: draft.synopsis,
+          targetAge: draft.targetAge,
           characterBible: buildCharacterBibleText(draft.character),
-          scene: story.synopsis,
-          stylePrompt,
-          model,
+          count,
+          wordsPerStory: words,
         },
       });
-      if (error || !data?.url) throw new Error(error?.message || data?.error || 'Génération échouée');
-      updateStory(story.id, { illustrationUrl: data.url });
-      toast.success('Illustration générée');
+      if (error || !data?.stories?.length) {
+        throw new Error(error?.message || data?.error || 'Aucune histoire générée');
+      }
+      const stories: KidsStory[] = data.stories.map((s: any) => ({
+        id: crypto.randomUUID(),
+        title: s.title,
+        synopsis: s.synopsis,
+        content: s.content || '',
+      }));
+      setDraft((d) => ({ ...d, stories }));
+      toast.success(`${stories.length} histoires écrites ✨`);
+
+      // 2) Illustrations (une par histoire, en série pour respecter les quotas)
+      setPhase('illustrations');
+      setProgress({ done: 0, total: stories.length });
+      const stylePrompt = ILLUSTRATION_STYLES.find((s) => s.id === draft.style)?.prompt || '';
+      const model = KIDS_BOOK_IMAGE_MODEL[plan || 'expert'];
+      const characterBible = buildCharacterBibleText(draft.character);
+
+      for (let i = 0; i < stories.length; i++) {
+        const story = stories[i];
+        try {
+          const { data: img, error: imgErr } = await supabase.functions.invoke('agent-illustrator', {
+            body: {
+              bookId: 'draft',
+              storyId: story.id,
+              characterBible,
+              scene: story.synopsis,
+              stylePrompt,
+              model,
+            },
+          });
+          if (imgErr || !img?.url) throw new Error(imgErr?.message || img?.error || 'échec');
+          stories[i] = { ...story, illustrationUrl: img.url };
+          setDraft((d) => ({ ...d, stories: [...stories] }));
+        } catch (e: any) {
+          toast.error(`Illustration ${i + 1} : ${e.message}`);
+        }
+        setProgress({ done: i + 1, total: stories.length });
+      }
+
+      setPhase('done');
+      toast.success('Livre prêt — tu peux l\'exporter.');
     } catch (e: any) {
       toast.error(e.message || 'Erreur de génération');
-    } finally {
-      setGenerating(null);
+      setPhase('idle');
     }
   };
 
@@ -161,6 +163,7 @@ export default function V3KidsBookCreatePage() {
   }
 
   const planAllowed = canUseKidsBook(plan);
+  const busy = phase === 'stories' || phase === 'illustrations';
 
   return (
     <section className="v3-halo-soft min-h-[calc(100vh-4rem)] py-12 px-5">
@@ -171,10 +174,10 @@ export default function V3KidsBookCreatePage() {
 
         <div className="text-center mb-8">
           <span className="v3-chip v3-chip-orange"><Sparkles className="w-3.5 h-3.5" /> Livre illustré maternelle</span>
-          <h1 className="v3-serif text-4xl font-bold mt-4">Album jeunesse illustré</h1>
-          <p className="text-sm text-[var(--v3-muted)] mt-2 max-w-lg mx-auto">
-            Crée un livre d'histoires courtes avec un personnage cohérent d'une page à l'autre.
-            Format album carré, compatible KDP.
+          <h1 className="v3-serif text-4xl font-bold mt-4">Album jeunesse — 100% automatique</h1>
+          <p className="text-sm text-[var(--v3-muted)] mt-2 max-w-xl mx-auto">
+            Renseigne le titre, l'auteur, le synopsis et ton personnage.
+            L'IA écrit toutes les histoires et génère les illustrations cohérentes.
           </p>
         </div>
 
@@ -184,28 +187,33 @@ export default function V3KidsBookCreatePage() {
               <Lock className="w-5 h-5 text-[#C97A14] shrink-0 mt-0.5" />
               <div className="text-sm text-[var(--v3-ink)]">
                 <strong>Mode aperçu.</strong> La génération d'illustrations est incluse dans les forfaits{' '}
-                <strong>Studio</strong> et <strong>Éditeur</strong>. Tu peux tester le wizard librement ;
-                l'export d'album nécessite un forfait éligible.{' '}
+                <strong>Studio</strong> et <strong>Éditeur</strong>.{' '}
                 <Link to="/v3/forfaits" className="underline text-[#C97A14]">Voir les forfaits</Link>
               </div>
             </div>
           </div>
         )}
 
-        {/* Étape 1 — Livre */}
+        {/* 1. Le livre */}
         <div className="v3-card mb-4">
           <h2 className="font-semibold mb-3">1. Ton livre</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <input
               value={draft.title}
               onChange={(e) => update({ title: e.target.value })}
-              placeholder="Titre du livre (ex: 5 minutes pour grandir en maternelle)"
+              placeholder="Titre du livre *"
+              className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#C97A14]/40"
+            />
+            <input
+              value={draft.subtitle || ''}
+              onChange={(e) => update({ subtitle: e.target.value })}
+              placeholder="Sous-titre (optionnel)"
               className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#C97A14]/40"
             />
             <input
               value={draft.authorName}
               onChange={(e) => update({ authorName: e.target.value })}
-              placeholder="Nom d'auteur (affiché sur la couverture) *"
+              placeholder="Nom d'auteur (sur la couverture) *"
               className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#C97A14]/40"
             />
             <input
@@ -214,32 +222,27 @@ export default function V3KidsBookCreatePage() {
               placeholder="Âge cible (ex: 3-6 ans)"
               className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#C97A14]/40"
             />
-            <select
-              value={draft.style}
-              onChange={(e) => update({ style: e.target.value as IllustrationStyle })}
-              className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#C97A14]/40"
-            >
-              {ILLUSTRATION_STYLES.map((s) => (
-                <option key={s.id} value={s.id}>{s.label}</option>
-              ))}
-            </select>
+            <textarea
+              value={draft.synopsis || ''}
+              onChange={(e) => update({ synopsis: e.target.value })}
+              placeholder="Synopsis / pitch du livre — le fil rouge que l'IA suivra pour toutes les histoires *"
+              rows={3}
+              className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm md:col-span-2 focus:outline-none focus:ring-2 focus:ring-[#C97A14]/40"
+            />
           </div>
-          {!draft.authorName && (
-            <p className="text-xs text-amber-700 mt-2">⚠️ Le nom d'auteur est obligatoire — il apparaît sur la couverture et la page de titre.</p>
-          )}
         </div>
 
-        {/* Étape 2 — Bible personnage */}
+        {/* 2. Bible personnage */}
         <div className="v3-card mb-4">
-          <h2 className="font-semibold mb-1">2. Bible du personnage principal</h2>
+          <h2 className="font-semibold mb-1">2. Ton personnage</h2>
           <p className="text-xs text-[var(--v3-muted)] mb-3">
-            Plus tu es précis, plus le personnage restera identique d'une image à l'autre.
+            Plus tu es précis, plus le personnage restera identique d'une illustration à l'autre.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <input
               value={draft.character.name}
               onChange={(e) => updateChar({ name: e.target.value })}
-              placeholder="Prénom (ex: Jules)"
+              placeholder="Prénom (ex: Jules) *"
               className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#C97A14]/40"
             />
             <input
@@ -251,114 +254,132 @@ export default function V3KidsBookCreatePage() {
             <textarea
               value={draft.character.physical}
               onChange={(e) => updateChar({ physical: e.target.value })}
-              placeholder="Description physique — cheveux, yeux, morphologie (ex: cheveux bruns bouclés, yeux marron, joues rondes)"
+              placeholder="Description physique — cheveux, yeux, morphologie *"
               className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm md:col-span-2 focus:outline-none focus:ring-2 focus:ring-[#C97A14]/40"
               rows={2}
             />
             <textarea
               value={draft.character.outfit}
               onChange={(e) => updateChar({ outfit: e.target.value })}
-              placeholder="Tenue signature — reprise sur TOUTES les images (ex: t-shirt vert, short bleu, baskets blanches)"
+              placeholder="Tenue signature — reprise sur TOUTES les images"
               className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm md:col-span-2 focus:outline-none focus:ring-2 focus:ring-[#C97A14]/40"
               rows={2}
             />
             <input
               value={draft.character.personality || ''}
               onChange={(e) => updateChar({ personality: e.target.value })}
-              placeholder="Personnalité (optionnel — curieux, maladroit, gentil...)"
+              placeholder="Personnalité (optionnel — curieux, gentil, maladroit...)"
               className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm md:col-span-2 focus:outline-none focus:ring-2 focus:ring-[#C97A14]/40"
             />
           </div>
         </div>
 
-        {/* Étape 3 — Histoires */}
+        {/* 3. Paramètres */}
         <div className="v3-card mb-4">
-          <div className="flex flex-wrap justify-between items-center gap-2 mb-3">
-            <h2 className="font-semibold">3. Tes histoires ({draft.stories.length})</h2>
-            <div className="flex items-center gap-2">
-              <label className="text-xs text-[var(--v3-muted)]">Nombre :</label>
+          <h2 className="font-semibold mb-3">3. Format du livre</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <label className="text-sm">
+              <span className="block text-xs text-[var(--v3-muted)] mb-1">Nombre d'histoires</span>
               <input
-                type="number" min={1} max={30} value={storyCount}
-                onChange={(e) => setStoryCount(Math.max(1, Math.min(30, Number(e.target.value) || 1)))}
-                className="w-16 px-2 py-1 rounded border border-neutral-300 bg-white text-sm"
+                type="number" min={1} max={30}
+                value={draft.chapterCount || 10}
+                onChange={(e) => update({ chapterCount: Math.max(1, Math.min(30, Number(e.target.value) || 1)) })}
+                className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm"
               />
-              <Button
-                size="sm"
-                onClick={generateStoriesWithAI}
-                disabled={generatingStories}
-                className="bg-[#064e3b] hover:bg-[#053d2e] text-white"
+            </label>
+            <label className="text-sm">
+              <span className="block text-xs text-[var(--v3-muted)] mb-1">Mots par histoire</span>
+              <input
+                type="number" min={30} max={400} step={10}
+                value={draft.wordsPerStory || 120}
+                onChange={(e) => update({ wordsPerStory: Math.max(30, Math.min(400, Number(e.target.value) || 120)) })}
+                className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm"
+              />
+            </label>
+            <label className="text-sm">
+              <span className="block text-xs text-[var(--v3-muted)] mb-1">Style d'illustration</span>
+              <select
+                value={draft.style}
+                onChange={(e) => update({ style: e.target.value as IllustrationStyle })}
+                className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm"
               >
-                {generatingStories ? (
-                  <><Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" /> Génération…</>
-                ) : (
-                  <><Sparkles className="w-3.5 h-3.5 mr-1.5" /> Générer les histoires (IA)</>
-                )}
-              </Button>
-              <Button size="sm" variant="outline" onClick={addStory}>+ Ajouter</Button>
-            </div>
-          </div>
-          <p className="text-xs text-[var(--v3-muted)] mb-3">
-            Astuce : clique <strong>« Générer les histoires (IA) »</strong> pour créer automatiquement {storyCount} mini-histoires cohérentes avec ton personnage, puis génère l'illustration de chaque histoire.
-          </p>
-          <div className="space-y-4">
-            {draft.stories.map((story, idx) => (
-              <div key={story.id} className="border rounded-lg p-3 bg-white/60">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xs font-semibold text-[var(--v3-muted)]">Histoire {idx + 1}</span>
-                  <input
-                    value={story.title}
-                    onChange={(e) => updateStory(story.id, { title: e.target.value })}
-                    placeholder="Titre (ex: Oups, encore !)"
-                    className="flex-1 px-3 py-2 rounded border border-neutral-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#C97A14]/40"
-                  />
-                  {draft.stories.length > 1 && (
-                    <button
-                      onClick={() => removeStory(story.id)}
-                      className="text-xs text-red-600 hover:underline"
-                    >Retirer</button>
-                  )}
-                </div>
-                <textarea
-                  value={story.synopsis}
-                  onChange={(e) => updateStory(story.id, { synopsis: e.target.value })}
-                  placeholder="Synopsis en 1-2 phrases — ce que le personnage vit dans cette histoire. Sert de scène pour l'illustration."
-                  className="w-full px-3 py-2 rounded border border-neutral-300 bg-white text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-[#C97A14]/40"
-                  rows={2}
-                />
-                <div className="flex items-center gap-3">
-                  <Button
-                    size="sm"
-                    onClick={() => generateIllustration(story)}
-                    disabled={generating === story.id}
-                    className="bg-[#C97A14] hover:bg-[#a8630f] text-white"
-                  >
-                    {generating === story.id ? (
-                      <><Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" /> Génération…</>
-                    ) : (
-                      <><ImageIcon className="w-3.5 h-3.5 mr-1.5" /> {story.illustrationUrl ? 'Régénérer' : 'Générer l\'illustration'}</>
-                    )}
-                  </Button>
-                  {story.illustrationUrl && (
-                    <img src={story.illustrationUrl} alt="" className="w-20 h-20 object-cover rounded border" />
-                  )}
-                </div>
-              </div>
-            ))}
+                {ILLUSTRATION_STYLES.map((s) => (
+                  <option key={s.id} value={s.id}>{s.label}</option>
+                ))}
+              </select>
+            </label>
           </div>
         </div>
 
-        {/* Étape 4 — Export */}
-        <div className="v3-card mb-8">
-          <h2 className="font-semibold mb-2">4. Export album</h2>
-          <p className="text-xs text-[var(--v3-muted)] mb-3">
-            Télécharge un fichier HTML au format album carré (21,59 × 21,59 cm). Ouvre-le dans Chrome et fais <em>Imprimer → PDF</em> pour un fichier prêt KDP.
+        {/* 4. Lancer */}
+        <div className="v3-card mb-4 text-center bg-gradient-to-br from-[#fff7ec] to-white">
+          <h2 className="font-semibold mb-2">4. Lancer la création complète</h2>
+          <p className="text-xs text-[var(--v3-muted)] mb-4">
+            L'IA écrit les {draft.chapterCount || 10} histoires (~{draft.wordsPerStory || 120} mots chacune)
+            puis génère leur illustration cohérente. Compte quelques minutes.
           </p>
-          <Button onClick={exportHtml} disabled={!draft.title || !draft.authorName}>
+          <Button
+            onClick={generateAll}
+            disabled={busy}
+            size="lg"
+            className="bg-gradient-to-r from-[#C97A14] to-[#a8630f] hover:opacity-90 text-white shadow-lg"
+          >
+            {busy ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                {phase === 'stories' && 'Écriture des histoires…'}
+                {phase === 'illustrations' && `Illustrations ${progress.done}/${progress.total}…`}
+              </>
+            ) : (
+              <><Wand2 className="w-4 h-4 mr-2" /> Créer tout mon livre automatiquement</>
+            )}
+          </Button>
+          {phase === 'illustrations' && (
+            <div className="mt-4 max-w-md mx-auto">
+              <div className="h-2 bg-neutral-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#C97A14] transition-all"
+                  style={{ width: `${(progress.done / Math.max(1, progress.total)) * 100}%` }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Aperçu des histoires générées */}
+        {draft.stories.length > 0 && (
+          <div className="v3-card mb-4">
+            <h2 className="font-semibold mb-3">Aperçu ({draft.stories.length} histoires)</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {draft.stories.map((s, i) => (
+                <div key={s.id} className="border rounded-lg p-3 bg-white/60 flex gap-3">
+                  {s.illustrationUrl ? (
+                    <img src={s.illustrationUrl} alt="" className="w-20 h-20 object-cover rounded shrink-0" />
+                  ) : (
+                    <div className="w-20 h-20 rounded bg-neutral-100 flex items-center justify-center text-[10px] text-neutral-400 shrink-0">
+                      {phase === 'illustrations' ? '…' : 'En attente'}
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <div className="text-xs text-[var(--v3-muted)]">Histoire {i + 1}</div>
+                    <div className="font-medium text-sm truncate">{s.title}</div>
+                    <div className="text-xs text-neutral-600 line-clamp-2">{s.content || s.synopsis}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Export */}
+        <div className="v3-card mb-8">
+          <h2 className="font-semibold mb-2">5. Export album</h2>
+          <p className="text-xs text-[var(--v3-muted)] mb-3">
+            Fichier HTML au format album carré (21,59 × 21,59 cm). Ouvre-le dans Chrome et fais <em>Imprimer → PDF</em> pour un fichier prêt KDP.
+          </p>
+          <Button onClick={exportHtml} disabled={!draft.stories.length || !draft.title || !draft.authorName}>
             <Download className="w-4 h-4 mr-2" /> Télécharger l'album (HTML)
           </Button>
-          {(!draft.title || !draft.authorName) && (
-            <p className="text-xs text-amber-700 mt-2">Renseigne le titre et le nom d'auteur pour exporter.</p>
-          )}
         </div>
 
         <div className="text-center text-xs text-[var(--v3-muted)] flex items-center justify-center gap-2">
@@ -392,10 +413,12 @@ function buildAlbumHtml(d: KidsBookDraft): string {
   body { margin: 0; font-family: 'Georgia', serif; color: #232F3E; }
   .page { width: 21.59cm; height: 21.59cm; page-break-after: always; box-sizing: border-box; display: flex; flex-direction: column; }
   .cover { background: linear-gradient(160deg,#fef3c7,#fde68a); padding: 3cm 2cm; text-align: center; justify-content: center; align-items: center; }
-  .cover h1 { font-size: 48pt; margin: 0 0 1cm; line-height: 1.1; }
+  .cover h1 { font-size: 48pt; margin: 0 0 0.5cm; line-height: 1.1; }
+  .cover .subtitle { font-size: 22pt; font-style: italic; margin-bottom: 1cm; }
   .cover .author { font-size: 20pt; margin-top: 2cm; font-style: italic; }
   .title-page { padding: 4cm 2cm; text-align: center; justify-content: center; }
   .title-page h1 { font-size: 36pt; margin: 0; }
+  .title-page .subtitle { font-size: 18pt; font-style: italic; margin-top: 0.5cm; }
   .title-page .author { font-size: 22pt; margin-top: 3cm; }
   .title-page .age { font-size: 14pt; color: #888; margin-top: 1cm; }
   .image-page { padding: 0; }
@@ -403,14 +426,16 @@ function buildAlbumHtml(d: KidsBookDraft): string {
   .image-page .placeholder { flex: 1; display: flex; align-items: center; justify-content: center; background: #f5f5f4; color: #999; font-size: 14pt; }
   .text-page { padding: 3cm 2.5cm; justify-content: center; }
   .text-page h2 { font-size: 26pt; margin: 0 0 1cm; }
-  .text-page p { font-size: 18pt; line-height: 1.6; margin: 0; }
+  .text-page p { font-size: 16pt; line-height: 1.6; margin: 0; white-space: pre-wrap; }
 </style></head><body>
   <section class="page cover">
     <h1>${esc(d.title)}</h1>
+    ${d.subtitle ? `<div class="subtitle">${esc(d.subtitle)}</div>` : ''}
     <div class="author">${esc(d.authorName)}</div>
   </section>
   <section class="page title-page">
     <h1>${esc(d.title)}</h1>
+    ${d.subtitle ? `<div class="subtitle">${esc(d.subtitle)}</div>` : ''}
     <div class="author">${esc(d.authorName)}</div>
     <div class="age">${esc(d.targetAge)}</div>
   </section>
