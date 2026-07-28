@@ -25,7 +25,7 @@ C'est une suite d'édition complète : plus de 30 agents IA spécialisés qui tr
 Notre promesse est simple : vous donnez une idée, un titre, un public visé — la V3 vous rend un livre prêt à publier sur Amazon KDP, avec sa couverture, sa fiche produit, ses mots-clés et ses catégories.`,
   },
   {
-    title: '2. De la V2 à la V3 : une maison d'édition en ligne (1:30 → 2:15)',
+    title: "2. De la V2 à la V3 : une maison d'édition en ligne (1:30 → 2:15)",
     duration: '~45 s',
     body: `Je tiens à être très clair : ce n'est pas une simple mise à jour.
 
