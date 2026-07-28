@@ -14,6 +14,7 @@ import {
   ILLUSTRATION_STYLES,
   buildCharacterBibleText,
   canUseKidsBook,
+  computeSpineWidth,
   KIDS_BOOK_IMAGE_MODEL,
   type KidsBookDraft,
   type KidsStory,
