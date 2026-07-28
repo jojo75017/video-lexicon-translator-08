@@ -619,6 +619,7 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
         savedAt: new Date().toISOString(),
         title, description, category, customCategory, tone, chapters, wordsPerChapter,
         characters, outline, finalTitle, subtitle, authorName,
+        bibleUnivers, arbreNarratif,
       };
       const raw = localStorage.getItem('v3_wizard_drafts_v1');
       const list = raw ? JSON.parse(raw) : [];
