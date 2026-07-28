@@ -705,7 +705,10 @@ export default function V3KidsBookCreatePage() {
                 ))}
               </select>
             </label>
+          </div>
         </div>
+
+
 
         {/* 3bis. Mentions KDP */}
         <div className="v3-card mb-4">
