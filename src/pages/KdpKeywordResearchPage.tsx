@@ -17,6 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 import AmazonSpyTab from '@/components/ebook/AmazonSpyTab';
+import { FirecrawlNoticeBanner } from '@/components/ebook/FirecrawlNoticeBanner';
 
 interface KdpKeyword {
   keyword: string;
