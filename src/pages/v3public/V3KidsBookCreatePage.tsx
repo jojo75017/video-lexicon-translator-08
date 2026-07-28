@@ -102,6 +102,70 @@ export default function V3KidsBookCreatePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
+  // Ré-ouvre un projet existant via ?projectId=... (depuis "Mes projets")
+  useEffect(() => {
+    const pid = searchParams.get('projectId');
+    if (!pid) return;
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from('ebook_projects')
+        .select('id,title,author_name,book_summary,target_audience,writing_style,characters,chapters,ebook_images,cover_concepts,kdp_description,kdp_keywords,kdp_categories,preface,seo_optimization,project_type')
+        .eq('id', pid)
+        .maybeSingle();
+      if (cancelled) return;
+      if (error || !data) { toast.error("Impossible de charger le projet."); return; }
+      // Priorité au snapshot JSON complet
+      let hydrated: KidsBookDraft | null = null;
+      try {
+        const parsed = data.seo_optimization ? JSON.parse(data.seo_optimization as string) : null;
+        if (parsed && parsed.kidsDraft && typeof parsed.kidsDraft === 'object') {
+          hydrated = parsed.kidsDraft as KidsBookDraft;
+        }
+      } catch { /* noop */ }
+      if (!hydrated) {
+        // Reconstruit depuis les colonnes
+        const imgs: any[] = Array.isArray(data.ebook_images) ? (data.ebook_images as any[]) : [];
+        const front = imgs.find((x) => x?.type === 'front_cover')?.url || data.cover_concepts || undefined;
+        const back = imgs.find((x) => x?.type === 'back_cover')?.url || undefined;
+        const ch: any[] = Array.isArray(data.chapters) ? (data.chapters as any[]) : [];
+        const chars: any[] = Array.isArray(data.characters) ? (data.characters as any[]) : [];
+        hydrated = {
+          ...loadDraft(),
+          title: data.title || '',
+          authorName: data.author_name || '',
+          synopsis: data.book_summary || '',
+          targetAge: data.target_audience || '3-6 ans',
+          style: (data.writing_style as any) || 'pixar-3d',
+          chapterCount: ch.length || 10,
+          character: chars[0] || loadDraft().character,
+          stories: ch.map((c, i) => ({
+            id: `s-${i + 1}`,
+            title: c.title || `Histoire ${i + 1}`,
+            synopsis: c.synopsis || '',
+            content: c.content || '',
+            illustrationUrl: c.illustration_url || undefined,
+          })) as KidsStory[],
+          coverUrl: front,
+          backCoverUrl: back,
+          backCoverText: (data.preface as string) || '',
+          kdpDescription: (data.kdp_description as string) || '',
+          kdpKeywords: (data.kdp_keywords as string || '').split(',').map((s) => s.trim()).filter(Boolean),
+          kdpCategories: (data.kdp_categories as string || '').split('|').map((s) => s.trim()).filter(Boolean),
+        };
+      }
+      setDraft(hydrated!);
+      setProjectId(pid);
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(hydrated));
+        localStorage.setItem(PROJECT_ID_KEY, pid);
+      } catch { /* noop */ }
+      toast.success('Projet chargé.');
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
 
   const generateCover = async () => {
     if (!draft.title) return toast.error('Ajoute un titre avant de créer la couverture.');
