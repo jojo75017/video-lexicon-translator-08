@@ -117,6 +117,7 @@ const AmazonSpyTab: React.FC<AmazonSpyTabProps> = ({ initialKeyword = '' }) => {
 
   return (
     <div className="space-y-4">
+      <FirecrawlNoticeBanner />
       <Card className="border-2 border-amber-300/60 bg-gradient-to-br from-amber-50/60 to-orange-50/40 dark:from-amber-950/20 dark:to-orange-950/10">
         <CardContent className="p-4 space-y-3">
           <div className="flex items-center gap-2">
