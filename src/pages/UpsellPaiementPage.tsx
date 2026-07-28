@@ -1,16 +1,28 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import StripeCheckoutButton from "@/components/StripeCheckoutButton";
-import { 
-  Check, CreditCard, ArrowLeft, ArrowRight, Sparkles, Cpu, Headphones, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
+import {
+  Check, CreditCard, ArrowLeft, ArrowRight, Sparkles, Cpu, Headphones,
   Image, ShieldCheck, Lock, Clock, Users, Star, Zap, Gift, CheckCircle
 } from "lucide-react";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { getIsCurrentSessionAdmin } from "@/lib/adminAccess";
+import { getStripe, getStripeEnvironment } from "@/lib/stripe";
+import { supabase } from "@/integrations/supabase/client";
+
 
 const LAUNCH_PRICE = 59; // promo d'été jusqu'au 31 août (tarif normal 67€)
 const NORMAL_PRICE = 197;
