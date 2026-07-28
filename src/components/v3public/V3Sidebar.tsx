@@ -17,6 +17,24 @@ type NavSection = { section: string; items: NavItem[] };
 
 const NAV: NavSection[] = [
   {
+    section: 'Recherche KDP',
+    items: [
+      { to: '/v3/recherche', label: 'Studio Recherche KDP', icon: Search, badge: 'Hub' },
+      { to: '/kdp-keywords', label: 'Recherche mots-clés', icon: Search },
+      { to: '/kdp-keywords?tab=spy', label: 'Espion Amazon (ASIN)', icon: Target },
+      { to: '/kdp-keywords?tab=longtail', label: 'Longue traîne', icon: BarChart3 },
+      { to: '/kdp-keywords?tab=backend7', label: '7 mots-clés backend', icon: Search },
+      { to: '/v3/recherche?tab=desc', label: 'Description KDP', icon: FileText },
+      { to: '/v3/recherche?tab=cat', label: '3 Catégories KDP', icon: ListTree },
+      { to: '/v3/recherche?tab=bio', label: 'Bio auteur', icon: User },
+      { to: '/v3/recherche?tab=aplus', label: 'Contenu A+ Amazon', icon: Award, badge: 'Pro' },
+      { to: '/audit-pilot', label: 'KDP Pilot — Audit', icon: Award },
+      { to: '/niches', label: 'Niches rentables', icon: BarChart3 },
+      { to: '/niches-600', label: '600 niches', icon: BarChart3, badge: 'Base' },
+      { to: '/couverture-kdp', label: 'Couverture KDP', icon: ImageIcon },
+    ],
+  },
+  {
     section: 'Mon espace',
     items: [
       { to: '/v3', label: 'Accueil V3', icon: Home, end: true },
@@ -30,18 +48,6 @@ const NAV: NavSection[] = [
       { to: '/v3/pourquoi', label: 'Pourquoi EbookStudio', icon: Award, badge: 'À lire' },
       { to: '/v3/script-heygen', label: 'Script vidéo HeyGen', icon: Video, badge: 'Pour vous' },
       { to: '/v3/outils', label: 'Tous les outils', icon: ListTree },
-    ],
-  },
-  {
-    section: 'Recherche KDP',
-    items: [
-      { to: '/kdp-keywords', label: 'Recherche mots-clés', icon: Search, badge: 'KDP' },
-      { to: '/kdp-keywords?tab=spy', label: 'Espion Amazon (ASIN)', icon: Target },
-      { to: '/kdp-keywords?tab=longtail', label: 'Longue traîne', icon: BarChart3 },
-      { to: '/kdp-keywords?tab=backend7', label: '7 mots-clés backend', icon: Search },
-      { to: '/niches', label: 'Niches rentables', icon: BarChart3 },
-      { to: '/niches-600', label: '600 niches', icon: BarChart3, badge: 'Base' },
-      { to: '/couverture-kdp', label: 'Couverture KDP', icon: ImageIcon },
     ],
   },
   {
