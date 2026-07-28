@@ -27,6 +27,7 @@ const NAV: NavSection[] = [
       { to: '/v3/mes-livres', label: 'Mes livres', icon: BookOpen },
       { to: '/v3/hub?tab=livres', label: 'Brouillons', icon: FolderOpen },
       { to: '/v3/pourquoi', label: 'Pourquoi EbookStudio', icon: Award, badge: 'À lire' },
+      { to: '/v3/script-heygen', label: 'Script vidéo HeyGen', icon: Video, badge: 'Pour vous' },
       { to: '/v3/outils', label: 'Tous les outils', icon: ListTree },
     ],
   },
