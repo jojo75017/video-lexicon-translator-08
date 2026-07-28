@@ -40,6 +40,37 @@ export default function V3KidsBookCreatePage() {
   const [loadingPlan, setLoadingPlan] = useState(true);
   const [draft, setDraft] = useState<KidsBookDraft>(loadDraft);
   const [generating, setGenerating] = useState<string | null>(null);
+  const [storyCount, setStoryCount] = useState<number>(10);
+  const [generatingStories, setGeneratingStories] = useState(false);
+
+  const generateStoriesWithAI = async () => {
+    if (!draft.title) { toast.error('Ajoute d\'abord un titre au livre.'); return; }
+    if (!draft.character.name || !draft.character.physical) {
+      toast.error('Complète la bible du personnage avant de générer les histoires.');
+      return;
+    }
+    setGeneratingStories(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('agent-kids-stories', {
+        body: {
+          bookTitle: draft.title,
+          targetAge: draft.targetAge,
+          characterBible: buildCharacterBibleText(draft.character),
+          count: storyCount,
+        },
+      });
+      if (error || !data?.stories?.length) throw new Error(error?.message || data?.error || 'Aucune histoire générée');
+      const newStories: KidsStory[] = data.stories.map((s: { title: string; synopsis: string }) => ({
+        id: crypto.randomUUID(), title: s.title, synopsis: s.synopsis,
+      }));
+      setDraft((d) => ({ ...d, stories: newStories }));
+      toast.success(`${newStories.length} histoires générées ✨`);
+    } catch (e: any) {
+      toast.error(e.message || 'Erreur génération histoires');
+    } finally {
+      setGeneratingStories(false);
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -249,10 +280,33 @@ export default function V3KidsBookCreatePage() {
 
         {/* Étape 3 — Histoires */}
         <div className="v3-card mb-4">
-          <div className="flex justify-between items-center mb-3">
+          <div className="flex flex-wrap justify-between items-center gap-2 mb-3">
             <h2 className="font-semibold">3. Tes histoires ({draft.stories.length})</h2>
-            <Button size="sm" variant="outline" onClick={addStory}>+ Ajouter</Button>
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-[var(--v3-muted)]">Nombre :</label>
+              <input
+                type="number" min={1} max={30} value={storyCount}
+                onChange={(e) => setStoryCount(Math.max(1, Math.min(30, Number(e.target.value) || 1)))}
+                className="w-16 px-2 py-1 rounded border border-neutral-300 bg-white text-sm"
+              />
+              <Button
+                size="sm"
+                onClick={generateStoriesWithAI}
+                disabled={generatingStories}
+                className="bg-[#064e3b] hover:bg-[#053d2e] text-white"
+              >
+                {generatingStories ? (
+                  <><Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" /> Génération…</>
+                ) : (
+                  <><Sparkles className="w-3.5 h-3.5 mr-1.5" /> Générer les histoires (IA)</>
+                )}
+              </Button>
+              <Button size="sm" variant="outline" onClick={addStory}>+ Ajouter</Button>
+            </div>
           </div>
+          <p className="text-xs text-[var(--v3-muted)] mb-3">
+            Astuce : clique <strong>« Générer les histoires (IA) »</strong> pour créer automatiquement {storyCount} mini-histoires cohérentes avec ton personnage, puis génère l'illustration de chaque histoire.
+          </p>
           <div className="space-y-4">
             {draft.stories.map((story, idx) => (
               <div key={story.id} className="border rounded-lg p-3 bg-white/60">
