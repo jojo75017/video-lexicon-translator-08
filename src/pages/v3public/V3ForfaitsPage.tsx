@@ -15,9 +15,9 @@ const PLAN_ICONS = {
 } as const;
 
 const PLAN_ACCENTS: Record<string, string> = {
-  debutant: "#10b981",
-  expert: "#f59e0b",
-  auteur: "#b45309",
+  debutant: "#0d7a5f",   // Auteur — émeraude douce
+  expert: "#C97A14",     // Studio — or/ambre (mis en avant)
+  auteur: "#5B21B6",     // Éditeur — pourpre édition
 };
 
 export default function V3ForfaitsPage() {
