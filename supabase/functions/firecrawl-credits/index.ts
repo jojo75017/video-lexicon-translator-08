@@ -73,9 +73,9 @@ Deno.serve(async (req) => {
     const l = limitData?.data ?? limitData ?? {};
 
     const remaining = d?.remaining_credits ?? d?.remainingCredits ?? d?.credits_remaining ?? null;
-    const planCredits = d?.plan_credits ?? d?.planCredits ?? l?.plan_credits ?? l?.credit_limit ?? null;
-    const billingPeriodStart = d?.billing_period_start ?? l?.billing_period_start ?? null;
-    const billingPeriodEnd = d?.billing_period_end ?? l?.billing_period_end ?? null;
+    const planCredits = d?.plan_credits ?? d?.planCredits ?? l?.plan_credits ?? l?.planCredits ?? l?.credit_limit ?? null;
+    const billingPeriodStart = d?.billing_period_start ?? d?.billingPeriodStart ?? l?.billing_period_start ?? l?.billingPeriodStart ?? null;
+    const billingPeriodEnd = d?.billing_period_end ?? d?.billingPeriodEnd ?? l?.billing_period_end ?? l?.billingPeriodEnd ?? null;
     const used = planCredits != null && remaining != null ? Math.max(0, planCredits - remaining) : null;
     const pct = planCredits && used != null ? Math.min(100, Math.round((used / planCredits) * 100)) : null;
 
