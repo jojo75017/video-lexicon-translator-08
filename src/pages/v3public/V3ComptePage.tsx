@@ -27,7 +27,7 @@ export default function V3ComptePage() {
       if (user) {
         const { data } = await supabase
           .from("ebook_projects")
-          .select("id,title,updated_at")
+          .select("id,title,updated_at,project_type")
           .eq("user_id", user.id)
           .order("updated_at", { ascending: false })
           .limit(5);
