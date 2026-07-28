@@ -84,6 +84,7 @@ const V3PourquoiPage = lazy(() => import('./pages/v3public/V3PourquoiPage'));
 const V3ScriptHeygenPage = lazy(() => import('./pages/v3public/V3ScriptHeygenPage'));
 const V3AmsKeywordsPage = lazy(() => import('./pages/v3public/V3AmsKeywordsPage'));
 const V3CompetitorSpyPage = lazy(() => import('./pages/v3public/V3CompetitorSpyPage'));
+const V3CategoryFinderPage = lazy(() => import('./pages/v3public/V3CategoryFinderPage'));
 const V3ForfaitsPage = lazy(() => import('./pages/v3public/V3ForfaitsPage'));
 const V3RecherchePage = lazy(() => import('./pages/v3public/V3RecherchePage'));
 const V3Upsell17Page = lazy(() => import('./pages/v3public/V3Upsell17Page'));
@@ -522,6 +523,7 @@ const App = () => {
               <Route path="upsell-17" element={<V3Upsell17Page />} />
               <Route path="outils/ams-keywords" element={<V3AmsKeywordsPage />} />
               <Route path="outils/espion-concurrents" element={<V3CompetitorSpyPage />} />
+              <Route path="outils/categories" element={<V3CategoryFinderPage />} />
               <Route path="hub" element={isPlannerPreviewHost ? <V3HubPage /> : <V3Gate><V3HubPage /></V3Gate>} />
             </Route>
 
