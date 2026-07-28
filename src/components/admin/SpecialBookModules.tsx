@@ -13,6 +13,7 @@ import EbookDiaryGenerator from '@/components/ebook/EbookDiaryGenerator';
 import EbookAquariumGenerator from '@/components/ebook/EbookAquariumGenerator';
 import EbookBirdSheetGenerator from '@/components/ebook/EbookBirdSheetGenerator';
 import { EbookMultiTomeHub } from '@/components/ebook/EbookMultiTomeHub';
+import ProBookShell from '@/components/ebook/pro/ProBookShell';
 
 const CONFIG_KEY = 'edition_book_config_v1';
 
