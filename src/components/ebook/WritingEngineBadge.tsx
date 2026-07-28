@@ -61,9 +61,9 @@ export const WritingEngineBadge: React.FC<WritingEngineBadgeProps> = ({ tier, is
     tier ?? (isPro ? 'auteur' : 'debutant');
 
   const tierLabel =
-    activeTier === 'auteur' ? 'Auteur 59 €/mois'
-    : activeTier === 'expert' ? 'Expert 9,99 €/mois'
-    : 'Débutant 6,99 €/mois';
+    activeTier === 'auteur' ? 'Éditeur 59 €/mois'
+    : activeTier === 'expert' ? 'Studio 12,99 €/mois'
+    : 'Auteur 9,99 €/mois';
 
   const canUpgrade = activeTier !== 'auteur';
 
@@ -88,13 +88,16 @@ export const WritingEngineBadge: React.FC<WritingEngineBadgeProps> = ({ tier, is
           {/* En-têtes colonnes */}
           <div />
           <div className={`text-center text-[11px] font-bold uppercase tracking-wide py-2 ${activeTier === 'debutant' ? 'text-foreground' : 'text-muted-foreground'}`}>
-            Débutant<br />6,99 €/mois
+            🌱 Auteur<br />9,99 €/mois
           </div>
-          <div className={`text-center text-[11px] font-bold uppercase tracking-wide py-2 ${activeTier === 'expert' ? 'text-foreground' : 'text-muted-foreground'}`}>
-            Expert<br />9,99 €/mois
+          <div
+            className="text-center text-[11px] font-black uppercase tracking-wide py-2 rounded-t-lg"
+            style={{ color: '#C97A14', background: '#C97A1412' }}
+          >
+            🚀 Studio ⭐<br />12,99 €/mois
           </div>
           <div className="text-center text-[11px] font-black uppercase tracking-wide py-2 rounded-t-lg" style={{ color: TEAL, background: `${TEAL}12` }}>
-            <span className="inline-flex items-center gap-1"><Crown className="h-3 w-3" />Auteur</span><br />59 €/mois
+            <span className="inline-flex items-center gap-1"><Crown className="h-3 w-3" />Éditeur</span><br />59 €/mois
           </div>
 
           {ROWS.map((row, i) => (
@@ -119,12 +122,12 @@ export const WritingEngineBadge: React.FC<WritingEngineBadgeProps> = ({ tier, is
       {/* Call to action / statut */}
       {!canUpgrade ? (
         <div className="px-4 sm:px-5 py-3 text-[12px] font-semibold" style={{ background: `${TEAL}0d`, color: TEAL }}>
-          ✓ Vous êtes sur le palier <strong>Auteur</strong> — toutes les capacités ci-dessus sont actives.
+          ✓ Vous êtes sur le palier <strong>Éditeur</strong> — toutes les capacités ci-dessus sont actives.
         </div>
       ) : (
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-5 py-3.5" style={{ background: `${AMBER}12` }}>
           <span className="text-[12px] text-foreground max-w-md">
-            <strong>Passez au palier Auteur (59 €/mois)</strong> pour débloquer les 30 agents, l'édition Pro, le comité de lecture et des livres illimités.
+            <strong>Passez au palier Éditeur (59 €/mois)</strong> pour débloquer les 30 agents, l'édition Pro, le comité de lecture et des livres illimités.
           </span>
           {onUpgrade && (
             <button

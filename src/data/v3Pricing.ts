@@ -19,8 +19,8 @@ export interface V3Plan {
 export const V3_PLANS: V3Plan[] = [
   {
     id: "debutant",
-    name: "Débutant",
-    tagline: "Publiez vos premiers livres proprement sur KDP",
+    name: "Auteur",
+    tagline: "🌱 Je démarre — publier mes premiers livres proprement sur KDP",
     monthlyPrice: 9.99,
     yearlyPrice: 97,
     booksPerMonth: 10,
@@ -41,8 +41,8 @@ export const V3_PLANS: V3Plan[] = [
   },
   {
     id: "expert",
-    name: "Expert",
-    tagline: "Plus de livres, plus de contrôle, plus de conversions",
+    name: "Studio",
+    tagline: "🚀 Je produis efficacement — plus de livres, plus de contrôle, plus de conversions",
     monthlyPrice: 12.99,
     yearlyPrice: 117,
     booksPerMonth: 20,
@@ -63,8 +63,8 @@ export const V3_PLANS: V3Plan[] = [
   },
   {
     id: "auteur",
-    name: "Auteur",
-    tagline: "L'atelier d'édition complet : tout, illimité, sans compromis",
+    name: "Éditeur",
+    tagline: "👑 Je pilote une vraie maison d'édition — tout, illimité, sans compromis",
     monthlyPrice: 59,
     yearlyPrice: 547,
     booksPerMonth: null,
