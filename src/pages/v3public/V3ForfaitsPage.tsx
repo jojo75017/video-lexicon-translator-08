@@ -18,7 +18,9 @@ import {
   V3_PLANS,
   formatPrice,
   getYearlySavingsPercent,
+  getV3PriceId,
   type V3BillingInterval,
+  type V3PlanId,
 } from "@/data/v3Pricing";
 
 const PLAN_ICONS = {
