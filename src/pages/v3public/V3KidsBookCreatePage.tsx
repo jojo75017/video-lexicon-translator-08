@@ -178,6 +178,20 @@ export default function V3KidsBookCreatePage() {
           </p>
         </div>
 
+        {!planAllowed && (
+          <div className="v3-card mb-4 border-l-4 border-[#C97A14] bg-[#fff7ec]">
+            <div className="flex items-start gap-3">
+              <Lock className="w-5 h-5 text-[#C97A14] shrink-0 mt-0.5" />
+              <div className="text-sm text-[var(--v3-ink)]">
+                <strong>Mode aperçu.</strong> La génération d'illustrations est incluse dans les forfaits{' '}
+                <strong>Studio</strong> et <strong>Éditeur</strong>. Tu peux tester le wizard librement ;
+                l'export d'album nécessite un forfait éligible.{' '}
+                <Link to="/v3/forfaits" className="underline text-[#C97A14]">Voir les forfaits</Link>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Étape 1 — Livre */}
         <div className="v3-card mb-4">
           <h2 className="font-semibold mb-3">1. Ton livre</h2>
