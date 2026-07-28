@@ -496,9 +496,10 @@ const App = () => {
               <Route path="u/:slug" element={<V3AuthorProfilePage />} />
               <Route path="mes-livres" element={<V3BookManagerPage />} />
               <Route path="parametres" element={<V3AuthorSettingsPage />} />
-              <Route path="livres/:type" element={<V3SpecialBookPage />} />
-              <Route path="offres" element={<V3OffresPage />} />
-              <Route path="offres/merci" element={<V3OffresMerciPage />} />
+              <Route path="livres/:type" element={<Navigate to="/v3/forfaits" replace />} />
+              <Route path="offres" element={<Navigate to="/v3/forfaits" replace />} />
+              <Route path="offres/merci" element={<Navigate to="/v3/forfaits" replace />} />
+
               <Route path="outils" element={<V3ToolsIndexPage />} />
               <Route path="outils/sommaire-ultime" element={<V3TocUltimatePage />} />
               <Route path="outils/traduction" element={<V3TranslatorPage />} />
