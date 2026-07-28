@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ExternalLink, BookOpen } from 'lucide-react';
+import { BackButton } from '@/components/v3/BackButton';
 
 const STATS = [
   { label: 'Livres publiés', value: '71' },
