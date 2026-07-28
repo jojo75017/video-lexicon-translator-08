@@ -203,7 +203,7 @@ export default function V3ComptePage() {
                     </p>
                   </div>
                   <Link
-                    to={`/v3/book/${p.id}`}
+                    to={(p as any).project_type === 'kids_book' ? `/v3/create/illustre?projectId=${p.id}` : `/v3/book/${p.id}`}
                     className="text-xs font-semibold px-3 py-1.5 rounded-md border"
                     style={{ borderColor: "#e5e7eb", color: "#008296" }}
                   >
