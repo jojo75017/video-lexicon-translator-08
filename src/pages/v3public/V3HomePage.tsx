@@ -77,7 +77,7 @@ export default function V3HomePage() {
             >
               Obtenir ma clé gratuite
             </a>
-            <Link to="/v3/gemini-key" className="v3-btn v3-btn-on-dark text-[12.5px] whitespace-nowrap">
+            <Link to="/v3/compte" className="v3-btn v3-btn-on-dark text-[12.5px] whitespace-nowrap">
               Coller ma clé
             </Link>
           </div>
