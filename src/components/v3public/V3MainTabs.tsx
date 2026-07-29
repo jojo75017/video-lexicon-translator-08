@@ -49,6 +49,18 @@ export default function V3MainTabs() {
       <div className="max-w-7xl mx-auto px-5 md:px-8 h-14 flex items-center gap-1">
         {/* Desktop (≥ lg) */}
         <nav className="hidden lg:flex items-center gap-0.5 flex-1 min-w-0">
+          <NavLink
+            to="/v3"
+            end
+            className={({ isActive }) =>
+              `v3-nav-item flex items-center gap-1.5 px-3 py-2 text-[13.5px] v3-serif font-semibold`
+            }
+            style={({ isActive }) => ({ color: isActive ? 'var(--v3-emerald)' : 'var(--v3-ink)' })}
+          >
+            <span aria-hidden className="text-[15px]">🏠</span>
+            <span>Accueil</span>
+          </NavLink>
+
           {V3_HEADER_MENU.map((cat) => {
             const active = openKey === cat.key || isCatActive(cat);
             const cols = cat.links.length > 8 ? 3 : cat.links.length > 4 ? 2 : 1;

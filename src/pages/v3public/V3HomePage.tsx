@@ -48,8 +48,45 @@ export default function V3HomePage() {
 
   return (
     <>
+      {/* BANNIÈRE — Clé Gemini obligatoire */}
+      <section
+        className="relative"
+        style={{
+          background: 'linear-gradient(90deg, #064e3b 0%, #0a5a45 100%)',
+          borderBottom: '1px solid rgba(201,168,76,0.4)',
+        }}
+      >
+        <div className="max-w-7xl mx-auto px-5 md:px-8 py-3 flex flex-col md:flex-row items-start md:items-center gap-3 justify-between">
+          <div className="flex items-start md:items-center gap-3 text-white">
+            <span
+              className="grid place-items-center w-8 h-8 rounded-full shrink-0"
+              style={{ background: 'var(--v3-gold)', color: '#1a1408', fontWeight: 700 }}
+            >
+              🔑
+            </span>
+            <div className="text-[13.5px] leading-snug">
+              <strong style={{ color: 'var(--v3-gold)' }}>Avant de commencer :</strong> branchez votre <strong>clé Gemini gratuite</strong> (60 s, quota généreux offert par Google) pour déverrouiller la V3 sans limite.
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <a
+              href="https://aistudio.google.com/apikey"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="v3-btn v3-btn-gold text-[12.5px] whitespace-nowrap"
+            >
+              Obtenir ma clé gratuite
+            </a>
+            <Link to="/v3/compte" className="v3-btn v3-btn-on-dark text-[12.5px] whitespace-nowrap">
+              Coller ma clé
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* HERO — éditorial Émeraude & Or */}
       <section
+
         className="relative overflow-hidden"
         style={{
           background:
