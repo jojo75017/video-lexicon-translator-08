@@ -231,6 +231,44 @@ async function firecrawlScrape(
   return data.data || data;
 }
 
+async function scraperApiScrape(
+  url: string,
+  marketplace: string,
+): Promise<FirecrawlScrapePayload | null> {
+  const key = Deno.env.get('SCRAPERAPI_KEY');
+  if (!key) return null;
+  const country = (MARKET_COUNTRY[marketplace] || 'FR').toLowerCase();
+  const params = new URLSearchParams({
+    api_key: key,
+    url,
+    country_code: country,
+    render: 'true',
+    keep_headers: 'true',
+  });
+  try {
+    const response = await fetch(`https://api.scraperapi.com/?${params.toString()}`, {
+      method: 'GET',
+    });
+    if (!response.ok) {
+      console.error('ScraperAPI error:', response.status, await response.text().catch(() => ''));
+      return null;
+    }
+    const html = await response.text();
+    if (!html || html.length < 500) return null;
+    const markdown = html
+      .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    console.log('ScraperAPI OK pour', url, '— HTML length:', html.length);
+    return { html, rawHtml: html, markdown, metadata: {} };
+  } catch (e) {
+    console.error('ScraperAPI exception:', e);
+    return null;
+  }
+}
+
 function mapSearchResults(items: FirecrawlSearchItem[]) {
   const seen = new Set<string>();
 
@@ -317,15 +355,26 @@ async function resolveAmazonBook(
 
   // 2) Firecrawl en complément (description, image, fallback)
   const directUrl = `https://www.${domain}/dp/${asin}`;
-  const directScrape = await firecrawlScrape(firecrawlApiKey, directUrl, marketplace);
+  let directScrape = await firecrawlScrape(firecrawlApiKey, directUrl, marketplace);
   const searchHit = await searchAmazonByAsin(firecrawlApiKey, asin, marketplace, domain);
 
   let selectedScrape = directScrape;
+  let scrapeSource: 'firecrawl' | 'scraperapi' = 'firecrawl';
 
   if ((!selectedScrape || looksLikeInterstitial(selectedScrape.markdown, selectedScrape.metadata)) && searchHit?.url) {
     const fallbackScrape = await firecrawlScrape(firecrawlApiKey, searchHit.url, marketplace);
     if (fallbackScrape && !looksLikeInterstitial(fallbackScrape.markdown, fallbackScrape.metadata)) {
       selectedScrape = fallbackScrape;
+    }
+  }
+
+  // 2bis) Fallback ScraperAPI si Firecrawl a échoué ou renvoyé un interstitiel
+  if (!selectedScrape || looksLikeInterstitial(selectedScrape.markdown, selectedScrape.metadata)) {
+    console.log('Firecrawl KO, bascule sur ScraperAPI pour', asin);
+    const scraperApiScrapeResult = await scraperApiScrape(directUrl, marketplace);
+    if (scraperApiScrapeResult && !looksLikeInterstitial(scraperApiScrapeResult.markdown, scraperApiScrapeResult.metadata)) {
+      selectedScrape = scraperApiScrapeResult;
+      scrapeSource = 'scraperapi';
     }
   }
 
@@ -355,9 +404,9 @@ async function resolveAmazonBook(
     if (paapiData.categories && paapiData.categories.length > 0) {
       book.categories = [...new Set([...paapiData.categories, ...(book.categories || [])])].slice(0, 8);
     }
-    (book as any).source = 'paapi+firecrawl';
+    (book as any).source = `paapi+${scrapeSource}`;
   } else {
-    (book as any).source = 'firecrawl';
+    (book as any).source = scrapeSource;
   }
 
   const keywordSource = [
