@@ -404,9 +404,9 @@ async function resolveAmazonBook(
     if (paapiData.categories && paapiData.categories.length > 0) {
       book.categories = [...new Set([...paapiData.categories, ...(book.categories || [])])].slice(0, 8);
     }
-    (book as any).source = 'paapi+firecrawl';
+    (book as any).source = `paapi+${scrapeSource}`;
   } else {
-    (book as any).source = 'firecrawl';
+    (book as any).source = scrapeSource;
   }
 
   const keywordSource = [
