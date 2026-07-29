@@ -22,6 +22,7 @@ export const V3_LAUNCH_DATE_ISO = "2026-10-01T08:00:00+02:00";
 export const V3_PUBLIC_PREVIEW_PATHS = new Set<string>([
   "/v3",
   "/v3/pourquoi",
+  "/v3/realite-kdp",
   "/v3/offre",
   "/v3/auth",
 ]);

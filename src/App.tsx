@@ -83,6 +83,7 @@ const V3TranslatorPage = lazy(() => import('./pages/v3public/V3TranslatorPage'))
 const V3ToolsIndexPage = lazy(() => import('./pages/v3public/V3ToolsIndexPage'));
 const V3ComptePage = lazy(() => import('./pages/v3public/V3ComptePage'));
 const V3PourquoiPage = lazy(() => import('./pages/v3public/V3PourquoiPage'));
+const V3RealiteKdpPage = lazy(() => import('./pages/v3public/V3RealiteKdpPage'));
 const V3CommunautePage = lazy(() => import('./pages/v3public/V3CommunautePage'));
 const V3CommunautePostPage = lazy(() => import('./pages/v3public/V3CommunautePostPage'));
 const V3ScriptHeygenPage = lazy(() => import('./pages/v3public/V3ScriptHeygenPage'));
@@ -516,6 +517,7 @@ const App = () => {
               <Route index element={<V3HomePage />} />
               <Route path="auth" element={<V3AuthPage />} />
               <Route path="pourquoi" element={<V3PourquoiPage />} />
+              <Route path="realite-kdp" element={<V3RealiteKdpPage />} />
               <Route path="offre" element={<V3OffrePage />} />
 
               {/* Routes verrouillées jusqu'au 1er octobre 2026 (admins exceptés) */}
