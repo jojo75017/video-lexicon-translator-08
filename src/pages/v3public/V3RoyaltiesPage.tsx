@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import BackButton from '@/components/v3public/BackButton';
+import BackButton from '@/components/v3/BackButton';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import BackButton from '@/components/v3public/BackButton';
+import BackButton from '@/components/v3/BackButton';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {

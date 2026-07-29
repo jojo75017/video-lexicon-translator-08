@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import BackButton from '@/components/v3public/BackButton';
+import BackButton from '@/components/v3/BackButton';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
