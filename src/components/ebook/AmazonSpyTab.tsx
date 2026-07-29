@@ -15,6 +15,7 @@ import { motion } from 'framer-motion';
 import { FirecrawlNoticeBanner } from './FirecrawlNoticeBanner';
 import { FirecrawlCreditsIndicator } from './FirecrawlCreditsIndicator';
 import { KdpPilotAccuracyBanner } from './KdpPilotAccuracyBanner';
+import { ScrapedMetricWarning } from './ScrapedMetricWarning';
 
 interface SpyBook {
   title: string;
