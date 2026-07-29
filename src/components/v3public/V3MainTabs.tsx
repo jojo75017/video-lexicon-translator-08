@@ -53,13 +53,16 @@ export default function V3MainTabs() {
             to="/v3"
             end
             className={({ isActive }) =>
-              `v3-nav-item flex items-center gap-1.5 px-3 py-2 text-[13.5px] v3-serif font-semibold`
+              `v3-btn text-[12px] ml-1 mr-1 ${isActive ? 'v3-btn-gold' : 'v3-btn-outline'}`
             }
-            style={({ isActive }) => ({ color: isActive ? 'var(--v3-emerald)' : 'var(--v3-ink)' })}
+            style={({ isActive }) =>
+              isActive ? {} : { borderColor: 'var(--v3-gold)', color: 'var(--v3-emerald)' }
+            }
           >
             <span aria-hidden className="text-[15px]">🏠</span>
             <span>Accueil</span>
           </NavLink>
+
 
           {V3_HEADER_MENU.map((cat) => {
             const active = openKey === cat.key || isCatActive(cat);
