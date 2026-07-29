@@ -1,103 +1,108 @@
+# Communauté EbookStudio V3 — Forum pré-rempli
 
-# Feuille de route — Documentaire · Atlas · Cuisine · Voyage
+## État actuel (vérifié)
 
-Objectif : moderniser ces 4 modules « livres spéciaux » en **deux niveaux** :
-- **Version Standard** : incluse dans les 3 forfaits (Débutant 9,99 € · Expert 12,99 € · Éditeur 59 €)
-- **Version Pro avancée** : réservée au forfait **Éditeur 59 €** uniquement
+- Backend forum **déjà en place** : tables `forum_categories` (10 rubriques), `forum_posts` (11), `forum_replies` (3), `forum_likes`, `forum_notifications` — RLS + triggers de comptage OK.
+- Hook `useForum.ts` prêt (posts, replies, likes, notifications, realtime).
+- Composant `CommunityKdpHub.tsx` prêt (lanceur depuis le hub V3).
+- **Problème** : la route `/communaute` dans `src/App.tsx` ligne 357 redirige vers `/offres` → la communauté n'est **pas accessible** aujourd'hui.
+- Seulement 11 posts existants → contenu insuffisant pour donner l'impression d'une communauté active.
 
-## Matrice Standard vs Pro (par module)
+## Objectif
 
-| Fonctionnalité | Standard (3 plans) | Pro (Éditeur 59 €) |
-|---|---|---|
-| Nb de chapitres/fiches/recettes/étapes | jusqu'à 15 | jusqu'à 60 |
-| Longueur par section | 400-800 mots | 1500-2500 mots |
-| Illustrations IA | 1 par section (basique) | 2-3 par section HD photoréalistes |
-| Structure | linéaire simple | encadrés, sources, index, annexes |
-| Format KDP | 1 format par défaut | tous formats KDP + couverture assortie via Cover Studio Pro |
-| Export | PDF + DOCX | PDF print-ready (bleed) + DOCX + EPUB |
-| Sections obligatoires | Sommaire + Remerciements | + Bibliographie / Index / À propos de l'auteur / Note pour avis |
-| Résilience | génération unique | checkpoints localStorage + reprise après crash |
-| Métadonnées KDP | manuelles | Fiche produit IA (description, keywords, catégories) |
+Livrer une communauté visible et vivante dès l'ouverture, avec **220+ questions déjà posées** (et une majorité déjà répondues) couvrant l'ensemble des modules V3, façon forum officiel Amazon KDP.
 
-## Vue d'ensemble des modules
+## Plan
 
-| Module | Route | Composant actuel V2 |
-|---|---|---|
-| Documentaire | `/v3/livres/documentaire` | `EbookDocumentaryGenerator` |
-| Atlas | `/v3/livres/atlas` | `EbookAtlas` |
-| Cuisine | `/v3/livres/cuisine` | `EbookRecipeBookGenerator` |
-| Voyage | `/v3/livres/voyage` | `EbookTravelGuideGenerator` |
+### 1. Réactiver la route `/communaute`
+- Remplacer la redirection par une vraie page `V3CommunautePage.tsx` (liste des rubriques + fil des dernières discussions + bouton "Nouvelle discussion").
+- Route `/communaute/:slug` pour la rubrique, `/communaute/post/:id` pour le fil.
+- Lecture publique (SEO, `robots` OK), écriture réservée aux abonnés connectés (garde via `SubscriberGate` existant sur les actions).
 
-## Jour 1 — Socle commun (matin)
+### 2. Ajuster les rubriques (compléter les 10 existantes si besoin)
+Rubriques cibles alignées sur les modules V3 :
+1. Créer un livre (Assistant V3, sommaire, personnages, import)
+2. Écrire (Planner 22 agents, Parcours 30 agents, BookPerfect, Ebookbot)
+3. Couvertures & visuels (Cover Studio KDP, Cover Studio Pro V3, illustrations)
+4. Livres illustrés & enfants (3-7 ans, histoires du soir)
+5. Livres spéciaux (Cuisine, Voyage, Atlas, Documentaire, Univers multi-volumes, BD)
+6. Publier sur Amazon KDP (Audit Pilot, catégories, mots-clés, ISBN, conformité)
+7. Vendre & marketing (AMS Keywords, Espion Concurrents, tunnels, emails, affiliation)
+8. Traductions & international (10 langues, KDP Étranger)
+9. Compte, forfaits & paiements (Débutant/Studio/Éditeur, PayPal, upsells 17 €)
+10. Clés API & tokens (Gemini BYOK, OpenRouter, quotas)
 
-1. Audit rapide des 4 composants existants dans `src/components/ebook/`.
-2. Créer un socle partagé `src/components/ebook/pro/` :
-   - `ProBookShell.tsx` — layout uniforme (fiche projet, progress bar, bouton lancer)
-   - `useProBookGeneration.ts` — hook commun : appel agent → images → checkpoints localStorage → export (calqué sur Kids Book)
-   - `ProBookExporter.ts` — PDF/DOCX avec images intégrées HD
-   - `useProBookTier.ts` — hook qui lit `useV3Entitlement` et retourne `'standard' | 'pro'` (Pro si plan `editeur` / `lifetime` / `vip`)
-3. Badge visuel « Version PRO » / « Version Standard » selon plan, avec CTA d'upsell discret vers `/v3/forfaits` pour les non-Éditeur.
+### 3. Générer 220+ questions + réponses de référence
 
-## Jour 1 — Documentaire (après-midi)
+Répartition indicative (≈ 20-25 par rubrique) :
 
-4. Edge function `agent-documentary` avec paramètre `tier: 'standard' | 'pro'` :
-   - Standard : N chapitres 400-800 mots, structure simple
-   - Pro : N chapitres 1500-2500 mots, encadrés « Le saviez-vous », citations sourcées, bibliographie auto
-5. Génération images photoréalistes via `generate-illustration` (Gemini) : 1/section en standard, 2-3/section en pro.
-6. Format KDP : 15,24 × 22,86 cm (6"×9").
-7. Sections finales adaptées au tier.
+```text
+Rubrique                              Posts   Réponses épinglées
+Créer un livre                          25          25
+Écrire                                  25          25
+Couvertures & visuels                   22          22
+Livres illustrés enfants                20          20
+Livres spéciaux                         22          22
+Publier KDP                             25          25
+Vendre & marketing                      22          22
+Traductions                             18          18
+Compte, forfaits, paiements             22          22
+Clés API & tokens                       20          20
+TOTAL                                   221         221
+```
 
-## Jour 2 — Atlas (matin)
+- Chaque post = **une vraie question d'abonné** (formulation naturelle, tags pertinents).
+- Chaque post reçoit **au moins une réponse "solution"** signée `Équipe EbookStudio`, épinglée (`is_pinned = true` sur la question type FAQ).
+- ~30 % des posts reçoivent une **2ᵉ réponse** d'un "membre" pour l'aspect communautaire.
+- Auteurs : compte système `equipe@ebookstudio.fr` + une dizaine de pseudos d'abonnés fictifs cohérents (aucun vrai email).
+- Dates étalées sur les 4 derniers mois (pas toutes le même jour).
+- Compteurs `likes_count` / `replies_count` cohérents.
 
-8. Edge function `agent-atlas` avec tiers :
-   - Standard : fiches courtes (données clés + description)
-   - Pro : fiches longues (géographie, histoire, culture, économie, curiosités, données chiffrées, encadrés)
-9. Illustrations : 1 carte stylisée IA par fiche (standard) + 1-2 photos emblématiques additionnelles (pro).
-10. Format Standard : portrait 6"×9" · Pro : paysage 25,4 × 20,32 cm avec mise en page 2 colonnes.
-11. Pro uniquement : index alphabétique auto + sommaire cliquable enrichi.
+### 4. Intégration UI
 
-## Jour 2 — Cuisine (après-midi)
+- Lien **Communauté** visible dans `V3Sidebar` (haut) + item dans le mega-menu header (rubrique "Vendre" ou nouvelle entrée dédiée).
+- Sur le hub V3, `CommunityKdpHub.tsx` pointe déjà vers `/communaute` — rien à changer.
+- Page rubrique : solutions épinglées en tête, puis discussions par activité récente.
+- Recherche simple (input + filtre client-side sur titre/tags) — pas de full-text serveur pour cette itération.
 
-12. Edge function `agent-recipe` avec tiers :
-    - Standard : titre, ingrédients, étapes, temps
-    - Pro : + astuces chef, variantes, valeurs nutritionnelles estimées, difficulté, portions ajustables
-13. Photo plat photoréaliste : 1/recette (standard), 2/recette + photo pas-à-pas (pro).
-14. Format : carré 21,59 × 21,59 cm (KDP).
-15. Pro uniquement : index par ingrédient, conversions mesures, page auteur, catégorisation par régime/occasion.
+### 5. Écriture réservée aux abonnés
 
-## Jour 3 — Voyage (matin)
+- Boutons "Nouvelle discussion" / "Répondre" masqués si non-connecté → CTA vers `/auth`.
+- Utilisateur connecté non-abonné : message doux "Réservé aux abonnés Débutant / Studio / Éditeur" + lien `/v3/forfaits`.
+- Admins : accès édition/épinglage/suppression (gate via `has_role`).
 
-16. Edge function `agent-travel` avec tiers :
-    - Standard : itinéraire jour par jour + top lieux
-    - Pro : + où dormir/manger par gamme, transports, budget estimé, phrases utiles, encart sécurité/santé, checklist voyage
-17. Illustrations : 1 photo lieu emblématique par étape (standard) + carte itinéraire stylisée IA globale (pro).
-18. Format 15 × 22 cm, encarts pratiques colorés en Pro.
+### 6. SEO
 
-## Jour 3 — Intégration & finitions (après-midi)
+- `<title>` et meta description par rubrique et par post.
+- URLs propres `/communaute/publier-kdp/pourquoi-mon-livre-est-il-bloque`.
+- JSON-LD `QAPage` sur chaque post (Question + acceptedAnswer).
+- Sitemap : ajout d'un `sitemap-communaute.xml` généré à partir des posts publics.
 
-19. Sidebar V3 : 4 entrées « Documentaire », « Atlas », « Cuisine », « Voyage » avec badge « PRO disponible » (pas d'exclusivité totale).
-20. Bouton « Ouvrir dans Cover Studio Pro » depuis chaque module (préréglage catégorie) — actif pour tous, avec templates Pro exclusifs Éditeur.
-21. Persistance cloud dans `ebook_projects` avec `project_type` = `documentary` / `atlas` / `recipe` / `travel` et un flag `tier`.
-22. Tests Playwright : pour chaque module × chaque tier (2×4 = 8 scénarios), générer un mini-livre 3 sections et vérifier export PDF avec images.
-23. Retirer/rediriger les anciens composants V2 obsolètes une fois validé.
+## Détails techniques
 
-## Aspects techniques
+- Seed en une seule migration `insert` (données, pas de schéma) : ~220 INSERT dans `forum_posts` + ~300 dans `forum_replies`, avec `user_id` = uuid système fixe (ex. `00000000-0000-0000-0000-00000000c0de`).
+- Pas de nouveau schéma requis — RLS actuel autorise déjà `select` public sur `forum_posts`/`forum_replies` (à vérifier au moment du seed ; sinon ajuster policy en même migration).
+- Nouveaux fichiers :
+  - `src/pages/v3public/V3CommunautePage.tsx` (index rubriques + derniers posts)
+  - `src/pages/v3public/V3CommunauteCategoryPage.tsx`
+  - `src/pages/v3public/V3CommunautePostPage.tsx`
+  - `src/data/forumSeed.ts` (source des Q/R, utilisé par le script de seed)
+  - `supabase/migrations/xxxx_forum_seed.sql` (INSERT bulk)
+- Routes à ajouter dans `App.tsx` (remplace la redirection actuelle).
+- Composant `ForumPostCard`, `ForumReplyItem`, `PinnedSolutionBadge`.
+- Realtime déjà géré par `useForumPosts` / `useForumReplies`.
 
-- **Réutilisation** : socle Kids Book (progress bar, checkpoints, export PDF avec images intégrées) = patron directeur.
-- **Images** : `generate-illustration` (Gemini 3 Flash Image), prompts spécialisés par module (photoréalisme strict — respect règle mémoire).
-- **Gating** : `useV3Entitlement` détermine le tier ; aucun blocage d'accès au module, seule la richesse change.
-- **Résilience** : checkpoint localStorage après chaque section (Pro), reprise si crash IA.
-- **BYOK** : respect clé Gemini utilisateur si présente.
-- **Cover Studio Pro** : templates réservés Éditeur pour les catégories Documentaire / Atlas / Cuisine / Voyage.
+## Livrables
 
-## Hors périmètre (à valider ensuite)
+1. Route `/communaute` fonctionnelle (index + rubrique + post).
+2. 220+ questions et 300+ réponses seedées, réparties sur toutes les rubriques V3.
+3. Lien sidebar + header.
+4. Écriture protégée par auth + statut abonné.
+5. SEO (meta + JSON-LD QAPage) et sitemap communauté.
 
-- Mockup 3D des livres
-- Traduction automatique (upsell 1-clic post-génération)
-- Version audio des chapitres
+## Hors périmètre (à faire plus tard)
 
-## Points à confirmer avant de coder
-
-1. Valider la matrice Standard/Pro ci-dessus (limites de chapitres, longueurs, nombre d'images) — ces chiffres sont-ils OK ou tu veux ajuster ?
-2. En Standard, on garde bien l'accès à **tous les 4 modules** pour les 3 forfaits (Débutant inclus) ou tu veux verrouiller certains sur Expert minimum ?
-3. Ordre de traitement : je commence par Documentaire (jour 1) comme prévu, ou tu préfères un autre module en premier ?
+- Notifications email des réponses (déjà en table `forum_notifications`, il reste juste l'envoi Brevo/Resend).
+- Modération avancée (signalement, banissement).
+- Recherche full-text serveur (`tsvector`).
+- Badges de réputation membres.

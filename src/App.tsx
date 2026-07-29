@@ -81,6 +81,8 @@ const V3TranslatorPage = lazy(() => import('./pages/v3public/V3TranslatorPage'))
 const V3ToolsIndexPage = lazy(() => import('./pages/v3public/V3ToolsIndexPage'));
 const V3ComptePage = lazy(() => import('./pages/v3public/V3ComptePage'));
 const V3PourquoiPage = lazy(() => import('./pages/v3public/V3PourquoiPage'));
+const V3CommunautePage = lazy(() => import('./pages/v3public/V3CommunautePage'));
+const V3CommunautePostPage = lazy(() => import('./pages/v3public/V3CommunautePostPage'));
 const V3ScriptHeygenPage = lazy(() => import('./pages/v3public/V3ScriptHeygenPage'));
 const V3AmsKeywordsPage = lazy(() => import('./pages/v3public/V3AmsKeywordsPage'));
 const V3CompetitorSpyPage = lazy(() => import('./pages/v3public/V3CompetitorSpyPage'));
@@ -354,7 +356,8 @@ const App = () => {
             <Route path="/guide-ebook" element={<Navigate to="/formation" replace />} />
             <Route path="/kdp-ads-guide" element={<Navigate to="/formation" replace />} />
             <Route path="/checklist-tournage" element={<Navigate to="/formation" replace />} />
-            <Route path="/communaute" element={<Navigate to="/offres" replace />} />
+            <Route path="/communaute" element={<V3CommunautePage />} />
+            <Route path="/communaute/post/:id" element={<V3CommunautePostPage />} />
             <Route path="/ai-chat" element={<Navigate to="/ebookbot" replace />} />
             <Route path="/business-center" element={<Navigate to="/admin" replace />} />
             <Route path="/plan-marketing" element={<Navigate to="/admin" replace />} />
