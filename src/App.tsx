@@ -89,6 +89,7 @@ const V3CompetitorSpyPage = lazy(() => import('./pages/v3public/V3CompetitorSpyP
 const V3OutilsOffertsPage = lazy(() => import('./pages/v3public/V3OutilsOffertsPage'));
 const V3CategoryFinderPage = lazy(() => import('./pages/v3public/V3CategoryFinderPage'));
 const V3ForfaitsPage = lazy(() => import('./pages/v3public/V3ForfaitsPage'));
+const V3PayPalReturnPage = lazy(() => import('./pages/v3public/V3PayPalReturnPage'));
 const V3RecherchePage = lazy(() => import('./pages/v3public/V3RecherchePage'));
 const V3Upsell17Page = lazy(() => import('./pages/v3public/V3Upsell17Page'));
 
