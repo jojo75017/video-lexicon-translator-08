@@ -658,9 +658,12 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
       if (!hasAnyContent && /^chapitre\s+\d+$/i.test(chapter.title.trim())) return;
 
       const tocTitle = resolveChapter(chapter, index).displayTitle;
+      const safeTocTitle = isGenericTitle(tocTitle)
+        ? `Chapitre ${index + 1}`
+        : `Chapitre ${index + 1} – ${tocTitle}`;
       children.push(new Paragraph({
         children: [new TextRun({
-          text: isGenericTitle(tocTitle) ? `Chapitre ${index + 1}` : `Chapitre ${index + 1} – ${tocTitle}`,
+          text: safeTocTitle,
           size: baseSize,
           font,
         })],
