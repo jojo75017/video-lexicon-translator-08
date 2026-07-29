@@ -473,12 +473,10 @@ function extractFromHtml(html: string) {
   };
   if (!html) return result;
 
-  // Price from offer blocks (Amazon a-price classes)
-  const priceWhole = html.match(/<span[^>]*class="[^"]*a-price-whole[^"]*"[^>]*>([\d\s.,]+)<\/span>\s*(?:<span[^>]*class="[^"]*a-price-decimal[^"]*"[^>]*>[^<]*<\/span>\s*<span[^>]*class="[^"]*a-price-fraction[^"]*"[^>]*>([\d]+)<\/span>)?/i);
-  if (priceWhole) {
-    const w = priceWhole[1].replace(/[^\d]/g, '');
-    const f = priceWhole[2] ? priceWhole[2].replace(/[^\d]/g, '') : '00';
-    const num = parseFloat(`${w}.${f}`);
+  // Price from offer blocks (Amazon a-price classes — whole/decimal/fraction sont IMBRIQUÉS, pas frères)
+  const priceMatch = html.match(/a-price-whole"[^>]*>(\d+)[\s\S]{0,120}?a-price-fraction"[^>]*>(\d+)/i);
+  if (priceMatch) {
+    const num = parseFloat(`${priceMatch[1]}.${priceMatch[2]}`);
     if (!isNaN(num) && num > 0 && num < 1000) result.price = num;
   }
   if (!result.price) {
@@ -493,7 +491,8 @@ function extractFromHtml(html: string) {
   // Rating
   const ratingMatch = html.match(/(\d[.,]\d)\s*(?:sur|out of)\s*5\s*étoiles?/i)
     || html.match(/data-hook="rating-out-of-text"[^>]*>\s*(\d[.,]\d)/i)
-    || html.match(/a-icon-alt[^>]*>\s*(\d[.,]\d)\s*(?:sur|out of)/i);
+    || html.match(/a-icon-alt[^>]*>\s*(\d[.,]\d)\s*(?:sur|out of)/i)
+    || html.match(/(\d[.,]\d)\s*(?:sur|out of)\s*5/i);
   if (ratingMatch) {
     const r = parseFloat(ratingMatch[1].replace(',', '.'));
     if (!isNaN(r) && r > 0 && r <= 5) result.rating = r;
