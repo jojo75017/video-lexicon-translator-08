@@ -23,6 +23,7 @@ import {
   type V3PlanId,
 } from "@/data/v3Pricing";
 import { BackButton } from "@/components/v3/BackButton";
+import { PayPalSubscribeButton } from "@/components/v3/PayPalSubscribeButton";
 
 const PLAN_ICONS = {
   debutant: Sparkles,
