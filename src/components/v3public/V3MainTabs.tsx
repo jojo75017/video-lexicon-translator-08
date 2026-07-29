@@ -68,10 +68,11 @@ export default function V3MainTabs() {
               `v3-btn text-[12px] mr-1 ${isActive ? 'v3-btn-gold' : ''}`
             }
             style={{
-              background: 'linear-gradient(135deg,#064e3b 0%,#053e2f 100%)',
-              color: '#c9a84c',
-              border: '1px solid #c9a84c',
+              background: 'linear-gradient(135deg,#FF9E2D 0%,#fbbf24 100%)',
+              color: '#1f2937',
+              border: '1px solid #f59e0b',
               fontWeight: 700,
+              textShadow: 'none',
             }}
           >
             <span aria-hidden>✨</span>
@@ -214,10 +215,11 @@ export default function V3MainTabs() {
               onClick={() => setMobileOpen(false)}
               className="v3-btn w-full justify-center text-[13px]"
               style={{
-                background: 'linear-gradient(135deg,#064e3b,#053e2f)',
-                color: '#c9a84c',
-                border: '1px solid #c9a84c',
+                background: 'linear-gradient(135deg,#FF9E2D,#fbbf24)',
+                color: '#1f2937',
+                border: '1px solid #f59e0b',
                 fontWeight: 700,
+                textShadow: 'none',
               }}
             >
               ✨ Offre V3 · 1er octobre
