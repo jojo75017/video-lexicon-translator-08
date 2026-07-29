@@ -342,7 +342,39 @@ export default function V3OffrePage() {
         </div>
       </section>
 
+      {/* PARRAINAGE */}
+      <section className="max-w-4xl mx-auto px-5 pb-16">
+        <div className="rounded-3xl p-8 md:p-10 relative overflow-hidden"
+          style={{ background: "#fff", border: `1px solid ${GOLD}55`, boxShadow: "0 20px 60px -30px rgba(6,78,59,0.35)" }}>
+          <div className="absolute top-0 inset-x-0 h-[3px]" style={{ background: `linear-gradient(90deg, transparent, ${GOLD}, transparent)` }} />
+          <div className="flex flex-col md:flex-row gap-6 items-center">
+            <div className="w-16 h-16 rounded-full grid place-items-center shrink-0"
+              style={{ background: EMERALD, color: GOLD }}>
+              <Users className="w-8 h-8" />
+            </div>
+            <div className="flex-1 text-center md:text-left">
+              <div className="inline-block text-[10px] font-bold uppercase tracking-[0.18em] px-2 py-0.5 rounded-full mb-2"
+                style={{ background: `${GOLD}22`, color: GOLD_DEEP, border: `1px solid ${GOLD}55` }}>
+                Nouveau — Octobre 2026
+              </div>
+              <h3 className="text-2xl md:text-3xl font-semibold" style={{ fontFamily: SERIF, color: EMERALD }}>
+                Programme de parrainage
+              </h3>
+              <p className="text-sm md:text-base text-slate-700 mt-2 leading-relaxed">
+                Dès le 1ᵉʳ octobre, chaque abonné V3 recevra un <strong>lien de parrainage unique</strong>.
+                Pour chaque ami qui rejoint EbookStudio, vous gagnez <strong>1 mois offert</strong> sur votre
+                forfait — et votre filleul reçoit <strong>−20 %</strong> sur son premier mois. Cumulable sans limite.
+              </p>
+              <p className="text-xs text-slate-500 mt-3">
+                Les détails complets et votre tableau de bord parrainage seront disponibles le jour de l'ouverture.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* FAQ */}
+
       <section className="max-w-3xl mx-auto px-5 pb-20">
         <h2 className="text-3xl font-semibold text-center mb-8" style={{ fontFamily: SERIF, color: EMERALD }}>
           Questions fréquentes
