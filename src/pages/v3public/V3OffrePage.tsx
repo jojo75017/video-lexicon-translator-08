@@ -12,6 +12,7 @@ import SeoHead from "@/components/funnel/SeoHead";
 import { V3_LAUNCH_DATE_ISO } from "@/config/v3Launch";
 import { V3_PLANS, formatPrice, getYearlySavingsPercent } from "@/data/v3Pricing";
 
+const V2_PURCHASE_LINK = "https://www.trafic-affiliation.com/ebookstudiopv";
 const EMERALD = "#064e3b";
 const GOLD = "#c9a84c";
 const GOLD_DEEP = "#a3831f";
@@ -138,8 +139,8 @@ export default function V3OffrePage() {
   return (
     <div style={{ background: PAPER, color: INK }} className="min-h-screen">
       <SeoHead
-        title="V3 EbookStudio — la maison d'édition IA — Ouverture 1er octobre"
-        description="Découvrez la V3 EbookStudio : 30 agents IA, forfaits dès 9,99 €/mois, freemium, livres illustrés, KDP Pilot Pro. Ouverture 1er octobre 2026."
+        title="Offre EbookStudio V2 — V3 incluse le 1er octobre"
+        description="Rejoignez EbookStudio V2 maintenant à tarif avantageux. Le 1er octobre 2026, le premier plan V3 est inclus sans surcoût."
         canonical="https://www.ebookstudio.fr/v3/offre"
       />
 
@@ -150,21 +151,40 @@ export default function V3OffrePage() {
             className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.25em] px-4 py-1.5 rounded-full mb-6"
             style={{ background: "#fff4c7", color: GOLD_DEEP, border: `1px solid ${GOLD}` }}
           >
-            <Sparkles className="w-3.5 h-3.5" /> Ouverture officielle · 1er octobre 2026
+            <Sparkles className="w-3.5 h-3.5" /> Offre passerelle V2 → V3 · 1er octobre 2026
           </span>
 
           <h1 className="font-semibold leading-[1.05]" style={{ fontFamily: SERIF, color: EMERALD }}>
-            <span className="block text-5xl md:text-6xl">La V3 arrive.</span>
+            <span className="block text-5xl md:text-6xl">Prenez la V2 maintenant.</span>
             <span className="block text-5xl md:text-6xl italic mt-1" style={{ color: GOLD_DEEP }}>
-              La maison d'édition IA repensée.
+              La V3 sera incluse au 1er octobre.
             </span>
           </h1>
 
           <p className="mt-6 text-lg max-w-2xl mx-auto text-slate-600">
-            30 agents IA, freemium gratuit, forfaits dès 9,99 €/mois, Cover Studio Pro,
-            KDP Pilot Pro, livres illustrés, univers multi-volumes… L'atelier complet
-            pour écrire, illustrer et publier votre livre sur Amazon.
+            En attendant l'ouverture officielle de la V3, vous pouvez rejoindre
+            EbookStudio V2 à un tarif avantageux, commencer vos livres tout de suite,
+            puis recevoir le <strong>premier plan V3 sans surcoût</strong> le 1er octobre.
           </p>
+
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a
+              href={V2_PURCHASE_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-xl px-7 py-4 font-black text-sm shadow-lg"
+              style={{ background: GOLD, color: INK, boxShadow: "0 18px 40px -22px rgba(6,78,59,0.7)" }}
+            >
+              Je prends la V2 maintenant <ArrowRight className="w-4 h-4" />
+            </a>
+            <a
+              href="#details-offre"
+              className="inline-flex items-center justify-center gap-2 rounded-xl px-7 py-4 font-bold text-sm bg-white"
+              style={{ color: EMERALD, border: `1px solid ${EMERALD}33` }}
+            >
+              Voir ce qui est inclus
+            </a>
+          </div>
 
           <div className="mt-10">
             <Countdown />
@@ -173,7 +193,7 @@ export default function V3OffrePage() {
           <div className="mt-8">
             <PreRegisterForm />
             <p className="text-xs text-slate-500 mt-2 flex items-center justify-center gap-1">
-              <Lock className="w-3 h-3" /> Aucune carte requise. Simple pré-inscription.
+              <Lock className="w-3 h-3" /> Rappel gratuit si vous voulez attendre le 1er octobre.
             </p>
           </div>
         </motion.div>
@@ -185,13 +205,60 @@ export default function V3OffrePage() {
           style={{ background: "#f0fdf4", border: `1px solid ${EMERALD}33` }}>
           <ShieldCheck className="w-6 h-6 shrink-0 mt-0.5" style={{ color: EMERALD }} />
           <div>
-            <h3 className="font-bold" style={{ color: EMERALD }}>Vous êtes déjà abonné·e V2 ?</h3>
+            <h3 className="font-bold" style={{ color: EMERALD }}>Le message est simple : vous ne perdez rien à commencer maintenant.</h3>
             <p className="text-sm text-slate-700 mt-1">
-              <strong>Aucune action requise.</strong> Votre abonnement actuel continue
-              sans interruption. Le 1er octobre, vous pourrez découvrir la V3 et
-              choisir de basculer si vous le souhaitez — ou rester en V2. Tous vos
-              livres, personnages et projets sont préservés.
+              La V2 reste disponible tout de suite pour créer vos livres. Le 1er octobre,
+              vous serez averti·e de l'ouverture V3 et le premier plan V3 sera ajouté
+              à votre accès <strong>sans supplément</strong>.
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* OFFRE ACTUELLE */}
+      <section id="details-offre" className="max-w-5xl mx-auto px-5 py-14">
+        <div className="rounded-3xl p-8 md:p-10 bg-white" style={{ border: `2px solid ${GOLD}`, boxShadow: "0 22px 60px -34px rgba(6,78,59,0.45)" }}>
+          <div className="grid md:grid-cols-[1.1fr_0.9fr] gap-8 items-center">
+            <div>
+              <div className="text-[10px] uppercase tracking-[0.24em] font-bold" style={{ color: GOLD_DEEP }}>
+                Offre en attendant la V3
+              </div>
+              <h2 className="mt-2 text-3xl md:text-4xl font-semibold" style={{ fontFamily: SERIF, color: EMERALD }}>
+                V2 maintenant + premier plan V3 offert le 1er octobre
+              </h2>
+              <p className="mt-4 text-slate-700 leading-relaxed">
+                Cette page n'est pas une vente anticipée de la V3 seule. C'est l'offre
+                de transition : vous démarrez avec EbookStudio V2, vous profitez du tarif
+                actuel, et vous recevez l'accès V3 de premier niveau dès l'ouverture.
+              </p>
+              <ul className="mt-5 space-y-3 text-sm text-slate-700">
+                {[
+                  "Accès V2 immédiat pour créer et publier sans attendre octobre",
+                  "Tarif avantageux réservé aux prospects avant le lancement V3",
+                  "Premier plan V3 inclus sans surcoût le 1er octobre 2026",
+                  "Alerte email le jour de l'ouverture avec le lien d'accès V3",
+                ].map((item) => (
+                  <li key={item} className="flex gap-2">
+                    <Check size={17} className="shrink-0 mt-0.5" style={{ color: EMERALD }} />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-2xl p-6" style={{ background: "#fff9e6", border: `1px solid ${GOLD}88` }}>
+              <div className="text-sm font-bold" style={{ color: EMERALD }}>Accès immédiat</div>
+              <div className="mt-2 text-4xl font-black" style={{ color: EMERALD }}>V2</div>
+              <p className="mt-2 text-sm text-slate-700">Puis bascule vers le premier plan V3 le 1er octobre, sans payer deux fois.</p>
+              <a
+                href={V2_PURCHASE_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-4 font-black text-sm"
+                style={{ background: EMERALD, color: GOLD }}
+              >
+                Rejoindre avec l'offre V2 <ArrowRight className="w-4 h-4" />
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -228,14 +295,14 @@ export default function V3OffrePage() {
       <section className="max-w-6xl mx-auto px-5 pb-16">
         <div className="text-center mb-10">
           <div className="text-[10px] uppercase tracking-[0.24em] font-semibold" style={{ color: GOLD_DEEP }}>
-            À l'ouverture
+            Ensuite, au 1er octobre
           </div>
           <h2 className="mt-2 text-3xl md:text-4xl font-semibold" style={{ fontFamily: SERIF, color: EMERALD }}>
-            Trois forfaits, une même exigence
+            Les plans V3 seront ouverts progressivement
           </h2>
           <p className="mt-3 text-sm text-slate-600 max-w-xl mx-auto">
-            Facturation mensuelle ou annuelle (jusqu'à -22 %). Freemium gratuit à
-            l'ouverture — testez sans carte.
+            Les nouveaux forfaits arriveront le jour du lancement. L'avantage actuel :
+            commencer en V2 maintenant et obtenir le premier plan V3 sans surcoût.
           </p>
         </div>
 
@@ -292,7 +359,7 @@ export default function V3OffrePage() {
                   style={{ background: "#e5e7eb", color: "#6b7280" }}
                 >
                   <Lock className="w-3.5 h-3.5 inline mr-1.5 -mt-0.5" />
-                  Disponible le 1er octobre
+                  Ouverture V3 le 1er octobre
                 </button>
               </article>
             );
@@ -307,12 +374,12 @@ export default function V3OffrePage() {
           <div className="absolute top-0 inset-x-0 h-[3px]" style={{ background: `linear-gradient(90deg, transparent, ${GOLD}, transparent)` }} />
           <Gift className="w-10 h-10 mx-auto mb-3" style={{ color: GOLD }} />
           <h2 className="text-3xl md:text-4xl font-semibold" style={{ fontFamily: SERIF }}>
-            Freemium gratuit — dès l'ouverture
+            Premier plan V3 inclus — dès l'ouverture
           </h2>
           <p className="mt-3 text-white/85 max-w-xl mx-auto">
-            Testez la V3 sans carte bancaire. Créez 1 livre complet (3 chapitres,
-            1 personnage) pour découvrir la puissance des 30 agents IA. Passez à
-            un forfait quand vous voulez plus.
+            Si vous rejoignez la V2 maintenant, vous ne repartez pas de zéro en octobre :
+            le premier plan V3 sera inclus dans votre accès, sans supplément, pour découvrir
+            le nouveau parcours IA.
           </p>
           <div className="mt-5 inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full"
             style={{ background: "rgba(255,255,255,0.15)", color: GOLD }}>
@@ -331,12 +398,11 @@ export default function V3OffrePage() {
           </div>
           <div className="flex-1 text-center md:text-left">
             <h3 className="text-2xl font-semibold" style={{ fontFamily: SERIF, color: EMERALD }}>
-              Bonus fondateur — 100 premiers abonnés
+              Offre passerelle — avant le lancement V3
             </h3>
             <p className="text-sm text-slate-700 mt-2">
-              Les 100 premiers abonnés du 1er octobre bénéficient d'un
-              <strong> mois offert</strong> sur le forfait annuel et d'un accès
-              anticipé aux nouveaux modules Pro (Audiobook TTS, Mockups 3D…).
+              L'objectif est de permettre aux prospects de commencer avec la V2 au tarif actuel,
+              puis de recevoir le premier accès V3 le 1er octobre sans frais supplémentaires.
             </p>
           </div>
         </div>
@@ -382,28 +448,28 @@ export default function V3OffrePage() {
         <div className="space-y-3">
           {[
             {
-              q: "Est-ce que mon abonnement V2 continue ?",
-              a: "Oui, 100 %. Aucun changement pour vous : votre accès V2 reste actif, vos livres et projets sont préservés. La V3 est un nouvel espace optionnel que vous pourrez rejoindre le 1er octobre.",
+              q: "Si je prends la V2 maintenant, est-ce que je paie encore pour la V3 ?",
+              a: "Non pour le premier plan V3 : il sera inclus sans surcoût le 1er octobre 2026 pour les personnes qui rejoignent avec cette offre de transition.",
             },
             {
-              q: "Puis-je basculer vers la V3 le jour J ?",
-              a: "Oui. Le 1er octobre, un bouton dédié apparaîtra dans votre espace V2 pour choisir un forfait V3 (Auteur, Studio ou Éditeur) au tarif de votre choix. Aucune migration technique n'est nécessaire.",
+              q: "Est-ce que je peux créer mes livres avant octobre ?",
+              a: "Oui. Vous accédez à la V2 immédiatement : vous pouvez planifier, écrire, exporter et avancer vos projets sans attendre l'ouverture officielle de la V3.",
             },
             {
-              q: "Freemium : combien de temps est-ce gratuit ?",
-              a: "Le freemium est illimité dans le temps mais limité en volume : 1 livre, 3 chapitres, 1 personnage, pas d'export premium. C'est fait pour tester le pipeline avant de passer à un forfait.",
+              q: "Qu'est-ce qui arrive le 1er octobre ?",
+              a: "Vous recevez l'information d'ouverture V3 et l'accès au premier plan V3 inclus. Les plans supérieurs resteront optionnels pour ceux qui veulent plus de volumes ou de modules Pro.",
             },
             {
-              q: "Puis-je payer à l'année pour économiser ?",
-              a: "Oui. La facturation annuelle offre jusqu'à -22 % : Auteur 97 €/an, Studio 117 €/an, Éditeur 547 €/an. Paiement en une fois par carte ou PayPal.",
+              q: "Pourquoi prendre la V2 maintenant ?",
+              a: "Parce que vous commencez tout de suite à produire vos livres, vous gardez le tarif avantageux actuel et vous sécurisez l'accès au premier plan V3 sans supplément.",
             },
             {
-              q: "PayPal en 3× est-il possible ?",
-              a: "PayPal en abonnement récurrent (mensuel ou annuel) sera disponible dès l'ouverture. Le paiement en 3× reste possible pour les forfaits annuels via PayPal.",
+              q: "Le lien de paiement fonctionne-t-il ?",
+              a: "Oui. Le bouton d'inscription renvoie vers la page de paiement actuelle. Les pages sur ebookstudio.fr/v3 peuvent encore dépendre de la publication du domaine, donc ce bouton utilise le lien de paiement direct.",
             },
             {
               q: "Où en suis-je si je m'inscris aujourd'hui ?",
-              a: "Vous recevez un email de rappel le 1er octobre à 8h avec un lien d'accès prioritaire et le bonus fondateur activé sur votre compte.",
+              a: "Vous démarrez en V2 maintenant, puis vous recevez l'accès au premier plan V3 le 1er octobre 2026, sans supplément.",
             },
           ].map((item) => (
             <details key={item.q} className="rounded-xl bg-white p-4"
@@ -420,13 +486,24 @@ export default function V3OffrePage() {
       {/* CTA FINAL */}
       <section className="max-w-3xl mx-auto px-5 pb-24 text-center">
         <h2 className="text-3xl md:text-4xl font-semibold" style={{ fontFamily: SERIF, color: EMERALD }}>
-          Soyez prévenu·e à l'ouverture
+          Rejoindre maintenant ou recevoir le rappel
         </h2>
         <p className="mt-3 text-slate-600 max-w-xl mx-auto">
-          Un simple email suffit. Vous recevez un rappel le 1er octobre 2026 avec
-          le bonus fondateur pré-activé.
+          Si vous êtes prêt·e, prenez la V2 maintenant. Sinon, laissez simplement votre email
+          pour recevoir l'ouverture V3 le 1er octobre.
         </p>
-        <div className="mt-8">
+        <div className="mt-8 flex justify-center">
+          <a
+            href={V2_PURCHASE_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 rounded-xl px-7 py-4 font-black text-sm"
+            style={{ background: GOLD, color: INK }}
+          >
+            Je prends la V2 maintenant <ArrowRight className="w-4 h-4" />
+          </a>
+        </div>
+        <div className="mt-6">
           <PreRegisterForm />
         </div>
 
