@@ -325,6 +325,8 @@ export const KdpAmazonResearch: React.FC<KdpAmazonResearchProps> = ({ defaultTab
 
   return (
     <div className="space-y-6">
+      <KdpPilotAccuracyBanner />
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
