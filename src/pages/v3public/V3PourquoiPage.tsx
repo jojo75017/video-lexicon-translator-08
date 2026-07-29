@@ -99,16 +99,31 @@ export default function V3PourquoiPage() {
         <ol className="mt-4 space-y-2 list-decimal list-inside">
           <Bullet>
             Rendez-vous sur{' '}
-            <a
-              href="https://aistudio.google.com/apikey"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline font-semibold"
+            <button
+              type="button"
+              onClick={async () => {
+                const url = 'https://aistudio.google.com/app/apikey';
+                try {
+                  await navigator.clipboard.writeText(url);
+                  const { toast } = await import('sonner');
+                  toast.success('Lien copié. Collez-le dans un nouvel onglet si le clic est bloqué.', { duration: 7000 });
+                } catch {}
+                const win = window.open(url, '_blank', 'noopener,noreferrer');
+                if (!win || win.closed || typeof win.closed === 'undefined') {
+                  const { toast } = await import('sonner');
+                  toast.info('Nouvel onglet bloqué. Le lien est copié — ouvrez-le manuellement.', { duration: 9000 });
+                }
+              }}
+              className="underline font-semibold cursor-pointer"
               style={{ color: '#064E3B' }}
+              title="Copier le lien et l'ouvrir (fallback presse-papiers si blocage)"
             >
               aistudio.google.com/apikey
-            </a>{' '}
+            </button>{' '}
             et connectez-vous avec votre compte Google.
+            <em className="block text-sm mt-1 opacity-80">
+              Astuce : si le lien ne s'ouvre pas depuis cette page, il est automatiquement copié dans votre presse-papiers — collez-le simplement dans un nouvel onglet.
+            </em>
           </Bullet>
           <Bullet>Cliquez sur « Create API Key » — la clé commence par <code>AIza…</code>.</Bullet>
           <Bullet>Copiez la clé et collez-la dans EbookStudio via l'onglet « Mon compte » → « Clés API ».</Bullet>
