@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { SubscriberGate } from '@/components/auth/SubscriberGate';
 import { AdminGate } from '@/components/auth/AdminGate';
 import { V3Gate } from '@/components/auth/V3Gate';
+import { V3LockedGate } from '@/components/v3/V3LockedGate';
 import { BookPerfectGate } from '@/components/auth/BookPerfectGate';
 import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 import { Loader2 } from 'lucide-react';
@@ -511,40 +512,44 @@ const App = () => {
             <Route path="/v3" element={<V3PublicLayout />}>
               <Route index element={<V3HomePage />} />
               <Route path="auth" element={<V3AuthPage />} />
-              <Route path="create" element={<V3CreatePage />} />
-              <Route path="create/illustre" element={<V3KidsBookCreatePage />} />
-              <Route path="book/:id" element={<V3BookPage />} />
-              <Route path="library" element={<V3LibraryPage />} />
-              <Route path="gallery" element={<V3GalleryPage />} />
-              <Route path="auteur" element={<V3GuestAuthorPage />} />
-              <Route path="u/:slug" element={<V3AuthorProfilePage />} />
-              <Route path="mes-livres" element={<V3BookManagerPage />} />
-              <Route path="parametres" element={<V3AuthorSettingsPage />} />
-              <Route path="livres/:type" element={<V3SpecialBookPage />} />
-              <Route path="offres" element={<Navigate to="/v3/forfaits" replace />} />
-              <Route path="offres/merci" element={<Navigate to="/v3/forfaits" replace />} />
-
-              <Route path="recherche" element={<V3RecherchePage />} />
-              <Route path="outils" element={<V3ToolsIndexPage />} />
-              <Route path="outils/sommaire-ultime" element={<V3TocUltimatePage />} />
-              <Route path="outils/traduction" element={<V3TranslatorPage />} />
-              <Route path="compte" element={<V3ComptePage />} />
-              <Route path="forfaits" element={<V3ForfaitsPage />} />
-              <Route path="paypal-retour" element={<V3PayPalReturnPage />} />
               <Route path="pourquoi" element={<V3PourquoiPage />} />
-              <Route path="script-heygen" element={<V3ScriptHeygenPage />} />
-              <Route path="upsell-17" element={<V3Upsell17Page />} />
-              <Route path="outils/ams-keywords" element={<V3AmsKeywordsPage />} />
-              <Route path="outils/espion-concurrents" element={<V3CompetitorSpyPage />} />
-              <Route path="outils/categories" element={<V3CategoryFinderPage />} />
-              <Route path="outils/offerts" element={<V3OutilsOffertsPage />} />
-              <Route path="nouveautes" element={<V3NouveautesPage />} />
-              <Route path="outils/royalties" element={<V3RoyaltiesPage />} />
-              <Route path="outils/humanizer" element={<V3HumanizerPage />} />
-              <Route path="outils/mockup-3d" element={<V3MockupPage />} />
-              <Route path="outils/audiobook" element={<V3AudiobookPage />} />
-              <Route path="outils/editeur" element={<V3EditorPage />} />
-              <Route path="hub" element={isPlannerPreviewHost ? <V3HubPage /> : <V3Gate><V3HubPage /></V3Gate>} />
+              <Route path="offre" element={<V3OffrePage />} />
+
+              {/* Routes verrouillées jusqu'au 1er octobre 2026 (admins exceptés) */}
+              <Route path="create" element={<V3LockedGate><V3CreatePage /></V3LockedGate>} />
+              <Route path="create/illustre" element={<V3LockedGate><V3KidsBookCreatePage /></V3LockedGate>} />
+              <Route path="book/:id" element={<V3LockedGate><V3BookPage /></V3LockedGate>} />
+              <Route path="library" element={<V3LockedGate><V3LibraryPage /></V3LockedGate>} />
+              <Route path="gallery" element={<V3LockedGate><V3GalleryPage /></V3LockedGate>} />
+              <Route path="auteur" element={<V3LockedGate><V3GuestAuthorPage /></V3LockedGate>} />
+              <Route path="u/:slug" element={<V3LockedGate><V3AuthorProfilePage /></V3LockedGate>} />
+              <Route path="mes-livres" element={<V3LockedGate><V3BookManagerPage /></V3LockedGate>} />
+              <Route path="parametres" element={<V3LockedGate><V3AuthorSettingsPage /></V3LockedGate>} />
+              <Route path="livres/:type" element={<V3LockedGate><V3SpecialBookPage /></V3LockedGate>} />
+              <Route path="offres" element={<Navigate to="/v3/offre" replace />} />
+              <Route path="offres/merci" element={<Navigate to="/v3/offre" replace />} />
+
+              <Route path="recherche" element={<V3LockedGate><V3RecherchePage /></V3LockedGate>} />
+              <Route path="outils" element={<V3LockedGate><V3ToolsIndexPage /></V3LockedGate>} />
+              <Route path="outils/sommaire-ultime" element={<V3LockedGate><V3TocUltimatePage /></V3LockedGate>} />
+              <Route path="outils/traduction" element={<V3LockedGate><V3TranslatorPage /></V3LockedGate>} />
+              <Route path="compte" element={<V3LockedGate><V3ComptePage /></V3LockedGate>} />
+              <Route path="forfaits" element={<V3LockedGate><V3ForfaitsPage /></V3LockedGate>} />
+              <Route path="paypal-retour" element={<V3LockedGate><V3PayPalReturnPage /></V3LockedGate>} />
+              <Route path="script-heygen" element={<V3LockedGate><V3ScriptHeygenPage /></V3LockedGate>} />
+              <Route path="upsell-17" element={<V3LockedGate><V3Upsell17Page /></V3LockedGate>} />
+              <Route path="outils/ams-keywords" element={<V3LockedGate><V3AmsKeywordsPage /></V3LockedGate>} />
+              <Route path="outils/espion-concurrents" element={<V3LockedGate><V3CompetitorSpyPage /></V3LockedGate>} />
+              <Route path="outils/categories" element={<V3LockedGate><V3CategoryFinderPage /></V3LockedGate>} />
+              <Route path="outils/offerts" element={<V3LockedGate><V3OutilsOffertsPage /></V3LockedGate>} />
+              <Route path="nouveautes" element={<V3LockedGate><V3NouveautesPage /></V3LockedGate>} />
+              <Route path="outils/royalties" element={<V3LockedGate><V3RoyaltiesPage /></V3LockedGate>} />
+              <Route path="outils/humanizer" element={<V3LockedGate><V3HumanizerPage /></V3LockedGate>} />
+              <Route path="outils/mockup-3d" element={<V3LockedGate><V3MockupPage /></V3LockedGate>} />
+              <Route path="outils/audiobook" element={<V3LockedGate><V3AudiobookPage /></V3LockedGate>} />
+              <Route path="outils/editeur" element={<V3LockedGate><V3EditorPage /></V3LockedGate>} />
+              <Route path="hub" element={<V3LockedGate>{isPlannerPreviewHost ? <V3HubPage /> : <V3Gate><V3HubPage /></V3Gate>}</V3LockedGate>} />
+
 
             </Route>
 
