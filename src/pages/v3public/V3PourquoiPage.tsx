@@ -86,7 +86,39 @@ export default function V3PourquoiPage() {
         </p>
       </Section>
 
-      {/* 30 agents */}
+      {/* Clé Gemini obligatoire */}
+      <Section id="cle-gemini" icon={<ShieldCheck />} title="Avant de commencer : votre clé Gemini gratuite (obligatoire)">
+        <p>
+          La V3 fonctionne en <strong>BYOK</strong> — <em>Bring Your Own Key</em>. Concrètement : vous branchez
+          votre propre clé Gemini de Google, gratuite, et vous débloquez la V3 sans limite. Google offre un
+          quota très généreux sur Gemini — largement suffisant pour rédiger des livres entiers sans jamais
+          payer, et sans dépendre d'un pool de crédits partagés.
+        </p>
+        <ol className="mt-4 space-y-2 list-decimal list-inside">
+          <Bullet>
+            Rendez-vous sur{' '}
+            <a
+              href="https://aistudio.google.com/apikey"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline font-semibold"
+              style={{ color: '#064E3B' }}
+            >
+              aistudio.google.com/apikey
+            </a>{' '}
+            et connectez-vous avec votre compte Google.
+          </Bullet>
+          <Bullet>Cliquez sur « Create API Key » — la clé commence par <code>AIza…</code>.</Bullet>
+          <Bullet>Copiez la clé et collez-la dans EbookStudio via l'onglet « Mon compte » → « Clés API ».</Bullet>
+          <Bullet>C'est fini. La V3 est déverrouillée intégralement, vos crédits vous appartiennent.</Bullet>
+        </ol>
+        <Callout>
+          Sans clé Gemini, la V3 reste utilisable en mode découverte mais la génération de manuscrits est
+          limitée. Avec la clé, tout devient illimité côté écriture — et cela reste 100 % gratuit pour vous.
+        </Callout>
+      </Section>
+
+
       <Section id="agents" icon={<Brain />} title="Un workflow piloté par 30 agents IA spécialisés">
         <p>
           Le cœur d'EbookStudio Pro V3, c'est une chaîne de trente agents IA qui se passent le relais dans un
