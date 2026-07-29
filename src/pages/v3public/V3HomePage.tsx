@@ -69,14 +69,14 @@ export default function V3HomePage() {
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <a
-              href="https://aistudio.google.com/apikey"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="v3-btn v3-btn-gold text-[12.5px] whitespace-nowrap"
+            <button
+              type="button"
+              onClick={() => window.open('https://aistudio.google.com/app/apikey', '_blank', 'noopener,noreferrer')}
+              className="v3-btn v3-btn-gold text-[12.5px] whitespace-nowrap cursor-pointer"
             >
               Obtenir ma clé gratuite
-            </a>
+            </button>
+
             <Link to="/v3/compte" className="v3-btn v3-btn-on-dark text-[12.5px] whitespace-nowrap">
               Coller ma clé
             </Link>
