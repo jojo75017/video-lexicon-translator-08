@@ -273,6 +273,28 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
         borderBottom: '1px solid hsl(var(--joy-ink) / 0.08)',
       }}
     >
+      {/* V3 Launch Announcement — visible for all V2 users */}
+      <a
+        href="/v3/offre"
+        className="block w-full relative overflow-hidden group"
+        style={{
+          background: 'linear-gradient(90deg, #0F2E1F 0%, #14532D 50%, #0F2E1F 100%)',
+          borderBottom: '1px solid rgba(212,175,55,0.4)',
+        }}
+      >
+        <div className="mx-auto flex max-w-7xl items-center justify-center gap-3 px-4 py-2.5 sm:px-6 text-center">
+          <span className="hidden sm:inline text-[10px] font-bold uppercase tracking-[0.18em] text-[#D4AF37] bg-[#D4AF37]/10 border border-[#D4AF37]/40 rounded-full px-2 py-0.5">
+            1ᵉʳ Octobre 2026
+          </span>
+          <p className="text-[13px] sm:text-[14px] font-medium text-white" style={{ fontFamily: "'Work Sans', system-ui, sans-serif" }}>
+            🚀 <strong className="text-[#D4AF37]">EbookStudio V3</strong> arrive — Auteur 9,99€ · Studio 12,99€ · Éditeur 59€.{' '}
+            <span className="underline decoration-[#D4AF37]/60 underline-offset-2 group-hover:decoration-[#D4AF37]">
+              Découvrir l'offre Fondateur →
+            </span>
+          </p>
+        </div>
+      </a>
+
       {!bannerDismissed && (
         <div
           className="w-full text-white text-sm relative"
