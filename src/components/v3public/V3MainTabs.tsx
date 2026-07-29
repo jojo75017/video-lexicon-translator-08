@@ -62,6 +62,22 @@ export default function V3MainTabs() {
             <span aria-hidden className="text-[15px]">🏠</span>
             <span>Accueil</span>
           </NavLink>
+          <NavLink
+            to="/v3/offre"
+            className={({ isActive }) =>
+              `v3-btn text-[12px] mr-1 ${isActive ? 'v3-btn-gold' : ''}`
+            }
+            style={{
+              background: 'linear-gradient(135deg,#064e3b 0%,#053e2f 100%)',
+              color: '#c9a84c',
+              border: '1px solid #c9a84c',
+              fontWeight: 700,
+            }}
+          >
+            <span aria-hidden>✨</span>
+            <span>Offre V3 · 1er oct.</span>
+          </NavLink>
+
 
 
           {V3_HEADER_MENU.map((cat) => {
