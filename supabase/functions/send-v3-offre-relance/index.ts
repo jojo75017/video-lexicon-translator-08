@@ -23,8 +23,8 @@ const SUBJECT = "🚀 Le 1er octobre, EbookStudio devient une maison d'édition 
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const TRACK_CLICK = `${SUPABASE_URL}/functions/v1/track-email-click`;
-const OFFRE_LINK = "https://www.ebookstudio.fr/v3/offre";
-const POURQUOI_LINK = "https://www.ebookstudio.fr/v3/pourquoi";
+const OFFRE_LINK = "https://ebookstudio.blog/#accueil";
+const POURQUOI_LINK = "https://www.trafic-affiliation.com/ebookstudiopv";
 
 function trackedUrl(email: string, dest: string): string {
   return `${TRACK_CLICK}?e=${encodeURIComponent(email)}&s=1&u=${encodeURIComponent(dest)}&t=${encodeURIComponent(TEMPLATE_NAME)}`;
@@ -52,7 +52,7 @@ export function buildHtml(email: string): string {
 
     <table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px auto;">
       <tr><td style="border-radius:10px;background:#FF9E2D;">
-        <a href="${cta}" style="display:inline-block;padding:16px 32px;color:#0b1220;text-decoration:none;font-weight:bold;font-size:17px;border-radius:10px;">🚀 Voir l'offre V3 complète →</a>
+        <a href="${cta}" style="display:inline-block;padding:16px 32px;color:#0b1220;text-decoration:none;font-weight:bold;font-size:17px;border-radius:10px;">🚀 Voir la page d'offre complète →</a>
       </td></tr>
     </table>
 
@@ -75,8 +75,8 @@ export function buildHtml(email: string): string {
     </ul>
 
     <p style="font-size:15px;line-height:1.6;margin:18px 0;">
-      Vous préférez comprendre d'abord <em>pourquoi</em> cet outil est différent ? Cette page l'explique en 2 minutes :
-      <br><a href="${pourquoi}" style="color:#008296;">👉 Pourquoi EbookStudio V3</a>
+      Vous voulez réserver l'offre fondateur directement ? Le lien de paiement fonctionne ici :
+      <br><a href="${pourquoi}" style="color:#008296;">👉 Réserver EbookStudio Pro — 59 € à vie</a>
     </p>
 
     <table role="presentation" cellpadding="0" cellspacing="0" style="margin:26px auto 8px;">
