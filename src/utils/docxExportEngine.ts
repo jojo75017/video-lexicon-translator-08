@@ -205,25 +205,42 @@ function isGenericTitle(t: string | undefined | null): boolean {
 /** Retire un marqueur de chapitre redondant en début de contenu ("2, " / "2." / "Chapitre 2 –"). */
 function stripLeadingChapterMarker(content: string, num: number): string {
   let t = (content || '').replace(/^[\s\u00A0]+/, '');
+  // Retire un éventuel titre Markdown "# ..." ou "## ..." en tête
+  t = t.replace(/^#{1,3}\s+[^\n]{0,120}\n+/, '');
+  // Retire "Chapitre N : Titre" / "**Chapitre N — Titre**" en tête
+  t = t.replace(new RegExp(`^\\*{0,2}\\s*(?:chapitre\\s*)?0*${num}\\s*[\\.,:\\-–—\\)]\\s*[^\\n]{0,120}\\*{0,2}\\s*\\n+`, 'i'), '');
   t = t.replace(new RegExp(`^(?:chapitre\\s*)?0*${num}\\s*[\\.,:\\-–—\\)]\\s*`, 'i'), '');
+  t = t.replace(/^\*{0,2}\s*chapitre\s*\d+\s*[\.,:\-–—\)]?\s*[^\n]{0,120}\*{0,2}\s*\n+/i, '');
   t = t.replace(/^chapitre\s*\d+\s*[\.,:\-–—\)]?\s*/i, '');
   return t.replace(/^[\s\u00A0]+/, '');
 }
 
 /**
  * Extrait un titre "inline" placé en tête du contenu quand le champ titre est générique.
- * Gère le format IA "Titre Principal : Sous-titre Le corps du texte commence ici…".
+ * Gère : Markdown (# Titre), gras (**Titre**), première ligne courte, ou Title Case.
  */
 function extractInlineTitle(body: string): { title: string; rest: string } | null {
   const trimmed = (body || '').replace(/^[\s\u00A0]+/, '');
   if (!trimmed) return null;
+
+  // 0) Markdown heading "# Titre"
+  const mdHeading = trimmed.match(/^#{1,3}\s+([^\n]{4,110})\n+([\s\S]+)$/);
+  if (mdHeading && mdHeading[2].trim().length > 30) {
+    return { title: cleanChapterTitle(mdHeading[1]), rest: mdHeading[2].replace(/^[\s\u00A0]+/, '') };
+  }
+
+  // 0b) Gras Markdown "**Titre**" seul sur la première ligne
+  const boldHeading = trimmed.match(/^\*\*([^\n*]{4,110})\*\*\s*\n+([\s\S]+)$/);
+  if (boldHeading && boldHeading[2].trim().length > 30) {
+    return { title: cleanChapterTitle(boldHeading[1]), rest: boldHeading[2].replace(/^[\s\u00A0]+/, '') };
+  }
 
   // 1) Cas idéal : un vrai retour à la ligne sépare le titre du corps.
   const nl = trimmed.indexOf('\n');
   if (nl > 4 && nl <= 110) {
     const cand = trimmed.slice(0, nl).trim();
     const rest = trimmed.slice(nl).replace(/^[\s\u00A0]+/, '');
-    if (cand.length >= 5 && cand.length <= 110 && rest.length > 40) {
+    if (cand.length >= 5 && cand.length <= 110 && rest.length > 40 && !/[.!?…]$/.test(cand)) {
       return { title: cleanChapterTitle(cand), rest };
     }
   }
@@ -247,12 +264,10 @@ function extractInlineTitle(body: string): { title: string; rest: string } | nul
     }
     if (startsUpper(w)) {
       const next = words[i + 1];
-      // "...Karmiques | La sensation" → "La" démarre une phrase : on s'arrête avant.
       if (next && startsLower(next) && !connectors.has(bare(next)) && !isPunct(next)) break;
     }
     title.push(w);
   }
-  // Retire connecteurs/ponctuation traînants (ils repartent dans le corps).
   while (title.length && (isPunct(title[title.length - 1]) || connectors.has(bare(title[title.length - 1])))) {
     title.pop();
   }
@@ -267,13 +282,23 @@ function extractInlineTitle(body: string): { title: string; rest: string } | nul
 function resolveChapter(chapter: { title: string; content?: string }, index: number): { displayTitle: string; body: string } {
   let displayTitle = cleanChapterTitle(chapter.title);
   let body = stripLeadingChapterMarker(chapter.content || '', index + 1);
+
   if (isGenericTitle(chapter.title) || isGenericTitle(displayTitle)) {
     const ext = extractInlineTitle(body);
     if (ext) {
       displayTitle = ext.title;
       body = ext.rest;
     }
+  } else {
+    // Titre présent : évite qu'il soit répété en tête du corps (Markdown, gras, ou brut).
+    const norm = (s: string) => s.toLowerCase().replace(/[«»"'*#]/g, '').replace(/\s+/g, ' ').trim();
+    const nt = norm(displayTitle);
+    const firstLineMatch = body.match(/^([^\n]{1,140})\n+([\s\S]*)$/);
+    if (firstLineMatch && nt.length >= 4 && norm(firstLineMatch[1]).includes(nt)) {
+      body = firstLineMatch[2].replace(/^[\s\u00A0]+/, '');
+    }
   }
+
   return { displayTitle, body };
 }
 
@@ -633,9 +658,12 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
       if (!hasAnyContent && /^chapitre\s+\d+$/i.test(chapter.title.trim())) return;
 
       const tocTitle = resolveChapter(chapter, index).displayTitle;
+      const safeTocTitle = isGenericTitle(tocTitle)
+        ? `Chapitre ${index + 1}`
+        : `Chapitre ${index + 1} – ${tocTitle}`;
       children.push(new Paragraph({
         children: [new TextRun({
-          text: isGenericTitle(tocTitle) ? `Chapitre ${index + 1}` : `Chapitre ${index + 1} – ${tocTitle}`,
+          text: safeTocTitle,
           size: baseSize,
           font,
         })],
