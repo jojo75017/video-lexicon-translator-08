@@ -277,6 +277,37 @@ Georges
 
 PS : si vous préférez d'abord voir l'outil en action, la démo est ici 👉 ${DEMO_LINK}`,
   },
+  // Variante 5 — Décision : 7 jours, puis clôture définitive de l'offre Fondateur
+  {
+    subject: "⏳ {name}, il faut trancher : oui ou non dans 7 jours",
+    body: (name) => `${name},
+
+Je vais être direct — vous méritez de la clarté, pas encore un email marketing.
+
+Depuis plusieurs semaines, je vous envoie des démos, des explications, des offres. Vous n'avez pas encore cliqué. C'est OK. Mais je ne peux plus vous garder indéfiniment sur ma liste "Fondateurs".
+
+Voici la règle, simple :
+
+📅 **Dans 7 jours**, je ferme votre place Fondateur à 67€ à vie.
+Après cette date, vous ne pourrez rejoindre EbookStudio qu'au **tarif mensuel V3** (9,99€ à 59€/mois, sans accès à vie).
+
+Donc trois choix, et un seul à faire maintenant :
+
+**1️⃣ Vous rejoignez les Fondateurs à 67€ à vie** (V3 d'octobre incluse, sans surcoût, jamais)
+[[ ✅ Je verrouille ma place Fondateur (67€ à vie) | ${OFFRES_LINK} ]]
+
+**2️⃣ Vous voulez d'abord voir l'outil tourner en direct** (2 min, sans carte)
+[[ 🎬 Je regarde la démo gratuite | ${DEMO_LINK} ]]
+
+**3️⃣ Ce n'est pas pour vous** → répondez simplement "STOP" à cet email, je vous retire de la liste. Aucun jugement, c'est mieux pour nous deux.
+
+Je préfère 100 personnes qui ont **choisi** EbookStudio que 10 000 qui hésitent.
+À vous de jouer.
+
+Georges
+
+PS : la V3 (octobre 2026) transforme EbookStudio en vraie **maison d'édition en ligne** — 30 agents IA, livres illustrés, univers multi-volumes, Cover Studio Pro, traduction 10 langues, KDP Pilot. Les Fondateurs l'auront **gratuitement**. Les nouveaux paieront jusqu'à 59€/mois. Vous choisissez de quel côté vous êtes.`,
+  },
 ];
 const RELANCE_MAX_ROUNDS = RELANCE_VARIANTS.length;
 
