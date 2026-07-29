@@ -6,6 +6,7 @@ import V3Header from './V3Header';
 import V3MainTabs from './V3MainTabs';
 import V3Footer from './V3Footer';
 import V3Sidebar from './V3Sidebar';
+import V3ContemplationMode from '@/components/v3/V3ContemplationMode';
 
 export default function V3PublicLayout() {
   const [isAuthed, setIsAuthed] = useState(false);
@@ -17,17 +18,20 @@ export default function V3PublicLayout() {
   }, []);
 
   return (
-    <div className="v3pub min-h-screen flex flex-col">
-      <V3Header isAuthed={isAuthed} />
-      <V3MainTabs />
-      <div className="flex flex-1 w-full">
-        <V3Sidebar />
-        <main className="flex-1 min-w-0">
-          <Outlet />
-        </main>
+    <V3ContemplationMode>
+      <div className="v3pub min-h-screen flex flex-col">
+        <V3Header isAuthed={isAuthed} />
+        <V3MainTabs />
+        <div className="flex flex-1 w-full">
+          <V3Sidebar />
+          <main className="flex-1 min-w-0">
+            <Outlet />
+          </main>
+        </div>
+        <V3Footer />
       </div>
-      <V3Footer />
-    </div>
+    </V3ContemplationMode>
   );
 }
+
 
