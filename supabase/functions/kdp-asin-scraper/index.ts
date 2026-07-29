@@ -468,21 +468,30 @@ function extractFromHtml(html: string) {
   }
 
   // BSR — Amazon "Détails sur le produit" / "Product details" block
-  // Format FR: "Classement des meilleures ventes d'Amazon : 12 345 en Boutique Kindle"
-  // Format EN: "Best Sellers Rank: #12,345 in Kindle Store"
-  const bsrBlock = html.match(/(?:Classement des meilleures ventes|Best Sellers Rank|Amazon Bestseller-Rang|Clasificaci[oó]n en los m[aá]s vendidos|Posizione nella classifica)[^<]{0,500}/i);
-  if (bsrBlock) {
-    const text = stripHtml(bsrBlock[0]);
-    const m = text.match(/#?\s*([\d\s.,\u202f\u00a0]{2,})/);
-    if (m) {
-      const n = parseInt(m[1].replace(/[^\d]/g, ''), 10);
+  // On capture ~2000 caractères après le label (tags HTML inclus) puis on strip le HTML :
+  // le rang principal est souvent enfermé dans un <span> voisin, donc [^<] ne suffisait pas.
+  const bsrBlockMatch = html.match(/(?:Classement des meilleures ventes|Best Sellers Rank|Amazon Bestseller-Rang|Clasificaci[oó]n en los m[aá]s vendidos|Posizione nella classifica)[\s\S]{0,2000}/i);
+  if (bsrBlockMatch) {
+    const text = stripHtml(bsrBlockMatch[0]);
+    // Priorité : rang racine (Kindle Store, Boutique Kindle, Livres, Books…)
+    const rootRank = text.match(/#?\s*([\d][\d\s.,\u202f\u00a0]{0,12})\s+(?:en|in|dans)\s+(?:Boutique\s+Kindle|Kindle\s+Store|Livres|Books|Kindle-Shop|Tienda\s+Kindle|Negozio\s+Kindle)/i);
+    if (rootRank) {
+      const n = parseInt(rootRank[1].replace(/[^\d]/g, ''), 10);
       if (n > 0 && n < 10_000_000) result.bsr = n;
+    } else {
+      const m = text.match(/#?\s*([\d][\d\s.,\u202f\u00a0]{1,})/);
+      if (m) {
+        const n = parseInt(m[1].replace(/[^\d]/g, ''), 10);
+        if (n > 0 && n < 10_000_000) result.bsr = n;
+      }
     }
-    // Sub-categories like "12 in Self-Help"
-    const subMatches = [...text.matchAll(/#?\s*([\d\s.,\u202f\u00a0]+)\s+(?:dans|in|en)\s+([^#\n<>]{3,80})/gi)];
-    for (const sub of subMatches.slice(0, 5)) {
+    // Sous-catégories (ex. "3 en Fantasy romantique - ebooks")
+    const subMatches = [...text.matchAll(/#?\s*([\d\s.,\u202f\u00a0]+)\s+(?:dans|in|en)\s+([^#\n<>()]{3,80})/gi)];
+    for (const sub of subMatches.slice(0, 6)) {
       const cat = cleanText(sub[2]).replace(/\s*\(.*$/, '');
-      if (cat) result.categories.push(cat);
+      if (cat && !/^(Boutique\s+Kindle|Kindle\s+Store|Livres|Books|Kindle-Shop)$/i.test(cat)) {
+        result.categories.push(cat);
+      }
     }
   }
 
