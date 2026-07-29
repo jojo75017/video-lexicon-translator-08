@@ -1,121 +1,79 @@
-Plan de lancement V3 — 1er octobre 2026
 
-Objectif : verrouiller totalement l'accès V3 pour les abonnés V2 (aperçu uniquement : /v3 home + /v3/pourquoi + nouvelle page de présentation), préparer les paiements mensuels/annuels en coulisses, et sortir une page de vente V3 dédiée.
+# Plan final V3 — derniers points à valider avant test
 
----
-
-## Phase 0 — Verrouillage V3 pour les abonnés V2 (priorité absolue)
-
-1. Créer `src/components/v3/V3LockedGate.tsx`
-   - Composant wrapper qui bloque tout accès V3 sauf 3 routes autorisées : `/v3` (home), `/v3/pourquoi`, `/v3/offre` (nouvelle page de présentation).
-   - Si l'utilisateur tente d'accéder à une autre route V3, redirection vers `/v3/offre` avec un toast : « La V3 est disponible le 1er octobre 2026 — découvrez ce qui vous attend ».
-   - Flag global `V3_LAUNCH_UNLOCKED = false` dans `src/config/v3Launch.ts` pour pouvoir tout débloquer en une variable le jour J.
-   - Admin bypass : les admins (`getIsCurrentSessionAdmin`) continuent d'accéder à tout pour préparer.
-
-2. Bannière "Bientôt disponible" sur `/v3` et `/v3/pourquoi`
-   - Bandeau doré fixe en haut : « V3 disponible le 1er octobre 2026 — vous êtes déjà abonné V2, aucune action requise ».
-   - CTA : « Voir l'offre V3 » → `/v3/offre`.
-   - Retirer le bandeau "clé Gemini obligatoire" tant que la V3 n'est pas ouverte.
-
-3. Neutraliser les boutons de paiement `/v3/forfaits`
-   - Cacher la page ou la rediriger vers `/v3/offre` tant que `V3_LAUNCH_UNLOCKED = false`.
-   - Les boutons Stripe/PayPal restent en place dans le code mais désactivés.
-
-4. Retirer les liens V3 dans la sidebar V2 pour les abonnés
-   - Dans `V3MainTabs.tsx` et `V3Sidebar.tsx`, quand `V3_LAUNCH_UNLOCKED = false` : ne garder que 3 entrées visibles : Accueil V3, Pourquoi EbookStudio, Découvrir l'offre V3.
-   - Tous les autres onglets (Créer, Écrire, Habiller, Publier, Vendre, Livres spéciaux, Outils, Nouveautés…) sont masqués ou grisés avec badge « 1er octobre ».
+Objectif : passer en revue tout ce qui doit être vérifié / corrigé avant que tu testes la V3 de bout en bout. Rien de nouveau à créer — uniquement du verrouillage, du nettoyage et de la validation.
 
 ---
 
-## Phase 1 — Page de présentation de l'offre V3 (nouvelle page)
+## 1. Verrouillage & mode contemplation
+- Confirmer `V3_LAUNCH_UNLOCKED = false` dans `src/config/v3Launch.ts` (état actuel : OK).
+- Re-tester que **admin bypass** fonctionne sur toutes les routes V3 (les corrections récentes de `V3LockedGate` et `V3ContemplationMode`).
+- Vérifier les routes autorisées en mode contemplation : `/v3`, `/v3/offre`, `/v3/pourquoi`, `/v3/script-heygen`, `/v3/nouveautes`. Ajouter/retirer si besoin.
+- Contrôler qu'aucun lien du header/sidebar ne provoque de toast "contemplation" pour un admin connecté.
 
-5. Créer `src/pages/v3public/V3OffrePage.tsx` sur la route `/v3/offre`
-   - Structure inspirée d'une squeeze page + comparateur, alignée avec l'identité Émeraude & Or.
-   - Sections :
-     1. **Hero** : « La V3 arrive le 1er octobre — la maison d'édition IA repensée » + compte à rebours J-1er octobre + CTA « Je veux être prévenu ».
-     2. **Avant / Après V2 → V3** : tableau montrant les nouveautés (30 agents, Cover Studio Pro, KDP Pilot Pro, livres illustrés maternelle, univers multi-volumes, traduction 10 langues, humaniseur IA, mockups 3D, audiobook TTS, forum communauté).
-     3. **Les 3 forfaits** : cartes Auteur 9,99 €, Studio 12,99 € ⭐, Éditeur 59 € (mensuel + annuel avec économie affichée). Boutons désactivés « Disponible le 1er octobre ».
-     4. **Freemium** : bloc « Testez gratuitement dès l'ouverture — 1 livre offert, 3 chapitres, sans carte ».
-     5. **Ce que les abonnés V2 conservent** : rassurer sur la continuité, transition automatique, aucune interruption.
-     6. **Bonus fondateur** : réduction ou crédits offerts aux 100 premiers abonnés du 1er octobre.
-     7. **FAQ** : « Est-ce que mon abonnement V2 continue ? », « Puis-je basculer vers V3 le jour J ? », « À vie ou mensuel ? », « Freemium = combien de temps ? ».
-     8. **Formulaire de pré-inscription** : email → insert dans `funnel_leads` avec `lead_magnet = 'v3_launch_notify'`.
+## 2. Page de vente `/v3/offre` (passerelle V2 → V3)
+- Relire le hero, la section "détails de l'offre" et la FAQ pour vérifier le message : "V2 tout de suite à tarif avantageux, V3 offerte le 1er octobre".
+- Vérifier que **tous les CTA** pointent bien vers `V2_PURCHASE_LINK` (trafic-affiliation) et non vers un ancien lien Stripe.
+- Vérifier le compte à rebours (`V3_LAUNCH_DATE_ISO`) : 1er octobre 2026, 08:00 Europe/Paris.
+- Formulaire pré-inscription → `funnel_leads` avec `lead_magnet = 'v3_launch_notify'` : tester un envoi.
 
-6. SEO
-   - Title : « V3 EbookStudio — la maison d'édition IA — Ouverture 1er octobre »
-   - Meta description : « Découvrez la V3 EbookStudio : 30 agents IA, forfaits dès 9,99 €/mois, freemium, livres illustrés, KDP Pilot Pro. Ouverture 1er octobre 2026. »
+## 3. Emails & prospects
+- Vérifier qu'il ne reste **0 destinataire** en attente de correction pour l'ancien template cassé.
+- Confirmer que `track-email-click` redirige encore `ebookstudio.fr/v3/*` vers le domaine Lovable fonctionnel (test curl).
+- S'assurer qu'aucune future séquence n'utilise encore l'URL `ebookstudio.fr/v3/...` en dur (grep dans `supabase/functions`).
 
-7. Lien vers `/v3/offre` depuis :
-   - Le bandeau home V3.
-   - `/v3/pourquoi` en bas.
-   - Le header V3 (bouton doré « Découvrir l'offre »).
+## 4. Paiements
+- PayPal Live : ID/Secret/Webhook ID enregistrés → faire **un vrai test 1 €** via `V3ForfaitsPage` en mode admin.
+- Stripe : vérifier que PayPal est activé comme méthode dans le dashboard Stripe (côté user, pas côté code).
+- Bouton "Tester PayPal 1 €" toujours réservé aux admins.
 
----
+## 5. Parcours de création (routes admin uniquement pendant contemplation)
+- `/v3/create` : wizard 4 étapes, sauvegarde `ebook_projects`, reprise brouillon.
+- `/v3/livres/kids` : livre illustré maternelle (couverture pleine page, pas de bandes).
+- `/v3/livres/univers` : sagas multi-volumes.
+- `/v3/livres/bd`, `/documentaire`, `/atlas`, `/cuisine`, `/voyage` : gating plan Éditeur pour la version Pro.
 
-## Phase 2 — Préparation invisible de la monétisation (en coulisses, désactivée)
+## 6. Outils gratuits & recherche
+- `/v3/outils/offerts` : 4 outils marketing accessibles à tous.
+- `/v3/recherche` : hub KDP Pilot + Espion ASIN + catégories + keywords.
+- Vérifier bannière Firecrawl si la clé n'est pas active.
 
-8. Vérifier les prix Stripe existants
-   - Confirmer que les 6 lookup_keys sont créés en sandbox : `v3_auteur_monthly` (9,99 €), `v3_auteur_annual` (97 €), `v3_expert_monthly` (12,99 €), `v3_expert_annual` (117 €), `v3_auteur_monthly_pro` (59 €), `v3_auteur_annual_pro` (547 €).
-   - Créer ceux qui manquent via l'outil de création de prix.
-   - Ne rien publier tant que `V3_LAUNCH_UNLOCKED = false`.
+## 7. Communauté & contenu
+- `/v3/communaute` : 220 posts seed présents, création/réponse fonctionnelle.
+- `/v3/nouveautes` : liens vers Royalties, Humanizer, Mockup, Audiobook, Editor.
+- `/v3/script-heygen` : version 15 sections à jour.
+- Sidebar : ordre final validé (Recherche KDP en haut, Blog externe avec badge, Pourquoi, Offre).
 
-9. Écrire (mais ne pas déployer publiquement) le webhook V3 mensuel/annuel
-   - Nouveau `supabase/functions/v3-subscription-webhook/index.ts` qui gère `checkout.session.completed`, `invoice.payment_succeeded`, `customer.subscription.deleted` pour les subscriptions V3.
-   - Met à jour `subscribers` avec `plan_type`, `plan_tier`, `expires_at`, `stripe_subscription_id`.
-   - Testé en sandbox sur un compte admin uniquement.
+## 8. Nettoyage final
+- Passer `bun run build` (ou équivalent) mentalement pour repérer les imports orphelins signalés récemment.
+- Vérifier qu'aucune page supprimée (`V3SpecialBookPage`, etc.) n'est encore référencée dans les routes.
+- Meta `<title>` / `<meta description>` sur `/v3/offre` et `/v3/pourquoi` cohérentes avec la campagne email.
 
-10. Aligner `check-quota` sur les plans V3
-    - Ajouter les nouvelles limites : Auteur 10 livres/mois, Studio 20 livres/mois, Éditeur illimité.
-    - Ne pas activer côté client tant que la V3 est verrouillée.
+## 9. Sécurité & monitoring
+- Lancer un `security--run_security_scan` avant publication.
+- Vérifier RLS/GRANT sur les tables récentes (`funnel_leads`, `paypal_subscriptions`, `forum_*`).
 
-11. Préparer le freemium
-    - Config `src/config/v3Freemium.ts` : 1 livre, 3 chapitres, 1 personnage, pas d'export premium.
-    - Composant `<V3FreemiumBlock />` réutilisable avec CTA « Passez à Studio ».
-    - Restera inactif jusqu'au 1er octobre.
-
----
-
-## Phase 3 — Communication en amont
-
-12. Email de pré-lancement aux 653 prospects
-    - Sujet : « La V3 arrive le 1er octobre — voici ce que vous obtenez »
-    - Corps : lien vers `/v3/offre`, résumé des nouveautés, promesse fondateur.
-    - Envoi manuel via `send-sales-email` avec un nouveau template `v3_prelaunch_teaser`.
-
-13. Email dédié aux abonnés V2 actifs
-    - Sujet : « Votre abonnement continue — voici comment la V3 vous concerne »
-    - Rassurer sur la continuité + inviter à voir `/v3/offre`.
-
-14. Bandeau site global (V2)
-    - Sur le dashboard V2 : « La V3 arrive le 1er octobre — [Découvrir l'offre] ».
+## 10. Checklist Jour J (1er octobre) — à ne PAS exécuter maintenant
+1. Basculer `V3_LAUNCH_UNLOCKED = true`.
+2. Republier.
+3. Envoyer les emails de lancement (V2 + prospects).
+4. Surveiller `edge_function_logs` + premiers checkouts.
 
 ---
 
-## Phase 4 — Jour J (1er octobre 2026) — checklist à exécuter
-
-15. Basculer `V3_LAUNCH_UNLOCKED = true` dans `src/config/v3Launch.ts`.
-16. Activer les vrais boutons de paiement sur `/v3/forfaits`.
-17. Enregistrer le webhook V3 dans Stripe live avec `PAYMENTS_LIVE_WEBHOOK_SECRET`.
-18. Publier le site.
-19. Envoyer l'email de lancement aux prospects et aux V2.
-20. Surveiller les logs edge functions + les premiers checkout.
+## Détails techniques
+- Flag unique de bascule : `src/config/v3Launch.ts`.
+- Gate composant : `src/components/v3/V3LockedGate.tsx` (redirige vers `/v3/offre`).
+- Interception clic globale : `src/components/v3/V3ContemplationMode.tsx`.
+- Redirection anti-404 email : `supabase/functions/track-email-click/index.ts`.
+- Page pivot : `src/pages/v3public/V3OffrePage.tsx`.
 
 ---
 
-## Livrables de ce plan (avant le 1er octobre)
+## Livrables de ce plan
+Aucun développement neuf — uniquement :
+1. Une passe de vérification/validation guidée sur les 9 axes ci-dessus.
+2. Les micro-corrections détectées pendant la revue (imports morts, textes, liens résiduels).
+3. Un go/no-go clair pour la bascule du 1er octobre.
 
-- Composant `V3LockedGate` + flag global `V3_LAUNCH_UNLOCKED`.
-- Sidebar/menu V3 réduits aux 3 pages autorisées.
-- Nouvelle page `/v3/offre` complète avec compte à rebours, comparateur, forfaits en preview, formulaire pré-inscription.
-- Webhook V3 et quotas prêts mais désactivés.
-- 2 campagnes email prêtes à envoyer.
-
-## Ce qui reste bloqué (comme demandé)
-- `/v3/create`, `/v3/outils`, `/v3/hub`, `/v3/nouveautes`, `/v3/livres/*`, `/v3/forfaits` → redirection vers `/v3/offre`.
-- Aucun paiement ne peut être finalisé avant le 1er octobre.
-- Les abonnés V2 gardent 100 % de leurs accès V2 actuels sans changement.
-
-Indicateurs à préparer pour le suivi post-lancement
-- Nombre de pré-inscriptions collectées sur `/v3/offre`.
-- Taux de clic email prospects/V2.
-- Conversions Stripe/PayPal J+7, J+30 après ouverture.
+Dis-moi si tu veux que je démarre la revue axe par axe (je peux commencer par le §1 verrouillage + §2 page de vente, qui sont les plus critiques avant tes tests).
