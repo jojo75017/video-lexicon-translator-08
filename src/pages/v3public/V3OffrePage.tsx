@@ -141,7 +141,7 @@ export default function V3OffrePage() {
       <SeoHead
         title="Offre EbookStudio V2 — V3 incluse le 1er octobre"
         description="Rejoignez EbookStudio V2 maintenant à tarif avantageux. Le 1er octobre 2026, le premier plan V3 est inclus sans surcoût."
-        canonical="https://www.ebookstudio.fr/v3/offre"
+        canonical="https://video-lexicon-translator-08.lovable.app/v3/offre"
       />
 
       {/* HERO */}
