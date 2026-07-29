@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { KdpPilotAccuracyBanner } from './KdpPilotAccuracyBanner';
 
 // ——— Types ———
 
@@ -324,6 +325,8 @@ export const KdpAmazonResearch: React.FC<KdpAmazonResearchProps> = ({ defaultTab
 
   return (
     <div className="space-y-6">
+      <KdpPilotAccuracyBanner />
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

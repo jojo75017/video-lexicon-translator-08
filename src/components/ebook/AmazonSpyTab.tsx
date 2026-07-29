@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { FirecrawlNoticeBanner } from './FirecrawlNoticeBanner';
 import { FirecrawlCreditsIndicator } from './FirecrawlCreditsIndicator';
+import { KdpPilotAccuracyBanner } from './KdpPilotAccuracyBanner';
 
 interface SpyBook {
   title: string;
@@ -119,6 +120,7 @@ const AmazonSpyTab: React.FC<AmazonSpyTabProps> = ({ initialKeyword = '' }) => {
   return (
     <div className="space-y-4">
       <FirecrawlNoticeBanner />
+      <KdpPilotAccuracyBanner />
       <FirecrawlCreditsIndicator />
       <Card className="border-2 border-amber-300/60 bg-gradient-to-br from-amber-50/60 to-orange-50/40 dark:from-amber-950/20 dark:to-orange-950/10">
         <CardContent className="p-4 space-y-3">
