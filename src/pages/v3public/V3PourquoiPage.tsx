@@ -57,7 +57,9 @@ export default function V3PourquoiPage() {
           </div>
           <ol className="grid md:grid-cols-2 gap-y-1.5 gap-x-4 text-sm list-decimal list-inside">
             <li><a href="#promesse" className="hover:underline">La promesse EbookStudio</a></li>
+            <li><a href="#cle-gemini" className="hover:underline font-semibold" style={{ color: '#064E3B' }}>Clé Gemini gratuite (obligatoire)</a></li>
             <li><a href="#agents" className="hover:underline">Les 30 agents IA du workflow</a></li>
+
             <li><a href="#kids" className="hover:underline">Le mode Livre illustré maternelle</a></li>
             <li><a href="#couvertures" className="hover:underline">Cover Studio Pro : couverture + dos + 4e</a></li>
             <li><a href="#kdp" className="hover:underline">Conformité KDP native</a></li>
