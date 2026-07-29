@@ -231,21 +231,27 @@ const AmazonSpyTab: React.FC<AmazonSpyTabProps> = ({ initialKeyword = '' }) => {
               <CardContent className="p-3 text-center">
                 <Tag className="w-4 h-4 mx-auto text-orange-500 mb-1" />
                 <div className="text-xl font-bold">{result.analysis.avgPrice || '—'} €</div>
-                <p className="text-[11px] text-muted-foreground">Prix moyen</p>
+                <p className="text-[11px] text-muted-foreground flex items-center justify-center gap-1">
+                  Prix moyen <ScrapedMetricWarning size={11} />
+                </p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-3 text-center">
                 <MessageSquare className="w-4 h-4 mx-auto text-purple-500 mb-1" />
                 <div className="text-xl font-bold">{result.analysis.avgReviews}</div>
-                <p className="text-[11px] text-muted-foreground">Avis moyens</p>
+                <p className="text-[11px] text-muted-foreground flex items-center justify-center gap-1">
+                  Avis moyens <ScrapedMetricWarning size={11} />
+                </p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-3 text-center">
                 <Star className="w-4 h-4 mx-auto text-amber-500 mb-1" />
                 <div className="text-xl font-bold">{result.analysis.avgRating || '—'}</div>
-                <p className="text-[11px] text-muted-foreground">Note moyenne /5</p>
+                <p className="text-[11px] text-muted-foreground flex items-center justify-center gap-1">
+                  Note moyenne /5 <ScrapedMetricWarning size={11} />
+                </p>
               </CardContent>
             </Card>
           </div>
