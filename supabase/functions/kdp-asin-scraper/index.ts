@@ -378,7 +378,7 @@ async function resolveAmazonBook(
     }
   }
 
-  const book = parseAmazonBookPage(
+  let book = parseAmazonBookPage(
     selectedScrape?.markdown || searchHit?.markdown || '',
     selectedScrape?.metadata || {},
     asin,
@@ -386,6 +386,28 @@ async function resolveAmazonBook(
     searchHit,
     selectedScrape?.html || selectedScrape?.rawHtml || '',
   );
+
+  // 2ter) Si Firecrawl a rendu du HTML mais que le parser n'a rien extrait de fiable
+  // (BSR ET reviews null), on tente ScraperAPI en repli et on garde le meilleur résultat.
+  if (scrapeSource === 'firecrawl' && book.bsr == null && book.reviews == null) {
+    console.log('Parser vide sur Firecrawl, second essai via ScraperAPI pour', asin);
+    const secondPass = await scraperApiScrape(directUrl, marketplace);
+    if (secondPass) {
+      const bookB = parseAmazonBookPage(
+        secondPass.markdown || '',
+        secondPass.metadata || {},
+        asin,
+        domain,
+        searchHit,
+        secondPass.html || secondPass.rawHtml || '',
+      );
+      if (bookB.bsr != null || bookB.reviews != null || bookB.rating != null || bookB.price != null) {
+        book = bookB;
+        scrapeSource = 'scraperapi';
+      }
+    }
+  }
+
 
   // 3) PA-API a priorité absolue sur les valeurs scrapées (sources officielles)
   if (paapiData) {
@@ -473,12 +495,10 @@ function extractFromHtml(html: string) {
   };
   if (!html) return result;
 
-  // Price from offer blocks (Amazon a-price classes)
-  const priceWhole = html.match(/<span[^>]*class="[^"]*a-price-whole[^"]*"[^>]*>([\d\s.,]+)<\/span>\s*(?:<span[^>]*class="[^"]*a-price-decimal[^"]*"[^>]*>[^<]*<\/span>\s*<span[^>]*class="[^"]*a-price-fraction[^"]*"[^>]*>([\d]+)<\/span>)?/i);
-  if (priceWhole) {
-    const w = priceWhole[1].replace(/[^\d]/g, '');
-    const f = priceWhole[2] ? priceWhole[2].replace(/[^\d]/g, '') : '00';
-    const num = parseFloat(`${w}.${f}`);
+  // Price from offer blocks (Amazon a-price classes — whole/decimal/fraction sont IMBRIQUÉS, pas frères)
+  const priceMatch = html.match(/a-price-whole"[^>]*>(\d+)[\s\S]{0,120}?a-price-fraction"[^>]*>(\d+)/i);
+  if (priceMatch) {
+    const num = parseFloat(`${priceMatch[1]}.${priceMatch[2]}`);
     if (!isNaN(num) && num > 0 && num < 1000) result.price = num;
   }
   if (!result.price) {
@@ -493,7 +513,8 @@ function extractFromHtml(html: string) {
   // Rating
   const ratingMatch = html.match(/(\d[.,]\d)\s*(?:sur|out of)\s*5\s*étoiles?/i)
     || html.match(/data-hook="rating-out-of-text"[^>]*>\s*(\d[.,]\d)/i)
-    || html.match(/a-icon-alt[^>]*>\s*(\d[.,]\d)\s*(?:sur|out of)/i);
+    || html.match(/a-icon-alt[^>]*>\s*(\d[.,]\d)\s*(?:sur|out of)/i)
+    || html.match(/(\d[.,]\d)\s*(?:sur|out of)\s*5/i);
   if (ratingMatch) {
     const r = parseFloat(ratingMatch[1].replace(',', '.'));
     if (!isNaN(r) && r > 0 && r <= 5) result.rating = r;
