@@ -303,8 +303,10 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <div className="min-h-screen bg-background">
+          <V3LaunchGlobalBanner />
           <Suspense fallback={<PageLoader />}>
           <Routes>
+
             <Route
               path="/googleba4e4a3539729cd0.html"
               element={
