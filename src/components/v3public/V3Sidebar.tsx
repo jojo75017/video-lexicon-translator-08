@@ -19,6 +19,7 @@ const NAV: NavSection[] = [
   {
     section: 'Recherche KDP',
     items: [
+      { to: '/v3/recherche', label: 'Studio Recherche KDP', icon: Search, badge: 'Hub' },
       { to: '/v3/nouveautes', label: '✨ Nouveautés V3', icon: Sparkles, badge: 'NEW' },
       { to: '/v3/outils/offerts', label: '🎁 Outils offerts', icon: Search, badge: 'Offert' },
       { to: '/v3/outils/royalties', label: 'Calculateur royalties', icon: BarChart3, badge: 'Offert' },
@@ -26,7 +27,6 @@ const NAV: NavSection[] = [
       { to: '/v3/outils/mockup-3d', label: 'Mockups 3D', icon: ImageIcon, badge: 'NEW' },
       { to: '/v3/outils/audiobook', label: 'Audiobook TTS', icon: Video, badge: 'NEW' },
       { to: '/v3/outils/editeur', label: 'Éditeur WYSIWYG', icon: FileText, badge: 'NEW' },
-      { to: '/v3/recherche', label: 'Studio Recherche KDP', icon: Search, badge: 'Hub' },
       { to: '/kdp-keywords', label: 'Recherche mots-clés', icon: Search },
       { to: '/kdp-keywords?tab=spy', label: 'Espion Amazon (ASIN)', icon: Target },
       { to: '/kdp-keywords?tab=longtail', label: 'Longue traîne', icon: BarChart3 },
