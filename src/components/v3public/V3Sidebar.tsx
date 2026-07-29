@@ -19,6 +19,7 @@ const NAV: NavSection[] = [
   {
     section: 'Recherche KDP',
     items: [
+      { to: '/v3/outils/offerts', label: '🎁 Outils offerts', icon: Search, badge: 'Offert' },
       { to: '/v3/recherche', label: 'Studio Recherche KDP', icon: Search, badge: 'Hub' },
       { to: '/kdp-keywords', label: 'Recherche mots-clés', icon: Search },
       { to: '/kdp-keywords?tab=spy', label: 'Espion Amazon (ASIN)', icon: Target },
