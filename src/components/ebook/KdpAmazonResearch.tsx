@@ -947,11 +947,12 @@ const AuditResultsCard: React.FC<{ audit: AuditData; onCopy: (t: string) => void
   </div>
 );
 
-const StatCard: React.FC<{ icon: any; label: string; value: string; color: string }> = ({ icon: Icon, label, value, color }) => (
+const StatCard: React.FC<{ icon: any; label: string; value: string; color: string; scraped?: boolean }> = ({ icon: Icon, label, value, color, scraped }) => (
   <div className="p-3 rounded-lg border bg-card">
     <div className="flex items-center gap-2 mb-1">
       <Icon className={`h-4 w-4 ${color}`} />
       <span className="text-xs text-muted-foreground">{label}</span>
+      {scraped && <ScrapedMetricWarning size={12} />}
     </div>
     <p className="text-lg font-bold text-foreground">{value}</p>
   </div>
