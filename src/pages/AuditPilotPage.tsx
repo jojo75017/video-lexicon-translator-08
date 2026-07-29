@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ClipboardCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { KdpAmazonResearch } from '@/components/ebook/KdpAmazonResearch';
+import { KdpPilotAccuracyBanner } from '@/components/ebook/KdpPilotAccuracyBanner';
 
 const AuditPilotPage: React.FC = () => {
   const navigate = useNavigate();
