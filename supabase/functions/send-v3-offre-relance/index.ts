@@ -1,4 +1,4 @@
-// Envoi de la page de vente V3 (page /v3/offre) à tous les prospects
+// Envoi de l'offre passerelle V2 → V3 à tous les prospects
 // qui n'ont JAMAIS cliqué sur un email précédent.
 //
 // - Corps HTML autonome (reprend les blocs clés de /v3/offre)
@@ -18,13 +18,13 @@ const corsHeaders = {
 const FROM_ADDRESS = "Georges Boubet <noreply@ebookstudio.fr>";
 const EXCLUDED = ["boubetgeorges@gmail.com"];
 
-const TEMPLATE_NAME = "v3-offre-relance-oct2026";
-const SUBJECT = "🚀 Le 1er octobre, EbookStudio devient une maison d'édition IA — verrouillez votre place";
+const TEMPLATE_NAME = "v2-v3-passerelle-oct2026";
+const SUBJECT = "V2 maintenant, premier plan V3 offert le 1er octobre";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const TRACK_CLICK = `${SUPABASE_URL}/functions/v1/track-email-click`;
-const OFFRE_LINK = "https://ebookstudio.blog/#accueil";
-const POURQUOI_LINK = "https://www.trafic-affiliation.com/ebookstudiopv";
+const OFFRE_LINK = "https://video-lexicon-translator-08.lovable.app/v3/offre";
+const PAY_LINK = "https://www.trafic-affiliation.com/ebookstudiopv";
 
 function trackedUrl(email: string, dest: string): string {
   return `${TRACK_CLICK}?e=${encodeURIComponent(email)}&s=1&u=${encodeURIComponent(dest)}&t=${encodeURIComponent(TEMPLATE_NAME)}`;
@@ -32,56 +32,57 @@ function trackedUrl(email: string, dest: string): string {
 
 export function buildHtml(email: string): string {
   const cta = trackedUrl(email, OFFRE_LINK);
-  const pourquoi = trackedUrl(email, POURQUOI_LINK);
+  const pay = trackedUrl(email, PAY_LINK);
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#0b1220;">
 <div style="max-width:640px;margin:0 auto;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#232F3E;">
 
   <div style="background:linear-gradient(135deg,#0b1220 0%,#0f2a3a 100%);padding:36px 28px;text-align:center;color:#fff;">
-    <div style="display:inline-block;background:#FF9E2D;color:#0b1220;font-weight:bold;padding:6px 14px;border-radius:20px;font-size:12px;letter-spacing:1px;">OFFRE FONDATEUR · 1ER OCTOBRE 2026</div>
-    <h1 style="margin:16px 0 8px;font-size:28px;line-height:1.25;">EbookStudio V3 : votre <span style="color:#FF9E2D;">maison d'édition IA</span></h1>
-    <p style="margin:0;font-size:16px;color:#cfe6ea;line-height:1.5;">30 agents IA · livres illustrés maternelle · univers multi-volumes · Cover Studio Pro · KDP Pilot · traduction 10 langues</p>
+    <div style="display:inline-block;background:#FF9E2D;color:#0b1220;font-weight:bold;padding:6px 14px;border-radius:20px;font-size:12px;letter-spacing:1px;">OFFRE PASSERELLE V2 → V3</div>
+    <h1 style="margin:16px 0 8px;font-size:28px;line-height:1.25;">Prenez la V2 maintenant,<br><span style="color:#FF9E2D;">la V3 arrive sans surcoût</span></h1>
+    <p style="margin:0;font-size:16px;color:#cfe6ea;line-height:1.5;">Accès V2 immédiat · tarif avantageux · premier plan V3 inclus le 1er octobre 2026</p>
   </div>
 
   <div style="padding:28px;">
     <p style="font-size:16px;line-height:1.6;margin:0 0 14px;">Bonjour,</p>
     <p style="font-size:16px;line-height:1.6;margin:0 0 14px;">
-      Le <strong>1er octobre 2026</strong>, EbookStudio bascule officiellement en <strong>V3</strong> : une vraie maison d'édition IA en ligne. J'ai créé une page dédiée qui montre exactement ce que vous aurez, et le tarif Fondateur avant l'augmentation.
+      La V3 ouvrira officiellement le <strong>1er octobre 2026</strong>. En attendant, vous n'êtes pas obligé d'attendre : vous pouvez rejoindre <strong>EbookStudio V2 maintenant</strong>, à un tarif intéressant, et commencer vos livres tout de suite.
+    </p>
+    <p style="font-size:16px;line-height:1.6;margin:0 0 14px;">
+      Le plus important : si vous prenez la V2 avec cette offre, le <strong>premier plan V3 sera ajouté à votre accès sans surcoût</strong> au lancement.
     </p>
 
     <table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px auto;">
       <tr><td style="border-radius:10px;background:#FF9E2D;">
-        <a href="${cta}" style="display:inline-block;padding:16px 32px;color:#0b1220;text-decoration:none;font-weight:bold;font-size:17px;border-radius:10px;">🚀 Voir la page d'offre complète →</a>
+        <a href="${pay}" style="display:inline-block;padding:16px 32px;color:#0b1220;text-decoration:none;font-weight:bold;font-size:17px;border-radius:10px;">Je prends la V2 maintenant →</a>
       </td></tr>
     </table>
 
     <div style="background:#FFF7E6;border-left:4px solid #FF9E2D;padding:14px 18px;border-radius:6px;margin:18px 0;font-size:14px;line-height:1.6;">
-      🎁 <strong>Ce que les Fondateurs obtiennent :</strong><br>
-      ✅ Accès complet à la V3 dès le 1er octobre — <strong>sans surcoût, à vie</strong><br>
-      ✅ Tarif bloqué avant l'augmentation officielle<br>
-      ✅ 1 mois offert par filleul · −20 % pour vos invités<br>
-      ✅ Garantie 7 jours
+      🎁 <strong>Ce que cette offre vous donne :</strong><br>
+      ✅ Accès immédiat à EbookStudio V2 pour créer sans attendre octobre<br>
+      ✅ Tarif avantageux avant le lancement officiel de la V3<br>
+      ✅ Premier plan V3 inclus le 1er octobre — <strong>sans supplément</strong><br>
+      ✅ Email de rappel le jour de l'ouverture V3
     </div>
 
-    <h3 style="font-size:18px;margin:22px 0 10px;color:#0b1220;">Ce que la V3 change concrètement</h3>
+    <h3 style="font-size:18px;margin:22px 0 10px;color:#0b1220;">Pourquoi commencer avec la V2 maintenant ?</h3>
     <ul style="font-size:15px;line-height:1.75;padding-left:20px;margin:0 0 18px;">
-      <li><strong>30 agents IA</strong> qui écrivent, illustrent, formatent et publient à votre place</li>
-      <li><strong>Livres illustrés maternelle 3-7 ans</strong> — histoires + images générées automatiquement</li>
-      <li><strong>Univers multi-volumes</strong> — sagas de 3 à 10 tomes cohérents</li>
-      <li><strong>Cover Studio Pro</strong> — couvertures 300 DPI avec dos et 4e de couv calculés</li>
-      <li><strong>KDP Pilot</strong> — audit niche, ASIN spy, catégories, mots-clés Amazon</li>
-      <li><strong>Traduction 10 langues</strong> pour publier à l'international</li>
+      <li>Vous commencez vos livres immédiatement, sans attendre le 1er octobre.</li>
+      <li>Vous profitez du tarif actuel avant l'arrivée des nouveaux plans.</li>
+      <li>Vous gardez votre accès V2 et recevez le premier plan V3 au lancement.</li>
+      <li>La V3 apportera ensuite le nouveau workflow, les agents IA enrichis, les couvertures pro et les modules avancés.</li>
     </ul>
 
     <p style="font-size:15px;line-height:1.6;margin:18px 0;">
-      Vous voulez réserver l'offre fondateur directement ? Le lien de paiement fonctionne ici :
-      <br><a href="${pourquoi}" style="color:#008296;">👉 Réserver EbookStudio Pro — 59 € à vie</a>
+      Si vous voulez relire la page avant de vous inscrire :
+      <br><a href="${cta}" style="color:#008296;">👉 Voir la page d'explication V2 → V3</a>
     </p>
 
     <table role="presentation" cellpadding="0" cellspacing="0" style="margin:26px auto 8px;">
       <tr><td style="border-radius:10px;background:#008296;">
-        <a href="${cta}" style="display:inline-block;padding:14px 28px;color:#fff;text-decoration:none;font-weight:bold;font-size:16px;border-radius:10px;">Verrouiller ma place Fondateur →</a>
+        <a href="${pay}" style="display:inline-block;padding:14px 28px;color:#fff;text-decoration:none;font-weight:bold;font-size:16px;border-radius:10px;">Rejoindre EbookStudio V2 →</a>
       </td></tr>
     </table>
 
