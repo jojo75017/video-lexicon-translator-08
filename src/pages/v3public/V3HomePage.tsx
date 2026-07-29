@@ -66,6 +66,7 @@ export default function V3HomePage() {
             </span>
             <div className="text-[13.5px] leading-snug">
               <strong style={{ color: 'var(--v3-gold)' }}>Avant de commencer :</strong> branchez votre <strong>clé Gemini gratuite</strong> (60 s, quota généreux offert par Google) pour déverrouiller la V3 sans limite.
+              <span className="hidden md:inline ml-1 opacity-90">Si le lien est bloqué par votre navigateur, copiez-le et ouvrez-le dans un nouvel onglet.</span>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -73,25 +74,31 @@ export default function V3HomePage() {
               type="button"
               onClick={async () => {
                 const url = 'https://aistudio.google.com/app/apikey';
-                try { await navigator.clipboard.writeText(url); } catch {}
-                window.open(url, '_blank', 'noopener,noreferrer');
-                // Fallback si le nouvel onglet est bloqué (aperçu iframe Lovable)
                 try {
+                  await navigator.clipboard.writeText(url);
                   const { toast } = await import('sonner');
-                  toast.success('Lien copié : ' + url, { duration: 6000 });
+                  toast.success('Lien copié. Collez-le dans un nouvel onglet si le clic ne fonctionne pas.', { duration: 7000 });
                 } catch {}
+                const win = window.open(url, '_blank', 'noopener,noreferrer');
+                if (!win || win.closed || typeof win.closed === 'undefined') {
+                  const { toast } = await import('sonner');
+                  toast.info('Le nouvel onglet a été bloqué. Le lien est déjà copié : collez-le manuellement.', { duration: 9000 });
+                }
               }}
               className="v3-btn v3-btn-gold text-[12.5px] whitespace-nowrap cursor-pointer"
-              title="Ouvrir Google AI Studio dans un nouvel onglet (lien aussi copié)"
+              title="Copier le lien Google AI Studio et l'ouvrir dans un nouvel onglet"
             >
               Obtenir ma clé gratuite
             </button>
-
-
             <Link to="/v3/compte" className="v3-btn v3-btn-on-dark text-[12.5px] whitespace-nowrap">
               Coller ma clé
             </Link>
           </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-5 md:px-8 pb-3 -mt-1 md:hidden">
+          <p className="text-[12px] text-white/80 leading-snug">
+            Si le bouton ne s'ouvre pas, copiez ce lien : <code className="text-[11px] bg-white/15 px-1.5 py-0.5 rounded">https://aistudio.google.com/app/apikey</code>
+          </p>
         </div>
       </section>
 
