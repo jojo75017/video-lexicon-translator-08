@@ -248,6 +248,35 @@ Et si vous préférez m'écrire, répondez simplement à cet email : je lis tout
 Au plaisir d'échanger,
 Georges`,
   },
+  // Variante 4 — Preuve sociale + V3 offerte en octobre
+  {
+    subject: "🎁 {name}, rejoignez ceux qui auront la V3 sans surcoût en octobre",
+    body: (name) => `Bonjour ${name},
+
+Petit rappel qui peut tout changer pour vous.
+
+Des **centaines d'auteurs** ont déjà rejoint EbookStudio ces dernières semaines. Tous ont désormais une certitude :
+
+✅ Ils profitent de l'outil **dès aujourd'hui** (génération d'ebooks, couvertures, audio, KDP…)
+✅ Ils recevront **la V3 en octobre 2026 SANS AUCUN SURCOÛT**
+✅ Ils bloquent leur tarif Fondateur avant l'augmentation officielle
+
+Concrètement, la V3 c'est une vraie **maison d'édition en ligne** : 30 agents IA, livres illustrés maternelle, univers multi-volumes, Cover Studio Pro, KDP Pilot, communauté de 220+ auteurs actifs, traduction 10 langues…
+
+👉 Aujourd'hui, tout ça est **inclus** dans l'offre Fondateur à 67€ à vie.
+👉 En octobre, les nouveaux abonnés paieront le plein tarif V3 (jusqu'à 59€/mois).
+
+Vous, si vous rejoignez maintenant, vous payez **une seule fois** et vous avez tout à vie.
+
+[[ 🚀 Rejoindre les Fondateurs (67€ à vie · V3 incluse) | ${OFFRES_LINK} ]]
+
+Ne laissez pas passer l'occasion — le nombre de places Fondateur diminue chaque semaine.
+
+À très vite,
+Georges
+
+PS : si vous préférez d'abord voir l'outil en action, la démo est ici 👉 ${DEMO_LINK}`,
+  },
 ];
 const RELANCE_MAX_ROUNDS = RELANCE_VARIANTS.length;
 
