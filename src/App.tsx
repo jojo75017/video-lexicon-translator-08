@@ -89,6 +89,7 @@ const V3CompetitorSpyPage = lazy(() => import('./pages/v3public/V3CompetitorSpyP
 const V3OutilsOffertsPage = lazy(() => import('./pages/v3public/V3OutilsOffertsPage'));
 const V3CategoryFinderPage = lazy(() => import('./pages/v3public/V3CategoryFinderPage'));
 const V3ForfaitsPage = lazy(() => import('./pages/v3public/V3ForfaitsPage'));
+const V3PayPalReturnPage = lazy(() => import('./pages/v3public/V3PayPalReturnPage'));
 const V3RecherchePage = lazy(() => import('./pages/v3public/V3RecherchePage'));
 const V3Upsell17Page = lazy(() => import('./pages/v3public/V3Upsell17Page'));
 
@@ -522,6 +523,7 @@ const App = () => {
               <Route path="outils/traduction" element={<V3TranslatorPage />} />
               <Route path="compte" element={<V3ComptePage />} />
               <Route path="forfaits" element={<V3ForfaitsPage />} />
+              <Route path="paypal-retour" element={<V3PayPalReturnPage />} />
               <Route path="pourquoi" element={<V3PourquoiPage />} />
               <Route path="script-heygen" element={<V3ScriptHeygenPage />} />
               <Route path="upsell-17" element={<V3Upsell17Page />} />

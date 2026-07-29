@@ -23,6 +23,7 @@ import {
   type V3PlanId,
 } from "@/data/v3Pricing";
 import { BackButton } from "@/components/v3/BackButton";
+import { PayPalSubscribeButton } from "@/components/v3/PayPalSubscribeButton";
 
 const PLAN_ICONS = {
   debutant: Sparkles,
@@ -374,8 +375,17 @@ export default function V3ForfaitsPage() {
                 >
                   Être prévenu au lancement
                 </Link>
+                <div className="mt-2">
+                  <PayPalSubscribeButton
+                    planId={plan.id}
+                    interval={interval}
+                    planName={plan.name}
+                    amount={price}
+                    accent={accent}
+                  />
+                </div>
                 <p className="text-[11px] text-center mt-2" style={{ color: "#9ca3af" }}>
-                  Ouverture des abonnements · octobre 2026
+                  Prélèvement automatique {interval === "month" ? "mensuel" : "annuel"} · Annulable à tout moment
                 </p>
               </article>
             );
