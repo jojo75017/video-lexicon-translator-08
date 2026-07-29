@@ -1296,6 +1296,99 @@ export type Database = {
         }
         Relationships: []
       }
+      paypal_plan_cache: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          interval: string
+          lookup_key: string
+          paypal_plan_id: string
+          paypal_product_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          interval: string
+          lookup_key: string
+          paypal_plan_id: string
+          paypal_product_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          interval?: string
+          lookup_key?: string
+          paypal_plan_id?: string
+          paypal_product_id?: string
+        }
+        Relationships: []
+      }
+      paypal_subscriptions: {
+        Row: {
+          amount: number
+          cancelled_at: string | null
+          created_at: string
+          currency: string
+          email: string
+          id: string
+          interval: string
+          last_payment_at: string | null
+          metadata: Json
+          next_billing_at: string | null
+          paypal_payer_id: string | null
+          paypal_plan_id: string | null
+          paypal_subscription_id: string | null
+          plan_id: string
+          plan_name: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          cancelled_at?: string | null
+          created_at?: string
+          currency?: string
+          email: string
+          id?: string
+          interval: string
+          last_payment_at?: string | null
+          metadata?: Json
+          next_billing_at?: string | null
+          paypal_payer_id?: string | null
+          paypal_plan_id?: string | null
+          paypal_subscription_id?: string | null
+          plan_id: string
+          plan_name: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          cancelled_at?: string | null
+          created_at?: string
+          currency?: string
+          email?: string
+          id?: string
+          interval?: string
+          last_payment_at?: string | null
+          metadata?: Json
+          next_billing_at?: string | null
+          paypal_payer_id?: string | null
+          paypal_plan_id?: string | null
+          paypal_subscription_id?: string | null
+          plan_id?: string
+          plan_name?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       published_books: {
         Row: {
           asin: string | null
