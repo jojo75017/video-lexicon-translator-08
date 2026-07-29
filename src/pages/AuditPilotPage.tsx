@@ -22,6 +22,8 @@ const AuditPilotPage: React.FC = () => {
           </div>
         </div>
 
+        <KdpPilotAccuracyBanner />
+
         <KdpAmazonResearch defaultTab="pilot" />
       </div>
     </div>
