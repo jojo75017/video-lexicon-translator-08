@@ -24,6 +24,7 @@ import V2V3FloatingSwitch from '@/components/admin/V2V3FloatingSwitch';
 import LeadCapturePopup from '@/components/marketing/LeadCapturePopup';
 import FloatingToolCTA from '@/components/marketing/FloatingToolCTA';
 import StickySignupBar from '@/components/marketing/StickySignupBar';
+import V3LaunchGlobalBanner from '@/components/V3LaunchGlobalBanner';
 import { captureUtmParams } from '@/lib/utmTracking';
 
 // V2 — Ebook Planner + outils satellites
