@@ -47,12 +47,16 @@ function isAllowedTarget(href: string | null): boolean {
 }
 
 export default function V3ContemplationMode({ children }: { children: ReactNode }) {
-  // Verrouillage total pour TOUT LE MONDE (admins compris) jusqu'au 1er octobre.
-  // La surprise doit rester intacte : on peut voir, pas cliquer.
+  // Verrouillage pour les visiteurs / abonnés — les admins peuvent tester librement.
   const [locked, setLocked] = useState(!V3_LAUNCH_UNLOCKED);
 
   useEffect(() => {
-    setLocked(!V3_LAUNCH_UNLOCKED);
+    let cancelled = false;
+    if (V3_LAUNCH_UNLOCKED) { setLocked(false); return; }
+    getIsCurrentSessionAdmin()
+      .then((isAdmin) => { if (!cancelled) setLocked(!isAdmin); })
+      .catch(() => { if (!cancelled) setLocked(true); });
+    return () => { cancelled = true; };
   }, []);
 
 
