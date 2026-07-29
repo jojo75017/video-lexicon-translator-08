@@ -64,9 +64,9 @@ export default function V3HomePage() {
             >
               🔑
             </span>
-            <div className="text-[13.5px] leading-snug">
-              <strong style={{ color: 'var(--v3-gold)' }}>Avant de commencer :</strong> branchez votre <strong>clé Gemini gratuite</strong> (60 s, quota généreux offert par Google) pour déverrouiller la V3 sans limite.
-              <span className="hidden md:inline ml-1 opacity-90">Si le lien est bloqué par votre navigateur, copiez-le et ouvrez-le dans un nouvel onglet.</span>
+            <div className="text-[13.5px] leading-snug text-white">
+              <strong style={{ color: '#fff4c7' }}>Avant de commencer :</strong> branchez votre <strong className="text-white">clé Gemini gratuite</strong> (60 s, quota généreux offert par Google) pour déverrouiller la V3 sans limite.
+              <span className="hidden md:inline ml-1 text-white/95">Si le lien est bloqué par votre navigateur, copiez-le et ouvrez-le dans un nouvel onglet.</span>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
