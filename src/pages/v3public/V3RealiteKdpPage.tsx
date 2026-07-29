@@ -14,7 +14,8 @@ export default function V3RealiteKdpPage() {
         <BackButton to="/v3" />
 
         <header className="mb-8">
-          <Badge className="bg-[#008296] mb-3">📖 À lire avant de publier</Badge>
+          <Badge className="bg-[#008296] mb-3">📖 Guide</Badge>
+
           <h1 className="text-3xl md:text-4xl font-bold text-[#232F3E] leading-tight">
             La vraie vie des auteurs Amazon KDP&nbsp;: combien on gagne réellement,
             et pourquoi la plupart se plantent
