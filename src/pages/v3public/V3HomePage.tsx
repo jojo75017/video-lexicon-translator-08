@@ -71,11 +71,22 @@ export default function V3HomePage() {
           <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
-              onClick={() => window.open('https://aistudio.google.com/app/apikey', '_blank', 'noopener,noreferrer')}
+              onClick={async () => {
+                const url = 'https://aistudio.google.com/app/apikey';
+                try { await navigator.clipboard.writeText(url); } catch {}
+                window.open(url, '_blank', 'noopener,noreferrer');
+                // Fallback si le nouvel onglet est bloqué (aperçu iframe Lovable)
+                try {
+                  const { toast } = await import('sonner');
+                  toast.success('Lien copié : ' + url, { duration: 6000 });
+                } catch {}
+              }}
               className="v3-btn v3-btn-gold text-[12.5px] whitespace-nowrap cursor-pointer"
+              title="Ouvrir Google AI Studio dans un nouvel onglet (lien aussi copié)"
             >
               Obtenir ma clé gratuite
             </button>
+
 
             <Link to="/v3/compte" className="v3-btn v3-btn-on-dark text-[12.5px] whitespace-nowrap">
               Coller ma clé
