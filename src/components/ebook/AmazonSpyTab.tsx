@@ -309,14 +309,16 @@ const AmazonSpyTab: React.FC<AmazonSpyTabProps> = ({ initialKeyword = '' }) => {
                     </div>
                     <div className="text-right shrink-0 space-y-0.5">
                       {typeof book.price === 'number' && (
-                        <div className="font-bold text-sm text-orange-600">{book.price} €</div>
+                        <div className="font-bold text-sm text-orange-600 flex items-center justify-end gap-1">
+                          {book.price} € <ScrapedMetricWarning size={10} />
+                        </div>
                       )}
                       <div className="flex items-center justify-end gap-2 text-[11px] text-muted-foreground">
                         {typeof book.rating === 'number' && (
-                          <span className="flex items-center gap-0.5"><Star className="w-3 h-3 text-amber-400 fill-amber-400" />{book.rating}</span>
+                          <span className="flex items-center gap-0.5"><Star className="w-3 h-3 text-amber-400 fill-amber-400" />{book.rating} <ScrapedMetricWarning size={10} /></span>
                         )}
                         {typeof book.reviews === 'number' && (
-                          <span className="flex items-center gap-0.5"><MessageSquare className="w-3 h-3" />{book.reviews}</span>
+                          <span className="flex items-center gap-0.5"><MessageSquare className="w-3 h-3" />{book.reviews} <ScrapedMetricWarning size={10} /></span>
                         )}
                       </div>
                     </div>
