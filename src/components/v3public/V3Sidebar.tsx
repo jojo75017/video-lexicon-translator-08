@@ -19,6 +19,7 @@ const NAV: NavSection[] = [
   {
     section: 'Recherche KDP',
     items: [
+      { to: '/v3/recherche', label: 'Studio Recherche KDP', icon: Search, badge: 'Hub' },
       { to: '/v3/nouveautes', label: '✨ Nouveautés V3', icon: Sparkles, badge: 'NEW' },
       { to: '/v3/outils/offerts', label: '🎁 Outils offerts', icon: Search, badge: 'Offert' },
       { to: '/v3/outils/royalties', label: 'Calculateur royalties', icon: BarChart3, badge: 'Offert' },
@@ -26,7 +27,6 @@ const NAV: NavSection[] = [
       { to: '/v3/outils/mockup-3d', label: 'Mockups 3D', icon: ImageIcon, badge: 'NEW' },
       { to: '/v3/outils/audiobook', label: 'Audiobook TTS', icon: Video, badge: 'NEW' },
       { to: '/v3/outils/editeur', label: 'Éditeur WYSIWYG', icon: FileText, badge: 'NEW' },
-      { to: '/v3/recherche', label: 'Studio Recherche KDP', icon: Search, badge: 'Hub' },
       { to: '/kdp-keywords', label: 'Recherche mots-clés', icon: Search },
       { to: '/kdp-keywords?tab=spy', label: 'Espion Amazon (ASIN)', icon: Target },
       { to: '/kdp-keywords?tab=longtail', label: 'Longue traîne', icon: BarChart3 },
@@ -45,8 +45,8 @@ const NAV: NavSection[] = [
   {
     section: 'Mon espace',
     items: [
-      { to: '/v3', label: 'Accueil V3', icon: Home, end: true },
       { to: '/v3/create', label: 'Créer un livre', icon: Sparkles },
+      { to: '/v3', label: 'Accueil V3', icon: Home, end: true },
       { to: '/v3/create/illustre?preset=maternelle-3-6', label: 'Album maternelle 3-6 ans', icon: Sparkles, badge: 'Livré' },
       { to: '/v3/create/illustre?preset=histoires-du-soir-3-7', label: 'Histoires du soir 3-7 ans', icon: BookOpen, badge: 'Livré' },
 
