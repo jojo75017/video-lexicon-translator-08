@@ -20,7 +20,7 @@ Aujourd'hui, je vais vous faire visiter, de A à Z, la version 3 d'EbookStudio �
     duration: '~50 s',
     body: `Un point très important avant tout : pour utiliser la V3 sans limite, vous devez brancher votre propre clé Gemini gratuite. C'est gratuit, ça prend 60 secondes, et cela vous appartient.
 
-Rendez-vous sur aistudio.google.com/apikey, connectez-vous avec votre compte Google, cliquez sur "Create API Key", copiez la clé qui commence par "AIza", puis collez-la dans EbookStudio depuis l'onglet "Ma clé Gemini". C'est tout.
+Rendez-vous sur aistudio.google.com/apikey, connectez-vous avec votre compte Google, cliquez sur "Create API Key", copiez la clé qui commence par "AIza", puis collez-la dans EbookStudio depuis l'onglet "Ma clé Gemini". Si le lien est bloqué par votre navigateur ou par un aperçu intégré, copiez-le simplement et collez-le dans un nouvel onglet. C'est tout.
 
 Pourquoi ? Parce que Google offre un quota généreux sur Gemini — largement suffisant pour écrire des livres entiers gratuitement — et parce que vos crédits vous appartiennent, personne ne peut les épuiser à votre place. Sans cette clé, la V3 fonctionne en mode découverte ; avec la clé, elle se déverrouille intégralement.`,
   },
