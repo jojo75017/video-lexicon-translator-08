@@ -15,6 +15,7 @@ import { motion } from 'framer-motion';
 import { FirecrawlNoticeBanner } from './FirecrawlNoticeBanner';
 import { FirecrawlCreditsIndicator } from './FirecrawlCreditsIndicator';
 import { KdpPilotAccuracyBanner } from './KdpPilotAccuracyBanner';
+import { ScrapedMetricWarning } from './ScrapedMetricWarning';
 
 interface SpyBook {
   title: string;
@@ -230,21 +231,27 @@ const AmazonSpyTab: React.FC<AmazonSpyTabProps> = ({ initialKeyword = '' }) => {
               <CardContent className="p-3 text-center">
                 <Tag className="w-4 h-4 mx-auto text-orange-500 mb-1" />
                 <div className="text-xl font-bold">{result.analysis.avgPrice || '—'} €</div>
-                <p className="text-[11px] text-muted-foreground">Prix moyen</p>
+                <p className="text-[11px] text-muted-foreground flex items-center justify-center gap-1">
+                  Prix moyen <ScrapedMetricWarning size={11} />
+                </p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-3 text-center">
                 <MessageSquare className="w-4 h-4 mx-auto text-purple-500 mb-1" />
                 <div className="text-xl font-bold">{result.analysis.avgReviews}</div>
-                <p className="text-[11px] text-muted-foreground">Avis moyens</p>
+                <p className="text-[11px] text-muted-foreground flex items-center justify-center gap-1">
+                  Avis moyens <ScrapedMetricWarning size={11} />
+                </p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-3 text-center">
                 <Star className="w-4 h-4 mx-auto text-amber-500 mb-1" />
                 <div className="text-xl font-bold">{result.analysis.avgRating || '—'}</div>
-                <p className="text-[11px] text-muted-foreground">Note moyenne /5</p>
+                <p className="text-[11px] text-muted-foreground flex items-center justify-center gap-1">
+                  Note moyenne /5 <ScrapedMetricWarning size={11} />
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -302,14 +309,16 @@ const AmazonSpyTab: React.FC<AmazonSpyTabProps> = ({ initialKeyword = '' }) => {
                     </div>
                     <div className="text-right shrink-0 space-y-0.5">
                       {typeof book.price === 'number' && (
-                        <div className="font-bold text-sm text-orange-600">{book.price} €</div>
+                        <div className="font-bold text-sm text-orange-600 flex items-center justify-end gap-1">
+                          {book.price} € <ScrapedMetricWarning size={10} />
+                        </div>
                       )}
                       <div className="flex items-center justify-end gap-2 text-[11px] text-muted-foreground">
                         {typeof book.rating === 'number' && (
-                          <span className="flex items-center gap-0.5"><Star className="w-3 h-3 text-amber-400 fill-amber-400" />{book.rating}</span>
+                          <span className="flex items-center gap-0.5"><Star className="w-3 h-3 text-amber-400 fill-amber-400" />{book.rating} <ScrapedMetricWarning size={10} /></span>
                         )}
                         {typeof book.reviews === 'number' && (
-                          <span className="flex items-center gap-0.5"><MessageSquare className="w-3 h-3" />{book.reviews}</span>
+                          <span className="flex items-center gap-0.5"><MessageSquare className="w-3 h-3" />{book.reviews} <ScrapedMetricWarning size={10} /></span>
                         )}
                       </div>
                     </div>
