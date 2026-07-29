@@ -151,9 +151,13 @@ Deno.serve(async (req) => {
 
     const plan = PLANS[planId as PlanId];
     const amount = interval === "month" ? plan.monthly : plan.yearly;
-    const origin = new URL(req.url).origin;
-    const finalReturn = returnUrl || `https://www.ebookstudio.fr/v3/paypal-retour`;
-    const finalCancel = cancelUrl || `https://www.ebookstudio.fr/v3/forfaits?paypal=cancelled`;
+    // Fallback origin: use the caller's origin/referer, else the request URL host.
+    const callerOrigin =
+      req.headers.get("origin") ||
+      (req.headers.get("referer") ? new URL(req.headers.get("referer")!).origin : null) ||
+      new URL(req.url).origin;
+    const finalReturn = returnUrl || `${callerOrigin}/v3/paypal-retour`;
+    const finalCancel = cancelUrl || `${callerOrigin}/v3/forfaits?paypal=cancelled`;
 
     // Create subscription
     const subRes = await fetch(`${PAYPAL_BASE}/v1/billing/subscriptions`, {
