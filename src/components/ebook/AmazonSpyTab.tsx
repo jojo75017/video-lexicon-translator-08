@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { FirecrawlNoticeBanner } from './FirecrawlNoticeBanner';
 import { FirecrawlCreditsIndicator } from './FirecrawlCreditsIndicator';
+import { KdpPilotAccuracyBanner } from './KdpPilotAccuracyBanner';
 
 interface SpyBook {
   title: string;
