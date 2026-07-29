@@ -92,6 +92,12 @@ const V3ForfaitsPage = lazy(() => import('./pages/v3public/V3ForfaitsPage'));
 const V3PayPalReturnPage = lazy(() => import('./pages/v3public/V3PayPalReturnPage'));
 const V3RecherchePage = lazy(() => import('./pages/v3public/V3RecherchePage'));
 const V3Upsell17Page = lazy(() => import('./pages/v3public/V3Upsell17Page'));
+const V3NouveautesPage = lazy(() => import('./pages/v3public/V3NouveautesPage'));
+const V3RoyaltiesPage = lazy(() => import('./pages/v3public/V3RoyaltiesPage'));
+const V3HumanizerPage = lazy(() => import('./pages/v3public/V3HumanizerPage'));
+const V3MockupPage = lazy(() => import('./pages/v3public/V3MockupPage'));
+const V3AudiobookPage = lazy(() => import('./pages/v3public/V3AudiobookPage'));
+const V3EditorPage = lazy(() => import('./pages/v3public/V3EditorPage'));
 
 // Blog / Formation SEO
 const BlogPage = lazy(() => import('./pages/BlogPage'));
@@ -531,6 +537,12 @@ const App = () => {
               <Route path="outils/espion-concurrents" element={<V3CompetitorSpyPage />} />
               <Route path="outils/categories" element={<V3CategoryFinderPage />} />
               <Route path="outils/offerts" element={<V3OutilsOffertsPage />} />
+              <Route path="nouveautes" element={<V3NouveautesPage />} />
+              <Route path="outils/royalties" element={<V3RoyaltiesPage />} />
+              <Route path="outils/humanizer" element={<V3HumanizerPage />} />
+              <Route path="outils/mockup-3d" element={<V3MockupPage />} />
+              <Route path="outils/audiobook" element={<V3AudiobookPage />} />
+              <Route path="outils/editeur" element={<V3EditorPage />} />
               <Route path="hub" element={isPlannerPreviewHost ? <V3HubPage /> : <V3Gate><V3HubPage /></V3Gate>} />
 
             </Route>
