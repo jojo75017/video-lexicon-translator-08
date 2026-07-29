@@ -98,6 +98,7 @@ const V3HumanizerPage = lazy(() => import('./pages/v3public/V3HumanizerPage'));
 const V3MockupPage = lazy(() => import('./pages/v3public/V3MockupPage'));
 const V3AudiobookPage = lazy(() => import('./pages/v3public/V3AudiobookPage'));
 const V3EditorPage = lazy(() => import('./pages/v3public/V3EditorPage'));
+const V3OffrePage = lazy(() => import('./pages/v3public/V3OffrePage'));
 
 // Blog / Formation SEO
 const BlogPage = lazy(() => import('./pages/BlogPage'));
