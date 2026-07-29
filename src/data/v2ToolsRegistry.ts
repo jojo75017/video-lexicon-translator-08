@@ -33,7 +33,7 @@ export interface V2Tool {
   route: string;
   icon: LucideIcon;
   category: V2ToolCategory;
-  badge?: 'V2' | 'V3' | 'Populaire' | 'Nouveau' | 'Pro';
+  badge?: 'V2' | 'V3' | 'Populaire' | 'Nouveau' | 'Pro' | 'Gratuit';
   image?: string;
 }
 
@@ -92,7 +92,7 @@ export const V2_TOOLS: V2Tool[] = [
   { id: 'checklist-tournage', label: 'Checklist tournage', description: 'Préparer et tourner vos vidéos auteur.', route: '/checklist-tournage', icon: Video, category: 'audio', image: IMG.audio },
 
   // — Amazon KDP —
-  { id: 'kdp-keywords', label: 'KDP Keywords', description: 'Recherche de mots-clés Amazon KDP à fort volume.', route: '/kdp-keywords', icon: Search, category: 'kdp', badge: 'Populaire', image: IMG.kdp },
+  { id: 'kdp-keywords', label: 'KDP Keywords', description: 'Recherche de mots-clés Amazon KDP à fort volume — gratuit pour tout le monde.', route: '/kdp-keywords', icon: Search, category: 'kdp', badge: 'Gratuit', image: IMG.kdp },
   { id: 'niches', label: 'Niches Amazon', description: 'Explorez les niches KDP qui vendent aujourd\'hui.', route: '/niches', icon: Target, category: 'kdp', image: IMG.kdp },
   { id: 'niches-600', label: '600 Niches', description: 'Base élargie de 600 niches Amazon analysées.', route: '/niches-600', icon: Layers, category: 'kdp', badge: 'Nouveau', image: IMG.kdp },
   { id: 'series-tomes', label: 'Séries & Tomes', description: 'Planifiez vos séries multi-tomes sur Amazon.', route: '/series-tomes', icon: BookOpen, category: 'kdp', image: IMG.kdp },
