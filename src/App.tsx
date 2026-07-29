@@ -525,7 +525,9 @@ const App = () => {
               <Route path="outils/ams-keywords" element={<V3AmsKeywordsPage />} />
               <Route path="outils/espion-concurrents" element={<V3CompetitorSpyPage />} />
               <Route path="outils/categories" element={<V3CategoryFinderPage />} />
+              <Route path="outils/offerts" element={<V3OutilsOffertsPage />} />
               <Route path="hub" element={isPlannerPreviewHost ? <V3HubPage /> : <V3Gate><V3HubPage /></V3Gate>} />
+
             </Route>
 
             <Route path="*" element={<Navigate to={hasPlannerAccess ? "/ebook-planner" : "/offres"} replace />} />
