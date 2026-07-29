@@ -355,15 +355,26 @@ async function resolveAmazonBook(
 
   // 2) Firecrawl en complément (description, image, fallback)
   const directUrl = `https://www.${domain}/dp/${asin}`;
-  const directScrape = await firecrawlScrape(firecrawlApiKey, directUrl, marketplace);
+  let directScrape = await firecrawlScrape(firecrawlApiKey, directUrl, marketplace);
   const searchHit = await searchAmazonByAsin(firecrawlApiKey, asin, marketplace, domain);
 
   let selectedScrape = directScrape;
+  let scrapeSource: 'firecrawl' | 'scraperapi' = 'firecrawl';
 
   if ((!selectedScrape || looksLikeInterstitial(selectedScrape.markdown, selectedScrape.metadata)) && searchHit?.url) {
     const fallbackScrape = await firecrawlScrape(firecrawlApiKey, searchHit.url, marketplace);
     if (fallbackScrape && !looksLikeInterstitial(fallbackScrape.markdown, fallbackScrape.metadata)) {
       selectedScrape = fallbackScrape;
+    }
+  }
+
+  // 2bis) Fallback ScraperAPI si Firecrawl a échoué ou renvoyé un interstitiel
+  if (!selectedScrape || looksLikeInterstitial(selectedScrape.markdown, selectedScrape.metadata)) {
+    console.log('Firecrawl KO, bascule sur ScraperAPI pour', asin);
+    const scraperApiScrapeResult = await scraperApiScrape(directUrl, marketplace);
+    if (scraperApiScrapeResult && !looksLikeInterstitial(scraperApiScrapeResult.markdown, scraperApiScrapeResult.metadata)) {
+      selectedScrape = scraperApiScrapeResult;
+      scrapeSource = 'scraperapi';
     }
   }
 
