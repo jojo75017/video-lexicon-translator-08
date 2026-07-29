@@ -231,6 +231,44 @@ async function firecrawlScrape(
   return data.data || data;
 }
 
+async function scraperApiScrape(
+  url: string,
+  marketplace: string,
+): Promise<FirecrawlScrapePayload | null> {
+  const key = Deno.env.get('SCRAPERAPI_KEY');
+  if (!key) return null;
+  const country = (MARKET_COUNTRY[marketplace] || 'FR').toLowerCase();
+  const params = new URLSearchParams({
+    api_key: key,
+    url,
+    country_code: country,
+    render: 'true',
+    keep_headers: 'true',
+  });
+  try {
+    const response = await fetch(`https://api.scraperapi.com/?${params.toString()}`, {
+      method: 'GET',
+    });
+    if (!response.ok) {
+      console.error('ScraperAPI error:', response.status, await response.text().catch(() => ''));
+      return null;
+    }
+    const html = await response.text();
+    if (!html || html.length < 500) return null;
+    const markdown = html
+      .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    console.log('ScraperAPI OK pour', url, '— HTML length:', html.length);
+    return { html, rawHtml: html, markdown, metadata: {} };
+  } catch (e) {
+    console.error('ScraperAPI exception:', e);
+    return null;
+  }
+}
+
 function mapSearchResults(items: FirecrawlSearchItem[]) {
   const seen = new Set<string>();
 
