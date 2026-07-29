@@ -523,6 +523,7 @@ const App = () => {
               <Route path="outils/traduction" element={<V3TranslatorPage />} />
               <Route path="compte" element={<V3ComptePage />} />
               <Route path="forfaits" element={<V3ForfaitsPage />} />
+              <Route path="paypal-retour" element={<V3PayPalReturnPage />} />
               <Route path="pourquoi" element={<V3PourquoiPage />} />
               <Route path="script-heygen" element={<V3ScriptHeygenPage />} />
               <Route path="upsell-17" element={<V3Upsell17Page />} />
