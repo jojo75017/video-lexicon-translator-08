@@ -16,6 +16,7 @@ const ALLOWED_PATHS = [
   '/v3/',
   '/v3/offre',
   '/v3/pourquoi',
+  '/v3/realite-kdp',
   '/v3/script-heygen',
   '/v3/nouveautes',
 ];
