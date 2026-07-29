@@ -721,16 +721,16 @@ const BookDataCard: React.FC<{ book: BookData; onCopy: (t: string) => void }> = 
     </CardHeader>
     <CardContent>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <StatCard icon={DollarSign} label="Prix" value={book.price ? `${book.price}€` : 'N/A'} color="text-green-600" />
-        <StatCard icon={TrendingUp} label="BSR" value={book.bsr ? `#${book.bsr.toLocaleString()}` : 'Indispo.'} color={book.bsr ? "text-blue-600" : "text-muted-foreground"} />
-        <StatCard icon={Star} label="Note" value={book.rating ? `${book.rating}/5` : 'N/A'} color="text-yellow-600" />
-        <StatCard icon={Users} label="Avis" value={book.reviews?.toLocaleString() || 'N/A'} color="text-purple-600" />
+        <StatCard icon={DollarSign} label="Prix" value={book.price ? `${book.price}€` : 'N/A'} color="text-green-600" scraped />
+        <StatCard icon={TrendingUp} label="BSR" value={book.bsr ? `#${book.bsr.toLocaleString()}` : 'Indispo.'} color={book.bsr ? "text-blue-600" : "text-muted-foreground"} scraped />
+        <StatCard icon={Star} label="Note" value={book.rating ? `${book.rating}/5` : 'N/A'} color="text-yellow-600" scraped />
+        <StatCard icon={Users} label="Avis" value={book.reviews?.toLocaleString() || 'N/A'} color="text-purple-600" scraped />
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-2">
-        <StatCard icon={BarChart3} label="~Ventes/jour (est.)" value={book.estimatedDailySales?.toString() || 'N/A'} color="text-orange-600" />
-        <StatCard icon={BarChart3} label="~Ventes/mois (est.)" value={book.estimatedMonthlySales?.toString() || 'N/A'} color="text-orange-600" />
-        <StatCard icon={DollarSign} label="~Revenus/mois (est.)" value={book.estimatedMonthlyRevenue ? `${book.estimatedMonthlyRevenue}€` : 'N/A'} color="text-emerald-600" />
+        <StatCard icon={BarChart3} label="~Ventes/jour (est.)" value={book.estimatedDailySales?.toString() || 'N/A'} color="text-orange-600" scraped />
+        <StatCard icon={BarChart3} label="~Ventes/mois (est.)" value={book.estimatedMonthlySales?.toString() || 'N/A'} color="text-orange-600" scraped />
+        <StatCard icon={DollarSign} label="~Revenus/mois (est.)" value={book.estimatedMonthlyRevenue ? `${book.estimatedMonthlyRevenue}€` : 'N/A'} color="text-emerald-600" scraped />
       </div>
       {book.bsr ? (
         <p className="text-xs text-muted-foreground mb-6 italic">
