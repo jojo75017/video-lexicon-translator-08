@@ -1,6 +1,8 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.78.0";
 
 const OFFRES_LINK = "https://video-lexicon-translator-08.lovable.app/offres";
+const SAFE_V3_OFFER_LINK = "https://video-lexicon-translator-08.lovable.app/v3/offre";
+const SAFE_V3_WHY_LINK = "https://video-lexicon-translator-08.lovable.app/v3/pourquoi";
 
 function isSafeUrl(u: string): boolean {
   try {
@@ -8,6 +10,22 @@ function isSafeUrl(u: string): boolean {
     return parsed.protocol === "https:" || parsed.protocol === "http:";
   } catch {
     return false;
+  }
+}
+
+function rescueKnownBrokenUrl(u: string): string {
+  try {
+    const parsed = new URL(u);
+    const host = parsed.hostname.replace(/^www\./, "");
+    if (host === "ebookstudio.fr" && parsed.pathname.startsWith("/v3/offre")) {
+      return SAFE_V3_OFFER_LINK;
+    }
+    if (host === "ebookstudio.fr" && parsed.pathname.startsWith("/v3/pourquoi")) {
+      return SAFE_V3_WHY_LINK;
+    }
+    return u;
+  } catch {
+    return u;
   }
 }
 
@@ -22,7 +40,7 @@ Deno.serve(async (req) => {
 
     if (dest) {
       const decoded = decodeURIComponent(dest);
-      if (isSafeUrl(decoded)) target = decoded;
+      if (isSafeUrl(decoded)) target = rescueKnownBrokenUrl(decoded);
     }
 
     if (email && dest) {
