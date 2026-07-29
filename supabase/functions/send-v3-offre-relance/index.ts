@@ -18,6 +18,7 @@ const corsHeaders = {
 const FROM_ADDRESS = "Georges Boubet <noreply@ebookstudio.fr>";
 const EXCLUDED = ["boubetgeorges@gmail.com"];
 
+const PREVIOUS_BROKEN_TEMPLATE = "v3-offre-relance-oct2026";
 const TEMPLATE_NAME = "v2-v3-passerelle-oct2026";
 const SUBJECT = "V2 maintenant, premier plan V3 offert le 1er octobre";
 
@@ -117,8 +118,16 @@ Deno.serve(async (req) => {
       if (typeof body?.limit === "number") limit = body.limit;
     } catch { /* no body */ }
 
-    // Prospects actifs
-    const { data: prospects, error: pErr } = await supabase
+    // Prospects ayant reçu l'ancien email contenant des liens /v3 en 404.
+    const { data: previousRecipients, error: previousErr } = await supabase
+      .from("email_send_log")
+      .select("recipient_email")
+      .eq("template_name", PREVIOUS_BROKEN_TEMPLATE)
+      .eq("status", "sent");
+    if (previousErr) throw previousErr;
+
+    // Prospects actifs uniquement, pour éviter de relancer une adresse désinscrite depuis.
+    const { data: activeProspects, error: pErr } = await supabase
       .from("sales_prospects")
       .select("email")
       .eq("unsubscribed", false);
@@ -139,11 +148,14 @@ Deno.serve(async (req) => {
       .eq("status", "sent");
     const sentSet = new Set((alreadySent ?? []).map((s: any) => norm(s.recipient_email)));
 
+    const activeSet = new Set((activeProspects ?? []).map((p: any) => norm(p.email)));
+
     let recipients = Array.from(new Set(
-      (prospects ?? [])
-        .map((p: any) => norm(p.email))
+      (previousRecipients ?? [])
+        .map((p: any) => norm(p.recipient_email))
         .filter((e: string) =>
           e && e.includes("@") &&
+          activeSet.has(e) &&
           !clickers.has(e) &&
           !sentSet.has(e) &&
           !EXCLUDED.includes(e),
@@ -182,7 +194,7 @@ Deno.serve(async (req) => {
     const sent = results.filter((r) => r.ok).length;
     return new Response(JSON.stringify({
       template: TEMPLATE_NAME,
-      target: "non_clickers_all_prospects",
+      target: "previous_v3_offer_recipients_without_click",
       total: recipients.length,
       sent,
       testMode,
