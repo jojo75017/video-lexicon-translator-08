@@ -89,8 +89,8 @@ export const V3_HEADER_MENU: MenuCategory[] = [
     color: '#c9a84c',
     tagline: 'La visibilité & les ventes',
     links: [
-      { label: 'Mots-clés Amazon Ads', to: '/v3/outils/ams-keywords', desc: '🚀 Générez des centaines de mots-clés AMS ultra-ciblés — Nouveau, gratuit' },
-      { label: 'Espionner les concurrents', to: '/v3/outils/espion-concurrents', desc: '🕵️ Stratégies, prix, catégories et tactiques des best-sellers — Nouveau, gratuit' },
+      { label: 'Mots-clés Amazon Ads', to: '/v3/outils/ams-keywords', badge: 'Offert', desc: '🚀 Générez des centaines de mots-clés AMS ultra-ciblés' },
+      { label: 'Espionner les concurrents', to: '/v3/outils/espion-concurrents', badge: 'Offert', desc: '🕵️ Stratégies, prix, catégories et tactiques des best-sellers' },
       { label: 'Galerie communauté', to: '/v3/gallery', desc: 'Livres publiés par les auteurs Ebookstudio' },
       { label: 'Ma page auteur', to: '/v3/auteur', desc: 'Configurez votre profil public' },
       { label: 'Marketing & Emails', to: '/v3/hub?tab=marketing', desc: 'Séquences email, tunnels, relance' },
