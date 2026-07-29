@@ -72,9 +72,9 @@ export const V3_HEADER_MENU: MenuCategory[] = [
     tagline: 'Le lancement Amazon',
     links: [
       { label: 'KDP Pilot / Audit', to: '/audit-pilot', badge: 'Pro', desc: 'Audit complet avant publication Kindle/poche' },
-      { label: 'Mots-clés Amazon (KDSpy)', to: '/kdp-keywords', badge: 'Gratuit', desc: 'Recherche de mots-clés KDP à fort volume — 7 mots-clés rentables en quelques minutes' },
+      { label: 'Mots-clés Amazon (KDSpy)', to: '/kdp-keywords', badge: 'Offert', desc: 'Recherche de mots-clés KDP à fort volume — 7 mots-clés rentables en quelques minutes' },
       { label: '600 Niches', to: '/niches-600', badge: 'Nouveau', desc: 'Base élargie de 600 niches Amazon analysées' },
-      { label: 'Analyser les catégories KDP', to: '/v3/outils/categories', badge: 'Nouveau', desc: '📂 Explorez 19 000+ catégories Amazon — doublez vos chances de best-seller' },
+      { label: 'Analyser les catégories KDP', to: '/v3/outils/categories', badge: 'Offert', desc: '📂 Explorez 19 000+ catégories Amazon — doublez vos chances de best-seller' },
       { label: 'Niches Amazon', to: '/niches', desc: 'Explorez les niches KDP qui vendent' },
       { label: 'Amazon Spy', to: '/v3/outils/amazon-spy', desc: 'Analyse concurrentielle en temps réel' },
       { label: 'Séries & Tomes', to: '/series-tomes', desc: 'Planifiez vos séries multi-tomes' },
@@ -89,8 +89,8 @@ export const V3_HEADER_MENU: MenuCategory[] = [
     color: '#c9a84c',
     tagline: 'La visibilité & les ventes',
     links: [
-      { label: 'Mots-clés Amazon Ads', to: '/v3/outils/ams-keywords', desc: '🚀 Générez des centaines de mots-clés AMS ultra-ciblés — Nouveau, gratuit' },
-      { label: 'Espionner les concurrents', to: '/v3/outils/espion-concurrents', desc: '🕵️ Stratégies, prix, catégories et tactiques des best-sellers — Nouveau, gratuit' },
+      { label: 'Mots-clés Amazon Ads', to: '/v3/outils/ams-keywords', badge: 'Offert', desc: '🚀 Générez des centaines de mots-clés AMS ultra-ciblés' },
+      { label: 'Espionner les concurrents', to: '/v3/outils/espion-concurrents', badge: 'Offert', desc: '🕵️ Stratégies, prix, catégories et tactiques des best-sellers' },
       { label: 'Galerie communauté', to: '/v3/gallery', desc: 'Livres publiés par les auteurs Ebookstudio' },
       { label: 'Ma page auteur', to: '/v3/auteur', desc: 'Configurez votre profil public' },
       { label: 'Marketing & Emails', to: '/v3/hub?tab=marketing', desc: 'Séquences email, tunnels, relance' },
