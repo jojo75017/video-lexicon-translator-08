@@ -537,6 +537,12 @@ const App = () => {
               <Route path="outils/espion-concurrents" element={<V3CompetitorSpyPage />} />
               <Route path="outils/categories" element={<V3CategoryFinderPage />} />
               <Route path="outils/offerts" element={<V3OutilsOffertsPage />} />
+              <Route path="nouveautes" element={<V3NouveautesPage />} />
+              <Route path="outils/royalties" element={<V3RoyaltiesPage />} />
+              <Route path="outils/humanizer" element={<V3HumanizerPage />} />
+              <Route path="outils/mockup-3d" element={<V3MockupPage />} />
+              <Route path="outils/audiobook" element={<V3AudiobookPage />} />
+              <Route path="outils/editeur" element={<V3EditorPage />} />
               <Route path="hub" element={isPlannerPreviewHost ? <V3HubPage /> : <V3Gate><V3HubPage /></V3Gate>} />
 
             </Route>
