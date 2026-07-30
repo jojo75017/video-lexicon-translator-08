@@ -4,7 +4,7 @@ import { Loader2, Download, FileText, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { generateProfessionalDocx, type DocxExportOptions } from '@/utils/docxExportEngine';
+import { generateProfessionalDocx, getDocxOutline, type DocxExportOptions } from '@/utils/docxExportEngine';
 import { toast } from 'sonner';
 
 interface DocxPreviewDialogProps {
@@ -51,12 +51,10 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
           .replace(/\s+/g, '_');
         setFileName(`${safeName || 'Mon-Ebook'}_KDP.docx`);
 
-        setToc(
-          (options.chapters || []).map((ch, i) => {
-            const t = (ch.title || '').trim();
-            return t && !/^chapitre\s*\d+$/i.test(t) ? `Chapitre ${i + 1} – ${t}` : `Chapitre ${i + 1}`;
-          })
-        );
+        setToc(getDocxOutline(options.chapters || []).flatMap((entry) => [
+          entry.title,
+          ...entry.subChapters.map((sub) => `${sub.number}  ${sub.title}`),
+        ]));
 
         const { renderAsync } = await import('docx-preview');
         // Laisse le temps au conteneur d'être monté

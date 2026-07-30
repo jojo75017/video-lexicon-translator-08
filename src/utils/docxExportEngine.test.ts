@@ -56,4 +56,21 @@ describe('export DOCX', () => {
     // eslint-disable-next-line no-console
     console.log('Chapitres rendus:', unique, '\nEntrées:', all.filter((t) => /^Chapitre\s+\d/.test(t)));
   });
+
+  it('conserve un chapitre court mais réellement rédigé', async () => {
+    const blob = await generateProfessionalDocx({
+      title: 'Livre court',
+      chapters: [{ title: 'Une vraie scène', content: 'Enfin, elle rentra.', subChapters: [] }],
+    });
+    const all = texts(await docXml(blob)).map((t) => t.trim()).filter(Boolean);
+    expect(all).toContain('Chapitre 1 – Une vraie scène');
+    expect(all).toContain('Enfin, elle rentra.');
+  });
+
+  it('refuse un DOCX vide au lieu de produire un livre sans sommaire', async () => {
+    await expect(generateProfessionalDocx({
+      title: 'Livre vide',
+      chapters: [{ title: 'Chapitre 1', content: '[Contenu à rédiger]', subChapters: [] }],
+    })).rejects.toThrow(/aucun chapitre rédigé/i);
+  });
 });

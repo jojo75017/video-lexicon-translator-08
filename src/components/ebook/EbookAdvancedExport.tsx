@@ -444,7 +444,10 @@ h2+p,h3+p{text-indent:0}
     chapters,
     preface: includePreface ? preface : undefined,
     conclusion: includeConclusion ? conclusion : undefined,
-  }), [ebookTitle, authorName, chapters, includePreface, preface, includeConclusion, conclusion]);
+    includeTableOfContents: includeToc,
+    includePageNumbers,
+    includeCopyrightPage: includeCopyright,
+  }), [ebookTitle, authorName, chapters, includePreface, preface, includeConclusion, conclusion, includeToc, includePageNumbers, includeCopyright]);
 
   const handleExport = async () => {
     setIsExporting(true);
