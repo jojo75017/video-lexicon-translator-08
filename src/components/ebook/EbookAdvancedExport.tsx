@@ -11,7 +11,7 @@ import { Chapter } from '@/hooks/useSubscriptionGeneration';
 import { useKdpFormat } from '@/hooks/useKdpFormat';
 import { estimatePages } from '@/utils/kdpPageDensity';
 import { cleanGeneratedText } from '@/utils/textCleaner';
-import { exportProfessionalDocx, type DocxExportOptions } from '@/utils/docxExportEngine';
+import { exportProfessionalDocx, validateDocxChapters, type DocxExportOptions } from '@/utils/docxExportEngine';
 import { DocxPreviewDialog } from './DocxPreviewDialog';
 import jsPDF from 'jspdf';
 import JSZip from 'jszip';
@@ -449,11 +449,17 @@ h2+p,h3+p{text-indent:0}
     includeCopyrightPage: includeCopyright,
   }), [ebookTitle, authorName, chapters, includePreface, preface, includeConclusion, conclusion, includeToc, includePageNumbers, includeCopyright]);
 
+  const docxAudit = useMemo(() => validateDocxChapters(chapters), [chapters]);
+
   const handleExport = async () => {
     setIsExporting(true);
     try {
       switch (selectedFormat) {
         case 'docx-kdp':
+          if (!docxAudit.valid) {
+            setPreviewOpen(true);
+            throw new Error(`DOCX bloqué : ${docxAudit.readyCount}/${docxAudit.totalCount} chapitres sont prêts. Consultez le contrôle.`);
+          }
           await exportProfessionalDocx(buildDocxOptions());
           break;
         case 'epub':
@@ -557,6 +563,12 @@ h2+p,h3+p{text-indent:0}
                 <Eye className="h-4 w-4 mr-2" />
                 Aperçu avant téléchargement
               </Button>
+            )}
+
+            {selectedFormat === 'docx-kdp' && !docxAudit.valid && (
+              <p className="text-xs text-destructive">
+                DOCX bloqué : {docxAudit.readyCount}/{docxAudit.totalCount} chapitres prêts. Ouvrez l’aperçu pour voir les erreurs.
+              </p>
             )}
 
             <Button className={selectedFormat === 'docx-kdp' ? 'w-full mt-2' : 'w-full mt-4'} onClick={handleExport} disabled={isExporting || chapters.length === 0}>

@@ -4,7 +4,7 @@ import { Loader2, Download, FileText, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { generateProfessionalDocx, getDocxOutline, type DocxExportOptions } from '@/utils/docxExportEngine';
+import { generateProfessionalDocx, getDocxOutline, validateDocxChapters, type DocxExportOptions, type DocxValidationResult } from '@/utils/docxExportEngine';
 import { toast } from 'sonner';
 
 interface DocxPreviewDialogProps {
@@ -25,12 +25,14 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
   const [fileName, setFileName] = useState('Mon-Ebook_KDP.docx');
   const [error, setError] = useState<string | null>(null);
   const [toc, setToc] = useState<string[]>([]);
+  const [audit, setAudit] = useState<DocxValidationResult | null>(null);
 
   useEffect(() => {
     if (!open) {
       setBlob(null);
       setError(null);
       setToc([]);
+      setAudit(null);
       return;
     }
 
@@ -41,6 +43,15 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
       setError(null);
       try {
         const options = getOptions();
+        const validation = validateDocxChapters(options.chapters || []);
+        setAudit(validation);
+        setToc(getDocxOutline(options.chapters || []).flatMap((entry) => [
+          entry.title,
+          ...entry.subChapters.map((sub) => `${sub.number}  ${sub.title}`),
+        ]));
+        if (!validation.valid) {
+          throw new Error('Export bloqué : corrigez les chapitres signalés avant de télécharger le DOCX.');
+        }
         const generated = await generateProfessionalDocx(options);
         if (cancelled) return;
 
@@ -50,11 +61,6 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
           .trim()
           .replace(/\s+/g, '_');
         setFileName(`${safeName || 'Mon-Ebook'}_KDP.docx`);
-
-        setToc(getDocxOutline(options.chapters || []).flatMap((entry) => [
-          entry.title,
-          ...entry.subChapters.map((sub) => `${sub.number}  ${sub.title}`),
-        ]));
 
         const { renderAsync } = await import('docx-preview');
         // Laisse le temps au conteneur d'être monté
@@ -107,18 +113,24 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
           {/* Sommaire de contrôle */}
           <div className="border-r hidden lg:flex flex-col min-h-0">
             <div className="px-4 py-3 border-b flex items-center justify-between">
-              <span className="text-sm font-medium">Sommaire détecté</span>
-              <Badge variant="secondary">{toc.length}</Badge>
+              <span className="text-sm font-medium">Contrôle des chapitres</span>
+              <Badge variant={audit?.valid ? 'secondary' : 'destructive'}>
+                {audit ? `${audit.readyCount}/${audit.totalCount} prêts` : toc.length}
+              </Badge>
             </div>
             <div className="flex-1 overflow-auto">
-              <ul className="p-4 space-y-2 text-xs text-muted-foreground">
-                {toc.map((line, i) => (
-                  <li key={i} className="leading-snug">
-                    {line}
-                  </li>
+              <div className="p-3 space-y-2 text-xs">
+                {audit?.chapters.map((chapter) => (
+                  <div key={chapter.number} className={`rounded-md border p-2 ${chapter.valid ? 'border-border' : 'border-destructive/40 bg-destructive/5'}`}>
+                    <div className="flex items-start justify-between gap-2">
+                      <strong className="leading-snug">{chapter.number}. {chapter.title}</strong>
+                      <span className="whitespace-nowrap text-muted-foreground">{chapter.wordCount} mots</span>
+                    </div>
+                    {!chapter.valid && <p className="mt-1 text-destructive">{chapter.issues.join(' · ')}</p>}
+                  </div>
                 ))}
-                {!toc.length && !loading && <li>Aucun chapitre détecté.</li>}
-              </ul>
+                {!audit?.chapters.length && !loading && <p className="text-muted-foreground">Aucun chapitre détecté.</p>}
+              </div>
             </div>
           </div>
 
@@ -144,7 +156,7 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Fermer
           </Button>
-          <Button onClick={handleDownload} disabled={!blob || loading} className="gap-2">
+          <Button onClick={handleDownload} disabled={!blob || loading || !audit?.valid} className="gap-2">
             <Download className="h-4 w-4" />
             Télécharger le DOCX
           </Button>
