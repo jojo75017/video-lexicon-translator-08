@@ -9,7 +9,7 @@ const RESEND_API_URL = "https://api.resend.com/emails";
 const FROM_ADDRESS = "Georges Boubet <noreply@ebookstudio.fr>";
 const EXCLUDED = ["boubetgeorges@gmail.com", "qa-test-tunnel@ebookstudio.fr", "test-debug@example.com"];
 const SUBJECT = "🎁 Vos 2 cadeaux + l'offre EbookStudio à 59€";
-const OFFRES_LINK = "https://www.ebookstudio.fr/offres";
+const OFFRES_LINK = "https://www.ebookstudio.fr/commander?src=email";
 const PDF_NICHES = "https://www.ebookstudio.fr/lead-magnets/5-niches-rentables-2026.pdf";
 const PDF_GUIDE = "https://www.ebookstudio.fr/lead-magnets/guide-generateur-ebookstudio-principal.pdf";
 

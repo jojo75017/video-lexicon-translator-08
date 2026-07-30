@@ -159,7 +159,7 @@ const handler = async (req: Request): Promise<Response> => {
               </p>
 
               <p style="text-align: center; margin-top: 10px;">
-                <a href="https://ebookstudio.fr/offres" style="color: #8B5CF6; text-decoration: underline; font-size: 14px;">
+                <a href="https://www.ebookstudio.fr/commander?src=email" style="color: #8B5CF6; text-decoration: underline; font-size: 14px;">
                   Ou découvrir les offres d'abonnement →
                 </a>
               </p>

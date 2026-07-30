@@ -38,7 +38,7 @@ const SUBJECT = "Publiez votre livre sur Amazon en 7 jours";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const TRACK_CLICK = `${SUPABASE_URL}/functions/v1/track-email-click`;
-const CHECKOUT_LINK = "https://www.ebookstudio.fr/promo/commande";
+const CHECKOUT_LINK = "https://www.ebookstudio.fr/commander";
 const SALES_TUNNEL_LINK = "https://www.ebookstudio.fr/commander?src=email";
 
 function trackedUrl(email: string, dest: string): string {
