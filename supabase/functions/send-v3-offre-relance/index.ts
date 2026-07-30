@@ -25,7 +25,7 @@ const SUBJECT = "V2 maintenant, premier plan V3 offert le 1er octobre";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const TRACK_CLICK = `${SUPABASE_URL}/functions/v1/track-email-click`;
 const OFFRE_LINK = "https://video-lexicon-translator-08.lovable.app/v3/offre";
-const PAY_LINK = "https://www.trafic-affiliation.com/ebookstudiopv";
+const PAY_LINK = "https://www.ebookstudio.fr/commander?src=email";
 
 function trackedUrl(email: string, dest: string): string {
   return `${TRACK_CLICK}?e=${encodeURIComponent(email)}&s=1&u=${encodeURIComponent(dest)}&t=${encodeURIComponent(TEMPLATE_NAME)}`;
