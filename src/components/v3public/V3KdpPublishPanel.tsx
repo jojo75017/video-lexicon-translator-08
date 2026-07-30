@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import JSZip from 'jszip';
 import { toast } from 'sonner';
-import { BookMarked, Copy, Download, Loader2, Sparkles } from 'lucide-react';
+import { BookMarked, Copy, Download, Loader2, Sparkles, Wand2 } from 'lucide-react';
+import { callAIWriting } from '@/services/aiWritingService';
 
 interface V3KdpPublishPanelProps {
   title: string;
@@ -37,6 +38,15 @@ function slugify(value: string) {
     .slice(0, 60) || 'livre';
 }
 
+function extractJson(raw: string): any | null {
+  try {
+    const match = raw.match(/\{[\s\S]*\}/);
+    return match ? JSON.parse(match[0]) : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function V3KdpPublishPanel({
   title,
   subtitle,
@@ -53,8 +63,12 @@ export default function V3KdpPublishPanel({
     return Array.from({ length: 7 }, (_, i) => base[i] || '');
   });
   const [categories, setCategories] = useState<string[]>(['', '', '']);
+  const [authorBio, setAuthorBio] = useState('');
+  const [aPlusContent, setAPlusContent] = useState('');
+  const [backCoverText, setBackCoverText] = useState('');
   const [price, setPrice] = useState('9.99');
   const [zipping, setZipping] = useState(false);
+  const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
     if (initialDescription && !description) setDescription(initialDescription);
@@ -77,6 +91,52 @@ export default function V3KdpPublishPanel({
     toast.success(`${label} copié.`);
   };
 
+  const generateAll = async () => {
+    if (!title.trim()) {
+      toast.error('Le titre du livre est requis.');
+      return;
+    }
+    setGenerating(true);
+    try {
+      const excerpt = (manuscript || '').slice(0, 6000);
+      const prompt = `Tu es un expert copywriting Amazon KDP francophone.
+Livre : "${title}"${subtitle ? ` — sous-titre : "${subtitle}"` : ''}
+Auteur : ${author || 'Auteur indépendant'}
+${category ? `Genre : ${category}` : ''}
+Extrait du manuscrit :
+"""${excerpt}"""
+
+Réponds UNIQUEMENT en JSON valide :
+{
+  "description": "description KDP vendeuse, 1500 à 3000 caractères, HTML autorisé <b> <i> <br>",
+  "keywords": ["7 mots-clés longue traîne de recherche Amazon"],
+  "bisac": ["3 catégories BISAC officielles en anglais"],
+  "authorBio": "biographie auteur 500 à 800 caractères à la 3e personne",
+  "aPlusContent": "contenu A+ Amazon : 3 modules texte (titre + paragraphe) séparés par des sauts de ligne",
+  "backCover": "texte de 4e de couverture, 700 caractères max"
+}`;
+      const raw = await callAIWriting(prompt, { temperature: 0.8, maxTokens: 4000, jsonMode: true });
+      const data = extractJson(typeof raw === 'string' ? raw : JSON.stringify(raw));
+      if (!data) throw new Error('Réponse IA illisible, réessaie.');
+
+      if (data.description) setDescription(String(data.description).slice(0, 4000));
+      if (Array.isArray(data.keywords)) {
+        setKeywords(Array.from({ length: 7 }, (_, i) => String(data.keywords[i] || '').slice(0, 50)));
+      }
+      if (Array.isArray(data.bisac)) {
+        setCategories(Array.from({ length: 3 }, (_, i) => String(data.bisac[i] || '')));
+      }
+      if (data.authorBio) setAuthorBio(String(data.authorBio));
+      if (data.aPlusContent) setAPlusContent(String(data.aPlusContent));
+      if (data.backCover) setBackCoverText(String(data.backCover));
+      toast.success('Contenu Amazon KDP généré ✓');
+    } catch (error: any) {
+      toast.error(error?.message || 'Génération impossible.');
+    } finally {
+      setGenerating(false);
+    }
+  };
+
   const buildMetadataText = () => {
     const lines = [
       `Titre : ${title}`,
@@ -94,6 +154,15 @@ export default function V3KdpPublishPanel({
       '',
       '--- CATÉGORIES BISAC ---',
       ...categories.map((c, i) => `${i + 1}. ${c}`),
+      '',
+      '--- BIOGRAPHIE AUTEUR (Author Central) ---',
+      authorBio,
+      '',
+      '--- 4E DE COUVERTURE ---',
+      backCoverText,
+      '',
+      '--- CONTENU A+ AMAZON ---',
+      aPlusContent,
     ];
     return lines.filter((line) => line !== undefined).join('\n');
   };
@@ -116,11 +185,17 @@ export default function V3KdpPublishPanel({
             description,
             keywords: keywords.filter(Boolean),
             bisac: categories.filter(Boolean),
+            authorBio,
+            backCover: backCoverText,
+            aPlusContent,
           },
           null,
           2,
         ),
       );
+      if (authorBio.trim()) zip.file(`${base}-bio-auteur.txt`, authorBio);
+      if (aPlusContent.trim()) zip.file(`${base}-contenu-a-plus.txt`, aPlusContent);
+      if (backCoverText.trim()) zip.file(`${base}-4e-de-couverture.txt`, backCoverText);
       if (manuscript?.trim()) zip.file(`${base}-manuscrit.md`, manuscript);
       if (coverUrl) {
         try {
@@ -152,6 +227,11 @@ export default function V3KdpPublishPanel({
     background: 'var(--v3-paper)',
   } as const;
 
+  const chipButton = {
+    borderColor: 'var(--v3-border)',
+    color: 'var(--v3-ink)',
+  } as const;
+
   return (
     <div className="rounded-[28px] border p-5 sm:p-7" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -159,19 +239,32 @@ export default function V3KdpPublishPanel({
           <span className="v3-chip v3-chip-orange"><BookMarked className="h-3.5 w-3.5" /> Publication KDP</span>
           <h3 className="v3-serif mt-3 text-2xl font-bold" style={{ color: 'var(--v3-ink)' }}>Publier sur Amazon KDP</h3>
           <p className="mt-1 text-sm" style={{ color: 'var(--v3-muted)' }}>
-            Prépare ici tout ce que KDP te demandera : description, 7 mots-clés, catégories BISAC et prix.
+            Tout ce que KDP te demandera : description, 7 mots-clés, catégories BISAC, bio auteur,
+            4e de couverture, contenu A+ et prix.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={downloadPack}
-          disabled={zipping}
-          className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold disabled:opacity-60"
-          style={{ background: 'var(--v3-orange-600)', color: '#fff' }}
-        >
-          {zipping ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-          Télécharger le Pack KDP (ZIP)
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={generateAll}
+            disabled={generating}
+            className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold disabled:opacity-60"
+            style={{ background: 'var(--v3-ink)', color: '#fff' }}
+          >
+            {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+            Générer tout avec l'IA
+          </button>
+          <button
+            type="button"
+            onClick={downloadPack}
+            disabled={zipping}
+            className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold disabled:opacity-60"
+            style={{ background: 'var(--v3-orange-600)', color: '#fff' }}
+          >
+            {zipping ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+            Télécharger le Pack KDP (ZIP)
+          </button>
+        </div>
       </div>
 
       <div className="mt-5 space-y-4">
@@ -192,7 +285,7 @@ export default function V3KdpPublishPanel({
             type="button"
             onClick={() => copy('Description', description)}
             className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold"
-            style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)' }}
+            style={chipButton}
           >
             <Copy className="h-3.5 w-3.5" /> Copier la description
           </button>
@@ -216,7 +309,7 @@ export default function V3KdpPublishPanel({
             type="button"
             onClick={() => copy('Mots-clés', keywords.filter(Boolean).join('\n'))}
             className="mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold"
-            style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)' }}
+            style={chipButton}
           >
             <Copy className="h-3.5 w-3.5" /> Copier les mots-clés
           </button>
@@ -243,6 +336,74 @@ export default function V3KdpPublishPanel({
             ))}
           </datalist>
         </div>
+
+        <label className="block space-y-1">
+          <span className="flex items-center justify-between text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>
+            <span>Biographie auteur (Author Central)</span>
+            <span>{authorBio.length} / 2000</span>
+          </span>
+          <textarea
+            value={authorBio}
+            onChange={(e) => setAuthorBio(e.target.value.slice(0, 2000))}
+            rows={4}
+            placeholder="Qui est l’auteur, son parcours, sa légitimité, son univers…"
+            className="w-full rounded-xl border px-3 py-2 text-sm outline-none"
+            style={inputStyle}
+          />
+          <button
+            type="button"
+            onClick={() => copy('Biographie auteur', authorBio)}
+            className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold"
+            style={chipButton}
+          >
+            <Copy className="h-3.5 w-3.5" /> Copier la bio
+          </button>
+        </label>
+
+        <label className="block space-y-1">
+          <span className="flex items-center justify-between text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>
+            <span>4e de couverture</span>
+            <span>{backCoverText.length} / 1200</span>
+          </span>
+          <textarea
+            value={backCoverText}
+            onChange={(e) => setBackCoverText(e.target.value.slice(0, 1200))}
+            rows={4}
+            placeholder="Texte imprimé au dos du livre broché."
+            className="w-full rounded-xl border px-3 py-2 text-sm outline-none"
+            style={inputStyle}
+          />
+          <button
+            type="button"
+            onClick={() => copy('4e de couverture', backCoverText)}
+            className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold"
+            style={chipButton}
+          >
+            <Copy className="h-3.5 w-3.5" /> Copier la 4e de couverture
+          </button>
+        </label>
+
+        <label className="block space-y-1">
+          <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>
+            Contenu A+ Amazon (modules texte)
+          </span>
+          <textarea
+            value={aPlusContent}
+            onChange={(e) => setAPlusContent(e.target.value)}
+            rows={6}
+            placeholder="Module 1 : titre + paragraphe / Module 2 : … / Module 3 : …"
+            className="w-full rounded-xl border px-3 py-2 text-sm outline-none"
+            style={inputStyle}
+          />
+          <button
+            type="button"
+            onClick={() => copy('Contenu A+', aPlusContent)}
+            className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold"
+            style={chipButton}
+          >
+            <Copy className="h-3.5 w-3.5" /> Copier le contenu A+
+          </button>
+        </label>
 
         <div className="grid gap-3 md:grid-cols-2">
           <label className="block space-y-1">
