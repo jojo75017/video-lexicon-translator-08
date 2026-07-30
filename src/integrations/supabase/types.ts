@@ -287,6 +287,42 @@ export type Database = {
         }
         Relationships: []
       }
+      book_testimonials: {
+        Row: {
+          approved: boolean
+          author_name: string
+          book_title: string | null
+          comment: string
+          created_at: string
+          email: string
+          id: string
+          photo_url: string | null
+          rating: number | null
+        }
+        Insert: {
+          approved?: boolean
+          author_name: string
+          book_title?: string | null
+          comment: string
+          created_at?: string
+          email: string
+          id?: string
+          photo_url?: string | null
+          rating?: number | null
+        }
+        Update: {
+          approved?: boolean
+          author_name?: string
+          book_title?: string | null
+          comment?: string
+          created_at?: string
+          email?: string
+          id?: string
+          photo_url?: string | null
+          rating?: number | null
+        }
+        Relationships: []
+      }
       book_tracking_history: {
         Row: {
           book_id: string
