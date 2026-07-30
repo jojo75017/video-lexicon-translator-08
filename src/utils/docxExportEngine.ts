@@ -186,14 +186,28 @@ function cleanChapterTitle(rawTitle: string): string {
     const firstSentence = title.match(/^([^.!?\n]{5,80})[.!?]/);
     if (firstSentence) return firstSentence[1].trim();
     
-    // En dernier recours, tronquer
-    return title.substring(0, 80).trim() + '…';
+    return 'Sans titre';
   }
   
-  // Supprimer les numéros de chapitre redondants en début
-  title = title.replace(/^chapitre\s+\d+\s*[:–—]\s*/i, '');
-  
+  // Supprimer les numéros de chapitre redondants en début (avec OU sans séparateur)
+  title = title.replace(/^\**\s*chapitre\s+\d+\s*[:–—\-.,)]*\s*/i, '');
+  title = title.replace(/^\**\s*|\s*\**$/g, '').trim();
+
+  // Un vrai titre est court : si ça ressemble à de la prose, on refuse.
+  if (isProseLike(title)) return 'Sans titre';
+
   return title.trim() || 'Sans titre';
+}
+
+/** Détecte un fragment de prose (phrase de contenu) plutôt qu'un titre. */
+function isProseLike(t: string): boolean {
+  const s = (t || '').trim();
+  if (!s) return true;
+  if (s.length > 80) return true;
+  if (/[.!?…]$/.test(s)) return true;
+  if (/[.!?]\s+\S/.test(s)) return true; // plusieurs phrases
+  if (s.split(/\s+/).length > 12) return true;
+  return false;
 }
 
 /** Un titre est "générique" s'il ne contient pas de vrai intitulé (ex: "Chapitre 2", "12", vide). */
@@ -201,6 +215,7 @@ function isGenericTitle(t: string | undefined | null): boolean {
   const n = (t || '').trim();
   return !n || /^chapitre\s*\d+$/i.test(n) || /^\d+$/.test(n) || /^sans titre$/i.test(n);
 }
+
 
 /** Retire un marqueur de chapitre redondant en début de contenu ("2, " / "2." / "Chapitre 2 –"). */
 function stripLeadingChapterMarker(content: string, num: number): string {
@@ -217,77 +232,60 @@ function stripLeadingChapterMarker(content: string, num: number): string {
 
 /**
  * Extrait un titre "inline" placé en tête du contenu quand le champ titre est générique.
- * Gère : Markdown (# Titre), gras (**Titre**), première ligne courte, ou Title Case.
+ * Gère uniquement des titres explicites : Markdown (# Titre), gras (**Titre**),
+ * ou une première ligne courte isolée. Aucune heuristique sur la prose :
+ * mieux vaut "Chapitre 4" qu'un début de phrase en guise de titre.
  */
 function extractInlineTitle(body: string): { title: string; rest: string } | null {
   const trimmed = (body || '').replace(/^[\s\u00A0]+/, '');
   if (!trimmed) return null;
 
+  const accept = (rawTitle: string, rest: string) => {
+    const title = cleanChapterTitle(rawTitle);
+    if (isGenericTitle(title) || isProseLike(title)) return null;
+    if (rest.trim().length < 40) return null;
+    return { title, rest: rest.replace(/^[\s\u00A0]+/, '') };
+  };
+
   // 0) Markdown heading "# Titre"
   const mdHeading = trimmed.match(/^#{1,3}\s+([^\n]{4,110})\n+([\s\S]+)$/);
-  if (mdHeading && mdHeading[2].trim().length > 30) {
-    return { title: cleanChapterTitle(mdHeading[1]), rest: mdHeading[2].replace(/^[\s\u00A0]+/, '') };
+  if (mdHeading) {
+    const r = accept(mdHeading[1], mdHeading[2]);
+    if (r) return r;
   }
 
   // 0b) Gras Markdown "**Titre**" seul sur la première ligne
   const boldHeading = trimmed.match(/^\*\*([^\n*]{4,110})\*\*\s*\n+([\s\S]+)$/);
-  if (boldHeading && boldHeading[2].trim().length > 30) {
-    return { title: cleanChapterTitle(boldHeading[1]), rest: boldHeading[2].replace(/^[\s\u00A0]+/, '') };
+  if (boldHeading) {
+    const r = accept(boldHeading[1], boldHeading[2]);
+    if (r) return r;
   }
 
-  // 1) Cas idéal : un vrai retour à la ligne sépare le titre du corps.
+  // 1) Première ligne courte isolée (vrai retour à la ligne avant le corps)
   const nl = trimmed.indexOf('\n');
-  if (nl > 4 && nl <= 110) {
-    const cand = trimmed.slice(0, nl).trim();
-    const rest = trimmed.slice(nl).replace(/^[\s\u00A0]+/, '');
-    if (cand.length >= 5 && cand.length <= 110 && rest.length > 40 && !/[.!?…]$/.test(cand)) {
-      return { title: cleanChapterTitle(cand), rest };
-    }
+  if (nl > 4 && nl <= 90) {
+    const r = accept(trimmed.slice(0, nl), trimmed.slice(nl));
+    if (r) return r;
   }
 
-  // 2) Heuristique "Title Case" : on garde la séquence de mots capitalisés en tête.
-  const connectors = new Set(['de','des','du','la','le','les','et','à','a','en','un','une','ou','au','aux','d','l','sur','dans','pour','vos','votre','ses','son','sa','par','avec','sans','ce','cet','cette']);
-  const words = trimmed.split(/\s+/);
-  const firstChar = (w: string) => w.replace(/^[«»"'(]+/, '').charAt(0);
-  const startsUpper = (w: string) => /[A-ZÀ-ÝÆŒ]/.test(firstChar(w));
-  const startsLower = (w: string) => /[a-zà-ÿæœ]/.test(firstChar(w));
-  const isPunct = (w: string) => /^[:–—\-«»"'().,;]+$/.test(w);
-  const bare = (w: string) => w.replace(/[«»"'().,;:!?]/g, '').toLowerCase();
-
-  const title: string[] = [];
-  for (let i = 0; i < words.length && i < 18; i++) {
-    const w = words[i];
-    if (isPunct(w)) { title.push(w); continue; }
-    if (startsLower(w) && !connectors.has(bare(w))) {
-      if (i === 0) { title.push(w); continue; }
-      break;
-    }
-    if (startsUpper(w)) {
-      const next = words[i + 1];
-      if (next && startsLower(next) && !connectors.has(bare(next)) && !isPunct(next)) break;
-    }
-    title.push(w);
-  }
-  while (title.length && (isPunct(title[title.length - 1]) || connectors.has(bare(title[title.length - 1])))) {
-    title.pop();
-  }
-  const t = title.join(' ').replace(/\s+([,.])/g, '$1').trim();
-  if (t.length < 5 || t.length > 110) return null;
-  const rest = words.slice(title.length).join(' ').trim();
-  if (rest.length < 30) return null;
-  return { title: t, rest };
+  return null;
 }
 
 /** Calcule le titre affichable + le corps nettoyé d'un chapitre. */
-function resolveChapter(chapter: { title: string; content?: string }, index: number): { displayTitle: string; body: string } {
+function resolveChapter(
+  chapter: { title: string; content?: string },
+  index: number,
+): { displayTitle: string; body: string } {
   let displayTitle = cleanChapterTitle(chapter.title);
   let body = stripLeadingChapterMarker(chapter.content || '', index + 1);
 
-  if (isGenericTitle(chapter.title) || isGenericTitle(displayTitle)) {
+  if (isGenericTitle(displayTitle)) {
     const ext = extractInlineTitle(body);
     if (ext) {
       displayTitle = ext.title;
       body = ext.rest;
+    } else {
+      displayTitle = '';
     }
   } else {
     // Titre présent : évite qu'il soit répété en tête du corps (Markdown, gras, ou brut).
@@ -301,6 +299,7 @@ function resolveChapter(chapter: { title: string; content?: string }, index: num
 
   return { displayTitle, body };
 }
+
 
 function editorialClean(raw: string): string {
   if (!raw) return '';
@@ -635,7 +634,20 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
     children.push(new Paragraph({ children: [new PageBreak()] }));
   }
 
+  // ═══ CHAPITRES RETENUS (numérotation continue, sans trous) ═══
+  const renderChapters = chapters
+    .filter((chapter) => {
+      const hasAnyContent = (chapter.content && chapter.content.trim().length > 50) ||
+        chapter.subChapters.some((s) => s.content && s.content.trim().length > 50);
+      return hasAnyContent || !/^chapitre\s+\d+$/i.test((chapter.title || '').trim());
+    })
+    .map((chapter, i) => {
+      const { displayTitle, body } = resolveChapter(chapter, i);
+      return { chapter, num: i + 1, displayTitle, body };
+    });
+
   // ═══ TABLE DES MATIÈRES ═══
+
   if (includeTableOfContents) {
     children.push(new Paragraph({
       children: [new TextRun({ text: 'TABLE DES MATIÈRES', bold: true, size: chapterTitleSize, font })],
@@ -651,38 +663,37 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
       }));
     }
 
-    chapters.forEach((chapter, index) => {
-      // Filtrer les chapitres vides (titre générique sans contenu)
-      const hasAnyContent = (chapter.content && chapter.content.trim().length > 50) ||
-        chapter.subChapters.some(s => s.content && s.content.trim().length > 50);
-      if (!hasAnyContent && /^chapitre\s+\d+$/i.test(chapter.title.trim())) return;
-
-      const tocTitle = resolveChapter(chapter, index).displayTitle;
-      const safeTocTitle = isGenericTitle(tocTitle)
-        ? `Chapitre ${index + 1}`
-        : `Chapitre ${index + 1} – ${tocTitle}`;
+    renderChapters.forEach(({ chapter, num, displayTitle }) => {
+      const safeTocTitle = isGenericTitle(displayTitle)
+        ? `Chapitre ${num}`
+        : `Chapitre ${num} – ${displayTitle}`;
       children.push(new Paragraph({
         children: [new TextRun({
           text: safeTocTitle,
           size: baseSize,
           font,
         })],
-        spacing: { after: 80 },
+        spacing: { after: 100 },
+        // Retrait négatif : les titres longs se replient alignés sous le premier mot
+        indent: { left: convertInchesToTwip(0.35), hanging: convertInchesToTwip(0.35) },
       }));
 
       chapter.subChapters.forEach((sub, subIdx) => {
+        const subTitle = cleanChapterTitle(sub.title);
+        if (isGenericTitle(subTitle)) return;
         children.push(new Paragraph({
           children: [new TextRun({
-            text: `${index + 1}.${subIdx + 1}  ${cleanChapterTitle(sub.title)}`,
+            text: `${num}.${subIdx + 1}  ${subTitle}`,
             size: Math.round(baseSize * 0.9),
             font,
             color: '555555',
           })],
           spacing: { after: 60 },
-          indent: { left: convertInchesToTwip(0.4) },
+          indent: { left: convertInchesToTwip(0.75), hanging: convertInchesToTwip(0.4) },
         }));
       });
     });
+
 
     if (conclusion) {
       children.push(new Paragraph({
@@ -714,18 +725,10 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
   }
 
   // ═══ CHAPITRES ═══
-  chapters.forEach((chapter, index) => {
-    // Filtrer les chapitres vides (titre générique sans contenu réel)
-    const hasAnyContent = (chapter.content && chapter.content.trim().length > 50) ||
-      chapter.subChapters.some(s => s.content && s.content.trim().length > 50);
-    if (!hasAnyContent && /^chapitre\s+\d+$/i.test(chapter.title.trim())) return;
-
-    // Titre + corps résolus (extrait le vrai titre si le champ est générique)
-    const { displayTitle, body } = resolveChapter(chapter, index);
-
+  renderChapters.forEach(({ chapter, num, displayTitle, body }, position) => {
     // Numéro du chapitre (discret)
     children.push(new Paragraph({
-      children: [new TextRun({ text: `CHAPITRE ${index + 1}`, bold: true, size: subTitleSize, font, color: '888888' })],
+      children: [new TextRun({ text: `CHAPITRE ${num}`, bold: true, size: subTitleSize, font, color: '888888' })],
       heading: HeadingLevel.HEADING_1,
       alignment: AlignmentType.CENTER,
       spacing: { before: 800, after: 200 },
@@ -747,35 +750,20 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
       children.push(...buildContentParagraphs(body, baseSize, font));
     }
 
-
     // Sous-chapitres
     chapter.subChapters.forEach((sub, subIdx) => {
-      // Ne pas afficher les sous-chapitres vides (titre seul sans contenu)
-      if (!sub.content || sub.content.trim().length === 0) {
-        // Afficher quand même le titre du sous-chapitre comme repère
-        children.push(new Paragraph({
-        children: [new TextRun({
-          text: `${index + 1}.${subIdx + 1}  ${cleanChapterTitle(sub.title)}`,
-          bold: true,
-          size: subTitleSize,
-          font,
-        })],
-        heading: HeadingLevel.HEADING_2,
-        spacing: { before: 480, after: 120 },
-      }));
+      const subTitle = cleanChapterTitle(sub.title);
+      const subLabel = isGenericTitle(subTitle) ? `${num}.${subIdx + 1}` : `${num}.${subIdx + 1}  ${subTitle}`;
+
+      // Sous-chapitre vide : on saute (pas de "[Contenu à rédiger]" dans un livre vendu)
+      if (!sub.content || sub.content.trim().length === 0) return;
+
+      // Séparateur visuel subtil avant le sous-chapitre
+      children.push(new Paragraph({ spacing: { before: 240 } }));
+
       children.push(new Paragraph({
-        children: [new TextRun({ text: '[Contenu à rédiger]', italics: true, size: baseSize, font, color: 'AAAAAA' })],
-        spacing: { after: 200 },
-      }));
-      return;
-    }
-
-    // Séparateur visuel subtil avant le sous-chapitre
-    children.push(new Paragraph({ spacing: { before: 240 } }));
-
-    children.push(new Paragraph({
-      children: [new TextRun({
-        text: `${index + 1}.${subIdx + 1}  ${cleanChapterTitle(sub.title)}`,
+        children: [new TextRun({
+          text: subLabel,
           bold: true,
           size: subTitleSize,
           font,
@@ -788,10 +776,11 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
     });
 
     // Saut de page entre chapitres
-    if (index < chapters.length - 1) {
+    if (position < renderChapters.length - 1) {
       children.push(new Paragraph({ children: [new PageBreak()] }));
     }
   });
+
 
   // ═══ CONCLUSION ═══
   if (conclusion) {
