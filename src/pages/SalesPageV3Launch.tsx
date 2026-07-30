@@ -152,6 +152,9 @@ const SalesPageV3Launch = () => {
         </div>
       </section>
 
+      {/* TÉMOIGNAGES CLIENTS (photos de premiers livres) */}
+      <TestimonialsWall amber={AMBER} ink={INK} serif={SERIF} />
+
       {/* BONUS DE LANCEMENT */}
       <section className="px-4 pb-16">
         <motion.div {...fade} className="max-w-3xl mx-auto rounded-3xl border-2 border-dashed p-6" style={{ borderColor: AMBER, background: "#FFFDF8" }}>
