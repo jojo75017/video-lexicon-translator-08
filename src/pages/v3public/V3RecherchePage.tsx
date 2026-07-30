@@ -49,6 +49,11 @@ export default function V3RecherchePage() {
         </p>
       </header>
 
+      {/* Clés IA — avant la zone de recherche */}
+      <V3ApiKeysGate context="Sans clé Gemini, la recherche Amazon KDP et les générateurs IA ne démarrent pas." />
+
+
+
       {/* Raccourcis outils profonds */}
       <section>
         <h2 className="text-sm font-semibold text-slate-800 mb-3">Outils de recherche</h2>
