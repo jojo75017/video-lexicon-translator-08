@@ -1,9 +1,9 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Sparkles, Loader2, ImageIcon, ArrowRight, KeyRound } from 'lucide-react';
-import ApiProviderQuickSettings from '@/components/ebook/ApiProviderQuickSettings';
+import { Sparkles, Loader2, ImageIcon, ArrowRight } from 'lucide-react';
 import { BackButton } from '@/components/v3/BackButton';
 import V3BriefRecap from '@/components/v3public/V3BriefRecap';
+import V3ApiKeysGate from '@/components/v3public/V3ApiKeysGate';
 
 const V3CreateWizard = lazy(() => import('@/components/v3public/V3CreateWizard'));
 const V3ImportStudio = lazy(() => import('@/components/v3public/V3ImportStudio'));
@@ -31,12 +31,11 @@ export default function V3CreatePage() {
   const type = params.get('type');
 
   const [showWizard, setShowWizard] = useState(false);
-  const [showKeys, setShowKeys] = useState(false);
   const wizardRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => { seedHubConfig(idea, genre, type); }, [idea, genre, type]);
 
-  const openFloating = () => window.dispatchEvent(new CustomEvent('open-api-keys'));
+
 
   const launchWorkflow = () => {
     setShowWizard(true);
@@ -77,17 +76,11 @@ export default function V3CreatePage() {
           </Link>
         </div>
 
-        {/* Clés API — repliées par défaut */}
+        {/* Clés API — encart partagé (alerte si aucune clé) */}
         <div className="mt-6">
-          <button type="button" onClick={() => setShowKeys((v) => !v)} className="v3-btn v3-btn-outline text-xs">
-            <KeyRound className="w-3.5 h-3.5" /> {showKeys ? 'Masquer' : 'Ma clé Gemini / modèles IA'}
-          </button>
-          {showKeys && (
-            <div className="v3-card mt-3">
-              <ApiProviderQuickSettings onOpenAdvanced={openFloating} />
-            </div>
-          )}
+          <V3ApiKeysGate context="Sans clé Gemini, le workflow d’écriture ne peut pas démarrer." />
         </div>
+
 
         {/* Fiche du livre + Cible & Promesse IA + Sommaire validé */}
         <div className="mt-6">

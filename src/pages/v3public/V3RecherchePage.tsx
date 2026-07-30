@@ -11,6 +11,7 @@ import {
   Search, Target, BarChart3, Image as ImageIcon, FileText, Sparkles, Award, ExternalLink,
 } from 'lucide-react';
 import { BackButton } from "@/components/v3/BackButton";
+import V3ApiKeysGate from '@/components/v3public/V3ApiKeysGate';
 
 /**
  * V3 Recherche — Hub central de la recherche KDP.
@@ -48,6 +49,11 @@ export default function V3RecherchePage() {
           niches, espion ASIN et couverture pro.
         </p>
       </header>
+
+      {/* Clés IA — avant la zone de recherche */}
+      <V3ApiKeysGate context="Sans clé Gemini, la recherche Amazon KDP et les générateurs IA ne démarrent pas." />
+
+
 
       {/* Raccourcis outils profonds */}
       <section>

@@ -5,6 +5,9 @@ import {
 import { V3_HEADER_MENU } from '@/data/v3HeaderMenu';
 import homeHero from '@/assets/v3/home-hero.jpg';
 import V3BriefRecap from '@/components/v3public/V3BriefRecap';
+import V3ApiKeysGate from '@/components/v3public/V3ApiKeysGate';
+import V3StartBookBar from '@/components/v3public/V3StartBookBar';
+import V3PaletteModule from '@/components/v3public/V3PaletteModule';
 
 
 
@@ -184,7 +187,17 @@ export default function V3HomePage() {
         <div className="v3-gold-rule relative" />
       </section>
 
+      {/* Clés IA — avant toute recherche ou création */}
+      <div className="max-w-7xl mx-auto px-5 md:px-8 pt-10">
+        <V3ApiKeysGate />
+      </div>
+
+      {/* Démarrage : titre du livre → fiche */}
+      <V3StartBookBar />
+
       <V3BriefRecap />
+
+
 
 
       {/* BANDE BLOG — mise en évidence */}
@@ -423,6 +436,10 @@ export default function V3HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Palette officielle V3 */}
+      <V3PaletteModule />
     </>
+
   );
 }
