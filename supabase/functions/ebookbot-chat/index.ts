@@ -109,7 +109,7 @@ serve(async (req) => {
 
     // ===== Mode BYOK : clé Gemini personnelle de l'abonné =====
     if (typeof geminiApiKey === "string" && geminiApiKey.startsWith("AIza")) {
-      const model = "gemini-2.5-flash";
+      const model = "gemini-flash-latest";
       const contents = messages.map((m: { role: string; content: string }) => ({
         role: m.role === "assistant" ? "model" : "user",
         parts: [{ text: m.content }],

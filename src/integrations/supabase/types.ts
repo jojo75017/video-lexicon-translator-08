@@ -1735,6 +1735,7 @@ export type Database = {
           subchapters_generated: number
           trial_ends_at: string | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           access_code?: string | null
@@ -1754,6 +1755,7 @@ export type Database = {
           subchapters_generated?: number
           trial_ends_at?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           access_code?: string | null
@@ -1773,6 +1775,7 @@ export type Database = {
           subchapters_generated?: number
           trial_ends_at?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }

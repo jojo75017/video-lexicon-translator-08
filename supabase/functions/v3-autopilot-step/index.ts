@@ -169,7 +169,7 @@ serve(async (req) => {
         return { ok: true, text: (d.choices?.[0]?.message?.content || "").trim() };
       }
       // Gemini par défaut
-      const gModel = model || "gemini-2.5-flash";
+      const gModel = model || "gemini-flash-latest";
       const r = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/${gModel}:generateContent?key=${geminiKey}`,
         {

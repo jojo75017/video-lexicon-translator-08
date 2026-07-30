@@ -37,7 +37,7 @@ function isValidGoogleKey(key: string): boolean {
 
 async function callGemini(prompt: string, apiKey: string) {
   const cleanKey = sanitizeApiKey(apiKey);
-  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(cleanKey)}`;
+  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${encodeURIComponent(cleanKey)}`;
   const response = await fetch(geminiUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
