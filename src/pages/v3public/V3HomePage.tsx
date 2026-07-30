@@ -5,6 +5,9 @@ import {
 import { V3_HEADER_MENU } from '@/data/v3HeaderMenu';
 import homeHero from '@/assets/v3/home-hero.jpg';
 import V3BriefRecap from '@/components/v3public/V3BriefRecap';
+import V3ApiKeysGate from '@/components/v3public/V3ApiKeysGate';
+import V3StartBookBar from '@/components/v3public/V3StartBookBar';
+import V3PaletteModule from '@/components/v3public/V3PaletteModule';
 
 
 
