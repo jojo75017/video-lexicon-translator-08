@@ -337,12 +337,20 @@ function prepareRenderableChapters(chapters: DocxChapter[]) {
       const validSubChapters = (chapter.subChapters || []).filter((sub) => meaningfulText(sub.content).length > 0);
       return { chapter: { ...chapter, subChapters: validSubChapters }, ...resolved };
     })
-    .filter(({ body, chapter }) => {
-      const subContent = chapter.subChapters.reduce((total, sub) => total + meaningfulText(sub.content).length, 0);
-      return meaningfulText(body).length > 0 || subContent > 0;
+    .map((entry) => {
+      const subContent = entry.chapter.subChapters.reduce(
+        (total, sub) => total + meaningfulText(sub.content).length,
+        0,
+      );
+      const hasContent = meaningfulText(entry.body).length > 0 || subContent > 0;
+      // Un chapitre sans texte mais avec un vrai titre reste au sommaire (contenu partiel).
+      const hasRealTitle = !isGenericTitle(entry.displayTitle);
+      return { ...entry, hasContent, keep: hasContent || hasRealTitle, isStub: !hasContent };
     })
+    .filter((entry) => entry.keep)
     .map((entry, index) => ({ ...entry, num: index + 1 }));
 }
+
 
 export function getDocxOutline(chapters: DocxChapter[]): DocxOutlineEntry[] {
   return prepareRenderableChapters(chapters).map(({ chapter, num, displayTitle }) => ({
