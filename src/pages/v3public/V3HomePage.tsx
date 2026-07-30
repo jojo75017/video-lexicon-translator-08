@@ -148,6 +148,22 @@ export default function V3HomePage() {
             Trente agents IA au service de votre livre.
           </p>
 
+          {/* Accès rapide clé IA depuis le bandeau */}
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+            <a
+              href="https://aistudio.google.com/app/apikey"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="v3-btn v3-btn-gold text-[12.5px]"
+            >
+              Obtenir ma clé Gemini gratuite
+            </a>
+            <Link to="/v3/compte" className="v3-btn v3-btn-outline text-[12.5px] bg-white/90">
+              Coller ma clé
+            </Link>
+          </div>
+
+
           {/* Social proof */}
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <div className="flex -space-x-2">
