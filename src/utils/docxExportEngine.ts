@@ -232,77 +232,60 @@ function stripLeadingChapterMarker(content: string, num: number): string {
 
 /**
  * Extrait un titre "inline" placé en tête du contenu quand le champ titre est générique.
- * Gère : Markdown (# Titre), gras (**Titre**), première ligne courte, ou Title Case.
+ * Gère uniquement des titres explicites : Markdown (# Titre), gras (**Titre**),
+ * ou une première ligne courte isolée. Aucune heuristique sur la prose :
+ * mieux vaut "Chapitre 4" qu'un début de phrase en guise de titre.
  */
 function extractInlineTitle(body: string): { title: string; rest: string } | null {
   const trimmed = (body || '').replace(/^[\s\u00A0]+/, '');
   if (!trimmed) return null;
 
+  const accept = (rawTitle: string, rest: string) => {
+    const title = cleanChapterTitle(rawTitle);
+    if (isGenericTitle(title) || isProseLike(title)) return null;
+    if (rest.trim().length < 40) return null;
+    return { title, rest: rest.replace(/^[\s\u00A0]+/, '') };
+  };
+
   // 0) Markdown heading "# Titre"
   const mdHeading = trimmed.match(/^#{1,3}\s+([^\n]{4,110})\n+([\s\S]+)$/);
-  if (mdHeading && mdHeading[2].trim().length > 30) {
-    return { title: cleanChapterTitle(mdHeading[1]), rest: mdHeading[2].replace(/^[\s\u00A0]+/, '') };
+  if (mdHeading) {
+    const r = accept(mdHeading[1], mdHeading[2]);
+    if (r) return r;
   }
 
   // 0b) Gras Markdown "**Titre**" seul sur la première ligne
   const boldHeading = trimmed.match(/^\*\*([^\n*]{4,110})\*\*\s*\n+([\s\S]+)$/);
-  if (boldHeading && boldHeading[2].trim().length > 30) {
-    return { title: cleanChapterTitle(boldHeading[1]), rest: boldHeading[2].replace(/^[\s\u00A0]+/, '') };
+  if (boldHeading) {
+    const r = accept(boldHeading[1], boldHeading[2]);
+    if (r) return r;
   }
 
-  // 1) Cas idéal : un vrai retour à la ligne sépare le titre du corps.
+  // 1) Première ligne courte isolée (vrai retour à la ligne avant le corps)
   const nl = trimmed.indexOf('\n');
-  if (nl > 4 && nl <= 110) {
-    const cand = trimmed.slice(0, nl).trim();
-    const rest = trimmed.slice(nl).replace(/^[\s\u00A0]+/, '');
-    if (cand.length >= 5 && cand.length <= 110 && rest.length > 40 && !/[.!?…]$/.test(cand)) {
-      return { title: cleanChapterTitle(cand), rest };
-    }
+  if (nl > 4 && nl <= 90) {
+    const r = accept(trimmed.slice(0, nl), trimmed.slice(nl));
+    if (r) return r;
   }
 
-  // 2) Heuristique "Title Case" : on garde la séquence de mots capitalisés en tête.
-  const connectors = new Set(['de','des','du','la','le','les','et','à','a','en','un','une','ou','au','aux','d','l','sur','dans','pour','vos','votre','ses','son','sa','par','avec','sans','ce','cet','cette']);
-  const words = trimmed.split(/\s+/);
-  const firstChar = (w: string) => w.replace(/^[«»"'(]+/, '').charAt(0);
-  const startsUpper = (w: string) => /[A-ZÀ-ÝÆŒ]/.test(firstChar(w));
-  const startsLower = (w: string) => /[a-zà-ÿæœ]/.test(firstChar(w));
-  const isPunct = (w: string) => /^[:–—\-«»"'().,;]+$/.test(w);
-  const bare = (w: string) => w.replace(/[«»"'().,;:!?]/g, '').toLowerCase();
-
-  const title: string[] = [];
-  for (let i = 0; i < words.length && i < 18; i++) {
-    const w = words[i];
-    if (isPunct(w)) { title.push(w); continue; }
-    if (startsLower(w) && !connectors.has(bare(w))) {
-      if (i === 0) { title.push(w); continue; }
-      break;
-    }
-    if (startsUpper(w)) {
-      const next = words[i + 1];
-      if (next && startsLower(next) && !connectors.has(bare(next)) && !isPunct(next)) break;
-    }
-    title.push(w);
-  }
-  while (title.length && (isPunct(title[title.length - 1]) || connectors.has(bare(title[title.length - 1])))) {
-    title.pop();
-  }
-  const t = title.join(' ').replace(/\s+([,.])/g, '$1').trim();
-  if (t.length < 5 || t.length > 110) return null;
-  const rest = words.slice(title.length).join(' ').trim();
-  if (rest.length < 30) return null;
-  return { title: t, rest };
+  return null;
 }
 
 /** Calcule le titre affichable + le corps nettoyé d'un chapitre. */
-function resolveChapter(chapter: { title: string; content?: string }, index: number): { displayTitle: string; body: string } {
+function resolveChapter(
+  chapter: { title: string; content?: string },
+  index: number,
+): { displayTitle: string; body: string } {
   let displayTitle = cleanChapterTitle(chapter.title);
   let body = stripLeadingChapterMarker(chapter.content || '', index + 1);
 
-  if (isGenericTitle(chapter.title) || isGenericTitle(displayTitle)) {
+  if (isGenericTitle(displayTitle)) {
     const ext = extractInlineTitle(body);
     if (ext) {
       displayTitle = ext.title;
       body = ext.rest;
+    } else {
+      displayTitle = '';
     }
   } else {
     // Titre présent : évite qu'il soit répété en tête du corps (Markdown, gras, ou brut).
@@ -316,6 +299,7 @@ function resolveChapter(chapter: { title: string; content?: string }, index: num
 
   return { displayTitle, body };
 }
+
 
 function editorialClean(raw: string): string {
   if (!raw) return '';
