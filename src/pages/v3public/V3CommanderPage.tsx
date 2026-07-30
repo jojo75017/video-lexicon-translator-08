@@ -35,6 +35,7 @@ const INCLUDED = [
   "Livres audio (voix de synthèse professionnelle)",
   "Forum communauté + guides de publication",
   "Accès à vie : aucun abonnement, aucune date d'expiration",
+  "V3 incluse sans surcoût : tous les nouveaux outils vous seront ajoutés automatiquement",
 ];
 
 export default function V3CommanderPage() {
@@ -81,8 +82,8 @@ export default function V3CommanderPage() {
   return (
     <main className="min-h-screen" style={{ background: PAPER, color: INK }}>
       <SeoHead
-        title="Commander EbookStudio Pro — 59 € accès à vie"
-        description="Accès à vie à EbookStudio Pro pour 59 €, ou en 2 à 3 fois. Paiement sécurisé par carte bancaire ou PayPal, accès immédiat."
+        title="Commander EbookStudio Pro — 59 € accès à vie, V3 incluse"
+        description="Accès à vie à EbookStudio Pro pour 59 €, ou en 2 à 3 fois. La V3 est incluse sans surcoût. Paiement sécurisé par carte bancaire ou PayPal, accès immédiat."
         canonical="https://www.ebookstudio.fr/commander"
       />
       <PaymentTestModeBanner />
@@ -147,6 +148,13 @@ export default function V3CommanderPage() {
           >
             {!clientSecret ? (
               <>
+                <div
+                  className="mb-4 rounded-xl border px-4 py-3 text-sm font-bold"
+                  style={{ background: `${GOLD}14`, borderColor: `${GOLD}55`, color: "#8a6d16" }}
+                >
+                  🎁 La V3 est incluse sans surcoût : tous les nouveaux outils et la nouvelle interface vous seront ajoutés automatiquement.
+                </div>
+
                 <div className="flex items-baseline gap-2">
                   <span className="text-4xl font-black" style={{ color: EMERALD }}>59 €</span>
                   <span className="text-sm text-slate-500">paiement unique</span>
