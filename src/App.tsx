@@ -577,7 +577,7 @@ const App = () => {
 
             </Route>
 
-            <Route path="*" element={<Navigate to={hasPlannerAccess ? "/ebook-planner" : "/offres"} replace />} />
+            <Route path="*" element={<Navigate to={hasPlannerAccess ? "/ebook-planner" : "/commander"} replace />} />
           </Routes>
           </Suspense>
           <SubscriberActivityPopup />
