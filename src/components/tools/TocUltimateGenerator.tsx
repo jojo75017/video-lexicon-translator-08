@@ -61,7 +61,7 @@ function clean(text: unknown): string {
   return String(text || '').replace(/```(json)?/gi, '').replace(/[{}"]/g, '').replace(/\s+/g, ' ').trim();
 }
 
-export default function TocUltimateGenerator({ onApply, initialTheme, initialDescription, initialGenre, initialChapters }: Props) {
+export default function TocUltimateGenerator({ onApply, applyLabel, initialTheme, initialDescription, initialGenre, initialChapters }: Props) {
   const [theme, setTheme] = useState(initialTheme || '');
   const [genre, setGenre] = useState(initialGenre || 'Roman');
   const [audience, setAudience] = useState('Adultes');
