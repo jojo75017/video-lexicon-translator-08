@@ -347,50 +347,11 @@ export default function V3CreateWizard() {
   const [promesseBenefices, setPromesseBenefices] = useState('');
   const [promesseDifferenciation, setPromesseDifferenciation] = useState('');
   const [promesseEmotion, setPromesseEmotion] = useState('');
-  const [autofillLoading, setAutofillLoading] = useState(false);
-  const [targetPromiseOpen, setTargetPromiseOpen] = useState(false);
 
   // Bible de l'univers & Arbre narratif (fiction / séries / univers étendus)
   const [bibleUnivers, setBibleUnivers] = useState('');
   const [arbreNarratif, setArbreNarratif] = useState('');
 
-  const handleAutofillTargetPromise = async () => {
-    if (!title.trim() && !finalTitle.trim()) {
-      toast.error('Ajoute au moins un titre avant l’auto-remplissage.');
-      return;
-    }
-    setAutofillLoading(true);
-    try {
-      const provider = getProvider();
-      const userApiKey = provider === 'gemini' ? getProviderKey('gemini') : '';
-      const { data, error } = await supabase.functions.invoke('autofill-target-promise', {
-        body: {
-          title: finalTitle.trim() || title.trim(),
-          subtitle: subtitle.trim(),
-          category: effectiveCategory,
-          bookIntroduction: description.trim(),
-          language: 'fr',
-          userApiKey,
-        },
-      });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      setCibleProfil(data?.cibleProfil || '');
-      setCibleNiveau(data?.cibleNiveau || 'tous');
-      setCibleBesoins(data?.cibleBesoins || '');
-      setCibleFrustrations(data?.cibleFrustrations || '');
-      setPromesseCentrale(data?.promesseCentrale || '');
-      setPromesseBenefices(data?.promesseBenefices || '');
-      setPromesseDifferenciation(data?.promesseDifferenciation || '');
-      setPromesseEmotion(data?.promesseEmotion || '');
-      setTargetPromiseOpen(true);
-      toast.success('Cible & Promesse remplies — relis puis lance la génération.');
-    } catch (e: any) {
-      toast.error(e?.message || 'Auto-remplissage indisponible.');
-    } finally {
-      setAutofillLoading(false);
-    }
-  };
 
   // Assistant IA — trouve titre / sous-titre / synopsis / catégories à partir d'une idée ou d'une niche.
   const [aiTopic, setAiTopic] = useState('');
