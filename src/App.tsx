@@ -322,13 +322,23 @@ const App = () => {
             <Route path="/" element={<Navigate to={hasPlannerAccess ? '/ebook-planner' : '/offres'} replace />} />
 
             {/* Marketing */}
+            {/* Visiteurs non connectés → page de commande publique (plus de mur de login) */}
             <Route path="/offres" element={
               hasPlannerAccess
                 ? <Navigate to="/ebook-planner" replace />
                 : (isAuthenticated
                     ? <SubscriptionPage subscriberEmail={subscriberEmail} subscriberData={subscriberData} onLogout={handleLogout} />
-                    : <SubscriptionAuth onAuthenticated={handleAuthenticated} />)
+                    : <Navigate to="/commander" replace />)
             } />
+            <Route path="/connexion-abonne" element={
+              isAuthenticated
+                ? <Navigate to="/offres" replace />
+                : <SubscriptionAuth onAuthenticated={handleAuthenticated} />
+            } />
+            <Route path="/commander" element={<V3CommanderPage />} />
+            <Route path="/offre-59" element={<Navigate to="/commander" replace />} />
+            <Route path="/59" element={<Navigate to="/commander" replace />} />
+
             <Route path="/demo" element={<DemoPage />} />
             <Route path="/faq" element={<FaqAssistancePage />} />
             <Route path="/assistance" element={<FaqAssistancePage />} />
