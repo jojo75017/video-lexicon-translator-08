@@ -674,47 +674,42 @@ Instructions de génération:
       
       console.log('Generating image with prompt:', imagePrompt);
 
-      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'google/gemini-3-pro-image-preview',
-          messages: [
-            {
-              role: 'user',
-              content: imagePrompt
-            }
-          ],
-          modalities: ['image', 'text']
-        }),
-      });
+      const response = LOVABLE_API_KEY
+        ? await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              model: 'google/gemini-3-pro-image-preview',
+              messages: [
+                {
+                  role: 'user',
+                  content: imagePrompt
+                }
+              ],
+              modalities: ['image', 'text']
+            }),
+          })
+        : null;
 
-      if (!response.ok) {
-        // Si erreur 429 ou 402 (crédits Lovable), tenter Gemini direct avec la clé user
-        if (response.status === 429 || response.status === 402) {
+      if (!response || !response.ok) {
+        if (!response) {
+          console.error('LOVABLE_API_KEY missing, trying user Gemini key...');
+        } else if (response.status === 429 || response.status === 402) {
           console.log('Lovable AI credits/rate limit reached, trying user Gemini key...');
-          const geminiImg = await tryGeminiDirect(imagePrompt, userGeminiApiKey);
-          if (geminiImg) {
-            generatedImageUrl = geminiImg;
-          } else {
-            console.log('No Gemini fallback available, returning placeholder');
-            generatedImageUrl = getPlaceholderUrl(chapterTitle, style, colorScheme);
-          }
         } else {
           const errorText = await response.text();
           console.error('AI Gateway error:', response.status, errorText);
-          const geminiImg = await tryGeminiDirect(imagePrompt, userGeminiApiKey);
-          generatedImageUrl = geminiImg || getPlaceholderUrl(chapterTitle, style, colorScheme);
         }
+        const geminiImg = await tryGeminiDirect(imagePrompt, userGeminiApiKey);
+        generatedImageUrl = geminiImg || getPlaceholderUrl(chapterTitle, style, colorScheme);
       } else {
         // Réponse OK - extraire l'image base64 de la réponse Gemini
         const data = await response.json();
         console.log('Lovable AI response received successfully');
         
-        // Le modèle gemini-2.5-flash-image-preview renvoie les images en base64
         const imageData = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
         
         if (imageData) {
@@ -727,10 +722,12 @@ Instructions de génération:
             generatedImageUrl = content;
           } else {
             console.error('No image in Lovable AI response:', JSON.stringify(data).substring(0, 500));
-            throw new Error('No image URL in response');
+            const geminiImg = await tryGeminiDirect(imagePrompt, userGeminiApiKey);
+            generatedImageUrl = geminiImg || getPlaceholderUrl(chapterTitle, style, colorScheme);
           }
         }
       }
+
     }
 
     // Upload vers Supabase Storage si activé (mais pas les placeholders)
