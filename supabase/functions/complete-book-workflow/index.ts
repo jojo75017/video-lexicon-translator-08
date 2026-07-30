@@ -54,6 +54,21 @@ STANDARDS ÉDITORIAUX PROFESSIONNELS (niveau maison d'édition) :
    Score < 7 = à refaire
 `;
 
+// RECHERCHE APPROFONDIE — réservé au palier Pro (Éditeur 59 €/mois et Pack 347 €).
+// Ces directives poussent les agents à creuser davantage : sources, données
+// chiffrées, contre-arguments, exemples vérifiables, angles concurrentiels.
+const PRO_DEEP_RESEARCH = `
+
+🔬 MODE RECHERCHE APPROFONDIE (palier ÉDITEUR PRO — l'auteur paie un abonnement premium, le rendu doit être digne d'une maison d'édition) :
+1. PROFONDEUR : pour chaque idée clé, va au-delà de l'évidence. Apporte le mécanisme (le "pourquoi ça marche"), pas seulement le "quoi".
+2. PREUVES : appuie chaque affirmation forte sur un élément concret — étude, ordre de grandeur chiffré, cas réel documenté, référence d'auteur ou d'ouvrage reconnu. Si tu n'es pas certain d'une donnée, formule-la comme un ordre de grandeur ("environ", "la plupart des études convergent vers…") et n'invente JAMAIS de chiffre précis ni de source qui n'existe pas.
+3. CONTRE-ARGUMENTS : anticipe l'objection principale du lecteur exigeant et traite-la explicitement.
+4. NUANCE EXPERTE : distingue ce qui est établi, ce qui est débattu et ce qui relève de l'expérience terrain.
+5. VALEUR ACTIONNABLE : chaque section se termine sur une application concrète, un protocole ou un exemple transposable.
+6. NIVEAU DE LANGUE : registre soutenu mais fluide, vocabulaire spécifique du domaine correctement employé, zéro formulation générique interchangeable.
+7. ORIGINALITÉ : interdiction de recycler les listes de conseils standards que l'on trouve dans dix autres livres de la niche. Cherche l'angle que la concurrence n'exploite pas.
+`;
+
 // Variable globale pour stocker la clé API utilisateur optionnelle
 let activeApiKey: string | null = null;
 let activeLanguageDirective = '';
