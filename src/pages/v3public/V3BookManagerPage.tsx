@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { BackButton } from "@/components/v3/BackButton";
 
-type Book = { id: string; title: string; author_name?: string | null; kdp_description?: string | null };
+type Book = { id: string; title: string; author_name?: string | null; kdp_description?: string | null; chapters?: unknown };
 
 export default function V3BookManagerPage() {
   const nav = useNavigate();
@@ -17,7 +17,7 @@ export default function V3BookManagerPage() {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) { nav('/v3/auth'); return; }
     const { data, error } = await supabase.from('ebook_projects')
-      .select('id,title,author_name,kdp_description')
+      .select('id,title,author_name,kdp_description,chapters')
       .eq('user_id', auth.user.id).order('updated_at', { ascending: false });
     if (error) toast.error(`Chargement impossible : ${error.message}`);
     setRows((data as Book[]) || []);
@@ -53,22 +53,27 @@ export default function V3BookManagerPage() {
         </div>
       ) : (
         <div className="mt-10 space-y-3">
-          {rows.map((b) => (
+          {rows.map((b) => {
+            const chapterCount = Array.isArray(b.chapters) ? b.chapters.length : 0;
+            return (
             <div key={b.id} className="v3-card flex items-center gap-4">
               <div className="w-14 h-20 rounded bg-[var(--v3-ink)] shrink-0" />
               <div className="flex-1 min-w-0">
                 <div className="font-semibold truncate">{b.title}</div>
                 {b.author_name && <div className="text-xs text-[var(--v3-muted)]">par {b.author_name}</div>}
+                <div className="mt-1 text-xs font-semibold text-[var(--v3-muted)]">
+                  {chapterCount > 0 ? `${chapterCount} chapitre${chapterCount > 1 ? 's' : ''} · Export disponible` : 'Brouillon · récupération des sauvegardes à l’ouverture'}
+                </div>
               </div>
               <div className="flex gap-2">
                 <button onClick={() => nav(`/v3/create?projectId=${b.id}`)} className="v3-btn v3-btn-primary text-xs">
-                  <BookOpen className="w-3.5 h-3.5" /> Ouvrir
+                  <BookOpen className="w-3.5 h-3.5" /> {chapterCount > 0 ? 'Ouvrir & exporter' : 'Ouvrir'}
                 </button>
                 <button onClick={() => setEditing(b)} className="v3-btn v3-btn-outline text-xs"><Pencil className="w-3.5 h-3.5" /></button>
                 <button onClick={() => remove(b.id)} className="v3-btn v3-btn-ghost text-xs text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>
               </div>
             </div>
-          ))}
+          );})}
         </div>
       )}
 

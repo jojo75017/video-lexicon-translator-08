@@ -388,8 +388,29 @@ export default function V3CreateWizard() {
         return;
       }
 
-      const saved = data as any;
-      const savedChapters = Array.isArray(saved.chapters) ? saved.chapters : [];
+      let saved = data as any;
+      let savedChapters = Array.isArray(saved.chapters) ? saved.chapters : [];
+
+      // Les anciens workflows ont parfois enregistré le manuscrit complet dans
+      // l'historique des versions avant de mettre à jour la fiche principale.
+      // Récupère automatiquement la dernière version exploitable : l'abonné ne
+      // doit jamais avoir à régénérer un livre déjà terminé.
+      if (!savedChapters.some((chapter: any) => String(chapter?.content || chapter?.contenu || '').trim())) {
+        const { data: versions } = await supabase
+          .from('ebook_project_versions')
+          .select('*')
+          .eq('project_id', requestedProjectId)
+          .eq('user_id', auth.user.id)
+          .order('version_number', { ascending: false });
+        const completeVersion = (versions || []).find((version: any) =>
+          Array.isArray(version?.chapters)
+          && version.chapters.some((chapter: any) => String(chapter?.content || chapter?.contenu || '').trim())
+        );
+        if (completeVersion) {
+          saved = { ...saved, ...completeVersion, id: data.id, title: completeVersion.title || data.title };
+          savedChapters = completeVersion.chapters;
+        }
+      }
       const restoredOutline = savedChapters.map((chapter: any, index: number) => ({
         id: makeId(),
         numero: Number(chapter.number || chapter.numero || index + 1),
@@ -425,7 +446,10 @@ export default function V3CreateWizard() {
         })));
       }
       setCoverUrl(savedCover);
-      if (savedChapters.length) {
+      const hasManuscript = savedChapters.some((chapter: any) =>
+        String(chapter?.content || chapter?.contenu || '').trim().length > 0
+      );
+      if (hasManuscript) {
         setCompletedBook({
           chapters: savedChapters,
           conclusion: saved.conclusion || '',
@@ -436,7 +460,7 @@ export default function V3CreateWizard() {
         setStep(2);
         setLaunched(false);
       }
-      toast.success(`« ${saved.title} » est ouvert.`);
+        toast.success(`« ${saved.title} » est ouvert — l’export est affiché en premier.`);
     };
 
     void openSavedProject();
