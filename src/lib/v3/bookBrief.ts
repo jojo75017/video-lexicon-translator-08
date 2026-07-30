@@ -173,3 +173,39 @@ export function normalizeOutline(items: BriefOutlineChapter[]): BriefOutlineChap
     .filter((item) => item.titre.length >= 2)
     .map((item, index) => ({ ...item, numero: index + 1 }));
 }
+
+/* ------------------------------------------------------------------ */
+/* Historique des titres sauvegardés (accueil V3)                      */
+/* ------------------------------------------------------------------ */
+
+export type TitleHistoryEntry = { title: string; savedAt: string };
+
+const TITLE_HISTORY_KEY = 'v3_title_history_v1';
+const TITLE_HISTORY_MAX = 12;
+
+export function readTitleHistory(): TitleHistoryEntry[] {
+  return readJSON<TitleHistoryEntry[]>(TITLE_HISTORY_KEY, []).filter((e) => e && typeof e.title === 'string' && e.title.trim());
+}
+
+/** Ajoute (ou remonte) un titre dans l'historique et renvoie la liste à jour. */
+export function pushTitleHistory(title: string): TitleHistoryEntry[] {
+  const clean = (title || '').trim();
+  if (!clean) return readTitleHistory();
+  const next = [
+    { title: clean, savedAt: new Date().toISOString() },
+    ...readTitleHistory().filter((e) => e.title.toLowerCase() !== clean.toLowerCase()),
+  ].slice(0, TITLE_HISTORY_MAX);
+  try { localStorage.setItem(TITLE_HISTORY_KEY, JSON.stringify(next)); } catch { /* noop */ }
+  return next;
+}
+
+export function removeTitleFromHistory(title: string): TitleHistoryEntry[] {
+  const next = readTitleHistory().filter((e) => e.title.toLowerCase() !== (title || '').trim().toLowerCase());
+  try { localStorage.setItem(TITLE_HISTORY_KEY, JSON.stringify(next)); } catch { /* noop */ }
+  return next;
+}
+
+export function clearTitleHistory(): TitleHistoryEntry[] {
+  try { localStorage.removeItem(TITLE_HISTORY_KEY); } catch { /* noop */ }
+  return [];
+}
