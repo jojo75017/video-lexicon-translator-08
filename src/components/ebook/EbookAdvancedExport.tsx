@@ -563,10 +563,11 @@ h2+p,h3+p{text-indent:0}
             )}
 
             {selectedFormat === 'docx-kdp' && !docxAudit.valid && (
-              <p className="text-xs text-destructive">
-                DOCX bloqué : {docxAudit.readyCount}/{docxAudit.totalCount} chapitres prêts. Ouvrez l’aperçu pour voir les erreurs.
+              <p className="text-xs text-amber-600">
+                {docxAudit.readyCount}/{docxAudit.totalCount} chapitres complets. L’export reste possible : les chapitres incomplets sortiront avec la mention « [Contenu à rédiger] ».
               </p>
             )}
+
 
             <Button className={selectedFormat === 'docx-kdp' ? 'w-full mt-2' : 'w-full mt-4'} onClick={handleExport} disabled={isExporting || chapters.length === 0}>
               {isExporting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
