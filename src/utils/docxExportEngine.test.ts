@@ -49,6 +49,10 @@ describe('export DOCX', () => {
       .map((m) => Number(m![1]));
     const unique = [...new Set(nums)].sort((a, b) => a - b);
     expect(unique).toEqual([1, 2, 3]); // 5 chapitres bruts -> 3 valides
+    // Aucun titre résiduel de type "2,"
+    const tocEntries = all.filter((t) => /^Chapitre\s+\d/.test(t));
+    for (const e of tocEntries) expect(e).not.toMatch(/–\s*\d+[,.]?$/);
+    expect(tocEntries[1]).toMatch(/Chapitre 2(?: – Le Silence des Pierres)?$/);
     // eslint-disable-next-line no-console
     console.log('Chapitres rendus:', unique, '\nEntrées:', all.filter((t) => /^Chapitre\s+\d/.test(t)));
   });
