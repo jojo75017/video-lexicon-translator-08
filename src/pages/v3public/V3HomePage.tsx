@@ -139,7 +139,7 @@ export default function V3HomePage() {
             <span className="block text-4xl md:text-5xl xl:text-6xl italic" style={{ color: 'var(--v3-gold)' }}>vous avez en vous.</span>
           </h1>
 
-          <p className="mt-6 text-[15px] max-w-2xl mx-auto text-white/90">
+          <p className="mt-6 text-[15px] max-w-2xl mx-auto text-white" style={{ textShadow: '0 2px 10px rgba(3,32,24,0.7)' }}>
             Un atelier éditorial complet : de l'idée à la couverture, du sommaire à la publication Amazon KDP.
             Trente agents IA au service de votre livre.
           </p>
