@@ -794,7 +794,7 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
   }
 
   // ═══ CHAPITRES ═══
-  renderChapters.forEach(({ chapter, num, displayTitle, body }, position) => {
+  renderChapters.forEach(({ chapter, num, displayTitle, body, hasContent }, position) => {
     // Numéro du chapitre (discret)
     children.push(new Paragraph({
       children: [new TextRun({ text: `CHAPITRE ${num}`, bold: true, size: subTitleSize, font, color: '888888' })],
