@@ -490,6 +490,28 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
   const canStepOutline = normalizedOutline.length >= 3;
   const canStepFour = finalTitle.trim().length >= 3 && authorName.trim().length >= 2;
 
+  // Instantané du brief pour le récapitulatif « Livre en préparation » sur /v3
+  useEffect(() => {
+    if (!title.trim() && !description.trim()) return;
+    writeBookBrief({
+      title: finalTitle.trim() || title.trim(),
+      subtitle: subtitle.trim(),
+      author: authorName.trim(),
+      description: description.trim(),
+      category: effectiveCategory,
+      genre: effectiveCategory,
+      tone,
+      chapters,
+      numberOfChapters: chapters,
+      wordsPerChapter,
+      outline: normalizedOutline.map((c) => ({ numero: c.numero, titre: c.titre, objectif: c.objectif })),
+      characters: characters.filter((c) => c.name.trim()).map((c) => ({ name: c.name, role: c.role, description: c.traits, traits: c.traits })),
+      cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations,
+      promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion,
+      projectId,
+    } as any);
+  }, [title, finalTitle, subtitle, authorName, description, effectiveCategory, tone, chapters, wordsPerChapter, normalizedOutline, characters, cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion, projectId]);
+
   const [showTocPaste, setShowTocPaste] = useState(false);
   const [tocPasteText, setTocPasteText] = useState('');
 
