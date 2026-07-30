@@ -364,19 +364,20 @@ const App = () => {
             <Route path="/promo/affilie" element={<PromoAffiliePage />} />
 
             {/* Redirections SEO (pages supprimées) */}
-            <Route path="/sales" element={<Navigate to="/offres" replace />} />
-            <Route path="/publication-pro" element={<Navigate to="/offres" replace />} />
-            <Route path="/v3-offre" element={<Navigate to="/offres" replace />} />
-            <Route path="/valeur-offre" element={<Navigate to="/offres" replace />} />
+            <Route path="/sales" element={<Navigate to="/commander" replace />} />
+            <Route path="/publication-pro" element={<Navigate to="/commander" replace />} />
+            <Route path="/v3-offre" element={<Navigate to="/commander" replace />} />
+            <Route path="/valeur-offre" element={<Navigate to="/commander" replace />} />
             <Route path="/coaching-vip" element={<Navigate to="/offres" replace />} />
             <Route path="/parrainage" element={<Navigate to="/offres" replace />} />
             <Route path="/affiliation" element={<Navigate to="/offres" replace />} />
             <Route path="/webinaire" element={<Navigate to="/offres" replace />} />
             <Route path="/nouveautes-2026" element={<Navigate to="/offres" replace />} />
             <Route path="/arc-signup" element={<Navigate to="/offres" replace />} />
-            <Route path="/essai-gratuit" element={<Navigate to="/offres" replace />} />
-            <Route path="/resultat-en-5-min" element={<Navigate to="/offres" replace />} />
-            <Route path="/bookperfect-offre" element={<Navigate to="/offres" replace />} />
+            <Route path="/essai-gratuit" element={<Navigate to="/commander" replace />} />
+            <Route path="/resultat-en-5-min" element={<Navigate to="/commander" replace />} />
+            <Route path="/bookperfect-offre" element={<Navigate to="/commander" replace />} />
+
             <Route path="/tutoriels" element={<Navigate to="/formation" replace />} />
             <Route path="/guide-outils" element={<Navigate to="/formation" replace />} />
             <Route path="/guide-ebook" element={<Navigate to="/formation" replace />} />
