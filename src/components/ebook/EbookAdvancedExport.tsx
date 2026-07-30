@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,7 +11,8 @@ import { Chapter } from '@/hooks/useSubscriptionGeneration';
 import { useKdpFormat } from '@/hooks/useKdpFormat';
 import { estimatePages } from '@/utils/kdpPageDensity';
 import { cleanGeneratedText } from '@/utils/textCleaner';
-import { exportProfessionalDocx } from '@/utils/docxExportEngine';
+import { exportProfessionalDocx, type DocxExportOptions } from '@/utils/docxExportEngine';
+import { DocxPreviewDialog } from './DocxPreviewDialog';
 import jsPDF from 'jspdf';
 import JSZip from 'jszip';
 
@@ -84,6 +85,7 @@ export const EbookAdvancedExport: React.FC<EbookAdvancedExportProps> = ({
   const { formatId } = useKdpFormat();
   const [selectedFormat, setSelectedFormat] = useState<ExportFormat>('docx-kdp');
   const [isExporting, setIsExporting] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [includeToc, setIncludeToc] = useState(true);
   const [includePageNumbers, setIncludePageNumbers] = useState(true);
   const [includeCopyright, setIncludeCopyright] = useState(true);
@@ -436,12 +438,20 @@ h2+p,h3+p{text-indent:0}
     downloadBlob(new Blob([html], { type: 'text/html;charset=utf-8' }), `${ebookTitle}.html`);
   };
 
+  const buildDocxOptions = useCallback((): DocxExportOptions => ({
+    title: ebookTitle,
+    authorName,
+    chapters,
+    preface: includePreface ? preface : undefined,
+    conclusion: includeConclusion ? conclusion : undefined,
+  }), [ebookTitle, authorName, chapters, includePreface, preface, includeConclusion, conclusion]);
+
   const handleExport = async () => {
     setIsExporting(true);
     try {
       switch (selectedFormat) {
         case 'docx-kdp':
-          await exportProfessionalDocx({ title: ebookTitle, authorName, chapters, preface: includePreface ? preface : undefined, conclusion: includeConclusion ? conclusion : undefined });
+          await exportProfessionalDocx(buildDocxOptions());
           break;
         case 'epub':
           await exportEpub();
@@ -534,14 +544,29 @@ h2+p,h3+p{text-indent:0}
               </div>
             ))}
 
-            <Button className="w-full mt-4" onClick={handleExport} disabled={isExporting || chapters.length === 0}>
+            {selectedFormat === 'docx-kdp' && (
+              <Button
+                variant="outline"
+                className="w-full mt-4"
+                onClick={() => setPreviewOpen(true)}
+                disabled={chapters.length === 0}
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                Aperçu avant téléchargement
+              </Button>
+            )}
+
+            <Button className={selectedFormat === 'docx-kdp' ? 'w-full mt-2' : 'w-full mt-4'} onClick={handleExport} disabled={isExporting || chapters.length === 0}>
               {isExporting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
               Exporter en {formats.find(f => f.id === selectedFormat)?.label}
             </Button>
           </CardContent>
         </Card>
       </div>
+
+      <DocxPreviewDialog open={previewOpen} onOpenChange={setPreviewOpen} getOptions={buildDocxOptions} />
     </div>
+
   );
 };
 

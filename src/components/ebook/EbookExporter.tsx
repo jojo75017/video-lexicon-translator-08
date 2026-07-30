@@ -17,7 +17,8 @@ import JSZip from 'jszip';
 import { Character } from './EbookCharacters';
 import { EbookExportPreview } from './EbookExportPreview';
 import { cleanGeneratedText } from '@/utils/textCleaner';
-import { exportProfessionalDocx } from '@/utils/docxExportEngine';
+import { exportProfessionalDocx, type DocxExportOptions } from '@/utils/docxExportEngine';
+import { DocxPreviewDialog } from './DocxPreviewDialog';
 import {
   Document, 
   Packer, 
@@ -115,6 +116,7 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
   const [includePageNumbers, setIncludePageNumbers] = useState(true);
   const [includeCoverPage, setIncludeCoverPage] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
+  const [showDocxPreview, setShowDocxPreview] = useState(false);
   const [generateKdpMetadata, setGenerateKdpMetadata] = useState(false);
   const [includeCharacterList, setIncludeCharacterList] = useState(true);
   const [showGoogleDocsPreview, setShowGoogleDocsPreview] = useState(false);
@@ -1511,9 +1513,7 @@ ${navContent}    </ol>
   };
 
   // Export DOCX formaté KDP professionnel
-  const exportAsKdpDocx = async () => {
-    try {
-      await exportProfessionalDocx({
+  const buildDocxOptions = (): DocxExportOptions => ({
         title: ebookTitle,
         authorName,
         preface: cleanedPreface,
@@ -1538,8 +1538,12 @@ ${navContent}    </ol>
         includeCoverPage,
         includePageNumbers,
         includeCopyrightPage: true,
-        pageFormat: '6x9',
-      });
+    pageFormat: '6x9',
+  });
+
+  const exportAsKdpDocx = async () => {
+    try {
+      await exportProfessionalDocx(buildDocxOptions());
       toast.success('DOCX professionnel exporté ! Prêt pour publication.');
     } catch (error) {
       console.error('Erreur export DOCX:', error);
@@ -2035,6 +2039,17 @@ Paperback: 9.99€ - 19.99€
             </Button>
 
             <Button
+              onClick={() => setShowDocxPreview(true)}
+              disabled={!ebookTitle || chapters.length === 0}
+              variant="outline"
+              className="w-full border-primary/30 hover:bg-primary/5"
+              size="lg"
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              👁️ Aperçu DOCX avant téléchargement
+            </Button>
+
+            <Button
               onClick={handleExport}
               disabled={isExporting || !ebookTitle || chapters.length === 0}
               className="w-full"
@@ -2055,6 +2070,12 @@ Paperback: 9.99€ - 19.99€
           </div>
         </CardContent>
       </Card>
+
+      <DocxPreviewDialog
+        open={showDocxPreview}
+        onOpenChange={setShowDocxPreview}
+        getOptions={buildDocxOptions}
+      />
 
       <EbookExportPreview
         isOpen={showGoogleDocsPreview}
