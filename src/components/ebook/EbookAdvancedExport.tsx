@@ -534,12 +534,28 @@ h2+p,h3+p{text-indent:0}
               </div>
             ))}
 
-            <Button className="w-full mt-4" onClick={handleExport} disabled={isExporting || chapters.length === 0}>
+            {selectedFormat === 'docx-kdp' && (
+              <Button
+                variant="outline"
+                className="w-full mt-4"
+                onClick={() => setPreviewOpen(true)}
+                disabled={chapters.length === 0}
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                Aperçu avant téléchargement
+              </Button>
+            )}
+
+            <Button className={selectedFormat === 'docx-kdp' ? 'w-full mt-2' : 'w-full mt-4'} onClick={handleExport} disabled={isExporting || chapters.length === 0}>
               {isExporting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
               Exporter en {formats.find(f => f.id === selectedFormat)?.label}
             </Button>
           </CardContent>
         </Card>
+      </div>
+
+      <DocxPreviewDialog open={previewOpen} onOpenChange={setPreviewOpen} getOptions={buildDocxOptions} />
+
       </div>
     </div>
   );
