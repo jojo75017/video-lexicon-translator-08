@@ -16,7 +16,8 @@ import {
   FileType, ArrowRight, Eye, Copy, Trash2, Palette
 } from 'lucide-react';
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from 'docx';
-import { exportProfessionalDocx } from '@/utils/docxExportEngine';
+import { exportProfessionalDocx, type DocxExportOptions } from '@/utils/docxExportEngine';
+import { DocxPreviewDialog } from './DocxPreviewDialog';
 import { KdpQuickTools, KdpProductType } from './KdpQuickTools';
 
 interface Chapter {
@@ -51,6 +52,7 @@ export const EbookDocumentTransformer: React.FC<EbookDocumentTransformerProps> =
   const [rawText, setRawText] = useState('');
   const [isExtracting, setIsExtracting] = useState(false);
   const [isTransforming, setIsTransforming] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [transformProgress, setTransformProgress] = useState(0);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const [result, setResult] = useState<TransformResult | null>(null);
@@ -313,24 +315,26 @@ Réponds UNIQUEMENT en JSON valide:
     }
   };
 
+  const buildDocxOptions = (): DocxExportOptions => ({
+    title: result?.title || 'Mon-Ebook',
+    authorName: result?.author,
+    preface: result?.preface,
+    conclusion: result?.conclusion,
+    chapters: (result?.chapters || []).map((ch) => ({
+      title: ch.title,
+      content: ch.content,
+      subChapters: [],
+    })),
+    fontFamily: 'Georgia',
+    fontSize: 12,
+    pageFormat: '6x9',
+  });
+
   const exportToDocx = async () => {
     if (!result) return;
 
     try {
-      await exportProfessionalDocx({
-        title: result.title,
-        authorName: result.author,
-        preface: result.preface,
-        conclusion: result.conclusion,
-        chapters: result.chapters.map((ch, i) => ({
-          title: ch.title,
-          content: ch.content,
-          subChapters: [],
-        })),
-        fontFamily: 'Georgia',
-        fontSize: 12,
-        pageFormat: '6x9',
-      });
+      await exportProfessionalDocx(buildDocxOptions());
       toast.success('Export DOCX professionnel réussi !');
     } catch (error) {
       console.error('Export error:', error);
@@ -575,10 +579,15 @@ Réponds UNIQUEMENT en JSON valide:
                   <Copy className="w-4 h-4 mr-2" />
                   Copier
                 </Button>
+                <Button variant="outline" size="sm" onClick={() => setPreviewOpen(true)}>
+                  <Eye className="w-4 h-4 mr-2" />
+                  Aperçu DOCX
+                </Button>
                 <Button size="sm" onClick={exportToDocx} className="bg-emerald-600 hover:bg-emerald-500">
                   <Download className="w-4 h-4 mr-2" />
                   Export DOCX
                 </Button>
+                <DocxPreviewDialog open={previewOpen} onOpenChange={setPreviewOpen} getOptions={buildDocxOptions} />
               </div>
             </div>
           </CardHeader>
