@@ -816,7 +816,15 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
     // Contenu du chapitre
     if (body && body.trim().length > 0) {
       children.push(...buildContentParagraphs(body, baseSize, font));
+    } else {
+      // Chapitre annoncé au sommaire mais non encore rédigé : marqueur discret
+      children.push(new Paragraph({
+        children: [new TextRun({ text: 'Chapitre en cours de rédaction.', italics: true, size: baseSize, font, color: '888888' })],
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 200 },
+      }));
     }
+
 
     // Sous-chapitres
     (chapter.subChapters || []).forEach((sub, subIdx) => {
