@@ -489,6 +489,51 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
   const canStepOutline = normalizedOutline.length >= 3;
   const canStepFour = finalTitle.trim().length >= 3 && authorName.trim().length >= 2;
 
+  const [showTocPaste, setShowTocPaste] = useState(false);
+  const [tocPasteText, setTocPasteText] = useState('');
+
+  const applyImportedToc = (imported: BriefOutlineChapter[], sourceLabel: string) => {
+    if (!imported.length) {
+      toast.error('Aucun chapitre détecté dans ce sommaire.');
+      return;
+    }
+    const capped = imported.slice(0, 60);
+    setOutline(capped.map((chapter, index) => ({
+      id: makeId(),
+      numero: index + 1,
+      titre: cleanText(chapter.titre) || `Chapitre ${index + 1}`,
+      objectif: cleanText(chapter.objectif || ''),
+    })));
+    setChapters(clampNumber(capped.length, 3, 60, capped.length));
+    toast.success(`${capped.length} chapitres importés (${sourceLabel}) ✓`);
+  };
+
+  const importUltimateToc = () => {
+    const found = readLatestUltimateToc();
+    if (!found) {
+      toast.error('Aucun sommaire trouvé. Crée-le dans « Sommaire Ultime » puis clique sur « Envoyer vers le workflow ».');
+      return;
+    }
+    applyImportedToc(found.chapters, found.source);
+    clearTocForWorkflow();
+  };
+
+  // Import automatique quand on arrive depuis /v3/toc-ultime (?toc=ultime)
+  const tocParamHandled = useRef(false);
+  useEffect(() => {
+    if (tocParamHandled.current) return;
+    const wantsToc = new URLSearchParams(window.location.search).get('toc') === 'ultime';
+    if (!wantsToc) return;
+    tocParamHandled.current = true;
+    const found = readLatestUltimateToc();
+    if (found) {
+      applyImportedToc(found.chapters, found.source);
+      clearTocForWorkflow();
+      setStep(2);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     if (hasRepeatedFallbackTitles(outline, chapters)) {
       setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
