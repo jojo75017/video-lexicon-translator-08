@@ -1,37 +1,51 @@
-## Problème
+## Diagnostic confirmé sur votre fichier
 
-L'accueil V3 n'a plus de point de départ : plus de geste « je tape mon titre → je suis redirigé vers les infos du livre ». Et les clés API sont enterrées (bannière en haut + panneau replié sur `/v3/create`), donc des abonnés lancent un livre ou une recherche sans clé et ça échoue.
+J’ai ouvert et converti `LEmprise_des_Ombres_KDP_3.docx` : **117 pages**.
 
-## Ce qu'on met en place
+Le sommaire existe, mais il est effectivement inutilisable :
+- 23 chapitres annoncés, dont la majorité apparaît seulement comme « Chapitre 2 », « Chapitre 3 », etc., sans titre.
+- Les titres des chapitres 5, 13 et 17 contiennent du texte de manuscrit et même un mauvais numéro (`Chapitre 13 – Chapitre 15…`, `Chapitre 17 – Chapitre 19…`).
+- Trois chapitres sont exportés avec **« Chapitre en cours de rédaction »**, ce qui est interdit dans un fichier destiné à être vendu.
+- Le chapitre 1 reprend le titre du livre comme titre de chapitre, puis répète encore ce titre au début du texte.
+- Le sommaire est une liste statique sans numéros de page ni liens Word.
 
-### 1. Barre de démarrage sur l'accueil
-Juste sous le héros, une carte « Commencez votre livre » :
-- champ **Titre du livre** (grand, doré, focus auto) + bouton **Continuer →**, validation à la touche Entrée
-- au clic : le titre est enregistré dans la fiche livre puis redirection vers `/v3/create`, titre déjà prérempli (sans écraser le reste d'une fiche existante)
-- si un livre est déjà en cours : ligne « Reprendre : *Titre* » sous le champ
-- champ vide : bouton inactif + aide « Donnez d'abord un titre — vous pourrez le modifier ensuite »
+La cause visible dans le moteur actuel est qu’il conserve volontairement les chapitres vides dès qu’ils semblent avoir un titre, puis ajoute le marqueur « Chapitre en cours de rédaction ». Il construit aussi le sommaire à partir de données de chapitres déjà incohérentes au lieu de valider la correspondance numéro/titre/contenu.
 
-### 2. Bloc Clés API remonté juste avant la zone de recherche / de démarrage
-Encart **« Vos clés IA »** placé **au-dessus** de la barre de démarrage sur l'accueil et **au-dessus** de la zone de recherche sur `/v3/recherche` :
-- **Clé manquante** : encart ambre ouvert par défaut, « Sans clé Gemini, la recherche Amazon et l'écriture ne démarrent pas », boutons « Obtenir ma clé gratuite » et « Coller ma clé ».
-- **Clé active** : encart replié en une ligne verte « Clé IA active ✓ — modifier ».
-- `/v3/create` réutilise ce même composant à la place du panneau actuel (plus de doublon).
+## Correction prioritaire
 
-### 3. Module « Couleurs V3 »
-Petit module en bas de page (accueil), carte discrète repliable listant la palette officielle en pastilles + code hex, lue depuis les variables CSS `.v3pub` :
+### 1. Bloquer tout DOCX non publiable
+Avant de générer le fichier, ajouter une validation stricte :
+- aucun chapitre vide ;
+- aucun titre générique manquant ;
+- aucun titre ressemblant au début du contenu ;
+- aucune incohérence de numéros (`Chapitre 13` contenant `Chapitre 15`) ;
+- aucun placeholder, JSON, Markdown parasite ou texte tronqué.
 
-```text
-Émeraude #064e3b · Émeraude 600 #0d7a5f · Émeraude 50 #ecf5f1
-Or #c9a84c · Or 600 #b0902f · Or pâle #f5f0e0
-Papier #fbfaf6 · Crème #f5f3ee
-Encre #0a1f18 · Encre 2 #1a2e26 · Texte discret #5b6b64
-Bordures rgba(6,78,59,0.10)
-```
+Si une erreur existe, le téléchargement est bloqué et l’utilisateur voit la liste précise des chapitres à corriger/régénérer.
 
-Chaque pastille est cliquable pour copier le hex (toast de confirmation).
+### 2. Reconstruire la source unique des chapitres
+- Conserver le numéro prévu par le sommaire validé, sans renumérotation silencieuse.
+- Faire correspondre chaque titre validé au bon contenu généré.
+- Extraire un titre depuis le contenu uniquement s’il s’agit d’un vrai en-tête court et distinct, jamais depuis une phrase narrative.
+- Supprimer la répétition du titre au début du corps.
+- Ne jamais injecter « Chapitre en cours de rédaction » dans un export final.
 
-## Détails techniques
+### 3. Créer un vrai sommaire professionnel
+- Une entrée pour chaque chapitre réellement présent, avec son titre complet.
+- Table des matières Word dynamique avec liens et numéros de page, fondée sur de vrais styles `Heading 1`.
+- Titres de chapitre identiques entre sommaire et corps du livre.
+- Sections finales ajoutées seulement lorsqu’elles ont un contenu réel (Remerciements, Mot de l’auteur, etc.).
 
-- Nouveaux composants : `src/components/v3public/V3ApiKeysGate.tsx` (encart clés partagé, s'appuie sur `ApiProviderQuickSettings`), `src/components/v3public/V3StartBookBar.tsx` (champ titre → `writeBookBrief({ title })` → `navigate('/v3/create')`), `src/components/v3public/V3PaletteModule.tsx` (palette, tokens en dur alignés sur `src/styles/v3-public.css`).
-- Fichiers modifiés : `src/pages/v3public/V3HomePage.tsx`, `src/pages/v3public/V3CreatePage.tsx`, `src/pages/v3public/V3RecherchePage.tsx`.
-- Aucun changement de base de données ni de backend.
+### 4. Ajouter un contrôle avant téléchargement
+Dans l’aperçu DOCX :
+- tableau `N° | Titre | Nombre de mots | État` ;
+- alerte rouge pour chapitre vide ou titre invalide ;
+- compteur « 23/23 chapitres prêts » ;
+- bouton de téléchargement actif uniquement quand tout est valide.
+
+### 5. Tests sur le cas réel
+- Ajouter un test de régression reproduisant exactement les défauts de ce fichier.
+- Générer un nouveau DOCX depuis les données corrigées.
+- Valider sa structure XML, le convertir en PDF et inspecter visuellement la couverture, le sommaire, plusieurs débuts de chapitres et les dernières pages.
+
+Une fois cet export stabilisé, je reprendrai le bloc final prévu : bouton vers Cover Studio Pro, téléchargement de la couverture et section complète Amazon KDP.
