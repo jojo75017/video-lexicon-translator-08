@@ -634,7 +634,20 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
     children.push(new Paragraph({ children: [new PageBreak()] }));
   }
 
+  // ═══ CHAPITRES RETENUS (numérotation continue, sans trous) ═══
+  const renderChapters = chapters
+    .filter((chapter) => {
+      const hasAnyContent = (chapter.content && chapter.content.trim().length > 50) ||
+        chapter.subChapters.some((s) => s.content && s.content.trim().length > 50);
+      return hasAnyContent || !/^chapitre\s+\d+$/i.test((chapter.title || '').trim());
+    })
+    .map((chapter, i) => {
+      const { displayTitle, body } = resolveChapter(chapter, i);
+      return { chapter, num: i + 1, displayTitle, body };
+    });
+
   // ═══ TABLE DES MATIÈRES ═══
+
   if (includeTableOfContents) {
     children.push(new Paragraph({
       children: [new TextRun({ text: 'TABLE DES MATIÈRES', bold: true, size: chapterTitleSize, font })],
