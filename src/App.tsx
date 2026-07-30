@@ -513,12 +513,13 @@ const App = () => {
             <Route path="/apercu-emails" element={<AdminGate><EmailPreviewPage /></AdminGate>} />
 
             {/* V3 public site */}
+            <Route path="/v3/offre" element={<V3OffrePage />} />
             <Route path="/v3" element={<V3PublicLayout />}>
               <Route index element={<V3HomePage />} />
               <Route path="auth" element={<V3AuthPage />} />
               <Route path="pourquoi" element={<V3PourquoiPage />} />
               <Route path="realite-kdp" element={<V3RealiteKdpPage />} />
-              <Route path="offre" element={<V3OffrePage />} />
+
 
               {/* Routes verrouillées jusqu'au 1er octobre 2026 (admins exceptés) */}
               <Route path="create" element={<V3LockedGate><V3CreatePage /></V3LockedGate>} />
