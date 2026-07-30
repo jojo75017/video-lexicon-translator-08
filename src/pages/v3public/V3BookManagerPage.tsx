@@ -8,12 +8,19 @@ import V3ExportPanel from '@/components/admin/V3ExportPanel';
 
 type Book = { id: string; title: string; author_name?: string | null; kdp_description?: string | null; chapters?: unknown };
 
+const hasChapterContent = (chapters: unknown): chapters is Record<string, unknown>[] =>
+  Array.isArray(chapters) && chapters.some((raw) => {
+    const chapter = raw && typeof raw === 'object' ? raw as Record<string, unknown> : {};
+    return String(chapter.content || chapter.contenu || '').trim().length > 0;
+  });
+
 export default function V3BookManagerPage() {
   const nav = useNavigate();
   const [rows, setRows] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Book | null>(null);
   const [exporting, setExporting] = useState<Book | null>(null);
+  const [exportLoadingId, setExportLoadingId] = useState<string | null>(null);
 
   const load = async () => {
     const { data: auth } = await supabase.auth.getUser();
@@ -45,6 +52,34 @@ export default function V3BookManagerPage() {
       const content = String(chapter.content || chapter.contenu || '').trim();
       return `# Chapitre ${index + 1} – ${title || `Chapitre ${index + 1}`}\n\n${content}`;
     }).join('\n\n');
+  };
+
+  const openExport = async (book: Book) => {
+    setExportLoadingId(book.id);
+    try {
+      let exportBook = book;
+      if (!hasChapterContent(book.chapters)) {
+        const { data, error } = await supabase
+          .from('ebook_project_versions')
+          .select('title,author_name,kdp_description,chapters')
+          .eq('project_id', book.id)
+          .order('version_number', { ascending: false });
+        if (error) throw error;
+        const completeVersion = (data || []).find((version) => hasChapterContent(version.chapters));
+        if (completeVersion) exportBook = { ...book, ...completeVersion, id: book.id };
+      }
+
+      if (!hasChapterContent(exportBook.chapters)) {
+        toast.error('Aucun manuscrit terminé n’est disponible pour cet export.');
+        return;
+      }
+      setExporting(exportBook);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Sauvegarde du manuscrit introuvable.';
+      toast.error(`Export impossible : ${message}`);
+    } finally {
+      setExportLoadingId(null);
+    }
   };
 
   return (
@@ -80,13 +115,15 @@ export default function V3BookManagerPage() {
                 </div>
               </div>
               <div className="flex gap-2">
-                {chapterCount > 0 && (
-                  <button onClick={() => setExporting(b)} className="v3-btn v3-btn-outline text-xs">
-                    <FileDown className="w-3.5 h-3.5" /> Exporter
-                  </button>
-                )}
+                <button
+                  onClick={() => void openExport(b)}
+                  disabled={exportLoadingId === b.id}
+                  className="v3-btn v3-btn-outline text-xs"
+                >
+                  <FileDown className="w-3.5 h-3.5" /> {exportLoadingId === b.id ? 'Chargement…' : 'Exporter'}
+                </button>
                 <button onClick={() => nav(`/v3/create?projectId=${b.id}`)} className="v3-btn v3-btn-primary text-xs">
-                  <BookOpen className="w-3.5 h-3.5" /> {chapterCount > 0 ? 'Ouvrir & exporter' : 'Ouvrir'}
+                  <BookOpen className="w-3.5 h-3.5" /> Ouvrir le livre
                 </button>
                 <button onClick={() => setEditing(b)} className="v3-btn v3-btn-outline text-xs"><Pencil className="w-3.5 h-3.5" /></button>
                 <button onClick={() => remove(b.id)} className="v3-btn v3-btn-ghost text-xs text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>
