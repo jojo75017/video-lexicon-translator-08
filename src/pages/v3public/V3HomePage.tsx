@@ -104,9 +104,13 @@ export default function V3HomePage() {
             >
               Obtenir ma clé gratuite
             </button>
-            <Link to="/v3/compte" className="v3-btn v3-btn-on-dark text-[12.5px] whitespace-nowrap">
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent('v3-open-keys'))}
+              className="v3-btn v3-btn-on-dark text-[12.5px] whitespace-nowrap"
+            >
               Coller ma clé
-            </Link>
+            </button>
           </div>
         </div>
         <div className="max-w-7xl mx-auto px-5 md:px-8 pb-3 -mt-1 md:hidden">
@@ -115,6 +119,11 @@ export default function V3HomePage() {
           </p>
         </div>
       </section>
+
+      {/* Tableau des clés toujours visible avant le reste de la page */}
+      <div className="max-w-7xl mx-auto px-5 md:px-8 py-5">
+        <V3ApiKeysGate />
+      </div>
 
       {/* HERO — bandeau pleine largeur */}
       <section className="relative overflow-hidden">
@@ -207,11 +216,6 @@ export default function V3HomePage() {
         </div>
         <div className="v3-gold-rule relative" />
       </section>
-
-      {/* Clés IA — avant toute recherche ou création */}
-      <div className="max-w-7xl mx-auto px-5 md:px-8 pt-10">
-        <V3ApiKeysGate />
-      </div>
 
       {/* Démarrage : titre du livre → fiche */}
       <V3StartBookBar />
