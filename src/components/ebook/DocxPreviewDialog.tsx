@@ -49,10 +49,9 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
           entry.title,
           ...entry.subChapters.map((sub) => `${sub.number}  ${sub.title}`),
         ]));
-        if (!validation.valid) {
-          throw new Error('Export bloqué : corrigez les chapitres signalés avant de télécharger le DOCX.');
-        }
-        const generated = await generateProfessionalDocx(options);
+        // L'aperçu doit rester consultable même si l'audit trouve des défauts.
+        // Le téléchargement final, lui, reste bloqué tant que le manuscrit n'est pas valide.
+        const generated = await generateProfessionalDocx(options, true);
         if (cancelled) return;
 
         setBlob(generated);
@@ -146,6 +145,11 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
               <div className="h-full flex flex-col items-center justify-center gap-3 p-6 text-center">
                 <AlertTriangle className="h-6 w-6 text-destructive" />
                 <p className="text-sm text-destructive">{error}</p>
+              </div>
+            )}
+            {!loading && !error && audit && !audit.valid && (
+              <div className="sticky top-0 z-10 border-b border-destructive/30 bg-destructive/10 px-4 py-3 text-center text-sm text-destructive">
+                Aperçu disponible pour contrôle — téléchargement bloqué jusqu’à correction des chapitres signalés.
               </div>
             )}
             <div ref={containerRef} className={`flex justify-center py-6 ${loading || error ? 'hidden' : ''}`} />
