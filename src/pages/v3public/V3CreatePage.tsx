@@ -1,8 +1,9 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Sparkles, Loader2, ImageIcon, ArrowRight } from 'lucide-react';
+import { Sparkles, Loader2, ImageIcon, ArrowRight, KeyRound } from 'lucide-react';
 import ApiProviderQuickSettings from '@/components/ebook/ApiProviderQuickSettings';
-import { BackButton } from "@/components/v3/BackButton";
+import { BackButton } from '@/components/v3/BackButton';
+import V3BriefRecap from '@/components/v3public/V3BriefRecap';
 
 const V3CreateWizard = lazy(() => import('@/components/v3public/V3CreateWizard'));
 const V3ImportStudio = lazy(() => import('@/components/v3public/V3ImportStudio'));
@@ -29,9 +30,18 @@ export default function V3CreatePage() {
   const genre = params.get('genre');
   const type = params.get('type');
 
+  const [showWizard, setShowWizard] = useState(false);
+  const [showKeys, setShowKeys] = useState(false);
+  const wizardRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => { seedHubConfig(idea, genre, type); }, [idea, genre, type]);
 
   const openFloating = () => window.dispatchEvent(new CustomEvent('open-api-keys'));
+
+  const launchWorkflow = () => {
+    setShowWizard(true);
+    setTimeout(() => wizardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
+  };
 
   if (importMode) {
     return (
@@ -45,73 +55,53 @@ export default function V3CreatePage() {
   }
 
   return (
-    <section className="v3-halo-soft min-h-[calc(100vh-4rem)] py-14 px-5">
-      {/* Bouton fixe d'accès rapide au mode illustré maternelle */}
-      <div className="sticky top-20 z-50 max-w-4xl mx-auto mb-6 flex flex-col md:flex-row gap-2 md:justify-end">
-        <Link
-          to="/v3/create/illustre"
-          className="flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 text-white px-5 py-3 text-sm font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all border-2 border-white"
-        >
-          <ImageIcon className="w-5 h-5" />
-          <span>Livre illustré maternelle</span>
-          <span className="text-[10px] uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">Nouveau</span>
-          <ArrowRight className="w-4 h-4" />
-        </Link>
-        <Link
-          to="/v3/create/illustre?preset=histoires-du-soir-3-7"
-          className="flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-violet-700 text-white px-5 py-3 text-sm font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all border-2 border-white"
-        >
-          <ImageIcon className="w-5 h-5" />
-          <span>Histoires du soir 3-7 ans</span>
-          <span className="text-[10px] uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">Nouveau</span>
-          <ArrowRight className="w-4 h-4" />
-        </Link>
-      </div>
-
-
+    <section className="v3-halo-soft min-h-[calc(100vh-4rem)] py-10 px-5">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <span className="v3-chip v3-chip-orange"><Sparkles className="w-3.5 h-3.5" /> Choisis ton type de livre</span>
-          <h1 className="v3-serif text-4xl font-bold mt-4">Ton atelier d'écriture</h1>
+        <BackButton />
+
+        <div className="mt-6 text-center">
+          <span className="v3-chip v3-chip-orange"><Sparkles className="w-3.5 h-3.5" /> Écrire un livre</span>
+          <h1 className="v3-serif text-4xl font-bold mt-4" style={{ color: 'var(--v3-ink)' }}>Ton atelier d'écriture</h1>
+          <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>
+            Fiche du livre, Cible &amp; Promesse générées par l'IA, sommaire validé — puis le workflow des agents.
+          </p>
         </div>
 
-        {/* Sélecteur de mode — 2 gros choix visibles */}
-        <div className="grid md:grid-cols-2 gap-4 mb-8">
-          <div className="v3-card border-2 border-[var(--v3-emerald,#064e3b)]/40 bg-white">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-10 h-10 rounded-full bg-[var(--v3-emerald,#064e3b)] text-white flex items-center justify-center"><Sparkles className="w-5 h-5" /></div>
-              <h3 className="font-bold">Roman / non-fiction (texte)</h3>
-            </div>
-            <p className="text-xs text-[var(--v3-muted)] mb-3">Livre classique généré par les 15 agents. Chapitres longs, sans illustrations.</p>
-            <p className="text-[11px] text-[var(--v3-emerald,#064e3b)] font-semibold">↓ Utilise le wizard ci-dessous</p>
-          </div>
-
-          <Link
-            to="/v3/create/illustre"
-            className="v3-card border-2 border-[#C97A14] bg-gradient-to-br from-amber-50 to-orange-100 hover:shadow-lg transition-all block relative"
-          >
-            <span className="absolute -top-2 -right-2 text-[10px] uppercase tracking-wide bg-[#C97A14] text-white px-2 py-0.5 rounded-full font-bold">Nouveau</span>
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-10 h-10 rounded-full bg-[#C97A14] text-white flex items-center justify-center"><ImageIcon className="w-5 h-5" /></div>
-              <h3 className="font-bold text-[#C97A14]">Livre illustré maternelle</h3>
-            </div>
-            <p className="text-xs text-[var(--v3-muted)] mb-3">Album carré 21×21 cm, 3-6 ans, illustrations IA cohérentes (même personnage à chaque page). Style "28 histoires pour la maternelle".</p>
-            <p className="text-[11px] text-[#C97A14] font-semibold flex items-center gap-1">Ouvrir ce mode <ArrowRight className="w-3.5 h-3.5" /></p>
-            <p className="text-[10px] text-[var(--v3-muted)] mt-1">Réservé Studio & Éditeur</p>
+        {/* Modes illustrés — liens discrets */}
+        <div className="mt-5 flex flex-wrap justify-center gap-2">
+          <Link to="/v3/create/illustre" className="v3-btn v3-btn-ghost text-xs">
+            <ImageIcon className="w-3.5 h-3.5" /> Album maternelle 3-6 ans <ArrowRight className="w-3 h-3" />
+          </Link>
+          <Link to="/v3/create/illustre?preset=histoires-du-soir-3-7" className="v3-btn v3-btn-ghost text-xs">
+            <ImageIcon className="w-3.5 h-3.5" /> Histoires du soir 3-7 ans <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
 
-
-        {/* Panneau clés API & modèles — TOUJOURS visible ici, admin ou non */}
-        <div className="v3-card mb-6">
-          <ApiProviderQuickSettings onOpenAdvanced={openFloating} />
+        {/* Clés API — repliées par défaut */}
+        <div className="mt-6">
+          <button type="button" onClick={() => setShowKeys((v) => !v)} className="v3-btn v3-btn-outline text-xs">
+            <KeyRound className="w-3.5 h-3.5" /> {showKeys ? 'Masquer' : 'Ma clé Gemini / modèles IA'}
+          </button>
+          {showKeys && (
+            <div className="v3-card mt-3">
+              <ApiProviderQuickSettings onOpenAdvanced={openFloating} />
+            </div>
+          )}
         </div>
 
-        <div className="v3-card">
-          <Suspense fallback={<div className="py-16 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-[var(--v3-orange)]" /></div>}>
-            <V3CreateWizard />
-          </Suspense>
+        {/* Fiche du livre + Cible & Promesse IA + Sommaire validé */}
+        <div className="mt-6">
+          <V3BriefRecap variant="full" onLaunch={launchWorkflow} />
         </div>
+
+        {/* Workflow */}
+        {showWizard && (
+          <div ref={wizardRef} className="v3-card mt-8">
+            <Suspense fallback={<div className="py-16 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-[var(--v3-orange)]" /></div>}>
+              <V3CreateWizard />
+            </Suspense>
+          </div>
+        )}
       </div>
     </section>
   );
