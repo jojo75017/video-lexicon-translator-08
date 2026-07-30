@@ -67,6 +67,12 @@ export interface DocxExportOptions {
   pageFormat?: '6x9' | 'a4' | 'letter';
 }
 
+export interface DocxOutlineEntry {
+  number: number;
+  title: string;
+  subChapters: Array<{ number: string; title: string }>;
+}
+
 // ═══════════════════════════════════════════════════════════
 // NETTOYAGE TYPOGRAPHIQUE ÉDITORIAL
 // ═══════════════════════════════════════════════════════════
@@ -310,6 +316,45 @@ function resolveChapter(
   }
 
   return { displayTitle, body };
+}
+
+/** Retire les marqueurs qui ne constituent pas un contenu publiable. */
+function meaningfulText(raw?: string): string {
+  if (!raw) return '';
+  return raw
+    .replace(/\[[^\]]*(?:à\s*r[ée]diger|a\s*venir|à\s*venir|todo|placeholder|contenu)[^\]]*\]/gi, '')
+    .replace(/\((?:contenu\s*)?à\s*r[ée]diger\)/gi, '')
+    .replace(/```[a-z]*|```/gi, '')
+    .replace(/[\s\u00A0]+/g, ' ')
+    .trim();
+}
+
+/** Source unique du sommaire et des chapitres exportés. */
+function prepareRenderableChapters(chapters: DocxChapter[]) {
+  return (chapters || [])
+    .map((chapter, sourceIndex) => {
+      const resolved = resolveChapter(chapter, sourceIndex);
+      const validSubChapters = (chapter.subChapters || []).filter((sub) => meaningfulText(sub.content).length > 0);
+      return { chapter: { ...chapter, subChapters: validSubChapters }, ...resolved };
+    })
+    .filter(({ body, chapter }) => {
+      const subContent = chapter.subChapters.reduce((total, sub) => total + meaningfulText(sub.content).length, 0);
+      return meaningfulText(body).length > 0 || subContent > 0;
+    })
+    .map((entry, index) => ({ ...entry, num: index + 1 }));
+}
+
+export function getDocxOutline(chapters: DocxChapter[]): DocxOutlineEntry[] {
+  return prepareRenderableChapters(chapters).map(({ chapter, num, displayTitle }) => ({
+    number: num,
+    title: isGenericTitle(displayTitle) ? `Chapitre ${num}` : `Chapitre ${num} – ${displayTitle}`,
+    subChapters: chapter.subChapters
+      .map((sub, subIndex) => {
+        const title = cleanChapterTitle(sub.title);
+        return isGenericTitle(title) ? null : { number: `${num}.${subIndex + 1}`, title };
+      })
+      .filter((entry): entry is { number: string; title: string } => entry !== null),
+  }));
 }
 
 
@@ -647,32 +692,11 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
   }
 
   // ═══ CHAPITRES RETENUS (numérotation continue, sans trous) ═══
-  /** Texte réellement exploitable : sans placeholders ni marqueurs vides. */
-  const meaningfulLength = (raw?: string): number => {
-    if (!raw) return 0;
-    const stripped = raw
-      .replace(/\[[^\]]*(?:à\s*r[ée]diger|a\s*venir|à\s*venir|todo|placeholder|contenu)[^\]]*\]/gi, '')
-      .replace(/\((?:contenu\s*)?à\s*r[ée]diger\)/gi, '')
-      .replace(/```[a-z]*|```/gi, '')
-      .replace(/[\s\u00A0]+/g, ' ')
-      .trim();
-    return stripped.length;
-  };
+  const renderChapters = prepareRenderableChapters(chapters);
 
-  const renderChapters = chapters
-    .filter((chapter) => {
-      const chapterLen = meaningfulLength(chapter.content);
-      const subLen = (chapter.subChapters || []).reduce(
-        (acc, s) => acc + meaningfulLength(s.content),
-        0,
-      );
-      // Un chapitre sans contenu exploitable n'est jamais exporté (ni TDM, ni corps)
-      return chapterLen + subLen >= 50;
-    })
-    .map((chapter, i) => {
-      const { displayTitle, body } = resolveChapter(chapter, i);
-      return { chapter, num: i + 1, displayTitle, body };
-    });
+  if (renderChapters.length === 0) {
+    throw new Error("Export impossible : aucun chapitre rédigé n'a été détecté. Rechargez le manuscrit ou générez ses chapitres avant de télécharger le DOCX.");
+  }
 
 
   // ═══ TABLE DES MATIÈRES ═══
@@ -707,7 +731,7 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
         indent: { left: convertInchesToTwip(0.35), hanging: convertInchesToTwip(0.35) },
       }));
 
-      (chapter.subChapters || []).forEach((sub, subIdx) => {
+      chapter.subChapters.forEach((sub, subIdx) => {
         const subTitle = cleanChapterTitle(sub.title);
         if (isGenericTitle(subTitle)) return;
         children.push(new Paragraph({
@@ -737,6 +761,13 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
         spacing: { after: 120 },
       }));
     }
+
+    ['Remerciements', "Mot de l’auteur", 'Un dernier mot'].forEach((label) => {
+      children.push(new Paragraph({
+        children: [new TextRun({ text: label, size: baseSize, font })],
+        spacing: { after: 120 },
+      }));
+    });
 
     children.push(new Paragraph({ children: [new PageBreak()] }));
   }
