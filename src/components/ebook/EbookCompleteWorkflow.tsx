@@ -25,6 +25,7 @@ import { useWorkflowCloudSync } from '@/hooks/useWorkflowCloudSync';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 import { getProvider, getOpenRouterModel, validateKeyFormat, isAIConfigured, getActiveAIKey, sanitizeKey } from '@/services/aiWritingService';
 import { useV3Entitlement } from '@/hooks/useV3Entitlement';
+import useProBookTier from '@/hooks/useProBookTier';
 import WritingEngineBadge from './WritingEngineBadge';
 import { WORKFLOW_STEPS, WORKFLOW_STEP_COUNT } from './workflow/workflowAgents';
 
@@ -122,6 +123,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
   // Hook pour sauvegarder les résultats P1-P14 globalement
   const { saveStepResult } = useWorkflowResults();
   const { hasFull } = useV3Entitlement();
+  // Le palier « Pro » du workflow couvre le Pack 347 € ET l'abonnement Éditeur 59 €/mois.
+  const { isPro: isEditeurPro } = useProBookTier();
+  const proWorkflow = hasFull || isEditeurPro;
   const { saveStepToCloud } = useWorkflowCloudSync();
   
   // Hook pour récupérer la clé API utilisateur
@@ -815,7 +819,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
             useUserKey: hasUsableApiKey,
             provider: activeProvider,
             openrouterModel: getOpenRouterModel(),
-            quality: hasFull ? 'pro' : 'core',
+            quality: proWorkflow ? 'pro' : 'core',
             ...extraBody,
           }
         });
@@ -873,7 +877,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
               useUserKey: hasUsableApiKey,
               provider: activeProvider,
               openrouterModel: getOpenRouterModel(),
-              quality: hasFull ? 'pro' : 'core',
+              quality: proWorkflow ? 'pro' : 'core',
               ...extraBody,
               forceFallback: true,
             }
@@ -1581,7 +1585,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
   return (
     <div className="space-y-6">
       {/* Input Card */}
-      <WritingEngineBadge isPro={hasFull} />
+      <WritingEngineBadge isPro={proWorkflow} />
 
       {!hideInputForm && (
       <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-background to-amber-500/5">

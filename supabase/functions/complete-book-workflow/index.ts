@@ -54,6 +54,21 @@ STANDARDS ÉDITORIAUX PROFESSIONNELS (niveau maison d'édition) :
    Score < 7 = à refaire
 `;
 
+// RECHERCHE APPROFONDIE — réservé au palier Pro (Éditeur 59 €/mois et Pack 347 €).
+// Ces directives poussent les agents à creuser davantage : sources, données
+// chiffrées, contre-arguments, exemples vérifiables, angles concurrentiels.
+const PRO_DEEP_RESEARCH = `
+
+🔬 MODE RECHERCHE APPROFONDIE (palier ÉDITEUR PRO — l'auteur paie un abonnement premium, le rendu doit être digne d'une maison d'édition) :
+1. PROFONDEUR : pour chaque idée clé, va au-delà de l'évidence. Apporte le mécanisme (le "pourquoi ça marche"), pas seulement le "quoi".
+2. PREUVES : appuie chaque affirmation forte sur un élément concret — étude, ordre de grandeur chiffré, cas réel documenté, référence d'auteur ou d'ouvrage reconnu. Si tu n'es pas certain d'une donnée, formule-la comme un ordre de grandeur ("environ", "la plupart des études convergent vers…") et n'invente JAMAIS de chiffre précis ni de source qui n'existe pas.
+3. CONTRE-ARGUMENTS : anticipe l'objection principale du lecteur exigeant et traite-la explicitement.
+4. NUANCE EXPERTE : distingue ce qui est établi, ce qui est débattu et ce qui relève de l'expérience terrain.
+5. VALEUR ACTIONNABLE : chaque section se termine sur une application concrète, un protocole ou un exemple transposable.
+6. NIVEAU DE LANGUE : registre soutenu mais fluide, vocabulaire spécifique du domaine correctement employé, zéro formulation générique interchangeable.
+7. ORIGINALITÉ : interdiction de recycler les listes de conseils standards que l'on trouve dans dix autres livres de la niche. Cherche l'angle que la concurrence n'exploite pas.
+`;
+
 // Variable globale pour stocker la clé API utilisateur optionnelle
 let activeApiKey: string | null = null;
 let activeLanguageDirective = '';
@@ -1125,11 +1140,11 @@ function buildFallbackP3Result(params: {
   };
 }
 
-function getP3GenerationSettings(numberOfChapters: number) {
+function getP3GenerationSettings(numberOfChapters: number, isPro = false) {
   const isLargeProject = numberOfChapters >= 16;
   const isVeryLargeProject = numberOfChapters >= 30;
 
-  return {
+  const base = {
     isLargeProject,
     isVeryLargeProject,
     maxTokens: isVeryLargeProject
@@ -1140,6 +1155,22 @@ function getP3GenerationSettings(numberOfChapters: number) {
     sousSectionsRange: isVeryLargeProject ? '2-3' : isLargeProject ? '3-4' : '4-6',
     keyPointsCount: isVeryLargeProject ? 1 : isLargeProject ? 2 : 3,
     characterDescriptionLength: isVeryLargeProject ? '1 phrase maximum' : isLargeProject ? '1-2 phrases maximum' : '2-3 phrases',
+  };
+
+  if (!isPro) return base;
+
+  // Palier Éditeur Pro : plan plus fouillé (plus de sous-sections, plus de points clés,
+  // une passe de reprise supplémentaire) sans dégrader la robustesse des gros projets.
+  return {
+    ...base,
+    maxTokens: isVeryLargeProject
+      ? 5200
+      : Math.min(9000, Math.max(4800, 2400 + numberOfChapters * 110)),
+    minScore: isLargeProject ? 8 : 9,
+    maxRetries: isVeryLargeProject ? 0 : 1,
+    sousSectionsRange: isVeryLargeProject ? '3-4' : isLargeProject ? '4-5' : '5-7',
+    keyPointsCount: isVeryLargeProject ? 2 : isLargeProject ? 3 : 4,
+    characterDescriptionLength: isVeryLargeProject ? '1-2 phrases' : '2-4 phrases',
   };
 }
 
@@ -1244,6 +1275,8 @@ serve(async (req) => {
     // Palier qualité : 'pro' = Pack 347€ (chapitres plus longs, boucle qualité renforcée,
     // passe éditoriale auto). 'core' = offre 197€ (réglages standard).
     const isProQuality = quality === 'pro';
+    // Directive de recherche approfondie injectée dans tous les prompts au palier Pro.
+    const proResearchDirective = isProQuality ? PRO_DEEP_RESEARCH : '';
 
     const LANGUAGE_NAMES: Record<string, string> = {
       fr: 'français (France)',
@@ -1302,7 +1335,7 @@ TITRE COMPLET : "${fullTitle}"
 CATÉGORIE : ${category || 'Non spécifiée'}
 AUTEUR : ${authorName}
 LANGUE DE RÉDACTION : ${langName}
-CHAPITRES PRÉVUS : ${numberOfChapters}${introContext}${charactersContext}${languageDirective}
+CHAPITRES PRÉVUS : ${numberOfChapters}${introContext}${charactersContext}${languageDirective}${proResearchDirective}
 `.trim();
 
     console.log(`Step ${step} for: "${fullTitle}" (Category: ${category}, Lang: ${language}, Characters: ${characters.length})`);
@@ -1408,8 +1441,8 @@ Réponds en JSON :
   "recommandation": "ton avis franc de professionnel",
   "qualityScore": 9
 }`,
-          5000,
-          9, 2, 'P1'
+          isProQuality ? 7000 : 5000,
+          isProQuality ? 10 : 9, isProQuality ? 3 : 2, 'P1'
         );
         result = parseJSON(content) || { raw: content };
         result._qualityScore = qualityScore;
@@ -1506,7 +1539,7 @@ Format JSON :
   "strategieLancement": "3 actions concrètes pour le lancement",
   "qualityScore": 9
 }`,
-          4000, 9, 1, 'P2'
+          isProQuality ? 6000 : 4000, isProQuality ? 10 : 9, isProQuality ? 2 : 1, 'P2'
         );
         result = parseJSON(content) || { raw: content };
         result._qualityScore = qualityScore;
@@ -1529,7 +1562,7 @@ Format JSON :
         // ARCHITECTE DE CONTENU PRO
         const totalWords = numberOfChapters * wordsPerChapter;
         const estimatedPages = Math.ceil(totalWords / 250);
-        const p3Settings = getP3GenerationSettings(numberOfChapters);
+        const p3Settings = getP3GenerationSettings(numberOfChapters, isProQuality);
         const descriptionGeneree = previousContext.P1?.descriptionGeneree || '';
         const introductionGeneree = previousContext.P1?.introductionGeneree || '';
         const conclusionGeneree = previousContext.P1?.conclusionGeneree || '';
