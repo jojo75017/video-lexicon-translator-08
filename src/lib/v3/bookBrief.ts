@@ -65,6 +65,15 @@ export function writeBookBrief(brief: BookBrief) {
   }
 }
 
+/** Efface la fiche du livre en cours (titre, synopsis, etc.). */
+export function clearBookBrief() {
+  try {
+    localStorage.removeItem(WIZARD_BRIEF_KEY);
+  } catch {
+    /* mode privé : on ignore */
+  }
+}
+
 /** Enregistre un sommaire pour qu'il soit importable dans le wizard. */
 export function sendTocToWorkflow(chapters: BriefOutlineChapter[], meta?: { theme?: string; genre?: string; description?: string }) {
   try {
