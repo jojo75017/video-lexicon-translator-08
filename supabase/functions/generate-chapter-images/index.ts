@@ -589,21 +589,17 @@ COHÉRENCE STRICTE ABSOLUE:
           customPrompt
         );
       } catch (err) {
-        console.error('OpenAI image generation failed:', err);
-        return new Response(
-          JSON.stringify({
-            error: "Erreur OpenAI lors de la génération de l'image",
-            details: err instanceof Error ? err.message : String(err),
-          }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        console.error('OpenAI image generation failed, falling back:', err);
+        const fallbackPrompt = isColoringBook
+          ? getColoringBookPrompt(chapterTitle, coloringBookAgeGroup)
+          : (customPrompt || `Illustration pour le chapitre "${chapterTitle}" du livre "${ebookTitle}". Style: ${style}.`);
+        const geminiImg = await tryGeminiDirect(fallbackPrompt, userGeminiApiKey);
+        generatedImageUrl = geminiImg || getPlaceholderUrl(chapterTitle, style, colorScheme);
       }
     } else {
       // Utiliser Lovable AI
       const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-      if (!LOVABLE_API_KEY) {
-        throw new Error('LOVABLE_API_KEY is not configured');
-      }
+
 
       // Ajouter les descriptions de personnages au prompt pour la cohérence
       let charactersContext = '';
