@@ -8,7 +8,7 @@ const corsHeaders = {
 async function callGemini(apiKey: string, systemPrompt: string, userPrompt: string, opts: { maxTokens?: number; temperature?: number; timeout?: number } = {}) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), opts.timeout || 90000);
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ system_instruction: { parts: [{ text: systemPrompt }] }, contents: [{ role: "user", parts: [{ text: userPrompt }] }], generationConfig: { temperature: opts.temperature ?? 0.7, maxOutputTokens: opts.maxTokens ?? 4000 } }), signal: controller.signal });
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ system_instruction: { parts: [{ text: systemPrompt }] }, contents: [{ role: "user", parts: [{ text: userPrompt }] }], generationConfig: { temperature: opts.temperature ?? 0.7, maxOutputTokens: opts.maxTokens ?? 4000 } }), signal: controller.signal });
   clearTimeout(timeoutId);
   if (!response.ok) { const e = await response.text(); console.error("Gemini error:", response.status, e); if (response.status === 429) throw { status: 429, message: "Limite Gemini atteinte." }; throw new Error(`Erreur Gemini: ${response.status}`); }
   const data = await response.json();

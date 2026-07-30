@@ -130,7 +130,7 @@ async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTok
   }
   
   console.log(`[Gemini] Using subscriber key (length=${cleanKey.length}), retry=${retryCount}`);
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(cleanKey)}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${encodeURIComponent(cleanKey)}`;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), maxTokens >= 5000 ? 115000 : 90000);
   let response: Response | null = null;
