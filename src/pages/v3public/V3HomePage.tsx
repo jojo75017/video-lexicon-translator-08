@@ -184,7 +184,17 @@ export default function V3HomePage() {
         <div className="v3-gold-rule relative" />
       </section>
 
+      {/* Clés IA — avant toute recherche ou création */}
+      <div className="max-w-7xl mx-auto px-5 md:px-8 pt-10">
+        <V3ApiKeysGate />
+      </div>
+
+      {/* Démarrage : titre du livre → fiche */}
+      <V3StartBookBar />
+
       <V3BriefRecap />
+
+
 
 
       {/* BANDE BLOG — mise en évidence */}
