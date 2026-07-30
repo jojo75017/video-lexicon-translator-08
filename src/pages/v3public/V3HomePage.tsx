@@ -436,6 +436,10 @@ export default function V3HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Palette officielle V3 */}
+      <V3PaletteModule />
     </>
+
   );
 }
