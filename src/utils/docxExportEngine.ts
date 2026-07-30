@@ -855,7 +855,7 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
     children.push(new Paragraph({
       children: [
         new TextRun({ text: `CHAPITRE ${num}`, bold: true, size: subTitleSize, font, color: '888888' }),
-        new TextRun({ text: `\n${displayTitle.toUpperCase()}`, bold: true, size: chapterTitleSize, font, break: 1 }),
+        new TextRun({ text: displayTitle.toUpperCase(), bold: true, size: chapterTitleSize, font, break: 1 }),
       ],
       heading: HeadingLevel.HEADING_1,
       alignment: AlignmentType.CENTER,
