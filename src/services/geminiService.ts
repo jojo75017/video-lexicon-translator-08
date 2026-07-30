@@ -112,12 +112,20 @@ export async function callGemini(
   }
 
   const cleanedApiKey = sanitizeGeminiApiKey(apiKey);
+  let degraded = false; // repli si le modèle refuse thinkingConfig / responseMimeType
+  const buildBody = () => {
+    if (!degraded) return body;
+    const gc: any = { temperature, maxOutputTokens: maxTokens };
+    const b: any = { contents: body.contents, generationConfig: gc };
+    if (systemPrompt) b.system_instruction = body.system_instruction;
+    return b;
+  };
   const doFetch = (model: string) => fetch(
     `${GEMINI_API_BASE}/${model}:generateContent?key=${encodeURIComponent(cleanedApiKey)}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: JSON.stringify(buildBody()),
       signal: controller.signal,
     }
   );
@@ -125,6 +133,7 @@ export async function callGemini(
   try {
     let response: Response | null = null;
     let lastStatus = 0;
+    let lastErrText = '';
 
     // On parcourt les modèles de secours ; backoff court (3s puis 8s) pour
     // ne pas bloquer l'interface aussi longtemps qu'avant.
@@ -150,6 +159,16 @@ export async function callGemini(
           await response.text().catch(() => {});
           continue outer;
         }
+        lastErrText = await response.text().catch(() => '');
+        // 400 « requête invalide » (thinkingConfig / responseMimeType refusés)
+        // ≠ clé invalide : on retente une fois en mode dégradé.
+        const looksLikeBadKey = /API_KEY_INVALID|API key not valid|PERMISSION_DENIED|api key/i.test(lastErrText);
+        if (response.status === 400 && !looksLikeBadKey && !degraded) {
+          console.warn('[Gemini] 400 sur la requête — nouvelle tentative sans jsonMode/thinkingConfig.', lastErrText.slice(0, 300));
+          degraded = true;
+          attempt = -1; // relance immédiatement le même modèle
+          continue;
+        }
         // Erreur non récupérable → on sort pour la traiter ci-dessous
         break outer;
       }
@@ -159,16 +178,21 @@ export async function callGemini(
     clearTimeout(timeoutId);
 
     if (!response || !response.ok) {
-      const errText = response ? await response.text().catch(() => '') : '';
+      const errText = lastErrText || (response ? await response.text().catch(() => '') : '');
       console.error('Gemini API error:', lastStatus, errText);
+      let apiMessage = '';
+      try { apiMessage = JSON.parse(errText)?.error?.message || ''; } catch { /* ignore */ }
       if (lastStatus === 429 || lastStatus === 503) {
         throw new Error('Service Google momentanément saturé. Patientez ~30s puis relancez.');
       }
-      if (lastStatus === 400 || lastStatus === 401 || lastStatus === 403) {
+      const badKey = /API_KEY_INVALID|API key not valid|PERMISSION_DENIED/i.test(errText);
+      if (badKey || lastStatus === 401 || (lastStatus === 403 && !apiMessage)) {
         throw new Error('Clé API Gemini invalide. Vérifiez votre clé sur aistudio.google.com');
       }
-      throw new Error(`Erreur Gemini: ${lastStatus || 'réseau'}`);
+      throw new Error(apiMessage ? `Gemini (${lastStatus}) : ${apiMessage}` : `Erreur Gemini: ${lastStatus || 'réseau'}`);
     }
+
+
 
     const data = await response.json();
     const content = extractGeminiText(data);
