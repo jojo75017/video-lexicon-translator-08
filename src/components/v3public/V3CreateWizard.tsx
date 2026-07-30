@@ -1558,6 +1558,40 @@ Règles :
         </DialogContent>
       </Dialog>
 
+      <Dialog open={showTocPaste} onOpenChange={setShowTocPaste}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileDown className="h-4 w-4 text-emerald-600" /> Coller mon sommaire
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Une ligne = un chapitre. Formats acceptés : texte, Markdown, ou JSON du Sommaire Ultime. « Titre | Objectif » est reconnu.
+          </p>
+          <textarea
+            value={tocPasteText}
+            onChange={(event) => setTocPasteText(event.target.value)}
+            rows={12}
+            placeholder={'1. L’appel du large | Installer le décor et la tension\n2. La première fissure | ...'}
+            className="w-full rounded-xl border px-3 py-2 text-sm outline-none"
+          />
+          <button
+            type="button"
+            onClick={() => {
+              const parsed = parseTocText(tocPasteText);
+              if (!parsed.length) { toast.error('Aucun chapitre détecté.'); return; }
+              applyImportedToc(parsed, 'sommaire collé');
+              setShowTocPaste(false);
+            }}
+            className="v3-btn v3-btn-primary w-full justify-center"
+          >
+            <Check className="h-4 w-4" /> Injecter dans le workflow
+          </button>
+        </DialogContent>
+      </Dialog>
+
+
+
 
       {step === 3 && (
         <div className="space-y-6">
