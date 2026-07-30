@@ -26,6 +26,7 @@ import {
   Tab,
   LevelFormat,
   SectionType,
+  TableOfContents,
 } from 'docx';
 import { saveAs } from 'file-saver';
 import { cleanGeneratedText } from '@/utils/textCleaner';
@@ -71,6 +72,21 @@ export interface DocxOutlineEntry {
   number: number;
   title: string;
   subChapters: Array<{ number: string; title: string }>;
+}
+
+export interface DocxChapterAudit {
+  number: number;
+  title: string;
+  wordCount: number;
+  valid: boolean;
+  issues: string[];
+}
+
+export interface DocxValidationResult {
+  valid: boolean;
+  readyCount: number;
+  totalCount: number;
+  chapters: DocxChapterAudit[];
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -327,6 +343,45 @@ function meaningfulText(raw?: string): string {
     .replace(/```[a-z]*|```/gi, '')
     .replace(/[\s\u00A0]+/g, ' ')
     .trim();
+}
+
+function countMeaningfulWords(raw?: string): number {
+  return meaningfulText(raw).split(/\s+/).filter(Boolean).length;
+}
+
+/** Audit bloquant : aucun brouillon incomplet ne doit sortir comme livre final. */
+export function validateDocxChapters(chapters: DocxChapter[]): DocxValidationResult {
+  const audits = (chapters || []).map((chapter, index) => {
+    const number = index + 1;
+    const rawTitle = chapter.title || '';
+    const title = cleanChapterTitle(rawTitle);
+    const subWords = (chapter.subChapters || []).reduce(
+      (sum, sub) => sum + countMeaningfulWords(sub.content),
+      0,
+    );
+    const words = countMeaningfulWords(chapter.content) + subWords;
+    const issues: string[] = [];
+    const embeddedNumber = rawTitle.match(/\bchapitre\s+(\d+)\b/i);
+
+    if (isGenericTitle(title)) issues.push('Titre manquant ou générique');
+    if (words === 0) issues.push('Chapitre vide');
+    if (embeddedNumber && Number(embeddedNumber[1]) !== number) {
+      issues.push(`Numéro incohérent : le titre indique chapitre ${embeddedNumber[1]}`);
+    }
+    if (/```|[\[{]\s*"?(?:numero|number|titre|title|content)"?\s*:/i.test(rawTitle)) {
+      issues.push('Artefact JSON ou Markdown dans le titre');
+    }
+
+    return { number, title, wordCount: words, valid: issues.length === 0, issues };
+  });
+
+  const readyCount = audits.filter((chapter) => chapter.valid).length;
+  return {
+    valid: audits.length > 0 && readyCount === audits.length,
+    readyCount,
+    totalCount: audits.length,
+    chapters: audits,
+  };
 }
 
 /** Source unique du sommaire et des chapitres exportés. */
