@@ -252,7 +252,7 @@ Règles :
 - Aucune donnée inventée présentée comme une vérité chiffrée officielle : si tu estimes des chiffres (ventes, recherches), précise que ce sont des estimations.
 
 ${isPro
-  ? `## Niveau de qualité : PRO (Pack Tout Complet 347€) — niveau EXPERT
+  ? `## Niveau de qualité : PRO (Pack Tout Complet 547€) — niveau EXPERT
 - Vise le niveau d'un consultant senior en auto-édition Amazon : analyse plus fine, livrable plus long, plus détaillé et plus actionnable que la version standard.
 - Quand c'est pertinent pour un livrable marketing/commercial (titres, sous-titres, descriptions, accroches, emails, annonces), propose 2 à 3 VARIANTES clairement numérotées (Variante A / B / C) avec une courte note sur le positionnement de chacune et laquelle tu recommandes.
 - Termine par une mini-checklist qualité « À vérifier avant d'utiliser » (3 à 5 points).`
@@ -269,10 +269,10 @@ ${isPro
     if (isManuscript) {
       const n = Math.min(Math.max(parseInt(brief.chapterCount || "", 10) || 8, 1), 40);
       // Plafond serveur par palier : 197€ (core) limité à 3500 mots/chapitre,
-      // 347€ (pro) jusqu'à 6000. Empêche tout contournement côté client.
+      // 547€ (pro) jusqu'à 6000. Empêche tout contournement côté client.
       const wordCap = isPro ? 6000 : 3500;
       const briefWords = Math.min(Math.max(parseInt(brief.wordsPerChapter || "", 10) || 1500, 300), wordCap);
-      // Palier Pro (347€) : chapitres nettement plus longs et denses (~5000 mots).
+      // Palier Pro (547€) : chapitres nettement plus longs et denses (~5000 mots).
       const targetWords = isPro ? Math.max(briefWords, 5000) : briefWords;
       const minWords = Math.round(targetWords * 0.85);
       const maxWords = Math.round(targetWords * 1.15);
@@ -318,7 +318,7 @@ ${isPro ? proGuidelines : coreGuidelines}`;
       }
 
       let finalChapter = r.text;
-      // === Passe éditoriale automatique (Pack Pro 347€ uniquement) ===
+      // === Passe éditoriale automatique (Pack Pro 547€ uniquement) ===
       // 2ᵉ appel IA : densifie, fluidifie et enrichit le chapitre.
       // Fallback silencieux sur le texte initial en cas d'échec.
       if (isPro) {

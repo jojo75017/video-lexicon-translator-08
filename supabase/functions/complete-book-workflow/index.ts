@@ -54,7 +54,7 @@ STANDARDS ÉDITORIAUX PROFESSIONNELS (niveau maison d'édition) :
    Score < 7 = à refaire
 `;
 
-// RECHERCHE APPROFONDIE — réservé au palier Pro (Éditeur 59 €/mois et Pack 347 €).
+// RECHERCHE APPROFONDIE — réservé au palier Pro (Éditeur 59 €/mois et Pack 547 €).
 // Ces directives poussent les agents à creuser davantage : sources, données
 // chiffrées, contre-arguments, exemples vérifiables, angles concurrentiels.
 const PRO_DEEP_RESEARCH = `
@@ -1196,7 +1196,7 @@ function getP4GenerationSettings(numberOfChapters: number, isPro = false, reques
 
   if (!isPro) return base;
 
-  // Pack Pro 347€ : chapitres plus longs et plus denses, boucle qualité renforcée.
+  // Pack Pro 547€ : chapitres plus longs et plus denses, boucle qualité renforcée.
   return {
     ...base,
     maxTokens: isVeryLargeProject ? Math.max(base.maxTokens, Math.min(9000, Math.round(targetWords * 1.6))) : isLargeProject ? Math.max(base.maxTokens, Math.min(10000, Math.round(targetWords * 1.7))) : Math.max(base.maxTokens, Math.min(12000, Math.round(targetWords * 1.8))),
@@ -1272,7 +1272,7 @@ serve(async (req) => {
       quality = 'core',
     } = payload;
 
-    // Palier qualité : 'pro' = Pack 347€ (chapitres plus longs, boucle qualité renforcée,
+    // Palier qualité : 'pro' = Pack 547€ (chapitres plus longs, boucle qualité renforcée,
     // passe éditoriale auto). 'core' = offre 197€ (réglages standard).
     const isProQuality = quality === 'pro';
     // Directive de recherche approfondie injectée dans tous les prompts au palier Pro.
@@ -1937,7 +1937,7 @@ Retourne en JSON :
             _fallbackTitle: chapitre.titre,
           } : fallbackChapter));
 
-          // PACK PRO 347€ — passe éditoriale automatique : on reprend le chapitre
+          // PACK PRO 547€ — passe éditoriale automatique : on reprend le chapitre
           // généré pour le densifier, fluidifier et enrichir les exemples.
           if (isProQuality && typeof chapitreGenere?.contenu === 'string' && chapitreGenere.contenu.trim().length > 300) {
             try {

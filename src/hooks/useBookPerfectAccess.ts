@@ -10,7 +10,7 @@ import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
  *  - Admin (préparation / démonstration)
  *  - Achat direct de BookPerfect AI (module_entitlements)
  *
- * Aucun accès gratuit : ni Base 197€, ni Pack Pro 347€, ni V2, ni aucun autre
+ * Aucun accès gratuit : ni Base 197€, ni Pack Pro 547€, ni V2, ni aucun autre
  * module. Tout le monde (sauf admin) doit acheter BookPerfect séparément.
  */
 const PAID_STATUSES = new Set(['active', 'completed', 'paid']);

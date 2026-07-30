@@ -30,7 +30,7 @@ export const V3_GIFT_PRICE = Math.round(V3_PRICE * (1 - V3_GIFT_DISCOUNT)); // 1
 
 // ============= Grille tarifaire V3 =============
 // Base 197€ + 7 packs upsell (total 661€) → 858€ à la pièce.
-// Pack Pro Vendeur 347€ → débloque tout, économie de 200€.
+// Pack Pro Vendeur 547€ → débloque tout, économie de 200€.
 
 export interface V3UpsellPack {
   id: V3PackId;
@@ -43,7 +43,7 @@ export interface V3UpsellPack {
   installments?: string[];
   /** Badge marketing affiché (ex. « Opportunité »). */
   badge?: string;
-  /** true = option spécialiste vendue uniquement à la carte (hors Pack Pro 347€). */
+  /** true = option spécialiste vendue uniquement à la carte (hors Pack Pro 547€). */
   alacarte?: boolean;
 }
 
@@ -100,7 +100,7 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
       'amazon-ads-keyword-research', 'trademark-checker',
     ],
   },
-  // ===== Options spécialistes — vendues uniquement à la carte (hors Pack Pro 347€) =====
+  // ===== Options spécialistes — vendues uniquement à la carte (hors Pack Pro 547€) =====
   {
     id: 'promotion',
     title: 'Pack Promotion Éditeur',
@@ -140,7 +140,7 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
   },
 ];
 
-/** Packs inclus dans le Pack Pro 347€ (hors options à la carte). */
+/** Packs inclus dans le Pack Pro 547€ (hors options à la carte). */
 export const V3_ESSENTIAL_PACKS = V3_UPSELL_PACKS.filter((p) => !p.alacarte);
 
 /** Options spécialistes vendues uniquement à la carte. */
@@ -149,7 +149,7 @@ export const V3_ALACARTE_PACKS = V3_UPSELL_PACKS.filter((p) => p.alacarte);
 /** Somme des packs essentiels (historique). */
 export const V3_UPSELLS_TOTAL = V3_ESSENTIAL_PACKS.reduce((sum, p) => sum + p.price, 0);
 
-/** Somme de TOUS les packs premium (essentiels + options à la carte) — tous inclus dans le Pack Pro 347€. */
+/** Somme de TOUS les packs premium (essentiels + options à la carte) — tous inclus dans le Pack Pro 547€. */
 export const V3_ALL_PACKS_TOTAL = V3_UPSELL_PACKS.reduce((sum, p) => sum + p.price, 0);
 
 /** Facilités de paiement de la base 197€. */
@@ -158,11 +158,11 @@ export const V3_BASE_INSTALLMENTS = ['1×197€', '3×69€'];
 /** Pack Pro : la base 197€ + TOUS les packs premium (essentiels + options à la carte) d'un coup. */
 export const V3_FULL_PACK = {
   title: 'Pack Pro Vendeur',
-  price: 347,
+  price: 547,
   /** Prix si on prend la base + tous les packs premium séparément. */
   compareAt: V3_PRICE + V3_ALL_PACKS_TOTAL,
-  saves: V3_PRICE + V3_ALL_PACKS_TOTAL - 347,
-  installments: ['1×347€', '3×119€', '4×89€'],
+  saves: V3_PRICE + V3_ALL_PACKS_TOTAL - 547,
+  installments: ['1×547€', '3×189€', '4×144€'],
 };
 
 
@@ -188,7 +188,7 @@ export type V3Access = 'included' | 'pack';
  * Liste blanche des modules COMPRIS dans la base 197€.
  * Frontière : de l'idée jusqu'à publier proprement sur KDP.
  * Tout ce qui relève du marketing, de la vente, de la monétisation et de
- * l'IA avancée passe en pack premium (débloqué via le Pack Tout Complet 347€).
+ * l'IA avancée passe en pack premium (débloqué via le Pack Tout Complet 547€).
  * Source de vérité de l'inclusion : un module absent de ce set est premium par défaut.
  */
 export const V3_BASE_MODULE_IDS = new Set<string>([
@@ -464,17 +464,17 @@ export const V3_MODULES: V3Module[] = [
   { id: 'community-ai-unblock',     pillar: 'ia',        status: 'done', title: 'Assistant IA Débloquage KDP',
     description: 'Bouton « Débloquer avec l’IA » : à partir de la question/blocage de l’abonné, génère une solution KDP concrète (étapes, modèle d’email au support KDP si besoin) et propose l’outil interne adapté.' },
 
-  // ===== AJOUTS V3 — Tunnel de prix 347€ + paiement échelonné — à construire (AOÛT) =====
+  // ===== AJOUTS V3 — Tunnel de prix 547€ + paiement échelonné — à construire (AOÛT) =====
 
   // MONÉTISER
-  { id: 'pricing-ladder-497',       pillar: 'monetiser', status: 'done', title: 'Échelle de Prix 347€ (Upsells + Pack Tout Inclus)',
-    description: 'Parcours commercial menant à 347€ : V3 197€ + order bump guides avancés 47€ + OTO1 visuels 67€ + OTO2 communauté/coaching 36€ (= 347€), OU bouton unique « Pack Pro Vendeur » à 347€. Source unique de vérité dans un module pricing dédié.' },
-  { id: 'installment-payments',     pillar: 'monetiser', status: 'done', title: 'Paiement Échelonné Sécurisé (3×119€ / 4×89€)',
-    description: 'Pack payable en 1×347€, 3×119€ (357€) ou 4×89€ (356€). Géré par abonnement Stripe à durée limitée pour détecter les échecs. COUPURE AUTOMATIQUE de l’accès 3 JOURS après un paiement échoué (statut suspended → SubscriberGate bloque le lien) ; réactivation auto à la régularisation ; bascule en accès à vie une fois toutes les échéances payées. Relances email Resend à chaque échec + à la suspension.' },
+  { id: 'pricing-ladder-497',       pillar: 'monetiser', status: 'done', title: 'Échelle de Prix 547€ (Upsells + Pack Tout Inclus)',
+    description: 'Parcours commercial menant à 547€ : V3 197€ + packs premium successifs (= 547€), OU bouton unique « Pack Pro Vendeur » à 547€. Source unique de vérité dans un module pricing dédié.' },
+  { id: 'installment-payments',     pillar: 'monetiser', status: 'done', title: 'Paiement Échelonné Sécurisé (3×189€ / 4×144€)',
+    description: 'Pack payable en 1×547€, 3×189€ (567€) ou 4×144€ (576€). Géré par abonnement Stripe à durée limitée pour détecter les échecs. COUPURE AUTOMATIQUE de l’accès 3 JOURS après un paiement échoué (statut suspended → SubscriberGate bloque le lien) ; réactivation auto à la régularisation ; bascule en accès à vie une fois toutes les échéances payées. Relances email Resend à chaque échec + à la suspension.' },
 
   // PUBLIER — Guides nouveaux abonnés (mix : base offerte + avancés payants)
   { id: 'onboarding-guides',        pillar: 'publier',   status: 'done', title: 'Guides Nouveaux Abonnés (Onboarding 7 jours)',
-    description: 'Mix : onboarding « Premiers pas KDP en 7 jours » + 2 guides de base OFFERTS pour activer les nouveaux abonnés ; guides avancés verrouillés avec CTA vers order bump / upsell. Mise en ligne prévue en août avec le tunnel 347€.' },
+    description: 'Mix : onboarding « Premiers pas KDP en 7 jours » + 2 guides de base OFFERTS pour activer les nouveaux abonnés ; guides avancés verrouillés avec CTA vers order bump / upsell. Mise en ligne prévue en août avec le tunnel 547€.' },
 
   // ===== AJOUTS V3 — Maison d'édition — packs upsell — à construire =====
 
@@ -549,13 +549,13 @@ export const V3_MODULES: V3Module[] = [
 
   // ============= LANCEMENT V3 — Page de vente "obsession" (Hypnova) =============
   { id: 'v3-sales-page',         pillar: 'promotion',    status: 'done', title: 'Page de vente V3 haute conversion (style Hypnova)',
-    description: 'Page commerciale longue type "moteur d\'obsession" : hero accrocheur, storytelling, preuves chiffrées réelles du marché ebook/KDP, démonstration produit, garantie 7 jours, FAQ et compte à rebours. Bloc VALEUR "Voici ce que tu obtiens" présentant DEUX choix : Base 197€ OU Pack Pro 347€ (un OU exclusif, jamais l\'addition des deux).' },
+    description: 'Page commerciale longue type "moteur d\'obsession" : hero accrocheur, storytelling, preuves chiffrées réelles du marché ebook/KDP, démonstration produit, garantie 7 jours, FAQ et compte à rebours. Bloc VALEUR "Voici ce que tu obtiens" présentant DEUX choix : Base 197€ OU Pack Pro 547€ (un OU exclusif, jamais l\'addition des deux).' },
   { id: 'v3-order-page',         pillar: 'promotion',    status: 'done', title: 'Page de commande V3 + order bump',
-    description: 'Tunnel de paiement dédié avec case order bump optionnelle, choix de l\'offre Base 197€ OU Pack Pro 347€, paiement Stripe + PayPal. Aucune addition automatique : l\'acheteur sélectionne une seule offre.' },
+    description: 'Tunnel de paiement dédié avec case order bump optionnelle, choix de l\'offre Base 197€ OU Pack Pro 547€, paiement Stripe + PayPal. Aucune addition automatique : l\'acheteur sélectionne une seule offre.' },
   { id: 'v3-launch-bonuses',     pillar: 'promotion',    status: 'done', title: 'Bonus de lancement V3',
     description: 'Bonus offerts mis en avant dans l\'offre V3 pour augmenter la valeur perçue et déclencher l\'achat (à définir précisément au moment de la construction).' },
 
-  // ===== AJOUTS V3 — Suite « Étude de Marché » (équivalent BookBeam) — Pack 347€ — à construire =====
+  // ===== AJOUTS V3 — Suite « Étude de Marché » (équivalent BookBeam) — Pack 547€ — à construire =====
   // Données Amazon réelles (Firecrawl / Amazon PA-API) + estimations IA clairement étiquetées.
   { id: 'amazon-book-database',        pillar: 'data', status: 'done', title: 'Base de Données Livres Amazon',
     description: 'Recherche de produits dans le catalogue Amazon avec filtres (BSR, prix, nombre d\'avis, date de sortie, format, catégorie). Récupération des données de fiches réelles via Firecrawl pour repérer les livres qui marchent dans une niche.' },
@@ -594,7 +594,7 @@ export function getModuleById(id: string): V3Module | undefined {
 
 /** Modules compris dans la base 197€. */
 export const V3_INCLUDED_MODULES = V3_MODULES.filter((m) => getModuleAccess(m.id) === 'included');
-/** Modules premium (débloqués par le Pack Pro 347€). */
+/** Modules premium (débloqués par le Pack Pro 547€). */
 export const V3_PREMIUM_MODULES = V3_MODULES.filter((m) => getModuleAccess(m.id) === 'pack');
 
 export const V3_INCLUDED_COUNT = V3_INCLUDED_MODULES.length; // 32
@@ -602,7 +602,7 @@ export const V3_PREMIUM_COUNT = V3_PREMIUM_MODULES.length;   // 68
 export const V3_TOTAL_COUNT = V3_MODULES.length;             // 100
 
 /**
- * Modules premium « orphelins » : débloqués par le Pack Pro 347€ mais rattachés
+ * Modules premium « orphelins » : débloqués par le Pack Pro 547€ mais rattachés
  * à aucun pack thématique. Affichés dans le bloc « Inclus en plus dans le Pack Pro ».
  * Calcul automatique → robuste aux futurs ajouts.
  */

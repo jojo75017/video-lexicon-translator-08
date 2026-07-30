@@ -26,7 +26,7 @@ function buildHtml(offerUrl: string): string {
 
           <div style="background:#FAFAFA;border:2px solid #008296;border-radius:10px;padding:18px;margin:22px 0;">
             <p style="margin:0 0 8px;font-weight:bold;color:#008296;">Aujourd'hui, EbookStudio reste à 67€ à vie.</p>
-            <p style="margin:0;">En <strong>octobre</strong>, je lance la nouvelle version <strong>Publication Assistée Pro</strong> (paliers 197€ et 347€), bien plus complète — à un tarif nettement supérieur. C'est donc le meilleur moment pour sécuriser votre accès à vie au prix actuel.</p>
+            <p style="margin:0;">En <strong>octobre</strong>, je lance la nouvelle version <strong>Publication Assistée Pro</strong> (paliers 197€ et 547€), bien plus complète — à un tarif nettement supérieur. C'est donc le meilleur moment pour sécuriser votre accès à vie au prix actuel.</p>
           </div>
 
           <div style="text-align:center;margin:24px 0;">

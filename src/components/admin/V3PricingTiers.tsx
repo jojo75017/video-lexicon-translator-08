@@ -27,7 +27,7 @@ const SERIF = "'Georgia', 'Times New Roman', serif";
  * Bloc Tarifs V3 — 3 niveaux de lecture :
  *   1. Base 197€ (ce qui est inclus)
  *   2. Packs upsell à la carte (total 400€) — dépliables pour voir les modules
- *   3. Pack Pro Vendeur 347€ (−200€) mis en avant
+ *   3. Pack Pro Vendeur 547€ (−200€) mis en avant
  */
 const V3PricingTiers: React.FC = () => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -301,7 +301,7 @@ const V3PricingTiers: React.FC = () => {
                 style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}
               >
                 <FlaskConical className="h-3.5 w-3.5" />
-                Tester le paiement 347€ · Mode test
+                Tester le paiement 547€ · Mode test
               </button>
             )}
 
@@ -328,7 +328,7 @@ const V3PricingTiers: React.FC = () => {
         </div>
       </div>
 
-      {/* Encart : moteur de rédaction renforcé au Pack Pro 347€ */}
+      {/* Encart : moteur de rédaction renforcé au Pack Pro 547€ */}
       <div className="mt-6 rounded-2xl border-2 p-5 sm:p-6"
         style={{ borderColor: '#008296', background: '#00829611' }}>
         <div className="flex items-start gap-3">
@@ -338,7 +338,7 @@ const V3PricingTiers: React.FC = () => {
               Le Pack Pro écrit aussi de meilleurs livres — pas seulement plus d'outils.
             </h3>
             <p className="text-sm leading-relaxed mb-2" style={{ color: '#5a6b6e' }}>
-              Le 347€ active un <strong>Moteur de Rédaction Pro</strong> directement dans l'outil d'écriture :
+              Le 547€ active un <strong>Moteur de Rédaction Pro</strong> directement dans l'outil d'écriture :
             </p>
             <ul className="grid sm:grid-cols-2 gap-1.5 text-sm" style={{ color: INK }}>
               <li className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5" style={{ color: '#008296' }} />Chapitres plus longs et denses (~5000 mots vs ~3500)</li>
@@ -353,7 +353,7 @@ const V3PricingTiers: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. Packs premium inclus dans le Pack Pro 347€ */}
+      {/* 2. Packs premium inclus dans le Pack Pro 547€ */}
       <div className="flex items-center gap-2 mb-4 mt-8">
         <Lock className="h-4 w-4" style={{ color: AMBER }} />
         <h3 className="text-base font-bold" style={{ fontFamily: SERIF, color: INK }}>Packs premium pour vendre & scaler</h3>
@@ -385,7 +385,7 @@ const V3PricingTiers: React.FC = () => {
           <div className="flex items-center gap-2 mb-4 mt-10">
             <Crown className="h-4 w-4" style={{ color: AMBER }} />
             <h3 className="text-base font-bold" style={{ fontFamily: SERIF, color: INK }}>Inclus en plus dans le Pack Pro</h3>
-            <span className="text-xs" style={{ color: '#a18a6c' }}>{V3_FULL_PACK_EXTRA_IDS.length} outils premium débloqués par le 347€</span>
+            <span className="text-xs" style={{ color: '#a18a6c' }}>{V3_FULL_PACK_EXTRA_IDS.length} outils premium débloqués par le 547€</span>
             <div className="flex-1 h-px ml-2" style={{ background: `linear-gradient(90deg, ${AMBER}44, transparent)` }} />
           </div>
           <ul className="grid sm:grid-cols-2 gap-2">

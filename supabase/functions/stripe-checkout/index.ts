@@ -32,7 +32,7 @@ const PRODUCT_CATALOG: Record<string, { name: string; description: string; amoun
   v3_pro: {
     name: "Publication Assistée Pro V3 — Pack Pro Vendeur",
     description: "La Base + les 4 packs essentiels (accès à vie)",
-    amount: 34700,
+    amount: 54700,
   },
   v3_order_bump: {
     name: "Pack Guides Avancés KDP (Order Bump)",
