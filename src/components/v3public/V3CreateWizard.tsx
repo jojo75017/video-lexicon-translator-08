@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Check, ImageIcon, Loader2, Palette, Plus, RefreshCw, Rocket, Save, Sparkles, Trash2, UserRound, Wand2, FileDown, RotateCcw, Wrench } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Copy, ExternalLink, ImageIcon, Loader2, Palette, Plus, RefreshCw, Rocket, Save, Sparkles, Trash2, UserRound, Wand2, FileDown, RotateCcw, Wrench } from 'lucide-react';
 import { toast } from 'sonner';
 import EbookCompleteWorkflow from '@/components/ebook/EbookCompleteWorkflow';
 import { ApiProviderQuickSettings } from '@/components/ebook/ApiProviderQuickSettings';
 import V3ExportPanel from '@/components/admin/V3ExportPanel';
+import V3KdpPublishPanel from '@/components/v3public/V3KdpPublishPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { invokeImageFunction } from '@/lib/aiImageInvoke';
 import { callAIWriting, getProvider, getProviderKey, validateKeyFormat } from '@/services/aiWritingService';
@@ -1021,8 +1022,8 @@ Règles :
                 <input value={subtitle} onChange={(e) => setSubtitle(e.target.value.slice(0, 120))} placeholder="Optionnel" className="w-full rounded-xl border px-3 py-2 text-sm outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
               </label>
             </div>
-            <div className="mt-5 flex justify-center">
-              <div className="w-56 aspect-[2/3] rounded-xl overflow-hidden border flex items-center justify-center" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-orange-50)' }}>
+            <div className="mt-5 flex flex-col items-center gap-4">
+              <div className="w-[320px] max-w-full aspect-[2/3] rounded-xl overflow-hidden border flex items-center justify-center" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-orange-50)' }}>
                 {coverLoading && !coverUrl ? (
                   <Loader2 className="h-6 w-6 animate-spin" style={{ color: 'var(--v3-orange-600)' }} />
                 ) : coverUrl ? (
@@ -1030,6 +1031,59 @@ Règles :
                 ) : (
                   <span className="text-xs px-2 text-center" style={{ color: 'var(--v3-muted)' }}>Aucune couverture</span>
                 )}
+              </div>
+              <div className="flex flex-wrap justify-center gap-2">
+                <button
+                  type="button"
+                  disabled={!coverUrl}
+                  onClick={async () => {
+                    if (!coverUrl) return;
+                    try {
+                      const response = await fetch(coverUrl);
+                      const blob = await response.blob();
+                      const url = URL.createObjectURL(blob);
+                      const link = document.createElement('a');
+                      link.href = url;
+                      link.download = `couverture-${(finalTitle || 'livre').replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.png`;
+                      link.click();
+                      URL.revokeObjectURL(url);
+                      toast.success('Couverture téléchargée.');
+                    } catch {
+                      window.open(coverUrl, '_blank', 'noopener,noreferrer');
+                    }
+                  }}
+                  className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold disabled:opacity-50"
+                  style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+                >
+                  <FileDown className="h-4 w-4" /> Télécharger l’image
+                </button>
+                <button
+                  type="button"
+                  disabled={!coverUrl}
+                  onClick={async () => {
+                    if (!coverUrl) return;
+                    await navigator.clipboard.writeText(coverUrl);
+                    toast.success('URL de la couverture copiée.');
+                  }}
+                  className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold disabled:opacity-50"
+                  style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+                >
+                  <Copy className="h-4 w-4" /> Copier l’URL
+                </button>
+                <Link
+                  to={`/v3/cover-studio-pro/edit?title=${encodeURIComponent(finalTitle)}&subtitle=${encodeURIComponent(subtitle || '')}&author=${encodeURIComponent(authorName)}${coverUrl ? `&image=${encodeURIComponent(coverUrl)}` : ''}`}
+                  className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold"
+                  style={{ background: 'var(--v3-ink)', color: '#fff' }}
+                >
+                  <Palette className="h-4 w-4" /> Ouvrir Cover Studio Pro
+                </Link>
+                <Link
+                  to="/couverture-kdp"
+                  className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold"
+                  style={{ borderColor: 'var(--v3-orange-600)', color: 'var(--v3-orange-600)', background: 'var(--v3-paper)' }}
+                >
+                  <ExternalLink className="h-4 w-4" /> Couverture PDF exacte KDP
+                </Link>
               </div>
             </div>
           </div>
@@ -1048,6 +1102,24 @@ Règles :
             author={authorName}
           />
         )}
+
+        {completedBook && (
+          <V3KdpPublishPanel
+            title={finalTitle}
+            subtitle={subtitle}
+            author={authorName}
+            category={effectiveCategory}
+            coverUrl={coverUrl}
+            initialDescription={completedBook?.backCover?.description || ''}
+            manuscript={(completedBook.chapters || []).map((c: any, index: number) => {
+              const validatedOutlineTitle = normalizedOutline[index]?.titre?.trim();
+              const generatedTitle = typeof c.title === 'string' ? c.title.trim() : '';
+              const titleForExport = validatedOutlineTitle || generatedTitle || `Chapitre ${index + 1}`;
+              return `# Chapitre ${index + 1} – ${titleForExport.replace(/^chapitre\s+\d+\s*[:–—-]?\s*/i, '')}\n\n${c.content || ''}`;
+            }).join('\n\n')}
+          />
+        )}
+
 
         <div className="flex flex-wrap gap-3">
           <Link
