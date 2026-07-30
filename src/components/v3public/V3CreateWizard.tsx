@@ -1320,15 +1320,9 @@ Règles :
         <div className="space-y-6">
           <div>
             <h2 className="v3-serif text-4xl font-bold" style={{ color: 'var(--v3-ink)' }}>Style du livre</h2>
-            <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>Choisis la catégorie, le ton, le nombre de chapitres et la longueur.</p>
+            <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>Choisis le ton, le nombre de chapitres et la longueur. Catégorie retenue : <strong>{category === 'Autre' ? (customCategory || 'Autre') : category}</strong>.</p>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            <label className="block space-y-2">
-              <span className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>Catégorie</span>
-              <select value={category} onChange={(event) => setCategory(event.target.value)} className="w-full rounded-2xl border px-4 py-3 outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}>
-                {CATEGORIES.map((item) => <option key={item} value={item}>{item}</option>)}
-              </select>
-            </label>
             <label className="block space-y-2">
               <span className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>Ton</span>
               <select value={tone} onChange={(event) => setTone(event.target.value)} className="w-full rounded-2xl border px-4 py-3 outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}>
@@ -1336,12 +1330,7 @@ Règles :
               </select>
             </label>
           </div>
-          {category === 'Autre' && (
-            <label className="block space-y-2">
-              <span className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>Nouvelle catégorie</span>
-              <input value={customCategory} onChange={(event) => setCustomCategory(event.target.value)} className="w-full rounded-2xl border px-4 py-3 outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
-            </label>
-          )}
+
           <div className="grid gap-5 md:grid-cols-2">
             <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
               <div className="flex items-center justify-between gap-3">
