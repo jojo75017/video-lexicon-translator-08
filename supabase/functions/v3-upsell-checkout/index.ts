@@ -80,7 +80,7 @@ Deno.serve(async (req) => {
 
     const session = await stripeRequest(env, "POST", "/checkout/sessions", {
       mode: "payment",
-      ui_mode: "embedded",
+      ui_mode: "embedded_page",
       customer: customerId,
       return_url: returnUrl,
       line_items: [{

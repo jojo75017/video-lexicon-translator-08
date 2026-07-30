@@ -108,7 +108,7 @@ Deno.serve(async (req) => {
       environment, "POST", "/checkout/sessions",
       {
         mode: "payment",
-        ui_mode: "embedded",
+        ui_mode: "embedded_page",
         return_url: returnUrl,
         customer_email: email,
         line_items: lineItems,
