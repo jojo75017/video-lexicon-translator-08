@@ -45,7 +45,8 @@ export default function V3ApiKeysGate({
   className = '',
 }: Props) {
   const [ready, setReady] = useState<boolean>(() => hasValidKey());
-  const [open, setOpen] = useState<boolean>(() => !hasValidKey());
+  // Le tableau doit rester immédiatement visible, même lorsqu'une clé existe déjà.
+  const [open, setOpen] = useState<boolean>(true);
 
   const refresh = useCallback(() => setReady(hasValidKey()), []);
 
