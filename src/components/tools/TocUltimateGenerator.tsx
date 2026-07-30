@@ -309,7 +309,7 @@ Règles strictes :
                   onClick={() => onApply(chapters, { theme, genre, audience, style, creativity, description })}
                   className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white shadow hover:bg-emerald-700"
                 >
-                  <Download className="h-4 w-4" /> Utiliser ce sommaire dans le wizard
+                  <Download className="h-4 w-4" /> {applyLabel || 'Utiliser ce sommaire dans le wizard'}
                 </button>
               )}
             </>
