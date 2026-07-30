@@ -635,16 +635,33 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
   }
 
   // ═══ CHAPITRES RETENUS (numérotation continue, sans trous) ═══
+  /** Texte réellement exploitable : sans placeholders ni marqueurs vides. */
+  const meaningfulLength = (raw?: string): number => {
+    if (!raw) return 0;
+    const stripped = raw
+      .replace(/\[[^\]]*(?:à\s*r[ée]diger|a\s*venir|à\s*venir|todo|placeholder|contenu)[^\]]*\]/gi, '')
+      .replace(/\((?:contenu\s*)?à\s*r[ée]diger\)/gi, '')
+      .replace(/```[a-z]*|```/gi, '')
+      .replace(/[\s\u00A0]+/g, ' ')
+      .trim();
+    return stripped.length;
+  };
+
   const renderChapters = chapters
     .filter((chapter) => {
-      const hasAnyContent = (chapter.content && chapter.content.trim().length > 50) ||
-        (chapter.subChapters || []).some((s) => s.content && s.content.trim().length > 50);
-      return hasAnyContent || !/^chapitre\s+\d+$/i.test((chapter.title || '').trim());
+      const chapterLen = meaningfulLength(chapter.content);
+      const subLen = (chapter.subChapters || []).reduce(
+        (acc, s) => acc + meaningfulLength(s.content),
+        0,
+      );
+      // Un chapitre sans contenu exploitable n'est jamais exporté (ni TDM, ni corps)
+      return chapterLen + subLen >= 50;
     })
     .map((chapter, i) => {
       const { displayTitle, body } = resolveChapter(chapter, i);
       return { chapter, num: i + 1, displayTitle, body };
     });
+
 
   // ═══ TABLE DES MATIÈRES ═══
 
