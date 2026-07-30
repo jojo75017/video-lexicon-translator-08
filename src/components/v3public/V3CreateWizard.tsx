@@ -1121,7 +1121,7 @@ Règles :
   }
 
 
-  const steps = ['Idée', 'Style', 'Sommaire', 'Personnages', 'Titre'];
+  const steps = ['Fiche du livre', 'Style', 'Sommaire', 'Personnages', 'Titre'];
 
   return (
     <div className="space-y-8">
