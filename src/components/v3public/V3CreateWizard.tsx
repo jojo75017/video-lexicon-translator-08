@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check, Copy, ExternalLink, ImageIcon, Loader2, Palette, Plus, RefreshCw, Rocket, Save, Sparkles, Trash2, UserRound, Wand2, FileDown, RotateCcw, Wrench } from 'lucide-react';
 import { toast } from 'sonner';
 import EbookCompleteWorkflow from '@/components/ebook/EbookCompleteWorkflow';
@@ -194,6 +194,8 @@ function hasRepeatedFallbackTitles(items: OutlineChapter[], expectedCount: numbe
 }
 
 export default function V3CreateWizard() {
+  const [searchParams] = useSearchParams();
+  const requestedProjectId = searchParams.get('projectId');
   const hub = useMemo(readHubConfig, []);
   const [step, setStep] = useState(0);
   const [launched, setLaunched] = useState(false);
@@ -249,6 +251,7 @@ export default function V3CreateWizard() {
   // au bon step si `ebook_workflow_progress` / `ebook_workflow_results` existent.
   useEffect(() => {
     if (restoreRef.current) return;
+    if (requestedProjectId) return;
     restoreRef.current = true;
     try {
       const wizRaw = localStorage.getItem(WIZARD_KEY);
@@ -323,7 +326,7 @@ export default function V3CreateWizard() {
     } catch (e) {
       console.warn('V3 wizard restore skipped:', e);
     }
-  }, []);
+  }, [requestedProjectId]);
 
 
   const [title, setTitle] = useState(hub.title || '');
@@ -358,6 +361,89 @@ export default function V3CreateWizard() {
   const [aiTopic, setAiTopic] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiResult, setAiResult] = useState<{ title: string; subtitle: string; synopsis: string; categories: string[] } | null>(null);
+
+  // Ouverture depuis « Mes livres » : recharge le vrai projet cloud dans le
+  // workflow, au lieu d'afficher uniquement sa page publique en lecture.
+  useEffect(() => {
+    if (!requestedProjectId) return;
+    let cancelled = false;
+
+    const openSavedProject = async () => {
+      const { data: auth, error: authError } = await supabase.auth.getUser();
+      if (authError || !auth.user) {
+        toast.error('Connecte-toi pour ouvrir ce livre.');
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('ebook_projects')
+        .select('*')
+        .eq('id', requestedProjectId)
+        .eq('user_id', auth.user.id)
+        .maybeSingle();
+
+      if (cancelled) return;
+      if (error || !data) {
+        toast.error(error?.message || 'Livre introuvable dans Mes livres.');
+        return;
+      }
+
+      const saved = data as any;
+      const savedChapters = Array.isArray(saved.chapters) ? saved.chapters : [];
+      const restoredOutline = savedChapters.map((chapter: any, index: number) => ({
+        id: makeId(),
+        numero: Number(chapter.number || chapter.numero || index + 1),
+        titre: cleanText(chapter.title || chapter.titre || `Chapitre ${index + 1}`),
+        objectif: cleanText(chapter.objectif || chapter.goal || ''),
+      }));
+      const savedImages = Array.isArray(saved.ebook_images) ? saved.ebook_images : [];
+      const savedCover = savedImages.find((image: any) => image?.type === 'front_cover')?.url || saved.cover_concepts || null;
+      const savedSubtitle = String(saved.narrative_format || '').replace(/^Sous-titre\s*:\s*/i, '');
+      const savedChapterCount = clampNumber(Number(saved.number_of_chapters || savedChapters.length), 3, 60, 12);
+
+      restoreRef.current = true;
+      syncProjectId(saved.id);
+      setTitle(saved.title || '');
+      setFinalTitle(saved.title || '');
+      setSubtitle(savedSubtitle === 'Workflow V3 complet' ? '' : savedSubtitle);
+      setAuthorName(saved.author_name || 'Auteur Ebookstudio');
+      setDescription(saved.preface || saved.book_summary || 'Livre sauvegardé dans Mes livres.');
+      setTone(saved.tone || saved.writing_style || 'Inspirant');
+      setChapters(savedChapterCount);
+      if (saved.kdp_categories) {
+        const match = CATEGORIES.find((item) => item.toLowerCase() === String(saved.kdp_categories).toLowerCase());
+        if (match) setCategory(match);
+        else { setCategory('Autre'); setCustomCategory(String(saved.kdp_categories)); }
+      }
+      if (restoredOutline.length) setOutline(restoredOutline);
+      if (Array.isArray(saved.characters) && saved.characters.length) {
+        setCharacters(saved.characters.map((character: any) => ({
+          id: makeId(),
+          name: character.name || '',
+          role: character.role || 'Personnage',
+          traits: character.description || character.traits || '',
+        })));
+      }
+      setCoverUrl(savedCover);
+      if (savedChapters.length) {
+        setCompletedBook({
+          chapters: savedChapters,
+          conclusion: saved.conclusion || '',
+          backCover: { description: saved.kdp_description || '' },
+        });
+        setLaunched(true);
+      } else {
+        setStep(2);
+        setLaunched(false);
+      }
+      toast.success(`« ${saved.title} » est ouvert.`);
+    };
+
+    void openSavedProject();
+    return () => { cancelled = true; };
+    // syncProjectId is intentionally stable for the lifetime of this wizard.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [requestedProjectId]);
 
   const runAIAssistant = async () => {
     if (aiTopic.trim().length < 4) {

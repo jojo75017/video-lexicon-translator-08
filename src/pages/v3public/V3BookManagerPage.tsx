@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Pencil, Trash2, ExternalLink, BookOpen } from 'lucide-react';
+import { Plus, Pencil, Trash2, BookOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { BackButton } from "@/components/v3/BackButton";
@@ -16,9 +16,10 @@ export default function V3BookManagerPage() {
   const load = async () => {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) { nav('/v3/auth'); return; }
-    const { data } = await supabase.from('ebook_projects')
+    const { data, error } = await supabase.from('ebook_projects')
       .select('id,title,author_name,kdp_description')
       .eq('user_id', auth.user.id).order('updated_at', { ascending: false });
+    if (error) toast.error(`Chargement impossible : ${error.message}`);
     setRows((data as Book[]) || []);
     setLoading(false);
   };
@@ -37,8 +38,8 @@ export default function V3BookManagerPage() {
       <div className="max-w-6xl mx-auto px-4 pt-4"><BackButton /></div>
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
-          <h1 className="v3-serif text-4xl font-bold">Mes livres publiés</h1>
-          <p className="text-sm text-[var(--v3-muted)] mt-1">Édite ta page auteur publique.</p>
+          <h1 className="v3-serif text-4xl font-bold">Mes livres</h1>
+          <p className="text-sm text-[var(--v3-muted)] mt-1">Ouvre un livre pour retrouver le manuscrit, le sommaire et les exports.</p>
         </div>
         <button onClick={() => nav('/v3/create')} className="v3-btn v3-btn-primary"><Plus className="w-4 h-4" /> Ajouter</button>
       </div>
@@ -60,7 +61,9 @@ export default function V3BookManagerPage() {
                 {b.author_name && <div className="text-xs text-[var(--v3-muted)]">par {b.author_name}</div>}
               </div>
               <div className="flex gap-2">
-                <a href={`/v3/book/${b.id}`} target="_blank" rel="noreferrer" className="v3-btn v3-btn-ghost text-xs"><ExternalLink className="w-3.5 h-3.5" /></a>
+                <button onClick={() => nav(`/v3/create?projectId=${b.id}`)} className="v3-btn v3-btn-primary text-xs">
+                  <BookOpen className="w-3.5 h-3.5" /> Ouvrir
+                </button>
                 <button onClick={() => setEditing(b)} className="v3-btn v3-btn-outline text-xs"><Pencil className="w-3.5 h-3.5" /></button>
                 <button onClick={() => remove(b.id)} className="v3-btn v3-btn-ghost text-xs text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>
               </div>
