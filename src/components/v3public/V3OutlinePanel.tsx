@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Check, ClipboardPaste, ListOrdered, Loader2, RefreshCw, Wand2, X } from 'lucide-react';
 import { toast } from 'sonner';
-import { callAIWriting, getProvider, getProviderKey, validateKeyFormat } from '@/services/aiWritingService';
+import {
+  callAIWriting, getProvider, getProviderKey, setProvider, validateKeyFormat,
+  type AIProvider,
+} from '@/services/aiWritingService';
+
 import {
   clearTocForWorkflow, normalizeOutline, parseTocText, readLatestUltimateToc,
   type BookBrief, type BriefOutlineChapter,
