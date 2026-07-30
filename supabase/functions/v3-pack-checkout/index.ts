@@ -83,13 +83,19 @@ Deno.serve(async (req) => {
     if (orderErr) throw new Error(`DB: ${orderErr.message}`);
     const orderId = order.id as string;
 
-    const commonMeta = {
+    const clean = (v: unknown) =>
+      typeof v === "string" && v.trim() ? v.trim().slice(0, 60) : undefined;
+    const commonMeta: Record<string, string> = {
       kind: "v3_full_pack",
       plan,
       email: trimmedEmail,
       order_id: orderId,
       installments_total: String(planDef.installments),
     };
+    const srcTag = clean(src);
+    const refTag = clean(ref);
+    if (srcTag) commonMeta.src = srcTag;
+    if (refTag) commonMeta.ref = refTag;
 
     let sessionParams: Record<string, any>;
     if (planDef.installments === 1) {
