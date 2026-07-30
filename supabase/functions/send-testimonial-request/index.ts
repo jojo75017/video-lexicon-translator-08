@@ -105,7 +105,7 @@ Deno.serve(async (req) => {
           status: "sent",
         });
       } catch (e) {
-        if (isQuotaExhausted(e)) {
+        if (isQuotaExhausted()) {
           return new Response(
             JSON.stringify({ ok: false, reason: "quota", sent, remaining: recipients.length - sent }),
             { headers: { ...corsHeaders, "Content-Type": "application/json" } },
