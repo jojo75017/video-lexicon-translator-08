@@ -28,6 +28,7 @@ export default function ContactSupportPage({ subscriberEmail }: Props) {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
+  const isV3 = useLocation().pathname.startsWith('/v3');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
