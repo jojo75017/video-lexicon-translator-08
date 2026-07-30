@@ -26,7 +26,6 @@ import {
   Tab,
   LevelFormat,
   SectionType,
-  TableOfContents,
 } from 'docx';
 import { saveAs } from 'file-saver';
 import { cleanGeneratedText } from '@/utils/textCleaner';
@@ -695,6 +694,15 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
     pageFormat = '6x9',
   } = options;
 
+  const audit = validateDocxChapters(chapters);
+  if (!audit.valid) {
+    const details = audit.chapters
+      .filter((chapter) => !chapter.valid)
+      .map((chapter) => `Chapitre ${chapter.number} : ${chapter.issues.join(', ')}`)
+      .join(' ; ');
+    throw new Error(`Export bloqué : le manuscrit n'est pas publiable. ${details}`);
+  }
+
   const font = fontFamily;
   const baseSize = fontSize * 2; // half-points
   const titleSize = 72; // 36pt toujours
@@ -762,9 +770,9 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
   }
 
 
-  // ═══ TABLE DES MATIÈRES (toujours générée) ═══
+  // ═══ TABLE DES MATIÈRES ═══
 
-  {
+  if (includeTableOfContents) {
 
     children.push(new Paragraph({
       children: [new TextRun({ text: 'TABLE DES MATIÈRES', bold: true, size: chapterTitleSize, font })],
@@ -826,13 +834,6 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
       }));
     }
 
-    ['Remerciements', "Mot de l’auteur", 'Un dernier mot'].forEach((label) => {
-      children.push(new Paragraph({
-        children: [new TextRun({ text: label, size: baseSize, font })],
-        spacing: { after: 120 },
-      }));
-    });
-
     children.push(new Paragraph({ children: [new PageBreak()] }));
   }
 
@@ -849,37 +850,21 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
   }
 
   // ═══ CHAPITRES ═══
-  renderChapters.forEach(({ chapter, num, displayTitle, body, hasContent }, position) => {
-    // Numéro du chapitre (discret)
+  renderChapters.forEach(({ chapter, num, displayTitle, body }, position) => {
+    // Un seul vrai Heading 1 contient numéro + titre : le sommaire Word reste cohérent.
     children.push(new Paragraph({
-      children: [new TextRun({ text: `CHAPITRE ${num}`, bold: true, size: subTitleSize, font, color: '888888' })],
+      children: [
+        new TextRun({ text: `CHAPITRE ${num}`, bold: true, size: subTitleSize, font, color: '888888' }),
+        new TextRun({ text: `\n${displayTitle.toUpperCase()}`, bold: true, size: chapterTitleSize, font, break: 1 }),
+      ],
       heading: HeadingLevel.HEADING_1,
       alignment: AlignmentType.CENTER,
-      spacing: { before: 800, after: 200 },
+      spacing: { before: 800, after: 600 },
     }));
 
-    // Titre du chapitre — on n'affiche pas un titre générique (évite "CHAPITRE 2" en double)
-    if (!isGenericTitle(displayTitle)) {
-      children.push(new Paragraph({
-        children: [new TextRun({ text: displayTitle.toUpperCase(), bold: true, size: chapterTitleSize, font })],
-        alignment: AlignmentType.CENTER,
-        spacing: { after: 600 },
-      }));
-    } else {
-      children.push(new Paragraph({ spacing: { after: 400 } }));
-    }
-
     // Contenu du chapitre
-    if (hasContent && body && body.trim().length > 0) {
+    if (body && body.trim().length > 0) {
       children.push(...buildContentParagraphs(body, baseSize, font));
-
-    } else {
-      // Chapitre annoncé au sommaire mais non encore rédigé : marqueur discret
-      children.push(new Paragraph({
-        children: [new TextRun({ text: 'Chapitre en cours de rédaction.', italics: true, size: baseSize, font, color: '888888' })],
-        alignment: AlignmentType.CENTER,
-        spacing: { after: 200 },
-      }));
     }
 
 
