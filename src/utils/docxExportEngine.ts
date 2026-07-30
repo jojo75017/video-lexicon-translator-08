@@ -725,18 +725,10 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
   }
 
   // ═══ CHAPITRES ═══
-  chapters.forEach((chapter, index) => {
-    // Filtrer les chapitres vides (titre générique sans contenu réel)
-    const hasAnyContent = (chapter.content && chapter.content.trim().length > 50) ||
-      chapter.subChapters.some(s => s.content && s.content.trim().length > 50);
-    if (!hasAnyContent && /^chapitre\s+\d+$/i.test(chapter.title.trim())) return;
-
-    // Titre + corps résolus (extrait le vrai titre si le champ est générique)
-    const { displayTitle, body } = resolveChapter(chapter, index);
-
+  renderChapters.forEach(({ chapter, num, displayTitle, body }, position) => {
     // Numéro du chapitre (discret)
     children.push(new Paragraph({
-      children: [new TextRun({ text: `CHAPITRE ${index + 1}`, bold: true, size: subTitleSize, font, color: '888888' })],
+      children: [new TextRun({ text: `CHAPITRE ${num}`, bold: true, size: subTitleSize, font, color: '888888' })],
       heading: HeadingLevel.HEADING_1,
       alignment: AlignmentType.CENTER,
       spacing: { before: 800, after: 200 },
@@ -758,35 +750,20 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
       children.push(...buildContentParagraphs(body, baseSize, font));
     }
 
-
     // Sous-chapitres
     chapter.subChapters.forEach((sub, subIdx) => {
-      // Ne pas afficher les sous-chapitres vides (titre seul sans contenu)
-      if (!sub.content || sub.content.trim().length === 0) {
-        // Afficher quand même le titre du sous-chapitre comme repère
-        children.push(new Paragraph({
-        children: [new TextRun({
-          text: `${index + 1}.${subIdx + 1}  ${cleanChapterTitle(sub.title)}`,
-          bold: true,
-          size: subTitleSize,
-          font,
-        })],
-        heading: HeadingLevel.HEADING_2,
-        spacing: { before: 480, after: 120 },
-      }));
+      const subTitle = cleanChapterTitle(sub.title);
+      const subLabel = isGenericTitle(subTitle) ? `${num}.${subIdx + 1}` : `${num}.${subIdx + 1}  ${subTitle}`;
+
+      // Sous-chapitre vide : on saute (pas de "[Contenu à rédiger]" dans un livre vendu)
+      if (!sub.content || sub.content.trim().length === 0) return;
+
+      // Séparateur visuel subtil avant le sous-chapitre
+      children.push(new Paragraph({ spacing: { before: 240 } }));
+
       children.push(new Paragraph({
-        children: [new TextRun({ text: '[Contenu à rédiger]', italics: true, size: baseSize, font, color: 'AAAAAA' })],
-        spacing: { after: 200 },
-      }));
-      return;
-    }
-
-    // Séparateur visuel subtil avant le sous-chapitre
-    children.push(new Paragraph({ spacing: { before: 240 } }));
-
-    children.push(new Paragraph({
-      children: [new TextRun({
-        text: `${index + 1}.${subIdx + 1}  ${cleanChapterTitle(sub.title)}`,
+        children: [new TextRun({
+          text: subLabel,
           bold: true,
           size: subTitleSize,
           font,
@@ -799,10 +776,11 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
     });
 
     // Saut de page entre chapitres
-    if (index < chapters.length - 1) {
+    if (position < renderChapters.length - 1) {
       children.push(new Paragraph({ children: [new PageBreak()] }));
     }
   });
+
 
   // ═══ CONCLUSION ═══
   if (conclusion) {
