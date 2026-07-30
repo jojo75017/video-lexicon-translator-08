@@ -713,13 +713,15 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
   } = options;
 
   const audit = validateDocxChapters(chapters);
-  if (!previewMode && !audit.valid) {
+  if (!audit.valid) {
     const details = audit.chapters
       .filter((chapter) => !chapter.valid)
       .map((chapter) => `Chapitre ${chapter.number} : ${chapter.issues.join(', ')}`)
       .join(' ; ');
-    throw new Error(`Export bloqué : le manuscrit n'est pas publiable. ${details}`);
+    // On n'empêche jamais le téléchargement : le DOCX est généré avec les zones à compléter.
+    console.warn(`[DOCX] Manuscrit incomplet, export généré avec avertissements. ${details}`);
   }
+
 
   const font = fontFamily;
   const baseSize = fontSize * 2; // half-points
