@@ -247,7 +247,7 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module, opts?: { autoRun?:
   const [revisionPasses, setRevisionPasses] = useState(() => readRevisionPasses());
   const [openConfig, setOpenConfig] = useState(() => !readConfig().title.trim());
   const [keysOpen, setKeysOpen] = useState(false);
-  // Onglet d'offre affiché : V3 (197€) ou V4 (347€).
+  // Onglet d'offre affiché : V3 (197€) ou V4 (547€).
   const [activeTier, setActiveTier] = useState<EditionTier>('v3');
 
 
@@ -301,7 +301,7 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module, opts?: { autoRun?:
 
   // Agents de l'onglet actif.
   // V3 (197€) = 22 agents de base uniquement.
-  // V4 (347€) = parcours COMPLET (base + premium), organisé en phases : un vrai
+  // V4 (547€) = parcours COMPLET (base + premium), organisé en phases : un vrai
   // processus supérieur de bout en bout, pas seulement les agents bonus.
   const tierAgents = useMemo(
     () => (activeTier === 'v4' ? EDITION_AGENTS : EDITION_AGENTS.filter((a) => a.tier === 'v3')),
@@ -363,7 +363,7 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module, opts?: { autoRun?:
           Suivez les agents dans l'ordre. Chaque métier fait avancer votre livre d'une étape claire.
         </p>
 
-        {/* Sélecteur d'offre : 197€ (V3) vs 347€ (V4) */}
+        {/* Sélecteur d'offre : 197€ (V3) vs 547€ (V4) */}
         <div className="mt-4 inline-flex rounded-xl p-1 border" style={{ background: '#fff', borderColor: '#eadfc9' }}>
           <button
             onClick={() => setActiveTier('v3')}
@@ -381,7 +381,7 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module, opts?: { autoRun?:
               background: activeTier === 'v4' ? AMBER_DEEP : 'transparent',
               color: activeTier === 'v4' ? '#fff' : '#8a7860',
             }}>
-            V4 · 347€ <span className="opacity-80">({v4Count} agents)</span>
+            V4 · 547€ <span className="opacity-80">({v4Count} agents)</span>
             {!canV4 && <Lock className="h-3 w-3" />}
           </button>
         </div>
@@ -698,7 +698,7 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module, opts?: { autoRun?:
                 )}
                 <h3 className="text-sm font-black uppercase tracking-wide" style={{ color: AMBER_DEEP }}>{group.label}</h3>
                 {isPro && activeTier !== 'v4' && (
-                  <span className="rounded-full px-2 py-0.5 text-[10px] font-bold text-white" style={{ background: AMBER_DEEP }}>V4 · 347€</span>
+                  <span className="rounded-full px-2 py-0.5 text-[10px] font-bold text-white" style={{ background: AMBER_DEEP }}>V4 · 547€</span>
                 )}
                 <span className="ml-auto text-[11px]" style={{ color: '#a18a6c' }}>{deptDone}/{agents.length}</span>
               </div>
@@ -717,7 +717,7 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module, opts?: { autoRun?:
                 {agents.map((agent) => {
                   const isDone = done.has(agent.order);
                   const locked = agent.tier === 'v4' && !canV4;
-                  const tierLabel = agent.tier === 'v4' ? 'V4 · 347€' : 'V3 · 197€';
+                  const tierLabel = agent.tier === 'v4' ? 'V4 · 547€' : 'V3 · 197€';
                   const visibleOrder = tierAgents.findIndex((a) => a.order === agent.order) + 1;
                   return (
                     <div key={agent.order}
@@ -784,7 +784,7 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module, opts?: { autoRun?:
         <div className="border-t px-5 sm:px-7 py-5" style={{ borderColor: '#f0e7d4', background: AMBER_SOFT }}>
           <div className="flex flex-wrap items-center gap-3">
             <div className="min-w-0 flex-1">
-              <div className="text-sm font-black" style={{ color: INK }}>Passez en V4 — 347€ · {V4_AGENT_COUNT} agents</div>
+              <div className="text-sm font-black" style={{ color: INK }}>Passez en V4 — 547€ · {V4_AGENT_COUNT} agents</div>
               <p className="text-[12.5px]" style={{ color: '#6f5e47' }}>
                 Studio A/B/C (titre, 4e, couverture avec version recommandée), Stratège de Positionnement,
                 illustrations, audiobook, traductions + tout le Département Commercial (presse, social, Ads, distribution…).

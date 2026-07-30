@@ -123,7 +123,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
   // Hook pour sauvegarder les résultats P1-P14 globalement
   const { saveStepResult } = useWorkflowResults();
   const { hasFull } = useV3Entitlement();
-  // Le palier « Pro » du workflow couvre le Pack 347 € ET l'abonnement Éditeur 59 €/mois.
+  // Le palier « Pro » du workflow couvre le Pack 547 € ET l'abonnement Éditeur 59 €/mois.
   const { isPro: isEditeurPro } = useProBookTier();
   const proWorkflow = hasFull || isEditeurPro;
   const { saveStepToCloud } = useWorkflowCloudSync();

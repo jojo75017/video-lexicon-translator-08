@@ -18,7 +18,7 @@ const GREEN_FG = '#0b6e4c';
 /**
  * Récapitulatif global des droits V3 :
  * - colonne « Inclus 197€ » (base, livres & ebooks illimités)
- * - colonne « Pack 347€ » (premium : marketing, monétisation, IA avancée, couvertures pro…)
+ * - colonne « Pack 547€ » (premium : marketing, monétisation, IA avancée, couvertures pro…)
  * Chaque module porte un badge de prix + un indicateur « débloqué » selon l'achat réel.
  */
 const V3AccessRecap: React.FC<{ onOpenModule?: (m: V3Module) => void }> = ({ onOpenModule }) => {
@@ -84,7 +84,7 @@ const V3AccessRecap: React.FC<{ onOpenModule?: (m: V3Module) => void }> = ({ onO
           </h2>
           <p className="mt-0.5 text-[12px]" style={{ color: '#8a7860' }}>
             Ce qui est inclus à <strong style={{ color: GREEN_FG }}>197€</strong> vs ce qui demande le{' '}
-            <strong style={{ color: AMBER_DEEP }}>Pack Tout Complet 347€</strong>.
+            <strong style={{ color: AMBER_DEEP }}>Pack Tout Complet 547€</strong>.
             <span className="ml-1">
               {unlockedCount}/{V3_MODULES.length} outils débloqués pour vous.
             </span>
@@ -117,12 +117,12 @@ const V3AccessRecap: React.FC<{ onOpenModule?: (m: V3Module) => void }> = ({ onO
             </ul>
           </div>
 
-          {/* Pack 347€ */}
+          {/* Pack 547€ */}
           <div className="bg-white p-4">
             <div className="mb-3 flex items-center gap-2">
               <Lock className="h-4 w-4" style={{ color: AMBER }} />
               <h3 className="text-sm font-bold" style={{ color: AMBER_DEEP }}>
-                Pack premium — 347€
+                Pack premium — 547€
               </h3>
               <span className="rounded-full px-2 py-0.5 text-[10px] font-bold" style={{ background: AMBER_SOFT, color: AMBER_DEEP }}>
                 {pack.length}

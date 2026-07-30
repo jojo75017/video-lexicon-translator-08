@@ -23,13 +23,13 @@ const LINKS: LaunchLink[] = [
   {
     to: "/commande-v3",
     title: "Page de commande + order bump",
-    desc: "Tunnel de paiement : choix Base 197€ OU Pack Pro 347€, order bump optionnel, Stripe + PayPal.",
+    desc: "Tunnel de paiement : choix Base 197€ OU Pack Pro 547€, order bump optionnel, Stripe + PayPal.",
     icon: ShoppingCart,
   },
   {
     to: "/publication-pro",
     title: "Offre Publication Pro V3",
-    desc: "Présentation de l'offre V3 avec les deux paliers (Base 197€ / Pack Pro 347€).",
+    desc: "Présentation de l'offre V3 avec les deux paliers (Base 197€ / Pack Pro 547€).",
     icon: Tag,
   },
   {

@@ -1,5 +1,5 @@
 // V3 Pack Tout Complet — checkout embarqué via la gateway Lovable Payments.
-// Formules : 1×347€ (paiement unique) / 3×119€ / 4×89€ (échéancier mensuel).
+// Formules : 1×547€ (paiement unique) / 3×189€ / 4×144€ (échéancier mensuel).
 // Les échéances sont gérées via un abonnement Stripe mensuel ; le webhook
 // `payments-webhook` annule l'abonnement et bascule en accès à vie une fois
 // toutes les échéances payées (voir métadonnées installments_total).
@@ -25,7 +25,7 @@ const PLANS: Record<
   string,
   { label: string; total: number; installments: number; monthly: number }
 > = {
-  full_1x: { label: "Pack Pro Vendeur V3 — paiement unique", total: 34700, installments: 1, monthly: 34700 },
+  full_1x: { label: "Pack Pro Vendeur V3 — paiement unique", total: 54700, installments: 1, monthly: 54700 },
   full_3x: { label: "Pack Pro Vendeur V3 — 3× sans frais", total: 35700, installments: 3, monthly: 11900 },
   full_4x: { label: "Pack Pro Vendeur V3 — 4× sans frais", total: 35600, installments: 4, monthly: 8900 },
   base_1x: { label: "Base Création & Publication V3 — paiement unique", total: 19700, installments: 1, monthly: 19700 },
@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
 
     let sessionParams: Record<string, any>;
     if (planDef.installments === 1) {
-      // Paiement unique 347€.
+      // Paiement unique 547€.
       sessionParams = {
         mode: "payment",
         ui_mode: "embedded",

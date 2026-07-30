@@ -37,7 +37,7 @@ export const V3_OFFERS: V3Offer[] = [
   {
     key: 'v3-pro',
     name: 'V4 — Maison d\'Édition (30 agents)',
-    price: V3_FULL_PACK.price, // 347
+    price: V3_FULL_PACK.price, // 547
     compareAt: V3_FULL_PACK.compareAt,
     installments: V3_FULL_PACK.installments,
     tagline: 'Tout pour écrire, publier ET vendre : les 100 modules débloqués.',

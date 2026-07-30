@@ -14,7 +14,7 @@ export function V3OrderPageModule() {
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <p className="text-sm text-muted-foreground flex items-center gap-2">
           <ShoppingCart className="w-4 h-4" style={{ color: AMBER_DEEP }} />
-          Tunnel de commande live : choix Base 197€ / Pack Pro 347€ + order bump optionnel.
+          Tunnel de commande live : choix Base 197€ / Pack Pro 547€ + order bump optionnel.
         </p>
         <Link to="/commande-v3" target="_blank">
           <Button variant="outline" size="sm" className="gap-2">
@@ -52,7 +52,7 @@ export function V3SalesPageModule() {
       <ul className="text-sm grid gap-1.5 list-disc pl-5 text-muted-foreground">
         <li>Hero accrocheur + double CTA</li>
         <li>Preuves chiffrées réelles du marché KDP</li>
-        <li>Bloc VALEUR « Voici ce que vous obtenez » — Base 197€ OU Pack Pro 347€ (OU exclusif)</li>
+        <li>Bloc VALEUR « Voici ce que vous obtenez » — Base 197€ OU Pack Pro 547€ (OU exclusif)</li>
         <li>Bonus de lancement, garantie 7 jours, compte à rebours et FAQ</li>
       </ul>
     </div>

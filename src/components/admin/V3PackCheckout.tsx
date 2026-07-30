@@ -15,9 +15,9 @@ const PLANS_BY_PRODUCT: Record<Product, { title: string; options: { id: PlanId; 
   full: {
     title: 'Pack Pro Vendeur V3',
     options: [
-      { id: 'full_1x', label: '1 × 347€', sub: 'Paiement unique · le plus économique' },
-      { id: 'full_3x', label: '3 × 119€', sub: 'Échéancier mensuel (357€)' },
-      { id: 'full_4x', label: '4 × 89€', sub: 'Petit budget (356€)' },
+      { id: 'full_1x', label: '1 × 547€', sub: 'Paiement unique · le plus économique' },
+      { id: 'full_3x', label: '3 × 189€', sub: 'Échéancier mensuel (357€)' },
+      { id: 'full_4x', label: '4 × 144€', sub: 'Petit budget (356€)' },
     ],
   },
   base: {

@@ -7,11 +7,11 @@ import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
  * Droits d'accès V3 d'après les commandes réellement payées (v3_installment_orders).
  *
  * - `hasBase`  : a réglé l'offre Base 197€ (plan `base_*`, statut actif/terminé/payé).
- * - `hasFull`  : a réglé le Pack Tout Complet 347€ (plan `full_*`, statut actif/terminé/payé).
+ * - `hasFull`  : a réglé le Pack Tout Complet 547€ (plan `full_*`, statut actif/terminé/payé).
  * - L'admin a accès à tout (préparation / démonstration).
  *
- * Tant que rien n'est réglé, le parcours Pro 347€ reste verrouillé : impossible
- * de "commencer à 347€" sans paiement.
+ * Tant que rien n'est réglé, le parcours Pro 547€ reste verrouillé : impossible
+ * de "commencer à 547€" sans paiement.
  */
 const PAID_STATUSES = new Set(['active', 'completed', 'paid']);
 

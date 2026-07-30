@@ -54,7 +54,7 @@ interface Step {
   moduleId: string;
   label?: string;
   hint: string;
-  /** 'core' = parcours 197€ ; 'premium' = réservé au parcours 347€ (livre + marketing enrichis). */
+  /** 'core' = parcours 197€ ; 'premium' = réservé au parcours 547€ (livre + marketing enrichis). */
   tier?: Tier;
 }
 interface Phase {
@@ -71,7 +71,7 @@ interface Phase {
  *   - Les phases « core » (197€) viennent EN PREMIER. Un acheteur 197€ déroule
  *     tout le parcours « idée → publié → lancé » sans jamais croiser une étape
  *     verrouillée au milieu de son travail.
- *   - Toutes les étapes Pro (347€) sont regroupées dans les phases FINALES
+ *   - Toutes les étapes Pro (547€) sont regroupées dans les phases FINALES
  *     (« Aller plus loin »), présentées comme un bonus marketing & scaling.
  */
 const PHASES: Phase[] = [
@@ -167,9 +167,9 @@ const PHASES: Phase[] = [
     ],
   },
 
-  // ============ PRO (347€) — exclusif, verrouillé pour le 197€ (aperçu) ============
+  // ============ PRO (547€) — exclusif, verrouillé pour le 197€ (aperçu) ============
   {
-    key: 'fiche-avis', emoji: '💰', title: 'Phase 12 — Fiche qui convertit & premiers avis (Pack Pro · 347€)',
+    key: 'fiche-avis', emoji: '💰', title: 'Phase 12 — Fiche qui convertit & premiers avis (Pack Pro · 547€)',
     steps: [
       { moduleId: 'sales-description', label: 'Écrire la description vendeuse', hint: 'Une fiche produit qui convertit vraiment.', tier: 'premium' },
       { moduleId: 'review-generation', label: 'Obtenir les premiers avis', hint: 'Plan ARC & bêta-lecteurs pour lancer les avis.', tier: 'premium' },
@@ -177,7 +177,7 @@ const PHASES: Phase[] = [
     ],
   },
   {
-    key: 'piloter-ventes', emoji: '📈', title: 'Phase 13 — Piloter & optimiser les ventes (Pack Pro · 347€)',
+    key: 'piloter-ventes', emoji: '📈', title: 'Phase 13 — Piloter & optimiser les ventes (Pack Pro · 547€)',
     steps: [
       { moduleId: 'sales-tracker', label: 'Suivre les ventes', hint: 'Plan de pilotage des ventes et royalties.', tier: 'premium' },
       { moduleId: 'pricing-ads-pro', label: 'Optimiser prix & pubs', hint: 'Optimisation avancée du prix et des campagnes Amazon Ads.', tier: 'premium' },
@@ -185,7 +185,7 @@ const PHASES: Phase[] = [
     ],
   },
   {
-    key: 'etendre-audience', emoji: '🌍', title: 'Phase 14 — Étendre l\'audience (Pack Pro · 347€)',
+    key: 'etendre-audience', emoji: '🌍', title: 'Phase 14 — Étendre l\'audience (Pack Pro · 547€)',
     steps: [
       { moduleId: 'email-sequence-auteur', label: 'Bâtir la séquence email', hint: 'Séquence d\'auteur pour vendre en direct à ta liste.', tier: 'premium' },
       { moduleId: 'social-launch-kit', label: 'Créer le kit réseaux sociaux', hint: 'Posts prêts à publier pour le lancement.', tier: 'premium' },
@@ -193,7 +193,7 @@ const PHASES: Phase[] = [
     ],
   },
   {
-    key: 'catalogue', emoji: '📚', title: 'Phase 15 — Développer le catalogue (Pack Pro · 347€)',
+    key: 'catalogue', emoji: '📚', title: 'Phase 15 — Développer le catalogue (Pack Pro · 547€)',
     steps: [
       { moduleId: 'p17-series', label: 'Architecturer la série', hint: 'Planifie les tomes si c\'est une saga.', tier: 'premium' },
       { moduleId: 'bundle-boxset', label: 'Créer un coffret / box set', hint: 'Assemble tes tomes en offre groupée rentable.', tier: 'premium' },
@@ -201,7 +201,7 @@ const PHASES: Phase[] = [
     ],
   },
   {
-    key: 'decliner', emoji: '🎧', title: 'Phase 16 — Décliner & rayonner (Pack Pro · 347€)',
+    key: 'decliner', emoji: '🎧', title: 'Phase 16 — Décliner & rayonner (Pack Pro · 547€)',
     steps: [
       { moduleId: 'audiobook-plan', label: 'Planifier l\'audiobook', hint: 'Plan de production de la version audio.', tier: 'premium' },
       { moduleId: 'translation-strategy', label: 'Ouvrir les marchés étrangers', hint: 'Stratégie de traduction & marchés internationaux.', tier: 'premium' },
@@ -219,7 +219,7 @@ interface FlatStep extends Step {
 
 type Parcours = 'core' | 'full';
 
-/** Construit la liste plate d'étapes pour un parcours donné (197€ = core, 347€ = full). */
+/** Construit la liste plate d'étapes pour un parcours donné (197€ = core, 547€ = full). */
 const buildFlat = (parcours: Parcours): FlatStep[] =>
   PHASES.flatMap((p) =>
     p.steps
@@ -228,8 +228,8 @@ const buildFlat = (parcours: Parcours): FlatStep[] =>
   ).map((s, i) => ({ ...s, globalIndex: i }));
 
 const CORE_TOTAL = buildFlat('core').length; // 197€
-const FULL_TOTAL = buildFlat('full').length; // 347€ (livre + marketing enrichis)
-const PREMIUM_TOTAL = FULL_TOTAL - CORE_TOTAL; // étapes exclusives Pack Pro 347€
+const FULL_TOTAL = buildFlat('full').length; // 547€ (livre + marketing enrichis)
+const PREMIUM_TOTAL = FULL_TOTAL - CORE_TOTAL; // étapes exclusives Pack Pro 547€
 const PARCOURS_KEY = 'v3_workflow30_parcours';
 
 function loadSet(key: string): Set<string> {
@@ -367,20 +367,20 @@ const ResultView: React.FC<{ text: string; stepId?: string }> = ({ text, stepId 
 
 const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpenModule }) => {
   const { apiKey: userGeminiKey } = useOpenAIConfig();
-  // Droits réellement payés (197€ base / 347€ Pack Tout Complet). L'admin a tout.
+  // Droits réellement payés (197€ base / 547€ Pack Tout Complet). L'admin a tout.
   const { hasFull, loading: entLoading } = useV3Entitlement();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
-  // Parcours actif : 'core' = offre 197€ (29 étapes), 'full' = Pack Tout Complet 347€ (45 étapes).
+  // Parcours actif : 'core' = offre 197€ (29 étapes), 'full' = Pack Tout Complet 547€ (45 étapes).
   const [parcours, setParcours] = useState<Parcours>(
     () => ((localStorage.getItem(PARCOURS_KEY) as Parcours) === 'full' ? 'full' : 'core'),
   );
-  // Garde-fou : tant que le Pack 347€ n'est pas réglé, on ne peut pas démarrer en Pro.
+  // Garde-fou : tant que le Pack 547€ n'est pas réglé, on ne peut pas démarrer en Pro.
   useEffect(() => {
     if (!entLoading && parcours === 'full' && !hasFull) setParcours('core');
   }, [entLoading, parcours, hasFull]);
   useEffect(() => { localStorage.setItem(PARCOURS_KEY, parcours); }, [parcours]);
   // On affiche TOUJOURS la liste complète (32 étapes). Les étapes premium non débloquées
-  // restent visibles en « teaser » verrouillé pour donner envie de passer au Pack 347€.
+  // restent visibles en « teaser » verrouillé pour donner envie de passer au Pack 547€.
   const FLAT = useMemo(() => buildFlat('full'), []);
   const fullMode = parcours === 'full' && hasFull;
   const isAccessible = (s: FlatStep) => (s.tier ?? 'core') !== 'premium' || fullMode;
@@ -664,7 +664,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
         priorOutputs,
         provider,
         model: currentModel,
-        // Palier de qualité IA : 'pro' (347€) = sorties plus longues + variantes ; 'core' (197€) = qualité enrichie.
+        // Palier de qualité IA : 'pro' (547€) = sorties plus longues + variantes ; 'core' (197€) = qualité enrichie.
         quality: fullMode ? 'pro' : 'core',
         userApiKey: provider === 'gemini' ? effectiveKey : customKey.trim(),
       };
@@ -939,10 +939,10 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 </div>
                 <p className="mt-1 text-[12px]" style={{ color: '#6f5e47' }}>
                   {parcours === 'full'
-                    ? `Pack Tout Complet 347€ : un livre de meilleure qualité (édition structurelle, copy-editing, comité de lecture, label qualité, couverture signature) PUIS lancé et vendu (emails, annonces, suivi des ventes, audio…), avec une IA au niveau maximal (sorties plus longues, variantes A/B). ${PREMIUM_TOTAL} étapes exclusives en plus.`
+                    ? `Pack Tout Complet 547€ : un livre de meilleure qualité (édition structurelle, copy-editing, comité de lecture, label qualité, couverture signature) PUIS lancé et vendu (emails, annonces, suivi des ventes, audio…), avec une IA au niveau maximal (sorties plus longues, variantes A/B). ${PREMIUM_TOTAL} étapes exclusives en plus.`
                     : hasFull
-                      ? `Offre 197€ : ${CORE_TOTAL} agents pour aller de l'idée jusqu'à publier ton livre. Le Pack 347€ ajoute ${PREMIUM_TOTAL} étapes exclusives : un livre plus abouti (édition pro, comité de lecture, couverture signature) + tout le marketing & la vente. Tu peux basculer en Pro à tout moment.`
-                      : `Offre 197€ : ${CORE_TOTAL} agents pour aller de l'idée jusqu'à publier ton livre. Le Pack 347€ débloque ${PREMIUM_TOTAL} étapes exclusives : édition structurelle, copy-editing, comité de lecture, label qualité, couverture signature Pro, puis toute la partie marketing & ventes.`}
+                      ? `Offre 197€ : ${CORE_TOTAL} agents pour aller de l'idée jusqu'à publier ton livre. Le Pack 547€ ajoute ${PREMIUM_TOTAL} étapes exclusives : un livre plus abouti (édition pro, comité de lecture, couverture signature) + tout le marketing & la vente. Tu peux basculer en Pro à tout moment.`
+                      : `Offre 197€ : ${CORE_TOTAL} agents pour aller de l'idée jusqu'à publier ton livre. Le Pack 547€ débloque ${PREMIUM_TOTAL} étapes exclusives : édition structurelle, copy-editing, comité de lecture, label qualité, couverture signature Pro, puis toute la partie marketing & ventes.`}
                 </p>
               </div>
               <div className="inline-flex rounded-xl border overflow-hidden" style={{ borderColor: `${AMBER}55` }}>
@@ -959,7 +959,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                   style={parcours === 'full'
                     ? { background: `linear-gradient(90deg, ${GREEN}, #2fc488)`, color: '#fff' }
                     : { background: '#fff', color: GREEN }}>
-                  {!hasFull && <Lock className="h-3 w-3" />} Pro · 347€
+                  {!hasFull && <Lock className="h-3 w-3" />} Pro · 547€
                 </button>
               </div>
             </div>
@@ -974,12 +974,12 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                 <div className="mt-3 flex flex-wrap items-center gap-2">
                   <span className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-[12px] font-semibold border"
                     style={{ borderColor: `${AMBER}55`, color: AMBER_DEEP, background: '#fff' }}>
-                    <Lock className="h-3.5 w-3.5" /> Parcours Pro verrouillé — réservé au Pack Tout Complet 347€
+                    <Lock className="h-3.5 w-3.5" /> Parcours Pro verrouillé — réservé au Pack Tout Complet 547€
                   </span>
                   <button onClick={() => setCheckoutOpen(true)}
                     className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5"
                     style={{ background: `linear-gradient(90deg, ${GREEN}, #2fc488)` }}>
-                    <Sparkles className="h-3.5 w-3.5" /> Débloquer les 15 étapes Pro avancées (347€)
+                    <Sparkles className="h-3.5 w-3.5" /> Débloquer les 15 étapes Pro avancées (547€)
                   </button>
                 </div>
               )
@@ -1417,7 +1417,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                                 {isTeaser && (
                                   <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold border"
                                     style={{ borderColor: `${GREEN}66`, color: GREEN, background: '#eafaf2' }}>
-                                    <Lock className="h-2.5 w-2.5" /> Pro · 347€
+                                    <Lock className="h-2.5 w-2.5" /> Pro · 547€
                                   </span>
                                 )}
                               </div>
@@ -1427,8 +1427,8 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                               {isTeaser && (
                                 <div className="mt-2 rounded-xl border p-3" style={{ borderColor: `${GREEN}33`, background: '#f6fdf9' }}>
                                   <p className="text-[11px] leading-snug" style={{ color: '#4a6a59' }}>
-                                    🔒 Étape exclusive au <strong>Pack Tout Complet 347€</strong> ({PREMIUM_TOTAL} étapes en plus).
-                                    Le 347€ produit un <strong>livre de meilleure qualité</strong> (édition structurelle, copy-editing,
+                                    🔒 Étape exclusive au <strong>Pack Tout Complet 547€</strong> ({PREMIUM_TOTAL} étapes en plus).
+                                    Le 547€ produit un <strong>livre de meilleure qualité</strong> (édition structurelle, copy-editing,
                                     comité de lecture, label qualité, <strong>couverture signature Pro</strong>) PUIS le lance et le vend
                                     (description vendeuse, avis, séquences email, tunnel, série, audiobook, traduction…) — le tout avec une IA
                                     au niveau maximal (sorties plus longues, variantes A/B).
@@ -1436,7 +1436,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                                   <button onClick={() => setCheckoutOpen(true)}
                                     className="mt-2 inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5"
                                     style={{ background: `linear-gradient(90deg, ${GREEN}, #2fc488)` }}>
-                                    <Sparkles className="h-3.5 w-3.5" /> Débloquer avec le Pack Tout Complet (347€)
+                                    <Sparkles className="h-3.5 w-3.5" /> Débloquer avec le Pack Tout Complet (547€)
                                   </button>
                                 </div>
                               )}
@@ -1615,14 +1615,14 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
             style={{ borderColor: `${GREEN}40`, background: '#f6fdf9' }}>
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold text-white" style={{ background: GREEN }}>
-                <Lock className="h-3.5 w-3.5" /> Réservé au Pack Tout Complet 347€
+                <Lock className="h-3.5 w-3.5" /> Réservé au Pack Tout Complet 547€
               </span>
               <span className="text-[12px] font-semibold" style={{ color: '#3f6a55' }}>
                 {PREMIUM_TOTAL} étapes exclusives en plus — un meilleur livre + tout le marketing
               </span>
             </div>
             <p className="text-[12px] leading-snug mb-3" style={{ color: '#4a6a59' }}>
-              Le Pack 347€ ne fait pas que « vendre » : il produit d'abord un <strong>livre de meilleure qualité</strong>
+              Le Pack 547€ ne fait pas que « vendre » : il produit d'abord un <strong>livre de meilleure qualité</strong>
               (édition structurelle, copy-editing, comité de lecture, label qualité et une <strong>couverture signature Pro</strong>),
               puis il le lance et le fait grandir. Voici ce que tu débloques :
             </p>
@@ -1658,7 +1658,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
                   <span className="text-base leading-none mt-0.5">{p.emoji}</span>
                   <div className="min-w-0">
                     <div className="text-[12px] font-bold leading-tight" style={{ color: INK }}>
-                      {p.title.replace(/^Phase \d+ — /, '').replace(/ \(Pack Pro · 347€\)$/, '')}
+                      {p.title.replace(/^Phase \d+ — /, '').replace(/ \(Pack Pro · 547€\)$/, '')}
                     </div>
                     <div className="text-[11px] leading-snug mt-0.5" style={{ color: '#8a7860' }}>
                       {p.steps.map((s) => s.label).join(' · ')}
@@ -1671,7 +1671,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
               <button onClick={() => setCheckoutOpen(true)}
                 className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-[13px] font-bold text-white transition-transform hover:-translate-y-0.5"
                 style={{ background: `linear-gradient(90deg, ${GREEN}, #2fc488)` }}>
-                <Sparkles className="h-4 w-4" /> Débloquer les {PREMIUM_TOTAL} étapes Pro (Pack Tout Complet · 347€)
+                <Sparkles className="h-4 w-4" /> Débloquer les {PREMIUM_TOTAL} étapes Pro (Pack Tout Complet · 547€)
               </button>
             )}
           </div>

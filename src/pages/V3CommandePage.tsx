@@ -16,7 +16,7 @@ const V3CommandePage = () => {
     <div style={{ background: CREAM, color: INK }} className="min-h-screen py-8 px-4">
       <SeoHead
         title="Commande — Publication Assistée Pro V3"
-        description="Finalisez votre commande V3 : choisissez l'offre Base 197€ ou le Pack Pro 347€. Paiement carte sécurisé ou PayPal."
+        description="Finalisez votre commande V3 : choisissez l'offre Base 197€ ou le Pack Pro 547€. Paiement carte sécurisé ou PayPal."
         canonical="https://www.ebookstudio.fr/commande-v3"
         noindex
       />

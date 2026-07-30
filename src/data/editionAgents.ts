@@ -2,7 +2,7 @@
 //
 // Deux offres :
 //   - V3 (197€) : les 22 agents « tier: v3 » — de l'idée au livre publié sur KDP.
-//   - V4 (347€) : les 30 agents « tier: v4 » — exclusifs au pack premium.
+//   - V4 (547€) : les 30 agents « tier: v4 » — exclusifs au pack premium.
 //
 // Chaque agent est branché sur un module déjà présent dans le projet
 // (voir src/components/admin/v3ModuleRegistry.tsx → V3_MODULE_COMPONENTS).
