@@ -102,7 +102,7 @@ Deno.serve(async (req) => {
       // Paiement unique 547€.
       sessionParams = {
         mode: "payment",
-        ui_mode: "embedded",
+        ui_mode: "embedded_page",
         customer: customerId,
         return_url: returnUrl,
         line_items: [{
@@ -121,7 +121,7 @@ Deno.serve(async (req) => {
       // Échéancier : abonnement mensuel limité à N prélèvements (annulé par le webhook).
       sessionParams = {
         mode: "subscription",
-        ui_mode: "embedded",
+        ui_mode: "embedded_page",
         customer: customerId,
         return_url: returnUrl,
         line_items: [{
