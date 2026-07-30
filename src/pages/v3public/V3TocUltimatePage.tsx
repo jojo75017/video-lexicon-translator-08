@@ -1,8 +1,12 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Sparkles } from 'lucide-react';
-import TocUltimateGenerator from '@/components/tools/TocUltimateGenerator';
+import { toast } from 'sonner';
+import TocUltimateGenerator, { type UltimateTocChapter } from '@/components/tools/TocUltimateGenerator';
+import { sendTocToWorkflow } from '@/lib/v3/bookBrief';
 
 export default function V3TocUltimatePage() {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen" style={{ background: 'var(--v3-paper, #fafafa)' }}>
       <div className="max-w-6xl mx-auto px-4 md:px-8 py-8">
@@ -21,12 +25,24 @@ export default function V3TocUltimatePage() {
             Générateur Ultime de<br/>Table des Matières
           </h1>
           <p className="mt-3 max-w-2xl text-base text-gray-600">
-            Bâtissez un sommaire professionnel en quelques secondes. Genre, public, style, créativité — tout est modulable, puis éditable ligne par ligne et exportable.
+            Bâtissez un sommaire professionnel en quelques secondes. Genre, public, style, créativité — tout est modulable,
+            puis éditable ligne par ligne, exportable, et surtout <strong>injectable directement dans le workflow</strong> de rédaction.
           </p>
         </header>
 
         <div className="rounded-2xl border border-black/5 bg-white p-6 shadow-sm">
-          <TocUltimateGenerator />
+          <TocUltimateGenerator
+            applyLabel="Envoyer vers le workflow"
+            onApply={(chapters: UltimateTocChapter[], meta) => {
+              const ok = sendTocToWorkflow(chapters, { theme: meta.theme, genre: meta.genre, description: meta.description });
+              if (!ok) {
+                toast.error('Impossible d’enregistrer le sommaire sur cet appareil.');
+                return;
+              }
+              toast.success(`Sommaire de ${chapters.length} chapitres envoyé au workflow ✓`);
+              navigate('/v3/create?toc=ultime');
+            }}
+          />
         </div>
       </div>
     </div>
