@@ -48,7 +48,10 @@ describe('export DOCX', () => {
       .filter(Boolean)
       .map((m) => Number(m![1]));
     const unique = [...new Set(nums)].sort((a, b) => a - b);
-    expect(unique).toEqual([1, 2, 3]); // 5 chapitres bruts -> 3 valides
+    // Chapitre vide sans titre exclu ; chapitre titré mais non rédigé conservé au sommaire
+    expect(unique).toEqual([1, 2, 3, 4]);
+    expect(joined).toMatch(/Chapitre en cours de rédaction/);
+
     // Aucun titre résiduel de type "2,"
     const tocEntries = all.filter((t) => /^Chapitre\s+\d/.test(t));
     for (const e of tocEntries) expect(e).not.toMatch(/–\s*\d+[,.]?$/);

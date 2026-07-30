@@ -337,12 +337,20 @@ function prepareRenderableChapters(chapters: DocxChapter[]) {
       const validSubChapters = (chapter.subChapters || []).filter((sub) => meaningfulText(sub.content).length > 0);
       return { chapter: { ...chapter, subChapters: validSubChapters }, ...resolved };
     })
-    .filter(({ body, chapter }) => {
-      const subContent = chapter.subChapters.reduce((total, sub) => total + meaningfulText(sub.content).length, 0);
-      return meaningfulText(body).length > 0 || subContent > 0;
+    .map((entry) => {
+      const subContent = entry.chapter.subChapters.reduce(
+        (total, sub) => total + meaningfulText(sub.content).length,
+        0,
+      );
+      const hasContent = meaningfulText(entry.body).length > 0 || subContent > 0;
+      // Un chapitre sans texte mais avec un vrai titre reste au sommaire (contenu partiel).
+      const hasRealTitle = !isGenericTitle(entry.displayTitle);
+      return { ...entry, hasContent, keep: hasContent || hasRealTitle, isStub: !hasContent };
     })
+    .filter((entry) => entry.keep)
     .map((entry, index) => ({ ...entry, num: index + 1 }));
 }
+
 
 export function getDocxOutline(chapters: DocxChapter[]): DocxOutlineEntry[] {
   return prepareRenderableChapters(chapters).map(({ chapter, num, displayTitle }) => ({
@@ -699,9 +707,10 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
   }
 
 
-  // ═══ TABLE DES MATIÈRES ═══
+  // ═══ TABLE DES MATIÈRES (toujours générée) ═══
 
-  if (includeTableOfContents) {
+  {
+
     children.push(new Paragraph({
       children: [new TextRun({ text: 'TABLE DES MATIÈRES', bold: true, size: chapterTitleSize, font })],
       heading: HeadingLevel.HEADING_1,
@@ -785,7 +794,7 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
   }
 
   // ═══ CHAPITRES ═══
-  renderChapters.forEach(({ chapter, num, displayTitle, body }, position) => {
+  renderChapters.forEach(({ chapter, num, displayTitle, body, hasContent }, position) => {
     // Numéro du chapitre (discret)
     children.push(new Paragraph({
       children: [new TextRun({ text: `CHAPITRE ${num}`, bold: true, size: subTitleSize, font, color: '888888' })],
@@ -806,9 +815,18 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
     }
 
     // Contenu du chapitre
-    if (body && body.trim().length > 0) {
+    if (hasContent && body && body.trim().length > 0) {
       children.push(...buildContentParagraphs(body, baseSize, font));
+
+    } else {
+      // Chapitre annoncé au sommaire mais non encore rédigé : marqueur discret
+      children.push(new Paragraph({
+        children: [new TextRun({ text: 'Chapitre en cours de rédaction.', italics: true, size: baseSize, font, color: '888888' })],
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 200 },
+      }));
     }
+
 
     // Sous-chapitres
     (chapter.subChapters || []).forEach((sub, subIdx) => {
