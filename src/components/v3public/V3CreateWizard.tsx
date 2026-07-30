@@ -1218,11 +1218,11 @@ Règles :
       {step === 0 && (
         <div className="space-y-5">
           <div>
-            <h2 className="v3-serif text-4xl font-bold" style={{ color: 'var(--v3-ink)' }}>Page principale</h2>
-            <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>Commence par le titre du projet et une description d’environ 150 mots.</p>
+            <h2 className="v3-serif text-4xl font-bold" style={{ color: 'var(--v3-ink)' }}>Fiche du livre</h2>
+            <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>Titre, sous-titre, catégorie KDP, auteur et synopsis : c’est la base que suivront les agents.</p>
           </div>
           <label className="block space-y-2">
-            <span className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>Titre de départ</span>
+            <span className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>Titre du livre</span>
             <input
               value={title}
               onChange={(event) => { setTitle(event.target.value); if (!finalTitle.trim()) setFinalTitle(event.target.value); }}
@@ -1232,8 +1232,52 @@ Règles :
             />
           </label>
           <label className="block space-y-2">
+            <span className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>Sous-titre <span className="font-normal" style={{ color: 'var(--v3-muted)' }}>(optionnel)</span></span>
+            <input
+              value={subtitle}
+              onChange={(event) => setSubtitle(event.target.value)}
+              placeholder="Ex : la méthode pas à pas pour publier sur Amazon KDP en 30 jours"
+              className="w-full rounded-2xl border px-4 py-3 outline-none"
+              style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+            />
+          </label>
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="block space-y-2">
+              <span className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>Catégorie ({CATEGORIES.length} disponibles)</span>
+              <select
+                value={category}
+                onChange={(event) => setCategory(event.target.value)}
+                size={8}
+                className="w-full rounded-2xl border px-3 py-2 text-sm outline-none"
+                style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+              >
+                {CATEGORIES.map((item) => <option key={item} value={item}>{item}</option>)}
+              </select>
+              <span className="block text-xs" style={{ color: 'var(--v3-muted)' }}>Sélection : <strong>{category === 'Autre' ? (customCategory || 'Autre') : category}</strong></span>
+            </label>
+            <label className="block space-y-2">
+              <span className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>Nom de l’auteur</span>
+              <input
+                value={authorName}
+                onChange={(event) => setAuthorName(event.target.value)}
+                placeholder="Ex : Nanakia"
+                className="w-full rounded-2xl border px-4 py-3 outline-none"
+                style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+              />
+              {category === 'Autre' && (
+                <input
+                  value={customCategory}
+                  onChange={(event) => setCustomCategory(event.target.value)}
+                  placeholder="Précise ta catégorie"
+                  className="mt-2 w-full rounded-2xl border px-4 py-3 outline-none"
+                  style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+                />
+              )}
+            </label>
+          </div>
+          <label className="block space-y-2">
             <span className="flex items-center justify-between gap-3 text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>
-              Description du livre
+              Synopsis du livre
               <span className="text-xs font-semibold" style={{ color: descriptionWords >= 120 ? 'var(--v3-orange-600)' : 'var(--v3-muted)' }}>{descriptionWords} / 150 mots</span>
             </span>
             <textarea
@@ -1245,8 +1289,32 @@ Règles :
               style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
             />
           </label>
+          <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-orange-600)', background: 'var(--v3-orange-50)' }}>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="v3-serif text-lg font-bold" style={{ color: 'var(--v3-ink)' }}>Auto-remplir Cible &amp; Promesse</h3>
+                <p className="text-xs" style={{ color: 'var(--v3-muted)' }}>L’IA déduit le lecteur idéal, ses frustrations et la promesse centrale à partir du synopsis.</p>
+              </div>
+              <button
+                type="button"
+                onClick={handleAutofillTargetPromise}
+                disabled={autofillLoading}
+                className="inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-bold disabled:opacity-60"
+                style={{ background: 'var(--v3-orange-600)', color: '#fff' }}
+              >
+                {autofillLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+                Auto-remplir
+              </button>
+            </div>
+            {promesseCentrale.trim() && (
+              <p className="mt-3 rounded-xl border bg-white px-3 py-2 text-xs" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)' }}>
+                ✨ {promesseCentrale}
+              </p>
+            )}
+          </div>
         </div>
       )}
+
 
       {step === 1 && (
         <div className="space-y-6">
