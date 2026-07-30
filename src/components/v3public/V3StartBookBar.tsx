@@ -151,7 +151,67 @@ export default function V3StartBookBar() {
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         )}
+
+        {history.length > 0 && (
+          <div className="mt-6 pt-5 border-t" style={{ borderColor: 'rgba(6,78,59,0.12)' }}>
+            <div className="flex items-center justify-between gap-3">
+              <span className="inline-flex items-center gap-2 text-[13px] font-bold" style={{ color: 'var(--v3-ink)' }}>
+                <History className="w-4 h-4" /> Historique des titres ({history.length})
+              </span>
+              <button
+                type="button"
+                onClick={() => { setHistory(clearTitleHistory()); toast.success('Historique vidé'); }}
+                className="text-[12px] font-semibold underline"
+                style={{ color: '#b23b3b' }}
+              >
+                Tout effacer
+              </button>
+            </div>
+
+            <ul className="mt-3 flex flex-col gap-2">
+              {history.map((entry) => (
+                <li
+                  key={entry.title}
+                  className="flex items-center gap-2 rounded-xl border px-3 py-2"
+                  style={{ borderColor: 'rgba(201,168,76,0.4)', background: '#fff' }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => restore(entry)}
+                    className="flex-1 text-left"
+                    title="Restaurer ce titre"
+                  >
+                    <span className="v3-serif text-[14px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+                      {entry.title}
+                    </span>
+                    <span className="block text-[11.5px]" style={{ color: 'var(--v3-muted)' }}>
+                      Sauvegardé le {new Date(entry.savedAt).toLocaleString('fr-FR')}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => restore(entry)}
+                    className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[12px] font-semibold"
+                    style={{ borderColor: 'rgba(6,78,59,0.3)', color: 'var(--v3-emerald)' }}
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" /> Restaurer
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setHistory(removeTitleFromHistory(entry.title)); }}
+                    aria-label={`Retirer ${entry.title} de l'historique`}
+                    className="rounded-lg p-1.5"
+                    style={{ color: '#b23b3b' }}
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </section>
   );
 }
+
