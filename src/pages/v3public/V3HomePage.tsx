@@ -124,9 +124,10 @@ export default function V3HomePage() {
           width={1920}
           height={640}
           className="absolute inset-0 h-full w-full object-cover"
-          style={{ filter: 'brightness(1.12) saturate(1.05)' }}
+          style={{ filter: 'brightness(1.32) saturate(1.06)' }}
         />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(5,62,47,0.55) 0%, rgba(5,62,47,0.35) 45%, rgba(5,62,47,0.75) 100%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(5,62,47,0.28) 0%, rgba(5,62,47,0.14) 45%, rgba(5,62,47,0.48) 100%)' }} />
+
         <div className="absolute inset-x-0 top-0 h-[3px]" style={{ background: 'linear-gradient(90deg, transparent, var(--v3-gold), transparent)' }} />
 
         <div className="relative max-w-5xl mx-auto px-5 md:px-8 py-16 md:py-24 text-center min-h-[420px] md:min-h-[520px] flex flex-col items-center justify-center">
@@ -146,6 +147,22 @@ export default function V3HomePage() {
             Un atelier éditorial complet : de l'idée à la couverture, du sommaire à la publication Amazon KDP.
             Trente agents IA au service de votre livre.
           </p>
+
+          {/* Accès rapide clé IA depuis le bandeau */}
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+            <a
+              href="https://aistudio.google.com/app/apikey"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="v3-btn v3-btn-gold text-[12.5px]"
+            >
+              Obtenir ma clé Gemini gratuite
+            </a>
+            <Link to="/v3/compte" className="v3-btn v3-btn-outline text-[12.5px] bg-white/90">
+              Coller ma clé
+            </Link>
+          </div>
+
 
           {/* Social proof */}
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
