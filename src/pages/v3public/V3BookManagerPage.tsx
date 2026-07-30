@@ -1,23 +1,25 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Pencil, Trash2, BookOpen } from 'lucide-react';
+import { Plus, Pencil, Trash2, BookOpen, FileDown, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { BackButton } from "@/components/v3/BackButton";
+import V3ExportPanel from '@/components/admin/V3ExportPanel';
 
-type Book = { id: string; title: string; author_name?: string | null; kdp_description?: string | null };
+type Book = { id: string; title: string; author_name?: string | null; kdp_description?: string | null; chapters?: unknown };
 
 export default function V3BookManagerPage() {
   const nav = useNavigate();
   const [rows, setRows] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Book | null>(null);
+  const [exporting, setExporting] = useState<Book | null>(null);
 
   const load = async () => {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) { nav('/v3/auth'); return; }
     const { data, error } = await supabase.from('ebook_projects')
-      .select('id,title,author_name,kdp_description')
+      .select('id,title,author_name,kdp_description,chapters')
       .eq('user_id', auth.user.id).order('updated_at', { ascending: false });
     if (error) toast.error(`Chargement impossible : ${error.message}`);
     setRows((data as Book[]) || []);
@@ -31,6 +33,18 @@ export default function V3BookManagerPage() {
     if (error) return toast.error(error.message);
     toast.success('Livre supprimé');
     load();
+  };
+
+  const exportManuscript = (book: Book) => {
+    if (!Array.isArray(book.chapters)) return '';
+    return book.chapters.map((raw, index) => {
+      const chapter = raw && typeof raw === 'object' ? raw as Record<string, unknown> : {};
+      const title = String(chapter.title || chapter.titre || `Chapitre ${index + 1}`)
+        .replace(/^chapitre\s+\d+\s*[:–—-]?\s*/i, '')
+        .trim();
+      const content = String(chapter.content || chapter.contenu || '').trim();
+      return `# Chapitre ${index + 1} – ${title || `Chapitre ${index + 1}`}\n\n${content}`;
+    }).join('\n\n');
   };
 
   return (
@@ -53,22 +67,49 @@ export default function V3BookManagerPage() {
         </div>
       ) : (
         <div className="mt-10 space-y-3">
-          {rows.map((b) => (
+          {rows.map((b) => {
+            const chapterCount = Array.isArray(b.chapters) ? b.chapters.length : 0;
+            return (
             <div key={b.id} className="v3-card flex items-center gap-4">
               <div className="w-14 h-20 rounded bg-[var(--v3-ink)] shrink-0" />
               <div className="flex-1 min-w-0">
                 <div className="font-semibold truncate">{b.title}</div>
                 {b.author_name && <div className="text-xs text-[var(--v3-muted)]">par {b.author_name}</div>}
+                <div className="mt-1 text-xs font-semibold text-[var(--v3-muted)]">
+                  {chapterCount > 0 ? `${chapterCount} chapitre${chapterCount > 1 ? 's' : ''} · Export disponible` : 'Brouillon · récupération des sauvegardes à l’ouverture'}
+                </div>
               </div>
               <div className="flex gap-2">
+                {chapterCount > 0 && (
+                  <button onClick={() => setExporting(b)} className="v3-btn v3-btn-outline text-xs">
+                    <FileDown className="w-3.5 h-3.5" /> Exporter
+                  </button>
+                )}
                 <button onClick={() => nav(`/v3/create?projectId=${b.id}`)} className="v3-btn v3-btn-primary text-xs">
-                  <BookOpen className="w-3.5 h-3.5" /> Ouvrir
+                  <BookOpen className="w-3.5 h-3.5" /> {chapterCount > 0 ? 'Ouvrir & exporter' : 'Ouvrir'}
                 </button>
                 <button onClick={() => setEditing(b)} className="v3-btn v3-btn-outline text-xs"><Pencil className="w-3.5 h-3.5" /></button>
                 <button onClick={() => remove(b.id)} className="v3-btn v3-btn-ghost text-xs text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>
               </div>
             </div>
-          ))}
+          );})}
+        </div>
+      )}
+
+      {exporting && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 px-4 py-8" onClick={() => setExporting(null)}>
+          <div className="mx-auto w-full max-w-5xl" onClick={(event) => event.stopPropagation()}>
+            <div className="mb-3 flex justify-end">
+              <button type="button" onClick={() => setExporting(null)} className="v3-btn v3-btn-primary">
+                <X className="h-4 w-4" /> Fermer
+              </button>
+            </div>
+            <V3ExportPanel
+              manuscript={exportManuscript(exporting)}
+              title={exporting.title}
+              author={exporting.author_name || ''}
+            />
+          </div>
         </div>
       )}
 

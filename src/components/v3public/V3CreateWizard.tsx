@@ -240,12 +240,12 @@ export default function V3CreateWizard() {
   };
 
   useEffect(() => {
-    if (completedBook && !coverTriggeredRef.current) {
+    if (completedBook && !coverUrl && !coverTriggeredRef.current) {
       coverTriggeredRef.current = true;
       generateCover();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [completedBook]);
+  }, [completedBook, coverUrl]);
 
   // Reprise après crash : recharge le brouillon wizard + relance le workflow
   // au bon step si `ebook_workflow_progress` / `ebook_workflow_results` existent.
@@ -388,8 +388,29 @@ export default function V3CreateWizard() {
         return;
       }
 
-      const saved = data as any;
-      const savedChapters = Array.isArray(saved.chapters) ? saved.chapters : [];
+      let saved = data as any;
+      let savedChapters = Array.isArray(saved.chapters) ? saved.chapters : [];
+
+      // Les anciens workflows ont parfois enregistré le manuscrit complet dans
+      // l'historique des versions avant de mettre à jour la fiche principale.
+      // Récupère automatiquement la dernière version exploitable : l'abonné ne
+      // doit jamais avoir à régénérer un livre déjà terminé.
+      if (!savedChapters.some((chapter: any) => String(chapter?.content || chapter?.contenu || '').trim())) {
+        const { data: versions } = await supabase
+          .from('ebook_project_versions')
+          .select('*')
+          .eq('project_id', requestedProjectId)
+          .eq('user_id', auth.user.id)
+          .order('version_number', { ascending: false });
+        const completeVersion = (versions || []).find((version: any) =>
+          Array.isArray(version?.chapters)
+          && version.chapters.some((chapter: any) => String(chapter?.content || chapter?.contenu || '').trim())
+        );
+        if (completeVersion) {
+          saved = { ...saved, ...completeVersion, id: data.id, title: completeVersion.title || data.title };
+          savedChapters = completeVersion.chapters;
+        }
+      }
       const restoredOutline = savedChapters.map((chapter: any, index: number) => ({
         id: makeId(),
         numero: Number(chapter.number || chapter.numero || index + 1),
@@ -425,7 +446,10 @@ export default function V3CreateWizard() {
         })));
       }
       setCoverUrl(savedCover);
-      if (savedChapters.length) {
+      const hasManuscript = savedChapters.some((chapter: any) =>
+        String(chapter?.content || chapter?.contenu || '').trim().length > 0
+      );
+      if (hasManuscript) {
         setCompletedBook({
           chapters: savedChapters,
           conclusion: saved.conclusion || '',
@@ -436,7 +460,7 @@ export default function V3CreateWizard() {
         setStep(2);
         setLaunched(false);
       }
-      toast.success(`« ${saved.title} » est ouvert.`);
+        toast.success(`« ${saved.title} » est ouvert — l’export est affiché en premier.`);
     };
 
     void openSavedProject();
@@ -1030,8 +1054,13 @@ Règles :
         <div className="rounded-[28px] border p-5 sm:p-7" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-orange-50)' }}>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <span className="v3-chip v3-chip-orange"><Rocket className="h-3.5 w-3.5" /> Workflow lancé</span>
-              <h2 className="v3-serif mt-3 text-3xl font-bold" style={{ color: 'var(--v3-ink)' }}>Les agents travaillent sur ton livre</h2>
+              <span className="v3-chip v3-chip-orange">
+                {completedBook ? <Check className="h-3.5 w-3.5" /> : <Rocket className="h-3.5 w-3.5" />}
+                {completedBook ? 'Livre terminé et sauvegardé' : 'Workflow lancé'}
+              </span>
+              <h2 className="v3-serif mt-3 text-3xl font-bold" style={{ color: 'var(--v3-ink)' }}>
+                {completedBook ? 'Ton livre est prêt à exporter' : 'Les agents travaillent sur ton livre'}
+              </h2>
               <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>
                 {finalTitle} · {chapters} chapitres · {totalWords.toLocaleString('fr-FR')} mots estimés
               </p>
@@ -1061,21 +1090,37 @@ Règles :
         </div>
 
 
-        <EbookCompleteWorkflow
-          key={`${finalTitle}-${chapters}-${wordsPerChapter}`}
-          autoStart
-          hideInputForm
-          initialTitle={finalTitle.trim()}
-          initialSubtitle={subtitle.trim()}
-          initialCategory={effectiveCategory}
-          initialAuthorName={authorName.trim()}
-          initialNumberOfChapters={chapters}
-          initialWordsPerChapter={wordsPerChapter}
-          initialTone={tone}
-          characters={workflowCharacters}
-          initialBookIntroduction={buildWorkflowDescription()}
-          onComplete={handleWorkflowComplete}
-        />
+        {completedBook ? (
+          <div id="exports-livre" className="scroll-mt-24">
+            <V3ExportPanel
+              manuscript={(completedBook.chapters || []).map((c: any, index: number) => {
+                const validatedOutlineTitle = normalizedOutline[index]?.titre?.trim();
+                const generatedTitle = typeof c.title === 'string' ? c.title.trim() : '';
+                const titleForExport = validatedOutlineTitle || generatedTitle || `Chapitre ${index + 1}`;
+                return `# Chapitre ${index + 1} – ${titleForExport.replace(/^chapitre\s+\d+\s*[:–—-]?\s*/i, '')}\n\n${c.content || c.contenu || ''}`;
+              }).join('\n\n')}
+              title={finalTitle}
+              subtitle={subtitle}
+              author={authorName}
+            />
+          </div>
+        ) : (
+          <EbookCompleteWorkflow
+            key={`${finalTitle}-${chapters}-${wordsPerChapter}`}
+            autoStart
+            hideInputForm
+            initialTitle={finalTitle.trim()}
+            initialSubtitle={subtitle.trim()}
+            initialCategory={effectiveCategory}
+            initialAuthorName={authorName.trim()}
+            initialNumberOfChapters={chapters}
+            initialWordsPerChapter={wordsPerChapter}
+            initialTone={tone}
+            characters={workflowCharacters}
+            initialBookIntroduction={buildWorkflowDescription()}
+            onComplete={handleWorkflowComplete}
+          />
+        )}
 
         {completedBook && (
           <div className="rounded-[28px] border p-5 sm:p-7" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
@@ -1173,20 +1218,6 @@ Règles :
               </div>
             </div>
           </div>
-        )}
-
-        {completedBook && (
-          <V3ExportPanel
-            manuscript={(completedBook.chapters || []).map((c: any, index: number) => {
-              const validatedOutlineTitle = normalizedOutline[index]?.titre?.trim();
-              const generatedTitle = typeof c.title === 'string' ? c.title.trim() : '';
-              const titleForExport = validatedOutlineTitle || generatedTitle || `Chapitre ${index + 1}`;
-              return `# Chapitre ${index + 1} – ${titleForExport.replace(/^chapitre\s+\d+\s*[:–—-]?\s*/i, '')}\n\n${c.content || ''}`;
-            }).join('\n\n')}
-            title={finalTitle}
-            subtitle={subtitle}
-            author={authorName}
-          />
         )}
 
         {completedBook && (
