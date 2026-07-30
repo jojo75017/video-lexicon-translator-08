@@ -409,12 +409,13 @@ export default function V3HomePage() {
             Retrouvez tous les livres que vous avez créés, mis en favori ou en cours de rédaction.
           </p>
           <div className="mt-6 flex flex-wrap gap-3 justify-center">
-            <button onClick={() => nav('/v3/library')} className="v3-btn v3-btn-primary">
+            <Link to="/v3/library" className="v3-btn v3-btn-primary">
               <BookOpen className="w-4 h-4" /> Ma bibliothèque
-            </button>
-            <button onClick={() => nav('/v3/create')} className="v3-btn v3-btn-gold">
-              <Sparkles className="w-4 h-4" /> Créer un livre
-            </button>
+            </Link>
+            <Link to="/v3/create" className="v3-btn v3-btn-gold">
+              <Sparkles className="w-4 h-4" /> Écrire un livre
+            </Link>
+
           </div>
         </div>
       </section>
