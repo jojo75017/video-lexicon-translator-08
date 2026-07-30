@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import JSZip from 'jszip';
-import { generateProfessionalDocx } from './docxExportEngine';
+import { generateProfessionalDocx, validateDocxChapters } from './docxExportEngine';
 
 const messyChapters = [
   { title: '# L\'Écho des Absents', content: 'Le vent soufflait sur la lande. Elle avança sans se retourner.', subChapters: [] },
@@ -23,41 +23,21 @@ function texts(xml: string): string[] {
 }
 
 describe('export DOCX', () => {
-  it('produit un sommaire numéroté en continu sans chapitre vide', async () => {
-    const blob = await generateProfessionalDocx({
+  it('bloque un manuscrit avec titres JSON, titre générique et chapitres vides', async () => {
+    const audit = validateDocxChapters(messyChapters);
+    expect(audit.valid).toBe(false);
+    expect(audit.readyCount).toBeLessThan(audit.totalCount);
+    expect(audit.chapters.some((chapter) => chapter.issues.includes('Chapitre vide'))).toBe(true);
+    expect(audit.chapters.some((chapter) => chapter.issues.includes('Titre manquant ou générique'))).toBe(true);
+
+    await expect(generateProfessionalDocx({
       title: 'Mon Livre Test',
       authorName: 'Nanakia',
       chapters: messyChapters,
       includeTableOfContents: true,
       includeCoverPage: true,
       includeCopyrightPage: true,
-    });
-
-    const xml = await docXml(blob);
-    const all = texts(xml).map((t) => t.trim()).filter(Boolean);
-    const joined = all.join(' | ');
-
-    // Aucun artefact JSON / markdown
-    expect(joined).not.toMatch(/```/);
-    expect(joined).not.toMatch(/numero"\s*:/);
-    expect(joined).not.toMatch(/\[Contenu à rédiger\]/i);
-
-    // Numérotation continue du sommaire
-    const nums = all
-      .map((t) => t.match(/^Chapitre\s+(\d+)\b/))
-      .filter(Boolean)
-      .map((m) => Number(m![1]));
-    const unique = [...new Set(nums)].sort((a, b) => a - b);
-    // Chapitre vide sans titre exclu ; chapitre titré mais non rédigé conservé au sommaire
-    expect(unique).toEqual([1, 2, 3, 4]);
-    expect(joined).toMatch(/Chapitre en cours de rédaction/);
-
-    // Aucun titre résiduel de type "2,"
-    const tocEntries = all.filter((t) => /^Chapitre\s+\d/.test(t));
-    for (const e of tocEntries) expect(e).not.toMatch(/–\s*\d+[,.]?$/);
-    expect(tocEntries[1]).toMatch(/Chapitre 2(?: – Le Silence des Pierres)?$/);
-    // eslint-disable-next-line no-console
-    console.log('Chapitres rendus:', unique, '\nEntrées:', all.filter((t) => /^Chapitre\s+\d/.test(t)));
+    })).rejects.toThrow(/export bloqué/i);
   });
 
   it('conserve un chapitre court mais réellement rédigé', async () => {
@@ -74,6 +54,28 @@ describe('export DOCX', () => {
     await expect(generateProfessionalDocx({
       title: 'Livre vide',
       chapters: [{ title: 'Chapitre 1', content: '[Contenu à rédiger]', subChapters: [] }],
-    })).rejects.toThrow(/aucun chapitre rédigé/i);
+    })).rejects.toThrow(/export bloqué/i);
+  });
+
+  it('refuse un titre dont le numéro ne correspond pas à sa position', () => {
+    const audit = validateDocxChapters([
+      { title: 'Chapitre 15 Le café froid', content: 'Un vrai contenu rédigé.', subChapters: [] },
+    ]);
+    expect(audit.valid).toBe(false);
+    expect(audit.chapters[0].issues.join(' ')).toMatch(/numéro incohérent/i);
+  });
+
+  it('génère un sommaire propre lorsque tous les chapitres sont complets', async () => {
+    const blob = await generateProfessionalDocx({
+      title: 'Livre prêt',
+      chapters: [
+        { title: 'La Porte close', content: 'La pluie frappait les vitres.', subChapters: [] },
+        { title: 'Le Dernier Indice', content: 'Valérie relut le rapport en silence.', subChapters: [] },
+      ],
+    });
+    const all = texts(await docXml(blob)).map((text) => text.trim()).filter(Boolean).join(' | ');
+    expect(all).toMatch(/Chapitre 1 – La Porte close/);
+    expect(all).toMatch(/Chapitre 2 – Le Dernier Indice/);
+    expect(all).not.toMatch(/en cours de rédaction/i);
   });
 });
