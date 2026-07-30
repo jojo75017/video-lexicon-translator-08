@@ -42,10 +42,18 @@ const WIZARD_KEY = 'v3_create_wizard_config_v1';
 const PROJECT_ID_KEY = 'v3_create_current_project_id_v1';
 
 const CATEGORIES = [
-  'Roman', 'Thriller / Policier', 'Romance', 'Fantasy / Fantastique', 'Science-fiction', 'Biographie / Mémoires',
-  'Développement personnel', 'Business / Entrepreneuriat', 'Santé / Bien-être', 'Cuisine / Recettes', 'Voyage / Guide',
-  'Enfants / Jeunesse', 'Éducation / Pédagogie', 'Spiritualité', 'Autre',
+  'Roman', 'Thriller / Policier', 'Policier / Enquête', 'Romance', 'Romance historique',
+  'Fantasy / Fantastique', 'Science-fiction', 'Horreur / Suspense', 'Aventure',
+  'Nouvelles / Récits courts', 'Biographie / Mémoires', 'Témoignage / Récit de vie',
+  'Développement personnel', 'Productivité / Organisation', 'Business / Entrepreneuriat',
+  'Finances personnelles / Investissement', 'Marketing / Vente en ligne',
+  'Santé / Bien-être', 'Fitness / Sport', 'Nutrition / Régimes', 'Cuisine / Recettes',
+  'Voyage / Guide', 'Enfants / Jeunesse', 'Livre illustré 3-7 ans', 'Éducation / Pédagogie',
+  'Parentalité / Famille', 'Spiritualité', 'Psychologie / Relations', 'Histoire / Culture',
+  'Nature / Animaux', 'Loisirs créatifs / DIY', 'Informatique / IA', 'Carnet / Journal / Cahier',
+  'Poésie', 'Autre',
 ];
+
 
 const TONES = ['Inspirant', 'Pédagogique', 'Émotionnel', 'Direct', 'Humoristique', 'Premium', 'Romanesque', 'Expert'];
 
