@@ -225,22 +225,40 @@ function cleanChapterTitle(rawTitle: string): string {
   // Ponctuation résiduelle en début/fin
   title = title.replace(/^[\s:–—\-,.]+|[\s:–—,.]+$/g, '').trim();
 
-  // Un vrai titre est court : si ça ressemble à de la prose, on refuse.
-  if (isProseLike(title)) return 'Sans titre';
+  // Un vrai titre est court : si ça ressemble à de la prose, on tente de le raccourcir
+  // (les titres descriptifs non-fiction sont légitimes) avant d'abandonner.
+  if (isProseLike(title)) {
+    const shortened = shortenProseTitle(title);
+    return shortened || 'Sans titre';
+  }
 
   return title.trim() || 'Sans titre';
+}
+
+/** Réduit une phrase à un intitulé exploitable (première proposition, sans ponctuation finale). */
+function shortenProseTitle(t: string): string | null {
+  const s = (t || '').trim();
+  if (!s) return null;
+  const firstClause = (s.split(/(?<=[.!?…])\s+/)[0] || s)
+    .split(/\s+[–—-]\s+/)[0]
+    .replace(/[.!?…,;:\s]+$/, '')
+    .trim();
+  const words = firstClause.split(/\s+/).filter(Boolean);
+  const candidate = words.length > 20 ? words.slice(0, 20).join(' ') : firstClause;
+  if (candidate.length < 3) return null;
+  return candidate.length > 120 ? `${candidate.slice(0, 117).trim()}…` : candidate;
 }
 
 /** Détecte un fragment de prose (phrase de contenu) plutôt qu'un titre. */
 function isProseLike(t: string): boolean {
   const s = (t || '').trim();
   if (!s) return true;
-  if (s.length > 80) return true;
-  if (/[.!?…]$/.test(s)) return true;
+  if (s.length > 120) return true;
   if (/[.!?]\s+\S/.test(s)) return true; // plusieurs phrases
-  if (s.split(/\s+/).length > 12) return true;
+  if (s.split(/\s+/).length > 20) return true;
   return false;
 }
+
 
 /** Un titre est "générique" s'il ne contient pas de vrai intitulé (ex: "Chapitre 2", "12", vide). */
 function isGenericTitle(t: string | undefined | null): boolean {
