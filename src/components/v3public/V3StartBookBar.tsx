@@ -1,8 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, BookOpen, RotateCcw, Save, Trash2 } from 'lucide-react';
+import { ArrowRight, BookOpen, History, RotateCcw, Save, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
-import { clearBookBrief, readBookBrief, writeBookBrief } from '@/lib/v3/bookBrief';
+import {
+  clearBookBrief,
+  clearTitleHistory,
+  pushTitleHistory,
+  readBookBrief,
+  readTitleHistory,
+  removeTitleFromHistory,
+  writeBookBrief,
+  type TitleHistoryEntry,
+} from '@/lib/v3/bookBrief';
 
 /**
  * Point de départ de l'accueil V3 : on saisit un titre, on est redirigé
@@ -12,12 +21,14 @@ export default function V3StartBookBar() {
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [currentTitle, setCurrentTitle] = useState<string>('');
+  const [history, setHistory] = useState<TitleHistoryEntry[]>([]);
 
   useEffect(() => {
     const brief = readBookBrief();
     const t = (brief?.title || '').trim();
     setCurrentTitle(t);
     setTitle(t);
+    setHistory(readTitleHistory());
   }, []);
 
   const save = () => {
@@ -26,6 +37,7 @@ export default function V3StartBookBar() {
     const brief = readBookBrief() || {};
     writeBookBrief({ ...brief, title: clean });
     setCurrentTitle(clean);
+    setHistory(pushTitleHistory(clean));
     toast.success('Titre sauvegardé', { description: clean });
   };
 
@@ -36,13 +48,24 @@ export default function V3StartBookBar() {
     toast.success('Fiche du livre effacée', { description: 'Vous pouvez saisir un nouveau titre.' });
   };
 
+  const restore = (entry: TitleHistoryEntry) => {
+    const brief = readBookBrief() || {};
+    writeBookBrief({ ...brief, title: entry.title });
+    setTitle(entry.title);
+    setCurrentTitle(entry.title);
+    setHistory(pushTitleHistory(entry.title));
+    toast.success('Titre restauré', { description: entry.title });
+  };
+
   const start = () => {
     const clean = title.trim();
     if (!clean) return;
     const brief = readBookBrief() || {};
     writeBookBrief({ ...brief, title: clean });
+    pushTitleHistory(clean);
     navigate('/v3/create');
   };
+
 
   return (
     <section className="max-w-7xl mx-auto px-5 md:px-8 pt-10">
