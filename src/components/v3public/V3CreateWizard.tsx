@@ -1389,6 +1389,22 @@ Règles :
                 </button>
                 <button
                   type="button"
+                  onClick={importUltimateToc}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-white px-3 py-1.5 text-xs font-bold text-emerald-700 hover:bg-emerald-50"
+                  title="Injecter le sommaire créé dans l'outil « Sommaire Ultime »"
+                >
+                  <FileDown className="h-3 w-3" /> Injecter mon Sommaire Ultime
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowTocPaste(true)}
+                  className="text-xs font-bold underline"
+                  style={{ color: 'var(--v3-muted)' }}
+                >
+                  Coller mon sommaire
+                </button>
+                <button
+                  type="button"
                   onClick={() => { if (!finalTitle.trim()) setFinalTitle(title); setStep(3); }}
                   className="text-xs font-bold underline"
                   style={{ color: 'var(--v3-muted)' }}
