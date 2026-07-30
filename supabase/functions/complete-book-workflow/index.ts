@@ -1259,6 +1259,8 @@ serve(async (req) => {
     // Palier qualité : 'pro' = Pack 347€ (chapitres plus longs, boucle qualité renforcée,
     // passe éditoriale auto). 'core' = offre 197€ (réglages standard).
     const isProQuality = quality === 'pro';
+    // Directive de recherche approfondie injectée dans tous les prompts au palier Pro.
+    const proResearchDirective = isProQuality ? PRO_DEEP_RESEARCH : '';
 
     const LANGUAGE_NAMES: Record<string, string> = {
       fr: 'français (France)',
@@ -1317,7 +1319,7 @@ TITRE COMPLET : "${fullTitle}"
 CATÉGORIE : ${category || 'Non spécifiée'}
 AUTEUR : ${authorName}
 LANGUE DE RÉDACTION : ${langName}
-CHAPITRES PRÉVUS : ${numberOfChapters}${introContext}${charactersContext}${languageDirective}
+CHAPITRES PRÉVUS : ${numberOfChapters}${introContext}${charactersContext}${languageDirective}${proResearchDirective}
 `.trim();
 
     console.log(`Step ${step} for: "${fullTitle}" (Category: ${category}, Lang: ${language}, Characters: ${characters.length})`);
@@ -1423,8 +1425,8 @@ Réponds en JSON :
   "recommandation": "ton avis franc de professionnel",
   "qualityScore": 9
 }`,
-          5000,
-          9, 2, 'P1'
+          isProQuality ? 7000 : 5000,
+          isProQuality ? 10 : 9, isProQuality ? 3 : 2, 'P1'
         );
         result = parseJSON(content) || { raw: content };
         result._qualityScore = qualityScore;
@@ -1521,7 +1523,7 @@ Format JSON :
   "strategieLancement": "3 actions concrètes pour le lancement",
   "qualityScore": 9
 }`,
-          4000, 9, 1, 'P2'
+          isProQuality ? 6000 : 4000, isProQuality ? 10 : 9, isProQuality ? 2 : 1, 'P2'
         );
         result = parseJSON(content) || { raw: content };
         result._qualityScore = qualityScore;
