@@ -468,9 +468,9 @@ export const V3_MODULES: V3Module[] = [
 
   // MONÉTISER
   { id: 'pricing-ladder-497',       pillar: 'monetiser', status: 'done', title: 'Échelle de Prix 547€ (Upsells + Pack Tout Inclus)',
-    description: 'Parcours commercial menant à 547€ : V3 197€ + order bump guides avancés 47€ + OTO1 visuels 67€ + OTO2 communauté/coaching 36€ (= 547€), OU bouton unique « Pack Pro Vendeur » à 547€. Source unique de vérité dans un module pricing dédié.' },
+    description: 'Parcours commercial menant à 547€ : V3 197€ + packs premium successifs (= 547€), OU bouton unique « Pack Pro Vendeur » à 547€. Source unique de vérité dans un module pricing dédié.' },
   { id: 'installment-payments',     pillar: 'monetiser', status: 'done', title: 'Paiement Échelonné Sécurisé (3×189€ / 4×144€)',
-    description: 'Pack payable en 1×547€, 3×189€ (357€) ou 4×144€ (356€). Géré par abonnement Stripe à durée limitée pour détecter les échecs. COUPURE AUTOMATIQUE de l’accès 3 JOURS après un paiement échoué (statut suspended → SubscriberGate bloque le lien) ; réactivation auto à la régularisation ; bascule en accès à vie une fois toutes les échéances payées. Relances email Resend à chaque échec + à la suspension.' },
+    description: 'Pack payable en 1×547€, 3×189€ (567€) ou 4×144€ (576€). Géré par abonnement Stripe à durée limitée pour détecter les échecs. COUPURE AUTOMATIQUE de l’accès 3 JOURS après un paiement échoué (statut suspended → SubscriberGate bloque le lien) ; réactivation auto à la régularisation ; bascule en accès à vie une fois toutes les échéances payées. Relances email Resend à chaque échec + à la suspension.' },
 
   // PUBLIER — Guides nouveaux abonnés (mix : base offerte + avancés payants)
   { id: 'onboarding-guides',        pillar: 'publier',   status: 'done', title: 'Guides Nouveaux Abonnés (Onboarding 7 jours)',
