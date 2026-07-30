@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { plan, email, environment, returnUrl } = await req.json();
+    const { plan, email, environment, returnUrl, src, ref } = await req.json();
 
     const env: StripeEnv = environment === "live" ? "live" : "sandbox";
     const trimmedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
