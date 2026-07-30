@@ -1140,11 +1140,11 @@ function buildFallbackP3Result(params: {
   };
 }
 
-function getP3GenerationSettings(numberOfChapters: number) {
+function getP3GenerationSettings(numberOfChapters: number, isPro = false) {
   const isLargeProject = numberOfChapters >= 16;
   const isVeryLargeProject = numberOfChapters >= 30;
 
-  return {
+  const base = {
     isLargeProject,
     isVeryLargeProject,
     maxTokens: isVeryLargeProject
@@ -1155,6 +1155,22 @@ function getP3GenerationSettings(numberOfChapters: number) {
     sousSectionsRange: isVeryLargeProject ? '2-3' : isLargeProject ? '3-4' : '4-6',
     keyPointsCount: isVeryLargeProject ? 1 : isLargeProject ? 2 : 3,
     characterDescriptionLength: isVeryLargeProject ? '1 phrase maximum' : isLargeProject ? '1-2 phrases maximum' : '2-3 phrases',
+  };
+
+  if (!isPro) return base;
+
+  // Palier Éditeur Pro : plan plus fouillé (plus de sous-sections, plus de points clés,
+  // une passe de reprise supplémentaire) sans dégrader la robustesse des gros projets.
+  return {
+    ...base,
+    maxTokens: isVeryLargeProject
+      ? 5200
+      : Math.min(9000, Math.max(4800, 2400 + numberOfChapters * 110)),
+    minScore: isLargeProject ? 8 : 9,
+    maxRetries: isVeryLargeProject ? 0 : 1,
+    sousSectionsRange: isVeryLargeProject ? '3-4' : isLargeProject ? '4-5' : '5-7',
+    keyPointsCount: isVeryLargeProject ? 2 : isLargeProject ? 3 : 4,
+    characterDescriptionLength: isVeryLargeProject ? '1-2 phrases' : '2-4 phrases',
   };
 }
 
@@ -1546,7 +1562,7 @@ Format JSON :
         // ARCHITECTE DE CONTENU PRO
         const totalWords = numberOfChapters * wordsPerChapter;
         const estimatedPages = Math.ceil(totalWords / 250);
-        const p3Settings = getP3GenerationSettings(numberOfChapters);
+        const p3Settings = getP3GenerationSettings(numberOfChapters, isProQuality);
         const descriptionGeneree = previousContext.P1?.descriptionGeneree || '';
         const introductionGeneree = previousContext.P1?.introductionGeneree || '';
         const conclusionGeneree = previousContext.P1?.conclusionGeneree || '';
