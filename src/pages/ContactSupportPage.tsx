@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Mail, Send, ArrowLeft, MessageCircle, HelpCircle, Bug, Lightbulb, CreditCard, Video, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,6 +29,7 @@ export default function ContactSupportPage({ subscriberEmail }: Props) {
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   const isV3 = useLocation().pathname.startsWith('/v3');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,12 +71,18 @@ export default function ContactSupportPage({ subscriberEmail }: Props) {
 
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to={isV3 ? '/v3' : '/espace'} className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#008296]">
+          <Link
+            to={isV3 ? '/v3' : '/espace'}
+            data-contemplation-allow="true"
+            className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#008296]"
+          >
             <ArrowLeft className="w-4 h-4" /> {isV3 ? 'Retour à la V3' : 'Retour à mon espace'}
           </Link>
           <div className="text-sm text-gray-500">Support abonnés</div>
         </div>
       </header>
+
+
 
 
       <main className="max-w-5xl mx-auto px-4 py-12">

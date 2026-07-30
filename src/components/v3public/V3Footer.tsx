@@ -29,6 +29,7 @@ export default function V3Footer() {
             <li><Link to="/v3">Accueil V3</Link></li>
             <li><Link to="/v3/gallery">Galerie</Link></li>
             <li><Link to="/v3/create">Créer un livre</Link></li>
+            <li><Link to="/v3/contact" className="hover:text-white">Contact &amp; support</Link></li>
           </ul>
         </div>
         <div>
