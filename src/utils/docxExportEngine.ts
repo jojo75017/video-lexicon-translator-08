@@ -189,9 +189,20 @@ function cleanChapterTitle(rawTitle: string): string {
     return 'Sans titre';
   }
   
+  // Retire les code fences et fragments JSON résiduels ("numero": 2, / "titre":)
+  title = title
+    .replace(/```(?:json|javascript|js|ts|typescript|md|markdown)?/gi, '')
+    .replace(/```/g, '')
+    .replace(/\b(?:numero|number|numéro|titre|title|nom|chapterTitle|heading|objectif|resume|summary|description|content|contenu)\s*["'»«]?\s*:\s*["'«]?\s*\d*\s*,?/gi, '')
+    .replace(/[{}[\]"«»""]+/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+
   // Supprimer les numéros de chapitre redondants en début (avec OU sans séparateur)
   title = title.replace(/^\**\s*chapitre\s+\d+\s*[:–—\-.,)]*\s*/i, '');
   title = title.replace(/^\**\s*|\s*\**$/g, '').trim();
+  // Ponctuation résiduelle en début/fin
+  title = title.replace(/^[\s:–—\-,.]+|[\s:–—,.]+$/g, '').trim();
 
   // Un vrai titre est court : si ça ressemble à de la prose, on refuse.
   if (isProseLike(title)) return 'Sans titre';
@@ -212,9 +223,10 @@ function isProseLike(t: string): boolean {
 
 /** Un titre est "générique" s'il ne contient pas de vrai intitulé (ex: "Chapitre 2", "12", vide). */
 function isGenericTitle(t: string | undefined | null): boolean {
-  const n = (t || '').trim();
-  return !n || /^chapitre\s*\d+$/i.test(n) || /^\d+$/.test(n) || /^sans titre$/i.test(n);
+  const n = (t || '').trim().replace(/^[\s:–—\-,.]+|[\s:–—\-,.]+$/g, '');
+  return !n || /^chapitre\s*\d*$/i.test(n) || /^\d+$/.test(n) || /^sans titre$/i.test(n);
 }
+
 
 
 /** Retire un marqueur de chapitre redondant en début de contenu ("2, " / "2." / "Chapitre 2 –"). */
