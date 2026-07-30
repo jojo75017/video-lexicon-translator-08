@@ -102,6 +102,7 @@ const V3MockupPage = lazy(() => import('./pages/v3public/V3MockupPage'));
 const V3AudiobookPage = lazy(() => import('./pages/v3public/V3AudiobookPage'));
 const V3EditorPage = lazy(() => import('./pages/v3public/V3EditorPage'));
 const V3OffrePage = lazy(() => import('./pages/v3public/V3OffrePage'));
+const V3TemoignagePage = lazy(() => import('./pages/v3public/V3TemoignagePage'));
 
 // Blog / Formation SEO
 const BlogPage = lazy(() => import('./pages/BlogPage'));
@@ -514,6 +515,8 @@ const App = () => {
 
             {/* V3 public site */}
             <Route path="/v3/offre" element={<V3OffrePage />} />
+            <Route path="/v3/temoignage" element={<V3TemoignagePage />} />
+
             <Route path="/v3" element={<V3PublicLayout />}>
               <Route index element={<V3HomePage />} />
               <Route path="auth" element={<V3AuthPage />} />

@@ -11,6 +11,7 @@ import {
   V3_OFFERS, V3_LAUNCH_BONUSES, V3_BONUSES_TOTAL_VALUE,
 } from "@/data/v3Launch";
 import { V3_TOTAL_COUNT, V3_INCLUDED_COUNT } from "@/data/roadmapV3";
+import TestimonialsWall from "@/components/sales/TestimonialsWall";
 
 const AMBER = "#E8951E";
 const AMBER_DEEP = "#C97A14";
@@ -150,6 +151,9 @@ const SalesPageV3Launch = () => {
           ))}
         </div>
       </section>
+
+      {/* TÉMOIGNAGES CLIENTS (photos de premiers livres) */}
+      <TestimonialsWall amber={AMBER} ink={INK} serif={SERIF} />
 
       {/* BONUS DE LANCEMENT */}
       <section className="px-4 pb-16">
