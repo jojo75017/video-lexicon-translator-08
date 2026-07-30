@@ -39,17 +39,62 @@ export default function V3OutlinePanel({ brief, onChange }: Props) {
     toast.success(`${normalized.length} chapitres importés (${source}) — validez le sommaire.`);
   };
 
+  /** Bascule automatiquement sur un provider réellement configuré (clé valide). */
+  const resolveProvider = (): AIProvider | null => {
+    const current = getProvider();
+    const ok = (p: AIProvider) => {
+      const k = getProviderKey(p);
+      return Boolean(k) && validateKeyFormat(p, k);
+    };
+    if (ok(current)) return current;
+    const alt = (['gemini', 'openrouter', 'openai', 'claude'] as AIProvider[]).find(ok);
+    if (alt) {
+      setProvider(alt);
+      return alt;
+    }
+    return null;
+  };
+
+  const parseChapters = (raw: string, count: number): BriefOutlineChapter[] => {
+    let parsed: any = null;
+    const cleaned = String(raw || '').replace(/```json|```/gi, '').trim();
+    try { parsed = JSON.parse(cleaned); } catch {
+      const match = cleaned.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
+      if (match) { try { parsed = JSON.parse(match[0]); } catch { /* ignore */ } }
+    }
+    const list = Array.isArray(parsed) ? parsed : Array.isArray(parsed?.chapters) ? parsed.chapters : [];
+    const seen = new Set<string>();
+    const chapters = list
+      .map((item: any, index: number) => ({
+        numero: index + 1,
+        titre: String(item?.titre || item?.title || '').trim(),
+        objectif: String(item?.objectif || item?.goal || item?.description || '').trim(),
+      }))
+      .filter((item: BriefOutlineChapter) => {
+        const k = item.titre.toLowerCase();
+        if (!k || seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      })
+      .slice(0, count);
+    // Repli : l'IA a répondu en texte brut (liste de titres) au lieu du JSON.
+    if (chapters.length < 3) return parseTocText(cleaned).slice(0, count);
+    return chapters;
+  };
+
   const generate = async () => {
     const title = (brief.title || '').trim();
     const description = (brief.description || '').trim();
-    if (title.length < 3 || description.length < 30) {
-      toast.error('Renseigne d’abord le titre et le synopsis avant de générer le sommaire.');
+    if (title.length < 3) {
+      toast.error('Renseignez d’abord le titre du livre.');
       return;
     }
-    const provider = getProvider();
-    const key = getProviderKey(provider);
-    if (!key || !validateKeyFormat(provider, key)) {
-      toast.error('Branchez votre clé IA (Gemini gratuite) avant de générer le sommaire.');
+    const provider = resolveProvider();
+    if (!provider) {
+      toast.error('Branchez votre clé IA (Gemini gratuite) avant de générer le sommaire.', {
+        description: 'Le panneau « Vos clés IA » se trouve en haut de la page.',
+      });
+      window.dispatchEvent(new CustomEvent('v3-open-keys'));
       return;
     }
     const count = Math.min(60, Math.max(3, Number(brief.chapters) || 12));
@@ -60,7 +105,7 @@ Titre : ${title}
 Sous-titre : ${(brief.subtitle || '').trim() || 'Non défini'}
 Catégorie : ${brief.category || 'Non définie'}
 Ton : ${brief.tone || 'Inspirant'}
-Synopsis : ${description}
+Synopsis : ${description || 'Non fourni — déduis un fil conducteur cohérent à partir du titre et de la catégorie.'}
 Promesse centrale : ${(brief.promesseCentrale || '').trim() || 'Non définie'}
 Nombre exact de chapitres : ${count}
 
@@ -72,36 +117,31 @@ Règles :
 - jamais de titre générique comme "Chapitre 1" ;
 - jamais deux titres identiques ;
 - titres courts, vendeurs, cohérents avec le synopsis.`;
-      const raw = await callAIWriting(prompt, { jsonMode: true, temperature: 0.55, maxTokens: Math.min(12000, 1800 + count * 180) });
-      let parsed: any = null;
-      try { parsed = JSON.parse(raw); } catch {
-        const match = raw.match(/\{[\s\S]*\}/);
-        if (match) parsed = JSON.parse(match[0]);
+
+      const options = { temperature: 0.55, maxTokens: Math.min(12000, 1800 + count * 180) };
+      let chapters: BriefOutlineChapter[] = [];
+      try {
+        chapters = parseChapters(await callAIWriting(prompt, { ...options, jsonMode: true }), count);
+      } catch (firstError) {
+        console.warn('[Sommaire] échec en mode JSON, nouvelle tentative en texte brut', firstError);
       }
-      const list = Array.isArray(parsed?.chapters) ? parsed.chapters : [];
-      const seen = new Set<string>();
-      const chapters: BriefOutlineChapter[] = list
-        .map((item: any, index: number) => ({
-          numero: index + 1,
-          titre: String(item?.titre || item?.title || '').trim(),
-          objectif: String(item?.objectif || item?.goal || '').trim(),
-        }))
-        .filter((item: BriefOutlineChapter) => {
-          const k = item.titre.toLowerCase();
-          if (!k || seen.has(k)) return false;
-          seen.add(k);
-          return true;
-        })
-        .slice(0, count);
-      if (chapters.length < 3) throw new Error('Sommaire incomplet renvoyé par l’IA.');
+      if (chapters.length < 3) {
+        // 2e tentative sans jsonMode : certains providers/modèles refusent responseMimeType.
+        const fallbackPrompt = `${prompt}\n\nSi tu ne peux pas produire de JSON, écris simplement une ligne par chapitre au format : Titre — Objectif.`;
+        chapters = parseChapters(await callAIWriting(fallbackPrompt, options), count);
+      }
+      if (chapters.length < 3) throw new Error('L’IA n’a pas renvoyé de sommaire exploitable. Réessayez ou collez le vôtre.');
       onChange({ outline: normalizeOutline(chapters), chapters: chapters.length, outlineValidated: false });
-      toast.success('Sommaire généré — relisez puis validez-le.');
+      toast.success(`Sommaire généré (${chapters.length} chapitres) — relisez puis validez-le.`);
     } catch (e: any) {
-      toast.error(e?.message || 'Génération du sommaire impossible.');
+      console.error('[Sommaire] génération impossible', e);
+      toast.error('Génération du sommaire impossible', { description: e?.message || 'Erreur inconnue.' });
     } finally {
       setLoading(false);
     }
   };
+
+
 
   const importUltimate = () => {
     const found = readLatestUltimateToc();
