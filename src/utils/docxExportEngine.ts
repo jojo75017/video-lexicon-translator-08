@@ -676,7 +676,7 @@ function buildContentParagraphs(
 // GÉNÉRATEUR PRINCIPAL
 // ═══════════════════════════════════════════════════════════
 
-export async function generateProfessionalDocx(options: DocxExportOptions): Promise<Blob> {
+export async function generateProfessionalDocx(options: DocxExportOptions, previewMode = false): Promise<Blob> {
   const {
     title,
     authorName = '',
@@ -695,7 +695,7 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
   } = options;
 
   const audit = validateDocxChapters(chapters);
-  if (!audit.valid) {
+  if (!previewMode && !audit.valid) {
     const details = audit.chapters
       .filter((chapter) => !chapter.valid)
       .map((chapter) => `Chapitre ${chapter.number} : ${chapter.issues.join(', ')}`)
