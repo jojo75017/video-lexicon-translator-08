@@ -31,12 +31,11 @@ export default function V3CreatePage() {
   const type = params.get('type');
 
   const [showWizard, setShowWizard] = useState(false);
-  const [showKeys, setShowKeys] = useState(false);
   const wizardRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => { seedHubConfig(idea, genre, type); }, [idea, genre, type]);
 
-  const openFloating = () => window.dispatchEvent(new CustomEvent('open-api-keys'));
+
 
   const launchWorkflow = () => {
     setShowWizard(true);
