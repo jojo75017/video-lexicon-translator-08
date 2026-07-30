@@ -456,12 +456,9 @@ h2+p,h3+p{text-indent:0}
     try {
       switch (selectedFormat) {
         case 'docx-kdp':
-          if (!docxAudit.valid) {
-            setPreviewOpen(true);
-            throw new Error(`DOCX bloqué : ${docxAudit.readyCount}/${docxAudit.totalCount} chapitres sont prêts. Consultez le contrôle.`);
-          }
           await exportProfessionalDocx(buildDocxOptions());
           break;
+
         case 'epub':
           await exportEpub();
           break;
