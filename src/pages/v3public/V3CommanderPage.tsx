@@ -35,6 +35,7 @@ const INCLUDED = [
   "Livres audio (voix de synthèse professionnelle)",
   "Forum communauté + guides de publication",
   "Accès à vie : aucun abonnement, aucune date d'expiration",
+  "V3 incluse sans surcoût : tous les nouveaux outils vous seront ajoutés automatiquement",
 ];
 
 export default function V3CommanderPage() {
