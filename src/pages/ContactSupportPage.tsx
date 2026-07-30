@@ -71,22 +71,17 @@ export default function ContactSupportPage({ subscriberEmail }: Props) {
 
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-          {isV3 ? (
-            <button
-              type="button"
-              onClick={() => (window.history.length > 1 ? navigate(-1) : navigate('/v3'))}
-              className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#008296]"
-            >
-              <ArrowLeft className="w-4 h-4" /> Retour à la V3
-            </button>
-          ) : (
-            <Link to="/espace" className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#008296]">
-              <ArrowLeft className="w-4 h-4" /> Retour à mon espace
-            </Link>
-          )}
+          <Link
+            to={isV3 ? '/v3' : '/espace'}
+            data-contemplation-allow="true"
+            className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#008296]"
+          >
+            <ArrowLeft className="w-4 h-4" /> {isV3 ? 'Retour à la V3' : 'Retour à mon espace'}
+          </Link>
           <div className="text-sm text-gray-500">Support abonnés</div>
         </div>
       </header>
+
 
 
 
