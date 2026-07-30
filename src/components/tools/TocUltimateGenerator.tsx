@@ -13,6 +13,8 @@ export type UltimateTocChapter = {
 type Props = {
   /** Callback optionnel : quand fourni, un bouton "Utiliser dans le wizard" apparaît. */
   onApply?: (chapters: UltimateTocChapter[], meta: { theme: string; genre: string; audience: string; style: string; creativity: string; description: string }) => void;
+  /** Libellé du bouton d'application (par défaut : « Utiliser ce sommaire dans le wizard »). */
+  applyLabel?: string;
   /** Valeurs initiales (pré-remplissage depuis le wizard). */
   initialTheme?: string;
   initialDescription?: string;
