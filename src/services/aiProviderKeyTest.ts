@@ -19,8 +19,13 @@ export async function testAIProviderKey(provider: AIProvider, rawKey: string): P
 
     if (provider === 'gemini') {
       const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`);
-      ok = r.ok || r.status === 429 || (/^AQ\.Ab8?/i.test(key) && [400, 401, 403].includes(r.status));
-      if (!r.ok && /^AQ\.Ab8?/i.test(key)) extra = ' (nouveau format accepté)';
+      const body = r.ok ? '' : await r.text().catch(() => '');
+      const explicitlyInvalid = /API_KEY_INVALID|API key not valid|API_KEY_SERVICE_BLOCKED/i.test(body);
+      // 429 = clé reconnue mais quota atteint. Certains nouveaux formats AQ.*
+      // ne sont pas vérifiables par l'endpoint models : seul un rejet explicite
+      // de Google permet alors de les déclarer invalides.
+      ok = r.ok || r.status === 429 || (/^AQ\./i.test(key) && !explicitlyInvalid);
+      if (!r.ok && ok && /^AQ\./i.test(key)) extra = ' (nouveau format accepté)';
     } else if (provider === 'openai') {
       const r = await fetch('https://api.openai.com/v1/models', { headers: { Authorization: `Bearer ${key}` } });
       ok = r.ok || r.status === 429;
