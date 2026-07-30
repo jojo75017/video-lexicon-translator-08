@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { CheckCircle2, KeyRound, Loader2, Settings2, XCircle } from 'lucide-react';
+import { CheckCircle2, KeyRound, Loader2, Save, Settings2, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -44,6 +44,7 @@ export const ApiProviderQuickSettings: React.FC<ApiProviderQuickSettingsProps> =
   const [providerTest, setProviderTest] = useState<Record<AIProvider, TestState>>({
     gemini: 'idle', claude: 'idle', openai: 'idle', openrouter: 'idle',
   });
+  const [dirty, setDirty] = useState(false);
 
   const currentKey = keys[provider];
   const keyValid = currentKey ? validateKeyFormat(provider, currentKey) : false;
@@ -52,14 +53,37 @@ export const ApiProviderQuickSettings: React.FC<ApiProviderQuickSettingsProps> =
   const updateProvider = (p: AIProvider) => {
     setProviderState(p);
     setProvider(p);
+    setDirty(false);
     onStatusChange?.();
   };
 
   const updateKey = (p: AIProvider, value: string) => {
     setKeys((prev) => ({ ...prev, [p]: value }));
-    setProviderKey(p, value);
+    setDirty(true);
     setProviderTest((prev) => ({ ...prev, [p]: 'idle' }));
-    onStatusChange?.();
+  };
+
+  const saveCurrentKey = () => {
+    if (!currentKey || !validateKeyFormat(provider, currentKey)) {
+      toast.error(`Format de clé ${PROVIDER_LABELS[provider]} invalide.`);
+      return;
+    }
+    try {
+      setProvider(provider);
+      setProviderKey(provider, currentKey);
+      const savedKey = getProviderKey(provider);
+      if (!savedKey || !validateKeyFormat(provider, savedKey)) {
+        throw new Error('La clé n’a pas pu être relue après son enregistrement.');
+      }
+      setKeys((prev) => ({ ...prev, [provider]: savedKey }));
+      setDirty(false);
+      setProviderTest((prev) => ({ ...prev, [provider]: 'idle' }));
+      onStatusChange?.();
+      toast.success(`Clé ${PROVIDER_LABELS[provider]} sauvegardée et activée.`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Stockage indisponible dans ce navigateur.';
+      toast.error('Impossible de sauvegarder la clé.', { description: message });
+    }
   };
 
   const updateOpenrouterModel = (model: string) => {
@@ -69,6 +93,10 @@ export const ApiProviderQuickSettings: React.FC<ApiProviderQuickSettingsProps> =
   };
 
   const validateCurrentKey = async () => {
+    if (dirty) {
+      toast.error('Sauvegardez d’abord la clé avant de la valider.');
+      return;
+    }
     setProviderTest((prev) => ({ ...prev, [provider]: 'testing' }));
     const result = await testAIProviderKey(provider, currentKey);
     setProviderTest((prev) => ({ ...prev, [provider]: result.ok ? 'ok' : 'fail' }));
@@ -135,15 +163,25 @@ export const ApiProviderQuickSettings: React.FC<ApiProviderQuickSettingsProps> =
           </p>
         </div>
 
-        <div className="flex items-end lg:col-span-2">
+        <div className="flex items-end gap-2 lg:col-span-2 lg:flex-col lg:justify-end">
           <Button
             type="button"
-            disabled={!currentKey || providerTest[provider] === 'testing'}
+            disabled={!currentKey || !keyValid || !dirty}
+            onClick={saveCurrentKey}
+            className="w-full gap-1.5"
+          >
+            <Save className="h-4 w-4" />
+            Sauvegarder
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={!currentKey || dirty || providerTest[provider] === 'testing'}
             onClick={validateCurrentKey}
             className="w-full gap-1.5"
           >
             <TestIcon state={providerTest[provider]} />
-            Valider la clé
+            Tester
           </Button>
         </div>
       </div>
