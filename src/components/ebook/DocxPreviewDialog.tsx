@@ -3,7 +3,6 @@ import { saveAs } from 'file-saver';
 import { Loader2, Download, FileText, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { generateProfessionalDocx, type DocxExportOptions } from '@/utils/docxExportEngine';
 import { toast } from 'sonner';
@@ -113,7 +112,7 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
               <span className="text-sm font-medium">Sommaire détecté</span>
               <Badge variant="secondary">{toc.length}</Badge>
             </div>
-            <ScrollArea className="flex-1">
+            <div className="flex-1 overflow-auto">
               <ul className="p-4 space-y-2 text-xs text-muted-foreground">
                 {toc.map((line, i) => (
                   <li key={i} className="leading-snug">
@@ -122,7 +121,7 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
                 ))}
                 {!toc.length && !loading && <li>Aucun chapitre détecté.</li>}
               </ul>
-            </ScrollArea>
+            </div>
           </div>
 
           {/* Rendu du document */}
