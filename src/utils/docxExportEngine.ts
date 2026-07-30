@@ -415,11 +415,11 @@ function prepareRenderableChapters(chapters: DocxChapter[]) {
         0,
       );
       const hasContent = meaningfulText(entry.body).length > 0 || subContent > 0;
-      // Un chapitre sans texte mais avec un vrai titre reste au sommaire (contenu partiel).
-      const hasRealTitle = !isGenericTitle(entry.displayTitle);
-      return { ...entry, hasContent, keep: hasContent || hasRealTitle, isStub: !hasContent };
+      // Un chapitre sans texte reste dans le livre (zone à compléter) : on ne perd jamais de chapitre.
+      return { ...entry, hasContent, keep: true, isStub: !hasContent };
     })
     .filter((entry) => entry.keep)
+
     .map((entry, index) => ({ ...entry, num: index + 1 }));
 }
 
