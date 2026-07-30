@@ -1357,29 +1357,12 @@ Règles :
               style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
             />
           </label>
-          <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-orange-600)', background: 'var(--v3-orange-50)' }}>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h3 className="v3-serif text-lg font-bold" style={{ color: 'var(--v3-ink)' }}>Auto-remplir Cible &amp; Promesse</h3>
-                <p className="text-xs" style={{ color: 'var(--v3-muted)' }}>L’IA déduit le lecteur idéal, ses frustrations et la promesse centrale à partir du synopsis.</p>
-              </div>
-              <button
-                type="button"
-                onClick={handleAutofillTargetPromise}
-                disabled={autofillLoading}
-                className="inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-bold disabled:opacity-60"
-                style={{ background: 'var(--v3-orange-600)', color: '#fff' }}
-              >
-                {autofillLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-                Auto-remplir
-              </button>
+          {promesseCentrale.trim() && (
+            <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-orange-600)', background: 'var(--v3-orange-50)' }}>
+              <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: 'var(--v3-muted)' }}>Promesse centrale (générée par l’IA)</span>
+              <p className="mt-1 text-sm" style={{ color: 'var(--v3-ink)' }}>✨ {promesseCentrale}</p>
             </div>
-            {promesseCentrale.trim() && (
-              <p className="mt-3 rounded-xl border bg-white px-3 py-2 text-xs" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)' }}>
-                ✨ {promesseCentrale}
-              </p>
-            )}
-          </div>
+          )}
         </div>
       )}
 
