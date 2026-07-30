@@ -1,9 +1,9 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Sparkles, Loader2, ImageIcon, ArrowRight, KeyRound } from 'lucide-react';
-import ApiProviderQuickSettings from '@/components/ebook/ApiProviderQuickSettings';
+import { Sparkles, Loader2, ImageIcon, ArrowRight } from 'lucide-react';
 import { BackButton } from '@/components/v3/BackButton';
 import V3BriefRecap from '@/components/v3public/V3BriefRecap';
+import V3ApiKeysGate from '@/components/v3public/V3ApiKeysGate';
 
 const V3CreateWizard = lazy(() => import('@/components/v3public/V3CreateWizard'));
 const V3ImportStudio = lazy(() => import('@/components/v3public/V3ImportStudio'));
