@@ -12,7 +12,6 @@ import SeoHead from "@/components/funnel/SeoHead";
 import { V3_LAUNCH_DATE_ISO } from "@/config/v3Launch";
 import { V3_PLANS, formatPrice, getYearlySavingsPercent } from "@/data/v3Pricing";
 
-const V2_PURCHASE_LINK = "https://www.trafic-affiliation.com/ebookstudiopv";
 const EMERALD = "#064e3b";
 const GOLD = "#c9a84c";
 const GOLD_DEEP = "#a3831f";
@@ -169,9 +168,7 @@ export default function V3OffrePage() {
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             <a
-              href={V2_PURCHASE_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/commander"
               className="inline-flex items-center justify-center gap-2 rounded-xl px-7 py-4 font-black text-sm shadow-lg"
               style={{ background: GOLD, color: INK, boxShadow: "0 18px 40px -22px rgba(6,78,59,0.7)" }}
             >
@@ -250,9 +247,7 @@ export default function V3OffrePage() {
               <div className="mt-2 text-4xl font-black" style={{ color: EMERALD }}>V2</div>
               <p className="mt-2 text-sm text-slate-700">Puis bascule vers le premier plan V3 le 1er octobre, sans payer deux fois.</p>
               <a
-                href={V2_PURCHASE_LINK}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/commander"
                 className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-4 font-black text-sm"
                 style={{ background: EMERALD, color: GOLD }}
               >
@@ -494,9 +489,7 @@ export default function V3OffrePage() {
         </p>
         <div className="mt-8 flex justify-center">
           <a
-            href={V2_PURCHASE_LINK}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/commander"
             className="inline-flex items-center justify-center gap-2 rounded-xl px-7 py-4 font-black text-sm"
             style={{ background: GOLD, color: INK }}
           >

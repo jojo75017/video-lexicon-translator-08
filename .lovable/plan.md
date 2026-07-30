@@ -1,51 +1,68 @@
-## Diagnostic confirmé sur votre fichier
+## Décision
 
-J’ai ouvert et converti `LEmprise_des_Ombres_KDP_3.docx` : **117 pages**.
+1TPE est **mis en pause, pas supprimé** : le code reste en place derrière un interrupteur, désactivé par défaut. Vous pourrez le réactiver en une ligne si vous décidez d'en refaire quelque chose. À partir de maintenant, **tous les liens de vente pointent chez vous**.
 
-Le sommaire existe, mais il est effectivement inutilisable :
-- 23 chapitres annoncés, dont la majorité apparaît seulement comme « Chapitre 2 », « Chapitre 3 », etc., sans titre.
-- Les titres des chapitres 5, 13 et 17 contiennent du texte de manuscrit et même un mauvais numéro (`Chapitre 13 – Chapitre 15…`, `Chapitre 17 – Chapitre 19…`).
-- Trois chapitres sont exportés avec **« Chapitre en cours de rédaction »**, ce qui est interdit dans un fichier destiné à être vendu.
-- Le chapitre 1 reprend le titre du livre comme titre de chapitre, puis répète encore ce titre au début du texte.
-- Le sommaire est une liste statique sans numéros de page ni liens Word.
+## Le lien unique pour vos réseaux sociaux et vos emails
 
-La cause visible dans le moteur actuel est qu’il conserve volontairement les chapitres vides dès qu’ils semblent avoir un titre, puis ajoute le marqueur « Chapitre en cours de rédaction ». Il construit aussi le sommaire à partir de données de chapitres déjà incohérentes au lieu de valider la correspondance numéro/titre/contenu.
+```text
+https://www.ebookstudio.fr/commander
+```
 
-## Correction prioritaire
+C'est le seul lien à diffuser. Variantes utiles, toutes vers la même page :
 
-### 1. Bloquer tout DOCX non publiable
-Avant de générer le fichier, ajouter une validation stricte :
-- aucun chapitre vide ;
-- aucun titre générique manquant ;
-- aucun titre ressemblant au début du contenu ;
-- aucune incohérence de numéros (`Chapitre 13` contenant `Chapitre 15`) ;
-- aucun placeholder, JSON, Markdown parasite ou texte tronqué.
+```text
+https://www.ebookstudio.fr/commander?src=facebook
+https://www.ebookstudio.fr/commander?src=youtube
+https://www.ebookstudio.fr/commander?src=email
+https://www.ebookstudio.fr/commander?ref=VOTRECODE
+```
 
-Si une erreur existe, le téléchargement est bloqué et l’utilisateur voit la liste précise des chapitres à corriger/régénérer.
+Le paramètre `src` sert au suivi de la provenance, `ref` au suivi affilié. Ils sont conservés jusqu'à la commande, donc vous saurez quel réseau vend.
 
-### 2. Reconstruire la source unique des chapitres
-- Conserver le numéro prévu par le sommaire validé, sans renumérotation silencieuse.
-- Faire correspondre chaque titre validé au bon contenu généré.
-- Extraire un titre depuis le contenu uniquement s’il s’agit d’un vrai en-tête court et distinct, jamais depuis une phrase narrative.
-- Supprimer la répétition du titre au début du corps.
-- Ne jamais injecter « Chapitre en cours de rédaction » dans un export final.
+## 1. La page `/commander`
 
-### 3. Créer un vrai sommaire professionnel
-- Une entrée pour chaque chapitre réellement présent, avec son titre complet.
-- Table des matières Word dynamique avec liens et numéros de page, fondée sur de vrais styles `Heading 1`.
-- Titres de chapitre identiques entre sommaire et corps du livre.
-- Sections finales ajoutées seulement lorsqu’elles ont un contenu réel (Remerciements, Mot de l’auteur, etc.).
+Seule page de paiement de l'offre à 59 € (accès à vie EbookStudio Pro, sans abonnement).
 
-### 4. Ajouter un contrôle avant téléchargement
-Dans l’aperçu DOCX :
-- tableau `N° | Titre | Nombre de mots | État` ;
-- alerte rouge pour chapitre vide ou titre invalide ;
-- compteur « 23/23 chapitres prêts » ;
-- bouton de téléchargement actif uniquement quand tout est valide.
+- Rappel de l'offre et de ce qui est inclus.
+- Choix du règlement : **59 € en une fois** (mis en avant), **2 ×** et **3 ×** pour étaler.
+- Champ email (clé de création du compte).
+- Formulaire de paiement **intégré à la page** : carte bancaire et PayPal dans le même écran, sans redirection vers un site tiers.
+- Bandeau de réassurance : paiement sécurisé, accès immédiat, contact.
+- Suivi de `src` / `ref` transmis à la commande.
 
-### 5. Tests sur le cas réel
-- Ajouter un test de régression reproduisant exactement les défauts de ce fichier.
-- Générer un nouveau DOCX depuis les données corrigées.
-- Valider sa structure XML, le convertir en PDF et inspecter visuellement la couverture, le sommaire, plusieurs débuts de chapitres et les dernières pages.
+La mécanique de paiement en plusieurs fois existe déjà chez vous (utilisée pour le pack 547 € : suivi des échéances, relance en cas d'échec, suspension d'accès, bascule automatique en accès à vie à la dernière échéance). Je la réutilise pour le 59 €.
 
-Une fois cet export stabilisé, je reprendrai le bloc final prévu : bouton vers Cover Studio Pro, téléchargement de la couverture et section complète Amazon KDP.
+## 2. Après paiement
+
+- Commande enregistrée avec l'email de l'acheteur.
+- **Accès à vie attribué automatiquement** : immédiat en paiement unique ; dès la 1re échéance en plusieurs fois, avec suspension si une échéance échoue.
+- Email de confirmation avec lien de connexion et code d'accès.
+- Page de remerciement avec la prochaine étape (créer son 1er livre).
+
+## 3. 1TPE mis en veille
+
+- Un interrupteur `TPE_ENABLED = false` dans `src/data/externalLinks.ts`.
+- Tant qu'il est sur `false` : aucun bouton, lien ou mention 1TPE n'apparaît nulle part (pages de vente, emails, bannières).
+- Le code et le lien restent conservés, réactivables instantanément.
+- Vos acheteurs 1TPE existants ne sont pas touchés : leur accès reste valide.
+- Sur votre page externe `trafic-affiliation.com/ebookstudiopv`, le bouton d'achat doit être repointé vers `https://www.ebookstudio.fr/commander` — à faire de votre côté, je n'ai pas la main sur cet hébergement.
+
+## 4. Rangement des pages (fin de la confusion)
+
+Redirection vers `/commander` de toutes les adresses qui parlent d'offre ou de paiement : `/v3-offre`, `/valeur-offre`, `/offre-59`, `/59`, `/vente-v3`, `/essai-gratuit`, `/publication-pro`, `/bookperfect-offre`, plus les boutons de la page de présentation.
+
+Point vérifié dans le code : `/offres` affiche aujourd'hui un **écran de connexion avec code d'accès** aux visiteurs non connectés — vos prospects venant des emails tombent donc sur un mur au lieu de l'offre. Les visiteurs non connectés seront redirigés vers `/commander` ; les abonnés connectés gardent exactement leur comportement actuel.
+
+## 5. Emails prospects
+
+Tous les liens d'offre des fonctions d'emailing pointeront vers `https://www.ebookstudio.fr/commander?src=email`, avec le code affilié transmis quand il existe.
+
+## 6. Vérifications avant de communiquer
+
+- Test carte en mode test, puis test PayPal réel à 1 € (le bouton admin existe déjà) pour confirmer que PayPal est bien actif sur votre compte d'encaissement.
+- Test d'un paiement en 3 fois : accès ouvert dès la 1re échéance.
+- Contrôle qu'aucun lien d'email ne mène plus à un écran de connexion ni à 1TPE.
+
+## Point à confirmer
+
+Pour les paiements en plusieurs fois sur 59 €, je propose **2 × 32 €** et **3 × 22 €** (léger supplément couvrant les frais bancaires). Vous préférez sans supplément (2 × 29,50 € / 3 × 19,67 €) ?

@@ -102,6 +102,8 @@ const V3MockupPage = lazy(() => import('./pages/v3public/V3MockupPage'));
 const V3AudiobookPage = lazy(() => import('./pages/v3public/V3AudiobookPage'));
 const V3EditorPage = lazy(() => import('./pages/v3public/V3EditorPage'));
 const V3OffrePage = lazy(() => import('./pages/v3public/V3OffrePage'));
+const V3CommanderPage = lazy(() => import('./pages/v3public/V3CommanderPage'));
+
 const V3TemoignagePage = lazy(() => import('./pages/v3public/V3TemoignagePage'));
 
 // Blog / Formation SEO
@@ -322,13 +324,23 @@ const App = () => {
             <Route path="/" element={<Navigate to={hasPlannerAccess ? '/ebook-planner' : '/offres'} replace />} />
 
             {/* Marketing */}
+            {/* Visiteurs non connectés → page de commande publique (plus de mur de login) */}
             <Route path="/offres" element={
               hasPlannerAccess
                 ? <Navigate to="/ebook-planner" replace />
                 : (isAuthenticated
                     ? <SubscriptionPage subscriberEmail={subscriberEmail} subscriberData={subscriberData} onLogout={handleLogout} />
-                    : <SubscriptionAuth onAuthenticated={handleAuthenticated} />)
+                    : <Navigate to="/commander" replace />)
             } />
+            <Route path="/connexion-abonne" element={
+              isAuthenticated
+                ? <Navigate to="/offres" replace />
+                : <SubscriptionAuth onAuthenticated={handleAuthenticated} />
+            } />
+            <Route path="/commander" element={<V3CommanderPage />} />
+            <Route path="/offre-59" element={<Navigate to="/commander" replace />} />
+            <Route path="/59" element={<Navigate to="/commander" replace />} />
+
             <Route path="/demo" element={<DemoPage />} />
             <Route path="/faq" element={<FaqAssistancePage />} />
             <Route path="/assistance" element={<FaqAssistancePage />} />
@@ -352,19 +364,20 @@ const App = () => {
             <Route path="/promo/affilie" element={<PromoAffiliePage />} />
 
             {/* Redirections SEO (pages supprimées) */}
-            <Route path="/sales" element={<Navigate to="/offres" replace />} />
-            <Route path="/publication-pro" element={<Navigate to="/offres" replace />} />
-            <Route path="/v3-offre" element={<Navigate to="/offres" replace />} />
-            <Route path="/valeur-offre" element={<Navigate to="/offres" replace />} />
+            <Route path="/sales" element={<Navigate to="/commander" replace />} />
+            <Route path="/publication-pro" element={<Navigate to="/commander" replace />} />
+            <Route path="/v3-offre" element={<Navigate to="/commander" replace />} />
+            <Route path="/valeur-offre" element={<Navigate to="/commander" replace />} />
             <Route path="/coaching-vip" element={<Navigate to="/offres" replace />} />
             <Route path="/parrainage" element={<Navigate to="/offres" replace />} />
             <Route path="/affiliation" element={<Navigate to="/offres" replace />} />
             <Route path="/webinaire" element={<Navigate to="/offres" replace />} />
             <Route path="/nouveautes-2026" element={<Navigate to="/offres" replace />} />
             <Route path="/arc-signup" element={<Navigate to="/offres" replace />} />
-            <Route path="/essai-gratuit" element={<Navigate to="/offres" replace />} />
-            <Route path="/resultat-en-5-min" element={<Navigate to="/offres" replace />} />
-            <Route path="/bookperfect-offre" element={<Navigate to="/offres" replace />} />
+            <Route path="/essai-gratuit" element={<Navigate to="/commander" replace />} />
+            <Route path="/resultat-en-5-min" element={<Navigate to="/commander" replace />} />
+            <Route path="/bookperfect-offre" element={<Navigate to="/commander" replace />} />
+
             <Route path="/tutoriels" element={<Navigate to="/formation" replace />} />
             <Route path="/guide-outils" element={<Navigate to="/formation" replace />} />
             <Route path="/guide-ebook" element={<Navigate to="/formation" replace />} />

@@ -30,6 +30,10 @@ const PLANS: Record<
   full_4x: { label: "Pack Pro Vendeur V3 — 4× sans frais", total: 57600, installments: 4, monthly: 14400 },
   base_1x: { label: "Base Création & Publication V3 — paiement unique", total: 19700, installments: 1, monthly: 19700 },
   base_3x: { label: "Base Création & Publication V3 — 3× sans frais", total: 20700, installments: 3, monthly: 6900 },
+  // Offre V2 « accès à vie » à 59 € — tunnel unique /commander.
+  v2_1x: { label: "EbookStudio Pro — accès à vie (paiement unique)", total: 5900, installments: 1, monthly: 5900 },
+  v2_2x: { label: "EbookStudio Pro — accès à vie (2× 32€)", total: 6400, installments: 2, monthly: 3200 },
+  v2_3x: { label: "EbookStudio Pro — accès à vie (3× 22€)", total: 6600, installments: 3, monthly: 2200 },
 };
 
 Deno.serve(async (req) => {
@@ -41,7 +45,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { plan, email, environment, returnUrl } = await req.json();
+    const { plan, email, environment, returnUrl, src, ref } = await req.json();
 
     const env: StripeEnv = environment === "live" ? "live" : "sandbox";
     const trimmedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
@@ -79,20 +83,26 @@ Deno.serve(async (req) => {
     if (orderErr) throw new Error(`DB: ${orderErr.message}`);
     const orderId = order.id as string;
 
-    const commonMeta = {
+    const clean = (v: unknown) =>
+      typeof v === "string" && v.trim() ? v.trim().slice(0, 60) : undefined;
+    const commonMeta: Record<string, string> = {
       kind: "v3_full_pack",
       plan,
       email: trimmedEmail,
       order_id: orderId,
       installments_total: String(planDef.installments),
     };
+    const srcTag = clean(src);
+    const refTag = clean(ref);
+    if (srcTag) commonMeta.src = srcTag;
+    if (refTag) commonMeta.ref = refTag;
 
     let sessionParams: Record<string, any>;
     if (planDef.installments === 1) {
       // Paiement unique 547€.
       sessionParams = {
         mode: "payment",
-        ui_mode: "embedded",
+        ui_mode: "embedded_page",
         customer: customerId,
         return_url: returnUrl,
         line_items: [{
@@ -111,7 +121,7 @@ Deno.serve(async (req) => {
       // Échéancier : abonnement mensuel limité à N prélèvements (annulé par le webhook).
       sessionParams = {
         mode: "subscription",
-        ui_mode: "embedded",
+        ui_mode: "embedded_page",
         customer: customerId,
         return_url: returnUrl,
         line_items: [{
