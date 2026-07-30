@@ -1,17 +1,12 @@
-import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
-  Sparkles, Feather, BookOpen, Library, ArrowRight, Star, Quote,
+  Sparkles, BookOpen, Library, ArrowRight, Star, Quote,
 } from 'lucide-react';
 import { V3_HEADER_MENU } from '@/data/v3HeaderMenu';
 import homeHero from '@/assets/v3/home-hero.jpg';
 import V3BriefRecap from '@/components/v3public/V3BriefRecap';
 
-const IDEA_EXAMPLES = [
-  'Deux rivaux en cuisine tombent amoureux lors d\'un…',
-  'Une héroïne hérite d\'un manoir au chagrin…',
-  'Un détective insomniaque résout ses affaires la nuit…',
-];
+
 
 const FEATURED_TOOLS = [
   { emoji: '📘', title: 'Assistant V3', desc: 'Créez votre livre en 4 étapes guidées.', to: '/v3/create', badge: 'V3' },
