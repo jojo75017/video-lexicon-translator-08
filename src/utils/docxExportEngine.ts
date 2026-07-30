@@ -678,7 +678,7 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
         indent: { left: convertInchesToTwip(0.35), hanging: convertInchesToTwip(0.35) },
       }));
 
-      chapter.subChapters.forEach((sub, subIdx) => {
+      (chapter.subChapters || []).forEach((sub, subIdx) => {
         const subTitle = cleanChapterTitle(sub.title);
         if (isGenericTitle(subTitle)) return;
         children.push(new Paragraph({
@@ -751,7 +751,7 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
     }
 
     // Sous-chapitres
-    chapter.subChapters.forEach((sub, subIdx) => {
+    (chapter.subChapters || []).forEach((sub, subIdx) => {
       const subTitle = cleanChapterTitle(sub.title);
       const subLabel = isGenericTitle(subTitle) ? `${num}.${subIdx + 1}` : `${num}.${subIdx + 1}  ${subTitle}`;
 
