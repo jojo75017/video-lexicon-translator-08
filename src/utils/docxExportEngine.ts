@@ -815,8 +815,9 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
     }
 
     // Contenu du chapitre
-    if (body && body.trim().length > 0) {
+    if (hasContent && body && body.trim().length > 0) {
       children.push(...buildContentParagraphs(body, baseSize, font));
+
     } else {
       // Chapitre annoncé au sommaire mais non encore rédigé : marqueur discret
       children.push(new Paragraph({
