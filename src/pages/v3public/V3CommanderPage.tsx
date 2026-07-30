@@ -82,8 +82,8 @@ export default function V3CommanderPage() {
   return (
     <main className="min-h-screen" style={{ background: PAPER, color: INK }}>
       <SeoHead
-        title="Commander EbookStudio Pro — 59 € accès à vie"
-        description="Accès à vie à EbookStudio Pro pour 59 €, ou en 2 à 3 fois. Paiement sécurisé par carte bancaire ou PayPal, accès immédiat."
+        title="Commander EbookStudio Pro — 59 € accès à vie, V3 incluse"
+        description="Accès à vie à EbookStudio Pro pour 59 €, ou en 2 à 3 fois. La V3 est incluse sans surcoût. Paiement sécurisé par carte bancaire ou PayPal, accès immédiat."
         canonical="https://www.ebookstudio.fr/commander"
       />
       <PaymentTestModeBanner />
