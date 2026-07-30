@@ -107,6 +107,42 @@ async function suspendAccess(email: string) {
     .eq("email", email);
 }
 
+// Email de confirmation pour l'offre "accès à vie" (tunnel /commander).
+async function sendLifetimeAccessEmail(email: string, planLabel: string) {
+  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+  if (!RESEND_API_KEY) return;
+  const html = `
+  <div style="font-family:Inter,Arial,sans-serif;max-width:560px;margin:0 auto;color:#232F3E;background:#FAFAFA;padding:24px;border-radius:12px">
+    <h1 style="color:#008296">🎉 Bienvenue dans EbookStudio Pro</h1>
+    <p>Bonjour,</p>
+    <p>Votre paiement est confirmé (<strong>${planLabel}</strong>).</p>
+    <p><strong>Votre accès à vie est actif — aucun abonnement, aucune date d'expiration.</strong></p>
+    <p style="text-align:center;margin:24px 0">
+      <a href="https://www.ebookstudio.fr/auth"
+         style="display:inline-block;background:#FF9E2D;color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold">
+        Accéder à mon espace
+      </a>
+    </p>
+    <p>Connectez-vous avec l'email <strong>${email}</strong> (création du mot de passe au 1er accès).</p>
+    <p>Première étape conseillée : créer votre premier livre depuis le tableau de bord.</p>
+    <p>L'équipe EbookStudio</p>
+  </div>`;
+  try {
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from: "EbookStudio <contact@ebookstudio.fr>",
+        to: [email],
+        subject: "🎉 Votre accès à vie EbookStudio Pro est actif",
+        html,
+      }),
+    });
+  } catch (e) {
+    console.error("Lifetime access email failed:", e);
+  }
+}
+
 async function handleV3CheckoutCompleted(session: any) {
   const orderId = session.metadata?.order_id;
   if (!orderId) return;
@@ -114,6 +150,8 @@ async function handleV3CheckoutCompleted(session: any) {
   const installmentsTotal = Number(session.metadata?.installments_total || "1");
   const email = (session.metadata?.email || session.customer_email || "").toLowerCase();
   const subscriptionId = session.subscription || null;
+  const plan = String(session.metadata?.plan || "");
+  const isV2Lifetime = plan.startsWith("v2_");
 
   if (installmentsTotal <= 1) {
     // Paiement unique : accès à vie immédiat, commande terminée.
@@ -133,7 +171,15 @@ async function handleV3CheckoutCompleted(session: any) {
     }).eq("id", orderId);
     if (email) await grantV3Lifetime(email);
   }
+
+  if (email && isV2Lifetime) {
+    const label = installmentsTotal <= 1
+      ? "EbookStudio Pro — accès à vie, 59 € payés en une fois"
+      : `EbookStudio Pro — accès à vie, ${installmentsTotal} échéances`;
+    await sendLifetimeAccessEmail(email, label);
+  }
 }
+
 
 async function handleV3InvoicePaid(invoice: any, env: StripeEnv) {
   const subscriptionId = invoice.subscription;
