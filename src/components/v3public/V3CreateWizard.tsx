@@ -1037,7 +1037,12 @@ Règles :
 
         {completedBook && (
           <V3ExportPanel
-            manuscript={(completedBook.chapters || []).map((c: any) => `# ${c.title || `Chapitre ${c.number}`}\n\n${c.content || ''}`).join('\n\n')}
+            manuscript={(completedBook.chapters || []).map((c: any, index: number) => {
+              const validatedOutlineTitle = normalizedOutline[index]?.titre?.trim();
+              const generatedTitle = typeof c.title === 'string' ? c.title.trim() : '';
+              const titleForExport = validatedOutlineTitle || generatedTitle || `Chapitre ${index + 1}`;
+              return `# Chapitre ${index + 1} – ${titleForExport.replace(/^chapitre\s+\d+\s*[:–—-]?\s*/i, '')}\n\n${c.content || ''}`;
+            }).join('\n\n')}
             title={finalTitle}
             subtitle={subtitle}
             author={authorName}
