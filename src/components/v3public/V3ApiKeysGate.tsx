@@ -41,7 +41,7 @@ type Props = {
  * Clé manquante : alerte ambre ouverte. Clé active : ligne verte repliée.
  */
 export default function V3ApiKeysGate({
-  context = 'Sans clé Gemini, la recherche Amazon et l’écriture ne démarrent pas.',
+  context = 'Collez ici votre clé Gemini, OpenAI, Claude ou OpenRouter : sans clé, la recherche Amazon et l’écriture ne démarrent pas.',
   className = '',
 }: Props) {
   const [ready, setReady] = useState<boolean>(() => hasValidKey());
@@ -50,12 +50,21 @@ export default function V3ApiKeysGate({
   const refresh = useCallback(() => setReady(hasValidKey()), []);
 
   useEffect(() => {
+    const forceOpen = () => {
+      setOpen(true);
+      requestAnimationFrame(() => {
+        document.getElementById('cles-ia')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    };
+    if (window.location.hash === '#cles-ia') forceOpen();
+    window.addEventListener('v3-open-keys', forceOpen);
     refresh();
     window.addEventListener('focus', refresh);
     window.addEventListener('storage', refresh);
     return () => {
       window.removeEventListener('focus', refresh);
       window.removeEventListener('storage', refresh);
+      window.removeEventListener('v3-open-keys', forceOpen);
     };
   }, [refresh]);
 
@@ -63,7 +72,8 @@ export default function V3ApiKeysGate({
 
   return (
     <section
-      className={`rounded-2xl border p-4 md:p-5 ${className}`}
+      id="cles-ia"
+      className={`scroll-mt-24 rounded-2xl border p-4 md:p-5 ${className}`}
       style={
         ready
           ? { borderColor: 'rgba(6,78,59,0.25)', background: '#ecf5f1' }
@@ -80,7 +90,7 @@ export default function V3ApiKeysGate({
           </span>
           <div>
             <p className="text-[13.5px] font-bold" style={{ color: ready ? '#064e3b' : '#7a5a0b' }}>
-              {ready ? 'Clé IA active ✓' : 'Vos clés IA — indispensable avant de commencer'}
+              {ready ? 'Clé IA active ✓' : 'Vos clés IA (Gemini, OpenAI, Claude, OpenRouter) — indispensable avant de commencer'}
             </p>
             {!ready && <p className="text-[12.5px] mt-0.5" style={{ color: '#7a5a0b' }}>{context}</p>}
           </div>
@@ -92,9 +102,13 @@ export default function V3ApiKeysGate({
               <button type="button" onClick={openAiStudio} className="v3-btn v3-btn-gold text-[12.5px] whitespace-nowrap cursor-pointer">
                 Obtenir ma clé gratuite
               </button>
-              <Link to="/v3/compte" className="v3-btn v3-btn-outline text-[12.5px] whitespace-nowrap">
-                Coller ma clé
-              </Link>
+              <button
+                type="button"
+                onClick={() => setOpen(true)}
+                className="v3-btn v3-btn-outline text-[12.5px] whitespace-nowrap"
+              >
+                Coller ma clé ici
+              </button>
             </>
           )}
           <button

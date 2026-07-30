@@ -158,9 +158,13 @@ export default function V3HomePage() {
             >
               Obtenir ma clé Gemini gratuite
             </a>
-            <Link to="/v3/compte" className="v3-btn v3-btn-outline text-[12.5px] bg-white/90">
-              Coller ma clé
-            </Link>
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent('v3-open-keys'))}
+              className="v3-btn v3-btn-outline text-[12.5px] bg-white/90"
+            >
+              Coller ma clé (Gemini, OpenAI, Claude, OpenRouter)
+            </button>
           </div>
 
 
