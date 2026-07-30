@@ -148,8 +148,8 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
               </div>
             )}
             {!loading && !error && audit && !audit.valid && (
-              <div className="sticky top-0 z-10 border-b border-destructive/30 bg-destructive/10 px-4 py-3 text-center text-sm text-destructive">
-                Aperçu disponible pour contrôle — téléchargement bloqué jusqu’à correction des chapitres signalés.
+              <div className="sticky top-0 z-10 border-b border-amber-500/30 bg-amber-500/10 px-4 py-3 text-center text-sm text-amber-700">
+                Chapitres signalés à compléter — le téléchargement reste disponible (mention « [Contenu à rédiger] »).
               </div>
             )}
             <div ref={containerRef} className={`flex justify-center py-6 ${loading || error ? 'hidden' : ''}`} />
@@ -160,7 +160,8 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Fermer
           </Button>
-          <Button onClick={handleDownload} disabled={!blob || loading || !audit?.valid} className="gap-2">
+          <Button onClick={handleDownload} disabled={!blob || loading} className="gap-2">
+
             <Download className="h-4 w-4" />
             Télécharger le DOCX
           </Button>
