@@ -84,7 +84,7 @@ const NAV: NavSection[] = [
   {
     section: 'Support',
     items: [
-      { to: '/contact-support', label: 'Contact', icon: Mail },
+      { to: '/v3/contact', label: 'Contact', icon: Mail },
       { to: '/faq', label: 'FAQ / Aide', icon: HelpCircle },
       { to: '/assistance', label: 'Assistance', icon: LifeBuoy },
     ],

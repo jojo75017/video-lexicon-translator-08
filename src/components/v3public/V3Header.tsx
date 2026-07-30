@@ -70,7 +70,7 @@ export default function V3Header({ isAuthed = false }: { isAuthed?: boolean }) {
           <Link to="/formation" className="v3-btn v3-btn-on-dark" title="Formation">
             <GraduationCap className="w-4 h-4" /> Formation
           </Link>
-          <Link to="/contact-support" className="v3-btn v3-btn-on-dark" title="Support">
+          <Link to="/v3/contact" className="v3-btn v3-btn-on-dark" title="Support">
             <Mail className="w-4 h-4" /> Support
           </Link>
           <Link to="/ebook-planner" className="v3-btn v3-btn-on-dark text-[12.5px]" title="Basculer sur EbookStudio V2">
@@ -147,7 +147,7 @@ export default function V3Header({ isAuthed = false }: { isAuthed?: boolean }) {
             <Link to="/formation" onClick={() => setOpen(false)} className="v3-btn v3-btn-on-dark w-full justify-center">
               <GraduationCap className="w-4 h-4" /> Formation
             </Link>
-            <Link to="/contact-support" onClick={() => setOpen(false)} className="v3-btn v3-btn-on-dark w-full justify-center">
+            <Link to="/v3/contact" onClick={() => setOpen(false)} className="v3-btn v3-btn-on-dark w-full justify-center">
               <Mail className="w-4 h-4" /> Contact & support
             </Link>
             <Link to="/ebook-planner" onClick={() => setOpen(false)} className="v3-btn v3-btn-on-dark w-full justify-center">
