@@ -121,8 +121,9 @@ export default function V3HomePage() {
           width={1920}
           height={640}
           className="absolute inset-0 h-full w-full object-cover"
+          style={{ filter: 'brightness(1.12) saturate(1.05)' }}
         />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(5,62,47,0.82) 0%, rgba(5,62,47,0.62) 45%, rgba(5,62,47,0.9) 100%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(5,62,47,0.55) 0%, rgba(5,62,47,0.35) 45%, rgba(5,62,47,0.75) 100%)' }} />
         <div className="absolute inset-x-0 top-0 h-[3px]" style={{ background: 'linear-gradient(90deg, transparent, var(--v3-gold), transparent)' }} />
 
         <div className="relative max-w-5xl mx-auto px-5 md:px-8 py-16 md:py-24 text-center min-h-[420px] md:min-h-[520px] flex flex-col items-center justify-center">
@@ -130,8 +131,11 @@ export default function V3HomePage() {
             <Sparkles className="w-3.5 h-3.5" /> Atelier d'écriture premium
           </span>
 
-          <h1 className="v3-serif mt-6 font-semibold leading-[1.02] tracking-tight text-white">
-            <span className="block text-4xl md:text-5xl xl:text-6xl">Publiez le livre que</span>
+          <h1
+            className="v3-serif mt-6 font-semibold leading-[1.02] tracking-tight"
+            style={{ textShadow: '0 3px 18px rgba(3,32,24,0.75), 0 1px 3px rgba(0,0,0,0.55)' }}
+          >
+            <span className="block text-4xl md:text-5xl xl:text-6xl" style={{ color: '#fffaf0' }}>Publiez le livre que</span>
             <span className="block text-4xl md:text-5xl xl:text-6xl italic" style={{ color: 'var(--v3-gold)' }}>vous avez en vous.</span>
           </h1>
 
