@@ -10,6 +10,7 @@ import { invokeImageFunction } from '@/lib/aiImageInvoke';
 import { callAIWriting, getProvider, getProviderKey, validateKeyFormat } from '@/services/aiWritingService';
 import TocUltimateGenerator, { type UltimateTocChapter } from '@/components/tools/TocUltimateGenerator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { clearTocForWorkflow, parseTocText, readLatestUltimateToc, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
 
 
 type WizardCharacter = {
@@ -42,10 +43,18 @@ const WIZARD_KEY = 'v3_create_wizard_config_v1';
 const PROJECT_ID_KEY = 'v3_create_current_project_id_v1';
 
 const CATEGORIES = [
-  'Roman', 'Thriller / Policier', 'Romance', 'Fantasy / Fantastique', 'Science-fiction', 'Biographie / Mémoires',
-  'Développement personnel', 'Business / Entrepreneuriat', 'Santé / Bien-être', 'Cuisine / Recettes', 'Voyage / Guide',
-  'Enfants / Jeunesse', 'Éducation / Pédagogie', 'Spiritualité', 'Autre',
+  'Roman', 'Thriller / Policier', 'Policier / Enquête', 'Romance', 'Romance historique',
+  'Fantasy / Fantastique', 'Science-fiction', 'Horreur / Suspense', 'Aventure',
+  'Nouvelles / Récits courts', 'Biographie / Mémoires', 'Témoignage / Récit de vie',
+  'Développement personnel', 'Productivité / Organisation', 'Business / Entrepreneuriat',
+  'Finances personnelles / Investissement', 'Marketing / Vente en ligne',
+  'Santé / Bien-être', 'Fitness / Sport', 'Nutrition / Régimes', 'Cuisine / Recettes',
+  'Voyage / Guide', 'Enfants / Jeunesse', 'Livre illustré 3-7 ans', 'Éducation / Pédagogie',
+  'Parentalité / Famille', 'Spiritualité', 'Psychologie / Relations', 'Histoire / Culture',
+  'Nature / Animaux', 'Loisirs créatifs / DIY', 'Informatique / IA', 'Carnet / Journal / Cahier',
+  'Poésie', 'Autre',
 ];
+
 
 const TONES = ['Inspirant', 'Pédagogique', 'Émotionnel', 'Direct', 'Humoristique', 'Premium', 'Romanesque', 'Expert'];
 
@@ -480,6 +489,73 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
   // Sommaire non bloquant : les agents V2 (P3 « L'Architecte ») reconstruisent le plan si l'auteur ne l'a pas affiné.
   const canStepOutline = normalizedOutline.length >= 3;
   const canStepFour = finalTitle.trim().length >= 3 && authorName.trim().length >= 2;
+
+  // Instantané du brief pour le récapitulatif « Livre en préparation » sur /v3
+  useEffect(() => {
+    if (!title.trim() && !description.trim()) return;
+    writeBookBrief({
+      title: finalTitle.trim() || title.trim(),
+      subtitle: subtitle.trim(),
+      author: authorName.trim(),
+      description: description.trim(),
+      category: effectiveCategory,
+      genre: effectiveCategory,
+      tone,
+      chapters,
+      numberOfChapters: chapters,
+      wordsPerChapter,
+      outline: normalizedOutline.map((c) => ({ numero: c.numero, titre: c.titre, objectif: c.objectif })),
+      characters: characters.filter((c) => c.name.trim()).map((c) => ({ name: c.name, role: c.role, description: c.traits, traits: c.traits })),
+      cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations,
+      promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion,
+      projectId,
+    } as any);
+  }, [title, finalTitle, subtitle, authorName, description, effectiveCategory, tone, chapters, wordsPerChapter, normalizedOutline, characters, cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion, projectId]);
+
+  const [showTocPaste, setShowTocPaste] = useState(false);
+  const [tocPasteText, setTocPasteText] = useState('');
+
+  const applyImportedToc = (imported: BriefOutlineChapter[], sourceLabel: string) => {
+    if (!imported.length) {
+      toast.error('Aucun chapitre détecté dans ce sommaire.');
+      return;
+    }
+    const capped = imported.slice(0, 60);
+    setOutline(capped.map((chapter, index) => ({
+      id: makeId(),
+      numero: index + 1,
+      titre: cleanText(chapter.titre) || `Chapitre ${index + 1}`,
+      objectif: cleanText(chapter.objectif || ''),
+    })));
+    setChapters(clampNumber(capped.length, 3, 60, capped.length));
+    toast.success(`${capped.length} chapitres importés (${sourceLabel}) ✓`);
+  };
+
+  const importUltimateToc = () => {
+    const found = readLatestUltimateToc();
+    if (!found) {
+      toast.error('Aucun sommaire trouvé. Crée-le dans « Sommaire Ultime » puis clique sur « Envoyer vers le workflow ».');
+      return;
+    }
+    applyImportedToc(found.chapters, found.source);
+    clearTocForWorkflow();
+  };
+
+  // Import automatique quand on arrive depuis /v3/toc-ultime (?toc=ultime)
+  const tocParamHandled = useRef(false);
+  useEffect(() => {
+    if (tocParamHandled.current) return;
+    const wantsToc = new URLSearchParams(window.location.search).get('toc') === 'ultime';
+    if (!wantsToc) return;
+    tocParamHandled.current = true;
+    const found = readLatestUltimateToc();
+    if (found) {
+      applyImportedToc(found.chapters, found.source);
+      clearTocForWorkflow();
+      setStep(2);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (hasRepeatedFallbackTitles(outline, chapters)) {
@@ -1045,7 +1121,7 @@ Règles :
   }
 
 
-  const steps = ['Idée', 'Style', 'Sommaire', 'Personnages', 'Titre'];
+  const steps = ['Fiche du livre', 'Style', 'Sommaire', 'Personnages', 'Titre'];
 
   return (
     <div className="space-y-8">
@@ -1210,11 +1286,11 @@ Règles :
       {step === 0 && (
         <div className="space-y-5">
           <div>
-            <h2 className="v3-serif text-4xl font-bold" style={{ color: 'var(--v3-ink)' }}>Page principale</h2>
-            <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>Commence par le titre du projet et une description d’environ 150 mots.</p>
+            <h2 className="v3-serif text-4xl font-bold" style={{ color: 'var(--v3-ink)' }}>Fiche du livre</h2>
+            <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>Titre, sous-titre, catégorie KDP, auteur et synopsis : c’est la base que suivront les agents.</p>
           </div>
           <label className="block space-y-2">
-            <span className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>Titre de départ</span>
+            <span className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>Titre du livre</span>
             <input
               value={title}
               onChange={(event) => { setTitle(event.target.value); if (!finalTitle.trim()) setFinalTitle(event.target.value); }}
@@ -1224,8 +1300,52 @@ Règles :
             />
           </label>
           <label className="block space-y-2">
+            <span className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>Sous-titre <span className="font-normal" style={{ color: 'var(--v3-muted)' }}>(optionnel)</span></span>
+            <input
+              value={subtitle}
+              onChange={(event) => setSubtitle(event.target.value)}
+              placeholder="Ex : la méthode pas à pas pour publier sur Amazon KDP en 30 jours"
+              className="w-full rounded-2xl border px-4 py-3 outline-none"
+              style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+            />
+          </label>
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="block space-y-2">
+              <span className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>Catégorie ({CATEGORIES.length} disponibles)</span>
+              <select
+                value={category}
+                onChange={(event) => setCategory(event.target.value)}
+                size={8}
+                className="w-full rounded-2xl border px-3 py-2 text-sm outline-none"
+                style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+              >
+                {CATEGORIES.map((item) => <option key={item} value={item}>{item}</option>)}
+              </select>
+              <span className="block text-xs" style={{ color: 'var(--v3-muted)' }}>Sélection : <strong>{category === 'Autre' ? (customCategory || 'Autre') : category}</strong></span>
+            </label>
+            <label className="block space-y-2">
+              <span className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>Nom de l’auteur</span>
+              <input
+                value={authorName}
+                onChange={(event) => setAuthorName(event.target.value)}
+                placeholder="Ex : Nanakia"
+                className="w-full rounded-2xl border px-4 py-3 outline-none"
+                style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+              />
+              {category === 'Autre' && (
+                <input
+                  value={customCategory}
+                  onChange={(event) => setCustomCategory(event.target.value)}
+                  placeholder="Précise ta catégorie"
+                  className="mt-2 w-full rounded-2xl border px-4 py-3 outline-none"
+                  style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+                />
+              )}
+            </label>
+          </div>
+          <label className="block space-y-2">
             <span className="flex items-center justify-between gap-3 text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>
-              Description du livre
+              Synopsis du livre
               <span className="text-xs font-semibold" style={{ color: descriptionWords >= 120 ? 'var(--v3-orange-600)' : 'var(--v3-muted)' }}>{descriptionWords} / 150 mots</span>
             </span>
             <textarea
@@ -1237,22 +1357,40 @@ Règles :
               style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
             />
           </label>
+          <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-orange-600)', background: 'var(--v3-orange-50)' }}>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="v3-serif text-lg font-bold" style={{ color: 'var(--v3-ink)' }}>Auto-remplir Cible &amp; Promesse</h3>
+                <p className="text-xs" style={{ color: 'var(--v3-muted)' }}>L’IA déduit le lecteur idéal, ses frustrations et la promesse centrale à partir du synopsis.</p>
+              </div>
+              <button
+                type="button"
+                onClick={handleAutofillTargetPromise}
+                disabled={autofillLoading}
+                className="inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-bold disabled:opacity-60"
+                style={{ background: 'var(--v3-orange-600)', color: '#fff' }}
+              >
+                {autofillLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+                Auto-remplir
+              </button>
+            </div>
+            {promesseCentrale.trim() && (
+              <p className="mt-3 rounded-xl border bg-white px-3 py-2 text-xs" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)' }}>
+                ✨ {promesseCentrale}
+              </p>
+            )}
+          </div>
         </div>
       )}
+
 
       {step === 1 && (
         <div className="space-y-6">
           <div>
             <h2 className="v3-serif text-4xl font-bold" style={{ color: 'var(--v3-ink)' }}>Style du livre</h2>
-            <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>Choisis la catégorie, le ton, le nombre de chapitres et la longueur.</p>
+            <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>Choisis le ton, le nombre de chapitres et la longueur. Catégorie retenue : <strong>{category === 'Autre' ? (customCategory || 'Autre') : category}</strong>.</p>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            <label className="block space-y-2">
-              <span className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>Catégorie</span>
-              <select value={category} onChange={(event) => setCategory(event.target.value)} className="w-full rounded-2xl border px-4 py-3 outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}>
-                {CATEGORIES.map((item) => <option key={item} value={item}>{item}</option>)}
-              </select>
-            </label>
             <label className="block space-y-2">
               <span className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>Ton</span>
               <select value={tone} onChange={(event) => setTone(event.target.value)} className="w-full rounded-2xl border px-4 py-3 outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}>
@@ -1260,12 +1398,7 @@ Règles :
               </select>
             </label>
           </div>
-          {category === 'Autre' && (
-            <label className="block space-y-2">
-              <span className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>Nouvelle catégorie</span>
-              <input value={customCategory} onChange={(event) => setCustomCategory(event.target.value)} className="w-full rounded-2xl border px-4 py-3 outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }} />
-            </label>
-          )}
+
           <div className="grid gap-5 md:grid-cols-2">
             <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
               <div className="flex items-center justify-between gap-3">
@@ -1321,6 +1454,22 @@ Règles :
                   title="Ouvrir le générateur avancé (genre, public, style, créativité)"
                 >
                   <Wrench className="h-3 w-3" /> Générateur ultime
+                </button>
+                <button
+                  type="button"
+                  onClick={importUltimateToc}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-white px-3 py-1.5 text-xs font-bold text-emerald-700 hover:bg-emerald-50"
+                  title="Injecter le sommaire créé dans l'outil « Sommaire Ultime »"
+                >
+                  <FileDown className="h-3 w-3" /> Injecter mon Sommaire Ultime
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowTocPaste(true)}
+                  className="text-xs font-bold underline"
+                  style={{ color: 'var(--v3-muted)' }}
+                >
+                  Coller mon sommaire
                 </button>
                 <button
                   type="button"
@@ -1430,6 +1579,40 @@ Règles :
           />
         </DialogContent>
       </Dialog>
+
+      <Dialog open={showTocPaste} onOpenChange={setShowTocPaste}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileDown className="h-4 w-4 text-emerald-600" /> Coller mon sommaire
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Une ligne = un chapitre. Formats acceptés : texte, Markdown, ou JSON du Sommaire Ultime. « Titre | Objectif » est reconnu.
+          </p>
+          <textarea
+            value={tocPasteText}
+            onChange={(event) => setTocPasteText(event.target.value)}
+            rows={12}
+            placeholder={'1. L’appel du large | Installer le décor et la tension\n2. La première fissure | ...'}
+            className="w-full rounded-xl border px-3 py-2 text-sm outline-none"
+          />
+          <button
+            type="button"
+            onClick={() => {
+              const parsed = parseTocText(tocPasteText);
+              if (!parsed.length) { toast.error('Aucun chapitre détecté.'); return; }
+              applyImportedToc(parsed, 'sommaire collé');
+              setShowTocPaste(false);
+            }}
+            className="v3-btn v3-btn-primary w-full justify-center"
+          >
+            <Check className="h-4 w-4" /> Injecter dans le workflow
+          </button>
+        </DialogContent>
+      </Dialog>
+
+
 
 
       {step === 3 && (

@@ -13,6 +13,8 @@ export type UltimateTocChapter = {
 type Props = {
   /** Callback optionnel : quand fourni, un bouton "Utiliser dans le wizard" apparaît. */
   onApply?: (chapters: UltimateTocChapter[], meta: { theme: string; genre: string; audience: string; style: string; creativity: string; description: string }) => void;
+  /** Libellé du bouton d'application (par défaut : « Utiliser ce sommaire dans le wizard »). */
+  applyLabel?: string;
   /** Valeurs initiales (pré-remplissage depuis le wizard). */
   initialTheme?: string;
   initialDescription?: string;
@@ -59,7 +61,7 @@ function clean(text: unknown): string {
   return String(text || '').replace(/```(json)?/gi, '').replace(/[{}"]/g, '').replace(/\s+/g, ' ').trim();
 }
 
-export default function TocUltimateGenerator({ onApply, initialTheme, initialDescription, initialGenre, initialChapters }: Props) {
+export default function TocUltimateGenerator({ onApply, applyLabel, initialTheme, initialDescription, initialGenre, initialChapters }: Props) {
   const [theme, setTheme] = useState(initialTheme || '');
   const [genre, setGenre] = useState(initialGenre || 'Roman');
   const [audience, setAudience] = useState('Adultes');
@@ -309,7 +311,7 @@ Règles strictes :
                   onClick={() => onApply(chapters, { theme, genre, audience, style, creativity, description })}
                   className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white shadow hover:bg-emerald-700"
                 >
-                  <Download className="h-4 w-4" /> Utiliser ce sommaire dans le wizard
+                  <Download className="h-4 w-4" /> {applyLabel || 'Utiliser ce sommaire dans le wizard'}
                 </button>
               )}
             </>

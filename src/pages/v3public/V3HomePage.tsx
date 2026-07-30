@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { V3_HEADER_MENU } from '@/data/v3HeaderMenu';
 import homeHero from '@/assets/v3/home-hero.jpg';
+import V3BriefRecap from '@/components/v3public/V3BriefRecap';
 
 const IDEA_EXAMPLES = [
   'Deux rivaux en cuisine tombent amoureux lors d\'un…',
@@ -127,6 +128,8 @@ export default function V3HomePage() {
           </p>
         </div>
       </section>
+
+      <V3BriefRecap />
 
       {/* HERO — éditorial Émeraude & Or */}
       <section

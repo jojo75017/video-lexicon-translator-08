@@ -1,0 +1,164 @@
+/**
+ * Pont partagé entre le wizard V3, l'outil « Sommaire Ultime » et la page d'accueil V3.
+ * Tout est stocké en localStorage : le wizard écrit un instantané du brief à chaque
+ * modification, l'accueil le lit pour l'afficher avant le lancement du workflow.
+ */
+
+export type BriefOutlineChapter = {
+  numero: number;
+  titre: string;
+  objectif?: string;
+};
+
+export type BookBrief = {
+  savedAt?: string;
+  title?: string;
+  subtitle?: string;
+  author?: string;
+  category?: string;
+  description?: string;
+  tone?: string;
+  chapters?: number;
+  wordsPerChapter?: number;
+  outline?: BriefOutlineChapter[];
+  characters?: Array<{ name?: string; role?: string; description?: string; traits?: string }>;
+  cibleProfil?: string;
+  cibleNiveau?: string;
+  cibleBesoins?: string;
+  cibleFrustrations?: string;
+  promesseCentrale?: string;
+  promesseBenefices?: string;
+  promesseDifferenciation?: string;
+  promesseEmotion?: string;
+  projectId?: string | null;
+};
+
+export const WIZARD_BRIEF_KEY = 'v3_create_wizard_config_v1';
+/** Sommaire envoyé depuis l'outil « Sommaire Ultime » vers le workflow. */
+export const TOC_FOR_WORKFLOW_KEY = 'v3_toc_for_workflow_v1';
+const TOC_HISTORY_KEY = 'toc_ultimate_history_v1';
+const TOC_PINNED_KEY = 'toc_ultimate_pinned_v1';
+
+function readJSON<T>(key: string, fallback: T): T {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+export function readBookBrief(): BookBrief | null {
+  const brief = readJSON<BookBrief | null>(WIZARD_BRIEF_KEY, null);
+  if (!brief) return null;
+  const hasSomething = Boolean((brief.title || '').trim() || (brief.description || '').trim());
+  return hasSomething ? brief : null;
+}
+
+export function writeBookBrief(brief: BookBrief) {
+  try {
+    localStorage.setItem(WIZARD_BRIEF_KEY, JSON.stringify({ ...brief, savedAt: new Date().toISOString() }));
+  } catch {
+    /* quota / mode privé : on ignore */
+  }
+}
+
+/** Enregistre un sommaire pour qu'il soit importable dans le wizard. */
+export function sendTocToWorkflow(chapters: BriefOutlineChapter[], meta?: { theme?: string; genre?: string; description?: string }) {
+  try {
+    localStorage.setItem(
+      TOC_FOR_WORKFLOW_KEY,
+      JSON.stringify({
+        savedAt: new Date().toISOString(),
+        theme: meta?.theme || '',
+        genre: meta?.genre || '',
+        description: meta?.description || '',
+        chapters: chapters.map((c, i) => ({ numero: i + 1, titre: c.titre, objectif: c.objectif || '' })),
+      }),
+    );
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Récupère le dernier sommaire « Sommaire Ultime » disponible :
+ * envoi explicite vers le workflow, sinon épinglé, sinon historique.
+ */
+export function readLatestUltimateToc(): { chapters: BriefOutlineChapter[]; source: string } | null {
+  const sent = readJSON<{ chapters?: BriefOutlineChapter[] } | null>(TOC_FOR_WORKFLOW_KEY, null);
+  if (sent?.chapters?.length) return { chapters: normalizeOutline(sent.chapters), source: 'envoyé depuis Sommaire Ultime' };
+
+  const pinned = readJSON<Array<{ chapters?: BriefOutlineChapter[] }>>(TOC_PINNED_KEY, []);
+  if (pinned[0]?.chapters?.length) return { chapters: normalizeOutline(pinned[0].chapters), source: 'sommaire épinglé' };
+
+  const history = readJSON<Array<{ chapters?: BriefOutlineChapter[] }>>(TOC_HISTORY_KEY, []);
+  if (history[0]?.chapters?.length) return { chapters: normalizeOutline(history[0].chapters), source: 'dernier sommaire généré' };
+
+  return null;
+}
+
+export function clearTocForWorkflow() {
+  try { localStorage.removeItem(TOC_FOR_WORKFLOW_KEY); } catch { /* noop */ }
+}
+
+function cleanLine(raw: string): string {
+  return String(raw || '')
+    .replace(/```[a-z]*|```/gi, '')
+    .replace(/^\s*[#>*\-–—•\d.)\s]+/, '')
+    .replace(/^\s*(chapitre|chapter|partie|section)\s*\d*\s*[:–—-]*\s*/i, '')
+    .replace(/["{}[\]«»]/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
+/**
+ * Analyse un sommaire collé par l'auteur (Markdown, TXT ou JSON du Sommaire Ultime).
+ * Une ligne = un chapitre ; « Titre | Objectif » ou « Titre — Objectif » sont acceptés.
+ */
+export function parseTocText(text: string): BriefOutlineChapter[] {
+  const trimmed = (text || '').trim();
+  if (!trimmed) return [];
+
+  // 1) JSON (export du Sommaire Ultime)
+  if (/^[[{]/.test(trimmed)) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      const list = Array.isArray(parsed) ? parsed : parsed?.chapters;
+      if (Array.isArray(list)) {
+        return normalizeOutline(
+          list.map((item: any) => ({
+            numero: Number(item?.numero) || 0,
+            titre: cleanLine(item?.titre || item?.title || ''),
+            objectif: String(item?.objectif || item?.goal || item?.description || '').trim(),
+          })),
+        );
+      }
+    } catch {
+      /* on retombe sur l'analyse texte */
+    }
+  }
+
+  // 2) Texte / Markdown
+  const chapters: BriefOutlineChapter[] = [];
+  for (const rawLine of trimmed.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line) continue;
+    if (/^table des mati|^sommaire\b/i.test(line)) continue;
+    if (/^-{3,}$/.test(line)) continue;
+
+    const [head, ...rest] = line.split(/\s*[|]\s*|\s+—\s+|\s+–\s+/);
+    const titre = cleanLine(head);
+    if (!titre || titre.length < 2) continue;
+    chapters.push({ numero: chapters.length + 1, titre, objectif: rest.join(' — ').trim() });
+  }
+  return normalizeOutline(chapters);
+}
+
+export function normalizeOutline(items: BriefOutlineChapter[]): BriefOutlineChapter[] {
+  return (items || [])
+    .map((item) => ({ numero: 0, titre: String(item?.titre || '').trim(), objectif: String(item?.objectif || '').trim() }))
+    .filter((item) => item.titre.length >= 2)
+    .map((item, index) => ({ ...item, numero: index + 1 }));
+}
