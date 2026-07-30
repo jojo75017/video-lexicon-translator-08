@@ -885,7 +885,13 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
     // Contenu du chapitre
     if (body && body.trim().length > 0) {
       children.push(...buildContentParagraphs(body, baseSize, font));
+    } else if (!(chapter.subChapters || []).some((sub) => (sub.content || '').trim().length > 0)) {
+      children.push(new Paragraph({
+        children: [new TextRun({ text: '[Contenu à rédiger]', italics: true, size: baseSize, font, color: '888888' })],
+        spacing: { after: 240 },
+      }));
     }
+
 
 
     // Sous-chapitres
