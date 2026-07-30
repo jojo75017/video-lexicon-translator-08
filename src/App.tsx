@@ -321,7 +321,8 @@ const App = () => {
               }
             />
 
-            <Route path="/" element={<Navigate to={hasPlannerAccess ? '/ebook-planner' : '/offres'} replace />} />
+            {/* Accueil V2 : les visiteurs arrivent directement sur l'offre 59 € */}
+            <Route path="/" element={<Navigate to={hasPlannerAccess ? '/ebook-planner' : '/commander'} replace />} />
 
             {/* Marketing */}
             {/* Visiteurs non connectés → page de commande publique (plus de mur de login) */}
