@@ -555,9 +555,8 @@ h2+p,h3+p{text-indent:0}
       </div>
 
       <DocxPreviewDialog open={previewOpen} onOpenChange={setPreviewOpen} getOptions={buildDocxOptions} />
-
-      </div>
     </div>
+
   );
 };
 
