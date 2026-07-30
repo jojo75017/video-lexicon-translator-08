@@ -29,18 +29,7 @@ const fallbackCoverUrl = (asin: string) => `https://m.media-amazon.com/images/P/
 const amazonBookUrl = (asin: string) => `https://www.amazon.fr/dp/${asin}/`;
 
 export default function V3HomePage() {
-  const nav = useNavigate();
-  const [idea, setIdea] = useState('');
-  const [phIdx, setPhIdx] = useState(0);
-  useEffect(() => {
-    const id = window.setInterval(() => setPhIdx((n) => (n + 1) % IDEA_EXAMPLES.length), 3200);
-    return () => window.clearInterval(id);
-  }, []);
 
-  const submitIdea = () => {
-    const q = idea.trim();
-    nav(`/v3/create${q ? `?idea=${encodeURIComponent(q)}` : ''}`);
-  };
 
   return (
     <>
