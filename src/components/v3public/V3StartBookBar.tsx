@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, BookOpen, RotateCcw } from 'lucide-react';
-import { readBookBrief, writeBookBrief } from '@/lib/v3/bookBrief';
+import { ArrowRight, BookOpen, RotateCcw, Save, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { clearBookBrief, readBookBrief, writeBookBrief } from '@/lib/v3/bookBrief';
 
 /**
  * Point de départ de l'accueil V3 : on saisit un titre, on est redirigé
@@ -14,8 +15,26 @@ export default function V3StartBookBar() {
 
   useEffect(() => {
     const brief = readBookBrief();
-    setCurrentTitle((brief?.title || '').trim());
+    const t = (brief?.title || '').trim();
+    setCurrentTitle(t);
+    setTitle(t);
   }, []);
+
+  const save = () => {
+    const clean = title.trim();
+    if (!clean) return;
+    const brief = readBookBrief() || {};
+    writeBookBrief({ ...brief, title: clean });
+    setCurrentTitle(clean);
+    toast.success('Titre sauvegardé', { description: clean });
+  };
+
+  const erase = () => {
+    clearBookBrief();
+    setTitle('');
+    setCurrentTitle('');
+    toast.success('Fiche du livre effacée', { description: 'Vous pouvez saisir un nouveau titre.' });
+  };
 
   const start = () => {
     const clean = title.trim();
@@ -68,6 +87,27 @@ export default function V3StartBookBar() {
             className="v3-btn v3-btn-gold text-[14px] px-6 py-3.5 whitespace-nowrap disabled:opacity-45 disabled:cursor-not-allowed"
           >
             Continuer <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={save}
+            disabled={!title.trim()}
+            className="inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-[13px] font-semibold disabled:opacity-45 disabled:cursor-not-allowed"
+            style={{ borderColor: 'rgba(6,78,59,0.3)', color: 'var(--v3-emerald)', background: '#fff' }}
+          >
+            <Save className="w-3.5 h-3.5" /> Sauvegarder
+          </button>
+          <button
+            type="button"
+            onClick={erase}
+            disabled={!title.trim() && !currentTitle}
+            className="inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-[13px] font-semibold disabled:opacity-45 disabled:cursor-not-allowed"
+            style={{ borderColor: 'rgba(190,60,60,0.35)', color: '#b23b3b', background: '#fff' }}
+          >
+            <Trash2 className="w-3.5 h-3.5" /> Effacer
           </button>
         </div>
 
