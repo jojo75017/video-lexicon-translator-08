@@ -13,7 +13,7 @@ const SUBJECT = "Et vous, qu'est-ce qui vous retient ?";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const TRACK_CLICK = `${SUPABASE_URL}/functions/v1/track-email-click`;
-const OFFRES_LINK = "https://www.ebookstudio.fr/offres";
+const OFFRES_LINK = "https://www.ebookstudio.fr/commander?src=email";
 
 function trackedUrl(email: string, dest: string): string {
   return `${TRACK_CLICK}?e=${encodeURIComponent(email)}&s=10&u=${encodeURIComponent(dest)}&t=${encodeURIComponent(TEMPLATE_NAME)}`;

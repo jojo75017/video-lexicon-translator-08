@@ -9,7 +9,7 @@ const RESEND_API_URL = "https://api.resend.com/emails";
 const FROM_ADDRESS = "Georges Boubet <noreply@ebookstudio.fr>";
 const EXCLUDED_EMAILS = ["boubetgeorges@gmail.com"];
 const SUBJECT = "🎁 Offre inédite 59€ + BONUS : les 10 niches rentables Amazon KDP";
-const OFFRES_LINK = "https://www.ebookstudio.fr/offres";
+const OFFRES_LINK = "https://www.ebookstudio.fr/commander?src=email";
 
 function buildHtml(): string {
   return `

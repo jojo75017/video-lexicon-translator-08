@@ -16,7 +16,7 @@ const SUBJECT = "⏳ EbookStudio à 59€ — offre temporaire (au lieu de 67€
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const TRACK_CLICK = `${SUPABASE_URL}/functions/v1/track-email-click`;
-const OFFRES_LINK = "https://www.ebookstudio.fr/offres";
+const OFFRES_LINK = "https://www.ebookstudio.fr/commander?src=email";
 const DEMO_LINK = "https://www.ebookstudio.fr/demo";
 
 // Construit une URL de redirection trackée (les clics sont enregistrés)

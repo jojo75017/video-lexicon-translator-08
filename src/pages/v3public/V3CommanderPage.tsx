@@ -42,7 +42,7 @@ export default function V3CommanderPage() {
   const src = params.get("src") || undefined;
   const ref = params.get("ref") || params.get("aff") || undefined;
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(() => (params.get("email") || "").trim().toLowerCase());
   const [plan, setPlan] = useState<PlanId>("v2_1x");
   const [loading, setLoading] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);

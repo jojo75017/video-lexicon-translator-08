@@ -86,7 +86,7 @@ const EMAIL_SEQUENCE = [
 ];
 
 const DEMO_LINK = "https://www.ebookstudio.fr/demo";
-const OFFRES_LINK = "https://www.ebookstudio.fr/offres";
+const OFFRES_LINK = "https://www.ebookstudio.fr/commander?src=email";
 
 function getEmailBody(step: number, firstName: string): string {
   const name = firstName || "cher lecteur";
