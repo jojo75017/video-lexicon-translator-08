@@ -162,7 +162,7 @@ export async function callGemini(
         lastErrText = await response.text().catch(() => '');
         // 400 « requête invalide » (thinkingConfig / responseMimeType refusés)
         // ≠ clé invalide : on retente une fois en mode dégradé.
-        const looksLikeBadKey = /API_KEY_INVALID|API key not valid|PERMISSION_DENIED|api key/i.test(lastErrText);
+        const looksLikeBadKey = /API_KEY_INVALID|API key not valid|API_KEY_SERVICE_BLOCKED/i.test(lastErrText);
         if (response.status === 400 && !looksLikeBadKey && !degraded) {
           console.warn('[Gemini] 400 sur la requête — nouvelle tentative sans jsonMode/thinkingConfig.', lastErrText.slice(0, 300));
           degraded = true;
@@ -185,7 +185,7 @@ export async function callGemini(
       if (lastStatus === 429 || lastStatus === 503) {
         throw new Error('Service Google momentanément saturé. Patientez ~30s puis relancez.');
       }
-      const badKey = /API_KEY_INVALID|API key not valid|PERMISSION_DENIED/i.test(errText);
+      const badKey = /API_KEY_INVALID|API key not valid|API_KEY_SERVICE_BLOCKED/i.test(errText);
       if (badKey || lastStatus === 401 || (lastStatus === 403 && !apiMessage)) {
         throw new Error('Clé API Gemini invalide. Vérifiez votre clé sur aistudio.google.com');
       }

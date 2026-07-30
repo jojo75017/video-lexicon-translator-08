@@ -1,29 +1,18 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { testAIProviderKey } from '@/services/aiProviderKeyTest';
 
 const validateOpenAIApiKey = async (apiKey: string, _model: string): Promise<boolean> => {
   try {
     toast.loading("Validation de la clé API Gemini...", { id: "validate-openai-key" });
     const normalizedKey = sanitizeKey(apiKey);
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(normalizedKey)}`);
-    if (response.status === 429) {
-      toast.warning("Clé API valide mais limite de requêtes atteinte", { id: "validate-openai-key" });
+    const result = await testAIProviderKey('gemini', normalizedKey);
+    if (result.ok) {
+      toast.success(`Clé API Gemini validée ✓${result.extra || ''}`, { id: "validate-openai-key" });
       return true;
     }
-    if (response.status === 400 || response.status === 401 || response.status === 403) {
-      if (/^AQ\.Ab8?/i.test(normalizedKey)) {
-        toast.success("Nouveau format Google accepté ✓", { id: "validate-openai-key" });
-        return true;
-      }
-      toast.error("Clé API Gemini invalide", { id: "validate-openai-key" });
-      return false;
-    }
-    if (!response.ok) {
-      toast.error("Erreur de validation", { id: "validate-openai-key" });
-      return false;
-    }
-    toast.success("Clé API Gemini validée ✓", { id: "validate-openai-key" });
-    return true;
+    toast.error(result.error || "Clé API Gemini rejetée", { id: "validate-openai-key" });
+    return false;
   } catch {
     toast.error("Erreur de connexion", { id: "validate-openai-key" });
     return false;
@@ -79,13 +68,17 @@ export const useOpenAIConfig = () => {
       }
     }
 
-    const savedApiKey = localStorage.getItem(GEMINI_API_KEY);
+    // Toujours relire la clé active du gestionnaire multi-clés. Le slot legacy
+    // peut contenir une ancienne clé après un changement de projet.
+    const savedApiKey = getProviderKey('gemini') || localStorage.getItem(GEMINI_API_KEY);
     if (savedApiKey) {
-      const normalizedSavedApiKey = savedApiKey.trim();
+      const normalizedSavedApiKey = sanitizeKey(savedApiKey);
       if (isValidGeminiKey(normalizedSavedApiKey)) {
         setApiKey(normalizedSavedApiKey);
         logSecurityWarning();
-        setTimeout(() => validateApiKey(normalizedSavedApiKey), 100);
+        // Le format valide suffit pour démarrer. Le test réseau reste informatif
+        // et ne doit jamais reverrouiller un workflow sur une panne temporaire.
+        setIsValid(true);
       } else {
         console.warn('[Security] Stored API key has invalid format, removing.');
         localStorage.removeItem(GEMINI_API_KEY);
@@ -131,7 +124,7 @@ export const useOpenAIConfig = () => {
     const key = keyToValidate || apiKey;
     if (!key) return false;
 
-    const normalizedKey = key.trim();
+    const normalizedKey = sanitizeKey(key);
     const isValidFormat = isValidGeminiKey(normalizedKey);
     if (!isValidFormat) {
       setIsValid(false);
