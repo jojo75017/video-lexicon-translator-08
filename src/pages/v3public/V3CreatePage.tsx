@@ -77,17 +77,11 @@ export default function V3CreatePage() {
           </Link>
         </div>
 
-        {/* Clés API — repliées par défaut */}
+        {/* Clés API — encart partagé (alerte si aucune clé) */}
         <div className="mt-6">
-          <button type="button" onClick={() => setShowKeys((v) => !v)} className="v3-btn v3-btn-outline text-xs">
-            <KeyRound className="w-3.5 h-3.5" /> {showKeys ? 'Masquer' : 'Ma clé Gemini / modèles IA'}
-          </button>
-          {showKeys && (
-            <div className="v3-card mt-3">
-              <ApiProviderQuickSettings onOpenAdvanced={openFloating} />
-            </div>
-          )}
+          <V3ApiKeysGate context="Sans clé Gemini, le workflow d’écriture ne peut pas démarrer." />
         </div>
+
 
         {/* Fiche du livre + Cible & Promesse IA + Sommaire validé */}
         <div className="mt-6">
