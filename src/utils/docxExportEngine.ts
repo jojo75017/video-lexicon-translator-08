@@ -663,38 +663,37 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
       }));
     }
 
-    chapters.forEach((chapter, index) => {
-      // Filtrer les chapitres vides (titre générique sans contenu)
-      const hasAnyContent = (chapter.content && chapter.content.trim().length > 50) ||
-        chapter.subChapters.some(s => s.content && s.content.trim().length > 50);
-      if (!hasAnyContent && /^chapitre\s+\d+$/i.test(chapter.title.trim())) return;
-
-      const tocTitle = resolveChapter(chapter, index).displayTitle;
-      const safeTocTitle = isGenericTitle(tocTitle)
-        ? `Chapitre ${index + 1}`
-        : `Chapitre ${index + 1} – ${tocTitle}`;
+    renderChapters.forEach(({ chapter, num, displayTitle }) => {
+      const safeTocTitle = isGenericTitle(displayTitle)
+        ? `Chapitre ${num}`
+        : `Chapitre ${num} – ${displayTitle}`;
       children.push(new Paragraph({
         children: [new TextRun({
           text: safeTocTitle,
           size: baseSize,
           font,
         })],
-        spacing: { after: 80 },
+        spacing: { after: 100 },
+        // Retrait négatif : les titres longs se replient alignés sous le premier mot
+        indent: { left: convertInchesToTwip(0.35), hanging: convertInchesToTwip(0.35) },
       }));
 
       chapter.subChapters.forEach((sub, subIdx) => {
+        const subTitle = cleanChapterTitle(sub.title);
+        if (isGenericTitle(subTitle)) return;
         children.push(new Paragraph({
           children: [new TextRun({
-            text: `${index + 1}.${subIdx + 1}  ${cleanChapterTitle(sub.title)}`,
+            text: `${num}.${subIdx + 1}  ${subTitle}`,
             size: Math.round(baseSize * 0.9),
             font,
             color: '555555',
           })],
           spacing: { after: 60 },
-          indent: { left: convertInchesToTwip(0.4) },
+          indent: { left: convertInchesToTwip(0.75), hanging: convertInchesToTwip(0.4) },
         }));
       });
     });
+
 
     if (conclusion) {
       children.push(new Paragraph({
