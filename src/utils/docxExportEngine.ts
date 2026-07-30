@@ -707,9 +707,10 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
   }
 
 
-  // ═══ TABLE DES MATIÈRES ═══
+  // ═══ TABLE DES MATIÈRES (toujours générée) ═══
 
-  if (includeTableOfContents) {
+  {
+
     children.push(new Paragraph({
       children: [new TextRun({ text: 'TABLE DES MATIÈRES', bold: true, size: chapterTitleSize, font })],
       heading: HeadingLevel.HEADING_1,
