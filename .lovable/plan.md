@@ -1,68 +1,44 @@
-## Décision
+## Diagnostic (vérifié en base)
 
-1TPE est **mis en pause, pas supprimé** : le code reste en place derrière un interrupteur, désactivé par défaut. Vous pourrez le réactiver en une ligne si vous décidez d'en refaire quelque chose. À partir de maintenant, **tous les liens de vente pointent chez vous**.
+- `email_clicks` : 157 lignes, **30 emails uniques** depuis juin. Ce n'est pas un blocage à 19, c'est un vrai plafond d'engagement.
+- Les ouvertures sont excellentes : `vrai-lien-commander-59` = **330 ouvreurs uniques**, `v3-incluse-59` = 267, `v2-lettre-perso` = 154, `v2-v3-passerelle` = 264 (dernière ouverture aujourd'hui 11h48).
+- Deux causes techniques confirmées :
+  1. `send-clickers-59-offer` et `send-clickers-followup` envoient des liens **directs, non trackés** → leurs clics ne sont jamais enregistrés, donc le vivier de cliqueurs ne peut pas grossir.
+  2. Une partie des lignes de `email_clicks` sont des faux positifs de scanners anti-spam (noms de template en ROT13 : `fgbaebee-7` = `standard-7`, `efybadf-6` = `relance-6`), ce qui gonfle le total sans être de vrais humains.
+- Conclusion : il ne faut plus recibler « les cliqueurs », mais **les ouvreurs** (≈330 personnes réellement attentives), avec un contenu neuf : la vidéo YouTube.
 
-## Le lien unique pour vos réseaux sociaux et vos emails
+## Ce qui va être fait
 
-```text
-https://www.ebookstudio.fr/commander
-```
+### 1. Nouvelle campagne « vidéo » (`send-video-demo-openers`)
 
-C'est le seul lien à diffuser. Variantes utiles, toutes vers la même page :
+- **Cible** : tous les emails présents dans `email_opens` (ouvreurs réels), moins :
+  - les clients payants (`funnel_orders.status = 'paid'`),
+  - les désabonnés (`sales_prospects.unsubscribed = true`),
+  - l'adresse admin,
+  - ceux ayant déjà reçu ce template (reprise sûre en cas de relance).
+- **Contenu** : email court centré sur la vidéo `https://www.youtube.com/watch?v=rOwQYrC1KYM`
+  - objet orienté curiosité vidéo (ex. « je vous montre l'outil en vidéo (rien à lire) »),
+  - une vignette cliquable (image YouTube + bouton play) qui pointe vers la vidéo,
+  - un seul lien secondaire vers `https://www.ebookstudio.fr/commander` (59 € à vie, V3 incluse),
+  - version texte brut + version HTML sobre pour la délivrabilité,
+  - mention STOP en pied.
+- **Tracking corrigé** : les deux liens (vidéo et commander) passent par `track-email-click` avec `t=video-demo-openers`, pixel d'ouverture inclus. On saura enfin qui clique, et sur quoi (vidéo vs offre).
+- **Sécurité d'envoi** : réutilisation du throttle Resend existant (8 req/s, arrêt sur quota journalier), journalisation dans `email_send_log`, mode `{ test: true }` pour un envoi à l'admin d'abord, et `{ limit: n }` pour envoyer par lots.
 
-```text
-https://www.ebookstudio.fr/commander?src=facebook
-https://www.ebookstudio.fr/commander?src=youtube
-https://www.ebookstudio.fr/commander?src=email
-https://www.ebookstudio.fr/commander?ref=VOTRECODE
-```
+### 2. Nettoyage des campagnes obsolètes
 
-Le paramètre `src` sert au suivi de la provenance, `ref` au suivi affilié. Ils sont conservés jusqu'à la commande, donc vous saurez quel réseau vend.
+Suppression des fonctions de campagne périmées ou non trackées :
+`send-clickers-59-offer`, `send-clickers-followup`, `send-v3-offre-relance`, `send-v3-incluse-59`, `send-vrai-lien-commander`, `send-marie-rachel-story`, `send-marie-rachel-story-v2`, `send-openers-reactivation`, `send-prospects-gift-59`.
 
-## 1. La page `/commander`
+Conservés : `track-email-click`, `track-email-open`, `send-v2-lettre-perso` (référence texte), et toutes les fonctions transactionnelles (accès, bêta, audiobook, bienvenue, etc.).
 
-Seule page de paiement de l'offre à 59 € (accès à vie EbookStudio Pro, sans abonnement).
+### 3. Correction du tracker
 
-- Rappel de l'offre et de ce qui est inclus.
-- Choix du règlement : **59 € en une fois** (mis en avant), **2 ×** et **3 ×** pour étaler.
-- Champ email (clé de création du compte).
-- Formulaire de paiement **intégré à la page** : carte bancaire et PayPal dans le même écran, sans redirection vers un site tiers.
-- Bandeau de réassurance : paiement sécurisé, accès immédiat, contact.
-- Suivi de `src` / `ref` transmis à la commande.
+Dans `track-email-click`, la redirection par défaut et les liens de secours pointent encore vers l'ancien domaine `video-lexicon-translator-08.lovable.app/offres`. Ils seront redirigés vers `https://www.ebookstudio.fr/commander`, le tunnel unique.
 
-La mécanique de paiement en plusieurs fois existe déjà chez vous (utilisée pour le pack 547 € : suivi des échéances, relance en cas d'échec, suspension d'accès, bascule automatique en accès à vie à la dernière échéance). Je la réutilise pour le 59 €.
+### Détails techniques
 
-## 2. Après paiement
-
-- Commande enregistrée avec l'email de l'acheteur.
-- **Accès à vie attribué automatiquement** : immédiat en paiement unique ; dès la 1re échéance en plusieurs fois, avec suspension si une échéance échoue.
-- Email de confirmation avec lien de connexion et code d'accès.
-- Page de remerciement avec la prochaine étape (créer son 1er livre).
-
-## 3. 1TPE mis en veille
-
-- Un interrupteur `TPE_ENABLED = false` dans `src/data/externalLinks.ts`.
-- Tant qu'il est sur `false` : aucun bouton, lien ou mention 1TPE n'apparaît nulle part (pages de vente, emails, bannières).
-- Le code et le lien restent conservés, réactivables instantanément.
-- Vos acheteurs 1TPE existants ne sont pas touchés : leur accès reste valide.
-- Sur votre page externe `trafic-affiliation.com/ebookstudiopv`, le bouton d'achat doit être repointé vers `https://www.ebookstudio.fr/commander` — à faire de votre côté, je n'ai pas la main sur cet hébergement.
-
-## 4. Rangement des pages (fin de la confusion)
-
-Redirection vers `/commander` de toutes les adresses qui parlent d'offre ou de paiement : `/v3-offre`, `/valeur-offre`, `/offre-59`, `/59`, `/vente-v3`, `/essai-gratuit`, `/publication-pro`, `/bookperfect-offre`, plus les boutons de la page de présentation.
-
-Point vérifié dans le code : `/offres` affiche aujourd'hui un **écran de connexion avec code d'accès** aux visiteurs non connectés — vos prospects venant des emails tombent donc sur un mur au lieu de l'offre. Les visiteurs non connectés seront redirigés vers `/commander` ; les abonnés connectés gardent exactement leur comportement actuel.
-
-## 5. Emails prospects
-
-Tous les liens d'offre des fonctions d'emailing pointeront vers `https://www.ebookstudio.fr/commander?src=email`, avec le code affilié transmis quand il existe.
-
-## 6. Vérifications avant de communiquer
-
-- Test carte en mode test, puis test PayPal réel à 1 € (le bouton admin existe déjà) pour confirmer que PayPal est bien actif sur votre compte d'encaissement.
-- Test d'un paiement en 3 fois : accès ouvert dès la 1re échéance.
-- Contrôle qu'aucun lien d'email ne mène plus à un écran de connexion ni à 1TPE.
-
-## Point à confirmer
-
-Pour les paiements en plusieurs fois sur 59 €, je propose **2 × 32 €** et **3 × 22 €** (léger supplément couvrant les frais bancaires). Vous préférez sans supplément (2 × 29,50 € / 3 × 19,67 €) ?
+- Nouvelle fonction : `supabase/functions/send-video-demo-openers/index.ts`, basée sur le pattern de `send-v2-lettre-perso` (pagination `fetchAll`, dédoublonnage, `sendResendEmailThrottled`).
+- Vignette vidéo : image `https://i.ytimg.com/vi/rOwQYrC1KYM/hqdefault.jpg` en `<img>` cliquable (pas de vidéo embarquée, non supportée en email).
+- Déploiement de la nouvelle fonction et de `track-email-click`, puis envoi test à l'admin avant l'envoi complet aux ouvreurs.
+- Aucune modification de schéma base de données.
