@@ -1,44 +1,24 @@
-## Diagnostic (vérifié en base)
+# Plan : Fichier de suivi des sujets en attente
 
-- `email_clicks` : 157 lignes, **30 emails uniques** depuis juin. Ce n'est pas un blocage à 19, c'est un vrai plafond d'engagement.
-- Les ouvertures sont excellentes : `vrai-lien-commander-59` = **330 ouvreurs uniques**, `v3-incluse-59` = 267, `v2-lettre-perso` = 154, `v2-v3-passerelle` = 264 (dernière ouverture aujourd'hui 11h48).
-- Deux causes techniques confirmées :
-  1. `send-clickers-59-offer` et `send-clickers-followup` envoient des liens **directs, non trackés** → leurs clics ne sont jamais enregistrés, donc le vivier de cliqueurs ne peut pas grossir.
-  2. Une partie des lignes de `email_clicks` sont des faux positifs de scanners anti-spam (noms de template en ROT13 : `fgbaebee-7` = `standard-7`, `efybadf-6` = `relance-6`), ce qui gonfle le total sans être de vrais humains.
-- Conclusion : il ne faut plus recibler « les cliqueurs », mais **les ouvreurs** (≈330 personnes réellement attentives), avec un contenu neuf : la vidéo YouTube.
+## Objectif
+Créer un fichier `.lovable/plan-attente.md` centralisé et visible, listant tous les sujets mis en pause sur demande explicite, avec leur contexte et la raison du gel.
 
-## Ce qui va être fait
+## Contenu du fichier `.lovable/plan-attente.md`
 
-### 1. Nouvelle campagne « vidéo » (`send-video-demo-openers`)
+### 🧊 En attente — gel demandé jusqu'après août 2026
 
-- **Cible** : tous les emails présents dans `email_opens` (ouvreurs réels), moins :
-  - les clients payants (`funnel_orders.status = 'paid'`),
-  - les désabonnés (`sales_prospects.unsubscribed = true`),
-  - l'adresse admin,
-  - ceux ayant déjà reçu ce template (reprise sûre en cas de relance).
-- **Contenu** : email court centré sur la vidéo `https://www.youtube.com/watch?v=rOwQYrC1KYM`
-  - objet orienté curiosité vidéo (ex. « je vous montre l'outil en vidéo (rien à lire) »),
-  - une vignette cliquable (image YouTube + bouton play) qui pointe vers la vidéo,
-  - un seul lien secondaire vers `https://www.ebookstudio.fr/commander` (59 € à vie, V3 incluse),
-  - version texte brut + version HTML sobre pour la délivrabilité,
-  - mention STOP en pied.
-- **Tracking corrigé** : les deux liens (vidéo et commander) passent par `track-email-click` avec `t=video-demo-openers`, pixel d'ouverture inclus. On saura enfin qui clique, et sur quoi (vidéo vs offre).
-- **Sécurité d'envoi** : réutilisation du throttle Resend existant (8 req/s, arrêt sur quota journalier), journalisation dans `email_send_log`, mode `{ test: true }` pour un envoi à l'admin d'abord, et `{ limit: n }` pour envoyer par lots.
+| # | Sujet | Contexte / objectif | Pourquoi gelé | Date de reprise estimée |
+|---|-------|---------------------|---------------|--------------------------|
+| 1 | **Facturation annuelle + tacite reconduction** | Configurer les 3 plans (Débutant, Studio, Éditeur) en facturation annuelle par défaut, avec tacite reconduction, possibilité de résiliation utilisateur et accès portail Stripe pour annulation. | Gelé sur demande : « met cela en attente on en reparle ». | Septembre 2026 |
+| 2 | **Essai gratuit — 1 ebook sans workflow** | Proposer un plan gratuit limité à 1 projet, 8 chapitres max, génération simplifiée 1 passe, export PDF filigrané. Le V2/V3 lifetime reste honoré. | Gelé sur demande : « ok met cela en attente ». | Septembre 2026 |
+| 3 | **Améliorations workflows V3 (août 2026)** | Différencier les plans (Débutant limité, Expert enrichi, Éditeur avec mode recherche approfondie + workflow de qualité professionnelle). | Gelé : « dans le mois d'août on va perfectionner le workflow des 2 plans ». | Août 2026 selon planning utilisateur |
+| 4 | **KDP Pilot + lien affilié** | Intégrer Amazon PA-API pour données KDP réelles (BSR, volumes, notes concurrents) et créer un lien affilié KDP Pilot. | En attente de réception des clés PA-API de l'utilisateur : « je te le donnerais je ne l'ai pas encore ». | Dès réception des clés |
+| 5 | **Stratégie V4 (2027)** | Définir la politique d'accès à la V4 pour les possesseurs de V2+V3 à vie (proposition : upgrade V4 payant, mais pas inclus dans l'offre 59 €). | Gelé : V4 prévue pour 2027, à décider après le lancement V3. | Fin 2026 / début 2027 |
 
-### 2. Nettoyage des campagnes obsolètes
+### Règle de conduite
+- Aucun code, migration, edge function ou modification de base de données ne sera effectué sur ces sujets avant la date de reprise indiquée ou une nouvelle décision explicite.
+- Ce fichier sera relu et mis à jour à chaque reprise de l'un des sujets.
 
-Suppression des fonctions de campagne périmées ou non trackées :
-`send-clickers-59-offer`, `send-clickers-followup`, `send-v3-offre-relance`, `send-v3-incluse-59`, `send-vrai-lien-commander`, `send-marie-rachel-story`, `send-marie-rachel-story-v2`, `send-openers-reactivation`, `send-prospects-gift-59`.
-
-Conservés : `track-email-click`, `track-email-open`, `send-v2-lettre-perso` (référence texte), et toutes les fonctions transactionnelles (accès, bêta, audiobook, bienvenue, etc.).
-
-### 3. Correction du tracker
-
-Dans `track-email-click`, la redirection par défaut et les liens de secours pointent encore vers l'ancien domaine `video-lexicon-translator-08.lovable.app/offres`. Ils seront redirigés vers `https://www.ebookstudio.fr/commander`, le tunnel unique.
-
-### Détails techniques
-
-- Nouvelle fonction : `supabase/functions/send-video-demo-openers/index.ts`, basée sur le pattern de `send-v2-lettre-perso` (pagination `fetchAll`, dédoublonnage, `sendResendEmailThrottled`).
-- Vignette vidéo : image `https://i.ytimg.com/vi/rOwQYrC1KYM/hqdefault.jpg` en `<img>` cliquable (pas de vidéo embarquée, non supportée en email).
-- Déploiement de la nouvelle fonction et de `track-email-click`, puis envoi test à l'admin avant l'envoi complet aux ouvreurs.
-- Aucune modification de schéma base de données.
+## Livrable
+- Fichier `.lovable/plan-attente.md` créé et rempli avec le tableau ci-dessus.
+- Aucun autre fichier modifié.
