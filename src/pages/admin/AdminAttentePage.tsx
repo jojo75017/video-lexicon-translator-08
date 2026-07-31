@@ -45,7 +45,7 @@ const attenteItems: AttenteItem[] = [
   {
     id: 5,
     subject: "Stratégie V4 (2027)",
-    context: "Définir la politique d'accès à la V4 pour les possesseurs de V2+V3 à vie (proposition : upgrade V4 payant, mais pas inclus dans l'offre 59 €).",
+    context: "Construire une 'Maison d'Édition Professionnelle' autour des données KDP Pilot (abonnement 19 €/mois interne). 3 forfaits V4 proposés : Auteur 19 €, Studio 29 €, Éditeur 79 €. 15 modules : Market Intelligence Hub, Data Layer multi-sources, Quota & metering, Niche Validator, Keyword Engine Pro, Deep Research Writing, Editorial Board, Style DNA, Studio Illustration unifié, Séries & Univers, Publication Pack KDP, Post-Launch Tracker, Pricing Optimizer, Ads & Lancement, Abonnements & entitlements.",
     reason: "Gelé : V4 prévue pour 2027, à décider après le lancement V3.",
     estimatedResume: "Fin 2026 / début 2027",
   },
