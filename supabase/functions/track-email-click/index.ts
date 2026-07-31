@@ -1,8 +1,8 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.78.0";
 
-const OFFRES_LINK = "https://video-lexicon-translator-08.lovable.app/offres";
-const SAFE_V3_OFFER_LINK = "https://video-lexicon-translator-08.lovable.app/v3/offre";
-const SAFE_V3_WHY_LINK = "https://video-lexicon-translator-08.lovable.app/v3/pourquoi";
+const OFFRES_LINK = "https://www.ebookstudio.fr/commander";
+const SAFE_V3_OFFER_LINK = "https://www.ebookstudio.fr/commander";
+const SAFE_V3_WHY_LINK = "https://www.ebookstudio.fr/commander";
 
 function isSafeUrl(u: string): boolean {
   try {
