@@ -1,11 +1,6 @@
-# Plan : Fichier de suivi des sujets en attente
+# 🧊 Sujets en attente
 
-## Objectif
-Créer un fichier `.lovable/plan-attente.md` centralisé et visible, listant tous les sujets mis en pause sur demande explicite, avec leur contexte et la raison du gel.
-
-## Contenu du fichier `.lovable/plan-attente.md`
-
-### 🧊 En attente — gel demandé jusqu'après août 2026
+Gel demandé jusqu'après août 2026.
 
 | # | Sujet | Contexte / objectif | Pourquoi gelé | Date de reprise estimée |
 |---|-------|---------------------|---------------|--------------------------|
@@ -15,10 +10,7 @@ Créer un fichier `.lovable/plan-attente.md` centralisé et visible, listant tou
 | 4 | **KDP Pilot + lien affilié** | Intégrer Amazon PA-API pour données KDP réelles (BSR, volumes, notes concurrents) et créer un lien affilié KDP Pilot. | En attente de réception des clés PA-API de l'utilisateur : « je te le donnerais je ne l'ai pas encore ». | Dès réception des clés |
 | 5 | **Stratégie V4 (2027)** | Définir la politique d'accès à la V4 pour les possesseurs de V2+V3 à vie (proposition : upgrade V4 payant, mais pas inclus dans l'offre 59 €). | Gelé : V4 prévue pour 2027, à décider après le lancement V3. | Fin 2026 / début 2027 |
 
-### Règle de conduite
+## Règle de conduite
+
 - Aucun code, migration, edge function ou modification de base de données ne sera effectué sur ces sujets avant la date de reprise indiquée ou une nouvelle décision explicite.
 - Ce fichier sera relu et mis à jour à chaque reprise de l'un des sujets.
-
-## Livrable
-- Fichier `.lovable/plan-attente.md` créé et rempli avec le tableau ci-dessus.
-- Aucun autre fichier modifié.
