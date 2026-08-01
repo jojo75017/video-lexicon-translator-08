@@ -1,24 +1,40 @@
-# Plan : Fichier de suivi des sujets en attente
+## Problème
 
-## Objectif
-Créer un fichier `.lovable/plan-attente.md` centralisé et visible, listant tous les sujets mis en pause sur demande explicite, avec leur contexte et la raison du gel.
+L'onglet **Attente** (`/admin/attente`) n'affiche que des résumés courts : chaque sujet gelé tient dans une petite carte avec 2 phrases. Les décisions détaillées (prix, modules, limites par plan, conditions de résiliation, stratégie V4 en 15 modules) sont écrasées en une seule ligne de texte, donc illisible.
 
-## Contenu du fichier `.lovable/plan-attente.md`
+## Ce que je vais faire
 
-### 🧊 En attente — gel demandé jusqu'après août 2026
+Réécrire `src/pages/admin/AdminAttentePage.tsx` pour que chaque sujet gelé devienne une fiche complète et dépliable, avec l'intégralité de ce qui a été décidé en conversation.
 
-| # | Sujet | Contexte / objectif | Pourquoi gelé | Date de reprise estimée |
-|---|-------|---------------------|---------------|--------------------------|
-| 1 | **Facturation annuelle + tacite reconduction** | Configurer les 3 plans (Débutant, Studio, Éditeur) en facturation annuelle par défaut, avec tacite reconduction, possibilité de résiliation utilisateur et accès portail Stripe pour annulation. | Gelé sur demande : « met cela en attente on en reparle ». | Septembre 2026 |
-| 2 | **Essai gratuit — 1 ebook sans workflow** | Proposer un plan gratuit limité à 1 projet, 8 chapitres max, génération simplifiée 1 passe, export PDF filigrané. Le V2/V3 lifetime reste honoré. | Gelé sur demande : « ok met cela en attente ». | Septembre 2026 |
-| 3 | **Améliorations workflows V3 (août 2026)** | Différencier les plans (Débutant limité, Expert enrichi, Éditeur avec mode recherche approfondie + workflow de qualité professionnelle). | Gelé : « dans le mois d'août on va perfectionner le workflow des 2 plans ». | Août 2026 selon planning utilisateur |
-| 4 | **KDP Pilot + lien affilié** | Intégrer Amazon PA-API pour données KDP réelles (BSR, volumes, notes concurrents) et créer un lien affilié KDP Pilot. | En attente de réception des clés PA-API de l'utilisateur : « je te le donnerais je ne l'ai pas encore ». | Dès réception des clés |
-| 5 | **Stratégie V4 (2027)** | Construire une « Maison d'Édition Professionnelle » autour des données KDP Pilot (abonnement 19 €/mois interne). 3 forfaits V4 proposés : Auteur 19 €, Studio 29 €, Éditeur 79 €. 15 modules : Market Intelligence Hub, Data Layer multi-sources, Quota & metering, Niche Validator, Keyword Engine Pro, Deep Research Writing, Editorial Board, Style DNA, Studio Illustration unifié, Séries & Univers, Publication Pack KDP, Post-Launch Tracker, Pricing Optimizer, Ads & Lancement, Abonnements & entitlements. | Gelé : V4 prévue pour 2027, à décider après le lancement V3. | Fin 2026 / début 2027 |
+### Structure de chaque fiche (Accordion shadcn, ouvrable/fermable)
 
-### Règle de conduite
-- Aucun code, migration, edge function ou modification de base de données ne sera effectué sur ces sujets avant la date de reprise indiquée ou une nouvelle décision explicite.
-- Ce fichier sera relu et mis à jour à chaque reprise de l'un des sujets.
+En-tête toujours visible : numéro, titre, badge date de reprise, statut « Gelé ».
 
-## Livrable
-- Fichier `.lovable/plan-attente.md` créé et rempli avec le tableau ci-dessus.
-- Aucun autre fichier modifié.
+Contenu déplié, en sections :
+1. **Objectif** — ce qu'on veut obtenir, en clair.
+2. **Décisions actées** — liste à puces de tout ce qui a été validé (tarifs exacts, limites, règles).
+3. **Détail technique** — tables/fonctions/pages concernées quand c'est pertinent.
+4. **Pourquoi gelé** — la citation exacte de la demande de mise en attente.
+5. **Conditions de reprise** — ce qui doit arriver pour débloquer (date, réception de clés API, décision).
+
+### Contenu complet à restituer (5 sujets)
+
+1. **Facturation annuelle + tacite reconduction** — 3 plans (Débutant 9,99 €/mois, Expert 12,99 €/mois, Auteur/Éditeur 59 €), option annuelle avec économie affichée, tacite reconduction chaque année, résiliation self-service, portail client pour annulation, synchro des annulations côté backend.
+2. **Essai gratuit — 1 ebook sans workflow** — 1 projet, 8 chapitres max, génération 1 passe, export PDF filigrané, pas d'accès au workflow multi-agents, offre lifetime V2/V3 honorée, palier `trial` dans les droits utilisateur.
+3. **Améliorations workflows V3 (août 2026)** — Débutant : 10 livres/mois, 20 chapitres, workflow standard. Expert : 20 livres/mois, 40 chapitres, presets Kids Book. Éditeur 59 € : Mode Recherche Approfondie, enrichissement marché en amont du plan, fiches produit KDP automatiques, pack ZIP complet, qualité éditoriale renforcée.
+4. **KDP Pilot + lien affilié** — intégration Amazon PA-API pour BSR réel, volumes de mots-clés, notes concurrents ; carte d'affiliation KDP Pilot avec commission ; option d'un abonnement 19 €/mois côté backend comme source de données mutualisée. Bloqué en attente des clés PA-API.
+5. **Stratégie V4 (2027) — Maison d'Édition Professionnelle** — forfaits 19 € / 29 € / 79 €, upgrade fidélité pour les lifetime V2+V3 (V4 non incluse), et les **15 modules listés un par un** avec une phrase de description chacun : Market Intelligence Hub, Data Layer multi-sources, Quota & metering, Niche Validator, Keyword Engine Pro, Deep Research Writing, Editorial Board, Style DNA, Studio Illustration unifié, Séries & Univers, Publication Pack KDP, Post-Launch Tracker, Pricing Optimizer, Ads & Lancement, Abonnements & entitlements.
+
+### Ergonomie
+
+- Bouton « Tout déplier / Tout replier » en haut.
+- Première fiche ouverte par défaut.
+- Texte en pleine largeur avec interlignage lisible, plus de troncature ni de blocs compressés.
+- Rappel de la règle de conduite (aucun code ni migration avant la date de reprise) conservé en haut.
+
+### Fichiers touchés
+
+- `src/pages/admin/AdminAttentePage.tsx` — réécriture de l'affichage et enrichissement des données.
+- `.lovable/plan-attente.md` — mise à jour pour refléter le même niveau de détail (source de vérité écrite).
+
+Aucun changement de route, de navigation, de base de données ni de logique métier. Rien n'est dégelé : c'est uniquement de l'affichage.
