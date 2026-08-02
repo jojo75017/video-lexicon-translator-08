@@ -143,10 +143,10 @@ Construire en 2027 une véritable maison d'édition professionnelle assistée pa
 - Positionnement : données de marché précises comme cœur de valeur, l'écriture devient une conséquence de l'analyse.
 - Les acheteurs lifetime V2+V3 conservent V2 et V3 à vie, mais la V4 nécessitera un upgrade fidélité (tarif préférentiel, pas gratuit).
 - Mention à ajouter dans les conditions : l'accès à vie couvre V2 et V3, pas les versions majeures suivantes.
-- Périmètre arrêté : 15 modules (détaillés ci-dessous).
+- Périmètre arrêté : 16 modules (détaillés ci-dessous).
 - Décision de lancement à reconfirmer après le lancement V3 d'octobre 2026 et les premiers retours d'abonnés.
 
-### Les 15 modules prévus
+### Les 16 modules prévus
 1. **Market Intelligence Hub** — tableau de bord central des données de marché : niches, tendances, saisonnalité, opportunités.
 2. **Data Layer multi-sources** — couche d'agrégation unifiée (PA-API, KDP Pilot, scraping de secours) avec cache et normalisation.
 3. **Quota & metering** — comptage précis des appels IA et data par abonné, plafonds par forfait, alertes de dépassement.
@@ -162,6 +162,7 @@ Construire en 2027 une véritable maison d'édition professionnelle assistée pa
 13. **Pricing Optimizer** — recommandation de prix selon le marché et simulation de royalties.
 14. **Ads & Lancement** — plan de lancement et de campagnes publicitaires Amazon, budgets et mots-clés suggérés.
 15. **Abonnements & entitlements** — gestion complète des forfaits, upgrades, upgrade fidélité lifetime, résiliations.
+16. **Assistant conversationnel Livre spécial** — création de livres spécialisés par entretien guidé (style Designrr / KDPilot), avec sommaire + préface à valider avant rédaction et insertion d'images en un clic.
 
 ### Pourquoi gelé
 V4 prévue pour 2027, à décider après le lancement V3 — « et met cela en attente ».
@@ -169,3 +170,36 @@ V4 prévue pour 2027, à décider après le lancement V3 — « et met cela en a
 ### Conditions de reprise
 - Reprise fin 2026 / début 2027.
 - Prérequis : lancement V3 d'octobre 2026 stabilisé, et données KDP réelles opérationnelles (sujet n°4).
+
+---
+
+## 6. Assistant conversationnel Livre spécial (style Designrr / KDPilot) — V4
+
+**Reprise estimée : Fin 2026 / début 2027 (V4)**
+
+### Objectif
+Permettre de créer n'importe quel livre spécialisé via un entretien guidé par l'IA, sans formulaire, avec validation du sommaire et de la préface avant rédaction, et insertion d'images en un clic.
+
+### Décisions actées
+- L'IA pose les questions une par une : sujet, promesse, lecteur cible, ton, longueur, format KDP, etc.
+- Des exemples de livres réels sont proposés à chaque étape pour aider à choisir le périmètre.
+- L'utilisateur choisit ce qu'il veut inclure, y compris les 3 pages annexes : À propos de l'auteur, Remerciements, Note aux lecteurs (après lecture / demande d'avis).
+- L'IA génère d'abord un sommaire complet + une préface. Aucun chapitre n'est rédigé avant validation explicite.
+- Boucle de validation obligatoire : si le sommaire ne convient pas, l'IA repose des questions et regénère le sommaire / la préface.
+- À chaque paragraphe ou section, l'IA propose 3 images au choix, intégrables en un clic dans le manuscrit.
+- Parcours de référence : Designrr (entretien guidé) et la page KDPilot fournie (question → exemple → proposition → validation).
+- Cible V4 : ce module devient le 16e module de la Maison d'Édition Professionnelle (les 3 forfaits 19 / 29 / 79 €).
+
+### Détail technique prévu
+- Machine à états de conversation côté client : étape courante, réponses collectées, statut de validation du sommaire.
+- Fonction serveur unique d'entretien : renvoie à chaque tour la question suivante + les exemples, puis le sommaire + préface.
+- Verrou de rédaction : la génération des chapitres est bloquée tant que `sommaire_validé` est faux.
+- Proposition d'images : 3 candidats par bloc via le studio d'illustration existant, insertion en un clic dans le manuscrit.
+- Réutilisation des blocs existants (fiche livre, éditeur de sommaire, export DOCX/PDF/KDP) plutôt qu'un pipeline parallèle.
+
+### Pourquoi gelé
+Gelé sur demande : « attention ce sera pour la v4 ». Le module est clairement positionné dans le périmètre V4, pas V3.
+
+### Conditions de reprise
+- Reprise avec la V4 (fin 2026 / début 2027).
+- Prérequis : stabilisation de la V3 d'octobre 2026 et validation des 3 forfaits V4 (19 / 29 / 79 €).
