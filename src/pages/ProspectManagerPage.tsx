@@ -516,6 +516,10 @@ const ProspectManagerPage = () => {
   const autoEnabled = prospects.filter(p => p.auto_send).length;
   const hotCount = prospects.filter(p => p.status === 'active' && !p.completed && hasOpened(p.email)).length;
   const clickCount = prospects.filter(p => hasClicked(p.email)).length;
+  // Cliqueurs enregistrés au total (toutes sources : prospects, leads funnel, newsletter…)
+  const totalClickers = Object.keys(clicksByEmail).length;
+  // Cliqueurs présents dans email_clicks mais absents de la liste prospects
+  const offListClickers = Math.max(0, totalClickers - clickCount);
   // Cibles de la relance non-cliqueurs : ouvreurs sans clic (toutes ouvertures paginées prises en compte)
   const nonClickerOpeners = prospects.filter(
     p => p.status === 'active' && !p.unsubscribed && hasOpened(p.email) && !hasClicked(p.email)
