@@ -192,7 +192,6 @@ const attenteItems: AttenteItem[] = [
     estimatedResume: "Fin 2026 / début 2027 (V4)",
   }
 ];
-];
 
 const ALL_IDS = attenteItems.map((i) => `item-${i.id}`);
 
