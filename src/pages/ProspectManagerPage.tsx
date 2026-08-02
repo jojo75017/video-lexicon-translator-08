@@ -567,6 +567,11 @@ const ProspectManagerPage = () => {
               <Mail className="h-6 w-6 mx-auto mb-2 text-emerald-400" />
               <div className="text-2xl font-bold text-emerald-400">{clickCount}</div>
               <div className="text-xs text-muted-foreground">👆 Ont cliqué</div>
+              {offListClickers > 0 && (
+                <div className="text-[10px] text-muted-foreground mt-1">
+                  {totalClickers} cliqueurs au total · {offListClickers} hors liste prospects
+                </div>
+              )}
             </CardContent>
           </Card>
           <Card className="bg-card border-border">
