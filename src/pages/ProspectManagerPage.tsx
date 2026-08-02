@@ -516,6 +516,10 @@ const ProspectManagerPage = () => {
   const autoEnabled = prospects.filter(p => p.auto_send).length;
   const hotCount = prospects.filter(p => p.status === 'active' && !p.completed && hasOpened(p.email)).length;
   const clickCount = prospects.filter(p => hasClicked(p.email)).length;
+  // Cliqueurs enregistrés au total (toutes sources : prospects, leads funnel, newsletter…)
+  const totalClickers = Object.keys(clicksByEmail).length;
+  // Cliqueurs présents dans email_clicks mais absents de la liste prospects
+  const offListClickers = Math.max(0, totalClickers - clickCount);
   // Cibles de la relance non-cliqueurs : ouvreurs sans clic (toutes ouvertures paginées prises en compte)
   const nonClickerOpeners = prospects.filter(
     p => p.status === 'active' && !p.unsubscribed && hasOpened(p.email) && !hasClicked(p.email)
@@ -563,6 +567,11 @@ const ProspectManagerPage = () => {
               <Mail className="h-6 w-6 mx-auto mb-2 text-emerald-400" />
               <div className="text-2xl font-bold text-emerald-400">{clickCount}</div>
               <div className="text-xs text-muted-foreground">👆 Ont cliqué</div>
+              {offListClickers > 0 && (
+                <div className="text-[10px] text-muted-foreground mt-1">
+                  {totalClickers} cliqueurs au total · {offListClickers} hors liste prospects
+                </div>
+              )}
             </CardContent>
           </Card>
           <Card className="bg-card border-border">
