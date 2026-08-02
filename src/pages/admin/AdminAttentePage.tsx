@@ -134,7 +134,7 @@ const attenteItems: AttenteItem[] = [
       "Positionnement : données de marché précises comme cœur de valeur, l'écriture devient une conséquence de l'analyse.",
       "Les acheteurs lifetime V2+V3 conservent V2 et V3 à vie, mais la V4 nécessitera un upgrade fidélité (tarif préférentiel, pas gratuit).",
       "Mention à ajouter dans les conditions : l'accès à vie couvre V2 et V3, pas les versions majeures suivantes.",
-      "Périmètre arrêté : 15 modules (détaillés ci-dessous).",
+      "Périmètre arrêté : 16 modules (détaillés ci-dessous).",
       "Décision de lancement à reconfirmer après le lancement V3 d'octobre 2026 et les premiers retours d'abonnés.",
     ],
     technique: [
@@ -153,6 +153,7 @@ const attenteItems: AttenteItem[] = [
       "13. Pricing Optimizer — recommandation de prix selon le marché et simulation de royalties.",
       "14. Ads & Lancement — plan de lancement et de campagnes publicitaires Amazon, budgets et mots-clés suggérés.",
       "15. Abonnements & entitlements — gestion complète des forfaits, upgrades, upgrade fidélité lifetime, résiliations.",
+      "16. Assistant conversationnel Livre spécial — création de livres spécialisés par entretien guidé (style Designrr / KDPilot), avec sommaire + préface à valider avant rédaction et insertion d'images en un clic.",
     ],
     reason: "Gelé : V4 prévue pour 2027, à décider après le lancement V3 — « et met cela en attente ».",
     reprise: [
@@ -277,7 +278,7 @@ export default function AdminAttentePage() {
                     <section className="space-y-2 rounded-lg border bg-muted/40 p-4">
                       <h3 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                         <Wrench className="h-3.5 w-3.5" />
-                        {item.id === 5 ? `Les 15 modules prévus` : "Détail technique prévu"}
+                        {item.id === 5 ? `Les 16 modules prévus` : "Détail technique prévu"}
                       </h3>
                       <ul className="space-y-2">
                         {item.technique.map((t, idx) => (
