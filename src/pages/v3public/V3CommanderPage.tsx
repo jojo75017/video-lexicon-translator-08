@@ -68,7 +68,15 @@ export default function V3CommanderPage() {
           returnUrl: `${window.location.origin}/paiement-succes?session_id={CHECKOUT_SESSION_ID}`,
         },
       });
-      if (error) throw new Error(error.message);
+      if (error) {
+        let message = error.message;
+        const context = error.context;
+        if (context instanceof Response) {
+          const payload = await context.clone().json().catch(() => null) as { error?: string } | null;
+          if (payload?.error) message = payload.error;
+        }
+        throw new Error(message);
+      }
       const secret = (data as { clientSecret?: string })?.clientSecret;
       if (!secret) throw new Error("Session de paiement indisponible.");
       setClientSecret(secret);
