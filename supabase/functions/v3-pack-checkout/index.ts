@@ -30,10 +30,13 @@ const PLANS: Record<
   full_4x: { label: "Pack Pro Vendeur V3 — 4× sans frais", total: 57600, installments: 4, monthly: 14400 },
   base_1x: { label: "Base Création & Publication V3 — paiement unique", total: 19700, installments: 1, monthly: 19700 },
   base_3x: { label: "Base Création & Publication V3 — 3× sans frais", total: 20700, installments: 3, monthly: 6900 },
-  // Offre V2 « accès à vie » à 59 € — tunnel unique /commander.
-  v2_1x: { label: "EbookStudio Pro — accès à vie (paiement unique)", total: 5900, installments: 1, monthly: 5900 },
-  v2_2x: { label: "EbookStudio Pro — accès à vie (2× 32€)", total: 6400, installments: 2, monthly: 3200 },
-  v2_3x: { label: "EbookStudio Pro — accès à vie (3× 22€)", total: 6600, installments: 3, monthly: 2200 },
+  // Offre V2 « accès à vie » — tunnel unique /commander.
+  // Tarif été (août & septembre 2026) : 47 € au lieu de 59 €.
+  v2_1x: { label: "EbookStudio Pro — accès à vie (paiement unique)", total: 4700, installments: 1, monthly: 4700 },
+  v2_2x: { label: "EbookStudio Pro — accès à vie (2× 25€)", total: 5000, installments: 2, monthly: 2500 },
+  v2_3x: { label: "EbookStudio Pro — accès à vie (3× 18€)", total: 5400, installments: 3, monthly: 1800 },
+  // Ancien tarif conservé pour les liens déjà envoyés.
+  v2_59_1x: { label: "EbookStudio Pro — accès à vie (paiement unique)", total: 5900, installments: 1, monthly: 5900 },
 };
 
 Deno.serve(async (req) => {
