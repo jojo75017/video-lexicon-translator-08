@@ -160,9 +160,14 @@ export default function V3CommanderPage() {
                 </div>
 
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-black" style={{ color: EMERALD }}>59 €</span>
+                  <span className="text-lg font-bold text-slate-400 line-through">59 €</span>
+                  <span className="text-4xl font-black" style={{ color: EMERALD }}>47 €</span>
                   <span className="text-sm text-slate-500">paiement unique</span>
                 </div>
+                <p className="mt-1 text-[11px] font-bold" style={{ color: "#8a6d16" }}>
+                  Offre valable jusqu'au 30 septembre — ensuite 59 €.
+                </p>
+
 
                 <label className="mt-6 block text-xs font-bold uppercase tracking-wide text-slate-500">
                   Votre email
