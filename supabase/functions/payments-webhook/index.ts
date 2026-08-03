@@ -174,7 +174,7 @@ async function handleV3CheckoutCompleted(session: any) {
 
   if (email && isV2Lifetime) {
     const label = installmentsTotal <= 1
-      ? "EbookStudio Pro — accès à vie, 59 € payés en une fois"
+      ? "EbookStudio Pro — accès à vie, 47 € payés en une fois"
       : `EbookStudio Pro — accès à vie, ${installmentsTotal} échéances`;
     await sendLifetimeAccessEmail(email, label);
   }
