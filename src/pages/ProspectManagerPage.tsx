@@ -628,7 +628,7 @@ const ProspectManagerPage = () => {
             </TabsTrigger>
           </TabsList>
 
-          {/* KIT A/B TAB */}
+          {/* KIT GETRESPONSE TAB */}
           <TabsContent value="abkit" className="space-y-4">
             <AbKitPanel />
           </TabsContent>
