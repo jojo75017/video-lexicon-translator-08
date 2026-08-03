@@ -8,6 +8,7 @@ import { encodeHex } from "https://deno.land/std@0.224.0/encoding/hex.ts";
 export type StripeEnv = "sandbox" | "live";
 
 const GATEWAY = "https://connector-gateway.lovable.dev/stripe";
+const STRIPE_API_VERSION = "2026-03-25.dahlia";
 
 function env(name: string): string {
   const v = Deno.env.get(name);
@@ -66,6 +67,7 @@ export async function stripeRequest<T = any>(
     headers: {
       Authorization: `Bearer ${lovableKey}`,
       "X-Connection-Api-Key": apiKey,
+      "Stripe-Version": STRIPE_API_VERSION,
       "Content-Type": "application/x-www-form-urlencoded",
     },
     body,
