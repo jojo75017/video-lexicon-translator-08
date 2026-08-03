@@ -11,12 +11,14 @@ import { supabase } from '@/integrations/supabase/client';
 import {
   Upload, Users, Send, Play, Pause, Trash2,
   Mail, CheckCircle, Clock, AlertCircle, RefreshCw,
-  FileSpreadsheet, Zap, BarChart3, Globe
+  FileSpreadsheet, Zap, BarChart3, Globe, Copy
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 import LeadsInscritsPanel from '@/components/admin/LeadsInscritsPanel';
 import TemplatePerformancePanel from '@/components/admin/TemplatePerformancePanel';
+import AbKitPanel from '@/components/admin/AbKitPanel';
+
 
 interface Prospect {
   id: string;
