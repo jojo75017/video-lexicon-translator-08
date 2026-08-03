@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { Copy, Download, ExternalLink } from 'lucide-react';
 
 const LIEN = 'https://www.ebookstudio.fr/commander?src=getresponse';
-const TEMPLATE_FILE = '/email-templates/offre-47-getresponse.html';
+const TEMPLATE_FILE = '/email-templates/offre-47-final-2026-getresponse.html';
 
 const FIELDS: Array<{ label: string; value: string }> = [
   { label: 'Nom interne (GetResponse)', value: 'Offre été 47 € — EbookStudio' },
@@ -29,7 +29,7 @@ export default function AbKitPanel() {
   };
 
   const loadHtml = async () => {
-    const res = await fetch(TEMPLATE_FILE);
+    const res = await fetch(`${TEMPLATE_FILE}?v=47-final-2026`, { cache: 'no-store' });
     if (!res.ok) throw new Error('Template introuvable');
     return res.text();
   };
@@ -52,7 +52,7 @@ export default function AbKitPanel() {
       const url = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'offre-47-getresponse.html';
+      a.download = 'offre-47-final-getresponse.html';
       a.click();
       URL.revokeObjectURL(url);
       toast.success('Fichier HTML téléchargé');
@@ -99,10 +99,10 @@ export default function AbKitPanel() {
 
           <div className="rounded-lg border border-gold/30 bg-white p-2">
             <div className="mb-2 text-xs uppercase tracking-wide text-muted-foreground">
-              Aperçu du mail envoyé (prix affiché : 47 € au lieu de 59 €)
+              Nouveau modèle final — prix affiché : 47 € paiement unique
             </div>
             <iframe
-              src={TEMPLATE_FILE}
+              src={`${TEMPLATE_FILE}?v=47-final-2026`}
               title="Aperçu email offre 47 €"
               className="h-[520px] w-full rounded border-0 bg-white"
             />
@@ -121,7 +121,7 @@ export default function AbKitPanel() {
               <Download className="mr-1 h-3 w-3" /> Télécharger le fichier HTML
             </Button>
             <Button size="sm" variant="outline" asChild>
-              <a href={TEMPLATE_FILE} target="_blank" rel="noopener noreferrer">
+              <a href={`${TEMPLATE_FILE}?v=47-final-2026`} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="mr-1 h-3 w-3" /> Ouvrir le mail en grand
               </a>
             </Button>
