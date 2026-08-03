@@ -605,7 +605,7 @@ const ProspectManagerPage = () => {
         </div>
 
         <Tabs defaultValue="prospects" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 bg-card border border-border">
+          <TabsList className="grid w-full grid-cols-6 bg-card border border-border">
             <TabsTrigger value="prospects" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
               <Users className="h-4 w-4 mr-2" /> Prospects
             </TabsTrigger>
@@ -615,6 +615,9 @@ const ProspectManagerPage = () => {
             <TabsTrigger value="send" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
               <Send className="h-4 w-4 mr-2" /> Envoi Manuel
             </TabsTrigger>
+            <TabsTrigger value="abkit" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
+              <Copy className="h-4 w-4 mr-2" /> Kit A/B
+            </TabsTrigger>
             <TabsTrigger value="templates" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
               <Mail className="h-4 w-4 mr-2" /> Templates
             </TabsTrigger>
@@ -622,6 +625,12 @@ const ProspectManagerPage = () => {
               <BarChart3 className="h-4 w-4 mr-2" /> Pipeline
             </TabsTrigger>
           </TabsList>
+
+          {/* KIT A/B TAB */}
+          <TabsContent value="abkit" className="space-y-4">
+            <AbKitPanel />
+          </TabsContent>
+
 
           {/* INSCRITS (leads lead-magnet) TAB */}
           <TabsContent value="inscrits" className="space-y-4">
