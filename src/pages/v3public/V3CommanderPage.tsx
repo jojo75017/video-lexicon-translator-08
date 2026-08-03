@@ -82,8 +82,8 @@ export default function V3CommanderPage() {
   return (
     <main className="min-h-screen" style={{ background: PAPER, color: INK }}>
       <SeoHead
-        title="Commander EbookStudio Pro — 59 € accès à vie, V3 incluse"
-        description="Accès à vie à EbookStudio Pro pour 59 €, ou en 2 à 3 fois. La V3 est incluse sans surcoût. Paiement sécurisé par carte bancaire ou PayPal, accès immédiat."
+        title="Commander EbookStudio Pro — 47 € accès à vie (offre août-septembre)"
+        description="Accès à vie à EbookStudio Pro pour 47 € au lieu de 59 €, jusqu'au 30 septembre. Aucun abonnement. La V3 est incluse sans surcoût. Carte bancaire ou PayPal, accès immédiat."
         canonical="https://www.ebookstudio.fr/commander"
       />
       <PaymentTestModeBanner />
@@ -97,13 +97,17 @@ export default function V3CommanderPage() {
             <InfinityIcon className="h-3.5 w-3.5" /> Accès à vie · sans abonnement
           </span>
           <h1 className="mt-5 text-4xl md:text-5xl font-black leading-tight" style={{ fontFamily: SERIF, color: EMERALD }}>
-            EbookStudio Pro — 59 €, une seule fois
+            EbookStudio Pro — 47 €, une seule fois
           </h1>
+          <p className="mx-auto mt-3 text-sm font-bold" style={{ color: "#8a6d16" }}>
+            Tarif d'été : 47 € au lieu de 59 €, jusqu'au 30 septembre. Après cette date, retour à 59 €.
+          </p>
           <p className="mx-auto mt-4 max-w-2xl text-base text-slate-700">
             Écrivez, habillez et publiez vos livres sur Amazon KDP avec l'assistance IA complète.
             Paiement sécurisé par carte bancaire ou PayPal, accès ouvert immédiatement.
           </p>
         </div>
+
 
         <div className="mt-10 grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
           {/* Colonne offre */}
