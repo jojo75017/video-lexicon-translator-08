@@ -618,7 +618,7 @@ const ProspectManagerPage = () => {
               <Send className="h-4 w-4 mr-2" /> Envoi Manuel
             </TabsTrigger>
             <TabsTrigger value="abkit" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
-              <Copy className="h-4 w-4 mr-2" /> Kit A/B
+              <Copy className="h-4 w-4 mr-2" /> Kit GetResponse
             </TabsTrigger>
             <TabsTrigger value="templates" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
               <Mail className="h-4 w-4 mr-2" /> Templates
