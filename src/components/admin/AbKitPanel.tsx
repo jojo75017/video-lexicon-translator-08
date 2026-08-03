@@ -97,6 +97,17 @@ export default function AbKitPanel() {
             </div>
           ))}
 
+          <div className="rounded-lg border border-gold/30 bg-white p-2">
+            <div className="mb-2 text-xs uppercase tracking-wide text-muted-foreground">
+              Aperçu du mail envoyé (prix affiché : 47 € au lieu de 59 €)
+            </div>
+            <iframe
+              src={TEMPLATE_FILE}
+              title="Aperçu email offre 47 €"
+              className="h-[520px] w-full rounded border-0 bg-white"
+            />
+          </div>
+
           <div className="flex flex-wrap gap-2 pt-1">
             <Button
               size="sm"
@@ -108,6 +119,11 @@ export default function AbKitPanel() {
             </Button>
             <Button size="sm" variant="outline" onClick={downloadHtml} disabled={busy === 'dl'}>
               <Download className="mr-1 h-3 w-3" /> Télécharger le fichier HTML
+            </Button>
+            <Button size="sm" variant="outline" asChild>
+              <a href={TEMPLATE_FILE} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="mr-1 h-3 w-3" /> Ouvrir le mail en grand
+              </a>
             </Button>
             <Button size="sm" variant="outline" asChild>
               <a href={LIEN} target="_blank" rel="noopener noreferrer">
