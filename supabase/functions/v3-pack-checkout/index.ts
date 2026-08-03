@@ -35,8 +35,6 @@ const PLANS: Record<
   v2_1x: { label: "EbookStudio Pro — accès à vie (paiement unique)", total: 4700, installments: 1, monthly: 4700 },
   v2_2x: { label: "EbookStudio Pro — accès à vie (2× 25€)", total: 5000, installments: 2, monthly: 2500 },
   v2_3x: { label: "EbookStudio Pro — accès à vie (3× 18€)", total: 5400, installments: 3, monthly: 1800 },
-  // Ancien tarif conservé pour les liens déjà envoyés.
-  v2_59_1x: { label: "EbookStudio Pro — accès à vie (paiement unique)", total: 5900, installments: 1, monthly: 5900 },
 };
 
 Deno.serve(async (req) => {
@@ -55,7 +53,11 @@ Deno.serve(async (req) => {
     if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
       throw new Error("Email valide requis");
     }
-    const planDef = PLANS[plan];
+    // Tous les anciens identifiants de l'offre à vie sont ramenés au tarif
+    // public actuel. Un vieux lien ou une ancienne version du site ne peut
+    // donc jamais créer une commande à 59 € pendant la promo.
+    const normalizedPlan = plan === "v2_59_1x" ? "v2_1x" : plan;
+    const planDef = PLANS[normalizedPlan];
     if (!planDef) throw new Error("Formule inconnue");
     if (typeof returnUrl !== "string" || !/^https?:\/\//.test(returnUrl)) {
       throw new Error("returnUrl invalide");
@@ -72,7 +74,7 @@ Deno.serve(async (req) => {
       .from("v3_installment_orders")
       .insert({
         email: trimmedEmail,
-        plan,
+        plan: normalizedPlan,
         installments_total: planDef.installments,
         installments_paid: 0,
         amount_total: planDef.total / 100,
@@ -90,7 +92,7 @@ Deno.serve(async (req) => {
       typeof v === "string" && v.trim() ? v.trim().slice(0, 60) : undefined;
     const commonMeta: Record<string, string> = {
       kind: "v3_full_pack",
-      plan,
+      plan: normalizedPlan,
       email: trimmedEmail,
       order_id: orderId,
       installments_total: String(planDef.installments),
