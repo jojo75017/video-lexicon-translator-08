@@ -5,25 +5,14 @@ import { Badge } from '@/components/ui/badge';
 import { RefreshCw, Mail, Eye, MousePointerClick, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { ACTIVE_EMAIL_CAMPAIGN } from '@/data/canonicalEmailCampaign';
 
-// Les 15 templates de la séquence de vente
-const TEMPLATES: { key: string; label: string; group: string }[] = [
-  { key: 'standard-1', label: 'Curiosité', group: 'Standard' },
-  { key: 'standard-2', label: 'Douleur', group: 'Standard' },
-  { key: 'standard-3', label: 'Preuve', group: 'Standard' },
-  { key: 'standard-4', label: 'Urgence', group: 'Standard' },
-  { key: 'standard-5', label: 'Dernier appel', group: 'Standard' },
-  { key: 'standard-6', label: 'Relance finale', group: 'Standard' },
-  { key: 'interesse-1', label: 'Démo prête', group: 'Intéressés' },
-  { key: 'interesse-2', label: 'Offre Fondateur', group: 'Intéressés' },
-  { key: 'interesse-3', label: '67€ = V3', group: 'Intéressés' },
-  { key: 'interesse-4', label: 'Pourquoi maintenant', group: 'Intéressés' },
-  { key: 'interesse-5', label: 'Dernier rappel', group: 'Intéressés' },
-  { key: 'interesse-6', label: 'On en reste là ?', group: 'Intéressés' },
-  { key: 'relance-1', label: 'Démo 2 min', group: 'Relances' },
-  { key: 'relance-2', label: 'Valeur 67€', group: 'Relances' },
-  { key: 'relance-3', label: 'Dernière main tendue', group: 'Relances' },
-];
+const TEMPLATES: { key: string; label: string; group: string }[] =
+  ACTIVE_EMAIL_CAMPAIGN.steps.map((step) => ({
+    key: step.template,
+    label: `${step.step}. ${step.label}`,
+    group: 'Séquence unique',
+  }));
 
 interface Stat {
   sent: number;

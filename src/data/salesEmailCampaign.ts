@@ -1,3 +1,5 @@
+// ARCHIVÉ : conservé uniquement comme historique éditorial.
+// Aucun moteur d'envoi ne doit importer cette ancienne campagne.
 
 export interface SalesEmail {
   id: string;
