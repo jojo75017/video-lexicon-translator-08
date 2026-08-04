@@ -179,16 +179,11 @@ const AuthorQuiz: React.FC<AuthorQuizProps> = ({
     try {
       const emailLower = email.trim().toLowerCase();
       
-      // Sauvegarder l'email dans la séquence automatique
-      await supabase.functions.invoke('add-to-email-sequence', {
-        body: { email: emailLower }
-      });
-
       // Sauvegarder localement
       localStorage.setItem('quiz_email', emailLower);
       localStorage.setItem('quiz_profile', getResultProfile().type);
       
-      toast.success('🎁 Votre guide personnalisé arrive dans votre boîte mail !');
+      toast.success('🎁 Votre profil personnalisé est prêt !');
       
       if (onComplete) {
         onComplete(getResultProfile(), emailLower);

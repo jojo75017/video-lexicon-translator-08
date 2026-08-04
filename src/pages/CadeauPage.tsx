@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Gift, Mail, Loader2, Sparkles, CheckCircle2, BookOpen, TrendingUp, Target } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const CadeauPage = () => {
@@ -22,9 +21,6 @@ const CadeauPage = () => {
     setIsSubmitting(true);
     try {
       const emailLower = email.trim().toLowerCase();
-      await supabase.functions.invoke("add-to-email-sequence", {
-        body: { email: emailLower }
-      });
       trackLeadMagnetDownload("10_niches_kdp_2026");
       trackFormSubmit('cadeau_guide', emailLower);
       setIsSuccess(true);
@@ -46,7 +42,7 @@ const CadeauPage = () => {
           </div>
           <h1 className="text-3xl font-bold text-white">C'est envoyé ! 🎉</h1>
           <p className="text-gray-300 text-lg">
-            Vérifiez votre boîte mail (et vos spams). Vous recevrez aussi des conseils exclusifs les jours suivants.
+            Votre demande est enregistrée. Aucune séquence automatique ne sera lancée.
           </p>
           <div className="space-y-4 mt-6">
             <a
@@ -82,7 +78,7 @@ const CadeauPage = () => {
             🎁 Guide GRATUIT : 10 Niches KDP Rentables en 2026
           </h1>
           <p className="text-gray-300 text-lg">
-            Recevez immédiatement notre guide PDF exclusif + des conseils quotidiens pour réussir sur Amazon KDP.
+            Accédez à notre guide PDF exclusif pour réussir sur Amazon KDP.
           </p>
         </div>
 
