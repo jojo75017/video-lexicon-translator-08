@@ -11,13 +11,14 @@ import { supabase } from '@/integrations/supabase/client';
 import {
   Upload, Users, Send, Play, Pause, Trash2,
   Mail, CheckCircle, Clock, AlertCircle, RefreshCw,
-  FileSpreadsheet, Zap, BarChart3, Globe, Copy
+  FileSpreadsheet, Zap, BarChart3, Globe, Copy, Route
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 import LeadsInscritsPanel from '@/components/admin/LeadsInscritsPanel';
 import TemplatePerformancePanel from '@/components/admin/TemplatePerformancePanel';
 import AbKitPanel from '@/components/admin/AbKitPanel';
+import CommunicationJourneyTracker from '@/components/admin/CommunicationJourneyTracker';
 
 
 interface Prospect {
@@ -73,6 +74,7 @@ const ProspectManagerPage = () => {
   // ce qui saturait la mémoire et rendait l'onglet Chrome instable.
   const PAGE_SIZE = 100;
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [activeManagerTab, setActiveManagerTab] = useState('prospects');
 
   const fetchOpens = useCallback(async () => {
     // Pagination obligatoire : PostgREST plafonne à 1000 lignes par requête,
@@ -606,8 +608,8 @@ const ProspectManagerPage = () => {
           </Card>
         </div>
 
-        <Tabs defaultValue="prospects" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 bg-card border border-border">
+        <Tabs value={activeManagerTab} onValueChange={setActiveManagerTab} className="space-y-6">
+          <TabsList className="grid h-auto w-full grid-cols-2 gap-1 bg-card border border-border p-1 md:grid-cols-4 xl:grid-cols-7">
             <TabsTrigger value="prospects" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
               <Users className="h-4 w-4 mr-2" /> Prospects
             </TabsTrigger>
@@ -626,7 +628,14 @@ const ProspectManagerPage = () => {
             <TabsTrigger value="stats" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
               <BarChart3 className="h-4 w-4 mr-2" /> Pipeline
             </TabsTrigger>
+            <TabsTrigger value="tracking" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
+              <Route className="h-4 w-4 mr-2" /> Suivi global
+            </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="tracking" className="space-y-4">
+            <CommunicationJourneyTracker onSelectTab={setActiveManagerTab} />
+          </TabsContent>
 
           {/* KIT GETRESPONSE TAB */}
           <TabsContent value="abkit" className="space-y-4">
