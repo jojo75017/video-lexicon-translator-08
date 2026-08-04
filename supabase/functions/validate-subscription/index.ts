@@ -67,7 +67,7 @@ serve(async (req) => {
         .eq('id', subscriber.id);
 
       return new Response(
-        JSON.stringify({ valid: false, message: 'Votre essai gratuit de 7 jours est terminé. Passez à l\'accès à vie pour 67€ et continuez à créer !' }),
+        JSON.stringify({ valid: false, message: 'Votre essai gratuit de 7 jours est terminé. Consultez l’offre actuelle pour continuer à créer.' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -87,7 +87,7 @@ serve(async (req) => {
 
     if (subscriber.status !== 'active' && subscriber.status !== 'trialing') {
       return new Response(
-        JSON.stringify({ valid: false, message: subscriber.status === 'trial_expired' ? 'Essai terminé. Passez à l\'accès à vie pour 67€.' : 'Abonnement inactif' }),
+        JSON.stringify({ valid: false, message: subscriber.status === 'trial_expired' ? 'Essai terminé. Consultez l’offre actuelle pour continuer.' : 'Abonnement inactif' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }

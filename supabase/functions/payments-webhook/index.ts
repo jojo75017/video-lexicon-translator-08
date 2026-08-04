@@ -32,8 +32,8 @@ async function sendAccessEmail(email: string, firstName: string | null, accessCo
   <div style="font-family:Inter,Arial,sans-serif;max-width:560px;margin:0 auto;color:#232F3E;background:#FAFAFA;padding:24px;border-radius:12px">
     <h1 style="color:#008296">🎉 Paiement reçu — Bienvenue !</h1>
     <p>${greeting}</p>
-    <p>Votre paiement de <strong>67 €</strong> a bien été confirmé.</p>
-    <p><strong>Votre accès EbookStudio est maintenant actif pour 12 mois.</strong></p>
+    <p>Votre paiement a bien été confirmé.</p>
+    <p><strong>Votre accès EbookStudio est maintenant actif.</strong></p>
     <p style="text-align:center;margin:24px 0">
        <a href="https://www.ebookstudio.fr/connexion-abonne"
          style="display:inline-block;background:#FF9E2D;color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold">

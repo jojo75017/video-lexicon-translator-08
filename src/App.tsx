@@ -363,8 +363,8 @@ const App = () => {
             <Route path="/promo" element={<PromoCapturePage />} />
             <Route path="/promo/merci" element={<PromoMerciPage />} />
             <Route path="/promo/decouverte" element={<PromoDecouvertePage />} />
-            <Route path="/promo/commande" element={<PromoCommandePage />} />
-            <Route path="/promo/paiement" element={<PromoPaiementPage />} />
+            <Route path="/promo/commande" element={<Navigate to="/commander" replace />} />
+            <Route path="/promo/paiement" element={<Navigate to="/commander" replace />} />
             <Route path="/promo/bonus" element={<PromoBonusPage />} />
             <Route path="/promo/espace" element={<PromoEspacePage />} />
             <Route path="/promo/affilie" element={<PromoAffiliePage />} />

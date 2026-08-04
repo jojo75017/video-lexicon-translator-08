@@ -126,7 +126,7 @@ Deno.serve(async (req) => {
       const emailResponse = await resend.emails.send({
         from: 'EbookStudio <noreply@ebookstudio.fr>',
         to: [subscriber.email],
-        subject: 'Votre code d\'accès - Générateur Ebook',
+        subject: 'Votre code d\'accès EbookStudio',
         html: `
           <!DOCTYPE html>
           <html>
@@ -134,10 +134,10 @@ Deno.serve(async (req) => {
               <style>
                 body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
                 .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                 .header { background: #008296; color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
                 .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-                .code-box { background: white; border: 3px solid #667eea; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center; }
-                .code { font-size: 32px; font-weight: bold; color: #667eea; letter-spacing: 4px; font-family: monospace; }
+                 .code-box { background: white; border: 3px solid #008296; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center; }
+                 .code { font-size: 32px; font-weight: bold; color: #008296; letter-spacing: 4px; font-family: monospace; }
                 .info { background: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px; margin: 20px 0; }
                 .footer { text-align: center; margin-top: 30px; color: #666; font-size: 12px; }
               </style>
@@ -149,7 +149,7 @@ Deno.serve(async (req) => {
                 </div>
                 <div class="content">
                   <p>Bonjour,</p>
-                  <p>Vous avez demandé votre code d'accès pour le Générateur d'Ebook.</p>
+                   <p>Vous avez demandé votre code d'accès EbookStudio.</p>
                   
                   <div class="code-box">
                     <div style="color: #666; font-size: 14px; margin-bottom: 10px;">Votre code d'accès :</div>
@@ -176,7 +176,7 @@ Deno.serve(async (req) => {
                   </p>
                 </div>
                 <div class="footer">
-                  <p>Générateur d'Ebook - Créez des ebooks professionnels en quelques clics</p>
+                   <p>EbookStudio — Créez et publiez vos livres avec l'intelligence artificielle</p>
                   <p>Si vous n'avez pas demandé ce code, ignorez cet email.</p>
                 </div>
               </div>
