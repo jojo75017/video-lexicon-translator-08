@@ -40,8 +40,7 @@ export function SubscriberGate({
     // Explicit rejection (expired / invalid subscription, missing creds):
     // purge any lingering auth session + cached subscriber data so a stale
     // Supabase session can't re-grant access, then let the component redirect
-    // to /subscription via <Navigate> below (do NOT call onInvalid, which does
-    // a hard logout redirect to /offres).
+    // to the subscriber login via <Navigate> below.
     const denyAccess = async () => {
       try {
         await Promise.race([
@@ -56,6 +55,7 @@ export function SubscriberGate({
       if (!cancelled) {
         setAllowed(false);
         setChecking(false);
+        onInvalid();
       }
     };
 
@@ -147,22 +147,7 @@ export function SubscriberGate({
         setChecking(false);
       } catch (networkErr) {
         if (cancelled) return;
-        // Network/timeout error (NOT explicit rejection) → allow temporary access
-        // if localStorage has complete subscriber data
-        console.warn("SubscriberGate: Network error, using fallback:", networkErr);
-        const cachedData = localStorage.getItem("subscriber_data");
-        const cachedEmail = localStorage.getItem("subscriber_email");
-        if (cachedData && cachedEmail && cachedEmail === email) {
-          try {
-            const parsed = JSON.parse(cachedData);
-            if (parsed?.email && parsed?.access_code) {
-              console.log("SubscriberGate: Allowing temporary access via cached data");
-              setAllowed(true);
-              setChecking(false);
-              return;
-            }
-          } catch { /* invalid cache */ }
-        }
+        console.warn("SubscriberGate: Network validation failed:", networkErr);
         await denyAccess();
       }
     };
@@ -183,7 +168,7 @@ export function SubscriberGate({
   }
 
   if (!allowed) {
-    return <Navigate to="/subscription" replace />;
+    return <Navigate to="/connexion-abonne" replace />;
   }
 
   return <>{children}</>;

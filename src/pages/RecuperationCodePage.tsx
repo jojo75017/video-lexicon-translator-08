@@ -72,7 +72,7 @@ const RecuperationCodePage = () => {
                   Pensez à vérifier vos spams.
                 </p>
               </div>
-              <Button onClick={() => navigate('/subscription')} className="w-full">
+              <Button onClick={() => navigate('/connexion-abonne')} className="w-full">
                 Retour à la connexion
               </Button>
             </div>
@@ -107,7 +107,7 @@ const RecuperationCodePage = () => {
                 type="button"
                 variant="ghost"
                 className="w-full"
-                onClick={() => navigate('/subscription')}
+                onClick={() => navigate('/connexion-abonne')}
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Retour

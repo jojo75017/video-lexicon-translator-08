@@ -140,10 +140,14 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
             });
             console.log('✅ Session auth créée pour abonné:', normalizedEmail);
           } else {
-            console.warn('⚠️ Auth session creation failed, continuing without persistent save:', authError);
+            throw authError || new Error('Session abonné non créée');
           }
         } catch (authErr) {
-          console.warn('⚠️ subscriber-auth call failed, continuing:', authErr);
+          console.error('Subscriber auth failed:', authErr);
+          toast.error('Connexion incomplète', {
+            description: 'Votre accès est valide, mais la session sécurisée n’a pas pu être créée. Réessayez.',
+          });
+          return;
         }
 
         localStorage.setItem('subscriber_email', normalizedEmail);
@@ -372,7 +376,7 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
           <div>
             <p>Pas encore abonné ?</p>
             <a 
-              href="/offres" 
+               href="/commander" 
               className="text-primary hover:underline font-medium"
             >
               Souscrire maintenant

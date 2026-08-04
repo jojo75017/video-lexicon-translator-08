@@ -177,6 +177,13 @@ async function sendBrevo(email: string, subject: string, html: string): Promise<
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  // Ancien moteur Brevo neutralisé : les campagnes marketing sont désormais
+  // pilotées hors de l'application pour éviter les doublons et tarifs obsolètes.
+  return new Response(JSON.stringify({ ok: true, disabled: true, processed: 0, sent: 0 }), {
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+
+  /* Legacy implementation retained temporarily for audit history.
   try {
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -237,4 +244,5 @@ serve(async (req) => {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
+  */
 });

@@ -60,6 +60,7 @@ const UpsellPaiementPage = lazy(() => import('./pages/UpsellPaiementPage'));
 const V3CommandePage = lazy(() => import('./pages/V3CommandePage'));
 const V3PaiementPage = lazy(() => import('./pages/V3PaiementPage'));
 const SalesPageV3Launch = lazy(() => import('./pages/SalesPageV3Launch'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 // V3 hub + public site
 const V3HubPage = lazy(() => import('./pages/V3HubPage'));
@@ -322,7 +323,7 @@ const App = () => {
               }
             />
 
-            {/* Accueil V2 : les visiteurs arrivent directement sur l'offre 59 € */}
+            {/* Accueil : client reconnu vers son espace, visiteur vers l'offre active */}
             <Route path="/" element={<Navigate to={hasPlannerAccess ? '/ebook-planner' : '/commander'} replace />} />
 
             {/* Marketing */}
@@ -494,27 +495,6 @@ const App = () => {
             <Route path="/series-tomes" element={gated(<SeriesTomesPage />)} />
             <Route path="/fiches-pratiques" element={gated(<PracticalSheetsGeneratorPage />)} />
 
-            {/* Abonnement */}
-            <Route
-              path="/subscription"
-              element={
-                isAdmin ? (
-                  <SubscriptionPage
-                    subscriberEmail={subscriberEmail || ''}
-                    subscriberData={subscriberData || {
-                      plan_type: 'lifetime', status: 'active', access_code: 'ADMIN-ACCESS',
-                      ebook_plans_generated: 0, chapters_generated: 0, subchapters_generated: 0, covers_generated: 0
-                    }}
-                    onLogout={handleLogout}
-                  />
-                ) : isAuthenticated ? (
-                  <SubscriptionPage subscriberEmail={subscriberEmail} subscriberData={subscriberData} onLogout={handleLogout} />
-                ) : (
-                  <SubscriptionAuth onAuthenticated={handleAuthenticated} />
-                )
-              }
-            />
-
             {/* Admin */}
             <Route path="/admin" element={<AdminGate><AdminPage /></AdminGate>} />
             <Route path="/admin-direct" element={<AdminDirectPage />} />
@@ -582,7 +562,7 @@ const App = () => {
 
             </Route>
 
-            <Route path="*" element={<Navigate to={hasPlannerAccess ? "/ebook-planner" : "/commander"} replace />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
           </Suspense>
           <SubscriberActivityPopup />
