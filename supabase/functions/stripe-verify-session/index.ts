@@ -106,6 +106,7 @@ serve(async (req) => {
           stripe_customer_id: session.customer as string,
           stripe_subscription_id: (session as any).subscription as string,
           updated_at: new Date().toISOString(),
+          access_code: accessCode,
         })
         .eq("email", email);
 

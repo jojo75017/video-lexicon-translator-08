@@ -17,7 +17,14 @@ function getSupabase() {
   return _supabase;
 }
 
-async function sendAccessEmail(email: string, firstName: string | null) {
+function generateAccessCode() {
+  const bytes = crypto.getRandomValues(new Uint8Array(6));
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const value = Array.from(bytes, (byte) => alphabet[byte % alphabet.length]).join("");
+  return `EBK-${value}`;
+}
+
+async function sendAccessEmail(email: string, firstName: string | null, accessCode: string) {
   const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
   if (!RESEND_API_KEY) return;
   const greeting = firstName ? `Bonjour ${firstName},` : "Bonjour,";
@@ -28,12 +35,13 @@ async function sendAccessEmail(email: string, firstName: string | null) {
     <p>Votre paiement de <strong>67 €</strong> a bien été confirmé.</p>
     <p><strong>Votre accès EbookStudio est maintenant actif pour 12 mois.</strong></p>
     <p style="text-align:center;margin:24px 0">
-      <a href="https://www.ebookstudio.fr/auth"
+       <a href="https://www.ebookstudio.fr/connexion-abonne"
          style="display:inline-block;background:#FF9E2D;color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold">
         Accéder à mon espace
       </a>
     </p>
-    <p>Identifiants : utilisez l'email <strong>${email}</strong> pour vous connecter (création de mot de passe au 1er accès).</p>
+    <p><strong>Email :</strong> ${email}</p>
+    <p><strong>Code d'accès :</strong> ${accessCode}</p>
     <p>L'équipe EbookStudio</p>
   </div>`;
   try {
@@ -74,15 +82,21 @@ async function handleCheckoutCompleted(session: any) {
   // Add subscriber row (12 months access)
   const expiresAt = new Date();
   expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+  const { data: existingSubscriber } = await supabase.from("subscribers")
+    .select("access_code")
+    .eq("email", order.email)
+    .maybeSingle();
+  const accessCode = existingSubscriber?.access_code || generateAccessCode();
   await supabase.from("subscribers").upsert({
     email: order.email,
+    access_code: accessCode,
     status: "active",
     plan_type: "annual",
     plan_tier: "standard",
     expires_at: expiresAt.toISOString(),
   }, { onConflict: "email" });
 
-  await sendAccessEmail(order.email, order.first_name);
+  await sendAccessEmail(order.email, order.first_name, accessCode);
 }
 
 // ===== V3 Pack Tout Complet — paiement unique ou échéancier =====
@@ -90,13 +104,20 @@ async function handleCheckoutCompleted(session: any) {
 // Octroie l'accès à vie EbookStudio (statut actif, pas d'expiration).
 async function grantV3Lifetime(email: string) {
   const supabase = getSupabase();
+  const { data: existingSubscriber } = await supabase.from("subscribers")
+    .select("access_code")
+    .eq("email", email)
+    .maybeSingle();
+  const accessCode = existingSubscriber?.access_code || generateAccessCode();
   await supabase.from("subscribers").upsert({
     email,
+    access_code: accessCode,
     status: "active",
     plan_type: "lifetime",
     plan_tier: "pro",
     expires_at: null,
   }, { onConflict: "email" });
+  return accessCode;
 }
 
 // Bloque l'accès (échéances en échec après la période de grâce).
@@ -108,7 +129,7 @@ async function suspendAccess(email: string) {
 }
 
 // Email de confirmation pour l'offre "accès à vie" (tunnel /commander).
-async function sendLifetimeAccessEmail(email: string, planLabel: string) {
+async function sendLifetimeAccessEmail(email: string, planLabel: string, accessCode: string) {
   const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
   if (!RESEND_API_KEY) return;
   const html = `
@@ -118,12 +139,13 @@ async function sendLifetimeAccessEmail(email: string, planLabel: string) {
     <p>Votre paiement est confirmé (<strong>${planLabel}</strong>).</p>
     <p><strong>Votre accès à vie est actif — aucun abonnement, aucune date d'expiration.</strong></p>
     <p style="text-align:center;margin:24px 0">
-      <a href="https://www.ebookstudio.fr/auth"
+       <a href="https://www.ebookstudio.fr/connexion-abonne"
          style="display:inline-block;background:#FF9E2D;color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold">
         Accéder à mon espace
       </a>
     </p>
-    <p>Connectez-vous avec l'email <strong>${email}</strong> (création du mot de passe au 1er accès).</p>
+    <p><strong>Email :</strong> ${email}</p>
+    <p><strong>Code d'accès :</strong> ${accessCode}</p>
     <p>Première étape conseillée : créer votre premier livre depuis le tableau de bord.</p>
     <p>L'équipe EbookStudio</p>
   </div>`;
@@ -152,6 +174,7 @@ async function handleV3CheckoutCompleted(session: any) {
   const subscriptionId = session.subscription || null;
   const plan = String(session.metadata?.plan || "");
   const isV2Lifetime = plan.startsWith("v2_");
+  let accessCode = "";
 
   if (installmentsTotal <= 1) {
     // Paiement unique : accès à vie immédiat, commande terminée.
@@ -160,7 +183,7 @@ async function handleV3CheckoutCompleted(session: any) {
       installments_paid: 1,
       completed_at: new Date().toISOString(),
     }).eq("id", orderId);
-    if (email) await grantV3Lifetime(email);
+    if (email) accessCode = await grantV3Lifetime(email);
   } else {
     // Échéancier : 1re échéance encaissée, accès ouvert dès maintenant.
     await supabase.from("v3_installment_orders").update({
@@ -169,14 +192,14 @@ async function handleV3CheckoutCompleted(session: any) {
       stripe_subscription_id: subscriptionId,
       grace_until: null,
     }).eq("id", orderId);
-    if (email) await grantV3Lifetime(email);
+    if (email) accessCode = await grantV3Lifetime(email);
   }
 
   if (email && isV2Lifetime) {
     const label = installmentsTotal <= 1
       ? "EbookStudio Pro — accès à vie, 47 € payés en une fois"
       : `EbookStudio Pro — accès à vie, ${installmentsTotal} échéances`;
-    await sendLifetimeAccessEmail(email, label);
+    await sendLifetimeAccessEmail(email, label, accessCode);
   }
 }
 

@@ -144,6 +144,13 @@ serve(async (req) => {
           };
 
           if (existingSubscriber) {
+            let accessCode = existingSubscriber.access_code;
+            if (!accessCode) {
+              const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
+              accessCode = `EBK-${randomPart}`;
+              subscriberData.access_code = accessCode;
+            }
+
             const { error: updateError } = await supabase
               .from("subscribers")
               .update(subscriberData)
@@ -152,7 +159,7 @@ serve(async (req) => {
             if (updateError) console.error("Error updating subscriber:", updateError);
             else console.log("Updated existing subscriber:", email);
 
-            await sendEmail(email, existingSubscriber.access_code, planType, true);
+            await sendEmail(email, accessCode, planType, true);
           } else {
             const { error: insertError } = await supabase
               .from("subscribers")
