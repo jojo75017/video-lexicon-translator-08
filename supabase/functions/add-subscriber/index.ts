@@ -295,28 +295,30 @@ Deno.serve(async (req) => {
     }
 
     if (existingSubscriber) {
+      accessCode = existingSubscriber.access_code || generateAccessCode();
+      assignedTier = existingSubscriber.plan_tier;
+
       // Update existing subscriber
       const { error: updateError } = await supabaseAdmin
-        .from('subscribers')
+        .from("subscribers")
         .update({
-          status: 'active',
+          status: "active",
           plan_type: plan_type,
           expires_at: expires_at || null,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          access_code: accessCode
         })
-        .eq('email', email);
+        .eq("email", email);
 
       if (updateError) {
-        console.error('Error updating subscriber:', updateError);
+        console.error("Error updating subscriber:", updateError);
         return new Response(
-          JSON.stringify({ error: 'Erreur lors de la mise à jour' }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+          JSON.stringify({ error: "Erreur lors de la mise à jour" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
         );
       }
 
-      accessCode = existingSubscriber.access_code;
-      assignedTier = existingSubscriber.plan_tier;
-      console.log('Subscriber updated:', email);
+      console.log("Subscriber updated:", email);
 
       // Send update email + admin notification
       const emailResult = await sendWelcomeEmail(email, accessCode, plan_type, false);

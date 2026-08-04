@@ -146,7 +146,11 @@ serve(async (req) => {
       if (existing.status === "active" || existing.status === "trialing") {
         alreadyActive = true;
         trialEndsAt = existing.trial_ends_at || new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
-      } else {
+        
+        if (!existing.access_code) {
+          await supabase.from("subscribers").update({ access_code: accessCode }).eq("id", existing.id);
+          console.log("Restored missing access code for existing subscriber:", email);
+        }
         // Un seul essai gratuit autorisé par email : ne pas réactiver un essai déjà utilisé
         return new Response(
           JSON.stringify({

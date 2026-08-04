@@ -339,6 +339,9 @@ const App = () => {
                 ? <Navigate to="/offres" replace />
                 : <SubscriptionAuth onAuthenticated={handleAuthenticated} />
             } />
+            <Route path="/login" element={<Navigate to="/connexion-abonne" replace />} />
+            <Route path="/connexion" element={<Navigate to="/connexion-abonne" replace />} />
+            <Route path="/subscription" element={<Navigate to="/connexion-abonne" replace />} />
             <Route path="/commander" element={<V3CommanderPage />} />
             <Route path="/offre-59" element={<Navigate to="/commander" replace />} />
             <Route path="/59" element={<Navigate to="/commander" replace />} />

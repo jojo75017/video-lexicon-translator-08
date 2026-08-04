@@ -8,6 +8,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+function generateAccessCode(): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(6));
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return `EBK-${Array.from(bytes, (byte) => alphabet[byte % alphabet.length]).join('')}`;
+}
+
 // Rate limiting store (in-memory, simple implementation)
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
@@ -76,7 +82,6 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
-
     const { data: subscriber, error: dbError } = await supabase
       .from('subscribers')
       .select('email, access_code, status, plan_type')
@@ -103,6 +108,17 @@ Deno.serve(async (req) => {
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 }
       );
+    }
+
+    // Repair legacy paid accounts that were created without an access code.
+    let accessCode = subscriber.access_code;
+    if (!accessCode) {
+      accessCode = generateAccessCode();
+      const { error: updateError } = await supabase
+        .from('subscribers')
+        .update({ access_code: accessCode })
+        .eq('email', normalizedEmail);
+      if (updateError) throw updateError;
     }
 
     // Send email with access code
@@ -137,7 +153,7 @@ Deno.serve(async (req) => {
                   
                   <div class="code-box">
                     <div style="color: #666; font-size: 14px; margin-bottom: 10px;">Votre code d'accès :</div>
-                    <div class="code">${subscriber.access_code}</div>
+                    <div class="code">${accessCode}</div>
                   </div>
 
                   <div class="info">
@@ -149,9 +165,9 @@ Deno.serve(async (req) => {
 
                   <p><strong>Comment se connecter :</strong></p>
                   <ol>
-                    <li>Allez sur la page de connexion</li>
+                     <li><a href="https://www.ebookstudio.fr/connexion-abonne">Allez sur la page de connexion abonnés</a></li>
                     <li>Entrez votre email : <strong>${subscriber.email}</strong></li>
-                    <li>Entrez votre code d'accès : <strong>${subscriber.access_code}</strong></li>
+                     <li>Entrez votre code d'accès : <strong>${accessCode}</strong></li>
                     <li>Cliquez sur "Accéder au générateur"</li>
                   </ol>
 
