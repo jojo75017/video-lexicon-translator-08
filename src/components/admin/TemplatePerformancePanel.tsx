@@ -33,7 +33,6 @@ const pct = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 100) : 0);
 const TemplatePerformancePanel: React.FC = () => {
   const [stats, setStats] = useState<Record<string, Stat>>({});
   const [loading, setLoading] = useState(false);
-  const [verifying, setVerifying] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -59,26 +58,6 @@ const TemplatePerformancePanel: React.FC = () => {
 
   useEffect(() => { load(); }, [load]);
 
-  const verifyDelivery = async () => {
-    setVerifying(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('send-sales-email', {
-        body: { mode: 'verify_delivery', limit: 150 },
-      });
-      if (error) throw error;
-      if (data?.checked === 0) {
-        toast.info("Lecture du statut via l'API indisponible (clé Resend en envoi seul). La livraison est confirmée automatiquement par le webhook Resend.");
-      } else {
-        toast.success(`${data.delivered}/${data.checked} confirmés livrés côté Resend`);
-      }
-      await load();
-    } catch (e: any) {
-      toast.error('Vérification impossible');
-    } finally {
-      setVerifying(false);
-    }
-  };
-
   const totals = TEMPLATES.reduce(
     (acc, t) => {
       const s = stats[t.key];
@@ -90,7 +69,7 @@ const TemplatePerformancePanel: React.FC = () => {
     { sent: 0, delivered: 0, opens: 0, clicks: 0 }
   );
 
-  const groups = ['Standard', 'Intéressés', 'Relances'];
+  const groups = ['Séquence unique'];
 
   return (
     <div className="space-y-4">
@@ -113,9 +92,6 @@ const TemplatePerformancePanel: React.FC = () => {
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={load} disabled={loading}>
             <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Actualiser
-          </Button>
-          <Button size="sm" onClick={verifyDelivery} disabled={verifying}>
-            <CheckCircle2 className={`h-4 w-4 mr-2 ${verifying ? 'animate-spin' : ''}`} /> Vérifier la livraison
           </Button>
         </div>
       </div>
