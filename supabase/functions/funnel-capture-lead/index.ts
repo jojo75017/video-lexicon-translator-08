@@ -201,29 +201,8 @@ serve(async (req) => {
         .eq("id", leadId);
     }
 
-    // Enroll in nurturing sequence (optional table)
-    // Le guide PDF est déjà envoyé immédiatement ci-dessus (sendLeadMagnetEmail).
-    // On choisit la séquence selon le lead magnet téléchargé.
-    const SEQUENCE_BY_MAGNET: Record<string, string> = {
-      "publier-kdp-etranger": "expat_funnel",
-    };
-    const sequenceName = SEQUENCE_BY_MAGNET[magnetKey] || "promo_funnel";
-    // expat_funnel : l'étape 0 (livraison du guide) vient d'être envoyée → on démarre à l'étape 1.
-    // promo_funnel : on conserve le comportement existant (démarre à l'étape 0).
-    const startStep = sequenceName === "expat_funnel" ? 1 : 0;
-    try {
-      await supabase.from("email_sequences").upsert(
-        {
-          email,
-          sequence_name: sequenceName,
-          current_step: startStep,
-          next_email_at: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
-        },
-        { onConflict: "email,sequence_name" },
-      );
-    } catch (e) {
-      console.warn("Sequence enrollment skipped:", (e as Error).message);
-    }
+    // Le guide demandé est envoyé, mais aucune ancienne séquence marketing
+    // n'est réactivée automatiquement pendant la remise à zéro des campagnes.
 
     return new Response(
       JSON.stringify({
