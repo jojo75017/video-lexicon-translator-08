@@ -19,7 +19,7 @@ serve(async (req) => {
 
   const url = new URL(req.url);
   const email = (url.searchParams.get("email") || "").trim().toLowerCase();
-  const seq = (url.searchParams.get("seq") || "promo_funnel").trim();
+  const seq = (url.searchParams.get("seq") || "all").trim();
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return new Response(html("Erreur", "<h1>Lien invalide</h1><p>Cet email est invalide.</p>"), {
@@ -33,17 +33,23 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
-    await supabase
+    let sequenceQuery = supabase
       .from("email_sequences")
       .update({ unsubscribed: true, completed: true })
-      .ilike("email", email)
-      .eq("sequence_name", seq);
+      .ilike("email", email);
+    if (seq !== "all") sequenceQuery = sequenceQuery.eq("sequence_name", seq);
+    await sequenceQuery;
+
+    await supabase
+      .from("sales_prospects")
+      .update({ unsubscribed: true, auto_send: false, completed: true, next_email_at: null })
+      .ilike("email", email);
 
     return new Response(
       html(
         "Désinscription confirmée",
         `<h1>✅ Désinscription confirmée</h1>
-         <p>L'adresse <strong>${email}</strong> ne recevra plus d'emails de cette séquence.</p>
+         <p>L'adresse <strong>${email}</strong> ne recevra plus aucun email marketing EbookStudio.</p>
          <p><a href="https://ebookstudio.fr">Retour au site</a></p>`,
       ),
       { headers: { ...corsHeaders, "Content-Type": "text/html; charset=utf-8" } },

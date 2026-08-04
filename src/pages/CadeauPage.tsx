@@ -22,9 +22,10 @@ const CadeauPage = () => {
     setIsSubmitting(true);
     try {
       const emailLower = email.trim().toLowerCase();
-      await supabase.functions.invoke("add-to-email-sequence", {
-        body: { email: emailLower }
+      const { error } = await supabase.functions.invoke("funnel-capture-lead", {
+        body: { email: emailLower, lead_magnet: "5-niches-rentables-2026", landing_url: window.location.href },
       });
+      if (error) throw error;
       trackLeadMagnetDownload("10_niches_kdp_2026");
       trackFormSubmit('cadeau_guide', emailLower);
       setIsSuccess(true);
@@ -46,7 +47,7 @@ const CadeauPage = () => {
           </div>
           <h1 className="text-3xl font-bold text-white">C'est envoyé ! 🎉</h1>
           <p className="text-gray-300 text-lg">
-            Vérifiez votre boîte mail (et vos spams). Vous recevrez aussi des conseils exclusifs les jours suivants.
+            Vérifiez votre boîte mail (et vos spams). Seul le guide demandé vous est envoyé.
           </p>
           <div className="space-y-4 mt-6">
             <a
@@ -82,7 +83,7 @@ const CadeauPage = () => {
             🎁 Guide GRATUIT : 10 Niches KDP Rentables en 2026
           </h1>
           <p className="text-gray-300 text-lg">
-            Recevez immédiatement notre guide PDF exclusif + des conseils quotidiens pour réussir sur Amazon KDP.
+            Accédez à notre guide PDF exclusif pour réussir sur Amazon KDP.
           </p>
         </div>
 

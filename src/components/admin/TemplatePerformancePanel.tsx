@@ -5,25 +5,14 @@ import { Badge } from '@/components/ui/badge';
 import { RefreshCw, Mail, Eye, MousePointerClick, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { ACTIVE_EMAIL_CAMPAIGN } from '@/data/canonicalEmailCampaign';
 
-// Les 15 templates de la séquence de vente
-const TEMPLATES: { key: string; label: string; group: string }[] = [
-  { key: 'standard-1', label: 'Curiosité', group: 'Standard' },
-  { key: 'standard-2', label: 'Douleur', group: 'Standard' },
-  { key: 'standard-3', label: 'Preuve', group: 'Standard' },
-  { key: 'standard-4', label: 'Urgence', group: 'Standard' },
-  { key: 'standard-5', label: 'Dernier appel', group: 'Standard' },
-  { key: 'standard-6', label: 'Relance finale', group: 'Standard' },
-  { key: 'interesse-1', label: 'Démo prête', group: 'Intéressés' },
-  { key: 'interesse-2', label: 'Offre Fondateur', group: 'Intéressés' },
-  { key: 'interesse-3', label: '67€ = V3', group: 'Intéressés' },
-  { key: 'interesse-4', label: 'Pourquoi maintenant', group: 'Intéressés' },
-  { key: 'interesse-5', label: 'Dernier rappel', group: 'Intéressés' },
-  { key: 'interesse-6', label: 'On en reste là ?', group: 'Intéressés' },
-  { key: 'relance-1', label: 'Démo 2 min', group: 'Relances' },
-  { key: 'relance-2', label: 'Valeur 67€', group: 'Relances' },
-  { key: 'relance-3', label: 'Dernière main tendue', group: 'Relances' },
-];
+const TEMPLATES: { key: string; label: string; group: string }[] =
+  ACTIVE_EMAIL_CAMPAIGN.steps.map((step) => ({
+    key: step.template,
+    label: `${step.step}. ${step.label}`,
+    group: 'Séquence unique',
+  }));
 
 interface Stat {
   sent: number;
@@ -44,7 +33,6 @@ const pct = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 100) : 0);
 const TemplatePerformancePanel: React.FC = () => {
   const [stats, setStats] = useState<Record<string, Stat>>({});
   const [loading, setLoading] = useState(false);
-  const [verifying, setVerifying] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -70,26 +58,6 @@ const TemplatePerformancePanel: React.FC = () => {
 
   useEffect(() => { load(); }, [load]);
 
-  const verifyDelivery = async () => {
-    setVerifying(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('send-sales-email', {
-        body: { mode: 'verify_delivery', limit: 150 },
-      });
-      if (error) throw error;
-      if (data?.checked === 0) {
-        toast.info("Lecture du statut via l'API indisponible (clé Resend en envoi seul). La livraison est confirmée automatiquement par le webhook Resend.");
-      } else {
-        toast.success(`${data.delivered}/${data.checked} confirmés livrés côté Resend`);
-      }
-      await load();
-    } catch (e: any) {
-      toast.error('Vérification impossible');
-    } finally {
-      setVerifying(false);
-    }
-  };
-
   const totals = TEMPLATES.reduce(
     (acc, t) => {
       const s = stats[t.key];
@@ -101,7 +69,7 @@ const TemplatePerformancePanel: React.FC = () => {
     { sent: 0, delivered: 0, opens: 0, clicks: 0 }
   );
 
-  const groups = ['Standard', 'Intéressés', 'Relances'];
+  const groups = ['Séquence unique'];
 
   return (
     <div className="space-y-4">
@@ -124,9 +92,6 @@ const TemplatePerformancePanel: React.FC = () => {
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={load} disabled={loading}>
             <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Actualiser
-          </Button>
-          <Button size="sm" onClick={verifyDelivery} disabled={verifying}>
-            <CheckCircle2 className={`h-4 w-4 mr-2 ${verifying ? 'animate-spin' : ''}`} /> Vérifier la livraison
           </Button>
         </div>
       </div>

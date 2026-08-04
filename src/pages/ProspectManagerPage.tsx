@@ -19,6 +19,7 @@ import LeadsInscritsPanel from '@/components/admin/LeadsInscritsPanel';
 import TemplatePerformancePanel from '@/components/admin/TemplatePerformancePanel';
 import AbKitPanel from '@/components/admin/AbKitPanel';
 import CommunicationJourneyTracker from '@/components/admin/CommunicationJourneyTracker';
+import { ACTIVE_EMAIL_CAMPAIGN } from '@/data/canonicalEmailCampaign';
 
 
 interface Prospect {
@@ -39,13 +40,7 @@ interface Prospect {
   relance_round?: number | null;
 }
 
-const STEPS = [
-  { step: 1, label: 'Curiosité', day: 'J+0' },
-  { step: 2, label: 'Douleur', day: 'J+2' },
-  { step: 3, label: 'Preuve', day: 'J+4' },
-  { step: 4, label: 'Urgence', day: 'J+6' },
-  { step: 5, label: 'Dernier appel', day: 'J+7' },
-];
+const STEPS = ACTIVE_EMAIL_CAMPAIGN.steps;
 
 const ProspectManagerPage = () => {
   const navigate = useNavigate();
@@ -291,128 +286,6 @@ const ProspectManagerPage = () => {
     setSending(false);
   };
 
-  // Relancer uniquement les prospects "chauds" = ceux qui ont déjà ouvert un email
-  const handleRelancerChauds = async (step: number) => {
-    const ids = prospects
-      .filter(p => p.status === 'active' && !p.unsubscribed && !p.completed && hasOpened(p.email))
-      .map(p => p.id);
-
-    if (ids.length === 0) {
-      toast.error('Aucun prospect chaud (aucune ouverture détectée pour l\'instant)');
-      return;
-    }
-
-    setSending(true);
-    try {
-      const { data: session } = await supabase.auth.getSession();
-      const { data, error } = await supabase.functions.invoke('send-sales-email', {
-        body: { mode: 'manual', step, prospect_ids: ids },
-        headers: { Authorization: `Bearer ${session.session?.access_token}` },
-      });
-      if (error) throw error;
-      toast.success(`🔥 ${data.sent} prospects chauds relancés (étape ${step})`);
-      fetchProspects();
-    } catch (err: any) {
-      toast.error('Erreur d\'envoi : ' + (err.message || ''));
-    }
-    setSending(false);
-  };
-
-  // Relancer les "tièdes" = ont OUVERT mais jamais CLIQUÉ (meilleur potentiel inexploité)
-  // Anti-doublon : on exclut les prospects déjà relancés avec succès (relance_sent_at renseigné).
-  const handleRelancerNonCliqueurs = async () => {
-    const ids = prospects
-      .filter(p =>
-        p.status === 'active' && !p.unsubscribed &&
-        hasOpened(p.email) && !hasClicked(p.email) && !p.relance_sent_at
-      )
-      .map(p => p.id);
-
-    if (ids.length === 0) {
-      toast.error('Aucun nouveau prospect tiède à relancer (tous déjà relancés)');
-      return;
-    }
-
-    if (!confirm(`Envoyer un email de relance dédié à ${ids.length} prospect(s) qui ont ouvert sans cliquer ?`)) return;
-
-    setSending(true);
-    try {
-      const { data: session } = await supabase.auth.getSession();
-      // Envoi par lots de 150 pour rester sous le timeout de la fonction et tout couvrir
-      const chunkSize = 150;
-      let totalSent = 0;
-      let totalErrors = 0;
-      for (let i = 0; i < ids.length; i += chunkSize) {
-        const chunk = ids.slice(i, i + chunkSize);
-        const { data, error } = await supabase.functions.invoke('send-sales-email', {
-          body: { mode: 'relance', prospect_ids: chunk, batch_size: chunk.length },
-          headers: { Authorization: `Bearer ${session.session?.access_token}` },
-        });
-        if (error) throw error;
-        totalSent += data?.sent || 0;
-        totalErrors += data?.errors || 0;
-      }
-      if (totalErrors > 0) {
-        toast.warning(`🔁 ${totalSent}/${ids.length} relance(s) envoyée(s) · ${totalErrors} échec(s) — voir le statut par prospect`);
-      } else {
-        toast.success(`✅ ${totalSent}/${ids.length} relance(s) envoyée(s), aucun doublon`);
-      }
-      fetchProspects();
-    } catch (err: any) {
-      toast.error('Erreur d\'envoi : ' + (err.message || ''));
-    }
-    setSending(false);
-  };
-
-  // Relances supplémentaires : 3 variantes tournantes (démo / offre) pour les prospects
-  // qui ont TERMINÉ la séquence (5/5) sans jamais cliquer. Anti-doublon par variante (relance_round).
-  const RELANCE_MAX_ROUNDS = 3;
-  const handleRelancesSupplementaires = async () => {
-    const ids = prospects
-      .filter(p =>
-        p.status === 'active' && !p.unsubscribed && (p.completed || (p.current_step ?? 0) >= 5) &&
-        !hasClicked(p.email) && (p.relance_round ?? 0) < RELANCE_MAX_ROUNDS
-      )
-      .map(p => p.id);
-
-    if (ids.length === 0) {
-      toast.error('Aucun prospect éligible (tous ont cliqué ou reçu les 3 relances)');
-      return;
-    }
-
-    if (!confirm(`Envoyer la prochaine relance (sur 3) à ${ids.length} prospect(s) à 5/5 non-cliqueurs ?`)) return;
-
-    setSending(true);
-    try {
-      const { data: session } = await supabase.auth.getSession();
-      const chunkSize = 150;
-      let totalSent = 0;
-      let totalErrors = 0;
-      for (let i = 0; i < ids.length; i += chunkSize) {
-        const chunk = ids.slice(i, i + chunkSize);
-        const { data, error } = await supabase.functions.invoke('send-sales-email', {
-          body: { mode: 'relance', prospect_ids: chunk, batch_size: chunk.length },
-          headers: { Authorization: `Bearer ${session.session?.access_token}` },
-        });
-        if (error) throw error;
-        totalSent += data?.sent || 0;
-        totalErrors += data?.errors || 0;
-      }
-      if (totalErrors > 0) {
-        toast.warning(`🔁 ${totalSent}/${ids.length} relance(s) envoyée(s) · ${totalErrors} échec(s)`);
-      } else {
-        toast.success(`✅ ${totalSent}/${ids.length} relance(s) supplémentaire(s) envoyée(s)`);
-      }
-      fetchProspects();
-    } catch (err: any) {
-      toast.error('Erreur d\'envoi : ' + (err.message || ''));
-    }
-    setSending(false);
-  };
-
-
-
-
   // Rapatrier les prospects vers le CRM (table crm_contacts) pour alimenter le pipeline
   const handleSyncToCrm = async () => {
     if (prospects.length === 0) {
@@ -524,20 +397,6 @@ const ProspectManagerPage = () => {
   const totalClickers = Object.keys(clicksByEmail).length;
   // Cliqueurs présents dans email_clicks mais absents de la liste prospects
   const offListClickers = Math.max(0, totalClickers - clickCount);
-  // Cibles de la relance non-cliqueurs : ouvreurs sans clic (toutes ouvertures paginées prises en compte)
-  const nonClickerOpeners = prospects.filter(
-    p => p.status === 'active' && !p.unsubscribed && hasOpened(p.email) && !hasClicked(p.email)
-  );
-  // Cibles à relancer = non-cliqueurs PAS encore relancés (anti-doublon)
-  const nonClickerTargets = nonClickerOpeners.filter(p => !p.relance_sent_at).length;
-  // Vérification d'envoi : combien de non-cliqueurs ont bien reçu la relance / en échec
-  const relanceSentCount = nonClickerOpeners.filter(p => p.relance_status === 'sent').length;
-  const relanceErrorCount = nonClickerOpeners.filter(p => p.relance_status === 'error').length;
-  // Cibles des relances supplémentaires : prospects à 5/5 (completed), non-cliqueurs, avec encore des variantes
-  const relancesSupplTargets = prospects.filter(
-    p => p.status === 'active' && !p.unsubscribed && (p.completed || (p.current_step ?? 0) >= 5) && !hasClicked(p.email) && (p.relance_round ?? 0) < 3
-  ).length;
-
   const stepDistribution = STEPS.map(s => ({
     ...s,
     count: prospects.filter(p => p.current_step === s.step).length,
@@ -553,7 +412,7 @@ const ProspectManagerPage = () => {
             📋 Gestion des Prospects
           </h1>
           <p className="text-muted-foreground">
-            Import Excel, envoi automatique & manuel de la séquence de vente
+            Campagne unique {ACTIVE_EMAIL_CAMPAIGN.price} · anciens automatismes arrêtés
           </p>
         </div>
 
@@ -693,49 +552,6 @@ const ProspectManagerPage = () => {
                 <Mail className="h-3 w-3 mr-1" />
                 {showClickedOnly ? '👆 Afficher tous' : `👆 Voir les ${clickCount} cliqueurs`}
               </Button>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleRelancerNonCliqueurs}
-                  disabled={sending || nonClickerTargets === 0}
-                  className="border-orange-500/40 text-orange-400 hover:bg-orange-500/10 font-semibold"
-                >
-                  <RefreshCw className="h-3 w-3 mr-1" /> 🔁 Relancer les non-cliqueurs
-                </Button>
-                <span className="text-xs font-semibold px-2 py-1 rounded-md bg-orange-500/10 text-orange-400 border border-orange-500/30 whitespace-nowrap">
-                  🎯 {nonClickerTargets} cible{nonClickerTargets > 1 ? 's' : ''} sélectionnée{nonClickerTargets > 1 ? 's' : ''}
-                </span>
-                {relanceSentCount > 0 && (
-                  <span className="text-xs font-semibold px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 whitespace-nowrap">
-                    ✅ {relanceSentCount} relancé{relanceSentCount > 1 ? 's' : ''}
-                  </span>
-                )}
-                {relanceErrorCount > 0 && (
-                  <span className="text-xs font-semibold px-2 py-1 rounded-md bg-red-500/10 text-red-400 border border-red-500/30 whitespace-nowrap">
-                    ⚠️ {relanceErrorCount} échec{relanceErrorCount > 1 ? 's' : ''}
-                  </span>
-                )}
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleRelancesSupplementaires}
-                  disabled={sending || relancesSupplTargets === 0}
-                  className="border-violet-500/40 text-violet-400 hover:bg-violet-500/10 font-semibold"
-                >
-                  <RefreshCw className="h-3 w-3 mr-1" /> ✨ Relances 5/5 (prochaine sur 3)
-                </Button>
-                <span className="text-xs font-semibold px-2 py-1 rounded-md bg-violet-500/10 text-violet-400 border border-violet-500/30 whitespace-nowrap">
-                  🎯 {relancesSupplTargets} prospect{relancesSupplTargets > 1 ? 's' : ''} à 5/5 relançable{relancesSupplTargets > 1 ? 's' : ''}
-                </span>
-              </div>
-
-
-
-
               <Button
                 variant="outline"
                 size="sm"
@@ -922,35 +738,13 @@ const ProspectManagerPage = () => {
 
           {/* MANUAL SEND TAB */}
           <TabsContent value="send" className="space-y-4">
-            {/* Relance prioritaire des prospects chauds */}
-            <Card className="bg-card border-orange-500/40 ring-1 ring-orange-500/20">
-              <CardHeader>
-                <CardTitle className="text-orange-400 text-lg flex items-center gap-2">
-                  <Zap className="h-5 w-5" /> Relancer les prospects chauds
-                </CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  {hotCount} prospect(s) ont déjà <strong>ouvert</strong> un de vos emails. Ce sont vos meilleurs leads : relancez-les en priorité avec l'email d'urgence (étape 4).
-                </p>
-              </CardHeader>
-              <CardContent>
-                <Button
-                  onClick={() => handleRelancerChauds(4)}
-                  disabled={sending || hotCount === 0}
-                  className="bg-gradient-to-r from-orange-500 to-amber-500 text-black font-semibold hover:opacity-90"
-                >
-                  <Zap className="h-4 w-4 mr-2" />
-                  {sending ? 'Envoi...' : `🔥 Relancer les ${hotCount} chauds (étape 4 - Urgence)`}
-                </Button>
-              </CardContent>
-            </Card>
-
             <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle className="text-gradient-gold text-lg">Envoi Manuel par Vague</CardTitle>
+                <CardTitle className="text-gradient-gold text-lg">Séquence unique — envoi contrôlé</CardTitle>
                 <p className="text-sm text-muted-foreground">
                   {selectedIds.size > 0
                     ? `${selectedIds.size} prospect(s) sélectionné(s)`
-                    : `Tous les prospects actifs (${active})`}
+                    : `Tous les prospects actifs (${active})`} · aucun envoi sans action explicite
                 </p>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -962,7 +756,7 @@ const ProspectManagerPage = () => {
                       </div>
                       <div>
                         <span className="text-foreground font-medium">{s.label}</span>
-                        <span className="text-muted-foreground text-xs ml-2">({s.day})</span>
+                        <span className="text-muted-foreground text-xs ml-2">({s.delay})</span>
                       </div>
                     </div>
                     <Button
@@ -1016,7 +810,7 @@ const ProspectManagerPage = () => {
                     </div>
                     <div className="flex-1">
                       <div className="flex justify-between">
-                        <span className="text-foreground">{s.label} ({s.day})</span>
+                        <span className="text-foreground">{s.label} ({s.delay})</span>
                         <span className="text-gold-light font-bold">{s.count}</span>
                       </div>
                       <div className="h-2 bg-muted rounded-full mt-1 overflow-hidden">

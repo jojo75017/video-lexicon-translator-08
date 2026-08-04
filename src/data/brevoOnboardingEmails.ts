@@ -1,3 +1,4 @@
+// ARCHIVÉ : ancienne séquence Brevo, conservée uniquement pour référence.
 // Séquence d'onboarding EbookStudio — 8 emails prêts à coller dans Brevo (Automatisations).
 // Chaque email est un template HTML autonome, responsive et compatible clients mail.
 // Variables Brevo : {{ contact.PRENOM }} (fallback géré côté Brevo si vide).
