@@ -756,7 +756,7 @@ const ProspectManagerPage = () => {
                       </div>
                       <div>
                         <span className="text-foreground font-medium">{s.label}</span>
-                        <span className="text-muted-foreground text-xs ml-2">({s.day})</span>
+                        <span className="text-muted-foreground text-xs ml-2">({s.delay})</span>
                       </div>
                     </div>
                     <Button
@@ -810,7 +810,7 @@ const ProspectManagerPage = () => {
                     </div>
                     <div className="flex-1">
                       <div className="flex justify-between">
-                        <span className="text-foreground">{s.label} ({s.day})</span>
+                        <span className="text-foreground">{s.label} ({s.delay})</span>
                         <span className="text-gold-light font-bold">{s.count}</span>
                       </div>
                       <div className="h-2 bg-muted rounded-full mt-1 overflow-hidden">
