@@ -328,6 +328,14 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Ancien moteur marketing neutralisé. Les séquences historiques restent en
+  // base pour l'audit mais aucun envoi automatique ne doit repartir.
+  return new Response(JSON.stringify({ success: true, disabled: true, processed: 0, sent: 0 }), {
+    status: 200,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+
+  /* Legacy implementation retained temporarily for audit history.
   try {
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -500,6 +508,7 @@ const handler = async (req: Request): Promise<Response> => {
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
+  */
 };
 
 serve(handler);

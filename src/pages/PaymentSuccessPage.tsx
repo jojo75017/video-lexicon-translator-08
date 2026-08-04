@@ -177,7 +177,7 @@ const PaymentSuccessPage = () => {
                       <Sparkles className="w-4 h-4 text-orange-500" /> Connecte-toi à ton espace
                     </h3>
                     <p className="text-sm text-black/60 mb-3">Accède à tous les outils : générateur d'ebooks, formations, niches, KDP keywords...</p>
-                    <Button onClick={() => navigate("/subscription")} className="bg-orange-500 hover:bg-orange-600 text-white">
+                    <Button onClick={() => navigate("/connexion-abonne")} className="bg-orange-500 hover:bg-orange-600 text-white">
                       Se connecter maintenant
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
@@ -216,7 +216,7 @@ const PaymentSuccessPage = () => {
                 <p>{result?.error || "Veuillez réessayer dans quelques secondes."}</p>
               </div>
               <div className="flex flex-col gap-3">
-                <Button size="lg" onClick={() => navigate("/subscription")}>
+                <Button size="lg" onClick={() => navigate("/connexion-abonne")}>
                   Se connecter avec mon code
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>

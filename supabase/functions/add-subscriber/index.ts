@@ -9,25 +9,22 @@ const corsHeaders = {
 };
 
 function generateAccessCode(): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let code = 'EBK-';
-  for (let i = 0; i < 6; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return code;
+  const bytes = crypto.getRandomValues(new Uint8Array(6));
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return `EBK-${Array.from(bytes, (byte) => chars[byte % chars.length]).join('')}`;
 }
 
 function getPlanLimits(planType: string) {
   const plans: any = {
     starter: {
-      label: 'Starter - 27€/mois',
+      label: 'Accès Standard',
       ebooks: '5 ebooks par mois',
       chapters: '50 chapitres maximum',
       covers: '3 couvertures par mois',
       features: ['Génération automatique', 'Export PDF', 'Formation Ebook incluse', 'Support email']
     },
     pro: {
-      label: 'Pro - 67€/mois',
+      label: 'Accès Pro',
       ebooks: '20 ebooks par mois',
       chapters: '200 chapitres maximum',
       covers: '10 couvertures par mois',
@@ -72,7 +69,7 @@ async function sendAdminNotification(subscriberEmail: string, planType: string, 
     `;
 
     await resend.emails.send({
-      from: 'EbookStudio <noreply@ebookstudio.frr>',
+      from: 'EbookStudio <noreply@ebookstudio.fr>',
       to: [adminEmail],
       subject: `${action} — ${subscriberEmail} (${planType})`,
       html,
@@ -102,17 +99,17 @@ async function sendWelcomeEmail(email: string, accessCode: string, planType: str
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+             .header { background: #008296; color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
             .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-            .code-box { background: white; border: 3px solid #667eea; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center; }
-            .code { font-size: 32px; font-weight: bold; color: #667eea; letter-spacing: 4px; font-family: monospace; }
+             .code-box { background: white; border: 3px solid #008296; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center; }
+             .code { font-size: 32px; font-weight: bold; color: #008296; letter-spacing: 4px; font-family: monospace; }
             .info { background: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px; margin: 20px 0; }
             .plan-box { background: #f0f9ff; border: 2px solid #0ea5e9; border-radius: 8px; padding: 20px; margin: 20px 0; }
             .feature-list { list-style: none; padding: 0; }
             .feature-list li { padding: 8px 0; border-bottom: 1px solid #e0e0e0; }
             .feature-list li:before { content: "✅ "; color: #10b981; }
             .footer { text-align: center; margin-top: 30px; color: #666; font-size: 12px; }
-            .cta-button { display: inline-block; background: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; font-weight: bold; }
+             .cta-button { display: inline-block; background: #FF9E2D; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; font-weight: bold; }
           </style>
         </head>
         <body>
@@ -156,7 +153,7 @@ async function sendWelcomeEmail(email: string, accessCode: string, planType: str
               </div>
 
               <div style="text-align: center;">
-                <a href="#" class="cta-button">🚀 Commencer maintenant</a>
+                 <a href="https://www.ebookstudio.fr/connexion-abonne" class="cta-button">🚀 Me connecter à EbookStudio</a>
               </div>
 
               <p style="margin-top: 30px; padding: 15px; background: #fff3cd; border-left: 4px solid #ffc107; font-size: 14px;">
