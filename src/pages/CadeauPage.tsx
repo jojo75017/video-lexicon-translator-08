@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Gift, Mail, Loader2, Sparkles, CheckCircle2, BookOpen, TrendingUp, Target } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const CadeauPage = () => {
@@ -21,6 +22,10 @@ const CadeauPage = () => {
     setIsSubmitting(true);
     try {
       const emailLower = email.trim().toLowerCase();
+      const { error } = await supabase.functions.invoke("funnel-capture-lead", {
+        body: { email: emailLower, lead_magnet: "5-niches-rentables-2026", landing_url: window.location.href },
+      });
+      if (error) throw error;
       trackLeadMagnetDownload("10_niches_kdp_2026");
       trackFormSubmit('cadeau_guide', emailLower);
       setIsSuccess(true);
@@ -42,7 +47,7 @@ const CadeauPage = () => {
           </div>
           <h1 className="text-3xl font-bold text-white">C'est envoyé ! 🎉</h1>
           <p className="text-gray-300 text-lg">
-            Votre demande est enregistrée. Aucune séquence automatique ne sera lancée.
+            Vérifiez votre boîte mail (et vos spams). Seul le guide demandé vous est envoyé.
           </p>
           <div className="space-y-4 mt-6">
             <a
