@@ -82,8 +82,35 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
+      .select("id, email, access_code, status, plan_type")
+      .eq("email", normalizedEmail)
+      .single();
 
-    const { data: subscriber, error: dbError } = await supabase
+    if (dbError || !subscriber) {
+      console.log("Subscriber not found:", normalizedEmail);
+      // Dont reveal if email exists or not for security
+      return new Response(
+        JSON.stringify({ 
+          success: true,
+          message: "Si cet email est enregistré, vous recevrez un code daccès."
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    let accessCode = accessCode;
+    if (!accessCode) {
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      accessCode = "EBK-";
+      for (let i = 0; i < 6; i++) {
+        accessCode += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      await supabase
+        .from("subscribers")
+        .update({ access_code: accessCode })
+        .eq("id", subscriber.id);
+      console.log("Generated missing access code for:", normalizedEmail);
+    }
       .from('subscribers')
       .select('email, access_code, status, plan_type')
       .eq('email', normalizedEmail)
@@ -112,7 +139,7 @@ Deno.serve(async (req) => {
     }
 
     // Repair legacy paid accounts that were created without an access code.
-    let accessCode = subscriber.access_code;
+    let accessCode = accessCode;
     if (!accessCode) {
       accessCode = generateAccessCode();
       const { error: updateError } = await supabase
