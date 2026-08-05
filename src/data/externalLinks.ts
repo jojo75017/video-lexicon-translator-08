@@ -15,12 +15,10 @@ export const V2_PURCHASE_LINK_TPE = 'https://www.trafic-affiliation.com/ebookstu
 
 /**
  * Page de commande interne (unique tunnel de paiement).
- * IMPORTANT : `SITE_ORIGIN` doit toujours pointer vers un domaine réellement
- * rattaché au projet. `www.ebookstudio.fr` n'étant plus connecté, on utilise
- * `notify.ebookstudio.fr`. Remettre `https://www.ebookstudio.fr` ici dès que
- * ce domaine est de nouveau actif.
+ * IMPORTANT : `SITE_ORIGIN` doit toujours pointer vers le domaine principal
+ * réellement rattaché au projet. ebookstudio.fr est le domaine principal.
  */
-export const SITE_ORIGIN = 'https://notify.ebookstudio.fr';
+export const SITE_ORIGIN = 'https://ebookstudio.fr';
 export const COMMANDER_PATH = '/commander';
 export const COMMANDER_URL = `${SITE_ORIGIN}${COMMANDER_PATH}`;
 

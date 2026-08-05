@@ -80,7 +80,7 @@ export const AuthPage = () => {
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://video-lexicon-translator-08.lovable.app/auth',
+        redirectTo: `${window.location.origin}/auth`,
       });
 
       if (error) throw error;
@@ -114,7 +114,7 @@ export const AuthPage = () => {
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: 'https://video-lexicon-translator-08.lovable.app/auth',
+          emailRedirectTo: `${window.location.origin}/auth`,
         },
       });
 
@@ -191,7 +191,7 @@ export const AuthPage = () => {
           email,
           password,
           options: {
-            emailRedirectTo: 'https://video-lexicon-translator-08.lovable.app/auth',
+            emailRedirectTo: `${window.location.origin}/auth`,
           },
         });
 

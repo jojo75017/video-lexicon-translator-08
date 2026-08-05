@@ -111,7 +111,7 @@ serve(async (req) => {
                   <p><strong>URL:</strong> ${url || "N/A"}</p>
                   <p><strong>Utilisateur:</strong> ${user_email || "Anonyme"}</p>
                   <p><strong>Total dernière heure:</strong> ${count}</p>
-                  <p><a href="https://www.ebookstudio.fr/admin">Voir dans le dashboard admin</a></p>
+                  <p><a href="https://ebookstudio.fr/admin">Voir dans le dashboard admin</a></p>
                 `,
               }),
             });

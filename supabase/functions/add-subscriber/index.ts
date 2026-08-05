@@ -156,7 +156,7 @@ async function sendWelcomeEmail(email: string, accessCode: string, planType: str
               </div>
 
               <div style="text-align: center;">
-                 <a href="https://www.ebookstudio.fr/connexion-abonne" class="cta-button">🚀 Me connecter à EbookStudio</a>
+                 <a href="https://ebookstudio.fr/connexion-abonne" class="cta-button">🚀 Me connecter à EbookStudio</a>
               </div>
 
               <p style="margin-top: 30px; padding: 15px; background: #fff3cd; border-left: 4px solid #ffc107; font-size: 14px;">

@@ -6,7 +6,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const SYSTEM_PROMPT = `Tu es **EBOOKBOT**, le copilote IA officiel d'EbookStudio (https://www.ebookstudio.fr), une plateforme française qui aide les auteurs à créer, optimiser et vendre leurs ebooks sur Amazon KDP.
+const SYSTEM_PROMPT = `Tu es **EBOOKBOT**, le copilote IA officiel d'EbookStudio (https://ebookstudio.fr), une plateforme française qui aide les auteurs à créer, optimiser et vendre leurs ebooks sur Amazon KDP.
 
 # Ton identité
 - Nom : EBOOKBOT 🤖

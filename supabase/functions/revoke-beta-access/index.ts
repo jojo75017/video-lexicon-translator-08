@@ -85,7 +85,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const origin = req.headers.get('origin') || 'https://www.ebookstudio.fr';
+    const origin = req.headers.get('origin') || 'https://ebookstudio.fr';
     const offerUrl = `${origin}/offres`;
     const html = buildHtml(offerUrl);
 

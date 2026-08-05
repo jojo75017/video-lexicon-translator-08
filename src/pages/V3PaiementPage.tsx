@@ -104,7 +104,7 @@ const V3PaiementPage = () => {
       <SeoHead
         title={`Commande — ${plan.name}`}
         description="Finalisez votre commande Publication Assistée Pro V3. Paiement carte sécurisé ou PayPal."
-        canonical="https://www.ebookstudio.fr/v3-paiement"
+        canonical="https://ebookstudio.fr/v3-paiement"
         noindex
       />
       <div className="max-w-xl mx-auto">

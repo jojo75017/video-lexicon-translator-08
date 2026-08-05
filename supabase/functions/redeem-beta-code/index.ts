@@ -203,7 +203,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const origin = req.headers.get('origin') || 'https://www.ebookstudio.fr';
+    const origin = req.headers.get('origin') || 'https://ebookstudio.fr';
     const loginUrl = `${origin}/subscription`;
 
     await sendWelcomeEmail(email, accessCode, loginUrl);

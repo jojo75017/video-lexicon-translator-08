@@ -37,7 +37,7 @@ async function sendAccessEmail(email: string, firstName: string | null, accessCo
     <p>Votre paiement a bien été confirmé.</p>
     <p><strong>Votre accès EbookStudio est maintenant actif.</strong></p>
     <p style="text-align:center;margin:24px 0">
-       <a href="https://www.ebookstudio.fr/connexion-abonne"
+       <a href="https://ebookstudio.fr/connexion-abonne"
          style="display:inline-block;background:#FF9E2D;color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold">
         Accéder à mon espace
       </a>
@@ -142,7 +142,7 @@ async function sendLifetimeAccessEmail(email: string, planLabel: string, accessC
     <p>Votre paiement est confirmé (<strong>${planLabel}</strong>).</p>
     <p><strong>Votre accès à vie est actif — aucun abonnement, aucune date d'expiration.</strong></p>
     <p style="text-align:center;margin:24px 0">
-       <a href="https://www.ebookstudio.fr/connexion-abonne"
+       <a href="https://ebookstudio.fr/connexion-abonne"
          style="display:inline-block;background:#FF9E2D;color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold">
         Accéder à mon espace
       </a>

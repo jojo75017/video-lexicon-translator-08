@@ -101,7 +101,7 @@ const QuizPage = () => {
           name="description"
           content="Découvrez en 2 minutes votre profil d'auteur et la méthode idéale pour enfin écrire et publier votre livre avec EbookStudio."
         />
-        <link rel="canonical" href="https://www.ebookstudio.fr/quiz" />
+        <link rel="canonical" href="https://ebookstudio.fr/quiz" />
       </Helmet>
 
       <div className="mx-auto max-w-2xl px-4 py-10">

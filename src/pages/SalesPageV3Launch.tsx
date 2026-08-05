@@ -84,7 +84,7 @@ const SalesPageV3Launch = () => {
       <SeoHead
         title="Publiez et vendez votre livre sur Amazon KDP — Publication Assistée Pro V3"
         description="La méthode + les outils IA pour transformer votre idée en livre publié et rentable sur Amazon KDP. Accès à vie, garantie 7 jours."
-        canonical="https://www.ebookstudio.fr/vente-v3"
+        canonical="https://ebookstudio.fr/vente-v3"
       />
 
       {/* HERO */}
