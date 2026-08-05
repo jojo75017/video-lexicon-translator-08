@@ -16,16 +16,22 @@ const DELAYS = [0, 2, 3, 2, 3];
 interface StepContent {
   subject: string;
   preheader: string;
+  badge: string;
   heading: string;
   intro: string;
   bulletsTitle: string;
   bullets: Array<{ label: string; text: string }>;
+  valueTitle: string;
+  valueBody: string;
   result: string;
   reassurance: string;
   cta: string;
   closing: string;
   ps: string;
+  showPrice: boolean;
+  doubleCta: boolean;
 }
+
 
 const OFFER_BULLETS: Array<{ label: string; text: string }> = [
   { label: "Un plan structuré", text: "chapitres et sous-parties générés à partir de votre sujet, que vous validez et modifiez librement." },
