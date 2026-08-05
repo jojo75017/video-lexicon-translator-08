@@ -32,6 +32,10 @@ Lovable délègue un sous-domaine dédié à l'envoi (ex. `notify.ebookstudio.fr
    - Envoyer un email de test (code d'accès, confirmation).
    - Vérifier la réception et que l'expéditeur est bien `xxx@ebookstudio.fr`.
 
+## Nettoyage externe
+
+- Resend n'est pas connecté au projet et n'est pas utilisé dans le code. Vous pouvez annuler votre abonnement Resend directement dans le tableau de bord Resend. L'envoi via Lovable Emails est inclus dans le plan Pro, sans surcoût.
+
 ## Limites importantes
 
 - Lovable Emails est réservé aux emails transactionnels (codes d'accès, confirmations, réinitialisations, notifications applicatives). Il ne permet pas les campagnes marketing en masse.
