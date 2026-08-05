@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { EMAIL_SENDING_ENABLED } from "../_shared/emailSendingGuard.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -63,6 +64,7 @@ const LEAD_MAGNET_URL = MAGNETS[DEFAULT_MAGNET].url;
 const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 
 async function sendLeadMagnetEmail(email: string, firstName: string, magnetKey: string) {
+  if (!EMAIL_SENDING_ENABLED) return false;
   const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
   if (!RESEND_API_KEY) {
     console.warn("RESEND_API_KEY missing — skipping email");

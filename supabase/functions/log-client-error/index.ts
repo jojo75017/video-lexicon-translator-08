@@ -1,6 +1,7 @@
 // Log client errors to error_logs table + send email alert if severity >= critical or rate threshold passed
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { EMAIL_SENDING_ENABLED } from "../_shared/emailSendingGuard.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -79,7 +80,7 @@ serve(async (req) => {
     const aboveThreshold = (count || 0) >= ALERT_THRESHOLD_PER_HOUR;
 
     let alertSent = false;
-    if (isCritical || aboveThreshold) {
+    if (EMAIL_SENDING_ENABLED && (isCritical || aboveThreshold)) {
       // Check if we already alerted in last hour to avoid spam
       const { count: recentAlerts } = await supabase
         .from("error_logs")

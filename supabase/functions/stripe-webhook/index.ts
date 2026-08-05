@@ -287,6 +287,7 @@ serve(async (req) => {
 });
 
 async function sendEmail(email: string, accessCode: string, planType: string, isRenewal: boolean) {
+  if (!EMAIL_SENDING_ENABLED) return;
   const resendKey = Deno.env.get("RESEND_API_KEY");
   
   if (!resendKey) {

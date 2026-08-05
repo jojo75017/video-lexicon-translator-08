@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 import { pushToSystemeIo } from "../_shared/systemeio.ts";
+import { EMAIL_SENDING_ENABLED, emailSendingBlockedResult } from "../_shared/emailSendingGuard.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -15,6 +16,12 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
+    if (!EMAIL_SENDING_ENABLED) {
+      return new Response(JSON.stringify(emailSendingBlockedResult()), {
+        status: 423,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     const { email, name, subject, category, message, source, handle } = await req.json();
 
     if (!email || !message) {
