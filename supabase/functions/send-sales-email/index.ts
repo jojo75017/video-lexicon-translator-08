@@ -237,10 +237,12 @@ Deno.serve(async (req) => {
     const db = createClient(baseUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "");
     const body = await req.json().catch(() => ({}));
     const mode = String(body.mode || "status");
+    const { data: cronSecret } = await db.from("app_secrets").select("value").eq("key", "cron_secret").maybeSingle();
+    const hasCronSecret = !!cronSecret?.value && req.headers.get("x-cron-secret") === cronSecret.value;
     if (mode === "auto") {
-      const { data: secret } = await db.from("app_secrets").select("value").eq("key", "cron_secret").maybeSingle();
-      if (!secret?.value || req.headers.get("x-cron-secret") !== secret.value) return respond({ error: "Non autorisé" }, 401);
-    } else if (!(await isAdmin(req, baseUrl))) return respond({ error: "Accès administrateur requis" }, 403);
+      if (!hasCronSecret) return respond({ error: "Non autorisé" }, 401);
+    } else if (!hasCronSecret && !(await isAdmin(req, baseUrl))) return respond({ error: "Accès administrateur requis" }, 403);
+
 
     if (mode === "status") return respond({ campaign: CAMPAIGN, active: true, blocked: !EMAIL_SENDING_ENABLED, steps: STEPS.map((s, i) => ({ step: i + 1, subject: s.subject, template: templateName(i + 1) })) });
     if (mode === "preview") {
