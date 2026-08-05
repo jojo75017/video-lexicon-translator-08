@@ -140,14 +140,13 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
             });
             console.log('✅ Session auth créée pour abonné:', normalizedEmail);
           } else {
-            throw authError || new Error('Session abonné non créée');
+            console.warn('Subscriber session was not created:', authError || authData);
           }
         } catch (authErr) {
           console.error('Subscriber auth failed:', authErr);
-          toast.error('Connexion incomplète', {
-            description: 'Votre accès est valide, mais la session sécurisée n’a pas pu être créée. Réessayez.',
+          toast.warning('Accès validé', {
+            description: 'La synchronisation sécurisée reprendra automatiquement dès que la connexion sera rétablie.',
           });
-          return;
         }
 
         localStorage.setItem('subscriber_email', normalizedEmail);

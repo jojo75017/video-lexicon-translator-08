@@ -103,18 +103,21 @@ export function SubscriberGate({
       }
 
       try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 10000);
-
-        const { data, error } = await supabase.functions.invoke("validate-subscription", {
+        const validationPromise = supabase.functions.invoke("validate-subscription", {
           body: { email, access_code: code },
         });
-
-        clearTimeout(timeout);
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("Subscription validation timed out")), 10000)
+        );
+        const { data, error } = await Promise.race([validationPromise, timeoutPromise]);
 
         if (cancelled) return;
 
-        if (error || !data?.valid) {
+        if (error) {
+          throw error;
+        }
+
+        if (!data?.valid) {
           // Explicit rejection from the server (e.g. expired) → deny + redirect
           await denyAccess();
           return;
@@ -148,7 +151,20 @@ export function SubscriberGate({
       } catch (networkErr) {
         if (cancelled) return;
         console.warn("SubscriberGate: Network validation failed:", networkErr);
-        await denyAccess();
+
+        // A transport outage is not an access rejection. Keep an already
+        // authenticated subscriber inside the app and retry on the next mount.
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          setAllowed(true);
+          setChecking(false);
+          return;
+        }
+
+        // Without a real session, return to login without destroying the
+        // subscriber credentials. A retry can then succeed when the network is back.
+        setAllowed(false);
+        setChecking(false);
       }
     };
 
