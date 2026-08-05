@@ -1,41 +1,58 @@
-# Plan simple : envoyer les codes et les campagnes
+# Plan email ebookstudio.fr
 
-## 1. Codes d'accès après paiement (transactionnel)
+## Objectif
+Permettre l'envoi fiable des codes d'accès après paiement et des campagnes marketing, sans perturber la réception actuelle sur Amazon SES.
 
-**Pourquoi** : quand un client paie, il doit recevoir immédiatement son code d'accès. C'est un email transactionnel, autorisé avec Lovable Emails.
+## État actuel
+- Aucun domaine email Lovable n'est configuré.
+- Le domaine `ebookstudio.fr` est lié au projet (custom domain).
+- La clé API Systeme.io est déjà présente dans le projet.
+- Resend n'est pas utilisé dans le projet et peut être annulé.
 
-**Solution** : activer Lovable Emails inclus dans Pro.
+## Option recommandée : Transactionnel Lovable + Campagnes Systeme.io
 
-**Étapes** :
-1. Ouvrir l'assistant de configuration email dans Lovable.
-2. Saisir le domaine `ebookstudio.fr`.
-3. Copier les 2 lignes NS fournies dans Hostinger (DNS de `ebookstudio.fr`).
-4. Attendre la vérification (souvent instantanée, parfois 72h).
-5. Scaffolder les templates d'emails de l'application.
-6. Tester l'envoi d'un code d'accès.
+### Pourquoi
+- Lovable Emails est inclus dans le plan Pro (jusqu'à 50 000 emails transactionnels/mois).
+- Systeme.io est déjà connecté : idéal pour les séquences marketing et les prospects.
+- Cela évite d'acheter une boîte email Hostinger ou de toucher aux MX actuels (Amazon SES).
 
-**Coût** : inclus dans Pro.
+## Étapes du plan
 
-## 2. Campagnes marketing
+### 1. Déléguer un sous-domaine d'envoi
+Créer un sous-domaine dédié à l'envoi pour ne pas toucher à la réception actuelle.
+- Sous-domaine proposé : `notify.ebookstudio.fr`
+- Lovable génère automatiquement les enregistrements NS.
+- L'utilisateur copie ces 2 enregistrements NS dans Hostinger.
+- Lovable gère ensuite SPF, DKIM et DMARC automatiquement.
 
-**Pourquoi** : envoyer des séquences de vente aux prospects.
+### 2. Configurer l'infrastructure email Lovable
+Une fois le domaine délégué :
+- Activer l'infrastructure email partagée (queues, send log, suppression, cron).
+- Scaffolder les templates d'emails d'authentification (codes d'accès, confirmation de paiement, récupération de mot de passe).
+- Scaffolder les templates transactionnels si nécessaire.
+- Déployer les Edge Functions concernées.
 
-**Solution** : utiliser Systeme.io car vous avez déjà une clé API enregistrée.
+### 3. Connecter les codes d'accès à Lovable Emails
+Modifier les points d'envoi actuels des codes d'accès pour passer par le système Lovable transactionnel au lieu d'un système externe ou d'un envoi manuel.
 
-**Étapes** :
-1. Connecter le projet à Systeme.io via le connecteur standard.
-2. Créer ou utiliser la campagne existante dans Systeme.io.
-3. Depuis l'application, ajouter les prospects à Systeme.io au lieu de les envoyer via l'application.
-4. Laisser Systeme.io gérer les envois en masse.
+### 4. Préparer la campagne marketing dans Systeme.io
+- Utiliser la clé API Systeme.io existante pour synchroniser les prospects.
+- Créer la séquence marketing (offre 47 €, codes d'accès, relances) directement dans Systeme.io.
+- L'application n'envoie plus de campagnes marketing en masse : elle pousse les contacts vers Systeme.io.
 
-**Avantage** : Systeme.io a une offre gratuite généreuse et gère bien les campagnes.
+### 5. Tester
+- Envoi d'un code d'accès test.
+- Envoi d'un email de confirmation de paiement test.
+- Inscription d'un prospect test dans Systeme.io.
 
-## 3. Nettoyage
+## Alternative si la délégation NS est impossible
+Si Hostinger ne permet pas d'ajouter des enregistrements NS ou si l'utilisateur ne souhaite pas déléguer :
+- Utiliser Systeme.io également pour les emails transactionnels (codes d'accès).
+- Désactiver complètement l'envoi d'emails depuis Lovable et ne garder que Systeme.io comme moteur d'envoi.
+- Cela implique de configurer l'intégration Systeme.io dans les points de code actuels (paiement, connexion, etc.).
 
-- Annuler Resend depuis le tableau de bord Resend (il n'est pas utilisé dans le projet).
-- Ne pas créer de boîte email Hostinger complexe pour l'instant.
-
-## 4. Test final
-
-- Tester un achat test et vérifier que le code d'accès arrive bien.
-- Tester l'inscription d'un prospect à Systeme.io.
+## Livrables attendus
+- Domaine `notify.ebookstudio.fr` délégué et vérifié (ou alternative Systeme.io validée).
+- Infrastructure email Lovable active et testée.
+- Codes d'accès envoyés automatiquement après paiement.
+- Prospects synchronisés avec Systeme.io pour la campagne marketing.
