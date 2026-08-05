@@ -1,46 +1,41 @@
-# Plan : activer Lovable Emails simplement
+# Plan simple : envoyer les codes et les campagnes
 
-## Objectif
+## 1. Codes d'accès après paiement (transactionnel)
 
-Utiliser la solution d'emails intégrée de Lovable (incluse dans Pro) pour envoyer les emails transactionnels depuis l'application. C'est plus simple qu'un SMTP externe : pas de configuration de boîte email chez Hostinger, pas de DNS MX, pas de SPF/DKIM/DMARC manuels.
+**Pourquoi** : quand un client paie, il doit recevoir immédiatement son code d'accès. C'est un email transactionnel, autorisé avec Lovable Emails.
 
-## Principe
+**Solution** : activer Lovable Emails inclus dans Pro.
 
-Lovable délègue un sous-domaine dédié à l'envoi (ex. `notify.ebookstudio.fr`). Lovable gère automatiquement les enregistrements SPF, DKIM et MX. Cela ne perturbe pas les emails reçus sur `ebookstudio.fr` s'ils sont actuellement gérés par Amazon.
+**Étapes** :
+1. Ouvrir l'assistant de configuration email dans Lovable.
+2. Saisir le domaine `ebookstudio.fr`.
+3. Copier les 2 lignes NS fournies dans Hostinger (DNS de `ebookstudio.fr`).
+4. Attendre la vérification (souvent instantanée, parfois 72h).
+5. Scaffolder les templates d'emails de l'application.
+6. Tester l'envoi d'un code d'accès.
 
-## Étapes
+**Coût** : inclus dans Pro.
 
-1. **Ouvrir l'assistant d'emails Lovable**
-   - Utiliser le bouton de configuration email.
-   - Saisir le domaine racine `ebookstudio.fr` (pas `notify.ebookstudio.fr`, afin d'éviter `notify.notify.ebookstudio.fr`).
-   - Lovable génère automatiquement le sous-domaine d'envoi.
+## 2. Campagnes marketing
 
-2. **Ajouter les enregistrements NS dans Hostinger**
-   - L'assistant fournit 2 valeurs NS exactes.
-   - Les copier dans Hostinger, DNS de `ebookstudio.fr`, en tant qu'enregistrements NS pour le sous-domaine choisi.
-   - Attendre la propagation DNS (jusqu'à 72h, souvent quelques minutes).
+**Pourquoi** : envoyer des séquences de vente aux prospects.
 
-3. **Vérifier le domaine**
-   - Revenir dans l'assistant Lovable et cliquer sur vérification.
-   - Une fois actif, les emails de l'application peuvent partir.
+**Solution** : utiliser Systeme.io car vous avez déjà une clé API enregistrée.
 
-4. **Scaffolder les emails transactionnels**
-   - Configurer l'infrastructure email (queues, tables, Edge Functions) pour le projet.
-   - Scaffolder les templates d'emails d'authentification et les emails applicatifs si nécessaire.
+**Étapes** :
+1. Connecter le projet à Systeme.io via le connecteur standard.
+2. Créer ou utiliser la campagne existante dans Systeme.io.
+3. Depuis l'application, ajouter les prospects à Systeme.io au lieu de les envoyer via l'application.
+4. Laisser Systeme.io gérer les envois en masse.
 
-5. **Tester l'envoi**
-   - Envoyer un email de test (code d'accès, confirmation).
-   - Vérifier la réception et que l'expéditeur est bien `xxx@ebookstudio.fr`.
+**Avantage** : Systeme.io a une offre gratuite généreuse et gère bien les campagnes.
 
-## Nettoyage externe
+## 3. Nettoyage
 
-- Resend n'est pas connecté au projet et n'est pas utilisé dans le code. Vous pouvez annuler votre abonnement Resend directement dans le tableau de bord Resend. L'envoi via Lovable Emails est inclus dans le plan Pro, sans surcoût.
+- Annuler Resend depuis le tableau de bord Resend (il n'est pas utilisé dans le projet).
+- Ne pas créer de boîte email Hostinger complexe pour l'instant.
 
-## Limites importantes
+## 4. Test final
 
-- Lovable Emails est réservé aux emails transactionnels (codes d'accès, confirmations, réinitialisations, notifications applicatives). Il ne permet pas les campagnes marketing en masse.
-- Pour les newsletters et campagnes marketing, il faudra toujours un service externe (GetResponse, Brevo, Mailerlite, etc.).
-
-## Alternative si Lovable Emails reste bloqué
-
-- Utiliser un connecteur standard (Resend, Brevo ou Mailgun) via Lovable. Cela demande un compte chez le fournisseur et de vérifier un domaine ou sous-domaine, mais c'est souvent plus rapide que de configurer un SMTP classique.
+- Tester un achat test et vérifier que le code d'accès arrive bien.
+- Tester l'inscription d'un prospect à Systeme.io.
