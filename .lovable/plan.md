@@ -6,11 +6,11 @@
 - Votre **domaine est déjà configuré et vérifié** dans Resend.
 - Le verrou « zéro envoi » (`EMAIL_SENDING_ENABLED = false`) bloque toujours les envois dans le projet.
 
-## Ce qu'il faut faire de votre côté (obligatoire)
+## Ce qu'il faut faire de votre côté
 
-1. **Réabonnez-vous à Resend** sur le plan à 20 €/mois (ou l'équivalent en euros selon votre compte).
-2. **Vérifiez (ou re-vérifiez) votre domaine d'envoi** dans Resend : `ebookstudio.fr` ou `notify.ebookstudio.fr` selon ce qui était configuré avant.
-3. **Vérifiez que `RESEND_API_KEY` est toujours dans les secrets du projet.** Si vous avez changé de clé en vous réabonnant, il faudra me la donner pour mettre à jour le secret.
+1. **Renouvelez votre abonnement Resend après le 20 août** pour ne pas être coupé.
+2. **Ne touchez pas à la configuration du domaine** : elle est déjà bonne.
+3. Si vous avez généré une nouvelle clé API Resend, donnez-la-moi pour mettre à jour le secret `RESEND_API_KEY`. Sinon, la clé actuelle reste valide.
 
 ## Ce que je vais faire côté technique
 
