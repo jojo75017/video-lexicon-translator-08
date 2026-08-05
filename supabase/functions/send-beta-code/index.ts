@@ -86,7 +86,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const origin = req.headers.get('origin') || 'https://www.ebookstudio.fr';
+    const origin = req.headers.get('origin') || 'https://ebookstudio.fr';
     const activateUrl = `${origin}/activer-beta`;
 
     const res = await resend.emails.send({

@@ -17,7 +17,7 @@ const V3CommandePage = () => {
       <SeoHead
         title="Commande — Publication Assistée Pro V3"
         description="Finalisez votre commande V3 : choisissez l'offre Base 197€ ou le Pack Pro 547€. Paiement carte sécurisé ou PayPal."
-        canonical="https://www.ebookstudio.fr/commande-v3"
+        canonical="https://ebookstudio.fr/commande-v3"
         noindex
       />
       <div className="max-w-xl mx-auto">

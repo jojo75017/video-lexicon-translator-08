@@ -173,7 +173,7 @@ Deno.serve(async (req) => {
 
                   <p><strong>Comment se connecter :</strong></p>
                   <ol>
-                     <li><a href="https://www.ebookstudio.fr/connexion-abonne">Allez sur la page de connexion abonnés</a></li>
+                     <li><a href="https://ebookstudio.fr/connexion-abonne">Allez sur la page de connexion abonnés</a></li>
                     <li>Entrez votre email : <strong>${subscriber.email}</strong></li>
                      <li>Entrez votre code d'accès : <strong>${accessCode}</strong></li>
                     <li>Cliquez sur "Accéder au générateur"</li>

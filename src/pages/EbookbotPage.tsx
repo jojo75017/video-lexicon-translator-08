@@ -10,7 +10,7 @@ const EbookbotPage = () => {
       <Helmet>
         <title>EBOOKBOT - Ton copilote IA pour réussir sur Amazon KDP | Ebookstudio Pro V2</title>
         <meta name="description" content="EBOOKBOT, l'assistant IA gratuit qui te guide sur Amazon KDP : niches rentables, mots-clés, structure d'ebook, marketing et lancement. Réponses en 3 secondes." />
-        <link rel="canonical" href="https://www.ebookstudio.fr/ebookbot" />
+        <link rel="canonical" href="https://ebookstudio.fr/ebookbot" />
       </Helmet>
 
       {/* Header */}

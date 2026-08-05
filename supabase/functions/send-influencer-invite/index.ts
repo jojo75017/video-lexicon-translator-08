@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const origin = req.headers.get('origin') || 'https://www.ebookstudio.fr';
+    const origin = req.headers.get('origin') || 'https://ebookstudio.fr';
     const kitUrl = `${origin}/influenceurs`;
     const pdfUrl = `${origin}/kit-influenceurs.pdf`;
 

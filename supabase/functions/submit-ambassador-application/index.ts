@@ -121,7 +121,7 @@ Deno.serve(async (req) => {
       ],
     ) : { ok: false, detail: 'domain_pending_validation' };
 
-    const origin = req.headers.get('origin') || 'https://www.ebookstudio.fr';
+    const origin = req.headers.get('origin') || 'https://ebookstudio.fr';
     const kitUrl = `${origin}/influenceurs`;
     const joinUrl = `${origin}/influenceurs`;
     const pdfUrl = `${origin}/kit-influenceurs.pdf`;

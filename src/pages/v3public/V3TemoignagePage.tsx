@@ -87,7 +87,7 @@ export default function V3TemoignagePage() {
       <SeoHead
         title="Envoyez la photo de votre premier livre — EbookStudio"
         description="Partagez la photo de votre premier livre publié avec EbookStudio et votre commentaire : votre témoignage peut apparaître sur notre page de présentation."
-        canonical="https://www.ebookstudio.fr/v3/temoignage"
+        canonical="https://ebookstudio.fr/v3/temoignage"
       />
 
       <span
