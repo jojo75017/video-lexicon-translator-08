@@ -128,6 +128,7 @@ Deno.serve(async (req) => {
       sessionParams = {
         mode: "subscription",
         ui_mode: "embedded_page",
+        locale: "fr",
         customer: customerId,
         return_url: returnUrl,
         line_items: [{
