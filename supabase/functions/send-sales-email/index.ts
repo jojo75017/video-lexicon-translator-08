@@ -197,21 +197,23 @@ function render(baseUrl: string, email: string, firstName: string, step: number)
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse"><tr><td align="center">
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width:600px;width:100%;background:#ffffff;border:1px solid #e5e7eb;border-collapse:collapse">
 <tr><td style="background:#008296;padding:18px 28px;color:#ffffff;font:700 22px Arial,Helvetica,sans-serif">EbookStudio</td></tr>
-<tr><td style="padding:26px 28px 0"><span style="display:inline-block;background:#FFF4E5;color:#8a4b00;border:1px solid #FF9E2D;border-radius:4px;padding:7px 12px;font:700 12px Arial,Helvetica,sans-serif;letter-spacing:.4px">OFFRE 47 € AU LIEU DE 59 € — JUSQU’AU 30 SEPTEMBRE</span></td></tr>
+<tr><td style="padding:26px 28px 0"><span style="display:inline-block;background:#FFF4E5;color:#8a4b00;border:1px solid #FF9E2D;border-radius:4px;padding:7px 12px;font:700 12px Arial,Helvetica,sans-serif;letter-spacing:.4px">${c.badge}</span></td></tr>
 <tr><td style="padding:20px 28px 0;color:#232F3E;font:16px/1.65 Arial,Helvetica,sans-serif">
 <p style="margin:0 0 18px">Bonjour${firstName ? ` ${firstName}` : ""},</p>
 <h1 style="margin:0 0 16px;font:700 25px/1.3 Arial,Helvetica,sans-serif;color:#232F3E">${c.heading}</h1>
 <p style="margin:0 0 20px">${c.intro}</p>
 <p style="margin:0 0 14px;font:700 17px Arial,Helvetica,sans-serif;color:#232F3E">${c.bulletsTitle}</p>
 ${bulletList(c.bullets)}
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td style="background:#fffaf2;border:1px solid #FF9E2D;padding:18px 20px;font:16px/1.65 Arial,Helvetica,sans-serif;color:#232F3E"><p style="margin:0 0 8px;font:700 16px Arial,Helvetica,sans-serif;color:#8a4b00">${c.valueTitle}</p>${c.valueBody}</td></tr></table>
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:22px 0"><tr><td style="background:#f2f8f9;border-left:4px solid #008296;padding:16px 18px;font:16px/1.6 Arial,Helvetica,sans-serif;color:#232F3E"><strong>Le résultat :</strong> ${c.result}</td></tr></table>
 <p style="margin:0 0 20px">${c.reassurance}</p>
-<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse"><tr><td align="center" style="background:#232F3E;padding:20px;color:#ffffff;font:16px/1.5 Arial,Helvetica,sans-serif"><div style="font:700 38px/1.1 Arial,Helvetica,sans-serif;color:#FF9E2D">47 €</div><div style="margin-top:8px"><span style="text-decoration:line-through;opacity:.75">59 €</span> &nbsp;·&nbsp; paiement unique</div><div style="margin-top:6px;font-size:14px;opacity:.9">Pas d’abonnement, pas de prélèvement mensuel, accès conservé.</div></td></tr></table>
+${c.showPrice ? `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse"><tr><td align="center" style="background:#232F3E;padding:20px;color:#ffffff;font:16px/1.5 Arial,Helvetica,sans-serif"><div style="font:700 38px/1.1 Arial,Helvetica,sans-serif;color:#FF9E2D">47 €</div><div style="margin-top:8px"><span style="text-decoration:line-through;opacity:.75">59 €</span> &nbsp;·&nbsp; paiement unique</div><div style="margin-top:6px;font-size:14px;opacity:.9">Pas d’abonnement, pas de prélèvement mensuel, accès conservé.</div></td></tr></table>` : `<p style="margin:0 0 20px;font:16px/1.6 Arial,Helvetica,sans-serif;color:#232F3E"><strong>47 €</strong> en un seul paiement (au lieu de 59 €), jusqu’au 30 septembre. Pas d’abonnement.</p>`}
 ${ctaButton(link, c.cta)}
 <p style="margin:0 0 18px">${c.closing}</p>
 <p style="margin:0 0 6px">Bien à vous,<br><strong>Georges Boubet</strong><br>EbookStudio</p>
 <p style="margin:18px 0 0;padding:14px 0 0;border-top:1px solid #e5e7eb;font:15px/1.6 Arial,Helvetica,sans-serif;color:#4b5563">${c.ps}</p>
-${ctaButton(link, "J’accède à EbookStudio pour 47 €")}
+${c.doubleCta ? ctaButton(link, "J’accède à EbookStudio pour 47 €") : ""}
+
 </td></tr>
 <tr><td style="padding:18px 24px;background:#f6f7f8;text-align:center;color:#68737d;font:12px/1.6 Arial,Helvetica,sans-serif">Offre valable jusqu’au 30 septembre 2026, sous réserve des conditions indiquées sur le site.<br>Vous recevez cet email car vous avez manifesté un intérêt pour EbookStudio.<br><a href="${unsubscribe}" style="color:#008296">Se désinscrire de tous les emails marketing</a></td></tr>
 </table></td></tr></table><img src="${pixel}" width="1" height="1" alt="" style="display:none"></body></html>`;
