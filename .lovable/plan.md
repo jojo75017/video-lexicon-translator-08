@@ -1,8 +1,10 @@
 # Plan : Réactiver l'envoi d'emails via Resend
 
-## Votre décision
+## État actuel
 
-Vous choisissez de **réabonner Resend** (~20 €/mois) et de réactiver le moteur d'envoi actuel. C'est la solution la plus rapide.
+- Vous êtes encore abonné à Resend **jusqu'au 20 août**.
+- Votre **domaine est déjà configuré et vérifié** dans Resend.
+- Le verrou « zéro envoi » (`EMAIL_SENDING_ENABLED = false`) bloque toujours les envois dans le projet.
 
 ## Ce qu'il faut faire de votre côté (obligatoire)
 
