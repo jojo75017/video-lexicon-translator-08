@@ -17,6 +17,7 @@ import * as XLSX from 'xlsx';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 import LeadsInscritsPanel from '@/components/admin/LeadsInscritsPanel';
 import TemplatePerformancePanel from '@/components/admin/TemplatePerformancePanel';
+import CampaignPerformanceDashboard from '@/components/admin/CampaignPerformanceDashboard';
 import AbKitPanel from '@/components/admin/AbKitPanel';
 import CommunicationJourneyTracker from '@/components/admin/CommunicationJourneyTracker';
 import { ACTIVE_EMAIL_CAMPAIGN } from '@/data/canonicalEmailCampaign';
