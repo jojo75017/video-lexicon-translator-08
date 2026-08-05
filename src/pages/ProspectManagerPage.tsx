@@ -11,12 +11,13 @@ import { supabase } from '@/integrations/supabase/client';
 import {
   Upload, Users, Send, Play, Pause, Trash2,
   Mail, CheckCircle, Clock, AlertCircle, RefreshCw,
-  FileSpreadsheet, Zap, BarChart3, Globe, Copy, Route
+  FileSpreadsheet, Zap, BarChart3, Globe, Copy, Route, TrendingUp
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 import LeadsInscritsPanel from '@/components/admin/LeadsInscritsPanel';
 import TemplatePerformancePanel from '@/components/admin/TemplatePerformancePanel';
+import CampaignPerformanceDashboard from '@/components/admin/CampaignPerformanceDashboard';
 import AbKitPanel from '@/components/admin/AbKitPanel';
 import CommunicationJourneyTracker from '@/components/admin/CommunicationJourneyTracker';
 import { ACTIVE_EMAIL_CAMPAIGN } from '@/data/canonicalEmailCampaign';
@@ -489,29 +490,19 @@ const ProspectManagerPage = () => {
         </div>
 
         <Tabs value={activeManagerTab} onValueChange={setActiveManagerTab} className="space-y-6">
-          <TabsList className="grid h-auto w-full grid-cols-2 gap-1 bg-card border border-border p-1 md:grid-cols-4 xl:grid-cols-7">
-            <TabsTrigger value="prospects" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
-              <Users className="h-4 w-4 mr-2" /> Prospects
-            </TabsTrigger>
-            <TabsTrigger value="inscrits" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
-              <Globe className="h-4 w-4 mr-2" /> Inscrits
-            </TabsTrigger>
-            <TabsTrigger value="send" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
-              <Send className="h-4 w-4 mr-2" /> Envoi Manuel
-            </TabsTrigger>
-            <TabsTrigger value="abkit" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
-              <Copy className="h-4 w-4 mr-2" /> Kit GetResponse
-            </TabsTrigger>
-            <TabsTrigger value="templates" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
-              <Mail className="h-4 w-4 mr-2" /> Templates
-            </TabsTrigger>
-            <TabsTrigger value="stats" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
-              <BarChart3 className="h-4 w-4 mr-2" /> Pipeline
-            </TabsTrigger>
+          <TabsList className="grid h-auto w-full grid-cols-2 gap-1 bg-card border border-border p-1 md:grid-cols-4 xl:grid-cols-8">
+...
             <TabsTrigger value="tracking" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
               <Route className="h-4 w-4 mr-2" /> Suivi global
             </TabsTrigger>
+            <TabsTrigger value="perf" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
+              <TrendingUp className="h-4 w-4 mr-2" /> Perf & CA
+            </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="perf" className="space-y-4">
+            <CampaignPerformanceDashboard />
+          </TabsContent>
 
           <TabsContent value="tracking" className="space-y-4">
             <CommunicationJourneyTracker onSelectTab={setActiveManagerTab} />
