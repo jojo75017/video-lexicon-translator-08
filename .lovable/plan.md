@@ -1,48 +1,28 @@
-# Plan immédiat : emails transactionnels avec Hostinger
+# Plan : Réactiver l'envoi d'emails via Resend
 
-## Pourquoi c'est devenu compliqué
+## Votre décision
 
-Avant, vous utilisiez **Brevo** avec votre propre clé API (`BREVO_API_KEY` est encore dans les secrets). Lovable a ensuite ajouté **Lovable Emails**, qui est géré en interne et demande une délégation NS sur un sous-domaine. Cette délégation NS n’est pas supportée par Hostinger, d’où le blocage actuel.
+Vous choisissez de **réabonner Resend** (~20 €/mois) et de réactiver le moteur d'envoi actuel. C'est la solution la plus rapide.
 
-**La bonne nouvelle :** Brevo fonctionne toujours. Vous n’êtes pas obligé de passer par Lovable Emails.
+## Ce qu'il faut faire de votre côté (obligatoire)
 
-## Options possibles
+1. **Réabonnez-vous à Resend** sur le plan à 20 €/mois (ou l'équivalent en euros selon votre compte).
+2. **Vérifiez (ou re-vérifiez) votre domaine d'envoi** dans Resend : `ebookstudio.fr` ou `notify.ebookstudio.fr` selon ce qui était configuré avant.
+3. **Vérifiez que `RESEND_API_KEY` est toujours dans les secrets du projet.** Si vous avez changé de clé en vous réabonnant, il faudra me la donner pour mettre à jour le secret.
 
-### Option A — Utiliser Brevo (recommandée si vous voulez éviter la DNS)
+## Ce que je vais faire côté technique
 
-Avantage : vous gardez Hostinger, pas de NS à ajouter, c’est ce que vous connaissez.
+1. **Supprimer le verrou « zéro envoi »** (`EMAIL_SENDING_ENABLED`) pour que les emails repartent.
+2. **Vérifier que toutes les fonctions d'envoi** (`send-sales-email`, `resend-access-code`, `payments-webhook`, `trial-signup`) reprennent bien via Resend.
+3. **Garder Brevo** uniquement pour la synchronisation des contacts, si vous le souhaitez.
+4. **Envoyer un email de test** à votre adresse pour confirmer que tout repart.
+5. **Mettre à jour le tableau de suivi** CommunicationJourneyTracker pour indiquer que Resend est réactivé.
 
-Étapes :
-1. Vérifier que votre domaine/sender est validé dans Brevo.
-2. Utiliser la clé `BREVO_API_KEY` déjà stockée.
-3. Adapter le moteur d’envoi pour passer par Brevo au lieu de Lovable Emails.
-4. Garder le mode « zéro envoi » jusqu’à ce que le sender Brevo soit confirmé actif.
-5. Tester un email à vous-même.
+## Ensuite, si vous le voulez
 
-### Option B — Déléguer via Cloudflare
+- On peut relancer une séquence d'emails propre (la nouvelle séquence canonique de 5 emails à 47 €) quand l'envoi est validé.
+- On peut nettoyer les anciennes campagnes résiduelles pour éviter que des prospects reçoivent des emails obsolètes.
 
-1. Créer un compte gratuit Cloudflare.
-2. Transférer la gestion DNS de `ebookstudio.fr` de Hostinger vers Cloudflare.
-3. Ajouter les NS Lovable pour `notify.ebookstudio.fr` dans Cloudflare.
-4. Valider et passer à Lovable Emails.
+## Prochaine action
 
-### Option C — Transférer le domaine dans Lovable
-
-Lovable gère la DNS et la délégation email automatiquement. Plus de manipulation chez Hostinger.
-
-### Option D — Ne rien faire / rester bloqué
-
-Conserver le mode « zéro envoi ». Les emails ne partent pas, les clients peuvent perdre leurs codes d’accès.
-
-## Ce que je recommande
-
-Si Brevo marchait bien avant, reprenons **Option A**. C’est la plus rapide, la moins risquée pour votre site, et ça ne touche pas à Hostinger.
-
-## Question immédiate
-
-Voulez-vous que je reprenne le moteur d’emails avec **Brevo** (Option A) ?
-
-- **Oui** → je configure le moteur pour envoyer via Brevo, je teste un email, puis on réactive les envois indispensables.
-- **Non** → je détaille la marche à suivre pour Cloudflare (Option B) ou le transfert Lovable (Option C).
-
-Répondez **Oui** ou **Non**, pas besoin de faire autre chose.
+Dites-moi quand vous avez réabonné Resend et vérifié le domaine, puis je retire le verrou et je teste l'envoi.
