@@ -249,6 +249,54 @@ Deno.serve(async (req) => {
     }
     if (!EMAIL_SENDING_ENABLED) return respond(emailSendingBlockedResult(), 423);
 
+    // Relance ciblée : ouvreurs de l'email 1 qui n'ont pas cliqué (nouvelle version enrichie)
+    if (mode === "resend_openers") {
+      const sourceTemplate = String(body.source_template || templateName(1));
+      const resendTemplate = `${sourceTemplate}-v2`;
+      const step = Math.min(Math.max(Number(body.step || 1), 1), 5);
+      const limit = Math.min(Number(body.batch_size || 250), 300);
+
+      const { data: opens } = await db.from("email_opens").select("prospect_email").eq("template_name", sourceTemplate);
+      const { data: clicks } = await db.from("email_clicks").select("prospect_email");
+      const { data: alreadySent } = await db.from("email_send_log").select("recipient_email").eq("template_name", resendTemplate).in("status", ["sent", "delivered"]);
+      const { data: paidOrders } = await db.from("funnel_orders").select("email").eq("status", "paid");
+      const { data: unsub } = await db.from("sales_prospects").select("email,first_name,unsubscribed,status").limit(5000);
+
+      const clickers = new Set((clicks || []).map((r) => normalize(r.prospect_email || "")));
+      const done = new Set((alreadySent || []).map((r) => normalize(r.recipient_email || "")));
+      const paid = new Set((paidOrders || []).map((r) => normalize(r.email || "")));
+      const profiles = new Map((unsub || []).map((r) => [normalize(r.email || ""), r]));
+
+      const targets: string[] = [];
+      for (const row of opens || []) {
+        const email = normalize(row.prospect_email || "");
+        if (!isEmail(email) || targets.includes(email)) continue;
+        if (clickers.has(email) || done.has(email) || paid.has(email)) continue;
+        const profile = profiles.get(email);
+        if (profile && (profile.unsubscribed === true || profile.status !== "active")) continue;
+        targets.push(email);
+        if (targets.length >= limit) break;
+      }
+
+      if (body.dry_run) return respond({ success: true, mode, template: resendTemplate, would_send: targets.length });
+
+      let sentCount = 0;
+      for (const email of targets) {
+        const profile = profiles.get(email);
+        const result = await sendResendEmailThrottled({
+          from: "Georges Boubet <noreply@ebookstudio.fr>",
+          to: [email],
+          subject: STEPS[step - 1].subject,
+          html: render(baseUrl, email, (profile?.first_name as string) || "", step),
+          reply_to: "contact@ebookstudio.fr",
+        });
+        await db.from("email_send_log").insert({ recipient_email: email, template_name: resendTemplate, message_id: result.id || `${CAMPAIGN}-${resendTemplate}-${email}`, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
+        if (!result.ok) { if (isQuotaExhausted()) break; continue; }
+        sentCount++;
+      }
+      return respond({ success: true, mode, template: resendTemplate, sent: sentCount, targets: targets.length });
+    }
+
     let recipients: Array<{ id?: string; email: string; first_name: string; current_step: number }> = [];
     if (mode === "test") {
       const requested = Number(body.step || 0);
@@ -262,6 +310,7 @@ Deno.serve(async (req) => {
       if (error) throw error;
       recipients = data || [];
     }
+
 
     const { data: orders } = await db.from("funnel_orders").select("email").eq("status", "paid");
     const buyers = new Set((orders || []).map((row) => normalize(row.email || "")));
