@@ -27,4 +27,4 @@
 
 ## Prochaine action
 
-Dites-moi quand vous avez réabonné Resend et vérifié le domaine, puis je retire le verrou et je teste l'envoi.
+Je peux **retirer le verrou « zéro envoi »** maintenant et envoyer un email de test. Voulez-vous que je le fasse ?
