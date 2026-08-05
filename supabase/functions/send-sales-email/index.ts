@@ -58,7 +58,7 @@ Deno.serve(async (req) => {
       if (!secret?.value || req.headers.get("x-cron-secret") !== secret.value) return respond({ error: "Non autorisé" }, 401);
     } else if (!(await isAdmin(req, baseUrl))) return respond({ error: "Accès administrateur requis" }, 403);
 
-    if (mode === "status") return respond({ campaign: CAMPAIGN, active: false, blocked: !EMAIL_SENDING_ENABLED, steps: STEPS.map((s, i) => ({ step: i + 1, subject: s.subject, template: templateName(i + 1) })) });
+    if (mode === "status") return respond({ campaign: CAMPAIGN, active: true, blocked: !EMAIL_SENDING_ENABLED, steps: STEPS.map((s, i) => ({ step: i + 1, subject: s.subject, template: templateName(i + 1) })) });
     if (!EMAIL_SENDING_ENABLED) return respond(emailSendingBlockedResult(), 423);
 
     let recipients: Array<{ id?: string; email: string; first_name: string; current_step: number }> = [];
