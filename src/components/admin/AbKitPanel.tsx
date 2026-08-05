@@ -4,7 +4,10 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Copy, Download, ExternalLink } from 'lucide-react';
 
-const LIEN = 'https://www.ebookstudio.fr/commander?src=getresponse';
+import { commanderUrl } from '@/data/externalLinks';
+
+const LIEN = commanderUrl('getresponse');
+
 const TEMPLATE_FILE = '/email-templates/offre-47-final-2026-getresponse.html';
 
 const FIELDS: Array<{ label: string; value: string }> = [

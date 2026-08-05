@@ -13,9 +13,17 @@ export const BLOG_LABEL = 'Blog EbookStudio';
 export const TPE_ENABLED = false;
 export const V2_PURCHASE_LINK_TPE = 'https://www.trafic-affiliation.com/ebookstudiopv';
 
-/** Page de commande interne (unique tunnel de paiement de l'offre 59 €). */
+/**
+ * Page de commande interne (unique tunnel de paiement).
+ * IMPORTANT : `SITE_ORIGIN` doit toujours pointer vers un domaine réellement
+ * rattaché au projet. `www.ebookstudio.fr` n'étant plus connecté, on utilise
+ * `notify.ebookstudio.fr`. Remettre `https://www.ebookstudio.fr` ici dès que
+ * ce domaine est de nouveau actif.
+ */
+export const SITE_ORIGIN = 'https://notify.ebookstudio.fr';
 export const COMMANDER_PATH = '/commander';
-export const COMMANDER_URL = 'https://www.ebookstudio.fr/commander';
+export const COMMANDER_URL = `${SITE_ORIGIN}${COMMANDER_PATH}`;
+
 
 /** Construit un lien de commande traçable pour les réseaux sociaux / emails. */
 export function commanderUrl(src?: string, ref?: string): string {
