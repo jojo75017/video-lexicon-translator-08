@@ -151,6 +151,7 @@ serve(async (req) => {
           await supabase.from("subscribers").update({ access_code: accessCode }).eq("id", existing.id);
           console.log("Restored missing access code for existing subscriber:", email);
         }
+      } else {
         // Un seul essai gratuit autorisé par email : ne pas réactiver un essai déjà utilisé
         return new Response(
           JSON.stringify({
@@ -159,10 +160,8 @@ serve(async (req) => {
             error: "Vous avez déjà utilisé votre essai gratuit. Pour continuer, passez à l'accès à vie (67€, paiement unique).",
           }),
           { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-
         );
       }
-
     } else {
       accessCode = generateAccessCode();
       trialEndsAt = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
