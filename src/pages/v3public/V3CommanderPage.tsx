@@ -10,6 +10,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import SeoHead from "@/components/funnel/SeoHead";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+import { COMMANDER_URL } from "@/data/externalLinks";
+
 
 const EMERALD = "#064e3b";
 const GOLD = "#c9a84c";
