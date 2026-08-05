@@ -1,6 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.78.0";
 import { isQuotaExhausted, sendResendEmailThrottled } from "../_shared/resendThrottle.ts";
 import { EMAIL_SENDING_ENABLED, emailSendingBlockedResult } from "../_shared/emailSendingGuard.ts";
+import { CHECKOUT_URL } from "../_shared/checkoutUrl.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -8,7 +9,8 @@ const corsHeaders = {
 };
 
 const CAMPAIGN = "offre-47-sequence-2026";
-const CHECKOUT = "https://www.ebookstudio.fr/commander";
+const CHECKOUT = CHECKOUT_URL;
+
 const DELAYS = [0, 2, 3, 2, 3];
 const STEPS = [
   { subject: "Tout EbookStudio à 47 € — voici ce qui est inclus", heading: "Votre idée peut devenir un vrai livre", body: "Jusqu’au 30 septembre, l’accès complet à EbookStudio est à <strong>47 € au lieu de 59 €</strong>.<br><br>Un paiement unique, aucun abonnement : plan, rédaction, export Word/PDF, couverture KDP et fiche Amazon sont réunis dans un seul workflow.", cta: "Voir tout ce qui est inclus à 47 €" },

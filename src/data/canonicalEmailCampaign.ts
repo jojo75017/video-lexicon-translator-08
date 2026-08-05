@@ -1,3 +1,5 @@
+import { COMMANDER_URL } from './externalLinks';
+
 export const ACTIVE_EMAIL_CAMPAIGN = {
   id: 'offre-47-sequence-2026',
   name: 'Offre 47 € — séquence unique',
@@ -6,7 +8,8 @@ export const ACTIVE_EMAIL_CAMPAIGN = {
   price: '47 €',
   regularPrice: '59 €',
   deadline: '30 septembre 2026',
-  checkoutUrl: 'https://www.ebookstudio.fr/commander',
+  checkoutUrl: COMMANDER_URL,
+
   steps: [
     { step: 1, delay: 'J+0', label: 'Offre claire', template: 'offre-47-unique-1', subject: 'Tout EbookStudio à 47 € — voici ce qui est inclus' },
     { step: 2, delay: 'J+2', label: 'Bénéfices', template: 'offre-47-unique-2', subject: 'De votre idée à un livre prêt pour Amazon KDP' },
