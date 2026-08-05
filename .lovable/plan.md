@@ -1,45 +1,42 @@
-# Plan simple : passer les emails à Hostinger sans coupure
+# Plan : activer Lovable Emails simplement
 
 ## Objectif
 
-Utiliser une vraie boîte Hostinger pour **envoyer et recevoir** les emails de `ebookstudio.fr`, puis retirer Amazon uniquement lorsqu’il ne sert plus.
+Utiliser la solution d'emails intégrée de Lovable (incluse dans Pro) pour envoyer les emails transactionnels depuis l'application. C'est plus simple qu'un SMTP externe : pas de configuration de boîte email chez Hostinger, pas de DNS MX, pas de SPF/DKIM/DMARC manuels.
+
+## Principe
+
+Lovable délègue un sous-domaine dédié à l'envoi (ex. `notify.ebookstudio.fr`). Lovable gère automatiquement les enregistrements SPF, DKIM et MX. Cela ne perturbe pas les emails reçus sur `ebookstudio.fr` s'ils sont actuellement gérés par Amazon.
 
 ## Étapes
 
-1. **Arrêter les essais Lovable Emails**
-   - Ne lancer aucune nouvelle configuration de domaine email dans Lovable.
-   - Ne modifier ni le site, ni les parcours d’achat, ni les campagnes pendant cette intervention.
+1. **Ouvrir l'assistant d'emails Lovable**
+   - Utiliser le bouton de configuration email.
+   - Saisir le domaine racine `ebookstudio.fr` (pas `notify.ebookstudio.fr`, afin d'éviter `notify.notify.ebookstudio.fr`).
+   - Lovable génère automatiquement le sous-domaine d'envoi.
 
-2. **Faire l’inventaire avant toute suppression**
-   - Relever les enregistrements DNS actuels liés aux emails dans Hostinger.
-   - Identifier précisément ce qu’Amazon gère aujourd’hui : réception, envoi de l’application, ou anciens enregistrements inutilisés.
-   - Conserver une copie de ces valeurs pour pouvoir revenir en arrière.
+2. **Ajouter les enregistrements NS dans Hostinger**
+   - L'assistant fournit 2 valeurs NS exactes.
+   - Les copier dans Hostinger, DNS de `ebookstudio.fr`, en tant qu'enregistrements NS pour le sous-domaine choisi.
+   - Attendre la propagation DNS (jusqu'à 72h, souvent quelques minutes).
 
-3. **Créer la boîte chez Hostinger**
-   - Créer ou confirmer une adresse principale, par exemple `contact@ebookstudio.fr`.
-   - Récupérer dans Hostinger les valeurs exactes MX, SPF, DKIM et DMARC propres à cette boîte.
+3. **Vérifier le domaine**
+   - Revenir dans l'assistant Lovable et cliquer sur vérification.
+   - Une fois actif, les emails de l'application peuvent partir.
 
-4. **Basculer progressivement les DNS**
-   - Installer les valeurs fournies par Hostinger sans inventer d’adresse IP ni de CNAME.
-   - Éviter plusieurs SPF concurrents : fusionner ou remplacer l’ancien SPF selon l’usage Amazon constaté.
-   - Ne retirer les MX et éléments Amazon devenus inutiles qu’après validation de Hostinger.
+4. **Scaffolder les emails transactionnels**
+   - Configurer l'infrastructure email (queues, tables, Edge Functions) pour le projet.
+   - Scaffolder les templates d'emails d'authentification et les emails applicatifs si nécessaire.
 
-5. **Vérifier avant de considérer la migration terminée**
-   - Envoyer un email depuis la boîte Hostinger vers une adresse extérieure.
-   - Répondre depuis cette adresse extérieure et vérifier la réception dans Hostinger.
-   - Contrôler que SPF et DKIM passent, et que DMARC ne bloque pas les messages.
+5. **Tester l'envoi**
+   - Envoyer un email de test (code d'accès, confirmation).
+   - Vérifier la réception et que l'expéditeur est bien `xxx@ebookstudio.fr`.
 
-6. **Reconnecter ensuite l’application, séparément**
-   - Une fois la boîte stable, relier uniquement les emails indispensables de l’application : codes d’accès, récupération et confirmations.
-   - Tester ces parcours avant de désactiver leur ancien moyen d’envoi.
-   - Garder les campagnes marketing séparées : une boîte Hostinger classique n’est pas adaptée aux envois massifs.
+## Limites importantes
 
-## Ce dont j’aurai besoin
+- Lovable Emails est réservé aux emails transactionnels (codes d'accès, confirmations, réinitialisations, notifications applicatives). Il ne permet pas les campagnes marketing en masse.
+- Pour les newsletters et campagnes marketing, il faudra toujours un service externe (GetResponse, Brevo, Mailerlite, etc.).
 
-Une capture de la page **Hostinger → Emails** montrant l’offre ou la boîte active, puis une capture de **DNS / Zone DNS** filtrée sur `MX` et `TXT`. Les valeurs sensibles comme le mot de passe de la boîte ne doivent jamais être envoyées dans le chat.
+## Alternative si Lovable Emails reste bloqué
 
-## Protection contre les dégâts
-
-- Aucun DNS Amazon supprimé avant un test réussi d’envoi **et** de réception chez Hostinger.
-- Aucun secret demandé avant que la boîte Hostinger existe réellement.
-- Une seule modification contrôlée à la fois, avec possibilité de retour arrière.
+- Utiliser un connecteur standard (Resend, Brevo ou Mailgun) via Lovable. Cela demande un compte chez le fournisseur et de vérifier un domaine ou sous-domaine, mais c'est souvent plus rapide que de configurer un SMTP classique.
