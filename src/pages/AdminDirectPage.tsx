@@ -68,7 +68,7 @@ const AdminDirectPage = () => {
     setStatus("sending");
     setMessage("Envoi du lien magique...");
 
-    const redirectTo = 'https://video-lexicon-translator-08.lovable.app/admin-direct';
+    const redirectTo = 'https://ebookstudio.fr/admin-direct';
 
     const { error: magicLinkError } = await supabase.auth.signInWithOtp({
       email: email.trim().toLowerCase(),

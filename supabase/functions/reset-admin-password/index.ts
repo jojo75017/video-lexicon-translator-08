@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
       type: 'recovery',
       email: ADMIN_EMAIL,
       options: {
-        redirectTo: `${req.headers.get('origin') || 'https://video-lexicon-translator-08.lovable.app'}/auth`,
+        redirectTo: `${req.headers.get('origin') || 'https://ebookstudio.fr'}/auth`,
       },
     });
 

@@ -13,7 +13,7 @@ const FROM_ADDRESS = "Georges Boubet <noreply@ebookstudio.fr>";
 const ADMIN_EMAIL = "boubetgeorges@gmail.com";
 const TEMPLATE_NAME = "temoignage-photo-premier-livre";
 const SUBJECT = "Une photo de votre premier livre ? (2 minutes, et ça m'aide beaucoup)";
-const FORM_LINK = "https://video-lexicon-translator-08.lovable.app/v3/temoignage";
+const FORM_LINK = "https://ebookstudio.fr/v3/temoignage";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 

@@ -38,7 +38,7 @@ async function sendTrialEmail(toEmail: string, accessCode: string, trialEndsAt: 
               <p style="font-size: 28px; font-weight: bold; font-family: monospace; color: #0891b2; margin: 0;">${accessCode}</p>
             </div>
             <p><strong>Email :</strong> ${toEmail}</p>
-            <p>Connectez-vous sur <a href="https://video-lexicon-translator-08.lovable.app/subscription">EbookStudio</a> avec votre email et ce code.</p>
+            <p>Connectez-vous sur <a href="https://ebookstudio.fr/subscription">EbookStudio</a> avec votre email et ce code.</p>
             <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
             <p style="color: #999; font-size: 12px; text-align: center;">
               Votre essai expire le ${new Date(trialEndsAt).toLocaleDateString('fr-FR')}.
