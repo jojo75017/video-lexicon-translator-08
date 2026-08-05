@@ -1,51 +1,48 @@
 # Plan immédiat : emails transactionnels avec Hostinger
 
-## Problème constaté
+## Pourquoi c'est devenu compliqué
 
-Hostinger ne permet pas d’ajouter des enregistrements NS personnalisés pour un sous-domaine (`notify.ebookstudio.fr`).
-Lovable Emails a besoin d’une délégation NS sur le sous-domaine d’envoi pour gérer SPF, DKIM et MX automatiquement. Il n’existe pas d’alternative CNAME, A ou TXT équivalente.
+Avant, vous utilisiez **Brevo** avec votre propre clé API (`BREVO_API_KEY` est encore dans les secrets). Lovable a ensuite ajouté **Lovable Emails**, qui est géré en interne et demande une délégation NS sur un sous-domaine. Cette délégation NS n’est pas supportée par Hostinger, d’où le blocage actuel.
+
+**La bonne nouvelle :** Brevo fonctionne toujours. Vous n’êtes pas obligé de passer par Lovable Emails.
 
 ## Options possibles
 
-### Option A — Déléguer `notify.ebookstudio.fr` via Cloudflare (recommandée, gratuite)
+### Option A — Utiliser Brevo (recommandée si vous voulez éviter la DNS)
 
-1. Créer un compte gratuit sur **Cloudflare**.
-2. Ajouter le domaine `ebookstudio.fr` dans Cloudflare.
-3. Récupérer les 2 serveurs DNS de Cloudflare (ex. `bob.ns.cloudflare.com`, `lara.ns.cloudflare.com`).
-4. Dans Hostinger, remplacer les **NS du domaine racine** `ebookstudio.fr` par ceux de Cloudflare.
-5. Attendre la propagation (jusqu’à 24h).
-6. Une fois le domaine géré par Cloudflare, ajouter dans Cloudflare les enregistrements NS pour `notify.ebookstudio.fr` fournis par Lovable (affichés après avoir cliqué sur le bouton de configuration email).
-7. Valider le domaine dans Lovable.
+Avantage : vous gardez Hostinger, pas de NS à ajouter, c’est ce que vous connaissez.
 
-**Avantage :** Cloudflare gère bien les NS de sous-domaine, c’est gratuit, et cela ne casse pas l’hébergement web actuel. Les enregistrements A/TXT/CNAME existants peuvent être recréés dans Cloudflare si nécessaire.
+Étapes :
+1. Vérifier que votre domaine/sender est validé dans Brevo.
+2. Utiliser la clé `BREVO_API_KEY` déjà stockée.
+3. Adapter le moteur d’envoi pour passer par Brevo au lieu de Lovable Emails.
+4. Garder le mode « zéro envoi » jusqu’à ce que le sender Brevo soit confirmé actif.
+5. Tester un email à vous-même.
 
-### Option B — Transférer le domaine dans Lovable
+### Option B — Déléguer via Cloudflare
 
-1. Dans Lovable, ouvrir **Workspace settings → Workspace domains**.
-2. Lancer le transfert de `ebookstudio.fr`.
-3. Lorsque le domaine est géré par Lovable, la configuration email crée automatiquement la délégation NS sans manipulation DNS manuelle.
-4. Configurer `notify.ebookstudio.fr` comme domaine d’envoi.
+1. Créer un compte gratuit Cloudflare.
+2. Transférer la gestion DNS de `ebookstudio.fr` de Hostinger vers Cloudflare.
+3. Ajouter les NS Lovable pour `notify.ebookstudio.fr` dans Cloudflare.
+4. Valider et passer à Lovable Emails.
 
-**Avantage :** aucune manipulation chez Hostinger, aucune propagation hasardeuse.  
-**Inconvénient :** le domaine change de gestionnaire DNS, ce qui peut impacter d’autres services s’ils sont liés à Hostinger.
+### Option C — Transférer le domaine dans Lovable
 
-### Option C — Ne pas déléguer NS et garder le statu quo (non recommandée)
+Lovable gère la DNS et la délégation email automatiquement. Plus de manipulation chez Hostinger.
 
-Continuer sans domaine email Lovable. Les emails transactionnels partiront alors depuis un domaine Lovable par défaut (moins personnalisé, moins de délivrabilité).  
-Cela n’active pas la marque propre et peut renforcer le spam-score.
+### Option D — Ne rien faire / rester bloqué
 
-## Ce qu'il ne faut PAS faire
+Conserver le mode « zéro envoi ». Les emails ne partent pas, les clients peuvent perdre leurs codes d’accès.
 
-- Ne remplacez **pas** les NS de `ebookstudio.fr` par ceux de Lovable directement : cela casserait l’hébergement web actuel.
-- N’essayez pas d’ajouter un CNAME ou un TXT à la place des NS : Lovable n’en a pas besoin et cela ne suffira pas.
-- Ne continuez pas à payer des crédits pour des modifications techniques avant d’avoir choisi une option et validé la propagation.
+## Ce que je recommande
 
-## Prochaine décision
+Si Brevo marchait bien avant, reprenons **Option A**. C’est la plus rapide, la moins risquée pour votre site, et ça ne touche pas à Hostinger.
 
-Quelle option préférez-vous ?
+## Question immédiate
 
-- **A** — Cloudflare (gratuit, simple, recommandé)  
-- **B** — Transfert dans Lovable (zéro DNS, mais plus engageant)  
-- **C** — Rester sans domaine dédié (solution de repli)
+Voulez-vous que je reprenne le moteur d’emails avec **Brevo** (Option A) ?
 
-Dès que vous choisissez, je détaille les étapes suivantes sans action technique avant votre validation.
+- **Oui** → je configure le moteur pour envoyer via Brevo, je teste un email, puis on réactive les envois indispensables.
+- **Non** → je détaille la marche à suivre pour Cloudflare (Option B) ou le transfert Lovable (Option C).
+
+Répondez **Oui** ou **Non**, pas besoin de faire autre chose.
