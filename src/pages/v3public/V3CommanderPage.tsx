@@ -92,7 +92,7 @@ export default function V3CommanderPage() {
       <SeoHead
         title="Commander EbookStudio Pro — 47 € accès à vie (offre août-septembre)"
         description="Accès à vie à EbookStudio Pro pour 47 € au lieu de 59 €, jusqu'au 30 septembre. Aucun abonnement. La V3 est incluse sans surcoût. Carte bancaire ou PayPal, accès immédiat."
-        canonical="https://www.ebookstudio.fr/commander"
+        canonical={COMMANDER_URL}
       />
       <PaymentTestModeBanner />
 
