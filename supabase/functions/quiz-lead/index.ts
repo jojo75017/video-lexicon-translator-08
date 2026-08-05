@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { EMAIL_SENDING_ENABLED } from "../_shared/emailSendingGuard.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -166,7 +167,9 @@ serve(async (req) => {
     const tags = [tag];
     if (base_tag) tags.push(base_tag);
     if (source) tags.push(`quiz-source-${source}`);
-    const sio = await pushToSystemeIo(email, first_name, tags);
+    const sio = EMAIL_SENDING_ENABLED
+      ? await pushToSystemeIo(email, first_name, tags)
+      : { ok: false, detail: "domain_pending_validation" };
 
     return new Response(
       JSON.stringify({ ok: true, lead_id: leadId, systemeio: sio.ok, systemeio_detail: sio.detail, profile_key, profile_title }),
