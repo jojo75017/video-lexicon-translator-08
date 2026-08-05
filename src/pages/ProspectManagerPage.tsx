@@ -430,13 +430,24 @@ const ProspectManagerPage = () => {
           </p>
         </div>
 
-        <div className="mb-6 flex items-start gap-3 rounded-md border border-destructive/40 bg-destructive/10 p-4 text-destructive">
-          <Pause className="mt-0.5 h-5 w-5 shrink-0" />
-          <div>
-            <p className="font-semibold">Zéro envoi actif</p>
-            <p className="text-sm text-muted-foreground">Tous les emails d’application et de campagne sont bloqués jusqu’à la validation du domaine email.</p>
+        {EMAIL_SENDING_BLOCKED ? (
+          <div className="mb-6 flex items-start gap-3 rounded-md border border-destructive/40 bg-destructive/10 p-4 text-destructive">
+            <Pause className="mt-0.5 h-5 w-5 shrink-0" />
+            <div>
+              <p className="font-semibold">Zéro envoi actif</p>
+              <p className="text-sm text-muted-foreground">Tous les emails d’application et de campagne sont bloqués jusqu’à la validation du domaine email.</p>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="mb-6 flex items-start gap-3 rounded-md border border-emerald-500/40 bg-emerald-500/10 p-4 text-emerald-500">
+            <Zap className="mt-0.5 h-5 w-5 shrink-0" />
+            <div>
+              <p className="font-semibold">Envoi actif</p>
+              <p className="text-sm text-muted-foreground">La campagne {ACTIVE_EMAIL_CAMPAIGN.price} peut être envoyée. Chaque envoi reste manuel ou planifié.</p>
+            </div>
+          </div>
+        )}
+
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
