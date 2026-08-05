@@ -109,6 +109,10 @@ Deno.serve(async (req) => {
         mode: "payment",
         ui_mode: "embedded_page",
         locale: "fr",
+        // PayPal forcé explicitement : la configuration dynamique de moyens
+        // de paiement du compte ne le remontait pas sur /commander.
+        "payment_method_types[0]": "card",
+        "payment_method_types[1]": "paypal",
         customer: customerId,
         return_url: returnUrl,
         line_items: [{
