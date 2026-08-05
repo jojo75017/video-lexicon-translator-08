@@ -4,6 +4,7 @@
 
 import { type StripeEnv, stripeRequest } from "../_shared/stripe.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { EMAIL_SENDING_ENABLED } from "../_shared/emailSendingGuard.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -18,6 +19,7 @@ function getSupabase() {
 }
 
 async function emailRecipientCode(to: string, code: string, buyer: string) {
+  if (!EMAIL_SENDING_ENABLED) return;
   const resendKey = Deno.env.get("RESEND_API_KEY");
   if (!resendKey) return;
   await fetch("https://api.resend.com/emails", {

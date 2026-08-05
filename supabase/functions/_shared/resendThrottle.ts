@@ -9,6 +9,8 @@
 //   const res = await sendResendEmailThrottled({ from, to, subject, html });
 //   if (isQuotaExhausted()) break; // stop looping when daily quota is hit
 
+import { EMAIL_SENDING_ENABLED } from "./emailSendingGuard.ts";
+
 const RESEND_API_URL = "https://api.resend.com/emails";
 
 // 8 req/s => min 125ms between requests
@@ -66,6 +68,9 @@ export async function sendResendEmailThrottled(
   payload: ResendPayload,
   opts: { apiKey?: string } = {},
 ): Promise<ResendResult> {
+  if (!EMAIL_SENDING_ENABLED) {
+    return { ok: false, status: 423, detail: "domain_pending_validation" };
+  }
   const apiKey = opts.apiKey || Deno.env.get("RESEND_API_KEY");
   if (!apiKey) return { ok: false, detail: "RESEND_API_KEY manquante" };
 

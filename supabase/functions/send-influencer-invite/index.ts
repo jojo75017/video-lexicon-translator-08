@@ -1,4 +1,5 @@
 import { Resend } from 'npm:resend@2.0.0';
+import { EMAIL_SENDING_ENABLED, emailSendingBlockedResult } from '../_shared/emailSendingGuard.ts';
 
 const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
 
@@ -44,6 +45,12 @@ Deno.serve(async (req) => {
   }
 
   try {
+    if (!EMAIL_SENDING_ENABLED) {
+      return new Response(JSON.stringify(emailSendingBlockedResult()), {
+        status: 423,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
     const body = await req.json().catch(() => ({}));
     const email = String(body?.email ?? '').trim().toLowerCase();
     const name = String(body?.name ?? '').trim();

@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { EMAIL_SENDING_ENABLED, emailSendingBlockedResult } from "../_shared/emailSendingGuard.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,6 +12,12 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
+    if (!EMAIL_SENDING_ENABLED) {
+      return new Response(JSON.stringify(emailSendingBlockedResult()), {
+        status: 423,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     const { email, first_name } = await req.json();
     const cleanEmail = String(email || "").trim().toLowerCase();
     const greeting = first_name ? `Bonjour ${String(first_name).replace(/[<>]/g, "")},` : "Bonjour,";

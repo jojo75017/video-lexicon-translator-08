@@ -1,6 +1,7 @@
 // Edge function: funnel-create-order — PayPal order creation
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { EMAIL_SENDING_ENABLED } from "../_shared/emailSendingGuard.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -25,6 +26,7 @@ const NICHES_10_URL = "https://www.ebookstudio.fr/niches-600";
 const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 
 async function sendInstructions(email: string, firstName: string, productKey: string, product: { label: string; amount: number }, method: string) {
+  if (!EMAIL_SENDING_ENABLED) return false;
   const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
   if (!RESEND_API_KEY) return false;
 

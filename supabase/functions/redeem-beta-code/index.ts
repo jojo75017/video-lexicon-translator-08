@@ -1,5 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.78.0';
 import { Resend } from 'npm:resend@2.0.0';
+import { EMAIL_SENDING_ENABLED } from '../_shared/emailSendingGuard.ts';
 
 const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
 
@@ -25,6 +26,7 @@ function generateAccessCode(): string {
 }
 
 async function sendWelcomeEmail(email: string, accessCode: string, loginUrl: string) {
+  if (!EMAIL_SENDING_ENABLED) return false;
   const html = `
   <!DOCTYPE html>
   <html lang="fr">
@@ -74,6 +76,7 @@ async function sendWelcomeEmail(email: string, accessCode: string, loginUrl: str
 const ADMIN_NOTIFY_EMAILS = ['boubetgeorges@gmail.com', 'tranboub75017@gmail.com'];
 
 async function notifyAdmin(email: string, code: string, accessCode: string) {
+  if (!EMAIL_SENDING_ENABLED) return;
   const html = `
   <div style="font-family:Arial,Helvetica,sans-serif;color:#232F3E;max-width:600px;margin:0 auto;">
     <h2 style="color:#008296;">Nouvelle activation bêta-testeur 🎉</h2>

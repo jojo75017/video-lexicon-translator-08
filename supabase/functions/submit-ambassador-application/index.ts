@@ -1,6 +1,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { Resend } from 'npm:resend@2.0.0';
 import { pushToSystemeIo } from '../_shared/systemeio.ts';
+import { EMAIL_SENDING_ENABLED } from '../_shared/emailSendingGuard.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -110,7 +111,7 @@ Deno.serve(async (req) => {
       `ambassadeur-${platform}`,
     ];
     if (niche) sioTags.push('client-prospect');
-    const systemeio = await pushToSystemeIo(
+    const systemeio = EMAIL_SENDING_ENABLED ? await pushToSystemeIo(
       email,
       name || handle,
       sioTags,
@@ -118,7 +119,7 @@ Deno.serve(async (req) => {
         ...(handle ? [{ slug: 'pseudo', value: handle }] : []),
         ...(niche ? [{ slug: 'niche', value: niche }] : []),
       ],
-    );
+    ) : { ok: false, detail: 'domain_pending_validation' };
 
     const origin = req.headers.get('origin') || 'https://www.ebookstudio.fr';
     const kitUrl = `${origin}/influenceurs`;
@@ -126,7 +127,7 @@ Deno.serve(async (req) => {
     const pdfUrl = `${origin}/kit-influenceurs.pdf`;
 
     const resendKey = Deno.env.get('RESEND_API_KEY');
-    if (resendKey) {
+    if (EMAIL_SENDING_ENABLED && resendKey) {
       const resend = new Resend(resendKey);
       await resend.emails.send({
         from: 'Ebookstudio <noreply@ebookstudio.fr>',

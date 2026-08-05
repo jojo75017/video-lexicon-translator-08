@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { EMAIL_SENDING_ENABLED } from "../_shared/emailSendingGuard.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -157,6 +158,7 @@ serve(async (req) => {
 });
 
 async function sendEmail(email: string, accessCode: string, planType: string, isRenewal: boolean) {
+  if (!EMAIL_SENDING_ENABLED) return;
   const resendKey = Deno.env.get("RESEND_API_KEY");
   if (!resendKey) {
     console.warn("RESEND_API_KEY not configured - email not sent");

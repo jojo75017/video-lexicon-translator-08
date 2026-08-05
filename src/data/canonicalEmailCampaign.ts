@@ -1,7 +1,9 @@
 export const ACTIVE_EMAIL_CAMPAIGN = {
   id: 'offre-47-sequence-2026',
   name: 'Offre 47 € — séquence unique',
-  status: 'ready' as const,
+  status: 'paused' as const,
+  sendingBlocked: true,
+  blockedReason: 'Domaine email en attente de validation',
   price: '47 €',
   regularPrice: '59 €',
   deadline: '30 septembre 2026',

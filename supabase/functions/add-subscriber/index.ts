@@ -1,5 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.78.0';
 import { Resend } from 'npm:resend@2.0.0';
+import { EMAIL_SENDING_ENABLED } from '../_shared/emailSendingGuard.ts';
 
 const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
 
@@ -49,6 +50,7 @@ function getPlanLimits(planType: string) {
 }
 
 async function sendAdminNotification(subscriberEmail: string, planType: string, planTier: string, isNew: boolean) {
+  if (!EMAIL_SENDING_ENABLED) return;
   try {
     const adminEmail = 'boubetgeorges@gmail.com';
     const action = isNew ? '🆕 Nouvel abonné' : '🔄 Abonnement mis à jour';
@@ -81,6 +83,7 @@ async function sendAdminNotification(subscriberEmail: string, planType: string, 
 }
 
 async function sendWelcomeEmail(email: string, accessCode: string, planType: string, isNewSubscriber: boolean) {
+  if (!EMAIL_SENDING_ENABLED) return { success: false, blocked: true };
   try {
     const planDetails = getPlanLimits(planType);
     const subject = isNewSubscriber 

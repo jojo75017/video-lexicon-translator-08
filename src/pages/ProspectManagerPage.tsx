@@ -41,6 +41,7 @@ interface Prospect {
 }
 
 const STEPS = ACTIVE_EMAIL_CAMPAIGN.steps;
+const EMAIL_SENDING_BLOCKED = ACTIVE_EMAIL_CAMPAIGN.sendingBlocked;
 
 const ProspectManagerPage = () => {
   const navigate = useNavigate();
@@ -260,6 +261,10 @@ const ProspectManagerPage = () => {
   };
 
   const handleSendManual = async (step: number) => {
+    if (EMAIL_SENDING_BLOCKED) {
+      toast.error('Zéro envoi actif : le domaine email doit d’abord être validé.');
+      return;
+    }
     const ids = selectedIds.size > 0
       ? Array.from(selectedIds)
       : prospects.filter(p => p.status === 'active' && !p.unsubscribed && !p.completed).map(p => p.id);
@@ -357,11 +362,19 @@ const ProspectManagerPage = () => {
   };
 
   const toggleAutoSend = async (id: string, value: boolean) => {
+    if (EMAIL_SENDING_BLOCKED && value) {
+      toast.error('Auto-envoi bloqué tant que le domaine email n’est pas validé.');
+      return;
+    }
     await (supabase as any).from('sales_prospects').update({ auto_send: value }).eq('id', id);
     setProspects(prev => prev.map(p => p.id === id ? { ...p, auto_send: value } : p));
   };
 
   const toggleAllAutoSend = async (value: boolean) => {
+    if (EMAIL_SENDING_BLOCKED && value) {
+      toast.error('Auto-envoi bloqué tant que le domaine email n’est pas validé.');
+      return;
+    }
     const activeIds = prospects.filter(p => p.status === 'active' && !p.completed).map(p => p.id);
     if (activeIds.length === 0) return;
     await (supabase as any).from('sales_prospects').update({ auto_send: value }).in('id', activeIds);
@@ -414,6 +427,14 @@ const ProspectManagerPage = () => {
           <p className="text-muted-foreground">
             Campagne unique {ACTIVE_EMAIL_CAMPAIGN.price} · anciens automatismes arrêtés
           </p>
+        </div>
+
+        <div className="mb-6 flex items-start gap-3 rounded-md border border-destructive/40 bg-destructive/10 p-4 text-destructive">
+          <Pause className="mt-0.5 h-5 w-5 shrink-0" />
+          <div>
+            <p className="font-semibold">Zéro envoi actif</p>
+            <p className="text-sm text-muted-foreground">Tous les emails d’application et de campagne sont bloqués jusqu’à la validation du domaine email.</p>
+          </div>
         </div>
 
         {/* Stats */}
@@ -528,6 +549,7 @@ const ProspectManagerPage = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => toggleAllAutoSend(true)}
+                disabled={EMAIL_SENDING_BLOCKED}
                 className="border-primary/20 text-emerald-400 hover:bg-emerald-500/10"
               >
                 <Play className="h-3 w-3 mr-1" /> Auto ON (tous)
@@ -678,6 +700,7 @@ const ProspectManagerPage = () => {
                               type="checkbox"
                               checked={p.auto_send}
                               onChange={(e) => toggleAutoSend(p.id, e.target.checked)}
+                              disabled={EMAIL_SENDING_BLOCKED}
                               className="accent-gold h-4 w-4 cursor-pointer"
                             />
                           </td>
@@ -762,11 +785,11 @@ const ProspectManagerPage = () => {
                     <Button
                       size="sm"
                       onClick={() => handleSendManual(s.step)}
-                      disabled={sending}
+                      disabled={sending || EMAIL_SENDING_BLOCKED}
                       className="bg-gradient-to-r from-gold to-gold-dark text-black font-semibold hover:opacity-90"
                     >
                       <Send className="h-3 w-3 mr-1" />
-                      {sending ? 'Envoi...' : 'Envoyer'}
+                      {EMAIL_SENDING_BLOCKED ? 'Bloqué' : sending ? 'Envoi...' : 'Envoyer'}
                     </Button>
                   </div>
                 ))}

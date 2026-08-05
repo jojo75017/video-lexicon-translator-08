@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { EMAIL_SENDING_ENABLED } from "../_shared/emailSendingGuard.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -17,6 +18,7 @@ function generateAccessCode(): string {
 
 // Envoi (best-effort) du code d'accès par e-mail — le code n'est JAMAIS renvoyé dans la réponse HTTP
 async function sendTrialEmail(toEmail: string, accessCode: string, trialEndsAt: string) {
+  if (!EMAIL_SENDING_ENABLED) return;
   const resendKey = Deno.env.get('RESEND_API_KEY');
   if (!resendKey) return;
   try {
