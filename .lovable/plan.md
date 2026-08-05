@@ -3,18 +3,31 @@
 ## Objectif
 Permettre l'envoi fiable des codes d'accès après paiement et des campagnes marketing, sans perturber la réception actuelle sur Amazon SES.
 
-## État actuel
-- Aucun domaine email Lovable n'est configuré.
-- Le domaine `ebookstudio.fr` est lié au projet (custom domain).
-- La clé API Systeme.io est déjà présente dans le projet.
-- Resend n'est pas utilisé dans le projet et peut être annulé.
+## État actuel vérifié
+- **Domaine email Lovable** : non configuré (statut `not_started`).
+- **Domaine du projet** : `ebookstudio.fr` et `www.ebookstudio.fr` sont liés comme custom domain.
+- **Réception actuelle** : `ebookstudio.fr` utilise Amazon SES (ne pas toucher aux MX sans préparation).
+- **Clé API Systeme.io** : déjà présente dans le projet (`SYSTEMEIO_API_KEY`).
+- **Resend** : non utilisé dans le code, peut être annulé.
+- **Plan Lovable** : Pro (Lovable Emails inclus).
 
-## Option recommandée : Transactionnel Lovable + Campagnes Systeme.io
+## Configuration email proposée
 
-### Pourquoi
-- Lovable Emails est inclus dans le plan Pro (jusqu'à 50 000 emails transactionnels/mois).
-- Systeme.io est déjà connecté : idéal pour les séquences marketing et les prospects.
-- Cela évite d'acheter une boîte email Hostinger ou de toucher aux MX actuels (Amazon SES).
+### Moteur transactionnel (codes d'accès, confirmations de paiement)
+- **Lovable Emails** via sous-domaine délégué `notify.ebookstudio.fr`.
+- **Envoi** : depuis `noreply@notify.ebookstudio.fr` ou `contact@notify.ebookstudio.fr`.
+- **Authentification** : SPF, DKIM et DMARC gérés automatiquement par Lovable après délégation NS.
+- **Limite** : inclus dans le plan Pro (jusqu'à 50 000 emails transactionnels/mois).
+
+### Moteur marketing (campagnes, relances, prospects)
+- **Systeme.io** (déjà connecté via `SYSTEMEIO_API_KEY`).
+- L'application pousse les nouveaux prospects et contacts vers Systeme.io.
+- Les séquences de vente (offre 47 €, relances) sont gérées dans Systeme.io, pas dans l'application.
+
+### Ce qui ne change pas
+- La réception d'emails sur `ebookstudio.fr` reste sur Amazon SES.
+- Aucun MX/SPF/DMARC de `ebookstudio.fr` n'est modifié.
+- Aucun achat de boîte email Hostinger n'est nécessaire.
 
 ## Étapes du plan
 
