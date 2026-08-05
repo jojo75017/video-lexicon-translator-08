@@ -80,7 +80,7 @@ export const AuthPage = () => {
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://ebookstudio.fr/auth',
+        redirectTo: `${window.location.origin}/auth`,
       });
 
       if (error) throw error;
