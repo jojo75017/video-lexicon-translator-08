@@ -114,7 +114,7 @@ export const AuthPage = () => {
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: 'https://ebookstudio.fr/auth',
+          emailRedirectTo: `${window.location.origin}/auth`,
         },
       });
 
@@ -191,7 +191,7 @@ export const AuthPage = () => {
           email,
           password,
           options: {
-            emailRedirectTo: 'https://ebookstudio.fr/auth',
+            emailRedirectTo: `${window.location.origin}/auth`,
           },
         });
 
