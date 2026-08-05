@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
+import { EMAIL_SENDING_ENABLED, emailSendingBlockedResult } from "../_shared/emailSendingGuard.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -19,6 +20,12 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    if (!EMAIL_SENDING_ENABLED) {
+      return new Response(JSON.stringify(emailSendingBlockedResult()), {
+        status: 423,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
     const { email, timestamp }: NotifyAdminRequest = await req.json();
 
     const adminEmail = "boubetgeorges@gmail.com";

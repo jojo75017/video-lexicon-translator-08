@@ -5,6 +5,7 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { type StripeEnv, verifyWebhook, stripeRequest } from "../_shared/stripe.ts";
+import { EMAIL_SENDING_ENABLED } from "../_shared/emailSendingGuard.ts";
 
 let _supabase: ReturnType<typeof createClient> | null = null;
 function getSupabase() {
@@ -25,6 +26,7 @@ function generateAccessCode() {
 }
 
 async function sendAccessEmail(email: string, firstName: string | null, accessCode: string) {
+  if (!EMAIL_SENDING_ENABLED) return;
   const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
   if (!RESEND_API_KEY) return;
   const greeting = firstName ? `Bonjour ${firstName},` : "Bonjour,";
@@ -130,6 +132,7 @@ async function suspendAccess(email: string) {
 
 // Email de confirmation pour l'offre "accès à vie" (tunnel /commander).
 async function sendLifetimeAccessEmail(email: string, planLabel: string, accessCode: string) {
+  if (!EMAIL_SENDING_ENABLED) return;
   const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
   if (!RESEND_API_KEY) return;
   const html = `

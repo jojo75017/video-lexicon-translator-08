@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { EMAIL_SENDING_ENABLED } from "../_shared/emailSendingGuard.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -20,6 +21,10 @@ function generateAccessCode(): string {
 
 // --- Email d'accès + bonus PDF (best-effort) ---
 async function sendAccessEmail(email: string, firstName: string, accessCode: string, trialEndsAt: string) {
+  if (!EMAIL_SENDING_ENABLED) {
+    console.info("Access email blocked: domain_pending_validation");
+    return false;
+  }
   const resendKey = Deno.env.get("RESEND_API_KEY");
   if (!resendKey) {
     console.warn("RESEND_API_KEY missing — skipping email");
@@ -207,11 +212,11 @@ serve(async (req) => {
     // 3) Email d'accès + bonus PDF
     await sendAccessEmail(email, firstName, accessCode, trialEndsAt);
 
-    // 4) Synchronisation Brevo
-    await addToBrevo(email, firstName);
+    // 4) Synchronisation externe suspendue avec le mode zéro envoi.
+    if (EMAIL_SENDING_ENABLED) await addToBrevo(email, firstName);
 
-    // 5) Enrôlement dans la séquence d'onboarding automatique (8 emails)
-    try {
+    // 5) Aucun enrôlement automatique tant que le domaine email n'est pas validé.
+    if (EMAIL_SENDING_ENABLED) try {
       const { data: existingSeq } = await supabase
         .from("email_sequences")
         .select("id")
