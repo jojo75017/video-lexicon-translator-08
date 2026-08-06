@@ -502,7 +502,24 @@ const ProspectManagerPage = () => {
 
         <Tabs value={activeManagerTab} onValueChange={setActiveManagerTab} className="space-y-6">
           <TabsList className="grid h-auto w-full grid-cols-2 gap-1 bg-card border border-border p-1 md:grid-cols-4 xl:grid-cols-8">
-...
+            <TabsTrigger value="prospects" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
+              <Users className="h-4 w-4 mr-2" /> Prospects
+            </TabsTrigger>
+            <TabsTrigger value="inscrits" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
+              <CheckCircle className="h-4 w-4 mr-2" /> Inscrits
+            </TabsTrigger>
+            <TabsTrigger value="send" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
+              <Send className="h-4 w-4 mr-2" /> Envoi Manuel
+            </TabsTrigger>
+            <TabsTrigger value="abkit" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
+              <Globe className="h-4 w-4 mr-2" /> Kit GetResponse
+            </TabsTrigger>
+            <TabsTrigger value="templates" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
+              <Mail className="h-4 w-4 mr-2" /> Templates
+            </TabsTrigger>
+            <TabsTrigger value="stats" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
+              <BarChart3 className="h-4 w-4 mr-2" /> Pipeline
+            </TabsTrigger>
             <TabsTrigger value="tracking" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
               <Route className="h-4 w-4 mr-2" /> Suivi global
             </TabsTrigger>
