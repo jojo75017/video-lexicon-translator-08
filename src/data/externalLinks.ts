@@ -31,3 +31,13 @@ export function commanderUrl(src?: string, ref?: string): string {
   const qs = params.toString();
   return qs ? `${COMMANDER_URL}?${qs}` : COMMANDER_URL;
 }
+
+/**
+ * KDP Pilot — outil tiers de suivi des données Amazon (lien de suivi partenaire).
+ * Le lien n'est jamais affiché à l'écran : on l'ouvre uniquement via `openKdpPilot()`.
+ */
+export const KDP_PILOT_URL = 'https://kdp-pilot.com?fpr=georges53';
+
+export function openKdpPilot(): void {
+  window.open(KDP_PILOT_URL, '_blank', 'noopener,noreferrer');
+}
