@@ -1,7 +1,7 @@
 import React from 'react';
 import { Info } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { openKdpPilot } from '@/data/externalLinks';
+import { KDP_PILOT_GO_PATH } from '@/data/externalLinks';
 
 /**
  * Petit bandeau d'information honnête sur la fiabilité des données scrapées.
