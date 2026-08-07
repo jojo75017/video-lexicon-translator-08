@@ -23,6 +23,8 @@ import { OnboardingGuide } from '@/components/onboarding/OnboardingGuide';
 import { FirstVisitBanner } from '@/components/onboarding/FirstVisitBanner';
 import { MissingApiKeyBanner } from '@/components/ebook/MissingApiKeyBanner';
 import { FirecrawlCreditsIndicator } from '@/components/ebook/FirecrawlCreditsIndicator';
+import KdpPilotPromoBanner from '@/components/ebook/KdpPilotPromoBanner';
+
 import { WorkflowAIProviderBadge } from '@/components/ebook/WorkflowAIProviderBadge';
 import { useEbookDatabase } from '@/hooks/useEbookDatabase';
 import { EbookMarketing } from '@/components/ebook/EbookMarketing';
@@ -3939,7 +3941,11 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
           }}
         />
         <FirstVisitBanner />
+        <div className="px-4 md:px-8 pt-3">
+          <KdpPilotPromoBanner />
+        </div>
         <FirecrawlCreditsIndicator className="mb-3" />
+
         {/* Back to board button in trello mode */}
         {viewMode === 'trello' && activeTab !== 'workflow-dashboard' && (
           <div className="bg-white border-b-2 border-[hsl(var(--joy-peach))] px-6 py-3 flex items-center gap-3">
