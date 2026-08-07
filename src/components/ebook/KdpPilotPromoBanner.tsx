@@ -1,6 +1,6 @@
 import React from 'react';
 import { BarChart3, TrendingUp, Target } from 'lucide-react';
-import { KDP_PILOT_URL } from '@/data/externalLinks';
+
 
 /**
  * Bandeau V2 : KDP Pilot est en préparation, le lien est masqué/bloqué.
