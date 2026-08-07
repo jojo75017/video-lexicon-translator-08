@@ -41,3 +41,6 @@ export const KDP_PILOT_URL = 'https://kdp-pilot.com?fpr=georges53';
 export function openKdpPilot(): void {
   window.open(KDP_PILOT_URL, '_blank', 'noopener,noreferrer');
 }
+
+/** Chemin relais interne (le lien de suivi n'est jamais visible). */
+export const KDP_PILOT_GO_PATH = '/go/kdp-pilot';
