@@ -1,7 +1,7 @@
 import React from 'react';
 import { BarChart3, TrendingUp, Target, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { openKdpPilot } from '@/data/externalLinks';
+import { KDP_PILOT_GO_PATH } from '@/data/externalLinks';
 
 /**
  * Bandeau V2 : invite à consulter des données Amazon plus précises via KDP Pilot.
