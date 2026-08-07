@@ -1,7 +1,7 @@
 import React from 'react';
 import { BarChart3, TrendingUp, Target, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { openKdpPilot } from '@/data/externalLinks';
+import { KDP_PILOT_GO_PATH } from '@/data/externalLinks';
 
 /**
  * Bandeau V2 : invite à consulter des données Amazon plus précises via KDP Pilot.
@@ -40,10 +40,13 @@ export const KdpPilotPromoBanner: React.FC<{ className?: string }> = ({ classNam
         </div>
 
         <div className="shrink-0">
-          <Button size="lg" onClick={() => openKdpPilot()} className="w-full md:w-auto">
-            Voir mes données précises
-            <ArrowRight className="ml-2 h-4 w-4" />
+          <Button size="lg" asChild className="w-full md:w-auto">
+            <a href={KDP_PILOT_GO_PATH} target="_blank" rel="noopener noreferrer">
+              Voir mes données précises
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </a>
           </Button>
+
           <p className="mt-2 text-center text-[11px] text-muted-foreground md:text-right">
             Outil tiers indépendant d'EbookStudio
           </p>

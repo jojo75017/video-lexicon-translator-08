@@ -1,7 +1,7 @@
 import React from 'react';
 import { Info } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { openKdpPilot } from '@/data/externalLinks';
+import { KDP_PILOT_GO_PATH } from '@/data/externalLinks';
 
 /**
  * Petit bandeau d'information honnête sur la fiabilité des données scrapées.
@@ -20,13 +20,15 @@ export const KdpPilotAccuracyBanner: React.FC = () => {
             Les chiffres Amazon affichés ici sont obtenus par scraping public en temps réel : ils
             peuvent être incomplets ou momentanément imprécis. Pour des données historiques plus
             justes et suivre l'évolution de votre livre,{' '}
-            <button
-              type="button"
-              onClick={openKdpPilot}
+            <a
+              href={KDP_PILOT_GO_PATH}
+              target="_blank"
+              rel="noopener noreferrer"
               className="font-medium text-blue-700 underline hover:text-blue-800"
             >
               consultez KDP Pilot
-            </button>
+            </a>
+
             . C'est un outil tiers indépendant d'EbookStudio.
           </p>
         </div>

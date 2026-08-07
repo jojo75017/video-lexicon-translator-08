@@ -104,6 +104,8 @@ const V3AudiobookPage = lazy(() => import('./pages/v3public/V3AudiobookPage'));
 const V3EditorPage = lazy(() => import('./pages/v3public/V3EditorPage'));
 const V3OffrePage = lazy(() => import('./pages/v3public/V3OffrePage'));
 const V3CommanderPage = lazy(() => import('./pages/v3public/V3CommanderPage'));
+const GoKdpPilotPage = lazy(() => import('./pages/GoKdpPilotPage'));
+
 
 const V3TemoignagePage = lazy(() => import('./pages/v3public/V3TemoignagePage'));
 
@@ -344,6 +346,8 @@ const App = () => {
             <Route path="/connexion" element={<Navigate to="/connexion-abonne" replace />} />
             <Route path="/subscription" element={<Navigate to="/connexion-abonne" replace />} />
             <Route path="/commander" element={<V3CommanderPage />} />
+            <Route path="/go/kdp-pilot" element={<GoKdpPilotPage />} />
+
             <Route path="/offre-59" element={<Navigate to="/commander" replace />} />
             <Route path="/59" element={<Navigate to="/commander" replace />} />
 
