@@ -6,7 +6,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { KDP_PILOT_GO_PATH } from '@/data/externalLinks';
+import { KDP_PILOT_GO_PATH, leaveForKdpPilot } from '@/data/externalLinks';
 
 interface ScrapedMetricWarningProps {
   className?: string;
@@ -23,11 +23,13 @@ export const ScrapedMetricWarning: React.FC<ScrapedMetricWarningProps> = ({
         <TooltipTrigger asChild>
           <a
             href={KDP_PILOT_GO_PATH}
-            target="_blank"
-            rel="noopener noreferrer"
             className={`inline-flex items-center justify-center rounded-full p-0.5 hover:bg-amber-100/50 transition-colors ${className}`}
             aria-label="Données issues du scraping - voir des données plus précises"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              leaveForKdpPilot();
+            }}
           >
             <AlertTriangle className="text-amber-500" style={{ width: size, height: size }} />
           </a>

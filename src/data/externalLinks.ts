@@ -42,5 +42,22 @@ export function openKdpPilot(): void {
   window.open(KDP_PILOT_URL, '_blank', 'noopener,noreferrer');
 }
 
+/**
+ * Sort explicitement de l'iframe d'aperçu. L'affectation de `top.location`
+ * doit être déclenchée par le clic utilisateur pour être autorisée.
+ */
+export function leaveForKdpPilot(): void {
+  try {
+    if (window.top) {
+      window.top.location.href = KDP_PILOT_URL;
+      return;
+    }
+  } catch {
+    // Repli pour les navigateurs qui interdisent l'accès à la fenêtre parente.
+  }
+
+  window.location.href = KDP_PILOT_URL;
+}
+
 /** Chemin relais interne (le lien de suivi n'est jamais visible). */
 export const KDP_PILOT_GO_PATH = '/go/kdp-pilot';
