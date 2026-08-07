@@ -6,7 +6,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { openKdpPilot } from '@/data/externalLinks';
+import { KDP_PILOT_GO_PATH } from '@/data/externalLinks';
 
 interface ScrapedMetricWarningProps {
   className?: string;
@@ -21,18 +21,18 @@ export const ScrapedMetricWarning: React.FC<ScrapedMetricWarningProps> = ({
     <TooltipProvider delayDuration={100}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <button
-            type="button"
+          <a
+            href={KDP_PILOT_GO_PATH}
+            target="_blank"
+            rel="noopener noreferrer"
             className={`inline-flex items-center justify-center rounded-full p-0.5 hover:bg-amber-100/50 transition-colors ${className}`}
             aria-label="Données issues du scraping - voir des données plus précises"
-            onClick={(e) => {
-              e.stopPropagation();
-              openKdpPilot();
-            }}
+            onClick={(e) => e.stopPropagation()}
           >
             <AlertTriangle className="text-amber-500" style={{ width: size, height: size }} />
-          </button>
+          </a>
         </TooltipTrigger>
+
         <TooltipContent side="top" className="max-w-xs text-xs">
           <p className="font-medium mb-1">Données issues du scraping public Amazon</p>
           <p className="text-muted-foreground">
