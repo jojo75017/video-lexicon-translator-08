@@ -1,0 +1,1 @@
+UPDATE public.sales_prospects SET next_email_at = now() WHERE status='active' AND unsubscribed=false AND auto_send=true AND completed=false AND current_step=1;
