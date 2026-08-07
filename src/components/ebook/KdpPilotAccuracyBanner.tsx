@@ -1,7 +1,7 @@
 import React from 'react';
 import { Info } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { KDP_PILOT_GO_PATH, leaveForKdpPilot } from '@/data/externalLinks';
+import { KDP_PILOT_GO_PATH } from '@/data/externalLinks';
 
 /**
  * Petit bandeau d'information honnête sur la fiabilité des données scrapées.
@@ -22,10 +22,8 @@ export const KdpPilotAccuracyBanner: React.FC = () => {
             justes et suivre l'évolution de votre livre,{' '}
             <a
               href={KDP_PILOT_GO_PATH}
-              onClick={(event) => {
-                event.preventDefault();
-                leaveForKdpPilot();
-              }}
+              target="_blank"
+              rel="noopener noreferrer"
               className="font-medium text-blue-700 underline hover:text-blue-800"
             >
               consultez KDP Pilot
