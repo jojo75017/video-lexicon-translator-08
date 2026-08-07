@@ -104,6 +104,8 @@ const V3AudiobookPage = lazy(() => import('./pages/v3public/V3AudiobookPage'));
 const V3EditorPage = lazy(() => import('./pages/v3public/V3EditorPage'));
 const V3OffrePage = lazy(() => import('./pages/v3public/V3OffrePage'));
 const V3CommanderPage = lazy(() => import('./pages/v3public/V3CommanderPage'));
+const GoKdpPilotPage = lazy(() => import('./pages/GoKdpPilotPage'));
+
 
 const V3TemoignagePage = lazy(() => import('./pages/v3public/V3TemoignagePage'));
 
