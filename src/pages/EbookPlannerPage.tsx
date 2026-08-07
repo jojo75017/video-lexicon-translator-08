@@ -23,6 +23,8 @@ import { OnboardingGuide } from '@/components/onboarding/OnboardingGuide';
 import { FirstVisitBanner } from '@/components/onboarding/FirstVisitBanner';
 import { MissingApiKeyBanner } from '@/components/ebook/MissingApiKeyBanner';
 import { FirecrawlCreditsIndicator } from '@/components/ebook/FirecrawlCreditsIndicator';
+import KdpPilotPromoBanner from '@/components/ebook/KdpPilotPromoBanner';
+
 import { WorkflowAIProviderBadge } from '@/components/ebook/WorkflowAIProviderBadge';
 import { useEbookDatabase } from '@/hooks/useEbookDatabase';
 import { EbookMarketing } from '@/components/ebook/EbookMarketing';
