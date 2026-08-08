@@ -945,17 +945,12 @@ Règles :
       const rawCh = (p4?.chapitres || p5?.chapitresFinal || []) as any[];
       const p3Ch = Array.isArray(p3?.chapitres) ? p3.chapitres : [];
       if (rawCh.length === 0 && p3Ch.length === 0) return null;
-      const byNum = new Map<number, any>();
-      rawCh.forEach((ch, i) => byNum.set(ch?.numero || ch?.number || i + 1, ch));
-      const total = Math.max(chapters || 0, rawCh.length, p3Ch.length);
-      const out: any[] = [];
-      for (let i = 1; i <= total; i++) {
-        const ch = byNum.get(i);
-        const p3m = p3Ch.find((p: any) => (p.numero || 0) === i) || p3Ch[i - 1];
-        const title = cleanText(ch?.titre || ch?.title || p3m?.titre || p3m?.title || `Chapitre ${i}`);
-        const content = String(ch?.contenu || ch?.content || '').trim();
-        out.push({ number: i, title, content, incomplete: !content });
-      }
+      const out = normalizeManuscript(rawCh, {
+        expectedCount: chapters,
+        outline: p3Ch.length > 0 ? p3Ch : normalizedOutline,
+        bookTitle: finalTitle || title,
+      });
+
       return {
         chapters: out,
         conclusion: '',
