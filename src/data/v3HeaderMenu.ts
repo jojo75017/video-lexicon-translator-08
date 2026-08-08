@@ -118,10 +118,11 @@ export const V3_HEADER_MENU: MenuCategory[] = [
     color: '#c9a84c',
     tagline: 'Ce que débloque chaque plan',
     links: [
-      { label: 'Auteur — 9,99 €/mois', to: '/v3/outils?plan=debutant', badge: '10 livres', desc: '🌱 Je démarre : les outils essentiels — création, écriture, KDP de base' },
-      { label: 'Studio — 12,99 €/mois ⭐', to: '/v3/outils?plan=expert', badge: 'Recommandé', desc: '🚀 Je produis efficacement : Audit Pilot, 600 niches, marketing, séries' },
-      { label: 'Éditeur — 59 €/mois', to: '/v3/outils?plan=auteur', badge: 'Illimité', desc: '👑 Maison d’édition complète : Business Center, CRM, BookPerfect, BD/Audio, VIP' },
-      { label: 'Comparer les 3 forfaits', to: '/v3/outils?plan=all', desc: 'Vue complète : quel outil est inclus dans quel plan' },
+      { label: 'Plume — 29 €/mois', to: '/v3/outils?plan=plume', badge: '30 livres/mois', desc: '✍️ J’écris et je publie : tous les onglets, audiolivre inclus, export propre' },
+      { label: 'Édition — 49 €/mois ⭐', to: '/v3/outils?plan=edition', badge: 'Recommandé · illimité', desc: '👑 Version pro : Recherche Approfondie, Cover Studio Pro, BD Studio Pro, upsells inclus' },
+      { label: 'Comparer les 2 forfaits', to: '/v3/outils?plan=all', desc: 'Vue complète : quel outil est standard, quel outil est en version pro' },
+      { label: 'Mensuel ou annuel (2 mois offerts)', to: '/v3/forfaits', desc: 'Plume 290 €/an · Édition 490 €/an' },
     ],
   },
+
 ];
