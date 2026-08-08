@@ -24,22 +24,28 @@ function texts(xml: string): string[] {
 }
 
 describe('export DOCX', () => {
-  it('bloque un manuscrit avec titres JSON, titre générique et chapitres vides', async () => {
+  it('signale les titres JSON, titres génériques et chapitres vides sans perdre le texte rédigé', async () => {
     const audit = validateDocxChapters(messyChapters);
     expect(audit.valid).toBe(false);
     expect(audit.readyCount).toBeLessThan(audit.totalCount);
     expect(audit.chapters.some((chapter) => chapter.issues.includes('Chapitre vide'))).toBe(true);
     expect(audit.chapters.some((chapter) => chapter.issues.includes('Titre manquant ou générique'))).toBe(true);
 
-    await expect(generateProfessionalDocx({
+    const blob = await generateProfessionalDocx({
       title: 'Mon Livre Test',
       authorName: 'Nanakia',
       chapters: messyChapters,
       includeTableOfContents: true,
       includeCoverPage: true,
       includeCopyrightPage: true,
-    })).rejects.toThrow(/export bloqué/i);
+    });
+    const all = texts(await docXml(blob)).map((t) => t.trim()).filter(Boolean).join(' | ');
+    expect(all).toMatch(/Le vent soufflait sur la lande/);
+    expect(all).toMatch(/La nuit tomba très vite/);
+    expect(all).toMatch(/Il restait une lueur/);
+    expect(all).not.toMatch(/numero"/);
   });
+
 
   it('conserve un chapitre court mais réellement rédigé', async () => {
     const blob = await generateProfessionalDocx({
