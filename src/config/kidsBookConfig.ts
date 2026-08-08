@@ -1,9 +1,9 @@
 // Configuration du mode "Livre illustré maternelle"
-// Réservé aux forfaits Studio (expert) et Éditeur (auteur).
+// Inclus dans les deux forfaits ; version Pro sur Édition.
 
 import type { V3Plan } from '@/data/v3ToolPlans';
 
-export const KIDS_BOOK_ALLOWED_PLANS: V3Plan[] = ['expert', 'auteur'];
+export const KIDS_BOOK_ALLOWED_PLANS: V3Plan[] = ['plume', 'edition'];
 
 export type IllustrationStyle = 'pixar-3d' | 'aquarelle' | 'crayonne' | 'flat-vector' | 'storybook';
 
@@ -21,16 +21,14 @@ export const KIDS_BOOK_FORMATS = {
 
 // Quotas d'illustrations par livre selon le forfait
 export const KIDS_BOOK_IMAGE_QUOTA: Record<V3Plan, number> = {
-  debutant: 0,
-  expert: 30,
-  auteur: 60,
+  plume: 30,
+  edition: 60,
 };
 
 // Modèle image par forfait
 export const KIDS_BOOK_IMAGE_MODEL: Record<V3Plan, string> = {
-  debutant: 'google/gemini-3.1-flash-image',
-  expert: 'google/gemini-3.1-flash-image',
-  auteur: 'google/gemini-3-pro-image',
+  plume: 'google/gemini-3.1-flash-image',
+  edition: 'google/gemini-3-pro-image',
 };
 
 export function canUseKidsBook(plan: V3Plan | null | undefined): boolean {
