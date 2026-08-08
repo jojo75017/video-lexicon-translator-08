@@ -25,8 +25,33 @@ export interface ChapterProofread {
   status: 'pending' | 'running' | 'done' | 'failed';
   /** L'auteur a validé le texte corrigé pour ce chapitre. */
   accepted: boolean;
+  /** Texte réécrit à la main par l'auteur (prioritaire sur la correction IA). */
+  edited?: string;
+  /** Index des corrections refusées : le mot d'origine est rétabli. */
+  rejected?: number[];
   error?: string;
 }
+
+/** Rétablit dans le texte corrigé les mots dont la correction a été refusée. */
+export function applyRejections(chapter: ChapterProofread): string {
+  const rejected = chapter.rejected || [];
+  if (!chapter.corrected || rejected.length === 0) return chapter.corrected;
+  let text = chapter.corrected;
+  rejected.forEach((i) => {
+    const corr = chapter.corrections[i];
+    if (!corr?.corrige || !corr.original) return;
+    if (text.includes(corr.corrige)) text = text.replace(corr.corrige, corr.original);
+  });
+  return text;
+}
+
+/** Texte réellement retenu pour l'export d'un chapitre. */
+export function effectiveText(chapter: ChapterProofread): string {
+  if (typeof chapter.edited === 'string' && chapter.edited.trim()) return chapter.edited;
+  if (chapter.accepted && chapter.corrected) return applyRejections(chapter);
+  return chapter.original;
+}
+
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
