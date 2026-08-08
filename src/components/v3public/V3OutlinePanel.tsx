@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Check, ClipboardPaste, ListOrdered, Loader2, RefreshCw, Wand2, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 import {
   callAIWriting, getProvider, getProviderKey, setProvider, validateKeyFormat,
   type AIProvider,
