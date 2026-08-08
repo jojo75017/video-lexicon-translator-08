@@ -180,7 +180,19 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
                 {audit ? `${audit.readyCount}/${audit.totalCount} prêts` : toc.length}
               </Badge>
             </div>
+            {missingTitles.length > 0 && (
+              <div className="px-3 py-3 border-b bg-muted/40 space-y-2">
+                <p className="text-xs text-muted-foreground">
+                  {missingTitles.length} chapitre(s) sans titre. L'IA peut les nommer d'après leur contenu.
+                </p>
+                <Button size="sm" className="w-full gap-2" onClick={handleGenerateTitles} disabled={naming || loading}>
+                  {naming ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                  {naming ? 'Génération…' : 'Générer les titres manquants'}
+                </Button>
+              </div>
+            )}
             <div className="flex-1 overflow-auto">
+
               <div className="p-3 space-y-2 text-xs">
                 {audit?.chapters.map((chapter) => (
                   <div key={chapter.number} className={`rounded-md border p-2 ${chapter.valid ? 'border-border' : 'border-destructive/40 bg-destructive/5'}`}>
