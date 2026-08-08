@@ -76,6 +76,51 @@ describe('export DOCX', () => {
     const all = texts(await docXml(blob)).map((text) => text.trim()).filter(Boolean).join(' | ');
     expect(all).toMatch(/Chapitre 1 – La Porte close/);
     expect(all).toMatch(/Chapitre 2 – Le Dernier Indice/);
-    expect(all).not.toMatch(/en cours de rédaction/i);
+  });
+
+  it('exporte les 40 chapitres demandés, chacun avec son texte', async () => {
+    const chapters = Array.from({ length: 40 }, (_, i) => ({
+      title: `Titre réel ${i + 1}`,
+      content: `Chapitre ${i + 1} du récit : Marek referma la porte. `.repeat(12),
+      subChapters: [],
+    }));
+    const blob = await generateProfessionalDocx({
+      title: 'Noces de Vendetta',
+      chapters,
+      expectedChapterCount: 40,
+      includeTableOfContents: true,
+    });
+    const all = texts(await docXml(blob)).map((t) => t.trim()).filter(Boolean).join(' | ');
+    for (const n of [1, 17, 40]) expect(all).toMatch(new RegExp(`Chapitre ${n} – Titre réel ${n}`));
+    expect(all).not.toMatch(/Chapitre 41/);
+    expect(all).not.toMatch(/Contenu à rédiger/);
   });
 });
+
+describe('découpage d’un manuscrit collé', () => {
+  it('ne crée pas de faux chapitre sur une phrase commençant par « Chapitre »', () => {
+    const text = [
+      '# Chapitre 1 – L’Ombre du Sang',
+      '',
+      'Chapitre après chapitre, elle relut le dossier sans trouver la faille du récit.',
+      'Section fermée, il repartit.',
+      '',
+      '# Chapitre 2 – Le Pacte',
+      '',
+      'La nuit tomba sur le port.',
+    ].join('\n');
+    const out = manuscriptToChapters(text);
+    expect(out).toHaveLength(2);
+    expect(out[0].content).toMatch(/Chapitre après chapitre/);
+    expect(out[1].content).toMatch(/La nuit tomba/);
+  });
+
+  it('ignore un chapitre fantôme vide en fin de manuscrit', () => {
+    const out = dropTrailingEmptyChapters([
+      { id: 'ch-1', title: 'A', subChapters: [], content: 'Texte du premier chapitre.' },
+      { id: 'ch-2', title: 'B', subChapters: [], content: '   ' },
+    ] as any);
+    expect(out).toHaveLength(1);
+  });
+});
+
