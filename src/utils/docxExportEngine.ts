@@ -264,7 +264,7 @@ function isProseLike(t: string): boolean {
 
 
 /** Un titre est "générique" s'il ne contient pas de vrai intitulé (ex: "Chapitre 2", "12", vide). */
-function isGenericTitle(t: string | undefined | null): boolean {
+export function isGenericTitle(t: string | undefined | null): boolean {
   const n = (t || '').trim().replace(/^[\s:–—\-,.]+|[\s:–—\-,.]+$/g, '');
   return !n || /^chapitre\s*\d*$/i.test(n) || /^\d+$/.test(n) || /^sans titre$/i.test(n);
 }
