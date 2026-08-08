@@ -65,13 +65,17 @@ export default function V3BriefRecap({ variant = 'compact', onLaunch }: Props) {
   const wordsPerChapter = Number(brief.wordsPerChapter) || 0;
   const totalWords = chapters * wordsPerChapter;
 
+  // Obligatoire pour lancer : titre, auteur, synopsis. Le reste est recommandé
+  // (le sommaire et la Cible & Promesse sont générés automatiquement si absents).
   const missing: string[] = [];
   if (!(brief.title || '').trim()) missing.push('le titre');
   if (!(brief.author || '').trim()) missing.push('le nom de l’auteur');
   if ((brief.description || '').trim().length < 30) missing.push('le synopsis');
-  if (!(brief.promesseCentrale || '').trim()) missing.push('la Cible & Promesse (bouton IA)');
-  if (!brief.outlineValidated || outline.length === 0) missing.push('la validation du sommaire');
+  const recommended: string[] = [];
+  if (!(brief.promesseCentrale || '').trim()) recommended.push('la Cible & Promesse (bouton IA)');
+  if (!brief.outlineValidated || outline.length === 0) recommended.push('la validation du sommaire');
   const ready = missing.length === 0;
+
 
   /* ---------------------------- Variante compacte ---------------------------- */
   if (variant === 'compact') {
