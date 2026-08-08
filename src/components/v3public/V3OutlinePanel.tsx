@@ -163,14 +163,20 @@ Règles :
       if (chapters.length < 3) {
         // 2e tentative sans jsonMode : certains providers/modèles refusent responseMimeType.
         const fallbackPrompt = `${prompt}\n\nSi tu ne peux pas produire de JSON, écris simplement une ligne par chapitre au format : Titre — Objectif.`;
-        chapters = parseChapters(await callAIWriting(fallbackPrompt, options), count);
+        try {
+          chapters = parseChapters(await callAIWriting(fallbackPrompt, options), count);
+        } catch (secondError) {
+          console.warn('[Sommaire] échec avec la clé personnelle, repli serveur', secondError);
+        }
       }
-      if (chapters.length < 3) throw new Error('L’IA n’a pas renvoyé de sommaire exploitable. Réessayez ou collez le vôtre.');
+      // Dernier repli : le serveur, pour ne jamais bloquer la création du livre.
+      if (chapters.length < 3) chapters = await generateOnServer(count);
       onChange({ outline: normalizeOutline(chapters), chapters: chapters.length, outlineValidated: false });
       toast.success(`Sommaire généré (${chapters.length} chapitres) — relisez puis validez-le.`);
     } catch (e: any) {
       console.error('[Sommaire] génération impossible', e);
       toast.error('Génération du sommaire impossible', { description: e?.message || 'Erreur inconnue.' });
+
     } finally {
       setLoading(false);
     }
