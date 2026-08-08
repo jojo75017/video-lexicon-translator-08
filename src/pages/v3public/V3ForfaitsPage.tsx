@@ -399,39 +399,9 @@ export default function V3ForfaitsPage() {
             — réponse sous 24h.
           </p>
 
-          {isAdmin && (
-            <div className="inline-flex flex-col items-center gap-2 rounded-xl border border-dashed border-blue-300 bg-blue-50/50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-blue-600">
-                Outils admin
-              </p>
-              <div className="flex flex-wrap gap-2 justify-center">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowPayPalTest(true)}
-                  className="border-blue-300 text-blue-700 hover:bg-blue-100"
-                >
-                  <CreditCard className="w-4 h-4 mr-2" />
-                  Tester PayPal (1 € fictif)
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setShowPlanTest(true)}
-                  className="border-blue-300 text-blue-700 hover:bg-blue-100"
-                >
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Tester un forfait V3 (Stripe)
-                </Button>
-              </div>
-              <p className="text-xs text-blue-600/80 max-w-xs">
-                Ouvre les vrais tunnels de paiement en mode test. Visible uniquement par vous.
-              </p>
-            </div>
-          )}
         </div>
       </div>
 
-      <PayPalTestModal open={showPayPalTest} onClose={() => setShowPayPalTest(false)} />
-      <V3PlanTestModal open={showPlanTest} onClose={() => setShowPlanTest(false)} />
     </div>
   );
 }
