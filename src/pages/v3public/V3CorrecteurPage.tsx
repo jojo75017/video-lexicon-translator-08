@@ -3,7 +3,9 @@ import { toast } from 'sonner';
 import {
   FileText, FileType2, Globe, ClipboardPaste, Upload, Loader2, Wand2, ShieldCheck,
   CheckCircle2, AlertTriangle, RefreshCw, FileDown, Sparkles, StopCircle,
+  Pencil, Save, Undo2, RotateCcw,
 } from 'lucide-react';
+
 import { BackButton } from '@/components/v3/BackButton';
 import { importManuscript } from '@/lib/bookperfect/importManuscript';
 import { importFromPdf } from '@/lib/import/importFromPdf';
