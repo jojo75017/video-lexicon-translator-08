@@ -733,6 +733,8 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
     includePageNumbers = true,
     includeCopyrightPage = true,
     pageFormat = '6x9',
+    expectedChapterCount,
+
   } = options;
 
   const audit = validateDocxChapters(chapters);
