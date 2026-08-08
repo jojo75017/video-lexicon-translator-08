@@ -13,7 +13,7 @@ export interface KdpPilotFeatureFlag {
 export interface KdpPilotTierConfig {
   planId: V3PlanId;
   label: string;
-  version: "basique" | "complet" | "pro";
+  version: "complet" | "pro";
   agentCode: "P27" | "P27" | "P27+";
   runsPerMonth: number | null; // null = illimité
   bsrMode: "static" | "daily" | "live";
@@ -26,34 +26,12 @@ export interface KdpPilotTierConfig {
 }
 
 export const KDP_PILOT_TIERS: Record<V3PlanId, KdpPilotTierConfig> = {
-  debutant: {
-    planId: "debutant",
-    label: "KDP Pilot — Audit basique",
-    version: "basique",
-    agentCode: "P27",
-    runsPerMonth: 5,
-    bsrMode: "static",
-    keywordSuggestions: 10,
-    nicheComparator: false,
-    competitorScan: false,
-    actionPlanAI: false,
-    scoreDepth: "basic",
-    features: [
-      { key: "score", label: "Score qualité KDP (/100)", description: "Notation globale titre + description + mots-clés.", included: true },
-      { key: "top3", label: "Top 3 axes d'amélioration", description: "Les 3 leviers prioritaires pour votre fiche produit.", included: true },
-      { key: "bsr_static", label: "BSR estimé (snapshot)", description: "Estimation de rang à l'instant T (non actualisée).", included: true },
-      { key: "keywords_10", label: "10 suggestions de mots-clés", description: "Mots-clés de base extraits automatiquement.", included: true },
-      { key: "niche_compare", label: "Comparateur de niches", description: "Réservé Auteur.", included: false },
-      { key: "competitor_scan", label: "Scan concurrence live", description: "Réservé Auteur.", included: false },
-      { key: "action_plan", label: "Plan d'action IA", description: "Réservé Auteur.", included: false },
-    ],
-  },
-  expert: {
-    planId: "expert",
+  plume: {
+    planId: "plume",
     label: "KDP Pilot — Audit complet",
     version: "complet",
     agentCode: "P27",
-    runsPerMonth: 20,
+    runsPerMonth: 30,
     bsrMode: "daily",
     keywordSuggestions: 30,
     nicheComparator: false,
@@ -67,12 +45,12 @@ export const KDP_PILOT_TIERS: Record<V3PlanId, KdpPilotTierConfig> = {
       { key: "keywords_30", label: "30 suggestions de mots-clés + longue traîne", description: "Analyse volume + concurrence estimée.", included: true },
       { key: "competitor_top10", label: "Scan Top 10 concurrents", description: "Titres, prix, notes, formats des 10 premiers résultats.", included: true },
       { key: "categories", label: "Catégories BSR recommandées", description: "Top catégories à cibler pour maximiser le classement.", included: true },
-      { key: "niche_compare", label: "Comparateur multi-niches", description: "Réservé Auteur.", included: false },
-      { key: "action_plan", label: "Plan d'action IA", description: "Réservé Auteur.", included: false },
+      { key: "niche_compare", label: "Comparateur multi-niches", description: "Version Pro — forfait Édition.", included: false },
+      { key: "action_plan", label: "Plan d'action IA", description: "Version Pro — forfait Édition.", included: false },
     ],
   },
-  auteur: {
-    planId: "auteur",
+  edition: {
+    planId: "edition",
     label: "KDP Pilot Pro — Version renforcée",
     version: "pro",
     agentCode: "P27+",
