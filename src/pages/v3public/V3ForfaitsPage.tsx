@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Check, Sparkles, Crown, Feather } from "lucide-react";
+import { Check, Crown, Feather } from "lucide-react";
 import {
   V3_PLANS,
   formatPrice,
