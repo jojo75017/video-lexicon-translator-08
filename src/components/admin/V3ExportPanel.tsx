@@ -166,7 +166,7 @@ const V3ExportPanel: React.FC<V3ExportPanelProps> = ({
         <strong style={{ color: INK }}>« {title || 'Mon livre'} »</strong>
         {author ? <span style={{ color: '#5f7a6c' }}> — {author}</span> : null}
         <span className="ml-2" style={{ color: '#5f7a6c' }}>
-          ({chapters.length} chapitre{chapters.length > 1 ? 's' : ''} · {manuscript.trim().split(/\s+/).filter(Boolean).length.toLocaleString('fr-FR')} mots détectés)
+          ({chapters.length} chapitre{chapters.length > 1 ? 's' : ''} · {wordCount.toLocaleString('fr-FR')} mots détectés)
         </span>
         <div className="mt-1 text-[11px]" style={{ color: '#8a7a5c' }}>
           Vérifie que c'est bien le bon livre. Sinon, recharge le projet voulu (section « Rouvrir un projet ») avant d'exporter.
