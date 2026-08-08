@@ -224,11 +224,16 @@ export default function V3BriefRecap({ variant = 'compact', onLaunch }: Props) {
         >
           <Rocket className="h-5 w-5" /> Lancer le workflow
         </button>
-        {!ready && (
+        {!ready ? (
           <p className="mt-3 text-center text-xs" style={{ color: 'var(--v3-muted)' }}>
             Il manque encore : {missing.join(', ')}.
           </p>
-        )}
+        ) : recommended.length > 0 ? (
+          <p className="mt-3 text-center text-xs" style={{ color: 'var(--v3-muted)' }}>
+            Recommandé (généré automatiquement si vous lancez maintenant) : {recommended.join(', ')}.
+          </p>
+        ) : null}
+
       </div>
     </section>
   );
