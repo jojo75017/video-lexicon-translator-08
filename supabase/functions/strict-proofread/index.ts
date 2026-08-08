@@ -87,7 +87,7 @@ FORMAT DE RÉPONSE — JSON STRICT :
 }`;
 
 
-    const userPrompt = `Corrige ce chapitre en respectant STRICTEMENT les consignes de correction éditoriale (zéro réécriture, zéro ajout, zéro suppression) :
+    const userPrompt = `Corrige ce chapitre en respectant STRICTEMENT les consignes ${polish ? 'de correction et de polissage (zéro ajout d\'idée, zéro suppression de passage)' : 'de correction éditoriale (zéro réécriture, zéro ajout, zéro suppression)'} :
 
 ${chapterTitle ? `Titre du chapitre : "${chapterTitle}"\n` : ''}
 ---
