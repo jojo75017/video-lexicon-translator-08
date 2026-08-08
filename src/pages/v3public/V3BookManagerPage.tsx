@@ -5,8 +5,18 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { BackButton } from "@/components/v3/BackButton";
 import V3ExportPanel from '@/components/admin/V3ExportPanel';
+import { normalizeManuscript } from '@/utils/manuscriptNormalizer';
+import type { Chapter } from '@/hooks/useSubscriptionGeneration';
 
-type Book = { id: string; title: string; author_name?: string | null; kdp_description?: string | null; chapters?: unknown };
+type Book = {
+  id: string;
+  title: string;
+  author_name?: string | null;
+  kdp_description?: string | null;
+  chapters?: unknown;
+  number_of_chapters?: number | null;
+};
+
 
 const hasChapterContent = (chapters: unknown): chapters is Record<string, unknown>[] =>
   Array.isArray(chapters) && chapters.some((raw) => {
@@ -26,7 +36,7 @@ export default function V3BookManagerPage() {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) { nav('/v3/auth'); return; }
     const { data, error } = await supabase.from('ebook_projects')
-      .select('id,title,author_name,kdp_description,chapters')
+      .select('id,title,author_name,kdp_description,chapters,number_of_chapters')
       .eq('user_id', auth.user.id).order('updated_at', { ascending: false });
     if (error) toast.error(`Chargement impossible : ${error.message}`);
     setRows((data as Book[]) || []);
@@ -42,17 +52,19 @@ export default function V3BookManagerPage() {
     load();
   };
 
-  const exportManuscript = (book: Book) => {
-    if (!Array.isArray(book.chapters)) return '';
-    return book.chapters.map((raw, index) => {
-      const chapter = raw && typeof raw === 'object' ? raw as Record<string, unknown> : {};
-      const title = String(chapter.title || chapter.titre || `Chapitre ${index + 1}`)
-        .replace(/^chapitre\s+\d+\s*[:–—-]?\s*/i, '')
-        .trim();
-      const content = String(chapter.content || chapter.contenu || '').trim();
-      return `# Chapitre ${index + 1} – ${title || `Chapitre ${index + 1}`}\n\n${content}`;
-    }).join('\n\n');
+  /** Chapitres structurés prêts pour l'export : titres réels conservés, aucun re-découpage du texte. */
+  const exportChapters = (book: Book): Chapter[] => {
+    const raw = Array.isArray(book.chapters) ? book.chapters : [];
+    const expected = Number(book.number_of_chapters) > 0 ? Number(book.number_of_chapters) : undefined;
+    return normalizeManuscript(raw, { expectedCount: expected, bookTitle: book.title })
+      .map((chapter) => ({
+        id: `ch-${chapter.number}`,
+        title: chapter.title || `Chapitre ${chapter.number}`,
+        subChapters: [],
+        content: chapter.content,
+      }));
   };
+
 
   const openExport = async (book: Book) => {
     setExportLoadingId(book.id);
@@ -142,10 +154,12 @@ export default function V3BookManagerPage() {
               </button>
             </div>
             <V3ExportPanel
-              manuscript={exportManuscript(exporting)}
+              chapters={exportChapters(exporting)}
+              expectedChapterCount={Number(exporting.number_of_chapters) || undefined}
               title={exporting.title}
               author={exporting.author_name || ''}
             />
+
           </div>
         </div>
       )}

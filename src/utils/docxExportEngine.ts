@@ -406,7 +406,6 @@ export function validateDocxChapters(chapters: DocxChapter[]): DocxValidationRes
 
 /** Source unique du sommaire et des chapitres exportés. */
 function prepareRenderableChapters(chapters: DocxChapter[], expectedCount?: number) {
-  const seenContent = new Set<string>();
   const seenStubTitles = new Set<string>();
 
   const prepared = (chapters || [])
@@ -422,16 +421,11 @@ function prepareRenderableChapters(chapters: DocxChapter[], expectedCount?: numb
       );
       const hasContent = meaningfulText(entry.body).length > 0 || subContent > 0;
       const normalizedTitle = (entry.displayTitle || '').toLowerCase().replace(/\s+/g, ' ').trim();
-      const signature = meaningfulText(entry.body).slice(0, 300).toLowerCase().replace(/\s+/g, ' ').trim();
 
-      // Anti-doublon : deux fois le même chapitre (même texte) = une seule entrée.
-      let keep = true;
-      if (hasContent && signature) {
-        if (seenContent.has(signature)) keep = false;
-        else seenContent.add(signature);
-      }
       // Un chapitre vide qui répète le titre d'un autre chapitre vide est un artefact de fusion.
-      if (keep && !hasContent && normalizedTitle) {
+      // (Aucune déduplication par contenu : deux chapitres au texte proche restent deux chapitres.)
+      let keep = true;
+      if (!hasContent && normalizedTitle) {
         if (seenStubTitles.has(normalizedTitle)) keep = false;
         else seenStubTitles.add(normalizedTitle);
       }
@@ -440,6 +434,7 @@ function prepareRenderableChapters(chapters: DocxChapter[], expectedCount?: numb
       return { ...entry, hasContent, keep, isStub: !hasContent };
     })
     .filter((entry) => entry.keep);
+
 
   // Plafond dur : jamais plus de chapitres que ce que l'auteur a demandé.
   const capped = expectedCount && expectedCount > 0 ? prepared.slice(0, expectedCount) : prepared;
@@ -749,6 +744,12 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
     // On n'empêche jamais le téléchargement : le DOCX est généré avec les zones à compléter.
     console.warn(`[DOCX] Manuscrit incomplet, export généré avec avertissements. ${details}`);
   }
+
+  // Un livre sans une seule ligne rédigée n'est pas exportable.
+  if (audit.chapters.length > 0 && audit.chapters.every((chapter) => chapter.wordCount === 0)) {
+    throw new Error("Export bloqué : aucun chapitre rédigé. Génère ou importe le manuscrit avant de télécharger le DOCX.");
+  }
+
 
 
   const font = fontFamily;
