@@ -107,6 +107,8 @@ function isGenericTitle(value: unknown) {
 
 function buildFallbackOutline(title: string, category: string, count: number): OutlineChapter[] {
   const subject = cleanText(title) || cleanText(category) || 'le projet';
+  void subject;
+
   const isFiction = /roman|thriller|policier|romance|fantasy|fantastique|science|fiction|jeunesse|enfants/i.test(category);
   const fictionTemplates = [
     ['L’appel de Montferrand', 'Ouvrir le récit par une image forte, un lieu, une attente et une tension immédiate.'],
