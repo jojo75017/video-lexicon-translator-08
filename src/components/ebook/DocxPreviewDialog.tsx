@@ -93,8 +93,10 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
       setError(null);
       setToc([]);
       setAudit(null);
+      setTitleOverrides({});
       return;
     }
+
 
     let cancelled = false;
 
