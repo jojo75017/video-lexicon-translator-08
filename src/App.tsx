@@ -539,8 +539,8 @@ const App = () => {
               <Route path="mes-livres" element={<V3LockedGate><V3BookManagerPage /></V3LockedGate>} />
               <Route path="parametres" element={<V3LockedGate><V3AuthorSettingsPage /></V3LockedGate>} />
               <Route path="livres/:type" element={<V3LockedGate><V3SpecialBookPage /></V3LockedGate>} />
-              <Route path="offres" element={<Navigate to="/v3/offre" replace />} />
-              <Route path="offres/merci" element={<Navigate to="/v3/offre" replace />} />
+              <Route path="offres" element={<Navigate to="/v3/forfaits" replace />} />
+              <Route path="offres/merci" element={<Navigate to="/v3/forfaits" replace />} />
 
               <Route path="recherche" element={<V3LockedGate><V3RecherchePage /></V3LockedGate>} />
               <Route path="outils" element={<V3LockedGate><V3ToolsIndexPage /></V3LockedGate>} />
