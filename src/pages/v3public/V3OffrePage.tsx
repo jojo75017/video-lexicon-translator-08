@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  Sparkles, Crown, Zap, Feather, Check, Lock, Star, ArrowRight,
+  Sparkles, Crown, Feather, Check, Lock, Star, ArrowRight,
   Palette, BookOpen, Rocket, Globe, Users, Wand2, ImageIcon, Mic,
   ShieldCheck, Clock, Gift, Mail,
 } from "lucide-react";
@@ -301,7 +301,7 @@ export default function V3OffrePage() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-5">
+        <div className="grid md:grid-cols-2 gap-5 max-w-3xl mx-auto">
           {V3_PLANS.map((plan) => {
             const featured = plan.id === "edition";
             const Icon = plan.id === "edition" ? Crown : Feather;
