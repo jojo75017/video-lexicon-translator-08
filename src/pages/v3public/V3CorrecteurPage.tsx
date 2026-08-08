@@ -12,9 +12,10 @@ import { buildManuscriptFromText } from '@/lib/import/buildManuscriptFromText';
 import type { Manuscript } from '@/lib/bookperfect/types';
 import { diffWords } from '@/lib/bookperfect/textDiff';
 import {
-  proofreadChapters, proofreadChapter, correctionBreakdown,
+  proofreadChapters, proofreadChapter, correctionBreakdown, effectiveText,
   CORRECTION_TYPE_LABELS, type ChapterProofread, type ProofreadMode,
 } from '@/lib/correcteur/proofreadBook';
+
 import { exportProfessionalDocx } from '@/utils/docxExportEngine';
 import { exportEbookToPdf } from '@/lib/ebookPdfExporter';
 
