@@ -806,7 +806,7 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
   }
 
   // ═══ CHAPITRES RETENUS (numérotation continue, sans trous) ═══
-  const renderChapters = prepareRenderableChapters(chapters);
+  const renderChapters = prepareRenderableChapters(chapters, expectedChapterCount);
 
   if (renderChapters.length === 0) {
     throw new Error("Export impossible : aucun chapitre rédigé n'a été détecté. Rechargez le manuscrit ou générez ses chapitres avant de télécharger le DOCX.");
