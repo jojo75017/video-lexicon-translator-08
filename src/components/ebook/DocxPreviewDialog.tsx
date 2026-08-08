@@ -148,7 +148,7 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
     return () => {
       cancelled = true;
     };
-  }, [open, getOptions]);
+  }, [open, resolveOptions]);
 
   const handleDownload = () => {
     if (!blob) return;
