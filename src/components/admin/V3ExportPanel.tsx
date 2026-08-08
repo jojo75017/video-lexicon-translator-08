@@ -38,13 +38,29 @@ function sanitizeTitle(raw: string): string {
   return t;
 }
 
-/** Découpe un manuscrit (texte brut / markdown) en chapitres exploitables par l'exporteur. */
+/**
+ * Découpe un manuscrit collé (texte brut / markdown) en chapitres.
+ * N'est utilisé QUE pour du texte importé : un livre déjà structuré passe par la prop `chapters`.
+ */
 export function manuscriptToChapters(text: string): Chapter[] {
   const cleaned = (text || '').replace(/^\s*-{3,}\s*$/gm, ''); // retire les séparateurs ---
   const lines = cleaned.split('\n');
-  const isHeading = (l: string) =>
-    /^#{1,3}\s+/.test(l.trim()) ||
-    /^\s*(chapitre|chapter|partie|section)\b/i.test(l.trim());
+
+  // Un vrai titre = ligne courte, sans ponctuation de phrase :
+  //  - "# Titre" (markdown) ;
+  //  - "Chapitre 12", "Chapitre 12 – Le pacte", "Partie 3 : ...".
+  // Une phrase du récit commençant par « Chapitre » ne doit JAMAIS créer un chapitre.
+  const isHeading = (raw: string) => {
+    const l = raw.trim();
+    if (!l || l.length > 90) return false;
+    if (/^#{1,3}\s+\S/.test(l)) return true;
+    if (!/^(chapitre|chapter|partie|part|section)\s+(\d{1,3}|[ivxlcdm]{1,7})\b/i.test(l)) return false;
+    // Après le numéro, seul un séparateur de titre est accepté (pas une phrase).
+    const rest = l.replace(/^(chapitre|chapter|partie|part|section)\s+(\d{1,3}|[ivxlcdm]{1,7})\s*/i, '');
+    if (!rest) return true;
+    if (!/^[:.–—-]/.test(rest)) return false;
+    return !/[.!?]\s*\S/.test(rest);
+  };
 
   const chapters: Chapter[] = [];
   let cur: { title: string; body: string[] } | null = null;
@@ -75,11 +91,23 @@ export function manuscriptToChapters(text: string): Chapter[] {
   if (chapters.length === 0 && cleaned.trim()) {
     chapters.push({ id: 'ch-1', title: 'Chapitre 1', subChapters: [], content: cleaned.trim() });
   }
-  return chapters;
+  return dropTrailingEmptyChapters(chapters);
+}
+
+/** Un chapitre fantôme vide en fin de manuscrit ne doit pas polluer le sommaire. */
+export function dropTrailingEmptyChapters(chapters: Chapter[]): Chapter[] {
+  const out = [...chapters];
+  while (out.length > 1 && !(out[out.length - 1]?.content || '').trim()) out.pop();
+  return out;
 }
 
 interface V3ExportPanelProps {
-  manuscript: string;
+  /** Manuscrit collé / importé (utilisé seulement si `chapters` n'est pas fourni). */
+  manuscript?: string;
+  /** Chapitres déjà structurés (titre + contenu) : source prioritaire, aucun re-découpage. */
+  chapters?: Chapter[];
+  /** Nombre de chapitres demandé par l'auteur (plafond dur de l'export). */
+  expectedChapterCount?: number;
   title: string;
   subtitle?: string;
   author?: string;
@@ -91,13 +119,28 @@ interface V3ExportPanelProps {
  * - sélecteur de gabarit KDP (pilote les dimensions du PDF Impression)
  * - panneau pédagogique : gabarits, marges, fonds perdus, DPI images.
  */
-const V3ExportPanel: React.FC<V3ExportPanelProps> = ({ manuscript, title, subtitle, author }) => {
+const V3ExportPanel: React.FC<V3ExportPanelProps> = ({
+  manuscript = '', chapters: structuredChapters, expectedChapterCount, title, subtitle, author,
+}) => {
   const [trimId, setTrimId] = useState('6x9');
   const [infoOpen, setInfoOpen] = useState(false);
   const trim = KDP_TRIM_SIZES.find((t) => t.id === trimId) ?? KDP_TRIM_SIZES[3];
 
-  const chapters = useMemo(() => manuscriptToChapters(manuscript), [manuscript]);
-  const ready = (manuscript || '').trim().length >= 50;
+  const chapters = useMemo(() => {
+    // Livre déjà structuré : on garde les chapitres tels quels (titres + texte intacts).
+    if (structuredChapters && structuredChapters.length > 0) {
+      const kept = dropTrailingEmptyChapters(structuredChapters);
+      return expectedChapterCount && expectedChapterCount > 0 ? kept.slice(0, expectedChapterCount) : kept;
+    }
+    return manuscriptToChapters(manuscript);
+  }, [structuredChapters, expectedChapterCount, manuscript]);
+
+  const wordCount = useMemo(
+    () => chapters.reduce((total, ch) => total + (ch.content || '').trim().split(/\s+/).filter(Boolean).length, 0),
+    [chapters],
+  );
+  const ready = chapters.some((ch) => (ch.content || '').trim().length > 0) && wordCount >= 20;
+
 
   if (!ready) {
     return (
