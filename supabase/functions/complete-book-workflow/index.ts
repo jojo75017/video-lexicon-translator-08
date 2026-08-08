@@ -54,6 +54,19 @@ STANDARDS ÉDITORIAUX PROFESSIONNELS (niveau maison d'édition) :
    Score < 7 = à refaire
 `;
 
+// LANGUE — empêche l'IA d'insérer du latin ou des expressions étrangères
+// inventées (« Pactum intra cruorem »…) dans un manuscrit français.
+const LANGUE_RULE = `
+LANGUE — RÈGLE ABSOLUE :
+- Le livre est rédigé INTÉGRALEMENT en français courant et lisible.
+- INTERDIT : latin, faux latin, latin de cuisine, devises ou incantations en langue morte (ex. "Pactum intra cruorem", "matrimonium intra cineres"), mots inventés, pseudo-langues.
+- INTERDIT : anglicismes, mots italiens/espagnols/allemands décoratifs, titres de chapitre en langue étrangère.
+- Les seules exceptions tolérées : noms propres de personnes, de lieux réels et titres d'œuvres réelles existantes.
+- Une expression étrangère réellement passée dans l'usage français reste possible, mais au maximum une fois par chapitre et jamais comme effet de style.
+- Tout ce qui devait sonner "solennel" doit être écrit en français : pas de formule latine pour faire ancien ou mystérieux.
+`;
+
+
 // RECHERCHE APPROFONDIE — réservé au palier Pro (Éditeur 59 €/mois et Pack 547 €).
 // Ces directives poussent les agents à creuser davantage : sources, données
 // chiffrées, contre-arguments, exemples vérifiables, angles concurrentiels.
