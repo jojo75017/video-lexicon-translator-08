@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import JSZip from 'jszip';
 import { generateProfessionalDocx, validateDocxChapters } from './docxExportEngine';
+import { manuscriptToChapters, dropTrailingEmptyChapters } from '@/components/admin/V3ExportPanel';
 
 const messyChapters = [
   { title: '# L\'Écho des Absents', content: 'Le vent soufflait sur la lande. Elle avança sans se retourner.', subChapters: [] },
