@@ -58,9 +58,12 @@ export default function V3CorrecteurPage() {
   const [running, setRunning] = useState(false);
   const [current, setCurrent] = useState(0);
   const [openChapter, setOpenChapter] = useState<string | null>(null);
+  const [editingChapter, setEditingChapter] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState('');
   const [retrying, setRetrying] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
   const stopRef = useRef(false);
+
 
   const doneCount = chapters.filter((c) => c.status === 'done').length;
   const failedCount = chapters.filter((c) => c.status === 'failed').length;
