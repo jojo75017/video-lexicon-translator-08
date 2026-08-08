@@ -42,17 +42,19 @@ export default function V3BookManagerPage() {
     load();
   };
 
-  const exportManuscript = (book: Book) => {
-    if (!Array.isArray(book.chapters)) return '';
-    return book.chapters.map((raw, index) => {
-      const chapter = raw && typeof raw === 'object' ? raw as Record<string, unknown> : {};
-      const title = String(chapter.title || chapter.titre || `Chapitre ${index + 1}`)
-        .replace(/^chapitre\s+\d+\s*[:–—-]?\s*/i, '')
-        .trim();
-      const content = String(chapter.content || chapter.contenu || '').trim();
-      return `# Chapitre ${index + 1} – ${title || `Chapitre ${index + 1}`}\n\n${content}`;
-    }).join('\n\n');
+  /** Chapitres structurés prêts pour l'export : titres réels conservés, aucun re-découpage du texte. */
+  const exportChapters = (book: Book): Chapter[] => {
+    const raw = Array.isArray(book.chapters) ? book.chapters : [];
+    const expected = Number(book.number_of_chapters) > 0 ? Number(book.number_of_chapters) : undefined;
+    return normalizeManuscript(raw, { expectedCount: expected, bookTitle: book.title })
+      .map((chapter) => ({
+        id: `ch-${chapter.number}`,
+        title: chapter.title || `Chapitre ${chapter.number}`,
+        subChapters: [],
+        content: chapter.content,
+      }));
   };
+
 
   const openExport = async (book: Book) => {
     setExportLoadingId(book.id);
