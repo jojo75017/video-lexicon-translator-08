@@ -42,7 +42,7 @@ export default function V3ToolsIndexPage() {
     let list = V2_TOOLS;
     if (activeCat) list = list.filter((t) => t.category === activeCat);
     if (activePlan && activePlan !== 'all') {
-      const rank = { debutant: 0, expert: 1, auteur: 2 } as const;
+      const rank = { plume: 0, edition: 1 } as const;
       list = list.filter((t) => rank[planForTool(t)] <= rank[activePlan]);
     }
     if (s) {
@@ -142,7 +142,7 @@ export default function V3ToolsIndexPage() {
             >
               Tous
             </button>
-            {(['debutant', 'expert', 'auteur'] as const).map((p) => {
+            {(['plume', 'edition'] as const).map((p) => {
               const meta = PLAN_META[p];
               const active = activePlan === p;
               return (
@@ -154,9 +154,8 @@ export default function V3ToolsIndexPage() {
                     ? { background: meta.color, color: '#fff', borderColor: meta.color }
                     : { background: meta.bg, color: meta.color, border: `1px solid ${meta.border}` }}
                 >
-                  {p === 'debutant' && '🌱 '}
-                  {p === 'expert' && '⚡ '}
-                  {p === 'auteur' && '👑 '}
+                  {p === 'plume' && '🖊️ '}
+                  {p === 'edition' && '👑 '}
                   {meta.short}
                 </button>
               );
@@ -215,9 +214,8 @@ export default function V3ToolsIndexPage() {
                   </div>
                   <span className="absolute top-2 right-2 shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold"
                     style={{ background: meta.bg, color: meta.color, border: `1px solid ${meta.border}` }}>
-                    {p === 'debutant' && '🌱 '}
-                    {p === 'expert' && '⚡ '}
-                    {p === 'auteur' && '👑 '}
+                    {p === 'plume' && '🖊️ '}
+                    {p === 'edition' && '👑 '}
                     {meta.short}
                   </span>
                   {tool.badge && (
@@ -241,7 +239,7 @@ export default function V3ToolsIndexPage() {
           };
 
           if (groupByPlan) {
-            return (['debutant', 'expert', 'auteur'] as const).map((p) => {
+            return (['plume', 'edition'] as const).map((p) => {
               const meta = PLAN_META[p];
               const tools = filtered.filter((t) => planForTool(t) === p);
               if (tools.length === 0) return null;
@@ -249,9 +247,8 @@ export default function V3ToolsIndexPage() {
                 <section key={p} className="mb-12">
                   <div className="flex items-baseline gap-3 mb-4">
                     <h2 className="v3-serif text-[22px] font-semibold flex items-center gap-2" style={{ color: meta.color }}>
-                      {p === 'debutant' && '🌱'}
-                      {p === 'expert' && '⚡'}
-                      {p === 'auteur' && '👑'}
+                      {p === 'plume' && '🖊️'}
+                      {p === 'edition' && '👑'}
                       Forfait {meta.short}
                     </h2>
                     <span className="text-[12px]" style={{ color: 'var(--v3-muted)' }}>

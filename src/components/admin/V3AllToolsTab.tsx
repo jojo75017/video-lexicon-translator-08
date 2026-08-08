@@ -28,7 +28,7 @@ const V3AllToolsTab = () => {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
   // Vue par forfait : simule ce qui est débloqué pour chaque plan.
-  const [planView, setPlanView] = useState<PlanView>('auteur');
+  const [planView, setPlanView] = useState<PlanView>('edition');
   const [showLocked, setShowLocked] = useState(true);
   const [groupBy, setGroupBy] = useState<GroupBy>('plan');
 
@@ -48,18 +48,17 @@ const V3AllToolsTab = () => {
   }, [query, filter, withPlan, planView, showLocked]);
 
   const counts = useMemo(() => {
-    const c = { debutant: 0, expert: 0, auteur: 0 };
+    const c = { plume: 0, edition: 0 };
     for (const t of withPlan) {
-      if (isUnlockedForPlan(t.plan, 'debutant')) c.debutant++;
-      if (isUnlockedForPlan(t.plan, 'expert')) c.expert++;
-      if (isUnlockedForPlan(t.plan, 'auteur')) c.auteur++;
+      if (isUnlockedForPlan(t.plan, 'plume')) c.plume++;
+      if (isUnlockedForPlan(t.plan, 'edition')) c.edition++;
     }
     return c;
   }, [withPlan]);
 
   const sections = useMemo(() => {
     if (groupBy === 'plan') {
-      const order: V3Plan[] = ['debutant', 'expert', 'auteur'];
+      const order: V3Plan[] = ['plume', 'edition'];
       return order
         .map((p) => {
           const meta = PLAN_META[p];
@@ -67,7 +66,7 @@ const V3AllToolsTab = () => {
           return {
             key: p,
             label: `Forfait ${meta.label}`,
-            emoji: p === 'debutant' ? '🌱' : p === 'expert' ? '⚡' : '👑',
+            emoji: p === 'plume' ? '🖊️' : '👑',
             accent: meta.color,
             items,
           };
@@ -101,7 +100,7 @@ const V3AllToolsTab = () => {
       <div className="mb-4 rounded-2xl border border-[#eadfc9] bg-white p-3 flex flex-col md:flex-row md:items-center gap-3">
         <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: '#8a7860' }}>Vue par forfait</span>
         <div className="flex flex-wrap gap-2">
-          {(['debutant','expert','auteur'] as const).map((p) => {
+          {(['plume','edition'] as const).map((p) => {
             const meta = PLAN_META[p];
             const active = planView === p;
             return (
