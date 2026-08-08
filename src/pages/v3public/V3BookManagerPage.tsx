@@ -154,10 +154,12 @@ export default function V3BookManagerPage() {
               </button>
             </div>
             <V3ExportPanel
-              manuscript={exportManuscript(exporting)}
+              chapters={exportChapters(exporting)}
+              expectedChapterCount={Number(exporting.number_of_chapters) || undefined}
               title={exporting.title}
               author={exporting.author_name || ''}
             />
+
           </div>
         </div>
       )}
