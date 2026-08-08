@@ -5,8 +5,18 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { BackButton } from "@/components/v3/BackButton";
 import V3ExportPanel from '@/components/admin/V3ExportPanel';
+import { normalizeManuscript } from '@/utils/manuscriptNormalizer';
+import type { Chapter } from '@/hooks/useSubscriptionGeneration';
 
-type Book = { id: string; title: string; author_name?: string | null; kdp_description?: string | null; chapters?: unknown };
+type Book = {
+  id: string;
+  title: string;
+  author_name?: string | null;
+  kdp_description?: string | null;
+  chapters?: unknown;
+  number_of_chapters?: number | null;
+};
+
 
 const hasChapterContent = (chapters: unknown): chapters is Record<string, unknown>[] =>
   Array.isArray(chapters) && chapters.some((raw) => {
