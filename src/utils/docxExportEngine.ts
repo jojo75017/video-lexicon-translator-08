@@ -446,8 +446,9 @@ function prepareRenderableChapters(chapters: DocxChapter[], expectedCount?: numb
 
 
 
-export function getDocxOutline(chapters: DocxChapter[]): DocxOutlineEntry[] {
-  return prepareRenderableChapters(chapters).map(({ chapter, num, displayTitle }) => ({
+export function getDocxOutline(chapters: DocxChapter[], expectedCount?: number): DocxOutlineEntry[] {
+  return prepareRenderableChapters(chapters, expectedCount).map(({ chapter, num, displayTitle }) => ({
+
     number: num,
     title: isGenericTitle(displayTitle) ? `Chapitre ${num}` : `Chapitre ${num} – ${displayTitle}`,
     subChapters: chapter.subChapters
