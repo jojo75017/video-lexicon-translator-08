@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Check, ClipboardPaste, ListOrdered, Loader2, RefreshCw, Wand2, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 import {
   callAIWriting, getProvider, getProviderKey, setProvider, validateKeyFormat,
   type AIProvider,
@@ -82,6 +83,28 @@ export default function V3OutlinePanel({ brief, onChange }: Props) {
     return chapters;
   };
 
+  /** Repli serveur : génère le sommaire même sans clé personnelle. */
+  const generateOnServer = async (count: number): Promise<BriefOutlineChapter[]> => {
+    const { data, error } = await supabase.functions.invoke('v3-generate-outline', {
+      body: {
+        title: (brief.title || '').trim(),
+        subtitle: (brief.subtitle || '').trim(),
+        category: brief.category || '',
+        tone: brief.tone || '',
+        description: (brief.description || '').trim(),
+        promesseCentrale: (brief.promesseCentrale || '').trim(),
+        chapters: count,
+      },
+    });
+    if (error) throw error;
+    if ((data as any)?.error) throw new Error((data as any).error);
+    const chapters = (data as any)?.chapters;
+    if (!Array.isArray(chapters) || chapters.length < 3) {
+      throw new Error('Sommaire indisponible pour le moment. Réessaie ou colle le tien.');
+    }
+    return chapters as BriefOutlineChapter[];
+  };
+
   const generate = async () => {
     const title = (brief.title || '').trim();
     const description = (brief.description || '').trim();
@@ -90,14 +113,26 @@ export default function V3OutlinePanel({ brief, onChange }: Props) {
       return;
     }
     const provider = resolveProvider();
+    const count = Math.min(60, Math.max(3, Number(brief.chapters) || 12));
+
+    // Aucune clé personnelle : on passe directement par le serveur (aucun blocage).
     if (!provider) {
-      toast.error('Branchez votre clé IA (Gemini gratuite) avant de générer le sommaire.', {
-        description: 'Le panneau « Vos clés IA » se trouve en haut de la page.',
-      });
-      window.dispatchEvent(new CustomEvent('v3-open-keys'));
+      setLoading(true);
+      try {
+        const chapters = await generateOnServer(count);
+        onChange({ outline: normalizeOutline(chapters), chapters: chapters.length, outlineValidated: false });
+        toast.success(`Sommaire généré (${chapters.length} chapitres) — relisez puis validez-le.`, {
+          description: 'Astuce : branchez votre clé Gemini gratuite pour générer plus vite et sans limite.',
+        });
+      } catch (e: any) {
+        console.error('[Sommaire] génération serveur impossible', e);
+        toast.error('Génération du sommaire impossible', { description: e?.message || 'Erreur inconnue.' });
+      } finally {
+        setLoading(false);
+      }
       return;
     }
-    const count = Math.min(60, Math.max(3, Number(brief.chapters) || 12));
+
     setLoading(true);
     try {
       const prompt = `Tu es directeur éditorial KDP. Crée une table des matières professionnelle en français.
@@ -128,14 +163,20 @@ Règles :
       if (chapters.length < 3) {
         // 2e tentative sans jsonMode : certains providers/modèles refusent responseMimeType.
         const fallbackPrompt = `${prompt}\n\nSi tu ne peux pas produire de JSON, écris simplement une ligne par chapitre au format : Titre — Objectif.`;
-        chapters = parseChapters(await callAIWriting(fallbackPrompt, options), count);
+        try {
+          chapters = parseChapters(await callAIWriting(fallbackPrompt, options), count);
+        } catch (secondError) {
+          console.warn('[Sommaire] échec avec la clé personnelle, repli serveur', secondError);
+        }
       }
-      if (chapters.length < 3) throw new Error('L’IA n’a pas renvoyé de sommaire exploitable. Réessayez ou collez le vôtre.');
+      // Dernier repli : le serveur, pour ne jamais bloquer la création du livre.
+      if (chapters.length < 3) chapters = await generateOnServer(count);
       onChange({ outline: normalizeOutline(chapters), chapters: chapters.length, outlineValidated: false });
       toast.success(`Sommaire généré (${chapters.length} chapitres) — relisez puis validez-le.`);
     } catch (e: any) {
       console.error('[Sommaire] génération impossible', e);
       toast.error('Génération du sommaire impossible', { description: e?.message || 'Erreur inconnue.' });
+
     } finally {
       setLoading(false);
     }
