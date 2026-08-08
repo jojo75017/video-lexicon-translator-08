@@ -281,7 +281,7 @@ export default function V3HomePage() {
 
       {/* KDP Pilot — outil partenaire payant + code abonnés (mis en évidence) */}
       <section className="max-w-6xl mx-auto px-5 md:px-8 pt-6 pb-2">
-        <KdpPilotPromoBanner variant="dark" />
+        <KdpPilotPromoBanner variant="light" />
       </section>
 
       {/* 6 CATÉGORIES PREMIUM */}
