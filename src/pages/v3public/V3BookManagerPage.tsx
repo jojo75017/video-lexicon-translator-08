@@ -36,7 +36,7 @@ export default function V3BookManagerPage() {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) { nav('/v3/auth'); return; }
     const { data, error } = await supabase.from('ebook_projects')
-      .select('id,title,author_name,kdp_description,chapters')
+      .select('id,title,author_name,kdp_description,chapters,number_of_chapters')
       .eq('user_id', auth.user.id).order('updated_at', { ascending: false });
     if (error) toast.error(`Chargement impossible : ${error.message}`);
     setRows((data as Book[]) || []);
