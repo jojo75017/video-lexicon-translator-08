@@ -547,7 +547,9 @@ const App = () => {
               <Route path="outils/sommaire-ultime" element={<V3LockedGate><V3TocUltimatePage /></V3LockedGate>} />
               <Route path="outils/traduction" element={<V3LockedGate><V3TranslatorPage /></V3LockedGate>} />
               <Route path="compte" element={<V3LockedGate><V3ComptePage /></V3LockedGate>} />
-              <Route path="forfaits" element={<V3LockedGate><V3ForfaitsPage /></V3LockedGate>} />
+              {/* Page des 2 forfaits : toujours visible (vitrine tarifaire) */}
+              <Route path="forfaits" element={<V3ForfaitsPage />} />
+              <Route path="tarifs" element={<Navigate to="/v3/forfaits" replace />} />
               <Route path="paypal-retour" element={<V3LockedGate><V3PayPalReturnPage /></V3LockedGate>} />
               <Route path="script-heygen" element={<V3LockedGate><V3ScriptHeygenPage /></V3LockedGate>} />
               <Route path="upsell-17" element={<V3LockedGate><V3Upsell17Page /></V3LockedGate>} />
