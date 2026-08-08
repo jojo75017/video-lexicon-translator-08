@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { Check, Sparkles, Crown, Zap, CreditCard, X } from "lucide-react";
+import { Check, Sparkles, Crown, Feather, CreditCard } from "lucide-react";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import {
   Dialog,
@@ -26,15 +26,13 @@ import { BackButton } from "@/components/v3/BackButton";
 import { PayPalSubscribeButton } from "@/components/v3/PayPalSubscribeButton";
 
 const PLAN_ICONS = {
-  debutant: Sparkles,
-  expert: Zap,
-  auteur: Crown,
+  plume: Feather,
+  edition: Crown,
 } as const;
 
 const PLAN_ACCENTS: Record<string, string> = {
-  debutant: "#0d7a5f",   // Auteur — émeraude douce
-  expert: "#C97A14",     // Studio — or/ambre (mis en avant)
-  auteur: "#5B21B6",     // Éditeur — pourpre édition
+  plume: "#0d7a5f",     // Plume — émeraude
+  edition: "#5B21B6",   // Édition — pourpre (mis en avant)
 };
 
 function PayPalTestModal({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -141,7 +139,7 @@ function PayPalTestModal({ open, onClose }: { open: boolean; onClose: () => void
 function V3PlanTestModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [planId, setPlanId] = useState<V3PlanId>("expert");
+  const [planId, setPlanId] = useState<V3PlanId>("edition");
   const [billing, setBilling] = useState<V3BillingInterval>("month");
   const [step, setStep] = useState<"choose" | "checkout">("choose");
   const [email, setEmail] = useState("");
@@ -205,9 +203,8 @@ function V3PlanTestModal({ open, onClose }: { open: boolean; onClose: () => void
                 onChange={(e) => setPlanId(e.target.value as V3PlanId)}
                 className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
               >
-                <option value="debutant">Auteur — 9,99€/mo · 97€/an</option>
-                <option value="expert">Studio — 12,99€/mo · 117€/an</option>
-                <option value="auteur">Éditeur — 59€/mo · 547€/an</option>
+                <option value="plume">Plume — 29€/mois · 290€/an</option>
+                <option value="edition">Édition — 49€/mois · 490€/an</option>
               </select>
             </div>
             <div>
@@ -271,7 +268,8 @@ export default function V3ForfaitsPage() {
             Choisissez votre atelier d'édition
           </h1>
           <p className="text-lg max-w-2xl mx-auto" style={{ color: "#4b5563" }}>
-            3 forfaits, tous équipés du pipeline IA. Passez au supérieur à tout moment.
+            Deux forfaits, tous les outils dans les deux. Édition ajoute la puissance
+            professionnelle et inclut les upsells. Changez de forfait à tout moment.
           </p>
 
           <div className="inline-flex mt-8 p-1 rounded-full border" style={{ borderColor: "#e5e7eb", background: "#fff" }}>
@@ -291,18 +289,18 @@ export default function V3ForfaitsPage() {
               }`}
               style={{ background: interval === "year" ? "#008296" : "transparent" }}
             >
-              Annuel <span className="text-xs opacity-80">(−20%)</span>
+              Annuel <span className="text-xs opacity-80">(2 mois offerts)</span>
             </button>
           </div>
         </header>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           {V3_PLANS.map((plan) => {
             const Icon = PLAN_ICONS[plan.id];
             const accent = PLAN_ACCENTS[plan.id];
             const price = interval === "month" ? plan.monthlyPrice : plan.yearlyPrice;
             const savings = getYearlySavingsPercent(plan);
-            const featured = plan.id === "expert";
+            const featured = plan.id === "edition";
 
             return (
               <article
@@ -320,7 +318,7 @@ export default function V3ForfaitsPage() {
                     className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold text-white shadow-lg whitespace-nowrap"
                     style={{ background: accent }}
                   >
-                    ⭐ Le plus recommandé
+                    ⭐ Recommandé
                   </span>
                 )}
 

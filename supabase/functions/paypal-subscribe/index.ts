@@ -1,5 +1,5 @@
 // PayPal Subscription creator — creates a PayPal Product+Plan on demand
-// and starts a subscription for the chosen V3 plan (Auteur / Studio / Éditeur)
+// and starts a subscription for the chosen V3 plan (Plume / Édition)
 // in monthly or yearly interval. Returns the PayPal approval URL.
 
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -13,9 +13,8 @@ const CORS = {
 const PAYPAL_BASE = "https://api-m.paypal.com"; // Live
 
 const PLANS = {
-  debutant: { name: "EbookStudio — Auteur", monthly: 9.99, yearly: 97 },
-  expert:   { name: "EbookStudio — Studio", monthly: 12.99, yearly: 117 },
-  auteur:   { name: "EbookStudio — Éditeur", monthly: 59, yearly: 547 },
+  plume:   { name: "EbookStudio — Plume", monthly: 29, yearly: 290 },
+  edition: { name: "EbookStudio — Édition", monthly: 49, yearly: 490 },
 } as const;
 
 type PlanId = keyof typeof PLANS;

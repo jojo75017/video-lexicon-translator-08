@@ -10,13 +10,11 @@ const cors = {
 };
 
 const ALLOWED_PRICES = new Set([
-  // V3 subscriptions (activation octobre 2026)
-  "v3_auteur_monthly",
-  "v3_auteur_annual",
-  "v3_expert_monthly",
-  "v3_expert_annual",
-  "v3_auteur_monthly_pro",
-  "v3_auteur_annual_pro",
+  // V3 subscriptions — 2 forfaits (activation octobre 2026)
+  "v3_plume_monthly",
+  "v3_plume_annual",
+  "v3_edition_monthly",
+  "v3_edition_annual",
   // Legacy / upsells
   "v3_upsell_selection_month",
   "v3_upsell_aplus_month",

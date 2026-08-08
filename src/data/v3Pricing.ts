@@ -1,4 +1,4 @@
-export type V3PlanId = "debutant" | "expert" | "auteur";
+export type V3PlanId = "plume" | "edition";
 export type V3BillingInterval = "month" | "year";
 
 export interface V3Plan {
@@ -16,58 +16,45 @@ export interface V3Plan {
   features: string[];
 }
 
+/**
+ * Deux forfaits V3 (activation octobre 2026).
+ * Principe : même socle d'outils pour les deux. Édition ajoute la puissance
+ * professionnelle (workflow renforcé, Cover Studio Pro, BD Studio Pro…) et
+ * inclut les upsells au lieu de les facturer à l'unité.
+ * L'audiolivre est inclus dans LES DEUX forfaits.
+ */
 export const V3_PLANS: V3Plan[] = [
   {
-    id: "debutant",
-    name: "Auteur",
-    tagline: "🌱 Je démarre — publier mes premiers livres proprement sur KDP",
-    monthlyPrice: 9.99,
-    yearlyPrice: 97,
-    booksPerMonth: 10,
-    chaptersMax: 20,
-    wordsPerChapter: 3500,
-    charactersMax: 3,
-    agentsCount: 18,
-    proModulesIncluded: false,
-    features: [
-      "10 livres / mois",
-      "20 chapitres max · 3 500 mots/ch",
-      "18 agents IA",
-      "Export PDF/DOCX/EPUB + TOC",
-      "10 traductions incluses",
-      "Couverture base (recto + tranche + 4e)",
-      "Support email 48h",
-    ],
-  },
-  {
-    id: "expert",
-    name: "Studio",
-    tagline: "🚀 Je produis efficacement — plus de livres, plus de contrôle, plus de conversions",
-    monthlyPrice: 12.99,
-    yearlyPrice: 117,
-    booksPerMonth: 20,
+    id: "plume",
+    name: "Plume",
+    tagline: "J'écris et je publie mes livres, avec tous les outils du studio",
+    monthlyPrice: 29,
+    yearlyPrice: 290,
+    booksPerMonth: 30,
     chaptersMax: 40,
     wordsPerChapter: 5000,
     charactersMax: 8,
     agentsCount: 22,
     proModulesIncluded: false,
     features: [
-      "20 livres / mois",
+      "30 livres / mois",
+      "Tous les onglets : Plan, Écrire, Habiller, Publier, Vendre",
       "40 chapitres max · 5 000 mots/ch",
-      "22 agents IA + priorité",
-      "Templates KDP standard",
-      "10 traductions incluses",
-      "Couverture pro + variantes",
-      "🎨 Livre illustré maternelle (30 images/livre)",
-      "Support email 24h",
+      "Export PDF / DOCX / EPUB + sommaire propre",
+      "Couverture complète (recto + tranche + 4e)",
+      "Audiolivre inclus",
+      "Import de manuscrit (DOCX / PDF / URL)",
+      "Livre illustré maternelle",
+      "Traductions 10 langues incluses",
+      "Support email 24 h",
     ],
   },
   {
-    id: "auteur",
-    name: "Éditeur",
-    tagline: "👑 Je pilote une vraie maison d'édition — tout, illimité, sans compromis",
-    monthlyPrice: 59,
-    yearlyPrice: 547,
+    id: "edition",
+    name: "Édition",
+    tagline: "Je publie en professionnel et je vends — tout Plume, en version pro",
+    monthlyPrice: 49,
+    yearlyPrice: 490,
     booksPerMonth: null,
     chaptersMax: 60,
     wordsPerChapter: 8000,
@@ -76,16 +63,16 @@ export const V3_PLANS: V3Plan[] = [
     proModulesIncluded: true,
     features: [
       "Livres illimités",
+      "Tout ce que contient Plume, en version professionnelle",
+      "Mode Recherche Approfondie (workflow renforcé)",
       "60 chapitres max · 8 000 mots/ch",
-      "30 agents IA (P1 → P30)",
-      "Tous les modules Pro inclus",
-      "Cover Studio Pro (P23)",
-      "KDP Pilot Pro renforcé (P27+)",
-      "Sélection éditeurs (P26)",
-      "Amazon Spy (P28), Audiobook (P29), BD Studio (P30)",
-      "🎨 Livre illustré maternelle (60 images/livre, modèle Pro)",
-      "10 traductions + relecture IA premium",
-      "Support prioritaire 12h + coaching mensuel",
+      "Cover Studio Pro (300 DPI, gabarits KDP, variantes)",
+      "Audiolivre version pro (voix premium, chapitrage)",
+      "BD Studio Pro",
+      "Amazon Spy / Audit ASIN / mots-clés avancés",
+      "Pack KDP prêt à publier (ZIP) + checklist",
+      "Upsells inclus : BookPerfect AI, sélection éditeurs, relecture IA premium",
+      "Support prioritaire + coaching mensuel",
     ],
   },
 ];
@@ -95,12 +82,11 @@ export function getV3Plan(id: V3PlanId): V3Plan | undefined {
 }
 
 export function getV3PriceId(planId: V3PlanId, interval: V3BillingInterval): string {
-  // Map internal plan IDs to Stripe price IDs (activation octobre 2026).
+  // Identifiants de prix stables (identiques en test et en production).
   const suffix = interval === "month" ? "monthly" : "annual";
   const map: Record<V3PlanId, { monthly: string; annual: string }> = {
-    debutant: { monthly: "v3_auteur_monthly", annual: "v3_auteur_annual" },
-    expert: { monthly: "v3_expert_monthly", annual: "v3_expert_annual" },
-    auteur: { monthly: "v3_auteur_monthly_pro", annual: "v3_auteur_annual_pro" },
+    plume: { monthly: "v3_plume_monthly", annual: "v3_plume_annual" },
+    edition: { monthly: "v3_edition_monthly", annual: "v3_edition_annual" },
   };
   return map[planId][suffix];
 }
@@ -128,7 +114,7 @@ export const V3_ADDONS = {
   bookperfect: {
     key: "bookperfect",
     title: "BookPerfect AI — Directeur Éditorial",
-    description: "Analyse éditoriale IA + export Word corrigé",
+    description: "Analyse éditoriale IA + export Word corrigé (inclus dans Édition)",
     price: 97,
   },
   serenity: {

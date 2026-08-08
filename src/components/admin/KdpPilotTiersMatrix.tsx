@@ -4,12 +4,11 @@ import { Check, Lock, Radar, Sparkles, Infinity as InfinityIcon } from "lucide-r
 import { KDP_PILOT_TIERS } from "@/data/kdpPilotTiers";
 import type { V3PlanId } from "@/data/v3Pricing";
 
-const ORDER: V3PlanId[] = ["debutant", "expert", "auteur"];
+const ORDER: V3PlanId[] = ["plume", "edition"];
 
 const TIER_COLOR: Record<V3PlanId, string> = {
-  debutant: "border-l-blue-500",
-  expert: "border-l-amber-500",
-  auteur: "border-l-teal-500",
+  plume: "border-l-emerald-500",
+  edition: "border-l-purple-600",
 };
 
 const BSR_LABEL: Record<string, string> = {
@@ -34,11 +33,11 @@ export function KdpPilotTiersMatrix() {
           <Badge variant="outline" className="ml-2">P27 / P27+</Badge>
         </CardTitle>
         <p className="mt-1 text-sm text-muted-foreground">
-          Trois niveaux d'audit KDP : basique (Débutant), complet (Expert), Pro renforcé (Auteur).
+          Deux niveaux d'audit KDP : complet (Plume) et Pro renforcé (Édition).
         </p>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {ORDER.map((id) => {
             const tier = KDP_PILOT_TIERS[id];
             return (

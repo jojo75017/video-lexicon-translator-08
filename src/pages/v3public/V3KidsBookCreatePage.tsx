@@ -172,7 +172,7 @@ export default function V3KidsBookCreatePage() {
     setGeneratingCover(true);
     try {
       const stylePrompt = ILLUSTRATION_STYLES.find((s) => s.id === draft.style)?.prompt || '';
-      const model = KIDS_BOOK_IMAGE_MODEL[plan || 'expert'];
+      const model = KIDS_BOOK_IMAGE_MODEL[plan || 'plume'];
       const characterBible = buildCharacterBibleText(draft.character);
       const coverScene = `Couverture professionnelle de livre jeunesse KDP, format album carré. Grand titre "${draft.title}" en typographie manuscrite enfantine, colorée et lisible, occupant le haut de la couverture. ${draft.subtitle ? `Sous-titre: "${draft.subtitle}". ` : ''}Nom de l'auteur "${draft.authorName}" en bas de la couverture, plus petit. Illustration centrale mettant en scène ${draft.character.name} de manière expressive et joyeuse, ambiance ${draft.synopsis || 'douce et magique'}. Composition professionnelle équilibrée, marges nettes, couleurs vives, style prêt à imprimer pour Amazon KDP.`;
       const { data: img, error: imgErr } = await supabase.functions.invoke('agent-illustrator', {
@@ -200,7 +200,7 @@ export default function V3KidsBookCreatePage() {
     setGeneratingBack(true);
     try {
       const stylePrompt = ILLUSTRATION_STYLES.find((s) => s.id === draft.style)?.prompt || '';
-      const model = KIDS_BOOK_IMAGE_MODEL[plan || 'expert'];
+      const model = KIDS_BOOK_IMAGE_MODEL[plan || 'plume'];
       const characterBible = buildCharacterBibleText(draft.character);
       const backText = draft.backCoverText
         || `Un livre tendre pour les enfants de ${draft.targetAge}. ${draft.synopsis || ''}`.trim();
@@ -333,9 +333,8 @@ Pays dépôt légal : ${draft.legalDepositCountry || ''}
       const { data: sub } = await (supabase as any)
         .from('subscribers').select('plan_tier').eq('user_id', user.id).maybeSingle();
       const tier = (sub?.plan_tier ?? '').toLowerCase();
-      if (tier.includes('auteur') || tier.includes('editeur') || tier.includes('vip')) setPlan('auteur');
-      else if (tier.includes('expert') || tier.includes('studio')) setPlan('expert');
-      else if (tier) setPlan('debutant');
+      if (tier.includes('edition') || tier.includes('editeur') || tier.includes('auteur') || tier.includes('vip')) setPlan('edition');
+      else if (tier) setPlan('plume');
       setLoadingPlan(false);
     })();
   }, []);
@@ -393,7 +392,7 @@ Pays dépôt légal : ${draft.legalDepositCountry || ''}
       setPhase('illustrations');
       setProgress({ done: 0, total: stories.length });
       const stylePrompt = ILLUSTRATION_STYLES.find((s) => s.id === draft.style)?.prompt || '';
-      const model = KIDS_BOOK_IMAGE_MODEL[plan || 'expert'];
+      const model = KIDS_BOOK_IMAGE_MODEL[plan || 'plume'];
       const characterBible = buildCharacterBibleText(draft.character);
 
       for (let i = 0; i < stories.length; i++) {
