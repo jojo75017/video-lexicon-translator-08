@@ -284,6 +284,8 @@ export default function V3HomePage() {
         <KdpPilotPromoBanner variant="dark" />
       </section>
 
+      {/* 6 CATÉGORIES PREMIUM */}
+      <section className="max-w-7xl mx-auto px-5 md:px-8 py-16">
         <div className="text-center mb-10">
           <div className="text-[10px] uppercase tracking-[0.24em] font-semibold" style={{ color: 'var(--v3-gold-600)' }}>
             L'atelier complet
