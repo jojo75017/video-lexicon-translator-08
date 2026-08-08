@@ -42,6 +42,7 @@ Deno.serve(async (req) => {
       "Pour chaque extrait de chapitre ci-dessous, propose UN titre de chapitre littéraire, évocateur,",
       "de 2 à 6 mots, sans numéro, sans guillemets, sans le mot « Chapitre », en français.",
       "Les titres doivent être tous différents et fidèles au contenu de l'extrait.",
+      "INTERDIT : latin ou faux latin, langue morte, mot inventé, expression en langue étrangère. 100 % français.",
       "Réponds STRICTEMENT en JSON : {\"titles\":[{\"number\":1,\"title\":\"...\"}]}",
       "",
       ...list.map((c) => `--- Chapitre ${c.number} ---\n${c.excerpt}`),

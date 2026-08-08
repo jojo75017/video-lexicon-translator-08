@@ -54,6 +54,19 @@ STANDARDS ÉDITORIAUX PROFESSIONNELS (niveau maison d'édition) :
    Score < 7 = à refaire
 `;
 
+// LANGUE — empêche l'IA d'insérer du latin ou des expressions étrangères
+// inventées (« Pactum intra cruorem »…) dans un manuscrit français.
+const LANGUE_RULE = `
+LANGUE — RÈGLE ABSOLUE :
+- Le livre est rédigé INTÉGRALEMENT en français courant et lisible.
+- INTERDIT : latin, faux latin, latin de cuisine, devises ou incantations en langue morte (ex. "Pactum intra cruorem", "matrimonium intra cineres"), mots inventés, pseudo-langues.
+- INTERDIT : anglicismes, mots italiens/espagnols/allemands décoratifs, titres de chapitre en langue étrangère.
+- Les seules exceptions tolérées : noms propres de personnes, de lieux réels et titres d'œuvres réelles existantes.
+- Une expression étrangère réellement passée dans l'usage français reste possible, mais au maximum une fois par chapitre et jamais comme effet de style.
+- Tout ce qui devait sonner "solennel" doit être écrit en français : pas de formule latine pour faire ancien ou mystérieux.
+`;
+
+
 // RECHERCHE APPROFONDIE — réservé au palier Pro (Éditeur 59 €/mois et Pack 547 €).
 // Ces directives poussent les agents à creuser davantage : sources, données
 // chiffrées, contre-arguments, exemples vérifiables, angles concurrentiels.
@@ -1809,8 +1822,10 @@ RÈGLES STRICTES :
 - Aucune redite, aucun remplissage, aucun méta-discours
 - Style vivant, concret, immersif
 - Si ce n'est pas le dernier segment, ne conclus pas le chapitre
-- Retourne uniquement un JSON valide${personnagesSection}`
-            : `Tu es un AUTEUR BEST-SELLER avec 20 ans d'expérience. Tu rédiges des chapitres EXCEPTIONNELS dans le genre "${category}".
+- Retourne uniquement un JSON valide${personnagesSection}
+${LANGUE_RULE}`
+            : `${LANGUE_RULE}
+Tu es un AUTEUR BEST-SELLER avec 20 ans d'expérience. Tu rédiges des chapitres EXCEPTIONNELS dans le genre "${category}".
 
 EXIGENCES QUALITÉ PUBLICATION PROFESSIONNELLE :
 - Chaque paragraphe doit être INDISPENSABLE (zéro remplissage, zéro redondance)
@@ -1943,7 +1958,8 @@ Retourne en JSON :
             try {
               const original = chapitreGenere.contenu;
               const refined = await callAI(
-                `Tu es un ÉDITEUR-RÉÉCRIVAIN de maison d'édition premium. Tu améliores un chapitre déjà écrit SANS en changer le fond ni la structure : tu densifies les idées, fluidifies le style, enrichis les exemples concrets, supprimes les redites et le remplissage, et renforces le rythme. Tu conserves la même langue et le même titre. Tu ne raccourcis jamais le chapitre.`,
+                `Tu es un ÉDITEUR-RÉÉCRIVAIN de maison d'édition premium. Tu améliores un chapitre déjà écrit SANS en changer le fond ni la structure : tu densifies les idées, fluidifies le style, enrichis les exemples concrets, supprimes les redites et le remplissage, et renforces le rythme. Tu conserves la même langue et le même titre. Tu ne raccourcis jamais le chapitre.
+${LANGUE_RULE}`,
                 `Améliore ce chapitre pour une qualité publication professionnelle (garde ou augmente la longueur, vise ${p4Settings.targetWords} mots) :\n\nTITRE : "${chapitreGenere.titre}"\n\nCHAPITRE ACTUEL :\n${original}\n\nRetourne UNIQUEMENT du JSON :\n{"numero": ${chapitreGenere.numero}, "titre": "${chapitreGenere.titre}", "contenu": "LE CHAPITRE AMÉLIORÉ, PLUS DENSE ET PLUS FLUIDE", "nombreMots": ${p4Settings.targetWords}}`,
                 p4Settings.maxTokens,
               );
@@ -2001,7 +2017,8 @@ Retourne en JSON :
           const transition = chapSuivant ? `Termine en amenant vers "${chapSuivant.titre}".` : 'Dernier chapitre, conclusion forte.';
 
           const chapterContent = await callAI(
-            `Tu es un AUTEUR BEST-SELLER. Chapitres EXCEPTIONNELS dans "${category}". TON : ${tonEditorial}${personnagesSection}`,
+            `Tu es un AUTEUR BEST-SELLER. Chapitres EXCEPTIONNELS dans "${category}". TON : ${tonEditorial}${personnagesSection}
+${LANGUE_RULE}`,
             `LIVRE : "${fullTitle}"\nDESCRIPTION : ${descriptionGeneree}\nPLAN : ${planComplet}${resumePrecedents}${personnagesSection}\n\nCHAPITRE ${chapitre.numero}/${structure.length} : "${chapitre.titre}"\nSOUS-SECTIONS : ${(chapitre.sousSections || []).join(', ')}\n${transition}\n\nJSON :\n{"numero": ${chapitre.numero}, "titre": "${chapitre.titre}", "contenu": "...", "nombreMots": 3000}`,
             6000
           );

@@ -44,6 +44,7 @@ TU DOIS UNIQUEMENT :
 5. Supprimer les anglicismes involontaires (remplacer par l'équivalent français)
 6. Harmoniser les temps narratifs UNIQUEMENT en cas d'incohérence manifeste
 7. Alléger les répétitions UNIQUEMENT si elles sont manifestement fautives (même mot 3+ fois dans la même phrase/paragraphe immédiat)
+8. Remplacer par du français clair toute expression en latin, faux latin, langue morte, pseudo-langue ou mot inventé (ex. « Pactum intra cruorem, matrimonium intra cineres » → « Un pacte scellé dans le sang, un mariage scellé dans les cendres »), ainsi que les mots étrangers décoratifs. Exceptions : noms propres réels, titres d'œuvres réelles et locutions latines réellement courantes en français (a priori, etc.). Type de correction : "anglicisme".
 
 Le style de l'auteur doit rester STRICTEMENT identique.`;
 
@@ -61,6 +62,7 @@ TU DOIS :
 4. Alléger les lourdeurs : phrases trop longues coupées, adverbes inutiles retirés, voix passive remplacée quand c'est plus net
 5. Harmoniser les temps narratifs sur l'ensemble du chapitre
 6. Fluidifier les enchaînements entre paragraphes sans changer leur contenu
+7. Remplacer par du français clair toute expression en latin, faux latin, langue morte, pseudo-langue ou mot inventé, ainsi que les mots étrangers décoratifs, en conservant le sens et l'effet voulu. Exceptions : noms propres réels, titres d'œuvres réelles et locutions latines courantes en français.
 
 La voix de l'auteur doit rester reconnaissable : polissage, pas réécriture.
 Le nombre de mots doit rester dans une marge de ±10 % du texte original.`;
