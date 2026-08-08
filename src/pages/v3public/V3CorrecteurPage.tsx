@@ -438,15 +438,21 @@ export default function V3CorrecteurPage() {
                       </button>
                     )}
                     {c.status === 'done' && (
-                      c.accepted ? (
-                        <button onClick={() => setAccepted(c.chapterId, false)} className="v3-btn-outline text-[12px] inline-flex items-center gap-1.5">
-                          <CheckCircle2 className="w-3.5 h-3.5" style={{ color: '#0b6e4c' }} /> Accepté — annuler
+                      <>
+                        <button onClick={() => { setOpenChapter(c.chapterId); openEditor(c); }}
+                          className="v3-btn-outline text-[12px] inline-flex items-center gap-1.5">
+                          <Pencil className="w-3.5 h-3.5" /> Corriger à la main
                         </button>
-                      ) : (
-                        <button onClick={() => setAccepted(c.chapterId, true)} className="v3-btn-primary text-[12px]">
-                          Accepter ce chapitre
-                        </button>
-                      )
+                        {c.accepted ? (
+                          <button onClick={() => setAccepted(c.chapterId, false)} className="v3-btn-outline text-[12px] inline-flex items-center gap-1.5">
+                            <CheckCircle2 className="w-3.5 h-3.5" style={{ color: '#0b6e4c' }} /> Retenu — refuser
+                          </button>
+                        ) : (
+                          <button onClick={() => setAccepted(c.chapterId, true)} className="v3-btn-primary text-[12px]">
+                            Accepter ce chapitre
+                          </button>
+                        )}
+                      </>
                     )}
                   </div>
 
@@ -454,10 +460,10 @@ export default function V3CorrecteurPage() {
                     <div className="border-t p-4 space-y-4" style={{ borderColor: 'var(--v3-line)' }}>
                       <div>
                         <div className="text-[11px] uppercase tracking-wider font-semibold mb-2" style={{ color: 'var(--v3-gold-600)' }}>
-                          Avant / après
+                          Avant / après {c.edited ? '(version manuelle)' : ''}
                         </div>
                         <p className="text-[13.5px] leading-relaxed whitespace-pre-wrap">
-                          {diffWords(c.original, c.corrected).map((seg, i) => (
+                          {diffWords(c.original, effectiveText(c)).map((seg, i) => (
                             <span key={i}
                               style={
                                 seg.type === 'removed'
@@ -472,29 +478,72 @@ export default function V3CorrecteurPage() {
                         </p>
                       </div>
 
+                      {/* Édition manuelle du chapitre */}
+                      {editingChapter === c.chapterId ? (
+                        <div>
+                          <div className="text-[11px] uppercase tracking-wider font-semibold mb-2" style={{ color: 'var(--v3-gold-600)' }}>
+                            Votre version (texte final du chapitre)
+                          </div>
+                          <textarea value={editDraft} onChange={(e) => setEditDraft(e.target.value)} rows={16}
+                            className="w-full rounded-xl border px-4 py-3 text-[13.5px] leading-relaxed outline-none"
+                            style={{ borderColor: 'var(--v3-line)' }} />
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            <button onClick={() => saveEdit(c.chapterId)} className="v3-btn-primary text-[12px] inline-flex items-center gap-1.5">
+                              <Save className="w-3.5 h-3.5" /> Enregistrer ma version
+                            </button>
+                            <button onClick={() => setEditingChapter(null)} className="v3-btn-outline text-[12px]">Annuler</button>
+                            {c.edited && (
+                              <button onClick={() => resetEdit(c.chapterId)} className="v3-btn-outline text-[12px]">
+                                Revenir à la correction IA
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <button onClick={() => openEditor(c)} className="v3-btn-outline text-[12px] inline-flex items-center gap-1.5">
+                          <Pencil className="w-3.5 h-3.5" /> Modifier le texte de ce chapitre
+                        </button>
+                      )}
+
                       {c.corrections.length > 0 && (
                         <div>
                           <div className="text-[11px] uppercase tracking-wider font-semibold mb-2" style={{ color: 'var(--v3-gold-600)' }}>
-                            Détail des corrections
+                            Détail des corrections — refusez celles qui n'ont pas lieu d'être
                           </div>
                           <ul className="space-y-2">
-                            {c.corrections.map((corr, i) => (
-                              <li key={i} className="text-[12.5px] rounded-lg border p-2.5" style={{ borderColor: 'var(--v3-line)' }}>
-                                <span className="font-semibold" style={{ color: 'var(--v3-emerald)' }}>
-                                  {CORRECTION_TYPE_LABELS[(corr.type || '').toLowerCase()] || 'Correction'}
-                                </span>
-                                <span className="mx-2" style={{ color: '#991b1b', textDecoration: 'line-through' }}>{corr.original}</span>
-                                <span style={{ color: '#065f46' }}>{corr.corrige}</span>
-                                {corr.explication && (
-                                  <div className="mt-1" style={{ color: 'var(--v3-muted)' }}>{corr.explication}</div>
-                                )}
-                              </li>
-                            ))}
+                            {c.corrections.map((corr, i) => {
+                              const isRejected = (c.rejected || []).includes(i);
+                              return (
+                                <li key={i} className="text-[12.5px] rounded-lg border p-2.5"
+                                  style={{ borderColor: 'var(--v3-line)', background: isRejected ? '#f8f8f8' : '#fff', opacity: isRejected ? 0.7 : 1 }}>
+                                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                                    <span className="font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+                                      {CORRECTION_TYPE_LABELS[(corr.type || '').toLowerCase()] || 'Correction'}
+                                    </span>
+                                    <span style={{ color: '#991b1b', textDecoration: 'line-through' }}>{corr.original}</span>
+                                    <span style={{ color: '#065f46', textDecoration: isRejected ? 'line-through' : undefined }}>{corr.corrige}</span>
+                                    <button onClick={() => toggleCorrection(c.chapterId, i)}
+                                      className="v3-btn-outline text-[11.5px] ml-auto inline-flex items-center gap-1.5">
+                                      {isRejected ? <><RotateCcw className="w-3.5 h-3.5" /> Rétablir la correction</> : <><Undo2 className="w-3.5 h-3.5" /> Garder mon mot</>}
+                                    </button>
+                                  </div>
+                                  {corr.explication && (
+                                    <div className="mt-1" style={{ color: 'var(--v3-muted)' }}>{corr.explication}</div>
+                                  )}
+                                  {isRejected && (
+                                    <div className="mt-1 text-[11.5px]" style={{ color: '#92400e' }}>
+                                      Correction refusée : « {corr.original} » est conservé dans le texte final.
+                                    </div>
+                                  )}
+                                </li>
+                              );
+                            })}
                           </ul>
                         </div>
                       )}
                     </div>
                   )}
+
                 </div>
               );
             })}
