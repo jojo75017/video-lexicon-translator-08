@@ -745,6 +745,12 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
     console.warn(`[DOCX] Manuscrit incomplet, export généré avec avertissements. ${details}`);
   }
 
+  // Un livre sans une seule ligne rédigée n'est pas exportable.
+  if (audit.chapters.length > 0 && audit.chapters.every((chapter) => chapter.wordCount === 0)) {
+    throw new Error("Export bloqué : aucun chapitre rédigé. Génère ou importe le manuscrit avant de télécharger le DOCX.");
+  }
+
+
 
   const font = fontFamily;
   const baseSize = fontSize * 2; // half-points
