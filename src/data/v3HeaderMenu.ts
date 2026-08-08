@@ -42,7 +42,9 @@ export const V3_HEADER_MENU: MenuCategory[] = [
     links: [
       { label: 'Ebook Planner V2 — 22 agents', to: '/ebook-planner', badge: 'Populaire', desc: 'Le pipeline P1–P15 éprouvé, en production' },
       { label: 'Parcours 30 agents', to: '/v3/hub?tab=parcours', badge: 'V3', desc: 'Le nouveau workflow enrichi' },
+      { label: 'Corriger mon livre', to: '/v3/corriger', badge: 'Nouveau', desc: 'Importez un manuscrit terminé : correction intégrale chapitre par chapitre, relecture et export KDP' },
       { label: 'BookPerfect AI', to: '/bookperfect', desc: 'Correction et polissage IA de votre manuscrit' },
+
       { label: 'Ebookbot — Chat IA', to: '/ebookbot', desc: 'Assistant conversationnel pour brainstormer' },
       { label: 'Outils V3 (Hub)', to: '/v3/hub?tab=outils', desc: 'Tous les micro-outils IA regroupés' },
       { label: "Parler à l'assistant V3", to: '/v3/hub?tab=assistant', desc: 'Aide contextuelle sur votre livre' },
