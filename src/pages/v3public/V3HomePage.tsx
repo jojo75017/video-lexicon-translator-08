@@ -445,10 +445,6 @@ export default function V3HomePage() {
         </div>
       </section>
 
-      {/* KDP Pilot — outil partenaire payant + code abonnés */}
-      <section className="max-w-6xl mx-auto px-5 md:px-8 pt-14">
-        <KdpPilotPromoBanner />
-      </section>
 
       {/* CTA final */}
 
