@@ -548,6 +548,9 @@ const App = () => {
               <Route path="outils" element={<V3LockedGate><V3ToolsIndexPage /></V3LockedGate>} />
               <Route path="outils/sommaire-ultime" element={<V3LockedGate><V3TocUltimatePage /></V3LockedGate>} />
               <Route path="outils/traduction" element={<V3LockedGate><V3TranslatorPage /></V3LockedGate>} />
+              <Route path="corriger" element={<V3LockedGate><V3CorrecteurPage /></V3LockedGate>} />
+              <Route path="correcteur" element={<Navigate to="/v3/corriger" replace />} />
+
               <Route path="compte" element={<V3LockedGate><V3ComptePage /></V3LockedGate>} />
               {/* Page des 2 forfaits : toujours visible (vitrine tarifaire) */}
               <Route path="forfaits" element={<V3ForfaitsPage />} />
