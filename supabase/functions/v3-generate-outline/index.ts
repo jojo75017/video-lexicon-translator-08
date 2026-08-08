@@ -137,6 +137,7 @@ Réponds STRICTEMENT en JSON valide, sans markdown, avec ce schéma :
 Règles :
 - exactement ${count} chapitres ;
 - jamais de titre générique comme "Chapitre 1" ;
+- 100 % français : aucun titre en latin ou faux latin, aucune langue morte, aucun mot inventé, aucune expression étrangère décorative ;
 - jamais deux titres identiques ;
 - titres courts, vendeurs, cohérents avec le synopsis.`;
 
