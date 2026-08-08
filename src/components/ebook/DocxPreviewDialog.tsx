@@ -104,7 +104,8 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
       setLoading(true);
       setError(null);
       try {
-        const options = getOptions();
+        const options = resolveOptions();
+
         const validation = validateDocxChapters(options.chapters || []);
         setAudit(validation);
         setToc(getDocxOutline(options.chapters || []).flatMap((entry) => [
