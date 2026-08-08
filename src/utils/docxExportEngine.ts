@@ -65,6 +65,9 @@ export interface DocxExportOptions {
   includePageNumbers?: boolean;
   includeCopyrightPage?: boolean;
   pageFormat?: '6x9' | 'a4' | 'letter';
+  /** Nombre de chapitres demandé par l'auteur : plafond dur du sommaire et de l'export. */
+  expectedChapterCount?: number;
+
 }
 
 export interface DocxOutlineEntry {
