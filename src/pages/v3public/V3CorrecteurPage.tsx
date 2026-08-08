@@ -113,7 +113,8 @@ export default function V3CorrecteurPage() {
         working,
         mode,
         ({ index, chapter }) => {
-          working[index] = chapter;
+          // Un chapitre corrigé est retenu par défaut : l'auteur peut refuser ensuite.
+          working[index] = chapter.status === 'done' ? { ...chapter, accepted: true } : chapter;
           setCurrent(index);
           setChapters(working.map((c) => ({ ...c })));
         },
@@ -135,7 +136,7 @@ export default function V3CorrecteurPage() {
     try {
       const res = await proofreadChapter(target.title, target.original, mode);
       setChapters((prev) => prev.map((c) => c.chapterId === id
-        ? { ...c, status: 'done', corrected: res.corrected, corrections: res.corrections, quality: res.quality, error: undefined }
+        ? { ...c, status: 'done', corrected: res.corrected, corrections: res.corrections, quality: res.quality, accepted: true, rejected: [], edited: undefined, error: undefined }
         : c));
       toast.success(`Chapitre corrigé : ${target.title || `Chapitre ${target.index + 1}`}`);
     } catch (e: any) {
@@ -148,18 +149,49 @@ export default function V3CorrecteurPage() {
   const setAccepted = (id: string, accepted: boolean) =>
     setChapters((prev) => prev.map((c) => (c.chapterId === id ? { ...c, accepted } : c)));
 
-  const acceptAll = () =>
+  const acceptAll = () => {
     setChapters((prev) => prev.map((c) => (c.status === 'done' ? { ...c, accepted: true } : c)));
+    toast.success('Toutes les corrections sont retenues pour l\'export.');
+  };
 
-  /** Texte retenu pour l'export : corrigé si accepté, sinon l'original intact. */
+  /** Refuse (ou rétablit) une correction précise : le mot d'origine revient dans le texte. */
+  const toggleCorrection = (id: string, corrIndex: number) =>
+    setChapters((prev) => prev.map((c) => {
+      if (c.chapterId !== id) return c;
+      const rejected = c.rejected || [];
+      const next = rejected.includes(corrIndex)
+        ? rejected.filter((i) => i !== corrIndex)
+        : [...rejected, corrIndex];
+      return { ...c, rejected: next, accepted: true };
+    }));
+
+  const openEditor = (c: ChapterProofread) => {
+    setEditingChapter(c.chapterId);
+    setEditDraft(effectiveText(c));
+  };
+
+  const saveEdit = (id: string) => {
+    setChapters((prev) => prev.map((c) => (c.chapterId === id ? { ...c, edited: editDraft, accepted: true } : c)));
+    setEditingChapter(null);
+    toast.success('Votre version manuelle est enregistrée pour ce chapitre.');
+  };
+
+  const resetEdit = (id: string) => {
+    setChapters((prev) => prev.map((c) => (c.chapterId === id ? { ...c, edited: undefined } : c)));
+    setEditingChapter(null);
+    toast.info('Version manuelle supprimée — la correction IA est rétablie.');
+  };
+
+  /** Texte retenu pour l'export : version manuelle, puis corrigé accepté, sinon l'original. */
   const finalChapters = useMemo(
     () => chapters.map((c) => ({
       title: c.title || `Chapitre ${c.index + 1}`,
-      content: c.accepted && c.corrected ? c.corrected : c.original,
+      content: effectiveText(c),
       subChapters: [] as { title: string; content?: string }[],
     })),
     [chapters],
   );
+
 
   const exportWord = useCallback(async () => {
     if (!manuscript) return;
