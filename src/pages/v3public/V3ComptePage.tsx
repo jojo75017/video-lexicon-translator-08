@@ -16,7 +16,7 @@ export default function V3ComptePage() {
   const [email, setEmail] = useState<string | null>(null);
   const [projects, setProjects] = useState<ProjectRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [plan, setPlan] = useState<"debutant" | "expert" | "auteur" | null>(null);
+  const [plan, setPlan] = useState<"plume" | "edition" | null>(null);
   const [geminiKeys, setGeminiKeys] = useState<string[]>([]);
 
   useEffect(() => {
@@ -40,9 +40,8 @@ export default function V3ComptePage() {
           .eq("user_id", user.id)
           .maybeSingle();
         const tier = (sub?.plan_tier ?? "").toLowerCase();
-        if (tier.includes("auteur")) setPlan("auteur");
-        else if (tier.includes("expert")) setPlan("expert");
-        else if (tier.includes("debutant") || tier.includes("débutant")) setPlan("debutant");
+        if (tier.includes("edition") || tier.includes("édition") || tier.includes("editeur") || tier.includes("auteur")) setPlan("edition");
+        else if (tier) setPlan("plume");
       }
 
       // Load Gemini keys from localStorage (BYOK)
