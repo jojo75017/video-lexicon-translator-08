@@ -690,13 +690,13 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
     const activeCoverUrl = coverUrlOverride ?? coverUrl;
     const completed = completedBookOverride || completedBook;
     const completedChapters = Array.isArray(completed?.chapters)
-      ? completed.chapters.map((chapter: any, index: number) => ({
-          number: Number(chapter.number || chapter.numero || index + 1),
-          title: cleanText(chapter.title || chapter.titre || normalizedOutline[index]?.titre || `Partie ${index + 1}`),
-          content: String(chapter.content || chapter.contenu || '').trim(),
-          incomplete: Boolean(chapter.incomplete),
-        }))
+      ? normalizeManuscript(completed.chapters, {
+          expectedCount: chapters,
+          outline: normalizedOutline,
+          bookTitle: resolvedTitle,
+        })
       : [];
+
 
     const projectPayload = {
       title: resolvedTitle,
