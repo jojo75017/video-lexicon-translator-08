@@ -248,13 +248,7 @@ function V3PlanTestModal({ open, onClose }: { open: boolean; onClose: () => void
 
 export default function V3ForfaitsPage() {
   const [interval, setInterval] = useState<V3BillingInterval>("month");
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [showPayPalTest, setShowPayPalTest] = useState(false);
-  const [showPlanTest, setShowPlanTest] = useState(false);
 
-  useEffect(() => {
-    getIsCurrentSessionAdmin().then(setIsAdmin);
-  }, []);
 
   return (
     <div className="min-h-screen py-12 px-4" style={{ background: "#FAFAFA" }}>
