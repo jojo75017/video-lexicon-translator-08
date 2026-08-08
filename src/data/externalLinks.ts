@@ -33,10 +33,13 @@ export function commanderUrl(src?: string, ref?: string): string {
 }
 
 /**
- * KDP Pilot — outil tiers de suivi des données Amazon (lien de suivi partenaire).
- * Le lien n'est jamais affiché à l'écran : on l'ouvre uniquement via `openKdpPilot()`.
+ * KDP Pilot — outil tiers PAYANT de suivi des données Amazon (lien partenaire).
+ * Le lien est vérifié et fonctionnel. Code promo réservé aux abonnés EbookStudio :
+ * 15 % de réduction sur le 1er mois ou la 1re année.
  */
 export const KDP_PILOT_URL = 'https://kdp-pilot.com?fpr=georges53';
+export const KDP_PILOT_PROMO_CODE = 'PROMO15';
+
 
 export function openKdpPilot(): void {
   window.open(KDP_PILOT_URL, '_blank', 'noopener,noreferrer');
