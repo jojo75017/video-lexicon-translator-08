@@ -104,7 +104,9 @@ export const V2_TOOLS: V2Tool[] = [
 
   // — Analyse & Audit —
   { id: 'audit-pilot', label: 'Audit Pilot', description: 'Audit complet de votre manuscrit avant publication.', route: '/audit-pilot', icon: BarChart3, category: 'analyse', image: IMG.analyse },
+  { id: 'correcteur-livre', label: 'Corriger mon livre', description: 'Importez un manuscrit terminé : correction intégrale chapitre par chapitre, relecture et export KDP.', route: '/v3/corriger', icon: Wand2, category: 'analyse', badge: 'Nouveau', image: IMG.analyse },
   { id: 'bookperfect', label: 'BookPerfect AI', description: 'Correction et polissage IA de votre manuscrit.', route: '/bookperfect', icon: Sparkles, category: 'analyse', badge: 'Populaire', image: IMG.analyse },
+
   { id: 'resultat-5min', label: 'Résultat en 5 min', description: 'Diagnostic express de votre projet livre.', route: '/resultat-en-5-min', icon: Zap, category: 'analyse', image: IMG.analyse },
   { id: 'fiches-pratiques', label: 'Fiches pratiques', description: 'Modèles et fiches méthodologiques.', route: '/fiches-pratiques', icon: FileText, category: 'analyse', image: IMG.analyse },
 
