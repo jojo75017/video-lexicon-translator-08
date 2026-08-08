@@ -141,9 +141,8 @@ export default function AdminPlansV3Page() {
                   <tr key={row.letter} className={idx % 2 === 1 ? "bg-muted/30" : ""}>
                     <td className="px-4 py-3 font-bold text-muted-foreground">{row.letter}</td>
                     <td className="px-4 py-3 font-medium">{row.domain}</td>
-                    <td className="px-4 py-3 text-center">{renderCell(row.debutant)}</td>
-                    <td className="px-4 py-3 text-center">{renderCell(row.expert)}</td>
-                    <td className="px-4 py-3 text-center">{renderCell(row.auteur)}</td>
+                    <td className="px-4 py-3 text-center">{renderCell(row.plume)}</td>
+                    <td className="px-4 py-3 text-center">{renderCell(row.edition)}</td>
                   </tr>
                 ))}
               </tbody>
