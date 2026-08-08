@@ -81,6 +81,8 @@ const V3AuthorSettingsPage = lazy(() => import('./pages/v3public/V3AuthorSetting
 // Files kept in src/pages/v3public/ for reference; remove after Oct 2026 launch if unused.
 const V3TocUltimatePage = lazy(() => import('./pages/v3public/V3TocUltimatePage'));
 const V3TranslatorPage = lazy(() => import('./pages/v3public/V3TranslatorPage'));
+const V3CorrecteurPage = lazy(() => import('./pages/v3public/V3CorrecteurPage'));
+
 const V3ToolsIndexPage = lazy(() => import('./pages/v3public/V3ToolsIndexPage'));
 const V3ComptePage = lazy(() => import('./pages/v3public/V3ComptePage'));
 const V3PourquoiPage = lazy(() => import('./pages/v3public/V3PourquoiPage'));
@@ -546,6 +548,9 @@ const App = () => {
               <Route path="outils" element={<V3LockedGate><V3ToolsIndexPage /></V3LockedGate>} />
               <Route path="outils/sommaire-ultime" element={<V3LockedGate><V3TocUltimatePage /></V3LockedGate>} />
               <Route path="outils/traduction" element={<V3LockedGate><V3TranslatorPage /></V3LockedGate>} />
+              <Route path="corriger" element={<V3LockedGate><V3CorrecteurPage /></V3LockedGate>} />
+              <Route path="correcteur" element={<Navigate to="/v3/corriger" replace />} />
+
               <Route path="compte" element={<V3LockedGate><V3ComptePage /></V3LockedGate>} />
               {/* Page des 2 forfaits : toujours visible (vitrine tarifaire) */}
               <Route path="forfaits" element={<V3ForfaitsPage />} />

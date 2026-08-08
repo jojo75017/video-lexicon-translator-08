@@ -12,7 +12,8 @@ serve(async (req) => {
   }
 
   try {
-    const { chapterTitle, chapterContent } = await req.json();
+    const { chapterTitle, chapterContent, mode } = await req.json();
+    const polish = mode === 'polish';
 
     if (!chapterContent || chapterContent.length < 20) {
       return new Response(
@@ -26,9 +27,7 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY non configurée");
     }
 
-    const systemPrompt = `Tu es un correcteur éditorial professionnel francophone. Tu appliques une correction STRICTE sans aucune réécriture.
-
-RÈGLES ABSOLUES — TU NE DOIS JAMAIS :
+    const strictRules = `RÈGLES ABSOLUES — TU NE DOIS JAMAIS :
 - Modifier l'intrigue ou le sens
 - Ajouter du contenu
 - Supprimer des passages
@@ -46,7 +45,30 @@ TU DOIS UNIQUEMENT :
 6. Harmoniser les temps narratifs UNIQUEMENT en cas d'incohérence manifeste
 7. Alléger les répétitions UNIQUEMENT si elles sont manifestement fautives (même mot 3+ fois dans la même phrase/paragraphe immédiat)
 
-Le style de l'auteur doit rester STRICTEMENT identique.
+Le style de l'auteur doit rester STRICTEMENT identique.`;
+
+    const polishRules = `RÈGLES ABSOLUES — TU NE DOIS JAMAIS :
+- Modifier l'intrigue, les faits ou le sens
+- Ajouter une idée, une scène ou un personnage
+- Supprimer un passage narratif
+- Changer la structure des chapitres
+- Réécrire les dialogues sur le fond (seule la forme est corrigée)
+
+TU DOIS :
+1. Corriger l'orthographe, la grammaire, les accords et la ponctuation
+2. Supprimer les anglicismes involontaires
+3. Alléger les répétitions de mots et de tournures
+4. Alléger les lourdeurs : phrases trop longues coupées, adverbes inutiles retirés, voix passive remplacée quand c'est plus net
+5. Harmoniser les temps narratifs sur l'ensemble du chapitre
+6. Fluidifier les enchaînements entre paragraphes sans changer leur contenu
+
+La voix de l'auteur doit rester reconnaissable : polissage, pas réécriture.
+Le nombre de mots doit rester dans une marge de ±10 % du texte original.`;
+
+    const systemPrompt = `Tu es un correcteur éditorial professionnel francophone. Tu appliques une correction ${polish ? 'STRICTE PUIS un polissage de style mesuré' : 'STRICTE sans aucune réécriture'}.
+
+${polish ? polishRules : strictRules}
+
 Le texte corrigé doit être prêt pour publication Amazon KDP.
 
 FORMAT DE RÉPONSE — JSON STRICT :
@@ -54,7 +76,7 @@ FORMAT DE RÉPONSE — JSON STRICT :
   "texteCorrige": "Le texte intégral corrigé",
   "corrections": [
     {
-      "type": "orthographe|grammaire|accord|ponctuation|anglicisme|temps|repetition",
+      "type": "orthographe|grammaire|accord|ponctuation|anglicisme|temps|repetition|style",
       "original": "texte original fautif",
       "corrige": "texte corrigé",
       "explication": "brève explication de la correction"
@@ -64,7 +86,8 @@ FORMAT DE RÉPONSE — JSON STRICT :
   "qualiteOrthographe": 95
 }`;
 
-    const userPrompt = `Corrige ce chapitre en respectant STRICTEMENT les consignes de correction éditoriale (zéro réécriture, zéro ajout, zéro suppression) :
+
+    const userPrompt = `Corrige ce chapitre en respectant STRICTEMENT les consignes ${polish ? 'de correction et de polissage (zéro ajout d\'idée, zéro suppression de passage)' : 'de correction éditoriale (zéro réécriture, zéro ajout, zéro suppression)'} :
 
 ${chapterTitle ? `Titre du chapitre : "${chapterTitle}"\n` : ''}
 ---

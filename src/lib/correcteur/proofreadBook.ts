@@ -1,0 +1,143 @@
+/**
+ * Correction intégrale d'un manuscrit importé, chapitre par chapitre.
+ * Appelle l'edge function `strict-proofread` (IA réelle, aucune simulation),
+ * séquentiellement, avec relance automatique en cas de limite de débit.
+ */
+import { supabase } from '@/integrations/supabase/client';
+
+export type ProofreadMode = 'strict' | 'polish';
+
+export interface Correction {
+  type: string;
+  original: string;
+  corrige: string;
+  explication?: string;
+}
+
+export interface ChapterProofread {
+  chapterId: string;
+  index: number;
+  title: string;
+  original: string;
+  corrected: string;
+  corrections: Correction[];
+  quality: number;
+  status: 'pending' | 'running' | 'done' | 'failed';
+  /** L'auteur a validé le texte corrigé pour ce chapitre. */
+  accepted: boolean;
+  error?: string;
+}
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+export const CORRECTION_TYPE_LABELS: Record<string, string> = {
+  orthographe: 'Orthographe',
+  grammaire: 'Grammaire',
+  accord: 'Accords',
+  ponctuation: 'Ponctuation',
+  anglicisme: 'Anglicismes',
+  temps: 'Temps narratifs',
+  repetition: 'Répétitions',
+  style: 'Style',
+};
+
+/** Corrige un seul chapitre. Relance jusqu'à 3 fois si la limite de débit est atteinte. */
+export async function proofreadChapter(
+  title: string,
+  content: string,
+  mode: ProofreadMode,
+): Promise<{ corrected: string; corrections: Correction[]; quality: number }> {
+  let lastError = '';
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const { data, error } = await supabase.functions.invoke('strict-proofread', {
+      body: { chapterTitle: title, chapterContent: content, mode },
+    });
+
+    if (!error && data && !data.error) {
+      const corrected = String(data.texteCorrige || '').trim();
+      if (!corrected) throw new Error('La correction est revenue vide.');
+      return {
+        corrected,
+        corrections: Array.isArray(data.corrections) ? data.corrections : [],
+        quality: Number(data.qualiteOrthographe) || 0,
+      };
+    }
+
+    const message = String(data?.error || error?.message || 'Erreur de correction');
+    lastError = message;
+
+    // Limite de débit : on patiente puis on réessaie.
+    if (/429|limite|rate/i.test(message)) {
+      await sleep(4000 * (attempt + 1));
+      continue;
+    }
+    // Crédits épuisés : inutile d'insister.
+    if (/402|crédit/i.test(message)) throw new Error(message);
+    await sleep(1500);
+  }
+  throw new Error(lastError || 'Correction impossible après plusieurs tentatives.');
+}
+
+export interface ProofreadProgress {
+  index: number;
+  total: number;
+  chapter: ChapterProofread;
+}
+
+/**
+ * Corrige une liste de chapitres en série. `onProgress` est appelé après chaque
+ * chapitre pour que l'interface affiche l'avancement en direct.
+ * `shouldStop` permet d'interrompre proprement sans perdre le travail déjà fait.
+ */
+export async function proofreadChapters(
+  chapters: ChapterProofread[],
+  mode: ProofreadMode,
+  onProgress: (p: ProofreadProgress) => void,
+  shouldStop?: () => boolean,
+): Promise<void> {
+  for (let i = 0; i < chapters.length; i++) {
+    if (shouldStop?.()) return;
+    const chapter = chapters[i];
+    if (chapter.status === 'done') continue;
+
+    onProgress({ index: i, total: chapters.length, chapter: { ...chapter, status: 'running' } });
+
+    try {
+      const res = await proofreadChapter(chapter.title, chapter.original, mode);
+      onProgress({
+        index: i,
+        total: chapters.length,
+        chapter: {
+          ...chapter,
+          status: 'done',
+          corrected: res.corrected,
+          corrections: res.corrections,
+          quality: res.quality,
+        },
+      });
+    } catch (e: any) {
+      onProgress({
+        index: i,
+        total: chapters.length,
+        chapter: { ...chapter, status: 'failed', error: e?.message || 'Erreur inconnue' },
+      });
+      // Crédits épuisés : on arrête toute la série.
+      if (/402|crédit/i.test(String(e?.message))) return;
+    }
+    await sleep(600);
+  }
+}
+
+/** Répartition des corrections par type, pour le rapport final. */
+export function correctionBreakdown(chapters: ChapterProofread[]): { type: string; label: string; count: number }[] {
+  const map = new Map<string, number>();
+  chapters.forEach((c) =>
+    c.corrections.forEach((corr) => {
+      const key = (corr.type || 'autre').toLowerCase();
+      map.set(key, (map.get(key) || 0) + 1);
+    }),
+  );
+  return Array.from(map.entries())
+    .map(([type, count]) => ({ type, label: CORRECTION_TYPE_LABELS[type] || 'Autres', count }))
+    .sort((a, b) => b.count - a.count);
+}
