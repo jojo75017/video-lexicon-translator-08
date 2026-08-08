@@ -539,15 +539,17 @@ const App = () => {
               <Route path="mes-livres" element={<V3LockedGate><V3BookManagerPage /></V3LockedGate>} />
               <Route path="parametres" element={<V3LockedGate><V3AuthorSettingsPage /></V3LockedGate>} />
               <Route path="livres/:type" element={<V3LockedGate><V3SpecialBookPage /></V3LockedGate>} />
-              <Route path="offres" element={<Navigate to="/v3/offre" replace />} />
-              <Route path="offres/merci" element={<Navigate to="/v3/offre" replace />} />
+              <Route path="offres" element={<Navigate to="/v3/forfaits" replace />} />
+              <Route path="offres/merci" element={<Navigate to="/v3/forfaits" replace />} />
 
               <Route path="recherche" element={<V3LockedGate><V3RecherchePage /></V3LockedGate>} />
               <Route path="outils" element={<V3LockedGate><V3ToolsIndexPage /></V3LockedGate>} />
               <Route path="outils/sommaire-ultime" element={<V3LockedGate><V3TocUltimatePage /></V3LockedGate>} />
               <Route path="outils/traduction" element={<V3LockedGate><V3TranslatorPage /></V3LockedGate>} />
               <Route path="compte" element={<V3LockedGate><V3ComptePage /></V3LockedGate>} />
-              <Route path="forfaits" element={<V3LockedGate><V3ForfaitsPage /></V3LockedGate>} />
+              {/* Page des 2 forfaits : toujours visible (vitrine tarifaire) */}
+              <Route path="forfaits" element={<V3ForfaitsPage />} />
+              <Route path="tarifs" element={<Navigate to="/v3/forfaits" replace />} />
               <Route path="paypal-retour" element={<V3LockedGate><V3PayPalReturnPage /></V3LockedGate>} />
               <Route path="script-heygen" element={<V3LockedGate><V3ScriptHeygenPage /></V3LockedGate>} />
               <Route path="upsell-17" element={<V3LockedGate><V3Upsell17Page /></V3LockedGate>} />
