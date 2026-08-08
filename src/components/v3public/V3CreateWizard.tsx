@@ -7,6 +7,8 @@ import { ApiProviderQuickSettings } from '@/components/ebook/ApiProviderQuickSet
 import V3ExportPanel from '@/components/admin/V3ExportPanel';
 import V3KdpPublishPanel from '@/components/v3public/V3KdpPublishPanel';
 import { supabase } from '@/integrations/supabase/client';
+import { normalizeManuscript } from '@/utils/manuscriptNormalizer';
+
 import { invokeImageFunction } from '@/lib/aiImageInvoke';
 import { callAIWriting, getProvider, getProviderKey, validateKeyFormat } from '@/services/aiWritingService';
 import TocUltimateGenerator, { type UltimateTocChapter } from '@/components/tools/TocUltimateGenerator';
@@ -107,6 +109,8 @@ function isGenericTitle(value: unknown) {
 
 function buildFallbackOutline(title: string, category: string, count: number): OutlineChapter[] {
   const subject = cleanText(title) || cleanText(category) || 'le projet';
+  void subject;
+
   const isFiction = /roman|thriller|policier|romance|fantasy|fantastique|science|fiction|jeunesse|enfants/i.test(category);
   const fictionTemplates = [
     ['L’appel de Montferrand', 'Ouvrir le récit par une image forte, un lieu, une attente et une tension immédiate.'],
@@ -176,13 +180,19 @@ function buildFallbackOutline(title: string, category: string, count: number): O
 
   return Array.from({ length: count }, (_, index) => {
     const [prefix, objectif] = templates[index % templates.length];
+    const cycle = Math.floor(index / templates.length);
+    // Pas de suffixe « 2 » et pas de titre du livre collé à chaque chapitre :
+    // au-delà du premier cycle on produit une variante réellement différente.
+    const cycleVariants = ['', 'seconde vague', 'contre-courant', 'dernier acte'];
+    const variant = cycleVariants[cycle] || `variation ${cycle}`;
     return {
       id: makeId(),
       numero: index + 1,
-      titre: index < templates.length ? `${prefix} — ${subject}` : `${prefix} ${Math.floor(index / templates.length) + 1} — ${subject}`,
+      titre: cycle === 0 ? prefix : `${prefix} — ${variant}`,
       objectif,
     };
   });
+
 }
 
 function hasRepeatedFallbackTitles(items: OutlineChapter[], expectedCount: number) {
@@ -682,13 +692,13 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
     const activeCoverUrl = coverUrlOverride ?? coverUrl;
     const completed = completedBookOverride || completedBook;
     const completedChapters = Array.isArray(completed?.chapters)
-      ? completed.chapters.map((chapter: any, index: number) => ({
-          number: Number(chapter.number || chapter.numero || index + 1),
-          title: cleanText(chapter.title || chapter.titre || normalizedOutline[index]?.titre || `Partie ${index + 1}`),
-          content: String(chapter.content || chapter.contenu || '').trim(),
-          incomplete: Boolean(chapter.incomplete),
-        }))
+      ? normalizeManuscript(completed.chapters, {
+          expectedCount: chapters,
+          outline: normalizedOutline,
+          bookTitle: resolvedTitle,
+        })
       : [];
+
 
     const projectPayload = {
       title: resolvedTitle,
@@ -937,17 +947,12 @@ Règles :
       const rawCh = (p4?.chapitres || p5?.chapitresFinal || []) as any[];
       const p3Ch = Array.isArray(p3?.chapitres) ? p3.chapitres : [];
       if (rawCh.length === 0 && p3Ch.length === 0) return null;
-      const byNum = new Map<number, any>();
-      rawCh.forEach((ch, i) => byNum.set(ch?.numero || ch?.number || i + 1, ch));
-      const total = Math.max(chapters || 0, rawCh.length, p3Ch.length);
-      const out: any[] = [];
-      for (let i = 1; i <= total; i++) {
-        const ch = byNum.get(i);
-        const p3m = p3Ch.find((p: any) => (p.numero || 0) === i) || p3Ch[i - 1];
-        const title = cleanText(ch?.titre || ch?.title || p3m?.titre || p3m?.title || `Chapitre ${i}`);
-        const content = String(ch?.contenu || ch?.content || '').trim();
-        out.push({ number: i, title, content, incomplete: !content });
-      }
+      const out = normalizeManuscript(rawCh, {
+        expectedCount: chapters,
+        outline: p3Ch.length > 0 ? p3Ch : normalizedOutline,
+        bookTitle: finalTitle || title,
+      });
+
       return {
         chapters: out,
         conclusion: '',

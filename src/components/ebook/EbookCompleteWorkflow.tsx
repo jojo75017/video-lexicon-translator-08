@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { normalizeManuscript } from '@/utils/manuscriptNormalizer';
+
 import { motion } from 'framer-motion';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -1364,37 +1366,19 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
         chapters: (() => {
           const rawChapters = (context.P4?.chapitres || context.P5?.chapitresFinal || []) as any[];
           const p3Chapters = Array.isArray(context.P3?.chapitres) ? context.P3.chapitres : [];
-          const byNumber = new Map<number, any>();
-          rawChapters.forEach((ch: any, idx: number) => {
-            const num = ch?.numero || ch?.number || idx + 1;
-            byNumber.set(num, ch);
+          const out = normalizeManuscript(rawChapters, {
+            expectedCount: numberOfChapters,
+            outline: p3Chapters,
+            bookTitle: title,
+            placeholder: (num) => `[Chapitre ${num} — à regénérer]\n\nCe chapitre n'a pas été produit par le workflow. Relance ce chapitre depuis l'onglet Rédaction pour compléter le manuscrit avant export.`,
           });
-          const total = Math.max(numberOfChapters || 0, rawChapters.length, p3Chapters.length);
-          const out: Array<{ number: number; title: string; content: string; incomplete?: boolean }> = [];
-          for (let i = 1; i <= total; i++) {
-            const ch = byNumber.get(i);
-            const p3Match = p3Chapters.find((p: any) => (p.numero || 0) === i) || p3Chapters[i - 1];
-            const resolvedTitle =
-              ch?.titre || ch?.title ||
-              p3Match?.titre || p3Match?.title ||
-              `Chapitre ${i}`;
-            const content = (ch?.contenu || ch?.content || '').toString();
-            const incomplete = !ch || !content.trim();
-            out.push({
-              number: i,
-              title: resolvedTitle,
-              content: incomplete
-                ? `[Chapitre ${i} — à regénérer]\n\nCe chapitre n'a pas été produit par le workflow. Relance ce chapitre depuis l'onglet Rédaction pour compléter le manuscrit avant export.`
-                : content,
-              incomplete,
-            });
-          }
           const missing = out.filter((c) => c.incomplete).map((c) => c.number);
           if (missing.length > 0) {
             toast.warning(`⚠️ ${missing.length} chapitre(s) manquant(s) : ${missing.join(', ')}. Un placeholder a été inséré pour éviter les trous à l'export.`);
           }
           return out;
         })(),
+
         conclusion: context.P8?.verdict || '',
         marketPositioning: context.P2 || {},
         backCover: {

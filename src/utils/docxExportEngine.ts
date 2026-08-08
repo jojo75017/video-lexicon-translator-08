@@ -65,6 +65,9 @@ export interface DocxExportOptions {
   includePageNumbers?: boolean;
   includeCopyrightPage?: boolean;
   pageFormat?: '6x9' | 'a4' | 'letter';
+  /** Nombre de chapitres demandé par l'auteur : plafond dur du sommaire et de l'export. */
+  expectedChapterCount?: number;
+
 }
 
 export interface DocxOutlineEntry {
@@ -402,8 +405,11 @@ export function validateDocxChapters(chapters: DocxChapter[]): DocxValidationRes
 }
 
 /** Source unique du sommaire et des chapitres exportés. */
-function prepareRenderableChapters(chapters: DocxChapter[]) {
-  return (chapters || [])
+function prepareRenderableChapters(chapters: DocxChapter[], expectedCount?: number) {
+  const seenContent = new Set<string>();
+  const seenStubTitles = new Set<string>();
+
+  const prepared = (chapters || [])
     .map((chapter, sourceIndex) => {
       const resolved = resolveChapter(chapter, sourceIndex);
       const validSubChapters = (chapter.subChapters || []).filter((sub) => meaningfulText(sub.content).length > 0);
@@ -415,17 +421,37 @@ function prepareRenderableChapters(chapters: DocxChapter[]) {
         0,
       );
       const hasContent = meaningfulText(entry.body).length > 0 || subContent > 0;
-      // Un chapitre sans texte reste dans le livre (zone à compléter) : on ne perd jamais de chapitre.
-      return { ...entry, hasContent, keep: true, isStub: !hasContent };
-    })
-    .filter((entry) => entry.keep)
+      const normalizedTitle = (entry.displayTitle || '').toLowerCase().replace(/\s+/g, ' ').trim();
+      const signature = meaningfulText(entry.body).slice(0, 300).toLowerCase().replace(/\s+/g, ' ').trim();
 
-    .map((entry, index) => ({ ...entry, num: index + 1 }));
+      // Anti-doublon : deux fois le même chapitre (même texte) = une seule entrée.
+      let keep = true;
+      if (hasContent && signature) {
+        if (seenContent.has(signature)) keep = false;
+        else seenContent.add(signature);
+      }
+      // Un chapitre vide qui répète le titre d'un autre chapitre vide est un artefact de fusion.
+      if (keep && !hasContent && normalizedTitle) {
+        if (seenStubTitles.has(normalizedTitle)) keep = false;
+        else seenStubTitles.add(normalizedTitle);
+      }
+
+      // Un chapitre sans texte reste dans le livre (zone à compléter) : on ne perd jamais de chapitre.
+      return { ...entry, hasContent, keep, isStub: !hasContent };
+    })
+    .filter((entry) => entry.keep);
+
+  // Plafond dur : jamais plus de chapitres que ce que l'auteur a demandé.
+  const capped = expectedCount && expectedCount > 0 ? prepared.slice(0, expectedCount) : prepared;
+
+  return capped.map((entry, index) => ({ ...entry, num: index + 1 }));
 }
 
 
-export function getDocxOutline(chapters: DocxChapter[]): DocxOutlineEntry[] {
-  return prepareRenderableChapters(chapters).map(({ chapter, num, displayTitle }) => ({
+
+export function getDocxOutline(chapters: DocxChapter[], expectedCount?: number): DocxOutlineEntry[] {
+  return prepareRenderableChapters(chapters, expectedCount).map(({ chapter, num, displayTitle }) => ({
+
     number: num,
     title: isGenericTitle(displayTitle) ? `Chapitre ${num}` : `Chapitre ${num} – ${displayTitle}`,
     subChapters: chapter.subChapters
@@ -710,6 +736,8 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
     includePageNumbers = true,
     includeCopyrightPage = true,
     pageFormat = '6x9',
+    expectedChapterCount,
+
   } = options;
 
   const audit = validateDocxChapters(chapters);
@@ -783,7 +811,7 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
   }
 
   // ═══ CHAPITRES RETENUS (numérotation continue, sans trous) ═══
-  const renderChapters = prepareRenderableChapters(chapters);
+  const renderChapters = prepareRenderableChapters(chapters, expectedChapterCount);
 
   if (renderChapters.length === 0) {
     throw new Error("Export impossible : aucun chapitre rédigé n'a été détecté. Rechargez le manuscrit ou générez ses chapitres avant de télécharger le DOCX.");
