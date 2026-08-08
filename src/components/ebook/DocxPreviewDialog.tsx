@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { saveAs } from 'file-saver';
-import { Loader2, Download, FileText, AlertTriangle } from 'lucide-react';
+import { Loader2, Download, FileText, AlertTriangle, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { generateProfessionalDocx, getDocxOutline, validateDocxChapters, type DocxExportOptions, type DocxValidationResult } from '@/utils/docxExportEngine';
+import { generateProfessionalDocx, getDocxOutline, validateDocxChapters, isGenericTitle, type DocxExportOptions, type DocxValidationResult } from '@/utils/docxExportEngine';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 interface DocxPreviewDialogProps {
@@ -26,6 +27,65 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
   const [error, setError] = useState<string | null>(null);
   const [toc, setToc] = useState<string[]>([]);
   const [audit, setAudit] = useState<DocxValidationResult | null>(null);
+  /** Titres générés par l'IA pour les chapitres sans titre (numéro → titre). */
+  const [titleOverrides, setTitleOverrides] = useState<Record<number, string>>({});
+  const [naming, setNaming] = useState(false);
+
+  /** Options d'export enrichies des titres générés. */
+  const resolveOptions = useCallback((): DocxExportOptions => {
+    const options = getOptions();
+    if (!Object.keys(titleOverrides).length) return options;
+    return {
+      ...options,
+      chapters: (options.chapters || []).map((chapter, index) => {
+        const override = titleOverrides[index + 1];
+        return override ? { ...chapter, title: override } : chapter;
+      }),
+    };
+  }, [getOptions, titleOverrides]);
+
+  const missingTitles = useMemo(
+    () => (audit?.chapters || []).filter((c) => isGenericTitle(c.title)).map((c) => c.number),
+    [audit],
+  );
+
+  const handleGenerateTitles = async () => {
+    const options = resolveOptions();
+    const chapters = options.chapters || [];
+    const payload = chapters
+      .map((chapter, index) => ({ number: index + 1, chapter }))
+      .filter(({ number }) => missingTitles.includes(number))
+      .map(({ number, chapter }) => ({ number, excerpt: (chapter.content || '').slice(0, 900) }))
+      .filter((c) => c.excerpt.trim().length > 50);
+
+    if (!payload.length) {
+      toast.info('Aucun chapitre à nommer.');
+      return;
+    }
+
+    setNaming(true);
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke('v3-generate-chapter-titles', {
+        body: { bookTitle: options.title, chapters: payload },
+      });
+      if (fnError) throw fnError;
+      const titles: { number: number; title: string }[] = data?.titles || [];
+      if (!titles.length) throw new Error("L'IA n'a renvoyé aucun titre");
+      setTitleOverrides((prev) => {
+        const next = { ...prev };
+        titles.forEach((t) => {
+          if (t?.title) next[t.number] = t.title;
+        });
+        return next;
+      });
+      toast.success(`${titles.length} titre(s) de chapitre généré(s)`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Génération des titres impossible');
+    } finally {
+      setNaming(false);
+    }
+  };
+
 
   useEffect(() => {
     if (!open) {
@@ -33,8 +93,10 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
       setError(null);
       setToc([]);
       setAudit(null);
+      setTitleOverrides({});
       return;
     }
+
 
     let cancelled = false;
 
@@ -42,7 +104,8 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
       setLoading(true);
       setError(null);
       try {
-        const options = getOptions();
+        const options = resolveOptions();
+
         const validation = validateDocxChapters(options.chapters || []);
         setAudit(validation);
         setToc(getDocxOutline(options.chapters || []).flatMap((entry) => [
@@ -85,7 +148,7 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
     return () => {
       cancelled = true;
     };
-  }, [open, getOptions]);
+  }, [open, resolveOptions]);
 
   const handleDownload = () => {
     if (!blob) return;
@@ -117,7 +180,19 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
                 {audit ? `${audit.readyCount}/${audit.totalCount} prêts` : toc.length}
               </Badge>
             </div>
+            {missingTitles.length > 0 && (
+              <div className="px-3 py-3 border-b bg-muted/40 space-y-2">
+                <p className="text-xs text-muted-foreground">
+                  {missingTitles.length} chapitre(s) sans titre. L'IA peut les nommer d'après leur contenu.
+                </p>
+                <Button size="sm" className="w-full gap-2" onClick={handleGenerateTitles} disabled={naming || loading}>
+                  {naming ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                  {naming ? 'Génération…' : 'Générer les titres manquants'}
+                </Button>
+              </div>
+            )}
             <div className="flex-1 overflow-auto">
+
               <div className="p-3 space-y-2 text-xs">
                 {audit?.chapters.map((chapter) => (
                   <div key={chapter.number} className={`rounded-md border p-2 ${chapter.valid ? 'border-border' : 'border-destructive/40 bg-destructive/5'}`}>
