@@ -176,13 +176,19 @@ function buildFallbackOutline(title: string, category: string, count: number): O
 
   return Array.from({ length: count }, (_, index) => {
     const [prefix, objectif] = templates[index % templates.length];
+    const cycle = Math.floor(index / templates.length);
+    // Pas de suffixe « 2 » et pas de titre du livre collé à chaque chapitre :
+    // au-delà du premier cycle on produit une variante réellement différente.
+    const cycleVariants = ['', 'seconde vague', 'contre-courant', 'dernier acte'];
+    const variant = cycleVariants[cycle] || `variation ${cycle}`;
     return {
       id: makeId(),
       numero: index + 1,
-      titre: index < templates.length ? `${prefix} — ${subject}` : `${prefix} ${Math.floor(index / templates.length) + 1} — ${subject}`,
+      titre: cycle === 0 ? prefix : `${prefix} — ${variant}`,
       objectif,
     };
   });
+
 }
 
 function hasRepeatedFallbackTitles(items: OutlineChapter[], expectedCount: number) {
