@@ -279,6 +279,11 @@ export default function V3HomePage() {
         </a>
       </section>
 
+      {/* KDP Pilot — outil partenaire payant + code abonnés (mis en évidence) */}
+      <section className="max-w-6xl mx-auto px-5 md:px-8 pt-6 pb-2">
+        <KdpPilotPromoBanner variant="light" />
+      </section>
+
       {/* 6 CATÉGORIES PREMIUM */}
       <section className="max-w-7xl mx-auto px-5 md:px-8 py-16">
         <div className="text-center mb-10">
@@ -440,10 +445,6 @@ export default function V3HomePage() {
         </div>
       </section>
 
-      {/* KDP Pilot — outil partenaire payant + code abonnés */}
-      <section className="max-w-6xl mx-auto px-5 md:px-8 pt-14">
-        <KdpPilotPromoBanner />
-      </section>
 
       {/* CTA final */}
 
