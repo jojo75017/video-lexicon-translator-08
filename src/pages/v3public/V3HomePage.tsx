@@ -438,7 +438,13 @@ export default function V3HomePage() {
         </div>
       </section>
 
+      {/* KDP Pilot — outil partenaire payant + code abonnés */}
+      <section className="max-w-6xl mx-auto px-5 md:px-8 pt-14">
+        <KdpPilotPromoBanner />
+      </section>
+
       {/* CTA final */}
+
       <section className="max-w-5xl mx-auto px-5 md:px-8 py-20 text-center">
         <div className="v3-card">
           <div className="w-12 h-12 rounded-xl grid place-items-center mx-auto" style={{ background: 'var(--v3-gold-soft)' }}>
