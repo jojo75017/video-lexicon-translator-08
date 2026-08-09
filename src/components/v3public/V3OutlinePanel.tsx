@@ -19,7 +19,10 @@ import {
 type Props = {
   brief: BookBrief;
   onChange: (patch: Partial<BookBrief>) => void;
+  /** Mode préselectionné (ex. `guided` via /v3/create?sommaire=ia). */
+  initialMode?: 'full' | 'guided';
 };
+
 
 type OutlineMode = 'full' | 'guided';
 type Suggestion = { titre: string; objectif?: string };
@@ -28,11 +31,12 @@ type Suggestion = { titre: string; objectif?: string };
  * Sommaire du livre — deux modes : proposition complète éditable, ou dialogue
  * chapitre par chapitre avec l'IA. Le sommaire validé pilote le workflow.
  */
-export default function V3OutlinePanel({ brief, onChange }: Props) {
+export default function V3OutlinePanel({ brief, onChange, initialMode }: Props) {
   const [loading, setLoading] = useState(false);
   const [pasteOpen, setPasteOpen] = useState(false);
   const [pasteText, setPasteText] = useState('');
-  const [mode, setMode] = useState<OutlineMode>('full');
+  const [mode, setMode] = useState<OutlineMode>(initialMode || 'full');
+
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [guidance, setGuidance] = useState('');
   const [suggesting, setSuggesting] = useState(false);
@@ -282,18 +286,23 @@ Règles :
 
 
   return (
-    <div className="rounded-[22px] border p-5" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
+    <div id="sommaire-ia" className="scroll-mt-24 rounded-[22px] border p-5" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <span className="v3-chip v3-chip-orange"><ListOrdered className="h-3.5 w-3.5" /> Sommaire du livre</span>
+          <span className="v3-chip v3-chip-orange"><ListOrdered className="h-3.5 w-3.5" /> Sommaire IA</span>
+          <span className="ml-2 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider"
+            style={{ background: 'var(--v3-gold, #c9a84c)', color: '#1a1408' }}>
+            <Sparkles className="h-3 w-3" /> Dernière nouveauté IA
+          </span>
           <p className="mt-2 text-xs" style={{ color: 'var(--v3-muted)' }}>
             Deux façons de faire : l’IA propose tout le sommaire et vous l’ajustez, ou vous le construisez avec elle
-            chapitre par chapitre. Dans les deux cas, validez-le à la fin : c’est lui qui pilote le workflow.
+            chapitre par chapitre en dialoguant. Une fois validé, il pilote le workflow jusqu’à l’export et la couverture.
           </p>
         </div>
         {validated && (
           <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold"
             style={{ background: 'var(--v3-emerald, #064e3b)', color: '#fff' }}>
+
             <Check className="h-3.5 w-3.5" /> Sommaire validé — {outline.length} chapitres
           </span>
         )}

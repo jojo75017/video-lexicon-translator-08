@@ -29,11 +29,21 @@ export default function V3CreatePage() {
   const idea = params.get('idea');
   const genre = params.get('genre');
   const type = params.get('type');
+  const sommaireIa = params.get('sommaire') === 'ia';
 
   const [showWizard, setShowWizard] = useState(false);
   const wizardRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => { seedHubConfig(idea, genre, type); }, [idea, genre, type]);
+
+  // Arrivée depuis « Sommaire IA » : on descend directement sur le panneau.
+  useEffect(() => {
+    if (!sommaireIa) return;
+    const t = setTimeout(() => {
+      document.getElementById('sommaire-ia')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 400);
+    return () => clearTimeout(t);
+  }, [sommaireIa]);
 
 
 
@@ -66,6 +76,29 @@ export default function V3CreatePage() {
           </p>
         </div>
 
+        {/* Sommaire IA — mise en avant */}
+        <div className="mt-6 rounded-[22px] border p-5"
+          style={{ borderColor: 'var(--v3-gold, #c9a84c)', background: 'linear-gradient(180deg, rgba(201,168,76,0.10), rgba(201,168,76,0.03))' }}>
+          <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider"
+            style={{ background: 'var(--v3-gold, #c9a84c)', color: '#1a1408' }}>
+            <Sparkles className="h-3 w-3" /> Dernière nouveauté IA
+          </span>
+          <h2 className="v3-serif mt-3 text-2xl font-bold" style={{ color: 'var(--v3-ink)' }}>
+            Sommaire IA — on le construit ensemble
+          </h2>
+          <p className="mt-1 text-sm" style={{ color: 'var(--v3-muted)' }}>
+            Vous dialoguez avec l’IA : elle propose les chapitres, vous corrigez selon vos infos. Dès que le sommaire vous
+            convient, l’IA rédige le livre via le workflow, jusqu’à l’export et la couverture.
+          </p>
+          <button
+            type="button"
+            onClick={() => document.getElementById('sommaire-ia')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            className="v3-btn v3-btn-primary mt-4"
+          >
+            <Sparkles className="h-4 w-4" /> Construire mon sommaire avec l’IA <ArrowRight className="h-4 w-4" />
+          </button>
+        </div>
+
         {/* Modes illustrés — liens discrets */}
         <div className="mt-5 flex flex-wrap justify-center gap-2">
           <Link to="/v3/create/illustre" className="v3-btn v3-btn-ghost text-xs">
@@ -84,7 +117,7 @@ export default function V3CreatePage() {
 
         {/* Fiche du livre + Cible & Promesse IA + Sommaire validé */}
         <div className="mt-6">
-          <V3BriefRecap variant="full" onLaunch={launchWorkflow} />
+          <V3BriefRecap variant="full" onLaunch={launchWorkflow} outlineMode={sommaireIa ? 'guided' : undefined} />
         </div>
 
         {/* Workflow */}

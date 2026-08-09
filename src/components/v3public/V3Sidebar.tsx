@@ -21,6 +21,7 @@ const NAV: NavSection[] = [
     items: [
       { to: '/v3/recherche', label: 'Studio Recherche KDP', icon: Search, badge: 'Hub' },
       { to: '/v3/create', label: 'Écrire un livre', icon: Sparkles, badge: 'Start' },
+      { to: '/v3/create?sommaire=ia', label: 'Sommaire IA (dialogue)', icon: ListTree, badge: 'Nouveauté IA' },
       { to: '/v3/nouveautes', label: '✨ Nouveautés V3', icon: Sparkles, badge: 'NEW' },
       { to: '/v3/outils/offerts', label: '🎁 Outils offerts', icon: Search, badge: 'Offert' },
       { to: '/v3/outils/royalties', label: 'Calculateur royalties', icon: BarChart3, badge: 'Offert' },
