@@ -824,66 +824,104 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
   // ═══ TABLE DES MATIÈRES ═══
 
   if (includeTableOfContents) {
+    // Palette « motif discret »
+    const TOC_CREAM = 'F5F1EA';
+    const TOC_TEXT = '3A3A3A';
+    const TOC_GOLD = '8C6A3F';
+    const TOC_SEP = 'D9C7A7';
+    const styled = styledToc !== false;
+
+    const goldRule = () =>
+      new Paragraph({
+        children: [new TextRun({ text: '', size: 2 })],
+        border: { bottom: { style: 'single' as never, size: 6, color: TOC_GOLD, space: 4 } },
+        spacing: { after: 200 },
+        ...(styled ? { shading: { fill: TOC_CREAM, type: 'clear' as never, color: 'auto' } } : {}),
+      });
+
+    const tocEntry = (runs: TextRun[], opts: { indentLeft: number; hanging: number; after: number; separator: boolean }) =>
+      new Paragraph({
+        children: runs,
+        spacing: { after: opts.after },
+        indent: { left: convertInchesToTwip(opts.indentLeft), hanging: convertInchesToTwip(opts.hanging) },
+        ...(styled ? { shading: { fill: TOC_CREAM, type: 'clear' as never, color: 'auto' } } : {}),
+        ...(styled && opts.separator
+          ? { border: { bottom: { style: 'single' as never, size: 2, color: TOC_SEP, space: 3 } } }
+          : {}),
+      });
+
+    if (styled) children.push(goldRule());
 
     children.push(new Paragraph({
-      children: [new TextRun({ text: 'TABLE DES MATIÈRES', bold: true, size: chapterTitleSize, font })],
+      children: [new TextRun({
+        text: styled ? 'T A B L E   D E S   M A T I È R E S' : 'TABLE DES MATIÈRES',
+        bold: true,
+        size: chapterTitleSize,
+        font,
+        ...(styled ? { color: TOC_GOLD } : {}),
+      })],
       heading: HeadingLevel.HEADING_1,
       alignment: AlignmentType.CENTER,
-      spacing: { after: 600 },
+      spacing: { after: styled ? 200 : 600 },
+      ...(styled ? { shading: { fill: TOC_CREAM, type: 'clear' as never, color: 'auto' } } : {}),
     }));
 
+    if (styled) children.push(goldRule());
+
     if (preface) {
-      children.push(new Paragraph({
-        children: [new TextRun({ text: 'Préface', size: baseSize, font })],
-        spacing: { after: 120 },
-      }));
+      children.push(tocEntry(
+        [new TextRun({ text: 'Préface', size: baseSize, font, ...(styled ? { color: TOC_TEXT, italics: true } : {}) })],
+        { indentLeft: 0.35, hanging: 0.35, after: 120, separator: true },
+      ));
     }
 
     renderChapters.forEach(({ chapter, num, displayTitle }) => {
-      const safeTocTitle = isGenericTitle(displayTitle)
-        ? `Chapitre ${num}`
-        : `Chapitre ${num} – ${displayTitle}`;
-      children.push(new Paragraph({
-        children: [new TextRun({
-          text: safeTocTitle,
-          size: baseSize,
-          font,
-        })],
-        spacing: { after: 100 },
-        // Retrait négatif : les titres longs se replient alignés sous le premier mot
-        indent: { left: convertInchesToTwip(0.35), hanging: convertInchesToTwip(0.35) },
-      }));
+      const generic = isGenericTitle(displayTitle);
+      const runs: TextRun[] = styled
+        ? [
+            new TextRun({ text: `${num}`.padStart(2, '0'), size: baseSize, font, bold: true, color: TOC_GOLD }),
+            new TextRun({ text: '   ', size: baseSize, font }),
+            new TextRun({ text: generic ? `Chapitre ${num}` : displayTitle, size: baseSize, font, color: TOC_TEXT }),
+          ]
+        : [new TextRun({
+            text: generic ? `Chapitre ${num}` : `Chapitre ${num} – ${displayTitle}`,
+            size: baseSize,
+            font,
+          })];
+
+      children.push(tocEntry(runs, { indentLeft: 0.35, hanging: 0.35, after: 100, separator: true }));
 
       chapter.subChapters.forEach((sub, subIdx) => {
         const subTitle = cleanChapterTitle(sub.title);
         if (isGenericTitle(subTitle)) return;
-        children.push(new Paragraph({
-          children: [new TextRun({
+        children.push(tocEntry(
+          [new TextRun({
             text: `${num}.${subIdx + 1}  ${subTitle}`,
             size: Math.round(baseSize * 0.9),
             font,
-            color: '555555',
+            color: styled ? TOC_TEXT : '555555',
+            ...(styled ? { italics: true } : {}),
           })],
-          spacing: { after: 60 },
-          indent: { left: convertInchesToTwip(0.75), hanging: convertInchesToTwip(0.4) },
-        }));
+          { indentLeft: 0.75, hanging: 0.4, after: 60, separator: false },
+        ));
       });
     });
 
-
     if (conclusion) {
-      children.push(new Paragraph({
-        children: [new TextRun({ text: 'Conclusion', size: baseSize, font })],
-        spacing: { after: 120 },
-      }));
+      children.push(tocEntry(
+        [new TextRun({ text: 'Conclusion', size: baseSize, font, ...(styled ? { color: TOC_TEXT, italics: true } : {}) })],
+        { indentLeft: 0.35, hanging: 0.35, after: 120, separator: true },
+      ));
     }
 
     if (characters.length > 0) {
-      children.push(new Paragraph({
-        children: [new TextRun({ text: 'Personnages', size: baseSize, font })],
-        spacing: { after: 120 },
-      }));
+      children.push(tocEntry(
+        [new TextRun({ text: 'Personnages', size: baseSize, font, ...(styled ? { color: TOC_TEXT, italics: true } : {}) })],
+        { indentLeft: 0.35, hanging: 0.35, after: 120, separator: true },
+      ));
     }
+
+    if (styled) children.push(goldRule());
 
     children.push(new Paragraph({ children: [new PageBreak()] }));
   }
