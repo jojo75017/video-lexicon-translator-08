@@ -33,7 +33,7 @@ async function callGemini(prompt: string, apiKey: string) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: { responseMimeType: "application/json", temperature: 0.5, maxOutputTokens: 1400 },
+      generationConfig: { responseMimeType: "application/json", temperature: 0.5, maxOutputTokens: 4000 },
     }),
   });
   if (!res.ok) {
@@ -61,7 +61,7 @@ async function callLovableAI(prompt: string) {
         { role: "user", content: prompt },
       ],
       temperature: 0.5,
-      max_tokens: 1400,
+      max_tokens: 4000,
     }),
   });
   const text = await res.text();
@@ -133,6 +133,7 @@ Règles :
       const m = raw.match(/\{[\s\S]*\}/);
       if (m) { try { parsed = JSON.parse(m[0]); } catch { /* noop */ } }
     }
+    if (!parsed || typeof parsed !== "object") { console.error("brief parse failed:", raw.slice(0, 600)); }
     if (!parsed || typeof parsed !== "object") return json(502, { error: "Réponse IA illisible. Réessayez." });
 
     const clamp = (n: unknown, min: number, max: number, fallback: number) => {
