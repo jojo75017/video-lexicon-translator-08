@@ -739,19 +739,24 @@ ${authorName ? `Include author name: ${authorName}` : ''}`,
     return data?.imageUrl || null;
   };
 
-  /** Génère les photos de toutes les fiches (séquentiel, tolérant aux erreurs). */
+  /** Génère les photos des fiches passées en paramètre (séquentiel, tolérant aux erreurs). */
   const generateSheetImages = async (sheetsToProcess: TravelSheet[]) => {
+    if (sheetsToProcess.length === 0) {
+      toast.info('Toutes les fiches ont déjà une photo.');
+      return;
+    }
     setIsGeneratingImages(true);
-    const updated = [...sheetsToProcess];
-    for (let i = 0; i < updated.length; i++) {
-      setCurrentStep(`Photo ${i + 1}/${updated.length} : ${updated[i].destinationName}...`);
-      setProgress(Math.round(((i + 1) / updated.length) * 100));
+    const queue = [...sheetsToProcess];
+    for (let i = 0; i < queue.length; i++) {
+      setCurrentStep(`Photo ${i + 1}/${queue.length} : ${queue[i].destinationName}...`);
+      setProgress(Math.round(((i + 1) / queue.length) * 100));
       try {
-        const imageUrl = await requestDestinationImage(updated[i]);
+        const imageUrl = await requestDestinationImage(queue[i]);
         if (imageUrl) {
-          updated[i] = { ...updated[i], imageUrl };
-          setSheets([...updated]);
+          const targetId = queue[i].id;
+          setSheets(prev => prev.map(s => (s.id === targetId ? { ...s, imageUrl } : s)));
         }
+
       } catch (err: any) {
         const status = err?.context?.status ?? err?.status;
         if (status === 402) {
