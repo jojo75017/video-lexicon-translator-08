@@ -544,6 +544,12 @@ Format JSON strict:
       setCurrentStep('Guide de voyage généré !');
       setActiveTab('sheets');
       toast.success(`🎉 ${generatedSheets.length} fiches destinations générées !`);
+
+      // Photos des destinations (une par fiche)
+      setIsGenerating(false);
+      await generateSheetImages(generatedSheets);
+      
+
       
     } catch (error) {
       console.error('Erreur génération:', error);
