@@ -168,9 +168,11 @@ const normalize = (value: string) => value.trim().toLowerCase();
 const templateName = (step: number) => `offre-47-unique-${step}`;
 const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
-function trackedLink(baseUrl: string, email: string, step: number) {
+/** Lien de clic hébergé sur notre propre domaine (/r) : plus de confiance
+ *  côté messageries qu'une URL technique, et le suivi reste enregistré. */
+function trackedLink(_baseUrl: string, email: string, step: number) {
   const destination = `${CHECKOUT}?src=${CAMPAIGN}-${step}&email=${encodeURIComponent(email)}`;
-  return `${baseUrl}/functions/v1/track-email-click?e=${encodeURIComponent(email)}&s=${step}&t=${templateName(step)}&u=${encodeURIComponent(destination)}`;
+  return `https://ebookstudio.fr/r?e=${encodeURIComponent(email)}&s=${step}&t=${templateName(step)}&u=${encodeURIComponent(destination)}`;
 }
 
 function ctaButton(link: string, label: string) {
