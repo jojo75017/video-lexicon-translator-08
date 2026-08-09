@@ -28,6 +28,7 @@ import V3LaunchGlobalBanner from '@/components/V3LaunchGlobalBanner';
 import { captureUtmParams } from '@/lib/utmTracking';
 
 // V2 — Ebook Planner + outils satellites
+const RedirectClickPage = lazy(() => import('./pages/RedirectClickPage'));
 const EbookPlannerPage = lazy(() => import('./pages/EbookPlannerPage'));
 const EbookIdeasPage = lazy(() => import('./pages/EbookIdeasPage'));
 const EbookbotPage = lazy(() => import('./pages/EbookbotPage'));
@@ -451,6 +452,7 @@ const App = () => {
             <Route path="/mon-code" element={<RecuperationCodePage />} />
             <Route path="/activer-beta" element={<ActivationBetaPage />} />
             <Route path="/cadeau" element={<CadeauPage />} />
+            <Route path="/r" element={<RedirectClickPage />} />
             <Route path="/carte-cadeau" element={<GiftRedeemPage />} />
             <Route path="/carte-cadeau-merci" element={<GiftThankYouPage />} />
             <Route path="/influenceurs" element={<InfluenceursPage />} />
