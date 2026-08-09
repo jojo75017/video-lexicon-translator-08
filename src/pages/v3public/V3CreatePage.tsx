@@ -113,7 +113,7 @@ export default function V3CreatePage() {
 
         {/* Fiche du livre + Cible & Promesse IA + Sommaire validé */}
         <div className="mt-6">
-          <V3BriefRecap variant="full" onLaunch={launchWorkflow} outlineMode={sommaireIa ? 'guided' : undefined} />
+          <V3BriefRecap variant="full" onLaunch={launchWorkflow} outlineMode={sommaireIa ? 'guided' : undefined} hideBookForm />
         </div>
 
         {/* Workflow */}
