@@ -237,6 +237,10 @@ const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ e
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
   const [isGeneratingCover, setIsGeneratingCover] = useState(false);
 
+  // Photos des fiches
+  const [photoStyle, setPhotoStyle] = useState('realistic');
+  const [isGeneratingImages, setIsGeneratingImages] = useState(false);
+
   // Helper functions for promo links
   const addPromoLink = () => {
     if (newLinkLabel.trim() && newLinkUrl.trim()) {
