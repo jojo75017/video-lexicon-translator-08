@@ -222,6 +222,65 @@ Règles :
     onChange({ outline: next, chapters: next.length, outlineValidated: false });
   };
 
+  const moveChapter = (index: number, dir: -1 | 1) => {
+    const to = index + dir;
+    if (to < 0 || to >= outline.length) return;
+    const next = [...outline];
+    [next[index], next[to]] = [next[to], next[index]];
+    onChange({ outline: normalizeOutline(next), outlineValidated: false });
+  };
+
+  const addChapter = () => {
+    const next = normalizeOutline([...outline, { numero: outline.length + 1, titre: '', objectif: '' }]);
+    onChange({ outline: next, chapters: next.length, outlineValidated: false });
+  };
+
+  /** Mode dialogue : demande 3 propositions pour le prochain chapitre. */
+  const askNextChapter = async () => {
+    const title = (brief.title || '').trim();
+    if (title.length < 3) {
+      toast.error('Renseignez d’abord le titre du livre.');
+      return;
+    }
+    setSuggesting(true);
+    setSuggestions([]);
+    try {
+      const { data, error } = await supabase.functions.invoke('v3-generate-outline', {
+        body: {
+          step: 'next',
+          title,
+          subtitle: (brief.subtitle || '').trim(),
+          category: brief.category || '',
+          tone: brief.tone || '',
+          description: (brief.description || '').trim(),
+          promesseCentrale: (brief.promesseCentrale || '').trim(),
+          chapters: target,
+          accepted: outline,
+          guidance: guidance.trim(),
+        },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      const list = (data as any)?.suggestions as Suggestion[] | undefined;
+      if (!Array.isArray(list) || !list.length) throw new Error('Aucune proposition reçue.');
+      setSuggestions(list);
+    } catch (e: any) {
+      console.error('[Sommaire guidé] proposition impossible', e);
+      toast.error('Proposition impossible', { description: e?.message || 'Erreur inconnue.' });
+    } finally {
+      setSuggesting(false);
+    }
+  };
+
+  const acceptSuggestion = (s: Suggestion) => {
+    const next = normalizeOutline([...outline, { numero: outline.length + 1, titre: s.titre, objectif: s.objectif }]);
+    onChange({ outline: next, chapters: next.length, outlineValidated: false });
+    setSuggestions([]);
+    setGuidance('');
+    toast.success(`Chapitre ${next.length} ajouté — ${s.titre}`);
+  };
+
+
   return (
     <div className="rounded-[22px] border p-5" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
