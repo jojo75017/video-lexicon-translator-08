@@ -68,35 +68,57 @@ export default function V3CreatePage() {
       <div className="max-w-4xl mx-auto">
         <BackButton />
 
+        {/* Hero « Ebookstudio-Génie » */}
         <div className="mt-6 text-center">
-          <span className="v3-chip v3-chip-orange"><Sparkles className="w-3.5 h-3.5" /> Écrire un livre</span>
-          <h1 className="v3-serif text-4xl font-bold mt-4" style={{ color: 'var(--v3-ink)' }}>Ton atelier d'écriture</h1>
-          <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>
-            Fiche du livre, Cible &amp; Promesse générées par l'IA, sommaire validé — puis le workflow des agents.
+          <span className="v3-chip v3-chip-orange"><Sparkles className="w-3.5 h-3.5" /> Ebookstudio-Génie</span>
+          <h1 className="v3-serif text-4xl md:text-5xl font-bold mt-4 leading-tight" style={{ color: 'var(--v3-ink)' }}>
+            Commencez à créer votre livre
+          </h1>
+          <p className="mt-3 text-sm md:text-base" style={{ color: 'var(--v3-muted)' }}>
+            Parlez de votre projet à Ebookstudio-Génie. Il construit le sommaire avec vous,
+            rédige les chapitres, puis va jusqu’à l’export et la couverture.
           </p>
         </div>
 
-        {/* Sommaire IA — mise en avant */}
-        <div className="mt-6 rounded-[22px] border p-5"
-          style={{ borderColor: 'var(--v3-gold, #c9a84c)', background: 'linear-gradient(180deg, rgba(201,168,76,0.10), rgba(201,168,76,0.03))' }}>
-          <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider"
-            style={{ background: 'var(--v3-gold, #c9a84c)', color: '#1a1408' }}>
-            <Sparkles className="h-3 w-3" /> Dernière nouveauté IA
-          </span>
-          <h2 className="v3-serif mt-3 text-2xl font-bold" style={{ color: 'var(--v3-ink)' }}>
-            Sommaire IA — on le construit ensemble
-          </h2>
-          <p className="mt-1 text-sm" style={{ color: 'var(--v3-muted)' }}>
-            Vous dialoguez avec l’IA : elle propose les chapitres, vous corrigez selon vos infos. Dès que le sommaire vous
-            convient, l’IA rédige le livre via le workflow, jusqu’à l’export et la couverture.
-          </p>
-          <button
-            type="button"
-            onClick={() => document.getElementById('sommaire-ia')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-            className="v3-btn v3-btn-primary mt-4"
-          >
-            <Sparkles className="h-4 w-4" /> Construire mon sommaire avec l’IA <ArrowRight className="h-4 w-4" />
-          </button>
+        {/* Boîte de dialogue Génie */}
+        <div className="mt-7 rounded-[24px] border p-4 md:p-5"
+          style={{ borderColor: 'var(--v3-gold, #c9a84c)', background: 'linear-gradient(180deg, rgba(201,168,76,0.10), rgba(201,168,76,0.02))' }}>
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider"
+              style={{ background: 'var(--v3-gold, #c9a84c)', color: '#1a1408' }}>
+              <Sparkles className="h-3 w-3" /> Dernière nouveauté IA
+            </span>
+            <span className="text-[11px]" style={{ color: 'var(--v3-muted)' }}>Rédaction 100 % en français</span>
+          </div>
+
+          <textarea
+            value={genieIdea}
+            onChange={(e) => setGenieIdea(e.target.value)}
+            rows={4}
+            placeholder="Parlez-moi de vous et du livre que vous aimeriez écrire…"
+            className="mt-3 w-full resize-none rounded-2xl border bg-white/90 p-4 text-sm outline-none focus:ring-2"
+            style={{ borderColor: 'rgba(0,0,0,0.10)', color: 'var(--v3-ink)' }}
+          />
+
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <button type="button" onClick={startGenie} disabled={!genieIdea.trim()} className="v3-btn v3-btn-primary disabled:opacity-50">
+              <Wand2 className="h-4 w-4" /> Lancer Ebookstudio-Génie <ArrowRight className="h-4 w-4" />
+            </button>
+            <Link to="/v3/create?import=1" className="v3-btn v3-btn-ghost text-xs">
+              <Upload className="w-3.5 h-3.5" /> Importer un document (.docx, .pdf, URL)
+            </Link>
+          </div>
+
+          {/* Suggestions rapides */}
+          <div className="mt-3 flex flex-wrap gap-2">
+            {GENIE_SUGGESTIONS.map((s) => (
+              <button key={s} type="button" onClick={() => setGenieIdea(s)}
+                className="rounded-full border px-3 py-1 text-[11px] transition hover:opacity-80"
+                style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-muted)' }}>
+                {s}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Modes illustrés — liens discrets */}
@@ -108,6 +130,7 @@ export default function V3CreatePage() {
             <ImageIcon className="w-3.5 h-3.5" /> Histoires du soir 3-7 ans <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
+
 
         {/* Clés API — encart partagé (alerte si aucune clé) */}
         <div className="mt-6">
