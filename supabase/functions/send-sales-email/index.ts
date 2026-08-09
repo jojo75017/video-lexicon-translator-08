@@ -16,6 +16,8 @@ const DELAYS = [0, 2, 3, 2, 3];
 interface StepContent {
   subject: string;
   preheader: string;
+  /** Rappel court affiché sous la salutation (optionnel). */
+  reminder?: string;
   badge: string;
   heading: string;
   intro: string;
@@ -90,6 +92,7 @@ const STEPS: StepContent[] = [
   {
     subject: "Les 5 étapes qui créent votre livre",
     preheader: "Le workflow complet, étape par étape, sans page blanche.",
+    reminder: "Petit rappel avant d’entrer dans le détail : l’accès complet est à <strong>47 €</strong> en un seul paiement (au lieu de 59 €) jusqu’au <strong>30 septembre 2026</strong>.",
     badge: "ÉTAPE 3 · LE WORKFLOW EN DÉTAIL",
     heading: "Un workflow simple, sans page blanche",
     intro: "Beaucoup abandonnent parce qu’ils ne savent pas par quoi commencer. Voici exactement ce que vous voyez à l’écran, dans l’ordre.",
@@ -202,6 +205,7 @@ function render(baseUrl: string, email: string, firstName: string, step: number)
 <tr><td style="padding:26px 28px 0"><span style="display:inline-block;background:#FFF4E5;color:#8a4b00;border:1px solid #FF9E2D;border-radius:4px;padding:7px 12px;font:700 12px Arial,Helvetica,sans-serif;letter-spacing:.4px">${c.badge}</span></td></tr>
 <tr><td style="padding:20px 28px 0;color:#232F3E;font:16px/1.65 Arial,Helvetica,sans-serif">
 <p style="margin:0 0 18px">Bonjour${firstName ? ` ${firstName}` : ""},</p>
+${c.reminder ? `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:0 0 18px"><tr><td style="background:#f2f8f9;border-left:4px solid #008296;padding:12px 16px;font:15px/1.6 Arial,Helvetica,sans-serif;color:#232F3E">${c.reminder}</td></tr></table>` : ""}
 <h1 style="margin:0 0 16px;font:700 25px/1.3 Arial,Helvetica,sans-serif;color:#232F3E">${c.heading}</h1>
 <p style="margin:0 0 20px">${c.intro}</p>
 <p style="margin:0 0 14px;font:700 17px Arial,Helvetica,sans-serif;color:#232F3E">${c.bulletsTitle}</p>
