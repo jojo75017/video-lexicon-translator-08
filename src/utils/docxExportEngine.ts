@@ -878,17 +878,15 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
 
     renderChapters.forEach(({ chapter, num, displayTitle }) => {
       const generic = isGenericTitle(displayTitle);
-      const runs: TextRun[] = styled
-        ? [
-            new TextRun({ text: `${num}`.padStart(2, '0'), size: baseSize, font, bold: true, color: TOC_GOLD }),
-            new TextRun({ text: '   ', size: baseSize, font }),
-            new TextRun({ text: generic ? `Chapitre ${num}` : displayTitle, size: baseSize, font, color: TOC_TEXT }),
-          ]
-        : [new TextRun({
-            text: generic ? `Chapitre ${num}` : `Chapitre ${num} – ${displayTitle}`,
-            size: baseSize,
-            font,
-          })];
+      const label = generic ? `Chapitre ${num}` : `Chapitre ${num} – ${displayTitle}`;
+      const runs: TextRun[] = [
+        new TextRun({
+          text: label,
+          size: baseSize,
+          font,
+          ...(styled ? { color: TOC_TEXT } : {}),
+        }),
+      ];
 
       children.push(tocEntry(runs, { indentLeft: 0.35, hanging: 0.35, after: 100, separator: true }));
 
