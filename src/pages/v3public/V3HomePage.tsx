@@ -38,7 +38,7 @@ export default function V3HomePage() {
 
   return (
     <>
-      {/* BANNIÈRE — Lancement V3 le 1er octobre */}
+      {/* BANNIÈRE — Migration V2 vers V3 (3 modules offerts) */}
       <section
         style={{
           background: 'linear-gradient(90deg,#c9a84c 0%,#e6c66b 50%,#c9a84c 100%)',
@@ -47,18 +47,18 @@ export default function V3HomePage() {
       >
         <div className="max-w-7xl mx-auto px-5 md:px-8 py-3 flex flex-col sm:flex-row items-center gap-3 justify-between">
           <div className="flex items-center gap-3" style={{ color: '#1a1408' }}>
-            <span className="text-2xl">✨</span>
+            <span className="text-2xl">🎁</span>
             <p className="text-[13.5px] leading-snug font-semibold">
-              <strong>Ouverture officielle de la V3 le 1er octobre 2026.</strong>{' '}
-              <span className="font-normal">Découvrez les 3 forfaits, le freemium gratuit et le bonus fondateur.</span>
+              <strong>Abonnés V2 : votre V3 arrive avec 3 modules offerts.</strong>{' '}
+              <span className="font-normal">Génie, Correcteur et Export Premium — et -20 % à vie sur les nouveaux forfaits Plume / Édition.</span>
             </p>
           </div>
           <Link
-            to="/v3/offre"
+            to="/v3/migration"
             className="shrink-0 inline-flex items-center gap-1.5 px-5 py-2 rounded-full font-bold text-[13px] whitespace-nowrap"
             style={{ background: '#064e3b', color: '#c9a84c', border: '1px solid #1a1408' }}
           >
-            Découvrir l'offre V3 <ArrowRight className="w-3.5 h-3.5" />
+            Voir ma migration V3 <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       </section>
