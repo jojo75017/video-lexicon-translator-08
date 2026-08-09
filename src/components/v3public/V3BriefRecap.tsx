@@ -39,7 +39,7 @@ type Props = {
  * La Cible & Promesse est générée par l'IA (aucun champ à remplir) et le sommaire
  * doit être validé avant de lancer le workflow.
  */
-export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMode }: Props) {
+export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMode, hideBookForm }: Props) {
   const [brief, setBrief] = useState<BookBrief>({});
   const [saved, setSaved] = useState(false);
 
