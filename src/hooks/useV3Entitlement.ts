@@ -19,6 +19,7 @@ export function useV3Entitlement() {
   const [loading, setLoading] = useState(true);
   const [hasBase, setHasBase] = useState(false);
   const [hasFull, setHasFull] = useState(false);
+  const [hasV2, setHasV2] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -32,6 +33,7 @@ export function useV3Entitlement() {
       if (admin) {
         setHasBase(true);
         setHasFull(true);
+        setHasV2(true);
         setLoading(false);
         return;
       }
@@ -42,6 +44,7 @@ export function useV3Entitlement() {
       if (!email) {
         setHasBase(false);
         setHasFull(false);
+        setHasV2(false);
         setLoading(false);
         return;
       }
@@ -56,11 +59,14 @@ export function useV3Entitlement() {
         const full = paid.some((r: any) => (r.plan ?? '').startsWith('full'));
         setHasFull(full);
         setHasBase(full || paid.some((r: any) => (r.plan ?? '').startsWith('base')));
+        // Acheteur V2 (accès à vie) : plans `v2_1x` / `v2_3x` réglés.
+        setHasV2(paid.some((r: any) => (r.plan ?? '').startsWith('v2')));
 
       } catch {
         if (!cancelled) {
           setHasBase(false);
           setHasFull(false);
+          setHasV2(false);
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -69,7 +75,7 @@ export function useV3Entitlement() {
     return () => { cancelled = true; };
   }, []);
 
-  return { loading, hasBase, hasFull, isAdmin };
+  return { loading, hasBase, hasFull, hasV2, isAdmin };
 }
 
 export default useV3Entitlement;
