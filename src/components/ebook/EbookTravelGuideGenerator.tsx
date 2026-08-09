@@ -1450,23 +1450,25 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
             {sheets.map((sheet) => (
               <Card key={sheet.id} className="overflow-hidden border-2 hover:border-primary/30 transition-colors">
                 <CardHeader className="bg-gradient-to-r from-blue-50 to-cyan-50 pb-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-4xl">{sheet.countryFlag}</span>
-                      <div>
-                        <CardTitle className="text-xl">{sheet.destinationName}</CardTitle>
-                        <p className="text-sm text-muted-foreground">{sheet.country} • {sheet.region}</p>
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="flex items-start gap-3 min-w-0 flex-1">
+                      <span className="text-3xl md:text-4xl shrink-0 leading-none">{sheet.countryFlag}</span>
+                      <div className="min-w-0">
+                        <CardTitle className="text-base md:text-lg lg:text-xl leading-snug break-words line-clamp-2">
+                          {sheet.destinationName}
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground break-words line-clamp-2">{sheet.country} • {sheet.region}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 shrink-0">
                       <Badge 
                         variant="outline" 
-                        className={countWords(sheet) >= 800 
+                        className={countWords(sheet) >= 400 
                           ? "bg-green-100 text-green-700 border-green-300" 
                           : "bg-red-100 text-red-700 border-red-300"
                         }
                       >
-                        {countWords(sheet)} mots {countWords(sheet) >= 800 ? '✓' : '⚠️'}
+                        {countWords(sheet)} mots {countWords(sheet) >= 400 ? '✓' : '⚠️'}
                       </Badge>
                       <Button
                         variant="ghost"
@@ -1486,10 +1488,45 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
                 <CardContent className="pt-6">
                   <div className="grid md:grid-cols-2 gap-6">
                     {/* Left column - Quick info and content */}
-                    <div className="space-y-4">
+                    <div className="space-y-4 min-w-0">
+                      {/* Photo de la destination — contenue dans l'encart */}
+                      <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-gradient-to-br from-blue-100 to-cyan-100 border border-blue-200/60">
+                        {sheet.imageUrl ? (
+                          <img
+                            src={sheet.imageUrl}
+                            alt={`Photo de ${sheet.destinationName}, ${sheet.country}`}
+                            loading="lazy"
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            {sheet.isGeneratingImage || isGeneratingImages ? (
+                              <Loader2 className="h-10 w-10 text-blue-400 animate-spin" />
+                            ) : (
+                              <Camera className="h-10 w-10 text-blue-300" />
+                            )}
+                          </div>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => regenerateSheetImage(sheet.id)}
+                          disabled={sheet.isGeneratingImage || isGeneratingImages}
+                          className="absolute top-2 right-2 bg-white/85 hover:bg-white"
+                          aria-label="Régénérer la photo"
+                        >
+                          {sheet.isGeneratingImage ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Camera className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+
                       {/* Quick info box */}
-                      <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 space-y-2">
+                      <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 space-y-2 min-w-0">
                         <h4 className="font-semibold flex items-center gap-2">
+
                           <Globe className="h-4 w-4" /> Infos pratiques
                         </h4>
                         <div className="grid grid-cols-2 gap-2 text-sm">
