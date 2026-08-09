@@ -992,25 +992,46 @@ ${sheet.servingSuggestion}`;
         pdf.text(noEmoji(`${sheet.difficulty} | ${sheet.cookingTime}`), margin, yPos);
         yPos += 8;
         
-        // Left column - Image
+        // Left column - Image (recadrée au format de l'encart, jamais déformée)
         const leftColStartY = yPos;
+        const imgBoxH = 45;
         if (sheet.imageUrl) {
           try {
-            const response = await fetch(sheet.imageUrl);
-            const blob = await response.blob();
-            const reader = new FileReader();
-            await new Promise<void>((resolve) => {
-              reader.onloadend = () => {
-                const base64 = reader.result as string;
-                pdf.addImage(base64, 'PNG', margin, yPos, leftColumnWidth, 45);
-                resolve();
+            const cropped = await new Promise<string | null>((resolve) => {
+              const img = new Image();
+              img.crossOrigin = 'anonymous';
+              img.onload = () => {
+                try {
+                  const targetRatio = leftColumnWidth / imgBoxH;
+                  const srcRatio = img.width / img.height;
+                  let sw = img.width;
+                  let sh = img.height;
+                  if (srcRatio > targetRatio) sw = img.height * targetRatio;
+                  else sh = img.width / targetRatio;
+                  const canvas = document.createElement('canvas');
+                  canvas.width = Math.round(sw);
+                  canvas.height = Math.round(sh);
+                  const ctx = canvas.getContext('2d');
+                  if (!ctx) return resolve(null);
+                  ctx.drawImage(img, (img.width - sw) / 2, (img.height - sh) / 2, sw, sh, 0, 0, canvas.width, canvas.height);
+                  resolve(canvas.toDataURL('image/jpeg', 0.85));
+                } catch {
+                  resolve(null);
+                }
               };
-              reader.readAsDataURL(blob);
+              img.onerror = () => resolve(null);
+              img.src = sheet.imageUrl as string;
             });
+            if (cropped) {
+              pdf.addImage(cropped, 'JPEG', margin, yPos, leftColumnWidth, imgBoxH);
+              pdf.setDrawColor(220, 210, 190);
+              pdf.roundedRect(margin, yPos, leftColumnWidth, imgBoxH, 2, 2, 'S');
+            }
           } catch {
             // Skip image on error
           }
         }
+
         
         // Right column - Description & History
         let rightYPos = leftColStartY;
