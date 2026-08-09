@@ -1,16 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Sparkles, Wand2, ArrowRight, Check, Upload, ImageIcon, RotateCcw } from 'lucide-react';
+import { Sparkles, Wand2, ArrowRight, Check, Upload, FileText, RotateCcw, Loader2, Mic, Pencil } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import { readBookBrief, writeBookBrief, type BookBrief } from '@/lib/v3/bookBrief';
 
 /**
- * Ebookstudio-Génie — dialogue guidé.
- * L'abonné répond à quelques questions dans une conversation, la fiche du livre est
- * remplie au fur et à mesure, puis on enchaîne sur le Sommaire IA (dialogue) : une fois
- * le sommaire validé, le workflow rédige le livre, exporte et génère la couverture.
+ * Ebookstudio-Génie — une seule boîte de dialogue.
+ * L'abonné écrit librement ce qu'il veut écrire (comme Designrr / Wordgenie) ;
+ * l'IA en déduit toute la fiche du livre (titre, catégorie, ton, longueur, images),
+ * l'abonné ajuste si besoin, puis on enchaîne sur le Sommaire IA → workflow → export.
  */
-
-type StepId = 'idea' | 'title' | 'author' | 'category' | 'tone' | 'size' | 'images' | 'done';
 
 const CATEGORIES = [
   'Roman', 'Thriller / Policier', 'Romance', 'Fantasy / Fantastique', 'Science-fiction',
@@ -18,52 +19,34 @@ const CATEGORIES = [
   'Cuisine / Recettes', 'Voyage / Guide', 'Enfants / Jeunesse', 'Histoire / Culture', 'Autre',
 ];
 const TONES = ['Inspirant', 'Pédagogique', 'Émotionnel', 'Direct', 'Humoristique', 'Premium', 'Romanesque', 'Expert'];
-const SIZES = [
-  { label: 'Court — 12 chapitres × 1 200 mots', chapters: 12, wordsPerChapter: 1200 },
-  { label: 'Standard — 20 chapitres × 1 500 mots', chapters: 20, wordsPerChapter: 1500 },
-  { label: 'Long — 30 chapitres × 2 000 mots', chapters: 30, wordsPerChapter: 2000 },
-];
 
-const QUESTIONS: Record<Exclude<StepId, 'done'>, string> = {
-  idea: 'Parlez-moi de votre livre : le sujet, pour qui, et ce que le lecteur va y gagner.',
-  title: 'Parfait. Quel titre voulez-vous donner à ce livre ? (modifiable plus tard)',
-  author: 'Sous quel nom d’auteur doit-il être publié ?',
-  category: 'Dans quelle catégorie Amazon KDP le classons-nous ?',
-  tone: 'Quel ton dois-je adopter pour l’écriture ?',
-  size: 'Quelle longueur visez-vous ?',
-  images: 'Souhaitez-vous des images/illustrations à l’intérieur du livre ?',
-};
+const EXAMPLES = [
+  'Un guide pratique pour débuter sur Amazon KDP en 30 jours, pour débutants complets.',
+  'Un thriller psychologique dans un village breton où une journaliste enquête sur sa propre famille.',
+  'Un livre de recettes minceur méditerranéennes, 30 plats simples avec photos.',
+];
 
 type Props = {
   /** Idée pré-remplie (query param ?idea=). */
   initialIdea?: string;
-  /** Appelé quand la fiche est complète : on enchaîne sur le Sommaire IA guidé. */
+  /** Appelé quand la fiche est prête : on enchaîne sur le Sommaire IA guidé. */
   onReady: () => void;
 };
 
 export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
   const [brief, setBrief] = useState<BookBrief>({});
-  const [step, setStep] = useState<StepId>('idea');
   const [input, setInput] = useState(initialIdea);
-  const endRef = useRef<HTMLDivElement | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [questions, setQuestions] = useState<string[]>([]);
+  const [editing, setEditing] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
+  const resultRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const existing = readBookBrief() || {};
-    setBrief(existing);
-    // On reprend là où l'abonné s'était arrêté.
-    if (!(existing.description || '').trim() && !initialIdea) setStep('idea');
-    else if (!(existing.title || '').trim()) setStep('title');
-    else if (!(existing.author || '').trim()) setStep('author');
-    else if (!(existing.category || '').trim()) setStep('category');
-    else if (!(existing.tone || '').trim()) setStep('tone');
-    else if (!existing.chapters) setStep('size');
-    else if (existing.wantsIllustrations === undefined) setStep('images');
-    else setStep('done');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setBrief(readBookBrief() || {});
   }, []);
 
-  useEffect(() => { endRef.current?.scrollIntoView({ block: 'nearest' }); inputRef.current?.focus(); }, [step]);
+  const ready = Boolean((brief.title || '').trim() && brief.chapters);
 
   const patch = (values: Partial<BookBrief>) => {
     setBrief((prev) => {
@@ -73,48 +56,62 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
     });
   };
 
-  const nextOf: Record<Exclude<StepId, 'done'>, StepId> = {
-    idea: 'title', title: 'author', author: 'category', category: 'tone', tone: 'size', size: 'images', images: 'done',
-  };
-
-  const submitText = () => {
-    const text = input.trim();
-    if (!text) return;
-    if (step === 'idea') patch({ description: text });
-    if (step === 'title') patch({ title: text });
-    if (step === 'author') patch({ author: text });
-    setInput('');
-    setStep((s) => (s === 'done' ? s : nextOf[s]));
-  };
-
-  const chooseCategory = (value: string) => { patch({ category: value }); setStep('tone'); };
-  const chooseTone = (value: string) => { patch({ tone: value }); setStep('size'); };
-  const chooseSize = (s: typeof SIZES[number]) => { patch({ chapters: s.chapters, wordsPerChapter: s.wordsPerChapter }); setStep('images'); };
-  const chooseImages = (value: boolean) => { patch({ wantsIllustrations: value }); setStep('done'); };
-
-  const restart = () => { setStep('idea'); setInput(''); };
-
-  /** Fil de la conversation : réponses déjà données. */
-  const transcript = useMemo(() => {
-    const rows: Array<{ q: string; a: string }> = [];
-    if ((brief.description || '').trim()) rows.push({ q: QUESTIONS.idea, a: brief.description! });
-    if ((brief.title || '').trim()) rows.push({ q: QUESTIONS.title, a: brief.title! });
-    if ((brief.author || '').trim()) rows.push({ q: QUESTIONS.author, a: brief.author! });
-    if ((brief.category || '').trim()) rows.push({ q: QUESTIONS.category, a: brief.category! });
-    if ((brief.tone || '').trim()) rows.push({ q: QUESTIONS.tone, a: brief.tone! });
-    if (brief.chapters) rows.push({ q: QUESTIONS.size, a: `${brief.chapters} chapitres × ${brief.wordsPerChapter || 1500} mots` });
-    if (brief.wantsIllustrations !== undefined) {
-      rows.push({ q: QUESTIONS.images, a: brief.wantsIllustrations ? 'Oui, avec illustrations IA' : 'Non, texte uniquement' });
+  const ask = async (message: string) => {
+    const text = message.trim();
+    if (text.length < 10) {
+      toast.error('Décrivez votre livre en une ou deux phrases.');
+      return;
     }
-    return rows;
-  }, [brief]);
+    setLoading(true);
+    setQuestions([]);
+    try {
+      const provider = getProvider();
+      const userApiKey = provider === 'gemini' ? getProviderKey('gemini') : '';
+      const { data, error } = await supabase.functions.invoke('v3-genie-brief', {
+        body: { message: text, userApiKey, author: (brief.author || '').trim() },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      const b = (data as any)?.brief || {};
+      patch({
+        title: b.title || '',
+        subtitle: b.subtitle || '',
+        author: b.author || brief.author || '',
+        category: b.category || '',
+        tone: b.tone || 'Inspirant',
+        description: b.description || text,
+        chapters: b.chapters || 20,
+        wordsPerChapter: b.wordsPerChapter || 1500,
+        wantsIllustrations: Boolean(b.wantsIllustrations),
+        cibleProfil: b.cibleProfil || brief.cibleProfil || '',
+        promesseCentrale: b.promesseCentrale || brief.promesseCentrale || '',
+        outlineValidated: false,
+      });
+      setQuestions(Array.isArray((data as any)?.questions) ? (data as any).questions : []);
+      setInput('');
+      setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 120);
+    } catch (e: any) {
+      toast.error(e?.message || 'Le Génie est indisponible pour le moment.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const isTextStep = step === 'idea' || step === 'title' || step === 'author';
-  const stepIndex = Math.min(transcript.length, 7);
+  const refine = async (extra: string) => {
+    const base = (brief.description || '').trim();
+    await ask(`${base}\n\nPrécision de l'auteur : ${extra.trim()}`);
+  };
+
+  const steps = useMemo(() => ([
+    { label: '1. Votre idée', done: ready },
+    { label: '2. Sommaire IA validé', done: Boolean(brief.outlineValidated) },
+    { label: '3. Rédaction (workflow)', done: false },
+    { label: '4. Export + couverture', done: false },
+  ]), [ready, brief.outlineValidated]);
 
   return (
     <div
-      className="rounded-[24px] border p-4 md:p-5"
+      className="rounded-[24px] border p-4 md:p-6"
       style={{ borderColor: 'var(--v3-gold, #c9a84c)', background: 'linear-gradient(180deg, rgba(201,168,76,0.10), rgba(201,168,76,0.02))' }}
     >
       <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -123,18 +120,12 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
           <Sparkles className="h-3 w-3" /> Dernière nouveauté IA
         </span>
         <span className="text-[11px]" style={{ color: 'var(--v3-muted)' }}>
-          Étape {Math.min(stepIndex + (step === 'done' ? 0 : 1), 7)}/7 · rédaction 100 % en français
+          Rédaction 100 % en français · une seule question, l’IA fait le reste
         </span>
       </div>
 
-      {/* Progression du parcours complet */}
       <ol className="mt-3 flex flex-wrap gap-2 text-[11px]">
-        {[
-          { label: '1. Fiche du livre', done: step === 'done' },
-          { label: '2. Sommaire IA validé', done: Boolean(brief.outlineValidated) },
-          { label: '3. Rédaction (workflow)', done: false },
-          { label: '4. Export + couverture', done: false },
-        ].map((s) => (
+        {steps.map((s) => (
           <li key={s.label} className="inline-flex items-center gap-1 rounded-full border px-2.5 py-1"
             style={{ borderColor: s.done ? 'var(--v3-gold, #c9a84c)' : 'rgba(0,0,0,0.12)', color: 'var(--v3-muted)' }}>
             {s.done ? <Check className="h-3 w-3" /> : null} {s.label}
@@ -142,110 +133,158 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
         ))}
       </ol>
 
-      {/* Conversation */}
-      <div className="mt-4 max-h-[320px] space-y-3 overflow-y-auto pr-1">
-        {transcript.map((row, i) => (
-          <div key={i} className="space-y-1">
-            <p className="text-xs" style={{ color: 'var(--v3-muted)' }}>🧞 {row.q}</p>
-            <p className="ml-4 rounded-2xl bg-white/85 px-3 py-2 text-sm" style={{ color: 'var(--v3-ink)' }}>{row.a}</p>
-          </div>
-        ))}
-
-        {step !== 'done' && (
-          <p className="text-sm font-semibold" style={{ color: 'var(--v3-ink)' }}>
-            🧞 {QUESTIONS[step]}
-          </p>
-        )}
-        <div ref={endRef} />
+      {/* Boîte de saisie unique */}
+      <div className="mt-5 rounded-3xl border bg-white/90 p-3 shadow-sm" style={{ borderColor: 'rgba(201,168,76,0.55)' }}>
+        <textarea
+          ref={inputRef}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); ask(input); } }}
+          rows={3}
+          disabled={loading}
+          placeholder="Parlez-moi de vous et de ce sur quoi vous aimeriez écrire…"
+          className="w-full resize-none bg-transparent px-2 py-2 text-sm outline-none"
+          style={{ color: 'var(--v3-ink)' }}
+        />
+        <div className="flex items-center justify-between gap-2 px-1 pt-1">
+          <span className="text-[11px]" style={{ color: 'var(--v3-muted)' }}>
+            <Mic className="mr-1 inline h-3 w-3" /> Écrivez librement : sujet, lecteur, promesse.
+          </span>
+          <button type="button" onClick={() => ask(input)} disabled={loading || input.trim().length < 10}
+            className="v3-btn v3-btn-primary disabled:opacity-50">
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+            {loading ? 'Le Génie prépare votre fiche…' : 'Envoyer au Génie'}
+            {!loading && <ArrowRight className="h-4 w-4" />}
+          </button>
+        </div>
       </div>
 
-      {/* Saisie / choix */}
-      {isTextStep && (
-        <div className="mt-3">
-          <textarea
-            ref={inputRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey || step !== 'idea')) { e.preventDefault(); submitText(); } }}
-            rows={step === 'idea' ? 4 : 2}
-            placeholder={step === 'idea' ? 'Ex. : un guide pratique pour débuter sur Amazon KDP en 30 jours…' : 'Votre réponse…'}
-            className="w-full resize-none rounded-2xl border bg-white/90 p-3 text-sm outline-none"
-            style={{ borderColor: 'rgba(0,0,0,0.10)', color: 'var(--v3-ink)' }}
-          />
-          <div className="mt-2 flex flex-wrap items-center gap-2">
-            <button type="button" onClick={submitText} disabled={!input.trim()} className="v3-btn v3-btn-primary disabled:opacity-50">
-              <Wand2 className="h-4 w-4" /> Envoyer au Génie <ArrowRight className="h-4 w-4" />
-            </button>
-            <Link to="/v3/create?import=1" className="v3-btn v3-btn-ghost text-xs">
-              <Upload className="w-3.5 h-3.5" /> Importer un document (.docx, .pdf, URL)
-            </Link>
-          </div>
-        </div>
-      )}
-
-      {step === 'category' && (
-        <ChoiceRow options={CATEGORIES} onPick={chooseCategory} />
-      )}
-      {step === 'tone' && (
-        <ChoiceRow options={TONES} onPick={chooseTone} />
-      )}
-      {step === 'size' && (
-        <div className="mt-3 grid gap-2 md:grid-cols-3">
-          {SIZES.map((s) => (
-            <button key={s.label} type="button" onClick={() => chooseSize(s)}
-              className="rounded-2xl border bg-white/90 px-3 py-3 text-left text-xs font-semibold transition hover:opacity-80"
-              style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }}>
-              {s.label}
+      {!ready && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {EXAMPLES.map((ex) => (
+            <button key={ex} type="button" onClick={() => setInput(ex)}
+              className="rounded-full border bg-white/80 px-3 py-1.5 text-[11px] transition hover:opacity-80"
+              style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-muted)' }}>
+              {ex.length > 62 ? `${ex.slice(0, 62)}…` : ex}
             </button>
           ))}
         </div>
       )}
-      {step === 'images' && (
-        <div className="mt-3 flex flex-wrap gap-2">
-          <button type="button" onClick={() => chooseImages(true)} className="v3-btn v3-btn-primary">
-            <ImageIcon className="h-4 w-4" /> Oui, avec illustrations IA
-          </button>
-          <button type="button" onClick={() => chooseImages(false)} className="v3-btn v3-btn-outline">
-            Non, texte uniquement
-          </button>
-        </div>
-      )}
 
-      {step === 'done' && (
-        <div className="mt-4 rounded-2xl border bg-white/90 p-4" style={{ borderColor: 'rgba(0,0,0,0.10)' }}>
+      {/* Autres voies */}
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]" style={{ color: 'var(--v3-muted)' }}>
+        Ou choisissez une autre voie :
+        <Link to="/v3/create?import=1" className="v3-btn v3-btn-ghost text-xs">
+          <Upload className="h-3.5 w-3.5" /> Importer un document (.docx, .pdf, URL)
+        </Link>
+        <Link to="/v3/corriger" className="v3-btn v3-btn-ghost text-xs">
+          <FileText className="h-3.5 w-3.5" /> Corriger un livre existant
+        </Link>
+      </div>
+
+      {/* Fiche déduite par le Génie */}
+      {ready && (
+        <div ref={resultRef} className="mt-5 rounded-2xl border bg-white/92 p-4" style={{ borderColor: 'rgba(0,0,0,0.10)' }}>
           <p className="text-sm" style={{ color: 'var(--v3-ink)' }}>
-            🧞 J’ai tout ce qu’il me faut : <strong>{brief.title}</strong> — {brief.category} · {brief.tone} ·{' '}
-            {brief.chapters} chapitres × {brief.wordsPerChapter} mots ·{' '}
-            {brief.wantsIllustrations ? 'avec illustrations' : 'sans illustration'}.
+            🧞 Voilà ce que j’ai compris : <strong>{brief.title}</strong>
+            {brief.subtitle ? ` — ${brief.subtitle}` : ''}
           </p>
-          <p className="mt-1 text-xs" style={{ color: 'var(--v3-muted)' }}>
-            On construit maintenant le sommaire ensemble. Dès que vous le validez, le workflow rédige les chapitres avec
-            vos informations, puis enchaîne l’export (PDF/Word) et la couverture{brief.wantsIllustrations ? ' et les illustrations' : ''}.
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2">
+          <p className="mt-1 text-xs leading-relaxed" style={{ color: 'var(--v3-muted)' }}>{brief.description}</p>
+
+          <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
+            {[
+              brief.category,
+              brief.tone,
+              `${brief.chapters} chapitres × ${brief.wordsPerChapter} mots`,
+              brief.wantsIllustrations ? 'avec illustrations IA' : 'texte uniquement',
+              brief.author ? `par ${brief.author}` : null,
+            ].filter(Boolean).map((chip) => (
+              <span key={String(chip)} className="rounded-full border px-2.5 py-1"
+                style={{ borderColor: 'rgba(201,168,76,0.6)', color: 'var(--v3-ink)' }}>{chip}</span>
+            ))}
+          </div>
+
+          {questions.length > 0 && (
+            <div className="mt-3 space-y-2">
+              {questions.map((q) => (
+                <RefineRow key={q} question={q} disabled={loading} onSend={refine} />
+              ))}
+            </div>
+          )}
+
+          <div className="mt-4 flex flex-wrap gap-2">
             <button type="button" onClick={onReady} className="v3-btn v3-btn-primary">
               <Sparkles className="h-4 w-4" /> Construire mon sommaire avec l’IA <ArrowRight className="h-4 w-4" />
             </button>
-            <button type="button" onClick={restart} className="v3-btn v3-btn-ghost text-xs">
-              <RotateCcw className="w-3.5 h-3.5" /> Reprendre le dialogue
+            <button type="button" onClick={() => setEditing((v) => !v)} className="v3-btn v3-btn-outline text-xs">
+              <Pencil className="h-3.5 w-3.5" /> Ajuster la fiche
+            </button>
+            <button type="button" onClick={() => { setBrief({}); writeBookBrief({}); setQuestions([]); setInput(''); inputRef.current?.focus(); }}
+              className="v3-btn v3-btn-ghost text-xs">
+              <RotateCcw className="h-3.5 w-3.5" /> Repartir de zéro
             </button>
           </div>
+
+          {editing && (
+            <div className="mt-4 grid gap-3 border-t pt-4 md:grid-cols-2" style={{ borderColor: 'rgba(0,0,0,0.08)' }}>
+              <Field label="Titre" value={brief.title || ''} onChange={(v) => patch({ title: v })} />
+              <Field label="Auteur" value={brief.author || ''} onChange={(v) => patch({ author: v })} />
+              <Select label="Catégorie" value={brief.category || ''} options={CATEGORIES} onChange={(v) => patch({ category: v })} />
+              <Select label="Ton" value={brief.tone || ''} options={TONES} onChange={(v) => patch({ tone: v })} />
+              <Field label="Chapitres" type="number" value={String(brief.chapters || 20)}
+                onChange={(v) => patch({ chapters: Math.min(40, Math.max(3, Number(v) || 20)) })} />
+              <Field label="Mots par chapitre" type="number" value={String(brief.wordsPerChapter || 1500)}
+                onChange={(v) => patch({ wordsPerChapter: Math.min(3000, Math.max(600, Number(v) || 1500)) })} />
+              <label className="flex items-center gap-2 text-xs md:col-span-2" style={{ color: 'var(--v3-ink)' }}>
+                <input type="checkbox" checked={Boolean(brief.wantsIllustrations)}
+                  onChange={(e) => patch({ wantsIllustrations: e.target.checked })} />
+                Ajouter des illustrations IA à l’intérieur du livre
+              </label>
+            </div>
+          )}
         </div>
       )}
     </div>
   );
 }
 
-function ChoiceRow({ options, onPick }: { options: string[]; onPick: (value: string) => void }) {
+function RefineRow({ question, disabled, onSend }: { question: string; disabled?: boolean; onSend: (v: string) => void }) {
+  const [value, setValue] = useState('');
   return (
-    <div className="mt-3 flex flex-wrap gap-2">
-      {options.map((option) => (
-        <button key={option} type="button" onClick={() => onPick(option)}
-          className="rounded-full border bg-white/90 px-3 py-1.5 text-[12px] font-semibold transition hover:opacity-80"
-          style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }}>
-          {option}
-        </button>
-      ))}
+    <div className="rounded-2xl border bg-white/80 p-2.5" style={{ borderColor: 'rgba(0,0,0,0.10)' }}>
+      <p className="text-xs" style={{ color: 'var(--v3-muted)' }}>🧞 {question}</p>
+      <div className="mt-2 flex gap-2">
+        <input value={value} onChange={(e) => setValue(e.target.value)} placeholder="Votre réponse…"
+          className="flex-1 rounded-xl border bg-white px-2.5 py-1.5 text-xs outline-none"
+          style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }} />
+        <button type="button" disabled={disabled || !value.trim()} onClick={() => onSend(value)}
+          className="v3-btn v3-btn-outline text-xs disabled:opacity-50">Affiner</button>
+      </div>
     </div>
+  );
+}
+
+function Field({ label, value, onChange, type = 'text' }: { label: string; value: string; onChange: (v: string) => void; type?: string }) {
+  return (
+    <label className="block text-xs" style={{ color: 'var(--v3-muted)' }}>
+      {label}
+      <input type={type} value={value} onChange={(e) => onChange(e.target.value)}
+        className="mt-1 w-full rounded-xl border bg-white px-2.5 py-2 text-sm outline-none"
+        style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }} />
+    </label>
+  );
+}
+
+function Select({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (v: string) => void }) {
+  return (
+    <label className="block text-xs" style={{ color: 'var(--v3-muted)' }}>
+      {label}
+      <select value={value} onChange={(e) => onChange(e.target.value)}
+        className="mt-1 w-full rounded-xl border bg-white px-2.5 py-2 text-sm outline-none"
+        style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }}>
+        <option value="">—</option>
+        {options.map((o) => <option key={o} value={o}>{o}</option>)}
+      </select>
+    </label>
   );
 }
