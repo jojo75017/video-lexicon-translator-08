@@ -1069,7 +1069,7 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
         yPos += Math.min(descLines.length, 6) * 3.5 + 4;
 
         // History section
-        if (sheet.history && yPos < 130) {
+        if (sheet.history && yPos < 150) {
           pdf.setFontSize(10);
           pdf.setFont('helvetica', 'bold');
           pdf.setTextColor(30, 60, 100);
@@ -1085,7 +1085,7 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
         }
 
         // Gastronomy section
-        if (yPos < 155) {
+        if (yPos < 172) {
           pdf.setFontSize(10);
           pdf.setFont('helvetica', 'bold');
           pdf.setTextColor(30, 60, 100);
@@ -1101,7 +1101,7 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
         }
 
         // Must see section
-        if (yPos < 185) {
+        if (yPos < 195) {
           pdf.setFontSize(10);
           pdf.setFont('helvetica', 'bold');
           pdf.setTextColor(30, 60, 100);
@@ -1120,7 +1120,7 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
         }
 
         // Accommodations section
-        if (yPos < 210) {
+        if (yPos < 212) {
           pdf.setFontSize(10);
           pdf.setFont('helvetica', 'bold');
           pdf.setTextColor(30, 60, 100);
@@ -1139,7 +1139,7 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
         }
 
         // Travel tips section
-        if (yPos < 230) {
+        if (yPos < 210) {
           pdf.setFillColor(255, 252, 245);
           pdf.roundedRect(margin, yPos, fullWidth, 20, 3, 3, 'F');
           pdf.setDrawColor(230, 220, 200);
