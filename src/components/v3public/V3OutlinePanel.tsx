@@ -287,7 +287,8 @@ Règles :
         <div>
           <span className="v3-chip v3-chip-orange"><ListOrdered className="h-3.5 w-3.5" /> Sommaire du livre</span>
           <p className="mt-2 text-xs" style={{ color: 'var(--v3-muted)' }}>
-            Générez-le, importez votre « Sommaire Ultime » ou collez le vôtre, puis validez-le : c’est lui qui pilote le workflow.
+            Deux façons de faire : l’IA propose tout le sommaire et vous l’ajustez, ou vous le construisez avec elle
+            chapitre par chapitre. Dans les deux cas, validez-le à la fin : c’est lui qui pilote le workflow.
           </p>
         </div>
         {validated && (
@@ -298,10 +299,48 @@ Règles :
         )}
       </div>
 
+      {/* Sélecteur de mode */}
+      <div className="mt-4 grid gap-2 sm:grid-cols-2">
+        {([
+          { id: 'full' as OutlineMode, icon: Wand2, label: 'Proposition complète', hint: 'L’IA propose tout, vous réordonnez et renommez.' },
+          { id: 'guided' as OutlineMode, icon: MessageSquarePlus, label: 'Dialogue chapitre par chapitre', hint: 'L’IA propose 3 options, vous choisissez, puis on avance.' },
+        ]).map((opt) => {
+          const active = mode === opt.id;
+          return (
+            <button
+              key={opt.id}
+              type="button"
+              onClick={() => { setMode(opt.id); setSuggestions([]); }}
+              className="rounded-2xl border p-3 text-left transition"
+              style={{
+                borderColor: active ? 'var(--v3-accent, #8C6A3F)' : 'var(--v3-border)',
+                background: active ? 'rgba(140,106,63,0.06)' : '#fff',
+                boxShadow: active ? '0 0 0 1px var(--v3-accent, #8C6A3F) inset' : 'none',
+              }}
+            >
+              <span className="flex items-center gap-2 text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>
+                <opt.icon className="h-4 w-4" /> {opt.label}
+              </span>
+              <span className="mt-1 block text-xs" style={{ color: 'var(--v3-muted)' }}>{opt.hint}</span>
+            </button>
+          );
+        })}
+      </div>
+
       <div className="mt-4 flex flex-wrap gap-2">
-        <button type="button" onClick={generate} disabled={loading} className="v3-btn v3-btn-primary disabled:opacity-60">
-          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-          {outline.length ? 'Régénérer le sommaire' : 'Générer le sommaire'}
+        {mode === 'full' ? (
+          <button type="button" onClick={generate} disabled={loading} className="v3-btn v3-btn-primary disabled:opacity-60">
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+            {outline.length ? 'Régénérer le sommaire' : 'Générer le sommaire'}
+          </button>
+        ) : (
+          <button type="button" onClick={askNextChapter} disabled={suggesting} className="v3-btn v3-btn-primary disabled:opacity-60">
+            {suggesting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            Proposer le chapitre {outline.length + 1}
+          </button>
+        )}
+        <button type="button" onClick={addChapter} className="v3-btn v3-btn-outline">
+          <Plus className="h-4 w-4" /> Chapitre vide
         </button>
         <button type="button" onClick={importUltimate} className="v3-btn v3-btn-outline">
           <RefreshCw className="h-4 w-4" /> Importer mon Sommaire Ultime
@@ -311,6 +350,47 @@ Règles :
         </button>
         <Link to="/v3/outils/sommaire-ultime" className="v3-btn v3-btn-ghost text-xs">Ouvrir Sommaire Ultime</Link>
       </div>
+
+      {mode === 'guided' && (
+        <div className="mt-4 rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)', background: 'rgba(140,106,63,0.04)' }}>
+          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--v3-muted)' }}>
+            Chapitre {outline.length + 1} sur {target} prévus
+          </p>
+          <input
+            value={guidance}
+            onChange={(e) => setGuidance(e.target.value)}
+            placeholder="Consigne pour ce chapitre (optionnel) — ex : introduire l’antagoniste, plus de tension"
+            className="mt-2 w-full rounded-xl border px-3 py-2 text-sm outline-none"
+            style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: '#fff' }}
+          />
+
+          {suggestions.length > 0 && (
+            <div className="mt-3 space-y-2">
+              {suggestions.map((s, i) => (
+                <div key={i} className="rounded-xl border px-3 py-2" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
+                  <p className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>{s.titre}</p>
+                  {s.objectif && <p className="mt-0.5 text-xs" style={{ color: 'var(--v3-muted)' }}>{s.objectif}</p>}
+                  <div className="mt-2 flex gap-2">
+                    <button type="button" onClick={() => acceptSuggestion(s)} className="v3-btn v3-btn-primary text-xs">
+                      <Check className="h-3.5 w-3.5" /> Retenir ce chapitre
+                    </button>
+                  </div>
+                </div>
+              ))}
+              <button type="button" onClick={askNextChapter} disabled={suggesting} className="v3-btn v3-btn-outline text-xs disabled:opacity-60">
+                <RefreshCw className="h-3.5 w-3.5" /> Autres propositions
+              </button>
+            </div>
+          )}
+
+          {outline.length >= target && (
+            <p className="mt-3 text-xs font-semibold" style={{ color: 'var(--v3-accent, #8C6A3F)' }}>
+              Objectif de {target} chapitres atteint — vous pouvez valider le sommaire ci-dessous.
+            </p>
+          )}
+        </div>
+      )}
+
 
       {pasteOpen && (
         <div className="mt-4">
