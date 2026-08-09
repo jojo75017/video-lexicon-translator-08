@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, ClipboardPaste, ListOrdered, Loader2, RefreshCw, Wand2, X } from 'lucide-react';
+import {
+  ArrowDown, ArrowUp, Check, ClipboardPaste, ListOrdered, Loader2, MessageSquarePlus,
+  Plus, RefreshCw, Sparkles, Wand2, X,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -18,17 +21,26 @@ type Props = {
   onChange: (patch: Partial<BookBrief>) => void;
 };
 
+type OutlineMode = 'full' | 'guided';
+type Suggestion = { titre: string; objectif?: string };
+
 /**
- * Sommaire du livre — génération IA, import « Sommaire Ultime » ou collage manuel,
- * puis validation explicite : c'est ce sommaire validé qui pilote le workflow.
+ * Sommaire du livre — deux modes : proposition complète éditable, ou dialogue
+ * chapitre par chapitre avec l'IA. Le sommaire validé pilote le workflow.
  */
 export default function V3OutlinePanel({ brief, onChange }: Props) {
   const [loading, setLoading] = useState(false);
   const [pasteOpen, setPasteOpen] = useState(false);
   const [pasteText, setPasteText] = useState('');
+  const [mode, setMode] = useState<OutlineMode>('full');
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [guidance, setGuidance] = useState('');
+  const [suggesting, setSuggesting] = useState(false);
 
   const outline = brief.outline || [];
   const validated = Boolean(brief.outlineValidated) && outline.length > 0;
+  const target = Math.min(60, Math.max(3, Number(brief.chapters) || 12));
+
 
   const applyOutline = (chapters: BriefOutlineChapter[], source: string) => {
     const normalized = normalizeOutline(chapters).slice(0, 60);
