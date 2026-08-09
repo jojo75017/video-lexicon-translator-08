@@ -28,6 +28,8 @@ type Props = {
   /** `compact` : récapitulatif en lecture (accueil). `full` : fiche complète éditable (/v3/create). */
   variant?: 'full' | 'compact';
   onLaunch?: () => void;
+  /** Préselectionne le mode du Sommaire IA (dialogue guidé). */
+  outlineMode?: 'full' | 'guided';
 };
 
 /**
@@ -35,7 +37,7 @@ type Props = {
  * La Cible & Promesse est générée par l'IA (aucun champ à remplir) et le sommaire
  * doit être validé avant de lancer le workflow.
  */
-export default function V3BriefRecap({ variant = 'compact', onLaunch }: Props) {
+export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMode }: Props) {
   const [brief, setBrief] = useState<BookBrief>({});
   const [saved, setSaved] = useState(false);
 
@@ -212,7 +214,7 @@ export default function V3BriefRecap({ variant = 'compact', onLaunch }: Props) {
       <V3TargetPromisePanel brief={brief} onChange={patch} />
 
       {/* Sommaire + validation */}
-      <V3OutlinePanel brief={brief} onChange={patch} />
+      <V3OutlinePanel brief={brief} onChange={patch} initialMode={outlineMode} />
 
       {/* Lancement du workflow */}
       <div className="rounded-[22px] border p-5" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
