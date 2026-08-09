@@ -73,10 +73,11 @@ export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMod
   if (!(brief.title || '').trim()) missing.push('le titre');
   if (!(brief.author || '').trim()) missing.push('le nom de l’auteur');
   if ((brief.description || '').trim().length < 30) missing.push('le synopsis');
+  if (!brief.outlineValidated || outline.length === 0) missing.push('la validation du sommaire (Sommaire IA)');
   const recommended: string[] = [];
   if (!(brief.promesseCentrale || '').trim()) recommended.push('la Cible & Promesse (bouton IA)');
-  if (!brief.outlineValidated || outline.length === 0) recommended.push('la validation du sommaire');
   const ready = missing.length === 0;
+
 
 
   /* ---------------------------- Variante compacte ---------------------------- */
@@ -218,14 +219,20 @@ export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMod
 
       {/* Lancement du workflow */}
       <div className="rounded-[22px] border p-5" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
+        <p className="mb-3 text-xs" style={{ color: 'var(--v3-muted)' }}>
+          Le workflow reprend vos informations (titre, auteur, synopsis, catégorie, ton, {chapters || '—'} chapitres) et le
+          sommaire validé, rédige tous les chapitres, puis enchaîne l’export (PDF / Word) et la couverture
+          {brief.wantsIllustrations ? ', avec les illustrations IA demandées' : ''}.
+        </p>
         <button
           type="button"
           onClick={() => { save(); onLaunch?.(); }}
           disabled={!ready}
           className="v3-btn v3-btn-primary w-full justify-center py-4 text-base disabled:opacity-50"
         >
-          <Rocket className="h-5 w-5" /> Lancer le workflow
+          <Rocket className="h-5 w-5" /> Lancer le workflow (rédaction → export → couverture)
         </button>
+
         {!ready ? (
           <p className="mt-3 text-center text-xs" style={{ color: 'var(--v3-muted)' }}>
             Il manque encore : {missing.join(', ')}.

@@ -23,6 +23,8 @@ export type BookBrief = {
   outline?: BriefOutlineChapter[];
   /** Vrai quand l'auteur a explicitement validé le sommaire utilisé par le workflow. */
   outlineValidated?: boolean;
+  /** L'abonné souhaite des illustrations IA à l'intérieur du livre. */
+  wantsIllustrations?: boolean;
   characters?: Array<{ name?: string; role?: string; description?: string; traits?: string }>;
   cibleProfil?: string;
   cibleNiveau?: string;

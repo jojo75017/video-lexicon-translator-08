@@ -275,13 +275,16 @@ export default function V3CreateWizard() {
       if (w.subtitle) setSubtitle(w.subtitle);
       if (w.author) setAuthorName(w.author);
       if (w.description) setDescription(w.description);
-      if (w.genre) {
-        const match = CATEGORIES.find((c) => c.toLowerCase() === String(w.genre).toLowerCase());
+      // La fiche du livre (Génie / V3BriefRecap) écrit `category`/`chapters`,
+      // le wizard historique `genre`/`numberOfChapters` : on accepte les deux.
+      const wGenre = w.genre || w.category;
+      if (wGenre) {
+        const match = CATEGORIES.find((c) => c.toLowerCase() === String(wGenre).toLowerCase());
         if (match) setCategory(match);
-        else { setCategory('Autre'); setCustomCategory(String(w.genre)); }
+        else { setCategory('Autre'); setCustomCategory(String(wGenre)); }
       }
       if (w.tone) setTone(w.tone);
-      if (w.numberOfChapters) setChapters(clampNumber(Number(w.numberOfChapters), 3, 60, 12));
+      if (w.numberOfChapters || w.chapters) setChapters(clampNumber(Number(w.numberOfChapters || w.chapters), 3, 60, 12));
       if (w.wordsPerChapter) setWordsPerChapter(Number(w.wordsPerChapter));
       if (Array.isArray(w.characters) && w.characters.length) {
         setCharacters(w.characters.map((c: any) => ({
@@ -292,9 +295,9 @@ export default function V3CreateWizard() {
         const restoredOutline = w.outline.map((o: any, i: number) => ({
           id: makeId(), numero: o.numero || i + 1, titre: o.titre || `Chapitre ${i + 1}`, objectif: o.objectif || '',
         }));
-        const restoredCount = clampNumber(Number(w.numberOfChapters || restoredOutline.length), 3, 60, restoredOutline.length || 12);
+        const restoredCount = clampNumber(Number(w.numberOfChapters || w.chapters || restoredOutline.length), 3, 60, restoredOutline.length || 12);
         setOutline(hasRepeatedFallbackTitles(restoredOutline, restoredCount)
-          ? buildFallbackOutline(w.title || title, w.genre || effectiveCategory, restoredCount)
+          ? buildFallbackOutline(w.title || title, wGenre || effectiveCategory, restoredCount)
           : restoredOutline);
       }
       if (w.cibleProfil) setCibleProfil(w.cibleProfil);
