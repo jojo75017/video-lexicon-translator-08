@@ -135,81 +135,92 @@ export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMod
           </div>
         </div>
 
-        {/* Champs du livre */}
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
-          <label className="block">
-            <span className={labelClass} style={{ color: 'var(--v3-muted)' }}>Titre du livre *</span>
-            <input value={brief.title || ''} onChange={(e) => set('title', e.target.value)} placeholder="Le titre de votre livre"
-              className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none" style={fieldStyle} />
-          </label>
-          <label className="block">
-            <span className={labelClass} style={{ color: 'var(--v3-muted)' }}>Sous-titre (optionnel)</span>
-            <input value={brief.subtitle || ''} onChange={(e) => set('subtitle', e.target.value)} placeholder="Promesse courte, bénéfice…"
-              className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none" style={fieldStyle} />
-          </label>
-          <label className="block">
-            <span className={labelClass} style={{ color: 'var(--v3-muted)' }}>Nom de l'auteur *</span>
-            <input value={brief.author || ''} onChange={(e) => set('author', e.target.value)} placeholder="Nom de plume"
-              className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none" style={fieldStyle} />
-          </label>
-          <label className="block">
-            <span className={labelClass} style={{ color: 'var(--v3-muted)' }}>Catégorie Amazon KDP * ({CATEGORIES.length})</span>
-            <select value={brief.category || ''} onChange={(e) => set('category', e.target.value)} size={1}
-              className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none" style={fieldStyle}>
-              <option value="">— Choisir une catégorie —</option>
-              {CATEGORIES.map((item) => <option key={item} value={item}>{item}</option>)}
-            </select>
-          </label>
-          <label className="block">
-            <span className={labelClass} style={{ color: 'var(--v3-muted)' }}>Ton du livre</span>
-            <select value={brief.tone || ''} onChange={(e) => set('tone', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none" style={fieldStyle}>
-              <option value="">— Choisir un ton —</option>
-              {TONES.map((item) => <option key={item} value={item}>{item}</option>)}
-            </select>
-          </label>
-          <div className="grid grid-cols-2 gap-4">
-            <label className="block">
-              <span className={labelClass} style={{ color: 'var(--v3-muted)' }}>Chapitres</span>
-              <input type="number" min={3} max={60} value={brief.chapters ?? ''} onChange={(e) => set('chapters', Number(e.target.value) || undefined)}
-                className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none" style={fieldStyle} />
-            </label>
-            <label className="block">
-              <span className={labelClass} style={{ color: 'var(--v3-muted)' }}>Mots / chapitre</span>
-              <input type="number" min={500} max={8000} step={100} value={brief.wordsPerChapter ?? ''} onChange={(e) => set('wordsPerChapter', Number(e.target.value) || undefined)}
-                className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none" style={fieldStyle} />
-            </label>
-          </div>
-          <label className="block md:col-span-2">
-            <span className={labelClass} style={{ color: 'var(--v3-muted)' }}>
-              Synopsis * {brief.description ? `· ${brief.description.trim().split(/\s+/).filter(Boolean).length} mots` : ''}
-            </span>
-            <textarea value={brief.description || ''} onChange={(e) => set('description', e.target.value)} rows={5}
-              placeholder="De quoi parle votre livre ? Pour qui ? Que va-t-il changer pour le lecteur ?"
-              className="mt-1 w-full rounded-xl border px-3 py-2 text-sm leading-relaxed outline-none" style={fieldStyle} />
-          </label>
-        </div>
+        {/* Champs du livre — masqués en mode Génie (le dialogue remplit la fiche) */}
+        {!hideBookForm && (
+          <>
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              <label className="block">
+                <span className={labelClass} style={{ color: 'var(--v3-muted)' }}>Titre du livre *</span>
+                <input value={brief.title || ''} onChange={(e) => set('title', e.target.value)} placeholder="Le titre de votre livre"
+                  className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none" style={fieldStyle} />
+              </label>
+              <label className="block">
+                <span className={labelClass} style={{ color: 'var(--v3-muted)' }}>Sous-titre (optionnel)</span>
+                <input value={brief.subtitle || ''} onChange={(e) => set('subtitle', e.target.value)} placeholder="Promesse courte, bénéfice…"
+                  className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none" style={fieldStyle} />
+              </label>
+              <label className="block">
+                <span className={labelClass} style={{ color: 'var(--v3-muted)' }}>Nom de l'auteur *</span>
+                <input value={brief.author || ''} onChange={(e) => set('author', e.target.value)} placeholder="Nom de plume"
+                  className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none" style={fieldStyle} />
+              </label>
+              <label className="block">
+                <span className={labelClass} style={{ color: 'var(--v3-muted)' }}>Catégorie Amazon KDP * ({CATEGORIES.length})</span>
+                <select value={brief.category || ''} onChange={(e) => set('category', e.target.value)} size={1}
+                  className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none" style={fieldStyle}>
+                  <option value="">— Choisir une catégorie —</option>
+                  {CATEGORIES.map((item) => <option key={item} value={item}>{item}</option>)}
+                </select>
+              </label>
+              <label className="block">
+                <span className={labelClass} style={{ color: 'var(--v3-muted)' }}>Ton du livre</span>
+                <select value={brief.tone || ''} onChange={(e) => set('tone', e.target.value)}
+                  className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none" style={fieldStyle}>
+                  <option value="">— Choisir un ton —</option>
+                  {TONES.map((item) => <option key={item} value={item}>{item}</option>)}
+                </select>
+              </label>
+              <div className="grid grid-cols-2 gap-4">
+                <label className="block">
+                  <span className={labelClass} style={{ color: 'var(--v3-muted)' }}>Chapitres</span>
+                  <input type="number" min={3} max={60} value={brief.chapters ?? ''} onChange={(e) => set('chapters', Number(e.target.value) || undefined)}
+                    className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none" style={fieldStyle} />
+                </label>
+                <label className="block">
+                  <span className={labelClass} style={{ color: 'var(--v3-muted)' }}>Mots / chapitre</span>
+                  <input type="number" min={500} max={8000} step={100} value={brief.wordsPerChapter ?? ''} onChange={(e) => set('wordsPerChapter', Number(e.target.value) || undefined)}
+                    className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none" style={fieldStyle} />
+                </label>
+              </div>
+              <label className="block md:col-span-2">
+                <span className={labelClass} style={{ color: 'var(--v3-muted)' }}>
+                  Synopsis * {brief.description ? `· ${brief.description.trim().split(/\s+/).filter(Boolean).length} mots` : ''}
+                </span>
+                <textarea value={brief.description || ''} onChange={(e) => set('description', e.target.value)} rows={5}
+                  placeholder="De quoi parle votre livre ? Pour qui ? Que va-t-il changer pour le lecteur ?"
+                  className="mt-1 w-full rounded-xl border px-3 py-2 text-sm leading-relaxed outline-none" style={fieldStyle} />
+              </label>
+            </div>
 
-        {totalWords > 0 && (
-          <p className="mt-3 text-xs font-semibold" style={{ color: 'var(--v3-muted)' }}>
-            Estimation : {chapters} chapitres · {totalWords.toLocaleString('fr-FR')} mots · ~{Math.max(1, Math.round(totalWords / 300))} pages
-          </p>
+            {totalWords > 0 && (
+              <p className="mt-3 text-xs font-semibold" style={{ color: 'var(--v3-muted)' }}>
+                Estimation : {chapters} chapitres · {totalWords.toLocaleString('fr-FR')} mots · ~{Math.max(1, Math.round(totalWords / 300))} pages
+              </p>
+            )}
+
+            {characters.length > 0 && (
+              <div className="mt-6">
+                <h3 className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--v3-muted)' }}>
+                  Personnages ({characters.length})
+                </h3>
+                <ul className="mt-3 grid gap-2 md:grid-cols-2">
+                  {characters.map((character, index) => (
+                    <li key={index} className="rounded-xl border px-3 py-2 text-sm" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)' }}>
+                      <span className="flex items-center gap-2 font-bold"><UserRound className="h-3.5 w-3.5" /> {character.name}</span>
+                      <span className="text-xs" style={{ color: 'var(--v3-muted)' }}>{[character.role, character.description || character.traits].filter(Boolean).join(' — ')}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </>
         )}
 
-        {characters.length > 0 && (
-          <div className="mt-6">
-            <h3 className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--v3-muted)' }}>
-              Personnages ({characters.length})
-            </h3>
-            <ul className="mt-3 grid gap-2 md:grid-cols-2">
-              {characters.map((character, index) => (
-                <li key={index} className="rounded-xl border px-3 py-2 text-sm" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)' }}>
-                  <span className="flex items-center gap-2 font-bold"><UserRound className="h-3.5 w-3.5" /> {character.name}</span>
-                  <span className="text-xs" style={{ color: 'var(--v3-muted)' }}>{[character.role, character.description || character.traits].filter(Boolean).join(' — ')}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+        {/* Récapitulatif minimal en mode Génie (remplace le formulaire) */}
+        {hideBookForm && totalWords > 0 && (
+          <p className="mt-4 text-xs font-semibold" style={{ color: 'var(--v3-muted)' }}>
+            Estimation : {chapters} chapitres · {totalWords.toLocaleString('fr-FR')} mots · ~{Math.max(1, Math.round(totalWords / 300))} pages
+          </p>
         )}
       </div>
 
