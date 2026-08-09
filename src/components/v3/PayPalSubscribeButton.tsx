@@ -12,9 +12,11 @@ interface Props {
   planName: string;
   amount: number;
   accent: string;
+  /** Tarif ancien client V2 (-20 % à vie). */
+  legacyV2?: boolean;
 }
 
-export function PayPalSubscribeButton({ planId, interval, planName, amount, accent }: Props) {
+export function PayPalSubscribeButton({ planId, interval, planName, amount, accent, legacyV2 = false }: Props) {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -30,6 +32,7 @@ export function PayPalSubscribeButton({ planId, interval, planName, amount, acce
         body: {
           planId,
           interval,
+          legacyV2,
           email: email.trim(),
           returnUrl: `${window.location.origin}/v3/paypal-retour?plan=${planId}&interval=${interval}`,
           cancelUrl: `${window.location.origin}/v3/forfaits?paypal=cancelled`,
