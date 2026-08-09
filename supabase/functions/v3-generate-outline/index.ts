@@ -22,7 +22,14 @@ interface Body {
   promesseCentrale?: string;
   chapters?: number;
   userApiKey?: string;
+  /** 'full' (défaut) = sommaire complet ; 'next' = propositions pour le prochain chapitre */
+  step?: "full" | "next";
+  /** Chapitres déjà validés par l'auteur (mode dialogue) */
+  accepted?: Array<{ numero?: number; titre?: string; objectif?: string }>;
+  /** Consigne libre de l'auteur pour orienter les propositions */
+  guidance?: string;
 }
+
 
 function sanitizeApiKey(value: unknown): string {
   return typeof value === "string"
