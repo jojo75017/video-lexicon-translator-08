@@ -30,6 +30,8 @@ type Props = {
   onLaunch?: () => void;
   /** Préselectionne le mode du Sommaire IA (dialogue guidé). */
   outlineMode?: 'full' | 'guided';
+  /** Masque le formulaire de saisie manuelle (mode Ebookstudio-Génie) : le récap + sommaire + lancement restent. */
+  hideBookForm?: boolean;
 };
 
 /**
