@@ -61,6 +61,8 @@ export interface DocxExportOptions {
   fontFamily?: string;
   fontSize?: number; // in pt (e.g. 12)
   includeTableOfContents?: boolean;
+  /** Sommaire stylé « motif discret » (crème + filets dorés). Activé par défaut. */
+  styledToc?: boolean;
   includeCoverPage?: boolean;
   includePageNumbers?: boolean;
   includeCopyrightPage?: boolean;
