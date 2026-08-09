@@ -613,6 +613,8 @@ const ProspectManagerPage = () => {
               </Button>
             </div>
 
+            <CampaignSequencePanel />
+
             <p className="text-xs text-muted-foreground">
               Format Excel : colonnes <code>email</code> et <code>prenom</code> (ou <code>first_name</code>, <code>nom</code>)
             </p>
