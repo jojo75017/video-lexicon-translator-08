@@ -40,7 +40,22 @@ export default function V3CreatePage() {
   const sommaireIa = params.get('sommaire') === 'ia';
 
   const [showWizard, setShowWizard] = useState(false);
+  const [genieIdea, setGenieIdea] = useState(idea || '');
   const wizardRef = useRef<HTMLDivElement | null>(null);
+
+  /** Enregistre l'idée dans la fiche livre puis relance la page en mode Sommaire IA guidé. */
+  const startGenie = () => {
+    const text = genieIdea.trim();
+    if (!text) return;
+    seedHubConfig(text, genre, type);
+    const url = `/v3/create?sommaire=ia&idea=${encodeURIComponent(text)}`;
+    if (sommaireIa) {
+      window.location.assign(url);
+    } else {
+      window.location.assign(url);
+    }
+  };
+
 
   useEffect(() => { seedHubConfig(idea, genre, type); }, [idea, genre, type]);
 
