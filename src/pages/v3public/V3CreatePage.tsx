@@ -99,46 +99,14 @@ export default function V3CreatePage() {
           </p>
         </div>
 
-        {/* Boîte de dialogue Génie */}
-        <div className="mt-7 rounded-[24px] border p-4 md:p-5"
-          style={{ borderColor: 'var(--v3-gold, #c9a84c)', background: 'linear-gradient(180deg, rgba(201,168,76,0.10), rgba(201,168,76,0.02))' }}>
-          <div className="flex items-center justify-between gap-3 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider"
-              style={{ background: 'var(--v3-gold, #c9a84c)', color: '#1a1408' }}>
-              <Sparkles className="h-3 w-3" /> Dernière nouveauté IA
-            </span>
-            <span className="text-[11px]" style={{ color: 'var(--v3-muted)' }}>Rédaction 100 % en français</span>
-          </div>
-
-          <textarea
-            value={genieIdea}
-            onChange={(e) => setGenieIdea(e.target.value)}
-            rows={4}
-            placeholder="Parlez-moi de vous et du livre que vous aimeriez écrire…"
-            className="mt-3 w-full resize-none rounded-2xl border bg-white/90 p-4 text-sm outline-none focus:ring-2"
-            style={{ borderColor: 'rgba(0,0,0,0.10)', color: 'var(--v3-ink)' }}
+        {/* Boîte de dialogue Génie — parcours guidé jusqu'au Sommaire IA */}
+        <div className="mt-7">
+          <V3GenieDialog
+            initialIdea={idea || ''}
+            onReady={() => document.getElementById('sommaire-ia')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
           />
-
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <button type="button" onClick={startGenie} disabled={!genieIdea.trim()} className="v3-btn v3-btn-primary disabled:opacity-50">
-              <Wand2 className="h-4 w-4" /> Lancer Ebookstudio-Génie <ArrowRight className="h-4 w-4" />
-            </button>
-            <Link to="/v3/create?import=1" className="v3-btn v3-btn-ghost text-xs">
-              <Upload className="w-3.5 h-3.5" /> Importer un document (.docx, .pdf, URL)
-            </Link>
-          </div>
-
-          {/* Suggestions rapides */}
-          <div className="mt-3 flex flex-wrap gap-2">
-            {GENIE_SUGGESTIONS.map((s) => (
-              <button key={s} type="button" onClick={() => setGenieIdea(s)}
-                className="rounded-full border px-3 py-1 text-[11px] transition hover:opacity-80"
-                style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-muted)' }}>
-                {s}
-              </button>
-            ))}
-          </div>
         </div>
+
 
         {/* Modes illustrés — liens discrets */}
         <div className="mt-5 flex flex-wrap justify-center gap-2">
