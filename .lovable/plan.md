@@ -35,6 +35,7 @@ Limites de la version offerte (pour laisser une marge claire vers les forfaits) 
 
 ## Le parcours
 
+0. **Un onglet dédié « Ancien client V2 »** visible dans le header (menu Forfaits) et dans la sidebar V3, avec un badge « -20 % à vie ». Il n'apparaît que pour les acheteurs V2 connectés et mène à `/v3/migration`.
 1. Email « Votre V2 évolue » → bouton vers `/v3/migration`.
 2. `/v3/migration` (nouvelle page, réservée aux acheteurs V2) :
    - Rappel : « Votre accès V2 reste à vie »
