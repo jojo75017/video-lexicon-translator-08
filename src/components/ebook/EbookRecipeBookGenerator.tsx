@@ -1439,13 +1439,13 @@ ${sheet.servingSuggestion}`;
                     </div>
 
                     {/* Right column: Content */}
-                    <div className="lg:col-span-2 space-y-4">
+                    <div className="lg:col-span-2 space-y-4 min-w-0">
                       {/* Header */}
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="text-2xl">{sheet.countryFlag}</span>
-                            <Badge variant="outline" className="bg-orange-50">{sheet.country}</Badge>
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <span className="text-2xl leading-none">{sheet.countryFlag}</span>
+                            <Badge variant="outline" className="bg-orange-50 max-w-[10rem] truncate">{sheet.country}</Badge>
                             <Badge variant="secondary">{sheet.difficulty}</Badge>
                             <Badge variant="outline" className="text-xs">{sheet.portions}</Badge>
 {(() => {
@@ -1459,16 +1459,17 @@ ${sheet.servingSuggestion}`;
                               );
                             })()}
                           </div>
-                          <h3 className="text-2xl font-bold text-orange-800 dark:text-orange-400">
+                          <h3 className="text-lg md:text-xl lg:text-2xl font-bold text-orange-800 dark:text-orange-400 leading-snug break-words line-clamp-2">
                             {sheet.dishName}
                           </h3>
                         </div>
-                        <div className="text-right text-sm text-muted-foreground">
-                          <span className="bg-orange-100 dark:bg-orange-900/30 px-2 py-1 rounded-lg">
+                        <div className="text-right text-sm text-muted-foreground shrink-0">
+                          <span className="bg-orange-100 dark:bg-orange-900/30 px-2 py-1 rounded-lg whitespace-nowrap">
                             ⏱️ {sheet.cookingTime}
                           </span>
                         </div>
                       </div>
+
 
                       {/* Description & History */}
                       <div className="space-y-2">
