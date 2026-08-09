@@ -1,12 +1,20 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Sparkles, Loader2, ImageIcon, ArrowRight } from 'lucide-react';
+import { Sparkles, Loader2, ImageIcon, ArrowRight, Wand2, Upload } from 'lucide-react';
 import { BackButton } from '@/components/v3/BackButton';
 import V3BriefRecap from '@/components/v3public/V3BriefRecap';
 import V3ApiKeysGate from '@/components/v3public/V3ApiKeysGate';
 
 const V3CreateWizard = lazy(() => import('@/components/v3public/V3CreateWizard'));
 const V3ImportStudio = lazy(() => import('@/components/v3public/V3ImportStudio'));
+
+const GENIE_SUGGESTIONS = [
+  'Un thriller psychologique en 30 chapitres',
+  'Un guide pratique pour débuter sur Amazon KDP',
+  'Un livre de recettes familiales illustré',
+  'Un roman historique en Provence',
+];
+
 
 /** Préremplit la fiche livre du hub à partir de query params afin que BookCreationStudio
  *  (qui lit `edition_book_config_v1`) parte avec le bon titre/genre/idée. */
