@@ -19,7 +19,10 @@ import {
 type Props = {
   brief: BookBrief;
   onChange: (patch: Partial<BookBrief>) => void;
+  /** Mode préselectionné (ex. `guided` via /v3/create?sommaire=ia). */
+  initialMode?: 'full' | 'guided';
 };
+
 
 type OutlineMode = 'full' | 'guided';
 type Suggestion = { titre: string; objectif?: string };
