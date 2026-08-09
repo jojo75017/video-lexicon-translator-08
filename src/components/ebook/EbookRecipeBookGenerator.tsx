@@ -405,7 +405,7 @@ ${customInstructions ? `Instructions spéciales du client: ${customInstructions}
 ${countryInstruction}
 ${finalCountry ? `Tous les ${count} plats DOIVENT être des plats 100% ${finalCountry.toLowerCase() === 'france' ? 'français' : `de ${finalCountry}`}. Aucune exception.` : ''}
 
-Génère exactement ${count} FICHES RECETTES COMPLÈTES ET UNIQUES (minimum 300 mots chacune).
+Génère exactement ${count} FICHES RECETTES COMPLÈTES ET UNIQUES (minimum 400 mots chacune).
 
 🚫 RÈGLE ANTI-DOUBLONS CRITIQUE:
 - CHAQUE recette DOIT être un plat DIFFÉRENT avec un nom UNIQUE
@@ -420,7 +420,7 @@ Pour CHAQUE recette, fournis un accord vin PRÉCIS avec:
 - winePairing: L'appellation exacte du vin (ex: "Saint-Émilion Grand Cru 2018" ou "Meursault 1er Cru")
 - wineReason: Explication détaillée de pourquoi cet accord fonctionne (les arômes, la complémentarité, les tanins, l'acidité)
 
-IMPORTANT: Chaque fiche doit être DÉTAILLÉE avec au moins 300 mots de contenu.
+IMPORTANT: Chaque fiche doit être DÉTAILLÉE avec au moins 400 mots de contenu rédigé (description, histoire, étapes, conseils). Ne jamais descendre sous 400 mots.
 Retourne UNIQUEMENT du JSON valide, sans texte avant ni après.
 
 Pour CHAQUE recette, fournis OBLIGATOIREMENT:
@@ -892,7 +892,7 @@ ${sheet.servingSuggestion}`;
       await navigator.clipboard.writeText(text);
       setCopiedIndex(index);
       setTimeout(() => setCopiedIndex(null), 2000);
-      toast.success('Fiche complète copiée ! (300+ mots)');
+      toast.success('Fiche complète copiée ! (400+ mots)');
     } catch (err) {
       toast.error('Erreur lors de la copie');
     }
@@ -1452,9 +1452,9 @@ ${sheet.servingSuggestion}`;
                               const wc = countSheetWords(sheet);
                               return (
                                 <Badge 
-                                  variant={wc >= 300 ? 'default' : 'destructive'} 
+                                  variant={wc >= 400 ? 'default' : 'destructive'} 
                                 >
-                                  {wc} mots {wc < 300 && '⚠️'}
+                                  {wc} mots {wc < 400 && '⚠️'}
                                 </Badge>
                               );
                             })()}
