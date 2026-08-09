@@ -405,7 +405,7 @@ ${customInstructions ? `Instructions spéciales du client: ${customInstructions}
 ${countryInstruction}
 ${finalCountry ? `Tous les ${count} plats DOIVENT être des plats 100% ${finalCountry.toLowerCase() === 'france' ? 'français' : `de ${finalCountry}`}. Aucune exception.` : ''}
 
-Génère exactement ${count} FICHES RECETTES COMPLÈTES ET UNIQUES (minimum 300 mots chacune).
+Génère exactement ${count} FICHES RECETTES COMPLÈTES ET UNIQUES (minimum 400 mots chacune).
 
 🚫 RÈGLE ANTI-DOUBLONS CRITIQUE:
 - CHAQUE recette DOIT être un plat DIFFÉRENT avec un nom UNIQUE
@@ -420,7 +420,7 @@ Pour CHAQUE recette, fournis un accord vin PRÉCIS avec:
 - winePairing: L'appellation exacte du vin (ex: "Saint-Émilion Grand Cru 2018" ou "Meursault 1er Cru")
 - wineReason: Explication détaillée de pourquoi cet accord fonctionne (les arômes, la complémentarité, les tanins, l'acidité)
 
-IMPORTANT: Chaque fiche doit être DÉTAILLÉE avec au moins 300 mots de contenu.
+IMPORTANT: Chaque fiche doit être DÉTAILLÉE avec au moins 400 mots de contenu rédigé (description, histoire, étapes, conseils). Ne jamais descendre sous 400 mots.
 Retourne UNIQUEMENT du JSON valide, sans texte avant ni après.
 
 Pour CHAQUE recette, fournis OBLIGATOIREMENT:
@@ -892,7 +892,7 @@ ${sheet.servingSuggestion}`;
       await navigator.clipboard.writeText(text);
       setCopiedIndex(index);
       setTimeout(() => setCopiedIndex(null), 2000);
-      toast.success('Fiche complète copiée ! (300+ mots)');
+      toast.success('Fiche complète copiée ! (400+ mots)');
     } catch (err) {
       toast.error('Erreur lors de la copie');
     }
@@ -992,25 +992,46 @@ ${sheet.servingSuggestion}`;
         pdf.text(noEmoji(`${sheet.difficulty} | ${sheet.cookingTime}`), margin, yPos);
         yPos += 8;
         
-        // Left column - Image
+        // Left column - Image (recadrée au format de l'encart, jamais déformée)
         const leftColStartY = yPos;
+        const imgBoxH = 45;
         if (sheet.imageUrl) {
           try {
-            const response = await fetch(sheet.imageUrl);
-            const blob = await response.blob();
-            const reader = new FileReader();
-            await new Promise<void>((resolve) => {
-              reader.onloadend = () => {
-                const base64 = reader.result as string;
-                pdf.addImage(base64, 'PNG', margin, yPos, leftColumnWidth, 45);
-                resolve();
+            const cropped = await new Promise<string | null>((resolve) => {
+              const img = new Image();
+              img.crossOrigin = 'anonymous';
+              img.onload = () => {
+                try {
+                  const targetRatio = leftColumnWidth / imgBoxH;
+                  const srcRatio = img.width / img.height;
+                  let sw = img.width;
+                  let sh = img.height;
+                  if (srcRatio > targetRatio) sw = img.height * targetRatio;
+                  else sh = img.width / targetRatio;
+                  const canvas = document.createElement('canvas');
+                  canvas.width = Math.round(sw);
+                  canvas.height = Math.round(sh);
+                  const ctx = canvas.getContext('2d');
+                  if (!ctx) return resolve(null);
+                  ctx.drawImage(img, (img.width - sw) / 2, (img.height - sh) / 2, sw, sh, 0, 0, canvas.width, canvas.height);
+                  resolve(canvas.toDataURL('image/jpeg', 0.85));
+                } catch {
+                  resolve(null);
+                }
               };
-              reader.readAsDataURL(blob);
+              img.onerror = () => resolve(null);
+              img.src = sheet.imageUrl as string;
             });
+            if (cropped) {
+              pdf.addImage(cropped, 'JPEG', margin, yPos, leftColumnWidth, imgBoxH);
+              pdf.setDrawColor(220, 210, 190);
+              pdf.roundedRect(margin, yPos, leftColumnWidth, imgBoxH, 2, 2, 'S');
+            }
           } catch {
             // Skip image on error
           }
         }
+
         
         // Right column - Description & History
         let rightYPos = leftColStartY;
@@ -1439,36 +1460,37 @@ ${sheet.servingSuggestion}`;
                     </div>
 
                     {/* Right column: Content */}
-                    <div className="lg:col-span-2 space-y-4">
+                    <div className="lg:col-span-2 space-y-4 min-w-0">
                       {/* Header */}
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="text-2xl">{sheet.countryFlag}</span>
-                            <Badge variant="outline" className="bg-orange-50">{sheet.country}</Badge>
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <span className="text-2xl leading-none">{sheet.countryFlag}</span>
+                            <Badge variant="outline" className="bg-orange-50 max-w-[10rem] truncate">{sheet.country}</Badge>
                             <Badge variant="secondary">{sheet.difficulty}</Badge>
                             <Badge variant="outline" className="text-xs">{sheet.portions}</Badge>
 {(() => {
                               const wc = countSheetWords(sheet);
                               return (
                                 <Badge 
-                                  variant={wc >= 300 ? 'default' : 'destructive'} 
+                                  variant={wc >= 400 ? 'default' : 'destructive'} 
                                 >
-                                  {wc} mots {wc < 300 && '⚠️'}
+                                  {wc} mots {wc < 400 && '⚠️'}
                                 </Badge>
                               );
                             })()}
                           </div>
-                          <h3 className="text-2xl font-bold text-orange-800 dark:text-orange-400">
+                          <h3 className="text-lg md:text-xl lg:text-2xl font-bold text-orange-800 dark:text-orange-400 leading-snug break-words line-clamp-2">
                             {sheet.dishName}
                           </h3>
                         </div>
-                        <div className="text-right text-sm text-muted-foreground">
-                          <span className="bg-orange-100 dark:bg-orange-900/30 px-2 py-1 rounded-lg">
+                        <div className="text-right text-sm text-muted-foreground shrink-0">
+                          <span className="bg-orange-100 dark:bg-orange-900/30 px-2 py-1 rounded-lg whitespace-nowrap">
                             ⏱️ {sheet.cookingTime}
                           </span>
                         </div>
                       </div>
+
 
                       {/* Description & History */}
                       <div className="space-y-2">

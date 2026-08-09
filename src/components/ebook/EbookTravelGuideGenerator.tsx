@@ -237,6 +237,10 @@ const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ e
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
   const [isGeneratingCover, setIsGeneratingCover] = useState(false);
 
+  // Photos des fiches
+  const [photoStyle, setPhotoStyle] = useState('realistic');
+  const [isGeneratingImages, setIsGeneratingImages] = useState(false);
+
   // Helper functions for promo links
   const addPromoLink = () => {
     if (newLinkLabel.trim() && newLinkUrl.trim()) {
@@ -540,6 +544,12 @@ Format JSON strict:
       setCurrentStep('Guide de voyage généré !');
       setActiveTab('sheets');
       toast.success(`🎉 ${generatedSheets.length} fiches destinations générées !`);
+
+      // Photos des destinations (une par fiche)
+      setIsGenerating(false);
+      await generateSheetImages(generatedSheets);
+      
+
       
     } catch (error) {
       console.error('Erreur génération:', error);
@@ -716,11 +726,78 @@ ${authorName ? `Include author name: ${authorName}` : ''}`,
     }
   };
 
+  /** Génère une photo pour une destination (édge function dédiée voyage). */
+  const requestDestinationImage = async (sheet: TravelSheet): Promise<string | null> => {
+    const { data, error } = await supabase.functions.invoke('generate-travel-image', {
+      body: {
+        destinationName: sheet.destinationName,
+        country: sheet.country,
+        photoStyle,
+      },
+    });
+    if (error) throw error;
+    return data?.imageUrl || null;
+  };
+
+  /** Génère les photos des fiches passées en paramètre (séquentiel, tolérant aux erreurs). */
+  const generateSheetImages = async (sheetsToProcess: TravelSheet[]) => {
+    if (sheetsToProcess.length === 0) {
+      toast.info('Toutes les fiches ont déjà une photo.');
+      return;
+    }
+    setIsGeneratingImages(true);
+    const queue = [...sheetsToProcess];
+    for (let i = 0; i < queue.length; i++) {
+      setCurrentStep(`Photo ${i + 1}/${queue.length} : ${queue[i].destinationName}...`);
+      setProgress(Math.round(((i + 1) / queue.length) * 100));
+      try {
+        const imageUrl = await requestDestinationImage(queue[i]);
+        if (imageUrl) {
+          const targetId = queue[i].id;
+          setSheets(prev => prev.map(s => (s.id === targetId ? { ...s, imageUrl } : s)));
+        }
+
+      } catch (err: any) {
+        const status = err?.context?.status ?? err?.status;
+        if (status === 402) {
+          toast.error('Crédits images épuisés — photos non générées.');
+          break;
+        }
+        if (status === 429) {
+          toast.error('Trop de requêtes image — réessayez dans quelques instants.');
+          break;
+        }
+        console.error(`Erreur photo ${i + 1}:`, err);
+      }
+    }
+    setIsGeneratingImages(false);
+    setCurrentStep('');
+  };
+
+  /** Regénère la photo d'une seule fiche. */
+  const regenerateSheetImage = async (sheetId: number) => {
+    const sheet = sheets.find((s) => s.id === sheetId);
+    if (!sheet) return;
+    setSheets((prev) => prev.map((s) => (s.id === sheetId ? { ...s, isGeneratingImage: true } : s)));
+    try {
+      const imageUrl = await requestDestinationImage(sheet);
+      setSheets((prev) =>
+        prev.map((s) => (s.id === sheetId ? { ...s, imageUrl: imageUrl || s.imageUrl, isGeneratingImage: false } : s))
+      );
+      if (imageUrl) toast.success('Photo générée !');
+    } catch (err) {
+      console.error('Erreur photo:', err);
+      setSheets((prev) => prev.map((s) => (s.id === sheetId ? { ...s, isGeneratingImage: false } : s)));
+      toast.error('Erreur lors de la génération de la photo');
+    }
+  };
+
   // Copy sheet content
   const copySheet = async (sheet: TravelSheet) => {
     let content = `
 ${sheet.countryFlag} ${sheet.destinationName.toUpperCase()} - ${sheet.country}
 ${sheet.region}
+
 
 📊 INFORMATIONS GÉNÉRALES
 • Population: ${sheet.population}
@@ -842,6 +919,39 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
         });
       };
 
+      /** Recadre l'image au ratio de l'encart (pas de déformation, pas de débordement). */
+      const loadImageCropped = (url: string, boxW: number, boxH: number): Promise<string | null> => {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => {
+            try {
+              const targetRatio = boxW / boxH;
+              const srcRatio = img.width / img.height;
+              let sw = img.width;
+              let sh = img.height;
+              if (srcRatio > targetRatio) sw = img.height * targetRatio;
+              else sh = img.width / targetRatio;
+              const sx = (img.width - sw) / 2;
+              const sy = (img.height - sh) / 2;
+              const canvas = document.createElement('canvas');
+              canvas.width = Math.round(sw);
+              canvas.height = Math.round(sh);
+              const ctx = canvas.getContext('2d');
+              if (!ctx) return resolve(null);
+              ctx.drawImage(img, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+              resolve(canvas.toDataURL('image/jpeg', 0.85));
+            } catch {
+              resolve(null);
+            }
+          };
+          img.onerror = () => resolve(null);
+          img.src = url;
+        });
+      };
+
+
+
       // Cover page
       if (coverImageUrl) {
         const coverBase64 = await loadImageAsBase64(coverImageUrl);
@@ -880,36 +990,69 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
         // Header with flag and name (using text instead of emojis)
         pdf.setFillColor(235, 245, 255);
         pdf.rect(0, 0, pageWidth, 45, 'F');
-        
-        pdf.setFontSize(22);
-        pdf.setTextColor(30, 60, 100);
+
+        // Titre auto-ajusté pour rester dans l'encart (jamais de débordement)
+        const titleMaxWidth = contentWidth;
+        let titleSize = 22;
         pdf.setFont('helvetica', 'bold');
-        pdf.text(sheet.destinationName.toUpperCase(), margin, 22);
+        pdf.setFontSize(titleSize);
+        let titleText = sheet.destinationName.toUpperCase();
+        while (titleSize > 12 && pdf.getTextWidth(titleText) > titleMaxWidth) {
+          titleSize -= 1;
+          pdf.setFontSize(titleSize);
+        }
+        pdf.setTextColor(30, 60, 100);
+        pdf.text(titleText, margin, 22, { maxWidth: titleMaxWidth });
         
         pdf.setFontSize(11);
         pdf.setTextColor(80, 80, 80);
         pdf.setFont('helvetica', 'normal');
-        pdf.text(`${sheet.country} - ${sheet.region}`, margin, 35);
+        const subtitle = pdf.splitTextToSize(`${sheet.country} - ${sheet.region}`, titleMaxWidth)[0];
+        pdf.text(subtitle, margin, 35);
         
         yPos = 55;
         
-        // Full-width article layout (no images)
         const fullWidth = contentWidth;
 
-        // Info box at the top (full width)
+        // Photo de la destination (recadrée dans son encart) + infos pratiques à droite
+        const photoW = 60;
+        const photoH = 45;
+        let photoDrawn = false;
+        if (sheet.imageUrl) {
+          const cropped = await loadImageCropped(sheet.imageUrl, photoW, photoH);
+          if (cropped) {
+            pdf.addImage(cropped, 'JPEG', margin, yPos, photoW, photoH);
+            pdf.setDrawColor(200, 220, 240);
+            pdf.roundedRect(margin, yPos, photoW, photoH, 2, 2, 'S');
+            photoDrawn = true;
+          }
+        }
+
+        const infoX = photoDrawn ? margin + photoW + 5 : margin;
+        const infoW = photoDrawn ? fullWidth - photoW - 5 : fullWidth;
         pdf.setFillColor(245, 250, 255);
-        pdf.roundedRect(margin, yPos, fullWidth, 25, 3, 3, 'F');
+        pdf.roundedRect(infoX, yPos, infoW, photoH, 3, 3, 'F');
         pdf.setDrawColor(200, 220, 240);
-        pdf.roundedRect(margin, yPos, fullWidth, 25, 3, 3, 'S');
+        pdf.roundedRect(infoX, yPos, infoW, photoH, 3, 3, 'S');
         
         pdf.setFontSize(8);
         pdf.setTextColor(50, 50, 50);
         pdf.setFont('helvetica', 'normal');
-        const infoLine1 = `Population: ${sheet.population} | Langue: ${sheet.language} | Monnaie: ${sheet.currency}`;
-        const infoLine2 = `Climat: ${sheet.climate} | Meilleure saison: ${sheet.bestSeason}`;
-        pdf.text(infoLine1, margin + 5, yPos + 9);
-        pdf.text(infoLine2, margin + 5, yPos + 18);
-        yPos += 30;
+        const infoRows = [
+          `Population: ${sheet.population}`,
+          `Langue: ${sheet.language}`,
+          `Monnaie: ${sheet.currency}`,
+          `Climat: ${sheet.climate}`,
+          `Meilleure saison: ${sheet.bestSeason}`,
+        ];
+        let infoY = yPos + 8;
+        infoRows.forEach((row) => {
+          const line = pdf.splitTextToSize(row, infoW - 10)[0];
+          pdf.text(line, infoX + 5, infoY);
+          infoY += 7;
+        });
+        yPos += photoH + 6;
+
 
         // Description section
         pdf.setFontSize(10);
@@ -926,7 +1069,7 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
         yPos += Math.min(descLines.length, 6) * 3.5 + 4;
 
         // History section
-        if (sheet.history && yPos < 130) {
+        if (sheet.history && yPos < 150) {
           pdf.setFontSize(10);
           pdf.setFont('helvetica', 'bold');
           pdf.setTextColor(30, 60, 100);
@@ -942,7 +1085,7 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
         }
 
         // Gastronomy section
-        if (yPos < 155) {
+        if (yPos < 172) {
           pdf.setFontSize(10);
           pdf.setFont('helvetica', 'bold');
           pdf.setTextColor(30, 60, 100);
@@ -958,7 +1101,7 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
         }
 
         // Must see section
-        if (yPos < 185) {
+        if (yPos < 195) {
           pdf.setFontSize(10);
           pdf.setFont('helvetica', 'bold');
           pdf.setTextColor(30, 60, 100);
@@ -977,7 +1120,7 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
         }
 
         // Accommodations section
-        if (yPos < 210) {
+        if (yPos < 212) {
           pdf.setFontSize(10);
           pdf.setFont('helvetica', 'bold');
           pdf.setTextColor(30, 60, 100);
@@ -996,7 +1139,7 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
         }
 
         // Travel tips section
-        if (yPos < 230) {
+        if (yPos < 210) {
           pdf.setFillColor(255, 252, 245);
           pdf.roundedRect(margin, yPos, fullWidth, 20, 3, 3, 'F');
           pdf.setDrawColor(230, 220, 200);
@@ -1375,26 +1518,48 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
         {/* Sheets Tab */}
         <TabsContent value="sheets">
           <div className="space-y-6">
+            {sheets.length > 0 && (
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-muted/40 p-3">
+                <p className="text-sm text-muted-foreground">
+                  {sheets.filter(s => s.imageUrl).length}/{sheets.length} photos générées
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={isGeneratingImages}
+                  onClick={() => generateSheetImages(sheets.filter(s => !s.imageUrl))}
+                >
+                  {isGeneratingImages ? (
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Génération des photos…</>
+                  ) : (
+                    <><Camera className="mr-2 h-4 w-4" /> Générer les photos manquantes</>
+                  )}
+                </Button>
+              </div>
+            )}
             {sheets.map((sheet) => (
+
               <Card key={sheet.id} className="overflow-hidden border-2 hover:border-primary/30 transition-colors">
                 <CardHeader className="bg-gradient-to-r from-blue-50 to-cyan-50 pb-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-4xl">{sheet.countryFlag}</span>
-                      <div>
-                        <CardTitle className="text-xl">{sheet.destinationName}</CardTitle>
-                        <p className="text-sm text-muted-foreground">{sheet.country} • {sheet.region}</p>
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="flex items-start gap-3 min-w-0 flex-1">
+                      <span className="text-3xl md:text-4xl shrink-0 leading-none">{sheet.countryFlag}</span>
+                      <div className="min-w-0">
+                        <CardTitle className="text-base md:text-lg lg:text-xl leading-snug break-words line-clamp-2">
+                          {sheet.destinationName}
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground break-words line-clamp-2">{sheet.country} • {sheet.region}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 shrink-0">
                       <Badge 
                         variant="outline" 
-                        className={countWords(sheet) >= 800 
+                        className={countWords(sheet) >= 400 
                           ? "bg-green-100 text-green-700 border-green-300" 
                           : "bg-red-100 text-red-700 border-red-300"
                         }
                       >
-                        {countWords(sheet)} mots {countWords(sheet) >= 800 ? '✓' : '⚠️'}
+                        {countWords(sheet)} mots {countWords(sheet) >= 400 ? '✓' : '⚠️'}
                       </Badge>
                       <Button
                         variant="ghost"
@@ -1414,10 +1579,45 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
                 <CardContent className="pt-6">
                   <div className="grid md:grid-cols-2 gap-6">
                     {/* Left column - Quick info and content */}
-                    <div className="space-y-4">
+                    <div className="space-y-4 min-w-0">
+                      {/* Photo de la destination — contenue dans l'encart */}
+                      <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-gradient-to-br from-blue-100 to-cyan-100 border border-blue-200/60">
+                        {sheet.imageUrl ? (
+                          <img
+                            src={sheet.imageUrl}
+                            alt={`Photo de ${sheet.destinationName}, ${sheet.country}`}
+                            loading="lazy"
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            {sheet.isGeneratingImage || isGeneratingImages ? (
+                              <Loader2 className="h-10 w-10 text-blue-400 animate-spin" />
+                            ) : (
+                              <Camera className="h-10 w-10 text-blue-300" />
+                            )}
+                          </div>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => regenerateSheetImage(sheet.id)}
+                          disabled={sheet.isGeneratingImage || isGeneratingImages}
+                          className="absolute top-2 right-2 bg-white/85 hover:bg-white"
+                          aria-label="Régénérer la photo"
+                        >
+                          {sheet.isGeneratingImage ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Camera className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+
                       {/* Quick info box */}
-                      <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 space-y-2">
+                      <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 space-y-2 min-w-0">
                         <h4 className="font-semibold flex items-center gap-2">
+
                           <Globe className="h-4 w-4" /> Infos pratiques
                         </h4>
                         <div className="grid grid-cols-2 gap-2 text-sm">
