@@ -1447,7 +1447,27 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
         {/* Sheets Tab */}
         <TabsContent value="sheets">
           <div className="space-y-6">
+            {sheets.length > 0 && (
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-muted/40 p-3">
+                <p className="text-sm text-muted-foreground">
+                  {sheets.filter(s => s.imageUrl).length}/{sheets.length} photos générées
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={isGeneratingImages}
+                  onClick={() => generateSheetImages(sheets.filter(s => !s.imageUrl))}
+                >
+                  {isGeneratingImages ? (
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Génération des photos…</>
+                  ) : (
+                    <><Camera className="mr-2 h-4 w-4" /> Générer les photos manquantes</>
+                  )}
+                </Button>
+              </div>
+            )}
             {sheets.map((sheet) => (
+
               <Card key={sheet.id} className="overflow-hidden border-2 hover:border-primary/30 transition-colors">
                 <CardHeader className="bg-gradient-to-r from-blue-50 to-cyan-50 pb-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
