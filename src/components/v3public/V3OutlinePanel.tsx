@@ -31,11 +31,12 @@ type Suggestion = { titre: string; objectif?: string };
  * Sommaire du livre — deux modes : proposition complète éditable, ou dialogue
  * chapitre par chapitre avec l'IA. Le sommaire validé pilote le workflow.
  */
-export default function V3OutlinePanel({ brief, onChange }: Props) {
+export default function V3OutlinePanel({ brief, onChange, initialMode }: Props) {
   const [loading, setLoading] = useState(false);
   const [pasteOpen, setPasteOpen] = useState(false);
   const [pasteText, setPasteText] = useState('');
-  const [mode, setMode] = useState<OutlineMode>('full');
+  const [mode, setMode] = useState<OutlineMode>(initialMode || 'full');
+
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [guidance, setGuidance] = useState('');
   const [suggesting, setSuggesting] = useState(false);
