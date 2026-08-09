@@ -26,4 +26,5 @@ export const V3_PUBLIC_PREVIEW_PATHS = new Set<string>([
   "/v3/offre",
   "/v3/auth",
   "/v3/temoignage",
+  "/v3/migration",
 ]);

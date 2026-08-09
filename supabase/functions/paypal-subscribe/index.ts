@@ -38,13 +38,35 @@ async function getAccessToken(): Promise<string> {
   return body.access_token;
 }
 
+/** Remise permanente réservée aux acheteurs V2 (accès à vie V2 déjà payé). */
+const LEGACY_V2_DISCOUNT = 0.2;
+
+const priceFor = (planId: PlanId, interval: Interval, legacyV2: boolean) => {
+  const base = interval === "month" ? PLANS[planId].monthly : PLANS[planId].yearly;
+  return legacyV2 ? Math.round(base * (1 - LEGACY_V2_DISCOUNT) * 100) / 100 : base;
+};
+
+/** Vérifie côté serveur qu'un email a bien réglé la V2 (plans `v2_*`). */
+async function isLegacyV2Buyer(
+  supabase: ReturnType<typeof createClient>,
+  email: string,
+): Promise<boolean> {
+  const { data } = await supabase
+    .from("v3_installment_orders")
+    .select("plan, status")
+    .ilike("email", email)
+    .in("status", ["active", "completed", "paid"]);
+  return (data ?? []).some((r: any) => String(r.plan ?? "").startsWith("v2"));
+}
+
 async function ensurePlan(
   supabase: ReturnType<typeof createClient>,
   planId: PlanId,
   interval: Interval,
   token: string,
+  legacyV2 = false,
 ): Promise<string> {
-  const lookupKey = `v3_${planId}_${interval}`;
+  const lookupKey = `v3_${planId}_${interval}${legacyV2 ? "_legacy" : ""}`;
   const { data: cached } = await supabase
     .from("paypal_plan_cache")
     .select("paypal_plan_id")
@@ -53,7 +75,7 @@ async function ensurePlan(
   if (cached?.paypal_plan_id) return cached.paypal_plan_id as string;
 
   const plan = PLANS[planId];
-  const amount = interval === "month" ? plan.monthly : plan.yearly;
+  const amount = priceFor(planId, interval, legacyV2);
 
   // 1. Create Product
   const prodRes = await fetch(`${PAYPAL_BASE}/v1/catalogs/products`, {
@@ -64,7 +86,7 @@ async function ensurePlan(
       "PayPal-Request-Id": `prod-${lookupKey}-${Date.now()}`,
     },
     body: JSON.stringify({
-      name: plan.name,
+      name: legacyV2 ? `${plan.name} — Ancien client V2` : plan.name,
       description: `Abonnement ${interval === "month" ? "mensuel" : "annuel"} EbookStudio V3`,
       type: "SERVICE",
       category: "SOFTWARE",
@@ -125,7 +147,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
 
   try {
-    const { planId, interval, email, returnUrl, cancelUrl } = await req.json();
+    const { planId, interval, email, returnUrl, cancelUrl, legacyV2 } = await req.json();
 
     if (!PLANS[planId as PlanId]) throw new Error("Invalid planId");
     if (interval !== "month" && interval !== "year") throw new Error("Invalid interval");
@@ -136,8 +158,16 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
+    // La remise ancien client est revérifiée en base : impossible de l'obtenir
+    // en modifiant la requête côté navigateur.
+    const wantsLegacy = legacyV2 === true;
+    const legacyOk = wantsLegacy ? await isLegacyV2Buyer(supabase, String(email)) : false;
+    if (wantsLegacy && !legacyOk) {
+      throw new Error("Remise ancien client V2 non applicable à cet email");
+    }
+
     const token = await getAccessToken();
-    const paypalPlanId = await ensurePlan(supabase, planId as PlanId, interval as Interval, token);
+    const paypalPlanId = await ensurePlan(supabase, planId as PlanId, interval as Interval, token, legacyOk);
 
     // Optional: link to authenticated user
     let userId: string | null = null;
@@ -148,8 +178,7 @@ Deno.serve(async (req) => {
       if (data.user) userId = data.user.id;
     }
 
-    const plan = PLANS[planId as PlanId];
-    const amount = interval === "month" ? plan.monthly : plan.yearly;
+    const amount = priceFor(planId as PlanId, interval as Interval, legacyOk);
     // Fallback origin: use the caller's origin/referer, else the request URL host.
     const callerOrigin =
       req.headers.get("origin") ||
@@ -181,7 +210,7 @@ Deno.serve(async (req) => {
           return_url: finalReturn,
           cancel_url: finalCancel,
         },
-        custom_id: JSON.stringify({ planId, interval, email, userId }),
+        custom_id: JSON.stringify({ planId, interval, email, userId, legacyV2: legacyOk }),
       }),
     });
     const subBody = await subRes.json();

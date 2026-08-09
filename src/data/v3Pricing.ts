@@ -81,14 +81,20 @@ export function getV3Plan(id: V3PlanId): V3Plan | undefined {
   return V3_PLANS.find((p) => p.id === id);
 }
 
-export function getV3PriceId(planId: V3PlanId, interval: V3BillingInterval): string {
+export function getV3PriceId(
+  planId: V3PlanId,
+  interval: V3BillingInterval,
+  legacyV2 = false,
+): string {
   // Identifiants de prix stables (identiques en test et en production).
   const suffix = interval === "month" ? "monthly" : "annual";
   const map: Record<V3PlanId, { monthly: string; annual: string }> = {
     plume: { monthly: "v3_plume_monthly", annual: "v3_plume_annual" },
     edition: { monthly: "v3_edition_monthly", annual: "v3_edition_annual" },
   };
-  return map[planId][suffix];
+  const base = map[planId][suffix];
+  // Prix réservé aux acheteurs V2 (-20 % à vie). Le serveur revérifie le droit.
+  return legacyV2 ? `${base}_legacy` : base;
 }
 
 export function getYearlySavingsPercent(plan: V3Plan): number {

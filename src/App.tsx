@@ -96,6 +96,7 @@ const V3CompetitorSpyPage = lazy(() => import('./pages/v3public/V3CompetitorSpyP
 const V3OutilsOffertsPage = lazy(() => import('./pages/v3public/V3OutilsOffertsPage'));
 const V3CategoryFinderPage = lazy(() => import('./pages/v3public/V3CategoryFinderPage'));
 const V3ForfaitsPage = lazy(() => import('./pages/v3public/V3ForfaitsPage'));
+const V3MigrationPage = lazy(() => import('./pages/v3public/V3MigrationPage'));
 const V3PayPalReturnPage = lazy(() => import('./pages/v3public/V3PayPalReturnPage'));
 const V3RecherchePage = lazy(() => import('./pages/v3public/V3RecherchePage'));
 const V3Upsell17Page = lazy(() => import('./pages/v3public/V3Upsell17Page'));
@@ -557,6 +558,8 @@ const App = () => {
               {/* Page des 2 forfaits : toujours visible (vitrine tarifaire) */}
               <Route path="forfaits" element={<V3ForfaitsPage />} />
               <Route path="tarifs" element={<Navigate to="/v3/forfaits" replace />} />
+              {/* Onglet ancien client V2 : visible sans attendre l'ouverture publique */}
+              <Route path="migration" element={<V3MigrationPage />} />
               <Route path="paypal-retour" element={<V3LockedGate><V3PayPalReturnPage /></V3LockedGate>} />
               <Route path="script-heygen" element={<V3LockedGate><V3ScriptHeygenPage /></V3LockedGate>} />
               <Route path="upsell-17" element={<V3LockedGate><V3Upsell17Page /></V3LockedGate>} />

@@ -2,6 +2,7 @@
 // Uses the shared gateway helper (stripeRequest) — the "keys" in env are
 // Lovable connector identifiers, not real Stripe secrets.
 import { stripeRequest, type StripeEnv } from "../_shared/stripe.ts";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -15,6 +16,11 @@ const ALLOWED_PRICES = new Set([
   "v3_plume_annual",
   "v3_edition_monthly",
   "v3_edition_annual",
+  // Tarifs « ancien client V2 » (-20 % à vie) — droit revérifié en base
+  "v3_plume_monthly_legacy",
+  "v3_plume_annual_legacy",
+  "v3_edition_monthly_legacy",
+  "v3_edition_annual_legacy",
   // Legacy / upsells
   "v3_upsell_selection_month",
   "v3_upsell_aplus_month",
@@ -25,6 +31,26 @@ const ALLOWED_PRICES = new Set([
   "v3_upsell_docstudio_once",
   "bookperfect_launch_once",
 ]);
+
+/** Vérifie qu'un email/userId a bien réglé la V2 (plans `v2_*` payés). */
+async function isLegacyV2Buyer(email?: string, userId?: string): Promise<boolean> {
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
+  let target = email;
+  if (!target && userId) {
+    const { data } = await supabase.auth.admin.getUserById(userId);
+    target = data?.user?.email ?? undefined;
+  }
+  if (!target) return false;
+  const { data } = await supabase
+    .from("v3_installment_orders")
+    .select("plan, status")
+    .ilike("email", target)
+    .in("status", ["active", "completed", "paid"]);
+  return (data ?? []).some((r: any) => String(r.plan ?? "").startsWith("v2"));
+}
 
 async function resolveOrCreateCustomer(
   env: StripeEnv,
@@ -76,6 +102,13 @@ Deno.serve(async (req) => {
     if (!priceId || !ALLOWED_PRICES.has(priceId)) {
       throw new Error("Prix invalide");
     }
+    // Un prix `_legacy` n'est accepté que si le droit ancien client V2 est
+    // confirmé côté base : le front ne peut pas s'octroyer la remise.
+    if (String(priceId).endsWith("_legacy")) {
+      const ok = await isLegacyV2Buyer(email, userId);
+      if (!ok) throw new Error("Tarif ancien client V2 non applicable à ce compte");
+    }
+
     const env: StripeEnv = environment === "live" ? "live" : "sandbox";
     if (!returnUrl || typeof returnUrl !== "string") {
       throw new Error("returnUrl requis");

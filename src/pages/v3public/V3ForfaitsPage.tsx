@@ -9,6 +9,7 @@ import {
 } from "@/data/v3Pricing";
 import { BackButton } from "@/components/v3/BackButton";
 import { PayPalSubscribeButton } from "@/components/v3/PayPalSubscribeButton";
+import useV3Entitlement from "@/hooks/useV3Entitlement";
 
 const PLAN_ICONS = {
   plume: Feather,
@@ -23,12 +24,29 @@ const PLAN_ACCENTS: Record<string, string> = {
 
 export default function V3ForfaitsPage() {
   const [interval, setInterval] = useState<V3BillingInterval>("month");
+  const { hasV2 } = useV3Entitlement();
 
 
   return (
     <div className="min-h-screen py-12 px-4" style={{ background: "#FAFAFA" }}>
       <div className="max-w-6xl mx-auto">
         <BackButton className="mb-4" />
+
+        {hasV2 && (
+          <Link
+            to="/v3/migration"
+            className="block mb-8 rounded-xl px-5 py-4 text-center transition hover:opacity-90"
+            style={{ background: "rgba(180,83,9,0.10)", border: "1px solid rgba(180,83,9,0.35)" }}
+          >
+            <span className="font-semibold" style={{ color: "#b45309" }}>
+              Vous avez acheté la V2 : -20 % à vie sur ces forfaits, plus 3 nouveautés V3 offertes.
+            </span>
+            <span className="block text-sm mt-1" style={{ color: "#7c4a06" }}>
+              Voir mon offre ancien client →
+            </span>
+          </Link>
+        )}
+
         <header className="text-center mb-10">
           <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: "#b45309" }}>
             EbookStudio V3 · Forfaits

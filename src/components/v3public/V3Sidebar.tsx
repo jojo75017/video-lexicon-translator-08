@@ -7,6 +7,7 @@ import {
   Search, Target, BarChart3, Image as ImageIcon,
 } from 'lucide-react';
 import { useState } from 'react';
+import useV3Entitlement from '@/hooks/useV3Entitlement';
 
 /**
  * Sidebar V3 — espace personnel uniquement (jamais les catégories du header).
@@ -95,6 +96,7 @@ const NAV: NavSection[] = [
 
 export default function V3Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
+  const { hasV2 } = useV3Entitlement();
   const { pathname, search } = useLocation();
   const currentTab = new URLSearchParams(search).get('tab');
 
@@ -132,6 +134,30 @@ export default function V3Sidebar() {
           {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
         </button>
       </div>
+
+      {hasV2 && (
+        <div className="px-2 pt-2">
+          <NavLink
+            to="/v3/migration"
+            title="Ancien client V2 — -20 % à vie"
+            className="relative flex items-center gap-2.5 rounded-md px-2.5 py-2 text-[13px] font-semibold"
+            style={{ background: 'rgba(180,83,9,0.10)', color: '#b45309' }}
+          >
+            <Gem className="w-4 h-4 shrink-0" />
+            {!collapsed && (
+              <>
+                <span className="truncate flex-1">Ancien client V2</span>
+                <span
+                  className="text-[9px] font-bold uppercase tracking-[0.15em] px-1.5 py-0.5 rounded"
+                  style={{ background: '#b45309', color: '#fff' }}
+                >
+                  -20 %
+                </span>
+              </>
+            )}
+          </NavLink>
+        </div>
+      )}
 
       <nav className="p-2 space-y-5">
         {NAV.map((group) => (
