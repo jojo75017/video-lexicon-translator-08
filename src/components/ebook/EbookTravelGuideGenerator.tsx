@@ -720,11 +720,73 @@ ${authorName ? `Include author name: ${authorName}` : ''}`,
     }
   };
 
+  /** Génère une photo pour une destination (édge function dédiée voyage). */
+  const requestDestinationImage = async (sheet: TravelSheet): Promise<string | null> => {
+    const { data, error } = await supabase.functions.invoke('generate-travel-image', {
+      body: {
+        destinationName: sheet.destinationName,
+        country: sheet.country,
+        photoStyle,
+      },
+    });
+    if (error) throw error;
+    return data?.imageUrl || null;
+  };
+
+  /** Génère les photos de toutes les fiches (séquentiel, tolérant aux erreurs). */
+  const generateSheetImages = async (sheetsToProcess: TravelSheet[]) => {
+    setIsGeneratingImages(true);
+    const updated = [...sheetsToProcess];
+    for (let i = 0; i < updated.length; i++) {
+      setCurrentStep(`Photo ${i + 1}/${updated.length} : ${updated[i].destinationName}...`);
+      setProgress(Math.round(((i + 1) / updated.length) * 100));
+      try {
+        const imageUrl = await requestDestinationImage(updated[i]);
+        if (imageUrl) {
+          updated[i] = { ...updated[i], imageUrl };
+          setSheets([...updated]);
+        }
+      } catch (err: any) {
+        const status = err?.context?.status ?? err?.status;
+        if (status === 402) {
+          toast.error('Crédits images épuisés — photos non générées.');
+          break;
+        }
+        if (status === 429) {
+          toast.error('Trop de requêtes image — réessayez dans quelques instants.');
+          break;
+        }
+        console.error(`Erreur photo ${i + 1}:`, err);
+      }
+    }
+    setIsGeneratingImages(false);
+    setCurrentStep('');
+  };
+
+  /** Regénère la photo d'une seule fiche. */
+  const regenerateSheetImage = async (sheetId: number) => {
+    const sheet = sheets.find((s) => s.id === sheetId);
+    if (!sheet) return;
+    setSheets((prev) => prev.map((s) => (s.id === sheetId ? { ...s, isGeneratingImage: true } : s)));
+    try {
+      const imageUrl = await requestDestinationImage(sheet);
+      setSheets((prev) =>
+        prev.map((s) => (s.id === sheetId ? { ...s, imageUrl: imageUrl || s.imageUrl, isGeneratingImage: false } : s))
+      );
+      if (imageUrl) toast.success('Photo générée !');
+    } catch (err) {
+      console.error('Erreur photo:', err);
+      setSheets((prev) => prev.map((s) => (s.id === sheetId ? { ...s, isGeneratingImage: false } : s)));
+      toast.error('Erreur lors de la génération de la photo');
+    }
+  };
+
   // Copy sheet content
   const copySheet = async (sheet: TravelSheet) => {
     let content = `
 ${sheet.countryFlag} ${sheet.destinationName.toUpperCase()} - ${sheet.country}
 ${sheet.region}
+
 
 📊 INFORMATIONS GÉNÉRALES
 • Population: ${sheet.population}
