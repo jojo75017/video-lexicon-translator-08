@@ -436,10 +436,21 @@ Règles :
                       style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-muted)', background: '#fff' }}
                     />
                   </div>
-                  <button type="button" onClick={() => removeChapter(index)} title="Supprimer ce chapitre"
-                    className="mt-1 rounded-lg border p-1.5" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-muted)' }}>
-                    <X className="h-3.5 w-3.5" />
-                  </button>
+                  <div className="mt-1 flex flex-col gap-1">
+                    <button type="button" onClick={() => moveChapter(index, -1)} disabled={index === 0} title="Monter"
+                      className="rounded-lg border p-1.5 disabled:opacity-40" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-muted)' }}>
+                      <ArrowUp className="h-3.5 w-3.5" />
+                    </button>
+                    <button type="button" onClick={() => moveChapter(index, 1)} disabled={index === outline.length - 1} title="Descendre"
+                      className="rounded-lg border p-1.5 disabled:opacity-40" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-muted)' }}>
+                      <ArrowDown className="h-3.5 w-3.5" />
+                    </button>
+                    <button type="button" onClick={() => removeChapter(index)} title="Supprimer ce chapitre"
+                      className="rounded-lg border p-1.5" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-muted)' }}>
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+
                 </div>
               </li>
             ))}
