@@ -1,19 +1,13 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Sparkles, Loader2, ImageIcon, ArrowRight, Wand2, Upload } from 'lucide-react';
+import { Sparkles, Loader2, ImageIcon, ArrowRight } from 'lucide-react';
 import { BackButton } from '@/components/v3/BackButton';
 import V3BriefRecap from '@/components/v3public/V3BriefRecap';
 import V3ApiKeysGate from '@/components/v3public/V3ApiKeysGate';
+import V3GenieDialog from '@/components/v3public/V3GenieDialog';
 
 const V3CreateWizard = lazy(() => import('@/components/v3public/V3CreateWizard'));
 const V3ImportStudio = lazy(() => import('@/components/v3public/V3ImportStudio'));
-
-const GENIE_SUGGESTIONS = [
-  'Un thriller psychologique en 30 chapitres',
-  'Un guide pratique pour débuter sur Amazon KDP',
-  'Un livre de recettes familiales illustré',
-  'Un roman historique en Provence',
-];
 
 
 /** Préremplit la fiche livre du hub à partir de query params afin que BookCreationStudio
@@ -40,16 +34,8 @@ export default function V3CreatePage() {
   const sommaireIa = params.get('sommaire') === 'ia';
 
   const [showWizard, setShowWizard] = useState(false);
-  const [genieIdea, setGenieIdea] = useState(idea || '');
   const wizardRef = useRef<HTMLDivElement | null>(null);
 
-  /** Enregistre l'idée dans la fiche livre puis relance la page en mode Sommaire IA guidé. */
-  const startGenie = () => {
-    const text = genieIdea.trim();
-    if (!text) return;
-    seedHubConfig(text, genre, type);
-    window.location.assign(`/v3/create?sommaire=ia&idea=${encodeURIComponent(text)}`);
-  };
 
 
 
