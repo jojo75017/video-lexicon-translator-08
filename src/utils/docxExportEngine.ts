@@ -729,6 +729,7 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
     fontFamily = 'Georgia',
     fontSize = 12,
     includeTableOfContents = true,
+    styledToc = true,
     includeCoverPage = true,
     includePageNumbers = true,
     includeCopyrightPage = true,
