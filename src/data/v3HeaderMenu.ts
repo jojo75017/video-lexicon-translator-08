@@ -23,7 +23,7 @@ export const V3_HEADER_MENU: MenuCategory[] = [
     color: '#064e3b',
     tagline: 'De l’idée au plan',
     links: [
-      { label: 'Créer un livre (Assistant V3)', to: '/v3/create', badge: 'V3', desc: '4 étapes : détails, réglages, personnages, génération' },
+      { label: 'Ebookstudio-Génie — créer mon livre', to: '/v3/create', badge: 'Dernière nouveauté IA', desc: 'Dialoguez avec le Génie : il remplit la fiche, construit le sommaire, rédige, exporte et crée la couverture' },
       { label: 'Sommaire IA — dialogue avec l’IA', to: '/v3/create?sommaire=ia', badge: 'Dernière nouveauté IA', desc: 'On construit le sommaire ensemble, puis l’IA rédige le livre jusqu’à l’export et la couverture' },
       { label: 'Sommaire Ultime', to: '/v3/outils/sommaire-ultime', badge: 'Nouveau', desc: 'Table des matières pro, éditable et exportable' },
       { label: 'Personnages', to: '/v3/create?step=3', desc: 'Créez et développez vos protagonistes' },

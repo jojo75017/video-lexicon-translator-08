@@ -464,8 +464,9 @@ export default function V3HomePage() {
               <BookOpen className="w-4 h-4" /> Ma bibliothèque
             </Link>
             <Link to="/v3/create" className="v3-btn v3-btn-gold">
-              <Sparkles className="w-4 h-4" /> Écrire un livre
+              <Sparkles className="w-4 h-4" /> Ebookstudio-Génie — créer mon livre
             </Link>
+
 
           </div>
         </div>
