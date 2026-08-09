@@ -919,6 +919,39 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
         });
       };
 
+      /** Recadre l'image au ratio de l'encart (pas de déformation, pas de débordement). */
+      const loadImageCropped = (url: string, boxW: number, boxH: number): Promise<string | null> => {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => {
+            try {
+              const targetRatio = boxW / boxH;
+              const srcRatio = img.width / img.height;
+              let sw = img.width;
+              let sh = img.height;
+              if (srcRatio > targetRatio) sw = img.height * targetRatio;
+              else sh = img.width / targetRatio;
+              const sx = (img.width - sw) / 2;
+              const sy = (img.height - sh) / 2;
+              const canvas = document.createElement('canvas');
+              canvas.width = Math.round(sw);
+              canvas.height = Math.round(sh);
+              const ctx = canvas.getContext('2d');
+              if (!ctx) return resolve(null);
+              ctx.drawImage(img, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+              resolve(canvas.toDataURL('image/jpeg', 0.85));
+            } catch {
+              resolve(null);
+            }
+          };
+          img.onerror = () => resolve(null);
+          img.src = url;
+        });
+      };
+
+
+
       // Cover page
       if (coverImageUrl) {
         const coverBase64 = await loadImageAsBase64(coverImageUrl);
