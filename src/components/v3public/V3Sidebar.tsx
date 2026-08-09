@@ -96,6 +96,7 @@ const NAV: NavSection[] = [
 
 export default function V3Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
+  const { hasV2 } = useV3Entitlement();
   const { pathname, search } = useLocation();
   const currentTab = new URLSearchParams(search).get('tab');
 
