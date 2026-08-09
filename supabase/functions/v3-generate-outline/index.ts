@@ -183,6 +183,8 @@ Règles :
 
       let parsed: any = null;
       const raw = String(r.text || "").replace(/```json|```/gi, "").trim();
+      console.log("[next] raw:", raw.slice(0, 400));
+
       try {
         parsed = JSON.parse(raw);
       } catch {
