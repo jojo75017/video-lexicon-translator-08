@@ -48,13 +48,9 @@ export default function V3CreatePage() {
     const text = genieIdea.trim();
     if (!text) return;
     seedHubConfig(text, genre, type);
-    const url = `/v3/create?sommaire=ia&idea=${encodeURIComponent(text)}`;
-    if (sommaireIa) {
-      window.location.assign(url);
-    } else {
-      window.location.assign(url);
-    }
+    window.location.assign(`/v3/create?sommaire=ia&idea=${encodeURIComponent(text)}`);
   };
+
 
 
   useEffect(() => { seedHubConfig(idea, genre, type); }, [idea, genre, type]);
