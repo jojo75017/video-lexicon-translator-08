@@ -990,36 +990,69 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
         // Header with flag and name (using text instead of emojis)
         pdf.setFillColor(235, 245, 255);
         pdf.rect(0, 0, pageWidth, 45, 'F');
-        
-        pdf.setFontSize(22);
-        pdf.setTextColor(30, 60, 100);
+
+        // Titre auto-ajusté pour rester dans l'encart (jamais de débordement)
+        const titleMaxWidth = contentWidth;
+        let titleSize = 22;
         pdf.setFont('helvetica', 'bold');
-        pdf.text(sheet.destinationName.toUpperCase(), margin, 22);
+        pdf.setFontSize(titleSize);
+        let titleText = sheet.destinationName.toUpperCase();
+        while (titleSize > 12 && pdf.getTextWidth(titleText) > titleMaxWidth) {
+          titleSize -= 1;
+          pdf.setFontSize(titleSize);
+        }
+        pdf.setTextColor(30, 60, 100);
+        pdf.text(titleText, margin, 22, { maxWidth: titleMaxWidth });
         
         pdf.setFontSize(11);
         pdf.setTextColor(80, 80, 80);
         pdf.setFont('helvetica', 'normal');
-        pdf.text(`${sheet.country} - ${sheet.region}`, margin, 35);
+        const subtitle = pdf.splitTextToSize(`${sheet.country} - ${sheet.region}`, titleMaxWidth)[0];
+        pdf.text(subtitle, margin, 35);
         
         yPos = 55;
         
-        // Full-width article layout (no images)
         const fullWidth = contentWidth;
 
-        // Info box at the top (full width)
+        // Photo de la destination (recadrée dans son encart) + infos pratiques à droite
+        const photoW = 60;
+        const photoH = 45;
+        let photoDrawn = false;
+        if (sheet.imageUrl) {
+          const cropped = await loadImageCropped(sheet.imageUrl, photoW, photoH);
+          if (cropped) {
+            pdf.addImage(cropped, 'JPEG', margin, yPos, photoW, photoH);
+            pdf.setDrawColor(200, 220, 240);
+            pdf.roundedRect(margin, yPos, photoW, photoH, 2, 2, 'S');
+            photoDrawn = true;
+          }
+        }
+
+        const infoX = photoDrawn ? margin + photoW + 5 : margin;
+        const infoW = photoDrawn ? fullWidth - photoW - 5 : fullWidth;
         pdf.setFillColor(245, 250, 255);
-        pdf.roundedRect(margin, yPos, fullWidth, 25, 3, 3, 'F');
+        pdf.roundedRect(infoX, yPos, infoW, photoH, 3, 3, 'F');
         pdf.setDrawColor(200, 220, 240);
-        pdf.roundedRect(margin, yPos, fullWidth, 25, 3, 3, 'S');
+        pdf.roundedRect(infoX, yPos, infoW, photoH, 3, 3, 'S');
         
         pdf.setFontSize(8);
         pdf.setTextColor(50, 50, 50);
         pdf.setFont('helvetica', 'normal');
-        const infoLine1 = `Population: ${sheet.population} | Langue: ${sheet.language} | Monnaie: ${sheet.currency}`;
-        const infoLine2 = `Climat: ${sheet.climate} | Meilleure saison: ${sheet.bestSeason}`;
-        pdf.text(infoLine1, margin + 5, yPos + 9);
-        pdf.text(infoLine2, margin + 5, yPos + 18);
-        yPos += 30;
+        const infoRows = [
+          `Population: ${sheet.population}`,
+          `Langue: ${sheet.language}`,
+          `Monnaie: ${sheet.currency}`,
+          `Climat: ${sheet.climate}`,
+          `Meilleure saison: ${sheet.bestSeason}`,
+        ];
+        let infoY = yPos + 8;
+        infoRows.forEach((row) => {
+          const line = pdf.splitTextToSize(row, infoW - 10)[0];
+          pdf.text(line, infoX + 5, infoY);
+          infoY += 7;
+        });
+        yPos += photoH + 6;
+
 
         // Description section
         pdf.setFontSize(10);
