@@ -22,7 +22,14 @@ interface Body {
   promesseCentrale?: string;
   chapters?: number;
   userApiKey?: string;
+  /** 'full' (défaut) = sommaire complet ; 'next' = propositions pour le prochain chapitre */
+  step?: "full" | "next";
+  /** Chapitres déjà validés par l'auteur (mode dialogue) */
+  accepted?: Array<{ numero?: number; titre?: string; objectif?: string }>;
+  /** Consigne libre de l'auteur pour orienter les propositions */
+  guidance?: string;
 }
+
 
 function sanitizeApiKey(value: unknown): string {
   return typeof value === "string"
@@ -121,6 +128,83 @@ Deno.serve(async (req) => {
     const count = Math.min(60, Math.max(3, Number(body.chapters) || 12));
     const maxTokens = Math.min(12000, 1800 + count * 180);
     const userKey = sanitizeApiKey(body.userApiKey);
+    const serverKeyEarly = sanitizeApiKey(Deno.env.get("GEMINI_API_KEY") || "");
+
+    // ---- Mode dialogue : propositions pour le prochain chapitre ----
+    if (body.step === "next") {
+      const accepted = Array.isArray(body.accepted) ? body.accepted : [];
+      const nextNum = accepted.length + 1;
+      const acceptedList = accepted.length
+        ? accepted
+            .map((c, i) => `${i + 1}. ${String(c?.titre || "").trim()}${c?.objectif ? ` — ${String(c.objectif).trim()}` : ""}`)
+            .join("\n")
+        : "Aucun chapitre validé pour l'instant.";
+
+      const nextPrompt = `Tu es directeur éditorial KDP. Nous construisons ensemble, chapitre par chapitre, le sommaire d'un livre en français.
+Titre : ${title}
+Sous-titre : ${(body.subtitle || "").trim() || "Non défini"}
+Catégorie : ${(body.category || "").trim() || "Non définie"}
+Ton : ${(body.tone || "").trim() || "Inspirant"}
+Synopsis : ${(body.description || "").trim().slice(0, 4000) || "Non fourni"}
+Promesse centrale : ${(body.promesseCentrale || "").trim() || "Non définie"}
+Nombre total de chapitres prévus : ${count}
+
+Chapitres déjà validés par l'auteur :
+${acceptedList}
+
+${(body.guidance || "").trim() ? `Consigne de l'auteur pour ce chapitre : ${(body.guidance || "").trim()}` : ""}
+
+Propose 3 options DIFFÉRENTES pour le chapitre ${nextNum} (et seulement celui-là).
+Réponds STRICTEMENT en JSON valide, sans markdown :
+{"suggestions":[{"titre":"Titre spécifique","objectif":"Objectif éditorial en une phrase"}]}
+
+Règles :
+- exactement 3 options ;
+- progression logique après les chapitres validés, sans répéter leurs titres ;
+- jamais de titre générique comme "Chapitre ${nextNum}" ;
+- 100 % français : aucun latin ou faux latin, aucune langue morte, aucun mot inventé, aucune expression étrangère décorative ;
+- titres courts et vendeurs.`;
+
+      let r: { ok: boolean; status?: number; text?: string } | null = null;
+      if (isValidGoogleKey(userKey)) r = await callGemini(nextPrompt, userKey, 1200);
+      if (!r?.ok && isValidGoogleKey(serverKeyEarly)) r = await callGemini(nextPrompt, serverKeyEarly, 1200);
+      if (!r?.ok) r = await callLovableAI(nextPrompt, 1200);
+      if (!r?.ok) {
+        const status = r?.status === 429 ? 429 : r?.status === 402 ? 402 : 502;
+        return json(status, {
+          error:
+            status === 429
+              ? "Limite IA atteinte. Réessaie dans quelques secondes."
+              : status === 402
+                ? "Crédits IA indisponibles pour le moment."
+                : "Service IA temporairement indisponible.",
+        });
+      }
+
+      let parsed: any = null;
+      const raw = String(r.text || "").replace(/```json|```/gi, "").trim();
+      
+
+      try {
+        parsed = JSON.parse(raw);
+      } catch {
+        const m = raw.match(/\{[\s\S]*\}/);
+        if (m) { try { parsed = JSON.parse(m[0]); } catch { /* noop */ } }
+      }
+      const list = Array.isArray(parsed?.suggestions) ? parsed.suggestions : Array.isArray(parsed) ? parsed : [];
+      const suggestions = list
+        .map((c: any) => ({
+          titre: String(c?.titre ?? c?.title ?? "").trim(),
+          objectif: String(c?.objectif ?? c?.objective ?? "").trim(),
+        }))
+        .filter((c: { titre: string }) => c.titre.length > 1)
+        .slice(0, 3);
+
+      if (!suggestions.length) return json(502, { error: "Aucune proposition exploitable. Réessaie." });
+      return json(200, { suggestions, numero: nextNum });
+    }
+
+
 
     const prompt = `Tu es directeur éditorial KDP. Crée une table des matières professionnelle en français.
 Titre : ${title}
