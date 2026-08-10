@@ -76,39 +76,6 @@ async function sendAccessEmail(email: string, firstName: string, accessCode: str
   return true;
 }
 
-// --- Ajout du contact dans Brevo (best-effort) ---
-async function addToBrevo(email: string, firstName: string) {
-  const brevoKey = Deno.env.get("BREVO_API_KEY");
-  if (!brevoKey) {
-    console.warn("BREVO_API_KEY missing — skipping Brevo sync");
-    return false;
-  }
-  const listIdRaw = Deno.env.get("BREVO_TRIAL_LIST_ID");
-  const listId = listIdRaw ? parseInt(listIdRaw, 10) : NaN;
-  try {
-    const res = await fetch("https://api.brevo.com/v3/contacts", {
-      method: "POST",
-      headers: { "api-key": brevoKey, "content-type": "application/json", accept: "application/json" },
-      body: JSON.stringify({
-        email,
-        attributes: firstName ? { PRENOM: firstName, FIRSTNAME: firstName } : {},
-        updateEnabled: true,
-        ...(Number.isFinite(listId) ? { listIds: [listId] } : {}),
-      }),
-    });
-    if (!res.ok) {
-      const body = await res.text();
-      // 400 "Contact already exist" est acceptable
-      console.warn("Brevo add contact non-OK:", res.status, body);
-      return res.status === 400 && body.includes("already");
-    }
-    return true;
-  } catch (e) {
-    console.error("Brevo sync failed:", (e as Error).message);
-    return false;
-  }
-}
-
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -212,8 +179,7 @@ serve(async (req) => {
     // 3) Email d'accès + bonus PDF
     await sendAccessEmail(email, firstName, accessCode, trialEndsAt);
 
-    // 4) Synchronisation externe suspendue avec le mode zéro envoi.
-    if (EMAIL_SENDING_ENABLED) await addToBrevo(email, firstName);
+    // 4) Emailing centralisé dans l'app : plus de synchronisation Brevo.
 
     // 5) Aucun enrôlement automatique tant que le domaine email n'est pas validé.
     if (EMAIL_SENDING_ENABLED) try {

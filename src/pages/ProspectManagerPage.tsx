@@ -501,7 +501,7 @@ const ProspectManagerPage = () => {
         </div>
 
         <Tabs value={activeManagerTab} onValueChange={setActiveManagerTab} className="space-y-6">
-          <TabsList className="grid h-auto w-full grid-cols-2 gap-1 bg-card border border-border p-1 md:grid-cols-4 xl:grid-cols-8">
+          <TabsList className="grid h-auto w-full grid-cols-2 gap-1 bg-card border border-border p-1 md:grid-cols-4 xl:grid-cols-7">
             <TabsTrigger value="prospects" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
               <Users className="h-4 w-4 mr-2" /> Prospects
             </TabsTrigger>
