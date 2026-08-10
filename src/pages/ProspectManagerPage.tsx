@@ -533,11 +533,8 @@ const ProspectManagerPage = () => {
           <TabsContent value="tracking" className="space-y-4">
             <CommunicationJourneyTracker onSelectTab={setActiveManagerTab} />
           </TabsContent>
+          {/* Kit GetResponse retiré : tout l'emailing est centralisé dans l'app. */}
 
-          {/* KIT GETRESPONSE TAB */}
-          <TabsContent value="abkit" className="space-y-4">
-            <AbKitPanel />
-          </TabsContent>
 
 
           {/* INSCRITS (leads lead-magnet) TAB */}
