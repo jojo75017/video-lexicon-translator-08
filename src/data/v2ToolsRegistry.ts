@@ -149,7 +149,6 @@ export const V2_TOOLS: V2Tool[] = [
   { id: 'tutoriels', label: 'Tutoriels', description: 'Tutoriels pas-à-pas.', route: '/tutoriels', icon: ClipboardList, category: 'formation', image: IMG.formation },
   { id: 'guide-ebook', label: 'Guide Ebook', description: 'Guide complet de l\'auteur.', route: '/guide-ebook', icon: ScrollText, category: 'formation', image: IMG.formation },
   { id: 'guide-outils', label: 'Guide des outils', description: 'Prise en main de tous les outils.', route: '/guide-outils', icon: Compass, category: 'formation', image: IMG.formation },
-  { id: 'guide-brevo', label: 'Guide automatisation Brevo', description: 'Automatiser vos emails avec Brevo.', route: '/guide-automatisation-brevo', icon: Mail, category: 'formation', image: IMG.formation },
   { id: 'blog', label: 'Guides & Blog', description: 'Tous les guides publiés.', route: '/blog', icon: FileText, category: 'formation', image: IMG.formation },
   { id: 'faq', label: 'FAQ', description: 'Questions fréquentes.', route: '/faq', icon: MessageSquare, category: 'formation', image: IMG.formation },
 ];
