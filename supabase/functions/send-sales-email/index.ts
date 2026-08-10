@@ -347,7 +347,16 @@ Deno.serve(async (req) => {
         await db.from("email_send_log").insert({ recipient_email: email, template_name: template, message_id: result.id || `${CAMPAIGN}-${step}-${email}`, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
         if (!result.ok) { if (isQuotaExhausted()) break; continue; }
         sentCount++;
-      }
+        // Synchronise l'étape du prospect : sans cela la séquence reste bloquée
+        // sur l'étape précédente et l'envoi automatique la renvoie en boucle.
+        const completed = step >= 5;
+        await db.from("sales_prospects").update({
+          current_step: step,
+          last_email_sent_at: new Date().toISOString(),
+          next_email_at: completed ? null : new Date(Date.now() + (DELAYS[step] || 3) * 86400000).toISOString(),
+          completed,
+        }).eq("email", email);
+
       return respond({ success: true, mode, step, template, sent: sentCount, targets: targets.length });
     }
 
