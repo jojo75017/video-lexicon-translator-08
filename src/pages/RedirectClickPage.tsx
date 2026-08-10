@@ -31,18 +31,21 @@ const RedirectClickPage = () => {
     const sep = destination.includes('?') ? '&' : '?';
     const finalUrl = `${destination}${sep}src=email${template ? `&t=${encodeURIComponent(template)}` : ''}`;
 
-    // Suivi non bloquant
+    // Suivi non bloquant. sendBeacon survit à la navigation : avec fetch(),
+    // la redirection annulait l'appel et une partie des clics n'était jamais comptée.
     if (SUPABASE_URL && email) {
       const trackUrl = `${SUPABASE_URL}/functions/v1/track-email-click?e=${encodeURIComponent(email)}&s=${encodeURIComponent(step)}&t=${encodeURIComponent(template)}&u=${encodeURIComponent('https://ebookstudio.fr' + finalUrl)}&noredirect=1`;
       try {
-        fetch(trackUrl, { mode: 'no-cors', keepalive: true }).catch(() => {});
+        const sent = navigator.sendBeacon?.(trackUrl);
+        if (!sent) fetch(trackUrl, { mode: 'no-cors', keepalive: true }).catch(() => {});
       } catch {
         /* silencieux */
       }
     }
 
-    const timer = window.setTimeout(() => window.location.replace(finalUrl), 120);
+    const timer = window.setTimeout(() => window.location.replace(finalUrl), 250);
     return () => window.clearTimeout(timer);
+
   }, []);
 
   return (
