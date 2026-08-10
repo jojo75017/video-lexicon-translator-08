@@ -356,6 +356,8 @@ Deno.serve(async (req) => {
           next_email_at: completed ? null : new Date(Date.now() + (DELAYS[step] || 3) * 86400000).toISOString(),
           completed,
         }).eq("email", email);
+      }
+
 
       return respond({ success: true, mode, step, template, sent: sentCount, targets: targets.length });
     }
