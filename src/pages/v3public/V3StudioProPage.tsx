@@ -147,7 +147,9 @@ const V3StudioProPage: React.FC = () => {
           <TabsTrigger value="fiche">1. Fiche maître</TabsTrigger>
           <TabsTrigger value="bible">2. Bible du livre</TabsTrigger>
           <TabsTrigger value="tableau">3. Tableau de bord</TabsTrigger>
+          <TabsTrigger value="redaction">4. Rédaction</TabsTrigger>
         </TabsList>
+
 
         <TabsContent value="fiche">
           <MasterSheetForm
