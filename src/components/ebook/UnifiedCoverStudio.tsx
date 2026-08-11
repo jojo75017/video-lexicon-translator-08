@@ -7,6 +7,7 @@ import { EbookAICoverStudio } from './EbookAICoverStudio';
 import KdpCoverStudio from './KdpCoverStudio';
 import { EbookBackCoverGenerator } from './EbookBackCoverGenerator';
 import coverHero from '@/assets/cover-studio-hero.jpg';
+import IdeogramKeyCard from './IdeogramKeyCard';
 
 interface UnifiedCoverStudioProps {
   ebookTitle?: string;
