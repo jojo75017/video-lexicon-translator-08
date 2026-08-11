@@ -226,32 +226,27 @@ export default function V3PourquoiPage() {
 
       {/* Tarifs */}
       <Section id="tarifs" icon={<Gem />} title="Nos forfaits à l'ouverture (Octobre 2026)">
-        <div className="grid md:grid-cols-3 gap-4 mt-2">
+        <div className="grid md:grid-cols-2 gap-4 mt-2">
           <PlanCard
-            name="Débutant"
-            price="9,99 €"
+            name="Plume"
+            price="17 €"
             per="/ mois"
-            highlights={['10 livres / mois', '18 agents IA', 'Exports KDP', 'Support standard']}
+            highlights={['170 € / an (2 mois offerts)', '10 livres / mois', 'Exports KDP', 'Correcteur IA']}
           />
           <PlanCard
-            name="Studio"
+            name="Édition"
             recommended
-            price="12,99 €"
+            price="27 €"
             per="/ mois"
-            highlights={['20 livres / mois', '22 agents IA', 'Traduction 10 langues', 'Cover Studio Pro']}
-          />
-          <PlanCard
-            name="Auteur"
-            price="59,00 €"
-            per="/ mois"
-            highlights={['Livres illimités', '30 agents IA', 'Priorité workflow', 'Support prioritaire']}
+            highlights={['270 € / an (2 mois offerts)', 'Livres illimités', 'Traduction 10 langues', 'Cover Studio Pro']}
           />
         </div>
         <p className="text-xs text-[#6B7280] mt-4">
-          Tarifs annuels également disponibles avec économie affichée. Les modules Pro (couvertures haut de
-          gamme, KDP Pilot) sont proposés en upsells depuis l'espace auteur.
+          En ce moment, l'accès à vie à 47 € reste disponible jusqu'au 30/09/2026. Les abonnements Plume et
+          Édition démarrent le 1er octobre 2026.
         </p>
       </Section>
+
 
       {/* CTA */}
       <section className="max-w-4xl mx-auto px-6 py-12">
