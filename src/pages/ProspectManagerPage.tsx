@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CampaignSequencePanel from '@/components/admin/CampaignSequencePanel';
 import ClosingCampaignPanel from '@/components/admin/ClosingCampaignPanel';
+import ConversionBoostersPanel from '@/components/admin/ConversionBoostersPanel';
 import ChannelPerformancePanel from '@/components/admin/ChannelPerformancePanel';
 
 
@@ -623,6 +624,7 @@ const ProspectManagerPage = () => {
             <CampaignSequencePanel />
 
             <ClosingCampaignPanel />
+            <ConversionBoostersPanel />
 
 
             <p className="text-xs text-muted-foreground">

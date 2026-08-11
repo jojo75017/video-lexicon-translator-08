@@ -12,6 +12,9 @@ import { toast } from "sonner";
 import SeoHead from "@/components/funnel/SeoHead";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { COMMANDER_URL } from "@/data/externalLinks";
+import { V3_LAUNCH_BONUSES, V3_BONUSES_TOTAL_VALUE } from "@/data/v3Launch";
+
+const BONUS_TOTAL = V3_BONUSES_TOTAL_VALUE;
 
 
 const EMERALD = "#064e3b";
@@ -193,6 +196,43 @@ export default function V3CommanderPage() {
               ))}
             </div>
 
+            {/* Bonus de lancement : la valeur monte, le prix ne bouge pas */}
+            <div className="mt-7 rounded-xl border p-5" style={{ borderColor: `${GOLD}55`, background: `${GOLD}0d` }}>
+              <h3 className="text-sm font-black" style={{ color: EMERALD }}>
+                Offerts avec votre commande — {BONUS_TOTAL} € de valeur
+              </h3>
+              <ul className="mt-3 space-y-2.5">
+                {V3_LAUNCH_BONUSES.map((b) => (
+                  <li key={b.title} className="flex gap-3 text-sm text-slate-700">
+                    <span aria-hidden className="text-base leading-none">{b.emoji}</span>
+                    <span>
+                      <span className="font-bold" style={{ color: EMERALD }}>{b.title}</span>
+                      <span className="block text-xs text-slate-600">{b.desc}</span>
+                    </span>
+                  </li>
+                ))}
+                <li className="flex gap-3 text-sm text-slate-700">
+                  <span aria-hidden className="text-base leading-none">🤝</span>
+                  <span>
+                    <span className="font-bold" style={{ color: EMERALD }}>Démarrage accompagné</span>
+                    <span className="block text-xs text-slate-600">
+                      Envoyez-moi votre sujet après votre commande : je crée votre premier sommaire avec vous.
+                    </span>
+                  </span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Le calcul, écrit noir sur blanc */}
+            <div className="mt-5 rounded-xl border p-5" style={{ borderColor: `${EMERALD}22` }}>
+              <h3 className="text-sm font-black" style={{ color: EMERALD }}>Pourquoi maintenant</h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate-700">
+                À partir du 1<sup>er</sup> octobre, EbookStudio passe uniquement en abonnement :
+                17 € par mois, soit <strong>204 € la première année</strong>. Aujourd'hui, c'est
+                <strong> 47 € une seule fois</strong>, conservés à vie, mises à jour comprises.
+              </p>
+            </div>
+
             <p className="mt-6 text-xs text-slate-500">
               Une question avant de commander ? Écrivez à{" "}
               <a href="mailto:contact@ebookstudio.fr" className="underline" style={{ color: EMERALD }}>
@@ -201,6 +241,7 @@ export default function V3CommanderPage() {
               — réponse sous 24 h ouvrées.
             </p>
           </div>
+
 
           {/* Colonne paiement */}
           <div
@@ -272,6 +313,22 @@ export default function V3CommanderPage() {
                     );
                   })}
                 </div>
+
+                {/* Réassurance juste au-dessus du bouton : c'est là qu'on hésite */}
+                <ul className="mt-5 space-y-1.5 rounded-xl border p-4 text-xs text-slate-700" style={{ borderColor: `${EMERALD}1f`, background: `${EMERALD}08` }}>
+                  <li className="flex items-center gap-2">
+                    <RotateCcw className="h-3.5 w-3.5 shrink-0" style={{ color: EMERALD }} />
+                    <span><strong>Garantie 30 jours</strong> — remboursé sur simple demande, sans justification.</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CreditCard className="h-3.5 w-3.5 shrink-0" style={{ color: EMERALD }} />
+                    <span><strong>PayPal ou carte bancaire</strong>, en 1, 2 ou 3 fois.</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Lock className="h-3.5 w-3.5 shrink-0" style={{ color: EMERALD }} />
+                    <span><strong>Aucun abonnement</strong> : rien à résilier, accès conservé à vie.</span>
+                  </li>
+                </ul>
 
                 <button
                   onClick={startPayment}

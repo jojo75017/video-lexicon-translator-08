@@ -25,23 +25,23 @@ export interface AbCopy {
 /** Contenu par variante, séparé entre audience générale et expatriés. */
 const COPY: Record<'general' | 'expat', Record<AbVariant, AbCopy>> = {
   general: {
-    // Variante A — contrôle : promesse "niches rentables" (offre actuelle)
+    // Variante A — promesse "guide niches" (contrôle historique)
     A: {
       popupTitle: 'Avant de partir… 🎁',
       popupSubtitle:
         'Recevez gratuitement les 5 niches d\'ebooks les plus rentables en 2026 (données Amazon réelles) + un plan d\'ebook prêt à l\'emploi.',
       popupCta: 'Recevoir mon guide gratuit',
-      stickyMessage: 'Recevez gratuitement les 5 niches d\'ebooks rentables 2026 🎁',
-      stickyCta: 'Recevoir le guide',
+      stickyMessage: 'Le sommaire complet de votre livre, généré en 2 minutes — gratuit',
+      stickyCta: 'Voir mon sommaire',
     },
-    // Variante B — promesse "résultat rapide" : publier son 1er ebook en 7 jours
+    // Variante B — promesse "résultat immédiat" : le sommaire de SON livre, gratuit
     B: {
-      popupTitle: 'Publiez votre 1er ebook en 7 jours 🚀',
+      popupTitle: 'Le sommaire complet de votre livre, en 2 minutes',
       popupSubtitle:
-        'Recevez gratuitement le plan d\'action pas-à-pas pour écrire et publier votre premier ebook sur Amazon KDP en une semaine, même en partant de zéro.',
-      popupCta: 'Recevoir le plan gratuit',
-      stickyMessage: 'Le plan pour publier votre 1er ebook KDP en 7 jours 🚀',
-      stickyCta: 'Recevoir le plan',
+        'Donnez votre sujet, l\'IA construit le sommaire chapitre par chapitre sous vos yeux. Gratuit, sans carte bancaire.',
+      popupCta: 'Voir mon sommaire gratuitement',
+      stickyMessage: 'Testez : l\'IA construit le sommaire de votre livre, gratuitement',
+      stickyCta: 'Voir mon sommaire',
     },
   },
   expat: {

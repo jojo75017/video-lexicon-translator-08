@@ -108,6 +108,7 @@ const InlineLeadCapture: React.FC<InlineLeadCaptureProps> = ({
       });
       trackFormSubmit(isDemo ? 'inline_demo_capture' : 'inline_lead_capture', email);
       trackLeadMagnetDownload(leadMagnet);
+      trackCaptureEvent(isDemo ? 'demo' : 'inline', 'submit', { leadMagnet });
       setDone(true);
     } catch {
       toast.error('Une erreur est survenue, réessayez dans un instant.');
