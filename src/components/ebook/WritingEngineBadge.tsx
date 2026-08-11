@@ -111,12 +111,12 @@ export const WritingEngineBadge: React.FC<WritingEngineBadgeProps> = ({ tier, is
       {/* Call to action / statut */}
       {!canUpgrade ? (
         <div className="px-4 sm:px-5 py-3 text-[12px] font-semibold" style={{ background: `${TEAL}0d`, color: TEAL }}>
-          ✓ Vous êtes sur le palier <strong>Éditeur</strong> — toutes les capacités ci-dessus sont actives.
+          ✓ Vous êtes sur le forfait <strong>Édition</strong> — toutes les capacités ci-dessus sont actives.
         </div>
       ) : (
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-5 py-3.5" style={{ background: `${AMBER}12` }}>
           <span className="text-[12px] text-foreground max-w-md">
-            <strong>Passez au palier Éditeur (59 €/mois)</strong> pour débloquer les 30 agents, l'édition Pro, le comité de lecture et des livres illimités.
+            <strong>Passez au forfait Édition (27 €/mois)</strong> pour débloquer les 30 agents, l'édition Pro, le comité de lecture et des livres illimités.
           </span>
           {onUpgrade && (
             <button
