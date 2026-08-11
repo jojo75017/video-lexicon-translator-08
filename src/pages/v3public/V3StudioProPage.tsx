@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -46,6 +45,10 @@ const V3StudioProPage: React.FC = () => {
   React.useEffect(() => {
     if (bible) setDraftBible({ ...EMPTY_BIBLE, ...bible });
   }, [bible]);
+
+  React.useEffect(() => {
+    document.title = 'Studio Pro — Bible du livre | EbookStudio';
+  }, []);
 
   const currentSheet = useMemo(() => sheet, [sheet]);
 
@@ -125,14 +128,6 @@ const V3StudioProPage: React.FC = () => {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-8">
-      <Helmet>
-        <title>Studio Pro — Bible du livre et validation | EbookStudio</title>
-        <meta
-          name="description"
-          content="Studio éditorial hybride : Gemini construit l'architecture complète de votre livre, vous validez, ChatGPT rédige ensuite chapitre par chapitre."
-        />
-      </Helmet>
-
       <header className="mb-6 space-y-3">
         <div className="flex flex-wrap items-center gap-2">
           <Badge>Studio Pro</Badge>
