@@ -54,7 +54,7 @@ export default function V3CreatePage() {
       setOpeningBook(true);
       const { data, error } = await supabase
         .from('ebook_projects')
-        .select('id,title,author_name,kdp_description,chapters,number_of_chapters')
+        .select('id,title,author_name,kdp_description,kdp_categories,tone,chapters,number_of_chapters')
         .eq('id', projectId)
         .maybeSingle();
       if (cancelled) return;
@@ -69,6 +69,9 @@ export default function V3CreatePage() {
         titre: String(c?.title || c?.titre || `Chapitre ${i + 1}`),
         objectif: String(c?.objectif || c?.summary || ''),
       }));
+      const category = Array.isArray(data.kdp_categories)
+        ? String(data.kdp_categories[0] || '')
+        : String(data.kdp_categories || '');
       const prev = readBookBrief() || {};
       writeBookBrief({
         ...prev,
@@ -76,10 +79,13 @@ export default function V3CreatePage() {
         title: data.title || prev.title || '',
         author: data.author_name || prev.author || '',
         description: data.kdp_description || prev.description || '',
+        category: category || prev.category || '',
+        tone: data.tone || prev.tone || '',
         chapters: outline.length || Number(data.number_of_chapters) || prev.chapters,
         outline: outline.length ? outline : prev.outline,
         outlineValidated: outline.length ? true : prev.outlineValidated,
       });
+
       setOpenedBook({ id: data.id, title: data.title || 'Livre sans titre', chapters: outline.length });
       setBriefKey((k) => k + 1);
       setShowWizard(true);
