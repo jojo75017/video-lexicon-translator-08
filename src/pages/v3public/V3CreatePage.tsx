@@ -1,10 +1,14 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Sparkles, Loader2, ImageIcon, ArrowRight } from 'lucide-react';
+import { Sparkles, Loader2, ImageIcon, ArrowRight, BookOpen } from 'lucide-react';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 import { BackButton } from '@/components/v3/BackButton';
 import V3BriefRecap from '@/components/v3public/V3BriefRecap';
 import V3ApiKeysGate from '@/components/v3public/V3ApiKeysGate';
 import V3GenieDialog from '@/components/v3public/V3GenieDialog';
+import { readBookBrief, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
+
 
 const V3CreateWizard = lazy(() => import('@/components/v3public/V3CreateWizard'));
 const V3ImportStudio = lazy(() => import('@/components/v3public/V3ImportStudio'));
