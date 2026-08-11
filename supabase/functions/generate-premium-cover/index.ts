@@ -336,7 +336,7 @@ serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({ covers, artDirection, errors }), {
+    return new Response(JSON.stringify({ covers, artDirection, errors, engine }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
