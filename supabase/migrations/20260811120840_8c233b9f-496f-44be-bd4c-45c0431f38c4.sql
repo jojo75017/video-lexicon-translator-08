@@ -1,0 +1,1 @@
+DELETE FROM public.funnel_leads WHERE email = 'test-demo-genie@ebookstudio.fr';
