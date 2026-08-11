@@ -72,6 +72,10 @@ const CoverStudioPro: React.FC = () => {
     () => localStorage.getItem(OR_MODEL_LS) || OR_IMAGE_MODELS[0].id,
   );
   const [orStatus, setOrStatus] = useState<'idle' | 'testing' | 'valid' | 'invalid'>('idle');
+  const [ideoKey, setIdeoKey] = useState(getIdeogramKey());
+  const [noText, setNoText] = useState(false);
+  const [engineUsed, setEngineUsed] = useState('');
+
   const [orCredits, setOrCredits] = useState<string>('');
 
   const testOpenRouterKey = async () => {
