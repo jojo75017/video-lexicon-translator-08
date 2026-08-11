@@ -11,20 +11,19 @@ const requireUser = async (req: Request) => {
   if (!authHeader?.startsWith('Bearer ')) return null;
   const token = authHeader.slice('Bearer '.length).trim();
   const supabaseUrl = Deno.env.get('SUPABASE_URL');
-  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-  const fallbackKey = Deno.env.get('SUPABASE_ANON_KEY') || Deno.env.get('SUPABASE_PUBLISHABLE_KEY');
-  const serverKey = serviceRoleKey || fallbackKey;
-  if (!token || !supabaseUrl || !serverKey) {
+  const publishableKey = Deno.env.get('SUPABASE_ANON_KEY') || Deno.env.get('SUPABASE_PUBLISHABLE_KEY');
+  if (!token || !supabaseUrl || !publishableKey) {
     console.error('Workflow auth configuration is incomplete');
     return null;
   }
 
-  // Validation explicite du JWT reçu. Utiliser getUser(token) évite que le
-  // client serveur perde l'en-tête Authorization lors d'une session reprise.
-  const supabase = createClient(supabaseUrl, serverKey, {
+  // Le client doit porter le JWT de l'abonné. Un client créé avec la clé de
+  // service remplaçait cet en-tête par son propre jeton (sans claim `sub`).
+  const supabase = createClient(supabaseUrl, publishableKey, {
     auth: { persistSession: false, autoRefreshToken: false },
+    global: { headers: { Authorization: `Bearer ${token}` } },
   });
-  const { data, error } = await supabase.auth.getUser(token);
+  const { data, error } = await supabase.auth.getUser();
   if (error || !data?.user) {
     console.warn('Workflow authentication rejected:', error?.message || 'user missing');
     return null;

@@ -12,7 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import {
   Upload, Users, Send, Play, Pause, Trash2,
   Mail, CheckCircle, Clock, AlertCircle, RefreshCw,
-  FileSpreadsheet, Zap, BarChart3, Globe, Copy, Route, TrendingUp
+  FileSpreadsheet, Zap, BarChart3, Globe, Copy, Route, TrendingUp, Images
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
@@ -20,6 +20,7 @@ import LeadsInscritsPanel from '@/components/admin/LeadsInscritsPanel';
 import TemplatePerformancePanel from '@/components/admin/TemplatePerformancePanel';
 import CampaignPerformanceDashboard from '@/components/admin/CampaignPerformanceDashboard';
 import CommunicationJourneyTracker from '@/components/admin/CommunicationJourneyTracker';
+import AdminPublishingKitPage from '@/pages/admin/AdminPublishingKitPage';
 import { ACTIVE_EMAIL_CAMPAIGN } from '@/data/canonicalEmailCampaign';
 
 
@@ -501,7 +502,7 @@ const ProspectManagerPage = () => {
         </div>
 
         <Tabs value={activeManagerTab} onValueChange={setActiveManagerTab} className="space-y-6">
-          <TabsList className="grid h-auto w-full grid-cols-2 gap-1 bg-card border border-border p-1 md:grid-cols-4 xl:grid-cols-7">
+          <TabsList className="grid h-auto w-full grid-cols-2 gap-1 bg-card border border-border p-1 md:grid-cols-4 xl:grid-cols-8">
             <TabsTrigger value="prospects" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
               <Users className="h-4 w-4 mr-2" /> Prospects
             </TabsTrigger>
@@ -523,7 +524,14 @@ const ProspectManagerPage = () => {
             <TabsTrigger value="perf" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
               <TrendingUp className="h-4 w-4 mr-2" /> Perf & CA
             </TabsTrigger>
+            <TabsTrigger value="posts" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
+              <Images className="h-4 w-4 mr-2" /> Posts & visuels
+            </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="posts" className="space-y-4">
+            <AdminPublishingKitPage embedded />
+          </TabsContent>
 
           <TabsContent value="perf" className="space-y-4">
             <CampaignPerformanceDashboard />

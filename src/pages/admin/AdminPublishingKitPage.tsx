@@ -44,18 +44,16 @@ function DownloadButton({ src, filename }: { src: string; filename: string }) {
   );
 }
 
-export default function AdminPublishingKitPage() {
+export default function AdminPublishingKitPage({ embedded = false }: { embedded?: boolean }) {
   const navigate = useNavigate();
 
-  return (
-    <div className="min-h-screen bg-background">
-      <AdminPanelNav />
-      <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
-        <div className="flex items-center gap-3">
+  const content = (
+      <div className={embedded ? "space-y-6" : "max-w-6xl mx-auto px-4 py-8 space-y-6"}>
+        {!embedded && <div className="flex items-center gap-3">
           <Button variant="ghost" size="sm" onClick={() => navigate('/admin')} className="gap-1.5">
             <ArrowLeft className="w-4 h-4" /> Admin
           </Button>
-        </div>
+        </div>}
 
         <header className="space-y-2">
           <Badge variant="outline" className="text-xs">Campagne 47 € — jusqu'au 30/09/2026</Badge>
@@ -159,6 +157,14 @@ export default function AdminPublishingKitPage() {
           </TabsContent>
         </Tabs>
       </div>
+  );
+
+  if (embedded) return content;
+
+  return (
+    <div className="min-h-screen bg-background">
+      <AdminPanelNav />
+      {content}
     </div>
   );
 }

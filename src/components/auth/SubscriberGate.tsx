@@ -131,18 +131,30 @@ export function SubscriberGate({
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
           try {
-            const { data: authData } = await supabase.functions.invoke("subscriber-auth", {
+            const { data: authData, error: authInvokeError } = await supabase.functions.invoke("subscriber-auth", {
               body: { email, access_code: code },
             });
-            if (authData?.access_token && authData?.refresh_token) {
-              await supabase.auth.setSession({
-                access_token: authData.access_token,
-                refresh_token: authData.refresh_token,
-              });
-              console.log("SubscriberGate: Auth session created for subscriber");
+            if (authInvokeError || !authData?.access_token || !authData?.refresh_token) {
+              console.error("SubscriberGate: subscriber-auth failed", authInvokeError);
+              await denyAccess();
+              return;
             }
+
+            const { error: setSessionError } = await supabase.auth.setSession({
+              access_token: authData.access_token,
+              refresh_token: authData.refresh_token,
+            });
+            if (setSessionError) {
+              console.error("SubscriberGate: session installation failed", setSessionError);
+              await denyAccess();
+              return;
+            }
+
+            console.log("SubscriberGate: Auth session created for subscriber");
           } catch (authErr) {
-            console.warn("SubscriberGate: Could not create auth session:", authErr);
+            console.error("SubscriberGate: Could not create auth session:", authErr);
+            await denyAccess();
+            return;
           }
         }
 
