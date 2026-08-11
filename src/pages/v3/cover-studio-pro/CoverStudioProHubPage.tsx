@@ -36,6 +36,10 @@ export default function CoverStudioProHubPage() {
         </p>
       </header>
 
+      <IdeogramKeyCard />
+
+
+
       <section>
         <h2 className="text-lg font-semibold mb-4">Choisis un format</h2>
         <div className="grid md:grid-cols-2 gap-4">
