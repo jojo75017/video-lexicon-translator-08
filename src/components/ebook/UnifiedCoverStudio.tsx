@@ -129,7 +129,8 @@ export const UnifiedCoverStudio: React.FC<UnifiedCoverStudioProps> = ({
         </TabsList>
 
         <div className="mt-6">
-          <TabsContent value="ai" className="mt-0 animate-fade-in">
+          <TabsContent value="ai" className="mt-0 animate-fade-in space-y-4">
+            <IdeogramKeyCard />
             <EbookAICoverStudio
               ebookTitle={ebookTitle}
               authorName={authorName}
