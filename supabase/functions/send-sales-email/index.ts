@@ -269,7 +269,8 @@ Deno.serve(async (req) => {
 
       const { data: opens } = await db.from("email_opens").select("prospect_email").eq("template_name", sourceTemplate);
       const { data: clicks } = await db.from("email_clicks").select("prospect_email");
-      const { data: alreadySent } = await db.from("email_send_log").select("recipient_email").eq("template_name", resendTemplate).in("status", ["sent", "delivered"]);
+      // On exclut aussi l'ancien nom de relance (`-v2`) pour ne pas réécrire deux fois aux mêmes contacts.
+      const { data: alreadySent } = await db.from("email_send_log").select("recipient_email").in("template_name", [resendTemplate, `${sourceTemplate}-v2`]).in("status", ["sent", "delivered"]);
       const { data: paidOrders } = await db.from("funnel_orders").select("email").eq("status", "paid");
       const { data: unsub } = await db.from("sales_prospects").select("email,first_name,unsubscribed,status").limit(5000);
 
