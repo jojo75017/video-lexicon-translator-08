@@ -23,7 +23,7 @@ const SOURCES: { id: Source; icon: any; title: string; desc: string; formats: st
 const WIZARD_CFG_KEY = 'edition_book_config_v1';
 const IMPORTED_KEY = 'v3_imported_manuscript_v1';
 
-function persistAndGo(m: Manuscript, navigate: ReturnType<typeof useNavigate>) {
+function persistManuscript(m: Manuscript) {
   try {
     const summary = m.rawText.slice(0, 800).replace(/\s+/g, ' ').trim();
     const prev = JSON.parse(localStorage.getItem(WIZARD_CFG_KEY) || '{}');
@@ -38,9 +38,11 @@ function persistAndGo(m: Manuscript, navigate: ReturnType<typeof useNavigate>) {
       chapters: m.chapters.length, wordCount: m.wordCount, pageEstimate: m.pageEstimate, importedAt: m.importedAt,
     }));
   } catch { /* ignore */ }
+  // Conservé pour « Corriger mon livre » : le texte complet, chapitre par chapitre.
+  savePendingManuscript(m);
   toast.success(`Importé : ${m.chapters.length} chapitre(s), ${m.wordCount.toLocaleString('fr-FR')} mots.`);
-  navigate('/v3/create', { replace: true });
 }
+
 
 export default function V3ImportStudio() {
   const navigate = useNavigate();
