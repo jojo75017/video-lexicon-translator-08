@@ -129,7 +129,7 @@ const ChapterWriter: React.FC<Props> = ({
                   </li>
                 ))}
               </ul>
-            </ScrollArea>
+            </div>
           </CardContent>
         </Card>
 
