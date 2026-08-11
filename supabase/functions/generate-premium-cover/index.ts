@@ -19,7 +19,38 @@ interface CoverRequest {
   showAuthor?: boolean;
   openrouterKey?: string;    // BYOK OpenRouter (sk-or-...) — prioritaire si fourni
   openrouterModel?: string;  // modèle d'image OpenRouter choisi
+  ideogramKey?: string;      // BYOK Ideogram — meilleur rendu typographique
+  noText?: boolean;          // illustration seule (typographie ajoutée ensuite au 300 DPI)
 }
+
+/** Ideogram v3 — le meilleur modèle pour un titre net et bien composé. */
+async function generateIdeogram(
+  ideogramKey: string,
+  prompt: string,
+): Promise<string | null> {
+  try {
+    const form = new FormData();
+    form.append('prompt', prompt.slice(0, 9000));
+    form.append('aspect_ratio', '2x3');
+    form.append('rendering_speed', 'QUALITY');
+    form.append('magic_prompt', 'AUTO');
+    const resp = await fetch('https://api.ideogram.ai/v1/ideogram-v3/generate', {
+      method: 'POST',
+      headers: { 'Api-Key': ideogramKey },
+      body: form,
+    });
+    if (!resp.ok) {
+      console.error('Ideogram error:', resp.status, (await resp.text()).slice(0, 300));
+      return null;
+    }
+    const data = await resp.json();
+    return data?.data?.[0]?.url || null;
+  } catch (e) {
+    console.error('Ideogram exception:', (e as Error).message);
+    return null;
+  }
+}
+
 
 async function buildArtDirection(
   lovableKey: string,
