@@ -3,8 +3,9 @@ import { useSearchParams } from "react-router-dom";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import {
   Check, Loader2, ShieldCheck, Zap, Infinity as InfinityIcon, CreditCard,
-  Lock, Mail, ArrowRight,
+  Lock, Mail, ArrowRight, RotateCcw, Star, Quote,
 } from "lucide-react";
+
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -40,6 +41,33 @@ const INCLUDED = [
   "V3 incluse sans surcoût : tous les nouveaux outils vous seront ajoutés automatiquement",
 ];
 
+interface Testimonial {
+  id: string;
+  author_name: string;
+  book_title: string | null;
+  comment: string;
+  rating: number | null;
+}
+
+/** Blocs de réassurance : les trois objections qui bloquent le paiement. */
+const REASSURANCE = [
+  {
+    icon: RotateCcw,
+    title: "Garantie 30 jours",
+    body: "Si l'outil ne vous convient pas, écrivez-moi dans les 30 jours : vous êtes remboursé, sans justification à fournir.",
+  },
+  {
+    icon: CreditCard,
+    title: "PayPal accepté",
+    body: "Sur la page de paiement, choisissez PayPal ou la carte bancaire. Le paiement en 2 ou 3 fois reste possible.",
+  },
+  {
+    icon: Lock,
+    title: "Aucun abonnement",
+    body: "Un seul paiement, accès conservé, rien à résilier. À partir du 1er octobre, l'accès à vie n'existera plus.",
+  },
+];
+
 export default function V3CommanderPage() {
   const [params] = useSearchParams();
   const src = params.get("src") || undefined;
@@ -49,8 +77,27 @@ export default function V3CommanderPage() {
   const [plan, setPlan] = useState<PlanId>("v2_1x");
   const [loading, setLoading] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
 
   const selected = useMemo(() => PLANS.find((p) => p.id === plan)!, [plan]);
+
+  // Avis réels et approuvés uniquement : aucun témoignage fabriqué.
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const { data } = await supabase
+        .from("book_testimonials")
+        .select("id,author_name,book_title,comment,rating")
+        .eq("approved", true)
+        .order("created_at", { ascending: false })
+        .limit(3);
+      if (active && data) setTestimonials(data as Testimonial[]);
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
+
 
   const startPayment = async () => {
     const e = email.trim().toLowerCase();
