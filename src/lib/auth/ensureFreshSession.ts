@@ -6,17 +6,25 @@ import { supabase } from "@/integrations/supabase/client";
  * la durée de vie du token, ce qui provoquait des erreurs "Non authentifié").
  */
 export async function ensureFreshAccessToken(): Promise<string | null> {
-  const { data } = await supabase.auth.getSession();
+  const { data, error: sessionError } = await supabase.auth.getSession();
+  if (sessionError) return null;
   const session = data?.session;
 
   if (session?.access_token) {
     const expiresAt = (session.expires_at ?? 0) * 1000;
     const isExpiringSoon = !expiresAt || expiresAt - Date.now() < 120_000;
-    if (!isExpiringSoon) return session.access_token;
+    if (!isExpiringSoon) {
+      const { data: verified, error: verificationError } = await supabase.auth.getUser(session.access_token);
+      if (!verificationError && verified.user) return session.access_token;
+    }
   }
 
-  const { data: refreshed } = await supabase.auth.refreshSession();
-  return refreshed?.session?.access_token ?? session?.access_token ?? null;
+  const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession();
+  const refreshedToken = refreshed?.session?.access_token;
+  if (refreshError || !refreshedToken) return null;
+
+  const { data: verified, error: verificationError } = await supabase.auth.getUser(refreshedToken);
+  return !verificationError && verified.user ? refreshedToken : null;
 }
 
 export function isAuthError(message: unknown): boolean {
