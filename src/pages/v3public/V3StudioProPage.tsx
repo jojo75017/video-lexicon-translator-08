@@ -146,7 +146,7 @@ const V3StudioProPage: React.FC = () => {
         <div className="flex flex-wrap items-center gap-2">
           <Badge>Studio Pro</Badge>
           <EngineBadge engine="gemini" task="Architecture, analyse, cohérence" />
-          <EngineBadge engine="chatgpt" task="Rédaction et style (étape suivante)" />
+          <EngineBadge engine="chatgpt" task="Rédaction et style, chapitre par chapitre" />
         </div>
         <h1 className="text-3xl font-bold tracking-tight">Studio éditorial hybride</h1>
         <p className="max-w-3xl text-muted-foreground">
