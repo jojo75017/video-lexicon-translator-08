@@ -109,6 +109,7 @@ const V3AudiobookPage = lazy(() => import('./pages/v3public/V3AudiobookPage'));
 const V3EditorPage = lazy(() => import('./pages/v3public/V3EditorPage'));
 const V3OffrePage = lazy(() => import('./pages/v3public/V3OffrePage'));
 const V3CommanderPage = lazy(() => import('./pages/v3public/V3CommanderPage'));
+const ReferralKitPage = lazy(() => import('./pages/ReferralKitPage'));
 const GoKdpPilotPage = lazy(() => import('./pages/GoKdpPilotPage'));
 
 
@@ -386,7 +387,8 @@ const App = () => {
             <Route path="/v3-offre" element={<Navigate to="/commander" replace />} />
             <Route path="/valeur-offre" element={<Navigate to="/commander" replace />} />
             <Route path="/coaching-vip" element={<Navigate to="/offres" replace />} />
-            <Route path="/parrainage" element={<Navigate to="/offres" replace />} />
+            <Route path="/parrainage" element={<Navigate to="/mon-parrainage" replace />} />
+            <Route path="/mon-parrainage" element={<ReferralKitPage />} />
             <Route path="/affiliation" element={<Navigate to="/offres" replace />} />
             <Route path="/webinaire" element={<Navigate to="/offres" replace />} />
             <Route path="/nouveautes-2026" element={<Navigate to="/offres" replace />} />
