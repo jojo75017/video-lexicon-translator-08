@@ -132,8 +132,8 @@ export default function AdminPlansV3Page() {
                 <tr>
                   <th className="px-4 py-3 text-left font-semibold">#</th>
                   <th className="px-4 py-3 text-left font-semibold">Domaine</th>
-                  <th className="px-4 py-3 text-center font-semibold text-emerald-600">Plume — 29 €/mois</th>
-                  <th className="px-4 py-3 text-center font-semibold text-purple-600">Édition — 49 €/mois</th>
+                  <th className="px-4 py-3 text-center font-semibold text-emerald-600">Plume — 17 €/mois</th>
+                  <th className="px-4 py-3 text-center font-semibold text-purple-600">Édition — 27 €/mois</th>
                 </tr>
               </thead>
               <tbody>
