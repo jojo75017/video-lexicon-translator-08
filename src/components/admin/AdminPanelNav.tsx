@@ -21,7 +21,7 @@ const adminNavItems: AdminNavItem[] = [
   { label: 'Profil', path: '/admin/profile', icon: User, exact: true },
   { label: 'Prospects', path: '/gestion-prospects', icon: Users, exact: true },
   { label: 'Emails', path: '/apercu-emails', icon: Mail, exact: true },
-  { label: 'Posts', path: '/generateur-posts', icon: MessageSquare, exact: true },
+  { label: 'Posts', path: '/admin/kit-publication', icon: MessageSquare, exact: true },
   { label: 'Marketing', path: '/dashboard-marketing', icon: BarChart3, exact: true },
   { label: 'Influenceurs', path: '/influenceurs', icon: Megaphone, exact: true },
   { label: 'Guide Ebook', path: '/guide-ebook', icon: BookMarked, exact: true },
