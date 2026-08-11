@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
-import { ScrollArea } from '@/components/ui/scroll-area';
+
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   AlertTriangle, BookOpen, Check, Loader2, PenLine, Save, Sparkles, StopCircle, Wand2,
