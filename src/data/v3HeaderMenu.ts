@@ -97,10 +97,9 @@ export const V3_HEADER_MENU: MenuCategory[] = [
       { label: 'Espionner les concurrents', to: '/v3/outils/espion-concurrents', badge: 'Offert', desc: '🕵️ Stratégies, prix, catégories et tactiques des best-sellers' },
       { label: 'Galerie communauté', to: '/v3/gallery', desc: 'Livres publiés par les auteurs Ebookstudio' },
       { label: 'Ma page auteur', to: '/v3/auteur', desc: 'Configurez votre profil public' },
-      { label: 'Marketing & Emails', to: '/v3/outils', desc: 'Séquences email, tunnels, relance' },
+      { label: 'Marketing & Emails', to: '/v3/hub?tab=outils', desc: 'Séquences email, tunnels, relance' },
       { label: 'Formation Audio', to: '/formation-audio', desc: 'Podcasts et cours audio' },
       { label: 'Séries Audio', to: '/formation-series-audio', desc: 'Formations en séries structurées' },
-      { label: 'Signature email', to: '/signature', desc: 'Bloc email pro pour vos envois' },
     ],
   },
   {
