@@ -124,8 +124,8 @@ export default function V3CorrecteurPage() {
         working,
         mode,
         ({ index, chapter }) => {
-          // Un chapitre corrigé est retenu par défaut : l'auteur peut refuser ensuite.
-          working[index] = chapter.status === 'done' ? { ...chapter, accepted: true } : chapter;
+          // L'auteur valide lui-même chaque chapitre : rien n'est retenu sans son accord.
+          working[index] = chapter.status === 'done' ? { ...chapter, accepted: false } : chapter;
           setCurrent(index);
           setChapters(working.map((c) => ({ ...c })));
         },
