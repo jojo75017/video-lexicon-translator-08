@@ -147,7 +147,7 @@ export default function V3CorrecteurPage() {
     try {
       const res = await proofreadChapter(target.title, target.original, mode);
       setChapters((prev) => prev.map((c) => c.chapterId === id
-        ? { ...c, status: 'done', corrected: res.corrected, corrections: res.corrections, quality: res.quality, accepted: true, rejected: [], edited: undefined, error: undefined }
+        ? { ...c, status: 'done', corrected: res.corrected, corrections: res.corrections, quality: res.quality, accepted: false, rejected: [], edited: undefined, error: undefined }
         : c));
       toast.success(`Chapitre corrigé : ${target.title || `Chapitre ${target.index + 1}`}`);
     } catch (e: any) {
