@@ -20,6 +20,21 @@ export const ACTIVE_EMAIL_CAMPAIGN = {
 
 } as const;
 
+/** Campagne de clôture de l'offre 47 € : envois manuels depuis /gestion-prospects. */
+export const CLOSING_EMAIL_CAMPAIGN = {
+  id: 'cloture-47-2026',
+  name: 'Clôture 47 € — cliqueurs et ouvreurs',
+  deadline: '30 septembre 2026',
+  checkoutUrl: COMMANDER_URL,
+  letters: [
+    { template: 'cliqueurs-personnel', segment: 'clickers', label: 'Message personnel aux cliqueurs', subject: "Vous avez regardé EbookStudio — qu'est-ce qui vous retient ?" },
+    { template: 'cloture-47-1', segment: 'openers_no_click', label: 'Ce qui change le 1er octobre', subject: "Le 1er octobre, l'accès à vie disparaît (le calcul est simple)" },
+    { template: 'cloture-47-2', segment: 'openers_no_click', label: 'La preuve en images', subject: 'Un livre entier, du sommaire au fichier Amazon' },
+    { template: 'cloture-47-3', segment: 'openers_no_click', label: 'Dernier jour utile', subject: "Dernier rappel : après le 30 septembre, ce tarif n'existe plus" },
+  ],
+} as const;
+
+
 export const ARCHIVED_TEMPLATE_PREFIXES = [
   'standard-', 'interesse-', 'relance-', 'offre-47-serie-', 'ab-47-',
   'v3-incluse-', 'vrai-lien-', 'v3-offre-', 'v2-v3-', 'marie-rachel-',

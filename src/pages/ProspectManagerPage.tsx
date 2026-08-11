@@ -537,8 +537,10 @@ const ProspectManagerPage = () => {
           </TabsContent>
 
           <TabsContent value="perf" className="space-y-4">
+            <ChannelPerformancePanel />
             <CampaignPerformanceDashboard />
           </TabsContent>
+
 
           <TabsContent value="tracking" className="space-y-4">
             <CommunicationJourneyTracker onSelectTab={setActiveManagerTab} />
@@ -619,6 +621,9 @@ const ProspectManagerPage = () => {
             </div>
 
             <CampaignSequencePanel />
+
+            <ClosingCampaignPanel />
+
 
             <p className="text-xs text-muted-foreground">
               Format Excel : colonnes <code>email</code> et <code>prenom</code> (ou <code>first_name</code>, <code>nom</code>)
