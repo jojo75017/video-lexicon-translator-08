@@ -7,7 +7,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2, Sparkles, Download, Crown, Wand2, Eye, BookOpen, CheckCircle2, KeyRound } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { getOpenRouterImageKey, setOpenRouterImageKey } from '@/lib/ebookExportOptions';
+import {
+  getOpenRouterImageKey,
+  setOpenRouterImageKey,
+  getIdeogramKey,
+  setIdeogramKey,
+} from '@/lib/ebookExportOptions';
+
 
 const GOLD = '#a8842c';
 
@@ -66,6 +72,10 @@ const CoverStudioPro: React.FC = () => {
     () => localStorage.getItem(OR_MODEL_LS) || OR_IMAGE_MODELS[0].id,
   );
   const [orStatus, setOrStatus] = useState<'idle' | 'testing' | 'valid' | 'invalid'>('idle');
+  const [ideoKey, setIdeoKey] = useState(getIdeogramKey());
+  const [noText, setNoText] = useState(false);
+  const [engineUsed, setEngineUsed] = useState('');
+
   const [orCredits, setOrCredits] = useState<string>('');
 
   const testOpenRouterKey = async () => {
@@ -164,7 +174,10 @@ const CoverStudioPro: React.FC = () => {
           showAuthor: !!author.trim(),
           openrouterKey: useOpenRouter ? orKey.trim() : undefined,
           openrouterModel: useOpenRouter ? orModel : undefined,
+          ideogramKey: ideoKey.trim() || undefined,
+          noText,
         },
+
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -172,7 +185,13 @@ const CoverStudioPro: React.FC = () => {
       if (urls.length === 0) throw new Error('Aucune couverture générée.');
       setCovers(urls.map((url) => ({ url })));
       setArtDirection(data?.artDirection || '');
-      toast.success(`${urls.length} couverture(s) premium générée(s) !`);
+      setEngineUsed(data?.engine || '');
+      toast.success(
+        data?.engine === 'ideogram'
+          ? `${urls.length} couverture(s) générée(s) en qualité pro (Ideogram) !`
+          : `${urls.length} couverture(s) premium générée(s) !`,
+      );
+
     } catch (e) {
       console.error(e);
       toast.error((e as Error).message || 'Erreur lors de la génération.');
@@ -258,6 +277,86 @@ const CoverStudioPro: React.FC = () => {
           </p>
         )}
       </div>
+
+      {/* Ideogram BYOK — rendu typographique professionnel */}
+      <div
+        className="rounded-xl border p-4 space-y-3"
+        style={{ borderColor: GOLD, background: 'rgba(168,132,44,0.06)' }}
+      >
+        <div className="flex items-start gap-2">
+          <Crown className="h-4 w-4 mt-0.5 shrink-0" style={{ color: GOLD }} />
+          <div className="space-y-1">
+            <p className="text-sm font-semibold" style={{ color: GOLD }}>
+              Pour un rendu vraiment professionnel : ajoutez votre clé Ideogram
+            </p>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Ideogram v3 est aujourd'hui le seul moteur qui compose un <strong>titre net et
+              parfaitement lisible</strong> directement sur la couverture (les autres déforment les
+              lettres). Comptez environ <strong>0,06 € par couverture</strong>.
+              <br />
+              Créez un compte sur{' '}
+              <a
+                href="https://ideogram.ai/manage-api"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline font-medium"
+                style={{ color: GOLD }}
+              >
+                ideogram.ai (API)
+              </a>
+              , copiez votre clé, collez-la ci-dessous : elle reste enregistrée sur votre appareil et
+              n'est jamais partagée. Sans clé, la génération continue de fonctionner avec les
+              moteurs inclus — la qualité typographique sera simplement moins fine.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Input
+            type="password"
+            value={ideoKey}
+            onChange={(e) => {
+              setIdeoKey(e.target.value);
+              setIdeogramKey(e.target.value);
+            }}
+            placeholder="Collez votre clé Ideogram ici pour un rendu pro"
+            autoComplete="off"
+            className="flex-1"
+          />
+          {ideoKey.trim().length > 20 ? (
+            <span className="text-[11px] text-emerald-600 flex items-center gap-1 whitespace-nowrap">
+              <CheckCircle2 className="h-3.5 w-3.5" /> Clé enregistrée
+            </span>
+          ) : (
+            <span className="text-[11px] text-muted-foreground flex items-center gap-1 whitespace-nowrap">
+              <KeyRound className="h-3.5 w-3.5" /> Aucune clé
+            </span>
+          )}
+        </div>
+
+        <label className="flex items-start gap-2 text-xs text-muted-foreground cursor-pointer">
+          <input
+            type="checkbox"
+            checked={noText}
+            onChange={(e) => setNoText(e.target.checked)}
+            className="mt-0.5"
+          />
+          <span>
+            <strong>Illustration seule, sans texte</strong> (recommandé pour un résultat maison
+            d'édition) : l'IA génère uniquement le visuel, et vous posez le titre en typographie
+            nette 300 DPI dans l'éditeur de couverture.
+          </span>
+        </label>
+
+        {engineUsed && (
+          <p className="text-[11px] text-muted-foreground">
+            Dernière génération :{' '}
+            <strong>{engineUsed === 'ideogram' ? 'Ideogram v3 (qualité pro)' : engineUsed}</strong>
+          </p>
+        )}
+      </div>
+
+
 
       {/* OpenRouter BYOK — génération d'images plus économique */}
       <div className="rounded-xl border border-border bg-card p-4 space-y-3">

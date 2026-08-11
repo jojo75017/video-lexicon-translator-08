@@ -103,6 +103,21 @@ export const setOpenRouterImageKey = (k: string) => {
   else localStorage.removeItem(OPENROUTER_LS);
 };
 
+/** Clé Ideogram (BYOK) — rendu typographique professionnel des couvertures. */
+const IDEOGRAM_LS = 'ideogram_api_key';
+export const getIdeogramKey = (): string => {
+  if (typeof window === 'undefined') return '';
+  return (localStorage.getItem(IDEOGRAM_LS) || '').trim();
+};
+export const setIdeogramKey = (k: string) => {
+  if (typeof window === 'undefined') return;
+  const v = (k || '').trim();
+  if (v) localStorage.setItem(IDEOGRAM_LS, v);
+  else localStorage.removeItem(IDEOGRAM_LS);
+};
+
+
+
 /** Famille jsPDF acceptée (helvetica / times / courier).
  *  jsPDF ne supporte pas Calibri/Garamond → fallback raisonnable. */
 export const pdfFontFor = (f: ExportFontFamily): 'helvetica' | 'times' | 'courier' => {

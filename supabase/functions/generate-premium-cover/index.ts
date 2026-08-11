@@ -19,7 +19,38 @@ interface CoverRequest {
   showAuthor?: boolean;
   openrouterKey?: string;    // BYOK OpenRouter (sk-or-...) — prioritaire si fourni
   openrouterModel?: string;  // modèle d'image OpenRouter choisi
+  ideogramKey?: string;      // BYOK Ideogram — meilleur rendu typographique
+  noText?: boolean;          // illustration seule (typographie ajoutée ensuite au 300 DPI)
 }
+
+/** Ideogram v3 — le meilleur modèle pour un titre net et bien composé. */
+async function generateIdeogram(
+  ideogramKey: string,
+  prompt: string,
+): Promise<string | null> {
+  try {
+    const form = new FormData();
+    form.append('prompt', prompt.slice(0, 9000));
+    form.append('aspect_ratio', '2x3');
+    form.append('rendering_speed', 'QUALITY');
+    form.append('magic_prompt', 'AUTO');
+    const resp = await fetch('https://api.ideogram.ai/v1/ideogram-v3/generate', {
+      method: 'POST',
+      headers: { 'Api-Key': ideogramKey },
+      body: form,
+    });
+    if (!resp.ok) {
+      console.error('Ideogram error:', resp.status, (await resp.text()).slice(0, 300));
+      return null;
+    }
+    const data = await resp.json();
+    return data?.data?.[0]?.url || null;
+  } catch (e) {
+    console.error('Ideogram exception:', (e as Error).message);
+    return null;
+  }
+}
+
 
 async function buildArtDirection(
   lovableKey: string,
@@ -76,10 +107,13 @@ ${req.subtitle ? `- Subtitle: "${req.subtitle}"` : ''}
 ${showAuthor && req.author ? `- Author: "${req.author}"` : '- No author name on cover'}
 - Genre: ${req.genre || 'general'}
 
-TYPOGRAPHY (CRITICAL — MUST BE PERFECT):
+${req.noText ? `NO TEXT AT ALL (CRITICAL):
+Produce the ILLUSTRATION ONLY — absolutely no title, no subtitle, no author name, no letters, no words, no logo, no lettering of any kind anywhere in the image.
+Leave clean, uncluttered breathing space in the upper third and lower fifth so professional typography can be composed on top later.` : `TYPOGRAPHY (CRITICAL — MUST BE PERFECT):
 1. TITLE "${req.title}" — large, razor-sharp, professional font with perfect kerning, readable even as a small Amazon thumbnail.
 ${req.subtitle ? `2. SUBTITLE "${req.subtitle}" — elegant, lighter weight, below the title.` : ''}
-${showAuthor && req.author ? `3. AUTHOR "${req.author}" — refined typography, smaller than title, at the bottom.` : ''}
+${showAuthor && req.author ? `3. AUTHOR "${req.author}" — refined typography, smaller than title, at the bottom.` : ''}`}
+
 
 PHOTOGRAPHIC STANDARDS:
 - As if shot on Canon EOS R5 / Sony A7R V, 85mm f/1.4 prime lens
@@ -243,7 +277,11 @@ serve(async (req) => {
       ? body.openrouterKey.trim()
       : null;
 
-    if (!OPENAI_API_KEY && !LOVABLE_API_KEY && !openrouterKey) {
+    const ideogramKey = typeof body.ideogramKey === 'string' && body.ideogramKey.trim().length > 20
+      ? body.ideogramKey.trim()
+      : (Deno.env.get('IDEOGRAM_API_KEY') || null);
+
+    if (!OPENAI_API_KEY && !LOVABLE_API_KEY && !openrouterKey && !ideogramKey) {
       return new Response(JSON.stringify({ error: 'Aucune clé API image configurée.' }), {
         status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -254,6 +292,7 @@ serve(async (req) => {
       ? await buildArtDirection(LOVABLE_API_KEY, body)
       : (body.registrePrompt || body.customPrompt || '');
 
+    let engine = 'lovable';
     // Génération EN PARALLÈLE des variations pour rester sous la limite de temps.
     const results = await Promise.all(
       Array.from({ length: count }, async (_v, i) => {
@@ -261,16 +300,26 @@ serve(async (req) => {
           + `\n\nVARIATION ${i + 1}/${count}: propose une interprétation visuelle UNIQUE.`;
 
         let imageUrl: string | null = null;
-        // BYOK OpenRouter prioritaire (économise les crédits) si fourni.
-        if (openrouterKey) {
-          imageUrl = await generateOpenRouter(openrouterKey, prompt, body.openrouterModel);
+        // Ideogram prioritaire : meilleur rendu typographique (qualité édition).
+        if (ideogramKey) {
+          imageUrl = await generateIdeogram(ideogramKey, prompt);
+          if (imageUrl) engine = 'ideogram';
         }
+        // BYOK OpenRouter ensuite (économise les crédits) si fourni.
+        if (!imageUrl && openrouterKey) {
+          imageUrl = await generateOpenRouter(openrouterKey, prompt, body.openrouterModel);
+          if (imageUrl) engine = 'openrouter';
+        }
+
         if (!imageUrl && OPENAI_API_KEY) {
           imageUrl = await generateOpenAI(OPENAI_API_KEY, prompt);
+          if (imageUrl) engine = 'openai';
         }
         if (!imageUrl && LOVABLE_API_KEY) {
           imageUrl = await generateGemini(LOVABLE_API_KEY, prompt);
+          if (imageUrl) engine = 'lovable';
         }
+
         if (!imageUrl) return null;
         return await uploadCover(SUPABASE_URL, SERVICE_KEY, imageUrl);
       }),
@@ -287,7 +336,7 @@ serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({ covers, artDirection, errors }), {
+    return new Response(JSON.stringify({ covers, artDirection, errors, engine }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
