@@ -124,8 +124,8 @@ export default function V3CorrecteurPage() {
         working,
         mode,
         ({ index, chapter }) => {
-          // Un chapitre corrigé est retenu par défaut : l'auteur peut refuser ensuite.
-          working[index] = chapter.status === 'done' ? { ...chapter, accepted: true } : chapter;
+          // L'auteur valide lui-même chaque chapitre : rien n'est retenu sans son accord.
+          working[index] = chapter.status === 'done' ? { ...chapter, accepted: false } : chapter;
           setCurrent(index);
           setChapters(working.map((c) => ({ ...c })));
         },
@@ -147,7 +147,7 @@ export default function V3CorrecteurPage() {
     try {
       const res = await proofreadChapter(target.title, target.original, mode);
       setChapters((prev) => prev.map((c) => c.chapterId === id
-        ? { ...c, status: 'done', corrected: res.corrected, corrections: res.corrections, quality: res.quality, accepted: true, rejected: [], edited: undefined, error: undefined }
+        ? { ...c, status: 'done', corrected: res.corrected, corrections: res.corrections, quality: res.quality, accepted: false, rejected: [], edited: undefined, error: undefined }
         : c));
       toast.success(`Chapitre corrigé : ${target.title || `Chapitre ${target.index + 1}`}`);
     } catch (e: any) {
