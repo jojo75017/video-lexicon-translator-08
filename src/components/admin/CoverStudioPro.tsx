@@ -174,7 +174,10 @@ const CoverStudioPro: React.FC = () => {
           showAuthor: !!author.trim(),
           openrouterKey: useOpenRouter ? orKey.trim() : undefined,
           openrouterModel: useOpenRouter ? orModel : undefined,
+          ideogramKey: ideoKey.trim() || undefined,
+          noText,
         },
+
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
