@@ -444,9 +444,10 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
     ? `${systemPrompt}\n\n${activeLanguageDirective}`
     : systemPrompt;
 
-  // Providers BYOK : si une clé utilisateur est configurée, on NE retombe jamais
-  // silencieusement sur Lovable AI. Sinon l'abonné croit utiliser sa clé alors
-  // que le workflow consomme les crédits workspace et échoue au mauvais endroit.
+  // Providers BYOK : la clé utilisateur reste prioritaire. Pour Gemini uniquement,
+  // le quota gratuit (20 requêtes/jour sur certains projets) peut être épuisé au
+  // milieu d'un workflow long. Dans ce cas précis, on poursuit avec l'IA gérée
+  // afin de ne pas bloquer le livre après plusieurs heures de génération.
   if (userKey && activeProvider !== 'gemini') {
     try {
       switch (activeProvider) {
@@ -470,6 +471,10 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       console.warn('User Gemini key failed:', msg);
+      if (msg.includes('RATE_LIMIT:')) {
+        console.warn('Gemini subscriber quota reached; continuing with managed AI fallback.');
+        return await callLovableAI(finalSystemPrompt, userPrompt, maxTokens);
+      }
       throw error;
     }
   }
