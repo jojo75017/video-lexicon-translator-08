@@ -29,7 +29,7 @@ const V3StudioProPage: React.FC = () => {
   const { apiKey } = useOpenAIConfig();
   const {
     project, bible, chapters, saving, loading,
-    saveMasterSheet, saveBibleVersion,
+    saveMasterSheet, saveBibleVersion, load,
   } = useBookProject(projectId);
 
   const [sheet, setSheet] = useState<MasterSheetDraft>(emptyMasterSheet());
@@ -37,6 +37,16 @@ const V3StudioProPage: React.FC = () => {
   const [tab, setTab] = useState('fiche');
   const [generating, setGenerating] = useState(false);
   const [busySection, setBusySection] = useState<string | null>(null);
+
+  // Phase 2 : ChatGPT rédige, Gemini analyse et mémorise.
+  const writing = useChapterWriting({
+    projectId,
+    sheet,
+    bible,
+    chapters,
+    onChaptersChange: () => { if (projectId) load(projectId); },
+  });
+
 
   // Hydrate depuis le projet chargé
   React.useEffect(() => {
