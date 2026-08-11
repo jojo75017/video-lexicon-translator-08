@@ -24,8 +24,8 @@ interface Tool {
 
 const ACCESS_META: Record<Access, { label: string; color: string }> = {
   offert:   { label: '🎁 Offert',      color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-  debutant: { label: 'Débutant 9,99€', color: 'bg-slate-50 text-slate-700 border-slate-200' },
-  studio:   { label: 'Studio 12,99€',  color: 'bg-amber-50 text-amber-800 border-amber-200' },
+  debutant: { label: 'Plume 17€', color: 'bg-slate-50 text-slate-700 border-slate-200' },
+  studio:   { label: 'Édition 27€',  color: 'bg-amber-50 text-amber-800 border-amber-200' },
   editeur:  { label: 'Édition 27€',    color: 'bg-yellow-100 text-yellow-900 border-yellow-300' },
 };
 
@@ -41,7 +41,7 @@ const TOOLS: { section: string; items: Tool[] }[] = [
     ],
   },
   {
-    section: '🥉 Débutant 9,99€/mois',
+    section: '🥉 Plume 17€/mois',
     items: [
       { title: 'Correcteur ortho & style IA', desc: 'Corrige 10 chapitres/mois, style clair et fluide.', to: '/v3/outils/correcteur', icon: PenTool, access: 'debutant', status: 'live', badge: 'NEW' },
       { title: 'Éditeur WYSIWYG', desc: 'Retouchez chapitre par chapitre sans quitter EbookStudio.', to: '/v3/outils/editeur', icon: Edit3, access: 'debutant', status: 'live', badge: 'NEW' },
@@ -50,7 +50,7 @@ const TOOLS: { section: string; items: Tool[] }[] = [
     ],
   },
   {
-    section: '🥈 Studio 12,99€/mois — Le plus recommandé',
+    section: '🥈 Édition 27€/mois — Le plus recommandé',
     items: [
       { title: 'Humaniseur IA', desc: 'Rend vos textes 100% indétectables (GPTZero, Originality).', to: '/v3/outils/humanizer', icon: Wand2, access: 'studio', status: 'live', badge: 'NEW' },
       { title: 'Détecteur d\'IA', desc: 'Score de détection avant publication Amazon.', to: '/v3/outils/detection-ia', icon: ShieldCheck, access: 'studio', status: 'live', badge: 'NEW' },
