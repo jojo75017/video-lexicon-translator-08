@@ -138,7 +138,7 @@ const ChapterWriter: React.FC<Props> = ({
               <StopCircle className="mr-2 h-4 w-4" /> Arrêter la rédaction
             </Button>
           ) : (
-            <Button onClick={onWriteAll} disabled={busy || written === sorted.length}>
+            <Button onClick={requestWriteAll} disabled={busy || written === sorted.length}>
               <Sparkles className="mr-2 h-4 w-4" /> Rédiger tout le livre
             </Button>
           )}
@@ -207,7 +207,7 @@ const ChapterWriter: React.FC<Props> = ({
 
                 <div className="flex flex-wrap gap-2">
                   <Button
-                    onClick={() => onWrite(selected, { guidance: guidance.trim() || undefined })}
+                    onClick={() => requestWrite(selected, { guidance: guidance.trim() || undefined })}
                     disabled={busy}
                   >
                     {busyChapterId === selected.id ? (
@@ -219,7 +219,7 @@ const ChapterWriter: React.FC<Props> = ({
                   </Button>
                   <Button
                     variant="outline"
-                    onClick={() => onWrite(selected, { polish: true, guidance: guidance.trim() || undefined })}
+                    onClick={() => requestWrite(selected, { polish: true, guidance: guidance.trim() || undefined })}
                     disabled={busy || !contents[selected.id]}
                   >
                     <Wand2 className="mr-2 h-4 w-4" /> Améliorer le style
@@ -235,6 +235,16 @@ const ChapterWriter: React.FC<Props> = ({
                     <Check className="mr-2 h-4 w-4" /> Valider le chapitre
                   </Button>
                 </div>
+
+                {dirty && (
+                  <Alert>
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertDescription>
+                      Modifications non enregistrées — cliquez sur « Enregistrer mes corrections »
+                      pour les conserver. Elles ne seront jamais écrasées par l’IA sans votre accord.
+                    </AlertDescription>
+                  </Alert>
+                )}
 
                 {busyChapterId === selected.id && busyLabel && (
                   <p className="text-sm text-muted-foreground">{busyLabel}</p>
