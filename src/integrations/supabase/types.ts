@@ -287,6 +287,346 @@ export type Database = {
         }
         Relationships: []
       }
+      book_bibles: {
+        Row: {
+          characters: Json
+          concept: string | null
+          created_at: string
+          engine: string
+          id: string
+          notes: string | null
+          pedagogy: Json
+          places: Json
+          plot_threads: Json
+          project_id: string
+          promise: string | null
+          structure: Json
+          synopsis: string | null
+          timeline: Json
+          updated_at: string
+          user_id: string
+          validated_at: string | null
+          version: number
+        }
+        Insert: {
+          characters?: Json
+          concept?: string | null
+          created_at?: string
+          engine?: string
+          id?: string
+          notes?: string | null
+          pedagogy?: Json
+          places?: Json
+          plot_threads?: Json
+          project_id: string
+          promise?: string | null
+          structure?: Json
+          synopsis?: string | null
+          timeline?: Json
+          updated_at?: string
+          user_id: string
+          validated_at?: string | null
+          version?: number
+        }
+        Update: {
+          characters?: Json
+          concept?: string | null
+          created_at?: string
+          engine?: string
+          id?: string
+          notes?: string | null
+          pedagogy?: Json
+          places?: Json
+          plot_threads?: Json
+          project_id?: string
+          promise?: string | null
+          structure?: Json
+          synopsis?: string | null
+          timeline?: Json
+          updated_at?: string
+          user_id?: string
+          validated_at?: string | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "book_bibles_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "book_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      book_chapter_versions: {
+        Row: {
+          chapter_id: string
+          content: string
+          created_at: string
+          engine: string | null
+          id: string
+          kind: string
+          project_id: string
+          user_id: string
+          version: number
+          word_count: number
+        }
+        Insert: {
+          chapter_id: string
+          content?: string
+          created_at?: string
+          engine?: string | null
+          id?: string
+          kind?: string
+          project_id: string
+          user_id: string
+          version?: number
+          word_count?: number
+        }
+        Update: {
+          chapter_id?: string
+          content?: string
+          created_at?: string
+          engine?: string | null
+          id?: string
+          kind?: string
+          project_id?: string
+          user_id?: string
+          version?: number
+          word_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "book_chapter_versions_chapter_id_fkey"
+            columns: ["chapter_id"]
+            isOneToOne: false
+            referencedRelation: "book_chapters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "book_chapter_versions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "book_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      book_chapters: {
+        Row: {
+          created_at: string
+          id: string
+          objective: string | null
+          planned_summary: string | null
+          position: number
+          project_id: string
+          status: string
+          subsections: Json
+          title: string
+          updated_at: string
+          user_id: string
+          word_count: number
+          word_target: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          objective?: string | null
+          planned_summary?: string | null
+          position: number
+          project_id: string
+          status?: string
+          subsections?: Json
+          title?: string
+          updated_at?: string
+          user_id: string
+          word_count?: number
+          word_target?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          objective?: string | null
+          planned_summary?: string | null
+          position?: number
+          project_id?: string
+          status?: string
+          subsections?: Json
+          title?: string
+          updated_at?: string
+          user_id?: string
+          word_count?: number
+          word_target?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "book_chapters_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "book_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      book_memory: {
+        Row: {
+          chapter_id: string | null
+          chapter_position: number | null
+          characters_present: Json
+          clues: Json
+          created_at: string
+          dates: Json
+          decisions: Json
+          events: Json
+          id: string
+          objects: Json
+          open_questions: Json
+          places: Json
+          project_id: string
+          relationship_changes: Json
+          revealed_info: Json
+          summary: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          chapter_id?: string | null
+          chapter_position?: number | null
+          characters_present?: Json
+          clues?: Json
+          created_at?: string
+          dates?: Json
+          decisions?: Json
+          events?: Json
+          id?: string
+          objects?: Json
+          open_questions?: Json
+          places?: Json
+          project_id: string
+          relationship_changes?: Json
+          revealed_info?: Json
+          summary?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          chapter_id?: string | null
+          chapter_position?: number | null
+          characters_present?: Json
+          clues?: Json
+          created_at?: string
+          dates?: Json
+          decisions?: Json
+          events?: Json
+          id?: string
+          objects?: Json
+          open_questions?: Json
+          places?: Json
+          project_id?: string
+          relationship_changes?: Json
+          revealed_info?: Json
+          summary?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "book_memory_chapter_id_fkey"
+            columns: ["chapter_id"]
+            isOneToOne: false
+            referencedRelation: "book_chapters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "book_memory_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "book_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      book_projects: {
+        Row: {
+          book_kind: string
+          chapters_target: number
+          constraints: string | null
+          created_at: string
+          era: string | null
+          genre: string | null
+          id: string
+          language_level: string | null
+          length_target: string | null
+          main_characters: string | null
+          mode: string
+          narrative_pov: string | null
+          objective: string | null
+          places: string | null
+          source_notes: string | null
+          status: string
+          subtitle: string | null
+          target_audience: string | null
+          title: string
+          tone: string | null
+          updated_at: string
+          user_id: string
+          with_images: boolean
+          writing_style: string | null
+        }
+        Insert: {
+          book_kind?: string
+          chapters_target?: number
+          constraints?: string | null
+          created_at?: string
+          era?: string | null
+          genre?: string | null
+          id?: string
+          language_level?: string | null
+          length_target?: string | null
+          main_characters?: string | null
+          mode?: string
+          narrative_pov?: string | null
+          objective?: string | null
+          places?: string | null
+          source_notes?: string | null
+          status?: string
+          subtitle?: string | null
+          target_audience?: string | null
+          title?: string
+          tone?: string | null
+          updated_at?: string
+          user_id: string
+          with_images?: boolean
+          writing_style?: string | null
+        }
+        Update: {
+          book_kind?: string
+          chapters_target?: number
+          constraints?: string | null
+          created_at?: string
+          era?: string | null
+          genre?: string | null
+          id?: string
+          language_level?: string | null
+          length_target?: string | null
+          main_characters?: string | null
+          mode?: string
+          narrative_pov?: string | null
+          objective?: string | null
+          places?: string | null
+          source_notes?: string | null
+          status?: string
+          subtitle?: string | null
+          target_audience?: string | null
+          title?: string
+          tone?: string | null
+          updated_at?: string
+          user_id?: string
+          with_images?: boolean
+          writing_style?: string | null
+        }
+        Relationships: []
+      }
       book_testimonials: {
         Row: {
           approved: boolean
