@@ -9,11 +9,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, Sparkles } from 'lucide-react';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 import useBookProject from '@/hooks/useBookProject';
+import useChapterWriting from '@/hooks/useChapterWriting';
 import MasterSheetForm from '@/components/v3/studio/MasterSheetForm';
 import BibleReview from '@/components/v3/studio/BibleReview';
 import BookDashboard from '@/components/v3/studio/BookDashboard';
+import ChapterWriter from '@/components/v3/studio/ChapterWriter';
 import EngineBadge from '@/components/v3/studio/EngineBadge';
 import { BibleContent, EMPTY_BIBLE, MasterSheetDraft, emptyMasterSheet } from '@/types/studioPro';
+
 
 /**
  * Studio Pro — parcours hybride : Gemini construit la Bible, ChatGPT rédigera
