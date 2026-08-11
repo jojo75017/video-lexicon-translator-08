@@ -36,14 +36,55 @@ export default function V3CreatePage() {
   const genre = params.get('genre');
   const type = params.get('type');
   const sommaireIa = params.get('sommaire') === 'ia';
+  const projectId = params.get('projectId');
 
   const [showWizard, setShowWizard] = useState(false);
+  const [openedBook, setOpenedBook] = useState<{ id: string; title: string; chapters: number } | null>(null);
+  const [openingBook, setOpeningBook] = useState(false);
   const wizardRef = useRef<HTMLDivElement | null>(null);
 
-
-
-
   useEffect(() => { seedHubConfig(idea, genre, type); }, [idea, genre, type]);
+
+  // Ouverture d'un livre existant depuis « Mes livres » (?projectId=...)
+  useEffect(() => {
+    if (!projectId) { setOpenedBook(null); return; }
+    let cancelled = false;
+    (async () => {
+      setOpeningBook(true);
+      const { data, error } = await supabase
+        .from('ebook_projects')
+        .select('id,title,author_name,kdp_description,chapters,number_of_chapters')
+        .eq('id', projectId)
+        .maybeSingle();
+      if (cancelled) return;
+      setOpeningBook(false);
+      if (error || !data) {
+        toast.error("Ce livre est introuvable ou n'est plus accessible.");
+        return;
+      }
+      const rawChapters = Array.isArray(data.chapters) ? (data.chapters as any[]) : [];
+      const outline: BriefOutlineChapter[] = rawChapters.map((c, i) => ({
+        numero: i + 1,
+        titre: String(c?.title || c?.titre || `Chapitre ${i + 1}`),
+        objectif: String(c?.objectif || c?.summary || ''),
+      }));
+      const prev = readBookBrief() || {};
+      writeBookBrief({
+        ...prev,
+        projectId: data.id,
+        title: data.title || prev.title || '',
+        author: data.author_name || prev.author || '',
+        description: data.kdp_description || prev.description || '',
+        chapters: outline.length || Number(data.number_of_chapters) || prev.chapters,
+        outline: outline.length ? outline : prev.outline,
+        outlineValidated: outline.length ? true : prev.outlineValidated,
+      });
+      setOpenedBook({ id: data.id, title: data.title || 'Livre sans titre', chapters: outline.length });
+      setShowWizard(true);
+      setTimeout(() => wizardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+    })();
+    return () => { cancelled = true; };
+  }, [projectId]);
 
   // Arrivée depuis « Sommaire IA » : on descend directement sur le panneau.
   useEffect(() => {
@@ -53,6 +94,7 @@ export default function V3CreatePage() {
     }, 400);
     return () => clearTimeout(t);
   }, [sommaireIa]);
+
 
 
 
