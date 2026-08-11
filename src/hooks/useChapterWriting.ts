@@ -2,10 +2,29 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { BibleContent, BookChapter, ChapterMemory, MasterSheetDraft } from '@/types/studioPro';
+import { getBudgetState, trackAIUsage } from '@/lib/aiCostTracker';
 
 const db = supabase as any;
 
 const countWords = (t: string) => t.split(/\s+/).filter(Boolean).length;
+
+const alertsKey = (projectId: string) => `studio_pro_alerts:${projectId}`;
+
+const loadAlerts = (projectId: string): Record<number, string[]> => {
+  try {
+    return JSON.parse(localStorage.getItem(alertsKey(projectId)) || '{}');
+  } catch {
+    return {};
+  }
+};
+
+const persistAlerts = (projectId: string, alerts: Record<number, string[]>) => {
+  try {
+    localStorage.setItem(alertsKey(projectId), JSON.stringify(alerts));
+  } catch {
+    /* quota : on ignore */
+  }
+};
 
 interface Args {
   projectId?: string | null;
@@ -19,6 +38,11 @@ interface Args {
 /**
  * Phase 2 du Studio Pro : ChatGPT rédige chapitre par chapitre, Gemini analyse
  * chaque chapitre et alimente la mémoire persistante du livre.
+ *
+ * Garde-fous production :
+ * - la mémoire est relue en base avant CHAQUE chapitre (pas de dérive sur un livre long) ;
+ * - un chapitre validé ou modifié à la main n'est jamais écrasé sans confirmation ;
+ * - un plafond de coût IA bloque la rédaction avant explosion de la facture.
  */
 export const useChapterWriting = ({ projectId, sheet, bible, chapters, geminiKey, onChaptersChange }: Args) => {
   const [contents, setContents] = useState<Record<string, string>>({});
@@ -28,8 +52,10 @@ export const useChapterWriting = ({ projectId, sheet, bible, chapters, geminiKey
   const [runningAll, setRunningAll] = useState(false);
   const [alerts, setAlerts] = useState<Record<number, string[]>>({});
   const cancelRef = useRef(false);
+  /** Copie toujours fraîche de la mémoire : évite la dérive dans la boucle « Rédiger tout ». */
+  const memoriesRef = useRef<ChapterMemory[]>([]);
 
-  const loadWriting = useCallback(async (id: string) => {
+  const loadWriting = useCallback(async (id: string): Promise<ChapterMemory[]> => {
     try {
       const [{ data: versions }, { data: mem }] = await Promise.all([
         db.from('book_chapter_versions')
@@ -46,14 +72,21 @@ export const useChapterWriting = ({ projectId, sheet, bible, chapters, geminiKey
         if (!map[v.chapter_id]) map[v.chapter_id] = v.content || '';
       });
       setContents(map);
-      setMemories((mem || []) as ChapterMemory[]);
+      const list = (mem || []) as ChapterMemory[];
+      memoriesRef.current = list;
+      setMemories(list);
+      return list;
     } catch (e) {
       console.error('[StudioPro] loadWriting', e);
+      return memoriesRef.current;
     }
   }, []);
 
   useEffect(() => {
-    if (projectId) loadWriting(projectId);
+    if (projectId) {
+      loadWriting(projectId);
+      setAlerts(loadAlerts(projectId));
+    }
   }, [projectId, loadWriting]);
 
   /** Enregistre une nouvelle version de chapitre (aucun écrasement). */
@@ -101,7 +134,7 @@ export const useChapterWriting = ({ projectId, sheet, bible, chapters, geminiKey
       const userId = auth?.user?.id;
       if (!userId) return;
 
-      const previous = memories.filter((m) => (m.chapter_position || 0) < chapter.position);
+      const previous = memoriesRef.current.filter((m) => (m.chapter_position || 0) < chapter.position);
       const { data, error } = await supabase.functions.invoke('book-memory-extract', {
         body: {
           content,
@@ -116,6 +149,11 @@ export const useChapterWriting = ({ projectId, sheet, bible, chapters, geminiKey
         return;
       }
       const payload = (data as any).memory || {};
+      trackAIUsage({
+        provider: 'gemini',
+        promptChars: content.length + JSON.stringify(previous).length,
+        responseChars: JSON.stringify(payload).length,
+      });
       const row = {
         project_id: projectId,
         chapter_id: chapter.id,
@@ -123,30 +161,48 @@ export const useChapterWriting = ({ projectId, sheet, bible, chapters, geminiKey
         chapter_position: chapter.position,
         ...payload,
       };
-      const existing = memories.find((m) => m.chapter_id === chapter.id);
+      const existing = memoriesRef.current.find((m) => m.chapter_id === chapter.id);
       if (existing) {
         await db.from('book_memory').update(row).eq('id', existing.id);
       } else {
         await db.from('book_memory').insert(row);
       }
       const list = (data as any).coherence_alerts || [];
-      setAlerts((prev) => ({ ...prev, [chapter.position]: list }));
+      setAlerts((prev) => {
+        const next = { ...prev, [chapter.position]: list };
+        persistAlerts(projectId, next);
+        return next;
+      });
+      // Relecture immédiate : le chapitre suivant part de la mémoire à jour.
       await loadWriting(projectId);
     },
-    [projectId, memories, geminiKey, loadWriting],
+    [projectId, geminiKey, loadWriting],
   );
 
   /** ChatGPT rédige (ou polit) un chapitre, puis Gemini met à jour la mémoire. */
   const writeChapter = useCallback(
-    async (chapter: BookChapter, opts?: { polish?: boolean; guidance?: string; silent?: boolean }): Promise<boolean> => {
+    async (
+      chapter: BookChapter,
+      opts?: { polish?: boolean; guidance?: string; silent?: boolean },
+    ): Promise<boolean> => {
       if (!projectId) {
         toast.error('Enregistrez d’abord la fiche maître');
+        return false;
+      }
+      const budget = getBudgetState(projectId);
+      if (budget.exceeded) {
+        toast.error(
+          `Plafond de coût IA atteint (${budget.capEUR.toFixed(2)} €). Augmentez-le dans le panneau « Coût IA » pour continuer.`,
+        );
         return false;
       }
       setBusyChapterId(chapter.id);
       setBusyLabel(opts?.polish ? 'Polissage du style…' : 'Rédaction en cours…');
       try {
-        const previous = memories.filter((m) => (m.chapter_position || 0) < chapter.position);
+        // Mémoire relue en base juste avant l'appel : aucune dérive de cohérence.
+        const fresh = await loadWriting(projectId);
+        const previous = fresh.filter((m) => (m.chapter_position || 0) < chapter.position);
+        const existingContent = opts?.polish ? contents[chapter.id] || '' : undefined;
         const { data, error } = await supabase.functions.invoke('book-chapter-write', {
           body: {
             sheet,
@@ -161,7 +217,7 @@ export const useChapterWriting = ({ projectId, sheet, bible, chapters, geminiKey
             },
             memory: previous,
             task: opts?.polish ? 'polissage' : 'redaction',
-            existing: opts?.polish ? contents[chapter.id] || '' : undefined,
+            existing: existingContent,
             guidance: opts?.guidance,
           },
         });
@@ -169,6 +225,13 @@ export const useChapterWriting = ({ projectId, sheet, bible, chapters, geminiKey
         if ((data as any)?.error) throw new Error((data as any).error);
         const content = String((data as any).content || '').trim();
         if (!content) throw new Error('Chapitre vide renvoyé par la plume IA');
+
+        trackAIUsage({
+          provider: 'openai',
+          promptChars:
+            JSON.stringify({ sheet, bible: bible || {}, memory: previous }).length + (existingContent?.length || 0),
+          responseChars: content.length,
+        });
 
         await persistChapter(chapter, content, {
           kind: opts?.polish ? 'polissage' : 'originale',
@@ -190,11 +253,18 @@ export const useChapterWriting = ({ projectId, sheet, bible, chapters, geminiKey
         setBusyLabel('');
       }
     },
-    [projectId, sheet, bible, memories, contents, persistChapter, extractMemory],
+    [projectId, sheet, bible, contents, persistChapter, extractMemory, loadWriting],
   );
 
   /** Rédige à la chaîne tous les chapitres non encore rédigés. */
   const writeAll = useCallback(async () => {
+    if (projectId) {
+      const budget = getBudgetState(projectId);
+      if (budget.exceeded) {
+        toast.error(`Plafond de coût IA atteint (${budget.capEUR.toFixed(2)} €). Rédaction en série bloquée.`);
+        return;
+      }
+    }
     cancelRef.current = false;
     setRunningAll(true);
     try {
@@ -208,6 +278,10 @@ export const useChapterWriting = ({ projectId, sheet, bible, chapters, geminiKey
           toast.info('Rédaction interrompue');
           break;
         }
+        if (projectId && getBudgetState(projectId).exceeded) {
+          toast.warning('Plafond de coût IA atteint : rédaction stoppée, votre travail est conservé.');
+          break;
+        }
         const ok = await writeChapter(chapter, { silent: true });
         if (!ok) break;
       }
@@ -215,7 +289,7 @@ export const useChapterWriting = ({ projectId, sheet, bible, chapters, geminiKey
     } finally {
       setRunningAll(false);
     }
-  }, [chapters, writeChapter]);
+  }, [chapters, writeChapter, projectId]);
 
   const cancelAll = useCallback(() => {
     cancelRef.current = true;

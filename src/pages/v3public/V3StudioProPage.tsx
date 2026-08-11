@@ -14,6 +14,8 @@ import MasterSheetForm from '@/components/v3/studio/MasterSheetForm';
 import BibleReview from '@/components/v3/studio/BibleReview';
 import BookDashboard from '@/components/v3/studio/BookDashboard';
 import ChapterWriter from '@/components/v3/studio/ChapterWriter';
+import StudioProExport from '@/components/v3/studio/StudioProExport';
+import StudioProBudgetPanel from '@/components/v3/studio/StudioProBudgetPanel';
 import EngineBadge from '@/components/v3/studio/EngineBadge';
 import { BibleContent, EMPTY_BIBLE, MasterSheetDraft, emptyMasterSheet } from '@/types/studioPro';
 
@@ -162,6 +164,7 @@ const V3StudioProPage: React.FC = () => {
           <TabsTrigger value="bible">2. Bible du livre</TabsTrigger>
           <TabsTrigger value="tableau">3. Tableau de bord</TabsTrigger>
           <TabsTrigger value="redaction">4. Rédaction</TabsTrigger>
+          <TabsTrigger value="export">5. Export</TabsTrigger>
         </TabsList>
 
 
@@ -221,6 +224,8 @@ const V3StudioProPage: React.FC = () => {
           {loading ? (
             <div className="flex justify-center py-10"><Loader2 className="h-6 w-6 animate-spin" /></div>
           ) : (
+            <div className="space-y-5">
+            <StudioProBudgetPanel projectId={projectId} />
             <ChapterWriter
               chapters={chapters}
               contents={writing.contents}
@@ -234,7 +239,17 @@ const V3StudioProPage: React.FC = () => {
               onCancelAll={writing.cancelAll}
               onSave={writing.saveManual}
             />
+            </div>
           )}
+        </TabsContent>
+
+        <TabsContent value="export">
+          <StudioProExport
+            sheet={currentSheet}
+            bible={bible}
+            chapters={chapters}
+            contents={writing.contents}
+          />
         </TabsContent>
 
       </Tabs>

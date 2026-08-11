@@ -53,7 +53,15 @@ const ChapterWriter: React.FC<Props> = ({
 
   useEffect(() => {
     if (selected) setDraft(contents[selected.id] || '');
-  }, [selected?.id, contents]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected?.id]);
+
+  // Le texte venu du serveur ne remplace jamais une saisie non enregistrée.
+  useEffect(() => {
+    if (!selected) return;
+    const server = contents[selected.id] || '';
+    setDraft((current) => (current.trim() === '' || current === server ? server : current));
+  }, [contents, selected?.id]);
 
   const written = sorted.filter((c) => c.status !== 'a_ecrire').length;
   const totalWords = sorted.reduce((sum, c) => sum + (c.word_count || 0), 0);
@@ -62,6 +70,43 @@ const ChapterWriter: React.FC<Props> = ({
   const chapterAlerts = selected ? alerts[selected.position] || [] : [];
   const busy = Boolean(busyChapterId);
   const dirty = Boolean(selected && draft !== (contents[selected.id] || ''));
+
+  /**
+   * Rédaction protégée : on n'écrase jamais un chapitre validé ni une correction
+   * manuelle non enregistrée sans confirmation explicite de l'auteur.
+   */
+  const requestWrite = (chapter: BookChapter, opts?: { polish?: boolean; guidance?: string }) => {
+    if (dirty) {
+      const keep = window.confirm(
+        'Vous avez des modifications non enregistrées sur ce chapitre.\n\n' +
+          'OK = enregistrer mes corrections d’abord, Annuler = ne rien faire.',
+      );
+      if (!keep) return;
+      onSave(chapter, draft);
+    }
+    if (chapter.status === 'valide' && !opts?.polish) {
+      const ok = window.confirm(
+        `Le chapitre ${chapter.position} est déjà validé. Le réécrire créera une nouvelle version ` +
+          '(l’ancienne reste consultable). Continuer ?',
+      );
+      if (!ok) return;
+    }
+    onWrite(chapter, opts);
+  };
+
+  const requestWriteAll = () => {
+    const validated = sorted.filter((c) => c.status === 'valide').length;
+    const pending = sorted.filter((c) => c.status === 'a_ecrire').length;
+    const ok = window.confirm(
+      `Rédaction en série de ${pending} chapitre${pending > 1 ? 's' : ''}.\n\n` +
+        `Vos ${validated} chapitre${validated > 1 ? 's validés ne seront pas touchés' : ' validé ne sera pas touché'}. ` +
+        'La cohérence est vérifiée après chaque chapitre. Lancer ?',
+    );
+    if (!ok) return;
+    if (dirty && selected) onSave(selected, draft);
+    onWriteAll();
+  };
+
 
   if (!sorted.length) {
     return (
@@ -93,7 +138,7 @@ const ChapterWriter: React.FC<Props> = ({
               <StopCircle className="mr-2 h-4 w-4" /> Arrêter la rédaction
             </Button>
           ) : (
-            <Button onClick={onWriteAll} disabled={busy || written === sorted.length}>
+            <Button onClick={requestWriteAll} disabled={busy || written === sorted.length}>
               <Sparkles className="mr-2 h-4 w-4" /> Rédiger tout le livre
             </Button>
           )}
@@ -162,7 +207,7 @@ const ChapterWriter: React.FC<Props> = ({
 
                 <div className="flex flex-wrap gap-2">
                   <Button
-                    onClick={() => onWrite(selected, { guidance: guidance.trim() || undefined })}
+                    onClick={() => requestWrite(selected, { guidance: guidance.trim() || undefined })}
                     disabled={busy}
                   >
                     {busyChapterId === selected.id ? (
@@ -174,7 +219,7 @@ const ChapterWriter: React.FC<Props> = ({
                   </Button>
                   <Button
                     variant="outline"
-                    onClick={() => onWrite(selected, { polish: true, guidance: guidance.trim() || undefined })}
+                    onClick={() => requestWrite(selected, { polish: true, guidance: guidance.trim() || undefined })}
                     disabled={busy || !contents[selected.id]}
                   >
                     <Wand2 className="mr-2 h-4 w-4" /> Améliorer le style
@@ -190,6 +235,16 @@ const ChapterWriter: React.FC<Props> = ({
                     <Check className="mr-2 h-4 w-4" /> Valider le chapitre
                   </Button>
                 </div>
+
+                {dirty && (
+                  <Alert>
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertDescription>
+                      Modifications non enregistrées — cliquez sur « Enregistrer mes corrections »
+                      pour les conserver. Elles ne seront jamais écrasées par l’IA sans votre accord.
+                    </AlertDescription>
+                  </Alert>
+                )}
 
                 {busyChapterId === selected.id && busyLabel && (
                   <p className="text-sm text-muted-foreground">{busyLabel}</p>
