@@ -230,6 +230,29 @@ export default function V3ImportStudio() {
             )}
           </div>
 
+          {/* Que faire de ce manuscrit ? */}
+          {imported && (
+            <div className="mt-5 rounded-2xl border border-[var(--v3-gold,#c9a84c)] bg-[var(--v3-gold-soft,#f5f0e0)] p-5">
+              <div className="v3-serif text-lg font-semibold text-[var(--v3-ink,#0a1f18)]">
+                « {imported.title} » est prêt
+              </div>
+              <div className="text-[13px] text-[var(--v3-muted,#4b5b55)] mt-1">
+                {imported.chapters.length} chapitre(s) · {imported.wordCount.toLocaleString('fr-FR')} mots · ≈ {imported.pageEstimate} pages.
+                Choisissez la suite :
+              </div>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <button onClick={() => navigate('/v3/corriger')} className="v3-btn-primary inline-flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4" /> Corriger ce manuscrit
+                </button>
+                <button onClick={() => navigate('/v3/create')} className="v3-btn-outline inline-flex items-center gap-2">
+                  <Sparkles className="w-4 h-4" /> Rédiger / enrichir avec l'IA
+                </button>
+              </div>
+            </div>
+          )}
+
+
+
           {/* Trust bar */}
           <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-[var(--v3-muted,#4b5b55)]">
             <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-[var(--v3-gold,#c9a84c)]" /> 5 formats acceptés</span>
