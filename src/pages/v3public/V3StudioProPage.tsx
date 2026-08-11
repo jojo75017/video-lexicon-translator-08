@@ -9,11 +9,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, Sparkles } from 'lucide-react';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 import useBookProject from '@/hooks/useBookProject';
+import useChapterWriting from '@/hooks/useChapterWriting';
 import MasterSheetForm from '@/components/v3/studio/MasterSheetForm';
 import BibleReview from '@/components/v3/studio/BibleReview';
 import BookDashboard from '@/components/v3/studio/BookDashboard';
+import ChapterWriter from '@/components/v3/studio/ChapterWriter';
 import EngineBadge from '@/components/v3/studio/EngineBadge';
 import { BibleContent, EMPTY_BIBLE, MasterSheetDraft, emptyMasterSheet } from '@/types/studioPro';
+
 
 /**
  * Studio Pro — parcours hybride : Gemini construit la Bible, ChatGPT rédigera
@@ -26,7 +29,7 @@ const V3StudioProPage: React.FC = () => {
   const { apiKey } = useOpenAIConfig();
   const {
     project, bible, chapters, saving, loading,
-    saveMasterSheet, saveBibleVersion,
+    saveMasterSheet, saveBibleVersion, load,
   } = useBookProject(projectId);
 
   const [sheet, setSheet] = useState<MasterSheetDraft>(emptyMasterSheet());
@@ -34,6 +37,16 @@ const V3StudioProPage: React.FC = () => {
   const [tab, setTab] = useState('fiche');
   const [generating, setGenerating] = useState(false);
   const [busySection, setBusySection] = useState<string | null>(null);
+
+  // Phase 2 : ChatGPT rédige, Gemini analyse et mémorise.
+  const writing = useChapterWriting({
+    projectId,
+    sheet,
+    bible,
+    chapters,
+    onChaptersChange: () => { if (projectId) load(projectId); },
+  });
+
 
   // Hydrate depuis le projet chargé
   React.useEffect(() => {
@@ -121,9 +134,10 @@ const V3StudioProPage: React.FC = () => {
     if (!projectId) return;
     const saved = await saveBibleVersion(projectId, draftBible, { validate: true });
     if (saved) {
-      toast.success('Bible validée — les chapitres sont prêts');
-      setTab('tableau');
+      toast.success('Bible validée — la rédaction peut commencer');
+      setTab('redaction');
     }
+
   };
 
   return (
@@ -132,7 +146,7 @@ const V3StudioProPage: React.FC = () => {
         <div className="flex flex-wrap items-center gap-2">
           <Badge>Studio Pro</Badge>
           <EngineBadge engine="gemini" task="Architecture, analyse, cohérence" />
-          <EngineBadge engine="chatgpt" task="Rédaction et style (étape suivante)" />
+          <EngineBadge engine="chatgpt" task="Rédaction et style, chapitre par chapitre" />
         </div>
         <h1 className="text-3xl font-bold tracking-tight">Studio éditorial hybride</h1>
         <p className="max-w-3xl text-muted-foreground">
@@ -147,7 +161,9 @@ const V3StudioProPage: React.FC = () => {
           <TabsTrigger value="fiche">1. Fiche maître</TabsTrigger>
           <TabsTrigger value="bible">2. Bible du livre</TabsTrigger>
           <TabsTrigger value="tableau">3. Tableau de bord</TabsTrigger>
+          <TabsTrigger value="redaction">4. Rédaction</TabsTrigger>
         </TabsList>
+
 
         <TabsContent value="fiche">
           <MasterSheetForm
@@ -200,6 +216,27 @@ const V3StudioProPage: React.FC = () => {
             <BookDashboard chaptersTarget={currentSheet.chapters_target} chapters={chapters} />
           )}
         </TabsContent>
+
+        <TabsContent value="redaction">
+          {loading ? (
+            <div className="flex justify-center py-10"><Loader2 className="h-6 w-6 animate-spin" /></div>
+          ) : (
+            <ChapterWriter
+              chapters={chapters}
+              contents={writing.contents}
+              memories={writing.memories}
+              alerts={writing.alerts}
+              busyChapterId={writing.busyChapterId}
+              busyLabel={writing.busyLabel}
+              runningAll={writing.runningAll}
+              onWrite={(chapter, opts) => writing.writeChapter(chapter, opts)}
+              onWriteAll={writing.writeAll}
+              onCancelAll={writing.cancelAll}
+              onSave={writing.saveManual}
+            />
+          )}
+        </TabsContent>
+
       </Tabs>
     </div>
   );

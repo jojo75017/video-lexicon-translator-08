@@ -145,6 +145,27 @@ export interface BookChapter {
   word_count: number;
 }
 
+/** Mémoire persistante d'un chapitre rédigé (produite par Gemini). */
+export interface ChapterMemory {
+  id: string;
+  project_id: string;
+  chapter_id: string;
+  chapter_position: number;
+  summary: string | null;
+  events: string[] | null;
+  characters_present: string[] | null;
+  revealed_info: string[] | null;
+  places: string[] | null;
+  dates: string[] | null;
+  objects: string[] | null;
+  clues: string[] | null;
+  decisions: string[] | null;
+  relationship_changes: string[] | null;
+  open_questions: string[] | null;
+  created_at?: string;
+}
+
+
 export const EMPTY_BIBLE: BibleContent = {
   concept: '',
   promise: '',
