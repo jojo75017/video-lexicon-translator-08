@@ -23,6 +23,7 @@ const NAV: NavSection[] = [
       { to: '/v3/recherche', label: 'Studio Recherche KDP', icon: Search, badge: 'Hub' },
       { to: '/v3/create', label: 'Ebookstudio-Génie', icon: Sparkles, badge: 'Nouveauté IA' },
       { to: '/v3/create?sommaire=ia', label: 'Sommaire IA (dialogue)', icon: ListTree, badge: 'Nouveauté IA' },
+      { to: '/v3/studio', label: 'Studio Pro (Gemini + ChatGPT)', icon: Gem, badge: 'Nouveau' },
 
       { to: '/v3/nouveautes', label: '✨ Nouveautés V3', icon: Sparkles, badge: 'NEW' },
       { to: '/v3/outils/offerts', label: '🎁 Outils offerts', icon: Search, badge: 'Offert' },

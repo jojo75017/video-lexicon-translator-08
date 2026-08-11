@@ -83,6 +83,7 @@ const V3AuthorSettingsPage = lazy(() => import('./pages/v3public/V3AuthorSetting
 const V3TocUltimatePage = lazy(() => import('./pages/v3public/V3TocUltimatePage'));
 const V3TranslatorPage = lazy(() => import('./pages/v3public/V3TranslatorPage'));
 const V3CorrecteurPage = lazy(() => import('./pages/v3public/V3CorrecteurPage'));
+const V3StudioProPage = lazy(() => import('./pages/v3public/V3StudioProPage'));
 
 const V3ToolsIndexPage = lazy(() => import('./pages/v3public/V3ToolsIndexPage'));
 const V3ComptePage = lazy(() => import('./pages/v3public/V3ComptePage'));
@@ -552,6 +553,7 @@ const App = () => {
               <Route path="outils/sommaire-ultime" element={<V3LockedGate><V3TocUltimatePage /></V3LockedGate>} />
               <Route path="outils/traduction" element={<V3LockedGate><V3TranslatorPage /></V3LockedGate>} />
               <Route path="corriger" element={<V3LockedGate><V3CorrecteurPage /></V3LockedGate>} />
+              <Route path="studio" element={<V3LockedGate><V3StudioProPage /></V3LockedGate>} />
               <Route path="correcteur" element={<Navigate to="/v3/corriger" replace />} />
 
               <Route path="compte" element={<V3LockedGate><V3ComptePage /></V3LockedGate>} />
