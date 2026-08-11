@@ -12,6 +12,9 @@ import { toast } from "sonner";
 import SeoHead from "@/components/funnel/SeoHead";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { COMMANDER_URL } from "@/data/externalLinks";
+import { V3_LAUNCH_BONUSES, V3_BONUSES_TOTAL_VALUE } from "@/data/v3Launch";
+
+const BONUS_TOTAL = V3_BONUSES_TOTAL_VALUE;
 
 
 const EMERALD = "#064e3b";
