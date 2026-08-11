@@ -1,49 +1,58 @@
-# Couvertures vraiment professionnelles (V3) + export KDP complet
+# Corriger la V3 + démo Génie et campagne 47 € (objectif 20-30 abonnés)
 
-## Recommandation de clé API
+## Partie 1 — Corrections V3 constatées
 
-Ma réponse à « lequel est le mieux » : **Ideogram v3** (clé à créer sur ideogram.ai).
+1. `/v3/hub` : ajouter un vrai titre en haut de page et déplacer l'avertissement « Clé IA manquante » sous le titre, en encart discret (il est aujourd'hui le premier élément visible).
+2. Bandeau header « Offre V3 · 1er oct. » : le remplacer par le message unique de campagne — « Accès à vie 47 € jusqu'au 30/09 » — pour ne plus contredire `/commander`.
+3. Liens du menu : « Marketing & Emails » pointera vers la page marketing réelle et non `/v3/outils` ; suppression du doublon « Signature email » / « Signature auteur ».
+4. Anciens liens : `/v3/import` redirige vers `/v3/create?import=1`, `/v3/traduire` vers `/v3/outils/traduction` (aujourd'hui page « introuvable »).
+5. Vérifié et sain : create, studio, corriger, cover-studio-pro, forfaits, migration, outils, commander — aucune erreur bloquante, et le paiement est bien en mode réel en production.
 
-Raison : c'est aujourd'hui le seul modèle qui rend un **titre lisible et bien composé directement dans l'image** (les autres déforment les lettres). Coût ~0,06 $ par couverture, donc négligeable.
+## Partie 2 — Démo guidée du Génie (le vrai formulaire d'inscription)
 
-Mais une couverture vendable ne se fait pas « en un prompt ». Le vrai standard édition, c'est deux couches :
+Nouveau parcours public `/demo` :
 
-1. **L'illustration** générée sans aucun texte (fond, personnage, atmosphère) — Ideogram v3, avec repli automatique sur Gemini/OpenAI déjà en place si la clé manque.
-2. **La typographie posée par-dessus** en vectoriel 300 DPI (titre, sous-titre, auteur, collection) dans Cover Studio Pro. C'est ce qui fait la différence « amateur / pro » : lettres nettes, jamais pixelisées, texte modifiable.
+```text
+Page /demo
+ ├─ 1. Le visiteur décrit son livre en une phrase (aucun compte demandé)
+ ├─ 2. Le Génie propose titre + sous-titre + 8 premiers chapitres (gratuit)
+ ├─ 3. Pour voir le sommaire complet + le 1er chapitre rédigé :
+ │      formulaire email + prénom (une ligne, un bouton)
+ ├─ 4. Écran résultat : sommaire complet, 1er chapitre lisible
+ └─ 5. Paywall : « Écrire les 39 autres chapitres et exporter » → /commander (47 €)
+```
 
-Ideogram sert aussi de mode « tout-en-un » quand l'utilisateur veut un rendu direct avec texte incrusté.
+- L'email est enregistré comme lead avec la source `demo-genie`, le titre de livre généré et la niche.
+- Le lead reçoit immédiatement un email contenant son sommaire personnalisé + le lien vers l'offre 47 €.
+- Le contenu déjà produit est conservé : après achat, le livre commencé se retrouve dans « Mes livres ».
+- Les blocs d'inscription existants (pop-up, barre collante, encart inline) basculent sur cette promesse « Testez le Génie sur votre idée de livre » au lieu du PDF.
 
-## Ce qui est corrigé / ajouté
+## Partie 3 — Séquence email de la démo
 
-### 1. Génération d'image haut de gamme
-- Nouveau fournisseur Ideogram dans la chaîne de génération, en tête de priorité, avec repli sur l'existant.
-- Prompts réécrits en direction artistique de maison d'édition : cadrage, palette, éclairage, style par genre (thriller, romance, dev perso, jeunesse, cuisine, voyage), et interdiction explicite de texte pour la couche illustration.
-- Deux modes : « Illustration seule (recommandé) » et « Couverture complète avec titre ».
-- Format demandé en portrait 1024x1536 puis upscale, plus de rendu carré étiré.
+4 emails automatiques, déclenchés par l'inscription à la démo :
 
-### 2. Typographie pro
-- Presets de composition par genre (titre / sous-titre / auteur / bandeau série), polices d'édition, ombrage, contour, capitalisation.
-- Ajustement automatique de la taille du titre pour qu'il tienne dans la zone sans débordement.
-- Aperçu instantané sur 3 variantes de mise en page, choix en un clic.
+| Jour | Contenu |
+| --- | --- |
+| J0 | « Voici votre sommaire » + lien démo + offre 47 € |
+| J1 | Le 1er chapitre écrit par l'IA, en entier, dans l'email |
+| J3 | Marie & Rachel (preuve) + rappel 47 € à vie |
+| J6 | Dernière relance : ce que coûte l'abonnement après le 30/09 |
 
-### 3. Export KDP complet (couverture entière)
-- Passage du gabarit « front seul » au gabarit **wrap complet** : 4e de couverture + tranche + 1re.
-- Tranche calculée automatiquement selon le nombre de pages et le type de papier (blanc / crème / couleur).
-- Zone texte 4e de couverture : synopsis + bio auteur + emplacement code-barres réservé (aucun élément dedans).
-- Export **PDF/X 300 DPI avec fonds perdus 3 mm**, dimensions exactes exigées par KDP, plus export PNG front seul pour l'ebook.
-- Contrôle avant téléchargement : alerte si un texte dépasse la zone sûre, si la tranche est trop fine pour du texte (<100 pages), ou si l'image est sous 300 DPI.
+Tous les liens passent par le relais `/r` déjà en place, vers `ebookstudio.fr/commander`.
 
-### 4. Parcours unifié
-- Un seul point d'entrée « Couverture » qui mène à Cover Studio Pro, avec reprise automatique du titre, de l'auteur, du genre et du nombre de pages du livre ouvert.
-- Les anciennes pages couverture redirigent vers ce parcours.
+## Partie 4 — Contenus prêts à publier (Facebook groupes KDP + Pinterest)
+
+Nouvelle page admin « Kit de publication » regroupant, copiables en un clic :
+
+- **Facebook / groupes KDP** : 10 posts rédigés (démo du Génie, avant/après sommaire, correction d'un manuscrit, couverture pro, résultat d'un livre publié), avec règles anti-spam par groupe et 5 modèles de commentaires utiles.
+- **Pinterest** : 15 épingles verticales (2:3) générées avec titre lisible + visuel de couverture, toutes vers `/demo`, avec titres et descriptions optimisés (« sommaire de livre IA », « publier sur Amazon KDP », « couverture KDP gratuite »).
+- Suivi : chaque lien porte son UTM, et un tableau montre inscriptions démo / clics vers `/commander` / ventes par canal, pour savoir où sont les 20-30 abonnés.
 
 ## Détails techniques
-- `supabase/functions/generate-premium-cover/index.ts` : ajout du provider Ideogram (`IDEOGRAM_API_KEY`, secret demandé au moment de la mise en place), ordre Ideogram → OpenAI → Gemini/OpenRouter, prompts par genre, mode texte/sans-texte.
-- Nouveau `src/config/kdpCoverSpecs.ts` : formats KDP, épaisseur papier, calcul de tranche, zones sûres, bleed.
-- `CoverEditorPage.tsx` / `CoverCanvas.tsx` : gabarit wrap, zones 4e/tranche/1re, guides non exportés, contrôles de dépassement.
-- `TemplatesPanel.tsx` : presets typographiques par genre + auto-fit du titre.
-- Export : `jspdf` en mm avec dimensions exactes calculées, image insérée en qualité `NONE` (pas de recompression `FAST`).
-- Pré-remplissage depuis `book_projects` / projet ouvert via query param.
 
-## Clé à créer
-Une seule : `IDEOGRAM_API_KEY` (compte ideogram.ai, plan API). Je la demanderai via le gestionnaire de secrets au lancement. Sans elle, tout fonctionne avec les modèles actuels — la qualité typographique vient alors uniquement de la couche vectorielle.
+- `src/pages/DemoGeniePage.tsx` + route publique `/demo` ; réutilise `v3-genie-brief` pour l'étape 2 et `v3-generate-outline` pour le sommaire complet.
+- Edge function `demo-genie-capture` : validation de l'email, insertion dans `funnel_leads` (`lead_magnet = 'demo-genie'`, stockage du brief), envoi de l'email J0 via Resend.
+- Séquence : réutilise la mécanique `send-sales-email` / `CampaignSequencePanel` avec un nouveau jeu de gabarits `demo-genie-1..4`.
+- Corrections V3 : `src/pages/v3/V3HubPage.tsx` (titre + ordre des blocs), `src/data/v3HeaderMenu.ts` (liens et doublons), `src/App.tsx` (2 redirections), bandeau dans `V3LaunchGlobalBanner.tsx`.
+- Kit de publication : `src/pages/admin/AdminPublishingKitPage.tsx` + `src/data/socialLaunchKit.ts` ; visuels Pinterest générés en 1024x1536.
+- Aucune modification des tarifs ni du tunnel de paiement existant.
