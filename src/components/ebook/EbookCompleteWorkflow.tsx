@@ -801,30 +801,41 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
 
     const previousContext = options.previousContextOverride ?? buildLeanWorkflowContext(stepId, context);
 
+    const invokeWorkflow = async (body: Record<string, any>) => {
+      const token = await ensureFreshAccessToken();
+      if (!token) {
+        throw new Error("Session expirée : reconnectez-vous, votre progression est conservée.");
+      }
+      return supabase.functions.invoke('complete-book-workflow', {
+        body,
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    };
+
+    const workflowBody = {
+      step: stepId,
+      title,
+      subtitle,
+      category,
+      authorName,
+      language,
+      numberOfChapters,
+      wordsPerChapter,
+      bookIntroduction: buildEnrichedIntroduction(),
+      previousContext,
+      userApiKey: hasUsableApiKey ? normalizedUserApiKey : undefined,
+      useUserKey: hasUsableApiKey,
+      provider: activeProvider,
+      openrouterModel: getOpenRouterModel(),
+      quality: proWorkflow ? 'pro' : 'core',
+      ...extraBody,
+    };
+
     try {
       // IMPORTANT: pour éviter des payloads énormes (P4 chapitre par chapitre),
       // on peut passer un contexte "slim".
 
-      const { data, error: fnError } = await supabase.functions.invoke('complete-book-workflow', {
-          body: {
-            step: stepId,
-            title,
-            subtitle,
-            category,
-            authorName,
-            language,
-            numberOfChapters,
-            wordsPerChapter,
-            bookIntroduction: buildEnrichedIntroduction(),
-            previousContext,
-            userApiKey: hasUsableApiKey ? normalizedUserApiKey : undefined,
-            useUserKey: hasUsableApiKey,
-            provider: activeProvider,
-            openrouterModel: getOpenRouterModel(),
-            quality: proWorkflow ? 'pro' : 'core',
-            ...extraBody,
-          }
-        });
+      let { data, error: fnError } = await invokeWorkflow(workflowBody);
 
       if (fnError) {
         // Extraire le vrai message renvoyé par l'edge function (sinon on n'a que "non-2xx status code")
@@ -843,9 +854,24 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
             realMessage = ctx.json.error;
           }
         } catch (_) { /* ignore */ }
+
+        // Token expiré pendant la génération : on rafraîchit et on retente une fois
+        if (isAuthError(realMessage) || (fnError as any)?.context?.status === 401) {
+          await supabase.auth.refreshSession();
+          const retry = await invokeWorkflow(workflowBody);
+          if (!retry.error && !retry.data?.error) {
+            return {
+              result: retry.data.result,
+              displayContent: retry.data.displayContent || 'Résultat généré',
+            };
+          }
+          throw new Error("Session expirée : reconnectez-vous puis cliquez sur « Reprendre le workflow » (votre progression est conservée).");
+        }
+
         throw new Error(realMessage);
       }
       if (data?.error) throw new Error(data.error);
+
 
 
       return {
