@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Sparkles, Loader2, Lock, ArrowRight, Check } from 'lucide-react';
+import { Sparkles, Loader2, ArrowRight, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -18,8 +18,8 @@ interface Chapter {
   objectif?: string;
 }
 
-const FREE_CHAPTERS = 8;
 const OFFER_URL = '/commander';
+
 
 export default function DemoGeniePage() {
   const [idea, setIdea] = useState('');
@@ -109,7 +109,7 @@ export default function DemoGeniePage() {
       });
       if (error || data?.error) throw new Error(error?.message || data?.error);
       setStep('unlocked');
-      toast.success('Sommaire complet débloqué — il est aussi parti par email.');
+      toast.success('Envoyé : vous recevez le sommaire en PDF et le premier chapitre par email.');
     } catch (err) {
       toast.error((err as Error).message || 'Enregistrement impossible, réessayez.');
     } finally {
@@ -255,8 +255,9 @@ export default function DemoGeniePage() {
             {step === 'unlocked' && (
               <div className="mt-6 rounded-xl p-5" style={{ background: '#FFF3DF' }}>
                 <p className="flex items-center gap-2 font-semibold">
-                  <Check className="w-4 h-4" /> Sommaire complet débloqué
+                  <Check className="w-4 h-4" /> C'est envoyé : sommaire PDF + 1er chapitre
                 </p>
+
                 <p className="mt-1 text-sm" style={{ color: '#6B6257' }}>
                   Étape suivante : faire rédiger les {chapters.length} chapitres, corriger le manuscrit,
                   créer la couverture et exporter le fichier prêt pour Amazon KDP.
