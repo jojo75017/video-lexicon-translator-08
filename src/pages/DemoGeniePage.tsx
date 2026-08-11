@@ -185,51 +185,72 @@ export default function DemoGeniePage() {
               ))}
             </ol>
 
-            {step === 'preview' && hidden > 0 && (
-              <form onSubmit={unlock} className="mt-6 rounded-xl p-5" style={{ background: '#FFF3DF' }}>
-                <p className="flex items-center gap-2 font-semibold">
-                  <Lock className="w-4 h-4" /> {hidden} chapitres restants
-                </p>
-                <p className="mt-1 text-sm" style={{ color: '#6B6257' }}>
-                  Entrez votre email : le sommaire complet s'affiche immédiatement et vous le recevez aussi par email.
-                </p>
-                <div className="mt-3 grid sm:grid-cols-[1fr_1.4fr_auto] gap-2">
-                  <input
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="Prénom"
-                    className="rounded-lg border px-3 py-2.5 text-[15px] bg-white focus:outline-none"
-                    style={{ borderColor: 'rgba(0,0,0,.15)' }}
-                  />
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="vous@exemple.com"
-                    className="rounded-lg border px-3 py-2.5 text-[15px] bg-white focus:outline-none"
-                    style={{ borderColor: 'rgba(0,0,0,.15)' }}
-                  />
-                  <button
-                    type="submit"
-                    disabled={sending}
-                    className="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 font-semibold text-white disabled:opacity-60"
-                    style={{ background: '#2A2118' }}
+            {step === 'preview' && (
+              <>
+                <div className="mt-6 rounded-xl p-5" style={{ background: '#FFF3DF' }}>
+                  <p className="flex items-center gap-2 font-semibold">
+                    <Check className="w-4 h-4" /> Sommaire complet, {chapters.length} chapitres — offert
+                  </p>
+                  <p className="mt-1 text-sm" style={{ color: '#6B6257' }}>
+                    Étape suivante : faire rédiger les {chapters.length} chapitres, corriger le manuscrit,
+                    créer la couverture et exporter le fichier prêt pour Amazon KDP.
+                  </p>
+                  <a
+                    href={OFFER_URL}
+                    className="mt-4 inline-flex items-center gap-2 rounded-xl px-5 py-3 font-semibold text-white"
+                    style={{ background: '#E8951E' }}
                   >
-                    {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
-                    Voir tout
-                  </button>
+                    Écrire mon livre en entier — 47 € à vie <ArrowRight className="w-4 h-4" />
+                  </a>
+                  <p className="mt-2 text-xs" style={{ color: '#6B6257' }}>
+                    Accès à vie à 47 € jusqu'au 30 septembre 2026. Ensuite, uniquement par abonnement.
+                  </p>
                 </div>
-                <input
-                  tabIndex={-1}
-                  autoComplete="off"
-                  value={website}
-                  onChange={(e) => setWebsite(e.target.value)}
-                  className="hidden"
-                  aria-hidden="true"
-                />
-              </form>
+
+                <form onSubmit={unlock} className="mt-4 rounded-xl border p-5" style={{ borderColor: 'rgba(0,0,0,.12)' }}>
+                  <p className="font-semibold">Recevoir ce sommaire en PDF + le 1er chapitre rédigé</p>
+                  <p className="mt-1 text-sm" style={{ color: '#6B6257' }}>
+                    Gratuit. Vous recevez le sommaire mis en page et un premier chapitre écrit à partir de votre idée.
+                  </p>
+                  <div className="mt-3 grid sm:grid-cols-[1fr_1.4fr_auto] gap-2">
+                    <input
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      placeholder="Prénom"
+                      className="rounded-lg border px-3 py-2.5 text-[15px] bg-white focus:outline-none"
+                      style={{ borderColor: 'rgba(0,0,0,.15)' }}
+                    />
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="vous@exemple.com"
+                      className="rounded-lg border px-3 py-2.5 text-[15px] bg-white focus:outline-none"
+                      style={{ borderColor: 'rgba(0,0,0,.15)' }}
+                    />
+                    <button
+                      type="submit"
+                      disabled={sending}
+                      className="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 font-semibold text-white disabled:opacity-60"
+                      style={{ background: '#2A2118' }}
+                    >
+                      {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
+                      Recevoir
+                    </button>
+                  </div>
+                  <input
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={website}
+                    onChange={(e) => setWebsite(e.target.value)}
+                    className="hidden"
+                    aria-hidden="true"
+                  />
+                </form>
+              </>
             )}
+
 
             {step === 'unlocked' && (
               <div className="mt-6 rounded-xl p-5" style={{ background: '#FFF3DF' }}>
