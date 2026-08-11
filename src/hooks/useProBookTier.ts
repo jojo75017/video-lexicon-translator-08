@@ -9,7 +9,7 @@ export type ProBookTier = 'standard' | 'pro';
  * Documentaire · Atlas · Cuisine · Voyage.
  *
  * - Standard : inclus dans les 3 forfaits V3 (Débutant / Expert / Éditeur).
- * - Pro : réservé au forfait Éditeur 59 € (+ lifetime, vip, admin).
+ * - Pro : réservé au forfait Édition 27 € (+ lifetime, vip, admin).
  */
 const PRO_TIERS = new Set(['editeur', 'auteur', 'lifetime', 'vip']);
 

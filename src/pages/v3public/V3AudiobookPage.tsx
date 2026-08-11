@@ -56,7 +56,7 @@ export default function V3AudiobookPage() {
               <Mic className="h-6 w-6" />
             </div>
             <div>
-              <Badge className="bg-amber-500 mb-1">NEW · Studio 12,99€ / Voix Premium en Éditeur 59€</Badge>
+              <Badge className="bg-amber-500 mb-1">NEW · Voix Premium en Édition 27 €</Badge>
               <h1 className="text-3xl font-bold text-[#232F3E]">Audiobook TTS</h1>
             </div>
           </div>

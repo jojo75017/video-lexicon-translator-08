@@ -59,7 +59,7 @@ Vous pausez, reprenez, régénérez, et tout est sauvegardé dans le cloud, dans
     duration: '~50 s',
     body: `Cover Studio Pro génère première de couverture, quatrième, et calcule le dos automatiquement en fonction du nombre de pages. Export PNG haute qualité, aux gabarits Amazon exacts, sans bandes ni marges parasites.
 
-Et pour les bandes dessinées, BD Studio Pro — inclus dans le forfait Éditeur — propose un mode professionnel avec cases, bulles, et rendu print prêt pour KDP.`,
+Et pour les bandes dessinées, BD Studio Pro — inclus dans le forfait Édition — propose un mode professionnel avec cases, bulles, et rendu print prêt pour KDP.`,
   },
   {
     title: '8. Livres spéciaux — Documentaires, Atlas, Cuisine, Voyage, Sagas (5:30 → 6:20)',

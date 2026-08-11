@@ -14,7 +14,7 @@ interface Props {
 
 /**
  * Bandeau visuel indiquant si l'utilisateur bénéficie de la version
- * Standard (3 plans) ou Pro (Éditeur 59 €) pour un module de livre spécial.
+ * Standard (Plume) ou Pro (Édition 27 €) pour un module de livre spécial.
  */
 export const ProBookTierBadge: React.FC<Props> = ({ module, compact }) => {
   const { tier, loading, isAdmin } = useProBookTier();
@@ -32,7 +32,7 @@ export const ProBookTierBadge: React.FC<Props> = ({ module, compact }) => {
           Version PRO — {label}
         </span>
         <Badge variant="outline" className="border-amber-400 text-amber-700 dark:text-amber-300">
-          {isAdmin ? 'Admin' : 'Plan Éditeur 59 €'}
+          {isAdmin ? 'Admin' : 'Forfait Édition 27 €'}
         </Badge>
         {!compact && (
           <span className="ml-auto text-xs text-amber-800/80 dark:text-amber-200/80">

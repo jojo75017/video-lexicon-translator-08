@@ -54,18 +54,16 @@ const Cell: React.FC<{ value: string | boolean; accent?: boolean }> = ({ value, 
 
 /**
  * Encart comparatif affiché en tête du parcours de rédaction.
- * Compare les 3 abonnements mensuels : Débutant 6,99 € · Expert 9,99 € · Auteur 59 €.
+ * Compare les 2 forfaits mensuels : Plume 17 € · Édition 27 €.
  */
 export const WritingEngineBadge: React.FC<WritingEngineBadgeProps> = ({ tier, isPro, onUpgrade }) => {
   const activeTier: 'debutant' | 'expert' | 'auteur' =
     tier ?? (isPro ? 'auteur' : 'debutant');
 
-  const tierLabel =
-    activeTier === 'auteur' ? 'Éditeur 59 €/mois'
-    : activeTier === 'expert' ? 'Studio 12,99 €/mois'
-    : 'Auteur 9,99 €/mois';
+  const isEdition = activeTier === 'auteur';
+  const tierLabel = isEdition ? 'Édition 27 €/mois' : 'Plume 17 €/mois';
 
-  const canUpgrade = activeTier !== 'auteur';
+  const canUpgrade = !isEdition;
 
   return (
     <div className="rounded-2xl border-2 overflow-hidden" style={{ borderColor: `${TEAL}33`, background: '#fff' }}>
@@ -78,35 +76,26 @@ export const WritingEngineBadge: React.FC<WritingEngineBadgeProps> = ({ tier, is
           </span>
         </div>
         <span className="text-xs font-semibold" style={{ color: TEAL }}>
-          Comparatif des 3 abonnements
+          Comparatif des 2 forfaits
         </span>
       </div>
 
       {/* Tableau comparatif */}
       <div className="px-2 sm:px-4 py-3 overflow-x-auto">
-        <div className="grid grid-cols-[1fr_90px_90px_100px] sm:grid-cols-[1fr_130px_130px_150px] items-center gap-x-2 gap-y-0 min-w-[520px]">
+        <div className="grid grid-cols-[1fr_100px_110px] sm:grid-cols-[1fr_140px_150px] items-center gap-x-2 gap-y-0 min-w-[440px]">
           {/* En-têtes colonnes */}
           <div />
-          <div className={`text-center text-[11px] font-bold uppercase tracking-wide py-2 ${activeTier === 'debutant' ? 'text-foreground' : 'text-muted-foreground'}`}>
-            🌱 Auteur<br />9,99 €/mois
-          </div>
-          <div
-            className="text-center text-[11px] font-black uppercase tracking-wide py-2 rounded-t-lg"
-            style={{ color: '#C97A14', background: '#C97A1412' }}
-          >
-            🚀 Studio ⭐<br />12,99 €/mois
+          <div className={`text-center text-[11px] font-bold uppercase tracking-wide py-2 rounded-t-lg ${isEdition ? 'text-muted-foreground' : 'text-foreground'}`} style={{ background: '#C97A1412', color: '#C97A14' }}>
+            ✍️ Plume<br />17 €/mois
           </div>
           <div className="text-center text-[11px] font-black uppercase tracking-wide py-2 rounded-t-lg" style={{ color: TEAL, background: `${TEAL}12` }}>
-            <span className="inline-flex items-center gap-1"><Crown className="h-3 w-3" />Éditeur</span><br />59 €/mois
+            <span className="inline-flex items-center gap-1"><Crown className="h-3 w-3" />Édition ⭐</span><br />27 €/mois
           </div>
 
           {ROWS.map((row, i) => (
             <React.Fragment key={row.label}>
               <div className={`text-[12px] leading-snug text-foreground py-2 ${i > 0 ? 'border-t border-border/50' : ''}`}>
                 {row.label}
-              </div>
-              <div className={`text-center py-2 ${i > 0 ? 'border-t border-border/50' : ''}`}>
-                <Cell value={row.debutant} />
               </div>
               <div className={`text-center py-2 ${i > 0 ? 'border-t border-border/50' : ''}`}>
                 <Cell value={row.expert} />
@@ -122,12 +111,12 @@ export const WritingEngineBadge: React.FC<WritingEngineBadgeProps> = ({ tier, is
       {/* Call to action / statut */}
       {!canUpgrade ? (
         <div className="px-4 sm:px-5 py-3 text-[12px] font-semibold" style={{ background: `${TEAL}0d`, color: TEAL }}>
-          ✓ Vous êtes sur le palier <strong>Éditeur</strong> — toutes les capacités ci-dessus sont actives.
+          ✓ Vous êtes sur le forfait <strong>Édition</strong> — toutes les capacités ci-dessus sont actives.
         </div>
       ) : (
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-5 py-3.5" style={{ background: `${AMBER}12` }}>
           <span className="text-[12px] text-foreground max-w-md">
-            <strong>Passez au palier Éditeur (59 €/mois)</strong> pour débloquer les 30 agents, l'édition Pro, le comité de lecture et des livres illimités.
+            <strong>Passez au forfait Édition (27 €/mois)</strong> pour débloquer les 30 agents, l'édition Pro, le comité de lecture et des livres illimités.
           </span>
           {onUpgrade && (
             <button
