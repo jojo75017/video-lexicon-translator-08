@@ -97,3 +97,39 @@ export const formatEUR = (n: number) => {
   if (n < 0.01) return '< 0,01 €';
   return n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 2 });
 };
+
+// ═══════════════════════════════════════════════════════════
+// PLAFOND DE COÛT PAR ABONNÉ (garde-fou)
+// ═══════════════════════════════════════════════════════════
+
+const BUDGET_KEY = 'ai_budget_cap_eur_v1';
+/** Plafond par défaut, généreux : ~15 livres complets. */
+export const DEFAULT_BUDGET_CAP_EUR = 5;
+
+export const getBudgetCapEUR = (): number => {
+  if (typeof window === 'undefined') return DEFAULT_BUDGET_CAP_EUR;
+  const raw = localStorage.getItem(BUDGET_KEY);
+  const n = raw ? Number(raw) : NaN;
+  return Number.isFinite(n) && n > 0 ? n : DEFAULT_BUDGET_CAP_EUR;
+};
+
+export const setBudgetCapEUR = (value: number) => {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(BUDGET_KEY, String(Math.max(0.5, value)));
+  window.dispatchEvent(new CustomEvent('ai:cost:updated'));
+};
+
+export interface BudgetState {
+  spentEUR: number;
+  capEUR: number;
+  ratio: number;
+  exceeded: boolean;
+  nearLimit: boolean;
+}
+
+export const getBudgetState = (projectId?: string): BudgetState => {
+  const spentEUR = getCostEntry(projectId).totalCostEUR;
+  const capEUR = getBudgetCapEUR();
+  const ratio = capEUR > 0 ? spentEUR / capEUR : 0;
+  return { spentEUR, capEUR, ratio, exceeded: ratio >= 1, nearLimit: ratio >= 0.8 };
+};
