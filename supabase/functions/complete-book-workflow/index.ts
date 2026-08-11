@@ -67,7 +67,7 @@ LANGUE — RÈGLE ABSOLUE :
 `;
 
 
-// RECHERCHE APPROFONDIE — réservé au palier Pro (Éditeur 59 €/mois et Pack 547 €).
+// RECHERCHE APPROFONDIE — réservé au palier Pro (Édition 27 €/mois et Pack 547 €).
 // Ces directives poussent les agents à creuser davantage : sources, données
 // chiffrées, contre-arguments, exemples vérifiables, angles concurrentiels.
 const PRO_DEEP_RESEARCH = `
