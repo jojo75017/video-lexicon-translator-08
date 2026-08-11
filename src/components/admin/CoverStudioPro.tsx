@@ -7,7 +7,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2, Sparkles, Download, Crown, Wand2, Eye, BookOpen, CheckCircle2, KeyRound } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { getOpenRouterImageKey, setOpenRouterImageKey } from '@/lib/ebookExportOptions';
+import {
+  getOpenRouterImageKey,
+  setOpenRouterImageKey,
+  getIdeogramKey,
+  setIdeogramKey,
+} from '@/lib/ebookExportOptions';
+
 
 const GOLD = '#a8842c';
 
