@@ -25,7 +25,7 @@ const attenteItems: AttenteItem[] = [
     objectif:
       "Passer les 3 forfaits d'abonnement en facturation annuelle par défaut, avec tacite reconduction chaque année, tout en laissant l'abonné libre de résilier lui-même à tout moment.",
     decisions: [
-      "Trois plans concernés : Débutant 9,99 €/mois, Expert 12,99 €/mois, Auteur/Éditeur 59 €.",
+      "Deux forfaits concernés : Plume 17 €/mois et Édition 27 €/mois.",
       "Chaque plan propose une formule mensuelle et une formule annuelle, avec l'économie réalisée affichée clairement sur la formule annuelle.",
       "La formule annuelle est reconduite tacitement chaque année, sauf résiliation de l'abonné.",
       "Justification de la reconduction annuelle : les améliorations s'accumulent année après année, et la V4 très professionnelle arrive en 2027.",
