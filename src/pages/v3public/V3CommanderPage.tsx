@@ -314,6 +314,22 @@ export default function V3CommanderPage() {
                   })}
                 </div>
 
+                {/* Réassurance juste au-dessus du bouton : c'est là qu'on hésite */}
+                <ul className="mt-5 space-y-1.5 rounded-xl border p-4 text-xs text-slate-700" style={{ borderColor: `${EMERALD}1f`, background: `${EMERALD}08` }}>
+                  <li className="flex items-center gap-2">
+                    <RotateCcw className="h-3.5 w-3.5 shrink-0" style={{ color: EMERALD }} />
+                    <span><strong>Garantie 30 jours</strong> — remboursé sur simple demande, sans justification.</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CreditCard className="h-3.5 w-3.5 shrink-0" style={{ color: EMERALD }} />
+                    <span><strong>PayPal ou carte bancaire</strong>, en 1, 2 ou 3 fois.</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Lock className="h-3.5 w-3.5 shrink-0" style={{ color: EMERALD }} />
+                    <span><strong>Aucun abonnement</strong> : rien à résilier, accès conservé à vie.</span>
+                  </li>
+                </ul>
+
                 <button
                   onClick={startPayment}
                   disabled={loading}
