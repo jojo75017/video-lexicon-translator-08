@@ -53,6 +53,22 @@ export function effectiveText(chapter: ChapterProofread): string {
 }
 
 
+/**
+ * Nettoie la réponse du modèle : certains retours réintègrent le titre du chapitre
+ * ou les séparateurs « --- » du prompt dans le texte corrigé.
+ */
+function cleanCorrected(raw: string, title: string): string {
+  let t = (raw || '').replace(/\r\n/g, '\n').trim();
+  t = t.replace(/^\s*Titre du chapitre\s*:\s*"?.*?"?\s*\n/i, '');
+  t = t.replace(/^\s*-{3,}\s*\n/, '').replace(/\n\s*-{3,}\s*$/, '');
+  const clean = (title || '').trim();
+  if (clean) {
+    const escaped = clean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    t = t.replace(new RegExp(`^\\s*${escaped}\\s*\\n+`, 'i'), '');
+  }
+  return t.trim();
+}
+
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export const CORRECTION_TYPE_LABELS: Record<string, string> = {
@@ -79,7 +95,7 @@ export async function proofreadChapter(
     });
 
     if (!error && data && !data.error) {
-      const corrected = String(data.texteCorrige || '').trim();
+      const corrected = cleanCorrected(String(data.texteCorrige || ''), title);
       if (!corrected) throw new Error('La correction est revenue vide.');
       return {
         corrected,
