@@ -305,6 +305,45 @@ export default function V3CommanderPage() {
             )}
           </div>
         </div>
+
+        {/* Réassurance : garantie, PayPal, absence d'abonnement */}
+        <div className="mt-12 grid gap-4 md:grid-cols-3">
+          {REASSURANCE.map((r) => (
+            <div key={r.title} className="rounded-2xl border bg-white p-5" style={{ borderColor: `${EMERALD}18` }}>
+              <r.icon className="h-5 w-5" style={{ color: GOLD }} />
+              <h3 className="mt-3 text-sm font-black" style={{ color: EMERALD }}>{r.title}</h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-slate-600">{r.body}</p>
+            </div>
+          ))}
+        </div>
+
+        {testimonials.length > 0 && (
+          <div className="mt-10">
+            <h2 className="text-center text-lg font-black" style={{ color: EMERALD }}>
+              Ce qu'en disent les auteurs
+            </h2>
+            <div className="mt-5 grid gap-4 md:grid-cols-3">
+              {testimonials.map((t) => (
+                <figure key={t.id} className="rounded-2xl border bg-white p-5" style={{ borderColor: `${GOLD}44` }}>
+                  <Quote className="h-4 w-4" style={{ color: GOLD }} />
+                  <blockquote className="mt-2 text-sm leading-relaxed text-slate-700">{t.comment}</blockquote>
+                  <figcaption className="mt-3 text-xs font-bold" style={{ color: EMERALD }}>
+                    {t.author_name}
+                    {t.book_title && <span className="font-normal text-slate-500"> — {t.book_title}</span>}
+                  </figcaption>
+                  {t.rating ? (
+                    <div className="mt-1.5 flex gap-0.5" aria-label={`${t.rating} sur 5`}>
+                      {Array.from({ length: t.rating }).map((_, i) => (
+                        <Star key={i} className="h-3 w-3" style={{ color: GOLD, fill: GOLD }} />
+                      ))}
+                    </div>
+                  ) : null}
+                </figure>
+              ))}
+            </div>
+          </div>
+        )}
+
       </section>
     </main>
   );
