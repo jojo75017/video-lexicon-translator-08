@@ -185,7 +185,13 @@ const CoverStudioPro: React.FC = () => {
       if (urls.length === 0) throw new Error('Aucune couverture générée.');
       setCovers(urls.map((url) => ({ url })));
       setArtDirection(data?.artDirection || '');
-      toast.success(`${urls.length} couverture(s) premium générée(s) !`);
+      setEngineUsed(data?.engine || '');
+      toast.success(
+        data?.engine === 'ideogram'
+          ? `${urls.length} couverture(s) générée(s) en qualité pro (Ideogram) !`
+          : `${urls.length} couverture(s) premium générée(s) !`,
+      );
+
     } catch (e) {
       console.error(e);
       toast.error((e as Error).message || 'Erreur lors de la génération.');
