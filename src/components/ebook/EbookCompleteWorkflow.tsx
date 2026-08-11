@@ -890,26 +890,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
 
         if (needsFallback && !extraBody.forceFallback) {
           console.warn('P3 failed in standard mode, retrying with robust fallback mode.');
-          const { data, error: fallbackError } = await supabase.functions.invoke('complete-book-workflow', {
-            body: {
-              step: stepId,
-              title,
-              subtitle,
-              category,
-              authorName,
-              language,
-              numberOfChapters,
-              wordsPerChapter,
-              bookIntroduction: buildEnrichedIntroduction(),
-              previousContext,
-              userApiKey: hasUsableApiKey ? normalizedUserApiKey : undefined,
-              useUserKey: hasUsableApiKey,
-              provider: activeProvider,
-              openrouterModel: getOpenRouterModel(),
-              quality: proWorkflow ? 'pro' : 'core',
-              ...extraBody,
-              forceFallback: true,
-            }
+          const { data, error: fallbackError } = await invokeWorkflow({
+            ...workflowBody,
+            forceFallback: true,
           });
 
           if (!fallbackError && !data?.error) {
