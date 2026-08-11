@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { projectId } = (await req.json()) as { projectId?: string };
+    const { projectId, force } = (await req.json()) as { projectId?: string; force?: boolean };
     if (!projectId) return json(400, { error: "projectId requis" });
 
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
@@ -99,12 +99,12 @@ Deno.serve(async (req) => {
 
     const targets = chapters
       .map((c, i) => ({ index: i, number: i + 1, title: String(c?.title || c?.titre || ""), excerpt: cleanExcerpt(c?.content || "") }))
-      .filter((c) => isGeneric(c.title) && c.excerpt.length > 80);
+      .filter((c) => (force || isGeneric(c.title)) && c.excerpt.length > 80);
 
     if (!targets.length) return json(200, { updated: 0, message: "Tous les chapitres ont déjà un titre." });
 
     const used = new Set(
-      chapters
+      (force ? [] : chapters)
         .map((c) => String(c?.title || c?.titre || "").trim().toLowerCase())
         .filter((t) => t && !isGeneric(t)),
     );
