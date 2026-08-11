@@ -107,10 +107,13 @@ ${req.subtitle ? `- Subtitle: "${req.subtitle}"` : ''}
 ${showAuthor && req.author ? `- Author: "${req.author}"` : '- No author name on cover'}
 - Genre: ${req.genre || 'general'}
 
-TYPOGRAPHY (CRITICAL — MUST BE PERFECT):
+${req.noText ? `NO TEXT AT ALL (CRITICAL):
+Produce the ILLUSTRATION ONLY — absolutely no title, no subtitle, no author name, no letters, no words, no logo, no lettering of any kind anywhere in the image.
+Leave clean, uncluttered breathing space in the upper third and lower fifth so professional typography can be composed on top later.` : `TYPOGRAPHY (CRITICAL — MUST BE PERFECT):
 1. TITLE "${req.title}" — large, razor-sharp, professional font with perfect kerning, readable even as a small Amazon thumbnail.
 ${req.subtitle ? `2. SUBTITLE "${req.subtitle}" — elegant, lighter weight, below the title.` : ''}
-${showAuthor && req.author ? `3. AUTHOR "${req.author}" — refined typography, smaller than title, at the bottom.` : ''}
+${showAuthor && req.author ? `3. AUTHOR "${req.author}" — refined typography, smaller than title, at the bottom.` : ''}`}
+
 
 PHOTOGRAPHIC STANDARDS:
 - As if shot on Canon EOS R5 / Sony A7R V, 85mm f/1.4 prime lens
