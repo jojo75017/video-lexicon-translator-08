@@ -111,17 +111,29 @@ const CampaignSequencePanel = () => {
   };
 
   const sendOpeners = async (step: number) => {
-    if (!window.confirm(`Relancer les ouvreurs non-cliqueurs avec le message de l'étape ${step} ?`)) return;
     setBusyStep(step);
     try {
+      // On montre d'abord le nombre réel de destinataires : évite les relances "0 envoyé" sans explication.
+      const check = await call({ mode: 'resend_openers', step, dry_run: true });
+      const count = Number(check.would_send || 0);
+      if (count === 0) {
+        toast.info(`Aucun ouvreur à relancer sur l'étape ${step} (tous ont déjà cliqué, acheté ou été relancés).`);
+        setBusyStep(null);
+        return;
+      }
+      if (!window.confirm(`Relancer ${count} ouvreurs non-cliqueurs de l'étape ${step} ?`)) {
+        setBusyStep(null);
+        return;
+      }
       const data = await call({ mode: 'resend_openers', step });
-      toast.success(`Relance envoyée à ${data.sent} ouvreurs non-cliqueurs`);
+      toast.success(`Relance envoyée à ${data.sent} ouvreurs non-cliqueurs sur ${data.targets} ciblés`);
       load();
     } catch (err) {
       toast.error('Relance impossible : ' + ((err as Error).message || ''));
     }
     setBusyStep(null);
   };
+
 
   return (
     <div className="rounded-lg border border-border bg-card/50 p-4 space-y-4">
