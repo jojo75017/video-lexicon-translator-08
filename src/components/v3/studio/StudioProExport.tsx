@@ -39,7 +39,6 @@ const StudioProExport: React.FC<Props> = ({ sheet, bible, chapters, contents }) 
   const totalWords = ready.reduce((sum, c) => sum + countWords(contents[c.id] || ''), 0);
 
   const title = sheet.title || 'Mon livre';
-  const author = 'Auteur';
 
   const docxChapters: DocxChapter[] = ready.map((c) => ({
     title: c.title || `Chapitre ${c.position}`,
@@ -52,7 +51,6 @@ const StudioProExport: React.FC<Props> = ({ sheet, bible, chapters, contents }) 
     try {
       await exportProfessionalDocx({
         title,
-        authorName: sheet.main_characters ? undefined : undefined,
         preface: bible?.synopsis || undefined,
         chapters: docxChapters,
         includeTableOfContents: true,
