@@ -125,6 +125,7 @@ export const V3_HEADER_MENU: MenuCategory[] = [
       { label: 'Plume — 17 €/mois', to: '/v3/outils?plan=plume', badge: '30 livres/mois', desc: '✍️ J’écris et je publie : tous les onglets, audiolivre inclus, export propre' },
       { label: 'Édition — 27 €/mois ⭐', to: '/v3/outils?plan=edition', badge: 'Recommandé · illimité', desc: '👑 Version pro : Recherche Approfondie, Cover Studio Pro, BD Studio Pro, upsells inclus' },
       { label: 'Ancien client V2', to: '/v3/migration', badge: '-20 % à vie', desc: 'Votre V2 reste à vie + 3 nouveautés V3 offertes, et -20 % à vie sur Plume ou Édition' },
+      { label: 'Mensuel ou annuel (2 mois offerts)', to: '/v3/forfaits', desc: 'Plume 170 €/an · Édition 270 €/an' },
     ],
   },
 
