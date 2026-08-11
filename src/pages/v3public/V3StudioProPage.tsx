@@ -200,6 +200,27 @@ const V3StudioProPage: React.FC = () => {
             <BookDashboard chaptersTarget={currentSheet.chapters_target} chapters={chapters} />
           )}
         </TabsContent>
+
+        <TabsContent value="redaction">
+          {loading ? (
+            <div className="flex justify-center py-10"><Loader2 className="h-6 w-6 animate-spin" /></div>
+          ) : (
+            <ChapterWriter
+              chapters={chapters}
+              contents={writing.contents}
+              memories={writing.memories}
+              alerts={writing.alerts}
+              busyChapterId={writing.busyChapterId}
+              busyLabel={writing.busyLabel}
+              runningAll={writing.runningAll}
+              onWrite={(chapter, opts) => writing.writeChapter(chapter, opts)}
+              onWriteAll={writing.writeAll}
+              onCancelAll={writing.cancelAll}
+              onSave={writing.saveManual}
+            />
+          )}
+        </TabsContent>
+
       </Tabs>
     </div>
   );
