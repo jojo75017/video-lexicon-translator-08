@@ -41,6 +41,7 @@ export default function V3CreatePage() {
   const [showWizard, setShowWizard] = useState(false);
   const [openedBook, setOpenedBook] = useState<{ id: string; title: string; chapters: number } | null>(null);
   const [openingBook, setOpeningBook] = useState(false);
+  const [briefKey, setBriefKey] = useState(0);
   const wizardRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => { seedHubConfig(idea, genre, type); }, [idea, genre, type]);
@@ -80,6 +81,7 @@ export default function V3CreatePage() {
         outlineValidated: outline.length ? true : prev.outlineValidated,
       });
       setOpenedBook({ id: data.id, title: data.title || 'Livre sans titre', chapters: outline.length });
+      setBriefKey((k) => k + 1);
       setShowWizard(true);
       setTimeout(() => wizardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
     })();
@@ -190,7 +192,7 @@ export default function V3CreatePage() {
 
         {/* Fiche du livre + Cible & Promesse IA + Sommaire validé */}
         <div className="mt-6">
-          <V3BriefRecap variant="full" onLaunch={launchWorkflow} outlineMode={sommaireIa ? 'guided' : undefined} hideBookForm={!projectId} />
+          <V3BriefRecap key={briefKey} variant="full" onLaunch={launchWorkflow} outlineMode={sommaireIa ? 'guided' : undefined} hideBookForm={!projectId} />
         </div>
 
         {/* Workflow */}
