@@ -106,7 +106,7 @@ const ChapterWriter: React.FC<Props> = ({
             <CardTitle className="text-base">Chapitres</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <ScrollArea className="max-h-[520px]">
+            <div className="max-h-[520px] overflow-y-auto">
               <ul className="divide-y">
                 {sorted.map((c) => (
                   <li key={c.id}>
