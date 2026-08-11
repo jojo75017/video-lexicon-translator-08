@@ -139,7 +139,7 @@ export default function V3CreatePage() {
                 <Link to={`/v3/book/${openedBook.id}`} className="v3-btn v3-btn-outline text-xs">
                   <BookOpen className="w-3.5 h-3.5" /> Lire le livre
                 </Link>
-                <Link to="/v3/livres" className="v3-btn v3-btn-ghost text-xs">Mes livres</Link>
+                <Link to="/v3/mes-livres" className="v3-btn v3-btn-ghost text-xs">Mes livres</Link>
               </div>
             </div>
           </div>
@@ -190,7 +190,7 @@ export default function V3CreatePage() {
 
         {/* Fiche du livre + Cible & Promesse IA + Sommaire validé */}
         <div className="mt-6">
-          <V3BriefRecap variant="full" onLaunch={launchWorkflow} outlineMode={sommaireIa ? 'guided' : undefined} hideBookForm />
+          <V3BriefRecap variant="full" onLaunch={launchWorkflow} outlineMode={sommaireIa ? 'guided' : undefined} hideBookForm={!projectId} />
         </div>
 
         {/* Workflow */}
