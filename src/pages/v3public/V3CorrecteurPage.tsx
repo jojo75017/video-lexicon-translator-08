@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import {
   FileText, FileType2, Globe, ClipboardPaste, Upload, Loader2, Wand2, ShieldCheck,
@@ -11,6 +11,7 @@ import { importManuscript } from '@/lib/bookperfect/importManuscript';
 import { importFromPdf } from '@/lib/import/importFromPdf';
 import { importFromUrl } from '@/lib/import/importFromUrl';
 import { buildManuscriptFromText } from '@/lib/import/buildManuscriptFromText';
+import { readPendingManuscript, clearPendingManuscript } from '@/lib/import/pendingManuscript';
 import type { Manuscript } from '@/lib/bookperfect/types';
 import { diffWords } from '@/lib/bookperfect/textDiff';
 import {
@@ -94,9 +95,17 @@ export default function V3CorrecteurPage() {
     toast.success(`${m.chapters.length} chapitre(s) importés · ${m.wordCount.toLocaleString('fr-FR')} mots.`);
   }, []);
 
+  // Manuscrit déjà importé ailleurs (Import Studio) : on le reprend ici.
+  useEffect(() => {
+    if (manuscript) return;
+    const pending = readPendingManuscript();
+    if (pending) loadManuscript(pending);
+  }, [manuscript, loadManuscript]);
+
   const runImport = useCallback(async (fn: () => Promise<Manuscript>) => {
     setImporting(true);
     try {
+      clearPendingManuscript();
       loadManuscript(await fn());
     } catch (e: any) {
       toast.error(e?.message || 'Import impossible.');

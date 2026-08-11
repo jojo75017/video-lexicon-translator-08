@@ -42,6 +42,8 @@ type Props = {
 export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMode, hideBookForm }: Props) {
   const [brief, setBrief] = useState<BookBrief>({});
   const [saved, setSaved] = useState(false);
+  /** Le mode Génie masque la fiche, mais l'auteur peut toujours l'ouvrir. */
+  const [formOpen, setFormOpen] = useState(false);
 
   useEffect(() => {
     setBrief(readBookBrief() || {});
@@ -79,6 +81,11 @@ export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMod
   const recommended: string[] = [];
   if (!(brief.promesseCentrale || '').trim()) recommended.push('la Cible & Promesse (bouton IA)');
   const ready = missing.length === 0;
+  // Titre, auteur ou synopsis manquant : la fiche doit rester accessible,
+  // sinon le sommaire ne peut pas être généré.
+  const essentialsMissing =
+    !(brief.title || '').trim() || !(brief.author || '').trim() || (brief.description || '').trim().length < 30;
+  const showForm = !hideBookForm || formOpen || essentialsMissing;
 
 
 
@@ -135,8 +142,14 @@ export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMod
           </div>
         </div>
 
-        {/* Champs du livre — masqués en mode Génie (le dialogue remplit la fiche) */}
-        {!hideBookForm && (
+        {hideBookForm && !essentialsMissing && (
+          <button type="button" onClick={() => setFormOpen((v) => !v)} className="v3-btn v3-btn-outline mt-4">
+            {formOpen ? 'Masquer la fiche du livre' : 'Modifier la fiche du livre'}
+          </button>
+        )}
+
+        {/* Champs du livre — le dialogue Génie les remplit, mais ils restent modifiables */}
+        {showForm && (
           <>
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               <label className="block">

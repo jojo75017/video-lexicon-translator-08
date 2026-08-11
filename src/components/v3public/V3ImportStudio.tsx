@@ -8,6 +8,7 @@ import { importFromUrl } from '@/lib/import/importFromUrl';
 import { importFromMediaFile } from '@/lib/import/importFromMedia';
 import { buildManuscriptFromText } from '@/lib/import/buildManuscriptFromText';
 import type { Manuscript } from '@/lib/bookperfect/types';
+import { savePendingManuscript } from '@/lib/import/pendingManuscript';
 import heroImage from '@/assets/v3/import-hero.jpg';
 
 type Source = 'doc' | 'pdf' | 'url' | 'media' | 'paste';
@@ -23,7 +24,7 @@ const SOURCES: { id: Source; icon: any; title: string; desc: string; formats: st
 const WIZARD_CFG_KEY = 'edition_book_config_v1';
 const IMPORTED_KEY = 'v3_imported_manuscript_v1';
 
-function persistAndGo(m: Manuscript, navigate: ReturnType<typeof useNavigate>) {
+function persistManuscript(m: Manuscript) {
   try {
     const summary = m.rawText.slice(0, 800).replace(/\s+/g, ' ').trim();
     const prev = JSON.parse(localStorage.getItem(WIZARD_CFG_KEY) || '{}');
@@ -38,14 +39,17 @@ function persistAndGo(m: Manuscript, navigate: ReturnType<typeof useNavigate>) {
       chapters: m.chapters.length, wordCount: m.wordCount, pageEstimate: m.pageEstimate, importedAt: m.importedAt,
     }));
   } catch { /* ignore */ }
+  // Conservé pour « Corriger mon livre » : le texte complet, chapitre par chapitre.
+  savePendingManuscript(m);
   toast.success(`Importé : ${m.chapters.length} chapitre(s), ${m.wordCount.toLocaleString('fr-FR')} mots.`);
-  navigate('/v3/create', { replace: true });
 }
+
 
 export default function V3ImportStudio() {
   const navigate = useNavigate();
   const [active, setActive] = useState<Source>('doc');
   const [loading, setLoading] = useState(false);
+  const [imported, setImported] = useState<Manuscript | null>(null);
   const [urlValue, setUrlValue] = useState('');
   const [pasteValue, setPasteValue] = useState('');
   const [pasteTitle, setPasteTitle] = useState('');
@@ -61,7 +65,8 @@ export default function V3ImportStudio() {
         : kind === 'media'
           ? await importFromMediaFile(file)
           : await importManuscript(file);
-      persistAndGo(m, navigate);
+      persistManuscript(m);
+      setImported(m);
     } catch (e: any) {
       toast.error(e?.message || "Import impossible.");
     } finally {
@@ -74,7 +79,8 @@ export default function V3ImportStudio() {
     setLoading(true);
     try {
       const m = await importFromUrl(urlValue.trim());
-      persistAndGo(m, navigate);
+      persistManuscript(m);
+      setImported(m);
     } catch (e: any) {
       toast.error(e?.message || "Impossible d'importer cet article.");
     } finally { setLoading(false); }
@@ -88,7 +94,8 @@ export default function V3ImportStudio() {
     setLoading(true);
     try {
       const m = await buildManuscriptFromText(pasteValue, (pasteTitle || 'texte-colle') + '.md', pasteTitle || undefined);
-      persistAndGo(m, navigate);
+      persistManuscript(m);
+      setImported(m);
     } catch (e: any) {
       toast.error(e?.message || 'Import impossible.');
     } finally { setLoading(false); }
@@ -222,6 +229,29 @@ export default function V3ImportStudio() {
               </div>
             )}
           </div>
+
+          {/* Que faire de ce manuscrit ? */}
+          {imported && (
+            <div className="mt-5 rounded-2xl border border-[var(--v3-gold,#c9a84c)] bg-[var(--v3-gold-soft,#f5f0e0)] p-5">
+              <div className="v3-serif text-lg font-semibold text-[var(--v3-ink,#0a1f18)]">
+                « {imported.title} » est prêt
+              </div>
+              <div className="text-[13px] text-[var(--v3-muted,#4b5b55)] mt-1">
+                {imported.chapters.length} chapitre(s) · {imported.wordCount.toLocaleString('fr-FR')} mots · ≈ {imported.pageEstimate} pages.
+                Choisissez la suite :
+              </div>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <button onClick={() => navigate('/v3/corriger')} className="v3-btn-primary inline-flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4" /> Corriger ce manuscrit
+                </button>
+                <button onClick={() => navigate('/v3/create')} className="v3-btn-outline inline-flex items-center gap-2">
+                  <Sparkles className="w-4 h-4" /> Rédiger / enrichir avec l'IA
+                </button>
+              </div>
+            </div>
+          )}
+
+
 
           {/* Trust bar */}
           <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-[var(--v3-muted,#4b5b55)]">
