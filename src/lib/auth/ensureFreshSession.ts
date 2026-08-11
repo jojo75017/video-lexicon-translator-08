@@ -1,5 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
+let sessionRecoveryPromise: Promise<string | null> | null = null;
+
 async function restoreSubscriberSession(): Promise<string | null> {
   try {
     const email = localStorage.getItem("subscriber_email")?.trim().toLowerCase();
@@ -36,7 +38,8 @@ async function restoreSubscriberSession(): Promise<string | null> {
  * expirée ou proche de l'expiration (les workflows longs dépassent souvent
  * la durée de vie du token, ce qui provoquait des erreurs "Non authentifié").
  */
-export async function ensureFreshAccessToken(): Promise<string | null> {
+async function resolveFreshAccessToken(): Promise<string | null> {
+  try {
   const { data, error: sessionError } = await supabase.auth.getSession();
   if (sessionError) return restoreSubscriberSession();
   const session = data?.session;
@@ -58,6 +61,22 @@ export async function ensureFreshAccessToken(): Promise<string | null> {
 
   const { data: verified, error: verificationError } = await supabase.auth.getUser(refreshedToken);
   return !verificationError && verified.user ? refreshedToken : restoreSubscriberSession();
+  } catch {
+    return restoreSubscriberSession();
+  }
+}
+
+export async function ensureFreshAccessToken(): Promise<string | null> {
+  // Plusieurs sauvegardes cloud peuvent vérifier la session au même instant.
+  // Un refresh token est à usage unique : on mutualise donc le renouvellement
+  // afin qu'un workflow long ne perde pas sa session vers P8/P9.
+  if (!sessionRecoveryPromise) {
+    sessionRecoveryPromise = resolveFreshAccessToken().finally(() => {
+      sessionRecoveryPromise = null;
+    });
+  }
+
+  return sessionRecoveryPromise;
 }
 
 export function isAuthError(message: unknown): boolean {
