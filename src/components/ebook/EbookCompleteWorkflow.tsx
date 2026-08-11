@@ -30,6 +30,7 @@ import { useV3Entitlement } from '@/hooks/useV3Entitlement';
 import useProBookTier from '@/hooks/useProBookTier';
 import WritingEngineBadge from './WritingEngineBadge';
 import { WORKFLOW_STEPS, WORKFLOW_STEP_COUNT } from './workflow/workflowAgents';
+import { ensureFreshAccessToken, isAuthError } from '@/lib/auth/ensureFreshSession';
 
 interface Character {
   id: string;
