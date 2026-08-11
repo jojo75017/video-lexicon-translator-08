@@ -313,10 +313,13 @@ serve(async (req) => {
 
         if (!imageUrl && OPENAI_API_KEY) {
           imageUrl = await generateOpenAI(OPENAI_API_KEY, prompt);
+          if (imageUrl) engine = 'openai';
         }
         if (!imageUrl && LOVABLE_API_KEY) {
           imageUrl = await generateGemini(LOVABLE_API_KEY, prompt);
+          if (imageUrl) engine = 'lovable';
         }
+
         if (!imageUrl) return null;
         return await uploadCover(SUPABASE_URL, SERVICE_KEY, imageUrl);
       }),
