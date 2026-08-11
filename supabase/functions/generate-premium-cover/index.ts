@@ -277,7 +277,11 @@ serve(async (req) => {
       ? body.openrouterKey.trim()
       : null;
 
-    if (!OPENAI_API_KEY && !LOVABLE_API_KEY && !openrouterKey) {
+    const ideogramKey = typeof body.ideogramKey === 'string' && body.ideogramKey.trim().length > 20
+      ? body.ideogramKey.trim()
+      : (Deno.env.get('IDEOGRAM_API_KEY') || null);
+
+    if (!OPENAI_API_KEY && !LOVABLE_API_KEY && !openrouterKey && !ideogramKey) {
       return new Response(JSON.stringify({ error: 'Aucune clé API image configurée.' }), {
         status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -288,6 +292,7 @@ serve(async (req) => {
       ? await buildArtDirection(LOVABLE_API_KEY, body)
       : (body.registrePrompt || body.customPrompt || '');
 
+    let engine = 'lovable';
     // Génération EN PARALLÈLE des variations pour rester sous la limite de temps.
     const results = await Promise.all(
       Array.from({ length: count }, async (_v, i) => {
@@ -295,10 +300,17 @@ serve(async (req) => {
           + `\n\nVARIATION ${i + 1}/${count}: propose une interprétation visuelle UNIQUE.`;
 
         let imageUrl: string | null = null;
-        // BYOK OpenRouter prioritaire (économise les crédits) si fourni.
-        if (openrouterKey) {
-          imageUrl = await generateOpenRouter(openrouterKey, prompt, body.openrouterModel);
+        // Ideogram prioritaire : meilleur rendu typographique (qualité édition).
+        if (ideogramKey) {
+          imageUrl = await generateIdeogram(ideogramKey, prompt);
+          if (imageUrl) engine = 'ideogram';
         }
+        // BYOK OpenRouter ensuite (économise les crédits) si fourni.
+        if (!imageUrl && openrouterKey) {
+          imageUrl = await generateOpenRouter(openrouterKey, prompt, body.openrouterModel);
+          if (imageUrl) engine = 'openrouter';
+        }
+
         if (!imageUrl && OPENAI_API_KEY) {
           imageUrl = await generateOpenAI(OPENAI_API_KEY, prompt);
         }
