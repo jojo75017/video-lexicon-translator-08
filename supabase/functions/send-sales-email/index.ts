@@ -257,12 +257,15 @@ Deno.serve(async (req) => {
     }
     if (!EMAIL_SENDING_ENABLED) return respond(emailSendingBlockedResult(), 423);
 
-    // Relance ciblée : ouvreurs de l'email 1 qui n'ont pas cliqué (nouvelle version enrichie)
+    // Relance ciblée : ouvreurs non-cliqueurs de l'étape demandée (relance propre à chaque étape)
     if (mode === "resend_openers") {
-      const sourceTemplate = String(body.source_template || templateName(1));
-      const resendTemplate = `${sourceTemplate}-v2`;
       const step = Math.min(Math.max(Number(body.step || 1), 1), 5);
+      // Par défaut on relance les ouvreurs de l'étape choisie (pas systématiquement ceux de l'étape 1).
+      const sourceTemplate = String(body.source_template || templateName(step));
+      // Le journal de relance est propre à l'étape, sinon une seule relance bloque toutes les suivantes.
+      const resendTemplate = `${sourceTemplate}-relance`;
       const limit = Math.min(Number(body.batch_size || 250), 300);
+
 
       const { data: opens } = await db.from("email_opens").select("prospect_email").eq("template_name", sourceTemplate);
       const { data: clicks } = await db.from("email_clicks").select("prospect_email");
