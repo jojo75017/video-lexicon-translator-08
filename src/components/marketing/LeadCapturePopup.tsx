@@ -85,6 +85,7 @@ const LeadCapturePopup: React.FC = () => {
       return;
     }
     setSubmitting(true);
+    trackCaptureEvent('popup', 'click', { abVariant: variant, leadMagnet });
     try {
       const utm = getStoredUtm();
       await supabase.functions.invoke('funnel-capture-lead', {
@@ -100,7 +101,8 @@ const LeadCapturePopup: React.FC = () => {
         },
       });
       trackFormSubmit(`lead_popup_${variant}`, email);
-      trackLeadMagnetDownload(isExpat ? 'publier-kdp-etranger' : '5-niches-rentables-2026');
+      trackLeadMagnetDownload(leadMagnet);
+      trackCaptureEvent('popup', 'submit', { abVariant: variant, leadMagnet });
       localStorage.setItem(DONE_KEY, '1');
       setDone(true);
     } catch {
