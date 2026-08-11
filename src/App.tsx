@@ -159,6 +159,8 @@ const AdminCleanupPage = lazy(() => import('./pages/admin/AdminCleanupPage'));
 const AdminPlansV3Page = lazy(() => import('./pages/admin/AdminPlansV3Page'));
 const AdminTestPayPalPage = lazy(() => import('./pages/admin/AdminTestPayPalPage'));
 const AdminAttentePage = lazy(() => import('./pages/admin/AdminAttentePage'));
+const AdminPublishingKitPage = lazy(() => import('./pages/admin/AdminPublishingKitPage'));
+const DemoGeniePage = lazy(() => import('./pages/DemoGeniePage'));
 const CrmPage = lazy(() => import('./pages/CrmPage'));
 const ProspectManagerPage = lazy(() => import('./pages/ProspectManagerPage'));
 const EmailPreviewPage = lazy(() => import('./pages/EmailPreviewPage'));
@@ -356,7 +358,7 @@ const App = () => {
             <Route path="/offre-59" element={<Navigate to="/commander" replace />} />
             <Route path="/59" element={<Navigate to="/commander" replace />} />
 
-            <Route path="/demo" element={<DemoPage />} />
+            <Route path="/demo-classique" element={<DemoPage />} />
             <Route path="/faq" element={<FaqAssistancePage />} />
             <Route path="/assistance" element={<FaqAssistancePage />} />
             <Route path="/paiement-succes" element={<PaymentSuccessPage />} />
@@ -418,6 +420,9 @@ const App = () => {
             <Route path="/audiobook-embed/:slug" element={<Navigate to="/formation-audio" replace />} />
             <Route path="/audiobook-merci/:slug" element={<Navigate to="/formation-audio" replace />} />
             <Route path="/hub-v3" element={<Navigate to="/v3/hub" replace />} />
+            <Route path="/demo" element={<DemoGeniePage />} />
+            <Route path="/v3/import" element={<Navigate to="/v3/create?import=1" replace />} />
+            <Route path="/v3/traduire" element={<Navigate to="/v3/outils/traduction" replace />} />
             <Route path="/dashboard-essais" element={<Navigate to="/admin" replace />} />
             <Route path="/emails-onboarding" element={<Navigate to="/admin" replace />} />
             <Route path="/guide-automatisation-brevo" element={<Navigate to="/admin" replace />} />
@@ -516,6 +521,7 @@ const App = () => {
             <Route path="/admin/cleanup" element={<AdminGate><Navigate to="/admin/plans-v3" replace /></AdminGate>} />
             <Route path="/admin/plans-v3" element={<AdminGate><AdminPlansV3Page /></AdminGate>} />
             <Route path="/admin/attente" element={<AdminGate><AdminAttentePage /></AdminGate>} />
+            <Route path="/admin/kit-publication" element={<AdminGate><AdminPublishingKitPage /></AdminGate>} />
             <Route path="/admin/tester-paypal" element={<AdminGate><AdminTestPayPalPage /></AdminGate>} />
             <Route path="/admin-paiements" element={<AdminGate><AdminPaymentsDashboardPage /></AdminGate>} />
             <Route path="/crm" element={<AdminGate><CrmPage /></AdminGate>} />
