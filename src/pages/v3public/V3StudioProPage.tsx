@@ -134,9 +134,10 @@ const V3StudioProPage: React.FC = () => {
     if (!projectId) return;
     const saved = await saveBibleVersion(projectId, draftBible, { validate: true });
     if (saved) {
-      toast.success('Bible validée — les chapitres sont prêts');
-      setTab('tableau');
+      toast.success('Bible validée — la rédaction peut commencer');
+      setTab('redaction');
     }
+
   };
 
   return (
