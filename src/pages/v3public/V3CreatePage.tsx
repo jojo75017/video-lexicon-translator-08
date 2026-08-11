@@ -119,7 +119,34 @@ export default function V3CreatePage() {
       <div className="max-w-4xl mx-auto">
         <BackButton />
 
+        {openingBook && (
+          <div className="mt-6 v3-card flex items-center gap-3 text-sm">
+            <Loader2 className="w-4 h-4 animate-spin text-[var(--v3-orange)]" /> Ouverture de votre livre…
+          </div>
+        )}
+
+        {openedBook && (
+          <div className="mt-6 v3-card">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-xs uppercase tracking-wider" style={{ color: 'var(--v3-muted)' }}>Livre ouvert</div>
+                <div className="v3-serif text-xl font-bold truncate">{openedBook.title}</div>
+                <div className="text-xs mt-1" style={{ color: 'var(--v3-muted)' }}>
+                  {openedBook.chapters > 0 ? `${openedBook.chapters} chapitre(s) chargé(s) dans le workflow` : 'Aucun chapitre enregistré pour le moment'}
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Link to={`/v3/book/${openedBook.id}`} className="v3-btn v3-btn-outline text-xs">
+                  <BookOpen className="w-3.5 h-3.5" /> Lire le livre
+                </Link>
+                <Link to="/v3/livres" className="v3-btn v3-btn-ghost text-xs">Mes livres</Link>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Hero « Ebookstudio-Génie » */}
+        {!openedBook && (
         <div className="mt-6 text-center">
           <span className="v3-chip v3-chip-orange"><Sparkles className="w-3.5 h-3.5" /> Ebookstudio-Génie</span>
           <h1 className="v3-serif text-4xl md:text-5xl font-bold mt-4 leading-tight" style={{ color: 'var(--v3-ink)' }}>
@@ -130,14 +157,18 @@ export default function V3CreatePage() {
             rédige les chapitres, puis va jusqu’à l’export et la couverture.
           </p>
         </div>
+        )}
 
         {/* Boîte de dialogue Génie — parcours guidé jusqu'au Sommaire IA */}
+        {!openedBook && (
         <div className="mt-7">
           <V3GenieDialog
             initialIdea={idea || ''}
             onReady={() => document.getElementById('sommaire-ia')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
           />
         </div>
+        )}
+
 
 
         {/* Modes illustrés — liens discrets */}
