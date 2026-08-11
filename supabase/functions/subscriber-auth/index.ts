@@ -40,7 +40,9 @@ serve(async (req) => {
       .from('subscribers')
       .select('*')
       .ilike('email', normalizedEmail)
-      .single();
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
     if (subError || !subscriber) {
       return new Response(
