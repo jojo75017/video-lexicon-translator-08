@@ -117,8 +117,10 @@ export default function DemoGeniePage() {
     }
   };
 
-  const visible = step === 'unlocked' ? chapters : chapters.slice(0, FREE_CHAPTERS);
-  const hidden = Math.max(0, chapters.length - FREE_CHAPTERS);
+  // Le sommaire complet est offert : plus aucun chapitre masqué.
+  // L'email n'est demandé que pour recevoir le PDF et le 1er chapitre rédigé.
+  const visible = chapters;
+
 
   return (
     <div className="min-h-screen" style={{ background: '#FBF6EC', color: '#2A2118' }}>
