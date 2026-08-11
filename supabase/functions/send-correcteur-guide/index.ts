@@ -100,7 +100,7 @@ Deno.serve(async (req) => {
 
     const pool = explicit.length
       ? explicit
-      : Array.from(new Set((subs || []).map((s: any) => String(s.email || "").trim().toLowerCase()).filter(Boolean)));
+      : Array.from(new Set((subs || []).map((s: any) => String(s.email || "").trim().toLowerCase()).filter((e: string) => Boolean(e) && !e.endsWith("@example.com"))));
     const targets = explicit.length ? pool : pool.filter((e) => !done.has(e));
 
     if (mode === "status" || mode === "preview") {
