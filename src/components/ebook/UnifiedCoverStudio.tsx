@@ -7,6 +7,7 @@ import { EbookAICoverStudio } from './EbookAICoverStudio';
 import KdpCoverStudio from './KdpCoverStudio';
 import { EbookBackCoverGenerator } from './EbookBackCoverGenerator';
 import coverHero from '@/assets/cover-studio-hero.jpg';
+import IdeogramKeyCard from './IdeogramKeyCard';
 
 interface UnifiedCoverStudioProps {
   ebookTitle?: string;
@@ -129,7 +130,8 @@ export const UnifiedCoverStudio: React.FC<UnifiedCoverStudioProps> = ({
         </TabsList>
 
         <div className="mt-6">
-          <TabsContent value="ai" className="mt-0 animate-fade-in">
+          <TabsContent value="ai" className="mt-0 animate-fade-in space-y-4">
+            <IdeogramKeyCard />
             <EbookAICoverStudio
               ebookTitle={ebookTitle}
               authorName={authorName}

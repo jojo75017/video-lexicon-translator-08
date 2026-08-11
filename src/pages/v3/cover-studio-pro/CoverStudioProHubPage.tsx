@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BookOpen, Layers, Square, BookCopy, Sparkles, ArrowRight, ArrowLeft } from 'lucide-react';
+import IdeogramKeyCard from '@/components/ebook/IdeogramKeyCard';
 
 const FORMAT_ICONS: Record<CoverFormatId, typeof BookOpen> = {
   'ebook-kindle': BookOpen,
@@ -35,6 +36,10 @@ export default function CoverStudioProHubPage() {
           export PDF print-ready avec bleed 3 mm.
         </p>
       </header>
+
+      <IdeogramKeyCard />
+
+
 
       <section>
         <h2 className="text-lg font-semibold mb-4">Choisis un format</h2>
