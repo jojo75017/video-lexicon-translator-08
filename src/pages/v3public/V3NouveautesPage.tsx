@@ -26,7 +26,7 @@ const ACCESS_META: Record<Access, { label: string; color: string }> = {
   offert:   { label: '🎁 Offert',      color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
   debutant: { label: 'Débutant 9,99€', color: 'bg-slate-50 text-slate-700 border-slate-200' },
   studio:   { label: 'Studio 12,99€',  color: 'bg-amber-50 text-amber-800 border-amber-200' },
-  editeur:  { label: 'Éditeur 59€',    color: 'bg-yellow-100 text-yellow-900 border-yellow-300' },
+  editeur:  { label: 'Édition 27€',    color: 'bg-yellow-100 text-yellow-900 border-yellow-300' },
 };
 
 const TOOLS: { section: string; items: Tool[] }[] = [
@@ -63,7 +63,7 @@ const TOOLS: { section: string; items: Tool[] }[] = [
     ],
   },
   {
-    section: '🥇 Éditeur 59€/mois — Maison d\'édition complète',
+    section: '🥇 Édition 27€/mois — Maison d\'édition complète',
     items: [
       { title: 'Audiobook voix premium', desc: 'ElevenLabs qualité pro + export chapitré MP3.', to: '/v3/outils/audiobook?tier=premium', icon: Mic, access: 'editeur', status: 'live', badge: 'NEW' },
       { title: 'Book trailer vidéo', desc: '30-60s pour réseaux sociaux, IA générative.', to: '/v3/outils/book-trailer', icon: Video, access: 'editeur', status: 'live', badge: 'NEW' },
@@ -140,7 +140,7 @@ export default function V3NouveautesPage() {
         <div className="mt-12 p-6 rounded-2xl bg-gradient-to-br from-[#008296] to-emerald-700 text-white text-center">
           <Award className="h-8 w-8 mx-auto mb-3" />
           <h3 className="text-2xl font-bold mb-2">Vous n'avez pas encore le bon plan ?</h3>
-          <p className="mb-4 opacity-90">Débloquez tout avec le forfait Éditeur 59€/mois — livres illimités, 30 agents IA, tous les outils Pro.</p>
+          <p className="mb-4 opacity-90">Débloquez tout avec le forfait Édition 27€/mois — livres illimités, 30 agents IA, tous les outils Pro.</p>
           <Link to="/v3/forfaits" className="inline-block px-6 py-3 rounded-full bg-white text-[#008296] font-semibold hover:bg-yellow-100 transition">
             Voir les forfaits
           </Link>

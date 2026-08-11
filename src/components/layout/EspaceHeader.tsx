@@ -287,7 +287,7 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
             1ᵉʳ Octobre 2026
           </span>
           <p className="text-[13px] sm:text-[14px] font-medium text-white" style={{ fontFamily: "'Work Sans', system-ui, sans-serif" }}>
-            🚀 <strong className="text-[#D4AF37]">EbookStudio V3</strong> arrive — Auteur 9,99€ · Studio 12,99€ · Éditeur 59€.{' '}
+            🚀 <strong className="text-[#D4AF37]">EbookStudio V3</strong> arrive — Plume 17 €/mois · Édition 27 €/mois (2 mois offerts en annuel).{' '}
             <span className="underline decoration-[#D4AF37]/60 underline-offset-2 group-hover:decoration-[#D4AF37]">
               Découvrir l'offre Fondateur →
             </span>
