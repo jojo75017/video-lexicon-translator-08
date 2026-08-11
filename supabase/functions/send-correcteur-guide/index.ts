@@ -128,7 +128,7 @@ Deno.serve(async (req) => {
           status: "sent",
         });
       } else {
-        errors.push(`${email}: ${res?.error || "envoi refusé"}`);
+        errors.push(`${email}: ${res?.detail || "envoi refusé"}`);
       }
     }
 
