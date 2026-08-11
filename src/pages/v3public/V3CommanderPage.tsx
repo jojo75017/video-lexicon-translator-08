@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import {
   Check, Loader2, ShieldCheck, Zap, Infinity as InfinityIcon, CreditCard,
-  Lock, Mail, ArrowRight,
+  Lock, Mail, ArrowRight, RotateCcw, Star, Quote,
 } from "lucide-react";
+
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -40,6 +41,33 @@ const INCLUDED = [
   "V3 incluse sans surcoût : tous les nouveaux outils vous seront ajoutés automatiquement",
 ];
 
+interface Testimonial {
+  id: string;
+  author_name: string;
+  book_title: string | null;
+  comment: string;
+  rating: number | null;
+}
+
+/** Blocs de réassurance : les trois objections qui bloquent le paiement. */
+const REASSURANCE = [
+  {
+    icon: RotateCcw,
+    title: "Garantie 30 jours",
+    body: "Si l'outil ne vous convient pas, écrivez-moi dans les 30 jours : vous êtes remboursé, sans justification à fournir.",
+  },
+  {
+    icon: CreditCard,
+    title: "PayPal accepté",
+    body: "Sur la page de paiement, choisissez PayPal ou la carte bancaire. Le paiement en 2 ou 3 fois reste possible.",
+  },
+  {
+    icon: Lock,
+    title: "Aucun abonnement",
+    body: "Un seul paiement, accès conservé, rien à résilier. À partir du 1er octobre, l'accès à vie n'existera plus.",
+  },
+];
+
 export default function V3CommanderPage() {
   const [params] = useSearchParams();
   const src = params.get("src") || undefined;
@@ -49,8 +77,27 @@ export default function V3CommanderPage() {
   const [plan, setPlan] = useState<PlanId>("v2_1x");
   const [loading, setLoading] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
 
   const selected = useMemo(() => PLANS.find((p) => p.id === plan)!, [plan]);
+
+  // Avis réels et approuvés uniquement : aucun témoignage fabriqué.
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const { data } = await supabase
+        .from("book_testimonials")
+        .select("id,author_name,book_title,comment,rating")
+        .eq("approved", true)
+        .order("created_at", { ascending: false })
+        .limit(3);
+      if (active && data) setTestimonials(data as Testimonial[]);
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
+
 
   const startPayment = async () => {
     const e = email.trim().toLowerCase();
@@ -258,6 +305,45 @@ export default function V3CommanderPage() {
             )}
           </div>
         </div>
+
+        {/* Réassurance : garantie, PayPal, absence d'abonnement */}
+        <div className="mt-12 grid gap-4 md:grid-cols-3">
+          {REASSURANCE.map((r) => (
+            <div key={r.title} className="rounded-2xl border bg-white p-5" style={{ borderColor: `${EMERALD}18` }}>
+              <r.icon className="h-5 w-5" style={{ color: GOLD }} />
+              <h3 className="mt-3 text-sm font-black" style={{ color: EMERALD }}>{r.title}</h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-slate-600">{r.body}</p>
+            </div>
+          ))}
+        </div>
+
+        {testimonials.length > 0 && (
+          <div className="mt-10">
+            <h2 className="text-center text-lg font-black" style={{ color: EMERALD }}>
+              Ce qu'en disent les auteurs
+            </h2>
+            <div className="mt-5 grid gap-4 md:grid-cols-3">
+              {testimonials.map((t) => (
+                <figure key={t.id} className="rounded-2xl border bg-white p-5" style={{ borderColor: `${GOLD}44` }}>
+                  <Quote className="h-4 w-4" style={{ color: GOLD }} />
+                  <blockquote className="mt-2 text-sm leading-relaxed text-slate-700">{t.comment}</blockquote>
+                  <figcaption className="mt-3 text-xs font-bold" style={{ color: EMERALD }}>
+                    {t.author_name}
+                    {t.book_title && <span className="font-normal text-slate-500"> — {t.book_title}</span>}
+                  </figcaption>
+                  {t.rating ? (
+                    <div className="mt-1.5 flex gap-0.5" aria-label={`${t.rating} sur 5`}>
+                      {Array.from({ length: t.rating }).map((_, i) => (
+                        <Star key={i} className="h-3 w-3" style={{ color: GOLD, fill: GOLD }} />
+                      ))}
+                    </div>
+                  ) : null}
+                </figure>
+              ))}
+            </div>
+          </div>
+        )}
+
       </section>
     </main>
   );

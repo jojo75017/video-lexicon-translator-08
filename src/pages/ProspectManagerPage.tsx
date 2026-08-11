@@ -4,6 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CampaignSequencePanel from '@/components/admin/CampaignSequencePanel';
+import ClosingCampaignPanel from '@/components/admin/ClosingCampaignPanel';
+import ChannelPerformancePanel from '@/components/admin/ChannelPerformancePanel';
+
 
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
@@ -534,8 +537,10 @@ const ProspectManagerPage = () => {
           </TabsContent>
 
           <TabsContent value="perf" className="space-y-4">
+            <ChannelPerformancePanel />
             <CampaignPerformanceDashboard />
           </TabsContent>
+
 
           <TabsContent value="tracking" className="space-y-4">
             <CommunicationJourneyTracker onSelectTab={setActiveManagerTab} />
@@ -616,6 +621,9 @@ const ProspectManagerPage = () => {
             </div>
 
             <CampaignSequencePanel />
+
+            <ClosingCampaignPanel />
+
 
             <p className="text-xs text-muted-foreground">
               Format Excel : colonnes <code>email</code> et <code>prenom</code> (ou <code>first_name</code>, <code>nom</code>)
