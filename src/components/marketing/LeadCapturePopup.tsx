@@ -29,9 +29,10 @@ const BULLETS_EXPAT = [
 ];
 
 /**
- * Pop-up de capture email global (lead magnet "5 niches rentables 2026").
- * Déclenché sur intention de sortie, après 18s, OU au scroll à 50% de la page,
- * une seule fois par session. N'apparaît que sur les pages publiques marketing.
+ * Pop-up de capture email global.
+ * Déclenché uniquement sur intention de sortie OU après 40 % de défilement :
+ * plus d'apparition automatique au chargement, qui faisait fuir les visiteurs.
+ * Une seule fois par session, sur les pages publiques marketing uniquement.
  */
 const LeadCapturePopup: React.FC = () => {
   const location = useLocation();
@@ -45,6 +46,7 @@ const LeadCapturePopup: React.FC = () => {
   const isExpat = isExpatPath(location.pathname);
   const { variant, copy } = getAbCopy(isExpat);
   const bullets = isExpat ? BULLETS_EXPAT : BULLETS_GENERAL;
+  const leadMagnet = isExpat ? 'publier-kdp-etranger' : '5-niches-rentables-2026';
 
   useEffect(() => {
     if (isExcluded) return;
@@ -57,10 +59,7 @@ const LeadCapturePopup: React.FC = () => {
       armed.current = false;
       sessionStorage.setItem(SESSION_KEY, '1');
       setOpen(true);
-      trackCaptureEvent('popup', 'view', {
-        abVariant: variant,
-        leadMagnet: isExpat ? 'publier-kdp-etranger' : '5-niches-rentables-2026',
-      });
+      trackCaptureEvent('popup', 'view', { abVariant: variant, leadMagnet });
     };
 
     const onMouseLeave = (e: MouseEvent) => {
@@ -69,13 +68,11 @@ const LeadCapturePopup: React.FC = () => {
     const onScroll = () => {
       const scrolled = window.scrollY + window.innerHeight;
       const total = document.documentElement.scrollHeight;
-      if (total > 0 && scrolled / total >= 0.5) trigger();
+      if (total > 0 && scrolled / total >= 0.4) trigger();
     };
-    const timer = window.setTimeout(trigger, 18000);
     document.addEventListener('mouseleave', onMouseLeave);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => {
-      window.clearTimeout(timer);
       document.removeEventListener('mouseleave', onMouseLeave);
       window.removeEventListener('scroll', onScroll);
     };
