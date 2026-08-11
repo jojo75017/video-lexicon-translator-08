@@ -100,40 +100,69 @@ serve(async (req) => {
     });
 
     if (createError) {
-      // Maybe user exists with different password (edge case: code was changed)
-      // Try updating the password
-      if (createError.message?.includes('already been registered') || createError.message?.includes('already exists')) {
-        // Find user by email using targeted lookup instead of listing all users
-        const { data: existingUserData } = await adminClient.auth.admin.listUsers({ 
-          filter: `email.eq.${normalizedEmail}`,
-          page: 1,
-          perPage: 1
-        });
-        const existingUser = existingUserData?.users?.[0];
-        
-        if (existingUser) {
-          await adminClient.auth.admin.updateUserById(existingUser.id, { password });
-          
-          // Now sign in
-          const { data: retryData, error: retryError } = await userClient.auth.signInWithPassword({
-            email: normalizedEmail,
-            password,
+      // L'utilisateur existe déjà (abonnés V2 créés avant, ou code d'accès modifié).
+      // On retrouve son id puis on réaligne son mot de passe déterministe.
+      console.log('Auth user already exists, realigning password:', normalizedEmail);
+
+      let existingUserId: string | null =
+        typeof subscriber.user_id === 'string' ? subscriber.user_id : null;
+
+      if (!existingUserId) {
+        // GoTrue admin API : recherche paginée (le paramètre `filter` de
+        // listUsers n'est pas fiable et renvoyait un tableau vide).
+        for (let page = 1; page <= 25 && !existingUserId; page++) {
+          const { data: pageData, error: listError } = await adminClient.auth.admin.listUsers({
+            page,
+            perPage: 200,
           });
-
-          if (retryData?.session) {
-            return new Response(
-              JSON.stringify({
-                success: true,
-                access_token: retryData.session.access_token,
-                refresh_token: retryData.session.refresh_token,
-              }),
-              { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-            );
+          if (listError) {
+            console.error('listUsers failed:', listError);
+            break;
           }
-
-          console.error('Retry sign-in failed:', retryError);
+          const users = pageData?.users ?? [];
+          const match = users.find(
+            (u) => (u.email || '').trim().toLowerCase() === normalizedEmail
+          );
+          if (match) existingUserId = match.id;
+          if (users.length < 200) break;
         }
       }
+
+      if (existingUserId) {
+        const { error: updateError } = await adminClient.auth.admin.updateUserById(existingUserId, {
+          password,
+          email_confirm: true,
+        });
+        if (updateError) console.error('Password realign failed:', updateError);
+
+        const { data: retryData, error: retryError } = await userClient.auth.signInWithPassword({
+          email: normalizedEmail,
+          password,
+        });
+
+        if (retryData?.session) {
+          // On mémorise le lien abonné ↔ utilisateur pour les prochaines connexions
+          if (!subscriber.user_id) {
+            await adminClient
+              .from('subscribers')
+              .update({ user_id: existingUserId })
+              .eq('id', subscriber.id);
+          }
+          return new Response(
+            JSON.stringify({
+              success: true,
+              access_token: retryData.session.access_token,
+              refresh_token: retryData.session.refresh_token,
+            }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        console.error('Retry sign-in failed:', retryError);
+      } else {
+        console.error('No auth user found for subscriber:', normalizedEmail);
+      }
+
 
       console.error('Create user error:', createError);
       return new Response(
