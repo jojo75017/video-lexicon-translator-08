@@ -4,6 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CampaignSequencePanel from '@/components/admin/CampaignSequencePanel';
+import ClosingCampaignPanel from '@/components/admin/ClosingCampaignPanel';
+import ChannelPerformancePanel from '@/components/admin/ChannelPerformancePanel';
+
 
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
