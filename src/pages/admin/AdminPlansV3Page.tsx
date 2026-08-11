@@ -204,7 +204,7 @@ export default function AdminPlansV3Page() {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              4 prix synchronisés (sandbox → live automatique au publish) : 29 €/mois, 290 €/an, 49 €/mois, 490 €/an. Résiliable à tout moment.
+              4 prix synchronisés (sandbox → live automatique au publish) : 17 €/mois, 170 €/an, 27 €/mois, 270 €/an. Résiliable à tout moment.
             </p>
             <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-3">
               {V3_PLANS.flatMap((plan) => [
