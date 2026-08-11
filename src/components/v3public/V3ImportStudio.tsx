@@ -8,6 +8,7 @@ import { importFromUrl } from '@/lib/import/importFromUrl';
 import { importFromMediaFile } from '@/lib/import/importFromMedia';
 import { buildManuscriptFromText } from '@/lib/import/buildManuscriptFromText';
 import type { Manuscript } from '@/lib/bookperfect/types';
+import { savePendingManuscript } from '@/lib/import/pendingManuscript';
 import heroImage from '@/assets/v3/import-hero.jpg';
 
 type Source = 'doc' | 'pdf' | 'url' | 'media' | 'paste';
@@ -48,6 +49,7 @@ export default function V3ImportStudio() {
   const navigate = useNavigate();
   const [active, setActive] = useState<Source>('doc');
   const [loading, setLoading] = useState(false);
+  const [imported, setImported] = useState<Manuscript | null>(null);
   const [urlValue, setUrlValue] = useState('');
   const [pasteValue, setPasteValue] = useState('');
   const [pasteTitle, setPasteTitle] = useState('');
@@ -63,7 +65,8 @@ export default function V3ImportStudio() {
         : kind === 'media'
           ? await importFromMediaFile(file)
           : await importManuscript(file);
-      persistAndGo(m, navigate);
+      persistManuscript(m);
+      setImported(m);
     } catch (e: any) {
       toast.error(e?.message || "Import impossible.");
     } finally {
@@ -76,7 +79,8 @@ export default function V3ImportStudio() {
     setLoading(true);
     try {
       const m = await importFromUrl(urlValue.trim());
-      persistAndGo(m, navigate);
+      persistManuscript(m);
+      setImported(m);
     } catch (e: any) {
       toast.error(e?.message || "Impossible d'importer cet article.");
     } finally { setLoading(false); }
@@ -90,7 +94,8 @@ export default function V3ImportStudio() {
     setLoading(true);
     try {
       const m = await buildManuscriptFromText(pasteValue, (pasteTitle || 'texte-colle') + '.md', pasteTitle || undefined);
-      persistAndGo(m, navigate);
+      persistManuscript(m);
+      setImported(m);
     } catch (e: any) {
       toast.error(e?.message || 'Import impossible.');
     } finally { setLoading(false); }
