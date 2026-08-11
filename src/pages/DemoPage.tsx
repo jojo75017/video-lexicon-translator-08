@@ -177,20 +177,20 @@ const DemoPage = () => {
       <header className="sticky top-0 z-50 bg-joy-cream/85 backdrop-blur-xl border-b-2 border-joy-ink/10">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/offres')} className="text-joy-ink/70 hover:text-joy-ink hover:bg-joy-peach/30 rounded-2xl gap-2">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/commander')} className="text-joy-ink/70 hover:text-joy-ink hover:bg-joy-peach/30 rounded-2xl gap-2">
               <ArrowLeft className="w-4 h-4" />
               <span className="hidden sm:inline">Retour</span>
             </Button>
-            <Link to="/offres" className="flex items-center gap-3">
+            <Link to="/commander" className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-2xl bg-joy-peach flex items-center justify-center shadow-joy animate-joy-wiggle">
                 <BookOpen className="w-5 h-5 text-joy-ink" />
               </div>
               <span className="font-black text-lg text-joy-ink">Ebookstudio Pro V2</span>
             </Link>
           </div>
-          <Button onClick={() => navigate('/offres')} className="bg-joy-ink hover:bg-joy-ink/90 text-joy-cream font-black rounded-full px-5 shadow-joy">
+          <Button onClick={() => navigate('/commander')} className="bg-joy-ink hover:bg-joy-ink/90 text-joy-cream font-black rounded-full px-5 shadow-joy">
             <Sparkles className="w-4 h-4 mr-2" />
-            67€ à vie
+            47€ à vie
           </Button>
         </div>
       </header>
@@ -301,8 +301,8 @@ const DemoPage = () => {
                 {demoUsed && (
                   <div className="text-center pt-4 border-t-2 border-joy-ink/10 space-y-3">
                     <p className="text-joy-ink text-sm font-bold">🚀 Tu as vu ce que l'IA peut faire !</p>
-                    <Button className="w-full bg-joy-sun hover:bg-joy-sun/90 text-joy-ink font-black rounded-2xl py-6 shadow-joy" onClick={() => navigate("/offres")}>
-                      <Crown className="w-5 h-5 mr-2" /> Tout débloquer pour 67€
+                    <Button className="w-full bg-joy-sun hover:bg-joy-sun/90 text-joy-ink font-black rounded-2xl py-6 shadow-joy" onClick={() => navigate("/commander")}>
+                      <Crown className="w-5 h-5 mr-2" /> Tout débloquer pour 47€
                     </Button>
                   </div>
                 )}
@@ -432,14 +432,14 @@ const DemoPage = () => {
                       </div>
                       <div className="flex-1">
                         <h3 className="font-black text-xl text-joy-ink mb-1">Tu veux la version complète ?</h3>
-                        <p className="text-joy-ink/70 text-sm mb-4">67€ à vie - pas d'abonnement, pas de limites.</p>
+                        <p className="text-joy-ink/70 text-sm mb-4">47€ à vie - pas d'abonnement, pas de limites.</p>
                         <div className="grid sm:grid-cols-2 gap-2 mb-4 text-sm text-joy-ink">
                           {["✍️ Rédaction complète des chapitres", "🎨 Couvertures IA", "📄 Export PDF / EPUB / Word", "🎧 Audiobooks voix neurale", "🎓 Formation 18 modules", "♾️ Générations illimitées"].map((f, i) => (
                             <div key={i}>{f}</div>
                           ))}
                         </div>
-                        <Button className="bg-joy-peach hover:bg-joy-peach/90 text-joy-ink font-black rounded-2xl shadow-joy" size="lg" onClick={() => navigate('/offres')}>
-                          <Rocket className="w-5 h-5 mr-2" /> Tout débloquer pour 67€ <ArrowRight className="w-5 h-5 ml-2" />
+                        <Button className="bg-joy-peach hover:bg-joy-peach/90 text-joy-ink font-black rounded-2xl shadow-joy" size="lg" onClick={() => navigate('/commander')}>
+                          <Rocket className="w-5 h-5 mr-2" /> Tout débloquer pour 47€ <ArrowRight className="w-5 h-5 ml-2" />
                         </Button>
                       </div>
                     </div>
@@ -501,8 +501,8 @@ const DemoPage = () => {
           <p className="text-joy-ink/70 max-w-lg mx-auto mb-6">
             Rejoins +2 400 créateurs qui utilisent Ebookstudio Pro V2 pour publier sur Amazon KDP.
           </p>
-          <Button size="lg" className="bg-joy-peach hover:bg-joy-peach/90 text-joy-ink font-black rounded-2xl px-10 py-7 text-lg shadow-joy-lg hover:scale-105 transition-transform" onClick={() => navigate('/offres')}>
-            <Crown className="w-5 h-5 mr-2" /> Tout débloquer pour 67€
+          <Button size="lg" className="bg-joy-peach hover:bg-joy-peach/90 text-joy-ink font-black rounded-2xl px-10 py-7 text-lg shadow-joy-lg hover:scale-105 transition-transform" onClick={() => navigate('/commander')}>
+            <Crown className="w-5 h-5 mr-2" /> Tout débloquer pour 47€
           </Button>
           <p className="text-xs text-joy-ink/50 mt-3">Paiement unique • Accès à vie • Garantie 30 jours</p>
         </motion.div>
