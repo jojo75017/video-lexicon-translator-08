@@ -97,15 +97,25 @@ export function SubscriberGate({
       const email = (subscriberEmail || "").trim().toLowerCase();
       const code = (accessCode || "").trim().toUpperCase();
 
-      if (!email || !email.includes("@") || !code) {
+      if (!email || !email.includes("@")) {
+        await denyAccess();
+        return;
+      }
+
+      // Le code d'accès peut manquer dans le cache local (données anciennes).
+      // Dans ce cas, une session Supabase active suffit : le serveur revérifie
+      // l'abonnement à partir du jeton et renvoie le code à jour.
+      const { data: { session: existingSession } } = await supabase.auth.getSession();
+      if (!code && !existingSession) {
         await denyAccess();
         return;
       }
 
       try {
         const validationPromise = supabase.functions.invoke("validate-subscription", {
-          body: { email, access_code: code },
+          body: code ? { email, access_code: code } : { email },
         });
+
         const timeoutPromise = new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error("Subscription validation timed out")), 10000)
         );
@@ -132,8 +142,9 @@ export function SubscriberGate({
         if (!session) {
           try {
             const { data: authData, error: authInvokeError } = await supabase.functions.invoke("subscriber-auth", {
-              body: { email, access_code: code },
+              body: { email, access_code: code || data.subscriber?.access_code },
             });
+
             if (authInvokeError || !authData?.access_token || !authData?.refresh_token) {
               console.error("SubscriberGate: subscriber-auth failed", authInvokeError);
               await denyAccess();

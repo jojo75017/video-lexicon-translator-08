@@ -19,18 +19,33 @@ serve(async (req) => {
     const normalizedCode = access_code?.trim().toUpperCase();
     
     console.log('Validating subscription for:', normalizedEmail);
-    console.log('Access code provided:', normalizedCode);
-
-    if (!normalizedCode) {
-      return new Response(
-        JSON.stringify({ valid: false, message: 'Code d\'accès requis' }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    console.log('Access code provided:', normalizedCode ? 'yes' : 'no');
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Sans code d'accès (cache local incomplet), on accepte une session
+    // authentifiée dont l'email correspond : le code est alors renvoyé au client.
+    let sessionVerified = false;
+    if (!normalizedCode) {
+      const authHeader = req.headers.get('Authorization') ?? '';
+      const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+      if (token) {
+        const { data: userData } = await supabase.auth.getUser(token);
+        const tokenEmail = userData?.user?.email?.trim().toLowerCase();
+        if (tokenEmail && normalizedEmail && tokenEmail === normalizedEmail) {
+          sessionVerified = true;
+        }
+      }
+      if (!sessionVerified) {
+        return new Response(
+          JSON.stringify({ valid: false, message: 'Code d\'accès requis' }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
 
     // First, find subscriber by email only
     const { data: subscriber, error } = await supabase
@@ -47,17 +62,18 @@ serve(async (req) => {
       );
     }
 
-    console.log('Found subscriber, stored code:', subscriber.access_code);
-    
-    // Compare access codes (case-insensitive)
+    console.log('Found subscriber for', normalizedEmail);
+
+    // Compare access codes (case-insensitive) — sauf si la session a déjà été vérifiée
     const storedCode = subscriber.access_code?.trim().toUpperCase();
-    if (storedCode !== normalizedCode) {
-      console.log('Code mismatch. Expected:', storedCode, 'Got:', normalizedCode);
+    if (!sessionVerified && storedCode !== normalizedCode) {
+      console.log('Code mismatch for', normalizedEmail);
       return new Response(
         JSON.stringify({ valid: false, message: 'Code d\'accès incorrect' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
 
     // Vérifier si essai expiré
     if (subscriber.status === 'trialing' && subscriber.trial_ends_at && new Date(subscriber.trial_ends_at) < new Date()) {
