@@ -8,6 +8,7 @@ import V3ExportPanel from '@/components/admin/V3ExportPanel';
 import V3KdpPublishPanel from '@/components/v3public/V3KdpPublishPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { normalizeManuscript } from '@/utils/manuscriptNormalizer';
+import { proofreadChapters, type ChapterProofread } from '@/lib/correcteur/proofreadBook';
 
 import { invokeImageFunction } from '@/lib/aiImageInvoke';
 import { callAIWriting, getProvider, getProviderKey, validateKeyFormat } from '@/services/aiWritingService';
@@ -210,6 +211,17 @@ export default function V3CreateWizard() {
   const [step, setStep] = useState(0);
   const [launched, setLaunched] = useState(false);
   const [completedBook, setCompletedBook] = useState<any>(null);
+  // Relecture automatique du manuscrit (V3) : dès que le livre est terminé,
+  // chaque chapitre est corrigé puis remplacé par sa version relue.
+  const [autoFix, setAutoFix] = useState<{
+    running: boolean;
+    done: number;
+    total: number;
+    corrections: number;
+    failed: number;
+    finished: boolean;
+  }>({ running: false, done: 0, total: 0, corrections: 0, failed: 0, finished: false });
+  const autoFixStartedRef = useRef(false);
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [coverLoading, setCoverLoading] = useState(false);
   const [savingCloud, setSavingCloud] = useState(false);
@@ -935,6 +947,80 @@ Règles :
     toast.success('Livre terminé et sauvegardé dans Mes livres.');
   };
 
+  // Correction automatique du livre terminé (V3) : aucune action de l'abonné.
+  useEffect(() => {
+    if (!completedBook || autoFixStartedRef.current) return;
+    const source = Array.isArray(completedBook.chapters) ? completedBook.chapters : [];
+    const items = source
+      .map((c: any, index: number) => ({
+        index,
+        title: String(c.title || c.titre || `Chapitre ${index + 1}`),
+        original: String(c.content || c.contenu || ''),
+      }))
+      .filter((c) => c.original.trim().length > 200);
+    if (items.length === 0) return;
+
+    autoFixStartedRef.current = true;
+    let cancelled = false;
+    setAutoFix({ running: true, done: 0, total: items.length, corrections: 0, failed: 0, finished: false });
+
+    (async () => {
+      const list: ChapterProofread[] = items.map((c) => ({
+        chapterId: `auto-${c.index}`,
+        index: c.index,
+        title: c.title,
+        original: c.original,
+        corrected: '',
+        corrections: [],
+        quality: 0,
+        status: 'pending',
+        accepted: false,
+      }));
+
+      await proofreadChapters(
+        list,
+        'strict',
+        (p) => {
+          if (cancelled) return;
+          const ch = p.chapter;
+          if (ch.status === 'done' && ch.corrected) {
+            setCompletedBook((prev: any) => {
+              if (!prev) return prev;
+              const next = [...(prev.chapters || [])];
+              const target = next[ch.index];
+              if (!target) return prev;
+              next[ch.index] = { ...target, content: ch.corrected, contenu: ch.corrected, corrected: true };
+              return { ...prev, chapters: next };
+            });
+            setAutoFix((s) => ({
+              ...s,
+              done: s.done + 1,
+              corrections: s.corrections + (ch.corrections?.length || 0),
+            }));
+          } else if (ch.status === 'failed') {
+            setAutoFix((s) => ({ ...s, done: s.done + 1, failed: s.failed + 1 }));
+          }
+        },
+        () => cancelled,
+      );
+
+      if (cancelled) return;
+      setAutoFix((s) => ({ ...s, running: false, finished: true }));
+      toast.success('Relecture automatique terminée : le manuscrit corrigé est prêt à exporter.');
+      setCompletedBook((prev: any) => {
+        if (prev) void saveProjectToCloud({ silent: true, completedBookOverride: prev });
+        return prev;
+      });
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [completedBook]);
+
+
+
   // Auto-save cloud pendant que les agents avancent : lit `ebook_workflow_results`
   // et reconstruit un `completedBook` partiel pour ne jamais perdre les chapitres.
   const buildBookFromWorkflowResults = () => {
@@ -1098,8 +1184,32 @@ Règles :
         </div>
 
 
+        {completedBook && (autoFix.running || autoFix.finished) && (
+          <div className="rounded-[28px] border p-5" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
+            <div className="flex items-center gap-3">
+              {autoFix.running ? <Loader2 className="h-5 w-5 animate-spin" style={{ color: 'var(--v3-orange-600)' }} /> : <Check className="h-5 w-5" style={{ color: 'var(--v3-orange-600)' }} />}
+              <div>
+                <h3 className="v3-serif text-xl font-bold" style={{ color: 'var(--v3-ink)' }}>
+                  {autoFix.running ? 'Relecture automatique en cours' : 'Relecture automatique terminée'}
+                </h3>
+                <p className="mt-1 text-sm" style={{ color: 'var(--v3-muted)' }}>
+                  {autoFix.done}/{autoFix.total} chapitres relus · {autoFix.corrections} corrections appliquées
+                  {autoFix.failed > 0 ? ` · ${autoFix.failed} chapitre(s) à revoir dans le Correcteur` : ''}
+                </p>
+              </div>
+            </div>
+            <div className="mt-3 h-2 w-full overflow-hidden rounded-full" style={{ background: 'var(--v3-orange-50)' }}>
+              <div
+                className="h-full rounded-full transition-all"
+                style={{ width: `${autoFix.total ? Math.round((autoFix.done / autoFix.total) * 100) : 0}%`, background: 'var(--v3-orange-600)' }}
+              />
+            </div>
+          </div>
+        )}
+
         {completedBook ? (
           <div id="exports-livre" className="scroll-mt-24">
+
             <V3ExportPanel
               manuscript={(completedBook.chapters || []).map((c: any, index: number) => {
                 const validatedOutlineTitle = normalizedOutline[index]?.titre?.trim();
