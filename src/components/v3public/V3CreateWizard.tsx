@@ -946,6 +946,80 @@ Règles :
     toast.success('Livre terminé et sauvegardé dans Mes livres.');
   };
 
+  // Correction automatique du livre terminé (V3) : aucune action de l'abonné.
+  useEffect(() => {
+    if (!completedBook || autoFixStartedRef.current) return;
+    const source = Array.isArray(completedBook.chapters) ? completedBook.chapters : [];
+    const items = source
+      .map((c: any, index: number) => ({
+        index,
+        title: String(c.title || c.titre || `Chapitre ${index + 1}`),
+        original: String(c.content || c.contenu || ''),
+      }))
+      .filter((c) => c.original.trim().length > 200);
+    if (items.length === 0) return;
+
+    autoFixStartedRef.current = true;
+    let cancelled = false;
+    setAutoFix({ running: true, done: 0, total: items.length, corrections: 0, failed: 0, finished: false });
+
+    (async () => {
+      const list: ChapterProofread[] = items.map((c) => ({
+        chapterId: `auto-${c.index}`,
+        index: c.index,
+        title: c.title,
+        original: c.original,
+        corrected: '',
+        corrections: [],
+        quality: 0,
+        status: 'pending',
+        accepted: false,
+      }));
+
+      await proofreadChapters(
+        list,
+        'strict',
+        (p) => {
+          if (cancelled) return;
+          const ch = p.chapter;
+          if (ch.status === 'done' && ch.corrected) {
+            setCompletedBook((prev: any) => {
+              if (!prev) return prev;
+              const next = [...(prev.chapters || [])];
+              const target = next[ch.index];
+              if (!target) return prev;
+              next[ch.index] = { ...target, content: ch.corrected, contenu: ch.corrected, corrected: true };
+              return { ...prev, chapters: next };
+            });
+            setAutoFix((s) => ({
+              ...s,
+              done: s.done + 1,
+              corrections: s.corrections + (ch.corrections?.length || 0),
+            }));
+          } else if (ch.status === 'failed') {
+            setAutoFix((s) => ({ ...s, done: s.done + 1, failed: s.failed + 1 }));
+          }
+        },
+        () => cancelled,
+      );
+
+      if (cancelled) return;
+      setAutoFix((s) => ({ ...s, running: false, finished: true }));
+      toast.success('Relecture automatique terminée : le manuscrit corrigé est prêt à exporter.');
+      setCompletedBook((prev: any) => {
+        if (prev) void saveProjectToCloud({ silent: true, completedBookOverride: prev });
+        return prev;
+      });
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [completedBook]);
+
+
+
   // Auto-save cloud pendant que les agents avancent : lit `ebook_workflow_results`
   // et reconstruit un `completedBook` partiel pour ne jamais perdre les chapitres.
   const buildBookFromWorkflowResults = () => {
