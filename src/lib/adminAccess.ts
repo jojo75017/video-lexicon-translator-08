@@ -4,7 +4,11 @@ import { supabase } from '@/integrations/supabase/client';
 let cachedResult: { isAdmin: boolean; timestamp: number } | null = null;
 const CACHE_DURATION_MS = 60_000; // 60 seconds
 const LS_KEY = 'admin_status_cache_v1';
-const LS_TTL_MS = 5 * 60_000; // 5 minutes localStorage fallback
+// Un admin confirmé reste admin longtemps : on ne le déconnecte plus pour un
+// simple cache expiré ou une panne réseau. Un "non" reste éphémère.
+const LS_TTL_MS = 30 * 24 * 60 * 60_000; // 30 jours
+const LS_TTL_NEGATIVE_MS = 60_000; // 1 minute pour un "non"
+
 
 export function clearAdminCache() {
   cachedResult = null;
@@ -16,11 +20,13 @@ export function readLocalCache(): boolean | null {
     const raw = localStorage.getItem(LS_KEY);
     if (!raw) return null;
     const { isAdmin, ts } = JSON.parse(raw);
-    if (Date.now() - ts > LS_TTL_MS) return null;
+    const ttl = isAdmin ? LS_TTL_MS : LS_TTL_NEGATIVE_MS;
+    if (Date.now() - ts > ttl) return null;
     return !!isAdmin;
   } catch {
     return null;
   }
+
 }
 
 function writeLocalCache(isAdmin: boolean) {

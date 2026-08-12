@@ -10,7 +10,7 @@ import { AdminGate } from '@/components/auth/AdminGate';
 import { V3Gate } from '@/components/auth/V3Gate';
 import { V3LockedGate } from '@/components/v3/V3LockedGate';
 import { BookPerfectGate } from '@/components/auth/BookPerfectGate';
-import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
+import { getIsCurrentSessionAdmin, readLocalCache } from '@/lib/adminAccess';
 import { Loader2 } from 'lucide-react';
 import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup';
 import { FirstEbookOnboarding } from '@/components/onboarding/FirstEbookOnboarding';
@@ -194,7 +194,10 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [subscriberEmail, setSubscriberEmail] = useState('');
   const [subscriberData, setSubscriberData] = useState<any>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  // Admin reconnu immédiatement depuis le cache local : aucun écran de
+  // vérification, aucune redirection parasite avant la réponse réseau.
+  const [isAdmin, setIsAdmin] = useState<boolean>(() => readLocalCache() === true);
+
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
@@ -233,13 +236,16 @@ const App = () => {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           const adminStatus = await getIsCurrentSessionAdmin();
-          setIsAdmin(adminStatus);
-        } else {
+          // On ne retire jamais le statut admin déjà confirmé en cache :
+          // une réponse réseau ratée ne doit pas éjecter l'admin.
+          if (adminStatus || readLocalCache() !== true) setIsAdmin(adminStatus);
+        } else if (readLocalCache() !== true) {
           setIsAdmin(false);
         }
       } catch (error) {
         console.error('Erreur session admin:', error);
       }
+
     };
 
     initAuth();
@@ -250,11 +256,12 @@ const App = () => {
       if (shouldRecheckAdmin && session?.user) {
         setTimeout(async () => {
           const adminStatus = await getIsCurrentSessionAdmin();
-          setIsAdmin(adminStatus);
+          if (adminStatus || readLocalCache() !== true) setIsAdmin(adminStatus);
         }, 0);
         return;
       }
-      if (!session || event === 'SIGNED_OUT') setIsAdmin(false);
+      if (event === 'SIGNED_OUT') setIsAdmin(false);
+
     });
 
     return () => {
