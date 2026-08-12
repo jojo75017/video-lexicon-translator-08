@@ -76,9 +76,17 @@ export default function V3CorrecteurPage() {
   const acceptedCount = chapters.filter((c) => c.accepted).length;
   const totalCorrections = chapters.reduce((s, c) => s + c.corrections.length, 0);
   const breakdown = useMemo(() => correctionBreakdown(chapters), [chapters]);
+  const latinRemoved = chapters.reduce((s, c) => s + (c.latinRemoved || 0), 0);
+  const latinRemaining = useMemo(
+    () => chapters
+      .filter((c) => (c.latinRemaining?.length || 0) > 0)
+      .map((c) => ({ label: c.title || `Chapitre ${c.index + 1}`, items: c.latinRemaining as string[] })),
+    [chapters],
+  );
   const avgQuality = doneCount
     ? Math.round(chapters.filter((c) => c.status === 'done').reduce((s, c) => s + (c.quality || 0), 0) / doneCount)
     : 0;
+
 
   const loadManuscript = useCallback((m: Manuscript) => {
     setManuscript(m);
