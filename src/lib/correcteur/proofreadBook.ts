@@ -5,8 +5,10 @@
  */
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getActiveAIKey, getOpenRouterModel } from '@/services/aiWritingService';
+import { detectLatin, latinExpressions as findLatinExpressions } from '@/utils/latinSweep';
 
 export type ProofreadMode = 'strict' | 'polish';
+
 
 export interface Correction {
   type: string;
