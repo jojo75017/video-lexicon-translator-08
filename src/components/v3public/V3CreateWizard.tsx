@@ -218,9 +218,12 @@ export default function V3CreateWizard() {
     done: number;
     total: number;
     corrections: number;
+    /** Expressions latines / pseudo-latines supprimées automatiquement. */
+    latin: number;
     failed: number;
     finished: boolean;
-  }>({ running: false, done: 0, total: 0, corrections: 0, failed: 0, finished: false });
+  }>({ running: false, done: 0, total: 0, corrections: 0, latin: 0, failed: 0, finished: false });
+
   const autoFixStartedRef = useRef(false);
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [coverLoading, setCoverLoading] = useState(false);
@@ -962,7 +965,7 @@ Règles :
 
     autoFixStartedRef.current = true;
     let cancelled = false;
-    setAutoFix({ running: true, done: 0, total: items.length, corrections: 0, failed: 0, finished: false });
+    setAutoFix({ running: true, done: 0, total: items.length, corrections: 0, latin: 0, failed: 0, finished: false });
 
     (async () => {
       const list: ChapterProofread[] = items.map((c) => ({
@@ -996,7 +999,9 @@ Règles :
               ...s,
               done: s.done + 1,
               corrections: s.corrections + (ch.corrections?.length || 0),
+              latin: (s.latin || 0) + (ch.latinRemoved || 0),
             }));
+
           } else if (ch.status === 'failed') {
             setAutoFix((s) => ({ ...s, done: s.done + 1, failed: s.failed + 1 }));
           }
@@ -1194,7 +1199,9 @@ Règles :
                 </h3>
                 <p className="mt-1 text-sm" style={{ color: 'var(--v3-muted)' }}>
                   {autoFix.done}/{autoFix.total} chapitres relus · {autoFix.corrections} corrections appliquées
+                  {autoFix.latin > 0 ? ` · ${autoFix.latin} expression(s) latine(s) supprimée(s)` : ''}
                   {autoFix.failed > 0 ? ` · ${autoFix.failed} chapitre(s) à revoir dans le Correcteur` : ''}
+
                 </p>
               </div>
             </div>

@@ -12,8 +12,11 @@ serve(async (req) => {
   }
 
   try {
-    const { chapterTitle, chapterContent, mode, userProvider, userApiKey, userModel } = await req.json();
+    const { chapterTitle, chapterContent, mode, userProvider, userApiKey, userModel, latinExpressions } =
+      await req.json();
     const polish = mode === 'polish';
+    const latinFix = mode === 'latin-fix';
+
 
     if (!chapterContent || chapterContent.length < 20) {
       return new Response(
@@ -62,9 +65,29 @@ TU DOIS :
 La voix de l'auteur doit rester reconnaissable : polissage, pas réécriture.
 Le nombre de mots doit rester dans une marge de ±10 % du texte original.`;
 
-    const systemPrompt = `Tu es un correcteur éditorial professionnel francophone. Tu appliques une correction ${polish ? 'STRICTE PUIS un polissage de style mesuré' : 'STRICTE sans aucune réécriture'}.
+    const flagged: string[] = Array.isArray(latinExpressions)
+      ? latinExpressions.map((e: unknown) => String(e)).filter(Boolean).slice(0, 40)
+      : [];
 
-${polish ? polishRules : strictRules}
+    const latinRules = `MISSION UNIQUE : éliminer tout latin, faux latin, langue morte, pseudo-langue, mot inventé et mot étranger décoratif de ce texte français.
+
+TU DOIS :
+1. Remplacer chaque expression concernée par du français clair, en conservant le sens, le rythme et l'effet voulu (ex. « Pactum intra cruorem, matrimonium intra cineres » → « Un pacte scellé dans le sang, un mariage scellé dans les cendres »).
+2. Traiter en priorité ces expressions repérées dans le texte :
+${flagged.length ? flagged.map((e) => `   - « ${e} »`).join('\n') : '   (aucune liste fournie : repère-les toi-même)'}
+3. Parcourir aussi le reste du texte pour supprimer toute autre expression du même type.
+
+TU NE DOIS RIEN CHANGER D'AUTRE : pas une virgule, pas un mot, pas un paragraphe en dehors de ces remplacements.
+Exceptions à conserver : noms propres réels, titres d'œuvres réelles, locutions latines réellement courantes en français (a priori, de facto, etc.).
+Type de correction à renvoyer pour chacun : "anglicisme".`;
+
+    const systemPrompt = `Tu es un correcteur éditorial professionnel francophone. ${
+      latinFix
+        ? 'Tu effectues une passe unique de francisation, sans aucune autre correction.'
+        : `Tu appliques une correction ${polish ? 'STRICTE PUIS un polissage de style mesuré' : 'STRICTE sans aucune réécriture'}.`
+    }
+
+${latinFix ? latinRules : polish ? polishRules : strictRules}
 
 Le texte corrigé doit être prêt pour publication Amazon KDP.
 
@@ -84,7 +107,16 @@ FORMAT DE RÉPONSE — JSON STRICT :
 }`;
 
 
-    const userPrompt = `Corrige ce chapitre en respectant STRICTEMENT les consignes ${polish ? 'de correction et de polissage (zéro ajout d\'idée, zéro suppression de passage)' : 'de correction éditoriale (zéro réécriture, zéro ajout, zéro suppression)'} :
+    const userPrompt = latinFix
+      ? `Remplace par du français clair toutes les expressions en latin / faux latin / pseudo-langue de ce texte, et ne modifie rien d'autre :
+
+${chapterTitle ? `Titre du chapitre : "${chapterTitle}"\n` : ''}
+---
+${chapterContent}
+---
+
+Retourne le JSON avec le texte intégral francisé et la liste des expressions remplacées.`
+      : `Corrige ce chapitre en respectant STRICTEMENT les consignes ${polish ? 'de correction et de polissage (zéro ajout d\'idée, zéro suppression de passage)' : 'de correction éditoriale (zéro réécriture, zéro ajout, zéro suppression)'} :
 
 ${chapterTitle ? `Titre du chapitre : "${chapterTitle}"\n` : ''}
 ---
@@ -92,6 +124,7 @@ ${chapterContent}
 ---
 
 Retourne le JSON avec le texte corrigé et la liste exhaustive des corrections effectuées.`;
+
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 120000);

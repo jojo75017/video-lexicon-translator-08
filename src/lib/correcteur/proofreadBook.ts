@@ -5,8 +5,10 @@
  */
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getActiveAIKey, getOpenRouterModel } from '@/services/aiWritingService';
+import { detectLatin, latinExpressions as findLatinExpressions } from '@/utils/latinSweep';
 
 export type ProofreadMode = 'strict' | 'polish';
+
 
 export interface Correction {
   type: string;
@@ -30,8 +32,13 @@ export interface ChapterProofread {
   edited?: string;
   /** Index des corrections refusées : le mot d'origine est rétabli. */
   rejected?: number[];
+  /** Nombre d'expressions latines / pseudo-latines éliminées sur ce chapitre. */
+  latinRemoved?: number;
+  /** Expressions latines qui résistent après les passes ciblées. */
+  latinRemaining?: string[];
   error?: string;
 }
+
 
 /** Rétablit dans le texte corrigé les mots dont la correction a été refusée. */
 export function applyRejections(chapter: ChapterProofread): string {
@@ -83,11 +90,22 @@ export const CORRECTION_TYPE_LABELS: Record<string, string> = {
   style: 'Style',
 };
 
-/** Corrige un seul chapitre. Relance jusqu'à 3 fois si la limite de débit est atteinte. */
-export async function proofreadChapter(
+export interface ProofreadResult {
+  corrected: string;
+  corrections: Correction[];
+  quality: number;
+  /** Expressions latines / pseudo-latines éliminées. */
+  latinRemoved: number;
+  /** Expressions qui résistent malgré les passes ciblées. */
+  latinRemaining: string[];
+}
+
+/** Un appel à l'edge function, avec relance si la limite de débit est atteinte. */
+async function callProofread(
   title: string,
   content: string,
-  mode: ProofreadMode,
+  mode: ProofreadMode | 'latin-fix',
+  latinList?: string[],
 ): Promise<{ corrected: string; corrections: Correction[]; quality: number }> {
   let lastError = '';
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -96,6 +114,7 @@ export async function proofreadChapter(
         chapterTitle: title,
         chapterContent: content,
         mode,
+        latinExpressions: latinList,
         // Clé de l'abonné (Gemini / ChatGPT / Claude / OpenRouter) : la correction
         // passe par son propre compte IA, aucun crédit de la plateforme n'est utilisé.
         userProvider: getProvider(),
@@ -128,6 +147,50 @@ export async function proofreadChapter(
   }
   throw new Error(lastError || 'Correction impossible après plusieurs tentatives.');
 }
+
+/**
+ * Corrige un chapitre, puis vérifie mécaniquement qu'il ne reste aucune expression
+ * en latin / faux latin / pseudo-langue. Si le détecteur en trouve encore, une passe
+ * ciblée est relancée (deux tentatives au maximum).
+ */
+export async function proofreadChapter(
+  title: string,
+  content: string,
+  mode: ProofreadMode,
+): Promise<ProofreadResult> {
+  const before = detectLatin(content).length;
+  const res = await callProofread(title, content, mode);
+
+  let corrected = res.corrected;
+  let corrections = res.corrections;
+
+  for (let pass = 0; pass < 2; pass++) {
+    const remaining = findLatinExpressions(corrected);
+    if (!remaining.length) break;
+    try {
+      const fix = await callProofread(title, corrected, 'latin-fix', remaining);
+      // On ne garde la passe que si elle a réellement réduit le latin.
+      if (findLatinExpressions(fix.corrected).length < remaining.length) {
+        corrected = fix.corrected;
+        corrections = [...corrections, ...fix.corrections];
+      } else {
+        break;
+      }
+    } catch {
+      break;
+    }
+  }
+
+  const latinRemaining = findLatinExpressions(corrected);
+  return {
+    corrected,
+    corrections,
+    quality: res.quality,
+    latinRemoved: Math.max(0, before - latinRemaining.length),
+    latinRemaining,
+  };
+}
+
 
 export interface ProofreadProgress {
   index: number;
@@ -164,7 +227,10 @@ export async function proofreadChapters(
           corrected: res.corrected,
           corrections: res.corrections,
           quality: res.quality,
+          latinRemoved: res.latinRemoved,
+          latinRemaining: res.latinRemaining,
         },
+
       });
     } catch (e: any) {
       onProgress({

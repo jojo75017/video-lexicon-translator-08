@@ -57,7 +57,10 @@ export default function V3CorrecteurPage() {
 
   const [manuscript, setManuscript] = useState<Manuscript | null>(null);
   const [mode, setMode] = useState<ProofreadMode>('strict');
+  /** Décoché par défaut : les corrections sont appliquées automatiquement. */
+  const [manualReview, setManualReview] = useState(false);
   const [chapters, setChapters] = useState<ChapterProofread[]>([]);
+
   const [running, setRunning] = useState(false);
   const [current, setCurrent] = useState(0);
   const [openChapter, setOpenChapter] = useState<string | null>(null);
@@ -73,9 +76,17 @@ export default function V3CorrecteurPage() {
   const acceptedCount = chapters.filter((c) => c.accepted).length;
   const totalCorrections = chapters.reduce((s, c) => s + c.corrections.length, 0);
   const breakdown = useMemo(() => correctionBreakdown(chapters), [chapters]);
+  const latinRemoved = chapters.reduce((s, c) => s + (c.latinRemoved || 0), 0);
+  const latinRemaining = useMemo(
+    () => chapters
+      .filter((c) => (c.latinRemaining?.length || 0) > 0)
+      .map((c) => ({ label: c.title || `Chapitre ${c.index + 1}`, items: c.latinRemaining as string[] })),
+    [chapters],
+  );
   const avgQuality = doneCount
     ? Math.round(chapters.filter((c) => c.status === 'done').reduce((s, c) => s + (c.quality || 0), 0) / doneCount)
     : 0;
+
 
   const loadManuscript = useCallback((m: Manuscript) => {
     setManuscript(m);
@@ -124,21 +135,28 @@ export default function V3CorrecteurPage() {
         working,
         mode,
         ({ index, chapter }) => {
-          // L'auteur valide lui-même chaque chapitre : rien n'est retenu sans son accord.
-          working[index] = chapter.status === 'done' ? { ...chapter, accepted: false } : chapter;
+          // Mode automatique : la correction est retenue d'office pour l'export.
+          // Mode relecture : l'auteur valide lui-même chaque chapitre.
+          working[index] = chapter.status === 'done' ? { ...chapter, accepted: !manualReview } : chapter;
           setCurrent(index);
           setChapters(working.map((c) => ({ ...c })));
         },
         () => stopRef.current,
       );
       const ko = working.filter((c) => c.status === 'failed').length;
+      const latin = working.reduce((s, c) => s + (c.latinRemoved || 0), 0);
+      const stuck = working.reduce((s, c) => s + (c.latinRemaining?.length || 0), 0);
       if (stopRef.current) toast.info('Correction interrompue — le travail déjà fait est conservé.');
       else if (ko) toast.warning(`Correction terminée avec ${ko} chapitre(s) en échec — relancez-les individuellement.`);
-      else toast.success('Correction terminée. Relisez chapitre par chapitre puis exportez.');
+      else if (manualReview) toast.success('Correction terminée. Relisez chapitre par chapitre puis exportez.');
+      else toast.success(
+        `Livre corrigé et appliqué${latin ? ` · ${latin} expression(s) latine(s) supprimée(s)` : ''}. Vous pouvez exporter.`,
+      );
+      if (stuck > 0) toast.warning(`${stuck} expression(s) en latin résistent — la liste est affichée sous la progression.`);
     } finally {
       setRunning(false);
     }
-  }, [chapters, mode]);
+  }, [chapters, mode, manualReview]);
 
   const retryChapter = useCallback(async (id: string) => {
     const target = chapters.find((c) => c.chapterId === id);
@@ -147,7 +165,11 @@ export default function V3CorrecteurPage() {
     try {
       const res = await proofreadChapter(target.title, target.original, mode);
       setChapters((prev) => prev.map((c) => c.chapterId === id
-        ? { ...c, status: 'done', corrected: res.corrected, corrections: res.corrections, quality: res.quality, accepted: false, rejected: [], edited: undefined, error: undefined }
+        ? {
+            ...c, status: 'done', corrected: res.corrected, corrections: res.corrections,
+            quality: res.quality, latinRemoved: res.latinRemoved, latinRemaining: res.latinRemaining,
+            accepted: !manualReview, rejected: [], edited: undefined, error: undefined,
+          }
         : c));
       toast.success(`Chapitre corrigé : ${target.title || `Chapitre ${target.index + 1}`}`);
     } catch (e: any) {
@@ -155,7 +177,8 @@ export default function V3CorrecteurPage() {
     } finally {
       setRetrying(null);
     }
-  }, [chapters, mode]);
+  }, [chapters, mode, manualReview]);
+
 
   const setAccepted = (id: string, accepted: boolean) =>
     setChapters((prev) => prev.map((c) => (c.chapterId === id ? { ...c, accepted } : c)));
@@ -368,10 +391,20 @@ export default function V3CorrecteurPage() {
             })}
           </div>
 
+          <label className="mt-5 flex items-start gap-2.5 cursor-pointer">
+            <input type="checkbox" checked={manualReview} disabled={running}
+              onChange={(e) => setManualReview(e.target.checked)}
+              className="mt-0.5 w-4 h-4 accent-[var(--v3-emerald)]" />
+            <span className="text-[13px]" style={{ color: 'var(--v3-muted)' }}>
+              <strong style={{ color: 'var(--v3-ink)' }}>Je veux relire chapitre par chapitre avant d'appliquer.</strong><br />
+              Par défaut, les corrections sont appliquées automatiquement : un seul clic et votre livre corrigé est prêt à exporter.
+            </span>
+          </label>
+
           <div className="mt-5 flex flex-wrap items-center gap-3">
             {!running ? (
               <button onClick={startCorrection} className="v3-btn-primary inline-flex items-center gap-2">
-                <Wand2 className="w-4 h-4" /> {doneCount ? 'Reprendre la correction' : 'Lancer la correction du livre'}
+                <Wand2 className="w-4 h-4" /> {doneCount ? 'Reprendre la correction' : 'Corriger tout le livre'}
               </button>
             ) : (
               <button onClick={() => { stopRef.current = true; }} className="v3-btn-outline inline-flex items-center gap-2">
@@ -379,9 +412,12 @@ export default function V3CorrecteurPage() {
               </button>
             )}
             <span className="text-[12px]" style={{ color: 'var(--v3-muted)' }}>
-              Rien n'est écrasé : le texte original reste intact jusqu'à votre validation.
+              {manualReview
+                ? "Rien n'est écrasé : le texte original reste intact jusqu'à votre validation."
+                : 'Orthographe, grammaire, ponctuation et suppression du latin — appliqués automatiquement.'}
             </span>
           </div>
+
         </section>
       )}
 
@@ -389,10 +425,14 @@ export default function V3CorrecteurPage() {
       {chapters.length > 0 && (doneCount > 0 || failedCount > 0 || running) && (
         <section className="mt-6 rounded-2xl border bg-white p-6" style={{ borderColor: 'var(--v3-line)' }}>
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="v3-serif text-xl font-semibold" style={{ color: 'var(--v3-emerald)' }}>3 · Relire les corrections</h2>
-            <button onClick={acceptAll} disabled={!doneCount} className="v3-btn-outline text-[12px] disabled:opacity-50">
-              Tout accepter
-            </button>
+            <h2 className="v3-serif text-xl font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+              {manualReview ? '3 · Relire les corrections' : '3 · Corrections appliquées'}
+            </h2>
+            {manualReview && (
+              <button onClick={acceptAll} disabled={!doneCount} className="v3-btn-outline text-[12px] disabled:opacity-50">
+                Tout accepter
+              </button>
+            )}
           </div>
 
           <div className="mt-4">
@@ -404,7 +444,8 @@ export default function V3CorrecteurPage() {
               <span>{totalCorrections} correction(s)</span>
               {avgQuality > 0 && <span>Qualité orthographique : {avgQuality}/100</span>}
               {failedCount > 0 && <span style={{ color: '#b45309' }}>{failedCount} à relancer</span>}
-              <span>{acceptedCount} validé(s)</span>
+              <span>{acceptedCount} appliqué(s)</span>
+              {latinRemoved > 0 && <span style={{ color: 'var(--v3-emerald)' }}>{latinRemoved} expression(s) latine(s) supprimée(s)</span>}
               {running && <span>En cours : chapitre {current + 1}…</span>}
             </div>
           </div>
@@ -419,6 +460,22 @@ export default function V3CorrecteurPage() {
               ))}
             </div>
           )}
+
+          {!running && latinRemaining.length > 0 && (
+            <div className="mt-4 rounded-xl border p-4" style={{ borderColor: '#f0c98a', background: '#fdf7ec' }}>
+              <p className="text-[13px] font-semibold" style={{ color: '#92400e' }}>
+                Expressions en latin encore détectées — à corriger à la main dans les chapitres concernés :
+              </p>
+              <ul className="mt-2 space-y-1">
+                {latinRemaining.map((r) => (
+                  <li key={r.label} className="text-[12.5px]" style={{ color: '#92400e' }}>
+                    <strong>{r.label}</strong> : {r.items.slice(0, 8).join(', ')}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
 
           <div className="mt-5 space-y-3">
             {chapters.map((c) => {
