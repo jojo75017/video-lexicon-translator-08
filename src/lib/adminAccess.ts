@@ -20,11 +20,13 @@ export function readLocalCache(): boolean | null {
     const raw = localStorage.getItem(LS_KEY);
     if (!raw) return null;
     const { isAdmin, ts } = JSON.parse(raw);
-    if (Date.now() - ts > LS_TTL_MS) return null;
+    const ttl = isAdmin ? LS_TTL_MS : LS_TTL_NEGATIVE_MS;
+    if (Date.now() - ts > ttl) return null;
     return !!isAdmin;
   } catch {
     return null;
   }
+
 }
 
 function writeLocalCache(isAdmin: boolean) {
