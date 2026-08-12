@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { chapterTitle, chapterContent, mode } = await req.json();
+    const { chapterTitle, chapterContent, mode, userProvider, userApiKey, userModel } = await req.json();
     const polish = mode === 'polish';
 
     if (!chapterContent || chapterContent.length < 20) {
@@ -20,11 +20,6 @@ serve(async (req) => {
         JSON.stringify({ error: "Le contenu du chapitre est requis (minimum 20 caractères)" }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
-    }
-
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY non configurée");
     }
 
     const strictRules = `RÈGLES ABSOLUES — TU NE DOIS JAMAIS :
@@ -101,38 +96,77 @@ Retourne le JSON avec le texte corrigé et la liste exhaustive des corrections e
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 120000);
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
-        max_tokens: 8000,
-      }),
-      signal: controller.signal
+    // Clé de l'abonné (BYOK) en priorité : aucun crédit Lovable consommé.
+    const provider = (userProvider || '').toString().trim();
+    const byoKey = (userApiKey || '').toString().trim();
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+
+    let endpoint = '';
+    let headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    let body: Record<string, unknown> = {};
+    let engine = 'lovable';
+
+    if (byoKey && provider === 'gemini') {
+      engine = 'gemini';
+      endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${encodeURIComponent(byoKey)}`;
+      body = {
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+        generationConfig: { temperature: 0.2, maxOutputTokens: 8000 },
+      };
+    } else if (byoKey && provider === 'openai') {
+      engine = 'openai';
+      endpoint = 'https://api.openai.com/v1/chat/completions';
+      headers.Authorization = `Bearer ${byoKey}`;
+      body = { model: userModel || 'gpt-4o-mini', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }], max_tokens: 8000 };
+    } else if (byoKey && provider === 'claude') {
+      engine = 'claude';
+      endpoint = 'https://api.anthropic.com/v1/messages';
+      headers['x-api-key'] = byoKey;
+      headers['anthropic-version'] = '2023-06-01';
+      body = { model: userModel || 'claude-3-5-haiku-20241022', max_tokens: 8000, system: systemPrompt, messages: [{ role: 'user', content: userPrompt }] };
+    } else if (byoKey && provider === 'openrouter') {
+      engine = 'openrouter';
+      endpoint = 'https://openrouter.ai/api/v1/chat/completions';
+      headers.Authorization = `Bearer ${byoKey}`;
+      headers['HTTP-Referer'] = 'https://ebookstudio.fr';
+      headers['X-Title'] = 'Correcteur - eBook Studio';
+      body = { model: userModel || 'google/gemini-2.5-flash-lite', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }], max_tokens: 8000 };
+    } else {
+      if (!LOVABLE_API_KEY) throw new Error("Aucune clé IA : configurez votre clé Gemini, ChatGPT, Claude ou OpenRouter dans Paramètres > Clés API.");
+      endpoint = 'https://ai.gateway.lovable.dev/v1/chat/completions';
+      headers.Authorization = `Bearer ${LOVABLE_API_KEY}`;
+      body = { model: 'google/gemini-2.5-flash', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }], max_tokens: 8000 };
+    }
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(body),
+      signal: controller.signal,
     });
 
     clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("AI error:", response.status, errorText);
-      
+      console.error(`AI error (${engine}):`, response.status, errorText);
+
       if (response.status === 429) {
         return new Response(
           JSON.stringify({ error: "Limite de requêtes atteinte, réessayez dans quelques instants." }),
           { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
+      if (response.status === 401 || response.status === 403) {
+        return new Response(
+          JSON.stringify({ error: "Clé API refusée. Vérifiez votre clé dans Paramètres > Clés API." }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
       if (response.status === 402) {
         return new Response(
-          JSON.stringify({ error: "Crédits insuffisants. Rechargez votre compte." }),
+          JSON.stringify({ error: "Crédits insuffisants sur votre compte IA." }),
           { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -140,7 +174,12 @@ Retourne le JSON avec le texte corrigé et la liste exhaustive des corrections e
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || '';
+    const content =
+      engine === 'gemini'
+        ? (data?.candidates?.[0]?.content?.parts?.[0]?.text || '')
+        : engine === 'claude'
+          ? (Array.isArray(data?.content) ? data.content.map((c: any) => c?.text || '').join('') : '')
+          : (data?.choices?.[0]?.message?.content || '');
 
     let result;
     try {
@@ -165,7 +204,7 @@ Retourne le JSON avec le texte corrigé et la liste exhaustive des corrections e
       };
     }
 
-    return new Response(JSON.stringify(result), {
+    return new Response(JSON.stringify({ ...result, engine }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
