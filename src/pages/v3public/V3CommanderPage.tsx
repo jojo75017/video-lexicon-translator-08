@@ -103,6 +103,11 @@ export default function V3CommanderPage() {
     };
   }, []);
 
+  // Suivi du tunnel : arrivée sur la page de commande.
+  useEffect(() => {
+    void trackCaptureEvent('commander', 'view');
+  }, []);
+
 
   const startPayment = async () => {
     const e = email.trim().toLowerCase();
