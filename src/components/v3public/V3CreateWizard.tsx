@@ -1199,7 +1199,9 @@ Règles :
                 </h3>
                 <p className="mt-1 text-sm" style={{ color: 'var(--v3-muted)' }}>
                   {autoFix.done}/{autoFix.total} chapitres relus · {autoFix.corrections} corrections appliquées
+                  {autoFix.latin > 0 ? ` · ${autoFix.latin} expression(s) latine(s) supprimée(s)` : ''}
                   {autoFix.failed > 0 ? ` · ${autoFix.failed} chapitre(s) à revoir dans le Correcteur` : ''}
+
                 </p>
               </div>
             </div>
