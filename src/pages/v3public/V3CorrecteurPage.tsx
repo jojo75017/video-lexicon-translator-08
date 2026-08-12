@@ -57,7 +57,10 @@ export default function V3CorrecteurPage() {
 
   const [manuscript, setManuscript] = useState<Manuscript | null>(null);
   const [mode, setMode] = useState<ProofreadMode>('strict');
+  /** Décoché par défaut : les corrections sont appliquées automatiquement. */
+  const [manualReview, setManualReview] = useState(false);
   const [chapters, setChapters] = useState<ChapterProofread[]>([]);
+
   const [running, setRunning] = useState(false);
   const [current, setCurrent] = useState(0);
   const [openChapter, setOpenChapter] = useState<string | null>(null);
