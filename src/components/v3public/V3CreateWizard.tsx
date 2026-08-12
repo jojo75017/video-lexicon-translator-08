@@ -218,9 +218,12 @@ export default function V3CreateWizard() {
     done: number;
     total: number;
     corrections: number;
+    /** Expressions latines / pseudo-latines supprimées automatiquement. */
+    latin: number;
     failed: number;
     finished: boolean;
-  }>({ running: false, done: 0, total: 0, corrections: 0, failed: 0, finished: false });
+  }>({ running: false, done: 0, total: 0, corrections: 0, latin: 0, failed: 0, finished: false });
+
   const autoFixStartedRef = useRef(false);
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [coverLoading, setCoverLoading] = useState(false);
