@@ -42,16 +42,33 @@ export async function getIsCurrentSessionAdmin(): Promise<boolean> {
   }
 
   try {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    // getUser() revalide réellement le jeton côté serveur. Un getSession()
+    // seul peut conserver une session locale expirée et provoquer un faux refus.
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
 
-    if (!session?.access_token) {
+    if (userError || !user) {
       cachedResult = { isAdmin: false, timestamp: Date.now() };
       return false;
     }
 
-    // Try edge function with a 6s timeout - fallback to localStorage if it fails
+    // Vérification directe du rôle en base : c'est le chemin le plus fiable et
+    // il reste protégé par la fonction security-definer has_role.
+    const { data: roleResult, error: roleError } = await supabase.rpc('has_role', {
+      _user_id: user.id,
+      _role: 'admin',
+    });
+
+    if (!roleError) {
+      const isAdmin = roleResult === true;
+      cachedResult = { isAdmin, timestamp: Date.now() };
+      writeLocalCache(isAdmin);
+      return isAdmin;
+    }
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) return false;
+
+    // Secours pour les anciens environnements où le RPC n'est pas disponible.
     const invokePromise = supabase.functions.invoke('check-admin', {
       headers: { Authorization: `Bearer ${session.access_token}` },
     });

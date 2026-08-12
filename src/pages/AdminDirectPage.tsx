@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { getIsCurrentSessionAdmin } from "@/lib/adminAccess";
+import { clearAdminCache, getIsCurrentSessionAdmin } from "@/lib/adminAccess";
 import { Loader2, Mail, Shield, AlertCircle, Send } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,9 @@ const AdminDirectPage = () => {
     }
     setStatus("authenticating");
     setMessage("Connexion en cours...");
+    // Un ancien refus mis en cache ne doit jamais survivre à une nouvelle
+    // authentification réussie.
+    clearAdminCache();
     const { error } = await supabase.auth.signInWithPassword({
       email: email.trim().toLowerCase(),
       password,
@@ -36,6 +39,7 @@ const AdminDirectPage = () => {
       setMessage(`Erreur: ${error.message || "Identifiants invalides"}`);
       return;
     }
+    clearAdminCache();
     const success = await checkAdminAndRedirect();
     if (!success) {
       setStatus("error");
@@ -48,7 +52,7 @@ const AdminDirectPage = () => {
       const isAdmin = await getIsCurrentSessionAdmin();
       if (isAdmin) {
         sessionStorage.setItem('is_admin', 'true');
-        navigate("/admin", { replace: true });
+        navigate("/ebook-planner", { replace: true });
         return true;
       }
       return false;
