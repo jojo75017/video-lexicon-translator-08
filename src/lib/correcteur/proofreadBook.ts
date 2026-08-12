@@ -32,8 +32,13 @@ export interface ChapterProofread {
   edited?: string;
   /** Index des corrections refusées : le mot d'origine est rétabli. */
   rejected?: number[];
+  /** Nombre d'expressions latines / pseudo-latines éliminées sur ce chapitre. */
+  latinRemoved?: number;
+  /** Expressions latines qui résistent après les passes ciblées. */
+  latinRemaining?: string[];
   error?: string;
 }
+
 
 /** Rétablit dans le texte corrigé les mots dont la correction a été refusée. */
 export function applyRejections(chapter: ChapterProofread): string {
