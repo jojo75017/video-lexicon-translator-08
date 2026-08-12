@@ -12,8 +12,11 @@ serve(async (req) => {
   }
 
   try {
-    const { chapterTitle, chapterContent, mode, userProvider, userApiKey, userModel } = await req.json();
+    const { chapterTitle, chapterContent, mode, userProvider, userApiKey, userModel, latinExpressions } =
+      await req.json();
     const polish = mode === 'polish';
+    const latinFix = mode === 'latin-fix';
+
 
     if (!chapterContent || chapterContent.length < 20) {
       return new Response(
