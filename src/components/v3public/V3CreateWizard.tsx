@@ -996,7 +996,9 @@ Règles :
               ...s,
               done: s.done + 1,
               corrections: s.corrections + (ch.corrections?.length || 0),
+              latin: (s.latin || 0) + (ch.latinRemoved || 0),
             }));
+
           } else if (ch.status === 'failed') {
             setAutoFix((s) => ({ ...s, done: s.done + 1, failed: s.failed + 1 }));
           }
