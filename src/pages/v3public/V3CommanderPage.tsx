@@ -108,6 +108,8 @@ export default function V3CommanderPage() {
       toast.error("Merci de saisir un email valide — c'est lui qui ouvrira votre accès.");
       return;
     }
+    // Suivi du tunnel : clic sur le bouton de paiement (avant l'appel Stripe).
+    void trackCaptureEvent('commander', 'checkout_click', { leadMagnet: plan });
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("v3-pack-checkout", {
@@ -131,7 +133,10 @@ export default function V3CommanderPage() {
       }
       const secret = (data as { clientSecret?: string })?.clientSecret;
       if (!secret) throw new Error("Session de paiement indisponible.");
+      // Suivi du tunnel : le formulaire Stripe s'affiche réellement.
+      void trackCaptureEvent('commander', 'checkout_ready', { leadMagnet: plan });
       setClientSecret(secret);
+
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Paiement impossible pour le moment.");
     } finally {
