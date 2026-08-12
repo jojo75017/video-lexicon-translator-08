@@ -425,10 +425,14 @@ export default function V3CorrecteurPage() {
       {chapters.length > 0 && (doneCount > 0 || failedCount > 0 || running) && (
         <section className="mt-6 rounded-2xl border bg-white p-6" style={{ borderColor: 'var(--v3-line)' }}>
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="v3-serif text-xl font-semibold" style={{ color: 'var(--v3-emerald)' }}>3 · Relire les corrections</h2>
-            <button onClick={acceptAll} disabled={!doneCount} className="v3-btn-outline text-[12px] disabled:opacity-50">
-              Tout accepter
-            </button>
+            <h2 className="v3-serif text-xl font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+              {manualReview ? '3 · Relire les corrections' : '3 · Corrections appliquées'}
+            </h2>
+            {manualReview && (
+              <button onClick={acceptAll} disabled={!doneCount} className="v3-btn-outline text-[12px] disabled:opacity-50">
+                Tout accepter
+              </button>
+            )}
           </div>
 
           <div className="mt-4">
@@ -440,7 +444,8 @@ export default function V3CorrecteurPage() {
               <span>{totalCorrections} correction(s)</span>
               {avgQuality > 0 && <span>Qualité orthographique : {avgQuality}/100</span>}
               {failedCount > 0 && <span style={{ color: '#b45309' }}>{failedCount} à relancer</span>}
-              <span>{acceptedCount} validé(s)</span>
+              <span>{acceptedCount} appliqué(s)</span>
+              {latinRemoved > 0 && <span style={{ color: 'var(--v3-emerald)' }}>{latinRemoved} expression(s) latine(s) supprimée(s)</span>}
               {running && <span>En cours : chapitre {current + 1}…</span>}
             </div>
           </div>
@@ -455,6 +460,22 @@ export default function V3CorrecteurPage() {
               ))}
             </div>
           )}
+
+          {!running && latinRemaining.length > 0 && (
+            <div className="mt-4 rounded-xl border p-4" style={{ borderColor: '#f0c98a', background: '#fdf7ec' }}>
+              <p className="text-[13px] font-semibold" style={{ color: '#92400e' }}>
+                Expressions en latin encore détectées — à corriger à la main dans les chapitres concernés :
+              </p>
+              <ul className="mt-2 space-y-1">
+                {latinRemaining.map((r) => (
+                  <li key={r.label} className="text-[12.5px]" style={{ color: '#92400e' }}>
+                    <strong>{r.label}</strong> : {r.items.slice(0, 8).join(', ')}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
 
           <div className="mt-5 space-y-3">
             {chapters.map((c) => {
