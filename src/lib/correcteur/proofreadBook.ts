@@ -227,7 +227,10 @@ export async function proofreadChapters(
           corrected: res.corrected,
           corrections: res.corrections,
           quality: res.quality,
+          latinRemoved: res.latinRemoved,
+          latinRemaining: res.latinRemaining,
         },
+
       });
     } catch (e: any) {
       onProgress({
