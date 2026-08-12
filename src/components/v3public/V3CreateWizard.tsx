@@ -965,7 +965,7 @@ Règles :
 
     autoFixStartedRef.current = true;
     let cancelled = false;
-    setAutoFix({ running: true, done: 0, total: items.length, corrections: 0, failed: 0, finished: false });
+    setAutoFix({ running: true, done: 0, total: items.length, corrections: 0, latin: 0, failed: 0, finished: false });
 
     (async () => {
       const list: ChapterProofread[] = items.map((c) => ({
