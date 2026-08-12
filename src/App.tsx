@@ -476,6 +476,7 @@ const App = () => {
             <Route path="/ebook-ideas" element={<EbookIdeasPage />} />
             <Route path="/ambiances" element={<AmbiancesPage />} />
             <Route path="/ebookbot" element={<EbookbotPage />} />
+            <Route path="/assistant" element={<AssistantPublicPage />} />
             <Route path="/masterclass" element={<MasterclassPage />} />
             <Route path="/niches" element={<NichesPage />} />
             <Route path="/niches-600" element={<Niches600Page />} />
