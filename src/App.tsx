@@ -14,7 +14,7 @@ import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 import { Loader2 } from 'lucide-react';
 import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup';
 import { FirstEbookOnboarding } from '@/components/onboarding/FirstEbookOnboarding';
-import EbookbotFloatingButton from '@/components/ebookbot/EbookbotFloatingButton';
+import AssistantFloatingButton from '@/components/assistant/AssistantFloatingButton';
 import ApiKeysFloatingButton from '@/components/ebook/ApiKeysFloatingButton';
 import GeminiKeyAlertBanner from '@/components/ebook/GeminiKeyAlertBanner';
 import AISosModal from '@/components/shared/AISosModal';
@@ -86,6 +86,8 @@ const V3CorrecteurPage = lazy(() => import('./pages/v3public/V3CorrecteurPage'))
 const V3StudioProPage = lazy(() => import('./pages/v3public/V3StudioProPage'));
 
 const V3ToolsIndexPage = lazy(() => import('./pages/v3public/V3ToolsIndexPage'));
+const V3AssistantPage = lazy(() => import('./pages/v3/V3AssistantPage'));
+const AssistantPublicPage = lazy(() => import('./pages/AssistantPublicPage'));
 const V3ComptePage = lazy(() => import('./pages/v3public/V3ComptePage'));
 const V3PourquoiPage = lazy(() => import('./pages/v3public/V3PourquoiPage'));
 const V3RealiteKdpPage = lazy(() => import('./pages/v3public/V3RealiteKdpPage'));
@@ -474,6 +476,7 @@ const App = () => {
             <Route path="/ebook-ideas" element={<EbookIdeasPage />} />
             <Route path="/ambiances" element={<AmbiancesPage />} />
             <Route path="/ebookbot" element={<EbookbotPage />} />
+            <Route path="/assistant" element={<AssistantPublicPage />} />
             <Route path="/masterclass" element={<MasterclassPage />} />
             <Route path="/niches" element={<NichesPage />} />
             <Route path="/niches-600" element={<Niches600Page />} />
@@ -558,6 +561,7 @@ const App = () => {
 
               <Route path="recherche" element={<V3LockedGate><V3RecherchePage /></V3LockedGate>} />
               <Route path="outils" element={<V3LockedGate><V3ToolsIndexPage /></V3LockedGate>} />
+              <Route path="assistant" element={<V3AssistantPage />} />
               <Route path="outils/sommaire-ultime" element={<V3LockedGate><V3TocUltimatePage /></V3LockedGate>} />
               <Route path="outils/traduction" element={<V3LockedGate><V3TranslatorPage /></V3LockedGate>} />
               <Route path="corriger" element={<V3LockedGate><V3CorrecteurPage /></V3LockedGate>} />
@@ -593,7 +597,7 @@ const App = () => {
           </Suspense>
           <SubscriberActivityPopup />
           {isAuthenticated && <FirstEbookOnboarding subscriberEmail={subscriberEmail} />}
-          <EbookbotFloatingButton />
+          <AssistantFloatingButton />
           <ApiKeysFloatingButton />
           <GeminiKeyAlertBanner />
           {(isAuthenticated || isAdmin || isPlannerPreviewHost) && (
