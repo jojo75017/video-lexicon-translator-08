@@ -343,8 +343,9 @@ const App = () => {
               }
             />
 
-            {/* Accueil : client reconnu vers son espace, visiteur vers l'offre active */}
-            <Route path="/" element={<Navigate to={hasPlannerAccess ? '/ebook-planner' : '/commander'} replace />} />
+            {/* Accueil : admin vers le panneau admin, client vers son espace, visiteur vers l'offre */}
+            <Route path="/" element={<Navigate to={isAdmin ? '/admin' : (hasPlannerAccess ? '/ebook-planner' : '/commander')} replace />} />
+
 
             {/* Marketing */}
             {/* Visiteurs non connectés → page de commande publique (plus de mur de login) */}
@@ -363,13 +364,14 @@ const App = () => {
             <Route path="/login" element={<Navigate to="/connexion-abonne" replace />} />
             <Route path="/connexion" element={<Navigate to="/connexion-abonne" replace />} />
             <Route path="/subscription" element={<Navigate to="/connexion-abonne" replace />} />
-            {/* Admin / abonné : renvoyé direct sur le tableau de bord (Ebook Planner).
+            {/* Admin : renvoyé sur le panneau admin, abonné : sur son espace.
                 Ajoute ?voir=1 pour inspecter la page de vente. */}
             <Route path="/commander" element={
               hasPlannerAccess && typeof window !== 'undefined' && !new URLSearchParams(window.location.search).has('voir')
-                ? <Navigate to="/ebook-planner" replace />
+                ? <Navigate to={isAdmin ? '/admin' : '/ebook-planner'} replace />
                 : <V3CommanderPage />
             } />
+
 
             <Route path="/go/kdp-pilot" element={<GoKdpPilotPage />} />
 
