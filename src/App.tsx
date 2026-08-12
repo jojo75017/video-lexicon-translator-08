@@ -236,13 +236,16 @@ const App = () => {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           const adminStatus = await getIsCurrentSessionAdmin();
-          setIsAdmin(adminStatus);
-        } else {
+          // On ne retire jamais le statut admin déjà confirmé en cache :
+          // une réponse réseau ratée ne doit pas éjecter l'admin.
+          if (adminStatus || readLocalCache() !== true) setIsAdmin(adminStatus);
+        } else if (readLocalCache() !== true) {
           setIsAdmin(false);
         }
       } catch (error) {
         console.error('Erreur session admin:', error);
       }
+
     };
 
     initAuth();
