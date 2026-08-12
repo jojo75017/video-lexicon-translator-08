@@ -531,7 +531,14 @@ const ProspectManagerPage = () => {
             <TabsTrigger value="posts" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
               <Images className="h-4 w-4 mr-2" /> Posts & visuels
             </TabsTrigger>
+            <TabsTrigger value="sante" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
+              <Activity className="h-4 w-4 mr-2" /> Santé emails
+            </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="sante" className="space-y-4">
+            <EmailHealthPanel />
+          </TabsContent>
 
           <TabsContent value="posts" className="space-y-4">
             <AdminPublishingKitPage embedded />
@@ -541,6 +548,7 @@ const ProspectManagerPage = () => {
             <ChannelPerformancePanel />
             <CampaignPerformanceDashboard />
           </TabsContent>
+
 
 
           <TabsContent value="tracking" className="space-y-4">
