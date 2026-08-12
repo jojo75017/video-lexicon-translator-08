@@ -135,21 +135,28 @@ export default function V3CorrecteurPage() {
         working,
         mode,
         ({ index, chapter }) => {
-          // L'auteur valide lui-même chaque chapitre : rien n'est retenu sans son accord.
-          working[index] = chapter.status === 'done' ? { ...chapter, accepted: false } : chapter;
+          // Mode automatique : la correction est retenue d'office pour l'export.
+          // Mode relecture : l'auteur valide lui-même chaque chapitre.
+          working[index] = chapter.status === 'done' ? { ...chapter, accepted: !manualReview } : chapter;
           setCurrent(index);
           setChapters(working.map((c) => ({ ...c })));
         },
         () => stopRef.current,
       );
       const ko = working.filter((c) => c.status === 'failed').length;
+      const latin = working.reduce((s, c) => s + (c.latinRemoved || 0), 0);
+      const stuck = working.reduce((s, c) => s + (c.latinRemaining?.length || 0), 0);
       if (stopRef.current) toast.info('Correction interrompue — le travail déjà fait est conservé.');
       else if (ko) toast.warning(`Correction terminée avec ${ko} chapitre(s) en échec — relancez-les individuellement.`);
-      else toast.success('Correction terminée. Relisez chapitre par chapitre puis exportez.');
+      else if (manualReview) toast.success('Correction terminée. Relisez chapitre par chapitre puis exportez.');
+      else toast.success(
+        `Livre corrigé et appliqué${latin ? ` · ${latin} expression(s) latine(s) supprimée(s)` : ''}. Vous pouvez exporter.`,
+      );
+      if (stuck > 0) toast.warning(`${stuck} expression(s) en latin résistent — la liste est affichée sous la progression.`);
     } finally {
       setRunning(false);
     }
-  }, [chapters, mode]);
+  }, [chapters, mode, manualReview]);
 
   const retryChapter = useCallback(async (id: string) => {
     const target = chapters.find((c) => c.chapterId === id);
@@ -158,7 +165,11 @@ export default function V3CorrecteurPage() {
     try {
       const res = await proofreadChapter(target.title, target.original, mode);
       setChapters((prev) => prev.map((c) => c.chapterId === id
-        ? { ...c, status: 'done', corrected: res.corrected, corrections: res.corrections, quality: res.quality, accepted: false, rejected: [], edited: undefined, error: undefined }
+        ? {
+            ...c, status: 'done', corrected: res.corrected, corrections: res.corrections,
+            quality: res.quality, latinRemoved: res.latinRemoved, latinRemaining: res.latinRemaining,
+            accepted: !manualReview, rejected: [], edited: undefined, error: undefined,
+          }
         : c));
       toast.success(`Chapitre corrigé : ${target.title || `Chapitre ${target.index + 1}`}`);
     } catch (e: any) {
@@ -166,7 +177,8 @@ export default function V3CorrecteurPage() {
     } finally {
       setRetrying(null);
     }
-  }, [chapters, mode]);
+  }, [chapters, mode, manualReview]);
+
 
   const setAccepted = (id: string, accepted: boolean) =>
     setChapters((prev) => prev.map((c) => (c.chapterId === id ? { ...c, accepted } : c)));
