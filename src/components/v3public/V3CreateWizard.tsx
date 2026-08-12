@@ -8,6 +8,7 @@ import V3ExportPanel from '@/components/admin/V3ExportPanel';
 import V3KdpPublishPanel from '@/components/v3public/V3KdpPublishPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { normalizeManuscript } from '@/utils/manuscriptNormalizer';
+import { proofreadChapters, type ChapterProofread } from '@/lib/correcteur/proofreadBook';
 
 import { invokeImageFunction } from '@/lib/aiImageInvoke';
 import { callAIWriting, getProvider, getProviderKey, validateKeyFormat } from '@/services/aiWritingService';
