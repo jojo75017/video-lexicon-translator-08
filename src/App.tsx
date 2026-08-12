@@ -86,6 +86,8 @@ const V3CorrecteurPage = lazy(() => import('./pages/v3public/V3CorrecteurPage'))
 const V3StudioProPage = lazy(() => import('./pages/v3public/V3StudioProPage'));
 
 const V3ToolsIndexPage = lazy(() => import('./pages/v3public/V3ToolsIndexPage'));
+const V3AssistantPage = lazy(() => import('./pages/v3/V3AssistantPage'));
+const AssistantPublicPage = lazy(() => import('./pages/AssistantPublicPage'));
 const V3ComptePage = lazy(() => import('./pages/v3public/V3ComptePage'));
 const V3PourquoiPage = lazy(() => import('./pages/v3public/V3PourquoiPage'));
 const V3RealiteKdpPage = lazy(() => import('./pages/v3public/V3RealiteKdpPage'));
