@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { getIsCurrentSessionAdmin } from "@/lib/adminAccess";
+import { getIsCurrentSessionAdmin, readLocalCache } from "@/lib/adminAccess";
 
 const corslessMessage = "Vérification de l'accès...";
 
