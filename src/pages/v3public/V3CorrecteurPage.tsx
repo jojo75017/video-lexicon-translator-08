@@ -368,10 +368,20 @@ export default function V3CorrecteurPage() {
             })}
           </div>
 
+          <label className="mt-5 flex items-start gap-2.5 cursor-pointer">
+            <input type="checkbox" checked={manualReview} disabled={running}
+              onChange={(e) => setManualReview(e.target.checked)}
+              className="mt-0.5 w-4 h-4 accent-[var(--v3-emerald)]" />
+            <span className="text-[13px]" style={{ color: 'var(--v3-muted)' }}>
+              <strong style={{ color: 'var(--v3-ink)' }}>Je veux relire chapitre par chapitre avant d'appliquer.</strong><br />
+              Par défaut, les corrections sont appliquées automatiquement : un seul clic et votre livre corrigé est prêt à exporter.
+            </span>
+          </label>
+
           <div className="mt-5 flex flex-wrap items-center gap-3">
             {!running ? (
               <button onClick={startCorrection} className="v3-btn-primary inline-flex items-center gap-2">
-                <Wand2 className="w-4 h-4" /> {doneCount ? 'Reprendre la correction' : 'Lancer la correction du livre'}
+                <Wand2 className="w-4 h-4" /> {doneCount ? 'Reprendre la correction' : 'Corriger tout le livre'}
               </button>
             ) : (
               <button onClick={() => { stopRef.current = true; }} className="v3-btn-outline inline-flex items-center gap-2">
@@ -379,9 +389,12 @@ export default function V3CorrecteurPage() {
               </button>
             )}
             <span className="text-[12px]" style={{ color: 'var(--v3-muted)' }}>
-              Rien n'est écrasé : le texte original reste intact jusqu'à votre validation.
+              {manualReview
+                ? "Rien n'est écrasé : le texte original reste intact jusqu'à votre validation."
+                : 'Orthographe, grammaire, ponctuation et suppression du latin — appliqués automatiquement.'}
             </span>
           </div>
+
         </section>
       )}
 
