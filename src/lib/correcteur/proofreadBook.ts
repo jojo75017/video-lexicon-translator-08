@@ -4,6 +4,7 @@
  * séquentiellement, avec relance automatique en cas de limite de débit.
  */
 import { supabase } from '@/integrations/supabase/client';
+import { getProvider, getActiveAIKey, getOpenRouterModel } from '@/services/aiWritingService';
 
 export type ProofreadMode = 'strict' | 'polish';
 
@@ -91,7 +92,16 @@ export async function proofreadChapter(
   let lastError = '';
   for (let attempt = 0; attempt < 3; attempt++) {
     const { data, error } = await supabase.functions.invoke('strict-proofread', {
-      body: { chapterTitle: title, chapterContent: content, mode },
+      body: {
+        chapterTitle: title,
+        chapterContent: content,
+        mode,
+        // Clé de l'abonné (Gemini / ChatGPT / Claude / OpenRouter) : la correction
+        // passe par son propre compte IA, aucun crédit de la plateforme n'est utilisé.
+        userProvider: getProvider(),
+        userApiKey: getActiveAIKey(),
+        userModel: getProvider() === 'openrouter' ? getOpenRouterModel() : undefined,
+      },
     });
 
     if (!error && data && !data.error) {
