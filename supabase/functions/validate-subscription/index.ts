@@ -62,17 +62,18 @@ serve(async (req) => {
       );
     }
 
-    console.log('Found subscriber, stored code:', subscriber.access_code);
-    
-    // Compare access codes (case-insensitive)
+    console.log('Found subscriber for', normalizedEmail);
+
+    // Compare access codes (case-insensitive) — sauf si la session a déjà été vérifiée
     const storedCode = subscriber.access_code?.trim().toUpperCase();
-    if (storedCode !== normalizedCode) {
-      console.log('Code mismatch. Expected:', storedCode, 'Got:', normalizedCode);
+    if (!sessionVerified && storedCode !== normalizedCode) {
+      console.log('Code mismatch for', normalizedEmail);
       return new Response(
         JSON.stringify({ valid: false, message: 'Code d\'accès incorrect' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
 
     // Vérifier si essai expiré
     if (subscriber.status === 'trialing' && subscriber.trial_ends_at && new Date(subscriber.trial_ends_at) < new Date()) {
