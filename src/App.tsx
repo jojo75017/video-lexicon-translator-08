@@ -343,8 +343,9 @@ const App = () => {
               }
             />
 
-            {/* Accueil : client reconnu vers son espace, visiteur vers l'offre active */}
-            <Route path="/" element={<Navigate to={hasPlannerAccess ? '/ebook-planner' : '/commander'} replace />} />
+            {/* Accueil : admin vers le panneau admin, client vers son espace, visiteur vers l'offre */}
+            <Route path="/" element={<Navigate to={isAdmin ? '/admin' : (hasPlannerAccess ? '/ebook-planner' : '/commander')} replace />} />
+
 
             {/* Marketing */}
             {/* Visiteurs non connectés → page de commande publique (plus de mur de login) */}
