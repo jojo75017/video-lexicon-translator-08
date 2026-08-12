@@ -149,7 +149,7 @@ export const ASSISTANT_FAQ: AssistantFaqEntry[] = [
     keywords: ['audio', 'audiobook', 'voix', 'livre audio', 'mp3'],
     answer:
       "Oui : **Audiobook Studio** transforme vos chapitres en fichiers audio téléchargeables, prêts pour vos pages de vente.",
-    actions: [{ label: 'Audiobook Studio', route: '/audiobook' }],
+    actions: [{ label: 'Audiobook Studio', route: '/v3/outils/audiobook' }],
   },
   {
     id: 'motscles',
