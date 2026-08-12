@@ -142,8 +142,9 @@ export function SubscriberGate({
         if (!session) {
           try {
             const { data: authData, error: authInvokeError } = await supabase.functions.invoke("subscriber-auth", {
-              body: { email, access_code: code },
+              body: { email, access_code: code || data.subscriber?.access_code },
             });
+
             if (authInvokeError || !authData?.access_token || !authData?.refresh_token) {
               console.error("SubscriberGate: subscriber-auth failed", authInvokeError);
               await denyAccess();
