@@ -92,16 +92,55 @@ Deno.serve(async (req) => {
       .limit(500);
     if (error) throw error;
 
+    // Paiements échelonnés (2× / 3×) restés en attente : même relance, même règle.
+    const { data: installments, error: instErr } = await db
+      .from("v3_installment_orders")
+      .select("id,email,status,created_at,metadata")
+      .eq("status", "pending")
+      .lt("created_at", maxDate)
+      .gt("created_at", minDate)
+      .limit(500);
+    if (instErr) throw instErr;
+
     // Ne jamais relancer une adresse qui a déjà payé, ni une commande déjà relancée.
     const { data: paid } = await db.from("funnel_orders").select("email").eq("status", "paid").limit(5000);
     const paidEmails = new Set((paid || []).map((r: any) => String(r.email || "").toLowerCase()));
+    const { data: paidInst } = await db
+      .from("v3_installment_orders").select("email").neq("status", "pending").limit(5000);
+    for (const r of paidInst || []) paidEmails.add(String((r as any).email || "").toLowerCase());
 
-    const candidates = (orders || []).filter((o: any) => {
-      const email = String(o.email || "").trim().toLowerCase();
-      if (!email || email.endsWith("@example.com")) return false;
-      if (paidEmails.has(email)) return false;
-      return !(o.metadata && (o.metadata as any).relance_sent_at);
-    });
+    type Candidate = {
+      table: "funnel_orders" | "v3_installment_orders";
+      id: string; email: string; first_name: string | null;
+      created_at: string; metadata: Record<string, unknown> | null;
+    };
+
+    const seen = new Set<string>();
+    const candidates: Candidate[] = [];
+    const pushCandidate = (c: Candidate) => {
+      const email = c.email.trim().toLowerCase();
+      if (!email || email.endsWith("@example.com")) return;
+      if (paidEmails.has(email)) return;
+      if (c.metadata && (c.metadata as any).relance_sent_at) return;
+      if (seen.has(email)) return; // un seul email par personne
+      seen.add(email);
+      candidates.push({ ...c, email });
+    };
+
+    for (const o of orders || []) {
+      pushCandidate({
+        table: "funnel_orders", id: String((o as any).id), email: String((o as any).email || ""),
+        first_name: (o as any).first_name ?? null, created_at: String((o as any).created_at),
+        metadata: (o as any).metadata ?? null,
+      });
+    }
+    for (const o of installments || []) {
+      pushCandidate({
+        table: "v3_installment_orders", id: String((o as any).id), email: String((o as any).email || ""),
+        first_name: null, created_at: String((o as any).created_at),
+        metadata: (o as any).metadata ?? null,
+      });
+    }
 
     if (mode === "status" || mode === "preview") {
       return respond({
@@ -109,7 +148,7 @@ Deno.serve(async (req) => {
         mode,
         template: TEMPLATE,
         would_send: candidates.length,
-        targets: candidates.map((o: any) => ({ id: o.id, email: o.email, created_at: o.created_at })),
+        targets: candidates.map((o) => ({ id: o.id, email: o.email, created_at: o.created_at, source: o.table })),
       });
     }
 
@@ -118,21 +157,21 @@ Deno.serve(async (req) => {
     let sent = 0;
     const errors: string[] = [];
     for (const order of candidates) {
-      const email = String(order.email).trim().toLowerCase();
+      const email = order.email;
       const link = `${CHECKOUT_URL}?src=relance-panier&email=${encodeURIComponent(email)}`;
       const res = await sendResendEmailThrottled({
         from: "Georges Boubet <noreply@ebookstudio.fr>",
         to: [email],
         reply_to: "contact@ebookstudio.fr",
         subject: "Votre commande EbookStudio n'a pas été finalisée",
-        html: html(order.first_name ? String(order.first_name) : null, link),
+        html: html(order.first_name, link),
       });
       if (res?.ok) {
         sent++;
         await db
-          .from("funnel_orders")
+          .from(order.table)
           .update({
-            metadata: { ...(order.metadata as Record<string, unknown> | null ?? {}), relance_sent_at: new Date().toISOString() },
+            metadata: { ...(order.metadata ?? {}), relance_sent_at: new Date().toISOString() },
           })
           .eq("id", order.id);
         await db.from("email_send_log").insert({
@@ -147,6 +186,7 @@ Deno.serve(async (req) => {
     }
 
     return respond({ success: true, mode, template: TEMPLATE, targets: candidates.length, sent, errors });
+
   } catch (e) {
     return respond({ error: e instanceof Error ? e.message : "Erreur inconnue" }, 500);
   }
