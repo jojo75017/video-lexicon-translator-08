@@ -149,9 +149,22 @@ async function callProofread(
 }
 
 /**
+ * Garde-fou : une correction ne doit jamais raccourcir le chapitre.
+ * Si le modèle renvoie un texte amputé (résumé, coupe de paragraphes), on refuse
+ * sa réponse et on conserve la version précédente.
+ */
+const MIN_KEEP_RATIO = 0.9;
+
+function isTruncated(before: string, after: string): boolean {
+  const a = (before || '').replace(/\s+/g, ' ').trim().length;
+  const b = (after || '').replace(/\s+/g, ' ').trim().length;
+  if (a < 200) return false;
+  return b < a * MIN_KEEP_RATIO;
+}
+
+/**
  * Corrige un chapitre, puis vérifie mécaniquement qu'il ne reste aucune expression
- * en latin / faux latin / pseudo-langue. Si le détecteur en trouve encore, une passe
- * ciblée est relancée (deux tentatives au maximum).
+ * en latin / faux latin. Toute réponse qui ampute le texte est rejetée.
  */
 export async function proofreadChapter(
   title: string,
@@ -161,16 +174,18 @@ export async function proofreadChapter(
   const before = detectLatin(content).length;
   const res = await callProofread(title, content, mode);
 
-  let corrected = res.corrected;
-  let corrections = res.corrections;
+  // Réponse tronquée : on garde le texte d'origine plutôt que d'abîmer le chapitre.
+  let corrected = isTruncated(content, res.corrected) ? content : res.corrected;
+  let corrections = isTruncated(content, res.corrected) ? [] : res.corrections;
 
   for (let pass = 0; pass < 2; pass++) {
     const remaining = findLatinExpressions(corrected);
     if (!remaining.length) break;
     try {
       const fix = await callProofread(title, corrected, 'latin-fix', remaining);
-      // On ne garde la passe que si elle a réellement réduit le latin.
-      if (findLatinExpressions(fix.corrected).length < remaining.length) {
+      const reduced = findLatinExpressions(fix.corrected).length < remaining.length;
+      // On ne garde la passe que si elle réduit le latin SANS raccourcir le texte.
+      if (reduced && !isTruncated(corrected, fix.corrected)) {
         corrected = fix.corrected;
         corrections = [...corrections, ...fix.corrections];
       } else {
@@ -190,6 +205,7 @@ export async function proofreadChapter(
     latinRemaining,
   };
 }
+
 
 
 export interface ProofreadProgress {
