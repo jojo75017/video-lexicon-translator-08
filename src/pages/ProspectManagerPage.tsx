@@ -16,11 +16,13 @@ import { supabase } from '@/integrations/supabase/client';
 import {
   Upload, Users, Send, Play, Pause, Trash2,
   Mail, CheckCircle, Clock, AlertCircle, RefreshCw,
-  FileSpreadsheet, Zap, BarChart3, Globe, Copy, Route, TrendingUp, Images
+  FileSpreadsheet, Zap, BarChart3, Globe, Copy, Route, TrendingUp, Images, Activity
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
+import EmailHealthPanel from '@/components/admin/EmailHealthPanel';
 import LeadsInscritsPanel from '@/components/admin/LeadsInscritsPanel';
+
 import TemplatePerformancePanel from '@/components/admin/TemplatePerformancePanel';
 import CampaignPerformanceDashboard from '@/components/admin/CampaignPerformanceDashboard';
 import CommunicationJourneyTracker from '@/components/admin/CommunicationJourneyTracker';
