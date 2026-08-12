@@ -312,10 +312,17 @@ export const AdminPage = () => {
             </div>
           </div>
           <div className="flex gap-2 flex-wrap items-center">
-            <Button onClick={() => navigate('/ebook-planner')} size="lg">
+            <Button onClick={() => navigate('/v3/hub')} size="lg">
+              Ouvrir la V3
+            </Button>
+            <Button onClick={() => navigate('/v3/create')} size="lg" variant="outline">
+              Créer un livre (V3)
+            </Button>
+            <Button onClick={() => navigate('/ebook-planner')} size="lg" variant="outline">
               <BookOpen className="w-4 h-4 mr-2" />
               Ouvrir le générateur
             </Button>
+
             {/* Notification Controls */}
             <div className="flex items-center gap-2 mr-2 p-2 rounded-lg bg-muted/50">
               <Button 
