@@ -128,7 +128,12 @@ export default function V3CorrecteurPage() {
     (async () => {
       const pending = readPendingManuscript();
       if (pending) {
-        if (!cancelled) loadManuscript(pending);
+        if (!cancelled) {
+          loadManuscript(pending);
+          // Cet import est consommé une seule fois. Aux visites suivantes,
+          // la sauvegarde du correcteur (avec les textes corrigés) est prioritaire.
+          clearPendingManuscript();
+        }
       } else {
         const saved = await readAutosaveAsync<CorrectorRecovery>(CORRECTOR_RECOVERY_SCOPE);
         if (!cancelled && saved?.manuscript && Array.isArray(saved.chapters) && saved.chapters.length > 0) {
