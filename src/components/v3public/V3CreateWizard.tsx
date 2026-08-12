@@ -1184,8 +1184,32 @@ Règles :
         </div>
 
 
+        {completedBook && (autoFix.running || autoFix.finished) && (
+          <div className="rounded-[28px] border p-5" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
+            <div className="flex items-center gap-3">
+              {autoFix.running ? <Loader2 className="h-5 w-5 animate-spin" style={{ color: 'var(--v3-orange-600)' }} /> : <Check className="h-5 w-5" style={{ color: 'var(--v3-orange-600)' }} />}
+              <div>
+                <h3 className="v3-serif text-xl font-bold" style={{ color: 'var(--v3-ink)' }}>
+                  {autoFix.running ? 'Relecture automatique en cours' : 'Relecture automatique terminée'}
+                </h3>
+                <p className="mt-1 text-sm" style={{ color: 'var(--v3-muted)' }}>
+                  {autoFix.done}/{autoFix.total} chapitres relus · {autoFix.corrections} corrections appliquées
+                  {autoFix.failed > 0 ? ` · ${autoFix.failed} chapitre(s) à revoir dans le Correcteur` : ''}
+                </p>
+              </div>
+            </div>
+            <div className="mt-3 h-2 w-full overflow-hidden rounded-full" style={{ background: 'var(--v3-orange-50)' }}>
+              <div
+                className="h-full rounded-full transition-all"
+                style={{ width: `${autoFix.total ? Math.round((autoFix.done / autoFix.total) * 100) : 0}%`, background: 'var(--v3-orange-600)' }}
+              />
+            </div>
+          </div>
+        )}
+
         {completedBook ? (
           <div id="exports-livre" className="scroll-mt-24">
+
             <V3ExportPanel
               manuscript={(completedBook.chapters || []).map((c: any, index: number) => {
                 const validatedOutlineTitle = normalizedOutline[index]?.titre?.trim();
