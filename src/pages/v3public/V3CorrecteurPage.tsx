@@ -12,6 +12,7 @@ import { importFromPdf } from '@/lib/import/importFromPdf';
 import { importFromUrl } from '@/lib/import/importFromUrl';
 import { buildManuscriptFromText } from '@/lib/import/buildManuscriptFromText';
 import { readPendingManuscript, clearPendingManuscript } from '@/lib/import/pendingManuscript';
+import { readAutosaveAsync, requestPersistentStorage, writeAutosaveAsync } from '@/lib/ebookProjectStorage';
 import type { Manuscript } from '@/lib/bookperfect/types';
 import { diffWords } from '@/lib/bookperfect/textDiff';
 import {
@@ -21,8 +22,19 @@ import {
 
 import { exportProfessionalDocx } from '@/utils/docxExportEngine';
 import { exportEbookToPdf } from '@/lib/ebookPdfExporter';
+import { useV3Mode } from '@/hooks/useV3Mode';
 
 type Source = 'doc' | 'pdf' | 'url' | 'paste';
+
+const CORRECTOR_RECOVERY_SCOPE = 'v3-correcteur-current-book';
+
+interface CorrectorRecovery {
+  manuscript: Manuscript;
+  chapters: ChapterProofread[];
+  mode: ProofreadMode;
+  manualReview: boolean;
+  savedAt: number;
+}
 
 const SOURCES: { id: Source; icon: any; title: string; formats: string }[] = [
   { id: 'doc', icon: FileText, title: 'Document', formats: '.docx · .md · .txt' },
@@ -47,6 +59,7 @@ const MODES: { id: ProofreadMode; title: string; desc: string; bullets: string[]
 ];
 
 export default function V3CorrecteurPage() {
+  const { isAdmin } = useV3Mode();
   const [source, setSource] = useState<Source>('doc');
   const [importing, setImporting] = useState(false);
   const [urlValue, setUrlValue] = useState('');
@@ -69,6 +82,8 @@ export default function V3CorrecteurPage() {
   const [retrying, setRetrying] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
   const stopRef = useRef(false);
+  const recoveryReadyRef = useRef(false);
+  const [recoveredAt, setRecoveredAt] = useState<number | null>(null);
 
 
   const doneCount = chapters.filter((c) => c.status === 'done').length;
@@ -106,12 +121,50 @@ export default function V3CorrecteurPage() {
     toast.success(`${m.chapters.length} chapitre(s) importés · ${m.wordCount.toLocaleString('fr-FR')} mots.`);
   }, []);
 
-  // Manuscrit déjà importé ailleurs (Import Studio) : on le reprend ici.
+  // Reprend d'abord un nouvel import, sinon restaure le dernier travail du
+  // correcteur. IndexedDB permet de conserver même les manuscrits volumineux.
   useEffect(() => {
-    if (manuscript) return;
-    const pending = readPendingManuscript();
-    if (pending) loadManuscript(pending);
-  }, [manuscript, loadManuscript]);
+    let cancelled = false;
+    (async () => {
+      const pending = readPendingManuscript();
+      if (pending) {
+        if (!cancelled) {
+          loadManuscript(pending);
+          // Cet import est consommé une seule fois. Aux visites suivantes,
+          // la sauvegarde du correcteur (avec les textes corrigés) est prioritaire.
+          clearPendingManuscript();
+        }
+      } else {
+        const saved = await readAutosaveAsync<CorrectorRecovery>(CORRECTOR_RECOVERY_SCOPE);
+        if (!cancelled && saved?.manuscript && Array.isArray(saved.chapters) && saved.chapters.length > 0) {
+          setManuscript(saved.manuscript);
+          setChapters(saved.chapters);
+          setMode(saved.mode || 'strict');
+          setManualReview(Boolean(saved.manualReview));
+          setRecoveredAt(saved.savedAt || Date.now());
+          toast.success(`Livre retrouvé : ${saved.manuscript.title}`);
+        }
+      }
+      recoveryReadyRef.current = true;
+      void requestPersistentStorage();
+    })();
+    return () => { cancelled = true; };
+  }, [loadManuscript]);
+
+  // Sauvegarde automatique après chaque chapitre corrigé, validation ou édition.
+  useEffect(() => {
+    if (!recoveryReadyRef.current || !manuscript || chapters.length === 0) return;
+    const timer = window.setTimeout(() => {
+      void writeAutosaveAsync<CorrectorRecovery>(CORRECTOR_RECOVERY_SCOPE, {
+        manuscript,
+        chapters,
+        mode,
+        manualReview,
+        savedAt: Date.now(),
+      });
+    }, 350);
+    return () => window.clearTimeout(timer);
+  }, [manuscript, chapters, mode, manualReview]);
 
   const runImport = useCallback(async (fn: () => Promise<Manuscript>) => {
     setImporting(true);
@@ -271,7 +324,10 @@ export default function V3CorrecteurPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-5 md:px-8 py-8">
-      <BackButton />
+      <BackButton
+        to={isAdmin ? '/admin' : '/v3/hub'}
+        label={isAdmin ? 'Tableau de bord admin' : 'Tableau de bord'}
+      />
 
       <input ref={fileRef} type="file" accept=".docx,.md,.txt,.rtf" className="hidden"
         onChange={(e) => { const f = e.target.files?.[0]; if (f) runImport(() => importManuscript(f)); e.target.value = ''; }} />
@@ -290,6 +346,18 @@ export default function V3CorrecteurPage() {
           correction, puis vous exportez un livre prêt pour Amazon KDP.
         </p>
       </header>
+
+      {recoveredAt && manuscript && (
+        <div className="mb-6 flex items-start gap-3 rounded-xl border p-4" style={{ borderColor: 'var(--v3-gold)', background: 'var(--v3-gold-soft, #f7f2e3)' }}>
+          <Save className="mt-0.5 h-5 w-5 shrink-0" style={{ color: 'var(--v3-emerald)' }} />
+          <div>
+            <div className="text-sm font-semibold" style={{ color: 'var(--v3-ink)' }}>Votre livre corrigé a été retrouvé automatiquement</div>
+            <div className="mt-0.5 text-xs" style={{ color: 'var(--v3-muted)' }}>
+              {manuscript.title} · {doneCount} chapitre(s) corrigé(s). Le travail reste disponible après un changement de page ou une actualisation.
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ÉTAPE 1 — Import */}
       <section className="rounded-2xl border bg-white p-6" style={{ borderColor: 'var(--v3-line)' }}>
@@ -626,7 +694,7 @@ export default function V3CorrecteurPage() {
           <p className="mt-2 text-[13px]" style={{ color: 'var(--v3-muted)' }}>
             Les chapitres validés partent en version corrigée ; les autres conservent votre texte d'origine.
           </p>
-          {acceptedCount < doneCount && (
+          {manualReview && acceptedCount < doneCount && (
             <div className="mt-3 flex items-start gap-2 text-[12.5px] rounded-lg border p-3"
               style={{ borderColor: '#fcd34d', background: '#fffbeb', color: '#92400e' }}>
               <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />

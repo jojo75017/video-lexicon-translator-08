@@ -30,10 +30,10 @@ describe('V2V3FloatingSwitch (E2E interaction)', () => {
     localStorage.clear();
   });
 
-  it('affiche V2 par défaut pour un admin', async () => {
+  it('propose la V3 par défaut pour un admin', async () => {
     renderAt('/');
     const btn = await screen.findByRole('button', { name: /Basculer vers la V3/i });
-    expect(btn).toHaveTextContent('V2');
+    expect(btn).toHaveTextContent('Ouvrir V3');
     expect(screen.getByTestId('location')).toHaveTextContent('/');
   });
 
@@ -45,35 +45,35 @@ describe('V2V3FloatingSwitch (E2E interaction)', () => {
     await user.click(btn);
 
     expect(screen.getByTestId('location')).toHaveTextContent('/hub-v3');
-    const btnV3 = screen.getByRole('button', { name: /Mode V3 actif/i });
-    expect(btnV3).toHaveTextContent('V3');
+    const btnV3 = screen.getByRole('button', { name: /Retour au tableau de bord admin/i });
+    expect(btnV3).toHaveTextContent('Dashboard admin');
     expect(localStorage.getItem('ebookstudio_v3_mode')).toBe('1');
   });
 
-  it('bascule V3 → V2 depuis /v3/... : atterrit sur /ebook-planner (générateur V2)', async () => {
+  it('revient au dashboard admin depuis /v3/...', async () => {
     localStorage.setItem('ebookstudio_v3_mode', '1');
     const user = userEvent.setup();
     renderAt('/v3/hub');
 
-    const btn = await screen.findByRole('button', { name: /Mode V3 actif/i });
+    const btn = await screen.findByRole('button', { name: /Retour au tableau de bord admin/i });
     await user.click(btn);
 
-    expect(screen.getByTestId('location')).toHaveTextContent('/ebook-planner');
-    expect(screen.getByRole('button', { name: /Basculer vers la V3/i })).toHaveTextContent('V2');
+    expect(screen.getByTestId('location')).toHaveTextContent('/admin');
+    expect(screen.getByRole('button', { name: /Basculer vers la V3/i })).toHaveTextContent('Ouvrir V3');
     expect(localStorage.getItem('ebookstudio_v3_mode')).toBeNull();
     expect(localStorage.getItem('ebook_planner_active_tab')).toBe('workflow-dashboard');
   });
 
-  it('bascule V3 → V2 depuis /admin : redirige aussi vers /ebook-planner', async () => {
+  it('reste sur le dashboard admin depuis /admin', async () => {
     localStorage.setItem('ebookstudio_v3_mode', '1');
     const user = userEvent.setup();
     renderAt('/admin');
 
-    const btn = await screen.findByRole('button', { name: /Mode V3 actif/i });
+    const btn = await screen.findByRole('button', { name: /Retour au tableau de bord admin/i });
     await user.click(btn);
 
-    expect(screen.getByTestId('location')).toHaveTextContent('/ebook-planner');
-    expect(screen.getByRole('button', { name: /Basculer vers la V3/i })).toHaveTextContent('V2');
+    expect(screen.getByTestId('location')).toHaveTextContent('/admin');
+    expect(screen.getByRole('button', { name: /Basculer vers la V3/i })).toHaveTextContent('Ouvrir V3');
     expect(localStorage.getItem('ebook_planner_active_tab')).toBe('workflow-dashboard');
   });
 
