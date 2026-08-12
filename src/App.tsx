@@ -256,11 +256,12 @@ const App = () => {
       if (shouldRecheckAdmin && session?.user) {
         setTimeout(async () => {
           const adminStatus = await getIsCurrentSessionAdmin();
-          setIsAdmin(adminStatus);
+          if (adminStatus || readLocalCache() !== true) setIsAdmin(adminStatus);
         }, 0);
         return;
       }
-      if (!session || event === 'SIGNED_OUT') setIsAdmin(false);
+      if (event === 'SIGNED_OUT') setIsAdmin(false);
+
     });
 
     return () => {
