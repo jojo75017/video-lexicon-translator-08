@@ -14,7 +14,7 @@ import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 import { Loader2 } from 'lucide-react';
 import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup';
 import { FirstEbookOnboarding } from '@/components/onboarding/FirstEbookOnboarding';
-import EbookbotFloatingButton from '@/components/ebookbot/EbookbotFloatingButton';
+import AssistantFloatingButton from '@/components/assistant/AssistantFloatingButton';
 import ApiKeysFloatingButton from '@/components/ebook/ApiKeysFloatingButton';
 import GeminiKeyAlertBanner from '@/components/ebook/GeminiKeyAlertBanner';
 import AISosModal from '@/components/shared/AISosModal';
@@ -597,7 +597,7 @@ const App = () => {
           </Suspense>
           <SubscriberActivityPopup />
           {isAuthenticated && <FirstEbookOnboarding subscriberEmail={subscriberEmail} />}
-          <EbookbotFloatingButton />
+          <AssistantFloatingButton />
           <ApiKeysFloatingButton />
           <GeminiKeyAlertBanner />
           {(isAuthenticated || isAdmin || isPlannerPreviewHost) && (

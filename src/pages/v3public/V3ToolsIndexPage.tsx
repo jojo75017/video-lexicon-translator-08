@@ -6,6 +6,7 @@ import { Search, ArrowRight, Lock, Check } from 'lucide-react';
 import { FirecrawlNoticeBanner } from '@/components/ebook/FirecrawlNoticeBanner';
 import { FirecrawlCreditsIndicator } from '@/components/ebook/FirecrawlCreditsIndicator';
 import { BackButton } from "@/components/v3/BackButton";
+import V3JourneyTiles from "@/components/v3/V3JourneyTiles";
 
 type PlanParam = V3Plan | 'all' | null;
 
@@ -173,6 +174,10 @@ export default function V3ToolsIndexPage() {
         </div>
       </section>
 
+
+      <div className="max-w-7xl mx-auto px-5 md:px-8 pt-8">
+        <V3JourneyTiles title="Le parcours du livre" />
+      </div>
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-5 md:px-8 py-10">
