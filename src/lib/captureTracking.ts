@@ -1,8 +1,9 @@
 import { supabase } from '@/integrations/supabase/client';
 import { getStoredUtm } from '@/lib/utmTracking';
 
-export type CaptureSurface = 'popup' | 'sticky' | 'demo' | 'inline' | 'cadeau';
-export type CaptureEventType = 'view' | 'click' | 'submit';
+export type CaptureSurface = 'popup' | 'sticky' | 'demo' | 'inline' | 'cadeau' | 'commander';
+export type CaptureEventType = 'view' | 'click' | 'submit' | 'checkout_click' | 'checkout_ready';
+
 
 /**
  * Enregistre un évènement d'acquisition (affichage ou clic) sur un élément de
