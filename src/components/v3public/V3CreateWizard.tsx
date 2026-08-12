@@ -210,6 +210,17 @@ export default function V3CreateWizard() {
   const [step, setStep] = useState(0);
   const [launched, setLaunched] = useState(false);
   const [completedBook, setCompletedBook] = useState<any>(null);
+  // Relecture automatique du manuscrit (V3) : dès que le livre est terminé,
+  // chaque chapitre est corrigé puis remplacé par sa version relue.
+  const [autoFix, setAutoFix] = useState<{
+    running: boolean;
+    done: number;
+    total: number;
+    corrections: number;
+    failed: number;
+    finished: boolean;
+  }>({ running: false, done: 0, total: 0, corrections: 0, failed: 0, finished: false });
+  const autoFixStartedRef = useRef(false);
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [coverLoading, setCoverLoading] = useState(false);
   const [savingCloud, setSavingCloud] = useState(false);
