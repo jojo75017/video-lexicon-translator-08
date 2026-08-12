@@ -194,7 +194,10 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [subscriberEmail, setSubscriberEmail] = useState('');
   const [subscriberData, setSubscriberData] = useState<any>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  // Admin reconnu immédiatement depuis le cache local : aucun écran de
+  // vérification, aucune redirection parasite avant la réponse réseau.
+  const [isAdmin, setIsAdmin] = useState<boolean>(() => readLocalCache() === true);
+
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
