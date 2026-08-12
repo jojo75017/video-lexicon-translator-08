@@ -52,7 +52,7 @@ const AdminDirectPage = () => {
       const isAdmin = await getIsCurrentSessionAdmin();
       if (isAdmin) {
         sessionStorage.setItem('is_admin', 'true');
-        navigate("/ebook-planner", { replace: true });
+        navigate("/admin", { replace: true });
         return true;
       }
       return false;
