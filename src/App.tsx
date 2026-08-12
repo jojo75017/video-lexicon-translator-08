@@ -561,6 +561,7 @@ const App = () => {
 
               <Route path="recherche" element={<V3LockedGate><V3RecherchePage /></V3LockedGate>} />
               <Route path="outils" element={<V3LockedGate><V3ToolsIndexPage /></V3LockedGate>} />
+              <Route path="assistant" element={<V3AssistantPage />} />
               <Route path="outils/sommaire-ultime" element={<V3LockedGate><V3TocUltimatePage /></V3LockedGate>} />
               <Route path="outils/traduction" element={<V3LockedGate><V3TranslatorPage /></V3LockedGate>} />
               <Route path="corriger" element={<V3LockedGate><V3CorrecteurPage /></V3LockedGate>} />
