@@ -122,7 +122,16 @@ FORMAT DE RÉPONSE — JSON STRICT :
 }`;
 
 
-    const userPrompt = latinFix
+    const userPrompt = endingFix
+      ? `Voici le dernier paragraphe d'un chapitre. Sa fin est inachevée. Renvoie ce paragraphe intégral, complété par une à deux phrases de clôture terminées par un point, sans rien changer d'autre :
+
+${chapterTitle ? `Titre du chapitre : "${chapterTitle}"\n` : ''}
+---
+${chapterContent}
+---
+
+Retourne le JSON : "texteCorrige" = le paragraphe complet complété, "corrections" = la phrase de clôture ajoutée.`
+      : latinFix
       ? `Remplace par du français clair toutes les expressions en latin / faux latin / pseudo-langue de ce texte, et ne modifie rien d'autre :
 
 ${chapterTitle ? `Titre du chapitre : "${chapterTitle}"\n` : ''}
