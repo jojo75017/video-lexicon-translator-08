@@ -100,44 +100,105 @@ RÈGLES CRITIQUES:
 
 Retourne UNIQUEMENT le texte réécrit, sans commentaires ni explications.`;
 
-    console.log(`Humanizing content with intensity: ${intensity}, style: ${style}`);
+    console.log(`Humanizing ${wordCount} words · intensity: ${intensity}, style: ${style}, byok: ${!!byoKey}`);
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-3-flash-preview',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Réécris ce texte pour le rendre plus humain:\n\n${content}` }
-        ],
-        temperature: 0.9, // Plus de créativité pour la variation
-      }),
-    });
+    const userPrompt = `Réécris ce texte pour le rendre plus humain:\n\n${content}`;
+    const maxTokens = Math.min(8000, Math.max(1200, Math.round(wordCount * 2.2)));
 
-    if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: 'Limite de requêtes atteinte. Réessayez dans quelques instants.' }),
-          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+    /** Appel BYOK (clé de l'abonné). Renvoie null si la clé n'est pas exploitable. */
+    async function callByok(): Promise<string | null> {
+      if (!byoKey) return null;
+      const provider = String(userProvider || (byoKey.startsWith('AIza') ? 'gemini' : byoKey.startsWith('sk-or-') ? 'openrouter' : 'openai'));
+      try {
+        if (provider === 'gemini') {
+          const r = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${encodeURIComponent(byoKey)}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                system_instruction: { parts: [{ text: systemPrompt }] },
+                contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+                generationConfig: { temperature: 0.9, maxOutputTokens: maxTokens },
+              }),
+            },
+          );
+          if (!r.ok) { console.error('BYOK gemini error', r.status, await r.text()); return null; }
+          const d = await r.json();
+          return d.candidates?.[0]?.content?.parts?.[0]?.text || null;
+        }
+
+        const endpoint = provider === 'openrouter'
+          ? 'https://openrouter.ai/api/v1/chat/completions'
+          : 'https://api.openai.com/v1/chat/completions';
+        const model = userModel || (provider === 'openrouter' ? 'google/gemini-2.5-flash' : 'gpt-4o-mini');
+        const r = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${byoKey}` },
+          body: JSON.stringify({
+            model,
+            messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
+            temperature: 0.9,
+            max_tokens: maxTokens,
+          }),
+        });
+        if (!r.ok) { console.error('BYOK error', provider, r.status, await r.text()); return null; }
+        const d = await r.json();
+        return d.choices?.[0]?.message?.content || null;
+      } catch (e) {
+        console.error('BYOK exception', e);
+        return null;
       }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: 'Crédits épuisés. Ajoutez des crédits à votre espace Lovable.' }),
-          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      const errorText = await response.text();
-      console.error('AI Gateway error:', response.status, errorText);
-      throw new Error(`Erreur API: ${response.status}`);
     }
 
-    const data = await response.json();
-    const humanizedContent = data.choices?.[0]?.message?.content;
+    let humanizedContent: string | null = await callByok();
+
+    if (!humanizedContent) {
+      if (!LOVABLE_API_KEY) {
+        return new Response(
+          JSON.stringify({ error: 'Clé IA refusée. Vérifiez votre clé dans Paramètres > Clés API.' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        );
+      }
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-3-flash-preview',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt }
+          ],
+          temperature: 0.9,
+          max_tokens: maxTokens,
+        }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 429) {
+          return new Response(
+            JSON.stringify({ error: 'Limite de requêtes atteinte. Réessayez dans quelques instants.' }),
+            { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        if (response.status === 402) {
+          return new Response(
+            JSON.stringify({ error: 'Crédits épuisés. Ajoutez votre clé IA dans Paramètres > Clés API.' }),
+            { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        const errorText = await response.text();
+        console.error('AI Gateway error:', response.status, errorText);
+        throw new Error(`Erreur API: ${response.status}`);
+      }
+
+      const data = await response.json();
+      humanizedContent = data.choices?.[0]?.message?.content;
+    }
+
 
     if (!humanizedContent) {
       throw new Error('Pas de contenu généré');
