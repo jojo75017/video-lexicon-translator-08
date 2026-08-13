@@ -71,7 +71,8 @@ Tous pointent vers `https://ebookstudio.fr/commander?src=perte-1er-octobre-1` (p
 ## Lettre 2 — Abonnés V2 (ton différent, pas de vente)
 
 **Objet :** Votre accès V2 est conservé — voici ce qui s'ajoute pour vous
-Contenu : leur accès à vie reste acquis, 3 modules V3 offerts (2 livres/mois, 20 chapitres), remise -20 % à vie sur Plume et Édition s'ils veulent tout débloquer, et le lien vers leur page de migration. Aucune pression, aucune date couperet.
+Contenu : leur accès à vie reste acquis, 3 modules V3 offerts (2 livres/mois, 20 chapitres), remise -20 % à vie sur Plume et Édition s'ils veulent tout débloquer. Aucune pression, aucune date couperet.
+**Appel à l'action :** bouton **« J'active mes 3 modules V3 offerts »** vers `https://ebookstudio.fr/v3/migration`, plus le lien en clair dans le P.S.
 **Relance J+7 uniquement**, vers ceux qui n'ont pas ouvert.
 
 ## Détails techniques
