@@ -129,36 +129,82 @@ export default function V3CorrecteurPage() {
     toast.success(`${m.chapters.length} chapitre(s) importés · ${m.wordCount.toLocaleString('fr-FR')} mots.`);
   }, []);
 
-  // Reprend d'abord un nouvel import, sinon restaure le dernier travail du
-  // correcteur. IndexedDB permet de conserver même les manuscrits volumineux.
+  /** Charge un livre déjà présent dans « Mes livres » (?projectId=…), sans réimport de fichier. */
+  const loadFromProject = useCallback(async (projectId: string): Promise<boolean> => {
+    const { data, error } = await supabase
+      .from('ebook_projects')
+      .select('id,title,chapters,number_of_chapters')
+      .eq('id', projectId)
+      .maybeSingle();
+    if (error || !data) {
+      toast.error('Ce livre est introuvable — importez le document à la place.');
+      return false;
+    }
+    const normalized = normalizeManuscript(Array.isArray(data.chapters) ? data.chapters : [], {
+      expectedCount: Number(data.number_of_chapters) || undefined,
+      bookTitle: data.title,
+    }).filter((c) => (c.content || '').trim().length > 0);
+    if (normalized.length === 0) {
+      toast.error('Ce livre n’a pas encore de texte à corriger.');
+      return false;
+    }
+    const chaptersForManuscript = normalized.map((c, i) => ({
+      id: `proj-${c.number || i + 1}`,
+      index: i,
+      title: c.title || `Chapitre ${i + 1}`,
+      content: c.content,
+      wordCount: c.content.trim().split(/\s+/).filter(Boolean).length,
+    }));
+    const rawText = chaptersForManuscript.map((c) => `${c.title}\n\n${c.content}`).join('\n\n');
+    loadManuscript({
+      id: data.id,
+      fileName: `${data.title}.docx`,
+      title: data.title,
+      rawText,
+      chapters: chaptersForManuscript,
+      wordCount: chaptersForManuscript.reduce((s, c) => s + c.wordCount, 0),
+      pageEstimate: Math.max(1, Math.round(chaptersForManuscript.reduce((s, c) => s + c.wordCount, 0) / 280)),
+      importedAt: Date.now(),
+    });
+    return true;
+  }, [loadManuscript]);
+
+  // Livre choisi depuis « Mes livres », sinon nouvel import, sinon dernier
+  // travail du correcteur. IndexedDB conserve même les manuscrits volumineux.
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const pending = readPendingManuscript();
-      if (pending) {
-        if (!cancelled) {
-          loadManuscript(pending);
-          // Cet import est consommé une seule fois. Aux visites suivantes,
-          // la sauvegarde du correcteur (avec les textes corrigés) est prioritaire.
-          clearPendingManuscript();
-        }
-      } else {
-        const saved = await readAutosaveAsync<CorrectorRecovery>(CORRECTOR_RECOVERY_SCOPE);
-        if (!cancelled && saved?.manuscript && Array.isArray(saved.chapters) && saved.chapters.length > 0) {
-          setManuscript(saved.manuscript);
-          setChapters(saved.chapters);
-          setMode(saved.mode || 'strict');
-          setManualReview(Boolean(saved.manualReview));
-          setCloudProjectId(saved.cloudProjectId || null);
-          setRecoveredAt(saved.savedAt || Date.now());
-          toast.success(`Livre retrouvé : ${saved.manuscript.title}`);
+      const projectId = searchParams.get('projectId');
+      const fromProject = projectId ? await loadFromProject(projectId) : false;
+      if (cancelled) return;
+      if (!fromProject) {
+        const pending = readPendingManuscript();
+        if (pending) {
+          if (!cancelled) {
+            loadManuscript(pending);
+            // Cet import est consommé une seule fois. Aux visites suivantes,
+            // la sauvegarde du correcteur (avec les textes corrigés) est prioritaire.
+            clearPendingManuscript();
+          }
+        } else {
+          const saved = await readAutosaveAsync<CorrectorRecovery>(CORRECTOR_RECOVERY_SCOPE);
+          if (!cancelled && saved?.manuscript && Array.isArray(saved.chapters) && saved.chapters.length > 0) {
+            setManuscript(saved.manuscript);
+            setChapters(saved.chapters);
+            setMode(saved.mode || 'strict');
+            setManualReview(Boolean(saved.manualReview));
+            setCloudProjectId(saved.cloudProjectId || null);
+            setRecoveredAt(saved.savedAt || Date.now());
+            toast.success(`Livre retrouvé : ${saved.manuscript.title}`);
+          }
         }
       }
       recoveryReadyRef.current = true;
       void requestPersistentStorage();
     })();
     return () => { cancelled = true; };
-  }, [loadManuscript]);
+  }, [loadManuscript, loadFromProject, searchParams]);
+
 
   // Sauvegarde automatique après chaque chapitre corrigé, validation ou édition.
   useEffect(() => {
