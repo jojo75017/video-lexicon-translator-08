@@ -330,10 +330,6 @@ export default function V3CorrecteurPage() {
 
   const saveCorrectedBook = useCallback(async () => {
     if (!manuscript || doneCount === 0) return;
-    if (latinRemaining.length > 0) {
-      toast.error('Enregistrement bloqué : des passages latins restent signalés. Relancez les chapitres concernés.');
-      return;
-    }
     setSavingToLibrary(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -362,7 +358,11 @@ export default function V3CorrecteurPage() {
       const { data, error } = await request;
       if (error) throw error;
       setCloudProjectId(data.id);
+      setSavedToLibrary(true);
       toast.success('Livre enregistré dans « Livres corrigés ».');
+      if (latinRemaining.length > 0) {
+        toast.warning('Des passages latins restent signalés : relancez les chapitres concernés puis mettez à jour.');
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Enregistrement impossible.');
     } finally {
@@ -370,7 +370,16 @@ export default function V3CorrecteurPage() {
     }
   }, [manuscript, doneCount, latinRemaining.length, finalChapters, totalCorrections, cloudProjectId]);
 
+  // Enregistrement automatique dès qu'une correction complète est terminée :
+  // l'auteur retrouve son livre dans « Livres corrigés » sans rien cliquer.
+  useEffect(() => {
+    if (!autoSavePendingRef.current || running || !manuscript || doneCount === 0 || savingToLibrary) return;
+    autoSavePendingRef.current = false;
+    void saveCorrectedBook();
+  }, [running, manuscript, doneCount, savingToLibrary, saveCorrectedBook]);
+
   const progressPct = chapters.length ? Math.round(((doneCount + failedCount) / chapters.length) * 100) : 0;
+
 
   return (
     <div className="max-w-6xl mx-auto px-5 md:px-8 py-8">
