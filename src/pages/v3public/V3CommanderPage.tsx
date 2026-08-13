@@ -474,7 +474,50 @@ export default function V3CommanderPage() {
           </div>
         )}
 
+        {/* FAQ — les questions posées avant de payer */}
+        <div className="mt-14" id="faq">
+          <h2 className="text-center text-2xl md:text-3xl" style={{ fontFamily: SERIF, color: EMERALD }}>
+            Questions fréquentes
+          </h2>
+          <div className="mx-auto mt-6 max-w-3xl">
+            <Accordion type="single" collapsible className="space-y-3">
+              {FAQ.map((f, i) => (
+                <AccordionItem
+                  key={f.q}
+                  value={`faq-${i}`}
+                  className="rounded-2xl border bg-white px-5"
+                  style={{ borderColor: `${EMERALD}1f` }}
+                >
+                  <AccordionTrigger className="text-left text-sm font-bold" style={{ color: EMERALD }}>
+                    {f.q}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm leading-relaxed text-slate-700">
+                    {f.a}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+          <p className="mt-6 text-center text-xs text-slate-500">
+            Une autre question ?{" "}
+            <a href="mailto:contact@ebookstudio.fr" className="underline" style={{ color: EMERALD }}>
+              contact@ebookstudio.fr
+            </a>{" "}
+            — réponse sous 24 h ouvrées.
+          </p>
+          <div className="mt-8 text-center">
+            <a
+              href="#paiement"
+              className="inline-flex items-center gap-2 rounded-xl px-7 py-4 text-sm font-black transition-transform hover:-translate-y-0.5"
+              style={{ background: `linear-gradient(90deg, ${GOLD_LIGHT}, ${GOLD})`, color: INK }}
+            >
+              Obtenir l'accès à vie — 47 € <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
+        </div>
+
       </section>
+
     </main>
   );
 }
