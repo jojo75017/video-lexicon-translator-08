@@ -82,13 +82,27 @@ TU NE DOIS RIEN CHANGER D'AUTRE : pas une virgule, pas un mot, pas un paragraphe
 Exceptions à conserver : noms propres réels, titres d'œuvres réelles, locutions latines réellement courantes en français (a priori, de facto, etc.).
 Type de correction à renvoyer pour chacun : "anglicisme".`;
 
+    const endingRules = `MISSION UNIQUE : ce fragment est le DERNIER paragraphe d'un chapitre et sa fin est bancale (mot isolé, phrase sans point, virgule ou tiret orphelin).
+
+TU DOIS :
+1. Reprendre ce paragraphe À L'IDENTIQUE et le compléter par une à deux phrases de clôture, dans le même style, le même temps et la même voix narrative.
+2. Terminer impérativement par un point (ou un point d'exclamation / d'interrogation si le ton l'exige).
+3. Rester dans le prolongement immédiat du texte : aucune information nouvelle, aucun personnage nouveau, aucun événement nouveau, aucune ellipse temporelle.
+4. Écrire un français impeccable : aucun mot latin, aucune langue étrangère, aucun mot inventé.
+
+TU NE DOIS PAS : résumer, réécrire, raccourcir ni supprimer une phrase existante du paragraphe.
+Type de correction à renvoyer : "style".`;
+
     const systemPrompt = `Tu es un correcteur éditorial professionnel francophone. ${
-      latinFix
-        ? 'Tu effectues une passe unique de francisation, sans aucune autre correction.'
-        : `Tu appliques une correction ${polish ? 'STRICTE PUIS un polissage de style mesuré' : 'STRICTE sans aucune réécriture'}.`
+      endingFix
+        ? "Tu complètes une fin de chapitre inachevée, sans rien réécrire d'autre."
+        : latinFix
+          ? 'Tu effectues une passe unique de francisation, sans aucune autre correction.'
+          : `Tu appliques une correction ${polish ? 'STRICTE PUIS un polissage de style mesuré' : 'STRICTE sans aucune réécriture'}.`
     }
 
-${latinFix ? latinRules : polish ? polishRules : strictRules}
+${endingFix ? endingRules : latinFix ? latinRules : polish ? polishRules : strictRules}
+
 
 Le texte corrigé doit être prêt pour publication Amazon KDP.
 
