@@ -9,6 +9,7 @@ import V3ApiKeysGate from '@/components/v3public/V3ApiKeysGate';
 import V3StartBookBar from '@/components/v3public/V3StartBookBar';
 import V3PaletteModule from '@/components/v3public/V3PaletteModule';
 import KdpPilotPromoBanner from '@/components/ebook/KdpPilotPromoBanner';
+import { V3EngineStrip, V3EngineGrid } from '@/components/v3public/V3EngineBanner';
 
 
 
@@ -347,6 +348,10 @@ export default function V3HomePage() {
           ))}
         </div>
       </section>
+
+      {/* MOTEUR MULTI-MODÈLES */}
+      <V3EngineStrip />
+      <V3EngineGrid />
 
       {/* OUTILS VEDETTES */}
       <section className="max-w-7xl mx-auto px-5 md:px-8 pb-16">

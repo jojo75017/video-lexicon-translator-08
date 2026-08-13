@@ -14,6 +14,7 @@ import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { COMMANDER_URL } from "@/data/externalLinks";
 import { V3_LAUNCH_BONUSES, V3_BONUSES_TOTAL_VALUE } from "@/data/v3Launch";
 import { trackCaptureEvent } from "@/lib/captureTracking";
+import { V3EngineStrip, V3EngineGrid } from "@/components/v3public/V3EngineBanner";
 
 
 const BONUS_TOTAL = V3_BONUSES_TOTAL_VALUE;
@@ -179,6 +180,14 @@ export default function V3CommanderPage() {
             Paiement sécurisé par carte bancaire ou PayPal, accès ouvert immédiatement.
           </p>
         </div>
+
+        {/* MOTEUR MULTI-MODÈLES */}
+        <div className="mt-10 overflow-hidden rounded-2xl">
+          <V3EngineStrip />
+        </div>
+        <V3EngineGrid className="!px-0 !py-8" />
+
+
 
 
         <div className="mt-10 grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">

@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import SeoHead from "@/components/funnel/SeoHead";
 import { V3_LAUNCH_DATE_ISO } from "@/config/v3Launch";
 import { V3_PLANS, formatPrice, getYearlySavingsPercent } from "@/data/v3Pricing";
+import { V3EngineStrip, V3EngineGrid } from "@/components/v3public/V3EngineBanner";
 
 const EMERALD = "#064e3b";
 const GOLD = "#c9a84c";
@@ -211,6 +212,10 @@ export default function V3OffrePage() {
           </div>
         </div>
       </section>
+
+      {/* MOTEUR MULTI-MODÈLES */}
+      <V3EngineStrip />
+      <V3EngineGrid />
 
       {/* OFFRE ACTUELLE */}
       <section id="details-offre" className="max-w-5xl mx-auto px-5 py-14">
