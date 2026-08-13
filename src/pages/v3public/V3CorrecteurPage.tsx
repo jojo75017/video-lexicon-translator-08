@@ -240,13 +240,21 @@ export default function V3CorrecteurPage() {
     }
   }, [loadManuscript]);
 
-  const startCorrection = useCallback(async () => {
+  // Affichage des temps d'attente (limite de débit) pendant la correction.
+  useEffect(() => {
+    setProofreadWaitNotifier((info) => setWaitInfo(info));
+    return () => setProofreadWaitNotifier(null);
+  }, []);
+
+  const startCorrection = useCallback(async (onlyFailed = false) => {
     if (!chapters.length) return;
     stopRef.current = false;
     setRunning(true);
     setSavedToLibrary(false);
     autoSavePendingRef.current = true;
-    const working = chapters.map((c) => ({ ...c }));
+    const working = chapters.map((c) => (
+      onlyFailed && c.status === 'failed' ? { ...c, status: 'pending' as const, error: undefined } : { ...c }
+    ));
     try {
       await proofreadChapters(
         working,
@@ -264,16 +272,18 @@ export default function V3CorrecteurPage() {
       const latin = working.reduce((s, c) => s + (c.latinRemoved || 0), 0);
       const stuck = working.reduce((s, c) => s + (c.latinRemaining?.length || 0), 0);
       if (stopRef.current) toast.info('Correction interrompue — le travail déjà fait est conservé.');
-      else if (ko) toast.warning(`Correction terminée avec ${ko} chapitre(s) en échec — relancez-les individuellement.`);
+      else if (ko) toast.warning(`Correction terminée avec ${ko} chapitre(s) en échec — utilisez « Reprendre les chapitres en échec ».`);
       else if (manualReview) toast.success('Correction terminée. Relisez chapitre par chapitre puis exportez.');
       else toast.success(
         `Livre corrigé et appliqué${latin ? ` · ${latin} expression(s) latine(s) supprimée(s)` : ''}. Vous pouvez exporter.`,
       );
       if (stuck > 0) toast.warning(`${stuck} expression(s) en latin résistent — la liste est affichée sous la progression.`);
     } finally {
+      setWaitInfo(null);
       setRunning(false);
     }
   }, [chapters, mode, manualReview]);
+
 
   const retryChapter = useCallback(async (id: string) => {
     const target = chapters.find((c) => c.chapterId === id);
