@@ -115,6 +115,9 @@ export default function V3CorrecteurPage() {
   const avgQuality = doneCount
     ? Math.round(chapters.filter((c) => c.status === 'done').reduce((s, c) => s + (c.quality || 0), 0) / doneCount)
     : 0;
+  const endingsFixed = chapters.filter((c) => c.endingFixed).length;
+  const endingIssues = chapters.filter((c) => c.endingIssue);
+  const blockFailures = chapters.reduce((s, c) => s + (c.blockFailures || 0), 0);
 
 
   const loadManuscript = useCallback((m: Manuscript) => {
