@@ -162,30 +162,78 @@ export default function V3CommanderPage() {
       <PaymentTestModeBanner />
 
       <section className="mx-auto max-w-6xl px-4 py-12 md:py-16">
-        <div className="text-center">
-          <span
-            className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold"
-            style={{ background: `${EMERALD}12`, color: EMERALD }}
-          >
-            <InfinityIcon className="h-3.5 w-3.5" /> Accès à vie · sans abonnement
-          </span>
-          <h1 className="mt-5 text-4xl md:text-5xl font-black leading-tight" style={{ fontFamily: SERIF, color: EMERALD }}>
-            EbookStudio Pro — 47 €, une seule fois
-          </h1>
-          <p className="mx-auto mt-3 text-sm font-bold" style={{ color: "#8a6d16" }}>
-            Tarif d'été : 47 € au lieu de 59 €, jusqu'au 30 septembre. Après cette date, retour à 59 €.
-          </p>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-slate-700">
-            Écrivez, habillez et publiez vos livres sur Amazon KDP avec l'assistance IA complète.
-            Paiement sécurisé par carte bancaire ou PayPal, accès ouvert immédiatement.
-          </p>
+        {/* HERO — nouvelle mise en page éditoriale */}
+        <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
+          <div>
+            <span
+              className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em]"
+              style={{ borderColor: `${GOLD}66`, color: "#8a6d16", background: `${GOLD}12` }}
+            >
+              <InfinityIcon className="h-3.5 w-3.5" /> Accès à vie · sans abonnement
+            </span>
+
+            <h1
+              className="mt-6 text-4xl leading-[1.05] md:text-6xl"
+              style={{ fontFamily: SERIF, color: EMERALD }}
+            >
+              Écrivez et publiez<br />votre livre sur<br />
+              <em>Amazon KDP</em>
+            </h1>
+
+            <div className="mt-7 h-px w-24" style={{ background: `${EMERALD}33` }} />
+
+            <p className="mt-6 max-w-xl text-base leading-relaxed text-slate-700">
+              EbookStudio rédige, met en page, habille et référence vos livres avec
+              l'assistance IA complète. Du sommaire vide au fichier prêt à téléverser.
+            </p>
+
+            <a
+              href="#paiement"
+              className="mt-8 inline-flex items-center gap-2 rounded-xl px-7 py-4 text-sm font-black transition-transform hover:-translate-y-0.5"
+              style={{ background: `linear-gradient(90deg, ${GOLD_LIGHT}, ${GOLD})`, color: INK }}
+            >
+              Obtenir l'accès à vie — 47 € <ArrowRight className="h-4 w-4" />
+            </a>
+
+            <p className="mt-4 text-sm text-slate-600">
+              <span className="line-through">59 €</span> jusqu'au 30 septembre · garanti 30 jours
+            </p>
+
+            <div className="mt-10 border-t pt-6" style={{ borderColor: `${EMERALD}1a` }}>
+              <dl className="grid grid-cols-3 gap-4">
+                {[
+                  { k: "Paiement", v: "unique, à vie" },
+                  { k: "Accès", v: "immédiat" },
+                  { k: "Garantie", v: "30 jours" },
+                ].map((s) => (
+                  <div key={s.k}>
+                    <dt className="text-[10px] font-bold uppercase tracking-[0.16em]" style={{ color: "#8a6d16" }}>
+                      {s.k}
+                    </dt>
+                    <dd className="mt-1 text-lg" style={{ fontFamily: SERIF, color: EMERALD }}>{s.v}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </div>
+
+          <div className="rounded-3xl border bg-white p-3 md:p-4" style={{ borderColor: `${GOLD}44` }}>
+            <img
+              src={heroBooks}
+              alt="Trois livres reliés vert foncé au titre doré, publiés avec EbookStudio"
+              width={1200}
+              height={912}
+              className="w-full rounded-2xl object-cover"
+            />
+          </div>
         </div>
 
         {/* MOTEUR MULTI-MODÈLES */}
-        <div className="mt-10 overflow-hidden rounded-2xl">
+        <div className="mt-14 overflow-hidden rounded-2xl">
           <V3EngineStrip />
         </div>
         <V3EngineGrid className="!px-0 !py-8" />
+
 
 
 
