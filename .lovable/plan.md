@@ -26,16 +26,16 @@ Aucun envoi ne part sans votre clic. Un même destinataire ne reçoit jamais deu
 
 ## Lettre 1 — Prospects (celle qui dissuade d'attendre)
 
-**Objet :** Le 1er octobre, l'accès à vie à EbookStudio disparaît
+**Objet :** Le 30 août, l'accès à vie à EbookStudio disparaît
 **Pré-en-tête :** Après cette date, il ne reste que l'abonnement. Le calcul est simple.
 
 > Bonjour,
 >
 > Je vous écris une fois, clairement, parce que la date approche et que je ne veux pas que vous l'appreniez après.
 >
-> **Jusqu'au 30 septembre**, EbookStudio est accessible pour **47 € une seule fois**, à vie. Vous payez une fois, vous gardez l'accès, y compris les évolutions à venir.
+> **Jusqu'au 29 août**, EbookStudio est accessible pour **47 € une seule fois**, à vie. Vous payez une fois, vous gardez l'accès, y compris les évolutions à venir.
 >
-> **À partir du 1er octobre**, cette offre n'existe plus. Il ne restera que l'abonnement : 17 €/mois pour la formule Plume, 27 €/mois pour la formule Édition. Sur un an, cela fait 204 € au lieu de 47 €. Sur trois ans, 612 €.
+> **À partir du 30 août**, cette offre n'existe plus. Il ne restera que l'abonnement : 17 €/mois pour la formule Plume, 27 €/mois pour la formule Édition. Sur un an, cela fait 204 € au lieu de 47 €. Sur trois ans, 612 €.
 >
 > **Ce que vous perdez précisément si vous attendez :**
 >
