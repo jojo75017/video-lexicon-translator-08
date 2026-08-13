@@ -64,7 +64,6 @@ export const AuthPage = () => {
         }
 
         if (data?.isAdmin) {
-          sessionStorage.setItem('is_admin', 'true');
           navigate(ADMIN_HOME_PATH, { replace: true });
         }
       } catch (error) {

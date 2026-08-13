@@ -153,7 +153,6 @@ const ContactSupportPage = lazy(() => import('./pages/ContactSupportPage'));
 // Admin simplifié
 const AdminPage = lazy(() => import('./pages/AdminPage').then(m => ({ default: m.AdminPage })));
 const AdminProfilePage = lazy(() => import('./pages/AdminProfilePage'));
-const AdminDirectPage = lazy(() => import('./pages/AdminDirectPage'));
 const AdminFunnelPage = lazy(() => import('./pages/admin/AdminFunnelPage'));
 const AdminPdfGiftsPage = lazy(() => import('./pages/admin/AdminPdfGiftsPage'));
 const AdminBetaCodesPage = lazy(() => import('./pages/admin/AdminBetaCodesPage'));

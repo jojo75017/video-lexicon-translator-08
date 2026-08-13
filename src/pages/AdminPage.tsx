@@ -15,6 +15,7 @@ import { usePaymentConfirmations } from '@/hooks/usePaymentConfirmations';
 import { format } from 'date-fns';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 import { ErrorLogsViewer } from '@/components/admin/ErrorLogsViewer';
+import { ADMIN_LOGIN_PATH } from '@/config/adminRoutes';
 
 export const AdminPage = () => {
   const [email, setEmail] = useState('');
@@ -40,8 +41,7 @@ export const AdminPage = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         toast.error('Session expirée - veuillez vous reconnecter');
-        sessionStorage.removeItem('is_admin');
-        navigate('/auth');
+        navigate(ADMIN_LOGIN_PATH);
         return;
       }
 
@@ -54,12 +54,10 @@ export const AdminPage = () => {
       }
 
       if (data?.isAdmin) {
-        sessionStorage.setItem('is_admin', 'true');
         toast.success('✅ Statut admin confirmé !');
       } else {
-        sessionStorage.removeItem('is_admin');
         toast.error('Vous n\'êtes plus admin - redirection...');
-        navigate('/auth');
+        navigate(ADMIN_LOGIN_PATH);
       }
     } catch (error: any) {
       console.error('Error refreshing admin status:', error);
