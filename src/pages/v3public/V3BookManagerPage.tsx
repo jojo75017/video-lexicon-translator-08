@@ -114,8 +114,26 @@ export default function V3BookManagerPage() {
       ) : rows.length === 0 ? (
         <div className="v3-card mt-10 text-center py-14">
           <BookOpen className="w-8 h-8 text-[var(--v3-orange)] mx-auto" />
-          <p className="mt-4 text-sm text-[var(--v3-muted)]">{correctedOnly ? 'Aucun livre corrigé enregistré pour l’instant.' : 'Aucun livre publié pour l’instant.'}</p>
+          {correctedOnly ? (
+            <div className="mt-4 max-w-xl mx-auto">
+              <p className="text-sm font-semibold">Aucun livre corrigé pour l’instant.</p>
+              <p className="mt-2 text-sm text-[var(--v3-muted)]">
+                Un livre apparaît ici automatiquement dès qu’une correction complète est terminée.
+                Ouvrez « Corriger mon livre », importez votre document (ou cliquez sur « Corriger ce livre »
+                depuis Mes livres), puis lancez la correction : l’enregistrement se fait tout seul.
+              </p>
+              <button onClick={() => nav('/v3/corriger')} className="v3-btn v3-btn-primary mt-5">
+                <Plus className="w-4 h-4" /> Corriger un livre
+              </button>
+              <button onClick={() => nav('/v3/mes-livres')} className="v3-btn v3-btn-outline mt-5 ml-2">
+                <BookOpen className="w-4 h-4" /> Voir mes livres
+              </button>
+            </div>
+          ) : (
+            <p className="mt-4 text-sm text-[var(--v3-muted)]">Aucun livre publié pour l’instant.</p>
+          )}
         </div>
+
       ) : (
         <div className="mt-10 space-y-3">
           {rows.map((b) => {
