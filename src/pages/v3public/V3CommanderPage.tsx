@@ -316,7 +316,9 @@ export default function V3CommanderPage() {
 
           {/* Colonne paiement */}
           <div
-            className="rounded-2xl border p-6 md:p-8"
+            id="paiement"
+            className="scroll-mt-24 rounded-2xl border p-6 md:p-8"
+
             style={{ background: "#fff", borderColor: `${GOLD}66`, boxShadow: "0 26px 60px -34px rgba(6,78,59,0.45)" }}
           >
             {!clientSecret ? (
