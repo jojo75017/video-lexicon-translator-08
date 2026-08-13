@@ -620,7 +620,7 @@ export default function V3CorrecteurPage() {
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
             {!running ? (
-              <button onClick={startCorrection} className="v3-btn-primary inline-flex items-center gap-2">
+              <button onClick={() => void startCorrection()} className="v3-btn-primary inline-flex items-center gap-2">
                 <Wand2 className="w-4 h-4" /> {doneCount ? 'Reprendre la correction' : 'Corriger tout le livre'}
               </button>
             ) : (
