@@ -123,8 +123,9 @@ export function applyDialogueTypography(text: string): string {
   if (!text) return text || '';
 
   return text
-    // Tirets cadratins pour les dialogues
-    .replace(/^[-–]\s+/gm, '—\u00A0')
+    // Tirets cadratins pour les vraies répliques de dialogue uniquement
+    .replace(/^[-–]\s+(.*)$/gm, (full, rest: string) => (isDialogueLine(rest) ? `—\u00A0${rest}` : full))
+
     // Guillemets français pour les citations
     .replace(/"([^"]+)"/g, '«\u00A0$1\u00A0»')
     // Apostrophes typographiques
