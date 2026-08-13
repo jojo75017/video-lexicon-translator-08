@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { getIsCurrentSessionAdmin } from "@/lib/adminAccess";
+import { ADMIN_LOGIN_PATH } from "@/config/adminRoutes";
 
 type Props = {
   children: React.ReactNode;
@@ -77,7 +78,7 @@ export function AdminGate({ children }: Props) {
   }
 
   if (!allowed) {
-    return <Navigate to="/auth" replace state={{ from: location }} />;
+    return <Navigate to={ADMIN_LOGIN_PATH} replace state={{ from: location.pathname }} />;
   }
 
   return <>{children}</>;

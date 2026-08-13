@@ -8,9 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { trackFormSubmit } from '@/utils/analytics';
+import { clearAdminCache } from '@/lib/adminAccess';
+import { ADMIN_HOME_PATH } from '@/config/adminRoutes';
 
 export const AuthPage = () => {
-  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -62,8 +63,7 @@ export const AuthPage = () => {
         }
 
         if (data?.isAdmin) {
-          sessionStorage.setItem('is_admin', 'true');
-          navigate('/dashboard', { replace: true });
+          navigate(ADMIN_HOME_PATH, { replace: true });
         }
       } catch (error) {
         // Ignorer les erreurs silencieusement
@@ -138,11 +138,10 @@ export const AuthPage = () => {
     setIsLoading(true);
 
     try {
-      if (isLogin) {
-        console.log('Tentative de connexion pour:', email);
+      console.log('Tentative de connexion administrateur');
 
         const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-          email,
+          email: email.trim().toLowerCase(),
           password,
         });
 
@@ -152,6 +151,7 @@ export const AuthPage = () => {
         }
 
         const accessToken = signInData?.session?.access_token;
+        clearAdminCache();
 
         console.log('Connexion réussie, vérification du rôle admin...');
 
@@ -182,28 +182,9 @@ export const AuthPage = () => {
         }
 
         console.log('Utilisateur admin confirmé');
-        sessionStorage.setItem('is_admin', 'true');
         if (shouldToast) toast.success('Connexion admin réussie');
         trackFormSubmit('admin_login', email);
-        navigate('/ebook-planner');
-      } else {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/auth`,
-          },
-        });
-
-        if (error) throw error;
-
-        if (shouldToast) {
-          toast.success('Compte créé', {
-            description: 'Veuillez vérifier votre email pour confirmer votre compte',
-          });
-        }
-        trackFormSubmit('signup', email);
-      }
+        navigate(ADMIN_HOME_PATH, { replace: true });
     } catch (error: any) {
       console.error('Auth error:', error);
       if (shouldToast) {
@@ -273,9 +254,9 @@ export const AuthPage = () => {
             <Loader2 className="h-6 w-6 text-primary hidden" />
             <span className="text-xl">🔐</span>
           </div>
-          <CardTitle className="text-xl">{isLogin ? 'Connexion Admin' : 'Créer un compte Admin'}</CardTitle>
+          <CardTitle className="text-xl">Connexion Admin</CardTitle>
           <CardDescription>
-            {isLogin ? 'Connectez-vous avec vos identifiants' : 'Créez votre compte administrateur'}
+            Connectez-vous avec vos identifiants administrateur
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -294,7 +275,7 @@ export const AuthPage = () => {
           </div>
 
           {/* MODE CONNEXION : lien magique recommandé */}
-          {isLogin && !usePasswordMode && (
+          {!usePasswordMode && (
             <div className="space-y-3">
               <form onSubmit={handlePasswordlessLogin}>
                 <Button type="submit" className="w-full" disabled={isLoading}>
@@ -326,7 +307,7 @@ export const AuthPage = () => {
           )}
 
           {/* MODE MOT DE PASSE (connexion) ou création de compte */}
-          {(!isLogin || usePasswordMode) && (
+          {usePasswordMode && (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="password">Mot de passe</Label>
@@ -344,13 +325,13 @@ export const AuthPage = () => {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {isLogin ? 'Connexion...' : 'Création...'}
+                    Connexion...
                   </>
                 ) : (
-                  isLogin ? 'Se connecter' : 'Créer le compte'
+                  'Se connecter'
                 )}
               </Button>
-              {isLogin && usePasswordMode && (
+              {usePasswordMode && (
                 <div className="text-center">
                   <Button
                     type="button"
@@ -366,25 +347,14 @@ export const AuthPage = () => {
             </form>
           )}
 
-          {isLogin && (
-            <div className="mt-2 text-center">
-              <Button
-                variant="link"
-                onClick={() => setIsForgotPassword(true)}
-                disabled={isLoading}
-                className="text-sm"
-              >
-                Mot de passe oublié ?
-              </Button>
-            </div>
-          )}
-          <div className="mt-4 text-center">
+          <div className="mt-2 text-center">
             <Button
               variant="link"
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={() => setIsForgotPassword(true)}
               disabled={isLoading}
+              className="text-sm"
             >
-              {isLogin ? "Créer un compte" : "Déjà un compte ? Se connecter"}
+              Mot de passe oublié ?
             </Button>
           </div>
           <div className="mt-2 text-center">

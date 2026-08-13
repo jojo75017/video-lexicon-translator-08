@@ -3,6 +3,7 @@ import { Crown, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useV3Mode } from '@/hooks/useV3Mode';
+import { ADMIN_HOME_PATH } from '@/config/adminRoutes';
 
 const GOLD = '#c9a84c';
 const LS_V3_MODE_KEY = 'ebookstudio_v3_mode';
@@ -75,7 +76,7 @@ export function V2V3FloatingSwitch({ forceVisible = false }: V2V3FloatingSwitchP
         duration: 3500,
         style: { zIndex: 99999 },
       });
-      navigate(isAdmin ? '/admin' : '/ebook-planner?tab=workflow-dashboard', { replace: true });
+      navigate(isAdmin ? ADMIN_HOME_PATH : '/ebook-planner?tab=workflow-dashboard', { replace: true });
     }
   };
 

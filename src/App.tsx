@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriberGate } from '@/components/auth/SubscriberGate';
 import { AdminGate } from '@/components/auth/AdminGate';
@@ -26,6 +26,7 @@ import FloatingToolCTA from '@/components/marketing/FloatingToolCTA';
 import StickySignupBar from '@/components/marketing/StickySignupBar';
 import V3LaunchGlobalBanner from '@/components/V3LaunchGlobalBanner';
 import { captureUtmParams } from '@/lib/utmTracking';
+import { ADMIN_HOME_PATH, ADMIN_LOGIN_PATH } from '@/config/adminRoutes';
 
 // V2 — Ebook Planner + outils satellites
 const RedirectClickPage = lazy(() => import('./pages/RedirectClickPage'));
@@ -152,7 +153,6 @@ const ContactSupportPage = lazy(() => import('./pages/ContactSupportPage'));
 // Admin simplifié
 const AdminPage = lazy(() => import('./pages/AdminPage').then(m => ({ default: m.AdminPage })));
 const AdminProfilePage = lazy(() => import('./pages/AdminProfilePage'));
-const AdminDirectPage = lazy(() => import('./pages/AdminDirectPage'));
 const AdminFunnelPage = lazy(() => import('./pages/admin/AdminFunnelPage'));
 const AdminPdfGiftsPage = lazy(() => import('./pages/admin/AdminPdfGiftsPage'));
 const AdminBetaCodesPage = lazy(() => import('./pages/admin/AdminBetaCodesPage'));
@@ -191,6 +191,7 @@ const queryClient = new QueryClient();
 
 const App = () => {
   useBrandTitle();
+  const { pathname } = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [subscriberEmail, setSubscriberEmail] = useState('');
   const [subscriberData, setSubscriberData] = useState<any>(null);
@@ -311,6 +312,7 @@ const App = () => {
     subchapters_generated: 0,
     covers_generated: 0,
   };
+  const isAdminAuthRoute = pathname === ADMIN_LOGIN_PATH || pathname === '/admin-direct';
 
   if (isCheckingAuth) return <PageLoader />;
 
@@ -344,7 +346,7 @@ const App = () => {
             />
 
             {/* Accueil : admin vers le panneau admin, client vers son espace, visiteur vers l'offre */}
-            <Route path="/" element={<Navigate to={isAdmin ? '/admin' : (hasPlannerAccess ? '/ebook-planner' : '/commander')} replace />} />
+            <Route path="/" element={<Navigate to={isAdmin ? ADMIN_HOME_PATH : (hasPlannerAccess ? '/ebook-planner' : '/commander')} replace />} />
 
 
             {/* Marketing */}
@@ -368,7 +370,7 @@ const App = () => {
                 Ajoute ?voir=1 pour inspecter la page de vente. */}
             <Route path="/commander" element={
               hasPlannerAccess && typeof window !== 'undefined' && !new URLSearchParams(window.location.search).has('voir')
-                ? <Navigate to={isAdmin ? '/admin' : '/ebook-planner'} replace />
+                ? <Navigate to={isAdmin ? ADMIN_HOME_PATH : '/ebook-planner'} replace />
                 : <V3CommanderPage />
             } />
 
@@ -424,16 +426,16 @@ const App = () => {
             <Route path="/communaute" element={<V3CommunautePage />} />
             <Route path="/communaute/post/:id" element={<V3CommunautePostPage />} />
             <Route path="/ai-chat" element={<Navigate to="/ebookbot" replace />} />
-            <Route path="/business-center" element={<Navigate to="/admin" replace />} />
-            <Route path="/plan-marketing" element={<Navigate to="/admin" replace />} />
-            <Route path="/campagne-vente" element={<Navigate to="/admin" replace />} />
-            <Route path="/dashboard-marketing" element={<Navigate to="/admin" replace />} />
-            <Route path="/generateur-posts" element={<Navigate to="/admin" replace />} />
-            <Route path="/dashboard" element={<Navigate to="/ebook-planner" replace />} />
+            <Route path="/business-center" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
+            <Route path="/plan-marketing" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
+            <Route path="/campagne-vente" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
+            <Route path="/dashboard-marketing" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
+            <Route path="/generateur-posts" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
+            <Route path="/dashboard" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
             <Route path="/espace" element={<Navigate to="/ebook-planner" replace />} />
             <Route path="/espace/lancement" element={<Navigate to="/ebook-planner" replace />} />
             <Route path="/tableau-de-bord" element={<Navigate to="/v3/hub" replace />} />
-            <Route path="/admin-cockpit" element={<Navigate to="/admin" replace />} />
+            <Route path="/admin-cockpit" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
             <Route path="/extension-chrome" element={<Navigate to="/offres" replace />} />
             <Route path="/elementor-export" element={<Navigate to="/admin" replace />} />
             <Route path="/audiobook-demo" element={<Navigate to="/formation-audio" replace />} />
@@ -474,7 +476,7 @@ const App = () => {
             <Route path="/licence" element={<Licence />} />
             <Route path="/eula" element={<Licence />} />
             <Route path="/licence-etendue" element={<LicenceEtenduePage />} />
-            <Route path="/auth" element={<AuthPage />} />
+            <Route path={ADMIN_LOGIN_PATH} element={<AuthPage />} />
             <Route path="/logout-total" element={<LogoutTotalPage />} />
             <Route path="/install" element={<InstallPage />} />
             <Route path="/mon-code" element={<RecuperationCodePage />} />
@@ -533,8 +535,8 @@ const App = () => {
             <Route path="/fiches-pratiques" element={gated(<PracticalSheetsGeneratorPage />)} />
 
             {/* Admin */}
-            <Route path="/admin" element={<AdminGate><AdminPage /></AdminGate>} />
-            <Route path="/admin-direct" element={<AdminDirectPage />} />
+            <Route path={ADMIN_HOME_PATH} element={<AdminGate><AdminPage /></AdminGate>} />
+            <Route path="/admin-direct" element={<Navigate to={ADMIN_LOGIN_PATH} replace />} />
             <Route path="/admin/profile" element={<AdminGate><AdminProfilePage /></AdminGate>} />
             <Route path="/admin/funnel" element={<AdminGate><AdminFunnelPage /></AdminGate>} />
             <Route path="/admin/cadeaux-pdf" element={<AdminGate><AdminPdfGiftsPage /></AdminGate>} />
@@ -613,19 +615,19 @@ const App = () => {
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
           </Suspense>
-          <SubscriberActivityPopup />
+          {!isAdminAuthRoute && <SubscriberActivityPopup />}
           {isAuthenticated && <FirstEbookOnboarding subscriberEmail={subscriberEmail} />}
-          <AssistantFloatingButton />
-          <ApiKeysFloatingButton />
-          <GeminiKeyAlertBanner />
-          {(isAuthenticated || isAdmin || isPlannerPreviewHost) && (
+          {!isAdminAuthRoute && <AssistantFloatingButton />}
+          {!isAdminAuthRoute && <ApiKeysFloatingButton />}
+          {!isAdminAuthRoute && <GeminiKeyAlertBanner />}
+          {!isAdminAuthRoute && (isAuthenticated || isAdmin || isPlannerPreviewHost) && (
             <V2V3FloatingSwitch forceVisible={isPlannerPreviewHost && !isAuthenticated && !isAdmin} />
           )}
           {isAuthenticated && <AISosModal />}
           {isAuthenticated && <AICostBadge />}
-          {!isAuthenticated && <LeadCapturePopup />}
-          {!isAuthenticated && <FloatingToolCTA />}
-          {!isAuthenticated && <StickySignupBar />}
+          {!isAdminAuthRoute && !isAuthenticated && <LeadCapturePopup />}
+          {!isAdminAuthRoute && !isAuthenticated && <FloatingToolCTA />}
+          {!isAdminAuthRoute && !isAuthenticated && <StickySignupBar />}
           <Toaster />
         </div>
       </TooltipProvider>

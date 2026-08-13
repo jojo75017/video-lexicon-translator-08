@@ -2,6 +2,7 @@ import { BarChart3, BookOpen, Contact, CreditCard, FileText, Gauge, Mail, Megaph
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { ADMIN_HOME_PATH } from '@/config/adminRoutes';
 
 type AdminNavItem = {
   label: string;
@@ -11,9 +12,8 @@ type AdminNavItem = {
 };
 
 const adminNavItems: AdminNavItem[] = [
-  { label: 'Dashboard', path: '/dashboard', icon: BarChart3, exact: true },
+  { label: 'Tableau de bord admin', path: ADMIN_HOME_PATH, icon: BarChart3, exact: true },
   { label: 'Business Center', path: '/business-center', icon: Gauge, exact: true },
-  { label: 'Abonnés', path: '/admin', icon: Shield, exact: true },
   { label: 'Tunnel', path: '/admin/funnel', icon: TrendingUp, exact: true },
   { label: 'Cadeaux PDF', path: '/admin/cadeaux-pdf', icon: FileText, exact: true },
   { label: 'Codes Bêta', path: '/admin/codes-beta', icon: Ticket, exact: true },
@@ -55,6 +55,10 @@ export function AdminPanelNav({ className }: AdminPanelNavProps) {
         </div>
 
         <div className="flex flex-wrap gap-2">
+          <Button type="button" variant="outline" onClick={() => navigate(ADMIN_HOME_PATH)} className="rounded-xl">
+            <Shield className="mr-2 h-4 w-4" />
+            Tableau de bord admin
+          </Button>
           <Button type="button" variant="outline" onClick={() => navigate('/v3')} className="rounded-xl border-teal-500 text-teal-700 hover:bg-teal-50">
             <Rocket className="mr-2 h-4 w-4" />
             Ouvrir V3
