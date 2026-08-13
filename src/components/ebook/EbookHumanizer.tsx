@@ -71,43 +71,96 @@ const EbookHumanizer: React.FC<EbookHumanizerProps> = ({
     setIsProcessing(true);
     setHumanizedContent('');
     setStats(null);
+    setProgress(null);
+
+    const provider = getProvider();
+    const userApiKey = getActiveAIKey() || undefined;
+    const userModel = provider === 'openrouter' ? getOpenRouterModel() : undefined;
+
+    // Un livre entier (18 000 mots) ne passe pas en un seul appel : le modèle
+    // tronque ou l'appel expire. On découpe en blocs de paragraphes.
+    const blocks = splitForProofread(originalContent, 900);
+    const outputs: string[] = [];
+    const failedBlocks: number[] = [];
+
+    const runBlock = async (block: string) => {
+      const { data, error } = await supabase.functions.invoke('humanize-content', {
+        body: { content: block, intensity, style, userProvider: provider, userApiKey, userModel }
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const out = data?.humanizedContent;
+      if (!out) throw new Error('Réponse vide du moteur IA.');
+      return out as string;
+    };
 
     try {
-      const { data, error } = await supabase.functions.invoke('humanize-content', {
-        body: { 
-          content: originalContent,
-          intensity,
-          style
+      for (let i = 0; i < blocks.length; i++) {
+        setProgress({ current: i + 1, total: blocks.length });
+        try {
+          outputs.push(await runBlock(blocks[i]));
+        } catch (err: any) {
+          // Une seconde chance après une pause (limite de débit fréquente).
+          await new Promise((r) => setTimeout(r, 4000));
+          try {
+            outputs.push(await runBlock(blocks[i]));
+          } catch (err2: any) {
+            failedBlocks.push(i + 1);
+            outputs.push(blocks[i]);
+            console.warn('[humaniseur] bloc en échec', i + 1, err2?.message);
+          }
         }
-      });
-
-      if (error) throw error;
-
-      if (data.error) {
-        toast.error('Erreur', { description: data.error });
-        return;
+        if (i < blocks.length - 1) await new Promise((r) => setTimeout(r, 500));
       }
 
-      setHumanizedContent(data.humanizedContent);
-      setStats(data.stats);
-      
-      toast.success('Contenu humanisé !', {
-        description: `${data.stats.changePercentage}% de modifications appliquées`
-      });
-
-      if (onContentHumanized) {
-        onContentHumanized(data.humanizedContent);
+      const result = outputs.join('\n\n').trim();
+      if (failedBlocks.length === blocks.length) {
+        throw new Error(
+          'Aucun bloc n’a pu être humanisé. Vérifiez votre clé IA dans Paramètres > Clés API, puis réessayez.',
+        );
       }
 
+      setHumanizedContent(result);
+      const originalWords = originalContent.split(/\s+/).filter(Boolean).length;
+      const humanizedWords = result.split(/\s+/).filter(Boolean).length;
+      setStats({
+        originalLength: originalContent.length,
+        humanizedLength: result.length,
+        originalWords,
+        humanizedWords,
+        changePercentage: originalWords
+          ? Math.round((Math.abs(humanizedWords - originalWords) / originalWords) * 100)
+          : 0,
+      });
+
+      if (failedBlocks.length) {
+        toast.warning(`${blocks.length - failedBlocks.length}/${blocks.length} blocs humanisés`, {
+          description: `Blocs conservés à l'identique : ${failedBlocks.join(', ')}. Relancez pour les reprendre.`,
+        });
+      } else {
+        toast.success('Contenu humanisé !', {
+          description: `${blocks.length} bloc(s) traité(s).`,
+        });
+      }
+
+      if (onContentHumanized) onContentHumanized(result);
     } catch (err: any) {
       console.error('Humanization error:', err);
-      toast.error('Erreur lors de l\'humanisation', {
-        description: err.message || 'Veuillez réessayer'
-      });
+      const raw = String(err?.message || '');
+      const description = /429|limite de requ/i.test(raw)
+        ? 'Limite de requêtes IA atteinte. Patientez une minute puis relancez.'
+        : /402|crédit/i.test(raw)
+          ? 'Crédits IA épuisés. Ajoutez votre clé Gemini ou OpenAI dans Paramètres > Clés API.'
+          : /clé|api key|401|403/i.test(raw)
+            ? 'Clé IA absente ou refusée. Vérifiez Paramètres > Clés API.'
+            : raw || 'Veuillez réessayer.';
+      toast.error('Erreur lors de l\'humanisation', { description });
     } finally {
       setIsProcessing(false);
+      setProgress(null);
     }
   };
+
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(humanizedContent);
