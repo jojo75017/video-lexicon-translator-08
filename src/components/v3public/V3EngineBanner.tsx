@@ -65,7 +65,7 @@ const ENGINES: Engine[] = [
     engine: 'Synthèse vocale premium',
     desc: 'Votre manuscrit lu au format audio, prêt à publier.',
     icon: AudioLines,
-    to: '/v3/outils/livre-audio',
+    to: '/v3/outils/audiobook',
   },
   {
     role: 'Métadonnées',
@@ -81,7 +81,7 @@ const ENGINES: Engine[] = [
     engine: 'Traduction 10 langues',
     desc: 'Le même livre publié sur les marchés Amazon étrangers.',
     icon: Languages,
-    to: '/v3/outils/traducteur',
+    to: '/v3/outils/traduction',
   },
 ];
 
