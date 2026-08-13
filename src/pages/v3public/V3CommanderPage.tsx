@@ -92,6 +92,7 @@ interface Testimonial {
   book_title: string | null;
   comment: string;
   rating: number | null;
+  created_at?: string | null;
 }
 
 /** Blocs de réassurance : les trois objections qui bloquent le paiement. */
@@ -132,7 +133,7 @@ export default function V3CommanderPage() {
     (async () => {
       const { data } = await supabase
         .from("book_testimonials")
-        .select("id,author_name,book_title,comment,rating")
+        .select("id,author_name,book_title,comment,rating,created_at")
         .eq("approved", true)
         .order("created_at", { ascending: false })
         .limit(3);
@@ -497,6 +498,12 @@ export default function V3CommanderPage() {
                   <figcaption className="mt-3 text-xs font-bold" style={{ color: EMERALD }}>
                     {t.author_name}
                     {t.book_title && <span className="font-normal text-slate-500"> — {t.book_title}</span>}
+                    {t.created_at && (
+                      <span className="font-normal text-slate-400">
+                        {" · "}
+                        {new Date(t.created_at).toLocaleDateString("fr-FR", { month: "long", year: "numeric" })}
+                      </span>
+                    )}
                   </figcaption>
                   {t.rating ? (
                     <div className="mt-1.5 flex gap-0.5" aria-label={`${t.rating} sur 5`}>
