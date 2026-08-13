@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Plus, Pencil, Trash2, BookOpen, FileDown, X } from 'lucide-react';
+import { Plus, Pencil, Trash2, BookOpen, FileDown, X, Wand2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { BackButton } from "@/components/v3/BackButton";
@@ -114,8 +114,26 @@ export default function V3BookManagerPage() {
       ) : rows.length === 0 ? (
         <div className="v3-card mt-10 text-center py-14">
           <BookOpen className="w-8 h-8 text-[var(--v3-orange)] mx-auto" />
-          <p className="mt-4 text-sm text-[var(--v3-muted)]">{correctedOnly ? 'Aucun livre corrigé enregistré pour l’instant.' : 'Aucun livre publié pour l’instant.'}</p>
+          {correctedOnly ? (
+            <div className="mt-4 max-w-xl mx-auto">
+              <p className="text-sm font-semibold">Aucun livre corrigé pour l’instant.</p>
+              <p className="mt-2 text-sm text-[var(--v3-muted)]">
+                Un livre apparaît ici automatiquement dès qu’une correction complète est terminée.
+                Ouvrez « Corriger mon livre », importez votre document (ou cliquez sur « Corriger ce livre »
+                depuis Mes livres), puis lancez la correction : l’enregistrement se fait tout seul.
+              </p>
+              <button onClick={() => nav('/v3/corriger')} className="v3-btn v3-btn-primary mt-5">
+                <Plus className="w-4 h-4" /> Corriger un livre
+              </button>
+              <button onClick={() => nav('/v3/mes-livres')} className="v3-btn v3-btn-outline mt-5 ml-2">
+                <BookOpen className="w-4 h-4" /> Voir mes livres
+              </button>
+            </div>
+          ) : (
+            <p className="mt-4 text-sm text-[var(--v3-muted)]">Aucun livre publié pour l’instant.</p>
+          )}
         </div>
+
       ) : (
         <div className="mt-10 space-y-3">
           {rows.map((b) => {
@@ -130,7 +148,12 @@ export default function V3BookManagerPage() {
                   {chapterCount > 0 ? `${chapterCount} chapitre${chapterCount > 1 ? 's' : ''} · Export disponible` : 'Brouillon · récupération des sauvegardes à l’ouverture'}
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap justify-end gap-2">
+                {!correctedOnly && (
+                  <button onClick={() => nav(`/v3/corriger?projectId=${b.id}`)} className="v3-btn v3-btn-outline text-xs">
+                    <Wand2 className="w-3.5 h-3.5" /> Corriger ce livre
+                  </button>
+                )}
                 <button
                   onClick={() => void openExport(b)}
                   disabled={exportLoadingId === b.id}

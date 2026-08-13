@@ -24,7 +24,8 @@ import { exportProfessionalDocx } from '@/utils/docxExportEngine';
 import { exportEbookToPdf } from '@/lib/ebookPdfExporter';
 import { useV3Mode } from '@/hooks/useV3Mode';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { normalizeManuscript } from '@/utils/manuscriptNormalizer';
 
 type Source = 'doc' | 'pdf' | 'url' | 'paste';
 
@@ -63,6 +64,7 @@ const MODES: { id: ProofreadMode; title: string; desc: string; bullets: string[]
 
 export default function V3CorrecteurPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { isAdmin } = useV3Mode();
   const [source, setSource] = useState<Source>('doc');
   const [importing, setImporting] = useState(false);
@@ -86,7 +88,9 @@ export default function V3CorrecteurPage() {
   const [retrying, setRetrying] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
   const [savingToLibrary, setSavingToLibrary] = useState(false);
+  const [savedToLibrary, setSavedToLibrary] = useState(false);
   const [cloudProjectId, setCloudProjectId] = useState<string | null>(null);
+  const autoSavePendingRef = useRef(false);
   const stopRef = useRef(false);
   const recoveryReadyRef = useRef(false);
   const [recoveredAt, setRecoveredAt] = useState<number | null>(null);
@@ -127,36 +131,82 @@ export default function V3CorrecteurPage() {
     toast.success(`${m.chapters.length} chapitre(s) importés · ${m.wordCount.toLocaleString('fr-FR')} mots.`);
   }, []);
 
-  // Reprend d'abord un nouvel import, sinon restaure le dernier travail du
-  // correcteur. IndexedDB permet de conserver même les manuscrits volumineux.
+  /** Charge un livre déjà présent dans « Mes livres » (?projectId=…), sans réimport de fichier. */
+  const loadFromProject = useCallback(async (projectId: string): Promise<boolean> => {
+    const { data, error } = await supabase
+      .from('ebook_projects')
+      .select('id,title,chapters,number_of_chapters')
+      .eq('id', projectId)
+      .maybeSingle();
+    if (error || !data) {
+      toast.error('Ce livre est introuvable — importez le document à la place.');
+      return false;
+    }
+    const normalized = normalizeManuscript(Array.isArray(data.chapters) ? data.chapters : [], {
+      expectedCount: Number(data.number_of_chapters) || undefined,
+      bookTitle: data.title,
+    }).filter((c) => (c.content || '').trim().length > 0);
+    if (normalized.length === 0) {
+      toast.error('Ce livre n’a pas encore de texte à corriger.');
+      return false;
+    }
+    const chaptersForManuscript = normalized.map((c, i) => ({
+      id: `proj-${c.number || i + 1}`,
+      index: i,
+      title: c.title || `Chapitre ${i + 1}`,
+      content: c.content,
+      wordCount: c.content.trim().split(/\s+/).filter(Boolean).length,
+    }));
+    const rawText = chaptersForManuscript.map((c) => `${c.title}\n\n${c.content}`).join('\n\n');
+    loadManuscript({
+      id: data.id,
+      fileName: `${data.title}.docx`,
+      title: data.title,
+      rawText,
+      chapters: chaptersForManuscript,
+      wordCount: chaptersForManuscript.reduce((s, c) => s + c.wordCount, 0),
+      pageEstimate: Math.max(1, Math.round(chaptersForManuscript.reduce((s, c) => s + c.wordCount, 0) / 280)),
+      importedAt: Date.now(),
+    });
+    return true;
+  }, [loadManuscript]);
+
+  // Livre choisi depuis « Mes livres », sinon nouvel import, sinon dernier
+  // travail du correcteur. IndexedDB conserve même les manuscrits volumineux.
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const pending = readPendingManuscript();
-      if (pending) {
-        if (!cancelled) {
-          loadManuscript(pending);
-          // Cet import est consommé une seule fois. Aux visites suivantes,
-          // la sauvegarde du correcteur (avec les textes corrigés) est prioritaire.
-          clearPendingManuscript();
-        }
-      } else {
-        const saved = await readAutosaveAsync<CorrectorRecovery>(CORRECTOR_RECOVERY_SCOPE);
-        if (!cancelled && saved?.manuscript && Array.isArray(saved.chapters) && saved.chapters.length > 0) {
-          setManuscript(saved.manuscript);
-          setChapters(saved.chapters);
-          setMode(saved.mode || 'strict');
-          setManualReview(Boolean(saved.manualReview));
-          setCloudProjectId(saved.cloudProjectId || null);
-          setRecoveredAt(saved.savedAt || Date.now());
-          toast.success(`Livre retrouvé : ${saved.manuscript.title}`);
+      const projectId = searchParams.get('projectId');
+      const fromProject = projectId ? await loadFromProject(projectId) : false;
+      if (cancelled) return;
+      if (!fromProject) {
+        const pending = readPendingManuscript();
+        if (pending) {
+          if (!cancelled) {
+            loadManuscript(pending);
+            // Cet import est consommé une seule fois. Aux visites suivantes,
+            // la sauvegarde du correcteur (avec les textes corrigés) est prioritaire.
+            clearPendingManuscript();
+          }
+        } else {
+          const saved = await readAutosaveAsync<CorrectorRecovery>(CORRECTOR_RECOVERY_SCOPE);
+          if (!cancelled && saved?.manuscript && Array.isArray(saved.chapters) && saved.chapters.length > 0) {
+            setManuscript(saved.manuscript);
+            setChapters(saved.chapters);
+            setMode(saved.mode || 'strict');
+            setManualReview(Boolean(saved.manualReview));
+            setCloudProjectId(saved.cloudProjectId || null);
+            setRecoveredAt(saved.savedAt || Date.now());
+            toast.success(`Livre retrouvé : ${saved.manuscript.title}`);
+          }
         }
       }
       recoveryReadyRef.current = true;
       void requestPersistentStorage();
     })();
     return () => { cancelled = true; };
-  }, [loadManuscript]);
+  }, [loadManuscript, loadFromProject, searchParams]);
+
 
   // Sauvegarde automatique après chaque chapitre corrigé, validation ou édition.
   useEffect(() => {
@@ -190,6 +240,8 @@ export default function V3CorrecteurPage() {
     if (!chapters.length) return;
     stopRef.current = false;
     setRunning(true);
+    setSavedToLibrary(false);
+    autoSavePendingRef.current = true;
     const working = chapters.map((c) => ({ ...c }));
     try {
       await proofreadChapters(
@@ -330,10 +382,6 @@ export default function V3CorrecteurPage() {
 
   const saveCorrectedBook = useCallback(async () => {
     if (!manuscript || doneCount === 0) return;
-    if (latinRemaining.length > 0) {
-      toast.error('Enregistrement bloqué : des passages latins restent signalés. Relancez les chapitres concernés.');
-      return;
-    }
     setSavingToLibrary(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -362,7 +410,11 @@ export default function V3CorrecteurPage() {
       const { data, error } = await request;
       if (error) throw error;
       setCloudProjectId(data.id);
+      setSavedToLibrary(true);
       toast.success('Livre enregistré dans « Livres corrigés ».');
+      if (latinRemaining.length > 0) {
+        toast.warning('Des passages latins restent signalés : relancez les chapitres concernés puis mettez à jour.');
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Enregistrement impossible.');
     } finally {
@@ -370,7 +422,16 @@ export default function V3CorrecteurPage() {
     }
   }, [manuscript, doneCount, latinRemaining.length, finalChapters, totalCorrections, cloudProjectId]);
 
+  // Enregistrement automatique dès qu'une correction complète est terminée :
+  // l'auteur retrouve son livre dans « Livres corrigés » sans rien cliquer.
+  useEffect(() => {
+    if (!autoSavePendingRef.current || running || !manuscript || doneCount === 0 || savingToLibrary) return;
+    autoSavePendingRef.current = false;
+    void saveCorrectedBook();
+  }, [running, manuscript, doneCount, savingToLibrary, saveCorrectedBook]);
+
   const progressPct = chapters.length ? Math.round(((doneCount + failedCount) / chapters.length) * 100) : 0;
+
 
   return (
     <div className="max-w-6xl mx-auto px-5 md:px-8 py-8">
@@ -396,6 +457,30 @@ export default function V3CorrecteurPage() {
           correction, puis vous exportez un livre prêt pour Amazon KDP.
         </p>
       </header>
+
+      {/* Mode d'emploi visible : 3 étapes, sans jargon. */}
+      <div className="mb-6 rounded-2xl border p-5" style={{ borderColor: 'var(--v3-line)', background: '#fbfaf7' }}>
+        <div className="flex items-center gap-2 text-sm font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+          <Sparkles className="h-4 w-4" /> Comment ça marche
+        </div>
+        <ol className="mt-3 grid gap-3 sm:grid-cols-3 text-[13px]" style={{ color: 'var(--v3-muted)' }}>
+          <li><span className="font-semibold" style={{ color: 'var(--v3-ink)' }}>1. Choisissez le livre</span><br />Importez un document (Word, PDF, texte) ou ouvrez un livre déjà présent dans « Mes livres » avec le bouton « Corriger ce livre ».</li>
+          <li><span className="font-semibold" style={{ color: 'var(--v3-ink)' }}>2. Cliquez sur « Corriger tout le livre »</span><br />L'IA corrige chaque chapitre, applique les corrections et supprime les mots latins.</li>
+          <li><span className="font-semibold" style={{ color: 'var(--v3-ink)' }}>3. C'est enregistré tout seul</span><br />Le livre corrigé apparaît dans <button type="button" onClick={() => navigate('/v3/livres-corriges')} className="underline font-semibold" style={{ color: 'var(--v3-emerald)' }}>Livres corrigés</button> et s'exporte en Word ou PDF.</li>
+        </ol>
+      </div>
+
+      {savedToLibrary && (
+        <div className="mb-6 flex flex-wrap items-center gap-3 rounded-xl border p-4" style={{ borderColor: '#a7f3d0', background: '#ecfdf5' }}>
+          <CheckCircle2 className="h-5 w-5 shrink-0" style={{ color: '#047857' }} />
+          <div className="text-sm font-semibold" style={{ color: '#065f46' }}>
+            Livre enregistré dans « Livres corrigés »{latinRemaining.length > 0 ? ' — quelques passages latins restent à revoir.' : '.'}
+          </div>
+          <button onClick={() => navigate('/v3/livres-corriges')} className="v3-btn-outline ml-auto inline-flex items-center gap-2 text-xs">
+            <BookOpen className="h-3.5 w-3.5" /> Voir mes livres corrigés
+          </button>
+        </div>
+      )}
 
       {recoveredAt && manuscript && (
         <div className="mb-6 flex items-start gap-3 rounded-xl border p-4" style={{ borderColor: 'var(--v3-gold)', background: 'var(--v3-gold-soft, #f7f2e3)' }}>
