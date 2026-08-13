@@ -2,10 +2,15 @@
  * Correction intégrale d'un manuscrit importé, chapitre par chapitre.
  * Appelle l'edge function `strict-proofread` (IA réelle, aucune simulation),
  * séquentiellement, avec relance automatique en cas de limite de débit.
+ *
+ * Les chapitres longs sont découpés en blocs de paragraphes : un modèle ne peut
+ * pas restituer 6 000 mots en une réponse, il tronque — et une réponse tronquée
+ * était auparavant rejetée en bloc, ce qui donnait « 0 correction ».
  */
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getActiveAIKey, getOpenRouterModel } from '@/services/aiWritingService';
 import { detectLatin, latinExpressions as findLatinExpressions } from '@/utils/latinSweep';
+import { checkEnding, lastParagraph, replaceLastParagraph } from '@/utils/chapterEnding';
 
 export type ProofreadMode = 'strict' | 'polish';
 
@@ -36,6 +41,14 @@ export interface ChapterProofread {
   latinRemoved?: number;
   /** Expressions latines qui résistent après les passes ciblées. */
   latinRemaining?: string[];
+  /** Nombre de blocs dont la réponse a été refusée (texte amputé / hors format). */
+  blockFailures?: number;
+  /** Nombre de blocs traités pour ce chapitre. */
+  blockCount?: number;
+  /** La fin du chapitre a été complétée par une phrase de clôture. */
+  endingFixed?: boolean;
+  /** Fin toujours bancale malgré la passe de clôture (raison affichée). */
+  endingIssue?: string;
   error?: string;
 }
 
@@ -98,6 +111,10 @@ export interface ProofreadResult {
   latinRemoved: number;
   /** Expressions qui résistent malgré les passes ciblées. */
   latinRemaining: string[];
+  blockCount: number;
+  blockFailures: number;
+  endingFixed: boolean;
+  endingIssue?: string;
 }
 
 /** Notification d'attente (limite de débit) pour l'interface. */
@@ -115,13 +132,23 @@ async function waitWithNotice(ms: number, reason: string) {
   waitNotifier?.(null);
 }
 
+type CallMode = ProofreadMode | 'latin-fix' | 'ending-fix';
+
+interface CallResult {
+  corrected: string;
+  corrections: Correction[];
+  quality: number;
+  /** Faux quand le modèle n'a pas renvoyé le JSON attendu (texte brut). */
+  formatOk: boolean;
+}
+
 /** Un appel à l'edge function, avec relances patientes si la limite de débit est atteinte. */
 async function callProofread(
   title: string,
   content: string,
-  mode: ProofreadMode | 'latin-fix',
+  mode: CallMode,
   latinList?: string[],
-): Promise<{ corrected: string; corrections: Correction[]; quality: number }> {
+): Promise<CallResult> {
   let lastError = '';
   for (let attempt = 0; attempt < 5; attempt++) {
     const { data, error } = await supabase.functions.invoke('strict-proofread', {
@@ -145,6 +172,7 @@ async function callProofread(
         corrected,
         corrections: Array.isArray(data.corrections) ? data.corrections : [],
         quality: Number(data.qualiteOrthographe) || 0,
+        formatOk: data.formatOk !== false,
       };
     }
 
@@ -164,60 +192,178 @@ async function callProofread(
 
 
 /**
- * Garde-fou : une correction ne doit jamais raccourcir le chapitre.
- * Si le modèle renvoie un texte amputé (résumé, coupe de paragraphes), on refuse
- * sa réponse et on conserve la version précédente.
+ * Garde-fou : une correction ne doit jamais raccourcir le texte envoyé.
+ * Appliqué BLOC par BLOC : une mauvaise réponse ne fait plus perdre tout le chapitre.
  */
 const MIN_KEEP_RATIO = 0.9;
 
+function normLen(s: string): number {
+  return (s || '').replace(/\s+/g, ' ').trim().length;
+}
+
 function isTruncated(before: string, after: string): boolean {
-  const a = (before || '').replace(/\s+/g, ' ').trim().length;
-  const b = (after || '').replace(/\s+/g, ' ').trim().length;
+  const a = normLen(before);
+  const b = normLen(after);
   if (a < 200) return false;
   return b < a * MIN_KEEP_RATIO;
 }
 
+const countParagraphs = (s: string) =>
+  (s || '').split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean).length;
+
+const countWords = (s: string) => (s || '').trim().split(/\s+/).filter(Boolean).length;
+
 /**
- * Corrige un chapitre, puis vérifie mécaniquement qu'il ne reste aucune expression
- * en latin / faux latin. Toute réponse qui ampute le texte est rejetée.
+ * Découpe un chapitre en blocs de paragraphes (jamais au milieu d'un paragraphe),
+ * de façon à rester sous la limite de sortie du modèle.
+ */
+export function splitForProofread(text: string, maxWords = 1200): string[] {
+  const paras = (text || '').replace(/\r\n/g, '\n').split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+  if (paras.length === 0) return [];
+  const blocks: string[] = [];
+  let current: string[] = [];
+  let words = 0;
+  for (const p of paras) {
+    const w = countWords(p);
+    if (current.length && words + w > maxWords) {
+      blocks.push(current.join('\n\n'));
+      current = [];
+      words = 0;
+    }
+    current.push(p);
+    words += w;
+  }
+  if (current.length) blocks.push(current.join('\n\n'));
+  return blocks;
+}
+
+/** Corrige un bloc, avec deux relances si la réponse est amputée ou hors format. */
+async function proofreadBlock(
+  title: string,
+  block: string,
+  mode: ProofreadMode,
+): Promise<{ text: string; corrections: Correction[]; quality: number; failed: boolean }> {
+  let lastQuality = 0;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const res = await callProofread(title, block, mode);
+      lastQuality = res.quality || lastQuality;
+      const truncated = isTruncated(block, res.corrected);
+      const lostParagraphs = countParagraphs(res.corrected) < countParagraphs(block);
+      if (!truncated && !lostParagraphs && res.formatOk) {
+        return { text: res.corrected, corrections: res.corrections, quality: res.quality, failed: false };
+      }
+      // Réponse inutilisable : on retente le même bloc plutôt que de rendre le texte d'origine.
+      console.warn(
+        `[correcteur] bloc refusé (${truncated ? 'amputé' : lostParagraphs ? 'paragraphes perdus' : 'hors format'}) — ` +
+        `${normLen(res.corrected)}/${normLen(block)} caractères, tentative ${attempt + 1}/3`,
+      );
+      if (attempt < 2) await sleep(1200);
+    } catch (e) {
+      if (attempt >= 2) throw e;
+      await sleep(1200);
+    }
+  }
+  return { text: block, corrections: [], quality: lastQuality, failed: true };
+}
+
+/** Passe de clôture : complète une fin de chapitre bancale par une vraie phrase. */
+async function fixEnding(
+  title: string,
+  text: string,
+): Promise<{ text: string; fixed: boolean }> {
+  const para = lastParagraph(text);
+  try {
+    const res = await callProofread(title, para, 'ending-fix');
+    const candidate = replaceLastParagraph(text, res.corrected);
+    const ok = !checkEnding(candidate).incomplete && normLen(candidate) >= normLen(text);
+    return ok ? { text: candidate, fixed: true } : { text, fixed: false };
+  } catch {
+    return { text, fixed: false };
+  }
+}
+
+/**
+ * Corrige un chapitre bloc par bloc, élimine le latin, puis garantit que le
+ * chapitre se termine par une phrase complète ponctuée.
  */
 export async function proofreadChapter(
   title: string,
   content: string,
   mode: ProofreadMode,
 ): Promise<ProofreadResult> {
-  const before = detectLatin(content).length;
-  const res = await callProofread(title, content, mode);
+  const latinBefore = detectLatin(content).length;
+  const blocks = splitForProofread(content);
+  if (blocks.length === 0) throw new Error('Chapitre vide : rien à corriger.');
 
-  // Réponse tronquée : on garde le texte d'origine plutôt que d'abîmer le chapitre.
-  let corrected = isTruncated(content, res.corrected) ? content : res.corrected;
-  let corrections = isTruncated(content, res.corrected) ? [] : res.corrections;
+  const outputs: string[] = [];
+  let corrections: Correction[] = [];
+  let qualitySum = 0;
+  let qualityCount = 0;
+  let blockFailures = 0;
 
-  // Une seule passe anti-latin, uniquement si le balayage local détecte vraiment
-  // des expressions : moins d'appels IA, donc moins de risque de quota.
-  const remaining = findLatinExpressions(corrected);
-  if (remaining.length) {
-    try {
-      const fix = await callProofread(title, corrected, 'latin-fix', remaining);
-      const reduced = findLatinExpressions(fix.corrected).length < remaining.length;
-      // On ne garde la passe que si elle réduit le latin SANS raccourcir le texte.
-      if (reduced && !isTruncated(corrected, fix.corrected)) {
-        corrected = fix.corrected;
-        corrections = [...corrections, ...fix.corrections];
-      }
-    } catch {
-      // La passe anti-latin échoue : on garde le texte corrigé tel quel.
-    }
+  for (let i = 0; i < blocks.length; i++) {
+    const res = await proofreadBlock(title, blocks[i], mode);
+    outputs.push(res.text);
+    corrections = [...corrections, ...res.corrections];
+    if (res.failed) blockFailures++;
+    if (res.quality) { qualitySum += res.quality; qualityCount++; }
+    if (i < blocks.length - 1) await sleep(400);
   }
 
+  let corrected = outputs.join('\n\n').trim();
+  console.info(
+    `[correcteur] « ${title} » : ${blocks.length} bloc(s), ${blockFailures} refusé(s), ` +
+    `${corrections.length} correction(s), ${normLen(corrected)}/${normLen(content)} caractères`,
+  );
+
+  // Anti-latin : passe ciblée sur les seuls blocs concernés, deux tentatives max.
+  for (let pass = 0; pass < 2; pass++) {
+    const remaining = findLatinExpressions(corrected);
+    if (!remaining.length) break;
+    const parts = splitForProofread(corrected);
+    let changed = false;
+    for (let i = 0; i < parts.length; i++) {
+      const hits = findLatinExpressions(parts[i]);
+      if (!hits.length) continue;
+      try {
+        const fix = await callProofread(title, parts[i], 'latin-fix', hits);
+        const reduced = findLatinExpressions(fix.corrected).length < hits.length;
+        if (reduced && !isTruncated(parts[i], fix.corrected)) {
+          parts[i] = fix.corrected;
+          corrections = [...corrections, ...fix.corrections];
+          changed = true;
+        }
+      } catch {
+        // Passe anti-latin en échec : on garde le bloc corrigé tel quel.
+      }
+    }
+    if (!changed) break;
+    corrected = parts.join('\n\n').trim();
+  }
+
+  // Fin de chapitre : jamais un mot isolé ni une phrase sans point.
+  let endingFixed = false;
+  let endingIssue: string | undefined;
+  const ending = checkEnding(corrected);
+  if (ending.incomplete) {
+    const fix = await fixEnding(title, corrected);
+    corrected = fix.text;
+    endingFixed = fix.fixed;
+    if (!fix.fixed) endingIssue = ending.reason;
+  }
 
   const latinRemaining = findLatinExpressions(corrected);
   return {
     corrected,
     corrections,
-    quality: res.quality,
-    latinRemoved: Math.max(0, before - latinRemaining.length),
+    quality: qualityCount ? Math.round(qualitySum / qualityCount) : 0,
+    latinRemoved: Math.max(0, latinBefore - latinRemaining.length),
     latinRemaining,
+    blockCount: blocks.length,
+    blockFailures,
+    endingFixed,
+    endingIssue,
   };
 }
 
@@ -260,6 +406,10 @@ export async function proofreadChapters(
           quality: res.quality,
           latinRemoved: res.latinRemoved,
           latinRemaining: res.latinRemaining,
+          blockCount: res.blockCount,
+          blockFailures: res.blockFailures,
+          endingFixed: res.endingFixed,
+          endingIssue: res.endingIssue,
           error: undefined,
         };
         onProgress({ index: i, total: chapters.length, chapter: chapters[i] });
