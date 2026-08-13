@@ -362,13 +362,10 @@ const App = () => {
             <Route path="/login" element={<Navigate to="/connexion-abonne" replace />} />
             <Route path="/connexion" element={<Navigate to="/connexion-abonne" replace />} />
             <Route path="/subscription" element={<Navigate to="/connexion-abonne" replace />} />
-            {/* Admin : renvoyé sur le panneau admin, abonné : sur son espace.
-                Ajoute ?voir=1 pour inspecter la page de vente. */}
-            <Route path="/commander" element={
-              hasPlannerAccess && typeof window !== 'undefined' && !new URLSearchParams(window.location.search).has('voir')
-                ? <Navigate to={isAdmin ? ADMIN_HOME_PATH : '/ebook-planner'} replace />
-                : <V3CommanderPage />
-            } />
+            {/* Tunnel de commande : toujours accessible (les CTA emails/bannières doivent
+                arriver sur le paiement, même pour un admin ou un abonné connecté). */}
+            <Route path="/commander" element={<V3CommanderPage />} />
+
 
 
             <Route path="/go/kdp-pilot" element={<GoKdpPilotPage />} />
