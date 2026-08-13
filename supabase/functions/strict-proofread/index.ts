@@ -285,30 +285,45 @@ Retourne le JSON avec le texte corrigé et la liste exhaustive des corrections e
 
     const content = attempt.content;
 
-    let result;
+    // Le modèle encadre parfois le JSON dans un bloc ```json.
+    const unfenced = String(content || '')
+      .replace(/^\s*```(?:json)?\s*/i, '')
+      .replace(/\s*```\s*$/, '');
+
+    let result: Record<string, unknown> | null = null;
+    let formatOk = true;
+
     try {
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        result = JSON.parse(jsonMatch[0]);
-      } else {
-        result = {
-          texteCorrige: content,
-          corrections: [],
-          nombreCorrections: 0,
-          qualiteOrthographe: 0
-        };
-      }
+      const jsonMatch = unfenced.match(/\{[\s\S]*\}/);
+      if (jsonMatch) result = JSON.parse(jsonMatch[0]);
     } catch {
-      console.log("JSON parsing failed, using raw content");
+      // JSON invalide (guillemets non échappés dans le texte, le plus souvent) :
+      // on récupère au moins le texte corrigé par extraction ciblée.
+      const field = unfenced.match(/"texteCorrige"\s*:\s*"([\s\S]*?)"\s*,\s*"corrections"/);
+      if (field) {
+        try {
+          const text = JSON.parse(`"${field[1].replace(/\n/g, '\\n')}"`);
+          result = { texteCorrige: text, corrections: [], nombreCorrections: 0, qualiteOrthographe: 0 };
+          console.log('JSON invalide : texte récupéré par extraction ciblée');
+        } catch { /* extraction impossible */ }
+      }
+    }
+
+    if (!result || typeof result.texteCorrige !== 'string' || !String(result.texteCorrige).trim()) {
+      // Aucun JSON exploitable : le texte brut est utilisé, mais l'appelant est
+      // averti (formatOk = false) pour relancer le bloc au lieu de croire à
+      // « zéro correction ».
+      console.log('Réponse hors format JSON : texte brut renvoyé');
+      formatOk = false;
       result = {
-        texteCorrige: content,
+        texteCorrige: unfenced.trim(),
         corrections: [],
         nombreCorrections: 0,
-        qualiteOrthographe: 0
+        qualiteOrthographe: 0,
       };
     }
 
-    return new Response(JSON.stringify({ ...result, engine }), {
+    return new Response(JSON.stringify({ ...result, formatOk, engine }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
