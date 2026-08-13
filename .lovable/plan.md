@@ -48,13 +48,22 @@ Aucun envoi ne part sans votre clic. Un même destinataire ne reçoit jamais deu
 >
 > **47 € — paiement unique — accès à vie.** Possible en 2 fois (2 × 25 €) ou 3 fois (3 × 18 €), carte bancaire ou PayPal.
 >
-> [Prendre l'accès à vie avant le 30 septembre]
+> **➜ [ JE PRENDS MON ACCÈS À VIE À 47 € ]**
+> *(gros bouton orange, pleine largeur, pointant vers https://ebookstudio.fr/commander)*
 >
 > Si quelque chose vous retient, répondez simplement à cet email : je lis et je réponds moi-même.
 >
 > Georges Boubet — EbookStudio
 >
-> P.S. Le 1er octobre au matin, cette page affichera 17 €/mois. Ce sera trop tard pour l'accès à vie, et je ne pourrai pas faire d'exception.
+> P.S. Le 1er octobre au matin, cette page affichera 17 €/mois. Ce sera trop tard pour l'accès à vie, et je ne pourrai pas faire d'exception. Le lien direct, si le bouton ne s'affiche pas : https://ebookstudio.fr/commander
+
+**Appels à l'action dans la lettre (3 au total, même destination) :**
+
+1. Un premier lien texte juste après le calcul des 204 €/an : « Voir l'offre à 47 € avant le 30 septembre ».
+2. Le bouton principal orange `#FF9E2D` au milieu de l'email : **« Je prends mon accès à vie à 47 € »**.
+3. Le lien brut en clair dans le P.S., pour les boîtes qui bloquent les boutons.
+
+Tous pointent vers `https://ebookstudio.fr/commander?src=perte-1er-octobre-1` (page d'inscription + paiement : l'email est saisi là, puis carte ou PayPal). Le clic est tracké pour exclure automatiquement la personne des relances.
 
 **Relance J+3 :** « Le calcul sur 12 mois » — 47 € une fois contre 204 € par an, plus une démonstration en images du livre produit.
 **Relance J+7 :** « Dernier rappel utile » — 3 paragraphes courts, la date, le lien, rien d'autre.
