@@ -26,6 +26,7 @@ import FloatingToolCTA from '@/components/marketing/FloatingToolCTA';
 import StickySignupBar from '@/components/marketing/StickySignupBar';
 import V3LaunchGlobalBanner from '@/components/V3LaunchGlobalBanner';
 import { captureUtmParams } from '@/lib/utmTracking';
+import { ADMIN_HOME_PATH, ADMIN_LOGIN_PATH } from '@/config/adminRoutes';
 
 // V2 — Ebook Planner + outils satellites
 const RedirectClickPage = lazy(() => import('./pages/RedirectClickPage'));
@@ -344,7 +345,7 @@ const App = () => {
             />
 
             {/* Accueil : admin vers le panneau admin, client vers son espace, visiteur vers l'offre */}
-            <Route path="/" element={<Navigate to={isAdmin ? '/admin' : (hasPlannerAccess ? '/ebook-planner' : '/commander')} replace />} />
+            <Route path="/" element={<Navigate to={isAdmin ? ADMIN_HOME_PATH : (hasPlannerAccess ? '/ebook-planner' : '/commander')} replace />} />
 
 
             {/* Marketing */}
@@ -368,7 +369,7 @@ const App = () => {
                 Ajoute ?voir=1 pour inspecter la page de vente. */}
             <Route path="/commander" element={
               hasPlannerAccess && typeof window !== 'undefined' && !new URLSearchParams(window.location.search).has('voir')
-                ? <Navigate to={isAdmin ? '/admin' : '/ebook-planner'} replace />
+                ? <Navigate to={isAdmin ? ADMIN_HOME_PATH : '/ebook-planner'} replace />
                 : <V3CommanderPage />
             } />
 
@@ -424,16 +425,16 @@ const App = () => {
             <Route path="/communaute" element={<V3CommunautePage />} />
             <Route path="/communaute/post/:id" element={<V3CommunautePostPage />} />
             <Route path="/ai-chat" element={<Navigate to="/ebookbot" replace />} />
-            <Route path="/business-center" element={<Navigate to="/admin" replace />} />
-            <Route path="/plan-marketing" element={<Navigate to="/admin" replace />} />
-            <Route path="/campagne-vente" element={<Navigate to="/admin" replace />} />
-            <Route path="/dashboard-marketing" element={<Navigate to="/admin" replace />} />
-            <Route path="/generateur-posts" element={<Navigate to="/admin" replace />} />
-            <Route path="/dashboard" element={<Navigate to="/ebook-planner" replace />} />
+            <Route path="/business-center" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
+            <Route path="/plan-marketing" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
+            <Route path="/campagne-vente" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
+            <Route path="/dashboard-marketing" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
+            <Route path="/generateur-posts" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
+            <Route path="/dashboard" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
             <Route path="/espace" element={<Navigate to="/ebook-planner" replace />} />
             <Route path="/espace/lancement" element={<Navigate to="/ebook-planner" replace />} />
             <Route path="/tableau-de-bord" element={<Navigate to="/v3/hub" replace />} />
-            <Route path="/admin-cockpit" element={<Navigate to="/admin" replace />} />
+            <Route path="/admin-cockpit" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
             <Route path="/extension-chrome" element={<Navigate to="/offres" replace />} />
             <Route path="/elementor-export" element={<Navigate to="/admin" replace />} />
             <Route path="/audiobook-demo" element={<Navigate to="/formation-audio" replace />} />
@@ -474,7 +475,7 @@ const App = () => {
             <Route path="/licence" element={<Licence />} />
             <Route path="/eula" element={<Licence />} />
             <Route path="/licence-etendue" element={<LicenceEtenduePage />} />
-            <Route path="/auth" element={<AuthPage />} />
+            <Route path={ADMIN_LOGIN_PATH} element={<AuthPage />} />
             <Route path="/logout-total" element={<LogoutTotalPage />} />
             <Route path="/install" element={<InstallPage />} />
             <Route path="/mon-code" element={<RecuperationCodePage />} />
@@ -533,8 +534,8 @@ const App = () => {
             <Route path="/fiches-pratiques" element={gated(<PracticalSheetsGeneratorPage />)} />
 
             {/* Admin */}
-            <Route path="/admin" element={<AdminGate><AdminPage /></AdminGate>} />
-            <Route path="/admin-direct" element={<AdminDirectPage />} />
+            <Route path={ADMIN_HOME_PATH} element={<AdminGate><AdminPage /></AdminGate>} />
+            <Route path="/admin-direct" element={<Navigate to={ADMIN_LOGIN_PATH} replace />} />
             <Route path="/admin/profile" element={<AdminGate><AdminProfilePage /></AdminGate>} />
             <Route path="/admin/funnel" element={<AdminGate><AdminFunnelPage /></AdminGate>} />
             <Route path="/admin/cadeaux-pdf" element={<AdminGate><AdminPdfGiftsPage /></AdminGate>} />

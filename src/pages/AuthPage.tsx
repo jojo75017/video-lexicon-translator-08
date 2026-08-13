@@ -8,6 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { trackFormSubmit } from '@/utils/analytics';
+import { clearAdminCache } from '@/lib/adminAccess';
+import { ADMIN_HOME_PATH } from '@/config/adminRoutes';
 
 export const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -63,7 +65,7 @@ export const AuthPage = () => {
 
         if (data?.isAdmin) {
           sessionStorage.setItem('is_admin', 'true');
-          navigate('/dashboard', { replace: true });
+          navigate(ADMIN_HOME_PATH, { replace: true });
         }
       } catch (error) {
         // Ignorer les erreurs silencieusement
@@ -142,7 +144,7 @@ export const AuthPage = () => {
         console.log('Tentative de connexion pour:', email);
 
         const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-          email,
+          email: email.trim().toLowerCase(),
           password,
         });
 
@@ -152,6 +154,7 @@ export const AuthPage = () => {
         }
 
         const accessToken = signInData?.session?.access_token;
+        clearAdminCache();
 
         console.log('Connexion réussie, vérification du rôle admin...');
 
@@ -182,10 +185,9 @@ export const AuthPage = () => {
         }
 
         console.log('Utilisateur admin confirmé');
-        sessionStorage.setItem('is_admin', 'true');
         if (shouldToast) toast.success('Connexion admin réussie');
         trackFormSubmit('admin_login', email);
-        navigate('/ebook-planner');
+        navigate(ADMIN_HOME_PATH, { replace: true });
       } else {
         const { error } = await supabase.auth.signUp({
           email,
