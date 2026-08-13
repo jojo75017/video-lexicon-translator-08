@@ -318,6 +318,10 @@ export const AdminPage = () => {
             <Button onClick={() => navigate('/v3/create')} size="lg" variant="outline">
               Créer un livre (V3)
             </Button>
+            <Button onClick={() => navigate('/v3/livres-corriges')} size="lg" variant="outline">
+              <BookOpen className="w-4 h-4 mr-2" />
+              Livres corrigés
+            </Button>
             <Button onClick={() => navigate('/ebook-planner')} size="lg" variant="outline">
               <BookOpen className="w-4 h-4 mr-2" />
               Ouvrir le générateur

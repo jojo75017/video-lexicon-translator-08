@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Plus, Pencil, Trash2, BookOpen, FileDown, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -26,6 +26,8 @@ const hasChapterContent = (chapters: unknown): chapters is Record<string, unknow
 
 export default function V3BookManagerPage() {
   const nav = useNavigate();
+  const location = useLocation();
+  const correctedOnly = location.pathname.endsWith('/livres-corriges');
   const [rows, setRows] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Book | null>(null);
@@ -35,9 +37,11 @@ export default function V3BookManagerPage() {
   const load = async () => {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) { nav('/v3/auth'); return; }
-    const { data, error } = await supabase.from('ebook_projects')
-      .select('id,title,author_name,kdp_description,chapters,number_of_chapters')
-      .eq('user_id', auth.user.id).order('updated_at', { ascending: false });
+    let query = supabase.from('ebook_projects')
+      .select('id,title,author_name,kdp_description,chapters,number_of_chapters,project_type')
+      .eq('user_id', auth.user.id);
+    if (correctedOnly) query = query.eq('project_type', 'corrected');
+    const { data, error } = await query.order('updated_at', { ascending: false });
     if (error) toast.error(`Chargement impossible : ${error.message}`);
     setRows((data as Book[]) || []);
     setLoading(false);
@@ -99,10 +103,10 @@ export default function V3BookManagerPage() {
       <div className="max-w-6xl mx-auto px-4 pt-4"><BackButton /></div>
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
-          <h1 className="v3-serif text-4xl font-bold">Mes livres</h1>
-          <p className="text-sm text-[var(--v3-muted)] mt-1">Ouvre un livre pour retrouver le manuscrit, le sommaire et les exports.</p>
+          <h1 className="v3-serif text-4xl font-bold">{correctedOnly ? 'Livres corrigés' : 'Mes livres'}</h1>
+          <p className="text-sm text-[var(--v3-muted)] mt-1">{correctedOnly ? 'Retrouvez ici les manuscrits enregistrés après leur correction complète.' : 'Ouvre un livre pour retrouver le manuscrit, le sommaire et les exports.'}</p>
         </div>
-        <button onClick={() => nav('/v3/create')} className="v3-btn v3-btn-primary"><Plus className="w-4 h-4" /> Ajouter</button>
+        <button onClick={() => nav(correctedOnly ? '/v3/corriger' : '/v3/create')} className="v3-btn v3-btn-primary"><Plus className="w-4 h-4" /> {correctedOnly ? 'Corriger un livre' : 'Ajouter'}</button>
       </div>
 
       {loading ? (
@@ -110,7 +114,7 @@ export default function V3BookManagerPage() {
       ) : rows.length === 0 ? (
         <div className="v3-card mt-10 text-center py-14">
           <BookOpen className="w-8 h-8 text-[var(--v3-orange)] mx-auto" />
-          <p className="mt-4 text-sm text-[var(--v3-muted)]">Aucun livre publié pour l'instant.</p>
+          <p className="mt-4 text-sm text-[var(--v3-muted)]">{correctedOnly ? 'Aucun livre corrigé enregistré pour l’instant.' : 'Aucun livre publié pour l’instant.'}</p>
         </div>
       ) : (
         <div className="mt-10 space-y-3">
