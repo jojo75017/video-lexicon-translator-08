@@ -86,7 +86,9 @@ export default function V3CorrecteurPage() {
   const [retrying, setRetrying] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
   const [savingToLibrary, setSavingToLibrary] = useState(false);
+  const [savedToLibrary, setSavedToLibrary] = useState(false);
   const [cloudProjectId, setCloudProjectId] = useState<string | null>(null);
+  const autoSavePendingRef = useRef(false);
   const stopRef = useRef(false);
   const recoveryReadyRef = useRef(false);
   const [recoveredAt, setRecoveredAt] = useState<number | null>(null);
