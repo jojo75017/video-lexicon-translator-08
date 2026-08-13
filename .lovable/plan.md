@@ -55,18 +55,20 @@ Aucun envoi ne part sans votre clic. Un même destinataire ne reçoit jamais deu
 >
 > Georges Boubet — EbookStudio
 >
-> P.S. Le 1er octobre au matin, cette page affichera 17 €/mois. Ce sera trop tard pour l'accès à vie, et je ne pourrai pas faire d'exception. Le lien direct, si le bouton ne s'affiche pas : https://ebookstudio.fr/commander
+> P.S. Le 30 août au matin, cette page affichera 17 €/mois. Ce sera trop tard pour l'accès à vie, et je ne pourrai pas faire d'exception. Le lien direct, si le bouton ne s'affiche pas : https://ebookstudio.fr/commander
 
 **Appels à l'action dans la lettre (3 au total, même destination) :**
 
-1. Un premier lien texte juste après le calcul des 204 €/an : « Voir l'offre à 47 € avant le 30 septembre ».
+1. Un premier lien texte juste après le calcul des 204 €/an : « Voir l'offre à 47 € avant le 29 août ».
 2. Le bouton principal orange `#FF9E2D` au milieu de l'email : **« Je prends mon accès à vie à 47 € »**.
 3. Le lien brut en clair dans le P.S., pour les boîtes qui bloquent les boutons.
 
-Tous pointent vers `https://ebookstudio.fr/commander?src=perte-1er-octobre-1` (page d'inscription + paiement : l'email est saisi là, puis carte ou PayPal). Le clic est tracké pour exclure automatiquement la personne des relances.
+Tous pointent vers `https://ebookstudio.fr/commander?src=perte-acces-a-vie-1` (page d'inscription + paiement : l'email est saisi là, puis carte ou PayPal). Le clic est tracké pour exclure automatiquement la personne des relances.
 
 **Relance J+3 :** « Le calcul sur 12 mois » — 47 € une fois contre 204 € par an, plus une démonstration en images du livre produit.
-**Relance J+7 :** « Dernier rappel utile » — 3 paragraphes courts, la date, le lien, rien d'autre.
+**Relance J+7 (28 août) :** « Dernier jour » — 3 paragraphes courts, la date, le lien, rien d'autre.
+
+**Version GetResponse prête à coller :** le HTML complet est donné dans mon message de chat juste en dessous du plan (bloc de code à copier dans l'éditeur HTML de GetResponse). Dès que vous passez en mode construction, je l'enregistre aussi dans le projet en fichier téléchargeable.
 
 ## Lettre 2 — Abonnés V2 (ton différent, pas de vente)
 
