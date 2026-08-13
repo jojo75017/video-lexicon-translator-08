@@ -92,6 +92,7 @@ interface Testimonial {
   book_title: string | null;
   comment: string;
   rating: number | null;
+  created_at?: string | null;
 }
 
 /** Blocs de réassurance : les trois objections qui bloquent le paiement. */
