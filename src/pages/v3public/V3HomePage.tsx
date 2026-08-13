@@ -349,6 +349,10 @@ export default function V3HomePage() {
         </div>
       </section>
 
+      {/* MOTEUR MULTI-MODÈLES */}
+      <V3EngineStrip />
+      <V3EngineGrid />
+
       {/* OUTILS VEDETTES */}
       <section className="max-w-7xl mx-auto px-5 md:px-8 pb-16">
         <div className="rounded-3xl p-10" style={{ background: 'var(--v3-cream)', border: '1px solid var(--v3-line)' }}>
