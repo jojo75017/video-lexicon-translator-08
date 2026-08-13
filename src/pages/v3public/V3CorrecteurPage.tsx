@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import {
   FileText, FileType2, Globe, ClipboardPaste, Upload, Loader2, Wand2, ShieldCheck,
   CheckCircle2, AlertTriangle, RefreshCw, FileDown, Sparkles, StopCircle,
-  Pencil, Save, Undo2, RotateCcw, BookOpen,
+  Pencil, Save, Undo2, RotateCcw, BookOpen, Trash2,
 } from 'lucide-react';
 
 import { BackButton } from '@/components/v3/BackButton';
@@ -12,7 +12,7 @@ import { importFromPdf } from '@/lib/import/importFromPdf';
 import { importFromUrl } from '@/lib/import/importFromUrl';
 import { buildManuscriptFromText } from '@/lib/import/buildManuscriptFromText';
 import { readPendingManuscript, clearPendingManuscript } from '@/lib/import/pendingManuscript';
-import { readAutosaveAsync, requestPersistentStorage, writeAutosaveAsync } from '@/lib/ebookProjectStorage';
+import { deleteAutosaveAsync, readAutosaveAsync, requestPersistentStorage, writeAutosaveAsync } from '@/lib/ebookProjectStorage';
 import type { Manuscript } from '@/lib/bookperfect/types';
 import { diffWords } from '@/lib/bookperfect/textDiff';
 import {
@@ -98,6 +98,7 @@ export default function V3CorrecteurPage() {
   const stopRef = useRef(false);
   const recoveryReadyRef = useRef(false);
   const [recoveredAt, setRecoveredAt] = useState<number | null>(null);
+  const [resetting, setResetting] = useState(false);
 
 
   const doneCount = chapters.filter((c) => c.status === 'done').length;
@@ -292,6 +293,61 @@ export default function V3CorrecteurPage() {
       setRunning(false);
     }
   }, [chapters, mode, manualReview]);
+
+  const resetCorrection = useCallback(async () => {
+    if (!manuscript || running || resetting) return;
+    const confirmed = window.confirm(
+      'Effacer toute la correction en cours ?\n\n' +
+      'Les chapitres corrigés, les erreurs et la progression seront supprimés. ' +
+      'Votre manuscrit original et vos livres enregistrés resteront intacts.',
+    );
+    if (!confirmed) return;
+
+    setResetting(true);
+    try {
+      // Ferme d'abord la porte à l'ancienne sauvegarde, puis inscrit un état vierge.
+      recoveryReadyRef.current = false;
+      await deleteAutosaveAsync(CORRECTOR_RECOVERY_SCOPE);
+      clearPendingManuscript();
+
+      const freshChapters: ChapterProofread[] = manuscript.chapters.map((chapter, index) => ({
+        chapterId: chapter.id,
+        index,
+        title: chapter.title,
+        original: chapter.content,
+        corrected: '',
+        corrections: [],
+        quality: 0,
+        status: 'pending',
+        accepted: false,
+      }));
+
+      setChapters(freshChapters);
+      setCurrent(0);
+      setWaitInfo(null);
+      setOpenChapter(null);
+      setEditingChapter(null);
+      setEditDraft('');
+      setRetrying(null);
+      setSavedToLibrary(false);
+      setRecoveredAt(null);
+      autoSavePendingRef.current = false;
+
+      await writeAutosaveAsync<CorrectorRecovery>(CORRECTOR_RECOVERY_SCOPE, {
+        manuscript,
+        chapters: freshChapters,
+        mode,
+        manualReview,
+        savedAt: Date.now(),
+        cloudProjectId: cloudProjectId || undefined,
+      });
+      recoveryReadyRef.current = true;
+      toast.success('Correction effacée. Vous pouvez relancer tout le livre depuis le chapitre 1.');
+    } finally {
+      recoveryReadyRef.current = true;
+      setResetting(false);
+    }
+  }, [cloudProjectId, manuscript, manualReview, mode, resetting, running]);
 
 
   const retryChapter = useCallback(async (id: string) => {
@@ -637,6 +693,15 @@ export default function V3CorrecteurPage() {
                 <StopCircle className="w-4 h-4" /> Interrompre
               </button>
             )}
+            <button
+              type="button"
+              onClick={() => void resetCorrection()}
+              disabled={running || resetting}
+              className="v3-btn-outline inline-flex items-center gap-2 border-destructive/40 text-destructive disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {resetting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+              Effacer la correction et repartir à zéro
+            </button>
             <span className="text-[12px]" style={{ color: 'var(--v3-muted)' }}>
               {manualReview
                 ? "Rien n'est écrasé : le texte original reste intact jusqu'à votre validation."

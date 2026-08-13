@@ -162,3 +162,24 @@ export const readAutosaveAsync = async <T,>(scope: string): Promise<T | null> =>
   return null;
 };
 
+/** Supprime les deux copies d'une sauvegarde automatique, sans toucher aux projets enregistrés. */
+export const deleteAutosaveAsync = async (scope: string): Promise<void> => {
+  try { localStorage.removeItem(autoKey(scope)); } catch {}
+
+  try {
+    const db = await openNativeDb();
+    if (!db) return;
+    await new Promise<void>((resolve) => {
+      try {
+        const tx = db.transaction(AUTOSAVE_STORE, 'readwrite');
+        tx.objectStore(AUTOSAVE_STORE).delete(autoKey(scope));
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => resolve();
+        tx.onabort = () => resolve();
+      } catch {
+        resolve();
+      }
+    });
+  } catch {}
+};
+
