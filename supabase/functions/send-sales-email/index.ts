@@ -372,13 +372,29 @@ Deno.serve(async (req) => {
       const testEmail = normalize(String(body.test_email || ""));
       if (!isEmail(testEmail)) return respond({ error: "Adresse de test invalide" }, 400);
       recipients = (requested >= 1 && requested <= 5 ? [requested] : [1, 2, 3, 4, 5]).map((step) => ({ email: testEmail, first_name: "Georges", current_step: step - 1 }));
+    } else if (mode === "manual" && Array.isArray(body.prospect_ids) && body.prospect_ids.length) {
+      // Découpage en lots : une URL avec des centaines d'IDs fait échouer la requête PostgREST.
+      const ids = (body.prospect_ids as string[]).filter((v) => typeof v === "string" && v.length > 0).slice(0, 500);
+      const collected: any[] = [];
+      for (let i = 0; i < ids.length && collected.length < 100; i += 40) {
+        const chunk = ids.slice(i, i + 40);
+        const { data, error } = await db
+          .from("sales_prospects")
+          .select("id,email,first_name,current_step")
+          .in("id", chunk)
+          .eq("status", "active")
+          .eq("unsubscribed", false);
+        if (error) throw error;
+        collected.push(...(data || []));
+      }
+      recipients = collected.slice(0, 100);
     } else {
-      let query = db.from("sales_prospects").select("id,email,first_name,current_step").eq("status", "active").eq("unsubscribed", false).eq("auto_send", true).eq("completed", false).lte("next_email_at", new Date().toISOString()).order("next_email_at").limit(Math.min(Number(body.batch_size || 50), 100));
-      if (mode === "manual" && Array.isArray(body.prospect_ids) && body.prospect_ids.length) query = db.from("sales_prospects").select("id,email,first_name,current_step").in("id", body.prospect_ids).eq("status", "active").eq("unsubscribed", false).limit(100);
+      const query = db.from("sales_prospects").select("id,email,first_name,current_step").eq("status", "active").eq("unsubscribed", false).eq("auto_send", true).eq("completed", false).lte("next_email_at", new Date().toISOString()).order("next_email_at").limit(Math.min(Number(body.batch_size || 50), 100));
       const { data, error } = await query;
       if (error) throw error;
       recipients = data || [];
     }
+
 
 
     const { data: orders } = await db.from("funnel_orders").select("email").eq("status", "paid");
