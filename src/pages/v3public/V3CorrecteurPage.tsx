@@ -24,7 +24,8 @@ import { exportProfessionalDocx } from '@/utils/docxExportEngine';
 import { exportEbookToPdf } from '@/lib/ebookPdfExporter';
 import { useV3Mode } from '@/hooks/useV3Mode';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { normalizeManuscript } from '@/utils/manuscriptNormalizer';
 
 type Source = 'doc' | 'pdf' | 'url' | 'paste';
 
