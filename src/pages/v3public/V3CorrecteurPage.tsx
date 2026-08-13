@@ -84,7 +84,9 @@ export default function V3CorrecteurPage() {
 
   const [running, setRunning] = useState(false);
   const [current, setCurrent] = useState(0);
+  const [waitInfo, setWaitInfo] = useState<{ seconds: number; reason: string } | null>(null);
   const [openChapter, setOpenChapter] = useState<string | null>(null);
+
   const [editingChapter, setEditingChapter] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState('');
   const [retrying, setRetrying] = useState<string | null>(null);
