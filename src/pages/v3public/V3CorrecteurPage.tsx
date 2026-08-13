@@ -192,6 +192,8 @@ export default function V3CorrecteurPage() {
     if (!chapters.length) return;
     stopRef.current = false;
     setRunning(true);
+    setSavedToLibrary(false);
+    autoSavePendingRef.current = true;
     const working = chapters.map((c) => ({ ...c }));
     try {
       await proofreadChapters(
