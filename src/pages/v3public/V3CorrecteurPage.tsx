@@ -717,6 +717,23 @@ export default function V3CorrecteurPage() {
             </div>
           )}
 
+          {!running && endingIssues.length > 0 && (
+            <div className="mt-4 rounded-xl border p-4" style={{ borderColor: '#f0c98a', background: '#fdf7ec' }}>
+              <p className="text-[13px] font-semibold" style={{ color: '#92400e' }}>
+                Fins de chapitre encore incomplètes — elles doivent se terminer par une phrase ponctuée :
+              </p>
+              <ul className="mt-2 space-y-1">
+                {endingIssues.map((c) => (
+                  <li key={c.chapterId} className="text-[12.5px]" style={{ color: '#92400e' }}>
+                    <strong>{c.title || `Chapitre ${c.index + 1}`}</strong> : {c.endingIssue}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+
+
 
           <div className="mt-5 space-y-3">
             {chapters.map((c) => {
