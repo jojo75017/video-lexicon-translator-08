@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import {
   FileText, FileType2, Globe, ClipboardPaste, Upload, Loader2, Wand2, ShieldCheck,
   CheckCircle2, AlertTriangle, RefreshCw, FileDown, Sparkles, StopCircle,
-  Pencil, Save, Undo2, RotateCcw,
+  Pencil, Save, Undo2, RotateCcw, BookOpen,
 } from 'lucide-react';
 
 import { BackButton } from '@/components/v3/BackButton';
@@ -23,6 +23,8 @@ import {
 import { exportProfessionalDocx } from '@/utils/docxExportEngine';
 import { exportEbookToPdf } from '@/lib/ebookPdfExporter';
 import { useV3Mode } from '@/hooks/useV3Mode';
+import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
 
 type Source = 'doc' | 'pdf' | 'url' | 'paste';
 
@@ -34,6 +36,7 @@ interface CorrectorRecovery {
   mode: ProofreadMode;
   manualReview: boolean;
   savedAt: number;
+  cloudProjectId?: string;
 }
 
 const SOURCES: { id: Source; icon: any; title: string; formats: string }[] = [
@@ -59,6 +62,7 @@ const MODES: { id: ProofreadMode; title: string; desc: string; bullets: string[]
 ];
 
 export default function V3CorrecteurPage() {
+  const navigate = useNavigate();
   const { isAdmin } = useV3Mode();
   const [source, setSource] = useState<Source>('doc');
   const [importing, setImporting] = useState(false);
@@ -81,6 +85,8 @@ export default function V3CorrecteurPage() {
   const [editDraft, setEditDraft] = useState('');
   const [retrying, setRetrying] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [savingToLibrary, setSavingToLibrary] = useState(false);
+  const [cloudProjectId, setCloudProjectId] = useState<string | null>(null);
   const stopRef = useRef(false);
   const recoveryReadyRef = useRef(false);
   const [recoveredAt, setRecoveredAt] = useState<number | null>(null);
@@ -141,6 +147,7 @@ export default function V3CorrecteurPage() {
           setChapters(saved.chapters);
           setMode(saved.mode || 'strict');
           setManualReview(Boolean(saved.manualReview));
+          setCloudProjectId(saved.cloudProjectId || null);
           setRecoveredAt(saved.savedAt || Date.now());
           toast.success(`Livre retrouvé : ${saved.manuscript.title}`);
         }
@@ -161,10 +168,11 @@ export default function V3CorrecteurPage() {
         mode,
         manualReview,
         savedAt: Date.now(),
+        cloudProjectId: cloudProjectId || undefined,
       });
     }, 350);
     return () => window.clearTimeout(timer);
-  }, [manuscript, chapters, mode, manualReview]);
+  }, [manuscript, chapters, mode, manualReview, cloudProjectId]);
 
   const runImport = useCallback(async (fn: () => Promise<Manuscript>) => {
     setImporting(true);
@@ -319,6 +327,48 @@ export default function V3CorrecteurPage() {
       setExporting(false);
     }
   }, [manuscript, finalChapters]);
+
+  const saveCorrectedBook = useCallback(async () => {
+    if (!manuscript || doneCount === 0) return;
+    if (latinRemaining.length > 0) {
+      toast.error('Enregistrement bloqué : des passages latins restent signalés. Relancez les chapitres concernés.');
+      return;
+    }
+    setSavingToLibrary(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error('Reconnectez-vous pour enregistrer ce livre.');
+        return;
+      }
+      const payload = {
+        user_id: user.id,
+        title: `${manuscript.title} — corrigé`,
+        author_name: '',
+        project_type: 'corrected',
+        chapters: finalChapters.map((chapter, index) => ({
+          id: `corrected-${index + 1}`,
+          number: index + 1,
+          title: chapter.title,
+          content: chapter.content,
+          subChapters: [],
+        })),
+        number_of_chapters: finalChapters.length,
+        book_summary: `Livre corrigé le ${new Date().toLocaleDateString('fr-FR')} · ${totalCorrections} correction(s)`,
+      };
+      const request = cloudProjectId
+        ? supabase.from('ebook_projects').update(payload).eq('id', cloudProjectId).select('id').single()
+        : supabase.from('ebook_projects').insert(payload).select('id').single();
+      const { data, error } = await request;
+      if (error) throw error;
+      setCloudProjectId(data.id);
+      toast.success('Livre enregistré dans « Livres corrigés ».');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Enregistrement impossible.');
+    } finally {
+      setSavingToLibrary(false);
+    }
+  }, [manuscript, doneCount, latinRemaining.length, finalChapters, totalCorrections, cloudProjectId]);
 
   const progressPct = chapters.length ? Math.round(((doneCount + failedCount) / chapters.length) * 100) : 0;
 
@@ -702,8 +752,15 @@ export default function V3CorrecteurPage() {
             </div>
           )}
           <div className="mt-4 flex flex-wrap gap-3">
+            <button onClick={saveCorrectedBook} disabled={savingToLibrary || exporting} className="v3-btn-primary inline-flex items-center gap-2 disabled:opacity-50">
+              {savingToLibrary ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {cloudProjectId ? 'Mettre à jour dans Livres corrigés' : 'Enregistrer dans Livres corrigés'}
+            </button>
             <button onClick={exportWord} disabled={exporting} className="v3-btn-primary inline-flex items-center gap-2 disabled:opacity-50">
               {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />} Exporter en Word
+            </button>
+            <button onClick={() => navigate('/v3/livres-corriges')} className="v3-btn-outline inline-flex items-center gap-2">
+              <BookOpen className="w-4 h-4" /> Voir mes livres corrigés
             </button>
             <button onClick={exportPdf} disabled={exporting} className="v3-btn-outline inline-flex items-center gap-2 disabled:opacity-50">
               {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />} Exporter en PDF

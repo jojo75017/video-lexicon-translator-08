@@ -571,6 +571,7 @@ const App = () => {
               <Route path="auteur" element={<V3LockedGate><V3GuestAuthorPage /></V3LockedGate>} />
               <Route path="u/:slug" element={<V3LockedGate><V3AuthorProfilePage /></V3LockedGate>} />
               <Route path="mes-livres" element={<V3LockedGate><V3BookManagerPage /></V3LockedGate>} />
+              <Route path="livres-corriges" element={<V3LockedGate><V3BookManagerPage /></V3LockedGate>} />
               <Route path="parametres" element={<V3LockedGate><V3AuthorSettingsPage /></V3LockedGate>} />
               <Route path="livres/:type" element={<V3LockedGate><V3SpecialBookPage /></V3LockedGate>} />
               <Route path="offres" element={<Navigate to="/v3/forfaits" replace />} />
