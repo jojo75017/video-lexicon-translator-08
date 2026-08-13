@@ -10,7 +10,7 @@ import { AdminGate } from '@/components/auth/AdminGate';
 import { V3Gate } from '@/components/auth/V3Gate';
 import { V3LockedGate } from '@/components/v3/V3LockedGate';
 import { BookPerfectGate } from '@/components/auth/BookPerfectGate';
-import { clearAdminCache, getIsCurrentSessionAdmin, readLocalCache } from '@/lib/adminAccess';
+import { clearAdminCache, getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 import { Loader2 } from 'lucide-react';
 import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup';
 import { FirstEbookOnboarding } from '@/components/onboarding/FirstEbookOnboarding';
@@ -195,9 +195,7 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [subscriberEmail, setSubscriberEmail] = useState('');
   const [subscriberData, setSubscriberData] = useState<any>(null);
-  // Admin reconnu immédiatement depuis le cache local : aucun écran de
-  // vérification, aucune redirection parasite avant la réponse réseau.
-  const [isAdmin, setIsAdmin] = useState<boolean>(() => readLocalCache() === true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
@@ -237,10 +235,8 @@ const App = () => {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           const adminStatus = await getIsCurrentSessionAdmin();
-          // On ne retire jamais le statut admin déjà confirmé en cache :
-          // une réponse réseau ratée ne doit pas éjecter l'admin.
-          if (adminStatus || readLocalCache() !== true) setIsAdmin(adminStatus);
-        } else if (readLocalCache() !== true) {
+          setIsAdmin(adminStatus);
+        } else {
           setIsAdmin(false);
         }
       } catch (error) {
@@ -258,7 +254,7 @@ const App = () => {
         setTimeout(async () => {
           if (event === 'SIGNED_IN') clearAdminCache();
           const adminStatus = await getIsCurrentSessionAdmin();
-          if (adminStatus || readLocalCache() !== true) setIsAdmin(adminStatus);
+          setIsAdmin(adminStatus);
         }, 0);
         return;
       }

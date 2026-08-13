@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { getIsCurrentSessionAdmin } from "@/lib/adminAccess";
 import { ADMIN_LOGIN_PATH } from "@/config/adminRoutes";
 
@@ -25,33 +24,11 @@ export function AdminGate({ children }: Props) {
 
     const run = async () => {
       try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (!session) {
-          console.log("AdminGate: No session found");
-          if (!cancelled) {
-            setAllowed(false);
-            setChecking(false);
-          }
-          return;
-        }
-
-        console.log("AdminGate: Session found, checking admin status...");
-
         const isAdmin = await getIsCurrentSessionAdmin();
 
         if (cancelled) return;
 
-        console.log("AdminGate: isAdmin =", isAdmin);
-
-        if (isAdmin) {
-          setAllowed(true);
-        } else {
-          setAllowed(false);
-        }
-        
+        setAllowed(isAdmin);
         setChecking(false);
       } catch (e) {
         console.error("AdminGate error:", e);
@@ -78,7 +55,7 @@ export function AdminGate({ children }: Props) {
   }
 
   if (!allowed) {
-    return <Navigate to={ADMIN_LOGIN_PATH} replace state={{ from: location.pathname }} />;
+    return <Navigate to={ADMIN_LOGIN_PATH} replace state={{ from: location.pathname, reason: "session-required" }} />;
   }
 
   return <>{children}</>;

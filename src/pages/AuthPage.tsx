@@ -8,61 +8,31 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { trackFormSubmit } from '@/utils/analytics';
-import { clearAdminCache } from '@/lib/adminAccess';
+import { clearAdminCache, getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 import { ADMIN_HOME_PATH } from '@/config/adminRoutes';
 
 export const AuthPage = () => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState('boubetgeorges@gmail.com');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
-  const [usePasswordMode, setUsePasswordMode] = useState(true);
+  const [usePasswordMode, setUsePasswordMode] = useState(false);
   const navigate = useNavigate();
 
   // En mode édition/dev, on évite les toasts (popups) qui deviennent vite envahissants.
   const shouldToast = !import.meta.env.DEV;
 
-  const checkAdmin = async (accessToken?: string) => {
-    // Important: after sign-in, the client token can take a tick to propagate.
-    // Passing the access token explicitly avoids false "non-admin" results.
-    // Timeout de sécurité 8s pour ne jamais figer la page de connexion.
-    const invokePromise = supabase.functions.invoke(
-      'check-admin',
-      accessToken ? { headers: { Authorization: `Bearer ${accessToken}` } } : undefined
-    );
-    const timeoutPromise = new Promise<{ data: null; error: Error }>((resolve) => {
-      setTimeout(
-        () => resolve({ data: null, error: new Error('check-admin timeout (8s)') }),
-        8000
-      );
-    });
-    return Promise.race([invokePromise, timeoutPromise]) as Promise<{ data: { isAdmin?: boolean } | null; error: Error | null }>;
-  };
-
   useEffect(() => {
     // Redirection silencieuse si déjà admin avec session active
     const checkAuth = async () => {
       try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        // Pas de session = pas de vérification automatique
-        if (!session) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
           console.log('AuthPage: Pas de session, affichage du formulaire');
           return;
         }
 
-        // Vérification silencieuse en arrière-plan (sans popup ni toast)
-        const { data, error } = await checkAdmin(session.access_token);
-        
-        // En cas d'erreur, on ignore silencieusement et on laisse l'utilisateur se connecter
-        if (error) {
-          console.log('AuthPage: Erreur check-admin silencieuse, formulaire affiché');
-          return;
-        }
-
-        if (data?.isAdmin) {
+        if (await getIsCurrentSessionAdmin()) {
           navigate(ADMIN_HOME_PATH, { replace: true });
         }
       } catch (error) {
@@ -150,33 +120,19 @@ export const AuthPage = () => {
           throw signInError;
         }
 
-        const accessToken = signInData?.session?.access_token;
+        if (!signInData.session) throw new Error('La session administrateur n’a pas pu être créée.');
         clearAdminCache();
 
         console.log('Connexion réussie, vérification du rôle admin...');
 
-        // Vérifie le rôle admin (passe le token explicitement pour éviter les faux négatifs)
-        const { data: roleData, error: roleError } = await checkAdmin(accessToken);
-
-        console.log('Résultat vérification admin:', { roleData, roleError });
-
-        if (roleError) {
-          console.error('Erreur lors de la vérification du rôle:', roleError);
-          toast.error('Erreur de vérification', {
-            description: 'Impossible de vérifier les droits administrateur. Réessayez dans quelques secondes.',
-          });
-          setIsLoading(false);
-          return;
-        }
-
-        if (!roleData?.isAdmin) {
+        const isAdmin = await getIsCurrentSessionAdmin();
+        if (!isAdmin) {
           console.log('Utilisateur non-admin détecté');
           toast.error('Accès refusé', {
-            description: "Cette page est réservée à l'administration. Pour accéder au générateur, connectez-vous avec votre email + code d'accès.",
+            description: "Ce compte ne possède pas les droits administrateur.",
           });
           // Important: éviter qu'une session non-admin puisse court-circuiter l'accès par code
           await supabase.auth.signOut();
-          navigate('/subscription', { replace: true });
           setIsLoading(false);
           return;
         }
@@ -285,12 +241,12 @@ export const AuthPage = () => {
                       Envoi du lien...
                     </>
                   ) : (
-                    '✨ Recevoir mon lien de connexion'
+                    'Recevoir mon lien d’accès admin'
                   )}
                 </Button>
               </form>
               <p className="text-center text-xs text-muted-foreground">
-                Recommandé — aucun mot de passe à retenir. Cliquez sur le lien reçu par email.
+                Un lien personnel et temporaire sera envoyé à cette adresse.
               </p>
               <div className="text-center">
                 <Button
