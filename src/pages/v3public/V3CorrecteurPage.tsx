@@ -115,6 +115,9 @@ export default function V3CorrecteurPage() {
   const avgQuality = doneCount
     ? Math.round(chapters.filter((c) => c.status === 'done').reduce((s, c) => s + (c.quality || 0), 0) / doneCount)
     : 0;
+  const endingsFixed = chapters.filter((c) => c.endingFixed).length;
+  const endingIssues = chapters.filter((c) => c.endingIssue);
+  const blockFailures = chapters.reduce((s, c) => s + (c.blockFailures || 0), 0);
 
 
   const loadManuscript = useCallback((m: Manuscript) => {
@@ -271,11 +274,17 @@ export default function V3CorrecteurPage() {
       const ko = working.filter((c) => c.status === 'failed').length;
       const latin = working.reduce((s, c) => s + (c.latinRemoved || 0), 0);
       const stuck = working.reduce((s, c) => s + (c.latinRemaining?.length || 0), 0);
+      const ends = working.filter((c) => c.endingFixed).length;
+      const corrs = working.reduce((s, c) => s + c.corrections.length, 0);
+      const extra = [
+        latin ? `${latin} expression(s) latine(s) supprimée(s)` : '',
+        ends ? `${ends} fin(s) de chapitre complétée(s)` : '',
+      ].filter(Boolean).join(' · ');
       if (stopRef.current) toast.info('Correction interrompue — le travail déjà fait est conservé.');
       else if (ko) toast.warning(`Correction terminée avec ${ko} chapitre(s) en échec — utilisez « Reprendre les chapitres en échec ».`);
       else if (manualReview) toast.success('Correction terminée. Relisez chapitre par chapitre puis exportez.');
       else toast.success(
-        `Livre corrigé et appliqué${latin ? ` · ${latin} expression(s) latine(s) supprimée(s)` : ''}. Vous pouvez exporter.`,
+        `Livre corrigé et appliqué · ${corrs} correction(s)${extra ? ` · ${extra}` : ''}. Vous pouvez exporter.`,
       );
       if (stuck > 0) toast.warning(`${stuck} expression(s) en latin résistent — la liste est affichée sous la progression.`);
     } finally {
@@ -663,6 +672,8 @@ export default function V3CorrecteurPage() {
               {failedCount > 0 && <span style={{ color: '#b45309' }}>{failedCount} à relancer</span>}
               <span>{acceptedCount} appliqué(s)</span>
               {latinRemoved > 0 && <span style={{ color: 'var(--v3-emerald)' }}>{latinRemoved} expression(s) latine(s) supprimée(s)</span>}
+              {endingsFixed > 0 && <span style={{ color: 'var(--v3-emerald)' }}>{endingsFixed} fin(s) de chapitre complétée(s)</span>}
+              {blockFailures > 0 && <span style={{ color: '#b45309' }}>{blockFailures} passage(s) non corrigé(s)</span>}
               {running && (
                 <span>
                   En cours : chapitre {current + 1} / {chapters.length}
@@ -712,6 +723,23 @@ export default function V3CorrecteurPage() {
             </div>
           )}
 
+          {!running && endingIssues.length > 0 && (
+            <div className="mt-4 rounded-xl border p-4" style={{ borderColor: '#f0c98a', background: '#fdf7ec' }}>
+              <p className="text-[13px] font-semibold" style={{ color: '#92400e' }}>
+                Fins de chapitre encore incomplètes — elles doivent se terminer par une phrase ponctuée :
+              </p>
+              <ul className="mt-2 space-y-1">
+                {endingIssues.map((c) => (
+                  <li key={c.chapterId} className="text-[12.5px]" style={{ color: '#92400e' }}>
+                    <strong>{c.title || `Chapitre ${c.index + 1}`}</strong> : {c.endingIssue}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+
+
 
           <div className="mt-5 space-y-3">
             {chapters.map((c) => {
@@ -726,7 +754,21 @@ export default function V3CorrecteurPage() {
                         {c.index + 1}. {label}
                       </span>
                       <span className="ml-2 text-[12px]" style={{ color: 'var(--v3-muted)' }}>
-                        {c.status === 'done' && `${c.corrections.length} correction(s)`}
+                        {c.status === 'done' && (
+                          <>
+                            {c.corrections.length} correction(s)
+                            {(c.blockCount || 1) > 1 && ` · ${c.blockCount} tronçons`}
+                            {c.endingFixed && ' · fin de chapitre complétée'}
+                            {(c.blockFailures || 0) > 0 && (
+                              <span style={{ color: '#b45309' }}>
+                                {' '}· {c.blockFailures} passage(s) non corrigé(s)
+                              </span>
+                            )}
+                            {c.endingIssue && (
+                              <span style={{ color: '#b45309' }}> · fin à revoir : {c.endingIssue.toLowerCase()}</span>
+                            )}
+                          </>
+                        )}
                         {c.status === 'running' && 'correction en cours…'}
                         {c.status === 'pending' && 'en attente'}
                         {c.status === 'failed' && (c.error || 'échec')}

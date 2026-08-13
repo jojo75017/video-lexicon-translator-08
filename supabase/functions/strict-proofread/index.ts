@@ -16,11 +16,12 @@ serve(async (req) => {
       await req.json();
     const polish = mode === 'polish';
     const latinFix = mode === 'latin-fix';
+    const endingFix = mode === 'ending-fix';
 
-
-    if (!chapterContent || chapterContent.length < 20) {
+    const minLength = endingFix ? 5 : 20;
+    if (!chapterContent || chapterContent.length < minLength) {
       return new Response(
-        JSON.stringify({ error: "Le contenu du chapitre est requis (minimum 20 caractères)" }),
+        JSON.stringify({ error: `Le contenu du chapitre est requis (minimum ${minLength} caractères)` }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -81,13 +82,27 @@ TU NE DOIS RIEN CHANGER D'AUTRE : pas une virgule, pas un mot, pas un paragraphe
 Exceptions à conserver : noms propres réels, titres d'œuvres réelles, locutions latines réellement courantes en français (a priori, de facto, etc.).
 Type de correction à renvoyer pour chacun : "anglicisme".`;
 
+    const endingRules = `MISSION UNIQUE : ce fragment est le DERNIER paragraphe d'un chapitre et sa fin est bancale (mot isolé, phrase sans point, virgule ou tiret orphelin).
+
+TU DOIS :
+1. Reprendre ce paragraphe À L'IDENTIQUE et le compléter par une à deux phrases de clôture, dans le même style, le même temps et la même voix narrative.
+2. Terminer impérativement par un point (ou un point d'exclamation / d'interrogation si le ton l'exige).
+3. Rester dans le prolongement immédiat du texte : aucune information nouvelle, aucun personnage nouveau, aucun événement nouveau, aucune ellipse temporelle.
+4. Écrire un français impeccable : aucun mot latin, aucune langue étrangère, aucun mot inventé.
+
+TU NE DOIS PAS : résumer, réécrire, raccourcir ni supprimer une phrase existante du paragraphe.
+Type de correction à renvoyer : "style".`;
+
     const systemPrompt = `Tu es un correcteur éditorial professionnel francophone. ${
-      latinFix
-        ? 'Tu effectues une passe unique de francisation, sans aucune autre correction.'
-        : `Tu appliques une correction ${polish ? 'STRICTE PUIS un polissage de style mesuré' : 'STRICTE sans aucune réécriture'}.`
+      endingFix
+        ? "Tu complètes une fin de chapitre inachevée, sans rien réécrire d'autre."
+        : latinFix
+          ? 'Tu effectues une passe unique de francisation, sans aucune autre correction.'
+          : `Tu appliques une correction ${polish ? 'STRICTE PUIS un polissage de style mesuré' : 'STRICTE sans aucune réécriture'}.`
     }
 
-${latinFix ? latinRules : polish ? polishRules : strictRules}
+${endingFix ? endingRules : latinFix ? latinRules : polish ? polishRules : strictRules}
+
 
 Le texte corrigé doit être prêt pour publication Amazon KDP.
 
@@ -107,7 +122,16 @@ FORMAT DE RÉPONSE — JSON STRICT :
 }`;
 
 
-    const userPrompt = latinFix
+    const userPrompt = endingFix
+      ? `Voici le dernier paragraphe d'un chapitre. Sa fin est inachevée. Renvoie ce paragraphe intégral, complété par une à deux phrases de clôture terminées par un point, sans rien changer d'autre :
+
+${chapterTitle ? `Titre du chapitre : "${chapterTitle}"\n` : ''}
+---
+${chapterContent}
+---
+
+Retourne le JSON : "texteCorrige" = le paragraphe complet complété, "corrections" = la phrase de clôture ajoutée.`
+      : latinFix
       ? `Remplace par du français clair toutes les expressions en latin / faux latin / pseudo-langue de ce texte, et ne modifie rien d'autre :
 
 ${chapterTitle ? `Titre du chapitre : "${chapterTitle}"\n` : ''}
@@ -261,30 +285,45 @@ Retourne le JSON avec le texte corrigé et la liste exhaustive des corrections e
 
     const content = attempt.content;
 
-    let result;
+    // Le modèle encadre parfois le JSON dans un bloc ```json.
+    const unfenced = String(content || '')
+      .replace(/^\s*```(?:json)?\s*/i, '')
+      .replace(/\s*```\s*$/, '');
+
+    let result: Record<string, unknown> | null = null;
+    let formatOk = true;
+
     try {
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        result = JSON.parse(jsonMatch[0]);
-      } else {
-        result = {
-          texteCorrige: content,
-          corrections: [],
-          nombreCorrections: 0,
-          qualiteOrthographe: 0
-        };
-      }
+      const jsonMatch = unfenced.match(/\{[\s\S]*\}/);
+      if (jsonMatch) result = JSON.parse(jsonMatch[0]);
     } catch {
-      console.log("JSON parsing failed, using raw content");
+      // JSON invalide (guillemets non échappés dans le texte, le plus souvent) :
+      // on récupère au moins le texte corrigé par extraction ciblée.
+      const field = unfenced.match(/"texteCorrige"\s*:\s*"([\s\S]*?)"\s*,\s*"corrections"/);
+      if (field) {
+        try {
+          const text = JSON.parse(`"${field[1].replace(/\n/g, '\\n')}"`);
+          result = { texteCorrige: text, corrections: [], nombreCorrections: 0, qualiteOrthographe: 0 };
+          console.log('JSON invalide : texte récupéré par extraction ciblée');
+        } catch { /* extraction impossible */ }
+      }
+    }
+
+    if (!result || typeof result.texteCorrige !== 'string' || !String(result.texteCorrige).trim()) {
+      // Aucun JSON exploitable : le texte brut est utilisé, mais l'appelant est
+      // averti (formatOk = false) pour relancer le bloc au lieu de croire à
+      // « zéro correction ».
+      console.log('Réponse hors format JSON : texte brut renvoyé');
+      formatOk = false;
       result = {
-        texteCorrige: content,
+        texteCorrige: unfenced.trim(),
         corrections: [],
         nombreCorrections: 0,
-        qualiteOrthographe: 0
+        qualiteOrthographe: 0,
       };
     }
 
-    return new Response(JSON.stringify({ ...result, engine }), {
+    return new Response(JSON.stringify({ ...result, formatOk, engine }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
