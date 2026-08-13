@@ -296,7 +296,7 @@ const EbookHumanizer: React.FC<EbookHumanizerProps> = ({
           {isProcessing ? (
             <>
               <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-              Humanisation en cours...
+              {progress ? `Humanisation — bloc ${progress.current} / ${progress.total}…` : 'Humanisation en cours...'}
             </>
           ) : (
             <>
@@ -305,6 +305,15 @@ const EbookHumanizer: React.FC<EbookHumanizerProps> = ({
             </>
           )}
         </Button>
+        {progress && (
+          <div className="space-y-1">
+            <Progress value={Math.round((progress.current / progress.total) * 100)} />
+            <p className="text-xs text-muted-foreground text-center">
+              Le texte est traité par blocs : un livre entier ne peut pas passer en un seul appel.
+            </p>
+          </div>
+        )}
+
 
         {/* Résultats */}
         {humanizedContent && (
