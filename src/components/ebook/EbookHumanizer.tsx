@@ -55,6 +55,8 @@ const EbookHumanizer: React.FC<EbookHumanizerProps> = ({
   const [style, setStyle] = useState('natural');
   const [isProcessing, setIsProcessing] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [progress, setProgress] = useState<{ current: number; total: number } | null>(null);
+
   const [stats, setStats] = useState<{
     originalLength: number;
     humanizedLength: number;
