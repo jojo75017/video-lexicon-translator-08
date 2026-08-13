@@ -100,7 +100,22 @@ export interface ProofreadResult {
   latinRemaining: string[];
 }
 
-/** Un appel à l'edge function, avec relance si la limite de débit est atteinte. */
+/** Notification d'attente (limite de débit) pour l'interface. */
+export type WaitNotifier = (info: { seconds: number; reason: string } | null) => void;
+let waitNotifier: WaitNotifier | null = null;
+export function setProofreadWaitNotifier(fn: WaitNotifier | null) {
+  waitNotifier = fn;
+}
+
+const BACKOFF_MS = [5000, 15000, 30000, 60000];
+
+async function waitWithNotice(ms: number, reason: string) {
+  waitNotifier?.({ seconds: Math.round(ms / 1000), reason });
+  await sleep(ms);
+  waitNotifier?.(null);
+}
+
+/** Un appel à l'edge function, avec relances patientes si la limite de débit est atteinte. */
 async function callProofread(
   title: string,
   content: string,
@@ -108,7 +123,7 @@ async function callProofread(
   latinList?: string[],
 ): Promise<{ corrected: string; corrections: Correction[]; quality: number }> {
   let lastError = '';
-  for (let attempt = 0; attempt < 3; attempt++) {
+  for (let attempt = 0; attempt < 5; attempt++) {
     const { data, error } = await supabase.functions.invoke('strict-proofread', {
       body: {
         chapterTitle: title,
@@ -136,17 +151,17 @@ async function callProofread(
     const message = String(data?.error || error?.message || 'Erreur de correction');
     lastError = message;
 
-    // Limite de débit : on patiente puis on réessaie.
-    if (/429|limite|rate/i.test(message)) {
-      await sleep(4000 * (attempt + 1));
+    const wait = BACKOFF_MS[Math.min(attempt, BACKOFF_MS.length - 1)];
+    // Limite de débit ou quota : on patiente puis on réessaie (jamais d'abandon du livre).
+    if (/429|limite|rate|quota|402|crédit/i.test(message)) {
+      await waitWithNotice(wait, 'Limite de requêtes atteinte');
       continue;
     }
-    // Crédits épuisés : inutile d'insister.
-    if (/402|crédit/i.test(message)) throw new Error(message);
-    await sleep(1500);
+    await waitWithNotice(Math.min(wait, 5000), 'Nouvelle tentative');
   }
   throw new Error(lastError || 'Correction impossible après plusieurs tentatives.');
 }
+
 
 /**
  * Garde-fou : une correction ne doit jamais raccourcir le chapitre.
