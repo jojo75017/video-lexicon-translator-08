@@ -233,6 +233,8 @@ export interface ProofreadProgress {
  * Corrige une liste de chapitres en série. `onProgress` est appelé après chaque
  * chapitre pour que l'interface affiche l'avancement en direct.
  * `shouldStop` permet d'interrompre proprement sans perdre le travail déjà fait.
+ * Aucune erreur (crédits, quota, limite de débit) n'interrompt la série : les
+ * chapitres en échec sont repris automatiquement en fin de passage.
  */
 export async function proofreadChapters(
   chapters: ChapterProofread[],
@@ -240,19 +242,17 @@ export async function proofreadChapters(
   onProgress: (p: ProofreadProgress) => void,
   shouldStop?: () => boolean,
 ): Promise<void> {
-  for (let i = 0; i < chapters.length; i++) {
-    if (shouldStop?.()) return;
-    const chapter = chapters[i];
-    if (chapter.status === 'done') continue;
+  const runPass = async () => {
+    for (let i = 0; i < chapters.length; i++) {
+      if (shouldStop?.()) return;
+      const chapter = chapters[i];
+      if (chapter.status === 'done') continue;
 
-    onProgress({ index: i, total: chapters.length, chapter: { ...chapter, status: 'running' } });
+      onProgress({ index: i, total: chapters.length, chapter: { ...chapter, status: 'running' } });
 
-    try {
-      const res = await proofreadChapter(chapter.title, chapter.original, mode);
-      onProgress({
-        index: i,
-        total: chapters.length,
-        chapter: {
+      try {
+        const res = await proofreadChapter(chapter.title, chapter.original, mode);
+        chapters[i] = {
           ...chapter,
           status: 'done',
           corrected: res.corrected,
@@ -260,21 +260,35 @@ export async function proofreadChapters(
           quality: res.quality,
           latinRemoved: res.latinRemoved,
           latinRemaining: res.latinRemaining,
-        },
-
-      });
-    } catch (e: any) {
-      onProgress({
-        index: i,
-        total: chapters.length,
-        chapter: { ...chapter, status: 'failed', error: e?.message || 'Erreur inconnue' },
-      });
-      // Crédits épuisés : on arrête toute la série.
-      if (/402|crédit/i.test(String(e?.message))) return;
+          error: undefined,
+        };
+        onProgress({ index: i, total: chapters.length, chapter: chapters[i] });
+      } catch (e: any) {
+        chapters[i] = { ...chapter, status: 'failed', error: e?.message || 'Erreur inconnue' };
+        onProgress({ index: i, total: chapters.length, chapter: chapters[i] });
+      }
+      await sleep(600);
     }
-    await sleep(600);
+  };
+
+  await runPass();
+
+  // Deux tours de reprise automatique sur les seuls chapitres en échec,
+  // avec pause progressive pour laisser retomber les limites de débit.
+  const RETRY_DELAYS = [10000, 30000];
+  for (const delay of RETRY_DELAYS) {
+    if (shouldStop?.()) return;
+    const failed = chapters.filter((c) => c.status === 'failed');
+    if (!failed.length) return;
+    await waitWithNotice(delay, `Reprise de ${failed.length} chapitre(s) en échec`);
+    failed.forEach((c) => {
+      const i = chapters.indexOf(c);
+      chapters[i] = { ...c, status: 'pending', error: undefined };
+    });
+    await runPass();
   }
 }
+
 
 /** Répartition des corrections par type, pour le rapport final. */
 export function correctionBreakdown(chapters: ChapterProofread[]): { type: string; label: string; count: number }[] {
