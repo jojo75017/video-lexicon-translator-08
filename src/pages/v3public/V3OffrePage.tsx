@@ -212,6 +212,10 @@ export default function V3OffrePage() {
         </div>
       </section>
 
+      {/* MOTEUR MULTI-MODÈLES */}
+      <V3EngineStrip />
+      <V3EngineGrid />
+
       {/* OFFRE ACTUELLE */}
       <section id="details-offre" className="max-w-5xl mx-auto px-5 py-14">
         <div className="rounded-3xl p-8 md:p-10 bg-white" style={{ border: `2px solid ${GOLD}`, boxShadow: "0 22px 60px -34px rgba(6,78,59,0.45)" }}>
