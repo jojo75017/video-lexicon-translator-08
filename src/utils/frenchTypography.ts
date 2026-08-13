@@ -40,10 +40,10 @@ export function applyFrenchTypography(text: string): string {
     .replace(/\s*\?/g, `${NNBSP}?`)
 
     // ========== TIRETS DE DIALOGUE ==========
-    // Remplacer les tirets simples en début de ligne par des tirets cadratins
-    .replace(/^[-–]\s+/gm, '—\u00A0')
-    // Tiret cadratin avec espace insécable
-    .replace(/^—\s*/gm, '—\u00A0')
+    // Un tiret en début de ligne ne devient un cadratin QUE s'il s'agit d'une
+    // vraie réplique de dialogue. Les listes et énumérations restent des puces.
+    .replace(/^[-–]\s+(.*)$/gm, (full, rest: string) => (isDialogueLine(rest) ? `—\u00A0${rest}` : full))
+
 
     // ========== POINTS DE SUSPENSION ==========
     // Remplacer trois points par le caractère Unicode
