@@ -726,7 +726,21 @@ export default function V3CorrecteurPage() {
                         {c.index + 1}. {label}
                       </span>
                       <span className="ml-2 text-[12px]" style={{ color: 'var(--v3-muted)' }}>
-                        {c.status === 'done' && `${c.corrections.length} correction(s)`}
+                        {c.status === 'done' && (
+                          <>
+                            {c.corrections.length} correction(s)
+                            {(c.blockCount || 1) > 1 && ` · ${c.blockCount} tronçons`}
+                            {c.endingFixed && ' · fin de chapitre complétée'}
+                            {(c.blockFailures || 0) > 0 && (
+                              <span style={{ color: '#b45309' }}>
+                                {' '}· {c.blockFailures} passage(s) non corrigé(s)
+                              </span>
+                            )}
+                            {c.endingIssue && (
+                              <span style={{ color: '#b45309' }}> · fin à revoir : {c.endingIssue.toLowerCase()}</span>
+                            )}
+                          </>
+                        )}
                         {c.status === 'running' && 'correction en cours…'}
                         {c.status === 'pending' && 'en attente'}
                         {c.status === 'failed' && (c.error || 'échec')}
