@@ -10,6 +10,8 @@
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getActiveAIKey, getOpenRouterModel } from '@/services/aiWritingService';
 import { detectLatin, latinExpressions as findLatinExpressions } from '@/utils/latinSweep';
+import { dashesToBullets } from '@/utils/frenchTypography';
+
 import { checkEnding, lastParagraph, replaceLastParagraph } from '@/utils/chapterEnding';
 
 export type ProofreadMode = 'strict' | 'polish';
