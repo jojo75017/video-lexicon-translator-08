@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { getIsCurrentSessionAdmin, readLocalCache } from "@/lib/adminAccess";
+import { getIsCurrentSessionAdmin } from "@/lib/adminAccess";
 
 const corslessMessage = "Vérification de l'accès...";
 
@@ -69,35 +69,9 @@ export function SubscriberGate({
         return;
       }
 
-      // Admin : on garde l'accès ouvert en permanence. On tente d'abord le
-      // cache local (instantané), puis un contrôle direct des rôles, puis la
-      // fonction check-admin. Un seul « oui » suffit, et une panne réseau ne
-      // déconnecte jamais un admin.
+      // A valid admin session bypasses subscriber validation. Browser storage
+      // never grants administrator access.
       try {
-        if (readLocalCache() === true) {
-          if (!cancelled) {
-            setAllowed(true);
-            setChecking(false);
-          }
-          return;
-        }
-
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user?.id) {
-          const { data: isAdminRole } = await supabase.rpc('has_role', {
-            _user_id: user.id,
-            _role: 'admin',
-          });
-          if (isAdminRole === true) {
-            try { localStorage.setItem('admin_status_cache_v1', JSON.stringify({ isAdmin: true, ts: Date.now() })); } catch { /* ignore */ }
-            if (!cancelled) {
-              setAllowed(true);
-              setChecking(false);
-            }
-            return;
-          }
-        }
-
         const adminPromise = getIsCurrentSessionAdmin();
         const timeoutPromise = new Promise<boolean>((resolve) =>
           setTimeout(() => resolve(false), 8000)
