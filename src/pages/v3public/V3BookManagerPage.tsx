@@ -148,7 +148,12 @@ export default function V3BookManagerPage() {
                   {chapterCount > 0 ? `${chapterCount} chapitre${chapterCount > 1 ? 's' : ''} · Export disponible` : 'Brouillon · récupération des sauvegardes à l’ouverture'}
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap justify-end gap-2">
+                {!correctedOnly && (
+                  <button onClick={() => nav(`/v3/corriger?projectId=${b.id}`)} className="v3-btn v3-btn-outline text-xs">
+                    <Wand2 className="w-3.5 h-3.5" /> Corriger ce livre
+                  </button>
+                )}
                 <button
                   onClick={() => void openExport(b)}
                   disabled={exportLoadingId === b.id}
