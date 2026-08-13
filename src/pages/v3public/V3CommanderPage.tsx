@@ -181,6 +181,14 @@ export default function V3CommanderPage() {
           </p>
         </div>
 
+        {/* MOTEUR MULTI-MODÈLES */}
+        <div className="mt-10 overflow-hidden rounded-2xl">
+          <V3EngineStrip />
+        </div>
+        <V3EngineGrid className="!px-0 !py-8" />
+
+
+
 
         <div className="mt-10 grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
           {/* Colonne offre */}
