@@ -663,9 +663,28 @@ export default function V3CorrecteurPage() {
               {failedCount > 0 && <span style={{ color: '#b45309' }}>{failedCount} à relancer</span>}
               <span>{acceptedCount} appliqué(s)</span>
               {latinRemoved > 0 && <span style={{ color: 'var(--v3-emerald)' }}>{latinRemoved} expression(s) latine(s) supprimée(s)</span>}
-              {running && <span>En cours : chapitre {current + 1}…</span>}
+              {running && (
+                <span>
+                  En cours : chapitre {current + 1} / {chapters.length}
+                  {waitInfo ? ` · ${waitInfo.reason} — nouvelle tentative dans ${waitInfo.seconds} s` : '…'}
+                </span>
+              )}
             </div>
           </div>
+
+          {!running && failedCount > 0 && (
+            <div className="mt-4 rounded-xl border p-4 flex flex-wrap items-center justify-between gap-3"
+              style={{ borderColor: '#f0c98a', background: '#fdf7ec' }}>
+              <p className="text-[13px]" style={{ color: '#92400e' }}>
+                <strong>{failedCount} chapitre(s) n'ont pas pu être corrigés</strong> — le plus souvent une limite de
+                requêtes ou un quota de clé IA. Le reste du livre est bien corrigé.
+              </p>
+              <button onClick={() => void startCorrection(true)} className="v3-btn-outline inline-flex items-center gap-2 text-[12.5px]">
+                <RefreshCw className="w-4 h-4" /> Reprendre les chapitres en échec
+              </button>
+            </div>
+          )}
+
 
           {breakdown.length > 0 && (
             <div className="mt-4 flex flex-wrap gap-2">
