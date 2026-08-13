@@ -293,7 +293,10 @@ export async function proofreadChapter(
   mode: ProofreadMode,
 ): Promise<ProofreadResult> {
   const latinBefore = detectLatin(content).length;
-  const blocks = splitForProofread(content);
+  // 700 mots par bloc : le modèle reste minutieux sur l'orthographe et ne
+  // survole plus le texte comme sur des blocs de 1200 mots.
+  const blocks = splitForProofread(content, 700);
+
   if (blocks.length === 0) throw new Error('Chapitre vide : rien à corriger.');
 
   const outputs: string[] = [];
