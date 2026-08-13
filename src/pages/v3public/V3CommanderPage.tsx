@@ -132,7 +132,7 @@ export default function V3CommanderPage() {
     (async () => {
       const { data } = await supabase
         .from("book_testimonials")
-        .select("id,author_name,book_title,comment,rating")
+        .select("id,author_name,book_title,comment,rating,created_at")
         .eq("approved", true)
         .order("created_at", { ascending: false })
         .limit(3);
