@@ -16,6 +16,43 @@ import { V3_LAUNCH_BONUSES, V3_BONUSES_TOTAL_VALUE } from "@/data/v3Launch";
 import { trackCaptureEvent } from "@/lib/captureTracking";
 import { V3EngineStrip, V3EngineGrid } from "@/components/v3public/V3EngineBanner";
 import heroBooks from "@/assets/commander-hero-books.jpg";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+
+const FAQ: Array<{ q: string; a: string }> = [
+  {
+    q: "Que comprend exactement le paiement de 47 € ?",
+    a: "Un accès à vie à EbookStudio Pro et à la V3 : génération complète des livres (plan, chapitres, relecture), exports Word et PDF prêts pour Amazon KDP, Cover Studio, livres illustrés enfants, fiche KDP, livres audio, guides et forum. Aucun abonnement, aucune date d'expiration.",
+  },
+  {
+    q: "Puis-je payer avec PayPal ou en plusieurs fois ?",
+    a: "Oui. Sur la page de paiement, vous choisissez la carte bancaire ou PayPal. Les formules 2 × 25 € et 3 × 18 € sont disponibles, et l'accès s'ouvre dès la première échéance.",
+  },
+  {
+    q: "Faut-il savoir écrire ou être technique ?",
+    a: "Non. Vous indiquez le sujet, le public et le ton : l'IA propose le sommaire, rédige chapitre par chapitre, relit le texte et prépare les fichiers. Vous gardez la main pour valider ou modifier à chaque étape.",
+  },
+  {
+    q: "Ai-je besoin de mes propres clés API ?",
+    a: "Ce n'est pas obligatoire pour démarrer. Vous pouvez ajouter votre clé Gemini ou OpenRouter dans les réglages pour générer sans limite à votre propre coût (quelques centimes par livre) ; sinon l'outil utilise les moteurs intégrés.",
+  },
+  {
+    q: "Les livres m'appartiennent-ils ? Puis-je les vendre sur Amazon KDP ?",
+    a: "Oui, vous conservez 100 % des droits sur tout ce que vous produisez, et vous pouvez les publier et les vendre sur Amazon KDP ou ailleurs, sans reversement.",
+  },
+  {
+    q: "Et si l'outil ne me convient pas ?",
+    a: "Garantie 30 jours : écrivez à contact@ebookstudio.fr dans les 30 jours suivant votre commande et vous êtes remboursé, sans justification à fournir.",
+  },
+  {
+    q: "Pourquoi commander maintenant ?",
+    a: "Le tarif 47 € est valable jusqu'au 30 septembre (59 € ensuite). À partir du 1er octobre, EbookStudio passe uniquement en abonnement à 17 € par mois : l'accès à vie n'existera plus.",
+  },
+  {
+    q: "Comment mon accès est-il ouvert après le paiement ?",
+    a: "Immédiatement, avec l'email saisi avant le paiement. Vous recevez le lien de connexion par email ; en cas de problème, écrivez-nous et l'accès est débloqué manuellement sous 24 h ouvrées.",
+  },
+];
+
 
 
 
