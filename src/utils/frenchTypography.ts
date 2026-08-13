@@ -9,8 +9,37 @@ const NNBSP = '\u202F';
 const NBSP = '\u00A0';
 
 /**
+ * Une ligne introduite par un tiret est-elle une vraie réplique de dialogue ?
+ * Les éléments de liste (courts, sans ponctuation finale, souvent en minuscule
+ * ou terminés par « : ») ne doivent PAS recevoir de tiret cadratin, sinon tout
+ * le livre se remplit de faux dialogues.
+ */
+export function isDialogueLine(rest: string): boolean {
+  const t = (rest || '').trim();
+  if (!t) return false;
+  // Titre / intitulé de liste
+  if (/[:;]$/.test(t)) return false;
+  // Une réplique se termine par une ponctuation de phrase
+  if (!/[.!?…»"]$/.test(t)) return false;
+  // Trop courte pour être une réplique crédible
+  if (t.split(/\s+/).filter(Boolean).length < 3) return false;
+  // Commence par une majuscule, un guillemet ou des points de suspension
+  if (!/^[«"“…A-ZÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ]/.test(t)) return false;
+  return true;
+}
+
+/** Reconvertit en puces les faux tirets de dialogue d'un texte déjà généré. */
+export function dashesToBullets(text: string): string {
+  if (!text) return text || '';
+  return text.replace(/^—[\u00A0\s]+(.*)$/gm, (full, rest: string) =>
+    isDialogueLine(rest) ? full : `• ${String(rest).trim()}`,
+  );
+}
+
+/**
  * Applique toutes les règles typographiques françaises à un texte
  */
+
 export function applyFrenchTypography(text: string): string {
   if (!text || typeof text !== 'string') return text || '';
 
@@ -40,10 +69,10 @@ export function applyFrenchTypography(text: string): string {
     .replace(/\s*\?/g, `${NNBSP}?`)
 
     // ========== TIRETS DE DIALOGUE ==========
-    // Remplacer les tirets simples en début de ligne par des tirets cadratins
-    .replace(/^[-–]\s+/gm, '—\u00A0')
-    // Tiret cadratin avec espace insécable
-    .replace(/^—\s*/gm, '—\u00A0')
+    // Un tiret en début de ligne ne devient un cadratin QUE s'il s'agit d'une
+    // vraie réplique de dialogue. Les listes et énumérations restent des puces.
+    .replace(/^[-–]\s+(.*)$/gm, (full, rest: string) => (isDialogueLine(rest) ? `—\u00A0${rest}` : full))
+
 
     // ========== POINTS DE SUSPENSION ==========
     // Remplacer trois points par le caractère Unicode
@@ -94,8 +123,9 @@ export function applyDialogueTypography(text: string): string {
   if (!text) return text || '';
 
   return text
-    // Tirets cadratins pour les dialogues
-    .replace(/^[-–]\s+/gm, '—\u00A0')
+    // Tirets cadratins pour les vraies répliques de dialogue uniquement
+    .replace(/^[-–]\s+(.*)$/gm, (full, rest: string) => (isDialogueLine(rest) ? `—\u00A0${rest}` : full))
+
     // Guillemets français pour les citations
     .replace(/"([^"]+)"/g, '«\u00A0$1\u00A0»')
     // Apostrophes typographiques

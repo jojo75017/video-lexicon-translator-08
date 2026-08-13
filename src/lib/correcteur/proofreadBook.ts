@@ -10,6 +10,8 @@
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getActiveAIKey, getOpenRouterModel } from '@/services/aiWritingService';
 import { detectLatin, latinExpressions as findLatinExpressions } from '@/utils/latinSweep';
+import { dashesToBullets } from '@/utils/frenchTypography';
+
 import { checkEnding, lastParagraph, replaceLastParagraph } from '@/utils/chapterEnding';
 
 export type ProofreadMode = 'strict' | 'polish';
@@ -293,7 +295,10 @@ export async function proofreadChapter(
   mode: ProofreadMode,
 ): Promise<ProofreadResult> {
   const latinBefore = detectLatin(content).length;
-  const blocks = splitForProofread(content);
+  // 700 mots par bloc : le modèle reste minutieux sur l'orthographe et ne
+  // survole plus le texte comme sur des blocs de 1200 mots.
+  const blocks = splitForProofread(content, 700);
+
   if (blocks.length === 0) throw new Error('Chapitre vide : rien à corriger.');
 
   const outputs: string[] = [];
@@ -321,7 +326,7 @@ export async function proofreadChapter(
   for (let pass = 0; pass < 2; pass++) {
     const remaining = findLatinExpressions(corrected);
     if (!remaining.length) break;
-    const parts = splitForProofread(corrected);
+    const parts = splitForProofread(corrected, 700);
     let changed = false;
     for (let i = 0; i < parts.length; i++) {
       const hits = findLatinExpressions(parts[i]);
@@ -342,7 +347,11 @@ export async function proofreadChapter(
     corrected = parts.join('\n\n').trim();
   }
 
+  // Passe locale : les puces transformées à tort en tirets de dialogue redeviennent des puces.
+  corrected = dashesToBullets(corrected);
+
   // Fin de chapitre : jamais un mot isolé ni une phrase sans point.
+
   let endingFixed = false;
   let endingIssue: string | undefined;
   const ending = checkEnding(corrected);

@@ -22,6 +22,9 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { splitForProofread } from '@/lib/correcteur/proofreadBook';
+import { getProvider, getActiveAIKey, getOpenRouterModel } from '@/services/aiWritingService';
+
 
 interface EbookHumanizerProps {
   initialContent?: string;
@@ -52,6 +55,8 @@ const EbookHumanizer: React.FC<EbookHumanizerProps> = ({
   const [style, setStyle] = useState('natural');
   const [isProcessing, setIsProcessing] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [progress, setProgress] = useState<{ current: number; total: number } | null>(null);
+
   const [stats, setStats] = useState<{
     originalLength: number;
     humanizedLength: number;
@@ -71,43 +76,96 @@ const EbookHumanizer: React.FC<EbookHumanizerProps> = ({
     setIsProcessing(true);
     setHumanizedContent('');
     setStats(null);
+    setProgress(null);
+
+    const provider = getProvider();
+    const userApiKey = getActiveAIKey() || undefined;
+    const userModel = provider === 'openrouter' ? getOpenRouterModel() : undefined;
+
+    // Un livre entier (18 000 mots) ne passe pas en un seul appel : le modèle
+    // tronque ou l'appel expire. On découpe en blocs de paragraphes.
+    const blocks = splitForProofread(originalContent, 900);
+    const outputs: string[] = [];
+    const failedBlocks: number[] = [];
+
+    const runBlock = async (block: string) => {
+      const { data, error } = await supabase.functions.invoke('humanize-content', {
+        body: { content: block, intensity, style, userProvider: provider, userApiKey, userModel }
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const out = data?.humanizedContent;
+      if (!out) throw new Error('Réponse vide du moteur IA.');
+      return out as string;
+    };
 
     try {
-      const { data, error } = await supabase.functions.invoke('humanize-content', {
-        body: { 
-          content: originalContent,
-          intensity,
-          style
+      for (let i = 0; i < blocks.length; i++) {
+        setProgress({ current: i + 1, total: blocks.length });
+        try {
+          outputs.push(await runBlock(blocks[i]));
+        } catch (err: any) {
+          // Une seconde chance après une pause (limite de débit fréquente).
+          await new Promise((r) => setTimeout(r, 4000));
+          try {
+            outputs.push(await runBlock(blocks[i]));
+          } catch (err2: any) {
+            failedBlocks.push(i + 1);
+            outputs.push(blocks[i]);
+            console.warn('[humaniseur] bloc en échec', i + 1, err2?.message);
+          }
         }
-      });
-
-      if (error) throw error;
-
-      if (data.error) {
-        toast.error('Erreur', { description: data.error });
-        return;
+        if (i < blocks.length - 1) await new Promise((r) => setTimeout(r, 500));
       }
 
-      setHumanizedContent(data.humanizedContent);
-      setStats(data.stats);
-      
-      toast.success('Contenu humanisé !', {
-        description: `${data.stats.changePercentage}% de modifications appliquées`
-      });
-
-      if (onContentHumanized) {
-        onContentHumanized(data.humanizedContent);
+      const result = outputs.join('\n\n').trim();
+      if (failedBlocks.length === blocks.length) {
+        throw new Error(
+          'Aucun bloc n’a pu être humanisé. Vérifiez votre clé IA dans Paramètres > Clés API, puis réessayez.',
+        );
       }
 
+      setHumanizedContent(result);
+      const originalWords = originalContent.split(/\s+/).filter(Boolean).length;
+      const humanizedWords = result.split(/\s+/).filter(Boolean).length;
+      setStats({
+        originalLength: originalContent.length,
+        humanizedLength: result.length,
+        originalWords,
+        humanizedWords,
+        changePercentage: originalWords
+          ? Math.round((Math.abs(humanizedWords - originalWords) / originalWords) * 100)
+          : 0,
+      });
+
+      if (failedBlocks.length) {
+        toast.warning(`${blocks.length - failedBlocks.length}/${blocks.length} blocs humanisés`, {
+          description: `Blocs conservés à l'identique : ${failedBlocks.join(', ')}. Relancez pour les reprendre.`,
+        });
+      } else {
+        toast.success('Contenu humanisé !', {
+          description: `${blocks.length} bloc(s) traité(s).`,
+        });
+      }
+
+      if (onContentHumanized) onContentHumanized(result);
     } catch (err: any) {
       console.error('Humanization error:', err);
-      toast.error('Erreur lors de l\'humanisation', {
-        description: err.message || 'Veuillez réessayer'
-      });
+      const raw = String(err?.message || '');
+      const description = /429|limite de requ/i.test(raw)
+        ? 'Limite de requêtes IA atteinte. Patientez une minute puis relancez.'
+        : /402|crédit/i.test(raw)
+          ? 'Crédits IA épuisés. Ajoutez votre clé Gemini ou OpenAI dans Paramètres > Clés API.'
+          : /clé|api key|401|403/i.test(raw)
+            ? 'Clé IA absente ou refusée. Vérifiez Paramètres > Clés API.'
+            : raw || 'Veuillez réessayer.';
+      toast.error('Erreur lors de l\'humanisation', { description });
     } finally {
       setIsProcessing(false);
+      setProgress(null);
     }
   };
+
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(humanizedContent);
@@ -154,6 +212,19 @@ const EbookHumanizer: React.FC<EbookHumanizerProps> = ({
             Un contenu trop "parfait" peut être signalé et impacter vos ventes ou votre compte.
           </div>
         </div>
+
+        {/* Renvoi vers le vrai correcteur */}
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-4 rounded-lg bg-teal-50 border border-teal-200">
+          <div className="text-sm text-teal-900">
+            <strong>Fautes d'orthographe, tirets cadratins, latin ?</strong> L'Humaniseur réécrit le style,
+            il ne corrige pas. Utilisez « Corriger mon livre » : importez votre DOCX, un clic, téléchargez.
+          </div>
+          <Button asChild variant="outline" className="shrink-0 border-teal-600 text-teal-800">
+            <a href="/v3/corriger">Corriger mon livre</a>
+          </Button>
+        </div>
+
+
 
         {/* Options */}
         <div className="grid gap-4 md:grid-cols-2">
@@ -225,7 +296,7 @@ const EbookHumanizer: React.FC<EbookHumanizerProps> = ({
           {isProcessing ? (
             <>
               <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-              Humanisation en cours...
+              {progress ? `Humanisation — bloc ${progress.current} / ${progress.total}…` : 'Humanisation en cours...'}
             </>
           ) : (
             <>
@@ -234,6 +305,15 @@ const EbookHumanizer: React.FC<EbookHumanizerProps> = ({
             </>
           )}
         </Button>
+        {progress && (
+          <div className="space-y-1">
+            <Progress value={Math.round((progress.current / progress.total) * 100)} />
+            <p className="text-xs text-muted-foreground text-center">
+              Le texte est traité par blocs : un livre entier ne peut pas passer en un seul appel.
+            </p>
+          </div>
+        )}
+
 
         {/* Résultats */}
         {humanizedContent && (
