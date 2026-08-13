@@ -213,6 +213,19 @@ const EbookHumanizer: React.FC<EbookHumanizerProps> = ({
           </div>
         </div>
 
+        {/* Renvoi vers le vrai correcteur */}
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-4 rounded-lg bg-teal-50 border border-teal-200">
+          <div className="text-sm text-teal-900">
+            <strong>Fautes d'orthographe, tirets cadratins, latin ?</strong> L'Humaniseur réécrit le style,
+            il ne corrige pas. Utilisez « Corriger mon livre » : importez votre DOCX, un clic, téléchargez.
+          </div>
+          <Button asChild variant="outline" className="shrink-0 border-teal-600 text-teal-800">
+            <a href="/v3/corriger">Corriger mon livre</a>
+          </Button>
+        </div>
+
+
+
         {/* Options */}
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
