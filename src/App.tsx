@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriberGate } from '@/components/auth/SubscriberGate';
 import { AdminGate } from '@/components/auth/AdminGate';
@@ -191,6 +191,7 @@ const queryClient = new QueryClient();
 
 const App = () => {
   useBrandTitle();
+  const { pathname } = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [subscriberEmail, setSubscriberEmail] = useState('');
   const [subscriberData, setSubscriberData] = useState<any>(null);
@@ -311,6 +312,7 @@ const App = () => {
     subchapters_generated: 0,
     covers_generated: 0,
   };
+  const isAdminAuthRoute = pathname === ADMIN_LOGIN_PATH || pathname === '/admin-direct';
 
   if (isCheckingAuth) return <PageLoader />;
 
@@ -613,19 +615,19 @@ const App = () => {
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
           </Suspense>
-          <SubscriberActivityPopup />
+          {!isAdminAuthRoute && <SubscriberActivityPopup />}
           {isAuthenticated && <FirstEbookOnboarding subscriberEmail={subscriberEmail} />}
-          <AssistantFloatingButton />
-          <ApiKeysFloatingButton />
-          <GeminiKeyAlertBanner />
-          {(isAuthenticated || isAdmin || isPlannerPreviewHost) && (
+          {!isAdminAuthRoute && <AssistantFloatingButton />}
+          {!isAdminAuthRoute && <ApiKeysFloatingButton />}
+          {!isAdminAuthRoute && <GeminiKeyAlertBanner />}
+          {!isAdminAuthRoute && (isAuthenticated || isAdmin || isPlannerPreviewHost) && (
             <V2V3FloatingSwitch forceVisible={isPlannerPreviewHost && !isAuthenticated && !isAdmin} />
           )}
           {isAuthenticated && <AISosModal />}
           {isAuthenticated && <AICostBadge />}
-          {!isAuthenticated && <LeadCapturePopup />}
-          {!isAuthenticated && <FloatingToolCTA />}
-          {!isAuthenticated && <StickySignupBar />}
+          {!isAdminAuthRoute && !isAuthenticated && <LeadCapturePopup />}
+          {!isAdminAuthRoute && !isAuthenticated && <FloatingToolCTA />}
+          {!isAdminAuthRoute && !isAuthenticated && <StickySignupBar />}
           <Toaster />
         </div>
       </TooltipProvider>
