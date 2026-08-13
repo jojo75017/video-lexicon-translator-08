@@ -666,6 +666,8 @@ export default function V3CorrecteurPage() {
               {failedCount > 0 && <span style={{ color: '#b45309' }}>{failedCount} à relancer</span>}
               <span>{acceptedCount} appliqué(s)</span>
               {latinRemoved > 0 && <span style={{ color: 'var(--v3-emerald)' }}>{latinRemoved} expression(s) latine(s) supprimée(s)</span>}
+              {endingsFixed > 0 && <span style={{ color: 'var(--v3-emerald)' }}>{endingsFixed} fin(s) de chapitre complétée(s)</span>}
+              {blockFailures > 0 && <span style={{ color: '#b45309' }}>{blockFailures} passage(s) non corrigé(s)</span>}
               {running && (
                 <span>
                   En cours : chapitre {current + 1} / {chapters.length}
