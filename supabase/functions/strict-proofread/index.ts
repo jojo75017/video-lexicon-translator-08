@@ -16,11 +16,12 @@ serve(async (req) => {
       await req.json();
     const polish = mode === 'polish';
     const latinFix = mode === 'latin-fix';
+    const endingFix = mode === 'ending-fix';
 
-
-    if (!chapterContent || chapterContent.length < 20) {
+    const minLength = endingFix ? 5 : 20;
+    if (!chapterContent || chapterContent.length < minLength) {
       return new Response(
-        JSON.stringify({ error: "Le contenu du chapitre est requis (minimum 20 caractères)" }),
+        JSON.stringify({ error: `Le contenu du chapitre est requis (minimum ${minLength} caractères)` }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
