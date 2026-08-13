@@ -193,9 +193,10 @@ export async function proofreadChapter(
   let corrected = isTruncated(content, res.corrected) ? content : res.corrected;
   let corrections = isTruncated(content, res.corrected) ? [] : res.corrections;
 
-  for (let pass = 0; pass < 2; pass++) {
-    const remaining = findLatinExpressions(corrected);
-    if (!remaining.length) break;
+  // Une seule passe anti-latin, uniquement si le balayage local détecte vraiment
+  // des expressions : moins d'appels IA, donc moins de risque de quota.
+  const remaining = findLatinExpressions(corrected);
+  if (remaining.length) {
     try {
       const fix = await callProofread(title, corrected, 'latin-fix', remaining);
       const reduced = findLatinExpressions(fix.corrected).length < remaining.length;
@@ -203,13 +204,12 @@ export async function proofreadChapter(
       if (reduced && !isTruncated(corrected, fix.corrected)) {
         corrected = fix.corrected;
         corrections = [...corrections, ...fix.corrections];
-      } else {
-        break;
       }
     } catch {
-      break;
+      // La passe anti-latin échoue : on garde le texte corrigé tel quel.
     }
   }
+
 
   const latinRemaining = findLatinExpressions(corrected);
   return {
