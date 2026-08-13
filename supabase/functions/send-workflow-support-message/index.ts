@@ -52,14 +52,12 @@ serve(async (req) => {
       });
     }
 
-    const resend = new Resend(resendKey);
-    const sent = await resend.emails.send({
-      from: "Georges Boubet <noreply@ebookstudio.fr>",
-      to: [email],
-      reply_to: "contact@ebookstudio.fr",
-      subject: "Votre workflow EbookStudio peut reprendre à P10",
-      html: `
-        <div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#232f3e;line-height:1.65">
+    const subject = typeof body?.subject === "string" && body.subject.trim()
+      ? body.subject.trim()
+      : "Votre workflow EbookStudio peut reprendre à P10";
+    const html = typeof body?.html === "string" && body.html.trim()
+      ? body.html.trim()
+      : `<div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#232f3e;line-height:1.65">
           <p>Bonjour,</p>
           <p>J’ai vérifié votre compte et votre livre <strong>« Reconversion professionnelle après 40 ans »</strong>.</p>
           <p>Votre accès est bien actif et les étapes <strong>P1 à P9 sont sauvegardées</strong>. Le nouveau blocage à P10 venait de la limite quotidienne de requêtes de votre clé Gemini gratuite.</p>
@@ -67,7 +65,15 @@ serve(async (req) => {
           <p>Vous pouvez vous reconnecter à EbookStudio, ouvrir votre workflow puis cliquer sur <strong>« Reprendre le workflow »</strong>. Il reprendra à P10 : vous ne devez pas repartir de zéro.</p>
           <p>Si le navigateur affiche encore l’ancien message, actualisez la page une fois avant de cliquer sur la reprise.</p>
           <p>Bien cordialement,<br><strong>Georges — EbookStudio</strong></p>
-        </div>`,
+        </div>`;
+
+    const resend = new Resend(resendKey);
+    const sent = await resend.emails.send({
+      from: "Georges Boubet <noreply@ebookstudio.fr>",
+      to: [email],
+      reply_to: "contact@ebookstudio.fr",
+      subject,
+      html,
     });
 
     if (sent.error) throw new Error(sent.error.message);
