@@ -22,6 +22,9 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { splitForProofread } from '@/lib/correcteur/proofreadBook';
+import { getProvider, getActiveAIKey, getOpenRouterModel } from '@/services/aiWritingService';
+
 
 interface EbookHumanizerProps {
   initialContent?: string;
