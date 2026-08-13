@@ -9,8 +9,37 @@ const NNBSP = '\u202F';
 const NBSP = '\u00A0';
 
 /**
+ * Une ligne introduite par un tiret est-elle une vraie réplique de dialogue ?
+ * Les éléments de liste (courts, sans ponctuation finale, souvent en minuscule
+ * ou terminés par « : ») ne doivent PAS recevoir de tiret cadratin, sinon tout
+ * le livre se remplit de faux dialogues.
+ */
+export function isDialogueLine(rest: string): boolean {
+  const t = (rest || '').trim();
+  if (!t) return false;
+  // Titre / intitulé de liste
+  if (/[:;]$/.test(t)) return false;
+  // Une réplique se termine par une ponctuation de phrase
+  if (!/[.!?…»"]$/.test(t)) return false;
+  // Trop courte pour être une réplique crédible
+  if (t.split(/\s+/).filter(Boolean).length < 3) return false;
+  // Commence par une majuscule, un guillemet ou des points de suspension
+  if (!/^[«"“…A-ZÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ]/.test(t)) return false;
+  return true;
+}
+
+/** Reconvertit en puces les faux tirets de dialogue d'un texte déjà généré. */
+export function dashesToBullets(text: string): string {
+  if (!text) return text || '';
+  return text.replace(/^—[\u00A0\s]+(.*)$/gm, (full, rest: string) =>
+    isDialogueLine(rest) ? full : `• ${String(rest).trim()}`,
+  );
+}
+
+/**
  * Applique toutes les règles typographiques françaises à un texte
  */
+
 export function applyFrenchTypography(text: string): string {
   if (!text || typeof text !== 'string') return text || '';
 
