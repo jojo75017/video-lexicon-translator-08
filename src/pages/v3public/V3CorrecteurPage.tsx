@@ -64,6 +64,7 @@ const MODES: { id: ProofreadMode; title: string; desc: string; bullets: string[]
 
 export default function V3CorrecteurPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { isAdmin } = useV3Mode();
   const [source, setSource] = useState<Source>('doc');
   const [importing, setImporting] = useState(false);
