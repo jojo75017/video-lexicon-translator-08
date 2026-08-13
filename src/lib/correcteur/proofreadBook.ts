@@ -345,7 +345,11 @@ export async function proofreadChapter(
     corrected = parts.join('\n\n').trim();
   }
 
+  // Passe locale : les puces transformées à tort en tirets de dialogue redeviennent des puces.
+  corrected = dashesToBullets(corrected);
+
   // Fin de chapitre : jamais un mot isolé ni une phrase sans point.
+
   let endingFixed = false;
   let endingIssue: string | undefined;
   const ending = checkEnding(corrected);
