@@ -100,7 +100,22 @@ export interface ProofreadResult {
   latinRemaining: string[];
 }
 
-/** Un appel à l'edge function, avec relance si la limite de débit est atteinte. */
+/** Notification d'attente (limite de débit) pour l'interface. */
+export type WaitNotifier = (info: { seconds: number; reason: string } | null) => void;
+let waitNotifier: WaitNotifier | null = null;
+export function setProofreadWaitNotifier(fn: WaitNotifier | null) {
+  waitNotifier = fn;
+}
+
+const BACKOFF_MS = [5000, 15000, 30000, 60000];
+
+async function waitWithNotice(ms: number, reason: string) {
+  waitNotifier?.({ seconds: Math.round(ms / 1000), reason });
+  await sleep(ms);
+  waitNotifier?.(null);
+}
+
+/** Un appel à l'edge function, avec relances patientes si la limite de débit est atteinte. */
 async function callProofread(
   title: string,
   content: string,
@@ -108,7 +123,7 @@ async function callProofread(
   latinList?: string[],
 ): Promise<{ corrected: string; corrections: Correction[]; quality: number }> {
   let lastError = '';
-  for (let attempt = 0; attempt < 3; attempt++) {
+  for (let attempt = 0; attempt < 5; attempt++) {
     const { data, error } = await supabase.functions.invoke('strict-proofread', {
       body: {
         chapterTitle: title,
@@ -136,17 +151,17 @@ async function callProofread(
     const message = String(data?.error || error?.message || 'Erreur de correction');
     lastError = message;
 
-    // Limite de débit : on patiente puis on réessaie.
-    if (/429|limite|rate/i.test(message)) {
-      await sleep(4000 * (attempt + 1));
+    const wait = BACKOFF_MS[Math.min(attempt, BACKOFF_MS.length - 1)];
+    // Limite de débit ou quota : on patiente puis on réessaie (jamais d'abandon du livre).
+    if (/429|limite|rate|quota|402|crédit/i.test(message)) {
+      await waitWithNotice(wait, 'Limite de requêtes atteinte');
       continue;
     }
-    // Crédits épuisés : inutile d'insister.
-    if (/402|crédit/i.test(message)) throw new Error(message);
-    await sleep(1500);
+    await waitWithNotice(Math.min(wait, 5000), 'Nouvelle tentative');
   }
   throw new Error(lastError || 'Correction impossible après plusieurs tentatives.');
 }
+
 
 /**
  * Garde-fou : une correction ne doit jamais raccourcir le chapitre.
@@ -178,9 +193,10 @@ export async function proofreadChapter(
   let corrected = isTruncated(content, res.corrected) ? content : res.corrected;
   let corrections = isTruncated(content, res.corrected) ? [] : res.corrections;
 
-  for (let pass = 0; pass < 2; pass++) {
-    const remaining = findLatinExpressions(corrected);
-    if (!remaining.length) break;
+  // Une seule passe anti-latin, uniquement si le balayage local détecte vraiment
+  // des expressions : moins d'appels IA, donc moins de risque de quota.
+  const remaining = findLatinExpressions(corrected);
+  if (remaining.length) {
     try {
       const fix = await callProofread(title, corrected, 'latin-fix', remaining);
       const reduced = findLatinExpressions(fix.corrected).length < remaining.length;
@@ -188,13 +204,12 @@ export async function proofreadChapter(
       if (reduced && !isTruncated(corrected, fix.corrected)) {
         corrected = fix.corrected;
         corrections = [...corrections, ...fix.corrections];
-      } else {
-        break;
       }
     } catch {
-      break;
+      // La passe anti-latin échoue : on garde le texte corrigé tel quel.
     }
   }
+
 
   const latinRemaining = findLatinExpressions(corrected);
   return {
@@ -218,6 +233,8 @@ export interface ProofreadProgress {
  * Corrige une liste de chapitres en série. `onProgress` est appelé après chaque
  * chapitre pour que l'interface affiche l'avancement en direct.
  * `shouldStop` permet d'interrompre proprement sans perdre le travail déjà fait.
+ * Aucune erreur (crédits, quota, limite de débit) n'interrompt la série : les
+ * chapitres en échec sont repris automatiquement en fin de passage.
  */
 export async function proofreadChapters(
   chapters: ChapterProofread[],
@@ -225,19 +242,17 @@ export async function proofreadChapters(
   onProgress: (p: ProofreadProgress) => void,
   shouldStop?: () => boolean,
 ): Promise<void> {
-  for (let i = 0; i < chapters.length; i++) {
-    if (shouldStop?.()) return;
-    const chapter = chapters[i];
-    if (chapter.status === 'done') continue;
+  const runPass = async () => {
+    for (let i = 0; i < chapters.length; i++) {
+      if (shouldStop?.()) return;
+      const chapter = chapters[i];
+      if (chapter.status === 'done') continue;
 
-    onProgress({ index: i, total: chapters.length, chapter: { ...chapter, status: 'running' } });
+      onProgress({ index: i, total: chapters.length, chapter: { ...chapter, status: 'running' } });
 
-    try {
-      const res = await proofreadChapter(chapter.title, chapter.original, mode);
-      onProgress({
-        index: i,
-        total: chapters.length,
-        chapter: {
+      try {
+        const res = await proofreadChapter(chapter.title, chapter.original, mode);
+        chapters[i] = {
           ...chapter,
           status: 'done',
           corrected: res.corrected,
@@ -245,21 +260,35 @@ export async function proofreadChapters(
           quality: res.quality,
           latinRemoved: res.latinRemoved,
           latinRemaining: res.latinRemaining,
-        },
-
-      });
-    } catch (e: any) {
-      onProgress({
-        index: i,
-        total: chapters.length,
-        chapter: { ...chapter, status: 'failed', error: e?.message || 'Erreur inconnue' },
-      });
-      // Crédits épuisés : on arrête toute la série.
-      if (/402|crédit/i.test(String(e?.message))) return;
+          error: undefined,
+        };
+        onProgress({ index: i, total: chapters.length, chapter: chapters[i] });
+      } catch (e: any) {
+        chapters[i] = { ...chapter, status: 'failed', error: e?.message || 'Erreur inconnue' };
+        onProgress({ index: i, total: chapters.length, chapter: chapters[i] });
+      }
+      await sleep(600);
     }
-    await sleep(600);
+  };
+
+  await runPass();
+
+  // Deux tours de reprise automatique sur les seuls chapitres en échec,
+  // avec pause progressive pour laisser retomber les limites de débit.
+  const RETRY_DELAYS = [10000, 30000];
+  for (const delay of RETRY_DELAYS) {
+    if (shouldStop?.()) return;
+    const failed = chapters.filter((c) => c.status === 'failed');
+    if (!failed.length) return;
+    await waitWithNotice(delay, `Reprise de ${failed.length} chapitre(s) en échec`);
+    failed.forEach((c) => {
+      const i = chapters.indexOf(c);
+      chapters[i] = { ...c, status: 'pending', error: undefined };
+    });
+    await runPass();
   }
 }
+
 
 /** Répartition des corrections par type, pour le rapport final. */
 export function correctionBreakdown(chapters: ChapterProofread[]): { type: string; label: string; count: number }[] {

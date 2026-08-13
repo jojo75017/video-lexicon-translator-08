@@ -134,85 +134,132 @@ Retourne le JSON avec le texte corrigé et la liste exhaustive des corrections e
     const byoKey = (userApiKey || '').toString().trim();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
-    let endpoint = '';
-    let headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    let body: Record<string, unknown> = {};
-    let engine = 'lovable';
+    type Call = { engine: string; endpoint: string; headers: Record<string, string>; body: Record<string, unknown> };
 
-    if (byoKey && provider === 'gemini') {
-      engine = 'gemini';
-      endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${encodeURIComponent(byoKey)}`;
-      body = {
-        system_instruction: { parts: [{ text: systemPrompt }] },
-        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
-        generationConfig: { temperature: 0.2, maxOutputTokens: 8000 },
+    const buildByoCall = (): Call | null => {
+      if (!byoKey) return null;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (provider === 'gemini') {
+        return {
+          engine: 'gemini',
+          endpoint: `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${encodeURIComponent(byoKey)}`,
+          headers,
+          body: {
+            system_instruction: { parts: [{ text: systemPrompt }] },
+            contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+            generationConfig: { temperature: 0.2, maxOutputTokens: 8000 },
+          },
+        };
+      }
+      if (provider === 'openai') {
+        headers.Authorization = `Bearer ${byoKey}`;
+        return {
+          engine: 'openai',
+          endpoint: 'https://api.openai.com/v1/chat/completions',
+          headers,
+          body: { model: userModel || 'gpt-4o-mini', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }], max_tokens: 8000 },
+        };
+      }
+      if (provider === 'claude') {
+        headers['x-api-key'] = byoKey;
+        headers['anthropic-version'] = '2023-06-01';
+        return {
+          engine: 'claude',
+          endpoint: 'https://api.anthropic.com/v1/messages',
+          headers,
+          body: { model: userModel || 'claude-3-5-haiku-20241022', max_tokens: 8000, system: systemPrompt, messages: [{ role: 'user', content: userPrompt }] },
+        };
+      }
+      if (provider === 'openrouter') {
+        headers.Authorization = `Bearer ${byoKey}`;
+        headers['HTTP-Referer'] = 'https://ebookstudio.fr';
+        headers['X-Title'] = 'Correcteur - eBook Studio';
+        return {
+          engine: 'openrouter',
+          endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+          headers,
+          body: { model: userModel || 'google/gemini-2.5-flash-lite', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }], max_tokens: 8000 },
+        };
+      }
+      return null;
+    };
+
+    const buildFallbackCall = (): Call | null => {
+      if (!LOVABLE_API_KEY) return null;
+      return {
+        engine: 'lovable',
+        endpoint: 'https://ai.gateway.lovable.dev/v1/chat/completions',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${LOVABLE_API_KEY}` },
+        body: { model: 'google/gemini-2.5-flash', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }], max_tokens: 8000 },
       };
-    } else if (byoKey && provider === 'openai') {
-      engine = 'openai';
-      endpoint = 'https://api.openai.com/v1/chat/completions';
-      headers.Authorization = `Bearer ${byoKey}`;
-      body = { model: userModel || 'gpt-4o-mini', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }], max_tokens: 8000 };
-    } else if (byoKey && provider === 'claude') {
-      engine = 'claude';
-      endpoint = 'https://api.anthropic.com/v1/messages';
-      headers['x-api-key'] = byoKey;
-      headers['anthropic-version'] = '2023-06-01';
-      body = { model: userModel || 'claude-3-5-haiku-20241022', max_tokens: 8000, system: systemPrompt, messages: [{ role: 'user', content: userPrompt }] };
-    } else if (byoKey && provider === 'openrouter') {
-      engine = 'openrouter';
-      endpoint = 'https://openrouter.ai/api/v1/chat/completions';
-      headers.Authorization = `Bearer ${byoKey}`;
-      headers['HTTP-Referer'] = 'https://ebookstudio.fr';
-      headers['X-Title'] = 'Correcteur - eBook Studio';
-      body = { model: userModel || 'google/gemini-2.5-flash-lite', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }], max_tokens: 8000 };
-    } else {
-      if (!LOVABLE_API_KEY) throw new Error("Aucune clé IA : configurez votre clé Gemini, ChatGPT, Claude ou OpenRouter dans Paramètres > Clés API.");
-      endpoint = 'https://ai.gateway.lovable.dev/v1/chat/completions';
-      headers.Authorization = `Bearer ${LOVABLE_API_KEY}`;
-      body = { model: 'google/gemini-2.5-flash', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }], max_tokens: 8000 };
+    };
+
+    const runCall = async (call: Call) => {
+      const response = await fetch(call.endpoint, {
+        method: 'POST',
+        headers: call.headers,
+        body: JSON.stringify(call.body),
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`AI error (${call.engine}):`, response.status, errorText);
+        return { ok: false as const, status: response.status };
+      }
+      const data = await response.json();
+      const content =
+        call.engine === 'gemini'
+          ? (data?.candidates?.[0]?.content?.parts?.[0]?.text || '')
+          : call.engine === 'claude'
+            ? (Array.isArray(data?.content) ? data.content.map((c: any) => c?.text || '').join('') : '')
+            : (data?.choices?.[0]?.message?.content || '');
+      return { ok: true as const, content };
+    };
+
+    const primary = buildByoCall() || buildFallbackCall();
+    if (!primary) {
+      throw new Error("Aucune clé IA : configurez votre clé Gemini, ChatGPT, Claude ou OpenRouter dans Paramètres > Clés API.");
     }
 
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(body),
-      signal: controller.signal,
-    });
+    let engine = primary.engine;
+    let attempt = await runCall(primary);
+
+    // Quota épuisé / clé refusée / limite de débit sur la clé de l'abonné :
+    // on rejoue immédiatement sur le moteur de secours de la plateforme.
+    if (!attempt.ok && primary.engine !== 'lovable' && [401, 402, 403, 429].includes(attempt.status)) {
+      const fallback = buildFallbackCall();
+      if (fallback) {
+        console.log(`Repli sur le moteur de secours (${primary.engine} → lovable), statut ${attempt.status}`);
+        engine = 'lovable';
+        attempt = await runCall(fallback);
+      }
+    }
 
     clearTimeout(timeoutId);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`AI error (${engine}):`, response.status, errorText);
-
-      if (response.status === 429) {
+    if (!attempt.ok) {
+      if (attempt.status === 429) {
         return new Response(
           JSON.stringify({ error: "Limite de requêtes atteinte, réessayez dans quelques instants." }),
           { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-      if (response.status === 401 || response.status === 403) {
+      if (attempt.status === 401 || attempt.status === 403) {
         return new Response(
           JSON.stringify({ error: "Clé API refusée. Vérifiez votre clé dans Paramètres > Clés API." }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-      if (response.status === 402) {
+      if (attempt.status === 402) {
         return new Response(
           JSON.stringify({ error: "Crédits insuffisants sur votre compte IA." }),
           { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-      throw new Error(`AI error: ${response.status}`);
+      throw new Error(`AI error: ${attempt.status}`);
     }
 
-    const data = await response.json();
-    const content =
-      engine === 'gemini'
-        ? (data?.candidates?.[0]?.content?.parts?.[0]?.text || '')
-        : engine === 'claude'
-          ? (Array.isArray(data?.content) ? data.content.map((c: any) => c?.text || '').join('') : '')
-          : (data?.choices?.[0]?.message?.content || '');
+    const content = attempt.content;
 
     let result;
     try {
@@ -240,6 +287,7 @@ Retourne le JSON avec le texte corrigé et la liste exhaustive des corrections e
     return new Response(JSON.stringify({ ...result, engine }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
+
 
   } catch (error) {
     console.error("Error in strict-proofread:", error);
