@@ -14,6 +14,7 @@ import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { COMMANDER_URL } from "@/data/externalLinks";
 import { V3_LAUNCH_BONUSES, V3_BONUSES_TOTAL_VALUE } from "@/data/v3Launch";
 import { trackCaptureEvent } from "@/lib/captureTracking";
+import { V3EngineStrip, V3EngineGrid } from "@/components/v3public/V3EngineBanner";
 
 
 const BONUS_TOTAL = V3_BONUSES_TOTAL_VALUE;
