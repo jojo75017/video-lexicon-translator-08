@@ -274,11 +274,17 @@ export default function V3CorrecteurPage() {
       const ko = working.filter((c) => c.status === 'failed').length;
       const latin = working.reduce((s, c) => s + (c.latinRemoved || 0), 0);
       const stuck = working.reduce((s, c) => s + (c.latinRemaining?.length || 0), 0);
+      const ends = working.filter((c) => c.endingFixed).length;
+      const corrs = working.reduce((s, c) => s + c.corrections.length, 0);
+      const extra = [
+        latin ? `${latin} expression(s) latine(s) supprimée(s)` : '',
+        ends ? `${ends} fin(s) de chapitre complétée(s)` : '',
+      ].filter(Boolean).join(' · ');
       if (stopRef.current) toast.info('Correction interrompue — le travail déjà fait est conservé.');
       else if (ko) toast.warning(`Correction terminée avec ${ko} chapitre(s) en échec — utilisez « Reprendre les chapitres en échec ».`);
       else if (manualReview) toast.success('Correction terminée. Relisez chapitre par chapitre puis exportez.');
       else toast.success(
-        `Livre corrigé et appliqué${latin ? ` · ${latin} expression(s) latine(s) supprimée(s)` : ''}. Vous pouvez exporter.`,
+        `Livre corrigé et appliqué · ${corrs} correction(s)${extra ? ` · ${extra}` : ''}. Vous pouvez exporter.`,
       );
       if (stuck > 0) toast.warning(`${stuck} expression(s) en latin résistent — la liste est affichée sous la progression.`);
     } finally {
