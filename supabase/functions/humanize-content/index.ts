@@ -12,7 +12,15 @@ serve(async (req) => {
   }
 
   try {
-    const { content, intensity = 'medium', style = 'natural', preserveKeywords = [] } = await req.json();
+    const {
+      content,
+      intensity = 'medium',
+      style = 'natural',
+      preserveKeywords = [],
+      userProvider,
+      userApiKey,
+      userModel,
+    } = await req.json();
 
     if (!content || content.trim().length < 50) {
       return new Response(
@@ -21,10 +29,24 @@ serve(async (req) => {
       );
     }
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY is not configured');
+    const wordCount = content.trim().split(/\s+/).filter(Boolean).length;
+    if (wordCount > 4000) {
+      return new Response(
+        JSON.stringify({
+          error:
+            `Texte trop long pour un seul appel (${wordCount} mots). Humanisez chapitre par chapitre ` +
+            `(4 000 mots maximum), ou utilisez « Corriger mon livre » pour le livre entier.`,
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
+
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const byoKey = typeof userApiKey === 'string' && userApiKey.length > 20 ? userApiKey : null;
+    if (!LOVABLE_API_KEY && !byoKey) {
+      throw new Error('Aucune clé IA disponible');
+    }
+
 
     // Intensité de l'humanisation
     const intensityPrompts: Record<string, string> = {
