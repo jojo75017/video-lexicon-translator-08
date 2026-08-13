@@ -458,6 +458,30 @@ export default function V3CorrecteurPage() {
         </p>
       </header>
 
+      {/* Mode d'emploi visible : 3 étapes, sans jargon. */}
+      <div className="mb-6 rounded-2xl border p-5" style={{ borderColor: 'var(--v3-line)', background: '#fbfaf7' }}>
+        <div className="flex items-center gap-2 text-sm font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+          <Sparkles className="h-4 w-4" /> Comment ça marche
+        </div>
+        <ol className="mt-3 grid gap-3 sm:grid-cols-3 text-[13px]" style={{ color: 'var(--v3-muted)' }}>
+          <li><span className="font-semibold" style={{ color: 'var(--v3-ink)' }}>1. Choisissez le livre</span><br />Importez un document (Word, PDF, texte) ou ouvrez un livre déjà présent dans « Mes livres » avec le bouton « Corriger ce livre ».</li>
+          <li><span className="font-semibold" style={{ color: 'var(--v3-ink)' }}>2. Cliquez sur « Corriger tout le livre »</span><br />L'IA corrige chaque chapitre, applique les corrections et supprime les mots latins.</li>
+          <li><span className="font-semibold" style={{ color: 'var(--v3-ink)' }}>3. C'est enregistré tout seul</span><br />Le livre corrigé apparaît dans <button type="button" onClick={() => navigate('/v3/livres-corriges')} className="underline font-semibold" style={{ color: 'var(--v3-emerald)' }}>Livres corrigés</button> et s'exporte en Word ou PDF.</li>
+        </ol>
+      </div>
+
+      {savedToLibrary && (
+        <div className="mb-6 flex flex-wrap items-center gap-3 rounded-xl border p-4" style={{ borderColor: '#a7f3d0', background: '#ecfdf5' }}>
+          <CheckCircle2 className="h-5 w-5 shrink-0" style={{ color: '#047857' }} />
+          <div className="text-sm font-semibold" style={{ color: '#065f46' }}>
+            Livre enregistré dans « Livres corrigés »{latinRemaining.length > 0 ? ' — quelques passages latins restent à revoir.' : '.'}
+          </div>
+          <button onClick={() => navigate('/v3/livres-corriges')} className="v3-btn-outline ml-auto inline-flex items-center gap-2 text-xs">
+            <BookOpen className="h-3.5 w-3.5" /> Voir mes livres corrigés
+          </button>
+        </div>
+      )}
+
       {recoveredAt && manuscript && (
         <div className="mb-6 flex items-start gap-3 rounded-xl border p-4" style={{ borderColor: 'var(--v3-gold)', background: 'var(--v3-gold-soft, #f7f2e3)' }}>
           <Save className="mt-0.5 h-5 w-5 shrink-0" style={{ color: 'var(--v3-emerald)' }} />
