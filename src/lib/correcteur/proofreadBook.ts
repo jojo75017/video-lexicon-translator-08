@@ -324,7 +324,7 @@ export async function proofreadChapter(
   for (let pass = 0; pass < 2; pass++) {
     const remaining = findLatinExpressions(corrected);
     if (!remaining.length) break;
-    const parts = splitForProofread(corrected);
+    const parts = splitForProofread(corrected, 700);
     let changed = false;
     for (let i = 0; i < parts.length; i++) {
       const hits = findLatinExpressions(parts[i]);
