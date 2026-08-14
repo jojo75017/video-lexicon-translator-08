@@ -12,6 +12,7 @@ import { installGlobalErrorHandlers } from "./lib/errorLogger";
 import { installChunkErrorRecovery } from "./lib/chunkErrorRecovery";
 import { purgeLegacyOffresCache } from "./lib/offresCachePurge";
 import { runSiteWidePurge } from "./lib/sitePurge";
+import { AdminAccessProvider } from "./contexts/AdminAccessContext";
 
 // Agent de contrôle : récupère automatiquement les pages cassées par un
 // chunk JS obsolète (post-déploiement) sur /offres, /demo, etc.
@@ -39,7 +40,9 @@ if (typeof window !== "undefined" && "serviceWorker" in navigator) {
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
-      <App />
+      <AdminAccessProvider>
+        <App />
+      </AdminAccessProvider>
     </BrowserRouter>
   </StrictMode>,
 );

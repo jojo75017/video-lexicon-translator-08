@@ -1,13 +1,17 @@
 import { supabase } from '@/integrations/supabase/client';
 
-let pendingCheck: Promise<boolean> | null = null;
+let pendingCheck: Promise<boolean | null> | null = null;
 /** Résultat mémorisé pour la session en cours (null = inconnu). */
 let cachedResult: boolean | null = null;
+/** Invalide les réponses asynchrones appartenant à une ancienne session. */
+let checkGeneration = 0;
 
 type Listener = (isAdmin: boolean | null) => void;
 const listeners = new Set<Listener>();
 
 function publish(value: boolean | null) {
+  // Une réponse négative tardive ne peut jamais écraser un admin déjà confirmé.
+  if (cachedResult === true && value !== true) return;
   cachedResult = value;
   listeners.forEach((fn) => {
     try { fn(value); } catch { /* un abonné en erreur ne bloque pas les autres */ }
@@ -57,6 +61,7 @@ export async function resolveAdminStatus(): Promise<boolean | null> {
   if (cachedResult === true) return true;
   if (pendingCheck) return pendingCheck;
 
+  const generation = checkGeneration;
   pendingCheck = (async () => {
     try {
       let result = await checkOnce();
@@ -65,6 +70,7 @@ export async function resolveAdminStatus(): Promise<boolean | null> {
         await new Promise((r) => setTimeout(r, 700));
         result = await checkOnce();
       }
+      if (generation !== checkGeneration) return cachedResult;
       if (result === null) return null; // inconnu : on ne conclut rien
       publish(result);
       return result;
@@ -89,8 +95,12 @@ export async function getIsCurrentSessionAdmin(): Promise<boolean> {
 
 /** À réserver à la déconnexion : efface un statut admin confirmé. */
 export function clearAdminCache() {
+  checkGeneration += 1;
   pendingCheck = null;
-  publish(null);
+  cachedResult = null;
+  listeners.forEach((fn) => {
+    try { fn(null); } catch { /* ignore */ }
+  });
   try {
     localStorage.removeItem('admin_status_cache_v1');
   } catch {

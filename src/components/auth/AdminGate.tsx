@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { resolveAdminStatus } from "@/lib/adminAccess";
 import { ADMIN_LOGIN_PATH } from "@/config/adminRoutes";
 import AccessPendingFallback from "@/components/auth/AccessPendingFallback";
+import { useAdminAccess } from "@/contexts/AdminAccessContext";
 
 type Props = {
   children: React.ReactNode;
@@ -16,9 +16,8 @@ type Props = {
  * QUE sur un refus confirmé : un statut inconnu patiente puis réessaie.
  */
 export function AdminGate({ children }: Props) {
-  const [status, setStatus] = useState<boolean | null>(null);
   const [timedOut, setTimedOut] = useState(false);
-  const [retry, setRetry] = useState(0);
+  const { status, refresh } = useAdminAccess();
   const location = useLocation();
 
   useEffect(() => {
@@ -28,32 +27,19 @@ export function AdminGate({ children }: Props) {
       if (!cancelled) setTimedOut(true);
     }, 8000);
 
-    const run = async () => {
-      try {
-        const result = await resolveAdminStatus();
-        if (cancelled) return;
-        // Un admin confirmé n'est jamais rétrogradé.
-        setStatus((prev) => (prev === true ? true : result));
-      } catch (e) {
-        console.error("AdminGate error:", e);
-      }
-    };
-
-    void run();
-
     return () => {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [retry]);
+  }, [status]);
 
-  const onRetry = useCallback(() => setRetry((n) => n + 1), []);
+  const onRetry = useCallback(() => { void refresh(); }, [refresh]);
 
-  if (status === null) {
+  if (status === 'restoring' || status === 'temporary-error') {
     return <AccessPendingFallback timedOut={timedOut} onRetry={onRetry} />;
   }
 
-  if (status === false) {
+  if (status === 'non-admin') {
     return <Navigate to={ADMIN_LOGIN_PATH} replace state={{ from: location.pathname, reason: "session-required" }} />;
   }
 
