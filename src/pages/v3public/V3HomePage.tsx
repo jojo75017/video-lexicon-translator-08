@@ -140,9 +140,8 @@ export default function V3HomePage() {
         </div>
       </section>
 
-      {/* MOTEUR MULTI-MODÈLES — juste sous le bandeau d'accroche */}
-      <V3EngineStrip />
-      <V3EngineGrid />
+      {/* MOTEUR MULTI-MODÈLES — déplacé en 2e module (voir plus haut) */}
+
 
       {/* KDP Pilot — outil partenaire payant + code abonnés (compact, avant les champs) */}
       <section className="max-w-7xl mx-auto px-5 md:px-8 pt-2">
