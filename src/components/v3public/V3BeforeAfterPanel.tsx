@@ -10,6 +10,14 @@ const BEFORE = [
   'Du contenu, pas de positionnement.',
   'Un classeur à livres : un outil d\u2019édition incomplet.',
   'Un modèle d\u2019IA unique, pas une équipe d\u2019édition.',
+  'Des heures à corriger des mots en latin et des phrases coupées.',
+  'Une couverture amateur qui ne convertit pas sur Amazon.',
+  'Aucun livre audio, ou un TTS cher et robotique.',
+  'Des mots-clés trouvés au hasard, sans données Amazon.',
+  'Une mise en page Word à refaire dix fois.',
+  'Obligé de payer cinq outils et cinq abonnements.',
+  'Des traductions approximatives qui passent mal.',
+  'Aucune aide pour choisir les catégories KDP.',
 ];
 
 const AFTER = [
@@ -21,6 +29,10 @@ const AFTER = [
   'SEO & mots-clés KDP',
   'Traduction',
   'Publication & métadonnées',
+  'Correction & humanisation',
+  'Mockups 3D & promotion',
+  'Plan marketing & réseaux sociaux',
+  'Suivi & reprise de projet',
 ];
 
 /** Section de conviction « Avant / Après » — informative, non cliquable. */
