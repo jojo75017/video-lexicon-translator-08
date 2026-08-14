@@ -215,9 +215,6 @@ export default function V3HomePage() {
       {/* Les six univers vivent désormais dans « Fonctionnalités » (12 modules) */}
 
 
-      {/* MOTEUR MULTI-MODÈLES */}
-      <V3EngineStrip />
-      <V3EngineGrid />
 
       {/* OUTILS VEDETTES */}
       <section className="max-w-7xl mx-auto px-5 md:px-8 pb-16">
