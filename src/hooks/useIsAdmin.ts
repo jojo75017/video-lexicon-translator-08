@@ -3,9 +3,10 @@ import { supabase } from '@/integrations/supabase/client';
 import {
   clearAdminCache,
   getCachedAdminStatus,
-  getIsCurrentSessionAdmin,
+  resolveAdminStatus,
   subscribeAdminStatus,
 } from '@/lib/adminAccess';
+
 
 /**
  * Statut admin partagé et réactif.
