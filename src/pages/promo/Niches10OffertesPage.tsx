@@ -132,7 +132,7 @@ const Niches10OffertesPage: React.FC = () => {
             <Niches10Offer
               surface="cadeau"
               hook="default"
-              variant="hero"
+              variant="compact"
               onDone={() => setUnlocked(true)}
             />
           </div>
