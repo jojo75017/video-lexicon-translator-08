@@ -1,17 +1,24 @@
-# Accueil V3 : sections Avant/Après, marché, public cible + accueil à jour
+# Accueil V3 : sections Avant/Après, marché, public cible, garantie, licence commerciale + accueil à jour
 
 ## Objectif
-Ajouter sur l'accueil V3 trois blocs de conviction :
-1. « Avant / Après » : opposer une IA généraliste à l’équipe d’IA spécialisées d’Ebookstudio V3.
-2. « Voici ce que prouve le marché » : chiffres KDP / livre numérique / livre audio.
-3. « À qui cela s’adresse-t-il ? » : les profils qui utilisent Ebookstudio V3.
+Ajouter sur l'accueil V3 cinq blocs de conviction et terminer les correctifs d'affichage.
 
-Et terminer les correctifs d’affichage : bandeau KDP Pilot visible, champs réduits, arrivée systématique sur `/v3`.
+Blocs :
+1. « Avant / Après » : opposer une IA généraliste à l'équipe d'IA spécialisées d'Ebookstudio V3.
+2. « Voici ce que prouve le marché » : chiffres KDP / livre numérique / livre audio.
+3. « À qui cela s'adresse-t-il ? » : les profils qui utilisent Ebookstudio V3.
+4. « Garantie 30 jours » : supprimer tout risque à l'achat.
+5. « Licence commerciale à vie incluse » : montrer qu'on peut revendre les livres et services d'édition.
+
+Correctifs d'affichage :
+- Bandeau KDP Pilot visible en tête de page.
+- Champs « Commencez votre livre » réduits.
+- Arrivée systématique sur `/v3` après connexion.
 
 ## Règle de nommage
 - Nom affiché partout : **Ebookstudio V3**.
-- Aucune mention d’un outil concurrent ni d’un nom emprunté, ni dans les titres, ni dans les textes, ni dans les commentaires du code.
-- Vocabulaire retenu : « anciens outils KDP », « une IA généraliste », « équipe d’IA spécialisées ».
+- Aucune mention d'un outil concurrent, d'un nom emprunté, ni dans les titres, ni dans les textes, ni dans les commentaires du code.
+- Vocabulaire retenu : « anciens outils KDP », « une IA généraliste », « équipe d'IA spécialisées ».
 
 ## Partie 1 — Section « Avant / Après »
 
@@ -26,7 +33,7 @@ Et terminer les correctifs d’affichage : bandeau KDP Pilot visible, champs ré
 
 ┌───────────────────────────────┐  ┌───────────────────────────────┐
 │ AVANT — UNE SEULE IA          │  │ APRÈS — EBOOKSTUDIO V3        │
-│ (colonne sobre, ton éteint)   │  │ PLUSIEURS IA SPÉCIALISÉES   │
+│ (colonne sobre, ton éteint)   │  │ PLUSIEURS IA SPÉCIALISÉES     │
 │                               │  │ (colonne émeraude + or)       │
 │ • Un texte, pas un flux       │  │ Écrire un livre demande       │
 │   de travail d'édition        │  │ plusieurs intelligences,      │
@@ -47,7 +54,7 @@ Et terminer les correctifs d’affichage : bandeau KDP Pilot visible, champs ré
 │ Chute pleine largeur, fond émeraude :                                │
 │ « Pas une seule IA qui tente de tout faire.                          │
 │   Une IA spécialisée pour chaque étape de votre livre. »             │
-│                     [ Voir les moteurs IA ]                         │
+│                     [ Voir les moteurs IA ]                          │
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -88,7 +95,7 @@ Chute : « Pas une seule IA qui tente de tout faire. Une IA spécialisée pour c
 
 ┌──────────────────────────────────────────────────────────────────────┐
 │ Chute : « Cela signifie que l'opportunité est énorme… Mais publier    │
-│ des ouvrages de mauvaise qualité est risqué. »                        │
+│ des ouvrages de mauvaise qualité est risqué. »                       │
 │                                                                       │
 │ « Ebookstudio V3 aide les auteurs à abandonner les livres d'IA        │
 │ bon marché et génériques pour adopter un flux de travail d'édition    │
@@ -117,7 +124,7 @@ Chute : Cela signifie que l'opportunité est énorme… Mais publier des ouvrage
 ┌──────────────────────────────────────────────────────────────────────┐
 │  Titre : « À qui cela s'adresse-t-il ? »                             │
 │  Sous-titre : Ebookstudio V3 est conçu pour les créateurs qui        │
-│               veulent publier vite, bien et durablement.               │
+│               veulent publier vite, bien et durablement.              │
 └──────────────────────────────────────────────────────────────────────┘
 
 ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
@@ -140,18 +147,124 @@ Chute : Cela signifie que l'opportunité est énorme… Mais publier des ouvrage
 10 profils sous forme de cartes :
 1. Débutants KDP — se lancer sans apprendre chaque étape technique.
 2. Auteurs pressés — créer des livres plus rapidement.
-3. Marketeurs d’affiliation — générer des revenus via la publication.
+3. Marketeurs d'affiliation — générer des revenus via la publication.
 4. Indépendants — proposer des services de création de livres.
-5. Agences d’édition — vendre des formules d’édition.
+5. Agences d'édition — vendre des formules d'édition.
 6. Coachs experts — transformer leurs connaissances en livres.
 7. Créateurs de cours — aimants à prospects et ouvrages de référence.
 8. Créateurs de contenu — constituer des ressources de livres de marque.
 9. Auteurs autoédités — développer leur catalogue.
-10. Porteurs d’idées — ceux qui n’écrivent pas mais veulent transformer une idée en livre avec l’IA.
+10. Porteurs d'idées — ceux qui n'écrivent pas mais veulent transformer une idée en livre avec l'IA.
 
 Chute : « Si vous souhaitez créer un catalogue d'édition, Ebookstudio V3 vous fournit le système. »
 
-## Partie 4 — Correctifs d'affichage à finir
+## Partie 4 — Section « Garantie 30 jours »
+
+### Schéma
+
+```text
+┌──────────────────────────────────────────────────────────────────────┐
+│  Titre : « Vous êtes entièrement protégé par notre garantie           │
+│            de remboursement de 30 jours »                            │
+└──────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ Liste numérotée :                                                    │
+│ 1 Essayez Ebookstudio V3 pendant 30 jours.                           │
+│ 2 Utilisez-le pour rechercher des idées de livres.                   │
+│ 3 Générez des manuscrits.                                            │
+│ 4 Créez des couvertures.                                             │
+│ 5 Préparez les métadonnées.                                          │
+│ 6 Créez des brouillons de livres audio.                              │
+│ 7 Testez les traductions.                                            │
+│ 8 Créez des ressources d'édition.                                    │
+└──────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ Chute : « Voyez à quel point votre flux de travail KDP devient       │
+│ plus rapide. Si vous estimez que ce produit ne vous convient pas,    │
+│ contactez-nous dans les 30 jours et vous serez remboursé.            │
+│ Pas de stress. Aucun risque. Aucun processus compliqué.               │
+│ Soit vous adorez le système… ou vous récupérez votre argent. »      │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+### Contenu rédigé
+
+Titre : « Vous êtes entièrement protégé par notre garantie de remboursement de 30 jours. »
+
+Liste d'actions possibles pendant l'essai :
+- Rechercher des idées de livres.
+- Générer des manuscrits.
+- Créer des couvertures.
+- Préparer les métadonnées.
+- Créer des brouillons de livres audio.
+- Tester les traductions.
+- Créer des ressources d'édition.
+
+Chute : « Voyez à quel point votre flux de travail KDP devient plus rapide. Si vous estimez que ce produit ne vous convient pas, contactez-nous dans les 30 jours et vous serez remboursé. Pas de stress. Aucun risque. Aucun processus compliqué. Soit vous adorez le système… ou vous récupérez votre argent. »
+
+## Partie 5 — Section « Licence commerciale à vie incluse »
+
+### Schéma
+
+```text
+┌──────────────────────────────────────────────────────────────────────┐
+│  Titre : « Licence commerciale à vie incluse »                        │
+│  Sous-titre : Ebookstudio V3 n'est pas réservé à vos propres livres. │
+└──────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ Deux colonnes :                                                      │
+│ Colonne gauche — « Vous pouvez créer » :                             │
+│   • Packs de livres Kindle                                           │
+│   • Packs de brouillons de livres audio                              │
+│   • Forfaits de couverture de livres                                 │
+│   • Rapports de recherche KDP                                        │
+│   • Ensembles de descriptions de livres                              │
+│   • Packs de mots clés et de catégories                              │
+│   • Packs de traduction                                              │
+│   • Emballages de marque d'auteur                                    │
+│   • Forfaits de planification de séries de livres                    │
+│   • Packs d'eBooks magnétiques                                       │
+│   • Packs de publication client                                        │
+│                                                                      │
+│ Colonne droite — « Le marché » :                                     │
+│   Des coachs, consultants, créateurs, experts locaux,               │
+│   chefs d'entreprise et entrepreneurs veulent un livre…            │
+│   mais ne savent pas comment faire les recherches, rédiger,          │
+│   concevoir, mettre en forme ou préparer le document.                │
+│   Avec Ebookstudio V3, vous devenez la personne qui les aide.        │
+│   Vous facturez ce service.                                          │
+│   Vous livrez plus rapidement.                                       │
+│   Vous conservez 100 % de ce que vous facturez.                      │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+### Contenu rédigé
+
+Titre : « Licence commerciale à vie incluse »
+
+Sous-titre : « Ebookstudio V3 n'est pas réservé à vos propres livres. Vous pouvez également l'utiliser pour proposer des services d'édition. »
+
+Liste des livrables possibles :
+- Packs de livres Kindle.
+- Packs de brouillons de livres audio.
+- Forfaits de couverture de livres.
+- Rapports de recherche KDP.
+- Ensembles de descriptions de livres.
+- Packs de mots clés et de catégories.
+- Packs de traduction.
+- Emballages de marque d'auteur.
+- Forfaits de planification de séries de livres.
+- Packs d'eBooks magnétiques.
+- Packs de publication client.
+
+Chute : « Des milliers de coachs, consultants, créateurs, experts locaux, chefs d'entreprise et entrepreneurs souhaitent un livre… mais ne savent pas comment faire les recherches, rédiger, concevoir, mettre en forme ou préparer le document. Avec Ebookstudio V3, vous devenez la personne qui les aide. Vous pouvez facturer ce service. Vous livrez plus rapidement. Et vous conservez 100 % de ce que vous facturez. »
+
+Note tarifaire : la licence commerciale est incluse dans les deux forfaits (Plume et Édition) ; aucune option payante supplémentaire n'est requise pour revendre ses services.
+
+## Partie 6 — Correctifs d'affichage à finir
 1. Bandeau compact KDP Pilot remonté en tête de l'accueil V3, code `PROMO15` conservé.
 2. Champs « Commencez votre livre » resserrés : une ligne sur ordinateur, paddings et historique réduits.
 3. Entrées générales `/`, `/dashboard`, `/espace` renvoyant l'abonné sur `/v3` ; accès V2 conservé via son bouton dédié.
@@ -159,7 +272,7 @@ Chute : « Si vous souhaitez créer un catalogue d'édition, Ebookstudio V3 vous
 
 ## Vérification
 - Déconnexion puis reconnexion : arrivée sur `/v3`, bandeau KDP Pilot et champs réduits visibles au premier écran.
-- Sections « Avant / Après », « Marché » et « Public cible » lisibles sur ordinateur et mobile, 100 % en français, aucune marque étrangère.
+- Sections « Avant / Après », « Marché », « Public cible », « Garantie 30 jours » et « Licence commerciale » lisibles sur ordinateur et mobile, 100 % en français, aucune marque étrangère.
 - Aucun rechargement en boucle.
 
 ## Détails techniques
@@ -167,9 +280,16 @@ Chute : « Si vous souhaitez créer un catalogue d'édition, Ebookstudio V3 vous
   - `src/components/v3public/V3BeforeAfterPanel.tsx`
   - `src/components/v3public/V3MarketProofPanel.tsx`
   - `src/components/v3public/V3AudiencePanel.tsx`
-- Insertion dans `V3HomePage.tsx` :
-  - `V3MarketProofPanel` au-dessus de `V3BeforeAfterPanel`.
-  - `V3BeforeAfterPanel` au-dessus de `V3EngineStrip`.
-  - `V3AudiencePanel` sous la grille des moteurs IA.
+  - `src/components/v3public/V3GuaranteePanel.tsx`
+  - `src/components/v3public/V3CommercialLicensePanel.tsx`
+- Insertion dans `V3HomePage.tsx` (ordre de lecture) :
+  1. `KdpPilotPromoBanner` en tête.
+  2. `V3StartBookBar` compact.
+  3. `V3MarketProofPanel`.
+  4. `V3BeforeAfterPanel`.
+  5. `V3EngineStrip` / grille des moteurs IA existante.
+  6. `V3AudiencePanel`.
+  7. `V3GuaranteePanel`.
+  8. `V3CommercialLicensePanel`.
 - Styles alignés sur `src/styles/v3-public.css` (émeraude, or, `v3-serif`), cohérents avec `V3EngineBanner.tsx`.
 - Icônes vectorielles uniquement : aucun appel IA, aucune génération d'image, donc aucun crédit IA consommé.
