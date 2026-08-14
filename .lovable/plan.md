@@ -1,14 +1,15 @@
-# Accueil V3 : sections Avant/Après, marché, public cible, garantie, licence commerciale + accueil à jour
+# Accueil V3 : bandeau d'accroche, sections Avant/Après, marché, public cible, garantie, licence commerciale + accueil à jour
 
 ## Objectif
-Ajouter sur l'accueil V3 cinq blocs de conviction et terminer les correctifs d'affichage, notamment le fait que les abonnés atterrissent bien sur `/v3` et non sur l'ancien `/ebook-planner`.
+Ajouter sur l'accueil V3 un bandeau d'accroche en tête, puis cinq blocs de conviction, et terminer les correctifs d'affichage, notamment le fait que les abonnés atterrissent bien sur `/v3` et non sur l'ancien `/ebook-planner`.
 
 Blocs :
-1. « Avant / Après » : opposer une IA généraliste à l'équipe d'IA spécialisées d'Ebookstudio V3.
-2. « Voici ce que prouve le marché » : chiffres KDP / livre numérique / livre audio.
-3. « À qui cela s'adresse-t-il ? » : les profils qui utilisent Ebookstudio V3.
-4. « Garantie 30 jours » : supprimer tout risque à l'achat.
-5. « Licence commerciale à vie incluse » : montrer qu'on peut revendre les livres et services d'édition.
+1. Bandeau d'accroche : positionner Ebookstudio V3 comme le premier agent d'édition IA multi-modèle.
+2. « Avant / Après » : opposer une IA généraliste à l'équipe d'IA spécialisées d'Ebookstudio V3.
+3. « Voici ce que prouve le marché » : chiffres KDP / livre numérique / livre audio.
+4. « À qui cela s'adresse-t-il ? » : les profils qui utilisent Ebookstudio V3.
+5. « Garantie 30 jours » : supprimer tout risque à l'achat.
+6. « Licence commerciale à vie incluse » : montrer qu'on peut revendre les livres et services d'édition.
 
 Correctifs d'affichage :
 - Bandeau KDP Pilot visible en tête de page.
@@ -19,6 +20,34 @@ Correctifs d'affichage :
 - Nom affiché partout : **Ebookstudio V3**.
 - Aucune mention d'un outil concurrent, d'un nom emprunté, ni dans les titres, ni dans les textes, ni dans les commentaires du code.
 - Vocabulaire retenu : « anciens outils KDP », « une IA généraliste », « équipe d'IA spécialisées ».
+
+## Partie 0 — Bandeau d'accroche (premier module)
+
+### Schéma
+
+```text
+┌──────────────────────────────────────────────────────────────────────┐
+│  Pleine largeur, fond émeraude/or selon charte V3                    │
+│                                                                      │
+│  Titre en police grande mais aérée :                                 │
+│  « Premier agent d'édition IA multi-modèle au monde »                │
+│                                                                      │
+│  Sous-titre :                                                        │
+│  « Transformez n'importe quelle idée de livre simple en un package   │
+│    complet prêt pour Amazon : Kindle, livre broché, couverture,      │
+│    livre audio et métadonnées. »                                     │
+│                                                                      │
+│  [ Bouton secondaire : Découvrir les moteurs ]                       │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+### Contenu rédigé
+
+Titre : « Premier agent d'édition IA multi-modèle au monde »
+
+Sous-titre : « Transformez n'importe quelle idée de livre simple en un package complet prêt pour Amazon : Kindle, livre broché, couverture, livre audio et métadonnées. »
+
+Style : bandeau pleine largeur, couleurs de la charte V3 (émeraude + or), texte centré, taille de titre grande mais lisible (pas de pleine hauteur d'écran), icônes ou pastilles discrètes pour Kindle / livre broché / couverture / audio / métadonnées.
 
 ## Partie 1 — Section « Avant / Après »
 
@@ -274,40 +303,43 @@ Note tarifaire : la licence commerciale est incluse dans les deux forfaits (Plum
 ## Partie 7 — Emplacement sur la page d'accueil V3
 
 Ordre de lecture final sur `V3HomePage.tsx` :
-1. `KdpPilotPromoBanner` en tête (compact, code `PROMO15`).
-2. `V3StartBookBar` compact (module « des livres » — création rapide).
-3. `V3BriefRecap`.
-4. `V3MarketProofPanel` — chiffres du marché.
-5. `V3BeforeAfterPanel` — ancienne voie vs Ebookstudio V3.
-6. `V3EngineStrip` / grille des moteurs IA existante.
-7. `V3AudiencePanel` — public cible.
-8. `V3GuaranteePanel` — garantie 30 jours.
-9. `V3CommercialLicensePanel` — licence commerciale.
+1. `V3HeroBanner` — bandeau d'accroche (premier module).
+2. `KdpPilotPromoBanner` (compact, code `PROMO15`).
+3. `V3StartBookBar` compact (module « des livres » — création rapide).
+4. `V3BriefRecap`.
+5. `V3MarketProofPanel` — chiffres du marché.
+6. `V3BeforeAfterPanel` — ancienne voie vs Ebookstudio V3.
+7. `V3EngineStrip` / grille des moteurs IA existante.
+8. `V3AudiencePanel` — public cible.
+9. `V3GuaranteePanel` — garantie 30 jours.
+10. `V3CommercialLicensePanel` — licence commerciale.
 
-Les nouvelles sections se placent **toutes sous le module des livres** (après `V3StartBookBar` + `V3BriefRecap`), avant le pied de page.
+Les nouvelles sections se placent **toutes sous le module des livres** (après `V3StartBookBar` + `V3BriefRecap`), sauf le bandeau d'accroche et le bandeau KDP Pilot qui restent en haut.
 
 ## Vérification
-- Déconnexion puis reconnexion : arrivée sur `/v3`, bandeau KDP Pilot et champs réduits visibles au premier écran.
+- Déconnexion puis reconnexion : arrivée sur `/v3`, bandeau d'accroche, bandeau KDP Pilot et champs réduits visibles au premier écran.
 - Sections « Avant / Après », « Marché », « Public cible », « Garantie 30 jours » et « Licence commerciale » lisibles sur ordinateur et mobile, 100 % en français, aucune marque étrangère.
 - Aucun rechargement en boucle.
 - L'onglet `/ebook-planner` affiche une bannière invitant à ouvrir `/v3`.
 
 ## Détails techniques
 - Nouveaux composants :
+  - `src/components/v3public/V3HeroBanner.tsx`
   - `src/components/v3public/V3BeforeAfterPanel.tsx`
   - `src/components/v3public/V3MarketProofPanel.tsx`
   - `src/components/v3public/V3AudiencePanel.tsx`
   - `src/components/v3public/V3GuaranteePanel.tsx`
   - `src/components/v3public/V3CommercialLicensePanel.tsx`
 - Insertion dans `V3HomePage.tsx` (ordre de lecture) :
-  1. `KdpPilotPromoBanner` en tête.
-  2. `V3StartBookBar` compact.
-  3. `V3BriefRecap`.
-  4. `V3MarketProofPanel`.
-  5. `V3BeforeAfterPanel`.
-  6. `V3EngineStrip` / grille des moteurs IA existante.
-  7. `V3AudiencePanel`.
-  8. `V3GuaranteePanel`.
-  9. `V3CommercialLicensePanel`.
+  1. `V3HeroBanner`.
+  2. `KdpPilotPromoBanner`.
+  3. `V3StartBookBar` compact.
+  4. `V3BriefRecap`.
+  5. `V3MarketProofPanel`.
+  6. `V3BeforeAfterPanel`.
+  7. `V3EngineStrip` / grille des moteurs IA existante.
+  8. `V3AudiencePanel`.
+  9. `V3GuaranteePanel`.
+  10. `V3CommercialLicensePanel`.
 - Styles alignés sur `src/styles/v3-public.css` (émeraude, or, `v3-serif`), cohérents avec `V3EngineBanner.tsx`.
 - Icônes vectorielles uniquement : aucun appel IA, aucune génération d'image, donc aucun crédit IA consommé.
