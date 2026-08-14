@@ -68,27 +68,27 @@ export default function V3StartBookBar() {
 
 
   return (
-    <section className="max-w-7xl mx-auto px-5 md:px-8 pt-10">
+    <section className="max-w-7xl mx-auto px-5 md:px-8 pt-6">
       <div
-        className="rounded-[28px] border p-6 md:p-8"
+        className="rounded-[24px] border p-4 md:p-5"
         style={{
           borderColor: 'rgba(201,168,76,0.45)',
           background: 'linear-gradient(135deg, #ffffff 0%, var(--v3-paper) 60%, #f7f2e2 100%)',
-          boxShadow: '0 24px 50px -34px rgba(6,78,59,0.35)',
+          boxShadow: '0 16px 40px -28px rgba(6,78,59,0.35)',
         }}
       >
-        <span className="v3-chip v3-chip-gold">
-          <BookOpen className="w-3.5 h-3.5" /> Commencez votre livre
+        <span className="v3-chip v3-chip-gold text-[11px]">
+          <BookOpen className="w-3 h-3" /> Commencez votre livre
         </span>
 
-        <h2 className="v3-serif text-2xl md:text-3xl font-bold mt-3" style={{ color: 'var(--v3-ink)' }}>
+        <h2 className="v3-serif text-xl md:text-2xl font-bold mt-2" style={{ color: 'var(--v3-ink)' }}>
           Quel est le titre de votre livre&nbsp;?
         </h2>
-        <p className="mt-1.5 text-[13.5px]" style={{ color: 'var(--v3-muted)' }}>
+        <p className="mt-1 text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
           Donnez un titre — vous serez redirigé vers la fiche du livre pour compléter les informations.
         </p>
 
-        <div className="mt-5 flex flex-col sm:flex-row gap-3">
+        <div className="mt-4 flex flex-col sm:flex-row gap-2.5">
           <input
             autoFocus
             value={title}
@@ -96,7 +96,7 @@ export default function V3StartBookBar() {
             onKeyDown={(e) => { if (e.key === 'Enter') start(); }}
             placeholder="Ex : Les petites victoires de Jules"
             aria-label="Titre du livre"
-            className="flex-1 rounded-xl border px-4 py-3.5 text-[16px] outline-none focus:ring-2"
+            className="flex-1 rounded-xl border px-4 py-3 text-[15px] outline-none focus:ring-2"
             style={{
               borderColor: 'rgba(201,168,76,0.6)',
               background: '#fff',
@@ -107,7 +107,7 @@ export default function V3StartBookBar() {
             type="button"
             onClick={start}
             disabled={!title.trim()}
-            className="v3-btn v3-btn-gold text-[14px] px-6 py-3.5 whitespace-nowrap disabled:opacity-45 disabled:cursor-not-allowed"
+            className="v3-btn v3-btn-gold text-[13px] px-5 py-3 whitespace-nowrap disabled:opacity-45 disabled:cursor-not-allowed"
           >
             Continuer <ArrowRight className="w-4 h-4" />
           </button>
