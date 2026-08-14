@@ -25,7 +25,7 @@ interface InlineLeadCaptureProps {
 }
 
 const DEFAULT_BULLETS_GENERAL = [
-  '5 niches d\'ebooks rentables en 2026 (données Amazon réelles)',
+  '10 niches d\'ebooks rentables en 2026 (données Amazon réelles)',
   'Les mots-clés à fort volume pour chaque niche',
   'Un plan d\'ebook prêt à l\'emploi',
 ];
@@ -79,7 +79,7 @@ const InlineLeadCapture: React.FC<InlineLeadCaptureProps> = ({
       ? 'Laissez votre email : vous recevez un accès à la démonstration et voyez le résultat sur votre propre sujet, avant de payer quoi que ce soit.'
       : isExpat
         ? 'Le guide complet pour créer et vendre un ebook en français depuis votre pays de résidence.'
-        : 'Les 5 niches d\'ebooks les plus rentables en 2026 + un plan prêt à l\'emploi.');
+        : 'Les 10 niches d\'ebooks les plus rentables en 2026 + un plan prêt à l\'emploi.');
   const ctaLabel = isDemo ? 'Essayer gratuitement' : 'Recevoir le guide gratuit';
   const Icon = isDemo ? Sparkles : Gift;
   const badge = isDemo ? 'DÉMO GRATUITE' : 'GUIDE PDF GRATUIT';

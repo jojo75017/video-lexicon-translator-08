@@ -18,7 +18,7 @@ const SESSION_KEY = 'ebs_lead_popup_shown';
 const DONE_KEY = 'ebs_lead_popup_done';
 
 const BULLETS_GENERAL = [
-  'Les 5 niches d’ebooks rentables en 2026',
+  'Les 10 niches d’ebooks rentables en 2026',
   'Les mots-clés Amazon à fort volume',
   'Un plan d’ebook prêt à remplir',
 ];

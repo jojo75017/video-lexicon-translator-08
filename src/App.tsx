@@ -87,6 +87,7 @@ const V3TocUltimatePage = lazy(() => import('./pages/v3public/V3TocUltimatePage'
 const V3TranslatorPage = lazy(() => import('./pages/v3public/V3TranslatorPage'));
 const V3CorrecteurPage = lazy(() => import('./pages/v3public/V3CorrecteurPage'));
 const V3AvisClientsPage = lazy(() => import('./pages/v3public/V3AvisClientsPage'));
+const V3KitDemarragePage = lazy(() => import('./pages/v3/V3KitDemarragePage'));
 const V3StudioProPage = lazy(() => import('./pages/v3public/V3StudioProPage'));
 
 const V3ToolsIndexPage = lazy(() => import('./pages/v3public/V3ToolsIndexPage'));
@@ -644,6 +645,7 @@ const App = () => {
               <Route path="outils/traduction" element={<V3LockedGate><V3TranslatorPage /></V3LockedGate>} />
               <Route path="corriger" element={<V3LockedGate><V3CorrecteurPage /></V3LockedGate>} />
               <Route path="avis" element={<V3LockedGate><V3AvisClientsPage /></V3LockedGate>} />
+              <Route path="kit-demarrage" element={<V3LockedGate><V3KitDemarragePage /></V3LockedGate>} />
               <Route path="studio" element={<V3LockedGate><V3StudioProPage /></V3LockedGate>} />
               <Route path="correcteur" element={<Navigate to="/v3/corriger" replace />} />
 
