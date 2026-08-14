@@ -12,11 +12,13 @@ serve(async (req) => {
   }
 
   try {
-    const { chapterTitle, chapterContent, mode, userProvider, userApiKey, userModel, latinExpressions } =
+    const { chapterTitle, chapterContent, mode, userProvider, userApiKey, userModel, latinExpressions, bookContext } =
       await req.json();
     const polish = mode === 'polish';
     const latinFix = mode === 'latin-fix';
     const endingFix = mode === 'ending-fix';
+    const edition = mode === 'edition';
+    const finalCheck = mode === 'final-check';
 
     const minLength = endingFix ? 5 : 20;
     if (!chapterContent || chapterContent.length < minLength) {
