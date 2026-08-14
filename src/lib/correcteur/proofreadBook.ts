@@ -180,6 +180,7 @@ async function callProofread(
         chapterContent: content,
         mode,
         latinExpressions: latinList,
+        bookContext: bookContext || undefined,
         // Clé de l'abonné (Gemini / ChatGPT / Claude / OpenRouter) : la correction
         // passe par son propre compte IA, aucun crédit de la plateforme n'est utilisé.
         userProvider: getProvider(),
