@@ -104,8 +104,11 @@ const ClosingCampaignPanel = () => {
         return;
       }
       const data = await call({ mode: 'send', template: letter.template });
-      toast.success(`${data.sent} emails envoyés sur ${data.targets} ciblés`);
+      const message = String(data.message || `${data.sent} emails envoyés sur ${data.targets} ciblés`);
+      if (data.quota_reached) toast.warning(message);
+      else toast.success(message);
       load();
+
     } catch (err) {
       toast.error("Erreur d'envoi : " + ((err as Error).message || ''));
     }
