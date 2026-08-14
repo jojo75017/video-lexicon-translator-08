@@ -3,8 +3,10 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Feather, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { clearAdminCache, getIsCurrentSessionAdmin } from '@/lib/adminAccess';
-import { getAuthenticatedHomePath } from '@/lib/authDestination';
+import { clearAdminCache } from '@/lib/adminAccess';
+import { SUBSCRIBER_HOME_PATH } from '@/lib/authDestination';
+import { ADMIN_HOME_PATH } from '@/config/adminRoutes';
+import { useAdminAccess } from '@/contexts/AdminAccessContext';
 
 export default function V3AuthPage() {
   const [params] = useSearchParams();
@@ -14,6 +16,7 @@ export default function V3AuthPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
+  const { isAdmin, isChecking: isAdminChecking, refresh: refreshAdminAccess } = useAdminAccess();
 
   useEffect(() => {
     let cancelled = false;
@@ -23,7 +26,7 @@ export default function V3AuthPage() {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return;
 
-        const destination = await getAuthenticatedHomePath(getIsCurrentSessionAdmin);
+        const destination = isAdmin ? ADMIN_HOME_PATH : SUBSCRIBER_HOME_PATH;
         if (!cancelled) nav(destination, { replace: true });
       } finally {
         if (!cancelled) setCheckingSession(false);
@@ -32,7 +35,7 @@ export default function V3AuthPage() {
 
     void redirectExistingSession();
     return () => { cancelled = true; };
-  }, [nav]);
+  }, [isAdmin, isAdminChecking, nav]);
 
   const strength = (() => {
     let s = 0;
@@ -59,7 +62,8 @@ export default function V3AuthPage() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         clearAdminCache();
-        const destination = await getAuthenticatedHomePath(getIsCurrentSessionAdmin);
+        const adminResult = await refreshAdminAccess();
+        const destination = adminResult === true ? ADMIN_HOME_PATH : SUBSCRIBER_HOME_PATH;
         toast.success('Connexion réussie ✓');
         nav(destination, { replace: true });
       }

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { getIsCurrentSessionAdmin } from "@/lib/adminAccess";
+import { useAdminAccess } from "@/contexts/AdminAccessContext";
 
 const corslessMessage = "Vérification de l'accès...";
 
@@ -26,6 +26,7 @@ export function SubscriberGate({
   onInvalid,
   children,
 }: Props) {
+  const adminAccess = useAdminAccess();
   const [checking, setChecking] = useState(true);
   const [allowed, setAllowed] = useState(false);
 
@@ -66,29 +67,15 @@ export function SubscriberGate({
         return;
       }
 
-      // A valid admin session bypasses subscriber validation. Browser storage
-      // never grants administrator access.
-      try {
-        const adminPromise = getIsCurrentSessionAdmin();
-        const timeoutPromise = new Promise<boolean>((resolve) =>
-          setTimeout(() => resolve(false), 8000)
-        );
-        const isCurrentSessionAdmin = await Promise.race([adminPromise, timeoutPromise]);
-
-        if (isCurrentSessionAdmin) {
-          console.log('SubscriberGate: Admin confirmed via cached/session check');
-          if (!cancelled) {
-            setAllowed(true);
-            setChecking(false);
-          }
-          return;
+      if (adminAccess.isAdmin) {
+        if (!cancelled) {
+          setAllowed(true);
+          setChecking(false);
         }
-        // Note: on ne se contente PAS d'une session Supabase active pour
-        // autoriser l'accès — le statut de l'abonné est revérifié plus bas
-        // via validate-subscription (sinon un abonné « expired » resterait
-        // connecté tant que sa session est valide).
-      } catch {
-        // Continue with subscriber validation
+        return;
+      }
+      if (adminAccess.isChecking) {
+        return;
       }
 
 
@@ -194,7 +181,7 @@ export function SubscriberGate({
     return () => {
       cancelled = true;
     };
-  }, [isAdmin, subscriberEmail, accessCode, onInvalid]);
+  }, [isAdmin, subscriberEmail, accessCode, onInvalid, adminAccess.isAdmin, adminAccess.isChecking]);
 
   if (checking) {
     return (

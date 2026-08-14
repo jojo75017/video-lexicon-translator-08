@@ -8,8 +8,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { trackFormSubmit } from '@/utils/analytics';
-import { clearAdminCache, getIsCurrentSessionAdmin } from '@/lib/adminAccess';
+import { clearAdminCache } from '@/lib/adminAccess';
 import { ADMIN_HOME_PATH } from '@/config/adminRoutes';
+import { useAdminAccess } from '@/contexts/AdminAccessContext';
 
 export const AuthPage = () => {
   const [email, setEmail] = useState('boubetgeorges@gmail.com');
@@ -18,31 +19,15 @@ export const AuthPage = () => {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [usePasswordMode, setUsePasswordMode] = useState(false);
   const navigate = useNavigate();
+  const { isAdmin, isChecking: isAdminChecking, refresh: refreshAdminAccess } = useAdminAccess();
 
   // En mode édition/dev, on évite les toasts (popups) qui deviennent vite envahissants.
   const shouldToast = !import.meta.env.DEV;
 
   useEffect(() => {
     // Redirection silencieuse si déjà admin avec session active
-    const checkAuth = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          console.log('AuthPage: Pas de session, affichage du formulaire');
-          return;
-        }
-
-        if (await getIsCurrentSessionAdmin()) {
-          navigate(ADMIN_HOME_PATH, { replace: true });
-        }
-      } catch (error) {
-        // Ignorer les erreurs silencieusement
-        console.log('AuthPage: Exception checkAuth ignorée');
-      }
-    };
-
-    checkAuth();
-  }, [navigate]);
+    if (!isAdminChecking && isAdmin) navigate(ADMIN_HOME_PATH, { replace: true });
+  }, [isAdmin, isAdminChecking, navigate]);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,8 +110,8 @@ export const AuthPage = () => {
 
         console.log('Connexion réussie, vérification du rôle admin...');
 
-        const isAdmin = await getIsCurrentSessionAdmin();
-        if (!isAdmin) {
+        const adminResult = await refreshAdminAccess();
+        if (adminResult !== true) {
           console.log('Utilisateur non-admin détecté');
           toast.error('Accès refusé', {
             description: "Ce compte ne possède pas les droits administrateur.",
