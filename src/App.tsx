@@ -87,6 +87,13 @@ const V3CorrecteurPage = lazy(() => import('./pages/v3public/V3CorrecteurPage'))
 const V3StudioProPage = lazy(() => import('./pages/v3public/V3StudioProPage'));
 
 const V3ToolsIndexPage = lazy(() => import('./pages/v3public/V3ToolsIndexPage'));
+const V3FeaturesPage = lazy(() => import('./pages/v3public/V3FeaturesPage'));
+const V3ApiKeysPage = lazy(() => import('./pages/v3public/V3ApiKeysPage'));
+const V3CoordonneesPage = lazy(() => import('./pages/v3public/V3CoordonneesPage'));
+const V3ReseauxPage = lazy(() => import('./pages/v3public/V3ReseauxPage'));
+const V3IntegrationsPage = lazy(() => import('./pages/v3public/V3IntegrationsPage'));
+const V3QuestionsPage = lazy(() => import('./pages/v3public/V3QuestionsPage'));
+
 const V3AssistantPage = lazy(() => import('./pages/v3/V3AssistantPage'));
 const AssistantPublicPage = lazy(() => import('./pages/AssistantPublicPage'));
 const V3ComptePage = lazy(() => import('./pages/v3public/V3ComptePage'));
@@ -555,6 +562,13 @@ const App = () => {
               <Route path="pourquoi" element={<V3PourquoiPage />} />
               <Route path="realite-kdp" element={<V3RealiteKdpPage />} />
               <Route path="contact" element={<ContactSupportPage subscriberEmail={subscriberEmail || ''} />} />
+              <Route path="fonctionnalites" element={<V3FeaturesPage />} />
+              <Route path="fonctionnalites/cles" element={<V3ApiKeysPage />} />
+              <Route path="fonctionnalites/coordonnees" element={<V3CoordonneesPage />} />
+              <Route path="fonctionnalites/reseaux" element={<V3ReseauxPage />} />
+              <Route path="fonctionnalites/integrations" element={<V3IntegrationsPage />} />
+              <Route path="fonctionnalites/questions" element={<V3QuestionsPage />} />
+
 
 
               {/* Routes verrouillées jusqu'au 1er octobre 2026 (admins exceptés) */}
