@@ -66,6 +66,35 @@ Bascule vers l'achat, en bas de la page cadeau :
 - Bloc final de bascule vers `/commander` + rappel des 590 niches restantes.
 - Accès direct sans email possible uniquement si l'email a déjà été capté (mémorisé localement) ; sinon la page renvoie vers le formulaire.
 
+## Après inscription : l'email de bienvenue (à réparer)
+
+Constaté dans le code : l'email de bienvenue existe (`send-welcome-email`) mais il envoie
+seulement « Votre Guide KDP Gratuit » — **il ne contient ni les identifiants, ni un email
+de contact**. Le code d'accès part d'une autre fonction (`send-access-code`). Et dans
+`src/data/brevoOnboardingEmails.ts` le bouton de réponse pointe vers `mailto:nebookstudio.fr`
+(adresse cassée, le `n` a mangé le `@`) : personne ne peut vous joindre depuis cet email.
+
+Le nouvel email de bienvenue, un seul envoi, contient :
+
+1. Le pack de 10 niches (bouton vers la page cadeau, consultable à vie).
+2. **Ses accès** : email de connexion, code d'accès, lien direct vers `/v3`.
+3. **Votre email de contact réel** en évidence : « Un souci ? Écrivez-moi directement à
+   contact@ebookstudio.fr — je réponds personnellement. » (adresse à confirmer par vous).
+4. Les 3 premières actions concrètes dans l'outil, pour éviter l'abandon au jour 1.
+5. Rien de promotionnel : c'est un email de service, il doit arriver en boîte principale.
+
+Le même contenu est affiché à l'écran juste après l'inscription (au cas où l'email tarde),
+avec un bouton « Renvoyer mes accès » branché sur `resend-access-code`.
+
+## Est-ce que ça va convertir ? Honnêtement
+
+Le pack de niches ne fait pas tout : il répare **une** fuite (537 affichages pour 1 clic,
+23 emails captés). Il faut s'attendre à des emails captés en nombre, et à une part d'achats
+seulement si les trois autres pièces suivent : la gratification immédiate (cette page cadeau),
+la preuve (aucun témoignage approuvé en base aujourd'hui), et la relance des 41 cliqueurs.
+Le pack est la première pièce, pas la solution unique — et on mesurera réellement via
+`capture_events` (affichage → clic → email) plutôt qu'à l'impression.
+
 ## Détails techniques
 
 - Nouvelle page `src/pages/promo/Niches10OffertesPage.tsx` + route `/10-niches-offertes` dans `src/App.tsx` (les routes `/niches` et `/niches-600` existantes ne changent pas).
@@ -73,5 +102,7 @@ Bascule vers l'achat, en bas de la page cadeau :
 - Nouveau composant réutilisable `src/components/marketing/Niches10Offer.tsx` (variantes `hero`, `compact`, `popup`) branché sur l'edge function existante `funnel-capture-lead` avec `lead_magnet: "10-niches-offertes"`, plus `trackCaptureEvent` pour l'A/B.
 - Réécriture de `src/components/sales/Guide10NichesBlock.tsx` : le lien externe est remplacé par la livraison interne instantanée.
 - Insertion : `V3CommanderPage.tsx` (haut de page), `LeadCapturePopup.tsx`, `StickySignupBar.tsx`, page d'inscription, `V3HomePage.tsx` (encart compact, sans alourdir la page).
+- Email : `supabase/functions/send-welcome-email/index.ts` réécrit (accès + contact + pack), correction du `mailto:` cassé dans `src/data/brevoOnboardingEmails.ts`, écran de confirmation après inscription avec bouton « Renvoyer mes accès » (`resend-access-code`).
 - Aucune modification de base de données : `funnel_leads.lead_magnet` et `capture_events` couvrent déjà le suivi.
-- Vérification finale : parcours réel testé en navigateur — saisie email sur `/commander`, arrivée immédiate sur la page cadeau, PDF généré, CTA d'achat fonctionnel.
+- Vérification finale : parcours réel testé en navigateur — saisie email sur `/commander`, arrivée immédiate sur la page cadeau, PDF généré, CTA d'achat fonctionnel, et envoi de test de l'email de bienvenue.
+
