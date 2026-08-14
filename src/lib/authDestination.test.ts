@@ -10,13 +10,13 @@ describe('auth destination policy', () => {
     expect(getHomePath('admin')).toBe('/admin');
   });
 
-  it('keeps subscribers in V3 and visitors on the public offer', () => {
-    expect(getHomePath('subscriber')).toBe('/v3');
+  it('keeps subscribers on V2 and visitors on the public offer', () => {
+    expect(getHomePath('subscriber')).toBe('/ebook-planner');
     expect(getHomePath('visitor')).toBe('/commander');
   });
 
   it('checks the backend role before resolving a signed-in destination', async () => {
     expect(await getAuthenticatedHomePath(vi.fn().mockResolvedValue(true))).toBe('/admin');
-    expect(await getAuthenticatedHomePath(vi.fn().mockResolvedValue(false))).toBe('/v3');
+    expect(await getAuthenticatedHomePath(vi.fn().mockResolvedValue(false))).toBe('/ebook-planner');
   });
 });

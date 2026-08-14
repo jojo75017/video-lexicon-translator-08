@@ -405,16 +405,17 @@ const App = () => {
             {/* Visiteurs non connectés → page de commande publique (plus de mur de login) */}
             <Route path="/offres" element={
               hasPlannerAccess
-                ? <Navigate to="/v3" replace />
+                ? <Navigate to={homePath ?? '/ebook-planner'} replace />
                 : (isAuthenticated
                     ? <SubscriptionPage subscriberEmail={subscriberEmail} subscriberData={subscriberData} onLogout={handleLogout} />
                     : <Navigate to="/commander" replace />)
             } />
             <Route path="/connexion-abonne" element={
               isAuthenticated
-                ? <Navigate to="/v3" replace />
+                ? <Navigate to={homePath ?? '/ebook-planner'} replace />
                 : <SubscriptionAuth onAuthenticated={handleAuthenticated} />
             } />
+
             <Route path="/login" element={<Navigate to="/connexion-abonne" replace />} />
             <Route path="/connexion" element={<Navigate to="/connexion-abonne" replace />} />
             <Route path="/subscription" element={<Navigate to="/connexion-abonne" replace />} />
@@ -606,7 +607,7 @@ const App = () => {
             <Route path="/v3/offre" element={<V3OffrePage />} />
             <Route path="/v3/temoignage" element={<V3TemoignagePage />} />
 
-            <Route path="/v3" element={<V3PublicLayout isAdmin={isAdmin} isAdminChecking={!isAdminChecked} />}>
+            <Route path="/v3" element={<V3PublicLayout isAdmin={isAdmin} isAdminChecking={!isAdminChecked} isSubscriber={isAuthenticated} />}>
               <Route index element={<V3HomePage />} />
               <Route path="auth" element={<V3AuthPage />} />
               <Route path="pourquoi" element={<V3PourquoiPage />} />

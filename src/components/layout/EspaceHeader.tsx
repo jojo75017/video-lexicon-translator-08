@@ -273,9 +273,9 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
         borderBottom: '1px solid hsl(var(--joy-ink) / 0.08)',
       }}
     >
-      {/* V3 Launch Announcement — visible for all V2 users */}
+      {/* Seul accès V3 proposé aux abonnés V2 : leur offre « Ancien client V2 » */}
       <a
-        href="/v3/offre"
+        href="/v3/migration"
         className="block w-full relative overflow-hidden group"
         style={{
           background: 'linear-gradient(90deg, #0F2E1F 0%, #14532D 50%, #0F2E1F 100%)',
@@ -284,16 +284,17 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
       >
         <div className="mx-auto flex max-w-7xl items-center justify-center gap-3 px-4 py-2.5 sm:px-6 text-center">
           <span className="hidden sm:inline text-[10px] font-bold uppercase tracking-[0.18em] text-[#D4AF37] bg-[#D4AF37]/10 border border-[#D4AF37]/40 rounded-full px-2 py-0.5">
-            1ᵉʳ Octobre 2026
+            Ancien client V2
           </span>
           <p className="text-[13px] sm:text-[14px] font-medium text-white" style={{ fontFamily: "'Work Sans', system-ui, sans-serif" }}>
-            🚀 <strong className="text-[#D4AF37]">EbookStudio V3</strong> arrive — Plume 17 €/mois · Édition 27 €/mois (2 mois offerts en annuel).{' '}
+            💛 Votre <strong className="text-[#D4AF37]">V2 reste à vie</strong> — et vous gardez −20 % à vie sur les formules V3.{' '}
             <span className="underline decoration-[#D4AF37]/60 underline-offset-2 group-hover:decoration-[#D4AF37]">
-              Découvrir l'offre Fondateur →
+              Voir mon offre ancien client →
             </span>
           </p>
         </div>
       </a>
+
 
       {!bannerDismissed && (
         <div

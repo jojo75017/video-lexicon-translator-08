@@ -2,7 +2,12 @@ import { ADMIN_HOME_PATH } from '@/config/adminRoutes';
 
 export type AccessState = 'pending' | 'admin' | 'subscriber' | 'visitor';
 
-export const SUBSCRIBER_HOME_PATH = '/v3';
+/**
+ * Les abonnés travaillent sur la V2 : la V3 n'est jamais une destination de
+ * connexion. Seule la page « Ancien client V2 » (/v3/migration) leur reste
+ * ouverte, via le lien dédié.
+ */
+export const SUBSCRIBER_HOME_PATH = '/ebook-planner';
 export const PUBLIC_HOME_PATH = '/commander';
 
 /** Single routing policy used after authentication and by legacy entry paths. */
