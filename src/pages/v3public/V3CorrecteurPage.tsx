@@ -28,6 +28,7 @@ import { useV3Mode } from '@/hooks/useV3Mode';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { normalizeManuscript } from '@/utils/manuscriptNormalizer';
+import { getActiveAIKey, getProvider, validateKeyFormat } from '@/services/aiWritingService';
 
 type Source = 'doc' | 'pdf' | 'url' | 'paste';
 
@@ -252,6 +253,14 @@ export default function V3CorrecteurPage() {
 
   const startCorrection = useCallback(async (onlyFailed = false) => {
     if (!chapters.length) return;
+    const provider = getProvider();
+    const activeKey = getActiveAIKey();
+    if (!activeKey || !validateKeyFormat(provider, activeKey)) {
+      toast.error('Correction non lancée : aucune clé IA valide.', {
+        description: 'Ajoutez ou vérifiez votre clé dans Fonctionnalités → Paramétrage des clés. Aucun crédit n’a été consommé.',
+      });
+      return;
+    }
     stopRef.current = false;
     setRunning(true);
     setSavedToLibrary(false);
