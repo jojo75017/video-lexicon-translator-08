@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { getStripeEnvironment } from '@/lib/stripe';
-import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
+import useIsAdmin from './useIsAdmin';
 
 /**
  * Droits d'accès V3 d'après les commandes réellement payées (v3_installment_orders).
@@ -20,23 +20,26 @@ export function useV3Entitlement() {
   const [hasBase, setHasBase] = useState(false);
   const [hasFull, setHasFull] = useState(false);
   const [hasV2, setHasV2] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  // Statut admin partagé et réactif : `null` = encore inconnu.
+  const { isAdmin: adminStatus } = useIsAdmin();
+  const isAdmin = adminStatus === true;
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      setLoading(true);
-      const admin = await getIsCurrentSessionAdmin();
-      if (cancelled) return;
-      setIsAdmin(admin);
+      // Statut admin inconnu : on reste en chargement, aucune conclusion hâtive.
+      if (adminStatus === null) { setLoading(true); return; }
 
-      if (admin) {
+      setLoading(true);
+
+      if (adminStatus === true) {
         setHasBase(true);
         setHasFull(true);
         setHasV2(true);
         setLoading(false);
         return;
       }
+
 
       const { data: { user } } = await supabase.auth.getUser();
       const email = user?.email;
@@ -73,7 +76,7 @@ export function useV3Entitlement() {
       }
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [adminStatus]);
 
   return { loading, hasBase, hasFull, hasV2, isAdmin };
 }

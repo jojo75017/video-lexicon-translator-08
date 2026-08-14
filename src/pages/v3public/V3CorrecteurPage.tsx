@@ -125,6 +125,57 @@ export default function V3CorrecteurPage() {
   const blockFailures = chapters.reduce((s, c) => s + (c.blockFailures || 0), 0);
   const typoFixed = chapters.reduce((s, c) => s + (c.typoFixed || 0), 0);
 
+  /** Rapport d'édition texte, copiable pour archiver la relecture du livre. */
+  const copyEditorialReport = useCallback(async () => {
+    const lines: string[] = [];
+    lines.push(`Rapport d'édition — ${manuscript?.title || 'Livre sans titre'}`);
+    lines.push(`Date : ${new Date().toLocaleString('fr-FR')}`);
+    lines.push(`Mode de correction : ${mode}`);
+    lines.push('');
+    lines.push(`Chapitres corrigés : ${doneCount}/${chapters.length}${failedCount ? ` (${failedCount} en échec)` : ''}`);
+    lines.push(`Corrections totales : ${totalCorrections}`);
+    lines.push(`Qualité moyenne : ${avgQuality}/100`);
+    lines.push(`Typographie française corrigée : ${typoFixed}`);
+    lines.push(`Expressions latines supprimées : ${latinRemoved}`);
+    lines.push(`Fins de chapitre complétées : ${endingsFixed}`);
+    if (blockFailures) lines.push(`Passages non corrigés : ${blockFailures}`);
+    if (breakdown.length) {
+      lines.push('');
+      lines.push('Répartition des corrections :');
+      breakdown.forEach((b) => lines.push(`  - ${b.label} : ${b.count}`));
+    }
+    if (nameIssues.length) {
+      lines.push('');
+      lines.push('Cohérence des noms :');
+      nameIssues.forEach((n: any) => lines.push(`  - ${n.canonical ?? n.name ?? ''} : ${(n.variants ?? []).join(', ')}`));
+    }
+    if (latinRemaining.length) {
+      lines.push('');
+      lines.push('Latin encore détecté :');
+      latinRemaining.forEach((r) => lines.push(`  - ${r.label} : ${r.items.join(', ')}`));
+    }
+    if (endingIssues.length) {
+      lines.push('');
+      lines.push('Fins de chapitre à revoir :');
+      endingIssues.forEach((c) => lines.push(`  - ${c.title || `Chapitre ${c.index + 1}`} : ${c.endingIssue}`));
+    }
+    lines.push('');
+    lines.push('Détail par chapitre :');
+    chapters.forEach((c) => {
+      lines.push(`  ${c.index + 1}. ${c.title || `Chapitre ${c.index + 1}`} — ${c.corrections.length} correction(s)${c.quality ? `, qualité ${c.quality}/100` : ''}${c.endingFixed ? ', fin complétée' : ''}`);
+    });
+
+    const report = lines.join('\n');
+    try {
+      await navigator.clipboard.writeText(report);
+      toast.success('Rapport d’édition copié dans le presse-papiers.');
+    } catch {
+      toast.error('Copie impossible — sélectionnez le texte manuellement.');
+    }
+  }, [manuscript, mode, chapters, doneCount, failedCount, totalCorrections, avgQuality,
+      typoFixed, latinRemoved, endingsFixed, blockFailures, breakdown, nameIssues,
+      latinRemaining, endingIssues]);
+
 
   const loadManuscript = useCallback((m: Manuscript) => {
     setManuscript(m);
@@ -863,6 +914,21 @@ export default function V3CorrecteurPage() {
             </div>
           )}
 
+          {!running && doneCount > 0 && (
+            <div className="mt-4">
+              <button
+                type="button"
+                onClick={copyEditorialReport}
+                className="rounded-lg border px-3 py-2 text-[13px] font-semibold"
+                style={{ borderColor: 'var(--v3-line)', color: 'var(--v3-ink)' }}
+              >
+                📋 Copier le rapport d’édition
+              </button>
+              <p className="mt-1 text-[12px]" style={{ color: 'var(--v3-muted)' }}>
+                Passes appliquées, corrections par chapitre, latin restant et fins de chapitre à revoir.
+              </p>
+            </div>
+          )}
 
 
 

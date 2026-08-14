@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 import { V3_LAUNCH_UNLOCKED } from '@/config/v3Launch';
+import useIsAdmin from '@/hooks/useIsAdmin';
 import { toast } from 'sonner';
 
 /**
@@ -8,8 +8,11 @@ import { toast } from 'sonner';
  *
  * Tant que la V3 n'est pas ouverte et que l'utilisateur n'est pas admin,
  * tous les clics sur des liens/boutons internes sont interceptés :
- * les visiteurs ne peuvent QUE contempler la V3. Seules quelques routes
- * de présentation restent navigables.
+ * les visiteurs ne peuvent QUE contempler la V3.
+ *
+ * Règle absolue : pendant que le statut admin est inconnu, RIEN n'est bloqué.
+ * Un admin dont la session met du temps à se restaurer ne doit jamais tomber
+ * sur le message d'ouverture au 1ᵉʳ octobre.
  */
 const ALLOWED_PATHS = [
   '/v3',
@@ -26,6 +29,17 @@ const ALLOWED_EXTERNAL_HOSTS = [
   'ebookstudio.blog',
   'www.ebookstudio.blog',
 ];
+
+/** Clé d'aperçu volontaire : l'admin regarde la V3 « comme un abonné ». */
+export const ADMIN_PREVIEW_AS_SUBSCRIBER_KEY = 'v3_admin_preview_as_subscriber';
+
+export function isPreviewingAsSubscriber(): boolean {
+  try {
+    return localStorage.getItem(ADMIN_PREVIEW_AS_SUBSCRIBER_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
 
 function isAllowedTarget(href: string | null): boolean {
   if (!href) return false;
@@ -49,18 +63,22 @@ function isAllowedTarget(href: string | null): boolean {
 }
 
 export default function V3ContemplationMode({ children }: { children: ReactNode }) {
-  // Verrouillage pour les visiteurs / abonnés — les admins peuvent tester librement.
-  const [locked, setLocked] = useState(!V3_LAUNCH_UNLOCKED);
+  const { isAdmin } = useIsAdmin();
+  const [previewAsSubscriber, setPreviewAsSubscriber] = useState(isPreviewingAsSubscriber);
 
+  // L'aperçu « comme un abonné » peut être basculé depuis la barre admin.
   useEffect(() => {
-    let cancelled = false;
-    if (V3_LAUNCH_UNLOCKED) { setLocked(false); return; }
-    getIsCurrentSessionAdmin()
-      .then((isAdmin) => { if (!cancelled) setLocked(!isAdmin); })
-      .catch(() => { if (!cancelled) setLocked(true); });
-    return () => { cancelled = true; };
+    const sync = () => setPreviewAsSubscriber(isPreviewingAsSubscriber());
+    window.addEventListener('v3-admin-preview-change', sync);
+    window.addEventListener('storage', sync);
+    return () => {
+      window.removeEventListener('v3-admin-preview-change', sync);
+      window.removeEventListener('storage', sync);
+    };
   }, []);
 
+  // Verrou uniquement quand le statut est CONNU et non admin (ou aperçu volontaire).
+  const locked = !V3_LAUNCH_UNLOCKED && (isAdmin === false || (isAdmin === true && previewAsSubscriber));
 
   useEffect(() => {
     if (!locked) return;
@@ -113,7 +131,9 @@ export default function V3ContemplationMode({ children }: { children: ReactNode 
                  color: '#D4AF37',
                  border: '1px solid rgba(212,175,55,0.5)',
                }}>
-            🔒 Mode contemplation · Ouverture le 1ᵉʳ octobre 2026
+            {isAdmin === true
+              ? '👁️ Aperçu abonné (admin) · Ouverture le 1ᵉʳ octobre 2026'
+              : '🔒 Mode contemplation · Ouverture le 1ᵉʳ octobre 2026'}
           </div>
         </div>
       )}
