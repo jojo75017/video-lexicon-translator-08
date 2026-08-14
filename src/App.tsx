@@ -371,7 +371,17 @@ const App = () => {
             />
 
             {/* Accueil : admin vers le panneau admin, client vers son espace, visiteur vers l'offre */}
-            <Route path="/" element={<Navigate to={isAdmin ? ADMIN_HOME_PATH : (hasPlannerAccess ? '/ebook-planner' : '/commander')} replace />} />
+            {/* Racine : on attend que la session soit connue avant de rediriger,
+                sinon un abonné / admin était envoyé sur la page de vente. */}
+            <Route
+              path="/"
+              element={
+                isCheckingAuth || !isAdminChecked
+                  ? <div className="min-h-screen" aria-busy="true" />
+                  : <Navigate to={isAdmin ? ADMIN_HOME_PATH : (hasPlannerAccess ? '/v3' : '/commander')} replace />
+              }
+            />
+
 
 
             {/* Marketing */}
