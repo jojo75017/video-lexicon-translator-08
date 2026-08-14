@@ -300,6 +300,20 @@ const App = () => {
     window.location.assign('/logout-total');
   }, []);
 
+  /**
+   * Accès abonné refusé sur une route protégée : on nettoie seulement le cache
+   * abonné. Pas de signOut ni de redirection dure — sinon un admin (ou un
+   * abonné dont la validation est encore en cours) était éjecté vers
+   * /logout-total et « aucun onglet n'ouvrait la bonne page ».
+   */
+  const handleInvalidSubscriber = useCallback(() => {
+    localStorage.removeItem('subscriber_email');
+    localStorage.removeItem('subscriber_data');
+    setIsAuthenticated(false);
+    setSubscriberEmail('');
+    setSubscriberData(null);
+  }, []);
+
   const isPlannerPreviewHost =
     typeof window !== 'undefined' &&
     (window.location.hostname === 'localhost' || window.location.hostname.includes('id-preview--'));
@@ -325,7 +339,7 @@ const App = () => {
       isAdmin={isAdmin}
       subscriberEmail={subscriberEmail}
       subscriberData={subscriberData}
-      onInvalid={handleLogout}
+      onInvalid={handleInvalidSubscriber}
     >
       {node}
     </SubscriberGate>

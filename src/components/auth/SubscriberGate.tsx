@@ -42,12 +42,9 @@ export function SubscriberGate({
     // Supabase session can't re-grant access, then let the component redirect
     // to the subscriber login via <Navigate> below.
     const denyAccess = async () => {
-      try {
-        await Promise.race([
-          supabase.auth.signOut(),
-          new Promise((resolve) => setTimeout(resolve, 1500)),
-        ]);
-      } catch { /* ignore */ }
+      // On ne fait PAS de signOut ici : cela détruisait aussi la session d'un
+      // admin ou d'un abonné en cours de revalidation, provoquant une
+      // déconnexion globale et des redirections vers /logout-total.
       try {
         localStorage.removeItem("subscriber_email");
         localStorage.removeItem("subscriber_data");
