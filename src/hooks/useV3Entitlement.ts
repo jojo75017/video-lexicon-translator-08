@@ -76,7 +76,7 @@ export function useV3Entitlement() {
       }
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [adminStatus]);
 
   return { loading, hasBase, hasFull, hasV2, isAdmin };
 }
