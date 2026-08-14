@@ -40,6 +40,7 @@ const CoverStudioProHubPage = lazy(() => import('./pages/v3/cover-studio-pro/Cov
 const CoverEditorPage = lazy(() => import('./pages/v3/cover-studio-pro/CoverEditorPage'));
 const Niches600Page = lazy(() => import('./pages/Niches600Page'));
 const NichesPage = lazy(() => import('./pages/NichesPage'));
+const Niches10OffertesPage = lazy(() => import('./pages/promo/Niches10OffertesPage'));
 const BookPerfectPage = lazy(() => import('./pages/BookPerfectPage'));
 const AuditPilotPage = lazy(() => import('./pages/AuditPilotPage'));
 const WordCountPage = lazy(() => import('./pages/WordCountPage'));
@@ -546,6 +547,7 @@ const App = () => {
             <Route path="/masterclass" element={<MasterclassPage />} />
             <Route path="/niches" element={<NichesPage />} />
             <Route path="/niches-600" element={<Niches600Page />} />
+            <Route path="/10-niches-offertes" element={<Niches10OffertesPage />} />
             <Route path="/quiz" element={<QuizPage />} />
             <Route path="/signature" element={<SignaturePage />} />
             <Route path="/bd-studio" element={<BDStudioPage />} />

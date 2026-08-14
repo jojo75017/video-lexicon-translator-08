@@ -8,6 +8,7 @@ import V3CapabilitiesPanel from '@/components/v3public/V3CapabilitiesPanel';
 import V3StartBookBar from '@/components/v3public/V3StartBookBar';
 import V3PaletteModule from '@/components/v3public/V3PaletteModule';
 import KdpPilotPromoBanner from '@/components/ebook/KdpPilotPromoBanner';
+import Niches10Offer from '@/components/marketing/Niches10Offer';
 import { V3EngineStrip, V3EngineGrid } from '@/components/v3public/V3EngineBanner';
 import V3HeroBanner from '@/components/v3public/V3HeroBanner';
 import V3MarketProofPanel from '@/components/v3public/V3MarketProofPanel';
@@ -155,6 +156,11 @@ export default function V3HomePage() {
       <V3StartBookBar />
 
       <V3BriefRecap />
+
+      {/* Pack de 10 niches : inclus dans l'accès, encart compact pour ne pas charger la page */}
+      <div className="max-w-7xl mx-auto px-5 md:px-8 pt-2">
+        <Niches10Offer surface="inline" hook="v3" variant="compact" />
+      </div>
 
       {/* Ce que l'outil produit (le paramétrage des clés vit dans « Fonctionnalités ») */}
       <div className="max-w-7xl mx-auto px-5 md:px-8 py-5">

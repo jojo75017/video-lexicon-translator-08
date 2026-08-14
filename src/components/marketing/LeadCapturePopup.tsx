@@ -12,6 +12,7 @@ import { isMarketingExcluded, isExpatPath } from '@/lib/marketingExclusions';
 import { getAbCopy } from '@/lib/abTest';
 import { trackCaptureEvent } from '@/lib/captureTracking';
 import coverImg from '@/assets/lead-magnet-cover.png';
+import Niches10Offer from '@/components/marketing/Niches10Offer';
 
 const SESSION_KEY = 'ebs_lead_popup_shown';
 const DONE_KEY = 'ebs_lead_popup_done';
@@ -113,6 +114,40 @@ const LeadCapturePopup: React.FC = () => {
   };
 
   if (!open) return null;
+
+  // Hors pages expatriés : le cadeau devient le pack de 10 niches, affiché
+  // immédiatement dans l'app au lieu d'un PDF envoyé par email.
+  if (!isExpat) {
+    return (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="10 niches Amazon KDP offertes"
+          className="relative w-full max-w-xl animate-in zoom-in-95"
+        >
+          <button
+            onClick={() => setOpen(false)}
+            aria-label="Fermer"
+            className="absolute -top-3 -right-3 z-10 h-11 w-11 flex items-center justify-center rounded-full bg-background text-muted-foreground shadow-lg hover:text-foreground transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          <Niches10Offer
+            surface="popup"
+            hook="popup"
+            variant="hero"
+            onDone={() => {
+              localStorage.setItem(DONE_KEY, '1');
+              setOpen(false);
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
