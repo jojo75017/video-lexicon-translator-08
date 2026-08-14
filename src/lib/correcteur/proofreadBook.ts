@@ -408,6 +408,42 @@ export async function proofreadChapter(
   // Passe locale : les puces transformées à tort en tirets de dialogue redeviennent des puces.
   corrected = dashesToBullets(corrected);
 
+  // ---------- Passe 2 : typographie française (locale, aucun appel IA) ----------
+  announce(PASS_LABELS[1]);
+  const typoBefore = checkTypographyCompliance(corrected).issues.reduce((s, i) => s + i.count, 0);
+  corrected = dashesToBullets(applyFrenchTypography(corrected));
+  const typoAfter = checkTypographyCompliance(corrected).issues.reduce((s, i) => s + i.count, 0);
+  const typoFixed = Math.max(0, typoBefore - typoAfter);
+
+  // ---------- Passe 3 : édition (mode polissage uniquement) ----------
+  if (mode === 'polish') {
+    announce(PASS_LABELS[2]);
+    try {
+      const ed = await runPassOverText(title, corrected, 'edition');
+      if (ed.text && !isTruncated(corrected, ed.text)) {
+        corrected = dashesToBullets(applyFrenchTypography(ed.text));
+        corrections = [...corrections, ...ed.corrections];
+        blockFailures += ed.failures;
+      }
+    } catch (e) {
+      console.warn('[correcteur] passe d’édition ignorée :', e);
+    }
+  }
+
+  // ---------- Passe 4 : contrôle final ----------
+  announce(PASS_LABELS[3]);
+  try {
+    const fc = await runPassOverText(title, corrected, 'final-check');
+    if (fc.text && !isTruncated(corrected, fc.text)) {
+      corrected = dashesToBullets(applyFrenchTypography(fc.text));
+      corrections = [...corrections, ...fc.corrections];
+      blockFailures += fc.failures;
+      if (fc.quality) { qualitySum += fc.quality; qualityCount++; }
+    }
+  } catch (e) {
+    console.warn('[correcteur] contrôle final ignoré :', e);
+  }
+
   // Fin de chapitre : jamais un mot isolé ni une phrase sans point.
 
   let endingFixed = false;
@@ -420,6 +456,8 @@ export async function proofreadChapter(
     if (!fix.fixed) endingIssue = ending.reason;
   }
 
+  passNotifier?.(null);
+
   const latinRemaining = findLatinExpressions(corrected);
   return {
     corrected,
@@ -431,6 +469,8 @@ export async function proofreadChapter(
     blockFailures,
     endingFixed,
     endingIssue,
+    passes,
+    typoFixed,
   };
 }
 
