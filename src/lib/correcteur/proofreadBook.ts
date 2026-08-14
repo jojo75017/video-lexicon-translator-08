@@ -517,6 +517,8 @@ export async function proofreadChapters(
           blockFailures: res.blockFailures,
           endingFixed: res.endingFixed,
           endingIssue: res.endingIssue,
+          passes: res.passes,
+          typoFixed: res.typoFixed,
           error: undefined,
         };
         onProgress({ index: i, total: chapters.length, chapter: chapters[i] });
