@@ -60,14 +60,14 @@ export default function V3BeforeAfterPanel({ className = '' }: { className?: str
           </div>
           <ol className="mt-4 grid gap-2.5 sm:grid-cols-2">
             {AFTER.map((a, i) => (
-              <li key={a} className="flex items-start gap-2 text-[13.5px] leading-snug text-white/90">
+              <li key={a} className="flex items-start gap-2 text-[13.5px] leading-snug" style={{ color: '#fff' }}>
                 <span
                   className="grid place-items-center w-5 h-5 rounded-full shrink-0 text-[10.5px] font-bold"
                   style={{ background: `${GOLD}26`, color: GOLD, border: `1px solid ${GOLD}66` }}
                 >
                   {i + 1}
                 </span>
-                <span>{a}</span>
+                <span className="font-medium">{a}</span>
               </li>
             ))}
           </ol>
