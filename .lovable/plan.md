@@ -124,7 +124,7 @@ Chute : Cela signifie que l'opportunité est énorme… Mais publier des ouvrage
 ┌──────────────────────────────────────────────────────────────────────┐
 │  Titre : « À qui cela s'adresse-t-il ? »                             │
 │  Sous-titre : Ebookstudio V3 est conçu pour les créateurs qui        │
-│               veulent publier vite, bien et durablement.              │
+│               veulent publier vite, bien et durablement.             │
 └──────────────────────────────────────────────────────────────────────┘
 
 ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
@@ -184,8 +184,8 @@ Chute : « Si vous souhaitez créer un catalogue d'édition, Ebookstudio V3 vous
 │ Chute : « Voyez à quel point votre flux de travail KDP devient       │
 │ plus rapide. Si vous estimez que ce produit ne vous convient pas,    │
 │ contactez-nous dans les 30 jours et vous serez remboursé.            │
-│ Pas de stress. Aucun risque. Aucun processus compliqué.               │
-│ Soit vous adorez le système… ou vous récupérez votre argent. »      │
+│ Pas de stress. Aucun risque. Aucun processus compliqué.             │
+│ Soit vous adorez le système… ou vous récupérez votre argent. »       │
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -230,10 +230,10 @@ Chute : « Voyez à quel point votre flux de travail KDP devient plus rapide. Si
 │   • Packs de publication client                                        │
 │                                                                      │
 │ Colonne droite — « Le marché » :                                     │
-│   Des coachs, consultants, créateurs, experts locaux,               │
-│   chefs d'entreprise et entrepreneurs veulent un livre…            │
+│   Des coachs, consultants, créateurs, experts locaux,                │
+│   chefs d'entreprise et entrepreneurs veulent un livre…              │
 │   mais ne savent pas comment faire les recherches, rédiger,          │
-│   concevoir, mettre en forme ou préparer le document.                │
+│   concevoir, mettre en forme ou préparer le document.              │
 │   Avec Ebookstudio V3, vous devenez la personne qui les aide.        │
 │   Vous facturez ce service.                                          │
 │   Vous livrez plus rapidement.                                       │
@@ -260,7 +260,7 @@ Liste des livrables possibles :
 - Packs d'eBooks magnétiques.
 - Packs de publication client.
 
-Chute : « Des milliers de coachs, consultants, créateurs, experts locaux, chefs d'entreprise et entrepreneurs souhaitent un livre… mais ne savent pas comment faire les recherches, rédiger, concevoir, mettre en forme ou préparer le document. Avec Ebookstudio V3, vous devenez la personne qui les aide. Vous pouvez facturer ce service. Vous livrez plus rapidement. Et vous conservez 100 % de ce que vous facturez. »
+Chute : « Des coachs, consultants, créateurs, experts locaux, chefs d'entreprise et entrepreneurs souhaitent un livre… mais ne savent pas comment faire les recherches, rédiger, concevoir, mettre en forme ou préparer le document. Avec Ebookstudio V3, vous devenez la personne qui les aide. Vous pouvez facturer ce service. Vous livrez plus rapidement. Et vous conservez 100 % de ce que vous facturez. »
 
 Note tarifaire : la licence commerciale est incluse dans les deux forfaits (Plume et Édition) ; aucune option payante supplémentaire n'est requise pour revendre ses services.
 
@@ -269,6 +269,21 @@ Note tarifaire : la licence commerciale est incluse dans les deux forfaits (Plum
 2. Champs « Commencez votre livre » resserrés : une ligne sur ordinateur, paddings et historique réduits.
 3. Entrées générales `/`, `/dashboard`, `/espace` renvoyant l'abonné sur `/v3` ; accès V2 conservé via son bouton dédié.
 4. Rafraîchissement propre après reconnexion : purge unique des service workers et de Cache Storage, ouverture de `/v3` versionnée, garde-fou anti-boucle, sans toucher aux livres, clés API ni profils.
+
+## Partie 7 — Emplacement sur la page d'accueil V3
+
+Ordre de lecture final sur `V3HomePage.tsx` :
+1. `KdpPilotPromoBanner` en tête (compact, code `PROMO15`).
+2. `V3StartBookBar` compact (module « des livres » — création rapide).
+3. `V3BriefRecap` / récap du brief (module « des livres » suite).
+4. `V3MarketProofPanel` — chiffres du marché.
+5. `V3BeforeAfterPanel` — ancienne voie vs Ebookstudio V3.
+6. `V3EngineStrip` / grille des moteurs IA existante.
+7. `V3AudiencePanel` — public cible.
+8. `V3GuaranteePanel` — garantie 30 jours.
+9. `V3CommercialLicensePanel` — licence commerciale.
+
+Les nouvelles sections se placent **toutes sous le module des livres** (après `V3StartBookBar` + `V3BriefRecap`), avant le pied de page.
 
 ## Vérification
 - Déconnexion puis reconnexion : arrivée sur `/v3`, bandeau KDP Pilot et champs réduits visibles au premier écran.
@@ -285,11 +300,12 @@ Note tarifaire : la licence commerciale est incluse dans les deux forfaits (Plum
 - Insertion dans `V3HomePage.tsx` (ordre de lecture) :
   1. `KdpPilotPromoBanner` en tête.
   2. `V3StartBookBar` compact.
-  3. `V3MarketProofPanel`.
-  4. `V3BeforeAfterPanel`.
-  5. `V3EngineStrip` / grille des moteurs IA existante.
-  6. `V3AudiencePanel`.
-  7. `V3GuaranteePanel`.
-  8. `V3CommercialLicensePanel`.
+  3. `V3BriefRecap`.
+  4. `V3MarketProofPanel`.
+  5. `V3BeforeAfterPanel`.
+  6. `V3EngineStrip` / grille des moteurs IA existante.
+  7. `V3AudiencePanel`.
+  8. `V3GuaranteePanel`.
+  9. `V3CommercialLicensePanel`.
 - Styles alignés sur `src/styles/v3-public.css` (émeraude, or, `v3-serif`), cohérents avec `V3EngineBanner.tsx`.
 - Icônes vectorielles uniquement : aucun appel IA, aucune génération d'image, donc aucun crédit IA consommé.
