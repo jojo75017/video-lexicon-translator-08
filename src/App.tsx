@@ -85,6 +85,7 @@ const V3AuthorSettingsPage = lazy(() => import('./pages/v3public/V3AuthorSetting
 const V3TocUltimatePage = lazy(() => import('./pages/v3public/V3TocUltimatePage'));
 const V3TranslatorPage = lazy(() => import('./pages/v3public/V3TranslatorPage'));
 const V3CorrecteurPage = lazy(() => import('./pages/v3public/V3CorrecteurPage'));
+const V3AvisClientsPage = lazy(() => import('./pages/v3public/V3AvisClientsPage'));
 const V3StudioProPage = lazy(() => import('./pages/v3public/V3StudioProPage'));
 
 const V3ToolsIndexPage = lazy(() => import('./pages/v3public/V3ToolsIndexPage'));
