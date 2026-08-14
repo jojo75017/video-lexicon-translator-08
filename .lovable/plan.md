@@ -1,39 +1,46 @@
-# Nouvel email GetResponse — vente avant la coupure du 30 septembre
+# Bloquer définitivement les accès V2 et Dashboard admin sur la V3
 
-## Objectif
-Un email HTML propre, prêt à coller dans GetResponse, conçu pour vendre l'accès à vie à 47 € avant la fin de l'offre (30/09/2026), avec le cadeau des 10 niches comme déclencheur de clic.
+## Problème confirmé
+- La V3 possède déjà une barre avec **V2 — Générateur**, **Prospects**, **Emails** et **Admin**, mais le composant la supprime entièrement dès que sa vérification locale n'obtient pas exactement `isAdmin === true`.
+- Cette barre relance sa propre vérification du rôle, séparément de l'état administrateur déjà calculé dans `App.tsx`. Ce doublon crée une nouvelle occasion de perdre momentanément les accès lors de la restauration ou du rafraîchissement de session.
+- Le lien V2 existe aussi dans le grand en-tête, mais **Dashboard admin** n'y est pas présent. La disparition de la barre rapide laisse donc la V3 sans accès visible au tableau administrateur.
+- Les destinations correctes existent : **V2** `/ebook-planner`, **Dashboard admin** `/admin`, **Prospects** `/gestion-prospects`, **Emails** `/apercu-emails`.
 
-## Ce qui sera fait
+## Correction
 
-### 1. Nouveau modèle d'email
-Créer `public/email-templates/derniere-chance-47-getresponse.html` :
-- Structure en tableaux (compatible Gmail, Outlook, mobile), largeur 560 px, texte lisible.
-- Bandeau date limite : « Offre terminée le 30 septembre ».
-- Accroche courte : le risque d'écrire un livre que personne ne cherche.
-- Le cadeau immédiat : les 10 niches Amazon offertes (mot-clé, concurrence, potentiel) — c'est le premier appel à l'action.
-- Ce que contient l'accès à 47 € : liste courte de 6 livrables réels (livre chapitre par chapitre, sommaire + Word/PDF KDP, couverture KDP complète, livres illustrés 3-7 ans, fiche Amazon, V3 incluse sans repayer).
-- Prix affiché : 47 € paiement unique, pas d'abonnement.
-- Deux boutons vers `/commander` (haut et bas) + un lien vers la page cadeau `/10-niches-offertes`.
-- Signature Georges Boubet, réponse directe à boubetgeorges@gmail.com.
-- Mention de désinscription en pied de page.
+### 1. Une seule source fiable pour le statut administrateur
+- Utiliser dans toute la mise en page V3 le statut administrateur déjà résolu au niveau principal de l'application, au lieu de lancer une deuxième détection indépendante dans la barre.
+- Conserver la validation du rôle par le backend : aucun droit administrateur ne sera fondé sur le stockage du navigateur.
+- Pendant une restauration de session, afficher un état de vérification au lieu de conclure trop tôt que l'administrateur est un simple abonné.
 
-Textes 100 % français, aucun mot latin ou inventé.
+### 2. Barre administrateur permanente sur toute la V3
+Afficher, sur toutes les routes `/v3/*` dès que le rôle est confirmé :
 
-### 2. Panneau admin
-Mettre à jour `src/components/admin/AbKitPanel.tsx` pour proposer les deux modèles (l'actuel « Offre 47 € » et le nouveau « Dernière chance ») avec, pour chacun : aperçu, objet, préheader, nom d'expéditeur, lien du bouton, copie du HTML et téléchargement.
+```text
+[V2 — Générateur] [Dashboard admin] [Prospects] [Emails] [Voir comme un abonné]
+```
 
-Champs prêts à copier pour le nouvel email :
-- Objet : « Il reste 6 semaines (47 € puis c'est fini) »
-- Préheader : « Vos 10 niches Amazon offertes + l'accès à vie à 47 €. »
-- Expéditeur : « Georges — EbookStudio »
-- Bouton : « Je prends l'accès à 47 € »
+- La barre reste visible sur ordinateur et mobile, même en changeant d'onglet V3.
+- **V2 — Générateur** ouvre directement `/ebook-planner`.
+- **Dashboard admin** ouvre directement `/admin`.
+- Aucun bouton ne passe par `/commander`, `/v3/auth` ou une autre page intermédiaire.
+- Le mode « Voir comme un abonné » ne masque plus cette barre : il simule les restrictions abonné tout en conservant les sorties administrateur.
 
-### 3. Liens et suivi
-Les liens utilisent le générateur existant (`commanderUrl`) avec la source `getresponse`, pour retrouver les clics dans le suivi.
+### 3. Accès de secours dans l'en-tête
+- Conserver **V2** dans l'en-tête principal.
+- Ajouter **Dashboard admin** à côté pour l'administrateur confirmé, sur ordinateur comme dans le menu mobile.
+- Ainsi, même si la barre rapide rencontre un problème d'affichage, les deux accès essentiels restent disponibles.
 
-## Ce qui ne change pas
-Aucun envoi automatique n'est activé : l'email est un modèle à copier dans GetResponse. Prix, tunnel de commande et pages existantes restent inchangés.
+### 4. Validation réelle
+Avec une session administrateur :
+1. Ouvrir directement `/v3` et vérifier la présence immédiate de **V2** et **Dashboard admin**.
+2. Naviguer dans plusieurs routes `/v3/*` et confirmer que les accès restent présents.
+3. Activer « Voir comme un abonné » et confirmer que les sorties V2/Admin restent visibles et utilisables.
+4. Tester `/ebook-planner`, puis `/admin`, et vérifier qu'aucune redirection ne mène à la page de vente.
+5. Recharger la page V3 et refaire le contrôle après restauration de session.
+6. Vérifier également le menu mobile.
 
 ## Détails techniques
-- Fichiers : nouveau HTML statique dans `public/email-templates/`, modification de `AbKitPanel.tsx` (liste de modèles au lieu d'un seul).
-- Aucune migration, aucune fonction backend, aucun envoi déclenché.
+- Centraliser la propagation de `isAdmin` et de son état de chargement depuis `App.tsx` vers `V3PublicLayout`, `V3AdminQuickAccess` et `V3Header`.
+- Retirer la vérification concurrente propre à `V3AdminQuickAccess`.
+- Ne modifier ni les pages métier, ni les droits des abonnés, ni le tunnel de vente.
