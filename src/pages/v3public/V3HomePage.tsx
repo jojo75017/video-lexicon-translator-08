@@ -5,7 +5,7 @@ import {
 import { V3_HEADER_MENU } from '@/data/v3HeaderMenu';
 import homeHero from '@/assets/v3/home-hero.jpg';
 import V3BriefRecap from '@/components/v3public/V3BriefRecap';
-import V3ApiKeysGate from '@/components/v3public/V3ApiKeysGate';
+import V3CapabilitiesPanel from '@/components/v3public/V3CapabilitiesPanel';
 import V3StartBookBar from '@/components/v3public/V3StartBookBar';
 import V3PaletteModule from '@/components/v3public/V3PaletteModule';
 import KdpPilotPromoBanner from '@/components/ebook/KdpPilotPromoBanner';
@@ -123,10 +123,11 @@ export default function V3HomePage() {
         </div>
       </section>
 
-      {/* Tableau des clés toujours visible avant le reste de la page */}
+      {/* Ce que l'outil produit (le paramétrage des clés vit désormais dans « Fonctionnalités ») */}
       <div className="max-w-7xl mx-auto px-5 md:px-8 py-5">
-        <V3ApiKeysGate />
+        <V3CapabilitiesPanel />
       </div>
+
 
       {/* HERO — bandeau pleine largeur */}
       <section className="relative overflow-hidden">
