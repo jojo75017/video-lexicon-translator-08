@@ -53,6 +53,10 @@ export interface ChapterProofread {
   endingFixed?: boolean;
   /** Fin toujours bancale malgré la passe de clôture (raison affichée). */
   endingIssue?: string;
+  /** Passes appliquées sur ce chapitre (Correction, Typographie, Édition, Contrôle). */
+  passes?: string[];
+  /** Défauts typographiques réparés localement. */
+  typoFixed?: number;
   error?: string;
 }
 
