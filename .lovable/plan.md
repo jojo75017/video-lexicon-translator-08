@@ -78,22 +78,34 @@ Le nouvel email de bienvenue, un seul envoi, contient :
 
 1. Le pack de 10 niches (bouton vers la page cadeau, consultable à vie).
 2. **Ses accès** : email de connexion, code d'accès, lien direct vers `/v3`.
-3. **Votre email de contact réel** en évidence : « Un souci ? Écrivez-moi directement à
-   contact@ebookstudio.fr — je réponds personnellement. » (adresse à confirmer par vous).
+3. **Votre email de contact** en évidence : « Un souci ? Écrivez-moi directement à
+   **boubetgeorges@gmail.com** — je réponds personnellement. » Ce même email est aussi mis
+   en `reply-to` de l'envoi, pour qu'un simple « Répondre » vous arrive.
 4. Les 3 premières actions concrètes dans l'outil, pour éviter l'abandon au jour 1.
 5. Rien de promotionnel : c'est un email de service, il doit arriver en boîte principale.
 
 Le même contenu est affiché à l'écran juste après l'inscription (au cas où l'email tarde),
 avec un bouton « Renvoyer mes accès » branché sur `resend-access-code`.
 
-## Est-ce que ça va convertir ? Honnêtement
+## Est-ce que ça va convertir ? Réponse franche : non, pas à lui seul
 
-Le pack de niches ne fait pas tout : il répare **une** fuite (537 affichages pour 1 clic,
-23 emails captés). Il faut s'attendre à des emails captés en nombre, et à une part d'achats
-seulement si les trois autres pièces suivent : la gratification immédiate (cette page cadeau),
-la preuve (aucun témoignage approuvé en base aujourd'hui), et la relance des 41 cliqueurs.
-Le pack est la première pièce, pas la solution unique — et on mesurera réellement via
-`capture_events` (affichage → clic → email) plutôt qu'à l'impression.
+Je ne peux pas vous promettre des ventes avec ce seul changement, et je ne le ferai pas.
+Ce que ce plan corrige est mesurable et certain : aujourd'hui 537 affichages de vos encarts
+n'ont produit **1 clic et 23 emails**. Un cadeau réel, affiché immédiatement, fait remonter
+ce chiffre — c'est mécanique.
+
+Ce qu'il ne corrige pas, et qui bloque l'achat autant que la capture :
+
+- **Zéro témoignage approuvé en base.** Personne n'achète 47 € sans voir un seul client.
+- **Aucune commande payée, 41 cliqueurs jamais rappelés individuellement.**
+- **L'email de bienvenue actuel ne donne ni les accès ni un moyen de vous joindre** — donc
+  ceux qui entrent se découragent seuls et ne reviennent pas.
+
+Ma recommandation : on livre ce plan (capture + email de bienvenue réparé), on mesure
+7 jours via `capture_events` — emails captés, clics vers `/commander` — et **c'est ce chiffre
+qui décide** de la suite (témoignages, relance des 41 cliqueurs). Pas mon avis, ni le vôtre.
+Si après 7 jours on a des emails mais aucun achat, le problème est la preuve, pas l'offre.
+
 
 ## Détails techniques
 
