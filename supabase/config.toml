@@ -163,9 +163,6 @@ verify_jwt = false
 [functions.funnel-create-order]
 verify_jwt = false
 
-[functions.process-promo-nurture]
-verify_jwt = false
-
 [functions.unsubscribe]
 verify_jwt = false
 
@@ -208,15 +205,49 @@ verify_jwt = false
 [functions.stripe-list-webhooks]
 verify_jwt = false
 
-
-[functions.send-juanito-payment-check]
-verify_jwt = false
-
 [functions.firecrawl-credits]
 verify_jwt = false
 
 [functions.test-paypal-checkout]
 verify_jwt = false
 
-[functions.send-offre-47-serie]
-verify_jwt = false
+# --- Chaîne V3 (session requise) ---
+
+[functions.complete-book-workflow]
+verify_jwt = true
+
+[functions.strict-proofread]
+verify_jwt = true
+
+[functions.book-chapter-write]
+verify_jwt = true
+
+[functions.book-memory-extract]
+verify_jwt = true
+
+[functions.book-bible-generate]
+verify_jwt = true
+
+[functions.book-positioning]
+verify_jwt = true
+
+[functions.agent-illustrator]
+verify_jwt = true
+
+[functions.agent-kids-kdp-metadata]
+verify_jwt = true
+
+[functions.agent-kids-stories]
+verify_jwt = true
+
+[functions.agent-universe-volumes]
+verify_jwt = true
+
+[functions.agent-ams-keywords]
+verify_jwt = true
+
+[functions.agent-category-finder]
+verify_jwt = true
+
+[functions.agent-competitor-spy]
+verify_jwt = true
