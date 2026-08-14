@@ -18,7 +18,7 @@ export function V3LockedGate({ children }: { children: ReactNode }) {
   if (loading) return null;
   if (isAdmin) return <>{children}</>;
   if (hasV2 && isLegacyUnlockedPath(location.pathname)) return <>{children}</>;
-  return <Navigate to="/v3/offre" replace state={{ from: location.pathname }} />;
+  return <Navigate to="/v3/auth" replace state={{ from: location.pathname }} />;
 }
 
 export default V3LockedGate;

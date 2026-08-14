@@ -3,6 +3,8 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Feather, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { clearAdminCache, getIsCurrentSessionAdmin } from '@/lib/adminAccess';
+import { getAuthenticatedHomePath } from '@/lib/authDestination';
 
 export default function V3AuthPage() {
   const [params] = useSearchParams();
@@ -36,8 +38,10 @@ export default function V3AuthPage() {
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        clearAdminCache();
+        const destination = await getAuthenticatedHomePath(getIsCurrentSessionAdmin);
         toast.success('Connexion réussie ✓');
-        nav('/v3/library');
+        nav(destination, { replace: true });
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Erreur inconnue';

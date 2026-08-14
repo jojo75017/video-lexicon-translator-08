@@ -27,6 +27,7 @@ import StickySignupBar from '@/components/marketing/StickySignupBar';
 import V3LaunchGlobalBanner from '@/components/V3LaunchGlobalBanner';
 import { captureUtmParams } from '@/lib/utmTracking';
 import { ADMIN_HOME_PATH, ADMIN_LOGIN_PATH } from '@/config/adminRoutes';
+import { getHomePath, type AccessState } from '@/lib/authDestination';
 
 // V2 — Ebook Planner + outils satellites
 const RedirectClickPage = lazy(() => import('./pages/RedirectClickPage'));
@@ -266,14 +267,19 @@ const App = () => {
       const shouldRecheckAdmin =
         (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') && !!session;
       if (shouldRecheckAdmin && session?.user) {
+        setIsAdminChecked(false);
         setTimeout(async () => {
           if (event === 'SIGNED_IN') clearAdminCache();
           const adminStatus = await getIsCurrentSessionAdmin();
           setIsAdmin(adminStatus);
+          setIsAdminChecked(true);
         }, 0);
         return;
       }
-      if (event === 'SIGNED_OUT') setIsAdmin(false);
+      if (event === 'SIGNED_OUT') {
+        setIsAdmin(false);
+        setIsAdminChecked(true);
+      }
 
     });
 
@@ -326,6 +332,14 @@ const App = () => {
     typeof window !== 'undefined' &&
     (window.location.hostname === 'localhost' || window.location.hostname.includes('id-preview--'));
   const hasPlannerAccess = isPlannerPreviewHost || isAuthenticated || isAdmin;
+  const accessState: AccessState = !isAdminChecked
+    ? 'pending'
+    : isAdmin
+      ? 'admin'
+      : (isAuthenticated || isPlannerPreviewHost)
+        ? 'subscriber'
+        : 'visitor';
+  const homePath = getHomePath(accessState);
   const previewSubscriberEmail = 'preview@ebookstudio.fr';
   const previewSubscriberData = {
     email: previewSubscriberEmail,
@@ -376,9 +390,9 @@ const App = () => {
             <Route
               path="/"
               element={
-                isCheckingAuth || !isAdminChecked
+                isCheckingAuth || !homePath
                   ? <div className="min-h-screen" aria-busy="true" />
-                  : <Navigate to={isAdmin ? ADMIN_HOME_PATH : (hasPlannerAccess ? '/v3' : '/commander')} replace />
+                  : <Navigate to={homePath} replace />
               }
             />
 
@@ -463,10 +477,10 @@ const App = () => {
             <Route path="/campagne-vente" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
             <Route path="/dashboard-marketing" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
             <Route path="/generateur-posts" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
-            <Route path="/dashboard" element={<Navigate to="/ebook-planner" replace />} />
-            <Route path="/espace" element={<Navigate to="/ebook-planner" replace />} />
-            <Route path="/espace/lancement" element={<Navigate to="/ebook-planner" replace />} />
-            <Route path="/tableau-de-bord" element={<Navigate to="/v3/hub" replace />} />
+            <Route path="/dashboard" element={!homePath ? <PageLoader /> : <Navigate to={homePath} replace />} />
+            <Route path="/espace" element={!homePath ? <PageLoader /> : <Navigate to={homePath} replace />} />
+            <Route path="/espace/lancement" element={!homePath ? <PageLoader /> : <Navigate to={homePath} replace />} />
+            <Route path="/tableau-de-bord" element={!homePath ? <PageLoader /> : <Navigate to={homePath} replace />} />
             <Route path="/admin-cockpit" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
             <Route path="/extension-chrome" element={<Navigate to="/offres" replace />} />
             <Route path="/elementor-export" element={<Navigate to="/admin" replace />} />
