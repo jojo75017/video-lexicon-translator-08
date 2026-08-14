@@ -49,6 +49,12 @@ export default function V3HomePage() {
       {/* BANDEAU D'ACCROCHE — premier module */}
       <V3HeroBanner />
 
+      {/* MOTEUR MULTI-MODÈLES — deuxième module, juste sous l'accroche */}
+      <V3EngineStrip />
+      <V3EngineGrid />
+
+
+
 
       {/* BANNIÈRE — Migration V2 vers V3 (3 modules offerts) */}
       <section
