@@ -13,6 +13,8 @@ import { detectLatin, latinExpressions as findLatinExpressions } from '@/utils/l
 import { dashesToBullets } from '@/utils/frenchTypography';
 
 import { checkEnding, lastParagraph, replaceLastParagraph } from '@/utils/chapterEnding';
+import { applyFrenchTypography, checkTypographyCompliance } from '@/utils/frenchTypography';
+import type { BookContext } from './bookContext';
 
 export type ProofreadMode = 'strict' | 'polish';
 
@@ -51,6 +53,10 @@ export interface ChapterProofread {
   endingFixed?: boolean;
   /** Fin toujours bancale malgré la passe de clôture (raison affichée). */
   endingIssue?: string;
+  /** Passes appliquées sur ce chapitre (Correction, Typographie, Édition, Contrôle). */
+  passes?: string[];
+  /** Défauts typographiques réparés localement. */
+  typoFixed?: number;
   error?: string;
 }
 
@@ -117,6 +123,10 @@ export interface ProofreadResult {
   blockFailures: number;
   endingFixed: boolean;
   endingIssue?: string;
+  /** Passes réellement appliquées sur ce chapitre. */
+  passes?: string[];
+  /** Défauts typographiques réparés localement (guillemets, espaces, apostrophes…). */
+  typoFixed?: number;
 }
 
 /** Notification d'attente (limite de débit) pour l'interface. */
@@ -126,6 +136,21 @@ export function setProofreadWaitNotifier(fn: WaitNotifier | null) {
   waitNotifier = fn;
 }
 
+/** Notification de passe en cours (Correction / Typographie / Édition / Contrôle). */
+export type PassNotifier = (info: { pass: number; total: number; label: string } | null) => void;
+let passNotifier: PassNotifier | null = null;
+export function setProofreadPassNotifier(fn: PassNotifier | null) {
+  passNotifier = fn;
+}
+
+/** Relevé de cohérence du livre, transmis à chaque appel IA. */
+let bookContext: BookContext | null = null;
+export function setProofreadBookContext(ctx: BookContext | null) {
+  bookContext = ctx;
+}
+
+export const PASS_LABELS = ['Correction', 'Typographie française', 'Édition', 'Contrôle final'];
+
 const BACKOFF_MS = [5000, 15000];
 
 async function waitWithNotice(ms: number, reason: string) {
@@ -134,7 +159,7 @@ async function waitWithNotice(ms: number, reason: string) {
   waitNotifier?.(null);
 }
 
-type CallMode = ProofreadMode | 'latin-fix' | 'ending-fix';
+type CallMode = ProofreadMode | 'latin-fix' | 'ending-fix' | 'edition' | 'final-check';
 
 interface CallResult {
   corrected: string;
@@ -159,6 +184,7 @@ async function callProofread(
         chapterContent: content,
         mode,
         latinExpressions: latinList,
+        bookContext: bookContext || undefined,
         // Clé de l'abonné (Gemini / ChatGPT / Claude / OpenRouter) : la correction
         // passe par son propre compte IA, aucun crédit de la plateforme n'est utilisé.
         userProvider: getProvider(),
@@ -248,7 +274,7 @@ export function splitForProofread(text: string, maxWords = 1200): string[] {
 async function proofreadBlock(
   title: string,
   block: string,
-  mode: ProofreadMode,
+  mode: CallMode,
 ): Promise<{ text: string; corrections: Correction[]; quality: number; failed: boolean }> {
   const res = await callProofread(title, block, mode);
   const truncated = isTruncated(block, res.corrected);
@@ -279,9 +305,40 @@ async function fixEnding(
   }
 }
 
+/** Applique une passe IA sur l'ensemble d'un texte, bloc par bloc. */
+async function runPassOverText(
+  title: string,
+  text: string,
+  mode: CallMode,
+): Promise<{ text: string; corrections: Correction[]; failures: number; quality: number }> {
+  const parts = splitForProofread(text, 700);
+  const out: string[] = [];
+  let corrections: Correction[] = [];
+  let failures = 0;
+  let qSum = 0;
+  let qCount = 0;
+  for (let i = 0; i < parts.length; i++) {
+    const res = await proofreadBlock(title, parts[i], mode);
+    out.push(res.text);
+    corrections = [...corrections, ...res.corrections];
+    if (res.failed) failures++;
+    if (res.quality) { qSum += res.quality; qCount++; }
+    if (i < parts.length - 1) await sleep(400);
+  }
+  return {
+    text: out.join('\n\n').trim(),
+    corrections,
+    failures,
+    quality: qCount ? Math.round(qSum / qCount) : 0,
+  };
+}
+
 /**
- * Corrige un chapitre bloc par bloc, élimine le latin, puis garantit que le
- * chapitre se termine par une phrase complète ponctuée.
+ * Correction « maison d'édition » d'un chapitre, en 4 passes successives :
+ *   1. Correction (orthographe, grammaire, accords, ponctuation) + anti-latin
+ *   2. Typographie française (locale, sans IA)
+ *   3. Édition (répétitions, lourdeurs, temps narratifs) — mode polissage
+ *   4. Contrôle final (défauts résiduels, artefacts, noms propres, fin de chapitre)
  */
 export async function proofreadChapter(
   title: string,
@@ -295,6 +352,17 @@ export async function proofreadChapter(
 
   if (blocks.length === 0) throw new Error('Chapitre vide : rien à corriger.');
 
+  const passes: string[] = [];
+  const totalPasses = mode === 'polish' ? 4 : 3;
+  let passIndex = 0;
+  const announce = (label: string) => {
+    passIndex++;
+    passes.push(label);
+    passNotifier?.({ pass: passIndex, total: totalPasses, label });
+  };
+
+  // ---------- Passe 1 : correction ----------
+  announce(PASS_LABELS[0]);
   const outputs: string[] = [];
   let corrections: Correction[] = [];
   let qualitySum = 0;
@@ -344,6 +412,42 @@ export async function proofreadChapter(
   // Passe locale : les puces transformées à tort en tirets de dialogue redeviennent des puces.
   corrected = dashesToBullets(corrected);
 
+  // ---------- Passe 2 : typographie française (locale, aucun appel IA) ----------
+  announce(PASS_LABELS[1]);
+  const typoBefore = checkTypographyCompliance(corrected).issues.reduce((s, i) => s + i.count, 0);
+  corrected = dashesToBullets(applyFrenchTypography(corrected));
+  const typoAfter = checkTypographyCompliance(corrected).issues.reduce((s, i) => s + i.count, 0);
+  const typoFixed = Math.max(0, typoBefore - typoAfter);
+
+  // ---------- Passe 3 : édition (mode polissage uniquement) ----------
+  if (mode === 'polish') {
+    announce(PASS_LABELS[2]);
+    try {
+      const ed = await runPassOverText(title, corrected, 'edition');
+      if (ed.text && !isTruncated(corrected, ed.text)) {
+        corrected = dashesToBullets(applyFrenchTypography(ed.text));
+        corrections = [...corrections, ...ed.corrections];
+        blockFailures += ed.failures;
+      }
+    } catch (e) {
+      console.warn('[correcteur] passe d’édition ignorée :', e);
+    }
+  }
+
+  // ---------- Passe 4 : contrôle final ----------
+  announce(PASS_LABELS[3]);
+  try {
+    const fc = await runPassOverText(title, corrected, 'final-check');
+    if (fc.text && !isTruncated(corrected, fc.text)) {
+      corrected = dashesToBullets(applyFrenchTypography(fc.text));
+      corrections = [...corrections, ...fc.corrections];
+      blockFailures += fc.failures;
+      if (fc.quality) { qualitySum += fc.quality; qualityCount++; }
+    }
+  } catch (e) {
+    console.warn('[correcteur] contrôle final ignoré :', e);
+  }
+
   // Fin de chapitre : jamais un mot isolé ni une phrase sans point.
 
   let endingFixed = false;
@@ -356,6 +460,8 @@ export async function proofreadChapter(
     if (!fix.fixed) endingIssue = ending.reason;
   }
 
+  passNotifier?.(null);
+
   const latinRemaining = findLatinExpressions(corrected);
   return {
     corrected,
@@ -367,6 +473,8 @@ export async function proofreadChapter(
     blockFailures,
     endingFixed,
     endingIssue,
+    passes,
+    typoFixed,
   };
 }
 
@@ -413,6 +521,8 @@ export async function proofreadChapters(
           blockFailures: res.blockFailures,
           endingFixed: res.endingFixed,
           endingIssue: res.endingIssue,
+          passes: res.passes,
+          typoFixed: res.typoFixed,
           error: undefined,
         };
         onProgress({ index: i, total: chapters.length, chapter: chapters[i] });

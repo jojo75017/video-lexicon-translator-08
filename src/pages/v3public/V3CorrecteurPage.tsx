@@ -17,9 +17,10 @@ import type { Manuscript } from '@/lib/bookperfect/types';
 import { diffWords } from '@/lib/bookperfect/textDiff';
 import {
   proofreadChapters, proofreadChapter, correctionBreakdown, effectiveText,
-  setProofreadWaitNotifier,
+  setProofreadWaitNotifier, setProofreadPassNotifier, setProofreadBookContext, PASS_LABELS,
   CORRECTION_TYPE_LABELS, type ChapterProofread, type ProofreadMode,
 } from '@/lib/correcteur/proofreadBook';
+import { buildBookContext, type NameInconsistency } from '@/lib/correcteur/bookContext';
 
 
 import { exportProfessionalDocx } from '@/utils/docxExportEngine';
@@ -86,6 +87,8 @@ export default function V3CorrecteurPage() {
   const [running, setRunning] = useState(false);
   const [current, setCurrent] = useState(0);
   const [waitInfo, setWaitInfo] = useState<{ seconds: number; reason: string } | null>(null);
+  const [passInfo, setPassInfo] = useState<{ pass: number; total: number; label: string } | null>(null);
+  const [nameIssues, setNameIssues] = useState<NameInconsistency[]>([]);
   const [openChapter, setOpenChapter] = useState<string | null>(null);
 
   const [editingChapter, setEditingChapter] = useState<string | null>(null);
@@ -120,6 +123,7 @@ export default function V3CorrecteurPage() {
   const endingsFixed = chapters.filter((c) => c.endingFixed).length;
   const endingIssues = chapters.filter((c) => c.endingIssue);
   const blockFailures = chapters.reduce((s, c) => s + (c.blockFailures || 0), 0);
+  const typoFixed = chapters.reduce((s, c) => s + (c.typoFixed || 0), 0);
 
 
   const loadManuscript = useCallback((m: Manuscript) => {
@@ -248,7 +252,8 @@ export default function V3CorrecteurPage() {
   // Affichage des temps d'attente (limite de débit) pendant la correction.
   useEffect(() => {
     setProofreadWaitNotifier((info) => setWaitInfo(info));
-    return () => setProofreadWaitNotifier(null);
+    setProofreadPassNotifier((info) => setPassInfo(info));
+    return () => { setProofreadWaitNotifier(null); setProofreadPassNotifier(null); };
   }, []);
 
   const startCorrection = useCallback(async (onlyFailed = false) => {
@@ -268,6 +273,14 @@ export default function V3CorrecteurPage() {
     const working = chapters.map((c) => (
       onlyFailed && c.status === 'failed' ? { ...c, status: 'pending' as const, error: undefined } : { ...c }
     ));
+
+    // Relevé de cohérence du livre (noms propres, lieux, temps, point de vue) :
+    // transmis à chaque passe pour que l'orthographe des noms reste identique
+    // d'un chapitre à l'autre. Analyse locale, aucun crédit consommé.
+    const { context, inconsistencies } = buildBookContext(working, manuscript?.title);
+    setProofreadBookContext(context);
+    setNameIssues(inconsistencies);
+
     try {
       await proofreadChapters(
         working,
@@ -748,14 +761,52 @@ export default function V3CorrecteurPage() {
               {latinRemoved > 0 && <span style={{ color: 'var(--v3-emerald)' }}>{latinRemoved} expression(s) latine(s) supprimée(s)</span>}
               {endingsFixed > 0 && <span style={{ color: 'var(--v3-emerald)' }}>{endingsFixed} fin(s) de chapitre complétée(s)</span>}
               {blockFailures > 0 && <span style={{ color: '#b45309' }}>{blockFailures} passage(s) non corrigé(s)</span>}
+              {typoFixed > 0 && <span style={{ color: 'var(--v3-emerald)' }}>{typoFixed} correction(s) typographiques</span>}
               {running && (
                 <span>
                   En cours : chapitre {current + 1} / {chapters.length}
+                  {passInfo ? ` · passe ${passInfo.pass}/${passInfo.total} — ${passInfo.label}` : ''}
                   {waitInfo ? ` · ${waitInfo.reason} — nouvelle tentative dans ${waitInfo.seconds} s` : '…'}
                 </span>
               )}
             </div>
+
+            <div className="mt-3 flex flex-wrap gap-2">
+              {PASS_LABELS.map((label, i) => {
+                const active = running && passInfo?.pass === i + 1;
+                const skipped = mode === 'strict' && i === 2;
+                return (
+                  <span
+                    key={label}
+                    className="text-[11.5px] rounded-full border px-2.5 py-1"
+                    style={{
+                      borderColor: active ? 'var(--v3-emerald)' : 'var(--v3-line)',
+                      background: active ? '#eef7f2' : '#fbfbfa',
+                      color: skipped ? 'var(--v3-muted)' : 'var(--v3-emerald)',
+                      opacity: skipped ? 0.55 : 1,
+                    }}
+                  >
+                    Passe {i + 1} · {label}{skipped ? ' (polissage uniquement)' : ''}
+                  </span>
+                );
+              })}
+            </div>
           </div>
+
+          {!running && nameIssues.length > 0 && (
+            <div className="mt-4 rounded-xl border p-4" style={{ borderColor: 'var(--v3-line)', background: '#fbfbfa' }}>
+              <p className="text-[13px] font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+                Noms propres écrits de plusieurs façons dans le livre — orthographe de référence retenue :
+              </p>
+              <ul className="mt-2 space-y-1">
+                {nameIssues.slice(0, 12).map((n) => (
+                  <li key={n.retained} className="text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
+                    <strong style={{ color: 'var(--v3-ink)' }}>{n.retained}</strong> — variantes rencontrées : {n.variants.join(', ')}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {!running && failedCount > 0 && (
             <div className="mt-4 rounded-xl border p-4 flex flex-wrap items-center justify-between gap-3"

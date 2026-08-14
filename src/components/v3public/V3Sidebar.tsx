@@ -4,7 +4,7 @@ import {
   ChevronLeft, ChevronRight,
   GraduationCap, Gem, FileText, User,
   LifeBuoy, Mail, HelpCircle, FolderOpen, Video, ListTree, Award,
-  Search, Target, BarChart3, Image as ImageIcon, LayoutGrid,
+  Search, Target, BarChart3, Image as ImageIcon, LayoutGrid, Star,
 } from 'lucide-react';
 import { useState } from 'react';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
@@ -62,6 +62,8 @@ const NAV: NavSection[] = [
       { to: '/v3/hub?tab=livres', label: 'Brouillons', icon: FolderOpen },
       { to: '/v3/pourquoi', label: 'Pourquoi EbookStudio', icon: Award },
       { to: '/v3/realite-kdp', label: 'Combien gagnent les auteurs KDP', icon: BookOpen },
+
+      { to: '/v3/avis', label: '⭐ Obtenir des avis clients', icon: Star, badge: 'Marche à suivre' },
 
       { to: '/communaute', label: 'Communauté (Q&R)', icon: Award, badge: '220+' },
       { to: '/v3/script-heygen', label: 'Script vidéo HeyGen', icon: Video, badge: 'Pour vous' },
