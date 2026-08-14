@@ -20,8 +20,6 @@ const NAV: NavSection[] = [
   {
     section: 'Recherche KDP',
     items: [
-      { to: '/v3/fonctionnalites', label: 'Fonctionnalités (12 modules)', icon: LayoutGrid, end: true, badge: 'Hub' },
-
       { to: '/v3/recherche', label: 'Studio Recherche KDP', icon: Search, badge: 'Hub' },
       { to: '/v3/create', label: 'Ebookstudio-Génie', icon: Sparkles, badge: 'Nouveauté IA' },
       { to: '/v3/create?sommaire=ia', label: 'Sommaire IA (dialogue)', icon: ListTree, badge: 'Nouveauté IA' },
@@ -40,6 +38,7 @@ const NAV: NavSection[] = [
       { to: '/kdp-keywords?tab=backend7', label: '7 mots-clés backend', icon: Search },
       { to: '/v3/recherche?tab=desc', label: 'Description KDP', icon: FileText },
       { to: '/v3/recherche?tab=cat', label: '3 Catégories KDP', icon: ListTree },
+      { to: '/v3/fonctionnalites', label: 'Fonctionnalités (12 modules)', icon: LayoutGrid, end: true, badge: 'Hub' },
       { to: '/v3/recherche?tab=bio', label: 'Bio auteur', icon: User },
       { to: '/v3/recherche?tab=aplus', label: 'Contenu A+ Amazon', icon: Award, badge: 'Pro' },
       { to: '/audit-pilot', label: 'KDP Pilot — Audit', icon: Award },
