@@ -760,14 +760,52 @@ export default function V3CorrecteurPage() {
               {latinRemoved > 0 && <span style={{ color: 'var(--v3-emerald)' }}>{latinRemoved} expression(s) latine(s) supprimée(s)</span>}
               {endingsFixed > 0 && <span style={{ color: 'var(--v3-emerald)' }}>{endingsFixed} fin(s) de chapitre complétée(s)</span>}
               {blockFailures > 0 && <span style={{ color: '#b45309' }}>{blockFailures} passage(s) non corrigé(s)</span>}
+              {typoFixed > 0 && <span style={{ color: 'var(--v3-emerald)' }}>{typoFixed} correction(s) typographiques</span>}
               {running && (
                 <span>
                   En cours : chapitre {current + 1} / {chapters.length}
+                  {passInfo ? ` · passe ${passInfo.pass}/${passInfo.total} — ${passInfo.label}` : ''}
                   {waitInfo ? ` · ${waitInfo.reason} — nouvelle tentative dans ${waitInfo.seconds} s` : '…'}
                 </span>
               )}
             </div>
+
+            <div className="mt-3 flex flex-wrap gap-2">
+              {PASS_LABELS.map((label, i) => {
+                const active = running && passInfo?.pass === i + 1;
+                const skipped = mode === 'strict' && i === 2;
+                return (
+                  <span
+                    key={label}
+                    className="text-[11.5px] rounded-full border px-2.5 py-1"
+                    style={{
+                      borderColor: active ? 'var(--v3-emerald)' : 'var(--v3-line)',
+                      background: active ? '#eef7f2' : '#fbfbfa',
+                      color: skipped ? 'var(--v3-muted)' : 'var(--v3-emerald)',
+                      opacity: skipped ? 0.55 : 1,
+                    }}
+                  >
+                    Passe {i + 1} · {label}{skipped ? ' (polissage uniquement)' : ''}
+                  </span>
+                );
+              })}
+            </div>
           </div>
+
+          {!running && nameIssues.length > 0 && (
+            <div className="mt-4 rounded-xl border p-4" style={{ borderColor: 'var(--v3-line)', background: '#fbfbfa' }}>
+              <p className="text-[13px] font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+                Noms propres écrits de plusieurs façons dans le livre — orthographe de référence retenue :
+              </p>
+              <ul className="mt-2 space-y-1">
+                {nameIssues.slice(0, 12).map((n) => (
+                  <li key={n.retained} className="text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
+                    <strong style={{ color: 'var(--v3-ink)' }}>{n.retained}</strong> — variantes rencontrées : {n.variants.join(', ')}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {!running && failedCount > 0 && (
             <div className="mt-4 rounded-xl border p-4 flex flex-wrap items-center justify-between gap-3"
