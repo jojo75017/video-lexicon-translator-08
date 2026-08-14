@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Feather, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { clearAdminCache, getIsCurrentSessionAdmin } from '@/lib/adminAccess';
+import { getAuthenticatedHomePath } from '@/lib/authDestination';
 
 export default function V3AuthPage() {
   const [params] = useSearchParams();
@@ -11,6 +13,26 @@ export default function V3AuthPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const redirectExistingSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+
+        const destination = await getAuthenticatedHomePath(getIsCurrentSessionAdmin);
+        if (!cancelled) nav(destination, { replace: true });
+      } finally {
+        if (!cancelled) setCheckingSession(false);
+      }
+    };
+
+    void redirectExistingSession();
+    return () => { cancelled = true; };
+  }, [nav]);
 
   const strength = (() => {
     let s = 0;
@@ -36,8 +58,10 @@ export default function V3AuthPage() {
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        clearAdminCache();
+        const destination = await getAuthenticatedHomePath(getIsCurrentSessionAdmin);
         toast.success('Connexion réussie ✓');
-        nav('/v3/library');
+        nav(destination, { replace: true });
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Erreur inconnue';
@@ -46,6 +70,14 @@ export default function V3AuthPage() {
       setLoading(false);
     }
   };
+
+  if (checkingSession) {
+    return (
+      <main className="min-h-[calc(100vh-4rem)] grid place-items-center" aria-busy="true">
+        <Loader2 className="w-6 h-6 animate-spin text-[var(--v3-orange)]" />
+      </main>
+    );
+  }
 
   return (
     <section className="v3-halo min-h-[calc(100vh-4rem)] grid place-items-center px-5 py-16">

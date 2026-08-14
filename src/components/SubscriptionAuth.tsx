@@ -17,6 +17,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
+import { ADMIN_HOME_PATH } from '@/config/adminRoutes';
 
 interface SubscriptionAuthProps {
   onAuthenticated: (email: string, subscriber: any) => void;
@@ -71,7 +72,7 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
       if (isAdmin) {
         setHasAdminSession(true);
         toast.success('Accès admin confirmé');
-        navigate('/dashboard');
+        navigate(ADMIN_HOME_PATH, { replace: true });
       } else {
         setHasAdminSession(false);
         toast.error('Accès refusé', {
