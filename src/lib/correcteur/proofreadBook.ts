@@ -117,6 +117,10 @@ export interface ProofreadResult {
   blockFailures: number;
   endingFixed: boolean;
   endingIssue?: string;
+  /** Passes réellement appliquées sur ce chapitre. */
+  passes?: string[];
+  /** Défauts typographiques réparés localement (guillemets, espaces, apostrophes…). */
+  typoFixed?: number;
 }
 
 /** Notification d'attente (limite de débit) pour l'interface. */
@@ -126,6 +130,21 @@ export function setProofreadWaitNotifier(fn: WaitNotifier | null) {
   waitNotifier = fn;
 }
 
+/** Notification de passe en cours (Correction / Typographie / Édition / Contrôle). */
+export type PassNotifier = (info: { pass: number; total: number; label: string } | null) => void;
+let passNotifier: PassNotifier | null = null;
+export function setProofreadPassNotifier(fn: PassNotifier | null) {
+  passNotifier = fn;
+}
+
+/** Relevé de cohérence du livre, transmis à chaque appel IA. */
+let bookContext: BookContext | null = null;
+export function setProofreadBookContext(ctx: BookContext | null) {
+  bookContext = ctx;
+}
+
+export const PASS_LABELS = ['Correction', 'Typographie française', 'Édition', 'Contrôle final'];
+
 const BACKOFF_MS = [5000, 15000];
 
 async function waitWithNotice(ms: number, reason: string) {
@@ -134,7 +153,7 @@ async function waitWithNotice(ms: number, reason: string) {
   waitNotifier?.(null);
 }
 
-type CallMode = ProofreadMode | 'latin-fix' | 'ending-fix';
+type CallMode = ProofreadMode | 'latin-fix' | 'ending-fix' | 'edition' | 'final-check';
 
 interface CallResult {
   corrected: string;
