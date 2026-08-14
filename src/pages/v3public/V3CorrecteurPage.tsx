@@ -863,6 +863,21 @@ export default function V3CorrecteurPage() {
             </div>
           )}
 
+          {!running && doneCount > 0 && (
+            <div className="mt-4">
+              <button
+                type="button"
+                onClick={copyEditorialReport}
+                className="rounded-lg border px-3 py-2 text-[13px] font-semibold"
+                style={{ borderColor: 'var(--v3-line)', color: 'var(--v3-ink)' }}
+              >
+                📋 Copier le rapport d’édition
+              </button>
+              <p className="mt-1 text-[12px]" style={{ color: 'var(--v3-muted)' }}>
+                Passes appliquées, corrections par chapitre, latin restant et fins de chapitre à revoir.
+              </p>
+            </div>
+          )}
 
 
 
