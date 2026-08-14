@@ -64,12 +64,14 @@ const ClosingCampaignPanel = () => {
     setBusy(template);
     try {
       const data = await call({ mode: 'send', template, dry_run: true });
-      toast.success(`${data.would_send} destinataires seraient contactés`);
+      const eligible = Number(data.eligible_total ?? data.would_send ?? 0);
+      toast.success(`${data.would_send} destinataires dans cette vague — ${eligible} éligibles au total`);
     } catch (err) {
       toast.error('Simulation impossible : ' + ((err as Error).message || ''));
     }
     setBusy(null);
   };
+
 
   const sendTest = async (template: string) => {
     const email = testEmail.trim();
