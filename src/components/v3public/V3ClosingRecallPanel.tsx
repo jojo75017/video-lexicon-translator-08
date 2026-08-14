@@ -22,14 +22,21 @@ export default function V3ClosingRecallPanel({ className = '' }: { className?: s
           border: `1px solid ${GOLD}55`,
         }}
       >
-        <h2 className="v3-serif text-2xl md:text-3xl font-semibold text-white leading-tight">
-          Cette page est un rappel de tout ce que vous avez déjà
+        <div
+          className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em]"
+          style={{ background: `${GOLD}22`, color: GOLD, border: `1px solid ${GOLD}55` }}
+        >
+          <span aria-hidden>📌</span> Encart de démarrage
+        </div>
+
+        <h2 className="v3-serif mt-4 text-2xl md:text-3xl font-semibold text-white leading-tight">
+          Cette page vous montre tout ce que contient l’outil
         </h2>
         <p className="mt-3 text-[14.5px] leading-relaxed text-white/85 max-w-2xl mx-auto">
-          Tous les outils sont accessibles depuis les onglets du menu :
+          Pour démarrer un livre, utilisez les onglets dans la barre en haut. Chaque onglet mène directement au module concerné :
         </p>
 
-        <ul className="mt-4 flex flex-wrap items-center justify-center gap-2">
+        <ul className="mt-5 flex flex-wrap items-center justify-center gap-2">
           {TABS.map((t) => (
             <li
               key={t}
@@ -50,7 +57,7 @@ export default function V3ClosingRecallPanel({ className = '' }: { className?: s
         </div>
 
         <p className="mt-8 v3-serif text-[20px] md:text-[24px] italic" style={{ color: GOLD }}>
-          À votre succès.
+          À vos livres — et à votre succès.
         </p>
       </div>
     </section>
