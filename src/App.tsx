@@ -308,7 +308,8 @@ const App = () => {
 
       subscription.unsubscribe();
     };
-  }, []);
+  }, [adminRetry]);
+
 
   const handleAuthenticated = useCallback((email: string, data: any) => {
     setSubscriberEmail(email);
