@@ -92,25 +92,25 @@ export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMod
   /* ---------------------------- Variante compacte ---------------------------- */
   if (variant === 'compact') {
     return (
-      <section className="max-w-7xl mx-auto px-5 md:px-8 py-10">
-        <div className="rounded-[28px] border p-6 md:p-8" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <section className="max-w-7xl mx-auto px-5 md:px-8 py-6">
+        <div className="rounded-[24px] border p-4 md:p-5" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="min-w-0">
-              <span className="v3-chip v3-chip-orange"><BookOpen className="h-3.5 w-3.5" /> Mon livre en préparation</span>
-              <h2 className="v3-serif mt-3 text-3xl font-bold" style={{ color: 'var(--v3-ink)' }}>
+              <span className="v3-chip v3-chip-orange text-[11px]"><BookOpen className="h-3 w-3" /> Mon livre en préparation</span>
+              <h2 className="v3-serif mt-2 text-xl md:text-2xl font-bold" style={{ color: 'var(--v3-ink)' }}>
                 {brief.title?.trim() || 'Projet sans titre'}
               </h2>
-              <p className="mt-1 text-sm" style={{ color: 'var(--v3-muted)' }}>
+              <p className="mt-0.5 text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
                 {[brief.category, chapters ? `${chapters} chapitres` : null,
                   brief.outlineValidated && outline.length ? `sommaire validé (${outline.length})` : 'sommaire à valider',
                 ].filter(Boolean).join(' · ')}
               </p>
               {brief.promesseCentrale?.trim() && (
-                <p className="mt-2 text-sm italic" style={{ color: 'var(--v3-ink)' }}>✨ {brief.promesseCentrale}</p>
+                <p className="mt-1.5 text-[12.5px] italic" style={{ color: 'var(--v3-ink)' }}>✨ {brief.promesseCentrale}</p>
               )}
             </div>
-            <Link to="/v3/create" className="v3-btn v3-btn-primary shrink-0">
-              <ArrowRight className="h-4 w-4" /> Continuer mon livre
+            <Link to="/v3/create" className="v3-btn v3-btn-primary text-[13px] px-4 py-2.5 shrink-0">
+              <ArrowRight className="h-4 w-4" /> Continuer
             </Link>
           </div>
         </div>
