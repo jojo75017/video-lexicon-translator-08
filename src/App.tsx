@@ -10,8 +10,10 @@ import { AdminGate } from '@/components/auth/AdminGate';
 import { V3Gate } from '@/components/auth/V3Gate';
 import { V3LockedGate } from '@/components/v3/V3LockedGate';
 import { BookPerfectGate } from '@/components/auth/BookPerfectGate';
-import { clearAdminCache, getIsCurrentSessionAdmin } from '@/lib/adminAccess';
+import { clearAdminCache, getIsCurrentSessionAdmin, resolveAdminStatus } from '@/lib/adminAccess';
 import { Loader2 } from 'lucide-react';
+import AccessPendingFallback from '@/components/auth/AccessPendingFallback';
+
 import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup';
 import { FirstEbookOnboarding } from '@/components/onboarding/FirstEbookOnboarding';
 import AssistantFloatingButton from '@/components/assistant/AssistantFloatingButton';
@@ -206,20 +208,53 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [subscriberEmail, setSubscriberEmail] = useState('');
   const [subscriberData, setSubscriberData] = useState<any>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-  /** Passe à true dès que la vérification de session/admin est terminée. */
-  const [isAdminChecked, setIsAdminChecked] = useState(false);
+  /**
+   * `null` = statut admin encore inconnu. Aucune redirection ne doit être
+   * décidée dans cet état, sinon un admin dont la session se restaure est
+   * renvoyé vers la page de vente.
+   */
+  const [adminStatus, setAdminStatus] = useState<boolean | null>(null);
+  /** Vrai quand la vérification dure anormalement longtemps. */
+  const [adminTimedOut, setAdminTimedOut] = useState(false);
+  const [adminRetry, setAdminRetry] = useState(0);
+  const isAdmin = adminStatus === true;
+  const isAdminChecked = adminStatus !== null;
 
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
 
-  useEffect(() => {
-    const safetyTimer = setTimeout(() => {
-      console.warn('Safety timer triggered – forcing auth check complete');
-      setIsCheckingAuth(false);
-      setIsAdminChecked(true);
-    }, 6000);
 
+  useEffect(() => {
+    let cancelled = false;
+    // Le minuteur n'invente aucun statut : il signale seulement une attente
+    // anormale pour proposer des sorties directes (admin / V2).
+    const safetyTimer = setTimeout(() => {
+      setIsCheckingAuth(false);
+      setAdminTimedOut(true);
+    }, 8000);
+
+    /** Résout le rôle sans jamais conclure « visiteur » sur un statut inconnu. */
+    const resolve = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) {
+          // Pas de session : laisser une chance à la restauration avant de conclure.
+          await new Promise((r) => setTimeout(r, 600));
+          const { data: { session: retry } } = await supabase.auth.getSession();
+          if (cancelled) return;
+          if (!retry?.user) {
+            setAdminStatus(false);
+            return;
+          }
+        }
+        const status = await resolveAdminStatus();
+        if (cancelled) return;
+        // Un admin confirmé n'est jamais rétrogradé.
+        setAdminStatus((prev) => (prev === true ? true : status));
+      } catch (error) {
+        console.error('Erreur session admin:', error);
+      }
+    };
 
     const initAuth = async () => {
       const savedEmail = localStorage.getItem('subscriber_email');
@@ -246,21 +281,7 @@ const App = () => {
       }
 
       setIsCheckingAuth(false);
-
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          const adminStatus = await getIsCurrentSessionAdmin();
-          setIsAdmin(adminStatus);
-        } else {
-          setIsAdmin(false);
-        }
-      } catch (error) {
-        console.error('Erreur session admin:', error);
-      } finally {
-        setIsAdminChecked(true);
-      }
-
+      await resolve();
     };
 
 
@@ -270,28 +291,27 @@ const App = () => {
       const shouldRecheckAdmin =
         (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') && !!session;
       if (shouldRecheckAdmin && session?.user) {
-        setIsAdminChecked(false);
-        setTimeout(async () => {
-          clearAdminCache();
-          const adminStatus = await getIsCurrentSessionAdmin();
-          setIsAdmin(adminStatus);
-          setIsAdminChecked(true);
-        }, 0);
+        // Aucun clearAdminCache ici : un rafraîchissement de jeton ne doit pas
+        // effacer un statut admin déjà confirmé.
+        setTimeout(() => { void resolve(); }, 0);
         return;
       }
       if (event === 'SIGNED_OUT') {
         clearAdminCache();
-        setIsAdmin(false);
-        setIsAdminChecked(true);
+        setAdminStatus(false);
+        setAdminTimedOut(false);
       }
 
     });
 
     return () => {
+      cancelled = true;
       clearTimeout(safetyTimer);
+
       subscription.unsubscribe();
     };
-  }, []);
+  }, [adminRetry]);
+
 
   const handleAuthenticated = useCallback((email: string, data: any) => {
     setSubscriberEmail(email);
@@ -331,6 +351,14 @@ const App = () => {
     setSubscriberEmail('');
     setSubscriberData(null);
   }, []);
+
+  /** Relance la vérification du rôle sans recharger la page. */
+  const handleAdminRetry = useCallback(() => {
+    setAdminTimedOut(false);
+    setAdminRetry((n) => n + 1);
+  }, []);
+
+
 
   const isPlannerPreviewHost =
     typeof window !== 'undefined' &&
@@ -395,10 +423,11 @@ const App = () => {
               path="/"
               element={
                 isCheckingAuth || !homePath
-                  ? <div className="min-h-screen" aria-busy="true" />
+                  ? <AccessPendingFallback timedOut={adminTimedOut} onRetry={handleAdminRetry} />
                   : <Navigate to={homePath} replace />
               }
             />
+
 
 
 
