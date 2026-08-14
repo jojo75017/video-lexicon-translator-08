@@ -477,7 +477,7 @@ const App = () => {
             <Route path="/campagne-vente" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
             <Route path="/dashboard-marketing" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
             <Route path="/generateur-posts" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
-            <Route path="/dashboard" element={!homePath ? <PageLoader /> : <Navigate to={homePath} replace />} />
+            <Route path="/dashboard" element={<Navigate to="/ebook-planner" replace />} />
             <Route path="/espace" element={!homePath ? <PageLoader /> : <Navigate to={homePath} replace />} />
             <Route path="/espace/lancement" element={!homePath ? <PageLoader /> : <Navigate to={homePath} replace />} />
             <Route path="/tableau-de-bord" element={!homePath ? <PageLoader /> : <Navigate to={homePath} replace />} />
