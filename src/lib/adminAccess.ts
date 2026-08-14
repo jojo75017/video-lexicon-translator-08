@@ -26,10 +26,16 @@ export function subscribeAdminStatus(fn: Listener): () => void {
 }
 
 async function checkOnce(): Promise<boolean | null> {
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+  if (sessionError) return null;
+  if (!session) return false;
+
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   // Erreur réseau : statut inconnu (null) pour permettre une nouvelle tentative.
   if (userError) return null;
-  if (!user) return false;
+  // Une session existe mais l'utilisateur n'est pas encore restauré : ne jamais
+  // mémoriser ce décalage transitoire comme un refus administrateur définitif.
+  if (!user) return null;
 
   const { data: roleResult, error: roleError } = await supabase.rpc('has_role', {
     _user_id: user.id,
@@ -48,7 +54,10 @@ async function checkOnce(): Promise<boolean | null> {
  * pour un simple visiteur. Une seconde tentative est effectuée en cas d'erreur.
  */
 export async function getIsCurrentSessionAdmin(): Promise<boolean> {
-  if (cachedResult !== null) return cachedResult;
+  // Un rôle admin confirmé reste valable pour la session. En revanche, un
+  // résultat négatif est toujours revérifié : il peut provenir d'une session
+  // encore en cours de restauration au chargement direct d'une page V3.
+  if (cachedResult === true) return true;
   if (pendingCheck) return pendingCheck;
 
   pendingCheck = (async () => {

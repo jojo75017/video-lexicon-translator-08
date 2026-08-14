@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, LogIn, User, Mail, GraduationCap, Menu, X } from 'lucide-react';
 import BlogExternalLink from './BlogExternalLink';
+import { ADMIN_HOME_PATH } from '@/config/adminRoutes';
 
 /**
  * Header V3 — Ligne 1 (barre de marque premium).
  * Fond émeraude profond, accent or, typo sérif. La ligne 2 (mega-menu
  * catégories) est rendue par V3MainTabs juste en dessous.
  */
-export default function V3Header({ isAuthed = false }: { isAuthed?: boolean }) {
+export default function V3Header({ isAuthed = false, isAdmin = false }: { isAuthed?: boolean; isAdmin?: boolean }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState('');
   const nav = useNavigate();
@@ -76,6 +77,11 @@ export default function V3Header({ isAuthed = false }: { isAuthed?: boolean }) {
           <Link to="/ebook-planner" className="v3-btn v3-btn-on-dark text-[12.5px]" title="Basculer sur EbookStudio V2">
             Basculer V2
           </Link>
+          {isAdmin && (
+            <Link to={ADMIN_HOME_PATH} className="v3-btn v3-btn-on-dark text-[12.5px]" title="Ouvrir le dashboard administrateur">
+              Dashboard admin
+            </Link>
+          )}
 
           <span className="w-px h-6 mx-1" style={{ background: 'rgba(201,168,76,0.25)' }} />
 
@@ -153,6 +159,11 @@ export default function V3Header({ isAuthed = false }: { isAuthed?: boolean }) {
             <Link to="/ebook-planner" onClick={() => setOpen(false)} className="v3-btn v3-btn-on-dark w-full justify-center">
               Basculer V2
             </Link>
+            {isAdmin && (
+              <Link to={ADMIN_HOME_PATH} onClick={() => setOpen(false)} className="v3-btn v3-btn-on-dark w-full justify-center">
+                Dashboard admin
+              </Link>
+            )}
           </div>
         </div>
       )}
