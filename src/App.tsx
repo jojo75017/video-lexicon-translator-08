@@ -206,11 +206,20 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [subscriberEmail, setSubscriberEmail] = useState('');
   const [subscriberData, setSubscriberData] = useState<any>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-  /** Passe à true dès que la vérification de session/admin est terminée. */
-  const [isAdminChecked, setIsAdminChecked] = useState(false);
+  /**
+   * `null` = statut admin encore inconnu. Aucune redirection ne doit être
+   * décidée dans cet état, sinon un admin dont la session se restaure est
+   * renvoyé vers la page de vente.
+   */
+  const [adminStatus, setAdminStatus] = useState<boolean | null>(null);
+  /** Vrai quand la vérification dure anormalement longtemps. */
+  const [adminTimedOut, setAdminTimedOut] = useState(false);
+  const [adminRetry, setAdminRetry] = useState(0);
+  const isAdmin = adminStatus === true;
+  const isAdminChecked = adminStatus !== null;
 
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
 
 
   useEffect(() => {
