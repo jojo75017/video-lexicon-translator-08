@@ -83,6 +83,14 @@ const ENGINES: Engine[] = [
     icon: Languages,
     to: '/v3/outils/traduction',
   },
+  {
+    role: 'Partenariat',
+    title: 'KDP Pilot',
+    engine: 'Suivi des ventes & concurrence',
+    desc: 'Historique des positions, ventes estimées et analyse de niche, chaque jour.',
+    icon: LineChart,
+    to: '/go/kdp-pilot',
+  },
 ];
 
 const BENEFITS = [
