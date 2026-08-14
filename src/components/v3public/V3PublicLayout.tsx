@@ -9,7 +9,12 @@ import V3Sidebar from './V3Sidebar';
 import V3ContemplationMode from '@/components/v3/V3ContemplationMode';
 import V3AdminQuickAccess from './V3AdminQuickAccess';
 
-export default function V3PublicLayout() {
+type V3PublicLayoutProps = {
+  isAdmin: boolean;
+  isAdminChecking: boolean;
+};
+
+export default function V3PublicLayout({ isAdmin, isAdminChecking }: V3PublicLayoutProps) {
   const [isAuthed, setIsAuthed] = useState(false);
 
   useEffect(() => {
@@ -21,9 +26,9 @@ export default function V3PublicLayout() {
   return (
     <V3ContemplationMode>
       <div className="v3pub min-h-screen flex flex-col">
-        <V3Header isAuthed={isAuthed} />
+        <V3Header isAuthed={isAuthed} isAdmin={isAdmin} />
         <V3MainTabs />
-        <V3AdminQuickAccess />
+        <V3AdminQuickAccess isAdmin={isAdmin} isAdminChecking={isAdminChecking} />
         <div className="flex flex-1 w-full">
           <V3Sidebar />
           <main className="flex-1 min-w-0">

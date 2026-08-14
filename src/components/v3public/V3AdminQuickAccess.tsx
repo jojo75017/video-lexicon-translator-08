@@ -3,7 +3,6 @@ import { BookOpen, Eye, EyeOff, Mail, Shield, ShieldCheck, Users } from 'lucide-
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import useIsAdmin from '@/hooks/useIsAdmin';
 import { ADMIN_HOME_PATH } from '@/config/adminRoutes';
 import {
   ADMIN_PREVIEW_AS_SUBSCRIBER_KEY,
@@ -21,9 +20,13 @@ const ACCESS_LINKS = [
  * Barre d'accès rapide réservée à l'admin : bascule V2 / V3, outils internes,
  * et interrupteur « Voir comme un abonné » pour tester le parcours verrouillé.
  */
-export default function V3AdminQuickAccess() {
+type V3AdminQuickAccessProps = {
+  isAdmin: boolean;
+  isAdminChecking: boolean;
+};
+
+export default function V3AdminQuickAccess({ isAdmin, isAdminChecking }: V3AdminQuickAccessProps) {
   const navigate = useNavigate();
-  const { isAdmin } = useIsAdmin();
   const [preview, setPreview] = useState(isPreviewingAsSubscriber);
 
   useEffect(() => {
@@ -32,7 +35,7 @@ export default function V3AdminQuickAccess() {
     return () => window.removeEventListener('v3-admin-preview-change', sync);
   }, []);
 
-  if (isAdmin !== true) return null;
+  if (isAdminChecking || !isAdmin) return null;
 
   const togglePreview = () => {
     const next = !preview;
@@ -75,7 +78,7 @@ export default function V3AdminQuickAccess() {
             onClick={() => navigate(path)}
           >
             <Icon className="mr-1.5 h-4 w-4" />
-            {label}
+            {label === 'Admin' ? 'Dashboard admin' : label}
           </Button>
         ))}
 
