@@ -253,9 +253,12 @@ const App = () => {
         }
       } catch (error) {
         console.error('Erreur session admin:', error);
+      } finally {
+        setIsAdminChecked(true);
       }
 
     };
+
 
     initAuth();
 
