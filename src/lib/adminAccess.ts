@@ -49,31 +49,28 @@ async function checkOnce(): Promise<boolean | null> {
 }
 
 /**
- * Revalide l'utilisateur puis vérifie le rôle admin en base.
- * Le résultat est mémorisé : un aléa réseau ne fait plus passer un admin
- * pour un simple visiteur. Une seconde tentative est effectuée en cas d'erreur.
+ * Résout le statut admin en distinguant clairement les trois états :
+ * `true` (admin confirmé), `false` (confirmé non-admin), `null` (inconnu).
+ * Un `true` confirmé n'est jamais rétrogradé pendant la session.
  */
-export async function getIsCurrentSessionAdmin(): Promise<boolean> {
-  // Un rôle admin confirmé reste valable pour la session. En revanche, un
-  // résultat négatif est toujours revérifié : il peut provenir d'une session
-  // encore en cours de restauration au chargement direct d'une page V3.
+export async function resolveAdminStatus(): Promise<boolean | null> {
   if (cachedResult === true) return true;
   if (pendingCheck) return pendingCheck;
 
   pendingCheck = (async () => {
     try {
       let result = await checkOnce();
-      if (result === null) {
-        // Session peut-être encore en cours de restauration : une seconde chance.
-        await new Promise((r) => setTimeout(r, 800));
+      // Session peut-être encore en cours de restauration : 2 nouvelles chances.
+      for (let attempt = 0; attempt < 2 && result === null; attempt++) {
+        await new Promise((r) => setTimeout(r, 700));
         result = await checkOnce();
       }
-      if (result === null) return false; // inconnu : on n'accorde rien, mais on ne mémorise pas
+      if (result === null) return null; // inconnu : on ne conclut rien
       publish(result);
       return result;
     } catch (error) {
       console.error('Vérification de la session admin en échec :', error);
-      return false;
+      return null;
     } finally {
       pendingCheck = null;
     }
@@ -82,6 +79,15 @@ export async function getIsCurrentSessionAdmin(): Promise<boolean> {
   return pendingCheck;
 }
 
+/**
+ * Variante booléenne pour les appelants qui ne savent pas gérer l'inconnu :
+ * un statut inconnu n'accorde aucun droit, mais n'est jamais mémorisé.
+ */
+export async function getIsCurrentSessionAdmin(): Promise<boolean> {
+  return (await resolveAdminStatus()) === true;
+}
+
+/** À réserver à la déconnexion : efface un statut admin confirmé. */
 export function clearAdminCache() {
   pendingCheck = null;
   publish(null);
@@ -91,3 +97,4 @@ export function clearAdminCache() {
     // Browser storage may be unavailable.
   }
 }
+
