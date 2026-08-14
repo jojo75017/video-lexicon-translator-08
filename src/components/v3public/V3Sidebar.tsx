@@ -63,6 +63,8 @@ const NAV: NavSection[] = [
       { to: '/v3/pourquoi', label: 'Pourquoi EbookStudio', icon: Award },
       { to: '/v3/realite-kdp', label: 'Combien gagnent les auteurs KDP', icon: BookOpen },
 
+      { to: '/v3/avis', label: '⭐ Obtenir des avis clients', icon: Star, badge: 'Marche à suivre' },
+
       { to: '/communaute', label: 'Communauté (Q&R)', icon: Award, badge: '220+' },
       { to: '/v3/script-heygen', label: 'Script vidéo HeyGen', icon: Video, badge: 'Pour vous' },
       { to: '/v3/outils', label: 'Tous les outils', icon: ListTree },
