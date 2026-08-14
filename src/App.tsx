@@ -203,14 +203,19 @@ const App = () => {
   const [subscriberEmail, setSubscriberEmail] = useState('');
   const [subscriberData, setSubscriberData] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  /** Passe à true dès que la vérification de session/admin est terminée. */
+  const [isAdminChecked, setIsAdminChecked] = useState(false);
 
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
 
   useEffect(() => {
     const safetyTimer = setTimeout(() => {
       console.warn('Safety timer triggered – forcing auth check complete');
       setIsCheckingAuth(false);
+      setIsAdminChecked(true);
     }, 6000);
+
 
     const initAuth = async () => {
       const savedEmail = localStorage.getItem('subscriber_email');
@@ -248,9 +253,12 @@ const App = () => {
         }
       } catch (error) {
         console.error('Erreur session admin:', error);
+      } finally {
+        setIsAdminChecked(true);
       }
 
     };
+
 
     initAuth();
 
@@ -363,7 +371,17 @@ const App = () => {
             />
 
             {/* Accueil : admin vers le panneau admin, client vers son espace, visiteur vers l'offre */}
-            <Route path="/" element={<Navigate to={isAdmin ? ADMIN_HOME_PATH : (hasPlannerAccess ? '/ebook-planner' : '/commander')} replace />} />
+            {/* Racine : on attend que la session soit connue avant de rediriger,
+                sinon un abonné / admin était envoyé sur la page de vente. */}
+            <Route
+              path="/"
+              element={
+                isCheckingAuth || !isAdminChecked
+                  ? <div className="min-h-screen" aria-busy="true" />
+                  : <Navigate to={isAdmin ? ADMIN_HOME_PATH : (hasPlannerAccess ? '/v3' : '/commander')} replace />
+              }
+            />
+
 
 
             {/* Marketing */}
