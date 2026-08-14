@@ -128,6 +128,12 @@ Chute : « Des coachs, consultants, créateurs, experts locaux, chefs d'entrepri
 
 Note : licence commerciale incluse dans les deux forfaits (Plume et Édition), sans option payante supplémentaire.
 
+## Modules ou pas ? (parties 4 à 7)
+- **Partie 4 — Public cible : module.** Vrai bloc visuel sur l'accueil V3 (`V3AudiencePanel`), 10 cartes non cliquables, purement informatives.
+- **Partie 5 — Garantie 30 jours : module.** Bloc `V3GuaranteePanel`, non cliquable (aucun lien de paiement).
+- **Partie 6 — Licence commerciale : module.** Bloc `V3CommercialLicensePanel`, non cliquable, mention « incluse dans Plume et Édition ».
+- **Partie 7 — pas un module.** Ce sont des correctifs d'affichage et de routage sur des éléments déjà existants (bandeau KDP Pilot, champs du module des livres, page d'arrivée, purge de cache).
+
 ## Partie 7 — Correctifs d'affichage (et respect de la V2)
 1. Bandeau compact KDP Pilot conservé au-dessus du module des livres, code `PROMO15`.
 2. Champs « Commencez votre livre » resserrés : une ligne sur ordinateur, paddings et historique réduits.
