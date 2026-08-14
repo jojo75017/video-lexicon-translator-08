@@ -370,14 +370,14 @@ const App = () => {
             {/* Visiteurs non connectés → page de commande publique (plus de mur de login) */}
             <Route path="/offres" element={
               hasPlannerAccess
-                ? <Navigate to="/ebook-planner" replace />
+                ? <Navigate to="/v3" replace />
                 : (isAuthenticated
                     ? <SubscriptionPage subscriberEmail={subscriberEmail} subscriberData={subscriberData} onLogout={handleLogout} />
                     : <Navigate to="/commander" replace />)
             } />
             <Route path="/connexion-abonne" element={
               isAuthenticated
-                ? <Navigate to="/offres" replace />
+                ? <Navigate to="/v3" replace />
                 : <SubscriptionAuth onAuthenticated={handleAuthenticated} />
             } />
             <Route path="/login" element={<Navigate to="/connexion-abonne" replace />} />

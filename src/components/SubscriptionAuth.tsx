@@ -154,7 +154,7 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
         localStorage.setItem('ebook_planner_active_tab', 'workflow-dashboard');
         toast.success(`Bienvenue ! Plan ${data.subscriber.plan_type}`);
         onAuthenticated(normalizedEmail, data.subscriber);
-        window.location.href = '/ebook-planner';
+        window.location.href = '/v3';
       } else {
         toast.error(data.message || 'Abonnement non trouvé');
       }
