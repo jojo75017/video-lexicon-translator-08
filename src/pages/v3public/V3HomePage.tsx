@@ -46,6 +46,10 @@ export default function V3HomePage() {
 
   return (
     <>
+      {/* BANDEAU D'ACCROCHE — premier module */}
+      <V3HeroBanner />
+
+
       {/* BANNIÈRE — Migration V2 vers V3 (3 modules offerts) */}
       <section
         style={{
