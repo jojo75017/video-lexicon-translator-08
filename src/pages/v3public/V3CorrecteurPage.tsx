@@ -123,6 +123,7 @@ export default function V3CorrecteurPage() {
   const endingsFixed = chapters.filter((c) => c.endingFixed).length;
   const endingIssues = chapters.filter((c) => c.endingIssue);
   const blockFailures = chapters.reduce((s, c) => s + (c.blockFailures || 0), 0);
+  const typoFixed = chapters.reduce((s, c) => s + (c.typoFixed || 0), 0);
 
 
   const loadManuscript = useCallback((m: Manuscript) => {
