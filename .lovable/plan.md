@@ -141,17 +141,39 @@ Note : licence commerciale incluse dans les deux forfaits (Plume et Édition), s
 4. Un lien clair « Ouvrir l'espace de travail V2 » dans l'accueil V3, pour y retourner en un clic.
 5. Rafraîchissement propre après reconnexion : purge unique des service workers et de Cache Storage (mécanisme déjà présent dans `sitePurge`/`chunkErrorRecovery`), garde-fou anti-boucle, sans toucher aux livres, clés API ni profils.
 
+## Confirmation
+- Oui : les champs « Commencez votre livre » sont **réduits** (une seule ligne sur ordinateur, paddings et historique resserrés).
+- Oui : l'**encart compact KDP Pilot** est bien remis en place, juste au-dessus du module des livres, avec le code `PROMO15`.
+- Juste en dessous du module des livres démarrent les sections de conviction (moteurs, marché, avant/après, public, garantie, licence), dans l'esprit de l'image de référence mais avec nos propres moteurs et nos icônes — aucune marque tierce.
+
+## Partie 8 — Module de clôture « Tout est déjà à votre portée »
+Dernier bloc de l'accueil V3, ton chaleureux, non commercial :
+
+```text
+┌──────────────────────────────────────────────────────────────────────┐
+│  « Cette page est un rappel de tout ce que vous avez déjà. »         │
+│  Tous les outils sont accessibles depuis les onglets du menu :       │
+│  Plan · Écrire · Habiller · Publier · Vendre · Livres spéciaux       │
+│  → Voir les 12 modules  ·  → Tous les outils  ·  → Support           │
+│                                                                      │
+│              « À votre succès. »                                     │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+Trois liens réels uniquement : `/v3/fonctionnalites`, `/v3/outils`, `/v3/contact`.
+
 ## Ordre final de l'accueil V3
 1. Bandeau d'accroche « Premier agent d'édition IA multi-modèle au monde ».
-2. Section « Moteur de publication multi-modèles » (nos 7 moteurs).
+2. Section « Moteur de publication multi-modèles » (nos 8 encarts, KDP Pilot inclus).
 3. Bandeau compact KDP Pilot.
-4. Module des livres : `V3StartBookBar` compact + `V3BriefRecap`.
+4. Module des livres : `V3StartBookBar` compact + `V3BriefRecap` (champs réduits).
 5. Marché.
 6. Avant / Après.
 7. Public cible.
 8. Garantie 30 jours.
 9. Licence commerciale.
-10. Pied de page.
+10. Module de clôture « Tout est déjà à votre portée » + « À votre succès. »
+11. Pied de page.
 
 ## Vérification
 - `/ebook-planner` s'ouvre normalement et tous ses onglets fonctionnent comme avant.
