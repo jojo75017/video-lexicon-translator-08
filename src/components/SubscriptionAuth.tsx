@@ -16,8 +16,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 import { ADMIN_HOME_PATH } from '@/config/adminRoutes';
+import { useAdminAccess } from '@/contexts/AdminAccessContext';
 
 interface SubscriptionAuthProps {
   onAuthenticated: (email: string, subscriber: any) => void;
@@ -34,26 +34,11 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
   const [hasAdminSession, setHasAdminSession] = useState(false);
   const [isCheckingAdmin, setIsCheckingAdmin] = useState(false);
   const navigate = useNavigate();
+  const adminAccess = useAdminAccess();
 
   useEffect(() => {
-    const checkAdminSession = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-          setHasAdminSession(false);
-          return;
-        }
-
-        const isAdmin = await getIsCurrentSessionAdmin();
-        setHasAdminSession(isAdmin);
-      } catch (error) {
-        console.error('Admin session check error:', error);
-        setHasAdminSession(false);
-      }
-    };
-
-    checkAdminSession();
-  }, []);
+    if (!adminAccess.isChecking) setHasAdminSession(adminAccess.isAdmin);
+  }, [adminAccess.isAdmin, adminAccess.isChecking]);
 
   const handleAdminAccess = async () => {
     setIsCheckingAdmin(true);
@@ -67,7 +52,7 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
         return;
       }
 
-      const isAdmin = await getIsCurrentSessionAdmin();
+      const isAdmin = (await adminAccess.refresh()) === true;
 
       if (isAdmin) {
         setHasAdminSession(true);
