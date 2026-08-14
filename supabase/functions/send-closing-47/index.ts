@@ -293,25 +293,40 @@ Deno.serve(async (req) => {
     const paid = new Set((paidOrders || []).map((r) => normalize(r.email || "")));
     const profiles = new Map((profileRows || []).map((r) => [normalize(r.email || ""), r]));
 
+    // Non-cliqueurs : les ouvreurs d'abord (les plus chauds), puis les autres contacts connus.
+    const allKnown = [...profiles.keys()];
     const pool = letter.segment === "clickers"
       ? [...clickers]
-      : [...openers].filter((email) => !clickers.has(email));
+      : letter.segment === "openers_no_click"
+        ? [...openers].filter((email) => !clickers.has(email))
+        : [
+            ...allKnown.filter((email) => openers.has(email) && !clickers.has(email)),
+            ...allKnown.filter((email) => !openers.has(email) && !clickers.has(email)),
+          ];
 
-    const targets: string[] = [];
+    const eligible: string[] = [];
     for (const email of pool) {
       if (!isEmail(email) || done.has(email) || paid.has(email)) continue;
       const profile = profiles.get(email);
       if (!profile) continue; // on n'écrit qu'aux contacts connus et actifs
       if (profile.unsubscribed === true || profile.status !== "active") continue;
-      targets.push(email);
-      if (targets.length >= limit) break;
+      eligible.push(email);
     }
+    const targets = eligible.slice(0, limit);
 
     if (body.dry_run) {
-      return respond({ success: true, mode, template: letter.key, segment: letter.segment, would_send: targets.length });
+      return respond({
+        success: true,
+        mode,
+        template: letter.key,
+        segment: letter.segment,
+        would_send: targets.length,
+        eligible_total: eligible.length,
+      });
     }
 
     let sent = 0;
+    let quotaReached = false;
     for (const email of targets) {
       const profile = profiles.get(email);
       const result = await sendResendEmailThrottled({
@@ -329,13 +344,31 @@ Deno.serve(async (req) => {
         error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}`,
       });
       if (!result.ok) {
-        if (isQuotaExhausted()) break;
+        if (isQuotaExhausted()) {
+          quotaReached = true;
+          break;
+        }
         continue;
       }
       sent++;
     }
 
-    return respond({ success: true, mode, template: letter.key, segment: letter.segment, sent, targets: targets.length });
+    const remaining = Math.max(0, eligible.length - sent);
+    return respond({
+      success: true,
+      mode,
+      template: letter.key,
+      segment: letter.segment,
+      sent,
+      targets: targets.length,
+      eligible_total: eligible.length,
+      remaining,
+      quota_reached: quotaReached,
+      message: quotaReached
+        ? `Quota journalier d'envoi atteint : ${sent} emails envoyés, ${remaining} restants. Reprise possible demain, sans doublon.`
+        : `${sent} emails envoyés, ${remaining} restants.`,
+    });
+
   } catch (error) {
     console.error("send-closing-47", error);
     return respond({ error: error instanceof Error ? error.message : "Erreur serveur" }, 500);
