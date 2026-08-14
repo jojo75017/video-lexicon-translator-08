@@ -301,9 +301,40 @@ async function fixEnding(
   }
 }
 
+/** Applique une passe IA sur l'ensemble d'un texte, bloc par bloc. */
+async function runPassOverText(
+  title: string,
+  text: string,
+  mode: CallMode,
+): Promise<{ text: string; corrections: Correction[]; failures: number; quality: number }> {
+  const parts = splitForProofread(text, 700);
+  const out: string[] = [];
+  let corrections: Correction[] = [];
+  let failures = 0;
+  let qSum = 0;
+  let qCount = 0;
+  for (let i = 0; i < parts.length; i++) {
+    const res = await proofreadBlock(title, parts[i], mode);
+    out.push(res.text);
+    corrections = [...corrections, ...res.corrections];
+    if (res.failed) failures++;
+    if (res.quality) { qSum += res.quality; qCount++; }
+    if (i < parts.length - 1) await sleep(400);
+  }
+  return {
+    text: out.join('\n\n').trim(),
+    corrections,
+    failures,
+    quality: qCount ? Math.round(qSum / qCount) : 0,
+  };
+}
+
 /**
- * Corrige un chapitre bloc par bloc, élimine le latin, puis garantit que le
- * chapitre se termine par une phrase complète ponctuée.
+ * Correction « maison d'édition » d'un chapitre, en 4 passes successives :
+ *   1. Correction (orthographe, grammaire, accords, ponctuation) + anti-latin
+ *   2. Typographie française (locale, sans IA)
+ *   3. Édition (répétitions, lourdeurs, temps narratifs) — mode polissage
+ *   4. Contrôle final (défauts résiduels, artefacts, noms propres, fin de chapitre)
  */
 export async function proofreadChapter(
   title: string,
@@ -317,6 +348,17 @@ export async function proofreadChapter(
 
   if (blocks.length === 0) throw new Error('Chapitre vide : rien à corriger.');
 
+  const passes: string[] = [];
+  const totalPasses = mode === 'polish' ? 4 : 3;
+  let passIndex = 0;
+  const announce = (label: string) => {
+    passIndex++;
+    passes.push(label);
+    passNotifier?.({ pass: passIndex, total: totalPasses, label });
+  };
+
+  // ---------- Passe 1 : correction ----------
+  announce(PASS_LABELS[0]);
   const outputs: string[] = [];
   let corrections: Correction[] = [];
   let qualitySum = 0;
