@@ -15,7 +15,7 @@ interface LetterStat {
   template: string;
   label: string;
   subject: string;
-  segment: 'clickers' | 'openers_no_click';
+  segment: 'clickers' | 'openers_no_click' | 'no_click';
   sent: number;
   opens: number;
   clicks: number;
@@ -24,7 +24,9 @@ interface LetterStat {
 const SEGMENT_LABEL: Record<LetterStat['segment'], string> = {
   clickers: 'Cliqueurs',
   openers_no_click: 'Ouvreurs sans clic',
+  no_click: 'Tous les non-cliqueurs',
 };
+
 
 const ClosingCampaignPanel = () => {
   const [letters, setLetters] = useState<LetterStat[]>([]);
