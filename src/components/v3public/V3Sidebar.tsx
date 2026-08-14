@@ -4,7 +4,7 @@ import {
   ChevronLeft, ChevronRight,
   GraduationCap, Gem, FileText, User,
   LifeBuoy, Mail, HelpCircle, FolderOpen, Video, ListTree, Award,
-  Search, Target, BarChart3, Image as ImageIcon, LayoutGrid,
+  Search, Target, BarChart3, Image as ImageIcon, LayoutGrid, Star,
 } from 'lucide-react';
 import { useState } from 'react';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
