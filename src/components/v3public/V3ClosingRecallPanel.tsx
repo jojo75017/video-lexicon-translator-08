@@ -33,7 +33,10 @@ export default function V3ClosingRecallPanel({ className = '' }: { className?: s
           Cette page vous montre tout ce que contient l’outil
         </h2>
         <p className="mt-3 text-[14.5px] leading-relaxed text-white/85 max-w-2xl mx-auto">
-          Pour démarrer un livre, utilisez les onglets dans la barre en haut. Chaque onglet mène directement au module concerné :
+          Pour démarrer un livre, utilisez les onglets dans la barre en haut et dans la barre latérale. Plusieurs modules vous sont déjà à disposition.
+        </p>
+        <p className="mt-2 text-[13.5px] leading-relaxed text-white/70 max-w-2xl mx-auto">
+          Chaque onglet mène directement au module concerné : planifier, écrire, habiller la couverture, publier, vendre ou gérer vos livres.
         </p>
 
         <ul className="mt-5 flex flex-wrap items-center justify-center gap-2">
