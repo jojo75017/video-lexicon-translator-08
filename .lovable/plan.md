@@ -48,12 +48,13 @@ Même esprit que la capture de référence, mais **uniquement avec les moteurs r
 │ recherche    │ │ la plume     │ │ d'images IA  │ │ Pro — 300 DPI│
 │ approfondie  │ │              │ │              │ │              │
 └──────────────┘ └──────────────┘ └──────────────┘ └──────────────┘
-┌──────────────┐ ┌──────────────┐ ┌──────────────┐
-│ NARRATION    │ │ MÉTADONNÉES  │ │ INTERNATIONAL│
-│ Synthèse     │ │ Optimisation │ │ Traduction   │
-│ vocale       │ │ KDP          │ │ 10 langues   │
-│ premium      │ │              │ │              │
-└──────────────┘ └──────────────┘ └──────────────┘
+┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+│ NARRATION    │ │ MÉTADONNÉES  │ │ INTERNATIONAL│ │ PARTENARIAT  │
+│ Synthèse     │ │ Optimisation │ │ Traduction   │ │ KDP Pilot    │
+│ vocale       │ │ KDP          │ │ 10 langues   │ │ Suivi des    │
+│ premium      │ │              │ │              │ │ ventes &     │
+└──────────────┘ └──────────────┘ └──────────────┘ │ concurrence  │
+                                                   └──────────────┘
 
 ┌──────────────────────────────────────────────────────────────────────┐
 │ Trois bénéfices : autonomie réelle de l'IA · fichiers prêts pour KDP │
@@ -61,7 +62,7 @@ Même esprit que la capture de référence, mais **uniquement avec les moteurs r
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
-Chaque carte reste cliquable vers l'outil déjà en place (`/v3/studio`, `/v3/hub?tab=cover-pro`, `/v3/outils/audiobook`, `/kdp-keywords`, `/v3/outils/traduction`, `/v3/outils/espion-concurrents`). Aucun logo de marque tierce ; icônes vectorielles uniquement.
+Chaque carte reste cliquable vers l'outil déjà en place (`/v3/studio`, `/v3/hub?tab=cover-pro`, `/v3/outils/audiobook`, `/kdp-keywords`, `/v3/outils/traduction`, `/v3/outils/espion-concurrents`, `/kdp-pilot`). Aucun logo de marque tierce ; icônes vectorielles uniquement.
 
 ## Partie 2 — Section « Avant / Après »
 
