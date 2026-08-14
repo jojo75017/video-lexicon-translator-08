@@ -1,15 +1,22 @@
 import { Link } from 'react-router-dom';
 import {
-  Sparkles, BookOpen, Library, ArrowRight, Star, Quote,
+  Sparkles, BookOpen, Library, ArrowRight,
 } from 'lucide-react';
 
-import homeHero from '@/assets/v3/home-hero.jpg';
 import V3BriefRecap from '@/components/v3public/V3BriefRecap';
 import V3CapabilitiesPanel from '@/components/v3public/V3CapabilitiesPanel';
 import V3StartBookBar from '@/components/v3public/V3StartBookBar';
 import V3PaletteModule from '@/components/v3public/V3PaletteModule';
 import KdpPilotPromoBanner from '@/components/ebook/KdpPilotPromoBanner';
 import { V3EngineStrip, V3EngineGrid } from '@/components/v3public/V3EngineBanner';
+import V3HeroBanner from '@/components/v3public/V3HeroBanner';
+import V3MarketProofPanel from '@/components/v3public/V3MarketProofPanel';
+import V3BeforeAfterPanel from '@/components/v3public/V3BeforeAfterPanel';
+import V3AudiencePanel from '@/components/v3public/V3AudiencePanel';
+import V3GuaranteePanel from '@/components/v3public/V3GuaranteePanel';
+import V3CommercialLicensePanel from '@/components/v3public/V3CommercialLicensePanel';
+import V3ClosingRecallPanel from '@/components/v3public/V3ClosingRecallPanel';
+
 
 
 
