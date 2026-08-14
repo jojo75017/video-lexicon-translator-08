@@ -17,6 +17,7 @@ export const MARKETING_EXCLUDED_PREFIXES = [
   '/demo',
   '/espace',
   '/v3',
+  '/10-niches-offertes',
 ];
 
 export const isMarketingExcluded = (pathname: string): boolean =>

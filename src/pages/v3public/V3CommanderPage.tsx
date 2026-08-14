@@ -15,6 +15,7 @@ import { COMMANDER_URL } from "@/data/externalLinks";
 import { V3_LAUNCH_BONUSES, V3_BONUSES_TOTAL_VALUE } from "@/data/v3Launch";
 import { trackCaptureEvent } from "@/lib/captureTracking";
 import { V3EngineStrip, V3EngineGrid } from "@/components/v3public/V3EngineBanner";
+import Niches10Offer from "@/components/marketing/Niches10Offer";
 import heroBooks from "@/assets/commander-hero-books.jpg";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
@@ -267,6 +268,9 @@ export default function V3CommanderPage() {
             />
           </div>
         </div>
+
+        {/* CADEAU : 10 niches offertes, affichées immédiatement */}
+        <Niches10Offer surface="commander" hook="commander" variant="hero" className="mt-10" />
 
         {/* MOTEUR MULTI-MODÈLES */}
         <div className="mt-14 overflow-hidden rounded-2xl">

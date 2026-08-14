@@ -4,6 +4,7 @@ import { Sparkles, X, ArrowRight } from 'lucide-react';
 import { isMarketingExcluded, isExpatPath } from '@/lib/marketingExclusions';
 import { getAbCopy } from '@/lib/abTest';
 import { trackCaptureEvent } from '@/lib/captureTracking';
+import { NICHES_10_LEAD_MAGNET, NICHES_10_PATH } from '@/lib/niches10Pack';
 
 const DISMISS_KEY = 'ebs_sticky_signup_dismissed';
 const DONE_KEY = 'ebs_lead_popup_done';
@@ -23,7 +24,7 @@ const StickySignupBar: React.FC = () => {
   const isExcluded = isMarketingExcluded(location.pathname);
   const isExpat = isExpatPath(location.pathname);
   const { variant, copy } = getAbCopy(isExpat);
-  const leadMagnet = isExpat ? 'publier-kdp-etranger' : '5-niches-rentables-2026';
+  const leadMagnet = isExpat ? 'publier-kdp-etranger' : NICHES_10_LEAD_MAGNET;
 
   useEffect(() => {
     if (isExcluded) {
@@ -55,15 +56,17 @@ const StickySignupBar: React.FC = () => {
         <div className="relative max-w-5xl mx-auto px-4 py-2.5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
           <div className="flex items-center gap-2 min-w-0 flex-1 pr-8 sm:pr-0">
             <Sparkles className="w-5 h-5 shrink-0" />
-            <p className="text-sm font-semibold min-w-0">{copy.stickyMessage}</p>
+            <p className="text-sm font-semibold min-w-0">
+              {isExpat ? copy.stickyMessage : '10 niches KDP vérifiées — offertes. Ne perdez pas un livre de plus.'}
+            </p>
           </div>
 
           <Link
-            to="/demo"
+            to={isExpat ? '/demo' : NICHES_10_PATH}
             onClick={() => trackCaptureEvent('sticky', 'click', { abVariant: variant, leadMagnet })}
             className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-background px-5 text-sm font-bold text-foreground whitespace-nowrap transition-transform hover:-translate-y-0.5"
           >
-            {copy.stickyCta} <ArrowRight className="w-4 h-4" />
+            {isExpat ? copy.stickyCta : 'Voir mes 10 niches'} <ArrowRight className="w-4 h-4" />
           </Link>
 
           <p className="hidden md:block text-[11px] opacity-90 whitespace-nowrap">
