@@ -18,6 +18,10 @@ const BEFORE = [
   'Obligé de payer cinq outils et cinq abonnements.',
   'Des traductions approximatives qui passent mal.',
   'Aucune aide pour choisir les catégories KDP.',
+  'Pas de stratégie de lancement ni de preuve sociale.',
+  'Aucun mockup professionnel pour promouvoir le livre.',
+  'Obligé de solliciter des avis readers un par un.',
+  'Pas de plan marketing ni de contenu pour les réseaux.',
 ];
 
 const AFTER = [
@@ -33,6 +37,10 @@ const AFTER = [
   'Mockups 3D & promotion',
   'Plan marketing & réseaux sociaux',
   'Suivi & reprise de projet',
+  'Stratégie de lancement & preuve sociale',
+  'Offrir son livre pour avis',
+  'Description KDP optimisée',
+  'Cohérence narrative & mémoire du livre',
 ];
 
 /** Section de conviction « Avant / Après » — informative, non cliquable. */
