@@ -1,7 +1,11 @@
 # Accueil V3 : bandeau d'accroche + moteurs multi-modèles + sections de conviction
 
+## Ce qui est garanti d'abord
+- **`/ebook-planner` reste votre page de travail V2, intacte et toujours accessible.** Aucune suppression, aucun blocage, aucune redirection forcée depuis cette adresse. Le bouton « Ouvrir V3 » / « Revenir V2 » continue de fonctionner dans les deux sens.
+- Les changements ne touchent que l'accueil V3 (`/v3`) et le choix de la page d'arrivée après connexion.
+
 ## Objectif
-Restructurer l'accueil V3 avec, dans l'ordre : un bandeau d'accroche fort, la grille des moteurs IA réellement utilisés, puis les blocs de conviction (marché, avant/après, public, garantie, licence). Et terminer les correctifs d'affichage pour que les abonnés atterrissent bien sur `/v3` et voient les changements.
+Restructurer l'accueil V3 dans cet ordre : bandeau d'accroche fort, grille des moteurs IA réellement utilisés, module des livres, puis les blocs de conviction (marché, avant/après, public, garantie, licence).
 
 ## Règle de nommage
 - Nom affiché partout : **Ebookstudio V3**.
@@ -29,7 +33,7 @@ Titre en police grande mais mesurée (pas de hauteur d'écran complète), texte 
 
 ## Partie 1 — Section « Moteur de publication multi-modèles » (juste en dessous)
 
-Reprise de la mise en forme de la capture de référence, mais **uniquement avec les moteurs réellement employés dans Ebookstudio V3**, tels que déjà déclarés dans `V3EngineBanner.tsx`.
+Même esprit que la capture de référence, mais **uniquement avec les moteurs réellement employés dans Ebookstudio V3**, tels que déjà déclarés dans `V3EngineBanner.tsx`.
 
 ```text
 ┌──────────────────────────────────────────────────────────────────────┐
@@ -57,7 +61,7 @@ Reprise de la mise en forme de la capture de référence, mais **uniquement avec
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
-Chaque carte reste cliquable vers l'outil correspondant déjà en place (`/v3/studio`, `/v3/hub?tab=cover-pro`, `/v3/outils/audiobook`, `/kdp-keywords`, `/v3/outils/traduction`, `/v3/outils/espion-concurrents`). Aucun logo de marque tierce ; icônes vectorielles uniquement.
+Chaque carte reste cliquable vers l'outil déjà en place (`/v3/studio`, `/v3/hub?tab=cover-pro`, `/v3/outils/audiobook`, `/kdp-keywords`, `/v3/outils/traduction`, `/v3/outils/espion-concurrents`). Aucun logo de marque tierce ; icônes vectorielles uniquement.
 
 ## Partie 2 — Section « Avant / Après »
 
@@ -123,12 +127,12 @@ Chute : « Des coachs, consultants, créateurs, experts locaux, chefs d'entrepri
 
 Note : licence commerciale incluse dans les deux forfaits (Plume et Édition), sans option payante supplémentaire.
 
-## Partie 7 — Correctifs d'affichage à finir
+## Partie 7 — Correctifs d'affichage (et respect de la V2)
 1. Bandeau compact KDP Pilot conservé au-dessus du module des livres, code `PROMO15`.
 2. Champs « Commencez votre livre » resserrés : une ligne sur ordinateur, paddings et historique réduits.
-3. Entrées `/`, `/dashboard`, `/espace` renvoyant l'abonné sur `/v3` ; accès V2 conservé via son bouton dédié.
-4. Rafraîchissement propre après reconnexion : purge unique des service workers et de Cache Storage, ouverture de `/v3` versionnée, garde-fou anti-boucle, sans toucher aux livres, clés API ni profils.
-5. Bannière sur `/ebook-planner` invitant à ouvrir `/v3`.
+3. Page d'arrivée après connexion : `/v3`. **`/ebook-planner` reste accessible en permanence** par le bouton de bascule et par saisie directe de l'adresse ; rien n'y est retiré.
+4. Un lien clair « Ouvrir l'espace de travail V2 » dans l'accueil V3, pour y retourner en un clic.
+5. Rafraîchissement propre après reconnexion : purge unique des service workers et de Cache Storage (mécanisme déjà présent dans `sitePurge`/`chunkErrorRecovery`), garde-fou anti-boucle, sans toucher aux livres, clés API ni profils.
 
 ## Ordre final de l'accueil V3
 1. Bandeau d'accroche « Premier agent d'édition IA multi-modèle au monde ».
@@ -143,6 +147,7 @@ Note : licence commerciale incluse dans les deux forfaits (Plume et Édition), s
 10. Pied de page.
 
 ## Vérification
+- `/ebook-planner` s'ouvre normalement et tous ses onglets fonctionnent comme avant.
 - Après reconnexion : arrivée sur `/v3`, bandeau d'accroche puis moteurs visibles en haut, champs réduits.
 - Les cartes moteurs pointent vers des outils existants (aucun lien mort).
 - Toutes les sections lisibles sur ordinateur et mobile, 100 % en français, aucune marque étrangère.
@@ -156,7 +161,7 @@ Note : licence commerciale incluse dans les deux forfaits (Plume et Édition), s
   - `src/components/v3public/V3AudiencePanel.tsx`
   - `src/components/v3public/V3GuaranteePanel.tsx`
   - `src/components/v3public/V3CommercialLicensePanel.tsx`
-- Réutilisation de `V3EngineGrid` existant (`src/components/v3public/V3EngineBanner.tsx`) pour la section moteurs, monté juste sous le bandeau d'accueil ; contenu des moteurs conservé tel qu'il est déjà défini (nos outils réels).
-- Recomposition de `src/pages/v3public/V3HomePage.tsx` selon l'ordre ci-dessus.
+- Réutilisation de `V3EngineGrid` (`src/components/v3public/V3EngineBanner.tsx`) pour la section moteurs, montée juste sous le bandeau d'accroche ; contenu des moteurs conservé tel quel (nos outils réels).
+- Recomposition de `src/pages/v3public/V3HomePage.tsx` selon l'ordre ci-dessus ; aucune modification des pages V2 (`EbookPlanner*`) ni de `V2V3FloatingSwitch`.
 - Styles alignés sur `src/styles/v3-public.css` (émeraude `#064e3b`, or `#c9a84c`, crème, `v3-serif`).
 - Icônes `lucide-react` uniquement : aucun appel IA, aucune génération d'image, donc aucun crédit IA consommé.
