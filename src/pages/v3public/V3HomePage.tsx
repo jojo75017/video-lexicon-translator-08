@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import {
   Sparkles, BookOpen, Library, ArrowRight, Star, Quote,
 } from 'lucide-react';
-import { V3_HEADER_MENU } from '@/data/v3HeaderMenu';
+
 import homeHero from '@/assets/v3/home-hero.jpg';
 import V3BriefRecap from '@/components/v3public/V3BriefRecap';
 import V3CapabilitiesPanel from '@/components/v3public/V3CapabilitiesPanel';
@@ -286,69 +286,8 @@ export default function V3HomePage() {
         </a>
       </section>
 
-      {/* 6 CATÉGORIES PREMIUM */}
-      <section className="max-w-7xl mx-auto px-5 md:px-8 py-16">
-        <div className="text-center mb-10">
-          <div className="text-[10px] uppercase tracking-[0.24em] font-semibold" style={{ color: 'var(--v3-gold-600)' }}>
-            L'atelier complet
-          </div>
-          <h2 className="v3-serif mt-2 text-3xl md:text-4xl font-semibold" style={{ color: 'var(--v3-emerald)' }}>
-            Un studio éditorial, six univers
-          </h2>
-          <p className="mt-3 text-[14px] max-w-xl mx-auto" style={{ color: 'var(--v3-muted)' }}>
-            Chaque étape du parcours d'auteur a ses outils dédiés — et son moment.
-          </p>
-        </div>
+      {/* Les six univers vivent désormais dans « Fonctionnalités » (12 modules) */}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {V3_HEADER_MENU.map((cat) => (
-            <Link
-              key={cat.key}
-              to={cat.links[0]?.to ?? '/v3/outils'}
-              className="group relative rounded-2xl bg-white p-6 transition-all"
-              style={{
-                border: '1px solid var(--v3-line)',
-                boxShadow: '0 1px 2px rgba(6,78,59,0.03)',
-              }}
-              onMouseOver={(e) => {
-                const el = e.currentTarget as HTMLElement;
-                el.style.borderColor = 'rgba(201,168,76,0.5)';
-                el.style.boxShadow = 'var(--v3-shadow-card)';
-                el.style.transform = 'translateY(-3px)';
-              }}
-              onMouseOut={(e) => {
-                const el = e.currentTarget as HTMLElement;
-                el.style.borderColor = 'var(--v3-line)';
-                el.style.boxShadow = '0 1px 2px rgba(6,78,59,0.03)';
-                el.style.transform = '';
-              }}
-            >
-              <div className="flex items-start justify-between">
-                <div className="text-3xl">{cat.emoji}</div>
-                <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition" style={{ color: 'var(--v3-gold-600)' }} />
-              </div>
-              <div className="text-[10px] uppercase tracking-[0.22em] font-semibold mt-4" style={{ color: 'var(--v3-gold-600)' }}>
-                {cat.tagline}
-              </div>
-              <h3 className="v3-serif text-[22px] font-semibold mt-1" style={{ color: 'var(--v3-emerald)' }}>
-                {cat.label}
-              </h3>
-              <ul className="mt-3 space-y-1">
-                {cat.links.slice(0, 3).map((l) => (
-                  <li key={l.to + l.label} className="text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
-                    · {l.label}
-                  </li>
-                ))}
-                {cat.links.length > 3 && (
-                  <li className="text-[12px] font-semibold" style={{ color: 'var(--v3-emerald)' }}>
-                    + {cat.links.length - 3} outils
-                  </li>
-                )}
-              </ul>
-            </Link>
-          ))}
-        </div>
-      </section>
 
       {/* MOTEUR MULTI-MODÈLES */}
       <V3EngineStrip />
