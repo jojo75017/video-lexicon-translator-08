@@ -188,6 +188,24 @@ ${chapterContent}
 ---
 
 Retourne le JSON avec le texte intégral francisé et la liste des expressions remplacées.`
+      : edition
+      ? `Voici un fragment de chapitre DÉJÀ corrigé sur le plan orthographique. Applique la passe d'édition (répétitions, lourdeurs, adverbes inutiles, passif, temps narratifs, transitions) sans toucher au fond :
+
+${chapterTitle ? `Titre du chapitre : "${chapterTitle}"\n` : ''}
+---
+${chapterContent}
+---
+
+Retourne le JSON avec le texte intégral édité et la liste des interventions (types "repetition", "style", "temps", "anglicisme").`
+      : finalCheck
+      ? `Voici un fragment de chapitre déjà corrigé et édité. Effectue le CONTRÔLE FINAL : fautes résiduelles, phrases incomplètes, artefacts techniques, noms propres incohérents. Ne réécris rien d'autre :
+
+${chapterTitle ? `Titre du chapitre : "${chapterTitle}"\n` : ''}
+---
+${chapterContent}
+---
+
+Retourne le JSON avec le texte intégral vérifié et la liste des défauts résiduels corrigés.`
       : `Corrige ce chapitre en respectant STRICTEMENT les consignes ${polish ? 'de correction et de polissage (zéro ajout d\'idée, zéro suppression de passage)' : 'de correction éditoriale (zéro réécriture, zéro ajout, zéro suppression)'} :
 
 ${chapterTitle ? `Titre du chapitre : "${chapterTitle}"\n` : ''}
