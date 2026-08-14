@@ -271,7 +271,7 @@ const App = () => {
       if (shouldRecheckAdmin && session?.user) {
         setIsAdminChecked(false);
         setTimeout(async () => {
-          if (event === 'SIGNED_IN') clearAdminCache();
+          clearAdminCache();
           const adminStatus = await getIsCurrentSessionAdmin();
           setIsAdmin(adminStatus);
           setIsAdminChecked(true);
@@ -279,6 +279,7 @@ const App = () => {
         return;
       }
       if (event === 'SIGNED_OUT') {
+        clearAdminCache();
         setIsAdmin(false);
         setIsAdminChecked(true);
       }
