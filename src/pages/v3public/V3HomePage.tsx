@@ -123,10 +123,11 @@ export default function V3HomePage() {
         </div>
       </section>
 
-      {/* Tableau des clés toujours visible avant le reste de la page */}
+      {/* Ce que l'outil produit (le paramétrage des clés vit désormais dans « Fonctionnalités ») */}
       <div className="max-w-7xl mx-auto px-5 md:px-8 py-5">
-        <V3ApiKeysGate />
+        <V3CapabilitiesPanel />
       </div>
+
 
       {/* HERO — bandeau pleine largeur */}
       <section className="relative overflow-hidden">
