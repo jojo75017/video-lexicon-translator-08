@@ -113,29 +113,29 @@ export default function V3StartBookBar() {
           </button>
         </div>
 
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="mt-2.5 flex flex-wrap gap-2">
           <button
             type="button"
             onClick={save}
             disabled={!title.trim()}
-            className="inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-[13px] font-semibold disabled:opacity-45 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[12px] font-semibold disabled:opacity-45 disabled:cursor-not-allowed"
             style={{ borderColor: 'rgba(6,78,59,0.3)', color: 'var(--v3-emerald)', background: '#fff' }}
           >
-            <Save className="w-3.5 h-3.5" /> Sauvegarder
+            <Save className="w-3 h-3" /> Sauvegarder
           </button>
           <button
             type="button"
             onClick={erase}
             disabled={!title.trim() && !currentTitle}
-            className="inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-[13px] font-semibold disabled:opacity-45 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[12px] font-semibold disabled:opacity-45 disabled:cursor-not-allowed"
             style={{ borderColor: 'rgba(190,60,60,0.35)', color: '#b23b3b', background: '#fff' }}
           >
-            <Trash2 className="w-3.5 h-3.5" /> Effacer
+            <Trash2 className="w-3 h-3" /> Effacer
           </button>
         </div>
 
         {!title.trim() && (
-          <p className="mt-2 text-[12px]" style={{ color: 'var(--v3-muted)' }}>
+          <p className="mt-1.5 text-[11.5px]" style={{ color: 'var(--v3-muted)' }}>
             Donnez d’abord un titre — vous pourrez le modifier ensuite.
           </p>
         )}
@@ -144,7 +144,7 @@ export default function V3StartBookBar() {
           <button
             type="button"
             onClick={() => navigate('/v3/create')}
-            className="mt-4 inline-flex items-center gap-2 text-[13px] font-semibold"
+            className="mt-3 inline-flex items-center gap-2 text-[12.5px] font-semibold"
             style={{ color: 'var(--v3-emerald)' }}
           >
             <RotateCcw className="w-3.5 h-3.5" /> Reprendre : <em className="v3-serif">{currentTitle}</em>
@@ -153,60 +153,65 @@ export default function V3StartBookBar() {
         )}
 
         {history.length > 0 && (
-          <div className="mt-6 pt-5 border-t" style={{ borderColor: 'rgba(6,78,59,0.12)' }}>
+          <div className="mt-4 pt-3 border-t" style={{ borderColor: 'rgba(6,78,59,0.12)' }}>
             <div className="flex items-center justify-between gap-3">
-              <span className="inline-flex items-center gap-2 text-[13px] font-bold" style={{ color: 'var(--v3-ink)' }}>
-                <History className="w-4 h-4" /> Historique des titres ({history.length})
+              <span className="inline-flex items-center gap-2 text-[12.5px] font-bold" style={{ color: 'var(--v3-ink)' }}>
+                <History className="w-3.5 h-3.5" /> Historique ({history.length})
               </span>
               <button
                 type="button"
                 onClick={() => { setHistory(clearTitleHistory()); toast.success('Historique vidé'); }}
-                className="text-[12px] font-semibold underline"
+                className="text-[11px] font-semibold underline"
                 style={{ color: '#b23b3b' }}
               >
                 Tout effacer
               </button>
             </div>
 
-            <ul className="mt-3 flex flex-col gap-2">
-              {history.map((entry) => (
+            <ul className="mt-2 flex flex-col gap-1.5">
+              {history.slice(0, 3).map((entry) => (
                 <li
                   key={entry.title}
-                  className="flex items-center gap-2 rounded-xl border px-3 py-2"
+                  className="flex items-center gap-2 rounded-xl border px-2.5 py-1.5"
                   style={{ borderColor: 'rgba(201,168,76,0.4)', background: '#fff' }}
                 >
                   <button
                     type="button"
                     onClick={() => restore(entry)}
-                    className="flex-1 text-left"
+                    className="flex-1 text-left min-w-0"
                     title="Restaurer ce titre"
                   >
-                    <span className="v3-serif text-[14px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+                    <span className="v3-serif text-[13px] font-semibold truncate block" style={{ color: 'var(--v3-ink)' }}>
                       {entry.title}
                     </span>
-                    <span className="block text-[11.5px]" style={{ color: 'var(--v3-muted)' }}>
-                      Sauvegardé le {new Date(entry.savedAt).toLocaleString('fr-FR')}
+                    <span className="block text-[10.5px]" style={{ color: 'var(--v3-muted)' }}>
+                      {new Date(entry.savedAt).toLocaleDateString('fr-FR')}
                     </span>
                   </button>
                   <button
                     type="button"
                     onClick={() => restore(entry)}
-                    className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[12px] font-semibold"
+                    className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[11px] font-semibold"
                     style={{ borderColor: 'rgba(6,78,59,0.3)', color: 'var(--v3-emerald)' }}
                   >
-                    <RotateCcw className="w-3.5 h-3.5" /> Restaurer
+                    <RotateCcw className="w-3 h-3" /> Reprendre
                   </button>
                   <button
                     type="button"
                     onClick={() => { setHistory(removeTitleFromHistory(entry.title)); }}
                     aria-label={`Retirer ${entry.title} de l'historique`}
-                    className="rounded-lg p-1.5"
+                    className="rounded-md p-1"
                     style={{ color: '#b23b3b' }}
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-3.5 h-3.5" />
                   </button>
                 </li>
               ))}
+              {history.length > 3 && (
+                <li className="text-[11px]" style={{ color: 'var(--v3-muted)' }}>
+                  + {history.length - 3} titre{history.length > 4 ? 's' : ''} plus ancien{history.length > 4 ? 's' : ''}
+                </li>
+              )}
             </ul>
           </div>
         )}
