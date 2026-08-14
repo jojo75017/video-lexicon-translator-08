@@ -5,12 +5,71 @@ import { KDP_PILOT_URL, KDP_PILOT_PROMO_CODE } from '@/data/externalLinks';
 /**
  * Bandeau KDP Pilot (outil payant, partenaire).
  * `variant="dark"` pour les sections sombres de la V3, `light` par défaut (V2).
+ * `compact` réduit la hauteur pour l'accueil V3.
  */
-export const KdpPilotPromoBanner: React.FC<{ className?: string; variant?: 'light' | 'dark' }> = ({
+export const KdpPilotPromoBanner: React.FC<{ className?: string; variant?: 'light' | 'dark'; compact?: boolean }> = ({
   className = '',
   variant = 'light',
+  compact = false,
 }) => {
   const dark = variant === 'dark';
+
+  if (compact) {
+    return (
+      <div
+        className={`rounded-xl border p-3 md:p-4 ${className} ${
+          dark
+            ? 'border-[rgba(201,168,76,0.35)] bg-[rgba(255,255,255,0.04)]'
+            : 'border-amber-200/60 bg-gradient-to-r from-amber-50/60 via-background to-background'
+        }`}
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+          <div className="flex items-start gap-3 min-w-0">
+            <div
+              className={`shrink-0 grid place-items-center w-9 h-9 rounded-lg ${
+                dark ? 'bg-[rgba(201,168,76,0.15)] text-[#e6c66b]' : 'bg-amber-100 text-amber-700'
+              }`}
+            >
+              <BarChart3 className="h-4 w-4" />
+            </div>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className={`text-sm font-semibold ${dark ? 'text-white' : 'text-foreground'}`}>
+                  KDP Pilot — suivez vos ventes et votre niche
+                </h3>
+                <span
+                  className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${
+                    dark
+                      ? 'border-[rgba(201,168,76,0.45)] bg-[rgba(201,168,76,0.15)] text-[#e6c66b]'
+                      : 'border-amber-300/50 bg-amber-100/70 text-amber-800'
+                  }`}
+                >
+                  Partenaire
+                </span>
+              </div>
+              <p className={`text-xs leading-snug mt-0.5 ${dark ? 'text-white/70' : 'text-muted-foreground'}`}>
+                Outil indépendant : historique BSR, ventes estimées et analyse concurrentielle.{' '}
+                <span className="inline-flex items-center gap-1">
+                  <Tag className="h-3 w-3" />
+                  <strong>{KDP_PILOT_PROMO_CODE}</strong> = -15 %
+                </span>
+              </p>
+            </div>
+          </div>
+          <a
+            href={KDP_PILOT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`shrink-0 inline-flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-xs font-semibold transition-transform hover:-translate-y-0.5 ${
+              dark ? 'bg-[#e6c66b] text-[#1a1408]' : 'bg-amber-600 text-white'
+            }`}
+          >
+            Découvrir <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
