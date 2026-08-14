@@ -248,7 +248,8 @@ export default function V3CorrecteurPage() {
   // Affichage des temps d'attente (limite de débit) pendant la correction.
   useEffect(() => {
     setProofreadWaitNotifier((info) => setWaitInfo(info));
-    return () => setProofreadWaitNotifier(null);
+    setProofreadPassNotifier((info) => setPassInfo(info));
+    return () => { setProofreadWaitNotifier(null); setProofreadPassNotifier(null); };
   }, []);
 
   const startCorrection = useCallback(async (onlyFailed = false) => {
@@ -268,6 +269,14 @@ export default function V3CorrecteurPage() {
     const working = chapters.map((c) => (
       onlyFailed && c.status === 'failed' ? { ...c, status: 'pending' as const, error: undefined } : { ...c }
     ));
+
+    // Relevé de cohérence du livre (noms propres, lieux, temps, point de vue) :
+    // transmis à chaque passe pour que l'orthographe des noms reste identique
+    // d'un chapitre à l'autre. Analyse locale, aucun crédit consommé.
+    const { context, inconsistencies } = buildBookContext(working, manuscript?.title);
+    setProofreadBookContext(context);
+    setNameIssues(inconsistencies);
+
     try {
       await proofreadChapters(
         working,
