@@ -153,10 +153,10 @@ Retourne le JSON avec le texte corrigé et la liste exhaustive des corrections e
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 120000);
 
-    // Clé de l'abonné (BYOK) en priorité : aucun crédit Lovable consommé.
+    // Correction exclusivement BYOK : une clé refusée ne doit jamais consommer
+    // silencieusement les crédits de la plateforme.
     const provider = (userProvider || '').toString().trim();
     const byoKey = (userApiKey || '').toString().trim();
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
     type Call = { engine: string; endpoint: string; headers: Record<string, string>; body: Record<string, unknown> };
 
@@ -171,7 +171,7 @@ Retourne le JSON avec le texte corrigé et la liste exhaustive des corrections e
           body: {
             system_instruction: { parts: [{ text: systemPrompt }] },
             contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
-            generationConfig: { temperature: 0.2, maxOutputTokens: 8000 },
+            generationConfig: { temperature: 0.2, maxOutputTokens: 8000, responseMimeType: 'application/json' },
           },
         };
       }
@@ -181,7 +181,7 @@ Retourne le JSON avec le texte corrigé et la liste exhaustive des corrections e
           engine: 'openai',
           endpoint: 'https://api.openai.com/v1/chat/completions',
           headers,
-          body: { model: userModel || 'gpt-4o-mini', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }], max_tokens: 8000 },
+          body: { model: userModel || 'gpt-4o-mini', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }], max_tokens: 8000, response_format: { type: 'json_object' } },
         };
       }
       if (provider === 'claude') {
@@ -202,20 +202,10 @@ Retourne le JSON avec le texte corrigé et la liste exhaustive des corrections e
           engine: 'openrouter',
           endpoint: 'https://openrouter.ai/api/v1/chat/completions',
           headers,
-          body: { model: userModel || 'google/gemini-2.5-flash-lite', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }], max_tokens: 8000 },
+          body: { model: userModel || 'google/gemini-2.5-flash-lite', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }], max_tokens: 8000, response_format: { type: 'json_object' } },
         };
       }
       return null;
-    };
-
-    const buildFallbackCall = (): Call | null => {
-      if (!LOVABLE_API_KEY) return null;
-      return {
-        engine: 'lovable',
-        endpoint: 'https://ai.gateway.lovable.dev/v1/chat/completions',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${LOVABLE_API_KEY}` },
-        body: { model: 'google/gemini-2.5-flash', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }], max_tokens: 8000 },
-      };
     };
 
     const runCall = async (call: Call) => {
@@ -240,24 +230,13 @@ Retourne le JSON avec le texte corrigé et la liste exhaustive des corrections e
       return { ok: true as const, content };
     };
 
-    const primary = buildByoCall() || buildFallbackCall();
+    const primary = buildByoCall();
     if (!primary) {
       throw new Error("Aucune clé IA : configurez votre clé Gemini, ChatGPT, Claude ou OpenRouter dans Paramètres > Clés API.");
     }
 
-    let engine = primary.engine;
-    let attempt = await runCall(primary);
-
-    // Quota épuisé / clé refusée / limite de débit sur la clé de l'abonné :
-    // on rejoue immédiatement sur le moteur de secours de la plateforme.
-    if (!attempt.ok && primary.engine !== 'lovable' && [401, 402, 403, 429].includes(attempt.status)) {
-      const fallback = buildFallbackCall();
-      if (fallback) {
-        console.log(`Repli sur le moteur de secours (${primary.engine} → lovable), statut ${attempt.status}`);
-        engine = 'lovable';
-        attempt = await runCall(fallback);
-      }
-    }
+    const engine = primary.engine;
+    const attempt = await runCall(primary);
 
     clearTimeout(timeoutId);
 

@@ -126,7 +126,7 @@ export function setProofreadWaitNotifier(fn: WaitNotifier | null) {
   waitNotifier = fn;
 }
 
-const BACKOFF_MS = [5000, 15000, 30000, 60000];
+const BACKOFF_MS = [5000, 15000];
 
 async function waitWithNotice(ms: number, reason: string) {
   waitNotifier?.({ seconds: Math.round(ms / 1000), reason });
@@ -152,7 +152,7 @@ async function callProofread(
   latinList?: string[],
 ): Promise<CallResult> {
   let lastError = '';
-  for (let attempt = 0; attempt < 5; attempt++) {
+  for (let attempt = 0; attempt < 3; attempt++) {
     const { data, error } = await supabase.functions.invoke('strict-proofread', {
       body: {
         chapterTitle: title,
@@ -181,13 +181,17 @@ async function callProofread(
     const message = String(data?.error || error?.message || 'Erreur de correction');
     lastError = message;
 
-    const wait = BACKOFF_MS[Math.min(attempt, BACKOFF_MS.length - 1)];
-    // Limite de débit ou quota : on patiente puis on réessaie (jamais d'abandon du livre).
-    if (/429|limite|rate|quota|402|crédit/i.test(message)) {
+    // Seule une limite de débit temporaire justifie un nouvel appel payant.
+    // Clé refusée, quota/crédits épuisés et erreurs de format s'arrêtent tout de suite.
+    if (/clé api refusée|aucune clé|402|crédit|quota épuisé|insuffisant/i.test(message)) {
+      throw new Error(message);
+    }
+    if (/429|limite de requêtes|rate limit/i.test(message) && attempt < 2) {
+      const wait = BACKOFF_MS[Math.min(attempt, BACKOFF_MS.length - 1)];
       await waitWithNotice(wait, 'Limite de requêtes atteinte');
       continue;
     }
-    await waitWithNotice(Math.min(wait, 5000), 'Nouvelle tentative');
+    throw new Error(message);
   }
   throw new Error(lastError || 'Correction impossible après plusieurs tentatives.');
 }
@@ -239,34 +243,24 @@ export function splitForProofread(text: string, maxWords = 1200): string[] {
   return blocks;
 }
 
-/** Corrige un bloc, avec deux relances si la réponse est amputée ou hors format. */
+/** Corrige un bloc une seule fois : une réponse inutilisable conserve l'original
+ * au lieu de consommer plusieurs appels supplémentaires. */
 async function proofreadBlock(
   title: string,
   block: string,
   mode: ProofreadMode,
 ): Promise<{ text: string; corrections: Correction[]; quality: number; failed: boolean }> {
-  let lastQuality = 0;
-  for (let attempt = 0; attempt < 3; attempt++) {
-    try {
-      const res = await callProofread(title, block, mode);
-      lastQuality = res.quality || lastQuality;
-      const truncated = isTruncated(block, res.corrected);
-      const lostParagraphs = countParagraphs(res.corrected) < countParagraphs(block);
-      if (!truncated && !lostParagraphs && res.formatOk) {
-        return { text: res.corrected, corrections: res.corrections, quality: res.quality, failed: false };
-      }
-      // Réponse inutilisable : on retente le même bloc plutôt que de rendre le texte d'origine.
-      console.warn(
-        `[correcteur] bloc refusé (${truncated ? 'amputé' : lostParagraphs ? 'paragraphes perdus' : 'hors format'}) — ` +
-        `${normLen(res.corrected)}/${normLen(block)} caractères, tentative ${attempt + 1}/3`,
-      );
-      if (attempt < 2) await sleep(1200);
-    } catch (e) {
-      if (attempt >= 2) throw e;
-      await sleep(1200);
-    }
+  const res = await callProofread(title, block, mode);
+  const truncated = isTruncated(block, res.corrected);
+  const lostParagraphs = countParagraphs(res.corrected) < countParagraphs(block);
+  if (!truncated && !lostParagraphs && res.formatOk) {
+    return { text: res.corrected, corrections: res.corrections, quality: res.quality, failed: false };
   }
-  return { text: block, corrections: [], quality: lastQuality, failed: true };
+  console.warn(
+    `[correcteur] bloc conservé dans sa version originale (${truncated ? 'réponse amputée' : lostParagraphs ? 'paragraphes perdus' : 'format invalide'}) — ` +
+    `${normLen(res.corrected)}/${normLen(block)} caractères`,
+  );
+  return { text: block, corrections: [], quality: res.quality, failed: true };
 }
 
 /** Passe de clôture : complète une fin de chapitre bancale par une vraie phrase. */
@@ -432,20 +426,8 @@ export async function proofreadChapters(
 
   await runPass();
 
-  // Deux tours de reprise automatique sur les seuls chapitres en échec,
-  // avec pause progressive pour laisser retomber les limites de débit.
-  const RETRY_DELAYS = [10000, 30000];
-  for (const delay of RETRY_DELAYS) {
-    if (shouldStop?.()) return;
-    const failed = chapters.filter((c) => c.status === 'failed');
-    if (!failed.length) return;
-    await waitWithNotice(delay, `Reprise de ${failed.length} chapitre(s) en échec`);
-    failed.forEach((c) => {
-      const i = chapters.indexOf(c);
-      chapters[i] = { ...c, status: 'pending', error: undefined };
-    });
-    await runPass();
-  }
+  // Aucun second passage automatique : l'auteur choisit explicitement s'il
+  // souhaite reprendre les chapitres en échec, donc aucun crédit ne part seul.
 }
 
 
