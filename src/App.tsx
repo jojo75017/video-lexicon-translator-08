@@ -352,6 +352,14 @@ const App = () => {
     setSubscriberData(null);
   }, []);
 
+  /** Relance la vérification du rôle sans recharger la page. */
+  const handleAdminRetry = useCallback(() => {
+    setAdminTimedOut(false);
+    setAdminRetry((n) => n + 1);
+  }, []);
+
+
+
   const isPlannerPreviewHost =
     typeof window !== 'undefined' &&
     (window.location.hostname === 'localhost' || window.location.hostname.includes('id-preview--'));
