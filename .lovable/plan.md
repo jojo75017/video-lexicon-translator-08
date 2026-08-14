@@ -1,7 +1,7 @@
 # Accueil V3 : sections Avant/Après, marché, public cible, garantie, licence commerciale + accueil à jour
 
 ## Objectif
-Ajouter sur l'accueil V3 cinq blocs de conviction et terminer les correctifs d'affichage.
+Ajouter sur l'accueil V3 cinq blocs de conviction et terminer les correctifs d'affichage, notamment le fait que les abonnés atterrissent bien sur `/v3` et non sur l'ancien `/ebook-planner`.
 
 Blocs :
 1. « Avant / Après » : opposer une IA généraliste à l'équipe d'IA spécialisées d'Ebookstudio V3.
@@ -13,7 +13,7 @@ Blocs :
 Correctifs d'affichage :
 - Bandeau KDP Pilot visible en tête de page.
 - Champs « Commencez votre livre » réduits.
-- Arrivée systématique sur `/v3` après connexion.
+- Arrivée systématique sur `/v3` après connexion (et non sur `/ebook-planner`).
 
 ## Règle de nommage
 - Nom affiché partout : **Ebookstudio V3**.
@@ -269,13 +269,14 @@ Note tarifaire : la licence commerciale est incluse dans les deux forfaits (Plum
 2. Champs « Commencez votre livre » resserrés : une ligne sur ordinateur, paddings et historique réduits.
 3. Entrées générales `/`, `/dashboard`, `/espace` renvoyant l'abonné sur `/v3` ; accès V2 conservé via son bouton dédié.
 4. Rafraîchissement propre après reconnexion : purge unique des service workers et de Cache Storage, ouverture de `/v3` versionnée, garde-fou anti-boucle, sans toucher aux livres, clés API ni profils.
+5. Bannière temporaire sur `/ebook-planner` pour inviter les abonnés à basculer sur `/v3`, avec un lien direct.
 
 ## Partie 7 — Emplacement sur la page d'accueil V3
 
 Ordre de lecture final sur `V3HomePage.tsx` :
 1. `KdpPilotPromoBanner` en tête (compact, code `PROMO15`).
 2. `V3StartBookBar` compact (module « des livres » — création rapide).
-3. `V3BriefRecap` / récap du brief (module « des livres » suite).
+3. `V3BriefRecap`.
 4. `V3MarketProofPanel` — chiffres du marché.
 5. `V3BeforeAfterPanel` — ancienne voie vs Ebookstudio V3.
 6. `V3EngineStrip` / grille des moteurs IA existante.
@@ -289,6 +290,7 @@ Les nouvelles sections se placent **toutes sous le module des livres** (après `
 - Déconnexion puis reconnexion : arrivée sur `/v3`, bandeau KDP Pilot et champs réduits visibles au premier écran.
 - Sections « Avant / Après », « Marché », « Public cible », « Garantie 30 jours » et « Licence commerciale » lisibles sur ordinateur et mobile, 100 % en français, aucune marque étrangère.
 - Aucun rechargement en boucle.
+- L'onglet `/ebook-planner` affiche une bannière invitant à ouvrir `/v3`.
 
 ## Détails techniques
 - Nouveaux composants :
