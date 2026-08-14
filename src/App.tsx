@@ -213,7 +213,9 @@ const App = () => {
     const safetyTimer = setTimeout(() => {
       console.warn('Safety timer triggered – forcing auth check complete');
       setIsCheckingAuth(false);
+      setIsAdminChecked(true);
     }, 6000);
+
 
     const initAuth = async () => {
       const savedEmail = localStorage.getItem('subscriber_email');
