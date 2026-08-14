@@ -134,9 +134,9 @@ export function V3EngineStrip({ className = '' }: { className?: string }) {
 /** Section détaillée — les 7 moteurs IA de la V3. */
 export function V3EngineGrid({ className = '' }: { className?: string }) {
   return (
-    <section id="moteurs-ia-v3" className={`max-w-7xl mx-auto px-5 md:px-8 py-14 ${className}`}>
+    <section id="moteurs-ia-v3" className={`max-w-7xl mx-auto px-5 md:px-8 py-8 ${className}`}>
       <div
-        className="rounded-3xl p-8 md:p-10"
+        className="rounded-3xl p-6 md:p-8"
         style={{ background: CREAM, border: `1px solid ${LINE}` }}
       >
         <div className="text-center max-w-3xl mx-auto">
@@ -144,18 +144,18 @@ export function V3EngineGrid({ className = '' }: { className?: string }) {
             Sous le capot
           </div>
           <h2
-            className="v3-serif mt-2 text-3xl md:text-4xl font-semibold leading-tight"
+            className="v3-serif mt-2 text-2xl md:text-3xl font-semibold leading-tight"
             style={{ color: EMERALD }}
           >
             Les moteurs IA de la V3
           </h2>
-          <p className="mt-3 text-[15px] leading-relaxed text-slate-700">
+          <p className="mt-2.5 text-[14px] leading-relaxed" style={{ color: '#334155' }}>
             Un moteur de publication <strong>multi-modèles</strong> : là où les autres outils font tout
             passer par une seule IA généraliste, la V3 confie chaque tâche au modèle le plus doué pour elle.
           </p>
         </div>
 
-        <div className="mt-9 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
           {ENGINES.map((e) => {
             const Icon = e.icon;
             const inner = (
@@ -182,7 +182,7 @@ export function V3EngineGrid({ className = '' }: { className?: string }) {
                 <div className="mt-3 text-[12px] font-semibold" style={{ color: GOLD_DEEP }}>
                   {e.engine}
                 </div>
-                <p className="mt-1.5 text-[13px] leading-relaxed text-slate-600">{e.desc}</p>
+                <p className="mt-1.5 text-[12.5px] leading-relaxed" style={{ color: '#334155' }}>{e.desc}</p>
                 {e.to && (
                   <span
                     className="mt-3 inline-flex items-center gap-1 text-[12.5px] font-semibold"
@@ -198,24 +198,24 @@ export function V3EngineGrid({ className = '' }: { className?: string }) {
               <Link
                 key={e.title}
                 to={e.to}
-                className="rounded-2xl bg-white p-5 transition-shadow hover:shadow-[0_18px_40px_-28px_rgba(6,78,59,0.55)]"
+                className="rounded-2xl bg-white p-4 transition-shadow hover:shadow-[0_18px_40px_-28px_rgba(6,78,59,0.55)]"
                 style={{ border: `1px solid ${LINE}` }}
               >
                 {inner}
               </Link>
             ) : (
-              <div key={e.title} className="rounded-2xl bg-white p-5" style={{ border: `1px solid ${LINE}` }}>
+              <div key={e.title} className="rounded-2xl bg-white p-4" style={{ border: `1px solid ${LINE}` }}>
                 {inner}
               </div>
             );
           })}
         </div>
 
-        <ul className="mt-9 grid gap-3 md:grid-cols-3">
+        <ul className="mt-6 grid gap-3 md:grid-cols-3">
           {BENEFITS.map((b) => (
-            <li key={b} className="flex gap-2.5 text-[13.5px] leading-snug text-slate-700">
+            <li key={b} className="flex gap-2.5 text-[13px] leading-snug" style={{ color: '#334155' }}>
               <Check className="mt-0.5 w-4 h-4 shrink-0" style={{ color: GOLD }} />
-              <span>{b}</span>
+              <span style={{ color: '#334155' }}>{b}</span>
             </li>
           ))}
         </ul>
