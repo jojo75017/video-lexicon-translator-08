@@ -183,8 +183,10 @@ function render(baseUrl: string, email: string, firstName: string, letter: Lette
 <tr><td style="padding:26px 28px 0;color:#232F3E;font:16px/1.65 Arial,Helvetica,sans-serif">
 <p style="margin:0 0 18px">Bonjour${firstName ? ` ${firstName}` : ""},</p>
 ${letter.body}
+${letter.gift ? giftBlock(giftLink(email, letter)) : ""}
 ${PRICE_BLOCK}
 ${ctaButton(link, letter.cta)}
+
 <p style="margin:0 0 6px">Bien à vous,<br><strong>Georges Boubet</strong><br>EbookStudio</p>
 <p style="margin:18px 0 0;padding:14px 0 0;border-top:1px solid #e5e7eb;font:15px/1.6 Arial,Helvetica,sans-serif;color:#4b5563">${letter.ps}</p>
 </td></tr>
