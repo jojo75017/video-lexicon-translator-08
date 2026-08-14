@@ -119,7 +119,7 @@ const handler = async (req: Request): Promise<Response> => {
       </p>
 
 
-      <h2 style="margin:28px 0 8px;font-size:18px;color:#064e3b">3. Vos 3 premières actions</h2>
+      <h2 style="margin:28px 0 8px;font-size:18px;color:#064e3b">4. Vos 3 premières actions</h2>
       <ol style="margin:0;padding-left:20px;font-size:15px;line-height:1.7">
         <li>Choisissez une niche dans votre pack et cliquez sur « Écrire ce livre ».</li>
         <li>Validez le sommaire proposé (vous pouvez tout modifier).</li>
