@@ -28,9 +28,11 @@ export function useIsAdmin() {
     });
 
     const refresh = async () => {
-      const result = await getIsCurrentSessionAdmin();
-      if (!cancelled) setIsAdmin((prev) => (result ? true : prev === true ? true : result));
+      const result = await resolveAdminStatus();
+      // Un admin confirmé n'est jamais rétrogradé ; un inconnu ne conclut rien.
+      if (!cancelled) setIsAdmin((prev) => (prev === true ? true : result));
     };
+
 
     void refresh();
 
