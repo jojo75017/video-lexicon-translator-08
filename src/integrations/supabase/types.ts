@@ -2056,6 +2056,120 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriber_integrations: {
+        Row: {
+          api_key: string | null
+          created_at: string
+          id: string
+          last_tested_at: string | null
+          list_id: string | null
+          provider: string
+          status: string
+          updated_at: string
+          user_id: string
+          webhook_url: string | null
+        }
+        Insert: {
+          api_key?: string | null
+          created_at?: string
+          id?: string
+          last_tested_at?: string | null
+          list_id?: string | null
+          provider: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          webhook_url?: string | null
+        }
+        Update: {
+          api_key?: string | null
+          created_at?: string
+          id?: string
+          last_tested_at?: string | null
+          list_id?: string | null
+          provider?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          webhook_url?: string | null
+        }
+        Relationships: []
+      }
+      subscriber_profiles: {
+        Row: {
+          address_line: string | null
+          amazon_author_url: string | null
+          billing_email: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          facebook_url: string | null
+          first_name: string | null
+          instagram_url: string | null
+          last_name: string | null
+          linkedin_url: string | null
+          pen_name: string | null
+          phone: string | null
+          pinterest_url: string | null
+          postal_code: string | null
+          socials_public: boolean
+          tiktok_url: string | null
+          updated_at: string
+          user_id: string
+          website_url: string | null
+          x_url: string | null
+          youtube_url: string | null
+        }
+        Insert: {
+          address_line?: string | null
+          amazon_author_url?: string | null
+          billing_email?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          facebook_url?: string | null
+          first_name?: string | null
+          instagram_url?: string | null
+          last_name?: string | null
+          linkedin_url?: string | null
+          pen_name?: string | null
+          phone?: string | null
+          pinterest_url?: string | null
+          postal_code?: string | null
+          socials_public?: boolean
+          tiktok_url?: string | null
+          updated_at?: string
+          user_id: string
+          website_url?: string | null
+          x_url?: string | null
+          youtube_url?: string | null
+        }
+        Update: {
+          address_line?: string | null
+          amazon_author_url?: string | null
+          billing_email?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          facebook_url?: string | null
+          first_name?: string | null
+          instagram_url?: string | null
+          last_name?: string | null
+          linkedin_url?: string | null
+          pen_name?: string | null
+          phone?: string | null
+          pinterest_url?: string | null
+          postal_code?: string | null
+          socials_public?: boolean
+          tiktok_url?: string | null
+          updated_at?: string
+          user_id?: string
+          website_url?: string | null
+          x_url?: string | null
+          youtube_url?: string | null
+        }
+        Relationships: []
+      }
       subscribers: {
         Row: {
           access_code: string | null

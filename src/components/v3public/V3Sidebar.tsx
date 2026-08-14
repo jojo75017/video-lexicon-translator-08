@@ -4,7 +4,7 @@ import {
   ChevronLeft, ChevronRight,
   GraduationCap, Gem, FileText, User,
   LifeBuoy, Mail, HelpCircle, FolderOpen, Video, ListTree, Award,
-  Search, Target, BarChart3, Image as ImageIcon,
+  Search, Target, BarChart3, Image as ImageIcon, LayoutGrid,
 } from 'lucide-react';
 import { useState } from 'react';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
@@ -20,6 +20,8 @@ const NAV: NavSection[] = [
   {
     section: 'Recherche KDP',
     items: [
+      { to: '/v3/fonctionnalites', label: 'Fonctionnalités (12 modules)', icon: LayoutGrid, end: true, badge: 'Hub' },
+
       { to: '/v3/recherche', label: 'Studio Recherche KDP', icon: Search, badge: 'Hub' },
       { to: '/v3/create', label: 'Ebookstudio-Génie', icon: Sparkles, badge: 'Nouveauté IA' },
       { to: '/v3/create?sommaire=ia', label: 'Sommaire IA (dialogue)', icon: ListTree, badge: 'Nouveauté IA' },
