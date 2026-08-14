@@ -65,7 +65,7 @@ export function AdminPanelNav({ className }: AdminPanelNavProps) {
           </Button>
           <Button type="button" onClick={() => navigate('/ebook-planner')} className="rounded-xl">
             <BookOpen className="mr-2 h-4 w-4" />
-            Retour au générateur
+            Ouvrir EbookStudio V2
           </Button>
         </div>
       </div>

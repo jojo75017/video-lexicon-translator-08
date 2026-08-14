@@ -3,7 +3,6 @@ import { Crown, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useV3Mode } from '@/hooks/useV3Mode';
-import { ADMIN_HOME_PATH } from '@/config/adminRoutes';
 
 const GOLD = '#c9a84c';
 const LS_V3_MODE_KEY = 'ebookstudio_v3_mode';
@@ -69,14 +68,14 @@ export function V2V3FloatingSwitch({ forceVisible = false }: V2V3FloatingSwitchP
       navigate('/hub-v3');
     } else {
       resetV2PlannerEntryPoint();
-      toast.success('Retour à la V2', {
-        description: isAdmin ? 'Retour au tableau de bord admin.' : 'Générateur V2 — onglet Workflow.',
+      toast.success('Ouverture de la V2', {
+        description: 'Générateur V2 — onglet Workflow.',
         icon: '✨',
         position: 'top-center',
         duration: 3500,
         style: { zIndex: 99999 },
       });
-      navigate(isAdmin ? ADMIN_HOME_PATH : '/ebook-planner?tab=workflow-dashboard', { replace: true });
+      navigate('/ebook-planner?tab=workflow-dashboard', { replace: true });
     }
   };
 
@@ -84,8 +83,8 @@ export function V2V3FloatingSwitch({ forceVisible = false }: V2V3FloatingSwitchP
     <button
       type="button"
       onClick={handleClick}
-      aria-label={displayV3Mode ? (isAdmin ? 'Retour au tableau de bord admin' : 'Mode V3 actif — revenir en V2') : 'Basculer vers la V3'}
-      title={displayV3Mode ? (isAdmin ? 'Retour au tableau de bord admin' : 'Mode V3 actif — cliquer pour revenir en V2') : 'Basculer vers la V3'}
+      aria-label={displayV3Mode ? 'Ouvrir EbookStudio V2' : 'Ouvrir EbookStudio V3'}
+      title={displayV3Mode ? 'Ouvrir EbookStudio V2' : 'Ouvrir EbookStudio V3'}
       className="fixed left-4 top-[6.5rem] z-[9998] inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-extrabold shadow-xl transition-all duration-200 hover:scale-[1.04] hover:shadow-2xl"
       style={{
         borderColor: 'rgba(255,255,255,0.45)',
@@ -97,7 +96,7 @@ export function V2V3FloatingSwitch({ forceVisible = false }: V2V3FloatingSwitchP
       }}
     >
       {displayV3Mode ? <Crown className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
-      <span className="tracking-wide">{displayV3Mode ? (isAdmin ? 'Dashboard admin' : 'Revenir V2') : 'Ouvrir V3'}</span>
+      <span className="tracking-wide">{displayV3Mode ? 'Ouvrir V2' : 'Ouvrir V3'}</span>
     </button>
   );
 }
