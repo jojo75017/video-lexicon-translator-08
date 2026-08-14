@@ -5,42 +5,72 @@ const GOLD = '#c9a84c';
 const GOLD_DEEP = '#8a6d16';
 const LINE = 'rgba(6,78,59,0.14)';
 
-const BEFORE = [
-  'Un texte, pas un flux de travail d\u2019édition.',
-  'Du contenu, pas de positionnement.',
-  'Un classeur à livres : un outil d\u2019édition incomplet.',
-  'Un modèle d\u2019IA unique, pas une équipe d\u2019édition.',
-  'Des heures à corriger des mots en latin et des phrases coupées.',
-  'Une couverture amateur qui ne convertit pas sur Amazon.',
-  'Aucun livre audio, ou un TTS cher et robotique.',
-  'Des mots-clés trouvés au hasard, sans données Amazon.',
-  'Une mise en page Word à refaire dix fois.',
-  'Obligé de payer cinq outils et cinq abonnements.',
-  'Des traductions approximatives qui passent mal.',
-  'Aucune aide pour choisir les catégories KDP.',
-  'Pas de stratégie de lancement ni de preuve sociale.',
-  'Aucun mockup professionnel pour promouvoir le livre.',
-  'Obligé de solliciter des avis readers un par un.',
-  'Pas de plan marketing ni de contenu pour les réseaux.',
-];
-
-const AFTER = [
-  'Recherche & niche',
-  'Écriture du manuscrit',
-  'Création des visuels',
-  'Conception de couverture',
-  'Voix (livre audio)',
-  'SEO & mots-clés KDP',
-  'Traduction',
-  'Publication & métadonnées',
-  'Correction & humanisation',
-  'Mockups 3D & promotion',
-  'Plan marketing & réseaux sociaux',
-  'Suivi & reprise de projet',
-  'Stratégie de lancement & preuve sociale',
-  'Offrir son livre pour avis',
-  'Description KDP optimisée',
-  'Cohérence narrative & mémoire du livre',
+/** 16 paires appariées : chaque problème « Avant » face à sa solution « Après ». */
+const PAIRS: { before: string; after: string }[] = [
+  {
+    before: 'Un texte brut, pas un vrai flux de travail d\u2019édition.',
+    after: 'Un parcours d\u2019édition complet, de la recherche jusqu\u2019à la publication.',
+  },
+  {
+    before: 'Du contenu générique, aucun positionnement de niche.',
+    after: 'Recherche de niche et angle éditorial définis avant d\u2019écrire.',
+  },
+  {
+    before: 'Un classeur à livres : un outil d\u2019édition incomplet.',
+    after: 'Un studio unique qui couvre chaque étape du livre.',
+  },
+  {
+    before: 'Un modèle d\u2019IA unique, pas une équipe d\u2019édition.',
+    after: 'Plusieurs IA spécialisées, une par métier du livre.',
+  },
+  {
+    before: 'Des heures à corriger des mots en latin et des phrases coupées.',
+    after: 'Correction stricte : zéro latin, chapitres qui finissent par une vraie phrase.',
+  },
+  {
+    before: 'Une couverture amateur qui ne convertit pas sur Amazon.',
+    after: 'Couverture KDP professionnelle, dos et 4e de couverture inclus.',
+  },
+  {
+    before: 'Aucun livre audio, ou un TTS cher et robotique.',
+    after: 'Voix naturelle pour préparer votre version audio du livre.',
+  },
+  {
+    before: 'Des mots-clés trouvés au hasard, sans données Amazon.',
+    after: 'Mots-clés et catégories KDP appuyés sur des données Amazon réelles.',
+  },
+  {
+    before: 'Une mise en page Word à refaire dix fois.',
+    after: 'Export Word et PDF prêts à publier, sommaire soigné inclus.',
+  },
+  {
+    before: 'Obligé de payer cinq outils et cinq abonnements.',
+    after: 'Un seul abonnement pour toute la chaîne de production.',
+  },
+  {
+    before: 'Des traductions approximatives qui passent mal.',
+    after: 'Traduction fidèle pour ouvrir vos livres à de nouveaux marchés.',
+  },
+  {
+    before: 'Aucune aide pour choisir les catégories KDP.',
+    after: 'Métadonnées et catégories KDP recommandées pour votre livre.',
+  },
+  {
+    before: 'Pas de stratégie de lancement ni de preuve sociale.',
+    after: 'Stratégie de lancement et preuve sociale prêtes à appliquer.',
+  },
+  {
+    before: 'Aucun mockup professionnel pour promouvoir le livre.',
+    after: 'Mockups 3D professionnels pour vos pages et vos publicités.',
+  },
+  {
+    before: 'Obligé de solliciter des avis lecteurs un par un.',
+    after: 'Offrez votre livre pour avis, avec un parcours prêt à l\u2019emploi.',
+  },
+  {
+    before: 'Pas de plan marketing ni de contenu pour les réseaux.',
+    after: 'Plan marketing et contenus réseaux sociaux générés pour vous.',
+  },
 ];
 
 /** Section de conviction « Avant / Après » — informative, non cliquable. */
@@ -56,38 +86,48 @@ export default function V3BeforeAfterPanel({ className = '' }: { className?: str
         </h2>
       </div>
 
-      <div className="mt-8 grid gap-4 md:grid-cols-2">
-        <div className="rounded-3xl bg-white p-6 md:p-7" style={{ border: `1px solid ${LINE}` }}>
+      <div className="mt-8 grid gap-4 md:grid-cols-2 items-stretch">
+        {/* AVANT */}
+        <div className="h-full rounded-3xl bg-white p-6 md:p-7 flex flex-col" style={{ border: `1px solid ${LINE}` }}>
           <div className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: '#a2483d' }}>
             Avant — une seule IA
           </div>
-          <ul className="mt-4 space-y-3">
-            {BEFORE.map((b) => (
-              <li key={b} className="flex gap-2.5 text-[13.5px] leading-snug text-slate-600">
+          <ul className="mt-4 flex-1 flex flex-col">
+            {PAIRS.map((p) => (
+              <li
+                key={p.before}
+                className="flex gap-2.5 text-[13.5px] leading-snug py-[7px] min-h-[44px] items-start"
+                style={{ color: '#475569' }}
+              >
                 <X className="mt-0.5 w-4 h-4 shrink-0" style={{ color: '#a2483d' }} />
-                <span>{b}</span>
+                <span style={{ color: '#475569' }}>{p.before}</span>
               </li>
             ))}
           </ul>
         </div>
 
+        {/* APRÈS */}
         <div
-          className="rounded-3xl p-6 md:p-7"
+          className="h-full rounded-3xl p-6 md:p-7 flex flex-col"
           style={{ background: 'linear-gradient(160deg,#064e3b 0%,#053e2f 100%)', border: `1px solid ${GOLD}55` }}
         >
           <div className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: GOLD }}>
             Après — Ebookstudio V3
           </div>
-          <ol className="mt-4 grid gap-2.5 sm:grid-cols-2">
-            {AFTER.map((a, i) => (
-              <li key={a} className="flex items-start gap-2 text-[13.5px] leading-snug" style={{ color: '#fff' }}>
+          <ol className="mt-4 flex-1 flex flex-col">
+            {PAIRS.map((p, i) => (
+              <li
+                key={p.after}
+                className="flex gap-2.5 text-[13.5px] leading-snug py-[7px] min-h-[44px] items-start"
+                style={{ color: '#fff' }}
+              >
                 <span
-                  className="grid place-items-center w-5 h-5 rounded-full shrink-0 text-[10.5px] font-bold"
+                  className="grid place-items-center w-5 h-5 rounded-full shrink-0 text-[10.5px] font-bold mt-0.5"
                   style={{ background: `${GOLD}26`, color: GOLD, border: `1px solid ${GOLD}66` }}
                 >
                   {i + 1}
                 </span>
-                <span className="font-medium" style={{ color: '#fff' }}>{a}</span>
+                <span className="font-medium" style={{ color: '#fff' }}>{p.after}</span>
               </li>
             ))}
           </ol>
@@ -98,7 +138,7 @@ export default function V3BeforeAfterPanel({ className = '' }: { className?: str
 
       <p className="text-center v3-serif text-[18px] md:text-[21px] font-semibold leading-snug" style={{ color: EMERALD }}>
         Pas une seule IA qui tente de tout faire.
-        <span className="block not-italic text-[15px] md:text-[16px] font-normal mt-1.5 text-slate-600">
+        <span className="block not-italic text-[15px] md:text-[16px] font-normal mt-1.5" style={{ color: '#475569' }}>
           <Check className="inline w-4 h-4 mr-1 -mt-0.5" style={{ color: GOLD }} />
           Une IA spécialisée pour chaque étape de votre livre.
         </span>
