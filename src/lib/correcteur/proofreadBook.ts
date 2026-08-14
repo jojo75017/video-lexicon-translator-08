@@ -270,7 +270,7 @@ export function splitForProofread(text: string, maxWords = 1200): string[] {
 async function proofreadBlock(
   title: string,
   block: string,
-  mode: ProofreadMode,
+  mode: CallMode,
 ): Promise<{ text: string; corrections: Correction[]; quality: number; failed: boolean }> {
   const res = await callProofread(title, block, mode);
   const truncated = isTruncated(block, res.corrected);
