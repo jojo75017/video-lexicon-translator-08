@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { getStripeEnvironment } from '@/lib/stripe';
-import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
+import useIsAdmin from './useIsAdmin';
 
 /**
  * Droits d'accès V3 d'après les commandes réellement payées (v3_installment_orders).
