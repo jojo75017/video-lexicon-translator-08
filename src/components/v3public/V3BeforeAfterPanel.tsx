@@ -67,7 +67,7 @@ export default function V3BeforeAfterPanel({ className = '' }: { className?: str
                 >
                   {i + 1}
                 </span>
-                <span className="font-medium">{a}</span>
+                <span className="font-medium" style={{ color: '#fff' }}>{a}</span>
               </li>
             ))}
           </ol>
