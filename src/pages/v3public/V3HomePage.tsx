@@ -221,6 +221,11 @@ export default function V3HomePage() {
         <div className="v3-gold-rule relative" />
       </section>
 
+      {/* KDP Pilot — outil partenaire payant + code abonnés (compact, avant les champs) */}
+      <section className="max-w-7xl mx-auto px-5 md:px-8 pt-5">
+        <KdpPilotPromoBanner variant="light" compact />
+      </section>
+
       {/* Démarrage : titre du livre → fiche */}
       <V3StartBookBar />
 
