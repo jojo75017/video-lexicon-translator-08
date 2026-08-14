@@ -95,15 +95,61 @@ TU DOIS :
 TU NE DOIS PAS : résumer, réécrire, raccourcir ni supprimer une phrase existante du paragraphe.
 Type de correction à renvoyer : "style".`;
 
+    const editionRules = `MISSION : passe d'ÉDITION professionnelle, telle qu'une maison d'édition la pratique après la correction orthographique.
+
+TU DOIS :
+1. Supprimer les répétitions de mots et de tournures proches (même mot ou même structure à quelques lignes d'intervalle) en variant le vocabulaire, sans changer le sens.
+2. Alléger les lourdeurs : phrases interminables coupées, subordonnées empilées démêlées, formules creuses retirées.
+3. Retirer les adverbes inutiles en -ment et les intensifieurs faibles (très, vraiment, un peu, beaucoup) quand ils n'apportent rien.
+4. Remplacer la voix passive par la voix active quand la phrase y gagne en netteté.
+5. Harmoniser les temps narratifs sur tout le fragment (un seul régime : passé simple/imparfait OU présent).
+6. Rendre les enchaînements entre paragraphes fluides, sans ajouter d'idée ni de transition artificielle.
+7. Remplacer par du français clair tout latin, faux latin, pseudo-langue, mot inventé ou mot étranger décoratif.
+8. Vérifier la cohérence des noms propres, lieux et titres avec le relevé du livre fourni.
+
+TU NE DOIS JAMAIS : modifier l'intrigue, les faits, la chronologie ; ajouter une scène, une idée ou un personnage ; supprimer un passage narratif ; changer le fond d'un dialogue.
+La voix de l'auteur doit rester reconnaissable. Le nombre de mots doit rester dans une marge de ±10 % du texte fourni.`;
+
+    const finalCheckRules = `MISSION : CONTRÔLE FINAL avant publication. Le texte a déjà été corrigé et édité. Tu ne cherches que les défauts résiduels.
+
+TU DOIS :
+1. Corriger toute faute résiduelle d'orthographe, de grammaire, d'accord, de conjugaison ou de ponctuation.
+2. Vérifier que chaque phrase est complète et ponctuée : aucun mot orphelin, aucune phrase sans verbe, aucune fin en virgule ou en tiret.
+3. Supprimer tout artefact technique : fragments de JSON, accolades, guillemets droits parasites, balises markdown (#, **, ---), numérotations en double, mentions « Chapitre X » répétées dans le corps du texte.
+4. Vérifier l'orthographe constante des noms propres, lieux et titres selon le relevé du livre fourni.
+5. Supprimer tout latin, faux latin ou mot inventé restant.
+
+TU NE DOIS RIEN RÉÉCRIRE D'AUTRE : ni le style, ni les tournures, ni la longueur des phrases. Zéro ajout, zéro suppression de passage.`;
+
+    const contextBlock = (() => {
+      const c = bookContext && typeof bookContext === 'object' ? bookContext as Record<string, unknown> : null;
+      if (!c) return '';
+      const names = Array.isArray(c.names) ? (c.names as unknown[]).map(String).slice(0, 60) : [];
+      const places = Array.isArray(c.places) ? (c.places as unknown[]).map(String).slice(0, 40) : [];
+      const lines: string[] = [];
+      if (c.title) lines.push(`Titre du livre : ${String(c.title)}`);
+      if (c.tense) lines.push(`Temps narratif dominant : ${String(c.tense)}`);
+      if (c.pov) lines.push(`Point de vue : ${String(c.pov)}`);
+      if (names.length) lines.push(`Noms propres du livre (orthographe de référence, à ne jamais altérer) : ${names.join(', ')}`);
+      if (places.length) lines.push(`Lieux du livre : ${places.join(', ')}`);
+      if (!lines.length) return '';
+      return `\n\nRELEVÉ DE COHÉRENCE DU LIVRE (à respecter strictement) :\n${lines.map((l) => `- ${l}`).join('\n')}`;
+    })();
+
     const systemPrompt = `Tu es un correcteur éditorial professionnel francophone. ${
       endingFix
         ? "Tu complètes une fin de chapitre inachevée, sans rien réécrire d'autre."
         : latinFix
           ? 'Tu effectues une passe unique de francisation, sans aucune autre correction.'
-          : `Tu appliques une correction ${polish ? 'STRICTE PUIS un polissage de style mesuré' : 'STRICTE sans aucune réécriture'}.`
+          : edition
+            ? "Tu es l'éditeur d'une maison d'édition : tu affines un texte déjà corrigé, sans le réécrire."
+            : finalCheck
+              ? 'Tu effectues le contrôle final avant impression : tu ne traques que les défauts résiduels.'
+              : `Tu appliques une correction ${polish ? 'STRICTE PUIS un polissage de style mesuré' : 'STRICTE sans aucune réécriture'}.`
     }
 
-${endingFix ? endingRules : latinFix ? latinRules : polish ? polishRules : strictRules}
+${endingFix ? endingRules : latinFix ? latinRules : edition ? editionRules : finalCheck ? finalCheckRules : polish ? polishRules : strictRules}${contextBlock}
+
 
 
 Le texte corrigé doit être prêt pour publication Amazon KDP.
