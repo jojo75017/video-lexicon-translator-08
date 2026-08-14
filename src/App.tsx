@@ -339,7 +339,7 @@ const App = () => {
       isAdmin={isAdmin}
       subscriberEmail={subscriberEmail}
       subscriberData={subscriberData}
-      onInvalid={handleLogout}
+      onInvalid={handleInvalidSubscriber}
     >
       {node}
     </SubscriberGate>
