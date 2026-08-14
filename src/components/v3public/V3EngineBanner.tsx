@@ -7,6 +7,7 @@ import {
   AudioLines,
   Tags,
   Languages,
+  LineChart,
   Check,
   ArrowRight,
 } from 'lucide-react';
@@ -82,6 +83,14 @@ const ENGINES: Engine[] = [
     desc: 'Le même livre publié sur les marchés Amazon étrangers.',
     icon: Languages,
     to: '/v3/outils/traduction',
+  },
+  {
+    role: 'Partenariat',
+    title: 'KDP Pilot',
+    engine: 'Suivi des ventes & concurrence',
+    desc: 'Historique des positions, ventes estimées et analyse de niche, chaque jour.',
+    icon: LineChart,
+    to: '/go/kdp-pilot',
   },
 ];
 

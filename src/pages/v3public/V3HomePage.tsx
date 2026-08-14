@@ -1,15 +1,22 @@
 import { Link } from 'react-router-dom';
 import {
-  Sparkles, BookOpen, Library, ArrowRight, Star, Quote,
+  Sparkles, BookOpen, Library, ArrowRight,
 } from 'lucide-react';
 
-import homeHero from '@/assets/v3/home-hero.jpg';
 import V3BriefRecap from '@/components/v3public/V3BriefRecap';
 import V3CapabilitiesPanel from '@/components/v3public/V3CapabilitiesPanel';
 import V3StartBookBar from '@/components/v3public/V3StartBookBar';
 import V3PaletteModule from '@/components/v3public/V3PaletteModule';
 import KdpPilotPromoBanner from '@/components/ebook/KdpPilotPromoBanner';
 import { V3EngineStrip, V3EngineGrid } from '@/components/v3public/V3EngineBanner';
+import V3HeroBanner from '@/components/v3public/V3HeroBanner';
+import V3MarketProofPanel from '@/components/v3public/V3MarketProofPanel';
+import V3BeforeAfterPanel from '@/components/v3public/V3BeforeAfterPanel';
+import V3AudiencePanel from '@/components/v3public/V3AudiencePanel';
+import V3GuaranteePanel from '@/components/v3public/V3GuaranteePanel';
+import V3CommercialLicensePanel from '@/components/v3public/V3CommercialLicensePanel';
+import V3ClosingRecallPanel from '@/components/v3public/V3ClosingRecallPanel';
+
 
 
 
@@ -39,6 +46,10 @@ export default function V3HomePage() {
 
   return (
     <>
+      {/* BANDEAU D'ACCROCHE — premier module */}
+      <V3HeroBanner />
+
+
       {/* BANNIÈRE — Migration V2 vers V3 (3 modules offerts) */}
       <section
         style={{
@@ -123,113 +134,32 @@ export default function V3HomePage() {
         </div>
       </section>
 
-      {/* Ce que l'outil produit (le paramétrage des clés vit désormais dans « Fonctionnalités ») */}
+      {/* MOTEUR MULTI-MODÈLES — juste sous le bandeau d'accroche */}
+      <V3EngineStrip />
+      <V3EngineGrid />
+
+      {/* KDP Pilot — outil partenaire payant + code abonnés (compact, avant les champs) */}
+      <section className="max-w-7xl mx-auto px-5 md:px-8 pt-2">
+        <KdpPilotPromoBanner variant="light" compact />
+      </section>
+
+      {/* Démarrage : titre du livre → fiche (champs réduits) */}
+      <V3StartBookBar />
+
+      <V3BriefRecap />
+
+      {/* Ce que l'outil produit (le paramétrage des clés vit dans « Fonctionnalités ») */}
       <div className="max-w-7xl mx-auto px-5 md:px-8 py-5">
         <V3CapabilitiesPanel />
       </div>
 
+      {/* SECTIONS DE CONVICTION — sous le module des livres */}
+      <V3MarketProofPanel />
+      <V3BeforeAfterPanel />
+      <V3AudiencePanel />
+      <V3GuaranteePanel />
+      <V3CommercialLicensePanel />
 
-      {/* HERO — bandeau pleine largeur */}
-      <section className="relative overflow-hidden">
-        <img
-          src={homeHero}
-          alt="Atelier d'écriture premium — livre ouvert, plume et lampe verte sur bureau en chêne"
-          width={1920}
-          height={640}
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ filter: 'brightness(1.32) saturate(1.06)' }}
-        />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(5,62,47,0.28) 0%, rgba(5,62,47,0.14) 45%, rgba(5,62,47,0.48) 100%)' }} />
-
-        <div className="absolute inset-x-0 top-0 h-[3px]" style={{ background: 'linear-gradient(90deg, transparent, var(--v3-gold), transparent)' }} />
-
-        <div className="relative max-w-5xl mx-auto px-5 md:px-8 py-16 md:py-24 text-center min-h-[420px] md:min-h-[520px] flex flex-col items-center justify-center">
-          <span className="v3-chip v3-chip-gold">
-            <Sparkles className="w-3.5 h-3.5" /> Atelier d'écriture premium
-          </span>
-
-          <h1
-            className="v3-serif mt-6 font-semibold leading-[1.02] tracking-tight"
-            style={{ textShadow: '0 3px 18px rgba(3,32,24,0.75), 0 1px 3px rgba(0,0,0,0.55)' }}
-          >
-            <span className="block text-4xl md:text-5xl xl:text-6xl" style={{ color: '#fffaf0' }}>Publiez le livre que</span>
-            <span className="block text-4xl md:text-5xl xl:text-6xl italic" style={{ color: 'var(--v3-gold)' }}>vous avez en vous.</span>
-          </h1>
-
-          <p className="mt-6 text-[15px] max-w-2xl mx-auto text-white" style={{ textShadow: '0 2px 10px rgba(3,32,24,0.7)' }}>
-            Un atelier éditorial complet : de l'idée à la couverture, du sommaire à la publication Amazon KDP.
-            Trente agents IA au service de votre livre.
-          </p>
-
-          {/* Accès rapide clé IA depuis le bandeau */}
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-            <a
-              href="https://aistudio.google.com/app/apikey"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="v3-btn v3-btn-gold text-[12.5px]"
-            >
-              Obtenir ma clé Gemini gratuite
-            </a>
-            <button
-              type="button"
-              onClick={() => window.dispatchEvent(new CustomEvent('v3-open-keys'))}
-              className="v3-btn v3-btn-outline text-[12.5px] bg-white/90"
-            >
-              Coller ma clé (Gemini, OpenAI, Claude, OpenRouter)
-            </button>
-          </div>
-
-
-          {/* Social proof */}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <div className="flex -space-x-2">
-              {[
-                'https://randomuser.me/api/portraits/women/68.jpg',
-                'https://randomuser.me/api/portraits/men/32.jpg',
-                'https://randomuser.me/api/portraits/women/44.jpg',
-                'https://randomuser.me/api/portraits/men/75.jpg',
-                'https://randomuser.me/api/portraits/women/12.jpg',
-              ].map((src, i) => (
-                <img
-                  key={i}
-                  src={src}
-                  alt={`Auteur ${i + 1}`}
-                  loading="lazy"
-                  className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm"
-                />
-              ))}
-            </div>
-            <div className="flex items-center gap-0.5" style={{ color: 'var(--v3-gold)' }}>
-              {[0,1,2,3,4].map(i => <Star key={i} className="w-4 h-4 fill-current" />)}
-            </div>
-            <span className="text-xs text-white/85">Rejoignez les 1 247 auteurs</span>
-          </div>
-
-          {/* Citation */}
-          <figure className="relative mt-10 max-w-xl mx-auto rounded-xl bg-white/95 backdrop-blur px-6 py-4"
-            style={{ border: '1px solid rgba(201,168,76,0.35)', boxShadow: '0 10px 30px -12px rgba(6,78,59,0.35)' }}>
-            <Quote className="absolute -top-2 -left-2 w-6 h-6 p-1 rounded-full" style={{ background: 'var(--v3-gold)', color: '#1a1408' }} />
-            <blockquote className="text-[13px] italic leading-relaxed" style={{ color: 'var(--v3-ink)' }}>
-              Le problème n'est pas d'écrire. C'est de ne jamais commencer.
-            </blockquote>
-            <figcaption className="v3-serif text-[13px] font-semibold mt-1" style={{ color: 'var(--v3-emerald)' }}>
-              Commencez votre livre.
-            </figcaption>
-          </figure>
-        </div>
-        <div className="v3-gold-rule relative" />
-      </section>
-
-      {/* KDP Pilot — outil partenaire payant + code abonnés (compact, avant les champs) */}
-      <section className="max-w-7xl mx-auto px-5 md:px-8 pt-5">
-        <KdpPilotPromoBanner variant="light" compact />
-      </section>
-
-      {/* Démarrage : titre du livre → fiche */}
-      <V3StartBookBar />
-
-      <V3BriefRecap />
 
 
 
@@ -289,9 +219,6 @@ export default function V3HomePage() {
       {/* Les six univers vivent désormais dans « Fonctionnalités » (12 modules) */}
 
 
-      {/* MOTEUR MULTI-MODÈLES */}
-      <V3EngineStrip />
-      <V3EngineGrid />
 
       {/* OUTILS VEDETTES */}
       <section className="max-w-7xl mx-auto px-5 md:px-8 pb-16">
@@ -416,6 +343,9 @@ export default function V3HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Module de clôture — rappel de tout ce qui est déjà disponible */}
+      <V3ClosingRecallPanel />
 
       {/* Palette officielle V3 */}
       <V3PaletteModule />
