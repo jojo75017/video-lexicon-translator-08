@@ -53,6 +53,9 @@ export default function V3HomePage() {
       <V3EngineStrip />
       <V3EngineGrid />
 
+      {/* Encart de démarrage — immédiatement après les moteurs IA */}
+      <V3ClosingRecallPanel />
+
 
 
 
@@ -348,9 +351,6 @@ export default function V3HomePage() {
           </div>
         </div>
       </section>
-
-      {/* Module de clôture — rappel de tout ce qui est déjà disponible */}
-      <V3ClosingRecallPanel />
 
       {/* Palette officielle V3 */}
       <V3PaletteModule />
