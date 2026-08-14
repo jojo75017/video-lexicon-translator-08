@@ -203,8 +203,11 @@ const App = () => {
   const [subscriberEmail, setSubscriberEmail] = useState('');
   const [subscriberData, setSubscriberData] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  /** Passe à true dès que la vérification de session/admin est terminée. */
+  const [isAdminChecked, setIsAdminChecked] = useState(false);
 
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
 
   useEffect(() => {
     const safetyTimer = setTimeout(() => {
