@@ -606,7 +606,7 @@ const App = () => {
             <Route path="/v3/offre" element={<V3OffrePage />} />
             <Route path="/v3/temoignage" element={<V3TemoignagePage />} />
 
-            <Route path="/v3" element={<V3PublicLayout isAdmin={isAdmin} isAdminChecking={!isAdminChecked} />}>
+            <Route path="/v3" element={<V3PublicLayout isAdmin={isAdmin} isAdminChecking={!isAdminChecked} isSubscriber={isAuthenticated} />}>
               <Route index element={<V3HomePage />} />
               <Route path="auth" element={<V3AuthPage />} />
               <Route path="pourquoi" element={<V3PourquoiPage />} />
