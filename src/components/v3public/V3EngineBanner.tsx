@@ -7,6 +7,7 @@ import {
   AudioLines,
   Tags,
   Languages,
+  LineChart,
   Check,
   ArrowRight,
 } from 'lucide-react';
