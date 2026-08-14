@@ -223,12 +223,36 @@ const App = () => {
 
 
   useEffect(() => {
+    let cancelled = false;
+    // Le minuteur n'invente aucun statut : il signale seulement une attente
+    // anormale pour proposer des sorties directes (admin / V2).
     const safetyTimer = setTimeout(() => {
-      console.warn('Safety timer triggered – forcing auth check complete');
       setIsCheckingAuth(false);
-      setIsAdminChecked(true);
-    }, 6000);
+      setAdminTimedOut(true);
+    }, 8000);
 
+    /** Résout le rôle sans jamais conclure « visiteur » sur un statut inconnu. */
+    const resolve = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) {
+          // Pas de session : laisser une chance à la restauration avant de conclure.
+          await new Promise((r) => setTimeout(r, 600));
+          const { data: { session: retry } } = await supabase.auth.getSession();
+          if (cancelled) return;
+          if (!retry?.user) {
+            setAdminStatus(false);
+            return;
+          }
+        }
+        const status = await resolveAdminStatus();
+        if (cancelled) return;
+        // Un admin confirmé n'est jamais rétrogradé.
+        setAdminStatus((prev) => (prev === true ? true : status));
+      } catch (error) {
+        console.error('Erreur session admin:', error);
+      }
+    };
 
     const initAuth = async () => {
       const savedEmail = localStorage.getItem('subscriber_email');
@@ -255,21 +279,7 @@ const App = () => {
       }
 
       setIsCheckingAuth(false);
-
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          const adminStatus = await getIsCurrentSessionAdmin();
-          setIsAdmin(adminStatus);
-        } else {
-          setIsAdmin(false);
-        }
-      } catch (error) {
-        console.error('Erreur session admin:', error);
-      } finally {
-        setIsAdminChecked(true);
-      }
-
+      await resolve();
     };
 
 
@@ -279,25 +289,23 @@ const App = () => {
       const shouldRecheckAdmin =
         (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') && !!session;
       if (shouldRecheckAdmin && session?.user) {
-        setIsAdminChecked(false);
-        setTimeout(async () => {
-          clearAdminCache();
-          const adminStatus = await getIsCurrentSessionAdmin();
-          setIsAdmin(adminStatus);
-          setIsAdminChecked(true);
-        }, 0);
+        // Aucun clearAdminCache ici : un rafraîchissement de jeton ne doit pas
+        // effacer un statut admin déjà confirmé.
+        setTimeout(() => { void resolve(); }, 0);
         return;
       }
       if (event === 'SIGNED_OUT') {
         clearAdminCache();
-        setIsAdmin(false);
-        setIsAdminChecked(true);
+        setAdminStatus(false);
+        setAdminTimedOut(false);
       }
 
     });
 
     return () => {
+      cancelled = true;
       clearTimeout(safetyTimer);
+
       subscription.unsubscribe();
     };
   }, []);
