@@ -7,6 +7,7 @@ import { BackButton } from '@/components/v3/BackButton';
 import V3BriefRecap from '@/components/v3public/V3BriefRecap';
 import V3ApiKeysGate from '@/components/v3public/V3ApiKeysGate';
 import V3GenieDialog from '@/components/v3public/V3GenieDialog';
+import V3QuickActionsBar from '@/components/v3public/V3QuickActionsBar';
 import { readBookBrief, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
 
 
@@ -125,7 +126,11 @@ export default function V3CreatePage() {
   return (
     <section className="v3-halo-soft min-h-[calc(100vh-4rem)] py-10 px-5">
       <div className="max-w-4xl mx-auto">
-        <BackButton />
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <BackButton />
+          <V3QuickActionsBar />
+        </div>
+
 
         {openingBook && (
           <div className="mt-6 v3-card flex items-center gap-3 text-sm">

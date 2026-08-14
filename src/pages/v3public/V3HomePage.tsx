@@ -6,6 +6,7 @@ import {
 import V3BriefRecap from '@/components/v3public/V3BriefRecap';
 import V3CapabilitiesPanel from '@/components/v3public/V3CapabilitiesPanel';
 import V3StartBookBar from '@/components/v3public/V3StartBookBar';
+import V3QuickActionsBar from '@/components/v3public/V3QuickActionsBar';
 import V3PaletteModule from '@/components/v3public/V3PaletteModule';
 import KdpPilotPromoBanner from '@/components/ebook/KdpPilotPromoBanner';
 import Niches10Offer from '@/components/marketing/Niches10Offer';
@@ -151,6 +152,11 @@ export default function V3HomePage() {
       <section className="max-w-7xl mx-auto px-5 md:px-8 pt-2">
         <KdpPilotPromoBanner variant="light" compact />
       </section>
+
+      {/* Actions rapides (Workflow IA, Couverture, Ambiances, Sauvegarder, Nouveau, Formulaire manuel) */}
+      <div className="max-w-7xl mx-auto px-5 md:px-8 pt-3">
+        <V3QuickActionsBar />
+      </div>
 
       {/* Démarrage : titre du livre → fiche (champs réduits) */}
       <V3StartBookBar />

@@ -21,6 +21,7 @@ const NAV: NavSection[] = [
     section: 'Fonctionnalités',
     items: [
       { to: '/v3/fonctionnalites', label: 'Fonctionnalités (12 modules)', icon: LayoutGrid, end: true, badge: 'Hub' },
+      { to: '/v3/kit-demarrage', label: '📘 Kit de démarrage (PDF)', icon: GraduationCap, badge: 'NEW' },
       { to: '/v3/recherche', label: 'Studio Recherche KDP', icon: Search, badge: 'Hub' },
       { to: '/v3/create', label: 'Ebookstudio-Génie', icon: Sparkles, badge: 'Nouveauté IA' },
       { to: '/v3/create?sommaire=ia', label: 'Sommaire IA (dialogue)', icon: ListTree, badge: 'Nouveauté IA' },

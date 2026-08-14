@@ -29,7 +29,7 @@ const COPY: Record<'general' | 'expat', Record<AbVariant, AbCopy>> = {
     A: {
       popupTitle: 'Avant de partir… 🎁',
       popupSubtitle:
-        'Recevez gratuitement les 5 niches d\'ebooks les plus rentables en 2026 (données Amazon réelles) + un plan d\'ebook prêt à l\'emploi.',
+        'Recevez gratuitement les 10 niches d\'ebooks les plus rentables en 2026 (données Amazon réelles) + un plan d\'ebook prêt à l\'emploi.',
       popupCta: 'Recevoir mon guide gratuit',
       stickyMessage: 'Le sommaire complet de votre livre, généré en 2 minutes — gratuit',
       stickyCta: 'Voir mon sommaire',
