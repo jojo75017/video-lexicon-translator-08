@@ -24,8 +24,14 @@ const corsHeaders = {
 const CAMPAIGN = "cloture-47-2026";
 const CHECKOUT = CHECKOUT_URL;
 const DEMO_URL = "https://ebookstudio.fr/demo";
+const GIFT_URL = "https://ebookstudio.fr/10-niches-offertes";
 
-type TemplateKey = "cliqueurs-personnel" | "cloture-47-1" | "cloture-47-2" | "cloture-47-3";
+type TemplateKey =
+  | "cliqueurs-personnel"
+  | "cloture-47-1"
+  | "cloture-47-2"
+  | "cloture-47-3"
+  | "relance-niches-1";
 
 interface Letter {
   key: TemplateKey;
@@ -36,9 +42,12 @@ interface Letter {
   body: string;
   cta: string;
   ps: string;
-  /** Cible par défaut : cliqueurs, ou ouvreurs qui n'ont jamais cliqué. */
-  segment: "clickers" | "openers_no_click";
+  /** Cible par défaut : cliqueurs, ouvreurs sans clic, ou tous les non-cliqueurs. */
+  segment: "clickers" | "openers_no_click" | "no_click";
+  /** Ajoute le bloc cadeau « 10 niches offertes » avant le prix. */
+  gift?: boolean;
 }
+
 
 const PRICE_BLOCK = `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td align="center" style="background:#232F3E;padding:20px;color:#ffffff;font:16px/1.5 Arial,Helvetica,sans-serif">
 <div style="font:700 38px/1.1 Arial,Helvetica,sans-serif;color:#FF9E2D">47 €</div>
