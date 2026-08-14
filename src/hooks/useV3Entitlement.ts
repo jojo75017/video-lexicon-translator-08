@@ -20,23 +20,26 @@ export function useV3Entitlement() {
   const [hasBase, setHasBase] = useState(false);
   const [hasFull, setHasFull] = useState(false);
   const [hasV2, setHasV2] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  // Statut admin partagé et réactif : `null` = encore inconnu.
+  const { isAdmin: adminStatus } = useIsAdmin();
+  const isAdmin = adminStatus === true;
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      setLoading(true);
-      const admin = await getIsCurrentSessionAdmin();
-      if (cancelled) return;
-      setIsAdmin(admin);
+      // Statut admin inconnu : on reste en chargement, aucune conclusion hâtive.
+      if (adminStatus === null) { setLoading(true); return; }
 
-      if (admin) {
+      setLoading(true);
+
+      if (adminStatus === true) {
         setHasBase(true);
         setHasFull(true);
         setHasV2(true);
         setLoading(false);
         return;
       }
+
 
       const { data: { user } } = await supabase.auth.getUser();
       const email = user?.email;
