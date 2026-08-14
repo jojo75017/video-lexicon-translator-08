@@ -13,6 +13,8 @@ import { detectLatin, latinExpressions as findLatinExpressions } from '@/utils/l
 import { dashesToBullets } from '@/utils/frenchTypography';
 
 import { checkEnding, lastParagraph, replaceLastParagraph } from '@/utils/chapterEnding';
+import { applyFrenchTypography, checkTypographyCompliance } from '@/utils/frenchTypography';
+import type { BookContext } from './bookContext';
 
 export type ProofreadMode = 'strict' | 'polish';
 
