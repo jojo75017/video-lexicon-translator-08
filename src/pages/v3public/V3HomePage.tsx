@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import {
   Sparkles, BookOpen, Library, ArrowRight, Star, Quote,
 } from 'lucide-react';
-import { V3_HEADER_MENU } from '@/data/v3HeaderMenu';
+
 import homeHero from '@/assets/v3/home-hero.jpg';
 import V3BriefRecap from '@/components/v3public/V3BriefRecap';
 import V3CapabilitiesPanel from '@/components/v3public/V3CapabilitiesPanel';
