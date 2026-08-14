@@ -24,8 +24,14 @@ const corsHeaders = {
 const CAMPAIGN = "cloture-47-2026";
 const CHECKOUT = CHECKOUT_URL;
 const DEMO_URL = "https://ebookstudio.fr/demo";
+const GIFT_URL = "https://ebookstudio.fr/10-niches-offertes";
 
-type TemplateKey = "cliqueurs-personnel" | "cloture-47-1" | "cloture-47-2" | "cloture-47-3";
+type TemplateKey =
+  | "cliqueurs-personnel"
+  | "cloture-47-1"
+  | "cloture-47-2"
+  | "cloture-47-3"
+  | "relance-niches-1";
 
 interface Letter {
   key: TemplateKey;
@@ -36,9 +42,12 @@ interface Letter {
   body: string;
   cta: string;
   ps: string;
-  /** Cible par défaut : cliqueurs, ou ouvreurs qui n'ont jamais cliqué. */
-  segment: "clickers" | "openers_no_click";
+  /** Cible par défaut : cliqueurs, ouvreurs sans clic, ou tous les non-cliqueurs. */
+  segment: "clickers" | "openers_no_click" | "no_click";
+  /** Ajoute le bloc cadeau « 10 niches offertes » avant le prix. */
+  gift?: boolean;
 }
+
 
 const PRICE_BLOCK = `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td align="center" style="background:#232F3E;padding:20px;color:#ffffff;font:16px/1.5 Arial,Helvetica,sans-serif">
 <div style="font:700 38px/1.1 Arial,Helvetica,sans-serif;color:#FF9E2D">47 €</div>
@@ -110,6 +119,24 @@ const LETTERS: Letter[] = [
     cta: "Ouvrir mon accès à vie — 47 €",
     ps: "Après le 30 septembre, ce tarif ne reviendra pas.",
   },
+  {
+    key: "relance-niches-1",
+    label: "Relance — 10 niches offertes (non-cliqueurs)",
+    subject: "10 niches Amazon rentables, offertes (même si vous n'achetez rien)",
+    preheader: "Le pack de 10 niches est à vous, sans condition. La suite est optionnelle.",
+    segment: "no_click",
+    gift: true,
+    body: `<p style="margin:0 0 18px">Je commence par le cadeau, parce qu'il ne vous coûte rien et qu'il est utile tout de suite.</p>
+<p style="margin:0 0 18px">Je vous offre <strong>10 niches Amazon rentables</strong>, extraites de notre base de 600 niches analysées : le thème, le public visé et l'angle du livre à écrire. Vous les consultez immédiatement, sans achat, sans carte bancaire.</p>
+<p style="margin:0 0 14px;font:700 17px Arial,Helvetica,sans-serif">Ce que devient une niche avec EbookStudio</p>
+<p style="margin:0 0 12px">Vous choisissez une niche, vous la décrivez en une phrase, et vous obtenez le sommaire. Puis les chapitres, un par un, en français, avec la mémoire du livre pour rester cohérent jusqu'à la fin.</p>
+<p style="margin:0 0 12px">Ensuite la correction chapitre par chapitre, la couverture avec le dos calculé selon votre nombre de pages, le fichier Word et le PDF aux normes Amazon KDP, et la fiche de vente : titre, description, mots-clés, catégories.</p>
+<p style="margin:0 0 14px;font:700 17px Arial,Helvetica,sans-serif">Ce que vous recevez juste après le paiement</p>
+<p style="margin:0 0 12px">Un email de bienvenue avec <strong>vos identifiants d'accès</strong>, le lien de vos 10 niches, et mon adresse directe <strong>boubetgeorges@gmail.com</strong> : si quelque chose bloque, vous m'écrivez et je réponds moi-même.</p>
+<p style="margin:0 0 18px">Jusqu'au <strong>30 septembre 2026</strong>, l'accès est à <strong>47 € une seule fois, à vie</strong>. À partir du 1<sup>er</sup> octobre, il ne restera que l'abonnement à 17 €/mois, soit 204 € sur un an.</p>`,
+    cta: "Ouvrir mon accès à vie — 47 €",
+    ps: "Le pack de 10 niches reste à vous quoi qu'il arrive : cliquez simplement sur le lien du cadeau ci-dessus.",
+  },
 ];
 
 const byKey = new Map(LETTERS.map((l) => [l.key, l]));
@@ -121,9 +148,24 @@ const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 function trackedLink(email: string, letter: Letter) {
   const destination = letter.key === "cloture-47-2"
     ? `${DEMO_URL}?utm_source=email&utm_medium=cloture&utm_campaign=${letter.key}`
-    : `${CHECKOUT}?src=${CAMPAIGN}-${letter.key}&email=${encodeURIComponent(email)}`;
+    : `${CHECKOUT}?src=${letter.key === "relance-niches-1" ? letter.key : `${CAMPAIGN}-${letter.key}`}&email=${encodeURIComponent(email)}`;
   return `https://ebookstudio.fr/r?e=${encodeURIComponent(email)}&s=1&t=${letter.key}&u=${encodeURIComponent(destination)}`;
 }
+
+/** Lien du cadeau « 10 niches offertes », tracké lui aussi. */
+function giftLink(email: string, letter: Letter) {
+  const destination = `${GIFT_URL}?src=${letter.key}&email=${encodeURIComponent(email)}`;
+  return `https://ebookstudio.fr/r?e=${encodeURIComponent(email)}&s=1&t=${letter.key}-cadeau&u=${encodeURIComponent(destination)}`;
+}
+
+function giftBlock(link: string) {
+  return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td style="background:#FFF7EA;border:1px solid #FF9E2D;padding:18px 20px;color:#232F3E;font:16px/1.6 Arial,Helvetica,sans-serif">
+<div style="font:700 17px Arial,Helvetica,sans-serif;margin-bottom:8px">🎁 Votre cadeau : 10 niches Amazon rentables</div>
+<div style="margin-bottom:12px">Offert, sans achat et sans carte bancaire.</div>
+<a href="${link}" style="color:#008296;font-weight:700;text-decoration:underline">Voir mes 10 niches offertes</a>
+</td></tr></table>`;
+}
+
 
 function ctaButton(link: string, label: string) {
   return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:26px 0"><tr><td align="center" bgcolor="#FF9E2D" style="border-radius:6px"><a href="${link}" style="display:block;padding:17px 24px;color:#232F3E;text-decoration:none;font:700 17px/1.3 Arial,Helvetica,sans-serif;text-align:center">${label}</a></td></tr></table>`;
@@ -141,8 +183,10 @@ function render(baseUrl: string, email: string, firstName: string, letter: Lette
 <tr><td style="padding:26px 28px 0;color:#232F3E;font:16px/1.65 Arial,Helvetica,sans-serif">
 <p style="margin:0 0 18px">Bonjour${firstName ? ` ${firstName}` : ""},</p>
 ${letter.body}
+${letter.gift ? giftBlock(giftLink(email, letter)) : ""}
 ${PRICE_BLOCK}
 ${ctaButton(link, letter.cta)}
+
 <p style="margin:0 0 6px">Bien à vous,<br><strong>Georges Boubet</strong><br>EbookStudio</p>
 <p style="margin:18px 0 0;padding:14px 0 0;border-top:1px solid #e5e7eb;font:15px/1.6 Arial,Helvetica,sans-serif;color:#4b5563">${letter.ps}</p>
 </td></tr>
@@ -249,25 +293,40 @@ Deno.serve(async (req) => {
     const paid = new Set((paidOrders || []).map((r) => normalize(r.email || "")));
     const profiles = new Map((profileRows || []).map((r) => [normalize(r.email || ""), r]));
 
+    // Non-cliqueurs : les ouvreurs d'abord (les plus chauds), puis les autres contacts connus.
+    const allKnown = [...profiles.keys()];
     const pool = letter.segment === "clickers"
       ? [...clickers]
-      : [...openers].filter((email) => !clickers.has(email));
+      : letter.segment === "openers_no_click"
+        ? [...openers].filter((email) => !clickers.has(email))
+        : [
+            ...allKnown.filter((email) => openers.has(email) && !clickers.has(email)),
+            ...allKnown.filter((email) => !openers.has(email) && !clickers.has(email)),
+          ];
 
-    const targets: string[] = [];
+    const eligible: string[] = [];
     for (const email of pool) {
       if (!isEmail(email) || done.has(email) || paid.has(email)) continue;
       const profile = profiles.get(email);
       if (!profile) continue; // on n'écrit qu'aux contacts connus et actifs
       if (profile.unsubscribed === true || profile.status !== "active") continue;
-      targets.push(email);
-      if (targets.length >= limit) break;
+      eligible.push(email);
     }
+    const targets = eligible.slice(0, limit);
 
     if (body.dry_run) {
-      return respond({ success: true, mode, template: letter.key, segment: letter.segment, would_send: targets.length });
+      return respond({
+        success: true,
+        mode,
+        template: letter.key,
+        segment: letter.segment,
+        would_send: targets.length,
+        eligible_total: eligible.length,
+      });
     }
 
     let sent = 0;
+    let quotaReached = false;
     for (const email of targets) {
       const profile = profiles.get(email);
       const result = await sendResendEmailThrottled({
@@ -285,13 +344,31 @@ Deno.serve(async (req) => {
         error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}`,
       });
       if (!result.ok) {
-        if (isQuotaExhausted()) break;
+        if (isQuotaExhausted()) {
+          quotaReached = true;
+          break;
+        }
         continue;
       }
       sent++;
     }
 
-    return respond({ success: true, mode, template: letter.key, segment: letter.segment, sent, targets: targets.length });
+    const remaining = Math.max(0, eligible.length - sent);
+    return respond({
+      success: true,
+      mode,
+      template: letter.key,
+      segment: letter.segment,
+      sent,
+      targets: targets.length,
+      eligible_total: eligible.length,
+      remaining,
+      quota_reached: quotaReached,
+      message: quotaReached
+        ? `Quota journalier d'envoi atteint : ${sent} emails envoyés, ${remaining} restants. Reprise possible demain, sans doublon.`
+        : `${sent} emails envoyés, ${remaining} restants.`,
+    });
+
   } catch (error) {
     console.error("send-closing-47", error);
     return respond({ error: error instanceof Error ? error.message : "Erreur serveur" }, 500);

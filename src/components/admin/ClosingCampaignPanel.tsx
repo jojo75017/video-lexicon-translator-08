@@ -15,7 +15,7 @@ interface LetterStat {
   template: string;
   label: string;
   subject: string;
-  segment: 'clickers' | 'openers_no_click';
+  segment: 'clickers' | 'openers_no_click' | 'no_click';
   sent: number;
   opens: number;
   clicks: number;
@@ -24,7 +24,9 @@ interface LetterStat {
 const SEGMENT_LABEL: Record<LetterStat['segment'], string> = {
   clickers: 'Cliqueurs',
   openers_no_click: 'Ouvreurs sans clic',
+  no_click: 'Tous les non-cliqueurs',
 };
+
 
 const ClosingCampaignPanel = () => {
   const [letters, setLetters] = useState<LetterStat[]>([]);
@@ -62,12 +64,14 @@ const ClosingCampaignPanel = () => {
     setBusy(template);
     try {
       const data = await call({ mode: 'send', template, dry_run: true });
-      toast.success(`${data.would_send} destinataires seraient contactés`);
+      const eligible = Number(data.eligible_total ?? data.would_send ?? 0);
+      toast.success(`${data.would_send} destinataires dans cette vague — ${eligible} éligibles au total`);
     } catch (err) {
       toast.error('Simulation impossible : ' + ((err as Error).message || ''));
     }
     setBusy(null);
   };
+
 
   const sendTest = async (template: string) => {
     const email = testEmail.trim();
@@ -100,8 +104,11 @@ const ClosingCampaignPanel = () => {
         return;
       }
       const data = await call({ mode: 'send', template: letter.template });
-      toast.success(`${data.sent} emails envoyés sur ${data.targets} ciblés`);
+      const message = String(data.message || `${data.sent} emails envoyés sur ${data.targets} ciblés`);
+      if (data.quota_reached) toast.warning(message);
+      else toast.success(message);
       load();
+
     } catch (err) {
       toast.error("Erreur d'envoi : " + ((err as Error).message || ''));
     }
