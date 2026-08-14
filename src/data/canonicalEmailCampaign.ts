@@ -31,6 +31,8 @@ export const CLOSING_EMAIL_CAMPAIGN = {
     { template: 'cloture-47-1', segment: 'openers_no_click', label: 'Ce qui change le 1er octobre', subject: "Le 1er octobre, l'accès à vie disparaît (le calcul est simple)" },
     { template: 'cloture-47-2', segment: 'openers_no_click', label: 'La preuve en images', subject: 'Un livre entier, du sommaire au fichier Amazon' },
     { template: 'cloture-47-3', segment: 'openers_no_click', label: 'Dernier jour utile', subject: "Dernier rappel : après le 30 septembre, ce tarif n'existe plus" },
+    { template: 'relance-niches-1', segment: 'no_click', label: '10 niches offertes (non-cliqueurs)', subject: "10 niches Amazon rentables, offertes (même si vous n'achetez rien)" },
+
   ],
 } as const;
 
