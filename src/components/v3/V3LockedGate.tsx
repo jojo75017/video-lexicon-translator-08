@@ -4,6 +4,8 @@ import { Loader2 } from "lucide-react";
 import { V3_LAUNCH_UNLOCKED } from "@/config/v3Launch";
 import { isLegacyUnlockedPath } from "@/data/v2LegacyAccess";
 import useV3Entitlement from "@/hooks/useV3Entitlement";
+import { useAdminAccess } from "@/contexts/AdminAccessContext";
+import AccessPendingFallback from "@/components/auth/AccessPendingFallback";
 
 /**
  * Verrouille une route V3 tant que `V3_LAUNCH_UNLOCKED = false`.
@@ -15,9 +17,13 @@ import useV3Entitlement from "@/hooks/useV3Entitlement";
 export function V3LockedGate({ children }: { children: ReactNode }) {
   const location = useLocation();
   const { loading, isAdmin, hasV2 } = useV3Entitlement();
+  const adminAccess = useAdminAccess();
 
   if (V3_LAUNCH_UNLOCKED) return <>{children}</>;
   if (isAdmin) return <>{children}</>;
+  if (adminAccess.isChecking) {
+    return <AccessPendingFallback timedOut={false} onRetry={() => { void adminAccess.refresh(); }} />;
+  }
   if (loading) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center">

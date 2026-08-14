@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { getIsCurrentSessionAdmin } from "@/lib/adminAccess";
+import { useAdminAccess } from "@/contexts/AdminAccessContext";
 
 type Props = {
   children: React.ReactNode;
@@ -15,12 +15,21 @@ type Props = {
 export function V3Gate({ children }: Props) {
   const [checking, setChecking] = useState(true);
   const [allowed, setAllowed] = useState(false);
+  const adminAccess = useAdminAccess();
   const location = useLocation();
 
   useEffect(() => {
     let cancelled = false;
 
     const run = async () => {
+      if (adminAccess.isAdmin) {
+        if (!cancelled) { setAllowed(true); setChecking(false); }
+        return;
+      }
+      if (adminAccess.isChecking) {
+        if (!cancelled) setChecking(true);
+        return;
+      }
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
@@ -30,10 +39,8 @@ export function V3Gate({ children }: Props) {
           }
           return;
         }
-        // Pas de session : dernier recours, vérifier un admin en cache
-        const isAdmin = await getIsCurrentSessionAdmin();
         if (!cancelled) {
-          setAllowed(isAdmin);
+          setAllowed(false);
           setChecking(false);
         }
       } catch {
@@ -46,7 +53,7 @@ export function V3Gate({ children }: Props) {
 
     run();
     return () => { cancelled = true; };
-  }, []);
+  }, [adminAccess.isAdmin, adminAccess.isChecking]);
 
   if (checking) {
     return (

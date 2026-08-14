@@ -25,11 +25,12 @@ export default function V3AuthPage() {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return;
+        if (isAdminChecking) return;
 
         const destination = isAdmin ? ADMIN_HOME_PATH : SUBSCRIBER_HOME_PATH;
         if (!cancelled) nav(destination, { replace: true });
       } finally {
-        if (!cancelled) setCheckingSession(false);
+        if (!cancelled && !isAdminChecking) setCheckingSession(false);
       }
     };
 
