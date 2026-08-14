@@ -413,10 +413,11 @@ const App = () => {
               path="/"
               element={
                 isCheckingAuth || !homePath
-                  ? <div className="min-h-screen" aria-busy="true" />
+                  ? <AccessPendingFallback timedOut={adminTimedOut} onRetry={handleAdminRetry} />
                   : <Navigate to={homePath} replace />
               }
             />
+
 
 
 
