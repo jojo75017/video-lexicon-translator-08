@@ -109,6 +109,16 @@ const handler = async (req: Request): Promise<Response> => {
         <a href="${NICHES_URL}" style="display:inline-block;background:#c9a84c;color:#1a1a1a;text-decoration:none;padding:13px 24px;border-radius:10px;font-weight:bold">Voir mes 10 niches offertes</a>
       </p>
 
+      <h2 style="margin:28px 0 8px;font-size:18px;color:#064e3b">3. Votre kit de démarrage (PDF, 16 pages)</h2>
+      <p style="margin:0;font-size:15px;line-height:1.6">
+        De la première connexion jusqu'à la mise en vente sur Amazon KDP, avec les captures de votre
+        espace : clés IA, niche, sommaire, écriture, correction, couverture, exports, premiers avis.
+      </p>
+      <p style="margin:14px 0 0">
+        <a href="${SITE_ORIGIN}/kit-demarrage-ebookstudio-v3.pdf" style="display:inline-block;background:#064e3b;color:#ffffff;text-decoration:none;padding:13px 24px;border-radius:10px;font-weight:bold">Télécharger le kit de démarrage</a>
+      </p>
+
+
       <h2 style="margin:28px 0 8px;font-size:18px;color:#064e3b">3. Vos 3 premières actions</h2>
       <ol style="margin:0;padding-left:20px;font-size:15px;line-height:1.7">
         <li>Choisissez une niche dans votre pack et cliquez sur « Écrire ce livre ».</li>
