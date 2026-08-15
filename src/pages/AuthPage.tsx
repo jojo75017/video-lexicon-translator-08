@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,15 +19,19 @@ export const AuthPage = () => {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [usePasswordMode, setUsePasswordMode] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAdmin, isChecking: isAdminChecking, refresh: refreshAdminAccess } = useAdminAccess();
+  const requestedPath = typeof location.state === 'object' && location.state && 'from' in location.state
+    ? String((location.state as { from?: string }).from || ADMIN_HOME_PATH)
+    : ADMIN_HOME_PATH;
 
   // En mode édition/dev, on évite les toasts (popups) qui deviennent vite envahissants.
   const shouldToast = !import.meta.env.DEV;
 
   useEffect(() => {
     // Redirection silencieuse si déjà admin avec session active
-    if (!isAdminChecking && isAdmin) navigate(ADMIN_HOME_PATH, { replace: true });
-  }, [isAdmin, isAdminChecking, navigate]);
+    if (!isAdminChecking && isAdmin) navigate(requestedPath, { replace: true });
+  }, [isAdmin, isAdminChecking, navigate, requestedPath]);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,7 +129,7 @@ export const AuthPage = () => {
         console.log('Utilisateur admin confirmé');
         if (shouldToast) toast.success('Connexion admin réussie');
         trackFormSubmit('admin_login', email);
-        navigate(ADMIN_HOME_PATH, { replace: true });
+        navigate(requestedPath, { replace: true });
     } catch (error: any) {
       console.error('Auth error:', error);
       if (shouldToast) {

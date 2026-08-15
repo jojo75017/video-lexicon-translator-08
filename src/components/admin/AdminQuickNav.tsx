@@ -1,0 +1,39 @@
+import { BookOpen, LayoutDashboard, Mail, Rocket, Users } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ADMIN_HOME_PATH } from '@/config/adminRoutes';
+
+const LINKS = [
+  { label: 'V2 — Générateur', path: '/ebook-planner', icon: BookOpen },
+  { label: 'V3 — Tester', path: '/v3', icon: Rocket },
+  { label: 'Dashboard admin', path: ADMIN_HOME_PATH, icon: LayoutDashboard },
+  { label: 'Prospects', path: '/gestion-prospects', icon: Users },
+  { label: 'Emails', path: '/apercu-emails', icon: Mail },
+];
+
+export default function AdminQuickNav() {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  return (
+    <nav
+      data-contemplation-allow="true"
+      aria-label="Accès permanents administrateur"
+      className="sticky top-0 z-[9997] flex w-full gap-2 overflow-x-auto border-b border-border bg-card/95 px-3 py-2 shadow-sm backdrop-blur"
+    >
+      {LINKS.map(({ label, path, icon: Icon }) => (
+        <Button
+          key={path}
+          type="button"
+          size="sm"
+          variant={pathname === path ? 'default' : 'outline'}
+          className="shrink-0"
+          onClick={() => navigate(path)}
+        >
+          <Icon className="mr-1.5 h-4 w-4" />
+          {label}
+        </Button>
+      ))}
+    </nav>
+  );
+}
