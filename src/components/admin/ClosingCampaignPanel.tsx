@@ -94,6 +94,21 @@ const ClosingCampaignPanel = () => {
     load();
   }, [load]);
 
+  const loadRecipients = useCallback(async (template: string) => {
+    setBusy(template);
+    setDetailTemplate(template);
+    setRecipients([]);
+    try {
+      const data = await call({ mode: 'recipients', template });
+      setRecipients((data.recipients as RecipientRow[]) || []);
+    } catch (err) {
+      toast.error('Détail indisponible : ' + ((err as Error).message || ''));
+      setDetailTemplate(null);
+    }
+    setBusy(null);
+  }, [call]);
+
+
   const simulate = async (template: string) => {
     setBusy(template);
     try {
