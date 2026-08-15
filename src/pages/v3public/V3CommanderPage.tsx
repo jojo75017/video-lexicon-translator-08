@@ -115,7 +115,32 @@ const REASSURANCE = [
   },
 ];
 
+/** Fin de l'accès à vie : 30 septembre 2026, 23 h 59 (heure de Paris). */
+const OFFER_END = new Date("2026-09-30T21:59:00Z");
+
+/** Compte à rebours sobre : jours et heures restants, sans clignotement. */
+function OfferCountdown() {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(Date.now()), 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+  const remaining = OFFER_END.getTime() - now;
+  if (remaining <= 0) return null;
+  const days = Math.floor(remaining / 86_400_000);
+  const hours = Math.floor((remaining % 86_400_000) / 3_600_000);
+  return (
+    <div
+      className="mb-4 flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-bold"
+      style={{ borderColor: `${EMERALD}33`, background: `${EMERALD}0a`, color: EMERALD }}
+    >
+      ⏳ Il reste {days} jour{days > 1 ? "s" : ""} et {hours} h avant la fin de l'accès à vie
+    </div>
+  );
+}
+
 export default function V3CommanderPage() {
+
   const [params] = useSearchParams();
   const src = params.get("src") || undefined;
   const ref = params.get("ref") || params.get("aff") || undefined;
@@ -365,6 +390,8 @@ export default function V3CommanderPage() {
           >
             {!clientSecret ? (
               <>
+                <OfferCountdown />
+
                 <div
                   className="mb-4 rounded-xl border px-4 py-3 text-sm font-bold"
                   style={{ background: `${GOLD}14`, borderColor: `${GOLD}55`, color: "#8a6d16" }}
@@ -464,6 +491,13 @@ export default function V3CommanderPage() {
                 <p className="mt-2 text-center text-[11px] text-slate-500">
                   En plusieurs fois, l'accès s'ouvre dès la 1re échéance.
                 </p>
+                <p className="mt-2 text-center text-[11px] text-slate-500">
+                  Un doute avant de payer ? Écrivez-moi directement :{" "}
+                  <a href="mailto:boubetgeorges@gmail.com" className="underline" style={{ color: EMERALD }}>
+                    boubetgeorges@gmail.com
+                  </a>
+                </p>
+
               </>
             ) : (
               <div>
