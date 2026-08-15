@@ -65,7 +65,7 @@ export function V2V3FloatingSwitch({ forceVisible = false }: V2V3FloatingSwitchP
         duration: 3500,
         style: { zIndex: 99999 },
       });
-      navigate('/hub-v3');
+      navigate('/v3');
     } else {
       resetV2PlannerEntryPoint();
       toast.success('Ouverture de la V2', {

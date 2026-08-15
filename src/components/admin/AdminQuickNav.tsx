@@ -15,6 +15,13 @@ export default function AdminQuickNav() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
+  const isActive = (path: string) => {
+    if (path === '/v3') return pathname === '/v3' || pathname.startsWith('/v3/');
+    if (path === ADMIN_HOME_PATH) return pathname === ADMIN_HOME_PATH || pathname.startsWith('/admin/');
+    if (path === '/ebook-planner') return pathname === path;
+    return pathname === path;
+  };
+
   return (
     <nav
       data-contemplation-allow="true"
@@ -26,7 +33,7 @@ export default function AdminQuickNav() {
           key={path}
           type="button"
           size="sm"
-          variant={pathname === path ? 'default' : 'outline'}
+          variant={isActive(path) ? 'default' : 'outline'}
           className="shrink-0"
           onClick={() => navigate(path)}
         >

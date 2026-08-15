@@ -31,6 +31,7 @@ import { ADMIN_HOME_PATH, ADMIN_LOGIN_PATH } from '@/config/adminRoutes';
 import { getHomePath, type AccessState } from '@/lib/authDestination';
 import { useAdminAccess } from '@/contexts/AdminAccessContext';
 import AdminQuickNav from '@/components/admin/AdminQuickNav';
+import { hasPersistedAdminHint } from '@/lib/adminAccess';
 
 // V2 — Ebook Planner + outils satellites
 const RedirectClickPage = lazy(() => import('./pages/RedirectClickPage'));
@@ -212,6 +213,9 @@ const App = () => {
   const [subscriberData, setSubscriberData] = useState<any>(null);
   const [adminTimedOut, setAdminTimedOut] = useState(false);
   const isAdminChecked = !isAdminChecking;
+  // L'indice ne donne aucun droit : il maintient seulement la barre de sortie
+  // visible pendant la revalidation. Chaque destination reste protégée côté serveur.
+  const keepAdminNavigationVisible = isAdmin || (isAdminChecking && hasPersistedAdminHint());
 
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
@@ -337,7 +341,7 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <div className="min-h-screen bg-background">
-          {isAdmin && !isAdminAuthRoute && <AdminQuickNav />}
+          {keepAdminNavigationVisible && !isAdminAuthRoute && <AdminQuickNav />}
           <V3LaunchGlobalBanner />
           <Suspense fallback={<PageLoader />}>
           <Routes>
