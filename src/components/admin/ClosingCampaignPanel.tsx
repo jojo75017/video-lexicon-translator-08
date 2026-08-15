@@ -36,13 +36,37 @@ const PRIMARY_LABEL: Record<LetterStat['primary'], string> = {
   checkout: 'Paiement 47 €',
 };
 
+interface RecipientRow {
+  email: string;
+  first_name: string;
+  status: 'sent' | 'error' | 'pending' | 'excluded';
+  reason: string;
+  sent_at: string | null;
+}
 
+const RECIPIENT_LABEL: Record<RecipientRow['status'], string> = {
+  sent: 'Envoyé',
+  pending: 'En attente',
+  error: 'Erreur',
+  excluded: 'Exclu',
+};
+
+const RECIPIENT_STYLE: Record<RecipientRow['status'], string> = {
+  sent: 'bg-emerald-500/15 text-emerald-600',
+  pending: 'bg-amber-500/15 text-amber-600',
+  error: 'bg-red-500/15 text-red-600',
+  excluded: 'bg-muted text-muted-foreground',
+};
 
 const ClosingCampaignPanel = () => {
   const [letters, setLetters] = useState<LetterStat[]>([]);
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [testEmail, setTestEmail] = useState('');
+  const [detailTemplate, setDetailTemplate] = useState<string | null>(null);
+  const [recipients, setRecipients] = useState<RecipientRow[]>([]);
+  const [recipientFilter, setRecipientFilter] = useState<'all' | RecipientRow['status']>('all');
+
 
   const call = useCallback(async (body: Record<string, unknown>) => {
     const { data: session } = await supabase.auth.getSession();
