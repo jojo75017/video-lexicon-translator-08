@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import {
   clearAdminCache,
   getCachedAdminStatus,
+  hasPersistedAdminHint,
   resolveAdminStatus,
   subscribeAdminStatus,
 } from '@/lib/adminAccess';
@@ -18,6 +19,9 @@ type AdminAccessValue = {
 
 const AdminAccessContext = createContext<AdminAccessValue | null>(null);
 
+/** Cadence de reprise automatique tant que le statut reste inconnu. */
+const RETRY_DELAY_MS = 2500;
+
 export function AdminAccessProvider({ children }: { children: React.ReactNode }) {
   const initial = getCachedAdminStatus();
   const [status, setStatus] = useState<AdminAccessStatus>(
@@ -28,10 +32,13 @@ export function AdminAccessProvider({ children }: { children: React.ReactNode })
   const applyResult = useCallback((result: boolean | null) => {
     if (!mounted.current) return;
     setStatus((previous) => {
+      // Un admin confirmé ne peut jamais être rétrogradé pendant la session.
       if (previous === 'admin' && result !== true) return 'admin';
       if (result === true) return 'admin';
       if (result === false) return 'non-admin';
-      return 'temporary-error';
+      // Statut inconnu : si la session a déjà été confirmée admin, on reste en
+      // vérification (jamais « visiteur ») ; sinon erreur temporaire.
+      return hasPersistedAdminHint() ? 'restoring' : 'temporary-error';
     });
   }, []);
 
@@ -46,7 +53,7 @@ export function AdminAccessProvider({ children }: { children: React.ReactNode })
     const unsubscribeStatus = subscribeAdminStatus(applyResult);
 
     const restore = async () => {
-      setStatus((previous) => previous === 'admin' ? 'admin' : 'restoring');
+      setStatus((previous) => (previous === 'admin' ? 'admin' : 'restoring'));
       await refresh();
     };
     void restore();
@@ -68,6 +75,13 @@ export function AdminAccessProvider({ children }: { children: React.ReactNode })
       subscription.unsubscribe();
     };
   }, [applyResult, refresh]);
+
+  // Reprise automatique en arrière-plan : aucune attente ne se transforme en refus.
+  useEffect(() => {
+    if (status !== 'restoring' && status !== 'temporary-error') return;
+    const timer = setTimeout(() => { void refresh(); }, RETRY_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [status, refresh]);
 
   return (
     <AdminAccessContext.Provider value={{
