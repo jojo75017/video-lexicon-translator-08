@@ -256,6 +256,75 @@ const ClosingCampaignPanel = () => {
         </table>
       </div>
 
+      {detailTemplate && (
+        <div className="space-y-2 rounded-lg border border-border p-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <h4 className="text-sm font-semibold">
+              Destinataires — {letters.find((l) => l.template === detailTemplate)?.label || detailTemplate}
+            </h4>
+            <div className="ml-auto flex flex-wrap gap-1">
+              {(['all', 'sent', 'pending', 'error', 'excluded'] as const).map((key) => {
+                const count = key === 'all' ? recipients.length : recipients.filter((r) => r.status === key).length;
+                return (
+                  <Button
+                    key={key}
+                    size="sm"
+                    variant={recipientFilter === key ? 'default' : 'outline'}
+                    onClick={() => setRecipientFilter(key)}
+                  >
+                    {key === 'all' ? 'Tous' : RECIPIENT_LABEL[key]} ({count})
+                  </Button>
+                );
+              })}
+              <Button variant="ghost" size="sm" onClick={() => loadRecipients(detailTemplate)}>
+                {busy === detailTemplate ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+              </Button>
+            </div>
+          </div>
+
+          <div className="max-h-80 overflow-auto rounded-lg border border-border">
+            <table className="w-full text-sm">
+              <thead className="sticky top-0 bg-card/95 border-b border-border">
+                <tr>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">Adresse</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">Statut</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">Détail</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">Envoyé le</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recipients
+                  .filter((r) => recipientFilter === 'all' || r.status === recipientFilter)
+                  .map((r) => (
+                    <tr key={r.email} className="border-b border-border/50">
+                      <td className="px-3 py-1.5">
+                        {r.email}
+                        {r.first_name ? <span className="ml-1 text-xs text-muted-foreground">({r.first_name})</span> : null}
+                      </td>
+                      <td className="px-3 py-1.5">
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${RECIPIENT_STYLE[r.status]}`}>
+                          {RECIPIENT_LABEL[r.status]}
+                        </span>
+                      </td>
+                      <td className="px-3 py-1.5 text-xs text-muted-foreground">{r.reason || '—'}</td>
+                      <td className="px-3 py-1.5 text-xs text-muted-foreground">
+                        {r.sent_at ? new Date(r.sent_at).toLocaleString('fr-FR') : '—'}
+                      </td>
+                    </tr>
+                  ))}
+                {recipients.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="px-3 py-4 text-center text-xs text-muted-foreground">
+                      {busy === detailTemplate ? 'Chargement…' : 'Aucun destinataire pour ce gabarit.'}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-wrap items-center gap-2">
         <Input
           value={testEmail}
