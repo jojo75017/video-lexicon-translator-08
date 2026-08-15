@@ -6,26 +6,36 @@ import { toast } from 'sonner';
 import { Loader2, RefreshCw, Send, Eye, ExternalLink } from 'lucide-react';
 
 /**
- * Campagne de clôture de l'offre 47 € (fin le 30/09/2026).
- * Deux segments : message personnel aux cliqueurs (les plus chauds),
- * et séquence de clôture en 3 emails pour les ouvreurs sans clic.
+ * Campagne de conversion 2026 — trois séquences :
+ *  A. jamais ouvert (réactivation), B. ouvreurs sans clic (cadeau d'abord),
+ *  C. cliqueurs (demande de vente). Quota 100 emails/jour, reprise sans doublon.
  */
 
 interface LetterStat {
   template: string;
   label: string;
   subject: string;
-  segment: 'clickers' | 'openers_no_click' | 'no_click';
+  segment: 'clickers' | 'openers_no_click' | 'never_opened';
+  primary: 'gift' | 'checkout' | 'demo';
   sent: number;
   opens: number;
   clicks: number;
+  leads: number;
+  orders: number;
 }
 
 const SEGMENT_LABEL: Record<LetterStat['segment'], string> = {
-  clickers: 'Cliqueurs',
-  openers_no_click: 'Ouvreurs sans clic',
-  no_click: 'Tous les non-cliqueurs',
+  never_opened: 'A · Jamais ouvert',
+  openers_no_click: 'B · Ouvreurs sans clic',
+  clickers: 'C · Cliqueurs',
 };
+
+const PRIMARY_LABEL: Record<LetterStat['primary'], string> = {
+  gift: 'Cadeau 10 niches',
+  demo: 'Démonstration',
+  checkout: 'Paiement 47 €',
+};
+
 
 
 const ClosingCampaignPanel = () => {
