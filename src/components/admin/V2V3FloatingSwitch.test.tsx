@@ -4,9 +4,14 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { V2V3FloatingSwitch } from './V2V3FloatingSwitch';
 
-// Mock admin check → always admin
-vi.mock('@/lib/adminAccess', () => ({
-  getIsCurrentSessionAdmin: vi.fn().mockResolvedValue(true),
+// Mock de l'état admin partagé → toujours admin
+vi.mock('@/contexts/AdminAccessContext', () => ({
+  useAdminAccess: () => ({
+    status: 'admin' as const,
+    isAdmin: true,
+    isChecking: false,
+    refresh: vi.fn().mockResolvedValue(true),
+  }),
 }));
 
 function LocationProbe() {
