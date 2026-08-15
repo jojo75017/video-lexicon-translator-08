@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { Loader2, RefreshCw, Send, Eye, ExternalLink } from 'lucide-react';
+import { Loader2, RefreshCw, Send, Eye, ExternalLink, ListChecks } from 'lucide-react';
 
 /**
  * Campagne de conversion 2026 — trois séquences :
