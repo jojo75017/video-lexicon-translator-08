@@ -147,8 +147,8 @@ const ClosingCampaignPanel = () => {
   return (
     <div className="rounded-lg border border-border bg-card/50 p-4 space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        <h3 className="font-semibold">Clôture 47 € — cliqueurs et ouvreurs</h3>
-        <span className="text-xs text-muted-foreground">Fin de l'accès à vie le 30/09/2026</span>
+        <h3 className="font-semibold">Conversion 2026 — 3 séquences (A réactivation, B clic, C vente)</h3>
+        <span className="text-xs text-muted-foreground">Fin de l'accès à vie le 30/09/2026 · 100 emails/jour</span>
         <Button variant="ghost" size="sm" onClick={load} className="ml-auto text-muted-foreground">
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
         </Button>
@@ -160,9 +160,12 @@ const ClosingCampaignPanel = () => {
             <tr>
               <th className="px-3 py-2 text-left font-medium text-muted-foreground">Email</th>
               <th className="px-3 py-2 text-left font-medium text-muted-foreground">Cible</th>
+              <th className="px-3 py-2 text-left font-medium text-muted-foreground">Objectif</th>
               <th className="px-3 py-2 text-center font-medium text-muted-foreground">Envoyés</th>
               <th className="px-3 py-2 text-center font-medium text-muted-foreground">Ouvertures</th>
               <th className="px-3 py-2 text-center font-medium text-muted-foreground">Clics</th>
+              <th className="px-3 py-2 text-center font-medium text-muted-foreground">Cadeau</th>
+              <th className="px-3 py-2 text-center font-medium text-muted-foreground">Ventes</th>
               <th className="px-3 py-2 text-right font-medium text-muted-foreground">Actions</th>
             </tr>
           </thead>
@@ -174,9 +177,13 @@ const ClosingCampaignPanel = () => {
                   <div className="text-xs text-muted-foreground">{l.subject}</div>
                 </td>
                 <td className="px-3 py-2 text-xs">{SEGMENT_LABEL[l.segment]}</td>
+                <td className="px-3 py-2 text-xs">{PRIMARY_LABEL[l.primary]}</td>
                 <td className="px-3 py-2 text-center">{l.sent}</td>
                 <td className="px-3 py-2 text-center">{l.opens}</td>
                 <td className="px-3 py-2 text-center">{l.clicks}</td>
+                <td className="px-3 py-2 text-center">{l.leads}</td>
+                <td className="px-3 py-2 text-center font-semibold">{l.orders}</td>
+
                 <td className="px-3 py-2">
                   <div className="flex flex-wrap justify-end gap-1">
                     <Button variant="outline" size="sm" disabled={busy === l.template} onClick={() => openPreview(l.template)}>
