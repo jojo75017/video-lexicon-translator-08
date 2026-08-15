@@ -392,6 +392,29 @@ export default function V3CommanderPage() {
               <>
                 <OfferCountdown />
 
+                {/* Preuves vérifiables — aucun témoignage fabriqué */}
+                <ul className="mb-4 grid gap-2 text-[13px]" style={{ color: "#3f3a31" }}>
+                  {[
+                    "Accès immédiat à votre espace après le paiement",
+                    "Paiement sécurisé par carte (Stripe) ou PayPal",
+                    "Mises à jour incluses à vie, sans supplément",
+                    "Le pack des 10 niches offert dès l'inscription",
+                    "Une réponse personnelle par email sous 24 h ouvrées",
+                  ].map((fact) => (
+                    <li key={fact} className="flex items-start gap-2">
+                      <span
+                        aria-hidden
+                        className="mt-[3px] grid h-4 w-4 shrink-0 place-items-center rounded-full text-[10px] font-bold"
+                        style={{ background: `${EMERALD}18`, color: EMERALD }}
+                      >
+                        ✓
+                      </span>
+                      <span>{fact}</span>
+                    </li>
+                  ))}
+                </ul>
+
+
                 <div
                   className="mb-4 rounded-xl border px-4 py-3 text-sm font-bold"
                   style={{ background: `${GOLD}14`, borderColor: `${GOLD}55`, color: "#8a6d16" }}
