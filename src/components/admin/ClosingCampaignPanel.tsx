@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { Loader2, RefreshCw, Send, Eye, ExternalLink } from 'lucide-react';
+import { Loader2, RefreshCw, Send, Eye, ExternalLink, ListChecks } from 'lucide-react';
 
 /**
  * Campagne de conversion 2026 — trois séquences :
@@ -36,13 +36,37 @@ const PRIMARY_LABEL: Record<LetterStat['primary'], string> = {
   checkout: 'Paiement 47 €',
 };
 
+interface RecipientRow {
+  email: string;
+  first_name: string;
+  status: 'sent' | 'error' | 'pending' | 'excluded';
+  reason: string;
+  sent_at: string | null;
+}
 
+const RECIPIENT_LABEL: Record<RecipientRow['status'], string> = {
+  sent: 'Envoyé',
+  pending: 'En attente',
+  error: 'Erreur',
+  excluded: 'Exclu',
+};
+
+const RECIPIENT_STYLE: Record<RecipientRow['status'], string> = {
+  sent: 'bg-emerald-500/15 text-emerald-600',
+  pending: 'bg-amber-500/15 text-amber-600',
+  error: 'bg-red-500/15 text-red-600',
+  excluded: 'bg-muted text-muted-foreground',
+};
 
 const ClosingCampaignPanel = () => {
   const [letters, setLetters] = useState<LetterStat[]>([]);
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [testEmail, setTestEmail] = useState('');
+  const [detailTemplate, setDetailTemplate] = useState<string | null>(null);
+  const [recipients, setRecipients] = useState<RecipientRow[]>([]);
+  const [recipientFilter, setRecipientFilter] = useState<'all' | RecipientRow['status']>('all');
+
 
   const call = useCallback(async (body: Record<string, unknown>) => {
     const { data: session } = await supabase.auth.getSession();
@@ -69,6 +93,21 @@ const ClosingCampaignPanel = () => {
   useEffect(() => {
     load();
   }, [load]);
+
+  const loadRecipients = useCallback(async (template: string) => {
+    setBusy(template);
+    setDetailTemplate(template);
+    setRecipients([]);
+    try {
+      const data = await call({ mode: 'recipients', template });
+      setRecipients((data.recipients as RecipientRow[]) || []);
+    } catch (err) {
+      toast.error('Détail indisponible : ' + ((err as Error).message || ''));
+      setDetailTemplate(null);
+    }
+    setBusy(null);
+  }, [call]);
+
 
   const simulate = async (template: string) => {
     setBusy(template);
@@ -118,6 +157,8 @@ const ClosingCampaignPanel = () => {
       if (data.quota_reached) toast.warning(message);
       else toast.success(message);
       load();
+      if (detailTemplate === letter.template) loadRecipients(letter.template);
+
 
     } catch (err) {
       toast.error("Erreur d'envoi : " + ((err as Error).message || ''));
@@ -198,13 +239,91 @@ const ClosingCampaignPanel = () => {
                     <Button size="sm" disabled={busy === l.template} onClick={() => send(l)}>
                       <Send className="mr-1 h-3 w-3" /> Envoyer
                     </Button>
+                    <Button
+                      variant={detailTemplate === l.template ? 'default' : 'ghost'}
+                      size="sm"
+                      disabled={busy === l.template}
+                      onClick={() => (detailTemplate === l.template ? setDetailTemplate(null) : loadRecipients(l.template))}
+                    >
+                      <ListChecks className="mr-1 h-3 w-3" /> Détail
+                    </Button>
                   </div>
+
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {detailTemplate && (
+        <div className="space-y-2 rounded-lg border border-border p-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <h4 className="text-sm font-semibold">
+              Destinataires — {letters.find((l) => l.template === detailTemplate)?.label || detailTemplate}
+            </h4>
+            <div className="ml-auto flex flex-wrap gap-1">
+              {(['all', 'sent', 'pending', 'error', 'excluded'] as const).map((key) => {
+                const count = key === 'all' ? recipients.length : recipients.filter((r) => r.status === key).length;
+                return (
+                  <Button
+                    key={key}
+                    size="sm"
+                    variant={recipientFilter === key ? 'default' : 'outline'}
+                    onClick={() => setRecipientFilter(key)}
+                  >
+                    {key === 'all' ? 'Tous' : RECIPIENT_LABEL[key]} ({count})
+                  </Button>
+                );
+              })}
+              <Button variant="ghost" size="sm" onClick={() => loadRecipients(detailTemplate)}>
+                {busy === detailTemplate ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+              </Button>
+            </div>
+          </div>
+
+          <div className="max-h-80 overflow-auto rounded-lg border border-border">
+            <table className="w-full text-sm">
+              <thead className="sticky top-0 bg-card/95 border-b border-border">
+                <tr>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">Adresse</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">Statut</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">Détail</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">Envoyé le</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recipients
+                  .filter((r) => recipientFilter === 'all' || r.status === recipientFilter)
+                  .map((r) => (
+                    <tr key={r.email} className="border-b border-border/50">
+                      <td className="px-3 py-1.5">
+                        {r.email}
+                        {r.first_name ? <span className="ml-1 text-xs text-muted-foreground">({r.first_name})</span> : null}
+                      </td>
+                      <td className="px-3 py-1.5">
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${RECIPIENT_STYLE[r.status]}`}>
+                          {RECIPIENT_LABEL[r.status]}
+                        </span>
+                      </td>
+                      <td className="px-3 py-1.5 text-xs text-muted-foreground">{r.reason || '—'}</td>
+                      <td className="px-3 py-1.5 text-xs text-muted-foreground">
+                        {r.sent_at ? new Date(r.sent_at).toLocaleString('fr-FR') : '—'}
+                      </td>
+                    </tr>
+                  ))}
+                {recipients.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="px-3 py-4 text-center text-xs text-muted-foreground">
+                      {busy === detailTemplate ? 'Chargement…' : 'Aucun destinataire pour ce gabarit.'}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-wrap items-center gap-2">
         <Input

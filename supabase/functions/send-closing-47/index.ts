@@ -356,6 +356,95 @@ Deno.serve(async (req) => {
 
     if (!letter) return respond({ error: "Gabarit inconnu" }, 400);
 
+    // ------------------------------------------------ statut par destinataire
+    if (mode === "recipients") {
+      const [{ data: clicksRows }, { data: opensRows }, { data: logRows }, { data: paidOrders }, { data: profileRows }] =
+        await Promise.all([
+          db.from("email_clicks").select("prospect_email").limit(20000),
+          db.from("email_opens").select("prospect_email").limit(20000),
+          db.from("email_send_log")
+            .select("recipient_email,status,error_message,created_at")
+            .eq("template_name", letter.key)
+            .order("created_at", { ascending: false })
+            .limit(20000),
+          db.from("funnel_orders").select("email").eq("status", "paid").limit(5000),
+          db.from("sales_prospects").select("email,first_name,unsubscribed,status").limit(20000),
+        ]);
+
+      const clickers = new Set((clicksRows || []).map((r) => normalize(r.prospect_email || "")));
+      const openers = new Set((opensRows || []).map((r) => normalize(r.prospect_email || "")));
+      const paid = new Set((paidOrders || []).map((r) => normalize(r.email || "")));
+      const profiles = new Map((profileRows || []).map((r) => [normalize(r.email || ""), r]));
+
+      // Dernière ligne de journal par destinataire (le plus récent d'abord).
+      const lastLog = new Map<string, { status: string; error_message: string | null; created_at: string }>();
+      for (const row of logRows || []) {
+        const email = normalize(row.recipient_email || "");
+        if (!email || lastLog.has(email)) continue;
+        lastLog.set(email, {
+          status: String(row.status || ""),
+          error_message: (row.error_message as string) || null,
+          created_at: String(row.created_at || ""),
+        });
+      }
+
+      const pool = letter.segment === "clickers"
+        ? [...clickers]
+        : letter.segment === "openers_no_click"
+          ? [...openers].filter((email) => !clickers.has(email))
+          : [...profiles.keys()].filter((email) => !openers.has(email) && !clickers.has(email));
+
+      const rows: Array<Record<string, unknown>> = [];
+      for (const email of new Set([...pool, ...lastLog.keys()])) {
+        if (!isEmail(email)) continue;
+        const profile = profiles.get(email);
+        const log = lastLog.get(email);
+        let status: "sent" | "error" | "pending" | "excluded" = "pending";
+        let reason = "";
+        if (log && ["sent", "delivered"].includes(log.status)) status = "sent";
+        else if (log) {
+          status = "error";
+          reason = log.error_message || `Échec (${log.status})`;
+        } else if (paid.has(email)) {
+          status = "excluded";
+          reason = "Client déjà acheteur";
+        } else if (!profile) {
+          status = "excluded";
+          reason = "Contact inconnu";
+        } else if (profile.unsubscribed === true) {
+          status = "excluded";
+          reason = "Désinscrit";
+        } else if (profile.status !== "active") {
+          status = "excluded";
+          reason = `Contact ${profile.status || "inactif"}`;
+        }
+        rows.push({
+          email,
+          first_name: (profile?.first_name as string) || "",
+          status,
+          reason,
+          sent_at: log?.created_at || null,
+        });
+      }
+
+      const order = { error: 0, pending: 1, sent: 2, excluded: 3 } as Record<string, number>;
+      rows.sort((a, b) =>
+        (order[String(a.status)] - order[String(b.status)]) || String(a.email).localeCompare(String(b.email)),
+      );
+
+      const counts = rows.reduce(
+        (acc, r) => {
+          const key = String(r.status);
+          acc[key] = (acc[key] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>,
+      );
+
+      return respond({ success: true, template: letter.key, label: letter.label, counts, recipients: rows });
+    }
+
+
     if (mode === "preview") {
       return new Response(render(baseUrl, "apercu@ebookstudio.fr", "Georges", letter, letter.subject), {
         headers: { ...corsHeaders, "Content-Type": "text/html; charset=utf-8" },
