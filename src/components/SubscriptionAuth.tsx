@@ -17,6 +17,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ADMIN_HOME_PATH } from '@/config/adminRoutes';
+import { SUBSCRIBER_HOME_PATH } from '@/lib/authDestination';
 import { useAdminAccess } from '@/contexts/AdminAccessContext';
 
 interface SubscriptionAuthProps {
@@ -140,7 +141,7 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
         localStorage.setItem('ebook_planner_active_tab', 'workflow-dashboard');
         toast.success(`Bienvenue ! Plan ${data.subscriber.plan_type}`);
         onAuthenticated(normalizedEmail, data.subscriber);
-        window.location.href = '/v3';
+        window.location.assign(SUBSCRIBER_HOME_PATH);
       } else {
         toast.error(data.message || 'Abonnement non trouvé');
       }

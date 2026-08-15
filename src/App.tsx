@@ -306,29 +306,17 @@ const App = () => {
 
 
 
-  const isPlannerPreviewHost =
-    typeof window !== 'undefined' &&
-    (window.location.hostname === 'localhost' || window.location.hostname.includes('id-preview--'));
-  const hasPlannerAccess = isPlannerPreviewHost || isAuthenticated || isAdmin;
+  // La prévisualisation ne doit jamais fabriquer un faux accès V2 : elle doit
+  // suivre exactement les mêmes règles de session que le site publié.
+  const hasPlannerAccess = isAuthenticated || isAdmin;
   const accessState: AccessState = !isAdminChecked
     ? 'pending'
     : isAdmin
       ? 'admin'
-      : (isAuthenticated || isPlannerPreviewHost)
+      : isAuthenticated
         ? 'subscriber'
         : 'visitor';
   const homePath = getHomePath(accessState);
-  const previewSubscriberEmail = 'preview@ebookstudio.fr';
-  const previewSubscriberData = {
-    email: previewSubscriberEmail,
-    plan_type: 'pro',
-    status: 'active',
-    access_code: 'PREVIEW-ACCESS',
-    ebook_plans_generated: 0,
-    chapters_generated: 0,
-    subchapters_generated: 0,
-    covers_generated: 0,
-  };
   const isAdminAuthRoute = pathname === ADMIN_LOGIN_PATH || pathname === '/admin-direct';
 
   if (isCheckingAuth) return <PageLoader />;
@@ -534,15 +522,7 @@ const App = () => {
             <Route
               path="/ebook-planner"
               element={
-                isPlannerPreviewHost && !isAuthenticated && !isAdmin ? (
-                  <EbookPlannerPage
-                    subscriberEmail={previewSubscriberEmail}
-                    subscriberData={previewSubscriberData}
-                    isDemo={false}
-                    isAdmin={false}
-                    onLogout={handleLogout}
-                  />
-                ) : gated(
+                gated(
                   <EbookPlannerPage
                     subscriberEmail={subscriberEmail || ''}
                     subscriberData={subscriberData}
@@ -644,7 +624,7 @@ const App = () => {
               <Route path="outils/mockup-3d" element={<V3LockedGate><V3MockupPage /></V3LockedGate>} />
               <Route path="outils/audiobook" element={<V3LockedGate><V3AudiobookPage /></V3LockedGate>} />
               <Route path="outils/editeur" element={<V3LockedGate><V3EditorPage /></V3LockedGate>} />
-              <Route path="hub" element={<V3LockedGate>{isPlannerPreviewHost ? <V3HubPage /> : <V3Gate><V3HubPage /></V3Gate>}</V3LockedGate>} />
+              <Route path="hub" element={<V3LockedGate><V3Gate><V3HubPage /></V3Gate></V3LockedGate>} />
 
 
             </Route>
@@ -657,8 +637,8 @@ const App = () => {
           {!isAdminAuthRoute && <AssistantFloatingButton />}
           {!isAdminAuthRoute && <ApiKeysFloatingButton />}
           {!isAdminAuthRoute && <GeminiKeyAlertBanner />}
-          {!isAdminAuthRoute && (isAuthenticated || isAdmin || isPlannerPreviewHost) && (
-            <V2V3FloatingSwitch forceVisible={isPlannerPreviewHost && !isAuthenticated && !isAdmin} />
+          {!isAdminAuthRoute && (isAuthenticated || isAdmin) && (
+            <V2V3FloatingSwitch forceVisible={isAdmin} />
           )}
           {isAuthenticated && <AISosModal />}
           {isAuthenticated && <AICostBadge />}
