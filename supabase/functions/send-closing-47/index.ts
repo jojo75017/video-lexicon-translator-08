@@ -4,16 +4,21 @@ import { EMAIL_SENDING_ENABLED, emailSendingBlockedResult } from "../_shared/ema
 import { CHECKOUT_URL } from "../_shared/checkoutUrl.ts";
 
 /**
- * Campagne de clôture de l'offre 47 € (fin le 30/09/2026).
+ * Campagne de conversion 2026 — trois séquences, un seul objectif par email.
  *
- * Deux usages :
- *  - `cliqueurs-personnel` : message personnel aux prospects qui ont déjà cliqué
- *    (les plus chauds). Ton au singulier, réponse aux objections, paiement en 2 fois.
- *  - `cloture-47-1..3` : séquence courte de clôture pour les ouvreurs sans clic.
+ *  A. `reactivation-a1..a3`  → 208 adresses qui n'ont jamais ouvert : obtenir une ouverture.
+ *  B. `clic-b1..b4`          → 440 lecteurs qui n'ont jamais cliqué : obtenir un premier clic
+ *                              gratuit vers le cadeau (10 niches), l'achat vient en second.
+ *  C. `chaud-c1..c2`         → les cliqueurs : demander la vente.
  *
- * Sécurité : admin (has_role) ou secret cron. Les acheteurs, désinscrits et
- * contacts inactifs sont toujours exclus, et un même gabarit n'est jamais
- * envoyé deux fois à la même adresse.
+ * Règles appliquées à tous les envois :
+ *  - un email = un objectif = un lien principal ;
+ *  - les acheteurs, désinscrits et contacts inactifs sont exclus ;
+ *  - un même gabarit n'est jamais envoyé deux fois à la même adresse ;
+ *  - quota Resend respecté (reprise le lendemain sans doublon) ;
+ *  - adresse directe boubetgeorges@gmail.com dans chaque signature.
+ *
+ * Sécurité : admin (has_role) ou secret cron.
  */
 
 const corsHeaders = {
@@ -21,33 +26,33 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-cron-secret",
 };
 
-const CAMPAIGN = "cloture-47-2026";
+const CAMPAIGN = "conversion-2026";
 const CHECKOUT = CHECKOUT_URL;
 const DEMO_URL = "https://ebookstudio.fr/demo";
 const GIFT_URL = "https://ebookstudio.fr/10-niches-offertes";
+const DIRECT_EMAIL = "boubetgeorges@gmail.com";
 
-type TemplateKey =
-  | "cliqueurs-personnel"
-  | "cloture-47-1"
-  | "cloture-47-2"
-  | "cloture-47-3"
-  | "relance-niches-1";
+type Segment = "never_opened" | "openers_no_click" | "clickers";
+/** Cible du bouton principal : le cadeau (sans risque) ou la page de paiement. */
+type Primary = "gift" | "checkout" | "demo";
 
 interface Letter {
-  key: TemplateKey;
+  key: string;
   label: string;
   subject: string;
+  /** Objet alternatif testé sur une partie de la vague. */
+  subjectB?: string;
   preheader: string;
-  /** Corps en HTML simple (paragraphes déjà balisés). */
   body: string;
   cta: string;
   ps: string;
-  /** Cible par défaut : cliqueurs, ouvreurs sans clic, ou tous les non-cliqueurs. */
-  segment: "clickers" | "openers_no_click" | "no_click";
-  /** Ajoute le bloc cadeau « 10 niches offertes » avant le prix. */
+  segment: Segment;
+  primary: Primary;
+  /** Affiche le pavé prix 47 € (jamais dans les emails « clic gratuit »). */
+  price?: boolean;
+  /** Ajoute le pavé cadeau au-dessus du bouton. */
   gift?: boolean;
 }
-
 
 const PRICE_BLOCK = `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td align="center" style="background:#232F3E;padding:20px;color:#ffffff;font:16px/1.5 Arial,Helvetica,sans-serif">
 <div style="font:700 38px/1.1 Arial,Helvetica,sans-serif;color:#FF9E2D">47 €</div>
@@ -56,86 +61,150 @@ const PRICE_BLOCK = `<table role="presentation" cellspacing="0" cellpadding="0" 
 </td></tr></table>`;
 
 const LETTERS: Letter[] = [
+  // ------------------------------------------------------------ Séquence A
   {
-    key: "cliqueurs-personnel",
-    label: "Message personnel aux cliqueurs",
-    subject: "Vous avez regardé EbookStudio — qu'est-ce qui vous retient ?",
-    preheader: "Trois objections, trois réponses claires. Et une proposition concrète.",
+    key: "reactivation-a1",
+    label: "A1 — Réactivation : une question courte",
+    subject: "Votre livre, il parle de quoi ?",
+    subjectB: "Une question sur votre projet de livre",
+    preheader: "Une phrase de votre part, un sommaire complet en retour.",
+    segment: "never_opened",
+    primary: "gift",
+    body: `<p style="margin:0 0 18px">Je vous écris court, parce que je n'ai qu'une question : votre livre, il parle de quoi ?</p>
+<p style="margin:0 0 18px">Si vous n'avez pas encore d'idée arrêtée, j'ai préparé pour vous <strong>10 niches Amazon rentables</strong> : le thème, le public visé et l'angle du livre. C'est offert, sans achat et sans carte bancaire.</p>`,
+    cta: "Voir mes 10 niches offertes",
+    ps: `Si vous préférez me répondre directement : ${DIRECT_EMAIL}. C'est moi qui lis.`,
+  },
+  {
+    key: "reactivation-a2",
+    label: "A2 — Réactivation : le sommaire en deux minutes",
+    subject: "Le sommaire de votre livre en deux minutes",
+    subjectB: "Deux minutes pour voir le plan de votre livre",
+    preheader: "Vous décrivez votre sujet en une phrase, le plan sort tout seul.",
+    segment: "never_opened",
+    primary: "gift",
+    body: `<p style="margin:0 0 18px">La partie qui bloque presque tout le monde, c'est le plan du livre. C'est justement celle qui prend deux minutes avec EbookStudio.</p>
+<p style="margin:0 0 18px">Vous décrivez votre sujet en une phrase, vous obtenez un sommaire chapitre par chapitre, et vous le modifiez librement.</p>
+<p style="margin:0 0 18px">Pour choisir un sujet qui se vend, commencez par mes 10 niches offertes.</p>`,
+    cta: "Voir mes 10 niches offertes",
+    ps: `Une question, un doute, un blocage : écrivez-moi à ${DIRECT_EMAIL}.`,
+  },
+  {
+    key: "reactivation-a3",
+    label: "A3 — Réactivation : dernier message",
+    subject: "Je vous laisse tranquille",
+    subjectB: "Dernier message de ma part",
+    preheader: "Le cadeau reste à vous, ensuite je m'arrête.",
+    segment: "never_opened",
+    primary: "gift",
+    body: `<p style="margin:0 0 18px">C'est mon dernier message : je ne veux pas encombrer votre boîte.</p>
+<p style="margin:0 0 18px">Le cadeau reste à vous : <strong>10 niches Amazon rentables</strong>, avec le public visé et l'angle du livre. Rien à payer, rien à installer.</p>`,
+    cta: "Récupérer mes 10 niches",
+    ps: "Si ce n'est pas le bon moment, ignorez simplement ce message : vous ne recevrez plus cette relance.",
+  },
+
+  // ------------------------------------------------------------ Séquence B
+  {
+    key: "clic-b1",
+    label: "B1 — Cadeau immédiat (10 niches)",
+    subject: "Vos 10 niches Amazon, offertes",
+    subjectB: "10 niches rentables, sans rien payer",
+    preheader: "Thème, public visé, angle du livre. Offert, sans condition.",
+    segment: "openers_no_click",
+    primary: "gift",
+    gift: true,
+    body: `<p style="margin:0 0 18px">Je commence par le cadeau, parce qu'il ne vous coûte rien et qu'il sert tout de suite.</p>
+<p style="margin:0 0 18px">Voici <strong>10 niches Amazon rentables</strong>, extraites de notre base de 600 niches analysées : pour chacune, le thème, le public visé et l'angle du livre à écrire.</p>
+<p style="margin:0 0 18px">Vous les consultez immédiatement : aucun achat, aucune carte bancaire.</p>`,
+    cta: "Voir mes 10 niches offertes",
+    ps: `Choisissez-en une et répondez-moi : je vous dis franchement ce que j'en pense (${DIRECT_EMAIL}).`,
+  },
+  {
+    key: "clic-b2",
+    label: "B2 — Preuve : du sommaire au fichier Amazon",
+    subject: "Du sommaire au fichier Amazon, en 5 étapes",
+    subjectB: "Ce qui sort vraiment à la fin",
+    preheader: "Les cinq étapes visibles, sans promesse floue.",
+    segment: "openers_no_click",
+    primary: "demo",
+    gift: true,
+    body: `<p style="margin:0 0 18px">Plutôt que de décrire l'outil, voici ce qui sort concrètement d'un projet complet.</p>
+<p style="margin:0 0 12px"><strong>1. Le sommaire.</strong> Votre sujet en une phrase, un plan chapitre par chapitre que vous modifiez librement.</p>
+<p style="margin:0 0 12px"><strong>2. Les chapitres.</strong> Rédigés un par un, en français, avec la mémoire du livre : personnages, lieux et faits restent cohérents jusqu'à la fin.</p>
+<p style="margin:0 0 12px"><strong>3. La correction.</strong> Le manuscrit entier est relu et les corrections vous sont proposées une par une.</p>
+<p style="margin:0 0 12px"><strong>4. La couverture.</strong> Face avant, dos calculé selon le nombre de pages, 4<sup>e</sup> de couverture aux dimensions exigées par Amazon.</p>
+<p style="margin:0 0 18px"><strong>5. Le dépôt.</strong> Word et PDF avec table des matières propre, plus la fiche Amazon : titre, description, mots-clés, catégories.</p>`,
+    cta: "Voir la démonstration",
+    ps: "Rien à installer, rien à configurer : tout se passe dans votre navigateur.",
+  },
+  {
+    key: "clic-b3",
+    label: "B3 — Objections : « je n'écris pas bien »",
+    subject: "« Je n'écris pas bien » : et alors ?",
+    subjectB: "Trois blocages, trois réponses courtes",
+    preheader: "Les trois phrases qu'on me dit le plus, et ce qu'il en est.",
+    segment: "openers_no_click",
+    primary: "gift",
+    gift: true,
+    body: `<p style="margin:0 0 18px">Trois phrases reviennent tout le temps. Voici mes réponses, sans détour.</p>
+<p style="margin:0 0 12px"><strong>« Je n'écris pas bien. »</strong> Vous n'écrivez pas : vous décidez. Vous validez le plan, vous relisez, vous corrigez un mot ici ou là. La rédaction est faite pour vous, en français correct.</p>
+<p style="margin:0 0 12px"><strong>« C'est trop technique. »</strong> Vous répondez à des questions, vous cliquez, vous téléchargez un Word et un PDF déjà aux normes Amazon. Aucun logiciel à installer.</p>
+<p style="margin:0 0 18px"><strong>« Je n'ai pas le temps. »</strong> La première séance utile dure vingt minutes. Le reste se fait chapitre par chapitre, à votre rythme, et tout est sauvegardé entre deux sessions.</p>
+<p style="margin:0 0 18px">Le plus simple : prenez une de mes 10 niches offertes et regardez ce que devient l'idée.</p>`,
+    cta: "Voir mes 10 niches offertes",
+    ps: `Il vous reste une question qui bloque tout ? Écrivez-moi : ${DIRECT_EMAIL}, je réponds moi-même.`,
+  },
+  {
+    key: "clic-b4",
+    label: "B4 — Échéance : l'accès à vie disparaît",
+    subject: "Après le 30 septembre, ce tarif n'existe plus",
+    subjectB: "47 € une fois, ou 204 € par an",
+    preheader: "Le calcul est simple, et la date ne bougera pas.",
+    segment: "openers_no_click",
+    primary: "checkout",
+    price: true,
+    body: `<p style="margin:0 0 18px">Jusqu'au <strong>30 septembre 2026</strong>, EbookStudio est accessible pour <strong>47 €, une seule fois, à vie</strong>. À partir du 1<sup>er</sup> octobre, il ne restera que l'abonnement : 17 € par mois, soit <strong>204 € la première année</strong>, et autant les suivantes.</p>
+<p style="margin:0 0 18px">Avec l'accès à vie, vous gardez tout : la rédaction complète de vos livres, les exports Word et PDF aux normes Amazon KDP, les couvertures avec dos calculé, la fiche de vente, les livres illustrés pour enfants — et les nouveaux outils au fur et à mesure, sans repayer.</p>
+<p style="margin:0 0 14px;font:700 17px Arial,Helvetica,sans-serif">Ce qui lève le risque</p>
+<p style="margin:0 0 12px"><strong>Garantie 30 jours</strong> : remboursé sur simple demande, sans justification.</p>
+<p style="margin:0 0 12px"><strong>Accès immédiat</strong> : vos identifiants arrivent par email juste après le paiement.</p>
+<p style="margin:0 0 18px"><strong>Mon adresse directe</strong> : ${DIRECT_EMAIL}. Si quelque chose bloque, vous m'écrivez et je réponds moi-même.</p>`,
+    cta: "Ouvrir mon accès à vie — 47 €",
+    ps: "Paiement en 2 fois (2 × 25 €) ou 3 fois (3 × 18 €), accès ouvert dès la première échéance.",
+  },
+
+  // ------------------------------------------------------------ Séquence C
+  {
+    key: "chaud-c1",
+    label: "C1 — Cliqueurs : qu'est-ce qui vous retient ?",
+    subject: "Qu'est-ce qui vous retient ?",
+    subjectB: "Une phrase et je vous fais votre sommaire",
+    preheader: "Répondez-moi, je construis votre premier sommaire avec vous.",
     segment: "clickers",
-    body: `<p style="margin:0 0 18px">Vous avez ouvert la page d'EbookStudio, puis vous n'êtes pas allé plus loin. C'est votre droit le plus strict — mais si quelque chose vous retient, je préfère y répondre directement.</p>
-<p style="margin:0 0 14px;font:700 17px Arial,Helvetica,sans-serif">Les trois raisons qui reviennent le plus</p>
-<p style="margin:0 0 12px"><strong>« 47 €, c'est un budget. »</strong> C'est un paiement unique, sans abonnement. Vous pouvez le régler en 2 fois (2 × 25 €) ou en 3 fois (3 × 18 €), et l'accès s'ouvre dès la première échéance. À partir du 1<sup>er</sup> octobre, l'accès à vie disparaît : il ne restera que l'abonnement à 17 €/mois, soit 204 € sur un an.</p>
-<p style="margin:0 0 12px"><strong>« Je n'aurai pas le temps. »</strong> La première séance utile dure vingt minutes : vous décrivez votre sujet, vous obtenez le sommaire, vous le corrigez. Le reste se fait chapitre par chapitre, à votre rythme, et votre projet est sauvegardé entre deux sessions.</p>
-<p style="margin:0 0 12px"><strong>« C'est trop technique pour moi. »</strong> Vous répondez à des questions, vous cliquez, vous téléchargez un fichier Word et un PDF déjà aux normes Amazon. Il n'y a aucun logiciel à installer.</p>
-<p style="margin:0 0 18px">Et je vous propose autre chose : <strong>répondez à cet email avec le sujet de votre livre en une phrase</strong>, et je construis le premier sommaire avec vous. Vous verrez le résultat avant de décider quoi que ce soit.</p>`,
-    cta: "Ouvrir mon accès à vie pour 47 €",
-    ps: "Si ce n'est pas le bon moment, répondez-moi simplement « pas maintenant » : je vous retire de ces relances.",
+    primary: "gift",
+    body: `<p style="margin:0 0 18px">Vous êtes venu voir EbookStudio, puis vous n'êtes pas allé plus loin. C'est votre droit — mais si quelque chose vous retient, je préfère y répondre directement.</p>
+<p style="margin:0 0 18px">Ma proposition est simple : <strong>répondez à cet email avec le sujet de votre livre en une phrase</strong>, et je construis le premier sommaire avec vous. Vous verrez le résultat avant de décider quoi que ce soit.</p>
+<p style="margin:0 0 18px">En attendant, prenez le cadeau : 10 niches Amazon rentables, offertes.</p>`,
+    cta: "Voir mes 10 niches offertes",
+    ps: `Vous pouvez aussi m'écrire directement à ${DIRECT_EMAIL}. Si ce n'est pas le moment, répondez « pas maintenant » et je vous retire des relances.`,
   },
   {
-    key: "cloture-47-1",
-    label: "Clôture 1 — ce qui change le 1er octobre",
-    subject: "Le 1er octobre, l'accès à vie disparaît (le calcul est simple)",
-    preheader: "47 € une fois aujourd'hui, ou 204 € par an à partir d'octobre.",
-    segment: "openers_no_click",
-    body: `<p style="margin:0 0 18px">Je vais être direct, parce que la date approche.</p>
-<p style="margin:0 0 18px">Jusqu'au <strong>30 septembre 2026</strong>, EbookStudio est accessible pour <strong>47 €, une seule fois, à vie</strong>. À partir du <strong>1<sup>er</sup> octobre</strong>, cette formule n'existe plus : il ne restera que des abonnements mensuels, à partir de 17 €/mois.</p>
-<p style="margin:0 0 14px;font:700 17px Arial,Helvetica,sans-serif">Le calcul, fait pour vous</p>
-<p style="margin:0 0 12px">47 € une seule fois aujourd'hui.<br>17 €/mois à partir d'octobre, soit <strong>204 € sur un an</strong>, et autant chaque année suivante.</p>
-<p style="margin:0 0 18px">Ce n'est pas une urgence fabriquée : c'est le passage de la version à vie au modèle par abonnement, et il ne sera pas annulé.</p>
-<p style="margin:0 0 18px">Avec l'accès à vie, vous gardez tout : la rédaction complète de vos livres, l'export Word et PDF aux normes Amazon KDP, les couvertures avec dos calculé, la fiche de vente, les livres illustrés pour enfants — et les nouveaux outils au fur et à mesure, sans repayer.</p>`,
-    cta: "Prendre l'accès à vie avant le 30 septembre",
-    ps: "Vous pouvez aussi tester gratuitement le sommaire de votre livre avant de décider.",
-  },
-  {
-    key: "cloture-47-2",
-    label: "Clôture 2 — la preuve en images",
-    subject: "Un livre entier, du sommaire au fichier Amazon",
-    preheader: "Ce que vous obtenez réellement à la fin, étape par étape.",
-    segment: "openers_no_click",
-    body: `<p style="margin:0 0 18px">Plutôt que de vous décrire l'outil, voici exactement ce qui sort d'un projet complet.</p>
-<p style="margin:0 0 12px"><strong>1. Le sommaire.</strong> Vous décrivez votre sujet en une phrase. Vous recevez un sommaire chapitre par chapitre, que vous modifiez librement : vous ajoutez, supprimez, réorganisez.</p>
-<p style="margin:0 0 12px"><strong>2. Les chapitres.</strong> Ils sont rédigés un par un, en français, avec une mémoire du livre : les personnages, les lieux et les faits déjà racontés restent cohérents jusqu'à la fin.</p>
-<p style="margin:0 0 12px"><strong>3. La correction.</strong> Un module relit le manuscrit entier et vous propose les corrections une par une : vous acceptez ou vous gardez votre mot.</p>
-<p style="margin:0 0 12px"><strong>4. La couverture.</strong> Face avant, dos calculé selon votre nombre de pages, 4<sup>e</sup> de couverture, aux dimensions exactes exigées par Amazon.</p>
-<p style="margin:0 0 12px"><strong>5. Le dépôt.</strong> Fichier Word et PDF avec table des matières propre, plus la fiche Amazon : titre, description, mots-clés, catégories.</p>
-<p style="margin:0 0 18px">Le plus simple reste de l'essayer sur votre propre idée : décrivez votre livre en une phrase et regardez le sommaire qui en sort. C'est gratuit et cela prend deux minutes.</p>`,
-    cta: "Tester sur mon idée de livre, gratuitement",
-    ps: "L'accès complet reste à 47 € à vie jusqu'au 30 septembre.",
-  },
-  {
-    key: "cloture-47-3",
-    label: "Clôture 3 — dernier jour utile",
-    subject: "Dernier rappel : après le 30 septembre, ce tarif n'existe plus",
-    preheader: "Garantie 30 jours, paiement en 2 fois, PayPal accepté.",
-    segment: "openers_no_click",
-    body: `<p style="margin:0 0 18px">C'est mon dernier message sur cette offre.</p>
-<p style="margin:0 0 18px">Après le <strong>30 septembre 2026</strong>, l'accès à vie à 47 € disparaît définitivement, remplacé par des abonnements mensuels. Si votre projet de livre attend depuis des mois, c'est le moment de le sortir — ou de le laisser attendre une année de plus.</p>
-<p style="margin:0 0 14px;font:700 17px Arial,Helvetica,sans-serif">Ce qui doit lever vos derniers doutes</p>
-<p style="margin:0 0 12px"><strong>Garantie 30 jours.</strong> Si l'outil ne vous convient pas, vous demandez le remboursement et vous l'obtenez.</p>
-<p style="margin:0 0 12px"><strong>Paiement fractionné.</strong> 2 × 25 € ou 3 × 18 €, accès ouvert dès la première échéance.</p>
-<p style="margin:0 0 12px"><strong>PayPal accepté</strong> au même titre que la carte bancaire, sur la page de paiement.</p>
-<p style="margin:0 0 12px"><strong>Aucun abonnement caché.</strong> Un paiement, un accès conservé, les nouveaux outils inclus.</p>
-<p style="margin:0 0 18px">Si vous avez une seule question qui vous retient encore, répondez à cet email : je réponds moi-même, et vite.</p>`,
+    key: "chaud-c2",
+    label: "C2 — Cliqueurs : rappel final avec achat",
+    subject: "Je ferme l'accès à vie le 30 septembre",
+    subjectB: "Dernier rappel avant le passage en abonnement",
+    preheader: "Garantie 30 jours, paiement en 2 ou 3 fois, PayPal accepté.",
+    segment: "clickers",
+    primary: "checkout",
+    price: true,
+    body: `<p style="margin:0 0 18px">Dernier message sur cette offre, et il est court.</p>
+<p style="margin:0 0 18px">Le <strong>30 septembre 2026</strong>, l'accès à vie à 47 € disparaît. Ensuite, c'est 17 € par mois, soit 204 € la première année.</p>
+<p style="margin:0 0 12px"><strong>Garantie 30 jours</strong> : remboursé sur simple demande.</p>
+<p style="margin:0 0 12px"><strong>2 × 25 € ou 3 × 18 €</strong>, accès ouvert dès la première échéance.</p>
+<p style="margin:0 0 12px"><strong>PayPal ou carte bancaire</strong>, au choix sur la page de paiement.</p>
+<p style="margin:0 0 18px">Juste après le paiement, vous recevez vos identifiants, le lien de vos 10 niches et mon adresse directe (${DIRECT_EMAIL}).</p>`,
     cta: "Ouvrir mon accès à vie — 47 €",
     ps: "Après le 30 septembre, ce tarif ne reviendra pas.",
-  },
-  {
-    key: "relance-niches-1",
-    label: "Relance — 10 niches offertes (non-cliqueurs)",
-    subject: "10 niches Amazon rentables, offertes (même si vous n'achetez rien)",
-    preheader: "Le pack de 10 niches est à vous, sans condition. La suite est optionnelle.",
-    segment: "no_click",
-    gift: true,
-    body: `<p style="margin:0 0 18px">Je commence par le cadeau, parce qu'il ne vous coûte rien et qu'il est utile tout de suite.</p>
-<p style="margin:0 0 18px">Je vous offre <strong>10 niches Amazon rentables</strong>, extraites de notre base de 600 niches analysées : le thème, le public visé et l'angle du livre à écrire. Vous les consultez immédiatement, sans achat, sans carte bancaire.</p>
-<p style="margin:0 0 14px;font:700 17px Arial,Helvetica,sans-serif">Ce que devient une niche avec EbookStudio</p>
-<p style="margin:0 0 12px">Vous choisissez une niche, vous la décrivez en une phrase, et vous obtenez le sommaire. Puis les chapitres, un par un, en français, avec la mémoire du livre pour rester cohérent jusqu'à la fin.</p>
-<p style="margin:0 0 12px">Ensuite la correction chapitre par chapitre, la couverture avec le dos calculé selon votre nombre de pages, le fichier Word et le PDF aux normes Amazon KDP, et la fiche de vente : titre, description, mots-clés, catégories.</p>
-<p style="margin:0 0 14px;font:700 17px Arial,Helvetica,sans-serif">Ce que vous recevez juste après le paiement</p>
-<p style="margin:0 0 12px">Un email de bienvenue avec <strong>vos identifiants d'accès</strong>, le lien de vos 10 niches, et mon adresse directe <strong>boubetgeorges@gmail.com</strong> : si quelque chose bloque, vous m'écrivez et je réponds moi-même.</p>
-<p style="margin:0 0 18px">Jusqu'au <strong>30 septembre 2026</strong>, l'accès est à <strong>47 € une seule fois, à vie</strong>. À partir du 1<sup>er</sup> octobre, il ne restera que l'abonnement à 17 €/mois, soit 204 € sur un an.</p>`,
-    cta: "Ouvrir mon accès à vie — 47 €",
-    ps: "Le pack de 10 niches reste à vous quoi qu'il arrive : cliquez simplement sur le lien du cadeau ci-dessus.",
   },
 ];
 
@@ -144,18 +213,25 @@ const byKey = new Map(LETTERS.map((l) => [l.key, l]));
 const normalize = (value: string) => value.trim().toLowerCase();
 const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
-/** Lien de clic hébergé sur notre domaine (/r) : plus de confiance, clic enregistré. */
-function trackedLink(email: string, letter: Letter) {
-  const destination = letter.key === "cloture-47-2"
-    ? `${DEMO_URL}?utm_source=email&utm_medium=cloture&utm_campaign=${letter.key}`
-    : `${CHECKOUT}?src=${letter.key === "relance-niches-1" ? letter.key : `${CAMPAIGN}-${letter.key}`}&email=${encodeURIComponent(email)}`;
-  return `https://ebookstudio.fr/r?e=${encodeURIComponent(email)}&s=1&t=${letter.key}&u=${encodeURIComponent(destination)}`;
+/** Destination du bouton principal, selon l'objectif de l'email. */
+function primaryDestination(email: string, letter: Letter) {
+  if (letter.primary === "gift") {
+    return `${GIFT_URL}?src=${letter.key}&email=${encodeURIComponent(email)}`;
+  }
+  if (letter.primary === "demo") {
+    return `${DEMO_URL}?utm_source=email&utm_medium=${CAMPAIGN}&utm_campaign=${letter.key}`;
+  }
+  return `${CHECKOUT}?src=${CAMPAIGN}-${letter.key}&email=${encodeURIComponent(email)}`;
 }
 
-/** Lien du cadeau « 10 niches offertes », tracké lui aussi. */
-function giftLink(email: string, letter: Letter) {
-  const destination = `${GIFT_URL}?src=${letter.key}&email=${encodeURIComponent(email)}`;
-  return `https://ebookstudio.fr/r?e=${encodeURIComponent(email)}&s=1&t=${letter.key}-cadeau&u=${encodeURIComponent(destination)}`;
+/** Lien de clic hébergé sur notre domaine (/r) : plus de confiance, clic enregistré. */
+function trackedLink(email: string, letter: Letter, suffix = "") {
+  const destination = suffix === "-achat"
+    ? `${CHECKOUT}?src=${CAMPAIGN}-${letter.key}&email=${encodeURIComponent(email)}`
+    : suffix === "-cadeau"
+      ? `${GIFT_URL}?src=${letter.key}&email=${encodeURIComponent(email)}`
+      : primaryDestination(email, letter);
+  return `https://ebookstudio.fr/r?e=${encodeURIComponent(email)}&s=1&t=${letter.key}${suffix}&u=${encodeURIComponent(destination)}`;
 }
 
 function giftBlock(link: string) {
@@ -166,16 +242,21 @@ function giftBlock(link: string) {
 </td></tr></table>`;
 }
 
-
 function ctaButton(link: string, label: string) {
   return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:26px 0"><tr><td align="center" bgcolor="#FF9E2D" style="border-radius:6px"><a href="${link}" style="display:block;padding:17px 24px;color:#232F3E;text-decoration:none;font:700 17px/1.3 Arial,Helvetica,sans-serif;text-align:center">${label}</a></td></tr></table>`;
 }
 
-function render(baseUrl: string, email: string, firstName: string, letter: Letter) {
-  const link = trackedLink(email, letter);
+/** Rappel discret de l'offre, quand l'email n'a pas pour but de vendre. */
+function softOfferLine(link: string) {
+  return `<p style="margin:0 0 18px;font:14px/1.6 Arial,Helvetica,sans-serif;color:#4b5563">Si vous voulez aller plus loin : l'accès complet est à 47 € une seule fois, à vie, jusqu'au 30 septembre 2026 (ensuite 17 €/mois). <a href="${link}" style="color:#008296">Voir l'offre</a>.</p>`;
+}
+
+function render(baseUrl: string, email: string, firstName: string, letter: Letter, subject: string) {
+  const primary = trackedLink(email, letter);
   const unsubscribe = `${baseUrl}/functions/v1/unsubscribe?email=${encodeURIComponent(email)}&seq=all`;
   const pixel = `${baseUrl}/functions/v1/track-email-open?e=${encodeURIComponent(email)}&s=1&t=${letter.key}`;
-  return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#f6f7f8;padding:24px 10px">
+  const showsPrice = letter.price === true;
+  return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${subject}</title></head><body style="margin:0;background:#f6f7f8;padding:24px 10px">
 <div style="display:none;font-size:1px;color:#f6f7f8;max-height:0;overflow:hidden">${letter.preheader}</div>
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse"><tr><td align="center">
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width:600px;width:100%;background:#ffffff;border:1px solid #e5e7eb;border-collapse:collapse">
@@ -183,11 +264,11 @@ function render(baseUrl: string, email: string, firstName: string, letter: Lette
 <tr><td style="padding:26px 28px 0;color:#232F3E;font:16px/1.65 Arial,Helvetica,sans-serif">
 <p style="margin:0 0 18px">Bonjour${firstName ? ` ${firstName}` : ""},</p>
 ${letter.body}
-${letter.gift ? giftBlock(giftLink(email, letter)) : ""}
-${PRICE_BLOCK}
-${ctaButton(link, letter.cta)}
-
-<p style="margin:0 0 6px">Bien à vous,<br><strong>Georges Boubet</strong><br>EbookStudio</p>
+${letter.gift && letter.primary !== "gift" ? giftBlock(trackedLink(email, letter, "-cadeau")) : ""}
+${showsPrice ? PRICE_BLOCK : ""}
+${ctaButton(primary, letter.cta)}
+${showsPrice ? "" : softOfferLine(trackedLink(email, letter, "-achat"))}
+<p style="margin:0 0 6px">Bien à vous,<br><strong>Georges Boubet</strong><br>EbookStudio — <a href="mailto:${DIRECT_EMAIL}" style="color:#008296">${DIRECT_EMAIL}</a></p>
 <p style="margin:18px 0 0;padding:14px 0 0;border-top:1px solid #e5e7eb;font:15px/1.6 Arial,Helvetica,sans-serif;color:#4b5563">${letter.ps}</p>
 </td></tr>
 <tr><td style="padding:18px 24px;background:#f6f7f8;text-align:center;color:#68737d;font:12px/1.6 Arial,Helvetica,sans-serif">Offre à 47 € valable jusqu'au 30 septembre 2026.<br>Vous recevez cet email car vous avez manifesté un intérêt pour EbookStudio.<br><a href="${unsubscribe}" style="color:#008296">Se désinscrire de tous les emails marketing</a></td></tr>
@@ -223,27 +304,50 @@ Deno.serve(async (req) => {
       return respond({ error: "Accès administrateur requis" }, 403);
     }
 
-    const letterKey = String(body.template || "") as TemplateKey;
-    const letter = byKey.get(letterKey);
+    const letter = byKey.get(String(body.template || ""));
 
+    // ---------------------------------------------------------------- status
     if (mode === "status") {
+      const [{ data: leadRows }, { data: orderRows }] = await Promise.all([
+        db.from("funnel_leads").select("email,landing_url,utm_campaign").limit(10000),
+        db.from("funnel_orders").select("email,status").limit(10000),
+      ]);
+      const paidEmails = new Set(
+        (orderRows || []).filter((o) => o.status === "paid").map((o) => normalize(o.email || "")),
+      );
+
       const stats = await Promise.all(
         LETTERS.map(async (l) => {
-          const { count } = await db
+          const { data: sentRows } = await db
             .from("email_send_log")
-            .select("id", { count: "exact", head: true })
+            .select("recipient_email")
             .eq("template_name", l.key)
-            .in("status", ["sent", "delivered"]);
-          const { data: opens } = await db.from("email_opens").select("prospect_email").eq("template_name", l.key).limit(5000);
-          const { data: clicks } = await db.from("email_clicks").select("prospect_email").eq("template_name", l.key).limit(5000);
+            .in("status", ["sent", "delivered"])
+            .limit(10000);
+          const recipients = new Set((sentRows || []).map((r) => normalize(r.recipient_email || "")));
+
+          const { data: opens } = await db
+            .from("email_opens").select("prospect_email").eq("template_name", l.key).limit(10000);
+          const { data: clicks } = await db
+            .from("email_clicks").select("prospect_email").ilike("template_name", `${l.key}%`).limit(10000);
+
+          const leads = (leadRows || []).filter((r) => {
+            const url = String(r.landing_url || "");
+            return url.includes(`src=${l.key}`) || String(r.utm_campaign || "") === l.key;
+          }).length;
+          const orders = [...paidEmails].filter((e) => recipients.has(e)).length;
+
           return {
             template: l.key,
             label: l.label,
             subject: l.subject,
             segment: l.segment,
-            sent: count || 0,
+            primary: l.primary,
+            sent: recipients.size,
             opens: new Set((opens || []).map((r) => normalize(r.prospect_email || ""))).size,
             clicks: new Set((clicks || []).map((r) => normalize(r.prospect_email || ""))).size,
+            leads,
+            orders,
           };
         }),
       );
@@ -253,7 +357,7 @@ Deno.serve(async (req) => {
     if (!letter) return respond({ error: "Gabarit inconnu" }, 400);
 
     if (mode === "preview") {
-      return new Response(render(baseUrl, "apercu@ebookstudio.fr", "Georges", letter), {
+      return new Response(render(baseUrl, "apercu@ebookstudio.fr", "Georges", letter, letter.subject), {
         headers: { ...corsHeaders, "Content-Type": "text/html; charset=utf-8" },
       });
     }
@@ -267,8 +371,8 @@ Deno.serve(async (req) => {
         from: "Georges Boubet <noreply@ebookstudio.fr>",
         to: [testEmail],
         subject: `[TEST] ${letter.subject}`,
-        html: render(baseUrl, testEmail, "Georges", letter),
-        reply_to: "contact@ebookstudio.fr",
+        html: render(baseUrl, testEmail, "Georges", letter, letter.subject),
+        reply_to: DIRECT_EMAIL,
       });
       if (!result.ok) return respond({ error: `Envoi refusé (HTTP ${result.status || ""}) ${result.detail || ""}` }, 502);
       return respond({ success: true, mode, template: letter.key, sent: 1 });
@@ -276,15 +380,15 @@ Deno.serve(async (req) => {
 
     if (mode !== "send") return respond({ error: "Mode inconnu" }, 400);
 
-    const limit = Math.min(Number(body.batch_size || 250), 300);
+    const limit = Math.min(Number(body.batch_size || 100), 300);
 
     const [{ data: clicksRows }, { data: opensRows }, { data: alreadySent }, { data: paidOrders }, { data: profileRows }] =
       await Promise.all([
-        db.from("email_clicks").select("prospect_email").limit(10000),
-        db.from("email_opens").select("prospect_email").limit(10000),
-        db.from("email_send_log").select("recipient_email").eq("template_name", letter.key).in("status", ["sent", "delivered"]).limit(10000),
+        db.from("email_clicks").select("prospect_email").limit(20000),
+        db.from("email_opens").select("prospect_email").limit(20000),
+        db.from("email_send_log").select("recipient_email").eq("template_name", letter.key).in("status", ["sent", "delivered"]).limit(20000),
         db.from("funnel_orders").select("email").eq("status", "paid").limit(5000),
-        db.from("sales_prospects").select("email,first_name,unsubscribed,status").limit(5000),
+        db.from("sales_prospects").select("email,first_name,unsubscribed,status").limit(20000),
       ]);
 
     const clickers = new Set((clicksRows || []).map((r) => normalize(r.prospect_email || "")));
@@ -292,17 +396,13 @@ Deno.serve(async (req) => {
     const done = new Set((alreadySent || []).map((r) => normalize(r.recipient_email || "")));
     const paid = new Set((paidOrders || []).map((r) => normalize(r.email || "")));
     const profiles = new Map((profileRows || []).map((r) => [normalize(r.email || ""), r]));
-
-    // Non-cliqueurs : les ouvreurs d'abord (les plus chauds), puis les autres contacts connus.
     const allKnown = [...profiles.keys()];
+
     const pool = letter.segment === "clickers"
       ? [...clickers]
       : letter.segment === "openers_no_click"
         ? [...openers].filter((email) => !clickers.has(email))
-        : [
-            ...allKnown.filter((email) => openers.has(email) && !clickers.has(email)),
-            ...allKnown.filter((email) => !openers.has(email) && !clickers.has(email)),
-          ];
+        : allKnown.filter((email) => !openers.has(email) && !clickers.has(email));
 
     const eligible: string[] = [];
     for (const email of pool) {
@@ -327,14 +427,18 @@ Deno.serve(async (req) => {
 
     let sent = 0;
     let quotaReached = false;
+    let index = 0;
     for (const email of targets) {
       const profile = profiles.get(email);
+      // Test d'objet : une adresse sur deux reçoit l'objet alternatif.
+      const subject = letter.subjectB && index % 2 === 1 ? letter.subjectB : letter.subject;
+      index++;
       const result = await sendResendEmailThrottled({
         from: "Georges Boubet <noreply@ebookstudio.fr>",
         to: [email],
-        subject: letter.subject,
-        html: render(baseUrl, email, (profile?.first_name as string) || "", letter),
-        reply_to: "contact@ebookstudio.fr",
+        subject,
+        html: render(baseUrl, email, (profile?.first_name as string) || "", letter, subject),
+        reply_to: DIRECT_EMAIL,
       });
       await db.from("email_send_log").insert({
         recipient_email: email,
