@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
+import { useAdminAccess } from '@/contexts/AdminAccessContext';
 
 const LS_KEY = 'ebookstudio_v3_mode';
 
@@ -14,28 +14,17 @@ function readStored(): boolean {
 /**
  * Bascule V2 / V3 réservée à l'admin (préparation du lancement V3).
  *
- * - Le mode n'est lisible/activable que si la session est admin.
- * - Pour tout non-admin, `v3Mode` reste forcé à `false`.
- * - L'état est persisté en localStorage pour l'admin uniquement.
+ * Le statut admin vient exclusivement de l'état partagé `useAdminAccess` :
+ * aucune vérification concurrente, donc aucun affichage divergent d'une page
+ * à l'autre.
  */
 export function useV3Mode() {
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [checking, setChecking] = useState(true);
+  const { isAdmin, isChecking } = useAdminAccess();
   const [v3Mode, setV3ModeState] = useState(false);
 
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const admin = await getIsCurrentSessionAdmin();
-      if (cancelled) return;
-      setIsAdmin(admin);
-      setV3ModeState(admin ? readStored() : false);
-      setChecking(false);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    setV3ModeState(isAdmin ? readStored() : false);
+  }, [isAdmin]);
 
   const setV3Mode = useCallback(
     (next: boolean) => {
@@ -53,7 +42,7 @@ export function useV3Mode() {
 
   const toggleV3Mode = useCallback(() => setV3Mode(!v3Mode), [setV3Mode, v3Mode]);
 
-  return { isAdmin, checking, v3Mode, setV3Mode, toggleV3Mode };
+  return { isAdmin, checking: isChecking, v3Mode, setV3Mode, toggleV3Mode };
 }
 
 export default useV3Mode;

@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ArrowLeft, LogOut, Sparkles, LayoutGrid, Search, Shield, Settings, Target, ClipboardCheck, MessageCircle, BookOpen, FolderOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
+import { useAdminAccess } from '@/contexts/AdminAccessContext';
 import { EbookSettingsPanel } from '@/components/ebook/EbookSettingsPanel';
 import KdpPackButton from '@/components/shared/KdpPackButton';
 import AITokenHeaderBadge from '@/components/shared/AITokenHeaderBadge';
@@ -214,16 +214,8 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
 }) => {
   const [allToolsOpen, setAllToolsOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [isAdmin, setIsAdmin] = useState(false);
+  const { isAdmin } = useAdminAccess();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    let cancelled = false;
-    getIsCurrentSessionAdmin()
-      .then((v) => { if (!cancelled) setIsAdmin(!!v); })
-      .catch(() => {});
-    return () => { cancelled = true; };
-  }, []);
 
   const showTabBar =
     !!activeTab && !!onTabChange && !HIDE_TABBAR_ON.has(activeTab);

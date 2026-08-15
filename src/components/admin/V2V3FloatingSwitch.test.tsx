@@ -4,9 +4,15 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { V2V3FloatingSwitch } from './V2V3FloatingSwitch';
 
-// Mock admin check → always admin
-vi.mock('@/lib/adminAccess', () => ({
-  getIsCurrentSessionAdmin: vi.fn().mockResolvedValue(true),
+// État admin partagé simulé (mutable pour tester le cas non-admin)
+const adminState = { isAdmin: true, isChecking: false };
+vi.mock('@/contexts/AdminAccessContext', () => ({
+  useAdminAccess: () => ({
+    status: adminState.isAdmin ? 'admin' : 'non-admin',
+    isAdmin: adminState.isAdmin,
+    isChecking: adminState.isChecking,
+    refresh: vi.fn().mockResolvedValue(adminState.isAdmin),
+  }),
 }));
 
 function LocationProbe() {
@@ -28,6 +34,8 @@ function renderAt(path: string) {
 describe('V2V3FloatingSwitch (E2E interaction)', () => {
   beforeEach(() => {
     localStorage.clear();
+    adminState.isAdmin = true;
+    adminState.isChecking = false;
   });
 
   it('propose la V3 par défaut pour un admin', async () => {
@@ -78,8 +86,7 @@ describe('V2V3FloatingSwitch (E2E interaction)', () => {
   });
 
   it('ne rend rien pour un non-admin', async () => {
-    const mod = await import('@/lib/adminAccess');
-    (mod.getIsCurrentSessionAdmin as ReturnType<typeof vi.fn>).mockResolvedValueOnce(false);
+    adminState.isAdmin = false;
 
     const { container } = renderAt('/');
     // Attendre le résolveur async

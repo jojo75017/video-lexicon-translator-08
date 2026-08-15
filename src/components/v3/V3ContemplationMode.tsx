@@ -30,15 +30,22 @@ const ALLOWED_EXTERNAL_HOSTS = [
   'www.ebookstudio.blog',
 ];
 
-/** Clé d'aperçu volontaire : l'admin regarde la V3 « comme un abonné ». */
+/**
+ * Aperçu volontaire « comme un abonné » : conservé EN MÉMOIRE uniquement.
+ * Il se réinitialise à chaque chargement, donc il ne peut plus masquer les
+ * sorties admin ni réafficher le verrou du 1ᵉʳ octobre après une actualisation.
+ */
 export const ADMIN_PREVIEW_AS_SUBSCRIBER_KEY = 'v3_admin_preview_as_subscriber';
 
+let previewAsSubscriberMemory = false;
+
 export function isPreviewingAsSubscriber(): boolean {
-  try {
-    return localStorage.getItem(ADMIN_PREVIEW_AS_SUBSCRIBER_KEY) === '1';
-  } catch {
-    return false;
-  }
+  return previewAsSubscriberMemory;
+}
+
+export function setPreviewingAsSubscriber(next: boolean) {
+  previewAsSubscriberMemory = next;
+  window.dispatchEvent(new Event('v3-admin-preview-change'));
 }
 
 function isAllowedTarget(href: string | null): boolean {

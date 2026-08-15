@@ -6,6 +6,34 @@ let cachedResult: boolean | null = null;
 /** Invalide les réponses asynchrones appartenant à une ancienne session. */
 let checkGeneration = 0;
 
+/**
+ * Indice de session persistant.
+ *
+ * IMPORTANT : cet indice n'accorde AUCUN droit. Il sert uniquement à savoir que
+ * la session courante a déjà été confirmée administrateur, afin de rester en
+ * « vérification en cours » plutôt que de conclure « visiteur » (et rediriger
+ * vers la page de vente) pendant une restauration lente ou une erreur réseau.
+ * Le rôle est systématiquement revalidé côté serveur.
+ */
+const ADMIN_HINT_KEY = 'admin_session_hint_v2';
+
+export function hasPersistedAdminHint(): boolean {
+  try {
+    return localStorage.getItem(ADMIN_HINT_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function writeAdminHint(value: boolean) {
+  try {
+    if (value) localStorage.setItem(ADMIN_HINT_KEY, '1');
+    else localStorage.removeItem(ADMIN_HINT_KEY);
+  } catch {
+    /* stockage indisponible : l'indice est simplement absent */
+  }
+}
+
 type Listener = (isAdmin: boolean | null) => void;
 const listeners = new Set<Listener>();
 
@@ -13,6 +41,8 @@ function publish(value: boolean | null) {
   // Une réponse négative tardive ne peut jamais écraser un admin déjà confirmé.
   if (cachedResult === true && value !== true) return;
   cachedResult = value;
+  if (value === true) writeAdminHint(true);
+  if (value === false) writeAdminHint(false);
   listeners.forEach((fn) => {
     try { fn(value); } catch { /* un abonné en erreur ne bloque pas les autres */ }
   });
@@ -101,10 +131,6 @@ export function clearAdminCache() {
   listeners.forEach((fn) => {
     try { fn(null); } catch { /* ignore */ }
   });
-  try {
-    localStorage.removeItem('admin_status_cache_v1');
-  } catch {
-    // Browser storage may be unavailable.
-  }
+  writeAdminHint(false);
 }
 
