@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
+import { useAdminAccess } from '@/contexts/AdminAccessContext';
 
 export type ProBookTier = 'standard' | 'pro';
 
@@ -16,15 +16,14 @@ const PRO_TIERS = new Set(['editeur', 'auteur', 'lifetime', 'vip']);
 export function useProBookTier() {
   const [loading, setLoading] = useState(true);
   const [tier, setTier] = useState<ProBookTier>('standard');
-  const [isAdmin, setIsAdmin] = useState(false);
+  const { isAdmin, isChecking } = useAdminAccess();
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       setLoading(true);
-      const admin = await getIsCurrentSessionAdmin();
-      if (cancelled) return;
-      setIsAdmin(admin);
+      if (isChecking) return;
+      const admin = isAdmin;
 
       if (admin) {
         setTier('pro');
@@ -60,7 +59,7 @@ export function useProBookTier() {
       }
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [isAdmin, isChecking]);
 
   return { loading, tier, isAdmin, isPro: tier === 'pro' };
 }

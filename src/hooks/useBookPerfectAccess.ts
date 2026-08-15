@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { getStripeEnvironment } from '@/lib/stripe';
-import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
+import { useAdminAccess } from '@/contexts/AdminAccessContext';
 
 /**
  * Droits d'accès à BookPerfect AI.
@@ -19,6 +19,7 @@ export function useBookPerfectAccess() {
   const [loading, setLoading] = useState(true);
   const [hasAccess, setHasAccess] = useState(false);
   const [reason, setReason] = useState<'admin' | 'purchased' | null>(null);
+  const { isAdmin, isChecking } = useAdminAccess();
 
   useEffect(() => {
     let cancelled = false;
@@ -26,9 +27,8 @@ export function useBookPerfectAccess() {
     (async () => {
       setLoading(true);
       try {
-        const admin = await getIsCurrentSessionAdmin();
-        if (cancelled) return;
-        if (admin) {
+        if (isChecking) return;
+        if (isAdmin) {
           setHasAccess(true);
           setReason('admin');
           setLoading(false);
@@ -81,7 +81,7 @@ export function useBookPerfectAccess() {
     })();
 
     return () => { cancelled = true; };
-  }, []);
+  }, [isAdmin, isChecking]);
 
   return { loading, hasAccess, reason };
 }
