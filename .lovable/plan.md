@@ -1,64 +1,102 @@
-# Audit V3 + relance des non-ouvreurs / non-cliqueurs + conversion de la page de vente
+# Faire convertir les emails (et la page de vente) — plan d'action
 
-## 1. Ce que le passage réel a montré (test navigateur, session admin)
+## Les chiffres réels (30-45 derniers jours)
 
-Les 23 onglets testés s'ouvrent tous, sans erreur JavaScript : accueil V3, Fonctionnalités, Génie/Créer, Studio Recherche, Tous les outils, Studio Pro, Corriger, Avis clients, Kit de démarrage, Forfaits, Migration V2, Mes livres, Bibliothèque, Nouveautés, Humaniseur, Audiobook, Éditeur, Mockups 3D, Royalties, Traduction, Sommaire ultime, Cover Studio Pro, /commander.
+- 679 destinataires touchés
+- 413 ont ouvert (~61 % : très bon)
+- 34 seulement ont cliqué (~5 % : trop faible)
+- 208 n'ont jamais ouvert
+- 440 ont ouvert sans jamais cliquer
+- 552 vues de la page `/commander`
+- 7 leads, **0 commande créée, 0 commande payée**
 
-Tous les liens de la barre latérale pointent vers des routes existantes (y compris `/kdp-keywords`, `/niches`, `/niches-600`, `/couverture-kdp`, `/audit-pilot`, `/communaute`, `/formation`, `/masterclass`, `/faq`, `/assistance`).
+Diagnostic : les emails arrivent bien et sont lus. Deux fuites seulement :
+1. **le clic** (95 % des lecteurs ne cliquent pas),
+2. **la page d'achat** (552 visites, aucune commande).
 
-Donc côté V3 il n'y a plus de page cassée : ce qui reste à corriger est de la cohérence et de la conversion, pas de la panne.
+Tant que ces deux points ne sont pas corrigés, augmenter le volume d'envoi ne servira à rien.
 
-## 2. Ce qui reste à corriger côté V3
+## Pourquoi les emails actuels ne font pas cliquer
 
-1. **Doublons de navigation.** « Mes livres » et « Livres corrigés » ouvrent la même page ; « Nouveautés V3 » et « Tous les outils » et « Outils offerts » se recoupent fortement. À fusionner en une seule entrée par intention, avec onglets internes.
-2. **Deux entrées « Créer » concurrentes.** `Ebookstudio-Génie` et `Sommaire IA (dialogue)` mènent à la même page avec un paramètre. À regrouper en une entrée unique avec choix du mode sur la page.
-3. **Barre latérale trop longue.** Une seule liste très dense ; regrouper en sections repliées avec les 6 entrées essentielles ouvertes par défaut.
-4. **Onglets non gardés.** `/v3/assistant` n'est pas soumis au verrou d'ouverture alors que les autres outils le sont : à aligner.
-5. **Alias non signalés.** `/v3/correcteur`, `/v3/traduire`, `/v3/tarifs`, `/v3/offres` sont de simples redirections : à conserver mais à retirer de toute navigation visible pour éviter les doublons d'URL en analytics.
+- Ils vendent un abonnement avant d'avoir rien donné : le lecteur doit payer pour savoir si l'outil marche.
+- Un seul type de lien : « acheter ». Aucune raison de cliquer si on n'est pas encore décidé.
+- Objets centrés sur l'offre et l'échéance, pas sur le résultat du lecteur.
+- Emails longs : la décision est demandée trop tard, après plusieurs écrans.
+- Aucun rythme : les non-ouvreurs et les lecteurs intéressés reçoivent le même message.
 
-## 3. Pourquoi la page de vente ne convertit pas — chiffres réels
+## La règle qui change tout : un clic gratuit avant tout achat
 
-Sur 30 à 45 jours :
+Chaque email de relance aura **un seul objectif : obtenir un clic sans risque**, vers le cadeau (les 10 niches) livré immédiatement dans l'application. Le lien d'achat existe, mais en second, plus bas, jamais en concurrence avec le lien cadeau.
 
-- 679 destinataires touchés par email
-- 413 ouvreurs, 34 cliqueurs seulement
-- 208 adresses n'ont jamais ouvert, 440 ont ouvert sans jamais cliquer
-- 552 vues de `/commander`
-- 7 leads enregistrés
-- **0 commande créée, 0 commande payée**
+Ce clic gratuit fait trois choses : il crée un lead identifié, il amène le prospect dans l'application, et c'est là — et seulement là — que l'offre 47 € est présentée.
 
-Lecture : l'ouverture est bonne (~61 %), le clic est très faible (~5 %), et surtout **552 visites de la page d'achat n'ont produit aucune commande**. Le problème n'est donc pas le trafic ni la délivrabilité : c'est la page `/commander` qui ne transforme pas, et le clic dans les emails qui est trop faible.
+## Les 3 séquences à écrire
 
-### Ce qui manque sur `/commander`
+### Séquence A — 208 jamais ouverts (réactivation)
 
-- Aucune capture intermédiaire : un visiteur qui n'achète pas repart sans laisser d'email. À ajouter : un seul bloc « Recevez les 10 niches offertes » en milieu de page, qui crée le lead même sans achat.
-- Pas de preuve visible immédiate : témoignages et avis existants ne sont pas au-dessus du prix.
-- Trop de promesses avant le prix : le bouton d'achat doit apparaître dans le premier écran, puis être répété 3 fois maximum.
-- Aucune levée de risque en clair près du bouton (ce qui se passe après paiement, sous combien de temps l'accès arrive, comment vous joindre).
-- Échéance peu lisible : l'accès à vie 47 € jusqu'au 30/09/2026 doit être affiché en compte à rebours au même endroit que le bouton.
-- Aucun suivi d'abandon : pas d'événement « bouton d'achat cliqué » distinct de « page vue », donc impossible de savoir si l'abandon est avant ou pendant le paiement.
+Objectif : obtenir une première ouverture.
 
-## 4. Relance des non-ouvreurs et des ouvreurs sans clic
+- Emails très courts (5 à 7 lignes maximum), un seul lien.
+- Objets courts, concrets, sans prix, sans majuscules, sans emoji : formulés comme un message personnel.
+- Nouvel objet à chaque envoi ; envoi le matin ; 3 messages espacés de 3 jours puis arrêt automatique.
 
-Deux segments distincts, deux messages différents, pas un envoi unique :
+### Séquence B — 440 ouverts sans clic (le plus gros gisement)
 
-- **Segment A — 208 jamais ouverts** : nouvel objet plus direct, envoi décalé le matin, contenu très court, un seul lien.
-- **Segment B — 440 ouverts sans clic** : ils sont intéressés mais n'ont pas cliqué ; message centré sur le cadeau immédiat (10 niches) et non sur l'offre, le lien d'achat venant en second.
+Objectif : le premier clic.
 
-Contraintes respectées : quota 100 envois par jour, marquage `[TEST]` pour vos essais, désabonnés et adresses en rebond exclus, un seul expéditeur valide, aucun lien mort.
+1. **Cadeau immédiat** — les 10 niches offertes, rien à payer, un seul bouton.
+2. **Preuve concrète** — un livre réel produit du sommaire au fichier Amazon, en 5 étapes visibles ; lien vers la démonstration.
+3. **Objection principale** — « je n'écris pas bien », « c'est technique » : réponses courtes, lien vers le cadeau, puis mention de l'offre.
+4. **Échéance** — l'accès à vie 47 € se termine le 30 septembre 2026 ; là seulement, le bouton d'achat est en premier.
 
-## 5. Détails techniques
+### Séquence C — 34 cliqueurs (les plus chauds)
 
-- Requêtes de segmentation basées sur `email_send_log`, `email_opens`, `email_clicks`, `sales_prospects` (exclusion `unsubscribed`, `status = 'bounced'`).
-- Deux nouveaux modèles dans `send-closing-47` : `relance-non-ouvreurs-1` (segment A) et `relance-sans-clic-1` (segment B), enregistrés dans `src/data/canonicalEmailCampaign.ts`.
-- `ClosingCampaignPanel.tsx` : ajout des deux segments avec compteur réel avant envoi, mode simulation, et étalement automatique sur plusieurs jours à cause du quota.
-- `V3CommanderPage.tsx` : ajout du bloc de capture « 10 niches », remontée du bouton d'achat, compte à rebours au 30/09/2026, bloc « ce qui se passe après paiement », témoignages au-dessus du prix.
-- Suivi : événements distincts `view`, `cta_click`, `checkout_start` dans `capture_events` pour localiser l'abandon.
-- Aucun changement de tarif : 47 € à vie jusqu'au 30/09/2026, puis Plume 17 €/mois et Édition 27 €/mois.
+Objectif : la vente.
 
-## 6. Ordre d'exécution
+- Message personnel signé de vous, court, qui demande simplement ce qui les retient et propose votre email direct.
+- Puis un rappel unique avec le lien d'achat et la levée de risque (ce qui se passe après paiement, délai d'accès, contact).
 
-1. Corrections de navigation V3 (points 1 à 5).
-2. Refonte de conversion de `/commander` + suivi des clics.
-3. Segmentation et création des deux emails de relance.
-4. Envoi test vers votre adresse, puis envoi réel étalé par lots de 100.
+## Les règles de rédaction appliquées à tous les emails
+
+- Un email = un objectif = un lien principal, répété au maximum deux fois.
+- Objet ≤ 45 caractères, sans prix ni majuscules ; texte de pré-en-tête distinct de la première phrase.
+- La promesse concrète dès la première ligne, la décision demandée avant le premier défilement.
+- Français impeccable, aucun mot latin ni pseudo-texte, aucun lien mort, aucun `#`.
+- Une seule signature avec votre adresse directe **boubetgeorges@gmail.com**.
+- Un seul expéditeur valide, désabonnement clair, exclusion des désabonnés et des adresses en rebond.
+- Marquage `[TEST]` obligatoire sur vos essais pour ne jamais polluer les statistiques.
+- Quota respecté : 100 envois par jour, donc envoi étalé automatiquement par lots.
+
+## Mesurer ce qui convertit vraiment
+
+- Chaque lien tracé par séquence et par email, pour connaître l'ouverture, le clic, le lead créé et la commande.
+- Deux objets différents testés sur les deux premiers lots de chaque séquence, puis on garde le gagnant.
+- Un tableau d'administration qui montre, par email : envoyés, ouverts, cliqués, leads, commandes. Sans ces colonnes, impossible de savoir quoi corriger.
+
+## Corriger la page d'arrivée en même temps
+
+Un email qui fait cliquer ne sert à rien si la page ne transforme pas. Sur `/commander` :
+
+- bloc de capture « 10 niches offertes » visible sans défiler, pour ne plus perdre les visiteurs non acheteurs ;
+- bouton d'achat dans le premier écran, puis répété trois fois maximum ;
+- témoignages et avis placés juste avant le prix ;
+- levée de risque à côté du bouton : ce qui se passe après paiement, délai d'accès, votre contact direct ;
+- compte à rebours jusqu'au 30 septembre 2026 au même endroit que le bouton ;
+- suivi séparé des événements « page vue », « bouton cliqué », « paiement commencé » pour localiser exactement l'abandon.
+
+## Détails techniques
+
+- Segments calculés depuis `email_send_log`, `email_opens`, `email_clicks`, `sales_prospects`, avec exclusion des `unsubscribed` et des statuts `bounced`.
+- Nouveaux modèles ajoutés à `send-closing-47` : `reactivation-a1/a2/a3`, `clic-b1/b2/b3/b4`, `chaud-c1/c2`, tous déclarés dans `src/data/canonicalEmailCampaign.ts`.
+- `ClosingCampaignPanel.tsx` : sélection de la séquence, compteur réel du segment avant envoi, simulation, étalement automatique sur plusieurs jours, colonnes ouvertures/clics/leads/commandes.
+- Liens cadeau tracés vers `/10-niches-offertes`, liens d'achat vers `/commander` avec source par email.
+- `V3CommanderPage.tsx` : capture cadeau, remontée du bouton, preuve sociale, levée de risque, compte à rebours.
+- `captureTracking.ts` : usage systématique de `checkout_click` et `checkout_ready` pour distinguer l'abandon avant et pendant paiement.
+- Tarifs inchangés : 47 € à vie jusqu'au 30/09/2026, puis Plume 17 €/mois et Édition 27 €/mois.
+
+## Ordre d'exécution après approbation
+
+1. Rédaction des 9 emails des séquences A, B, C.
+2. Segmentation et branchement dans l'outil d'envoi, avec compteurs réels.
+3. Correction de conversion de `/commander` et suivi des clics.
+4. Envoi test vers votre adresse, contrôle de chaque lien, puis envoi réel étalé par lots de 100 en commençant par la séquence B (le plus gros gisement).
