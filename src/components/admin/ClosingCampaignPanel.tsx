@@ -157,6 +157,8 @@ const ClosingCampaignPanel = () => {
       if (data.quota_reached) toast.warning(message);
       else toast.success(message);
       load();
+      if (detailTemplate === letter.template) loadRecipients(letter.template);
+
 
     } catch (err) {
       toast.error("Erreur d'envoi : " + ((err as Error).message || ''));
