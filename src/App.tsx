@@ -306,29 +306,17 @@ const App = () => {
 
 
 
-  const isPlannerPreviewHost =
-    typeof window !== 'undefined' &&
-    (window.location.hostname === 'localhost' || window.location.hostname.includes('id-preview--'));
-  const hasPlannerAccess = isPlannerPreviewHost || isAuthenticated || isAdmin;
+  // La prévisualisation ne doit jamais fabriquer un faux accès V2 : elle doit
+  // suivre exactement les mêmes règles de session que le site publié.
+  const hasPlannerAccess = isAuthenticated || isAdmin;
   const accessState: AccessState = !isAdminChecked
     ? 'pending'
     : isAdmin
       ? 'admin'
-      : (isAuthenticated || isPlannerPreviewHost)
+      : isAuthenticated
         ? 'subscriber'
         : 'visitor';
   const homePath = getHomePath(accessState);
-  const previewSubscriberEmail = 'preview@ebookstudio.fr';
-  const previewSubscriberData = {
-    email: previewSubscriberEmail,
-    plan_type: 'pro',
-    status: 'active',
-    access_code: 'PREVIEW-ACCESS',
-    ebook_plans_generated: 0,
-    chapters_generated: 0,
-    subchapters_generated: 0,
-    covers_generated: 0,
-  };
   const isAdminAuthRoute = pathname === ADMIN_LOGIN_PATH || pathname === '/admin-direct';
 
   if (isCheckingAuth) return <PageLoader />;
@@ -534,15 +522,7 @@ const App = () => {
             <Route
               path="/ebook-planner"
               element={
-                isPlannerPreviewHost && !isAuthenticated && !isAdmin ? (
-                  <EbookPlannerPage
-                    subscriberEmail={previewSubscriberEmail}
-                    subscriberData={previewSubscriberData}
-                    isDemo={false}
-                    isAdmin={false}
-                    onLogout={handleLogout}
-                  />
-                ) : gated(
+                gated(
                   <EbookPlannerPage
                     subscriberEmail={subscriberEmail || ''}
                     subscriberData={subscriberData}
