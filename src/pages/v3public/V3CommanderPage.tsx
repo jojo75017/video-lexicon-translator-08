@@ -390,6 +390,8 @@ export default function V3CommanderPage() {
           >
             {!clientSecret ? (
               <>
+                <OfferCountdown />
+
                 <div
                   className="mb-4 rounded-xl border px-4 py-3 text-sm font-bold"
                   style={{ background: `${GOLD}14`, borderColor: `${GOLD}55`, color: "#8a6d16" }}
