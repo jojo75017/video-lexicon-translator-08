@@ -9,7 +9,7 @@ import V3Footer from './V3Footer';
 import V3Sidebar from './V3Sidebar';
 import V3ContemplationMode from '@/components/v3/V3ContemplationMode';
 import V3AdminQuickAccess from './V3AdminQuickAccess';
-import { ADMIN_PREVIEW_AS_SUBSCRIBER_KEY } from '@/components/v3/V3ContemplationMode';
+import { setPreviewingAsSubscriber } from '@/components/v3/V3ContemplationMode';
 
 type V3PublicLayoutProps = {
   isAdmin: boolean;
@@ -36,12 +36,7 @@ export default function V3PublicLayout({ isAdmin, isAdminChecking, isSubscriber 
   // ou actualisations et ne peut donc plus réafficher le verrou du 1er octobre.
   useEffect(() => {
     if (!isAdmin || isAdminChecking) return;
-    try {
-      localStorage.removeItem(ADMIN_PREVIEW_AS_SUBSCRIBER_KEY);
-    } catch {
-      // Le stockage peut être indisponible ; le rôle backend reste la source.
-    }
-    window.dispatchEvent(new Event('v3-admin-preview-change'));
+    setPreviewingAsSubscriber(false);
   }, [isAdmin, isAdminChecking]);
 
   // Statut admin encore inconnu : on ne redirige jamais (évite d'éjecter un admin

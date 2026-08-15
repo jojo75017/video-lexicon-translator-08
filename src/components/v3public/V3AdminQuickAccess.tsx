@@ -5,8 +5,8 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { ADMIN_HOME_PATH } from '@/config/adminRoutes';
 import {
-  ADMIN_PREVIEW_AS_SUBSCRIBER_KEY,
   isPreviewingAsSubscriber,
+  setPreviewingAsSubscriber,
 } from '@/components/v3/V3ContemplationMode';
 
 const ACCESS_LINKS = [
@@ -35,19 +35,12 @@ export default function V3AdminQuickAccess({ isAdmin, isAdminChecking }: V3Admin
     return () => window.removeEventListener('v3-admin-preview-change', sync);
   }, []);
 
-  if (isAdminChecking || !isAdmin) return null;
+  if (!isAdmin) return null;
 
   const togglePreview = () => {
     const next = !preview;
-    try {
-      if (next) localStorage.setItem(ADMIN_PREVIEW_AS_SUBSCRIBER_KEY, '1');
-      else localStorage.removeItem(ADMIN_PREVIEW_AS_SUBSCRIBER_KEY);
-    } catch {
-      toast.error('Stockage du navigateur indisponible.');
-      return;
-    }
+    setPreviewingAsSubscriber(next);
     setPreview(next);
-    window.dispatchEvent(new Event('v3-admin-preview-change'));
     toast.info(next
       ? 'Aperçu abonné activé : la V3 se comporte comme avant l’ouverture.'
       : 'Mode admin rétabli : tous les modules V3 sont ouverts pour vos tests.');
