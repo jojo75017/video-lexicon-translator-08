@@ -624,7 +624,7 @@ const App = () => {
               <Route path="outils/mockup-3d" element={<V3LockedGate><V3MockupPage /></V3LockedGate>} />
               <Route path="outils/audiobook" element={<V3LockedGate><V3AudiobookPage /></V3LockedGate>} />
               <Route path="outils/editeur" element={<V3LockedGate><V3EditorPage /></V3LockedGate>} />
-              <Route path="hub" element={<V3LockedGate>{isPlannerPreviewHost ? <V3HubPage /> : <V3Gate><V3HubPage /></V3Gate>}</V3LockedGate>} />
+              <Route path="hub" element={<V3LockedGate><V3Gate><V3HubPage /></V3Gate></V3LockedGate>} />
 
 
             </Route>
@@ -637,8 +637,8 @@ const App = () => {
           {!isAdminAuthRoute && <AssistantFloatingButton />}
           {!isAdminAuthRoute && <ApiKeysFloatingButton />}
           {!isAdminAuthRoute && <GeminiKeyAlertBanner />}
-          {!isAdminAuthRoute && (isAuthenticated || isAdmin || isPlannerPreviewHost) && (
-            <V2V3FloatingSwitch forceVisible={isPlannerPreviewHost && !isAuthenticated && !isAdmin} />
+          {!isAdminAuthRoute && (isAuthenticated || isAdmin) && (
+            <V2V3FloatingSwitch forceVisible={isAdmin} />
           )}
           {isAuthenticated && <AISosModal />}
           {isAuthenticated && <AICostBadge />}
