@@ -491,6 +491,13 @@ export default function V3CommanderPage() {
                 <p className="mt-2 text-center text-[11px] text-slate-500">
                   En plusieurs fois, l'accès s'ouvre dès la 1re échéance.
                 </p>
+                <p className="mt-2 text-center text-[11px] text-slate-500">
+                  Un doute avant de payer ? Écrivez-moi directement :{" "}
+                  <a href="mailto:boubetgeorges@gmail.com" className="underline" style={{ color: EMERALD }}>
+                    boubetgeorges@gmail.com
+                  </a>
+                </p>
+
               </>
             ) : (
               <div>
