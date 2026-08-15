@@ -30,6 +30,7 @@ import { captureUtmParams } from '@/lib/utmTracking';
 import { ADMIN_HOME_PATH, ADMIN_LOGIN_PATH } from '@/config/adminRoutes';
 import { getHomePath, type AccessState } from '@/lib/authDestination';
 import { useAdminAccess } from '@/contexts/AdminAccessContext';
+import AdminQuickNav from '@/components/admin/AdminQuickNav';
 
 // V2 — Ebook Planner + outils satellites
 const RedirectClickPage = lazy(() => import('./pages/RedirectClickPage'));
@@ -348,6 +349,7 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <div className="min-h-screen bg-background">
+          {isAdmin && !isAdminAuthRoute && <AdminQuickNav />}
           <V3LaunchGlobalBanner />
           <Suspense fallback={<PageLoader />}>
           <Routes>

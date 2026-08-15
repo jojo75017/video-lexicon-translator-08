@@ -152,7 +152,7 @@ const ClosingCampaignPanel = () => {
         setBusy(null);
         return;
       }
-      const data = await call({ mode: 'send', template: letter.template, batch_size: 1000 });
+      const data = await call({ mode: 'send', template: letter.template, batch_size: 500 });
       const message = String(data.message || `${data.sent} emails envoyés sur ${data.targets} ciblés`);
       if (data.quota_reached) toast.warning(message);
       else toast.success(message);

@@ -470,10 +470,10 @@ Deno.serve(async (req) => {
     if (mode !== "send") return respond({ error: "Mode inconnu" }, 400);
 
     // Le forfait actif couvre 50 000 emails/mois. Le plafond précédent de 100
-    // était une limite applicative, pas une limite Resend. 1 000 garde un lot
+    // était une limite applicative, pas une limite Resend. 500 garde un lot
     // borné tout en permettant de terminer les segments actuels en un passage.
-    const requestedBatchSize = Number(body.batch_size || 1000);
-    const limit = Math.min(Math.max(Number.isFinite(requestedBatchSize) ? requestedBatchSize : 1000, 1), 1000);
+    const requestedBatchSize = Number(body.batch_size || 500);
+    const limit = Math.min(Math.max(Number.isFinite(requestedBatchSize) ? requestedBatchSize : 500, 1), 500);
 
     const [{ data: clicksRows }, { data: opensRows }, { data: alreadySent }, { data: paidOrders }, { data: profileRows }] =
       await Promise.all([
