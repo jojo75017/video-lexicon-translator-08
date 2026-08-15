@@ -239,7 +239,16 @@ const ClosingCampaignPanel = () => {
                     <Button size="sm" disabled={busy === l.template} onClick={() => send(l)}>
                       <Send className="mr-1 h-3 w-3" /> Envoyer
                     </Button>
+                    <Button
+                      variant={detailTemplate === l.template ? 'default' : 'ghost'}
+                      size="sm"
+                      disabled={busy === l.template}
+                      onClick={() => (detailTemplate === l.template ? setDetailTemplate(null) : loadRecipients(l.template))}
+                    >
+                      <ListChecks className="mr-1 h-3 w-3" /> Détail
+                    </Button>
                   </div>
+
                 </td>
               </tr>
             ))}
