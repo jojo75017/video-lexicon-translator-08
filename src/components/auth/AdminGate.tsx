@@ -3,6 +3,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { ADMIN_LOGIN_PATH } from "@/config/adminRoutes";
 import AccessPendingFallback from "@/components/auth/AccessPendingFallback";
 import { useAdminAccess } from "@/contexts/AdminAccessContext";
+import AdminQuickNav from "@/components/admin/AdminQuickNav";
 
 type Props = {
   children: React.ReactNode;
@@ -43,5 +44,10 @@ export function AdminGate({ children }: Props) {
     return <Navigate to={ADMIN_LOGIN_PATH} replace state={{ from: location.pathname, reason: "session-required" }} />;
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <AdminQuickNav />
+      {children}
+    </>
+  );
 }

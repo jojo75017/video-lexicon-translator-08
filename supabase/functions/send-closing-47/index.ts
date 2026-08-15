@@ -15,7 +15,7 @@ import { CHECKOUT_URL } from "../_shared/checkoutUrl.ts";
  *  - un email = un objectif = un lien principal ;
  *  - les acheteurs, désinscrits et contacts inactifs sont exclus ;
  *  - un même gabarit n'est jamais envoyé deux fois à la même adresse ;
- *  - quota Resend respecté (reprise le lendemain sans doublon) ;
+ *  - débit Resend respecté et reprise sans doublon ;
  *  - adresse directe boubetgeorges@gmail.com dans chaque signature.
  *
  * Sécurité : admin (has_role) ou secret cron.
@@ -363,7 +363,7 @@ Deno.serve(async (req) => {
           db.from("email_clicks").select("prospect_email").limit(20000),
           db.from("email_opens").select("prospect_email").limit(20000),
           db.from("email_send_log")
-            .select("recipient_email,status,error_message,created_at")
+            .select("message_id,recipient_email,status,error_message,created_at")
             .eq("template_name", letter.key)
             .order("created_at", { ascending: false })
             .limit(20000),
@@ -469,7 +469,11 @@ Deno.serve(async (req) => {
 
     if (mode !== "send") return respond({ error: "Mode inconnu" }, 400);
 
-    const limit = Math.min(Number(body.batch_size || 100), 300);
+    // Le forfait actif couvre 50 000 emails/mois. Le plafond précédent de 100
+    // était une limite applicative, pas une limite Resend. 1 000 garde un lot
+    // borné tout en permettant de terminer les segments actuels en un passage.
+    const requestedBatchSize = Number(body.batch_size || 1000);
+    const limit = Math.min(Math.max(Number.isFinite(requestedBatchSize) ? requestedBatchSize : 1000, 1), 1000);
 
     const [{ data: clicksRows }, { data: opensRows }, { data: alreadySent }, { data: paidOrders }, { data: profileRows }] =
       await Promise.all([
@@ -522,6 +526,14 @@ Deno.serve(async (req) => {
       // Test d'objet : une adresse sur deux reçoit l'objet alternatif.
       const subject = letter.subjectB && index % 2 === 1 ? letter.subjectB : letter.subject;
       index++;
+      const messageId = `${CAMPAIGN}-${letter.key}-${email}`;
+      await db.from("email_send_log").insert({
+        recipient_email: email,
+        template_name: letter.key,
+        message_id: messageId,
+        status: "pending",
+        error_message: null,
+      });
       const result = await sendResendEmailThrottled({
         from: "Georges Boubet <noreply@ebookstudio.fr>",
         to: [email],
@@ -532,9 +544,11 @@ Deno.serve(async (req) => {
       await db.from("email_send_log").insert({
         recipient_email: email,
         template_name: letter.key,
-        message_id: result.id || `${CAMPAIGN}-${letter.key}-${email}`,
+        message_id: messageId,
         status: result.ok ? "sent" : "failed",
-        error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}`,
+        error_message: result.ok
+          ? null
+          : `HTTP ${result.status || ""}: ${result.detail || ""}${result.id ? ` (fournisseur ${result.id})` : ""}`,
       });
       if (!result.ok) {
         if (isQuotaExhausted()) {

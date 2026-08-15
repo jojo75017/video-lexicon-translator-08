@@ -8,7 +8,7 @@ import { Loader2, RefreshCw, Send, Eye, ExternalLink, ListChecks } from 'lucide-
 /**
  * Campagne de conversion 2026 — trois séquences :
  *  A. jamais ouvert (réactivation), B. ouvreurs sans clic (cadeau d'abord),
- *  C. cliqueurs (demande de vente). Quota 100 emails/jour, reprise sans doublon.
+ *  C. cliqueurs (demande de vente). Lots complets, reprise sans doublon.
  */
 
 interface LetterStat {
@@ -152,7 +152,7 @@ const ClosingCampaignPanel = () => {
         setBusy(null);
         return;
       }
-      const data = await call({ mode: 'send', template: letter.template });
+      const data = await call({ mode: 'send', template: letter.template, batch_size: 1000 });
       const message = String(data.message || `${data.sent} emails envoyés sur ${data.targets} ciblés`);
       if (data.quota_reached) toast.warning(message);
       else toast.success(message);
@@ -189,7 +189,7 @@ const ClosingCampaignPanel = () => {
     <div className="rounded-lg border border-border bg-card/50 p-4 space-y-4">
       <div className="flex flex-wrap items-center gap-2">
         <h3 className="font-semibold">Conversion 2026 — 3 séquences (A réactivation, B clic, C vente)</h3>
-        <span className="text-xs text-muted-foreground">Fin de l'accès à vie le 30/09/2026 · 100 emails/jour</span>
+        <span className="text-xs text-muted-foreground">Fin de l'accès à vie le 30/09/2026 · forfait 50 000 emails/mois</span>
         <Button variant="ghost" size="sm" onClick={load} className="ml-auto text-muted-foreground">
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
         </Button>
@@ -237,7 +237,7 @@ const ClosingCampaignPanel = () => {
                       <Eye className="mr-1 h-3 w-3" /> Simuler
                     </Button>
                     <Button size="sm" disabled={busy === l.template} onClick={() => send(l)}>
-                      <Send className="mr-1 h-3 w-3" /> Envoyer
+                      <Send className="mr-1 h-3 w-3" /> Envoyer tous les restants
                     </Button>
                     <Button
                       variant={detailTemplate === l.template ? 'default' : 'ghost'}
