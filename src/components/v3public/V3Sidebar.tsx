@@ -4,10 +4,11 @@ import {
   ChevronLeft, ChevronRight, ChevronDown,
   GraduationCap, Gem, FileText, User,
   LifeBuoy, Mail, HelpCircle, Video, ListTree, Award,
-  Search, Target, BarChart3, Image as ImageIcon, LayoutGrid, Star, Wand2,
+  Search, Target, BarChart3, Image as ImageIcon, LayoutGrid, Star, Wand2, PlusCircle,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
+import ThemeToggle from './ThemeToggle';
 
 /**
  * Sidebar V3 — espace personnel, organisée en sections repliables.
@@ -100,6 +101,7 @@ const NAV: NavSection[] = [
     items: [
       { to: '/v3/compte', label: 'Mon compte & abonnement', icon: User },
       { to: '/v3/forfaits', label: 'Forfaits & tarifs', icon: Gem },
+      { to: '/v3/upsells', label: 'Compléments & options', icon: PlusCircle, badge: 'Options' },
       { to: '/v3/auteur', label: 'Profil auteur', icon: User },
       { to: '/v3/parametres', label: 'Paramètres', icon: Settings },
     ],
@@ -320,6 +322,12 @@ export default function V3Sidebar() {
           );
         })}
       </nav>
+
+      {/* Thème clair / sombre / automatique, toujours accessible. */}
+      <div className="px-2 pb-4 pt-1" style={{ borderTop: '1px solid var(--v3-line)' }}>
+        <ThemeToggle variant="plain" showLabel={!collapsed} className="w-full justify-center mt-3" />
+      </div>
     </aside>
+
   );
 }
