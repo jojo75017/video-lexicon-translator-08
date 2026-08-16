@@ -50,6 +50,7 @@ interface DiagnosticPayload {
  */
 export default function EmailHealthPanel() {
   const [data, setData] = useState<StatusPayload | null>(null);
+  const [diag, setDiag] = useState<DiagnosticPayload | null>(null);
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
 
@@ -71,7 +72,19 @@ export default function EmailHealthPanel() {
     }
   }, [call]);
 
-  useEffect(() => { void load(); }, [load]);
+  const loadDiagnostic = useCallback(async () => {
+    setBusy('diagnostic');
+    try {
+      setDiag(await call('diagnostic') as unknown as DiagnosticPayload);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Diagnostic impossible');
+    } finally {
+      setBusy(null);
+    }
+  }, [call]);
+
+  useEffect(() => { void load(); void loadDiagnostic(); }, [load, loadDiagnostic]);
+
 
   const run = async (mode: string, label: string) => {
     setBusy(mode);
