@@ -136,7 +136,48 @@ Ce que ces chiffres disent :
 
 Tant que le point (a) n'est pas branché, chaque campagne part à l'aveugle : c'est à faire avant de réécrire un seul email.
 
+## 8. Le bouton « Version audio · 9,99 € » — état réel et ce qu'il manque
+
+Ce qui existe déjà (vérifié) :
+
+- La carte d'offre **« Convertir en audiobook · 9,99 € »** existe et s'affiche sur la page de lecture d'un livre.
+- Mais elle ne fait **rien** aujourd'hui : elle affiche « La conversion arrive bientôt » et le bouton se contente d'inscrire le livre dans une liste d'attente stockée dans le navigateur. **Aucun paiement, aucun audio produit.**
+- Le texte actuel demande à l'abonné **sa propre clé Azure Speech** — c'est ce qu'il faut supprimer.
+- Côté serveur, la machinerie audio est déjà là : une fonction de synthèse qui sait utiliser **ElevenLabs, Azure Speech ou OpenAI** selon la clé disponible, et une fonction d'envoi du fichier par email.
+
+**Réponse à votre question : non, l'abonné n'a pas besoin de mettre une clé.** On est assez bons : la synthèse tourne côté serveur avec **nos** clés. C'est même indispensable pour vendre à 9,99 € — personne ne paie 9,99 € pour ensuite devoir créer un compte Azure. Le seul point à vérifier avant de lancer : quelle clé de voix est réellement active sur le projet (ElevenLabs ou Azure). La qualité ElevenLabs est nettement supérieure en français ; c'est celle à privilégier pour un produit payant.
+
+**Ce que le bouton fera après cette mise à jour :**
+
+1. Clic sur **🎧 Version audio · 9,99 €** sous le livre.
+2. Paiement 9,99 € (carte ou PayPal), paiement unique, aucun abonnement.
+3. Choix de la voix (2 voix femme, 2 voix homme) et du découpage (un seul MP3 ou un MP3 par chapitre).
+4. Génération chapitre par chapitre avec une barre de progression honnête, sans blocage sur les longs livres.
+5. **Après le règlement, l'abonné reçoit :** la page d'écoute en ligne, le lien de téléchargement des MP3, un email de confirmation contenant les mêmes liens, et le rappel « votre audio reste disponible dans Mes livres → onglet Audio ».
+6. Le fichier est rangé dans sa bibliothèque : le lien ne se perd jamais.
+
+Pour le forfait **Studio Pro**, ce bouton affiche **« Inclus dans votre forfait »** au lieu du prix.
+
+## 9. Ambiance choisie pour le Sommaire IA
+
+Les ambiances existent déjà (14 ambiances classées claires / sombres / vibrantes / classiques, avec police et couleurs). Elles ne sont simplement pas reliées au sommaire.
+
+- À l'étape Sommaire IA, un sélecteur **« Ambiance du sommaire »** avec aperçu immédiat.
+- L'ambiance choisie décide de l'apparence du sommaire à l'export : police du titre, filet décoratif, teinte des numéros de chapitre, motif discret ou fond doré.
+- Elle est mémorisée avec le livre : le même sommaire ressort identique à chaque export.
+- Un bouton « Aperçu du sommaire » montre le rendu exact avant de générer le livre.
+
+## 10. Tout le site en clair ou en sombre
+
+- Un bouton **☀️ / 🌙** dans l'en-tête, visible sur toutes les pages V3.
+- Trois positions : Clair, Sombre, Automatique (suit le réglage de l'ordinateur).
+- Le choix est mémorisé et s'applique dès le chargement, sans clignotement blanc.
+- Le mode sombre couvre l'ensemble : barre latérale, formulaires, tableaux, panneaux de vente, lecteur de livre.
+- La lecture du livre garde son fond crème même en mode sombre (confort de lecture), avec un bouton « lire en sombre » sur cette page uniquement.
+- Aucune couleur écrite en dur : tout passe par les jetons de couleur du thème, sinon le mode sombre casse.
+
 ## Schéma détaillé
+
 
 
 ```text
