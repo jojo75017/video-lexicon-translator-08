@@ -176,7 +176,7 @@ export const ASSISTANT_FAQ: AssistantFaqEntry[] = [
     question: 'Quels sont les forfaits et les prix ?',
     keywords: ['prix', 'tarif', 'forfait', 'abonnement', 'plume', 'édition', 'combien'],
     answer:
-      "Deux formules : **Plume 17 €/mois** (170 €/an) et **Édition 27 €/mois** (270 €/an) — 2 mois offerts en annuel. Les anciens clients V2 gardent -20 % à vie.",
+      "Trois formules : **Plume 27 €/mois** (270 €/an), **Édition 47 €/mois** (470 €/an) et **Studio Pro 97 €/mois** (970 €/an, tous les compléments inclus) — 2 mois offerts en annuel. Les 10 langues et le Sommaire IA sont dans les trois. Les anciens clients V2 gardent -20 % à vie.",
     actions: [
       { label: 'Voir les forfaits', route: '/v3/forfaits' },
       { label: 'Migration ancien client V2', route: '/v3/migration' },

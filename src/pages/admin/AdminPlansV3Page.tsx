@@ -132,8 +132,9 @@ export default function AdminPlansV3Page() {
                 <tr>
                   <th className="px-4 py-3 text-left font-semibold">#</th>
                   <th className="px-4 py-3 text-left font-semibold">Domaine</th>
-                  <th className="px-4 py-3 text-center font-semibold text-emerald-600">Plume — 17 €/mois</th>
-                  <th className="px-4 py-3 text-center font-semibold text-purple-600">Édition — 27 €/mois</th>
+                  <th className="px-4 py-3 text-center font-semibold text-emerald-600">Plume — 27 €/mois</th>
+                  <th className="px-4 py-3 text-center font-semibold text-purple-600">Édition — 47 €/mois</th>
+                  <th className="px-4 py-3 text-center font-semibold text-amber-600">Studio Pro — 97 €/mois</th>
                 </tr>
               </thead>
               <tbody>
@@ -204,7 +205,7 @@ export default function AdminPlansV3Page() {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              4 prix synchronisés (sandbox → live automatique au publish) : 17 €/mois, 170 €/an, 27 €/mois, 270 €/an. Résiliable à tout moment.
+              6 prix synchronisés (sandbox → live automatique au publish) : 27 €/mois, 270 €/an, 47 €/mois, 470 €/an, 97 €/mois, 970 €/an. Résiliable à tout moment.
             </p>
             <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-3">
               {V3_PLANS.flatMap((plan) => [
