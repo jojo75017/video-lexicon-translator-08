@@ -90,7 +90,54 @@ Pages et endroits à mettre à jour dans le même passage :
 
 Après ce passage, un changement de prix futur se fera **en un seul endroit**.
 
+## 7. Pourquoi personne ne clique — chiffres réels des 10 derniers jours
+
+| Étape | Valeur mesurée |
+| --- | --- |
+| Emails envoyés | 4 358 |
+| Emails avec un état de livraison enregistré | **0** |
+| Ouvertures | 1 491 (328 personnes différentes) |
+| Clics | 32 (**9 personnes différentes**) |
+| Événements sur le site | 570 |
+| Emails laissés sur le site | 3 |
+| Commandes | 0 |
+
+Ce que ces chiffres disent :
+
+1. **On ne sait pas si les emails arrivent.** 4 358 envois et zéro état de livraison enregistré : rebonds, spam et désinscriptions ne remontent pas. Impossible de savoir si des milliers de messages sont tombés dans les indésirables. C'est le trou n° 1 et il fausse tout le reste.
+2. **Les gens ouvrent (328 personnes) mais ne cliquent pas (9).** Ce n'est donc pas l'objet le problème : c'est le corps de l'email qui ne donne pas envie d'appuyer — trop long, trop de liens, promesse pas assez concrète, ou le lien sent la vente.
+3. **Les clics se concentrent sur les anciens emails « offre 47 »** (14 clics sur `offre-47-unique-5`). Les nouveaux modèles cadeau/relance font 1 clic chacun : volume trop faible pour conclure, ou ils n'accrochent pas.
+4. **570 visites sur le site, 3 emails laissés.** La capture ne fonctionne pas non plus.
+
+### Les corrections, dans cet ordre
+
+**a. Voir ce qui arrive vraiment (prioritaire)**
+- Brancher les événements du prestataire d'envoi (livré, rebond, spam, désinscription) sur le journal d'envoi.
+- Tableau « Santé emails » dans l'admin : livrés / rebonds / spam / ouvertures / clics, par modèle.
+- Couper l'envoi automatique aux adresses jamais ouvertes après 5 envois et aux rebonds durs.
+
+**b. Un email = un seul clic possible**
+- Un seul lien, une seule action, dans les 3 premières lignes.
+- Objet et première phrase promettent un **résultat**, pas une offre : « Votre sommaire de 40 chapitres, écrit en 4 minutes ».
+- Le lien mène au **cadeau** (`/10-niches-offertes`), jamais au paiement : le premier clic doit être gratuit et sans risque.
+- Texte lisible, aucune image lourde, expéditeur nominatif (Georges, pas « no-reply »).
+
+**c. Donner une raison de cliquer maintenant**
+- Preuve visible : une page réelle du livre exporté, la capture du sommaire, la couverture générée.
+- Une seule échéance rappelée en une ligne (30/09/2026), pas un compte à rebours partout.
+- Aux 9 cliqueurs identifiés : message personnel, court, avec **une question** — ce sont les seuls prospects chauds aujourd'hui.
+
+**d. Mesurer le clic sur le bouton de paiement**
+- Événement dédié sur le bouton de `/commander` : on saura si le bouton est vu et ignoré, ou jamais atteint.
+- Relance automatique de tout paiement resté en attente plus de 2 h.
+
+**e. Réparer la capture sur le site**
+- Un seul encart, une seule promesse chiffrée (« 10 niches rentables, gratuit »), un seul champ email, déclenché à 40 % de défilement ou à la sortie.
+
+Tant que le point (a) n'est pas branché, chaque campagne part à l'aveugle : c'est à faire avant de réécrire un seul email.
+
 ## Schéma détaillé
+
 
 ```text
                        ETAPE 1 - FICHE DU LIVRE
