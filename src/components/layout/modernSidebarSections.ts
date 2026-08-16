@@ -38,7 +38,7 @@ export const SIDEBAR_SUBSECTIONS: Record<string, SidebarSectionConfig[]> = {
   '⚙️ Mon Compte': [
     { label: 'Espace', itemIds: ['projects', 'ebook-library', 'settings', 'subscription'] },
     { label: 'Communauté', itemIds: ['parrainage', 'communaute'] },
-    { label: 'Admin', itemIds: ['admin', 'admin-subscribers'] },
+    { label: 'Admin', itemIds: ['admin', 'admin-subscribers', 'admin-prospects'] },
   ],
 };
 
