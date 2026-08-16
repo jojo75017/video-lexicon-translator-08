@@ -322,6 +322,12 @@ export default function V3Sidebar() {
           );
         })}
       </nav>
+
+      {/* Thème clair / sombre / automatique, toujours accessible. */}
+      <div className="px-2 pb-4 pt-1" style={{ borderTop: '1px solid var(--v3-line)' }}>
+        <ThemeToggle variant="plain" showLabel={!collapsed} className="w-full justify-center mt-3" />
+      </div>
     </aside>
+
   );
 }
