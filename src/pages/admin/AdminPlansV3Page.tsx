@@ -95,7 +95,7 @@ export default function AdminPlansV3Page() {
           </Badge>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {V3_PLANS.map((plan, idx) => {
             const borderColor = idx === 0 ? "border-l-emerald-500" : idx === 1 ? "border-l-purple-600" : "border-l-amber-500";
             const savings = getYearlySavingsPercent(plan);
