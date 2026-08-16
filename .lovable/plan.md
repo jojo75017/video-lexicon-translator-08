@@ -239,6 +239,10 @@ Les ambiances existent déjà (14 ambiances classées claires / sombres / vibran
 - Les boutons passent par l'identifiant du projet enregistré : correcteur, lecteur (`/v3/livre/:id`), panneau KDP, traduction (`translate-content` avec la langue préremplie) et export.
 - Nouvelle page et nouvel onglet « Compléments » avec masquage automatique selon le forfait (`useV3Entitlement`).
 - Aucun changement sur les accès admin, le tunnel `/commander` ni les droits des abonnés existants.
+- **Audio 9,99 €** : réécriture de `AudiobookOfferCard.tsx` (retirer la liste d'attente et l'exigence de clé Azure), création d'un prix unique 9,99 € chez le prestataire de paiement, table de commandes audio, génération par la fonction de synthèse existante (préférence ElevenLabs, repli Azure/OpenAI) en découpant le texte par chapitres, dépôt des MP3 dans le bucket `audiobooks` (public, déjà en place), envoi des liens via la fonction d'email de livraison, et onglet Audio dans « Mes livres ». Vérifier d'abord quelle clé de voix est active sur le projet ; connecter ElevenLabs si absente.
+- **Ambiance du sommaire** : réutilisation de `src/data/writingAmbiances.ts` (14 ambiances) ; l'identifiant d'ambiance est stocké dans le brief du livre et lu par le moteur d'export pour styliser la page de sommaire.
+- **Clair / sombre** : `darkMode: 'class'` est déjà configuré dans Tailwind mais aucun fournisseur de thème n'existe. Ajout d'un contexte de thème (clair / sombre / auto) appliqué sur `documentElement`, mémorisé, avec un script d'initialisation avant le premier rendu pour éviter le flash. Passage en revue des couleurs écrites en dur dans les composants V3 pour les remplacer par des jetons.
+
 
 ## Validation avant de déclarer terminé
 
