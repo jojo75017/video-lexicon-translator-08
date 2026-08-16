@@ -57,6 +57,8 @@ DKIM : enregistrement TXT fourni par le moteur d'envoi lors de l'ajout du domain
 4. **Ajouter un test d'arrivée réel** avant chaque campagne : un envoi vers votre adresse Gmail plus une adresse Outlook et une Yahoo, marqué `[TEST]`, avec affichage du statut d'authentification obtenu.
 5. **Nettoyer la liste** : les adresses en rebond dur et les jamais-ouvreurs après 5 envois sortent définitivement des envois.
 6. **Panneau admin lisible** : par email, envoyés / livrés / rebonds / plaintes / ouvertures / clics, plus un bandeau rouge tant que le taux de livraison n'est pas confirmé.
+7. **Mettre `support@georgesboubet.com` en adresse de réponse** de tous les envois, dès que la boîte est active.
+
 
 ## Étape 2 — Reprendre proprement les vagues bloquées
 
