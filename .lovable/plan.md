@@ -208,7 +208,11 @@ Les ambiances existent déjà (14 ambiances classées claires / sombres / vibran
                                  propre       7 mots-cles
                                               3 categories
                                   |
-                    Second rang : 7 COUVERTURE   8 AUDIOLIVRE
+          Second rang : 7 COUVERTURE   8 VERSION AUDIO 9,99
+                        (inclus dans Studio Pro)
+                        paiement > voix > MP3 > page d ecoute
+                        + email avec les liens + Mes livres / Audio
+
                                   |
                         ONGLET COMPLEMENTS
                                   |
