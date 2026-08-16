@@ -25,8 +25,53 @@ const RESEND_API = "https://api.resend.com/emails";
 const MAX_SYNC = 200;
 const NEVER_OPENED_MIN_SENDS = 5;
 
+const SEND_DOMAIN = "ebookstudio.fr";
+const FROM_ADDRESS = `noreply@${SEND_DOMAIN}`;
+const REPLY_TO_ADDRESS = "support@georgesboubet.com";
+
+/** Lit un enregistrement TXT public (résolveur DNS de Google). */
+async function txtRecord(name: string): Promise<string> {
+  try {
+    const res = await fetch(`https://dns.google/resolve?name=${encodeURIComponent(name)}&type=TXT`);
+    if (!res.ok) return "";
+    const payload = await res.json() as { Answer?: Array<{ data?: string }> };
+    return (payload.Answer || [])
+      .map((a) => String(a.data || "").replace(/^"|"$/g, ""))
+      .join(" | ");
+  } catch {
+    return "";
+  }
+}
+
+/** Contrôles d'authentification attendus sur le domaine d'envoi. */
+const DNS_CHECKS: Array<[string, string, string, (v: string) => boolean, string]> = [
+  [
+    "spf",
+    "SPF (autorisation d'envoi)",
+    SEND_DOMAIN,
+    (v) => /v=spf1/i.test(v) && /amazonses\.com/i.test(v),
+    `Publier sur ${SEND_DOMAIN} : v=spf1 include:amazonses.com ~all`,
+  ],
+  [
+    "dkim",
+    "DKIM (signature des messages)",
+    `resend._domainkey.${SEND_DOMAIN}`,
+    (v) => /p=[A-Za-z0-9+/]{100,}/.test(v),
+    `Publier la clé DKIM fournie par le moteur d'envoi sur resend._domainkey.${SEND_DOMAIN}`,
+  ],
+  [
+    "dmarc",
+    "DMARC (politique déclarée)",
+    `_dmarc.${SEND_DOMAIN}`,
+    // Gmail exige une politique lisible : `p=none` sans espace et en anglais.
+    (v) => /v=DMARC1\s*;/i.test(v) && /(^|;)\s*p=(none|quarantine|reject)\s*(;|$)/i.test(v),
+    "Remplacer l'enregistrement TXT _dmarc par : v=DMARC1; p=none; rua=mailto:boubetgeorges@gmail.com; adkim=r; aspf=r; fo=1",
+  ],
+];
+
 const isTestAddress = (email: string) =>
   /@example\.com$/i.test(email) || /^test[.\-+]/i.test(email) || email.includes("+test@");
+
 
 async function isAdmin(req: Request, baseUrl: string) {
   const authorization = req.headers.get("Authorization");
@@ -123,6 +168,22 @@ Deno.serve(async (req) => {
       const apiKey = Deno.env.get("RESEND_API_KEY");
       if (!apiKey) return respond({ error: "RESEND_API_KEY manquante" }, 400);
 
+      // Une clé « envoi seul » ne peut pas lire les évènements : on le dit
+      // clairement au lieu de laisser tous les statuts en « inconnu ».
+      const probe = await fetch("https://api.resend.com/domains", {
+        headers: { Authorization: `Bearer ${apiKey}` },
+      });
+      if (probe.status === 401 || probe.status === 403) {
+        const detail = (await probe.text()).slice(0, 200);
+        return respond({
+          error:
+            "La clé d'envoi est restreinte à l'envoi seul : impossible de lire les livraisons. " +
+            "Créez une clé à accès complet (envoi + lecture) et remplacez-la dans les secrets du projet.",
+          key_restricted: true,
+          detail,
+        }, 400);
+      }
+
       const { data: pending } = await db
         .from("email_send_log")
         .select("id,message_id,recipient_email")
@@ -131,6 +192,7 @@ Deno.serve(async (req) => {
         .gte("created_at", since)
         .order("created_at", { ascending: false })
         .limit(MAX_SYNC);
+
 
       let checked = 0, updated = 0, unknown = 0;
       const events: Record<string, number> = {};
@@ -239,7 +301,69 @@ Deno.serve(async (req) => {
       });
     }
 
+    // ------------------------------------------------------------ diagnostic
+    // Contrôle réel de l'authentification du domaine d'envoi (SPF, DKIM,
+    // DMARC) et de la capacité de la clé à lire les évènements de livraison.
+    if (mode === "diagnostic") {
+      const checks: Array<{
+        key: string; label: string; ok: boolean; value: string; fix: string;
+      }> = [];
+
+      for (const [key, label, name, test, fix] of DNS_CHECKS) {
+        const value = await txtRecord(name);
+        checks.push({
+          key, label, ok: test(value), value: value || "(aucun enregistrement)", fix,
+        });
+      }
+
+      // Capacité de la clé : une clé « envoi seul » renvoie 401 restricted_api_key.
+      const apiKey = Deno.env.get("RESEND_API_KEY");
+      let keyOk = false;
+      let keyValue = "RESEND_API_KEY absente";
+      if (apiKey) {
+        try {
+          const res = await fetch("https://api.resend.com/domains", {
+            headers: { Authorization: `Bearer ${apiKey}` },
+          });
+          const text = (await res.text()).slice(0, 200);
+          keyOk = res.ok;
+          keyValue = res.ok
+            ? "clé complète : lecture des évènements possible"
+            : `HTTP ${res.status} — ${text}`;
+        } catch (err) {
+          keyValue = `appel impossible : ${String(err)}`;
+        }
+      }
+      checks.push({
+        key: "api_key",
+        label: "Clé d'envoi (lecture des livraisons)",
+        ok: keyOk,
+        value: keyValue,
+        fix: "Créer une clé à accès complet (envoi + lecture) et la remplacer dans les secrets du projet.",
+      });
+
+      // Part d'envois dont la livraison n'est pas confirmée.
+      const { count: total } = await db
+        .from("email_send_log").select("id", { count: "exact", head: true }).gte("created_at", since);
+      const { count: confirmed } = await db
+        .from("email_send_log").select("id", { count: "exact", head: true })
+        .gte("created_at", since).not("last_event", "is", null);
+
+      return respond({
+        success: true,
+        mode,
+        days,
+        from_address: FROM_ADDRESS,
+        reply_to: REPLY_TO_ADDRESS,
+        checks,
+        blocking: checks.filter((c) => !c.ok).map((c) => c.key),
+        delivery_confirmed: confirmed ?? 0,
+        delivery_total: total ?? 0,
+      });
+    }
+
     return respond({ error: `Mode inconnu : ${mode}` }, 400);
+
   } catch (e) {
     console.error("email-health-sync error:", e);
     return respond({ error: e instanceof Error ? e.message : "Erreur inconnue" }, 500);

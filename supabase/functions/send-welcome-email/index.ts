@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.78.0";
 import { Resend } from "npm:resend@2.0.0";
 import { EMAIL_SENDING_ENABLED, emailSendingBlockedResult } from "../_shared/emailSendingGuard.ts";
 import { checkoutUrl, SITE_ORIGIN } from "../_shared/checkoutUrl.ts";
+import { FROM_APP, REPLY_TO } from "../_shared/emailIdentity.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -74,7 +75,8 @@ const handler = async (req: Request): Promise<Response> => {
       : `<p style="margin:8px 0 0;color:#5a5a5a">Votre code d'accès vous est envoyé dans un email séparé. S'il n'arrive pas, écrivez-moi et je vous l'ouvre à la main.</p>`;
 
     const emailResponse = await resend.emails.send({
-      from: "EbookStudio <noreply@ebookstudio.fr>",
+      from: FROM_APP,
+      reply_to: REPLY_TO,
       to: [email],
       reply_to: SUPPORT_EMAIL,
       subject: "Vos accès EbookStudio + vos 10 niches offertes",
