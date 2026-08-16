@@ -168,6 +168,22 @@ Deno.serve(async (req) => {
       const apiKey = Deno.env.get("RESEND_API_KEY");
       if (!apiKey) return respond({ error: "RESEND_API_KEY manquante" }, 400);
 
+      // Une clé « envoi seul » ne peut pas lire les évènements : on le dit
+      // clairement au lieu de laisser tous les statuts en « inconnu ».
+      const probe = await fetch("https://api.resend.com/domains", {
+        headers: { Authorization: `Bearer ${apiKey}` },
+      });
+      if (probe.status === 401 || probe.status === 403) {
+        const detail = (await probe.text()).slice(0, 200);
+        return respond({
+          error:
+            "La clé d'envoi est restreinte à l'envoi seul : impossible de lire les livraisons. " +
+            "Créez une clé à accès complet (envoi + lecture) et remplacez-la dans les secrets du projet.",
+          key_restricted: true,
+          detail,
+        }, 400);
+      }
+
       const { data: pending } = await db
         .from("email_send_log")
         .select("id,message_id,recipient_email")
@@ -176,6 +192,7 @@ Deno.serve(async (req) => {
         .gte("created_at", since)
         .order("created_at", { ascending: false })
         .limit(MAX_SYNC);
+
 
       let checked = 0, updated = 0, unknown = 0;
       const events: Record<string, number> = {};
