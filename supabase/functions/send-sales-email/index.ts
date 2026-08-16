@@ -2,6 +2,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.78.0";
 import { isQuotaExhausted, sendResendEmailThrottled } from "../_shared/resendThrottle.ts";
 import { EMAIL_SENDING_ENABLED, emailSendingBlockedResult } from "../_shared/emailSendingGuard.ts";
 import { CHECKOUT_URL } from "../_shared/checkoutUrl.ts";
+import { DIRECT_EMAIL, FROM_CAMPAIGN, REPLY_TO } from "../_shared/emailIdentity.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

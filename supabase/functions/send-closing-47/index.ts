@@ -2,6 +2,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.78.0";
 import { isQuotaExhausted, sendResendEmailThrottled } from "../_shared/resendThrottle.ts";
 import { EMAIL_SENDING_ENABLED, emailSendingBlockedResult } from "../_shared/emailSendingGuard.ts";
 import { CHECKOUT_URL } from "../_shared/checkoutUrl.ts";
+import { DIRECT_EMAIL, FROM_CAMPAIGN, REPLY_TO } from "../_shared/emailIdentity.ts";
 
 /**
  * Campagne de conversion 2026 — trois séquences, un seul objectif par email.
@@ -30,8 +31,6 @@ const CAMPAIGN = "conversion-2026";
 const CHECKOUT = CHECKOUT_URL;
 const DEMO_URL = "https://ebookstudio.fr/demo";
 const GIFT_URL = "https://ebookstudio.fr/10-niches-offertes";
-import { DIRECT_EMAIL, FROM_CAMPAIGN, REPLY_TO } from "../_shared/emailIdentity.ts";
-
 type Segment = "never_opened" | "openers_no_click" | "clickers";
 /** Cible du bouton principal : le cadeau (sans risque) ou la page de paiement. */
 type Primary = "gift" | "checkout" | "demo";

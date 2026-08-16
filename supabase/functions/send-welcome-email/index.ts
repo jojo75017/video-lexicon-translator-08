@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.78.0";
 import { Resend } from "npm:resend@2.0.0";
 import { EMAIL_SENDING_ENABLED, emailSendingBlockedResult } from "../_shared/emailSendingGuard.ts";
 import { checkoutUrl, SITE_ORIGIN } from "../_shared/checkoutUrl.ts";
+import { FROM_APP, REPLY_TO } from "../_shared/emailIdentity.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
