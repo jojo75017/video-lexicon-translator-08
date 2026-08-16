@@ -1,113 +1,155 @@
-# Livre généré : boutons d'action, langue au départ, Sommaire IA dans les 2 forfaits, onglet Upsells et nouveaux tarifs
+# 3 forfaits, 6 boutons sous le livre, langue au départ et Sommaire IA partout
 
 ## Ce que montre l'outil aujourd'hui (vérifié)
 
-- Quand le livre est terminé, la zone du bas propose seulement : Couverture, Ambiances, Sauvegarder le brouillon, Nouveau livre. Il n'y a **aucun** bouton direct « Voir mon livre », « Corriger », ni un accès resserré aux données KDP.
-- La sauvegarde existe déjà (bouton « Sauvegarder maintenant » en haut) mais elle est loin de la zone du livre terminé.
-- Le brief du livre (`title`, `chapters`, `tone`, `outline`…) **n'a pas de champ langue** : l'abonné ne peut pas choisir sa langue au démarrage.
-- La traduction existe bien comme outil séparé (onglet « Traduction 10 langues » et fonction serveur `translate-content`), mais elle n'est jamais reliée au livre qui vient d'être généré.
-- Le Sommaire IA existe (étape 3 du wizard, onglet « Sommaire IA (dialogue) ») mais **il n'est écrit dans aucune des deux fiches de forfait** : ni Plume, ni Édition.
-- Il n'existe **aucun onglet Upsells** dans la barre latérale V3. Deux compléments seulement sont définis en interne (BookPerfect 97 €, Pack Sérénité 30 €) et ne sont proposés nulle part côté abonné.
-- Tarifs actuels : Plume 17 €/mois (170 €/an), Édition 27 €/mois (270 €/an).
+- Sous un livre terminé, il n'y a que 4 boutons secondaires : Couverture, Ambiances, Sauvegarder le brouillon, Nouveau livre. Ni « Voir mon livre », ni « Corriger », ni accès direct aux données KDP.
+- Le brief du livre n'a **aucun champ langue** : l'abonné ne peut pas choisir sa langue au démarrage.
+- La traduction 10 langues existe déjà comme page séparée (`/v3/outils/traduction`) et côté serveur (`translate-content`), mais elle n'est jamais reliée au livre qui vient d'être généré.
+- Le Sommaire IA existe (étape 3 du wizard + onglet dialogue) mais n'est **écrit dans aucune fiche de forfait**.
+- Aucun onglet Upsells côté abonné. Seuls deux compléments sont définis en interne et ne sont proposés nulle part.
+- Les tarifs 17 €/27 € sont écrits **en dur dans plusieurs endroits** en plus de la fiche tarifaire : menu de l'en-tête, questions/réponses, base de connaissances de l'assistant. Un changement de prix doit passer partout, sinon l'abonné voit deux prix différents.
 
-## 1. Barre d'actions sous le livre généré
+## 1. Six boutons sous le livre généré (rien à chercher)
 
-Dès que le livre est terminé, afficher juste en dessous une barre claire, toujours visible :
+Dès que le livre est terminé, une barre large et visible, juste sous le livre :
 
 ```text
-[Sauvegarder]  [Corriger mon livre]  [Voir mon livre]  [Données KDP du livre]  [Traduire le livre]
+[💾 Sauvegarder]  [🪄 Corriger mon livre]  [📖 Voir mon livre]
+[📊 Données KDP]  [🌍 Traduire (10 langues)]  [⬇️ Exporter Word / PDF / EPUB]
 ```
 
-- **Sauvegarder** : enregistre immédiatement dans « Mes livres » avec confirmation visible.
-- **Corriger mon livre** : ouvre le correcteur avec CE livre déjà chargé (aucun copier-coller).
-- **Voir mon livre** : ouvre le livre en lecture propre (chapitres, sommaire, mise en page).
-- **Données KDP du livre** : titre, sous-titre, description, 7 mots-clés, 3 catégories, prix conseillé, prêts à copier.
-- **Traduire le livre** : envoie le manuscrit vers la traduction avec la langue à choisir.
+Plus deux raccourcis en second rang : **🎨 Couverture** et **🎧 Audiolivre**.
 
-Chaque bouton part du livre réellement généré : rien ne se perd entre deux pages.
+- Chaque bouton part du livre réellement généré : aucun copier-coller, aucune ressaisie.
+- La barre reste collée en bas de l'écran sur mobile tant que le livre est ouvert.
+- Chaque bouton affiche un état clair : « Sauvegardé ✓ », « Corrigé ✓ », « Traduit en 3 langues ✓ ».
 
-## 2. Choix de la langue dès le début du livre
+## 2. Langue du livre choisie dès le début
 
-- Nouveau champ **« Langue du livre »** à l'étape 1 (Fiche du livre), avant le style.
-- 10 langues : français, anglais, espagnol, allemand, italien, portugais, néerlandais, polonais, suédois, japonais.
-- La langue choisie s'applique à tout : sommaire, chapitres, préface, conclusion, description KDP et couverture.
-- La langue est mémorisée avec le livre : elle reste juste après un rechargement et se retrouve dans « Mes livres ».
-- Français reste la valeur par défaut.
+- Champ **« Langue du livre »** à l'étape 1, avant le style.
+- 10 langues : français, anglais, espagnol, allemand, italien, portugais, néerlandais, polonais, japonais, chinois.
+- La langue s'applique à tout : sommaire, chapitres, préface, conclusion, description KDP, couverture.
+- Elle est mémorisée avec le livre et survit à un rechargement.
+- **Les 10 langues sont incluses dans les 3 forfaits.** Aucune langue vendue en supplément.
 
-## 3. Sommaire IA écrit dans les deux forfaits
+## 3. Sommaire IA écrit dans les trois forfaits
 
-Ajouter la ligne dans les deux fiches, pour que ce soit vu avant l'achat :
+- **Plume** : Sommaire IA guidé (dialogue) — vous construisez le plan avec l'IA.
+- **Édition** : Sommaire IA avancé — plan long, sous-chapitres, cohérence de série.
+- **Studio Pro** : Sommaire IA avancé + architecture de série multi-tomes.
 
-- **Plume** : « Sommaire IA guidé (dialogue) — vous construisez le plan avec l'IA »
-- **Édition** : « Sommaire IA avancé — plan long, sous-chapitres, cohérence de série »
+## 4. Les trois forfaits, avec tous les upsells dans le troisième
 
-## 4. Nouvel onglet « Upsells » dans la barre latérale
+| | **Plume** | **Édition** ⭐ | **Studio Pro** 👑 |
+| --- | --- | --- | --- |
+| Mensuel | **27 €** | **47 €** | **97 €** |
+| Annuel (2 mois offerts) | **270 €** | **470 €** | **970 €** |
+| Livres / mois | 30 | Illimité | Illimité |
+| Chapitres max | 40 | 60 | 60 + séries |
+| Sommaire IA | Guidé | Avancé | Avancé + séries |
+| 10 langues | Incluses | Incluses | Incluses |
+| Audiolivre | Standard | Pro (voix premium) | Pro + distribution |
+| Cover Studio Pro | — | Inclus | Inclus |
+| BD Studio Pro | — | Inclus | Inclus |
+| Amazon Spy / Audit ASIN | Basique | Complet | Complet + suivi |
+| **BookPerfect AI (97 €)** | — | — | **Inclus** |
+| **Pack Traductions relues (97 €)** | — | — | **Inclus** |
+| **Audiolivre Premium (67 €)** | — | — | **Inclus** |
+| **Pack Sérénité — Zoom 1-à-1 (30 €)** | — | — | **Inclus** |
+| **Sélection maisons d'édition (77 €)** | — | — | **Inclus** |
+| Accompagnement | Support 24 h | Prioritaire | Coaching mensuel + priorité nouveautés |
 
-Un onglet dédié, aussi proposé sous le livre terminé (au bon moment : le livre est prêt, l'abonné veut le vendre).
+**Le message de vente du 3ᵉ forfait** : 368 € de compléments inclus pour 97 €/mois. Plus rien à acheter, jamais.
 
-| Complément | Ce que ça apporte | Prix |
-| --- | --- | --- |
-| BookPerfect AI | Direction éditoriale complète + Word corrigé | 97 € |
-| Cover Studio Pro | Couverture 300 DPI, gabarits KDP, variantes | 47 € |
-| Audiolivre Premium | Voix premium, chapitrage, fichiers prêts | 67 € |
-| Pack Traductions 10 langues | Le livre entier traduit, prêt à publier | 97 € |
-| Pack Sérénité | Zoom 1-à-1, audit, support prioritaire | 30 € |
-| Pack Tout Complet | Les 5 compléments réunis | 247 € au lieu de 338 € |
+Engagements respectés :
 
-Chaque carte affiche : ce que ça donne, pour qui, le prix, et un seul bouton de paiement. Les compléments déjà inclus dans Édition sont marqués « Inclus dans votre forfait » au lieu d'être vendus deux fois.
-
-## 5. Tarifs : vous êtes trop bas
-
-Vous vendez 30 livres par mois, 10 langues, correction, couverture, audiolivre et données KDP pour 17 €. C'est en dessous du marché et cela fait douter de la valeur. Proposition claire, sans casser vos engagements :
-
-| Forfait | Aujourd'hui | Proposé mensuel | Proposé annuel | Ce qui justifie le prix |
-| --- | --- | --- | --- | --- |
-| **Plume** | 17 € / 170 € | **27 €** | **270 €** (2 mois offerts) | 30 livres/mois, 40 chapitres, Sommaire IA guidé, correction, couverture, audiolivre, 10 langues |
-| **Édition** | 27 € / 270 € | **47 €** | **470 €** (2 mois offerts) | Livres illimités, 60 chapitres, Sommaire IA avancé, Cover Studio Pro, BookPerfect, Audiolivre pro, BD Studio, Amazon Spy |
-| **Studio Pro** (nouveau, 3ᵉ palier) | — | **97 €** | **970 €** | Tout Édition + Pack Traductions inclus + accompagnement mensuel + priorité sur les nouveaux modules |
-
-Règles de respect des promesses déjà faites :
-
-- Les abonnés déjà inscrits gardent leur prix actuel à vie.
-- La remise **-20 % à vie ancien client V2** s'applique aux nouveaux montants : Plume 21,60 €, Édition 37,60 €.
+- Les abonnés actuels gardent leur prix à vie.
+- La remise **-20 % à vie ancien client V2** s'applique aux nouveaux montants : Plume 21,60 €, Édition 37,60 €, Studio Pro 77,60 €.
 - L'accès à vie 47 € reste inchangé jusqu'au 30/09/2026.
-- Les nouveaux tarifs s'affichent avec la date d'entrée en vigueur, et l'ancien prix barré : c'est un argument d'urgence, pas une mauvaise surprise.
 
-## Schéma du parcours
+## 5. Un onglet Upsells quand même — mais pour Plume et Édition
+
+- Nouvel onglet **« Compléments »** dans la barre latérale, et rappel sous le livre terminé.
+- Un abonné **Studio Pro** y voit tout marqué « Inclus dans votre forfait » : jamais de double vente.
+- Un abonné Plume ou Édition y voit le prix à l'unité **et** l'économie réalisée en passant à Studio Pro.
+
+## 6. Difficulté et durée honnêtes
+
+Non, ce n'est pas difficile — mais c'est **large**, parce que le prix est écrit à plusieurs endroits. La bonne méthode : une source unique de vérité pour les tarifs, et toutes les pages qui la lisent au lieu de répéter les chiffres.
+
+Pages et endroits à mettre à jour dans le même passage :
+
+1. Fiche des forfaits (`/v3/forfaits`) — passage à 3 colonnes.
+2. Menu « Forfaits » de l'en-tête V3.
+3. Page de vente `/commander` et page `/v3/offre`.
+4. Page « Mon compte & abonnement ».
+5. Page « Ancien client V2 » (`/v3/migration`) avec les nouveaux prix remisés.
+6. Questions / réponses V3 et base de connaissances de l'assistant IA.
+7. Panneau admin des plans V3.
+8. Emails et bandeaux qui citent un prix.
+
+Après ce passage, un changement de prix futur se fera **en un seul endroit**.
+
+## Schéma détaillé
 
 ```text
-Etape 1 Fiche du livre  ->  LANGUE DU LIVRE (10 langues)
-        |
-Etape 2 Style
-        |
-Etape 3 SOMMAIRE IA          (inclus dans Plume ET Edition)
-        |
-Etape 4 Personnages  ->  Etape 5 Titre  ->  Generation par les agents
-        |
-   LIVRE TERMINE
-        |
-   +----+-----------+-----------------+---------------------+------------------+
-   |               |                 |                     |                  |
-Sauvegarder   Corriger        Voir mon livre     Donnees KDP du livre   Traduire le livre
-        |
-   Onglet UPSELLS : BookPerfect · Cover Studio Pro · Audiolivre Premium
-                    Pack Traductions · Pack Serenite · Pack Tout Complet
+                       ETAPE 1 - FICHE DU LIVRE
+                  Titre - Sujet - Categorie - AUTEUR
+                  >>> LANGUE DU LIVRE (10 langues, tous forfaits) <<<
+                                  |
+                       ETAPE 2 - STYLE ET LONGUEUR
+                                  |
+                   ETAPE 3 - SOMMAIRE IA (les 3 forfaits)
+                Plume: guide | Edition: avance | Studio Pro: series
+                                  |
+                       ETAPE 4 - PERSONNAGES
+                                  |
+                       ETAPE 5 - TITRE FINAL
+                                  |
+                 GENERATION PAR LES AGENTS (chapitre par chapitre)
+                                  |
+                          == LIVRE TERMINE ==
+                                  |
+      +--------------+--------------+--------------+--------------+--------------+
+      |              |              |              |              |              |
+ 1 SAUVEGARDER  2 CORRIGER    3 VOIR MON     4 DONNEES     5 TRADUIRE     6 EXPORTER
+   Mes livres     Correcteur      LIVRE           KDP        10 langues    Word PDF EPUB
+                                lecture       titre desc
+                                 propre       7 mots-cles
+                                              3 categories
+                                  |
+                    Second rang : 7 COUVERTURE   8 AUDIOLIVRE
+                                  |
+                        ONGLET COMPLEMENTS
+                                  |
+      Plume / Edition : prix a l unite + economie en passant a Studio Pro
+      Studio Pro      : tout marque INCLUS DANS VOTRE FORFAIT
+
+                        ======= TARIFS =======
+        PLUME 27 / mois        EDITION 47 / mois       STUDIO PRO 97 / mois
+        270 / an               470 / an                970 / an
+        30 livres              illimite                illimite + series
+        10 langues             10 langues              10 langues
+        Sommaire IA guide      Sommaire IA avance      Sommaire IA + series
+        --                     Cover + BD Studio Pro   TOUS LES UPSELLS INCLUS
+                                                       368 de valeur incluse
+        Ancien V2 : 21,60      Ancien V2 : 37,60       Ancien V2 : 77,60
 ```
 
 ## Détails techniques
 
-- `src/lib/v3/bookBrief.ts` : ajouter `language` au brief et le conserver en cloud avec le projet.
-- `src/components/v3public/V3CreateWizard.tsx` : champ langue à l'étape 1, propagation de la langue au workflow, et nouvelle barre d'actions sous le livre terminé (5 boutons) placée avant les panneaux couverture/KDP.
-- Passage du manuscrit terminé au correcteur, au lecteur, au panneau KDP et à la traduction via l'identifiant du projet enregistré, sans réécrire le contenu dans l'URL.
-- Traduction branchée sur la fonction serveur existante `translate-content`, langue préremplie avec celle du livre.
-- `src/data/v3Pricing.ts` : nouveaux montants, ligne Sommaire IA dans les deux forfaits, troisième forfait Studio Pro, et catalogue des compléments (5 packs + Pack Tout Complet).
-- Nouvel onglet et nouvelle page « Upsells » dans `V3Sidebar.tsx`, avec masquage automatique de ce qui est déjà inclus dans le forfait de l'abonné.
+- `src/data/v3Pricing.ts` devient la **source unique** : 3 forfaits, montants, remise ancien client V2, ligne Sommaire IA, mention 10 langues, catalogue des compléments et liste de ceux inclus dans Studio Pro.
+- Supprimer les prix écrits en dur dans `v3HeaderMenu.ts`, `v3Questions.ts`, `assistantKnowledge.ts` et les pages listées, et les faire lire la source unique.
+- `src/lib/v3/bookBrief.ts` : ajouter `language`, conservé aussi côté cloud avec le projet.
+- `src/components/v3public/V3CreateWizard.tsx` : champ langue à l'étape 1, propagation au workflow, et nouvelle barre de 6 boutons (+2) placée immédiatement sous le livre terminé, avant les panneaux couverture et KDP.
+- Les boutons passent par l'identifiant du projet enregistré : correcteur, lecteur (`/v3/livre/:id`), panneau KDP, traduction (`translate-content` avec la langue préremplie) et export.
+- Nouvelle page et nouvel onglet « Compléments » avec masquage automatique selon le forfait (`useV3Entitlement`).
 - Aucun changement sur les accès admin, le tunnel `/commander` ni les droits des abonnés existants.
 
 ## Validation avant de déclarer terminé
 
-1. Générer un livre court et vérifier les 5 boutons : chacun ouvre la bonne page avec le bon livre.
-2. Choisir l'anglais à l'étape 1 et vérifier que le livre entier sort en anglais.
-3. Recharger la page en cours de route : la langue et le livre sont toujours là.
-4. Vérifier « Sommaire IA » écrit dans les deux forfaits sur la page tarifs.
-5. Ouvrir l'onglet Upsells avec un compte Édition : les compléments inclus sont marqués, pas vendus.
+1. Générer un livre court : les 6 boutons apparaissent et chacun ouvre la bonne page avec le bon livre.
+2. Choisir l'anglais à l'étape 1 : tout le livre sort en anglais.
+3. Recharger en cours de route : langue et livre toujours là.
+4. Parcourir les 8 emplacements de prix : partout 27 / 47 / 97, jamais 17 ou 27 ancien.
+5. Ouvrir « Compléments » avec un compte Studio Pro : tout marqué inclus, rien à vendre.
