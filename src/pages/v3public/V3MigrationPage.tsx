@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { Check, Crown, Feather, Gift, Infinity as InfinityIcon, Lock } from "lucide-react";
+import { Check, Crown, Feather, Gift, Infinity as InfinityIcon, Lock, Sparkles } from "lucide-react";
 import {
   V3_PLANS,
   formatPrice,
@@ -18,9 +18,10 @@ import { PayPalSubscribeButton } from "@/components/v3/PayPalSubscribeButton";
 import V3SubscribeCheckout from "@/components/v3public/V3SubscribeCheckout";
 import useV3Entitlement from "@/hooks/useV3Entitlement";
 
-const PLAN_ICONS = { plume: Feather, edition: Crown } as const;
+const PLAN_ICONS = { plume: Feather, edition: Crown, studio: Sparkles } as const;
 const PLAN_ACCENTS: Record<string, string> = {
   plume: "#0d7a5f",
+  studio: "#b4831f",
   edition: "#5B21B6",
 };
 
@@ -161,7 +162,7 @@ export default function V3MigrationPage() {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {V3_PLANS.map((plan) => {
               const Icon = PLAN_ICONS[plan.id];
               const accent = PLAN_ACCENTS[plan.id];
