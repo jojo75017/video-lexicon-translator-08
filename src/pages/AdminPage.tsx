@@ -16,6 +16,7 @@ import { format } from 'date-fns';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 import { ErrorLogsViewer } from '@/components/admin/ErrorLogsViewer';
 import { ADMIN_LOGIN_PATH } from '@/config/adminRoutes';
+import { useAdminAccess } from '@/contexts/AdminAccessContext';
 
 export const AdminPage = () => {
   const [email, setEmail] = useState('');
@@ -34,6 +35,8 @@ export const AdminPage = () => {
   const [sendingEmailTo, setSendingEmailTo] = useState<string | null>(null);
   const [isRefreshingAdmin, setIsRefreshingAdmin] = useState(false);
   const navigate = useNavigate();
+  // Une seule autorité pour le statut admin (celle qui protège la route).
+  const { refresh: refreshAdminRole } = useAdminAccess();
 
   const refreshAdminStatus = async () => {
     setIsRefreshingAdmin(true);
@@ -45,19 +48,17 @@ export const AdminPage = () => {
         return;
       }
 
-      const { data, error } = await supabase.functions.invoke('check-admin', {
-        headers: { Authorization: `Bearer ${session.access_token}` }
-      });
+      // Même vérification que la garde de route : aucune divergence possible.
+      const result = await refreshAdminRole();
 
-      if (error) {
-        throw error;
-      }
-
-      if (data?.isAdmin) {
+      if (result === true) {
         toast.success('✅ Statut admin confirmé !');
-      } else {
-        toast.error('Vous n\'êtes plus admin - redirection...');
+      } else if (result === false) {
+        toast.error("Vous n'êtes plus admin - redirection...");
         navigate(ADMIN_LOGIN_PATH);
+      } else {
+        // Statut indéterminé (réseau) : on ne déconnecte jamais un admin.
+        toast.message('Vérification impossible pour le moment, votre accès est conservé.');
       }
     } catch (error: any) {
       console.error('Error refreshing admin status:', error);

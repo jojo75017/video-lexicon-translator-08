@@ -25,6 +25,7 @@ import { Progress } from '@/components/ui/progress';
 import { useUserQuotas, getQuotaPercentage } from '@/hooks/useUserQuotas';
 import { ToolsGuideButton } from '@/components/layout/ToolsGuideButton';
 import { ESSENTIAL_TOOL_IDS, WORKFLOW_AGENT_IDS } from './modernSidebarSections';
+import { useAdminAccess } from '@/contexts/AdminAccessContext';
 import { useSidebarFavorites } from '@/hooks/useSidebarFavorites';
 import { SidebarFavorites } from './SidebarFavorites';
 import { SidebarHeader, type RecentProject } from './SidebarHeader';
@@ -502,12 +503,10 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
   // Sous-bloc des 15 agents Workflow IA (replié par défaut)
   const [showWorkflowAgents, setShowWorkflowAgents] = useState<boolean>(false);
 
-  const [isAdmin, setIsAdmin] = useState(() => sessionStorage.getItem('is_admin') === 'true');
-  useEffect(() => {
-    const checkAdmin = () => setIsAdmin(sessionStorage.getItem('is_admin') === 'true');
-    window.addEventListener('storage', checkAdmin);
-    return () => window.removeEventListener('storage', checkAdmin);
-  }, []);
+  // Statut admin partagé (même autorité que les gardes de route) ; le drapeau
+  // de session ne sert plus que de repli le temps de la vérification.
+  const { isAdmin: adminFromContext, isChecking: adminChecking } = useAdminAccess();
+  const isAdmin = adminFromContext || (adminChecking && sessionStorage.getItem('is_admin') === 'true');
 
   // Favoris
   const { favorites, isFavorite, toggleFavorite } = useSidebarFavorites();
