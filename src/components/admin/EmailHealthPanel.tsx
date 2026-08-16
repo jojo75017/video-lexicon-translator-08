@@ -26,6 +26,24 @@ interface StatusPayload {
   resend_key_configured: boolean;
 }
 
+interface DiagnosticCheck {
+  key: string;
+  label: string;
+  ok: boolean;
+  value: string;
+  fix: string;
+}
+
+interface DiagnosticPayload {
+  from_address: string;
+  reply_to: string;
+  checks: DiagnosticCheck[];
+  blocking: string[];
+  delivery_confirmed: number;
+  delivery_total: number;
+}
+
+
 /**
  * Santé des emails : montre ce qui est réellement livré, rebondi ou inconnu,
  * et permet de synchroniser les évènements depuis Resend puis de nettoyer la liste.
