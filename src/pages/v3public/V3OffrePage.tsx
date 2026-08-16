@@ -301,16 +301,16 @@ export default function V3OffrePage() {
             Les plans V3 seront ouverts progressivement
           </h2>
           <p className="mt-3 text-sm text-slate-600 max-w-xl mx-auto">
-            Les nouveaux forfaits arriveront le jour du lancement. L'avantage actuel :
+            Trois forfaits (les 10 langues et le Sommaire IA partout) arriveront le jour du lancement. L'avantage actuel :
             commencer en V2 maintenant et obtenir le premier plan V3 sans surcoût.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-5 max-w-3xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
           {V3_PLANS.map((plan) => {
             const featured = plan.id === "edition";
             const Icon = plan.id === "edition" ? Crown : Feather;
-            const accent = plan.id === "edition" ? "#5B21B6" : EMERALD;
+            const accent = plan.id === "edition" ? "#5B21B6" : plan.id === "studio" ? GOLD : EMERALD;
             const savings = getYearlySavingsPercent(plan);
             return (
               <article key={plan.id}

@@ -46,7 +46,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "Pourquoi commander maintenant ?",
-    a: "Le tarif 47 € est valable jusqu'au 30 septembre (59 € ensuite). À partir du 1er octobre, EbookStudio passe uniquement en abonnement à 17 € par mois : l'accès à vie n'existera plus.",
+    a: "Le tarif 47 € est valable jusqu'au 30 septembre (59 € ensuite). À partir du 1er octobre, EbookStudio passe uniquement en abonnement : Plume 27 € par mois, Édition 47 €, Studio Pro 97 € (tout inclus). L'accès à vie n'existera plus.",
   },
   {
     q: "Comment mon accès est-il ouvert après le paiement ?",
@@ -366,7 +366,7 @@ export default function V3CommanderPage() {
               <h3 className="text-sm font-black" style={{ color: EMERALD }}>Pourquoi maintenant</h3>
               <p className="mt-2 text-sm leading-relaxed text-slate-700">
                 À partir du 1<sup>er</sup> octobre, EbookStudio passe uniquement en abonnement :
-                17 € par mois, soit <strong>204 € la première année</strong>. Aujourd'hui, c'est
+                à partir de 27 € par mois, soit <strong>324 € la première année</strong>. Aujourd'hui, c'est
                 <strong> 47 € une seule fois</strong>, conservés à vie, mises à jour comprises.
               </p>
             </div>

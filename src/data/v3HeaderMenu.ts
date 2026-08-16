@@ -121,10 +121,11 @@ export const V3_HEADER_MENU: MenuCategory[] = [
     color: '#c9a84c',
     tagline: 'Ce que débloque chaque plan',
     links: [
-      { label: 'Plume — 17 €/mois', to: '/v3/outils?plan=plume', badge: '30 livres/mois', desc: '✍️ J’écris et je publie : tous les onglets, audiolivre inclus, export propre' },
-      { label: 'Édition — 27 €/mois ⭐', to: '/v3/outils?plan=edition', badge: 'Recommandé · illimité', desc: '👑 Version pro : Recherche Approfondie, Cover Studio Pro, BD Studio Pro, upsells inclus' },
+      { label: 'Plume — 27 €/mois', to: '/v3/outils?plan=plume', badge: '30 livres/mois', desc: '✍️ J’écris et je publie : tous les onglets, Sommaire IA guidé, 10 langues, audiolivre inclus' },
+      { label: 'Édition — 47 €/mois ⭐', to: '/v3/outils?plan=edition', badge: 'Recommandé · illimité', desc: '👑 Version pro : Recherche Approfondie, Sommaire IA avancé, Cover Studio Pro, BD Studio Pro' },
+      { label: 'Studio Pro — 97 €/mois 👑', to: '/v3/outils?plan=studio', badge: 'Tout inclus', desc: '💎 Tous les compléments inclus : BookPerfect, traductions, audio premium, coaching 1-à-1' },
       { label: 'Ancien client V2', to: '/v3/migration', badge: '-20 % à vie', desc: 'Votre V2 reste à vie + 3 nouveautés V3 offertes, et -20 % à vie sur Plume ou Édition' },
-      { label: 'Mensuel ou annuel (2 mois offerts)', to: '/v3/forfaits', desc: 'Plume 170 €/an · Édition 270 €/an' },
+      { label: 'Mensuel ou annuel (2 mois offerts)', to: '/v3/forfaits', desc: 'Plume 270 €/an · Édition 470 €/an · Studio Pro 970 €/an' },
     ],
   },
 

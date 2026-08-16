@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Check, Crown, Feather } from "lucide-react";
+import { Check, Crown, Feather, Sparkles } from "lucide-react";
 import {
   V3_PLANS,
   formatPrice,
@@ -14,11 +14,13 @@ import useV3Entitlement from "@/hooks/useV3Entitlement";
 const PLAN_ICONS = {
   plume: Feather,
   edition: Crown,
+  studio: Sparkles,
 } as const;
 
 const PLAN_ACCENTS: Record<string, string> = {
   plume: "#0d7a5f",     // Plume — émeraude
   edition: "#5B21B6",   // Édition — pourpre (mis en avant)
+  studio: "#b4831f",    // Studio Pro — or (tout inclus)
 };
 
 
@@ -55,8 +57,9 @@ export default function V3ForfaitsPage() {
             Choisissez votre atelier d'édition
           </h1>
           <p className="text-lg max-w-2xl mx-auto" style={{ color: "#4b5563" }}>
-            Deux forfaits, tous les outils dans les deux. Édition ajoute la puissance
-            professionnelle et inclut les upsells. Changez de forfait à tout moment.
+            Trois forfaits, les 10 langues et le Sommaire IA dans les trois. Édition ajoute
+            la puissance professionnelle, Studio Pro inclut absolument tous les compléments.
+            Changez de forfait à tout moment.
           </p>
 
           <div className="inline-flex mt-8 p-1 rounded-full border" style={{ borderColor: "#e5e7eb", background: "#fff" }}>
@@ -81,7 +84,7 @@ export default function V3ForfaitsPage() {
           </div>
         </header>
 
-        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {V3_PLANS.map((plan) => {
             const Icon = PLAN_ICONS[plan.id];
             const accent = PLAN_ACCENTS[plan.id];
@@ -100,12 +103,12 @@ export default function V3ForfaitsPage() {
                     : "0 4px 12px rgba(0,0,0,0.04)",
                 }}
               >
-                {featured && (
+                {(featured || plan.allAddonsIncluded) && (
                   <span
                     className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold text-white shadow-lg whitespace-nowrap"
                     style={{ background: accent }}
                   >
-                    ⭐ Recommandé
+                    {plan.allAddonsIncluded ? "👑 Tout inclus" : "⭐ Recommandé"}
                   </span>
                 )}
 
@@ -140,6 +143,13 @@ export default function V3ForfaitsPage() {
                     </p>
                   )}
                 </div>
+
+                <p
+                  className="text-xs font-semibold mb-4 rounded-lg px-3 py-2"
+                  style={{ background: `${accent}12`, color: accent }}
+                >
+                  {plan.aiSummary} · 10 langues incluses
+                </p>
 
                 <ul className="space-y-2.5 mb-8 flex-1">
                   {plan.features.map((feat, i) => (

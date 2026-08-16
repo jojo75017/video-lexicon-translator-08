@@ -95,9 +95,9 @@ export default function AdminPlansV3Page() {
           </Badge>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {V3_PLANS.map((plan, idx) => {
-            const borderColor = idx === 0 ? "border-l-emerald-500" : "border-l-purple-600";
+            const borderColor = idx === 0 ? "border-l-emerald-500" : idx === 1 ? "border-l-purple-600" : "border-l-amber-500";
             const savings = getYearlySavingsPercent(plan);
             return (
               <Card key={plan.id} className={`border-l-4 ${borderColor}`}>
@@ -132,8 +132,9 @@ export default function AdminPlansV3Page() {
                 <tr>
                   <th className="px-4 py-3 text-left font-semibold">#</th>
                   <th className="px-4 py-3 text-left font-semibold">Domaine</th>
-                  <th className="px-4 py-3 text-center font-semibold text-emerald-600">Plume — 17 €/mois</th>
-                  <th className="px-4 py-3 text-center font-semibold text-purple-600">Édition — 27 €/mois</th>
+                  <th className="px-4 py-3 text-center font-semibold text-emerald-600">Plume — 27 €/mois</th>
+                  <th className="px-4 py-3 text-center font-semibold text-purple-600">Édition — 47 €/mois</th>
+                  <th className="px-4 py-3 text-center font-semibold text-amber-600">Studio Pro — 97 €/mois</th>
                 </tr>
               </thead>
               <tbody>
@@ -142,6 +143,7 @@ export default function AdminPlansV3Page() {
                     <td className="px-4 py-3 font-bold text-muted-foreground">{row.letter}</td>
                     <td className="px-4 py-3 font-medium">{row.domain}</td>
                     <td className="px-4 py-3 text-center">{renderCell(row.plume)}</td>
+                    <td className="px-4 py-3 text-center">{renderCell(row.edition)}</td>
                     <td className="px-4 py-3 text-center">{renderCell(row.edition)}</td>
                   </tr>
                 ))}
@@ -176,12 +178,12 @@ export default function AdminPlansV3Page() {
         <Card className="border-2 border-teal-500/50 bg-teal-50/30">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              📕 Couverture haut de gamme — À intégrer sur les 2 forfaits
+              📕 Couverture haut de gamme — À intégrer sur les 3 forfaits
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <p className="font-medium">
-              Objectif : livrer sur Plume et Édition une couverture professionnelle
+              Objectif : livrer sur Plume, Édition et Studio Pro une couverture professionnelle
               prête pour KDP, avec les 3 faces générées à partir des infos du livre.
             </p>
             <ul className="ml-5 list-disc space-y-1 text-muted-foreground">
@@ -204,7 +206,7 @@ export default function AdminPlansV3Page() {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              4 prix synchronisés (sandbox → live automatique au publish) : 17 €/mois, 170 €/an, 27 €/mois, 270 €/an. Résiliable à tout moment.
+              6 prix synchronisés (sandbox → live automatique au publish) : 27 €/mois, 270 €/an, 47 €/mois, 470 €/an, 97 €/mois, 970 €/an. Résiliable à tout moment.
             </p>
             <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-3">
               {V3_PLANS.flatMap((plan) => [
