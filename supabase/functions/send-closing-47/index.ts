@@ -401,10 +401,15 @@ Deno.serve(async (req) => {
         let status: "sent" | "error" | "pending" | "excluded" = "pending";
         let reason = "";
         if (log && ["sent", "delivered"].includes(log.status)) status = "sent";
-        else if (log) {
+        else if (log && log.status === "pending") {
+          // Ligne d'attente sans confirmation : le destinataire reste à envoyer.
+          status = "pending";
+          reason = "Envoi non confirmé, sera repris";
+        } else if (log) {
           status = "error";
           reason = log.error_message || `Échec (${log.status})`;
         } else if (paid.has(email)) {
+
           status = "excluded";
           reason = "Client déjà acheteur";
         } else if (!profile) {
