@@ -7,13 +7,15 @@ Les deux blocages confirmés par le diagnostic ne sont pas dans le code : l'un e
 Valeur publiée aujourd'hui, illisible pour Gmail :
 `v=DMARC1; p = aucun ; rua=mailto:rua@dmarc.brevo.com`
 
-À remplacer chez votre hébergeur DNS par exactement :
+À remplacer chez votre hébergeur DNS (où vous gérez `ebookstudio.fr`, probablement Hostinger) par exactement :
 
 ```text
 Type  : TXT
 Nom   : _dmarc
 Valeur: v=DMARC1; p=none; rua=mailto:boubetgeorges@gmail.com; adkim=r; aspf=r; fo=1
 ```
+
+L'adresse `boubetgeorges@gmail.com` est juste celle qui reçoit les rapports DMARC — elle n'a pas besoin d'être sur le même domaine. Gmail fonctionne très bien pour ça.
 
 C'est le seul enregistrement à changer. SPF et DKIM sont déjà corrects, ne pas y toucher. Propagation : quelques minutes à 24 h.
 
