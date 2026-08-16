@@ -205,3 +205,93 @@
 .v3pub .v3-scroll-x { scrollbar-width: thin; scrollbar-color: rgba(6,78,59,0.2) transparent; }
 .v3pub .v3-scroll-x::-webkit-scrollbar { height: 6px; }
 .v3pub .v3-scroll-x::-webkit-scrollbar-thumb { background: rgba(6,78,59,0.2); border-radius: 6px; }
+
+/* ─────────────────────────────────────────────────────────────
+   Thème sombre — Émeraude nuit. Activé par la classe `dark`
+   sur <html> (bouton clair/sombre du header et de la barre latérale).
+   ───────────────────────────────────────────────────────────── */
+.dark .v3pub {
+  --v3-emerald: #0f8a68;
+  --v3-emerald-600: #16a97f;
+  --v3-emerald-50: rgba(22, 169, 127, 0.12);
+  --v3-gold: #d9bb63;
+  --v3-gold-600: #c9a84c;
+  --v3-gold-soft: rgba(217, 187, 99, 0.14);
+  --v3-paper: #0a1512;
+  --v3-cream: #0f1e1a;
+  --v3-surface: #12201c;
+  --v3-ink: #f2f6f4;
+  --v3-ink-2: #dbe6e1;
+  --v3-muted: #9db3ab;
+  --v3-line: rgba(217, 187, 99, 0.18);
+  --v3-border: rgba(217, 187, 99, 0.18);
+  --v3-shadow-card: 0 1px 2px rgba(0,0,0,.35), 0 16px 40px -20px rgba(0,0,0,.6);
+  --v3-shadow-menu: 0 24px 60px -20px rgba(0,0,0,.7), 0 2px 6px rgba(0,0,0,.4);
+  color: var(--v3-ink);
+  background: var(--v3-paper);
+}
+
+.dark .v3pub .v3-halo,
+.dark .v3pub .v3-halo-soft {
+  background:
+    radial-gradient(55% 45% at 15% 15%, rgba(22, 169, 127, 0.16), transparent 60%),
+    radial-gradient(45% 40% at 88% 12%, rgba(217, 187, 99, 0.12), transparent 60%),
+    var(--v3-paper);
+}
+
+/* Surfaces claires posées en classes utilitaires */
+.dark .v3pub .bg-white,
+.dark .v3pub .bg-slate-50,
+.dark .v3pub .bg-gray-50,
+.dark .v3pub .bg-neutral-50 {
+  background-color: var(--v3-surface) !important;
+}
+.dark .v3pub .text-slate-900,
+.dark .v3pub .text-gray-900,
+.dark .v3pub .text-black { color: var(--v3-ink) !important; }
+.dark .v3pub .text-slate-700,
+.dark .v3pub .text-slate-600,
+.dark .v3pub .text-gray-700,
+.dark .v3pub .text-gray-600 { color: var(--v3-ink-2) !important; }
+.dark .v3pub .text-slate-500,
+.dark .v3pub .text-gray-500,
+.dark .v3pub .text-slate-400 { color: var(--v3-muted) !important; }
+.dark .v3pub .border,
+.dark .v3pub .border-t,
+.dark .v3pub .border-b,
+.dark .v3pub .border-slate-200,
+.dark .v3pub .border-gray-200 { border-color: var(--v3-line) !important; }
+
+/* Surfaces claires posées en style en ligne (héritage des pages V3) */
+.dark .v3pub [style*="#fff"],
+.dark .v3pub [style*="#FFF"],
+.dark .v3pub [style*="background: white"],
+.dark .v3pub [style*="background:white"],
+.dark .v3pub [style*="#FAFAFA"],
+.dark .v3pub [style*="#fafafa"],
+.dark .v3pub [style*="#f9fafb"],
+.dark .v3pub [style*="#F9FAFB"] {
+  background-color: var(--v3-surface) !important;
+  color: var(--v3-ink);
+}
+/* Les boutons pleins et les sections déjà sombres gardent leur fond */
+.dark .v3pub .v3-btn-gold,
+.dark .v3pub .v3-btn-primary,
+.dark .v3pub .v3-section-dark,
+.dark .v3pub [style*="linear-gradient"] {
+  background-color: initial !important;
+}
+
+.dark .v3pub input,
+.dark .v3pub textarea,
+.dark .v3pub select {
+  background-color: var(--v3-cream) !important;
+  color: var(--v3-ink) !important;
+  border-color: var(--v3-line) !important;
+}
+.dark .v3pub input::placeholder,
+.dark .v3pub textarea::placeholder { color: var(--v3-muted) !important; }
+
+.dark .v3pub table thead { background-color: var(--v3-cream) !important; }
+.dark .v3pub table td,
+.dark .v3pub table th { border-color: var(--v3-line) !important; }

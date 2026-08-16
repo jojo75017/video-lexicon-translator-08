@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, LogIn, User, Mail, GraduationCap, Menu, X } from 'lucide-react';
 import BlogExternalLink from './BlogExternalLink';
+import ThemeToggle from './ThemeToggle';
 import { ADMIN_HOME_PATH } from '@/config/adminRoutes';
 
 /**
@@ -67,6 +68,7 @@ export default function V3Header({ isAuthed = false, isAdmin = false }: { isAuth
 
         {/* Actions droite (≥ lg) */}
         <nav className="hidden lg:flex items-center gap-1 ml-auto">
+          <ThemeToggle variant="onDark" />
           <BlogExternalLink variant="headerDark" />
           <Link to="/formation" className="v3-btn v3-btn-on-dark" title="Formation">
             <GraduationCap className="w-4 h-4" /> Formation
@@ -149,6 +151,7 @@ export default function V3Header({ isAuthed = false, isAdmin = false }: { isAuth
             <Link to={isAuthed ? '/v3/library' : '/v3/auth'} onClick={() => setOpen(false)} className="v3-btn v3-btn-on-dark w-full justify-center">
               {isAuthed ? 'Ma bibliothèque' : 'Connexion'}
             </Link>
+            <ThemeToggle variant="onDark" className="w-full justify-center" />
             <BlogExternalLink variant="headerDark" className="w-full justify-center" onClick={() => setOpen(false)} />
             <Link to="/formation" onClick={() => setOpen(false)} className="v3-btn v3-btn-on-dark w-full justify-center">
               <GraduationCap className="w-4 h-4" /> Formation
