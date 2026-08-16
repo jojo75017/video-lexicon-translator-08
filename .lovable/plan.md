@@ -136,7 +136,48 @@ Ce que ces chiffres disent :
 
 Tant que le point (a) n'est pas branché, chaque campagne part à l'aveugle : c'est à faire avant de réécrire un seul email.
 
+## 8. Le bouton « Version audio · 9,99 € » — état réel et ce qu'il manque
+
+Ce qui existe déjà (vérifié) :
+
+- La carte d'offre **« Convertir en audiobook · 9,99 € »** existe et s'affiche sur la page de lecture d'un livre.
+- Mais elle ne fait **rien** aujourd'hui : elle affiche « La conversion arrive bientôt » et le bouton se contente d'inscrire le livre dans une liste d'attente stockée dans le navigateur. **Aucun paiement, aucun audio produit.**
+- Le texte actuel demande à l'abonné **sa propre clé Azure Speech** — c'est ce qu'il faut supprimer.
+- Côté serveur, la machinerie audio est déjà là : une fonction de synthèse qui sait utiliser **ElevenLabs, Azure Speech ou OpenAI** selon la clé disponible, et une fonction d'envoi du fichier par email.
+
+**Réponse à votre question : non, l'abonné n'a pas besoin de mettre une clé.** On est assez bons : la synthèse tourne côté serveur avec **nos** clés. C'est même indispensable pour vendre à 9,99 € — personne ne paie 9,99 € pour ensuite devoir créer un compte Azure. Le seul point à vérifier avant de lancer : quelle clé de voix est réellement active sur le projet (ElevenLabs ou Azure). La qualité ElevenLabs est nettement supérieure en français ; c'est celle à privilégier pour un produit payant.
+
+**Ce que le bouton fera après cette mise à jour :**
+
+1. Clic sur **🎧 Version audio · 9,99 €** sous le livre.
+2. Paiement 9,99 € (carte ou PayPal), paiement unique, aucun abonnement.
+3. Choix de la voix (2 voix femme, 2 voix homme) et du découpage (un seul MP3 ou un MP3 par chapitre).
+4. Génération chapitre par chapitre avec une barre de progression honnête, sans blocage sur les longs livres.
+5. **Après le règlement, l'abonné reçoit :** la page d'écoute en ligne, le lien de téléchargement des MP3, un email de confirmation contenant les mêmes liens, et le rappel « votre audio reste disponible dans Mes livres → onglet Audio ».
+6. Le fichier est rangé dans sa bibliothèque : le lien ne se perd jamais.
+
+Pour le forfait **Studio Pro**, ce bouton affiche **« Inclus dans votre forfait »** au lieu du prix.
+
+## 9. Ambiance choisie pour le Sommaire IA
+
+Les ambiances existent déjà (14 ambiances classées claires / sombres / vibrantes / classiques, avec police et couleurs). Elles ne sont simplement pas reliées au sommaire.
+
+- À l'étape Sommaire IA, un sélecteur **« Ambiance du sommaire »** avec aperçu immédiat.
+- L'ambiance choisie décide de l'apparence du sommaire à l'export : police du titre, filet décoratif, teinte des numéros de chapitre, motif discret ou fond doré.
+- Elle est mémorisée avec le livre : le même sommaire ressort identique à chaque export.
+- Un bouton « Aperçu du sommaire » montre le rendu exact avant de générer le livre.
+
+## 10. Tout le site en clair ou en sombre
+
+- Un bouton **☀️ / 🌙** dans l'en-tête, visible sur toutes les pages V3.
+- Trois positions : Clair, Sombre, Automatique (suit le réglage de l'ordinateur).
+- Le choix est mémorisé et s'applique dès le chargement, sans clignotement blanc.
+- Le mode sombre couvre l'ensemble : barre latérale, formulaires, tableaux, panneaux de vente, lecteur de livre.
+- La lecture du livre garde son fond crème même en mode sombre (confort de lecture), avec un bouton « lire en sombre » sur cette page uniquement.
+- Aucune couleur écrite en dur : tout passe par les jetons de couleur du thème, sinon le mode sombre casse.
+
 ## Schéma détaillé
+
 
 
 ```text
@@ -147,7 +188,9 @@ Tant que le point (a) n'est pas branché, chaque campagne part à l'aveugle : c'
                        ETAPE 2 - STYLE ET LONGUEUR
                                   |
                    ETAPE 3 - SOMMAIRE IA (les 3 forfaits)
-                Plume: guide | Edition: avance | Studio Pro: series
+                 Plume: guide | Edition: avance | Studio Pro: series
+                 + AMBIANCE DU SOMMAIRE (14 ambiances, apercu)
+
                                   |
                        ETAPE 4 - PERSONNAGES
                                   |
@@ -165,7 +208,11 @@ Tant que le point (a) n'est pas branché, chaque campagne part à l'aveugle : c'
                                  propre       7 mots-cles
                                               3 categories
                                   |
-                    Second rang : 7 COUVERTURE   8 AUDIOLIVRE
+          Second rang : 7 COUVERTURE   8 VERSION AUDIO 9,99
+                        (inclus dans Studio Pro)
+                        paiement > voix > MP3 > page d ecoute
+                        + email avec les liens + Mes livres / Audio
+
                                   |
                         ONGLET COMPLEMENTS
                                   |
@@ -192,6 +239,10 @@ Tant que le point (a) n'est pas branché, chaque campagne part à l'aveugle : c'
 - Les boutons passent par l'identifiant du projet enregistré : correcteur, lecteur (`/v3/livre/:id`), panneau KDP, traduction (`translate-content` avec la langue préremplie) et export.
 - Nouvelle page et nouvel onglet « Compléments » avec masquage automatique selon le forfait (`useV3Entitlement`).
 - Aucun changement sur les accès admin, le tunnel `/commander` ni les droits des abonnés existants.
+- **Audio 9,99 €** : réécriture de `AudiobookOfferCard.tsx` (retirer la liste d'attente et l'exigence de clé Azure), création d'un prix unique 9,99 € chez le prestataire de paiement, table de commandes audio, génération par la fonction de synthèse existante (préférence ElevenLabs, repli Azure/OpenAI) en découpant le texte par chapitres, dépôt des MP3 dans le bucket `audiobooks` (public, déjà en place), envoi des liens via la fonction d'email de livraison, et onglet Audio dans « Mes livres ». Vérifier d'abord quelle clé de voix est active sur le projet ; connecter ElevenLabs si absente.
+- **Ambiance du sommaire** : réutilisation de `src/data/writingAmbiances.ts` (14 ambiances) ; l'identifiant d'ambiance est stocké dans le brief du livre et lu par le moteur d'export pour styliser la page de sommaire.
+- **Clair / sombre** : `darkMode: 'class'` est déjà configuré dans Tailwind mais aucun fournisseur de thème n'existe. Ajout d'un contexte de thème (clair / sombre / auto) appliqué sur `documentElement`, mémorisé, avec un script d'initialisation avant le premier rendu pour éviter le flash. Passage en revue des couleurs écrites en dur dans les composants V3 pour les remplacer par des jetons.
+
 
 ## Validation avant de déclarer terminé
 
@@ -200,3 +251,7 @@ Tant que le point (a) n'est pas branché, chaque campagne part à l'aveugle : c'
 3. Recharger en cours de route : langue et livre toujours là.
 4. Parcourir les 8 emplacements de prix : partout 27 / 47 / 97, jamais 17 ou 27 ancien.
 5. Ouvrir « Compléments » avec un compte Studio Pro : tout marqué inclus, rien à vendre.
+6. Payer 9,99 € en test : audio réellement généré, écoutable, téléchargeable, email reçu avec les liens, présent dans « Mes livres → Audio ».
+7. Changer d'ambiance de sommaire : l'export reflète bien le style choisi.
+8. Basculer en mode sombre et parcourir 10 pages V3 : aucun texte illisible, aucun bloc resté blanc.
+
