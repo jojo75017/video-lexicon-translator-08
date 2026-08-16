@@ -251,3 +251,7 @@ Les ambiances existent déjà (14 ambiances classées claires / sombres / vibran
 3. Recharger en cours de route : langue et livre toujours là.
 4. Parcourir les 8 emplacements de prix : partout 27 / 47 / 97, jamais 17 ou 27 ancien.
 5. Ouvrir « Compléments » avec un compte Studio Pro : tout marqué inclus, rien à vendre.
+6. Payer 9,99 € en test : audio réellement généré, écoutable, téléchargeable, email reçu avec les liens, présent dans « Mes livres → Audio ».
+7. Changer d'ambiance de sommaire : l'export reflète bien le style choisi.
+8. Basculer en mode sombre et parcourir 10 pages V3 : aucun texte illisible, aucun bloc resté blanc.
+
