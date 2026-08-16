@@ -64,6 +64,40 @@ export interface ResendResult {
   quotaExhausted?: boolean;
 }
 
+/**
+ * Version texte brut dérivée du HTML.
+ *
+ * Un email HTML envoyé sans partie texte est pénalisé par Gmail et Outlook
+ * (signal de spam). On la génère systématiquement quand l'appelant n'en
+ * fournit pas, en conservant les liens sous la forme « libellé (url) ».
+ */
+export function htmlToPlainText(html: string): string {
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi, (_m, href, label) => {
+      const text = String(label).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+      return text ? `${text} (${href})` : String(href);
+    })
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/(p|div|tr|h[1-6]|li|table)>/gi, "\n\n")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&rsquo;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&euro;/g, "€")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .split("\n")
+    .map((line) => line.trim())
+    .join("\n")
+    .trim();
+}
+
 export async function sendResendEmailThrottled(
   payload: ResendPayload,
   opts: { apiKey?: string } = {},
@@ -74,9 +108,15 @@ export async function sendResendEmailThrottled(
   const apiKey = opts.apiKey || Deno.env.get("RESEND_API_KEY");
   if (!apiKey) return { ok: false, detail: "RESEND_API_KEY manquante" };
 
+  // Toujours envoyer une alternative texte : elle améliore la délivrabilité.
+  if (!payload.text && payload.html) {
+    payload = { ...payload, text: htmlToPlainText(payload.html) };
+  }
+
   if (dailyQuotaHit) {
     return { ok: false, status: 429, detail: "daily_quota_exceeded (short-circuit)", quotaExhausted: true };
   }
+
 
   for (let attempt = 0; attempt <= MAX_RETRIES_ON_RATE_LIMIT; attempt++) {
     await waitForSlot();
