@@ -188,7 +188,9 @@ Les ambiances existent déjà (14 ambiances classées claires / sombres / vibran
                        ETAPE 2 - STYLE ET LONGUEUR
                                   |
                    ETAPE 3 - SOMMAIRE IA (les 3 forfaits)
-                Plume: guide | Edition: avance | Studio Pro: series
+                 Plume: guide | Edition: avance | Studio Pro: series
+                 + AMBIANCE DU SOMMAIRE (14 ambiances, apercu)
+
                                   |
                        ETAPE 4 - PERSONNAGES
                                   |
