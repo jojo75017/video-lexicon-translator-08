@@ -148,6 +148,49 @@ export default function EmailHealthPanel() {
           </p>
         )}
 
+        <div className="rounded-lg border border-border bg-muted/30 p-3">
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <p className="text-sm font-semibold text-foreground">
+              Authentification du domaine d'envoi
+              {diag ? ` — ${diag.from_address}` : ''}
+            </p>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => void loadDiagnostic()}
+              disabled={busy !== null}
+            >
+              {busy === 'diagnostic'
+                ? <Loader2 className="h-4 w-4 animate-spin" />
+                : 'Relancer le diagnostic'}
+            </Button>
+          </div>
+
+          {!diag && <p className="text-sm text-muted-foreground">Diagnostic en cours…</p>}
+
+          {diag && (
+            <div className="space-y-2">
+              {diag.checks.map((c) => (
+                <div key={c.key} className="text-sm">
+                  <p className={c.ok ? 'text-emerald-400' : 'text-red-400'}>
+                    {c.ok ? '✓' : '✗'} {c.label}
+                  </p>
+                  <p className="break-all pl-4 text-xs text-muted-foreground">{c.value}</p>
+                  {!c.ok && (
+                    <p className="pl-4 text-xs text-amber-400">À faire : {c.fix}</p>
+                  )}
+                </div>
+              ))}
+              <p className="pt-1 text-xs text-muted-foreground">
+                Réponses reçues sur {diag.reply_to} · livraisons confirmées :{' '}
+                {diag.delivery_confirmed} / {diag.delivery_total} envois (14 jours)
+              </p>
+            </div>
+          )}
+        </div>
+
+
+
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           {[
             { label: 'Envoyés', value: t?.sent ?? 0, sub: '' },
