@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Gem } from 'lucide-react';
-import V3PublicLayout from '@/components/v3public/V3PublicLayout';
 import V3AddonCards from '@/components/v3public/V3AddonCards';
 import { V3_PLANS, formatPrice } from '@/data/v3Pricing';
 
@@ -9,7 +8,7 @@ export default function V3UpsellsPage() {
   const studio = V3_PLANS[V3_PLANS.length - 1];
 
   return (
-    <V3PublicLayout>
+    <>
       <title>Compléments & options V3 — Ebookstudio</title>
       <meta
         name="description"
@@ -42,7 +41,7 @@ export default function V3UpsellsPage() {
                 Tout inclus : {studio?.name ?? 'Studio Pro'}
               </h2>
               <p className="mt-1 text-sm" style={{ color: 'var(--v3-muted)' }}>
-                {studio ? `${formatPrice(studio.monthly)} / mois` : '97 € / mois'} — l'ensemble des
+                {studio ? `${formatPrice(studio.monthlyPrice)} / mois` : '97 € / mois'} — l'ensemble des
                 compléments ci-dessus, sans achat à l'unité.
               </p>
             </div>
@@ -52,6 +51,6 @@ export default function V3UpsellsPage() {
           </div>
         </section>
       </div>
-    </V3PublicLayout>
+    </>
   );
 }
