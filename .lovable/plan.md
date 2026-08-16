@@ -12,7 +12,44 @@
 
 Conclusion : on ne corrige pas la conversion avant d'avoir la preuve de livraison. Les deux chantiers se font dans cet ordre.
 
+## Quel expéditeur, et quels enregistrements DNS exactement
+
+J'ai vérifié les deux domaines à l'instant.
+
+**`ebookstudio.fr` (expéditeur actuel `noreply@ebookstudio.fr`)**
+- SPF : `v=spf1 include:amazonses.com ~all` — correct, ne pas y toucher.
+- DKIM : `resend._domainkey.ebookstudio.fr` présent — correct.
+- DMARC : **à remplacer**. Valeur publiée aujourd'hui, invalide :
+  `v=DMARC1; p = aucun ; rua=mailto:rua@dmarc.brevo.com`
+  Le mot « aucun » et les espaces autour du `=` rendent l'enregistrement illisible pour Gmail. À remplacer par exactement :
+
+```text
+Type : TXT
+Nom  : _dmarc
+Valeur : v=DMARC1; p=none; rua=mailto:boubetgeorges@gmail.com; adkim=r; aspf=r; fo=1
+```
+
+C'est **le seul** enregistrement à changer sur `ebookstudio.fr`. Une fois corrigé, l'authentification est complète (SPF + DKIM + DMARC alignés) : Gmail n'a rien d'autre à recevoir de votre part, le contrôle se fait uniquement sur ces trois enregistrements.
+
+**`georgesboubet.com` (expéditeur souhaité `support@georgesboubet.com`)**
+- DMARC déjà valide : `v=DMARC1; p=none`.
+- SPF actuel : `v=spf1 mx a include:_spf.mail.hostinger.com include:_spf.getresponse.com ~all` — il n'autorise **pas** encore notre moteur d'envoi.
+- Aucun DKIM d'envoi n'existe sur ce domaine.
+- Une boîte mail est bien possible : les MX pointent vers Hostinger, donc `support@georgesboubet.com` peut recevoir vos réponses.
+
+Pour l'utiliser comme expéditeur des campagnes, il faudrait ajouter ce domaine dans le moteur d'envoi puis publier son DKIM et étendre le SPF :
+
+```text
+SPF (modifier l'existant) :
+v=spf1 mx a include:_spf.mail.hostinger.com include:_spf.getresponse.com include:amazonses.com ~all
+
+DKIM : enregistrement TXT fourni par le moteur d'envoi lors de l'ajout du domaine
+```
+
+**Recommandation** : garder `noreply@ebookstudio.fr` comme expéditeur des campagnes (domaine déjà authentifié, avec de l'historique d'envoi), corriger uniquement le DMARC, et mettre `support@georgesboubet.com` en **adresse de réponse**. Créer un domaine d'envoi neuf juste avant une campagne repart d'une réputation à zéro et augmente le risque de spam. On pourra basculer l'expéditeur plus tard, une fois `georgesboubet.com` chauffé.
+
 ## Étape 1 — Prouver que les emails arrivent (avant tout nouvel envoi)
+
 
 1. **Réparer DMARC** : publier chez le fournisseur DNS `v=DMARC1; p=none; rua=mailto:boubetgeorges@gmail.com; fo=1` en remplacement de l'enregistrement actuel. C'est une action à faire dans l'interface DNS ; les valeurs exactes vous seront données.
 2. **Remplacer la clé d'envoi par une clé à accès complet** (envoi + lecture), afin que la synchronisation des livraisons fonctionne. Sans cela, aucun statut ne remontera jamais.
@@ -20,6 +57,8 @@ Conclusion : on ne corrige pas la conversion avant d'avoir la preuve de livraiso
 4. **Ajouter un test d'arrivée réel** avant chaque campagne : un envoi vers votre adresse Gmail plus une adresse Outlook et une Yahoo, marqué `[TEST]`, avec affichage du statut d'authentification obtenu.
 5. **Nettoyer la liste** : les adresses en rebond dur et les jamais-ouvreurs après 5 envois sortent définitivement des envois.
 6. **Panneau admin lisible** : par email, envoyés / livrés / rebonds / plaintes / ouvertures / clics, plus un bandeau rouge tant que le taux de livraison n'est pas confirmé.
+7. **Mettre `support@georgesboubet.com` en adresse de réponse** de tous les envois, dès que la boîte est active.
+
 
 ## Étape 2 — Reprendre proprement les vagues bloquées
 
