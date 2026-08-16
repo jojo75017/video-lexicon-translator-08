@@ -27,6 +27,12 @@ const ALLOWED_PRICES = new Set([
   "v3_studio_annual_legacy",
   // Version audio d'un livre (paiement unique)
   "v3_audio_single",
+  // Compléments (paiement unique)
+  "v3_addon_bookperfect_once",
+  "v3_addon_translations_once",
+  "v3_addon_audio_premium_once",
+  "v3_addon_publishers_once",
+  "v3_addon_serenity_once",
   // Legacy / upsells
   "v3_upsell_selection_month",
   "v3_upsell_aplus_month",

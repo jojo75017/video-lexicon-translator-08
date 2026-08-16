@@ -161,6 +161,8 @@ export function formatPrice(amount: number): string {
 
 export interface V3Addon {
   key: string;
+  /** Identifiant de prix (paiement unique) autorisé côté serveur. */
+  priceId: string;
   title: string;
   description: string;
   price: number;
@@ -174,6 +176,7 @@ export interface V3Addon {
 export const V3_ADDON_LIST: V3Addon[] = [
   {
     key: "bookperfect",
+    priceId: "v3_addon_bookperfect_once",
     title: "BookPerfect AI — Directeur Éditorial",
     description: "Analyse éditoriale complète + export Word corrigé, chapitre par chapitre.",
     price: 97,
@@ -182,6 +185,7 @@ export const V3_ADDON_LIST: V3Addon[] = [
   },
   {
     key: "translations",
+    priceId: "v3_addon_translations_once",
     title: "Pack Traductions relues",
     description: "Traduction de votre livre en 10 langues, relue et harmonisée.",
     price: 97,
@@ -190,6 +194,7 @@ export const V3_ADDON_LIST: V3Addon[] = [
   },
   {
     key: "audio_premium",
+    priceId: "v3_addon_audio_premium_once",
     title: "Audiolivre Premium",
     description: "Voix premium, chapitrage, master audio prêt pour la distribution.",
     price: 67,
@@ -198,6 +203,7 @@ export const V3_ADDON_LIST: V3Addon[] = [
   },
   {
     key: "audio_single",
+    priceId: "v3_audio_single",
     title: "Version audio d'un livre",
     description: "Un livre converti en MP3, voix naturelle, écoute et téléchargement immédiats.",
     price: 9.99,
@@ -206,6 +212,7 @@ export const V3_ADDON_LIST: V3Addon[] = [
   },
   {
     key: "publishers",
+    priceId: "v3_addon_publishers_once",
     title: "Sélection maisons d'édition",
     description: "Liste ciblée d'éditeurs + lettre d'accompagnement personnalisée.",
     price: 77,
@@ -214,6 +221,7 @@ export const V3_ADDON_LIST: V3Addon[] = [
   },
   {
     key: "serenity",
+    priceId: "v3_addon_serenity_once",
     title: "Pack Sérénité",
     description: "Session Zoom 1-à-1 + support prioritaire + audit complet de votre ebook.",
     price: 30,
