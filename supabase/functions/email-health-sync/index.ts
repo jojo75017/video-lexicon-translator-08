@@ -239,7 +239,69 @@ Deno.serve(async (req) => {
       });
     }
 
+    // ------------------------------------------------------------ diagnostic
+    // Contrôle réel de l'authentification du domaine d'envoi (SPF, DKIM,
+    // DMARC) et de la capacité de la clé à lire les évènements de livraison.
+    if (mode === "diagnostic") {
+      const checks: Array<{
+        key: string; label: string; ok: boolean; value: string; fix: string;
+      }> = [];
+
+      for (const [key, label, name, test, fix] of DNS_CHECKS) {
+        const value = await txtRecord(name);
+        checks.push({
+          key, label, ok: test(value), value: value || "(aucun enregistrement)", fix,
+        });
+      }
+
+      // Capacité de la clé : une clé « envoi seul » renvoie 401 restricted_api_key.
+      const apiKey = Deno.env.get("RESEND_API_KEY");
+      let keyOk = false;
+      let keyValue = "RESEND_API_KEY absente";
+      if (apiKey) {
+        try {
+          const res = await fetch("https://api.resend.com/domains", {
+            headers: { Authorization: `Bearer ${apiKey}` },
+          });
+          const text = (await res.text()).slice(0, 200);
+          keyOk = res.ok;
+          keyValue = res.ok
+            ? "clé complète : lecture des évènements possible"
+            : `HTTP ${res.status} — ${text}`;
+        } catch (err) {
+          keyValue = `appel impossible : ${String(err)}`;
+        }
+      }
+      checks.push({
+        key: "api_key",
+        label: "Clé d'envoi (lecture des livraisons)",
+        ok: keyOk,
+        value: keyValue,
+        fix: "Créer une clé à accès complet (envoi + lecture) et la remplacer dans les secrets du projet.",
+      });
+
+      // Part d'envois dont la livraison n'est pas confirmée.
+      const { count: total } = await db
+        .from("email_send_log").select("id", { count: "exact", head: true }).gte("created_at", since);
+      const { count: confirmed } = await db
+        .from("email_send_log").select("id", { count: "exact", head: true })
+        .gte("created_at", since).not("last_event", "is", null);
+
+      return respond({
+        success: true,
+        mode,
+        days,
+        from_address: FROM_ADDRESS,
+        reply_to: REPLY_TO_ADDRESS,
+        checks,
+        blocking: checks.filter((c) => !c.ok).map((c) => c.key),
+        delivery_confirmed: confirmed ?? 0,
+        delivery_total: total ?? 0,
+      });
+    }
+
     return respond({ error: `Mode inconnu : ${mode}` }, 400);
+
   } catch (e) {
     console.error("email-health-sync error:", e);
     return respond({ error: e instanceof Error ? e.message : "Erreur inconnue" }, 500);
