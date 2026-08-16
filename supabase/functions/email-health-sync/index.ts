@@ -25,8 +25,53 @@ const RESEND_API = "https://api.resend.com/emails";
 const MAX_SYNC = 200;
 const NEVER_OPENED_MIN_SENDS = 5;
 
+const SEND_DOMAIN = "ebookstudio.fr";
+const FROM_ADDRESS = `noreply@${SEND_DOMAIN}`;
+const REPLY_TO_ADDRESS = "support@georgesboubet.com";
+
+/** Lit un enregistrement TXT public (résolveur DNS de Google). */
+async function txtRecord(name: string): Promise<string> {
+  try {
+    const res = await fetch(`https://dns.google/resolve?name=${encodeURIComponent(name)}&type=TXT`);
+    if (!res.ok) return "";
+    const payload = await res.json() as { Answer?: Array<{ data?: string }> };
+    return (payload.Answer || [])
+      .map((a) => String(a.data || "").replace(/^"|"$/g, ""))
+      .join(" | ");
+  } catch {
+    return "";
+  }
+}
+
+/** Contrôles d'authentification attendus sur le domaine d'envoi. */
+const DNS_CHECKS: Array<[string, string, string, (v: string) => boolean, string]> = [
+  [
+    "spf",
+    "SPF (autorisation d'envoi)",
+    SEND_DOMAIN,
+    (v) => /v=spf1/i.test(v) && /amazonses\.com/i.test(v),
+    `Publier sur ${SEND_DOMAIN} : v=spf1 include:amazonses.com ~all`,
+  ],
+  [
+    "dkim",
+    "DKIM (signature des messages)",
+    `resend._domainkey.${SEND_DOMAIN}`,
+    (v) => /p=[A-Za-z0-9+/]{100,}/.test(v),
+    `Publier la clé DKIM fournie par le moteur d'envoi sur resend._domainkey.${SEND_DOMAIN}`,
+  ],
+  [
+    "dmarc",
+    "DMARC (politique déclarée)",
+    `_dmarc.${SEND_DOMAIN}`,
+    // Gmail exige une politique lisible : `p=none` sans espace et en anglais.
+    (v) => /v=DMARC1\s*;/i.test(v) && /(^|;)\s*p=(none|quarantine|reject)\s*(;|$)/i.test(v),
+    "Remplacer l'enregistrement TXT _dmarc par : v=DMARC1; p=none; rua=mailto:boubetgeorges@gmail.com; adkim=r; aspf=r; fo=1",
+  ],
+];
+
 const isTestAddress = (email: string) =>
   /@example\.com$/i.test(email) || /^test[.\-+]/i.test(email) || email.includes("+test@");
+
 
 async function isAdmin(req: Request, baseUrl: string) {
   const authorization = req.headers.get("Authorization");
