@@ -296,11 +296,11 @@ Deno.serve(async (req) => {
       for (const email of targets) {
         const profile = profiles.get(email);
         const result = await sendResendEmailThrottled({
-          from: "Georges Boubet <noreply@ebookstudio.fr>",
+          from: FROM_CAMPAIGN,
           to: [email],
           subject: STEPS[step - 1].subject,
           html: render(baseUrl, email, (profile?.first_name as string) || "", step),
-          reply_to: "contact@ebookstudio.fr",
+          reply_to: REPLY_TO,
         });
         await db.from("email_send_log").insert({ recipient_email: email, template_name: resendTemplate, message_id: result.id || `${CAMPAIGN}-${resendTemplate}-${email}`, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
         if (!result.ok) { if (isQuotaExhausted()) break; continue; }
@@ -342,11 +342,11 @@ Deno.serve(async (req) => {
       for (const email of targets) {
         const profile = profiles.get(email);
         const result = await sendResendEmailThrottled({
-          from: "Georges Boubet <noreply@ebookstudio.fr>",
+          from: FROM_CAMPAIGN,
           to: [email],
           subject: STEPS[step - 1].subject,
           html: render(baseUrl, email, (profile?.first_name as string) || "", step),
-          reply_to: "contact@ebookstudio.fr",
+          reply_to: REPLY_TO,
         });
         await db.from("email_send_log").insert({ recipient_email: email, template_name: template, message_id: result.id || `${CAMPAIGN}-${step}-${email}`, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
         if (!result.ok) { if (isQuotaExhausted()) break; continue; }
@@ -410,7 +410,7 @@ Deno.serve(async (req) => {
         const { count } = await db.from("email_send_log").select("id", { count: "exact", head: true }).eq("recipient_email", email).eq("template_name", template).in("status", ["sent", "delivered"]);
         if ((count || 0) > 0) { skipped++; continue; }
       }
-      const result = await sendResendEmailThrottled({ from: "Georges Boubet <noreply@ebookstudio.fr>", to: [email], subject: `${mode === "test" ? "[TEST] " : ""}${STEPS[step - 1].subject}`, html: render(baseUrl, email, recipient.first_name || "", step), reply_to: "contact@ebookstudio.fr" });
+      const result = await sendResendEmailThrottled({ from: FROM_CAMPAIGN, to: [email], subject: `${mode === "test" ? "[TEST] " : ""}${STEPS[step - 1].subject}`, html: render(baseUrl, email, recipient.first_name || "", step), reply_to: REPLY_TO });
       await db.from("email_send_log").insert({ recipient_email: email, template_name: template, message_id: result.id || `${CAMPAIGN}-${step}-${email}`, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
       if (!result.ok) { if (isQuotaExhausted()) break; continue; }
       sent++;

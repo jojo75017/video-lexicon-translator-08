@@ -30,7 +30,7 @@ const CAMPAIGN = "conversion-2026";
 const CHECKOUT = CHECKOUT_URL;
 const DEMO_URL = "https://ebookstudio.fr/demo";
 const GIFT_URL = "https://ebookstudio.fr/10-niches-offertes";
-const DIRECT_EMAIL = "boubetgeorges@gmail.com";
+import { DIRECT_EMAIL, FROM_CAMPAIGN, REPLY_TO } from "../_shared/emailIdentity.ts";
 
 type Segment = "never_opened" | "openers_no_click" | "clickers";
 /** Cible du bouton principal : le cadeau (sans risque) ou la page de paiement. */
@@ -457,11 +457,11 @@ Deno.serve(async (req) => {
       const testEmail = normalize(String(body.test_email || ""));
       if (!isEmail(testEmail)) return respond({ error: "Adresse de test invalide" }, 400);
       const result = await sendResendEmailThrottled({
-        from: "Georges Boubet <noreply@ebookstudio.fr>",
+        from: FROM_CAMPAIGN,
         to: [testEmail],
         subject: `[TEST] ${letter.subject}`,
         html: render(baseUrl, testEmail, "Georges", letter, letter.subject),
-        reply_to: DIRECT_EMAIL,
+        reply_to: REPLY_TO,
       });
       if (!result.ok) return respond({ error: `Envoi refusé (HTTP ${result.status || ""}) ${result.detail || ""}` }, 502);
       return respond({ success: true, mode, template: letter.key, sent: 1 });
@@ -535,11 +535,11 @@ Deno.serve(async (req) => {
         error_message: null,
       });
       const result = await sendResendEmailThrottled({
-        from: "Georges Boubet <noreply@ebookstudio.fr>",
+        from: FROM_CAMPAIGN,
         to: [email],
         subject,
         html: render(baseUrl, email, (profile?.first_name as string) || "", letter, subject),
-        reply_to: DIRECT_EMAIL,
+        reply_to: REPLY_TO,
       });
       await db.from("email_send_log").insert({
         recipient_email: email,
