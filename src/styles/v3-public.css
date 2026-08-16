@@ -275,12 +275,23 @@
   color: var(--v3-ink);
 }
 /* Les boutons pleins et les sections déjà sombres gardent leur fond */
-.dark .v3pub .v3-btn-gold,
-.dark .v3pub .v3-btn-primary,
-.dark .v3pub .v3-section-dark,
-.dark .v3pub [style*="linear-gradient"] {
-  background-color: initial !important;
+.dark .v3pub .v3-btn-primary {
+  background: var(--v3-emerald) !important;
+  color: #fff !important;
 }
+.dark .v3pub .v3-btn-primary:hover { background: var(--v3-emerald-600) !important; }
+.dark .v3pub .v3-btn-gold {
+  background: var(--v3-gold) !important;
+  color: #17120a !important;
+}
+.dark .v3pub .v3-btn-gold:hover { background: var(--v3-gold-600) !important; }
+.dark .v3pub .v3-btn-outline {
+  background: transparent !important;
+  border-color: var(--v3-emerald-600) !important;
+  color: var(--v3-emerald-600) !important;
+}
+.dark .v3pub .v3-btn-outline:hover { background: var(--v3-emerald) !important; color: #fff !important; }
+.dark .v3pub .v3-section-dark { background-color: initial !important; }
 
 .dark .v3pub input,
 .dark .v3pub textarea,
