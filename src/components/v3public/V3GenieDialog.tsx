@@ -4,16 +4,20 @@ import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
-import { appendSourceText, readBookBrief, resetBookProject, writeBookBrief, type BookBrief } from '@/lib/v3/bookBrief';
+import {
+  appendSourceText, mergeRespectingLocks, readBookBrief, resetBookProject, writeBookBrief, type BookBrief,
+} from '@/lib/v3/bookBrief';
 import { currentInterviewStep, stepLabel, type InterviewStep } from '@/lib/v3/genieInterview';
 
 import {
   clearLocalThread,
   clearRemoteThread,
+  countTextWords,
   describeBriefChanges,
   loadRemoteThread,
   makeMessage,
   readLocalThread,
+  rebuildSourceText,
   saveRemoteMessage,
   writeLocalThread,
   type GenieMessage,
