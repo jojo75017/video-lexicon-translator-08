@@ -76,13 +76,36 @@ export default function EmailHealthPanel() {
   const [testResult, setTestResult] = useState<TestPayload | null>(null);
 
   const call = useCallback(async (mode: string, extra: Record<string, unknown> = {}) => {
+    // La session admin peut avoir expiré depuis l'ouverture de l'onglet : on
+    // rafraîchit le jeton avant l'appel et on l'envoie explicitement, sinon la
+    // fonction répond 403 « Accès administrateur requis ».
+    const token = await ensureFreshAccessToken();
     const { data: res, error } = await supabase.functions.invoke('email-health-sync', {
       body: { mode, days: 14, ...extra },
+      ...(token ? { headers: { Authorization: `Bearer ${token}` } } : {}),
     });
-    if (error) throw error;
+    if (error) {
+      // `invoke` masque la vraie cause derrière « non-2xx status code ».
+      let detail = error.message;
+      const ctx = (error as { context?: Response }).context;
+      if (ctx && typeof ctx.text === 'function') {
+        const raw = await ctx.text().catch(() => '');
+        try {
+          const parsed = JSON.parse(raw) as { error?: string };
+          if (parsed?.error) detail = parsed.error;
+        } catch {
+          if (raw) detail = raw.slice(0, 300);
+        }
+      }
+      if (/administrateur/i.test(detail)) {
+        detail = 'Session admin expirée : reconnectez-vous puis relancez.';
+      }
+      throw new Error(detail);
+    }
     if ((res as { error?: string })?.error) throw new Error((res as { error: string }).error);
     return res as Record<string, unknown>;
   }, []);
+
 
   const load = useCallback(async () => {
     setLoading(true);
