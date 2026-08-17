@@ -71,9 +71,14 @@ export default function EmailHealthPanel() {
   const [diag, setDiag] = useState<DiagnosticPayload | null>(null);
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
+  const [showTestInput, setShowTestInput] = useState(false);
+  const [testAddresses, setTestAddresses] = useState('boubetgeorges@gmail.com');
+  const [testResult, setTestResult] = useState<TestPayload | null>(null);
 
-  const call = useCallback(async (mode: string) => {
-    const { data: res, error } = await supabase.functions.invoke('email-health-sync', { body: { mode, days: 14 } });
+  const call = useCallback(async (mode: string, extra: Record<string, unknown> = {}) => {
+    const { data: res, error } = await supabase.functions.invoke('email-health-sync', {
+      body: { mode, days: 14, ...extra },
+    });
     if (error) throw error;
     if ((res as { error?: string })?.error) throw new Error((res as { error: string }).error);
     return res as Record<string, unknown>;
@@ -100,6 +105,26 @@ export default function EmailHealthPanel() {
       setBusy(null);
     }
   }, [call]);
+
+  const runTest = useCallback(async () => {
+    const addresses = testAddresses.split(/[,;\s]+/).map((s) => s.trim()).filter(Boolean);
+    if (!addresses.length) {
+      toast.error('Aucune adresse de test valide');
+      return;
+    }
+    setBusy('test');
+    try {
+      const res = await call('deliverability_test', { addresses });
+      setTestResult(res as unknown as TestPayload);
+      const okCount = (res as unknown as TestPayload).results.filter((r) => r.ok).length;
+      toast.success(`${okCount} test(s) envoyé(s) sur ${(res as unknown as TestPayload).results.length}`);
+      await load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Test impossible');
+    } finally {
+      setBusy(null);
+    }
+  }, [call, load, testAddresses]);
 
   useEffect(() => { void load(); void loadDiagnostic(); }, [load, loadDiagnostic]);
 
