@@ -1159,6 +1159,7 @@ export type Database = {
           id: string
           last_event: string | null
           message_id: string | null
+          provider_message_id: string | null
           recipient_email: string
           status: string
           template_name: string | null
@@ -1170,6 +1171,7 @@ export type Database = {
           id?: string
           last_event?: string | null
           message_id?: string | null
+          provider_message_id?: string | null
           recipient_email: string
           status?: string
           template_name?: string | null
@@ -1181,6 +1183,7 @@ export type Database = {
           id?: string
           last_event?: string | null
           message_id?: string | null
+          provider_message_id?: string | null
           recipient_email?: string
           status?: string
           template_name?: string | null

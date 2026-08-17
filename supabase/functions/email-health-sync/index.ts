@@ -190,9 +190,8 @@ Deno.serve(async (req) => {
 
       const { data: pending } = await db
         .from("email_send_log")
-        .select("id,message_id,recipient_email")
+        .select("id,message_id,provider_message_id,recipient_email")
         .is("last_event", null)
-        .not("message_id", "is", null)
         .gte("created_at", since)
         .order("created_at", { ascending: false })
         .limit(MAX_SYNC);
@@ -202,7 +201,9 @@ Deno.serve(async (req) => {
       const events: Record<string, number> = {};
 
       for (const row of pending || []) {
-        const id = String(row.message_id || "");
+        // On interroge Resend avec son propre identifiant : `message_id`
+        // contient souvent notre clé d'idempotence, inutilisable côté API.
+        const id = String(row.provider_message_id || row.message_id || "");
         // Les identifiants internes de repli ne sont pas des ID Resend.
         if (!/^[0-9a-f-]{30,40}$/i.test(id)) { unknown++; continue; }
         checked++;
@@ -464,6 +465,7 @@ Deno.serve(async (req) => {
         if (res.ok && res.id) {
           await db.from("email_send_log").insert({
             message_id: res.id,
+            provider_message_id: res.id,
             template_name: "deliverability-test",
             recipient_email: to,
             status: "sent",
@@ -475,6 +477,7 @@ Deno.serve(async (req) => {
           to,
           ok: res.ok,
           message_id: res.id,
+            provider_message_id: res.id,
           detail: res.detail,
           quotaExhausted: res.quotaExhausted,
         });
