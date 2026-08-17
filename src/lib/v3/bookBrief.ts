@@ -104,7 +104,15 @@ function readJSON<T>(key: string, fallback: T): T {
 export function readBookBrief(): BookBrief | null {
   const brief = readJSON<BookBrief | null>(WIZARD_BRIEF_KEY, null);
   if (!brief) return null;
-  const hasSomething = Boolean((brief.title || '').trim() || (brief.description || '').trim());
+  // Un récit peut exister avant que le Génie ait proposé un titre ou un résumé.
+  // Ne jamais considérer cette fiche comme vide : sinon la colonne de droite
+  // perd la matière reconstruite et affiche « Projet sans titre ».
+  const hasSomething = Boolean(
+    (brief.title || '').trim()
+    || (brief.description || '').trim()
+    || (brief.sourceText || '').trim()
+    || (brief.outline || []).length,
+  );
   return hasSomething ? brief : null;
 }
 
