@@ -106,7 +106,13 @@ Deno.serve(async (req) => {
     const history = (Array.isArray(body.history) ? body.history : [])
       .filter((m) => m && typeof m.content === "string" && m.content.trim())
       .slice(-12)
-      .map((m) => `${m.role === "assistant" ? "Génie" : "Auteur"} : ${String(m.content).slice(0, 900)}`)
+      // Les messages de l'auteur ne sont plus rognés à 900 caractères : un long
+      // souvenir raconté d'un seul bloc doit rester entier dans la mémoire.
+      .map((m) =>
+        m.role === "assistant"
+          ? `Génie : ${String(m.content).slice(0, 900)}`
+          : `Auteur : ${String(m.content).slice(0, 6000)}`,
+      )
       .join("\n");
 
     const historyBlock = history
