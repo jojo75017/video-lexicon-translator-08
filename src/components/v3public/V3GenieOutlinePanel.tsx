@@ -129,6 +129,37 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
   const writtenTitles = new Set(written.map((c) => c.title.toLowerCase().trim()));
   const writing = progress.activeIndex >= 0 && progress.activeIndex < totalChapters;
 
+  const sourceText = String(brief.sourceText || '').trim();
+  const sourceWords = countTextWords(sourceText);
+  const estimatedTotal = (Number(brief.chapters) || 0) * (Number(brief.wordsPerChapter) || 0);
+
+  /** Saisie d'un réglage : on enregistre et on verrouille le champ. */
+  const setSetting = (field: LockableField, raw: string) => {
+    const current = readBookBrief() || {};
+    let value: string | number | undefined;
+    if (field === 'chapters') {
+      const n = Number(raw);
+      value = raw.trim() === '' ? undefined : Math.min(40, Math.max(3, Math.round(n) || 3));
+    } else if (field === 'wordsPerChapter') {
+      const n = Number(raw);
+      value = raw.trim() === '' ? undefined : Math.min(3500, Math.max(800, Math.round(n) || 800));
+    } else {
+      value = raw;
+    }
+    const next: BookBrief = { ...current, [field]: value, lockedFields: lockField(current, field) } as BookBrief;
+    setBrief(next);
+    writeBookBrief(next);
+  };
+
+  const unlock = (field: LockableField) => {
+    const current = readBookBrief() || {};
+    const next: BookBrief = { ...current, lockedFields: unlockField(current, field) };
+    setBrief(next);
+    writeBookBrief(next);
+    toast.success('Le Génie pourra de nouveau proposer cette valeur.');
+  };
+
+
   return (
     <div className="space-y-4">
       <div className="rounded-[22px] border p-4 md:p-5" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
