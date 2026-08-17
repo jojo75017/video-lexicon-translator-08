@@ -144,7 +144,7 @@ export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMod
           </div>
         </div>
 
-        {hideBookForm && !essentialsMissing && (
+        {hideBookForm && !formOnly && (
           <button type="button" onClick={() => setFormOpen((v) => !v)} className="v3-btn v3-btn-outline mt-4">
             {formOpen ? 'Masquer la fiche du livre' : 'Modifier la fiche du livre'}
           </button>
