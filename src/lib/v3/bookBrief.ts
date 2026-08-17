@@ -85,9 +85,24 @@ export function writeBookBrief(brief: BookBrief) {
 }
 
 
+/**
+ * Ajoute les mots de l'auteur à la matière brute, sans rien perdre.
+ * Les doublons exacts sont ignorés (envoi deux fois du même passage).
+ */
+export function appendSourceText(previous: string | undefined, addition: string): string {
+  const clean = String(addition || '').trim();
+  const base = String(previous || '').trim();
+  if (!clean) return base;
+  if (base.includes(clean)) return base;
+  const merged = base ? `${base}\n\n${clean}` : clean;
+  // Garde-fou localStorage : on conserve les 60 000 derniers caractères.
+  return merged.length > 60000 ? merged.slice(merged.length - 60000) : merged;
+}
+
 /** Efface la fiche du livre en cours (titre, synopsis, etc.). */
 export function clearBookBrief() {
   try {
+
     localStorage.removeItem(WIZARD_BRIEF_KEY);
     window.dispatchEvent(new CustomEvent(BOOK_BRIEF_EVENT));
   } catch {
