@@ -84,11 +84,10 @@ export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMod
   const recommended: string[] = [];
   if (!(brief.promesseCentrale || '').trim()) recommended.push('la Cible & Promesse (bouton IA)');
   const ready = missing.length === 0;
-  // Titre, auteur ou synopsis manquant : la fiche doit rester accessible,
-  // sinon le sommaire ne peut pas être généré.
-  const essentialsMissing =
-    !(brief.title || '').trim() || !(brief.author || '').trim() || (brief.description || '').trim().length < 30;
-  const showForm = !hideBookForm || formOpen || essentialsMissing;
+  // La fiche n'est jamais ouverte automatiquement : le dialogue Génie reste
+  // la voie principale, la saisie manuelle est un repli volontaire.
+  const showForm = formOnly || !hideBookForm || formOpen;
+
 
 
 
