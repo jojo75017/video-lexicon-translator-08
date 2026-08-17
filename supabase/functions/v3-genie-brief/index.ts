@@ -82,13 +82,29 @@ Deno.serve(async (req) => {
   if (req.method !== "POST") return json(405, { error: "Method not allowed" });
 
   try {
-    const body = (await req.json()) as { message?: string; userApiKey?: string; author?: string };
+    const body = (await req.json()) as {
+      message?: string;
+      userApiKey?: string;
+      author?: string;
+      history?: Array<{ role?: string; content?: string }>;
+    };
     const message = String(body.message || "").trim();
     if (message.length < 10) return json(400, { error: "Décrivez votre livre en quelques mots." });
 
-    const prompt = `Tu es directeur éditorial KDP francophone. Un auteur te décrit librement son projet de livre.
+    // Mémoire de conversation : le Génie doit tenir compte de tout ce qui a déjà été dit.
+    const history = (Array.isArray(body.history) ? body.history : [])
+      .filter((m) => m && typeof m.content === "string" && m.content.trim())
+      .slice(-12)
+      .map((m) => `${m.role === "assistant" ? "Génie" : "Auteur"} : ${String(m.content).slice(0, 900)}`)
+      .join("\n");
 
-Message de l'auteur :
+    const historyBlock = history
+      ? `\nHistorique de la conversation (à respecter : ne perds rien de ce qui a déjà été décidé, applique seulement les nouvelles précisions) :\n"""${history}"""\n`
+      : "";
+
+    const prompt = `Tu es directeur éditorial KDP francophone. Un auteur te décrit librement son projet de livre.
+${historyBlock}
+Dernier message de l'auteur :
 """${message.slice(0, 5000)}"""
 
 Déduis la fiche complète du livre. Réponds STRICTEMENT en JSON valide, sans markdown :
