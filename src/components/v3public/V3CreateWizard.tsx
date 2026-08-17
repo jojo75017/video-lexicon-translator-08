@@ -361,6 +361,9 @@ export default function V3CreateWizard() {
 
   const [title, setTitle] = useState(hub.title || '');
   const [description, setDescription] = useState(hub.description || '');
+  /** Mots exacts de l'auteur (souvenirs, récit) : transmis aux agents, jamais résumés. */
+  const [sourceText, setSourceText] = useState<string>((hub as any).sourceText || '');
+
   const [category, setCategory] = useState(hub.genre || 'Roman');
   const [customCategory, setCustomCategory] = useState('');
   const [tone, setTone] = useState('Inspirant');
