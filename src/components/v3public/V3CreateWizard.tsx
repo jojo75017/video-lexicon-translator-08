@@ -689,9 +689,13 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
 
   const buildWorkflowDescription = () => [
     description.trim(),
+    sourceText.trim()
+      ? `✍️ MATIÈRE BRUTE DE L'AUTEUR — ses mots exacts. RÈGLE ABSOLUE : ne jamais résumer, raccourcir ni supprimer ces souvenirs. Chaque passage doit être DÉVELOPPÉ en scènes complètes (dialogues, sensations, décors), en corrigeant seulement l'orthographe, la grammaire et le style :\n"""${sourceText.trim()}"""`
+      : '',
     `Style demandé : ${tone}.`,
-    `Format prévu : ${chapters} chapitres d'environ ${wordsPerChapter} mots chacun.`,
+    `Format prévu : ${chapters} chapitres de ${wordsPerChapter} mots minimum chacun (développement obligatoire, jamais de résumé).`,
     outlineText ? `SOMMAIRE VALIDÉ PAR L'AUTEUR — à respecter strictement :\n${outlineText}` : '',
+
     workflowCharacters.length
       ? `Personnages fournis : ${workflowCharacters.map((character) => `${character.name} (${character.role}) — ${character.description}`).join(' | ')}`
       : '',
