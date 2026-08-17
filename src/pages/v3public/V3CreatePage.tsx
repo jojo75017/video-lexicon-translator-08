@@ -14,6 +14,8 @@ import V3QuickActionsBar from '@/components/v3public/V3QuickActionsBar';
 import V3ResumeBookCard from '@/components/v3public/V3ResumeBookCard';
 import V3GenieOutlinePanel from '@/components/v3public/V3GenieOutlinePanel';
 import V3BookActionsBar from '@/components/v3public/V3BookActionsBar';
+import V3OutlineCoBuilder from '@/components/v3public/V3OutlineCoBuilder';
+
 import { BOOK_BRIEF_EVENT, readBookBrief, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
 
 
