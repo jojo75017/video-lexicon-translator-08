@@ -191,9 +191,6 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
     } finally {
       setLoading(false);
     }
-    } finally {
-      setLoading(false);
-    }
   };
 
 
