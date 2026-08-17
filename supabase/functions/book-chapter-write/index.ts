@@ -107,8 +107,13 @@ function memoryBlock(memory: Array<Record<string, unknown>>): string {
 function buildPrompt(body: Body): string {
   const sheet = body.sheet || {};
   const chapter = body.chapter || {};
-  const target = Math.min(6000, Math.max(700, Number(chapter.word_target) || 1800));
+  const target = Math.min(6000, Math.max(700, Number(chapter.word_target) || 2500));
   const subs = Array.isArray(chapter.subsections) ? (chapter.subsections as unknown[]).map(String) : [];
+  const source = String((body as any).sourceText || "").trim();
+  const sourceBlock = source
+    ? `\nMATIÈRE BRUTE DE L'AUTEUR (ses mots exacts)\n"""${source.slice(0, 20000)}"""\nRÈGLE ABSOLUE : tu DÉVELOPPES cette matière, tu ne la résumes JAMAIS. Tu corriges l'orthographe, la grammaire et le style, tu gardes les faits, les lieux, les dates et les prénoms tels quels, et tu transformes chaque souvenir en scène complète (décor, sensations, dialogues).\n`
+    : "";
+
 
   if (body.task === "polissage") {
     return `Tu es ÉCRIVAIN PROFESSIONNEL et RELECTEUR ÉDITORIAL francophone.
