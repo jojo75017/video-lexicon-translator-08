@@ -9,7 +9,7 @@ import {
 } from '@/lib/v3/bookBrief';
 import { saveOutlineVersion } from '@/lib/v3/genieThread';
 
-type Proposal = { titre: string; objectif: string };
+type Proposal = { titre: string; objectif: string; sources: number[] };
 
 /**
  * « On construit le sommaire ensemble » : le Génie ne propose jamais tout le
@@ -53,7 +53,7 @@ export default function V3OutlineCoBuilder() {
           mode: 'outline-step',
           message: (extra || note || '').trim(),
           userApiKey,
-          accepted: outline.map((c) => ({ titre: c.titre, objectif: c.objectif })),
+          accepted: outline.map((c) => ({ titre: c.titre, objectif: c.objectif, sources: c.sources || [] })),
           target,
           bookTitle: brief.title || '',
           bookDescription: brief.description || '',
@@ -66,7 +66,11 @@ export default function V3OutlineCoBuilder() {
       if (error) throw error;
       if ((data as any)?.error) throw new Error((data as any).error);
       const list = Array.isArray((data as any)?.chapters) ? (data as any).chapters : [];
-      setProposals(list.map((c: any) => ({ titre: String(c.titre || ''), objectif: String(c.objectif || '') })));
+      setProposals(list.map((c: any) => ({
+        titre: String(c.titre || ''),
+        objectif: String(c.objectif || ''),
+        sources: Array.isArray(c.sources) ? c.sources.map((n: any) => Number(n)).filter(Boolean) : [],
+      })));
       setQuestion(String((data as any)?.question || ''));
       setNote('');
     } catch (e: any) {
