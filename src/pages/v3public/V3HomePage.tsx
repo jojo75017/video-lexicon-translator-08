@@ -6,6 +6,7 @@ import {
 import V3BriefRecap from '@/components/v3public/V3BriefRecap';
 import V3CapabilitiesPanel from '@/components/v3public/V3CapabilitiesPanel';
 import V3StartBookBar from '@/components/v3public/V3StartBookBar';
+import V3ResumeBookCard from '@/components/v3public/V3ResumeBookCard';
 import V3QuickActionsBar from '@/components/v3public/V3QuickActionsBar';
 import V3PaletteModule from '@/components/v3public/V3PaletteModule';
 import KdpPilotPromoBanner from '@/components/ebook/KdpPilotPromoBanner';
@@ -159,6 +160,7 @@ export default function V3HomePage() {
       </div>
 
       {/* Démarrage : titre du livre → fiche (champs réduits) */}
+      <div className="max-w-6xl mx-auto px-5"><V3ResumeBookCard compact /></div>
       <V3StartBookBar />
 
       <V3BriefRecap />

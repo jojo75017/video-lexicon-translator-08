@@ -468,6 +468,42 @@ export type Database = {
           },
         ]
       }
+      book_conversations: {
+        Row: {
+          brief_snapshot: Json
+          changes: string | null
+          content: string
+          created_at: string
+          id: string
+          outline_snapshot: Json
+          project_id: string | null
+          role: string
+          user_id: string
+        }
+        Insert: {
+          brief_snapshot?: Json
+          changes?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          outline_snapshot?: Json
+          project_id?: string | null
+          role: string
+          user_id: string
+        }
+        Update: {
+          brief_snapshot?: Json
+          changes?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          outline_snapshot?: Json
+          project_id?: string | null
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       book_memory: {
         Row: {
           chapter_id: string | null
@@ -545,6 +581,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      book_outline_versions: {
+        Row: {
+          book_title: string
+          chapters: Json
+          created_at: string
+          id: string
+          project_id: string | null
+          user_id: string
+          version: number
+        }
+        Insert: {
+          book_title?: string
+          chapters?: Json
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          user_id: string
+          version?: number
+        }
+        Update: {
+          book_title?: string
+          chapters?: Json
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          user_id?: string
+          version?: number
+        }
+        Relationships: []
       }
       book_projects: {
         Row: {

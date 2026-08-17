@@ -1,10 +1,22 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Sparkles, Wand2, ArrowRight, Check, Upload, FileText, RotateCcw, Loader2, Mic, Pencil } from 'lucide-react';
+import { Sparkles, Wand2, ArrowRight, Check, Upload, FileText, RotateCcw, Loader2, Mic, Pencil, MessageSquare, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import { readBookBrief, writeBookBrief, type BookBrief } from '@/lib/v3/bookBrief';
+import {
+  clearLocalThread,
+  clearRemoteThread,
+  describeBriefChanges,
+  loadRemoteThread,
+  makeMessage,
+  readLocalThread,
+  saveRemoteMessage,
+  writeLocalThread,
+  type GenieMessage,
+} from '@/lib/v3/genieThread';
+
 
 /**
  * Ebookstudio-Génie — une seule boîte de dialogue.
@@ -39,12 +51,27 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState<string[]>([]);
   const [editing, setEditing] = useState(false);
+  const [messages, setMessages] = useState<GenieMessage[]>([]);
+  const [showThread, setShowThread] = useState(true);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const resultRef = useRef<HTMLDivElement | null>(null);
+  const threadEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    setBrief(readBookBrief() || {});
+    const stored = readBookBrief() || {};
+    setBrief(stored);
+    setMessages(readLocalThread());
+    // Reprise multi-appareils : le fil serveur fait foi s'il est plus complet.
+    loadRemoteThread(stored.projectId || null).then((remote) => {
+      if (remote.length) {
+        setMessages((local) => (remote.length >= local.length ? remote : local));
+      }
+    });
   }, []);
+
+  useEffect(() => {
+    if (messages.length) writeLocalThread(messages);
+  }, [messages]);
 
   const ready = Boolean((brief.title || '').trim() && brief.chapters);
 
@@ -56,6 +83,12 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
     });
   };
 
+  const pushMessage = (message: GenieMessage, briefSnapshot: BookBrief) => {
+    setMessages((prev) => [...prev, message]);
+    void saveRemoteMessage(message, briefSnapshot, briefSnapshot.projectId || null);
+    setTimeout(() => threadEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
+  };
+
   const ask = async (message: string) => {
     const text = message.trim();
     if (text.length < 10) {
@@ -64,16 +97,21 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
     }
     setLoading(true);
     setQuestions([]);
+    const previousBrief = brief;
+    const history = messages.slice(-12).map((m) => ({ role: m.role, content: m.content }));
+    pushMessage(makeMessage('user', text), previousBrief);
+    setInput('');
     try {
       const provider = getProvider();
       const userApiKey = provider === 'gemini' ? getProviderKey('gemini') : '';
       const { data, error } = await supabase.functions.invoke('v3-genie-brief', {
-        body: { message: text, userApiKey, author: (brief.author || '').trim() },
+        body: { message: text, userApiKey, author: (brief.author || '').trim(), history },
       });
       if (error) throw error;
       if ((data as any)?.error) throw new Error((data as any).error);
       const b = (data as any)?.brief || {};
-      patch({
+      const nextBrief: BookBrief = {
+        ...previousBrief,
         title: b.title || '',
         subtitle: b.subtitle || '',
         author: b.author || brief.author || '',
@@ -86,16 +124,30 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
         cibleProfil: b.cibleProfil || brief.cibleProfil || '',
         promesseCentrale: b.promesseCentrale || brief.promesseCentrale || '',
         outlineValidated: false,
-      });
-      setQuestions(Array.isArray((data as any)?.questions) ? (data as any).questions : []);
-      setInput('');
+      };
+      setBrief(nextBrief);
+      writeBookBrief(nextBrief);
+      const nextQuestions = Array.isArray((data as any)?.questions) ? (data as any).questions : [];
+      setQuestions(nextQuestions);
+      const changes = describeBriefChanges(previousBrief, nextBrief);
+      const reply = [
+        `Voilà ce que j’ai compris : « ${nextBrief.title} »${nextBrief.subtitle ? ` — ${nextBrief.subtitle}` : ''}.`,
+        nextBrief.description || '',
+        nextQuestions.length ? `Question : ${nextQuestions[0]}` : '',
+      ].filter(Boolean).join('\n\n');
+      pushMessage(makeMessage('assistant', reply, { changes: changes || undefined, outline: nextBrief.outline }), nextBrief);
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 120);
     } catch (e: any) {
       toast.error(e?.message || 'Le Génie est indisponible pour le moment.');
+      pushMessage(
+        makeMessage('assistant', 'Je n’ai pas pu traiter ce message. Reformulez-le ou réessayez dans quelques secondes.'),
+        previousBrief,
+      );
     } finally {
       setLoading(false);
     }
   };
+
 
   const refine = async (extra: string) => {
     const base = (brief.description || '').trim();
@@ -133,7 +185,66 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
         ))}
       </ol>
 
+      {/* Fil de conversation : tout ce que vous avez dit et ce que le Génie a corrigé */}
+      {messages.length > 0 && (
+        <div className="mt-5 rounded-3xl border bg-white/85 p-3" style={{ borderColor: 'rgba(0,0,0,0.10)' }}>
+          <div className="flex items-center justify-between gap-2">
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+              <MessageSquare className="h-3.5 w-3.5" /> Notre conversation ({messages.length} messages)
+            </span>
+            <div className="flex items-center gap-2">
+              <button type="button" onClick={() => setShowThread((v) => !v)} className="v3-btn v3-btn-ghost text-[11px]">
+                {showThread ? 'Masquer' : 'Afficher'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMessages([]);
+                  clearLocalThread();
+                  void clearRemoteThread(brief.projectId || null);
+                }}
+                className="v3-btn v3-btn-ghost text-[11px]"
+              >
+                <RotateCcw className="h-3 w-3" /> Effacer le fil
+              </button>
+            </div>
+          </div>
+
+          {showThread && (
+            <div className="mt-3 max-h-80 space-y-2 overflow-y-auto pr-1">
+              {messages.map((m) => (
+                <div
+                  key={m.id}
+                  className="rounded-2xl border p-2.5 text-xs leading-relaxed"
+                  style={{
+                    borderColor: m.role === 'assistant' ? 'rgba(201,168,76,0.55)' : 'rgba(0,0,0,0.10)',
+                    background: m.role === 'assistant' ? 'rgba(201,168,76,0.08)' : '#ffffff',
+                    color: 'var(--v3-ink)',
+                  }}
+                >
+                  <div className="mb-1 inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--v3-muted)' }}>
+                    {m.role === 'assistant' ? <Sparkles className="h-3 w-3" /> : <User className="h-3 w-3" />}
+                    {m.role === 'assistant' ? 'Ebookstudio-Génie' : 'Vous'}
+                    <span className="font-normal normal-case">
+                      · {new Date(m.createdAt).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                  <div className="whitespace-pre-wrap">{m.content}</div>
+                  {m.changes && (
+                    <div className="mt-2 rounded-xl border px-2 py-1.5 text-[11px]" style={{ borderColor: 'rgba(201,168,76,0.5)', color: 'var(--v3-muted)' }}>
+                      ✏️ Modifié : {m.changes}
+                    </div>
+                  )}
+                </div>
+              ))}
+              <div ref={threadEndRef} />
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Boîte de saisie unique */}
+
       <div className="mt-5 rounded-3xl border bg-white/90 p-3 shadow-sm" style={{ borderColor: 'rgba(201,168,76,0.55)' }}>
         <textarea
           ref={inputRef}
