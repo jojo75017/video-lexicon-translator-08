@@ -40,7 +40,7 @@ export default function V3OutlineCoBuilder() {
   };
 
   const propose = async (extra?: string) => {
-    if (!(brief.description || brief.title || '').trim()) {
+    if (!(brief.sourceText || brief.description || brief.title || '').trim()) {
       toast.info('Dites d’abord au Génie de quoi parle votre livre.');
       return;
     }
