@@ -41,7 +41,7 @@ export default function V3KeyHint() {
         <KeyRound className="h-3.5 w-3.5" style={{ color: '#8a6d1f' }} />
         Aucune clé IA enregistrée : la rédaction ne pourra pas démarrer.
       </span>
-      <Link to="/v3/fonctionnalites/cles-api" className="v3-btn v3-btn-outline text-[11px]">
+      <Link to="/v3/fonctionnalites/cles" className="v3-btn v3-btn-outline text-[11px]">
         Ouvrir Fonctionnalités &gt; Clés API <ArrowRight className="h-3 w-3" />
       </Link>
     </div>
