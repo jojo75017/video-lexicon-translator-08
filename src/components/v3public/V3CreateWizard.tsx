@@ -1076,8 +1076,10 @@ Règles :
       timer = setTimeout(() => {
         const partial = buildBookFromWorkflowResults();
         if (partial && partial.chapters.some((c: any) => !c.incomplete)) {
+          publishWrittenChapters(partial.chapters);
           void saveProjectToCloud({ silent: true, completedBookOverride: partial });
         }
+
       }, 4000);
     };
     trigger();
