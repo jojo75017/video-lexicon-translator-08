@@ -182,6 +182,15 @@ export default function EmailHealthPanel() {
             {busy === 'hygiene' ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <MailWarning className="h-4 w-4 mr-2" />}
             Nettoyer la liste
           </Button>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => setShowTestInput((s) => !s)}
+            disabled={busy !== null}
+          >
+            <TestTube2 className="h-4 w-4 mr-2" />
+            Test d'arrivée
+          </Button>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
