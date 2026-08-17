@@ -53,6 +53,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
   const [editing, setEditing] = useState(false);
   const [messages, setMessages] = useState<GenieMessage[]>([]);
   const [showThread, setShowThread] = useState(true);
+  const [collapseOld, setCollapseOld] = useState(true);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const resultRef = useRef<HTMLDivElement | null>(null);
   const threadEndRef = useRef<HTMLDivElement | null>(null);
