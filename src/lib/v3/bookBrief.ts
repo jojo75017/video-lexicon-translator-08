@@ -35,7 +35,14 @@ export type BookBrief = {
   promesseDifferenciation?: string;
   promesseEmotion?: string;
   projectId?: string | null;
+  /** Langue de rédaction du livre (code ISO court : fr, en, es…). */
+  language?: string;
+  /** Ambiance d'écriture choisie (voir src/data/writingAmbiances.ts). */
+  ambianceId?: string;
+  /** Étapes de l'entretien guidé volontairement passées. */
+  interviewSkipped?: number[];
 };
+
 
 export const WIZARD_BRIEF_KEY = 'v3_create_wizard_config_v1';
 /** Sommaire envoyé depuis l'outil « Sommaire Ultime » vers le workflow. */
