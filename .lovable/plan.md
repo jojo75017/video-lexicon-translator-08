@@ -34,12 +34,20 @@ Vos trois passages sont encore présents dans l’historique de conversation : i
 - Aucune réponse IA ne pourra écraser la matière brute avec un résumé.
 - Les dates, lieux, personnes, liens familiaux et incertitudes exprimées par l’auteur seront transmis tels quels à la rédaction.
 
+### 6. Vous fixez le titre, le sous-titre, les chapitres et les mots
+- Dans la colonne « Votre livre en direct », quatre champs directement modifiables : **Titre**, **Sous-titre**, **Nombre de chapitres** (3 à 40) et **Mots par chapitre** (800 à 3 500).
+- Enregistrement immédiat à la saisie, sans bouton caché, avec le total de mots estimé du livre affiché.
+- Dès que vous modifiez un de ces champs, il est **verrouillé** : le Génie ne pourra plus le remplacer à sa façon lors des échanges suivants.
+- Un bouton « Laisser le Génie proposer » par champ permet de rendre la main à l’IA si vous le souhaitez.
+- Le nombre de chapitres que vous fixez devient la cible réelle de la construction du sommaire, et les mots par chapitre la cible réelle de la rédaction.
+
 ## Détails techniques
 
 - `src/lib/v3/genieThread.ts` : charger aussi le dernier `brief_snapshot` et ajouter une reconstruction ordonnée à partir des messages `role=user`.
 - `src/components/v3public/V3GenieDialog.tsx` : persister `sourceText` avant l’appel IA, sauvegarder le bon instantané pour le message utilisateur et restaurer automatiquement les anciens passages.
-- `src/components/v3public/V3GenieOutlinePanel.tsx` : afficher `sourceText` comme récit principal et `description` comme simple résumé distinct.
-- `src/components/v3public/V3OutlineCoBuilder.tsx` et la fonction IA du Génie : transmettre et exploiter `sourceText` aussi en mode construction du sommaire.
+- `src/components/v3public/V3GenieOutlinePanel.tsx` : afficher `sourceText` comme récit principal, `description` comme simple résumé distinct, et ajouter le bloc « Réglages du livre » avec les quatre champs éditables.
+- `src/components/v3public/V3OutlineCoBuilder.tsx` et la fonction IA du Génie : transmettre et exploiter `sourceText` aussi en mode construction du sommaire, et respecter la cible de chapitres fixée.
+- `src/lib/v3/bookBrief.ts` : nouveau champ `lockedFields` (réglages fixés par l’auteur) persisté avec la fiche ; la fusion de la réponse IA ignore tout champ verrouillé.
 - La reconstruction sera idempotente : recharger la page plusieurs fois ne multipliera pas le même texte.
 
 ## Vérification avant livraison
@@ -50,3 +58,4 @@ Vos trois passages sont encore présents dans l’historique de conversation : i
 - Simuler une panne IA : le passage saisi n’est pas perdu.
 - Générer trois propositions de chapitres : elles reprennent les faits du récit complet, pas seulement le synopsis court.
 - Lancer un chapitre : cible 2 500 mots, matière brute transmise, aucune compression du récit source.
+- Fixer titre, sous-titre, 12 chapitres et 2 800 mots, puis envoyer deux messages au Génie : les quatre valeurs restent inchangées.
