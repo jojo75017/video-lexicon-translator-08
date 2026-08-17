@@ -1,4 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.78.0";
+import { FROM_CAMPAIGN, REPLY_TO } from "../_shared/emailIdentity.ts";
+import { sendResendEmailThrottled } from "../_shared/resendThrottle.ts";
 
 /**
  * Santé des emails : rend la délivrabilité visible.
@@ -12,6 +14,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.78.0";
  *  - `sync`     : interroge Resend pour les envois sans évènement connu
  *  - `hygiene`  : coupe l'envoi automatique pour les rebonds durs et les
  *                 adresses jamais ouvertes après 5 envois (mode `preview` sans écriture)
+ *  - `diagnostic` : contrôle SPF/DKIM/DMARC et capacité de la clé
+ *  - `deliverability_test` : envoi [TEST] vers Gmail/Outlook/Yahoo pour vérifier l'arrivée
  *
  * Sécurité : admin (has_role) ou secret cron.
  */
