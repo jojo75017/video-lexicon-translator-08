@@ -109,14 +109,27 @@ export default function V3CreatePage() {
     }, 400);
     return () => clearTimeout(t);
   }, [sommaireIa]);
-
-
-
+  // Rien ne démarre avant la validation du sommaire : si la fiche est effacée
+  // ou le sommaire dévalidé, le workflow se referme.
+  useEffect(() => {
+    const sync = () => {
+      const validated = Boolean(readBookBrief()?.outlineValidated);
+      if (!validated) setShowWizard(false);
+    };
+    window.addEventListener(BOOK_BRIEF_EVENT, sync);
+    return () => window.removeEventListener(BOOK_BRIEF_EVENT, sync);
+  }, []);
 
   const launchWorkflow = () => {
+    if (!readBookBrief()?.outlineValidated) {
+      toast.info('Validez d’abord votre sommaire : la rédaction démarre juste après.');
+      document.getElementById('sommaire-ia')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
     setShowWizard(true);
     setTimeout(() => wizardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
   };
+
 
   if (importMode) {
     return (
