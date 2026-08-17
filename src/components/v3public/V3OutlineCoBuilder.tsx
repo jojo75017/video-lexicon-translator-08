@@ -221,6 +221,13 @@ export default function V3OutlineCoBuilder() {
           disabled={loading} className="v3-btn v3-btn-outline text-xs disabled:opacity-50">
           <ArrowDown className="h-3.5 w-3.5" /> Suite logique
         </button>
+        {passages.length > 0 && (
+          <button type="button" disabled={loading}
+            onClick={() => propose('Ces chapitres ne suivent pas mon récit. Reprends STRICTEMENT mes passages dans l’ordre chronologique, sans rien inventer, et indique pour chaque chapitre les numéros de passages qu’il raconte.')}
+            className="v3-btn v3-btn-outline text-xs disabled:opacity-50">
+            <RefreshCw className="h-3.5 w-3.5" /> Recentrer sur mon récit
+          </button>
+        )}
         <button type="button" onClick={finish} disabled={outline.length < 3} className="v3-btn v3-btn-outline text-xs disabled:opacity-50">
           <Check className="h-3.5 w-3.5" /> Terminer et valider le sommaire
         </button>
