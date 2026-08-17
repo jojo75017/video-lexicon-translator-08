@@ -321,16 +321,12 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  if (!window.confirm('Effacer toute la conversation avec le Génie ?')) return;
-                  setMessages([]);
-                  clearLocalThread();
-                  void clearRemoteThread(brief.projectId || null);
-                }}
+                onClick={eraseEverything}
                 className="v3-btn v3-btn-ghost text-[11px]"
               >
-                <RotateCcw className="h-3 w-3" /> Repartir de zéro
+                <RotateCcw className="h-3 w-3" /> Effacer ce livre
               </button>
+
             </div>
           </div>
 
