@@ -93,8 +93,11 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
   };
 
   const outline = brief.outline || [];
+  const written = progress.chapters;
+  const totalChapters = outline.length || progress.total || brief.chapters || 0;
   const totalWords = written.reduce((sum, c) => sum + c.words, 0);
   const writtenTitles = new Set(written.map((c) => c.title.toLowerCase().trim()));
+  const writing = progress.activeIndex >= 0 && progress.activeIndex < totalChapters;
 
   return (
     <div className="space-y-4">
@@ -103,7 +106,7 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
           <span className="v3-chip v3-chip-orange text-[11px]"><ListOrdered className="h-3 w-3" /> Votre livre en direct</span>
           <span className="text-[11px]" style={{ color: 'var(--v3-muted)' }}>
             {written.length
-              ? `${written.length} chapitre(s) écrit(s) sur ${outline.length || brief.chapters || '?'} · ${totalWords.toLocaleString('fr-FR')} mots`
+              ? `${written.length} chapitre(s) écrit(s) sur ${totalChapters || '?'} · ${totalWords.toLocaleString('fr-FR')} mots`
               : outline.length ? `${outline.length} chapitres${brief.outlineValidated ? ' · validé' : ' · à valider'}` : 'aucun chapitre pour le moment'}
           </span>
         </div>
@@ -119,6 +122,35 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
               style={{ borderColor: 'rgba(201,168,76,0.6)', color: 'var(--v3-ink)' }}>{chip}</span>
           ))}
         </div>
+
+        {/* Le récit du livre : un seul endroit, jamais recopié dans la conversation */}
+        {(brief.description || '').trim() && (
+          <div className="mt-2 text-[12px]" style={{ color: 'var(--v3-muted)' }}>
+            <p className="whitespace-pre-wrap leading-relaxed">
+              {showStory ? brief.description : `${String(brief.description).slice(0, 180)}${String(brief.description).length > 180 ? '…' : ''}`}
+            </p>
+            {String(brief.description).length > 180 && (
+              <button type="button" onClick={() => setShowStory((v) => !v)} className="mt-1 underline">
+                {showStory ? 'Réduire le récit' : 'Voir le récit complet'}
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Progression de la rédaction */}
+        {(written.length > 0 || writing) && (
+          <div className="mt-3">
+            <div className="h-2 w-full overflow-hidden rounded-full" style={{ background: 'rgba(201,168,76,0.15)' }}>
+              <div className="h-full rounded-full transition-all"
+                style={{ width: `${totalChapters ? Math.min(100, Math.round((written.length / totalChapters) * 100)) : 0}%`, background: 'var(--v3-orange-600, #c9a84c)' }} />
+            </div>
+            <p className="mt-1 text-[11px]" style={{ color: 'var(--v3-muted)' }}>
+              {writing && written.length < totalChapters
+                ? `Chapitre ${Math.min(totalChapters, written.length + 1)} sur ${totalChapters} en cours · ${totalWords.toLocaleString('fr-FR')} mots écrits`
+                : `${written.length} chapitre(s) sur ${totalChapters || '?'} · ${totalWords.toLocaleString('fr-FR')} mots`}
+            </p>
+          </div>
+        )}
 
         {/* Onglets */}
         <div className="mt-3 flex gap-2">
@@ -140,11 +172,12 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
             <ol className="mt-3 max-h-72 space-y-1 overflow-y-auto pr-1 text-[13px]" style={{ color: 'var(--v3-ink)' }}>
               {outline.map((c, i) => {
                 const done = writtenTitles.has(String(c.titre || '').toLowerCase().trim()) || i < written.length;
+                const inProgress = !done && writing && i === written.length;
                 return (
                   <li key={`${c.numero}-${i}`} className="rounded-xl border px-3 py-2" style={{ borderColor: 'rgba(0,0,0,0.08)' }}>
                     <strong>{i + 1}.</strong> {c.titre}
                     <span className="ml-1 text-[10.5px]" style={{ color: done ? '#0f766e' : 'var(--v3-muted)' }}>
-                      · {done ? 'écrit' : 'à écrire'}
+                      · {done ? 'écrit' : inProgress ? 'en cours…' : 'à écrire'}
                     </span>
                     {c.objectif ? <span className="block text-[11px]" style={{ color: 'var(--v3-muted)' }}>{c.objectif}</span> : null}
                   </li>
@@ -177,6 +210,9 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
                       {fixing === c.index ? <Loader2 className="h-3 w-3 animate-spin" /> : <PenLine className="h-3 w-3" />}
                       Corriger ce chapitre
                     </button>
+                    <Link to="/v3/corriger" className="v3-btn v3-btn-ghost text-[11px]">
+                      <Wand2 className="h-3 w-3" /> Réécrire
+                    </Link>
                   </div>
                 </div>
               ))}
