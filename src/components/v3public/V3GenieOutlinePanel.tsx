@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import {
-  BOOK_BRIEF_EVENT, isFieldLocked, lockField, readBookBrief, unlockField, writeBookBrief,
+  BOOK_BRIEF_EVENT, dedupeSourceText, isFieldLocked, lockField, readBookBrief, unlockField, writeBookBrief,
   type BookBrief, type LockableField,
 } from '@/lib/v3/bookBrief';
 import { countTextWords, loadOutlineVersions, type OutlineVersion } from '@/lib/v3/genieThread';
@@ -131,7 +131,8 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
   const writtenTitles = new Set(written.map((c) => c.title.toLowerCase().trim()));
   const writing = progress.activeIndex >= 0 && progress.activeIndex < totalChapters;
 
-  const sourceText = String(brief.sourceText || '').trim();
+  // Affichage garanti sans répétition : un même souvenir n'apparaît qu'une fois.
+  const sourceText = dedupeSourceText(String(brief.sourceText || ''));
   const sourceWords = countTextWords(sourceText);
   const estimatedTotal = (Number(brief.chapters) || 0) * (Number(brief.wordsPerChapter) || 0);
 
