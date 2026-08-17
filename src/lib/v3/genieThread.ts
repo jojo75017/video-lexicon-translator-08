@@ -4,7 +4,7 @@
  * localStorage en secours pour ne jamais perdre l'échange en cours.
  */
 import { supabase } from '@/integrations/supabase/client';
-import { appendSourceText } from '@/lib/v3/bookBrief';
+import { appendSourceText, dedupeSourceText, stripAuthorPrefix } from '@/lib/v3/bookBrief';
 import type { BookBrief, BriefOutlineChapter } from '@/lib/v3/bookBrief';
 
 const db = supabase as any;
