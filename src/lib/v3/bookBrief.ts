@@ -130,9 +130,9 @@ export function appendSourceText(previous: string | undefined, addition: string)
   const base = String(previous || '').trim();
   if (!clean) return base;
   if (base.includes(clean)) return base;
-  const merged = base ? `${base}\n\n${clean}` : clean;
-  // Garde-fou localStorage : on conserve les 60 000 derniers caractères.
-  return merged.length > 60000 ? merged.slice(merged.length - 60000) : merged;
+  // Aucun découpage : dans une autobiographie, les premiers souvenirs sont
+  // aussi importants que les derniers et ne doivent jamais disparaître.
+  return base ? `${base}\n\n${clean}` : clean;
 }
 
 /** Efface la fiche du livre en cours (titre, synopsis, etc.). */

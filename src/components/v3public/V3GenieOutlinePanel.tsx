@@ -54,7 +54,9 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
   const [progress, setProgress] = useState<WrittenProgress>({ chapters: [], total: 0, activeIndex: -1 });
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [fixing, setFixing] = useState<number | null>(null);
-  const [showStory, setShowStory] = useState(false);
+  // Le récit doit être visible immédiatement : ne jamais donner l'impression
+  // qu'il a été remplacé par le court synopsis de l'IA.
+  const [showStory, setShowStory] = useState(true);
   const autoSwitched = useRef(false);
 
   useEffect(() => {
@@ -237,7 +239,7 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
                 Vos souvenirs — texte intégral
               </span>
               <span className="text-[10.5px]" style={{ color: 'var(--v3-muted)' }}>
-                {sourceWords.toLocaleString('fr-FR')} mots conservés
+                {sourceWords.toLocaleString('fr-FR')} mots · aucun mot supprimé
               </span>
             </div>
             <p className="mt-1.5 whitespace-pre-wrap text-[12px] leading-relaxed" style={{ color: 'var(--v3-ink)' }}>
@@ -246,7 +248,7 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
             {sourceText.length > 320 && (
               <button type="button" onClick={() => setShowStory((v) => !v)} className="mt-1 text-[11px] underline"
                 style={{ color: 'var(--v3-muted)' }}>
-                {showStory ? 'Replier mes souvenirs' : 'Voir tout ce que j’ai raconté'}
+                {showStory ? 'Replier temporairement' : 'Afficher mon récit intégral'}
               </button>
             )}
           </div>
