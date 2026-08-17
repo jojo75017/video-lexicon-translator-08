@@ -45,9 +45,11 @@ Aujourd'hui plusieurs mémoires vivent en parallèle : la fiche du Génie, la co
 
 ## Détails techniques
 
-- `src/lib/v3/bookBrief.ts` : nouvelle fonction `resetBookProject()` supprimant `v3_create_wizard_config_v1`, `edition_book_config_v1`, `v3_toc_for_workflow_v1` (+ clés du Sommaire Ultime en attente) et émettant `BOOK_BRIEF_EVENT` ; champ `ambianceId` ajouté au type `BookBrief`.
-- `src/lib/v3/genieThread.ts` : réutilisation de `clearLocalThread()` + `clearRemoteThread()` dans le reset global.
-- `src/components/v3public/V3BookActionsBar.tsx` et `V3GenieDialog.tsx` : bouton d'effacement complet avec confirmation.
-- Nouveau `src/components/v3public/V3AmbiancePicker.tsx` s'appuyant sur `src/data/writingAmbiances.ts` (aucune nouvelle donnée).
-- `src/pages/v3public/V3CreatePage.tsx` : layout `lg:grid-cols-[1fr_340px]` quand le workflow est ouvert, avec `V3GenieOutlinePanel` en colonne `sticky top-24`.
-- Aucun changement de base de données, de tarif ni d'edge function.
+- `src/lib/v3/bookBrief.ts` : `resetBookProject()` supprimant `v3_create_wizard_config_v1`, `edition_book_config_v1`, `v3_toc_for_workflow_v1` (+ clés Sommaire Ultime en attente) et émettant `BOOK_BRIEF_EVENT` ; champs `ambianceId`, `language`, `interviewStep` ajoutés à `BookBrief`.
+- Nouveau `src/lib/v3/genieInterview.ts` : définition des 6 étapes (question, exemple, type de réponse libre/choix, options) et calcul de l'étape courante à partir de la fiche.
+- `src/components/v3public/V3GenieDialog.tsx` : séparateurs d'étape, question courante, « Montrer un exemple », « Passer », cartes de choix cliquables, bouton d'effacement complet ; le prompt envoyé à `v3-genie-brief` indique l'étape en cours pour que l'IA pose la question suivante.
+- `src/lib/v3/genieThread.ts` : `clearLocalThread()` + `clearRemoteThread()` réutilisés dans le reset global.
+- Nouveau `src/components/v3public/V3AmbiancePicker.tsx` basé sur `src/data/writingAmbiances.ts` (aucune nouvelle donnée).
+- `src/pages/v3public/V3CreatePage.tsx` : layout `lg:grid-cols-[1fr_340px]` quand le workflow est ouvert, `V3GenieOutlinePanel` en colonne `sticky top-24`.
+- Aucun changement de base de données, de tarif ni d'edge function (seul le prompt de `v3-genie-brief` évolue).
+
