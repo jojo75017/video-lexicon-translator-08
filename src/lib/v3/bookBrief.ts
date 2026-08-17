@@ -17,9 +17,15 @@ export type BookBrief = {
   author?: string;
   category?: string;
   description?: string;
+  /**
+   * Matière brute : tout ce que l'auteur a écrit ou dicté, mot pour mot.
+   * Elle s'accumule et n'est JAMAIS résumée ni remplacée par l'IA.
+   */
+  sourceText?: string;
   tone?: string;
   chapters?: number;
   wordsPerChapter?: number;
+
   outline?: BriefOutlineChapter[];
   /** Vrai quand l'auteur a explicitement validé le sommaire utilisé par le workflow. */
   outlineValidated?: boolean;
