@@ -94,6 +94,7 @@ Deno.serve(async (req) => {
       bookDescription?: string;
       tone?: string;
       language?: string;
+      sourceText?: string;
     };
     const message = String(body.message || "").trim();
     const mode = String(body.mode || "brief");
@@ -145,12 +146,17 @@ Deno.serve(async (req) => {
       const remaining = Math.max(0, target - (Array.isArray(body.accepted) ? body.accepted.length : 0));
       const count = Math.min(3, remaining || 3);
 
+      const stepSource = String(body.sourceText || "").trim();
+      const stepSourceBlock = stepSource
+        ? `\nRÉCIT INTÉGRAL DE L'AUTEUR (ses mots exacts — les chapitres doivent suivre CES faits, ces lieux, ces dates et ces personnes, jamais un résumé inventé) :\n"""${stepSource.slice(-14000)}"""\n`
+        : "";
+
       const stepPrompt = `Tu es directeur éditorial KDP francophone. Tu construis un sommaire AVEC l'auteur, pas à sa place.
 Livre : « ${String(body.bookTitle || "").slice(0, 200)} »
 Sujet / promesse : """${String(body.bookDescription || message).slice(0, 2000)}"""
 Ton souhaité : ${String(body.tone || "Inspirant")}
 Nombre total de chapitres visé : ${target}
-${historyBlock}
+${stepSourceBlock}${historyBlock}
 Chapitres DÉJÀ acceptés par l'auteur (ne les répète jamais, ne les modifie pas) :
 """${accepted || "aucun pour le moment"}"""
 

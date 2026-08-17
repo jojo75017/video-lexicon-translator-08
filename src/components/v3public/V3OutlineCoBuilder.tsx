@@ -57,6 +57,8 @@ export default function V3OutlineCoBuilder() {
           target,
           bookTitle: brief.title || '',
           bookDescription: brief.description || '',
+          // Le récit intégral de l'auteur : les chapitres doivent suivre ses faits.
+          sourceText: brief.sourceText || '',
           tone: brief.tone || '',
           language: brief.language || 'fr',
         },
