@@ -136,9 +136,17 @@ export default function V3OutlineCoBuilder() {
       </div>
 
       <p className="mt-2 text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
-        Le Génie propose 3 chapitres à la fois. Vous gardez, reformulez ou retirez — rien n’est
-        décidé sans vous, et le sommaire n’est validé que par votre clic.
+        Le Génie propose 3 chapitres à la fois, en suivant votre récit dans l’ordre. Vous gardez,
+        reformulez ou retirez — le sommaire n’est validé que par votre clic.
       </p>
+
+      {passages.length > 0 && (
+        <p className="mt-2 rounded-xl border px-2.5 py-2 text-[11.5px]"
+          style={{ borderColor: 'rgba(15,107,74,0.35)', background: 'rgba(15,107,74,0.06)', color: 'var(--v3-ink)' }}>
+          Votre récit compte <strong>{passages.length} passage(s)</strong> — {coveredCount} déjà rattaché(s) à un
+          chapitre. Chaque chapitre proposé indique les passages qu’il raconte.
+        </p>
+      )}
 
       {proposals.length > 0 && (
         <div className="mt-3 space-y-2">
