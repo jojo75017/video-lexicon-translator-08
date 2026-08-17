@@ -2,9 +2,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Activity, Loader2, MailWarning, RefreshCw, ShieldCheck } from 'lucide-react';
+import { Activity, CheckCircle2, Loader2, MailWarning, RefreshCw, ShieldCheck, TestTube2, XCircle } from 'lucide-react';
 
 interface TemplateRow {
   template: string;
@@ -41,6 +43,22 @@ interface DiagnosticPayload {
   blocking: string[];
   delivery_confirmed: number;
   delivery_total: number;
+}
+
+interface TestResult {
+  to: string;
+  ok: boolean;
+  message_id?: string;
+  detail?: string;
+  quotaExhausted?: boolean;
+}
+
+interface TestPayload {
+  success: boolean;
+  test_id: string;
+  short_id: string;
+  addresses: string[];
+  results: TestResult[];
 }
 
 
