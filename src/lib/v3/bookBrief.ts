@@ -102,8 +102,13 @@ function readJSON<T>(key: string, fallback: T): T {
 }
 
 export function readBookBrief(): BookBrief | null {
-  const brief = readJSON<BookBrief | null>(WIZARD_BRIEF_KEY, null);
-  if (!brief) return null;
+  const stored = readJSON<BookBrief | null>(WIZARD_BRIEF_KEY, null);
+  if (!stored) return null;
+  // Auto-réparation : une matière enregistrée en double par une ancienne
+  // version est nettoyée à la lecture, pour ne plus jamais afficher le
+  // même souvenir plusieurs fois de suite.
+  const cleaned = dedupeSourceText(String(stored.sourceText || ''));
+  const brief: BookBrief = cleaned !== (stored.sourceText || '') ? { ...stored, sourceText: cleaned } : stored;
   // Un récit peut exister avant que le Génie ait proposé un titre ou un résumé.
   // Ne jamais considérer cette fiche comme vide : sinon la colonne de droite
   // perd la matière reconstruite et affiche « Projet sans titre ».
