@@ -605,6 +605,8 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
       subtitle: subtitle.trim(),
       author: authorName.trim(),
       description: description.trim(),
+      sourceText: sourceText.trim(),
+
       category: effectiveCategory,
       genre: effectiveCategory,
       tone,
