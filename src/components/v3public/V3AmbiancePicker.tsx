@@ -76,6 +76,7 @@ export default function V3AmbiancePicker({ compact = false }: { compact?: boolea
       <p className="mt-2 text-[11px]" style={{ color: 'var(--v3-muted)' }}>
         Vous pouvez changer d’ambiance quand vous voulez : cela ne modifie jamais le texte de votre livre.
       </p>
-    </div>
+    </details>
+
   );
 }
