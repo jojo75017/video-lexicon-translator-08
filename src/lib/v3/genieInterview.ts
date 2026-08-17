@@ -102,14 +102,109 @@ export const INTERVIEW_STEPS: InterviewStep[] = [
 
 export const INTERVIEW_TOTAL = INTERVIEW_STEPS.length;
 
+/* ------------------------------------------------------------------ */
+/* Entretien « Biographie — Le récit de votre vie »                     */
+/* ------------------------------------------------------------------ */
+
+/** Une étape est racontée dès que l'auteur a envoyé un souvenir pour elle. */
+const told = (id: number) => (b: BookBrief) => (b.biographySteps || []).includes(id);
+
+export const BIOGRAPHY_STEPS: InterviewStep[] = [
+  {
+    id: 1,
+    title: 'La langue de votre biographie',
+    question: 'Dans quelle langue voulez-vous raconter votre vie ?',
+    example: 'Français — la traduction dans 10 langues reste possible ensuite.',
+    skippable: false,
+    choice: { field: 'language', label: 'Choisissez la langue', options: BOOK_LANGUAGES },
+    isDone: (b) => Boolean((b.language || '').trim()),
+  },
+  {
+    id: 2,
+    title: 'Vos origines',
+    question: 'Où et quand êtes-vous né ? Parlez-moi de votre famille et de l’époque.',
+    hint: 'Année, ville, parents, frères et sœurs, métier des parents, contexte.',
+    example: 'Je suis né en 1952 à Berck-sur-Mer, ma mère élevait seule trois enfants après la guerre.',
+    skippable: false,
+    isDone: told(2),
+  },
+  {
+    id: 3,
+    title: 'Votre enfance',
+    question: 'Racontez votre enfance : la maison, les jours ordinaires, les joies, les peines.',
+    hint: 'Prenez tout le temps qu’il faut : vos mots seront conservés tels quels.',
+    example: 'À six ans, on m’a envoyé chez ma tante Yvonne, je dormais dans la pièce du fond…',
+    skippable: false,
+    isDone: told(3),
+  },
+  {
+    id: 4,
+    title: 'École, apprentissage, premiers métiers',
+    question: 'Comment s’est passée l’école, puis vos premiers travaux ?',
+    hint: 'Les maîtres, les copains, le premier salaire, les patrons.',
+    example: 'Monsieur Delattre m’a appris à lire vraiment ; à 14 ans, j’entrais en apprentissage.',
+    skippable: true,
+    isDone: told(4),
+  },
+  {
+    id: 5,
+    title: 'Rencontres et amours',
+    question: 'Quelles rencontres ont compté ? Comment avez-vous rencontré ceux que vous aimez ?',
+    example: 'J’ai rencontré Michelle au bal du 14 juillet 1972, à la salle des fêtes.',
+    skippable: true,
+    isDone: told(5),
+  },
+  {
+    id: 6,
+    title: 'Épreuves et tournants',
+    question: 'Quelles épreuves avez-vous traversées ? Quels moments ont tout changé ?',
+    example: 'La perte de mon frère en 1981 a changé ma façon de vivre.',
+    skippable: true,
+    isDone: told(6),
+  },
+  {
+    id: 7,
+    title: 'Votre vie adulte',
+    question: 'Votre vie d’adulte : le travail, la maison, les enfants, les habitudes.',
+    example: 'Vingt-huit ans dans la même usine, deux enfants, la maison achetée en 1985.',
+    skippable: true,
+    isDone: told(7),
+  },
+  {
+    id: 8,
+    title: 'Aujourd’hui, et ce que vous transmettez',
+    question: 'Où en êtes-vous aujourd’hui, et que voulez-vous transmettre par ce livre ?',
+    example: 'Je veux que mes petits-enfants sachent d’où ils viennent.',
+    skippable: true,
+    isDone: told(8),
+  },
+  {
+    id: 9,
+    title: 'Le sommaire de votre vie, puis validation',
+    question: 'Construisons le sommaire période par période, dans l’ordre de votre vie, puis vous validez.',
+    example: 'Chapitre 1 — 1952-1958, Berck-sur-Mer ; Chapitre 2 — 1958-1962, chez tante Yvonne…',
+    skippable: false,
+    isDone: (b) => Boolean(b.outlineValidated && (b.outline || []).length > 0),
+  },
+];
+
+export const BIOGRAPHY_TOTAL = BIOGRAPHY_STEPS.length;
+
+/** Le jeu d'étapes qui correspond au projet (livre classique ou biographie). */
+export function interviewSteps(brief: BookBrief): InterviewStep[] {
+  return brief.mode === 'biography' ? BIOGRAPHY_STEPS : INTERVIEW_STEPS;
+}
+
 /** Étape en cours : la première non terminée et non passée. */
 export function currentInterviewStep(brief: BookBrief): InterviewStep {
+  const steps = interviewSteps(brief);
   const skipped = brief.interviewSkipped || [];
-  const step = INTERVIEW_STEPS.find((s) => !s.isDone(brief) && !skipped.includes(s.id));
-  return step || INTERVIEW_STEPS[INTERVIEW_STEPS.length - 1];
+  const step = steps.find((s) => !s.isDone(brief) && !skipped.includes(s.id));
+  return step || steps[steps.length - 1];
 }
 
 /** Libellé « Étape 3 sur 6 – Votre lecteur ». */
-export function stepLabel(step: InterviewStep): string {
-  return `Étape ${step.id} sur ${INTERVIEW_TOTAL} – ${step.title}`;
+export function stepLabel(step: InterviewStep, brief?: BookBrief): string {
+  const total = brief?.mode === 'biography' ? BIOGRAPHY_TOTAL : INTERVIEW_TOTAL;
+  return `Étape ${step.id} sur ${total} – ${step.title}`;
 }
