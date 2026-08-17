@@ -1,15 +1,45 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { ListOrdered, History, RotateCcw, PenLine, Loader2, Sparkles, Wand2 } from 'lucide-react';
+import {
+  ListOrdered, History, RotateCcw, PenLine, Loader2, Sparkles, Wand2, SlidersHorizontal, Lock,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
-import { BOOK_BRIEF_EVENT, readBookBrief, writeBookBrief, type BookBrief } from '@/lib/v3/bookBrief';
-import { loadOutlineVersions, type OutlineVersion } from '@/lib/v3/genieThread';
+import {
+  BOOK_BRIEF_EVENT, isFieldLocked, lockField, readBookBrief, unlockField, writeBookBrief,
+  type BookBrief, type LockableField,
+} from '@/lib/v3/bookBrief';
+import { countTextWords, loadOutlineVersions, type OutlineVersion } from '@/lib/v3/genieThread';
 import {
   readWrittenProgress, replaceWrittenChapter, WRITTEN_CHAPTERS_EVENT, type WrittenProgress,
 } from '@/lib/v3/writtenChapters';
 import V3OutlinePanel from './V3OutlinePanel';
+
+/** Une ligne de réglage : le champ, et le cadenas quand l'auteur a décidé. */
+function SettingField({
+  label, field, locked, onUnlock, children,
+}: {
+  label: string;
+  field: LockableField;
+  locked: boolean;
+  onUnlock: (field: LockableField) => void;
+  children: ReactNode;
+}) {
+  return (
+    <label className="block">
+      <span className="flex items-center justify-between gap-2 text-[10.5px]" style={{ color: 'var(--v3-muted)' }}>
+        <span>{label}</span>
+        {locked && (
+          <button type="button" onClick={() => onUnlock(field)} className="inline-flex items-center gap-1 underline">
+            <Lock className="h-3 w-3" /> Laisser le Génie proposer
+          </button>
+        )}
+      </span>
+      <span className="mt-0.5 block">{children}</span>
+    </label>
+  );
+}
 
 /**
  * Colonne de droite : « Sommaire » (ce que l'IA a compris, versions restaurables)
