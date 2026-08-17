@@ -14,6 +14,8 @@ import V3QuickActionsBar from '@/components/v3public/V3QuickActionsBar';
 import V3ResumeBookCard from '@/components/v3public/V3ResumeBookCard';
 import V3GenieOutlinePanel from '@/components/v3public/V3GenieOutlinePanel';
 import V3BookActionsBar from '@/components/v3public/V3BookActionsBar';
+import V3OutlineCoBuilder from '@/components/v3public/V3OutlineCoBuilder';
+
 import { BOOK_BRIEF_EVENT, readBookBrief, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
 
 
@@ -144,7 +146,7 @@ export default function V3CreatePage() {
 
   return (
     <section className="v3-halo-soft min-h-[calc(100vh-4rem)] py-10 px-5">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <BackButton />
           <V3QuickActionsBar />
@@ -208,7 +210,12 @@ export default function V3CreatePage() {
               />
             )}
 
-            {/* Ambiance — modifiable à tout moment */}
+            {/* On construit le sommaire ensemble, 3 chapitres à la fois */}
+            <div className="mt-4">
+              <V3OutlineCoBuilder />
+            </div>
+
+            {/* Ambiance — repliée, modifiable à tout moment */}
             <div className="mt-4">
               <V3AmbiancePicker />
             </div>
@@ -217,6 +224,15 @@ export default function V3CreatePage() {
             <div className="mt-4">
               <V3BookActionsBar onLaunch={launchWorkflow} />
             </div>
+
+            {/* Workflow : dans la colonne de gauche pour garder le sommaire visible */}
+            {showWizard && (
+              <div ref={wizardRef} className="v3-card mt-6">
+                <Suspense fallback={<div className="py-16 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-[var(--v3-orange)]" /></div>}>
+                  <V3CreateWizard />
+                </Suspense>
+              </div>
+            )}
 
             {/* Rappel clé IA : uniquement si aucune clé enregistrée */}
             <div className="mt-4">
@@ -256,14 +272,6 @@ export default function V3CreatePage() {
         </div>
 
 
-        {/* Workflow */}
-        {showWizard && (
-          <div ref={wizardRef} className="v3-card mt-8">
-            <Suspense fallback={<div className="py-16 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-[var(--v3-orange)]" /></div>}>
-              <V3CreateWizard />
-            </Suspense>
-          </div>
-        )}
 
       </div>
     </section>

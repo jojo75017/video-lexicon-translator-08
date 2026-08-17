@@ -8,6 +8,8 @@ import V3ExportPanel from '@/components/admin/V3ExportPanel';
 import V3KdpPublishPanel from '@/components/v3public/V3KdpPublishPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { normalizeManuscript } from '@/utils/manuscriptNormalizer';
+import { publishWrittenChapters } from '@/lib/v3/writtenChapters';
+
 import { proofreadChapters, type ChapterProofread } from '@/lib/correcteur/proofreadBook';
 
 import { invokeImageFunction } from '@/lib/aiImageInvoke';
@@ -946,9 +948,17 @@ Règles :
 
   const handleWorkflowComplete = async (bookData: any) => {
     setCompletedBook(bookData);
+    publishWrittenChapters(Array.isArray(bookData?.chapters) ? bookData.chapters : []);
     await saveProjectToCloud({ silent: true, completedBookOverride: bookData });
     toast.success('Livre terminé et sauvegardé dans Mes livres.');
   };
+
+  // La colonne « Déjà écrit » suit la rédaction en direct.
+  useEffect(() => {
+    if (!completedBook) return;
+    publishWrittenChapters(Array.isArray(completedBook.chapters) ? completedBook.chapters : []);
+  }, [completedBook]);
+
 
   // Correction automatique du livre terminé (V3) : aucune action de l'abonné.
   useEffect(() => {
@@ -1066,8 +1076,10 @@ Règles :
       timer = setTimeout(() => {
         const partial = buildBookFromWorkflowResults();
         if (partial && partial.chapters.some((c: any) => !c.incomplete)) {
+          publishWrittenChapters(partial.chapters);
           void saveProjectToCloud({ silent: true, completedBookOverride: partial });
         }
+
       }, 4000);
     };
     trigger();

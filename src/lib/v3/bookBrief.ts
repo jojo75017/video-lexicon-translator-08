@@ -102,6 +102,7 @@ export function resetBookProject() {
     TOC_PINNED_KEY,
     'edition_book_config_v1',
     'v3_genie_thread_v1',
+    'v3_written_chapters_v1',
   ];
   for (const key of keys) {
     try { localStorage.removeItem(key); } catch { /* mode privé */ }
