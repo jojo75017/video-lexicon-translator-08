@@ -586,6 +586,8 @@ const App = () => {
 
               {/* Routes verrouillées jusqu'au 1er octobre 2026 (admins exceptés) */}
               <Route path="create" element={<V3LockedGate><V3CreatePage /></V3LockedGate>} />
+              {/* Biographie — même moteur, entretien et chronologie dédiés */}
+              <Route path="biographie" element={<V3LockedGate><V3CreatePage mode="biography" /></V3LockedGate>} />
               <Route path="create/illustre" element={<V3LockedGate><V3KidsBookCreatePage /></V3LockedGate>} />
               <Route path="book/:id" element={<V3LockedGate><V3BookPage /></V3LockedGate>} />
               <Route path="library" element={<V3LockedGate><V3LibraryPage /></V3LockedGate>} />

@@ -25,6 +25,7 @@ import V3ClosingRecallPanel from '@/components/v3public/V3ClosingRecallPanel';
 
 
 const FEATURED_TOOLS = [
+  { emoji: '📖', title: 'Biographie — Le récit de votre vie', desc: 'Racontez votre vie période par période : vos mots sont gardés, jamais résumés.', to: '/v3/biographie', badge: 'NEW' },
   { emoji: '📘', title: 'Assistant V3', desc: 'Créez votre livre en 4 étapes guidées.', to: '/v3/create', badge: 'V3' },
   { emoji: '🎨', title: 'Cover Studio Pro', desc: 'Couverture haut de gamme, direction artistique IA.', to: '/v3/hub?tab=cover-pro', badge: 'Pro' },
   { emoji: '🚀', title: 'KDP Pilot', desc: 'Audit complet avant publication Amazon.', to: '/audit-pilot', badge: 'Populaire' },
