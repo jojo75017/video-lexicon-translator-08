@@ -63,12 +63,27 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
   useEffect(() => {
     const stored = readBookBrief() || {};
     setBrief(stored);
-    setMessages(readLocalThread());
+    const local = readLocalThread();
+    setMessages(local);
+    // Récupération du récit : la matière brute est reconstruite depuis tous les
+    // messages de l'auteur (idempotent), afin que rien de ce qu'il a raconté
+    // ne soit perdu, même si un ancien enregistrement était vide.
+    const restore = (thread: GenieMessage[], base: BookBrief) => {
+      const rebuilt = rebuildSourceText(thread, base.sourceText);
+      if (rebuilt && rebuilt !== (base.sourceText || '')) {
+        const next = { ...base, sourceText: rebuilt };
+        setBrief(next);
+        writeBookBrief(next);
+        return next;
+      }
+      return base;
+    };
+    const afterLocal = restore(local, stored);
     // Reprise multi-appareils : le fil serveur fait foi s'il est plus complet.
     loadRemoteThread(stored.projectId || null).then((remote) => {
-      if (remote.length) {
-        setMessages((local) => (remote.length >= local.length ? remote : local));
-      }
+      if (!remote.length) return;
+      setMessages((current) => (remote.length >= current.length ? remote : current));
+      restore(remote, readBookBrief() || afterLocal);
     });
   }, []);
 
