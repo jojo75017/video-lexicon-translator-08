@@ -51,12 +51,27 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState<string[]>([]);
   const [editing, setEditing] = useState(false);
+  const [messages, setMessages] = useState<GenieMessage[]>([]);
+  const [showThread, setShowThread] = useState(true);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const resultRef = useRef<HTMLDivElement | null>(null);
+  const threadEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    setBrief(readBookBrief() || {});
+    const stored = readBookBrief() || {};
+    setBrief(stored);
+    setMessages(readLocalThread());
+    // Reprise multi-appareils : le fil serveur fait foi s'il est plus complet.
+    loadRemoteThread(stored.projectId || null).then((remote) => {
+      if (remote.length) {
+        setMessages((local) => (remote.length >= local.length ? remote : local));
+      }
+    });
   }, []);
+
+  useEffect(() => {
+    if (messages.length) writeLocalThread(messages);
+  }, [messages]);
 
   const ready = Boolean((brief.title || '').trim() && brief.chapters);
 
@@ -68,6 +83,12 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
     });
   };
 
+  const pushMessage = (message: GenieMessage, briefSnapshot: BookBrief) => {
+    setMessages((prev) => [...prev, message]);
+    void saveRemoteMessage(message, briefSnapshot, briefSnapshot.projectId || null);
+    setTimeout(() => threadEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
+  };
+
   const ask = async (message: string) => {
     const text = message.trim();
     if (text.length < 10) {
@@ -76,16 +97,21 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
     }
     setLoading(true);
     setQuestions([]);
+    const previousBrief = brief;
+    const history = messages.slice(-12).map((m) => ({ role: m.role, content: m.content }));
+    pushMessage(makeMessage('user', text), previousBrief);
+    setInput('');
     try {
       const provider = getProvider();
       const userApiKey = provider === 'gemini' ? getProviderKey('gemini') : '';
       const { data, error } = await supabase.functions.invoke('v3-genie-brief', {
-        body: { message: text, userApiKey, author: (brief.author || '').trim() },
+        body: { message: text, userApiKey, author: (brief.author || '').trim(), history },
       });
       if (error) throw error;
       if ((data as any)?.error) throw new Error((data as any).error);
       const b = (data as any)?.brief || {};
-      patch({
+      const nextBrief: BookBrief = {
+        ...previousBrief,
         title: b.title || '',
         subtitle: b.subtitle || '',
         author: b.author || brief.author || '',
@@ -98,16 +124,30 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
         cibleProfil: b.cibleProfil || brief.cibleProfil || '',
         promesseCentrale: b.promesseCentrale || brief.promesseCentrale || '',
         outlineValidated: false,
-      });
-      setQuestions(Array.isArray((data as any)?.questions) ? (data as any).questions : []);
-      setInput('');
+      };
+      setBrief(nextBrief);
+      writeBookBrief(nextBrief);
+      const nextQuestions = Array.isArray((data as any)?.questions) ? (data as any).questions : [];
+      setQuestions(nextQuestions);
+      const changes = describeBriefChanges(previousBrief, nextBrief);
+      const reply = [
+        `Voilà ce que j’ai compris : « ${nextBrief.title} »${nextBrief.subtitle ? ` — ${nextBrief.subtitle}` : ''}.`,
+        nextBrief.description || '',
+        nextQuestions.length ? `Question : ${nextQuestions[0]}` : '',
+      ].filter(Boolean).join('\n\n');
+      pushMessage(makeMessage('assistant', reply, { changes: changes || undefined, outline: nextBrief.outline }), nextBrief);
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 120);
     } catch (e: any) {
       toast.error(e?.message || 'Le Génie est indisponible pour le moment.');
+      pushMessage(
+        makeMessage('assistant', 'Je n’ai pas pu traiter ce message. Reformulez-le ou réessayez dans quelques secondes.'),
+        previousBrief,
+      );
     } finally {
       setLoading(false);
     }
   };
+
 
   const refine = async (extra: string) => {
     const base = (brief.description || '').trim();
