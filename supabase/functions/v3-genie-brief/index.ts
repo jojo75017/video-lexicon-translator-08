@@ -87,9 +87,19 @@ Deno.serve(async (req) => {
       userApiKey?: string;
       author?: string;
       history?: Array<{ role?: string; content?: string }>;
+      mode?: string;
+      accepted?: Array<{ titre?: string; objectif?: string }>;
+      target?: number;
+      bookTitle?: string;
+      bookDescription?: string;
+      tone?: string;
+      language?: string;
     };
     const message = String(body.message || "").trim();
-    if (message.length < 10) return json(400, { error: "Décrivez votre livre en quelques mots." });
+    const mode = String(body.mode || "brief");
+    if (mode !== "outline-step" && message.length < 10) {
+      return json(400, { error: "Décrivez votre livre en quelques mots." });
+    }
 
     // Mémoire de conversation : le Génie doit tenir compte de tout ce qui a déjà été dit.
     const history = (Array.isArray(body.history) ? body.history : [])
@@ -101,6 +111,7 @@ Deno.serve(async (req) => {
     const historyBlock = history
       ? `\nHistorique de la conversation (à respecter : ne perds rien de ce qui a déjà été décidé, applique seulement les nouvelles précisions) :\n"""${history}"""\n`
       : "";
+
 
     const prompt = `Tu es directeur éditorial KDP francophone. Un auteur te décrit librement son projet de livre.
 ${historyBlock}
