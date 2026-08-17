@@ -16,7 +16,7 @@ import { invokeImageFunction } from '@/lib/aiImageInvoke';
 import { callAIWriting, getProvider, getProviderKey, validateKeyFormat } from '@/services/aiWritingService';
 import TocUltimateGenerator, { type UltimateTocChapter } from '@/components/tools/TocUltimateGenerator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { clearTocForWorkflow, parseTocText, readLatestUltimateToc, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
+import { clearTocForWorkflow, parseTocText, readBookBrief, readLatestUltimateToc, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
 
 
 type WizardCharacter = {
@@ -600,12 +600,17 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
   // Instantané du brief pour le récapitulatif « Livre en préparation » sur /v3
   useEffect(() => {
     if (!title.trim() && !description.trim()) return;
+    // Le Génie et le wizard partagent la même fiche. Toujours reprendre ici la
+    // matière la plus récente du stockage, sinon un ancien état React pouvait
+    // écraser les nouveaux souvenirs saisis dans le dialogue.
+    const currentBrief = readBookBrief() || {};
     writeBookBrief({
+      ...currentBrief,
       title: finalTitle.trim() || title.trim(),
       subtitle: subtitle.trim(),
       author: authorName.trim(),
       description: description.trim(),
-      sourceText: sourceText.trim(),
+      sourceText: String(currentBrief.sourceText || sourceText).trim(),
 
       category: effectiveCategory,
       genre: effectiveCategory,

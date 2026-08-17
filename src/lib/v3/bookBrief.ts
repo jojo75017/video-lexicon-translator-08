@@ -137,7 +137,9 @@ export function appendSourceText(previous: string | undefined, addition: string)
   const clean = String(addition || '').trim();
   const base = String(previous || '').trim();
   if (!clean) return base;
-  if (base.includes(clean)) return base;
+  // Ignorer uniquement un passage complet déjà enregistré. Une simple phrase
+  // contenue ailleurs ne doit pas faire disparaître un nouveau souvenir.
+  if (base.split(/\n{2,}/).some((passage) => passage.trim() === clean)) return base;
   // Aucun découpage : dans une autobiographie, les premiers souvenirs sont
   // aussi importants que les derniers et ne doivent jamais disparaître.
   return base ? `${base}\n\n${clean}` : clean;
