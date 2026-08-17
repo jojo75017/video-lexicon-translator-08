@@ -35,13 +35,23 @@ Aujourd'hui plusieurs mémoires vivent en parallèle : la fiche du Génie, la co
 - L'ambiance choisie est mémorisée avec le livre et réappliquée à la reprise ; elle reste modifiable après génération (elle ne change que l'apparence, pas le texte).
 - Un lien discret vers la galerie complète `/ambiances` pour comparer en grand.
 
-## 3. Voir le sommaire pendant l'écriture
+## 3. Rien ne démarre avant la validation du sommaire
+
+Règle unique : **tant que le sommaire n'est pas validé, le workflow ne se lance pas.**
 
 À faire :
-- Pendant la rédaction, passer en **deux colonnes** sur écran large : le travail d'écriture à gauche, le **sommaire en cours à droite, collant (sticky)** et défilant.
-- Le panneau latéral affiche : titre du livre, chips (catégorie, ton, mots/chapitre), sommaire numéroté, état de chaque chapitre (à écrire / écrit) et les versions restaurables.
+- Avant validation : seuls le dialogue Génie, le sommaire en cours et le bouton « Valider le sommaire » sont actifs. Aucun formulaire de workflow, aucun bouton de rédaction, d'export, de correction ou d'audio n'est cliquable (ils restent visibles, grisés, avec « Disponible après validation du sommaire »).
+- Au clic sur **« Valider le sommaire »** : la version est enregistrée, puis le workflow s'ouvre juste en dessous et la barre complète des boutons devient active sous le livre.
+- Tant que le sommaire est modifié après validation, le workflow reste ouvert mais un rappel invite à revalider pour repartir sur le bon sommaire.
+
+## 4. Voir le sommaire pendant l'écriture
+
+À faire :
+- Après validation, passer en **deux colonnes** sur écran large : le travail d'écriture à gauche, le **sommaire à droite, collant (sticky)** et défilant.
+- Le panneau latéral affiche : titre du livre, chips (catégorie, ton, langue, mots/chapitre), sommaire numéroté, état de chaque chapitre (à écrire / écrit) et les versions restaurables.
 - Il se met à jour en direct à chaque modification faite par le Génie ou à la main.
 - Sur mobile : le sommaire reste au-dessus de la zone d'écriture, repliable, pour ne pas encombrer.
+
 
 ## Détails techniques
 
