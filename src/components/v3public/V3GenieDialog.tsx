@@ -1,10 +1,22 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Sparkles, Wand2, ArrowRight, Check, Upload, FileText, RotateCcw, Loader2, Mic, Pencil } from 'lucide-react';
+import { Sparkles, Wand2, ArrowRight, Check, Upload, FileText, RotateCcw, Loader2, Mic, Pencil, MessageSquare, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import { readBookBrief, writeBookBrief, type BookBrief } from '@/lib/v3/bookBrief';
+import {
+  clearLocalThread,
+  clearRemoteThread,
+  describeBriefChanges,
+  loadRemoteThread,
+  makeMessage,
+  readLocalThread,
+  saveRemoteMessage,
+  writeLocalThread,
+  type GenieMessage,
+} from '@/lib/v3/genieThread';
+
 
 /**
  * Ebookstudio-Génie — une seule boîte de dialogue.
