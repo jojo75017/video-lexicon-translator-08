@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import {
-  BOOK_BRIEF_EVENT, isFieldLocked, lockField, readBookBrief, unlockField, writeBookBrief,
+  BOOK_BRIEF_EVENT, dedupeSourceText, isFieldLocked, lockField, readBookBrief, unlockField, writeBookBrief,
   type BookBrief, type LockableField,
 } from '@/lib/v3/bookBrief';
 import { countTextWords, loadOutlineVersions, type OutlineVersion } from '@/lib/v3/genieThread';
