@@ -40,7 +40,7 @@ export default function V3OutlineCoBuilder() {
   };
 
   const propose = async (extra?: string) => {
-    if (!(brief.description || brief.title || '').trim()) {
+    if (!(brief.sourceText || brief.description || brief.title || '').trim()) {
       toast.info('Dites d’abord au Génie de quoi parle votre livre.');
       return;
     }
@@ -57,6 +57,8 @@ export default function V3OutlineCoBuilder() {
           target,
           bookTitle: brief.title || '',
           bookDescription: brief.description || '',
+          // Le récit intégral de l'auteur : les chapitres doivent suivre ses faits.
+          sourceText: brief.sourceText || '',
           tone: brief.tone || '',
           language: brief.language || 'fr',
         },

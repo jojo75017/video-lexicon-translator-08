@@ -94,6 +94,7 @@ Deno.serve(async (req) => {
       bookDescription?: string;
       tone?: string;
       language?: string;
+      sourceText?: string;
     };
     const message = String(body.message || "").trim();
     const mode = String(body.mode || "brief");
@@ -105,7 +106,13 @@ Deno.serve(async (req) => {
     const history = (Array.isArray(body.history) ? body.history : [])
       .filter((m) => m && typeof m.content === "string" && m.content.trim())
       .slice(-12)
-      .map((m) => `${m.role === "assistant" ? "Génie" : "Auteur"} : ${String(m.content).slice(0, 900)}`)
+      // Les messages de l'auteur ne sont plus rognés à 900 caractères : un long
+      // souvenir raconté d'un seul bloc doit rester entier dans la mémoire.
+      .map((m) =>
+        m.role === "assistant"
+          ? `Génie : ${String(m.content).slice(0, 900)}`
+          : `Auteur : ${String(m.content).slice(0, 6000)}`,
+      )
       .join("\n");
 
     const historyBlock = history
@@ -145,12 +152,17 @@ Deno.serve(async (req) => {
       const remaining = Math.max(0, target - (Array.isArray(body.accepted) ? body.accepted.length : 0));
       const count = Math.min(3, remaining || 3);
 
+      const stepSource = String(body.sourceText || "").trim();
+      const stepSourceBlock = stepSource
+        ? `\nRÉCIT INTÉGRAL DE L'AUTEUR (ses mots exacts — les chapitres doivent suivre CES faits, ces lieux, ces dates et ces personnes, jamais un résumé inventé) :\n"""${stepSource.slice(-14000)}"""\n`
+        : "";
+
       const stepPrompt = `Tu es directeur éditorial KDP francophone. Tu construis un sommaire AVEC l'auteur, pas à sa place.
 Livre : « ${String(body.bookTitle || "").slice(0, 200)} »
 Sujet / promesse : """${String(body.bookDescription || message).slice(0, 2000)}"""
 Ton souhaité : ${String(body.tone || "Inspirant")}
 Nombre total de chapitres visé : ${target}
-${historyBlock}
+${stepSourceBlock}${historyBlock}
 Chapitres DÉJÀ acceptés par l'auteur (ne les répète jamais, ne les modifie pas) :
 """${accepted || "aucun pour le moment"}"""
 
@@ -199,7 +211,7 @@ Règles :
 
     const sourceText = String((body as any).sourceText || "").trim();
     const sourceBlock = sourceText
-      ? `\nMATIÈRE BRUTE DE L'AUTEUR (ses mots exacts, à conserver et à développer — INTERDIT de la résumer, de la raccourcir ou de la remplacer) :\n"""${sourceText.slice(-12000)}"""\n`
+      ? `\nMATIÈRE BRUTE DE L'AUTEUR (ses mots exacts, à conserver et à développer — INTERDIT de la résumer, de la raccourcir ou de la remplacer) :\n"""${sourceText.slice(-24000)}"""\n`
       : "";
 
     const prompt = `Tu es directeur éditorial KDP francophone. Un auteur te décrit librement son projet de livre.

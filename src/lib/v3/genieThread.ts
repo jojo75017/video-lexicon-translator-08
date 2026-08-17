@@ -4,6 +4,7 @@
  * localStorage en secours pour ne jamais perdre l'échange en cours.
  */
 import { supabase } from '@/integrations/supabase/client';
+import { appendSourceText } from '@/lib/v3/bookBrief';
 import type { BookBrief, BriefOutlineChapter } from '@/lib/v3/bookBrief';
 
 const db = supabase as any;
@@ -146,6 +147,39 @@ export async function clearRemoteThread(projectId?: string | null) {
   } catch {
     /* ignore */
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Reconstruction de la matière brute depuis le fil                    */
+/* ------------------------------------------------------------------ */
+
+/** Retire les préfixes techniques pour ne garder que les mots de l'auteur. */
+function authorWords(content: string): string {
+  return String(content || '')
+    .replace(/^\s*Précision de l['’]auteur\s*:\s*/i, '')
+    .trim();
+}
+
+/**
+ * Reconstruit la matière brute (mots exacts de l'auteur) à partir de tous ses
+ * messages, dans l'ordre chronologique. Idempotent : les passages déjà présents
+ * ne sont jamais dupliqués. Les réponses très courtes (choix de langue, de ton…)
+ * sont ignorées : ce ne sont pas du récit.
+ */
+export function rebuildSourceText(messages: GenieMessage[], existing?: string): string {
+  let out = String(existing || '').trim();
+  for (const m of messages) {
+    if (m.role !== 'user') continue;
+    const text = authorWords(m.content);
+    if (text.length < 40) continue;
+    out = appendSourceText(out, text);
+  }
+  return out;
+}
+
+/** Nombre de mots réels d'un texte. */
+export function countTextWords(text: string): number {
+  return String(text || '').trim().split(/\s+/).filter(Boolean).length;
 }
 
 /* ------------------------------------------------------------------ */

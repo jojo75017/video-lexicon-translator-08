@@ -1,15 +1,45 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { ListOrdered, History, RotateCcw, PenLine, Loader2, Sparkles, Wand2 } from 'lucide-react';
+import {
+  ListOrdered, History, RotateCcw, PenLine, Loader2, Sparkles, Wand2, SlidersHorizontal, Lock,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
-import { BOOK_BRIEF_EVENT, readBookBrief, writeBookBrief, type BookBrief } from '@/lib/v3/bookBrief';
-import { loadOutlineVersions, type OutlineVersion } from '@/lib/v3/genieThread';
+import {
+  BOOK_BRIEF_EVENT, isFieldLocked, lockField, readBookBrief, unlockField, writeBookBrief,
+  type BookBrief, type LockableField,
+} from '@/lib/v3/bookBrief';
+import { countTextWords, loadOutlineVersions, type OutlineVersion } from '@/lib/v3/genieThread';
 import {
   readWrittenProgress, replaceWrittenChapter, WRITTEN_CHAPTERS_EVENT, type WrittenProgress,
 } from '@/lib/v3/writtenChapters';
 import V3OutlinePanel from './V3OutlinePanel';
+
+/** Une ligne de réglage : le champ, et le cadenas quand l'auteur a décidé. */
+function SettingField({
+  label, field, locked, onUnlock, children,
+}: {
+  label: string;
+  field: LockableField;
+  locked: boolean;
+  onUnlock: (field: LockableField) => void;
+  children: ReactNode;
+}) {
+  return (
+    <label className="block">
+      <span className="flex items-center justify-between gap-2 text-[10.5px]" style={{ color: 'var(--v3-muted)' }}>
+        <span>{label}</span>
+        {locked && (
+          <button type="button" onClick={() => onUnlock(field)} className="inline-flex items-center gap-1 underline">
+            <Lock className="h-3 w-3" /> Laisser le Génie proposer
+          </button>
+        )}
+      </span>
+      <span className="mt-0.5 block">{children}</span>
+    </label>
+  );
+}
 
 /**
  * Colonne de droite : « Sommaire » (ce que l'IA a compris, versions restaurables)
@@ -99,6 +129,37 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
   const writtenTitles = new Set(written.map((c) => c.title.toLowerCase().trim()));
   const writing = progress.activeIndex >= 0 && progress.activeIndex < totalChapters;
 
+  const sourceText = String(brief.sourceText || '').trim();
+  const sourceWords = countTextWords(sourceText);
+  const estimatedTotal = (Number(brief.chapters) || 0) * (Number(brief.wordsPerChapter) || 0);
+
+  /** Saisie d'un réglage : on enregistre et on verrouille le champ. */
+  const setSetting = (field: LockableField, raw: string) => {
+    const current = readBookBrief() || {};
+    let value: string | number | undefined;
+    if (field === 'chapters') {
+      const n = Number(raw);
+      value = raw.trim() === '' ? undefined : Math.min(40, Math.max(3, Math.round(n) || 3));
+    } else if (field === 'wordsPerChapter') {
+      const n = Number(raw);
+      value = raw.trim() === '' ? undefined : Math.min(3500, Math.max(800, Math.round(n) || 800));
+    } else {
+      value = raw;
+    }
+    const next: BookBrief = { ...current, [field]: value, lockedFields: lockField(current, field) } as BookBrief;
+    setBrief(next);
+    writeBookBrief(next);
+  };
+
+  const unlock = (field: LockableField) => {
+    const current = readBookBrief() || {};
+    const next: BookBrief = { ...current, lockedFields: unlockField(current, field) };
+    setBrief(next);
+    writeBookBrief(next);
+    toast.success('Le Génie pourra de nouveau proposer cette valeur.');
+  };
+
+
   return (
     <div className="space-y-4">
       <div className="rounded-[22px] border p-4 md:p-5" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
@@ -116,25 +177,87 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
         </h3>
         <div className="mt-1 flex flex-wrap gap-2 text-[11px]">
           {[brief.category, brief.tone, brief.author ? `par ${brief.author}` : null,
-            brief.wordsPerChapter ? `${brief.wordsPerChapter} mots / chapitre` : null,
           ].filter(Boolean).map((chip) => (
             <span key={String(chip)} className="rounded-full border px-2.5 py-1"
               style={{ borderColor: 'rgba(201,168,76,0.6)', color: 'var(--v3-ink)' }}>{chip}</span>
           ))}
         </div>
 
-        {/* Le récit du livre : un seul endroit, jamais recopié dans la conversation */}
-        {(brief.description || '').trim() && (
-          <div className="mt-2 text-[12px]" style={{ color: 'var(--v3-muted)' }}>
-            <p className="whitespace-pre-wrap leading-relaxed">
-              {showStory ? brief.description : `${String(brief.description).slice(0, 180)}${String(brief.description).length > 180 ? '…' : ''}`}
+        {/* Réglages du livre : c'est l'auteur qui décide, l'IA ne les touche plus */}
+        <div className="mt-3 rounded-2xl border p-3" style={{ borderColor: 'rgba(201,168,76,0.45)', background: 'rgba(201,168,76,0.06)' }}>
+          <div className="flex items-center justify-between gap-2">
+            <span className="inline-flex items-center gap-1.5 text-[11.5px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+              <SlidersHorizontal className="h-3.5 w-3.5" /> Réglages du livre
+            </span>
+            <span className="text-[10.5px]" style={{ color: 'var(--v3-muted)' }}>
+              ≈ {estimatedTotal.toLocaleString('fr-FR')} mots au total
+            </span>
+          </div>
+
+          <div className="mt-2 space-y-2">
+            <SettingField label="Titre" field="title" locked={isFieldLocked(brief, 'title')} onUnlock={unlock}>
+              <input type="text" value={brief.title || ''} placeholder="Le titre de votre livre"
+                onChange={(e) => setSetting('title', e.target.value)}
+                className="w-full rounded-lg border px-2.5 py-1.5 text-[12.5px]"
+                style={{ borderColor: 'rgba(0,0,0,0.15)', color: 'var(--v3-ink)' }} />
+            </SettingField>
+
+            <SettingField label="Sous-titre" field="subtitle" locked={isFieldLocked(brief, 'subtitle')} onUnlock={unlock}>
+              <input type="text" value={brief.subtitle || ''} placeholder="Sous-titre (facultatif)"
+                onChange={(e) => setSetting('subtitle', e.target.value)}
+                className="w-full rounded-lg border px-2.5 py-1.5 text-[12.5px]"
+                style={{ borderColor: 'rgba(0,0,0,0.15)', color: 'var(--v3-ink)' }} />
+            </SettingField>
+
+            <div className="grid grid-cols-2 gap-2">
+              <SettingField label="Chapitres" field="chapters" locked={isFieldLocked(brief, 'chapters')} onUnlock={unlock}>
+                <input type="number" min={3} max={40} value={brief.chapters ?? ''} placeholder="12"
+                  onChange={(e) => setSetting('chapters', e.target.value)}
+                  className="w-full rounded-lg border px-2.5 py-1.5 text-[12.5px]"
+                  style={{ borderColor: 'rgba(0,0,0,0.15)', color: 'var(--v3-ink)' }} />
+              </SettingField>
+              <SettingField label="Mots / chapitre" field="wordsPerChapter" locked={isFieldLocked(brief, 'wordsPerChapter')} onUnlock={unlock}>
+                <input type="number" min={800} max={3500} step={100} value={brief.wordsPerChapter ?? ''} placeholder="2500"
+                  onChange={(e) => setSetting('wordsPerChapter', e.target.value)}
+                  className="w-full rounded-lg border px-2.5 py-1.5 text-[12.5px]"
+                  style={{ borderColor: 'rgba(0,0,0,0.15)', color: 'var(--v3-ink)' }} />
+              </SettingField>
+            </div>
+          </div>
+          <p className="mt-2 text-[10.5px]" style={{ color: 'var(--v3-muted)' }}>
+            Dès que vous saisissez une valeur, elle est verrouillée : le Génie ne la remplacera plus.
+          </p>
+        </div>
+
+        {/* Vos souvenirs : les mots exacts de l'auteur, intégralement conservés */}
+        {sourceText ? (
+          <div className="mt-3 rounded-2xl border p-3" style={{ borderColor: 'rgba(0,0,0,0.10)' }}>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[11.5px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+                Vos souvenirs — texte intégral
+              </span>
+              <span className="text-[10.5px]" style={{ color: 'var(--v3-muted)' }}>
+                {sourceWords.toLocaleString('fr-FR')} mots conservés
+              </span>
+            </div>
+            <p className="mt-1.5 whitespace-pre-wrap text-[12px] leading-relaxed" style={{ color: 'var(--v3-ink)' }}>
+              {showStory ? sourceText : `${sourceText.slice(0, 320)}${sourceText.length > 320 ? '…' : ''}`}
             </p>
-            {String(brief.description).length > 180 && (
-              <button type="button" onClick={() => setShowStory((v) => !v)} className="mt-1 underline">
-                {showStory ? 'Réduire le récit' : 'Voir le récit complet'}
+            {sourceText.length > 320 && (
+              <button type="button" onClick={() => setShowStory((v) => !v)} className="mt-1 text-[11px] underline"
+                style={{ color: 'var(--v3-muted)' }}>
+                {showStory ? 'Replier mes souvenirs' : 'Voir tout ce que j’ai raconté'}
               </button>
             )}
           </div>
+        ) : null}
+
+        {/* Résumé court généré par l'IA : simple étiquette, jamais votre récit */}
+        {(brief.description || '').trim() && (
+          <details className="mt-2 text-[12px]" style={{ color: 'var(--v3-muted)' }}>
+            <summary className="cursor-pointer text-[11.5px]">Résumé du livre (généré par l’IA)</summary>
+            <p className="mt-1 whitespace-pre-wrap leading-relaxed">{brief.description}</p>
+          </details>
         )}
 
         {/* Progression de la rédaction */}
