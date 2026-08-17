@@ -197,24 +197,31 @@ Règles :
     }
 
 
+    const sourceText = String((body as any).sourceText || "").trim();
+    const sourceBlock = sourceText
+      ? `\nMATIÈRE BRUTE DE L'AUTEUR (ses mots exacts, à conserver et à développer — INTERDIT de la résumer, de la raccourcir ou de la remplacer) :\n"""${sourceText.slice(-12000)}"""\n`
+      : "";
+
     const prompt = `Tu es directeur éditorial KDP francophone. Un auteur te décrit librement son projet de livre.
-${historyBlock}
+${historyBlock}${sourceBlock}
 Dernier message de l'auteur :
 """${message.slice(0, 5000)}"""
 
 Déduis la fiche complète du livre. Réponds STRICTEMENT en JSON valide, sans markdown :
-{"title":"","subtitle":"","author":"","category":"","tone":"","description":"","chapters":20,"wordsPerChapter":1500,"wantsIllustrations":false,"audience":"","promesseCentrale":"","questions":[""]}
+{"title":"","subtitle":"","author":"","category":"","tone":"","description":"","chapters":20,"wordsPerChapter":2500,"wantsIllustrations":false,"audience":"","promesseCentrale":"","questions":[""]}
 
 Règles :
 - 100 % français : aucun latin, aucune langue étrangère décorative, aucun mot inventé ;
 - "title" : titre commercial court et vendeur (invente-le si l'auteur n'en donne pas) ;
-- "category" : une catégorie Amazon KDP parmi Roman, Thriller / Policier, Romance, Fantasy / Fantastique, Science-fiction, Développement personnel, Business / Entrepreneuriat, Santé / Bien-être, Cuisine / Recettes, Voyage / Guide, Enfants / Jeunesse, Histoire / Culture ;
+- "category" : une catégorie Amazon KDP parmi Roman, Thriller / Policier, Romance, Fantasy / Fantastique, Science-fiction, Développement personnel, Business / Entrepreneuriat, Santé / Bien-être, Cuisine / Recettes, Voyage / Guide, Enfants / Jeunesse, Histoire / Culture, Biographie / Récit de vie ;
 - "tone" : un seul mot parmi Inspirant, Pédagogique, Émotionnel, Direct, Humoristique, Premium, Romanesque, Expert ;
-- "description" : synopsis clair de 3 à 5 phrases, reformulé proprement à partir du message ;
-- "chapters" : entre 8 et 30 selon l'ambition du projet ; "wordsPerChapter" entre 1000 et 2200 ;
+- "description" : présentation du projet en 4 à 8 phrases. Tu NE RÉSUMES PAS la matière brute : tu la conserves comme socle et tu annonces qu'elle sera développée. Ne supprime aucun lieu, aucune date, aucun prénom ni aucun souvenir cité par l'auteur ;
+- INTERDIT de condenser un récit de vie en quelques lignes : chaque souvenir donné est un matériau de chapitre ;
+- "chapters" : entre 8 et 30 selon l'ambition du projet ; "wordsPerChapter" entre 2200 et 3500 (2500 par défaut) ;
 - "wantsIllustrations" : true si le sujet appelle des images (enfants, cuisine, voyage, pratique) ;
 - "author" : reprends le nom si l'auteur le donne, sinon "" ;
-- "questions" : 0 à 2 questions courtes seulement si une information essentielle manque vraiment.`;
+- "questions" : 0 à 2 questions courtes qui invitent l'auteur à donner PLUS de détails, de scènes et de souvenirs.`;
+
 
     const userKey = sanitizeApiKey(body.userApiKey);
     const serverKey = sanitizeApiKey(Deno.env.get("GEMINI_API_KEY") || "");
