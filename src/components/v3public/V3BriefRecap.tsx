@@ -240,12 +240,13 @@ export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMod
       </div>
 
       {/* Cible & Promesse — 100 % IA */}
-      <V3TargetPromisePanel brief={brief} onChange={patch} />
+      {!formOnly && <V3TargetPromisePanel brief={brief} onChange={patch} />}
 
       {/* Sommaire + validation */}
-      <V3OutlinePanel brief={brief} onChange={patch} initialMode={outlineMode} />
+      {!formOnly && <V3OutlinePanel brief={brief} onChange={patch} initialMode={outlineMode} />}
 
       {/* Lancement du workflow */}
+      {!formOnly && (
       <div className="rounded-[22px] border p-5" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
         <p className="mb-3 text-xs" style={{ color: 'var(--v3-muted)' }}>
           Le workflow reprend vos informations (titre, auteur, synopsis, catégorie, ton, {chapters || '—'} chapitres) et le
@@ -272,6 +273,8 @@ export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMod
         ) : null}
 
       </div>
+      )}
+
     </section>
   );
 }
