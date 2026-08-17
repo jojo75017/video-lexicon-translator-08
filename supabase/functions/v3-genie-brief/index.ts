@@ -144,38 +144,78 @@ Deno.serve(async (req) => {
     // L'IA ne propose JAMAIS le sommaire complet : au plus 3 chapitres à la fois,
     // en tenant compte des chapitres déjà acceptés par l'auteur.
     if (mode === "outline-step") {
-      const accepted = (Array.isArray(body.accepted) ? body.accepted : [])
-        .map((c, i) => `${i + 1}. ${String(c?.titre || "").trim()}${c?.objectif ? ` — ${String(c.objectif).trim()}` : ""}`)
+      const acceptedList = Array.isArray(body.accepted) ? body.accepted : [];
+      const accepted = acceptedList
+        .map((c, i) => {
+          const src = Array.isArray((c as any)?.sources) && (c as any).sources.length
+            ? ` [passages ${(c as any).sources.join(", ")}]`
+            : "";
+          return `${i + 1}. ${String(c?.titre || "").trim()}${c?.objectif ? ` — ${String(c.objectif).trim()}` : ""}${src}`;
+        })
         .filter((line) => line.length > 3)
         .join("\n");
       const target = Math.min(40, Math.max(3, Number(body.target) || 12));
-      const remaining = Math.max(0, target - (Array.isArray(body.accepted) ? body.accepted.length : 0));
+      const remaining = Math.max(0, target - acceptedList.length);
       const count = Math.min(3, remaining || 3);
 
+      // Passages numérotés du récit : le sommaire DOIT les suivre dans l'ordre.
+      // On garde le DÉBUT du récit en priorité (l'enfance vient en premier),
+      // au lieu de tronquer la fin comme avant.
       const stepSource = String(body.sourceText || "").trim();
-      const stepSourceBlock = stepSource
-        ? `\nRÉCIT INTÉGRAL DE L'AUTEUR (ses mots exacts — les chapitres doivent suivre CES faits, ces lieux, ces dates et ces personnes, jamais un résumé inventé) :\n"""${stepSource.slice(-14000)}"""\n`
+      const passages = stepSource
+        ? stepSource.split(/\n{2,}/).map((p) => p.trim()).filter((p) => p.length > 0)
+        : [];
+      let budget = 60000;
+      const numbered: string[] = [];
+      for (let i = 0; i < passages.length; i++) {
+        const line = `[Passage ${i + 1}] ${passages[i]}`;
+        if (line.length > budget) {
+          numbered.push(line.slice(0, Math.max(0, budget)));
+          break;
+        }
+        numbered.push(line);
+        budget -= line.length;
+      }
+      // Passages déjà couverts par les chapitres gardés : on repart après eux.
+      const coveredNumbers = acceptedList
+        .flatMap((c) => (Array.isArray((c as any)?.sources) ? (c as any).sources : []))
+        .map((n: unknown) => Number(n))
+        .filter((n: number) => Number.isFinite(n) && n > 0);
+      const nextPassage = coveredNumbers.length ? Math.max(...coveredNumbers) + 1 : 1;
+
+      const stepSourceBlock = numbered.length
+        ? `\nRÉCIT DE L'AUTEUR DÉCOUPÉ EN PASSAGES NUMÉROTÉS (ses mots exacts, dans son ordre) :\n"""\n${numbered.join("\n\n")}\n"""\nNombre total de passages : ${passages.length}. Premier passage encore à couvrir : ${nextPassage}.\n`
         : "";
 
-      const stepPrompt = `Tu es directeur éditorial KDP francophone. Tu construis un sommaire AVEC l'auteur, pas à sa place.
-Livre : « ${String(body.bookTitle || "").slice(0, 200)} »
-Sujet / promesse : """${String(body.bookDescription || message).slice(0, 2000)}"""
+      const anchorRules = numbered.length
+        ? `- Chaque chapitre proposé doit couvrir des passages RÉELS du récit, en commençant au passage ${nextPassage} et en avançant dans l'ordre du récit ;
+- "sources" : la liste des numéros de passages couverts par le chapitre (obligatoire, jamais vide, jamais un passage déjà couvert) ;
+- INTERDIT d'inventer un épisode, un lieu, une date, un prénom ou un métier qui n'est pas écrit dans les passages ;
+- INTERDIT de proposer un chapitre thématique générique (« développement personnel », « leçons de vie ») si le récit raconte des faits précis : suis la chronologie vécue par l'auteur ;
+- "titre" : titre concret tiré du contenu réel du passage (les mots, lieux et personnes de l'auteur), 8 mots maximum ;
+- "objectif" : une phrase qui rappelle QUELS souvenirs du récit ce chapitre raconte ;
+- si les passages restants ne suffisent pas pour ${count} chapitres, propose moins de chapitres et demande à l'auteur de raconter la suite ;`
+        : `- "titre" : titre de chapitre concret (8 mots maximum) ;
+- "objectif" : une seule phrase disant ce que le lecteur y gagne ;
+- "sources" : laisse un tableau vide, l'auteur n'a pas encore fourni de récit ;`;
+
+      const stepPrompt = `Tu es directeur éditorial KDP francophone. Tu construis un sommaire AVEC l'auteur, à partir de SON récit, pas à sa place et jamais à partir d'un résumé.
+Livre : « ${String(body.bookTitle || "").slice(0, 200)}${String(body.bookTitle || "") ? "" : ""}»
 Ton souhaité : ${String(body.tone || "Inspirant")}
 Nombre total de chapitres visé : ${target}
-${stepSourceBlock}${historyBlock}
+${numbered.length ? "" : `Sujet indiqué : """${String(body.bookDescription || message).slice(0, 2000)}"""\n`}${stepSourceBlock}${historyBlock}
 Chapitres DÉJÀ acceptés par l'auteur (ne les répète jamais, ne les modifie pas) :
 """${accepted || "aucun pour le moment"}"""
 
 ${message ? `Dernière demande de l'auteur : """${message.slice(0, 1500)}"""` : ""}
 
-Propose EXACTEMENT ${count} nouveaux chapitres qui suivent logiquement les précédents.
+Propose au maximum ${count} nouveaux chapitres qui suivent la suite du récit.
 Réponds STRICTEMENT en JSON valide, sans markdown :
-{"chapters":[{"titre":"","objectif":""}],"question":""}
+{"chapters":[{"titre":"","objectif":"","sources":[1]}],"question":""}
 
 Règles :
 - 100 % français : aucun latin, aucune langue étrangère, aucun mot inventé ;
-- "titre" : titre de chapitre concret et vendeur (8 mots maximum) ;
-- "objectif" : une seule phrase disant ce que le lecteur y gagne ;
+${anchorRules}
 - jamais plus de ${count} chapitres, jamais de doublon avec les chapitres acceptés ;
 - "question" : une seule question courte pour faire valider ces chapitres à l'auteur.`;
 
@@ -197,12 +237,19 @@ Règles :
         .map((c: any) => ({
           titre: String(c?.titre || c?.title || "").trim(),
           objectif: String(c?.objectif || c?.goal || "").trim(),
+          sources: Array.isArray(c?.sources)
+            ? c.sources
+              .map((n: unknown) => Number(n))
+              .filter((n: number) => Number.isFinite(n) && n >= 1 && n <= passages.length)
+            : [],
         }))
         .filter((c: any) => c.titre.length > 2)
         .slice(0, count);
       if (!chapters.length) return json(502, { error: "Réponse IA illisible. Réessayez." });
       return json(200, {
         chapters,
+        totalPassages: passages.length,
+        nextPassage,
         question: String(parsedStep?.question || "On garde ces chapitres ?").trim(),
         remaining: Math.max(0, remaining - chapters.length),
       });

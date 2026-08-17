@@ -8,6 +8,8 @@ export type BriefOutlineChapter = {
   numero: number;
   titre: string;
   objectif?: string;
+  /** Numéros des passages du récit de l'auteur couverts par ce chapitre. */
+  sources?: number[];
 };
 
 export type BookBrief = {
@@ -317,9 +319,24 @@ export function parseTocText(text: string): BriefOutlineChapter[] {
 
 export function normalizeOutline(items: BriefOutlineChapter[]): BriefOutlineChapter[] {
   return (items || [])
-    .map((item) => ({ numero: 0, titre: String(item?.titre || '').trim(), objectif: String(item?.objectif || '').trim() }))
+    .map((item) => ({
+      numero: 0,
+      titre: String(item?.titre || '').trim(),
+      objectif: String(item?.objectif || '').trim(),
+      sources: Array.isArray(item?.sources)
+        ? item!.sources!.map((n) => Number(n)).filter((n) => Number.isFinite(n) && n > 0)
+        : undefined,
+    }))
     .filter((item) => item.titre.length >= 2)
     .map((item, index) => ({ ...item, numero: index + 1 }));
+}
+
+/**
+ * Découpe le récit de l'auteur en passages numérotés (1, 2, 3…) : c'est la
+ * matière que le sommaire doit suivre dans l'ordre, sans rien inventer.
+ */
+export function listSourcePassages(text: string): string[] {
+  return splitPassages(dedupeSourceText(String(text || '')));
 }
 
 /* ------------------------------------------------------------------ */

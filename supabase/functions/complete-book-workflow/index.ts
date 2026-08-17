@@ -1596,6 +1596,9 @@ Format JSON :
         const descriptionGeneree = previousContext.P1?.descriptionGeneree || '';
         const introductionGeneree = previousContext.P1?.introductionGeneree || '';
         const conclusionGeneree = previousContext.P1?.conclusionGeneree || '';
+        const matiereAuteurP3 = bookIntroduction
+          ? `\n\nMATIÈRE DE L'AUTEUR (texte réel fourni par l'auteur — SOURCE DE VÉRITÉ, ne jamais la contredire, ne jamais inventer de faits/lieux/prénoms absents) :\n"""\n${String(bookIntroduction).slice(0, 20000)}\n"""\nRÈGLE : la structure doit suivre la chronologie et les faits de cette matière. Chaque chapitre doit correspondre à des éléments réellement présents ci-dessus.`
+          : '';
         const fallbackP3 = () => buildFallbackP3Result({
           title,
           subtitle,
@@ -1646,7 +1649,7 @@ RÈGLE DE CONCISION ABSOLUE :
 - Pas de paragraphes longs dans les descriptions`,
           `Structure ce livre selon les normes KDP PRO en ${numberOfChapters} chapitres ET crée les personnages :
 ${bookContext}
-DESCRIPTION : ${descriptionGeneree}
+DESCRIPTION : ${descriptionGeneree}${matiereAuteurP3}
 INTRODUCTION PRÉ-GÉNÉRÉE : ${introductionGeneree ? 'OUI (sera intégrée automatiquement)' : 'NON'}
 CONCLUSION PRÉ-GÉNÉRÉE : ${conclusionGeneree ? 'OUI (sera intégrée automatiquement)' : 'NON'}
 VISION P1 : ${JSON.stringify(previousContext.P1 || {})}
@@ -1774,6 +1777,9 @@ Format JSON :
         const tonEditorial = previousContext.P1?.tonEditorial || '';
         const lecteurCible = previousContext.P1?.lecteurCible || '';
         const structureGlobale = previousContext.P3?.structureGlobale || '';
+        const matiereAuteurP4 = bookIntroduction
+          ? `\n\nMATIÈRE DE L'AUTEUR (texte réel de l'auteur — SOURCE DE VÉRITÉ ABSOLUE) :\n"""\n${String(bookIntroduction).slice(0, 24000)}\n"""\nRÈGLES : reprends les faits, lieux, prénoms et dates exactement comme ci-dessus ; développe et enrichis ce matériau en scènes complètes, sans jamais le résumer, le raccourcir ni inventer d'éléments absents.`
+          : '';
 
         const personnagesP3 = previousContext.P3?.personnages || [];
         const personnagesAUtiliser = personnagesP3.length > 0 ? personnagesP3 : characters;
@@ -1885,7 +1891,7 @@ STYLE PROFESSIONNEL :
 
 LIVRE : "${fullTitle}"
 CATÉGORIE : ${category}
-DESCRIPTION : ${descriptionGeneree}
+DESCRIPTION : ${descriptionGeneree}${matiereAuteurP4}
 LECTEUR CIBLE : ${lecteurCible}
 ARC GLOBAL : ${structureGlobale}
 PLAN GLOBAL (compact) : ${planComplet}
@@ -1911,7 +1917,7 @@ Retourne en JSON :
 
 LIVRE : "${fullTitle}"
 CATÉGORIE : ${category}
-DESCRIPTION : ${descriptionGeneree}
+DESCRIPTION : ${descriptionGeneree}${matiereAuteurP4}
 LECTEUR CIBLE : ${lecteurCible}
 ARC GLOBAL : ${structureGlobale}
 PLAN : ${planComplet}
@@ -2036,7 +2042,7 @@ ${LANGUE_RULE}`,
           const chapterContent = await callAI(
             `Tu es un AUTEUR BEST-SELLER. Chapitres EXCEPTIONNELS dans "${category}". TON : ${tonEditorial}${personnagesSection}
 ${LANGUE_RULE}`,
-            `LIVRE : "${fullTitle}"\nDESCRIPTION : ${descriptionGeneree}\nPLAN : ${planComplet}${resumePrecedents}${personnagesSection}\n\nCHAPITRE ${chapitre.numero}/${structure.length} : "${chapitre.titre}"\nSOUS-SECTIONS : ${(chapitre.sousSections || []).join(', ')}\n${transition}\n\nJSON :\n{"numero": ${chapitre.numero}, "titre": "${chapitre.titre}", "contenu": "...", "nombreMots": 3000}`,
+            `LIVRE : "${fullTitle}"\nDESCRIPTION : ${descriptionGeneree}${matiereAuteurP4}\nPLAN : ${planComplet}${resumePrecedents}${personnagesSection}\n\nCHAPITRE ${chapitre.numero}/${structure.length} : "${chapitre.titre}"\nSOUS-SECTIONS : ${(chapitre.sousSections || []).join(', ')}\n${transition}\n\nJSON :\n{"numero": ${chapitre.numero}, "titre": "${chapitre.titre}", "contenu": "...", "nombreMots": 3000}`,
             6000
           );
           const parsed = parseJSON(chapterContent);

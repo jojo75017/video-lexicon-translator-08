@@ -4,12 +4,12 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import {
-  BOOK_BRIEF_EVENT, normalizeOutline, readBookBrief, writeBookBrief,
+  BOOK_BRIEF_EVENT, listSourcePassages, normalizeOutline, readBookBrief, writeBookBrief,
   type BookBrief, type BriefOutlineChapter,
 } from '@/lib/v3/bookBrief';
 import { saveOutlineVersion } from '@/lib/v3/genieThread';
 
-type Proposal = { titre: string; objectif: string };
+type Proposal = { titre: string; objectif: string; sources: number[] };
 
 /**
  * « On construit le sommaire ensemble » : le Génie ne propose jamais tout le
@@ -32,6 +32,11 @@ export default function V3OutlineCoBuilder() {
 
   const outline = brief.outline || [];
   const target = Math.min(40, Math.max(3, Number(brief.chapters) || 12));
+  /** Récit de l'auteur découpé en passages numérotés : le sommaire doit les suivre. */
+  const passages = listSourcePassages(brief.sourceText || '');
+  const coveredCount = new Set(
+    outline.flatMap((c) => (Array.isArray(c.sources) ? c.sources : [])),
+  ).size;
 
   const patch = (values: Partial<BookBrief>) => {
     const next = { ...(readBookBrief() || {}), ...values };
@@ -53,7 +58,7 @@ export default function V3OutlineCoBuilder() {
           mode: 'outline-step',
           message: (extra || note || '').trim(),
           userApiKey,
-          accepted: outline.map((c) => ({ titre: c.titre, objectif: c.objectif })),
+          accepted: outline.map((c) => ({ titre: c.titre, objectif: c.objectif, sources: c.sources || [] })),
           target,
           bookTitle: brief.title || '',
           bookDescription: brief.description || '',
@@ -66,7 +71,11 @@ export default function V3OutlineCoBuilder() {
       if (error) throw error;
       if ((data as any)?.error) throw new Error((data as any).error);
       const list = Array.isArray((data as any)?.chapters) ? (data as any).chapters : [];
-      setProposals(list.map((c: any) => ({ titre: String(c.titre || ''), objectif: String(c.objectif || '') })));
+      setProposals(list.map((c: any) => ({
+        titre: String(c.titre || ''),
+        objectif: String(c.objectif || ''),
+        sources: Array.isArray(c.sources) ? c.sources.map((n: any) => Number(n)).filter(Boolean) : [],
+      })));
       setQuestion(String((data as any)?.question || ''));
       setNote('');
     } catch (e: any) {
@@ -79,7 +88,7 @@ export default function V3OutlineCoBuilder() {
   const keep = (index: number) => {
     const p = proposals[index];
     if (!p?.titre.trim()) return;
-    const next = normalizeOutline([...outline, { numero: 0, titre: p.titre, objectif: p.objectif }] as BriefOutlineChapter[]);
+    const next = normalizeOutline([...outline, { numero: 0, titre: p.titre, objectif: p.objectif, sources: p.sources }] as BriefOutlineChapter[]);
     patch({ outline: next, outlineValidated: false });
     setProposals((prev) => prev.filter((_, i) => i !== index));
   };
@@ -89,7 +98,7 @@ export default function V3OutlineCoBuilder() {
     if (!kept.length) return;
     const next = normalizeOutline([
       ...outline,
-      ...kept.map((p) => ({ numero: 0, titre: p.titre, objectif: p.objectif })),
+      ...kept.map((p) => ({ numero: 0, titre: p.titre, objectif: p.objectif, sources: p.sources })),
     ] as BriefOutlineChapter[]);
     patch({ outline: next, outlineValidated: false });
     setProposals([]);
@@ -127,9 +136,17 @@ export default function V3OutlineCoBuilder() {
       </div>
 
       <p className="mt-2 text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
-        Le Génie propose 3 chapitres à la fois. Vous gardez, reformulez ou retirez — rien n’est
-        décidé sans vous, et le sommaire n’est validé que par votre clic.
+        Le Génie propose 3 chapitres à la fois, en suivant votre récit dans l’ordre. Vous gardez,
+        reformulez ou retirez — le sommaire n’est validé que par votre clic.
       </p>
+
+      {passages.length > 0 && (
+        <p className="mt-2 rounded-xl border px-2.5 py-2 text-[11.5px]"
+          style={{ borderColor: 'rgba(15,107,74,0.35)', background: 'rgba(15,107,74,0.06)', color: 'var(--v3-ink)' }}>
+          Votre récit compte <strong>{passages.length} passage(s)</strong> — {coveredCount} déjà rattaché(s) à un
+          chapitre. Chaque chapitre proposé indique les passages qu’il raconte.
+        </p>
+      )}
 
       {proposals.length > 0 && (
         <div className="mt-3 space-y-2">
@@ -148,6 +165,20 @@ export default function V3OutlineCoBuilder() {
               />
               {p.objectif && (
                 <p className="mt-1 text-[11.5px]" style={{ color: 'var(--v3-muted)' }}>{p.objectif}</p>
+              )}
+              {passages.length > 0 && (
+                p.sources.length ? (
+                  <p className="mt-1 text-[11px] font-semibold" style={{ color: '#0f6b4a' }}>
+                    D’après votre récit — passage(s) {p.sources.join(', ')} :
+                    <span className="ml-1 font-normal" style={{ color: 'var(--v3-muted)' }}>
+                      « {String(passages[p.sources[0] - 1] || '').slice(0, 120)}… »
+                    </span>
+                  </p>
+                ) : (
+                  <p className="mt-1 text-[11px] font-semibold" style={{ color: '#b42318' }}>
+                    Ce chapitre ne s’appuie sur aucun passage de votre récit — retirez-le ou demandez de suivre votre texte.
+                  </p>
+                )
               )}
               <div className="mt-2 flex flex-wrap gap-2">
                 <button type="button" onClick={() => keep(i)} className="v3-btn v3-btn-primary text-[11px]">
@@ -190,6 +221,13 @@ export default function V3OutlineCoBuilder() {
           disabled={loading} className="v3-btn v3-btn-outline text-xs disabled:opacity-50">
           <ArrowDown className="h-3.5 w-3.5" /> Suite logique
         </button>
+        {passages.length > 0 && (
+          <button type="button" disabled={loading}
+            onClick={() => propose('Ces chapitres ne suivent pas mon récit. Reprends STRICTEMENT mes passages dans l’ordre chronologique, sans rien inventer, et indique pour chaque chapitre les numéros de passages qu’il raconte.')}
+            className="v3-btn v3-btn-outline text-xs disabled:opacity-50">
+            <RefreshCw className="h-3.5 w-3.5" /> Recentrer sur mon récit
+          </button>
+        )}
         <button type="button" onClick={finish} disabled={outline.length < 3} className="v3-btn v3-btn-outline text-xs disabled:opacity-50">
           <Check className="h-3.5 w-3.5" /> Terminer et valider le sommaire
         </button>

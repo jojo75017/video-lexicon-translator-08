@@ -16,7 +16,7 @@ import { invokeImageFunction } from '@/lib/aiImageInvoke';
 import { callAIWriting, getProvider, getProviderKey, validateKeyFormat } from '@/services/aiWritingService';
 import TocUltimateGenerator, { type UltimateTocChapter } from '@/components/tools/TocUltimateGenerator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { clearTocForWorkflow, parseTocText, readBookBrief, readLatestUltimateToc, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
+import { clearTocForWorkflow, listSourcePassages, parseTocText, readBookBrief, readLatestUltimateToc, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
 
 
 type WizardCharacter = {
@@ -312,7 +312,7 @@ export default function V3CreateWizard() {
       }
       if (Array.isArray(w.outline) && w.outline.length) {
         const restoredOutline = w.outline.map((o: any, i: number) => ({
-          id: makeId(), numero: o.numero || i + 1, titre: o.titre || `Chapitre ${i + 1}`, objectif: o.objectif || '',
+          id: makeId(), numero: o.numero || i + 1, titre: o.titre || `Chapitre ${i + 1}`, objectif: o.objectif || '', sources: Array.isArray(o.sources) ? o.sources : undefined,
         }));
         const restoredCount = clampNumber(Number(w.numberOfChapters || w.chapters || restoredOutline.length), 3, 60, restoredOutline.length || 12);
         setOutline(hasRepeatedFallbackTitles(restoredOutline, restoredCount)
@@ -587,8 +587,24 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
       return { ...item, numero: index + 1, titre: fallbackTitle, objectif: cleanText(item.objectif) };
     });
 
+  // Chaque chapitre rappelle les passages du récit de l'auteur qu'il doit raconter :
+  // la rédaction suit ainsi sa vie, dans son ordre, sans inventer d'épisode.
   const outlineText = normalizedOutline
-    .map((chapter) => `Chapitre ${chapter.numero} — ${chapter.titre}\nObjectif : ${chapter.objectif || 'Objectif éditorial à préciser.'}`)
+    .map((chapter, index) => {
+      const brief = readBookBrief() || {};
+      const passages = listSourcePassages(String(brief.sourceText || ''));
+      const assigned = (brief.outline || [])[index]?.sources || [];
+      const memories = assigned
+        .map((n) => passages[Number(n) - 1])
+        .filter(Boolean)
+        .map((text, i) => `  Souvenir ${assigned[i]} (mots de l'auteur, à développer, jamais à résumer) : "${String(text).slice(0, 1500)}"`)
+        .join('\n');
+      return [
+        `Chapitre ${chapter.numero} — ${chapter.titre}`,
+        `Objectif : ${chapter.objectif || 'Objectif éditorial à préciser.'}`,
+        memories,
+      ].filter(Boolean).join('\n');
+    })
     .join('\n');
 
   const canStepOne = title.trim().length >= 3 && description.trim().length >= 30;
