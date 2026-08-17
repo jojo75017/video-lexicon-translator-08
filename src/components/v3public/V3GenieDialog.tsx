@@ -106,25 +106,34 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
     const history = messages.slice(-12).map((m) => ({ role: m.role, content: m.content }));
     pushMessage(makeMessage('user', text), previousBrief);
     setInput('');
+    // Matière brute : les mots exacts de l'auteur, accumulés et jamais résumés.
+    const nextSourceText = appendSourceText(previousBrief.sourceText, text);
     try {
       const provider = getProvider();
       const userApiKey = provider === 'gemini' ? getProviderKey('gemini') : '';
       const { data, error } = await supabase.functions.invoke('v3-genie-brief', {
-        body: { message: text, userApiKey, author: (brief.author || '').trim(), history },
+        body: {
+          message: text,
+          userApiKey,
+          author: (brief.author || '').trim(),
+          history,
+          sourceText: nextSourceText,
+        },
       });
       if (error) throw error;
       if ((data as any)?.error) throw new Error((data as any).error);
       const b = (data as any)?.brief || {};
       const nextBrief: BookBrief = {
         ...previousBrief,
-        title: b.title || '',
-        subtitle: b.subtitle || '',
+        title: b.title || previousBrief.title || '',
+        subtitle: b.subtitle || previousBrief.subtitle || '',
         author: b.author || brief.author || '',
-        category: b.category || '',
-        tone: b.tone || 'Inspirant',
+        category: b.category || previousBrief.category || '',
+        tone: b.tone || previousBrief.tone || 'Inspirant',
         description: b.description || previousBrief.description || text,
-        chapters: b.chapters || 20,
-        wordsPerChapter: b.wordsPerChapter || 1500,
+        sourceText: nextSourceText,
+        chapters: b.chapters || previousBrief.chapters || 20,
+        wordsPerChapter: b.wordsPerChapter || previousBrief.wordsPerChapter || 2500,
         wantsIllustrations: Boolean(b.wantsIllustrations),
         cibleProfil: b.cibleProfil || brief.cibleProfil || '',
         promesseCentrale: b.promesseCentrale || brief.promesseCentrale || '',
@@ -135,12 +144,14 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
       const nextQuestions = Array.isArray((data as any)?.questions) ? (data as any).questions : [];
       setQuestions(nextQuestions);
       const changes = describeBriefChanges(previousBrief, nextBrief);
+      const sourceWords = nextSourceText.split(/\s+/).filter(Boolean).length;
       // Une seule copie du récit : elle vit dans la colonne de droite.
       // Ici, le Génie répond court : ce qui a changé + sa prochaine question.
       const reply = [
-        `C’est noté : « ${nextBrief.title} »${nextBrief.subtitle ? ` — ${nextBrief.subtitle}` : ''}. Le récit et le sommaire sont à jour dans la colonne « Votre livre en direct ».`,
+        `C’est noté : « ${nextBrief.title} »${nextBrief.subtitle ? ` — ${nextBrief.subtitle}` : ''}. Vos mots sont conservés intégralement (${sourceWords} mots de matière) et seront développés, jamais résumés.`,
         nextQuestions.length ? `Question : ${nextQuestions[0]}` : '',
       ].filter(Boolean).join('\n\n');
+
       pushMessage(makeMessage('assistant', reply, { changes: changes || undefined, outline: nextBrief.outline }), nextBrief);
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 120);
     } catch (e: any) {
