@@ -292,6 +292,8 @@ export default function V3CreateWizard() {
       if (w.subtitle) setSubtitle(w.subtitle);
       if (w.author) setAuthorName(w.author);
       if (w.description) setDescription(w.description);
+      if (w.sourceText) setSourceText(String(w.sourceText));
+
       // La fiche du livre (Génie / V3BriefRecap) écrit `category`/`chapters`,
       // le wizard historique `genre`/`numberOfChapters` : on accepte les deux.
       const wGenre = w.genre || w.category;
