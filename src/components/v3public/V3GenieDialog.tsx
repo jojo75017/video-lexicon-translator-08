@@ -482,8 +482,9 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
               <Select label="Ton" value={brief.tone || ''} options={TONES} onChange={(v) => patch({ tone: v })} />
               <Field label="Chapitres" type="number" value={String(brief.chapters || 20)}
                 onChange={(v) => patch({ chapters: Math.min(40, Math.max(3, Number(v) || 20)) })} />
-              <Field label="Mots par chapitre" type="number" value={String(brief.wordsPerChapter || 1500)}
-                onChange={(v) => patch({ wordsPerChapter: Math.min(3000, Math.max(600, Number(v) || 1500)) })} />
+              <Field label="Mots par chapitre" type="number" value={String(brief.wordsPerChapter || 2500)}
+                onChange={(v) => patch({ wordsPerChapter: Math.min(3500, Math.max(800, Number(v) || 2500)) })} />
+
               <label className="flex items-center gap-2 text-xs md:col-span-2" style={{ color: 'var(--v3-ink)' }}>
                 <input type="checkbox" checked={Boolean(brief.wantsIllustrations)}
                   onChange={(e) => patch({ wantsIllustrations: e.target.checked })} />
