@@ -465,6 +465,7 @@ Deno.serve(async (req) => {
         if (res.ok && res.id) {
           await db.from("email_send_log").insert({
             message_id: res.id,
+            provider_message_id: res.id,
             template_name: "deliverability-test",
             recipient_email: to,
             status: "sent",
@@ -476,6 +477,7 @@ Deno.serve(async (req) => {
           to,
           ok: res.ok,
           message_id: res.id,
+            provider_message_id: res.id,
           detail: res.detail,
           quotaExhausted: res.quotaExhausted,
         });
