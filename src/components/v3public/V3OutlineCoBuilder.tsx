@@ -83,7 +83,7 @@ export default function V3OutlineCoBuilder() {
   const keep = (index: number) => {
     const p = proposals[index];
     if (!p?.titre.trim()) return;
-    const next = normalizeOutline([...outline, { numero: 0, titre: p.titre, objectif: p.objectif }] as BriefOutlineChapter[]);
+    const next = normalizeOutline([...outline, { numero: 0, titre: p.titre, objectif: p.objectif, sources: p.sources }] as BriefOutlineChapter[]);
     patch({ outline: next, outlineValidated: false });
     setProposals((prev) => prev.filter((_, i) => i !== index));
   };
@@ -93,7 +93,7 @@ export default function V3OutlineCoBuilder() {
     if (!kept.length) return;
     const next = normalizeOutline([
       ...outline,
-      ...kept.map((p) => ({ numero: 0, titre: p.titre, objectif: p.objectif })),
+      ...kept.map((p) => ({ numero: 0, titre: p.titre, objectif: p.objectif, sources: p.sources })),
     ] as BriefOutlineChapter[]);
     patch({ outline: next, outlineValidated: false });
     setProposals([]);
