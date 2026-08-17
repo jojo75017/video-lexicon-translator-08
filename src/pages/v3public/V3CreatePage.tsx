@@ -182,54 +182,63 @@ export default function V3CreatePage() {
           </div>
         )}
 
-        {/* Boîte de dialogue Génie — parcours guidé jusqu'au Sommaire IA */}
-        {!openedBook && (
-        <div className="mt-7">
-          <V3GenieDialog
-            initialIdea={idea || ''}
-            onReady={() => document.getElementById('sommaire-ia')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-          />
-        </div>
-        )}
+        {/* Dialogue + sommaire toujours visible côte à côte */}
+        <div className="mt-7 grid gap-5 lg:grid-cols-[1fr_360px] items-start">
+          <div className="min-w-0">
+            {!openedBook && (
+              <V3GenieDialog
+                initialIdea={idea || ''}
+                onReady={() => document.getElementById('sommaire-ia')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+              />
+            )}
 
+            {/* Ambiance — modifiable à tout moment */}
+            <div className="mt-4">
+              <V3AmbiancePicker />
+            </div>
 
+            {/* Tous les boutons au même endroit (grisés avant validation) */}
+            <div className="mt-4">
+              <V3BookActionsBar onLaunch={launchWorkflow} />
+            </div>
 
-        {/* Sommaire en cours + versions restaurables */}
-        <div id="sommaire-ia" className="mt-6">
-          <V3GenieOutlinePanel key={briefKey} outlineMode={sommaireIa ? 'guided' : undefined} />
-        </div>
+            {/* Rappel clé IA : uniquement si aucune clé enregistrée */}
+            <div className="mt-4">
+              <V3KeyHint />
+            </div>
 
-        {/* Tous les boutons au même endroit */}
-        <div className="mt-4">
-          <V3BookActionsBar onLaunch={launchWorkflow} />
-        </div>
+            {/* Les passes réelles : Gemini architecte + ChatGPT plume + agents */}
+            <div className="mt-4">
+              <V3PipelinePanel />
+            </div>
 
+            {/* Modes illustrés — liens discrets */}
+            <div className="mt-5 flex flex-wrap justify-center gap-2">
+              <Link to="/v3/create/illustre" className="v3-btn v3-btn-ghost text-xs">
+                <ImageIcon className="w-3.5 h-3.5" /> Album maternelle 3-6 ans <ArrowRight className="w-3 h-3" />
+              </Link>
+              <Link to="/v3/create/illustre?preset=histoires-du-soir-3-7" className="v3-btn v3-btn-ghost text-xs">
+                <ImageIcon className="w-3.5 h-3.5" /> Histoires du soir 3-7 ans <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
 
-        {/* Modes illustrés — liens discrets */}
-        <div className="mt-5 flex flex-wrap justify-center gap-2">
-          <Link to="/v3/create/illustre" className="v3-btn v3-btn-ghost text-xs">
-            <ImageIcon className="w-3.5 h-3.5" /> Album maternelle 3-6 ans <ArrowRight className="w-3 h-3" />
-          </Link>
-          <Link to="/v3/create/illustre?preset=histoires-du-soir-3-7" className="v3-btn v3-btn-ghost text-xs">
-            <ImageIcon className="w-3.5 h-3.5" /> Histoires du soir 3-7 ans <ArrowRight className="w-3 h-3" />
-          </Link>
-        </div>
-
-
-        {/* Clés API — encart partagé (alerte si aucune clé) */}
-        <div className="mt-6">
-          <V3ApiKeysGate context="Sans clé Gemini, le workflow d’écriture ne peut pas démarrer." />
-        </div>
-
-        {/* Réglage manuel — replié, jamais imposé */}
-        <details className="mt-6 rounded-[22px] border p-4" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
-          <summary className="cursor-pointer text-xs font-semibold" style={{ color: 'var(--v3-muted)' }}>
-            Modifier la fiche à la main (titre, auteur, catégorie, synopsis…)
-          </summary>
-          <div className="mt-4">
-            <V3BriefRecap key={briefKey} variant="full" formOnly hideBookForm={false} />
+            {/* Réglage manuel — replié, jamais imposé */}
+            <details className="mt-6 rounded-[22px] border p-4" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
+              <summary className="cursor-pointer text-xs font-semibold" style={{ color: 'var(--v3-muted)' }}>
+                Modifier la fiche à la main (titre, auteur, catégorie, synopsis…)
+              </summary>
+              <div className="mt-4">
+                <V3BriefRecap key={briefKey} variant="full" formOnly hideBookForm={false} />
+              </div>
+            </details>
           </div>
-        </details>
+
+          {/* Colonne sommaire : reste visible pendant l'écriture */}
+          <aside id="sommaire-ia" className="lg:sticky lg:top-24">
+            <V3GenieOutlinePanel key={briefKey} outlineMode={sommaireIa ? 'guided' : undefined} />
+          </aside>
+        </div>
+
 
         {/* Workflow */}
         {showWizard && (
