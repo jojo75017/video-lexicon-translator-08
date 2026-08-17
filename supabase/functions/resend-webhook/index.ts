@@ -43,7 +43,14 @@ Deno.serve(async (req) => {
 
     // Met à jour la ligne d'envoi correspondante (par message_id en priorité)
     if (messageId) {
-      await supabase.from("email_send_log").update(update).eq("message_id", messageId);
+      const { data: touched } = await supabase
+        .from("email_send_log")
+        .update(update)
+        .eq("provider_message_id", messageId)
+        .select("id");
+      if (!touched || touched.length === 0) {
+        await supabase.from("email_send_log").update(update).eq("message_id", messageId);
+      }
     } else if (recipient) {
       await supabase.from("email_send_log").update(update).eq("recipient_email", recipient);
     }
