@@ -76,6 +76,8 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
 
   const ready = Boolean((brief.title || '').trim() && brief.chapters);
 
+  const visibleMessages = collapseOld && messages.length > 6 ? messages.slice(-6) : messages;
+
   const patch = (values: Partial<BookBrief>) => {
     setBrief((prev) => {
       const next = { ...prev, ...values };
