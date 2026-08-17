@@ -1777,6 +1777,9 @@ Format JSON :
         const tonEditorial = previousContext.P1?.tonEditorial || '';
         const lecteurCible = previousContext.P1?.lecteurCible || '';
         const structureGlobale = previousContext.P3?.structureGlobale || '';
+        const matiereAuteurP4 = bookIntroduction
+          ? `\n\nMATIÈRE DE L'AUTEUR (texte réel de l'auteur — SOURCE DE VÉRITÉ ABSOLUE) :\n"""\n${String(bookIntroduction).slice(0, 24000)}\n"""\nRÈGLES : reprends les faits, lieux, prénoms et dates exactement comme ci-dessus ; développe et enrichis ce matériau en scènes complètes, sans jamais le résumer, le raccourcir ni inventer d'éléments absents.`
+          : '';
 
         const personnagesP3 = previousContext.P3?.personnages || [];
         const personnagesAUtiliser = personnagesP3.length > 0 ? personnagesP3 : characters;
