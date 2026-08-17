@@ -47,7 +47,43 @@ export type BookBrief = {
   ambianceId?: string;
   /** Étapes de l'entretien guidé volontairement passées. */
   interviewSkipped?: number[];
+  /**
+   * Réglages fixés par l'auteur : l'IA ne doit plus jamais les remplacer.
+   * Ex. ['title', 'subtitle', 'chapters', 'wordsPerChapter'].
+   */
+  lockedFields?: LockableField[];
 };
+
+/** Champs que l'auteur peut verrouiller depuis la colonne « Réglages du livre ». */
+export type LockableField = 'title' | 'subtitle' | 'chapters' | 'wordsPerChapter';
+
+export const LOCKABLE_FIELDS: LockableField[] = ['title', 'subtitle', 'chapters', 'wordsPerChapter'];
+
+export function isFieldLocked(brief: BookBrief | null | undefined, field: LockableField): boolean {
+  return Array.isArray(brief?.lockedFields) && brief!.lockedFields!.includes(field);
+}
+
+/** Ajoute un verrou (l'auteur vient de saisir la valeur lui-même). */
+export function lockField(brief: BookBrief, field: LockableField): LockableField[] {
+  const current = Array.isArray(brief.lockedFields) ? brief.lockedFields : [];
+  return current.includes(field) ? current : [...current, field];
+}
+
+export function unlockField(brief: BookBrief, field: LockableField): LockableField[] {
+  return (Array.isArray(brief.lockedFields) ? brief.lockedFields : []).filter((f) => f !== field);
+}
+
+/**
+ * Fusionne la proposition de l'IA avec la fiche courante en respectant
+ * strictement les champs verrouillés par l'auteur.
+ */
+export function mergeRespectingLocks(previous: BookBrief, proposed: Partial<BookBrief>): Partial<BookBrief> {
+  const kept: Partial<BookBrief> = { ...proposed };
+  for (const field of LOCKABLE_FIELDS) {
+    if (isFieldLocked(previous, field)) delete kept[field];
+  }
+  return kept;
+}
 
 
 export const WIZARD_BRIEF_KEY = 'v3_create_wizard_config_v1';
