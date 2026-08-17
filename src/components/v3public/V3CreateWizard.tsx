@@ -619,7 +619,7 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
       promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion,
       projectId,
     } as any);
-  }, [title, finalTitle, subtitle, authorName, description, effectiveCategory, tone, chapters, wordsPerChapter, normalizedOutline, characters, cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion, projectId]);
+  }, [title, finalTitle, subtitle, authorName, description, sourceText, effectiveCategory, tone, chapters, wordsPerChapter, normalizedOutline, characters, cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion, projectId]);
 
   const [showTocPaste, setShowTocPaste] = useState(false);
   const [tocPasteText, setTocPasteText] = useState('');
