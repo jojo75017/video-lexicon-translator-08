@@ -5,7 +5,10 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { BackButton } from '@/components/v3/BackButton';
 import V3BriefRecap from '@/components/v3public/V3BriefRecap';
-import V3ApiKeysGate from '@/components/v3public/V3ApiKeysGate';
+import V3AmbiancePicker from '@/components/v3public/V3AmbiancePicker';
+import V3KeyHint from '@/components/v3public/V3KeyHint';
+import V3PipelinePanel from '@/components/v3public/V3PipelinePanel';
+
 import V3GenieDialog from '@/components/v3public/V3GenieDialog';
 import V3QuickActionsBar from '@/components/v3public/V3QuickActionsBar';
 import V3ResumeBookCard from '@/components/v3public/V3ResumeBookCard';
