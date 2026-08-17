@@ -587,8 +587,24 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
       return { ...item, numero: index + 1, titre: fallbackTitle, objectif: cleanText(item.objectif) };
     });
 
+  // Chaque chapitre rappelle les passages du récit de l'auteur qu'il doit raconter :
+  // la rédaction suit ainsi sa vie, dans son ordre, sans inventer d'épisode.
   const outlineText = normalizedOutline
-    .map((chapter) => `Chapitre ${chapter.numero} — ${chapter.titre}\nObjectif : ${chapter.objectif || 'Objectif éditorial à préciser.'}`)
+    .map((chapter, index) => {
+      const brief = readBookBrief() || {};
+      const passages = listSourcePassages(String(brief.sourceText || ''));
+      const assigned = (brief.outline || [])[index]?.sources || [];
+      const memories = assigned
+        .map((n) => passages[Number(n) - 1])
+        .filter(Boolean)
+        .map((text, i) => `  Souvenir ${assigned[i]} (mots de l'auteur, à développer, jamais à résumer) : "${String(text).slice(0, 1500)}"`)
+        .join('\n');
+      return [
+        `Chapitre ${chapter.numero} — ${chapter.titre}`,
+        `Objectif : ${chapter.objectif || 'Objectif éditorial à préciser.'}`,
+        memories,
+      ].filter(Boolean).join('\n');
+    })
     .join('\n');
 
   const canStepOne = title.trim().length >= 3 && description.trim().length >= 30;
