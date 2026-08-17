@@ -195,18 +195,15 @@ export default function V3CreatePage() {
 
 
         {/* Sommaire en cours + versions restaurables */}
-        {!openedBook && (
-          <div id="sommaire-ia" className="mt-6">
-            <V3GenieOutlinePanel outlineMode={sommaireIa ? 'guided' : undefined} />
-          </div>
-        )}
+        <div id="sommaire-ia" className="mt-6">
+          <V3GenieOutlinePanel key={briefKey} outlineMode={sommaireIa ? 'guided' : undefined} />
+        </div>
 
         {/* Tous les boutons au même endroit */}
-        {!openedBook && (
-          <div className="mt-4">
-            <V3BookActionsBar onLaunch={launchWorkflow} />
-          </div>
-        )}
+        <div className="mt-4">
+          <V3BookActionsBar onLaunch={launchWorkflow} />
+        </div>
+
 
         {/* Modes illustrés — liens discrets */}
         <div className="mt-5 flex flex-wrap justify-center gap-2">
