@@ -261,7 +261,69 @@ export default function EmailHealthPanel() {
           )}
         </div>
 
+        {showTestInput && (
+          <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm font-semibold text-foreground">
+                Envoyer un email [TEST] pour vérifier l'arrivée
+              </p>
+              <Button
+                size="sm"
+                onClick={() => void runTest()}
+                disabled={busy !== null || !diag || diag.blocking.length > 0}
+              >
+                {busy === 'test' ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <TestTube2 className="h-4 w-4 mr-2" />}
+                Lancer le test
+              </Button>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="test-addresses" className="text-xs text-muted-foreground">
+                Destinataires (séparés par virgule, point-virgule ou espace)
+              </Label>
+              <Input
+                id="test-addresses"
+                value={testAddresses}
+                onChange={(e) => setTestAddresses(e.target.value)}
+                placeholder="boubetgeorges@gmail.com, test@outlook.com, test@yahoo.com"
+                disabled={busy === 'test'}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Conseil : testez au moins Gmail, Outlook et Yahoo. L'email porte le sujet
+              « [TEST] EbookStudio — vérification de délivrabilité ».
+            </p>
 
+            {testResult && (
+              <div className="space-y-2 rounded border border-border bg-background/40 p-3">
+                <p className="text-sm font-semibold text-foreground">
+                  Résultat du test <span className="text-gold">#{testResult.short_id}</span>
+                </p>
+                <div className="space-y-1">
+                  {testResult.results.map((r) => (
+                    <div key={r.to} className="flex items-center justify-between text-sm">
+                      <span className="text-foreground">{r.to}</span>
+                      <div className="flex items-center gap-2">
+                        {r.ok ? (
+                          <Badge variant="default" className="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30">Envoyé</Badge>
+                        ) : (
+                          <Badge variant="destructive">Erreur</Badge>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {testResult.results.some((r) => !r.ok) && (
+                  <div className="text-xs text-red-400">
+                    {testResult.results
+                      .filter((r) => !r.ok)
+                      .map((r) => `${r.to}: ${r.detail || 'échec'}`)
+                      .join(' · ')}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           {[
