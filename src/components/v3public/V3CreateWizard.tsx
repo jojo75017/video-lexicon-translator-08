@@ -312,7 +312,7 @@ export default function V3CreateWizard() {
       }
       if (Array.isArray(w.outline) && w.outline.length) {
         const restoredOutline = w.outline.map((o: any, i: number) => ({
-          id: makeId(), numero: o.numero || i + 1, titre: o.titre || `Chapitre ${i + 1}`, objectif: o.objectif || '',
+          id: makeId(), numero: o.numero || i + 1, titre: o.titre || `Chapitre ${i + 1}`, objectif: o.objectif || '', sources: Array.isArray(o.sources) ? o.sources : undefined,
         }));
         const restoredCount = clampNumber(Number(w.numberOfChapters || w.chapters || restoredOutline.length), 3, 60, restoredOutline.length || 12);
         setOutline(hasRepeatedFallbackTitles(restoredOutline, restoredCount)
