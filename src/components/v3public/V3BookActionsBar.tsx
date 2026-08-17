@@ -73,41 +73,62 @@ export default function V3BookActionsBar({ onLaunch }: { onLaunch: () => void })
           <Rocket className="h-3.5 w-3.5" /> Commencer la rédaction
         </button>
 
-        <button type="button" onClick={save} className="v3-btn v3-btn-outline justify-center text-xs">
+        <button type="button" onClick={save} disabled={!validated}
+          title={validated ? 'Enregistrer' : 'Validez d’abord votre sommaire'}
+          className="v3-btn v3-btn-outline justify-center text-xs disabled:opacity-50">
           <Save className="h-3.5 w-3.5" /> {saved ? 'Enregistré' : 'Enregistrer mon livre'}
         </button>
 
-        <Link to="/v3/corriger" className="v3-btn v3-btn-outline justify-center text-xs" title={written ? 'Correction professionnelle' : soon}>
-          <Wand2 className="h-3.5 w-3.5" /> Corriger mon livre
-        </Link>
+        {validated ? (
+          <Link to="/v3/corriger" className="v3-btn v3-btn-outline justify-center text-xs" title={written ? 'Correction professionnelle' : soon}>
+            <Wand2 className="h-3.5 w-3.5" /> Corriger mon livre
+          </Link>
+        ) : (
+          <button type="button" disabled title="Validez d’abord votre sommaire" className="v3-btn v3-btn-outline justify-center text-xs opacity-50">
+            <Wand2 className="h-3.5 w-3.5" /> Corriger mon livre
+          </button>
+        )}
 
-        {written ? (
+        {written && validated ? (
           <Link to={`/v3/book/${projectId}`} className="v3-btn v3-btn-outline justify-center text-xs">
             <BookOpen className="h-3.5 w-3.5" /> Voir mon livre
           </Link>
         ) : (
-          <button type="button" disabled title={soon} className="v3-btn v3-btn-outline justify-center text-xs opacity-50">
+          <button type="button" disabled title={validated ? soon : 'Validez d’abord votre sommaire'} className="v3-btn v3-btn-outline justify-center text-xs opacity-50">
             <BookOpen className="h-3.5 w-3.5" /> Voir mon livre
           </button>
         )}
 
-        {written ? (
+        {written && validated ? (
           <Link to={`/v3/book/${projectId}?tab=kdp`} className="v3-btn v3-btn-outline justify-center text-xs">
             <BarChart3 className="h-3.5 w-3.5" /> Données KDP
           </Link>
         ) : (
-          <button type="button" disabled title={soon} className="v3-btn v3-btn-outline justify-center text-xs opacity-50">
+          <button type="button" disabled title={validated ? soon : 'Validez d’abord votre sommaire'} className="v3-btn v3-btn-outline justify-center text-xs opacity-50">
             <BarChart3 className="h-3.5 w-3.5" /> Données KDP
           </button>
         )}
 
-        <Link to="/v3/outils/traduction" className="v3-btn v3-btn-outline justify-center text-xs">
-          <Languages className="h-3.5 w-3.5" /> Traduire (10 langues)
-        </Link>
+        {validated ? (
+          <Link to="/v3/outils/traduction" className="v3-btn v3-btn-outline justify-center text-xs">
+            <Languages className="h-3.5 w-3.5" /> Traduire (10 langues)
+          </Link>
+        ) : (
+          <button type="button" disabled title="Validez d’abord votre sommaire" className="v3-btn v3-btn-outline justify-center text-xs opacity-50">
+            <Languages className="h-3.5 w-3.5" /> Traduire (10 langues)
+          </button>
+        )}
 
-        <Link to="/v3/upsells" className="v3-btn v3-btn-outline justify-center text-xs">
-          <Headphones className="h-3.5 w-3.5" /> Version audio (9,99 €)
-        </Link>
+        {validated ? (
+          <Link to="/v3/upsells" className="v3-btn v3-btn-outline justify-center text-xs">
+            <Headphones className="h-3.5 w-3.5" /> Version audio (9,99 €)
+          </Link>
+        ) : (
+          <button type="button" disabled title="Validez d’abord votre sommaire" className="v3-btn v3-btn-outline justify-center text-xs opacity-50">
+            <Headphones className="h-3.5 w-3.5" /> Version audio (9,99 €)
+          </button>
+        )}
+
       </div>
     </div>
   );
