@@ -8,6 +8,7 @@ import V3BriefRecap from '@/components/v3public/V3BriefRecap';
 import V3ApiKeysGate from '@/components/v3public/V3ApiKeysGate';
 import V3GenieDialog from '@/components/v3public/V3GenieDialog';
 import V3QuickActionsBar from '@/components/v3public/V3QuickActionsBar';
+import V3ResumeBookCard from '@/components/v3public/V3ResumeBookCard';
 import { readBookBrief, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
 
 
@@ -170,6 +171,13 @@ export default function V3CreatePage() {
             rédige les chapitres, puis va jusqu’à l’export et la couverture.
           </p>
         </div>
+        )}
+
+        {/* Reprendre un livre déjà commencé */}
+        {!openedBook && (
+          <div className="mt-6">
+            <V3ResumeBookCard />
+          </div>
         )}
 
         {/* Boîte de dialogue Génie — parcours guidé jusqu'au Sommaire IA */}
