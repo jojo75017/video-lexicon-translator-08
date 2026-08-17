@@ -16,7 +16,7 @@ import { invokeImageFunction } from '@/lib/aiImageInvoke';
 import { callAIWriting, getProvider, getProviderKey, validateKeyFormat } from '@/services/aiWritingService';
 import TocUltimateGenerator, { type UltimateTocChapter } from '@/components/tools/TocUltimateGenerator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { clearTocForWorkflow, parseTocText, readBookBrief, readLatestUltimateToc, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
+import { clearTocForWorkflow, listSourcePassages, parseTocText, readBookBrief, readLatestUltimateToc, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
 
 
 type WizardCharacter = {
