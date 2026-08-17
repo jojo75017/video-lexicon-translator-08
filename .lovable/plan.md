@@ -1,6 +1,22 @@
-# V3 Création : effacer vraiment le livre, changer d'ambiance, sommaire visible pendant l'écriture
+# V3 Création : entretien guidé, effacement réel, ambiance, sommaire visible
 
-Trois corrections sur `/v3/create`.
+Quatre corrections sur `/v3/create`.
+
+## 0. Le Génie mène un entretien guidé (référence Wordgenie)
+
+Aujourd'hui le Génie répond librement. Dans la référence, l'IA conduit un entretien balisé : « Étape 1 sur 6 – Vous et votre livre », une question à la fois, un exemple dépliable, un bouton « Passer », et une carte de choix (langue du livre) répondue en un clic.
+
+À faire :
+- **Parcours en 6 étapes** annoncées dans le fil (séparateur « Étape X sur 6 – … ») : 1. Vous et votre livre · 2. Votre approche · 3. Votre lecteur · 4. Le plan du livre · 5. Ton et style · 6. Validation du sommaire.
+- **Une question à la fois**, formulée par le Génie, avec :
+  - un lien **« Montrer un exemple »** qui déplie une réponse type,
+  - un bouton **« Passer »** (l'IA travaille avec ce qui a déjà été dit),
+  - la réponse de l'abonné affichée en bulle à droite, comme aujourd'hui.
+- **Cartes de choix cliquables** quand la réponse est un choix : **langue du livre** (les 10 langues déjà gérées), nombre de chapitres, ton, ambiance. Un clic = réponse enregistrée dans la fiche.
+- La langue choisie est appliquée à la rédaction et aux exports (champ `language` de la fiche).
+- À la fin de l'étape 6, le sommaire est proposé et les boutons d'action s'activent.
+- Le parcours reste souple : l'abonné peut à tout moment écrire librement ; le Génie continue là où il en est, et la reprise repart à l'étape en cours.
+
 
 ## 1. « Effacer le livre » qui efface vraiment
 
