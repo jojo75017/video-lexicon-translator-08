@@ -66,7 +66,7 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
     toast.success(`Sommaire v${version.version} restauré (${version.chapters.length} chapitres).`);
   };
 
-  const correctChapter = async (chapter: WrittenChapter) => {
+  const correctChapter = async (chapter: WrittenProgress['chapters'][number]) => {
     setFixing(chapter.index);
     try {
       const provider = getProvider();
