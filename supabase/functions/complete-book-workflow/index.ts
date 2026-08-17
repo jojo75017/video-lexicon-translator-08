@@ -1649,7 +1649,7 @@ RÈGLE DE CONCISION ABSOLUE :
 - Pas de paragraphes longs dans les descriptions`,
           `Structure ce livre selon les normes KDP PRO en ${numberOfChapters} chapitres ET crée les personnages :
 ${bookContext}
-DESCRIPTION : ${descriptionGeneree}
+DESCRIPTION : ${descriptionGeneree}${matiereAuteurP3}
 INTRODUCTION PRÉ-GÉNÉRÉE : ${introductionGeneree ? 'OUI (sera intégrée automatiquement)' : 'NON'}
 CONCLUSION PRÉ-GÉNÉRÉE : ${conclusionGeneree ? 'OUI (sera intégrée automatiquement)' : 'NON'}
 VISION P1 : ${JSON.stringify(previousContext.P1 || {})}
