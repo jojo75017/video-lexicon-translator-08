@@ -193,26 +193,53 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
               <MessageSquare className="h-3.5 w-3.5" /> Notre conversation ({messages.length} messages)
             </span>
             <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const text = messages
+                    .map((m) => `${m.role === 'assistant' ? 'Ebookstudio-Génie' : 'Vous'} : ${m.content}${m.changes ? `\n(Modifié : ${m.changes})` : ''}`)
+                    .join('\n\n');
+                  void navigator.clipboard.writeText(text).then(
+                    () => toast.success('Conversation copiée.'),
+                    () => toast.error('Copie impossible sur ce navigateur.'),
+                  );
+                }}
+                className="v3-btn v3-btn-ghost text-[11px]"
+              >
+                Copier la conversation
+              </button>
+              {messages.length > 6 && (
+                <button type="button" onClick={() => setCollapseOld((v) => !v)} className="v3-btn v3-btn-ghost text-[11px]">
+                  {collapseOld ? 'Voir tous les échanges' : 'Replier les anciens tours'}
+                </button>
+              )}
               <button type="button" onClick={() => setShowThread((v) => !v)} className="v3-btn v3-btn-ghost text-[11px]">
                 {showThread ? 'Masquer' : 'Afficher'}
               </button>
               <button
                 type="button"
                 onClick={() => {
+                  if (!window.confirm('Effacer toute la conversation avec le Génie ?')) return;
                   setMessages([]);
                   clearLocalThread();
                   void clearRemoteThread(brief.projectId || null);
                 }}
                 className="v3-btn v3-btn-ghost text-[11px]"
               >
-                <RotateCcw className="h-3 w-3" /> Effacer le fil
+                <RotateCcw className="h-3 w-3" /> Repartir de zéro
               </button>
             </div>
           </div>
 
           {showThread && (
             <div className="mt-3 max-h-80 space-y-2 overflow-y-auto pr-1">
-              {messages.map((m) => (
+              {collapseOld && messages.length > 6 && (
+                <p className="text-center text-[11px]" style={{ color: 'var(--v3-muted)' }}>
+                  {messages.length - 6} échange(s) plus ancien(s) repliés
+                </p>
+              )}
+              {visibleMessages.map((m) => (
+
                 <div
                   key={m.id}
                   className="rounded-2xl border p-2.5 text-xs leading-relaxed"
