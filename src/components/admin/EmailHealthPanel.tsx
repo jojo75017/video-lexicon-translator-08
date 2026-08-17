@@ -2,9 +2,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Activity, Loader2, MailWarning, RefreshCw, ShieldCheck } from 'lucide-react';
+import { Activity, CheckCircle2, Loader2, MailWarning, RefreshCw, ShieldCheck, TestTube2, XCircle } from 'lucide-react';
 
 interface TemplateRow {
   template: string;
@@ -43,6 +45,22 @@ interface DiagnosticPayload {
   delivery_total: number;
 }
 
+interface TestResult {
+  to: string;
+  ok: boolean;
+  message_id?: string;
+  detail?: string;
+  quotaExhausted?: boolean;
+}
+
+interface TestPayload {
+  success: boolean;
+  test_id: string;
+  short_id: string;
+  addresses: string[];
+  results: TestResult[];
+}
+
 
 /**
  * Santé des emails : montre ce qui est réellement livré, rebondi ou inconnu,
@@ -53,9 +71,14 @@ export default function EmailHealthPanel() {
   const [diag, setDiag] = useState<DiagnosticPayload | null>(null);
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
+  const [showTestInput, setShowTestInput] = useState(false);
+  const [testAddresses, setTestAddresses] = useState('boubetgeorges@gmail.com');
+  const [testResult, setTestResult] = useState<TestPayload | null>(null);
 
-  const call = useCallback(async (mode: string) => {
-    const { data: res, error } = await supabase.functions.invoke('email-health-sync', { body: { mode, days: 14 } });
+  const call = useCallback(async (mode: string, extra: Record<string, unknown> = {}) => {
+    const { data: res, error } = await supabase.functions.invoke('email-health-sync', {
+      body: { mode, days: 14, ...extra },
+    });
     if (error) throw error;
     if ((res as { error?: string })?.error) throw new Error((res as { error: string }).error);
     return res as Record<string, unknown>;
@@ -82,6 +105,26 @@ export default function EmailHealthPanel() {
       setBusy(null);
     }
   }, [call]);
+
+  const runTest = useCallback(async () => {
+    const addresses = testAddresses.split(/[,;\s]+/).map((s) => s.trim()).filter(Boolean);
+    if (!addresses.length) {
+      toast.error('Aucune adresse de test valide');
+      return;
+    }
+    setBusy('test');
+    try {
+      const res = await call('deliverability_test', { addresses });
+      setTestResult(res as unknown as TestPayload);
+      const okCount = (res as unknown as TestPayload).results.filter((r) => r.ok).length;
+      toast.success(`${okCount} test(s) envoyé(s) sur ${(res as unknown as TestPayload).results.length}`);
+      await load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Test impossible');
+    } finally {
+      setBusy(null);
+    }
+  }, [call, load, testAddresses]);
 
   useEffect(() => { void load(); void loadDiagnostic(); }, [load, loadDiagnostic]);
 
@@ -139,6 +182,15 @@ export default function EmailHealthPanel() {
             {busy === 'hygiene' ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <MailWarning className="h-4 w-4 mr-2" />}
             Nettoyer la liste
           </Button>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => setShowTestInput((s) => !s)}
+            disabled={busy !== null}
+          >
+            <TestTube2 className="h-4 w-4 mr-2" />
+            Test d'arrivée
+          </Button>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -146,6 +198,26 @@ export default function EmailHealthPanel() {
           <p className="text-sm text-amber-400">
             Clé Resend absente : la synchronisation des livraisons est indisponible.
           </p>
+        )}
+
+        {diag && (
+          <div className={`flex items-start gap-3 rounded-lg border p-3 ${diag.blocking.length === 0 ? 'border-emerald-500/30 bg-emerald-500/10' : 'border-red-500/30 bg-red-500/10'}`}>
+            {diag.blocking.length === 0
+              ? <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-400" />
+              : <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-400" />}
+            <div>
+              <p className={`text-sm font-semibold ${diag.blocking.length === 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                {diag.blocking.length === 0
+                  ? 'Authentification OK — les emails peuvent partir'
+                  : `Blocage détecté : ${diag.blocking.join(', ')}`}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {diag.blocking.length === 0
+                  ? 'SPF, DKIM, DMARC et clé d\'envoi sont valides.'
+                  : 'Résolvez les points rouges ci-dessous avant d\'envoyer une campagne.'}
+              </p>
+            </div>
+          </div>
         )}
 
         <div className="rounded-lg border border-border bg-muted/30 p-3">
@@ -189,7 +261,69 @@ export default function EmailHealthPanel() {
           )}
         </div>
 
+        {showTestInput && (
+          <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm font-semibold text-foreground">
+                Envoyer un email [TEST] pour vérifier l'arrivée
+              </p>
+              <Button
+                size="sm"
+                onClick={() => void runTest()}
+                disabled={busy !== null || !diag || diag.blocking.length > 0}
+              >
+                {busy === 'test' ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <TestTube2 className="h-4 w-4 mr-2" />}
+                Lancer le test
+              </Button>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="test-addresses" className="text-xs text-muted-foreground">
+                Destinataires (séparés par virgule, point-virgule ou espace)
+              </Label>
+              <Input
+                id="test-addresses"
+                value={testAddresses}
+                onChange={(e) => setTestAddresses(e.target.value)}
+                placeholder="boubetgeorges@gmail.com, test@outlook.com, test@yahoo.com"
+                disabled={busy === 'test'}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Conseil : testez au moins Gmail, Outlook et Yahoo. L'email porte le sujet
+              « [TEST] EbookStudio — vérification de délivrabilité ».
+            </p>
 
+            {testResult && (
+              <div className="space-y-2 rounded border border-border bg-background/40 p-3">
+                <p className="text-sm font-semibold text-foreground">
+                  Résultat du test <span className="text-gold">#{testResult.short_id}</span>
+                </p>
+                <div className="space-y-1">
+                  {testResult.results.map((r) => (
+                    <div key={r.to} className="flex items-center justify-between text-sm">
+                      <span className="text-foreground">{r.to}</span>
+                      <div className="flex items-center gap-2">
+                        {r.ok ? (
+                          <Badge variant="default" className="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30">Envoyé</Badge>
+                        ) : (
+                          <Badge variant="destructive">Erreur</Badge>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {testResult.results.some((r) => !r.ok) && (
+                  <div className="text-xs text-red-400">
+                    {testResult.results
+                      .filter((r) => !r.ok)
+                      .map((r) => `${r.to}: ${r.detail || 'échec'}`)
+                      .join(' · ')}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           {[

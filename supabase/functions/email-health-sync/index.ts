@@ -1,4 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.78.0";
+import { FROM_CAMPAIGN, REPLY_TO } from "../_shared/emailIdentity.ts";
+import { sendResendEmailThrottled } from "../_shared/resendThrottle.ts";
 
 /**
  * Santé des emails : rend la délivrabilité visible.
@@ -12,6 +14,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.78.0";
  *  - `sync`     : interroge Resend pour les envois sans évènement connu
  *  - `hygiene`  : coupe l'envoi automatique pour les rebonds durs et les
  *                 adresses jamais ouvertes après 5 envois (mode `preview` sans écriture)
+ *  - `diagnostic` : contrôle SPF/DKIM/DMARC et capacité de la clé
+ *  - `deliverability_test` : envoi [TEST] vers Gmail/Outlook/Yahoo pour vérifier l'arrivée
  *
  * Sécurité : admin (has_role) ou secret cron.
  */
@@ -359,6 +363,131 @@ Deno.serve(async (req) => {
         blocking: checks.filter((c) => !c.ok).map((c) => c.key),
         delivery_confirmed: confirmed ?? 0,
         delivery_total: total ?? 0,
+      });
+    }
+
+    // --------------------------------------------- deliverability_test
+    // Envoie un email [TEST] vers une liste de destinataires (par défaut
+    // l'adresse de l'admin) et enregistre les message_id pour suivi.
+    if (mode === "deliverability_test") {
+      const checks: Array<{
+        key: string; label: string; ok: boolean; value: string; fix: string;
+      }> = [];
+      const blocking: string[] = [];
+
+      for (const [key, label, name, test, fix] of DNS_CHECKS) {
+        const value = await txtRecord(name);
+        const ok = test(value);
+        checks.push({ key, label, ok, value: value || "(aucun enregistrement)", fix });
+        if (!ok) blocking.push(key);
+      }
+
+      const apiKey = Deno.env.get("RESEND_API_KEY");
+      let keyOk = false;
+      let keyValue = "RESEND_API_KEY absente";
+      if (apiKey) {
+        try {
+          const res = await fetch("https://api.resend.com/domains", {
+            headers: { Authorization: `Bearer ${apiKey}` },
+          });
+          const text = (await res.text()).slice(0, 200);
+          keyOk = res.ok;
+          keyValue = res.ok
+            ? "clé complète : lecture des évènements possible"
+            : `HTTP ${res.status} — ${text}`;
+        } catch (err) {
+          keyValue = `appel impossible : ${String(err)}`;
+        }
+      }
+      checks.push({
+        key: "api_key",
+        label: "Clé d'envoi (lecture des livraisons)",
+        ok: keyOk,
+        value: keyValue,
+        fix: "Créer une clé à accès complet (envoi + lecture) et la remplacer dans les secrets du projet.",
+      });
+      if (!keyOk) blocking.push("api_key");
+
+      if (blocking.length) {
+        return respond({
+          error: "Impossible d'envoyer le test : authentification ou clé incorrecte.",
+          checks,
+          blocking,
+        }, 400);
+      }
+
+      const rawAddresses = (body as { addresses?: string[] }).addresses;
+      const addresses = Array.isArray(rawAddresses) && rawAddresses.length
+        ? rawAddresses
+          .map(String)
+          .map((s) => s.trim().toLowerCase())
+          .filter((s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s))
+        : ["boubetgeorges@gmail.com"];
+
+      if (!addresses.length) {
+        return respond({ error: "Aucune adresse de test valide." }, 400);
+      }
+
+      const testId = crypto.randomUUID();
+      const shortId = testId.slice(0, 8);
+      const subject = `[TEST] EbookStudio — vérification de délivrabilité (${shortId})`;
+      const html = [
+        `<!doctype html>`,
+        `<html><body style="font-family:system-ui,sans-serif;line-height:1.5;color:#232F3E;background:#FAFAFA;padding:24px;">`,
+        `<div style="max-width:560px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:24px;">`,
+        `<h2 style="color:#008296;margin-top:0;">Test de délivrabilité EbookStudio</h2>`,
+        `<p>Cet email a été envoyé depuis le panneau admin pour vérifier que vos messages arrivent bien dans les boîtes Gmail, Outlook et Yahoo.</p>`,
+        `<p><strong>ID du test :</strong> ${shortId}</p>`,
+        `<p>Si vous le recevez, l'authentification SPF/DKIM/DMARC est fonctionnelle.</p>`,
+        `<hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0;" />`,
+        `<p style="font-size:13px;color:#6b7280;">`,
+        `Réponses : <a href="mailto:${REPLY_TO}">${REPLY_TO}</a><br/>`,
+        `Contact direct : boubetgeorges@gmail.com`,
+        `</p>`,
+        `</div></body></html>`,
+      ].join("\n");
+
+      const results: Array<{
+        to: string; ok: boolean; message_id?: string; detail?: string; quotaExhausted?: boolean;
+      }> = [];
+
+      for (const to of addresses) {
+        const res = await sendResendEmailThrottled({
+          from: FROM_CAMPAIGN,
+          to,
+          subject,
+          html,
+          reply_to: REPLY_TO,
+          tags: [{ name: "type", value: "deliverability-test" }],
+        });
+
+        if (res.ok && res.id) {
+          await db.from("email_send_log").insert({
+            message_id: res.id,
+            template_name: "deliverability-test",
+            recipient_email: to,
+            status: "sent",
+            metadata: { test_id: testId, provider: "resend", source: "deliverability_test" },
+          });
+        }
+
+        results.push({
+          to,
+          ok: res.ok,
+          message_id: res.id,
+          detail: res.detail,
+          quotaExhausted: res.quotaExhausted,
+        });
+      }
+
+      return respond({
+        success: true,
+        mode,
+        test_id: testId,
+        short_id: shortId,
+        checks,
+        addresses,
+        results,
       });
     }
 
