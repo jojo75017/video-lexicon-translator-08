@@ -153,6 +153,20 @@ export default function V3OutlineCoBuilder() {
               {p.objectif && (
                 <p className="mt-1 text-[11.5px]" style={{ color: 'var(--v3-muted)' }}>{p.objectif}</p>
               )}
+              {passages.length > 0 && (
+                p.sources.length ? (
+                  <p className="mt-1 text-[11px] font-semibold" style={{ color: '#0f6b4a' }}>
+                    D’après votre récit — passage(s) {p.sources.join(', ')} :
+                    <span className="ml-1 font-normal" style={{ color: 'var(--v3-muted)' }}>
+                      « {String(passages[p.sources[0] - 1] || '').slice(0, 120)}… »
+                    </span>
+                  </p>
+                ) : (
+                  <p className="mt-1 text-[11px] font-semibold" style={{ color: '#b42318' }}>
+                    Ce chapitre ne s’appuie sur aucun passage de votre récit — retirez-le ou demandez de suivre votre texte.
+                  </p>
+                )
+              )}
               <div className="mt-2 flex flex-wrap gap-2">
                 <button type="button" onClick={() => keep(i)} className="v3-btn v3-btn-primary text-[11px]">
                   <Check className="h-3 w-3" /> Garder
