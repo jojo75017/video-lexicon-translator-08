@@ -1596,6 +1596,9 @@ Format JSON :
         const descriptionGeneree = previousContext.P1?.descriptionGeneree || '';
         const introductionGeneree = previousContext.P1?.introductionGeneree || '';
         const conclusionGeneree = previousContext.P1?.conclusionGeneree || '';
+        const matiereAuteurP3 = bookIntroduction
+          ? `\n\nMATIÈRE DE L'AUTEUR (texte réel fourni par l'auteur — SOURCE DE VÉRITÉ, ne jamais la contredire, ne jamais inventer de faits/lieux/prénoms absents) :\n"""\n${String(bookIntroduction).slice(0, 20000)}\n"""\nRÈGLE : la structure doit suivre la chronologie et les faits de cette matière. Chaque chapitre doit correspondre à des éléments réellement présents ci-dessus.`
+          : '';
         const fallbackP3 = () => buildFallbackP3Result({
           title,
           subtitle,
