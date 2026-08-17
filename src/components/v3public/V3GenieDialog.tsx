@@ -123,10 +123,14 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
     setQuestions([]);
     const previousBrief = brief;
     const history = messages.slice(-12).map((m) => ({ role: m.role, content: m.content }));
-    pushMessage(makeMessage('user', text), previousBrief);
-    setInput('');
     // Matière brute : les mots exacts de l'auteur, accumulés et jamais résumés.
+    // On les enregistre AVANT l'appel IA : même en cas de panne, rien n'est perdu.
     const nextSourceText = appendSourceText(previousBrief.sourceText, text);
+    const briefWithSource: BookBrief = { ...previousBrief, sourceText: nextSourceText };
+    setBrief(briefWithSource);
+    writeBookBrief(briefWithSource);
+    pushMessage(makeMessage('user', text), briefWithSource);
+    setInput('');
     try {
       const provider = getProvider();
       const userApiKey = provider === 'gemini' ? getProviderKey('gemini') : '';
@@ -142,28 +146,33 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
       if (error) throw error;
       if ((data as any)?.error) throw new Error((data as any).error);
       const b = (data as any)?.brief || {};
-      const nextBrief: BookBrief = {
-        ...previousBrief,
+      // Les réglages verrouillés par l'auteur ne sont jamais remplacés par l'IA.
+      const proposed = mergeRespectingLocks(briefWithSource, {
         title: b.title || previousBrief.title || '',
         subtitle: b.subtitle || previousBrief.subtitle || '',
+        chapters: b.chapters || previousBrief.chapters || 20,
+        wordsPerChapter: b.wordsPerChapter || previousBrief.wordsPerChapter || 2500,
+      });
+      const nextBrief: BookBrief = {
+        ...briefWithSource,
         author: b.author || brief.author || '',
         category: b.category || previousBrief.category || '',
         tone: b.tone || previousBrief.tone || 'Inspirant',
-        description: b.description || previousBrief.description || text,
-        sourceText: nextSourceText,
-        chapters: b.chapters || previousBrief.chapters || 20,
-        wordsPerChapter: b.wordsPerChapter || previousBrief.wordsPerChapter || 2500,
+        description: b.description || previousBrief.description || '',
+        chapters: previousBrief.chapters || 20,
+        wordsPerChapter: previousBrief.wordsPerChapter || 2500,
         wantsIllustrations: Boolean(b.wantsIllustrations),
         cibleProfil: b.cibleProfil || brief.cibleProfil || '',
         promesseCentrale: b.promesseCentrale || brief.promesseCentrale || '',
         outlineValidated: false,
+        ...proposed,
       };
       setBrief(nextBrief);
       writeBookBrief(nextBrief);
       const nextQuestions = Array.isArray((data as any)?.questions) ? (data as any).questions : [];
       setQuestions(nextQuestions);
       const changes = describeBriefChanges(previousBrief, nextBrief);
-      const sourceWords = nextSourceText.split(/\s+/).filter(Boolean).length;
+      const sourceWords = countTextWords(nextSourceText);
       // Une seule copie du récit : elle vit dans la colonne de droite.
       // Ici, le Génie répond court : ce qui a changé + sa prochaine question.
       const reply = [
@@ -176,9 +185,12 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
     } catch (e: any) {
       toast.error(e?.message || 'Le Génie est indisponible pour le moment.');
       pushMessage(
-        makeMessage('assistant', 'Je n’ai pas pu traiter ce message. Reformulez-le ou réessayez dans quelques secondes.'),
-        previousBrief,
+        makeMessage('assistant', 'Je n’ai pas pu traiter ce message : votre texte est conservé, réessayez dans quelques secondes.'),
+        briefWithSource,
       );
+    } finally {
+      setLoading(false);
+    }
     } finally {
       setLoading(false);
     }
