@@ -267,7 +267,7 @@ Règles :
       tone: String(parsed.tone || "Inspirant").trim(),
       description: String(parsed.description || message).trim(),
       chapters: clamp(parsed.chapters, 8, 30, 20),
-      wordsPerChapter: clamp(parsed.wordsPerChapter, 1000, 2200, 1500),
+      wordsPerChapter: clamp(parsed.wordsPerChapter, 2200, 3500, 2500),
       wantsIllustrations: Boolean(parsed.wantsIllustrations),
       cibleProfil: String(parsed.audience || "").trim(),
       promesseCentrale: String(parsed.promesseCentrale || "").trim(),
