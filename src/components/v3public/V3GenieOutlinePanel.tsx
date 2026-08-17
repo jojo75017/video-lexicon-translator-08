@@ -1,27 +1,31 @@
-import { useEffect, useState } from 'react';
-import { ListOrdered, History, RotateCcw, PenLine, Loader2, Sparkles } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ListOrdered, History, RotateCcw, PenLine, Loader2, Sparkles, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import { BOOK_BRIEF_EVENT, readBookBrief, writeBookBrief, type BookBrief } from '@/lib/v3/bookBrief';
 import { loadOutlineVersions, type OutlineVersion } from '@/lib/v3/genieThread';
 import {
-  readWrittenChapters, replaceWrittenChapter, WRITTEN_CHAPTERS_EVENT, type WrittenChapter,
+  readWrittenProgress, replaceWrittenChapter, WRITTEN_CHAPTERS_EVENT, type WrittenProgress,
 } from '@/lib/v3/writtenChapters';
 import V3OutlinePanel from './V3OutlinePanel';
 
 /**
  * Colonne de droite : « Sommaire » (ce que l'IA a compris, versions restaurables)
  * et « Déjà écrit » (les chapitres rédigés, relisibles et corrigeables) — visible
- * pendant toute la rédaction.
+ * pendant toute la rédaction, et qui s'ouvre d'elle-même sur le texte dès que la
+ * rédaction commence.
  */
 export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'full' | 'guided' }) {
   const [brief, setBrief] = useState<BookBrief>({});
   const [versions, setVersions] = useState<OutlineVersion[]>([]);
   const [tab, setTab] = useState<'outline' | 'written'>('outline');
-  const [written, setWritten] = useState<WrittenChapter[]>([]);
+  const [progress, setProgress] = useState<WrittenProgress>({ chapters: [], total: 0, activeIndex: -1 });
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [fixing, setFixing] = useState<number | null>(null);
+  const [showStory, setShowStory] = useState(false);
+  const autoSwitched = useRef(false);
 
   useEffect(() => {
     const sync = () => setBrief(readBookBrief() || {});
@@ -31,11 +35,19 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
   }, []);
 
   useEffect(() => {
-    const sync = () => setWritten(readWrittenChapters());
+    const sync = () => setProgress(readWrittenProgress());
     sync();
     window.addEventListener(WRITTEN_CHAPTERS_EVENT, sync);
     return () => window.removeEventListener(WRITTEN_CHAPTERS_EVENT, sync);
   }, []);
+
+  // Dès le premier chapitre rédigé, la colonne montre le texte sans qu'on cherche.
+  useEffect(() => {
+    if (autoSwitched.current || progress.chapters.length === 0) return;
+    autoSwitched.current = true;
+    setTab('written');
+    setOpenIndex(progress.chapters[progress.chapters.length - 1].index);
+  }, [progress.chapters.length]);
 
   useEffect(() => {
     loadOutlineVersions(brief.projectId || null).then(setVersions);
