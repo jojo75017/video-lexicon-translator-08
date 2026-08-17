@@ -292,6 +292,8 @@ export default function V3CreateWizard() {
       if (w.subtitle) setSubtitle(w.subtitle);
       if (w.author) setAuthorName(w.author);
       if (w.description) setDescription(w.description);
+      if (w.sourceText) setSourceText(String(w.sourceText));
+
       // La fiche du livre (Génie / V3BriefRecap) écrit `category`/`chapters`,
       // le wizard historique `genre`/`numberOfChapters` : on accepte les deux.
       const wGenre = w.genre || w.category;
@@ -361,6 +363,9 @@ export default function V3CreateWizard() {
 
   const [title, setTitle] = useState(hub.title || '');
   const [description, setDescription] = useState(hub.description || '');
+  /** Mots exacts de l'auteur (souvenirs, récit) : transmis aux agents, jamais résumés. */
+  const [sourceText, setSourceText] = useState<string>((hub as any).sourceText || '');
+
   const [category, setCategory] = useState(hub.genre || 'Roman');
   const [customCategory, setCustomCategory] = useState('');
   const [tone, setTone] = useState('Inspirant');
@@ -600,6 +605,8 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
       subtitle: subtitle.trim(),
       author: authorName.trim(),
       description: description.trim(),
+      sourceText: sourceText.trim(),
+
       category: effectiveCategory,
       genre: effectiveCategory,
       tone,
@@ -612,7 +619,7 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
       promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion,
       projectId,
     } as any);
-  }, [title, finalTitle, subtitle, authorName, description, effectiveCategory, tone, chapters, wordsPerChapter, normalizedOutline, characters, cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion, projectId]);
+  }, [title, finalTitle, subtitle, authorName, description, sourceText, effectiveCategory, tone, chapters, wordsPerChapter, normalizedOutline, characters, cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion, projectId]);
 
   const [showTocPaste, setShowTocPaste] = useState(false);
   const [tocPasteText, setTocPasteText] = useState('');
@@ -686,9 +693,13 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
 
   const buildWorkflowDescription = () => [
     description.trim(),
+    sourceText.trim()
+      ? `✍️ MATIÈRE BRUTE DE L'AUTEUR — ses mots exacts. RÈGLE ABSOLUE : ne jamais résumer, raccourcir ni supprimer ces souvenirs. Chaque passage doit être DÉVELOPPÉ en scènes complètes (dialogues, sensations, décors), en corrigeant seulement l'orthographe, la grammaire et le style :\n"""${sourceText.trim()}"""`
+      : '',
     `Style demandé : ${tone}.`,
-    `Format prévu : ${chapters} chapitres d'environ ${wordsPerChapter} mots chacun.`,
+    `Format prévu : ${chapters} chapitres de ${wordsPerChapter} mots minimum chacun (développement obligatoire, jamais de résumé).`,
     outlineText ? `SOMMAIRE VALIDÉ PAR L'AUTEUR — à respecter strictement :\n${outlineText}` : '',
+
     workflowCharacters.length
       ? `Personnages fournis : ${workflowCharacters.map((character) => `${character.name} (${character.role}) — ${character.description}`).join(' | ')}`
       : '',

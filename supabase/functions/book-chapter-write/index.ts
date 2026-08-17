@@ -107,8 +107,13 @@ function memoryBlock(memory: Array<Record<string, unknown>>): string {
 function buildPrompt(body: Body): string {
   const sheet = body.sheet || {};
   const chapter = body.chapter || {};
-  const target = Math.min(6000, Math.max(700, Number(chapter.word_target) || 1800));
+  const target = Math.min(6000, Math.max(700, Number(chapter.word_target) || 2500));
   const subs = Array.isArray(chapter.subsections) ? (chapter.subsections as unknown[]).map(String) : [];
+  const source = String((body as any).sourceText || "").trim();
+  const sourceBlock = source
+    ? `\nMATIÈRE BRUTE DE L'AUTEUR (ses mots exacts)\n"""${source.slice(0, 20000)}"""\nRÈGLE ABSOLUE : tu DÉVELOPPES cette matière, tu ne la résumes JAMAIS. Tu corriges l'orthographe, la grammaire et le style, tu gardes les faits, les lieux, les dates et les prénoms tels quels, et tu transformes chaque souvenir en scène complète (décor, sensations, dialogues).\n`
+    : "";
+
 
   if (body.task === "polissage") {
     return `Tu es ÉCRIVAIN PROFESSIONNEL et RELECTEUR ÉDITORIAL francophone.
@@ -139,7 +144,7 @@ ${sheetBlock(sheet)}
 
 BIBLE DU LIVRE (architecture validée par l'auteur — à respecter strictement)
 ${bibleBlock(body.bible || {})}
-
+${sourceBlock}
 MÉMOIRE DES CHAPITRES DÉJÀ RÉDIGÉS (faits à ne jamais contredire ni répéter)
 ${memoryBlock(body.memory || [])}
 
@@ -149,15 +154,17 @@ Titre : ${chapter.title || ""}
 Objectif : ${chapter.objective || ""}
 Résumé prévu : ${chapter.planned_summary || ""}
 ${subs.length ? `Sous-chapitres à couvrir dans l'ordre :\n${subs.map((s, i) => `${i + 1}. ${s}`).join("\n")}` : ""}
-Longueur visée : environ ${target} mots (ne descends jamais sous ${Math.round(target * 0.85)} mots).
+Longueur visée : environ ${target} mots (ne descends JAMAIS sous ${Math.round(target * 0.92)} mots ; si tu manques de matière, développe les scènes, les dialogues et les détails sensoriels — jamais de remplissage abstrait).
 ${body.guidance ? `\nCONSIGNE DE L'AUTEUR : ${body.guidance}` : ""}
 
 EXIGENCES
 - Enchaîne naturellement avec la fin du chapitre précédent, sans résumer ce qui précède.
+- Aucun résumé de la matière de l'auteur : tout est développé et raconté en entier.
 - Aucun remplissage, aucune redite, aucune phrase creuse.
 - Prose vivante et concrète : scènes, détails sensoriels, dialogues utiles (fiction) ou exemples et cas pratiques (non-fiction).
-- Respecte les sous-chapitres et l'objectif ; termine sur une clôture qui donne envie de lire la suite.
+- Respecte les sous-chapitres et l'objectif ; termine sur une phrase complète terminée par un point.
 - N'annonce pas ce que tu fais, n'écris aucun méta-commentaire.
+
 
 FORMAT DE SORTIE
 Le texte du chapitre uniquement, en paragraphes. Tu peux utiliser des intertitres en markdown "## " pour les sous-chapitres. Ne répète PAS le titre du chapitre en tête. Aucun JSON, aucune balise de code.`;
