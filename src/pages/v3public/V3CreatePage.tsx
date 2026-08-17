@@ -208,7 +208,12 @@ export default function V3CreatePage() {
               />
             )}
 
-            {/* Ambiance — modifiable à tout moment */}
+            {/* On construit le sommaire ensemble, 3 chapitres à la fois */}
+            <div className="mt-4">
+              <V3OutlineCoBuilder />
+            </div>
+
+            {/* Ambiance — repliée, modifiable à tout moment */}
             <div className="mt-4">
               <V3AmbiancePicker />
             </div>
@@ -217,6 +222,15 @@ export default function V3CreatePage() {
             <div className="mt-4">
               <V3BookActionsBar onLaunch={launchWorkflow} />
             </div>
+
+            {/* Workflow : dans la colonne de gauche pour garder le sommaire visible */}
+            {showWizard && (
+              <div ref={wizardRef} className="v3-card mt-6">
+                <Suspense fallback={<div className="py-16 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-[var(--v3-orange)]" /></div>}>
+                  <V3CreateWizard />
+                </Suspense>
+              </div>
+            )}
 
             {/* Rappel clé IA : uniquement si aucune clé enregistrée */}
             <div className="mt-4">
@@ -256,14 +270,6 @@ export default function V3CreatePage() {
         </div>
 
 
-        {/* Workflow */}
-        {showWizard && (
-          <div ref={wizardRef} className="v3-card mt-8">
-            <Suspense fallback={<div className="py-16 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-[var(--v3-orange)]" /></div>}>
-              <V3CreateWizard />
-            </Suspense>
-          </div>
-        )}
 
       </div>
     </section>
