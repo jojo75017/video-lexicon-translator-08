@@ -129,21 +129,60 @@ export function writeBookBrief(brief: BookBrief) {
 }
 
 
+/** Retire les préfixes techniques : seuls les mots de l'auteur sont conservés. */
+export function stripAuthorPrefix(text: string): string {
+  return String(text || '')
+    .replace(/^\s*(?:Précision de l['’]auteur|Complément de l['’]auteur)\s*:\s*/i, '')
+    .trim();
+}
+
+/** Clé de comparaison : ponctuation et casse ignorées, espaces normalisés. */
+function passageKey(text: string): string {
+  return stripAuthorPrefix(text)
+    .toLowerCase()
+    .replace(/[\s\u00A0]+/g, ' ')
+    .replace(/[^\p{L}\p{N} ]/gu, '')
+    .trim();
+}
+
+/** Découpe la matière brute en passages (un passage = un envoi de l'auteur). */
+function splitPassages(text: string): string[] {
+  return String(text || '')
+    .split(/\n{2,}/)
+    .map((p) => stripAuthorPrefix(p))
+    .filter((p) => p.length > 0);
+}
+
 /**
- * Ajoute les mots de l'auteur à la matière brute, sans rien perdre.
- * Les doublons exacts sont ignorés (envoi deux fois du même passage).
+ * Ajoute les mots de l'auteur à la matière brute, sans rien perdre et sans
+ * jamais répéter un passage déjà enregistré (même envoyé deux fois avec une
+ * ponctuation ou une casse différente).
  */
 export function appendSourceText(previous: string | undefined, addition: string): string {
-  const clean = String(addition || '').trim();
+  const clean = stripAuthorPrefix(addition);
   const base = String(previous || '').trim();
   if (!clean) return base;
-  // Ignorer uniquement un passage complet déjà enregistré. Une simple phrase
-  // contenue ailleurs ne doit pas faire disparaître un nouveau souvenir.
-  if (base.split(/\n{2,}/).some((passage) => passage.trim() === clean)) return base;
-  // Aucun découpage : dans une autobiographie, les premiers souvenirs sont
-  // aussi importants que les derniers et ne doivent jamais disparaître.
-  return base ? `${base}\n\n${clean}` : clean;
+
+  const existing = splitPassages(base);
+  const existingKeys = existing.map(passageKey);
+  const addedKey = passageKey(clean);
+  if (!addedKey) return base;
+
+  // Déjà présent à l'identique, ou déjà contenu dans un passage plus complet.
+  if (existingKeys.some((key) => key === addedKey || key.includes(addedKey))) return base;
+
+  // Le nouvel envoi est une version enrichie d'un passage déjà là : il le remplace.
+  const kept = existing.filter((_, i) => !addedKey.includes(existingKeys[i]));
+  return [...kept, clean].join('\n\n');
 }
+
+/** Nettoie une matière brute déjà enregistrée : supprime les répétitions. */
+export function dedupeSourceText(text: string): string {
+  let out = '';
+  for (const passage of splitPassages(text)) out = appendSourceText(out, passage);
+  return out;
+}
+
 
 /** Efface la fiche du livre en cours (titre, synopsis, etc.). */
 export function clearBookBrief() {
