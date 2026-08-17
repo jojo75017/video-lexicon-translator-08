@@ -407,15 +407,18 @@ Deno.serve(async (req) => {
         value: keyValue,
         fix: "Créer une clé à accès complet (envoi + lecture) et la remplacer dans les secrets du projet.",
       });
-      if (!keyOk) blocking.push("api_key");
 
-      if (blocking.length) {
+      // Seule l'absence totale de clé empêche l'envoi : une clé « envoi seul »
+      // (401 sur /domains) ou un DNS imparfait n'empêchent pas le test d'arriver.
+      if (!apiKey) {
         return respond({
-          error: "Impossible d'envoyer le test : authentification ou clé incorrecte.",
+          error: "Clé d'envoi absente : impossible d'envoyer le test.",
           checks,
-          blocking,
+          blocking: ["api_key"],
         }, 400);
       }
+      const warnings = blocking.concat(keyOk ? [] : ["api_key"]);
+
 
       const rawAddresses = (body as { addresses?: string[] }).addresses;
       const addresses = Array.isArray(rawAddresses) && rawAddresses.length
@@ -477,10 +480,20 @@ Deno.serve(async (req) => {
           to,
           ok: res.ok,
           message_id: res.id,
-            provider_message_id: res.id,
           detail: res.detail,
           quotaExhausted: res.quotaExhausted,
         });
+      }
+
+      const anySent = results.some((r) => r.ok);
+      if (!anySent) {
+        const detail = results.map((r) => `${r.to} : ${r.detail || "échec inconnu"}`).join(" — ");
+        return respond({
+          error: `Envoi refusé par le moteur d'emails : ${detail || "cause non communiquée"}`,
+          checks,
+          warnings,
+          results,
+        }, 400);
       }
 
       return respond({
@@ -489,9 +502,11 @@ Deno.serve(async (req) => {
         test_id: testId,
         short_id: shortId,
         checks,
+        warnings,
         addresses,
         results,
       });
+
     }
 
     return respond({ error: `Mode inconnu : ${mode}` }, 400);
