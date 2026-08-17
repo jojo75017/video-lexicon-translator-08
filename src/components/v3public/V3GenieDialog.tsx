@@ -122,7 +122,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
         author: b.author || brief.author || '',
         category: b.category || '',
         tone: b.tone || 'Inspirant',
-        description: b.description || text,
+        description: b.description || previousBrief.description || text,
         chapters: b.chapters || 20,
         wordsPerChapter: b.wordsPerChapter || 1500,
         wantsIllustrations: Boolean(b.wantsIllustrations),
@@ -135,9 +135,10 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
       const nextQuestions = Array.isArray((data as any)?.questions) ? (data as any).questions : [];
       setQuestions(nextQuestions);
       const changes = describeBriefChanges(previousBrief, nextBrief);
+      // Une seule copie du récit : elle vit dans la colonne de droite.
+      // Ici, le Génie répond court : ce qui a changé + sa prochaine question.
       const reply = [
-        `Voilà ce que j’ai compris : « ${nextBrief.title} »${nextBrief.subtitle ? ` — ${nextBrief.subtitle}` : ''}.`,
-        nextBrief.description || '',
+        `C’est noté : « ${nextBrief.title} »${nextBrief.subtitle ? ` — ${nextBrief.subtitle}` : ''}. Le récit et le sommaire sont à jour dans la colonne « Votre livre en direct ».`,
         nextQuestions.length ? `Question : ${nextQuestions[0]}` : '',
       ].filter(Boolean).join('\n\n');
       pushMessage(makeMessage('assistant', reply, { changes: changes || undefined, outline: nextBrief.outline }), nextBrief);
@@ -155,8 +156,8 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
 
 
   const refine = async (extra: string) => {
-    const base = (brief.description || '').trim();
-    await ask(`${base}\n\nPrécision de l'auteur : ${extra.trim()}`);
+    // On n'envoie que la nouvelle précision : l'historique porte déjà le récit.
+    await ask(`Précision de l'auteur : ${extra.trim()}`);
   };
 
   const steps = useMemo(() => ([

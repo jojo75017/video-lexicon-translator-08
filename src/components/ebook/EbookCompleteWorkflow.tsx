@@ -18,6 +18,7 @@ import {
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { normalizeManuscript } from '@/utils/manuscriptNormalizer';
+import { publishWrittenChapters } from '@/lib/v3/writtenChapters';
 
 import { motion } from 'framer-motion';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -1247,6 +1248,12 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
 
             console.log(`✅ [P4] Chapitre ${chapitresComplets.length}/${retryStructure.length} terminé : « ${chapitreGenere?.titre || ''} »`);
             toast.success(`✅ Chapitre ${chapitresComplets.length}/${retryStructure.length} rédigé`, { duration: 2000 });
+
+            // Colonne « Déjà écrit » : le texte apparaît dès le premier chapitre.
+            publishWrittenChapters(chapitresComplets, {
+              total: retryStructure.length,
+              activeIndex: chapitresComplets.length,
+            });
 
             // UI : on met à jour P4 au fil de l'eau
             const p4DisplayContent = `**📄 Chapitres rédigés : ${chapitresComplets.length}/${retryStructure.length}**\n\nDernier : ${chapitreGenere?.titre || partial?.displayContent || ''}`;

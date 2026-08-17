@@ -1,27 +1,31 @@
-import { useEffect, useState } from 'react';
-import { ListOrdered, History, RotateCcw, PenLine, Loader2, Sparkles } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ListOrdered, History, RotateCcw, PenLine, Loader2, Sparkles, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import { BOOK_BRIEF_EVENT, readBookBrief, writeBookBrief, type BookBrief } from '@/lib/v3/bookBrief';
 import { loadOutlineVersions, type OutlineVersion } from '@/lib/v3/genieThread';
 import {
-  readWrittenChapters, replaceWrittenChapter, WRITTEN_CHAPTERS_EVENT, type WrittenChapter,
+  readWrittenProgress, replaceWrittenChapter, WRITTEN_CHAPTERS_EVENT, type WrittenProgress,
 } from '@/lib/v3/writtenChapters';
 import V3OutlinePanel from './V3OutlinePanel';
 
 /**
  * Colonne de droite : « Sommaire » (ce que l'IA a compris, versions restaurables)
  * et « Déjà écrit » (les chapitres rédigés, relisibles et corrigeables) — visible
- * pendant toute la rédaction.
+ * pendant toute la rédaction, et qui s'ouvre d'elle-même sur le texte dès que la
+ * rédaction commence.
  */
 export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'full' | 'guided' }) {
   const [brief, setBrief] = useState<BookBrief>({});
   const [versions, setVersions] = useState<OutlineVersion[]>([]);
   const [tab, setTab] = useState<'outline' | 'written'>('outline');
-  const [written, setWritten] = useState<WrittenChapter[]>([]);
+  const [progress, setProgress] = useState<WrittenProgress>({ chapters: [], total: 0, activeIndex: -1 });
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [fixing, setFixing] = useState<number | null>(null);
+  const [showStory, setShowStory] = useState(false);
+  const autoSwitched = useRef(false);
 
   useEffect(() => {
     const sync = () => setBrief(readBookBrief() || {});
@@ -31,11 +35,19 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
   }, []);
 
   useEffect(() => {
-    const sync = () => setWritten(readWrittenChapters());
+    const sync = () => setProgress(readWrittenProgress());
     sync();
     window.addEventListener(WRITTEN_CHAPTERS_EVENT, sync);
     return () => window.removeEventListener(WRITTEN_CHAPTERS_EVENT, sync);
   }, []);
+
+  // Dès le premier chapitre rédigé, la colonne montre le texte sans qu'on cherche.
+  useEffect(() => {
+    if (autoSwitched.current || progress.chapters.length === 0) return;
+    autoSwitched.current = true;
+    setTab('written');
+    setOpenIndex(progress.chapters[progress.chapters.length - 1].index);
+  }, [progress.chapters.length]);
 
   useEffect(() => {
     loadOutlineVersions(brief.projectId || null).then(setVersions);
@@ -54,7 +66,7 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
     toast.success(`Sommaire v${version.version} restauré (${version.chapters.length} chapitres).`);
   };
 
-  const correctChapter = async (chapter: WrittenChapter) => {
+  const correctChapter = async (chapter: WrittenProgress['chapters'][number]) => {
     setFixing(chapter.index);
     try {
       const provider = getProvider();
@@ -81,8 +93,11 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
   };
 
   const outline = brief.outline || [];
+  const written = progress.chapters;
+  const totalChapters = outline.length || progress.total || brief.chapters || 0;
   const totalWords = written.reduce((sum, c) => sum + c.words, 0);
   const writtenTitles = new Set(written.map((c) => c.title.toLowerCase().trim()));
+  const writing = progress.activeIndex >= 0 && progress.activeIndex < totalChapters;
 
   return (
     <div className="space-y-4">
@@ -91,7 +106,7 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
           <span className="v3-chip v3-chip-orange text-[11px]"><ListOrdered className="h-3 w-3" /> Votre livre en direct</span>
           <span className="text-[11px]" style={{ color: 'var(--v3-muted)' }}>
             {written.length
-              ? `${written.length} chapitre(s) écrit(s) sur ${outline.length || brief.chapters || '?'} · ${totalWords.toLocaleString('fr-FR')} mots`
+              ? `${written.length} chapitre(s) écrit(s) sur ${totalChapters || '?'} · ${totalWords.toLocaleString('fr-FR')} mots`
               : outline.length ? `${outline.length} chapitres${brief.outlineValidated ? ' · validé' : ' · à valider'}` : 'aucun chapitre pour le moment'}
           </span>
         </div>
@@ -107,6 +122,35 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
               style={{ borderColor: 'rgba(201,168,76,0.6)', color: 'var(--v3-ink)' }}>{chip}</span>
           ))}
         </div>
+
+        {/* Le récit du livre : un seul endroit, jamais recopié dans la conversation */}
+        {(brief.description || '').trim() && (
+          <div className="mt-2 text-[12px]" style={{ color: 'var(--v3-muted)' }}>
+            <p className="whitespace-pre-wrap leading-relaxed">
+              {showStory ? brief.description : `${String(brief.description).slice(0, 180)}${String(brief.description).length > 180 ? '…' : ''}`}
+            </p>
+            {String(brief.description).length > 180 && (
+              <button type="button" onClick={() => setShowStory((v) => !v)} className="mt-1 underline">
+                {showStory ? 'Réduire le récit' : 'Voir le récit complet'}
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Progression de la rédaction */}
+        {(written.length > 0 || writing) && (
+          <div className="mt-3">
+            <div className="h-2 w-full overflow-hidden rounded-full" style={{ background: 'rgba(201,168,76,0.15)' }}>
+              <div className="h-full rounded-full transition-all"
+                style={{ width: `${totalChapters ? Math.min(100, Math.round((written.length / totalChapters) * 100)) : 0}%`, background: 'var(--v3-orange-600, #c9a84c)' }} />
+            </div>
+            <p className="mt-1 text-[11px]" style={{ color: 'var(--v3-muted)' }}>
+              {writing && written.length < totalChapters
+                ? `Chapitre ${Math.min(totalChapters, written.length + 1)} sur ${totalChapters} en cours · ${totalWords.toLocaleString('fr-FR')} mots écrits`
+                : `${written.length} chapitre(s) sur ${totalChapters || '?'} · ${totalWords.toLocaleString('fr-FR')} mots`}
+            </p>
+          </div>
+        )}
 
         {/* Onglets */}
         <div className="mt-3 flex gap-2">
@@ -128,11 +172,12 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
             <ol className="mt-3 max-h-72 space-y-1 overflow-y-auto pr-1 text-[13px]" style={{ color: 'var(--v3-ink)' }}>
               {outline.map((c, i) => {
                 const done = writtenTitles.has(String(c.titre || '').toLowerCase().trim()) || i < written.length;
+                const inProgress = !done && writing && i === written.length;
                 return (
                   <li key={`${c.numero}-${i}`} className="rounded-xl border px-3 py-2" style={{ borderColor: 'rgba(0,0,0,0.08)' }}>
                     <strong>{i + 1}.</strong> {c.titre}
                     <span className="ml-1 text-[10.5px]" style={{ color: done ? '#0f766e' : 'var(--v3-muted)' }}>
-                      · {done ? 'écrit' : 'à écrire'}
+                      · {done ? 'écrit' : inProgress ? 'en cours…' : 'à écrire'}
                     </span>
                     {c.objectif ? <span className="block text-[11px]" style={{ color: 'var(--v3-muted)' }}>{c.objectif}</span> : null}
                   </li>
@@ -165,6 +210,9 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
                       {fixing === c.index ? <Loader2 className="h-3 w-3 animate-spin" /> : <PenLine className="h-3 w-3" />}
                       Corriger ce chapitre
                     </button>
+                    <Link to="/v3/corriger" className="v3-btn v3-btn-ghost text-[11px]">
+                      <Wand2 className="h-3 w-3" /> Réécrire
+                    </Link>
                   </div>
                 </div>
               ))}
