@@ -1,6 +1,22 @@
-# V3 Création : effacer vraiment le livre, changer d'ambiance, sommaire visible pendant l'écriture
+# V3 Création : entretien guidé, effacement réel, ambiance, sommaire visible
 
-Trois corrections sur `/v3/create`.
+Quatre corrections sur `/v3/create`.
+
+## 0. Le Génie mène un entretien guidé (référence Wordgenie)
+
+Aujourd'hui le Génie répond librement. Dans la référence, l'IA conduit un entretien balisé : « Étape 1 sur 6 – Vous et votre livre », une question à la fois, un exemple dépliable, un bouton « Passer », et une carte de choix (langue du livre) répondue en un clic.
+
+À faire :
+- **Parcours en 6 étapes** annoncées dans le fil (séparateur « Étape X sur 6 – … ») : 1. Vous et votre livre · 2. Votre approche · 3. Votre lecteur · 4. Le plan du livre · 5. Ton et style · 6. Validation du sommaire.
+- **Une question à la fois**, formulée par le Génie, avec :
+  - un lien **« Montrer un exemple »** qui déplie une réponse type,
+  - un bouton **« Passer »** (l'IA travaille avec ce qui a déjà été dit),
+  - la réponse de l'abonné affichée en bulle à droite, comme aujourd'hui.
+- **Cartes de choix cliquables** quand la réponse est un choix : **langue du livre** (les 10 langues déjà gérées), nombre de chapitres, ton, ambiance. Un clic = réponse enregistrée dans la fiche.
+- La langue choisie est appliquée à la rédaction et aux exports (champ `language` de la fiche).
+- À la fin de l'étape 6, le sommaire est proposé et les boutons d'action s'activent.
+- Le parcours reste souple : l'abonné peut à tout moment écrire librement ; le Génie continue là où il en est, et la reprise repart à l'étape en cours.
+
 
 ## 1. « Effacer le livre » qui efface vraiment
 
@@ -29,9 +45,11 @@ Aujourd'hui plusieurs mémoires vivent en parallèle : la fiche du Génie, la co
 
 ## Détails techniques
 
-- `src/lib/v3/bookBrief.ts` : nouvelle fonction `resetBookProject()` supprimant `v3_create_wizard_config_v1`, `edition_book_config_v1`, `v3_toc_for_workflow_v1` (+ clés du Sommaire Ultime en attente) et émettant `BOOK_BRIEF_EVENT` ; champ `ambianceId` ajouté au type `BookBrief`.
-- `src/lib/v3/genieThread.ts` : réutilisation de `clearLocalThread()` + `clearRemoteThread()` dans le reset global.
-- `src/components/v3public/V3BookActionsBar.tsx` et `V3GenieDialog.tsx` : bouton d'effacement complet avec confirmation.
-- Nouveau `src/components/v3public/V3AmbiancePicker.tsx` s'appuyant sur `src/data/writingAmbiances.ts` (aucune nouvelle donnée).
-- `src/pages/v3public/V3CreatePage.tsx` : layout `lg:grid-cols-[1fr_340px]` quand le workflow est ouvert, avec `V3GenieOutlinePanel` en colonne `sticky top-24`.
-- Aucun changement de base de données, de tarif ni d'edge function.
+- `src/lib/v3/bookBrief.ts` : `resetBookProject()` supprimant `v3_create_wizard_config_v1`, `edition_book_config_v1`, `v3_toc_for_workflow_v1` (+ clés Sommaire Ultime en attente) et émettant `BOOK_BRIEF_EVENT` ; champs `ambianceId`, `language`, `interviewStep` ajoutés à `BookBrief`.
+- Nouveau `src/lib/v3/genieInterview.ts` : définition des 6 étapes (question, exemple, type de réponse libre/choix, options) et calcul de l'étape courante à partir de la fiche.
+- `src/components/v3public/V3GenieDialog.tsx` : séparateurs d'étape, question courante, « Montrer un exemple », « Passer », cartes de choix cliquables, bouton d'effacement complet ; le prompt envoyé à `v3-genie-brief` indique l'étape en cours pour que l'IA pose la question suivante.
+- `src/lib/v3/genieThread.ts` : `clearLocalThread()` + `clearRemoteThread()` réutilisés dans le reset global.
+- Nouveau `src/components/v3public/V3AmbiancePicker.tsx` basé sur `src/data/writingAmbiances.ts` (aucune nouvelle donnée).
+- `src/pages/v3public/V3CreatePage.tsx` : layout `lg:grid-cols-[1fr_340px]` quand le workflow est ouvert, `V3GenieOutlinePanel` en colonne `sticky top-24`.
+- Aucun changement de base de données, de tarif ni d'edge function (seul le prompt de `v3-genie-brief` évolue).
+
