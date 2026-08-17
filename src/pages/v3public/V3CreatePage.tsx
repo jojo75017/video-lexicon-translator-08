@@ -146,7 +146,7 @@ export default function V3CreatePage() {
 
   return (
     <section className="v3-halo-soft min-h-[calc(100vh-4rem)] py-10 px-5">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <BackButton />
           <V3QuickActionsBar />
