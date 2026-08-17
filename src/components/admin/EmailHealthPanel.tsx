@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
+import { ensureFreshAccessToken } from '@/lib/auth/ensureFreshSession';
+
 import { toast } from 'sonner';
 import { Activity, CheckCircle2, Loader2, MailWarning, RefreshCw, ShieldCheck, TestTube2, XCircle } from 'lucide-react';
 
