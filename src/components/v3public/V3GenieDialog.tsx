@@ -4,7 +4,9 @@ import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
-import { readBookBrief, writeBookBrief, type BookBrief } from '@/lib/v3/bookBrief';
+import { readBookBrief, resetBookProject, writeBookBrief, type BookBrief } from '@/lib/v3/bookBrief';
+import { currentInterviewStep, stepLabel, type InterviewStep } from '@/lib/v3/genieInterview';
+
 import {
   clearLocalThread,
   clearRemoteThread,
