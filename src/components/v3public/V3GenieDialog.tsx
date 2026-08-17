@@ -49,9 +49,11 @@ type Props = {
   initialIdea?: string;
   /** Appelé quand la fiche est prête : on enchaîne sur le Sommaire IA guidé. */
   onReady: () => void;
+  /** 'biography' = entretien « Le récit de votre vie » (chronologie stricte). */
+  mode?: 'book' | 'biography';
 };
 
-export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
+export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book' }: Props) {
   const [brief, setBrief] = useState<BookBrief>({});
   const [input, setInput] = useState(initialIdea);
   const [loading, setLoading] = useState(false);
@@ -126,7 +128,18 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
     // Matière brute : les mots exacts de l'auteur, accumulés et jamais résumés.
     // On les enregistre AVANT l'appel IA : même en cas de panne, rien n'est perdu.
     const nextSourceText = appendSourceText(previousBrief.sourceText, text);
-    const briefWithSource: BookBrief = { ...previousBrief, sourceText: nextSourceText };
+    const isBiography = mode === 'biography';
+    // Biographie : l'étape racontée est marquée pour passer à la période suivante.
+    const currentStep = currentInterviewStep({ ...previousBrief, mode: isBiography ? 'biography' : previousBrief.mode });
+    const toldSteps = isBiography && !currentStep.choice
+      ? Array.from(new Set([...(previousBrief.biographySteps || []), currentStep.id]))
+      : previousBrief.biographySteps;
+    const briefWithSource: BookBrief = {
+      ...previousBrief,
+      mode: isBiography ? 'biography' : previousBrief.mode,
+      biographySteps: toldSteps,
+      sourceText: nextSourceText,
+    };
     setBrief(briefWithSource);
     writeBookBrief(briefWithSource);
     pushMessage(makeMessage('user', text), briefWithSource);
@@ -141,6 +154,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
           author: (brief.author || '').trim(),
           history,
           sourceText: nextSourceText,
+          kind: mode === 'biography' ? 'biography' : 'book',
         },
       });
       if (error) throw error;
@@ -252,7 +266,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
         </span>
         <div className="flex items-center gap-2">
           <span className="text-[11px]" style={{ color: 'var(--v3-muted)' }}>
-            Entretien guidé en 6 étapes · une question à la fois
+            {mode === 'biography' ? 'Entretien biographique en 9 étapes · vos mots, dans l’ordre de votre vie' : 'Entretien guidé en 6 étapes · une question à la fois'}
           </span>
           <button type="button" onClick={eraseEverything} className="v3-btn v3-btn-ghost text-[11px]">
             <RotateCcw className="h-3 w-3" /> Effacer ce livre
@@ -274,7 +288,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady }: Props) {
         <div className="flex items-center gap-2">
           <span className="h-px flex-1" style={{ background: 'rgba(201,168,76,0.45)' }} />
           <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: '#8a6d1f' }}>
-            {stepLabel(step)}
+            {stepLabel(step, brief)}
           </span>
           <span className="h-px flex-1" style={{ background: 'rgba(201,168,76,0.45)' }} />
         </div>
