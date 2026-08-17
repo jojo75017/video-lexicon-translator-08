@@ -10,10 +10,19 @@ export type BriefOutlineChapter = {
   objectif?: string;
   /** Numéros des passages du récit de l'auteur couverts par ce chapitre. */
   sources?: number[];
+  /** Période de vie couverte (mode biographie), ex. « 1952-1958 ». */
+  period?: string;
 };
 
 export type BookBrief = {
   savedAt?: string;
+  /**
+   * Nature du projet : livre classique ou biographie (« Le récit de votre vie »).
+   * En biographie, la chronologie et les mots de l'auteur sont intouchables.
+   */
+  mode?: 'book' | 'biography';
+  /** Étapes de l'entretien biographique déjà racontées. */
+  biographySteps?: number[];
   title?: string;
   subtitle?: string;
   author?: string;
@@ -323,6 +332,7 @@ export function normalizeOutline(items: BriefOutlineChapter[]): BriefOutlineChap
       numero: 0,
       titre: String(item?.titre || '').trim(),
       objectif: String(item?.objectif || '').trim(),
+      period: String(item?.period || '').trim() || undefined,
       sources: Array.isArray(item?.sources)
         ? item!.sources!.map((n) => Number(n)).filter((n) => Number.isFinite(n) && n > 0)
         : undefined,
