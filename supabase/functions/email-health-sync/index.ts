@@ -480,10 +480,20 @@ Deno.serve(async (req) => {
           to,
           ok: res.ok,
           message_id: res.id,
-            provider_message_id: res.id,
           detail: res.detail,
           quotaExhausted: res.quotaExhausted,
         });
+      }
+
+      const anySent = results.some((r) => r.ok);
+      if (!anySent) {
+        const detail = results.map((r) => `${r.to} : ${r.detail || "échec inconnu"}`).join(" — ");
+        return respond({
+          error: `Envoi refusé par le moteur d'emails : ${detail || "cause non communiquée"}`,
+          checks,
+          warnings,
+          results,
+        }, 400);
       }
 
       return respond({
@@ -492,9 +502,11 @@ Deno.serve(async (req) => {
         test_id: testId,
         short_id: shortId,
         checks,
+        warnings,
         addresses,
         results,
       });
+
     }
 
     return respond({ error: `Mode inconnu : ${mode}` }, 400);
