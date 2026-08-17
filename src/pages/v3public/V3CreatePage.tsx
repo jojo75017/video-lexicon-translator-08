@@ -9,6 +9,8 @@ import V3ApiKeysGate from '@/components/v3public/V3ApiKeysGate';
 import V3GenieDialog from '@/components/v3public/V3GenieDialog';
 import V3QuickActionsBar from '@/components/v3public/V3QuickActionsBar';
 import V3ResumeBookCard from '@/components/v3public/V3ResumeBookCard';
+import V3GenieOutlinePanel from '@/components/v3public/V3GenieOutlinePanel';
+import V3BookActionsBar from '@/components/v3public/V3BookActionsBar';
 import { readBookBrief, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
 
 
@@ -192,6 +194,17 @@ export default function V3CreatePage() {
 
 
 
+        {/* Sommaire en cours + versions restaurables */}
+        <div id="sommaire-ia" className="mt-6">
+          <V3GenieOutlinePanel key={briefKey} outlineMode={sommaireIa ? 'guided' : undefined} />
+        </div>
+
+        {/* Tous les boutons au même endroit */}
+        <div className="mt-4">
+          <V3BookActionsBar onLaunch={launchWorkflow} />
+        </div>
+
+
         {/* Modes illustrés — liens discrets */}
         <div className="mt-5 flex flex-wrap justify-center gap-2">
           <Link to="/v3/create/illustre" className="v3-btn v3-btn-ghost text-xs">
@@ -208,11 +221,15 @@ export default function V3CreatePage() {
           <V3ApiKeysGate context="Sans clé Gemini, le workflow d’écriture ne peut pas démarrer." />
         </div>
 
-
-        {/* Fiche du livre + Cible & Promesse IA + Sommaire validé */}
-        <div className="mt-6">
-          <V3BriefRecap key={briefKey} variant="full" onLaunch={launchWorkflow} outlineMode={sommaireIa ? 'guided' : undefined} hideBookForm={!projectId} />
-        </div>
+        {/* Réglage manuel — replié, jamais imposé */}
+        <details className="mt-6 rounded-[22px] border p-4" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
+          <summary className="cursor-pointer text-xs font-semibold" style={{ color: 'var(--v3-muted)' }}>
+            Modifier la fiche à la main (titre, auteur, catégorie, synopsis…)
+          </summary>
+          <div className="mt-4">
+            <V3BriefRecap key={briefKey} variant="full" formOnly hideBookForm={false} />
+          </div>
+        </details>
 
         {/* Workflow */}
         {showWizard && (
@@ -222,6 +239,7 @@ export default function V3CreatePage() {
             </Suspense>
           </div>
         )}
+
       </div>
     </section>
   );

@@ -59,13 +59,18 @@ export function readBookBrief(): BookBrief | null {
   return hasSomething ? brief : null;
 }
 
+/** Événement émis à chaque écriture : les panneaux (sommaire, boutons) se resynchronisent. */
+export const BOOK_BRIEF_EVENT = 'v3:book-brief-updated';
+
 export function writeBookBrief(brief: BookBrief) {
   try {
     localStorage.setItem(WIZARD_BRIEF_KEY, JSON.stringify({ ...brief, savedAt: new Date().toISOString() }));
+    window.dispatchEvent(new CustomEvent(BOOK_BRIEF_EVENT));
   } catch {
     /* quota / mode privé : on ignore */
   }
 }
+
 
 /** Efface la fiche du livre en cours (titre, synopsis, etc.). */
 export function clearBookBrief() {

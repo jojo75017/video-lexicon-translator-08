@@ -32,6 +32,8 @@ type Props = {
   outlineMode?: 'full' | 'guided';
   /** Masque le formulaire de saisie manuelle (mode Ebookstudio-Génie) : le récap + sommaire + lancement restent. */
   hideBookForm?: boolean;
+  /** Fiche seule (réglage manuel replié) : ni Cible & Promesse, ni sommaire, ni lancement. */
+  formOnly?: boolean;
 };
 
 /**
@@ -39,7 +41,8 @@ type Props = {
  * La Cible & Promesse est générée par l'IA (aucun champ à remplir) et le sommaire
  * doit être validé avant de lancer le workflow.
  */
-export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMode, hideBookForm }: Props) {
+export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMode, hideBookForm, formOnly }: Props) {
+
   const [brief, setBrief] = useState<BookBrief>({});
   const [saved, setSaved] = useState(false);
   /** Le mode Génie masque la fiche, mais l'auteur peut toujours l'ouvrir. */
@@ -81,11 +84,10 @@ export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMod
   const recommended: string[] = [];
   if (!(brief.promesseCentrale || '').trim()) recommended.push('la Cible & Promesse (bouton IA)');
   const ready = missing.length === 0;
-  // Titre, auteur ou synopsis manquant : la fiche doit rester accessible,
-  // sinon le sommaire ne peut pas être généré.
-  const essentialsMissing =
-    !(brief.title || '').trim() || !(brief.author || '').trim() || (brief.description || '').trim().length < 30;
-  const showForm = !hideBookForm || formOpen || essentialsMissing;
+  // La fiche n'est jamais ouverte automatiquement : le dialogue Génie reste
+  // la voie principale, la saisie manuelle est un repli volontaire.
+  const showForm = formOnly || !hideBookForm || formOpen;
+
 
 
 
@@ -142,7 +144,7 @@ export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMod
           </div>
         </div>
 
-        {hideBookForm && !essentialsMissing && (
+        {hideBookForm && !formOnly && (
           <button type="button" onClick={() => setFormOpen((v) => !v)} className="v3-btn v3-btn-outline mt-4">
             {formOpen ? 'Masquer la fiche du livre' : 'Modifier la fiche du livre'}
           </button>
@@ -238,12 +240,13 @@ export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMod
       </div>
 
       {/* Cible & Promesse — 100 % IA */}
-      <V3TargetPromisePanel brief={brief} onChange={patch} />
+      {!formOnly && <V3TargetPromisePanel brief={brief} onChange={patch} />}
 
       {/* Sommaire + validation */}
-      <V3OutlinePanel brief={brief} onChange={patch} initialMode={outlineMode} />
+      {!formOnly && <V3OutlinePanel brief={brief} onChange={patch} initialMode={outlineMode} />}
 
       {/* Lancement du workflow */}
+      {!formOnly && (
       <div className="rounded-[22px] border p-5" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
         <p className="mb-3 text-xs" style={{ color: 'var(--v3-muted)' }}>
           Le workflow reprend vos informations (titre, auteur, synopsis, catégorie, ton, {chapters || '—'} chapitres) et le
@@ -270,6 +273,8 @@ export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMod
         ) : null}
 
       </div>
+      )}
+
     </section>
   );
 }
