@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowDown, ArrowUp, Check, ClipboardPaste, ListOrdered, Loader2, MessageSquarePlus,
-  Plus, RefreshCw, Sparkles, Wand2, X,
+  Plus, RefreshCw, Sparkles, Wand2, X, History, Undo2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,6 +15,7 @@ import {
   clearTocForWorkflow, normalizeOutline, parseTocText, readLatestUltimateToc,
   type BookBrief, type BriefOutlineChapter,
 } from '@/lib/v3/bookBrief';
+import { loadOutlineVersions, saveOutlineVersion, type OutlineVersion } from '@/lib/v3/genieThread';
 
 type Props = {
   brief: BookBrief;
@@ -40,6 +41,43 @@ export default function V3OutlinePanel({ brief, onChange, initialMode }: Props) 
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [guidance, setGuidance] = useState('');
   const [suggesting, setSuggesting] = useState(false);
+  const [versions, setVersions] = useState<OutlineVersion[]>([]);
+  const [savingVersion, setSavingVersion] = useState(false);
+
+  // Historique des sommaires validés (reprise possible à tout moment).
+  useEffect(() => {
+    loadOutlineVersions(brief.projectId || null).then(setVersions);
+  }, [brief.projectId]);
+
+  const validateOutline = async () => {
+    onChange({ outlineValidated: true, chapters: outline.length });
+    toast.success(`Sommaire validé — ${outline.length} chapitres retenus ✓`);
+    setSavingVersion(true);
+    try {
+      const saved = await saveOutlineVersion(outline, {
+        projectId: brief.projectId || null,
+        bookTitle: (brief.title || '').trim(),
+      });
+      if (saved) {
+        setVersions((prev) => [saved, ...prev]);
+        toast.success(`Version ${saved.version} du sommaire enregistrée`, {
+          description: 'Vous pourrez y revenir à tout moment depuis l’historique.',
+        });
+      }
+    } finally {
+      setSavingVersion(false);
+    }
+  };
+
+  const restoreVersion = (version: OutlineVersion) => {
+    const restored = normalizeOutline(version.chapters);
+    if (!restored.length) {
+      toast.error('Cette version ne contient aucun chapitre.');
+      return;
+    }
+    onChange({ outline: restored, chapters: restored.length, outlineValidated: false });
+    toast.success(`Version ${version.version} restaurée — ${restored.length} chapitres`);
+  };
 
   const outline = brief.outline || [];
   const validated = Boolean(brief.outlineValidated) && outline.length > 0;
@@ -467,15 +505,38 @@ Règles :
 
           <button
             type="button"
-            onClick={() => {
-              onChange({ outlineValidated: true, chapters: outline.length });
-              toast.success(`Sommaire validé — ${outline.length} chapitres retenus ✓`);
-            }}
-            disabled={validated}
+            onClick={() => { void validateOutline(); }}
+            disabled={validated || savingVersion}
             className="v3-btn v3-btn-primary mt-4 w-full justify-center disabled:opacity-60"
           >
-            <Check className="h-4 w-4" /> {validated ? 'Sommaire validé' : 'Valider le sommaire'}
+            {savingVersion ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+            {validated ? 'Sommaire validé' : 'Valider le sommaire'}
           </button>
+
+          {versions.length > 0 && (
+            <div className="mt-4 rounded-2xl border p-3" style={{ borderColor: 'var(--v3-border)', background: 'rgba(140,106,63,0.04)' }}>
+              <p className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest" style={{ color: 'var(--v3-muted)' }}>
+                <History className="h-3.5 w-3.5" /> Historique de vos sommaires
+              </p>
+              <ul className="mt-2 space-y-1.5">
+                {versions.map((v) => (
+                  <li key={v.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border px-3 py-2 text-xs"
+                    style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
+                    <span style={{ color: 'var(--v3-ink)' }}>
+                      <strong>Version {v.version}</strong> · {v.chapters.length} chapitres
+                      <span style={{ color: 'var(--v3-muted)' }}>
+                        {' '}· {new Date(v.createdAt).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                      {v.bookTitle ? <span style={{ color: 'var(--v3-muted)' }}> · {v.bookTitle}</span> : null}
+                    </span>
+                    <button type="button" onClick={() => restoreVersion(v)} className="v3-btn v3-btn-outline text-[11px]">
+                      <Undo2 className="h-3 w-3" /> Restaurer cette version
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </>
       )}
     </div>
