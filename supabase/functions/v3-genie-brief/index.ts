@@ -112,6 +112,90 @@ Deno.serve(async (req) => {
       ? `\nHistorique de la conversation (à respecter : ne perds rien de ce qui a déjà été décidé, applique seulement les nouvelles précisions) :\n"""${history}"""\n`
       : "";
 
+    const askAI = async (prompt: string) => {
+      const userKey = sanitizeApiKey(body.userApiKey);
+      const serverKey = sanitizeApiKey(Deno.env.get("GEMINI_API_KEY") || "");
+      let r: { ok: boolean; status?: number; text?: string } | null = null;
+      if (isValidGoogleKey(userKey)) r = await callGemini(prompt, userKey);
+      if (!r?.ok && isValidGoogleKey(serverKey)) r = await callGemini(prompt, serverKey);
+      if (!r?.ok) r = await callLovableAI(prompt);
+      return r;
+    };
+
+    const parseJson = (raw: string) => {
+      const cleaned = String(raw || "").replace(/```json|```/gi, "").trim();
+      try {
+        return JSON.parse(cleaned);
+      } catch {
+        const m = cleaned.match(/\{[\s\S]*\}/);
+        if (m) { try { return JSON.parse(m[0]); } catch { /* noop */ } }
+        return null;
+      }
+    };
+
+    /* ---------------- Mode « on construit le sommaire ensemble » ---------------- */
+    // L'IA ne propose JAMAIS le sommaire complet : au plus 3 chapitres à la fois,
+    // en tenant compte des chapitres déjà acceptés par l'auteur.
+    if (mode === "outline-step") {
+      const accepted = (Array.isArray(body.accepted) ? body.accepted : [])
+        .map((c, i) => `${i + 1}. ${String(c?.titre || "").trim()}${c?.objectif ? ` — ${String(c.objectif).trim()}` : ""}`)
+        .filter((line) => line.length > 3)
+        .join("\n");
+      const target = Math.min(40, Math.max(3, Number(body.target) || 12));
+      const remaining = Math.max(0, target - (Array.isArray(body.accepted) ? body.accepted.length : 0));
+      const count = Math.min(3, remaining || 3);
+
+      const stepPrompt = `Tu es directeur éditorial KDP francophone. Tu construis un sommaire AVEC l'auteur, pas à sa place.
+Livre : « ${String(body.bookTitle || "").slice(0, 200)} »
+Sujet / promesse : """${String(body.bookDescription || message).slice(0, 2000)}"""
+Ton souhaité : ${String(body.tone || "Inspirant")}
+Nombre total de chapitres visé : ${target}
+${historyBlock}
+Chapitres DÉJÀ acceptés par l'auteur (ne les répète jamais, ne les modifie pas) :
+"""${accepted || "aucun pour le moment"}"""
+
+${message ? `Dernière demande de l'auteur : """${message.slice(0, 1500)}"""` : ""}
+
+Propose EXACTEMENT ${count} nouveaux chapitres qui suivent logiquement les précédents.
+Réponds STRICTEMENT en JSON valide, sans markdown :
+{"chapters":[{"titre":"","objectif":""}],"question":""}
+
+Règles :
+- 100 % français : aucun latin, aucune langue étrangère, aucun mot inventé ;
+- "titre" : titre de chapitre concret et vendeur (8 mots maximum) ;
+- "objectif" : une seule phrase disant ce que le lecteur y gagne ;
+- jamais plus de ${count} chapitres, jamais de doublon avec les chapitres acceptés ;
+- "question" : une seule question courte pour faire valider ces chapitres à l'auteur.`;
+
+      const r = await askAI(stepPrompt);
+      if (!r?.ok) {
+        const status = r?.status === 429 ? 429 : r?.status === 402 ? 402 : 502;
+        return json(status, {
+          error:
+            status === 429
+              ? "Limite IA atteinte. Réessayez dans quelques secondes."
+              : status === 402
+                ? "Crédits IA indisponibles pour le moment."
+                : "Service IA temporairement indisponible.",
+        });
+      }
+      const parsedStep = parseJson(String(r.text || ""));
+      const list = Array.isArray(parsedStep?.chapters) ? parsedStep.chapters : [];
+      const chapters = list
+        .map((c: any) => ({
+          titre: String(c?.titre || c?.title || "").trim(),
+          objectif: String(c?.objectif || c?.goal || "").trim(),
+        }))
+        .filter((c: any) => c.titre.length > 2)
+        .slice(0, count);
+      if (!chapters.length) return json(502, { error: "Réponse IA illisible. Réessayez." });
+      return json(200, {
+        chapters,
+        question: String(parsedStep?.question || "On garde ces chapitres ?").trim(),
+        remaining: Math.max(0, remaining - chapters.length),
+      });
+    }
+
 
     const prompt = `Tu es directeur éditorial KDP francophone. Un auteur te décrit librement son projet de livre.
 ${historyBlock}
