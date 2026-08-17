@@ -200,6 +200,26 @@ export default function EmailHealthPanel() {
           </p>
         )}
 
+        {diag && (
+          <div className={`flex items-start gap-3 rounded-lg border p-3 ${diag.blocking.length === 0 ? 'border-emerald-500/30 bg-emerald-500/10' : 'border-red-500/30 bg-red-500/10'}`}>
+            {diag.blocking.length === 0
+              ? <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-400" />
+              : <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-400" />}
+            <div>
+              <p className={`text-sm font-semibold ${diag.blocking.length === 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                {diag.blocking.length === 0
+                  ? 'Authentification OK — les emails peuvent partir'
+                  : `Blocage détecté : ${diag.blocking.join(', ')}`}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {diag.blocking.length === 0
+                  ? 'SPF, DKIM, DMARC et clé d\'envoi sont valides.'
+                  : 'Résolvez les points rouges ci-dessous avant d\'envoyer une campagne.'}
+              </p>
+            </div>
+          </div>
+        )}
+
         <div className="rounded-lg border border-border bg-muted/30 p-3">
           <div className="mb-2 flex items-center justify-between gap-3">
             <p className="text-sm font-semibold text-foreground">
