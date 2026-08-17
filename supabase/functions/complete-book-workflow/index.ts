@@ -1891,7 +1891,7 @@ STYLE PROFESSIONNEL :
 
 LIVRE : "${fullTitle}"
 CATÉGORIE : ${category}
-DESCRIPTION : ${descriptionGeneree}
+DESCRIPTION : ${descriptionGeneree}${matiereAuteurP4}
 LECTEUR CIBLE : ${lecteurCible}
 ARC GLOBAL : ${structureGlobale}
 PLAN GLOBAL (compact) : ${planComplet}
@@ -1917,7 +1917,7 @@ Retourne en JSON :
 
 LIVRE : "${fullTitle}"
 CATÉGORIE : ${category}
-DESCRIPTION : ${descriptionGeneree}
+DESCRIPTION : ${descriptionGeneree}${matiereAuteurP4}
 LECTEUR CIBLE : ${lecteurCible}
 ARC GLOBAL : ${structureGlobale}
 PLAN : ${planComplet}
@@ -2042,7 +2042,7 @@ ${LANGUE_RULE}`,
           const chapterContent = await callAI(
             `Tu es un AUTEUR BEST-SELLER. Chapitres EXCEPTIONNELS dans "${category}". TON : ${tonEditorial}${personnagesSection}
 ${LANGUE_RULE}`,
-            `LIVRE : "${fullTitle}"\nDESCRIPTION : ${descriptionGeneree}\nPLAN : ${planComplet}${resumePrecedents}${personnagesSection}\n\nCHAPITRE ${chapitre.numero}/${structure.length} : "${chapitre.titre}"\nSOUS-SECTIONS : ${(chapitre.sousSections || []).join(', ')}\n${transition}\n\nJSON :\n{"numero": ${chapitre.numero}, "titre": "${chapitre.titre}", "contenu": "...", "nombreMots": 3000}`,
+            `LIVRE : "${fullTitle}"\nDESCRIPTION : ${descriptionGeneree}${matiereAuteurP4}\nPLAN : ${planComplet}${resumePrecedents}${personnagesSection}\n\nCHAPITRE ${chapitre.numero}/${structure.length} : "${chapitre.titre}"\nSOUS-SECTIONS : ${(chapitre.sousSections || []).join(', ')}\n${transition}\n\nJSON :\n{"numero": ${chapitre.numero}, "titre": "${chapitre.titre}", "contenu": "...", "nombreMots": 3000}`,
             6000
           );
           const parsed = parseJSON(chapterContent);
