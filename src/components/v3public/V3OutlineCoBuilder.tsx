@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import {
-  BOOK_BRIEF_EVENT, normalizeOutline, readBookBrief, writeBookBrief,
+  BOOK_BRIEF_EVENT, listSourcePassages, normalizeOutline, readBookBrief, writeBookBrief,
   type BookBrief, type BriefOutlineChapter,
 } from '@/lib/v3/bookBrief';
 import { saveOutlineVersion } from '@/lib/v3/genieThread';
@@ -32,6 +32,11 @@ export default function V3OutlineCoBuilder() {
 
   const outline = brief.outline || [];
   const target = Math.min(40, Math.max(3, Number(brief.chapters) || 12));
+  /** Récit de l'auteur découpé en passages numérotés : le sommaire doit les suivre. */
+  const passages = listSourcePassages(brief.sourceText || '');
+  const coveredCount = new Set(
+    outline.flatMap((c) => (Array.isArray(c.sources) ? c.sources : [])),
+  ).size;
 
   const patch = (values: Partial<BookBrief>) => {
     const next = { ...(readBookBrief() || {}), ...values };
