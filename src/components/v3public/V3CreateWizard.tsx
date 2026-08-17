@@ -946,9 +946,17 @@ Règles :
 
   const handleWorkflowComplete = async (bookData: any) => {
     setCompletedBook(bookData);
+    publishWrittenChapters(Array.isArray(bookData?.chapters) ? bookData.chapters : []);
     await saveProjectToCloud({ silent: true, completedBookOverride: bookData });
     toast.success('Livre terminé et sauvegardé dans Mes livres.');
   };
+
+  // La colonne « Déjà écrit » suit la rédaction en direct.
+  useEffect(() => {
+    if (!completedBook) return;
+    publishWrittenChapters(Array.isArray(completedBook.chapters) ? completedBook.chapters : []);
+  }, [completedBook]);
+
 
   // Correction automatique du livre terminé (V3) : aucune action de l'abonné.
   useEffect(() => {
