@@ -50,7 +50,9 @@ export function readLocalThread(): GenieMessage[] {
 
 export function writeLocalThread(messages: GenieMessage[]) {
   try {
-    localStorage.setItem(GENIE_THREAD_KEY, JSON.stringify(messages.slice(-80)));
+    // Conserver un fil long pour pouvoir reconstruire un récit complet, y
+    // compris après de nombreux échanges avec le Génie.
+    localStorage.setItem(GENIE_THREAD_KEY, JSON.stringify(messages.slice(-500)));
   } catch {
     /* quota / navigation privée */
   }
@@ -94,7 +96,7 @@ export async function loadRemoteThread(projectId?: string | null): Promise<Genie
       .select('id,role,content,changes,outline_snapshot,created_at')
       .eq('user_id', userId)
       .order('created_at', { ascending: true })
-      .limit(80);
+      .limit(500);
     if (projectId) query = query.eq('project_id', projectId);
     const { data, error } = await query;
     if (error || !Array.isArray(data)) return [];

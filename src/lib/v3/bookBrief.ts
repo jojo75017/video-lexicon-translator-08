@@ -104,7 +104,15 @@ function readJSON<T>(key: string, fallback: T): T {
 export function readBookBrief(): BookBrief | null {
   const brief = readJSON<BookBrief | null>(WIZARD_BRIEF_KEY, null);
   if (!brief) return null;
-  const hasSomething = Boolean((brief.title || '').trim() || (brief.description || '').trim());
+  // Un récit peut exister avant que le Génie ait proposé un titre ou un résumé.
+  // Ne jamais considérer cette fiche comme vide : sinon la colonne de droite
+  // perd la matière reconstruite et affiche « Projet sans titre ».
+  const hasSomething = Boolean(
+    (brief.title || '').trim()
+    || (brief.description || '').trim()
+    || (brief.sourceText || '').trim()
+    || (brief.outline || []).length,
+  );
   return hasSomething ? brief : null;
 }
 
@@ -129,10 +137,12 @@ export function appendSourceText(previous: string | undefined, addition: string)
   const clean = String(addition || '').trim();
   const base = String(previous || '').trim();
   if (!clean) return base;
-  if (base.includes(clean)) return base;
-  const merged = base ? `${base}\n\n${clean}` : clean;
-  // Garde-fou localStorage : on conserve les 60 000 derniers caractères.
-  return merged.length > 60000 ? merged.slice(merged.length - 60000) : merged;
+  // Ignorer uniquement un passage complet déjà enregistré. Une simple phrase
+  // contenue ailleurs ne doit pas faire disparaître un nouveau souvenir.
+  if (base.split(/\n{2,}/).some((passage) => passage.trim() === clean)) return base;
+  // Aucun découpage : dans une autobiographie, les premiers souvenirs sont
+  // aussi importants que les derniers et ne doivent jamais disparaître.
+  return base ? `${base}\n\n${clean}` : clean;
 }
 
 /** Efface la fiche du livre en cours (titre, synopsis, etc.). */
