@@ -83,10 +83,32 @@ export function writeBookBrief(brief: BookBrief) {
 export function clearBookBrief() {
   try {
     localStorage.removeItem(WIZARD_BRIEF_KEY);
+    window.dispatchEvent(new CustomEvent(BOOK_BRIEF_EVENT));
   } catch {
     /* mode privé : on ignore */
   }
 }
+
+/**
+ * Efface TOUT le brouillon en cours : fiche du Génie, config du workflow,
+ * sommaire mis en attente et historiques du Sommaire Ultime.
+ * Les livres déjà enregistrés dans « Mes livres » ne sont jamais touchés.
+ */
+export function resetBookProject() {
+  const keys = [
+    WIZARD_BRIEF_KEY,
+    TOC_FOR_WORKFLOW_KEY,
+    TOC_HISTORY_KEY,
+    TOC_PINNED_KEY,
+    'edition_book_config_v1',
+    'v3_genie_thread_v1',
+  ];
+  for (const key of keys) {
+    try { localStorage.removeItem(key); } catch { /* mode privé */ }
+  }
+  try { window.dispatchEvent(new CustomEvent(BOOK_BRIEF_EVENT)); } catch { /* SSR */ }
+}
+
 
 /** Enregistre un sommaire pour qu'il soit importable dans le wizard. */
 export function sendTocToWorkflow(chapters: BriefOutlineChapter[], meta?: { theme?: string; genre?: string; description?: string }) {
