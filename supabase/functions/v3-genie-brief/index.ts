@@ -211,7 +211,7 @@ Règles :
 
     const sourceText = String((body as any).sourceText || "").trim();
     const sourceBlock = sourceText
-      ? `\nMATIÈRE BRUTE DE L'AUTEUR (ses mots exacts, à conserver et à développer — INTERDIT de la résumer, de la raccourcir ou de la remplacer) :\n"""${sourceText.slice(-12000)}"""\n`
+      ? `\nMATIÈRE BRUTE DE L'AUTEUR (ses mots exacts, à conserver et à développer — INTERDIT de la résumer, de la raccourcir ou de la remplacer) :\n"""${sourceText.slice(-24000)}"""\n`
       : "";
 
     const prompt = `Tu es directeur éditorial KDP francophone. Un auteur te décrit librement son projet de livre.
