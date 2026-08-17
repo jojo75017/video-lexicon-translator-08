@@ -407,15 +407,18 @@ Deno.serve(async (req) => {
         value: keyValue,
         fix: "Créer une clé à accès complet (envoi + lecture) et la remplacer dans les secrets du projet.",
       });
-      if (!keyOk) blocking.push("api_key");
 
-      if (blocking.length) {
+      // Seule l'absence totale de clé empêche l'envoi : une clé « envoi seul »
+      // (401 sur /domains) ou un DNS imparfait n'empêchent pas le test d'arriver.
+      if (!apiKey) {
         return respond({
-          error: "Impossible d'envoyer le test : authentification ou clé incorrecte.",
+          error: "Clé d'envoi absente : impossible d'envoyer le test.",
           checks,
-          blocking,
+          blocking: ["api_key"],
         }, 400);
       }
+      const warnings = blocking.concat(keyOk ? [] : ["api_key"]);
+
 
       const rawAddresses = (body as { addresses?: string[] }).addresses;
       const addresses = Array.isArray(rawAddresses) && rawAddresses.length
