@@ -32,6 +32,8 @@ type Props = {
   outlineMode?: 'full' | 'guided';
   /** Masque le formulaire de saisie manuelle (mode Ebookstudio-Génie) : le récap + sommaire + lancement restent. */
   hideBookForm?: boolean;
+  /** Fiche seule (réglage manuel replié) : ni Cible & Promesse, ni sommaire, ni lancement. */
+  formOnly?: boolean;
 };
 
 /**
@@ -39,7 +41,8 @@ type Props = {
  * La Cible & Promesse est générée par l'IA (aucun champ à remplir) et le sommaire
  * doit être validé avant de lancer le workflow.
  */
-export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMode, hideBookForm }: Props) {
+export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMode, hideBookForm, formOnly }: Props) {
+
   const [brief, setBrief] = useState<BookBrief>({});
   const [saved, setSaved] = useState(false);
   /** Le mode Génie masque la fiche, mais l'auteur peut toujours l'ouvrir. */
