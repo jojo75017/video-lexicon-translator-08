@@ -303,7 +303,7 @@ Deno.serve(async (req) => {
           html: render(baseUrl, email, (profile?.first_name as string) || "", step),
           reply_to: REPLY_TO,
         });
-        await db.from("email_send_log").insert({ recipient_email: email, template_name: resendTemplate, message_id: result.id || `${CAMPAIGN}-${resendTemplate}-${email}`, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
+        await db.from("email_send_log").insert({ recipient_email: email, template_name: resendTemplate, message_id: result.id || `${CAMPAIGN}-${resendTemplate}-${email}`, provider_message_id: result.id || null, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
         if (!result.ok) { if (isQuotaExhausted()) break; continue; }
         sentCount++;
       }
@@ -349,7 +349,7 @@ Deno.serve(async (req) => {
           html: render(baseUrl, email, (profile?.first_name as string) || "", step),
           reply_to: REPLY_TO,
         });
-        await db.from("email_send_log").insert({ recipient_email: email, template_name: template, message_id: result.id || `${CAMPAIGN}-${step}-${email}`, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
+        await db.from("email_send_log").insert({ recipient_email: email, template_name: template, message_id: result.id || `${CAMPAIGN}-${step}-${email}`, provider_message_id: result.id || null, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
         if (!result.ok) { if (isQuotaExhausted()) break; continue; }
         sentCount++;
         // Synchronise l'étape du prospect : sans cela la séquence reste bloquée
@@ -412,7 +412,7 @@ Deno.serve(async (req) => {
         if ((count || 0) > 0) { skipped++; continue; }
       }
       const result = await sendResendEmailThrottled({ from: FROM_CAMPAIGN, to: [email], subject: `${mode === "test" ? "[TEST] " : ""}${STEPS[step - 1].subject}`, html: render(baseUrl, email, recipient.first_name || "", step), reply_to: REPLY_TO });
-      await db.from("email_send_log").insert({ recipient_email: email, template_name: template, message_id: result.id || `${CAMPAIGN}-${step}-${email}`, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
+      await db.from("email_send_log").insert({ recipient_email: email, template_name: template, message_id: result.id || `${CAMPAIGN}-${step}-${email}`, provider_message_id: result.id || null, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
       if (!result.ok) { if (isQuotaExhausted()) break; continue; }
       sent++;
       if (mode !== "test" && recipient.id) {

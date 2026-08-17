@@ -549,6 +549,7 @@ Deno.serve(async (req) => {
         recipient_email: email,
         template_name: letter.key,
         message_id: messageId,
+        provider_message_id: result.id || null,
         status: result.ok ? "sent" : "failed",
         error_message: result.ok
           ? null
