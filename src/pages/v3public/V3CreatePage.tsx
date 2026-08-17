@@ -38,7 +38,13 @@ function seedHubConfig(idea: string | null, genre: string | null, type: string |
   } catch { /* ignore */ }
 }
 
-export default function V3CreatePage() {
+type PageProps = {
+  /** 'biography' = onglet « Biographie — Le récit de votre vie ». */
+  mode?: 'book' | 'biography';
+};
+
+export default function V3CreatePage({ mode = 'book' }: PageProps) {
+  const biography = mode === 'biography';
   const [params] = useSearchParams();
   const importMode = params.get('import') === '1';
   const idea = params.get('idea');
@@ -54,6 +60,13 @@ export default function V3CreatePage() {
   const wizardRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => { seedHubConfig(idea, genre, type); }, [idea, genre, type]);
+
+  // La nature du projet est portée par la fiche : biographie ou livre classique.
+  useEffect(() => {
+    const current = readBookBrief() || {};
+    const wanted: 'book' | 'biography' = biography ? 'biography' : 'book';
+    if (current.mode !== wanted) writeBookBrief({ ...current, mode: wanted });
+  }, [biography]);
 
   // Ouverture d'un livre existant depuis « Mes livres » (?projectId=...)
   useEffect(() => {
@@ -182,13 +195,16 @@ export default function V3CreatePage() {
         {/* Hero « Ebookstudio-Génie » */}
         {!openedBook && (
         <div className="mt-6 text-center">
-          <span className="v3-chip v3-chip-orange"><Sparkles className="w-3.5 h-3.5" /> Ebookstudio-Génie</span>
+          <span className="v3-chip v3-chip-orange">
+            <Sparkles className="w-3.5 h-3.5" /> {biography ? 'Biographie — Le récit de votre vie' : 'Ebookstudio-Génie'}
+          </span>
           <h1 className="v3-serif text-4xl md:text-5xl font-bold mt-4 leading-tight" style={{ color: 'var(--v3-ink)' }}>
-            Commencez à créer votre livre
+            {biography ? 'Racontez votre vie, nous en faisons un livre' : 'Commencez à créer votre livre'}
           </h1>
           <p className="mt-3 text-sm md:text-base" style={{ color: 'var(--v3-muted)' }}>
-            Parlez de votre projet à Ebookstudio-Génie. Il construit le sommaire avec vous,
-            rédige les chapitres, puis va jusqu’à l’export et la couverture.
+            {biography
+              ? 'Une question à la fois, période après période. Vos mots sont conservés et corrigés, jamais résumés, et le sommaire suit l’ordre réel de votre vie.'
+              : 'Parlez de votre projet à Ebookstudio-Génie. Il construit le sommaire avec vous, rédige les chapitres, puis va jusqu’à l’export et la couverture.'}
           </p>
         </div>
         )}
@@ -205,6 +221,7 @@ export default function V3CreatePage() {
           <div className="min-w-0">
             {!openedBook && (
               <V3GenieDialog
+                mode={biography ? 'biography' : 'book'}
                 initialIdea={idea || ''}
                 onReady={() => document.getElementById('sommaire-ia')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
               />

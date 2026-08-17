@@ -56,6 +56,8 @@ export default function V3OutlineCoBuilder() {
       const { data, error } = await supabase.functions.invoke('v3-genie-brief', {
         body: {
           mode: 'outline-step',
+          // Biographie : chapitres = périodes de vie dans l'ordre chronologique.
+          kind: brief.mode === 'biography' ? 'biography' : 'book',
           message: (extra || note || '').trim(),
           userApiKey,
           accepted: outline.map((c) => ({ titre: c.titre, objectif: c.objectif, sources: c.sources || [] })),
@@ -139,6 +141,14 @@ export default function V3OutlineCoBuilder() {
         Le Génie propose 3 chapitres à la fois, en suivant votre récit dans l’ordre. Vous gardez,
         reformulez ou retirez — le sommaire n’est validé que par votre clic.
       </p>
+
+      {brief.mode === 'biography' && (
+        <p className="mt-2 rounded-xl border px-2.5 py-2 text-[11.5px]"
+          style={{ borderColor: 'rgba(201,168,76,0.55)', background: 'rgba(201,168,76,0.08)', color: 'var(--v3-ink)' }}>
+          Mode biographie : chaque chapitre correspond à une période de votre vie, dans l’ordre
+          chronologique, et ne raconte que ce que vous avez réellement écrit.
+        </p>
+      )}
 
       {passages.length > 0 && (
         <p className="mt-2 rounded-xl border px-2.5 py-2 text-[11.5px]"
