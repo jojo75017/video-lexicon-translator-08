@@ -95,10 +95,26 @@ Deno.serve(async (req) => {
       tone?: string;
       language?: string;
       sourceText?: string;
+      /** 'biography' = récit de vie : chronologie stricte, zéro invention. */
+      kind?: string;
+      /** Mode polish-passage : le passage brut à corriger. */
+      passage?: string;
+      /** Contexte : numéro du passage et titre du livre. */
+      passageIndex?: number;
     };
     const message = String(body.message || "").trim();
     const mode = String(body.mode || "brief");
-    if (mode !== "outline-step" && message.length < 10) {
+    const isBiography = String(body.kind || "") === "biography";
+    /** Règles propres au récit de vie : rien d'inventé, rien de raccourci. */
+    const biographyRules = isBiography
+      ? `\nRÈGLES BIOGRAPHIE (prioritaires sur tout le reste) :
+- l'auteur raconte SA vie : aucun fait, prénom, lieu, date, métier ou maladie ne peut être inventé, déduit ou embelli ;
+- chronologie stricte : on suit l'ordre réel des années racontées, jamais un regroupement thématique ;
+- vocabulaire de la vie réelle (souvenirs, personnes, lieux, dates), pas de vocabulaire de méthode ou de développement personnel ;
+- INTERDIT de résumer : la matière de l'auteur est développée, corrigée, jamais raccourcie ;
+- si une information manque, on pose une question à l'auteur au lieu de l'inventer ;\n`
+      : "";
+    if (mode !== "outline-step" && mode !== "polish-passage" && message.length < 10) {
       return json(400, { error: "Décrivez votre livre en quelques mots." });
     }
 
@@ -139,6 +155,58 @@ Deno.serve(async (req) => {
         return null;
       }
     };
+
+    /* ---------------- Mode « Copilot » : corriger et développer un passage ---------------- */
+    // L'auteur donne ses mots tels qu'ils viennent ; le Génie les rend propres,
+    // sans jamais retirer un fait ni écrire moins de mots que l'original.
+    if (mode === "polish-passage") {
+      const passage = String(body.passage || "").trim();
+      if (passage.length < 20) return json(400, { error: "Écrivez d'abord quelques phrases à corriger." });
+      const floor = passage.trim().split(/\s+/).filter(Boolean).length;
+      const polishPrompt = `Tu es correcteur et plume d'une maison d'édition francophone. L'auteur t'a écrit un passage de son livre au fil de la plume, avec des fautes, des abréviations et une ponctuation approximative.
+
+PASSAGE DE L'AUTEUR (ses faits sont la vérité absolue) :
+"""${passage.slice(0, 20000)}"""
+${body.bookTitle ? `Livre : « ${String(body.bookTitle).slice(0, 200)} »` : ""}
+Ton souhaité : ${String(body.tone || "Émotionnel")}
+${biographyRules}
+Rends ce passage prêt à imprimer. Réponds STRICTEMENT en JSON valide, sans markdown :
+{"corrected":"","notes":""}
+
+Règles absolues :
+- 100 % français, aucun latin, aucune langue étrangère, aucun mot inventé ;
+- corrige l'orthographe, la grammaire, la ponctuation, les majuscules et les abréviations (« aps » -> « pas », « d ema » -> « de ma ») ;
+- conserve TOUS les faits, dates, âges, lieux, prénoms, liens de famille et incertitudes (« je ne me souviens plus très bien » reste) ;
+- n'invente rien : pas de dialogue, pas de détail sensoriel qui ne soit pas déjà suggéré par l'auteur ;
+- développe en phrases complètes et en paragraphes lisibles : le résultat doit contenir AU MOINS ${floor} mots, idéalement 1,5 fois plus ;
+- garde la voix de l'auteur à la première personne, sans style journalistique ;
+- "notes" : une phrase disant ce que tu as corrigé (facultatif).`;
+
+      const rp = await askAI(polishPrompt);
+      if (!rp?.ok) {
+        const status = rp?.status === 429 ? 429 : rp?.status === 402 ? 402 : 502;
+        return json(status, {
+          error:
+            status === 429
+              ? "Limite IA atteinte. Réessayez dans quelques secondes."
+              : status === 402
+                ? "Crédits IA indisponibles pour le moment."
+                : "Service IA temporairement indisponible.",
+        });
+      }
+      const parsedPolish = parseJson(String(rp.text || ""));
+      const corrected = String(parsedPolish?.corrected || "").trim();
+      if (!corrected) return json(502, { error: "Réponse IA illisible. Réessayez." });
+      const words = corrected.split(/\s+/).filter(Boolean).length;
+      return json(200, {
+        corrected,
+        notes: String(parsedPolish?.notes || "").trim(),
+        words,
+        originalWords: floor,
+        // Garde-fou visible côté écran : jamais moins de mots que l'auteur.
+        shorter: words < floor,
+      });
+    }
 
     /* ---------------- Mode « on construit le sommaire ensemble » ---------------- */
     // L'IA ne propose JAMAIS le sommaire complet : au plus 3 chapitres à la fois,
@@ -215,7 +283,7 @@ Réponds STRICTEMENT en JSON valide, sans markdown :
 
 Règles :
 - 100 % français : aucun latin, aucune langue étrangère, aucun mot inventé ;
-${anchorRules}
+${biographyRules}${anchorRules}
 - jamais plus de ${count} chapitres, jamais de doublon avec les chapitres acceptés ;
 - "question" : une seule question courte pour faire valider ces chapitres à l'auteur.`;
 
@@ -271,6 +339,7 @@ Déduis la fiche complète du livre. Réponds STRICTEMENT en JSON valide, sans m
 
 Règles :
 - 100 % français : aucun latin, aucune langue étrangère décorative, aucun mot inventé ;
+${biographyRules}
 - "title" : titre commercial court et vendeur (invente-le si l'auteur n'en donne pas) ;
 - "category" : une catégorie Amazon KDP parmi Roman, Thriller / Policier, Romance, Fantasy / Fantastique, Science-fiction, Développement personnel, Business / Entrepreneuriat, Santé / Bien-être, Cuisine / Recettes, Voyage / Guide, Enfants / Jeunesse, Histoire / Culture, Biographie / Récit de vie ;
 - "tone" : un seul mot parmi Inspirant, Pédagogique, Émotionnel, Direct, Humoristique, Premium, Romanesque, Expert ;

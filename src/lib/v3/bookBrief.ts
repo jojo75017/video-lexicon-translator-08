@@ -23,6 +23,11 @@ export type BookBrief = {
   mode?: 'book' | 'biography';
   /** Étapes de l'entretien biographique déjà racontées. */
   biographySteps?: number[];
+  /**
+   * Passages corrigés par le Génie (façon Copilot) : l'original de l'auteur est
+   * conservé mot pour mot, la version corrigée n'est utilisée qu'après validation.
+   */
+  polished?: PolishedPassage[];
   title?: string;
   subtitle?: string;
   author?: string;
@@ -66,6 +71,44 @@ export type BookBrief = {
 };
 
 /** Champs que l'auteur peut verrouiller depuis la colonne « Réglages du livre ». */
+/** Un passage de l'auteur, sa version corrigée et son état de validation. */
+export type PolishedPassage = {
+  /** Numéro du passage dans le récit (1 = premier). */
+  index: number;
+  /** Mots exacts de l'auteur : jamais modifiés. */
+  original: string;
+  /** Version corrigée et développée proposée par le Génie. */
+  corrected: string;
+  /** Date de validation par l'auteur ; absent = proposition en attente. */
+  validatedAt?: string;
+};
+
+export function countWords(text: string): number {
+  return String(text || '').trim().split(/\s+/).filter(Boolean).length;
+}
+
+/** Le passage corrigé s'il est validé, sinon les mots d'origine de l'auteur. */
+export function passageForBook(brief: BookBrief | null | undefined, index: number, original: string): string {
+  const entry = (brief?.polished || []).find((p) => p.index === index);
+  return entry?.validatedAt && entry.corrected.trim() ? entry.corrected : original;
+}
+
+/** Enregistre (ou remplace) la correction d'un passage dans la fiche. */
+export function upsertPolished(brief: BookBrief, entry: PolishedPassage): PolishedPassage[] {
+  const list = (brief.polished || []).filter((p) => p.index !== entry.index);
+  return [...list, entry].sort((a, b) => a.index - b.index);
+}
+
+/**
+ * Le récit tel qu'il entrera dans le livre : chaque passage validé remplace
+ * l'original, les passages non validés gardent les mots de l'auteur.
+ * Aucune compression : on ne retire jamais un passage.
+ */
+export function narrativeForBook(brief: BookBrief | null | undefined): string {
+  const passages = listSourcePassages(brief?.sourceText || '');
+  return passages.map((p, i) => passageForBook(brief, i + 1, p)).join('\n\n');
+}
+
 export type LockableField = 'title' | 'subtitle' | 'chapters' | 'wordsPerChapter';
 
 export const LOCKABLE_FIELDS: LockableField[] = ['title', 'subtitle', 'chapters', 'wordsPerChapter'];

@@ -15,6 +15,7 @@ import V3ResumeBookCard from '@/components/v3public/V3ResumeBookCard';
 import V3GenieOutlinePanel from '@/components/v3public/V3GenieOutlinePanel';
 import V3BookActionsBar from '@/components/v3public/V3BookActionsBar';
 import V3OutlineCoBuilder from '@/components/v3public/V3OutlineCoBuilder';
+import V3PassageCorrector from '@/components/v3public/V3PassageCorrector';
 
 import { BOOK_BRIEF_EVENT, readBookBrief, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
 
@@ -225,6 +226,13 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                 initialIdea={idea || ''}
                 onReady={() => document.getElementById('sommaire-ia')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
               />
+            )}
+
+            {/* Vos idées rendues corrigées, validées puis enregistrées pour le livre */}
+            {!openedBook && (
+              <div className="mt-4">
+                <V3PassageCorrector mode={biography ? 'biography' : 'book'} />
+              </div>
             )}
 
             {/* On construit le sommaire ensemble, 3 chapitres à la fois */}
