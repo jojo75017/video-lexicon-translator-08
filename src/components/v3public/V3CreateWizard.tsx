@@ -16,7 +16,7 @@ import { invokeImageFunction } from '@/lib/aiImageInvoke';
 import { callAIWriting, getProvider, getProviderKey, validateKeyFormat } from '@/services/aiWritingService';
 import TocUltimateGenerator, { type UltimateTocChapter } from '@/components/tools/TocUltimateGenerator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { clearTocForWorkflow, listSourcePassages, parseTocText, readBookBrief, readLatestUltimateToc, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
+import { clearTocForWorkflow, listSourcePassages, parseTocText, readBookBrief, readLatestUltimateToc, writeBookBrief, type BriefOutlineChapter , narrativeForBook } from '@/lib/v3/bookBrief';
 
 
 type WizardCharacter = {
@@ -626,7 +626,8 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
       subtitle: subtitle.trim(),
       author: authorName.trim(),
       description: description.trim(),
-      sourceText: String(currentBrief.sourceText || sourceText).trim(),
+      // Le livre part du récit validé : passages corrigés validés, sinon les mots d'origine.
+      sourceText: String(narrativeForBook(currentBrief) || currentBrief.sourceText || sourceText).trim(),
 
       category: effectiveCategory,
       genre: effectiveCategory,
