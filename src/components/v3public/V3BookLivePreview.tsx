@@ -5,8 +5,10 @@
  */
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Eye, EyeOff, Printer } from 'lucide-react';
+import { BookOpen, Eye, EyeOff, Loader2, Printer, Wand2 } from 'lucide-react';
+import { toast } from 'sonner';
 import type { BookBrief } from '@/lib/v3/bookBrief';
+import { correctWholeBook } from '@/lib/v3/autoCorrectChapters';
 import {
   effectiveChapterText, readWrittenProgress, WRITTEN_CHAPTERS_EVENT, type WrittenProgress,
 } from '@/lib/v3/writtenChapters';
@@ -21,6 +23,7 @@ function paragraphsOf(text: string): string[] {
 export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
   const [progress, setProgress] = useState<WrittenProgress>({ chapters: [], total: 0, activeIndex: -1 });
   const [open, setOpen] = useState(true);
+  const [fixing, setFixing] = useState(false);
 
   useEffect(() => {
     const sync = () => setProgress(readWrittenProgress());
@@ -41,6 +44,21 @@ export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
   const totalWords = chapters.reduce((sum, c) => sum + c.words, 0);
   const pages = Math.max(1, Math.round(totalWords / 250));
   const title = brief.title?.trim() || 'Projet sans titre';
+  const rawCount = chapters.filter((c) => c.status === 'raw' || c.status === 'failed').length;
+  const correcting = chapters.some((c) => c.status === 'correcting');
+
+  const fixAll = async () => {
+    setFixing(true);
+    try {
+      await correctWholeBook();
+      toast.success('Livre repassé dans la chaîne éditoriale.');
+    } catch (e: any) {
+      toast.error(e?.message || 'Correction impossible pour le moment.');
+    } finally {
+      setFixing(false);
+    }
+  };
+
 
   return (
     <section className="rounded-[22px] border p-4 md:p-5" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
