@@ -43,6 +43,31 @@ On ajuste le nombre de chapitres ou la longueur cible, et les chiffres bougent e
 - **Export du sommaire** (texte, Word, PDF habillé or) et **« Copier pour la fiche Amazon »** : version courte du sommaire prête à coller dans la description KDP.
 - Verrou après validation, déverrouillage explicite qui préserve les chapitres déjà écrits.
 
+## 7. Mise en forme riche : listes à puces, encadrés, exercices
+
+Le livre ne doit plus être un bloc de paragraphes. Chaque chapitre peut recevoir des **blocs de mise en forme**, choisis dans le sommaire puis respectés à la rédaction et à l'export :
+
+- **Liste à puces** et **liste numérotée** (étapes, matériel, erreurs à éviter) ;
+- **Points clés à retenir** en fin de chapitre (encadré or) ;
+- **Citation / témoignage** mise en valeur ;
+- **Encadré « À savoir »** ou « Attention » ;
+- **Exercice / question au lecteur** avec lignes à remplir ;
+- **Checklist cochable** (parfait pour les guides pratiques) ;
+- **Tableau simple** (comparatif, avant/après) ;
+- **Résumé du chapitre en 3 lignes**.
+
+Fonctionnement : sur chaque chapitre du sommaire, un sélecteur « Blocs de ce chapitre » (puces, points clés, exercice…). Le rédacteur reçoit la consigne et produit vraiment ces blocs ; l'export Word/PDF/Kindle les met en forme (puces réelles, encadrés or, tableaux) au lieu de texte brut. Un bouton **« Appliquer à tous les chapitres »** pose le même gabarit sur le livre entier.
+
+## 8. Autres pistes à valider
+
+- **Bibliothèque de gabarits de chapitre** : « chapitre pratique » (intro + étapes en puces + points clés), « chapitre récit » (scène + réflexion), « chapitre méthode » (problème + solution + exercice).
+- **Ton par chapitre** : un chapitre plus intime, un autre plus pédagogique, sans changer tout le livre.
+- **Durée de lecture** affichée par chapitre (« 9 min ») — utile pour équilibrer.
+- **Illustration suggérée** par chapitre (idée d'image + génération plus tard dans Cover/Illustration Studio).
+- **Bonus de fin de livre** proposés à partir du sommaire (checklist récapitulative, plan d'action, glossaire).
+- **Sommaire multilingue** : le plan validé traduit dans les 10 langues déjà gérées, pour publier la même structure ailleurs.
+
+
 ## Détails techniques
 
 - `src/lib/v3/bookBrief.ts` : `BriefOutlineChapter` gagne `points?: string[]`, `note?: string`, `keyword?: string`, `readerQuestion?: string`, `score?: { promesse; utilite; appui; position }` ; helpers `mergeChapters`, `splitChapter`, `insertChapterAt`, `moveChapter`, `outlineCoverage(outline, passages)`, `outlineDuplicates`.
