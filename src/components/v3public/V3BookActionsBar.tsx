@@ -130,6 +130,12 @@ export default function V3BookActionsBar({ onLaunch }: { onLaunch: () => void })
           <Headphones className="h-3.5 w-3.5" /> Version audio (9,99 €)
         </Link>
 
+        <Link to={`/v3/avis${brief.title ? `?title=${encodeURIComponent(brief.title)}` : ''}`}
+          className="v3-btn v3-btn-outline justify-center text-xs" title="La marche à suivre pour obtenir des avis Amazon">
+          <Star className="h-3.5 w-3.5" /> Obtenir des avis clients
+        </Link>
+
+
       </div>
     </div>
   );
