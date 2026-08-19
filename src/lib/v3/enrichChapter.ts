@@ -37,7 +37,6 @@ export async function enrichChapterWithInfo(
         subtitle: brief.subtitle || '',
         genre: brief.category || '',
         tone: brief.tone || '',
-        tone: brief.tone || '',
       },
       chapter: { title: chapterTitle, word_target: brief.wordsPerChapter || 2500 },
     },
