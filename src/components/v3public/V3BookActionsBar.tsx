@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Check, Rocket, Save, Wand2, BookOpen, BarChart3, Languages, Headphones } from 'lucide-react';
 import { toast } from 'sonner';
 import { BOOK_BRIEF_EVENT, readBookBrief, writeBookBrief, type BookBrief } from '@/lib/v3/bookBrief';
+import { readWrittenProgress, WRITTEN_CHAPTERS_EVENT } from '@/lib/v3/writtenChapters';
 import { saveOutlineVersion } from '@/lib/v3/genieThread';
 
 /**
@@ -14,6 +15,7 @@ export default function V3BookActionsBar({ onLaunch }: { onLaunch: () => void })
   const [brief, setBrief] = useState<BookBrief>({});
   const [saved, setSaved] = useState(false);
   const [validating, setValidating] = useState(false);
+  const [writtenCount, setWrittenCount] = useState(0);
 
   useEffect(() => {
     const sync = () => setBrief(readBookBrief() || {});
@@ -22,11 +24,39 @@ export default function V3BookActionsBar({ onLaunch }: { onLaunch: () => void })
     return () => window.removeEventListener(BOOK_BRIEF_EVENT, sync);
   }, []);
 
+  useEffect(() => {
+    const sync = () => setWrittenCount(readWrittenProgress().chapters.length);
+    sync();
+    window.addEventListener(WRITTEN_CHAPTERS_EVENT, sync);
+    return () => window.removeEventListener(WRITTEN_CHAPTERS_EVENT, sync);
+  }, []);
+
   const outline = brief.outline || [];
   const hasOutline = outline.length > 0;
   const validated = Boolean(brief.outlineValidated) && hasOutline;
   const projectId = brief.projectId || '';
-  const written = Boolean(projectId);
+  const written = writtenCount > 0 || Boolean(projectId);
+
+  const requireOutline = (action: () => void) => {
+    if (!validated) {
+      toast.info('Validez d’abord le sommaire.');
+      document.getElementById('sommaire-ia')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    action();
+  };
+
+  const showBook = () => {
+    if (writtenCount > 0) {
+      window.dispatchEvent(new CustomEvent('v3:show-written-book'));
+      return;
+    }
+    if (projectId) window.location.assign(`/v3/book/${projectId}`);
+    else {
+      onLaunch();
+      toast.info('La rédaction démarre : le premier chapitre apparaîtra dans « Votre livre en direct ».');
+    }
+  };
 
   const validate = async () => {
     if (!hasOutline) {
@@ -63,24 +93,24 @@ export default function V3BookActionsBar({ onLaunch }: { onLaunch: () => void })
       </div>
 
       <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-        <button type="button" onClick={validate} disabled={!hasOutline || validating}
+        <button type="button" onClick={validate} disabled={validating}
           className="v3-btn v3-btn-outline justify-center text-xs disabled:opacity-50">
           <Check className="h-3.5 w-3.5" /> {validated ? 'Sommaire validé' : 'Valider le sommaire'}
         </button>
 
-        <button type="button" onClick={onLaunch} disabled={!validated}
-          className="v3-btn v3-btn-primary justify-center text-xs disabled:opacity-50">
+        <button type="button" onClick={() => requireOutline(onLaunch)}
+          className="v3-btn v3-btn-primary justify-center text-xs">
           <Rocket className="h-3.5 w-3.5" /> Commencer la rédaction
         </button>
 
-        <button type="button" onClick={save} disabled={!validated}
+        <button type="button" onClick={() => requireOutline(save)}
           title={validated ? 'Enregistrer' : 'Validez d’abord votre sommaire'}
           className="v3-btn v3-btn-outline justify-center text-xs disabled:opacity-50">
           <Save className="h-3.5 w-3.5" /> {saved ? 'Enregistré' : 'Enregistrer mon livre'}
         </button>
 
         {validated ? (
-          <Link to="/v3/corriger" className="v3-btn v3-btn-outline justify-center text-xs" title={written ? 'Correction professionnelle' : soon}>
+          <Link to={projectId ? `/v3/corriger?projectId=${projectId}` : '/v3/corriger'} className="v3-btn v3-btn-outline justify-center text-xs" title={written ? 'Correction professionnelle' : soon}>
             <Wand2 className="h-3.5 w-3.5" /> Corriger mon livre
           </Link>
         ) : (
@@ -89,28 +119,20 @@ export default function V3BookActionsBar({ onLaunch }: { onLaunch: () => void })
           </button>
         )}
 
-        {written && validated ? (
-          <Link to={`/v3/book/${projectId}`} className="v3-btn v3-btn-outline justify-center text-xs">
-            <BookOpen className="h-3.5 w-3.5" /> Voir mon livre
-          </Link>
-        ) : (
-          <button type="button" disabled title={validated ? soon : 'Validez d’abord votre sommaire'} className="v3-btn v3-btn-outline justify-center text-xs opacity-50">
-            <BookOpen className="h-3.5 w-3.5" /> Voir mon livre
-          </button>
-        )}
+        <button type="button" onClick={() => requireOutline(showBook)} className="v3-btn v3-btn-outline justify-center text-xs">
+          <BookOpen className="h-3.5 w-3.5" /> Voir mon livre{writtenCount ? ` (${writtenCount})` : ''}
+        </button>
 
-        {written && validated ? (
-          <Link to={`/v3/book/${projectId}?tab=kdp`} className="v3-btn v3-btn-outline justify-center text-xs">
-            <BarChart3 className="h-3.5 w-3.5" /> Données KDP
-          </Link>
-        ) : (
-          <button type="button" disabled title={validated ? soon : 'Validez d’abord votre sommaire'} className="v3-btn v3-btn-outline justify-center text-xs opacity-50">
-            <BarChart3 className="h-3.5 w-3.5" /> Données KDP
-          </button>
-        )}
+        <button type="button" onClick={() => requireOutline(() => {
+          const target = document.getElementById('exports-livre');
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          else { onLaunch(); toast.info('Les données KDP seront visibles ici dès que le manuscrit sera terminé.'); }
+        })} className="v3-btn v3-btn-outline justify-center text-xs">
+          <BarChart3 className="h-3.5 w-3.5" /> Données KDP
+        </button>
 
         {validated ? (
-          <Link to="/v3/outils/traduction" className="v3-btn v3-btn-outline justify-center text-xs">
+          <Link to={projectId ? `/v3/outils/traduction?projectId=${projectId}` : '/v3/outils/traduction'} className="v3-btn v3-btn-outline justify-center text-xs">
             <Languages className="h-3.5 w-3.5" /> Traduire (10 langues)
           </Link>
         ) : (
