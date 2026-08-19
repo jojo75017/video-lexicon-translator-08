@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ListOrdered, History, RotateCcw, PenLine, Loader2, Sparkles, Wand2, SlidersHorizontal, Lock,
+  ListOrdered, History, RotateCcw, PenLine, Loader2, Sparkles, Wand2, SlidersHorizontal, Lock, BarChart3, Star,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
