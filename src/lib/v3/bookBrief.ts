@@ -109,6 +109,18 @@ export function narrativeForBook(brief: BookBrief | null | undefined): string {
   return passages.map((p, i) => passageForBook(brief, i + 1, p)).join('\n\n');
 }
 
+/**
+ * Passages explicitement validés par l'auteur, prêts à être affichés sans
+ * nouvel appel IA. L'aperçu latéral s'appuie sur cette source sûre tant que le
+ * chapitre final n'a pas encore terminé sa correction éditoriale.
+ */
+export function validatedPassages(brief: BookBrief | null | undefined): PolishedPassage[] {
+  return (brief?.polished || [])
+    .filter((passage) => Boolean(passage.validatedAt) && Boolean(passage.corrected?.trim()))
+    .slice()
+    .sort((a, b) => a.index - b.index);
+}
+
 export type LockableField = 'title' | 'subtitle' | 'chapters' | 'wordsPerChapter';
 
 export const LOCKABLE_FIELDS: LockableField[] = ['title', 'subtitle', 'chapters', 'wordsPerChapter'];

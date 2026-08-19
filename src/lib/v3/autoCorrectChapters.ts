@@ -72,13 +72,14 @@ export function enqueueAllPendingCorrections(): number {
   return pending.length;
 }
 
-/** Relance la chaîne complète sur tout le livre (chapitres déjà corrigés inclus). */
+/**
+ * Corrige tout ce qui reste à traiter. Les chapitres déjà corrigés ne sont
+ * jamais refacturés ; leur bouton individuel permet toujours une recorrrection
+ * volontaire si l'auteur la demande explicitement.
+ */
 export function correctWholeBook(): number {
-  const chapters = readWrittenProgress().chapters.filter(
-    (c) => c.rawContent.trim().length >= 60,
-  );
+  const chapters = readWrittenProgress().chapters.filter(isPending);
   chapters.forEach((c) => {
-    if (c.status !== 'correcting') setChapterStatus(c.index, 'raw');
     if (!queue.includes(c.index)) queue.push(c.index);
   });
   void drain();
