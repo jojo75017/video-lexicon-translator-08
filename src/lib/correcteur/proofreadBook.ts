@@ -176,7 +176,7 @@ async function waitWithNotice(ms: number, reason: string) {
   waitNotifier?.(null);
 }
 
-type CallMode = ProofreadMode | 'latin-fix' | 'ending-fix' | 'edition' | 'final-check';
+type CallMode = ProofreadMode | 'latin-fix' | 'ending-fix' | 'edition' | 'final-check' | 'dictation';
 
 interface CallResult {
   corrected: string;
