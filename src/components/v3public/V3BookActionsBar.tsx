@@ -47,16 +47,13 @@ export default function V3BookActionsBar({ onLaunch }: { onLaunch: () => void })
   };
 
   const showBook = () => {
-    if (writtenCount > 0) {
-      window.dispatchEvent(new CustomEvent('v3:show-written-book'));
-      return;
-    }
-    if (projectId) window.location.assign(`/v3/book/${projectId}`);
-    else {
-      onLaunch();
-      toast.info('La rédaction démarre : le premier chapitre apparaîtra dans « Votre livre en direct ».');
+    // Le livre reste visible à côté : on ouvre l'onglet « Mon livre » de la colonne.
+    window.dispatchEvent(new CustomEvent('v3:show-written-book'));
+    if (writtenCount === 0) {
+      toast.info('La colonne de droite affiche votre livre : chaque chapitre écrit s’y ajoute en direct.');
     }
   };
+
 
   const validate = async () => {
     if (!hasOutline) {
