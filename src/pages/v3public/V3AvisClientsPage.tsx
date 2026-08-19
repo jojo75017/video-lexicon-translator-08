@@ -97,12 +97,23 @@ function buildEmails(bookTitle: string, authorName: string, link: string) {
 }
 
 export default function V3AvisClientsPage() {
+  const [params] = useSearchParams();
   const [bookTitle, setBookTitle] = useState('');
   const [authorName, setAuthorName] = useState('');
   const [link, setLink] = useState('');
   const [copied, setCopied] = useState<string | null>(null);
+  const [videoOn, setVideoOn] = useState(false);
+
+  // Titre et auteur repris du livre en cours : aucune saisie à refaire.
+  useEffect(() => {
+    const brief = readBookBrief() || {};
+    const fromUrl = (params.get('title') || '').trim();
+    setBookTitle(fromUrl || (brief.title || '').trim());
+    setAuthorName((brief.author || '').trim());
+  }, [params]);
 
   const emails = useMemo(() => buildEmails(bookTitle, authorName, link), [bookTitle, authorName, link]);
+
 
   const backPage = useMemo(() => {
     const t = bookTitle.trim() || '[Titre du livre]';
