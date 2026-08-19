@@ -151,6 +151,58 @@ export default function V3AvisClientsPage() {
         </p>
       </header>
 
+      {/* La méthode en vidéo : chargée seulement au clic, sans lecture automatique */}
+      <section className="mt-6 grid gap-5 rounded-2xl border p-5 md:p-6 lg:grid-cols-[1.3fr_1fr]"
+        style={{ borderColor: 'rgba(201,162,39,0.55)', background: '#fff' }}>
+        <div>
+          <div className="flex items-center gap-2">
+            <PlayCircle className="w-4 h-4" style={{ color: 'var(--v3-gold, #c9a227)' }} />
+            <h2 className="text-[15px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+              Regarder la méthode en vidéo
+            </h2>
+          </div>
+          <div className="mt-3 overflow-hidden rounded-xl border" style={{ borderColor: 'rgba(201,162,39,0.55)' }}>
+            <div className="relative w-full" style={{ aspectRatio: '16 / 9', background: '#0f172a' }}>
+              {videoOn ? (
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${VIDEO_ID}?rel=0`}
+                  title="Obtenir des avis clients Amazon — la méthode"
+                  loading="lazy"
+                  allow="accelerometer; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="absolute inset-0 h-full w-full"
+                />
+              ) : (
+                <button type="button" onClick={() => setVideoOn(true)}
+                  className="absolute inset-0 flex h-full w-full flex-col items-center justify-center gap-2 text-white transition hover:opacity-90"
+                  style={{ backgroundImage: `url(https://i.ytimg.com/vi/${VIDEO_ID}/hqdefault.jpg)`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                  <span className="absolute inset-0" style={{ background: 'rgba(15,23,42,0.45)' }} />
+                  <PlayCircle className="relative w-14 h-14" />
+                  <span className="relative text-[13px] font-semibold">Lancer la vidéo</span>
+                </button>
+              )}
+            </div>
+          </div>
+          <a href={`https://www.youtube.com/watch?v=${VIDEO_ID}`} target="_blank" rel="noopener noreferrer"
+            className="mt-2 inline-flex items-center gap-1.5 text-[12.5px] underline" style={{ color: 'var(--v3-muted)' }}>
+            <ExternalLink className="w-3.5 h-3.5" /> Ouvrir sur YouTube
+          </a>
+        </div>
+
+        <div className="rounded-xl border p-4" style={{ borderColor: 'var(--v3-line)', background: '#fbfbfa' }}>
+          <h3 className="text-[13.5px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+            L’essentiel, si vous préférez lire
+          </h3>
+          <ul className="mt-3 space-y-2">
+            {VIDEO_POINTS.map((p) => (
+              <li key={p} className="text-[13px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>• {p}</li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+
+
       <section className="mt-6 rounded-2xl border p-6" style={{ borderColor: '#f0c98a', background: '#fdf7ec' }}>
         <h2 className="text-[15px] font-semibold" style={{ color: '#92400e' }}>
           Les règles Amazon, à lire avant tout
