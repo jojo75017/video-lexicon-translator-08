@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, Eye, EyeOff, Loader2, Printer, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
-import type { BookBrief } from '@/lib/v3/bookBrief';
+import { validatedPassages, type BookBrief } from '@/lib/v3/bookBrief';
 import { correctWholeBook } from '@/lib/v3/autoCorrectChapters';
 import {
   effectiveChapterText, readWrittenProgress, WRITTEN_CHAPTERS_EVENT, type WrittenProgress,
@@ -32,28 +32,72 @@ export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
     return () => window.removeEventListener(WRITTEN_CHAPTERS_EVENT, sync);
   }, []);
 
-  const chapters = useMemo(
-    () => progress.chapters
+  const chapters = useMemo(() => {
+    const validated = validatedPassages(brief);
+    const validatedByIndex = new Map(validated.map((passage) => [passage.index, passage.corrected.trim()]));
+    const consumed = new Set<number>();
+    const outline = brief.outline || [];
+
+    // Un chapitre brut n'est plus montré comme s'il était prêt à publier. Tant
+    // que sa correction éditoriale travaille, on affiche à sa place les passages
+    // Copilot déjà corrigés et validés qui ont servi à construire ce chapitre.
+    const writtenOrValidated = progress.chapters
       .slice()
       .sort((a, b) => a.index - b.index)
-      .map((c) => ({ ...c, text: effectiveChapterText(c) }))
-      .filter((c) => c.text.trim().length > 0),
-    [progress.chapters],
-  );
+      .map((chapter) => {
+        const readyText = chapter.editedContent?.trim() || chapter.correctedContent?.trim() || '';
+        if (readyText) {
+          (outline[chapter.index]?.sources || []).forEach((source) => consumed.add(source));
+          return { ...chapter, text: readyText, words: paragraphsOf(readyText).join(' ').split(/\s+/).filter(Boolean).length };
+        }
+
+        const sources = outline[chapter.index]?.sources || [];
+        const safeText = sources
+          .map((source) => {
+            const text = validatedByIndex.get(source) || '';
+            if (text) consumed.add(source);
+            return text;
+          })
+          .filter(Boolean)
+          .join('\n\n');
+        return { ...chapter, title: outline[chapter.index]?.titre || chapter.title, text: safeText,
+          words: safeText.split(/\s+/).filter(Boolean).length };
+      })
+      .filter((chapter) => chapter.text.trim().length > 0);
+
+    // Avant même la rédaction des chapitres, ou si un passage n'est pas encore
+    // rattaché au sommaire, tout ce qui a été validé reste visible dans l'aperçu.
+    const remaining = validated
+      .filter((passage) => !consumed.has(passage.index))
+      .map((passage, offset) => ({
+        index: progress.chapters.length + offset,
+        title: `Passage validé ${passage.index}`,
+        content: passage.corrected,
+        rawContent: passage.original,
+        correctedContent: passage.corrected,
+        status: 'corrected' as const,
+        text: passage.corrected,
+        words: passage.corrected.split(/\s+/).filter(Boolean).length,
+      }));
+
+    return [...writtenOrValidated, ...remaining];
+  }, [brief, progress.chapters]);
 
   const totalWords = chapters.reduce((sum, c) => sum + c.words, 0);
   const pages = Math.max(1, Math.round(totalWords / 250));
   const title = brief.title?.trim() || 'Projet sans titre';
-  const rawCount = chapters.filter((c) => c.status === 'raw' || c.status === 'failed').length;
-  const correcting = chapters.some((c) => c.status === 'correcting');
-  const firstError = chapters.find((c) => c.status === 'failed' && c.error)?.error || '';
+  const rawCount = progress.chapters.filter((c) => c.status === 'raw' || c.status === 'failed').length;
+  const correcting = progress.chapters.some((c) => c.status === 'correcting');
+  const firstError = progress.chapters.find((c) => c.status === 'failed' && c.error)?.error || '';
 
 
   const fixAll = async () => {
     setFixing(true);
     try {
-      await correctWholeBook();
-      toast.success('Livre repassé dans la chaîne éditoriale.');
+      const queued = correctWholeBook();
+      toast.success(queued > 0
+        ? `${queued} chapitre(s) restant(s) envoyé(s) en correction.`
+        : 'Tous les chapitres sont déjà corrigés : aucun crédit consommé.');
     } catch (e: any) {
       toast.error(e?.message || 'Correction impossible pour le moment.');
     } finally {
@@ -85,8 +129,8 @@ export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
 
       <p className="mt-1 text-[11px]" style={{ color: 'var(--v3-muted)' }}>
         {chapters.length
-          ? `${chapters.length} chapitre(s) · ${totalWords.toLocaleString('fr-FR')} mots · ≈ ${pages} page(s) · version retenue (corrigée ou modifiée)`
-          : 'Le livre s’affichera ici, mis en page, dès le premier chapitre rédigé.'}
+          ? `${chapters.length} partie(s) · ${totalWords.toLocaleString('fr-FR')} mots · ≈ ${pages} page(s) · uniquement le contenu corrigé et validé`
+          : 'Validez un passage corrigé : il apparaîtra immédiatement ici, sans nouvel appel IA.'}
       </p>
 
       {chapters.length > 0 && (rawCount > 0 || correcting) && (
