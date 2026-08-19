@@ -1,20 +1,20 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ListOrdered, History, RotateCcw, PenLine, Loader2, Sparkles, Wand2, SlidersHorizontal, Lock, BarChart3, Star,
+  ListOrdered, History, RotateCcw, Loader2, Sparkles, Wand2, SlidersHorizontal, Lock, BarChart3, Star,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
-import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import {
   BOOK_BRIEF_EVENT, dedupeSourceText, isFieldLocked, lockField, readBookBrief, unlockField, writeBookBrief,
   type BookBrief, type LockableField,
 } from '@/lib/v3/bookBrief';
 import { countTextWords, loadOutlineVersions, type OutlineVersion } from '@/lib/v3/genieThread';
 import {
-  readWrittenProgress, replaceWrittenChapter, WRITTEN_CHAPTERS_EVENT, type WrittenProgress,
+  readWrittenProgress, WRITTEN_CHAPTERS_EVENT, type WrittenProgress,
 } from '@/lib/v3/writtenChapters';
 import V3OutlinePanel from './V3OutlinePanel';
+import V3WrittenBookTab from './V3WrittenBookTab';
+
 
 /** Une ligne de réglage : le champ, et le cadenas quand l'auteur a décidé. */
 function SettingField({
