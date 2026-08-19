@@ -48,7 +48,7 @@ export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
         <span className="v3-chip v3-chip-orange text-[11px]"><BookOpen className="h-3 w-3" /> Aperçu du livre</span>
         <div className="flex items-center gap-2">
           {brief.projectId && (
-            <Link to={`/v3/livre/${brief.projectId}`} className="text-[11px] underline" style={{ color: 'var(--v3-muted)' }}>
+            <Link to={`/v3/book/${brief.projectId}`} className="text-[11px] underline" style={{ color: 'var(--v3-muted)' }}>
               Aperçu plein écran
             </Link>
           )}
