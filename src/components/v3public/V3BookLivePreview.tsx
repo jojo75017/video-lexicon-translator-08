@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import { validatedPassages, type BookBrief } from '@/lib/v3/bookBrief';
 import { correctWholeBook } from '@/lib/v3/autoCorrectChapters';
 import {
-  effectiveChapterText, readWrittenProgress, WRITTEN_CHAPTERS_EVENT, type WrittenProgress,
+  readWrittenProgress, WRITTEN_CHAPTERS_EVENT, type WrittenProgress,
 } from '@/lib/v3/writtenChapters';
 
 function paragraphsOf(text: string): string[] {
@@ -70,12 +70,16 @@ export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
     const remaining = validated
       .filter((passage) => !consumed.has(passage.index))
       .map((passage, offset) => ({
-        index: progress.chapters.length + offset,
+        index: 100000 + offset,
         title: `Passage validé ${passage.index}`,
         content: passage.corrected,
         rawContent: passage.original,
         correctedContent: passage.corrected,
+        editedContent: undefined,
         status: 'corrected' as const,
+        corrections: undefined,
+        error: undefined,
+        updatedAt: passage.validatedAt,
         text: passage.corrected,
         words: passage.corrected.split(/\s+/).filter(Boolean).length,
       }));
