@@ -206,6 +206,10 @@ export default function V3CorrecteurPage() {
       toast.error('Ce livre est introuvable — importez le document à la place.');
       return false;
     }
+    // Une correction lancée depuis « Mes livres » met à jour ce même livre.
+    // Sans ce lien, l'aperçu continuait à lire l'ancien manuscrit brut tandis
+    // qu'une copie corrigée séparée était créée.
+    setCloudProjectId(data.id);
     const normalized = normalizeManuscript(Array.isArray(data.chapters) ? data.chapters : [], {
       expectedCount: Number(data.number_of_chapters) || undefined,
       bookTitle: data.title,
@@ -543,7 +547,7 @@ export default function V3CorrecteurPage() {
       }
       const payload = {
         user_id: user.id,
-        title: `${manuscript.title} — corrigé`,
+        title: manuscript.title.replace(/\s+—\s+corrigé$/i, ''),
         author_name: '',
         project_type: 'corrected',
         chapters: finalChapters.map((chapter, index) => ({

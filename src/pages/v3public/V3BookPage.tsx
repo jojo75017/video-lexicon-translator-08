@@ -3,6 +3,13 @@ import { Link, useParams } from 'react-router-dom';
 import { Feather, ArrowLeft, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import AudiobookOfferCard from '@/components/v3public/AudiobookOfferCard';
+import { readBookBrief } from '@/lib/v3/bookBrief';
+import {
+  effectiveChapterText,
+  readWrittenChapters,
+  WRITTEN_CHAPTERS_EVENT,
+  type WrittenChapter,
+} from '@/lib/v3/writtenChapters';
 
 type Book = {
   id: string;
@@ -18,6 +25,7 @@ export default function V3BookPage() {
   const [book, setBook] = useState<Book | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeChapter, setActiveChapter] = useState(0);
+  const [liveChapters, setLiveChapters] = useState<WrittenChapter[]>([]);
 
   useEffect(() => {
     if (!id) return;
@@ -28,6 +36,19 @@ export default function V3BookPage() {
       setBook((data as Book) || null);
       setLoading(false);
     })();
+  }, [id]);
+
+  // L'aperçu doit refléter instantanément le texte retenu dans « Mon livre »
+  // (retouche manuelle > correction IA > premier jet), sans attendre un nouvel
+  // enregistrement du projet dans le cloud.
+  useEffect(() => {
+    const sync = () => {
+      const brief = readBookBrief();
+      setLiveChapters(brief?.projectId === id ? readWrittenChapters() : []);
+    };
+    sync();
+    window.addEventListener(WRITTEN_CHAPTERS_EVENT, sync);
+    return () => window.removeEventListener(WRITTEN_CHAPTERS_EVENT, sync);
   }, [id]);
 
   if (loading) {
@@ -52,7 +73,13 @@ export default function V3BookPage() {
     );
   }
 
-  const chapters = book.chapters || [];
+  const storedChapters = book.chapters || [];
+  const chapters = liveChapters.length > 0
+    ? liveChapters.map((chapter, index) => ({
+        title: chapter.title || storedChapters[index]?.title,
+        content: effectiveChapterText(chapter),
+      }))
+    : storedChapters;
   const current = chapters[activeChapter];
 
   return (
