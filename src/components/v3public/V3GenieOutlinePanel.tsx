@@ -292,7 +292,7 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
 
         {/* Onglets */}
         <div className="mt-3 flex gap-2">
-          {([['outline', 'Sommaire'], ['written', `Déjà écrit${written.length ? ` (${written.length})` : ''}`]] as const).map(([id, label]) => (
+          {([['outline', 'Sommaire'], ['written', `Mon livre${written.length ? ` (${written.length})` : ''}`]] as const).map(([id, label]) => (
             <button key={id} type="button" onClick={() => setTab(id)}
               className="rounded-full border px-3 py-1.5 text-[11.5px] transition"
               style={{
