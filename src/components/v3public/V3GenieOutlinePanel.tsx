@@ -73,6 +73,18 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
     return () => window.removeEventListener(WRITTEN_CHAPTERS_EVENT, sync);
   }, []);
 
+  useEffect(() => {
+    const showWritten = () => {
+      setTab('written');
+      const current = readWrittenProgress();
+      const latest = current.chapters[current.chapters.length - 1];
+      if (latest) setOpenIndex(latest.index);
+      document.getElementById('sommaire-ia')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    window.addEventListener('v3:show-written-book', showWritten);
+    return () => window.removeEventListener('v3:show-written-book', showWritten);
+  }, []);
+
   // Dès le premier chapitre rédigé, la colonne montre le texte sans qu'on cherche.
   useEffect(() => {
     if (autoSwitched.current || progress.chapters.length === 0) return;

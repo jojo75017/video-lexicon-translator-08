@@ -6,6 +6,7 @@ import EbookCompleteWorkflow from '@/components/ebook/EbookCompleteWorkflow';
 import { ApiProviderQuickSettings } from '@/components/ebook/ApiProviderQuickSettings';
 import V3ExportPanel from '@/components/admin/V3ExportPanel';
 import V3KdpPublishPanel from '@/components/v3public/V3KdpPublishPanel';
+import V3LiveBookProgress from '@/components/v3public/V3LiveBookProgress';
 import { supabase } from '@/integrations/supabase/client';
 import { normalizeManuscript } from '@/utils/manuscriptNormalizer';
 import { publishWrittenChapters } from '@/lib/v3/writtenChapters';
@@ -1275,21 +1276,24 @@ Règles :
             />
           </div>
         ) : (
-          <EbookCompleteWorkflow
-            key={`${finalTitle}-${chapters}-${wordsPerChapter}`}
-            autoStart
-            hideInputForm
-            initialTitle={finalTitle.trim()}
-            initialSubtitle={subtitle.trim()}
-            initialCategory={effectiveCategory}
-            initialAuthorName={authorName.trim()}
-            initialNumberOfChapters={chapters}
-            initialWordsPerChapter={wordsPerChapter}
-            initialTone={tone}
-            characters={workflowCharacters}
-            initialBookIntroduction={buildWorkflowDescription()}
-            onComplete={handleWorkflowComplete}
-          />
+          <div className="space-y-5">
+            <V3LiveBookProgress />
+            <EbookCompleteWorkflow
+              key={`${finalTitle}-${chapters}-${wordsPerChapter}`}
+              autoStart
+              hideInputForm
+              initialTitle={finalTitle.trim()}
+              initialSubtitle={subtitle.trim()}
+              initialCategory={effectiveCategory}
+              initialAuthorName={authorName.trim()}
+              initialNumberOfChapters={chapters}
+              initialWordsPerChapter={wordsPerChapter}
+              initialTone={tone}
+              characters={workflowCharacters}
+              initialBookIntroduction={buildWorkflowDescription()}
+              onComplete={handleWorkflowComplete}
+            />
+          </div>
         )}
 
         {completedBook && (
