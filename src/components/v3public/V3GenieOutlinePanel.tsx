@@ -59,6 +59,8 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
   // Le récit doit être visible immédiatement : ne jamais donner l'impression
   // qu'il a été remplacé par le court synopsis de l'IA.
   const [showStory, setShowStory] = useState(true);
+  // Par défaut on montre la version corrigée : c'est celle qui ira dans le livre.
+  const [storyView, setStoryView] = useState<'corrected' | 'original'>('corrected');
   const autoSwitched = useRef(false);
 
   useEffect(() => {
