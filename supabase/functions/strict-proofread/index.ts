@@ -123,7 +123,20 @@ TU DOIS :
 
 TU NE DOIS RIEN RÉÉCRIRE D'AUTRE : ni le style, ni les tournures, ni la longueur des phrases. Zéro ajout, zéro suppression de passage.`;
 
-    const contextBlock = (() => {
+    const dictationRules = `MISSION : ce texte a été DICTÉ ou tapé au fil de la pensée par l'auteur (souvenirs, récit de vie). Il contient des fautes de dictée qu'une correction ordinaire laisse passer parce que les mots existent en français. Tu les répares en te fiant UNIQUEMENT au sens de la phrase.
+
+TU DOIS :
+1. Corriger les homophones et quasi-homophones fautifs d'après le contexte, même si le mot écrit existe : « je me lavais avant 8 h pour rejoindre mes ouvriers » → « je me levais avant 8 h… » ; « mes fonctions d'égérant » → « mes fonctions de gérant » ; a/à, ou/où, ce/se, ces/ses/c'est/s'est, la/là, sa/ça, on/ont, son/sont, et/est, du/dû, quand/quant, plus tôt/plutôt, peut/peu, tout/tous, leur/leurs, participe passé en -é / infinitif en -er.
+2. Séparer les mots collés ou mal coupés (« gérantest » → « gérant est », « d'égérant » → « de gérant », « toutdesuite » → « tout de suite ») et recoller les mots coupés à tort.
+3. Rétablir la ponctuation absente : découper le flux en phrases complètes avec majuscule au début et point à la fin, virgules là où la phrase respire, points d'interrogation et d'exclamation quand le ton l'exige. Aucune phrase ne doit rester sans verbe ni sans point.
+4. Rétablir les majuscules aux noms propres et lieux (Berck-sur-Mer, etc.) et l'écriture correcte des heures, dates et nombres (8 h, années 1950).
+5. Aérer en paragraphes quand un bloc enchaîne plusieurs moments distincts, en respectant l'ORDRE des faits tel qu'il est écrit.
+
+TU NE DOIS JAMAIS : résumer, raccourcir, supprimer un souvenir, inventer un détail, un lieu, une date ou une personne, changer l'ordre des faits, ni reformuler par plaisir de style. Chaque mot de l'auteur qui est juste reste à sa place.
+Le texte rendu doit être AU MOINS aussi long que le texte reçu (la ponctuation ajoute des caractères, elle n'en retire pas).
+Type de correction à renvoyer : "orthographe" pour les homophones et mots collés, "ponctuation" pour la ponctuation ajoutée.`;
+
+
       const c = bookContext && typeof bookContext === 'object' ? bookContext as Record<string, unknown> : null;
       if (!c) return '';
       const names = Array.isArray(c.names) ? (c.names as unknown[]).map(String).slice(0, 60) : [];
