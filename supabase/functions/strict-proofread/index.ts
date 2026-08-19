@@ -157,14 +157,17 @@ Type de correction à renvoyer : "orthographe" pour les homophones et mots coll�
         ? "Tu complètes une fin de chapitre inachevée, sans rien réécrire d'autre."
         : latinFix
           ? 'Tu effectues une passe unique de francisation, sans aucune autre correction.'
-          : edition
-            ? "Tu es l'éditeur d'une maison d'édition : tu affines un texte déjà corrigé, sans le réécrire."
-            : finalCheck
-              ? 'Tu effectues le contrôle final avant impression : tu ne traques que les défauts résiduels.'
-              : `Tu appliques une correction ${polish ? 'STRICTE PUIS un polissage de style mesuré' : 'STRICTE sans aucune réécriture'}.`
+          : dictation
+            ? "Tu répares un texte dicté : homophones fautifs, mots collés et ponctuation absente, sans jamais résumer."
+            : edition
+              ? "Tu es l'éditeur d'une maison d'édition : tu affines un texte déjà corrigé, sans le réécrire."
+              : finalCheck
+                ? 'Tu effectues le contrôle final avant impression : tu ne traques que les défauts résiduels.'
+                : `Tu appliques une correction ${polish ? 'STRICTE PUIS un polissage de style mesuré' : 'STRICTE sans aucune réécriture'}.`
     }
 
-${endingFix ? endingRules : latinFix ? latinRules : edition ? editionRules : finalCheck ? finalCheckRules : polish ? polishRules : strictRules}${contextBlock}
+${endingFix ? endingRules : latinFix ? latinRules : dictation ? dictationRules : edition ? editionRules : finalCheck ? finalCheckRules : polish ? polishRules : strictRules}${contextBlock}
+
 
 
 
