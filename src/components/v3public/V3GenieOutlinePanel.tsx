@@ -5,7 +5,8 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
-  BOOK_BRIEF_EVENT, dedupeSourceText, isFieldLocked, lockField, readBookBrief, unlockField, writeBookBrief,
+  BOOK_BRIEF_EVENT, dedupeSourceText, isFieldLocked, lockField, narrativeForBook, readBookBrief,
+  unlockField, validatedPassages, writeBookBrief,
   type BookBrief, type LockableField,
 } from '@/lib/v3/bookBrief';
 import { countTextWords, loadOutlineVersions, type OutlineVersion } from '@/lib/v3/genieThread';
