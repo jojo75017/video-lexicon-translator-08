@@ -363,15 +363,41 @@ export async function proofreadChapter(
   mode: ProofreadMode,
 ): Promise<ProofreadResult> {
   const latinBefore = detectLatin(content).length;
+
+  // ---------- Passe 0 : réparation de la dictée ----------
+  // Un texte dicté contient des fautes que la correction classique laisse passer
+  // (« je me lavais » au lieu de « je me levais », « d'égérant » au lieu de
+  // « de gérant », aucune ponctuation). On la répare AVANT tout le reste.
+  const dictated = looksDictated(content);
+  let source = content;
+  let dictationCorrections: Correction[] = [];
+  let dictationFailures = 0;
+  const dictationPasses: string[] = [];
+
+  if (dictated) {
+    dictationPasses.push(DICTATION_PASS_LABEL);
+    passNotifier?.({ pass: 1, total: (mode === 'polish' ? 4 : 3) + 1, label: DICTATION_PASS_LABEL });
+    try {
+      const dic = await runPassOverText(title, content, 'dictation');
+      if (dic.text && !isTruncated(content, dic.text)) {
+        source = dic.text;
+        dictationCorrections = dic.corrections;
+        dictationFailures = dic.failures;
+      }
+    } catch (e) {
+      console.warn('[correcteur] passe de dictée ignorée :', e);
+    }
+  }
+
   // 700 mots par bloc : le modèle reste minutieux sur l'orthographe et ne
   // survole plus le texte comme sur des blocs de 1200 mots.
-  const blocks = splitForProofread(content, 700);
+  const blocks = splitForProofread(source, 700);
 
   if (blocks.length === 0) throw new Error('Chapitre vide : rien à corriger.');
 
-  const passes: string[] = [];
-  const totalPasses = mode === 'polish' ? 4 : 3;
-  let passIndex = 0;
+  const passes: string[] = [...dictationPasses];
+  const totalPasses = (mode === 'polish' ? 4 : 3) + dictationPasses.length;
+  let passIndex = dictationPasses.length;
   const announce = (label: string) => {
     passIndex++;
     passes.push(label);
@@ -381,10 +407,10 @@ export async function proofreadChapter(
   // ---------- Passe 1 : correction ----------
   announce(PASS_LABELS[0]);
   const outputs: string[] = [];
-  let corrections: Correction[] = [];
+  let corrections: Correction[] = [...dictationCorrections];
   let qualitySum = 0;
   let qualityCount = 0;
-  let blockFailures = 0;
+  let blockFailures = dictationFailures;
 
   for (let i = 0; i < blocks.length; i++) {
     const res = await proofreadBlock(title, blocks[i], mode);
@@ -393,6 +419,7 @@ export async function proofreadChapter(
     if (res.failed) blockFailures++;
     if (res.quality) { qualitySum += res.quality; qualityCount++; }
     if (i < blocks.length - 1) await sleep(400);
+
   }
 
   let corrected = outputs.join('\n\n').trim();
