@@ -27,20 +27,36 @@ Ce qui change dans la colonne de droite (`/v3/create` et `/v3/biographie`) :
 - Boutons en pied de l'onglet : « Corriger mon livre », « Données KDP », « Exporter » — pour enchaîner sans chercher.
 - Sur mobile, les deux onglets restent sous le dialogue, dans le même ordre.
 
-## 2. Bouton « Obtenir des avis clients »
+## 2. Bouton et page « Obtenir des avis clients » (avec la vidéo)
 
-La page guide existe déjà (`/v3/avis`, dans la barre latérale). Il manque le bouton au bon moment.
+La page guide existe déjà (`/v3/avis`, dans la barre latérale). Il manque le bouton au bon moment, et la page est remise au propre autour de la vidéo que vous donnez.
 
 - Ajout d'un 9e bouton dans la barre d'actions du livre : **« Obtenir des avis clients »**, avec l'icône étoile, qui ouvre `/v3/avis` en passant le titre du livre pour que la séquence d'emails soit déjà personnalisée.
 - Le même bouton apparaît en fin de rédaction, dans l'onglet « Mon livre », une fois le manuscrit terminé — c'est le moment naturel où l'on pense aux avis.
 - Sur `/v3/avis`, le titre reçu est pré-rempli dans le générateur de séquence d'avis (aucune saisie à refaire).
+
+Nouvelle mise en page de `/v3/avis`, en identité or et vert V3 :
+
+```text
+Bandeau   ⭐ Obtenir des avis clients — la marche à suivre
+Vidéo     [ lecteur YouTube 16/9, encadré or, « Regarder la méthode en vidéo » ]
+          + résumé en 5 points sous la vidéo, pour ceux qui préfèrent lire
+Étapes    1 Ce qu'Amazon autorise · 2 Préparer le livre · 3 Les 5 premiers avis
+          4 La séquence d'emails · 5 Suivi · 6 Ce qu'il ne faut jamais faire
+Outil     Générateur de séquence (titre pré-rempli) → 4 emails, bouton Copier
+```
+
+- La vidéo est intégrée en lecteur responsive (`youtube-nocookie`, chargement différé, sans lecture automatique), avec un lien « Ouvrir sur YouTube » en secours.
+- Sous la vidéo : les points clés en texte, pour appliquer sans revoir la vidéo.
+- Les 6 étapes deviennent des cartes numérotées lisibles, avec les interdits Amazon en encart rouge clair.
+
 
 ## Détails techniques
 
 - `src/components/v3public/V3GenieOutlinePanel.tsx` : passage à deux onglets internes (`sommaire` / `livre`), l'événement `v3:show-written-book` sélectionne l'onglet `livre`.
 - `src/components/v3public/V3LiveBookProgress.tsx` : variante compacte pour la colonne (props `variant="aside"`), chapitres complets en `<details>` au lieu de l'extrait tronqué, source inchangée (`readWrittenProgress`, `ebook_workflow_progress`).
 - `src/components/v3public/V3BookActionsBar.tsx` : « Voir mon livre » ouvre toujours l'onglet livre (au lieu de rediriger) ; ajout du bouton `⭐ Obtenir des avis clients` vers `/v3/avis?title=…`.
-- `src/pages/v3public/V3AvisClientsPage.tsx` : lecture du paramètre `title` (repli sur le brief en cours) pour pré-remplir la séquence.
+- `src/pages/v3public/V3AvisClientsPage.tsx` : refonte de la page (bandeau, lecteur vidéo `https://www.youtube-nocookie.com/embed/1fvJbcmhM2I`, cartes d'étapes) et lecture du paramètre `title` (repli sur le brief en cours) pour pré-remplir la séquence, générée via `callAIWriting` avec la clé de l'abonné (même logique que `ReviewsBooster`).
 - Aucune modification de base de données, aucun nouvel appel IA : tout vient de l'avancement déjà enregistré.
 
 ## Hors périmètre
