@@ -219,7 +219,8 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
 
         {/* Dialogue + sommaire toujours visible côte à côte */}
         <div className="mt-7 grid gap-5 lg:grid-cols-[1fr_360px] items-start">
-          <div className="min-w-0">
+          <div className="min-w-0 v3-ambiance">
+
             {!openedBook && (
               <V3GenieDialog
                 mode={biography ? 'biography' : 'book'}
