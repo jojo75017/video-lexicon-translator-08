@@ -87,6 +87,24 @@ export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
           : 'Le livre s’affichera ici, mis en page, dès le premier chapitre rédigé.'}
       </p>
 
+      {chapters.length > 0 && (rawCount > 0 || correcting) && (
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 rounded-xl border px-3 py-2 text-[11.5px]"
+          style={{ borderColor: 'rgba(180,83,9,0.35)', background: 'rgba(251,191,36,0.10)', color: '#92400e' }}>
+          <span>
+            {correcting
+              ? 'Correction éditoriale en cours : le texte affiché va se mettre à jour.'
+              : `${rawCount} chapitre(s) encore au premier jet (ponctuation et style non corrigés).`}
+          </span>
+          <button type="button" onClick={fixAll} disabled={fixing || correcting}
+            className="inline-flex items-center gap-1 rounded-full border px-3 py-1 font-semibold disabled:opacity-60"
+            style={{ borderColor: 'rgba(180,83,9,0.45)' }}>
+            {fixing || correcting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Wand2 className="h-3 w-3" />}
+            Corriger tout le livre
+          </button>
+        </div>
+      )}
+
+
       {open && chapters.length > 0 && (
         <div
           className="mt-3 max-h-[70vh] overflow-y-auto rounded-2xl border px-5 py-6 md:px-8"
