@@ -46,6 +46,8 @@ export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
   const title = brief.title?.trim() || 'Projet sans titre';
   const rawCount = chapters.filter((c) => c.status === 'raw' || c.status === 'failed').length;
   const correcting = chapters.some((c) => c.status === 'correcting');
+  const firstError = chapters.find((c) => c.status === 'failed' && c.error)?.error || '';
+
 
   const fixAll = async () => {
     setFixing(true);
