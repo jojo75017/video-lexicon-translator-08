@@ -124,7 +124,13 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
   // Affichage garanti sans répétition : un même souvenir n'apparaît qu'une fois.
   const sourceText = dedupeSourceText(String(brief.sourceText || ''));
   const sourceWords = countTextWords(sourceText);
+  // Le récit corrigé et validé passe devant : c'est lui qui entrera dans le livre.
+  const validatedCount = validatedPassages(brief).length;
+  const correctedStory = validatedCount > 0 ? narrativeForBook(brief) : sourceText;
+  const displayedStory = storyView === 'corrected' && validatedCount > 0 ? correctedStory : sourceText;
+  const displayedWords = countTextWords(displayedStory) || sourceWords;
   const estimatedTotal = (Number(brief.chapters) || 0) * (Number(brief.wordsPerChapter) || 0);
+
 
   /** Saisie d'un réglage : on enregistre et on verrouille le champ. */
   const setSetting = (field: LockableField, raw: string) => {
