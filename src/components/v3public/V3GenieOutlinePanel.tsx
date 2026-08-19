@@ -110,31 +110,8 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
     toast.success(`Sommaire v${version.version} restauré (${version.chapters.length} chapitres).`);
   };
 
-  const correctChapter = async (chapter: WrittenProgress['chapters'][number]) => {
-    setFixing(chapter.index);
-    try {
-      const provider = getProvider();
-      const { data, error } = await supabase.functions.invoke('strict-proofread', {
-        body: {
-          chapterTitle: chapter.title,
-          chapterContent: chapter.content,
-          mode: 'strict',
-          userProvider: provider,
-          userApiKey: getProviderKey(provider),
-        },
-      });
-      if (error) throw error;
-      if ((data as any)?.error) throw new Error((data as any).error);
-      const corrected = String((data as any)?.texteCorrige || '').trim();
-      if (!corrected) throw new Error('La correction est revenue vide.');
-      replaceWrittenChapter(chapter.index, corrected);
-      toast.success(`« ${chapter.title} » corrigé (${(data as any)?.nombreCorrections || 0} corrections).`);
-    } catch (e: any) {
-      toast.error(e?.message || 'Correction impossible pour le moment.');
-    } finally {
-      setFixing(null);
-    }
-  };
+
+
 
   const outline = brief.outline || [];
   const written = progress.chapters;
