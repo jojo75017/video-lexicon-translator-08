@@ -78,6 +78,7 @@ export default function V3BookPage() {
     ? liveChapters.map((chapter, index) => ({
         title: chapter.title || storedChapters[index]?.title,
         content: effectiveChapterText(chapter),
+        text: undefined,
       }))
     : storedChapters;
   const current = chapters[activeChapter];
