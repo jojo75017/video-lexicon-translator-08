@@ -329,7 +329,11 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
         )}
       </div>
 
+      {/* Aperçu réel du livre, juste sous la fiche du projet */}
+      <V3BookLivePreview brief={brief} />
+
       {/* Réglage avancé : générer ou coller un sommaire complet d'un coup */}
+
       <details className="rounded-[22px] border p-3" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
         <summary className="cursor-pointer text-[11.5px] font-semibold" style={{ color: 'var(--v3-muted)' }}>
           Sommaire complet d’un coup (avancé)
