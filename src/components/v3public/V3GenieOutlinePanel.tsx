@@ -1,20 +1,20 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ListOrdered, History, RotateCcw, PenLine, Loader2, Sparkles, Wand2, SlidersHorizontal, Lock, BarChart3, Star,
+  ListOrdered, History, RotateCcw, Sparkles, Wand2, SlidersHorizontal, Lock, BarChart3, Star,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
-import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import {
   BOOK_BRIEF_EVENT, dedupeSourceText, isFieldLocked, lockField, readBookBrief, unlockField, writeBookBrief,
   type BookBrief, type LockableField,
 } from '@/lib/v3/bookBrief';
 import { countTextWords, loadOutlineVersions, type OutlineVersion } from '@/lib/v3/genieThread';
 import {
-  readWrittenProgress, replaceWrittenChapter, WRITTEN_CHAPTERS_EVENT, type WrittenProgress,
+  readWrittenProgress, WRITTEN_CHAPTERS_EVENT, type WrittenProgress,
 } from '@/lib/v3/writtenChapters';
 import V3OutlinePanel from './V3OutlinePanel';
+import V3WrittenBookTab from './V3WrittenBookTab';
+
 
 /** Une ligne de réglage : le champ, et le cadenas quand l'auteur a décidé. */
 function SettingField({
@@ -53,7 +53,7 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
   const [tab, setTab] = useState<'outline' | 'written'>('outline');
   const [progress, setProgress] = useState<WrittenProgress>({ chapters: [], total: 0, activeIndex: -1 });
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [fixing, setFixing] = useState<number | null>(null);
+  
   // Le récit doit être visible immédiatement : ne jamais donner l'impression
   // qu'il a été remplacé par le court synopsis de l'IA.
   const [showStory, setShowStory] = useState(true);
@@ -110,31 +110,8 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
     toast.success(`Sommaire v${version.version} restauré (${version.chapters.length} chapitres).`);
   };
 
-  const correctChapter = async (chapter: WrittenProgress['chapters'][number]) => {
-    setFixing(chapter.index);
-    try {
-      const provider = getProvider();
-      const { data, error } = await supabase.functions.invoke('strict-proofread', {
-        body: {
-          chapterTitle: chapter.title,
-          chapterContent: chapter.content,
-          mode: 'strict',
-          userProvider: provider,
-          userApiKey: getProviderKey(provider),
-        },
-      });
-      if (error) throw error;
-      if ((data as any)?.error) throw new Error((data as any).error);
-      const corrected = String((data as any)?.texteCorrige || '').trim();
-      if (!corrected) throw new Error('La correction est revenue vide.');
-      replaceWrittenChapter(chapter.index, corrected);
-      toast.success(`« ${chapter.title} » corrigé (${(data as any)?.nombreCorrections || 0} corrections).`);
-    } catch (e: any) {
-      toast.error(e?.message || 'Correction impossible pour le moment.');
-    } finally {
-      setFixing(null);
-    }
-  };
+
+
 
   const outline = brief.outline || [];
   const written = progress.chapters;
@@ -328,61 +305,9 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
             </p>
           )
         ) : (
-          <>
-            {written.length > 0 ? (
-              <div className="mt-3 max-h-[28rem] space-y-2 overflow-y-auto pr-1">
-                {written.map((c) => (
-                  <div key={c.index} className="rounded-xl border px-3 py-2 text-[12.5px]" style={{ borderColor: 'rgba(0,0,0,0.08)' }}>
-                    <button type="button" onClick={() => setOpenIndex(openIndex === c.index ? null : c.index)}
-                      className="w-full text-left">
-                      <strong style={{ color: 'var(--v3-ink)' }}>{c.index + 1}. {c.title}</strong>
-                      <span className="block text-[10.5px]" style={{ color: 'var(--v3-muted)' }}>
-                        {c.words.toLocaleString('fr-FR')} mots · {openIndex === c.index ? 'replier' : 'lire le texte entier'}
-                      </span>
-                    </button>
-                    <p className="mt-1 whitespace-pre-wrap leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
-                      {openIndex === c.index ? c.content : `${c.content.slice(0, 220)}…`}
-                    </p>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      <button type="button" disabled={fixing === c.index} onClick={() => correctChapter(c)}
-                        className="v3-btn v3-btn-outline text-[11px] disabled:opacity-50">
-                        {fixing === c.index ? <Loader2 className="h-3 w-3 animate-spin" /> : <PenLine className="h-3 w-3" />}
-                        Corriger ce chapitre
-                      </button>
-                      <Link to="/v3/corriger" className="v3-btn v3-btn-ghost text-[11px]">
-                        <Wand2 className="h-3 w-3" /> Réécrire
-                      </Link>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="mt-3 text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
-                <Sparkles className="mr-1 inline h-3.5 w-3.5" />
-                Dès que la rédaction démarre, chaque chapitre écrit apparaît ici : vous le relisez et
-                vous le faites corriger sans quitter la page.
-              </p>
-            )}
-
-            {/* Enchaîner sans chercher, dès qu'il y a du texte */}
-            {written.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-2 border-t pt-3" style={{ borderColor: 'rgba(0,0,0,0.08)' }}>
-                <Link to={brief.projectId ? `/v3/corriger?projectId=${brief.projectId}` : '/v3/corriger'}
-                  className="v3-btn v3-btn-outline text-[11px]">
-                  <Wand2 className="h-3 w-3" /> Corriger mon livre
-                </Link>
-                <button type="button" className="v3-btn v3-btn-outline text-[11px]"
-                  onClick={() => document.getElementById('exports-livre')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>
-                  <BarChart3 className="h-3 w-3" /> Données KDP
-                </button>
-                <Link to={`/v3/avis${brief.title ? `?title=${encodeURIComponent(brief.title)}` : ''}`}
-                  className="v3-btn v3-btn-outline text-[11px]">
-                  <Star className="h-3 w-3" /> Obtenir des avis clients
-                </Link>
-              </div>
-            )}
-          </>
+          <V3WrittenBookTab progress={progress} brief={brief} openIndex={openIndex} onToggle={setOpenIndex} />
         )}
+
 
 
         {versions.length > 0 && (
