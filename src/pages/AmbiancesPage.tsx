@@ -9,9 +9,8 @@ import {
   AmbianceCategory,
   ensureAmbianceFont,
   getAmbianceById,
-  getStoredAmbianceId,
-  setStoredAmbianceId,
 } from '@/data/writingAmbiances';
+import { useAmbiance } from '@/hooks/useAmbiance';
 import { AmbianceCard } from '@/components/ambiance/AmbianceCard';
 import { AmbiancePreview } from '@/components/ambiance/AmbiancePreview';
 
@@ -25,7 +24,8 @@ const CATEGORIES: { id: AmbianceCategory | 'toutes'; label: string }[] = [
 
 const AmbiancesPage: React.FC = () => {
   const navigate = useNavigate();
-  const [selectedId, setSelectedId] = useState<string>(() => getStoredAmbianceId());
+  const { ambianceId, setAmbiance } = useAmbiance();
+  const [selectedId, setSelectedId] = useState<string>(ambianceId);
   const [activeCategory, setActiveCategory] = useState<AmbianceCategory | 'toutes'>('toutes');
 
   const selected = useMemo(
@@ -50,7 +50,7 @@ const AmbiancesPage: React.FC = () => {
   };
 
   const handleApply = () => {
-    setStoredAmbianceId(selectedId);
+    setAmbiance(selectedId);
     toast.success(`Ambiance « ${selected.name} » appliquée à votre éditeur`, {
       description: 'Elle sera active dès votre prochaine session d\'écriture.',
     });
