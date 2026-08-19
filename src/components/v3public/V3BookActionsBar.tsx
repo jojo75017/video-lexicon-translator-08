@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, Rocket, Save, Wand2, BookOpen, BarChart3, Languages, Headphones } from 'lucide-react';
+import { Check, Rocket, Save, Wand2, BookOpen, BarChart3, Languages, Headphones, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { BOOK_BRIEF_EVENT, readBookBrief, writeBookBrief, type BookBrief } from '@/lib/v3/bookBrief';
 import { readWrittenProgress, WRITTEN_CHAPTERS_EVENT } from '@/lib/v3/writtenChapters';
@@ -47,16 +47,13 @@ export default function V3BookActionsBar({ onLaunch }: { onLaunch: () => void })
   };
 
   const showBook = () => {
-    if (writtenCount > 0) {
-      window.dispatchEvent(new CustomEvent('v3:show-written-book'));
-      return;
-    }
-    if (projectId) window.location.assign(`/v3/book/${projectId}`);
-    else {
-      onLaunch();
-      toast.info('La rédaction démarre : le premier chapitre apparaîtra dans « Votre livre en direct ».');
+    // Le livre reste visible à côté : on ouvre l'onglet « Mon livre » de la colonne.
+    window.dispatchEvent(new CustomEvent('v3:show-written-book'));
+    if (writtenCount === 0) {
+      toast.info('La colonne de droite affiche votre livre : chaque chapitre écrit s’y ajoute en direct.');
     }
   };
+
 
   const validate = async () => {
     if (!hasOutline) {
@@ -132,6 +129,12 @@ export default function V3BookActionsBar({ onLaunch }: { onLaunch: () => void })
         <Link to="/v3/upsells" className="v3-btn v3-btn-outline justify-center text-xs">
           <Headphones className="h-3.5 w-3.5" /> Version audio (9,99 €)
         </Link>
+
+        <Link to={`/v3/avis${brief.title ? `?title=${encodeURIComponent(brief.title)}` : ''}`}
+          className="v3-btn v3-btn-outline justify-center text-xs" title="La marche à suivre pour obtenir des avis Amazon">
+          <Star className="h-3.5 w-3.5" /> Obtenir des avis clients
+        </Link>
+
 
       </div>
     </div>
