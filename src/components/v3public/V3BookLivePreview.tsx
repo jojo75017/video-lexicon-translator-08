@@ -93,8 +93,11 @@ export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
           <span>
             {correcting
               ? 'Correction éditoriale en cours : le texte affiché va se mettre à jour.'
-              : `${rawCount} chapitre(s) encore au premier jet (ponctuation et style non corrigés).`}
+              : firstError
+                ? `Correction interrompue : ${firstError}`
+                : `${rawCount} chapitre(s) encore au premier jet (dictée, ponctuation et style non corrigés).`}
           </span>
+
           <button type="button" onClick={fixAll} disabled={fixing || correcting}
             className="inline-flex items-center gap-1 rounded-full border px-3 py-1 font-semibold disabled:opacity-60"
             style={{ borderColor: 'rgba(180,83,9,0.45)' }}>
