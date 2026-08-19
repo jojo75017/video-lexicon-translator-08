@@ -14,6 +14,7 @@ import {
 } from '@/lib/v3/writtenChapters';
 import V3OutlinePanel from './V3OutlinePanel';
 import V3WrittenBookTab from './V3WrittenBookTab';
+import V3BookLivePreview from './V3BookLivePreview';
 
 
 /** Une ligne de réglage : le champ, et le cadenas quand l'auteur a décidé. */
