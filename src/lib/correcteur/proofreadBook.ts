@@ -150,6 +150,23 @@ export function setProofreadBookContext(ctx: BookContext | null) {
 }
 
 export const PASS_LABELS = ['Correction', 'Typographie française', 'Édition', 'Contrôle final'];
+export const DICTATION_PASS_LABEL = 'Réparation de la dictée';
+
+/**
+ * Repère un texte dicté / tapé au fil de la pensée : très peu de points,
+ * phrases interminables, majuscules manquantes. Ces textes ont besoin d'une
+ * passe dédiée (homophones, mots collés, ponctuation) avant la correction.
+ */
+export function looksDictated(text: string): boolean {
+  const t = (text || '').trim();
+  if (t.length < 200) return false;
+  const words = t.split(/\s+/).filter(Boolean).length;
+  const sentences = (t.match(/[.!?…]/g) || []).length;
+  const wordsPerSentence = sentences ? words / sentences : words;
+  const lowerStarts = (t.match(/\n\s*[a-zà-ÿ]/g) || []).length;
+  return wordsPerSentence > 40 || sentences < words / 60 || lowerStarts > 2;
+}
+
 
 const BACKOFF_MS = [5000, 15000];
 
