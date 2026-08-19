@@ -136,8 +136,9 @@ TU NE DOIS JAMAIS : résumer, raccourcir, supprimer un souvenir, inventer un dé
 Le texte rendu doit être AU MOINS aussi long que le texte reçu (la ponctuation ajoute des caractères, elle n'en retire pas).
 Type de correction à renvoyer : "orthographe" pour les homophones et mots collés, "ponctuation" pour la ponctuation ajoutée.`;
 
-
+    const contextBlock = (() => {
       const c = bookContext && typeof bookContext === 'object' ? bookContext as Record<string, unknown> : null;
+
       if (!c) return '';
       const names = Array.isArray(c.names) ? (c.names as unknown[]).map(String).slice(0, 60) : [];
       const places = Array.isArray(c.places) ? (c.places as unknown[]).map(String).slice(0, 40) : [];
