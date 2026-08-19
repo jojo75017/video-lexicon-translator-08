@@ -328,61 +328,9 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
             </p>
           )
         ) : (
-          <>
-            {written.length > 0 ? (
-              <div className="mt-3 max-h-[28rem] space-y-2 overflow-y-auto pr-1">
-                {written.map((c) => (
-                  <div key={c.index} className="rounded-xl border px-3 py-2 text-[12.5px]" style={{ borderColor: 'rgba(0,0,0,0.08)' }}>
-                    <button type="button" onClick={() => setOpenIndex(openIndex === c.index ? null : c.index)}
-                      className="w-full text-left">
-                      <strong style={{ color: 'var(--v3-ink)' }}>{c.index + 1}. {c.title}</strong>
-                      <span className="block text-[10.5px]" style={{ color: 'var(--v3-muted)' }}>
-                        {c.words.toLocaleString('fr-FR')} mots · {openIndex === c.index ? 'replier' : 'lire le texte entier'}
-                      </span>
-                    </button>
-                    <p className="mt-1 whitespace-pre-wrap leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
-                      {openIndex === c.index ? c.content : `${c.content.slice(0, 220)}…`}
-                    </p>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      <button type="button" disabled={fixing === c.index} onClick={() => correctChapter(c)}
-                        className="v3-btn v3-btn-outline text-[11px] disabled:opacity-50">
-                        {fixing === c.index ? <Loader2 className="h-3 w-3 animate-spin" /> : <PenLine className="h-3 w-3" />}
-                        Corriger ce chapitre
-                      </button>
-                      <Link to="/v3/corriger" className="v3-btn v3-btn-ghost text-[11px]">
-                        <Wand2 className="h-3 w-3" /> Réécrire
-                      </Link>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="mt-3 text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
-                <Sparkles className="mr-1 inline h-3.5 w-3.5" />
-                Dès que la rédaction démarre, chaque chapitre écrit apparaît ici : vous le relisez et
-                vous le faites corriger sans quitter la page.
-              </p>
-            )}
-
-            {/* Enchaîner sans chercher, dès qu'il y a du texte */}
-            {written.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-2 border-t pt-3" style={{ borderColor: 'rgba(0,0,0,0.08)' }}>
-                <Link to={brief.projectId ? `/v3/corriger?projectId=${brief.projectId}` : '/v3/corriger'}
-                  className="v3-btn v3-btn-outline text-[11px]">
-                  <Wand2 className="h-3 w-3" /> Corriger mon livre
-                </Link>
-                <button type="button" className="v3-btn v3-btn-outline text-[11px]"
-                  onClick={() => document.getElementById('exports-livre')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>
-                  <BarChart3 className="h-3 w-3" /> Données KDP
-                </button>
-                <Link to={`/v3/avis${brief.title ? `?title=${encodeURIComponent(brief.title)}` : ''}`}
-                  className="v3-btn v3-btn-outline text-[11px]">
-                  <Star className="h-3 w-3" /> Obtenir des avis clients
-                </Link>
-              </div>
-            )}
-          </>
+          <V3WrittenBookTab progress={progress} brief={brief} openIndex={openIndex} onToggle={setOpenIndex} />
         )}
+
 
 
         {versions.length > 0 && (
