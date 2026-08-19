@@ -1,49 +1,48 @@
-# Campagne V3 en masse — 3 cadeaux pour faire cliquer
+# Voir le livre à côté pendant la rédaction + bouton « Avis clients »
 
-## Ce que disent les données (vérifié)
+Oui, le principe reste celui d'un copilote : vous dictez vos idées, le Génie les rend corrigées, vous validez, et tout ce qui est validé part dans le livre. Ce plan complète deux points : voir le livre à côté en temps réel, et un bouton dédié pour obtenir des avis clients.
 
-- 647 prospects en base, 683 adresses déjà contactées, 476 ouvreurs, seulement 45 cliqueurs.
-- 4 224 envois sur les 3 derniers jours : le moteur d'envoi fonctionne, c'est le **clic** qui manque.
-- Conclusion : ne pas ajouter des envois, changer la raison de cliquer. Un cadeau immédiat, sans achat, avant toute offre.
+## 1. Le livre visible à côté, pendant qu'il s'écrit
 
-## Les 3 cadeaux (livrés tout de suite, sans paiement)
+Aujourd'hui la colonne de droite affiche le sommaire, et l'avancement (agents, chapitres, aperçu) n'apparaît qu'à l'intérieur du parcours de rédaction. Le clic sur « Voir mon livre » déclenche bien la bascule, mais on ne lit qu'un extrait.
 
-1. **10 niches Amazon rentables 2026** — page cadeau déjà en place, accès immédiat dans l'application.
-2. **Le guide « Publier son premier livre sur KDP »** (PDF déjà disponible) — envoyé en lien direct, pas en pièce jointe.
-3. **Un chapitre écrit gratuitement par l'IA** à partir du sujet du prospect — le cadeau qui fait vraiment cliquer : il essaie l'outil avant d'acheter, page dédiée limitée à 1 chapitre par adresse.
+Ce qui change dans la colonne de droite (`/v3/create` et `/v3/biographie`) :
 
-Un seul bouton par email vers **une page cadeaux unique** qui présente les 3 et les débloque après saisie de l'email. L'offre payante apparaît seulement en dessous, jamais en concurrence avec le cadeau.
+```text
+┌─ Colonne droite (collante) ─────────────┐
+│ [ Sommaire ] [ Mon livre ]   <- 2 onglets│
+│                                          │
+│ Onglet « Mon livre » :                   │
+│  Agent 7/15 · 4/12 chapitres · 9 800 mots│
+│  ▓▓▓▓▓▓░░░░░  progression                │
+│  Chapitre 1 — titre        [texte entier]│
+│  Chapitre 2 — titre        [texte entier]│
+│  … se remplit tout seul pendant l'écriture│
+└──────────────────────────────────────────┘
+```
 
-## La séquence (5 lettres, un objectif par lettre)
+- Deux onglets dans la colonne de droite : **Sommaire** et **Mon livre**. Le clic sur « Voir mon livre » (barre d'actions) ou sur « Lire tous les chapitres écrits » ouvre directement l'onglet « Mon livre » sans quitter la page.
+- L'onglet « Mon livre » affiche le compteur d'agents, les chapitres écrits, le nombre de mots, la barre de progression, puis **le texte complet de chaque chapitre** (dépliable), et non plus un extrait de 900 caractères.
+- Mise à jour automatique pendant la rédaction : chaque chapitre terminé s'ajoute en direct.
+- Boutons en pied de l'onglet : « Corriger mon livre », « Données KDP », « Exporter » — pour enchaîner sans chercher.
+- Sur mobile, les deux onglets restent sous le dialogue, dans le même ordre.
 
-- **V1 — l'annonce des 3 cadeaux** : objet court, sans prix, sans emoji, ton personnel. Promesse dès la première ligne, bouton unique vers la page cadeaux.
-- **V2 — la preuve** : pages réelles d'un livre produit, couverture, fichier prêt pour Amazon. Rappel du cadeau.
-- **V3 — le chapitre offert** : « dites-moi votre sujet, je vous écris le premier chapitre ». Lettre la plus courte des cinq.
-- **V4 — l'objection** : « je n'ai pas le temps / je n'écris pas bien » traitées en trois lignes chacune.
-- **V5 — l'échéance** : dernier rappel de l'offre, cadeaux toujours accessibles.
+## 2. Bouton « Obtenir des avis clients »
 
-Segments : jamais ouverts, ouverts sans clic, cliqueurs. Les cliqueurs sautent V1 et reçoivent une lettre personnelle plus l'offre.
+La page guide existe déjà (`/v3/avis`, dans la barre latérale). Il manque le bouton au bon moment.
 
-## Envoi en masse, propre
-
-- Envoi par lots automatiques dans la limite quotidienne du fournisseur, arrêt propre, reprise le lendemain sans doublon.
-- Exclusion des désabonnés, des adresses en rebond, des clients existants et de toute adresse ayant déjà reçu la même lettre.
-- Test vers votre adresse avant chaque vague, marquage `[TEST]`.
-
-## Mesure, lettre par lettre
-
-Colonnes dans le panneau d'administration : envoyés, ouverts, cliqués, cadeau réclamé, chapitre demandé, commande créée, commande payée. Chaque lien porte la source de la lettre, donc chaque vente est attribuée au message qui l'a produite.
+- Ajout d'un 9e bouton dans la barre d'actions du livre : **« Obtenir des avis clients »**, avec l'icône étoile, qui ouvre `/v3/avis` en passant le titre du livre pour que la séquence d'emails soit déjà personnalisée.
+- Le même bouton apparaît en fin de rédaction, dans l'onglet « Mon livre », une fois le manuscrit terminé — c'est le moment naturel où l'on pense aux avis.
+- Sur `/v3/avis`, le titre reçu est pré-rempli dans le générateur de séquence d'avis (aucune saisie à refaire).
 
 ## Détails techniques
 
-- Nouvelle page publique `/v3/cadeaux` (3 cartes Émeraude & Or, capture email, déblocage immédiat), réutilisation de `/10-niches-offertes` et du PDF existant dans `public/lead-magnets/`.
-- Cadeau chapitre : page `/v3/chapitre-offert` appuyée sur la fonction d'écriture existante (`book-chapter-write`), 1 chapitre par adresse, garde-fou anti-abus.
-- Lettres `v3-cadeaux-1..5` ajoutées dans `send-closing-47` et déclarées dans `src/data/canonicalEmailCampaign.ts` ; segments calculés depuis `sales_prospects`, `email_opens`, `email_clicks`, déduplication via `email_send_log`.
-- Colonnes de résultat ajoutées au panneau de campagne ; suivi des clics via `track-email-click`, source `?src=v3-cadeaux-N`.
-- Aucun changement de tarif.
+- `src/components/v3public/V3GenieOutlinePanel.tsx` : passage à deux onglets internes (`sommaire` / `livre`), l'événement `v3:show-written-book` sélectionne l'onglet `livre`.
+- `src/components/v3public/V3LiveBookProgress.tsx` : variante compacte pour la colonne (props `variant="aside"`), chapitres complets en `<details>` au lieu de l'extrait tronqué, source inchangée (`readWrittenProgress`, `ebook_workflow_progress`).
+- `src/components/v3public/V3BookActionsBar.tsx` : « Voir mon livre » ouvre toujours l'onglet livre (au lieu de rediriger) ; ajout du bouton `⭐ Obtenir des avis clients` vers `/v3/avis?title=…`.
+- `src/pages/v3public/V3AvisClientsPage.tsx` : lecture du paramètre `title` (repli sur le brief en cours) pour pré-remplir la séquence.
+- Aucune modification de base de données, aucun nouvel appel IA : tout vient de l'avancement déjà enregistré.
 
-## Ordre d'exécution
+## Hors périmètre
 
-1. Page cadeaux + cadeau chapitre offert.
-2. Les 5 lettres et les segments.
-3. Colonnes de résultat, puis envoi test, puis première vague en masse.
+Pas de récupération automatique des avis Amazon : `/v3/avis` reste un guide plus un générateur d'emails.
