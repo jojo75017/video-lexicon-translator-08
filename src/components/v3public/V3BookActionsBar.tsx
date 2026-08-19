@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, Rocket, Save, Wand2, BookOpen, BarChart3, Languages, Headphones } from 'lucide-react';
+import { Check, Rocket, Save, Wand2, BookOpen, BarChart3, Languages, Headphones, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { BOOK_BRIEF_EVENT, readBookBrief, writeBookBrief, type BookBrief } from '@/lib/v3/bookBrief';
 import { readWrittenProgress, WRITTEN_CHAPTERS_EVENT } from '@/lib/v3/writtenChapters';
