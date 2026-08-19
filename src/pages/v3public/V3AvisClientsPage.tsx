@@ -1,12 +1,25 @@
-import { useMemo, useState } from 'react';
-import { Star, ShieldCheck, Mail, QrCode, Users, CalendarClock, Copy, Check } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Star, ShieldCheck, Mail, QrCode, Users, CalendarClock, Copy, Check, PlayCircle, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
+import { readBookBrief } from '@/lib/v3/bookBrief';
 
 /**
- * Avis clients Amazon — la marche à suivre, étape par étape.
- * Page purement informative + générateurs de textes prêts à copier
- * (aucun appel IA, aucun crédit consommé).
+ * Avis clients Amazon — la marche à suivre, étape par étape, avec la vidéo
+ * de méthode en tête de page. Page informative + générateurs de textes prêts
+ * à copier (aucun appel IA, aucun crédit consommé).
  */
+
+const VIDEO_ID = '1fvJbcmhM2I';
+
+const VIDEO_POINTS = [
+  'Une invitation à l’avis honnête en fin de livre, jamais au début.',
+  'Vos premiers lecteurs viennent de votre liste email, pas d’Amazon.',
+  'Un seul email le jour de la sortie, une seule relance 10 à 14 jours après.',
+  'Le lien doit mener directement au formulaire d’avis, pas à la page produit.',
+  'Aucun avis acheté, échangé ou offert : c’est la suspension du compte KDP.',
+];
+
 
 const RULES = [
   'Jamais d’avis en échange d’argent, d’un cadeau, d’un service ou d’un exemplaire gratuit conditionné : c’est interdit par Amazon et le livre peut être retiré.',
