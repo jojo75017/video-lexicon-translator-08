@@ -297,9 +297,14 @@ export function getStoredAmbianceId(): string {
   return localStorage.getItem(AMBIANCE_STORAGE_KEY) || 'atelier';
 }
 
+/** Événement diffusé à chaque changement d'ambiance (toutes les vues se resynchronisent). */
+export const AMBIANCE_EVENT = 'ebookstudio:ambiance-changed';
+
 export function setStoredAmbianceId(id: string): void {
   if (typeof window === 'undefined') return;
   localStorage.setItem(AMBIANCE_STORAGE_KEY, id);
+  applyAmbiance(id);
+  window.dispatchEvent(new CustomEvent(AMBIANCE_EVENT, { detail: id }));
 }
 
 const loadedFonts = new Set<string>();
@@ -313,3 +318,34 @@ export function ensureAmbianceFont(ambiance: WritingAmbiance): void {
   document.head.appendChild(link);
   loadedFonts.add(ambiance.fonts.googleFontUrl);
 }
+
+/**
+ * Applique réellement l'ambiance : variables CSS `--amb-*` posées sur la racine
+ * (ou sur un conteneur), plus chargement de la police. Les surfaces d'écriture
+ * portant la classe `.v3-ambiance` suivent immédiatement.
+ */
+export function applyAmbiance(id: string, target?: HTMLElement): WritingAmbiance | undefined {
+  if (typeof document === 'undefined') return undefined;
+  const amb = getAmbianceById(id) || WRITING_AMBIANCES[0];
+  if (!amb) return undefined;
+  ensureAmbianceFont(amb);
+  const el = target || document.documentElement;
+  const p = amb.palette;
+  const vars: Record<string, string> = {
+    '--amb-bg': p.bg,
+    '--amb-surface': p.surface,
+    '--amb-surface-alt': p.surfaceAlt,
+    '--amb-text': p.text,
+    '--amb-muted': p.textMuted,
+    '--amb-accent': p.accent,
+    '--amb-accent-text': p.accentText,
+    '--amb-header-bg': p.headerBg,
+    '--amb-header-text': p.headerText,
+    '--amb-heading-font': `'${amb.fonts.headingFamily}'`,
+    '--amb-body-font': `'${amb.fonts.bodyFamily}'`,
+  };
+  Object.entries(vars).forEach(([k, v]) => el.style.setProperty(k, v));
+  el.setAttribute('data-ambiance', amb.id);
+  return amb;
+}
+
