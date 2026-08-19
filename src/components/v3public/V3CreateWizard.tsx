@@ -17,7 +17,7 @@ import { invokeImageFunction } from '@/lib/aiImageInvoke';
 import { callAIWriting, getProvider, getProviderKey, validateKeyFormat } from '@/services/aiWritingService';
 import TocUltimateGenerator, { type UltimateTocChapter } from '@/components/tools/TocUltimateGenerator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { clearTocForWorkflow, listSourcePassages, parseTocText, readBookBrief, readLatestUltimateToc, writeBookBrief, type BriefOutlineChapter , narrativeForBook } from '@/lib/v3/bookBrief';
+import { BOOK_BRIEF_EVENT, clearTocForWorkflow, listSourcePassages, narrativeForBook, parseTocText, passageForBook, readBookBrief, readLatestUltimateToc, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
 
 
 type WizardCharacter = {
@@ -367,6 +367,18 @@ export default function V3CreateWizard() {
   /** Mots exacts de l'auteur (souvenirs, récit) : transmis aux agents, jamais résumés. */
   const [sourceText, setSourceText] = useState<string>((hub as any).sourceText || '');
 
+  // Une validation Copilot peut arriver pendant que le wizard reste ouvert.
+  // On reprend alors immédiatement le récit retenu, sans attendre un rechargement.
+  useEffect(() => {
+    const syncValidatedNarrative = () => {
+      const latest = readBookBrief();
+      if (!latest) return;
+      setSourceText(narrativeForBook(latest) || latest.sourceText || '');
+    };
+    window.addEventListener(BOOK_BRIEF_EVENT, syncValidatedNarrative);
+    return () => window.removeEventListener(BOOK_BRIEF_EVENT, syncValidatedNarrative);
+  }, []);
+
   const [category, setCategory] = useState(hub.genre || 'Roman');
   const [customCategory, setCustomCategory] = useState('');
   const [tone, setTone] = useState('Inspirant');
@@ -598,7 +610,7 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
       const memories = assigned
         .map((n) => passages[Number(n) - 1])
         .filter(Boolean)
-        .map((text, i) => `  Souvenir ${assigned[i]} (mots de l'auteur, à développer, jamais à résumer) : "${String(text).slice(0, 1500)}"`)
+        .map((text, i) => `  Souvenir ${assigned[i]} (version validée si disponible, à développer, jamais à résumer) : "${String(passageForBook(brief, assigned[i], text)).slice(0, 1500)}"`)
         .join('\n');
       return [
         `Chapitre ${chapter.numero} — ${chapter.titre}`,
@@ -627,8 +639,10 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
       subtitle: subtitle.trim(),
       author: authorName.trim(),
       description: description.trim(),
-      // Le livre part du récit validé : passages corrigés validés, sinon les mots d'origine.
-      sourceText: String(narrativeForBook(currentBrief) || currentBrief.sourceText || sourceText).trim(),
+      // On conserve toujours la matière originale dans la fiche. Les passages
+      // validés restent séparés dans `polished`, afin de ne jamais casser leur
+      // correspondance ni de déclencher une nouvelle correction payante.
+      sourceText: String(currentBrief.sourceText || sourceText).trim(),
 
       category: effectiveCategory,
       genre: effectiveCategory,
@@ -714,10 +728,13 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
     return out.join('\n\n');
   };
 
-  const buildWorkflowDescription = () => [
+  const buildWorkflowDescription = () => {
+    const latestBrief = readBookBrief();
+    const retainedNarrative = String(narrativeForBook(latestBrief) || sourceText).trim();
+    return [
     description.trim(),
-    sourceText.trim()
-      ? `✍️ MATIÈRE BRUTE DE L'AUTEUR — ses mots exacts. RÈGLE ABSOLUE : ne jamais résumer, raccourcir ni supprimer ces souvenirs. Chaque passage doit être DÉVELOPPÉ en scènes complètes (dialogues, sensations, décors), en corrigeant seulement l'orthographe, la grammaire et le style :\n"""${sourceText.trim()}"""`
+    retainedNarrative
+      ? `✍️ MATIÈRE VALIDÉE DE L'AUTEUR — version corrigée approuvée quand elle existe. RÈGLE ABSOLUE : ne jamais résumer, raccourcir ni supprimer ces souvenirs. Chaque passage doit être DÉVELOPPÉ en scènes complètes (dialogues, sensations, décors) :\n"""${retainedNarrative}"""`
       : '',
     `Style demandé : ${tone}.`,
     `Format prévu : ${chapters} chapitres de ${wordsPerChapter} mots minimum chacun (développement obligatoire, jamais de résumé).`,
@@ -729,7 +746,8 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
     bibleUnivers.trim() ? `📚 BIBLE DE L'UNIVERS — cohérence obligatoire pour tous les agents :\n${bibleUnivers.trim()}` : '',
     arbreNarratif.trim() ? `🌳 ARBRE NARRATIF — arcs, embranchements, chronologie :\n${arbreNarratif.trim()}` : '',
     targetPromiseBlock(),
-  ].filter(Boolean).join('\n\n');
+    ].filter(Boolean).join('\n\n');
+  };
 
   const syncProjectId = (id: string | null) => {
     projectIdRef.current = id;
