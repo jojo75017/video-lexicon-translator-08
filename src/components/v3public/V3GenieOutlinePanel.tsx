@@ -222,7 +222,7 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
           </p>
         </div>
 
-        {/* Vos souvenirs : les mots exacts de l'auteur, intégralement conservés */}
+        {/* Vos souvenirs : version corrigée validée par défaut, mots d'origine à un clic */}
         {sourceText ? (
           <div className="mt-3 rounded-2xl border p-3" style={{ borderColor: 'rgba(0,0,0,0.10)' }}>
             <div className="flex items-center justify-between gap-2">
@@ -230,13 +230,28 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
                 Vos souvenirs — texte intégral
               </span>
               <span className="text-[10.5px]" style={{ color: 'var(--v3-muted)' }}>
-                {sourceWords.toLocaleString('fr-FR')} mots · aucun mot supprimé
+                {displayedWords.toLocaleString('fr-FR')} mots · aucun mot supprimé
               </span>
             </div>
+
+            {validatedCount > 0 && (
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                {([['corrected', `Version corrigée (${validatedCount} passage${validatedCount > 1 ? 's' : ''})`], ['original', 'Mes mots d’origine']] as const).map(([id, label]) => (
+                  <button key={id} type="button" onClick={() => setStoryView(id)}
+                    className="rounded-full border px-2.5 py-1 text-[10.5px] transition"
+                    style={{
+                      borderColor: storyView === id ? 'var(--v3-gold, #c9a84c)' : 'rgba(0,0,0,0.12)',
+                      background: storyView === id ? 'rgba(201,168,76,0.12)' : '#fff',
+                      color: 'var(--v3-ink)',
+                    }}>{label}</button>
+                ))}
+              </div>
+            )}
+
             <p className="mt-1.5 whitespace-pre-wrap text-[12px] leading-relaxed" style={{ color: 'var(--v3-ink)' }}>
-              {showStory ? sourceText : `${sourceText.slice(0, 320)}${sourceText.length > 320 ? '…' : ''}`}
+              {showStory ? displayedStory : `${displayedStory.slice(0, 320)}${displayedStory.length > 320 ? '…' : ''}`}
             </p>
-            {sourceText.length > 320 && (
+            {displayedStory.length > 320 && (
               <button type="button" onClick={() => setShowStory((v) => !v)} className="mt-1 text-[11px] underline"
                 style={{ color: 'var(--v3-muted)' }}>
                 {showStory ? 'Replier temporairement' : 'Afficher mon récit intégral'}
@@ -244,6 +259,7 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
             )}
           </div>
         ) : null}
+
 
         {/* Résumé court généré par l'IA : simple étiquette, jamais votre récit */}
         {(brief.description || '').trim() && (
