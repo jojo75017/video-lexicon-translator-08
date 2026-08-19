@@ -53,7 +53,7 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
   const [tab, setTab] = useState<'outline' | 'written'>('outline');
   const [progress, setProgress] = useState<WrittenProgress>({ chapters: [], total: 0, activeIndex: -1 });
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [fixing, setFixing] = useState<number | null>(null);
+  
   // Le récit doit être visible immédiatement : ne jamais donner l'impression
   // qu'il a été remplacé par le court synopsis de l'IA.
   const [showStory, setShowStory] = useState(true);
