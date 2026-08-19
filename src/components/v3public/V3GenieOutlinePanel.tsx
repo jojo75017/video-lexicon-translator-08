@@ -14,6 +14,7 @@ import {
 } from '@/lib/v3/writtenChapters';
 import V3OutlinePanel from './V3OutlinePanel';
 import V3WrittenBookTab from './V3WrittenBookTab';
+import V3BookLivePreview from './V3BookLivePreview';
 
 
 /** Une ligne de réglage : le champ, et le cadenas quand l'auteur a décidé. */
@@ -329,7 +330,11 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
         )}
       </div>
 
+      {/* Aperçu réel du livre, juste sous la fiche du projet */}
+      <V3BookLivePreview brief={brief} />
+
       {/* Réglage avancé : générer ou coller un sommaire complet d'un coup */}
+
       <details className="rounded-[22px] border p-3" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
         <summary className="cursor-pointer text-[11.5px] font-semibold" style={{ color: 'var(--v3-muted)' }}>
           Sommaire complet d’un coup (avancé)
