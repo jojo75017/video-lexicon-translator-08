@@ -109,15 +109,9 @@ export default function V3BookActionsBar({ onLaunch }: { onLaunch: () => void })
           <Save className="h-3.5 w-3.5" /> {saved ? 'Enregistré' : 'Enregistrer mon livre'}
         </button>
 
-        {validated ? (
-          <Link to={projectId ? `/v3/corriger?projectId=${projectId}` : '/v3/corriger'} className="v3-btn v3-btn-outline justify-center text-xs" title={written ? 'Correction professionnelle' : soon}>
-            <Wand2 className="h-3.5 w-3.5" /> Corriger mon livre
-          </Link>
-        ) : (
-          <button type="button" disabled title="Validez d’abord votre sommaire" className="v3-btn v3-btn-outline justify-center text-xs opacity-50">
-            <Wand2 className="h-3.5 w-3.5" /> Corriger mon livre
-          </button>
-        )}
+        <Link to={projectId ? `/v3/corriger?projectId=${projectId}` : '/v3/corriger'} className="v3-btn v3-btn-outline justify-center text-xs" title={written ? 'Correction professionnelle' : soon}>
+          <Wand2 className="h-3.5 w-3.5" /> Corriger mon livre
+        </Link>
 
         <button type="button" onClick={() => requireOutline(showBook)} className="v3-btn v3-btn-outline justify-center text-xs">
           <BookOpen className="h-3.5 w-3.5" /> Voir mon livre{writtenCount ? ` (${writtenCount})` : ''}
@@ -131,25 +125,13 @@ export default function V3BookActionsBar({ onLaunch }: { onLaunch: () => void })
           <BarChart3 className="h-3.5 w-3.5" /> Données KDP
         </button>
 
-        {validated ? (
-          <Link to={projectId ? `/v3/outils/traduction?projectId=${projectId}` : '/v3/outils/traduction'} className="v3-btn v3-btn-outline justify-center text-xs">
-            <Languages className="h-3.5 w-3.5" /> Traduire (10 langues)
-          </Link>
-        ) : (
-          <button type="button" disabled title="Validez d’abord votre sommaire" className="v3-btn v3-btn-outline justify-center text-xs opacity-50">
-            <Languages className="h-3.5 w-3.5" /> Traduire (10 langues)
-          </button>
-        )}
+        <Link to={projectId ? `/v3/outils/traduction?projectId=${projectId}` : '/v3/outils/traduction'} className="v3-btn v3-btn-outline justify-center text-xs">
+          <Languages className="h-3.5 w-3.5" /> Traduire (10 langues)
+        </Link>
 
-        {validated ? (
-          <Link to="/v3/upsells" className="v3-btn v3-btn-outline justify-center text-xs">
-            <Headphones className="h-3.5 w-3.5" /> Version audio (9,99 €)
-          </Link>
-        ) : (
-          <button type="button" disabled title="Validez d’abord votre sommaire" className="v3-btn v3-btn-outline justify-center text-xs opacity-50">
-            <Headphones className="h-3.5 w-3.5" /> Version audio (9,99 €)
-          </button>
-        )}
+        <Link to="/v3/upsells" className="v3-btn v3-btn-outline justify-center text-xs">
+          <Headphones className="h-3.5 w-3.5" /> Version audio (9,99 €)
+        </Link>
 
       </div>
     </div>
