@@ -56,7 +56,7 @@ Outil     Générateur de séquence (titre pré-rempli) → 4 emails, bouton Cop
 - `src/components/v3public/V3GenieOutlinePanel.tsx` : passage à deux onglets internes (`sommaire` / `livre`), l'événement `v3:show-written-book` sélectionne l'onglet `livre`.
 - `src/components/v3public/V3LiveBookProgress.tsx` : variante compacte pour la colonne (props `variant="aside"`), chapitres complets en `<details>` au lieu de l'extrait tronqué, source inchangée (`readWrittenProgress`, `ebook_workflow_progress`).
 - `src/components/v3public/V3BookActionsBar.tsx` : « Voir mon livre » ouvre toujours l'onglet livre (au lieu de rediriger) ; ajout du bouton `⭐ Obtenir des avis clients` vers `/v3/avis?title=…`.
-- `src/pages/v3public/V3AvisClientsPage.tsx` : lecture du paramètre `title` (repli sur le brief en cours) pour pré-remplir la séquence.
+- `src/pages/v3public/V3AvisClientsPage.tsx` : refonte de la page (bandeau, lecteur vidéo `https://www.youtube-nocookie.com/embed/1fvJbcmhM2I`, cartes d'étapes) et lecture du paramètre `title` (repli sur le brief en cours) pour pré-remplir la séquence, générée via `callAIWriting` avec la clé de l'abonné (même logique que `ReviewsBooster`).
 - Aucune modification de base de données, aucun nouvel appel IA : tout vient de l'avancement déjà enregistré.
 
 ## Hors périmètre
