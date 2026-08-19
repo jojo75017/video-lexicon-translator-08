@@ -19,6 +19,8 @@ serve(async (req) => {
     const endingFix = mode === 'ending-fix';
     const edition = mode === 'edition';
     const finalCheck = mode === 'final-check';
+    const dictation = mode === 'dictation';
+
 
     const minLength = endingFix ? 5 : 20;
     if (!chapterContent || chapterContent.length < minLength) {
