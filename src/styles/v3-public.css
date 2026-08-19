@@ -306,3 +306,38 @@
 .dark .v3pub table thead { background-color: var(--v3-cream) !important; }
 .dark .v3pub table td,
 .dark .v3pub table th { border-color: var(--v3-line) !important; }
+
+/* ============ Ambiances d'écriture (variables --amb-* posées par applyAmbiance) ============ */
+.v3-ambiance {
+  --v3-paper: var(--amb-surface, #fbfaf6);
+  --v3-cream: var(--amb-surface-alt, #f5f3ee);
+  --v3-ink: var(--amb-text, #0a1f18);
+  --v3-ink-2: var(--amb-text, #1a2e26);
+  --v3-muted: var(--amb-muted, #5b6b64);
+  --v3-emerald: var(--amb-accent, #064e3b);
+  --v3-emerald-600: var(--amb-accent, #0d7a5f);
+  --v3-emerald-50: var(--amb-surface-alt, #ecf5f1);
+  --v3-gold: var(--amb-accent, #c9a84c);
+  --v3-border: color-mix(in srgb, var(--amb-text, #0a1f18) 14%, transparent);
+  --v3-line: color-mix(in srgb, var(--amb-text, #0a1f18) 12%, transparent);
+  background: var(--amb-bg, transparent);
+  color: var(--amb-text, inherit);
+  border-radius: 26px;
+  padding: 10px;
+  transition: background 200ms ease, color 200ms ease;
+}
+.v3-ambiance .v3-serif,
+.v3-ambiance h1, .v3-ambiance h2, .v3-ambiance h3 {
+  font-family: var(--amb-heading-font, 'Cormorant Garamond'), Georgia, serif;
+}
+.v3-ambiance textarea,
+.v3-ambiance input[type="text"] {
+  font-family: var(--amb-body-font, 'Inter'), system-ui, sans-serif;
+  background: var(--amb-surface, #fff);
+  color: var(--amb-text, inherit);
+}
+.v3-ambiance .v3-card,
+.v3-ambiance details {
+  background: var(--amb-surface, #fff) !important;
+  color: var(--amb-text, inherit);
+}
