@@ -43,6 +43,31 @@ On ajuste le nombre de chapitres ou la longueur cible, et les chiffres bougent e
 - **Export du sommaire** (texte, Word, PDF habillé or) et **« Copier pour la fiche Amazon »** : version courte du sommaire prête à coller dans la description KDP.
 - Verrou après validation, déverrouillage explicite qui préserve les chapitres déjà écrits.
 
+## 7. Mise en forme riche : listes à puces, encadrés, exercices
+
+Le livre ne doit plus être un bloc de paragraphes. Chaque chapitre peut recevoir des **blocs de mise en forme**, choisis dans le sommaire puis respectés à la rédaction et à l'export :
+
+- **Liste à puces** et **liste numérotée** (étapes, matériel, erreurs à éviter) ;
+- **Points clés à retenir** en fin de chapitre (encadré or) ;
+- **Citation / témoignage** mise en valeur ;
+- **Encadré « À savoir »** ou « Attention » ;
+- **Exercice / question au lecteur** avec lignes à remplir ;
+- **Checklist cochable** (parfait pour les guides pratiques) ;
+- **Tableau simple** (comparatif, avant/après) ;
+- **Résumé du chapitre en 3 lignes**.
+
+Fonctionnement : sur chaque chapitre du sommaire, un sélecteur « Blocs de ce chapitre » (puces, points clés, exercice…). Le rédacteur reçoit la consigne et produit vraiment ces blocs ; l'export Word/PDF/Kindle les met en forme (puces réelles, encadrés or, tableaux) au lieu de texte brut. Un bouton **« Appliquer à tous les chapitres »** pose le même gabarit sur le livre entier.
+
+## 8. Autres pistes à valider
+
+- **Bibliothèque de gabarits de chapitre** : « chapitre pratique » (intro + étapes en puces + points clés), « chapitre récit » (scène + réflexion), « chapitre méthode » (problème + solution + exercice).
+- **Ton par chapitre** : un chapitre plus intime, un autre plus pédagogique, sans changer tout le livre.
+- **Durée de lecture** affichée par chapitre (« 9 min ») — utile pour équilibrer.
+- **Illustration suggérée** par chapitre (idée d'image + génération plus tard dans Cover/Illustration Studio).
+- **Bonus de fin de livre** proposés à partir du sommaire (checklist récapitulative, plan d'action, glossaire).
+- **Sommaire multilingue** : le plan validé traduit dans les 10 langues déjà gérées, pour publier la même structure ailleurs.
+
+
 ## Détails techniques
 
 - `src/lib/v3/bookBrief.ts` : `BriefOutlineChapter` gagne `points?: string[]`, `note?: string`, `keyword?: string`, `readerQuestion?: string`, `score?: { promesse; utilite; appui; position }` ; helpers `mergeChapters`, `splitChapter`, `insertChapterAt`, `moveChapter`, `outlineCoverage(outline, passages)`, `outlineDuplicates`.
@@ -52,4 +77,6 @@ On ajuste le nombre de chapitres ou la longueur cible, et les chiffres bougent e
 - `supabase/functions/v3-genie-brief/index.ts` : modes `outline-market` (questions lecteurs + angles libres à partir des données de niche), `outline-points`, `outline-variant`, `outline-improve` (3 titres plus forts pour un chapitre), `outline-fill-gaps`. Repli clé utilisateur → clé serveur → Lovable AI, 100 % français, aucun titre générique.
 - Données marché : réutilise l'analyse de niche Amazon existante (Firecrawl / mots-clés KDP) ; si aucune donnée n'est disponible, le sommaire fonctionne sans le volet marché (dégradation propre, aucun blocage).
 - Nouveaux composants : `V3OutlineScoreBar.tsx`, `V3OutlineBudgetBar.tsx`, `V3OutlineChapterRow.tsx` (drag, actions, points, note, score), `V3OutlineVariantCompare.tsx` — intégrés dans `V3OutlinePanel.tsx` et `V3OutlineCoBuilder.tsx`, glisser-déposer HTML5 natif, aucune nouvelle dépendance.
+- Blocs de mise en forme : `BriefOutlineChapter.blocks?: OutlineBlock[]` (`'bullets' | 'numbered' | 'keypoints' | 'quote' | 'callout' | 'exercise' | 'checklist' | 'table' | 'summary'`) ; nouveau `src/lib/v3/outlineBlocks.ts` (libellés, consignes de rédaction, gabarits de chapitre) injecté dans les prompts de rédaction (`book-chapter-write`, workflow V3) pour que les blocs soient réellement produits en markdown normalisé.
+- Rendu : `V3BookLivePreview.tsx` et l'export (`docxExportEngine`, PDF/EPUB) gèrent puces, listes numérotées, encadrés or, tableaux simples et checklists — parseur markdown léger, aucune nouvelle dépendance.
 - Export : réutilise `docxExportEngine` ; `saveOutlineVersion` accepte un `label`. Aucune nouvelle table, aucun changement de tarif ni de quota.
