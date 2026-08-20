@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { Loader2, RefreshCw, MousePointerClick, Send, BarChart3 } from 'lucide-react';
+import { Loader2, RefreshCw, MousePointerClick, Send, BarChart3, FlaskConical } from 'lucide-react';
+
 
 /**
  * Tunnel complet, d'un seul écran : envoyés → ouvreurs → clics par lien →
@@ -53,6 +55,9 @@ const EmailFunnelPanel = () => {
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [segments, setSegments] = useState<SegmentStat[]>([]);
+  const [testEmails, setTestEmails] = useState('boubetgeorges@gmail.com');
+  const [testResults, setTestResults] = useState<Array<{ email: string; ok: boolean; error?: string }>>([]);
+
 
   /** Appel authentifié à la fonction de campagne. */
   const invoke = async (body: Record<string, unknown>) => {
@@ -163,8 +168,34 @@ const EmailFunnelPanel = () => {
     setBusy(null);
   };
 
+  /** Mode test : envoie l'email 2 (relance) uniquement à la liste restreinte saisie. */
+  const sendTest = async (segment: 'non_openers' | 'clickers') => {
+    const list = testEmails.split(/[,;\s]+/).map((e) => e.trim()).filter(Boolean);
+    if (!list.length) {
+      toast.error('Indiquez au moins une adresse de test.');
+      return;
+    }
+    setBusy('Test relance');
+    try {
+      const { data: result, error } = await invoke({
+        mode: segment === 'non_openers' ? 'resend_non_openers' : 'resend_clickers',
+        step: 1,
+        test_mode: true,
+        test_emails: list,
+      });
+      if (error) throw error;
+      const r = result as Record<string, unknown>;
+      if (r.success === false) throw new Error(String(r.error || 'Envoi de test refusé'));
+      setTestResults((r.results as Array<{ email: string; ok: boolean; error?: string }>) || []);
+      toast.success(`Test envoyé : ${r.sent ?? 0} / ${r.targets ?? 0} adresse(s)`);
+    } catch (err) {
+      toast.error('Test impossible : ' + ((err as Error).message || ''));
+    }
+    setBusy(null);
+  };
   const steps = data
     ? [
+
         { label: 'Emails envoyés', value: data.sent },
         { label: 'Ont ouvert', value: data.openers },
         { label: 'Ont cliqué', value: data.clickers },
@@ -257,7 +288,42 @@ const EmailFunnelPanel = () => {
         )}
       </div>
 
+      <div className="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-4">
+        <h3 className="flex items-center gap-2 text-sm font-bold text-amber-900">
+          <FlaskConical className="h-4 w-4" /> Mode test de la relance (email 2)
+        </h3>
+        <p className="mt-1 text-xs text-amber-800">
+          Envoyez d’abord l’email 2 à vous seul ou à une petite liste. Rien n’est décompté :
+          les destinataires réels restent intacts, vous pourrez lancer l’envoi complet ensuite.
+        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <Input
+            value={testEmails}
+            onChange={(e) => setTestEmails(e.target.value)}
+            placeholder="moi@exemple.fr, ami@exemple.fr"
+            className="h-9 max-w-md bg-white text-sm"
+          />
+          <Button size="sm" disabled={!!busy} onClick={() => sendTest('non_openers')}>
+            {busy === 'Test relance' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+            Tester la relance non-ouvreurs
+          </Button>
+          <Button size="sm" variant="outline" disabled={!!busy} onClick={() => sendTest('clickers')}>
+            Tester la relance cliqueurs
+          </Button>
+        </div>
+        {testResults.length > 0 && (
+          <ul className="mt-3 space-y-1 text-xs">
+            {testResults.map((r) => (
+              <li key={r.email} className={r.ok ? 'text-emerald-700' : 'text-red-700'}>
+                {r.ok ? '✅' : '❌'} {r.email} {r.error ? `— ${r.error}` : ''}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
       <div className="mt-5 flex flex-wrap gap-2">
+
         <Button size="sm" variant="outline" disabled={!!busy} onClick={() => call({ mode: 'resend_non_openers', step: 1, dry_run: true }, 'Simulation non-ouvreurs')}>
           Simuler : non-ouvreurs (48 h)
         </Button>
