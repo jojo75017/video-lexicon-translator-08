@@ -1135,10 +1135,12 @@ Règles :
       toast.warning('Ancien sommaire répétitif remplacé par un plan complet.');
     }
     if (step === 2 && !canStepOutline) {
-      toast.error('Valide le sommaire : chaque chapitre doit avoir un titre et un objectif.');
-      return;
+      // Non bloquant : on complète le plan et on avance.
+      setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
+      toast.info('Sommaire complété automatiquement — tu peux le modifier à tout moment.');
     }
     if (step === 3 && !finalTitle.trim()) setFinalTitle(title);
+
     setStep((value) => Math.min(4, value + 1));
   };
 
