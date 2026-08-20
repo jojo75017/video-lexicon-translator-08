@@ -427,9 +427,16 @@ Règles :
             Proposer le chapitre {outline.length + 1}
           </button>
         )}
+        {outline.length > 0 && (
+          <button type="button" onClick={enrichOutline} disabled={enriching} className="v3-btn v3-btn-outline disabled:opacity-60">
+            {enriching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            Enrichir le sommaire (points + mots-clés)
+          </button>
+        )}
         <button type="button" onClick={addChapter} className="v3-btn v3-btn-outline">
           <Plus className="h-4 w-4" /> Chapitre vide
         </button>
+
         <button type="button" onClick={importUltimate} className="v3-btn v3-btn-outline">
           <RefreshCw className="h-4 w-4" /> Importer mon Sommaire Ultime
         </button>
