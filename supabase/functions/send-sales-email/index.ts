@@ -340,8 +340,13 @@ Deno.serve(async (req) => {
     await loadVideoUrl(db);
     const { data: cronSecret } = await db.from("app_secrets").select("value").eq("key", "cron_secret").maybeSingle();
     const hasCronSecret = !!cronSecret?.value && req.headers.get("x-cron-secret") === cronSecret.value;
-    if (mode === "auto" || mode === "auto_non_openers") {
+    const isAuto = mode === "auto" || mode === "auto_non_openers" || mode === "auto_clickers" || mode === "auto_pending";
+    if (isAuto) {
       if (!hasCronSecret) return respond({ error: "Non autorisé" }, 401);
+      const { data: paused } = await db.from("app_secrets").select("value").eq("key", "email_automation_paused").maybeSingle();
+      if (paused?.value === "true") {
+        return respond({ success: true, paused: true, sent: 0, message: "Automation paused by admin" });
+      }
     } else if (!hasCronSecret && !(await isAdmin(req, baseUrl))) return respond({ error: "Accès administrateur requis" }, 403);
 
 
