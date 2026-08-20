@@ -347,16 +347,8 @@ Règles :
     }
   };
 
-    const text = outlineToText(brief, outline);
-    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `sommaire-${(brief.title || 'livre').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 50)}.txt`;
-    link.click();
-    URL.revokeObjectURL(url);
-    toast.success('Sommaire exporté (titres, objectifs, points, mise en forme).');
-  };
+
+
 
   const updateChapter = (index: number, patch: Partial<BriefOutlineChapter>) => {
     const next = outline.map((c, i) => (i === index ? { ...c, ...patch } : c));
