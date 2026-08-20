@@ -1599,6 +1599,9 @@ Règles :
               category={effectiveCategory}
               coverUrl={coverUrl}
               initialDescription={completedBook?.backCover?.description || ''}
+              initialKeywords={readKdpMetaFromResults().keywords}
+              initialCategories={readKdpMetaFromResults().categories}
+
               manuscript={(completedBook.chapters || []).map((c: any, index: number) => {
                 const validatedOutlineTitle = normalizedOutline[index]?.titre?.trim();
                 const generatedTitle = typeof c.title === 'string' ? c.title.trim() : '';
