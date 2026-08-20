@@ -165,13 +165,56 @@ const EmailFunnelPanel = () => {
         )}
       </div>
 
+      <div className="mt-5">
+        <h3 className="flex items-center gap-2 text-sm font-bold text-slate-700">
+          <BarChart3 className="h-4 w-4" /> Résultats par segment (étape 1)
+        </h3>
+        <p className="mt-1 text-xs text-slate-500">
+          La relance des non-ouvreurs part 48 h après l’email d’origine, avec un message différent
+          (aucun prix) et un nouveau bouton : « Récupérer mes 2 cadeaux ».
+        </p>
+        {segments.length > 0 ? (
+          <div className="mt-2 overflow-x-auto rounded-lg border">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 text-[11px] uppercase tracking-wide text-slate-500">
+                <tr>
+                  <th className="px-3 py-2 text-left">Segment</th>
+                  <th className="px-3 py-2 text-right">Envoyés</th>
+                  <th className="px-3 py-2 text-right">Ouvertures</th>
+                  <th className="px-3 py-2 text-right">Clics</th>
+                  <th className="px-3 py-2 text-right">Échecs</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {segments.map((s) => (
+                  <tr key={s.template}>
+                    <td className="px-3 py-2 text-slate-700">{s.label}</td>
+                    <td className="px-3 py-2 text-right font-semibold text-slate-900">{s.sent}</td>
+                    <td className="px-3 py-2 text-right text-slate-700">{s.unique_opens} <span className="text-xs text-slate-400">({s.open_rate}%)</span></td>
+                    <td className="px-3 py-2 text-right text-slate-700">{s.unique_clicks} <span className="text-xs text-slate-400">({s.click_rate}%)</span></td>
+                    <td className="px-3 py-2 text-right text-slate-500">{s.failed}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <Button className="mt-2" size="sm" variant="outline" onClick={loadSegments} disabled={!!busy}>
+            Afficher les métriques par segment
+          </Button>
+        )}
+      </div>
+
       <div className="mt-5 flex flex-wrap gap-2">
         <Button size="sm" variant="outline" disabled={!!busy} onClick={() => call({ mode: 'resend_non_openers', step: 1, dry_run: true }, 'Simulation non-ouvreurs')}>
-          Simuler : non-ouvreurs
+          Simuler : non-ouvreurs (48 h)
         </Button>
         <Button size="sm" disabled={!!busy} onClick={() => call({ mode: 'resend_non_openers', step: 1 }, 'Envoi non-ouvreurs')}>
           {busy === 'Envoi non-ouvreurs' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
           Envoyer aux non-ouvreurs
+        </Button>
+        <Button size="sm" variant="outline" disabled={!!busy} onClick={previewNonOpener}>
+          Aperçu de l’email non-ouvreurs
         </Button>
         <Button size="sm" variant="outline" disabled={!!busy} onClick={() => call({ mode: 'resend_clickers', step: 1, dry_run: true }, 'Simulation cliqueurs')}>
           Simuler : cliqueurs
