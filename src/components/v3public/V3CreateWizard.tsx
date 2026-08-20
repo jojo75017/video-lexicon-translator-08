@@ -615,6 +615,8 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
       return [
         `Chapitre ${chapter.numero} — ${chapter.titre}`,
         `Objectif : ${chapter.objectif || 'Objectif éditorial à préciser.'}`,
+        chapterInstructions((brief.outline || [])[index] || (chapter as BriefOutlineChapter)),
+
         memories,
       ].filter(Boolean).join('\n');
     })
