@@ -65,6 +65,16 @@ Email / pub / blog
 - Les bandeaux et pages qui affichent encore 47 € à vie, 59 €, 67 €, 197 € ou 547 € sont retirés ou réécrits sur les trois forfaits 27 / 47 / 97.
 - Le bandeau global devient : « Écrivez votre premier chapitre gratuitement — ouverture le 1er octobre ».
 
+### 7. Pilotage depuis votre compte admin
+Nouvel onglet **« Lancement 1er septembre »** dans le tableau de bord admin, réservé aux administrateurs (rôle vérifié côté serveur) :
+- **Chiffres du jour** : essais lancés, chapitres livrés, emails captés, inscriptions, taux de conversion essai → abonné, répartition Plume / Édition / Studio Pro.
+- **Liste des essais** : idée du livre, email, date, chapitre consultable en un clic, statut (livré, converti, abandonné), export CSV.
+- **Liste d'attente** : membres inscrits, forfait choisi, rang, date de fin du mois offert, relance individuelle possible.
+- **Emails** : les 5 messages de la séquence avec statut par destinataire (envoyé, en attente, erreur), envoi manuel d'une vague et test sur votre adresse.
+- **Interrupteurs** : ouvrir / fermer l'essai gratuit, ouvrir la V3 (bascule du 1er octobre), fermer l'offre « premier mois offert » — sans republier le site.
+- **Contrôle qualité** : un bloc qui vérifie automatiquement qu'aucun ancien prix (59, 67, 197, 547 €) ne subsiste dans les pages du tunnel, et que les prix Stripe 27 / 47 / 97 sont bien en place.
+
+
 ## Détails techniques
 
 - Nouvelle table `trial_chapters` : email, idée, chapitre généré, sommaire, IP, date, `converted_user_id`. RLS : lecture par le propriétaire une fois lié, écriture via edge function ; GRANT explicites.
