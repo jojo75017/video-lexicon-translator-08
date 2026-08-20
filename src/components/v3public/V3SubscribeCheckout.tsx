@@ -8,9 +8,19 @@ interface Props {
   priceId: string;
   planName: string;
   onClose: () => void;
+  /** Offre de lancement : première facture au 1er novembre 2026. */
+  firstMonthFree?: boolean;
+  /** Où revenir après le paiement (défaut : page de remerciement V3). */
+  returnUrl?: string;
 }
 
-export default function V3SubscribeCheckout({ priceId, planName, onClose }: Props) {
+export default function V3SubscribeCheckout({
+  priceId,
+  planName,
+  onClose,
+  firstMonthFree,
+  returnUrl,
+}: Props) {
   const [email, setEmail] = useState('');
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,21 +37,25 @@ export default function V3SubscribeCheckout({ priceId, planName, onClose }: Prop
 
   const fetchClientSecret = useCallback(async (): Promise<string> => {
     const { data: { user } } = await supabase.auth.getUser();
-    const returnUrl = `${window.location.origin}/v3/offres/merci?session_id={CHECKOUT_SESSION_ID}&plan=${encodeURIComponent(planName)}`;
+    const target =
+      returnUrl ??
+      `${window.location.origin}/v3/offres/merci?session_id={CHECKOUT_SESSION_ID}&plan=${encodeURIComponent(planName)}`;
     const { data, error } = await supabase.functions.invoke('v3-subscription-checkout', {
       body: {
         priceId,
         email: user?.email || email,
         userId: user?.id,
         environment: getStripeEnvironment(),
-        returnUrl,
+        returnUrl: target,
+        firstMonthFree: firstMonthFree === true,
       },
     });
     if (error || !data?.clientSecret) {
       throw new Error(error?.message || data?.error || 'Impossible de créer la session de paiement');
     }
     return data.clientSecret as string;
-  }, [priceId, email, planName]);
+  }, [priceId, email, planName, firstMonthFree, returnUrl]);
+
 
   return (
     <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
