@@ -413,14 +413,26 @@ export function parseTocText(text: string): BriefOutlineChapter[] {
 export function normalizeOutline(items: BriefOutlineChapter[]): BriefOutlineChapter[] {
   return (items || [])
     .map((item) => ({
+      ...item,
       numero: 0,
       titre: String(item?.titre || '').trim(),
       objectif: String(item?.objectif || '').trim(),
       period: String(item?.period || '').trim() || undefined,
+      points: Array.isArray(item?.points)
+        ? item!.points!.map((p) => String(p || '').trim()).filter(Boolean)
+        : undefined,
+      note: String(item?.note || '').trim() || undefined,
+      keyword: String(item?.keyword || '').trim() || undefined,
+      readerQuestion: String(item?.readerQuestion || '').trim() || undefined,
+      tone: String(item?.tone || '').trim() || undefined,
+      wordsTarget: Number(item?.wordsTarget) > 0 ? Math.round(Number(item!.wordsTarget)) : undefined,
+      blocks: Array.isArray(item?.blocks) ? (item!.blocks!.filter(Boolean) as OutlineBlockId[]) : undefined,
+      locked: item?.locked ? true : undefined,
       sources: Array.isArray(item?.sources)
         ? item!.sources!.map((n) => Number(n)).filter((n) => Number.isFinite(n) && n > 0)
         : undefined,
     }))
+
     .filter((item) => item.titre.length >= 2)
     .map((item, index) => ({ ...item, numero: index + 1 }));
 }
