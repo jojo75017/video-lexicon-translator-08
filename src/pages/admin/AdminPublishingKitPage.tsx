@@ -56,7 +56,7 @@ export default function AdminPublishingKitPage({ embedded = false }: { embedded?
         </div>}
 
         <header className="space-y-2">
-          <Badge variant="outline" className="text-xs">Campagne 47 € — jusqu'au 30/09/2026</Badge>
+          <Badge variant="outline" className="text-xs">Campagne 47 € — jusqu'au 31/08/2026</Badge>
           <h1 className="text-3xl font-bold tracking-tight">Kit de publication</h1>
           <p className="text-muted-foreground max-w-2xl">
             {FACEBOOK_POSTS.length} posts Facebook et {PINTEREST_PINS.length} épingles Pinterest, visuels inclus.
