@@ -68,6 +68,10 @@ const UpsellPaiementPage = lazy(() => import('./pages/UpsellPaiementPage'));
 const V3CommandePage = lazy(() => import('./pages/V3CommandePage'));
 const V3PaiementPage = lazy(() => import('./pages/V3PaiementPage'));
 const SalesPageV3Launch = lazy(() => import('./pages/SalesPageV3Launch'));
+const EssaiPage = lazy(() => import('./pages/launch/EssaiPage'));
+const EssaiInscriptionPage = lazy(() => import('./pages/launch/EssaiInscriptionPage'));
+const V3WaitingRoomPage = lazy(() => import('./pages/launch/V3WaitingRoomPage'));
+const AdminLancementPage = lazy(() => import('./pages/admin/AdminLancementPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 // V3 hub + public site
@@ -395,6 +399,9 @@ const App = () => {
             {/* Tunnel de commande : toujours accessible (les CTA emails/bannières doivent
                 arriver sur le paiement, même pour un admin ou un abonné connecté). */}
             <Route path="/commander" element={<V3CommanderPage />} />
+            <Route path="/essai" element={<EssaiPage />} />
+            <Route path="/essai/inscription" element={<EssaiInscriptionPage />} />
+            <Route path="/v3/attente" element={<V3WaitingRoomPage />} />
 
 
 
@@ -561,6 +568,7 @@ const App = () => {
             <Route path="/admin/cleanup" element={<AdminGate><Navigate to="/admin/plans-v3" replace /></AdminGate>} />
             <Route path="/admin/plans-v3" element={<AdminGate><AdminPlansV3Page /></AdminGate>} />
             <Route path="/admin/attente" element={<AdminGate><AdminAttentePage /></AdminGate>} />
+            <Route path="/admin/lancement" element={<AdminLancementPage />} />
             <Route path="/admin/kit-publication" element={<AdminGate><AdminPublishingKitPage /></AdminGate>} />
             <Route path="/admin/tester-paypal" element={<AdminGate><AdminTestPayPalPage /></AdminGate>} />
             <Route path="/admin-paiements" element={<AdminGate><AdminPaymentsDashboardPage /></AdminGate>} />
