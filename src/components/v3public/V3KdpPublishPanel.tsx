@@ -13,7 +13,11 @@ interface V3KdpPublishPanelProps {
   coverUrl?: string | null;
   initialDescription?: string;
   initialKeywords?: string[];
+  initialCategories?: string[];
+  /** Remplit automatiquement mots-clés + catégories avec l'IA quand ils sont vides. */
+  autoFill?: boolean;
 }
+
 
 const BISAC_SUGGESTIONS = [
   'FICTION / Thrillers / Suspense',
