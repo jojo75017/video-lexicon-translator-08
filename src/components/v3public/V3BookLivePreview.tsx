@@ -20,6 +20,67 @@ function paragraphsOf(text: string): string[] {
     .filter(Boolean);
 }
 
+/**
+ * Rend une ligne du manuscrit en respectant la mise en forme riche demandée dans
+ * le sommaire : puces, listes numérotées, checklists, citations et encadrés.
+ */
+function renderLine(line: string, key: number) {
+  const bullet = line.match(/^[-•*]\s+(.*)$/);
+  if (bullet) {
+    return (
+      <p key={key} className="flex gap-2 pl-3">
+        <span style={{ color: 'var(--v3-gold, #c9a84c)' }}>•</span>
+        <span>{bullet[1]}</span>
+      </p>
+    );
+  }
+  const numbered = line.match(/^(\d+)[.)]\s+(.*)$/);
+  if (numbered) {
+    return (
+      <p key={key} className="flex gap-2 pl-3">
+        <span className="font-bold" style={{ color: 'var(--v3-accent, #8C6A3F)' }}>{numbered[1]}.</span>
+        <span>{numbered[2]}</span>
+      </p>
+    );
+  }
+  const checkbox = line.match(/^\[\s?[xX]?\s?\]\s+(.*)$/);
+  if (checkbox) {
+    return (
+      <p key={key} className="flex gap-2 pl-3">
+        <span style={{ color: 'var(--v3-muted)' }}>☐</span>
+        <span>{checkbox[1]}</span>
+      </p>
+    );
+  }
+  if (line.startsWith('>')) {
+    return (
+      <p key={key} className="border-l-2 pl-3 italic" style={{ borderColor: 'var(--v3-gold, #c9a84c)', color: 'var(--v3-muted)' }}>
+        {line.replace(/^>\s?/, '')}
+      </p>
+    );
+  }
+  if (/^(À retenir|A retenir|Exercice|Attention)\s*:/i.test(line)) {
+    return (
+      <p key={key} className="rounded-xl border px-3 py-2 text-[14px]"
+        style={{ borderColor: 'var(--v3-gold, #c9a84c)', background: 'rgba(201,168,76,0.10)' }}>
+        {line}
+      </p>
+    );
+  }
+  if (line.startsWith('|')) {
+    const cells = line.split('|').map((c) => c.trim()).filter(Boolean);
+    if (cells.every((c) => /^:?-{2,}:?$/.test(c))) return null;
+    return (
+      <p key={key} className="grid gap-2 rounded-lg border px-3 py-1.5 text-[13.5px]"
+        style={{ borderColor: 'var(--v3-border)', gridTemplateColumns: `repeat(${Math.max(1, cells.length)}, minmax(0,1fr))` }}>
+        {cells.map((cell, ci) => <span key={ci}>{cell}</span>)}
+      </p>
+    );
+  }
+  return (
+    <p key={key} style={key === 0 ? undefined : { textIndent: '1.4em' }} className="text-justify">{line}</p>
+  );
+
 export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
   const [progress, setProgress] = useState<WrittenProgress>({ chapters: [], total: 0, activeIndex: -1 });
   const [open, setOpen] = useState(true);
