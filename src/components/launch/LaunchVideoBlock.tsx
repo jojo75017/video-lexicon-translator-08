@@ -1,38 +1,66 @@
-import { PlayCircle } from 'lucide-react';
+import { Play, Headphones } from 'lucide-react';
 import useLaunchSettings from '@/hooks/useLaunchSettings';
 
-/**
- * Bloc vidéo de lancement. Le lien est réglé dans /admin/lancement
- * (clé `launch_video`) : si aucun lien n'est enregistré, rien ne s'affiche.
- */
-export default function LaunchVideoBlock({ className = '' }: { className?: string }) {
-  const { settings } = useLaunchSettings();
+interface LaunchVideoBlockProps {
+  className?: string;
+}
+
+/** Bloc média de lancement. Affiche une vidéo (lien externe) ou un lecteur audio (mp3). */
+export default function LaunchVideoBlock({ className = '' }: LaunchVideoBlockProps) {
+  const { settings, loading } = useLaunchSettings();
   const url = String(settings.launch_video?.url || '').trim();
-  if (!url || settings.launch_video?.enabled === false) return null;
+  const kind = settings.launch_video?.kind || (url.endsWith('.mp3') ? 'audio' : 'video');
+
+  if (loading || !url) return null;
+
+  if (kind === 'audio' || url.endsWith('.mp3')) {
+    return (
+      <div className={`rounded-2xl border border-[#D4AF37]/30 bg-[#0F2E1F] p-5 text-white ${className}`}>
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+              <Headphones className="h-3.5 w-3.5" /> Message audio — 2 minutes
+            </p>
+            <p className="mt-1 max-w-md text-sm leading-relaxed text-white/90">
+              Écoutez le message complet : pourquoi EbookStudio change la publication sur Amazon,
+              et comment prendre l'accès à vie à 47 € avant le 31 août.
+            </p>
+          </div>
+          <a
+            href="/message"
+            className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#D4AF37] px-5 py-3 text-sm font-bold text-[#2A2118] transition hover:brightness-110"
+          >
+            <Play className="h-4 w-4 fill-current" /> Écouter le message
+          </a>
+        </div>
+        <audio controls className="mt-4 w-full" preload="metadata">
+          <source src={url} type="audio/mpeg" />
+          Votre navigateur ne supporte pas la lecture audio.
+        </audio>
+      </div>
+    );
+  }
 
   return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`flex flex-wrap items-center gap-3 rounded-2xl px-5 py-4 no-underline ${className}`}
-      style={{ background: 'linear-gradient(120deg,#064e3b,#0b3b2f)', border: '1px solid #C9A84C' }}
-    >
-      <PlayCircle className="h-8 w-8 shrink-0" style={{ color: '#C9A84C' }} />
-      <span className="min-w-[200px] flex-1">
-        <span className="block text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: '#C9A84C' }}>
-          La vidéo — 2 minutes
-        </span>
-        <span className="block text-[15px] font-semibold text-white">
-          Un livre complet, du sommaire au fichier prêt pour Amazon
-        </span>
-      </span>
-      <span
-        className="rounded-lg px-4 py-2 text-[13px] font-bold"
-        style={{ background: '#C9A84C', color: '#0b2b22' }}
-      >
-        Regarder
-      </span>
-    </a>
+    <div className={`rounded-2xl border border-[#D4AF37]/30 bg-[#0F2E1F] p-5 text-white ${className}`}>
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+            <Play className="h-3.5 w-3.5" /> La vidéo — 2 minutes
+          </p>
+          <p className="mt-1 max-w-md text-sm leading-relaxed text-white/90">
+            Je vous montre un livre complet, du sommaire au fichier prêt pour Amazon.
+          </p>
+        </div>
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#D4AF37] px-5 py-3 text-sm font-bold text-[#2A2118] transition hover:brightness-110"
+        >
+          <Play className="h-4 w-4 fill-current" /> Regarder la vidéo
+        </a>
+      </div>
+    </div>
   );
 }
