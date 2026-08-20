@@ -201,10 +201,9 @@ export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
               </p>
               <h4 className="v3-serif mt-1 text-center text-xl font-bold" style={{ color: 'var(--v3-ink)' }}>{c.title}</h4>
               <div className="v3-serif mt-4 space-y-3 text-[14.5px] leading-[1.8]" style={{ color: 'var(--v3-ink)' }}>
-                {paragraphsOf(c.text).map((p, pi) => (
-                  <p key={pi} style={pi === 0 ? undefined : { textIndent: '1.4em' }} className="text-justify">{p}</p>
-                ))}
+                {paragraphsOf(c.text).map((p, pi) => renderLine(p, pi))}
               </div>
+
             </article>
           ))}
         </div>
