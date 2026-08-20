@@ -15,6 +15,7 @@ import { COMMANDER_URL } from "@/data/externalLinks";
 import { V3_LAUNCH_BONUSES, V3_BONUSES_TOTAL_VALUE } from "@/data/v3Launch";
 import { trackCaptureEvent } from "@/lib/captureTracking";
 import { V3EngineStrip, V3EngineGrid } from "@/components/v3public/V3EngineBanner";
+import V3LaunchBanner from "@/components/v3public/V3LaunchBanner";
 import Niches10Offer from "@/components/marketing/Niches10Offer";
 import heroBooks from "@/assets/commander-hero-books.jpg";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -46,7 +47,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "Pourquoi commander maintenant ?",
-    a: "Le tarif 47 € est valable jusqu'au 30 septembre (59 € ensuite). À partir du 1er octobre, EbookStudio passe uniquement en abonnement : Plume 27 € par mois, Édition 47 €, Studio Pro 97 € (tout inclus). L'accès à vie n'existera plus.",
+    a: "Le tarif 47 € est valable jusqu'au 31 août (59 € ensuite). À partir du 1er octobre, EbookStudio passe uniquement en abonnement : Plume 27 € par mois, Édition 47 €, Studio Pro 97 € (tout inclus). L'accès à vie n'existera plus.",
   },
   {
     q: "Comment mon accès est-il ouvert après le paiement ?",
@@ -226,6 +227,7 @@ export default function V3CommanderPage() {
         canonical={COMMANDER_URL}
       />
       <PaymentTestModeBanner />
+      <V3LaunchBanner compact />
 
       <section className="mx-auto max-w-6xl px-4 py-12 md:py-16">
         {/* HERO — nouvelle mise en page éditoriale */}
