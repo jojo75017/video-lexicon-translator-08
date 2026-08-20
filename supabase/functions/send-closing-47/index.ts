@@ -157,12 +157,12 @@ const LETTERS: Letter[] = [
     key: "clic-b4",
     label: "B4 — Échéance : l'accès à vie disparaît",
     subject: "Après le 30 septembre, ce tarif n'existe plus",
-    subjectB: "47 € une fois, ou 204 € par an",
+    subjectB: "47 € une fois, ou 324 € par an",
     preheader: "Le calcul est simple, et la date ne bougera pas.",
     segment: "openers_no_click",
     primary: "checkout",
     price: true,
-    body: `<p style="margin:0 0 18px">Jusqu'au <strong>30 septembre 2026</strong>, EbookStudio est accessible pour <strong>47 €, une seule fois, à vie</strong>. À partir du 1<sup>er</sup> octobre, il ne restera que l'abonnement : 17 € par mois, soit <strong>204 € la première année</strong>, et autant les suivantes.</p>
+    body: `<p style="margin:0 0 18px">Jusqu'au <strong>30 septembre 2026</strong>, EbookStudio est accessible pour <strong>47 €, une seule fois, à vie</strong>. À partir du 1<sup>er</sup> octobre, il ne restera que l'abonnement : 27 € par mois, soit <strong>324 € la première année</strong>, et autant les suivantes.</p>
 <p style="margin:0 0 18px">Avec l'accès à vie, vous gardez tout : la rédaction complète de vos livres, les exports Word et PDF aux normes Amazon KDP, les couvertures avec dos calculé, la fiche de vente, les livres illustrés pour enfants — et les nouveaux outils au fur et à mesure, sans repayer.</p>
 <p style="margin:0 0 14px;font:700 17px Arial,Helvetica,sans-serif">Ce qui lève le risque</p>
 <p style="margin:0 0 12px"><strong>Garantie 30 jours</strong> : remboursé sur simple demande, sans justification.</p>
@@ -197,7 +197,7 @@ const LETTERS: Letter[] = [
     primary: "checkout",
     price: true,
     body: `<p style="margin:0 0 18px">Dernier message sur cette offre, et il est court.</p>
-<p style="margin:0 0 18px">Le <strong>30 septembre 2026</strong>, l'accès à vie à 47 € disparaît. Ensuite, c'est 17 € par mois, soit 204 € la première année.</p>
+<p style="margin:0 0 18px">Le <strong>30 septembre 2026</strong>, l'accès à vie à 47 € disparaît. Ensuite, c'est 27 € par mois, soit 324 € la première année.</p>
 <p style="margin:0 0 12px"><strong>Garantie 30 jours</strong> : remboursé sur simple demande.</p>
 <p style="margin:0 0 12px"><strong>2 × 25 € ou 3 × 18 €</strong>, accès ouvert dès la première échéance.</p>
 <p style="margin:0 0 12px"><strong>PayPal ou carte bancaire</strong>, au choix sur la page de paiement.</p>
@@ -247,7 +247,7 @@ function ctaButton(link: string, label: string) {
 
 /** Rappel discret de l'offre, quand l'email n'a pas pour but de vendre. */
 function softOfferLine(link: string) {
-  return `<p style="margin:0 0 18px;font:14px/1.6 Arial,Helvetica,sans-serif;color:#4b5563">Si vous voulez aller plus loin : l'accès complet est à 47 € une seule fois, à vie, jusqu'au 30 septembre 2026 (ensuite 17 €/mois). <a href="${link}" style="color:#008296">Voir l'offre</a>.</p>`;
+  return `<p style="margin:0 0 18px;font:14px/1.6 Arial,Helvetica,sans-serif;color:#4b5563">Si vous voulez aller plus loin : l'accès complet est à 47 € une seule fois, à vie, jusqu'au 30 septembre 2026 (ensuite 27 €/mois). <a href="${link}" style="color:#008296">Voir l'offre</a>.</p>`;
 }
 
 function render(baseUrl: string, email: string, firstName: string, letter: Letter, subject: string) {

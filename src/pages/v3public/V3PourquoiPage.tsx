@@ -229,22 +229,23 @@ export default function V3PourquoiPage() {
         <div className="grid md:grid-cols-2 gap-4 mt-2">
           <PlanCard
             name="Plume"
-            price="17 €"
+            price="27 €"
             per="/ mois"
-            highlights={['170 € / an (2 mois offerts)', '10 livres / mois', 'Exports KDP', 'Correcteur IA']}
+            highlights={['270 € / an (2 mois offerts)', '30 livres / mois', 'Exports KDP', 'Correcteur IA']}
           />
           <PlanCard
             name="Édition"
             recommended
-            price="27 €"
+            price="47 €"
             per="/ mois"
-            highlights={['270 € / an (2 mois offerts)', 'Livres illimités', 'Traduction 10 langues', 'Cover Studio Pro']}
+            highlights={['470 € / an (2 mois offerts)', 'Livres illimités', 'Traduction 10 langues', 'Cover Studio Pro']}
           />
         </div>
         <p className="text-xs text-[#6B7280] mt-4">
-          En ce moment, l'accès à vie à 47 € reste disponible jusqu'au 31/08/2026. Les abonnements Plume et
-          Édition démarrent le 1er octobre 2026.
+          Studio Pro : 97 € / mois (970 € / an) — tous les compléments inclus. Les abonnements
+          démarrent le 1<sup>er</sup> octobre 2026, avec le premier mois offert.
         </p>
+
       </Section>
 
 

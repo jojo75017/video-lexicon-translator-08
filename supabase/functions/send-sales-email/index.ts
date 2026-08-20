@@ -195,10 +195,11 @@ const SITE = "https://ebookstudio.fr";
 
 /** Relais de clic sur notre domaine (/r) : chaque lien de l'email est mesuré,
  *  y compris l'audio et le MP3 — sinon on pilote à l'aveugle. `lk` identifie le lien. */
-function trackedUrl(email: string, step: number, destination: string, tag: string) {
+function trackedUrl(email: string, step: number, destination: string, tag: string, template?: string) {
   const sep = destination.includes("?") ? "&" : "?";
   const dest = `${destination}${sep}lk=${tag}`;
-  return `${SITE}/r?e=${encodeURIComponent(email)}&s=${step}&t=${templateName(step)}&u=${encodeURIComponent(dest)}`;
+  const t = template || templateName(step);
+  return `${SITE}/r?e=${encodeURIComponent(email)}&s=${step}&t=${t}&u=${encodeURIComponent(dest)}`;
 }
 
 function trackedLink(_baseUrl: string, email: string, step: number) {
@@ -281,6 +282,43 @@ ${c.doubleCta ? ctaButton(link, "J’accède à EbookStudio pour 47 €") : ""}
 </table></td></tr></table><img src="${pixel}" width="1" height="1" alt="" style="display:none"></body></html>`;
 }
 
+/** Gabarit de relance des non-ouvreurs (envoyé 48 h après l'email d'origine).
+ *  Message entièrement différent : pas de prix, pas de vente — un seul geste,
+ *  récupérer les deux cadeaux. Suivi propre au segment (`-non-ouvreurs`). */
+export const NON_OPENER_SUBJECTS = [
+  "Vos 2 cadeaux vous attendent (10 niches + le kit)",
+  "Je vous ai mis 10 niches de côté",
+];
+
+function renderNonOpener(baseUrl: string, email: string, firstName: string, step: number) {
+  const tpl = `${templateName(step)}-non-ouvreurs`;
+  const gift = trackedUrl(email, step, `${SITE}/cadeau?src=${CAMPAIGN}-non-ouvreurs&email=${encodeURIComponent(email)}`, "cadeau2", tpl);
+  const trial = trackedUrl(email, step, `${SITE}/essai?src=${CAMPAIGN}-non-ouvreurs&email=${encodeURIComponent(email)}`, "essai", tpl);
+  const unsubscribe = `${baseUrl}/functions/v1/unsubscribe?email=${encodeURIComponent(email)}&seq=all`;
+  const pixel = `${baseUrl}/functions/v1/track-email-open?e=${encodeURIComponent(email)}&s=${step}&t=${tpl}`;
+  return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#f6f7f8;padding:24px 10px">
+<div style="display:none;font-size:1px;color:#f6f7f8;max-height:0;overflow:hidden">Deux cadeaux, rien à payer : 10 niches Amazon analysées et le kit de démarrage.</div>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse"><tr><td align="center">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width:600px;width:100%;background:#ffffff;border:1px solid #e5e7eb;border-collapse:collapse">
+<tr><td style="background:#064e3b;padding:18px 28px;color:#ffffff;font:700 22px Arial,Helvetica,sans-serif">EbookStudio</td></tr>
+<tr><td style="padding:26px 28px 0;color:#232F3E;font:16px/1.65 Arial,Helvetica,sans-serif">
+<p style="margin:0 0 18px">Bonjour${firstName ? ` ${firstName}` : ""},</p>
+<h1 style="margin:0 0 16px;font:700 25px/1.3 Arial,Helvetica,sans-serif;color:#232F3E">Mon message précédent est passé inaperçu — ce n'est pas grave.</h1>
+<p style="margin:0 0 18px">Je ne vais donc rien vous vendre aujourd'hui. Je vous laisse simplement deux documents que j'ai préparés pour les auteurs qui débutent sur Amazon KDP :</p>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:0 0 20px">
+<tr><td valign="top" style="padding:0 10px 12px 0;font:700 16px/1.5 Arial,Helvetica,sans-serif;color:#008296;width:18px">1.</td><td style="padding:0 0 12px 0"><strong>10 niches Amazon à fort potentiel</strong> — analysées, avec le type de livre qui fonctionne dans chacune.</td></tr>
+<tr><td valign="top" style="padding:0 10px 12px 0;font:700 16px/1.5 Arial,Helvetica,sans-serif;color:#008296;width:18px">2.</td><td style="padding:0 0 12px 0"><strong>Le kit de démarrage V3</strong> — 16 pages illustrées, de la première connexion jusqu'à la mise en vente.</td></tr>
+</table>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td align="center" bgcolor="#064e3b" style="border-radius:6px"><a href="${gift}" style="display:block;padding:17px 24px;color:#ffffff;text-decoration:none;font:700 17px/1.3 Arial,Helvetica,sans-serif;text-align:center">Récupérer mes 2 cadeaux (gratuit)</a></td></tr></table>
+<p style="margin:0 0 18px;font:15px/1.6 Arial,Helvetica,sans-serif;color:#4b5563">Pas de carte bancaire, pas d'engagement. Lisez-les, et si vous vous dites « je pourrais écrire ce livre-là », vous saurez quoi faire ensuite.</p>
+<p style="margin:0 0 18px">Si vous préférez essayer directement : <a href="${trial}" style="color:#008296">écrivez le premier chapitre de votre livre gratuitement</a>.</p>
+<p style="margin:0 0 6px">Bien à vous,<br><strong>Georges Boubet</strong><br>EbookStudio</p>
+<p style="margin:18px 0 0;padding:14px 0 0;border-top:1px solid #e5e7eb;font:15px/1.6 Arial,Helvetica,sans-serif;color:#4b5563">P.-S. — Répondez-moi en une ligne si quelque chose vous a fait hésiter : je lis tous les messages.</p>
+</td></tr>
+<tr><td style="padding:18px 24px;background:#f6f7f8;text-align:center;color:#68737d;font:12px/1.6 Arial,Helvetica,sans-serif">Vous recevez cet email car vous avez manifesté un intérêt pour EbookStudio.<br><a href="${unsubscribe}" style="color:#008296">Se désinscrire de tous les emails marketing</a></td></tr>
+</table></td></tr></table><img src="${pixel}" width="1" height="1" alt="" style="display:none"></body></html>`;
+}
+
 async function isAdmin(req: Request, baseUrl: string) {
   const authorization = req.headers.get("Authorization");
   if (!authorization?.startsWith("Bearer ")) return false;
@@ -302,7 +340,7 @@ Deno.serve(async (req) => {
     await loadVideoUrl(db);
     const { data: cronSecret } = await db.from("app_secrets").select("value").eq("key", "cron_secret").maybeSingle();
     const hasCronSecret = !!cronSecret?.value && req.headers.get("x-cron-secret") === cronSecret.value;
-    if (mode === "auto") {
+    if (mode === "auto" || mode === "auto_non_openers") {
       if (!hasCronSecret) return respond({ error: "Non autorisé" }, 401);
     } else if (!hasCronSecret && !(await isAdmin(req, baseUrl))) return respond({ error: "Accès administrateur requis" }, 403);
 
@@ -310,7 +348,39 @@ Deno.serve(async (req) => {
     if (mode === "status") return respond({ campaign: CAMPAIGN, active: true, blocked: !EMAIL_SENDING_ENABLED, steps: STEPS.map((s, i) => ({ step: i + 1, subject: s.subject, template: templateName(i + 1) })) });
     if (mode === "preview") {
       const step = Math.min(Math.max(Number(body.step || 1), 1), 5);
-      return new Response(render(baseUrl, "apercu@ebookstudio.fr", "Georges", step), { headers: { ...corsHeaders, "Content-Type": "text/html; charset=utf-8" } });
+      const html = body.segment === "non_openers"
+        ? renderNonOpener(baseUrl, "apercu@ebookstudio.fr", "Georges", step)
+        : render(baseUrl, "apercu@ebookstudio.fr", "Georges", step);
+      return new Response(html, { headers: { ...corsHeaders, "Content-Type": "text/html; charset=utf-8" } });
+    }
+
+    // Métriques par segment : original vs relance non-ouvreurs vs relance cliqueurs.
+    if (mode === "segment_stats") {
+      const step = Math.min(Math.max(Number(body.step || 1), 1), 5);
+      const base = templateName(step);
+      const templates = [base, `${base}-non-ouvreurs`, `${base}-cliqueurs`, `${base}-relance`];
+      const segments = [];
+      for (const tpl of templates) {
+        const [{ count: sent }, { count: failed }, opensRes, clicksRes] = await Promise.all([
+          db.from("email_send_log").select("id", { count: "exact", head: true }).eq("template_name", tpl).in("status", ["sent", "delivered"]),
+          db.from("email_send_log").select("id", { count: "exact", head: true }).eq("template_name", tpl).eq("status", "failed"),
+          db.from("email_opens").select("prospect_email").eq("template_name", tpl).limit(5000),
+          db.from("email_clicks").select("prospect_email").eq("template_name", tpl).limit(5000),
+        ]);
+        const opens = new Set((opensRes.data || []).map((r) => normalize(r.prospect_email || "")));
+        const clicks = new Set((clicksRes.data || []).map((r) => normalize(r.prospect_email || "")));
+        segments.push({
+          template: tpl,
+          label: tpl === base ? `Étape ${step} (original)` : tpl.endsWith("non-ouvreurs") ? "Relance non-ouvreurs (48 h)" : tpl.endsWith("cliqueurs") ? "Relance cliqueurs" : "Relance ouvreurs",
+          sent: sent || 0,
+          failed: failed || 0,
+          unique_opens: opens.size,
+          unique_clicks: clicks.size,
+          open_rate: sent ? Math.round((opens.size / sent) * 1000) / 10 : 0,
+          click_rate: sent ? Math.round((clicks.size / sent) * 1000) / 10 : 0,
+        });
+      }
+      return respond({ success: true, step, segments });
     }
     if (!EMAIL_SENDING_ENABLED) return respond(emailSendingBlockedResult(), 423);
 
@@ -367,14 +437,19 @@ Deno.serve(async (req) => {
     }
 
     // Segments type GetResponse : non-ouvreurs et cliqueurs d'un gabarit donné.
-    if (mode === "resend_non_openers" || mode === "resend_clickers") {
+    // `auto_non_openers` = même logique, déclenchée par le cron (48 h après l'envoi).
+    if (mode === "resend_non_openers" || mode === "resend_clickers" || mode === "auto_non_openers") {
+      const isNonOpeners = mode !== "resend_clickers";
       const step = Math.min(Math.max(Number(body.step || 1), 1), 5);
       const sourceTemplate = String(body.source_template || templateName(step));
-      const suffix = mode === "resend_non_openers" ? "non-ouvreurs" : "cliqueurs";
+      const suffix = isNonOpeners ? "non-ouvreurs" : "cliqueurs";
       const resendTemplate = `${sourceTemplate}-${suffix}`;
       const limit = Math.min(Number(body.batch_size || 250), 300);
+      // Délai minimum avant relance : 48 h par défaut (0 pour forcer manuellement).
+      const delayHours = body.delay_hours === undefined ? 48 : Math.max(0, Number(body.delay_hours));
+      const cutoff = new Date(Date.now() - delayHours * 3600000).toISOString();
 
-      const { data: received } = await db.from("email_send_log").select("recipient_email").eq("template_name", sourceTemplate).in("status", ["sent", "delivered"]).limit(5000);
+      const { data: received } = await db.from("email_send_log").select("recipient_email,created_at").eq("template_name", sourceTemplate).in("status", ["sent", "delivered"]).lte("created_at", cutoff).limit(5000);
       const { data: opens } = await db.from("email_opens").select("prospect_email").eq("template_name", sourceTemplate);
       const { data: clicks } = await db.from("email_clicks").select("prospect_email").eq("template_name", sourceTemplate);
       const { data: alreadySent } = await db.from("email_send_log").select("recipient_email").eq("template_name", resendTemplate).in("status", ["sent", "delivered"]);
@@ -386,10 +461,11 @@ Deno.serve(async (req) => {
       const done = new Set((alreadySent || []).map((r) => normalize(r.recipient_email || "")));
       const paid = new Set((paidOrders || []).map((r) => normalize(r.email || "")));
       const profiles = new Map((profilesRows || []).map((r) => [normalize(r.email || ""), r]));
+      const eligible = new Set((received || []).map((r) => normalize(r.recipient_email || "")));
 
-      const pool = mode === "resend_clickers"
-        ? Array.from(clickers)
-        : (received || []).map((r) => normalize(r.recipient_email || "")).filter((e) => !openers.has(e) && !clickers.has(e));
+      const pool = isNonOpeners
+        ? Array.from(eligible).filter((e) => !openers.has(e) && !clickers.has(e))
+        : Array.from(clickers).filter((e) => eligible.has(e));
 
       const targets: string[] = [];
       for (const email of pool) {
@@ -401,27 +477,25 @@ Deno.serve(async (req) => {
         if (targets.length >= limit) break;
       }
 
-      if (body.dry_run) return respond({ success: true, mode, template: resendTemplate, would_send: targets.length });
-
-      const subject = mode === "resend_non_openers"
-        ? "Votre premier chapitre, écrit ce soir (offert)"
-        : "Vous avez regardé — je vous écris le premier chapitre";
+      if (body.dry_run) return respond({ success: true, mode, template: resendTemplate, delay_hours: delayHours, would_send: targets.length });
 
       let sentCount = 0;
-      for (const email of targets) {
+      for (let i = 0; i < targets.length; i++) {
+        const email = targets[i];
         const profile = profiles.get(email);
-        const result = await sendResendEmailThrottled({
-          from: FROM_CAMPAIGN,
-          to: [email],
-          subject,
-          html: render(baseUrl, email, (profile?.first_name as string) || "", step),
-          reply_to: REPLY_TO,
-        });
+        // Non-ouvreurs : sujet alterné (A/B) + message dédié « 2 cadeaux », sans prix.
+        const subject = isNonOpeners
+          ? NON_OPENER_SUBJECTS[i % NON_OPENER_SUBJECTS.length]
+          : "Vous avez regardé — je vous écris le premier chapitre";
+        const html = isNonOpeners
+          ? renderNonOpener(baseUrl, email, (profile?.first_name as string) || "", step)
+          : render(baseUrl, email, (profile?.first_name as string) || "", step);
+        const result = await sendResendEmailThrottled({ from: FROM_CAMPAIGN, to: [email], subject, html, reply_to: REPLY_TO });
         await db.from("email_send_log").insert({ recipient_email: email, template_name: resendTemplate, message_id: result.id || `${CAMPAIGN}-${resendTemplate}-${email}`, provider_message_id: result.id || null, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
         if (!result.ok) { if (isQuotaExhausted()) break; continue; }
         sentCount++;
       }
-      return respond({ success: true, mode, template: resendTemplate, sent: sentCount, targets: targets.length });
+      return respond({ success: true, mode, template: resendTemplate, delay_hours: delayHours, sent: sentCount, targets: targets.length });
     }
 
     // Relance des commandes restées en attente depuis plus de 2 heures.

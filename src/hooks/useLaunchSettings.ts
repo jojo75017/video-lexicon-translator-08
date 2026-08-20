@@ -1,7 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-export type LaunchSettingKey = 'free_trial_open' | 'v3_open' | 'first_month_free_open' | 'launch_video';
+export type LaunchSettingKey =
+  | 'free_trial_open'
+  | 'v3_open'
+  | 'first_month_free_open'
+  | 'launch_video'
+  /** Vidéo de présentation V3 (7-8 min, HeyGen) — réservée aux abonnés. */
+  | 'v3_video';
 
 export interface LaunchSettingValue {
   enabled: boolean;
@@ -20,6 +26,7 @@ const DEFAULTS: LaunchSettings = {
   v3_open: { enabled: false, opens_at: '2026-10-01T08:00:00+02:00' },
   first_month_free_open: { enabled: true, closes_at: '2026-09-30T23:59:59+02:00' },
   launch_video: { enabled: true, url: '', kind: 'video' },
+  v3_video: { enabled: true, url: '', kind: 'video' },
 };
 
 
