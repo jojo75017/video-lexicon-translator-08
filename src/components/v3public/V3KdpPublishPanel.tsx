@@ -164,7 +164,21 @@ Réponds UNIQUEMENT en JSON valide :
     }
   };
 
-  const buildMetadataText = () => {
+  // Livre déjà terminé mais mots-clés / catégories absents : on les complète une seule fois,
+  // pour que la fiche KDP ne soit jamais vide à l'ouverture.
+  useEffect(() => {
+    if (!autoFill || autoFilled || generating) return;
+    if (!title.trim() || !manuscript.trim()) return;
+    const noKeywords = keywords.every((k) => !k.trim());
+    const noCategories = categories.every((c) => !c.trim());
+    if (!noKeywords && !noCategories) return;
+    setAutoFilled(true);
+    toast.info('Mots-clés et catégories KDP en cours de génération…');
+    void generateAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoFill, autoFilled, title, manuscript, keywords, categories]);
+
+
     const lines = [
       `Titre : ${title}`,
       subtitle ? `Sous-titre : ${subtitle}` : '',
