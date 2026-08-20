@@ -12,8 +12,17 @@ const corsHeaders = {
 const CAMPAIGN = "fin-47-lancement-v3-2026";
 const CHECKOUT = CHECKOUT_URL;
 
-/** Séquence courte : un email par jour pendant 5 jours. */
-const DELAYS = [0, 1, 1, 1, 1];
+/** Rappels du 21 au 31 août : 21 → 24 → 27 → 29 → 31. */
+const DELAYS = [0, 3, 3, 2, 2];
+
+/** Lien de la vidéo de lancement, lu dans `launch_settings` à chaque appel. */
+let VIDEO_URL = "";
+
+async function loadVideoUrl(db: ReturnType<typeof createClient>) {
+  const { data } = await db.from("launch_settings").select("value").eq("key", "launch_video").maybeSingle();
+  const value = (data?.value ?? {}) as { url?: string; enabled?: boolean };
+  VIDEO_URL = value.enabled === false ? "" : String(value.url || "");
+}
 
 interface StepContent {
   subject: string;
@@ -48,7 +57,7 @@ const OFFER_BULLETS: Array<{ label: string; text: string }> = [
   { label: "La V3 incluse", text: "les évolutions à venir sont ajoutées à votre accès, sans repayer." },
 ];
 
-const STEPS: StepContent[] = [
+const RAW_STEPS: StepContent[] = [
   {
     subject: "L’accès à 47 € se termine le 31 août",
     preheader: "Le 1er octobre, EbookStudio passe en V3 par abonnement. Avant, l’accès complet reste à 47 €.",
@@ -170,8 +179,11 @@ const STEPS: StepContent[] = [
 
 
 
+/** Ordre des rappels : fin du 47 €, vidéo/démo, objections, ce qui change, dernier jour. */
+const STEPS: StepContent[] = [RAW_STEPS[0], RAW_STEPS[2], RAW_STEPS[3], RAW_STEPS[1], RAW_STEPS[4]];
+
 const normalize = (value: string) => value.trim().toLowerCase();
-const templateName = (step: number) => `fin-47-v3-${step}`;
+const templateName = (step: number) => `rappel-47-${step}`;
 const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
 /** Lien de clic hébergé sur notre propre domaine (/r) : plus de confiance
@@ -183,6 +195,12 @@ function trackedLink(_baseUrl: string, email: string, step: number) {
 
 function ctaButton(link: string, label: string) {
   return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:26px 0"><tr><td align="center" bgcolor="#FF9E2D" style="border-radius:6px"><a href="${link}" style="display:block;padding:17px 24px;color:#232F3E;text-decoration:none;font:700 17px/1.3 Arial,Helvetica,sans-serif;text-align:center">${label}</a></td></tr></table>`;
+}
+
+/** Bloc vidéo : vignette cliquable vers la vidéo de lancement. Masqué si aucune URL. */
+function videoBlock(url: string) {
+  if (!url) return "";
+  return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td align="center" style="background:#064e3b;padding:22px 20px"><p style="margin:0 0 6px;font:700 13px Arial,Helvetica,sans-serif;color:#C9A84C;letter-spacing:.6px">LA VIDÉO — 2 MINUTES</p><p style="margin:0 0 14px;font:16px/1.55 Arial,Helvetica,sans-serif;color:#ffffff">Je vous montre un livre complet, du sommaire au fichier prêt pour Amazon.</p><a href="${url}" style="display:inline-block;background:#C9A84C;color:#0b2b22;text-decoration:none;padding:14px 22px;border-radius:6px;font:700 16px Arial,Helvetica,sans-serif">&#9658;&nbsp; Regarder la vidéo</a></td></tr></table>`;
 }
 
 function bulletList(bullets: Array<{ label: string; text: string }>) {
@@ -213,6 +231,7 @@ ${c.reminder ? `<table role="presentation" cellspacing="0" cellpadding="0" borde
 <p style="margin:0 0 20px">${c.intro}</p>
 <p style="margin:0 0 14px;font:700 17px Arial,Helvetica,sans-serif;color:#232F3E">${c.bulletsTitle}</p>
 ${bulletList(c.bullets)}
+${videoBlock(VIDEO_URL)}
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td style="background:#fffaf2;border:1px solid #FF9E2D;padding:18px 20px;font:16px/1.65 Arial,Helvetica,sans-serif;color:#232F3E"><p style="margin:0 0 8px;font:700 16px Arial,Helvetica,sans-serif;color:#8a4b00">${c.valueTitle}</p>${c.valueBody}</td></tr></table>
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:22px 0"><tr><td style="background:#f2f8f9;border-left:4px solid #008296;padding:16px 18px;font:16px/1.6 Arial,Helvetica,sans-serif;color:#232F3E"><strong>Le résultat :</strong> ${c.result}</td></tr></table>
 <p style="margin:0 0 20px">${c.reassurance}</p>
@@ -224,7 +243,7 @@ ${ctaButton(link, c.cta)}
 ${c.doubleCta ? ctaButton(link, "J’accède à EbookStudio pour 47 €") : ""}
 
 </td></tr>
-<tr><td style="padding:18px 24px;background:#f6f7f8;text-align:center;color:#68737d;font:12px/1.6 Arial,Helvetica,sans-serif">Offre valable jusqu’au 31 août 2026, sous réserve des conditions indiquées sur le site.<br>Vous recevez cet email car vous avez manifesté un intérêt pour EbookStudio.<br><a href="${unsubscribe}" style="color:#008296">Se désinscrire de tous les emails marketing</a></td></tr>
+<tr><td style="padding:18px 24px;background:#f6f7f8;text-align:center;color:#68737d;font:12px/1.6 Arial,Helvetica,sans-serif">Offre valable jusqu’au 31 août 2026 (23h59, Paris), sous réserve des conditions indiquées sur le site.<br>Vous recevez cet email car vous avez manifesté un intérêt pour EbookStudio.<br><a href="${unsubscribe}" style="color:#008296">Se désinscrire de tous les emails marketing</a></td></tr>
 </table></td></tr></table><img src="${pixel}" width="1" height="1" alt="" style="display:none"></body></html>`;
 }
 
@@ -246,6 +265,7 @@ Deno.serve(async (req) => {
     const db = createClient(baseUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "");
     const body = await req.json().catch(() => ({}));
     const mode = String(body.mode || "status");
+    await loadVideoUrl(db);
     const { data: cronSecret } = await db.from("app_secrets").select("value").eq("key", "cron_secret").maybeSingle();
     const hasCronSecret = !!cronSecret?.value && req.headers.get("x-cron-secret") === cronSecret.value;
     if (mode === "auto") {
