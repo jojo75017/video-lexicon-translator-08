@@ -218,23 +218,27 @@ function AdminLancementContent() {
           ))}
         </div>
 
-        {/* Vidéo de lancement */}
+        {/* Média de lancement */}
         <Card className="rounded-2xl">
           <CardHeader>
-            <CardTitle className="text-base">Lien de la vidéo de lancement</CardTitle>
+            <CardTitle className="text-base flex items-center gap-2">
+              {videoUrl.trim().endsWith('.mp3') ? <Headphones className="h-4 w-4" /> : null}
+              Lien du média de lancement
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Collez l’URL de votre vidéo (YouTube ou autre). Elle apparaît aussitôt dans les emails de rappel,
+              Collez l’URL d’une <strong>vidéo</strong> (YouTube, Vimeo, etc.) ou d’un fichier <strong>MP3</strong>.
+              Le type est détecté automatiquement. Le média apparaît dans les emails de rappel,
               sur la page d’essai, sur la page de commande et dans le salon des membres fondateurs. Champ vide =
-              bloc vidéo masqué partout.
+              bloc masqué partout.
             </p>
             <div className="flex flex-wrap gap-2">
               <input
                 type="url"
                 value={videoUrl}
                 onChange={(e) => setVideoUrl(e.target.value)}
-                placeholder="https://www.youtube.com/watch?v=..."
+                placeholder="https://... (vidéo) ou https://.../message-lancement.mp3"
                 className="min-w-[280px] flex-1 rounded-xl border border-input bg-background px-3 py-2 text-sm"
               />
               <Button className="rounded-xl" onClick={() => void saveVideo()} disabled={savingVideo}>
@@ -243,12 +247,42 @@ function AdminLancementContent() {
               </Button>
               {videoUrl.trim() && (
                 <Button asChild variant="outline" className="rounded-xl">
-                  <a href={videoUrl.trim()} target="_blank" rel="noopener noreferrer">Ouvrir</a>
+                  <a href={videoUrl.trim()} target="_blank" rel="noopener noreferrer">
+                    {videoUrl.trim().endsWith('.mp3') ? 'Écouter' : 'Ouvrir'}
+                  </a>
                 </Button>
               )}
             </div>
+
+            {videoUrl.trim().endsWith('.mp3') && (
+              <div className="rounded-xl border border-[#D4AF37]/30 bg-[#0F2E1F] p-4">
+                <p className="text-xs font-bold uppercase tracking-wider text-[#D4AF37]">Aperçu audio</p>
+                <audio controls className="mt-3 w-full" preload="metadata">
+                  <source src={videoUrl.trim()} type="audio/mpeg" />
+                  Votre navigateur ne supporte pas la lecture audio.
+                </audio>
+              </div>
+            )}
+
+            <div className="space-y-3 rounded-xl border border-border bg-muted/30 p-4">
+              <p className="text-sm font-semibold text-foreground">Script du message</p>
+              <p className="text-xs text-muted-foreground">
+                Version longue (~2 minutes) et version courte à coller dans Fliki, ElevenLabs ou votre outil de génération audio.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" className="rounded-lg" onClick={() => void copyScript('long')}>
+                  {copiedScript === 'long' ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
+                  Copier la version longue
+                </Button>
+                <Button variant="outline" size="sm" className="rounded-lg" onClick={() => void copyScript('short')}>
+                  {copiedScript === 'short' ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
+                  Copier la version courte
+                </Button>
+              </div>
+            </div>
           </CardContent>
         </Card>
+
 
         {/* Interrupteurs */}
         <Card className="rounded-2xl">
