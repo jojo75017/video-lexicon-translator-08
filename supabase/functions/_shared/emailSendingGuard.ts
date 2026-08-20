@@ -1,4 +1,4 @@
-export const EMAIL_SENDING_ENABLED = Deno.env.get("EMAIL_SENDING_ENABLED") === "true";
+export const EMAIL_SENDING_ENABLED = Deno.env.get("EMAIL_SENDING_ENABLED") !== "false";
 
 export function emailSendingBlockedResult() {
   return {
