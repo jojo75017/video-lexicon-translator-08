@@ -71,8 +71,10 @@ const SalesPageV3Launch = lazy(() => import('./pages/SalesPageV3Launch'));
 const EssaiPage = lazy(() => import('./pages/launch/EssaiPage'));
 const EssaiInscriptionPage = lazy(() => import('./pages/launch/EssaiInscriptionPage'));
 const V3WaitingRoomPage = lazy(() => import('./pages/launch/V3WaitingRoomPage'));
+const MessageAudioPage = lazy(() => import('./pages/launch/MessageAudioPage'));
 const AdminLancementPage = lazy(() => import('./pages/admin/AdminLancementPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+
 
 // V3 hub + public site
 const V3HubPage = lazy(() => import('./pages/V3HubPage'));
