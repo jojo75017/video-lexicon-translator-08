@@ -340,7 +340,7 @@ Deno.serve(async (req) => {
     await loadVideoUrl(db);
     const { data: cronSecret } = await db.from("app_secrets").select("value").eq("key", "cron_secret").maybeSingle();
     const hasCronSecret = !!cronSecret?.value && req.headers.get("x-cron-secret") === cronSecret.value;
-    if (mode === "auto") {
+    if (mode === "auto" || mode === "auto_non_openers") {
       if (!hasCronSecret) return respond({ error: "Non autorisé" }, 401);
     } else if (!hasCronSecret && !(await isAdmin(req, baseUrl))) return respond({ error: "Accès administrateur requis" }, 403);
 
