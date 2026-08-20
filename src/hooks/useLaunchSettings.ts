@@ -26,6 +26,7 @@ const DEFAULTS: LaunchSettings = {
   v3_open: { enabled: false, opens_at: '2026-10-01T08:00:00+02:00' },
   first_month_free_open: { enabled: true, closes_at: '2026-09-30T23:59:59+02:00' },
   launch_video: { enabled: true, url: '', kind: 'video' },
+  v3_video: { enabled: true, url: '', kind: 'video' },
 };
 
 
