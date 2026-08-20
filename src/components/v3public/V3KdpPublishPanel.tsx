@@ -60,26 +60,47 @@ export default function V3KdpPublishPanel({
   coverUrl,
   initialDescription,
   initialKeywords,
+  initialCategories,
+  autoFill,
 }: V3KdpPublishPanelProps) {
   const [description, setDescription] = useState(initialDescription || '');
   const [keywords, setKeywords] = useState<string[]>(() => {
     const base = initialKeywords?.slice(0, 7) || [];
     return Array.from({ length: 7 }, (_, i) => base[i] || '');
   });
-  const [categories, setCategories] = useState<string[]>(['', '', '']);
+  const [categories, setCategories] = useState<string[]>(() => {
+    const base = initialCategories?.filter(Boolean).slice(0, 3) || [];
+    return Array.from({ length: 3 }, (_, i) => base[i] || '');
+  });
   const [authorBio, setAuthorBio] = useState('');
   const [aPlusContent, setAPlusContent] = useState('');
   const [backCoverText, setBackCoverText] = useState('');
   const [price, setPrice] = useState('9.99');
   const [zipping, setZipping] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [autoFilled, setAutoFilled] = useState(false);
 
   useEffect(() => {
     if (initialDescription && !description) setDescription(initialDescription);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialDescription]);
 
-  const royalty = useMemo(() => {
+  // Les données arrivent souvent après le premier rendu (chargement du livre) :
+  // on complète alors les cases encore vides sans écraser une saisie manuelle.
+  useEffect(() => {
+    const base = initialKeywords?.filter(Boolean).slice(0, 7) || [];
+    if (!base.length) return;
+    setKeywords((prev) => prev.map((value, index) => value.trim() || base[index] || ''));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(initialKeywords || [])]);
+
+  useEffect(() => {
+    const base = initialCategories?.filter(Boolean).slice(0, 3) || [];
+    if (!base.length) return;
+    setCategories((prev) => prev.map((value, index) => value.trim() || base[index] || ''));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(initialCategories || [])]);
+
     const value = Number(price.replace(',', '.'));
     if (!Number.isFinite(value) || value <= 0) return null;
     const rate = value >= 2.99 && value <= 9.99 ? 0.7 : 0.35;
