@@ -355,7 +355,7 @@ Deno.serve(async (req) => {
     // Lecture / écriture de l'état de pause de l'automation (front-end ne peut pas toucher app_secrets directement).
     if (mode === "automation_status") {
       const { data: paused } = await db.from("app_secrets").select("value").eq("key", "email_automation_paused").maybeSingle();
-      const { data: jobs } = await db.from("cron.job").select("jobid,jobname,schedule,active").in("jobname", ["sequence-daily", "relance-non-ouvreurs-48h", "clickers-followup-24h", "pending-orders-recovery"]);
+      const { data: jobs } = await db.schema("cron").from("job").select("jobid,jobname,schedule,active").in("jobname", ["sequence-daily", "relance-non-ouvreurs-48h", "clickers-followup-24h", "pending-orders-recovery"]);
       return respond({ success: true, paused: paused?.value === "true", jobs: jobs || [] });
     }
     if (mode === "set_automation_pause") {
