@@ -7,8 +7,10 @@ export interface LaunchSettingValue {
   enabled: boolean;
   opens_at?: string;
   closes_at?: string;
-  /** Lien de la vidéo de lancement (clé `launch_video`). */
+  /** Lien du média de lancement (vidéo ou audio). */
   url?: string;
+  /** Type de média : 'video' | 'audio'. Défaut : video. */
+  kind?: 'video' | 'audio';
 }
 
 export type LaunchSettings = Record<LaunchSettingKey, LaunchSettingValue>;
@@ -17,8 +19,9 @@ const DEFAULTS: LaunchSettings = {
   free_trial_open: { enabled: true },
   v3_open: { enabled: false, opens_at: '2026-10-01T08:00:00+02:00' },
   first_month_free_open: { enabled: true, closes_at: '2026-09-30T23:59:59+02:00' },
-  launch_video: { enabled: true, url: '' },
+  launch_video: { enabled: true, url: '', kind: 'video' },
 };
+
 
 /**
  * Interrupteurs du lancement, lus en base : ils permettent d'ouvrir ou de
