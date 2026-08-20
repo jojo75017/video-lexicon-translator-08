@@ -2,7 +2,7 @@ import { COMMANDER_URL } from './externalLinks';
 
 export const ACTIVE_EMAIL_CAMPAIGN = {
   id: 'fin-47-lancement-v3-2026',
-  name: 'Fin du 47 € (31 août) + lancement V3 (1er octobre) — 5 jours',
+  name: 'Rappels fin du 47 € (31 août) + lancement V3 (1er octobre) — 21 au 31 août',
   status: 'active' as const,
   sendingBlocked: false,
   price: '47 €',
@@ -11,11 +11,11 @@ export const ACTIVE_EMAIL_CAMPAIGN = {
   checkoutUrl: COMMANDER_URL,
 
   steps: [
-    { step: 1, delay: 'J+0', label: 'Fin du 47 € le 31 août', template: 'fin-47-v3-1', subject: 'L’accès à 47 € se termine le 31 août' },
-    { step: 2, delay: 'J+1', label: 'La V3 le 1er octobre', template: 'fin-47-v3-2', subject: 'Ce qui change vraiment le 1er octobre' },
-    { step: 3, delay: 'J+2', label: 'Le workflow', template: 'fin-47-v3-3', subject: 'Un livre complet, du sommaire au fichier Amazon' },
-    { step: 4, delay: 'J+3', label: 'Objections', template: 'fin-47-v3-4', subject: '« Je n’écris pas bien », « c’est trop technique » : mes réponses' },
-    { step: 5, delay: 'J+4', label: 'Dernier jour', template: 'fin-47-v3-5', subject: 'Dernier jour : 47 € ce soir, abonnement ensuite' },
+    { step: 1, delay: '21 août', label: 'R1 — Fin du 47 € le 31 août', template: 'rappel-47-1', subject: 'L’accès à 47 € se termine le 31 août' },
+    { step: 2, delay: '24 août', label: 'R2 — La vidéo démo', template: 'rappel-47-2', subject: 'Un livre complet, du sommaire au fichier Amazon' },
+    { step: 3, delay: '27 août', label: 'R3 — Objections', template: 'rappel-47-3', subject: '« Je n’écris pas bien », « c’est trop technique » : mes réponses' },
+    { step: 4, delay: '29 août', label: 'R4 — Ce qui change le 1er octobre', template: 'rappel-47-4', subject: 'Ce qui change vraiment le 1er octobre' },
+    { step: 5, delay: '31 août', label: 'R5 — Dernier jour', template: 'rappel-47-5', subject: 'Dernier jour : 47 € ce soir, abonnement ensuite' },
   ],
 
 } as const;
@@ -41,7 +41,7 @@ export const CLOSING_EMAIL_CAMPAIGN = {
 export const ARCHIVED_TEMPLATE_PREFIXES = [
   'standard-', 'interesse-', 'relance-', 'offre-47-serie-', 'ab-47-',
   'v3-incluse-', 'vrai-lien-', 'v3-offre-', 'v2-v3-', 'marie-rachel-',
-  'video-demo-', 'v2-lettre-', 'openers-reactivation-', 'clickers-',
+  'video-demo-', 'fin-47-v3-', 'v2-lettre-', 'openers-reactivation-', 'clickers-',
 ];
 
 export const isArchivedEmailTemplate = (template?: string | null) => {

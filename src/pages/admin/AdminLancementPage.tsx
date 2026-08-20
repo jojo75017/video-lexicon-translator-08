@@ -75,6 +75,8 @@ function AdminLancementContent() {
   const [waitlist, setWaitlist] = useState<WaitlistRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<LaunchSettingKey | null>(null);
+  const [videoUrl, setVideoUrl] = useState('');
+  const [savingVideo, setSavingVideo] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -101,6 +103,24 @@ function AdminLancementContent() {
     document.title = 'Lancement V3 — Administration';
     void load();
   }, [load]);
+
+  useEffect(() => {
+    setVideoUrl(String(settings.launch_video?.url || ''));
+  }, [settings.launch_video?.url]);
+
+  /** Enregistre le lien de la vidéo de lancement (emails, /essai, /commander, /v3/attente). */
+  const saveVideo = async () => {
+    setSavingVideo(true);
+    try {
+      const url = videoUrl.trim();
+      await update('launch_video', { enabled: url.length > 0, url });
+      toast.success(url ? 'Vidéo enregistrée.' : 'Bloc vidéo masqué.');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Enregistrement impossible.');
+    } finally {
+      setSavingVideo(false);
+    }
+  };
 
   const stats = useMemo(() => {
     const emailed = trials.filter((t) => t.delivered_at).length;
@@ -178,6 +198,38 @@ function AdminLancementContent() {
             </Card>
           ))}
         </div>
+
+        {/* Vidéo de lancement */}
+        <Card className="rounded-2xl">
+          <CardHeader>
+            <CardTitle className="text-base">Lien de la vidéo de lancement</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Collez l’URL de votre vidéo (YouTube ou autre). Elle apparaît aussitôt dans les emails de rappel,
+              sur la page d’essai, sur la page de commande et dans le salon des membres fondateurs. Champ vide =
+              bloc vidéo masqué partout.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <input
+                type="url"
+                value={videoUrl}
+                onChange={(e) => setVideoUrl(e.target.value)}
+                placeholder="https://www.youtube.com/watch?v=..."
+                className="min-w-[280px] flex-1 rounded-xl border border-input bg-background px-3 py-2 text-sm"
+              />
+              <Button className="rounded-xl" onClick={() => void saveVideo()} disabled={savingVideo}>
+                {savingVideo ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                Enregistrer
+              </Button>
+              {videoUrl.trim() && (
+                <Button asChild variant="outline" className="rounded-xl">
+                  <a href={videoUrl.trim()} target="_blank" rel="noopener noreferrer">Ouvrir</a>
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Interrupteurs */}
         <Card className="rounded-2xl">

@@ -12,7 +12,7 @@ import { Loader2, RefreshCw, Send, Eye } from 'lucide-react';
  */
 
 const STEPS = [1, 2, 3, 4, 5];
-const templateName = (step: number) => `fin-47-v3-${step}`;
+const templateName = (step: number) => `rappel-47-${step}`;
 
 interface StepStat {
   step: number;
