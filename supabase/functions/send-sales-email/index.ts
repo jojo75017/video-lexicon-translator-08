@@ -15,14 +15,17 @@ const CHECKOUT = CHECKOUT_URL;
 /** Rappels du 21 au 31 août : 21 → 24 → 27 → 29 → 31. */
 const DELAYS = [0, 3, 3, 2, 2];
 
-/** Lien de la vidéo de lancement, lu dans `launch_settings` à chaque appel. */
+/** Lien du média de lancement (vidéo ou audio), lu dans `launch_settings` à chaque appel. */
 let VIDEO_URL = "";
+let VIDEO_KIND: "video" | "audio" = "video";
 
 async function loadVideoUrl(db: ReturnType<typeof createClient>) {
   const { data } = await db.from("launch_settings").select("value").eq("key", "launch_video").maybeSingle();
-  const value = (data?.value ?? {}) as { url?: string; enabled?: boolean };
+  const value = (data?.value ?? {}) as { url?: string; enabled?: boolean; kind?: "video" | "audio" };
   VIDEO_URL = value.enabled === false ? "" : String(value.url || "");
+  VIDEO_KIND = value.kind || (VIDEO_URL.endsWith(".mp3") ? "audio" : "video");
 }
+
 
 interface StepContent {
   subject: string;
