@@ -98,10 +98,14 @@ export default function V3KdpDataPage() {
   const images = Array.isArray(book?.ebook_images) ? (book?.ebook_images as any[]) : [];
   const coverUrl = images.find((image) => image?.type === 'front_cover')?.url || book?.cover_concepts || null;
   const subtitle = String(book?.narrative_format || '').replace(/^Sous-titre\s*:\s*/i, '');
-  const keywords = String(book?.kdp_keywords || '')
-    .split(/[,;\n]/)
-    .map((word) => word.trim())
-    .filter(Boolean);
+  const splitList = (value?: string | null) =>
+    String(value || '')
+      .split(/[,;\n|]/)
+      .map((word) => word.trim())
+      .filter(Boolean);
+  const keywords = splitList(book?.kdp_keywords);
+  const categories = splitList(book?.kdp_categories);
+
 
   return (
     <section className="max-w-5xl mx-auto px-5 md:px-8 py-10">
