@@ -1591,21 +1591,36 @@ Règles :
         )}
 
         {completedBook && (
-          <V3KdpPublishPanel
-            title={finalTitle}
-            subtitle={subtitle}
-            author={authorName}
-            category={effectiveCategory}
-            coverUrl={coverUrl}
-            initialDescription={completedBook?.backCover?.description || ''}
-            manuscript={(completedBook.chapters || []).map((c: any, index: number) => {
-              const validatedOutlineTitle = normalizedOutline[index]?.titre?.trim();
-              const generatedTitle = typeof c.title === 'string' ? c.title.trim() : '';
-              const titleForExport = validatedOutlineTitle || generatedTitle || `Chapitre ${index + 1}`;
-              return `# Chapitre ${index + 1} – ${titleForExport.replace(/^chapitre\s+\d+\s*[:–—-]?\s*/i, '')}\n\n${c.content || ''}`;
-            }).join('\n\n')}
-          />
+          <div id="exports-livre">
+            <V3KdpPublishPanel
+              title={finalTitle}
+              subtitle={subtitle}
+              author={authorName}
+              category={effectiveCategory}
+              coverUrl={coverUrl}
+              initialDescription={completedBook?.backCover?.description || ''}
+              manuscript={(completedBook.chapters || []).map((c: any, index: number) => {
+                const validatedOutlineTitle = normalizedOutline[index]?.titre?.trim();
+                const generatedTitle = typeof c.title === 'string' ? c.title.trim() : '';
+                const titleForExport = validatedOutlineTitle || generatedTitle || `Chapitre ${index + 1}`;
+                return `# Chapitre ${index + 1} – ${titleForExport.replace(/^chapitre\s+\d+\s*[:–—-]?\s*/i, '')}\n\n${c.content || ''}`;
+              }).join('\n\n')}
+            />
+
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Link
+                to={projectId ? `/v3/donnees-kdp?projectId=${projectId}` : '/v3/mes-livres'}
+                className="v3-btn v3-btn-outline text-xs"
+              >
+                Retrouver ces données KDP plus tard
+              </Link>
+              <Link to="/v3/mes-livres" className="v3-btn v3-btn-outline text-xs">
+                Mes livres
+              </Link>
+            </div>
+          </div>
         )}
+
 
 
         <div className="flex flex-wrap gap-3">
