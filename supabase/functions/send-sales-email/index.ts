@@ -348,7 +348,39 @@ Deno.serve(async (req) => {
     if (mode === "status") return respond({ campaign: CAMPAIGN, active: true, blocked: !EMAIL_SENDING_ENABLED, steps: STEPS.map((s, i) => ({ step: i + 1, subject: s.subject, template: templateName(i + 1) })) });
     if (mode === "preview") {
       const step = Math.min(Math.max(Number(body.step || 1), 1), 5);
-      return new Response(render(baseUrl, "apercu@ebookstudio.fr", "Georges", step), { headers: { ...corsHeaders, "Content-Type": "text/html; charset=utf-8" } });
+      const html = body.segment === "non_openers"
+        ? renderNonOpener(baseUrl, "apercu@ebookstudio.fr", "Georges", step)
+        : render(baseUrl, "apercu@ebookstudio.fr", "Georges", step);
+      return new Response(html, { headers: { ...corsHeaders, "Content-Type": "text/html; charset=utf-8" } });
+    }
+
+    // Métriques par segment : original vs relance non-ouvreurs vs relance cliqueurs.
+    if (mode === "segment_stats") {
+      const step = Math.min(Math.max(Number(body.step || 1), 1), 5);
+      const base = templateName(step);
+      const templates = [base, `${base}-non-ouvreurs`, `${base}-cliqueurs`, `${base}-relance`];
+      const segments = [];
+      for (const tpl of templates) {
+        const [{ count: sent }, { count: failed }, opensRes, clicksRes] = await Promise.all([
+          db.from("email_send_log").select("id", { count: "exact", head: true }).eq("template_name", tpl).in("status", ["sent", "delivered"]),
+          db.from("email_send_log").select("id", { count: "exact", head: true }).eq("template_name", tpl).eq("status", "failed"),
+          db.from("email_opens").select("prospect_email").eq("template_name", tpl).limit(5000),
+          db.from("email_clicks").select("prospect_email").eq("template_name", tpl).limit(5000),
+        ]);
+        const opens = new Set((opensRes.data || []).map((r) => normalize(r.prospect_email || "")));
+        const clicks = new Set((clicksRes.data || []).map((r) => normalize(r.prospect_email || "")));
+        segments.push({
+          template: tpl,
+          label: tpl === base ? `Étape ${step} (original)` : tpl.endsWith("non-ouvreurs") ? "Relance non-ouvreurs (48 h)" : tpl.endsWith("cliqueurs") ? "Relance cliqueurs" : "Relance ouvreurs",
+          sent: sent || 0,
+          failed: failed || 0,
+          unique_opens: opens.size,
+          unique_clicks: clicks.size,
+          open_rate: sent ? Math.round((opens.size / sent) * 1000) / 10 : 0,
+          click_rate: sent ? Math.round((clicks.size / sent) * 1000) / 10 : 0,
+        });
+      }
+      return respond({ success: true, step, segments });
     }
     if (!EMAIL_SENDING_ENABLED) return respond(emailSendingBlockedResult(), 423);
 
