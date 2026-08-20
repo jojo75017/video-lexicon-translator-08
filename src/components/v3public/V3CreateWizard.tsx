@@ -1761,7 +1761,31 @@ Règles :
             Trouver des idées
           </button>
         </div>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={runFullProposal}
+            disabled={proposalLoading}
+            className="inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-bold disabled:opacity-60"
+            style={{ background: 'var(--v3-ink)', color: '#fff' }}
+          >
+            {proposalLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+            Laissez les agents proposer tout le livre
+          </button>
+          <span className="text-xs" style={{ color: 'var(--v3-muted)' }}>
+            Titre · sous-titre · catégorie · auteur · description · ton · format · personnages · sommaire
+          </span>
+        </div>
+        {proposedFields.length > 0 && (
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs" style={{ color: 'var(--v3-muted)' }}>
+            <Check className="h-3.5 w-3.5" /> Proposé par les agents :
+            {proposedFields.map((field) => (
+              <span key={field} className="rounded-full border px-2 py-0.5" style={{ borderColor: 'var(--v3-border)' }}>{field}</span>
+            ))}
+          </div>
+        )}
         {aiResult && (
+
           <div className="mt-4 rounded-xl border p-4 text-sm space-y-2" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)', color: 'var(--v3-ink)' }}>
             <div><strong>Titre :</strong> {aiResult.title}</div>
             {aiResult.subtitle && <div><strong>Sous-titre :</strong> {aiResult.subtitle}</div>}
