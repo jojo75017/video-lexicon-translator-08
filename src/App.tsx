@@ -84,6 +84,7 @@ const V3GalleryPage = lazy(() => import('./pages/v3public/V3GalleryPage'));
 const V3GuestAuthorPage = lazy(() => import('./pages/v3public/V3GuestAuthorPage'));
 const V3AuthorProfilePage = lazy(() => import('./pages/v3public/V3AuthorProfilePage'));
 const V3BookManagerPage = lazy(() => import('./pages/v3public/V3BookManagerPage'));
+const V3KdpDataPage = lazy(() => import('./pages/v3public/V3KdpDataPage'));
 const V3SpecialBookPage = lazy(() => import('./pages/v3public/V3SpecialBookPage'));
 const V3AuthorSettingsPage = lazy(() => import('./pages/v3public/V3AuthorSettingsPage'));
 // Archived V3 pages (no inbound links) — routes redirect to /v3/forfaits.
