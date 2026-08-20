@@ -300,6 +300,64 @@ Règles :
     toast.success('Sommaire exporté (titres, objectifs, points, mise en forme).');
   };
 
+  /** Enrichissement IA : points à traiter, question du lecteur et mot-clé par chapitre. */
+  const enrichOutline = async () => {
+    if (!outline.length) return;
+    setEnriching(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('v3-generate-outline', {
+        body: {
+          step: 'enrich',
+          title: (brief.title || '').trim(),
+          subtitle: (brief.subtitle || '').trim(),
+          category: brief.category || '',
+          tone: brief.tone || '',
+          promesseCentrale: (brief.promesseCentrale || '').trim(),
+          guidance: guidance.trim(),
+          accepted: outline.map((c) => ({ numero: c.numero, titre: c.titre, objectif: c.objectif })),
+          userApiKey: getProviderKey('gemini') || undefined,
+        },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      const enriched = (data as any)?.enriched as Array<{
+        numero: number; objectif?: string; points?: string[]; readerQuestion?: string; keyword?: string;
+      }> | undefined;
+      if (!Array.isArray(enriched) || !enriched.length) throw new Error('Aucun enrichissement reçu.');
+
+      const byNumero = new Map(enriched.map((e) => [Number(e.numero), e]));
+      const next = outline.map((chapter, i) => {
+        const found = byNumero.get(chapter.numero) || byNumero.get(i + 1);
+        if (!found || chapter.locked) return chapter;
+        return {
+          ...chapter,
+          objectif: chapter.objectif?.trim() || found.objectif || '',
+          points: (found.points || []).length ? found.points : chapter.points,
+          readerQuestion: chapter.readerQuestion || found.readerQuestion || undefined,
+          keyword: chapter.keyword || found.keyword || undefined,
+        };
+      });
+      applyOutlineChange(normalizeOutline(next));
+      toast.success('Sommaire enrichi — points à traiter, questions du lecteur et mots-clés ajoutés.');
+    } catch (e: any) {
+      console.error('[Sommaire] enrichissement impossible', e);
+      toast.error('Enrichissement impossible', { description: e?.message || 'Erreur inconnue.' });
+    } finally {
+      setEnriching(false);
+    }
+  };
+
+    const text = outlineToText(brief, outline);
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `sommaire-${(brief.title || 'livre').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 50)}.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success('Sommaire exporté (titres, objectifs, points, mise en forme).');
+  };
+
   const updateChapter = (index: number, patch: Partial<BriefOutlineChapter>) => {
     const next = outline.map((c, i) => (i === index ? { ...c, ...patch } : c));
     applyOutlineChange(next);
