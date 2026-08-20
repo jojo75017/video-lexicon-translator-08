@@ -54,6 +54,7 @@ export default function V3OutlinePanel({ brief, onChange, initialMode }: Props) 
   const [history, setHistory] = useState<BriefOutlineChapter[][]>([]);
   const [future, setFuture] = useState<BriefOutlineChapter[][]>([]);
   const dragIndex = useRef<number | null>(null);
+  const [enriching, setEnriching] = useState(false);
 
   // Historique des sommaires validés (reprise possible à tout moment).
   useEffect(() => {
