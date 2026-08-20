@@ -545,7 +545,93 @@ Réponds UNIQUEMENT en JSON valide :
             </span>
           </div>
         </div>
+
+        {/* Aperçu de la fiche telle qu'elle partira sur KDP, avant le téléchargement du pack. */}
+        <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)' }}>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="flex items-center gap-2 text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>
+              <Eye className="h-3.5 w-3.5" /> Aperçu de la fiche KDP finale
+            </span>
+            <button
+              type="button"
+              onClick={() => setShowPreview((v) => !v)}
+              className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold"
+              style={chipButton}
+            >
+              {showPreview ? 'Masquer l’aperçu' : 'Afficher l’aperçu'}
+            </button>
+          </div>
+
+          {showPreview && (
+            <div className="mt-4 space-y-4 text-sm" style={{ color: 'var(--v3-ink)' }}>
+              <div>
+                <p className="v3-serif text-xl font-bold">{title || 'Titre du livre'}</p>
+                {subtitle ? <p style={{ color: 'var(--v3-muted)' }}>{subtitle}</p> : null}
+                <p className="mt-1 text-xs" style={{ color: 'var(--v3-muted)' }}>
+                  {author || 'Auteur'} · {price} € · {royalty ? `${royalty.net.toFixed(2)} € net/vente` : 'prix à vérifier'}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Description (rendu Amazon)</p>
+                {description.trim() ? (
+                  <div
+                    className="mt-1 leading-relaxed"
+                    dangerouslySetInnerHTML={createSafeHtml(previewHtml(description))}
+                  />
+                ) : (
+                  <p className="mt-1 text-xs" style={{ color: 'var(--v3-muted)' }}>Description encore vide.</p>
+                )}
+              </div>
+
+              <div>
+                <p className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>7 mots-clés</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {keywords.filter(Boolean).length ? (
+                    keywords.filter(Boolean).map((keyword) => (
+                      <span key={keyword} className="rounded-full border px-3 py-1 text-xs" style={chipButton}>{keyword}</span>
+                    ))
+                  ) : (
+                    <span className="text-xs" style={{ color: 'var(--v3-muted)' }}>Aucun mot-clé renseigné.</span>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Catégories BISAC</p>
+                <ul className="mt-1 list-disc pl-5">
+                  {categories.filter(Boolean).length ? (
+                    categories.filter(Boolean).map((item) => <li key={item}>{item}</li>)
+                  ) : (
+                    <li style={{ color: 'var(--v3-muted)' }}>Aucune catégorie renseignée.</li>
+                  )}
+                </ul>
+              </div>
+
+              <div>
+                <p className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>Biographie auteur</p>
+                {authorBio.trim() ? (
+                  <div className="mt-1 leading-relaxed" dangerouslySetInnerHTML={createSafeHtml(previewHtml(authorBio))} />
+                ) : (
+                  <p className="mt-1 text-xs" style={{ color: 'var(--v3-muted)' }}>Bio encore vide.</p>
+                )}
+              </div>
+
+              <button
+                type="button"
+                onClick={downloadPack}
+                disabled={zipping}
+                className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold disabled:opacity-60"
+                style={{ background: 'var(--v3-orange-600)', color: '#fff' }}
+              >
+                {zipping ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+                Tout est bon — télécharger le Pack KDP
+              </button>
+            </div>
+          )}
+        </div>
       </div>
+
     </div>
   );
 }
