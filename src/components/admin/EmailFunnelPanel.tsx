@@ -288,7 +288,42 @@ const EmailFunnelPanel = () => {
         )}
       </div>
 
+      <div className="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-4">
+        <h3 className="flex items-center gap-2 text-sm font-bold text-amber-900">
+          <FlaskConical className="h-4 w-4" /> Mode test de la relance (email 2)
+        </h3>
+        <p className="mt-1 text-xs text-amber-800">
+          Envoyez d’abord l’email 2 à vous seul ou à une petite liste. Rien n’est décompté :
+          les destinataires réels restent intacts, vous pourrez lancer l’envoi complet ensuite.
+        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <Input
+            value={testEmails}
+            onChange={(e) => setTestEmails(e.target.value)}
+            placeholder="moi@exemple.fr, ami@exemple.fr"
+            className="h-9 max-w-md bg-white text-sm"
+          />
+          <Button size="sm" disabled={!!busy} onClick={() => sendTest('non_openers')}>
+            {busy === 'Test relance' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+            Tester la relance non-ouvreurs
+          </Button>
+          <Button size="sm" variant="outline" disabled={!!busy} onClick={() => sendTest('clickers')}>
+            Tester la relance cliqueurs
+          </Button>
+        </div>
+        {testResults.length > 0 && (
+          <ul className="mt-3 space-y-1 text-xs">
+            {testResults.map((r) => (
+              <li key={r.email} className={r.ok ? 'text-emerald-700' : 'text-red-700'}>
+                {r.ok ? '✅' : '❌'} {r.email} {r.error ? `— ${r.error}` : ''}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
       <div className="mt-5 flex flex-wrap gap-2">
+
         <Button size="sm" variant="outline" disabled={!!busy} onClick={() => call({ mode: 'resend_non_openers', step: 1, dry_run: true }, 'Simulation non-ouvreurs')}>
           Simuler : non-ouvreurs (48 h)
         </Button>
