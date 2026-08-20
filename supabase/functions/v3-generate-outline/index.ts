@@ -205,6 +205,82 @@ Règles :
       return json(200, { suggestions, numero: nextNum });
     }
 
+    /* ---- Mode « enrichir » : points à traiter, question du lecteur, mot-clé ---- */
+    if (body.step === "enrich") {
+      const toEnrich = (Array.isArray(body.accepted) ? body.accepted : []).slice(0, 40);
+      if (!toEnrich.length) return json(400, { error: "Aucun chapitre à enrichir." });
+
+      const list = toEnrich
+        .map((c, i) => `${i + 1}. ${String(c?.titre || "").trim()}${c?.objectif ? ` — ${String(c.objectif).trim()}` : ""}`)
+        .join("\n");
+
+      const enrichPrompt = `Tu es directeur éditorial KDP. Voici le sommaire d'un livre en français.
+Titre : ${title}
+Sous-titre : ${(body.subtitle || "").trim() || "Non défini"}
+Catégorie : ${(body.category || "").trim() || "Non définie"}
+Promesse centrale : ${(body.promesseCentrale || "").trim() || "Non définie"}
+Consigne de l'auteur : ${(body.guidance || "").trim() || "Aucune"}
+
+SOMMAIRE :
+${list}
+
+Pour CHAQUE chapitre, produis un plan de travail concret pour l'IA rédactrice.
+Réponds STRICTEMENT en JSON valide, sans markdown :
+{"chapters":[{"numero":1,"objectif":"...","points":["...","...","..."],"readerQuestion":"...","keyword":"..."}]}
+
+Règles :
+- exactement ${toEnrich.length} entrées, dans le même ordre ;
+- 3 à 5 "points" par chapitre : chacun est une phrase concrète et utile, jamais un mot seul ;
+- "readerQuestion" : une vraie question que le lecteur se pose sur ce chapitre ;
+- "keyword" : une expression de recherche Amazon crédible en français (2 à 4 mots) ;
+- "objectif" : reformule l'objectif du chapitre en une phrase claire s'il manque ;
+- 100 % français : aucun latin, aucun faux latin, aucun mot inventé, aucune langue étrangère.`;
+
+      const enrichTokens = Math.min(14000, 1200 + toEnrich.length * 260);
+      let enrichResult: { ok: boolean; status?: number; text?: string } | null = null;
+      if (isValidGoogleKey(userKey)) enrichResult = await callGemini(enrichPrompt, userKey, enrichTokens);
+      if (!enrichResult?.ok && isValidGoogleKey(serverKeyEarly)) enrichResult = await callGemini(enrichPrompt, serverKeyEarly, enrichTokens);
+      if (!enrichResult?.ok) enrichResult = await callLovableAI(enrichPrompt, enrichTokens);
+
+      if (!enrichResult?.ok) {
+        const status = enrichResult?.status === 429 ? 429 : enrichResult?.status === 402 ? 402 : 502;
+        return json(status, {
+          error:
+            status === 429
+              ? "Limite IA atteinte. Réessaie dans quelques secondes."
+              : status === 402
+                ? "Crédits IA indisponibles pour le moment."
+                : "Service IA temporairement indisponible.",
+        });
+      }
+
+      const raw = String(enrichResult.text || "").replace(/```json|```/gi, "").trim();
+      let parsed: any = null;
+      try {
+        parsed = JSON.parse(raw);
+      } catch {
+        const m = raw.match(/\{[\s\S]*\}/);
+        if (m) { try { parsed = JSON.parse(m[0]); } catch { /* ignoré */ } }
+      }
+      const items = Array.isArray(parsed?.chapters) ? parsed.chapters : Array.isArray(parsed) ? parsed : [];
+      const enriched = items
+        .map((item: any, i: number) => ({
+          numero: Number(item?.numero) > 0 ? Number(item.numero) : i + 1,
+          objectif: String(item?.objectif || "").trim(),
+          points: Array.isArray(item?.points)
+            ? item.points.map((p: unknown) => String(p || "").trim()).filter((p: string) => p.length > 3).slice(0, 6)
+            : [],
+          readerQuestion: String(item?.readerQuestion || "").trim(),
+          keyword: String(item?.keyword || "").trim(),
+        }))
+        .filter((item: { points: string[]; objectif: string }) => item.points.length || item.objectif);
+
+      if (!enriched.length) return json(502, { error: "Enrichissement illisible. Réessaie." });
+      return json(200, { enriched });
+    }
+
+
+
 
 
     const prompt = `Tu es directeur éditorial KDP. Crée une table des matières professionnelle en français.
