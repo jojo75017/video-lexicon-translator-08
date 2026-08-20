@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { Loader2, RefreshCw, MousePointerClick, Send, BarChart3, FlaskConical } from 'lucide-react';
+import { Loader2, RefreshCw, MousePointerClick, Send, BarChart3, FlaskConical, Bot, Pause, Play, Clock } from 'lucide-react';
 
 
 /**
@@ -11,6 +11,9 @@ import { Loader2, RefreshCw, MousePointerClick, Send, BarChart3, FlaskConical } 
  * visites de la page de commande → clics paiement → commandes payées.
  * Permet aussi de lancer les segments (non-ouvreurs, cliqueurs) et la relance
  * des commandes restées en attente.
+ *
+ * L'automatisation est maintenant active : 4 tâches cron tournent.
+ * Ce panneau affiche leur statut et permet de tout mettre en pause d'un clic.
  */
 
 const norm = (v?: string | null) => (v || '').trim().toLowerCase();
@@ -20,11 +23,20 @@ const uniq = (rows: Array<Record<string, unknown>> | null, key: string) =>
 /** Étiquette lisible pour chaque lien mesuré (`lk=` posé dans les emails). */
 const LINK_LABELS: Record<string, string> = {
   cadeau: 'Chapitre offert (/essai)',
+  cadeau2: 'Cadeau 10 niches + kit (/cadeau)',
   offre: 'Bouton offre 47 €',
+  essai: 'Essai gratuit (/essai)',
   audio: 'Page message audio',
   mp3: 'Fichier audio direct',
   video: 'Vidéo',
   autre: 'Autre lien',
+};
+
+const CRON_LABELS: Record<string, string> = {
+  'sequence-daily': 'Séquence principale (R1 → R5)',
+  'relance-non-ouvreurs-48h': 'Relance non-ouvreurs 48 h',
+  'clickers-followup-24h': 'Relance cliqueurs 24 h',
+  'pending-orders-recovery': 'Panier abandonné',
 };
 
 interface FunnelData {
@@ -50,6 +62,13 @@ interface SegmentStat {
   click_rate: number;
 }
 
+interface CronJob {
+  jobid: number;
+  jobname: string;
+  schedule: string;
+  active: boolean;
+}
+
 const EmailFunnelPanel = () => {
   const [data, setData] = useState<FunnelData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -57,7 +76,8 @@ const EmailFunnelPanel = () => {
   const [segments, setSegments] = useState<SegmentStat[]>([]);
   const [testEmails, setTestEmails] = useState('boubetgeorges@gmail.com');
   const [testResults, setTestResults] = useState<Array<{ email: string; ok: boolean; error?: string }>>([]);
-
+  const [cronJobs, setCronJobs] = useState<CronJob[]>([]);
+  const [automationPaused, setAutomationPaused] = useState<boolean | null>(null);
 
   /** Appel authentifié à la fonction de campagne. */
   const invoke = async (body: Record<string, unknown>) => {
@@ -66,6 +86,50 @@ const EmailFunnelPanel = () => {
       body,
       headers: { Authorization: `Bearer ${session.session?.access_token}` },
     });
+  };
+
+  const loadCronJobs = async () => {
+    try {
+      const { data: rows, error } = await (supabase as any)
+        .from('cron.job')
+        .select('jobid,jobname,schedule,active')
+        .in('jobname', Object.keys(CRON_LABELS));
+      if (error) throw error;
+      setCronJobs((rows || []).sort((a: CronJob, b: CronJob) => a.jobname.localeCompare(b.jobname)));
+    } catch (err) {
+      console.error('loadCronJobs', err);
+    }
+  };
+
+  const loadPauseState = async () => {
+    try {
+      const { data: row, error } = await (supabase as any)
+        .from('app_secrets')
+        .select('value')
+        .eq('key', 'email_automation_paused')
+        .maybeSingle();
+      if (error) throw error;
+      setAutomationPaused(row?.value === 'true');
+    } catch (err) {
+      console.error('loadPauseState', err);
+      setAutomationPaused(false);
+    }
+  };
+
+  const togglePause = async () => {
+    const next = !automationPaused;
+    setBusy(next ? 'Pause automation' : 'Reprise automation');
+    try {
+      const { error } = await (supabase as any)
+        .from('app_secrets')
+        .upsert({ key: 'email_automation_paused', value: String(next) }, { onConflict: 'key' });
+      if (error) throw error;
+      setAutomationPaused(next);
+      toast.success(next ? 'Automation mise en pause.' : 'Automation réactivée.');
+    } catch (err) {
+      toast.error('Impossible de changer l’état : ' + ((err as Error).message || ''));
+    }
+    setBusy(null);
   };
 
   /** Métriques comparées : email d'origine vs relances par segment. */
@@ -144,6 +208,8 @@ const EmailFunnelPanel = () => {
 
   useEffect(() => {
     load();
+    loadCronJobs();
+    loadPauseState();
   }, [load]);
 
   const call = async (body: Record<string, unknown>, label: string) => {
@@ -246,6 +312,61 @@ const EmailFunnelPanel = () => {
         ) : (
           <p className="mt-2 text-xs text-slate-500">Aucun clic enregistré pour le moment.</p>
         )}
+      </div>
+
+      <div className="mt-5 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h3 className="flex items-center gap-2 text-sm font-bold text-emerald-900">
+              <Bot className="h-4 w-4" /> Automation active — 4 tâches programmées
+            </h3>
+            <p className="mt-1 text-xs text-emerald-800">
+              L'envoi se fait maintenant automatiquement. Vous gardez la main : ce bouton met tout en pause.
+            </p>
+          </div>
+          <Button
+            size="sm"
+            variant={automationPaused ? 'default' : 'outline'}
+            disabled={automationPaused === null || !!busy}
+            onClick={togglePause}
+            className={automationPaused ? 'bg-emerald-600 hover:bg-emerald-700' : 'border-emerald-600 text-emerald-700 hover:bg-emerald-100'}
+          >
+            {busy === (automationPaused ? 'Reprise automation' : 'Pause automation') ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : automationPaused ? (
+              <Play className="mr-2 h-4 w-4" />
+            ) : (
+              <Pause className="mr-2 h-4 w-4" />
+            )}
+            {automationPaused ? 'Reprendre l’automation' : 'Mettre en pause'}
+          </Button>
+        </div>
+
+        {automationPaused === true && (
+          <p className="mt-3 rounded-md bg-amber-100 px-3 py-2 text-xs font-semibold text-amber-800">
+            ⏸ Automation en pause. Aucun envoi automatique ne partira tant que vous n’aurez pas cliqué sur « Reprendre l’automation ».
+          </p>
+        )}
+
+        <div className="mt-3 divide-y rounded-md border border-emerald-200 bg-white">
+          {cronJobs.map((job) => (
+            <div key={job.jobid} className="flex items-center justify-between px-3 py-2 text-sm">
+              <div className="flex items-center gap-2">
+                <Clock className="h-3.5 w-3.5 text-slate-400" />
+                <span className="text-slate-700">{CRON_LABELS[job.jobname] || job.jobname}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="font-mono text-xs text-slate-500">{job.schedule}</span>
+                <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${job.active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
+                  {job.active ? 'actif' : 'inactif'}
+                </span>
+              </div>
+            </div>
+          ))}
+          {cronJobs.length === 0 && (
+            <p className="px-3 py-2 text-xs text-slate-500">Chargement des tâches planifiées…</p>
+          )}
+        </div>
       </div>
 
       <div className="mt-5">
