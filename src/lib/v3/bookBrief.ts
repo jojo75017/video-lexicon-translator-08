@@ -4,6 +4,18 @@
  * modification, l'accueil le lit pour l'afficher avant le lancement du workflow.
  */
 
+/** Blocs de mise en forme imposés à l'IA rédactrice pour un chapitre. */
+export type OutlineBlockId =
+  | 'bullets'
+  | 'numbered'
+  | 'keypoints'
+  | 'quote'
+  | 'callout'
+  | 'exercise'
+  | 'checklist'
+  | 'table'
+  | 'summary';
+
 export type BriefOutlineChapter = {
   numero: number;
   titre: string;
@@ -12,7 +24,24 @@ export type BriefOutlineChapter = {
   sources?: number[];
   /** Période de vie couverte (mode biographie), ex. « 1952-1958 ». */
   period?: string;
+  /** Points à traiter obligatoirement dans le chapitre. */
+  points?: string[];
+  /** Consigne éditoriale libre transmise mot pour mot à l'IA rédactrice. */
+  note?: string;
+  /** Mot-clé Amazon visé par ce chapitre. */
+  keyword?: string;
+  /** Question réelle du lecteur à laquelle le chapitre répond. */
+  readerQuestion?: string;
+  /** Ton spécifique à ce chapitre (sinon : ton du livre). */
+  tone?: string;
+  /** Objectif de mots pour ce chapitre (sinon : réglage global). */
+  wordsTarget?: number;
+  /** Blocs de mise en forme demandés (listes, encadrés, exercices…). */
+  blocks?: OutlineBlockId[];
+  /** Chapitre figé : l'IA ne doit plus le réécrire ni le déplacer. */
+  locked?: boolean;
 };
+
 
 export type BookBrief = {
   savedAt?: string;
@@ -384,14 +413,26 @@ export function parseTocText(text: string): BriefOutlineChapter[] {
 export function normalizeOutline(items: BriefOutlineChapter[]): BriefOutlineChapter[] {
   return (items || [])
     .map((item) => ({
+      ...item,
       numero: 0,
       titre: String(item?.titre || '').trim(),
       objectif: String(item?.objectif || '').trim(),
       period: String(item?.period || '').trim() || undefined,
+      points: Array.isArray(item?.points)
+        ? item!.points!.map((p) => String(p || '').trim()).filter(Boolean)
+        : undefined,
+      note: String(item?.note || '').trim() || undefined,
+      keyword: String(item?.keyword || '').trim() || undefined,
+      readerQuestion: String(item?.readerQuestion || '').trim() || undefined,
+      tone: String(item?.tone || '').trim() || undefined,
+      wordsTarget: Number(item?.wordsTarget) > 0 ? Math.round(Number(item!.wordsTarget)) : undefined,
+      blocks: Array.isArray(item?.blocks) ? (item!.blocks!.filter(Boolean) as OutlineBlockId[]) : undefined,
+      locked: item?.locked ? true : undefined,
       sources: Array.isArray(item?.sources)
         ? item!.sources!.map((n) => Number(n)).filter((n) => Number.isFinite(n) && n > 0)
         : undefined,
     }))
+
     .filter((item) => item.titre.length >= 2)
     .map((item, index) => ({ ...item, numero: index + 1 }));
 }
