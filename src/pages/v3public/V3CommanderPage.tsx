@@ -548,6 +548,8 @@ export default function V3CommanderPage() {
           ))}
         </div>
 
+        <ActiveUsersPanel />
+
         {testimonials.length > 0 && (
           <div className="mt-10">
             <h2 className="text-center text-lg font-black" style={{ color: EMERALD }}>
