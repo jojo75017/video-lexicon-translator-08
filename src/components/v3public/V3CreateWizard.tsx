@@ -771,11 +771,15 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
     })
     .join('\n');
 
-  const canStepOne = title.trim().length >= 3 && description.trim().length >= 30;
-  const canStepTwo = Boolean(effectiveCategory.trim()) && chapters >= 3 && chapters <= 60 && wordsPerChapter >= 500;
-  // Sommaire non bloquant : les agents V2 (P3 « L'Architecte ») reconstruisent le plan si l'auteur ne l'a pas affiné.
+  // Un seul champ vraiment obligatoire : l'idée. Tout le reste est facultatif,
+  // les agents comblent les trous au lancement.
+  const seedLength = [aiTopic, title, description, sourceText].map((value) => String(value || '').trim()).join(' ').trim().length;
+  const canStepOne = seedLength >= 10;
+  const canStepTwo = true;
   const canStepOutline = normalizedOutline.length >= 3;
-  const canStepFour = finalTitle.trim().length >= 3 && authorName.trim().length >= 2;
+  const canStepFour = true;
+  // Conseils non bloquants affichés dans l'interface.
+  const adviceMissingDescription = description.trim().length < 30;
 
   // Instantané du brief pour le récapitulatif « Livre en préparation » sur /v3
   useEffect(() => {
