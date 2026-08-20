@@ -101,7 +101,9 @@ export default function V3KdpPublishPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(initialCategories || [])]);
 
+  const royalty = useMemo(() => {
     const value = Number(price.replace(',', '.'));
+
     if (!Number.isFinite(value) || value <= 0) return null;
     const rate = value >= 2.99 && value <= 9.99 ? 0.7 : 0.35;
     return { rate, net: value * rate };
