@@ -580,6 +580,147 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
     toast.success('Formulaire rempli — vérifie et continue vers l’étape suivante.');
   };
 
+  /**
+   * « Laissez les agents proposer » — une seule idée suffit.
+   * Un unique appel IA renvoie la fiche complète (titre, sous-titre, catégorie,
+   * auteur, description, ton, format) ET le sommaire. On ne remplit que les
+   * champs encore vides : jamais d'écrasement d'une saisie de l'abonné.
+   */
+  const runFullProposal = async () => {
+    const seed = [aiTopic, title, subtitle, description, sourceText.slice(0, 3000)]
+      .map((value) => String(value || '').trim())
+      .filter(Boolean)
+      .join('\n');
+    if (seed.length < 10) {
+      toast.error('Écris au moins une phrase sur ton idée — les agents s’occupent du reste.');
+      return;
+    }
+    const provider = getProvider();
+    const key = getProviderKey(provider);
+    if (!key || !validateKeyFormat(provider, key)) {
+      toast.error('Ajoute et valide ta clé IA en haut de la page avant de lancer les agents.');
+      return;
+    }
+    setProposalLoading(true);
+    try {
+      const prompt = `Tu es directeur éditorial senior spécialisé Amazon KDP. À partir de l'idée de l'auteur, propose un livre commercial complet, prêt à écrire.
+Idée / matière de l'auteur :
+"""${seed.slice(0, 6000)}"""
+
+Réglages du sommaire souhaités :
+- ${outlinePoints} points clés par chapitre
+- ton du sommaire : ${outlineTone}
+- mots-clés à placer naturellement : ${outlineKeywords.trim() || 'aucun imposé'}
+
+Réponds STRICTEMENT en JSON valide (aucun markdown, aucun texte autour) :
+{
+  "title": "titre commercial court (max 70 caractères)",
+  "subtitle": "sous-titre bénéfice (max 120 caractères)",
+  "authorName": "nom de plume crédible",
+  "categories": ["3 catégories Amazon FR, la plus pertinente en premier"],
+  "description": "synopsis vendeur de 150 à 200 mots",
+  "tone": "un seul ton parmi : ${TONES.join(', ')}",
+  "chapters": nombre entier entre 8 et 30,
+  "wordsPerChapter": nombre entier entre 1500 et 3500,
+  "characters": [{"name":"","role":"","traits":""}],
+  "outline": [{"numero":1,"titre":"titre spécifique jamais générique","objectif":"objectif éditorial en une phrase","points":["${outlinePoints} points clés"],"motCle":"mot-clé KDP"}]
+}
+
+Règles : 100 % en français courant, aucun mot latin ni langue étrangère, aucun titre « Chapitre 1 », aucun titre répété, autant d'entrées dans "outline" que la valeur de "chapters", "characters" vide si le livre est non-fiction.`;
+      const raw = await callAIWriting(prompt, { jsonMode: true, temperature: 0.7, maxTokens: 14000 });
+      let parsed: any = null;
+      try { parsed = JSON.parse(raw); } catch {
+        const match = raw.match(/\{[\s\S]*\}/);
+        if (match) parsed = JSON.parse(match[0]);
+      }
+      if (!parsed?.title) throw new Error('Réponse IA invalide.');
+
+      const filled: string[] = [];
+      const proposedTitle = cleanText(String(parsed.title || '')).slice(0, 120);
+      if (!title.trim() && proposedTitle) { setTitle(proposedTitle); filled.push('Titre'); }
+      if (!finalTitle.trim() && proposedTitle) setFinalTitle(proposedTitle);
+      if (!subtitle.trim() && parsed.subtitle) { setSubtitle(cleanText(String(parsed.subtitle)).slice(0, 160)); filled.push('Sous-titre'); }
+      if (parsed.authorName && (!authorName.trim() || authorName.trim() === 'Auteur Ebookstudio')) {
+        setAuthorName(cleanText(String(parsed.authorName)).slice(0, 80));
+        filled.push('Nom d’auteur');
+      }
+      if (!description.trim() && parsed.description) { setDescription(cleanText(String(parsed.description))); filled.push('Description'); }
+
+      const proposedCategories = Array.isArray(parsed.categories) ? parsed.categories.map((item: any) => cleanText(String(item))).filter(Boolean) : [];
+      if (proposedCategories.length && (category === 'Roman' || !category)) {
+        const match = CATEGORIES.find((item) => item.toLowerCase() === proposedCategories[0].toLowerCase());
+        if (match) setCategory(match);
+        else { setCategory('Autre'); setCustomCategory(proposedCategories[0]); }
+        filled.push('Catégorie');
+      }
+      if (parsed.tone && TONES.includes(String(parsed.tone))) { setTone(String(parsed.tone)); filled.push('Ton'); }
+
+      const proposedChapters = clampNumber(Number(parsed.chapters), 3, 60, chapters);
+      const proposedOutline: OutlineChapter[] = (Array.isArray(parsed.outline) ? parsed.outline : [])
+        .map((item: any, index: number) => ({
+          id: makeId(),
+          numero: index + 1,
+          titre: cleanText(String(item?.titre || item?.title || '')),
+          objectif: cleanText(String(item?.objectif || item?.goal || '')),
+        }))
+        .filter((item: OutlineChapter) => item.titre && !isGenericTitle(item.titre))
+        .slice(0, 60);
+
+      if (proposedOutline.length >= 3) {
+        setOutline(proposedOutline);
+        setChapters(proposedOutline.length);
+        filled.push('Sommaire complet');
+        // Points clés, mots-clés : conservés dans la fiche pour les agents rédacteurs.
+        try {
+          const brief = readBookBrief() || {};
+          writeBookBrief({
+            ...brief,
+            outline: proposedOutline.map((chapter, index) => {
+              const source = (Array.isArray(parsed.outline) ? parsed.outline : [])[index] || {};
+              return {
+                ...(brief.outline || [])[index],
+                numero: chapter.numero,
+                titre: chapter.titre,
+                objectif: chapter.objectif,
+                points: Array.isArray(source.points) ? source.points.map((point: any) => cleanText(String(point))).filter(Boolean) : [],
+                motCle: cleanText(String(source.motCle || '')),
+              };
+            }),
+          } as any);
+        } catch { /* la fiche locale reste utilisable sans les points clés */ }
+      } else {
+        setChapters(proposedChapters);
+      }
+      if (Number(parsed.wordsPerChapter) >= 500) {
+        setWordsPerChapter(clampNumber(Number(parsed.wordsPerChapter), 500, 5000, wordsPerChapter));
+        filled.push('Longueur des chapitres');
+      }
+
+      const proposedCharacters = Array.isArray(parsed.characters) ? parsed.characters : [];
+      const hasOwnCharacters = characters.some((character) => character.name.trim() || character.traits.trim());
+      if (!hasOwnCharacters && proposedCharacters.length) {
+        setCharacters(proposedCharacters.slice(0, 8).map((character: any) => ({
+          id: makeId(),
+          name: cleanText(String(character?.name || '')),
+          role: cleanText(String(character?.role || 'Personnage')) || 'Personnage',
+          traits: cleanText(String(character?.traits || character?.description || '')),
+        })));
+        filled.push('Personnages');
+      }
+
+      setProposedFields(filled);
+      toast.success(filled.length
+        ? `Proposition des agents appliquée : ${filled.join(', ')}. Modifie ce que tu veux.`
+        : 'Ta fiche était déjà complète — rien n’a été écrasé.');
+    } catch (error: any) {
+      toast.error(error?.message || 'Impossible de générer la proposition complète.');
+    } finally {
+      setProposalLoading(false);
+    }
+  };
+
+
+
   const effectiveCategory = category === 'Autre' ? (customCategory.trim() || 'Autre') : category;
   const totalWords = chapters * wordsPerChapter;
   const estimatedPages = Math.ceil(totalWords / 250);
