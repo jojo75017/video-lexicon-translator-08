@@ -26,7 +26,7 @@ import V3ClosingRecallPanel from '@/components/v3public/V3ClosingRecallPanel';
 
 const FEATURED_TOOLS = [
   { emoji: '📖', title: 'Biographie — Le récit de votre vie', desc: 'Racontez votre vie période par période : vos mots sont gardés, jamais résumés.', to: '/v3/biographie', badge: 'NEW' },
-  { emoji: '📘', title: 'Assistant V3', desc: 'Créez votre livre en 4 étapes guidées.', to: '/v3/create', badge: 'V3' },
+  { emoji: '📘', title: 'Lancer mon livre', desc: 'Fiche + 15 agents, en 4 étapes guidées.', to: '/v3/lancer', badge: 'V3' },
   { emoji: '🎨', title: 'Cover Studio Pro', desc: 'Couverture haut de gamme, direction artistique IA.', to: '/v3/hub?tab=cover-pro', badge: 'Pro' },
   { emoji: '🚀', title: 'KDP Pilot', desc: 'Audit complet avant publication Amazon.', to: '/audit-pilot', badge: 'Populaire' },
   { emoji: '📖', title: 'Sommaire Ultime', desc: 'Table des matières éditable et exportable.', to: '/v3/outils/sommaire-ultime', badge: 'Nouveau' },
@@ -163,7 +163,7 @@ export default function V3HomePage() {
       {/* Le pipeline des 15 agents, mis en évidence avant le formulaire de démarrage */}
       <div className="max-w-7xl mx-auto px-5 md:px-8 pt-3">
         <Link
-          to="/v3/workflow"
+          to="/v3/lancer"
           className="flex flex-wrap items-center gap-3 rounded-[22px] border p-4 transition hover:shadow-sm"
           style={{ borderColor: 'rgba(13,122,95,0.35)', background: 'linear-gradient(90deg,rgba(13,122,95,0.07),rgba(201,168,76,0.10))' }}
         >

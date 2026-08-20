@@ -30,7 +30,7 @@ export default function V3WorkflowPage() {
 
           <div className="mt-4 flex flex-wrap gap-2">
             <Link
-              to="/v3/create"
+              to="/v3/lancer"
               className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-white"
               style={{ background: '#0d7a5f' }}
             >
@@ -70,7 +70,7 @@ export default function V3WorkflowPage() {
                 </p>
               </Link>
               <Link
-                to="/ebook-planner"
+                to="/v3/lancer"
                 className="rounded-2xl border p-3 transition hover:shadow-sm"
                 style={{ borderColor: 'rgba(0,0,0,0.08)' }}
               >
