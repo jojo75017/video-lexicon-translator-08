@@ -46,11 +46,20 @@ function readKdpMetaFromResults(): { keywords: string[]; categories: string[] } 
     const results = JSON.parse(raw) as Record<string, { result?: any }>;
     const p2 = results.P2?.result || {};
     const p7 = results.P7?.result || {};
-    const list = (value: any) => (Array.isArray(value) ? value.map((v) => String(v).trim()).filter(Boolean) : []);
+    const asText = (v: any) =>
+      v && typeof v === 'object'
+        ? String(v.label ?? v.nom ?? v.name ?? v.categorie ?? v.category ?? v.titre ?? '')
+        : String(v ?? '');
+    const list = (value: any) =>
+      (Array.isArray(value) ? value : [])
+        .map((v) => asText(v).replace(/^\s*\d+\s*[).:-]?\s*/, '').trim())
+        // On écarte les rangs / codes chiffrés : une catégorie est un libellé texte.
+        .filter((v) => v.replace(/[^A-Za-zÀ-ÿ]/g, '').length >= 3);
     const keywords = Array.from(new Set([...list(p7.motsClésOptimises), ...list(p2.motsClésKDP)])).slice(0, 7);
     const categories = Array.from(
       new Set([...list(p2.categoriesKDP), ...list(p2.categoriesSecondaires)]),
     ).slice(0, 3);
+
     return { keywords, categories };
   } catch {
     return { keywords: [], categories: [] };
