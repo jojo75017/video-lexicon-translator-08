@@ -101,8 +101,8 @@ export default function V3Header({ isAuthed = false, isAdmin = false }: { isAuth
               <Link to="/v3/auth" className="v3-btn v3-btn-on-dark">
                 <LogIn className="w-4 h-4" /> Connexion
               </Link>
-              <Link to="/v3/auth?mode=signup" className="v3-btn v3-btn-gold">
-                S'inscrire
+              <Link to="/cadeau" className="v3-btn v3-btn-gold">
+                Commencer gratuitement
               </Link>
             </>
           )}
