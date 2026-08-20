@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import JSZip from 'jszip';
 import { toast } from 'sonner';
-import { BookMarked, Copy, Download, Loader2, Sparkles, Wand2 } from 'lucide-react';
+import { BookMarked, Copy, Download, Eye, Loader2, Sparkles, Wand2 } from 'lucide-react';
 import { callAIWriting } from '@/services/aiWritingService';
+import { createSafeHtml } from '@/utils/security/htmlSanitizer';
+
 
 interface V3KdpPublishPanelProps {
   title: string;
