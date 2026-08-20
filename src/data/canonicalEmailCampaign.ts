@@ -1,24 +1,25 @@
 import { COMMANDER_URL } from './externalLinks';
 
 export const ACTIVE_EMAIL_CAMPAIGN = {
-  id: 'offre-47-sequence-2026',
-  name: 'Offre 47 € — séquence unique',
+  id: 'fin-47-lancement-v3-2026',
+  name: 'Fin du 47 € (31 août) + lancement V3 (1er octobre) — 5 jours',
   status: 'active' as const,
   sendingBlocked: false,
   price: '47 €',
   regularPrice: '59 €',
-  deadline: '30 septembre 2026',
+  deadline: '31 août 2026',
   checkoutUrl: COMMANDER_URL,
 
   steps: [
-    { step: 1, delay: 'J+0', label: 'Offre complète', template: 'offre-47-unique-1', subject: 'Votre idée de livre peut être publiée sur Amazon ce mois-ci' },
-    { step: 2, delay: 'J+2', label: 'Avant / après', template: 'offre-47-unique-2', subject: 'De trois lignes d’idée à un manuscrit complet' },
-    { step: 3, delay: 'J+5', label: 'Workflow', template: 'offre-47-unique-3', subject: 'Les 5 étapes qui créent votre livre' },
-    { step: 4, delay: 'J+7', label: 'Objections', template: 'offre-47-unique-4', subject: '« Je n’écris pas bien », « c’est trop technique » : réponses claires' },
-    { step: 5, delay: 'J+10', label: 'Échéance', template: 'offre-47-unique-5', subject: 'Le tarif de 47 € se termine le 30 septembre' },
+    { step: 1, delay: 'J+0', label: 'Fin du 47 € le 31 août', template: 'fin-47-v3-1', subject: 'L’accès à 47 € se termine le 31 août' },
+    { step: 2, delay: 'J+1', label: 'La V3 le 1er octobre', template: 'fin-47-v3-2', subject: 'Ce qui change vraiment le 1er octobre' },
+    { step: 3, delay: 'J+2', label: 'Le workflow', template: 'fin-47-v3-3', subject: 'Un livre complet, du sommaire au fichier Amazon' },
+    { step: 4, delay: 'J+3', label: 'Objections', template: 'fin-47-v3-4', subject: '« Je n’écris pas bien », « c’est trop technique » : mes réponses' },
+    { step: 5, delay: 'J+4', label: 'Dernier jour', template: 'fin-47-v3-5', subject: 'Dernier jour : 47 € ce soir, abonnement ensuite' },
   ],
 
 } as const;
+
 
 /** Campagne de clôture de l'offre 47 € : envois manuels depuis /gestion-prospects. */
 export const CLOSING_EMAIL_CAMPAIGN = {

@@ -9,10 +9,11 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-cron-secret",
 };
 
-const CAMPAIGN = "offre-47-sequence-2026";
+const CAMPAIGN = "fin-47-lancement-v3-2026";
 const CHECKOUT = CHECKOUT_URL;
 
-const DELAYS = [0, 2, 3, 2, 3];
+/** Séquence courte : un email par jour pendant 5 jours. */
+const DELAYS = [0, 1, 1, 1, 1];
 
 interface StepContent {
   subject: string;
@@ -49,127 +50,128 @@ const OFFER_BULLETS: Array<{ label: string; text: string }> = [
 
 const STEPS: StepContent[] = [
   {
-    subject: "Votre idée de livre peut être publiée sur Amazon ce mois-ci",
-    preheader: "Plan, rédaction, couverture KDP et fiche Amazon réunis dans un seul espace.",
-    badge: "OFFRE 47 € AU LIEU DE 59 € — JUSQU’AU 30 SEPTEMBRE",
-    heading: "Votre idée est déjà là. Il ne manque que la chaîne de fabrication.",
-    intro: "Vous avez une idée de livre. Peut-être depuis des mois. Ce qui bloque, ce n’est presque jamais l’idée : c’est le plan à structurer, les chapitres à écrire, le fichier à mettre aux normes, la couverture à fabriquer et la fiche Amazon à remplir.<br><br>EbookStudio prend en charge cette chaîne complète, de la première idée jusqu’à la mise en vente.",
-    bulletsTitle: "Ce que vous obtenez concrètement",
+    subject: "L’accès à 47 € se termine le 31 août",
+    preheader: "Le 1er octobre, EbookStudio passe en V3 par abonnement. Avant, l’accès complet reste à 47 €.",
+    badge: "ACCÈS COMPLET 47 € — JUSQU’AU 31 AOÛT",
+    heading: "Le 31 août, le paiement unique à 47 € disparaît",
+    intro: "Je vous écris pour être clair sur le calendrier, sans détour.<br><br>Jusqu’au <strong>31 août 2026</strong>, l’accès complet à EbookStudio reste à <strong>47 € en un seul paiement</strong>. Après cette date, il n’y a plus de paiement unique : la <strong>V3 ouvre le 1er octobre</strong> et fonctionne par abonnement mensuel.",
+    bulletsTitle: "Ce que contient l’accès à 47 €",
     bullets: OFFER_BULLETS,
-    valueTitle: "À faire aujourd’hui, même sans EbookStudio",
-    valueBody: "Écrivez votre sujet en une seule phrase : « Ce livre aide <em>[qui]</em> à <em>[résultat précis]</em> en <em>[combien de temps / de pages]</em> ». Si vous n’arrivez pas à remplir les trois trous, votre livre est encore trop large : c’est la première cause d’abandon avant le chapitre 3.",
-    result: "vous ne repartez pas avec des conseils, mais avec un manuscrit complet, une couverture au bon format et une fiche produit prête à être publiée. Un projet qui traînait depuis des mois devient un livre disponible sur Amazon.",
-    reassurance: "Tout est réuni dans un seul espace : pas d’outils à assembler, pas de logiciel à apprendre, aucune compétence technique requise. Même s’il s’agit de votre premier livre.",
-    cta: "Découvrir EbookStudio et profiter de l’offre à 47 €",
-    closing: "Votre idée est déjà là. EbookStudio vous aide maintenant à en faire un véritable livre.",
-    ps: "Si vous hésitez, répondez simplement à cet email : je vous réponds personnellement.",
+    valueTitle: "Le calendrier, en trois dates",
+    valueBody: "<strong>31 août</strong> : dernier jour du paiement unique à 47 €.<br><strong>1er septembre</strong> : les inscriptions à la V3 ouvrent, avec le <strong>premier mois offert</strong>.<br><strong>1er octobre</strong> : la V3 ouvre pour de bon et tout le monde entre en même temps.",
+    result: "vous obtenez aujourd’hui le workflow complet — plan, rédaction, export KDP, couverture, fiche Amazon — pour un seul paiement, et vous gardez cet accès.",
+    reassurance: "Aucun abonnement, aucun prélèvement mensuel, aucune date de fin sur votre accès.",
+    cta: "Prendre l’accès complet à 47 € avant le 31 août",
+    closing: "Si votre projet de livre attend depuis des mois, c’est la dernière fenêtre à ce tarif.",
+    ps: "Une question sur votre projet ? Répondez à cet email : je réponds moi-même.",
     showPrice: true,
     doubleCta: true,
   },
   {
-    subject: "De trois lignes d’idée à un manuscrit complet",
-    preheader: "Ce que vous saisissez au départ, ce que vous récupérez à la fin.",
-    badge: "ÉTAPE 2 · AVANT / APRÈS",
-    heading: "Vous apportez l’idée. EbookStudio construit le livre.",
-    intro: "Au départ, vous écrivez trois lignes : le sujet de votre livre et à qui il s’adresse.<br><br>À l’arrivée, vous récupérez un dossier complet, prêt à être déposé sur Amazon KDP.",
-    bulletsTitle: "Ce que vous récupérez à la fin",
+    subject: "Ce qui change vraiment le 1er octobre",
+    preheader: "V3 en abonnement, premier mois offert, inscriptions dès le 1er septembre.",
+    badge: "JOUR 2 · LA V3 ARRIVE LE 1ER OCTOBRE",
+    heading: "La V3 ouvre le 1er octobre. Voici comment y entrer.",
+    intro: "La V3 n’est pas une mise à jour cosmétique : c’est l’atelier complet, avec les 15 agents qui fabriquent le livre étape par étape, le studio de couverture, la fiche KDP et l’aperçu du livre en direct.<br><br>Elle ouvre le <strong>1er octobre 2026</strong>. Les inscriptions, elles, ouvrent dès le <strong>1er septembre</strong>.",
+    bulletsTitle: "Comment se passe l’entrée en V3",
     bullets: [
-      { label: "Le manuscrit complet", text: "tous les chapitres rédigés, relus et modifiables jusqu’au dernier mot." },
-      { label: "Le fichier intérieur", text: "Word et PDF au bon format, sommaire généré, titres hiérarchisés." },
-      { label: "La couverture", text: "face avant, dos calculé, 4e de couverture, aux dimensions exactes de votre format." },
-      { label: "La fiche de vente", text: "titre, sous-titre, description, mots-clés et catégories Amazon." },
-      { label: "Le pack final", text: "un seul dossier à télécharger, tout est dedans." },
+      { label: "1er septembre", text: "vous pouvez vous inscrire immédiatement et réserver votre place." },
+      { label: "Premier mois offert", text: "vous ne payez rien le premier mois ; la première facture tombe après l’ouverture." },
+      { label: "1er octobre", text: "votre espace V3 s’ouvre, avec l’atelier complet et vos projets." },
+      { label: "Sans engagement", text: "vous arrêtez quand vous voulez, en un clic, avant la fin du mois offert." },
+      { label: "Avant l’ouverture", text: "vous accédez tout de suite aux cadeaux de bienvenue et au kit de démarrage." },
     ],
-    valueTitle: "Le repère que personne ne vous donne : le bon calibre",
-    valueBody: "Un guide pratique qui se vend bien sur Amazon fait le plus souvent <strong>120 à 180 pages</strong>, soit environ <strong>25 000 à 40 000 mots</strong>, répartis en <strong>8 à 12 chapitres de 2 500 à 3 500 mots</strong>. En dessous de 100 pages, le dos du livre est trop fin pour un titre lisible en broché. Notez ce calibre : c’est lui qui décide de votre plan.",
-    result: "le temps que vous passiez à chercher comment faire, vous le passez maintenant à améliorer votre livre. C’est la seule partie que personne ne peut faire à votre place.",
-    reassurance: "Vous restez maître du contenu à chaque étape : rien n’avance sans votre validation.",
-    cta: "Voir ce que j’obtiens pour 47 €",
-    closing: "Votre livre n’attend plus qu’une décision.",
-    ps: "Une question sur votre projet précis ? Répondez à cet email, je vous réponds moi-même.",
+    valueTitle: "Et si vous prenez l’accès à 47 € avant le 31 août ?",
+    valueBody: "Vous n’avez rien à payer ensuite : les évolutions sont <strong>incluses dans votre accès</strong>. C’est la seule manière d’avoir EbookStudio sans abonnement mensuel, et elle se ferme le 31 août.",
+    result: "deux chemins, un seul choix à faire ce mois-ci : un paiement unique de 47 € maintenant, ou un abonnement mensuel à partir du 1er octobre.",
+    reassurance: "Dans les deux cas, vous savez exactement ce que vous payez et quand.",
+    cta: "Choisir l’accès unique à 47 € (jusqu’au 31 août)",
+    closing: "Le 1er septembre, je vous enverrai le lien d’inscription à la V3.",
+    ps: "Vous hésitez entre les deux ? Répondez-moi en une ligne, je vous dis lequel correspond à votre situation.",
     showPrice: false,
     doubleCta: false,
   },
   {
-    subject: "Les 5 étapes qui créent votre livre",
-    preheader: "Le workflow complet, étape par étape, sans page blanche.",
-    reminder: "Petit rappel avant d’entrer dans le détail : l’accès complet est à <strong>47 €</strong> en un seul paiement (au lieu de 59 €) jusqu’au <strong>30 septembre 2026</strong>.",
-    badge: "ÉTAPE 3 · LE WORKFLOW EN DÉTAIL",
-    heading: "Un workflow simple, sans page blanche",
-    intro: "Beaucoup abandonnent parce qu’ils ne savent pas par quoi commencer. Voici exactement ce que vous voyez à l’écran, dans l’ordre.",
+    subject: "Un livre complet, du sommaire au fichier Amazon",
+    preheader: "Ce que la machine fabrique réellement, étape par étape.",
+    reminder: "Rappel du calendrier : <strong>47 € en paiement unique jusqu’au 31 août</strong>, puis V3 par abonnement à partir du 1er octobre (inscriptions dès le 1er septembre, premier mois offert).",
+    badge: "JOUR 3 · CE QUE VOUS OBTENEZ CONCRÈTEMENT",
+    heading: "De trois lignes d’idée à un livre déposable sur Amazon",
+    intro: "Vous écrivez votre sujet et à qui il s’adresse. Ensuite, chaque étape est prise en charge et vous validez au fur et à mesure.",
     bulletsTitle: "Les 5 étapes",
     bullets: [
-      { label: "1. Le cadrage", text: "vous décrivez votre sujet, votre lecteur et le ton souhaité." },
-      { label: "2. Le plan", text: "le sommaire est proposé ; vous ajoutez, supprimez et réorganisez les chapitres." },
-      { label: "3. La rédaction", text: "les chapitres sont rédigés un par un ; vous relisez et corrigez au fil de l’eau." },
-      { label: "4. L’habillage", text: "couverture, dos, 4e de couverture et mise en page aux normes KDP." },
-      { label: "5. La publication", text: "export du pack complet et fiche Amazon prête à copier-coller." },
+      { label: "1. Le cadrage", text: "votre sujet, votre lecteur, le ton. Une seule information est obligatoire : l’idée." },
+      { label: "2. Le sommaire", text: "le plan est proposé chapitre par chapitre ; vous ajoutez, supprimez, réorganisez." },
+      { label: "3. La rédaction", text: "les chapitres sont écrits un par un, relus, corrigés, et visibles en direct à côté." },
+      { label: "4. L’habillage", text: "couverture, dos calculé, 4e de couverture, mise en page aux normes KDP." },
+      { label: "5. La publication", text: "export Word et PDF, description, 7 mots-clés et catégories prêtes à coller." },
     ],
-    valueTitle: "Les réglages KDP à connaître avant de publier",
-    valueBody: "Format broché le plus courant : <strong>15,24 × 22,86 cm (6″ × 9″)</strong>. Marges intérieures de <strong>1,9 cm minimum</strong> dès 150 pages, sinon le texte se perd dans la reliure. Épaisseur du dos : <strong>nombre de pages × 0,0572 mm</strong> pour du papier blanc — c’est ce calcul qui fait rejeter la plupart des couvertures au premier dépôt.",
-    result: "cinq étapes, un seul écran, aucun logiciel à installer. Vous savez à tout moment où vous en êtes et ce qu’il reste à faire.",
-    reassurance: "Vous pouvez vous arrêter et reprendre plus tard : votre projet est sauvegardé.",
-    cta: "Voir le workflow EbookStudio",
+    valueTitle: "Le bon calibre, pour éviter le rejet au dépôt",
+    valueBody: "Un guide pratique qui se vend fait le plus souvent <strong>120 à 180 pages</strong> (25 000 à 40 000 mots), en <strong>8 à 12 chapitres</strong>. Format broché courant : <strong>15,24 × 22,86 cm</strong>. Marges intérieures de <strong>1,9 cm</strong> dès 150 pages. Sous 100 pages, le dos est trop fin pour un titre lisible.",
+    result: "vous ne repartez pas avec des conseils : vous repartez avec un manuscrit, une couverture au bon format et une fiche Amazon remplie.",
+    reassurance: "Vous gardez la main sur chaque mot : rien n’avance sans votre validation, et votre projet est sauvegardé.",
+    cta: "Voir l’accès complet à 47 €",
     closing: "La première étape prend cinq minutes.",
-    ps: "Bloqué à une étape ? Répondez à cet email, je vous débloque.",
+    ps: "Bloqué sur votre sujet ? Écrivez-le moi en une phrase, je vous aide à le cadrer.",
     showPrice: false,
     doubleCta: false,
   },
   {
-    subject: "« Je n’écris pas bien », « c’est trop technique » : réponses claires",
-    preheader: "Les questions qu’on me pose le plus, et mes réponses sans détour.",
-    badge: "ÉTAPE 4 · VOS QUESTIONS, MES RÉPONSES",
-    heading: "Avant de décider, voici les réponses essentielles",
-    intro: "Ce sont les questions qui reviennent le plus souvent. Voici mes réponses, sans détour.",
+    subject: "« Je n’écris pas bien », « c’est trop technique » : mes réponses",
+    preheader: "Les six questions qui reviennent le plus, et les réponses sans détour.",
+    badge: "JOUR 4 · VOS QUESTIONS, MES RÉPONSES",
+    heading: "Avant de décider, les réponses essentielles",
+    intro: "Il reste peu de jours avant le 31 août. Voici les questions qu’on me pose le plus souvent.",
     bulletsTitle: "Vos questions",
     bullets: [
-      { label: "« Je n’écris pas bien »", text: "vous n’avez pas à écrire le premier jet : vous le relisez et vous le corrigez. C’est beaucoup plus facile que de partir d’une page blanche." },
-      { label: "« C’est trop technique pour moi »", text: "aucune compétence technique nécessaire : vous répondez à des questions, vous cliquez, vous téléchargez." },
-      { label: "« Est-ce un abonnement ? »", text: "non. 47 € en un seul paiement, aucun prélèvement mensuel." },
-      { label: "« Est-ce que mon accès expire ? »", text: "non, l’accès est conservé et la V3 est incluse sans supplément." },
+      { label: "« Je n’écris pas bien »", text: "vous n’écrivez pas le premier jet : vous le relisez et le corrigez. Bien plus facile qu’une page blanche." },
+      { label: "« C’est trop technique »", text: "vous répondez à des questions, vous cliquez, vous téléchargez. Aucun logiciel à installer." },
+      { label: "« 47 €, c’est un abonnement ? »", text: "non. Un seul paiement, aucun prélèvement mensuel, jusqu’au 31 août." },
+      { label: "« Et la V3 ? »", text: "elle ouvre le 1er octobre. Avec l’accès à 47 € vous la recevez sans repayer." },
+      { label: "« Je préfère attendre octobre »", text: "c’est possible : inscriptions dès le 1er septembre, premier mois offert, sans engagement." },
       { label: "« Et si je bloque ? »", text: "vous répondez à mes emails et je vous réponds personnellement." },
-      { label: "« Puis-je publier plusieurs livres ? »", text: "oui, l’accès n’est pas limité à un seul projet." },
     ],
-    valueTitle: "Comment se rémunère réellement un livre sur Amazon",
-    valueBody: "En broché, KDP verse <strong>60 % du prix de vente moins les frais d’impression</strong> (environ 2,15 € + 0,0112 € par page). Un livre de 150 pages vendu 14,99 € rapporte donc à peu près <strong>5,20 € par exemplaire</strong>. En ebook, la redevance passe à <strong>70 %</strong> entre 2,99 € et 9,99 €. C’est ce calcul, pas le hasard, qui fixe le prix de votre livre.",
-    result: "le vrai risque n’est pas de payer 47 €. C’est de retrouver dans un an la même idée de livre, toujours au même point.",
+    valueTitle: "Ce que rapporte réellement un livre sur Amazon",
+    valueBody: "En broché, KDP verse <strong>60 % du prix de vente moins les frais d’impression</strong> (environ 2,15 € + 0,0112 € par page). Un livre de 150 pages vendu 14,99 € rapporte donc autour de <strong>5,20 € par exemplaire</strong>. En ebook, la redevance monte à <strong>70 %</strong> entre 2,99 € et 9,99 €.",
+    result: "le vrai risque n’est pas de payer 47 € une fois. C’est de relire ce même email dans un an avec la même idée de livre, toujours au même point.",
     reassurance: "Paiement unique, accès conservé, V3 incluse : rien à surveiller, rien à résilier.",
-    cta: "Vérifier l’offre et commander à 47 €",
+    cta: "Prendre l’accès à 47 € avant le 31 août",
     closing: "Si une question manque à cette liste, posez-la moi.",
-    ps: "Je lis et je réponds à chaque réponse à cet email.",
+    ps: "Je lis chaque réponse à cet email.",
     showPrice: true,
     doubleCta: false,
   },
   {
-    subject: "Le tarif de 47 € se termine le 30 septembre",
-    preheader: "Après cette date, l’accès repasse à 59 €. Dernier message de la séquence.",
-    badge: "DERNIER RAPPEL · 47 € JUSQU’AU 30 SEPTEMBRE",
-    heading: "Dernier message sur le tarif de 47 €",
-    intro: "Le 30 septembre 2026 au soir, l’accès complet repasse à <strong>59 €</strong>.<br><br>Ce n’est pas une fausse urgence : c’est simplement la fin du tarif d’été.",
+    subject: "Dernier jour : 47 € ce soir, abonnement ensuite",
+    preheader: "Après ce soir, plus de paiement unique. Rendez-vous le 1er septembre pour la V3.",
+    badge: "DERNIER JOUR · 47 € JUSQU’À CE SOIR",
+    heading: "Ce soir, le paiement unique s’arrête",
+    intro: "C’est le dernier message de cette série.<br><br>Ce soir, <strong>31 août</strong>, l’accès complet à 47 € en paiement unique disparaît. Ensuite, il n’existe plus qu’un chemin : l’abonnement V3, dont les inscriptions ouvrent <strong>demain 1er septembre</strong> avec le <strong>premier mois offert</strong>, pour une ouverture le <strong>1er octobre</strong>.",
     bulletsTitle: "Ce que vous obtenez encore aujourd’hui pour 47 €",
     bullets: [
       { label: "Plan et rédaction", text: "du sommaire au manuscrit complet, chapitre par chapitre." },
       { label: "Export KDP", text: "Word et PDF aux normes Amazon, sommaire propre." },
       { label: "Couverture complète", text: "face avant, dos calculé, 4e de couverture." },
-      { label: "Fiche Amazon", text: "titre, description, mots-clés, catégories." },
+      { label: "Fiche Amazon", text: "description, 7 mots-clés, catégories." },
       { label: "Livres enfants et outils annexes", text: "illustrés 3-7 ans, traduction, niches, analyse de la concurrence." },
-      { label: "V3 incluse", text: "sans repayer." },
+      { label: "La V3 incluse", text: "au 1er octobre, sans abonnement à payer." },
     ],
     valueTitle: "Les 7 mots-clés qui décident de votre visibilité",
-    valueBody: "Amazon vous laisse <strong>7 champs de mots-clés</strong> et <strong>2 catégories</strong>. Utilisez des expressions que le lecteur tape vraiment (« méthode pour arrêter de procrastiner »), jamais votre nom ni le titre du livre : ils sont déjà indexés, les répéter gaspille un champ. Une fiche bien remplie fait souvent plus de ventes qu’un chapitre de plus.",
-    result: "si votre projet de livre attend depuis trop longtemps, c’est le moment de le sortir. Vous obtenez maintenant le workflow complet pour 47 €, une seule fois.",
-    reassurance: "C’est le dernier email de cette séquence. Il n’y aura pas de relance cachée ensuite.",
-    cta: "Profiter du tarif avant le 30 septembre",
+    valueBody: "Amazon vous laisse <strong>7 champs de mots-clés</strong> et <strong>2 catégories</strong>. Utilisez des expressions que le lecteur tape vraiment (« méthode pour arrêter de procrastiner »), jamais votre nom ni le titre : ils sont déjà indexés. Une fiche bien remplie fait souvent plus de ventes qu’un chapitre de plus.",
+    result: "un seul paiement aujourd’hui, ou un abonnement mensuel à partir d’octobre. À vous de choisir, mais choisissez avant ce soir.",
+    reassurance: "C’est le dernier email de cette série : aucune relance cachée ensuite.",
+    cta: "Profiter des 47 € avant ce soir",
     closing: "Merci de m’avoir lu jusqu’ici.",
-    ps: "Après le 30 septembre, ce tarif ne reviendra pas.",
+    ps: "Si vous préférez la V3, ne faites rien : je vous envoie le lien d’inscription demain.",
     showPrice: true,
     doubleCta: true,
   },
 ];
 
 
+
 const normalize = (value: string) => value.trim().toLowerCase();
-const templateName = (step: number) => `offre-47-unique-${step}`;
+const templateName = (step: number) => `fin-47-v3-${step}`;
 const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
 /** Lien de clic hébergé sur notre propre domaine (/r) : plus de confiance
@@ -214,7 +216,7 @@ ${bulletList(c.bullets)}
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td style="background:#fffaf2;border:1px solid #FF9E2D;padding:18px 20px;font:16px/1.65 Arial,Helvetica,sans-serif;color:#232F3E"><p style="margin:0 0 8px;font:700 16px Arial,Helvetica,sans-serif;color:#8a4b00">${c.valueTitle}</p>${c.valueBody}</td></tr></table>
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:22px 0"><tr><td style="background:#f2f8f9;border-left:4px solid #008296;padding:16px 18px;font:16px/1.6 Arial,Helvetica,sans-serif;color:#232F3E"><strong>Le résultat :</strong> ${c.result}</td></tr></table>
 <p style="margin:0 0 20px">${c.reassurance}</p>
-${c.showPrice ? `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse"><tr><td align="center" style="background:#232F3E;padding:20px;color:#ffffff;font:16px/1.5 Arial,Helvetica,sans-serif"><div style="font:700 38px/1.1 Arial,Helvetica,sans-serif;color:#FF9E2D">47 €</div><div style="margin-top:8px"><span style="text-decoration:line-through;opacity:.75">59 €</span> &nbsp;·&nbsp; paiement unique</div><div style="margin-top:6px;font-size:14px;opacity:.9">Pas d’abonnement, pas de prélèvement mensuel, accès conservé.</div></td></tr></table>` : `<p style="margin:0 0 20px;font:16px/1.6 Arial,Helvetica,sans-serif;color:#232F3E"><strong>47 €</strong> en un seul paiement (au lieu de 59 €), jusqu’au 30 septembre. Pas d’abonnement.</p>`}
+${c.showPrice ? `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse"><tr><td align="center" style="background:#232F3E;padding:20px;color:#ffffff;font:16px/1.5 Arial,Helvetica,sans-serif"><div style="font:700 38px/1.1 Arial,Helvetica,sans-serif;color:#FF9E2D">47 €</div><div style="margin-top:8px"><span style="text-decoration:line-through;opacity:.75">59 €</span> &nbsp;·&nbsp; paiement unique</div><div style="margin-top:6px;font-size:14px;opacity:.9">Pas d’abonnement, pas de prélèvement mensuel, accès conservé.</div></td></tr></table>` : `<p style="margin:0 0 20px;font:16px/1.6 Arial,Helvetica,sans-serif;color:#232F3E"><strong>47 €</strong> en un seul paiement (au lieu de 59 €), jusqu’au 31 août. Pas d’abonnement.</p>`}
 ${ctaButton(link, c.cta)}
 <p style="margin:0 0 18px">${c.closing}</p>
 <p style="margin:0 0 6px">Bien à vous,<br><strong>Georges Boubet</strong><br>EbookStudio</p>
@@ -222,7 +224,7 @@ ${ctaButton(link, c.cta)}
 ${c.doubleCta ? ctaButton(link, "J’accède à EbookStudio pour 47 €") : ""}
 
 </td></tr>
-<tr><td style="padding:18px 24px;background:#f6f7f8;text-align:center;color:#68737d;font:12px/1.6 Arial,Helvetica,sans-serif">Offre valable jusqu’au 30 septembre 2026, sous réserve des conditions indiquées sur le site.<br>Vous recevez cet email car vous avez manifesté un intérêt pour EbookStudio.<br><a href="${unsubscribe}" style="color:#008296">Se désinscrire de tous les emails marketing</a></td></tr>
+<tr><td style="padding:18px 24px;background:#f6f7f8;text-align:center;color:#68737d;font:12px/1.6 Arial,Helvetica,sans-serif">Offre valable jusqu’au 31 août 2026, sous réserve des conditions indiquées sur le site.<br>Vous recevez cet email car vous avez manifesté un intérêt pour EbookStudio.<br><a href="${unsubscribe}" style="color:#008296">Se désinscrire de tous les emails marketing</a></td></tr>
 </table></td></tr></table><img src="${pixel}" width="1" height="1" alt="" style="display:none"></body></html>`;
 }
 
