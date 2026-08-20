@@ -35,6 +35,28 @@ type OutlineChapter = {
   objectif: string;
 };
 
+/**
+ * Les agents P2 (étude de marché) et P7 (packaging) produisent les 7 mots-clés KDP
+ * et les catégories Amazon. On les récupère pour remplir la fiche KDP et la sauvegarde.
+ */
+function readKdpMetaFromResults(): { keywords: string[]; categories: string[] } {
+  try {
+    const raw = localStorage.getItem('ebook_workflow_results');
+    if (!raw) return { keywords: [], categories: [] };
+    const results = JSON.parse(raw) as Record<string, { result?: any }>;
+    const p2 = results.P2?.result || {};
+    const p7 = results.P7?.result || {};
+    const list = (value: any) => (Array.isArray(value) ? value.map((v) => String(v).trim()).filter(Boolean) : []);
+    const keywords = Array.from(new Set([...list(p7.motsClésOptimises), ...list(p2.motsClésKDP)])).slice(0, 7);
+    const categories = Array.from(
+      new Set([...list(p2.categoriesKDP), ...list(p2.categoriesSecondaires)]),
+    ).slice(0, 3);
+    return { keywords, categories };
+  } catch {
+    return { keywords: [], categories: [] };
+  }
+}
+
 type HubConfig = {
   title?: string;
   subtitle?: string;
