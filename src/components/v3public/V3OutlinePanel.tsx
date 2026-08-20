@@ -50,6 +50,11 @@ export default function V3OutlinePanel({ brief, onChange, initialMode }: Props) 
   const [versions, setVersions] = useState<OutlineVersion[]>([]);
   const [savingVersion, setSavingVersion] = useState(false);
 
+  // Annuler / Rétablir sur le sommaire (manipulations du Sommaire Stratégique).
+  const [history, setHistory] = useState<BriefOutlineChapter[][]>([]);
+  const [future, setFuture] = useState<BriefOutlineChapter[][]>([]);
+  const dragIndex = useRef<number | null>(null);
+
   // Historique des sommaires validés (reprise possible à tout moment).
   useEffect(() => {
     loadOutlineVersions(brief.projectId || null).then(setVersions);
