@@ -631,6 +631,8 @@ const ProspectManagerPage = () => {
               </Button>
             </div>
 
+            <EmailFunnelPanel />
+
             <CampaignSequencePanel />
 
             <ClosingCampaignPanel />
