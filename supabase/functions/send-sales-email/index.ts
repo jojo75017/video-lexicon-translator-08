@@ -449,6 +449,37 @@ Deno.serve(async (req) => {
       const delayHours = body.delay_hours === undefined ? 48 : Math.max(0, Number(body.delay_hours));
       const cutoff = new Date(Date.now() - delayHours * 3600000).toISOString();
 
+      // === MODE TEST ===
+      // `test_mode: true` + `test_emails: ["moi@exemple.fr", ...]` envoie l'email de relance
+      // uniquement à cette liste restreinte, avec le préfixe [TEST], sans journaliser le
+      // gabarit de relance (donc l'envoi réel reste possible ensuite).
+      if (body.test_mode) {
+        const rawList: string[] = Array.isArray(body.test_emails)
+          ? body.test_emails
+          : String(body.test_emails || "").split(/[,;\s]+/);
+        const testTargets = Array.from(new Set(rawList.map((e) => normalize(String(e || ""))).filter(isEmail))).slice(0, 20);
+        if (!testTargets.length) return respond({ success: false, mode, error: "Aucune adresse de test valide fournie (test_emails)." }, 400);
+
+        const { data: testProfiles } = await db.from("sales_prospects").select("email,first_name").in("email", testTargets);
+        const testNames = new Map((testProfiles || []).map((r) => [normalize(r.email || ""), (r.first_name as string) || ""]));
+
+        let testSent = 0;
+        const results: Array<{ email: string; ok: boolean; error?: string }> = [];
+        for (let i = 0; i < testTargets.length; i++) {
+          const email = testTargets[i];
+          const subject = `[TEST] ${isNonOpeners ? NON_OPENER_SUBJECTS[i % NON_OPENER_SUBJECTS.length] : "Vous avez regardé — je vous écris le premier chapitre"}`;
+          const html = isNonOpeners
+            ? renderNonOpener(baseUrl, email, testNames.get(email) || "", step)
+            : render(baseUrl, email, testNames.get(email) || "", step);
+          const result = await sendResendEmailThrottled({ from: FROM_CAMPAIGN, to: [email], subject, html, reply_to: REPLY_TO });
+          await db.from("email_send_log").insert({ recipient_email: email, template_name: `${resendTemplate}-test`, message_id: result.id || `${CAMPAIGN}-${resendTemplate}-test-${email}`, provider_message_id: result.id || null, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
+          results.push({ email, ok: result.ok, error: result.ok ? undefined : `HTTP ${result.status || ""}: ${result.detail || ""}` });
+          if (result.ok) testSent++;
+        }
+        return respond({ success: true, mode, test_mode: true, template: `${resendTemplate}-test`, sent: testSent, targets: testTargets.length, results });
+      }
+
+
       const { data: received } = await db.from("email_send_log").select("recipient_email,created_at").eq("template_name", sourceTemplate).in("status", ["sent", "delivered"]).lte("created_at", cutoff).limit(5000);
       const { data: opens } = await db.from("email_opens").select("prospect_email").eq("template_name", sourceTemplate);
       const { data: clicks } = await db.from("email_clicks").select("prospect_email").eq("template_name", sourceTemplate);
