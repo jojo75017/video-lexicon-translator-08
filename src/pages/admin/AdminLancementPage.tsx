@@ -10,6 +10,9 @@ import {
   Crown,
   ToggleLeft,
   ToggleRight,
+  Headphones,
+  Copy,
+  Check,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,6 +23,8 @@ import AdminPanelNav from '@/components/admin/AdminPanelNav';
 import { AdminGate } from '@/components/auth/AdminGate';
 import useLaunchSettings, { type LaunchSettingKey } from '@/hooks/useLaunchSettings';
 import { formatPrice, V3_PLANS } from '@/data/v3Pricing';
+import { LAUNCH_SCRIPT_LONG, LAUNCH_SCRIPT_SHORT } from '@/data/launchMediaScript';
+
 
 interface TrialRow {
   id: string;
