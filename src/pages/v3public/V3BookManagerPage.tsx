@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Plus, Pencil, Trash2, BookOpen, FileDown, X, Wand2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, BookOpen, FileDown, X, Wand2, BarChart3 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { BackButton } from "@/components/v3/BackButton";
@@ -160,6 +160,9 @@ export default function V3BookManagerPage() {
                   className="v3-btn v3-btn-outline text-xs"
                 >
                   <FileDown className="w-3.5 h-3.5" /> {exportLoadingId === b.id ? 'Chargement…' : 'Exporter'}
+                </button>
+                <button onClick={() => nav(`/v3/donnees-kdp?projectId=${b.id}`)} className="v3-btn v3-btn-outline text-xs">
+                  <BarChart3 className="w-3.5 h-3.5" /> Données KDP
                 </button>
                 <button onClick={() => nav(`/v3/create?projectId=${b.id}`)} className="v3-btn v3-btn-primary text-xs">
                   <BookOpen className="w-3.5 h-3.5" /> Ouvrir le livre
