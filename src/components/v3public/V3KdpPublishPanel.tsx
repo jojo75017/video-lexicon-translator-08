@@ -101,7 +101,8 @@ export default function V3KdpPublishPanel({
     return Array.from({ length: 7 }, (_, i) => base[i] || '');
   });
   const [categories, setCategories] = useState<string[]>(() => {
-    const base = initialCategories?.filter(Boolean).slice(0, 3) || [];
+    const base = cleanCategories(initialCategories).slice(0, 3);
+
     return Array.from({ length: 3 }, (_, i) => base[i] || '');
   });
   const [authorBio, setAuthorBio] = useState('');
@@ -127,7 +128,7 @@ export default function V3KdpPublishPanel({
   }, [JSON.stringify(initialKeywords || [])]);
 
   useEffect(() => {
-    const base = initialCategories?.filter(Boolean).slice(0, 3) || [];
+    const base = cleanCategories(initialCategories).slice(0, 3);
     if (!base.length) return;
     setCategories((prev) => prev.map((value, index) => value.trim() || base[index] || ''));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -169,7 +170,7 @@ Réponds UNIQUEMENT en JSON valide :
 {
   "description": "description KDP vendeuse, 1500 à 3000 caractères, HTML autorisé <b> <i> <br>",
   "keywords": ["7 mots-clés longue traîne de recherche Amazon"],
-  "bisac": ["3 catégories BISAC officielles en anglais"],
+  "bisac": ["3 libellés de catégories BISAC officielles en anglais, format exact 'FICTION / Thrillers / Suspense', SANS code numérique, SANS numérotation"],
   "authorBio": "biographie auteur 500 à 800 caractères à la 3e personne",
   "aPlusContent": "contenu A+ Amazon : 3 modules texte (titre + paragraphe) séparés par des sauts de ligne",
   "backCover": "texte de 4e de couverture, 700 caractères max"
@@ -183,8 +184,10 @@ Réponds UNIQUEMENT en JSON valide :
         setKeywords(Array.from({ length: 7 }, (_, i) => String(data.keywords[i] || '').slice(0, 50)));
       }
       if (Array.isArray(data.bisac)) {
-        setCategories(Array.from({ length: 3 }, (_, i) => String(data.bisac[i] || '')));
+        const clean = cleanCategories(data.bisac);
+        setCategories(Array.from({ length: 3 }, (_, i) => clean[i] || ''));
       }
+
       if (data.authorBio) setAuthorBio(String(data.authorBio));
       if (data.aPlusContent) setAPlusContent(String(data.aPlusContent));
       if (data.backCover) setBackCoverText(String(data.backCover));
