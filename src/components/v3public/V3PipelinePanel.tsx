@@ -1,4 +1,5 @@
 import { Layers } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 /**
  * « Comment votre livre est écrit » — les passes réellement exécutées par l'outil,
