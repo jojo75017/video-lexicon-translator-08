@@ -441,7 +441,9 @@ Deno.serve(async (req) => {
     for (const recipient of recipients) {
       const email = normalize(recipient.email || "");
       const step = mode === "test" ? recipient.current_step + 1 : Number(body.step || recipient.current_step + 1);
-      if (!isEmail(email) || buyers.has(email) || !STEPS[step - 1]) { skipped++; continue; }
+      // En test on n'exclut jamais l'adresse : sinon un test vers une adresse déjà acheteuse part « en silence ».
+      if (!isEmail(email) || !STEPS[step - 1] || (mode !== "test" && buyers.has(email))) { skipped++; continue; }
+
       const template = templateName(step);
       if (mode !== "test") {
         const { count } = await db.from("email_send_log").select("id", { count: "exact", head: true }).eq("recipient_email", email).eq("template_name", template).in("status", ["sent", "delivered"]);
