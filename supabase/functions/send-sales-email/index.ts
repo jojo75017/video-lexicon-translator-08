@@ -9,10 +9,11 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-cron-secret",
 };
 
-const CAMPAIGN = "offre-47-sequence-2026";
+const CAMPAIGN = "fin-47-lancement-v3-2026";
 const CHECKOUT = CHECKOUT_URL;
 
-const DELAYS = [0, 2, 3, 2, 3];
+/** Séquence courte : un email par jour pendant 5 jours. */
+const DELAYS = [0, 1, 1, 1, 1];
 
 interface StepContent {
   subject: string;
