@@ -114,13 +114,14 @@ export default function V3BookActionsBar({ onLaunch }: { onLaunch: () => void })
           <BookOpen className="h-3.5 w-3.5" /> Voir mon livre{writtenCount ? ` (${writtenCount})` : ''}
         </button>
 
-        <button type="button" onClick={() => requireOutline(() => {
-          const target = document.getElementById('exports-livre');
-          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          else { onLaunch(); toast.info('Les données KDP seront visibles ici dès que le manuscrit sera terminé.'); }
-        })} className="v3-btn v3-btn-outline justify-center text-xs">
+        <Link
+          to={projectId ? `/v3/donnees-kdp?projectId=${projectId}` : '/v3/mes-livres'}
+          onClick={() => { if (!projectId) toast.info('Enregistrez d’abord votre livre : les données KDP s’ouvrent depuis « Mes livres ».'); }}
+          className="v3-btn v3-btn-outline justify-center text-xs"
+          title={projectId ? 'Description, mots-clés et catégories KDP' : 'Enregistrez votre livre pour obtenir ses données KDP'}
+        >
           <BarChart3 className="h-3.5 w-3.5" /> Données KDP
-        </button>
+        </Link>
 
         <Link to={projectId ? `/v3/outils/traduction?projectId=${projectId}` : '/v3/outils/traduction'} className="v3-btn v3-btn-outline justify-center text-xs">
           <Languages className="h-3.5 w-3.5" /> Traduire (10 langues)
