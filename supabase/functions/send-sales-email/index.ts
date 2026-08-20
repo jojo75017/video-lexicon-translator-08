@@ -200,11 +200,15 @@ function ctaButton(link: string, label: string) {
   return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:26px 0"><tr><td align="center" bgcolor="#FF9E2D" style="border-radius:6px"><a href="${link}" style="display:block;padding:17px 24px;color:#232F3E;text-decoration:none;font:700 17px/1.3 Arial,Helvetica,sans-serif;text-align:center">${label}</a></td></tr></table>`;
 }
 
-/** Bloc vidéo : vignette cliquable vers la vidéo de lancement. Masqué si aucune URL. */
-function videoBlock(url: string) {
+/** Bloc média : vignette cliquable vers la vidéo ou le message audio. Masqué si aucune URL. */
+function mediaBlock(url: string, kind: "video" | "audio") {
   if (!url) return "";
+  if (kind === "audio" || url.endsWith(".mp3")) {
+    return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td align="center" style="background:#064e3b;padding:22px 20px"><p style="margin:0 0 6px;font:700 13px Arial,Helvetica,sans-serif;color:#C9A84C;letter-spacing:.6px">LE MESSAGE AUDIO — 2 MINUTES</p><p style="margin:0 0 14px;font:16px/1.55 Arial,Helvetica,sans-serif;color:#ffffff">Je vous explique pourquoi EbookStudio change la publication sur Amazon.</p><a href="${url.startsWith("http") ? url : `${url}`}" style="display:inline-block;background:#C9A84C;color:#0b2b22;text-decoration:none;padding:14px 22px;border-radius:6px;font:700 16px Arial,Helvetica,sans-serif">&#9658;&nbsp; Écouter le message</a></td></tr></table>`;
+  }
   return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td align="center" style="background:#064e3b;padding:22px 20px"><p style="margin:0 0 6px;font:700 13px Arial,Helvetica,sans-serif;color:#C9A84C;letter-spacing:.6px">LA VIDÉO — 2 MINUTES</p><p style="margin:0 0 14px;font:16px/1.55 Arial,Helvetica,sans-serif;color:#ffffff">Je vous montre un livre complet, du sommaire au fichier prêt pour Amazon.</p><a href="${url}" style="display:inline-block;background:#C9A84C;color:#0b2b22;text-decoration:none;padding:14px 22px;border-radius:6px;font:700 16px Arial,Helvetica,sans-serif">&#9658;&nbsp; Regarder la vidéo</a></td></tr></table>`;
 }
+
 
 function bulletList(bullets: Array<{ label: string; text: string }>) {
   const rows = bullets
