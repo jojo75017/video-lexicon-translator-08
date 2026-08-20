@@ -653,7 +653,14 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
       chapters,
       numberOfChapters: chapters,
       wordsPerChapter,
-      outline: normalizedOutline.map((c) => ({ numero: c.numero, titre: c.titre, objectif: c.objectif })),
+      // On conserve les réglages riches du Sommaire Stratégique (points, blocs,
+      // mot-clé, ton, longueur) déjà enregistrés pour chaque chapitre.
+      outline: normalizedOutline.map((c, i) => ({
+        ...((currentBrief.outline || [])[i] || {}),
+        numero: c.numero,
+        titre: c.titre,
+        objectif: c.objectif,
+      })),
       characters: characters.filter((c) => c.name.trim()).map((c) => ({ name: c.name, role: c.role, description: c.traits, traits: c.traits })),
       cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations,
       promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion,
