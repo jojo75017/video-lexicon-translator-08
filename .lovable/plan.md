@@ -1,6 +1,7 @@
-# Script propre + version MP3 « podcast » du lancement
+# Mettre en ligne votre message audio de lancement (MP3 podcast)
 
-Pas de vidéo : on part sur un **MP3 style podcast** de 2 minutes, généré depuis le script avec la voix de synthèse déjà en place dans l'application. Aucun logo, aucun abonnement Fliki, et le fichier est téléchargeable pour être joint aux emails ou déposé sur les pages.
+Vous m'avez envoyé le MP3 (1 min 40, qualité 320 kbps). Je l'héberge sur votre backend et je le branche partout : lecteur audio sur les pages publiques et lien « Écouter le message » dans les 5 emails de rappel. Le script ci-dessous reste disponible en copier-coller, sans horodatage, si vous voulez réenregistrer une version plus longue.
+
 
 ## Le script à lire (sans horodatage)
 
@@ -29,21 +30,23 @@ Jusqu'au 31 août à minuit : 47 euros une seule fois, accès à vie, payable en
 
 Testez gratuitement votre premier chapitre, sans carte bancaire, ou prenez l'accès à vie avant le 31 août. Le lien est en dessous.
 
-## Ce que j'ajoute dans `/admin/lancement`
+## Ce que je mets en place
 
-Un bloc « Message audio du lancement » :
-
-- Le script en **diapositives** (une phrase par carte, flèches gauche/droite) si vous préférez l'enregistrer avec votre propre voix.
-- Deux boutons de copie : *script complet* et *version courte*, en texte nu.
-- Choix de la version (longue ou courte) et de la voix, puis **« Générer le MP3 »** : la voix de synthèse lit le script, un lecteur audio apparaît, et un bouton **« Télécharger le MP3 »**.
-- Un champ existant réutilisé : au lieu d'un lien vidéo, vous pouvez enregistrer le lien du MP3 (ou le fichier hébergé) — il s'affichera alors automatiquement dans les emails, sur `/essai`, `/commander` et `/v3/attente`, avec un lecteur audio au lieu du bloc vidéo.
+1. **Hébergement du MP3** : votre fichier est déposé dans un espace de stockage public du backend, avec une adresse fixe réutilisable partout.
+2. **Lecteur audio sur les pages** : sur `/essai`, `/commander`, l'accueil V3 et `/v3/attente`, le bloc média actuel devient un vrai lecteur « Écoutez le message — 2 minutes » (vert/or, dans l'identité V3), avec un bouton de téléchargement.
+3. **Emails de rappel R1 à R5** : chaque email reçoit un encart « Écouter le message (2 min) » qui pointe vers une page d'écoute — les clients mail ne lisent pas l'audio en ligne, donc un lien reste la seule option fiable.
+4. **Page d'écoute dédiée** `/message` : le lecteur, le rappel de l'échéance du 31 août et un seul bouton vers `/commander`.
+5. **Panneau admin** : dans `/admin/lancement`, le champ média accepte désormais un MP3 ou un lien vidéo, avec aperçu immédiat et interrupteur pour l'afficher ou le masquer partout d'un clic.
+6. **Script en copier-coller** : le texte ci-dessus est affiché dans l'admin avec un bouton *Copier*, en texte nu, sans minutage, pour réenregistrer facilement.
 
 ## Détails techniques
 
-- `src/data/launchVideoScript.ts` : script découpé en phrases, deux variantes (longue, courte).
-- `src/components/admin/LaunchAudioScriptPanel.tsx` : diapositives, boutons de copie, sélection de version/voix, génération MP3 et téléchargement. Intégré dans `AdminLancementPage.tsx`.
-- Génération audio : réutilisation de l'existant (`requestTtsAudioChunks` + fonction `elevenlabs-tts`), découpage automatique du script en segments puis assemblage en un seul MP3 côté navigateur.
-- Stockage : le MP3 est déposé dans un bucket public du backend, et son URL enregistrée dans `launch_settings` (clé `launch_video`, réutilisée, avec un indicateur `kind: 'audio'`).
-- `LaunchVideoBlock.tsx` : affiche un lecteur `<audio>` quand l'URL est un MP3, sinon garde le comportement vidéo actuel.
-- Emails (`send-sales-email`) : le bloc média devient « Écouter le message (2 min) » avec un lien direct vers le MP3 — les clients mail ne lisent pas l'audio en ligne, donc un lien reste la seule option fiable.
+- Stockage : bucket public `launch-media`, fichier `message-lancement.mp3` (migration + politique de lecture publique).
+- `launch_settings` : la clé `launch_video` est réutilisée avec `{ url, kind: 'audio' | 'video', enabled }`, sans migration de schéma (colonne `value` en JSON).
+- `src/components/launch/LaunchVideoBlock.tsx` : rendu conditionnel — lecteur `<audio controls>` + bouton de téléchargement pour un MP3, bloc lien pour une vidéo.
+- Nouvelle page `src/pages/launch/MessageAudioPage.tsx` + route `/message` dans `App.tsx`.
+- `supabase/functions/send-sales-email/index.ts` : `videoBlock` renommé en bloc média, texte « Écouter le message (2 min) », lien vers `/message`.
+- `src/data/launchVideoScript.ts` : script (version longue et courte) pour l'affichage et la copie dans l'admin.
+- `src/pages/admin/AdminLancementPage.tsx` : champ média (URL + type), aperçu, interrupteur, bloc script avec bouton *Copier*.
+
 
