@@ -82,6 +82,33 @@ function cleanCategory(input: unknown): string {
 const cleanCategories = (values: unknown): string[] =>
   (Array.isArray(values) ? values : []).map(cleanCategory).filter(Boolean);
 
+/**
+ * KDP n'accepte pas le markdown : on convertit **gras**, *italique*, titres et listes
+ * en texte propre avec les seules balises autorisées (<b>, <i>, <br>).
+ */
+function toKdpText(input: string): string {
+  return String(input || '')
+    .replace(/\r\n/g, '\n')
+    .replace(/```[a-z]*\n?/gi, '')
+    .replace(/^#{1,6}\s*(.+)$/gm, '<b>$1</b>')
+    .replace(/\*\*\*(.+?)\*\*\*/g, '<b><i>$1</i></b>')
+    .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+    .replace(/__(.+?)__/g, '<b>$1</b>')
+    .replace(/(^|[\s(])\*(?!\s)([^*\n]+?)\*(?=[\s).,;!?]|$)/g, '$1<i>$2</i>')
+    .replace(/(^|[\s(])_(?!\s)([^_\n]+?)_(?=[\s).,;!?]|$)/g, '$1<i>$2</i>')
+    .replace(/^\s*[-*+]\s+/gm, '• ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+/** Rendu lisible de l'aperçu : balises KDP → HTML sûr. */
+const previewHtml = (value: string) =>
+  toKdpText(value)
+    .split('\n')
+    .map((line) => line.trim())
+    .join('<br />');
+
+
 
 export default function V3KdpPublishPanel({
   title,
