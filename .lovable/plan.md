@@ -44,3 +44,24 @@ Un champ « Lien de la vidéo de lancement » dans `/admin/lancement` : dès que
 - Liens barre latérale : ajout dans le composant de navigation V3 existant, entrée admin conditionnée par `useIsAdmin`.
 - Emails : réécriture des 5 étapes de `supabase/functions/send-sales-email/index.ts` (templates `rappel-47-1` à `-5`) et mise à jour de `src/data/canonicalEmailCampaign.ts` + `CampaignSequencePanel.tsx` avec les nouvelles dates.
 - Vidéo : colonne `launch_video_url` dans `launch_settings` (migration + GRANT), lecture via `useLaunchSettings.ts`.
+
+## Script vidéo — 2 minutes (annonce fin du 47 € + V3 le 1er octobre)
+
+Format : vous face caméra, quelques captures d'écran en incrustation. Durée cible 2 min (~330 mots).
+
+**0:00 — 0:15 | Accroche**
+« Si vous avez toujours voulu publier un livre sur Amazon, écoutez-moi 2 minutes : le 31 août, l'accès à vie à EbookStudio à 47 € disparaît définitivement. Après, ce sera un abonnement mensuel. Je vous explique pourquoi, et ce que vous obtenez. »
+
+**0:15 — 0:40 | Le problème**
+« La plupart des gens n'échouent pas parce qu'ils manquent d'idées. Ils échouent au moment de la publication : le sommaire part dans tous les sens, les chapitres se répètent, la couverture n'est pas au bon format, et les données KDP — mots-clés, catégories, description — restent une énigme. Résultat : le livre ne sort jamais. »
+
+**0:40 — 1:15 | La démonstration (captures d'écran)**
+« Voilà ce que fait EbookStudio V3. J'écris une idée en une phrase. Les agents me proposent le titre, le sous-titre, la description commerciale et un sommaire complet. Je valide. Ils rédigent chapitre par chapitre, en gardant la mémoire de l'histoire. Ensuite : correction professionnelle en 4 passes, couverture au gabarit KDP, fichier prêt à téléverser, données KDP remplies — mots-clés, catégories BISAC, description avec les mots importants en gras. Et si je veux, une version audio. »
+
+**1:15 — 1:40 | L'offre et l'échéance**
+« Jusqu'au 31 août à minuit : 47 €, une seule fois, accès à vie. Payable en 1, 2 ou 3 fois. Le 1er septembre, cette offre disparaît. À partir du 1er septembre vous pourrez réserver votre place pour la V3, qui ouvre le 1er octobre — avec le premier mois offert. »
+
+**1:40 — 2:00 | Appel à l'action**
+« Deux choix. Un : vous testez gratuitement, vous écrivez votre premier chapitre en quelques minutes, sans carte bancaire. Deux : vous prenez l'accès à vie à 47 € avant le 31 août. Le lien est juste en dessous. Une question ? Vous m'écrivez directement à boubetgeorges@gmail.com, je réponds. À très vite — et bonne écriture. »
+
+**Incrustations à préparer** : compte à rebours « fin le 31 août », capture du sommaire généré, capture de la couverture, capture des données KDP, écran « 1er mois offert ».
