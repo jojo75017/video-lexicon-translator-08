@@ -410,6 +410,13 @@ export default function V3CreateWizard() {
   const [aiTopic, setAiTopic] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiResult, setAiResult] = useState<{ title: string; subtitle: string; synopsis: string; categories: string[] } | null>(null);
+  // Proposition complète : l'abonné n'a qu'une idée à donner, les agents remplissent le reste.
+  const [proposalLoading, setProposalLoading] = useState(false);
+  const [proposedFields, setProposedFields] = useState<string[]>([]);
+  // Réglages du Sommaire IA (comme la V2) : densité, ton du plan, mots-clés à placer.
+  const [outlinePoints, setOutlinePoints] = useState(4);
+  const [outlineTone, setOutlineTone] = useState('Clair et vendeur');
+  const [outlineKeywords, setOutlineKeywords] = useState('');
 
   // Ouverture depuis « Mes livres » : recharge le vrai projet cloud dans le
   // workflow, au lieu d'afficher uniquement sa page publique en lecture.
@@ -577,6 +584,147 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
     toast.success('Formulaire rempli — vérifie et continue vers l’étape suivante.');
   };
 
+  /**
+   * « Laissez les agents proposer » — une seule idée suffit.
+   * Un unique appel IA renvoie la fiche complète (titre, sous-titre, catégorie,
+   * auteur, description, ton, format) ET le sommaire. On ne remplit que les
+   * champs encore vides : jamais d'écrasement d'une saisie de l'abonné.
+   */
+  const runFullProposal = async () => {
+    const seed = [aiTopic, title, subtitle, description, sourceText.slice(0, 3000)]
+      .map((value) => String(value || '').trim())
+      .filter(Boolean)
+      .join('\n');
+    if (seed.length < 10) {
+      toast.error('Écris au moins une phrase sur ton idée — les agents s’occupent du reste.');
+      return;
+    }
+    const provider = getProvider();
+    const key = getProviderKey(provider);
+    if (!key || !validateKeyFormat(provider, key)) {
+      toast.error('Ajoute et valide ta clé IA en haut de la page avant de lancer les agents.');
+      return;
+    }
+    setProposalLoading(true);
+    try {
+      const prompt = `Tu es directeur éditorial senior spécialisé Amazon KDP. À partir de l'idée de l'auteur, propose un livre commercial complet, prêt à écrire.
+Idée / matière de l'auteur :
+"""${seed.slice(0, 6000)}"""
+
+Réglages du sommaire souhaités :
+- ${outlinePoints} points clés par chapitre
+- ton du sommaire : ${outlineTone}
+- mots-clés à placer naturellement : ${outlineKeywords.trim() || 'aucun imposé'}
+
+Réponds STRICTEMENT en JSON valide (aucun markdown, aucun texte autour) :
+{
+  "title": "titre commercial court (max 70 caractères)",
+  "subtitle": "sous-titre bénéfice (max 120 caractères)",
+  "authorName": "nom de plume crédible",
+  "categories": ["3 catégories Amazon FR, la plus pertinente en premier"],
+  "description": "synopsis vendeur de 150 à 200 mots",
+  "tone": "un seul ton parmi : ${TONES.join(', ')}",
+  "chapters": nombre entier entre 8 et 30,
+  "wordsPerChapter": nombre entier entre 1500 et 3500,
+  "characters": [{"name":"","role":"","traits":""}],
+  "outline": [{"numero":1,"titre":"titre spécifique jamais générique","objectif":"objectif éditorial en une phrase","points":["${outlinePoints} points clés"],"motCle":"mot-clé KDP"}]
+}
+
+Règles : 100 % en français courant, aucun mot latin ni langue étrangère, aucun titre « Chapitre 1 », aucun titre répété, autant d'entrées dans "outline" que la valeur de "chapters", "characters" vide si le livre est non-fiction.`;
+      const raw = await callAIWriting(prompt, { jsonMode: true, temperature: 0.7, maxTokens: 14000 });
+      let parsed: any = null;
+      try { parsed = JSON.parse(raw); } catch {
+        const match = raw.match(/\{[\s\S]*\}/);
+        if (match) parsed = JSON.parse(match[0]);
+      }
+      if (!parsed?.title) throw new Error('Réponse IA invalide.');
+
+      const filled: string[] = [];
+      const proposedTitle = cleanText(String(parsed.title || '')).slice(0, 120);
+      if (!title.trim() && proposedTitle) { setTitle(proposedTitle); filled.push('Titre'); }
+      if (!finalTitle.trim() && proposedTitle) setFinalTitle(proposedTitle);
+      if (!subtitle.trim() && parsed.subtitle) { setSubtitle(cleanText(String(parsed.subtitle)).slice(0, 160)); filled.push('Sous-titre'); }
+      if (parsed.authorName && (!authorName.trim() || authorName.trim() === 'Auteur Ebookstudio')) {
+        setAuthorName(cleanText(String(parsed.authorName)).slice(0, 80));
+        filled.push('Nom d’auteur');
+      }
+      if (!description.trim() && parsed.description) { setDescription(cleanText(String(parsed.description))); filled.push('Description'); }
+
+      const proposedCategories = Array.isArray(parsed.categories) ? parsed.categories.map((item: any) => cleanText(String(item))).filter(Boolean) : [];
+      if (proposedCategories.length && (category === 'Roman' || !category)) {
+        const match = CATEGORIES.find((item) => item.toLowerCase() === proposedCategories[0].toLowerCase());
+        if (match) setCategory(match);
+        else { setCategory('Autre'); setCustomCategory(proposedCategories[0]); }
+        filled.push('Catégorie');
+      }
+      if (parsed.tone && TONES.includes(String(parsed.tone))) { setTone(String(parsed.tone)); filled.push('Ton'); }
+
+      const proposedChapters = clampNumber(Number(parsed.chapters), 3, 60, chapters);
+      const proposedOutline: OutlineChapter[] = (Array.isArray(parsed.outline) ? parsed.outline : [])
+        .map((item: any, index: number) => ({
+          id: makeId(),
+          numero: index + 1,
+          titre: cleanText(String(item?.titre || item?.title || '')),
+          objectif: cleanText(String(item?.objectif || item?.goal || '')),
+        }))
+        .filter((item: OutlineChapter) => item.titre && !isGenericTitle(item.titre))
+        .slice(0, 60);
+
+      if (proposedOutline.length >= 3) {
+        setOutline(proposedOutline);
+        setChapters(proposedOutline.length);
+        filled.push('Sommaire complet');
+        // Points clés, mots-clés : conservés dans la fiche pour les agents rédacteurs.
+        try {
+          const brief = readBookBrief() || {};
+          writeBookBrief({
+            ...brief,
+            outline: proposedOutline.map((chapter, index) => {
+              const source = (Array.isArray(parsed.outline) ? parsed.outline : [])[index] || {};
+              return {
+                ...(brief.outline || [])[index],
+                numero: chapter.numero,
+                titre: chapter.titre,
+                objectif: chapter.objectif,
+                points: Array.isArray(source.points) ? source.points.map((point: any) => cleanText(String(point))).filter(Boolean) : [],
+                motCle: cleanText(String(source.motCle || '')),
+              };
+            }),
+          } as any);
+        } catch { /* la fiche locale reste utilisable sans les points clés */ }
+      } else {
+        setChapters(proposedChapters);
+      }
+      if (Number(parsed.wordsPerChapter) >= 500) {
+        setWordsPerChapter(clampNumber(Number(parsed.wordsPerChapter), 500, 5000, wordsPerChapter));
+        filled.push('Longueur des chapitres');
+      }
+
+      const proposedCharacters = Array.isArray(parsed.characters) ? parsed.characters : [];
+      const hasOwnCharacters = characters.some((character) => character.name.trim() || character.traits.trim());
+      if (!hasOwnCharacters && proposedCharacters.length) {
+        setCharacters(proposedCharacters.slice(0, 8).map((character: any) => ({
+          id: makeId(),
+          name: cleanText(String(character?.name || '')),
+          role: cleanText(String(character?.role || 'Personnage')) || 'Personnage',
+          traits: cleanText(String(character?.traits || character?.description || '')),
+        })));
+        filled.push('Personnages');
+      }
+
+      setProposedFields(filled);
+      toast.success(filled.length
+        ? `Proposition des agents appliquée : ${filled.join(', ')}. Modifie ce que tu veux.`
+        : 'Ta fiche était déjà complète — rien n’a été écrasé.');
+    } catch (error: any) {
+      toast.error(error?.message || 'Impossible de générer la proposition complète.');
+    } finally {
+      setProposalLoading(false);
+    }
+  };
+
+
+
   const effectiveCategory = category === 'Autre' ? (customCategory.trim() || 'Autre') : category;
   const totalWords = chapters * wordsPerChapter;
   const estimatedPages = Math.ceil(totalWords / 250);
@@ -623,11 +771,15 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
     })
     .join('\n');
 
-  const canStepOne = title.trim().length >= 3 && description.trim().length >= 30;
-  const canStepTwo = Boolean(effectiveCategory.trim()) && chapters >= 3 && chapters <= 60 && wordsPerChapter >= 500;
-  // Sommaire non bloquant : les agents V2 (P3 « L'Architecte ») reconstruisent le plan si l'auteur ne l'a pas affiné.
+  // Un seul champ vraiment obligatoire : l'idée. Tout le reste est facultatif,
+  // les agents comblent les trous au lancement.
+  const seedLength = [aiTopic, title, description, sourceText].map((value) => String(value || '').trim()).join(' ').trim().length;
+  const canStepOne = seedLength >= 10;
+  const canStepTwo = true;
   const canStepOutline = normalizedOutline.length >= 3;
-  const canStepFour = finalTitle.trim().length >= 3 && authorName.trim().length >= 2;
+  const canStepFour = true;
+  // Conseils non bloquants affichés dans l'interface.
+  const adviceMissingDescription = description.trim().length < 30;
 
   // Instantané du brief pour le récapitulatif « Livre en préparation » sur /v3
   useEffect(() => {
@@ -894,10 +1046,11 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
 
 
   const generateOutline = async () => {
-    if (!canStepOne || !canStepTwo) {
-      toast.error('Complète le titre, le synopsis, la catégorie et le format avant le sommaire.');
+    if (seedLength < 10) {
+      toast.error('Écris ton idée de livre (une phrase suffit) avant de générer le sommaire.');
       return;
     }
+
 
     const provider = getProvider();
     const key = getProviderKey(provider);
@@ -917,15 +1070,21 @@ Ton : ${tone}
 Synopsis : ${description}
 Nombre exact de chapitres : ${chapters}
 Mots par chapitre : ${wordsPerChapter}
+Points clés attendus par chapitre : ${outlinePoints}
+Ton du sommaire : ${outlineTone}
+Mots-clés à placer naturellement : ${outlineKeywords.trim() || 'aucun imposé'}
+Idée de départ de l'auteur : ${aiTopic || 'non précisée'}
 
 Réponds STRICTEMENT en JSON valide, sans markdown, avec ce schéma :
-{"chapters":[{"numero":1,"titre":"Titre spécifique non générique","objectif":"Objectif éditorial clair en une phrase"}]}
+{"chapters":[{"numero":1,"titre":"Titre spécifique non générique","objectif":"Objectif éditorial clair en une phrase","points":["${outlinePoints} points clés"],"motCle":"mot-clé KDP"}]}
 
 Règles :
 - exactement ${chapters} chapitres ;
+- exactement ${outlinePoints} points clés par chapitre ;
 - jamais de titre générique comme "Chapitre 1" ;
 - jamais le même titre répété ;
 - interdiction de répéter "L'aboutissement" ou une formule de conclusion sur plusieurs chapitres ;
+- 100 % en français courant, aucun mot latin ni étranger ;
 - aucun bloc markdown, aucune balise json ;
 - titres courts, vendeurs, cohérents avec le synopsis.`;
       const raw = await callAIWriting(prompt, { jsonMode: true, temperature: 0.55, maxTokens: Math.min(12000, 1800 + chapters * 180) });
@@ -961,13 +1120,10 @@ Règles :
 
   const goNext = () => {
     if (step === 0 && !canStepOne) {
-      toast.error('Ajoute un titre et une description claire avant de continuer.');
+      toast.error('Décris ton idée de livre en une phrase — les agents remplissent le reste.');
       return;
     }
-    if (step === 1 && !canStepTwo) {
-      toast.error('Vérifie la catégorie, le nombre de chapitres et les mots par chapitre.');
-      return;
-    }
+
     if (step === 1 && outline.length !== chapters) {
       setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
     }
@@ -976,10 +1132,12 @@ Règles :
       toast.warning('Ancien sommaire répétitif remplacé par un plan complet.');
     }
     if (step === 2 && !canStepOutline) {
-      toast.error('Valide le sommaire : chaque chapitre doit avoir un titre et un objectif.');
-      return;
+      // Non bloquant : on complète le plan et on avance.
+      setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
+      toast.info('Sommaire complété automatiquement — tu peux le modifier à tout moment.');
     }
     if (step === 3 && !finalTitle.trim()) setFinalTitle(title);
+
     setStep((value) => Math.min(4, value + 1));
   };
 
@@ -1154,22 +1312,31 @@ Règles :
   }, [launched, completedBook]);
 
   const launchWorkflow = async () => {
-    if (!canStepFour) {
-      toast.error('Valide le titre final et le nom d’auteur avant de générer.');
+    if (seedLength < 10) {
+      toast.error('Décris au moins ton idée de livre en une phrase avant de lancer les agents.');
+      setStep(0);
       return;
     }
-    if (!canStepOutline) {
-      toast.error('Valide le sommaire avant de générer le livre.');
-      setStep(2);
-      return;
+
+    // Rien n'est obligatoire sauf l'idée : on complète les champs laissés vides.
+    const safeTitle = (finalTitle.trim() || title.trim() || cleanText(aiTopic).slice(0, 70) || 'Mon livre');
+    const safeAuthor = authorName.trim() || 'Auteur Ebookstudio';
+    const safeOutline = normalizedOutline.length >= 3
+      ? normalizedOutline
+      : buildFallbackOutline(safeTitle, effectiveCategory, chapters);
+    if (finalTitle.trim() !== safeTitle) setFinalTitle(safeTitle);
+    if (authorName.trim() !== safeAuthor) setAuthorName(safeAuthor);
+    if (normalizedOutline.length < 3) {
+      setOutline(safeOutline);
+      toast.info('Sommaire complété automatiquement — l’agent P3 « L’Architecte » l’affinera.');
     }
 
     const workflowDescription = buildWorkflowDescription();
 
     const config = {
-      title: finalTitle.trim(),
+      title: safeTitle,
       subtitle: subtitle.trim(),
-      author: authorName.trim(),
+      author: safeAuthor,
       description: workflowDescription,
       genre: effectiveCategory,
       targetAudience: hub.targetAudience || '',
@@ -1177,8 +1344,9 @@ Règles :
       tone,
       wordsPerChapter,
       characters: workflowCharacters,
-      outline: normalizedOutline,
+      outline: safeOutline,
     };
+
 
     // Reprise après crash : ne PAS effacer la progression si l'utilisateur
     // relance le même livre (même titre). Le workflow V2 monté ci-dessous
@@ -1570,8 +1738,10 @@ Règles :
           </span>
         </div>
         <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>
-          Décris ton idée, ton sujet ou une niche Amazon. L'IA te propose un titre commercial, un sous-titre, un synopsis de ~150 mots et jusqu'à 5 catégories pertinentes.
+          Un seul champ est obligatoire : votre idée. Tout le reste (titre, sous-titre, catégorie, nom d’auteur,
+          description, ton, format, personnages et sommaire complet) peut être proposé par les agents — vous corrigez ensuite ce que vous voulez.
         </p>
+
         <div className="mt-3 flex flex-col gap-2 sm:flex-row">
           <input
             value={aiTopic}
@@ -1591,7 +1761,31 @@ Règles :
             Trouver des idées
           </button>
         </div>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={runFullProposal}
+            disabled={proposalLoading}
+            className="inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-bold disabled:opacity-60"
+            style={{ background: 'var(--v3-ink)', color: '#fff' }}
+          >
+            {proposalLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+            Laissez les agents proposer tout le livre
+          </button>
+          <span className="text-xs" style={{ color: 'var(--v3-muted)' }}>
+            Titre · sous-titre · catégorie · auteur · description · ton · format · personnages · sommaire
+          </span>
+        </div>
+        {proposedFields.length > 0 && (
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs" style={{ color: 'var(--v3-muted)' }}>
+            <Check className="h-3.5 w-3.5" /> Proposé par les agents :
+            {proposedFields.map((field) => (
+              <span key={field} className="rounded-full border px-2 py-0.5" style={{ borderColor: 'var(--v3-border)' }}>{field}</span>
+            ))}
+          </div>
+        )}
         {aiResult && (
+
           <div className="mt-4 rounded-xl border p-4 text-sm space-y-2" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)', color: 'var(--v3-ink)' }}>
             <div><strong>Titre :</strong> {aiResult.title}</div>
             {aiResult.subtitle && <div><strong>Sous-titre :</strong> {aiResult.subtitle}</div>}
@@ -1823,6 +2017,53 @@ Règles :
               </div>
             </div>
           </div>
+
+          {/* Réglages du Sommaire IA — comme la V2 : densité, ton du plan, mots-clés */}
+          <div className="rounded-[24px] border p-5" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-orange-50)' }}>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="v3-chip v3-chip-orange"><Wrench className="h-3.5 w-3.5" /> Réglages du sommaire IA</span>
+              <span className="text-xs" style={{ color: 'var(--v3-muted)' }}>Facultatif — appliqué à la génération et à la proposition complète</span>
+            </div>
+            <div className="mt-4 grid gap-4 md:grid-cols-3">
+              <label className="block space-y-2">
+                <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--v3-muted)' }}>Points clés par chapitre : {outlinePoints}</span>
+                <input
+                  type="range"
+                  min={2}
+                  max={8}
+                  step={1}
+                  value={outlinePoints}
+                  onChange={(event) => setOutlinePoints(Number(event.target.value))}
+                  className="w-full accent-orange-600"
+                />
+              </label>
+              <label className="block space-y-2">
+                <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--v3-muted)' }}>Ton du sommaire</span>
+                <select
+                  value={outlineTone}
+                  onChange={(event) => setOutlineTone(event.target.value)}
+                  className="w-full rounded-2xl border px-4 py-3 text-sm outline-none"
+                  style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+                >
+                  {['Clair et vendeur', 'Pédagogique', 'Émotionnel', 'Premium', 'Direct', 'Romanesque', 'Expert'].map((item) => (
+                    <option key={item} value={item}>{item}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="block space-y-2">
+                <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--v3-muted)' }}>Mots-clés à placer</span>
+                <input
+                  value={outlineKeywords}
+                  onChange={(event) => setOutlineKeywords(event.target.value)}
+                  placeholder="Ex : confiance en soi, routine du matin, KDP"
+                  className="w-full rounded-2xl border px-4 py-3 text-sm outline-none"
+                  style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+                />
+              </label>
+            </div>
+          </div>
+
+
 
           {/* Stats bar */}
           <div className="grid gap-3 sm:grid-cols-4">
