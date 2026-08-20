@@ -18,6 +18,7 @@ import { callAIWriting, getProvider, getProviderKey, validateKeyFormat } from '@
 import TocUltimateGenerator, { type UltimateTocChapter } from '@/components/tools/TocUltimateGenerator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { BOOK_BRIEF_EVENT, clearTocForWorkflow, listSourcePassages, narrativeForBook, parseTocText, passageForBook, readBookBrief, readLatestUltimateToc, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
+import { chapterInstructions } from '@/lib/v3/outlineStudio';
 
 
 type WizardCharacter = {
@@ -615,6 +616,8 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
       return [
         `Chapitre ${chapter.numero} — ${chapter.titre}`,
         `Objectif : ${chapter.objectif || 'Objectif éditorial à préciser.'}`,
+        chapterInstructions((brief.outline || [])[index] || (chapter as BriefOutlineChapter)),
+
         memories,
       ].filter(Boolean).join('\n');
     })
@@ -650,7 +653,14 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
       chapters,
       numberOfChapters: chapters,
       wordsPerChapter,
-      outline: normalizedOutline.map((c) => ({ numero: c.numero, titre: c.titre, objectif: c.objectif })),
+      // On conserve les réglages riches du Sommaire Stratégique (points, blocs,
+      // mot-clé, ton, longueur) déjà enregistrés pour chaque chapitre.
+      outline: normalizedOutline.map((c, i) => ({
+        ...((currentBrief.outline || [])[i] || {}),
+        numero: c.numero,
+        titre: c.titre,
+        objectif: c.objectif,
+      })),
       characters: characters.filter((c) => c.name.trim()).map((c) => ({ name: c.name, role: c.role, description: c.traits, traits: c.traits })),
       cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations,
       promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion,

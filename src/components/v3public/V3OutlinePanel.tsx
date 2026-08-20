@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowDown, ArrowUp, Check, ClipboardPaste, ListOrdered, Loader2, MessageSquarePlus,
-  Plus, RefreshCw, Sparkles, Wand2, X, History, Undo2,
+  Check, ClipboardPaste, Download, ListOrdered, Loader2, MessageSquarePlus,
+  Plus, RefreshCw, Redo2, Sparkles, Wand2, History, Undo2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,7 +15,13 @@ import {
   clearTocForWorkflow, normalizeOutline, parseTocText, readLatestUltimateToc,
   type BookBrief, type BriefOutlineChapter,
 } from '@/lib/v3/bookBrief';
+import {
+  duplicateChapter, insertChapterAt, mergeWithNext, moveChapterTo, outlineToText, splitChapter,
+} from '@/lib/v3/outlineStudio';
+import V3OutlineChapterCard from './V3OutlineChapterCard';
+import V3OutlineStudioBar from './V3OutlineStudioBar';
 import { loadOutlineVersions, saveOutlineVersion, type OutlineVersion } from '@/lib/v3/genieThread';
+
 
 type Props = {
   brief: BookBrief;
@@ -43,6 +49,12 @@ export default function V3OutlinePanel({ brief, onChange, initialMode }: Props) 
   const [suggesting, setSuggesting] = useState(false);
   const [versions, setVersions] = useState<OutlineVersion[]>([]);
   const [savingVersion, setSavingVersion] = useState(false);
+
+  // Annuler / Rétablir sur le sommaire (manipulations du Sommaire Stratégique).
+  const [history, setHistory] = useState<BriefOutlineChapter[][]>([]);
+  const [future, setFuture] = useState<BriefOutlineChapter[][]>([]);
+  const dragIndex = useRef<number | null>(null);
+  const [enriching, setEnriching] = useState(false);
 
   // Historique des sommaires validés (reprise possible à tout moment).
   useEffect(() => {
@@ -254,28 +266,108 @@ Règles :
     setPasteOpen(false);
   };
 
+  /** Toute modification du sommaire passe ici : historique + désactivation de la validation. */
+  const applyOutlineChange = (next: BriefOutlineChapter[]) => {
+    setHistory((prev) => [...prev.slice(-24), outline]);
+    setFuture([]);
+    onChange({ outline: next, chapters: next.length, outlineValidated: false });
+  };
+
+  const undo = () => {
+    if (!history.length) return;
+    const previous = history[history.length - 1];
+    setHistory((prev) => prev.slice(0, -1));
+    setFuture((prev) => [outline, ...prev].slice(0, 25));
+    onChange({ outline: previous, chapters: previous.length, outlineValidated: false });
+  };
+
+  const redo = () => {
+    if (!future.length) return;
+    const [next, ...rest] = future;
+    setFuture(rest);
+    setHistory((prev) => [...prev.slice(-24), outline]);
+    onChange({ outline: next, chapters: next.length, outlineValidated: false });
+  };
+
+  const exportOutline = () => {
+    const text = outlineToText(brief, outline);
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `sommaire-${(brief.title || 'livre').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 50)}.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success('Sommaire exporté (titres, objectifs, points, mise en forme).');
+  };
+
+  /** Enrichissement IA : points à traiter, question du lecteur et mot-clé par chapitre. */
+  const enrichOutline = async () => {
+    if (!outline.length) return;
+    setEnriching(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('v3-generate-outline', {
+        body: {
+          step: 'enrich',
+          title: (brief.title || '').trim(),
+          subtitle: (brief.subtitle || '').trim(),
+          category: brief.category || '',
+          tone: brief.tone || '',
+          promesseCentrale: (brief.promesseCentrale || '').trim(),
+          guidance: guidance.trim(),
+          accepted: outline.map((c) => ({ numero: c.numero, titre: c.titre, objectif: c.objectif })),
+          userApiKey: getProviderKey('gemini') || undefined,
+        },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      const enriched = (data as any)?.enriched as Array<{
+        numero: number; objectif?: string; points?: string[]; readerQuestion?: string; keyword?: string;
+      }> | undefined;
+      if (!Array.isArray(enriched) || !enriched.length) throw new Error('Aucun enrichissement reçu.');
+
+      const byNumero = new Map(enriched.map((e) => [Number(e.numero), e]));
+      const next = outline.map((chapter, i) => {
+        const found = byNumero.get(chapter.numero) || byNumero.get(i + 1);
+        if (!found || chapter.locked) return chapter;
+        return {
+          ...chapter,
+          objectif: chapter.objectif?.trim() || found.objectif || '',
+          points: (found.points || []).length ? found.points : chapter.points,
+          readerQuestion: chapter.readerQuestion || found.readerQuestion || undefined,
+          keyword: chapter.keyword || found.keyword || undefined,
+        };
+      });
+      applyOutlineChange(normalizeOutline(next));
+      toast.success('Sommaire enrichi — points à traiter, questions du lecteur et mots-clés ajoutés.');
+    } catch (e: any) {
+      console.error('[Sommaire] enrichissement impossible', e);
+      toast.error('Enrichissement impossible', { description: e?.message || 'Erreur inconnue.' });
+    } finally {
+      setEnriching(false);
+    }
+  };
+
+
+
+
   const updateChapter = (index: number, patch: Partial<BriefOutlineChapter>) => {
     const next = outline.map((c, i) => (i === index ? { ...c, ...patch } : c));
-    onChange({ outline: next, outlineValidated: false });
+    applyOutlineChange(next);
   };
 
   const removeChapter = (index: number) => {
-    const next = normalizeOutline(outline.filter((_, i) => i !== index));
-    onChange({ outline: next, chapters: next.length, outlineValidated: false });
+    applyOutlineChange(normalizeOutline(outline.filter((_, i) => i !== index)));
   };
 
   const moveChapter = (index: number, dir: -1 | 1) => {
-    const to = index + dir;
-    if (to < 0 || to >= outline.length) return;
-    const next = [...outline];
-    [next[index], next[to]] = [next[to], next[index]];
-    onChange({ outline: normalizeOutline(next), outlineValidated: false });
+    applyOutlineChange(moveChapterTo(outline, index, index + dir));
   };
 
   const addChapter = () => {
-    const next = normalizeOutline([...outline, { numero: outline.length + 1, titre: '', objectif: '' }]);
-    onChange({ outline: next, chapters: next.length, outlineValidated: false });
+    applyOutlineChange(normalizeOutline([...outline, { numero: outline.length + 1, titre: '', objectif: '' }]));
   };
+
 
   /** Mode dialogue : demande 3 propositions pour le prochain chapitre. */
   const askNextChapter = async () => {
@@ -386,9 +478,16 @@ Règles :
             Proposer le chapitre {outline.length + 1}
           </button>
         )}
+        {outline.length > 0 && (
+          <button type="button" onClick={enrichOutline} disabled={enriching} className="v3-btn v3-btn-outline disabled:opacity-60">
+            {enriching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            Enrichir le sommaire (points + mots-clés)
+          </button>
+        )}
         <button type="button" onClick={addChapter} className="v3-btn v3-btn-outline">
           <Plus className="h-4 w-4" /> Chapitre vide
         </button>
+
         <button type="button" onClick={importUltimate} className="v3-btn v3-btn-outline">
           <RefreshCw className="h-4 w-4" /> Importer mon Sommaire Ultime
         </button>
@@ -461,47 +560,46 @@ Règles :
         </p>
       ) : (
         <>
-          <ol className="mt-4 max-h-96 space-y-2 overflow-y-auto pr-2">
-            {outline.map((chapter, index) => (
-              <li key={index} className="rounded-xl border px-3 py-2" style={{ borderColor: 'var(--v3-border)' }}>
-                <div className="flex items-start gap-2">
-                  <span className="mt-2 text-[11px] font-bold uppercase tracking-widest" style={{ color: 'var(--v3-muted)' }}>
-                    Ch. {index + 1}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <input
-                      value={chapter.titre}
-                      onChange={(e) => updateChapter(index, { titre: e.target.value })}
-                      className="w-full rounded-lg border px-2 py-1.5 text-sm font-bold outline-none"
-                      style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: '#fff' }}
-                    />
-                    <input
-                      value={chapter.objectif || ''}
-                      onChange={(e) => updateChapter(index, { objectif: e.target.value })}
-                      placeholder="Objectif du chapitre (optionnel)"
-                      className="mt-1 w-full rounded-lg border px-2 py-1.5 text-xs outline-none"
-                      style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-muted)', background: '#fff' }}
-                    />
-                  </div>
-                  <div className="mt-1 flex flex-col gap-1">
-                    <button type="button" onClick={() => moveChapter(index, -1)} disabled={index === 0} title="Monter"
-                      className="rounded-lg border p-1.5 disabled:opacity-40" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-muted)' }}>
-                      <ArrowUp className="h-3.5 w-3.5" />
-                    </button>
-                    <button type="button" onClick={() => moveChapter(index, 1)} disabled={index === outline.length - 1} title="Descendre"
-                      className="rounded-lg border p-1.5 disabled:opacity-40" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-muted)' }}>
-                      <ArrowDown className="h-3.5 w-3.5" />
-                    </button>
-                    <button type="button" onClick={() => removeChapter(index)} title="Supprimer ce chapitre"
-                      className="rounded-lg border p-1.5" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-muted)' }}>
-                      <X className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
+          <V3OutlineStudioBar brief={brief} outline={outline} />
 
-                </div>
-              </li>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button type="button" onClick={undo} disabled={!history.length} className="v3-btn v3-btn-outline text-xs disabled:opacity-40">
+              <Undo2 className="h-3.5 w-3.5" /> Annuler
+            </button>
+            <button type="button" onClick={redo} disabled={!future.length} className="v3-btn v3-btn-outline text-xs disabled:opacity-40">
+              <Redo2 className="h-3.5 w-3.5" /> Rétablir
+            </button>
+            <button type="button" onClick={exportOutline} className="v3-btn v3-btn-outline text-xs">
+              <Download className="h-3.5 w-3.5" /> Exporter le sommaire
+            </button>
+          </div>
+
+          <ol className="mt-3 max-h-[32rem] space-y-2 overflow-y-auto pr-2">
+            {outline.map((chapter, index) => (
+              <V3OutlineChapterCard
+                key={index}
+                chapter={chapter}
+                index={index}
+                total={outline.length}
+                fallbackWords={Math.max(300, Number(brief.wordsPerChapter) || 1500)}
+                onPatch={(patch) => updateChapter(index, patch)}
+                onMove={(dir) => moveChapter(index, dir)}
+                onRemove={() => removeChapter(index)}
+                onDuplicate={() => applyOutlineChange(duplicateChapter(outline, index))}
+                onMerge={() => applyOutlineChange(mergeWithNext(outline, index))}
+                onSplit={() => applyOutlineChange(splitChapter(outline, index))}
+                onInsertAfter={() => applyOutlineChange(insertChapterAt(outline, index + 1))}
+                onDragStart={() => { dragIndex.current = index; }}
+                onDropOn={() => {
+                  const from = dragIndex.current;
+                  dragIndex.current = null;
+                  if (from === null || from === index) return;
+                  applyOutlineChange(moveChapterTo(outline, from, index));
+                }}
+              />
             ))}
           </ol>
+
 
           <button
             type="button"
