@@ -178,6 +178,8 @@ const CampaignSequencePanel = () => {
               <th className="px-3 py-2 text-center font-medium text-muted-foreground">Envoyés</th>
               <th className="px-3 py-2 text-center font-medium text-muted-foreground">Ouvertures uniques</th>
               <th className="px-3 py-2 text-center font-medium text-muted-foreground">Clics uniques</th>
+              <th className="px-3 py-2 text-center font-medium text-muted-foreground">Acheteurs</th>
+              <th className="px-3 py-2 text-center font-medium text-muted-foreground">Abonnés actifs</th>
               <th className="px-3 py-2 text-right font-medium text-muted-foreground">Actions</th>
             </tr>
           </thead>
@@ -188,6 +190,8 @@ const CampaignSequencePanel = () => {
                 <td className="px-3 py-2 text-center">{s.sent}</td>
                 <td className="px-3 py-2 text-center">{s.opens}</td>
                 <td className="px-3 py-2 text-center">{s.clicks}</td>
+                <td className="px-3 py-2 text-center font-semibold text-emerald-400">{s.buyers}</td>
+                <td className="px-3 py-2 text-center font-semibold text-gold-light">{s.subscribers}</td>
                 <td className="px-3 py-2">
                   <div className="flex flex-wrap justify-end gap-1">
                     <Button variant="outline" size="sm" disabled={busyStep === s.step} onClick={() => sendTest(s.step)}>
