@@ -582,6 +582,7 @@ const App = () => {
               <Route path="fonctionnalites/reseaux" element={<V3ReseauxPage />} />
               <Route path="fonctionnalites/integrations" element={<V3IntegrationsPage />} />
               <Route path="fonctionnalites/questions" element={<V3QuestionsPage />} />
+              <Route path="workflow" element={<V3WorkflowPage />} />
 
 
 
