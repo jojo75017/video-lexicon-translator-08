@@ -1120,13 +1120,10 @@ Règles :
 
   const goNext = () => {
     if (step === 0 && !canStepOne) {
-      toast.error('Ajoute un titre et une description claire avant de continuer.');
+      toast.error('Décris ton idée de livre en une phrase — les agents remplissent le reste.');
       return;
     }
-    if (step === 1 && !canStepTwo) {
-      toast.error('Vérifie la catégorie, le nombre de chapitres et les mots par chapitre.');
-      return;
-    }
+
     if (step === 1 && outline.length !== chapters) {
       setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
     }
