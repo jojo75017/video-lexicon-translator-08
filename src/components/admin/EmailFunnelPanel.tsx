@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { Loader2, RefreshCw, MousePointerClick, Send, BarChart3 } from 'lucide-react';
+import { Loader2, RefreshCw, MousePointerClick, Send, BarChart3, FlaskConical } from 'lucide-react';
+
 
 /**
  * Tunnel complet, d'un seul écran : envoyés → ouvreurs → clics par lien →
