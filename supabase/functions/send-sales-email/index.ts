@@ -189,30 +189,49 @@ const normalize = (value: string) => value.trim().toLowerCase();
 const templateName = (step: number) => `rappel-47-${step}`;
 const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
-/** Lien de clic hébergé sur notre propre domaine (/r) : plus de confiance
- *  côté messageries qu'une URL technique, et le suivi reste enregistré. */
+/** Site public : les liens visibles dans les emails ne doivent JAMAIS pointer
+ *  vers l'URL technique du backend (elle répond « requested path is invalid »). */
+const SITE = "https://ebookstudio.fr";
+
+/** Relais de clic sur notre domaine (/r) : chaque lien de l'email est mesuré,
+ *  y compris l'audio et le MP3 — sinon on pilote à l'aveugle. `lk` identifie le lien. */
+function trackedUrl(email: string, step: number, destination: string, tag: string) {
+  const sep = destination.includes("?") ? "&" : "?";
+  const dest = `${destination}${sep}lk=${tag}`;
+  return `${SITE}/r?e=${encodeURIComponent(email)}&s=${step}&t=${templateName(step)}&u=${encodeURIComponent(dest)}`;
+}
+
 function trackedLink(_baseUrl: string, email: string, step: number) {
-  const destination = `${CHECKOUT}?src=${CAMPAIGN}-${step}&email=${encodeURIComponent(email)}`;
-  return `https://ebookstudio.fr/r?e=${encodeURIComponent(email)}&s=${step}&t=${templateName(step)}&u=${encodeURIComponent(destination)}`;
+  return trackedUrl(email, step, `${CHECKOUT}?src=${CAMPAIGN}-${step}&email=${encodeURIComponent(email)}`, "offre");
+}
+
+/** Lien du cadeau : premier chapitre écrit gratuitement, sans inscription. */
+function giftLink(email: string, step: number) {
+  return trackedUrl(email, step, `${SITE}/essai?src=${CAMPAIGN}-${step}&email=${encodeURIComponent(email)}`, "cadeau");
 }
 
 function ctaButton(link: string, label: string) {
   return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:26px 0"><tr><td align="center" bgcolor="#FF9E2D" style="border-radius:6px"><a href="${link}" style="display:block;padding:17px 24px;color:#232F3E;text-decoration:none;font:700 17px/1.3 Arial,Helvetica,sans-serif;text-align:center">${label}</a></td></tr></table>`;
 }
 
-/** Site public : les liens visibles dans les emails ne doivent JAMAIS pointer
- *  vers l'URL technique du backend (elle répond « requested path is invalid »). */
-const SITE = "https://ebookstudio.fr";
+/** Bloc cadeau placé avant toute demande d'argent : c'est le premier clic possible. */
+function giftBlock(email: string, step: number) {
+  const link = giftLink(email, step);
+  return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:22px 0"><tr><td align="center" style="background:#f2f8f9;border:1px solid #008296;padding:22px 20px"><p style="margin:0 0 6px;font:700 12px Arial,Helvetica,sans-serif;color:#008296;letter-spacing:.6px">OFFERT — SANS INSCRIPTION, SANS CARTE</p><p style="margin:0 0 14px;font:16px/1.55 Arial,Helvetica,sans-serif;color:#232F3E">Donnez votre idée de livre : le premier chapitre est écrit devant vous, gratuitement.</p><a href="${link}" style="display:inline-block;background:#008296;color:#ffffff;text-decoration:none;padding:15px 24px;border-radius:6px;font:700 16px Arial,Helvetica,sans-serif">Écrire mon premier chapitre gratuitement</a></td></tr></table>`;
+}
 
 /** Bloc média : vignette cliquable vers la vidéo ou le message audio. Masqué si aucune URL. */
-function mediaBlock(_baseUrl: string, url: string, kind: "video" | "audio") {
+function mediaBlock(url: string, kind: "video" | "audio", email: string, step: number) {
   if (!url) return "";
   if (kind === "audio" || url.endsWith(".mp3")) {
-    const audioPage = `${SITE}/message`;
-    return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td align="center" style="background:#064e3b;padding:22px 20px"><p style="margin:0 0 6px;font:700 13px Arial,Helvetica,sans-serif;color:#C9A84C;letter-spacing:.6px">LE MESSAGE AUDIO — 2 MINUTES</p><p style="margin:0 0 14px;font:16px/1.55 Arial,Helvetica,sans-serif;color:#ffffff">Je vous explique pourquoi EbookStudio change la publication sur Amazon.</p><a href="${audioPage}" style="display:inline-block;background:#C9A84C;color:#0b2b22;text-decoration:none;padding:14px 22px;border-radius:6px;font:700 16px Arial,Helvetica,sans-serif">&#9658;&nbsp; Écouter le message</a><p style="margin:12px 0 0;font:13px/1.5 Arial,Helvetica,sans-serif;color:#ffffff"><a href="${url}" style="color:#C9A84C">Ou écouter le fichier MP3 directement</a></p></td></tr></table>`;
+    const audioPage = trackedUrl(email, step, `${SITE}/message`, "audio");
+    const mp3 = trackedUrl(email, step, url.startsWith(SITE) ? url : `${SITE}/message`, "mp3");
+    return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td align="center" style="background:#064e3b;padding:22px 20px"><p style="margin:0 0 6px;font:700 13px Arial,Helvetica,sans-serif;color:#C9A84C;letter-spacing:.6px">LE MESSAGE AUDIO — 2 MINUTES</p><p style="margin:0 0 14px;font:16px/1.55 Arial,Helvetica,sans-serif;color:#ffffff">Je vous explique pourquoi EbookStudio change la publication sur Amazon.</p><a href="${audioPage}" style="display:inline-block;background:#C9A84C;color:#0b2b22;text-decoration:none;padding:14px 22px;border-radius:6px;font:700 16px Arial,Helvetica,sans-serif">&#9658;&nbsp; Écouter le message</a><p style="margin:12px 0 0;font:13px/1.5 Arial,Helvetica,sans-serif;color:#ffffff"><a href="${mp3}" style="color:#C9A84C">Ou écouter le fichier audio directement</a></p></td></tr></table>`;
   }
 
-  return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td align="center" style="background:#064e3b;padding:22px 20px"><p style="margin:0 0 6px;font:700 13px Arial,Helvetica,sans-serif;color:#C9A84C;letter-spacing:.6px">LA VIDÉO — 2 MINUTES</p><p style="margin:0 0 14px;font:16px/1.55 Arial,Helvetica,sans-serif;color:#ffffff">Je vous montre un livre complet, du sommaire au fichier prêt pour Amazon.</p><a href="${url}" style="display:inline-block;background:#C9A84C;color:#0b2b22;text-decoration:none;padding:14px 22px;border-radius:6px;font:700 16px Arial,Helvetica,sans-serif">&#9658;&nbsp; Regarder la vidéo</a></td></tr></table>`;
+  const videoLink = trackedUrl(email, step, url.startsWith(SITE) ? url : `${SITE}/message`, "video");
+  return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td align="center" style="background:#064e3b;padding:22px 20px"><p style="margin:0 0 6px;font:700 13px Arial,Helvetica,sans-serif;color:#C9A84C;letter-spacing:.6px">LA VIDÉO — 2 MINUTES</p><p style="margin:0 0 14px;font:16px/1.55 Arial,Helvetica,sans-serif;color:#ffffff">Je vous montre un livre complet, du sommaire au fichier prêt pour Amazon.</p><a href="${videoLink}" style="display:inline-block;background:#C9A84C;color:#0b2b22;text-decoration:none;padding:14px 22px;border-radius:6px;font:700 16px Arial,Helvetica,sans-serif">&#9658;&nbsp; Regarder la vidéo</a></td></tr></table>`;
+
 }
 
 
