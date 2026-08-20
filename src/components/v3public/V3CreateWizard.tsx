@@ -413,6 +413,10 @@ export default function V3CreateWizard() {
   // Proposition complète : l'abonné n'a qu'une idée à donner, les agents remplissent le reste.
   const [proposalLoading, setProposalLoading] = useState(false);
   const [proposedFields, setProposedFields] = useState<string[]>([]);
+  // Réglages du Sommaire IA (comme la V2) : densité, ton du plan, mots-clés à placer.
+  const [outlinePoints, setOutlinePoints] = useState(4);
+  const [outlineTone, setOutlineTone] = useState('Clair et vendeur');
+  const [outlineKeywords, setOutlineKeywords] = useState('');
 
   // Ouverture depuis « Mes livres » : recharge le vrai projet cloud dans le
   // workflow, au lieu d'afficher uniquement sa page publique en lecture.
