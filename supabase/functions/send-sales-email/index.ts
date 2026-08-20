@@ -584,6 +584,49 @@ Deno.serve(async (req) => {
       return respond({ success: true, mode, sent: sentCount, targets: targets.length });
     }
 
+    // Mode automatique déclenché par le cron quotidien.
+    // Envoie l'étape suivante à chaque prospect dont next_email_at est atteint.
+    if (mode === "auto") {
+      const limit = Math.min(Number(body.batch_size || 300), 400);
+      const now = new Date().toISOString();
+      const { data: readyProspects } = await db
+        .from("sales_prospects")
+        .select("email,first_name,current_step")
+        .eq("status", "active")
+        .lte("next_email_at", now)
+        .lt("current_step", 5)
+        .order("next_email_at", { ascending: true })
+        .limit(limit);
+
+      if (body.dry_run) return respond({ success: true, mode, would_send: (readyProspects || []).length });
+
+      const profiles = (readyProspects || []).filter((p) => isEmail(normalize(p.email || "")));
+      let sentCount = 0;
+      for (const profile of profiles) {
+        const step = Math.min(Math.max((profile.current_step || 0) + 1, 1), 5);
+        const template = templateName(step);
+        const email = normalize(profile.email || "");
+        const result = await sendResendEmailThrottled({
+          from: FROM_CAMPAIGN,
+          to: [email],
+          subject: STEPS[step - 1].subject,
+          html: render(baseUrl, email, (profile.first_name as string) || "", step),
+          reply_to: REPLY_TO,
+        });
+        await db.from("email_send_log").insert({ recipient_email: email, template_name: template, message_id: result.id || `${CAMPAIGN}-${step}-${email}`, provider_message_id: result.id || null, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
+        if (!result.ok) { if (isQuotaExhausted()) break; continue; }
+        sentCount++;
+        const completed = step >= 5;
+        await db.from("sales_prospects").update({
+          current_step: step,
+          last_email_sent_at: new Date().toISOString(),
+          next_email_at: completed ? null : new Date(Date.now() + (DELAYS[step] || 3) * 86400000).toISOString(),
+          completed,
+        }).eq("email", email);
+      }
+      return respond({ success: true, mode, sent: sentCount, targets: profiles.length });
+    }
+
     // Relance de la séquence : envoie l'étape N aux contacts qui ont reçu l'étape N-1
     if (mode === "send_step") {
       const step = Math.min(Math.max(Number(body.step || 3), 2), 5);
