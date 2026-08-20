@@ -410,6 +410,9 @@ export default function V3CreateWizard() {
   const [aiTopic, setAiTopic] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiResult, setAiResult] = useState<{ title: string; subtitle: string; synopsis: string; categories: string[] } | null>(null);
+  // Proposition complète : l'abonné n'a qu'une idée à donner, les agents remplissent le reste.
+  const [proposalLoading, setProposalLoading] = useState(false);
+  const [proposedFields, setProposedFields] = useState<string[]>([]);
 
   // Ouverture depuis « Mes livres » : recharge le vrai projet cloud dans le
   // workflow, au lieu d'afficher uniquement sa page publique en lecture.
