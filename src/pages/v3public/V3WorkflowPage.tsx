@@ -53,7 +53,7 @@ export default function V3WorkflowPage() {
           </div>
         </header>
 
-        <div className="grid gap-4">
+        <div className="grid gap-4" id="pilotage-agents">
           <V3AgentsGrid />
 
           <div
