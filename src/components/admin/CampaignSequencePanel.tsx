@@ -62,7 +62,9 @@ const CampaignSequencePanel = () => {
             (supabase as any).from('email_opens').select('prospect_email').eq('template_name', t).limit(5000),
             (supabase as any).from('email_clicks').select('prospect_email').eq('template_name', t).limit(5000),
           ]);
-          const clickEmails = new Set((clicks || []).map((r: any) => norm(r.prospect_email)).filter(Boolean));
+          const clickEmails = new Set<string>(
+            (clicks || []).map((r: any) => norm(r.prospect_email as string)).filter(Boolean),
+          );
           return {
             step,
             sent: uniqueCount(sent, 'recipient_email'),
