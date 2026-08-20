@@ -1070,15 +1070,21 @@ Ton : ${tone}
 Synopsis : ${description}
 Nombre exact de chapitres : ${chapters}
 Mots par chapitre : ${wordsPerChapter}
+Points clés attendus par chapitre : ${outlinePoints}
+Ton du sommaire : ${outlineTone}
+Mots-clés à placer naturellement : ${outlineKeywords.trim() || 'aucun imposé'}
+Idée de départ de l'auteur : ${aiTopic || 'non précisée'}
 
 Réponds STRICTEMENT en JSON valide, sans markdown, avec ce schéma :
-{"chapters":[{"numero":1,"titre":"Titre spécifique non générique","objectif":"Objectif éditorial clair en une phrase"}]}
+{"chapters":[{"numero":1,"titre":"Titre spécifique non générique","objectif":"Objectif éditorial clair en une phrase","points":["${outlinePoints} points clés"],"motCle":"mot-clé KDP"}]}
 
 Règles :
 - exactement ${chapters} chapitres ;
+- exactement ${outlinePoints} points clés par chapitre ;
 - jamais de titre générique comme "Chapitre 1" ;
 - jamais le même titre répété ;
 - interdiction de répéter "L'aboutissement" ou une formule de conclusion sur plusieurs chapitres ;
+- 100 % en français courant, aucun mot latin ni étranger ;
 - aucun bloc markdown, aucune balise json ;
 - titres courts, vendeurs, cohérents avec le synopsis.`;
       const raw = await callAIWriting(prompt, { jsonMode: true, temperature: 0.55, maxTokens: Math.min(12000, 1800 + chapters * 180) });
