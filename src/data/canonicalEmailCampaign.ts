@@ -25,13 +25,13 @@ export const ACTIVE_EMAIL_CAMPAIGN = {
 export const CLOSING_EMAIL_CAMPAIGN = {
   id: 'cloture-47-2026',
   name: 'Clôture 47 € — cliqueurs et ouvreurs',
-  deadline: '30 septembre 2026',
+  deadline: '31 août 2026',
   checkoutUrl: COMMANDER_URL,
   letters: [
     { template: 'cliqueurs-personnel', segment: 'clickers', label: 'Message personnel aux cliqueurs', subject: "Vous avez regardé EbookStudio — qu'est-ce qui vous retient ?" },
     { template: 'cloture-47-1', segment: 'openers_no_click', label: 'Ce qui change le 1er octobre', subject: "Le 1er octobre, l'accès à vie disparaît (le calcul est simple)" },
     { template: 'cloture-47-2', segment: 'openers_no_click', label: 'La preuve en images', subject: 'Un livre entier, du sommaire au fichier Amazon' },
-    { template: 'cloture-47-3', segment: 'openers_no_click', label: 'Dernier jour utile', subject: "Dernier rappel : après le 30 septembre, ce tarif n'existe plus" },
+    { template: 'cloture-47-3', segment: 'openers_no_click', label: 'Dernier jour utile', subject: "Dernier rappel : après le 31 août, ce tarif n'existe plus" },
     { template: 'relance-niches-1', segment: 'no_click', label: '10 niches offertes (non-cliqueurs)', subject: "10 niches Amazon rentables, offertes (même si vous n'achetez rien)" },
 
   ],

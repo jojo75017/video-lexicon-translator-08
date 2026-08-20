@@ -1,4 +1,4 @@
-// Kit de publication réseaux sociaux — campagne « Accès à vie 47 € » (jusqu'au 30/09/2026).
+// Kit de publication réseaux sociaux — campagne « Accès à vie 47 € » (jusqu'au 31/08/2026).
 // Chaque post a son visuel prêt à télécharger. Aucun contenu inventé sur les résultats clients.
 
 import fb01 from '@/assets/social/fb-01-sommaire.jpg';
@@ -166,7 +166,7 @@ Testez sur votre idée, ce soir : ${FB('09')}`,
     imageFile: 'fb-10-echeance.jpg',
     text: `Information importante pour ceux qui hésitent encore.
 
-L'accès à vie à Ebookstudio est à 47 € jusqu'au 30 septembre 2026. Après cette date, l'accès se fera uniquement par abonnement mensuel ou annuel.
+L'accès à vie à Ebookstudio est à 47 € jusqu'au 31 août 2026. Après cette date, l'accès se fera uniquement par abonnement mensuel ou annuel.
 
 Détail de l'offre : ${withUtm(OFFER_URL, 'facebook', 'demo-genie-10')}`,
     link: withUtm(OFFER_URL, 'facebook', 'demo-genie-10'),
