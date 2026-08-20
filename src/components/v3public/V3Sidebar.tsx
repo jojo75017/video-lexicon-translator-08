@@ -32,6 +32,7 @@ const NAV: NavSection[] = [
   {
     section: 'Créer un livre',
     items: [
+      { to: '/v3/lancer', label: '🚀 Lancer mon livre (fiche + 15 agents)', icon: Layers, end: true, badge: 'Direct' },
       { to: '/v3/biographie', label: '📖 Biographie — Le récit de votre vie', icon: BookOpen, badge: 'NEW' },
       { to: '/v3/create', label: 'Ebookstudio-Génie', icon: Sparkles, badge: 'IA' },
       { to: '/v3/create?sommaire=ia', label: 'Sommaire IA (dialogue)', icon: ListTree, badge: 'IA' },

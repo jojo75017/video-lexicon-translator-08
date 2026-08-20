@@ -63,7 +63,7 @@ export default function V3StartBookBar() {
     const brief = readBookBrief() || {};
     writeBookBrief({ ...brief, title: clean });
     pushTitleHistory(clean);
-    navigate('/v3/create');
+    navigate('/v3/lancer');
   };
 
 
@@ -140,7 +140,7 @@ export default function V3StartBookBar() {
         {currentTitle && (
           <button
             type="button"
-            onClick={() => navigate('/v3/create')}
+            onClick={() => navigate('/v3/lancer')}
             className="mt-3 inline-flex items-center gap-2 text-[12.5px] font-semibold"
             style={{ color: 'var(--v3-emerald)' }}
           >
