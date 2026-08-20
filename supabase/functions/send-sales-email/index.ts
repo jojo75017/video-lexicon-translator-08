@@ -535,7 +535,7 @@ Deno.serve(async (req) => {
     }
 
     // Relance des commandes restées en attente depuis plus de 2 heures.
-    if (mode === "recover_pending") {
+    if (mode === "recover_pending" || mode === "auto_pending") {
       const cutoff = new Date(Date.now() - 2 * 3600000).toISOString();
       const { data: pending } = await db
         .from("funnel_orders")
