@@ -76,6 +76,7 @@ const V3PublicLayout = lazy(() => import('./components/v3public/V3PublicLayout')
 const V3HomePage = lazy(() => import('./pages/v3public/V3HomePage'));
 const V3AuthPage = lazy(() => import('./pages/v3public/V3AuthPage'));
 const V3CreatePage = lazy(() => import('./pages/v3public/V3CreatePage'));
+const V3LaunchBookPage = lazy(() => import('./pages/v3public/V3LaunchBookPage'));
 const V3KidsBookCreatePage = lazy(() => import('./pages/v3public/V3KidsBookCreatePage'));
 const V3BookPage = lazy(() => import('./pages/v3public/V3BookPage'));
 const V3LibraryPage = lazy(() => import('./pages/v3public/V3LibraryPage'));
