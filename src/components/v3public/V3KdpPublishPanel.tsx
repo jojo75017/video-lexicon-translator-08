@@ -51,6 +51,38 @@ function extractJson(raw: string): any | null {
   }
 }
 
+/**
+ * Une catégorie BISAC est un libellé lisible (« FICTION / Thrillers / Suspense »),
+ * jamais un code ni un numéro de rang. On rejette donc tout ce qui n'est pas du texte.
+ */
+function cleanCategory(input: unknown): string {
+  const source =
+    input && typeof input === 'object'
+      ? String(
+          (input as any).label ??
+            (input as any).nom ??
+            (input as any).name ??
+            (input as any).categorie ??
+            (input as any).category ??
+            '',
+        )
+      : String(input ?? '');
+  const value = source
+    .replace(/^\s*\d+\s*[).:-]?\s*/, '') // « 1. », « 2) »
+    .replace(/\b[A-Z]{3}\d{6}\b/g, '') // codes BISAC type FIC031000
+    .replace(/\s{2,}/g, ' ')
+    .trim()
+    .replace(/^[\/,;–-]+|[\/,;–-]+$/g, '')
+    .trim();
+  const letters = value.replace(/[^A-Za-zÀ-ÿ]/g, '');
+  if (letters.length < 3) return '';
+  return value.slice(0, 120);
+}
+
+const cleanCategories = (values: unknown): string[] =>
+  (Array.isArray(values) ? values : []).map(cleanCategory).filter(Boolean);
+
+
 export default function V3KdpPublishPanel({
   title,
   subtitle,
