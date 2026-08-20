@@ -385,15 +385,32 @@ Réponds UNIQUEMENT en JSON valide :
             className="w-full rounded-xl border px-3 py-2 text-sm outline-none"
             style={inputStyle}
           />
-          <button
-            type="button"
-            onClick={() => copy('Description', description)}
-            className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold"
-            style={chipButton}
-          >
-            <Copy className="h-3.5 w-3.5" /> Copier la description
-          </button>
+          <span className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => copy('Description', description)}
+              className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold"
+              style={chipButton}
+            >
+              <Copy className="h-3.5 w-3.5" /> Copier la description
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setDescription(toKdpText(description).slice(0, 4000));
+                toast.success('Markdown converti en texte KDP (gras en <b>).');
+              }}
+              className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold"
+              style={chipButton}
+            >
+              <Wand2 className="h-3.5 w-3.5" /> Nettoyer le markdown
+            </button>
+          </span>
+          <span className="block text-xs" style={{ color: 'var(--v3-muted)' }}>
+            KDP n’accepte que &lt;b&gt;, &lt;i&gt; et &lt;br&gt; : les mots-clés importants sont mis en gras avec &lt;b&gt;…&lt;/b&gt;.
+          </span>
         </label>
+
 
         <div>
           <span className="text-xs font-bold uppercase" style={{ color: 'var(--v3-muted)' }}>7 mots-clés KDP</span>
