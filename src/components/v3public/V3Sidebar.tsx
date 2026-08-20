@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
+import useIsAdmin from '@/hooks/useIsAdmin';
 import ThemeToggle from './ThemeToggle';
 
 /**
@@ -17,6 +18,16 @@ import ThemeToggle from './ThemeToggle';
  */
 type NavItem = { to: string; label: string; icon: any; end?: boolean; external?: boolean; badge?: string };
 type NavSection = { section: string; items: NavItem[] };
+
+const ADMIN_SECTION: NavSection = {
+  section: 'Admin — Lancement',
+  items: [
+    { to: '/admin/lancement', label: 'Pilotage du lancement', icon: Rocket, end: true, badge: 'Admin' },
+    { to: '/gestion-prospects', label: 'Base emails & envois', icon: Mail, end: true, badge: 'Admin' },
+    { to: '/apercu-emails', label: 'Aperçu des emails', icon: FileText, end: true, badge: 'Admin' },
+    { to: '/message', label: 'Message audio (MP3)', icon: Video, end: true },
+  ],
+};
 
 const NAV: NavSection[] = [
   {
@@ -130,20 +141,23 @@ const NAV: NavSection[] = [
 export default function V3Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const { hasV2 } = useV3Entitlement();
+  const { isAdmin } = useIsAdmin();
   const { pathname, search } = useLocation();
   const currentTab = new URLSearchParams(search).get('tab');
 
+  const sections = useMemo(() => (isAdmin ? [ADMIN_SECTION, ...NAV] : NAV), [isAdmin]);
+
   /** Section contenant la page courante (ouverte par défaut). */
   const activeSection = useMemo(() => {
-    const match = NAV.find((g) =>
+    const match = sections.find((g) =>
       g.items.some((it) => {
         if (it.external) return false;
         const [itPath] = it.to.split('?');
         return pathname === itPath || (itPath.length > 1 && pathname.startsWith(itPath + '/'));
       }),
     );
-    return match?.section ?? NAV[0].section;
-  }, [pathname]);
+    return match?.section ?? sections[0].section;
+  }, [pathname, sections]);
 
   const [open, setOpen] = useState<Record<string, boolean>>({ [activeSection]: true });
 
@@ -211,7 +225,7 @@ export default function V3Sidebar() {
       )}
 
       <nav className="p-2 space-y-2">
-        {NAV.map((group) => {
+        {sections.map((group) => {
           const isOpen = collapsed || !!open[group.section];
           return (
             <div key={group.section}>
