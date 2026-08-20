@@ -4,7 +4,7 @@ import {
   ChevronLeft, ChevronRight, ChevronDown,
   GraduationCap, Gem, FileText, User,
   LifeBuoy, Mail, HelpCircle, Video, ListTree, Award,
-  Search, Target, BarChart3, Image as ImageIcon, LayoutGrid, Star, Wand2, PlusCircle, Layers,
+  Rocket, Crown, Search, Target, BarChart3, Image as ImageIcon, LayoutGrid, Star, Wand2, PlusCircle, Layers,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
@@ -19,6 +19,14 @@ type NavItem = { to: string; label: string; icon: any; end?: boolean; external?:
 type NavSection = { section: string; items: NavItem[] };
 
 const NAV: NavSection[] = [
+  {
+    section: 'Lancement',
+    items: [
+      { to: '/essai', label: '🎁 Essai gratuit — chapitre 1', icon: Rocket, end: true, badge: 'Gratuit' },
+      { to: '/v3/attente', label: '👑 Salon des membres fondateurs', icon: Crown, end: true, badge: '1er mois' },
+      { to: '/commander', label: '47 € à vie — jusqu’au 31 août', icon: Gem, end: true, badge: '31 août' },
+    ],
+  },
   {
     section: 'Démarrer',
     items: [

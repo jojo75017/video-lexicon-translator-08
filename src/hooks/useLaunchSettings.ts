@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-export type LaunchSettingKey = 'free_trial_open' | 'v3_open' | 'first_month_free_open';
+export type LaunchSettingKey = 'free_trial_open' | 'v3_open' | 'first_month_free_open' | 'launch_video';
 
 export interface LaunchSettingValue {
   enabled: boolean;
   opens_at?: string;
   closes_at?: string;
+  /** Lien de la vidéo de lancement (clé `launch_video`). */
+  url?: string;
 }
 
 export type LaunchSettings = Record<LaunchSettingKey, LaunchSettingValue>;
@@ -15,6 +17,7 @@ const DEFAULTS: LaunchSettings = {
   free_trial_open: { enabled: true },
   v3_open: { enabled: false, opens_at: '2026-10-01T08:00:00+02:00' },
   first_month_free_open: { enabled: true, closes_at: '2026-09-30T23:59:59+02:00' },
+  launch_video: { enabled: true, url: '' },
 };
 
 /**

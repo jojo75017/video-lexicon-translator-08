@@ -15,6 +15,7 @@ import { COMMANDER_URL } from "@/data/externalLinks";
 import { V3_LAUNCH_BONUSES, V3_BONUSES_TOTAL_VALUE } from "@/data/v3Launch";
 import { trackCaptureEvent } from "@/lib/captureTracking";
 import { V3EngineStrip, V3EngineGrid } from "@/components/v3public/V3EngineBanner";
+import V3LaunchBanner from "@/components/v3public/V3LaunchBanner";
 import Niches10Offer from "@/components/marketing/Niches10Offer";
 import heroBooks from "@/assets/commander-hero-books.jpg";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -46,7 +47,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "Pourquoi commander maintenant ?",
-    a: "Le tarif 47 € est valable jusqu'au 30 septembre (59 € ensuite). À partir du 1er octobre, EbookStudio passe uniquement en abonnement : Plume 27 € par mois, Édition 47 €, Studio Pro 97 € (tout inclus). L'accès à vie n'existera plus.",
+    a: "Le tarif 47 € est valable jusqu'au 31 août (59 € ensuite). À partir du 1er octobre, EbookStudio passe uniquement en abonnement : Plume 27 € par mois, Édition 47 €, Studio Pro 97 € (tout inclus). L'accès à vie n'existera plus.",
   },
   {
     q: "Comment mon accès est-il ouvert après le paiement ?",
@@ -115,7 +116,7 @@ const REASSURANCE = [
   },
 ];
 
-/** Fin de l'accès à vie : 30 septembre 2026, 23 h 59 (heure de Paris). */
+/** Fin de l'accès à vie : 31 août 2026, 23 h 59 (heure de Paris). */
 const OFFER_END = new Date("2026-09-30T21:59:00Z");
 
 /** Compte à rebours sobre : jours et heures restants, sans clignotement. */
@@ -222,10 +223,11 @@ export default function V3CommanderPage() {
     <main className="min-h-screen" style={{ background: PAPER, color: INK }}>
       <SeoHead
         title="Commander EbookStudio Pro — 47 € accès à vie (offre août-septembre)"
-        description="Accès à vie à EbookStudio Pro pour 47 € au lieu de 59 €, jusqu'au 30 septembre. Aucun abonnement. La V3 est incluse sans surcoût. Carte bancaire ou PayPal, accès immédiat."
+        description="Accès à vie à EbookStudio Pro pour 47 € au lieu de 59 €, jusqu'au 31 août. Aucun abonnement. La V3 est incluse sans surcoût. Carte bancaire ou PayPal, accès immédiat."
         canonical={COMMANDER_URL}
       />
       <PaymentTestModeBanner />
+      <V3LaunchBanner compact />
 
       <section className="mx-auto max-w-6xl px-4 py-12 md:py-16">
         {/* HERO — nouvelle mise en page éditoriale */}
@@ -262,7 +264,7 @@ export default function V3CommanderPage() {
             </a>
 
             <p className="mt-4 text-sm text-slate-600">
-              <span className="line-through">59 €</span> jusqu'au 30 septembre · garanti 30 jours
+              <span className="line-through">59 €</span> jusqu'au 31 août · garanti 30 jours
             </p>
 
             <div className="mt-10 border-t pt-6" style={{ borderColor: `${EMERALD}1a` }}>
@@ -428,7 +430,7 @@ export default function V3CommanderPage() {
                   <span className="text-sm text-slate-500">paiement unique</span>
                 </div>
                 <p className="mt-1 text-[11px] font-bold" style={{ color: "#8a6d16" }}>
-                  Offre valable jusqu'au 30 septembre — ensuite 59 €.
+                  Offre valable jusqu'au 31 août — ensuite 59 €.
                 </p>
 
 

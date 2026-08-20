@@ -12,6 +12,7 @@ import V3PaletteModule from '@/components/v3public/V3PaletteModule';
 import KdpPilotPromoBanner from '@/components/ebook/KdpPilotPromoBanner';
 import Niches10Offer from '@/components/marketing/Niches10Offer';
 import { V3EngineStrip, V3EngineGrid } from '@/components/v3public/V3EngineBanner';
+import V3LaunchBanner from '@/components/v3public/V3LaunchBanner';
 import V3HeroBanner from '@/components/v3public/V3HeroBanner';
 import V3MarketProofPanel from '@/components/v3public/V3MarketProofPanel';
 import V3BeforeAfterPanel from '@/components/v3public/V3BeforeAfterPanel';
@@ -50,6 +51,9 @@ export default function V3HomePage() {
 
   return (
     <>
+      {/* LANCEMENT — fin du 47 € le 31 août, V3 le 1er octobre */}
+      <V3LaunchBanner />
+
       {/* BANDEAU D'ACCROCHE — premier module */}
       <V3HeroBanner />
 

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Gift, Crown, Clock, BookOpen, Mail, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import useLaunchSettings from '@/hooks/useLaunchSettings';
+import LaunchVideoBlock from '@/components/launch/LaunchVideoBlock';
 
 interface WaitlistRow {
   rank: number | null;
@@ -90,6 +91,7 @@ export default function V3WaitingRoomPage() {
       </header>
 
       <main className="mx-auto max-w-5xl px-5 py-12">
+        <LaunchVideoBlock className="mb-6" />
         <section className="rounded-2xl border-2 border-[#D4AF37]/40 bg-[#0F2E1F] p-8 text-white shadow-lg">
           <span className="inline-flex items-center gap-2 rounded-full bg-[#D4AF37]/20 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
             <Crown className="h-3.5 w-3.5" /> Membre fondateur

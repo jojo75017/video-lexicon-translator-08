@@ -189,7 +189,7 @@ const ClosingCampaignPanel = () => {
     <div className="rounded-lg border border-border bg-card/50 p-4 space-y-4">
       <div className="flex flex-wrap items-center gap-2">
         <h3 className="font-semibold">Conversion 2026 — 3 séquences (A réactivation, B clic, C vente)</h3>
-        <span className="text-xs text-muted-foreground">Fin de l'accès à vie le 30/09/2026 · forfait 50 000 emails/mois</span>
+        <span className="text-xs text-muted-foreground">Fin de l'accès à vie le 31/08/2026 · forfait 50 000 emails/mois</span>
         <Button variant="ghost" size="sm" onClick={load} className="ml-auto text-muted-foreground">
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
         </Button>

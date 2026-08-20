@@ -1,7 +1,7 @@
 // Promo d'été — source unique de vérité pour le prix de l'offre de base (accès à vie).
-// Baisse saisonnière 59€ → 47€ jusqu'au 30 septembre 2026 (23h59, Europe/Paris).
+// Baisse saisonnière 59€ → 47€ jusqu'au 31 août 2026 (23h59, Europe/Paris).
 //
-// Pour rétablir le tarif normal après le 30 septembre :
+// Pour rétablir le tarif normal après le 31 août :
 //  - remettre PROMO_PRICE = 59 ici (l'affichage repasse automatiquement)
 //  - ET remettre les montants dans les edge functions de paiement :
 //      supabase/functions/stripe-checkout/index.ts       (pro_lifetime.amount : 4700 → 5900)
@@ -14,8 +14,8 @@ export const PROMO_PRICE = 47;
 /** Prix normal, affiché barré à côté du prix promo. */
 export const REGULAR_PRICE = 59;
 
-/** Fin de la promo : 30 septembre 2026, 23h59 heure de Paris (UTC+2 en été). */
-export const PROMO_END = new Date("2026-09-30T23:59:59+02:00");
+/** Fin de la promo : 31 août 2026, 23h59 heure de Paris (UTC+2 en été). */
+export const PROMO_END = new Date("2026-08-31T23:59:59+02:00");
 
 /** true tant que la promo d'été est en cours. */
 export function isPromoActive(): boolean {

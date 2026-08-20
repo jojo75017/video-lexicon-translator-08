@@ -203,7 +203,7 @@ export default function DemoGeniePage() {
                     Écrire mon livre en entier — 47 € à vie <ArrowRight className="w-4 h-4" />
                   </a>
                   <p className="mt-2 text-xs" style={{ color: '#6B6257' }}>
-                    Accès à vie à 47 € jusqu'au 30 septembre 2026. Ensuite, uniquement par abonnement.
+                    Accès à vie à 47 € jusqu'au 31 août 2026. Ensuite, uniquement par abonnement.
                   </p>
                 </div>
 
@@ -270,7 +270,7 @@ export default function DemoGeniePage() {
                   Écrire mon livre en entier — 47 € à vie <ArrowRight className="w-4 h-4" />
                 </a>
                 <p className="mt-2 text-xs" style={{ color: '#6B6257' }}>
-                  Accès à vie à 47 € jusqu'au 30 septembre 2026. Ensuite, uniquement par abonnement.
+                  Accès à vie à 47 € jusqu'au 31 août 2026. Ensuite, uniquement par abonnement.
                 </p>
               </div>
             )}

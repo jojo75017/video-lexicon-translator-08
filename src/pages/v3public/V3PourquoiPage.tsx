@@ -242,7 +242,7 @@ export default function V3PourquoiPage() {
           />
         </div>
         <p className="text-xs text-[#6B7280] mt-4">
-          En ce moment, l'accès à vie à 47 € reste disponible jusqu'au 30/09/2026. Les abonnements Plume et
+          En ce moment, l'accès à vie à 47 € reste disponible jusqu'au 31/08/2026. Les abonnements Plume et
           Édition démarrent le 1er octobre 2026.
         </p>
       </Section>
