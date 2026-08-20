@@ -4,6 +4,7 @@ import { Loader2, Sparkles, Lock, BookOpen, Mail, CheckCircle2, PenLine } from '
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import useLaunchSettings from '@/hooks/useLaunchSettings';
+import LaunchVideoBlock from '@/components/launch/LaunchVideoBlock';
 import { V3_PLANS, formatPrice } from '@/data/v3Pricing';
 
 interface OutlineItem {
@@ -163,6 +164,8 @@ export default function EssaiPage() {
                 <strong> chapitre 1 complet (1 200 à 1 800 mots)</strong>, un titre, un sous-titre et le
                 sommaire du livre entier. Vous lisez, vous jugez, et vous décidez ensuite.
               </p>
+
+              <LaunchVideoBlock className="mt-6" />
 
               <div className="mt-8 space-y-4 rounded-2xl border border-black/5 bg-white p-6 shadow-sm">
                 <label className="block text-sm font-semibold text-[#2A2118]">
