@@ -193,9 +193,9 @@ const EmailFunnelPanel = () => {
     }
     setBusy(null);
   };
-
-
+  const steps = data
     ? [
+
         { label: 'Emails envoyés', value: data.sent },
         { label: 'Ont ouvert', value: data.openers },
         { label: 'Ont cliqué', value: data.clickers },
