@@ -141,6 +141,8 @@ export default function V3KdpPublishPanel({
   const [zipping, setZipping] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [autoFilled, setAutoFilled] = useState(false);
+  const [showPreview, setShowPreview] = useState(true);
+
 
   useEffect(() => {
     if (initialDescription && !description) setDescription(initialDescription);
