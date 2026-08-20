@@ -366,6 +366,96 @@ Deno.serve(async (req) => {
       return respond({ success: true, mode, template: resendTemplate, sent: sentCount, targets: targets.length });
     }
 
+    // Segments type GetResponse : non-ouvreurs et cliqueurs d'un gabarit donné.
+    if (mode === "resend_non_openers" || mode === "resend_clickers") {
+      const step = Math.min(Math.max(Number(body.step || 1), 1), 5);
+      const sourceTemplate = String(body.source_template || templateName(step));
+      const suffix = mode === "resend_non_openers" ? "non-ouvreurs" : "cliqueurs";
+      const resendTemplate = `${sourceTemplate}-${suffix}`;
+      const limit = Math.min(Number(body.batch_size || 250), 300);
+
+      const { data: received } = await db.from("email_send_log").select("recipient_email").eq("template_name", sourceTemplate).in("status", ["sent", "delivered"]).limit(5000);
+      const { data: opens } = await db.from("email_opens").select("prospect_email").eq("template_name", sourceTemplate);
+      const { data: clicks } = await db.from("email_clicks").select("prospect_email").eq("template_name", sourceTemplate);
+      const { data: alreadySent } = await db.from("email_send_log").select("recipient_email").eq("template_name", resendTemplate).in("status", ["sent", "delivered"]);
+      const { data: paidOrders } = await db.from("funnel_orders").select("email").eq("status", "paid");
+      const { data: profilesRows } = await db.from("sales_prospects").select("email,first_name,unsubscribed,status").limit(5000);
+
+      const openers = new Set((opens || []).map((r) => normalize(r.prospect_email || "")));
+      const clickers = new Set((clicks || []).map((r) => normalize(r.prospect_email || "")));
+      const done = new Set((alreadySent || []).map((r) => normalize(r.recipient_email || "")));
+      const paid = new Set((paidOrders || []).map((r) => normalize(r.email || "")));
+      const profiles = new Map((profilesRows || []).map((r) => [normalize(r.email || ""), r]));
+
+      const pool = mode === "resend_clickers"
+        ? Array.from(clickers)
+        : (received || []).map((r) => normalize(r.recipient_email || "")).filter((e) => !openers.has(e) && !clickers.has(e));
+
+      const targets: string[] = [];
+      for (const email of pool) {
+        if (!isEmail(email) || targets.includes(email)) continue;
+        if (done.has(email) || paid.has(email)) continue;
+        const profile = profiles.get(email);
+        if (profile && (profile.unsubscribed === true || profile.status !== "active")) continue;
+        targets.push(email);
+        if (targets.length >= limit) break;
+      }
+
+      if (body.dry_run) return respond({ success: true, mode, template: resendTemplate, would_send: targets.length });
+
+      const subject = mode === "resend_non_openers"
+        ? "Votre premier chapitre, écrit ce soir (offert)"
+        : "Vous avez regardé — je vous écris le premier chapitre";
+
+      let sentCount = 0;
+      for (const email of targets) {
+        const profile = profiles.get(email);
+        const result = await sendResendEmailThrottled({
+          from: FROM_CAMPAIGN,
+          to: [email],
+          subject,
+          html: render(baseUrl, email, (profile?.first_name as string) || "", step),
+          reply_to: REPLY_TO,
+        });
+        await db.from("email_send_log").insert({ recipient_email: email, template_name: resendTemplate, message_id: result.id || `${CAMPAIGN}-${resendTemplate}-${email}`, provider_message_id: result.id || null, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
+        if (!result.ok) { if (isQuotaExhausted()) break; continue; }
+        sentCount++;
+      }
+      return respond({ success: true, mode, template: resendTemplate, sent: sentCount, targets: targets.length });
+    }
+
+    // Relance des commandes restées en attente depuis plus de 2 heures.
+    if (mode === "recover_pending") {
+      const cutoff = new Date(Date.now() - 2 * 3600000).toISOString();
+      const { data: pending } = await db
+        .from("funnel_orders")
+        .select("id,email,first_name,amount,metadata,created_at")
+        .eq("status", "pending")
+        .lt("created_at", cutoff)
+        .limit(200);
+
+      const targets = (pending || []).filter((o) => {
+        const meta = (o.metadata ?? {}) as Record<string, unknown>;
+        return !meta.recovery_email_sent_at && isEmail(normalize(o.email || ""));
+      });
+
+      if (body.dry_run) return respond({ success: true, mode, would_send: targets.length });
+
+      let sentCount = 0;
+      for (const order of targets) {
+        const email = normalize(order.email || "");
+        const link = trackedLink(baseUrl, email, 1);
+        const html = `<!doctype html><html lang="fr"><body style="margin:0;background:#f6f7f8;padding:24px 10px"><table role="presentation" width="600" align="center" style="max-width:600px;background:#ffffff;border:1px solid #e5e7eb;border-collapse:collapse"><tr><td style="background:#008296;padding:18px 28px;color:#ffffff;font:700 22px Arial,Helvetica,sans-serif">EbookStudio</td></tr><tr><td style="padding:24px 28px;color:#232F3E;font:16px/1.65 Arial,Helvetica,sans-serif"><p style="margin:0 0 16px">Bonjour${order.first_name ? ` ${order.first_name}` : ""},</p><p style="margin:0 0 16px">Votre commande a été ouverte mais le paiement n’a pas abouti. Rien n’a été prélevé.</p><p style="margin:0 0 16px">Vous pouvez la reprendre là où vous vous étiez arrêté, par carte ou par PayPal, en une ou plusieurs échéances.</p>${ctaButton(link, "Reprendre ma commande")}<p style="margin:0 0 8px">Si quelque chose vous a bloqué, répondez simplement à cet email : je vous réponds personnellement.</p><p style="margin:16px 0 0">Georges Boubet<br>EbookStudio</p></td></tr></table></body></html>`;
+        const result = await sendResendEmailThrottled({ from: FROM_CAMPAIGN, to: [email], subject: "Votre commande EbookStudio est restée en attente", html, reply_to: REPLY_TO });
+        await db.from("email_send_log").insert({ recipient_email: email, template_name: "panier-en-attente", message_id: result.id || `${CAMPAIGN}-panier-${order.id}`, provider_message_id: result.id || null, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
+        if (!result.ok) { if (isQuotaExhausted()) break; continue; }
+        const meta = { ...((order.metadata ?? {}) as Record<string, unknown>), recovery_email_sent_at: new Date().toISOString() };
+        await db.from("funnel_orders").update({ metadata: meta }).eq("id", order.id);
+        sentCount++;
+      }
+      return respond({ success: true, mode, sent: sentCount, targets: targets.length });
+    }
+
     // Relance de la séquence : envoie l'étape N aux contacts qui ont reçu l'étape N-1
     if (mode === "send_step") {
       const step = Math.min(Math.max(Number(body.step || 3), 2), 5);
