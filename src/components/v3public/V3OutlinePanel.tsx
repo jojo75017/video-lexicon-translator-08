@@ -260,28 +260,58 @@ Règles :
     setPasteOpen(false);
   };
 
+  /** Toute modification du sommaire passe ici : historique + désactivation de la validation. */
+  const applyOutlineChange = (next: BriefOutlineChapter[]) => {
+    setHistory((prev) => [...prev.slice(-24), outline]);
+    setFuture([]);
+    onChange({ outline: next, chapters: next.length, outlineValidated: false });
+  };
+
+  const undo = () => {
+    if (!history.length) return;
+    const previous = history[history.length - 1];
+    setHistory((prev) => prev.slice(0, -1));
+    setFuture((prev) => [outline, ...prev].slice(0, 25));
+    onChange({ outline: previous, chapters: previous.length, outlineValidated: false });
+  };
+
+  const redo = () => {
+    if (!future.length) return;
+    const [next, ...rest] = future;
+    setFuture(rest);
+    setHistory((prev) => [...prev.slice(-24), outline]);
+    onChange({ outline: next, chapters: next.length, outlineValidated: false });
+  };
+
+  const exportOutline = () => {
+    const text = outlineToText(brief, outline);
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `sommaire-${(brief.title || 'livre').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 50)}.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success('Sommaire exporté (titres, objectifs, points, mise en forme).');
+  };
+
   const updateChapter = (index: number, patch: Partial<BriefOutlineChapter>) => {
     const next = outline.map((c, i) => (i === index ? { ...c, ...patch } : c));
-    onChange({ outline: next, outlineValidated: false });
+    applyOutlineChange(next);
   };
 
   const removeChapter = (index: number) => {
-    const next = normalizeOutline(outline.filter((_, i) => i !== index));
-    onChange({ outline: next, chapters: next.length, outlineValidated: false });
+    applyOutlineChange(normalizeOutline(outline.filter((_, i) => i !== index)));
   };
 
   const moveChapter = (index: number, dir: -1 | 1) => {
-    const to = index + dir;
-    if (to < 0 || to >= outline.length) return;
-    const next = [...outline];
-    [next[index], next[to]] = [next[to], next[index]];
-    onChange({ outline: normalizeOutline(next), outlineValidated: false });
+    applyOutlineChange(moveChapterTo(outline, index, index + dir));
   };
 
   const addChapter = () => {
-    const next = normalizeOutline([...outline, { numero: outline.length + 1, titre: '', objectif: '' }]);
-    onChange({ outline: next, chapters: next.length, outlineValidated: false });
+    applyOutlineChange(normalizeOutline([...outline, { numero: outline.length + 1, titre: '', objectif: '' }]));
   };
+
 
   /** Mode dialogue : demande 3 propositions pour le prochain chapitre. */
   const askNextChapter = async () => {
