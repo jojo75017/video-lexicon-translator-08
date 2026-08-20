@@ -19,6 +19,8 @@ interface StepStat {
   sent: number;
   opens: number;
   clicks: number;
+  buyers: number;
+  subscribers: number;
 }
 
 const uniqueCount = (rows: Array<Record<string, unknown>> | null, key: string) =>
