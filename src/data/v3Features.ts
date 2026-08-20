@@ -76,6 +76,15 @@ export const FEATURE_ROWS: FeatureRow[] = [
     label: 'Le parcours du livre',
     tiles: [
       {
+        id: 'workflow-15-agents',
+        title: 'Workflow 15 Agents',
+        subtitle: 'Le pipeline P1 → P15 et l’avancement de votre livre',
+        icon: Bot,
+        tint: 'rgba(13,122,95,0.14)',
+        kind: 'link',
+        to: '/v3/workflow',
+      },
+      {
         id: 'creer',
         title: 'Créer',
         subtitle: cat('creer')?.tagline ?? 'De l’idée au plan',
