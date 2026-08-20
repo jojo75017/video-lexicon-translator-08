@@ -189,30 +189,49 @@ const normalize = (value: string) => value.trim().toLowerCase();
 const templateName = (step: number) => `rappel-47-${step}`;
 const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
-/** Lien de clic hébergé sur notre propre domaine (/r) : plus de confiance
- *  côté messageries qu'une URL technique, et le suivi reste enregistré. */
+/** Site public : les liens visibles dans les emails ne doivent JAMAIS pointer
+ *  vers l'URL technique du backend (elle répond « requested path is invalid »). */
+const SITE = "https://ebookstudio.fr";
+
+/** Relais de clic sur notre domaine (/r) : chaque lien de l'email est mesuré,
+ *  y compris l'audio et le MP3 — sinon on pilote à l'aveugle. `lk` identifie le lien. */
+function trackedUrl(email: string, step: number, destination: string, tag: string) {
+  const sep = destination.includes("?") ? "&" : "?";
+  const dest = `${destination}${sep}lk=${tag}`;
+  return `${SITE}/r?e=${encodeURIComponent(email)}&s=${step}&t=${templateName(step)}&u=${encodeURIComponent(dest)}`;
+}
+
 function trackedLink(_baseUrl: string, email: string, step: number) {
-  const destination = `${CHECKOUT}?src=${CAMPAIGN}-${step}&email=${encodeURIComponent(email)}`;
-  return `https://ebookstudio.fr/r?e=${encodeURIComponent(email)}&s=${step}&t=${templateName(step)}&u=${encodeURIComponent(destination)}`;
+  return trackedUrl(email, step, `${CHECKOUT}?src=${CAMPAIGN}-${step}&email=${encodeURIComponent(email)}`, "offre");
+}
+
+/** Lien du cadeau : premier chapitre écrit gratuitement, sans inscription. */
+function giftLink(email: string, step: number) {
+  return trackedUrl(email, step, `${SITE}/essai?src=${CAMPAIGN}-${step}&email=${encodeURIComponent(email)}`, "cadeau");
 }
 
 function ctaButton(link: string, label: string) {
   return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:26px 0"><tr><td align="center" bgcolor="#FF9E2D" style="border-radius:6px"><a href="${link}" style="display:block;padding:17px 24px;color:#232F3E;text-decoration:none;font:700 17px/1.3 Arial,Helvetica,sans-serif;text-align:center">${label}</a></td></tr></table>`;
 }
 
-/** Site public : les liens visibles dans les emails ne doivent JAMAIS pointer
- *  vers l'URL technique du backend (elle répond « requested path is invalid »). */
-const SITE = "https://ebookstudio.fr";
+/** Bloc cadeau placé avant toute demande d'argent : c'est le premier clic possible. */
+function giftBlock(email: string, step: number) {
+  const link = giftLink(email, step);
+  return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:22px 0"><tr><td align="center" style="background:#f2f8f9;border:1px solid #008296;padding:22px 20px"><p style="margin:0 0 6px;font:700 12px Arial,Helvetica,sans-serif;color:#008296;letter-spacing:.6px">OFFERT — SANS INSCRIPTION, SANS CARTE</p><p style="margin:0 0 14px;font:16px/1.55 Arial,Helvetica,sans-serif;color:#232F3E">Donnez votre idée de livre : le premier chapitre est écrit devant vous, gratuitement.</p><a href="${link}" style="display:inline-block;background:#008296;color:#ffffff;text-decoration:none;padding:15px 24px;border-radius:6px;font:700 16px Arial,Helvetica,sans-serif">Écrire mon premier chapitre gratuitement</a></td></tr></table>`;
+}
 
 /** Bloc média : vignette cliquable vers la vidéo ou le message audio. Masqué si aucune URL. */
-function mediaBlock(_baseUrl: string, url: string, kind: "video" | "audio") {
+function mediaBlock(url: string, kind: "video" | "audio", email: string, step: number) {
   if (!url) return "";
   if (kind === "audio" || url.endsWith(".mp3")) {
-    const audioPage = `${SITE}/message`;
-    return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td align="center" style="background:#064e3b;padding:22px 20px"><p style="margin:0 0 6px;font:700 13px Arial,Helvetica,sans-serif;color:#C9A84C;letter-spacing:.6px">LE MESSAGE AUDIO — 2 MINUTES</p><p style="margin:0 0 14px;font:16px/1.55 Arial,Helvetica,sans-serif;color:#ffffff">Je vous explique pourquoi EbookStudio change la publication sur Amazon.</p><a href="${audioPage}" style="display:inline-block;background:#C9A84C;color:#0b2b22;text-decoration:none;padding:14px 22px;border-radius:6px;font:700 16px Arial,Helvetica,sans-serif">&#9658;&nbsp; Écouter le message</a><p style="margin:12px 0 0;font:13px/1.5 Arial,Helvetica,sans-serif;color:#ffffff"><a href="${url}" style="color:#C9A84C">Ou écouter le fichier MP3 directement</a></p></td></tr></table>`;
+    const audioPage = trackedUrl(email, step, `${SITE}/message`, "audio");
+    const mp3 = trackedUrl(email, step, url.startsWith(SITE) ? url : `${SITE}/message`, "mp3");
+    return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td align="center" style="background:#064e3b;padding:22px 20px"><p style="margin:0 0 6px;font:700 13px Arial,Helvetica,sans-serif;color:#C9A84C;letter-spacing:.6px">LE MESSAGE AUDIO — 2 MINUTES</p><p style="margin:0 0 14px;font:16px/1.55 Arial,Helvetica,sans-serif;color:#ffffff">Je vous explique pourquoi EbookStudio change la publication sur Amazon.</p><a href="${audioPage}" style="display:inline-block;background:#C9A84C;color:#0b2b22;text-decoration:none;padding:14px 22px;border-radius:6px;font:700 16px Arial,Helvetica,sans-serif">&#9658;&nbsp; Écouter le message</a><p style="margin:12px 0 0;font:13px/1.5 Arial,Helvetica,sans-serif;color:#ffffff"><a href="${mp3}" style="color:#C9A84C">Ou écouter le fichier audio directement</a></p></td></tr></table>`;
   }
 
-  return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td align="center" style="background:#064e3b;padding:22px 20px"><p style="margin:0 0 6px;font:700 13px Arial,Helvetica,sans-serif;color:#C9A84C;letter-spacing:.6px">LA VIDÉO — 2 MINUTES</p><p style="margin:0 0 14px;font:16px/1.55 Arial,Helvetica,sans-serif;color:#ffffff">Je vous montre un livre complet, du sommaire au fichier prêt pour Amazon.</p><a href="${url}" style="display:inline-block;background:#C9A84C;color:#0b2b22;text-decoration:none;padding:14px 22px;border-radius:6px;font:700 16px Arial,Helvetica,sans-serif">&#9658;&nbsp; Regarder la vidéo</a></td></tr></table>`;
+  const videoLink = trackedUrl(email, step, url.startsWith(SITE) ? url : `${SITE}/message`, "video");
+  return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td align="center" style="background:#064e3b;padding:22px 20px"><p style="margin:0 0 6px;font:700 13px Arial,Helvetica,sans-serif;color:#C9A84C;letter-spacing:.6px">LA VIDÉO — 2 MINUTES</p><p style="margin:0 0 14px;font:16px/1.55 Arial,Helvetica,sans-serif;color:#ffffff">Je vous montre un livre complet, du sommaire au fichier prêt pour Amazon.</p><a href="${videoLink}" style="display:inline-block;background:#C9A84C;color:#0b2b22;text-decoration:none;padding:14px 22px;border-radius:6px;font:700 16px Arial,Helvetica,sans-serif">&#9658;&nbsp; Regarder la vidéo</a></td></tr></table>`;
+
 }
 
 
@@ -243,9 +262,10 @@ function render(baseUrl: string, email: string, firstName: string, step: number)
 ${c.reminder ? `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:0 0 18px"><tr><td style="background:#f2f8f9;border-left:4px solid #008296;padding:12px 16px;font:15px/1.6 Arial,Helvetica,sans-serif;color:#232F3E">${c.reminder}</td></tr></table>` : ""}
 <h1 style="margin:0 0 16px;font:700 25px/1.3 Arial,Helvetica,sans-serif;color:#232F3E">${c.heading}</h1>
 <p style="margin:0 0 20px">${c.intro}</p>
+${giftBlock(email, step)}
 <p style="margin:0 0 14px;font:700 17px Arial,Helvetica,sans-serif;color:#232F3E">${c.bulletsTitle}</p>
 ${bulletList(c.bullets)}
-${mediaBlock(baseUrl, VIDEO_URL, VIDEO_KIND)}
+${mediaBlock(VIDEO_URL, VIDEO_KIND, email, step)}
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td style="background:#fffaf2;border:1px solid #FF9E2D;padding:18px 20px;font:16px/1.65 Arial,Helvetica,sans-serif;color:#232F3E"><p style="margin:0 0 8px;font:700 16px Arial,Helvetica,sans-serif;color:#8a4b00">${c.valueTitle}</p>${c.valueBody}</td></tr></table>
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:22px 0"><tr><td style="background:#f2f8f9;border-left:4px solid #008296;padding:16px 18px;font:16px/1.6 Arial,Helvetica,sans-serif;color:#232F3E"><strong>Le résultat :</strong> ${c.result}</td></tr></table>
 <p style="margin:0 0 20px">${c.reassurance}</p>
@@ -344,6 +364,96 @@ Deno.serve(async (req) => {
         sentCount++;
       }
       return respond({ success: true, mode, template: resendTemplate, sent: sentCount, targets: targets.length });
+    }
+
+    // Segments type GetResponse : non-ouvreurs et cliqueurs d'un gabarit donné.
+    if (mode === "resend_non_openers" || mode === "resend_clickers") {
+      const step = Math.min(Math.max(Number(body.step || 1), 1), 5);
+      const sourceTemplate = String(body.source_template || templateName(step));
+      const suffix = mode === "resend_non_openers" ? "non-ouvreurs" : "cliqueurs";
+      const resendTemplate = `${sourceTemplate}-${suffix}`;
+      const limit = Math.min(Number(body.batch_size || 250), 300);
+
+      const { data: received } = await db.from("email_send_log").select("recipient_email").eq("template_name", sourceTemplate).in("status", ["sent", "delivered"]).limit(5000);
+      const { data: opens } = await db.from("email_opens").select("prospect_email").eq("template_name", sourceTemplate);
+      const { data: clicks } = await db.from("email_clicks").select("prospect_email").eq("template_name", sourceTemplate);
+      const { data: alreadySent } = await db.from("email_send_log").select("recipient_email").eq("template_name", resendTemplate).in("status", ["sent", "delivered"]);
+      const { data: paidOrders } = await db.from("funnel_orders").select("email").eq("status", "paid");
+      const { data: profilesRows } = await db.from("sales_prospects").select("email,first_name,unsubscribed,status").limit(5000);
+
+      const openers = new Set((opens || []).map((r) => normalize(r.prospect_email || "")));
+      const clickers = new Set((clicks || []).map((r) => normalize(r.prospect_email || "")));
+      const done = new Set((alreadySent || []).map((r) => normalize(r.recipient_email || "")));
+      const paid = new Set((paidOrders || []).map((r) => normalize(r.email || "")));
+      const profiles = new Map((profilesRows || []).map((r) => [normalize(r.email || ""), r]));
+
+      const pool = mode === "resend_clickers"
+        ? Array.from(clickers)
+        : (received || []).map((r) => normalize(r.recipient_email || "")).filter((e) => !openers.has(e) && !clickers.has(e));
+
+      const targets: string[] = [];
+      for (const email of pool) {
+        if (!isEmail(email) || targets.includes(email)) continue;
+        if (done.has(email) || paid.has(email)) continue;
+        const profile = profiles.get(email);
+        if (profile && (profile.unsubscribed === true || profile.status !== "active")) continue;
+        targets.push(email);
+        if (targets.length >= limit) break;
+      }
+
+      if (body.dry_run) return respond({ success: true, mode, template: resendTemplate, would_send: targets.length });
+
+      const subject = mode === "resend_non_openers"
+        ? "Votre premier chapitre, écrit ce soir (offert)"
+        : "Vous avez regardé — je vous écris le premier chapitre";
+
+      let sentCount = 0;
+      for (const email of targets) {
+        const profile = profiles.get(email);
+        const result = await sendResendEmailThrottled({
+          from: FROM_CAMPAIGN,
+          to: [email],
+          subject,
+          html: render(baseUrl, email, (profile?.first_name as string) || "", step),
+          reply_to: REPLY_TO,
+        });
+        await db.from("email_send_log").insert({ recipient_email: email, template_name: resendTemplate, message_id: result.id || `${CAMPAIGN}-${resendTemplate}-${email}`, provider_message_id: result.id || null, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
+        if (!result.ok) { if (isQuotaExhausted()) break; continue; }
+        sentCount++;
+      }
+      return respond({ success: true, mode, template: resendTemplate, sent: sentCount, targets: targets.length });
+    }
+
+    // Relance des commandes restées en attente depuis plus de 2 heures.
+    if (mode === "recover_pending") {
+      const cutoff = new Date(Date.now() - 2 * 3600000).toISOString();
+      const { data: pending } = await db
+        .from("funnel_orders")
+        .select("id,email,first_name,amount,metadata,created_at")
+        .eq("status", "pending")
+        .lt("created_at", cutoff)
+        .limit(200);
+
+      const targets = (pending || []).filter((o) => {
+        const meta = (o.metadata ?? {}) as Record<string, unknown>;
+        return !meta.recovery_email_sent_at && isEmail(normalize(o.email || ""));
+      });
+
+      if (body.dry_run) return respond({ success: true, mode, would_send: targets.length });
+
+      let sentCount = 0;
+      for (const order of targets) {
+        const email = normalize(order.email || "");
+        const link = trackedLink(baseUrl, email, 1);
+        const html = `<!doctype html><html lang="fr"><body style="margin:0;background:#f6f7f8;padding:24px 10px"><table role="presentation" width="600" align="center" style="max-width:600px;background:#ffffff;border:1px solid #e5e7eb;border-collapse:collapse"><tr><td style="background:#008296;padding:18px 28px;color:#ffffff;font:700 22px Arial,Helvetica,sans-serif">EbookStudio</td></tr><tr><td style="padding:24px 28px;color:#232F3E;font:16px/1.65 Arial,Helvetica,sans-serif"><p style="margin:0 0 16px">Bonjour${order.first_name ? ` ${order.first_name}` : ""},</p><p style="margin:0 0 16px">Votre commande a été ouverte mais le paiement n’a pas abouti. Rien n’a été prélevé.</p><p style="margin:0 0 16px">Vous pouvez la reprendre là où vous vous étiez arrêté, par carte ou par PayPal, en une ou plusieurs échéances.</p>${ctaButton(link, "Reprendre ma commande")}<p style="margin:0 0 8px">Si quelque chose vous a bloqué, répondez simplement à cet email : je vous réponds personnellement.</p><p style="margin:16px 0 0">Georges Boubet<br>EbookStudio</p></td></tr></table></body></html>`;
+        const result = await sendResendEmailThrottled({ from: FROM_CAMPAIGN, to: [email], subject: "Votre commande EbookStudio est restée en attente", html, reply_to: REPLY_TO });
+        await db.from("email_send_log").insert({ recipient_email: email, template_name: "panier-en-attente", message_id: result.id || `${CAMPAIGN}-panier-${order.id}`, provider_message_id: result.id || null, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
+        if (!result.ok) { if (isQuotaExhausted()) break; continue; }
+        const meta = { ...((order.metadata ?? {}) as Record<string, unknown>), recovery_email_sent_at: new Date().toISOString() };
+        await db.from("funnel_orders").update({ metadata: meta }).eq("id", order.id);
+        sentCount++;
+      }
+      return respond({ success: true, mode, sent: sentCount, targets: targets.length });
     }
 
     // Relance de la séquence : envoie l'étape N aux contacts qui ont reçu l'étape N-1

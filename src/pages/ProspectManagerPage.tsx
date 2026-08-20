@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CampaignSequencePanel from '@/components/admin/CampaignSequencePanel';
+import EmailFunnelPanel from '@/components/admin/EmailFunnelPanel';
 import ClosingCampaignPanel from '@/components/admin/ClosingCampaignPanel';
 import ConversionBoostersPanel from '@/components/admin/ConversionBoostersPanel';
 import ChannelPerformancePanel from '@/components/admin/ChannelPerformancePanel';
@@ -630,6 +631,8 @@ const ProspectManagerPage = () => {
                 <RefreshCw className="h-4 w-4" />
               </Button>
             </div>
+
+            <EmailFunnelPanel />
 
             <CampaignSequencePanel />
 
