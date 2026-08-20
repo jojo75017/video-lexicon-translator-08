@@ -1046,10 +1046,11 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
 
 
   const generateOutline = async () => {
-    if (!canStepOne || !canStepTwo) {
-      toast.error('Complète le titre, le synopsis, la catégorie et le format avant le sommaire.');
+    if (seedLength < 10) {
+      toast.error('Écris ton idée de livre (une phrase suffit) avant de générer le sommaire.');
       return;
     }
+
 
     const provider = getProvider();
     const key = getProviderKey(provider);
