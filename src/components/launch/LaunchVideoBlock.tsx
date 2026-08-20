@@ -1,4 +1,4 @@
-import { Play, Headphones } from 'lucide-react';
+import { Play, Headphones, Download } from 'lucide-react';
 import useLaunchSettings from '@/hooks/useLaunchSettings';
 
 interface LaunchVideoBlockProps {
@@ -33,10 +33,17 @@ export default function LaunchVideoBlock({ className = '' }: LaunchVideoBlockPro
             <Play className="h-4 w-4 fill-current" /> Écouter le message
           </a>
         </div>
-        <audio controls className="mt-4 w-full" preload="metadata">
-          <source src={url} type="audio/mpeg" />
+        <audio controls className="mt-4 w-full" preload="metadata" src={url}>
           Votre navigateur ne supporte pas la lecture audio.
         </audio>
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 inline-flex items-center gap-1.5 text-[12px] font-semibold text-[#D4AF37] underline-offset-2 hover:underline"
+        >
+          <Download className="h-3.5 w-3.5" /> Si la lecture ne démarre pas : télécharger le MP3
+        </a>
       </div>
     );
   }
