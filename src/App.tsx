@@ -404,6 +404,8 @@ const App = () => {
             <Route path="/essai" element={<EssaiPage />} />
             <Route path="/essai/inscription" element={<EssaiInscriptionPage />} />
             <Route path="/v3/attente" element={<V3WaitingRoomPage />} />
+            <Route path="/message" element={<MessageAudioPage />} />
+
 
 
 
