@@ -109,7 +109,7 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { priceId, email, userId, environment, returnUrl } = body ?? {};
+    const { priceId, email, userId, environment, returnUrl, firstMonthFree } = body ?? {};
 
     if (!priceId || !ALLOWED_PRICES.has(priceId)) {
       throw new Error("Prix invalide");
@@ -138,19 +138,28 @@ Deno.serve(async (req) => {
 
     const customerId = await resolveOrCreateCustomer(env, { email, userId });
 
+    // Offre de lancement « premier mois offert » : la première facture tombe
+    // le 1er novembre 2026, jamais avant. Réservée aux abonnements.
+    const TRIAL_END_UNIX = Math.floor(Date.UTC(2026, 10, 1, 7, 0, 0) / 1000);
+    const wantsTrial =
+      firstMonthFree === true && isRecurring && TRIAL_END_UNIX > Math.floor(Date.now() / 1000);
+
+    const subscriptionData: Record<string, unknown> = {};
+    if (userId) subscriptionData.metadata = { userId, plan: priceId };
+    if (wantsTrial) subscriptionData.trial_end = TRIAL_END_UNIX;
+
     const session = await stripeRequest<any>(env, "POST", "/checkout/sessions", {
       mode: isRecurring ? "subscription" : "payment",
       ui_mode: "embedded_page",
       return_url: returnUrl,
       line_items: [{ price: stripePriceId, quantity: 1 }],
       ...(customerId && { customer: customerId }),
-      ...(userId && {
-        metadata: { userId, plan: priceId },
-        ...(isRecurring && {
-          subscription_data: { metadata: { userId, plan: priceId } },
-        }),
+      ...(userId && { metadata: { userId, plan: priceId } }),
+      ...(isRecurring && Object.keys(subscriptionData).length > 0 && {
+        subscription_data: subscriptionData,
       }),
     });
+
 
     return new Response(
       JSON.stringify({ clientSecret: session.client_secret }),

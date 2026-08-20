@@ -1675,6 +1675,92 @@ export type Database = {
         }
         Relationships: []
       }
+      launch_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
+      launch_waitlist: {
+        Row: {
+          amount: number | null
+          billing_interval: string
+          created_at: string
+          currency: string
+          email: string
+          environment: string
+          id: string
+          plan: string
+          rank: number
+          source: string | null
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          trial_chapter_id: string | null
+          trial_ends_at: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount?: number | null
+          billing_interval?: string
+          created_at?: string
+          currency?: string
+          email: string
+          environment?: string
+          id?: string
+          plan: string
+          rank?: never
+          source?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_chapter_id?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number | null
+          billing_interval?: string
+          created_at?: string
+          currency?: string
+          email?: string
+          environment?: string
+          id?: string
+          plan?: string
+          rank?: never
+          source?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_chapter_id?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "launch_waitlist_trial_chapter_id_fkey"
+            columns: ["trial_chapter_id"]
+            isOneToOne: false
+            referencedRelation: "trial_chapters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       module_entitlements: {
         Row: {
           amount: number | null
@@ -2299,6 +2385,81 @@ export type Database = {
           trial_ends_at?: string | null
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      trial_chapters: {
+        Row: {
+          audience: string | null
+          book_idea: string
+          chapter_text: string | null
+          chapter_title: string | null
+          converted_at: string | null
+          converted_user_id: string | null
+          created_at: string
+          delivered_at: string | null
+          email: string | null
+          id: string
+          ip: string | null
+          language: string
+          outline: Json
+          proposed_subtitle: string | null
+          proposed_title: string | null
+          status: string
+          tone: string | null
+          updated_at: string
+          user_agent: string | null
+          utm_campaign: string | null
+          utm_source: string | null
+          word_count: number
+        }
+        Insert: {
+          audience?: string | null
+          book_idea: string
+          chapter_text?: string | null
+          chapter_title?: string | null
+          converted_at?: string | null
+          converted_user_id?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          email?: string | null
+          id?: string
+          ip?: string | null
+          language?: string
+          outline?: Json
+          proposed_subtitle?: string | null
+          proposed_title?: string | null
+          status?: string
+          tone?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_source?: string | null
+          word_count?: number
+        }
+        Update: {
+          audience?: string | null
+          book_idea?: string
+          chapter_text?: string | null
+          chapter_title?: string | null
+          converted_at?: string | null
+          converted_user_id?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          email?: string | null
+          id?: string
+          ip?: string | null
+          language?: string
+          outline?: Json
+          proposed_subtitle?: string | null
+          proposed_title?: string | null
+          status?: string
+          tone?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_source?: string | null
+          word_count?: number
         }
         Relationships: []
       }
