@@ -19,6 +19,8 @@ interface StepStat {
   sent: number;
   opens: number;
   clicks: number;
+  buyers: number;
+  subscribers: number;
 }
 
 const uniqueCount = (rows: Array<Record<string, unknown>> | null, key: string) =>
@@ -33,6 +35,25 @@ const CampaignSequencePanel = () => {
   const load = useCallback(async () => {
     setLoading(true);
     try {
+      const [orders, modules, subs] = await Promise.all([
+        (supabase as any).from('funnel_orders').select('email, status').limit(5000),
+        (supabase as any).from('module_entitlements').select('email, status').limit(5000),
+        (supabase as any).from('subscribers').select('email, status').limit(5000),
+      ]);
+
+      const norm = (e?: string | null) => (e || '').trim().toLowerCase();
+      const paidEmails = new Set<string>();
+      (orders.data || []).forEach((o: any) => {
+        if ((o.status || '').toLowerCase() === 'paid') paidEmails.add(norm(o.email));
+      });
+      (modules.data || []).forEach((m: any) => {
+        if ((m.status || '').toLowerCase() === 'active') paidEmails.add(norm(m.email));
+      });
+      const activeSubEmails = new Set<string>();
+      (subs.data || []).forEach((s: any) => {
+        if ((s.status || '').toLowerCase() === 'active') activeSubEmails.add(norm(s.email));
+      });
+
       const rows = await Promise.all(
         STEPS.map(async (step) => {
           const t = templateName(step);
@@ -41,11 +62,16 @@ const CampaignSequencePanel = () => {
             (supabase as any).from('email_opens').select('prospect_email').eq('template_name', t).limit(5000),
             (supabase as any).from('email_clicks').select('prospect_email').eq('template_name', t).limit(5000),
           ]);
+          const clickEmails = new Set<string>(
+            (clicks || []).map((r: any) => norm(r.prospect_email as string)).filter(Boolean),
+          );
           return {
             step,
             sent: uniqueCount(sent, 'recipient_email'),
             opens: uniqueCount(opens, 'prospect_email'),
-            clicks: uniqueCount(clicks, 'prospect_email'),
+            clicks: clickEmails.size,
+            buyers: Array.from(clickEmails).filter((e) => paidEmails.has(e)).length,
+            subscribers: Array.from(clickEmails).filter((e) => activeSubEmails.has(e)).length,
           } as StepStat;
         }),
       );
@@ -152,6 +178,8 @@ const CampaignSequencePanel = () => {
               <th className="px-3 py-2 text-center font-medium text-muted-foreground">Envoyés</th>
               <th className="px-3 py-2 text-center font-medium text-muted-foreground">Ouvertures uniques</th>
               <th className="px-3 py-2 text-center font-medium text-muted-foreground">Clics uniques</th>
+              <th className="px-3 py-2 text-center font-medium text-muted-foreground">Acheteurs</th>
+              <th className="px-3 py-2 text-center font-medium text-muted-foreground">Abonnés actifs</th>
               <th className="px-3 py-2 text-right font-medium text-muted-foreground">Actions</th>
             </tr>
           </thead>
@@ -162,6 +190,8 @@ const CampaignSequencePanel = () => {
                 <td className="px-3 py-2 text-center">{s.sent}</td>
                 <td className="px-3 py-2 text-center">{s.opens}</td>
                 <td className="px-3 py-2 text-center">{s.clicks}</td>
+                <td className="px-3 py-2 text-center font-semibold text-emerald-400">{s.buyers}</td>
+                <td className="px-3 py-2 text-center font-semibold text-gold-light">{s.subscribers}</td>
                 <td className="px-3 py-2">
                   <div className="flex flex-wrap justify-end gap-1">
                     <Button variant="outline" size="sm" disabled={busyStep === s.step} onClick={() => sendTest(s.step)}>
