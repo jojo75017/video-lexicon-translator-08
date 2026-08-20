@@ -111,11 +111,11 @@ export default function V3Header({ isAuthed = false, isAdmin = false }: { isAuth
         {/* CTA rapide + trigger mobile & tablette (< lg) */}
         <div className="lg:hidden ml-auto flex items-center gap-2">
           <Link
-            to={isAuthed ? '/v3/create' : '/v3/auth?mode=signup'}
+            to={isAuthed ? '/v3/create' : '/cadeau'}
             className="v3-btn v3-btn-gold text-[12px] whitespace-nowrap"
             style={{ padding: '7px 14px' }}
           >
-            {isAuthed ? 'Écrire' : "S'inscrire"}
+            {isAuthed ? 'Écrire' : 'Gratuit'}
           </Link>
           <button
             className="p-2 text-white"
