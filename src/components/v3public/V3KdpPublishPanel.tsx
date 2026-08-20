@@ -215,9 +215,10 @@ Réponds UNIQUEMENT en JSON valide :
         setCategories(Array.from({ length: 3 }, (_, i) => clean[i] || ''));
       }
 
-      if (data.authorBio) setAuthorBio(String(data.authorBio));
-      if (data.aPlusContent) setAPlusContent(String(data.aPlusContent));
-      if (data.backCover) setBackCoverText(String(data.backCover));
+      if (data.authorBio) setAuthorBio(toKdpText(String(data.authorBio)));
+      if (data.aPlusContent) setAPlusContent(toKdpText(String(data.aPlusContent)));
+      if (data.backCover) setBackCoverText(toKdpText(String(data.backCover)));
+
       toast.success('Contenu Amazon KDP généré ✓');
     } catch (error: any) {
       toast.error(error?.message || 'Génération impossible.');
