@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowDown, ArrowUp, Check, ClipboardPaste, ListOrdered, Loader2, MessageSquarePlus,
-  Plus, RefreshCw, Sparkles, Wand2, X, History, Undo2,
+  Check, ClipboardPaste, Download, ListOrdered, Loader2, MessageSquarePlus,
+  Plus, RefreshCw, Redo2, Sparkles, Wand2, History, Undo2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,7 +15,13 @@ import {
   clearTocForWorkflow, normalizeOutline, parseTocText, readLatestUltimateToc,
   type BookBrief, type BriefOutlineChapter,
 } from '@/lib/v3/bookBrief';
+import {
+  duplicateChapter, insertChapterAt, mergeWithNext, moveChapterTo, outlineToText, splitChapter,
+} from '@/lib/v3/outlineStudio';
+import V3OutlineChapterCard from './V3OutlineChapterCard';
+import V3OutlineStudioBar from './V3OutlineStudioBar';
 import { loadOutlineVersions, saveOutlineVersion, type OutlineVersion } from '@/lib/v3/genieThread';
+
 
 type Props = {
   brief: BookBrief;
