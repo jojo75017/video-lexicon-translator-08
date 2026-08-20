@@ -15,6 +15,7 @@ import {
   Check,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { AdminLaunchLinkCheck } from '@/components/admin/AdminLaunchLinkCheck';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -283,6 +284,8 @@ function AdminLancementContent() {
           </CardContent>
         </Card>
 
+
+        <AdminLaunchLinkCheck mp3Url={videoUrl} />
 
         {/* Interrupteurs */}
         <Card className="rounded-2xl">
