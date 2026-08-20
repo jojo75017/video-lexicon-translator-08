@@ -152,12 +152,15 @@ export default function V3KdpDataPage() {
             title={book.title}
             subtitle={subtitle === 'Workflow V3 complet' ? '' : subtitle}
             author={book.author_name || 'Auteur Ebookstudio'}
-            category={book.kdp_categories || ''}
+            category={categories[0] || book.kdp_categories || ''}
             coverUrl={coverUrl}
             initialDescription={book.kdp_description || ''}
             initialKeywords={keywords}
+            initialCategories={categories}
+            autoFill
             manuscript={manuscript}
           />
+
 
           <div className="mt-5 flex flex-wrap gap-2">
             <Link to={`/v3/create?projectId=${book.id}`} className="v3-btn v3-btn-outline text-xs">
