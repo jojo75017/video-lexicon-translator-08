@@ -13,7 +13,11 @@ interface V3KdpPublishPanelProps {
   coverUrl?: string | null;
   initialDescription?: string;
   initialKeywords?: string[];
+  initialCategories?: string[];
+  /** Remplit automatiquement mots-clés + catégories avec l'IA quand ils sont vides. */
+  autoFill?: boolean;
 }
+
 
 const BISAC_SUGGESTIONS = [
   'FICTION / Thrillers / Suspense',
@@ -56,27 +60,50 @@ export default function V3KdpPublishPanel({
   coverUrl,
   initialDescription,
   initialKeywords,
+  initialCategories,
+  autoFill,
 }: V3KdpPublishPanelProps) {
   const [description, setDescription] = useState(initialDescription || '');
   const [keywords, setKeywords] = useState<string[]>(() => {
     const base = initialKeywords?.slice(0, 7) || [];
     return Array.from({ length: 7 }, (_, i) => base[i] || '');
   });
-  const [categories, setCategories] = useState<string[]>(['', '', '']);
+  const [categories, setCategories] = useState<string[]>(() => {
+    const base = initialCategories?.filter(Boolean).slice(0, 3) || [];
+    return Array.from({ length: 3 }, (_, i) => base[i] || '');
+  });
   const [authorBio, setAuthorBio] = useState('');
   const [aPlusContent, setAPlusContent] = useState('');
   const [backCoverText, setBackCoverText] = useState('');
   const [price, setPrice] = useState('9.99');
   const [zipping, setZipping] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [autoFilled, setAutoFilled] = useState(false);
 
   useEffect(() => {
     if (initialDescription && !description) setDescription(initialDescription);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialDescription]);
 
+  // Les données arrivent souvent après le premier rendu (chargement du livre) :
+  // on complète alors les cases encore vides sans écraser une saisie manuelle.
+  useEffect(() => {
+    const base = initialKeywords?.filter(Boolean).slice(0, 7) || [];
+    if (!base.length) return;
+    setKeywords((prev) => prev.map((value, index) => value.trim() || base[index] || ''));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(initialKeywords || [])]);
+
+  useEffect(() => {
+    const base = initialCategories?.filter(Boolean).slice(0, 3) || [];
+    if (!base.length) return;
+    setCategories((prev) => prev.map((value, index) => value.trim() || base[index] || ''));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(initialCategories || [])]);
+
   const royalty = useMemo(() => {
     const value = Number(price.replace(',', '.'));
+
     if (!Number.isFinite(value) || value <= 0) return null;
     const rate = value >= 2.99 && value <= 9.99 ? 0.7 : 0.35;
     return { rate, net: value * rate };
@@ -137,8 +164,22 @@ Réponds UNIQUEMENT en JSON valide :
     }
   };
 
+  // Livre déjà terminé mais mots-clés / catégories absents : on les complète une seule fois,
+  // pour que la fiche KDP ne soit jamais vide à l'ouverture.
+  useEffect(() => {
+    if (!autoFill || autoFilled || generating) return;
+    if (!title.trim() || !manuscript.trim()) return;
+    const noKeywords = keywords.every((k) => !k.trim());
+    const noCategories = categories.every((c) => !c.trim());
+    if (!noKeywords && !noCategories) return;
+    setAutoFilled(true);
+    toast.info('Mots-clés et catégories KDP en cours de génération…');
+    void generateAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoFill, autoFilled, title, manuscript, keywords, categories]);
   const buildMetadataText = () => {
     const lines = [
+
       `Titre : ${title}`,
       subtitle ? `Sous-titre : ${subtitle}` : '',
       `Auteur : ${author}`,

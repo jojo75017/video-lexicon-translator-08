@@ -35,6 +35,28 @@ type OutlineChapter = {
   objectif: string;
 };
 
+/**
+ * Les agents P2 (étude de marché) et P7 (packaging) produisent les 7 mots-clés KDP
+ * et les catégories Amazon. On les récupère pour remplir la fiche KDP et la sauvegarde.
+ */
+function readKdpMetaFromResults(): { keywords: string[]; categories: string[] } {
+  try {
+    const raw = localStorage.getItem('ebook_workflow_results');
+    if (!raw) return { keywords: [], categories: [] };
+    const results = JSON.parse(raw) as Record<string, { result?: any }>;
+    const p2 = results.P2?.result || {};
+    const p7 = results.P7?.result || {};
+    const list = (value: any) => (Array.isArray(value) ? value.map((v) => String(v).trim()).filter(Boolean) : []);
+    const keywords = Array.from(new Set([...list(p7.motsClésOptimises), ...list(p2.motsClésKDP)])).slice(0, 7);
+    const categories = Array.from(
+      new Set([...list(p2.categoriesKDP), ...list(p2.categoriesSecondaires)]),
+    ).slice(0, 3);
+    return { keywords, categories };
+  } catch {
+    return { keywords: [], categories: [] };
+  }
+}
+
 type HubConfig = {
   title?: string;
   subtitle?: string;
@@ -488,10 +510,13 @@ export default function V3CreateWizard() {
       setTone(saved.tone || saved.writing_style || 'Inspirant');
       setChapters(savedChapterCount);
       if (saved.kdp_categories) {
-        const match = CATEGORIES.find((item) => item.toLowerCase() === String(saved.kdp_categories).toLowerCase());
+        // Les catégories sont stockées « cat1 | cat2 | genre » : on repart de la première.
+        const first = String(saved.kdp_categories).split('|')[0].trim();
+        const match = CATEGORIES.find((item) => item.toLowerCase() === first.toLowerCase());
         if (match) setCategory(match);
-        else { setCategory('Autre'); setCustomCategory(String(saved.kdp_categories)); }
+        else { setCategory('Autre'); setCustomCategory(first); }
       }
+
       if (restoredOutline.length) setOutline(restoredOutline);
       if (Array.isArray(saved.characters) && saved.characters.length) {
         setCharacters(saved.characters.map((character: any) => ({
@@ -955,8 +980,12 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
       ].filter(Boolean).join('\n\n'),
       cover_concepts: activeCoverUrl || '',
       kdp_description: completed?.backCover?.description || '',
-      kdp_keywords: '',
-      kdp_categories: effectiveCategory,
+      kdp_keywords: readKdpMetaFromResults().keywords.join(', '),
+      kdp_categories: [...readKdpMetaFromResults().categories, effectiveCategory]
+        .filter(Boolean)
+        .filter((value, index, all) => all.indexOf(value) === index)
+        .join(' | '),
+
       project_type: 'ebook',
       updated_at: new Date().toISOString(),
     };
@@ -1599,6 +1628,9 @@ Règles :
               category={effectiveCategory}
               coverUrl={coverUrl}
               initialDescription={completedBook?.backCover?.description || ''}
+              initialKeywords={readKdpMetaFromResults().keywords}
+              initialCategories={readKdpMetaFromResults().categories}
+
               manuscript={(completedBook.chapters || []).map((c: any, index: number) => {
                 const validatedOutlineTitle = normalizedOutline[index]?.titre?.trim();
                 const generatedTitle = typeof c.title === 'string' ? c.title.trim() : '';
