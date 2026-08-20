@@ -442,8 +442,8 @@ Deno.serve(async (req) => {
     }
 
     // Segments type GetResponse : non-ouvreurs et cliqueurs d'un gabarit donné.
-    // `auto_non_openers` = même logique, déclenchée par le cron (48 h après l'envoi).
-    if (mode === "resend_non_openers" || mode === "resend_clickers" || mode === "auto_non_openers") {
+    // `auto_non_openers` / `auto_clickers` = même logique, déclenchée par le cron.
+    if (mode === "resend_non_openers" || mode === "resend_clickers" || mode === "auto_non_openers" || mode === "auto_clickers") {
       const isNonOpeners = mode !== "resend_clickers";
       const step = Math.min(Math.max(Number(body.step || 1), 1), 5);
       const sourceTemplate = String(body.source_template || templateName(step));
