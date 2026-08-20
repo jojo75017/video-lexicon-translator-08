@@ -14,6 +14,7 @@ import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { COMMANDER_URL } from "@/data/externalLinks";
 import { V3_LAUNCH_BONUSES, V3_BONUSES_TOTAL_VALUE } from "@/data/v3Launch";
 import { trackCaptureEvent } from "@/lib/captureTracking";
+import ActiveUsersPanel from "@/components/sales/ActiveUsersPanel";
 import { V3EngineStrip, V3EngineGrid } from "@/components/v3public/V3EngineBanner";
 import V3LaunchBanner from "@/components/v3public/V3LaunchBanner";
 import Niches10Offer from "@/components/marketing/Niches10Offer";
