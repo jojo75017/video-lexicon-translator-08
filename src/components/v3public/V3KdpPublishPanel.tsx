@@ -195,7 +195,7 @@ Extrait du manuscrit :
 
 Réponds UNIQUEMENT en JSON valide :
 {
-  "description": "description KDP vendeuse, 1500 à 3000 caractères, HTML autorisé <b> <i> <br>",
+  "description": "description KDP vendeuse de 1500 à 3000 caractères. INTERDIT : markdown (pas de **, pas de #, pas de tirets de liste). Seules balises autorisées : <b> <i> <br>. Mets en <b>gras</b> les mots-clés et bénéfices essentiels (5 à 8 passages courts).",
   "keywords": ["7 mots-clés longue traîne de recherche Amazon"],
   "bisac": ["3 libellés de catégories BISAC officielles en anglais, format exact 'FICTION / Thrillers / Suspense', SANS code numérique, SANS numérotation"],
   "authorBio": "biographie auteur 500 à 800 caractères à la 3e personne",
@@ -206,7 +206,7 @@ Réponds UNIQUEMENT en JSON valide :
       const data = extractJson(typeof raw === 'string' ? raw : JSON.stringify(raw));
       if (!data) throw new Error('Réponse IA illisible, réessaie.');
 
-      if (data.description) setDescription(String(data.description).slice(0, 4000));
+      if (data.description) setDescription(toKdpText(String(data.description)).slice(0, 4000));
       if (Array.isArray(data.keywords)) {
         setKeywords(Array.from({ length: 7 }, (_, i) => String(data.keywords[i] || '').slice(0, 50)));
       }
