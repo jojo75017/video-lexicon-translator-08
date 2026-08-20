@@ -195,10 +195,11 @@ const SITE = "https://ebookstudio.fr";
 
 /** Relais de clic sur notre domaine (/r) : chaque lien de l'email est mesuré,
  *  y compris l'audio et le MP3 — sinon on pilote à l'aveugle. `lk` identifie le lien. */
-function trackedUrl(email: string, step: number, destination: string, tag: string) {
+function trackedUrl(email: string, step: number, destination: string, tag: string, template?: string) {
   const sep = destination.includes("?") ? "&" : "?";
   const dest = `${destination}${sep}lk=${tag}`;
-  return `${SITE}/r?e=${encodeURIComponent(email)}&s=${step}&t=${templateName(step)}&u=${encodeURIComponent(dest)}`;
+  const t = template || templateName(step);
+  return `${SITE}/r?e=${encodeURIComponent(email)}&s=${step}&t=${t}&u=${encodeURIComponent(dest)}`;
 }
 
 function trackedLink(_baseUrl: string, email: string, step: number) {
