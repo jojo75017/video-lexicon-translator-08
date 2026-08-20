@@ -1306,22 +1306,31 @@ Règles :
   }, [launched, completedBook]);
 
   const launchWorkflow = async () => {
-    if (!canStepFour) {
-      toast.error('Valide le titre final et le nom d’auteur avant de générer.');
+    if (seedLength < 10) {
+      toast.error('Décris au moins ton idée de livre en une phrase avant de lancer les agents.');
+      setStep(0);
       return;
     }
-    if (!canStepOutline) {
-      toast.error('Valide le sommaire avant de générer le livre.');
-      setStep(2);
-      return;
+
+    // Rien n'est obligatoire sauf l'idée : on complète les champs laissés vides.
+    const safeTitle = (finalTitle.trim() || title.trim() || cleanText(aiTopic).slice(0, 70) || 'Mon livre');
+    const safeAuthor = authorName.trim() || 'Auteur Ebookstudio';
+    const safeOutline = normalizedOutline.length >= 3
+      ? normalizedOutline
+      : buildFallbackOutline(safeTitle, effectiveCategory, chapters);
+    if (finalTitle.trim() !== safeTitle) setFinalTitle(safeTitle);
+    if (authorName.trim() !== safeAuthor) setAuthorName(safeAuthor);
+    if (normalizedOutline.length < 3) {
+      setOutline(safeOutline);
+      toast.info('Sommaire complété automatiquement — l’agent P3 « L’Architecte » l’affinera.');
     }
 
     const workflowDescription = buildWorkflowDescription();
 
     const config = {
-      title: finalTitle.trim(),
+      title: safeTitle,
       subtitle: subtitle.trim(),
-      author: authorName.trim(),
+      author: safeAuthor,
       description: workflowDescription,
       genre: effectiveCategory,
       targetAudience: hub.targetAudience || '',
@@ -1329,8 +1338,9 @@ Règles :
       tone,
       wordsPerChapter,
       characters: workflowCharacters,
-      outline: normalizedOutline,
+      outline: safeOutline,
     };
+
 
     // Reprise après crash : ne PAS effacer la progression si l'utilisateur
     // relance le même livre (même titre). Le workflow V2 monté ci-dessous
