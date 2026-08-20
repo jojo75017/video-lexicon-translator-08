@@ -282,6 +282,43 @@ ${c.doubleCta ? ctaButton(link, "J’accède à EbookStudio pour 47 €") : ""}
 </table></td></tr></table><img src="${pixel}" width="1" height="1" alt="" style="display:none"></body></html>`;
 }
 
+/** Gabarit de relance des non-ouvreurs (envoyé 48 h après l'email d'origine).
+ *  Message entièrement différent : pas de prix, pas de vente — un seul geste,
+ *  récupérer les deux cadeaux. Suivi propre au segment (`-non-ouvreurs`). */
+export const NON_OPENER_SUBJECTS = [
+  "Vos 2 cadeaux vous attendent (10 niches + le kit)",
+  "Je vous ai mis 10 niches de côté",
+];
+
+function renderNonOpener(baseUrl: string, email: string, firstName: string, step: number) {
+  const tpl = `${templateName(step)}-non-ouvreurs`;
+  const gift = trackedUrl(email, step, `${SITE}/cadeau?src=${CAMPAIGN}-non-ouvreurs&email=${encodeURIComponent(email)}`, "cadeau2", tpl);
+  const trial = trackedUrl(email, step, `${SITE}/essai?src=${CAMPAIGN}-non-ouvreurs&email=${encodeURIComponent(email)}`, "essai", tpl);
+  const unsubscribe = `${baseUrl}/functions/v1/unsubscribe?email=${encodeURIComponent(email)}&seq=all`;
+  const pixel = `${baseUrl}/functions/v1/track-email-open?e=${encodeURIComponent(email)}&s=${step}&t=${tpl}`;
+  return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#f6f7f8;padding:24px 10px">
+<div style="display:none;font-size:1px;color:#f6f7f8;max-height:0;overflow:hidden">Deux cadeaux, rien à payer : 10 niches Amazon analysées et le kit de démarrage.</div>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse"><tr><td align="center">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width:600px;width:100%;background:#ffffff;border:1px solid #e5e7eb;border-collapse:collapse">
+<tr><td style="background:#064e3b;padding:18px 28px;color:#ffffff;font:700 22px Arial,Helvetica,sans-serif">EbookStudio</td></tr>
+<tr><td style="padding:26px 28px 0;color:#232F3E;font:16px/1.65 Arial,Helvetica,sans-serif">
+<p style="margin:0 0 18px">Bonjour${firstName ? ` ${firstName}` : ""},</p>
+<h1 style="margin:0 0 16px;font:700 25px/1.3 Arial,Helvetica,sans-serif;color:#232F3E">Mon message précédent est passé inaperçu — ce n'est pas grave.</h1>
+<p style="margin:0 0 18px">Je ne vais donc rien vous vendre aujourd'hui. Je vous laisse simplement deux documents que j'ai préparés pour les auteurs qui débutent sur Amazon KDP :</p>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:0 0 20px">
+<tr><td valign="top" style="padding:0 10px 12px 0;font:700 16px/1.5 Arial,Helvetica,sans-serif;color:#008296;width:18px">1.</td><td style="padding:0 0 12px 0"><strong>10 niches Amazon à fort potentiel</strong> — analysées, avec le type de livre qui fonctionne dans chacune.</td></tr>
+<tr><td valign="top" style="padding:0 10px 12px 0;font:700 16px/1.5 Arial,Helvetica,sans-serif;color:#008296;width:18px">2.</td><td style="padding:0 0 12px 0"><strong>Le kit de démarrage V3</strong> — 16 pages illustrées, de la première connexion jusqu'à la mise en vente.</td></tr>
+</table>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td align="center" bgcolor="#064e3b" style="border-radius:6px"><a href="${gift}" style="display:block;padding:17px 24px;color:#ffffff;text-decoration:none;font:700 17px/1.3 Arial,Helvetica,sans-serif;text-align:center">Récupérer mes 2 cadeaux (gratuit)</a></td></tr></table>
+<p style="margin:0 0 18px;font:15px/1.6 Arial,Helvetica,sans-serif;color:#4b5563">Pas de carte bancaire, pas d'engagement. Lisez-les, et si vous vous dites « je pourrais écrire ce livre-là », vous saurez quoi faire ensuite.</p>
+<p style="margin:0 0 18px">Si vous préférez essayer directement : <a href="${trial}" style="color:#008296">écrivez le premier chapitre de votre livre gratuitement</a>.</p>
+<p style="margin:0 0 6px">Bien à vous,<br><strong>Georges Boubet</strong><br>EbookStudio</p>
+<p style="margin:18px 0 0;padding:14px 0 0;border-top:1px solid #e5e7eb;font:15px/1.6 Arial,Helvetica,sans-serif;color:#4b5563">P.-S. — Répondez-moi en une ligne si quelque chose vous a fait hésiter : je lis tous les messages.</p>
+</td></tr>
+<tr><td style="padding:18px 24px;background:#f6f7f8;text-align:center;color:#68737d;font:12px/1.6 Arial,Helvetica,sans-serif">Vous recevez cet email car vous avez manifesté un intérêt pour EbookStudio.<br><a href="${unsubscribe}" style="color:#008296">Se désinscrire de tous les emails marketing</a></td></tr>
+</table></td></tr></table><img src="${pixel}" width="1" height="1" alt="" style="display:none"></body></html>`;
+}
+
 async function isAdmin(req: Request, baseUrl: string) {
   const authorization = req.headers.get("Authorization");
   if (!authorization?.startsWith("Bearer ")) return false;
