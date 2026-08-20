@@ -4,6 +4,18 @@
  * modification, l'accueil le lit pour l'afficher avant le lancement du workflow.
  */
 
+/** Blocs de mise en forme imposés à l'IA rédactrice pour un chapitre. */
+export type OutlineBlockId =
+  | 'bullets'
+  | 'numbered'
+  | 'keypoints'
+  | 'quote'
+  | 'callout'
+  | 'exercise'
+  | 'checklist'
+  | 'table'
+  | 'summary';
+
 export type BriefOutlineChapter = {
   numero: number;
   titre: string;
@@ -12,7 +24,24 @@ export type BriefOutlineChapter = {
   sources?: number[];
   /** Période de vie couverte (mode biographie), ex. « 1952-1958 ». */
   period?: string;
+  /** Points à traiter obligatoirement dans le chapitre. */
+  points?: string[];
+  /** Consigne éditoriale libre transmise mot pour mot à l'IA rédactrice. */
+  note?: string;
+  /** Mot-clé Amazon visé par ce chapitre. */
+  keyword?: string;
+  /** Question réelle du lecteur à laquelle le chapitre répond. */
+  readerQuestion?: string;
+  /** Ton spécifique à ce chapitre (sinon : ton du livre). */
+  tone?: string;
+  /** Objectif de mots pour ce chapitre (sinon : réglage global). */
+  wordsTarget?: number;
+  /** Blocs de mise en forme demandés (listes, encadrés, exercices…). */
+  blocks?: OutlineBlockId[];
+  /** Chapitre figé : l'IA ne doit plus le réécrire ni le déplacer. */
+  locked?: boolean;
 };
+
 
 export type BookBrief = {
   savedAt?: string;
