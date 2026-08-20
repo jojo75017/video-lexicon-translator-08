@@ -192,8 +192,7 @@ const EmailFunnelPanel = () => {
 
   useEffect(() => {
     load();
-    loadCronJobs();
-    loadPauseState();
+    loadAutomationStatus();
   }, [load]);
 
   const call = async (body: Record<string, unknown>, label: string) => {
