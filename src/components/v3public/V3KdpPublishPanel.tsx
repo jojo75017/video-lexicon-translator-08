@@ -177,9 +177,9 @@ Réponds UNIQUEMENT en JSON valide :
     void generateAll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoFill, autoFilled, title, manuscript, keywords, categories]);
-
-
+  const buildMetadataText = () => {
     const lines = [
+
       `Titre : ${title}`,
       subtitle ? `Sous-titre : ${subtitle}` : '',
       `Auteur : ${author}`,
