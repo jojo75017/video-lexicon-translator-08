@@ -977,8 +977,12 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
       ].filter(Boolean).join('\n\n'),
       cover_concepts: activeCoverUrl || '',
       kdp_description: completed?.backCover?.description || '',
-      kdp_keywords: '',
-      kdp_categories: effectiveCategory,
+      kdp_keywords: readKdpMetaFromResults().keywords.join(', '),
+      kdp_categories: [...readKdpMetaFromResults().categories, effectiveCategory]
+        .filter(Boolean)
+        .filter((value, index, all) => all.indexOf(value) === index)
+        .join(' | '),
+
       project_type: 'ebook',
       updated_at: new Date().toISOString(),
     };
