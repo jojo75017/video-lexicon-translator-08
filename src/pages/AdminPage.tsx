@@ -14,6 +14,7 @@ import { usePaymentNotifications } from '@/hooks/usePaymentNotifications';
 import { usePaymentConfirmations } from '@/hooks/usePaymentConfirmations';
 import { format } from 'date-fns';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
+import AdminLaunchQuickLinks from '@/components/admin/AdminLaunchQuickLinks';
 import { ErrorLogsViewer } from '@/components/admin/ErrorLogsViewer';
 import { ADMIN_LOGIN_PATH } from '@/config/adminRoutes';
 import { useAdminAccess } from '@/contexts/AdminAccessContext';
@@ -297,6 +298,8 @@ export const AdminPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 p-4">
       <div className="container mx-auto max-w-6xl py-8 space-y-6">
+        <AdminLaunchQuickLinks />
+
         <AdminPanelNav />
 
         {/* Header */}
