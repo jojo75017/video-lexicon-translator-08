@@ -1738,8 +1738,10 @@ Règles :
           </span>
         </div>
         <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>
-          Décris ton idée, ton sujet ou une niche Amazon. L'IA te propose un titre commercial, un sous-titre, un synopsis de ~150 mots et jusqu'à 5 catégories pertinentes.
+          Un seul champ est obligatoire : votre idée. Tout le reste (titre, sous-titre, catégorie, nom d’auteur,
+          description, ton, format, personnages et sommaire complet) peut être proposé par les agents — vous corrigez ensuite ce que vous voulez.
         </p>
+
         <div className="mt-3 flex flex-col gap-2 sm:flex-row">
           <input
             value={aiTopic}
