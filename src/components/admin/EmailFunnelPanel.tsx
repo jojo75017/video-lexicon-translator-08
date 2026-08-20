@@ -37,10 +37,62 @@ interface FunnelData {
   pending: number;
 }
 
+interface SegmentStat {
+  template: string;
+  label: string;
+  sent: number;
+  failed: number;
+  unique_opens: number;
+  unique_clicks: number;
+  open_rate: number;
+  click_rate: number;
+}
+
 const EmailFunnelPanel = () => {
   const [data, setData] = useState<FunnelData | null>(null);
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
+  const [segments, setSegments] = useState<SegmentStat[]>([]);
+
+  /** Appel authentifié à la fonction de campagne. */
+  const invoke = async (body: Record<string, unknown>) => {
+    const { data: session } = await supabase.auth.getSession();
+    return supabase.functions.invoke('send-sales-email', {
+      body,
+      headers: { Authorization: `Bearer ${session.session?.access_token}` },
+    });
+  };
+
+  /** Métriques comparées : email d'origine vs relances par segment. */
+  const loadSegments = async () => {
+    setBusy('Métriques segments');
+    try {
+      const { data: result, error } = await invoke({ mode: 'segment_stats', step: 1 });
+      if (error) throw error;
+      setSegments(((result as any)?.segments || []) as SegmentStat[]);
+    } catch (err) {
+      toast.error('Métriques par segment indisponibles : ' + ((err as Error).message || ''));
+    }
+    setBusy(null);
+  };
+
+  /** Aperçu du message dédié aux non-ouvreurs, dans un nouvel onglet. */
+  const previewNonOpener = async () => {
+    setBusy('Aperçu non-ouvreurs');
+    try {
+      const { data: result, error } = await invoke({ mode: 'preview', step: 1, segment: 'non_openers' });
+      if (error) throw error;
+      const html = typeof result === 'string' ? result : JSON.stringify(result);
+      const win = window.open('', '_blank');
+      if (win) {
+        win.document.write(html);
+        win.document.close();
+      }
+    } catch (err) {
+      toast.error('Aperçu impossible : ' + ((err as Error).message || ''));
+    }
+    setBusy(null);
+  };
 
   const load = useCallback(async () => {
     setLoading(true);
