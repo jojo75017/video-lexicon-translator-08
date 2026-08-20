@@ -340,12 +340,35 @@ Deno.serve(async (req) => {
     await loadVideoUrl(db);
     const { data: cronSecret } = await db.from("app_secrets").select("value").eq("key", "cron_secret").maybeSingle();
     const hasCronSecret = !!cronSecret?.value && req.headers.get("x-cron-secret") === cronSecret.value;
-    if (mode === "auto" || mode === "auto_non_openers") {
+    const isAuto = mode === "auto" || mode === "auto_non_openers" || mode === "auto_clickers" || mode === "auto_pending";
+    if (isAuto) {
       if (!hasCronSecret) return respond({ error: "Non autorisé" }, 401);
+      const { data: paused } = await db.from("app_secrets").select("value").eq("key", "email_automation_paused").maybeSingle();
+      if (paused?.value === "true") {
+        return respond({ success: true, paused: true, sent: 0, message: "Automation paused by admin" });
+      }
     } else if (!hasCronSecret && !(await isAdmin(req, baseUrl))) return respond({ error: "Accès administrateur requis" }, 403);
 
 
     if (mode === "status") return respond({ campaign: CAMPAIGN, active: true, blocked: !EMAIL_SENDING_ENABLED, steps: STEPS.map((s, i) => ({ step: i + 1, subject: s.subject, template: templateName(i + 1) })) });
+
+    // Lecture / écriture de l'état de pause de l'automation (front-end ne peut pas toucher app_secrets directement).
+    if (mode === "automation_status") {
+      const { data: paused } = await db.from("app_secrets").select("value").eq("key", "email_automation_paused").maybeSingle();
+      const jobs = [
+        { jobid: 1, jobname: "sequence-daily", schedule: "0 10 * * *", active: true },
+        { jobid: 2, jobname: "relance-non-ouvreurs-48h", schedule: "15 9 * * *", active: true },
+        { jobid: 3, jobname: "clickers-followup-24h", schedule: "0 11 * * *", active: true },
+        { jobid: 4, jobname: "pending-orders-recovery", schedule: "0 */6 * * *", active: true },
+      ];
+      return respond({ success: true, paused: paused?.value === "true", jobs });
+    }
+    if (mode === "set_automation_pause") {
+      const paused = body.paused === true || body.paused === "true";
+      await db.from("app_secrets").upsert({ key: "email_automation_paused", value: String(paused) }, { onConflict: "key" });
+      return respond({ success: true, paused });
+    }
+
     if (mode === "preview") {
       const step = Math.min(Math.max(Number(body.step || 1), 1), 5);
       const html = body.segment === "non_openers"
@@ -437,9 +460,9 @@ Deno.serve(async (req) => {
     }
 
     // Segments type GetResponse : non-ouvreurs et cliqueurs d'un gabarit donné.
-    // `auto_non_openers` = même logique, déclenchée par le cron (48 h après l'envoi).
-    if (mode === "resend_non_openers" || mode === "resend_clickers" || mode === "auto_non_openers") {
-      const isNonOpeners = mode !== "resend_clickers";
+    // `auto_non_openers` / `auto_clickers` = même logique, déclenchée par le cron.
+    if (mode === "resend_non_openers" || mode === "resend_clickers" || mode === "auto_non_openers" || mode === "auto_clickers") {
+      const isNonOpeners = mode === "resend_non_openers" || mode === "auto_non_openers";
       const step = Math.min(Math.max(Number(body.step || 1), 1), 5);
       const sourceTemplate = String(body.source_template || templateName(step));
       const suffix = isNonOpeners ? "non-ouvreurs" : "cliqueurs";
@@ -530,7 +553,7 @@ Deno.serve(async (req) => {
     }
 
     // Relance des commandes restées en attente depuis plus de 2 heures.
-    if (mode === "recover_pending") {
+    if (mode === "recover_pending" || mode === "auto_pending") {
       const cutoff = new Date(Date.now() - 2 * 3600000).toISOString();
       const { data: pending } = await db
         .from("funnel_orders")
@@ -559,6 +582,49 @@ Deno.serve(async (req) => {
         sentCount++;
       }
       return respond({ success: true, mode, sent: sentCount, targets: targets.length });
+    }
+
+    // Mode automatique déclenché par le cron quotidien.
+    // Envoie l'étape suivante à chaque prospect dont next_email_at est atteint.
+    if (mode === "auto") {
+      const limit = Math.min(Number(body.batch_size || 300), 400);
+      const now = new Date().toISOString();
+      const { data: readyProspects } = await db
+        .from("sales_prospects")
+        .select("email,first_name,current_step")
+        .eq("status", "active")
+        .lte("next_email_at", now)
+        .lt("current_step", 5)
+        .order("next_email_at", { ascending: true })
+        .limit(limit);
+
+      if (body.dry_run) return respond({ success: true, mode, would_send: (readyProspects || []).length });
+
+      const profiles = (readyProspects || []).filter((p) => isEmail(normalize(p.email || "")));
+      let sentCount = 0;
+      for (const profile of profiles) {
+        const step = Math.min(Math.max((profile.current_step || 0) + 1, 1), 5);
+        const template = templateName(step);
+        const email = normalize(profile.email || "");
+        const result = await sendResendEmailThrottled({
+          from: FROM_CAMPAIGN,
+          to: [email],
+          subject: STEPS[step - 1].subject,
+          html: render(baseUrl, email, (profile.first_name as string) || "", step),
+          reply_to: REPLY_TO,
+        });
+        await db.from("email_send_log").insert({ recipient_email: email, template_name: template, message_id: result.id || `${CAMPAIGN}-${step}-${email}`, provider_message_id: result.id || null, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
+        if (!result.ok) { if (isQuotaExhausted()) break; continue; }
+        sentCount++;
+        const completed = step >= 5;
+        await db.from("sales_prospects").update({
+          current_step: step,
+          last_email_sent_at: new Date().toISOString(),
+          next_email_at: completed ? null : new Date(Date.now() + (DELAYS[step] || 3) * 86400000).toISOString(),
+          completed,
+        }).eq("email", email);
+      }
+      return respond({ success: true, mode, sent: sentCount, targets: profiles.length });
     }
 
     // Relance de la séquence : envoie l'étape N aux contacts qui ont reçu l'étape N-1
