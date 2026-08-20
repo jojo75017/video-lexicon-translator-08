@@ -405,14 +405,19 @@ Deno.serve(async (req) => {
     }
 
     // Segments type GetResponse : non-ouvreurs et cliqueurs d'un gabarit donné.
-    if (mode === "resend_non_openers" || mode === "resend_clickers") {
+    // `auto_non_openers` = même logique, déclenchée par le cron (48 h après l'envoi).
+    if (mode === "resend_non_openers" || mode === "resend_clickers" || mode === "auto_non_openers") {
+      const isNonOpeners = mode !== "resend_clickers";
       const step = Math.min(Math.max(Number(body.step || 1), 1), 5);
       const sourceTemplate = String(body.source_template || templateName(step));
-      const suffix = mode === "resend_non_openers" ? "non-ouvreurs" : "cliqueurs";
+      const suffix = isNonOpeners ? "non-ouvreurs" : "cliqueurs";
       const resendTemplate = `${sourceTemplate}-${suffix}`;
       const limit = Math.min(Number(body.batch_size || 250), 300);
+      // Délai minimum avant relance : 48 h par défaut (0 pour forcer manuellement).
+      const delayHours = body.delay_hours === undefined ? 48 : Math.max(0, Number(body.delay_hours));
+      const cutoff = new Date(Date.now() - delayHours * 3600000).toISOString();
 
-      const { data: received } = await db.from("email_send_log").select("recipient_email").eq("template_name", sourceTemplate).in("status", ["sent", "delivered"]).limit(5000);
+      const { data: received } = await db.from("email_send_log").select("recipient_email,created_at").eq("template_name", sourceTemplate).in("status", ["sent", "delivered"]).lte("created_at", cutoff).limit(5000);
       const { data: opens } = await db.from("email_opens").select("prospect_email").eq("template_name", sourceTemplate);
       const { data: clicks } = await db.from("email_clicks").select("prospect_email").eq("template_name", sourceTemplate);
       const { data: alreadySent } = await db.from("email_send_log").select("recipient_email").eq("template_name", resendTemplate).in("status", ["sent", "delivered"]);
@@ -424,10 +429,11 @@ Deno.serve(async (req) => {
       const done = new Set((alreadySent || []).map((r) => normalize(r.recipient_email || "")));
       const paid = new Set((paidOrders || []).map((r) => normalize(r.email || "")));
       const profiles = new Map((profilesRows || []).map((r) => [normalize(r.email || ""), r]));
+      const eligible = new Set((received || []).map((r) => normalize(r.recipient_email || "")));
 
-      const pool = mode === "resend_clickers"
-        ? Array.from(clickers)
-        : (received || []).map((r) => normalize(r.recipient_email || "")).filter((e) => !openers.has(e) && !clickers.has(e));
+      const pool = isNonOpeners
+        ? Array.from(eligible).filter((e) => !openers.has(e) && !clickers.has(e))
+        : Array.from(clickers).filter((e) => eligible.has(e));
 
       const targets: string[] = [];
       for (const email of pool) {
@@ -439,27 +445,25 @@ Deno.serve(async (req) => {
         if (targets.length >= limit) break;
       }
 
-      if (body.dry_run) return respond({ success: true, mode, template: resendTemplate, would_send: targets.length });
-
-      const subject = mode === "resend_non_openers"
-        ? "Votre premier chapitre, écrit ce soir (offert)"
-        : "Vous avez regardé — je vous écris le premier chapitre";
+      if (body.dry_run) return respond({ success: true, mode, template: resendTemplate, delay_hours: delayHours, would_send: targets.length });
 
       let sentCount = 0;
-      for (const email of targets) {
+      for (let i = 0; i < targets.length; i++) {
+        const email = targets[i];
         const profile = profiles.get(email);
-        const result = await sendResendEmailThrottled({
-          from: FROM_CAMPAIGN,
-          to: [email],
-          subject,
-          html: render(baseUrl, email, (profile?.first_name as string) || "", step),
-          reply_to: REPLY_TO,
-        });
+        // Non-ouvreurs : sujet alterné (A/B) + message dédié « 2 cadeaux », sans prix.
+        const subject = isNonOpeners
+          ? NON_OPENER_SUBJECTS[i % NON_OPENER_SUBJECTS.length]
+          : "Vous avez regardé — je vous écris le premier chapitre";
+        const html = isNonOpeners
+          ? renderNonOpener(baseUrl, email, (profile?.first_name as string) || "", step)
+          : render(baseUrl, email, (profile?.first_name as string) || "", step);
+        const result = await sendResendEmailThrottled({ from: FROM_CAMPAIGN, to: [email], subject, html, reply_to: REPLY_TO });
         await db.from("email_send_log").insert({ recipient_email: email, template_name: resendTemplate, message_id: result.id || `${CAMPAIGN}-${resendTemplate}-${email}`, provider_message_id: result.id || null, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
         if (!result.ok) { if (isQuotaExhausted()) break; continue; }
         sentCount++;
       }
-      return respond({ success: true, mode, template: resendTemplate, sent: sentCount, targets: targets.length });
+      return respond({ success: true, mode, template: resendTemplate, delay_hours: delayHours, sent: sentCount, targets: targets.length });
     }
 
     // Relance des commandes restées en attente depuis plus de 2 heures.
