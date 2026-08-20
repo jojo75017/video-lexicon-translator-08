@@ -168,7 +168,33 @@ const EmailFunnelPanel = () => {
     setBusy(null);
   };
 
-  const steps = data
+  /** Mode test : envoie l'email 2 (relance) uniquement à la liste restreinte saisie. */
+  const sendTest = async (segment: 'non_openers' | 'clickers') => {
+    const list = testEmails.split(/[,;\s]+/).map((e) => e.trim()).filter(Boolean);
+    if (!list.length) {
+      toast.error('Indiquez au moins une adresse de test.');
+      return;
+    }
+    setBusy('Test relance');
+    try {
+      const { data: result, error } = await invoke({
+        mode: segment === 'non_openers' ? 'resend_non_openers' : 'resend_clickers',
+        step: 1,
+        test_mode: true,
+        test_emails: list,
+      });
+      if (error) throw error;
+      const r = result as Record<string, unknown>;
+      if (r.success === false) throw new Error(String(r.error || 'Envoi de test refusé'));
+      setTestResults((r.results as Array<{ email: string; ok: boolean; error?: string }>) || []);
+      toast.success(`Test envoyé : ${r.sent ?? 0} / ${r.targets ?? 0} adresse(s)`);
+    } catch (err) {
+      toast.error('Test impossible : ' + ((err as Error).message || ''));
+    }
+    setBusy(null);
+  };
+
+
     ? [
         { label: 'Emails envoyés', value: data.sent },
         { label: 'Ont ouvert', value: data.openers },
