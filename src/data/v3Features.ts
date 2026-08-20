@@ -1,6 +1,6 @@
 import {
   KeyRound, IdCard, Share2, Plug, BookPlus, PenLine, Palette, TrendingUp,
-  Library, Crown, HeartHandshake, HelpCircle,
+  Library, Crown, HeartHandshake, HelpCircle, Bot,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { V3_HEADER_MENU } from './v3HeaderMenu';
@@ -75,6 +75,15 @@ export const FEATURE_ROWS: FeatureRow[] = [
   {
     label: 'Le parcours du livre',
     tiles: [
+      {
+        id: 'workflow-15-agents',
+        title: 'Workflow 15 Agents',
+        subtitle: 'Le pipeline P1 → P15 et l’avancement de votre livre',
+        icon: Bot,
+        tint: 'rgba(13,122,95,0.14)',
+        kind: 'link',
+        to: '/v3/workflow',
+      },
       {
         id: 'creer',
         title: 'Créer',

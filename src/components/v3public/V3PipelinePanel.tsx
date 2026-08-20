@@ -1,4 +1,5 @@
 import { Layers } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 /**
  * « Comment votre livre est écrit » — les passes réellement exécutées par l'outil,
@@ -58,6 +59,11 @@ export default function V3PipelinePanel() {
             </div>
             <div className="mt-1.5 text-[13px] font-semibold" style={{ color: 'var(--v3-ink)' }}>{p.title}</div>
             <div className="text-[12px] leading-snug" style={{ color: 'var(--v3-muted)' }}>{p.detail}</div>
+            {p.engine.includes('P1-P15') && (
+              <Link to="/v3/workflow" className="mt-1.5 inline-block text-[11px] font-semibold underline" style={{ color: '#0d7a5f' }}>
+                Voir les 15 agents et l’avancement →
+              </Link>
+            )}
           </li>
         ))}
       </ol>

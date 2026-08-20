@@ -96,6 +96,7 @@ const V3StudioProPage = lazy(() => import('./pages/v3public/V3StudioProPage'));
 
 const V3ToolsIndexPage = lazy(() => import('./pages/v3public/V3ToolsIndexPage'));
 const V3FeaturesPage = lazy(() => import('./pages/v3public/V3FeaturesPage'));
+const V3WorkflowPage = lazy(() => import('./pages/v3public/V3WorkflowPage'));
 const V3ApiKeysPage = lazy(() => import('./pages/v3public/V3ApiKeysPage'));
 const V3CoordonneesPage = lazy(() => import('./pages/v3public/V3CoordonneesPage'));
 const V3ReseauxPage = lazy(() => import('./pages/v3public/V3ReseauxPage'));
@@ -581,6 +582,7 @@ const App = () => {
               <Route path="fonctionnalites/reseaux" element={<V3ReseauxPage />} />
               <Route path="fonctionnalites/integrations" element={<V3IntegrationsPage />} />
               <Route path="fonctionnalites/questions" element={<V3QuestionsPage />} />
+              <Route path="workflow" element={<V3WorkflowPage />} />
 
 
 

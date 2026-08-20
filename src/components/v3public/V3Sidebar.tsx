@@ -4,7 +4,7 @@ import {
   ChevronLeft, ChevronRight, ChevronDown,
   GraduationCap, Gem, FileText, User,
   LifeBuoy, Mail, HelpCircle, Video, ListTree, Award,
-  Search, Target, BarChart3, Image as ImageIcon, LayoutGrid, Star, Wand2, PlusCircle,
+  Search, Target, BarChart3, Image as ImageIcon, LayoutGrid, Star, Wand2, PlusCircle, Layers,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
@@ -24,6 +24,7 @@ const NAV: NavSection[] = [
     items: [
       { to: '/v3', label: 'Accueil V3', icon: Home, end: true },
       { to: '/v3/fonctionnalites', label: 'Fonctionnalités (12 modules)', icon: LayoutGrid, end: true, badge: 'Hub' },
+      { to: '/v3/workflow', label: '🤖 Workflow 15 Agents — écrire mon livre', icon: Layers, end: true, badge: 'Pipeline' },
       { to: '/v3/kit-demarrage', label: '📘 Kit de démarrage (PDF)', icon: GraduationCap, badge: 'NEW' },
       { to: '/v3/nouveautes', label: '✨ Nouveautés V3', icon: Sparkles },
     ],

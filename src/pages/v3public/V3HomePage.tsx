@@ -160,6 +160,39 @@ export default function V3HomePage() {
         <V3QuickActionsBar />
       </div>
 
+      {/* Le pipeline des 15 agents, mis en évidence avant le formulaire de démarrage */}
+      <div className="max-w-7xl mx-auto px-5 md:px-8 pt-3">
+        <Link
+          to="/v3/workflow"
+          className="flex flex-wrap items-center gap-3 rounded-[22px] border p-4 transition hover:shadow-sm"
+          style={{ borderColor: 'rgba(13,122,95,0.35)', background: 'linear-gradient(90deg,rgba(13,122,95,0.07),rgba(201,168,76,0.10))' }}
+        >
+          <div className="min-w-[240px] flex-1">
+            <div className="text-[15px] font-bold" style={{ color: 'var(--v3-ink)' }}>
+              🤖 Écrire mon livre avec les 15 agents
+            </div>
+            <p className="mt-1 text-[12px]" style={{ color: 'var(--v3-muted)' }}>
+              Niche → structure → rédaction → humanisation → correction → métadonnées KDP → verdict final.
+              Vous suivez l’avancement agent par agent.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-1">
+            {Array.from({ length: 15 }, (_, i) => (
+              <span
+                key={i}
+                className="grid h-6 w-8 place-items-center rounded-full text-[10px] font-bold"
+                style={{ background: 'rgba(201,168,76,0.20)', color: '#8a6d1f' }}
+              >
+                P{i + 1}
+              </span>
+            ))}
+          </div>
+          <span className="rounded-full px-4 py-2 text-sm font-semibold text-white" style={{ background: '#0d7a5f' }}>
+            Ouvrir le workflow
+          </span>
+        </Link>
+      </div>
+
       {/* Démarrage : titre du livre → fiche (champs réduits) */}
       <div className="max-w-6xl mx-auto px-5"><V3ResumeBookCard compact /></div>
       <V3StartBookBar />
