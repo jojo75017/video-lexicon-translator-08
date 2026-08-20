@@ -510,10 +510,13 @@ export default function V3CreateWizard() {
       setTone(saved.tone || saved.writing_style || 'Inspirant');
       setChapters(savedChapterCount);
       if (saved.kdp_categories) {
-        const match = CATEGORIES.find((item) => item.toLowerCase() === String(saved.kdp_categories).toLowerCase());
+        // Les catégories sont stockées « cat1 | cat2 | genre » : on repart de la première.
+        const first = String(saved.kdp_categories).split('|')[0].trim();
+        const match = CATEGORIES.find((item) => item.toLowerCase() === first.toLowerCase());
         if (match) setCategory(match);
-        else { setCategory('Autre'); setCustomCategory(String(saved.kdp_categories)); }
+        else { setCategory('Autre'); setCustomCategory(first); }
       }
+
       if (restoredOutline.length) setOutline(restoredOutline);
       if (Array.isArray(saved.characters) && saved.characters.length) {
         setCharacters(saved.characters.map((character: any) => ({
