@@ -161,6 +161,9 @@ export default function V3BookManagerPage() {
                 >
                   <FileDown className="w-3.5 h-3.5" /> {exportLoadingId === b.id ? 'Chargement…' : 'Exporter'}
                 </button>
+                <button onClick={() => nav(`/v3/donnees-kdp?projectId=${b.id}`)} className="v3-btn v3-btn-outline text-xs">
+                  <BarChart3 className="w-3.5 h-3.5" /> Données KDP
+                </button>
                 <button onClick={() => nav(`/v3/create?projectId=${b.id}`)} className="v3-btn v3-btn-primary text-xs">
                   <BookOpen className="w-3.5 h-3.5" /> Ouvrir le livre
                 </button>
