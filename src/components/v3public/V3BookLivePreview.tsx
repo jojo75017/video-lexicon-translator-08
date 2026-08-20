@@ -80,6 +80,9 @@ function renderLine(line: string, key: number) {
   return (
     <p key={key} style={key === 0 ? undefined : { textIndent: '1.4em' }} className="text-justify">{line}</p>
   );
+}
+
+
 
 export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
   const [progress, setProgress] = useState<WrittenProgress>({ chapters: [], total: 0, activeIndex: -1 });
