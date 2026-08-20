@@ -2018,6 +2018,53 @@ Règles :
             </div>
           </div>
 
+          {/* Réglages du Sommaire IA — comme la V2 : densité, ton du plan, mots-clés */}
+          <div className="rounded-[24px] border p-5" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-orange-50)' }}>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="v3-chip v3-chip-orange"><Wrench className="h-3.5 w-3.5" /> Réglages du sommaire IA</span>
+              <span className="text-xs" style={{ color: 'var(--v3-muted)' }}>Facultatif — appliqué à la génération et à la proposition complète</span>
+            </div>
+            <div className="mt-4 grid gap-4 md:grid-cols-3">
+              <label className="block space-y-2">
+                <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--v3-muted)' }}>Points clés par chapitre : {outlinePoints}</span>
+                <input
+                  type="range"
+                  min={2}
+                  max={8}
+                  step={1}
+                  value={outlinePoints}
+                  onChange={(event) => setOutlinePoints(Number(event.target.value))}
+                  className="w-full accent-orange-600"
+                />
+              </label>
+              <label className="block space-y-2">
+                <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--v3-muted)' }}>Ton du sommaire</span>
+                <select
+                  value={outlineTone}
+                  onChange={(event) => setOutlineTone(event.target.value)}
+                  className="w-full rounded-2xl border px-4 py-3 text-sm outline-none"
+                  style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+                >
+                  {['Clair et vendeur', 'Pédagogique', 'Émotionnel', 'Premium', 'Direct', 'Romanesque', 'Expert'].map((item) => (
+                    <option key={item} value={item}>{item}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="block space-y-2">
+                <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--v3-muted)' }}>Mots-clés à placer</span>
+                <input
+                  value={outlineKeywords}
+                  onChange={(event) => setOutlineKeywords(event.target.value)}
+                  placeholder="Ex : confiance en soi, routine du matin, KDP"
+                  className="w-full rounded-2xl border px-4 py-3 text-sm outline-none"
+                  style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+                />
+              </label>
+            </div>
+          </div>
+
+
+
           {/* Stats bar */}
           <div className="grid gap-3 sm:grid-cols-4">
             <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
