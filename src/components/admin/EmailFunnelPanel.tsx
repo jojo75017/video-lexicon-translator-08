@@ -88,30 +88,15 @@ const EmailFunnelPanel = () => {
     });
   };
 
-  const loadCronJobs = async () => {
+  const loadAutomationStatus = async () => {
     try {
-      const { data: rows, error } = await (supabase as any)
-        .from('cron.job')
-        .select('jobid,jobname,schedule,active')
-        .in('jobname', Object.keys(CRON_LABELS));
+      const { data: result, error } = await invoke({ mode: 'automation_status' });
       if (error) throw error;
-      setCronJobs((rows || []).sort((a: CronJob, b: CronJob) => a.jobname.localeCompare(b.jobname)));
+      const r = result as Record<string, unknown>;
+      setAutomationPaused(r.paused === true);
+      setCronJobs(((r.jobs as CronJob[]) || []).sort((a, b) => a.jobname.localeCompare(b.jobname)));
     } catch (err) {
-      console.error('loadCronJobs', err);
-    }
-  };
-
-  const loadPauseState = async () => {
-    try {
-      const { data: row, error } = await (supabase as any)
-        .from('app_secrets')
-        .select('value')
-        .eq('key', 'email_automation_paused')
-        .maybeSingle();
-      if (error) throw error;
-      setAutomationPaused(row?.value === 'true');
-    } catch (err) {
-      console.error('loadPauseState', err);
+      console.error('loadAutomationStatus', err);
       setAutomationPaused(false);
     }
   };
@@ -120,11 +105,10 @@ const EmailFunnelPanel = () => {
     const next = !automationPaused;
     setBusy(next ? 'Pause automation' : 'Reprise automation');
     try {
-      const { error } = await (supabase as any)
-        .from('app_secrets')
-        .upsert({ key: 'email_automation_paused', value: String(next) }, { onConflict: 'key' });
+      const { data: result, error } = await invoke({ mode: 'set_automation_pause', paused: next });
       if (error) throw error;
-      setAutomationPaused(next);
+      const r = result as Record<string, unknown>;
+      setAutomationPaused(r.paused === true);
       toast.success(next ? 'Automation mise en pause.' : 'Automation réactivée.');
     } catch (err) {
       toast.error('Impossible de changer l’état : ' + ((err as Error).message || ''));
