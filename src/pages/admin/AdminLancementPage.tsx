@@ -82,6 +82,7 @@ function AdminLancementContent() {
   const [saving, setSaving] = useState<LaunchSettingKey | null>(null);
   const [videoUrl, setVideoUrl] = useState('');
   const [savingVideo, setSavingVideo] = useState(false);
+  const [copiedScript, setCopiedScript] = useState<'long' | 'short' | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -113,19 +114,32 @@ function AdminLancementContent() {
     setVideoUrl(String(settings.launch_video?.url || ''));
   }, [settings.launch_video?.url]);
 
-  /** Enregistre le lien de la vidéo de lancement (emails, /essai, /commander, /v3/attente). */
+  /** Enregistre le média de lancement (vidéo ou audio MP3). Détecte le type automatiquement. */
   const saveVideo = async () => {
     setSavingVideo(true);
     try {
       const url = videoUrl.trim();
-      await update('launch_video', { enabled: url.length > 0, url });
-      toast.success(url ? 'Vidéo enregistrée.' : 'Bloc vidéo masqué.');
+      const kind: 'video' | 'audio' = url.endsWith('.mp3') ? 'audio' : 'video';
+      await update('launch_video', { enabled: url.length > 0, url, kind });
+      toast.success(url ? (kind === 'audio' ? 'Message audio enregistré.' : 'Vidéo enregistrée.') : 'Bloc média masqué.');
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Enregistrement impossible.');
     } finally {
       setSavingVideo(false);
     }
   };
+
+  const copyScript = async (variant: 'long' | 'short') => {
+    try {
+      await navigator.clipboard.writeText(variant === 'long' ? LAUNCH_SCRIPT_LONG : LAUNCH_SCRIPT_SHORT);
+      setCopiedScript(variant);
+      setTimeout(() => setCopiedScript(null), 2000);
+      toast.success('Script copié.');
+    } catch {
+      toast.error('Impossible de copier.');
+    }
+  };
+
 
   const stats = useMemo(() => {
     const emailed = trials.filter((t) => t.delivered_at).length;
