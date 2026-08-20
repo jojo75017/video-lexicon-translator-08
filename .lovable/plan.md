@@ -33,3 +33,10 @@ Une section « Admin — Lancement » repliable dans la barre latérale, visible
 - `AdminPage.tsx` : nouveau composant `AdminLaunchQuickLinks` (tuiles).
 - `V3Sidebar.tsx` : section admin conditionnée par `useIsAdmin`.
 - `/admin/lancement` sera protégé par `AdminGate` comme les autres pages admin.
+
+## 5. Lancer la première vague d'emails (partie 1)
+- Séquence `fin-47-lancement-v3-2026`, email n°1 (annonce : 47 € jusqu'au 31 août + lancement V3 le 1er octobre, 1er mois offert).
+- Cible : les 627 prospects à l'étape 0, non désabonnés.
+- Envoi par lots (pour éviter les erreurs de taille de requête), puis planification automatique des emails suivants selon le calendrier J+3 / J+3 / J+2 / J+2.
+- Le lien « Écouter le message (1 min 40) » vers `/message` sera inclus dans l'email, avec le nouveau MP3.
+- Après l'envoi : tableau de statut par destinataire (envoyé / en attente / erreur) visible dans `/gestion-prospects`.
