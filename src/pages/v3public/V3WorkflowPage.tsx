@@ -36,12 +36,19 @@ export default function V3WorkflowPage() {
             >
               <Rocket className="h-4 w-4" /> Lancer mon livre
             </Link>
-            <Link
-              to="/ebook-planner"
+            <a
+              href="#pilotage-agents"
               className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold"
               style={{ borderColor: 'rgba(201,168,76,0.6)', color: '#8a6d1f' }}
             >
               <ListTree className="h-4 w-4" /> Ouvrir le pilotage détaillé P1 → P15
+            </a>
+            <Link
+              to="/v3/mes-livres"
+              className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold"
+              style={{ borderColor: 'rgba(0,0,0,0.12)', color: '#232F3E' }}
+            >
+              <ListTree className="h-4 w-4" /> Mes livres &amp; données KDP
             </Link>
           </div>
         </header>
