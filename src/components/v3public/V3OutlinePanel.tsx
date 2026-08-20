@@ -467,47 +467,46 @@ Règles :
         </p>
       ) : (
         <>
-          <ol className="mt-4 max-h-96 space-y-2 overflow-y-auto pr-2">
-            {outline.map((chapter, index) => (
-              <li key={index} className="rounded-xl border px-3 py-2" style={{ borderColor: 'var(--v3-border)' }}>
-                <div className="flex items-start gap-2">
-                  <span className="mt-2 text-[11px] font-bold uppercase tracking-widest" style={{ color: 'var(--v3-muted)' }}>
-                    Ch. {index + 1}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <input
-                      value={chapter.titre}
-                      onChange={(e) => updateChapter(index, { titre: e.target.value })}
-                      className="w-full rounded-lg border px-2 py-1.5 text-sm font-bold outline-none"
-                      style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: '#fff' }}
-                    />
-                    <input
-                      value={chapter.objectif || ''}
-                      onChange={(e) => updateChapter(index, { objectif: e.target.value })}
-                      placeholder="Objectif du chapitre (optionnel)"
-                      className="mt-1 w-full rounded-lg border px-2 py-1.5 text-xs outline-none"
-                      style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-muted)', background: '#fff' }}
-                    />
-                  </div>
-                  <div className="mt-1 flex flex-col gap-1">
-                    <button type="button" onClick={() => moveChapter(index, -1)} disabled={index === 0} title="Monter"
-                      className="rounded-lg border p-1.5 disabled:opacity-40" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-muted)' }}>
-                      <ArrowUp className="h-3.5 w-3.5" />
-                    </button>
-                    <button type="button" onClick={() => moveChapter(index, 1)} disabled={index === outline.length - 1} title="Descendre"
-                      className="rounded-lg border p-1.5 disabled:opacity-40" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-muted)' }}>
-                      <ArrowDown className="h-3.5 w-3.5" />
-                    </button>
-                    <button type="button" onClick={() => removeChapter(index)} title="Supprimer ce chapitre"
-                      className="rounded-lg border p-1.5" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-muted)' }}>
-                      <X className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
+          <V3OutlineStudioBar brief={brief} outline={outline} />
 
-                </div>
-              </li>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button type="button" onClick={undo} disabled={!history.length} className="v3-btn v3-btn-outline text-xs disabled:opacity-40">
+              <Undo2 className="h-3.5 w-3.5" /> Annuler
+            </button>
+            <button type="button" onClick={redo} disabled={!future.length} className="v3-btn v3-btn-outline text-xs disabled:opacity-40">
+              <Redo2 className="h-3.5 w-3.5" /> Rétablir
+            </button>
+            <button type="button" onClick={exportOutline} className="v3-btn v3-btn-outline text-xs">
+              <Download className="h-3.5 w-3.5" /> Exporter le sommaire
+            </button>
+          </div>
+
+          <ol className="mt-3 max-h-[32rem] space-y-2 overflow-y-auto pr-2">
+            {outline.map((chapter, index) => (
+              <V3OutlineChapterCard
+                key={index}
+                chapter={chapter}
+                index={index}
+                total={outline.length}
+                fallbackWords={Math.max(300, Number(brief.wordsPerChapter) || 1500)}
+                onPatch={(patch) => updateChapter(index, patch)}
+                onMove={(dir) => moveChapter(index, dir)}
+                onRemove={() => removeChapter(index)}
+                onDuplicate={() => applyOutlineChange(duplicateChapter(outline, index))}
+                onMerge={() => applyOutlineChange(mergeWithNext(outline, index))}
+                onSplit={() => applyOutlineChange(splitChapter(outline, index))}
+                onInsertAfter={() => applyOutlineChange(insertChapterAt(outline, index + 1))}
+                onDragStart={() => { dragIndex.current = index; }}
+                onDropOn={() => {
+                  const from = dragIndex.current;
+                  dragIndex.current = null;
+                  if (from === null || from === index) return;
+                  applyOutlineChange(moveChapterTo(outline, from, index));
+                }}
+              />
             ))}
           </ol>
+
 
           <button
             type="button"
