@@ -18,6 +18,7 @@ import { callAIWriting, getProvider, getProviderKey, validateKeyFormat } from '@
 import TocUltimateGenerator, { type UltimateTocChapter } from '@/components/tools/TocUltimateGenerator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { BOOK_BRIEF_EVENT, clearTocForWorkflow, listSourcePassages, narrativeForBook, parseTocText, passageForBook, readBookBrief, readLatestUltimateToc, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
+import { chapterInstructions } from '@/lib/v3/outlineStudio';
 
 
 type WizardCharacter = {
