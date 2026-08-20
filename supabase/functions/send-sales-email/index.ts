@@ -15,14 +15,17 @@ const CHECKOUT = CHECKOUT_URL;
 /** Rappels du 21 au 31 août : 21 → 24 → 27 → 29 → 31. */
 const DELAYS = [0, 3, 3, 2, 2];
 
-/** Lien de la vidéo de lancement, lu dans `launch_settings` à chaque appel. */
+/** Lien du média de lancement (vidéo ou audio), lu dans `launch_settings` à chaque appel. */
 let VIDEO_URL = "";
+let VIDEO_KIND: "video" | "audio" = "video";
 
 async function loadVideoUrl(db: ReturnType<typeof createClient>) {
   const { data } = await db.from("launch_settings").select("value").eq("key", "launch_video").maybeSingle();
-  const value = (data?.value ?? {}) as { url?: string; enabled?: boolean };
+  const value = (data?.value ?? {}) as { url?: string; enabled?: boolean; kind?: "video" | "audio" };
   VIDEO_URL = value.enabled === false ? "" : String(value.url || "");
+  VIDEO_KIND = value.kind || (VIDEO_URL.endsWith(".mp3") ? "audio" : "video");
 }
+
 
 interface StepContent {
   subject: string;
@@ -197,11 +200,17 @@ function ctaButton(link: string, label: string) {
   return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:26px 0"><tr><td align="center" bgcolor="#FF9E2D" style="border-radius:6px"><a href="${link}" style="display:block;padding:17px 24px;color:#232F3E;text-decoration:none;font:700 17px/1.3 Arial,Helvetica,sans-serif;text-align:center">${label}</a></td></tr></table>`;
 }
 
-/** Bloc vidéo : vignette cliquable vers la vidéo de lancement. Masqué si aucune URL. */
-function videoBlock(url: string) {
+/** Bloc média : vignette cliquable vers la vidéo ou le message audio. Masqué si aucune URL. */
+function mediaBlock(baseUrl: string, url: string, kind: "video" | "audio") {
   if (!url) return "";
+  if (kind === "audio" || url.endsWith(".mp3")) {
+    const audioPage = `${baseUrl}/message`;
+    return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td align="center" style="background:#064e3b;padding:22px 20px"><p style="margin:0 0 6px;font:700 13px Arial,Helvetica,sans-serif;color:#C9A84C;letter-spacing:.6px">LE MESSAGE AUDIO — 2 MINUTES</p><p style="margin:0 0 14px;font:16px/1.55 Arial,Helvetica,sans-serif;color:#ffffff">Je vous explique pourquoi EbookStudio change la publication sur Amazon.</p><a href="${audioPage}" style="display:inline-block;background:#C9A84C;color:#0b2b22;text-decoration:none;padding:14px 22px;border-radius:6px;font:700 16px Arial,Helvetica,sans-serif">&#9658;&nbsp; Écouter le message</a></td></tr></table>`;
+  }
   return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td align="center" style="background:#064e3b;padding:22px 20px"><p style="margin:0 0 6px;font:700 13px Arial,Helvetica,sans-serif;color:#C9A84C;letter-spacing:.6px">LA VIDÉO — 2 MINUTES</p><p style="margin:0 0 14px;font:16px/1.55 Arial,Helvetica,sans-serif;color:#ffffff">Je vous montre un livre complet, du sommaire au fichier prêt pour Amazon.</p><a href="${url}" style="display:inline-block;background:#C9A84C;color:#0b2b22;text-decoration:none;padding:14px 22px;border-radius:6px;font:700 16px Arial,Helvetica,sans-serif">&#9658;&nbsp; Regarder la vidéo</a></td></tr></table>`;
 }
+
+
 
 function bulletList(bullets: Array<{ label: string; text: string }>) {
   const rows = bullets
@@ -231,7 +240,7 @@ ${c.reminder ? `<table role="presentation" cellspacing="0" cellpadding="0" borde
 <p style="margin:0 0 20px">${c.intro}</p>
 <p style="margin:0 0 14px;font:700 17px Arial,Helvetica,sans-serif;color:#232F3E">${c.bulletsTitle}</p>
 ${bulletList(c.bullets)}
-${videoBlock(VIDEO_URL)}
+${mediaBlock(baseUrl, VIDEO_URL, VIDEO_KIND)}
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td style="background:#fffaf2;border:1px solid #FF9E2D;padding:18px 20px;font:16px/1.65 Arial,Helvetica,sans-serif;color:#232F3E"><p style="margin:0 0 8px;font:700 16px Arial,Helvetica,sans-serif;color:#8a4b00">${c.valueTitle}</p>${c.valueBody}</td></tr></table>
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:22px 0"><tr><td style="background:#f2f8f9;border-left:4px solid #008296;padding:16px 18px;font:16px/1.6 Arial,Helvetica,sans-serif;color:#232F3E"><strong>Le résultat :</strong> ${c.result}</td></tr></table>
 <p style="margin:0 0 20px">${c.reassurance}</p>
