@@ -55,6 +55,9 @@ const EmailFunnelPanel = () => {
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [segments, setSegments] = useState<SegmentStat[]>([]);
+  const [testEmails, setTestEmails] = useState('boubetgeorges@gmail.com');
+  const [testResults, setTestResults] = useState<Array<{ email: string; ok: boolean; error?: string }>>([]);
+
 
   /** Appel authentifié à la fonction de campagne. */
   const invoke = async (body: Record<string, unknown>) => {
