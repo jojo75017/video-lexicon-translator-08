@@ -69,6 +69,15 @@ export default function V3HomePage() {
       {/* Encart de démarrage — immédiatement après les moteurs IA */}
       <V3ClosingRecallPanel />
 
+      {/* PRÉSENTATION LONGUE — comprendre la V3 (sommaire ancré + 4 sections) */}
+      <V3AnchorNav />
+      <V3WhatIsPanel />
+      <V3HowItWorksSteps />
+      <V3BenefitsPanel />
+      <V3DifferenceTable />
+
+
+
 
 
 
