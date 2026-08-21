@@ -29,7 +29,7 @@ const FAQ = [
   },
   {
     q: 'Et si ça ne me convient pas ?',
-    a: "Tu m'écris un email dans les 30 jours et je te remboourse intégralement, sans justification à donner.",
+    a: "Tu m'écris un email dans les 30 jours et je te rembourse intégralement, sans justification à donner.",
   },
 ];
 
