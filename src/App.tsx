@@ -100,6 +100,7 @@ const V3TranslatorPage = lazy(() => import('./pages/v3public/V3TranslatorPage'))
 const V3CorrecteurPage = lazy(() => import('./pages/v3public/V3CorrecteurPage'));
 const V3AvisClientsPage = lazy(() => import('./pages/v3public/V3AvisClientsPage'));
 const V3PostsPage = lazy(() => import('./pages/v3public/V3PostsPage'));
+const V3AcquisitionPage = lazy(() => import('./pages/v3public/V3AcquisitionPage'));
 const V3KitDemarragePage = lazy(() => import('./pages/v3/V3KitDemarragePage'));
 const V3StudioProPage = lazy(() => import('./pages/v3public/V3StudioProPage'));
 
