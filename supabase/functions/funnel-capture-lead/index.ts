@@ -15,6 +15,7 @@ type Magnet = {
   subject: string;
   intro: string;
   items: string[];
+  cta?: string;
 };
 
 const MAGNETS: Record<string, Magnet> = {
