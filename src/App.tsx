@@ -188,6 +188,8 @@ const AdminFunnelPage = lazy(() => import('./pages/admin/AdminFunnelPage'));
 const AdminPdfGiftsPage = lazy(() => import('./pages/admin/AdminPdfGiftsPage'));
 const AdminBetaCodesPage = lazy(() => import('./pages/admin/AdminBetaCodesPage'));
 const AdminBetaTestersPage = lazy(() => import('./pages/admin/AdminBetaTestersPage'));
+const AdminTemoignagesPage = lazy(() => import('./pages/admin/AdminTemoignagesPage'));
+
 const AdminPaymentsDashboardPage = lazy(() => import('./pages/admin/AdminPaymentsDashboardPage'));
 const AdminCleanupPage = lazy(() => import('./pages/admin/AdminCleanupPage'));
 const AdminPlansV3Page = lazy(() => import('./pages/admin/AdminPlansV3Page'));
