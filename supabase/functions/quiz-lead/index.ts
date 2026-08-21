@@ -9,10 +9,11 @@ const corsHeaders = {
 
 const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 
-const SYSTEMEIO_BASE = "https://api.systeme.io/api";
+// Systeme.io désactivé — les contacts quiz restent dans la base interne.
+// const SYSTEMEIO_BASE = "https://api.systeme.io/api";
 
 // Crée (ou récupère) un contact Systeme.io puis lui assigne un ou plusieurs tags.
-async function pushToSystemeIo(
+// async function pushToSystemeIo(
   email: string,
   firstName: string,
   tags: string[],
