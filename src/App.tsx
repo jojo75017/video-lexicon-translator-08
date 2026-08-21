@@ -582,6 +582,8 @@ const App = () => {
             <Route path="/admin/cadeaux-pdf" element={<AdminGate><AdminPdfGiftsPage /></AdminGate>} />
             <Route path="/admin/codes-beta" element={<AdminGate><AdminBetaCodesPage /></AdminGate>} />
             <Route path="/admin/beta-testeurs" element={<AdminGate><AdminBetaTestersPage /></AdminGate>} />
+            <Route path="/admin/temoignages" element={<AdminGate><AdminTemoignagesPage /></AdminGate>} />
+
             <Route path="/admin/cleanup" element={<AdminGate><Navigate to="/admin/plans-v3" replace /></AdminGate>} />
             <Route path="/admin/plans-v3" element={<AdminGate><AdminPlansV3Page /></AdminGate>} />
             <Route path="/admin/attente" element={<AdminGate><AdminAttentePage /></AdminGate>} />
