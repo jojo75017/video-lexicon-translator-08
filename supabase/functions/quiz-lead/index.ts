@@ -87,13 +87,14 @@ serve(async (req) => {
       leadId = inserted.id;
     }
 
-    // Envoi vers Systeme.io (non bloquant)
-    const tags = [tag];
-    if (base_tag) tags.push(base_tag);
-    if (source) tags.push(`quiz-source-${source}`);
-    const sio = EMAIL_SENDING_ENABLED
-      ? await pushToSystemeIo(email, first_name, tags)
-      : { ok: false, detail: "domain_pending_validation" };
+    // Systeme.io désactivé — les tags quiz restent internes.
+    // const tags = [tag];
+    // if (base_tag) tags.push(base_tag);
+    // if (source) tags.push(`quiz-source-${source}`);
+    // const sio = EMAIL_SENDING_ENABLED
+    //   ? await pushToSystemeIo(email, first_name, tags)
+    //   : { ok: false, detail: "domain_pending_validation" };
+    const sio = { ok: false, detail: "disabled" };
 
     return new Response(
       JSON.stringify({ ok: true, lead_id: leadId, systemeio: sio.ok, systemeio_detail: sio.detail, profile_key, profile_title }),
