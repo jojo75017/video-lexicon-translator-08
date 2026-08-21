@@ -53,7 +53,7 @@ export default function V3PostsPage() {
 
   const buildText = (day: number) => {
     const post = V3_SOCIAL_POSTS.find((p) => p.day === day)!;
-    const body = post[channel].replaceAll('{{LIEN}}', shareLink);
+    const body = post[channel].split('{{LIEN}}').join(shareLink);
     const tags = channel === 'linkedin'
       ? post.hashtags.map((h) => `#${h}`).join(' ')
       : post.hashtags.map((h) => `#${h}`).join(' ');
