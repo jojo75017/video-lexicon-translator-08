@@ -186,7 +186,9 @@ export default function ReadingGate({ surface, children, compact = false, title 
   };
 
   const card = (
-    <div className="relative z-10 mx-auto w-full max-w-xl rounded-3xl border-2 border-[#c9a84c]/50 bg-white p-6 shadow-xl md:p-8">
+    // data-contemplation-allow : exempte le formulaire du « mode contemplation »
+    // (qui bloque tous les boutons tant que la V3 n'est pas ouverte).
+    <div data-contemplation-allow="true" className="relative z-10 mx-auto w-full max-w-xl rounded-3xl border-2 border-[#c9a84c]/50 bg-white p-6 shadow-xl md:p-8">
       <div className="flex items-center justify-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-[#8a6d1f]">
         <Lock className="h-3.5 w-3.5" /> Lecture offerte
       </div>
