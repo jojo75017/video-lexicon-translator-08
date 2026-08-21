@@ -1,7 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { EMAIL_SENDING_ENABLED } from "../_shared/emailSendingGuard.ts";
-import { pushToSystemeIo } from "../_shared/systemeio.ts";
+// Systeme.io désactivé — tous les leads restent dans la base interne.
+// import { pushToSystemeIo } from "../_shared/systemeio.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
