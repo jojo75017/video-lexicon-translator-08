@@ -17,7 +17,6 @@ interface ProviderDef {
 }
 
 const PROVIDERS: ProviderDef[] = [
-  { id: 'brevo', label: 'Brevo', hint: 'Clé API v3 (Brevo → SMTP & API)', needsList: true },
   { id: 'systemeio', label: 'Systeme.io', hint: 'Clé API (Réglages → Clés API)', needsList: true },
   { id: 'getresponse', label: 'GetResponse', hint: 'Clé API (Intégrations → API)', needsList: true },
   { id: 'mailerlite', label: 'MailerLite', hint: 'Token API', needsList: true },
