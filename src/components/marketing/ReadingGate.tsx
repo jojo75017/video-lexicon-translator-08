@@ -245,9 +245,12 @@ export default function ReadingGate({ surface, children, compact = false, title 
 
   return (
     <div className="relative">
-      {/* Aperçu flouté du contenu verrouillé */}
+      {/* Aperçu flouté du contenu verrouillé (inerte : ni clic ni clavier) */}
       <div
         aria-hidden="true"
+        ref={(el) => {
+          if (el) (el as HTMLElement & { inert: boolean }).inert = true;
+        }}
         className="pointer-events-none select-none"
         style={{ maxHeight: 240, overflow: 'hidden', filter: 'blur(7px)', opacity: 0.5 }}
       >
