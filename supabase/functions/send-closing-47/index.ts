@@ -31,9 +31,10 @@ const CAMPAIGN = "conversion-2026";
 const CHECKOUT = CHECKOUT_URL;
 const DEMO_URL = "https://ebookstudio.fr/demo";
 const GIFT_URL = "https://ebookstudio.fr/10-niches-offertes";
+const V3_URL = "https://ebookstudio.fr/v3";
 type Segment = "never_opened" | "openers_no_click" | "clickers" | "all";
-/** Cible du bouton principal : le cadeau (sans risque) ou la page de paiement. */
-type Primary = "gift" | "checkout" | "demo";
+/** Cible du bouton principal : le cadeau (sans risque), la lecture V3 ou la page de paiement. */
+type Primary = "gift" | "checkout" | "demo" | "v3";
 
 interface Letter {
   key: string;
@@ -209,12 +210,12 @@ const LETTERS: Letter[] = [
   // ------------------------------------------------------------ Offre directe
   {
     key: "offre-47-directe",
-    label: "Offre directe — 47 € à vie (test de clics)",
+    label: "Offre directe — 47 € à vie (lecture V3 puis CTA)",
     subject: "47 € une fois, à vie — jusqu'au 31 août",
     subjectB: "Votre accès à vie à 47 € se termine bientôt",
     preheader: "Paiement unique, accès immédiat, garantie 30 jours.",
     segment: "all",
-    primary: "checkout",
+    primary: "v3",
     price: true,
     body: `<p style="margin:0 0 18px">Je vais droit au but : jusqu'au <strong>31 août 2026</strong>, l'accès complet à EbookStudio est à <strong>47 €, une seule fois, à vie</strong>. Ensuite, il ne restera que l'abonnement à 27 € par mois.</p>
 <p style="margin:0 0 12px">Pour 47 €, vous repartez avec tout ceci, sans limite de durée :</p>
@@ -222,8 +223,9 @@ const LETTERS: Letter[] = [
 <p style="margin:0 0 8px">— le fichier Word et le PDF aux normes Amazon KDP ;</p>
 <p style="margin:0 0 8px">— la couverture complète : face, dos calculé, 4<sup>e</sup> de couverture ;</p>
 <p style="margin:0 0 18px">— la fiche de vente Amazon : titre, description, mots-clés, catégories.</p>
+<p style="margin:0 0 18px">Le bouton ci-dessous vous ouvre la <strong>visite complète de la V3</strong> : vous voyez exactement comment votre livre se construit, étape par étape — et l'offre à 47 € vous attend en bas de page.</p>
 <p style="margin:0 0 18px"><strong>Garantie 30 jours</strong> : remboursé sur simple demande. Paiement possible en 2 ou 3 fois, par carte ou PayPal.</p>`,
-    cta: "Je prends l'accès à vie — 47 €",
+    cta: "Je découvre la V3 — lecture offerte",
     ps: `Une question avant de décider ? Répondez à cet email, ou écrivez-moi à ${DIRECT_EMAIL} : je lis et je réponds moi-même.`,
   },
 ];
@@ -240,6 +242,11 @@ function primaryDestination(email: string, letter: Letter) {
   }
   if (letter.primary === "demo") {
     return `${DEMO_URL}?utm_source=email&utm_medium=${CAMPAIGN}&utm_campaign=${letter.key}`;
+  }
+  if (letter.primary === "v3") {
+    // Lecture d'abord : la page V3 se débloque automatiquement grâce à
+    // ?email=..., le bouton d'achat se trouve en bas de page.
+    return `${V3_URL}?src=${CAMPAIGN}-${letter.key}&email=${encodeURIComponent(email)}`;
   }
   return `${CHECKOUT}?src=${CAMPAIGN}-${letter.key}&email=${encodeURIComponent(email)}`;
 }
