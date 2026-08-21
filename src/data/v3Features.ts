@@ -1,6 +1,6 @@
 import {
   KeyRound, IdCard, Share2, Plug, BookPlus, PenLine, Palette, TrendingUp,
-  Library, Crown, HeartHandshake, HelpCircle, Bot,
+  Library, Crown, HeartHandshake, HelpCircle, Bot, Megaphone,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { V3_HEADER_MENU } from './v3HeaderMenu';
@@ -69,6 +69,15 @@ export const FEATURE_ROWS: FeatureRow[] = [
         kind: 'link',
         to: '/v3/fonctionnalites/integrations',
         private: true,
+      },
+      {
+        id: 'posts',
+        title: 'Posts — 30 jours prêts',
+        subtitle: 'Facebook, LinkedIn, Reels : copier-coller avec votre lien',
+        icon: Megaphone,
+        tint: 'rgba(6,78,59,0.12)',
+        kind: 'link',
+        to: '/v3/posts',
       },
     ],
   },
