@@ -16,6 +16,7 @@ export default function V3TemoignagePage() {
   const [bookTitle, setBookTitle] = useState("");
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(5);
+  const [consent, setConsent] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -32,6 +33,11 @@ export default function V3TemoignagePage() {
       toast.error("Merci de remplir votre nom, votre email et votre commentaire.");
       return;
     }
+    if (!consent) {
+      toast.error("Merci de cocher l'accord de publication.");
+      return;
+    }
+
     setLoading(true);
     try {
       let photoUrl: string | null = null;
