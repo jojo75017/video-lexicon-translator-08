@@ -46,10 +46,10 @@ export default function V3PostsPage() {
 
   const shareLink = useMemo(() => {
     if (customLink.trim()) return customLink.trim();
-    const ref = getReferralLink();
-    if (ref) return ref;
+    // On envoie toujours vers la page cadeau : c'est l'entrée qui convertit,
+    // avec le code de parrainage de l'abonné quand il en a un.
     return code ? `${GIFT_URL}?ref=${code}` : GIFT_URL;
-  }, [customLink, code, getReferralLink]);
+  }, [customLink, code]);
 
   const buildText = (day: number) => {
     const post = V3_SOCIAL_POSTS.find((p) => p.day === day)!;
