@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 import Helmet from "react-helmet";
-import { trackLeadMagnetDownload, trackCTAClick, trackFormSubmit } from "@/utils/analytics";
+import {
+  trackLeadMagnetDownload,
+  trackCTAClick,
+  trackFormSubmit,
+  trackPageView,
+  trackLeadFormClick,
+  trackSignUp,
+  trackFormError,
+} from "@/utils/analytics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
