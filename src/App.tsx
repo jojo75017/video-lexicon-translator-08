@@ -415,6 +415,7 @@ const App = () => {
             <Route path="/fiche/histoire" element={<FicheHistoirePage />} />
             <Route path="/fiche/preuve" element={<FichePreuvePage />} />
             <Route path="/fiche/dernier-jour" element={<FicheDernierJourPage />} />
+            <Route path="/methode" element={<MethodePage />} />
 
 
 
