@@ -49,7 +49,13 @@ export function FicheCountdown({ dark = false }: { dark?: boolean }) {
 
 /** Le bouton unique de chaque fiche : redirige vers /commander en conservant
  *  les paramètres de suivi (src, email) venus de l'email. */
-export function FicheCta({ label = 'Profiter de l’accès à vie à 47 €' }: { label?: string }) {
+export function FicheCta({
+  label = 'Profiter de l’accès à vie à 47 €',
+  dark = false,
+}: {
+  label?: string;
+  dark?: boolean;
+}) {
   const [params] = useSearchParams();
   const qs = new URLSearchParams();
   const src = params.get('src');
@@ -65,12 +71,13 @@ export function FicheCta({ label = 'Profiter de l’accès à vie à 47 €' }: 
       >
         <Rocket className="h-5 w-5" /> {label}
       </Link>
-      <p className="mt-3 text-xs text-[#5B5245]">
+      <p className="mt-3 text-xs" style={{ color: dark ? 'rgba(255,255,255,0.7)' : '#5B5245' }}>
         Paiement unique · pas d'abonnement · accès conservé · V3 incluse au 1er octobre
       </p>
     </div>
   );
 }
+
 
 interface FicheShellProps {
   badge: string;
