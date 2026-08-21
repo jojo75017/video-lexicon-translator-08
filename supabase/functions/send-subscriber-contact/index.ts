@@ -57,15 +57,16 @@ serve(async (req) => {
 
     console.log("Contact email sent:", r);
 
-    // Si le message vient de la page influenceurs, on inscrit le contact dans Systeme.io.
-    let systemeio: { ok: boolean; detail?: string } | undefined;
-    if (source === "influenceurs") {
-      systemeio = await pushToSystemeIo(email, name || handle || "", [
-        "promoteur-interesse",
-        "ambassadeur-ebookstudio",
-        "contact-influenceur",
-      ]);
-    }
+    // Systeme.io désactivé — les contacts influenceurs restent internes.
+    // let systemeio: { ok: boolean; detail?: string } | undefined;
+    // if (source === "influenceurs") {
+    //   systemeio = await pushToSystemeIo(email, name || handle || "", [
+    //     "promoteur-interesse",
+    //     "ambassadeur-ebookstudio",
+    //     "contact-influenceur",
+    //   ]);
+    // }
+    const systemeio = { ok: false, detail: "disabled" };
 
     return new Response(JSON.stringify({ success: true, systemeio: systemeio?.ok }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
