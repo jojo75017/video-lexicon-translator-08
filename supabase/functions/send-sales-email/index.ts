@@ -181,7 +181,7 @@ export const NON_OPENER_SUBJECTS = [
 function renderNonOpener(baseUrl: string, email: string, firstName: string, step: number) {
   const tpl = `${templateName(step)}-non-ouvreurs`;
   const gift = trackedUrl(email, step, `${SITE}/cadeau?src=${CAMPAIGN}-non-ouvreurs&email=${encodeURIComponent(email)}`, "cadeau2", tpl);
-  const trial = trackedUrl(email, step, `${SITE}/essai?src=${CAMPAIGN}-non-ouvreurs&email=${encodeURIComponent(email)}`, "essai", tpl);
+  
   const unsubscribe = `${baseUrl}/functions/v1/unsubscribe?email=${encodeURIComponent(email)}&seq=all`;
   const pixel = `${baseUrl}/functions/v1/track-email-open?e=${encodeURIComponent(email)}&s=${step}&t=${tpl}`;
   return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#f6f7f8;padding:24px 10px">
