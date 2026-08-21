@@ -61,7 +61,9 @@ export default function V3TemoignagePage() {
         comment: comment.trim(),
         rating,
         photo_url: photoUrl,
+        consent_publication: true,
         approved: false,
+
       });
       if (error) throw error;
       setDone(true);
