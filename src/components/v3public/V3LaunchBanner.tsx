@@ -52,7 +52,7 @@ export default function V3LaunchBanner({ compact = false }: { compact?: boolean 
     >
       <div className={`mx-auto max-w-6xl px-5 ${compact ? 'py-4' : 'py-6'}`}>
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="min-w-[260px] flex-1">
+          <div className="min-w-0 flex-1 sm:min-w-[260px]">
             <span
               className="inline-flex items-center gap-1.5 rounded px-2 py-1 text-[10px] font-bold uppercase tracking-[0.18em]"
               style={{ background: '#C9A84C', color: '#0b2b22' }}
