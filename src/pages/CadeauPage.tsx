@@ -182,7 +182,7 @@ const CadeauPage = () => {
             Gratuit, sans carte bancaire. Vous voyez de vos yeux comment un livre se construit
             jusqu'à la publication Amazon.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-gray-400">
+          <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-gray-200">
             <span className="flex items-center gap-1"><ShieldCheck className="h-4 w-4 text-emerald-400" /> Sans carte bancaire</span>
             <span className="flex items-center gap-1"><Download className="h-4 w-4 text-emerald-400" /> Kit dispo immédiatement</span>
             <span className="flex items-center gap-1"><Star className="h-4 w-4 text-[#e7cf8c]" /> Désabonnement en 1 clic</span>
@@ -261,7 +261,7 @@ const CadeauPage = () => {
         {/* Étapes après inscription */}
         <section className="rounded-2xl border border-white/10 bg-white/5 p-6">
           <h2 className="text-white font-semibold">Ce qui se passe ensuite</h2>
-          <ol className="mt-3 space-y-3 text-sm text-gray-300">
+          <ol className="mt-3 space-y-3 text-sm text-gray-100">
             {[
               "Vous recevez vos 10 niches par email et le kit se télécharge tout de suite.",
               "Vous écrivez votre premier chapitre gratuitement, sur votre propre idée.",
@@ -292,7 +292,7 @@ const CadeauPage = () => {
                 <ChevronDown className={`h-4 w-4 shrink-0 transition ${openFaq === i ? "rotate-180" : ""}`} />
               </button>
               {openFaq === i && (
-                <p className="px-4 pb-4 text-sm leading-relaxed text-gray-300">{item.a}</p>
+                <p className="px-4 pb-4 text-sm leading-relaxed text-gray-200">{item.a}</p>
               )}
             </div>
           ))}
