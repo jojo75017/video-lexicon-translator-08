@@ -212,9 +212,9 @@ export default function MethodePage() {
             Dans quelques soirées, il peut être en ligne. Ou rester une idée de plus.
           </p>
           <div className="mt-6 flex flex-wrap items-baseline justify-center gap-3">
-            <span className="text-4xl font-black text-[#D4AF37]">47 €</span>
-            <span className="text-lg text-white/60 line-through">59 €</span>
-            <span className="rounded-full bg-white/10 px-3 py-1 text-sm font-bold text-[#D4AF37]">-20 %</span>
+            <span className="text-4xl font-black" style={{ color: "#D4AF37" }}>47 €</span>
+            <span className="text-lg line-through" style={{ color: "rgba(255,255,255,0.6)" }}>59 €</span>
+            <span className="rounded-full bg-white/10 px-3 py-1 text-sm font-bold" style={{ color: "#D4AF37" }}>-20 %</span>
           </div>
           <div className="mt-6 flex justify-center">
             <FicheCountdown dark />

@@ -49,7 +49,7 @@ export default function MethodeAvantApres() {
             {NOUVELLE.map((t) => (
               <li key={t} className="flex gap-3 text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.92)" }}>
                 <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#D4AF37]" />
-                <span>{t}</span>
+                <span style={{ color: 'rgba(255,255,255,0.92)' }}>{t}</span>
               </li>
             ))}
           </ul>
