@@ -205,8 +205,10 @@ export default function MethodePage() {
       {/* 12 — Rappel final */}
       <section className="bg-[#0F2E1F] py-14">
         <div className="mx-auto max-w-3xl px-5 text-center">
-          <h2 className="v3-serif text-2xl font-bold text-white md:text-3xl">Ton livre t'attend.</h2>
-          <p className="mt-4 text-white/85">
+          <h2 className="v3-serif text-2xl font-bold md:text-3xl" style={{ color: "#ffffff" }}>
+            Ton livre t'attend.
+          </h2>
+          <p className="mt-4" style={{ color: "rgba(255,255,255,0.88)" }}>
             Dans quelques soirées, il peut être en ligne. Ou rester une idée de plus.
           </p>
           <div className="mt-6 flex flex-wrap items-baseline justify-center gap-3">
