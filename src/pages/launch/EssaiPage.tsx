@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import useLaunchSettings from '@/hooks/useLaunchSettings';
 import LaunchVideoBlock from '@/components/launch/LaunchVideoBlock';
+import ReadingGate from '@/components/marketing/ReadingGate';
 import { V3_PLANS, formatPrice } from '@/data/v3Pricing';
 
 interface OutlineItem {
