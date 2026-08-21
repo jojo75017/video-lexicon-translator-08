@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Loader2, Sparkles, Lock, BookOpen, Mail, CheckCircle2, PenLine } from 'lucide-react';
+import { Loader2, Sparkles, Lock, BookOpen, Mail, CheckCircle2, PenLine, Rocket } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import useLaunchSettings from '@/hooks/useLaunchSettings';
@@ -382,7 +382,7 @@ export default function EssaiPage() {
                 <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
                   Pour écrire la suite
                 </p>
-                <h2 className="v3-serif mt-2 text-2xl font-bold">Le premier mois est offert</h2>
+                <h2 className="v3-serif mt-2 text-2xl font-bold">L'accès à vie à 47 € — jusqu'au 31 août</h2>
                 <ul className="mt-4 space-y-2 text-sm text-white/85">
                   {LOCKED.map((l) => (
                     <li key={l} className="flex items-start gap-2">
@@ -392,14 +392,20 @@ export default function EssaiPage() {
                   ))}
                 </ul>
                 <Link
-                  to={`/essai/inscription?trial=${result.trialId}`}
+                  to={"/commander" + (() => { const q = new URLSearchParams(params); q.set("src", "essai"); return `?${q.toString()}`; })()}
                   className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#D4AF37] px-5 py-3.5 text-sm font-bold text-[#2A2118] transition hover:brightness-110"
                 >
-                  Créer mon compte — 1<sup>er</sup> mois offert
+                  <Rocket className="h-4 w-4" /> Obtenir l'accès à vie à 47 €
                 </Link>
                 <p className="mt-3 text-center text-xs text-white/70">
-                  Première facture le 1<sup>er</sup> novembre 2026 · résiliable en un clic
+                  Paiement unique · aucun abonnement · V3 offerte au 1<sup>er</sup> octobre
                 </p>
+                <Link
+                  to={`/essai/inscription?trial=${result.trialId}`}
+                  className="mt-3 block text-center text-xs font-semibold text-white/60 underline underline-offset-4 hover:text-white/90"
+                >
+                  Ou créer mon compte — 1<sup>er</sup> mois offert à la V3
+                </Link>
               </div>
             </aside>
           </div>

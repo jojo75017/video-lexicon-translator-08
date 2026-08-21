@@ -72,6 +72,9 @@ const EssaiPage = lazy(() => import('./pages/launch/EssaiPage'));
 const EssaiInscriptionPage = lazy(() => import('./pages/launch/EssaiInscriptionPage'));
 const V3WaitingRoomPage = lazy(() => import('./pages/launch/V3WaitingRoomPage'));
 const MessageAudioPage = lazy(() => import('./pages/launch/MessageAudioPage'));
+const FicheHistoirePage = lazy(() => import('./pages/launch/FicheHistoirePage'));
+const FichePreuvePage = lazy(() => import('./pages/launch/FichePreuvePage'));
+const FicheDernierJourPage = lazy(() => import('./pages/launch/FicheDernierJourPage'));
 const AdminLancementPage = lazy(() => import('./pages/admin/AdminLancementPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
@@ -407,6 +410,10 @@ const App = () => {
             <Route path="/essai/inscription" element={<EssaiInscriptionPage />} />
             <Route path="/v3/attente" element={<V3WaitingRoomPage />} />
             <Route path="/message" element={<MessageAudioPage />} />
+            {/* Fiches ponts du tunnel email : 1 email = 1 fiche = 1 bouton vers /commander */}
+            <Route path="/fiche/histoire" element={<FicheHistoirePage />} />
+            <Route path="/fiche/preuve" element={<FichePreuvePage />} />
+            <Route path="/fiche/dernier-jour" element={<FicheDernierJourPage />} />
 
 
 
