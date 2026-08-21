@@ -136,7 +136,7 @@ export default function V3IntegrationsPage() {
         <title>Mes intégrations e-mailing — Ebookstudio</title>
         <meta
           name="description"
-          content="Reliez Brevo, Systeme.io, GetResponse, MailerLite ou votre propre webhook pour envoyer vos contacts lecteurs vers votre outil d'e-mailing."
+          content="Reliez Systeme.io, GetResponse, MailerLite ou votre propre webhook pour envoyer vos contacts lecteurs vers votre outil d'e-mailing."
         />
       </Helmet>
 
