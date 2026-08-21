@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Clock, Rocket } from 'lucide-react';
+import ReadingGate from '@/components/marketing/ReadingGate';
 
 /** Date de fin de l'offre à 47 € (31 août 2026, 23h59 Paris). */
 const DEADLINE = new Date('2026-08-31T23:59:59+02:00').getTime();
@@ -79,6 +80,25 @@ export function FicheCta({
 }
 
 
+/** Bouton final verrouillé pour les visiteurs inconnus (jamais pour un
+ *  prospect venu d'un email, un abonné ou un admin). */
+export function FicheCtaGated({
+  surface,
+  label,
+  dark = false,
+}: {
+  surface: string;
+  label?: string;
+  dark?: boolean;
+}) {
+  return (
+    <ReadingGate surface={surface} compact title="La suite vous est offerte">
+      <FicheCta label={label} dark={dark} />
+    </ReadingGate>
+  );
+}
+
+
 interface FicheShellProps {
   badge: string;
   title: string;
@@ -86,11 +106,13 @@ interface FicheShellProps {
   ctaLabel?: string;
   metaTitle?: string;
   metaDescription?: string;
+  /** Si présent, le bouton final est verrouillé pour les visiteurs inconnus. */
+  gateSurface?: string;
 }
 
 /** Gabarit commun des fiches ponts du tunnel email : en-tête sobre,
  *  compte à rebours, contenu pré-vendeur, UN seul bouton vers /commander. */
-export default function FicheShell({ badge, title, children, ctaLabel, metaTitle, metaDescription }: FicheShellProps) {
+export default function FicheShell({ badge, title, children, ctaLabel, metaTitle, metaDescription, gateSurface }: FicheShellProps) {
   useEffect(() => {
     if (metaTitle) document.title = metaTitle;
     if (metaDescription) {
