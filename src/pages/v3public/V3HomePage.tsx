@@ -20,6 +20,11 @@ import V3AudiencePanel from '@/components/v3public/V3AudiencePanel';
 import V3GuaranteePanel from '@/components/v3public/V3GuaranteePanel';
 import V3CommercialLicensePanel from '@/components/v3public/V3CommercialLicensePanel';
 import V3ClosingRecallPanel from '@/components/v3public/V3ClosingRecallPanel';
+import V3AnchorNav from '@/components/v3public/V3AnchorNav';
+import V3WhatIsPanel from '@/components/v3public/V3WhatIsPanel';
+import V3HowItWorksSteps from '@/components/v3public/V3HowItWorksSteps';
+import V3BenefitsPanel from '@/components/v3public/V3BenefitsPanel';
+import V3DifferenceTable from '@/components/v3public/V3DifferenceTable';
 
 
 
@@ -63,6 +68,15 @@ export default function V3HomePage() {
 
       {/* Encart de démarrage — immédiatement après les moteurs IA */}
       <V3ClosingRecallPanel />
+
+      {/* PRÉSENTATION LONGUE — comprendre la V3 (sommaire ancré + 4 sections) */}
+      <V3AnchorNav />
+      <V3WhatIsPanel />
+      <V3HowItWorksSteps />
+      <V3BenefitsPanel />
+      <V3DifferenceTable />
+
+
 
 
 
