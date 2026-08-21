@@ -27,8 +27,15 @@ Par défaut je crée une **nouvelle page `/methode`** (le modèle complet, long 
    qui existent vraiment (15 agents, correction éditoriale, Cover Studio Pro,
    données KDP, audio, traduction 10 langues, Génie/sommaire IA)
    → Valeur totale affichée, puis « Ton accès aujourd'hui : 47 € »
-8  Témoignages — voir la question ci-dessous
-9  QUI EST DERRIÈRE ÇA : votre présentation, dans vos mots
+8  Pas de témoignages (personne n'est rentré de vacances) → à la place, un bloc
+   factuel « Ce que l'outil produit vraiment » : exemples de livres réels,
+   captures des livrables (manuscrit, couverture, fiche Amazon). Le bloc
+   témoignages sera ajouté dès que vous aurez des avis réels.
+9  QUI EST DERRIÈRE ÇA : votre bio (10 ans d'auto-édition, catalogue thriller /
+   romance / jeunesse sur Amazon KDP, EbookStudio pensé par un auteur pour les
+   auteurs) + votre citation « transformer ses idées en ouvrages professionnels,
+   sans se perdre dans la complexité technique. »
+
 10 Garantie 30 jours, sans justification
 11 FAQ (8 questions, adaptées : « ça marche dans mon domaine ? », « je n'écris pas
    bien », « faut-il une audience ? », « c'est de l'IA, Amazon l'accepte ? »…)
@@ -37,12 +44,11 @@ Par défaut je crée une **nouvelle page `/methode`** (le modèle complet, long 
 
 Un seul bouton répété, toujours vers `/commander` — cohérent avec la règle « 1 promesse = 1 bouton » du tunnel déjà en place.
 
-## Ce dont j'ai besoin de vous
+## Preuve et autorité
 
-- **Témoignages** : je n'invente jamais d'avis. Si vous m'en donnez de réels (prénom + métier + texte), je les intègre. Sinon je remplace ce bloc par une section factuelle « ce que l'outil produit » avec des exemples de livres réels.
-- **Votre bio** en 3-4 lignes (parcours, pourquoi vous avez créé EbookStudio) pour le bloc « Qui est derrière ça ».
+- **Aucun témoignage inventé.** Le bloc avis est remplacé par la preuve produit (livrables réels) et réactivé plus tard avec vos vrais avis.
+- **Autorité assurée par votre bio** : elle remplace le rôle du « Damien Menu » du modèle — expérience de terrain d'auteur auto-édité, pas de chiffres de revenus non vérifiables.
 
-Sans ces éléments, je construis la page complète et je laisse ces deux blocs prêts à remplir plutôt que de fabriquer du faux.
 
 ## Détails techniques
 
