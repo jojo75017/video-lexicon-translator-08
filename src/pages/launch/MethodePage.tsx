@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { BookOpen, PenLine, Palette, Rocket, ShieldCheck, Quote } from 'lucide-react';
 import { FicheCountdown, FicheCta } from '@/components/launch/FicheShell';
+import ReadingGate from '@/components/marketing/ReadingGate';
 import MethodeProbleme from '@/components/launch/methode/MethodeProbleme';
 import MethodeAvantApres from '@/components/launch/methode/MethodeAvantApres';
 import MethodeValeur from '@/components/launch/methode/MethodeValeur';
@@ -152,6 +153,9 @@ export default function MethodePage() {
           ))}
         </div>
       </section>
+
+      {/* SUITE VERROUILLÉE pour les visiteurs inconnus : valeur, FAQ et CTA final */}
+      <ReadingGate surface="methode">
 
       {/* 7 — Ce que tu reçois */}
       <MethodeValeur />
