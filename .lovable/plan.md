@@ -44,12 +44,11 @@ Par défaut je crée une **nouvelle page `/methode`** (le modèle complet, long 
 
 Un seul bouton répété, toujours vers `/commander` — cohérent avec la règle « 1 promesse = 1 bouton » du tunnel déjà en place.
 
-## Ce dont j'ai besoin de vous
+## Preuve et autorité
 
-- **Témoignages** : je n'invente jamais d'avis. Si vous m'en donnez de réels (prénom + métier + texte), je les intègre. Sinon je remplace ce bloc par une section factuelle « ce que l'outil produit » avec des exemples de livres réels.
-- **Votre bio** en 3-4 lignes (parcours, pourquoi vous avez créé EbookStudio) pour le bloc « Qui est derrière ça ».
+- **Aucun témoignage inventé.** Le bloc avis est remplacé par la preuve produit (livrables réels) et réactivé plus tard avec vos vrais avis.
+- **Autorité assurée par votre bio** : elle remplace le rôle du « Damien Menu » du modèle — expérience de terrain d'auteur auto-édité, pas de chiffres de revenus non vérifiables.
 
-Sans ces éléments, je construis la page complète et je laisse ces deux blocs prêts à remplir plutôt que de fabriquer du faux.
 
 ## Détails techniques
 
