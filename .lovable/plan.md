@@ -1,60 +1,51 @@
-# Faire venir des abonnés sans email marketing
+# Tunnel de conversion : 1 email = 1 promesse = 1 fiche = 1 bouton
 
-## D'abord, un point clair sur les identifiants
+## Diagnostic (vérifié dans les données)
 
-Je ne peux pas — et je ne dois pas — utiliser vos mots de passe Facebook ou LinkedIn. Les deux plateformes l'interdisent (bannissement du compte possible), et stocker un identifiant personnel dans l'app serait un risque de sécurité. Il n'existe pas non plus d'API publique qui permette de « publier à votre place » sur un profil LinkedIn personnel ou dans des groupes Facebook.
+- Chaque email actuel contient **4 à 5 liens concurrents** : bouton « Commander », bloc cadeau vers /essai, bloc audio vers /message (2 liens), liens texte.
+- Résultat mesuré : **37 clics partent sur l'audio gratuit, ~10 seulement sur /commander**, ~8 sur /essai. 0 commande payée, 1 panier abandonné.
+- L'email essaie de vendre directement : c'est perçu comme « forcer la vente ». Le clic se fait par curiosité, pas par intention d'achat — et la curiosité va vers le gratuit.
 
-La solution qui marche : l'app prépare tout le contenu (texte + visuel + lien traqué), vous n'avez plus qu'à coller. 2 minutes par jour, zéro risque.
+## Le nouveau principe (ton modèle : fiche puis call-to-action)
 
-## Levier 1 — Studio de publication sociale (copier-coller)
+```text
+EMAIL (court, 1 promesse, 1 seul lien)
+   └─> FICHE (page pont : histoire / preuve / cadeau — pré-vend sans forcer)
+         └─> UN SEUL bouton « Accès à vie 47 € »
+               └─> /commander (Stripe)
+```
 
-Une page `/v3/social` avec un calendrier de 30 jours :
-- 1 post par jour prêt à copier : Facebook (groupes KDP/autoédition), LinkedIn (post pro), Instagram/TikTok (script court).
-- Bouton « Copier » + « Copier avec mon lien de parrainage » (lien traqué `?ref=`).
-- Visuel généré automatiquement pour chaque post (format carré + vertical).
-- Case à cocher « publié » pour suivre l'avancement.
+L'email ne vend plus : il donne envie de voir la fiche. La fiche convainc. Le bouton encaisse.
 
-## Levier 2 — Rendre le cadeau viral
+## Étape 1 — Réécriture des 5 emails (1 lien chacun)
 
-La page `/cadeau` (10 niches + kit de démarrage) devient partageable :
-- Aperçu social propre (titre, description, image) quand le lien est collé sur Facebook/LinkedIn.
-- Après téléchargement : écran « Offrez-le à un auteur » avec boutons de partage et le lien de parrainage de l'utilisateur.
-- Compteur visible : « X auteurs ont déjà reçu le pack ».
+- Suppression des blocs concurrents (cadeau + audio + commander dans le même email).
+- Texte court, ton personnel, une seule promesse, un seul bouton vers la fiche du jour.
+- Tracking conservé (email_clicks par fiche et par étape).
+- Relances non-ouvreurs et panier abandonné adaptées au même principe.
 
-## Levier 3 — Le chapitre gratuit comme aimant public
+## Étape 2 — Les 5 fiches (une par email)
 
-Chaque chapitre généré en essai obtient une page publique en lecture seule (`/chapitre/xxxx`) :
-- L'auteur peut la partager fièrement ; ses lecteurs découvrent Ebookstudio en bas de page.
-- Bouton « Créer le mien gratuitement » sous chaque chapitre partagé.
-- Pages indexables par Google (contenu unique = trafic organique gratuit).
+1. **J1 — L'histoire** (Marie & Rachel, « la nouvelle voie ») : adaptation de la page Pourquoi existante, CTA unique en bas.
+2. **J2 — Le message audio** : page /message remaniée — écoute d'abord, puis preuve sociale, puis CTA unique (les 3 liens actuels fusionnés en 1 bouton dominant + compte à rebours 31 août).
+3. **J3 — Le cadeau** : /essai (premier chapitre gratuit). Après génération du chapitre, un écran « Pour finir votre livre » avec CTA unique vers /commander.
+4. **J4 — La preuve** : nouvelle fiche témoignages + garantie + démo des 15 agents → CTA unique.
+5. **J5 — Dernier jour** : nouvelle fiche urgence, compte à rebours en haut de page, CTA unique.
 
-## Levier 4 — Parrainage mis en avant
+## Étape 3 — Mesure
 
-Le système de parrainage existe déjà mais reste invisible :
-- Bandeau dans la barre latérale : « Parrainez : 30 % de commission ».
-- Tableau de bord clair (clics, inscrits, gains) sur `/mon-parrainage`.
-- Récompense non monétaire aussi : 1 filleul abonné = 1 mois offert.
+- Suivi des clics par fiche dans le panneau admin (déjà en place via email_clicks).
+- Vous recevez d'abord la nouvelle séquence complète en mode **[TEST]** sur votre adresse avant tout envoi réel.
 
-## Levier 5 — Vitrine publique des livres
+## Ce qui ne change pas
 
-Une galerie publique `/livres` des livres créés (avec accord de l'auteur) : couverture, titre, extrait. C'est la preuve la plus convaincante, et ça crée des dizaines de pages indexées.
-
-## Levier 6 — SEO de fond
-
-- Vérifier titres/descriptions des pages publiques clés (`/cadeau`, `/essai`, `/commander`, `/v3`).
-- Données structurées (produit, avis, FAQ) pour apparaître plus large dans Google.
-- Lien croisé systématique avec le blog existant.
-
-## Ordre proposé
-
-1. Studio de publication sociale + liens traqués (impact immédiat, effort maîtrisé)
-2. Cadeau viral + parrainage visible
-3. Chapitre gratuit public + galerie publique
-4. Passe SEO
+- Le prix 47 €, la page /commander et le checkout Stripe : inchangés.
+- Aucun envoi de masse sans votre validation après réception du test.
 
 ## Détails techniques
 
-- Le partage social se fait par balises Open Graph / Twitter Card côté pages publiques, avec image générée.
-- Les liens traqués réutilisent `affiliate_clicks` et `referral_codes` déjà en place.
-- Les pages publiques de chapitre/galerie n'exposent que ce que l'auteur a explicitement rendu public (colonne dédiée + politique d'accès en lecture seule).
-- Aucun stockage d'identifiants tiers : rien de nouveau côté secrets.
+- `supabase/functions/send-sales-email/index.ts` : réécriture des gabarits des 5 étapes + non-ouvreurs.
+- `src/pages/launch/MessageAudioPage.tsx` : refonte CTA (1 bouton dominant + urgence).
+- `src/pages/launch/EssaiPage.tsx` : écran post-génération avec CTA /commander.
+- 2 nouvelles fiches (preuve, dernier jour) + routes dans `src/App.tsx`.
+- Redéploiement de la fonction, puis envoi test [TEST], puis votre feu vert.
