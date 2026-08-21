@@ -144,7 +144,11 @@ export default function FicheShell({ badge, title, children, ctaLabel, metaTitle
             <span className="text-lg text-[#5B5245] line-through">59 €</span>
             <span className="text-sm font-semibold text-[#5B5245]">paiement unique — jusqu'au 31 août</span>
           </div>
-          <FicheCta label={ctaLabel} />
+          {gateSurface ? (
+            <FicheCtaGated surface={gateSurface} label={ctaLabel} />
+          ) : (
+            <FicheCta label={ctaLabel} />
+          )}
         </div>
       </main>
     </div>
