@@ -27,7 +27,7 @@ export default function FicheDernierJourPage() {
       <section className="rounded-2xl bg-[#0F2E1F] p-6 text-white shadow-lg">
         <div className="flex items-center gap-3">
           <AlertTriangle className="h-6 w-6 flex-none text-[#D4AF37]" />
-          <h2 className="v3-serif text-xl font-bold">Après ce soir, il n'y a plus de paiement unique</h2>
+          <h2 className="v3-serif text-xl font-bold text-white">Après ce soir, il n'y a plus de paiement unique</h2>
         </div>
         <p className="mt-4 leading-relaxed text-white/85">
           Demain 1er septembre, les inscriptions à la V3 ouvrent avec le premier mois offert,

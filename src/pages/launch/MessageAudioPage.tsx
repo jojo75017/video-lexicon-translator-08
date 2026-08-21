@@ -75,7 +75,7 @@ export default function MessageAudioPage() {
           <span className="inline-flex items-center gap-2 rounded-full bg-[#D4AF37]/20 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
             <Headphones className="h-3.5 w-3.5" /> Message audio — 2 minutes
           </span>
-          <h1 className="v3-serif mt-4 text-3xl font-bold leading-tight md:text-4xl">
+          <h1 className="v3-serif mt-4 text-3xl font-bold leading-tight text-white md:text-4xl">
             Pourquoi EbookStudio change la publication sur Amazon
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/80">
@@ -91,7 +91,7 @@ export default function MessageAudioPage() {
           </div>
 
           <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-white/80">
-            <span className="inline-flex items-center gap-1.5">
+            <span className="inline-flex items-center gap-1.5 text-white/80">
               <Clock className="h-4 w-4 text-[#D4AF37]" /> ~2 minutes
             </span>
           </div>

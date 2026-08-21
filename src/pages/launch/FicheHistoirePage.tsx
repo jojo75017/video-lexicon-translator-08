@@ -46,7 +46,7 @@ export default function FicheHistoirePage() {
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#D4AF37]/20">
             <TrendingUp className="h-5 w-5 text-[#D4AF37]" />
           </span>
-          <h2 className="v3-serif text-xl font-bold">La nouvelle voie</h2>
+          <h2 className="v3-serif text-xl font-bold text-white">La nouvelle voie</h2>
         </div>
         <p className="mt-4 leading-relaxed text-white/85">
           Ni formation de 600 pages, ni logiciel compliqué. Vous donnez votre idée, vous validez
