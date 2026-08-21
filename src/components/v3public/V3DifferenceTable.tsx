@@ -63,8 +63,8 @@ export default function V3DifferenceTable() {
             className="hidden md:grid md:grid-cols-[1fr_1.2fr_1.4fr] gap-0 text-[11px] font-bold uppercase tracking-[0.16em]"
             style={{ background: 'rgba(255,255,255,0.06)' }}
           >
-            <div className="px-5 py-3 text-white/60">Sur ce point</div>
-            <div className="px-5 py-3 text-white/60">Outils IA classiques</div>
+            <div className="px-5 py-3 text-white/75">Sur ce point</div>
+            <div className="px-5 py-3 text-white/75">Outils IA classiques</div>
             <div className="px-5 py-3" style={{ color: 'var(--v3-gold)' }}>Ebookstudio V3</div>
           </div>
           {ROWS.map((r, i) => (
@@ -77,11 +77,11 @@ export default function V3DifferenceTable() {
               }}
             >
               <div className="text-[13.5px] font-semibold text-white md:px-5 md:py-4">{r.point}</div>
-              <div className="flex items-start gap-2 text-[13px] text-white/65 md:px-5 md:py-4">
+              <div className="flex items-start gap-2 text-[13px] text-white/80 md:px-5 md:py-4">
                 <X className="mt-[3px] h-3.5 w-3.5 shrink-0 text-white/40" />
                 <span>{r.others}</span>
               </div>
-              <div className="flex items-start gap-2 text-[13px] text-white md:px-5 md:py-4">
+              <div className="flex items-start gap-2 text-[13px] font-medium text-white md:px-5 md:py-4">
                 <Check className="mt-[3px] h-3.5 w-3.5 shrink-0" style={{ color: 'var(--v3-gold)' }} />
                 <span>{r.v3}</span>
               </div>
