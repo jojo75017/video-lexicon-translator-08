@@ -20,13 +20,15 @@ const schema = z.object({
   email: z.string().trim().email('Email invalide').max(255),
 });
 
-/** Suivi discret des déblocages (table capture_events, page_path = surface). */
-async function trackGate(eventType: 'reading_gate_view' | 'reading_gate_unlock', surface: string) {
+/** Suivi discret des déblocages (table capture_events, page_path = surface).
+ *  event_type est contraint à 'view' | 'click' : view = verrou affiché,
+ *  click = déblocage réussi. La surface passe par utm_campaign. */
+async function trackGate(kind: 'view' | 'unlock', surface: string) {
   try {
     if (typeof window === 'undefined') return;
     const utm = getStoredUtm();
     await supabase.from('capture_events').insert({
-      event_type: eventType,
+      event_type: kind === 'view' ? 'view' : 'click',
       surface: 'inline',
       lead_magnet: NICHES_10_LEAD_MAGNET,
       ab_variant: null,
