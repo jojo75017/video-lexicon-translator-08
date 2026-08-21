@@ -19,6 +19,7 @@ export default function FicheDernierJourPage() {
       ctaLabel="Profiter des 47 € avant ce soir"
       metaTitle="Dernier jour à 47 € — EbookStudio"
       metaDescription="Dernier jour pour obtenir l'accès complet EbookStudio à 47 € en paiement unique. Ensuite, la V3 passe par abonnement."
+      gateSurface="fiche-dernier-jour"
     >
       <div className="flex justify-center">
         <FicheCountdown dark />

@@ -40,6 +40,7 @@ export default function FichePreuvePage() {
       title="Ils ont publié leur livre — voici leurs mots"
       metaTitle="Ils ont publié avec EbookStudio"
       metaDescription="Témoignages d'auteurs publiés sur Amazon KDP avec EbookStudio, la méthode en 15 agents et la garantie."
+      gateSurface="fiche-preuve"
     >
       {testimonials.length > 0 && (
         <section className="space-y-4">
