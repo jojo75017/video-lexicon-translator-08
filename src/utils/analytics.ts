@@ -159,3 +159,41 @@ export const trackFormSubmit = (formName: string, email?: string) => {
     ...(email && { user_email: email }),
   });
 };
+
+// ═══════════════════════════════════════
+// Page cadeau (lead magnet) — conversion
+// ═══════════════════════════════════════
+
+/** Clic sur le bouton de capture (avant l'appel réseau) */
+export const trackLeadFormClick = (formName: string, source?: string) => {
+  trackEvent('lead_form_click', {
+    form_name: formName,
+    page_path: window.location.pathname,
+    ...(source && { source }),
+  });
+};
+
+/** Inscription confirmée (conversion GA4 recommandée : sign_up + generate_lead) */
+export const trackSignUp = (method: string, leadMagnet?: string) => {
+  trackEvent('sign_up', {
+    method,
+    page_path: window.location.pathname,
+    ...(leadMagnet && { lead_magnet: leadMagnet }),
+  });
+  trackEvent('generate_lead', {
+    method,
+    currency: 'EUR',
+    value: 0,
+    page_path: window.location.pathname,
+    ...(leadMagnet && { lead_magnet: leadMagnet }),
+  });
+};
+
+/** Échec de soumission d'un formulaire (pour mesurer le taux réel d'inscription) */
+export const trackFormError = (formName: string, reason: string) => {
+  trackEvent('form_error', {
+    form_name: formName,
+    reason,
+    page_path: window.location.pathname,
+  });
+};
