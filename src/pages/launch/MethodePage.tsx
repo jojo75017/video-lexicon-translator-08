@@ -226,6 +226,8 @@ export default function MethodePage() {
           <FicheCta label="Je prends l’accès à vie à 47 €" dark />
         </div>
       </section>
+
+      </ReadingGate>
     </div>
   );
 }
