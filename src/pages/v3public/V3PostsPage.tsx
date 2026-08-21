@@ -23,7 +23,7 @@ const GIFT_URL = 'https://ebookstudio.fr/cadeau';
  * Aucun identifiant de réseau social n'est demandé ni stocké.
  */
 export default function V3PostsPage() {
-  const { code, getReferralLink } = useReferral();
+  const { code } = useReferral();
   const [channel, setChannel] = useState<SocialChannel>('facebook');
   const [customLink, setCustomLink] = useState('');
   const [copied, setCopied] = useState<string | null>(null);
