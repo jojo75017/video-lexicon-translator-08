@@ -96,7 +96,7 @@ async function sendLeadMagnetEmail(email: string, firstName: string, magnetKey: 
     <p>${magnet.intro}</p>
     <p style="text-align:center;margin:24px 0">
       <a href="${magnet.url}" style="background:#FF9E2D;color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block">
-        📥 Télécharger le PDF
+        ${magnet.cta || "📥 Télécharger le PDF"}
       </a>
     </p>
     <p>À l'intérieur :</p>
