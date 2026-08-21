@@ -10,6 +10,7 @@ export default function FicheHistoirePage() {
       title="Marie n'y connaissait rien aux livres. Rachel, elle, avait une autre histoire."
       metaTitle="Marie et Rachel — EbookStudio"
       metaDescription="Deux histoires vraies d'auteures débutantes sur Amazon KDP, et la nouvelle voie qui les a menées à la publication."
+      gateSurface="fiche-histoire"
     >
       <section className="rounded-2xl bg-white p-6 shadow-sm">
         <div className="flex items-center gap-3">

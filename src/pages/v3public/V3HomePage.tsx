@@ -25,6 +25,7 @@ import V3WhatIsPanel from '@/components/v3public/V3WhatIsPanel';
 import V3HowItWorksSteps from '@/components/v3public/V3HowItWorksSteps';
 import V3BenefitsPanel from '@/components/v3public/V3BenefitsPanel';
 import V3DifferenceTable from '@/components/v3public/V3DifferenceTable';
+import ReadingGate from '@/components/marketing/ReadingGate';
 
 
 
@@ -72,6 +73,11 @@ export default function V3HomePage() {
       {/* PRÉSENTATION LONGUE — comprendre la V3 (sommaire ancré + 4 sections) */}
       <V3AnchorNav />
       <V3WhatIsPanel />
+
+      {/* SUITE VERROUILLÉE pour les visiteurs inconnus : l'email débloque
+          les étapes, les bénéfices, le comparatif et le CTA final.
+          Jamais affiché aux abonnés, admins ni prospects venus d'un email. */}
+      <ReadingGate surface="v3" title="La suite de la visite est offerte">
       <V3HowItWorksSteps />
       <V3BenefitsPanel />
       <V3DifferenceTable />
@@ -417,6 +423,7 @@ export default function V3HomePage() {
           </div>
         </div>
       </section>
+      </ReadingGate>
 
       {/* Palette officielle V3 */}
       <V3PaletteModule />

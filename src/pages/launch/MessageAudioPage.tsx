@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Headphones, Clock } from 'lucide-react';
 import useLaunchSettings from '@/hooks/useLaunchSettings';
-import { FicheCta, FicheCountdown } from '@/components/launch/FicheShell';
+import { FicheCtaGated, FicheCountdown } from '@/components/launch/FicheShell';
 
 /** Fiche J2 — écoute du message audio de lancement.
  *  Principe du tunnel : écouter d'abord, puis UN seul bouton vers /commander. */
@@ -105,7 +105,7 @@ export default function MessageAudioPage() {
           <p className="mt-2 text-sm leading-relaxed text-[#5B5245]">
             Paiement unique, aucun abonnement, accès conservé — et la V3 offerte au 1er octobre.
           </p>
-          <FicheCta />
+          <FicheCtaGated surface="message-audio" />
         </div>
       </main>
     </div>
