@@ -59,6 +59,20 @@ const MAGNETS: Record<string, Magnet> = {
       "Module 5 — Automatisation & stratégie marketing",
     ],
   },
+  "10-niches-offertes": {
+    url: "https://ebookstudio.fr/10-niches-offertes",
+    title: "🎁 Votre pack 10 niches offertes",
+    subject: "🎁 Vos 10 niches qui se vendent déjà (accès immédiat)",
+    intro:
+      "Merci pour votre inscription ! Voici votre pack : 10 niches KDP où la demande existe déjà, avec les mots-clés Amazon exacts à viser :",
+    items: [
+      "10 niches vérifiées, une par grande catégorie",
+      "Le mot-clé Amazon exact à viser pour chacune",
+      "BSR cible, niveau de concurrence et prix constaté",
+      "Un bouton « Écrire ce livre » pour démarrer directement",
+    ],
+    cta: "🎁 Ouvrir mon pack 10 niches",
+  },
 };
 
 const DEFAULT_MAGNET = "5-niches-rentables-2026";
