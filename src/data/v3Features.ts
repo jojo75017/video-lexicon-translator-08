@@ -1,6 +1,6 @@
 import {
   KeyRound, IdCard, Share2, Plug, BookPlus, PenLine, Palette, TrendingUp,
-  Library, Crown, HeartHandshake, HelpCircle, Bot,
+  Library, Crown, HeartHandshake, HelpCircle, Bot, Megaphone,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { V3_HEADER_MENU } from './v3HeaderMenu';
