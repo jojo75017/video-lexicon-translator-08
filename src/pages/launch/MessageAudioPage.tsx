@@ -105,7 +105,7 @@ export default function MessageAudioPage() {
           <p className="mt-2 text-sm leading-relaxed text-[#5B5245]">
             Paiement unique, aucun abonnement, accès conservé — et la V3 offerte au 1er octobre.
           </p>
-          <FicheCta />
+          <FicheCtaGated surface="message-audio" />
         </div>
       </main>
     </div>
