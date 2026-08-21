@@ -104,23 +104,16 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Pousse le contact dans Systeme.io avec des tags pour déclencher les automations.
-    // "promoteur-interesse" = candidat à la promotion ; "ambassadeur-{plateforme}" = segmentation réseau.
-    const sioTags = [
-      'promoteur-interesse',
-      'ambassadeur-ebookstudio',
-      `ambassadeur-${platform}`,
-    ];
-    if (niche) sioTags.push('client-prospect');
-    const systemeio = EMAIL_SENDING_ENABLED ? await pushToSystemeIo(
-      email,
-      name || handle,
-      sioTags,
-      [
-        ...(handle ? [{ slug: 'pseudo', value: handle }] : []),
-        ...(niche ? [{ slug: 'niche', value: niche }] : []),
-      ],
-    ) : { ok: false, detail: 'domain_pending_validation' };
+    // Systeme.io désactivé — les tags et la segmentation ambassadeur restent
+    // internes. L'email de bienvenue est envoyé via Resend ci-dessous.
+    // const sioTags = [
+    //   'promoteur-interesse',
+    //   'ambassadeur-ebookstudio',
+    //   `ambassadeur-${platform}`,
+    // ];
+    // if (niche) sioTags.push('client-prospect');
+    // const systemeio = EMAIL_SENDING_ENABLED ? await pushToSystemeIo(...) : { ... };
+    const systemeio = { ok: false, detail: 'disabled' };
 
     const origin = req.headers.get('origin') || 'https://ebookstudio.fr';
     const kitUrl = `${origin}/influenceurs`;
