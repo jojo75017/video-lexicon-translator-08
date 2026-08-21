@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Loader2, Sparkles, Lock, BookOpen, Mail, CheckCircle2, PenLine } from 'lucide-react';
+import { Loader2, Sparkles, Lock, BookOpen, Mail, CheckCircle2, PenLine, Rocket } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import useLaunchSettings from '@/hooks/useLaunchSettings';
@@ -392,7 +392,7 @@ export default function EssaiPage() {
                   ))}
                 </ul>
                 <Link
-                  to={"/commander" + (() => { const q = new URLSearchParams(searchParams); q.set("src", "essai"); return `?${q.toString()}`; })()}
+                  to={"/commander" + (() => { const q = new URLSearchParams(params); q.set("src", "essai"); return `?${q.toString()}`; })()}
                   className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#D4AF37] px-5 py-3.5 text-sm font-bold text-[#2A2118] transition hover:brightness-110"
                 >
                   <Rocket className="h-4 w-4" /> Obtenir l'accès à vie à 47 €
