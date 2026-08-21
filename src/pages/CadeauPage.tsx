@@ -65,9 +65,16 @@ const CadeauPage = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const countdown = useCountdown(OFFER_END);
 
+  // Vue de la page cadeau : dénominateur du taux d'inscription dans GA4.
+  useEffect(() => {
+    trackPageView("/cadeau", "Page cadeau — 10 niches + kit de démarrage");
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    trackLeadFormClick("cadeau_guide", "page_cadeau");
     if (!email || !email.includes("@")) {
+      trackFormError("cadeau_guide", "email_invalide");
       toast.error("Veuillez entrer un email valide");
       return;
     }
@@ -86,10 +93,12 @@ const CadeauPage = () => {
       if (error) throw error;
       trackLeadMagnetDownload("niches10_kit");
       trackFormSubmit("cadeau_guide", emailLower);
+      trackSignUp("page_cadeau", "niches10_kit");
       setIsSuccess(true);
       toast.success("🎁 Vos deux cadeaux arrivent dans votre boîte mail !");
     } catch (error) {
       console.error("Error:", error);
+      trackFormError("cadeau_guide", "erreur_serveur");
       toast.error("Erreur, réessayez");
     } finally {
       setIsSubmitting(false);
