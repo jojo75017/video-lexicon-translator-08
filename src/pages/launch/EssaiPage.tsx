@@ -123,6 +123,10 @@ export default function EssaiPage() {
       });
       if (error) throw new Error(error.message);
       if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);
+      try {
+        localStorage.setItem('ebs_lead_email', email.trim().toLowerCase());
+        localStorage.setItem('ebs_reader_unlocked', '1');
+      } catch { /* navigation privée */ }
       setClaimed(true);
       toast.success('Chapitre envoyé — vérifiez votre boîte de réception.');
     } catch (e) {
@@ -391,21 +395,23 @@ export default function EssaiPage() {
                     </li>
                   ))}
                 </ul>
-                <Link
-                  to={"/commander" + (() => { const q = new URLSearchParams(params); q.set("src", "essai"); return `?${q.toString()}`; })()}
-                  className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#D4AF37] px-5 py-3.5 text-sm font-bold text-[#2A2118] transition hover:brightness-110"
-                >
-                  <Rocket className="h-4 w-4" /> Obtenir l'accès à vie à 47 €
-                </Link>
-                <p className="mt-3 text-center text-xs text-white/70">
-                  Paiement unique · aucun abonnement · V3 offerte au 1<sup>er</sup> octobre
-                </p>
-                <Link
-                  to={`/essai/inscription?trial=${result.trialId}`}
-                  className="mt-3 block text-center text-xs font-semibold text-white/60 underline underline-offset-4 hover:text-white/90"
-                >
-                  Ou créer mon compte — 1<sup>er</sup> mois offert à la V3
-                </Link>
+                <ReadingGate surface="essai" compact title="La suite de votre livre vous attend">
+                  <Link
+                    to={"/commander" + (() => { const q = new URLSearchParams(params); q.set("src", "essai"); return `?${q.toString()}`; })()}
+                    className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#D4AF37] px-5 py-3.5 text-sm font-bold text-[#2A2118] transition hover:brightness-110"
+                  >
+                    <Rocket className="h-4 w-4" /> Obtenir l'accès à vie à 47 €
+                  </Link>
+                  <p className="mt-3 text-center text-xs text-white/70">
+                    Paiement unique · aucun abonnement · V3 offerte au 1<sup>er</sup> octobre
+                  </p>
+                  <Link
+                    to={`/essai/inscription?trial=${result.trialId}`}
+                    className="mt-3 block text-center text-xs font-semibold text-white/60 underline underline-offset-4 hover:text-white/90"
+                  >
+                    Ou créer mon compte — 1<sup>er</sup> mois offert à la V3
+                  </Link>
+                </ReadingGate>
               </div>
             </aside>
           </div>
