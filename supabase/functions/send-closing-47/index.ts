@@ -31,7 +31,7 @@ const CAMPAIGN = "conversion-2026";
 const CHECKOUT = CHECKOUT_URL;
 const DEMO_URL = "https://ebookstudio.fr/demo";
 const GIFT_URL = "https://ebookstudio.fr/10-niches-offertes";
-type Segment = "never_opened" | "openers_no_click" | "clickers";
+type Segment = "never_opened" | "openers_no_click" | "clickers" | "all";
 /** Cible du bouton principal : le cadeau (sans risque) ou la page de paiement. */
 type Primary = "gift" | "checkout" | "demo";
 
@@ -156,13 +156,13 @@ const LETTERS: Letter[] = [
   {
     key: "clic-b4",
     label: "B4 — Échéance : l'accès à vie disparaît",
-    subject: "Après le 30 septembre, ce tarif n'existe plus",
+    subject: "Après le 31 août, ce tarif n'existe plus",
     subjectB: "47 € une fois, ou 324 € par an",
     preheader: "Le calcul est simple, et la date ne bougera pas.",
     segment: "openers_no_click",
     primary: "checkout",
     price: true,
-    body: `<p style="margin:0 0 18px">Jusqu'au <strong>30 septembre 2026</strong>, EbookStudio est accessible pour <strong>47 €, une seule fois, à vie</strong>. À partir du 1<sup>er</sup> octobre, il ne restera que l'abonnement : 27 € par mois, soit <strong>324 € la première année</strong>, et autant les suivantes.</p>
+    body: `<p style="margin:0 0 18px">Jusqu'au <strong>31 août 2026</strong>, EbookStudio est accessible pour <strong>47 €, une seule fois, à vie</strong>. À partir du 1<sup>er</sup> septembre, il ne restera que l'abonnement : 27 € par mois, soit <strong>324 € la première année</strong>, et autant les suivantes.</p>
 <p style="margin:0 0 18px">Avec l'accès à vie, vous gardez tout : la rédaction complète de vos livres, les exports Word et PDF aux normes Amazon KDP, les couvertures avec dos calculé, la fiche de vente, les livres illustrés pour enfants — et les nouveaux outils au fur et à mesure, sans repayer.</p>
 <p style="margin:0 0 14px;font:700 17px Arial,Helvetica,sans-serif">Ce qui lève le risque</p>
 <p style="margin:0 0 12px"><strong>Garantie 30 jours</strong> : remboursé sur simple demande, sans justification.</p>
@@ -190,20 +190,41 @@ const LETTERS: Letter[] = [
   {
     key: "chaud-c2",
     label: "C2 — Cliqueurs : rappel final avec achat",
-    subject: "Je ferme l'accès à vie le 30 septembre",
+    subject: "Je ferme l'accès à vie le 31 août",
     subjectB: "Dernier rappel avant le passage en abonnement",
     preheader: "Garantie 30 jours, paiement en 2 ou 3 fois, PayPal accepté.",
     segment: "clickers",
     primary: "checkout",
     price: true,
     body: `<p style="margin:0 0 18px">Dernier message sur cette offre, et il est court.</p>
-<p style="margin:0 0 18px">Le <strong>30 septembre 2026</strong>, l'accès à vie à 47 € disparaît. Ensuite, c'est 27 € par mois, soit 324 € la première année.</p>
+<p style="margin:0 0 18px">Le <strong>31 août 2026</strong>, l'accès à vie à 47 € disparaît. Ensuite, c'est 27 € par mois, soit 324 € la première année.</p>
 <p style="margin:0 0 12px"><strong>Garantie 30 jours</strong> : remboursé sur simple demande.</p>
 <p style="margin:0 0 12px"><strong>2 × 25 € ou 3 × 18 €</strong>, accès ouvert dès la première échéance.</p>
 <p style="margin:0 0 12px"><strong>PayPal ou carte bancaire</strong>, au choix sur la page de paiement.</p>
 <p style="margin:0 0 18px">Juste après le paiement, vous recevez vos identifiants, le lien de vos 10 niches et mon adresse directe (${DIRECT_EMAIL}).</p>`,
     cta: "Ouvrir mon accès à vie — 47 €",
-    ps: "Après le 30 septembre, ce tarif ne reviendra pas.",
+    ps: "Après le 31 août, ce tarif ne reviendra pas.",
+  },
+
+  // ------------------------------------------------------------ Offre directe
+  {
+    key: "offre-47-directe",
+    label: "Offre directe — 47 € à vie (test de clics)",
+    subject: "47 € une fois, à vie — jusqu'au 31 août",
+    subjectB: "Votre accès à vie à 47 € se termine bientôt",
+    preheader: "Paiement unique, accès immédiat, garantie 30 jours.",
+    segment: "all",
+    primary: "checkout",
+    price: true,
+    body: `<p style="margin:0 0 18px">Je vais droit au but : jusqu'au <strong>31 août 2026</strong>, l'accès complet à EbookStudio est à <strong>47 €, une seule fois, à vie</strong>. Ensuite, il ne restera que l'abonnement à 27 € par mois.</p>
+<p style="margin:0 0 12px">Pour 47 €, vous repartez avec tout ceci, sans limite de durée :</p>
+<p style="margin:0 0 8px">— votre livre rédigé chapitre par chapitre, en français soigné ;</p>
+<p style="margin:0 0 8px">— le fichier Word et le PDF aux normes Amazon KDP ;</p>
+<p style="margin:0 0 8px">— la couverture complète : face, dos calculé, 4<sup>e</sup> de couverture ;</p>
+<p style="margin:0 0 18px">— la fiche de vente Amazon : titre, description, mots-clés, catégories.</p>
+<p style="margin:0 0 18px"><strong>Garantie 30 jours</strong> : remboursé sur simple demande. Paiement possible en 2 ou 3 fois, par carte ou PayPal.</p>`,
+    cta: "Je prends l'accès à vie — 47 €",
+    ps: `Une question avant de décider ? Répondez à cet email, ou écrivez-moi à ${DIRECT_EMAIL} : je lis et je réponds moi-même.`,
   },
 ];
 
@@ -247,7 +268,7 @@ function ctaButton(link: string, label: string) {
 
 /** Rappel discret de l'offre, quand l'email n'a pas pour but de vendre. */
 function softOfferLine(link: string) {
-  return `<p style="margin:0 0 18px;font:14px/1.6 Arial,Helvetica,sans-serif;color:#4b5563">Si vous voulez aller plus loin : l'accès complet est à 47 € une seule fois, à vie, jusqu'au 30 septembre 2026 (ensuite 27 €/mois). <a href="${link}" style="color:#008296">Voir l'offre</a>.</p>`;
+  return `<p style="margin:0 0 18px;font:14px/1.6 Arial,Helvetica,sans-serif;color:#4b5563">Si vous voulez aller plus loin : l'accès complet est à 47 € une seule fois, à vie, jusqu'au 31 août 2026 (ensuite 27 €/mois). <a href="${link}" style="color:#008296">Voir l'offre</a>.</p>`;
 }
 
 function render(baseUrl: string, email: string, firstName: string, letter: Letter, subject: string) {
@@ -270,7 +291,7 @@ ${showsPrice ? "" : softOfferLine(trackedLink(email, letter, "-achat"))}
 <p style="margin:0 0 6px">Bien à vous,<br><strong>Georges Boubet</strong><br>EbookStudio — <a href="mailto:${DIRECT_EMAIL}" style="color:#008296">${DIRECT_EMAIL}</a></p>
 <p style="margin:18px 0 0;padding:14px 0 0;border-top:1px solid #e5e7eb;font:15px/1.6 Arial,Helvetica,sans-serif;color:#4b5563">${letter.ps}</p>
 </td></tr>
-<tr><td style="padding:18px 24px;background:#f6f7f8;text-align:center;color:#68737d;font:12px/1.6 Arial,Helvetica,sans-serif">Offre à 47 € valable jusqu'au 30 septembre 2026.<br>Vous recevez cet email car vous avez manifesté un intérêt pour EbookStudio.<br><a href="${unsubscribe}" style="color:#008296">Se désinscrire de tous les emails marketing</a></td></tr>
+<tr><td style="padding:18px 24px;background:#f6f7f8;text-align:center;color:#68737d;font:12px/1.6 Arial,Helvetica,sans-serif">Offre à 47 € valable jusqu'au 31 août 2026.<br>Vous recevez cet email car vous avez manifesté un intérêt pour EbookStudio.<br><a href="${unsubscribe}" style="color:#008296">Se désinscrire de tous les emails marketing</a></td></tr>
 </table></td></tr></table><img src="${pixel}" width="1" height="1" alt="" style="display:none"></body></html>`;
 }
 
@@ -387,11 +408,13 @@ Deno.serve(async (req) => {
         });
       }
 
-      const pool = letter.segment === "clickers"
-        ? [...clickers]
-        : letter.segment === "openers_no_click"
-          ? [...openers].filter((email) => !clickers.has(email))
-          : [...profiles.keys()].filter((email) => !openers.has(email) && !clickers.has(email));
+      const pool = letter.segment === "all"
+        ? [...profiles.keys()]
+        : letter.segment === "clickers"
+          ? [...clickers]
+          : letter.segment === "openers_no_click"
+            ? [...openers].filter((email) => !clickers.has(email))
+            : [...profiles.keys()].filter((email) => !openers.has(email) && !clickers.has(email));
 
       const rows: Array<Record<string, unknown>> = [];
       for (const email of new Set([...pool, ...lastLog.keys()])) {
@@ -495,11 +518,13 @@ Deno.serve(async (req) => {
     const profiles = new Map((profileRows || []).map((r) => [normalize(r.email || ""), r]));
     const allKnown = [...profiles.keys()];
 
-    const pool = letter.segment === "clickers"
-      ? [...clickers]
-      : letter.segment === "openers_no_click"
-        ? [...openers].filter((email) => !clickers.has(email))
-        : allKnown.filter((email) => !openers.has(email) && !clickers.has(email));
+    const pool = letter.segment === "all"
+      ? allKnown
+      : letter.segment === "clickers"
+        ? [...clickers]
+        : letter.segment === "openers_no_click"
+          ? [...openers].filter((email) => !clickers.has(email))
+          : allKnown.filter((email) => !openers.has(email) && !clickers.has(email));
 
     const eligible: string[] = [];
     for (const email of pool) {

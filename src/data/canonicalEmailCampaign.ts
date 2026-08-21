@@ -33,6 +33,7 @@ export const CLOSING_EMAIL_CAMPAIGN = {
     { template: 'cloture-47-2', segment: 'openers_no_click', label: 'La preuve en images', subject: 'Un livre entier, du sommaire au fichier Amazon' },
     { template: 'cloture-47-3', segment: 'openers_no_click', label: 'Dernier jour utile', subject: "Dernier rappel : après le 31 août, ce tarif n'existe plus" },
     { template: 'relance-niches-1', segment: 'no_click', label: '10 niches offertes (non-cliqueurs)', subject: "10 niches Amazon rentables, offertes (même si vous n'achetez rien)" },
+    { template: 'offre-47-directe', segment: 'all', label: 'Offre directe 47 € (test de clics)', subject: "47 € une fois, à vie — jusqu'au 31 août" },
 
   ],
 } as const;
