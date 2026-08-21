@@ -103,7 +103,9 @@ const NAV: NavSection[] = [
   {
     section: 'Vendre',
     items: [
+      { to: '/v3/posts', label: '📣 Posts — 30 jours prêts', icon: Megaphone, badge: 'NEW' },
       { to: '/v3/avis', label: '⭐ Obtenir des avis clients', icon: Star, badge: 'Marche à suivre' },
+      { to: '/mon-parrainage', label: '🤝 Parrainage — 30 % de commission', icon: Gem },
       { to: '/v3/script-heygen', label: 'Script vidéo HeyGen', icon: Video },
       { to: '/v3/pourquoi', label: 'Pourquoi EbookStudio', icon: Award },
       { to: '/v3/realite-kdp', label: 'Combien gagnent les auteurs KDP', icon: BookOpen },
