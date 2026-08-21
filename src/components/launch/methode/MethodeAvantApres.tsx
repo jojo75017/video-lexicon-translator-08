@@ -42,12 +42,12 @@ export default function MethodeAvantApres() {
         </div>
 
         <div className="rounded-2xl bg-[#0F2E1F] p-6 shadow-lg">
-          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
+          <p className="text-[11px] font-bold uppercase tracking-[0.22em]" style={{ color: "#D4AF37" }}>
             La nouvelle voie : l'atelier EbookStudio
           </p>
           <ul className="mt-5 space-y-3">
             {NOUVELLE.map((t) => (
-              <li key={t} className="flex gap-3 text-sm leading-relaxed text-white/90">
+              <li key={t} className="flex gap-3 text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.92)" }}>
                 <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#D4AF37]" />
                 <span>{t}</span>
               </li>
