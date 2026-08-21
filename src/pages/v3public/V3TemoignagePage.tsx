@@ -168,14 +168,27 @@ export default function V3TemoignagePage() {
           )}
         </div>
 
-        <Button type="submit" size="lg" disabled={loading} className="mt-2 font-bold" style={{ background: AMBER, color: INK }}>
+        <label className="flex items-start gap-3 rounded-xl border p-4 text-sm">
+          <input
+            type="checkbox"
+            checked={consent}
+            onChange={(e) => setConsent(e.target.checked)}
+            className="mt-0.5 h-4 w-4"
+          />
+          <span>
+            J'autorise EbookStudio à publier mon prénom, ma note, ma photo de livre et mon
+            commentaire sur ses pages de présentation. *
+          </span>
+        </label>
+
+        <Button type="submit" size="lg" disabled={loading || !consent} className="mt-2 font-bold" style={{ background: AMBER, color: INK }}>
           {loading ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : null}
           Envoyer mon témoignage
         </Button>
         <p className="text-xs text-muted-foreground">
-          En envoyant ce formulaire, vous nous autorisez à publier votre prénom, votre photo de
-          livre et votre commentaire sur nos pages de présentation.
+          Votre témoignage est vérifié par nos soins avant toute publication.
         </p>
+
       </form>
     </div>
   );
