@@ -219,7 +219,7 @@ export default function MethodePage() {
           <div className="mt-6 flex justify-center">
             <FicheCountdown dark />
           </div>
-          <FicheCta label="Je prends l’accès à vie à 47 €" />
+          <FicheCta label="Je prends l’accès à vie à 47 €" dark />
         </div>
       </section>
     </div>
