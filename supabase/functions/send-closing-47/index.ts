@@ -408,11 +408,13 @@ Deno.serve(async (req) => {
         });
       }
 
-      const pool = letter.segment === "clickers"
-        ? [...clickers]
-        : letter.segment === "openers_no_click"
-          ? [...openers].filter((email) => !clickers.has(email))
-          : [...profiles.keys()].filter((email) => !openers.has(email) && !clickers.has(email));
+      const pool = letter.segment === "all"
+        ? [...profiles.keys()]
+        : letter.segment === "clickers"
+          ? [...clickers]
+          : letter.segment === "openers_no_click"
+            ? [...openers].filter((email) => !clickers.has(email))
+            : [...profiles.keys()].filter((email) => !openers.has(email) && !clickers.has(email));
 
       const rows: Array<Record<string, unknown>> = [];
       for (const email of new Set([...pool, ...lastLog.keys()])) {
@@ -516,11 +518,13 @@ Deno.serve(async (req) => {
     const profiles = new Map((profileRows || []).map((r) => [normalize(r.email || ""), r]));
     const allKnown = [...profiles.keys()];
 
-    const pool = letter.segment === "clickers"
-      ? [...clickers]
-      : letter.segment === "openers_no_click"
-        ? [...openers].filter((email) => !clickers.has(email))
-        : allKnown.filter((email) => !openers.has(email) && !clickers.has(email));
+    const pool = letter.segment === "all"
+      ? allKnown
+      : letter.segment === "clickers"
+        ? [...clickers]
+        : letter.segment === "openers_no_click"
+          ? [...openers].filter((email) => !clickers.has(email))
+          : allKnown.filter((email) => !openers.has(email) && !clickers.has(email));
 
     const eligible: string[] = [];
     for (const email of pool) {

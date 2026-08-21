@@ -15,7 +15,7 @@ interface LetterStat {
   template: string;
   label: string;
   subject: string;
-  segment: 'clickers' | 'openers_no_click' | 'never_opened';
+  segment: 'clickers' | 'openers_no_click' | 'never_opened' | 'all';
   primary: 'gift' | 'checkout' | 'demo';
   sent: number;
   opens: number;
@@ -28,6 +28,7 @@ const SEGMENT_LABEL: Record<LetterStat['segment'], string> = {
   never_opened: 'A · Jamais ouvert',
   openers_no_click: 'B · Ouvreurs sans clic',
   clickers: 'C · Cliqueurs',
+  all: 'Tous les prospects',
 };
 
 const PRIMARY_LABEL: Record<LetterStat['primary'], string> = {
