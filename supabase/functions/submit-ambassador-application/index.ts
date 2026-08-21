@@ -1,6 +1,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { Resend } from 'npm:resend@2.0.0';
-import { pushToSystemeIo } from '../_shared/systemeio.ts';
+// Systeme.io désactivé — les ambassadeurs restent dans la base interne.
+// import { pushToSystemeIo } from '../_shared/systemeio.ts';
 import { EMAIL_SENDING_ENABLED } from '../_shared/emailSendingGuard.ts';
 
 const corsHeaders = {
