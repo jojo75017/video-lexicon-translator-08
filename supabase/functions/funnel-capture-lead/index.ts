@@ -1,7 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { EMAIL_SENDING_ENABLED } from "../_shared/emailSendingGuard.ts";
-import { pushToSystemeIo } from "../_shared/systemeio.ts";
+// Systeme.io désactivé — tous les leads restent dans la base interne.
+// import { pushToSystemeIo } from "../_shared/systemeio.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -204,18 +205,19 @@ serve(async (req) => {
         .eq("id", leadId);
     }
 
-    // Chaque nouveau contact part immédiatement dans Systeme.io avec un tag
-    // par lead magnet : c'est là que tournent les séquences de relance.
-    try {
-      const tags = ["ebookstudio-lead", `lm-${magnetKey}`];
-      if (ab_variant) tags.push(`ab-${ab_variant.toLowerCase()}`);
-      const res = await pushToSystemeIo(email, first_name, tags, [
-        ...(ref_code ? [{ slug: "ref_code", value: ref_code }] : []),
-      ]);
-      if (!res.ok) console.warn("Systeme.io push skipped:", res.detail);
-    } catch (e) {
-      console.warn("Systeme.io push exception", (e as Error).message);
-    }
+    // Systeme.io désactivé — les séquences de relance tournent désormais
+    // entièrement via Resend et les tables internes (sales_prospects,
+    // funnel_leads, email_send_log). Aucun lead n'est transmis à Systeme.io.
+    // try {
+    //   const tags = ["ebookstudio-lead", `lm-${magnetKey}`];
+    //   if (ab_variant) tags.push(`ab-${ab_variant.toLowerCase()}`);
+    //   const res = await pushToSystemeIo(email, first_name, tags, [
+    //     ...(ref_code ? [{ slug: "ref_code", value: ref_code }] : []),
+    //   ]);
+    //   if (!res.ok) console.warn("Systeme.io push skipped:", res.detail);
+    // } catch (e) {
+    //   console.warn("Systeme.io push exception", (e as Error).message);
+    // }
 
 
     return new Response(

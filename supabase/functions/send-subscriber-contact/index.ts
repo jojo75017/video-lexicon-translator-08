@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
-import { pushToSystemeIo } from "../_shared/systemeio.ts";
+// Systeme.io désactivé — les contacts restent dans la base interne.
+// import { pushToSystemeIo } from "../_shared/systemeio.ts";
 import { EMAIL_SENDING_ENABLED, emailSendingBlockedResult } from "../_shared/emailSendingGuard.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
@@ -56,15 +57,16 @@ serve(async (req) => {
 
     console.log("Contact email sent:", r);
 
-    // Si le message vient de la page influenceurs, on inscrit le contact dans Systeme.io.
-    let systemeio: { ok: boolean; detail?: string } | undefined;
-    if (source === "influenceurs") {
-      systemeio = await pushToSystemeIo(email, name || handle || "", [
-        "promoteur-interesse",
-        "ambassadeur-ebookstudio",
-        "contact-influenceur",
-      ]);
-    }
+    // Systeme.io désactivé — les contacts influenceurs restent internes.
+    // let systemeio: { ok: boolean; detail?: string } | undefined;
+    // if (source === "influenceurs") {
+    //   systemeio = await pushToSystemeIo(email, name || handle || "", [
+    //     "promoteur-interesse",
+    //     "ambassadeur-ebookstudio",
+    //     "contact-influenceur",
+    //   ]);
+    // }
+    const systemeio = { ok: false, detail: "disabled" };
 
     return new Response(JSON.stringify({ success: true, systemeio: systemeio?.ok }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
