@@ -199,7 +199,7 @@ function renderNonOpener(baseUrl: string, email: string, firstName: string, step
 </table>
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;margin:24px 0"><tr><td align="center" bgcolor="#064e3b" style="border-radius:6px"><a href="${gift}" style="display:block;padding:17px 24px;color:#ffffff;text-decoration:none;font:700 17px/1.3 Arial,Helvetica,sans-serif;text-align:center">Récupérer mes 2 cadeaux (gratuit)</a></td></tr></table>
 <p style="margin:0 0 18px;font:15px/1.6 Arial,Helvetica,sans-serif;color:#4b5563">Pas de carte bancaire, pas d'engagement. Lisez-les, et si vous vous dites « je pourrais écrire ce livre-là », vous saurez quoi faire ensuite.</p>
-<p style="margin:0 0 18px">Si vous préférez essayer directement : <a href="${trial}" style="color:#008296">écrivez le premier chapitre de votre livre gratuitement</a>.</p>
+
 <p style="margin:0 0 6px">Bien à vous,<br><strong>Georges Boubet</strong><br>EbookStudio</p>
 <p style="margin:18px 0 0;padding:14px 0 0;border-top:1px solid #e5e7eb;font:15px/1.6 Arial,Helvetica,sans-serif;color:#4b5563">P.-S. — Répondez-moi en une ligne si quelque chose vous a fait hésiter : je lis tous les messages.</p>
 </td></tr>
