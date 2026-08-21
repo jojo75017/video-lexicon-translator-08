@@ -188,6 +188,8 @@ const AdminFunnelPage = lazy(() => import('./pages/admin/AdminFunnelPage'));
 const AdminPdfGiftsPage = lazy(() => import('./pages/admin/AdminPdfGiftsPage'));
 const AdminBetaCodesPage = lazy(() => import('./pages/admin/AdminBetaCodesPage'));
 const AdminBetaTestersPage = lazy(() => import('./pages/admin/AdminBetaTestersPage'));
+const AdminTemoignagesPage = lazy(() => import('./pages/admin/AdminTemoignagesPage'));
+
 const AdminPaymentsDashboardPage = lazy(() => import('./pages/admin/AdminPaymentsDashboardPage'));
 const AdminCleanupPage = lazy(() => import('./pages/admin/AdminCleanupPage'));
 const AdminPlansV3Page = lazy(() => import('./pages/admin/AdminPlansV3Page'));
@@ -580,6 +582,8 @@ const App = () => {
             <Route path="/admin/cadeaux-pdf" element={<AdminGate><AdminPdfGiftsPage /></AdminGate>} />
             <Route path="/admin/codes-beta" element={<AdminGate><AdminBetaCodesPage /></AdminGate>} />
             <Route path="/admin/beta-testeurs" element={<AdminGate><AdminBetaTestersPage /></AdminGate>} />
+            <Route path="/admin/temoignages" element={<AdminGate><AdminTemoignagesPage /></AdminGate>} />
+
             <Route path="/admin/cleanup" element={<AdminGate><Navigate to="/admin/plans-v3" replace /></AdminGate>} />
             <Route path="/admin/plans-v3" element={<AdminGate><AdminPlansV3Page /></AdminGate>} />
             <Route path="/admin/attente" element={<AdminGate><AdminAttentePage /></AdminGate>} />

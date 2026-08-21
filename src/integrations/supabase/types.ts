@@ -699,6 +699,7 @@ export type Database = {
           author_name: string
           book_title: string | null
           comment: string
+          consent_publication: boolean
           created_at: string
           email: string
           id: string
@@ -710,6 +711,7 @@ export type Database = {
           author_name: string
           book_title?: string | null
           comment: string
+          consent_publication?: boolean
           created_at?: string
           email: string
           id?: string
@@ -721,6 +723,7 @@ export type Database = {
           author_name?: string
           book_title?: string | null
           comment?: string
+          consent_publication?: boolean
           created_at?: string
           email?: string
           id?: string

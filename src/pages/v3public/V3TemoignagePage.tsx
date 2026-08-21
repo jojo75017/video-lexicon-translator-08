@@ -16,6 +16,7 @@ export default function V3TemoignagePage() {
   const [bookTitle, setBookTitle] = useState("");
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(5);
+  const [consent, setConsent] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -32,6 +33,11 @@ export default function V3TemoignagePage() {
       toast.error("Merci de remplir votre nom, votre email et votre commentaire.");
       return;
     }
+    if (!consent) {
+      toast.error("Merci de cocher l'accord de publication.");
+      return;
+    }
+
     setLoading(true);
     try {
       let photoUrl: string | null = null;
@@ -55,7 +61,9 @@ export default function V3TemoignagePage() {
         comment: comment.trim(),
         rating,
         photo_url: photoUrl,
+        consent_publication: true,
         approved: false,
+
       });
       if (error) throw error;
       setDone(true);
@@ -160,14 +168,27 @@ export default function V3TemoignagePage() {
           )}
         </div>
 
-        <Button type="submit" size="lg" disabled={loading} className="mt-2 font-bold" style={{ background: AMBER, color: INK }}>
+        <label className="flex items-start gap-3 rounded-xl border p-4 text-sm">
+          <input
+            type="checkbox"
+            checked={consent}
+            onChange={(e) => setConsent(e.target.checked)}
+            className="mt-0.5 h-4 w-4"
+          />
+          <span>
+            J'autorise EbookStudio à publier mon prénom, ma note, ma photo de livre et mon
+            commentaire sur ses pages de présentation. *
+          </span>
+        </label>
+
+        <Button type="submit" size="lg" disabled={loading || !consent} className="mt-2 font-bold" style={{ background: AMBER, color: INK }}>
           {loading ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : null}
           Envoyer mon témoignage
         </Button>
         <p className="text-xs text-muted-foreground">
-          En envoyant ce formulaire, vous nous autorisez à publier votre prénom, votre photo de
-          livre et votre commentaire sur nos pages de présentation.
+          Votre témoignage est vérifié par nos soins avant toute publication.
         </p>
+
       </form>
     </div>
   );
