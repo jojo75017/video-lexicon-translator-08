@@ -116,7 +116,7 @@ export default function ReadingGate({ surface, children, compact = false, title 
   }, [params]);
 
   useEffect(() => {
-    if (!unlocked) void trackGate('reading_gate_view', surface);
+    if (!unlocked) void trackGate('view', surface);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [surface]);
 
@@ -174,7 +174,7 @@ export default function ReadingGate({ surface, children, compact = false, title 
       } catch {
         // silencieux
       }
-      void trackGate('reading_gate_unlock', surface);
+      void trackGate('unlock', surface);
       setJustUnlocked(true);
       setUnlocked(true);
     } catch (err) {
