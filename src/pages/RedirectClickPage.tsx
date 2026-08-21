@@ -43,8 +43,9 @@ const RedirectClickPage = () => {
       }
     }
 
-    const timer = window.setTimeout(() => window.location.replace(finalUrl), 250);
-    return () => window.clearTimeout(timer);
+    // Redirection immédiate : sendBeacon survit à la navigation, inutile d'attendre.
+    window.location.replace(finalUrl);
+
 
   }, []);
 
