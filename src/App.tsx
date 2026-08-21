@@ -75,6 +75,7 @@ const MessageAudioPage = lazy(() => import('./pages/launch/MessageAudioPage'));
 const FicheHistoirePage = lazy(() => import('./pages/launch/FicheHistoirePage'));
 const FichePreuvePage = lazy(() => import('./pages/launch/FichePreuvePage'));
 const FicheDernierJourPage = lazy(() => import('./pages/launch/FicheDernierJourPage'));
+const MethodePage = lazy(() => import('./pages/launch/MethodePage'));
 const AdminLancementPage = lazy(() => import('./pages/admin/AdminLancementPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
