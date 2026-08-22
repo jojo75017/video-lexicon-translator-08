@@ -223,6 +223,32 @@ function renderNonOpener(baseUrl: string, email: string, firstName: string, step
 </table></td></tr></table><img src="${pixel}" width="1" height="1" alt="" style="display:none"></body></html>`;
 }
 
+/** Email personnel aux cliqueurs non-acheteurs : une seule question, un seul lien.
+ *  Objectif : obtenir des réponses (comprendre le frein) ET convertir les hésitants. */
+function renderQuestionCliqueur(baseUrl: string, email: string, firstName: string) {
+  const tpl = "question-cliqueurs";
+  const link = trackedUrl(email, 1, `${CHECKOUT}?src=${CAMPAIGN}-question&email=${encodeURIComponent(email)}`, "reprise", tpl);
+  const unsubscribe = `${baseUrl}/functions/v1/unsubscribe?email=${encodeURIComponent(email)}&seq=all`;
+  const pixel = `${baseUrl}/functions/v1/track-email-open?e=${encodeURIComponent(email)}&s=1&t=${tpl}`;
+  return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#f6f7f8;padding:24px 10px">
+<div style="display:none;font-size:1px;color:#f6f7f8;max-height:0;overflow:hidden">Vous avez regardé, et vous n'êtes pas allé au bout. Je peux vous aider ?</div>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse"><tr><td align="center">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width:600px;width:100%;background:#ffffff;border:1px solid #e5e7eb;border-collapse:collapse">
+<tr><td style="background:#008296;padding:18px 28px;color:#ffffff;font:700 22px Arial,Helvetica,sans-serif">EbookStudio</td></tr>
+<tr><td style="padding:26px 28px;color:#232F3E;font:16px/1.65 Arial,Helvetica,sans-serif">
+<p style="margin:0 0 18px">Bonjour${firstName ? ` ${firstName}` : ""},</p>
+<p style="margin:0 0 18px">Vous avez regardé EbookStudio ces derniers jours… et vous n'êtes pas allé jusqu'au bout. C'est tout à fait normal — et c'est exactement pour ça que je vous écris.</p>
+<p style="margin:0 0 18px"><strong>Qu'est-ce qui vous a fait hésiter ?</strong> Le prix, une question sur l'outil, un doute sur vos droits, la peur que ce soit trop technique ?</p>
+<p style="margin:0 0 18px">Répondez simplement à cet email, même en une ligne. Je lis et je réponds personnellement à chaque message — souvent, une réponse de deux phrases suffit à débloquer la situation.</p>
+<p style="margin:0 0 18px">Et si c'était juste le manque de temps, votre accès à 47 € est toujours ouvert :</p>
+${ctaButton(link, "Reprendre là où je m'étais arrêté")}
+<p style="margin:0 0 6px">Bien à vous,<br><strong>Georges Boubet</strong><br>EbookStudio</p>
+<p style="margin:18px 0 0;padding:14px 0 0;border-top:1px solid #e5e7eb;font:15px/1.6 Arial,Helvetica,sans-serif;color:#4b5563">P.-S. — L'accès à vie à 47 € reste ouvert jusqu'au 31 août. Après, ce sera uniquement par abonnement mensuel.</p>
+</td></tr>
+<tr><td style="padding:18px 24px;background:#f6f7f8;text-align:center;color:#68737d;font:12px/1.6 Arial,Helvetica,sans-serif">Vous recevez cet email car vous avez manifesté un intérêt pour EbookStudio.<br><a href="${unsubscribe}" style="color:#008296">Se désinscrire de tous les emails marketing</a></td></tr>
+</table></td></tr></table><img src="${pixel}" width="1" height="1" alt="" style="display:none"></body></html>`;
+}
+
 async function isAdmin(req: Request, baseUrl: string) {
   const authorization = req.headers.get("Authorization");
   if (!authorization?.startsWith("Bearer ")) return false;
@@ -454,6 +480,66 @@ Deno.serve(async (req) => {
         sentCount++;
       }
       return respond({ success: true, mode, template: resendTemplate, delay_hours: delayHours, sent: sentCount, targets: targets.length });
+    }
+
+    // Relance personnelle des cliqueurs non-acheteurs : « Une question avant de vous lancer ? »
+    if (mode === "question_cliqueurs") {
+      const QUESTION_TEMPLATE = "question-cliqueurs";
+      const QUESTION_SUBJECT = "Une question avant de vous lancer ?";
+      const limit = Math.min(Number(body.batch_size || 100), 200);
+
+      // === MODE TEST === : envoi uniquement à la liste fournie, préfixe [TEST],
+      // gabarit journalisé en `-test` pour ne pas bloquer l'envoi réel ensuite.
+      if (body.test_mode) {
+        const rawList: string[] = Array.isArray(body.test_emails)
+          ? body.test_emails
+          : String(body.test_emails || "").split(/[,;\s]+/);
+        const testTargets = Array.from(new Set(rawList.map((e) => normalize(String(e || ""))).filter(isEmail))).slice(0, 20);
+        if (!testTargets.length) return respond({ success: false, mode, error: "Aucune adresse de test valide fournie (test_emails)." }, 400);
+        let testSent = 0;
+        const results: Array<{ email: string; ok: boolean; error?: string }> = [];
+        for (const email of testTargets) {
+          const html = renderQuestionCliqueur(baseUrl, email, "Georges");
+          const result = await sendResendEmailThrottled({ from: FROM_CAMPAIGN, to: [email], subject: `[TEST] ${QUESTION_SUBJECT}`, html, reply_to: REPLY_TO });
+          await db.from("email_send_log").insert({ recipient_email: email, template_name: `${QUESTION_TEMPLATE}-test`, message_id: result.id || `${CAMPAIGN}-${QUESTION_TEMPLATE}-test-${email}`, provider_message_id: result.id || null, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
+          results.push({ email, ok: result.ok, error: result.ok ? undefined : `HTTP ${result.status || ""}: ${result.detail || ""}` });
+          if (result.ok) testSent++;
+        }
+        return respond({ success: true, mode, test_mode: true, sent: testSent, targets: testTargets.length, results });
+      }
+
+      const { data: clicks } = await db.from("email_clicks").select("prospect_email").limit(5000);
+      const { data: alreadySent } = await db.from("email_send_log").select("recipient_email").eq("template_name", QUESTION_TEMPLATE).in("status", ["sent", "delivered"]);
+      const { data: paidOrders } = await db.from("funnel_orders").select("email").eq("status", "paid");
+      const { data: profilesRows } = await db.from("sales_prospects").select("email,first_name,unsubscribed,status").limit(5000);
+
+      const done = new Set((alreadySent || []).map((r) => normalize(r.recipient_email || "")));
+      const paid = new Set((paidOrders || []).map((r) => normalize(r.email || "")));
+      const profiles = new Map((profilesRows || []).map((r) => [normalize(r.email || ""), r]));
+
+      const targets: string[] = [];
+      for (const row of clicks || []) {
+        const email = normalize(row.prospect_email || "");
+        if (!isEmail(email) || targets.includes(email)) continue;
+        if (done.has(email) || paid.has(email)) continue;
+        const profile = profiles.get(email);
+        if (profile && (profile.unsubscribed === true || profile.status !== "active")) continue;
+        targets.push(email);
+        if (targets.length >= limit) break;
+      }
+
+      if (body.dry_run) return respond({ success: true, mode, template: QUESTION_TEMPLATE, would_send: targets.length });
+
+      let sentCount = 0;
+      for (const email of targets) {
+        const profile = profiles.get(email);
+        const html = renderQuestionCliqueur(baseUrl, email, (profile?.first_name as string) || "");
+        const result = await sendResendEmailThrottled({ from: FROM_CAMPAIGN, to: [email], subject: QUESTION_SUBJECT, html, reply_to: REPLY_TO });
+        await db.from("email_send_log").insert({ recipient_email: email, template_name: QUESTION_TEMPLATE, message_id: result.id || `${CAMPAIGN}-${QUESTION_TEMPLATE}-${email}`, provider_message_id: result.id || null, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
+        if (!result.ok) { if (isQuotaExhausted()) break; continue; }
+        sentCount++;
+      }
+      return respond({ success: true, mode, template: QUESTION_TEMPLATE, sent: sentCount, targets: targets.length });
     }
 
     // Relance des commandes restées en attente depuis plus de 2 heures.

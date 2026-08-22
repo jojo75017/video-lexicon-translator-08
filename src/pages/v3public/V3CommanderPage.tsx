@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import {
-  Check, Loader2, ShieldCheck, Zap, Infinity as InfinityIcon, CreditCard,
-  Lock, Mail, ArrowRight, RotateCcw, Star, Quote,
+  Check, Loader2, ShieldCheck, CreditCard,
+  Lock, Mail, ArrowRight, RotateCcw, Star, Quote, Sparkles, Clock, Infinity as InfinityIcon,
 } from "lucide-react";
 
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
@@ -14,11 +14,8 @@ import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { COMMANDER_URL } from "@/data/externalLinks";
 import { V3_LAUNCH_BONUSES, V3_BONUSES_TOTAL_VALUE } from "@/data/v3Launch";
 import { trackCaptureEvent } from "@/lib/captureTracking";
-import ActiveUsersPanel from "@/components/sales/ActiveUsersPanel";
-import { V3EngineStrip, V3EngineGrid } from "@/components/v3public/V3EngineBanner";
-import V3LaunchBanner from "@/components/v3public/V3LaunchBanner";
-import Niches10Offer from "@/components/marketing/Niches10Offer";
-import heroBooks from "@/assets/commander-hero-books.jpg";
+import { FicheCountdown } from "@/components/launch/FicheShell";
+import mockup from "@/assets/methode-hero-mockup.jpg";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const FAQ: Array<{ q: string; a: string }> = [
@@ -56,18 +53,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
 ];
 
-
-
-
 const BONUS_TOTAL = V3_BONUSES_TOTAL_VALUE;
-
-
-const EMERALD = "#064e3b";
-const GOLD = "#c9a84c";
-const GOLD_LIGHT = "#f0d78c";
-const PAPER = "#fbfaf6";
-const INK = "#1a1a1a";
-const SERIF = "'Instrument Serif', Georgia, serif";
 
 type PlanId = "v2_1x" | "v2_2x" | "v2_3x";
 
@@ -78,15 +64,14 @@ const PLANS: Array<{ id: PlanId; label: string; sub: string; badge?: string }> =
 ];
 
 const INCLUDED = [
-  "Génération complète de vos livres (plan, chapitres, relecture)",
-  "Export Word & PDF prêts pour Amazon KDP, avec table des matières professionnelle",
+  "Génération complète de vos livres (plan, chapitres, relecture 4 passes)",
+  "Export Word & PDF prêts pour Amazon KDP, table des matières professionnelle",
   "Couvertures : Cover Studio (dos et 4e de couverture calculés)",
   "Livres illustrés enfants 3-7 ans et albums carrés",
   "Fiche KDP : description 4000 caractères, mots-clés, catégories, bio auteur",
-  "Livres audio (voix de synthèse professionnelle)",
-  "Forum communauté + guides de publication",
+  "Livres audio (voix de synthèse professionnelle) et traductions 10 langues",
   "Accès à vie : aucun abonnement, aucune date d'expiration",
-  "V3 incluse sans surcoût : tous les nouveaux outils vous seront ajoutés automatiquement",
+  "V3 incluse sans surcoût : tous les nouveaux outils ajoutés automatiquement",
 ];
 
 interface Testimonial {
@@ -98,29 +83,10 @@ interface Testimonial {
   created_at?: string | null;
 }
 
-/** Blocs de réassurance : les trois objections qui bloquent le paiement. */
-const REASSURANCE = [
-  {
-    icon: RotateCcw,
-    title: "Garantie 30 jours",
-    body: "Si l'outil ne vous convient pas, écrivez-moi dans les 30 jours : vous êtes remboursé, sans justification à fournir.",
-  },
-  {
-    icon: CreditCard,
-    title: "PayPal accepté",
-    body: "Sur la page de paiement, choisissez PayPal ou la carte bancaire. Le paiement en 2 ou 3 fois reste possible.",
-  },
-  {
-    icon: Lock,
-    title: "Aucun abonnement",
-    body: "Un seul paiement, accès conservé, rien à résilier. À partir du 1er octobre, l'accès à vie n'existera plus.",
-  },
-];
+/** Fin de l'offre 47 € : 31 août 2026, 23 h 59 (heure de Paris) — aligné sur
+ *  le compte à rebours de la page /methode et des emails. */
+const OFFER_END = new Date("2026-08-31T21:59:59Z");
 
-/** Fin de l'accès à vie : 31 août 2026, 23 h 59 (heure de Paris). */
-const OFFER_END = new Date("2026-09-30T21:59:00Z");
-
-/** Compte à rebours sobre : jours et heures restants, sans clignotement. */
 function OfferCountdown() {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -134,15 +100,19 @@ function OfferCountdown() {
   return (
     <div
       className="mb-4 flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-bold"
-      style={{ borderColor: `${EMERALD}33`, background: `${EMERALD}0a`, color: EMERALD }}
+      style={{ borderColor: "rgba(212,175,55,0.35)", background: "rgba(212,175,55,0.08)", color: "var(--ds-gold-light)" }}
     >
-      ⏳ Il reste {days} jour{days > 1 ? "s" : ""} et {hours} h avant la fin de l'accès à vie
+      <Clock className="h-3.5 w-3.5" /> Il reste {days} jour{days > 1 ? "s" : ""} et {hours} h avant la fin de l'accès à vie
     </div>
   );
 }
 
+/**
+ * Page de commande — même identité visuelle que la page de vente /methode
+ * (bleu nuit + doré + orange), un seul objectif : le paiement.
+ * Aucune distraction : pas de popup, pas de cadeau, pas de lien concurrent.
+ */
 export default function V3CommanderPage() {
-
   const [params] = useSearchParams();
   const src = params.get("src") || undefined;
   const ref = params.get("ref") || params.get("aff") || undefined;
@@ -174,9 +144,8 @@ export default function V3CommanderPage() {
 
   // Suivi du tunnel : arrivée sur la page de commande.
   useEffect(() => {
-    void trackCaptureEvent('commander', 'view');
+    void trackCaptureEvent("commander", "view");
   }, []);
-
 
   const startPayment = async () => {
     const e = email.trim().toLowerCase();
@@ -184,8 +153,7 @@ export default function V3CommanderPage() {
       toast.error("Merci de saisir un email valide — c'est lui qui ouvrira votre accès.");
       return;
     }
-    // Suivi du tunnel : clic sur le bouton de paiement (avant l'appel Stripe).
-    void trackCaptureEvent('commander', 'checkout_click', { leadMagnet: plan });
+    void trackCaptureEvent("commander", "checkout_click", { leadMagnet: plan });
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("v3-pack-checkout", {
@@ -202,17 +170,15 @@ export default function V3CommanderPage() {
         let message = error.message;
         const context = error.context;
         if (context instanceof Response) {
-          const payload = await context.clone().json().catch(() => null) as { error?: string } | null;
+          const payload = (await context.clone().json().catch(() => null)) as { error?: string } | null;
           if (payload?.error) message = payload.error;
         }
         throw new Error(message);
       }
       const secret = (data as { clientSecret?: string })?.clientSecret;
       if (!secret) throw new Error("Session de paiement indisponible.");
-      // Suivi du tunnel : le formulaire Stripe s'affiche réellement.
-      void trackCaptureEvent('commander', 'checkout_ready', { leadMagnet: plan });
+      void trackCaptureEvent("commander", "checkout_ready", { leadMagnet: plan });
       setClientSecret(secret);
-
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Paiement impossible pour le moment.");
     } finally {
@@ -221,142 +187,134 @@ export default function V3CommanderPage() {
   };
 
   return (
-    <main className="min-h-screen" style={{ background: PAPER, color: INK }}>
+    <main className="dark-sales min-h-screen">
       <SeoHead
         title="Commander EbookStudio Pro — 47 € accès à vie (offre août-septembre)"
         description="Accès à vie à EbookStudio Pro pour 47 € au lieu de 59 €, jusqu'au 31 août. Aucun abonnement. La V3 est incluse sans surcoût. Carte bancaire ou PayPal, accès immédiat."
         canonical={COMMANDER_URL}
       />
       <PaymentTestModeBanner />
-      <V3LaunchBanner compact />
 
-      <section className="mx-auto max-w-6xl px-4 py-12 md:py-16">
-        {/* HERO — nouvelle mise en page éditoriale */}
-        <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
+      {/* Header minimal — identique à la page /methode */}
+      <header className="border-b border-[var(--ds-border)] bg-[var(--ds-bg)]/80 backdrop-blur">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-4">
+          <span className="text-lg font-bold tracking-tight text-[var(--ds-text)]">EbookStudio</span>
+          <FicheCountdown dark />
+        </div>
+      </header>
+
+      <div className="mx-auto max-w-6xl px-5 pb-16">
+        {/* HERO compact : la vente est faite sur /methode, ici on finalise */}
+        <section className="grid items-center gap-8 pt-10 md:pt-14 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
             <span
-              className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em]"
-              style={{ borderColor: `${GOLD}66`, color: "#8a6d16", background: `${GOLD}12` }}
+              className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider"
+              style={{ background: "var(--ds-orange-soft)", color: "var(--ds-orange)" }}
             >
-              <InfinityIcon className="h-3.5 w-3.5" /> Accès à vie · sans abonnement
+              <Sparkles className="h-3.5 w-3.5" /> Dernière étape avant votre premier livre
             </span>
 
-            <h1
-              className="mt-6 text-4xl leading-[1.05] md:text-6xl"
-              style={{ fontFamily: SERIF, color: EMERALD }}
-            >
-              Écrivez et publiez<br />votre livre sur<br />
-              <em>Amazon KDP</em>
+            <h1 className="mt-5 text-3xl font-extrabold leading-tight md:text-5xl">
+              Votre accès à vie à EbookStudio,{" "}
+              <span style={{ color: "var(--ds-gold)" }}>pour 47 € une seule fois.</span>
             </h1>
 
-            <div className="mt-7 h-px w-24" style={{ background: `${EMERALD}33` }} />
-
-            <p className="mt-6 max-w-xl text-base leading-relaxed text-slate-700">
-              EbookStudio rédige, met en page, habille et référence vos livres avec
-              l'assistance IA complète. Du sommaire vide au fichier prêt à téléverser.
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-[var(--ds-text-muted)]">
+              Le système complet que vous venez de découvrir : 15 agents d'IA qui écrivent,
+              corrigent, habillent et préparent votre livre pour Amazon KDP. Paiement unique,
+              accès immédiat, garantie 30 jours.
             </p>
 
-            <a
-              href="#paiement"
-              className="mt-8 inline-flex items-center gap-2 rounded-xl px-7 py-4 text-sm font-black transition-transform hover:-translate-y-0.5"
-              style={{ background: `linear-gradient(90deg, ${GOLD_LIGHT}, ${GOLD})`, color: INK }}
-            >
-              Obtenir l'accès à vie — 47 € <ArrowRight className="h-4 w-4" />
-            </a>
-
-            <p className="mt-4 text-sm text-slate-600">
-              <span className="line-through">59 €</span> jusqu'au 31 août · garanti 30 jours
-            </p>
-
-            <div className="mt-10 border-t pt-6" style={{ borderColor: `${EMERALD}1a` }}>
-              <dl className="grid grid-cols-3 gap-4">
-                {[
-                  { k: "Paiement", v: "unique, à vie" },
-                  { k: "Accès", v: "immédiat" },
-                  { k: "Garantie", v: "30 jours" },
-                ].map((s) => (
-                  <div key={s.k}>
-                    <dt className="text-[10px] font-bold uppercase tracking-[0.16em]" style={{ color: "#8a6d16" }}>
-                      {s.k}
-                    </dt>
-                    <dd className="mt-1 text-lg" style={{ fontFamily: SERIF, color: EMERALD }}>{s.v}</dd>
-                  </div>
-                ))}
-              </dl>
+            <div className="mt-6 flex flex-wrap items-baseline gap-3">
+              <span className="text-4xl font-black" style={{ color: "var(--ds-gold)" }}>47 €</span>
+              <span className="text-lg text-[var(--ds-text-muted)] line-through">59 €</span>
+              <span
+                className="rounded-full px-3 py-1 text-sm font-bold"
+                style={{ background: "var(--ds-orange-soft)", color: "var(--ds-orange)" }}
+              >
+                -20 %
+              </span>
+              <span className="text-sm text-[var(--ds-text-muted)]">· paiement unique, accès à vie</span>
             </div>
-          </div>
 
-          <div className="rounded-3xl border bg-white p-3 md:p-4" style={{ borderColor: `${GOLD}44` }}>
-            <img
-              src={heroBooks}
-              alt="Trois livres reliés vert foncé au titre doré, publiés avec EbookStudio"
-              width={1200}
-              height={912}
-              className="w-full rounded-2xl object-cover"
-            />
-          </div>
-        </div>
-
-        {/* CADEAU : 10 niches offertes, affichées immédiatement */}
-        <Niches10Offer surface="commander" hook="commander" variant="hero" className="mt-10" />
-
-        {/* MOTEUR MULTI-MODÈLES */}
-        <div className="mt-14 overflow-hidden rounded-2xl">
-          <V3EngineStrip />
-        </div>
-        <V3EngineGrid className="!px-0 !py-8" />
-
-
-
-
-
-        <div className="mt-10 grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-          {/* Colonne offre */}
-          <div className="rounded-2xl border bg-white p-6 md:p-8" style={{ borderColor: `${EMERALD}22` }}>
-            <h2 className="text-xl font-black" style={{ color: EMERALD }}>Ce qui est inclus</h2>
-            <ul className="mt-5 space-y-3">
-              {INCLUDED.map((item) => (
-                <li key={item} className="flex gap-3 text-sm text-slate-700">
-                  <Check className="mt-0.5 h-4 w-4 flex-shrink-0" style={{ color: GOLD }} />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-
-            <div className="mt-7 grid gap-3 sm:grid-cols-3">
+            <dl className="mt-8 grid grid-cols-3 gap-4 border-t pt-6" style={{ borderColor: "var(--ds-border)" }}>
               {[
-                { icon: Zap, t: "Accès immédiat", d: "Dès le paiement validé" },
-                { icon: ShieldCheck, t: "Paiement sécurisé", d: "Carte bancaire & PayPal" },
-                { icon: Lock, t: "Sans engagement", d: "Aucun prélèvement caché" },
-              ].map((b) => (
-                <div key={b.t} className="rounded-xl border p-4" style={{ borderColor: `${EMERALD}18` }}>
-                  <b.icon className="h-4 w-4" style={{ color: EMERALD }} />
-                  <div className="mt-2 text-sm font-bold" style={{ color: EMERALD }}>{b.t}</div>
-                  <div className="text-xs text-slate-600">{b.d}</div>
+                { k: "Paiement", v: "unique, à vie" },
+                { k: "Accès", v: "immédiat" },
+                { k: "Garantie", v: "30 jours" },
+              ].map((s) => (
+                <div key={s.k}>
+                  <dt className="text-[10px] font-bold uppercase tracking-[0.16em]" style={{ color: "var(--ds-gold)" }}>
+                    {s.k}
+                  </dt>
+                  <dd className="mt-1 text-base font-bold text-[var(--ds-text)]">{s.v}</dd>
                 </div>
               ))}
+            </dl>
+          </div>
+
+          <div className="mx-auto w-full max-w-sm">
+            <img
+              src={mockup}
+              alt="Mockup d'un livre premium créé avec EbookStudio"
+              width={1024}
+              height={1024}
+              className="ds-glow w-full rounded-2xl"
+              loading="eager"
+            />
+          </div>
+        </section>
+
+        {/* OFFRE + PAIEMENT */}
+        <section className="mt-12 grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+          {/* Colonne offre */}
+          <div className="space-y-5">
+            <div className="ds-card p-6 md:p-8">
+              <h2 className="text-xl font-bold">Ce qui est inclus</h2>
+              <ul className="mt-5 space-y-3">
+                {INCLUDED.map((item) => (
+                  <li key={item} className="flex gap-3 text-sm leading-relaxed">
+                    <Check className="mt-0.5 h-4 w-4 flex-shrink-0" style={{ color: "var(--ds-success)" }} />
+                    <span className="text-[var(--ds-text-muted)]">{item}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                {[
+                  { icon: InfinityIcon, t: "Accès à vie", d: "Aucun abonnement" },
+                  { icon: ShieldCheck, t: "Paiement sécurisé", d: "Carte & PayPal" },
+                  { icon: Lock, t: "Sans engagement", d: "Rien à résilier" },
+                ].map((b) => (
+                  <div key={b.t} className="rounded-xl border p-4" style={{ borderColor: "var(--ds-border)", background: "var(--ds-bg-soft)" }}>
+                    <b.icon className="h-4 w-4" style={{ color: "var(--ds-gold)" }} />
+                    <div className="mt-2 text-sm font-bold text-[var(--ds-text)]">{b.t}</div>
+                    <div className="text-xs text-[var(--ds-text-muted)]">{b.d}</div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* Bonus de lancement : la valeur monte, le prix ne bouge pas */}
-            <div className="mt-7 rounded-xl border p-5" style={{ borderColor: `${GOLD}55`, background: `${GOLD}0d` }}>
-              <h3 className="text-sm font-black" style={{ color: EMERALD }}>
+            {/* Bonus de lancement */}
+            <div className="ds-card p-6" style={{ borderColor: "rgba(212,175,55,0.35)" }}>
+              <h3 className="text-sm font-bold" style={{ color: "var(--ds-gold)" }}>
                 Offerts avec votre commande — {BONUS_TOTAL} € de valeur
               </h3>
               <ul className="mt-3 space-y-2.5">
                 {V3_LAUNCH_BONUSES.map((b) => (
-                  <li key={b.title} className="flex gap-3 text-sm text-slate-700">
+                  <li key={b.title} className="flex gap-3 text-sm">
                     <span aria-hidden className="text-base leading-none">{b.emoji}</span>
                     <span>
-                      <span className="font-bold" style={{ color: EMERALD }}>{b.title}</span>
-                      <span className="block text-xs text-slate-600">{b.desc}</span>
+                      <span className="font-bold text-[var(--ds-text)]">{b.title}</span>
+                      <span className="block text-xs text-[var(--ds-text-muted)]">{b.desc}</span>
                     </span>
                   </li>
                 ))}
-                <li className="flex gap-3 text-sm text-slate-700">
+                <li className="flex gap-3 text-sm">
                   <span aria-hidden className="text-base leading-none">🤝</span>
                   <span>
-                    <span className="font-bold" style={{ color: EMERALD }}>Démarrage accompagné</span>
-                    <span className="block text-xs text-slate-600">
+                    <span className="font-bold text-[var(--ds-text)]">Démarrage accompagné</span>
+                    <span className="block text-xs text-[var(--ds-text-muted)]">
                       Envoyez-moi votre sujet après votre commande : je crée votre premier sommaire avec vous.
                     </span>
                   </span>
@@ -364,92 +322,69 @@ export default function V3CommanderPage() {
               </ul>
             </div>
 
-            {/* Le calcul, écrit noir sur blanc */}
-            <div className="mt-5 rounded-xl border p-5" style={{ borderColor: `${EMERALD}22` }}>
-              <h3 className="text-sm font-black" style={{ color: EMERALD }}>Pourquoi maintenant</h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-700">
-                À partir du 1<sup>er</sup> octobre, EbookStudio passe uniquement en abonnement :
-                à partir de 27 € par mois, soit <strong>324 € la première année</strong>. Aujourd'hui, c'est
-                <strong> 47 € une seule fois</strong>, conservés à vie, mises à jour comprises.
+            {/* Garantie — le bloc qui rassure au moment de payer */}
+            <div className="ds-card flex gap-4 p-6">
+              <span
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
+                style={{ background: "rgba(34,197,94,0.12)" }}
+              >
+                <ShieldCheck className="h-6 w-6 text-[var(--ds-success)]" />
+              </span>
+              <p className="text-sm leading-relaxed text-[var(--ds-text-muted)]">
+                <strong className="text-[var(--ds-text)]">30 jours satisfait ou remboursé.</strong>{" "}
+                Si l'atelier ne correspond pas à ce que vous attendiez, un simple email suffit :
+                remboursement intégral, sans justification. À 47 €, la vraie question n'est pas le
+                risque financier. C'est :{" "}
+                <span className="text-[var(--ds-text)]">est-ce que vous voulez enfin voir votre livre en ligne ?</span>
               </p>
             </div>
 
-            <p className="mt-6 text-xs text-slate-500">
-              Une question avant de commander ? Écrivez à{" "}
-              <a href="mailto:contact@ebookstudio.fr" className="underline" style={{ color: EMERALD }}>
-                contact@ebookstudio.fr
-              </a>{" "}
-              — réponse sous 24 h ouvrées.
-            </p>
+            {/* Pourquoi maintenant */}
+            <div className="ds-card p-6">
+              <h3 className="text-sm font-bold" style={{ color: "var(--ds-gold)" }}>Pourquoi maintenant</h3>
+              <p className="mt-2 text-sm leading-relaxed text-[var(--ds-text-muted)]">
+                À partir du 1<sup>er</sup> octobre, EbookStudio passe uniquement en abonnement :
+                à partir de 27 € par mois, soit <strong className="text-[var(--ds-text)]">324 € la première année</strong>.
+                Aujourd'hui, c'est <strong className="text-[var(--ds-text)]">47 € une seule fois</strong>,
+                conservés à vie, mises à jour comprises.
+              </p>
+            </div>
           </div>
-
 
           {/* Colonne paiement */}
           <div
             id="paiement"
-            className="scroll-mt-24 rounded-2xl border p-6 md:p-8"
-
-            style={{ background: "#fff", borderColor: `${GOLD}66`, boxShadow: "0 26px 60px -34px rgba(6,78,59,0.45)" }}
+            className="ds-card scroll-mt-24 p-6 md:p-8"
+            style={{ borderColor: "rgba(212,175,55,0.45)", boxShadow: "0 0 60px rgba(212,175,55,0.10)" }}
           >
             {!clientSecret ? (
               <>
                 <OfferCountdown />
 
-                {/* Preuves vérifiables — aucun témoignage fabriqué */}
-                <ul className="mb-4 grid gap-2 text-[13px]" style={{ color: "#3f3a31" }}>
-                  {[
-                    "Accès immédiat à votre espace après le paiement",
-                    "Paiement sécurisé par carte (Stripe) ou PayPal",
-                    "Mises à jour incluses à vie, sans supplément",
-                    "Le pack des 10 niches offert dès l'inscription",
-                    "Une réponse personnelle par email sous 24 h ouvrées",
-                  ].map((fact) => (
-                    <li key={fact} className="flex items-start gap-2">
-                      <span
-                        aria-hidden
-                        className="mt-[3px] grid h-4 w-4 shrink-0 place-items-center rounded-full text-[10px] font-bold"
-                        style={{ background: `${EMERALD}18`, color: EMERALD }}
-                      >
-                        ✓
-                      </span>
-                      <span>{fact}</span>
-                    </li>
-                  ))}
-                </ul>
-
-
-                <div
-                  className="mb-4 rounded-xl border px-4 py-3 text-sm font-bold"
-                  style={{ background: `${GOLD}14`, borderColor: `${GOLD}55`, color: "#8a6d16" }}
-                >
-                  🎁 La V3 est incluse sans surcoût : tous les nouveaux outils et la nouvelle interface vous seront ajoutés automatiquement.
-                </div>
-
                 <div className="flex items-baseline gap-2">
-                  <span className="text-lg font-bold text-slate-400 line-through">59 €</span>
-                  <span className="text-4xl font-black" style={{ color: EMERALD }}>47 €</span>
-                  <span className="text-sm text-slate-500">paiement unique</span>
+                  <span className="text-lg font-bold text-[var(--ds-text-muted)] line-through">59 €</span>
+                  <span className="text-4xl font-black" style={{ color: "var(--ds-gold)" }}>47 €</span>
+                  <span className="text-sm text-[var(--ds-text-muted)]">paiement unique</span>
                 </div>
-                <p className="mt-1 text-[11px] font-bold" style={{ color: "#8a6d16" }}>
+                <p className="mt-1 text-[11px] font-bold" style={{ color: "var(--ds-gold)" }}>
                   Offre valable jusqu'au 31 août — ensuite 59 €.
                 </p>
 
-
-                <label className="mt-6 block text-xs font-bold uppercase tracking-wide text-slate-500">
+                <label className="mt-6 block text-xs font-bold uppercase tracking-wide text-[var(--ds-text-muted)]">
                   Votre email
                 </label>
                 <div className="relative mt-1.5">
-                  <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--ds-text-muted)]" />
                   <input
                     type="email"
                     value={email}
                     onChange={(ev) => setEmail(ev.target.value)}
                     placeholder="vous@email.com"
-                    className="w-full rounded-xl border px-10 py-3 text-sm outline-none focus:border-emerald-700"
-                    style={{ borderColor: `${EMERALD}33` }}
+                    className="w-full rounded-xl border px-10 py-3 text-sm outline-none focus:border-[var(--ds-gold)]"
+                    style={{ background: "var(--ds-bg-soft)", borderColor: "var(--ds-border)", color: "var(--ds-text)" }}
                   />
                 </div>
-                <p className="mt-1.5 text-[11px] text-slate-500">
+                <p className="mt-1.5 text-[11px] text-[var(--ds-text-muted)]">
                   C'est avec cet email que votre accès sera créé.
                 </p>
 
@@ -463,46 +398,53 @@ export default function V3CommanderPage() {
                         onClick={() => setPlan(opt.id)}
                         className="flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition-all"
                         style={{
-                          borderColor: active ? GOLD : `${EMERALD}1f`,
-                          background: active ? `${GOLD}14` : "transparent",
+                          borderColor: active ? "var(--ds-gold)" : "var(--ds-border)",
+                          background: active ? "rgba(212,175,55,0.10)" : "transparent",
                         }}
                       >
                         <span>
-                          <span className="block text-sm font-bold" style={{ color: EMERALD }}>{opt.label}</span>
-                          <span className="block text-[11px] text-slate-600">{opt.sub}</span>
+                          <span className="block text-sm font-bold text-[var(--ds-text)]">{opt.label}</span>
+                          <span className="block text-[11px] text-[var(--ds-text-muted)]">{opt.sub}</span>
                         </span>
                         {opt.badge && !active && (
-                          <span className="rounded-full px-2 py-0.5 text-[10px] font-bold" style={{ background: `${GOLD}22`, color: "#8a6d16" }}>
+                          <span
+                            className="rounded-full px-2 py-0.5 text-[10px] font-bold"
+                            style={{ background: "var(--ds-orange-soft)", color: "var(--ds-orange)" }}
+                          >
                             {opt.badge}
                           </span>
                         )}
-                        {active && <Check className="h-4 w-4" style={{ color: GOLD }} />}
+                        {active && <Check className="h-4 w-4" style={{ color: "var(--ds-gold)" }} />}
                       </button>
                     );
                   })}
                 </div>
 
                 {/* Réassurance juste au-dessus du bouton : c'est là qu'on hésite */}
-                <ul className="mt-5 space-y-1.5 rounded-xl border p-4 text-xs text-slate-700" style={{ borderColor: `${EMERALD}1f`, background: `${EMERALD}08` }}>
+                <ul
+                  className="mt-5 space-y-1.5 rounded-xl border p-4 text-xs text-[var(--ds-text-muted)]"
+                  style={{ borderColor: "var(--ds-border)", background: "var(--ds-bg-soft)" }}
+                >
                   <li className="flex items-center gap-2">
-                    <RotateCcw className="h-3.5 w-3.5 shrink-0" style={{ color: EMERALD }} />
-                    <span><strong>Garantie 30 jours</strong> — remboursé sur simple demande, sans justification.</span>
+                    <RotateCcw className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--ds-success)" }} />
+                    <span><strong className="text-[var(--ds-text)]">Garantie 30 jours</strong> — remboursé sur simple demande, sans justification.</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CreditCard className="h-3.5 w-3.5 shrink-0" style={{ color: EMERALD }} />
-                    <span><strong>PayPal ou carte bancaire</strong>, en 1, 2 ou 3 fois.</span>
+                    <CreditCard className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--ds-gold)" }} />
+                    <span><strong className="text-[var(--ds-text)]">PayPal ou carte bancaire</strong>, en 1, 2 ou 3 fois.</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Lock className="h-3.5 w-3.5 shrink-0" style={{ color: EMERALD }} />
-                    <span><strong>Aucun abonnement</strong> : rien à résilier, accès conservé à vie.</span>
+                    <Lock className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--ds-gold)" }} />
+                    <span><strong className="text-[var(--ds-text)]">Aucun abonnement</strong> : rien à résilier, accès conservé à vie.</span>
                   </li>
                 </ul>
 
+                {/* LE bouton unique de la page */}
                 <button
                   onClick={startPayment}
                   disabled={loading}
-                  className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 text-sm font-black transition-transform hover:-translate-y-0.5 disabled:opacity-60"
-                  style={{ background: `linear-gradient(90deg, ${GOLD_LIGHT}, ${GOLD})`, color: INK }}
+                  className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 text-base font-bold text-white shadow-lg transition hover:brightness-110 disabled:opacity-60"
+                  style={{ background: "linear-gradient(135deg, var(--ds-orange) 0%, var(--ds-orange-deep) 100%)" }}
                 >
                   {loading ? (
                     <><Loader2 className="h-4 w-4 animate-spin" /> Préparation du paiement…</>
@@ -511,61 +453,46 @@ export default function V3CommanderPage() {
                   )}
                 </button>
 
-                <div className="mt-4 flex items-center justify-center gap-2 text-[11px] text-slate-500">
+                <div className="mt-4 flex items-center justify-center gap-2 text-[11px] text-[var(--ds-text-muted)]">
                   <CreditCard className="h-3.5 w-3.5" /> Carte bancaire & PayPal — paiement chiffré, sur cette page.
                 </div>
-                <p className="mt-2 text-center text-[11px] text-slate-500">
+                <p className="mt-2 text-center text-[11px] text-[var(--ds-text-muted)]">
                   En plusieurs fois, l'accès s'ouvre dès la 1re échéance.
                 </p>
-                <p className="mt-2 text-center text-[11px] text-slate-500">
+                <p className="mt-2 text-center text-[11px] text-[var(--ds-text-muted)]">
                   Un doute avant de payer ? Écrivez-moi directement :{" "}
-                  <a href="mailto:boubetgeorges@gmail.com" className="underline" style={{ color: EMERALD }}>
+                  <a href="mailto:boubetgeorges@gmail.com" className="underline" style={{ color: "var(--ds-gold)" }}>
                     boubetgeorges@gmail.com
                   </a>
                 </p>
-
               </>
             ) : (
               <div>
-                <h2 className="mb-4 text-lg font-black" style={{ color: EMERALD }}>
-                  Paiement sécurisé
-                </h2>
-                <EmbeddedCheckoutProvider stripe={getStripe()} options={{ clientSecret }}>
-                  <EmbeddedCheckout />
-                </EmbeddedCheckoutProvider>
+                <h2 className="mb-4 text-lg font-bold text-[var(--ds-text)]">Paiement sécurisé</h2>
+                <div className="rounded-xl bg-white p-2">
+                  <EmbeddedCheckoutProvider stripe={getStripe()} options={{ clientSecret }}>
+                    <EmbeddedCheckout />
+                  </EmbeddedCheckoutProvider>
+                </div>
               </div>
             )}
           </div>
-        </div>
+        </section>
 
-        {/* Réassurance : garantie, PayPal, absence d'abonnement */}
-        <div className="mt-12 grid gap-4 md:grid-cols-3">
-          {REASSURANCE.map((r) => (
-            <div key={r.title} className="rounded-2xl border bg-white p-5" style={{ borderColor: `${EMERALD}18` }}>
-              <r.icon className="h-5 w-5" style={{ color: GOLD }} />
-              <h3 className="mt-3 text-sm font-black" style={{ color: EMERALD }}>{r.title}</h3>
-              <p className="mt-1.5 text-xs leading-relaxed text-slate-600">{r.body}</p>
-            </div>
-          ))}
-        </div>
-
-        <ActiveUsersPanel />
-
+        {/* Témoignages réels, s'il y en a */}
         {testimonials.length > 0 && (
-          <div className="mt-10">
-            <h2 className="text-center text-lg font-black" style={{ color: EMERALD }}>
-              Ce qu'en disent les auteurs
-            </h2>
-            <div className="mt-5 grid gap-4 md:grid-cols-3">
+          <section className="mt-14">
+            <h2 className="text-center text-xl font-bold md:text-2xl">Ce qu'en disent les auteurs</h2>
+            <div className="mt-6 grid gap-4 md:grid-cols-3">
               {testimonials.map((t) => (
-                <figure key={t.id} className="rounded-2xl border bg-white p-5" style={{ borderColor: `${GOLD}44` }}>
-                  <Quote className="h-4 w-4" style={{ color: GOLD }} />
-                  <blockquote className="mt-2 text-sm leading-relaxed text-slate-700">{t.comment}</blockquote>
-                  <figcaption className="mt-3 text-xs font-bold" style={{ color: EMERALD }}>
+                <figure key={t.id} className="ds-card p-5">
+                  <Quote className="h-4 w-4" style={{ color: "var(--ds-gold)" }} />
+                  <blockquote className="mt-2 text-sm leading-relaxed text-[var(--ds-text-muted)]">{t.comment}</blockquote>
+                  <figcaption className="mt-3 text-xs font-bold text-[var(--ds-text)]">
                     {t.author_name}
-                    {t.book_title && <span className="font-normal text-slate-500"> — {t.book_title}</span>}
+                    {t.book_title && <span className="font-normal text-[var(--ds-text-muted)]"> — {t.book_title}</span>}
                     {t.created_at && (
-                      <span className="font-normal text-slate-400">
+                      <span className="font-normal text-[var(--ds-text-muted)]">
                         {" · "}
                         {new Date(t.created_at).toLocaleDateString("fr-FR", { month: "long", year: "numeric" })}
                       </span>
@@ -574,60 +501,80 @@ export default function V3CommanderPage() {
                   {t.rating ? (
                     <div className="mt-1.5 flex gap-0.5" aria-label={`${t.rating} sur 5`}>
                       {Array.from({ length: t.rating }).map((_, i) => (
-                        <Star key={i} className="h-3 w-3" style={{ color: GOLD, fill: GOLD }} />
+                        <Star key={i} className="h-3 w-3" style={{ color: "var(--ds-gold)", fill: "var(--ds-gold)" }} />
                       ))}
                     </div>
                   ) : null}
                 </figure>
               ))}
             </div>
-          </div>
+          </section>
         )}
 
         {/* FAQ — les questions posées avant de payer */}
-        <div className="mt-14" id="faq">
-          <h2 className="text-center text-2xl md:text-3xl" style={{ fontFamily: SERIF, color: EMERALD }}>
-            Questions fréquentes
-          </h2>
+        <section className="mt-14" id="faq">
+          <h2 className="text-center text-2xl font-bold md:text-3xl">Questions fréquentes</h2>
           <div className="mx-auto mt-6 max-w-3xl">
             <Accordion type="single" collapsible className="space-y-3">
               {FAQ.map((f, i) => (
                 <AccordionItem
                   key={f.q}
                   value={`faq-${i}`}
-                  className="rounded-2xl border bg-white px-5"
-                  style={{ borderColor: `${EMERALD}1f` }}
+                  className="ds-card border px-5"
+                  style={{ borderColor: "var(--ds-border)" }}
                 >
-                  <AccordionTrigger className="text-left text-sm font-bold" style={{ color: EMERALD }}>
+                  <AccordionTrigger className="text-left text-sm font-bold text-[var(--ds-text)] hover:no-underline">
                     {f.q}
                   </AccordionTrigger>
-                  <AccordionContent className="text-sm leading-relaxed text-slate-700">
+                  <AccordionContent className="text-sm leading-relaxed text-[var(--ds-text-muted)]">
                     {f.a}
                   </AccordionContent>
                 </AccordionItem>
               ))}
             </Accordion>
           </div>
-          <p className="mt-6 text-center text-xs text-slate-500">
+          <p className="mt-6 text-center text-xs text-[var(--ds-text-muted)]">
             Une autre question ?{" "}
-            <a href="mailto:contact@ebookstudio.fr" className="underline" style={{ color: EMERALD }}>
+            <a href="mailto:contact@ebookstudio.fr" className="underline" style={{ color: "var(--ds-gold)" }}>
               contact@ebookstudio.fr
             </a>{" "}
             — réponse sous 24 h ouvrées.
           </p>
-          <div className="mt-8 text-center">
+        </section>
+
+        {/* Rappel final — même bouton */}
+        <section className="mt-14 border-t pt-12 text-center" style={{ borderColor: "var(--ds-border)" }}>
+          <h2 className="text-2xl font-bold md:text-3xl">Votre livre est déjà dans votre tête.</h2>
+          <p className="mx-auto mt-3 max-w-xl text-[var(--ds-text-muted)]">
+            Dans quelques soirées, il peut être en ligne. Ou rester une idée de plus.
+          </p>
+          <div className="mt-6">
             <a
               href="#paiement"
-              className="inline-flex items-center gap-2 rounded-xl px-7 py-4 text-sm font-black transition-transform hover:-translate-y-0.5"
-              style={{ background: `linear-gradient(90deg, ${GOLD_LIGHT}, ${GOLD})`, color: INK }}
+              onClick={() => trackCaptureEvent("commander", "click")}
+              className="inline-flex items-center justify-center gap-2 rounded-xl px-8 py-4 text-base font-bold text-white shadow-lg transition hover:brightness-110"
+              style={{ background: "linear-gradient(135deg, var(--ds-orange) 0%, var(--ds-orange-deep) 100%)" }}
             >
-              Obtenir l'accès à vie — 47 € <ArrowRight className="h-4 w-4" />
+              Obtenir l'accès à vie — 47 € <ArrowRight className="h-5 w-5" />
             </a>
           </div>
-        </div>
+          <p className="mt-4 text-xs text-[var(--ds-text-muted)]">
+            <ShieldCheck className="mr-1 inline h-3.5 w-3.5 text-[var(--ds-success)]" />
+            Garantie 30 jours · paiement unique · accès immédiat
+          </p>
+        </section>
 
-      </section>
-
+        {/* Footer réduit aux mentions légales */}
+        <footer className="mt-14 border-t pt-6 text-center text-[11px] text-[var(--ds-text-muted)]" style={{ borderColor: "var(--ds-border)" }}>
+          <a href="/mentions-legales" className="hover:underline">Mentions légales</a>
+          {" · "}
+          <a href="/cgv" className="hover:underline">CGV</a>
+          {" · "}
+          <a href="/politique-confidentialite" className="hover:underline">Confidentialité</a>
+          {" · "}
+          <a href="mailto:contact@ebookstudio.fr" className="hover:underline">contact@ebookstudio.fr</a>
+        </footer>
+      </div>
     </main>
   );
 }
