@@ -152,6 +152,8 @@ export async function sendResendEmailThrottled(
 
     // Per-second rate limit — back off and retry.
     if (res.status === 429) {
+      lastRateLimitBody = bodyText.slice(0, 300);
+      console.warn(`Resend 429 (essai ${attempt + 1}): ${lastRateLimitBody}`);
       const retryAfterHeader = res.headers.get("retry-after");
       const retryAfterMs = retryAfterHeader
         ? Math.max(250, Number(retryAfterHeader) * 1000 || 500)
@@ -169,5 +171,9 @@ export async function sendResendEmailThrottled(
     return { ok: false, status: res.status, detail: bodyText.slice(0, 500) };
   }
 
-  return { ok: false, status: 429, detail: "rate_limit_exceeded after retries" };
+  return {
+    ok: false,
+    status: 429,
+    detail: `rate_limit_exceeded after retries — ${lastRateLimitBody || "aucun détail Resend"}`,
+  };
 }
