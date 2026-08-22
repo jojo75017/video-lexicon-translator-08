@@ -113,6 +113,22 @@ const STEPS: StepContent[] = [
     fiche: "/fiche/dernier-jour",
     ps: "Si vous préférez la V3 par abonnement, ne faites rien : je vous envoie le lien d'inscription demain.",
   },
+  // Étape 6 — page /methode (longue page de vente « système »). Réservée aux
+  // envois manuels et aux tests : les modes automatiques restent plafonnés à 5.
+  {
+    subject: "Pas une formation. Un système.",
+    preheader: "L'atelier complet pour publier votre livre sur Amazon — une seule page, tout y est expliqué.",
+    badge: "LA MÉTHODE COMPLÈTE",
+    heading: "Vous n'avez plus besoin de chercher. Il vous faut un système.",
+    paragraphs: [
+      "Pas une formation de 20 heures. Pas un énième outil KDP qui devient inutile au moment de publier.",
+      "EbookStudio V3, c'est un atelier complet : 15 agents qui écrivent, corrigent et mettent en page votre livre, la couverture aux normes Amazon, la fiche KDP remplie — jusqu'à la publication.",
+      "Tout est expliqué sur une seule page : ce que vous obtenez, comment ça marche, et ce que ça coûte. Lisez-la tranquillement, elle prend cinq minutes.",
+    ],
+    cta: "Découvrir la méthode complète",
+    fiche: "/methode",
+    ps: "Jusqu'au 31 août, l'accès à vie est à 47 € en un seul paiement. Après, ce sera l'abonnement mensuel.",
+  },
 ];
 
 
@@ -258,7 +274,7 @@ Deno.serve(async (req) => {
     }
 
     if (mode === "preview") {
-      const step = Math.min(Math.max(Number(body.step || 1), 1), 5);
+      const step = Math.min(Math.max(Number(body.step || 1), 1), STEPS.length);
       const html = body.segment === "non_openers"
         ? renderNonOpener(baseUrl, "apercu@ebookstudio.fr", "Georges", step)
         : render(baseUrl, "apercu@ebookstudio.fr", "Georges", step);
@@ -577,7 +593,7 @@ Deno.serve(async (req) => {
       const requested = Number(body.step || 0);
       const testEmail = normalize(String(body.test_email || ""));
       if (!isEmail(testEmail)) return respond({ error: "Adresse de test invalide" }, 400);
-      recipients = (requested >= 1 && requested <= 5 ? [requested] : [1, 2, 3, 4, 5]).map((step) => ({ email: testEmail, first_name: "Georges", current_step: step - 1 }));
+      recipients = (requested >= 1 && requested <= STEPS.length ? [requested] : [1, 2, 3, 4, 5]).map((step) => ({ email: testEmail, first_name: "Georges", current_step: step - 1 }));
     } else if (mode === "manual" && Array.isArray(body.prospect_ids) && body.prospect_ids.length) {
       // Découpage en lots : une URL avec des centaines d'IDs fait échouer la requête PostgREST.
       const ids = (body.prospect_ids as string[]).filter((v) => typeof v === "string" && v.length > 0).slice(0, 500);
