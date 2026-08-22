@@ -1,0 +1,1 @@
+DELETE FROM public.v3_installment_orders WHERE email = 'test-diagnostic@ebookstudio.fr';
