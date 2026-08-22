@@ -118,6 +118,7 @@ export async function sendResendEmailThrottled(
   }
 
 
+  let lastRateLimitBody = "";
   for (let attempt = 0; attempt <= MAX_RETRIES_ON_RATE_LIMIT; attempt++) {
     await waitForSlot();
 
@@ -143,14 +144,17 @@ export async function sendResendEmailThrottled(
     const bodyText = await res.text();
     const lower = bodyText.toLowerCase();
 
-    // Daily quota — no point retrying, and stop the whole batch.
-    if (res.status === 429 && lower.includes("daily_quota")) {
+    // Quota épuisé (jour ou mois) — inutile de réessayer, on stoppe le lot entier.
+    if (res.status === 429 && (lower.includes("daily_quota") || lower.includes("monthly_quota"))) {
       dailyQuotaHit = true;
+      console.error(`Resend quota épuisé : ${bodyText.slice(0, 300)}`);
       return { ok: false, status: 429, detail: bodyText, quotaExhausted: true };
     }
 
     // Per-second rate limit — back off and retry.
     if (res.status === 429) {
+      lastRateLimitBody = bodyText.slice(0, 300);
+      console.warn(`Resend 429 (essai ${attempt + 1}): ${lastRateLimitBody}`);
       const retryAfterHeader = res.headers.get("retry-after");
       const retryAfterMs = retryAfterHeader
         ? Math.max(250, Number(retryAfterHeader) * 1000 || 500)
@@ -168,5 +172,9 @@ export async function sendResendEmailThrottled(
     return { ok: false, status: res.status, detail: bodyText.slice(0, 500) };
   }
 
-  return { ok: false, status: 429, detail: "rate_limit_exceeded after retries" };
+  return {
+    ok: false,
+    status: 429,
+    detail: `rate_limit_exceeded after retries — ${lastRateLimitBody || "aucun détail Resend"}`,
+  };
 }
