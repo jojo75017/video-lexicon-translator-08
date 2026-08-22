@@ -533,7 +533,7 @@ Deno.serve(async (req) => {
 
     // Relance de la séquence : envoie l'étape N aux contacts qui ont reçu l'étape N-1
     if (mode === "send_step") {
-      const step = Math.min(Math.max(Number(body.step || 3), 2), 5);
+      const step = Math.min(Math.max(Number(body.step || 3), 2), STEPS.length);
       const limit = Math.min(Number(body.batch_size || 300), 400);
       const template = templateName(step);
       const previous = templateName(step - 1);
