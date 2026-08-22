@@ -212,7 +212,7 @@ export default function MethodePage() {
                 {NON_PROMESSES.map((p) => (
                   <li key={p} className="flex gap-3 text-sm leading-relaxed text-[var(--ds-text-muted)]">
                     <X className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
-                    <span>{p}</span>
+                    <span className="text-[var(--ds-text)]">{p}</span>
                   </li>
                 ))}
               </ul>

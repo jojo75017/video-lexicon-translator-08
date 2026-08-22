@@ -36,7 +36,7 @@ export default function MethodeAvantApres() {
             {ANCIENNE.map((t) => (
               <li key={t} className="flex gap-3 text-sm leading-relaxed text-[var(--ds-text-muted)]">
                 <X className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
-                <span>{t}</span>
+                <span className="text-[var(--ds-text)]">{t}</span>
               </li>
             ))}
           </ul>
