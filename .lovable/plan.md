@@ -1,26 +1,19 @@
-# Plan — Transformer `/methode` en page de vente à haute conversion
+# Pourquoi seulement 100 prospects visibles (sur 2 020)
 
-## Objectif
-Remplacer l'ancienne page `/commander` directe par une page long format `/methode` qui convertit les visiteurs déjà intéressés en clients à 47 €, sans distraction ni popup.
+## Diagnostic confirmé
 
-## Étapes
+- **La base contient bien tout** : 2 014 prospects actifs + 6 inactifs = 2 020 au total (vérifié par requête SQL directe). Rien n'a été perdu.
+- **C'est un choix d'affichage, pas une perte de données** : dans `src/pages/ProspectManagerPage.tsx` (ligne 80), la page charge bien tous les prospects, mais n'en **affiche que 100 à la fois** (`PAGE_SIZE = 100`). C'était volontaire : monter 2 000 lignes d'un coup (≈ 34 000 nœuds HTML) faisait planter l'onglet Chrome.
+- Le compteur « 100 / 2020 affichés » et les boutons « Afficher plus » / « Tout afficher » existent… mais **uniquement en bas du tableau**, après 100 lignes. Si on ne descend pas tout en bas, on croit qu'il n'y a que 100 prospects.
 
-| # | Action | Détails | État |
-|---|--------|---------|------|
-| 1 | Thème sombre premium | Fond bleu nuit `#0B1326`, accents doré `#D4AF37`, bouton orange `#FF6B1A`. Police sans-serif. | Fait |
-| 2 | Hero section | Un titre choc, mockup 3D premium, **un seul CTA** vers `/commander?src=methode`. | Fait |
-| 3 | Psychologie de vente honnête | Bloc « Ce que le système fait / ne fait pas », avant/après, 4 étapes du workflow. | Fait |
-| 4 | Zéro distraction | Masquer le bandeau global V3 sur `/methode`, `/commander`, `/commande`, `/fiche/*`, etc. Aucune popup sur le checkout. | Fait |
-| 5 | Tracking propre | Surface `methode` dans `capture_events`, migration SQL pour autoriser `surface='methode'`. | Fait |
-| 6 | Vérification visuelle | Rendu testé, contrastes corrigés, titres sans-serif. | Fait |
-| 7 | Email d'envoi | Rédiger un email unique-promesse qui pointe vers `/methode` (pas `/commander` directement). | À faire |
-| 8 | Lancer & suivre | Envoyer la vague, mesurer clics sur `/methode`, visites `/commander`, commandes. | À faire |
+## Correctif proposé
 
-## Règles de la page
-- Un seul bouton d'achat répété 3 fois maximum.
-- Pas de lien externe dans le corps de page.
-- Mentions légales uniquement en pied de page.
-- Ton honnête : on promet la méthode, pas des revenus garantis.
+1. **Compteur visible en haut de la liste** : badge au-dessus du tableau indiquant clairement « 2 014 prospects actifs — 100 affichés », avec le bouton « Tout afficher » directement accessible en haut aussi.
+2. **Barre de recherche par email/prénom** pour retrouver un prospect précis sans dérouler 2 000 lignes (recherche instantanée côté navigateur, sans coût serveur).
+3. Conserver l'affichage progressif par 100 (nécessaire pour la stabilité du navigateur), simplement rendu évident.
 
-## Prochaine décision
-Valider le ton de l'email d'envoi (curiosité + une seule promesse) avant de lancer la vague.
+## Détails techniques
+
+- Un seul fichier modifié : `src/pages/ProspectManagerPage.tsx`.
+- Aucun changement en base de données, aucun impact sur les campagnes d'emails en cours.
+- Les 2 020 prospects restent tous éligibles aux envois : la limite de 100 est purement visuelle.
