@@ -401,18 +401,20 @@ Deno.serve(async (req) => {
 
     // ------------------------------------------------ statut par destinataire
     if (mode === "recipients") {
-      const [{ data: clicksRows }, { data: opensRows }, { data: logRows }, { data: paidOrders }, { data: profileRows }] =
-        await Promise.all([
-          db.from("email_clicks").select("prospect_email").limit(20000),
-          db.from("email_opens").select("prospect_email").limit(20000),
+      const [clicksRows, opensRows, logRows, paidOrders, profileRows] = await Promise.all([
+        fetchAll<{ prospect_email?: string }>(db.from("email_clicks").select("prospect_email")),
+        fetchAll<{ prospect_email?: string }>(db.from("email_opens").select("prospect_email")),
+        fetchAll<{ message_id?: string; recipient_email?: string; status?: string; error_message?: string | null; created_at?: string }>(
           db.from("email_send_log")
             .select("message_id,recipient_email,status,error_message,created_at")
             .eq("template_name", letter.key)
-            .order("created_at", { ascending: false })
-            .limit(20000),
-          db.from("funnel_orders").select("email").eq("status", "paid").limit(5000),
-          db.from("sales_prospects").select("email,first_name,unsubscribed,status").limit(20000),
-        ]);
+            .order("created_at", { ascending: false }),
+        ),
+        fetchAll<{ email?: string }>(db.from("funnel_orders").select("email").eq("status", "paid")),
+        fetchAll<{ email?: string; first_name?: string; unsubscribed?: boolean; status?: string }>(
+          db.from("sales_prospects").select("email,first_name,unsubscribed,status"),
+        ),
+      ]);
 
       const clickers = new Set((clicksRows || []).map((r) => normalize(r.prospect_email || "")));
       const openers = new Set((opensRows || []).map((r) => normalize(r.prospect_email || "")));
