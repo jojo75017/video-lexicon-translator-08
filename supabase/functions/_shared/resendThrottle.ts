@@ -118,6 +118,7 @@ export async function sendResendEmailThrottled(
   }
 
 
+  let lastRateLimitBody = "";
   for (let attempt = 0; attempt <= MAX_RETRIES_ON_RATE_LIMIT; attempt++) {
     await waitForSlot();
 
