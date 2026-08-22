@@ -1,0 +1,1 @@
+SELECT cron.unschedule('offre-47-directe-resume');
