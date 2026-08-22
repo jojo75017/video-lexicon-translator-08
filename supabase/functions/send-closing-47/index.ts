@@ -525,14 +525,17 @@ Deno.serve(async (req) => {
     const requestedBatchSize = Number(body.batch_size || 500);
     const limit = Math.min(Math.max(Number.isFinite(requestedBatchSize) ? requestedBatchSize : 500, 1), 500);
 
-    const [{ data: clicksRows }, { data: opensRows }, { data: alreadySent }, { data: paidOrders }, { data: profileRows }] =
-      await Promise.all([
-        db.from("email_clicks").select("prospect_email").limit(20000),
-        db.from("email_opens").select("prospect_email").limit(20000),
-        db.from("email_send_log").select("recipient_email").eq("template_name", letter.key).in("status", ["sent", "delivered"]).limit(20000),
-        db.from("funnel_orders").select("email").eq("status", "paid").limit(5000),
-        db.from("sales_prospects").select("email,first_name,unsubscribed,status").limit(20000),
-      ]);
+    const [clicksRows, opensRows, alreadySent, paidOrders, profileRows] = await Promise.all([
+      fetchAll<{ prospect_email?: string }>(db.from("email_clicks").select("prospect_email")),
+      fetchAll<{ prospect_email?: string }>(db.from("email_opens").select("prospect_email")),
+      fetchAll<{ recipient_email?: string }>(
+        db.from("email_send_log").select("recipient_email").eq("template_name", letter.key).in("status", ["sent", "delivered"]),
+      ),
+      fetchAll<{ email?: string }>(db.from("funnel_orders").select("email").eq("status", "paid")),
+      fetchAll<{ email?: string; first_name?: string; unsubscribed?: boolean; status?: string }>(
+        db.from("sales_prospects").select("email,first_name,unsubscribed,status"),
+      ),
+    ]);
 
     const clickers = new Set((clicksRows || []).map((r) => normalize(r.prospect_email || "")));
     const openers = new Set((opensRows || []).map((r) => normalize(r.prospect_email || "")));
