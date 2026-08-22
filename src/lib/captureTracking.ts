@@ -1,7 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { getStoredUtm } from '@/lib/utmTracking';
 
-export type CaptureSurface = 'popup' | 'sticky' | 'demo' | 'inline' | 'cadeau' | 'commander';
+export type CaptureSurface = 'popup' | 'sticky' | 'demo' | 'inline' | 'cadeau' | 'commander' | 'methode';
 export type CaptureEventType = 'view' | 'click' | 'submit' | 'checkout_click' | 'checkout_ready';
 
 
