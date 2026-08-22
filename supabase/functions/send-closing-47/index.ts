@@ -351,9 +351,11 @@ Deno.serve(async (req) => {
 
     // ---------------------------------------------------------------- status
     if (mode === "status") {
-      const [{ data: leadRows }, { data: orderRows }] = await Promise.all([
-        db.from("funnel_leads").select("email,landing_url,utm_campaign").limit(10000),
-        db.from("funnel_orders").select("email,status").limit(10000),
+      const [leadRows, orderRows] = await Promise.all([
+        fetchAll<{ email?: string; landing_url?: string; utm_campaign?: string }>(
+          db.from("funnel_leads").select("email,landing_url,utm_campaign"),
+        ),
+        fetchAll<{ email?: string; status?: string }>(db.from("funnel_orders").select("email,status")),
       ]);
       const paidEmails = new Set(
         (orderRows || []).filter((o) => o.status === "paid").map((o) => normalize(o.email || "")),
