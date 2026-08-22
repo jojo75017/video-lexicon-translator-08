@@ -83,8 +83,9 @@ interface Testimonial {
   created_at?: string | null;
 }
 
-/** Fin de l'accès à vie : 30 septembre 2026, 23 h 59 (heure de Paris). */
-const OFFER_END = new Date("2026-09-30T21:59:00Z");
+/** Fin de l'offre 47 € : 31 août 2026, 23 h 59 (heure de Paris) — aligné sur
+ *  le compte à rebours de la page /methode et des emails. */
+const OFFER_END = new Date("2026-08-31T21:59:59Z");
 
 function OfferCountdown() {
   const [now, setNow] = useState(() => Date.now());
