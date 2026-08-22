@@ -750,6 +750,14 @@ a:hover {
   color: var(--ds-text);
 }
 
+.dark-sales h1,
+.dark-sales h2,
+.dark-sales h3 {
+  color: var(--ds-text);
+  font-family: 'Work Sans', system-ui, sans-serif;
+  font-style: normal;
+}
+
 .dark-sales .ds-section {
   padding-top: 4rem;
   padding-bottom: 4rem;
