@@ -29,7 +29,10 @@ const RedirectClickPage = () => {
       /* on garde la destination par défaut */
     }
     const sep = destination.includes('?') ? '&' : '?';
-    const finalUrl = `${destination}${sep}src=email${template ? `&t=${encodeURIComponent(template)}` : ''}`;
+    // On transmet l'email du prospect à la destination : le ReadingGate le
+    // reconnaît et ne lui redemande jamais son email (il l'a déjà donné).
+    const emailParam = email ? `&email=${encodeURIComponent(email)}` : '';
+    const finalUrl = `${destination}${sep}src=email${template ? `&t=${encodeURIComponent(template)}` : ''}${emailParam}`;
 
     // Suivi non bloquant. sendBeacon survit à la navigation : avec fetch(),
     // la redirection annulait l'appel et une partie des clics n'était jamais comptée.
