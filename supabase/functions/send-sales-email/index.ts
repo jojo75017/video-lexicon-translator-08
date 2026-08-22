@@ -536,7 +536,10 @@ Deno.serve(async (req) => {
       const step = Math.min(Math.max(Number(body.step || 3), 2), STEPS.length);
       const limit = Math.min(Number(body.batch_size || 300), 400);
       const template = templateName(step);
-      const previous = templateName(step - 1);
+      // `previous_template` permet de viser les destinataires d'une étape antérieure
+      // (ex. envoyer la page /methode à tous ceux qui ont reçu l'étape 1 alors que
+      // les étapes intermédiaires n'ont pas été diffusées en masse).
+      const previous = String(body.previous_template || templateName(step - 1));
 
       const { data: gotPrevious } = await db.from("email_send_log").select("recipient_email").eq("template_name", previous).in("status", ["sent", "delivered"]).limit(5000);
       const { data: gotCurrent } = await db.from("email_send_log").select("recipient_email").eq("template_name", template).in("status", ["sent", "delivered"]).limit(5000);
