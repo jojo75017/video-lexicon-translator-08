@@ -729,3 +729,38 @@ a:hover {
   background: var(--v3-gold-soft);
   border-radius: 999px;
 }
+
+/* ── Dark sales page theme (/methode) ── */
+.dark-sales {
+  --ds-bg: #0B1326;
+  --ds-bg-soft: #111C33;
+  --ds-surface: #152238;
+  --ds-surface-hover: #1b2a45;
+  --ds-border: rgba(255, 255, 255, 0.08);
+  --ds-text: #F8F7F4;
+  --ds-text-muted: #A7B0C0;
+  --ds-gold: #D4AF37;
+  --ds-gold-light: #F0D78C;
+  --ds-orange: #FF6B1A;
+  --ds-orange-deep: #E55300;
+  --ds-orange-soft: rgba(255, 107, 26, 0.14);
+  --ds-success: #22C55E;
+  --ds-radius: 1rem;
+  background: var(--ds-bg);
+  color: var(--ds-text);
+}
+
+.dark-sales .ds-section {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+.dark-sales .ds-card {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius);
+}
+
+.dark-sales .ds-glow {
+  box-shadow: 0 0 60px rgba(212, 175, 55, 0.12);
+}
