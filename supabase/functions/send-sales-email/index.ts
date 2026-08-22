@@ -223,6 +223,32 @@ function renderNonOpener(baseUrl: string, email: string, firstName: string, step
 </table></td></tr></table><img src="${pixel}" width="1" height="1" alt="" style="display:none"></body></html>`;
 }
 
+/** Email personnel aux cliqueurs non-acheteurs : une seule question, un seul lien.
+ *  Objectif : obtenir des réponses (comprendre le frein) ET convertir les hésitants. */
+function renderQuestionCliqueur(baseUrl: string, email: string, firstName: string) {
+  const tpl = "question-cliqueurs";
+  const link = trackedUrl(email, 1, `${CHECKOUT}?src=${CAMPAIGN}-question&email=${encodeURIComponent(email)}`, "reprise", tpl);
+  const unsubscribe = `${baseUrl}/functions/v1/unsubscribe?email=${encodeURIComponent(email)}&seq=all`;
+  const pixel = `${baseUrl}/functions/v1/track-email-open?e=${encodeURIComponent(email)}&s=1&t=${tpl}`;
+  return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#f6f7f8;padding:24px 10px">
+<div style="display:none;font-size:1px;color:#f6f7f8;max-height:0;overflow:hidden">Vous avez regardé, et vous n'êtes pas allé au bout. Je peux vous aider ?</div>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse"><tr><td align="center">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width:600px;width:100%;background:#ffffff;border:1px solid #e5e7eb;border-collapse:collapse">
+<tr><td style="background:#008296;padding:18px 28px;color:#ffffff;font:700 22px Arial,Helvetica,sans-serif">EbookStudio</td></tr>
+<tr><td style="padding:26px 28px;color:#232F3E;font:16px/1.65 Arial,Helvetica,sans-serif">
+<p style="margin:0 0 18px">Bonjour${firstName ? ` ${firstName}` : ""},</p>
+<p style="margin:0 0 18px">Vous avez regardé EbookStudio ces derniers jours… et vous n'êtes pas allé jusqu'au bout. C'est tout à fait normal — et c'est exactement pour ça que je vous écris.</p>
+<p style="margin:0 0 18px"><strong>Qu'est-ce qui vous a fait hésiter ?</strong> Le prix, une question sur l'outil, un doute sur vos droits, la peur que ce soit trop technique ?</p>
+<p style="margin:0 0 18px">Répondez simplement à cet email, même en une ligne. Je lis et je réponds personnellement à chaque message — souvent, une réponse de deux phrases suffit à débloquer la situation.</p>
+<p style="margin:0 0 18px">Et si c'était juste le manque de temps, votre accès à 47 € est toujours ouvert :</p>
+${ctaButton(link, "Reprendre là où je m'étais arrêté")}
+<p style="margin:0 0 6px">Bien à vous,<br><strong>Georges Boubet</strong><br>EbookStudio</p>
+<p style="margin:18px 0 0;padding:14px 0 0;border-top:1px solid #e5e7eb;font:15px/1.6 Arial,Helvetica,sans-serif;color:#4b5563">P.-S. — L'accès à vie à 47 € reste ouvert jusqu'au 31 août. Après, ce sera uniquement par abonnement mensuel.</p>
+</td></tr>
+<tr><td style="padding:18px 24px;background:#f6f7f8;text-align:center;color:#68737d;font:12px/1.6 Arial,Helvetica,sans-serif">Vous recevez cet email car vous avez manifesté un intérêt pour EbookStudio.<br><a href="${unsubscribe}" style="color:#008296">Se désinscrire de tous les emails marketing</a></td></tr>
+</table></td></tr></table><img src="${pixel}" width="1" height="1" alt="" style="display:none"></body></html>`;
+}
+
 async function isAdmin(req: Request, baseUrl: string) {
   const authorization = req.headers.get("Authorization");
   if (!authorization?.startsWith("Bearer ")) return false;
