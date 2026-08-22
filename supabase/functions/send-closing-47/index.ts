@@ -235,6 +235,22 @@ const byKey = new Map(LETTERS.map((l) => [l.key, l]));
 const normalize = (value: string) => value.trim().toLowerCase();
 const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
+/** Récupère toutes les lignes d'une requête Supabase en paginant par tranches de 1000.
+ *  PostgREST limite par défaut à 1000 lignes même si .limit() demande plus. */
+async function fetchAll<T = Record<string, unknown>>(baseQuery: any, pageSize = 1000): Promise<T[]> {
+  const results: T[] = [];
+  let from = 0;
+  while (true) {
+    const { data, error } = await baseQuery.range(from, from + pageSize - 1);
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    results.push(...(data as T[]));
+    if (data.length < pageSize) break;
+    from += pageSize;
+  }
+  return results;
+}
+
 /** Destination du bouton principal, selon l'objectif de l'email. */
 function primaryDestination(email: string, letter: Letter) {
   if (letter.primary === "gift") {
@@ -335,9 +351,11 @@ Deno.serve(async (req) => {
 
     // ---------------------------------------------------------------- status
     if (mode === "status") {
-      const [{ data: leadRows }, { data: orderRows }] = await Promise.all([
-        db.from("funnel_leads").select("email,landing_url,utm_campaign").limit(10000),
-        db.from("funnel_orders").select("email,status").limit(10000),
+      const [leadRows, orderRows] = await Promise.all([
+        fetchAll<{ email?: string; landing_url?: string; utm_campaign?: string }>(
+          db.from("funnel_leads").select("email,landing_url,utm_campaign"),
+        ),
+        fetchAll<{ email?: string; status?: string }>(db.from("funnel_orders").select("email,status")),
       ]);
       const paidEmails = new Set(
         (orderRows || []).filter((o) => o.status === "paid").map((o) => normalize(o.email || "")),
@@ -345,18 +363,17 @@ Deno.serve(async (req) => {
 
       const stats = await Promise.all(
         LETTERS.map(async (l) => {
-          const { data: sentRows } = await db
-            .from("email_send_log")
-            .select("recipient_email")
-            .eq("template_name", l.key)
-            .in("status", ["sent", "delivered"])
-            .limit(10000);
+          const sentRows = await fetchAll<{ recipient_email?: string }>(
+            db.from("email_send_log").select("recipient_email").eq("template_name", l.key).in("status", ["sent", "delivered"]),
+          );
           const recipients = new Set((sentRows || []).map((r) => normalize(r.recipient_email || "")));
 
-          const { data: opens } = await db
-            .from("email_opens").select("prospect_email").eq("template_name", l.key).limit(10000);
-          const { data: clicks } = await db
-            .from("email_clicks").select("prospect_email").ilike("template_name", `${l.key}%`).limit(10000);
+          const opens = await fetchAll<{ prospect_email?: string }>(
+            db.from("email_opens").select("prospect_email").eq("template_name", l.key),
+          );
+          const clicks = await fetchAll<{ prospect_email?: string }>(
+            db.from("email_clicks").select("prospect_email").ilike("template_name", `${l.key}%`),
+          );
 
           const leads = (leadRows || []).filter((r) => {
             const url = String(r.landing_url || "");
@@ -385,18 +402,20 @@ Deno.serve(async (req) => {
 
     // ------------------------------------------------ statut par destinataire
     if (mode === "recipients") {
-      const [{ data: clicksRows }, { data: opensRows }, { data: logRows }, { data: paidOrders }, { data: profileRows }] =
-        await Promise.all([
-          db.from("email_clicks").select("prospect_email").limit(20000),
-          db.from("email_opens").select("prospect_email").limit(20000),
+      const [clicksRows, opensRows, logRows, paidOrders, profileRows] = await Promise.all([
+        fetchAll<{ prospect_email?: string }>(db.from("email_clicks").select("prospect_email")),
+        fetchAll<{ prospect_email?: string }>(db.from("email_opens").select("prospect_email")),
+        fetchAll<{ message_id?: string; recipient_email?: string; status?: string; error_message?: string | null; created_at?: string }>(
           db.from("email_send_log")
             .select("message_id,recipient_email,status,error_message,created_at")
             .eq("template_name", letter.key)
-            .order("created_at", { ascending: false })
-            .limit(20000),
-          db.from("funnel_orders").select("email").eq("status", "paid").limit(5000),
-          db.from("sales_prospects").select("email,first_name,unsubscribed,status").limit(20000),
-        ]);
+            .order("created_at", { ascending: false }),
+        ),
+        fetchAll<{ email?: string }>(db.from("funnel_orders").select("email").eq("status", "paid")),
+        fetchAll<{ email?: string; first_name?: string; unsubscribed?: boolean; status?: string }>(
+          db.from("sales_prospects").select("email,first_name,unsubscribed,status"),
+        ),
+      ]);
 
       const clickers = new Set((clicksRows || []).map((r) => normalize(r.prospect_email || "")));
       const openers = new Set((opensRows || []).map((r) => normalize(r.prospect_email || "")));
@@ -509,14 +528,17 @@ Deno.serve(async (req) => {
     const requestedBatchSize = Number(body.batch_size || 500);
     const limit = Math.min(Math.max(Number.isFinite(requestedBatchSize) ? requestedBatchSize : 500, 1), 500);
 
-    const [{ data: clicksRows }, { data: opensRows }, { data: alreadySent }, { data: paidOrders }, { data: profileRows }] =
-      await Promise.all([
-        db.from("email_clicks").select("prospect_email").limit(20000),
-        db.from("email_opens").select("prospect_email").limit(20000),
-        db.from("email_send_log").select("recipient_email").eq("template_name", letter.key).in("status", ["sent", "delivered"]).limit(20000),
-        db.from("funnel_orders").select("email").eq("status", "paid").limit(5000),
-        db.from("sales_prospects").select("email,first_name,unsubscribed,status").limit(20000),
-      ]);
+    const [clicksRows, opensRows, alreadySent, paidOrders, profileRows] = await Promise.all([
+      fetchAll<{ prospect_email?: string }>(db.from("email_clicks").select("prospect_email")),
+      fetchAll<{ prospect_email?: string }>(db.from("email_opens").select("prospect_email")),
+      fetchAll<{ recipient_email?: string }>(
+        db.from("email_send_log").select("recipient_email").eq("template_name", letter.key).in("status", ["sent", "delivered"]),
+      ),
+      fetchAll<{ email?: string }>(db.from("funnel_orders").select("email").eq("status", "paid")),
+      fetchAll<{ email?: string; first_name?: string; unsubscribed?: boolean; status?: string }>(
+        db.from("sales_prospects").select("email,first_name,unsubscribed,status"),
+      ),
+    ]);
 
     const clickers = new Set((clicksRows || []).map((r) => normalize(r.prospect_email || "")));
     const openers = new Set((opensRows || []).map((r) => normalize(r.prospect_email || "")));
@@ -555,6 +577,7 @@ Deno.serve(async (req) => {
     }
 
     let sent = 0;
+    let skipped = 0;
     let quotaReached = false;
     let index = 0;
     for (const email of targets) {
@@ -563,13 +586,32 @@ Deno.serve(async (req) => {
       const subject = letter.subjectB && index % 2 === 1 ? letter.subjectB : letter.subject;
       index++;
       const messageId = `${CAMPAIGN}-${letter.key}-${email}`;
-      await db.from("email_send_log").insert({
+
+      // Anti-doublon : si une ligne existe déjà pour ce message_id, on saute.
+      const { data: existing } = await db
+        .from("email_send_log")
+        .select("id")
+        .eq("message_id", messageId)
+        .limit(1);
+      if ((existing || []).length > 0) {
+        skipped++;
+        continue;
+      }
+
+      const { error: pendingErr } = await db.from("email_send_log").insert({
         recipient_email: email,
         template_name: letter.key,
         message_id: messageId,
         status: "pending",
         error_message: null,
       });
+      if (pendingErr) {
+        // Conflit d'unicité = déjà en cours d'envoi par une autre exécution.
+        console.warn("Doublon bloqué pour", email, pendingErr.message);
+        skipped++;
+        continue;
+      }
+
       const result = await sendResendEmailThrottled({
         from: FROM_CAMPAIGN,
         to: [email],
@@ -597,20 +639,21 @@ Deno.serve(async (req) => {
       sent++;
     }
 
-    const remaining = Math.max(0, eligible.length - sent);
+    const remaining = Math.max(0, eligible.length - sent - skipped);
     return respond({
       success: true,
       mode,
       template: letter.key,
       segment: letter.segment,
       sent,
+      skipped,
       targets: targets.length,
       eligible_total: eligible.length,
       remaining,
       quota_reached: quotaReached,
       message: quotaReached
         ? `Quota journalier d'envoi atteint : ${sent} emails envoyés, ${remaining} restants. Reprise possible demain, sans doublon.`
-        : `${sent} emails envoyés, ${remaining} restants.`,
+        : `${sent} emails envoyés${skipped > 0 ? ` (${skipped} doublons évités)` : ""}, ${remaining} restants.`,
     });
 
   } catch (error) {
