@@ -577,6 +577,7 @@ Deno.serve(async (req) => {
     }
 
     let sent = 0;
+    let skipped = 0;
     let quotaReached = false;
     let index = 0;
     for (const email of targets) {
@@ -585,13 +586,32 @@ Deno.serve(async (req) => {
       const subject = letter.subjectB && index % 2 === 1 ? letter.subjectB : letter.subject;
       index++;
       const messageId = `${CAMPAIGN}-${letter.key}-${email}`;
-      await db.from("email_send_log").insert({
+
+      // Anti-doublon : si une ligne existe déjà pour ce message_id, on saute.
+      const { data: existing } = await db
+        .from("email_send_log")
+        .select("id")
+        .eq("message_id", messageId)
+        .limit(1);
+      if ((existing || []).length > 0) {
+        skipped++;
+        continue;
+      }
+
+      const { error: pendingErr } = await db.from("email_send_log").insert({
         recipient_email: email,
         template_name: letter.key,
         message_id: messageId,
         status: "pending",
         error_message: null,
       });
+      if (pendingErr) {
+        // Conflit d'unicité = déjà en cours d'envoi par une autre exécution.
+        console.warn("Doublon bloqué pour", email, pendingErr.message);
+        skipped++;
+        continue;
+      }
+
       const result = await sendResendEmailThrottled({
         from: FROM_CAMPAIGN,
         to: [email],
