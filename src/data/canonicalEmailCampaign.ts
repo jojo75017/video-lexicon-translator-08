@@ -16,6 +16,7 @@ export const ACTIVE_EMAIL_CAMPAIGN = {
     { step: 3, delay: '27 août', label: 'R3 — Objections', template: 'rappel-47-3', subject: '« Je n’écris pas bien », « c’est trop technique » : mes réponses' },
     { step: 4, delay: '29 août', label: 'R4 — Ce qui change le 1er octobre', template: 'rappel-47-4', subject: 'Ce qui change vraiment le 1er octobre' },
     { step: 5, delay: '31 août', label: 'R5 — Dernier jour', template: 'rappel-47-5', subject: 'Dernier jour : 47 € ce soir, abonnement ensuite' },
+    { step: 6, delay: '22 août', label: 'R6 — Page méthode (/methode)', template: 'rappel-47-6', subject: 'Pas une formation. Un système.' },
   ],
 
 } as const;
