@@ -1,13 +1,16 @@
 import { useLocation } from 'react-router-dom';
+import { isMarketingExcluded } from '@/lib/marketingExclusions';
 
 /**
  * Global fixed banner announcing the V3 launch on Oct 1st, 2026.
- * Hidden on V3 routes (already promoted there) and on the offer page itself.
+ * Hidden on V3 routes (already promoted there) and on all acquisition/checkout
+ * pages where the banner would compete with the single CTA.
  */
 export default function V3LaunchGlobalBanner() {
   const { pathname } = useLocation();
 
   if (pathname.startsWith('/v3')) return null;
+  if (isMarketingExcluded(pathname)) return null;
 
   return (
     <a

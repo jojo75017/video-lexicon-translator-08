@@ -11,45 +11,49 @@ const ANCIENNE = [
 ];
 
 const NOUVELLE = [
-  'Tu donnes ton idée, le plan est construit avec toi',
-  'Les chapitres sont rédigés dans ton style, sous tes yeux',
+  'Vous donnez votre idée, le plan est construit avec vous',
+  'Les chapitres sont rédigés dans votre style, sous vos yeux',
   'La correction éditoriale passe en 4 relectures',
   'Aucun prestataire : tout est dans l\u2019atelier',
   'Une couverture au format KDP exact, prête à téléverser',
   'Titre, description et mots-clés pensés pour être trouvés',
-  'Ton livre est en ligne. Il travaille pour toi.',
+  'Votre livre est en ligne. Il travaille pour vous.',
 ];
 
 /** Bloc « L'ancienne méthode » vs « La nouvelle voie », deux colonnes au même rythme. */
 export default function MethodeAvantApres() {
   return (
-    <section className="mx-auto max-w-4xl px-5 py-14">
-      <h2 className="v3-serif text-center text-2xl font-bold text-[#2A2118] md:text-3xl">
-        Deux façons d'écrire un livre. Une seule finit publiée.
+    <section className="ds-section mx-auto max-w-5xl px-5">
+      <h2 className="text-center text-2xl font-bold md:text-3xl">
+        Deux façons d'écrire un livre.{' '}
+        <span style={{ color: 'var(--ds-gold)' }}>Une seule finit publiée.</span>
       </h2>
 
       <div className="mt-8 grid gap-5 md:grid-cols-2">
-        <div className="rounded-2xl border border-black/10 bg-white p-6">
-          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#9b3d3d]">L'ancienne méthode</p>
+        <div className="ds-card p-6">
+          <p className="text-xs font-bold uppercase tracking-wider text-red-400">L'ancienne méthode</p>
           <ul className="mt-5 space-y-3">
             {ANCIENNE.map((t) => (
-              <li key={t} className="flex gap-3 text-sm leading-relaxed text-[#5B5245]">
-                <X className="mt-0.5 h-4 w-4 shrink-0 text-[#9b3d3d]" />
-                <span>{t}</span>
+              <li key={t} className="flex gap-3 text-sm leading-relaxed text-[var(--ds-text-muted)]">
+                <X className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
+                <span className="text-[var(--ds-text)]">{t}</span>
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="rounded-2xl bg-[#0F2E1F] p-6 shadow-lg">
-          <p className="text-[11px] font-bold uppercase tracking-[0.22em]" style={{ color: "#D4AF37" }}>
+        <div
+          className="rounded-2xl p-6 shadow-lg"
+          style={{ background: 'var(--ds-surface)', border: '1px solid var(--ds-gold)' }}
+        >
+          <p className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--ds-gold)' }}>
             La nouvelle voie : l'atelier EbookStudio
           </p>
           <ul className="mt-5 space-y-3">
             {NOUVELLE.map((t) => (
-              <li key={t} className="flex gap-3 text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.92)" }}>
-                <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#D4AF37]" />
-                <span style={{ color: 'rgba(255,255,255,0.92)' }}>{t}</span>
+              <li key={t} className="flex gap-3 text-sm leading-relaxed" style={{ color: 'rgba(248,247,244,0.92)' }}>
+                <Check className="mt-0.5 h-4 w-4 shrink-0" style={{ color: 'var(--ds-gold)' }} />
+                <span>{t}</span>
               </li>
             ))}
           </ul>
