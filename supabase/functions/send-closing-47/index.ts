@@ -639,20 +639,21 @@ Deno.serve(async (req) => {
       sent++;
     }
 
-    const remaining = Math.max(0, eligible.length - sent);
+    const remaining = Math.max(0, eligible.length - sent - skipped);
     return respond({
       success: true,
       mode,
       template: letter.key,
       segment: letter.segment,
       sent,
+      skipped,
       targets: targets.length,
       eligible_total: eligible.length,
       remaining,
       quota_reached: quotaReached,
       message: quotaReached
         ? `Quota journalier d'envoi atteint : ${sent} emails envoyés, ${remaining} restants. Reprise possible demain, sans doublon.`
-        : `${sent} emails envoyés, ${remaining} restants.`,
+        : `${sent} emails envoyés${skipped > 0 ? ` (${skipped} doublons évités)` : ""}, ${remaining} restants.`,
     });
 
   } catch (error) {
