@@ -235,6 +235,22 @@ const byKey = new Map(LETTERS.map((l) => [l.key, l]));
 const normalize = (value: string) => value.trim().toLowerCase();
 const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
+/** Récupère toutes les lignes d'une requête Supabase en paginant par tranches de 1000.
+ *  PostgREST limite par défaut à 1000 lignes même si .limit() demande plus. */
+async function fetchAll<T = Record<string, unknown>>(baseQuery: any, pageSize = 1000): Promise<T[]> {
+  const results: T[] = [];
+  let from = 0;
+  while (true) {
+    const { data, error } = await baseQuery.range(from, from + pageSize - 1);
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    results.push(...(data as T[]));
+    if (data.length < pageSize) break;
+    from += pageSize;
+  }
+  return results;
+}
+
 /** Destination du bouton principal, selon l'objectif de l'email. */
 function primaryDestination(email: string, letter: Letter) {
   if (letter.primary === "gift") {
