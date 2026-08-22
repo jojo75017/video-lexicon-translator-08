@@ -363,18 +363,17 @@ Deno.serve(async (req) => {
 
       const stats = await Promise.all(
         LETTERS.map(async (l) => {
-          const { data: sentRows } = await db
-            .from("email_send_log")
-            .select("recipient_email")
-            .eq("template_name", l.key)
-            .in("status", ["sent", "delivered"])
-            .limit(10000);
+          const sentRows = await fetchAll<{ recipient_email?: string }>(
+            db.from("email_send_log").select("recipient_email").eq("template_name", l.key).in("status", ["sent", "delivered"]),
+          );
           const recipients = new Set((sentRows || []).map((r) => normalize(r.recipient_email || "")));
 
-          const { data: opens } = await db
-            .from("email_opens").select("prospect_email").eq("template_name", l.key).limit(10000);
-          const { data: clicks } = await db
-            .from("email_clicks").select("prospect_email").ilike("template_name", `${l.key}%`).limit(10000);
+          const opens = await fetchAll<{ prospect_email?: string }>(
+            db.from("email_opens").select("prospect_email").eq("template_name", l.key),
+          );
+          const clicks = await fetchAll<{ prospect_email?: string }>(
+            db.from("email_clicks").select("prospect_email").ilike("template_name", `${l.key}%`),
+          );
 
           const leads = (leadRows || []).filter((r) => {
             const url = String(r.landing_url || "");
