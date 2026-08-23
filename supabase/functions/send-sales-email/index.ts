@@ -543,35 +543,75 @@ Deno.serve(async (req) => {
     }
 
     // Relance des commandes restées en attente depuis plus de 2 heures.
+    // Couvre funnel_orders ET v3_installment_orders (les paniers du tunnel /commander).
+    // Email court et humain : la priorité est d'obtenir une réponse, pas de forcer la vente.
     if (mode === "recover_pending" || mode === "auto_pending") {
       const cutoff = new Date(Date.now() - 2 * 3600000).toISOString();
-      const { data: pending } = await db
+
+      const renderRelancePanier = (email: string, firstName: string) => {
+        const link = trackedUrl(email, 1, `${CHECKOUT}?src=${CAMPAIGN}-panier&email=${encodeURIComponent(email)}`, "reprise", "panier-en-attente");
+        return `<!doctype html><html lang="fr"><body style="margin:0;background:#f6f7f8;padding:24px 10px"><table role="presentation" width="600" align="center" style="max-width:600px;background:#ffffff;border:1px solid #e5e7eb;border-collapse:collapse"><tr><td style="background:#008296;padding:18px 28px;color:#ffffff;font:700 22px Arial,Helvetica,sans-serif">EbookStudio</td></tr><tr><td style="padding:24px 28px;color:#232F3E;font:16px/1.65 Arial,Helvetica,sans-serif"><p style="margin:0 0 16px">Bonjour${firstName ? ` ${firstName}` : ""},</p><p style="margin:0 0 16px">J'ai vu que vous aviez commencé votre commande EbookStudio sans aller jusqu'au bout. Rien n'a été prélevé, aucune inquiétude.</p><p style="margin:0 0 16px"><strong>Quelque chose vous a bloqué ?</strong> Un doute, une question sur l'outil, un souci technique au moment du paiement ? Répondez simplement à cet email, même en une ligne : je lis et je réponds personnellement à chaque message.</p><p style="margin:0 0 16px">Et si c'était juste une interruption, vous pouvez reprendre là où vous étiez (carte ou PayPal, en une ou plusieurs échéances) :</p>${ctaButton(link, "Reprendre là où je m'étais arrêté")}<p style="margin:16px 0 0">Bien à vous,<br>Georges Boubet<br>EbookStudio</p></td></tr></table></body></html>`;
+      };
+
+      // Mode test : envoi d'un exemplaire [TEST] sans marquer les commandes.
+      if (body.test_mode) {
+        const testTargets = ((body.test_emails as string[]) || []).map((e) => normalize(e)).filter(isEmail).slice(0, 5);
+        if (!testTargets.length) return respond({ success: false, mode, error: "Aucune adresse de test valide fournie (test_emails)." }, 400);
+        let testSent = 0;
+        const results: Array<{ email: string; ok: boolean; detail?: string }> = [];
+        for (const email of testTargets) {
+          const result = await sendResendEmailThrottled({ from: FROM_CAMPAIGN, to: [email], subject: "[TEST] Votre accès EbookStudio est resté en attente — une question ?", html: renderRelancePanier(email, "Georges"), reply_to: REPLY_TO });
+          await db.from("email_send_log").insert({ recipient_email: email, template_name: "panier-en-attente-test", message_id: result.id || `${CAMPAIGN}-panier-test-${email}`, provider_message_id: result.id || null, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
+          results.push({ email, ok: result.ok, detail: result.ok ? undefined : result.detail });
+          if (result.ok) testSent++;
+        }
+        return respond({ success: true, mode, test_mode: true, sent: testSent, targets: testTargets.length, results });
+      }
+
+      const { data: pendingFunnel } = await db
         .from("funnel_orders")
-        .select("id,email,first_name,amount,metadata,created_at")
+        .select("id,email,first_name,metadata,created_at")
+        .eq("status", "pending")
+        .lt("created_at", cutoff)
+        .limit(200);
+      const { data: pendingV3 } = await db
+        .from("v3_installment_orders")
+        .select("id,email,metadata,created_at")
         .eq("status", "pending")
         .lt("created_at", cutoff)
         .limit(200);
 
-      const targets = (pending || []).filter((o) => {
+      const targetsFunnel = (pendingFunnel || []).filter((o) => {
+        const meta = (o.metadata ?? {}) as Record<string, unknown>;
+        return !meta.recovery_email_sent_at && isEmail(normalize(o.email || ""));
+      });
+      const targetsV3 = (pendingV3 || []).filter((o) => {
         const meta = (o.metadata ?? {}) as Record<string, unknown>;
         return !meta.recovery_email_sent_at && isEmail(normalize(o.email || ""));
       });
 
-      if (body.dry_run) return respond({ success: true, mode, would_send: targets.length });
+      if (body.dry_run) return respond({ success: true, mode, would_send: targetsFunnel.length + targetsV3.length, funnel: targetsFunnel.length, v3_installments: targetsV3.length });
 
       let sentCount = 0;
-      for (const order of targets) {
+      for (const order of targetsFunnel) {
         const email = normalize(order.email || "");
-        const link = trackedUrl(email, 1, `${CHECKOUT}?src=${CAMPAIGN}-panier&email=${encodeURIComponent(email)}`, "reprise", "panier-en-attente");
-        const html = `<!doctype html><html lang="fr"><body style="margin:0;background:#f6f7f8;padding:24px 10px"><table role="presentation" width="600" align="center" style="max-width:600px;background:#ffffff;border:1px solid #e5e7eb;border-collapse:collapse"><tr><td style="background:#008296;padding:18px 28px;color:#ffffff;font:700 22px Arial,Helvetica,sans-serif">EbookStudio</td></tr><tr><td style="padding:24px 28px;color:#232F3E;font:16px/1.65 Arial,Helvetica,sans-serif"><p style="margin:0 0 16px">Bonjour${order.first_name ? ` ${order.first_name}` : ""},</p><p style="margin:0 0 16px">Votre commande a été ouverte mais le paiement n’a pas abouti. Rien n’a été prélevé.</p><p style="margin:0 0 16px">Vous pouvez la reprendre là où vous vous étiez arrêté, par carte ou par PayPal, en une ou plusieurs échéances.</p>${ctaButton(link, "Reprendre ma commande")}<p style="margin:0 0 8px">Si quelque chose vous a bloqué, répondez simplement à cet email : je vous réponds personnellement.</p><p style="margin:16px 0 0">Georges Boubet<br>EbookStudio</p></td></tr></table></body></html>`;
-        const result = await sendResendEmailThrottled({ from: FROM_CAMPAIGN, to: [email], subject: "Votre commande EbookStudio est restée en attente", html, reply_to: REPLY_TO });
-        await db.from("email_send_log").insert({ recipient_email: email, template_name: "panier-en-attente", message_id: result.id || `${CAMPAIGN}-panier-${order.id}`, provider_message_id: result.id || null, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
+        const result = await sendResendEmailThrottled({ from: FROM_CAMPAIGN, to: [email], subject: "Votre accès EbookStudio est resté en attente — une question ?", html: renderRelancePanier(email, (order.first_name as string) || ""), reply_to: REPLY_TO });
+        await db.from("email_send_log").insert({ recipient_email: email, template_name: "panier-en-attente", message_id: result.id || `${CAMPAIGN}-panier-f-${order.id}`, provider_message_id: result.id || null, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
         if (!result.ok) { if (isQuotaExhausted()) break; continue; }
         const meta = { ...((order.metadata ?? {}) as Record<string, unknown>), recovery_email_sent_at: new Date().toISOString() };
         await db.from("funnel_orders").update({ metadata: meta }).eq("id", order.id);
         sentCount++;
       }
-      return respond({ success: true, mode, sent: sentCount, targets: targets.length });
+      for (const order of targetsV3) {
+        const email = normalize(order.email || "");
+        const result = await sendResendEmailThrottled({ from: FROM_CAMPAIGN, to: [email], subject: "Votre accès EbookStudio est resté en attente — une question ?", html: renderRelancePanier(email, ""), reply_to: REPLY_TO });
+        await db.from("email_send_log").insert({ recipient_email: email, template_name: "panier-en-attente", message_id: result.id || `${CAMPAIGN}-panier-v3-${order.id}`, provider_message_id: result.id || null, status: result.ok ? "sent" : "failed", error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}` });
+        if (!result.ok) { if (isQuotaExhausted()) break; continue; }
+        const meta = { ...((order.metadata ?? {}) as Record<string, unknown>), recovery_email_sent_at: new Date().toISOString() };
+        await db.from("v3_installment_orders").update({ metadata: meta }).eq("id", order.id);
+        sentCount++;
+      }
+      return respond({ success: true, mode, sent: sentCount, targets: targetsFunnel.length + targetsV3.length });
     }
 
     // Mode automatique déclenché par le cron quotidien.
