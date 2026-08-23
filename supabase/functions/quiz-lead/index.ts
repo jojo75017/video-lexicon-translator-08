@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { EMAIL_SENDING_ENABLED } from "../_shared/emailSendingGuard.ts";
+import { pushToSystemeIo } from "../_shared/systemeio.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -8,18 +8,6 @@ const corsHeaders = {
 };
 
 const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
-
-// Systeme.io désactivé — les contacts quiz restent dans la base interne.
-// const SYSTEMEIO_BASE = "https://api.systeme.io/api";
-
-// Systeme.io désactivé — la fonction pushToSystemeIo n'est plus appelée.
-// async function pushToSystemeIo(
-//   email: string,
-//   firstName: string,
-//   tags: string[],
-// ): Promise<{ ok: boolean; detail?: string }> {
-//   ...
-// }
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -87,14 +75,11 @@ serve(async (req) => {
       leadId = inserted.id;
     }
 
-    // Systeme.io désactivé — les tags quiz restent internes.
-    // const tags = [tag];
-    // if (base_tag) tags.push(base_tag);
-    // if (source) tags.push(`quiz-source-${source}`);
-    // const sio = EMAIL_SENDING_ENABLED
-    //   ? await pushToSystemeIo(email, first_name, tags)
-    //   : { ok: false, detail: "domain_pending_validation" };
-    const sio = { ok: false, detail: "disabled" };
+    // Synchronisation Systeme.io : le contact est poussé avec ses tags quiz.
+    const tags = [tag];
+    if (base_tag) tags.push(base_tag);
+    if (source) tags.push(`quiz-source-${source}`);
+    const sio = await pushToSystemeIo(email, first_name, tags);
 
     return new Response(
       JSON.stringify({ ok: true, lead_id: leadId, systemeio: sio.ok, systemeio_detail: sio.detail, profile_key, profile_title }),
