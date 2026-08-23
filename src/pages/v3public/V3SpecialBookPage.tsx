@@ -17,8 +17,10 @@ import {
   SpecialUniverseVolumes,
 } from '@/components/admin/SpecialBookModules';
 import V3CreatePage from './V3CreatePage';
+import V3PuzzleBookPage from './V3PuzzleBookPage';
 
 const MAP: Record<string, { title: string; Comp: React.FC }> = {
+  'jeux-enigmes': { title: 'Livres de Jeux & Énigmes', Comp: V3PuzzleBookPage },
   roman: { title: 'Roman', Comp: V3CreatePage },
   cuisine: { title: 'Livre de cuisine', Comp: SpecialRecipeBook },
   voyage: { title: 'Guide de voyage', Comp: SpecialTravelGuide },

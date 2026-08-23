@@ -4,7 +4,7 @@ import {
   ChevronLeft, ChevronRight, ChevronDown,
   GraduationCap, Gem, FileText, User,
   LifeBuoy, Mail, HelpCircle, Video, ListTree, Award,
-  Rocket, Crown, Search, Target, BarChart3, Image as ImageIcon, LayoutGrid, Star, Wand2, PlusCircle, Layers, Megaphone,
+  Rocket, Crown, Search, Target, BarChart3, Image as ImageIcon, LayoutGrid, Star, Wand2, PlusCircle, Layers, Megaphone, Puzzle,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
@@ -56,6 +56,7 @@ const NAV: NavSection[] = [
       { to: '/v3/create', label: 'Ebookstudio-Génie', icon: Sparkles, badge: 'IA' },
       { to: '/v3/create?sommaire=ia', label: 'Sommaire IA (dialogue)', icon: ListTree, badge: 'IA' },
       { to: '/v3/studio', label: 'Studio Pro (Gemini + ChatGPT)', icon: Gem, badge: 'Pro' },
+      { to: '/v3/livres/jeux-enigmes', label: '🧩 Livres de Jeux & Énigmes', icon: Puzzle, badge: 'Pro' },
       { to: '/v3/create/illustre?preset=maternelle-3-6', label: 'Album maternelle 3-6 ans', icon: Sparkles },
       { to: '/v3/create/illustre?preset=histoires-du-soir-3-7', label: 'Histoires du soir 3-7 ans', icon: BookOpen },
       { to: '/v3/corriger', label: 'Corriger mon livre', icon: Wand2 },
