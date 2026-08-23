@@ -5,7 +5,7 @@
 export type V3Pillar = 'publier' | 'monetiser' | 'marketing' | 'ia' | 'edition' | 'distribution' | 'promotion' | 'data';
 export type V3Status = 'todo' | 'in_progress' | 'done';
 export type V3Tier = 'core' | 'upsell';
-export type V3PackId = 'cover' | 'marketing' | 'social' | 'monetisation' | 'editorial' | 'distribution' | 'promotion' | 'transcription' | 'market-research' | 'documentation-studio' | 'boost_lancement';
+export type V3PackId = 'cover' | 'marketing' | 'social' | 'monetisation' | 'editorial' | 'distribution' | 'promotion' | 'transcription' | 'market-research' | 'documentation-studio' | 'boost_lancement' | 'puzzle_book' | 'cherche_trouve';
 
 export interface V3Module {
   id: string;
@@ -137,6 +137,25 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
     badge: 'Offre découverte',
     alacarte: true,
     modules: ['boost-lancement'],
+  },
+  // ===== Modules générateurs à la carte — 27€ accès à vie (inclus dans le plan Pro) =====
+  {
+    id: 'puzzle_book',
+    title: 'Livres de Jeux & Énigmes — Accès à vie',
+    desc: 'Générateur complet de livres d\'énigmes et d\'activités KDP : énoncés, indices progressifs, solutions, exports PDF/DOCX prêts à publier.',
+    price: 27,
+    badge: 'Nouveau',
+    alacarte: true,
+    modules: ['puzzle-book'],
+  },
+  {
+    id: 'cherche_trouve',
+    title: 'Coloriages Cherche & Trouve — Accès à vie',
+    desc: 'Générateur de concepts Cherche & Trouve : scènes thématiques, listes d\'objets cachés (5 à 20) et prompts image optimisés en anglais pour des pages de coloriage line art noir & blanc prêtes pour KDP.',
+    price: 27,
+    badge: 'Nouveau',
+    alacarte: true,
+    modules: ['cherche-trouve'],
   },
 ];
 
