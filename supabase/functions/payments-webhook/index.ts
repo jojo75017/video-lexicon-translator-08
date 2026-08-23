@@ -105,6 +105,7 @@ async function handleCheckoutCompleted(session: any) {
 // Table de correspondance pack_id (checkout) → module (module_entitlements).
 const UPSELL_PACK_MODULES: Record<string, string> = {
   puzzle_book: "puzzle-book",
+  cherche_trouve: "cherche-trouve",
 };
 
 async function handleV3UpsellPackCompleted(session: any, env: StripeEnv) {

@@ -102,6 +102,7 @@ export const V2_TOOLS: V2Tool[] = [
   { id: 'guide-kdp-enfants', label: 'Guide KDP Enfants', description: 'Livres jeunesse Amazon KDP : format & pièges.', route: '/guide-kdp-enfants', icon: BookOpen, category: 'kdp', image: IMG.kdp },
   { id: 'publication-pro', label: 'Publication Pro', description: 'Checklist complète avant publication.', route: '/publication-pro', icon: Rocket, category: 'kdp', badge: 'Pro', image: IMG.kdp },
   { id: 'puzzle-book', label: 'Livres de Jeux & Énigmes', description: 'Générez des livres d\'énigmes et d\'activités prêts pour KDP : énoncés, indices progressifs, solutions, export PDF/DOCX.', route: '/v3/livres/jeux-enigmes', icon: Puzzle, category: 'kdp', badge: 'Pro', image: IMG.kdp },
+  { id: 'cherche-trouve', label: 'Coloriages Cherche & Trouve', description: 'Concepts de scènes, listes d\'objets cachés et prompts IA optimisés (EN) pour des pages de coloriage Cherche & Trouve prêtes pour KDP.', route: '/v3/livres/cherche-trouve', icon: Search, category: 'kdp', badge: 'Pro', image: IMG.kdp },
 
   // — Analyse & Audit —
   { id: 'audit-pilot', label: 'Audit Pilot', description: 'Audit complet de votre manuscrit avant publication.', route: '/audit-pilot', icon: BarChart3, category: 'analyse', image: IMG.analyse },
