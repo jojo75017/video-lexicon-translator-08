@@ -8,6 +8,7 @@ import EmailFunnelPanel from '@/components/admin/EmailFunnelPanel';
 import ClosingCampaignPanel from '@/components/admin/ClosingCampaignPanel';
 import ConversionBoostersPanel from '@/components/admin/ConversionBoostersPanel';
 import ChannelPerformancePanel from '@/components/admin/ChannelPerformancePanel';
+import SystemeIoSyncPanel from '@/components/admin/SystemeIoSyncPanel';
 
 
 import { Input } from '@/components/ui/input';
@@ -807,6 +808,7 @@ const ProspectManagerPage = () => {
 
           {/* MANUAL SEND TAB */}
           <TabsContent value="send" className="space-y-4">
+            <SystemeIoSyncPanel />
             <Card className="bg-card border-border">
               <CardHeader>
                 <CardTitle className="text-gradient-gold text-lg">Séquence unique — envoi contrôlé</CardTitle>

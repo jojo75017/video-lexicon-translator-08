@@ -1583,6 +1583,8 @@ export type Database = {
           lead_magnet_sent_at: string | null
           ref_code: string | null
           sequence_started: boolean
+          systemeio_sync_error: string | null
+          systemeio_synced_at: string | null
           updated_at: string
           user_agent: string | null
           utm_campaign: string | null
@@ -1601,6 +1603,8 @@ export type Database = {
           lead_magnet_sent_at?: string | null
           ref_code?: string | null
           sequence_started?: boolean
+          systemeio_sync_error?: string | null
+          systemeio_synced_at?: string | null
           updated_at?: string
           user_agent?: string | null
           utm_campaign?: string | null
@@ -1619,6 +1623,8 @@ export type Database = {
           lead_magnet_sent_at?: string | null
           ref_code?: string | null
           sequence_started?: boolean
+          systemeio_sync_error?: string | null
+          systemeio_synced_at?: string | null
           updated_at?: string
           user_agent?: string | null
           utm_campaign?: string | null
@@ -2060,6 +2066,8 @@ export type Database = {
           relance_status: string | null
           source: string | null
           status: string | null
+          systemeio_sync_error: string | null
+          systemeio_synced_at: string | null
           unsubscribed: boolean | null
           updated_at: string | null
         }
@@ -2079,6 +2087,8 @@ export type Database = {
           relance_status?: string | null
           source?: string | null
           status?: string | null
+          systemeio_sync_error?: string | null
+          systemeio_synced_at?: string | null
           unsubscribed?: boolean | null
           updated_at?: string | null
         }
@@ -2098,6 +2108,8 @@ export type Database = {
           relance_status?: string | null
           source?: string | null
           status?: string | null
+          systemeio_sync_error?: string | null
+          systemeio_synced_at?: string | null
           unsubscribed?: boolean | null
           updated_at?: string | null
         }
