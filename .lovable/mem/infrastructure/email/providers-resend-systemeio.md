@@ -10,7 +10,8 @@ Fournisseurs retenus :
 - **Systeme.io** — automatisations marketing côté plateforme externe. Désactivé quelques jours en août 2026, puis **réactivé le 23/08/2026** : tous les contacts y sont synchronisés (on nettoie après).
 
 Synchronisation Systeme.io (mise en place le 23/08/2026) :
-- Fonction `sync-systemeio-contacts` (admin) : modes `test`, `dry_run`, `sync` (arrière-plan auto-enchaîné ~100 s/lot, verrou anti double-lancement), `status`.
+- Fonction `sync-systemeio-contacts` (admin) : modes `test`, `dry_run`, `sync` (arrière-plan auto-enchaîné ~100 s/lot, verrou anti double-lancement), `retag` (re-tagage des contacts déjà synchronisés, lancé auto à la fin d'une synchro), `status`.
+- **Tags Systeme.io : l'API exige un `tagId` numérique, JAMAIS un nom** (`tagName` → 422 silencieux, contacts sans tags). Le helper `_shared/systemeio.ts` crée les tags manquants (POST /tags) et assigne par ID, avec cache. Correctif du 23/08/2026.
 - Colonnes de suivi `systemeio_synced_at` / `systemeio_sync_error` sur `sales_prospects` et `funnel_leads`.
 - Tags : `ebookstudio-prospect` + `segment-actif`/`segment-froid`, `ebookstudio-lead` + `lm-<lead_magnet>`, `ebookstudio-client` pour les payants.
 - Les désabonnés (`unsubscribed = true`) ne sont JAMAIS poussés.
