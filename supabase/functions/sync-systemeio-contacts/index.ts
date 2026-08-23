@@ -20,7 +20,7 @@ const LOCK_TTL_MS = 3 * 60_000;
  * Le mode "retag" re-pousse uniquement les contacts synchronisés avant ce cutoff
  * (ou marqués tag_failed) pour leur appliquer leurs tags.
  */
-const TAGS_FIX_CUTOFF = "2026-08-23T13:00:00.000Z";
+const TAGS_FIX_CUTOFF = "2026-08-23T12:30:00.000Z";
 
 type ContactRow = {
   source: "sales_prospects" | "funnel_leads" | "buyers";
