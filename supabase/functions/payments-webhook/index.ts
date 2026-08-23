@@ -357,6 +357,8 @@ Deno.serve(async (req) => {
         }
         if (session.metadata?.kind === "v3_full_pack") {
           await handleV3CheckoutCompleted(session);
+        } else if (session.metadata?.kind === "v3_upsell_pack") {
+          await handleV3UpsellPackCompleted(session, env);
         } else {
           await handleCheckoutCompleted(session);
         }
