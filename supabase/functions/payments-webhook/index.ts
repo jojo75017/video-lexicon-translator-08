@@ -101,6 +101,49 @@ async function handleCheckoutCompleted(session: any) {
   await sendAccessEmail(order.email, order.first_name, accessCode);
 }
 
+// ===== Packs à la carte (v3-upsell-checkout) — ex. Livres de Jeux & Énigmes =====
+// Table de correspondance pack_id (checkout) → module (module_entitlements).
+const UPSELL_PACK_MODULES: Record<string, string> = {
+  puzzle_book: "puzzle-book",
+};
+
+async function handleV3UpsellPackCompleted(session: any, env: StripeEnv) {
+  const orderId = session.metadata?.order_id;
+  const packId = String(session.metadata?.pack_id || "");
+  const email = (session.metadata?.email || session.customer_email || session.customer_details?.email || "").toLowerCase();
+  const supabase = getSupabase();
+
+  // Clôturer la commande du pack.
+  if (orderId) {
+    await supabase.from("v3_installment_orders").update({
+      status: "completed",
+      installments_paid: 1,
+      completed_at: new Date().toISOString(),
+    }).eq("id", orderId);
+  }
+
+  // Accorder le droit d'accès au module (idempotent si Stripe renvoie l'événement).
+  if (email && packId) {
+    const module = UPSELL_PACK_MODULES[packId] ?? packId;
+    const { data: existing } = await supabase.from("module_entitlements")
+      .select("id").eq("stripe_session_id", session.id).maybeSingle();
+    if (!existing) {
+      const amount = typeof session.amount_total === "number" ? session.amount_total / 100 : null;
+      const { error } = await supabase.from("module_entitlements").insert({
+        email,
+        module,
+        status: "active",
+        amount,
+        currency: session.currency || "eur",
+        environment: env,
+        stripe_session_id: session.id,
+      });
+      if (error) console.error("Upsell entitlement insert failed:", error);
+      else console.log("Granted upsell module", module, "to", email);
+    }
+  }
+}
+
 // ===== V3 Pack Tout Complet — paiement unique ou échéancier =====
 
 // Octroie l'accès à vie EbookStudio (statut actif, pas d'expiration).
@@ -314,6 +357,8 @@ Deno.serve(async (req) => {
         }
         if (session.metadata?.kind === "v3_full_pack") {
           await handleV3CheckoutCompleted(session);
+        } else if (session.metadata?.kind === "v3_upsell_pack") {
+          await handleV3UpsellPackCompleted(session, env);
         } else {
           await handleCheckoutCompleted(session);
         }

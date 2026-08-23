@@ -29,6 +29,7 @@ const PACKS: Record<string, { label: string; amount: number }> = {
   distribution: { label: "Pack Distribution Large (Wide)", amount: 9700 },
   promotion: { label: "Pack Promotion Éditeur", amount: 9700 },
   boost_lancement: { label: "Pack Boost de Lancement", amount: 1700 },
+  puzzle_book: { label: "Livres de Jeux & Énigmes — Accès à vie", amount: 2700 },
 };
 
 Deno.serve(async (req) => {

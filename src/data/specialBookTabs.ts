@@ -14,4 +14,5 @@ export const SPECIAL_BOOK_TABS: { slug: string; label: string }[] = [
   { slug: 'oiseaux', label: 'Fiches oiseaux' },
   { slug: 'saga', label: 'Saga multi-tomes' },
   { slug: 'univers', label: 'Univers multi-volumes' },
+  { slug: 'jeux-enigmes', label: 'Jeux & Énigmes' },
 ];

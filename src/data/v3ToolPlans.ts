@@ -17,6 +17,7 @@ export const PRO_ONLY = new Set<string>([
   'bd-studio',
   'bookperfect',
   'masterclass',
+  'puzzle-book',
 ]);
 
 export function planForTool(tool: Pick<V2Tool, 'id'>): V3Plan {
