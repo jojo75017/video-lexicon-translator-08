@@ -14,6 +14,13 @@ const TIME_BUDGET_MS = 100_000;
 const MAX_CHAIN_DEPTH = 120;
 /** Verrou anti double-lancement (manuel + chaîne). */
 const LOCK_TTL_MS = 3 * 60_000;
+/**
+ * Correctif tags (23/08/2026) : avant cette date, les contacts étaient synchronisés
+ * SANS tags (l'API exige tagId, l'ancien code envoyait tagName → refus 422 silencieux).
+ * Le mode "retag" re-pousse uniquement les contacts synchronisés avant ce cutoff
+ * (ou marqués tag_failed) pour leur appliquer leurs tags.
+ */
+const TAGS_FIX_CUTOFF = "2026-08-23T13:00:00.000Z";
 
 type ContactRow = {
   source: "sales_prospects" | "funnel_leads" | "buyers";
@@ -22,6 +29,9 @@ type ContactRow = {
   first_name: string | null;
   tags: string[];
 };
+
+type CollectFilter = "unsynced" | "retag" | "all";
+type JobMode = "sync" | "retag";
 
 type Db = ReturnType<typeof createClient>;
 
@@ -38,11 +48,12 @@ async function isAdmin(req: Request, baseUrl: string) {
 }
 
 /** Rassemble tous les contacts à synchroniser, dédupliqués par email.
- *  Les désabonnés (sales_prospects.unsubscribed = true) ne sont JAMAIS poussés. */
-async function collectContacts(db: Db, onlyUnsynced: boolean): Promise<ContactRow[]> {
+ *  Les désabonnés (sales_prospects.unsubscribed = true) ne sont JAMAIS poussés.
+ *  filter "unsynced" : jamais synchronisés · "retag" : synchronisés sans tags (avant cutoff) · "all" : tout. */
+async function collectContacts(db: Db, filter: CollectFilter): Promise<ContactRow[]> {
   const byEmail = new Map<string, ContactRow>();
 
-  // 1) Acheteurs (priorité maximale : tag client)
+  // 1) Acheteurs (priorité maximale : tag client) — toujours inclus (très peu nombreux)
   const { data: orders } = await db
     .from("funnel_orders")
     .select("email, first_name")
@@ -82,7 +93,12 @@ async function collectContacts(db: Db, onlyUnsynced: boolean): Promise<ContactRo
       .eq("unsubscribed", false)
       .order("id")
       .range(from, from + 999);
-    if (onlyUnsynced) q = q.is("systemeio_synced_at", null);
+    if (filter === "unsynced") {
+      q = q.is("systemeio_synced_at", null);
+    } else if (filter === "retag") {
+      // Synchronisés avant le correctif tags, ou échec d'assignation de tag : à re-tagueter.
+      q = q.or(`systemeio_synced_at.lt.${TAGS_FIX_CUTOFF},systemeio_sync_error.like.tag_failed*`);
+    }
     const { data } = await q;
     prospects.push(...(data ?? []));
     if (!data || data.length < 1000) break;
@@ -103,7 +119,7 @@ async function collectContacts(db: Db, onlyUnsynced: boolean): Promise<ContactRo
     }
   }
 
-  // 3) Leads de tunnel (quiz, pages cadeau) non désabonnés — pagination idem.
+  // 3) Leads de tunnel (quiz, pages cadeau) — pagination idem.
   const leads: Record<string, unknown>[] = [];
   for (let from = 0; ; from += 1000) {
     let q = db
@@ -111,7 +127,11 @@ async function collectContacts(db: Db, onlyUnsynced: boolean): Promise<ContactRo
       .select("id, email, first_name, lead_magnet, systemeio_synced_at")
       .order("id")
       .range(from, from + 999);
-    if (onlyUnsynced) q = q.is("systemeio_synced_at", null);
+    if (filter === "unsynced") {
+      q = q.is("systemeio_synced_at", null);
+    } else if (filter === "retag") {
+      q = q.or(`systemeio_synced_at.lt.${TAGS_FIX_CUTOFF},systemeio_sync_error.like.tag_failed*`);
+    }
     const { data } = await q;
     leads.push(...(data ?? []));
     if (!data || data.length < 1000) break;
@@ -160,14 +180,16 @@ interface SyncLog {
   last_errors: { email: string; detail: string }[];
 }
 
-async function writeLog(db: Db, log: SyncLog) {
+const logKeyFor = (mode: JobMode) => (mode === "retag" ? "systemeio_retag_log" : "systemeio_sync_log");
+
+async function writeLog(db: Db, mode: JobMode, log: SyncLog) {
   await db
     .from("app_secrets")
-    .upsert({ key: "systemeio_sync_log", value: JSON.stringify(log) }, { onConflict: "key" });
+    .upsert({ key: logKeyFor(mode), value: JSON.stringify(log) }, { onConflict: "key" });
 }
 
-async function readLog(db: Db): Promise<SyncLog | null> {
-  const { data } = await db.from("app_secrets").select("value").eq("key", "systemeio_sync_log").maybeSingle();
+async function readLog(db: Db, mode: JobMode): Promise<SyncLog | null> {
+  const { data } = await db.from("app_secrets").select("value").eq("key", logKeyFor(mode)).maybeSingle();
   if (!data?.value) return null;
   try {
     return JSON.parse(data.value) as SyncLog;
@@ -177,16 +199,16 @@ async function readLog(db: Db): Promise<SyncLog | null> {
 }
 
 /** Traite le reste à synchroniser par lots de ~100 s, en s'auto-relancant jusqu'à épuisement. */
-async function runSyncJob(db: Db, baseUrl: string, cronSecret: string, depth: number) {
+async function runSyncJob(db: Db, baseUrl: string, cronSecret: string, depth: number, mode: JobMode) {
   const startedAt = Date.now();
   await refreshLock(db);
 
-  const previous = await readLog(db);
+  const previous = await readLog(db, mode);
   const cumul = depth > 0 && previous
     ? { synced: previous.synced, failed: previous.failed, started_at: previous.started_at }
     : { synced: 0, failed: 0, started_at: new Date().toISOString() };
 
-  const contacts = await collectContacts(db, true);
+  const contacts = await collectContacts(db, mode === "retag" ? "retag" : "unsynced");
   let synced = 0;
   let failed = 0;
   const errors: { email: string; detail: string }[] = [];
@@ -218,7 +240,7 @@ async function runSyncJob(db: Db, baseUrl: string, cronSecret: string, depth: nu
 
   const remaining = contacts.length - synced - failed;
   const done = remaining <= 0 || depth >= MAX_CHAIN_DEPTH;
-  await writeLog(db, {
+  await writeLog(db, mode, {
     state: done ? "done" : "running",
     started_at: cumul.started_at,
     updated_at: new Date().toISOString(),
@@ -228,7 +250,31 @@ async function runSyncJob(db: Db, baseUrl: string, cronSecret: string, depth: nu
     last_errors: errors.slice(0, 20),
   });
 
-  if (done) return;
+  if (done) {
+    // Fin de la synchro principale → on enchaîne automatiquement sur le re-tagage
+    // des contacts synchronisés sans tags (correctif tagId du 23/08/2026).
+    if (mode === "sync") {
+      await writeLog(db, "retag", {
+        state: "running",
+        started_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        synced: 0,
+        failed: 0,
+        remaining: -1,
+        last_errors: [],
+      });
+      try {
+        await fetch(`${baseUrl}/functions/v1/sync-systemeio-contacts`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-cron-secret": cronSecret },
+          body: JSON.stringify({ mode: "retag", depth: 0, chained: true }),
+        }).then((r) => r.text());
+      } catch (e) {
+        console.warn("retag chain launch failed:", (e as Error).message);
+      }
+    }
+    return;
+  }
 
   // Auto-relance : le maillon suivant répond immédiatement et poursuit en arrière-plan.
   if (rateLimited) await new Promise((r) => setTimeout(r, 30_000));
@@ -236,7 +282,7 @@ async function runSyncJob(db: Db, baseUrl: string, cronSecret: string, depth: nu
     await fetch(`${baseUrl}/functions/v1/sync-systemeio-contacts`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-cron-secret": cronSecret },
-      body: JSON.stringify({ mode: "sync", depth: depth + 1, chained: true }),
+      body: JSON.stringify({ mode, depth: depth + 1, chained: true }),
     }).then((r) => r.text());
   } catch (e) {
     console.warn("sync chain relay failed:", (e as Error).message);
@@ -268,7 +314,8 @@ Deno.serve(async (req) => {
     }
 
     if (mode === "status") {
-      const log = await readLog(db);
+      const log = await readLog(db, "sync");
+      const retagLog = await readLog(db, "retag");
       const { count: syncedProspects } = await db
         .from("sales_prospects")
         .select("id", { count: "exact", head: true })
@@ -283,36 +330,39 @@ Deno.serve(async (req) => {
         .not("systemeio_synced_at", "is", null);
       return respond({
         success: true,
-        running: log?.state === "running",
+        running: log?.state === "running" || retagLog?.state === "running",
         log,
+        retag_log: retagLog,
         synced_prospects: syncedProspects ?? 0,
         failed_prospects: failedProspects ?? 0,
         synced_leads: syncedLeads ?? 0,
       });
     }
 
-    if (mode === "dry_run" || mode === "dry_run_all") {
-      const contacts = await collectContacts(db, mode !== "dry_run_all");
+    if (mode === "dry_run" || mode === "dry_run_all" || mode === "dry_run_retag") {
+      const filter: CollectFilter = mode === "dry_run" ? "unsynced" : mode === "dry_run_retag" ? "retag" : "all";
+      const contacts = await collectContacts(db, filter);
       const stats = { total: contacts.length, prospects: 0, leads: 0, buyers: 0 };
       for (const c of contacts) {
         if (c.source === "sales_prospects") stats.prospects++;
         else if (c.source === "funnel_leads") stats.leads++;
         else stats.buyers++;
       }
-      return respond({ success: true, dry_run: true, stats });
+      return respond({ success: true, dry_run: true, filter, stats });
     }
 
-    if (mode === "sync") {
+    if (mode === "sync" || mode === "retag") {
+      const jobMode = mode as JobMode;
       // Verrou anti double-lancement (les maillons de la chaîne le contournent).
       if (!body.chained) {
         const { data: lockRow } = await db.from("app_secrets").select("value").eq("key", "systemeio_sync_lock").maybeSingle();
         const lockAt = lockRow?.value ? Date.parse(lockRow.value) : 0;
         if (lockAt && Date.now() - lockAt < LOCK_TTL_MS) {
-          const log = await readLog(db);
+          const log = await readLog(db, jobMode);
           return respond({ success: false, already_running: true, log });
         }
         // Nouveau lancement manuel : journal remis à zéro par runSyncJob (depth 0).
-        await writeLog(db, {
+        await writeLog(db, jobMode, {
           state: "running",
           started_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
@@ -323,7 +373,7 @@ Deno.serve(async (req) => {
         });
       }
       const depth = typeof body.depth === "number" ? body.depth : 0;
-      const job = runSyncJob(db, baseUrl, cronSecret?.value ?? "", depth);
+      const job = runSyncJob(db, baseUrl, cronSecret?.value ?? "", depth, jobMode);
       const edgeRuntime = (globalThis as { EdgeRuntime?: { waitUntil: (p: Promise<unknown>) => void } }).EdgeRuntime;
       if (edgeRuntime) edgeRuntime.waitUntil(job);
       else await job;
