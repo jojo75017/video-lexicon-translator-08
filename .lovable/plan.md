@@ -62,18 +62,18 @@ C'est le compromis que je recommande : ni redirection brutale (qui fait fuir), n
 
 ## 6. Panneau admin
 
-
-## 5. Panneau admin
-
 Un onglet dans l'admin liste les essais : prénom, email, dates, statut, état de la synchro Systeme.io, avec un bouton « Réessayer l'envoi » par ligne.
 
 ## Détails techniques
 
 - Table `public.free_trials` + GRANT (`service_role` complet, aucun accès direct anon/authenticated : tout passe par les fonctions serveur) + RLS avec lecture admin via `has_role`.
 - Fonction serveur `trial-signup` réécrite : validation email, insertion atomique `on conflict do nothing` pour l'anti-duplication, désactivation du chemin « réactivation d'essai ».
+- Reconnaissance d'un essai côté application : `subscribers.plan_tier = 'essai'` + `trial_ends_at`, exposé par un hook `useTrialAccess` (jours restants, filigrane, modules bloqués, lecture seule).
+- Filigrane d'export : option passée aux utilitaires d'export existants (PDF/DOCX) quand l'essai est actif ou expiré.
 - Réutilisation de `_shared/systemeio.ts` (`pushToSystemeIo`) avec le tag `ESSAI_EBOOKSTUDIO` et les champs personnalisés.
 - Nouvelle fonction `trials-maintenance` : passe les essais échus en `expire`, met à jour `subscribers.status`, et rejoue les synchros Systeme.io en échec. Planifiée via pg_cron (quotidien pour l'expiration, toutes les 15 min pour les reprises), protégée par un secret de cron.
 - Aucun email marketing envoyé depuis l'application : Systeme.io déclenche la campagne sur le tag.
+
 
 ## Ce que je vous montrerai à la fin
 
