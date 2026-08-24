@@ -150,6 +150,9 @@ export default function V3Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const { hasV2 } = useV3Entitlement();
   const { isAdmin } = useIsAdmin();
+  const { isTrial } = useTrialAccess();
+  const trialRestricted = isTrial && isAdmin !== true;
+
   const { pathname, search } = useLocation();
   const currentTab = new URLSearchParams(search).get('tab');
 
