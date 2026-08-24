@@ -1,26 +1,32 @@
-# Page essai gratuit 7 jours en thème clair
+# Page essai gratuit 7 jours : thème clair + mise en ligne
 
-La page `/essai-gratuit-7-jours` existe déjà et fonctionne (formulaire prénom + email, anti-robot, envoi vers Systeme.io). Seul son habillage change : on abandonne le fond sombre pour l'identité claire du site.
+La page `/essai-gratuit-7-jours` existe dans le code et répond bien en aperçu. Sur `ebookstudio.fr`, vous tombez sur « Page introuvable » parce que la version publiée du site est antérieure à la création de cette page : la route n'existe pas encore dans le build en ligne. Il faut donc republier après la refonte visuelle.
 
-## Ce qui change (visuel uniquement)
+## 1. Refonte en thème clair
 
-- Fond clair `#FAFAFA`, texte `#232F3E`, accent teal `#008296`, survol `#FF9E2D` — même identité que le reste d'EbookStudio.
-- Titre principal lisible : « Essai gratuit 7 jours » + sous-titre « Sans carte bancaire ».
-- Carte formulaire blanche, bordure fine, ombre douce, champs clairs, bouton teal pleine largeur.
-- Deux colonnes « Inclus pendant l'essai » (coches vertes) et « Réservé aux abonnés » (cadenas gris) en cartes blanches.
+- Fond clair `#FAFAFA`, texte `#232F3E`, accent teal `#008296`, survol `#FF9E2D`.
+- Titre « Essai gratuit 7 jours » + sous-titre « Sans carte bancaire ».
+- Carte formulaire blanche (bordure fine, ombre douce), champs clairs Prénom / Email, bouton teal pleine largeur.
+- Deux cartes blanches côte à côte : « Inclus pendant l'essai » (coches) et « Réservé aux abonnés » (cadenas).
 - Écran de confirmation et messages d'erreur (email déjà utilisé + bouton vers l'offre) repris dans le même style clair.
-- Responsive mobile conservé.
+- Rendu mobile conservé.
+
+## 2. Mise en ligne
+
+Publication du site pour que `https://ebookstudio.fr/essai-gratuit-7-jours` serve la vraie page au lieu du 404.
 
 ## Ce qui ne change pas
 
-- Le formulaire, la validation, l'anti-duplication, la création de l'essai, l'envoi du contact et du tag `ESSAI_EBOOKSTUDIO` vers Systeme.io.
-- L'URL `https://ebookstudio.fr/essai-gratuit-7-jours` et la redirection depuis `/essai-gratuit`.
+- Formulaire, validation, anti-duplication, création de l'essai 7 jours.
+- Envoi du contact et du tag `ESSAI_EBOOKSTUDIO` vers Systeme.io.
+- L'URL et la redirection depuis `/essai-gratuit`.
 
 ## Détails techniques
 
-- Refonte de `src/pages/launch/EssaiGratuit7JoursPage.tsx` : remplacement des classes/valeurs sombres codées en dur par les tokens clairs du design system, aucune modification de la logique `submit()` ni de l'appel `free-trial-signup`.
-- Titre et meta description de la page vérifiés pour le partage.
+- Refonte de `src/pages/launch/EssaiGratuit7JoursPage.tsx` : remplacement des valeurs sombres codées en dur par les tokens clairs du design system, sans toucher à `submit()` ni à l'appel `free-trial-signup`.
+- Titre et meta description vérifiés pour le partage.
+- Publication du front (les fonctions serveur sont déjà déployées).
 
 ## Vérification
 
-Contrôle navigateur sur `/essai-gratuit-7-jours` : rendu clair, formulaire soumis avec un email de test, message « déjà utilisé » sur un second envoi.
+Contrôle navigateur en aperçu (rendu clair, soumission d'un email de test, message « déjà utilisé » au second envoi), puis contrôle de l'URL publique après publication.
