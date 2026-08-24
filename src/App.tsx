@@ -9,6 +9,8 @@ import { SubscriberGate } from '@/components/auth/SubscriberGate';
 import { AdminGate } from '@/components/auth/AdminGate';
 import { V3Gate } from '@/components/auth/V3Gate';
 import { V3LockedGate } from '@/components/v3/V3LockedGate';
+import { TrialGate } from '@/components/auth/TrialGate';
+
 import { BookPerfectGate } from '@/components/auth/BookPerfectGate';
 import { Loader2 } from 'lucide-react';
 import AccessPendingFallback from '@/components/auth/AccessPendingFallback';
