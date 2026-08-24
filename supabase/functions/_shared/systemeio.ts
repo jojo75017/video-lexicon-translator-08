@@ -141,9 +141,34 @@ export async function pushToSystemeIo(
       if (!contactId) return { ok: false, detail: "created_no_id" };
     } else if (createRes.status === 422) {
       const cbody = await createRes.text();
-      const isUndeliverable = /n['’]existe pas|does not exist|n['’]est pas valide|invalid|non délivrable|undeliverable/i.test(cbody);
-      const isDuplicate = /déjà|already|existe déjà|already exists|duplicate|taken/i.test(cbody);
-      if (isDuplicate && !isUndeliverable) {
+      // On n'analyse QUE les violations portant sur l'email : un champ
+      // personnalisé absent ("The contact field with slug X does not exist")
+      // était auparavant lu comme « email refusé », ce qui annulait le tag.
+      let emailMsgs = "";
+      let fieldSlugError = false;
+      try {
+        const parsed = JSON.parse(cbody);
+        const violations = Array.isArray(parsed?.violations) ? parsed.violations : [];
+        for (const v of violations) {
+          const path = String(v?.propertyPath ?? "");
+          if (path === "email") emailMsgs += ` ${v?.message ?? ""}`;
+          if (path.startsWith("fields")) fieldSlugError = true;
+        }
+      } catch {
+        emailMsgs = cbody;
+      }
+      const scope = emailMsgs || cbody;
+      const isDuplicate = /déjà|already|existe déjà|already exists|duplicate|taken/i.test(scope);
+      const isUndeliverable =
+        !isDuplicate &&
+        /n['’]existe pas|does not exist|n['’]est pas valide|invalid|non délivrable|undeliverable/i.test(scope);
+
+      if (isUndeliverable) {
+        console.warn("Systeme.io email rejeté", scope.slice(0, 200));
+        return { ok: false, detail: `email_rejected:${scope.trim().slice(0, 120)}` };
+      }
+
+      if (isDuplicate) {
         const findRes = await fetch(
           `${SYSTEMEIO_BASE}/contacts?email=${encodeURIComponent(email)}`,
           { headers },
@@ -153,10 +178,34 @@ export async function pushToSystemeIo(
           contactId = found?.items?.[0]?.id ?? null;
         }
         if (!contactId) return { ok: false, detail: "existing_not_found" };
+      } else if (fieldSlugError) {
+        // Champs personnalisés inexistants : on recrée le contact sans champs
+        // pour que le tag soit malgré tout posé.
+        console.warn("Systeme.io : champs personnalisés inexistants, nouvel essai sans champs");
+        const retry = await fetch(`${SYSTEMEIO_BASE}/contacts`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ email, fields: firstName ? [{ slug: "first_name", value: firstName }] : [] }),
+        });
+        if (retry.ok) {
+          const data = await retry.json().catch(() => ({}));
+          contactId = data?.id ?? data?.contact?.id ?? null;
+        } else if (retry.status === 422) {
+          const findRes = await fetch(
+            `${SYSTEMEIO_BASE}/contacts?email=${encodeURIComponent(email)}`,
+            { headers },
+          );
+          if (findRes.ok) {
+            const found = await findRes.json().catch(() => ({}));
+            contactId = found?.items?.[0]?.id ?? null;
+          }
+        }
+        if (!contactId) return { ok: false, detail: `retry_without_fields_failed` };
       } else {
-        console.warn("Systeme.io email rejected", cbody);
-        return { ok: false, detail: "email_rejected" };
+        console.error("Systeme.io create 422", cbody.slice(0, 300));
+        return { ok: false, detail: `create_422:${cbody.slice(0, 150)}` };
       }
+
     } else if (createRes.status === 429) {
       return { ok: false, detail: "rate_429" };
     } else {
