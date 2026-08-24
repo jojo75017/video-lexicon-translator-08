@@ -194,6 +194,13 @@ export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
               Aperçu plein écran
             </Link>
           )}
+          {chapters.length > 0 && (
+            <button type="button" onClick={() => setShowExport((v) => !v)}
+              className="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+              style={{ borderColor: 'var(--v3-gold, #c9a84c)', color: 'var(--v3-accent, #8C6A3F)', background: 'rgba(201,168,76,0.10)' }}>
+              <FileDown className="h-3 w-3" /> {showExport ? 'Masquer l’export' : 'Exporter (tablette, Word, KDP…)'}
+            </button>
+          )}
           <button type="button" onClick={() => window.print()}
             className="inline-flex items-center gap-1 text-[11px] underline" style={{ color: 'var(--v3-muted)' }}>
             <Printer className="h-3 w-3" /> Imprimer
