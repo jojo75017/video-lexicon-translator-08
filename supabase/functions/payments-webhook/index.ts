@@ -106,6 +106,7 @@ async function handleCheckoutCompleted(session: any) {
 const UPSELL_PACK_MODULES: Record<string, string> = {
   puzzle_book: "puzzle-book",
   cherche_trouve: "cherche-trouve",
+  short_stories: "short-stories",
 };
 
 async function handleV3UpsellPackCompleted(session: any, env: StripeEnv) {

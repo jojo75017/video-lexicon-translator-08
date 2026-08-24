@@ -19,10 +19,12 @@ import {
 import V3CreatePage from './V3CreatePage';
 import V3PuzzleBookPage from './V3PuzzleBookPage';
 import V3ChercheTrouvePage from './V3ChercheTrouvePage';
+import V3ShortStoriesPage from './V3ShortStoriesPage';
 
 const MAP: Record<string, { title: string; Comp: React.FC }> = {
   'jeux-enigmes': { title: 'Livres de Jeux & Énigmes', Comp: V3PuzzleBookPage },
   'cherche-trouve': { title: 'Coloriages Cherche & Trouve', Comp: V3ChercheTrouvePage },
+  'histoires-illustrees': { title: 'Histoires Courtes & Contes Illustrés', Comp: V3ShortStoriesPage },
   roman: { title: 'Roman', Comp: V3CreatePage },
   cuisine: { title: 'Livre de cuisine', Comp: SpecialRecipeBook },
   voyage: { title: 'Guide de voyage', Comp: SpecialTravelGuide },
