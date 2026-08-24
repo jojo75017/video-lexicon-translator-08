@@ -47,7 +47,20 @@ interface DiagnosticPayload {
   delivery_total: number;
 }
 
+interface DnsRecordsPayload {
+  domain: string;
+  domain_status: string | null;
+  records: Array<{
+    role: string | null;
+    type: string | null;
+    name: string | null;
+    value: string | null;
+    priority: number | null;
+  }>;
+}
+
 interface TestResult {
+
   to: string;
   ok: boolean;
   message_id?: string;
@@ -71,6 +84,8 @@ interface TestPayload {
 export default function EmailHealthPanel() {
   const [data, setData] = useState<StatusPayload | null>(null);
   const [diag, setDiag] = useState<DiagnosticPayload | null>(null);
+  const [dns, setDns] = useState<DnsRecordsPayload | null>(null);
+
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [showTestInput, setShowTestInput] = useState(false);
