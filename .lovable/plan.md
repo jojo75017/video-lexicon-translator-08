@@ -34,14 +34,34 @@ Page publique `/essai-gratuit-7-jours` (et lien depuis la page d'essai existante
 
 Robustesse : l'inscription est enregistrée **avant** l'appel Systeme.io. Si l'appel échoue, l'essai reste valide, l'erreur est stockée sur la ligne et journalisée, et une tâche planifiée réessaie automatiquement (5 tentatives max, espacement progressif).
 
-## 4. Expiration automatique à J+7
+## 4. Ce qu'il peut faire pendant les 7 jours
+
+Un essai n'est pas un accès complet. Le statut est reconnaissable partout : bandeau permanent « Essai gratuit — il vous reste X jours ».
+
+Autorisé :
+
+- 1 seul livre (projet unique), complet : sommaire IA, écriture des chapitres, correction professionnelle
+- prévisualisation du livre, sauvegarde dans « Mes livres »
+- export PDF / DOCX **filigrané** « Version d'essai — EbookStudio » (page de garde + mention en pied de page)
+
+Bloqué (avec une invitation à passer à l'offre payante) :
+
+- 2e livre, Cover Studio Pro, audio/audiobook, KDP Pilot, traductions 10 langues, livres de jeux / histoires courtes
+- export sans filigrane et données KDP prêtes à publier
+
+## 5. Expiration automatique à J+7
 
 Tâche planifiée quotidienne :
 
-- tout essai dont la date de fin est dépassée passe en `expire`
-- l'accès correspondant est désactivé côté abonnés
-- côté application, un écran « Votre essai est terminé » remplace l'accès, avec le bouton d'achat vers l'offre payante
-- si l'utilisateur achète, l'essai passe en `converti`
+- tout essai dont la date de fin est dépassée passe en `expire`, l'accès est désactivé côté abonnés
+- l'utilisateur garde son livre en **lecture seule** (rien n'est perdu, c'est le meilleur argument de vente) : il peut relire ses chapitres
+- toute action (générer, corriger, exporter) ouvre l'écran « Votre essai est terminé » avec le bouton d'achat vers l'offre payante
+- s'il achète, l'essai passe en `converti` et son livre redevient pleinement modifiable, sans filigrane
+
+C'est le compromis que je recommande : ni redirection brutale (qui fait fuir), ni accès prolongé (qui tue la conversion).
+
+## 6. Panneau admin
+
 
 ## 5. Panneau admin
 
