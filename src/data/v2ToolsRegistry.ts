@@ -103,6 +103,7 @@ export const V2_TOOLS: V2Tool[] = [
   { id: 'publication-pro', label: 'Publication Pro', description: 'Checklist complète avant publication.', route: '/publication-pro', icon: Rocket, category: 'kdp', badge: 'Pro', image: IMG.kdp },
   { id: 'puzzle-book', label: 'Livres de Jeux & Énigmes', description: 'Générez des livres d\'énigmes et d\'activités prêts pour KDP : énoncés, indices progressifs, solutions, export PDF/DOCX.', route: '/v3/livres/jeux-enigmes', icon: Puzzle, category: 'kdp', badge: 'Pro', image: IMG.kdp },
   { id: 'cherche-trouve', label: 'Coloriages Cherche & Trouve', description: 'Concepts de scènes, listes d\'objets cachés et prompts IA optimisés (EN) pour des pages de coloriage Cherche & Trouve prêtes pour KDP.', route: '/v3/livres/cherche-trouve', icon: Search, category: 'kdp', badge: 'Pro', image: IMG.kdp },
+  { id: 'histoires-illustrees', label: 'Histoires Courtes & Contes Illustrés', description: 'Générez des histoires courtes et des contes avec synopsis visuels, prompts d\'illustration et exports PDF/DOCX prêts pour KDP.', route: '/v3/livres/histoires-illustrees', icon: BookOpen, category: 'kdp', badge: 'Pro', image: IMG.kdp },
 
   // — Analyse & Audit —
   { id: 'audit-pilot', label: 'Audit Pilot', description: 'Audit complet de votre manuscrit avant publication.', route: '/audit-pilot', icon: BarChart3, category: 'analyse', image: IMG.analyse },

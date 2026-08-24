@@ -31,6 +31,7 @@ const PACKS: Record<string, { label: string; amount: number }> = {
   boost_lancement: { label: "Pack Boost de Lancement", amount: 1700 },
   puzzle_book: { label: "Livres de Jeux & Énigmes — Accès à vie", amount: 2700 },
   cherche_trouve: { label: "Coloriages Cherche & Trouve — Accès à vie", amount: 2700 },
+  short_stories: { label: "Histoires Courtes & Contes Illustrés — Accès à vie", amount: 2700 },
 };
 
 Deno.serve(async (req) => {

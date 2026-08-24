@@ -16,4 +16,5 @@ export const SPECIAL_BOOK_TABS: { slug: string; label: string }[] = [
   { slug: 'univers', label: 'Univers multi-volumes' },
   { slug: 'jeux-enigmes', label: 'Jeux & Énigmes' },
   { slug: 'cherche-trouve', label: 'Coloriages Cherche & Trouve' },
+  { slug: 'histoires-illustrees', label: 'Histoires Courtes & Contes Illustrés' },
 ];

@@ -5,7 +5,7 @@
 export type V3Pillar = 'publier' | 'monetiser' | 'marketing' | 'ia' | 'edition' | 'distribution' | 'promotion' | 'data';
 export type V3Status = 'todo' | 'in_progress' | 'done';
 export type V3Tier = 'core' | 'upsell';
-export type V3PackId = 'cover' | 'marketing' | 'social' | 'monetisation' | 'editorial' | 'distribution' | 'promotion' | 'transcription' | 'market-research' | 'documentation-studio' | 'boost_lancement' | 'puzzle_book' | 'cherche_trouve';
+export type V3PackId = 'cover' | 'marketing' | 'social' | 'monetisation' | 'editorial' | 'distribution' | 'promotion' | 'transcription' | 'market-research' | 'documentation-studio' | 'boost_lancement' | 'puzzle_book' | 'cherche_trouve' | 'short_stories';
 
 export interface V3Module {
   id: string;
@@ -156,6 +156,15 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
     badge: 'Nouveau',
     alacarte: true,
     modules: ['cherche-trouve'],
+  },
+  {
+    id: 'short_stories',
+    title: 'Histoires Courtes & Contes Illustrés — Accès à vie',
+    desc: 'Générateur d\'histoires courtes et de contes : textes en français, synopsis visuels, prompts d\'illustration optimisés et exports PDF/DOCX prêts pour KDP.',
+    price: 27,
+    badge: 'Nouveau',
+    alacarte: true,
+    modules: ['short-stories'],
   },
 ];
 
