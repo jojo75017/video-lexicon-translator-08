@@ -47,7 +47,20 @@ interface DiagnosticPayload {
   delivery_total: number;
 }
 
+interface DnsRecordsPayload {
+  domain: string;
+  domain_status: string | null;
+  records: Array<{
+    role: string | null;
+    type: string | null;
+    name: string | null;
+    value: string | null;
+    priority: number | null;
+  }>;
+}
+
 interface TestResult {
+
   to: string;
   ok: boolean;
   message_id?: string;
@@ -71,6 +84,8 @@ interface TestPayload {
 export default function EmailHealthPanel() {
   const [data, setData] = useState<StatusPayload | null>(null);
   const [diag, setDiag] = useState<DiagnosticPayload | null>(null);
+  const [dns, setDns] = useState<DnsRecordsPayload | null>(null);
+
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [showTestInput, setShowTestInput] = useState(false);
@@ -130,6 +145,18 @@ export default function EmailHealthPanel() {
       setBusy(null);
     }
   }, [call]);
+
+  const loadDnsRecords = useCallback(async () => {
+    setBusy('dns');
+    try {
+      setDns(await call('dns_records') as unknown as DnsRecordsPayload);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Lecture des enregistrements impossible');
+    } finally {
+      setBusy(null);
+    }
+  }, [call]);
+
 
   const runTest = useCallback(async () => {
     const addresses = testAddresses.split(/[,;\s]+/).map((s) => s.trim()).filter(Boolean);
@@ -251,16 +278,28 @@ export default function EmailHealthPanel() {
               Authentification du domaine d'envoi
               {diag ? ` — ${diag.from_address}` : ''}
             </p>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => void loadDiagnostic()}
-              disabled={busy !== null}
-            >
-              {busy === 'diagnostic'
-                ? <Loader2 className="h-4 w-4 animate-spin" />
-                : 'Relancer le diagnostic'}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => void loadDnsRecords()}
+                disabled={busy !== null}
+              >
+                {busy === 'dns'
+                  ? <Loader2 className="h-4 w-4 animate-spin" />
+                  : 'Voir les enregistrements exacts'}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => void loadDiagnostic()}
+                disabled={busy !== null}
+              >
+                {busy === 'diagnostic'
+                  ? <Loader2 className="h-4 w-4 animate-spin" />
+                  : 'Relancer le diagnostic'}
+              </Button>
+            </div>
           </div>
 
           {!diag && <p className="text-sm text-muted-foreground">Diagnostic en cours…</p>}
@@ -284,7 +323,26 @@ export default function EmailHealthPanel() {
               </p>
             </div>
           )}
+
+          {dns && (
+            <div className="mt-3 space-y-2 border-t border-border pt-3">
+              <p className="text-xs text-muted-foreground">
+                Enregistrements à publier chez l'hébergeur DNS de {dns.domain} (valeurs
+                exactes du moteur d'envoi) :
+              </p>
+              {dns.records.map((r, i) => (
+                <div key={i} className="rounded border border-border bg-background/60 p-2 text-xs">
+                  <p className="font-semibold text-foreground">
+                    {r.type} · {r.name ? `${r.name}.${dns.domain}` : dns.domain}
+                    {r.priority ? ` · priorité ${r.priority}` : ''}
+                  </p>
+                  <p className="mt-1 break-all font-mono text-muted-foreground">{r.value}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
+
 
         {showTestInput && (
           <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-3">

@@ -48,21 +48,30 @@ async function txtRecord(name: string): Promise<string> {
 }
 
 /** Contrôles d'authentification attendus sur le domaine d'envoi. */
+/**
+ * Contrôles d'authentification attendus sur le domaine d'envoi.
+ *
+ * Important : le moteur d'envoi signe depuis le sous-domaine `send.` ; le SPF
+ * attendu est donc sur `send.ebookstudio.fr`, PAS sur le domaine racine (celui
+ * de la racine appartient à la messagerie de l'hébergeur et ne doit pas être
+ * modifié). Le DKIM, lui, se publie bien sur `resend._domainkey` à la racine.
+ */
 const DNS_CHECKS: Array<[string, string, string, (v: string) => boolean, string]> = [
   [
     "spf",
-    "SPF (autorisation d'envoi)",
-    SEND_DOMAIN,
+    "SPF du sous-domaine d'envoi (send.)",
+    `send.${SEND_DOMAIN}`,
     (v) => /v=spf1/i.test(v) && /amazonses\.com/i.test(v),
-    `Publier sur ${SEND_DOMAIN} : v=spf1 include:amazonses.com ~all`,
+    `Publier un TXT sur send.${SEND_DOMAIN} : v=spf1 include:amazonses.com ~all (ne pas toucher au SPF de la racine)`,
   ],
   [
     "dkim",
     "DKIM (signature des messages)",
     `resend._domainkey.${SEND_DOMAIN}`,
     (v) => /p=[A-Za-z0-9+/]{100,}/.test(v),
-    `Publier la clé DKIM fournie par le moteur d'envoi sur resend._domainkey.${SEND_DOMAIN}`,
+    `Publier un TXT nommé resend._domainkey sur ${SEND_DOMAIN} avec la clé publique fournie par le moteur d'envoi (bouton « Voir les enregistrements exacts »)`,
   ],
+
   [
     "dmarc",
     "DMARC (politique déclarée)",
@@ -366,6 +375,56 @@ Deno.serve(async (req) => {
         delivery_total: total ?? 0,
       });
     }
+
+    // ------------------------------------------------------------ dns_records
+    // Récupère chez le moteur d'envoi les enregistrements DNS exacts à publier
+    // (SPF/MX + clé DKIM complète). Nécessite une clé à accès complet.
+    if (mode === "dns_records") {
+      const apiKey = Deno.env.get("RESEND_API_KEY");
+      if (!apiKey) return respond({ error: "Clé d'envoi absente." }, 400);
+      const headers = { Authorization: `Bearer ${apiKey}` };
+
+      const listRes = await fetch("https://api.resend.com/domains", { headers });
+      const listText = await listRes.text();
+      if (!listRes.ok) {
+        return respond({ error: `HTTP ${listRes.status} — ${listText.slice(0, 300)}` }, 400);
+      }
+      const list = JSON.parse(listText) as { data?: Array<{ id: string; name: string; status?: string }> };
+      const domain = (list.data || []).find((d) => d.name?.toLowerCase() === SEND_DOMAIN);
+      if (!domain) {
+        return respond({
+          error: `Le domaine ${SEND_DOMAIN} n'est pas présent chez le moteur d'envoi.`,
+          domains: (list.data || []).map((d) => d.name),
+        }, 404);
+      }
+
+      const detailRes = await fetch(`https://api.resend.com/domains/${domain.id}`, { headers });
+      const detailText = await detailRes.text();
+      if (!detailRes.ok) {
+        return respond({ error: `HTTP ${detailRes.status} — ${detailText.slice(0, 300)}` }, 400);
+      }
+      const detail = JSON.parse(detailText) as {
+        status?: string;
+        records?: Array<{ record?: string; name?: string; type?: string; value?: string; ttl?: string; status?: string; priority?: number }>;
+      };
+
+      return respond({
+        success: true,
+        mode,
+        domain: SEND_DOMAIN,
+        domain_status: detail.status ?? domain.status ?? null,
+        records: (detail.records || []).map((r) => ({
+          role: r.record ?? null,
+          type: r.type ?? null,
+          name: r.name ?? null,
+          value: r.value ?? null,
+          priority: r.priority ?? null,
+          ttl: r.ttl ?? null,
+          status: r.status ?? null,
+        })),
+      });
+    }
+
 
     // --------------------------------------------- deliverability_test
     // Envoie un email [TEST] vers une liste de destinataires (par défaut
