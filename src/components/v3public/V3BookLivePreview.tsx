@@ -89,6 +89,7 @@ export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
   const [progress, setProgress] = useState<WrittenProgress>({ chapters: [], total: 0, activeIndex: -1 });
   const [open, setOpen] = useState(true);
   const [fixing, setFixing] = useState(false);
+  const [showExport, setShowExport] = useState(false);
 
   useEffect(() => {
     const sync = () => setProgress(readWrittenProgress());
