@@ -48,21 +48,30 @@ async function txtRecord(name: string): Promise<string> {
 }
 
 /** Contrôles d'authentification attendus sur le domaine d'envoi. */
+/**
+ * Contrôles d'authentification attendus sur le domaine d'envoi.
+ *
+ * Important : le moteur d'envoi signe depuis le sous-domaine `send.` ; le SPF
+ * attendu est donc sur `send.ebookstudio.fr`, PAS sur le domaine racine (celui
+ * de la racine appartient à la messagerie de l'hébergeur et ne doit pas être
+ * modifié). Le DKIM, lui, se publie bien sur `resend._domainkey` à la racine.
+ */
 const DNS_CHECKS: Array<[string, string, string, (v: string) => boolean, string]> = [
   [
     "spf",
-    "SPF (autorisation d'envoi)",
-    SEND_DOMAIN,
+    "SPF du sous-domaine d'envoi (send.)",
+    `send.${SEND_DOMAIN}`,
     (v) => /v=spf1/i.test(v) && /amazonses\.com/i.test(v),
-    `Publier sur ${SEND_DOMAIN} : v=spf1 include:amazonses.com ~all`,
+    `Publier un TXT sur send.${SEND_DOMAIN} : v=spf1 include:amazonses.com ~all (ne pas toucher au SPF de la racine)`,
   ],
   [
     "dkim",
     "DKIM (signature des messages)",
     `resend._domainkey.${SEND_DOMAIN}`,
     (v) => /p=[A-Za-z0-9+/]{100,}/.test(v),
-    `Publier la clé DKIM fournie par le moteur d'envoi sur resend._domainkey.${SEND_DOMAIN}`,
+    `Publier un TXT nommé resend._domainkey sur ${SEND_DOMAIN} avec la clé publique fournie par le moteur d'envoi (bouton « Voir les enregistrements exacts »)`,
   ],
+
   [
     "dmarc",
     "DMARC (politique déclarée)",
