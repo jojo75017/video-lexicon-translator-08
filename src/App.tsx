@@ -9,6 +9,10 @@ import { SubscriberGate } from '@/components/auth/SubscriberGate';
 import { AdminGate } from '@/components/auth/AdminGate';
 import { V3Gate } from '@/components/auth/V3Gate';
 import { V3LockedGate } from '@/components/v3/V3LockedGate';
+import { TrialGate } from '@/components/auth/TrialGate';
+import { TrialBookLimitGate } from '@/components/auth/TrialBookLimitGate';
+
+
 import { BookPerfectGate } from '@/components/auth/BookPerfectGate';
 import { Loader2 } from 'lucide-react';
 import AccessPendingFallback from '@/components/auth/AccessPendingFallback';
@@ -573,8 +577,9 @@ const App = () => {
             <Route path="/audit-pilot" element={gated(<AuditPilotPage />)} />
             <Route path="/bookperfect" element={<BookPerfectGate><BookPerfectPage /></BookPerfectGate>} />
             <Route path="/couverture-kdp" element={gated(<CouvertureKdpPage />)} />
-            <Route path="/v3/cover-studio-pro" element={gated(<CoverStudioProHubPage />)} />
-            <Route path="/v3/cover-studio-pro/edit" element={gated(<CoverEditorPage />)} />
+            <Route path="/v3/cover-studio-pro" element={gated(<TrialGate label="Cover Studio Pro"><CoverStudioProHubPage /></TrialGate>)} />
+            <Route path="/v3/cover-studio-pro/edit" element={gated(<TrialGate label="Cover Studio Pro"><CoverEditorPage /></TrialGate>)} />
+
             <Route path="/series-tomes" element={gated(<SeriesTomesPage />)} />
             <Route path="/fiches-pratiques" element={gated(<PracticalSheetsGeneratorPage />)} />
 
@@ -621,22 +626,24 @@ const App = () => {
 
 
               {/* Routes verrouillées jusqu'au 1er octobre 2026 (admins exceptés) */}
-              <Route path="create" element={<V3LockedGate><V3CreatePage /></V3LockedGate>} />
+              <Route path="create" element={<V3LockedGate><TrialBookLimitGate><V3CreatePage /></TrialBookLimitGate></V3LockedGate>} />
               {/* Parcours direct « comme la V2, en mieux » : fiche + workflow 15 agents */}
-              <Route path="lancer" element={<V3LockedGate><V3LaunchBookPage /></V3LockedGate>} />
+              <Route path="lancer" element={<V3LockedGate><TrialBookLimitGate><V3LaunchBookPage /></TrialBookLimitGate></V3LockedGate>} />
+
               {/* Biographie — même moteur, entretien et chronologie dédiés */}
-              <Route path="biographie" element={<V3LockedGate><V3CreatePage mode="biography" /></V3LockedGate>} />
-              <Route path="create/illustre" element={<V3LockedGate><V3KidsBookCreatePage /></V3LockedGate>} />
+              <Route path="biographie" element={<V3LockedGate><TrialGate label="Biographie"><V3CreatePage mode="biography" /></TrialGate></V3LockedGate>} />
+              <Route path="create/illustre" element={<V3LockedGate><TrialGate label="Livre illustré"><V3KidsBookCreatePage /></TrialGate></V3LockedGate>} />
               <Route path="book/:id" element={<V3LockedGate><V3BookPage /></V3LockedGate>} />
               <Route path="library" element={<V3LockedGate><V3LibraryPage /></V3LockedGate>} />
-              <Route path="gallery" element={<V3LockedGate><V3GalleryPage /></V3LockedGate>} />
-              <Route path="auteur" element={<V3LockedGate><V3GuestAuthorPage /></V3LockedGate>} />
-              <Route path="u/:slug" element={<V3LockedGate><V3AuthorProfilePage /></V3LockedGate>} />
+              <Route path="gallery" element={<V3LockedGate><TrialGate label="Galerie publique"><V3GalleryPage /></TrialGate></V3LockedGate>} />
+              <Route path="auteur" element={<V3LockedGate><TrialGate label="Profil auteur public"><V3GuestAuthorPage /></TrialGate></V3LockedGate>} />
+              <Route path="u/:slug" element={<V3LockedGate><TrialGate label="Profil auteur public"><V3AuthorProfilePage /></TrialGate></V3LockedGate>} />
               <Route path="mes-livres" element={<V3LockedGate><V3BookManagerPage /></V3LockedGate>} />
               <Route path="livres-corriges" element={<V3LockedGate><V3BookManagerPage /></V3LockedGate>} />
-              <Route path="donnees-kdp" element={<V3LockedGate><V3KdpDataPage /></V3LockedGate>} />
+              <Route path="donnees-kdp" element={<V3LockedGate><TrialGate label="Données KDP"><V3KdpDataPage /></TrialGate></V3LockedGate>} />
               <Route path="parametres" element={<V3LockedGate><V3AuthorSettingsPage /></V3LockedGate>} />
-              <Route path="livres/:type" element={<V3LockedGate><V3SpecialBookPage /></V3LockedGate>} />
+              <Route path="livres/:type" element={<V3LockedGate><TrialGate label="Livres spéciaux"><V3SpecialBookPage /></TrialGate></V3LockedGate>} />
+
               <Route path="offres" element={<Navigate to="/v3/forfaits" replace />} />
               <Route path="offres/merci" element={<Navigate to="/v3/forfaits" replace />} />
 
@@ -644,13 +651,14 @@ const App = () => {
               <Route path="outils" element={<V3LockedGate><V3ToolsIndexPage /></V3LockedGate>} />
               <Route path="assistant" element={<V3LockedGate><V3AssistantPage /></V3LockedGate>} />
               <Route path="outils/sommaire-ultime" element={<V3LockedGate><V3TocUltimatePage /></V3LockedGate>} />
-              <Route path="outils/traduction" element={<V3LockedGate><V3TranslatorPage /></V3LockedGate>} />
+              <Route path="outils/traduction" element={<V3LockedGate><TrialGate label="Traduction 10 langues"><V3TranslatorPage /></TrialGate></V3LockedGate>} />
               <Route path="corriger" element={<V3LockedGate><V3CorrecteurPage /></V3LockedGate>} />
-              <Route path="avis" element={<V3LockedGate><V3AvisClientsPage /></V3LockedGate>} />
-              <Route path="posts" element={<V3LockedGate><V3PostsPage /></V3LockedGate>} />
-              <Route path="acquisition" element={<V3LockedGate><V3AcquisitionPage /></V3LockedGate>} />
+              <Route path="avis" element={<V3LockedGate><TrialGate label="Avis clients"><V3AvisClientsPage /></TrialGate></V3LockedGate>} />
+              <Route path="posts" element={<V3LockedGate><TrialGate label="Publications sociales"><V3PostsPage /></TrialGate></V3LockedGate>} />
+              <Route path="acquisition" element={<V3LockedGate><TrialGate label="Acquisition"><V3AcquisitionPage /></TrialGate></V3LockedGate>} />
               <Route path="kit-demarrage" element={<V3LockedGate><V3KitDemarragePage /></V3LockedGate>} />
-              <Route path="studio" element={<V3LockedGate><V3StudioProPage /></V3LockedGate>} />
+              <Route path="studio" element={<V3LockedGate><TrialGate label="Studio Pro"><V3StudioProPage /></TrialGate></V3LockedGate>} />
+
               <Route path="correcteur" element={<Navigate to="/v3/corriger" replace />} />
 
               <Route path="compte" element={<V3LockedGate><V3ComptePage /></V3LockedGate>} />
@@ -664,16 +672,17 @@ const App = () => {
               <Route path="paypal-retour" element={<V3LockedGate><V3PayPalReturnPage /></V3LockedGate>} />
               <Route path="script-heygen" element={<V3LockedGate><V3ScriptHeygenPage /></V3LockedGate>} />
               <Route path="upsell-17" element={<V3LockedGate><V3Upsell17Page /></V3LockedGate>} />
-              <Route path="outils/ams-keywords" element={<V3LockedGate><V3AmsKeywordsPage /></V3LockedGate>} />
-              <Route path="outils/espion-concurrents" element={<V3LockedGate><V3CompetitorSpyPage /></V3LockedGate>} />
-              <Route path="outils/categories" element={<V3LockedGate><V3CategoryFinderPage /></V3LockedGate>} />
+              <Route path="outils/ams-keywords" element={<V3LockedGate><TrialGate label="Mots-clés AMS"><V3AmsKeywordsPage /></TrialGate></V3LockedGate>} />
+              <Route path="outils/espion-concurrents" element={<V3LockedGate><TrialGate label="Espion concurrents"><V3CompetitorSpyPage /></TrialGate></V3LockedGate>} />
+              <Route path="outils/categories" element={<V3LockedGate><TrialGate label="Catégories KDP"><V3CategoryFinderPage /></TrialGate></V3LockedGate>} />
               <Route path="outils/offerts" element={<V3LockedGate><V3OutilsOffertsPage /></V3LockedGate>} />
               <Route path="nouveautes" element={<V3LockedGate><V3NouveautesPage /></V3LockedGate>} />
-              <Route path="outils/royalties" element={<V3LockedGate><V3RoyaltiesPage /></V3LockedGate>} />
-              <Route path="outils/humanizer" element={<V3LockedGate><V3HumanizerPage /></V3LockedGate>} />
-              <Route path="outils/mockup-3d" element={<V3LockedGate><V3MockupPage /></V3LockedGate>} />
-              <Route path="outils/audiobook" element={<V3LockedGate><V3AudiobookPage /></V3LockedGate>} />
+              <Route path="outils/royalties" element={<V3LockedGate><TrialGate label="Royalties"><V3RoyaltiesPage /></TrialGate></V3LockedGate>} />
+              <Route path="outils/humanizer" element={<V3LockedGate><TrialGate label="Humanizer IA"><V3HumanizerPage /></TrialGate></V3LockedGate>} />
+              <Route path="outils/mockup-3d" element={<V3LockedGate><TrialGate label="Mockup 3D"><V3MockupPage /></TrialGate></V3LockedGate>} />
+              <Route path="outils/audiobook" element={<V3LockedGate><TrialGate label="Livre audio"><V3AudiobookPage /></TrialGate></V3LockedGate>} />
               <Route path="outils/editeur" element={<V3LockedGate><V3EditorPage /></V3LockedGate>} />
+
               <Route path="hub" element={<V3LockedGate><V3Gate><V3HubPage /></V3Gate></V3LockedGate>} />
 
 

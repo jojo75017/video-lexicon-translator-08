@@ -4,11 +4,13 @@ import {
   ChevronLeft, ChevronRight, ChevronDown,
   GraduationCap, Gem, FileText, User,
   LifeBuoy, Mail, HelpCircle, Video, ListTree, Award,
-  Rocket, Crown, Search, Target, BarChart3, Image as ImageIcon, LayoutGrid, Star, Wand2, PlusCircle, Layers, Megaphone, Puzzle,
+  Rocket, Crown, Search, Target, BarChart3, Image as ImageIcon, LayoutGrid, Star, Wand2, PlusCircle, Layers, Megaphone, Puzzle, Lock,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
 import useIsAdmin from '@/hooks/useIsAdmin';
+import useTrialAccess from '@/hooks/useTrialAccess';
+import { isTrialLockedPath } from '@/lib/trialLockedPaths';
 import ThemeToggle from './ThemeToggle';
 
 /**
@@ -148,6 +150,9 @@ export default function V3Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const { hasV2 } = useV3Entitlement();
   const { isAdmin } = useIsAdmin();
+  const { isTrial } = useTrialAccess();
+  const trialRestricted = isTrial && isAdmin !== true;
+
   const { pathname, search } = useLocation();
   const currentTab = new URLSearchParams(search).get('tab');
 
@@ -267,6 +272,7 @@ export default function V3Sidebar() {
                           ? pathname === itPath && currentTab === itTab
                           : pathname === itPath || (itPath.length > 1 && pathname.startsWith(itPath + '/'));
                     const Icon = it.icon;
+                    const trialLocked = trialRestricted && !it.external && isTrialLockedPath(it.to);
 
                     return (
                       <li key={it.to}>
@@ -275,7 +281,7 @@ export default function V3Sidebar() {
                             href={it.to}
                             target="_blank"
                             rel="noopener noreferrer"
-                            title={it.label}
+                            title={trialLocked ? `${it.label} — réservé aux abonnés` : it.label}
                             className="relative flex items-center gap-2.5 rounded-md px-2.5 py-2 text-[13px] transition-colors"
                             style={{ color: 'var(--v3-emerald)', fontWeight: 600, background: 'rgba(201,168,76,0.10)' }}
                           >
@@ -303,7 +309,7 @@ export default function V3Sidebar() {
                           <NavLink
                             to={it.to}
                             end={it.end}
-                            title={it.label}
+                            title={trialLocked ? `${it.label} — réservé aux abonnés` : it.label}
                             className="relative flex items-center gap-2.5 rounded-md px-2.5 py-2 text-[13px] transition-colors"
                             style={
                               active
@@ -332,14 +338,16 @@ export default function V3Sidebar() {
                             {!collapsed && (
                               <>
                                 <span className="truncate flex-1">{it.label}</span>
-                                {it.badge && (
+                                {trialLocked ? (
+                                  <Lock className="w-3.5 h-3.5 shrink-0" style={{ color: 'var(--v3-muted)' }} />
+                                ) : it.badge ? (
                                   <span
                                     className="text-[9px] font-bold uppercase tracking-[0.15em] px-1.5 py-0.5 rounded"
                                     style={{ background: '#C97A14', color: '#fff' }}
                                   >
                                     {it.badge}
                                   </span>
-                                )}
+                                ) : null}
                               </>
                             )}
                           </NavLink>
