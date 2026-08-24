@@ -9,6 +9,7 @@ import V3Footer from './V3Footer';
 import V3Sidebar from './V3Sidebar';
 import V3ContemplationMode from '@/components/v3/V3ContemplationMode';
 import V3AdminQuickAccess from './V3AdminQuickAccess';
+import V3TrialBanner from './V3TrialBanner';
 import { setPreviewingAsSubscriber } from '@/components/v3/V3ContemplationMode';
 
 type V3PublicLayoutProps = {
@@ -51,6 +52,7 @@ export default function V3PublicLayout({ isAdmin, isAdminChecking, isSubscriber 
     <V3ContemplationMode>
       <div className="v3pub min-h-screen flex flex-col">
         <V3Header isAuthed={isAuthed} isAdmin={isAdmin} />
+        <V3TrialBanner />
         <V3MainTabs />
         <V3AdminQuickAccess isAdmin={isAdmin} isAdminChecking={isAdminChecking} />
 
