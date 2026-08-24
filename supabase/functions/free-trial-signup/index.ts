@@ -8,7 +8,7 @@
 //    qui déclenche la campagne dans Systeme.io.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.78.0";
-import { pushToSystemeIo } from "../_shared/systemeio.ts";
+import { pushTrialContact } from "../_shared/systemeio.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -135,7 +135,7 @@ Deno.serve(async (req) => {
     // 4) Envoi vers Systeme.io — non bloquant pour l'inscription.
     let systemeio = false;
     try {
-      const res = await pushToSystemeIo(email, firstName, [TRIAL_TAG], [
+      const res = await pushTrialContact(email, firstName, [TRIAL_TAG], [
         { slug: "source", value: "lovable" },
         { slug: "date_debut_essai", value: frDate(startedAt.toISOString()) },
         { slug: "date_fin_essai", value: frDate(endsAt.toISOString()) },

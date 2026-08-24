@@ -208,3 +208,23 @@ export async function findSystemeIoContactId(email: string): Promise<string | nu
   }
 }
 
+
+/**
+ * Envoi d'un contact d'essai : tente avec les champs personnalisés
+ * (date_debut_essai / date_fin_essai / source) et retombe automatiquement sur
+ * un envoi « prénom + email + tag » si ces champs n'existent pas encore dans
+ * le compte Systeme.io. Le tag reste ainsi toujours posé.
+ */
+export async function pushTrialContact(
+  email: string,
+  firstName: string,
+  tags: string[],
+  fields: { slug: string; value: string }[] = [],
+): Promise<{ ok: boolean; contactId?: string | number | null; detail?: string; fieldsSkipped?: boolean }> {
+  if (fields.length > 0) {
+    const res = await pushToSystemeIo(email, firstName, tags, fields);
+    if (res.ok) return res;
+  }
+  const fallback = await pushToSystemeIo(email, firstName, tags);
+  return { ...fallback, fieldsSkipped: fields.length > 0 };
+}

@@ -11,6 +11,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.78.0";
 import {
   findSystemeIoContactId,
   pushToSystemeIo,
+  pushTrialContact,
   removeSystemeIoTag,
 } from "../_shared/systemeio.ts";
 
@@ -82,7 +83,7 @@ async function retrySync(row: {
   id: string; email: string; first_name: string | null; ends_at: string; systemeio_attempts: number;
 }) {
   try {
-    const res = await pushToSystemeIo(row.email, row.first_name ?? "", [TRIAL_TAG], [
+    const res = await pushTrialContact(row.email, row.first_name ?? "", [TRIAL_TAG], [
       { slug: "source", value: "lovable" },
       { slug: "date_fin_essai", value: new Date(row.ends_at).toLocaleDateString("fr-FR") },
     ]);
