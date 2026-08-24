@@ -1,83 +1,26 @@
-# Essai gratuit 7 jours + envoi automatique vers Systeme.io
+# Page essai gratuit 7 jours en thème clair
 
-Oui, j'ai bien compris. Voici le plan complet.
+La page `/essai-gratuit-7-jours` existe déjà et fonctionne (formulaire prénom + email, anti-robot, envoi vers Systeme.io). Seul son habillage change : on abandonne le fond sombre pour l'identité claire du site.
 
-L'application possède déjà une brique d'essai (`trial-signup`) et un connecteur Systeme.io fonctionnel (création du contact + tags par ID numérique, clé `SYSTEMEIO_API_KEY` déjà en place). Ce qui manque : un vrai registre d'essais avec statut, l'anti-duplication stricte, l'expiration automatique à J+7, et une file de reprise si Systeme.io échoue.
+## Ce qui change (visuel uniquement)
 
-## 1. Registre des essais
+- Fond clair `#FAFAFA`, texte `#232F3E`, accent teal `#008296`, survol `#FF9E2D` — même identité que le reste d'EbookStudio.
+- Titre principal lisible : « Essai gratuit 7 jours » + sous-titre « Sans carte bancaire ».
+- Carte formulaire blanche, bordure fine, ombre douce, champs clairs, bouton teal pleine largeur.
+- Deux colonnes « Inclus pendant l'essai » (coches vertes) et « Réservé aux abonnés » (cadenas gris) en cartes blanches.
+- Écran de confirmation et messages d'erreur (email déjà utilisé + bouton vers l'offre) repris dans le même style clair.
+- Responsive mobile conservé.
 
-Nouvelle table `free_trials` (une ligne par email, unique) :
+## Ce qui ne change pas
 
-- prénom, email (unique, en minuscules)
-- date de début d'essai, date de fin d'essai (début + 7 jours)
-- statut : `actif` / `expire` / `converti`
-- suivi Systeme.io : date de synchro, nombre de tentatives, dernière erreur, prochaine tentative
-
-L'unicité de l'email est garantie par la base : une deuxième inscription est refusée, quoi qu'il arrive.
-
-## 2. Formulaire d'inscription
-
-Page publique `/essai-gratuit-7-jours` (et lien depuis la page d'essai existante) :
-
-- Prénom + Email uniquement (+ champ piège anti-robot)
-- Cas email déjà utilisé : aucun nouvel essai créé, message clair « Vous avez déjà utilisé votre essai gratuit » avec un bouton vers l'offre payante
-- Cas nouvel email : essai créé pour 7 jours, écran de confirmation avec l'accès et la date de fin
-
-## 3. Envoi automatique vers Systeme.io
-
-À chaque nouvel essai, le contact est poussé immédiatement :
-
-- prénom, email
-- source = `lovable`
-- tag = `ESSAI_EBOOKSTUDIO` (créé automatiquement s'il n'existe pas, puis assigné par ID — c'est ce que l'API exige)
-- champs additionnels : date_debut_essai, date_fin_essai
-
-Robustesse : l'inscription est enregistrée **avant** l'appel Systeme.io. Si l'appel échoue, l'essai reste valide, l'erreur est stockée sur la ligne et journalisée, et une tâche planifiée réessaie automatiquement (5 tentatives max, espacement progressif).
-
-## 4. Ce qu'il peut faire pendant les 7 jours
-
-Un essai n'est pas un accès complet. Le statut est reconnaissable partout : bandeau permanent « Essai gratuit — il vous reste X jours ».
-
-Autorisé :
-
-- 1 seul livre (projet unique), complet : sommaire IA, écriture des chapitres, correction professionnelle
-- prévisualisation du livre, sauvegarde dans « Mes livres »
-- export PDF / DOCX **filigrané** « Version d'essai — EbookStudio » (page de garde + mention en pied de page)
-
-Bloqué (avec une invitation à passer à l'offre payante) :
-
-- 2e livre, Cover Studio Pro, audio/audiobook, KDP Pilot, traductions 10 langues, livres de jeux / histoires courtes
-- export sans filigrane et données KDP prêtes à publier
-
-## 5. Expiration automatique à J+7
-
-Tâche planifiée quotidienne :
-
-- tout essai dont la date de fin est dépassée passe en `expire`, l'accès est désactivé côté abonnés
-- l'utilisateur garde son livre en **lecture seule** (rien n'est perdu, c'est le meilleur argument de vente) : il peut relire ses chapitres
-- toute action (générer, corriger, exporter) ouvre l'écran « Votre essai est terminé » avec le bouton d'achat vers l'offre payante
-- s'il achète, l'essai passe en `converti` et son livre redevient pleinement modifiable, sans filigrane
-
-C'est le compromis que je recommande : ni redirection brutale (qui fait fuir), ni accès prolongé (qui tue la conversion).
-
-## 6. Panneau admin
-
-Un onglet dans l'admin liste les essais : prénom, email, dates, statut, état de la synchro Systeme.io, avec un bouton « Réessayer l'envoi » par ligne.
+- Le formulaire, la validation, l'anti-duplication, la création de l'essai, l'envoi du contact et du tag `ESSAI_EBOOKSTUDIO` vers Systeme.io.
+- L'URL `https://ebookstudio.fr/essai-gratuit-7-jours` et la redirection depuis `/essai-gratuit`.
 
 ## Détails techniques
 
-- Table `public.free_trials` + GRANT (`service_role` complet, aucun accès direct anon/authenticated : tout passe par les fonctions serveur) + RLS avec lecture admin via `has_role`.
-- Fonction serveur `trial-signup` réécrite : validation email, insertion atomique `on conflict do nothing` pour l'anti-duplication, désactivation du chemin « réactivation d'essai ».
-- Reconnaissance d'un essai côté application : `subscribers.plan_tier = 'essai'` + `trial_ends_at`, exposé par un hook `useTrialAccess` (jours restants, filigrane, modules bloqués, lecture seule).
-- Filigrane d'export : option passée aux utilitaires d'export existants (PDF/DOCX) quand l'essai est actif ou expiré.
-- Réutilisation de `_shared/systemeio.ts` (`pushToSystemeIo`) avec le tag `ESSAI_EBOOKSTUDIO` et les champs personnalisés.
-- Nouvelle fonction `trials-maintenance` : passe les essais échus en `expire`, met à jour `subscribers.status`, et rejoue les synchros Systeme.io en échec. Planifiée via pg_cron (quotidien pour l'expiration, toutes les 15 min pour les reprises), protégée par un secret de cron.
-- Aucun email marketing envoyé depuis l'application : Systeme.io déclenche la campagne sur le tag.
+- Refonte de `src/pages/launch/EssaiGratuit7JoursPage.tsx` : remplacement des classes/valeurs sombres codées en dur par les tokens clairs du design system, aucune modification de la logique `submit()` ni de l'appel `free-trial-signup`.
+- Titre et meta description de la page vérifiés pour le partage.
 
+## Vérification
 
-## Ce que je vous montrerai à la fin
-
-1. Où se trouve la clé API Systeme.io (secret `SYSTEMEIO_API_KEY`, déjà renseigné) et comment la remplacer.
-2. Comment tester une nouvelle inscription (formulaire + vérification en base).
-3. Comment vérifier dans Systeme.io que le contact et le tag `ESSAI_EBOOKSTUDIO` sont arrivés.
-4. Comment forcer l'expiration pour tester le J+7 (bouton admin de test + antidatage de la date de fin).
+Contrôle navigateur sur `/essai-gratuit-7-jours` : rendu clair, formulaire soumis avec un email de test, message « déjà utilisé » sur un second envoi.
