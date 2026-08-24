@@ -5,10 +5,11 @@
  */
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Eye, EyeOff, Loader2, Printer, Wand2 } from 'lucide-react';
+import { BookOpen, Eye, EyeOff, FileDown, Loader2, Printer, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { validatedPassages, type BookBrief } from '@/lib/v3/bookBrief';
 import { correctWholeBook } from '@/lib/v3/autoCorrectChapters';
+import V3ExportPanel from '@/components/admin/V3ExportPanel';
 import {
   readWrittenProgress, WRITTEN_CHAPTERS_EVENT, type WrittenProgress,
 } from '@/lib/v3/writtenChapters';
