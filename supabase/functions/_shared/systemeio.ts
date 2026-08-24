@@ -18,16 +18,32 @@ async function ensureTagId(name: string, headers: Headers): Promise<number | nul
   const cached = tagIdCache.get(key);
   if (cached) return cached;
 
+  // Parcourt TOUTES les pages de tags (l'ancienne version s'arrêtait aux 100
+  // premiers : au-delà, un tag existant n'était pas trouvé et un doublon
+  // homonyme était créé → le workflow Systeme.io ne se déclenchait jamais).
   const scanExisting = async (): Promise<number | null> => {
     try {
-      const listRes = await fetch(`${SYSTEMEIO_BASE}/tags?limit=100`, { headers });
-      if (!listRes.ok) return null;
-      const data = await listRes.json().catch(() => ({}));
-      const items = Array.isArray(data?.items) ? data.items : [];
-      for (const t of items) {
-        const n = String(t?.name ?? "").trim().toLowerCase();
-        const id = Number(t?.id);
-        if (n && Number.isFinite(id)) tagIdCache.set(n, id);
+      let url: string | null = `${SYSTEMEIO_BASE}/tags?limit=100`;
+      let guard = 0;
+      while (url && guard++ < 30) {
+        const listRes = await fetch(url, { headers });
+        if (!listRes.ok) {
+          console.warn("Systeme.io tags list error", listRes.status, (await listRes.text()).slice(0, 200));
+          break;
+        }
+        const data = await listRes.json().catch(() => ({}));
+        const items = Array.isArray(data?.items) ? data.items : [];
+        for (const t of items) {
+          const n = String(t?.name ?? "").trim().toLowerCase();
+          const id = Number(t?.id);
+          if (n && Number.isFinite(id) && !tagIdCache.has(n)) tagIdCache.set(n, id);
+        }
+        const hit = tagIdCache.get(key);
+        if (hit) return hit;
+        const next = data?.hasMore && items.length > 0
+          ? `${SYSTEMEIO_BASE}/tags?limit=100&startingAfter=${items[items.length - 1]?.id}`
+          : null;
+        url = next;
       }
       return tagIdCache.get(key) ?? null;
     } catch (e) {
@@ -38,7 +54,10 @@ async function ensureTagId(name: string, headers: Headers): Promise<number | nul
 
   // 1) Cherche dans les tags existants
   const found = await scanExisting();
-  if (found) return found;
+  if (found) {
+    console.log(`Systeme.io tag "${name}" trouvé (id=${found})`);
+    return found;
+  }
 
   // 2) Crée le tag
   try {
@@ -51,12 +70,13 @@ async function ensureTagId(name: string, headers: Headers): Promise<number | nul
       const data = await createRes.json().catch(() => ({}));
       const id = Number(data?.id);
       if (Number.isFinite(id)) {
+        console.log(`Systeme.io tag "${name}" créé (id=${id})`);
         tagIdCache.set(key, id);
         return id;
       }
     } else {
       // 422 = le tag existe déjà (créé entre-temps) → on reliste
-      console.warn("Systeme.io tag create warning", createRes.status, await createRes.text());
+      console.warn("Systeme.io tag create warning", createRes.status, (await createRes.text()).slice(0, 200));
     }
   } catch (e) {
     console.warn("Systeme.io tag create exception", (e as Error).message);
@@ -65,6 +85,26 @@ async function ensureTagId(name: string, headers: Headers): Promise<number | nul
   // 3) Dernier recours : relister (couvre le cas "déjà existant")
   return await scanExisting();
 }
+
+/** Liste les tags d'un contact (diagnostic : vérifie que le tag est bien posé). */
+export async function getContactTags(
+  contactId: string | number,
+  headers?: Headers,
+): Promise<{ id: number; name: string }[] | null> {
+  const apiKey = Deno.env.get("SYSTEMEIO_API_KEY");
+  if (!apiKey && !headers) return null;
+  const h = headers ?? { Accept: "application/json", "X-API-Key": apiKey! };
+  try {
+    const res = await fetch(`${SYSTEMEIO_BASE}/contacts/${contactId}`, { headers: h });
+    if (!res.ok) return null;
+    const data = await res.json().catch(() => ({}));
+    const tags = Array.isArray(data?.tags) ? data.tags : [];
+    return tags.map((t: any) => ({ id: Number(t?.id), name: String(t?.name ?? "") }));
+  } catch {
+    return null;
+  }
+}
+
 
 export async function pushToSystemeIo(
   email: string,
@@ -101,9 +141,34 @@ export async function pushToSystemeIo(
       if (!contactId) return { ok: false, detail: "created_no_id" };
     } else if (createRes.status === 422) {
       const cbody = await createRes.text();
-      const isUndeliverable = /n['’]existe pas|does not exist|n['’]est pas valide|invalid|non délivrable|undeliverable/i.test(cbody);
-      const isDuplicate = /déjà|already|existe déjà|already exists|duplicate|taken/i.test(cbody);
-      if (isDuplicate && !isUndeliverable) {
+      // On n'analyse QUE les violations portant sur l'email : un champ
+      // personnalisé absent ("The contact field with slug X does not exist")
+      // était auparavant lu comme « email refusé », ce qui annulait le tag.
+      let emailMsgs = "";
+      let fieldSlugError = false;
+      try {
+        const parsed = JSON.parse(cbody);
+        const violations = Array.isArray(parsed?.violations) ? parsed.violations : [];
+        for (const v of violations) {
+          const path = String(v?.propertyPath ?? "");
+          if (path === "email") emailMsgs += ` ${v?.message ?? ""}`;
+          if (path.startsWith("fields")) fieldSlugError = true;
+        }
+      } catch {
+        emailMsgs = cbody;
+      }
+      const scope = emailMsgs || cbody;
+      const isDuplicate = /déjà|already|existe déjà|already exists|duplicate|taken/i.test(scope);
+      const isUndeliverable =
+        !isDuplicate &&
+        /n['’]existe pas|does not exist|n['’]est pas valide|invalid|non délivrable|undeliverable/i.test(scope);
+
+      if (isUndeliverable) {
+        console.warn("Systeme.io email rejeté", scope.slice(0, 200));
+        return { ok: false, detail: `email_rejected:${scope.trim().slice(0, 120)}` };
+      }
+
+      if (isDuplicate) {
         const findRes = await fetch(
           `${SYSTEMEIO_BASE}/contacts?email=${encodeURIComponent(email)}`,
           { headers },
@@ -113,10 +178,34 @@ export async function pushToSystemeIo(
           contactId = found?.items?.[0]?.id ?? null;
         }
         if (!contactId) return { ok: false, detail: "existing_not_found" };
+      } else if (fieldSlugError) {
+        // Champs personnalisés inexistants : on recrée le contact sans champs
+        // pour que le tag soit malgré tout posé.
+        console.warn("Systeme.io : champs personnalisés inexistants, nouvel essai sans champs");
+        const retry = await fetch(`${SYSTEMEIO_BASE}/contacts`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ email, fields: firstName ? [{ slug: "first_name", value: firstName }] : [] }),
+        });
+        if (retry.ok) {
+          const data = await retry.json().catch(() => ({}));
+          contactId = data?.id ?? data?.contact?.id ?? null;
+        } else if (retry.status === 422) {
+          const findRes = await fetch(
+            `${SYSTEMEIO_BASE}/contacts?email=${encodeURIComponent(email)}`,
+            { headers },
+          );
+          if (findRes.ok) {
+            const found = await findRes.json().catch(() => ({}));
+            contactId = found?.items?.[0]?.id ?? null;
+          }
+        }
+        if (!contactId) return { ok: false, detail: `retry_without_fields_failed` };
       } else {
-        console.warn("Systeme.io email rejected", cbody);
-        return { ok: false, detail: "email_rejected" };
+        console.error("Systeme.io create 422", cbody.slice(0, 300));
+        return { ok: false, detail: `create_422:${cbody.slice(0, 150)}` };
       }
+
     } else if (createRes.status === 429) {
       return { ok: false, detail: "rate_429" };
     } else {
@@ -162,7 +251,25 @@ export async function pushToSystemeIo(
     // Le contact existe mais des tags manquent : signalé comme échec retentative.
     return { ok: false, detail: `tag_failed:${tagFailures.join(",").slice(0, 150)}`, contactId };
   }
+
+  // Vérification finale : un contact créé SANS son tag n'est jamais un succès.
+  if (tags.filter(Boolean).length > 0) {
+    const applied = await getContactTags(contactId, headers);
+    if (applied) {
+      const have = new Set(applied.map((t) => t.name.trim().toLowerCase()));
+      const missing = tags.filter((t) => t && !have.has(t.trim().toLowerCase()));
+      console.log(
+        `Systeme.io contact ${contactId} tags = [${applied.map((t) => `${t.name}#${t.id}`).join(", ")}]`,
+      );
+      if (missing.length > 0) {
+        return { ok: false, detail: `tag_not_applied:${missing.join(",")}`, contactId };
+      }
+    } else {
+      console.warn(`Systeme.io : vérification des tags impossible pour ${contactId}`);
+    }
+  }
   return { ok: true, contactId };
+
 }
 
 /** Retire un tag d'un contact Systeme.io (utilisé après achat pour stopper la relance d'essai). */
