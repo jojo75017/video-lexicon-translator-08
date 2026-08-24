@@ -251,16 +251,28 @@ export default function EmailHealthPanel() {
               Authentification du domaine d'envoi
               {diag ? ` — ${diag.from_address}` : ''}
             </p>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => void loadDiagnostic()}
-              disabled={busy !== null}
-            >
-              {busy === 'diagnostic'
-                ? <Loader2 className="h-4 w-4 animate-spin" />
-                : 'Relancer le diagnostic'}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => void loadDnsRecords()}
+                disabled={busy !== null}
+              >
+                {busy === 'dns'
+                  ? <Loader2 className="h-4 w-4 animate-spin" />
+                  : 'Voir les enregistrements exacts'}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => void loadDiagnostic()}
+                disabled={busy !== null}
+              >
+                {busy === 'diagnostic'
+                  ? <Loader2 className="h-4 w-4 animate-spin" />
+                  : 'Relancer le diagnostic'}
+              </Button>
+            </div>
           </div>
 
           {!diag && <p className="text-sm text-muted-foreground">Diagnostic en cours…</p>}
@@ -284,7 +296,26 @@ export default function EmailHealthPanel() {
               </p>
             </div>
           )}
+
+          {dns && (
+            <div className="mt-3 space-y-2 border-t border-border pt-3">
+              <p className="text-xs text-muted-foreground">
+                Enregistrements à publier chez l'hébergeur DNS de {dns.domain} (valeurs
+                exactes du moteur d'envoi) :
+              </p>
+              {dns.records.map((r, i) => (
+                <div key={i} className="rounded border border-border bg-background/60 p-2 text-xs">
+                  <p className="font-semibold text-foreground">
+                    {r.type} · {r.name ? `${r.name}.${dns.domain}` : dns.domain}
+                    {r.priority ? ` · priorité ${r.priority}` : ''}
+                  </p>
+                  <p className="mt-1 break-all font-mono text-muted-foreground">{r.value}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
+
 
         {showTestInput && (
           <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-3">
