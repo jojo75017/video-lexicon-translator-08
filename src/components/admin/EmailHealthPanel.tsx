@@ -146,6 +146,18 @@ export default function EmailHealthPanel() {
     }
   }, [call]);
 
+  const loadDnsRecords = useCallback(async () => {
+    setBusy('dns');
+    try {
+      setDns(await call('dns_records') as unknown as DnsRecordsPayload);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Lecture des enregistrements impossible');
+    } finally {
+      setBusy(null);
+    }
+  }, [call]);
+
+
   const runTest = useCallback(async () => {
     const addresses = testAddresses.split(/[,;\s]+/).map((s) => s.trim()).filter(Boolean);
     if (!addresses.length) {
