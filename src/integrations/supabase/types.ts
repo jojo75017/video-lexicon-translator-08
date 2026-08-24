@@ -1570,6 +1570,81 @@ export type Database = {
           },
         ]
       }
+      free_trials: {
+        Row: {
+          client_tag_synced_at: string | null
+          converted_at: string | null
+          created_at: string
+          email: string
+          ends_at: string
+          expired_at: string | null
+          first_name: string | null
+          id: string
+          ip: string | null
+          landing_url: string | null
+          source: string
+          started_at: string
+          status: string
+          systemeio_attempts: number
+          systemeio_contact_id: string | null
+          systemeio_last_error: string | null
+          systemeio_next_attempt_at: string | null
+          systemeio_synced_at: string | null
+          updated_at: string
+          user_agent: string | null
+          utm_campaign: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          client_tag_synced_at?: string | null
+          converted_at?: string | null
+          created_at?: string
+          email: string
+          ends_at: string
+          expired_at?: string | null
+          first_name?: string | null
+          id?: string
+          ip?: string | null
+          landing_url?: string | null
+          source?: string
+          started_at?: string
+          status?: string
+          systemeio_attempts?: number
+          systemeio_contact_id?: string | null
+          systemeio_last_error?: string | null
+          systemeio_next_attempt_at?: string | null
+          systemeio_synced_at?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          client_tag_synced_at?: string | null
+          converted_at?: string | null
+          created_at?: string
+          email?: string
+          ends_at?: string
+          expired_at?: string | null
+          first_name?: string | null
+          id?: string
+          ip?: string | null
+          landing_url?: string | null
+          source?: string
+          started_at?: string
+          status?: string
+          systemeio_attempts?: number
+          systemeio_contact_id?: string | null
+          systemeio_last_error?: string | null
+          systemeio_next_attempt_at?: string | null
+          systemeio_synced_at?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_source?: string | null
+        }
+        Relationships: []
+      }
       funnel_leads: {
         Row: {
           ab_variant: string | null

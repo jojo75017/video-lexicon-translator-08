@@ -70,6 +70,7 @@ const V3PaiementPage = lazy(() => import('./pages/V3PaiementPage'));
 const SalesPageV3Launch = lazy(() => import('./pages/SalesPageV3Launch'));
 const EssaiPage = lazy(() => import('./pages/launch/EssaiPage'));
 const EssaiInscriptionPage = lazy(() => import('./pages/launch/EssaiInscriptionPage'));
+const EssaiGratuit7JoursPage = lazy(() => import('./pages/launch/EssaiGratuit7JoursPage'));
 const V3WaitingRoomPage = lazy(() => import('./pages/launch/V3WaitingRoomPage'));
 const MessageAudioPage = lazy(() => import('./pages/launch/MessageAudioPage'));
 const FicheHistoirePage = lazy(() => import('./pages/launch/FicheHistoirePage'));
@@ -189,6 +190,7 @@ const AdminPdfGiftsPage = lazy(() => import('./pages/admin/AdminPdfGiftsPage'));
 const AdminBetaCodesPage = lazy(() => import('./pages/admin/AdminBetaCodesPage'));
 const AdminBetaTestersPage = lazy(() => import('./pages/admin/AdminBetaTestersPage'));
 const AdminTemoignagesPage = lazy(() => import('./pages/admin/AdminTemoignagesPage'));
+const AdminEssaisPage = lazy(() => import('./pages/admin/AdminEssaisPage'));
 
 const AdminPaymentsDashboardPage = lazy(() => import('./pages/admin/AdminPaymentsDashboardPage'));
 const AdminCleanupPage = lazy(() => import('./pages/admin/AdminCleanupPage'));
@@ -411,6 +413,8 @@ const App = () => {
             <Route path="/commander" element={<V3CommanderPage />} />
             <Route path="/essai" element={<EssaiPage />} />
             <Route path="/essai/inscription" element={<EssaiInscriptionPage />} />
+            {/* Essai gratuit 7 jours : inscription publique + envoi Systeme.io */}
+            <Route path="/essai-gratuit-7-jours" element={<EssaiGratuit7JoursPage />} />
             <Route path="/v3/attente" element={<V3WaitingRoomPage />} />
             <Route path="/message" element={<MessageAudioPage />} />
             {/* Fiches ponts du tunnel email : 1 email = 1 fiche = 1 bouton vers /commander */}
@@ -461,7 +465,7 @@ const App = () => {
             <Route path="/webinaire" element={<Navigate to="/offres" replace />} />
             <Route path="/nouveautes-2026" element={<Navigate to="/offres" replace />} />
             <Route path="/arc-signup" element={<Navigate to="/offres" replace />} />
-            <Route path="/essai-gratuit" element={<Navigate to="/commander" replace />} />
+            <Route path="/essai-gratuit" element={<Navigate to="/essai-gratuit-7-jours" replace />} />
             <Route path="/resultat-en-5-min" element={<Navigate to="/commander" replace />} />
             <Route path="/bookperfect-offre" element={<Navigate to="/commander" replace />} />
 
@@ -583,6 +587,7 @@ const App = () => {
             <Route path="/admin/codes-beta" element={<AdminGate><AdminBetaCodesPage /></AdminGate>} />
             <Route path="/admin/beta-testeurs" element={<AdminGate><AdminBetaTestersPage /></AdminGate>} />
             <Route path="/admin/temoignages" element={<AdminGate><AdminTemoignagesPage /></AdminGate>} />
+            <Route path="/admin/essais" element={<AdminGate><AdminEssaisPage /></AdminGate>} />
 
             <Route path="/admin/cleanup" element={<AdminGate><Navigate to="/admin/plans-v3" replace /></AdminGate>} />
             <Route path="/admin/plans-v3" element={<AdminGate><AdminPlansV3Page /></AdminGate>} />

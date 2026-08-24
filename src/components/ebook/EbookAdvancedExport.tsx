@@ -26,6 +26,8 @@ interface EbookAdvancedExportProps {
   coverImage?: string;
   /** Gabarit KDP du PDF Impression (en pouces). Par défaut 6×9. */
   trimSize?: { w: number; h: number };
+  /** Essai gratuit : ajoute un filigrane textuel dans tous les formats exportés. */
+  trialWatermark?: boolean;
 }
 
 type ExportFormat = 'docx-kdp' | 'epub' | 'pdf-print' | 'pdf-digital' | 'txt' | 'html';
@@ -70,17 +72,28 @@ const sanitizeChapterTitle = (raw: string, idx: number): string => {
 };
 
 export const EbookAdvancedExport: React.FC<EbookAdvancedExportProps> = ({
-  ebookTitle, authorName, chapters: rawChapters, preface, conclusion, characters, coverImage, trimSize,
+  ebookTitle, authorName, chapters: rawChapters, preface: rawPreface, conclusion: rawConclusion, characters, coverImage, trimSize,
+  trialWatermark = false,
 }) => {
+  // Filigrane d'essai : appliqué au texte lui-même pour couvrir les 6 formats.
+  const WATERMARK = '— Version d’essai EbookStudio · export sans filigrane réservé aux abonnés —';
   // Sanitize toutes les entrées avant export (protège TOC + corps).
   const chapters = useMemo(
     () => (rawChapters || []).map((ch, i) => ({
       ...ch,
       title: sanitizeChapterTitle(ch.title, i),
+      content: trialWatermark ? `${ch.content || ''}\n\n${WATERMARK}` : ch.content,
       subChapters: (ch.subChapters || []).map((s, j) => ({ ...s, title: sanitizeChapterTitle(s.title, j) })),
     })),
-    [rawChapters]
+    [rawChapters, trialWatermark]
   );
+
+  const preface = trialWatermark
+    ? `${WATERMARK}\n\n${rawPreface || ''}`.trim()
+    : rawPreface;
+  const conclusion = trialWatermark
+    ? `${rawConclusion || ''}\n\n${WATERMARK}`.trim()
+    : rawConclusion;
 
   const { formatId } = useKdpFormat();
   const [selectedFormat, setSelectedFormat] = useState<ExportFormat>('docx-kdp');
