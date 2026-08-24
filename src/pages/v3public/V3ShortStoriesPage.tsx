@@ -274,7 +274,7 @@ export default function V3ShortStoriesPage() {
           <input
             value={theme}
             onChange={(e) => setTheme(e.target.value)}
-            placeholder='Ex : "Histoires du soir", "Aventures dans l\'espace"…'
+            placeholder='Ex : "Histoires du soir", "Aventures dans l espace"…'
             className="w-full rounded-lg border px-3 py-2.5 text-sm mb-3"
             style={{ borderColor: LINE }}
           />
