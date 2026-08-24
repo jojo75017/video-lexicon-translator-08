@@ -628,18 +628,19 @@ const App = () => {
               {/* Parcours direct « comme la V2, en mieux » : fiche + workflow 15 agents */}
               <Route path="lancer" element={<V3LockedGate><V3LaunchBookPage /></V3LockedGate>} />
               {/* Biographie — même moteur, entretien et chronologie dédiés */}
-              <Route path="biographie" element={<V3LockedGate><V3CreatePage mode="biography" /></V3LockedGate>} />
-              <Route path="create/illustre" element={<V3LockedGate><V3KidsBookCreatePage /></V3LockedGate>} />
+              <Route path="biographie" element={<V3LockedGate><TrialGate label="Biographie"><V3CreatePage mode="biography" /></TrialGate></V3LockedGate>} />
+              <Route path="create/illustre" element={<V3LockedGate><TrialGate label="Livre illustré"><V3KidsBookCreatePage /></TrialGate></V3LockedGate>} />
               <Route path="book/:id" element={<V3LockedGate><V3BookPage /></V3LockedGate>} />
               <Route path="library" element={<V3LockedGate><V3LibraryPage /></V3LockedGate>} />
-              <Route path="gallery" element={<V3LockedGate><V3GalleryPage /></V3LockedGate>} />
-              <Route path="auteur" element={<V3LockedGate><V3GuestAuthorPage /></V3LockedGate>} />
-              <Route path="u/:slug" element={<V3LockedGate><V3AuthorProfilePage /></V3LockedGate>} />
+              <Route path="gallery" element={<V3LockedGate><TrialGate label="Galerie publique"><V3GalleryPage /></TrialGate></V3LockedGate>} />
+              <Route path="auteur" element={<V3LockedGate><TrialGate label="Profil auteur public"><V3GuestAuthorPage /></TrialGate></V3LockedGate>} />
+              <Route path="u/:slug" element={<V3LockedGate><TrialGate label="Profil auteur public"><V3AuthorProfilePage /></TrialGate></V3LockedGate>} />
               <Route path="mes-livres" element={<V3LockedGate><V3BookManagerPage /></V3LockedGate>} />
               <Route path="livres-corriges" element={<V3LockedGate><V3BookManagerPage /></V3LockedGate>} />
-              <Route path="donnees-kdp" element={<V3LockedGate><V3KdpDataPage /></V3LockedGate>} />
+              <Route path="donnees-kdp" element={<V3LockedGate><TrialGate label="Données KDP"><V3KdpDataPage /></TrialGate></V3LockedGate>} />
               <Route path="parametres" element={<V3LockedGate><V3AuthorSettingsPage /></V3LockedGate>} />
-              <Route path="livres/:type" element={<V3LockedGate><V3SpecialBookPage /></V3LockedGate>} />
+              <Route path="livres/:type" element={<V3LockedGate><TrialGate label="Livres spéciaux"><V3SpecialBookPage /></TrialGate></V3LockedGate>} />
+
               <Route path="offres" element={<Navigate to="/v3/forfaits" replace />} />
               <Route path="offres/merci" element={<Navigate to="/v3/forfaits" replace />} />
 
