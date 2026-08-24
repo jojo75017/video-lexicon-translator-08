@@ -648,13 +648,14 @@ const App = () => {
               <Route path="outils" element={<V3LockedGate><V3ToolsIndexPage /></V3LockedGate>} />
               <Route path="assistant" element={<V3LockedGate><V3AssistantPage /></V3LockedGate>} />
               <Route path="outils/sommaire-ultime" element={<V3LockedGate><V3TocUltimatePage /></V3LockedGate>} />
-              <Route path="outils/traduction" element={<V3LockedGate><V3TranslatorPage /></V3LockedGate>} />
+              <Route path="outils/traduction" element={<V3LockedGate><TrialGate label="Traduction 10 langues"><V3TranslatorPage /></TrialGate></V3LockedGate>} />
               <Route path="corriger" element={<V3LockedGate><V3CorrecteurPage /></V3LockedGate>} />
-              <Route path="avis" element={<V3LockedGate><V3AvisClientsPage /></V3LockedGate>} />
-              <Route path="posts" element={<V3LockedGate><V3PostsPage /></V3LockedGate>} />
-              <Route path="acquisition" element={<V3LockedGate><V3AcquisitionPage /></V3LockedGate>} />
+              <Route path="avis" element={<V3LockedGate><TrialGate label="Avis clients"><V3AvisClientsPage /></TrialGate></V3LockedGate>} />
+              <Route path="posts" element={<V3LockedGate><TrialGate label="Publications sociales"><V3PostsPage /></TrialGate></V3LockedGate>} />
+              <Route path="acquisition" element={<V3LockedGate><TrialGate label="Acquisition"><V3AcquisitionPage /></TrialGate></V3LockedGate>} />
               <Route path="kit-demarrage" element={<V3LockedGate><V3KitDemarragePage /></V3LockedGate>} />
-              <Route path="studio" element={<V3LockedGate><V3StudioProPage /></V3LockedGate>} />
+              <Route path="studio" element={<V3LockedGate><TrialGate label="Studio Pro"><V3StudioProPage /></TrialGate></V3LockedGate>} />
+
               <Route path="correcteur" element={<Navigate to="/v3/corriger" replace />} />
 
               <Route path="compte" element={<V3LockedGate><V3ComptePage /></V3LockedGate>} />
