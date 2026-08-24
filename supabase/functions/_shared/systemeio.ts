@@ -202,7 +202,25 @@ export async function pushToSystemeIo(
     // Le contact existe mais des tags manquent : signalé comme échec retentative.
     return { ok: false, detail: `tag_failed:${tagFailures.join(",").slice(0, 150)}`, contactId };
   }
+
+  // Vérification finale : un contact créé SANS son tag n'est jamais un succès.
+  if (tags.filter(Boolean).length > 0) {
+    const applied = await getContactTags(contactId, headers);
+    if (applied) {
+      const have = new Set(applied.map((t) => t.name.trim().toLowerCase()));
+      const missing = tags.filter((t) => t && !have.has(t.trim().toLowerCase()));
+      console.log(
+        `Systeme.io contact ${contactId} tags = [${applied.map((t) => `${t.name}#${t.id}`).join(", ")}]`,
+      );
+      if (missing.length > 0) {
+        return { ok: false, detail: `tag_not_applied:${missing.join(",")}`, contactId };
+      }
+    } else {
+      console.warn(`Systeme.io : vérification des tags impossible pour ${contactId}`);
+    }
+  }
   return { ok: true, contactId };
+
 }
 
 /** Retire un tag d'un contact Systeme.io (utilisé après achat pour stopper la relance d'essai). */
