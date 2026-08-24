@@ -135,11 +135,11 @@ Deno.serve(async (req) => {
     // 4) Envoi vers Systeme.io — non bloquant pour l'inscription.
     let systemeio = false;
     try {
-      const res = await pushTrialContact(email, firstName, [TRIAL_TAG], [
-        { slug: "source", value: "lovable" },
-        { slug: "date_debut_essai", value: frDate(startedAt.toISOString()) },
-        { slug: "date_fin_essai", value: frDate(endsAt.toISOString()) },
-      ]);
+      // Aucun champ personnalisé : les slugs source / date_debut_essai /
+      // date_fin_essai n'existent pas dans le compte Systeme.io et provoquaient
+      // un 422 à chaque inscription. Seul le tag pilote la campagne.
+      const res = await pushTrialContact(email, firstName, [TRIAL_TAG]);
+
       systemeio = res.ok;
       await supabase
         .from("free_trials")
