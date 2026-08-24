@@ -367,6 +367,56 @@ Deno.serve(async (req) => {
       });
     }
 
+    // ------------------------------------------------------------ dns_records
+    // Récupère chez le moteur d'envoi les enregistrements DNS exacts à publier
+    // (SPF/MX + clé DKIM complète). Nécessite une clé à accès complet.
+    if (mode === "dns_records") {
+      const apiKey = Deno.env.get("RESEND_API_KEY");
+      if (!apiKey) return respond({ error: "Clé d'envoi absente." }, 400);
+      const headers = { Authorization: `Bearer ${apiKey}` };
+
+      const listRes = await fetch("https://api.resend.com/domains", { headers });
+      const listText = await listRes.text();
+      if (!listRes.ok) {
+        return respond({ error: `HTTP ${listRes.status} — ${listText.slice(0, 300)}` }, 400);
+      }
+      const list = JSON.parse(listText) as { data?: Array<{ id: string; name: string; status?: string }> };
+      const domain = (list.data || []).find((d) => d.name?.toLowerCase() === SEND_DOMAIN);
+      if (!domain) {
+        return respond({
+          error: `Le domaine ${SEND_DOMAIN} n'est pas présent chez le moteur d'envoi.`,
+          domains: (list.data || []).map((d) => d.name),
+        }, 404);
+      }
+
+      const detailRes = await fetch(`https://api.resend.com/domains/${domain.id}`, { headers });
+      const detailText = await detailRes.text();
+      if (!detailRes.ok) {
+        return respond({ error: `HTTP ${detailRes.status} — ${detailText.slice(0, 300)}` }, 400);
+      }
+      const detail = JSON.parse(detailText) as {
+        status?: string;
+        records?: Array<{ record?: string; name?: string; type?: string; value?: string; ttl?: string; status?: string; priority?: number }>;
+      };
+
+      return respond({
+        success: true,
+        mode,
+        domain: SEND_DOMAIN,
+        domain_status: detail.status ?? domain.status ?? null,
+        records: (detail.records || []).map((r) => ({
+          role: r.record ?? null,
+          type: r.type ?? null,
+          name: r.name ?? null,
+          value: r.value ?? null,
+          priority: r.priority ?? null,
+          ttl: r.ttl ?? null,
+          status: r.status ?? null,
+        })),
+      });
+    }
+
+
     // --------------------------------------------- deliverability_test
     // Envoie un email [TEST] vers une liste de destinataires (par défaut
     // l'adresse de l'admin) et enregistre les message_id pour suivi.
