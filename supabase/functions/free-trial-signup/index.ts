@@ -26,7 +26,7 @@ const json = (body: unknown, status = 200) =>
 
 const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 
-const frDate = (iso: string) => new Date(iso).toLocaleDateString("fr-FR");
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
