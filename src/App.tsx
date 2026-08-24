@@ -669,16 +669,17 @@ const App = () => {
               <Route path="paypal-retour" element={<V3LockedGate><V3PayPalReturnPage /></V3LockedGate>} />
               <Route path="script-heygen" element={<V3LockedGate><V3ScriptHeygenPage /></V3LockedGate>} />
               <Route path="upsell-17" element={<V3LockedGate><V3Upsell17Page /></V3LockedGate>} />
-              <Route path="outils/ams-keywords" element={<V3LockedGate><V3AmsKeywordsPage /></V3LockedGate>} />
-              <Route path="outils/espion-concurrents" element={<V3LockedGate><V3CompetitorSpyPage /></V3LockedGate>} />
-              <Route path="outils/categories" element={<V3LockedGate><V3CategoryFinderPage /></V3LockedGate>} />
+              <Route path="outils/ams-keywords" element={<V3LockedGate><TrialGate label="Mots-clés AMS"><V3AmsKeywordsPage /></TrialGate></V3LockedGate>} />
+              <Route path="outils/espion-concurrents" element={<V3LockedGate><TrialGate label="Espion concurrents"><V3CompetitorSpyPage /></TrialGate></V3LockedGate>} />
+              <Route path="outils/categories" element={<V3LockedGate><TrialGate label="Catégories KDP"><V3CategoryFinderPage /></TrialGate></V3LockedGate>} />
               <Route path="outils/offerts" element={<V3LockedGate><V3OutilsOffertsPage /></V3LockedGate>} />
               <Route path="nouveautes" element={<V3LockedGate><V3NouveautesPage /></V3LockedGate>} />
-              <Route path="outils/royalties" element={<V3LockedGate><V3RoyaltiesPage /></V3LockedGate>} />
-              <Route path="outils/humanizer" element={<V3LockedGate><V3HumanizerPage /></V3LockedGate>} />
-              <Route path="outils/mockup-3d" element={<V3LockedGate><V3MockupPage /></V3LockedGate>} />
-              <Route path="outils/audiobook" element={<V3LockedGate><V3AudiobookPage /></V3LockedGate>} />
+              <Route path="outils/royalties" element={<V3LockedGate><TrialGate label="Royalties"><V3RoyaltiesPage /></TrialGate></V3LockedGate>} />
+              <Route path="outils/humanizer" element={<V3LockedGate><TrialGate label="Humanizer IA"><V3HumanizerPage /></TrialGate></V3LockedGate>} />
+              <Route path="outils/mockup-3d" element={<V3LockedGate><TrialGate label="Mockup 3D"><V3MockupPage /></TrialGate></V3LockedGate>} />
+              <Route path="outils/audiobook" element={<V3LockedGate><TrialGate label="Livre audio"><V3AudiobookPage /></TrialGate></V3LockedGate>} />
               <Route path="outils/editeur" element={<V3LockedGate><V3EditorPage /></V3LockedGate>} />
+
               <Route path="hub" element={<V3LockedGate><V3Gate><V3HubPage /></V3Gate></V3LockedGate>} />
 
 
