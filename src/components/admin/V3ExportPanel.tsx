@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { ChevronDown, Info, BookOpen } from 'lucide-react';
 import { EbookAdvancedExport } from '@/components/ebook/EbookAdvancedExport';
+import { useTrialAccess } from '@/hooks/useTrialAccess';
 import type { Chapter } from '@/hooks/useSubscriptionGeneration';
 
 const AMBER = '#E8951E';
@@ -122,6 +123,7 @@ interface V3ExportPanelProps {
 const V3ExportPanel: React.FC<V3ExportPanelProps> = ({
   manuscript = '', chapters: structuredChapters, expectedChapterCount, title, subtitle, author,
 }) => {
+  const { watermarkExports } = useTrialAccess();
   const [trimId, setTrimId] = useState('6x9');
   const [infoOpen, setInfoOpen] = useState(false);
   const trim = KDP_TRIM_SIZES.find((t) => t.id === trimId) ?? KDP_TRIM_SIZES[3];
@@ -257,6 +259,7 @@ const V3ExportPanel: React.FC<V3ExportPanelProps> = ({
           authorName={author || ''}
           chapters={chapters}
           trimSize={{ w: trim.w, h: trim.h }}
+          trialWatermark={watermarkExports}
         />
       </div>
     </div>

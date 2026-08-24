@@ -164,3 +164,47 @@ export async function pushToSystemeIo(
   }
   return { ok: true, contactId };
 }
+
+/** Retire un tag d'un contact Systeme.io (utilisé après achat pour stopper la relance d'essai). */
+export async function removeSystemeIoTag(
+  contactId: string | number,
+  tagName: string,
+): Promise<{ ok: boolean; detail?: string }> {
+  const apiKey = Deno.env.get("SYSTEMEIO_API_KEY");
+  if (!apiKey) return { ok: false, detail: "missing_key" };
+  const headers = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    "X-API-Key": apiKey,
+  };
+  try {
+    const tagId = await ensureTagId(tagName, headers);
+    if (!tagId) return { ok: false, detail: "tag_not_found" };
+    const res = await fetch(`${SYSTEMEIO_BASE}/contacts/${contactId}/tags/${tagId}`, {
+      method: "DELETE",
+      headers,
+    });
+    // 404 = le tag n'était déjà plus sur le contact : résultat identique.
+    if (res.ok || res.status === 404) return { ok: true };
+    return { ok: false, detail: `delete_${res.status}` };
+  } catch (e) {
+    return { ok: false, detail: (e as Error).message };
+  }
+}
+
+/** Retrouve l'ID d'un contact Systeme.io à partir de son email. */
+export async function findSystemeIoContactId(email: string): Promise<string | number | null> {
+  const apiKey = Deno.env.get("SYSTEMEIO_API_KEY");
+  if (!apiKey) return null;
+  try {
+    const res = await fetch(`${SYSTEMEIO_BASE}/contacts?email=${encodeURIComponent(email)}`, {
+      headers: { Accept: "application/json", "X-API-Key": apiKey },
+    });
+    if (!res.ok) return null;
+    const data = await res.json().catch(() => ({}));
+    return data?.items?.[0]?.id ?? null;
+  } catch {
+    return null;
+  }
+}
+
