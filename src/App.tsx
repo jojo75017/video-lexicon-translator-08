@@ -573,8 +573,9 @@ const App = () => {
             <Route path="/audit-pilot" element={gated(<AuditPilotPage />)} />
             <Route path="/bookperfect" element={<BookPerfectGate><BookPerfectPage /></BookPerfectGate>} />
             <Route path="/couverture-kdp" element={gated(<CouvertureKdpPage />)} />
-            <Route path="/v3/cover-studio-pro" element={gated(<CoverStudioProHubPage />)} />
-            <Route path="/v3/cover-studio-pro/edit" element={gated(<CoverEditorPage />)} />
+            <Route path="/v3/cover-studio-pro" element={gated(<TrialGate label="Cover Studio Pro"><CoverStudioProHubPage /></TrialGate>)} />
+            <Route path="/v3/cover-studio-pro/edit" element={gated(<TrialGate label="Cover Studio Pro"><CoverEditorPage /></TrialGate>)} />
+
             <Route path="/series-tomes" element={gated(<SeriesTomesPage />)} />
             <Route path="/fiches-pratiques" element={gated(<PracticalSheetsGeneratorPage />)} />
 
