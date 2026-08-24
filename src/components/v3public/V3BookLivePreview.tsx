@@ -289,6 +289,21 @@ export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
           ))}
         </div>
       )}
+
+      {showExport && chapters.length > 0 && (
+        <div className="mt-3">
+          <V3ExportPanel
+            chapters={exportChapters}
+            expectedChapterCount={progress.total > 0 ? progress.total : undefined}
+            title={title}
+            subtitle={brief.subtitle}
+            author={brief.author}
+          />
+          <p className="mt-2 text-[11px]" style={{ color: 'var(--v3-muted)' }}>
+            Pour relire sur tablette : choisis le format <strong>PDF Digital</strong> ou <strong>EPUB</strong>. Pour retravailler le texte : <strong>DOCX</strong> ou <strong>TXT</strong>.
+          </p>
+        </div>
+      )}
     </section>
   );
 }
