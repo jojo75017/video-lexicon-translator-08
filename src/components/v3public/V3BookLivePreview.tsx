@@ -5,10 +5,11 @@
  */
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Eye, EyeOff, Loader2, Printer, Wand2 } from 'lucide-react';
+import { BookOpen, Eye, EyeOff, FileDown, Loader2, Printer, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { validatedPassages, type BookBrief } from '@/lib/v3/bookBrief';
 import { correctWholeBook } from '@/lib/v3/autoCorrectChapters';
+import V3ExportPanel from '@/components/admin/V3ExportPanel';
 import {
   readWrittenProgress, WRITTEN_CHAPTERS_EVENT, type WrittenProgress,
 } from '@/lib/v3/writtenChapters';
@@ -88,6 +89,7 @@ export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
   const [progress, setProgress] = useState<WrittenProgress>({ chapters: [], total: 0, activeIndex: -1 });
   const [open, setOpen] = useState(true);
   const [fixing, setFixing] = useState(false);
+  const [showExport, setShowExport] = useState(false);
 
   useEffect(() => {
     const sync = () => setProgress(readWrittenProgress());
@@ -154,6 +156,14 @@ export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
   const totalWords = chapters.reduce((sum, c) => sum + c.words, 0);
   const pages = Math.max(1, Math.round(totalWords / 250));
   const title = brief.title?.trim() || 'Projet sans titre';
+
+  /** Chapitres structurés pour l'export multi-format (même texte que celui affiché). */
+  const exportChapters = useMemo(() => chapters.map((c, i) => ({
+    id: `ch-${i + 1}`,
+    title: c.title || `Chapitre ${i + 1}`,
+    subChapters: [],
+    content: c.text,
+  })), [chapters]);
   const rawCount = progress.chapters.filter((c) => c.status === 'raw' || c.status === 'failed').length;
   const correcting = progress.chapters.some((c) => c.status === 'correcting');
   const firstError = progress.chapters.find((c) => c.status === 'failed' && c.error)?.error || '';
@@ -183,6 +193,13 @@ export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
             <Link to={`/v3/book/${brief.projectId}`} className="text-[11px] underline" style={{ color: 'var(--v3-muted)' }}>
               Aperçu plein écran
             </Link>
+          )}
+          {chapters.length > 0 && (
+            <button type="button" onClick={() => setShowExport((v) => !v)}
+              className="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+              style={{ borderColor: 'var(--v3-gold, #c9a84c)', color: 'var(--v3-accent, #8C6A3F)', background: 'rgba(201,168,76,0.10)' }}>
+              <FileDown className="h-3 w-3" /> {showExport ? 'Masquer l’export' : 'Exporter (tablette, Word, KDP…)'}
+            </button>
           )}
           <button type="button" onClick={() => window.print()}
             className="inline-flex items-center gap-1 text-[11px] underline" style={{ color: 'var(--v3-muted)' }}>
@@ -270,6 +287,21 @@ export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
 
             </article>
           ))}
+        </div>
+      )}
+
+      {showExport && chapters.length > 0 && (
+        <div className="mt-3">
+          <V3ExportPanel
+            chapters={exportChapters}
+            expectedChapterCount={progress.total > 0 ? progress.total : undefined}
+            title={title}
+            subtitle={brief.subtitle}
+            author={brief.author}
+          />
+          <p className="mt-2 text-[11px]" style={{ color: 'var(--v3-muted)' }}>
+            Pour relire sur tablette : choisis le format <strong>PDF Digital</strong> ou <strong>EPUB</strong>. Pour retravailler le texte : <strong>DOCX</strong> ou <strong>TXT</strong>.
+          </p>
         </div>
       )}
     </section>
