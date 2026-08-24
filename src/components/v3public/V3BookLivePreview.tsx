@@ -156,6 +156,14 @@ export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
   const totalWords = chapters.reduce((sum, c) => sum + c.words, 0);
   const pages = Math.max(1, Math.round(totalWords / 250));
   const title = brief.title?.trim() || 'Projet sans titre';
+
+  /** Chapitres structurés pour l'export multi-format (même texte que celui affiché). */
+  const exportChapters = useMemo(() => chapters.map((c, i) => ({
+    id: `ch-${i + 1}`,
+    title: c.title || `Chapitre ${i + 1}`,
+    subChapters: [],
+    content: c.text,
+  })), [chapters]);
   const rawCount = progress.chapters.filter((c) => c.status === 'raw' || c.status === 'failed').length;
   const correcting = progress.chapters.some((c) => c.status === 'correcting');
   const firstError = progress.chapters.find((c) => c.status === 'failed' && c.error)?.error || '';
