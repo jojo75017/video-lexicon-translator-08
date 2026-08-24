@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { CheckCircle2, Loader2, Lock, Mail, User } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 /**
  * Inscription à l'essai gratuit 7 jours (page publique).
@@ -10,9 +11,6 @@ import { CheckCircle2, Loader2, Lock, Mail, User } from 'lucide-react';
  * envoi du contact vers Systeme.io (tag ESSAI_EBOOKSTUDIO).
  * Les emails marketing sont pilotés dans Systeme.io.
  */
-const AMBER = '#E8951E';
-const INK = '#2A2118';
-
 const INCLUDED = [
   '1 livre complet (sommaire IA + chapitres)',
   'Correction professionnelle éditoriale',
@@ -73,54 +71,53 @@ const EssaiGratuit7JoursPage: React.FC = () => {
   };
 
   return (
-    <main className="min-h-screen bg-[#0E0B08] text-[#F6EFE6] px-4 py-12">
+    <main className="min-h-screen bg-background px-4 py-12 text-foreground">
       <div className="mx-auto max-w-3xl">
-        <h1 className="text-3xl md:text-4xl font-bold text-center" style={{ color: AMBER }}>
+        <div className="text-center">
+          <p className="text-sm font-semibold uppercase text-primary">Sans carte bancaire</p>
+        </div>
+        <h1 className="mt-2 text-center text-3xl font-bold text-foreground md:text-4xl">
           Essai gratuit 7 jours
         </h1>
-        <p className="mt-3 text-center text-[#D8CCBC]">
+        <p className="mt-3 text-center text-muted-foreground">
           Écrivez votre premier livre complet avec EbookStudio. Sans carte bancaire.
         </p>
 
         {done ? (
-          <section className="mt-10 rounded-2xl border border-[#2E241A] bg-[#171208] p-8 text-center">
-            <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-400" />
-            <h2 className="mt-4 text-2xl font-semibold">Votre essai est ouvert</h2>
-            <p className="mt-2 text-[#D8CCBC]">
+          <section className="mt-10 rounded-lg border border-border bg-card p-8 text-center shadow-sm">
+            <CheckCircle2 className="mx-auto h-12 w-12 text-primary" />
+            <h2 className="mt-4 text-2xl font-semibold text-card-foreground">Votre essai est ouvert</h2>
+            <p className="mt-2 text-muted-foreground">
               Vous avez jusqu’au{' '}
               <strong>{new Date(done.endsAt).toLocaleDateString('fr-FR')}</strong> pour créer votre livre.
               Vos accès et la marche à suivre arrivent par email dans quelques minutes.
             </p>
-            <Link
-              to="/v3"
-              className="mt-6 inline-block rounded-lg px-6 py-3 font-semibold text-[#1A1206]"
-              style={{ background: AMBER }}
-            >
-              Commencer mon livre
-            </Link>
+            <Button asChild className="mt-6 min-h-11 px-6">
+              <Link to="/v3">Commencer mon livre</Link>
+            </Button>
           </section>
         ) : (
           <form
             onSubmit={submit}
-            className="mt-10 rounded-2xl border border-[#2E241A] bg-[#171208] p-6 md:p-8"
+            className="mt-10 rounded-lg border border-border bg-card p-6 text-card-foreground shadow-sm md:p-8"
           >
-            <label className="block text-sm text-[#D8CCBC]" htmlFor="trial-first-name">Prénom</label>
-            <div className="mt-1 flex items-center gap-2 rounded-lg border border-[#3A2C1D] bg-[#0F0B06] px-3">
-              <User className="h-4 w-4 text-[#8A7A66]" />
+            <label className="block text-sm font-medium text-foreground" htmlFor="trial-first-name">Prénom</label>
+            <div className="mt-1 flex items-center gap-2 rounded-md border border-input bg-background px-3 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+              <User className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
               <input
                 id="trial-first-name"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 required
                 autoComplete="given-name"
-                className="w-full bg-transparent py-3 outline-none"
+                className="w-full bg-transparent py-3 text-foreground outline-none placeholder:text-muted-foreground"
                 placeholder="Marie"
               />
             </div>
 
-            <label className="mt-5 block text-sm text-[#D8CCBC]" htmlFor="trial-email">Email</label>
-            <div className="mt-1 flex items-center gap-2 rounded-lg border border-[#3A2C1D] bg-[#0F0B06] px-3">
-              <Mail className="h-4 w-4 text-[#8A7A66]" />
+            <label className="mt-5 block text-sm font-medium text-foreground" htmlFor="trial-email">Email</label>
+            <div className="mt-1 flex items-center gap-2 rounded-md border border-input bg-background px-3 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+              <Mail className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
               <input
                 id="trial-email"
                 type="email"
@@ -128,7 +125,7 @@ const EssaiGratuit7JoursPage: React.FC = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
-                className="w-full bg-transparent py-3 outline-none"
+                className="w-full bg-transparent py-3 text-foreground outline-none placeholder:text-muted-foreground"
                 placeholder="vous@exemple.fr"
               />
             </div>
@@ -145,53 +142,48 @@ const EssaiGratuit7JoursPage: React.FC = () => {
             />
 
             {error && (
-              <div className="mt-5 rounded-lg border border-amber-600/40 bg-amber-900/20 p-4 text-sm">
+              <div className="mt-5 rounded-md border border-destructive/30 bg-destructive/10 p-4 text-sm text-foreground" role="alert">
                 <p>{error}</p>
                 {alreadyUsed && (
-                  <Link
-                    to="/commander"
-                    className="mt-3 inline-block rounded-lg px-4 py-2 font-semibold text-[#1A1206]"
-                    style={{ background: AMBER }}
-                  >
-                    Voir l’offre complète
-                  </Link>
+                  <Button asChild className="mt-3 min-h-11">
+                    <Link to="/commander">Voir l’offre complète</Link>
+                  </Button>
                 )}
               </div>
             )}
 
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg py-3 font-semibold text-[#1A1206] disabled:opacity-60"
-              style={{ background: AMBER }}
+              className="mt-6 min-h-11 w-full"
             >
               {loading && <Loader2 className="h-4 w-4 animate-spin" />}
               {loading ? 'Création de votre essai…' : 'Démarrer mes 7 jours gratuits'}
-            </button>
-            <p className="mt-3 text-center text-xs text-[#9C8B77]">
+            </Button>
+            <p className="mt-3 text-center text-xs text-muted-foreground">
               Un seul essai gratuit par adresse email. Aucune carte bancaire demandée.
             </p>
           </form>
         )}
 
         <section className="mt-10 grid gap-6 md:grid-cols-2">
-          <div className="rounded-2xl border border-[#2E241A] bg-[#12100A] p-6">
-            <h2 className="font-semibold" style={{ color: AMBER }}>Inclus pendant l’essai</h2>
-            <ul className="mt-3 space-y-2 text-sm text-[#D8CCBC]">
+          <div className="rounded-lg border border-border bg-card p-6 text-card-foreground shadow-sm">
+            <h2 className="font-semibold text-primary">Inclus pendant l’essai</h2>
+            <ul className="mt-3 space-y-2 text-sm text-foreground">
               {INCLUDED.map((i) => (
                 <li key={i} className="flex gap-2">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
                   {i}
                 </li>
               ))}
             </ul>
           </div>
-          <div className="rounded-2xl border border-[#2E241A] bg-[#12100A] p-6">
-            <h2 className="font-semibold text-[#C9B79E]">Réservé aux abonnés</h2>
-            <ul className="mt-3 space-y-2 text-sm text-[#A8998A]">
+          <div className="rounded-lg border border-border bg-card p-6 text-card-foreground shadow-sm">
+            <h2 className="font-semibold text-foreground">Réservé aux abonnés</h2>
+            <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               {LOCKED.map((i) => (
                 <li key={i} className="flex gap-2">
-                  <Lock className="mt-0.5 h-4 w-4 shrink-0" />
+                  <Lock className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
                   {i}
                 </li>
               ))}
@@ -199,10 +191,9 @@ const EssaiGratuit7JoursPage: React.FC = () => {
           </div>
         </section>
 
-        <p className="mt-8 text-center text-sm text-[#9C8B77]" style={{ color: undefined }}>
+        <p className="mt-8 text-center text-sm text-muted-foreground">
           À la fin des 7 jours, votre livre reste visible en lecture seule : rien n’est supprimé.
         </p>
-        <p className="sr-only" style={{ color: INK }}>EbookStudio essai gratuit</p>
       </div>
     </main>
   );
