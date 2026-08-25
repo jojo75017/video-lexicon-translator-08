@@ -21,7 +21,20 @@ const corsHeaders = {
 
 const TEMPLATE = "relance-panier-47";
 const MIN_AGE_HOURS = 2;
-const MAX_AGE_DAYS = 14;
+const MAX_AGE_DAYS = 60;
+
+/** Adresses internes / de test : jamais relancées. */
+function isInternalEmail(email: string): boolean {
+  const e = email.trim().toLowerCase();
+  if (!e || !e.includes("@")) return true;
+  if (e.endsWith("@example.com")) return true;
+  if (e.endsWith("@ebookstudio.fr")) return true;
+  if (e.includes("+test")) return true;
+  if (e.includes("test-") || e.includes("-test")) return true;
+  if (e.startsWith("boubetgeorges")) return true;
+  return false;
+}
+
 
 function html(firstName: string | null, link: string): string {
   const hello = firstName ? `Bonjour ${firstName},` : "Bonjour,";
