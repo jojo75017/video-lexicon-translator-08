@@ -21,7 +21,20 @@ const corsHeaders = {
 
 const TEMPLATE = "relance-panier-47";
 const MIN_AGE_HOURS = 2;
-const MAX_AGE_DAYS = 14;
+const MAX_AGE_DAYS = 60;
+
+/** Adresses internes / de test : jamais relancées. */
+function isInternalEmail(email: string): boolean {
+  const e = email.trim().toLowerCase();
+  if (!e || !e.includes("@")) return true;
+  if (e.endsWith("@example.com")) return true;
+  if (e.endsWith("@ebookstudio.fr")) return true;
+  if (e.includes("+test")) return true;
+  if (e.includes("test-") || e.includes("-test")) return true;
+  if (e.startsWith("boubetgeorges")) return true;
+  return false;
+}
+
 
 function html(firstName: string | null, link: string): string {
   const hello = firstName ? `Bonjour ${firstName},` : "Bonjour,";
@@ -105,9 +118,13 @@ Deno.serve(async (req) => {
     // Ne jamais relancer une adresse qui a déjà payé, ni une commande déjà relancée.
     const { data: paid } = await db.from("funnel_orders").select("email").eq("status", "paid").limit(5000);
     const paidEmails = new Set((paid || []).map((r: any) => String(r.email || "").toLowerCase()));
+    // `cancelled` n'est pas un paiement : ces personnes restent à relancer.
     const { data: paidInst } = await db
-      .from("v3_installment_orders").select("email").neq("status", "pending").limit(5000);
+      .from("v3_installment_orders").select("email").in("status", ["active", "completed", "paid"]).limit(5000);
     for (const r of paidInst || []) paidEmails.add(String((r as any).email || "").toLowerCase());
+    // Ni les abonnés actifs (accès déjà ouvert).
+    const { data: subs } = await db.from("subscribers").select("email").eq("status", "active").limit(5000);
+    for (const r of subs || []) paidEmails.add(String((r as any).email || "").toLowerCase());
 
     type Candidate = {
       table: "funnel_orders" | "v3_installment_orders";
@@ -119,7 +136,7 @@ Deno.serve(async (req) => {
     const candidates: Candidate[] = [];
     const pushCandidate = (c: Candidate) => {
       const email = c.email.trim().toLowerCase();
-      if (!email || email.endsWith("@example.com")) return;
+      if (isInternalEmail(email)) return;
       if (paidEmails.has(email)) return;
       if (c.metadata && (c.metadata as any).relance_sent_at) return;
       if (seen.has(email)) return; // un seul email par personne
