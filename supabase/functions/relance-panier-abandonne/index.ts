@@ -132,7 +132,7 @@ Deno.serve(async (req) => {
     const candidates: Candidate[] = [];
     const pushCandidate = (c: Candidate) => {
       const email = c.email.trim().toLowerCase();
-      if (!email || email.endsWith("@example.com")) return;
+      if (isInternalEmail(email)) return;
       if (paidEmails.has(email)) return;
       if (c.metadata && (c.metadata as any).relance_sent_at) return;
       if (seen.has(email)) return; // un seul email par personne
