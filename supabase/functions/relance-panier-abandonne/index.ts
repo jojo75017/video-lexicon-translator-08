@@ -23,10 +23,17 @@ const TEMPLATE = "relance-panier-47";
 const MIN_AGE_HOURS = 2;
 const MAX_AGE_DAYS = 60;
 
+/** Adresses à ne jamais relancer (doublons connus d'un client déjà payant, demandes explicites). */
+const DO_NOT_CONTACT = new Set<string>([
+  // Même personne que pacheco97223@gmail.com (déjà client payant)
+  "claude97rc@gmail.com",
+]);
+
 /** Adresses internes / de test : jamais relancées. */
 function isInternalEmail(email: string): boolean {
   const e = email.trim().toLowerCase();
   if (!e || !e.includes("@")) return true;
+  if (DO_NOT_CONTACT.has(e)) return true;
   if (e.endsWith("@example.com")) return true;
   if (e.endsWith("@ebookstudio.fr")) return true;
   if (e.includes("+test")) return true;
@@ -34,6 +41,7 @@ function isInternalEmail(email: string): boolean {
   if (e.startsWith("boubetgeorges")) return true;
   return false;
 }
+
 
 
 function html(firstName: string | null, link: string): string {
