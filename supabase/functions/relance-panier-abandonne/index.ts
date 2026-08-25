@@ -118,9 +118,13 @@ Deno.serve(async (req) => {
     // Ne jamais relancer une adresse qui a déjà payé, ni une commande déjà relancée.
     const { data: paid } = await db.from("funnel_orders").select("email").eq("status", "paid").limit(5000);
     const paidEmails = new Set((paid || []).map((r: any) => String(r.email || "").toLowerCase()));
+    // `cancelled` n'est pas un paiement : ces personnes restent à relancer.
     const { data: paidInst } = await db
-      .from("v3_installment_orders").select("email").neq("status", "pending").limit(5000);
+      .from("v3_installment_orders").select("email").in("status", ["active", "completed", "paid"]).limit(5000);
     for (const r of paidInst || []) paidEmails.add(String((r as any).email || "").toLowerCase());
+    // Ni les abonnés actifs (accès déjà ouvert).
+    const { data: subs } = await db.from("subscribers").select("email").eq("status", "active").limit(5000);
+    for (const r of subs || []) paidEmails.add(String((r as any).email || "").toLowerCase());
 
     type Candidate = {
       table: "funnel_orders" | "v3_installment_orders";
