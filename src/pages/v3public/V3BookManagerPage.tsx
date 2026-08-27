@@ -15,6 +15,7 @@ type Book = {
   kdp_description?: string | null;
   chapters?: unknown;
   number_of_chapters?: number | null;
+  updated_at?: string | null;
 };
 
 
@@ -23,6 +24,17 @@ const hasChapterContent = (chapters: unknown): chapters is Record<string, unknow
     const chapter = raw && typeof raw === 'object' ? raw as Record<string, unknown> : {};
     return String(chapter.content || chapter.contenu || '').trim().length > 0;
   });
+
+/** Poids d'un livre : plus il contient de texte, plus il est prioritaire lors du dédoublonnage. */
+const bookWeight = (book: Book): number => {
+  const raw = Array.isArray(book.chapters) ? book.chapters : [];
+  return raw.reduce((total, item) => {
+    const chapter = item && typeof item === 'object' ? item as Record<string, unknown> : {};
+    return total + String(chapter.content || chapter.contenu || '').trim().length;
+  }, 0);
+};
+
+const titleKey = (title: string) => title.trim().toLowerCase().replace(/\s+/g, ' ');
 
 export default function V3BookManagerPage() {
   const nav = useNavigate();
@@ -33,12 +45,13 @@ export default function V3BookManagerPage() {
   const [editing, setEditing] = useState<Book | null>(null);
   const [exporting, setExporting] = useState<Book | null>(null);
   const [exportLoadingId, setExportLoadingId] = useState<string | null>(null);
+  const [cleaning, setCleaning] = useState(false);
 
   const load = async () => {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) { nav('/v3/auth'); return; }
     let query = supabase.from('ebook_projects')
-      .select('id,title,author_name,kdp_description,chapters,number_of_chapters,project_type')
+      .select('id,title,author_name,kdp_description,chapters,number_of_chapters,project_type,updated_at')
       .eq('user_id', auth.user.id);
     if (correctedOnly) query = query.eq('project_type', 'corrected');
     const { data, error } = await query.order('updated_at', { ascending: false });
@@ -48,6 +61,42 @@ export default function V3BookManagerPage() {
   };
   useEffect(() => { load(); }, []); // eslint-disable-line
 
+  /** Groupes de livres partageant le même titre. */
+  const duplicateGroups = (() => {
+    const map = new Map<string, Book[]>();
+    rows.forEach((book) => {
+      const key = titleKey(book.title || '');
+      map.set(key, [...(map.get(key) || []), book]);
+    });
+    return [...map.values()].filter((group) => group.length > 1);
+  })();
+  const duplicateCount = duplicateGroups.reduce((total, group) => total + group.length - 1, 0);
+  const duplicateIds = new Set(duplicateGroups.flatMap((group) => group.map((book) => book.id)));
+
+  const cleanDuplicates = async () => {
+    if (duplicateCount === 0) return;
+    if (!confirm(`Supprimer ${duplicateCount} doublon(s) ? La version la plus complète de chaque titre est conservée.`)) return;
+    setCleaning(true);
+    try {
+      const toDelete = duplicateGroups.flatMap((group) => {
+        const sorted = [...group].sort((a, b) => {
+          const diff = bookWeight(b) - bookWeight(a);
+          if (diff !== 0) return diff;
+          return new Date(b.updated_at || 0).getTime() - new Date(a.updated_at || 0).getTime();
+        });
+        return sorted.slice(1).map((book) => book.id);
+      });
+      const { error } = await supabase.from('ebook_projects').delete().in('id', toDelete);
+      if (error) throw error;
+      toast.success(`${toDelete.length} doublon(s) supprimé(s) — versions les plus complètes conservées.`);
+      await load();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Nettoyage impossible');
+    } finally {
+      setCleaning(false);
+    }
+  };
+
   const remove = async (id: string) => {
     if (!confirm('Supprimer ce livre ? Cette action est définitive.')) return;
     const { error } = await supabase.from('ebook_projects').delete().eq('id', id);
@@ -55,6 +104,7 @@ export default function V3BookManagerPage() {
     toast.success('Livre supprimé');
     load();
   };
+
 
   /** Chapitres structurés prêts pour l'export : titres réels conservés, aucun re-découpage du texte. */
   const exportChapters = (book: Book): Chapter[] => {
@@ -109,6 +159,22 @@ export default function V3BookManagerPage() {
         <button onClick={() => nav(correctedOnly ? '/v3/corriger' : '/v3/create')} className="v3-btn v3-btn-primary"><Plus className="w-4 h-4" /> {correctedOnly ? 'Corriger un livre' : 'Ajouter'}</button>
       </div>
 
+      {!loading && duplicateCount > 0 && (
+        <div className="v3-card mt-6 flex flex-wrap items-center justify-between gap-3 border border-[var(--v3-orange)]/40">
+          <div>
+            <div className="text-sm font-semibold">{duplicateCount} doublon{duplicateCount > 1 ? 's' : ''} détecté{duplicateCount > 1 ? 's' : ''}</div>
+            <p className="text-xs text-[var(--v3-muted)] mt-1">
+              Le nettoyage conserve, pour chaque titre, la version contenant le plus de texte et supprime les copies vides.
+            </p>
+          </div>
+          <button onClick={() => void cleanDuplicates()} disabled={cleaning} className="v3-btn v3-btn-primary text-xs">
+            <Trash2 className="w-3.5 h-3.5" /> {cleaning ? 'Nettoyage…' : 'Nettoyer les doublons'}
+          </button>
+        </div>
+      )}
+
+
+
       {loading ? (
         <div className="mt-12 text-center text-[var(--v3-muted)]">Chargement…</div>
       ) : rows.length === 0 ? (
@@ -142,7 +208,12 @@ export default function V3BookManagerPage() {
             <div key={b.id} className="v3-card flex items-center gap-4">
               <div className="w-14 h-20 rounded bg-[var(--v3-ink)] shrink-0" />
               <div className="flex-1 min-w-0">
-                <div className="font-semibold truncate">{b.title}</div>
+                <div className="font-semibold truncate flex items-center gap-2">
+                  <span className="truncate">{b.title}</span>
+                  {duplicateIds.has(b.id) && (
+                    <span className="shrink-0 rounded-full bg-[var(--v3-orange)]/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[var(--v3-orange)]">Doublon</span>
+                  )}
+                </div>
                 {b.author_name && <div className="text-xs text-[var(--v3-muted)]">par {b.author_name}</div>}
                 <div className="mt-1 text-xs font-semibold text-[var(--v3-muted)]">
                   {chapterCount > 0 ? `${chapterCount} chapitre${chapterCount > 1 ? 's' : ''} · Export disponible` : 'Brouillon · récupération des sauvegardes à l’ouverture'}
