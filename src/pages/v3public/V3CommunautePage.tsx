@@ -48,7 +48,7 @@ export default function V3CommunautePage() {
 
   return (
     <div className="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
-      <BackButton />
+      <V3AgentReturnBar />
       <header className="space-y-2">
         <h1 className="text-3xl md:text-4xl font-bold text-[#232F3E]">Communauté EbookStudio</h1>
         <p className="text-[#232F3E]/70">
