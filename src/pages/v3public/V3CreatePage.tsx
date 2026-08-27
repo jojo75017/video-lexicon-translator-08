@@ -217,9 +217,24 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
           </div>
         )}
 
-        {/* Dialogue + sommaire toujours visible côte à côte */}
-        <div className="mt-7 grid gap-5 lg:grid-cols-[1fr_360px] items-start">
-          <div className="min-w-0 v3-ambiance">
+        {/* Le Sommaire IA mène tout : il passe en premier, en évidence */}
+        <div className="mt-7 grid gap-5 lg:grid-cols-[420px_1fr] items-start">
+          {/* Colonne sommaire : en tête sur mobile, collée en haut sur desktop */}
+          <aside id="sommaire-ia" className="order-first min-w-0 lg:sticky lg:top-24">
+            <div className="v3-card mb-3" style={{ borderColor: 'var(--v3-orange)' }}>
+              <span className="v3-chip v3-chip-orange">
+                <Sparkles className="w-3.5 h-3.5" /> Étape 1 — Sommaire IA
+              </span>
+              <p className="mt-2 text-xs" style={{ color: 'var(--v3-muted)' }}>
+                C’est le sommaire qui mène tout : on le construit ensemble, vous le validez,
+                puis la rédaction, la correction et l’export en découlent.
+              </p>
+            </div>
+            <V3GenieOutlinePanel key={briefKey} outlineMode={sommaireIa ? 'guided' : undefined} />
+          </aside>
+
+          <div className="min-w-0 v3-ambiance order-last">
+
 
             {!openedBook && (
               <V3GenieDialog
@@ -291,10 +306,6 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
             </details>
           </div>
 
-          {/* Colonne sommaire : reste visible pendant l'écriture */}
-          <aside id="sommaire-ia" className="lg:sticky lg:top-24">
-            <V3GenieOutlinePanel key={briefKey} outlineMode={sommaireIa ? 'guided' : undefined} />
-          </aside>
         </div>
 
 
