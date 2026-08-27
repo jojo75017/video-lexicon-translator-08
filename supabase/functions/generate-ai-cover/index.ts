@@ -59,8 +59,8 @@ function buildPaperbackSpec(parsed: ReturnType<typeof parseKdpBrief>) {
 
 const KINDLE_SPEC = `Vertical portrait flat 2D print-ready artwork, aspect ratio 1.6:1 (1600x2560 px), full-bleed edge to edge, no border, no 3D mockup, no tilted device.`;
 
-const OPENROUTER_IMAGE_MODEL = 'google/gemini-3.1-flash-image-preview';
-const LOVABLE_IMAGE_MODEL = 'google/gemini-3.1-flash-image-preview';
+const OPENROUTER_IMAGE_MODEL = 'google/gemini-2.5-flash-image-preview';
+const LOVABLE_IMAGE_MODEL = 'google/gemini-3.1-flash-image';
 
 function extractImageUrl(data: any): string | undefined {
   const message = data?.choices?.[0]?.message;
