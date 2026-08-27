@@ -979,6 +979,157 @@ export type Database = {
         }
         Relationships: []
       }
+      cs_chapters: {
+        Row: {
+          chapter_number: number
+          content_markdown: string | null
+          created_at: string
+          id: string
+          key_takeaways: string[] | null
+          project_id: string
+          status: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          chapter_number: number
+          content_markdown?: string | null
+          created_at?: string
+          id?: string
+          key_takeaways?: string[] | null
+          project_id: string
+          status?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          chapter_number?: number
+          content_markdown?: string | null
+          created_at?: string
+          id?: string
+          key_takeaways?: string[] | null
+          project_id?: string
+          status?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cs_chapters_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "cs_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cs_projects: {
+        Row: {
+          cover_image_url: string | null
+          created_at: string
+          id: string
+          kdp_categories: string[] | null
+          kdp_description: string | null
+          kdp_keywords: string[] | null
+          language_code: string | null
+          subtitle: string | null
+          target_audience: string | null
+          title: string
+          tone: string | null
+          updated_at: string
+          user_id: string
+          video_unlocked: boolean
+        }
+        Insert: {
+          cover_image_url?: string | null
+          created_at?: string
+          id?: string
+          kdp_categories?: string[] | null
+          kdp_description?: string | null
+          kdp_keywords?: string[] | null
+          language_code?: string | null
+          subtitle?: string | null
+          target_audience?: string | null
+          title: string
+          tone?: string | null
+          updated_at?: string
+          user_id: string
+          video_unlocked?: boolean
+        }
+        Update: {
+          cover_image_url?: string | null
+          created_at?: string
+          id?: string
+          kdp_categories?: string[] | null
+          kdp_description?: string | null
+          kdp_keywords?: string[] | null
+          language_code?: string | null
+          subtitle?: string | null
+          target_audience?: string | null
+          title?: string
+          tone?: string | null
+          updated_at?: string
+          user_id?: string
+          video_unlocked?: boolean
+        }
+        Relationships: []
+      }
+      cs_video_lessons: {
+        Row: {
+          audio_url: string | null
+          chapter_id: string
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          script_action: string | null
+          script_core: string | null
+          script_hook: string | null
+          slides_json: Json | null
+          subtitle_vtt_url: string | null
+          updated_at: string
+          video_mp4_url: string | null
+          video_title: string
+        }
+        Insert: {
+          audio_url?: string | null
+          chapter_id: string
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          script_action?: string | null
+          script_core?: string | null
+          script_hook?: string | null
+          slides_json?: Json | null
+          subtitle_vtt_url?: string | null
+          updated_at?: string
+          video_mp4_url?: string | null
+          video_title: string
+        }
+        Update: {
+          audio_url?: string | null
+          chapter_id?: string
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          script_action?: string | null
+          script_core?: string | null
+          script_hook?: string | null
+          slides_json?: Json | null
+          subtitle_vtt_url?: string | null
+          updated_at?: string
+          video_mp4_url?: string | null
+          video_title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cs_video_lessons_chapter_id_fkey"
+            columns: ["chapter_id"]
+            isOneToOne: false
+            referencedRelation: "cs_chapters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ebook_project_versions: {
         Row: {
           author_name: string | null

@@ -151,6 +151,8 @@ const V3OffrePage = lazy(() => import('./pages/v3public/V3OffrePage'));
 const V3CommanderPage = lazy(() => import('./pages/v3public/V3CommanderPage'));
 const ReferralKitPage = lazy(() => import('./pages/ReferralKitPage'));
 const GoKdpPilotPage = lazy(() => import('./pages/GoKdpPilotPage'));
+const ContentStudioPage = lazy(() => import('./pages/v3public/ContentStudioPage'));
+const ContentStudioProjectPage = lazy(() => import('./pages/v3public/ContentStudioProjectPage'));
 
 
 const V3TemoignagePage = lazy(() => import('./pages/v3public/V3TemoignagePage'));
@@ -624,6 +626,8 @@ const App = () => {
               <Route path="fonctionnalites/questions" element={<V3QuestionsPage />} />
               <Route path="workflow" element={<V3WorkflowPage />} />
               <Route path="commence-ici" element={<V3StartHerePage />} />
+              <Route path="contentstudio" element={<V3LockedGate><TrialGate label="ContentStudio Engine"><ContentStudioPage /></TrialGate></V3LockedGate>} />
+              <Route path="contentstudio/:id" element={<V3LockedGate><TrialGate label="ContentStudio Engine"><ContentStudioProjectPage /></TrialGate></V3LockedGate>} />
 
 
 
