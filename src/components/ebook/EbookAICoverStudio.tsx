@@ -13,6 +13,7 @@ import {
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { listSavedCovers, persistCoverToLibrary } from '@/lib/coverLibrary';
+import { normalizeCoverToKdp } from '@/lib/kdpCoverNormalize';
 
 
 interface EbookAICoverStudioProps {
@@ -600,9 +601,16 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
       if (error) throw error;
       if (!data?.imageUrl) throw new Error('Aucune image générée');
 
+      // L'IA ne respecte pas toujours le ratio demandé : on recadre au format KDP exact
+      // (Kindle 1600×2560, Broché 3300×2100) avant sauvegarde.
+      const normalizedUrl = await normalizeCoverToKdp(
+        data.imageUrl,
+        format === 'paperback' ? 'paperback' : 'kindle',
+      );
+
       // Sauvegarde durable : la couverture reste retrouvable après rechargement
       const persistedUrl = await persistCoverToLibrary({
-        imageUrl: data.imageUrl,
+        imageUrl: normalizedUrl,
         title,
         format,
       });

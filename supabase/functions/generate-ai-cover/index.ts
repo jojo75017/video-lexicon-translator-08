@@ -237,6 +237,9 @@ Render variation #${variationSeed}. The output MUST be a finished, print-ready, 
           model: modelId,
           messages: [{ role: "user", content: messageContent }],
           modalities: ["image", "text"],
+          // Kindle = portrait (2:3 est le ratio portrait le plus proche de 1.6:1),
+          // Broché wrap = paysage. Le recadrage exact est fait côté client.
+          image_config: { aspect_ratio: format === 'paperback' ? '3:2' : '2:3' },
         }),
       });
       if (!resp.ok) {
