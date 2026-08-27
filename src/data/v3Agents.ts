@@ -150,4 +150,35 @@ export const V3_AGENTS: V3Agent[] = [
     deliverables: ['Livre complet', 'Couverture', 'Métadonnées KDP'],
     filter: 'publier', route: '/v3/workflow', accent: '#0F766E',
   },
+  {
+    id: 'louise', num: '21', name: 'Louise', role: 'Bibliothécaire',
+    mission: 'Elle range vos livres, vos versions et vos couvertures sauvegardées.',
+    deliverables: ['Mes livres', 'Couvertures gardées', 'Reprise d’un projet'],
+    filter: 'publier', route: '/v3/mes-livres', accent: '#7E22CE',
+  },
+  {
+    id: 'romain', num: '22', name: 'Romain', role: 'Galeriste',
+    mission: 'Il expose vos livres publiés et votre page auteur publique.',
+    deliverables: ['Galerie publique', 'Page auteur', 'Partage social'],
+    filter: 'vendre', route: '/v3/gallery', accent: '#DB2777',
+  },
+  {
+    id: 'agathe', num: '23', name: 'Agathe', role: 'Gardienne du compte',
+    mission: 'Votre formule, vos quotas, vos coordonnées d’auteur.',
+    deliverables: ['Abonnement & quotas', 'Coordonnées', 'Facturation'],
+    filter: 'publier', route: '/v3/compte', accent: '#0E7490',
+  },
+  {
+    id: 'martin', num: '24', robot: true, name: 'Martin', role: 'Technicien des outils',
+    mission: 'Il branche vos clés IA et active toutes les fonctionnalités.',
+    deliverables: ['Clés Gemini / OpenRouter', 'Réseaux & intégrations', 'Diagnostic'],
+    filter: 'publier', route: '/v3/fonctionnalites', accent: '#334155',
+  },
+  {
+    id: 'lucie', num: '25', name: 'Lucie', role: 'Animatrice communauté',
+    mission: 'Entraide entre auteurs, questions, retours de lecteurs.',
+    deliverables: ['Forum auteurs', 'Questions fréquentes', 'Avis clients'],
+    filter: 'vendre', route: '/communaute', accent: '#B45309',
+  },
 ];
+
