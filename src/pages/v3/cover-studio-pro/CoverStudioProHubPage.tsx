@@ -3,7 +3,7 @@ import { COVER_FORMAT_LIST, type CoverFormatId } from '@/config/coverFormats';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Layers, Square, BookCopy, Sparkles, ArrowRight, ArrowLeft } from 'lucide-react';
+import { BookOpen, Layers, Square, BookCopy, Sparkles, ArrowRight } from 'lucide-react';
 import IdeogramKeyCard from '@/components/ebook/IdeogramKeyCard';
 import V3AgentReturnBar from '@/components/v3public/V3AgentReturnBar';
 
