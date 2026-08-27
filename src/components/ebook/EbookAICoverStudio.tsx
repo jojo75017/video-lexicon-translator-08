@@ -13,6 +13,7 @@ import {
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { listSavedCovers, persistCoverToLibrary } from '@/lib/coverLibrary';
+import { normalizeCoverToKdp } from '@/lib/kdpCoverNormalize';
 
 
 interface EbookAICoverStudioProps {
