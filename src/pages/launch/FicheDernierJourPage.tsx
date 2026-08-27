@@ -31,7 +31,7 @@ export default function FicheDernierJourPage() {
           <h2 className="v3-serif text-xl font-bold text-white">Après ce soir, il n'y a plus de paiement unique</h2>
         </div>
         <p className="mt-4 leading-relaxed text-white/85">
-          Demain 1er septembre, les inscriptions à la V3 ouvrent avec le premier mois offert,
+          Le 1er octobre, les inscriptions à la V3 ouvrent avec le premier mois offert,
           pour une ouverture le 1er octobre — par abonnement mensuel. L'accès à vie à 47 €,
           lui, s'arrête ce soir et ne reviendra pas.
         </p>

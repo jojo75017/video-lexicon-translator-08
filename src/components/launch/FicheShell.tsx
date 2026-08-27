@@ -3,8 +3,8 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { Clock, Rocket } from 'lucide-react';
 import ReadingGate from '@/components/marketing/ReadingGate';
 
-/** Date de fin de l'offre à 47 € (31 août 2026, 23h59 Paris). */
-const DEADLINE = new Date('2026-08-31T23:59:59+02:00').getTime();
+/** Date de fin de l'offre à 47 € (30 septembre 2026, 23h59 Paris). */
+const DEADLINE = new Date('2026-09-30T23:59:59+02:00').getTime();
 
 function useCountdown() {
   const [now, setNow] = useState(() => Date.now());
@@ -142,7 +142,7 @@ export default function FicheShell({ badge, title, children, ctaLabel, metaTitle
           <div className="flex flex-wrap items-baseline justify-center gap-3 text-center">
             <span className="text-4xl font-black text-[#0F2E1F]">47 €</span>
             <span className="text-lg text-[#5B5245] line-through">59 €</span>
-            <span className="text-sm font-semibold text-[#5B5245]">paiement unique — jusqu'au 31 août</span>
+            <span className="text-sm font-semibold text-[#5B5245]">paiement unique — jusqu'au 30 septembre</span>
           </div>
           {gateSurface ? (
             <FicheCtaGated surface={gateSurface} label={ctaLabel} />

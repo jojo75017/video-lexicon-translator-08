@@ -272,7 +272,7 @@ export default function MethodePage() {
           </div>
           <p className="mt-4 text-xs text-[var(--ds-text-muted)]">
             <Clock className="mr-1 inline h-3.5 w-3.5" />
-            Après le 31 août, l'accès à vie ne sera plus disponible qu'en abonnement mensuel.
+            Après le 30 septembre, l'accès à vie ne sera plus disponible qu'en abonnement mensuel.
           </p>
         </div>
       </section>

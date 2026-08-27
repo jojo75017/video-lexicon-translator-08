@@ -60,7 +60,7 @@ export default function V3HomePage() {
 
   return (
     <>
-      {/* LANCEMENT — fin du 47 € le 31 août, V3 le 1er octobre */}
+      {/* LANCEMENT — fin du 47 € le 30 septembre, V3 le 1er octobre */}
       <V3LaunchBanner />
 
       {/* BANDEAU D'ACCROCHE — premier module */}

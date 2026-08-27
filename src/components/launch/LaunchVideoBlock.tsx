@@ -23,7 +23,7 @@ export default function LaunchVideoBlock({ className = '' }: LaunchVideoBlockPro
             </p>
             <p className="mt-1 max-w-md text-sm leading-relaxed text-white/90">
               Écoutez le message complet : pourquoi EbookStudio change la publication sur Amazon,
-              et comment prendre l'accès à vie à 47 € avant le 31 août.
+              et comment prendre l'accès à vie à 47 € avant le 30 septembre.
             </p>
           </div>
           <a

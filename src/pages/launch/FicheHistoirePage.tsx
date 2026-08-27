@@ -56,7 +56,7 @@ export default function FicheHistoirePage() {
           mots-clés. C'est exactement le chemin qu'ont suivi Marie et Rachel.
         </p>
         <p className="mt-4 text-sm text-white/70">
-          Jusqu'au 31 août, l'accès complet est à 47 € en un seul paiement. Ensuite, place à la V3
+          Jusqu'au 30 septembre, l'accès complet est à 47 € en un seul paiement. Ensuite, place à la V3
           par abonnement.
         </p>
       </section>

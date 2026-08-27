@@ -22,7 +22,7 @@ const Box = ({ value, label }: { value: number | string; label: string }) => (
   </span>
 );
 
-/** Compte à rebours de la promo d'été (jusqu'au 31 août). */
+/** Compte à rebours de la promo d'été (jusqu'au 30 septembre). */
 const SummerPromoCountdown = () => {
   const [t, setT] = useState(compute);
 
@@ -43,7 +43,7 @@ const SummerPromoCountdown = () => {
     <div className="rounded-2xl bg-accent/10 border border-accent/30 p-4">
       <p className="flex items-center justify-center gap-2 text-sm font-bold text-foreground mb-3">
         <Flame className="w-4 h-4 text-accent" />
-        Offre d'été à {PROMO_PRICE}€ — se termine le 31 août
+        Offre d'été à {PROMO_PRICE}€ — se termine le 30 septembre
       </p>
       <div className="flex items-center justify-center gap-2">
         <Box value={t.days} label="jours" />

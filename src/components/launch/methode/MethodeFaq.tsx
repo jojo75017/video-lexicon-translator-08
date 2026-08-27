@@ -25,7 +25,7 @@ const FAQ = [
   },
   {
     q: "C'est un abonnement ?",
-    a: "Non. À 47 €, c'est un paiement unique et l'accès reste à vous. La V3 lancée le 1er octobre est incluse. Après le 31 août, l'accès ne sera plus disponible qu'en abonnement mensuel.",
+    a: "Non. À 47 €, c'est un paiement unique et l'accès reste à vous. La V3 lancée le 1er octobre est incluse. Après le 30 septembre, l'accès ne sera plus disponible qu'en abonnement mensuel.",
   },
   {
     q: 'Et si ça ne me convient pas ?',

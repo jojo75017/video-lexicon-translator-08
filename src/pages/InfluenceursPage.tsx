@@ -219,7 +219,7 @@ C'est un paiement unique de ${price}€ à vie, sans abonnement.
             </p>
             {!v3Live && (
               <p className="text-sm text-[#232F3E]/60">
-                ⏳ Prix actuel <strong>{PRICE_NOW}€</strong> jusqu'au 31 août, puis{' '}
+                ⏳ Prix actuel <strong>{PRICE_NOW}€</strong> jusqu'au 30 septembre, puis{' '}
                 <strong>{PRICE_V3}€</strong> au lancement V3 → ta commission passe à{' '}
                 <strong>{formatEuro(COMMISSION_V3)}</strong>/vente.
               </p>

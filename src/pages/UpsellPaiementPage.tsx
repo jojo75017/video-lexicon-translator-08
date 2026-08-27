@@ -23,7 +23,7 @@ import { getIsCurrentSessionAdmin } from "@/lib/adminAccess";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { supabase } from "@/integrations/supabase/client";
 
-const LAUNCH_PRICE = 59; // promo d'été jusqu'au 31 août (tarif normal 67€)
+const LAUNCH_PRICE = 59; // promo d'été jusqu'au 30 septembre (tarif normal 67€)
 const NORMAL_PRICE = 197;
 const SERENITY_PRICE = 30;
 const EXTENDED_LICENSE_PRICE = 67;

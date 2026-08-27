@@ -45,7 +45,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "Pourquoi commander maintenant ?",
-    a: "Le tarif 47 € est valable jusqu'au 31 août (59 € ensuite). À partir du 1er octobre, EbookStudio passe uniquement en abonnement : Plume 27 € par mois, Édition 47 €, Studio Pro 97 € (tout inclus). L'accès à vie n'existera plus.",
+    a: "Le tarif 47 € est valable jusqu'au 30 septembre (59 € ensuite). À partir du 1er octobre, EbookStudio passe uniquement en abonnement : Plume 27 € par mois, Édition 47 €, Studio Pro 97 € (tout inclus). L'accès à vie n'existera plus.",
   },
   {
     q: "Comment mon accès est-il ouvert après le paiement ?",
@@ -83,9 +83,9 @@ interface Testimonial {
   created_at?: string | null;
 }
 
-/** Fin de l'offre 47 € : 31 août 2026, 23 h 59 (heure de Paris) — aligné sur
+/** Fin de l'offre 47 € : 30 septembre 2026, 23 h 59 (heure de Paris) — aligné sur
  *  le compte à rebours de la page /methode et des emails. */
-const OFFER_END = new Date("2026-08-31T21:59:59Z");
+const OFFER_END = new Date("2026-09-30T21:59:59Z");
 
 function OfferCountdown() {
   const [now, setNow] = useState(() => Date.now());
@@ -190,7 +190,7 @@ export default function V3CommanderPage() {
     <main className="dark-sales min-h-screen">
       <SeoHead
         title="Commander EbookStudio Pro — 47 € accès à vie (offre août-septembre)"
-        description="Accès à vie à EbookStudio Pro pour 47 € au lieu de 59 €, jusqu'au 31 août. Aucun abonnement. La V3 est incluse sans surcoût. Carte bancaire ou PayPal, accès immédiat."
+        description="Accès à vie à EbookStudio Pro pour 47 € au lieu de 59 €, jusqu'au 30 septembre. Aucun abonnement. La V3 est incluse sans surcoût. Carte bancaire ou PayPal, accès immédiat."
         canonical={COMMANDER_URL}
       />
       <PaymentTestModeBanner />
@@ -367,7 +367,7 @@ export default function V3CommanderPage() {
                   <span className="text-sm text-[var(--ds-text-muted)]">paiement unique</span>
                 </div>
                 <p className="mt-1 text-[11px] font-bold" style={{ color: "var(--ds-gold)" }}>
-                  Offre valable jusqu'au 31 août — ensuite 59 €.
+                  Offre valable jusqu'au 30 septembre — ensuite 59 €.
                 </p>
 
                 <label className="mt-6 block text-xs font-bold uppercase tracking-wide text-[var(--ds-text-muted)]">
