@@ -230,7 +230,7 @@ This should look like a REAL book back cover with professional typography.`;
     : 'https://ai.gateway.lovable.dev/v1/chat/completions';
   const modelId = useOpenRouter
     ? 'google/gemini-2.5-flash-image-preview'
-    : 'google/gemini-3-pro-image-preview';
+    : 'google/gemini-3-pro-image';
 
   const response = await fetch(endpoint, {
     method: 'POST',
