@@ -11,9 +11,10 @@ export default function V3TocUltimatePage() {
     <div className="min-h-screen" style={{ background: 'var(--v3-paper, #fafafa)' }}>
       <div className="max-w-6xl mx-auto px-4 md:px-8 py-8">
         <div className="mb-6 flex items-center justify-between">
-          <Link to="/v3" className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-orange-600">
-            <ArrowLeft className="h-4 w-4" /> Retour au site
+          <Link to="/v3/commence-ici" className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-orange-600">
+            <ArrowLeft className="h-4 w-4" /> Retour aux agents
           </Link>
+
           <Link to="/v3/create" className="text-sm font-semibold text-orange-600 hover:underline">Créer un livre →</Link>
         </div>
 
