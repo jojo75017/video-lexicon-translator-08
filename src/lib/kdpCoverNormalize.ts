@@ -56,7 +56,7 @@ export async function normalizeCoverToKdp(
   format: KdpCoverTarget = 'kindle',
 ): Promise<string> {
   const target = KDP_COVER_TARGETS[format] ?? KDP_COVER_TARGETS.kindle;
-  let cleanup = () => undefined;
+  let cleanup: () => void = () => undefined;
   try {
     const loaded = await loadImage(imageUrl);
     const img = loaded.image;
