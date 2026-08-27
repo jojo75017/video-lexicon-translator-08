@@ -600,16 +600,24 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
       if (error) throw error;
       if (!data?.imageUrl) throw new Error('Aucune image générée');
 
+      // Sauvegarde durable : la couverture reste retrouvable après rechargement
+      const persistedUrl = await persistCoverToLibrary({
+        imageUrl: data.imageUrl,
+        title,
+        format,
+      });
+
       setGeneratedCovers((prev) => [
-        { url: data.imageUrl, desc: data.description || '', format, paperbackSpec: data.paperbackSpec, prompts: data.prompts },
+        { url: persistedUrl, desc: data.description || '', format, paperbackSpec: data.paperbackSpec, prompts: data.prompts },
         ...prev,
       ]);
-      onCoverGenerated?.(data.imageUrl);
+      onCoverGenerated?.(persistedUrl);
       toast.success(
         format === 'kindle'
-          ? 'Couverture Kindle générée !'
-          : 'Couverture Broché complète générée !'
+          ? 'Couverture Kindle générée et sauvegardée !'
+          : 'Couverture Broché complète générée et sauvegardée !'
       );
+
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Erreur lors de la génération';
       console.error('Cover AI generation failed:', message);
