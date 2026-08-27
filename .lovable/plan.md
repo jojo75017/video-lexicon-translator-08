@@ -1,81 +1,48 @@
-# Tarif unique 347 € + les 10 Spécialistes IA (mise en œuvre début septembre)
+# Réparer la génération de couverture IA
 
-Deux volets : le **nouveau tarif unique**, à préparer maintenant, et les **10 spécialistes IA**, développés début septembre.
+## Ce qui se passe
 
-## Contexte concurrentiel (août 2026)
+Le bug n'a rien à voir avec la clé OpenRouter. C'est pour cela qu'ajouter la clé n'a rien changé : **les deux chemins (avec et sans OpenRouter) appellent un modèle d'image qui n'existe pas.**
 
-| Outil | Modèle | Prix | Couverture |
-|---|---|---|---|
-| BookBolt | Abonnement | 9,99 $/mois | Design + recherche, pas d'écriture IA |
-| Publisher Rocket | Unique | 97 $ | Mots-clés uniquement |
-| AIZYBOOK (FR) | Crédits | 9 € → 149 € | Écriture IA, 12 ch/livre, crédits limités |
-| **EbookStudio V3** | Unique puis abonnement | **347 €** | Tout : 15 agents, correction pro, covers, KDP, traductions, audio, spécialistes IA |
+Dans `supabase/functions/generate-ai-cover/index.ts` (lignes 62-63), le modèle demandé est :
 
-Notre outil est 2-3× plus complet que le concurrent direct (AIZYBOOK 149 €). Le prix de 347 € est cohérent : au-dessus des concurrents, reflète la valeur, reste accessible.
+```
+google/gemini-3.1-flash-image-preview
+```
 
-## Volet 1 — Tarif unique de lancement
+Ce nom est faux dans les deux catalogues :
 
-Fin des paliers multiples. Une seule offre, tout inclus.
-
-| Formule | Montant | Total |
+| Fournisseur | Identifiant envoyé | Identifiant réel |
 |---|---|---|
-| 1 fois | 347 € | 347 € |
-| 3 fois | 119 €/mois | 357 € |
-| 5 fois | 79 €/mois | 395 € |
+| Lovable AI | `google/gemini-3.1-flash-image-preview` | `google/gemini-3.1-flash-image` (sans `-preview`) |
+| OpenRouter | `google/gemini-3.1-flash-image-preview` | `google/gemini-2.5-flash-image-preview` |
 
-- Affichage : **597 € barré → 347 €**, mention « prix de lancement valable jusqu'au 31 décembre 2026 ».
-- Tout est inclus : parcours complet, 15 agents du pipeline, correction professionnelle, couvertures, exports KDP, traductions, livres spéciaux, et les 10 spécialistes IA dès leur sortie.
-- Paiement par carte (Stripe) et PayPal, avec les 3 formules dans les deux moyens de paiement.
-- Compte à rebours et rappel de la date limite sur la page de commande et les pages passerelles.
+Résultat : le fournisseur rejette la requête, la fonction renvoie une erreur, et le front affiche « Edge Function returned a non-2xx status code ». Le message est identique avec ou sans clé puisque le nom de modèle est erroné dans les deux cas.
 
-### Anciens clients (47 € / 59 € à vie)
+## Ce qui va être corrigé
 
-- Ils **conservent leur accès V3 actuel**, sans surcoût et sans perte.
-- Les **10 spécialistes IA et les upsells ne sont pas inclus** dans leur accès.
-- Une **mise à niveau à 97 € (paiement unique)** leur ouvre les 10 spécialistes et les upsells — proposée sur une page dédiée `/v3/mise-a-niveau` et par email.
+1. **Le nom du modèle par chemin** dans `generate-ai-cover` : `google/gemini-3.1-flash-image` pour Lovable AI, `google/gemini-2.5-flash-image-preview` pour OpenRouter (ce sont deux catalogues distincts, ils ne peuvent pas partager la même constante).
+2. **Message d'erreur lisible pour l'abonné** : au lieu de « non-2xx status code », afficher la vraie cause renvoyée par le fournisseur (modèle refusé, crédits épuisés, clé invalide, limite atteinte), déjà présente dans la réponse mais aujourd'hui masquée côté front.
+3. **Repli automatique** : si la clé OpenRouter de l'abonné échoue (modèle non accessible sur son compte, crédits à zéro), la génération repasse sur le moteur Lovable AI au lieu d'échouer sèchement — avec une mention claire dans l'interface.
+4. **Même vérification sur les autres modules d'images**, car deux autres fonctions utilisent aussi un identifiant inexistant et échoueront de la même façon :
+   - `short-stories-generate` → `google/gemini-3.6-flash-image` (n'existe pas)
+   - `generate-chapter-images` → identifiants sans préfixe `google/`
+   Ces deux-là sont alignés sur les identifiants réels du catalogue.
 
-### Ce qui change dans l'application
+## Vérification avant de considérer le sujet clos
 
-- `src/data/v3Pricing.ts` devient une offre unique (347 €) avec ses trois échéanciers ; les anciens paliers 17/27/47/197/547 sont retirés de l'affichage.
-- Page de commande `/commander` refondue : une seule offre, trois boutons de paiement, prix barré 597 €, date limite 31/12/2026.
-- Menu et pages forfaits : plus de comparatif à plusieurs colonnes, un seul bloc « Tout inclus ».
-- Nouveaux produits/prix de paiement (Stripe + PayPal) :
-  - `ebookstudio_lancement` avec 3 prix : `lancement_1x` (347 €), `lancement_3x` (119 €/mois × 3), `lancement_5x` (79 €/mois × 5).
-  - `ebookstudio_maj_ancien_client` avec 1 prix : `maj_ancien_client_97` (97 € unique).
-- Droits : les comptes à vie existants reçoivent un marqueur « legacy » ; les spécialistes et upsells vérifient ce marqueur (ou la mise à niveau 97 €) avant d'ouvrir.
-- Pages de vente, emails et scripts alignés sur 347 € (aucune mention des anciens montants).
+- Appel réel de `generate-ai-cover` sans clé OpenRouter → une image doit revenir.
+- Appel réel avec une clé OpenRouter → une image doit revenir.
+- Contrôle des logs de la fonction pour confirmer l'absence de rejet de modèle.
+- Contrôle rapide de `short-stories-generate` et `generate-chapter-images`.
 
-## Volet 2 — Les 10 Spécialistes IA (début septembre)
+## Détails techniques
 
-Un agent par type de livre, avec des noms propres à Ebookstudio (aucun nom repris ailleurs).
+- `supabase/functions/generate-ai-cover/index.ts` : séparer `OPENROUTER_IMAGE_MODEL` et `LOVABLE_IMAGE_MODEL` avec les identifiants corrects, et ajouter le repli Lovable AI dans le bloc `if (!response.ok)` avant de renvoyer l'erreur.
+- Côté front (composant Cover Studio qui appelle `generate-ai-cover` via `invokeImageFunction`) : lire le champ `error` / `details` du corps de la réponse plutôt que de n'afficher que le message générique de `supabase.functions.invoke`.
+- `supabase/functions/short-stories-generate/index.ts` et `supabase/functions/generate-chapter-images/index.ts` : identifiants de modèle alignés sur le catalogue.
+- Aucune modification de la logique de prompt, de format KDP ni de la clé BYOK : le paramétrage de l'abonné reste intact.
 
-| # | Spécialiste | Domaine |
-|---|---|---|
-| 1 | **Camille** | Histoires pour enfants, contes illustrés |
-| 2 | **Victor** | Business & marketing |
-| 3 | **Noémie** | Maths, puzzles, énigmes |
-| 4 | **Basile** | Cahiers d'exercices, checklists, plannings |
-| 5 | **Iris** | Coloriage enfant & adulte |
-| 6 | **Gaspard** | Pratique & tutoriels |
-| 7 | **Prune** | Cuisine, recettes, plans de repas |
-| 8 | **Aurèle** | Développement personnel, productivité |
-| 9 | **Solène** | Romance & fiction |
-| 10 | **Timothée** | Éducatif & scolaire |
+## Réponse à envoyer à l'abonné
 
-- Écran « Mes spécialistes IA » sur `/v3/specialistes` : 10 cartes (nom, mission, 3 exemples de livres) et un bouton « Confier mon livre à … » qui ouvre le bon module avec le brief pré-réglé.
-- Chaque spécialiste a **sa propre mission** : rôle éditorial, règles de forme (longueur, illustrations, ton, niveau de langue) et contrôles de sortie spécifiques (Noémie vérifie ses corrigés, Prune les quantités et temps de cuisson, Camille le vocabulaire par âge, Iris un trait imprimable, Timothée le niveau scolaire).
-- Le pipeline des 15 agents reste le moteur : les spécialistes sont la porte d'entrée, pas un doublon.
-
-### Détails techniques du volet 2
-
-- Source unique `src/data/aiSpecialists.ts` (`id`, `name`, `domain`, `mission`, `examples[]`, `route`, `moduleId`, `promptProfile`, accès requis).
-- `src/components/v3public/V3SpecialistsGrid.tsx` + `src/pages/v3public/V3SpecialistsPage.tsx`, route dans `App.tsx`, entrée dans `V3Sidebar.tsx`.
-- Branchement sur les modules existants (histoires illustrées, jeux & énigmes, cherche & trouve, coloriage, cuisine, documentaire, scolaire, roman, workflow) — aucun générateur dupliqué.
-- Profils de prompt ajoutés aux Edge Functions existantes via un paramètre `specialist`, sans toucher aux moteurs.
-
-## Ordre de réalisation
-
-1. **Maintenant** : tarif unique 347 € (données `v3Pricing.ts`, page de commande `/commander`, produits de paiement Stripe, textes, compte à rebours 31/12/2026).
-2. **Maintenant** : page `/v3/mise-a-niveau` à 97 € et marquage des anciens clients.
-3. **Début septembre** : les 10 spécialistes (données `aiSpecialists.ts`, écran `/v3/specialistes`, branchements modules).
-4. **Début septembre** : missions et contrôles de sortie par spécialiste, puis test réel sur Camille, Noémie et Prune.
+Une fois vérifié, un court message expliquant que le problème venait d'un nom de moteur d'image incorrect de notre côté, que sa clé OpenRouter n'était pas en cause, et qu'il peut relancer la génération.
