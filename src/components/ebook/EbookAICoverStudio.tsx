@@ -608,6 +608,13 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
         format === 'paperback' ? 'paperback' : 'kindle',
       );
 
+      // Ne jamais présenter comme conforme une image que le navigateur n'a pas
+      // réussi à convertir. Le prompt ne peut pas imposer les pixels au modèle :
+      // c'est cette normalisation locale qui garantit le fichier KDP final.
+      if (format === 'kindle' && !normalizedUrl.startsWith('data:image/png')) {
+        throw new Error('La mise au format Kindle 1600 × 2560 px a échoué. Rechargez la page puis relancez la génération.');
+      }
+
       // Sauvegarde durable : la couverture reste retrouvable après rechargement
       const persistedUrl = await persistCoverToLibrary({
         imageUrl: normalizedUrl,
@@ -1441,7 +1448,7 @@ const CoverCard: React.FC<CoverCardProps> = ({ cover, index, onDownload, onUse, 
               )}
               <div className={`text-[11px] flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border ${ratioOk ? 'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300' : 'bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-950/30 dark:text-amber-300'}`}>
                 {ratioOk ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertTriangle className="w-3.5 h-3.5" />}
-                {ratioOk ? 'Ratio conforme Amazon Kindle (1.6:1)' : `Ratio ${realRatio?.toFixed(2)}:1 — Amazon attend 1.6:1, des bandes pourront apparaître`}
+                {ratioOk ? 'Format final conforme Amazon Kindle (1600 × 2560 px)' : `Image non normalisée (${dims?.w} × ${dims?.h} px) — ne pas utiliser ce fichier`}
               </div>
               {dims && (
                 <div className={`text-[11px] flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border ${resolutionOk ? 'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300' : 'bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-950/30 dark:text-amber-300'}`}>
