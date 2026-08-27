@@ -25,7 +25,6 @@ import { buildBookContext, type NameInconsistency } from '@/lib/correcteur/bookC
 
 import { exportProfessionalDocx } from '@/utils/docxExportEngine';
 import { exportEbookToPdf } from '@/lib/ebookPdfExporter';
-import { useV3Mode } from '@/hooks/useV3Mode';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { normalizeManuscript } from '@/utils/manuscriptNormalizer';
@@ -69,7 +68,6 @@ const MODES: { id: ProofreadMode; title: string; desc: string; bullets: string[]
 export default function V3CorrecteurPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { isAdmin } = useV3Mode();
   const [source, setSource] = useState<Source>('doc');
   const [importing, setImporting] = useState(false);
   const [urlValue, setUrlValue] = useState('');
@@ -591,10 +589,7 @@ export default function V3CorrecteurPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-5 md:px-8 py-8">
-      <BackButton
-        to={isAdmin ? '/admin' : '/v3/hub'}
-        label={isAdmin ? 'Tableau de bord admin' : 'Tableau de bord'}
-      />
+      <BackButton to="/v3/commence-ici" label="Retour aux agents" />
 
       <input ref={fileRef} type="file" accept=".docx,.md,.txt,.rtf" className="hidden"
         onChange={(e) => { const f = e.target.files?.[0]; if (f) runImport(() => importManuscript(f)); e.target.value = ''; }} />

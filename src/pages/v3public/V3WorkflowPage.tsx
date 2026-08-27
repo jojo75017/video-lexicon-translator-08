@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import BackButton from '@/components/v3/BackButton';
+import V3AgentReturnBar from '@/components/v3public/V3AgentReturnBar';
 import { Badge } from '@/components/ui/badge';
 import { Bot, Rocket, Sparkles, ListTree } from 'lucide-react';
 import V3AgentsGrid from '@/components/v3public/V3AgentsGrid';
@@ -13,7 +13,7 @@ export default function V3WorkflowPage() {
   return (
     <div className="min-h-screen bg-[#FAFAFA] px-4 py-8">
       <div className="mx-auto max-w-5xl">
-        <BackButton to="/v3" />
+        <V3AgentReturnBar />
 
         <header className="mb-6">
           <Badge className="mb-3 bg-[#008296]">🤖 Pipeline éditorial</Badge>
