@@ -116,7 +116,7 @@ export const persistCoverToLibrary = async ({
 
 /** Récupère toutes les couvertures déjà générées et sauvegardées (les plus récentes d'abord). */
 export const listSavedCovers = async (): Promise<SavedCover[]> => {
-  const storageRoot = await resolveEbookStorageRoot();
+  const storageRoot = await resolveCoverRoot();
   if (!storageRoot) return [];
 
   try {
