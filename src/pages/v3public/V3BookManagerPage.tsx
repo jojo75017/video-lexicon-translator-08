@@ -15,6 +15,7 @@ type Book = {
   kdp_description?: string | null;
   chapters?: unknown;
   number_of_chapters?: number | null;
+  updated_at?: string | null;
 };
 
 
@@ -23,6 +24,17 @@ const hasChapterContent = (chapters: unknown): chapters is Record<string, unknow
     const chapter = raw && typeof raw === 'object' ? raw as Record<string, unknown> : {};
     return String(chapter.content || chapter.contenu || '').trim().length > 0;
   });
+
+/** Poids d'un livre : plus il contient de texte, plus il est prioritaire lors du dédoublonnage. */
+const bookWeight = (book: Book): number => {
+  const raw = Array.isArray(book.chapters) ? book.chapters : [];
+  return raw.reduce((total, item) => {
+    const chapter = item && typeof item === 'object' ? item as Record<string, unknown> : {};
+    return total + String(chapter.content || chapter.contenu || '').trim().length;
+  }, 0);
+};
+
+const titleKey = (title: string) => title.trim().toLowerCase().replace(/\s+/g, ' ');
 
 export default function V3BookManagerPage() {
   const nav = useNavigate();
