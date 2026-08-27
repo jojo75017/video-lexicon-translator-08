@@ -43,6 +43,7 @@ const NAV: NavSection[] = [
   {
     section: 'Démarrer',
     items: [
+      { to: '/v3/commence-ici', label: '🚀 Commence ici — 20 agents', icon: Rocket, end: true, badge: 'Start' },
       { to: '/v3', label: 'Accueil V3', icon: Home, end: true },
       { to: '/v3/fonctionnalites', label: 'Fonctionnalités (12 modules)', icon: LayoutGrid, end: true, badge: 'Hub' },
       { to: '/v3/workflow', label: '🤖 Workflow 15 Agents — écrire mon livre', icon: Layers, end: true, badge: 'Pipeline' },

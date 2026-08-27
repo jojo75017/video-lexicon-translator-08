@@ -10,6 +10,8 @@ import V3ResumeBookCard from '@/components/v3public/V3ResumeBookCard';
 import V3QuickActionsBar from '@/components/v3public/V3QuickActionsBar';
 import V3PaletteModule from '@/components/v3public/V3PaletteModule';
 import KdpPilotPromoBanner from '@/components/ebook/KdpPilotPromoBanner';
+import AgentAvatar from '@/components/v3public/AgentAvatar';
+import { V3_AGENTS } from '@/data/v3Agents';
 import Niches10Offer from '@/components/marketing/Niches10Offer';
 import { V3EngineStrip, V3EngineGrid } from '@/components/v3public/V3EngineBanner';
 import V3LaunchBanner from '@/components/v3public/V3LaunchBanner';
@@ -173,6 +175,33 @@ export default function V3HomePage() {
 
       {/* MOTEUR MULTI-MODÈLES — déplacé en 2e module (voir plus haut) */}
 
+
+      {/* Point d'entrée unique : les agents par type de livre */}
+      <section className="max-w-7xl mx-auto px-5 md:px-8 pt-2">
+        <Link
+          to="/v3/commence-ici"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-black/5 bg-card px-5 py-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg"
+        >
+          <span>
+            <span className="block text-[15px] font-bold" style={{ color: 'var(--v3-ink)' }}>
+              🚀 Commence ici — 20 agents, un par type de livre
+            </span>
+            <span className="block text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
+              Roman, cuisine, voyage, enfants, coloriage, BD, atlas, jeux, agenda… choisissez votre agent.
+            </span>
+          </span>
+          <span className="flex items-center -space-x-2">
+            {['margaux', 'leandre', 'noemie', 'zoe'].map((id) => {
+              const a = V3_AGENTS.find((x) => x.id === id)!;
+              return (
+                <span key={id} className="rounded-full ring-2 ring-background bg-background">
+                  <AgentAvatar seed={a.id} accent={a.accent} robot={a.robot} size={38} />
+                </span>
+              );
+            })}
+          </span>
+        </Link>
+      </section>
 
       {/* KDP Pilot — outil partenaire payant + code abonnés (compact, avant les champs) */}
       <section className="max-w-7xl mx-auto px-5 md:px-8 pt-2">
