@@ -591,10 +591,7 @@ export default function V3CorrecteurPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-5 md:px-8 py-8">
-      <BackButton
-        to={isAdmin ? '/admin' : '/v3/hub'}
-        label={isAdmin ? 'Tableau de bord admin' : 'Tableau de bord'}
-      />
+      <BackButton to="/v3/commence-ici" label="Retour aux agents" />
 
       <input ref={fileRef} type="file" accept=".docx,.md,.txt,.rtf" className="hidden"
         onChange={(e) => { const f = e.target.files?.[0]; if (f) runImport(() => importManuscript(f)); e.target.value = ''; }} />

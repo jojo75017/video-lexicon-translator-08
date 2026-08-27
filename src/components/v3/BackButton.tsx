@@ -14,18 +14,16 @@ interface BackButtonProps {
 /**
  * Bouton retour réutilisable.
  * - `to` fourni : navigation directe.
- * - sinon : history.back() uniquement s'il existe un historique interne,
- *   sinon on retombe sur `fallback` (par défaut la page des agents).
- *   Cela évite de sortir du site ou d'atterrir sur une page de vente.
+ * - sinon : navigation directe vers `fallback` (par défaut la page des agents).
+ *   On n'utilise jamais l'historique : une redirection intermédiaire pourrait
+ *   sinon ramener à tort vers l'accueil ou une page de vente.
  */
 export function BackButton({ to, fallback = '/v3/commence-ici', label = 'Retour', className }: BackButtonProps) {
   const navigate = useNavigate();
 
   const handleClick = () => {
     if (to) { navigate(to); return; }
-    const idx = (window.history.state as { idx?: number } | null)?.idx ?? 0;
-    if (idx > 0) navigate(-1);
-    else navigate(fallback, { replace: false });
+    navigate(fallback, { replace: false });
   };
 
   return (
