@@ -45,12 +45,13 @@ export default function V3BookManagerPage() {
   const [editing, setEditing] = useState<Book | null>(null);
   const [exporting, setExporting] = useState<Book | null>(null);
   const [exportLoadingId, setExportLoadingId] = useState<string | null>(null);
+  const [cleaning, setCleaning] = useState(false);
 
   const load = async () => {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) { nav('/v3/auth'); return; }
     let query = supabase.from('ebook_projects')
-      .select('id,title,author_name,kdp_description,chapters,number_of_chapters,project_type')
+      .select('id,title,author_name,kdp_description,chapters,number_of_chapters,project_type,updated_at')
       .eq('user_id', auth.user.id);
     if (correctedOnly) query = query.eq('project_type', 'corrected');
     const { data, error } = await query.order('updated_at', { ascending: false });
@@ -60,6 +61,42 @@ export default function V3BookManagerPage() {
   };
   useEffect(() => { load(); }, []); // eslint-disable-line
 
+  /** Groupes de livres partageant le même titre. */
+  const duplicateGroups = (() => {
+    const map = new Map<string, Book[]>();
+    rows.forEach((book) => {
+      const key = titleKey(book.title || '');
+      map.set(key, [...(map.get(key) || []), book]);
+    });
+    return [...map.values()].filter((group) => group.length > 1);
+  })();
+  const duplicateCount = duplicateGroups.reduce((total, group) => total + group.length - 1, 0);
+  const duplicateIds = new Set(duplicateGroups.flatMap((group) => group.map((book) => book.id)));
+
+  const cleanDuplicates = async () => {
+    if (duplicateCount === 0) return;
+    if (!confirm(`Supprimer ${duplicateCount} doublon(s) ? La version la plus complète de chaque titre est conservée.`)) return;
+    setCleaning(true);
+    try {
+      const toDelete = duplicateGroups.flatMap((group) => {
+        const sorted = [...group].sort((a, b) => {
+          const diff = bookWeight(b) - bookWeight(a);
+          if (diff !== 0) return diff;
+          return new Date(b.updated_at || 0).getTime() - new Date(a.updated_at || 0).getTime();
+        });
+        return sorted.slice(1).map((book) => book.id);
+      });
+      const { error } = await supabase.from('ebook_projects').delete().in('id', toDelete);
+      if (error) throw error;
+      toast.success(`${toDelete.length} doublon(s) supprimé(s) — versions les plus complètes conservées.`);
+      await load();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Nettoyage impossible');
+    } finally {
+      setCleaning(false);
+    }
+  };
+
   const remove = async (id: string) => {
     if (!confirm('Supprimer ce livre ? Cette action est définitive.')) return;
     const { error } = await supabase.from('ebook_projects').delete().eq('id', id);
@@ -67,6 +104,7 @@ export default function V3BookManagerPage() {
     toast.success('Livre supprimé');
     load();
   };
+
 
   /** Chapitres structurés prêts pour l'export : titres réels conservés, aucun re-découpage du texte. */
   const exportChapters = (book: Book): Chapter[] => {
