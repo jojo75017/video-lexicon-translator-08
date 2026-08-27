@@ -174,6 +174,24 @@ export default function V3HomePage() {
       {/* MOTEUR MULTI-MODÈLES — déplacé en 2e module (voir plus haut) */}
 
 
+      {/* Point d'entrée unique : les agents par type de livre */}
+      <section className="max-w-7xl mx-auto px-5 md:px-8 pt-2">
+        <Link
+          to="/v3/commence-ici"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-black/5 bg-card px-5 py-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg"
+        >
+          <span>
+            <span className="block text-[15px] font-bold" style={{ color: 'var(--v3-ink)' }}>
+              🚀 Commence ici — 20 agents, un par type de livre
+            </span>
+            <span className="block text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
+              Roman, cuisine, voyage, enfants, coloriage, BD, atlas, jeux, agenda… choisissez votre agent.
+            </span>
+          </span>
+          <span className="text-2xl" aria-hidden>👩‍🍳 🧑‍✈️ 👩‍🎨 🤖</span>
+        </Link>
+      </section>
+
       {/* KDP Pilot — outil partenaire payant + code abonnés (compact, avant les champs) */}
       <section className="max-w-7xl mx-auto px-5 md:px-8 pt-2">
         <KdpPilotPromoBanner variant="light" compact />
