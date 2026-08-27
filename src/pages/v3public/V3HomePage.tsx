@@ -34,6 +34,7 @@ import ReadingGate from '@/components/marketing/ReadingGate';
 
 
 const FEATURED_TOOLS = [
+  { emoji: '✨', title: 'Sommaire IA — le meneur', desc: 'Dialogue avec l’IA : vos idées sont corrigées et deviennent le plan qui guide tout le livre.', to: '/v3/create?sommaire=ia', badge: 'Commencer ici' },
   { emoji: '📖', title: 'Biographie — Le récit de votre vie', desc: 'Racontez votre vie période par période : vos mots sont gardés, jamais résumés.', to: '/v3/biographie', badge: 'NEW' },
   { emoji: '📘', title: 'Lancer mon livre', desc: 'Fiche + 15 agents, en 4 étapes guidées.', to: '/v3/lancer', badge: 'V3' },
   { emoji: '🎨', title: 'Cover Studio Pro', desc: 'Couverture haut de gamme, direction artistique IA.', to: '/v3/hub?tab=cover-pro', badge: 'Pro' },
@@ -337,10 +338,10 @@ export default function V3HomePage() {
               Les incontournables
             </div>
             <h2 className="v3-serif mt-2 text-3xl font-semibold" style={{ color: 'var(--v3-emerald)' }}>
-              Quatre outils au cœur du studio
+              Les outils au cœur du studio
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {FEATURED_TOOLS.map((t) => (
               <Link
                 key={t.title}
