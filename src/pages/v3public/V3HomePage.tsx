@@ -74,6 +74,12 @@ export default function V3HomePage() {
       {/* Encart de démarrage — immédiatement après les moteurs IA */}
       <V3ClosingRecallPanel />
 
+      {/* ContentStudio Engine — encart premium HORS Reading Gate, accès direct
+          vers /v3/contentstudio visible même pour les visiteurs non débloqués */}
+      <section className="max-w-7xl mx-auto px-5 md:px-8 pt-3">
+        <V3ContentStudioPromo />
+      </section>
+
       {/* PRÉSENTATION LONGUE — comprendre la V3 (sommaire ancré + 4 sections) */}
       <V3AnchorNav />
       <V3WhatIsPanel />
@@ -210,10 +216,7 @@ export default function V3HomePage() {
         <KdpPilotPromoBanner variant="light" compact />
       </section>
 
-      {/* ContentStudio Engine — encart premium (livre → formation vidéo MP4) */}
-      <section className="max-w-7xl mx-auto px-5 md:px-8 pt-3">
-        <V3ContentStudioPromo />
-      </section>
+      {/* (ContentStudio déplacé hors du Reading Gate, sous l'encart de démarrage) */}
 
       {/* Actions rapides (Workflow IA, Couverture, Ambiances, Sauvegarder, Nouveau, Formulaire manuel) */}
       <div className="max-w-7xl mx-auto px-5 md:px-8 pt-3">
