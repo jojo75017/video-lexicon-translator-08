@@ -184,7 +184,7 @@ export default function V3HomePage() {
         >
           <span>
             <span className="block text-[15px] font-bold" style={{ color: 'var(--v3-ink)' }}>
-              🚀 Commence ici — 20 agents, un par type de livre
+              🚀 Commence ici — 25 agents, un par type de livre
             </span>
             <span className="block text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
               Roman, cuisine, voyage, enfants, coloriage, BD, atlas, jeux, agenda… choisissez votre agent.
