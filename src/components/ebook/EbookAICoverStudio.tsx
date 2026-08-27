@@ -171,12 +171,39 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
     try { return localStorage.getItem('cover_openrouter_key') || ''; } catch { return ''; }
   });
   const [showKeyInput, setShowKeyInput] = useState(false);
+  const [isLoadingLibrary, setIsLoadingLibrary] = useState(true);
   useEffect(() => {
     try {
       if (openrouterKey) localStorage.setItem('cover_openrouter_key', openrouterKey);
       else localStorage.removeItem('cover_openrouter_key');
     } catch {}
   }, [openrouterKey]);
+
+  // Récupération des couvertures déjà générées (bibliothèque persistante)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const saved = await listSavedCovers();
+      if (cancelled) return;
+      if (saved.length) {
+        setGeneratedCovers((prev) => {
+          const known = new Set(prev.map((c) => c.url));
+          const restored = saved
+            .filter((s) => !known.has(s.url))
+            .map<GeneratedCover>((s) => ({
+              url: s.url,
+              desc: s.title ? `Couverture sauvegardée — ${s.title}` : 'Couverture sauvegardée',
+              format: s.format,
+              paperbackSpec: null,
+            }));
+          return [...prev, ...restored];
+        });
+      }
+      setIsLoadingLibrary(false);
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
 
   useEffect(() => {
     if (initialDescription.trim()) setDescription(initialDescription);
