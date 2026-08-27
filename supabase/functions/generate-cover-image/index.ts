@@ -229,7 +229,7 @@ This should look like a REAL book back cover with professional typography.`;
     ? 'https://openrouter.ai/api/v1/chat/completions'
     : 'https://ai.gateway.lovable.dev/v1/chat/completions';
   const modelId = useOpenRouter
-    ? 'google/gemini-2.5-flash-image-preview'
+    ? 'google/gemini-2.5-flash-image'
     : 'google/gemini-3-pro-image';
 
   const response = await fetch(endpoint, {

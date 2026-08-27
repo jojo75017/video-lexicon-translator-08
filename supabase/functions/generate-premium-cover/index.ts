@@ -212,7 +212,7 @@ async function generateOpenRouter(openrouterKey: string, prompt: string, model?:
         'X-Title': 'EbookStudio',
       },
       body: JSON.stringify({
-        model: model || 'google/gemini-2.5-flash-image-preview',
+        model: model || 'google/gemini-2.5-flash-image',
         messages: [{ role: 'user', content: prompt }],
         modalities: ['image', 'text'],
       }),
