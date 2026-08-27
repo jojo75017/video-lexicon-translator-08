@@ -1,5 +1,5 @@
 import { useParams, Navigate } from 'react-router-dom';
-import BackButton from '@/components/v3/BackButton';
+import V3AgentReturnBar from '@/components/v3public/V3AgentReturnBar';
 import {
   SpecialAtlas,
   SpecialEncyclopedia,
