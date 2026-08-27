@@ -3,8 +3,9 @@ import { COVER_FORMAT_LIST, type CoverFormatId } from '@/config/coverFormats';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Layers, Square, BookCopy, Sparkles, ArrowRight, ArrowLeft } from 'lucide-react';
+import { BookOpen, Layers, Square, BookCopy, Sparkles, ArrowRight } from 'lucide-react';
 import IdeogramKeyCard from '@/components/ebook/IdeogramKeyCard';
+import V3AgentReturnBar from '@/components/v3public/V3AgentReturnBar';
 
 const FORMAT_ICONS: Record<CoverFormatId, typeof BookOpen> = {
   'ebook-kindle': BookOpen,
@@ -18,14 +19,8 @@ export default function CoverStudioProHubPage() {
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-8">
-      <div className="flex items-center gap-2">
-        <Button variant="ghost" size="sm" onClick={() => navigate('/v3/hub')}>
-          <ArrowLeft className="w-4 h-4 mr-1" /> Retour au hub V3
-        </Button>
-        <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-          <ArrowLeft className="w-4 h-4 mr-1" /> Page précédente
-        </Button>
-      </div>
+      <V3AgentReturnBar />
+
       <header className="text-center space-y-3">
         <Badge className="bg-gradient-to-r from-amber-400 to-yellow-500 text-white border-0">
           <Sparkles className="w-3 h-3 mr-1" /> COVER STUDIO PRO
