@@ -46,12 +46,12 @@ export default function V3SpecialBookPage() {
   const { type = '' } = useParams();
   const entry = MAP[type];
 
-  if (!entry) return <Navigate to="/v3" replace />;
+  if (!entry) return <Navigate to="/v3/commence-ici" replace />;
   const { title, Comp } = entry;
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-7xl">
-      <BackButton />
+      <V3AgentReturnBar />
       <h1 className="text-3xl font-bold mb-6 mt-4">{title}</h1>
       <Comp />
     </div>
