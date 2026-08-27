@@ -304,7 +304,7 @@ QUALITY BENCHMARK: This cover must be indistinguishable from a real professional
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'google/gemini-3-pro-image-preview',
+          model: 'google/gemini-3-pro-image',
           messages: [{ role: 'user', content: imagePrompt }],
           modalities: ['image', 'text'],
         }),

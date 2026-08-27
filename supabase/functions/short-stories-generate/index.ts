@@ -125,7 +125,7 @@ Varie les lieux et les émotions. Texte 100 % français.`;
               'Authorization': `Bearer ${lovableKey}`,
             },
             body: JSON.stringify({
-              model: 'google/gemini-3.6-flash-image',
+              model: 'google/gemini-3.1-flash-image',
               prompt: s.illustrationPromptEn,
               n: 1,
               size: '1024x1024',
