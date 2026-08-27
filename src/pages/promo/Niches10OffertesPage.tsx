@@ -225,7 +225,7 @@ const Niches10OffertesPage: React.FC = () => {
           </h2>
           <p className="mt-3 text-sm text-white/85">
             L'offre complète contient les <strong>{remaining} autres niches</strong>, plus l'outil qui
-            écrit, habille et publie le livre. Accès à vie 47 € jusqu'au 31/08/2026.
+            écrit, habille et publie le livre. Accès à vie 47 € jusqu'au 30/09/2026.
           </p>
           <Link to="/commander" onClick={() => trackCaptureEvent('cadeau', 'checkout_click', { leadMagnet: '10-niches-offertes' })}>
             <Button className="mt-5 h-12 px-7 font-bold" style={{ background: GOLD, color: '#1a1a1a' }}>

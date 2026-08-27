@@ -18,7 +18,7 @@ export default function MessageAudioPage() {
     if (meta) {
       meta.setAttribute(
         'content',
-        "Message audio de 2 minutes : pourquoi EbookStudio change la publication sur Amazon, et comment prendre l'accès à vie à 47 € avant le 31 août.",
+        "Message audio de 2 minutes : pourquoi EbookStudio change la publication sur Amazon, et comment prendre l'accès à vie à 47 € avant le 30 septembre.",
       );
     }
   }, []);
@@ -80,7 +80,7 @@ export default function MessageAudioPage() {
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/80">
             Installez-vous deux minutes et écoutez ce message. Je vous explique ce qui change
-            le 31 août — et pourquoi c'est le bon moment pour votre livre.
+            le 30 septembre — et pourquoi c'est le bon moment pour votre livre.
           </p>
 
           <div className="mt-6 rounded-xl bg-white/10 p-4">
@@ -100,7 +100,7 @@ export default function MessageAudioPage() {
         {/* Après l'écoute : un seul geste possible. */}
         <div className="mt-8 rounded-2xl border-2 border-[#D4AF37]/40 bg-white p-6 text-center shadow-sm">
           <p className="v3-serif text-xl font-bold text-[#2A2118]">
-            L'accès à vie à 47 € se termine le 31 août
+            L'accès à vie à 47 € se termine le 30 septembre
           </p>
           <p className="mt-2 text-sm leading-relaxed text-[#5B5245]">
             Paiement unique, aucun abonnement, accès conservé — et la V3 offerte au 1er octobre.

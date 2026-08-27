@@ -164,7 +164,7 @@ const CampaignSequencePanel = () => {
   return (
     <div className="rounded-lg border border-border bg-card/50 p-4 space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        <h3 className="font-semibold">Séquence 5 jours — fin du 47 € (31 août) et lancement V3 (1er octobre)</h3>
+        <h3 className="font-semibold">Séquence 5 jours — fin du 47 € (30 septembre) et lancement V3 (1er octobre)</h3>
         <Button variant="ghost" size="sm" onClick={load} className="ml-auto text-muted-foreground">
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
         </Button>

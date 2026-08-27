@@ -387,7 +387,7 @@ export default function EssaiPage() {
                 <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
                   Pour écrire la suite
                 </p>
-                <h2 className="v3-serif mt-2 text-2xl font-bold">L'accès à vie à 47 € — jusqu'au 31 août</h2>
+                <h2 className="v3-serif mt-2 text-2xl font-bold">L'accès à vie à 47 € — jusqu'au 30 septembre</h2>
                 <ul className="mt-4 space-y-2 text-sm text-white/85">
                   {LOCKED.map((l) => (
                     <li key={l} className="flex items-start gap-2">

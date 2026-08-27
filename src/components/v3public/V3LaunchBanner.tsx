@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { Rocket, PlayCircle, Crown } from 'lucide-react';
 import useLaunchSettings from '@/hooks/useLaunchSettings';
 
-/** Fin de l'offre 47 € à vie : 31 août 2026, 23h59 heure de Paris. */
-const DEADLINE = new Date('2026-08-31T23:59:59+02:00').getTime();
+/** Fin de l'offre 47 € à vie : 30 septembre 2026, 23h59 heure de Paris. */
+const DEADLINE = new Date('2026-09-30T23:59:59+02:00').getTime();
 
 function useCountdown(target: number) {
   const [now, setNow] = useState(() => Date.now());
@@ -25,7 +25,7 @@ function useCountdown(target: number) {
 }
 
 /**
- * Bandeau de lancement : rappelle la fin de l'accès à vie à 47 € (31 août)
+ * Bandeau de lancement : rappelle la fin de l'accès à vie à 47 € (30 septembre)
  * et l'ouverture de la V3 le 1er octobre avec le premier mois offert.
  * Affiché en haut de l'accueil V3 et de la page de commande.
  */
@@ -60,12 +60,12 @@ export default function V3LaunchBanner({ compact = false }: { compact?: boolean 
               <Crown className="h-3 w-3" /> Lancement V3
             </span>
             <h2 className="mt-2 text-[19px] font-bold leading-snug text-white sm:text-[22px]">
-              47 € à vie jusqu’au 31 août —{' '}
+              47 € à vie jusqu’au 30 septembre —{' '}
               <span style={{ color: '#F1DFA6' }}>la V3 ouvre le 1er octobre, 1<sup>er</sup> mois offert</span>
             </h2>
             {!compact && (
               <p className="mt-1 text-[13px] leading-relaxed text-white/80">
-                Après le 31 août, plus de paiement unique : uniquement l’abonnement. Inscriptions à la V3 dès
+                Après le 30 septembre, plus de paiement unique : uniquement l’abonnement. Inscriptions à la V3 dès
                 le 1<sup>er</sup> septembre.
               </p>
             )}
@@ -112,7 +112,7 @@ export default function V3LaunchBanner({ compact = false }: { compact?: boolean 
             to="/commander"
             className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-[14px] font-semibold text-white/90 underline decoration-[#C9A84C] underline-offset-4"
           >
-            Accès à vie 47 € avant le 31 août
+            Accès à vie 47 € avant le 30 septembre
           </Link>
           {video && (
             <a

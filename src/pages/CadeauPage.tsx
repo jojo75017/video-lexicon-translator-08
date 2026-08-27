@@ -23,7 +23,7 @@ import { useReferralTracking, getStoredRefCode } from "@/hooks/useReferralTracki
 /** Cadeau de bienvenue : 10 niches + kit de démarrage V3 (la vidéo reste réservée aux abonnés). */
 const KIT_PDF_URL = "/kit-demarrage-ebookstudio-v3.pdf";
 /** Fin de l'offre accès à vie 47 € */
-const OFFER_END = new Date("2026-08-31T23:59:59+02:00");
+const OFFER_END = new Date("2026-09-30T23:59:59+02:00");
 
 const useCountdown = (target: Date) => {
   const [left, setLeft] = useState(() => target.getTime() - Date.now());
@@ -159,7 +159,7 @@ const CadeauPage = () => {
             <div className="rounded-2xl border border-[#c9a84c]/40 bg-[#c9a84c]/10 p-5 text-left">
               <p className="flex items-center gap-2 text-sm font-semibold text-[#e7cf8c]">
                 <Clock className="h-4 w-4" />
-                Accès à vie 47 € — se termine le 31 août
+                Accès à vie 47 € — se termine le 30 septembre
               </p>
               <p className="mt-1 text-sm text-gray-300">
                 Il reste {countdown.days} j {countdown.hours} h {countdown.minutes} min. Après cette date,
@@ -209,7 +209,7 @@ const CadeauPage = () => {
         {countdown && (
           <div className="rounded-xl border border-[#c9a84c]/40 bg-[#c9a84c]/10 px-4 py-3 text-center text-sm text-[#e7cf8c]">
             <Clock className="mr-1 inline h-4 w-4" />
-            Offre accès à vie 47 € jusqu'au 31 août — il reste {countdown.days} j {countdown.hours} h {countdown.minutes} min
+            Offre accès à vie 47 € jusqu'au 30 septembre — il reste {countdown.days} j {countdown.hours} h {countdown.minutes} min
           </div>
         )}
 
