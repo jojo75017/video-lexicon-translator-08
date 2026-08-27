@@ -49,6 +49,31 @@ export const useProjectSave = () => {
         user_id: user.id,
       };
 
+      // Anti-doublon : un même titre + même type pour un utilisateur met à jour le projet existant
+      const { data: existing } = await supabase
+        .from('ebook_projects')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('title', projectData.title)
+        .eq('project_type', projectData.project_type)
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (existing?.id) {
+        const { error: updateError } = await supabase
+          .from('ebook_projects')
+          .update(projectData)
+          .eq('id', existing.id);
+        if (updateError) {
+          console.error('Erreur mise à jour projet existant:', updateError);
+          toast.error('Erreur lors de la sauvegarde');
+          return null;
+        }
+        toast.success(`Projet "${data.title}" mis à jour !`);
+        return existing.id;
+      }
+
       const { data: savedProject, error } = await supabase
         .from('ebook_projects')
         .insert(projectData)
