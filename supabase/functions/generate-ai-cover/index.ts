@@ -228,37 +228,63 @@ Render variation #${variationSeed}. The output MUST be a finished, print-ready, 
       ];
     }
 
-    const endpoint = conceptEndpoint;
-    const authHeaders = conceptHeaders;
-    const modelId = useOpenRouter ? OPENROUTER_IMAGE_MODEL : LOVABLE_IMAGE_MODEL;
+    // Helper: attempt image generation with a given provider config
+    const attemptGeneration = async (endpoint: string, headers: Record<string, string>, modelId: string) => {
+      const resp = await fetch(endpoint, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          model: modelId,
+          messages: [{ role: "user", content: messageContent }],
+          modalities: ["image", "text"],
+        }),
+      });
+      if (!resp.ok) {
+        return { ok: false as const, status: resp.status, text: await resp.text() };
+      }
+      return { ok: true as const, data: await resp.json() };
+    };
 
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: authHeaders,
-      body: JSON.stringify({
-        model: modelId,
-        messages: [{ role: "user", content: messageContent }],
-        modalities: ["image", "text"],
-      }),
-    });
+    let imageData: { ok: true; data: any } | { ok: false; status: number; text: string } | undefined;
+    let usedProvider: 'openrouter' | 'lovable-ai' = 'lovable-ai';
+    let usedModel = LOVABLE_IMAGE_MODEL;
 
-    if (!response.ok) {
-      const status = response.status;
+    // 1. Try OpenRouter BYOK first if provided
+    if (useOpenRouter) {
+      imageData = await attemptGeneration(conceptEndpoint, conceptHeaders, OPENROUTER_IMAGE_MODEL);
+      if (imageData.ok) {
+        usedProvider = 'openrouter';
+        usedModel = OPENROUTER_IMAGE_MODEL;
+      } else {
+        console.error('OpenRouter image failed, falling back to Lovable AI:', imageData.status, imageData.text.slice(0, 300));
+      }
+    }
+
+    // 2. Fall back to Lovable AI (or use it directly if no OpenRouter key)
+    if (!imageData?.ok && LOVABLE_API_KEY) {
+      const lovableEndpoint = 'https://ai.gateway.lovable.dev/v1/chat/completions';
+      const lovableHeaders = { 'Lovable-API-Key': LOVABLE_API_KEY, 'Content-Type': 'application/json' };
+      imageData = await attemptGeneration(lovableEndpoint, lovableHeaders, LOVABLE_IMAGE_MODEL);
+      if (imageData.ok) usedProvider = 'lovable-ai';
+    }
+
+    if (!imageData?.ok) {
+      const status = imageData?.status ?? 500;
+      const t = imageData?.text ?? '';
       if (status === 429) return new Response(JSON.stringify({ error: "Limite atteinte, réessayez dans 1 minute" }), { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       if (status === 402) return new Response(JSON.stringify({ error: "Crédits IA insuffisants" }), { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-      const t = await response.text();
       console.error("AI gateway error:", status, t);
       return new Response(JSON.stringify({
         error: useOpenRouter
-          ? `OpenRouter a refusé la génération (${status}). Vérifiez que votre clé est valide, créditée, et que le modèle ${modelId} est accessible sur votre compte.`
+          ? `Échec de génération (${status}). OpenRouter et Lovable AI ont tous deux échoué. Vérifiez votre clé OpenRouter et vos crédits.`
           : `Erreur génération Lovable AI (${status})`,
         details: t.slice(0, 800),
-        provider: useOpenRouter ? 'openrouter' : 'lovable-ai',
-        model: modelId,
+        provider: usedProvider,
+        model: usedModel,
       }), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    const data = await response.json();
+    const data = imageData.data;
     const imageUrl = extractImageUrl(data);
     const textResponse = data.choices?.[0]?.message?.content || "";
 
