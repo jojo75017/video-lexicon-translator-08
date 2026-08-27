@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { listSavedCovers, persistCoverToLibrary } from '@/lib/coverLibrary';
+
 
 interface EbookAICoverStudioProps {
   ebookTitle?: string;
@@ -171,12 +173,39 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
     try { return localStorage.getItem('cover_openrouter_key') || ''; } catch { return ''; }
   });
   const [showKeyInput, setShowKeyInput] = useState(false);
+  const [isLoadingLibrary, setIsLoadingLibrary] = useState(true);
   useEffect(() => {
     try {
       if (openrouterKey) localStorage.setItem('cover_openrouter_key', openrouterKey);
       else localStorage.removeItem('cover_openrouter_key');
     } catch {}
   }, [openrouterKey]);
+
+  // Récupération des couvertures déjà générées (bibliothèque persistante)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const saved = await listSavedCovers();
+      if (cancelled) return;
+      if (saved.length) {
+        setGeneratedCovers((prev) => {
+          const known = new Set(prev.map((c) => c.url));
+          const restored = saved
+            .filter((s) => !known.has(s.url))
+            .map<GeneratedCover>((s) => ({
+              url: s.url,
+              desc: s.title ? `Couverture sauvegardée — ${s.title}` : 'Couverture sauvegardée',
+              format: s.format,
+              paperbackSpec: null,
+            }));
+          return [...prev, ...restored];
+        });
+      }
+      setIsLoadingLibrary(false);
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
 
   useEffect(() => {
     if (initialDescription.trim()) setDescription(initialDescription);
@@ -571,16 +600,24 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
       if (error) throw error;
       if (!data?.imageUrl) throw new Error('Aucune image générée');
 
+      // Sauvegarde durable : la couverture reste retrouvable après rechargement
+      const persistedUrl = await persistCoverToLibrary({
+        imageUrl: data.imageUrl,
+        title,
+        format,
+      });
+
       setGeneratedCovers((prev) => [
-        { url: data.imageUrl, desc: data.description || '', format, paperbackSpec: data.paperbackSpec, prompts: data.prompts },
+        { url: persistedUrl, desc: data.description || '', format, paperbackSpec: data.paperbackSpec, prompts: data.prompts },
         ...prev,
       ]);
-      onCoverGenerated?.(data.imageUrl);
+      onCoverGenerated?.(persistedUrl);
       toast.success(
         format === 'kindle'
-          ? 'Couverture Kindle générée !'
-          : 'Couverture Broché complète générée !'
+          ? 'Couverture Kindle générée et sauvegardée !'
+          : 'Couverture Broché complète générée et sauvegardée !'
       );
+
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Erreur lors de la génération';
       console.error('Cover AI generation failed:', message);
@@ -1278,14 +1315,23 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2">
-            <ImageIcon className="h-5 w-5" /> Couvertures générées ({generatedCovers.length})
+            <ImageIcon className="h-5 w-5" /> Mes couvertures ({generatedCovers.length})
           </CardTitle>
+          <CardDescription className="text-xs">
+            Toutes vos couvertures sont sauvegardées automatiquement : vous les retrouvez ici même après avoir fermé la page.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          {generatedCovers.length === 0 ? (
+          {isLoadingLibrary && generatedCovers.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+              <Loader2 className="h-10 w-10 mb-4 animate-spin opacity-40" />
+              <p className="text-sm">Récupération de vos couvertures…</p>
+            </div>
+          ) : generatedCovers.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
               <Palette className="h-16 w-16 mb-4 opacity-20" />
               <p className="text-lg">Aucune couverture générée</p>
+
               <p className="text-sm">Saisissez le titre puis lancez la génération en 1 clic</p>
             </div>
           ) : (
