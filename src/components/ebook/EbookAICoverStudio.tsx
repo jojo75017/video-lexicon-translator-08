@@ -1315,14 +1315,23 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2">
-            <ImageIcon className="h-5 w-5" /> Couvertures générées ({generatedCovers.length})
+            <ImageIcon className="h-5 w-5" /> Mes couvertures ({generatedCovers.length})
           </CardTitle>
+          <CardDescription className="text-xs">
+            Toutes vos couvertures sont sauvegardées automatiquement : vous les retrouvez ici même après avoir fermé la page.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          {generatedCovers.length === 0 ? (
+          {isLoadingLibrary && generatedCovers.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+              <Loader2 className="h-10 w-10 mb-4 animate-spin opacity-40" />
+              <p className="text-sm">Récupération de vos couvertures…</p>
+            </div>
+          ) : generatedCovers.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
               <Palette className="h-16 w-16 mb-4 opacity-20" />
               <p className="text-lg">Aucune couverture générée</p>
+
               <p className="text-sm">Saisissez le titre puis lancez la génération en 1 clic</p>
             </div>
           ) : (
