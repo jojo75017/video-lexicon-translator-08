@@ -209,6 +209,11 @@ export default function V3HomePage() {
         <KdpPilotPromoBanner variant="light" compact />
       </section>
 
+      {/* ContentStudio Engine — encart premium (livre → formation vidéo MP4) */}
+      <section className="max-w-7xl mx-auto px-5 md:px-8 pt-3">
+        <V3ContentStudioPromo />
+      </section>
+
       {/* Actions rapides (Workflow IA, Couverture, Ambiances, Sauvegarder, Nouveau, Formulaire manuel) */}
       <div className="max-w-7xl mx-auto px-5 md:px-8 pt-3">
         <V3QuickActionsBar />
