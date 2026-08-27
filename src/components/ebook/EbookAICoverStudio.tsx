@@ -547,7 +547,7 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
     const usesOpenRouter = cleanOpenrouterKey.startsWith('sk-or-');
     setIsGenerating(true);
     try {
-      const invokePromise = supabase.functions.invoke('generate-ai-cover', {
+      const { data, error } = await supabase.functions.invoke('generate-ai-cover', {
           body: {
             title,
             subtitle,
@@ -568,10 +568,6 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
             openrouterKey: usesOpenRouter ? cleanOpenrouterKey : undefined,
           },
         });
-      const timeoutPromise = new Promise<never>((_, reject) => {
-        window.setTimeout(() => reject(new Error('La génération IA prend trop de temps')), 45000);
-      });
-      const { data, error } = await Promise.race([invokePromise, timeoutPromise]);
       if (error) throw error;
       if (!data?.imageUrl) throw new Error('Aucune image générée');
 
