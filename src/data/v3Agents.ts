@@ -31,16 +31,16 @@ export const AGENT_FILTERS: { id: AgentFilter | 'tous'; label: string }[] = [
 
 export const V3_AGENTS: V3Agent[] = [
   {
-    id: 'camille', num: '01', name: 'Camille', role: 'Architecte du sommaire',
-    mission: 'Elle construit le plan de votre livre chapitre par chapitre, avec vous.',
-    deliverables: ['Sommaire stratégique', 'Objectif par chapitre', 'Nombre de chapitres calibré'],
+    id: 'camille', num: '01', name: 'Camille', role: 'Table des matières',
+    mission: 'Elle produit uniquement le sommaire : chapitres numérotés, titres, objectifs — puis l’envoie au workflow.',
+    deliverables: ['Sommaire seul (TDM)', 'Titres éditables ligne à ligne', 'Envoi vers le workflow'],
     filter: 'fiction', route: '/v3/outils/sommaire-ultime', accent: '#0F766E',
   },
   {
-    id: 'victor', num: '02', name: 'Victor', role: 'Romancier',
-    mission: 'Il écrit vos romans et récits longs, d’une seule voix, sans latin ni remplissage.',
-    deliverables: ['Roman complet', 'Style cohérent', 'Fins de chapitre propres'],
-    filter: 'fiction', route: '/v3/create', accent: '#1D4ED8',
+    id: 'victor', num: '02', name: 'Victor', role: 'Romancier (workflow 15 agents)',
+    mission: 'Romans, thrillers, récits longs : il vous emmène directement dans le workflow de rédaction.',
+    deliverables: ['Roman complet chapitre par chapitre', 'Style cohérent', 'Export KDP'],
+    filter: 'fiction', route: '/v3/workflow?genre=roman', accent: '#1D4ED8',
   },
   {
     id: 'noemie', num: '03', name: 'Noémie', role: 'Conteuse jeunesse',
@@ -50,9 +50,9 @@ export const V3_AGENTS: V3Agent[] = [
   },
   {
     id: 'basile', num: '04', name: 'Basile', role: 'Auteur business & méthode',
-    mission: 'Guides pratiques, méthodes, développement professionnel.',
+    mission: 'Guides pratiques, méthodes, développement professionnel, via le workflow.',
     deliverables: ['Livre méthode', 'Exercices', 'Promesse de couverture'],
-    filter: 'pratique', route: '/v3/create', accent: '#065F46',
+    filter: 'pratique', route: '/v3/workflow?genre=methode', accent: '#065F46',
   },
   {
     id: 'margaux', num: '05', name: 'Margaux', role: 'Cheffe cuisine',
