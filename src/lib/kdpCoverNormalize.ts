@@ -63,13 +63,11 @@ export async function normalizeCoverToKdp(
     cleanup = loaded.cleanup;
     if (!img.naturalWidth || !img.naturalHeight) return imageUrl;
 
-    // Déjà au bon ratio et résolution suffisante → on ne touche pas.
+    // Même si la source semble déjà correcte, on recrée toujours un PNG local
+    // aux dimensions exactes. Le fournisseur peut sinon livrer une URL dont les
+    // métadonnées ou le fichier changent au téléchargement.
     const targetRatio = target.width / target.height;
     const srcRatio = img.naturalWidth / img.naturalHeight;
-    const ratioOk = Math.abs(srcRatio - targetRatio) < 0.02;
-    if (ratioOk && img.naturalWidth >= target.width && img.naturalHeight >= target.height) {
-      return imageUrl;
-    }
 
     const canvas = document.createElement('canvas');
     canvas.width = target.width;
