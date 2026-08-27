@@ -10,6 +10,8 @@ import V3ResumeBookCard from '@/components/v3public/V3ResumeBookCard';
 import V3QuickActionsBar from '@/components/v3public/V3QuickActionsBar';
 import V3PaletteModule from '@/components/v3public/V3PaletteModule';
 import KdpPilotPromoBanner from '@/components/ebook/KdpPilotPromoBanner';
+import AgentAvatar from '@/components/v3public/AgentAvatar';
+import { V3_AGENTS } from '@/data/v3Agents';
 import Niches10Offer from '@/components/marketing/Niches10Offer';
 import { V3EngineStrip, V3EngineGrid } from '@/components/v3public/V3EngineBanner';
 import V3LaunchBanner from '@/components/v3public/V3LaunchBanner';
@@ -188,7 +190,16 @@ export default function V3HomePage() {
               Roman, cuisine, voyage, enfants, coloriage, BD, atlas, jeux, agenda… choisissez votre agent.
             </span>
           </span>
-          <span className="text-2xl" aria-hidden>👩‍🍳 🧑‍✈️ 👩‍🎨 🤖</span>
+          <span className="flex items-center -space-x-2">
+            {['margaux', 'leandre', 'noemie', 'zoe'].map((id) => {
+              const a = V3_AGENTS.find((x) => x.id === id)!;
+              return (
+                <span key={id} className="rounded-full ring-2 ring-background bg-background">
+                  <AgentAvatar seed={a.id} accent={a.accent} robot={a.robot} size={38} />
+                </span>
+              );
+            })}
+          </span>
         </Link>
       </section>
 

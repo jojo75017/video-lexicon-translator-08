@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { AGENT_FILTERS, V3_AGENTS, type AgentFilter } from '@/data/v3Agents';
+import AgentAvatar from './AgentAvatar';
 
 /**
  * Grille « Commence ici » : un agent-personnage par type de livre.
@@ -56,11 +57,10 @@ export default function V3AgentsStartGrid() {
                 {agent.num}
               </span>
               <span
-                className="grid h-16 w-16 place-items-center rounded-2xl bg-background text-3xl shadow-sm ring-2 transition-transform duration-300 group-hover:scale-105"
+                className="grid h-16 w-16 place-items-center overflow-hidden rounded-2xl bg-background shadow-sm ring-2 transition-transform duration-300 group-hover:scale-105"
                 style={{ ['--tw-ring-color' as string]: `${agent.accent}55` }}
-                aria-hidden
               >
-                {agent.face}
+                <AgentAvatar seed={agent.id} accent={agent.accent} robot={agent.robot} size={56} />
               </span>
             </div>
 
