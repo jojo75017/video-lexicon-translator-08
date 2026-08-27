@@ -306,10 +306,6 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
             </details>
           </div>
 
-          {/* Colonne sommaire : reste visible pendant l'écriture */}
-          <aside id="sommaire-ia" className="lg:sticky lg:top-24">
-            <V3GenieOutlinePanel key={briefKey} outlineMode={sommaireIa ? 'guided' : undefined} />
-          </aside>
         </div>
 
 
