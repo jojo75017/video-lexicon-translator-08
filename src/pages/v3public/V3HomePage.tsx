@@ -10,6 +10,7 @@ import V3ResumeBookCard from '@/components/v3public/V3ResumeBookCard';
 import V3QuickActionsBar from '@/components/v3public/V3QuickActionsBar';
 import V3PaletteModule from '@/components/v3public/V3PaletteModule';
 import KdpPilotPromoBanner from '@/components/ebook/KdpPilotPromoBanner';
+import V3ContentStudioPromo from '@/components/v3public/V3ContentStudioPromo';
 import AgentAvatar from '@/components/v3public/AgentAvatar';
 import { V3_AGENTS } from '@/data/v3Agents';
 import Niches10Offer from '@/components/marketing/Niches10Offer';
@@ -207,6 +208,11 @@ export default function V3HomePage() {
       {/* KDP Pilot — outil partenaire payant + code abonnés (compact, avant les champs) */}
       <section className="max-w-7xl mx-auto px-5 md:px-8 pt-2">
         <KdpPilotPromoBanner variant="light" compact />
+      </section>
+
+      {/* ContentStudio Engine — encart premium (livre → formation vidéo MP4) */}
+      <section className="max-w-7xl mx-auto px-5 md:px-8 pt-3">
+        <V3ContentStudioPromo />
       </section>
 
       {/* Actions rapides (Workflow IA, Couverture, Ambiances, Sauvegarder, Nouveau, Formulaire manuel) */}
