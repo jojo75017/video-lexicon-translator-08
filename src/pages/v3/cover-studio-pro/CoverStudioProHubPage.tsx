@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BookOpen, Layers, Square, BookCopy, Sparkles, ArrowRight, ArrowLeft } from 'lucide-react';
 import IdeogramKeyCard from '@/components/ebook/IdeogramKeyCard';
+import V3AgentReturnBar from '@/components/v3public/V3AgentReturnBar';
 
 const FORMAT_ICONS: Record<CoverFormatId, typeof BookOpen> = {
   'ebook-kindle': BookOpen,
