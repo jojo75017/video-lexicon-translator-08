@@ -15,14 +15,36 @@ export const KDP_COVER_TARGETS = {
 
 export type KdpCoverTarget = keyof typeof KDP_COVER_TARGETS;
 
-function loadImage(src: string): Promise<HTMLImageElement> {
+function loadImageElement(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.crossOrigin = 'anonymous';
     img.onload = () => resolve(img);
     img.onerror = () => reject(new Error('Image de couverture illisible'));
     img.src = src;
   });
+}
+
+/**
+ * Charge d'abord l'image comme Blob local. Cela évite qu'un canvas soit bloqué
+ * par CORS pour certains abonnés lorsque le fournisseur renvoie une URL distante.
+ */
+async function loadImage(src: string): Promise<{ image: HTMLImageElement; cleanup: () => void }> {
+  try {
+    const response = await fetch(src);
+    if (!response.ok) throw new Error(`Image inaccessible (${response.status})`);
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    try {
+      const image = await loadImageElement(objectUrl);
+      return { image, cleanup: () => URL.revokeObjectURL(objectUrl) };
+    } catch (error) {
+      URL.revokeObjectURL(objectUrl);
+      throw error;
+    }
+  } catch {
+    const image = await loadImageElement(src);
+    return { image, cleanup: () => undefined };
+  }
 }
 
 /**
@@ -34,8 +56,11 @@ export async function normalizeCoverToKdp(
   format: KdpCoverTarget = 'kindle',
 ): Promise<string> {
   const target = KDP_COVER_TARGETS[format] ?? KDP_COVER_TARGETS.kindle;
+  let cleanup = () => undefined;
   try {
-    const img = await loadImage(imageUrl);
+    const loaded = await loadImage(imageUrl);
+    const img = loaded.image;
+    cleanup = loaded.cleanup;
     if (!img.naturalWidth || !img.naturalHeight) return imageUrl;
 
     // Déjà au bon ratio et résolution suffisante → on ne touche pas.
@@ -64,9 +89,15 @@ export async function normalizeCoverToKdp(
     ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(img, dx, dy, drawW, drawH);
 
-    return canvas.toDataURL('image/png');
+    const normalized = canvas.toDataURL('image/png');
+    if (!normalized.startsWith('data:image/png')) {
+      throw new Error('Le fichier KDP final n’a pas pu être créé');
+    }
+    return normalized;
   } catch (err) {
     console.warn('normalizeCoverToKdp: recadrage impossible, image conservée telle quelle', err);
     return imageUrl;
+  } finally {
+    cleanup();
   }
 }
