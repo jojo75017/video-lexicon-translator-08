@@ -5,21 +5,34 @@ import { cn } from '@/lib/utils';
 
 interface BackButtonProps {
   to?: string;
+  /** Destination utilisée quand il n'y a pas d'historique interne exploitable. */
+  fallback?: string;
   label?: string;
   className?: string;
 }
 
 /**
- * Bouton retour réutilisable — utilise history.back() par défaut,
- * ou navigue vers `to` si fourni. À placer en haut de chaque page V3.
+ * Bouton retour réutilisable.
+ * - `to` fourni : navigation directe.
+ * - sinon : history.back() uniquement s'il existe un historique interne,
+ *   sinon on retombe sur `fallback` (par défaut la page des agents).
+ *   Cela évite de sortir du site ou d'atterrir sur une page de vente.
  */
-export function BackButton({ to, label = 'Retour', className }: BackButtonProps) {
+export function BackButton({ to, fallback = '/v3/commence-ici', label = 'Retour', className }: BackButtonProps) {
   const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (to) { navigate(to); return; }
+    const idx = (window.history.state as { idx?: number } | null)?.idx ?? 0;
+    if (idx > 0) navigate(-1);
+    else navigate(fallback, { replace: false });
+  };
+
   return (
     <Button
       variant="ghost"
       size="sm"
-      onClick={() => (to ? navigate(to) : navigate(-1))}
+      onClick={handleClick}
       className={cn('gap-1 text-neutral-700 hover:text-neutral-900', className)}
     >
       <ArrowLeft className="w-4 h-4" /> {label}
