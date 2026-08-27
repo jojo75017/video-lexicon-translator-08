@@ -66,9 +66,6 @@ export async function normalizeCoverToKdp(
     // Même si la source semble déjà correcte, on recrée toujours un PNG local
     // aux dimensions exactes. Le fournisseur peut sinon livrer une URL dont les
     // métadonnées ou le fichier changent au téléchargement.
-    const targetRatio = target.width / target.height;
-    const srcRatio = img.naturalWidth / img.naturalHeight;
-
     const canvas = document.createElement('canvas');
     canvas.width = target.width;
     canvas.height = target.height;
