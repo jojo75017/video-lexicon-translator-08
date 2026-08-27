@@ -208,7 +208,12 @@ export default function V3BookManagerPage() {
             <div key={b.id} className="v3-card flex items-center gap-4">
               <div className="w-14 h-20 rounded bg-[var(--v3-ink)] shrink-0" />
               <div className="flex-1 min-w-0">
-                <div className="font-semibold truncate">{b.title}</div>
+                <div className="font-semibold truncate flex items-center gap-2">
+                  <span className="truncate">{b.title}</span>
+                  {duplicateIds.has(b.id) && (
+                    <span className="shrink-0 rounded-full bg-[var(--v3-orange)]/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[var(--v3-orange)]">Doublon</span>
+                  )}
+                </div>
                 {b.author_name && <div className="text-xs text-[var(--v3-muted)]">par {b.author_name}</div>}
                 <div className="mt-1 text-xs font-semibold text-[var(--v3-muted)]">
                   {chapterCount > 0 ? `${chapterCount} chapitre${chapterCount > 1 ? 's' : ''} · Export disponible` : 'Brouillon · récupération des sauvegardes à l’ouverture'}
