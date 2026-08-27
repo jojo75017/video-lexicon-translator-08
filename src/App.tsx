@@ -623,6 +623,7 @@ const App = () => {
               <Route path="fonctionnalites/integrations" element={<V3IntegrationsPage />} />
               <Route path="fonctionnalites/questions" element={<V3QuestionsPage />} />
               <Route path="workflow" element={<V3WorkflowPage />} />
+              <Route path="commence-ici" element={<V3StartHerePage />} />
 
 
 
