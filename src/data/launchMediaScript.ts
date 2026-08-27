@@ -8,7 +8,7 @@ Voilà ce que fait EbookStudio. J'écris mon idée en une seule phrase. Les agen
 
 Ensuite vient la partie que personne ne fait correctement. Une correction professionnelle en quatre passes. Une couverture au gabarit exact d'Amazon, avec le dos et la quatrième de couverture. Un fichier prêt à téléverser. Et la fiche Amazon entièrement remplie : mots-clés, catégories, description avec les mots importants en gras. Si vous le souhaitez, vous obtenez même une version audio de votre livre.
 
-Jusqu'au 30 septembre à minuit : 47 euros, une seule fois, accès à vie. Payable en une, deux ou trois fois. Le 1er septembre, cette offre disparaît pour de bon. À partir du 1er septembre, vous pourrez réserver votre place pour la nouvelle version, qui ouvre le 1er octobre, avec le premier mois offert.
+Jusqu'au 30 septembre à minuit : 47 euros, une seule fois, accès à vie. Payable en une, deux ou trois fois. Le 1er octobre, cette offre disparaît pour de bon. Dès maintenant, vous pouvez réserver votre place pour la nouvelle version, qui ouvre le 1er octobre, avec le premier mois offert.
 
 Vous avez deux choix. Le premier : vous testez gratuitement et vous écrivez votre premier chapitre en quelques minutes, sans carte bancaire. Le second : vous prenez l'accès à vie à 47 euros avant le 30 septembre. Le lien est juste en dessous. Une question ? Écrivez-moi directement, je réponds personnellement. À très vite, et bonne écriture.`;
 

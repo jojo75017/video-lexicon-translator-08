@@ -65,8 +65,8 @@ export default function V3LaunchBanner({ compact = false }: { compact?: boolean 
             </h2>
             {!compact && (
               <p className="mt-1 text-[13px] leading-relaxed text-white/80">
-                Après le 30 septembre, plus de paiement unique : uniquement l’abonnement. Inscriptions à la V3 dès
-                le 1<sup>er</sup> septembre.
+                Après le 30 septembre, plus de paiement unique : uniquement l’abonnement. La V3 ouvre le
+                1<sup>er</sup> octobre.
               </p>
             )}
           </div>
