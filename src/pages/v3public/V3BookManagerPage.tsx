@@ -159,6 +159,22 @@ export default function V3BookManagerPage() {
         <button onClick={() => nav(correctedOnly ? '/v3/corriger' : '/v3/create')} className="v3-btn v3-btn-primary"><Plus className="w-4 h-4" /> {correctedOnly ? 'Corriger un livre' : 'Ajouter'}</button>
       </div>
 
+      {!loading && duplicateCount > 0 && (
+        <div className="v3-card mt-6 flex flex-wrap items-center justify-between gap-3 border border-[var(--v3-orange)]/40">
+          <div>
+            <div className="text-sm font-semibold">{duplicateCount} doublon{duplicateCount > 1 ? 's' : ''} détecté{duplicateCount > 1 ? 's' : ''}</div>
+            <p className="text-xs text-[var(--v3-muted)] mt-1">
+              Le nettoyage conserve, pour chaque titre, la version contenant le plus de texte et supprime les copies vides.
+            </p>
+          </div>
+          <button onClick={() => void cleanDuplicates()} disabled={cleaning} className="v3-btn v3-btn-primary text-xs">
+            <Trash2 className="w-3.5 h-3.5" /> {cleaning ? 'Nettoyage…' : 'Nettoyer les doublons'}
+          </button>
+        </div>
+      )}
+
+
+
       {loading ? (
         <div className="mt-12 text-center text-[var(--v3-muted)]">Chargement…</div>
       ) : rows.length === 0 ? (
