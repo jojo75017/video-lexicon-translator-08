@@ -99,7 +99,11 @@ export default function BonusPage() {
               <p className="text-sm leading-relaxed text-[#232F3E]/75">{bonus.description}</p>
 
               <div className="mt-auto pt-2">
-                {isFile(bonus.to) ? (
+                {bonus.requiresAccess ? (
+                  <span className="inline-flex items-center text-sm font-semibold text-[#232F3E]/55">
+                    Livré dans votre espace dès votre accès
+                  </span>
+                ) : isFile(bonus.to) ? (
                   <a
                     href={bonus.to}
                     target="_blank"
@@ -119,6 +123,7 @@ export default function BonusPage() {
                   </Link>
                 )}
               </div>
+
             </Card>
           ))}
         </div>
