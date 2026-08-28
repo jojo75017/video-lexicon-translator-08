@@ -273,6 +273,9 @@ export default function V3HomePage() {
         <V3CapabilitiesPanel />
       </div>
 
+      {/* Bandeau rotatif d'upsells personnifiés — 1 promesse = 1 encart */}
+      <V3UpsellRotator />
+
       {/* SECTIONS DE CONVICTION — sous le module des livres */}
       <V3MarketProofPanel />
       <V3BeforeAfterPanel />
