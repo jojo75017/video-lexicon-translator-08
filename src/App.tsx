@@ -32,7 +32,7 @@ import StickySignupBar from '@/components/marketing/StickySignupBar';
 import V3LaunchGlobalBanner from '@/components/V3LaunchGlobalBanner';
 import { captureUtmParams } from '@/lib/utmTracking';
 import { ADMIN_HOME_PATH, ADMIN_LOGIN_PATH } from '@/config/adminRoutes';
-import { getHomePath, type AccessState } from '@/lib/authDestination';
+import { getHomePath, SUBSCRIBER_HOME_PATH, type AccessState } from '@/lib/authDestination';
 import { useAdminAccess } from '@/contexts/AdminAccessContext';
 import AdminQuickNav from '@/components/admin/AdminQuickNav';
 import { hasPersistedAdminHint } from '@/lib/adminAccess';
