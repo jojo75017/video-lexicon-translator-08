@@ -114,12 +114,11 @@ export default function V3CommanderPage() {
   const ref = params.get("ref") || params.get("aff") || undefined;
 
   const [email, setEmail] = useState(() => (params.get("email") || "").trim().toLowerCase());
-  const [plan, setPlan] = useState<PlanId>("v2_1x");
+  const plan = PLAN_ID;
   const [loading, setLoading] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
 
-  const selected = useMemo(() => PLANS.find((p) => p.id === plan)!, [plan]);
 
   // Avis réels et approuvés uniquement : aucun témoignage fabriqué.
   useEffect(() => {
