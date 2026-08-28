@@ -100,6 +100,8 @@ export function MagazineSidebar({
   onToggleCollapse,
 }: MagazineSidebarProps) {
   const navigate = useNavigate();
+  const { isAdmin } = useAdminAccess();
+
 
   const isStepActive = (item: StepItem) =>
     item.id === activeTab || item.matchIds?.includes(activeTab);
