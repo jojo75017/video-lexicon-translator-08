@@ -436,7 +436,7 @@ const App = () => {
             <Route path="/essai/inscription" element={<EssaiInscriptionPage />} />
             {/* Essai gratuit 7 jours : inscription publique + envoi Systeme.io */}
             <Route path="/essai-gratuit-7-jours" element={<EssaiGratuit7JoursPage />} />
-            <Route path="/v3/attente" element={<V3WaitingRoomPage />} />
+            <Route path="/v3/attente" element={v3Standalone(<V3WaitingRoomPage />)} />
             <Route path="/message" element={<MessageAudioPage />} />
             {/* Fiches ponts du tunnel email : 1 email = 1 fiche = 1 bouton vers /commander */}
             <Route path="/fiche/histoire" element={<FicheHistoirePage />} />
