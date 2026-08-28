@@ -227,7 +227,6 @@ export default function V3CommanderPage() {
 
             <div className="mt-6 flex flex-wrap items-baseline gap-3">
               <span className="text-4xl font-black" style={{ color: "var(--ds-gold)" }}>47 €</span>
-              <span className="text-lg text-[var(--ds-text-muted)] line-through">59 €</span>
               <span
                 className="rounded-full px-3 py-1 text-sm font-bold"
                 style={{ background: "var(--ds-orange-soft)", color: "var(--ds-orange)" }}
@@ -362,7 +361,6 @@ export default function V3CommanderPage() {
                 <OfferCountdown />
 
                 <div className="flex items-baseline gap-2">
-                  <span className="text-lg font-bold text-[var(--ds-text-muted)] line-through">59 €</span>
                   <span className="text-4xl font-black" style={{ color: "var(--ds-gold)" }}>47 €</span>
                   <span className="text-sm text-[var(--ds-text-muted)]">paiement unique</span>
                 </div>
