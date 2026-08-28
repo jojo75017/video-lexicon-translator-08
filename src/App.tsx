@@ -366,6 +366,18 @@ const App = () => {
     </SubscriberGate>
   );
 
+  /**
+   * Pages V3 déclarées hors du layout /v3 : elles doivent appliquer la même
+   * règle que le layout — un abonné V2 (non-admin) ne voit rien de la V3 et
+   * repart sur /ebook-planner. Statut inconnu = on patiente (jamais d'éjection).
+   */
+  const v3Standalone = (node: React.ReactNode) => {
+    if (!isAdminChecked) return <PageLoader />;
+    if (!isAdmin && isAuthenticated) return <Navigate to={SUBSCRIBER_HOME_PATH} replace />;
+    return <>{node}</>;
+  };
+
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
