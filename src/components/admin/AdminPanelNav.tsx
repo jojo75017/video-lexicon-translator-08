@@ -1,4 +1,4 @@
-import { BarChart3, BookOpen, Contact, CreditCard, FileText, Gauge, Mail, Megaphone, MessageSquare, Rocket, Shield, Snowflake, Table, Ticket, TrendingUp, User, Users, BookMarked } from 'lucide-react';
+import { Send, BarChart3, BookOpen, Contact, CreditCard, FileText, Gauge, Mail, Megaphone, MessageSquare, Rocket, Shield, Snowflake, Table, Ticket, TrendingUp, User, Users, BookMarked } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -28,6 +28,7 @@ const adminNavItems: AdminNavItem[] = [
   { label: 'CRM', path: '/crm', icon: Contact, exact: true },
   { label: 'Plans V3', path: '/admin/plans-v3', icon: Table, exact: true },
   { label: 'Lancement V3', path: '/admin/lancement', icon: Rocket, exact: true },
+  { label: 'Séquence Systeme.io', path: '/admin/sequence-email', icon: Send, exact: true },
   { label: 'Attente', path: '/admin/attente', icon: Snowflake, exact: true },
   { label: 'Tester PayPal', path: '/admin/tester-paypal', icon: CreditCard, exact: true },
 ];
