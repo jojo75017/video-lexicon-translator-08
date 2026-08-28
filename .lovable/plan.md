@@ -83,6 +83,67 @@ abonné V2 il affiche systématiquement le prix remisé −20 % + le lien `/v3/m
   Les encarts afficheront les prix présents dans `v3Pricing.ts` tant que vous ne validez
   pas un nouveau barème — aucun prix ne sera modifié par ce chantier.
 
+## Avis sur les tarifs + grille de comparaison couleur
+
+### Avis honnête
+À 27 €/47 €/97 € par mois, les forfaits ne sont **pas chers** — ils sont même plutôt
+positionnés « entrée de gamme » face au marché :
+- **Publisher Rocket** : 97 $/mo (≈ 89 €) — seulement la recherche de mots-clés/niches.
+- **AIZYBOOK** : 149 €/mo — publication assistée, sans le studio IA complet.
+- **Jasper / Copy.ai** (IA générique) : 20–60 €/mo, mais zéro outil KDP.
+
+EbookStudio à 27 € livre déjà 30 livres/mois + 10 langues + sommaire IA + couverture +
+audiolivre + correction. **Plume est trop bas** pour la valeur perçue (risque de
+doute sur la qualité). **Édition à 47 € est bien calibrée** pour le pro. **Studio Pro
+à 97 € est correct** vu que tout est inclus.
+
+Recommandation tarifaire (hors ce chantier — à valider séparément) :
+- Plume → **29 €/mo** (295 €/an) : psychologiquement plus « vrai outil pro ».
+- Édition → **47 €/mo** (inchangé) : bon rapport perçu.
+- Studio Pro → **97 €/mo** (inchangé) : reste l'offre « tout inclus ».
+
+### Grille de comparaison couleur (rendu côte à côte)
+
+```text
+┌──────────────────────────────┬──────────────────────────────┐
+│  FORFAIT 1 — PLUME            │  FORFAIT 2 — ÉDITION           │
+│  ████ VERT (#0d7a5f)          │  ████ POURPRE (#5B21B6)       │
+│                              │                              │
+│  27 €/mo · 270 €/an           │  47 €/mo · 470 €/an           │
+│  2 mois offerts en annuel     │  2 mois offerts en annuel     │
+├──────────────────────────────┼──────────────────────────────┤
+│  ✓ 30 livres / mois           │  ✓ Livres illimités           │
+│  ✓ Sommaire IA guidé          │  ✓ Sommaire IA avancé          │
+│  ✓ 40 chapitres · 5 000 mots  │  ✓ 60 chapitres · 8 000 mots  │
+│  ✓ 10 langues incluses        │  ✓ 10 langues incluses        │
+│  ✓ Export PDF/DOCX/EPUB       │  ✓ Export + Pack KDP ZIP       │
+│  ✓ Couverture complète        │  ✓ Cover Studio Pro 300 DPI    │
+│  ✓ Audiolivre standard        │  ✓ Audiolibre pro + BD Studio  │
+│  ✓ Correction pro             │  ✓ BookPerfect AI inclus (97€) │
+│  ✓ Import manuscrit           │  ✓ Amazon Spy / Audit ASIN     │
+│                              │  ✓ Mode Recherche Approfondie │
+├──────────────────────────────┼──────────────────────────────┤
+│  ✗ BookPerfect AI (97 €)      │  ✗ Traductions relues (97 €)  │
+│  ✗ Cover Studio Pro / BD      │  ✗ Audiolibre Premium (67 €)  │
+│  ✗ Amazon Spy / Audit ASIN    │  ✗ Maisons d'édition (77 €)   │
+│  ✗ Packs Revenus/Wide/Social  │  ✗ Packs Revenus/Wide/Social  │
+│  ✗ Traductions relues (97 €)  │  ✗ Modules à la carte (27 €)  │
+├──────────────────────────────┼──────────────────────────────┤
+│  CTA : « Commencer »          │  CTA : « Passer en pro » (★)   │
+│  bouton vert plein            │  bouton pourpre plein          │
+└──────────────────────────────┴──────────────────────────────┘
+```
+
+Rendu visuel cible (deux cartes côte à côte sur la page `/v3/forfaits`) :
+- Carte Plume : fond `--v3-emerald-50`, accent `#0d7a5f`, bouton « Commencer » vert plein.
+- Carte Édition : fond `--v3-gold-soft`, accent `#5B21B6` (pourpre), badge « ★ Recommandé »,
+  bouton pourpre plein — déjà le `featured` actuel dans `V3ForfaitsPage`.
+- Studio Pro : conserve son bandeau or `#b4831f` « 👑 Tout inclus » (grille existante).
+
+Aucune modification des prix dans ce chantier ; la grille couleur est un rendu de
+présentation pour valider l'arbitrage tarifaire séparément.
+
+
 
 ## Ce qui sera construit
 
