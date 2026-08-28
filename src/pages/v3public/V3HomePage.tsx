@@ -26,6 +26,7 @@ import V3CommercialLicensePanel from '@/components/v3public/V3CommercialLicenseP
 import V3ClosingRecallPanel from '@/components/v3public/V3ClosingRecallPanel';
 import V3AnchorNav from '@/components/v3public/V3AnchorNav';
 import V3WhatIsPanel from '@/components/v3public/V3WhatIsPanel';
+import V3WhatsNewPanel from '@/components/v3public/V3WhatsNewPanel';
 import V3HowItWorksSteps from '@/components/v3public/V3HowItWorksSteps';
 import V3BenefitsPanel from '@/components/v3public/V3BenefitsPanel';
 import V3DifferenceTable from '@/components/v3public/V3DifferenceTable';
