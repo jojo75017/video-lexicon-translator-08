@@ -16,7 +16,7 @@ export default function V3ComptePage() {
   const [email, setEmail] = useState<string | null>(null);
   const [projects, setProjects] = useState<ProjectRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [plan, setPlan] = useState<"plume" | "edition" | "studio" | null>(null);
+  const [plan, setPlan] = useState<"plume" | "edition" | null>(null);
   const [geminiKeys, setGeminiKeys] = useState<string[]>([]);
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export default function V3ComptePage() {
           .eq("user_id", user.id)
           .maybeSingle();
         const tier = (sub?.plan_tier ?? "").toLowerCase();
-        if (tier.includes("studio") || tier.includes("pro_all") || tier.includes("tout")) setPlan("studio");
+        if (tier.includes("studio") || tier.includes("pro_all") || tier.includes("tout")) setPlan("edition");
         else if (tier.includes("edition") || tier.includes("édition") || tier.includes("editeur") || tier.includes("auteur")) setPlan("edition");
         else if (tier) setPlan("plume");
       }

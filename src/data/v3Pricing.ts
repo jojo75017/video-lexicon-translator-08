@@ -1,4 +1,4 @@
-export type V3PlanId = "plume" | "edition" | "studio";
+export type V3PlanId = "plume" | "edition";
 export type V3BillingInterval = "month" | "year";
 
 export interface V3Plan {
@@ -27,10 +27,10 @@ export const legacyPrice = (amount: number): number =>
   Math.round(amount * (1 - V2_LEGACY_DISCOUNT) * 100) / 100;
 
 /**
- * Trois forfaits V3 (activation octobre 2026).
- * Socle identique pour les trois — dont les 10 langues et le Sommaire IA.
- * Édition ajoute la puissance professionnelle ; Studio Pro inclut
- * TOUS les compléments (aucun achat supplémentaire, jamais).
+ * Deux forfaits V3 uniquement (activation octobre 2026).
+ * Socle identique pour les deux — dont les 10 langues et le Sommaire IA.
+ * Édition ajoute la puissance professionnelle ET inclut TOUS les
+ * compléments (aucun achat supplémentaire, jamais).
  */
 export const V3_PLANS: V3Plan[] = [
   {
@@ -64,38 +64,9 @@ export const V3_PLANS: V3Plan[] = [
   {
     id: "edition",
     name: "Édition",
-    tagline: "Je publie en professionnel et je vends — tout Plume, en version pro",
+    tagline: "Tout est inclus : je publie en professionnel, je vends, plus rien à acheter",
     monthlyPrice: 47,
     yearlyPrice: 470,
-    booksPerMonth: null,
-    chaptersMax: 60,
-    wordsPerChapter: 8000,
-    charactersMax: Infinity,
-    agentsCount: 30,
-    proModulesIncluded: true,
-    aiSummary: "Sommaire IA avancé (sous-chapitres, plan long)",
-    allAddonsIncluded: false,
-    features: [
-      "Livres illimités",
-      "Tout ce que contient Plume, en version professionnelle",
-      "Mode Recherche Approfondie (workflow renforcé)",
-      "60 chapitres max · 8 000 mots/ch",
-      "Sommaire IA avancé + ambiances de sommaire",
-      "10 langues incluses",
-      "Cover Studio Pro (300 DPI, gabarits KDP, variantes)",
-      "Audiolivre version pro (voix premium, chapitrage)",
-      "BD Studio Pro",
-      "Amazon Spy / Audit ASIN / mots-clés avancés",
-      "Pack KDP prêt à publier (ZIP) + checklist",
-      "Support prioritaire",
-    ],
-  },
-  {
-    id: "studio",
-    name: "Studio Pro",
-    tagline: "Tout est inclus : plus aucun complément à acheter, jamais",
-    monthlyPrice: 97,
-    yearlyPrice: 970,
     booksPerMonth: null,
     chaptersMax: 60,
     wordsPerChapter: 8000,
@@ -105,16 +76,23 @@ export const V3_PLANS: V3Plan[] = [
     aiSummary: "Sommaire IA avancé + architecture de série multi-tomes",
     allAddonsIncluded: true,
     features: [
-      "Tout Édition, sans limite",
+      "Livres illimités",
+      "Tout ce que contient Plume, en version professionnelle",
+      "Mode Recherche Approfondie (workflow renforcé)",
+      "60 chapitres max · 8 000 mots/ch",
+      "Sommaire IA avancé + ambiances de sommaire",
       "Séries multi-tomes (Bible d'univers + mémoire de série)",
       "10 langues incluses",
+      "Cover Studio Pro (300 DPI, gabarits KDP, variantes)",
+      "BD Studio Pro",
+      "Amazon Spy / Audit ASIN / mots-clés avancés",
+      "Pack KDP prêt à publier (ZIP) + checklist",
       "BookPerfect AI inclus (valeur 97 €)",
       "Pack Traductions relues inclus (valeur 97 €)",
       "Audiolivre Premium inclus (valeur 67 €)",
-      "Version audio de chaque livre incluse (valeur 9,99 €/livre)",
       "Sélection maisons d'édition incluse (valeur 77 €)",
       "Pack Sérénité — Zoom 1-à-1 inclus (valeur 30 €)",
-      "Coaching mensuel + priorité sur les nouveaux modules",
+      "Support prioritaire",
     ],
   },
 ];
@@ -133,7 +111,7 @@ export function getV3PriceId(
   const map: Record<V3PlanId, { monthly: string; annual: string }> = {
     plume: { monthly: "v3_plume_monthly", annual: "v3_plume_annual" },
     edition: { monthly: "v3_edition_monthly", annual: "v3_edition_annual" },
-    studio: { monthly: "v3_studio_monthly", annual: "v3_studio_annual" },
+    
   };
   const base = map[planId][suffix];
   // Prix réservé aux acheteurs V2 (-20 % à vie). Le serveur revérifie le droit.

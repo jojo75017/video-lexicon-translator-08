@@ -242,7 +242,7 @@ export default function V3PourquoiPage() {
           />
         </div>
         <p className="text-xs text-[#6B7280] mt-4">
-          Studio Pro : 97 € / mois (970 € / an) — tous les compléments inclus. Les abonnements
+          Deux forfaits seulement : Plume et Édition (tous les compléments inclus). Les abonnements
           démarrent le 1<sup>er</sup> octobre 2026, avec le premier mois offert.
         </p>
 

@@ -146,7 +146,7 @@ export const FEATURE_ROWS: FeatureRow[] = [
       {
         id: 'forfaits',
         title: 'Forfaits',
-        subtitle: 'Plume 27 €/mois · Édition 47 €/mois · Studio Pro 97 €/mois',
+        subtitle: 'Plume 27 €/mois · Édition 47 €/mois (tout inclus)',
         icon: Crown,
         tint: 'rgba(201,168,76,0.18)',
         kind: 'link',

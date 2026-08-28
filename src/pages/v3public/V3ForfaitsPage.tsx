@@ -14,13 +14,11 @@ import useV3Entitlement from "@/hooks/useV3Entitlement";
 const PLAN_ICONS = {
   plume: Feather,
   edition: Crown,
-  studio: Sparkles,
 } as const;
 
 const PLAN_ACCENTS: Record<string, string> = {
   plume: "#0d7a5f",     // Plume — émeraude
   edition: "#5B21B6",   // Édition — pourpre (mis en avant)
-  studio: "#b4831f",    // Studio Pro — or (tout inclus)
 };
 
 
@@ -57,8 +55,8 @@ export default function V3ForfaitsPage() {
             Choisissez votre atelier d'édition
           </h1>
           <p className="text-lg max-w-2xl mx-auto" style={{ color: "#4b5563" }}>
-            Trois forfaits, les 10 langues et le Sommaire IA dans les trois. Édition ajoute
-            la puissance professionnelle, Studio Pro inclut absolument tous les compléments.
+            Deux forfaits, les 10 langues et le Sommaire IA dans les deux. Édition ajoute
+            la puissance professionnelle et inclut absolument tous les compléments.
             Changez de forfait à tout moment.
           </p>
 
@@ -84,7 +82,7 @@ export default function V3ForfaitsPage() {
           </div>
         </header>
 
-        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           {V3_PLANS.map((plan) => {
             const Icon = PLAN_ICONS[plan.id];
             const accent = PLAN_ACCENTS[plan.id];

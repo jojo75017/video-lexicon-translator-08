@@ -285,7 +285,7 @@ export default function EssaiPage() {
 
               <div className="mt-6 rounded-xl bg-[#FBF8F3] p-4">
                 <p className="text-xs font-semibold uppercase tracking-wider text-[#8A6D1B]">
-                  Les trois forfaits
+                  Les deux forfaits
                 </p>
                 <ul className="mt-2 space-y-1 text-sm text-[#2A2118]">
                   {V3_PLANS.map((p) => (

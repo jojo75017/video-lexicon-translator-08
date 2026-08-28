@@ -9,9 +9,9 @@ import { V3_ADDON_LIST, V3_PLANS, formatPrice } from '@/data/v3Pricing';
 import V3UpsellPromoCard from '@/components/v3public/V3UpsellPromoCard';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
 
-/** /v3/upsells — Compléments & options personnifiés, tous inclus dans Studio Pro. */
+/** /v3/upsells — Compléments & options personnifiés, tous inclus dans le forfait Édition. */
 export default function V3UpsellsPage() {
-  const studio = V3_PLANS[V3_PLANS.length - 1];
+  const edition = V3_PLANS[V3_PLANS.length - 1];
   const { hasFull, hasBase } = useV3Entitlement();
 
   return (
@@ -19,7 +19,7 @@ export default function V3UpsellsPage() {
       <title>Compléments & options V3 — Ebookstudio</title>
       <meta
         name="description"
-        content="Ajoutez la correction BookPerfect, les traductions relues, l'audiolivre ou le pack Sérénité à votre livre. Tout est inclus dans le forfait Studio Pro."
+        content="Ajoutez la correction BookPerfect, les traductions relues, l'audiolivre ou le pack Sérénité à votre livre. Tout est inclus dans le forfait Édition."
       />
 
       <div className="mx-auto max-w-6xl px-4 py-10">
@@ -33,7 +33,7 @@ export default function V3UpsellsPage() {
           <p className="mt-2 max-w-2xl text-[15px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
             Renforcez un livre précis sans changer de forfait : correction professionnelle, traductions
             relues, version audio, accompagnement. Chaque option s'ajoute en un paiement unique — et tout
-            est inclus dans le forfait Studio Pro.
+            est inclus dans le forfait Édition.
           </p>
         </header>
 
@@ -142,7 +142,7 @@ export default function V3UpsellsPage() {
           ))}
         </div>
 
-        {/* Bandeau Studio Pro */}
+        {/* Bandeau forfait Édition — tout inclus */}
         <section
           className="mt-12 rounded-3xl p-6 md:p-8"
           style={{ background: 'var(--v3-cream)', border: '1px solid var(--v3-line)' }}
@@ -150,10 +150,10 @@ export default function V3UpsellsPage() {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <h2 className="v3-serif text-2xl font-bold" style={{ color: 'var(--v3-ink)' }}>
-                Tout inclus : {studio?.name ?? 'Studio Pro'}
+                Tout inclus : {edition?.name ?? 'Édition'}
               </h2>
               <p className="mt-1 text-sm" style={{ color: 'var(--v3-muted)' }}>
-                {studio ? `${formatPrice(studio.monthlyPrice)} / mois` : '97 € / mois'} — l'ensemble des
+                {edition ? `${formatPrice(edition.monthlyPrice)} / mois` : '47 € / mois'} — l'ensemble des
                 compléments ci-dessus, sans achat à l'unité.
               </p>
             </div>

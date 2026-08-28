@@ -4,12 +4,11 @@ import { Check, Lock, Radar, Sparkles, Infinity as InfinityIcon } from "lucide-r
 import { KDP_PILOT_TIERS } from "@/data/kdpPilotTiers";
 import type { V3PlanId } from "@/data/v3Pricing";
 
-const ORDER: V3PlanId[] = ["plume", "edition", "studio"];
+const ORDER: V3PlanId[] = ["plume", "edition"];
 
 const TIER_COLOR: Record<V3PlanId, string> = {
   plume: "border-l-emerald-500",
   edition: "border-l-purple-600",
-  studio: "border-l-amber-500",
 };
 
 const BSR_LABEL: Record<string, string> = {

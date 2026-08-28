@@ -134,7 +134,6 @@ export default function AdminPlansV3Page() {
                   <th className="px-4 py-3 text-left font-semibold">Domaine</th>
                   <th className="px-4 py-3 text-center font-semibold text-emerald-600">Plume — 27 €/mois</th>
                   <th className="px-4 py-3 text-center font-semibold text-purple-600">Édition — 47 €/mois</th>
-                  <th className="px-4 py-3 text-center font-semibold text-amber-600">Studio Pro — 97 €/mois</th>
                 </tr>
               </thead>
               <tbody>
@@ -143,7 +142,6 @@ export default function AdminPlansV3Page() {
                     <td className="px-4 py-3 font-bold text-muted-foreground">{row.letter}</td>
                     <td className="px-4 py-3 font-medium">{row.domain}</td>
                     <td className="px-4 py-3 text-center">{renderCell(row.plume)}</td>
-                    <td className="px-4 py-3 text-center">{renderCell(row.edition)}</td>
                     <td className="px-4 py-3 text-center">{renderCell(row.edition)}</td>
                   </tr>
                 ))}
@@ -183,7 +181,7 @@ export default function AdminPlansV3Page() {
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <p className="font-medium">
-              Objectif : livrer sur Plume, Édition et Studio Pro une couverture professionnelle
+              Objectif : livrer sur Plume et Édition une couverture professionnelle
               prête pour KDP, avec les 3 faces générées à partir des infos du livre.
             </p>
             <ul className="ml-5 list-disc space-y-1 text-muted-foreground">
