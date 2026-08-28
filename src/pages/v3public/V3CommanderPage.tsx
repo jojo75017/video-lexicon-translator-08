@@ -437,8 +437,9 @@ export default function V3CommanderPage() {
                   <CreditCard className="h-3.5 w-3.5" /> Carte bancaire & PayPal — paiement chiffré, sur cette page.
                 </div>
                 <p className="mt-2 text-center text-[11px] text-[var(--ds-text-muted)]">
-                  En plusieurs fois, l'accès s'ouvre dès la 1re échéance.
+                  Paiement unique : votre accès s'ouvre immédiatement après le paiement.
                 </p>
+
                 <p className="mt-2 text-center text-[11px] text-[var(--ds-text-muted)]">
                   Un doute avant de payer ? Écrivez-moi directement :{" "}
                   <a href="mailto:boubetgeorges@gmail.com" className="underline" style={{ color: "var(--ds-gold)" }}>
