@@ -4,7 +4,6 @@ import { ArrowLeft, Check, Clock, Copy, ExternalLink, Flame, Gift, Mail, Snowfla
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 import { toast } from 'sonner';
 import {
@@ -184,8 +183,6 @@ export default function AdminSequenceEmailPage() {
             Contacts froids (3 emails)
           </Button>
         </div>
-
-        <Separator />
 
         <div className="space-y-4">
           {emails.map((email, i) => (
