@@ -625,8 +625,9 @@ const App = () => {
             <Route path="/apercu-emails" element={<AdminGate><EmailPreviewPage /></AdminGate>} />
 
             {/* V3 public site */}
-            <Route path="/v3/offre" element={<V3OffrePage />} />
-            <Route path="/v3/temoignage" element={<V3TemoignagePage />} />
+            <Route path="/v3/offre" element={v3Standalone(<V3OffrePage />)} />
+            <Route path="/v3/temoignage" element={v3Standalone(<V3TemoignagePage />)} />
+
 
             <Route path="/v3" element={<V3PublicLayout isAdmin={isAdmin} isAdminChecking={!isAdminChecked} isSubscriber={isAuthenticated} />}>
               <Route index element={<V3HomePage />} />
