@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Check, Rocket, Save, Wand2, BookOpen, BarChart3, Languages, Headphones, Star } from 'lucide-react';
 import { toast } from 'sonner';
+import V3UpsellPromoCard from '@/components/v3public/V3UpsellPromoCard';
 import { BOOK_BRIEF_EVENT, readBookBrief, writeBookBrief, type BookBrief } from '@/lib/v3/bookBrief';
 import { readWrittenProgress, WRITTEN_CHAPTERS_EVENT } from '@/lib/v3/writtenChapters';
 import { saveOutlineVersion } from '@/lib/v3/genieThread';
@@ -136,8 +137,21 @@ export default function V3BookActionsBar({ onLaunch }: { onLaunch: () => void })
           <Star className="h-3.5 w-3.5" /> Obtenir des avis clients
         </Link>
 
-
       </div>
+
+      {/* Encart upsell contextuel : livre terminé → Pack Boost de Lancement (17 €) */}
+      {written && (
+        <div className="mt-4">
+          <V3UpsellPromoCard
+            figureId="boost_lancement"
+            title="Pack Boost de Lancement — 17 €"
+            price={17}
+            description="10 visuels Pinterest + 5 posts Instagram IA + checklist ISBN/KDP premium + template métadonnées."
+            to="/v3/upsell-17"
+            badge="Offre découverte"
+          />
+        </div>
+      )}
     </div>
   );
 }
