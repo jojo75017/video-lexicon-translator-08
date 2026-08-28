@@ -48,6 +48,7 @@ export default function V3SubscribeCheckout({
         environment: getStripeEnvironment(),
         returnUrl: target,
         firstMonthFree: firstMonthFree === true,
+        refCode: sessionStorage.getItem('referral_code') || undefined,
       },
     });
     if (error || !data?.clientSecret) {

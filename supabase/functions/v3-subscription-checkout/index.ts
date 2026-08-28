@@ -105,7 +105,7 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { priceId, email, userId, environment, returnUrl, firstMonthFree } = body ?? {};
+    const { priceId, email, userId, environment, returnUrl, firstMonthFree, refCode } = body ?? {};
 
     if (!priceId || !ALLOWED_PRICES.has(priceId)) {
       throw new Error("Prix invalide");
@@ -121,6 +121,10 @@ Deno.serve(async (req) => {
     if (!returnUrl || typeof returnUrl !== "string") {
       throw new Error("returnUrl requis");
     }
+
+    // Code de parrainage optionnel (stocké côté Stripe pour calcul de commission).
+    const cleanRefCode =
+      typeof refCode === "string" && /^[A-Za-z0-9_-]{1,40}$/.test(refCode) ? refCode : null;
 
     // Resolve human-readable priceId → real Stripe price via lookup_key
     const prices = await stripeRequest<any>(env, "GET", "/prices/search", {
@@ -141,8 +145,15 @@ Deno.serve(async (req) => {
       firstMonthFree === true && isRecurring && TRIAL_END_UNIX > Math.floor(Date.now() / 1000);
 
     const subscriptionData: Record<string, unknown> = {};
-    if (userId) subscriptionData.metadata = { userId, plan: priceId };
+    const subMeta: Record<string, string> = {};
+    if (userId) { subMeta.userId = userId; subMeta.plan = priceId; }
+    if (cleanRefCode) subMeta.ref_code = cleanRefCode;
+    if (Object.keys(subMeta).length > 0) subscriptionData.metadata = subMeta;
     if (wantsTrial) subscriptionData.trial_end = TRIAL_END_UNIX;
+
+    const sessionMeta: Record<string, string> = {};
+    if (userId) { sessionMeta.userId = userId; sessionMeta.plan = priceId; }
+    if (cleanRefCode) sessionMeta.ref_code = cleanRefCode;
 
     const session = await stripeRequest<any>(env, "POST", "/checkout/sessions", {
       mode: isRecurring ? "subscription" : "payment",
@@ -150,7 +161,7 @@ Deno.serve(async (req) => {
       return_url: returnUrl,
       line_items: [{ price: stripePriceId, quantity: 1 }],
       ...(customerId && { customer: customerId }),
-      ...(userId && { metadata: { userId, plan: priceId } }),
+      ...(Object.keys(sessionMeta).length > 0 && { metadata: sessionMeta }),
       ...(isRecurring && Object.keys(subscriptionData).length > 0 && {
         subscription_data: subscriptionData,
       }),

@@ -6,10 +6,15 @@ import { Button } from '@/components/ui/button';
 
 /**
  * Kit de parrainage prêt à copier pour les abonnés.
- * Commission de 30 % sur l'offre à vie de 47 € (soit 14,10 € par vente).
+ * Commission : 15 % sur l'accès à vie (47 € → 7,05 € par vente),
+ * 20 % sur les abonnements V3 (Plume 27 €/mois → 5,40 € ; Édition 47 €/mois → 9,40 €).
  */
-const COMMISSION_RATE = 0.3;
-const OFFER_PRICE = 47;
+const LIFETIME_PRICE = 47;
+const LIFETIME_RATE = 0.15;
+const PLUME_PRICE = 27;
+const PLUME_RATE = 0.20;
+const EDITION_PRICE = 47;
+const EDITION_RATE = 0.20;
 
 const ReferralKitCard = () => {
   const { code, stats, loading } = useReferral();
@@ -20,7 +25,9 @@ const ReferralKitCard = () => {
     return `https://ebookstudio.fr/commander?ref=${code}&utm_source=parrainage`;
   }, [code]);
 
-  const commission = (OFFER_PRICE * COMMISSION_RATE).toFixed(2).replace('.', ',');
+  const lifetimeCommission = (LIFETIME_PRICE * LIFETIME_RATE).toFixed(2).replace('.', ',');
+  const plumeCommission = (PLUME_PRICE * PLUME_RATE).toFixed(2).replace('.', ',');
+  const editionCommission = (EDITION_PRICE * EDITION_RATE).toFixed(2).replace('.', ',');
 
   const posts = useMemo(
     () => [
@@ -60,8 +67,11 @@ const ReferralKitCard = () => {
         <div>
           <h2 className="text-lg font-bold">Votre kit de parrainage</h2>
           <p className="text-sm text-muted-foreground">
-            30 % de commission sur chaque vente, soit <strong>{commission} €</strong> pour l'offre à
-            vie à {OFFER_PRICE} €. Votre lien suit automatiquement les personnes que vous envoyez.
+            <strong>15 %</strong> sur l'accès à vie ({LIFETIME_PRICE} €), soit{' '}
+            <strong>{lifetimeCommission} €</strong> par vente. Sur les abonnements V3,{' '}
+            <strong>20 %</strong> : {plumeCommission} €/mois (Plume {PLUME_PRICE} €) ou{' '}
+            {editionCommission} €/mois (Édition {EDITION_PRICE} €). Votre lien suit automatiquement
+            les personnes que vous envoyez.
           </p>
         </div>
       </div>
