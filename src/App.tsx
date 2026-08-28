@@ -695,8 +695,28 @@ const App = () => {
 
               <Route path="hub" element={<V3LockedGate><V3Gate><V3HubPage /></V3Gate></V3LockedGate>} />
 
+              {/* Alias historiques : plus aucun lien V3 ne doit tomber en 404 */}
+              <Route path="avis-clients" element={<Navigate to="/v3/avis" replace />} />
+              <Route path="toc-ultime" element={<Navigate to="/v3/outils/sommaire-ultime" replace />} />
+              <Route path="outils/correcteur" element={<Navigate to="/v3/corriger" replace />} />
+              <Route path="outils/detection-ia" element={<Navigate to="/v3/outils/humanizer" replace />} />
+              <Route path="outils/anti-plagiat" element={<Navigate to="/v3/corriger" replace />} />
+              <Route path="outils/coherence-personnages" element={<Navigate to="/v3/studio" replace />} />
+              <Route path="outils/book-trailer" element={<Navigate to="/v3/contentstudio" replace />} />
+              <Route path="outils/reels" element={<Navigate to="/v3/contentstudio" replace />} />
+              <Route path="outils/epub" element={<Navigate to="/v3/outils/editeur" replace />} />
+              <Route path="outils/print-ready" element={<Navigate to="/v3/donnees-kdp" replace />} />
+              <Route path="outils/suivi-ventes" element={<Navigate to="/v3/outils/royalties" replace />} />
+              <Route path="outils/landing-auteur" element={<Navigate to="/v3/auteur" replace />} />
+              <Route path="outils/logo-auteur" element={<Navigate to="/v3/upsells" replace />} />
+              <Route path="outils/sequences-emails" element={<Navigate to="/v3/acquisition" replace />} />
+              <Route path="outils/arc" element={<Navigate to="/v3/avis" replace />} />
 
+              {/* Toute autre URL /v3/* inconnue revient sur l'accueil V3 (jamais de 404),
+                  et le layout renvoie l'abonné V2 sur /ebook-planner. */}
+              <Route path="*" element={<Navigate to="/v3" replace />} />
             </Route>
+
 
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
