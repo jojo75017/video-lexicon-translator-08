@@ -386,37 +386,19 @@ export default function V3CommanderPage() {
                   C'est avec cet email que votre accès sera créé.
                 </p>
 
-                <div className="mt-5 space-y-2">
-                  {PLANS.map((opt) => {
-                    const active = plan === opt.id;
-                    return (
-                      <button
-                        key={opt.id}
-                        type="button"
-                        onClick={() => setPlan(opt.id)}
-                        className="flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition-all"
-                        style={{
-                          borderColor: active ? "var(--ds-gold)" : "var(--ds-border)",
-                          background: active ? "rgba(212,175,55,0.10)" : "transparent",
-                        }}
-                      >
-                        <span>
-                          <span className="block text-sm font-bold text-[var(--ds-text)]">{opt.label}</span>
-                          <span className="block text-[11px] text-[var(--ds-text-muted)]">{opt.sub}</span>
-                        </span>
-                        {opt.badge && !active && (
-                          <span
-                            className="rounded-full px-2 py-0.5 text-[10px] font-bold"
-                            style={{ background: "var(--ds-orange-soft)", color: "var(--ds-orange)" }}
-                          >
-                            {opt.badge}
-                          </span>
-                        )}
-                        {active && <Check className="h-4 w-4" style={{ color: "var(--ds-gold)" }} />}
-                      </button>
-                    );
-                  })}
+                <div
+                  className="mt-5 flex items-center justify-between rounded-xl border px-4 py-3"
+                  style={{ borderColor: "var(--ds-gold)", background: "rgba(212,175,55,0.10)" }}
+                >
+                  <span>
+                    <span className="block text-sm font-bold text-[var(--ds-text)]">47 € en une fois</span>
+                    <span className="block text-[11px] text-[var(--ds-text-muted)]">
+                      Paiement unique · accès immédiat et à vie
+                    </span>
+                  </span>
+                  <Check className="h-4 w-4" style={{ color: "var(--ds-gold)" }} />
                 </div>
+
 
                 {/* Réassurance juste au-dessus du bouton : c'est là qu'on hésite */}
                 <ul
