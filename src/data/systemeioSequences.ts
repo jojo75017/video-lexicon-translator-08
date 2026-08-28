@@ -48,7 +48,7 @@ export const LAUNCH_BONUSES: SequenceBonus[] = [
     value: '27 €',
     description:
       'Vous donnez votre idée, l\'IA vous rend un sommaire complet, chapitre par chapitre, prêt à écrire. C\'est le meneur de tout le système.',
-    to: '/v3/sommaire-ia',
+    to: '/v3/outils/sommaire-ultime',
   },
   {
     key: 'couverture',
@@ -56,7 +56,7 @@ export const LAUNCH_BONUSES: SequenceBonus[] = [
     value: '37 €',
     description:
       'Une couverture générée puis recadrée aux formats exigés par Amazon (Kindle 1600 × 2560, broché prêt à téléverser). Aucun rejet de fichier.',
-    to: '/v3/couverture-kdp',
+    to: '/couverture-kdp',
   },
   {
     key: 'titres',
@@ -64,7 +64,7 @@ export const LAUNCH_BONUSES: SequenceBonus[] = [
     value: '17 €',
     description:
       'Trente modèles de titres testés, à adapter à votre sujet en deux minutes. Le titre fait la moitié des ventes sur Amazon.',
-    to: '/v3/outils/mots-cles',
+    to: '/v3/outils/ams-keywords',
   },
   {
     key: 'anti-plagiat',
