@@ -26,6 +26,64 @@ Rendre les upsells visibles partout dans le parcours abonné avec des **encarts 
 | Histoires Courtes & Contes | 27 €/à vie | contes illustrés KDP |
 | **Pack Pro Vendeur** | **547 €** (au lieu de ~935 €) | tout inclus, 1×/3×/4× |
 
+## Attention : ce qui est DÉJÀ inclus d'office (pas d'encart de vente)
+
+Un encart upsell ne doit jamais s'afficher pour un droit déjà acquis. Répartition réelle
+(source : `src/data/v3Pricing.ts` → `V3_PLANS` + `V3_ADDON_LIST.inEdition`, et
+`src/data/v2LegacyAccess.ts`).
+
+### Forfait 1 — Plume (27 €/mois · 270 €/an)
+| Élément | Statut |
+|---|---|
+| Sommaire IA guidé, 10 langues, tous les onglets | Inclus |
+| 30 livres/mois · 40 chapitres · 5 000 mots/ch | Inclus |
+| Export PDF/DOCX/EPUB + sommaire stylé | Inclus |
+| Couverture complète (recto + tranche + 4e) | Inclus |
+| Audiolivre standard, import manuscrit, correction pro | Inclus |
+| BookPerfect AI 97 € | **Upsell** |
+| Traductions relues 97 €, Audiolivre Premium 67 €, Audio/livre 9,99 € | **Upsell** |
+| Cover Studio Pro, BD Studio Pro, Amazon Spy / Audit ASIN | **Upsell** (ou passage Édition) |
+| Packs roadmap (Revenus 99 €, Wide 97 €, Social 87 €, Éditorial 67 €, Marché 97 €) | **Upsell** |
+| Modules à la carte 27 € (Jeux, Cherche & Trouve, Histoires courtes) | **Upsell** |
+| Boost Lancement 17 €, Transcription 67 €, Documentation Studio 197 €, Promotion 97 € | **Upsell** |
+
+### Forfait 2 — Édition (47 €/mois · 470 €/an)
+| Élément | Statut |
+|---|---|
+| Tout Plume en version pro · livres illimités · 60 ch · 8 000 mots | Inclus |
+| Sommaire IA avancé + ambiances | Inclus |
+| Cover Studio Pro 300 DPI, BD Studio Pro | Inclus |
+| Audiolivre pro, Mode Recherche Approfondie | Inclus |
+| Amazon Spy / Audit ASIN / mots-clés avancés, Pack KDP ZIP | Inclus |
+| **BookPerfect AI 97 €** (`inEdition: true`) | Inclus |
+| Traductions relues 97 €, Audiolivre Premium 67 €, Audio/livre 9,99 € | **Upsell** |
+| Sélection maisons d'édition 77 €, Pack Sérénité 30 € | **Upsell** |
+| Packs roadmap (Revenus, Wide, Social, Éditorial, Marché) | **Upsell** |
+| Modules à la carte 27 €, Boost 17 €, Transcription 67 €, Documentation 197 €, Promotion 97 € | **Upsell** |
+
+### Studio Pro (97 €/mois) — `allAddonsIncluded: true`
+Aucun encart upsell affiché : tout est inclus. On affiche seulement « Inclus · Ouvrir ».
+
+### Abonnés V2 (accès à vie conservé)
+| Élément | Statut |
+|---|---|
+| Génie + Sommaire IA (`/v3/create`) | Offert à vie |
+| Correcteur de livre (`/v3/corriger`) | Offert à vie |
+| Export premium (sommaire stylé) | Offert à vie |
+| Quotas : 2 livres/mois · 20 chapitres · 3 000 mots/ch | Limite |
+| Audiolivre, Cover Studio Pro, Traductions 10 langues, BD Studio Pro, Recherche approfondie, Amazon Spy / Audit ASIN / 600 niches | **Upsell** ou forfait |
+| Plume / Édition | **−20 % à vie** affiché dans chaque encart (18,40 € / 21,60 € équivalent selon prix appliqué) |
+
+Règle d'affichage unique : un encart n'apparaît que si `!isIncluded(pack, plan)`, et pour un
+abonné V2 il affiche systématiquement le prix remisé −20 % + le lien `/v3/migration`.
+
+### Points à confirmer avant implémentation
+- Le code applique Plume 27 € / Édition 47 € ; la note de tarifs V3 « en attente »
+  mentionne 17 € / 27 €, et un autre plan en attente parle d'un tarif unique 297 €.
+  Les encarts afficheront les prix présents dans `v3Pricing.ts` tant que vous ne validez
+  pas un nouveau barème — aucun prix ne sera modifié par ce chantier.
+
+
 ## Ce qui sera construit
 
 ### 1. Figure + prénom par upsell
