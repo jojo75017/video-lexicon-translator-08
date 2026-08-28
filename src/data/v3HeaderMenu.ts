@@ -93,7 +93,7 @@ export const V3_HEADER_MENU: MenuCategory[] = [
     color: '#c9a84c',
     tagline: 'La visibilité & les ventes',
     links: [
-      { label: 'UPSELLS — packs & compléments', to: '/v3/upsells', badge: '17+ packs', desc: '✨ Tous les packs et compléments pour booster votre livre, réunis au même endroit' },
+      { label: 'UPSELLS — packs & compléments', to: '/v3/upsells', badge: '18 tarifs', desc: '✨ Tous les packs et compléments avec leur prix d’achat à l’unité' },
       { label: 'Mots-clés Amazon Ads', to: '/v3/outils/ams-keywords', badge: 'Offert', desc: '🚀 Générez des centaines de mots-clés AMS ultra-ciblés' },
       { label: 'Espionner les concurrents', to: '/v3/outils/espion-concurrents', badge: 'Offert', desc: '🕵️ Stratégies, prix, catégories et tactiques des best-sellers' },
       { label: 'Galerie communauté', to: '/v3/gallery', desc: 'Livres publiés par les auteurs Ebookstudio' },
