@@ -25,7 +25,9 @@ const ReferralKitCard = () => {
     return `https://ebookstudio.fr/commander?ref=${code}&utm_source=parrainage`;
   }, [code]);
 
-  const commission = (OFFER_PRICE * COMMISSION_RATE).toFixed(2).replace('.', ',');
+  const lifetimeCommission = (LIFETIME_PRICE * LIFETIME_RATE).toFixed(2).replace('.', ',');
+  const plumeCommission = (PLUME_PRICE * PLUME_RATE).toFixed(2).replace('.', ',');
+  const editionCommission = (EDITION_PRICE * EDITION_RATE).toFixed(2).replace('.', ',');
 
   const posts = useMemo(
     () => [
