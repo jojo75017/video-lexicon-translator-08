@@ -1,7 +1,9 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Film, BookOpen, Trash2, Loader2, Sparkles } from 'lucide-react';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import CsImportPanel from '@/components/v3/contentstudio/CsImportPanel';
 import type { CsProject, CsTone } from '@/types/contentStudio';
 import { CS_TONE_LABELS } from '@/types/contentStudio';
 
