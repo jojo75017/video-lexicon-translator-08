@@ -166,6 +166,3 @@ export default function V3UpsellsPage() {
     </>
   );
 }
-
-// V3_UPSELL_PACKS est conservé pour référence future ; eslint ignore l'import non utilisé.
-void V3_UPSELL_PACKS;
