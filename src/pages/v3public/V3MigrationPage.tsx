@@ -161,7 +161,7 @@ export default function V3MigrationPage() {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {V3_PLANS.map((plan) => {
               const Icon = PLAN_ICONS[plan.id];
               const accent = PLAN_ACCENTS[plan.id];

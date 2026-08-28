@@ -11,7 +11,7 @@ const cors = {
 };
 
 const ALLOWED_PRICES = new Set([
-  // V3 subscriptions — 3 forfaits (activation octobre 2026)
+  // V3 subscriptions — 2 forfaits (activation octobre 2026)
   "v3_plume_monthly",
   "v3_plume_annual",
   "v3_edition_monthly",

@@ -83,7 +83,7 @@ const CURATED: QuestionEntry[] = [
     id: 'q-forfaits',
     question: 'Quelle différence entre Plume et Édition ?',
     answer:
-      'Plume (27 €/mois) donne tous les onglets d’écriture, le Sommaire IA guidé, les 10 langues, l’audiolivre et l’export. Édition (47 €/mois) ajoute la Recherche Approfondie, le Sommaire IA avancé, Cover Studio Pro et BD Studio Pro. Studio Pro (97 €/mois) inclut absolument tous les compléments (BookPerfect, traductions relues, audio premium, coaching 1-à-1). En annuel, deux mois sont offerts.',
+      'Plume (27 €/mois) donne tous les onglets d’écriture, le Sommaire IA guidé, les 10 langues, l’audiolivre et l’export. Édition (47 €/mois) ajoute la Recherche Approfondie, le Sommaire IA avancé, Cover Studio Pro, BD Studio Pro et inclut absolument tous les compléments (BookPerfect, traductions relues, audio premium, coaching 1-à-1). Il n’existe que ces deux forfaits. En annuel, deux mois sont offerts.',
     theme: 'Forfaits & paiement',
     action: { label: 'Comparer les forfaits', route: '/v3/forfaits' },
   },

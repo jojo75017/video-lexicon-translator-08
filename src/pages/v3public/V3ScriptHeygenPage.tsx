@@ -96,7 +96,7 @@ Le module Traduction transforme votre manuscrit en 10 langues — anglais, espag
 La communauté EbookStudio, accessible depuis /communaute, réunit déjà plus de 220 discussions et près de 300 réponses sur tout ce qui touche à l'écriture, à la publication KDP, au marketing et aux outils de la V3. Posez vos questions, partagez vos réussites, apprenez des autres auteurs.`,
   },
   {
-    title: '13. Les 3 forfaits — mensuel & annuel (8:50 → 9:35)',
+    title: '13. Les 2 forfaits — mensuel & annuel (8:50 → 9:35)',
     duration: '~45 s',
     body: `Parlons tarifs — c'est clair, c'est transparent.
 
@@ -109,7 +109,7 @@ EXPERT — 12,99 € par mois. Notre forfait le plus recommandé.
 AUTEUR — 59 € par mois.
 Livres illimités, 30 agents IA, traductions 10 langues, KDP Pilot, BD Studio Pro, univers multi-volumes, priorité de génération.
 
-Paiement par carte, ou par PayPal — y compris en 3 fois sans frais sur les 3 forfaits.`,
+Paiement par carte, ou par PayPal — y compris en 3 fois sans frais sur les 2 forfaits.`,
   },
   {
     title: '14. Sécurité, sauvegarde & vos données (9:35 → 9:50)',
@@ -160,7 +160,7 @@ export default function V3ScriptHeygenPage() {
               <h1 className="text-3xl font-bold text-[#232F3E]">Script vidéo HeyGen — V3 (10 min)</h1>
             </div>
             <p className="text-muted-foreground mt-1">
-              Présentation complète de la V3 mise à jour : clé Gemini gratuite obligatoire, KDP Pilot, 30 agents, livres jeunesse, BD Studio Pro, univers multi-volumes, communauté 220+, PayPal 3×, 3 forfaits mensuels & annuels.
+              Présentation complète de la V3 mise à jour : clé Gemini gratuite obligatoire, KDP Pilot, 30 agents, livres jeunesse, BD Studio Pro, univers multi-volumes, communauté 220+, PayPal 3×, 2 forfaits mensuels & annuels.
             </p>
           </div>
           <div className="flex gap-2">
