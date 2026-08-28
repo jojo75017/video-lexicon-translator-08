@@ -68,7 +68,10 @@ export default function V3HomePage() {
       {/* BANDEAU D'ACCROCHE — premier module */}
       <V3HeroBanner />
 
-      {/* MOTEUR MULTI-MODÈLES — deuxième module, juste sous l'accroche */}
+      {/* CE QUI A CHANGÉ — Sommaire IA + 25 agents en vedette */}
+      <V3WhatsNewPanel />
+
+      {/* MOTEUR MULTI-MODÈLES — juste sous les nouveautés */}
       <V3EngineStrip />
       <V3EngineGrid />
 
