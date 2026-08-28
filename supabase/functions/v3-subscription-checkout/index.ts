@@ -105,7 +105,7 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { priceId, email, userId, environment, returnUrl, firstMonthFree } = body ?? {};
+    const { priceId, email, userId, environment, returnUrl, firstMonthFree, refCode } = body ?? {};
 
     if (!priceId || !ALLOWED_PRICES.has(priceId)) {
       throw new Error("Prix invalide");
@@ -121,6 +121,10 @@ Deno.serve(async (req) => {
     if (!returnUrl || typeof returnUrl !== "string") {
       throw new Error("returnUrl requis");
     }
+
+    // Code de parrainage optionnel (stocké côté Stripe pour calcul de commission).
+    const cleanRefCode =
+      typeof refCode === "string" && /^[A-Za-z0-9_-]{1,40}$/.test(refCode) ? refCode : null;
 
     // Resolve human-readable priceId → real Stripe price via lookup_key
     const prices = await stripeRequest<any>(env, "GET", "/prices/search", {
