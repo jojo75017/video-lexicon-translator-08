@@ -6,10 +6,15 @@ import { Button } from '@/components/ui/button';
 
 /**
  * Kit de parrainage prêt à copier pour les abonnés.
- * Commission de 30 % sur l'offre à vie de 47 € (soit 14,10 € par vente).
+ * Commission : 15 % sur l'accès à vie (47 € → 7,05 € par vente),
+ * 20 % sur les abonnements V3 (Plume 27 €/mois → 5,40 € ; Édition 47 €/mois → 9,40 €).
  */
-const COMMISSION_RATE = 0.3;
-const OFFER_PRICE = 47;
+const LIFETIME_PRICE = 47;
+const LIFETIME_RATE = 0.15;
+const PLUME_PRICE = 27;
+const PLUME_RATE = 0.20;
+const EDITION_PRICE = 47;
+const EDITION_RATE = 0.20;
 
 const ReferralKitCard = () => {
   const { code, stats, loading } = useReferral();
