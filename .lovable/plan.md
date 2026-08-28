@@ -15,22 +15,41 @@ Les désabonnés et les adresses en rebond sont exclus d'office, sans exception.
 
 Le tagage se lance depuis le panneau admin (onglet Envoi de la page prospects), avec un aperçu des compteurs avant validation. Aucun email n'est envoyé par l'application : Systeme.io s'occupe de l'envoi.
 
+## Un bonus par email — c'est ça qui fait cliquer
+
+Personne ne clique pour « en savoir plus ». On clique pour recevoir quelque chose. Chaque email offre donc un bonus concret, gratuit, livré immédiatement dans l'application, sans carte bancaire et sans inscription payante.
+
+Les 5 bonus, du plus attractif au plus engageant :
+
+| Bonus | Ce que la personne reçoit | Page de retrait |
+|---|---|---|
+| Les 10 niches rentables | 10 niches Amazon analysées, avec la demande et la concurrence | `/cadeau` (existe déjà) |
+| Le sommaire de votre livre, offert | Elle donne son idée, l'IA lui rend un sommaire complet à télécharger | nouvelle page `/bonus/sommaire` |
+| Votre couverture, offerte | Une couverture générée aux dimensions exactes Amazon, en PNG | nouvelle page `/bonus/couverture` |
+| Les 30 titres qui vendent | 30 modèles de titres et sous-titres prêts à adapter | nouvelle page `/bonus/titres` |
+| Le premier chapitre écrit | Un vrai chapitre rédigé sur son sujet, prêt à relire | `/essai` (existe déjà) |
+
+Chaque bonus est une page unique, claire, avec un seul bouton. Le bonus est délivré d'abord ; l'offre payante n'apparaît qu'après, en bas de page, jamais avant le cadeau.
+
+Un compteur de retraits par bonus dans le panneau admin : vous verrez lequel attire, et lequel ne sert à rien.
+
 ## Les emails que je vous livre
 
-Deux séquences séparées, rédigées et prêtes à coller dans Systeme.io, avec objet, corps et lien unique par message.
+Deux séquences séparées, rédigées et prêtes à coller dans Systeme.io. Un email = un bonus = un lien.
 
 **Séquence chauds — 4 emails sur 8 jours**
-1. J+0 — le cadeau des 10 niches, un seul lien, aucune vente
-2. J+2 — la preuve : pages réelles d'un livre produit, du sommaire au fichier Amazon
-3. J+5 — l'objection principale (« je n'écris pas bien ») traitée en une page
-4. J+8 — décision : ce qui change, échéance claire, lien de commande
+1. J+0 — bonus : les 10 niches rentables
+2. J+2 — bonus : le sommaire de votre livre, offert (+ preuve en images d'un livre terminé)
+3. J+5 — bonus : votre couverture offerte (répond à « c'est trop technique »)
+4. J+8 — bonus : le premier chapitre écrit, puis décision et échéance claire
 
 **Séquence froids — 3 emails sur 10 jours**
-1. J+0 — réactivation : une seule question, réponse en un clic
-2. J+4 — le cadeau, sans conditions
-3. J+10 — dernier message, sortie propre proposée
+1. J+0 — bonus : les 30 titres qui vendent (le plus facile à réclamer)
+2. J+4 — bonus : les 10 niches rentables
+3. J+10 — bonus : le sommaire offert, puis sortie propre proposée
 
 Règles appliquées à tous : objet de 45 caractères maximum, aucun prix dans l'objet, aucune majuscule criée, aucun emoji, un seul lien principal répété deux fois au plus, signature avec votre adresse directe.
+
 
 ## Mesure des résultats
 
