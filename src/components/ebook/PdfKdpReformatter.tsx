@@ -54,17 +54,12 @@ const PdfKdpReformatter: React.FC = () => {
     setImages([]);
 
     try {
-      // Dynamically import pdf.js
-      const pdfjsLib = await import('pdfjs-dist');
-      
-      // Use legacy build that doesn't require a worker
-      const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
-      
-      // Disable worker - use main thread (more compatible)
-      pdfjs.GlobalWorkerOptions.workerSrc = '';
+      // Chargeur pdfjs partagé (worker correctement configuré)
+      const { openPdf } = await import('@/lib/import/pdfjsLoader');
 
       const arrayBuffer = await file.arrayBuffer();
-      const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
+      const pdf = await openPdf(arrayBuffer);
+
       
       const extractedImages: PageImage[] = [];
       const totalPages = pdf.numPages;
