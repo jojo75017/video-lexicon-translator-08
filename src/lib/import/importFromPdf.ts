@@ -1,13 +1,11 @@
 /** Extraction texte d'un PDF côté client via pdfjs-dist. */
 import { buildManuscriptFromText } from './buildManuscriptFromText';
+import { openPdf } from './pdfjsLoader';
 import type { Manuscript } from '@/lib/bookperfect/types';
 
 export async function extractTextFromPdf(file: File): Promise<string> {
-  const pdfjs: any = await import('pdfjs-dist/legacy/build/pdf.mjs');
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (pdfjs as any).GlobalWorkerOptions.workerSrc = '';
   const arrayBuffer = await file.arrayBuffer();
-  const pdf = await pdfjs.getDocument({ data: arrayBuffer, useWorker: false, isEvalSupported: false }).promise;
+  const pdf = await openPdf(arrayBuffer);
   let out = '';
   for (let p = 1; p <= pdf.numPages; p += 1) {
     const page = await pdf.getPage(p);

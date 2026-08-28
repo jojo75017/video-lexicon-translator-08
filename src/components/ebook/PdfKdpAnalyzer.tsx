@@ -191,15 +191,12 @@ const PdfKdpAnalyzer: React.FC = () => {
     setSelectedPage(0);
 
     try {
-      // Dynamically import pdf.js
-      const pdfjsLib = await import('pdfjs-dist');
-      const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
-      
-      // Disable worker - use main thread
-      pdfjs.GlobalWorkerOptions.workerSrc = '';
+      // Chargeur pdfjs partagé (worker correctement configuré)
+      const { openPdf } = await import('@/lib/import/pdfjsLoader');
 
       const arrayBuffer = await file.arrayBuffer();
-      const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
+      const pdf = await openPdf(arrayBuffer);
+
       const extracted: PageInfo[] = [];
 
       for (let i = 1; i <= pdf.numPages; i++) {
