@@ -30,6 +30,7 @@ export default function ContentStudioPage() {
       .order('created_at', { ascending: false });
     if (error) {
       console.error('load projects', error);
+      toast.error(`Chargement impossible : ${error.message}`);
       return;
     }
     setProjects((data as CsProject[]) || []);
@@ -45,6 +46,7 @@ export default function ContentStudioPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       setCreating(false);
+      toast.error('Vous devez être connecté pour créer un projet.');
       return;
     }
     const { data, error } = await supabase
@@ -62,6 +64,7 @@ export default function ContentStudioPage() {
     if (error) {
       console.error('create project', error);
       setCreating(false);
+      toast.error(`Création impossible : ${error.message}`);
       return;
     }
 
@@ -70,7 +73,7 @@ export default function ContentStudioPage() {
       const { data: outline, error: oErr } = await supabase.functions.invoke('cs-generate-outline', {
         body: { title: title.trim(), subtitle, target_audience: targetAudience, tone, language_code: languageCode, chapters_count: chaptersCount },
       });
-      if (oErr || !outline?.chapters) throw new Error(oErr?.message || 'Plan vide');
+      if (oErr || !outline?.chapters?.length) throw new Error(oErr?.message || outline?.error || 'Plan vide');
       const rows = outline.chapters.map((c: any) => ({
         project_id: data.id,
         chapter_number: c.chapter_number,
@@ -78,9 +81,12 @@ export default function ContentStudioPage() {
         key_takeaways: c.key_takeaways || [],
         status: 'draft',
       }));
-      await supabase.from('cs_chapters').insert(rows);
+      const { error: insErr } = await supabase.from('cs_chapters').insert(rows);
+      if (insErr) throw new Error(insErr.message);
+      toast.success(`Plan généré : ${rows.length} chapitres.`);
     } catch (e) {
       console.error('outline', e);
+      toast.error(`Plan IA indisponible : ${e instanceof Error ? e.message : 'erreur inconnue'}. Vous pouvez le relancer depuis le projet.`);
     }
 
     setCreating(false);
