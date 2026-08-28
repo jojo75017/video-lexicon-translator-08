@@ -204,6 +204,8 @@ const AdminCleanupPage = lazy(() => import('./pages/admin/AdminCleanupPage'));
 const AdminPlansV3Page = lazy(() => import('./pages/admin/AdminPlansV3Page'));
 const AdminTestPayPalPage = lazy(() => import('./pages/admin/AdminTestPayPalPage'));
 const AdminAttentePage = lazy(() => import('./pages/admin/AdminAttentePage'));
+const AdminSequenceEmailPage = lazy(() => import('./pages/admin/AdminSequenceEmailPage'));
+const BonusPage = lazy(() => import('./pages/BonusPage'));
 const AdminPublishingKitPage = lazy(() => import('./pages/admin/AdminPublishingKitPage'));
 const DemoGeniePage = lazy(() => import('./pages/DemoGeniePage'));
 const CrmPage = lazy(() => import('./pages/CrmPage'));
@@ -540,6 +542,7 @@ const App = () => {
             <Route path="/mon-code" element={<RecuperationCodePage />} />
             <Route path="/activer-beta" element={<ActivationBetaPage />} />
             <Route path="/cadeau" element={<CadeauPage />} />
+            <Route path="/bonus" element={<BonusPage />} />
             <Route path="/r" element={<RedirectClickPage />} />
             <Route path="/carte-cadeau" element={<GiftRedeemPage />} />
             <Route path="/carte-cadeau-merci" element={<GiftThankYouPage />} />
@@ -601,6 +604,7 @@ const App = () => {
             <Route path="/admin/plans-v3" element={<AdminGate><AdminPlansV3Page /></AdminGate>} />
             <Route path="/admin/attente" element={<AdminGate><AdminAttentePage /></AdminGate>} />
             <Route path="/admin/lancement" element={<AdminGate><AdminLancementPage /></AdminGate>} />
+            <Route path="/admin/sequence-email" element={<AdminGate><AdminSequenceEmailPage /></AdminGate>} />
             <Route path="/admin/kit-publication" element={<AdminGate><AdminPublishingKitPage /></AdminGate>} />
             <Route path="/admin/tester-paypal" element={<AdminGate><AdminTestPayPalPage /></AdminGate>} />
             <Route path="/admin-paiements" element={<AdminGate><AdminPaymentsDashboardPage /></AdminGate>} />
