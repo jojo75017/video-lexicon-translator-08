@@ -50,9 +50,10 @@ const SalesFaq: React.FC = () => {
       answer: "Oui ! Notre programme d'affiliation vous reverse 30% de commission, soit 20,10€ par vente (sur le paiement unique de 67€ à vie). Vous recevez un lien unique dans votre espace membre avec un kit de promotion complet (templates email, posts sociaux, visuels), et vos commissions sont suivies en temps réel. Paiement PayPal mensuel dès 50€."
     },
     {
-      question: "Comment fonctionne le paiement en plusieurs fois ?",
-      answer: "Vous pouvez choisir de payer en 2 fois (2×35€) ou en 3 fois (3×25€) via PayPal. Vous obtenez un accès immédiat dès le premier paiement. Les prélèvements suivants sont automatiques, sans aucune action de votre part."
+      question: "Comment se passe le paiement ?",
+      answer: "C'est un paiement unique, par carte bancaire ou PayPal. Aucun abonnement, aucune échéance : votre accès s'ouvre immédiatement après le paiement."
     }
+
   ];
 
   return (
