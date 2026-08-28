@@ -187,7 +187,7 @@ export const ASSISTANT_FAQ: AssistantFaqEntry[] = [
     question: 'Je veux payer avec PayPal',
     keywords: ['paypal', 'paiement', 'payer', 'carte', 'stripe', 'facture'],
     answer:
-      "PayPal et carte bancaire sont disponibles sur la page de commande, en 1×, 2× ou 3×. Si un paiement bloque, dites-le-moi et je vous oriente vers le support.",
+      "PayPal et carte bancaire sont disponibles sur la page de commande, en paiement unique. Si un paiement bloque, dites-le-moi et je vous oriente vers le support.",
     actions: [
       { label: 'Page de commande', route: '/commander' },
       { label: 'Contacter le support', route: '/contact-support' },
