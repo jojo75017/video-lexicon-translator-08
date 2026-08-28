@@ -21,6 +21,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAdminAccess } from '@/contexts/AdminAccessContext';
 import { supabase } from '@/integrations/supabase/client';
 import { splitForProofread } from '@/lib/correcteur/proofreadBook';
 import { getProvider, getActiveAIKey, getOpenRouterModel } from '@/services/aiWritingService';
@@ -213,7 +214,8 @@ const EbookHumanizer: React.FC<EbookHumanizerProps> = ({
           </div>
         </div>
 
-        {/* Renvoi vers le vrai correcteur */}
+        {/* Renvoi vers le correcteur V3 : admin uniquement (les abonnés V2 restent sur la V2) */}
+        {isAdmin && (
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-4 rounded-lg bg-teal-50 border border-teal-200">
           <div className="text-sm text-teal-900">
             <strong>Fautes d'orthographe, tirets cadratins, latin ?</strong> L'Humaniseur réécrit le style,
@@ -223,6 +225,7 @@ const EbookHumanizer: React.FC<EbookHumanizerProps> = ({
             <a href="/v3/corriger">Corriger mon livre</a>
           </Button>
         </div>
+        )}
 
 
 
