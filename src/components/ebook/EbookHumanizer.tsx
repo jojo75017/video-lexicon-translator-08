@@ -50,7 +50,9 @@ const EbookHumanizer: React.FC<EbookHumanizerProps> = ({
   initialContent = '', 
   onContentHumanized 
 }) => {
+  const { isAdmin } = useAdminAccess();
   const [originalContent, setOriginalContent] = useState(initialContent);
+
   const [humanizedContent, setHumanizedContent] = useState('');
   const [intensity, setIntensity] = useState('medium');
   const [style, setStyle] = useState('natural');
