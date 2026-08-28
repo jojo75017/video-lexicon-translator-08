@@ -415,6 +415,10 @@ Deno.serve(async (req) => {
           }
           break;
         }
+        // Commission d'affiliation 20 % sur les abonnements V3 (Plume/Édition).
+        if (typeof plan === "string" && (plan.startsWith("v3_plume_") || plan.startsWith("v3_edition_"))) {
+          await handleV3SubscriptionReferral(session);
+        }
         if (session.metadata?.kind === "v3_full_pack") {
           await handleV3CheckoutCompleted(session);
         } else if (session.metadata?.kind === "v3_upsell_pack") {
