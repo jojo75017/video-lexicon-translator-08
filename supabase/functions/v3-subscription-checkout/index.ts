@@ -16,15 +16,11 @@ const ALLOWED_PRICES = new Set([
   "v3_plume_annual",
   "v3_edition_monthly",
   "v3_edition_annual",
-  "v3_studio_monthly",
-  "v3_studio_annual",
   // Tarifs « ancien client V2 » (-20 % à vie) — droit revérifié en base
   "v3_plume_monthly_legacy",
   "v3_plume_annual_legacy",
   "v3_edition_monthly_legacy",
   "v3_edition_annual_legacy",
-  "v3_studio_monthly_legacy",
-  "v3_studio_annual_legacy",
   // Version audio d'un livre (paiement unique)
   "v3_audio_single",
   // Compléments (paiement unique)

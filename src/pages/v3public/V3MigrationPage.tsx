@@ -18,10 +18,9 @@ import { PayPalSubscribeButton } from "@/components/v3/PayPalSubscribeButton";
 import V3SubscribeCheckout from "@/components/v3public/V3SubscribeCheckout";
 import useV3Entitlement from "@/hooks/useV3Entitlement";
 
-const PLAN_ICONS = { plume: Feather, edition: Crown, studio: Sparkles } as const;
+const PLAN_ICONS = { plume: Feather, edition: Crown } as const;
 const PLAN_ACCENTS: Record<string, string> = {
   plume: "#0d7a5f",
-  studio: "#b4831f",
   edition: "#5B21B6",
 };
 
