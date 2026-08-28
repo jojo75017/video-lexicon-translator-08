@@ -26,7 +26,7 @@ const GIFTS = [
   {
     title: 'Le guide des avis clients',
     text: 'La marche à suivre pour obtenir vos premiers avis, sans enfreindre les règles.',
-    to: '/v3/avis-clients',
+    to: '/v3/avis',
   },
 ];
 
