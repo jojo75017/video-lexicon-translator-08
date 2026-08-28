@@ -10,6 +10,7 @@ import V3Sidebar from './V3Sidebar';
 import V3ContemplationMode from '@/components/v3/V3ContemplationMode';
 import V3AdminQuickAccess from './V3AdminQuickAccess';
 import V3TrialBanner from './V3TrialBanner';
+import V3UpsellReturnBar from './V3UpsellReturnBar';
 import { setPreviewingAsSubscriber } from '@/components/v3/V3ContemplationMode';
 
 type V3PublicLayoutProps = {
@@ -59,6 +60,7 @@ export default function V3PublicLayout({ isAdmin, isAdminChecking, isSubscriber 
         <div className="flex flex-1 w-full">
           <V3Sidebar />
           <main className="flex-1 min-w-0">
+            <V3UpsellReturnBar />
             <Outlet />
           </main>
         </div>

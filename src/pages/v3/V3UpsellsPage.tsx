@@ -92,7 +92,7 @@ export default function V3UpsellsPage() {
               title={pack.title}
               price={pack.price}
               description={pack.desc}
-              to="/v3/forfaits"
+              to={pack.to}
               priceId={pack.priceId}
               packId={pack.id}
               badge={pack.badge}
@@ -113,7 +113,7 @@ export default function V3UpsellsPage() {
               title={pack.title}
               price={pack.price}
               description={pack.desc}
-              to={pack.id === 'boost_lancement' ? '/v3/upsell-17' : '/v3/forfaits'}
+              to={pack.to}
               priceId={pack.priceId}
               packId={pack.id}
               badge={pack.badge}
