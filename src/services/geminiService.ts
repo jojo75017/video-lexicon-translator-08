@@ -69,6 +69,34 @@ async function maybeRouteToOtherProvider(
   }
 }
 
+/** Google refuse certaines régions pour les clés AI Studio (« User location is
+ *  not supported for the API use »), ou bloque la clé. Dans ce cas on bascule
+ *  automatiquement sur l'IA intégrée d'Ebookstudio (côté serveur), pour que la
+ *  génération aboutisse quand même. Vaut pour tous les abonnés. */
+function isRegionBlockedError(text: string): boolean {
+  return /User location is not supported|location is not supported|FAILED_PRECONDITION/i.test(text || '');
+}
+
+async function callServerFallback(
+  prompt: string,
+  options: GeminiCallOptions,
+): Promise<string> {
+  const { supabase } = await import('@/integrations/supabase/client');
+  const { data, error } = await supabase.functions.invoke('ai-text-fallback', {
+    body: {
+      prompt,
+      systemPrompt: options.systemPrompt,
+      temperature: options.temperature,
+      maxTokens: options.maxTokens,
+      jsonMode: options.jsonMode,
+    },
+  });
+  if (error) throw new Error(error.message || 'IA intégrée indisponible');
+  const content = (data as any)?.content;
+  if (!content) throw new Error((data as any)?.error || 'IA intégrée : réponse vide');
+  return content as string;
+}
+
 export async function callGemini(
   apiKey: string,
   prompt: string,
