@@ -424,7 +424,7 @@ export default function V3CommanderPage() {
                   {loading ? (
                     <><Loader2 className="h-4 w-4 animate-spin" /> Préparation du paiement…</>
                   ) : (
-                    <>Payer {selected.label.replace("en une fois", "").trim()} <ArrowRight className="h-4 w-4" /></>
+                    <>Payer 47 € <ArrowRight className="h-4 w-4" /></>
                   )}
                 </button>
 
