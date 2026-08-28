@@ -44,7 +44,7 @@ export const LAUNCH_BONUSES: SequenceBonus[] = [
     value: '47 €',
     description:
       'Dix niches analysées avec la demande réelle et le niveau de concurrence. De quoi choisir un sujet qui se vend avant même d\'écrire la première ligne.',
-    to: '/cadeau',
+    to: '/10-niches-offertes',
   },
   {
     key: 'sommaire',
@@ -69,7 +69,7 @@ export const LAUNCH_BONUSES: SequenceBonus[] = [
     value: '17 €',
     description:
       'Trente modèles de titres testés, à adapter à votre sujet en deux minutes. Le titre fait la moitié des ventes sur Amazon.',
-    to: '/v3/outils/ams-keywords',
+    to: '/kdp-keywords',
     requiresAccess: true,
   },
   {
