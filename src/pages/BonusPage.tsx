@@ -130,7 +130,7 @@ export default function BonusPage() {
             {[
               `Accès à vie à EbookStudio pour ${LAUNCH_OFFER.price} une fois — aucun abonnement, aucune reconduction.`,
               "La V3 complète incluse d'office dès sa sortie le 1er octobre.",
-              `Les ${LAUNCH_BONUSES.length} bonus ci-dessus, soit ${BONUS_TOTAL_VALUE} de valeur, livrés immédiatement.`,
+              `Les ${LAUNCH_BONUSES.length} bonus ci-dessus, soit ${BONUS_TOTAL_VALUE} de valeur, débloqués dans votre espace dès le paiement validé.`,
               'Toutes les améliorations futures de votre palier, sans supplément.',
             ].map((line) => (
               <li key={line} className="flex gap-3">
