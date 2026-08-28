@@ -43,7 +43,7 @@ const TOOLS: { section: string; items: Tool[] }[] = [
   {
     section: '🥉 Plume 17€/mois',
     items: [
-      { title: 'Correcteur ortho & style IA', desc: 'Corrige 10 chapitres/mois, style clair et fluide.', to: '/v3/outils/correcteur', icon: PenTool, access: 'debutant', status: 'live', badge: 'NEW' },
+      { title: 'Correcteur ortho & style IA', desc: 'Corrige 10 chapitres/mois, style clair et fluide.', to: '/v3/corriger', icon: PenTool, access: 'debutant', status: 'live', badge: 'NEW' },
       { title: 'Éditeur WYSIWYG', desc: 'Retouchez chapitre par chapitre sans quitter EbookStudio.', to: '/v3/outils/editeur', icon: Edit3, access: 'debutant', status: 'live', badge: 'NEW' },
       { title: '3 mockups 3D / mois', desc: 'Livre en main, sur étagère, sur iPad.', to: '/v3/outils/mockup-3d', icon: ImageIcon, access: 'debutant', status: 'live', badge: 'NEW' },
       { title: 'Export EPUB', desc: 'Format universel liseuses (Kobo, Apple Books, etc.).', to: '/v3/outils/epub', icon: BookOpen, access: 'debutant', status: 'bientot', badge: 'NEW' },
@@ -53,7 +53,7 @@ const TOOLS: { section: string; items: Tool[] }[] = [
     section: '🥈 Édition 27€/mois — Le plus recommandé',
     items: [
       { title: 'Humaniseur IA', desc: 'Rend vos textes 100% indétectables (GPTZero, Originality).', to: '/v3/outils/humanizer', icon: Wand2, access: 'studio', status: 'live', badge: 'NEW' },
-      { title: 'Détecteur d\'IA', desc: 'Score de détection avant publication Amazon.', to: '/v3/outils/detection-ia', icon: ShieldCheck, access: 'studio', status: 'live', badge: 'NEW' },
+      { title: 'Détecteur d\'IA', desc: 'Score de détection avant publication Amazon.', to: '/v3/outils/humanizer', icon: ShieldCheck, access: 'studio', status: 'live', badge: 'NEW' },
       { title: 'Anti-plagiat', desc: 'Scan croisé de vos chapitres avant publication.', to: '/v3/outils/anti-plagiat', icon: ScanSearch, access: 'studio', status: 'bientot', badge: 'NEW' },
       { title: 'Audiobook TTS standard', desc: 'Voix FR naturelle, export MP3 chapitré.', to: '/v3/outils/audiobook', icon: Mic, access: 'studio', status: 'live', badge: 'NEW' },
       { title: 'Bannières A+ Content', desc: '7 modules image+texte pour votre fiche Amazon.', to: '/v3/recherche?tab=aplus', icon: Layers, access: 'studio', status: 'live', badge: 'NEW' },
@@ -66,11 +66,11 @@ const TOOLS: { section: string; items: Tool[] }[] = [
     section: '🥇 Édition 27€/mois — Maison d\'édition complète',
     items: [
       { title: 'Audiobook voix premium', desc: 'ElevenLabs qualité pro + export chapitré MP3.', to: '/v3/outils/audiobook?tier=premium', icon: Mic, access: 'editeur', status: 'live', badge: 'NEW' },
-      { title: 'Book trailer vidéo', desc: '30-60s pour réseaux sociaux, IA générative.', to: '/v3/outils/book-trailer', icon: Video, access: 'editeur', status: 'live', badge: 'NEW' },
+      { title: 'Book trailer vidéo', desc: '30-60s pour réseaux sociaux, IA générative.', to: '/v3/contentstudio', icon: Video, access: 'editeur', status: 'live', badge: 'NEW' },
       { title: 'Reels/Shorts auto', desc: 'Extraits vidéo à partir de vos chapitres.', to: '/v3/outils/reels', icon: Video, access: 'editeur', status: 'bientot', badge: 'NEW' },
       { title: 'Suivi ventes KDP', desc: 'Importez le CSV Amazon → dashboard de royalties réelles.', to: '/v3/outils/suivi-ventes', icon: BarChart3, access: 'editeur', status: 'bientot', badge: 'NEW' },
       { title: 'ARC / Street team', desc: 'Recrutez vos lecteurs bêta et gérez les avis.', to: '/v3/outils/arc', icon: Trophy, access: 'editeur', status: 'bientot', badge: 'NEW' },
-      { title: 'Cohérence personnages', desc: 'Agent IA qui vérifie descriptions & dialogues.', to: '/v3/outils/coherence-personnages', icon: Bot, access: 'editeur', status: 'live', badge: 'NEW' },
+      { title: 'Cohérence personnages', desc: 'Agent IA qui vérifie descriptions & dialogues.', to: '/v3/studio', icon: Bot, access: 'editeur', status: 'live', badge: 'NEW' },
       { title: 'Logo auteur + carte de visite', desc: 'Identité visuelle pro pour vos livres.', to: '/v3/outils/logo-auteur', icon: Palette, access: 'editeur', status: 'bientot', badge: 'NEW' },
       { title: 'Académie vidéo complète', desc: '10-20 tutos + coaching live mensuel.', to: '/formation', icon: GraduationCap, access: 'editeur', status: 'live', badge: 'NEW' },
       { title: 'Export KDP Print-Ready', desc: 'PDF avec bleeds + gabarit auto selon nb pages.', to: '/v3/outils/print-ready', icon: Rocket, access: 'editeur', status: 'bientot', badge: 'NEW' },

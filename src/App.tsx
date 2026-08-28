@@ -32,7 +32,7 @@ import StickySignupBar from '@/components/marketing/StickySignupBar';
 import V3LaunchGlobalBanner from '@/components/V3LaunchGlobalBanner';
 import { captureUtmParams } from '@/lib/utmTracking';
 import { ADMIN_HOME_PATH, ADMIN_LOGIN_PATH } from '@/config/adminRoutes';
-import { getHomePath, type AccessState } from '@/lib/authDestination';
+import { getHomePath, SUBSCRIBER_HOME_PATH, type AccessState } from '@/lib/authDestination';
 import { useAdminAccess } from '@/contexts/AdminAccessContext';
 import AdminQuickNav from '@/components/admin/AdminQuickNav';
 import { hasPersistedAdminHint } from '@/lib/adminAccess';
@@ -366,6 +366,18 @@ const App = () => {
     </SubscriberGate>
   );
 
+  /**
+   * Pages V3 déclarées hors du layout /v3 : elles doivent appliquer la même
+   * règle que le layout — un abonné V2 (non-admin) ne voit rien de la V3 et
+   * repart sur /ebook-planner. Statut inconnu = on patiente (jamais d'éjection).
+   */
+  const v3Standalone = (node: React.ReactNode) => {
+    if (!isAdminChecked) return <PageLoader />;
+    if (!isAdmin && isAuthenticated) return <Navigate to={SUBSCRIBER_HOME_PATH} replace />;
+    return <>{node}</>;
+  };
+
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -424,7 +436,7 @@ const App = () => {
             <Route path="/essai/inscription" element={<EssaiInscriptionPage />} />
             {/* Essai gratuit 7 jours : inscription publique + envoi Systeme.io */}
             <Route path="/essai-gratuit-7-jours" element={<EssaiGratuit7JoursPage />} />
-            <Route path="/v3/attente" element={<V3WaitingRoomPage />} />
+            <Route path="/v3/attente" element={v3Standalone(<V3WaitingRoomPage />)} />
             <Route path="/message" element={<MessageAudioPage />} />
             {/* Fiches ponts du tunnel email : 1 email = 1 fiche = 1 bouton vers /commander */}
             <Route path="/fiche/histoire" element={<FicheHistoirePage />} />
@@ -613,8 +625,9 @@ const App = () => {
             <Route path="/apercu-emails" element={<AdminGate><EmailPreviewPage /></AdminGate>} />
 
             {/* V3 public site */}
-            <Route path="/v3/offre" element={<V3OffrePage />} />
-            <Route path="/v3/temoignage" element={<V3TemoignagePage />} />
+            <Route path="/v3/offre" element={v3Standalone(<V3OffrePage />)} />
+            <Route path="/v3/temoignage" element={v3Standalone(<V3TemoignagePage />)} />
+
 
             <Route path="/v3" element={<V3PublicLayout isAdmin={isAdmin} isAdminChecking={!isAdminChecked} isSubscriber={isAuthenticated} />}>
               <Route index element={<V3HomePage />} />
@@ -695,8 +708,28 @@ const App = () => {
 
               <Route path="hub" element={<V3LockedGate><V3Gate><V3HubPage /></V3Gate></V3LockedGate>} />
 
+              {/* Alias historiques : plus aucun lien V3 ne doit tomber en 404 */}
+              <Route path="avis-clients" element={<Navigate to="/v3/avis" replace />} />
+              <Route path="toc-ultime" element={<Navigate to="/v3/outils/sommaire-ultime" replace />} />
+              <Route path="outils/correcteur" element={<Navigate to="/v3/corriger" replace />} />
+              <Route path="outils/detection-ia" element={<Navigate to="/v3/outils/humanizer" replace />} />
+              <Route path="outils/anti-plagiat" element={<Navigate to="/v3/corriger" replace />} />
+              <Route path="outils/coherence-personnages" element={<Navigate to="/v3/studio" replace />} />
+              <Route path="outils/book-trailer" element={<Navigate to="/v3/contentstudio" replace />} />
+              <Route path="outils/reels" element={<Navigate to="/v3/contentstudio" replace />} />
+              <Route path="outils/epub" element={<Navigate to="/v3/outils/editeur" replace />} />
+              <Route path="outils/print-ready" element={<Navigate to="/v3/donnees-kdp" replace />} />
+              <Route path="outils/suivi-ventes" element={<Navigate to="/v3/outils/royalties" replace />} />
+              <Route path="outils/landing-auteur" element={<Navigate to="/v3/auteur" replace />} />
+              <Route path="outils/logo-auteur" element={<Navigate to="/v3/upsells" replace />} />
+              <Route path="outils/sequences-emails" element={<Navigate to="/v3/acquisition" replace />} />
+              <Route path="outils/arc" element={<Navigate to="/v3/avis" replace />} />
 
+              {/* Toute autre URL /v3/* inconnue revient sur l'accueil V3 (jamais de 404),
+                  et le layout renvoie l'abonné V2 sur /ebook-planner. */}
+              <Route path="*" element={<Navigate to="/v3" replace />} />
             </Route>
+
 
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
