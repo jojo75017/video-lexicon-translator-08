@@ -152,9 +152,10 @@ export default function BonusPage() {
           </Button>
 
           <p className="mt-4 text-center text-sm text-[#232F3E]/60">
-            Prix normal {LAUNCH_OFFER.regularPrice}. Après le {LAUNCH_OFFER.deadline}, l'offre à vie
-            n'existe plus.
+            Après le {LAUNCH_OFFER.deadline}, l'offre à vie n'existe plus : EbookStudio passe en{' '}
+            {LAUNCH_OFFER.afterOffer}, résiliable à tout moment.
           </p>
+
         </Card>
       </section>
     </main>
