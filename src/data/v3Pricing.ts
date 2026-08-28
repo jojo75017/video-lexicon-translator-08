@@ -111,7 +111,7 @@ export function getV3PriceId(
   const map: Record<V3PlanId, { monthly: string; annual: string }> = {
     plume: { monthly: "v3_plume_monthly", annual: "v3_plume_annual" },
     edition: { monthly: "v3_edition_monthly", annual: "v3_edition_annual" },
-    studio: { monthly: "v3_studio_monthly", annual: "v3_studio_annual" },
+    
   };
   const base = map[planId][suffix];
   // Prix réservé aux acheteurs V2 (-20 % à vie). Le serveur revérifie le droit.
