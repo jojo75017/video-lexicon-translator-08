@@ -21,6 +21,7 @@ import {
 
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAdminAccess } from '@/contexts/AdminAccessContext';
 
 interface MagazineSidebarProps {
   activeTab: string;
@@ -217,10 +218,11 @@ export function MagazineSidebar({
           )}
         </button>
 
-        {/* Site public V3 (nouveau) */}
+        {/* Site public V3 : réservé à l'admin — un abonné V2 ne doit voir aucun élément V3 */}
+        {isAdmin && (
         <button
           onClick={() => navigate('/v3')}
-          title="Voir le site public Ebookstudio V3 (style Pluméo)"
+          title="Voir le site public Ebookstudio V3 (admin)"
           className={cn(
             'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left mt-2 relative',
             'bg-gradient-to-r from-[#F97316] to-[#EA580C] text-white hover:brightness-110 shadow-md'
@@ -231,11 +233,12 @@ export function MagazineSidebar({
             <>
               <span className="text-sm font-bold flex-1">Site public V3</span>
               <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-white text-[#EA580C]">
-                NEW
+                ADMIN
               </span>
             </>
           )}
         </button>
+        )}
 
         {/* Séparateur */}
         {!isCollapsed && (
