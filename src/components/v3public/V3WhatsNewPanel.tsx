@@ -52,7 +52,7 @@ const MORE: Item[] = [
     emoji: '🌍',
     title: 'Traduction 10 langues',
     desc: 'Choisissez la langue dès le départ, ou traduisez un livre existant pour ouvrir de nouveaux marchés.',
-    to: '/v3/traducteur',
+    to: '/v3/outils/traduction',
     cta: 'Traduire mon livre',
   },
   {
@@ -66,7 +66,7 @@ const MORE: Item[] = [
     emoji: '📚',
     title: 'Aperçu du livre en direct',
     desc: 'Le manuscrit s’affiche à côté pendant l’écriture : version brute ou version corrigée, au choix.',
-    to: '/v3/bibliotheque',
+    to: '/v3/library',
     cta: 'Mes livres',
   },
   {
