@@ -43,7 +43,7 @@ export default function V3UpsellPromoCard({
   className = '',
 }: V3UpsellPromoCardProps) {
   const navigate = useNavigate();
-  const { hasFull, hasBase } = useV3Entitlement();
+  const { hasFull } = useV3Entitlement();
   const [checkout, setCheckout] = useState(false);
 
   const fig: UpsellFigure = getUpsellFigure(figureId);
