@@ -73,31 +73,6 @@ export const KDP_PILOT_TIERS: Record<V3PlanId, KdpPilotTierConfig> = {
       { key: "unlimited", label: "Audits illimités", description: "Aucun quota mensuel.", included: true },
     ],
   },
-  studio: {
-    planId: "studio",
-    label: "KDP Pilot Pro — Tout inclus",
-    version: "pro",
-    agentCode: "P27+",
-    runsPerMonth: null,
-    bsrMode: "live",
-    keywordSuggestions: 100,
-    nicheComparator: true,
-    competitorScan: true,
-    actionPlanAI: true,
-    scoreDepth: "expert",
-    features: [
-      { key: "score_expert", label: "Scoring expert multi-critères", description: "12 critères pondérés, benchmark vs top 100 de la niche.", included: true },
-      { key: "bsr_live", label: "BSR live temps réel", description: "Rafraîchissement à la demande + historique 30 jours.", included: true },
-      { key: "keywords_100", label: "100 mots-clés + volumes + intent", description: "Analyse sémantique + regroupement par intention d'achat.", included: true },
-      { key: "niche_compare", label: "Comparateur multi-niches", description: "Comparez 5 niches en parallèle sur 8 métriques.", included: true },
-      { key: "competitor_deep", label: "Scan concurrence profond", description: "Top 50 titres, extraction descriptions, look inside, reviews clés.", included: true },
-      { key: "action_plan", label: "Plan d'action IA personnalisé", description: "Roadmap 30/60/90 jours générée par IA.", included: true },
-      { key: "reprice", label: "Suggestions de prix optimales", description: "Fourchette recommandée + tests A/B suggérés.", included: true },
-      { key: "reports", label: "Rapports exportables (PDF/CSV)", description: "Livrables partageables avec ghostwriters ou éditeurs.", included: true },
-      { key: "unlimited", label: "Audits illimités", description: "Aucun quota mensuel.", included: true },
-      { key: "coaching", label: "Revue d'audit avec coaching", description: "Analyse commentée lors de votre session mensuelle 1-à-1.", included: true },
-    ],
-  },
 };
 
 export function getKdpPilotTier(planId: V3PlanId): KdpPilotTierConfig {
