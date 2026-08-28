@@ -87,8 +87,13 @@ serve(async (req) => {
   if (authError || !user) return jsonError('Session invalide', 401);
 
   const body = await req.json() as VoiceRequest;
-  const elevenKey = Deno.env.get('ELEVENLABS_API_KEY');
-  if (!elevenKey) return jsonError('ElevenLabs non configuré côté serveur', 500);
+  // Voix off : IA intégrée (Lovable AI) par défaut. ElevenLabs seulement si une
+  // vraie clé API est présente (les clés valides commencent par « sk_ » ; un ID
+  // de clé est refusé par ElevenLabs avec une erreur d'authentification).
+  const rawElevenKey = Deno.env.get('ELEVENLABS_API_KEY') || '';
+  const elevenKey = rawElevenKey.startsWith('sk_') ? rawElevenKey : '';
+  const lovableKey = Deno.env.get('LOVABLE_API_KEY') || '';
+  if (!elevenKey && !lovableKey) return jsonError('Aucun moteur de voix off configuré côté serveur', 500);
 
   const voiceId = VOICE_ID_BY_LANG[body.language_code] || VOICE_ID_BY_LANG.fr;
   const fullScript = [body.script_hook, body.script_core, body.script_action]
@@ -98,35 +103,75 @@ serve(async (req) => {
   const segments = chunkText(fullScript);
   const audioBuffers: ArrayBuffer[] = [];
 
+  /** Synthèse d'un segment via la passerelle IA intégrée (MP3). */
+  async function speakWithLovable(text: string): Promise<ArrayBuffer> {
+    const res = await fetch('https://ai.gateway.lovable.dev/v1/audio/speech', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${lovableKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'openai/gpt-4o-mini-tts',
+        input: text,
+        voice: 'alloy',
+        response_format: 'mp3',
+        instructions: 'Voix de formation professionnelle, chaleureuse, rythme posé, en français.',
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.text().catch(() => '');
+      console.error(`Lovable TTS ${res.status}: ${err.slice(0, 400)}`);
+      throw new Error(
+        res.status === 402
+          ? 'Crédits IA épuisés : rechargez vos crédits pour générer la voix off.'
+          : `Voix off échouée (${res.status}).`,
+      );
+    }
+    return await res.arrayBuffer();
+  }
+
   for (let i = 0; i < segments.length; i++) {
     const seg = segments[i];
     const previousText = i > 0 ? segments[i - 1].slice(0, 500) : undefined;
     const nextText = i < segments.length - 1 ? segments[i + 1].slice(0, 500) : undefined;
 
-    const res = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`,
-      {
-        method: 'POST',
-        headers: {
-          'xi-api-key': elevenKey,
-          'Content-Type': 'application/json',
+    try {
+      if (!elevenKey) {
+        audioBuffers.push(await speakWithLovable(seg));
+        continue;
+      }
+
+      const res = await fetch(
+        `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`,
+        {
+          method: 'POST',
+          headers: {
+            'xi-api-key': elevenKey,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            text: seg,
+            model_id: 'eleven_multilingual_v2',
+            voice_settings: { stability: 0.5, similarity_boost: 0.75, style: 0.4, use_speaker_boost: true },
+            ...(previousText ? { previous_text: previousText } : {}),
+            ...(nextText ? { next_text: nextText } : {}),
+          }),
         },
-        body: JSON.stringify({
-          text: seg,
-          model_id: 'eleven_multilingual_v2',
-          voice_settings: { stability: 0.5, similarity_boost: 0.75, style: 0.4, use_speaker_boost: true },
-          ...(previousText ? { previous_text: previousText } : {}),
-          ...(nextText ? { next_text: nextText } : {}),
-        }),
-      },
-    );
-    if (!res.ok) {
-      const err = await res.text();
-      console.error(`ElevenLabs TTS ${res.status}: ${err}`);
-      return jsonError(`Voix off échouée (${res.status})`, 502);
+      );
+      if (!res.ok) {
+        const err = await res.text();
+        console.error(`ElevenLabs TTS ${res.status}: ${err.slice(0, 400)}`);
+        if (!lovableKey) return jsonError(`Voix off échouée (${res.status})`, 502);
+        audioBuffers.push(await speakWithLovable(seg));
+        continue;
+      }
+      audioBuffers.push(await res.arrayBuffer());
+    } catch (e) {
+      return jsonError((e as Error).message || 'Voix off échouée', 502);
     }
-    audioBuffers.push(await res.arrayBuffer());
   }
+
 
   const mp3 = concatMp3(audioBuffers);
   const mp3Path = `${user.id}/${body.project_id}/${body.chapter_id}/voice.mp3`;
