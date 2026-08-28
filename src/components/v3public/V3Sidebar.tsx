@@ -35,7 +35,7 @@ const NAV: NavSection[] = [
   {
     section: 'Lancement',
     items: [
-      { to: '/v3/upsells', label: 'UPSELLS — packs & compléments', icon: Sparkles, badge: '17+ packs' },
+      { to: '/v3/upsells', label: 'UPSELLS — packs & compléments', icon: Sparkles, badge: '18 tarifs' },
       { to: '/essai', label: '🎁 Essai gratuit — chapitre 1', icon: Rocket, end: true, badge: 'Gratuit' },
       { to: '/v3/attente', label: '👑 Salon des membres fondateurs', icon: Crown, end: true, badge: '1er mois' },
       { to: '/commander', label: '47 € à vie — jusqu’au 30 septembre', icon: Gem, end: true, badge: '30 septembre' },

@@ -3,7 +3,7 @@ import { ArrowRight, Gem } from 'lucide-react';
 import {
   V3_ESSENTIAL_PACKS,
   V3_ALACARTE_PACKS,
-  V3_FULL_PACK,
+  V3_ALL_PACKS_TOTAL,
 } from '@/data/roadmapV3';
 import { V3_ADDON_LIST, V3_PLANS, formatPrice } from '@/data/v3Pricing';
 import V3UpsellPromoCard from '@/components/v3public/V3UpsellPromoCard';
@@ -37,45 +37,22 @@ export default function V3UpsellsPage() {
           </p>
         </header>
 
-        {/* Pack Pro Vendeur 547 € — en tête */}
-        <section
-          className="mb-10 rounded-3xl p-6 md:p-8"
-          style={{
-            background: 'linear-gradient(135deg, var(--v3-cream, #FAF6EE), #fff)',
-            border: '1px solid var(--v3-gold, #c9a84c)',
-          }}
-        >
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <span
-                className="inline-block rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white"
-                style={{ background: 'var(--v3-gold-600, #b4831f)' }}
-              >
-                {V3_FULL_PACK.title}
-              </span>
-              <h2 className="v3-serif mt-3 text-2xl font-bold" style={{ color: 'var(--v3-ink)' }}>
-                Le Pack Pro Vendeur — tout, d'un coup
-              </h2>
-              <p className="mt-1 text-sm" style={{ color: 'var(--v3-muted)' }}>
-                La base 197 € + tous les packs essentiels + toutes les options à la carte.
-                Économie de {V3_FULL_PACK.saves} € vs achat séparé.
-              </p>
-              <div className="mt-3 flex flex-wrap items-baseline gap-3">
-                <span className="text-3xl font-black" style={{ color: 'var(--v3-gold-600, #b4831f)' }}>
-                  {V3_FULL_PACK.price} €
-                </span>
-                <span className="text-sm line-through" style={{ color: 'var(--v3-muted)' }}>
-                  {V3_FULL_PACK.compareAt} €
-                </span>
-                <span className="text-xs" style={{ color: 'var(--v3-muted)' }}>
-                  · {V3_FULL_PACK.installments.join(' · ')}
-                </span>
-              </div>
-            </div>
-            <Link to="/v3/forfaits" className="v3-btn v3-btn-gold">
-              <Gem className="h-4 w-4" /> Passer en Studio Pro <ArrowRight className="h-4 w-4" />
-            </Link>
+        <section className="mb-10 overflow-hidden rounded-lg border" style={{ borderColor: 'var(--v3-line)' }}>
+          <div className="px-4 py-3" style={{ background: 'var(--v3-cream)' }}>
+            <h2 className="v3-serif text-xl font-bold" style={{ color: 'var(--v3-ink)' }}>Tarifs à l'unité</h2>
+            <p className="text-xs" style={{ color: 'var(--v3-muted)' }}>Chaque complément peut être acheté séparément, en paiement unique et sans abonnement.</p>
           </div>
+          <div className="grid gap-px sm:grid-cols-2 lg:grid-cols-3" style={{ background: 'var(--v3-line)' }}>
+            {[...V3_ADDON_LIST, ...V3_ESSENTIAL_PACKS, ...V3_ALACARTE_PACKS].map((item) => (
+              <div key={'key' in item ? item.key : item.id} className="flex items-center justify-between gap-3 px-4 py-3" style={{ background: 'var(--v3-surface)' }}>
+                <span className="text-xs font-semibold" style={{ color: 'var(--v3-ink)' }}>{item.title}</span>
+                <strong className="shrink-0 text-sm" style={{ color: 'var(--v3-gold-600)' }}>{formatPrice(item.price)}</strong>
+              </div>
+            ))}
+          </div>
+          <p className="px-4 py-3 text-xs font-semibold" style={{ color: 'var(--v3-muted)', background: 'var(--v3-cream)' }}>
+            Valeur cumulée des packs premium : {formatPrice(V3_ALL_PACKS_TOTAL)}. Les anciens clients V2 conservent leur remise de 20 % à vie.
+          </p>
         </section>
 
         {/* Compléments (V3_ADDON_LIST) — encarts personnifiés */}
@@ -100,13 +77,12 @@ export default function V3UpsellsPage() {
           })}
         </div>
 
-        {/* Packs essentiels (roadmap) — inclus dans le Pack Pro 547 € */}
+        {/* Packs premium — disponibles séparément */}
         <h2 className="v3-serif mb-4 mt-12 text-xl font-bold" style={{ color: 'var(--v3-ink)' }}>
-          Packs premium — inclus dans le Pack Pro 547 €
+          Packs premium à l'unité
         </h2>
         <p className="mb-4 text-[13px]" style={{ color: 'var(--v3-muted)' }}>
-          Ces packs ne s'achètent pas à l'unité : ils sont tous contenus dans le Pack Pro Vendeur
-          (ou dans le forfait Studio Pro).
+          Choisissez uniquement le pack utile à votre livre. Chaque tarif est un paiement unique.
         </p>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {V3_ESSENTIAL_PACKS.map((pack) => (
@@ -117,6 +93,8 @@ export default function V3UpsellsPage() {
               price={pack.price}
               description={pack.desc}
               to="/v3/forfaits"
+              priceId={pack.priceId}
+              packId={pack.id}
               badge={pack.badge}
               included={hasFull}
             />
@@ -136,6 +114,8 @@ export default function V3UpsellsPage() {
               price={pack.price}
               description={pack.desc}
               to={pack.id === 'boost_lancement' ? '/v3/upsell-17' : '/v3/forfaits'}
+              priceId={pack.priceId}
+              packId={pack.id}
               badge={pack.badge}
               included={hasFull}
             />
@@ -154,7 +134,7 @@ export default function V3UpsellsPage() {
               </h2>
               <p className="mt-1 text-sm" style={{ color: 'var(--v3-muted)' }}>
                 {edition ? `${formatPrice(edition.monthlyPrice)} / mois` : '47 € / mois'} — l'ensemble des
-                compléments ci-dessus, sans achat à l'unité.
+                compléments ci-dessus. Achat séparé toujours possible au tarif affiché.
               </p>
             </div>
             <Link to="/v3/forfaits" className="v3-btn v3-btn-gold">
