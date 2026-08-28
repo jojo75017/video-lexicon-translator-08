@@ -136,8 +136,21 @@ export default function V3BookActionsBar({ onLaunch }: { onLaunch: () => void })
           <Star className="h-3.5 w-3.5" /> Obtenir des avis clients
         </Link>
 
-
       </div>
+
+      {/* Encart upsell contextuel : livre terminé → Pack Boost de Lancement (17 €) */}
+      {written && (
+        <div className="mt-4">
+          <V3UpsellPromoCard
+            figureId="boost_lancement"
+            title="Pack Boost de Lancement — 17 €"
+            price={17}
+            description="10 visuels Pinterest + 5 posts Instagram IA + checklist ISBN/KDP premium + template métadonnées."
+            to="/v3/upsell-17"
+            badge="Offre découverte"
+          />
+        </div>
+      )}
     </div>
   );
 }
