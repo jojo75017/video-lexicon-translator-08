@@ -35,12 +35,12 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
           className="v3-serif mt-5 font-semibold leading-[1.1] text-[28px] md:text-[40px]"
           style={{ color: '#fffaf0', textShadow: '0 2px 14px rgba(3,32,24,0.6)' }}
         >
-          Premier agent d'édition IA{' '}
-          <span className="italic" style={{ color: GOLD }}>multi-modèle</span> au monde
+          Votre agent d'édition IA{' '}
+          <span className="italic" style={{ color: GOLD }}>multi-modèle</span>
         </h1>
 
         <p className="mt-4 mx-auto max-w-2xl text-[15px] md:text-[16.5px] leading-relaxed text-white/90">
-          Transformez n'importe quelle idée de livre simple en un package complet prêt pour Amazon :
+          Transformez une simple idée de livre en un package complet prêt pour Amazon :
           Kindle, livre broché, couverture, livre audio et métadonnées.
         </p>
 
