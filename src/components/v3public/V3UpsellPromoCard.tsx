@@ -56,11 +56,16 @@ export default function V3UpsellPromoCard({
     desc: description,
     price,
     priceId: priceId ?? `v3_pack_${packId}_once`,
+    to,
     modules: [],
     badge,
   } : null;
 
   const fig: UpsellFigure = getUpsellFigure(figureId);
+
+  /** Ajoute le marqueur de retour vers /v3/upsells sur la route de destination. */
+  const withReturn = (path: string) =>
+    path.startsWith('http') ? path : `${path}${path.includes('?') ? '&' : '?'}from=upsells`;
 
   // Forfait Édition = tout inclus : on affiche « Ouvrir ».
   const isIncluded = included || hasFull;
@@ -68,15 +73,15 @@ export default function V3UpsellPromoCard({
   const handleOpen = () => {
     if (isIncluded) {
       if (to.startsWith('http')) window.open(to, '_blank', 'noopener');
-      else navigate(to);
+      else navigate(withReturn(to));
       return;
     }
     if (priceId || packId) {
       setCheckout(true);
       return;
     }
-    // Pack roadmap (pas d'achat unitaire) → page forfaits.
-    navigate(to || '/v3/forfaits');
+    // Pas d'achat unitaire configuré → on ouvre au moins le bon outil.
+    navigate(withReturn(to || '/v3/forfaits'));
   };
 
   return (
