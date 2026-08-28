@@ -213,6 +213,64 @@ async function sendLifetimeAccessEmail(email: string, planLabel: string, accessC
   }
 }
 
+// ===== Commission d'affiliation sur abonnement V3 (Plume/Édition) : 20 % =====
+// Ne concerne que les paiements récurrents (v3_plume_*, v3_edition_*). Le code
+// de parrainage est transmis via les métadonnées de la session Stripe.
+async function handleV3SubscriptionReferral(session: any) {
+  const refCode = String(session.metadata?.ref_code || "");
+  const plan = String(session.metadata?.plan || "");
+  if (!refCode || !plan.startsWith("v3_plume_") && !plan.startsWith("v3_edition_")) return;
+  if (!/^[A-Za-z0-9_-]{1,40}$/.test(refCode)) return;
+
+  const supabase = getSupabase();
+  const { data: referrer } = await supabase
+    .from("referral_codes")
+    .select("user_id")
+    .eq("code", refCode)
+    .maybeSingle();
+  if (!referrer?.user_id) return;
+
+  const email = String(
+    session.metadata?.email || session.customer_email || session.customer_details?.email || "",
+  ).toLowerCase();
+  if (!email) return;
+
+  const amount = typeof session.amount_total === "number" ? session.amount_total / 100 : 0;
+  const commission = Math.round(amount * 0.2 * 100) / 100;
+
+  // S'il existe déjà une ligne convertie pour ce filleul, on ne double pas.
+  const { data: existing } = await supabase
+    .from("referrals")
+    .select("id, status")
+    .eq("referred_email", email)
+    .eq("referrer_id", referrer.user_id)
+    .maybeSingle();
+
+  if (existing) {
+    if (existing.status !== "converted") {
+      await supabase
+        .from("referrals")
+        .update({
+          status: "converted",
+          commission_amount: commission,
+          commission_rate: 0.2,
+          converted_at: new Date().toISOString(),
+        })
+        .eq("id", existing.id);
+    }
+  } else {
+    await supabase.from("referrals").insert({
+      referrer_id: referrer.user_id,
+      referred_email: email,
+      status: "converted",
+      commission_amount: commission,
+      commission_rate: 0.2,
+      converted_at: new Date().toISOString(),
+    });
+  }
+  console.log("Subscription referral commission recorded:", email, commission);
+}
+
 async function handleV3CheckoutCompleted(session: any) {
   const orderId = session.metadata?.order_id;
   if (!orderId) return;
