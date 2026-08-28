@@ -149,5 +149,3 @@ export default function V3UpsellPromoCard({
   );
 }
 
-// Évite l'avertissement "hasBase unused" si le consommateur veut gérer la déduction.
-void useV3Entitlement;
