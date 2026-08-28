@@ -55,13 +55,9 @@ const FAQ: Array<{ q: string; a: string }> = [
 
 const BONUS_TOTAL = V3_BONUSES_TOTAL_VALUE;
 
-type PlanId = "v2_1x" | "v2_2x" | "v2_3x";
+/** Paiement unique uniquement : plus de 2× ni 3×. */
+const PLAN_ID = "v2_1x" as const;
 
-const PLANS: Array<{ id: PlanId; label: string; sub: string; badge?: string }> = [
-  { id: "v2_1x", label: "47 € en une fois", sub: "Le plus économique · accès immédiat", badge: "Recommandé" },
-  { id: "v2_2x", label: "2 × 25 €", sub: "Prélevé sur 2 mois (50 € au total)" },
-  { id: "v2_3x", label: "3 × 18 €", sub: "Prélevé sur 3 mois (54 € au total)" },
-];
 
 const INCLUDED = [
   "Génération complète de vos livres (plan, chapitres, relecture 4 passes)",
