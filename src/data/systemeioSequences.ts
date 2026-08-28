@@ -153,7 +153,7 @@ const BONUS_BLOCK = `Ce que vous recevez en même temps que l'accès, sans suppl
 
 Soit ${BONUS_TOTAL_VALUE} de bonus, débloqués dans votre espace dès le paiement validé. Ces bonus ne sont pas vendus séparément et ne sont pas distribués en dehors de cette offre.`;
 
-const DEADLINE_BLOCK = `Jusqu'au ${LAUNCH_OFFER.deadline}, l'accès complet est à ${LAUNCH_OFFER.price} une fois, à vie. Un seul paiement, aucune reconduction, aucun prélèvement mensuel. Vous pouvez régler en 1×, 2× ou 3×, par carte ou par PayPal.
+const DEADLINE_BLOCK = `Jusqu'au ${LAUNCH_OFFER.deadline}, l'accès complet est à ${LAUNCH_OFFER.price} une fois, à vie. Un seul paiement, aucune reconduction, aucun prélèvement mensuel. Un seul règlement, par carte ou par PayPal.
 
 À partir du 1er octobre, cette formule disparaît : EbookStudio passe en ${LAUNCH_OFFER.afterOffer}. Ceux qui entrent maintenant ne repayeront jamais.`;
 
@@ -289,7 +289,7 @@ Un point important, pour être honnête avec vous : ces bonus ne sont pas distri
 
 >> Prendre l'accès à vie à ${LAUNCH_OFFER.price} : ${commanderUrl('sio-chaud-4')}
 
-Paiement en 1×, 2× ou 3×, carte ou PayPal. Après le ${LAUNCH_OFFER.deadline}, ce message n'aura plus d'objet et je ne le renverrai pas.
+Paiement unique, carte ou PayPal. Après le ${LAUNCH_OFFER.deadline}, ce message n'aura plus d'objet et je ne le renverrai pas.
 
 ${SIGN}`,
   },
@@ -378,7 +378,7 @@ Avant de vous laisser, je résume une dernière fois, honnêtement.
 
 Ce que vous obtenez : un espace unique qui construit le plan de votre livre, rédige les chapitres sous votre contrôle, corrige le manuscrit, produit les fichiers Word et PDF conformes à Amazon KDP, génère la couverture aux dimensions exactes et prépare la fiche produit. Un livre publiable, pas un cours.
 
-Ce que ça coûte : ${LAUNCH_OFFER.price} une fois, à vie, jusqu'au ${LAUNCH_OFFER.deadline}. Aucun abonnement, aucune reconduction. Paiement en 1×, 2× ou 3×.
+Ce que ça coûte : ${LAUNCH_OFFER.price} une fois, à vie, jusqu'au ${LAUNCH_OFFER.deadline}. Aucun abonnement, aucune reconduction. Paiement unique, carte ou PayPal.
 
 Ce qui change ensuite : le 1er octobre, l'accès à vie disparaît et EbookStudio passe en ${LAUNCH_OFFER.afterOffer}. La V3, elle, est incluse d'office pour ceux qui sont entrés avant.
 

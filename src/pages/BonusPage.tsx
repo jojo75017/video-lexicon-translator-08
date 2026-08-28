@@ -57,7 +57,7 @@ export default function BonusPage() {
               </a>
             </Button>
             <span className="text-sm text-[#232F3E]/60">
-              Paiement en 1×, 2× ou 3× — carte ou PayPal
+              Paiement unique — carte ou PayPal
             </span>
           </div>
         </div>
