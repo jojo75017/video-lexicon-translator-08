@@ -132,6 +132,9 @@ export default function ContentStudioPage() {
         </button>
       )}
 
+      <CsImportPanel onImported={loadProjects} />
+
+
       {showForm && (
         <div className="rounded-lg border border-border bg-card p-6 space-y-4 shadow-sm">
           <h2 className="text-lg font-semibold text-foreground">Nouveau projet ContentStudio</h2>
