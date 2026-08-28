@@ -217,7 +217,7 @@ Jusqu'au ${LAUNCH_OFFER.deadline}, l'accès complet est à ${LAUNCH_OFFER.price}
 
 Et ce qui compte vraiment : la V3 sort le 1er octobre, et vous l'aurez d'office, incluse, sans rien payer de plus. Ceux qui arriveront après le 30 septembre seront en abonnement mensuel.
 
-Avec l'accès, vous recevez aussi tous les bonus : les 10 niches, le sommaire illimité, les couvertures aux formats Amazon, les 30 titres qui vendent, le pack anti-plagiat, le kit de démarrage guidé, le guide de la clé API et le guide de parrainage. ${BONUS_TOTAL_VALUE} de bonus, inclus.
+Avec l'accès, vous recevez aussi tous les bonus : les 10 niches, le sommaire illimité, les couvertures aux formats Amazon, les 30 titres qui vendent, le pack anti-plagiat, le kit de démarrage guidé, le guide de la clé API et le guide pour structurer un ebook. ${BONUS_TOTAL_VALUE} de bonus, inclus.
 
 >> Prendre l'accès à vie à ${LAUNCH_OFFER.price} : ${commanderUrl('sio-chaud-4')}
 
