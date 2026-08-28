@@ -45,7 +45,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "Pourquoi commander maintenant ?",
-    a: "Le tarif 47 € est valable jusqu'au 30 septembre (59 € ensuite). À partir du 1er octobre, EbookStudio passe uniquement en abonnement : Plume 27 € par mois, Édition 47 €, Studio Pro 97 € (tout inclus). L'accès à vie n'existera plus.",
+    a: "Le tarif 47 € à vie est valable jusqu'au 30 septembre. À partir du 1er octobre, EbookStudio passe uniquement en abonnement mensuel sans engagement : Plume 27 € par mois ou Édition 47 € par mois, résiliable à tout moment. L'accès à vie n'existera plus.",
   },
   {
     q: "Comment mon accès est-il ouvert après le paiement ?",
@@ -190,7 +190,7 @@ export default function V3CommanderPage() {
     <main className="dark-sales min-h-screen">
       <SeoHead
         title="Commander EbookStudio Pro — 47 € accès à vie (offre août-septembre)"
-        description="Accès à vie à EbookStudio Pro pour 47 € au lieu de 59 €, jusqu'au 30 septembre. Aucun abonnement. La V3 est incluse sans surcoût. Carte bancaire ou PayPal, accès immédiat."
+        description="Accès à vie à EbookStudio Pro pour 47 € jusqu'au 30 septembre, ensuite abonnement mensuel sans engagement. Aucun abonnement. La V3 est incluse sans surcoût. Carte bancaire ou PayPal, accès immédiat."
         canonical={COMMANDER_URL}
       />
       <PaymentTestModeBanner />
@@ -367,7 +367,7 @@ export default function V3CommanderPage() {
                   <span className="text-sm text-[var(--ds-text-muted)]">paiement unique</span>
                 </div>
                 <p className="mt-1 text-[11px] font-bold" style={{ color: "var(--ds-gold)" }}>
-                  Offre valable jusqu'au 30 septembre — ensuite 59 €.
+                  Offre valable jusqu'au 30 septembre — ensuite abonnement mensuel 27 € ou 47 €/mois, sans engagement.
                 </p>
 
                 <label className="mt-6 block text-xs font-bold uppercase tracking-wide text-[var(--ds-text-muted)]">
