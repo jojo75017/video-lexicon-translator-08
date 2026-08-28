@@ -32,6 +32,8 @@ export interface SequenceBonus {
   description: string;
   /** Où le bonus est réellement livré. */
   to: string;
+  /** true = livré dans l'espace membre (nécessite l'accès), false = accessible tout de suite. */
+  requiresAccess?: boolean;
 }
 
 /** Les bonus offerts avec l'offre de lancement (livrés immédiatement). */
@@ -50,7 +52,7 @@ export const LAUNCH_BONUSES: SequenceBonus[] = [
     value: '27 €',
     description:
       'Vous donnez votre idée, l\'IA vous rend un sommaire complet, chapitre par chapitre, prêt à écrire. C\'est le meneur de tout le système.',
-    to: '/v3/outils/sommaire-ultime',
+    to: '/essai',
   },
   {
     key: 'couverture',
@@ -59,6 +61,7 @@ export const LAUNCH_BONUSES: SequenceBonus[] = [
     description:
       'Une couverture générée puis recadrée aux formats exigés par Amazon (Kindle 1600 × 2560, broché prêt à téléverser). Aucun rejet de fichier.',
     to: '/couverture-kdp',
+    requiresAccess: true,
   },
   {
     key: 'titres',
@@ -67,6 +70,7 @@ export const LAUNCH_BONUSES: SequenceBonus[] = [
     description:
       'Trente modèles de titres testés, à adapter à votre sujet en deux minutes. Le titre fait la moitié des ventes sur Amazon.',
     to: '/v3/outils/ams-keywords',
+    requiresAccess: true,
   },
   {
     key: 'anti-plagiat',
@@ -82,7 +86,7 @@ export const LAUNCH_BONUSES: SequenceBonus[] = [
     value: '37 €',
     description:
       'Votre premier livre du sommaire au fichier prêt pour Amazon, étape par étape, sans rien deviner.',
-    to: '/v3/kit-demarrage',
+    to: '/kit-demarrage-ebookstudio-v3.pdf',
   },
   {
     key: 'gemini',
