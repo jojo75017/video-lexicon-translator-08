@@ -6,6 +6,7 @@ import V3SubscribeCheckout from '@/components/v3public/V3SubscribeCheckout';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
 import { getUpsellFigure, type UpsellFigure } from '@/data/v3UpsellFigures';
 
+
 export interface V3UpsellPromoCardProps {
   /** Clé d'addon (V3_ADDON_LIST) ou id de pack roadmap — pour la figure. */
   figureId: string;
