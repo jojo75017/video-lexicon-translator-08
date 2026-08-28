@@ -69,6 +69,34 @@ async function maybeRouteToOtherProvider(
   }
 }
 
+/** Google refuse certaines régions pour les clés AI Studio (« User location is
+ *  not supported for the API use »), ou bloque la clé. Dans ce cas on bascule
+ *  automatiquement sur l'IA intégrée d'Ebookstudio (côté serveur), pour que la
+ *  génération aboutisse quand même. Vaut pour tous les abonnés. */
+function isRegionBlockedError(text: string): boolean {
+  return /User location is not supported|location is not supported|FAILED_PRECONDITION/i.test(text || '');
+}
+
+async function callServerFallback(
+  prompt: string,
+  options: GeminiCallOptions,
+): Promise<string> {
+  const { supabase } = await import('@/integrations/supabase/client');
+  const { data, error } = await supabase.functions.invoke('ai-text-fallback', {
+    body: {
+      prompt,
+      systemPrompt: options.systemPrompt,
+      temperature: options.temperature,
+      maxTokens: options.maxTokens,
+      jsonMode: options.jsonMode,
+    },
+  });
+  if (error) throw new Error(error.message || 'IA intégrée indisponible');
+  const content = (data as any)?.content;
+  if (!content) throw new Error((data as any)?.error || 'IA intégrée : réponse vide');
+  return content as string;
+}
+
 export async function callGemini(
   apiKey: string,
   prompt: string,
@@ -160,6 +188,12 @@ export async function callGemini(
           continue outer;
         }
         lastErrText = await response.text().catch(() => '');
+        // Région non supportée par Google (clé AI Studio) → inutile de retenter,
+        // on part directement sur l'IA intégrée.
+        if (isRegionBlockedError(lastErrText)) {
+          console.warn('[Gemini] région non supportée — bascule sur l’IA intégrée Ebookstudio.');
+          break outer;
+        }
         // 400 « requête invalide » (thinkingConfig / responseMimeType refusés)
         // ≠ clé invalide : on retente une fois en mode dégradé.
         const looksLikeBadKey = /API_KEY_INVALID|API key not valid|API_KEY_SERVICE_BLOCKED/i.test(lastErrText);
@@ -182,6 +216,22 @@ export async function callGemini(
       console.error('Gemini API error:', lastStatus, errText);
       let apiMessage = '';
       try { apiMessage = JSON.parse(errText)?.error?.message || ''; } catch { /* ignore */ }
+
+      // Repli automatique sur l'IA intégrée : région bloquée par Google ou
+      // service Google saturé. L'abonné obtient son contenu sans rien changer.
+      if (isRegionBlockedError(errText) || lastStatus === 429 || lastStatus === 503) {
+        try {
+          return await callServerFallback(prompt, { systemPrompt, temperature, maxTokens, jsonMode });
+        } catch (fallbackError: any) {
+          console.warn('[Gemini] repli IA intégrée échoué', fallbackError);
+          if (isRegionBlockedError(errText)) {
+            throw new Error(
+              'Votre clé Gemini est refusée par Google depuis votre région, et l’IA intégrée est momentanément indisponible. Réessayez dans quelques minutes.',
+            );
+          }
+        }
+      }
+
       if (lastStatus === 429 || lastStatus === 503) {
         throw new Error('Service Google momentanément saturé. Patientez ~30s puis relancez.');
       }
