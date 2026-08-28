@@ -6,7 +6,7 @@ export const ACTIVE_EMAIL_CAMPAIGN = {
   status: 'active' as const,
   sendingBlocked: false,
   price: '47 €',
-  regularPrice: '59 €',
+  afterOffer: 'abonnement mensuel sans engagement : 27 €/mois (Plume) ou 47 €/mois (Édition)',
   deadline: '30 septembre 2026',
   checkoutUrl: COMMANDER_URL,
 
