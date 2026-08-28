@@ -63,14 +63,18 @@ Je vous donne la procédure écrite, écran par écran : créer les deux campagn
 
 - Nouveau mode `tag_segments` dans `sync-systemeio-contacts` : calcule les deux segments depuis `email_opens`, `email_clicks`, `email_send_log` et `sales_prospects`, plafonne à 300 par segment (les plus récents d'abord), assigne `seq-chaud` / `seq-froid` par `tagId` numérique via `_shared/systemeio.ts`, avec reprise sur erreur et journal.
 - Exclusions codées en dur : `unsubscribed = true`, statut rebond dans `email_send_log`, contacts déjà clients (`ebookstudio-client`).
-- Nouveau fichier de contenu `src/data/systemeioSequences.ts` : les 7 emails avec objet, corps et lien tracké, affichés dans le panneau admin avec un bouton copier pour chacun.
-- Panneau admin : bloc « Séquence Systeme.io » dans `SystemeIoSyncPanel` — aperçu des compteurs, bouton de tagage, liste des emails à copier.
+- Nouveau fichier de contenu `src/data/systemeioSequences.ts` : les 7 emails avec objet, corps, bonus associé et lien tracké, affichés dans le panneau admin avec un bouton copier pour chacun.
+- Pages bonus : `src/pages/bonus/BonusSommairePage.tsx`, `BonusCouverturePage.tsx`, `BonusTitresPage.tsx` + routes `/bonus/sommaire`, `/bonus/couverture`, `/bonus/titres` dans `App.tsx`. Réutilisation des fonctions existantes (génération de sommaire, `generate-ai-cover` avec `kdpCoverNormalize`), capture email avant livraison via `funnel-capture-lead`, offre payante en bas de page uniquement.
+- Compteurs de retrait par bonus via `trackCaptureEvent` (surface `cadeau`, champ `lead_magnet` = clé du bonus) — aucune nouvelle table.
+- Panneau admin : bloc « Séquence Systeme.io » dans `SystemeIoSyncPanel` — aperçu des compteurs, bouton de tagage, liste des emails à copier, retraits par bonus.
 - Suivi des sources via `utmTracking.ts` / `captureTracking.ts` déjà en place, aucun schéma à modifier.
 - Aucun changement sur Resend : les emails applicatifs (commandes, essais, support) restent inchangés.
 
 ## Ordre d'exécution
 
-1. Mode `tag_segments` + aperçu des compteurs (validation ensemble avant tagage réel).
-2. Tagage des 300 + 300 dans Systeme.io.
-3. Livraison des 7 emails dans le panneau admin + procédure de paramétrage.
-4. Vous montez les deux campagnes dans Systeme.io, on vérifie un envoi test vers votre adresse avant l'ouverture des vannes.
+1. Les 3 nouvelles pages bonus + compteurs de retrait.
+2. Mode `tag_segments` + aperçu des compteurs (validation ensemble avant tagage réel).
+3. Tagage des 300 + 300 dans Systeme.io.
+4. Livraison des 7 emails dans le panneau admin + procédure de paramétrage.
+5. Vous montez les deux campagnes dans Systeme.io, on vérifie un envoi test vers votre adresse avant l'ouverture des vannes.
+
