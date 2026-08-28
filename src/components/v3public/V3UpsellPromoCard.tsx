@@ -48,7 +48,7 @@ export default function V3UpsellPromoCard({
 
   const fig: UpsellFigure = getUpsellFigure(figureId);
 
-  // Studio Pro = tout inclus : on affiche « Ouvrir ».
+  // Forfait Édition = tout inclus : on affiche « Ouvrir ».
   const isIncluded = included || hasFull;
 
   const handleOpen = () => {

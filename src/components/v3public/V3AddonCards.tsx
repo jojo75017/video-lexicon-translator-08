@@ -59,9 +59,9 @@ export default function V3AddonCards({ title = 'Compléments & options', compact
             <Link
               to="/v3/forfaits"
               className="v3-btn v3-btn-outline text-[12.5px]"
-              title="Tout est inclus dans Studio Pro"
+              title="Tout est inclus dans le forfait Édition"
             >
-              <Gem className="h-4 w-4" /> Tout inclus dès Studio Pro
+              <Gem className="h-4 w-4" /> Tout inclus dès Édition
             </Link>
           )}
         </div>
@@ -74,7 +74,7 @@ export default function V3AddonCards({ title = 'Compléments & options', compact
         >
           <p className="text-sm" style={{ color: 'var(--v3-ink)' }}>
             <strong>Valeur totale des compléments : {formatPrice(V3_ADDONS_TOTAL_VALUE)}.</strong>{' '}
-            Le forfait Studio Pro (97 €/mois) les inclut tous — vous n'avez alors plus rien à acheter
+            Le forfait Édition (47 €/mois) les inclut tous — vous n'avez alors plus rien à acheter
             à l'unité.
           </p>
         </div>
