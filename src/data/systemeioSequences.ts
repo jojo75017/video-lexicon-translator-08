@@ -97,12 +97,12 @@ export const LAUNCH_BONUSES: SequenceBonus[] = [
     to: '/Guide_Cle_Gemini_API.pdf',
   },
   {
-    key: 'parrainage',
-    title: 'Le guide de parrainage',
+    key: 'structuration',
+    title: 'Le guide pour structurer un ebook',
     value: '27 €',
     description:
-      'Comment faire financer votre abonnement par vos parrainages, avec les liens et les messages déjà écrits.',
-    to: '/lead-magnets/guide-parrainage-abonnes.pdf',
+      'Comment organiser vos idées en un plan cohérent, chapitre par chapitre, pour ne jamais vous perdre en cours d\'écriture. Exemples concrets inclus.',
+    to: '/guide-comprendre-ebook.pdf',
   },
 ];
 
