@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Check, Lock } from 'lucide-react';
+import { ArrowRight, Check, Lock, ShoppingBag } from 'lucide-react';
 import AgentAvatar from '@/components/v3public/AgentAvatar';
 import V3SubscribeCheckout from '@/components/v3public/V3SubscribeCheckout';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
 import { getUpsellFigure, type UpsellFigure } from '@/data/v3UpsellFigures';
+import V3UpsellCheckout from '@/components/admin/V3UpsellCheckout';
+import type { V3UpsellPack, V3PackId } from '@/data/roadmapV3';
 
 
 export interface V3UpsellPromoCardProps {
@@ -17,6 +19,8 @@ export interface V3UpsellPromoCardProps {
   to: string;
   /** Identifiant de prix Stripe (paiement unique) — si absent, la carte renvoie vers `to`. */
   priceId?: string;
+  /** Identifiant du pack pour le tunnel d'achat unitaire dédié. */
+  packId?: V3PackId;
   badge?: string;
   /** Inclus d'office dans le forfait courant ? */
   included?: boolean;
@@ -38,6 +42,7 @@ export default function V3UpsellPromoCard({
   description,
   to,
   priceId,
+  packId,
   badge,
   included = false,
   className = '',
@@ -45,6 +50,15 @@ export default function V3UpsellPromoCard({
   const navigate = useNavigate();
   const { hasFull } = useV3Entitlement();
   const [checkout, setCheckout] = useState(false);
+  const packForCheckout: V3UpsellPack | null = packId ? {
+    id: packId,
+    title,
+    desc: description,
+    price,
+    priceId: priceId ?? `v3_pack_${packId}_once`,
+    modules: [],
+    badge,
+  } : null;
 
   const fig: UpsellFigure = getUpsellFigure(figureId);
 
@@ -57,7 +71,7 @@ export default function V3UpsellPromoCard({
       else navigate(to);
       return;
     }
-    if (priceId) {
+    if (priceId || packId) {
       setCheckout(true);
       return;
     }
@@ -110,19 +124,23 @@ export default function V3UpsellPromoCard({
         « {fig.phrase} »
       </p>
 
-      <div className="mt-4 flex items-center justify-between gap-3">
-        {isIncluded ? (
-          <span
-            className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider"
-            style={{ background: 'var(--v3-emerald-50, #e8f7ef)', color: 'var(--v3-emerald-600, #0b6e4c)' }}
-          >
-            <Check className="h-3.5 w-3.5" /> Inclus
-          </span>
-        ) : (
-          <span className="text-lg font-bold" style={{ color: fig.accent }}>
+      <div className="mt-4 flex items-end justify-between gap-3">
+        <div>
+          <span className="block text-lg font-bold" style={{ color: fig.accent }}>
             {price.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
           </span>
-        )}
+          <span className="block text-[10px] font-medium" style={{ color: 'var(--v3-muted)' }}>
+            paiement unique · sans abonnement
+          </span>
+          {isIncluded && (
+          <span
+            className="mt-1 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider"
+            style={{ background: 'var(--v3-emerald-50, #e8f7ef)', color: 'var(--v3-emerald-600, #0b6e4c)' }}
+          >
+            <Check className="h-3.5 w-3.5" /> Inclus · valeur {price.toLocaleString('fr-FR')} €
+          </span>
+          )}
+        </div>
         <button
           type="button"
           onClick={handleOpen}
@@ -132,10 +150,21 @@ export default function V3UpsellPromoCard({
           {isIncluded ? (
             <>Ouvrir <ArrowRight className="h-3.5 w-3.5" /></>
           ) : (
-            <><Lock className="h-3.5 w-3.5" /> Débloquer</>
+            <><Lock className="h-3.5 w-3.5" /> Acheter {price.toLocaleString('fr-FR')} €</>
           )}
         </button>
       </div>
+
+      {isIncluded && (priceId || packId) && (
+        <button
+          type="button"
+          onClick={() => setCheckout(true)}
+          className="mt-2 inline-flex items-center justify-center gap-1 text-[11px] font-semibold underline"
+          style={{ color: fig.accent }}
+        >
+          <ShoppingBag className="h-3 w-3" /> Acheter séparément / offrir — {price.toLocaleString('fr-FR')} €
+        </button>
+      )}
 
       {checkout && priceId && (
         <V3SubscribeCheckout
@@ -144,6 +173,9 @@ export default function V3UpsellPromoCard({
           onClose={() => setCheckout(false)}
           returnUrl={`${window.location.origin}/v3/offres/merci?session_id={CHECKOUT_SESSION_ID}&plan=${encodeURIComponent(title)}`}
         />
+      )}
+      {checkout && packForCheckout && (
+        <V3UpsellCheckout pack={packForCheckout} onClose={() => setCheckout(false)} />
       )}
     </article>
   );

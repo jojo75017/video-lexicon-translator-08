@@ -32,6 +32,8 @@ const PACKS: Record<string, { label: string; amount: number }> = {
   puzzle_book: { label: "Livres de Jeux & Énigmes — Accès à vie", amount: 2700 },
   cherche_trouve: { label: "Coloriages Cherche & Trouve — Accès à vie", amount: 2700 },
   short_stories: { label: "Histoires Courtes & Contes Illustrés — Accès à vie", amount: 2700 },
+  "market-research": { label: "Pack Étude de Marché Pro", amount: 9700 },
+  "documentation-studio": { label: "Documentation Studio AI", amount: 19700 },
 };
 
 Deno.serve(async (req) => {

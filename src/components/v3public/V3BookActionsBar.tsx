@@ -148,6 +148,8 @@ export default function V3BookActionsBar({ onLaunch }: { onLaunch: () => void })
             price={17}
             description="10 visuels Pinterest + 5 posts Instagram IA + checklist ISBN/KDP premium + template métadonnées."
             to="/v3/upsell-17"
+            priceId="v3_pack_boost_lancement_once"
+            packId="boost_lancement"
             badge="Offre découverte"
           />
         </div>
