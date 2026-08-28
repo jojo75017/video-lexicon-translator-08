@@ -27,10 +27,10 @@ export const legacyPrice = (amount: number): number =>
   Math.round(amount * (1 - V2_LEGACY_DISCOUNT) * 100) / 100;
 
 /**
- * Trois forfaits V3 (activation octobre 2026).
- * Socle identique pour les trois — dont les 10 langues et le Sommaire IA.
- * Édition ajoute la puissance professionnelle ; Studio Pro inclut
- * TOUS les compléments (aucun achat supplémentaire, jamais).
+ * Deux forfaits V3 uniquement (activation octobre 2026).
+ * Socle identique pour les deux — dont les 10 langues et le Sommaire IA.
+ * Édition ajoute la puissance professionnelle ET inclut TOUS les
+ * compléments (aucun achat supplémentaire, jamais).
  */
 export const V3_PLANS: V3Plan[] = [
   {
