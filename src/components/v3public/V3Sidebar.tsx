@@ -4,7 +4,7 @@ import {
   ChevronLeft, ChevronRight, ChevronDown,
   GraduationCap, Gem, FileText, User,
   LifeBuoy, Mail, HelpCircle, Video, ListTree, Award,
-  Rocket, Crown, Search, Target, BarChart3, Image as ImageIcon, LayoutGrid, Star, Wand2, PlusCircle, Layers, Megaphone, Puzzle, Lock, Film,
+  Rocket, Crown, Search, Target, BarChart3, Image as ImageIcon, LayoutGrid, Star, Wand2, Layers, Megaphone, Puzzle, Lock, Film,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
@@ -35,6 +35,7 @@ const NAV: NavSection[] = [
   {
     section: 'Lancement',
     items: [
+      { to: '/v3/upsells', label: 'UPSELLS — packs & compléments', icon: Sparkles, badge: '17+ packs' },
       { to: '/essai', label: '🎁 Essai gratuit — chapitre 1', icon: Rocket, end: true, badge: 'Gratuit' },
       { to: '/v3/attente', label: '👑 Salon des membres fondateurs', icon: Crown, end: true, badge: '1er mois' },
       { to: '/commander', label: '47 € à vie — jusqu’au 30 septembre', icon: Gem, end: true, badge: '30 septembre' },
@@ -135,7 +136,7 @@ const NAV: NavSection[] = [
     items: [
       { to: '/v3/compte', label: 'Mon compte & abonnement', icon: User },
       { to: '/v3/forfaits', label: 'Forfaits & tarifs', icon: Gem },
-      { to: '/v3/upsells', label: 'Compléments & options', icon: PlusCircle, badge: 'Options' },
+      
       { to: '/v3/auteur', label: 'Profil auteur', icon: User },
       { to: '/v3/parametres', label: 'Paramètres', icon: Settings },
     ],
