@@ -66,13 +66,14 @@ export default function BonusPage() {
       <section className="mx-auto max-w-5xl px-5 py-14">
         <div className="mb-8 text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#008296]">
-            Inclus sans supplément
+            Inclus avec l'accès à vie
           </p>
           <h2 className="mt-2 text-2xl font-bold text-[#232F3E] md:text-3xl">
-            {LAUNCH_BONUSES.length} bonus offerts — {BONUS_TOTAL_VALUE} de valeur
+            {LAUNCH_BONUSES.length} bonus — {BONUS_TOTAL_VALUE} de valeur
           </h2>
           <p className="mt-3 text-[#232F3E]/70">
-            Cliquez sur chaque bonus pour l'ouvrir. Les outils réservés aux abonnés s'ouvrent dans votre espace V2.
+            Ces bonus ne sont pas vendus séparément et ne sont pas distribués en dehors de cette
+            offre. Ils se débloquent dans votre espace dès que le paiement est validé.
           </p>
         </div>
 
@@ -80,7 +81,7 @@ export default function BonusPage() {
           {LAUNCH_BONUSES.map((bonus) => (
             <Card
               key={bonus.key}
-              className="flex flex-col gap-3 rounded-2xl border-[#008296]/15 bg-white p-6 shadow-sm transition hover:border-[#FF9E2D] hover:shadow-md"
+              className="flex flex-col gap-3 rounded-2xl border-[#008296]/15 bg-white p-6 shadow-sm"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-2">
@@ -97,30 +98,30 @@ export default function BonusPage() {
               <p className="text-sm leading-relaxed text-[#232F3E]/75">{bonus.description}</p>
 
               <div className="mt-auto pt-2">
-                {bonus.to.endsWith('.pdf') ? (
-                  <a
-                    href={bonus.to}
-                    download
-                    className="inline-flex items-center text-sm font-semibold text-[#008296] hover:text-[#FF9E2D]"
-                  >
-                    Télécharger le bonus
-                    <ArrowRight className="ml-1.5 h-4 w-4" />
-                  </a>
-                ) : (
-                  <Link
-                    to={bonus.to}
-                    className="inline-flex items-center text-sm font-semibold text-[#008296] hover:text-[#FF9E2D]"
-                  >
-                    {bonus.requiresAccess ? 'Ouvrir dans mon espace V2' : 'Ouvrir le bonus'}
-                    <ArrowRight className="ml-1.5 h-4 w-4" />
-                  </Link>
-                )}
+                <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#232F3E]/55">
+                  <Lock className="h-3.5 w-3.5" />
+                  Débloqué après votre accès
+                </span>
               </div>
 
             </Card>
           ))}
         </div>
+
+        <div className="mt-10 text-center">
+          <Button
+            asChild
+            size="lg"
+            className="rounded-xl bg-[#008296] text-base font-semibold text-white hover:bg-[#00707f]"
+          >
+            <a href={commanderUrl(src)}>
+              Débloquer les {LAUNCH_BONUSES.length} bonus avec l'accès à {LAUNCH_OFFER.price}
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </a>
+          </Button>
+        </div>
       </section>
+
 
       <section className="mx-auto max-w-3xl px-5">
         <Card className="rounded-2xl border-[#008296]/20 bg-white p-8 shadow-sm">
