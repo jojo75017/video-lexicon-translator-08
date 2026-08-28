@@ -13,10 +13,12 @@ import { SITE_ORIGIN, commanderUrl } from './externalLinks';
 
 export const LAUNCH_OFFER = {
   price: '47 €',
-  regularPrice: '59 €',
   deadline: '30 septembre 2026',
+  /** Ce qui remplace l'offre à vie après la deadline. */
+  afterOffer: 'abonnement mensuel sans engagement : 27 €/mois (Plume) ou 47 €/mois (Édition)',
   promise: "Accès à vie, V3 incluse d'office le 1er octobre, plus tous les bonus.",
 } as const;
+
 
 export const BONUS_PAGE_URL = `${SITE_ORIGIN}/bonus`;
 
