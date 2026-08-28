@@ -26,8 +26,6 @@ export default function BonusPage() {
     if (desc) desc.setAttribute('content', content);
   }, []);
 
-  const isFile = (to: string) => to.endsWith('.pdf');
-
   return (
     <main className="min-h-screen bg-[#FAFAFA] pb-20">
       <section className="border-b border-[#008296]/20 bg-gradient-to-b from-white to-[#F3FAFA]">
@@ -74,7 +72,7 @@ export default function BonusPage() {
             {LAUNCH_BONUSES.length} bonus offerts — {BONUS_TOTAL_VALUE} de valeur
           </h2>
           <p className="mt-3 text-[#232F3E]/70">
-            Chaque bonus est livré dans l'application, immédiatement après votre accès.
+            Cliquez sur chaque bonus pour l'ouvrir. Les outils réservés aux abonnés s'ouvrent dans votre espace V2.
           </p>
         </div>
 
@@ -99,18 +97,13 @@ export default function BonusPage() {
               <p className="text-sm leading-relaxed text-[#232F3E]/75">{bonus.description}</p>
 
               <div className="mt-auto pt-2">
-                {bonus.requiresAccess ? (
-                  <span className="inline-flex items-center text-sm font-semibold text-[#232F3E]/55">
-                    Livré dans votre espace dès votre accès
-                  </span>
-                ) : isFile(bonus.to) ? (
+                {bonus.to.endsWith('.pdf') ? (
                   <a
                     href={bonus.to}
-                    target="_blank"
-                    rel="noreferrer"
+                    download
                     className="inline-flex items-center text-sm font-semibold text-[#008296] hover:text-[#FF9E2D]"
                   >
-                    Ouvrir le bonus
+                    Télécharger le bonus
                     <ArrowRight className="ml-1.5 h-4 w-4" />
                   </a>
                 ) : (
@@ -118,7 +111,7 @@ export default function BonusPage() {
                     to={bonus.to}
                     className="inline-flex items-center text-sm font-semibold text-[#008296] hover:text-[#FF9E2D]"
                   >
-                    Ouvrir le bonus
+                    {bonus.requiresAccess ? 'Ouvrir dans mon espace V2' : 'Ouvrir le bonus'}
                     <ArrowRight className="ml-1.5 h-4 w-4" />
                   </Link>
                 )}
