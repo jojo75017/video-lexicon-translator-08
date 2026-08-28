@@ -24,9 +24,10 @@ const FAQ: Array<{ q: string; a: string }> = [
     a: "Un accès à vie à EbookStudio Pro et à la V3 : génération complète des livres (plan, chapitres, relecture), exports Word et PDF prêts pour Amazon KDP, Cover Studio, livres illustrés enfants, fiche KDP, livres audio, guides et forum. Aucun abonnement, aucune date d'expiration.",
   },
   {
-    q: "Puis-je payer avec PayPal ou en plusieurs fois ?",
-    a: "Oui. Sur la page de paiement, vous choisissez la carte bancaire ou PayPal. Les formules 2 × 25 € et 3 × 18 € sont disponibles, et l'accès s'ouvre dès la première échéance.",
+    q: "Puis-je payer avec PayPal ?",
+    a: "Oui. Sur la page de paiement, vous choisissez la carte bancaire ou PayPal. C'est un paiement unique de 47 €, sans abonnement et sans échéances : l'accès s'ouvre immédiatement.",
   },
+
   {
     q: "Faut-il savoir écrire ou être technique ?",
     a: "Non. Vous indiquez le sujet, le public et le ton : l'IA propose le sommaire, rédige chapitre par chapitre, relit le texte et prépare les fichiers. Vous gardez la main pour valider ou modifier à chaque étape.",
@@ -55,13 +56,9 @@ const FAQ: Array<{ q: string; a: string }> = [
 
 const BONUS_TOTAL = V3_BONUSES_TOTAL_VALUE;
 
-type PlanId = "v2_1x" | "v2_2x" | "v2_3x";
+/** Paiement unique uniquement : plus de 2× ni 3×. */
+const PLAN_ID = "v2_1x" as const;
 
-const PLANS: Array<{ id: PlanId; label: string; sub: string; badge?: string }> = [
-  { id: "v2_1x", label: "47 € en une fois", sub: "Le plus économique · accès immédiat", badge: "Recommandé" },
-  { id: "v2_2x", label: "2 × 25 €", sub: "Prélevé sur 2 mois (50 € au total)" },
-  { id: "v2_3x", label: "3 × 18 €", sub: "Prélevé sur 3 mois (54 € au total)" },
-];
 
 const INCLUDED = [
   "Génération complète de vos livres (plan, chapitres, relecture 4 passes)",
@@ -118,12 +115,11 @@ export default function V3CommanderPage() {
   const ref = params.get("ref") || params.get("aff") || undefined;
 
   const [email, setEmail] = useState(() => (params.get("email") || "").trim().toLowerCase());
-  const [plan, setPlan] = useState<PlanId>("v2_1x");
+  const plan = PLAN_ID;
   const [loading, setLoading] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
 
-  const selected = useMemo(() => PLANS.find((p) => p.id === plan)!, [plan]);
 
   // Avis réels et approuvés uniquement : aucun témoignage fabriqué.
   useEffect(() => {
@@ -386,37 +382,19 @@ export default function V3CommanderPage() {
                   C'est avec cet email que votre accès sera créé.
                 </p>
 
-                <div className="mt-5 space-y-2">
-                  {PLANS.map((opt) => {
-                    const active = plan === opt.id;
-                    return (
-                      <button
-                        key={opt.id}
-                        type="button"
-                        onClick={() => setPlan(opt.id)}
-                        className="flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition-all"
-                        style={{
-                          borderColor: active ? "var(--ds-gold)" : "var(--ds-border)",
-                          background: active ? "rgba(212,175,55,0.10)" : "transparent",
-                        }}
-                      >
-                        <span>
-                          <span className="block text-sm font-bold text-[var(--ds-text)]">{opt.label}</span>
-                          <span className="block text-[11px] text-[var(--ds-text-muted)]">{opt.sub}</span>
-                        </span>
-                        {opt.badge && !active && (
-                          <span
-                            className="rounded-full px-2 py-0.5 text-[10px] font-bold"
-                            style={{ background: "var(--ds-orange-soft)", color: "var(--ds-orange)" }}
-                          >
-                            {opt.badge}
-                          </span>
-                        )}
-                        {active && <Check className="h-4 w-4" style={{ color: "var(--ds-gold)" }} />}
-                      </button>
-                    );
-                  })}
+                <div
+                  className="mt-5 flex items-center justify-between rounded-xl border px-4 py-3"
+                  style={{ borderColor: "var(--ds-gold)", background: "rgba(212,175,55,0.10)" }}
+                >
+                  <span>
+                    <span className="block text-sm font-bold text-[var(--ds-text)]">47 € en une fois</span>
+                    <span className="block text-[11px] text-[var(--ds-text-muted)]">
+                      Paiement unique · accès immédiat et à vie
+                    </span>
+                  </span>
+                  <Check className="h-4 w-4" style={{ color: "var(--ds-gold)" }} />
                 </div>
+
 
                 {/* Réassurance juste au-dessus du bouton : c'est là qu'on hésite */}
                 <ul
@@ -429,7 +407,7 @@ export default function V3CommanderPage() {
                   </li>
                   <li className="flex items-center gap-2">
                     <CreditCard className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--ds-gold)" }} />
-                    <span><strong className="text-[var(--ds-text)]">PayPal ou carte bancaire</strong>, en 1, 2 ou 3 fois.</span>
+                    <span><strong className="text-[var(--ds-text)]">PayPal ou carte bancaire</strong>, en un seul paiement.</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Lock className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--ds-gold)" }} />
@@ -447,7 +425,7 @@ export default function V3CommanderPage() {
                   {loading ? (
                     <><Loader2 className="h-4 w-4 animate-spin" /> Préparation du paiement…</>
                   ) : (
-                    <>Payer {selected.label.replace("en une fois", "").trim()} <ArrowRight className="h-4 w-4" /></>
+                    <>Payer 47 € <ArrowRight className="h-4 w-4" /></>
                   )}
                 </button>
 
@@ -455,8 +433,9 @@ export default function V3CommanderPage() {
                   <CreditCard className="h-3.5 w-3.5" /> Carte bancaire & PayPal — paiement chiffré, sur cette page.
                 </div>
                 <p className="mt-2 text-center text-[11px] text-[var(--ds-text-muted)]">
-                  En plusieurs fois, l'accès s'ouvre dès la 1re échéance.
+                  Paiement unique : votre accès s'ouvre immédiatement après le paiement.
                 </p>
+
                 <p className="mt-2 text-center text-[11px] text-[var(--ds-text-muted)]">
                   Un doute avant de payer ? Écrivez-moi directement :{" "}
                   <a href="mailto:boubetgeorges@gmail.com" className="underline" style={{ color: "var(--ds-gold)" }}>

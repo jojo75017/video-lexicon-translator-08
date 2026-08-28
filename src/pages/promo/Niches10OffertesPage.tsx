@@ -233,7 +233,7 @@ const Niches10OffertesPage: React.FC = () => {
             </Button>
           </Link>
           <p className="mt-3 flex items-center justify-center gap-2 text-xs text-white/70">
-            <ShieldCheck className="w-3.5 h-3.5" /> Garantie 30 jours · paiement en 1×, 2× ou 3× ·
+            <ShieldCheck className="w-3.5 h-3.5" /> Garantie 30 jours · paiement unique ·
             PayPal accepté
           </p>
         </div>
