@@ -39,6 +39,8 @@ export interface V3UpsellPack {
   price: number;
   /** Identifiant stable utilisé par le paiement à l'unité. */
   priceId: string;
+  /** Route de l'outil débloqué par ce pack (destination réelle du bouton). */
+  to: string;
   /** IDs des modules inclus dans ce pack. */
   modules: string[];
   /** Facilités de paiement affichées (optionnel). */
@@ -54,8 +56,9 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
     id: 'monetisation',
     title: 'Pack Revenus & Scaling',
     desc: 'Maximise tes gains sur chaque vente : auto-pricing intelligent, royalties live, simulateur multi-prix, bundles, KDP Select, lead magnet, tunnel back-catalogue, détecteur KU et redevances print.',
-    price: 99,
+    price: 47,
     priceId: 'v3_pack_monetisation_once',
+    to: '/v3/outils/royalties',
     modules: [
       'auto-pricing', 'royalties-dashboard', 'royalties-simulator', 'bundles-boxsets',
       'kdp-select-planner', 'lead-magnet', 'back-catalog-funnel', 'ku-niche-detector',
@@ -66,8 +69,9 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
     id: 'distribution',
     title: 'Pack Distribution Large (Wide)',
     desc: 'Sors de l\'exclusivité Amazon et diffuse comme un éditeur : assistant multi-plateformes (Kobo, Apple Books, Google Play, Fnac), dépôt légal & ISBN, export EPUB normé et tableau de bord catalogue.',
-    price: 97,
+    price: 47,
     priceId: 'v3_pack_distribution_once',
+    to: '/v3/donnees-kdp',
     modules: [
       'wide-distribution', 'legal-deposit-isbn', 'epub-normalizer', 'catalog-dashboard',
     ],
@@ -76,8 +80,9 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
     id: 'social',
     title: 'Pack Trafic Social & Viralité',
     desc: 'Une machine à trafic gratuit : Pinterest auto-pins, hooks viraux TikTok/Reels, calendrier éditorial 30 jours, visuels citations, book trailer IA et kit influenceurs pour recycler ton livre partout.',
-    price: 87,
+    price: 47,
     priceId: 'v3_pack_social_once',
+    to: '/v3/posts',
     modules: [
       'pinterest-pins', 'tiktok-hooks', 'social-calendar-30', 'quote-visuals',
       'book-trailer', 'influencer-kit',
@@ -87,8 +92,9 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
     id: 'editorial',
     title: 'Pack Qualité Éditoriale Pro',
     desc: 'Le travail d\'une vraie maison d\'édition AVANT publication : comité de lecture IA, édition structurelle, copy-editing & ligne éditoriale, charte de collection et label qualité certifiant.',
-    price: 67,
+    price: 47,
     priceId: 'v3_pack_editorial_once',
+    to: '/v3/corriger',
     modules: [
       'reading-committee', 'developmental-edit', 'copy-editing-line',
       'collection-charter', 'quality-label',
@@ -98,8 +104,9 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
     id: 'market-research',
     title: 'Pack Étude de Marché Pro',
     desc: 'La data façon BookBeam, adaptée au marché francophone : recherche de produits Amazon, estimateur de ventes (BSR → revenus), recherche & suivi de mots-clés, reverse ASIN, analyse de niche, explorateur de catégories/BSR, analyse d\'avis concurrents, suivi de concurrents, mots-clés Amazon Ads et vérification de marques déposées. Données Amazon réelles + estimations IA clairement étiquetées.',
-    price: 97,
+    price: 47,
     priceId: 'v3_pack_market_research_once',
+    to: '/v3/outils/espion-concurrents',
     modules: [
       'amazon-book-database', 'sales-estimator-bsr', 'keyword-explorer-amazon',
       'keyword-rank-tracker', 'reverse-asin', 'niche-scorecard',
@@ -112,8 +119,9 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
     id: 'promotion',
     title: 'Pack Promotion Éditeur',
     desc: 'Les leviers promo réservés aux éditeurs : service de presse (SP), argumentaire libraires & salons, cession de droits étrangers et stratégie de précommandes.',
-    price: 97,
+    price: 27,
     priceId: 'v3_pack_promotion_once',
+    to: '/v3/acquisition',
     alacarte: true,
     modules: [
       'press-service', 'booksellers-fairs', 'foreign-rights', 'preorders-strategy',
@@ -123,8 +131,9 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
     id: 'transcription',
     title: 'Transcription Audio / Vidéo → Texte',
     desc: 'Transforme n\'importe quel podcast, vidéo YouTube, interview ou note vocale en texte éditable, prêt à devenir un chapitre ou un livre entier. Transcription IA ultra-précise dans 99 langues, directement dans l\'interface.',
-    price: 67,
+    price: 27,
     priceId: 'v3_pack_transcription_once',
+    to: '/v3/outils',
     badge: 'Opportunité',
     alacarte: true,
     modules: ['audio-video-transcription'],
@@ -133,8 +142,9 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
     id: 'documentation-studio',
     title: 'Documentation Studio AI',
     desc: 'La 1re plateforme IA qui produit TOUTE la documentation d\'un produit numérique (SaaS, plugin, app, outil IA, API…) : Brand Book, manuel utilisateur, doc technique, FAQ, centre d\'aide + kit marketing (landing, one page, Product Hunt, AppSumo, kits média/affiliés) et communication (scripts vidéo, posts LinkedIn/X/Facebook). Exports Word, PDF Premium, HTML, Markdown, PowerPoint.',
-    price: 197,
+    price: 47,
     priceId: 'v3_pack_documentation_studio_once',
+    to: '/v3/hub?tab=documentation',
     badge: 'Nouveau',
     alacarte: true,
     modules: ['documentation-studio'],
@@ -145,6 +155,7 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
     desc: '10 visuels Pinterest prêts à poster + 5 posts Instagram générés par IA + checklist ISBN/KDP premium + template métadonnées optimisées. Le kit minimal pour lancer ton livre avec un vrai coup d\'accélérateur.',
     price: 17,
     priceId: 'v3_pack_boost_lancement_once',
+    to: '/v3/upsell-17',
     badge: 'Offre découverte',
     alacarte: true,
     modules: ['boost-lancement'],
@@ -156,6 +167,7 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
     desc: 'Générateur complet de livres d\'énigmes et d\'activités KDP : énoncés, indices progressifs, solutions, exports PDF/DOCX prêts à publier.',
     price: 27,
     priceId: 'v3_pack_puzzle_book_once',
+    to: '/v3/livres/jeux-enigmes',
     badge: 'Nouveau',
     alacarte: true,
     modules: ['puzzle-book'],
@@ -166,6 +178,7 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
     desc: 'Générateur de concepts Cherche & Trouve : scènes thématiques, listes d\'objets cachés (5 à 20) et prompts image optimisés en anglais pour des pages de coloriage line art noir & blanc prêtes pour KDP.',
     price: 27,
     priceId: 'v3_pack_cherche_trouve_once',
+    to: '/v3/livres/cherche-trouve',
     badge: 'Nouveau',
     alacarte: true,
     modules: ['cherche-trouve'],
@@ -176,6 +189,7 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
     desc: 'Générateur d\'histoires courtes et de contes : textes en français, synopsis visuels, prompts d\'illustration optimisés et exports PDF/DOCX prêts pour KDP.',
     price: 27,
     priceId: 'v3_pack_short_stories_once',
+    to: '/v3/livres/histoires-illustrees',
     badge: 'Nouveau',
     alacarte: true,
     modules: ['short-stories'],
