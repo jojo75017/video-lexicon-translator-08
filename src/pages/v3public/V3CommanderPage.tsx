@@ -24,9 +24,10 @@ const FAQ: Array<{ q: string; a: string }> = [
     a: "Un accès à vie à EbookStudio Pro et à la V3 : génération complète des livres (plan, chapitres, relecture), exports Word et PDF prêts pour Amazon KDP, Cover Studio, livres illustrés enfants, fiche KDP, livres audio, guides et forum. Aucun abonnement, aucune date d'expiration.",
   },
   {
-    q: "Puis-je payer avec PayPal ou en plusieurs fois ?",
-    a: "Oui. Sur la page de paiement, vous choisissez la carte bancaire ou PayPal. Les formules 2 × 25 € et 3 × 18 € sont disponibles, et l'accès s'ouvre dès la première échéance.",
+    q: "Puis-je payer avec PayPal ?",
+    a: "Oui. Sur la page de paiement, vous choisissez la carte bancaire ou PayPal. C'est un paiement unique de 47 €, sans abonnement et sans échéances : l'accès s'ouvre immédiatement.",
   },
+
   {
     q: "Faut-il savoir écrire ou être technique ?",
     a: "Non. Vous indiquez le sujet, le public et le ton : l'IA propose le sommaire, rédige chapitre par chapitre, relit le texte et prépare les fichiers. Vous gardez la main pour valider ou modifier à chaque étape.",
