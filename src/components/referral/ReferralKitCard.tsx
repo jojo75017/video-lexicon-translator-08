@@ -67,8 +67,11 @@ const ReferralKitCard = () => {
         <div>
           <h2 className="text-lg font-bold">Votre kit de parrainage</h2>
           <p className="text-sm text-muted-foreground">
-            30 % de commission sur chaque vente, soit <strong>{commission} €</strong> pour l'offre à
-            vie à {OFFER_PRICE} €. Votre lien suit automatiquement les personnes que vous envoyez.
+            <strong>15 %</strong> sur l'accès à vie ({LIFETIME_PRICE} €), soit{' '}
+            <strong>{lifetimeCommission} €</strong> par vente. Sur les abonnements V3,{' '}
+            <strong>20 %</strong> : {plumeCommission} €/mois (Plume {PLUME_PRICE} €) ou{' '}
+            {editionCommission} €/mois (Édition {EDITION_PRICE} €). Votre lien suit automatiquement
+            les personnes que vous envoyez.
           </p>
         </div>
       </div>
