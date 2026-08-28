@@ -26,6 +26,7 @@ import V3CommercialLicensePanel from '@/components/v3public/V3CommercialLicenseP
 import V3ClosingRecallPanel from '@/components/v3public/V3ClosingRecallPanel';
 import V3AnchorNav from '@/components/v3public/V3AnchorNav';
 import V3WhatIsPanel from '@/components/v3public/V3WhatIsPanel';
+import V3WhatsNewPanel from '@/components/v3public/V3WhatsNewPanel';
 import V3HowItWorksSteps from '@/components/v3public/V3HowItWorksSteps';
 import V3BenefitsPanel from '@/components/v3public/V3BenefitsPanel';
 import V3DifferenceTable from '@/components/v3public/V3DifferenceTable';
@@ -68,7 +69,10 @@ export default function V3HomePage() {
       {/* BANDEAU D'ACCROCHE — premier module */}
       <V3HeroBanner />
 
-      {/* MOTEUR MULTI-MODÈLES — deuxième module, juste sous l'accroche */}
+      {/* CE QUI A CHANGÉ — Sommaire IA + 25 agents en vedette */}
+      <V3WhatsNewPanel />
+
+      {/* MOTEUR MULTI-MODÈLES — juste sous les nouveautés */}
       <V3EngineStrip />
       <V3EngineGrid />
 
