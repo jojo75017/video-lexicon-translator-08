@@ -113,8 +113,15 @@ Deno.serve(async (req) => {
         });
       }
 
-      // Determine sale amount from request body (default 67€ Pro Lifetime)
-      const { sale_amount: saleAmount = 67 } = await req.json().catch(() => ({ sale_amount: 67 }));
+      // Determine sale amount from request body (default 47€ accès à vie)
+      const body = await req.json().catch(() => ({}));
+      const saleAmount = typeof body.sale_amount === "number" ? body.sale_amount : 47;
+      const recurring = body.recurring === true;
+
+      // Taux de commission :
+      //  - accès à vie (paiement unique) : 15 %
+      //  - abonnements V3 (Plume 27 € / Édition 47 €) : 20 %
+      const rate = recurring ? 0.20 : 0.15;
 
       // Get referrer's current converted count to determine commission tier
       const { data: referral } = await supabase
@@ -126,21 +133,7 @@ Deno.serve(async (req) => {
 
       let commission = 0;
       if (referral) {
-        const { count } = await supabase
-          .from("referrals")
-          .select("id", { count: "exact", head: true })
-          .eq("referrer_id", referral.referrer_id)
-          .eq("status", "converted");
-
-        const convertedCount = count ?? 0;
-
-        if (saleAmount >= 97) {
-          // Pro Lifetime: 30€ flat commission
-          commission = 30;
-        } else {
-          // Fallback: 30€ commission
-          commission = 30;
-        }
+        commission = Math.round(saleAmount * rate * 100) / 100;
       }
 
       const { error } = await supabase
