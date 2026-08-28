@@ -1,4 +1,4 @@
-export type V3PlanId = "plume" | "edition" | "studio";
+export type V3PlanId = "plume" | "edition";
 export type V3BillingInterval = "month" | "year";
 
 export interface V3Plan {
