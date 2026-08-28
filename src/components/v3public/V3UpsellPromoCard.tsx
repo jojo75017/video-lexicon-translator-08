@@ -166,7 +166,7 @@ export default function V3UpsellPromoCard({
         </button>
       )}
 
-      {checkout && priceId && (
+      {checkout && priceId && !packId && (
         <V3SubscribeCheckout
           priceId={priceId}
           planName={title}
