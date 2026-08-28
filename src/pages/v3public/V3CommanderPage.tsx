@@ -411,7 +411,7 @@ export default function V3CommanderPage() {
                   </li>
                   <li className="flex items-center gap-2">
                     <CreditCard className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--ds-gold)" }} />
-                    <span><strong className="text-[var(--ds-text)]">PayPal ou carte bancaire</strong>, en 1, 2 ou 3 fois.</span>
+                    <span><strong className="text-[var(--ds-text)]">PayPal ou carte bancaire</strong>, en un seul paiement.</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Lock className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--ds-gold)" }} />
