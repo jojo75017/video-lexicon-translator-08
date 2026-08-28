@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Gem } from 'lucide-react';
 import {
-  V3_UPSELL_PACKS,
   V3_ESSENTIAL_PACKS,
   V3_ALACARTE_PACKS,
   V3_FULL_PACK,
