@@ -50,6 +50,15 @@ serve(async (req) => {
       );
     }
 
+    if (NOISE_PATTERNS.some((p) => String(error_message).includes(p))) {
+      return new Response(JSON.stringify({ success: true, ignored: "noise" }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+
+
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
