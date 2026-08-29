@@ -19,13 +19,21 @@ interface LogErrorParams {
 const recentErrors = new Map<string, number>();
 const DEDUPE_WINDOW_MS = 30_000;
 
-// Bruit connu sans impact réel : extensions wallet, erreurs cross-origin, etc.
+// Bruit connu sans impact réel : extensions wallet, erreurs cross-origin,
+// scanners d'emails (Outlook Safe Links) et extensions qui injectent
+// « simulateEvent » / « Object Not Found Matching Id » dans la page.
 const NOISE_PATTERNS = [
   "Failed to connect to MetaMask",
   "MetaMask",
   "Script error.",
   "ResizeObserver loop",
+  "simulateEvent",
+  "Object Not Found Matching Id",
+  "Objet introuvable correspondant",
+  "getPageStructure",
+  "Non-Error promise rejection captured",
 ];
+
 
 export async function logError(params: LogErrorParams): Promise<void> {
   try {
