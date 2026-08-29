@@ -10,7 +10,20 @@ const corsHeaders = {
 };
 
 const ADMIN_EMAIL = "boubetgeorges@gmail.com";
-const ALERT_THRESHOLD_PER_HOUR = 5;
+const ALERT_THRESHOLD_PER_HOUR = 15;
+
+// Bruit connu (extensions navigateur, scanners d'emails type Outlook Safe Links).
+// Ces messages ne viennent pas de l'application : on ne les enregistre pas.
+const NOISE_PATTERNS = [
+  "simulateEvent",
+  "Object Not Found Matching Id",
+  "Objet introuvable correspondant",
+  "MetaMask",
+  "Script error.",
+  "ResizeObserver loop",
+  "getPageStructure",
+];
+
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
