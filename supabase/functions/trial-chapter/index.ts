@@ -91,7 +91,187 @@ Deno.serve(async (req) => {
     const action = String(body?.action ?? "generate");
     const supabase = admin();
 
+    const clientIp =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("x-real-ip") ||
+      "unknown";
+
+    const trialOpen = async () => {
+      const { data: setting } = await supabase
+        .from("launch_settings")
+        .select("value")
+        .eq("key", "free_trial_open")
+        .maybeSingle();
+      return !(setting && (setting.value as any)?.enabled === false);
+    };
+
+    // ----------------------------------------------------------------- outline
+    // Étape 1 (publique, rapide) : titre + sous-titre + sommaire complet.
+    if (action === "outline") {
+      if (!(await trialOpen())) return json({ error: "L'essai gratuit est momentanément fermé." }, 403);
+
+      const idea = String(body?.idea ?? "").trim();
+      if (idea.length < 10) return json({ error: "Décrivez votre idée en une phrase au minimum." }, 400);
+      if (idea.length > 2000) return json({ error: "Idée trop longue (2 000 caractères max)." }, 400);
+      if (rateLimited(clientIp)) {
+        return json({ error: "Vous avez déjà lancé 3 essais dans l'heure. Revenez plus tard." }, 429);
+      }
+
+      const audience = String(body?.audience ?? "").trim().slice(0, 300);
+      const tone = String(body?.tone ?? "").trim().slice(0, 200);
+      const langCode = LANGUAGES[String(body?.language ?? "fr")] ? String(body.language) : "fr";
+      const langName = LANGUAGES[langCode];
+
+      const raw = await callAI([
+        {
+          role: "system",
+          content:
+            `Tu es un directeur éditorial professionnel. Tu écris intégralement en ${langName}, ` +
+            `sans un seul mot de latin, sans pseudo-langue, sans mot inventé ni mot étranger décoratif. ` +
+            `Réponds uniquement par un objet JSON valide, sans texte autour.`,
+        },
+        {
+          role: "user",
+          content:
+            `Idée du livre : ${idea}\n` +
+            (audience ? `Public visé : ${audience}\n` : "") +
+            (tone ? `Ton souhaité : ${tone}\n` : "") +
+            `\nProduis un JSON avec exactement ces clés :\n` +
+            `{ "title": "titre commercial court", "subtitle": "sous-titre qui explique la promesse", ` +
+            `"outline": [{"title":"Chapitre 1 — …","summary":"2 phrases"}, … exactement 12 chapitres] }`,
+        },
+      ], 2500);
+
+      const parsed = extractJson(raw);
+      const outline = Array.isArray(parsed.outline)
+        ? parsed.outline.slice(0, 20).map((c: any, i: number) => ({
+            title: String(c?.title ?? `Chapitre ${i + 1}`).slice(0, 200),
+            summary: String(c?.summary ?? "").slice(0, 600),
+          }))
+        : [];
+      if (outline.length < 3) throw new Error("Sommaire incomplet, relancez la génération.");
+
+      const { data: inserted, error } = await supabase
+        .from("trial_chapters")
+        .insert({
+          book_idea: idea,
+          audience: audience || null,
+          tone: tone || null,
+          language: langCode,
+          proposed_title: String(parsed.title ?? "").slice(0, 300) || null,
+          proposed_subtitle: String(parsed.subtitle ?? "").slice(0, 400) || null,
+          outline,
+          status: "outline",
+          ip: clientIp,
+          user_agent: req.headers.get("user-agent")?.slice(0, 400) ?? null,
+          utm_source: String(body?.utmSource ?? "").slice(0, 120) || null,
+          utm_campaign: String(body?.utmCampaign ?? "").slice(0, 120) || null,
+        })
+        .select("id")
+        .single();
+      if (error) throw error;
+
+      return json({
+        trialId: inserted.id,
+        title: parsed.title ?? "",
+        subtitle: parsed.subtitle ?? "",
+        outline,
+      });
+    }
+
+    // ----------------------------------------------------------------- chapter
+    // Étape 2 : chapitre 1 écrit, mais seul l'extrait libre revient au client.
+    if (action === "chapter") {
+      const trialId = String(body?.trialId ?? "");
+      if (!/^[0-9a-f-]{36}$/.test(trialId)) return json({ error: "Essai introuvable." }, 400);
+
+      const { data: trial, error: readErr } = await supabase
+        .from("trial_chapters")
+        .select("id, book_idea, audience, tone, language, proposed_title, outline, chapter_text, chapter_title, word_count")
+        .eq("id", trialId)
+        .maybeSingle();
+      if (readErr) throw readErr;
+      if (!trial) return json({ error: "Essai introuvable." }, 404);
+
+      const excerptOf = (text: string) => {
+        const parts = text.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+        return { excerpt: parts.slice(0, 2), totalParagraphs: parts.length };
+      };
+
+      if (trial.chapter_text && String(trial.chapter_text).length > 400) {
+        const { excerpt, totalParagraphs } = excerptOf(String(trial.chapter_text));
+        return json({
+          chapterTitle: trial.chapter_title ?? "",
+          excerpt,
+          totalParagraphs,
+          wordCount: trial.word_count ?? 0,
+        });
+      }
+
+      const langCode = LANGUAGES[String(trial.language ?? "fr")] ? String(trial.language) : "fr";
+      const langName = LANGUAGES[langCode];
+      const firstChapter = (trial.outline as any[])?.[0];
+
+      const raw = await callAI([
+        {
+          role: "system",
+          content:
+            `Tu es un auteur professionnel publié. Tu écris intégralement en ${langName}, ` +
+            `sans un seul mot de latin, sans pseudo-langue, sans mot inventé ni mot étranger décoratif. ` +
+            `Style d'une vraie maison d'édition : phrases complètes, ponctuation soignée, ` +
+            `aucune liste à puces, aucun titre en markdown. Chaque paragraphe se termine par ` +
+            `une phrase complète suivie d'un point.`,
+        },
+        {
+          role: "user",
+          content:
+            `Livre : ${trial.proposed_title ?? ""}\n` +
+            `Idée : ${trial.book_idea}\n` +
+            (trial.audience ? `Public : ${trial.audience}\n` : "") +
+            (trial.tone ? `Ton : ${trial.tone}\n` : "") +
+            (firstChapter
+              ? `Chapitre 1 prévu : ${firstChapter.title} — ${firstChapter.summary ?? ""}\n`
+              : "") +
+            `\nÉcris le chapitre 1 complet, entre 1200 et 1800 mots.\n` +
+            `Format de réponse, en texte brut et rien d'autre :\n` +
+            `TITRE: le titre du chapitre 1\n` +
+            `(une ligne vide, puis le texte intégral du chapitre, paragraphes séparés par une ligne vide)\n` +
+            `Ouverture forte, développement, fin de chapitre qui donne envie de lire le suivant.`,
+        },
+      ], 8000);
+
+      const cleanedRaw = raw.replace(/```[a-z]*|```/g, "").trim();
+      const titleMatch = cleanedRaw.match(/^\s*TITRE\s*:\s*(.+)$/im);
+      const chapterTitle = (titleMatch?.[1] ?? firstChapter?.title ?? "Chapitre 1").trim();
+      const chapter = cleanedRaw
+        .replace(/^\s*TITRE\s*:\s*.+$/im, "")
+        .trim();
+      if (chapter.length < 400) throw new Error("Chapitre incomplet, relancez la génération.");
+      const wordCount = chapter.split(/\s+/).filter(Boolean).length;
+
+
+      await supabase
+        .from("trial_chapters")
+        .update({
+          chapter_title: chapterTitle.slice(0, 300) || null,
+          chapter_text: chapter,
+          word_count: wordCount,
+          status: "generated",
+        })
+        .eq("id", trialId);
+
+      const { excerpt, totalParagraphs } = excerptOf(chapter);
+      return json({
+        chapterTitle,
+
+        excerpt,
+        totalParagraphs,
+        wordCount,
+      });
+    }
+
     // ---------------------------------------------------------------- generate
+
     if (action === "generate") {
       const ip =
         req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
@@ -250,8 +430,9 @@ Deno.serve(async (req) => {
 <p style="margin:0 0 24px;color:#555;font:14px Arial,sans-serif;">${trial.chapter_title ? String(trial.chapter_title).replace(/</g, "&lt;") : "Chapitre 1"} — ${trial.word_count} mots, écrit pour vous.</p>
 ${paragraphs}
 <table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" style="margin:28px auto;">
-<tr><td bgcolor="#064e3b" style="border-radius:8px;"><a href="${SITE}/essai/inscription?trial=${trialId}" style="display:inline-block;padding:15px 30px;font:bold 16px Arial,sans-serif;color:#ffffff;text-decoration:none;">Écrire la suite de mon livre</a></td></tr></table>
-<p style="margin:0 0 12px;">Le premier mois est offert, et votre accès complet s'ouvre le 1er octobre 2026.</p>
+<tr><td bgcolor="#064e3b" style="border-radius:8px;"><a href="${SITE}/commander?src=essai-email" style="display:inline-block;padding:15px 30px;font:bold 16px Arial,sans-serif;color:#ffffff;text-decoration:none;">Écrire la suite de mon livre</a></td></tr></table>
+<p style="margin:0 0 12px;">L'accès à vie est à 47 € jusqu'au 30 septembre 2026 : paiement unique, aucun abonnement.</p>
+
 <p style="margin:24px 0 0;">Bien à vous,<br><strong>Georges Boubet</strong><br>EbookStudio — ${DIRECT_EMAIL}</p>
 </td></tr></table></td></tr></table></body></html>`;
 
@@ -270,7 +451,13 @@ ${paragraphs}
         if (!res.ok) console.error("Resend error", await res.text());
       }
 
-      return json({ ok: true, emailSent });
+      return json({
+        ok: true,
+        emailSent,
+        chapterTitle: trial.chapter_title ?? "",
+        chapter: trial.chapter_text ?? "",
+        wordCount: trial.word_count ?? 0,
+      });
     }
 
     return json({ error: "Action inconnue" }, 400);

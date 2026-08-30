@@ -4,8 +4,9 @@
  * Toutes les anciennes campagnes (sales, canonical, Brevo, séquences multiples)
  * ont été supprimées. Il n'existe plus qu'une seule séquence, ici.
  *
- * Parcours : email → page cadeau /cadeau (5 niches visibles) → inscription
- * (les bonus se débloquent immédiatement) → bouton Commander (47 € à vie).
+ * Parcours : email → page d'essai /essai (idée → titre, sommaire, début du
+ * chapitre 1) → mur email (chapitre complet) → bouton Commander (47 € à vie).
+ * Les 5 niches restent accessibles en second lien depuis /essai et /bonus.
  *
  * Règles de rédaction appliquées à chaque email :
  * - un seul lien, répété 2 à 3 fois (texte + bouton) ;
@@ -29,6 +30,10 @@ export const CADEAU_PAGE_URL = `${SITE_ORIGIN}/cadeau`;
 export const BONUS_PAGE_URL = `${SITE_ORIGIN}/bonus`;
 
 export const cadeauUrl = (src: string) => `${CADEAU_PAGE_URL}?src=${src}`;
+
+/** Page d'essai : c'est le seul lien des trois premiers emails. */
+export const ESSAI_PAGE_URL = `${SITE_ORIGIN}/essai`;
+export const essaiUrl = (src: string) => `${ESSAI_PAGE_URL}?src=${src}`;
 export const bonusUrl = (src: string) => `${BONUS_PAGE_URL}?src=${src}`;
 
 /* ------------------------------ LES BONUS ------------------------------ */
@@ -120,24 +125,28 @@ export const CAMPAGNE_EMAILS: CampagneEmail[] = [
     id: 'cadeau-1',
     template: 'cadeau-1',
     delayDays: 0,
-    subject: 'Vos 5 niches sont prêtes (ouvrez-les ici)',
-    preheader: '5 niches Amazon avec la demande réelle et le mot-clé exact. Rien à télécharger.',
-    goal: 'Voir ses 5 niches sur la page',
-    ctaLabel: 'Voir mes 5 niches',
-    ctaUrl: cadeauUrl('cadeau-1'),
+    subject: 'Donnez votre idée, je vous rends le chapitre 1',
+    preheader: 'Une phrase suffit. Vous lisez le début de votre livre dans deux minutes.',
+    goal: "Générer son livre sur la page d'essai",
+    ctaLabel: 'Voir mon livre commencer',
+    ctaUrl: essaiUrl('cadeau-1'),
     body: `Bonjour,
 
-Vos 5 niches Amazon sont affichées sur cette page, en clair, sans fichier à télécharger :
+Je vous propose quelque chose de très simple : écrivez votre idée de livre en une phrase, et je vous rends le début de ce livre.
 
->> Voir mes 5 niches : ${cadeauUrl('cadeau-1')}
+>> Voir mon livre commencer : ${essaiUrl('cadeau-1')}
 
-Pour chacune, vous voyez le sujet exact, le mot-clé Amazon à viser, le niveau de concurrence et le prix constaté. Ce sont des niches où la demande existe déjà : vous n'inventez pas un marché, vous vous placez sur un marché qui achète.
+Vous n'avez rien à installer, rien à payer, et vous n'avez même pas besoin de créer un compte pour voir le résultat. Vous tapez votre idée, et en deux minutes vous avez sous les yeux :
 
-Prenez trois minutes pour les lire et repérez celle qui vous parle. C'est la seule décision importante avant d'écrire.
+- le titre et le sous-titre de votre livre,
+- le sommaire complet, chapitre par chapitre,
+- le début de votre chapitre 1, réellement écrit pour votre sujet.
 
-Sur la même page, vous débloquez aussi vos bonus en laissant votre email : le guide pour structurer un ebook, le pack anti-plagiat, le kit de démarrage et le guide de la clé Gemini. Tout est ouvert immédiatement, sans rien acheter.
+Ce n'est pas une démonstration avec un livre d'exemple. C'est votre idée, votre public, votre ton. Beaucoup de gens hésitent pendant des mois parce qu'ils n'arrivent pas à imaginer leur livre. Là, vous le voyez.
 
->> Ouvrir la page : ${cadeauUrl('cadeau-1')}
+Si le début vous plaît, vous demandez le chapitre 1 en entier : il s'affiche immédiatement et vous le recevez par email pour le garder.
+
+>> Écrire mon chapitre 1 gratuitement : ${essaiUrl('cadeau-1')}
 
 ${SIGN}`,
   },
@@ -145,24 +154,26 @@ ${SIGN}`,
     id: 'cadeau-2',
     template: 'cadeau-2',
     delayDays: 1,
-    subject: 'La niche n°3 est celle que personne n\'exploite',
-    preheader: 'Concurrence faible, demande installée. Elle est toujours sur votre page.',
-    goal: 'Revenir sur la page cadeau',
-    ctaLabel: 'Revoir mes 5 niches',
-    ctaUrl: cadeauUrl('cadeau-2'),
+    subject: 'Votre sommaire complet en 2 minutes',
+    preheader: 'Le plan chapitre par chapitre de votre livre, écrit à partir de votre idée.',
+    goal: "Générer son sommaire sur la page d'essai",
+    ctaLabel: 'Obtenir mon sommaire',
+    ctaUrl: essaiUrl('cadeau-2'),
     body: `Bonjour,
 
-Sur les cinq niches que je vous ai données, il y en a une que presque personne ne travaille sérieusement : la troisième.
+Ce qui bloque la plupart des auteurs, ce n'est pas l'écriture. C'est le plan.
 
-La demande est installée depuis des années, les lecteurs achètent plusieurs livres sur le sujet, et la concurrence reste faible parce que les auteurs la trouvent moins « excitante » que la romance ou le thriller. C'est exactement pour ça qu'elle est rentable.
+On a une idée, on sent qu'il y a un livre dedans, mais on ne sait pas par quoi commencer, dans quel ordre, ni combien de chapitres il faut. Alors on repousse. Parfois pendant des années.
 
->> Revoir mes 5 niches : ${cadeauUrl('cadeau-2')}
+>> Obtenir mon sommaire : ${essaiUrl('cadeau-2')}
 
-Regardez la ligne « mot-clé Amazon » de cette niche. C'est la requête que tapent les lecteurs. Un livre dont le titre et la description reprennent ce mot-clé se retrouve devant eux, pas au fond du catalogue.
+Donnez votre idée en une phrase sur cette page, et vous recevez le sommaire complet de votre livre : chaque chapitre avec son titre et un résumé de deux phrases. Un vrai plan de travail, pas une liste vague.
 
-Choisissez votre niche aujourd'hui, même si vous n'écrivez pas encore une ligne.
+Vous verrez tout de suite si l'ordre vous convient, ce qui manque, ce que vous voulez déplacer. C'est à ce moment-là qu'un livre devient réel.
 
->> Ouvrir la page : ${cadeauUrl('cadeau-2')}
+Et pendant que vous lisez le sommaire, le chapitre 1 s'écrit à côté. Gratuitement, sans carte bancaire.
+
+>> Voir mon sommaire et mon chapitre 1 : ${essaiUrl('cadeau-2')}
 
 ${SIGN}`,
   },
@@ -170,14 +181,14 @@ ${SIGN}`,
     id: 'cadeau-3',
     template: 'cadeau-3',
     delayDays: 3,
-    subject: 'J\'ai écrit un livre entier hier soir, je vous montre',
-    preheader: 'Du sommaire au fichier Amazon, sur la même page que vos niches.',
-    goal: 'Voir la démonstration puis le bouton Commander',
-    ctaLabel: 'Voir comment ça se passe',
-    ctaUrl: cadeauUrl('cadeau-3'),
+    subject: "Votre livre existe déjà, il attend juste que vous l'ouvriez",
+    preheader: 'Titre, sommaire, chapitre 1 écrit pour votre idée. Deux minutes.',
+    goal: "Générer son livre sur la page d'essai",
+    ctaLabel: 'Ouvrir mon livre',
+    ctaUrl: essaiUrl('cadeau-3'),
     body: `Bonjour,
 
-Hier soir, j'ai pris une des cinq niches que vous avez reçues et j'en ai fait un livre complet. Voilà le trajet exact :
+Hier soir, j'ai pris une idée simple, une seule phrase, et j'en ai fait un livre complet. Voilà le trajet exact :
 
 - J'ai donné le sujet en une phrase. Le Sommaire IA m'a rendu un plan chapitre par chapitre, que j'ai corrigé à la main.
 - Chaque chapitre a été rédigé séparément, en tenant compte des précédents : pas de contradiction au chapitre 12, pas de répétition du chapitre 3.
@@ -188,12 +199,17 @@ Hier soir, j'ai pris une des cinq niches que vous avez reçues et j'en ai fait u
 
 Ce n'est pas un cours ni une méthode à appliquer plus tard. C'est un livre, à la fin de la soirée.
 
->> Voir comment ça se passe : ${cadeauUrl('cadeau-3')}
+Et la première étape, celle qui décide de tout, vous pouvez la faire maintenant en deux minutes et sans rien payer : votre titre, votre sommaire, votre chapitre 1.
 
-Vos 5 niches sont toujours en haut de cette page, et le bouton pour entrer dans l'atelier est juste en dessous.
+>> Ouvrir mon livre : ${essaiUrl('cadeau-3')}
+
+Lisez le début. Si ce que vous lisez ressemble à votre livre, la suite se joue en un clic.
+
+>> Commencer maintenant : ${essaiUrl('cadeau-3')}
 
 ${SIGN}`,
   },
+
   {
     id: 'cadeau-4',
     template: 'cadeau-4',

@@ -143,6 +143,70 @@ function EmailCard({ email, index }: { email: CampagneEmail; index: number }) {
 
 
 /** Panneau unique de la campagne email : tout se copie ici, nulle part ailleurs. */
+const FUNNEL_STEPS: Array<{ key: string; label: string }> = [
+  { key: 'view', label: "Arrivées sur /essai" },
+  { key: 'generate_click', label: 'Clics sur « Voir mon livre commencer »' },
+  { key: 'outline_shown', label: 'Sommaires affichés' },
+  { key: 'wall_shown', label: 'Murs email vus' },
+  { key: 'email_captured', label: 'Emails laissés (leads)' },
+  { key: 'commander_click', label: 'Clics vers /commander' },
+];
+
+function EssaiFunnelPanel() {
+  const [counts, setCounts] = useState<Record<string, number> | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await supabase
+        .from('capture_events')
+        .select('event_type')
+        .eq('surface', 'essai')
+        .limit(10000);
+      if (error) {
+        setCounts({});
+        return;
+      }
+      const map: Record<string, number> = {};
+      (data ?? []).forEach((row) => {
+        map[row.event_type] = (map[row.event_type] ?? 0) + 1;
+      });
+      setCounts(map);
+    })();
+  }, []);
+
+  const first = counts?.[FUNNEL_STEPS[0].key] ?? 0;
+
+  return (
+    <Card className="rounded-2xl border-border bg-card p-6">
+      <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
+        <Target className="h-5 w-5" /> Le tunnel d'essai, marche par marche
+      </h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Chaque ligne se remplit en temps réel. La marche qui chute est celle à corriger.
+      </p>
+      {counts === null ? (
+        <p className="mt-4 text-sm text-muted-foreground">Chargement…</p>
+      ) : (
+        <ul className="mt-4 space-y-2 text-sm">
+          {FUNNEL_STEPS.map((step) => {
+            const value = counts[step.key] ?? 0;
+            const pct = first > 0 ? Math.round((value / first) * 100) : 0;
+            return (
+              <li key={step.key} className="flex items-center justify-between gap-3">
+                <span className="text-muted-foreground">{step.label}</span>
+                <span className="font-semibold text-foreground">
+                  {value}
+                  {first > 0 && <span className="ml-2 text-xs text-muted-foreground">{pct} %</span>}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </Card>
+  );
+}
+
 export default function AdminSequenceEmailPage() {
   const navigate = useNavigate();
 
@@ -160,13 +224,16 @@ export default function AdminSequenceEmailPage() {
           <h1 className="mt-3 text-2xl font-bold text-foreground">{CAMPAGNE.name}</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Un seul tag Systeme.io : <strong>{CAMPAGNE.tag}</strong>. Un seul lien par email.
-            Les trois premiers emails renvoient sur la page cadeau (5 niches visibles + inscription
-            qui débloque les bonus), les deux derniers sur la commande à {CAMPAGNE.price}.
+            Les trois premiers emails renvoient sur la page d'essai (idée → titre, sommaire et
+            chapitre 1, puis mur email), les deux derniers sur la commande à {CAMPAGNE.price}.
           </p>
           <p className="mt-2 text-sm text-muted-foreground">
             Toutes les anciennes campagnes ont été supprimées : il n'y a plus qu'un seul contenu à jour.
           </p>
         </Card>
+
+        <EssaiFunnelPanel />
+
 
         <Card className="rounded-2xl border-border bg-card p-6">
           <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
