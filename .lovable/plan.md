@@ -1,80 +1,82 @@
-# Séquence de relance dans Systeme.io — 600 contacts (300 chauds + 300 froids)
+# Remise à zéro des campagnes + tunnel « 5 niches → inscription → bonus »
 
-Pas de Mailchimp : vos contacts sont déjà dans Systeme.io et la séquence automatique y est incluse. On monte la campagne là, sans nouveau DNS, sans nouveau coût, sans repartir d'une réputation à zéro.
+## Ce qui ne va pas aujourd'hui
 
-## Ce que je prépare côté application
+Il existe quatre jeux de campagnes qui se chevauchent (`salesEmailCampaign`, `canonicalEmailCampaign`, `brevoOnboardingEmails`, `systemeioSequences`), plusieurs pages admin d'envoi, et un cadeau à 10 niches dont les bonus ne sont livrés qu'après achat. Résultat : personne ne sait quelle campagne est active, et le prospect n'a aucune récompense immédiate.
 
-Un nouveau tagage précis dans Systeme.io pour que vous puissiez déclencher deux séquences distinctes :
+## Le nouveau parcours (un seul chemin)
 
-| Segment | Volume visé | Tag Systeme.io | Critère |
-|---|---|---|---|
-| Chauds | 300 | `seq-chaud` | A déjà ouvert ou cliqué au moins un email |
-| Froids | 300 | `seq-froid` | Jamais ouvert, jamais cliqué, jamais désabonné, pas en rebond |
+```text
+   EMAIL (Systeme.io)                PAGE CADEAU /cadeau
+   1 seule séquence  ───────────►    5 niches Amazon visibles
+   5 emails, 1 tag                   (aperçu réel, pas de mystère)
+                                              │
+                                              ▼
+                                     FORMULAIRE UNIQUE
+                                     email + prénom
+                                              │
+                              ┌───────────────┴───────────────┐
+                              ▼                               ▼
+                    Les 5 niches (PDF)            Les BONUS débloqués
+                    envoyées par email            tout de suite → /bonus
+                              └───────────────┬───────────────┘
+                                              ▼
+                                     SUITE DE LA SÉQUENCE
+                                     (5 emails automatiques)
+                                              │
+                                              ▼
+                                  /commander — 47 € à vie
+                              ┌───────────────┴───────────────┐
+                              ▼                               ▼
+                      Carte bancaire                   Bouton PayPal
+                       (Stripe)                        (bien visible)
+```
 
-Les désabonnés et les adresses en rebond sont exclus d'office, sans exception.
+## 1. Tout virer
 
-Le tagage se lance depuis le panneau admin (onglet Envoi de la page prospects), avec un aperçu des compteurs avant validation. Aucun email n'est envoyé par l'application : Systeme.io s'occupe de l'envoi.
+- Suppression des trois campagnes obsolètes : `salesEmailCampaign.ts`, `canonicalEmailCampaign.ts`, `brevoOnboardingEmails.ts`.
+- Un seul fichier de vérité : `src/data/campagneUnique.ts` (remplace `systemeioSequences.ts`).
+- Une seule page admin : `/admin/campagnes` (l'actuelle page séquence est réécrite, les autres panneaux d'envoi renvoient vers elle). Aucun autre endroit ne propose d'envoyer une campagne.
+- Les anciens templates HTML dans `public/email-templates/` sont retirés du build.
 
-## Un bonus par email — c'est ça qui fait cliquer
+## 2. La nouvelle séquence (style Systeme.io, prête à copier)
 
-Personne ne clique pour « en savoir plus ». On clique pour recevoir quelque chose. Chaque email offre donc un bonus concret, gratuit, livré immédiatement dans l'application, sans carte bancaire et sans inscription payante.
+5 emails, un seul tag `PROSPECT-EBS`, déclenchés à l'inscription :
 
-Les 5 bonus, du plus attractif au plus engageant :
+| # | Délai | Sujet | But |
+|---|-------|-------|-----|
+| 1 | immédiat | Vos 5 niches + vos bonus sont ouverts | livrer, créer la confiance |
+| 2 | J+1 | La niche que 9 auteurs sur 10 ignorent | preuve, usage du cadeau |
+| 3 | J+3 | De l'idée au livre publié en une soirée | démonstration produit |
+| 4 | J+5 | 47 € une fois, puis c'est un abonnement | l'offre + échéance 30 septembre |
+| 5 | J+7 | Dernier rappel avant la fermeture | urgence, dernier lien |
 
-| Bonus | Ce que la personne reçoit | Page de retrait |
-|---|---|---|
-| Les 10 niches rentables | 10 niches Amazon analysées, avec la demande et la concurrence | `/cadeau` (existe déjà) |
-| Le sommaire de votre livre, offert | Elle donne son idée, l'IA lui rend un sommaire complet à télécharger | nouvelle page `/bonus/sommaire` |
-| Votre couverture, offerte | Une couverture générée aux dimensions exactes Amazon, en PNG | nouvelle page `/bonus/couverture` |
-| Les 30 titres qui vendent | 30 modèles de titres et sous-titres prêts à adapter | nouvelle page `/bonus/titres` |
-| Le premier chapitre écrit | Un vrai chapitre rédigé sur son sujet, prêt à relire | `/essai` (existe déjà) |
+Chaque email : un seul lien, un seul bouton, ton direct, en français. Copier-coller depuis `/admin/campagnes` (bouton « Copier » par email, objet + corps).
 
-Chaque bonus est une page unique, claire, avec un seul bouton. Le bonus est délivré d'abord ; l'offre payante n'apparaît qu'après, en bas de page, jamais avant le cadeau.
+## 3. Le cadeau : 5 niches, pas 10
 
-Un compteur de retraits par bonus dans le panneau admin : vous verrez lequel attire, et lequel ne sert à rien.
+- Nouveau pack `nichesPack5` extrait des 600 niches réelles (5 catégories les plus vendeuses, meilleure demande / concurrence la plus faible). Aucune donnée inventée.
+- La page `/cadeau` est réécrite : les 5 niches sont montrées en clair (titre, demande, concurrence) puis le formulaire d'inscription juste en dessous.
+- L'ancienne page `/10-niches-offertes` redirige vers `/cadeau` (aucun lien mort).
 
-## Les emails que je vous livre
+## 4. Bonus livrés au moment de l'inscription
 
-Deux séquences séparées, rédigées et prêtes à coller dans Systeme.io. Un email = un bonus = un lien.
+Changement de règle assumé : les bonus ne sont plus réservés à l'achat, ils sont la récompense de l'inscription.
 
-**Séquence chauds — 4 emails sur 8 jours**
-1. J+0 — bonus : les 10 niches rentables
-2. J+2 — bonus : le sommaire de votre livre, offert (+ preuve en images d'un livre terminé)
-3. J+5 — bonus : votre couverture offerte (répond à « c'est trop technique »)
-4. J+8 — bonus : le premier chapitre écrit, puis décision et échéance claire
+- À la validation du formulaire : le prospect est enregistré, les 5 niches partent par email, et `/bonus` s'ouvre immédiatement, déverrouillé pour cet email.
+- `/bonus` reconnaît l'email inscrit (jeton local + vérification côté serveur) et affiche les bonus téléchargeables ; l'accès complet à l'atelier reste réservé aux acheteurs.
+- Les liens de bonus cassés sont revérifiés un par un.
 
-**Séquence froids — 3 emails sur 10 jours**
-1. J+0 — bonus : les 30 titres qui vendent (le plus facile à réclamer)
-2. J+4 — bonus : les 10 niches rentables
-3. J+10 — bonus : le sommaire offert, puis sortie propre proposée
+## 5. Le bouton PayPal sur /commander
 
-Règles appliquées à tous : objet de 45 caractères maximum, aucun prix dans l'objet, aucune majuscule criée, aucun emoji, un seul lien principal répété deux fois au plus, signature avec votre adresse directe.
-
-
-## Mesure des résultats
-
-Chaque lien porte une source par email (`?src=sio-chaud-1`, etc.). Les visites, les commandes créées et les commandes payées venant de Systeme.io deviennent visibles séparément dans votre suivi existant — vous saurez quel message a produit quelle vente, sans dépendre des statistiques de Systeme.io.
-
-## Marche à suivre dans Systeme.io
-
-Je vous donne la procédure écrite, écran par écran : créer les deux campagnes, coller les emails, régler les délais, brancher le déclencheur sur les tags. Vous n'avez rien à deviner.
+- Deux boutons côte à côte sous le prix : **Payer par carte — 47 €** et **Payer avec PayPal**, aux couleurs PayPal, avec le logo.
+- Les deux ouvrent le même paiement sécurisé (PayPal est déjà activé côté serveur) ; le bouton PayPal affiche directement le choix PayPal.
+- L'e-mail saisi est conservé dans les deux cas, c'est lui qui ouvre l'accès.
 
 ## Détails techniques
 
-- Nouveau mode `tag_segments` dans `sync-systemeio-contacts` : calcule les deux segments depuis `email_opens`, `email_clicks`, `email_send_log` et `sales_prospects`, plafonne à 300 par segment (les plus récents d'abord), assigne `seq-chaud` / `seq-froid` par `tagId` numérique via `_shared/systemeio.ts`, avec reprise sur erreur et journal.
-- Exclusions codées en dur : `unsubscribed = true`, statut rebond dans `email_send_log`, contacts déjà clients (`ebookstudio-client`).
-- Nouveau fichier de contenu `src/data/systemeioSequences.ts` : les 7 emails avec objet, corps, bonus associé et lien tracké, affichés dans le panneau admin avec un bouton copier pour chacun.
-- Pages bonus : `src/pages/bonus/BonusSommairePage.tsx`, `BonusCouverturePage.tsx`, `BonusTitresPage.tsx` + routes `/bonus/sommaire`, `/bonus/couverture`, `/bonus/titres` dans `App.tsx`. Réutilisation des fonctions existantes (génération de sommaire, `generate-ai-cover` avec `kdpCoverNormalize`), capture email avant livraison via `funnel-capture-lead`, offre payante en bas de page uniquement.
-- Compteurs de retrait par bonus via `trackCaptureEvent` (surface `cadeau`, champ `lead_magnet` = clé du bonus) — aucune nouvelle table.
-- Panneau admin : bloc « Séquence Systeme.io » dans `SystemeIoSyncPanel` — aperçu des compteurs, bouton de tagage, liste des emails à copier, retraits par bonus.
-- Suivi des sources via `utmTracking.ts` / `captureTracking.ts` déjà en place, aucun schéma à modifier.
-- Aucun changement sur Resend : les emails applicatifs (commandes, essais, support) restent inchangés.
-
-## Ordre d'exécution
-
-1. Les 3 nouvelles pages bonus + compteurs de retrait.
-2. Mode `tag_segments` + aperçu des compteurs (validation ensemble avant tagage réel).
-3. Tagage des 300 + 300 dans Systeme.io.
-4. Livraison des 7 emails dans le panneau admin + procédure de paramétrage.
-5. Vous montez les deux campagnes dans Systeme.io, on vérifie un envoi test vers votre adresse avant l'ouverture des vannes.
-
+- Fichiers supprimés : `src/data/salesEmailCampaign.ts`, `src/data/canonicalEmailCampaign.ts`, `src/data/brevoOnboardingEmails.ts`, `src/data/systemeioSequences.ts`. Les consommateurs (`BonusPage.tsx`, `AdminSequenceEmailPage.tsx`, `ProspectManagerPage.tsx`, `CampaignPerformanceDashboard.tsx`, `TemplatePerformancePanel.tsx`) sont repointés vers `src/data/campagneUnique.ts`.
+- Nouveau `src/lib/nichesPack5.ts` (dérivé déterministe de `niches600`) ; `src/lib/niches10Pack.ts` conservé uniquement pour la redirection.
+- `funnel-capture-lead` : ajout du `lead_magnet: 'niches5_bonus'`, tag `PROSPECT-EBS`, et déblocage bonus (colonne `bonus_unlocked_at`) — migration avec GRANT + RLS.
+- `/commander` : second bouton appelant `v3-pack-checkout` avec `preferred_method: 'paypal'` (Stripe Checkout, PayPal déjà forcé dans la fonction), Stripe embedded conservé.
+- Mémoires à mettre à jour : la règle « bonus uniquement après achat » est remplacée ; le cadeau passe de 10 à 5 niches.
