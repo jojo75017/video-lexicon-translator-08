@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { RefreshCw, Mail, Eye, MousePointerClick, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { ACTIVE_EMAIL_CAMPAIGN } from '@/data/canonicalEmailCampaign';
+import { ACTIVE_EMAIL_CAMPAIGN } from '@/data/campagneUnique';
 
 const TEMPLATES: { key: string; label: string; group: string }[] =
   ACTIVE_EMAIL_CAMPAIGN.steps.map((step) => ({
