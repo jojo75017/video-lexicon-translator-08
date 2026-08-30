@@ -220,7 +220,7 @@ Deno.serve(async (req) => {
             `sans un seul mot de latin, sans pseudo-langue, sans mot inventé ni mot étranger décoratif. ` +
             `Style d'une vraie maison d'édition : phrases complètes, ponctuation soignée, ` +
             `aucune liste à puces, aucun titre en markdown. Chaque paragraphe se termine par ` +
-            `une phrase complète suivie d'un point. Réponds uniquement par un objet JSON valide.`,
+            `une phrase complète suivie d'un point.`,
         },
         {
           role: "user",
@@ -232,16 +232,23 @@ Deno.serve(async (req) => {
             (firstChapter
               ? `Chapitre 1 prévu : ${firstChapter.title} — ${firstChapter.summary ?? ""}\n`
               : "") +
-            `\nÉcris le chapitre 1 complet, entre 1200 et 1800 mots. Réponds en JSON :\n` +
-            `{ "chapterTitle": "titre du chapitre 1", "chapter": "texte intégral, paragraphes séparés par \\n\\n" }\n` +
+            `\nÉcris le chapitre 1 complet, entre 1200 et 1800 mots.\n` +
+            `Format de réponse, en texte brut et rien d'autre :\n` +
+            `TITRE: le titre du chapitre 1\n` +
+            `(une ligne vide, puis le texte intégral du chapitre, paragraphes séparés par une ligne vide)\n` +
             `Ouverture forte, développement, fin de chapitre qui donne envie de lire le suivant.`,
         },
       ], 8000);
 
-      const parsed = extractJson(raw);
-      const chapter = String(parsed.chapter ?? "").trim();
+      const cleanedRaw = raw.replace(/```[a-z]*|```/g, "").trim();
+      const titleMatch = cleanedRaw.match(/^\s*TITRE\s*:\s*(.+)$/im);
+      const chapterTitle = (titleMatch?.[1] ?? firstChapter?.title ?? "Chapitre 1").trim();
+      const chapter = cleanedRaw
+        .replace(/^\s*TITRE\s*:\s*.+$/im, "")
+        .trim();
       if (chapter.length < 400) throw new Error("Chapitre incomplet, relancez la génération.");
       const wordCount = chapter.split(/\s+/).filter(Boolean).length;
+
 
       await supabase
         .from("trial_chapters")
