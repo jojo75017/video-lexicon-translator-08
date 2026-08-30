@@ -1,25 +1,26 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { Loader2, Sparkles, Lock, BookOpen, Mail, CheckCircle2, PenLine, Rocket } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Loader2, Sparkles, Lock, BookOpen, Mail, CheckCircle2, PenLine, Rocket, ChevronDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import useLaunchSettings from '@/hooks/useLaunchSettings';
-import LaunchVideoBlock from '@/components/launch/LaunchVideoBlock';
-import ReadingGate from '@/components/marketing/ReadingGate';
-import { V3_PLANS, formatPrice } from '@/data/v3Pricing';
 
 interface OutlineItem {
   title: string;
   summary: string;
 }
 
-interface TrialResult {
+interface OutlineResult {
   trialId: string;
   title: string;
   subtitle: string;
   outline: OutlineItem[];
+}
+
+interface ChapterResult {
   chapterTitle: string;
-  chapter: string;
+  excerpt: string[];
+  totalParagraphs: number;
   wordCount: number;
 }
 
@@ -40,6 +41,12 @@ const LANGUAGES: Array<{ code: string; label: string }> = [
   { code: 'nl', label: 'Néerlandais' },
 ];
 
+const EXAMPLES = [
+  'Un guide pour aider les jeunes parents à retrouver un sommeil normal en 30 jours.',
+  "Un roman policier dans un village breton où le boulanger disparaît la nuit de Noël.",
+  'Un livre de recettes simples pour cuisiner sain en moins de 20 minutes le soir.',
+];
+
 const LOCKED = [
   'Les chapitres 2 à 60, écrits dans la continuité du premier',
   'La correction professionnelle en 4 passes',
@@ -49,6 +56,22 @@ const LOCKED = [
   "L'audiolivre et les 10 langues",
 ];
 
+/** Chaque marche du tunnel est enregistrée pour voir précisément où ça casse. */
+async function track(eventType: string, params: URLSearchParams) {
+  try {
+    await supabase.from('capture_events').insert({
+      event_type: eventType,
+      surface: 'essai',
+      page_path: '/essai',
+      utm_source: params.get('utm_source'),
+      utm_medium: params.get('utm_medium'),
+      utm_campaign: params.get('utm_campaign'),
+    });
+  } catch {
+    /* le tracking ne doit jamais bloquer le visiteur */
+  }
+}
+
 export default function EssaiPage() {
   const [params] = useSearchParams();
   const { settings, loading: settingsLoading } = useLaunchSettings();
@@ -57,29 +80,46 @@ export default function EssaiPage() {
   const [audience, setAudience] = useState('');
   const [tone, setTone] = useState(TONES[0]);
   const [language, setLanguage] = useState('fr');
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
   const [generating, setGenerating] = useState(false);
-  const [result, setResult] = useState<TrialResult | null>(null);
+  const [outlineResult, setOutlineResult] = useState<OutlineResult | null>(null);
+  const [chapter, setChapter] = useState<ChapterResult | null>(null);
+  const [chapterLoading, setChapterLoading] = useState(false);
 
   const [email, setEmail] = useState('');
   const [claiming, setClaiming] = useState(false);
   const [claimed, setClaimed] = useState(false);
+  const [fullChapter, setFullChapter] = useState<string | null>(null);
+
+  const wallSeen = useRef(false);
 
   useEffect(() => {
-    document.title = 'Écrivez votre premier chapitre gratuitement — EbookStudio';
+    document.title = 'Votre chapitre 1 écrit gratuitement — EbookStudio';
     const meta = document.querySelector('meta[name="description"]');
     if (meta) {
       meta.setAttribute(
         'content',
-        "Donnez votre idée de livre : l'IA écrit gratuitement votre chapitre 1 et vous propose le sommaire complet. Premier mois offert, ouverture le 1er octobre 2026.",
+        "Donnez votre idée de livre : vous recevez immédiatement le titre, le sommaire complet et le début du chapitre 1, écrits pour vous. Gratuit, sans carte bancaire.",
       );
     }
+    void track('view', params);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const trialOpen = settings.free_trial_open.enabled;
-  const paragraphs = useMemo(
-    () => (result?.chapter ?? '').split(/\n{2,}/).filter((p) => p.trim().length > 0),
-    [result],
+
+  const fullParagraphs = useMemo(
+    () => (fullChapter ?? '').split(/\n{2,}/).map((p) => p.trim()).filter(Boolean),
+    [fullChapter],
   );
+
+  const invoke = async (body: Record<string, unknown>) => {
+    const { data, error } = await supabase.functions.invoke('trial-chapter', { body });
+    if (error) throw new Error(error.message);
+    if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);
+    return data;
+  };
 
   const generate = async () => {
     if (idea.trim().length < 10) {
@@ -87,23 +127,35 @@ export default function EssaiPage() {
       return;
     }
     setGenerating(true);
+    void track('generate_click', params);
     try {
-      const { data, error } = await supabase.functions.invoke('trial-chapter', {
-        body: {
-          action: 'generate',
-          idea: idea.trim(),
-          audience: audience.trim(),
-          tone,
-          language,
-          utmSource: params.get('utm_source') ?? undefined,
-          utmCampaign: params.get('utm_campaign') ?? undefined,
-        },
-      });
-      if (error) throw new Error(error.message);
-      if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);
-      setResult(data as TrialResult);
-      toast.success('Votre chapitre 1 est prêt.');
+      const data = (await invoke({
+        action: 'outline',
+        idea: idea.trim(),
+        audience: audience.trim(),
+        tone,
+        language,
+        utmSource: params.get('utm_source') ?? undefined,
+        utmCampaign: params.get('utm_campaign') ?? undefined,
+      })) as OutlineResult;
+      setOutlineResult(data);
+      void track('outline_shown', params);
       window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Le chapitre s'écrit en arrière-plan pendant qu'il lit son sommaire.
+      setChapterLoading(true);
+      try {
+        const ch = (await invoke({ action: 'chapter', trialId: data.trialId })) as ChapterResult;
+        setChapter(ch);
+        if (!wallSeen.current) {
+          wallSeen.current = true;
+          void track('wall_shown', params);
+        }
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "L'écriture du chapitre a échoué.");
+      } finally {
+        setChapterLoading(false);
+      }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'La génération a échoué.');
     } finally {
@@ -112,24 +164,28 @@ export default function EssaiPage() {
   };
 
   const claim = async () => {
-    if (!result) return;
+    if (!outlineResult) return;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       toast.error('Merci de saisir un email valide.');
       return;
     }
     setClaiming(true);
     try {
-      const { data, error } = await supabase.functions.invoke('trial-chapter', {
-        body: { action: 'claim', trialId: result.trialId, email: email.trim() },
-      });
-      if (error) throw new Error(error.message);
-      if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);
+      const data = (await invoke({
+        action: 'claim',
+        trialId: outlineResult.trialId,
+        email: email.trim(),
+      })) as { chapter?: string; chapterTitle?: string; wordCount?: number };
       try {
         localStorage.setItem('ebs_lead_email', email.trim().toLowerCase());
         localStorage.setItem('ebs_reader_unlocked', '1');
-      } catch { /* navigation privée */ }
+      } catch {
+        /* navigation privée */
+      }
+      setFullChapter(data.chapter ?? '');
       setClaimed(true);
-      toast.success('Chapitre envoyé — vérifiez votre boîte de réception.');
+      void track('email_captured', params);
+      toast.success('Chapitre débloqué — il part aussi dans votre boîte de réception.');
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "L'envoi a échoué.");
     } finally {
@@ -137,57 +193,102 @@ export default function EssaiPage() {
     }
   };
 
+  const commanderUrl = (() => {
+    const q = new URLSearchParams(params);
+    q.set('src', 'essai');
+    return `/commander?${q.toString()}`;
+  })();
+
   return (
     <div className="min-h-screen" style={{ background: 'var(--v3-cream, #FBF8F3)' }}>
-      {/* En-tête */}
+      {/* En-tête minimal : le visiteur reste dans son livre, rien d'autre. */}
       <header className="border-b border-black/5 bg-white/70 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
-          <Link to="/" className="v3-serif text-lg font-bold" style={{ color: 'var(--v3-ink, #2A2118)' }}>
+          <span className="v3-serif text-lg font-bold" style={{ color: 'var(--v3-ink, #2A2118)' }}>
             EbookStudio
-          </Link>
+          </span>
           <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#0F2E1F]">
-            Ouverture complète le 1<sup>er</sup> octobre 2026
+            Essai gratuit — sans carte bancaire
           </span>
         </div>
       </header>
 
       <main className="mx-auto max-w-6xl px-5 py-10">
-        {!result ? (
-          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] items-start">
-            <section>
-              <span className="inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/50 bg-[#D4AF37]/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A6D1B]">
-                <Sparkles className="h-3.5 w-3.5" /> Essai gratuit, sans carte bancaire
-              </span>
-              <h1
-                className="v3-serif mt-4 text-4xl font-bold leading-tight md:text-5xl"
-                style={{ color: 'var(--v3-ink, #2A2118)' }}
+        {!outlineResult ? (
+          <div className="mx-auto max-w-2xl">
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/50 bg-[#D4AF37]/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A6D1B]">
+              <Sparkles className="h-3.5 w-3.5" /> Gratuit, aucune inscription pour commencer
+            </span>
+            <h1
+              className="v3-serif mt-4 text-4xl font-bold leading-tight md:text-5xl"
+              style={{ color: 'var(--v3-ink, #2A2118)' }}
+            >
+              Donnez votre idée. Voyez votre livre commencer.
+            </h1>
+            <p className="mt-4 text-base leading-relaxed text-[#5B5245]">
+              Une phrase suffit. Vous recevez immédiatement le titre, le sous-titre, le{' '}
+              <strong>sommaire complet</strong> et le début de votre <strong>chapitre 1</strong>, écrits
+              pour vous. Vous lisez avant de décider quoi que ce soit.
+            </p>
+
+            <div className="mt-8 space-y-4 rounded-2xl border border-black/5 bg-white p-6 shadow-sm">
+              <label className="block text-sm font-semibold text-[#2A2118]">
+                Votre idée de livre
+                <textarea
+                  value={idea}
+                  onChange={(e) => setIdea(e.target.value)}
+                  rows={3}
+                  maxLength={2000}
+                  autoFocus
+                  placeholder="Exemple : un guide pour aider les jeunes parents à retrouver un sommeil normal en 30 jours."
+                  className="mt-2 w-full rounded-xl border border-black/15 px-3 py-3 text-base font-normal focus:border-[#0F2E1F] focus:outline-none"
+                />
+              </label>
+
+              <div className="flex flex-wrap gap-2">
+                <span className="text-xs text-[#8A8072]">Pas d'idée précise ?</span>
+                {EXAMPLES.map((ex, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setIdea(ex)}
+                    className="rounded-full border border-black/10 bg-[#FBF8F3] px-3 py-1 text-xs text-[#5B5245] transition hover:border-[#0F2E1F]/40 hover:text-[#0F2E1F]"
+                  >
+                    Exemple {i + 1}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={generate}
+                disabled={generating || !trialOpen || settingsLoading}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0F2E1F] px-6 py-4 text-base font-bold text-white shadow-lg transition hover:bg-[#14532D] disabled:opacity-60"
               >
-                Votre premier chapitre écrit gratuitement, en quelques minutes
-              </h1>
-              <p className="mt-4 max-w-xl text-base leading-relaxed text-[#5B5245]">
-                Donnez simplement votre idée. Nos moteurs éditoriaux vous rendent un
-                <strong> chapitre 1 complet (1 200 à 1 800 mots)</strong>, un titre, un sous-titre et le
-                sommaire du livre entier. Vous lisez, vous jugez, et vous décidez ensuite.
-              </p>
+                {generating ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" /> Votre livre démarre…
+                  </>
+                ) : (
+                  <>
+                    <PenLine className="h-5 w-5" /> Voir mon livre commencer
+                  </>
+                )}
+              </button>
 
-              <LaunchVideoBlock className="mt-6" />
+              <button
+                type="button"
+                onClick={() => setShowAdvanced((v) => !v)}
+                className="flex w-full items-center justify-center gap-1 text-xs font-semibold text-[#8A6D1B]"
+              >
+                <ChevronDown className={`h-3.5 w-3.5 transition ${showAdvanced ? 'rotate-180' : ''}`} />
+                Affiner (public, ton, langue) — facultatif
+              </button>
 
-              <div className="mt-8 space-y-4 rounded-2xl border border-black/5 bg-white p-6 shadow-sm">
-                <label className="block text-sm font-semibold text-[#2A2118]">
-                  Votre idée de livre <span className="text-red-600">*</span>
-                  <textarea
-                    value={idea}
-                    onChange={(e) => setIdea(e.target.value)}
-                    rows={4}
-                    maxLength={2000}
-                    placeholder="Exemple : un guide pour aider les jeunes parents à retrouver un sommeil normal en 30 jours."
-                    className="mt-2 w-full rounded-xl border border-black/15 px-3 py-2 text-sm font-normal focus:border-[#0F2E1F] focus:outline-none"
-                  />
-                </label>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <label className="block text-sm font-semibold text-[#2A2118]">
-                    Public visé <span className="font-normal text-[#8A8072]">(facultatif)</span>
+              {showAdvanced && (
+                <div className="grid gap-4 border-t border-black/5 pt-4 sm:grid-cols-3">
+                  <label className="block text-xs font-semibold text-[#2A2118]">
+                    Public visé
                     <input
                       value={audience}
                       onChange={(e) => setAudience(e.target.value)}
@@ -195,7 +296,7 @@ export default function EssaiPage() {
                       className="mt-2 w-full rounded-xl border border-black/15 px-3 py-2 text-sm font-normal focus:border-[#0F2E1F] focus:outline-none"
                     />
                   </label>
-                  <label className="block text-sm font-semibold text-[#2A2118]">
+                  <label className="block text-xs font-semibold text-[#2A2118]">
                     Ton du livre
                     <select
                       value={tone}
@@ -209,162 +310,140 @@ export default function EssaiPage() {
                       ))}
                     </select>
                   </label>
+                  <label className="block text-xs font-semibold text-[#2A2118]">
+                    Langue
+                    <select
+                      value={language}
+                      onChange={(e) => setLanguage(e.target.value)}
+                      className="mt-2 w-full rounded-xl border border-black/15 px-3 py-2 text-sm font-normal focus:border-[#0F2E1F] focus:outline-none"
+                    >
+                      {LANGUAGES.map((l) => (
+                        <option key={l.code} value={l.code}>
+                          {l.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
                 </div>
+              )}
 
-                <label className="block text-sm font-semibold text-[#2A2118]">
-                  Langue du livre
-                  <select
-                    value={language}
-                    onChange={(e) => setLanguage(e.target.value)}
-                    className="mt-2 w-full rounded-xl border border-black/15 px-3 py-2 text-sm font-normal focus:border-[#0F2E1F] focus:outline-none"
-                  >
-                    {LANGUAGES.map((l) => (
-                      <option key={l.code} value={l.code}>
-                        {l.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <button
-                  type="button"
-                  onClick={generate}
-                  disabled={generating || !trialOpen || settingsLoading}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0F2E1F] px-6 py-4 text-base font-bold text-white shadow-lg transition hover:bg-[#14532D] disabled:opacity-60"
-                >
-                  {generating ? (
-                    <>
-                      <Loader2 className="h-5 w-5 animate-spin" /> Votre chapitre s'écrit…
-                    </>
-                  ) : (
-                    <>
-                      <PenLine className="h-5 w-5" /> Écrire mon chapitre 1 gratuitement
-                    </>
-                  )}
-                </button>
-                {!trialOpen && !settingsLoading && (
-                  <p className="text-center text-sm text-red-700">
-                    L'essai gratuit est momentanément fermé. Revenez très vite.
-                  </p>
-                )}
-                <p className="text-center text-xs text-[#8A8072]">
-                  Aucune carte bancaire. Aucun engagement. Votre chapitre reste le vôtre.
+              {!trialOpen && !settingsLoading && (
+                <p className="text-center text-sm text-red-700">
+                  L'essai gratuit est momentanément fermé. Revenez très vite.
                 </p>
-              </div>
-            </section>
-
-            <aside className="rounded-2xl border border-black/5 bg-white p-6 shadow-sm">
-              <h2 className="v3-serif text-xl font-bold text-[#2A2118]">Ce qui se passe ensuite</h2>
-              <ol className="mt-4 space-y-4 text-sm text-[#5B5245]">
-                <li className="flex gap-3">
-                  <span className="flex h-7 w-7 flex-none items-center justify-center rounded-full bg-[#0F2E1F] text-xs font-bold text-white">
-                    1
-                  </span>
-                  Vous lisez votre chapitre 1 et le sommaire complet du livre.
-                </li>
-                <li className="flex gap-3">
-                  <span className="flex h-7 w-7 flex-none items-center justify-center rounded-full bg-[#0F2E1F] text-xs font-bold text-white">
-                    2
-                  </span>
-                  Vous le recevez par email, en un clic, pour le garder.
-                </li>
-                <li className="flex gap-3">
-                  <span className="flex h-7 w-7 flex-none items-center justify-center rounded-full bg-[#0F2E1F] text-xs font-bold text-white">
-                    3
-                  </span>
-                  Pour écrire la suite, vous créez votre compte —{' '}
-                  <strong>le premier mois est offert</strong>.
-                </li>
-                <li className="flex gap-3">
-                  <span className="flex h-7 w-7 flex-none items-center justify-center rounded-full bg-[#D4AF37] text-xs font-bold text-[#2A2118]">
-                    4
-                  </span>
-                  Votre studio complet s'ouvre le 1<sup>er</sup> octobre 2026.
-                </li>
-              </ol>
-
-              <div className="mt-6 rounded-xl bg-[#FBF8F3] p-4">
-                <p className="text-xs font-semibold uppercase tracking-wider text-[#8A6D1B]">
-                  Les deux forfaits
-                </p>
-                <ul className="mt-2 space-y-1 text-sm text-[#2A2118]">
-                  {V3_PLANS.map((p) => (
-                    <li key={p.id} className="flex justify-between gap-3">
-                      <span>{p.name}</span>
-                      <strong>{formatPrice(p.monthlyPrice)} / mois</strong>
-                    </li>
-                  ))}
-                </ul>
-                <p className="mt-2 text-xs text-[#8A8072]">
-                  Premier mois offert : première facture le 1<sup>er</sup> novembre 2026, résiliable en un
-                  clic avant.
-                </p>
-              </div>
-            </aside>
+              )}
+              <p className="text-center text-xs text-[#8A8072]">
+                Aucune carte bancaire. Aucun engagement. Votre livre reste le vôtre.
+              </p>
+            </div>
           </div>
         ) : (
           <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] items-start">
-            {/* Le chapitre */}
+            {/* Le livre */}
             <section className="rounded-2xl border border-black/5 bg-white p-7 shadow-sm">
               <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A6D1B]">
-                Votre chapitre 1 · {result.wordCount} mots
+                Votre livre {chapter ? `· chapitre 1, ${chapter.wordCount} mots` : ''}
               </p>
               <h1 className="v3-serif mt-2 text-3xl font-bold leading-tight text-[#2A2118]">
-                {result.title}
+                {outlineResult.title}
               </h1>
-              {result.subtitle && (
-                <p className="mt-1 text-base italic text-[#5B5245]">{result.subtitle}</p>
+              {outlineResult.subtitle && (
+                <p className="mt-1 text-base italic text-[#5B5245]">{outlineResult.subtitle}</p>
               )}
-              <h2 className="v3-serif mt-7 text-xl font-bold text-[#0F2E1F]">
-                {result.chapterTitle || 'Chapitre 1'}
-              </h2>
-              <div className="mt-4 space-y-4 text-[17px] leading-[1.75] text-[#2A2118]">
-                {paragraphs.map((p, i) => (
-                  <p key={i}>{p}</p>
-                ))}
-              </div>
 
-              <div className="mt-8 rounded-xl border border-[#0F2E1F]/15 bg-[#FBF8F3] p-5">
-                {claimed ? (
-                  <p className="flex items-center gap-2 text-sm font-semibold text-[#0F2E1F]">
-                    <CheckCircle2 className="h-5 w-5" /> Chapitre envoyé à {email}.
-                  </p>
-                ) : (
+              <h2 className="v3-serif mt-7 text-xl font-bold text-[#0F2E1F]">
+                {chapter?.chapterTitle || outlineResult.outline[0]?.title || 'Chapitre 1'}
+              </h2>
+
+              {chapterLoading && !chapter && (
+                <p className="mt-4 flex items-center gap-2 text-sm text-[#8A8072]">
+                  <Loader2 className="h-4 w-4 animate-spin" /> Votre chapitre 1 s'écrit en ce moment…
+                </p>
+              )}
+
+              {claimed && fullChapter ? (
+                <div className="mt-4 space-y-4 text-[17px] leading-[1.75] text-[#2A2118]">
+                  {fullParagraphs.map((p, i) => (
+                    <p key={i}>{p}</p>
+                  ))}
+                </div>
+              ) : (
+                chapter && (
                   <>
-                    <p className="text-sm font-semibold text-[#2A2118]">
-                      Recevoir ce chapitre par email pour le garder
-                    </p>
-                    <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-                      <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="vous@exemple.com"
-                        className="flex-1 rounded-xl border border-black/15 px-3 py-2.5 text-sm focus:border-[#0F2E1F] focus:outline-none"
-                      />
-                      <button
-                        type="button"
-                        onClick={claim}
-                        disabled={claiming}
-                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#0F2E1F] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#14532D] disabled:opacity-60"
+                    <div className="mt-4 space-y-4 text-[17px] leading-[1.75] text-[#2A2118]">
+                      {chapter.excerpt.map((p, i) => (
+                        <p key={i}>{p}</p>
+                      ))}
+                    </div>
+
+                    {/* Mur doux : on montre avant de demander. */}
+                    <div className="relative mt-2">
+                      <div
+                        aria-hidden
+                        className="select-none space-y-4 text-[17px] leading-[1.75] text-[#2A2118] blur-[5px]"
                       >
-                        {claiming ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
-                        Recevoir mon chapitre
-                      </button>
+                        <p>
+                          La suite du chapitre continue ici sur {Math.max(1, chapter.totalParagraphs - 2)} paragraphes,
+                          avec le développement complet et la fin qui donne envie de lire le chapitre suivant.
+                        </p>
+                        <p>
+                          Elle a été écrite pour votre idée, dans votre ton, et elle vous appartient
+                          entièrement dès que vous l'ouvrez.
+                        </p>
+                      </div>
+                      <div className="absolute inset-x-0 bottom-0 top-0 bg-gradient-to-b from-white/40 to-white" />
+                    </div>
+
+                    <div className="mt-2 rounded-xl border border-[#0F2E1F]/15 bg-[#FBF8F3] p-5">
+                      <p className="text-base font-bold text-[#2A2118]">
+                        Lire mon chapitre 1 en entier
+                      </p>
+                      <p className="mt-1 text-sm text-[#5B5245]">
+                        Votre email, et le chapitre complet s'affiche tout de suite. Vous le recevez
+                        aussi par mail pour le garder.
+                      </p>
+                      <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                        <input
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="vous@exemple.com"
+                          className="flex-1 rounded-xl border border-black/15 px-3 py-2.5 text-sm focus:border-[#0F2E1F] focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={claim}
+                          disabled={claiming}
+                          className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#0F2E1F] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#14532D] disabled:opacity-60"
+                        >
+                          {claiming ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Mail className="h-4 w-4" />
+                          )}
+                          Débloquer mon chapitre
+                        </button>
+                      </div>
                     </div>
                   </>
-                )}
-              </div>
+                )
+              )}
+
+              {claimed && (
+                <p className="mt-6 flex items-center gap-2 text-sm font-semibold text-[#0F2E1F]">
+                  <CheckCircle2 className="h-5 w-5" /> Chapitre envoyé à {email}.
+                </p>
+              )}
             </section>
 
-            {/* Sommaire + mur de conversion */}
+            {/* Sommaire, puis offre seulement après livraison */}
             <aside className="space-y-5 lg:sticky lg:top-6">
               <div className="rounded-2xl border border-black/5 bg-white p-6 shadow-sm">
                 <h2 className="v3-serif flex items-center gap-2 text-lg font-bold text-[#2A2118]">
                   <BookOpen className="h-4 w-4" /> Le sommaire de votre livre
                 </h2>
                 <ol className="mt-4 space-y-2 text-sm text-[#5B5245]">
-                  {result.outline.map((c, i) => (
+                  {outlineResult.outline.map((c, i) => (
                     <li
                       key={i}
                       className={
@@ -376,44 +455,42 @@ export default function EssaiPage() {
                       {i > 0 && <Lock className="mt-0.5 h-3.5 w-3.5 flex-none text-[#B8AFA0]" />}
                       <span>
                         {c.title}
-                        {i === 0 && ' — écrit ✓'}
+                        {i === 0 && (chapter ? ' — écrit ✓' : ' — en cours…')}
                       </span>
                     </li>
                   ))}
                 </ol>
               </div>
 
-              <div className="rounded-2xl border-2 border-[#D4AF37]/50 bg-[#0F2E1F] p-6 text-white shadow-lg">
-                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
-                  Pour écrire la suite
-                </p>
-                <h2 className="v3-serif mt-2 text-2xl font-bold">L'accès à vie à 47 € — jusqu'au 30 septembre</h2>
-                <ul className="mt-4 space-y-2 text-sm text-white/85">
-                  {LOCKED.map((l) => (
-                    <li key={l} className="flex items-start gap-2">
-                      <Lock className="mt-0.5 h-3.5 w-3.5 flex-none text-[#D4AF37]" />
-                      {l}
-                    </li>
-                  ))}
-                </ul>
-                <ReadingGate surface="essai" compact title="La suite de votre livre vous attend">
-                  <Link
-                    to={"/commander" + (() => { const q = new URLSearchParams(params); q.set("src", "essai"); return `?${q.toString()}`; })()}
+              {claimed && (
+                <div className="rounded-2xl border-2 border-[#D4AF37]/50 bg-[#0F2E1F] p-6 text-white shadow-lg">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+                    Pour écrire la suite
+                  </p>
+                  <h2 className="v3-serif mt-2 text-2xl font-bold">
+                    L'accès à vie à 47 € — jusqu'au 30 septembre 2026
+                  </h2>
+                  <ul className="mt-4 space-y-2 text-sm text-white/85">
+                    {LOCKED.map((l) => (
+                      <li key={l} className="flex items-start gap-2">
+                        <Lock className="mt-0.5 h-3.5 w-3.5 flex-none text-[#D4AF37]" />
+                        {l}
+                      </li>
+                    ))}
+                  </ul>
+                  <a
+                    href={commanderUrl}
+                    onClick={() => void track('commander_click', params)}
                     className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#D4AF37] px-5 py-3.5 text-sm font-bold text-[#2A2118] transition hover:brightness-110"
                   >
-                    <Rocket className="h-4 w-4" /> Obtenir l'accès à vie à 47 €
-                  </Link>
+                    <Rocket className="h-4 w-4" /> Écrire les chapitres 2 à 60
+                  </a>
                   <p className="mt-3 text-center text-xs text-white/70">
-                    Paiement unique · aucun abonnement · V3 offerte au 1<sup>er</sup> octobre
+                    Paiement unique de 47 € · aucun abonnement. Après le 30 septembre 2026 :
+                    abonnement mensuel 27 € ou 47 €, sans engagement.
                   </p>
-                  <Link
-                    to={`/essai/inscription?trial=${result.trialId}`}
-                    className="mt-3 block text-center text-xs font-semibold text-white/60 underline underline-offset-4 hover:text-white/90"
-                  >
-                    Ou créer mon compte — 1<sup>er</sup> mois offert à la V3
-                  </Link>
-                </ReadingGate>
-              </div>
+                </div>
+              )}
             </aside>
           </div>
         )}
