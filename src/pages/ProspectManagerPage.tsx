@@ -267,36 +267,9 @@ const ProspectManagerPage = () => {
     e.target.value = '';
   };
 
-  const handleSendManual = async (step: number) => {
-    if (EMAIL_SENDING_BLOCKED) {
-      toast.error('Zéro envoi actif : le domaine email doit d’abord être validé.');
-      return;
-    }
-    const ids = selectedIds.size > 0
-      ? Array.from(selectedIds)
-      : prospects.filter(p => p.status === 'active' && !p.unsubscribed && !p.completed).map(p => p.id);
+  // Aucun envoi de campagne depuis cette page : tout se passe dans /admin/campagnes.
 
-    if (ids.length === 0) {
-      toast.error('Aucun prospect à cibler');
-      return;
-    }
 
-    setSending(true);
-    try {
-      const { data: session } = await supabase.auth.getSession();
-      const { data, error } = await supabase.functions.invoke('send-sales-email', {
-        body: { mode: 'manual', step, prospect_ids: ids },
-        headers: { Authorization: `Bearer ${session.session?.access_token}` },
-      });
-
-      if (error) throw error;
-      toast.success(`📧 ${data.sent} emails envoyés (étape ${step})`);
-      fetchProspects();
-    } catch (err: any) {
-      toast.error('Erreur d\'envoi : ' + (err.message || ''));
-    }
-    setSending(false);
-  };
 
   // Rapatrier les prospects vers le CRM (table crm_contacts) pour alimenter le pipeline
   const handleSyncToCrm = async () => {
