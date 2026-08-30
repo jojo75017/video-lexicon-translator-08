@@ -83,6 +83,7 @@ export default function V3CommanderPage() {
 
   const [email, setEmail] = useState(() => (params.get("email") || "").trim().toLowerCase());
   const [loading, setLoading] = useState(false);
+  const [paypalLoading, setPaypalLoading] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
 
