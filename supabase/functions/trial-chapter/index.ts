@@ -253,7 +253,7 @@ Deno.serve(async (req) => {
       await supabase
         .from("trial_chapters")
         .update({
-          chapter_title: String(parsed.chapterTitle ?? "").slice(0, 300) || null,
+          chapter_title: chapterTitle.slice(0, 300) || null,
           chapter_text: chapter,
           word_count: wordCount,
           status: "generated",
@@ -262,7 +262,8 @@ Deno.serve(async (req) => {
 
       const { excerpt, totalParagraphs } = excerptOf(chapter);
       return json({
-        chapterTitle: parsed.chapterTitle ?? "",
+        chapterTitle,
+
         excerpt,
         totalParagraphs,
         wordCount,
