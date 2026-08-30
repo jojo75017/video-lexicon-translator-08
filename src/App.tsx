@@ -48,7 +48,6 @@ const CoverStudioProHubPage = lazy(() => import('./pages/v3/cover-studio-pro/Cov
 const CoverEditorPage = lazy(() => import('./pages/v3/cover-studio-pro/CoverEditorPage'));
 const Niches600Page = lazy(() => import('./pages/Niches600Page'));
 const NichesPage = lazy(() => import('./pages/NichesPage'));
-const Niches10OffertesPage = lazy(() => import('./pages/promo/Niches10OffertesPage'));
 const BookPerfectPage = lazy(() => import('./pages/BookPerfectPage'));
 const AuditPilotPage = lazy(() => import('./pages/AuditPilotPage'));
 const WordCountPage = lazy(() => import('./pages/WordCountPage'));
