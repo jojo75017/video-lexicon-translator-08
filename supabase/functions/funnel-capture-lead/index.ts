@@ -73,6 +73,20 @@ const MAGNETS: Record<string, Magnet> = {
     ],
     cta: "🎁 Ouvrir mon pack 10 niches",
   },
+  "niches5-bonus": {
+    url: "https://ebookstudio.fr/cadeau",
+    title: "🎁 Vos 5 niches Amazon + vos bonus débloqués",
+    subject: "🎁 Vos 5 niches Amazon sont prêtes (et vos bonus sont ouverts)",
+    intro:
+      "Merci pour votre inscription ! Vos 5 niches restent affichées sur votre page cadeau, et vos bonus y sont désormais débloqués :",
+    items: [
+      "5 niches KDP où la demande existe déjà, une par grande catégorie",
+      "Le mot-clé Amazon exact à viser pour chacune",
+      "BSR cible, niveau de concurrence et prix constaté",
+      "Vos bonus offerts, ouverts immédiatement sur la même page",
+    ],
+    cta: "🎁 Ouvrir ma page cadeau",
+  },
 };
 
 const DEFAULT_MAGNET = "5-niches-rentables-2026";
