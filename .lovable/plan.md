@@ -49,10 +49,13 @@ Trois règles : on montre avant de demander, on ne demande qu'un email, on ne pa
    - Sur `/essai`, remplacer « premier mois offert / ouverture le 1er octobre » par l'offre réelle : 47 € à vie jusqu'au 30 septembre 2026, puis abonnement mensuel 27 € ou 47 €.
    - Bloc offre affiché seulement après la livraison du chapitre.
 
-4. **La campagne pointe vers l'essai.**
-   - Emails 1 à 3 de la campagne unique : CTA vers `/essai` (« Voir mon livre commencer »), plus vers la liste de niches.
+4. **La campagne pointe vers l'essai — et donne une raison de cliquer.**
+   - Emails 1 à 3 : CTA unique vers `/essai`, formulé comme un résultat personnel et gratuit, pas comme une lecture : « Donnez votre idée, je vous rends le chapitre 1 », « Votre sommaire complet en 2 minutes », « Voyez votre livre commencer ».
+   - Objets réécrits sur la même promesse (le bénéfice dans l'objet, aucune mention de prix dans les trois premiers).
+   - Un seul lien par email, répété 2 fois (texte + bouton) : c'est ce qui fait grimper le taux de clic quand l'ouverture est déjà bonne.
    - Les 5 niches restent accessibles, mais en second lien depuis `/essai` et dans les bonus.
    - Emails 4 et 5 gardent `/commander`.
+
 
 5. **Le visiteur ne voit jamais la V3.**
    - `/essai` reste une page totalement autonome : son propre en-tête, aucun lien vers `/v3`, aucune barre latérale, aucun onglet du studio.
