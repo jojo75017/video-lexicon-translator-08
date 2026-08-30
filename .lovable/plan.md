@@ -41,23 +41,36 @@ Il existe quatre jeux de campagnes qui se chevauchent (`salesEmailCampaign`, `ca
 
 ## 2. La nouvelle séquence (style Systeme.io, prête à copier)
 
-5 emails, un seul tag `PROSPECT-EBS`, déclenchés à l'inscription :
+5 emails, un seul tag `PROSPECT-EBS`, déclenchés à l'inscription. Chaque email est écrit pour déclencher le clic : objet court et concret, première phrase qui pique, une seule promesse, un seul bouton.
 
-| # | Délai | Sujet | But |
-|---|-------|-------|-----|
-| 1 | immédiat | Vos 5 niches + vos bonus sont ouverts | livrer, créer la confiance |
-| 2 | J+1 | La niche que 9 auteurs sur 10 ignorent | preuve, usage du cadeau |
-| 3 | J+3 | De l'idée au livre publié en une soirée | démonstration produit |
-| 4 | J+5 | 47 € une fois, puis c'est un abonnement | l'offre + échéance 30 septembre |
-| 5 | J+7 | Dernier rappel avant la fermeture | urgence, dernier lien |
+| # | Délai | Sujet | Le clic promis |
+|---|-------|-------|----------------|
+| 1 | immédiat | Vos 5 niches sont prêtes (ouvrez-les ici) | voir ses 5 niches |
+| 2 | J+1 | La niche n°3 est celle que personne n'exploite | revenir sur la page niches |
+| 3 | J+3 | J'ai écrit un livre entier hier soir, je vous montre | voir la démonstration |
+| 4 | J+5 | 47 € une fois. Après le 30 septembre, c'est un abonnement | commander |
+| 5 | J+7 | Dernier rappel : ça ferme ce soir | commander |
 
-Chaque email : un seul lien, un seul bouton, ton direct, en français. Copier-coller depuis `/admin/campagnes` (bouton « Copier » par email, objet + corps).
+Règles de rédaction appliquées à chaque email :
 
-## 3. Le cadeau : 5 niches, pas 10
+- Un seul lien répété 2 à 3 fois (texte + bouton), jamais de menu de liens qui dilue le clic.
+- Le bénéfice est dans l'objet, pas dans le corps : « vos 5 niches », « je vous montre », « ça ferme ce soir ».
+- Aucune pièce jointe, aucun PDF dans l'email : le cadeau se consulte sur la page, ce qui garantit le clic.
+- Copier-coller depuis `/admin/campagnes` (bouton « Copier » par email : objet + corps).
+
+## 3. Le cadeau : 5 niches sur la page, et il y reste
+
+Le lien de l'email n'envoie pas un fichier : il ouvre `/cadeau`, où tout se passe.
 
 - Nouveau pack `nichesPack5` extrait des 600 niches réelles (5 catégories les plus vendeuses, meilleure demande / concurrence la plus faible). Aucune donnée inventée.
-- La page `/cadeau` est réécrite : les 5 niches sont montrées en clair (titre, demande, concurrence) puis le formulaire d'inscription juste en dessous.
+- `/cadeau` est réécrite en une seule page, sans lien sortant, dans cet ordre :
+  1. les 5 niches affichées en clair (sujet, demande, concurrence, angle conseillé) — la récompense est immédiate ;
+  2. « ce que vous pouvez en faire ce soir » : le même sujet transformé en livre prêt pour Amazon ;
+  3. le formulaire (email + prénom) qui débloque les bonus ;
+  4. le bloc offre 47 € à vie avec le bouton **Commander** — présent en haut en barre discrète et répété en bas.
+- Aucun autre bouton concurrent sur la page : le seul appel à l'action payant est « Commander ».
 - L'ancienne page `/10-niches-offertes` redirige vers `/cadeau` (aucun lien mort).
+
 
 ## 4. Bonus livrés au moment de l'inscription
 
