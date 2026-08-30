@@ -4,8 +4,9 @@
  * Toutes les anciennes campagnes (sales, canonical, Brevo, séquences multiples)
  * ont été supprimées. Il n'existe plus qu'une seule séquence, ici.
  *
- * Parcours : email → page cadeau /cadeau (5 niches visibles) → inscription
- * (les bonus se débloquent immédiatement) → bouton Commander (47 € à vie).
+ * Parcours : email → page d'essai /essai (idée → titre, sommaire, début du
+ * chapitre 1) → mur email (chapitre complet) → bouton Commander (47 € à vie).
+ * Les 5 niches restent accessibles en second lien depuis /essai et /bonus.
  *
  * Règles de rédaction appliquées à chaque email :
  * - un seul lien, répété 2 à 3 fois (texte + bouton) ;
