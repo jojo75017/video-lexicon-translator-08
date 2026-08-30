@@ -812,44 +812,37 @@ const ProspectManagerPage = () => {
             )}
           </TabsContent>
 
-          {/* MANUAL SEND TAB */}
+          {/* CAMPAGNE TAB — plus aucun envoi depuis ici */}
           <TabsContent value="send" className="space-y-4">
             <SystemeIoSyncPanel />
             <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle className="text-gradient-gold text-lg">Séquence unique — envoi contrôlé</CardTitle>
+                <CardTitle className="text-gradient-gold text-lg">Une seule campagne email</CardTitle>
                 <p className="text-sm text-muted-foreground">
-                  {selectedIds.size > 0
-                    ? `${selectedIds.size} prospect(s) sélectionné(s)`
-                    : `Tous les prospects actifs (${active})`} · aucun envoi sans action explicite
+                  Toutes les anciennes séquences ont été supprimées. Les 5 emails de la campagne
+                  unique se copient dans la page Campagnes, où se trouve aussi l'envoi de test.
                 </p>
               </CardHeader>
               <CardContent className="space-y-3">
-                {STEPS.map(s => (
-                  <div key={s.step} className="flex items-center justify-between p-3 rounded-lg bg-background/50 border border-border/50">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center text-gold-light font-bold text-sm">
-                        {s.step}
-                      </div>
-                      <div>
-                        <span className="text-foreground font-medium">{s.label}</span>
-                        <span className="text-muted-foreground text-xs ml-2">({s.delay})</span>
-                      </div>
-                    </div>
-                    <Button
-                      size="sm"
-                      onClick={() => handleSendManual(s.step)}
-                      disabled={sending || EMAIL_SENDING_BLOCKED}
-                      className="bg-gradient-to-r from-gold to-gold-dark text-black font-semibold hover:opacity-90"
-                    >
-                      <Send className="h-3 w-3 mr-1" />
-                      {EMAIL_SENDING_BLOCKED ? 'Bloqué' : sending ? 'Envoi...' : 'Envoyer'}
-                    </Button>
-                  </div>
-                ))}
+                <ol className="list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
+                  {STEPS.map(s => (
+                    <li key={s.step}>
+                      <span className="text-foreground font-medium">{s.label}</span>
+                      <span className="ml-2 text-xs">({s.delay})</span>
+                    </li>
+                  ))}
+                </ol>
+                <Button
+                  size="sm"
+                  onClick={() => navigate('/admin/campagnes')}
+                  className="bg-gradient-to-r from-gold to-gold-dark text-black font-semibold hover:opacity-90"
+                >
+                  <Mail className="h-3 w-3 mr-1" /> Ouvrir Campagnes
+                </Button>
               </CardContent>
             </Card>
           </TabsContent>
+
 
           {/* TEMPLATES PERFORMANCE TAB */}
           <TabsContent value="templates" className="space-y-4">
