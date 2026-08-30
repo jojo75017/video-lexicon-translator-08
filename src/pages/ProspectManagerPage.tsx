@@ -3,9 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import CampaignSequencePanel from '@/components/admin/CampaignSequencePanel';
-import EmailFunnelPanel from '@/components/admin/EmailFunnelPanel';
-import ClosingCampaignPanel from '@/components/admin/ClosingCampaignPanel';
 import ConversionBoostersPanel from '@/components/admin/ConversionBoostersPanel';
 import ChannelPerformancePanel from '@/components/admin/ChannelPerformancePanel';
 import SystemeIoSyncPanel from '@/components/admin/SystemeIoSyncPanel';
@@ -59,7 +56,7 @@ const ProspectManagerPage = () => {
   const [loading, setLoading] = useState(true);
   const [authReady, setAuthReady] = useState(false);
   const [hasSession, setHasSession] = useState(false);
-  const [sending, setSending] = useState(false);
+
   const [importing, setImporting] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [showClickedOnly, setShowClickedOnly] = useState(false);
@@ -270,36 +267,9 @@ const ProspectManagerPage = () => {
     e.target.value = '';
   };
 
-  const handleSendManual = async (step: number) => {
-    if (EMAIL_SENDING_BLOCKED) {
-      toast.error('Zéro envoi actif : le domaine email doit d’abord être validé.');
-      return;
-    }
-    const ids = selectedIds.size > 0
-      ? Array.from(selectedIds)
-      : prospects.filter(p => p.status === 'active' && !p.unsubscribed && !p.completed).map(p => p.id);
+  // Aucun envoi de campagne depuis cette page : tout se passe dans /admin/campagnes.
 
-    if (ids.length === 0) {
-      toast.error('Aucun prospect à cibler');
-      return;
-    }
 
-    setSending(true);
-    try {
-      const { data: session } = await supabase.auth.getSession();
-      const { data, error } = await supabase.functions.invoke('send-sales-email', {
-        body: { mode: 'manual', step, prospect_ids: ids },
-        headers: { Authorization: `Bearer ${session.session?.access_token}` },
-      });
-
-      if (error) throw error;
-      toast.success(`📧 ${data.sent} emails envoyés (étape ${step})`);
-      fetchProspects();
-    } catch (err: any) {
-      toast.error('Erreur d\'envoi : ' + (err.message || ''));
-    }
-    setSending(false);
-  };
 
   // Rapatrier les prospects vers le CRM (table crm_contacts) pour alimenter le pipeline
   const handleSyncToCrm = async () => {
@@ -518,7 +488,7 @@ const ProspectManagerPage = () => {
               <CheckCircle className="h-4 w-4 mr-2" /> Inscrits
             </TabsTrigger>
             <TabsTrigger value="send" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
-              <Send className="h-4 w-4 mr-2" /> Envoi Manuel
+              <Send className="h-4 w-4 mr-2" /> Campagne
             </TabsTrigger>
             <TabsTrigger value="templates" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
               <Mail className="h-4 w-4 mr-2" /> Templates
@@ -633,12 +603,21 @@ const ProspectManagerPage = () => {
               </Button>
             </div>
 
-            <EmailFunnelPanel />
-
-            <CampaignSequencePanel />
-
-            <ClosingCampaignPanel />
+            <Card className="bg-card border-border">
+              <CardContent className="flex flex-wrap items-center justify-between gap-3 py-4">
+                <div>
+                  <p className="text-sm font-medium text-foreground">Une seule campagne email</p>
+                  <p className="text-xs text-muted-foreground">
+                    Les 5 emails se copient depuis la page Campagnes, avec un envoi de test.
+                  </p>
+                </div>
+                <Button size="sm" onClick={() => navigate('/admin/campagnes')} className="rounded-xl">
+                  <Mail className="mr-2 h-4 w-4" /> Ouvrir Campagnes
+                </Button>
+              </CardContent>
+            </Card>
             <ConversionBoostersPanel />
+
 
 
             <p className="text-xs text-muted-foreground">
@@ -806,44 +785,37 @@ const ProspectManagerPage = () => {
             )}
           </TabsContent>
 
-          {/* MANUAL SEND TAB */}
+          {/* CAMPAGNE TAB — plus aucun envoi depuis ici */}
           <TabsContent value="send" className="space-y-4">
             <SystemeIoSyncPanel />
             <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle className="text-gradient-gold text-lg">Séquence unique — envoi contrôlé</CardTitle>
+                <CardTitle className="text-gradient-gold text-lg">Une seule campagne email</CardTitle>
                 <p className="text-sm text-muted-foreground">
-                  {selectedIds.size > 0
-                    ? `${selectedIds.size} prospect(s) sélectionné(s)`
-                    : `Tous les prospects actifs (${active})`} · aucun envoi sans action explicite
+                  Toutes les anciennes séquences ont été supprimées. Les 5 emails de la campagne
+                  unique se copient dans la page Campagnes, où se trouve aussi l'envoi de test.
                 </p>
               </CardHeader>
               <CardContent className="space-y-3">
-                {STEPS.map(s => (
-                  <div key={s.step} className="flex items-center justify-between p-3 rounded-lg bg-background/50 border border-border/50">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center text-gold-light font-bold text-sm">
-                        {s.step}
-                      </div>
-                      <div>
-                        <span className="text-foreground font-medium">{s.label}</span>
-                        <span className="text-muted-foreground text-xs ml-2">({s.delay})</span>
-                      </div>
-                    </div>
-                    <Button
-                      size="sm"
-                      onClick={() => handleSendManual(s.step)}
-                      disabled={sending || EMAIL_SENDING_BLOCKED}
-                      className="bg-gradient-to-r from-gold to-gold-dark text-black font-semibold hover:opacity-90"
-                    >
-                      <Send className="h-3 w-3 mr-1" />
-                      {EMAIL_SENDING_BLOCKED ? 'Bloqué' : sending ? 'Envoi...' : 'Envoyer'}
-                    </Button>
-                  </div>
-                ))}
+                <ol className="list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
+                  {STEPS.map(s => (
+                    <li key={s.step}>
+                      <span className="text-foreground font-medium">{s.label}</span>
+                      <span className="ml-2 text-xs">({s.delay})</span>
+                    </li>
+                  ))}
+                </ol>
+                <Button
+                  size="sm"
+                  onClick={() => navigate('/admin/campagnes')}
+                  className="bg-gradient-to-r from-gold to-gold-dark text-black font-semibold hover:opacity-90"
+                >
+                  <Mail className="h-3 w-3 mr-1" /> Ouvrir Campagnes
+                </Button>
               </CardContent>
             </Card>
           </TabsContent>
+
 
           {/* TEMPLATES PERFORMANCE TAB */}
           <TabsContent value="templates" className="space-y-4">

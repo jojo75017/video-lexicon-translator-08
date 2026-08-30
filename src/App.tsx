@@ -615,7 +615,9 @@ const App = () => {
             <Route path="/admin/plans-v3" element={<AdminGate><AdminPlansV3Page /></AdminGate>} />
             <Route path="/admin/attente" element={<AdminGate><AdminAttentePage /></AdminGate>} />
             <Route path="/admin/lancement" element={<AdminGate><AdminLancementPage /></AdminGate>} />
-            <Route path="/admin/sequence-email" element={<AdminGate><AdminSequenceEmailPage /></AdminGate>} />
+            <Route path="/admin/campagnes" element={<AdminGate><AdminSequenceEmailPage /></AdminGate>} />
+            <Route path="/admin/sequence-email" element={<Navigate to="/admin/campagnes" replace />} />
+
             <Route path="/admin/kit-publication" element={<AdminGate><AdminPublishingKitPage /></AdminGate>} />
             <Route path="/admin/tester-paypal" element={<AdminGate><AdminTestPayPalPage /></AdminGate>} />
             <Route path="/admin-paiements" element={<AdminGate><AdminPaymentsDashboardPage /></AdminGate>} />
