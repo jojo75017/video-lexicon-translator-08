@@ -1,14 +1,16 @@
 # Trouver et boucher la faille des inscriptions
 
-## Ce que disent les chiffres (vérifié en base)
+## Ce que disent les chiffres (vérifié en base, 30 derniers jours)
 
-- 11 792 emails envoyés sur 30 jours, 204 clics.
-- 25 leads au total (6 sur 30 jours), 0 commande payée.
+- 11 792 envois, **938 personnes ouvrent** sur 1 959 prospects actifs : environ 48 % d'ouverture, c'est très bon.
+- Mais seulement **34 personnes cliquent** — moins de 4 % des ouvreurs. 204 clics au total.
+- 25 leads depuis le début, 0 commande payée.
 - **0 chapitre d'essai généré depuis le début** (`trial_chapters` est vide), alors que des visiteurs ont bien cliqué sur des liens `/essai`.
 
-Conclusion : la faille n'est pas l'envoi, c'est l'arrivée. Les emails envoient surtout vers `/cadeau` (une liste de niches à lire) et `/commander` (payer tout de suite). La seule page qui donne envie de rester — écrire son livre — est atteinte par très peu de monde, et personne ne va jusqu'au bouton de génération : il faut remplir 4 champs avant de voir quoi que ce soit.
+Donc, pour répondre franchement à la question « est-ce qu'on aura plus de clics ? » : les gens ouvrent déjà, le problème est ce qu'on leur propose dans l'email et ce qu'ils trouvent derrière le lien. Aujourd'hui on propose de lire une liste de niches ou d'aller payer. Personne ne clique pour ça.
 
-Le visiteur ne vient pas lire des niches. Il vient voir son livre exister.
+Le visiteur ne vient pas lire des niches. Il vient voir son livre exister. On change donc les deux choses en même temps : la promesse dans l'email (le clic) et la page d'arrivée (l'inscription). Aucun des deux ne suffit seul.
+
 
 ## Le nouveau parcours
 
