@@ -29,6 +29,10 @@ export const CADEAU_PAGE_URL = `${SITE_ORIGIN}/cadeau`;
 export const BONUS_PAGE_URL = `${SITE_ORIGIN}/bonus`;
 
 export const cadeauUrl = (src: string) => `${CADEAU_PAGE_URL}?src=${src}`;
+
+/** Page d'essai : c'est le seul lien des trois premiers emails. */
+export const ESSAI_PAGE_URL = `${SITE_ORIGIN}/essai`;
+export const essaiUrl = (src: string) => `${ESSAI_PAGE_URL}?src=${src}`;
 export const bonusUrl = (src: string) => `${BONUS_PAGE_URL}?src=${src}`;
 
 /* ------------------------------ LES BONUS ------------------------------ */
