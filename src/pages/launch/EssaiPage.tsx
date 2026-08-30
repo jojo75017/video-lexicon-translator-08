@@ -469,34 +469,42 @@ export default function EssaiPage() {
               </div>
 
               {claimed && (
-                <div className="rounded-2xl border-2 border-[#D4AF37]/50 bg-[#0F2E1F] p-6 text-white shadow-lg">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+                <div
+                  className="rounded-2xl border-2 border-[#D4AF37]/50 p-6 shadow-lg"
+                  style={{ background: '#0F2E1F', color: '#FFFFFF' }}
+                >
+                  <p
+                    className="text-[11px] font-bold uppercase tracking-[0.18em]"
+                    style={{ color: '#D4AF37' }}
+                  >
                     Pour écrire la suite
                   </p>
-                  <h2 className="v3-serif mt-2 text-2xl font-bold">
+                  <h2 className="v3-serif mt-2 text-2xl font-bold" style={{ color: '#FFFFFF' }}>
                     L'accès à vie à 47 € — jusqu'au 30 septembre 2026
                   </h2>
-                  <ul className="mt-4 space-y-2 text-sm text-white/85">
+                  <ul className="mt-4 space-y-2 text-sm" style={{ color: 'rgba(255,255,255,0.9)' }}>
                     {LOCKED.map((l) => (
                       <li key={l} className="flex items-start gap-2">
-                        <Lock className="mt-0.5 h-3.5 w-3.5 flex-none text-[#D4AF37]" />
-                        {l}
+                        <Lock className="mt-0.5 h-3.5 w-3.5 flex-none" style={{ color: '#D4AF37' }} />
+                        <span style={{ color: 'rgba(255,255,255,0.9)' }}>{l}</span>
                       </li>
                     ))}
                   </ul>
                   <a
                     href={commanderUrl}
                     onClick={() => void track('commander_click', params)}
-                    className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#D4AF37] px-5 py-3.5 text-sm font-bold text-[#2A2118] transition hover:brightness-110"
+                    className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-bold transition hover:brightness-110"
+                    style={{ background: '#D4AF37', color: '#2A2118' }}
                   >
                     <Rocket className="h-4 w-4" /> Écrire les chapitres 2 à 60
                   </a>
-                  <p className="mt-3 text-center text-xs text-white/70">
+                  <p className="mt-3 text-center text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>
                     Paiement unique de 47 € · aucun abonnement. Après le 30 septembre 2026 :
                     abonnement mensuel 27 € ou 47 €, sans engagement.
                   </p>
                 </div>
               )}
+
             </aside>
           </div>
         )}
