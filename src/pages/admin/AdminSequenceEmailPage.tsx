@@ -46,6 +46,60 @@ function CopyButton({
   );
 }
 
+function TestSender({ email }: { email: CampagneEmail }) {
+  const [to, setTo] = useState('');
+  const [sending, setSending] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user?.email) setTo((prev) => prev || data.user!.email!);
+    });
+  }, []);
+
+  const send = async () => {
+    if (!to.trim()) {
+      toast.error('Indiquez une adresse email');
+      return;
+    }
+    setSending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-campaign-test', {
+        body: {
+          emailId: email.id,
+          to: to.trim(),
+          subject: email.subject,
+          html: emailToHtml(email),
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success(`Test envoyé à ${to.trim()}`);
+    } catch (err) {
+      toast.error(`Envoi impossible : ${(err as Error).message}`);
+    }
+    setSending(false);
+  };
+
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-border bg-muted/30 p-3">
+      <Input
+        type="email"
+        value={to}
+        onChange={(e) => setTo(e.target.value)}
+        placeholder="votre@email.fr"
+        className="h-9 w-56 rounded-xl"
+      />
+      <Button type="button" size="sm" onClick={send} disabled={sending} className="rounded-xl">
+        <Send className="mr-2 h-4 w-4" />
+        {sending ? 'Envoi…' : 'M’envoyer ce test'}
+      </Button>
+      <span className="text-xs text-muted-foreground">
+        Objet préfixé [TEST] — aucun impact sur les statistiques.
+      </span>
+    </div>
+  );
+}
+
 function EmailCard({ email, index }: { email: CampagneEmail; index: number }) {
   return (
     <Card className="rounded-2xl border-border bg-card p-5 shadow-sm">
@@ -78,9 +132,12 @@ function EmailCard({ email, index }: { email: CampagneEmail; index: number }) {
           </a>
         </Button>
       </div>
+
+      <TestSender email={email} />
     </Card>
   );
 }
+
 
 /** Panneau unique de la campagne email : tout se copie ici, nulle part ailleurs. */
 export default function AdminSequenceEmailPage() {
