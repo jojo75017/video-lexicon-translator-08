@@ -28,7 +28,7 @@ const adminNavItems: AdminNavItem[] = [
   { label: 'CRM', path: '/crm', icon: Contact, exact: true },
   { label: 'Plans V3', path: '/admin/plans-v3', icon: Table, exact: true },
   { label: 'Lancement V3', path: '/admin/lancement', icon: Rocket, exact: true },
-  { label: 'Séquence Systeme.io', path: '/admin/sequence-email', icon: Send, exact: true },
+  { label: 'Campagnes', path: '/admin/campagnes', icon: Send, exact: true },
   { label: 'Attente', path: '/admin/attente', icon: Snowflake, exact: true },
   { label: 'Tester PayPal', path: '/admin/tester-paypal', icon: CreditCard, exact: true },
 ];
