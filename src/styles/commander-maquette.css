@@ -256,3 +256,11 @@
   .cmdq .why { grid-template-columns: 1fr; padding: 24px; }
   .cmdq .site-footer { align-items: flex-start; gap: 18px; flex-direction: column; }
 }
+
+/* Bouton PayPal — même gabarit que le bouton principal, couleurs PayPal. */
+.cmdq .pay-paypal {
+  margin-top: 10px;
+  background: #ffc439;
+  color: #0c2a5a;
+}
+.cmdq .pay-paypal:hover { filter: brightness(1.05); }
