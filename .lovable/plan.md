@@ -1,14 +1,16 @@
 # Trouver et boucher la faille des inscriptions
 
-## Ce que disent les chiffres (vérifié en base)
+## Ce que disent les chiffres (vérifié en base, 30 derniers jours)
 
-- 11 792 emails envoyés sur 30 jours, 204 clics.
-- 25 leads au total (6 sur 30 jours), 0 commande payée.
+- 11 792 envois, **938 personnes ouvrent** sur 1 959 prospects actifs : environ 48 % d'ouverture, c'est très bon.
+- Mais seulement **34 personnes cliquent** — moins de 4 % des ouvreurs. 204 clics au total.
+- 25 leads depuis le début, 0 commande payée.
 - **0 chapitre d'essai généré depuis le début** (`trial_chapters` est vide), alors que des visiteurs ont bien cliqué sur des liens `/essai`.
 
-Conclusion : la faille n'est pas l'envoi, c'est l'arrivée. Les emails envoient surtout vers `/cadeau` (une liste de niches à lire) et `/commander` (payer tout de suite). La seule page qui donne envie de rester — écrire son livre — est atteinte par très peu de monde, et personne ne va jusqu'au bouton de génération : il faut remplir 4 champs avant de voir quoi que ce soit.
+Donc, pour répondre franchement à la question « est-ce qu'on aura plus de clics ? » : les gens ouvrent déjà, le problème est ce qu'on leur propose dans l'email et ce qu'ils trouvent derrière le lien. Aujourd'hui on propose de lire une liste de niches ou d'aller payer. Personne ne clique pour ça.
 
-Le visiteur ne vient pas lire des niches. Il vient voir son livre exister.
+Le visiteur ne vient pas lire des niches. Il vient voir son livre exister. On change donc les deux choses en même temps : la promesse dans l'email (le clic) et la page d'arrivée (l'inscription). Aucun des deux ne suffit seul.
+
 
 ## Le nouveau parcours
 
@@ -47,10 +49,13 @@ Trois règles : on montre avant de demander, on ne demande qu'un email, on ne pa
    - Sur `/essai`, remplacer « premier mois offert / ouverture le 1er octobre » par l'offre réelle : 47 € à vie jusqu'au 30 septembre 2026, puis abonnement mensuel 27 € ou 47 €.
    - Bloc offre affiché seulement après la livraison du chapitre.
 
-4. **La campagne pointe vers l'essai.**
-   - Emails 1 à 3 de la campagne unique : CTA vers `/essai` (« Voir mon livre commencer »), plus vers la liste de niches.
+4. **La campagne pointe vers l'essai — et donne une raison de cliquer.**
+   - Emails 1 à 3 : CTA unique vers `/essai`, formulé comme un résultat personnel et gratuit, pas comme une lecture : « Donnez votre idée, je vous rends le chapitre 1 », « Votre sommaire complet en 2 minutes », « Voyez votre livre commencer ».
+   - Objets réécrits sur la même promesse (le bénéfice dans l'objet, aucune mention de prix dans les trois premiers).
+   - Un seul lien par email, répété 2 fois (texte + bouton) : c'est ce qui fait grimper le taux de clic quand l'ouverture est déjà bonne.
    - Les 5 niches restent accessibles, mais en second lien depuis `/essai` et dans les bonus.
    - Emails 4 et 5 gardent `/commander`.
+
 
 5. **Le visiteur ne voit jamais la V3.**
    - `/essai` reste une page totalement autonome : son propre en-tête, aucun lien vers `/v3`, aucune barre latérale, aucun onglet du studio.
