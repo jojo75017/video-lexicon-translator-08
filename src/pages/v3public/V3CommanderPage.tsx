@@ -334,6 +334,21 @@ export default function V3CommanderPage() {
                   )}
                 </button>
 
+                <button
+                  type="button"
+                  className="pay pay-paypal"
+                  onClick={startPaypal}
+                  disabled={paypalLoading}
+                >
+                  {paypalLoading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" /> Ouverture de PayPal…
+                    </>
+                  ) : (
+                    <>Payer 47 € avec PayPal</>
+                  )}
+                </button>
+
                 <p className="secure">🔒 Carte bancaire ou PayPal · paiement sécurisé</p>
               </>
             ) : (
