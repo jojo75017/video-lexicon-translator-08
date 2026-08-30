@@ -442,7 +442,13 @@ ${paragraphs}
         if (!res.ok) console.error("Resend error", await res.text());
       }
 
-      return json({ ok: true, emailSent });
+      return json({
+        ok: true,
+        emailSent,
+        chapterTitle: trial.chapter_title ?? "",
+        chapter: trial.chapter_text ?? "",
+        wordCount: trial.word_count ?? 0,
+      });
     }
 
     return json({ error: "Action inconnue" }, 400);
