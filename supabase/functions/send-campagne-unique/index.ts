@@ -136,15 +136,23 @@ Deno.serve(async (req) => {
       const limit = Math.min(Math.max(Number(body.batch_size || 100), 1), 300);
       const step = TEMPLATES.indexOf(template as typeof TEMPLATES[number]) + 1;
 
-      const { data: alreadySent } = await db
-        .from("email_send_log")
-        .select("recipient_email")
-        .eq("template_name", template)
-        .in("status", ["sent", "delivered"])
-        .limit(20000);
-      const { data: paidOrders } = await db.from("funnel_orders").select("email").eq("status", "paid");
+      // Journal des envois déjà faits — paginé (PostgREST plafonne à 1000 lignes),
+      // sinon la déduplication est incomplète et les mêmes contacts sont renvoyés.
+      const done = new Set<string>();
+      for (let offset = 0; offset < 50000; offset += 1000) {
+        const { data: logRows } = await db
+          .from("email_send_log")
+          .select("recipient_email")
+          .eq("template_name", template)
+          .in("status", ["sent", "delivered"])
+          .order("created_at", { ascending: true })
+          .range(offset, offset + 999);
+        if (!logRows || logRows.length === 0) break;
+        for (const row of logRows) done.add(normalize(row.recipient_email || ""));
+        if (logRows.length < 1000) break;
+      }
 
-      const done = new Set((alreadySent || []).map((r) => normalize(r.recipient_email || "")));
+      const { data: paidOrders } = await db.from("funnel_orders").select("email").eq("status", "paid");
       const paid = new Set((paidOrders || []).map((r) => normalize(r.email || "")));
 
       // PostgREST plafonne chaque réponse à 1000 lignes : on pagine, sinon les
