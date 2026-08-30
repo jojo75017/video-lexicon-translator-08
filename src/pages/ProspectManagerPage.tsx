@@ -630,12 +630,21 @@ const ProspectManagerPage = () => {
               </Button>
             </div>
 
-            <EmailFunnelPanel />
-
-            <CampaignSequencePanel />
-
-            <ClosingCampaignPanel />
+            <Card className="bg-card border-border">
+              <CardContent className="flex flex-wrap items-center justify-between gap-3 py-4">
+                <div>
+                  <p className="text-sm font-medium text-foreground">Une seule campagne email</p>
+                  <p className="text-xs text-muted-foreground">
+                    Les 5 emails se copient depuis la page Campagnes, avec un envoi de test.
+                  </p>
+                </div>
+                <Button size="sm" onClick={() => navigate('/admin/campagnes')} className="rounded-xl">
+                  <Mail className="mr-2 h-4 w-4" /> Ouvrir Campagnes
+                </Button>
+              </CardContent>
+            </Card>
             <ConversionBoostersPanel />
+
 
 
             <p className="text-xs text-muted-foreground">
