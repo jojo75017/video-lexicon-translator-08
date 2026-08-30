@@ -53,7 +53,7 @@ export function getNiches5Pack(): Niche5[] {
     pack.push({
       ...best,
       categoryLabel: labelFor(key),
-      angle: `Un livre centré sur « ${best.sousNiche} », positionné sur le mot-clé « ${best.motCleAmazon} ».`,
+      angle: `Un livre centré sur « ${best.niche} », positionné sur le mot-clé Amazon « ${best.motCleAmazon} ».`,
     });
   }
 
