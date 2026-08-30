@@ -9,7 +9,9 @@ const corsHeaders = {
 };
 
 const PRODUCTS: Record<string, { label: string; amount: number }> = {
-  main: { label: "EbookStudio — Accès à vie", amount: 67 },
+  // Offre de lancement en cours : paiement unique de 47 € (accès à vie).
+  v3_lifetime: { label: "EbookStudio — Accès à vie", amount: 47 },
+  main: { label: "EbookStudio — Accès à vie", amount: 47 },
   license_extended: { label: "Licence commerciale étendue", amount: 67 },
   templates_premium: { label: "Pack 50 templates premium", amount: 25 },
   // Legacy aliases

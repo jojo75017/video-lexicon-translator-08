@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { RefreshCw, MousePointerClick, ShoppingCart, Euro, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { ACTIVE_EMAIL_CAMPAIGN } from '@/data/canonicalEmailCampaign';
+import { ACTIVE_EMAIL_CAMPAIGN } from '@/data/campagneUnique';
 
 interface Row {
   campaign: string;

@@ -29,7 +29,7 @@ import TemplatePerformancePanel from '@/components/admin/TemplatePerformancePane
 import CampaignPerformanceDashboard from '@/components/admin/CampaignPerformanceDashboard';
 import CommunicationJourneyTracker from '@/components/admin/CommunicationJourneyTracker';
 import AdminPublishingKitPage from '@/pages/admin/AdminPublishingKitPage';
-import { ACTIVE_EMAIL_CAMPAIGN } from '@/data/canonicalEmailCampaign';
+import { ACTIVE_EMAIL_CAMPAIGN } from '@/data/campagneUnique';
 
 
 interface Prospect {

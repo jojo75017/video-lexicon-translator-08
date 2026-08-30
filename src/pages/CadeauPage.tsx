@@ -1,334 +1,326 @@
-import { useState, useEffect } from "react";
-import Helmet from "react-helmet";
+import { useEffect, useMemo, useState } from 'react';
+import Helmet from 'react-helmet';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
-  trackLeadMagnetDownload,
-  trackCTAClick,
-  trackFormSubmit,
-  trackPageView,
-  trackLeadFormClick,
-  trackSignUp,
-  trackFormError,
-} from "@/utils/analytics";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+  ArrowRight, CheckCircle2, Clock, Gift, Loader2, Lock, ShieldCheck, Sparkles, TrendingUp,
+} from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
+import { useReferralTracking, getStoredRefCode } from '@/hooks/useReferralTracking';
 import {
-  Gift, Mail, Loader2, Sparkles, CheckCircle2, BookOpen, TrendingUp, Target,
-  Download, PenLine, ShieldCheck, Clock, Star, ChevronDown,
-} from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { useReferralTracking, getStoredRefCode } from "@/hooks/useReferralTracking";
+  trackFormError, trackFormSubmit, trackLeadFormClick, trackLeadMagnetDownload,
+  trackPageView, trackSignUp,
+} from '@/utils/analytics';
+import { getNiches5Pack, rememberNiches5Email, readNiches5Email, NICHES_5_LEAD_MAGNET } from '@/lib/nichesPack5';
+import { CAMPAGNE, CAMPAGNE_BONUSES, BONUS_TOTAL_VALUE } from '@/data/campagneUnique';
+import { commanderUrl } from '@/data/externalLinks';
 
-/** Cadeau de bienvenue : 10 niches + kit de démarrage V3 (la vidéo reste réservée aux abonnés). */
-const KIT_PDF_URL = "/kit-demarrage-ebookstudio-v3.pdf";
-/** Fin de l'offre accès à vie 47 € */
-const OFFER_END = new Date("2026-09-30T23:59:59+02:00");
+const TEAL = '#008296';
+const INK = '#232F3E';
+const OFFER_END = new Date('2026-09-30T23:59:59+02:00');
 
-const useCountdown = (target: Date) => {
+function useCountdown(target: Date) {
   const [left, setLeft] = useState(() => target.getTime() - Date.now());
   useEffect(() => {
     const id = setInterval(() => setLeft(target.getTime() - Date.now()), 1000);
     return () => clearInterval(id);
   }, [target]);
   if (left <= 0) return null;
-  const days = Math.floor(left / 86400000);
-  const hours = Math.floor((left % 86400000) / 3600000);
-  const minutes = Math.floor((left % 3600000) / 60000);
-  return { days, hours, minutes };
-};
+  return {
+    days: Math.floor(left / 86_400_000),
+    hours: Math.floor((left % 86_400_000) / 3_600_000),
+    minutes: Math.floor((left % 3_600_000) / 60_000),
+  };
+}
 
-const FAQ = [
-  {
-    q: "C'est vraiment gratuit ?",
-    a: "Oui. Les 10 niches et le kit de démarrage sont offerts, sans carte bancaire et sans engagement. Vous pouvez vous désabonner en un clic.",
-  },
-  {
-    q: "Je n'ai jamais écrit un livre, c'est pour moi ?",
-    a: "C'est fait exactement pour ça. Vous donnez votre idée, le studio construit le sommaire avec vous, écrit les chapitres, corrige le texte et prépare le fichier prêt pour Amazon KDP.",
-  },
-  {
-    q: "Qu'est-ce que je reçois exactement ?",
-    a: "Les 10 niches Amazon analysées arrivent par email, et le kit de démarrage (16 pages illustrées) se télécharge immédiatement après votre inscription.",
-  },
-  {
-    q: "Et si je veux aller plus loin ?",
-    a: "Vous pouvez écrire votre premier chapitre gratuitement, puis choisir une formule si le résultat vous convainc. Aucune obligation.",
-  },
-];
-
-const CadeauPage = () => {
+/**
+ * Page cadeau — le seul lien des emails.
+ * Les 5 niches sont visibles tout de suite, l'inscription débloque les bonus,
+ * et le seul appel à l'action payant est le bouton « Commander ».
+ */
+export default function CadeauPage() {
   useReferralTracking();
-  const [email, setEmail] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [params] = useSearchParams();
+  const src = params.get('src') || 'cadeau';
+  const niches = useMemo(() => getNiches5Pack(), []);
   const countdown = useCountdown(OFFER_END);
 
-  // Vue de la page cadeau : dénominateur du taux d'inscription dans GA4.
+  const [email, setEmail] = useState(() => (params.get('email') || '').trim().toLowerCase());
+  const [firstName, setFirstName] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [unlocked, setUnlocked] = useState(() => Boolean(readNiches5Email()));
+
   useEffect(() => {
-    trackPageView("/cadeau", "Page cadeau — 10 niches + kit de démarrage");
+    trackPageView('/cadeau', 'Page cadeau — 5 niches + bonus');
   }, []);
+
+  const commander = commanderUrl(src);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    trackLeadFormClick("cadeau_guide", "page_cadeau");
-    if (!email || !email.includes("@")) {
-      trackFormError("cadeau_guide", "email_invalide");
-      toast.error("Veuillez entrer un email valide");
+    const value = email.trim().toLowerCase();
+    trackLeadFormClick('cadeau_5_niches', 'page_cadeau');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      trackFormError('cadeau_5_niches', 'email_invalide');
+      toast.error('Merci d\'entrer un email valide.');
       return;
     }
-
-    setIsSubmitting(true);
+    setSubmitting(true);
     try {
-      const emailLower = email.trim().toLowerCase();
-      const { error } = await supabase.functions.invoke("funnel-capture-lead", {
+      const { error } = await supabase.functions.invoke('funnel-capture-lead', {
         body: {
-          email: emailLower,
-          lead_magnet: "niches10_kit",
+          email: value,
+          first_name: firstName.trim() || undefined,
+          lead_magnet: NICHES_5_LEAD_MAGNET,
           landing_url: window.location.href,
           ref_code: getStoredRefCode() || undefined,
         },
       });
       if (error) throw error;
-      trackLeadMagnetDownload("niches10_kit");
-      trackFormSubmit("cadeau_guide", emailLower);
-      trackSignUp("page_cadeau", "niches10_kit");
-      setIsSuccess(true);
-      toast.success("🎁 Vos deux cadeaux arrivent dans votre boîte mail !");
-    } catch (error) {
-      console.error("Error:", error);
-      trackFormError("cadeau_guide", "erreur_serveur");
-      toast.error("Erreur, réessayez");
+      rememberNiches5Email(value);
+      trackLeadMagnetDownload(NICHES_5_LEAD_MAGNET);
+      trackFormSubmit('cadeau_5_niches', value);
+      trackSignUp('page_cadeau', NICHES_5_LEAD_MAGNET);
+      setUnlocked(true);
+      toast.success('Vos bonus sont débloqués juste en dessous.');
+      setTimeout(() => {
+        document.getElementById('bonus')?.scrollIntoView({ behavior: 'smooth' });
+      }, 150);
+    } catch (err) {
+      console.error(err);
+      trackFormError('cadeau_5_niches', 'erreur_serveur');
+      toast.error('Erreur, réessayez dans un instant.');
     } finally {
-      setIsSubmitting(false);
+      setSubmitting(false);
     }
   };
 
-  const head = (
-    <Helmet>
-      <title>10 niches Amazon KDP + kit de démarrage offerts | Ebookstudio</title>
-      <meta
-        name="description"
-        content="Recevez gratuitement 10 niches Amazon KDP à fort potentiel et le kit de démarrage Ebookstudio V3. Sans carte bancaire, désabonnement en 1 clic."
-      />
-      <link rel="canonical" href="https://ebookstudio.fr/cadeau" />
-    </Helmet>
-  );
+  return (
+    <main className="min-h-screen bg-[#FAFAFA] pb-24" style={{ color: INK }}>
+      <Helmet>
+        <title>5 niches Amazon KDP rentables offertes | EbookStudio</title>
+        <meta
+          name="description"
+          content="Découvrez 5 niches Amazon KDP à forte demande avec le mot-clé exact à viser, puis débloquez vos bonus gratuitement. Sans carte bancaire."
+        />
+        <link rel="canonical" href="https://ebookstudio.fr/cadeau" />
+      </Helmet>
 
-  if (isSuccess) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-emerald-950 to-background flex items-center justify-center p-4">
-        {head}
-        <div className="max-w-lg w-full text-center space-y-6">
-          <div className="mx-auto w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center">
-            <CheckCircle2 className="w-10 h-10 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-white">C'est à vous 🎉</h1>
-          <p className="text-gray-300 text-lg">
-            Vos 10 niches partent par email. Le kit de démarrage se télécharge tout de suite ci-dessous.
-          </p>
-
-          <a
-            href={KIT_PDF_URL}
-            download
-            onClick={() => trackCTAClick("kit_demarrage_pdf", "cadeau_merci")}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#c9a84c] px-6 py-4 text-lg font-semibold text-[#1a1a1a] transition hover:brightness-110"
-          >
-            <Download className="h-5 w-5" />
-            Télécharger le kit de démarrage (PDF)
-          </a>
-
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-left">
-            <p className="text-sm font-semibold text-white">Et maintenant, la suite logique</p>
-            <p className="mt-1 text-sm leading-relaxed text-gray-300">
-              Écrivez le premier chapitre de votre livre gratuitement, sans carte bancaire.
-              Vous verrez de vos yeux ce que donne le studio sur votre idée.
-            </p>
-            <a
-              href="/essai"
-              onClick={() => trackCTAClick("essai_chapitre_gratuit", "cadeau_merci")}
-              className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-4 font-semibold text-white transition hover:brightness-110"
-            >
-              <PenLine className="h-5 w-5" />
-              Écrire mon premier chapitre gratuitement
-            </a>
-          </div>
-
-          {countdown && (
-            <div className="rounded-2xl border border-[#c9a84c]/40 bg-[#c9a84c]/10 p-5 text-left">
-              <p className="flex items-center gap-2 text-sm font-semibold text-[#e7cf8c]">
-                <Clock className="h-4 w-4" />
-                Accès à vie 47 € — se termine le 30 septembre
-              </p>
-              <p className="mt-1 text-sm text-gray-300">
-                Il reste {countdown.days} j {countdown.hours} h {countdown.minutes} min. Après cette date,
-                l'accès passe en abonnement mensuel uniquement.
-              </p>
-              <a
-                href="/commander"
-                onClick={() => trackCTAClick("offre_47_cadeau_merci", "cadeau_merci")}
-                className="mt-3 inline-block text-sm font-semibold text-[#e7cf8c] underline hover:text-white"
-              >
-                Voir l'accès à vie à 47 € →
-              </a>
-            </div>
-          )}
-
-          <a href="/v3/forfaits" className="inline-block text-emerald-400 hover:text-emerald-300 underline text-sm">
-            Voir les formules (Plume 27 € · Édition 47 € · Studio Pro 97 €) →
-          </a>
+      {/* Barre discrète : le seul bouton payant, toujours accessible */}
+      <div className="sticky top-0 z-30 border-b border-[#008296]/20 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-5 py-2.5">
+          <span className="text-sm font-semibold">
+            Accès à vie {CAMPAGNE.price} — jusqu'au {CAMPAGNE.deadline}
+          </span>
+          <Button asChild size="sm" className="rounded-xl bg-[#FF9E2D] font-bold text-[#232F3E] hover:bg-[#f59015]">
+            <a href={commander}>Commander</a>
+          </Button>
         </div>
       </div>
-    );
-  }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-emerald-950 to-background px-4 py-10 pb-28 md:pb-10">
-      {head}
-      <div className="mx-auto max-w-lg space-y-8">
-        {/* Header */}
-        <header className="text-center space-y-4">
-          <div className="mx-auto w-20 h-20 bg-gradient-to-br from-emerald-500 to-[#c9a84c] rounded-2xl flex items-center justify-center">
-            <Gift className="w-10 h-10 text-white" />
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-white">
-            🎁 Vos 2 cadeaux : 10 niches KDP + le kit de démarrage V3
-          </h1>
-          <p className="text-gray-300 text-lg">
-            Gratuit, sans carte bancaire. Vous voyez de vos yeux comment un livre se construit
-            jusqu'à la publication Amazon.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-gray-200">
-            <span className="flex items-center gap-1"><ShieldCheck className="h-4 w-4 text-emerald-400" /> Sans carte bancaire</span>
-            <span className="flex items-center gap-1"><Download className="h-4 w-4 text-emerald-400" /> Kit dispo immédiatement</span>
-            <span className="flex items-center gap-1"><Star className="h-4 w-4 text-[#e7cf8c]" /> Désabonnement en 1 clic</span>
-          </div>
-        </header>
+      {/* 1. Les 5 niches, immédiatement */}
+      <section className="mx-auto max-w-5xl px-5 pt-12">
+        <Badge className="rounded-full bg-[#008296] px-4 py-1 text-white hover:bg-[#008296]">
+          <Gift className="mr-2 h-3.5 w-3.5" /> Votre cadeau, sans rien télécharger
+        </Badge>
+        <h1 className="mt-5 text-3xl font-bold leading-tight md:text-4xl">
+          Vos 5 niches Amazon où la demande existe déjà
+        </h1>
+        <p className="mt-4 max-w-2xl text-lg text-[#232F3E]/75">
+          Pour chaque niche : le sujet exact, le mot-clé Amazon à viser, le niveau de concurrence
+          et le prix constaté. Extraites de notre base de 600 niches réelles.
+        </p>
 
-        {countdown && (
-          <div className="rounded-xl border border-[#c9a84c]/40 bg-[#c9a84c]/10 px-4 py-3 text-center text-sm text-[#e7cf8c]">
-            <Clock className="mr-1 inline h-4 w-4" />
-            Offre accès à vie 47 € jusqu'au 30 septembre — il reste {countdown.days} j {countdown.hours} h {countdown.minutes} min
-          </div>
-        )}
-
-        {/* What's included */}
-        <section className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
-          <h2 className="text-white font-semibold text-lg flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-[#e7cf8c]" />
-            Ce que vous recevez :
-          </h2>
-          <div className="space-y-3">
-            {[
-              { icon: Target, text: "10 niches Amazon à fort potentiel, analysées", badge: "Cadeau 1" },
-              { icon: BookOpen, text: "Kit de démarrage V3 : 16 pages illustrées", badge: "Cadeau 2" },
-              { icon: TrendingUp, text: "Checklist de lancement 7 jours incluse", badge: "Bonus" },
-            ].map(({ icon: Icon, text, badge }) => (
-              <div key={text} className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center shrink-0">
-                  <Icon className="w-4 h-4 text-emerald-300" />
+        <div className="mt-8 grid gap-4 md:grid-cols-2">
+          {niches.map((n, i) => (
+            <Card key={n.id} className="rounded-2xl border-[#008296]/15 bg-white p-6 shadow-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#008296]">
+                    Niche n°{i + 1} · {n.categoryLabel}
+                  </p>
+                  <h2 className="mt-1.5 text-lg font-bold">{n.niche}</h2>
                 </div>
-                <span className="text-gray-200 flex-1">{text}</span>
-                <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-200 border-primary/20 text-xs">
-                  {badge}
+                <Badge variant="outline" className="shrink-0 border-[#FF9E2D] text-[#B4690E]">
+                  Potentiel {n.potentiel}/5
                 </Badge>
               </div>
-            ))}
-          </div>
-          <p className="text-xs text-gray-400">
-            La vidéo de présentation complète de la V3 (7 minutes) est réservée aux abonnés.
-          </p>
-        </section>
 
-        {/* Email form */}
-        <form onSubmit={handleSubmit} className="space-y-4" id="form-cadeau">
-          <div className="relative">
-            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <Input
-              type="email"
-              placeholder="votre@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="pl-12 h-14 bg-white/10 border-white/20 text-white placeholder:text-gray-400 text-lg rounded-xl"
-              disabled={isSubmitting}
-              autoComplete="email"
-              aria-label="Votre adresse email"
-            />
-          </div>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full h-14 bg-gradient-to-r from-emerald-600 to-teal-600 hover:brightness-110 text-lg rounded-xl font-semibold"
-          >
-            {isSubmitting ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <>
-                <Gift className="w-5 h-5 mr-2" />
-                Recevoir mes 2 cadeaux gratuitement
-              </>
-            )}
-          </Button>
-          <p className="text-center text-gray-500 text-xs">
-            🔒 Vos données sont protégées. Désabonnement en 1 clic.
-          </p>
-        </form>
+              <dl className="mt-4 space-y-2 text-sm">
+                <div className="flex justify-between gap-3">
+                  <dt className="text-[#232F3E]/60">Mot-clé Amazon</dt>
+                  <dd className="text-right font-semibold">{n.motCleAmazon}</dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-[#232F3E]/60">Concurrence</dt>
+                  <dd className="text-right font-semibold">{n.concurrence}</dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-[#232F3E]/60">BSR cible</dt>
+                  <dd className="text-right font-semibold">{n.bsrCible.toLocaleString('fr-FR')}</dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-[#232F3E]/60">Prix constaté</dt>
+                  <dd className="text-right font-semibold">{n.exemplePrix.toFixed(2)} €</dd>
+                </div>
+              </dl>
 
-        {/* Étapes après inscription */}
-        <section className="rounded-2xl border border-white/10 bg-white/5 p-6">
-          <h2 className="text-white font-semibold">Ce qui se passe ensuite</h2>
-          <ol className="mt-3 space-y-3 text-sm text-gray-100">
+              <p className="mt-4 rounded-xl bg-[#F3FAFA] p-3 text-sm text-[#232F3E]/80">
+                <TrendingUp className="mr-1.5 inline h-4 w-4 text-[#008296]" />
+                {n.angle}
+              </p>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      {/* 2. Ce que vous pouvez en faire ce soir */}
+      <section className="mx-auto mt-16 max-w-5xl px-5">
+        <div className="rounded-3xl border border-[#008296]/20 bg-white p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#008296]">
+            Ce que vous pouvez en faire ce soir
+          </p>
+          <h2 className="mt-2 text-2xl font-bold md:text-3xl">
+            La même niche transformée en livre prêt pour Amazon
+          </h2>
+          <ul className="mt-6 grid gap-3 md:grid-cols-2">
             {[
-              "Vous recevez vos 10 niches par email et le kit se télécharge tout de suite.",
-              "Vous écrivez votre premier chapitre gratuitement, sur votre propre idée.",
-              "Si le résultat vous plaît, vous continuez le livre jusqu'à la publication Amazon.",
-            ].map((step, i) => (
-              <li key={step} className="flex gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-xs font-bold text-emerald-300">
-                  {i + 1}
-                </span>
-                <span>{step}</span>
+              'Le Sommaire IA construit le plan chapitre par chapitre à partir de la niche choisie.',
+              'La rédaction se fait chapitre par chapitre, en tenant compte des précédents.',
+              'La correction professionnelle relit tout : répétitions, incohérences, fins de chapitres.',
+              'L\'export sort un Word et un PDF conformes aux exigences d\'Amazon KDP.',
+              'La couverture est recadrée aux dimensions exactes d\'Amazon, aucun fichier refusé.',
+              'La fiche Amazon est prête : titre, description, mots-clés, catégories.',
+            ].map((item) => (
+              <li key={item} className="flex gap-2.5 text-sm text-[#232F3E]/80">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#008296]" />
+                {item}
               </li>
             ))}
-          </ol>
-        </section>
+          </ul>
+        </div>
+      </section>
 
-        {/* FAQ */}
-        <section className="space-y-2">
-          <h2 className="text-white font-semibold">Questions fréquentes</h2>
-          {FAQ.map((item, i) => (
-            <div key={item.q} className="rounded-xl border border-white/10 bg-white/5">
-              <button
-                type="button"
-                onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-medium text-white"
-                aria-expanded={openFaq === i}
-              >
-                {item.q}
-                <ChevronDown className={`h-4 w-4 shrink-0 transition ${openFaq === i ? "rotate-180" : ""}`} />
-              </button>
-              {openFaq === i && (
-                <p className="px-4 pb-4 text-sm leading-relaxed text-gray-200">{item.a}</p>
-              )}
-            </div>
-          ))}
-        </section>
-      </div>
+      {/* 3. Le formulaire qui débloque les bonus */}
+      <section id="bonus" className="mx-auto mt-16 max-w-3xl px-5">
+        <Card className="rounded-3xl border-[#008296]/25 bg-white p-8 shadow-sm">
+          {!unlocked ? (
+            <>
+              <h2 className="text-2xl font-bold">Débloquez vos bonus maintenant</h2>
+              <p className="mt-3 text-[#232F3E]/75">
+                Laissez votre email : les {CAMPAGNE_BONUSES.length} bonus ({BONUS_TOTAL_VALUE} de valeur)
+                s'ouvrent immédiatement sur cette page, et vous recevez vos 5 niches par email.
+                Sans carte bancaire, désabonnement en un clic.
+              </p>
+              <form onSubmit={handleSubmit} className="mt-6 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+                <Input
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="Votre prénom"
+                  className="h-12 rounded-xl"
+                  autoComplete="given-name"
+                />
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="vous@email.fr"
+                  className="h-12 rounded-xl"
+                  autoComplete="email"
+                  required
+                />
+                <Button
+                  type="submit"
+                  disabled={submitting}
+                  className="h-12 rounded-xl bg-[#008296] px-6 font-bold text-white hover:bg-[#00707f]"
+                >
+                  {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Débloquer'}
+                </Button>
+              </form>
+              <div className="mt-5 grid gap-2">
+                {CAMPAGNE_BONUSES.map((b) => (
+                  <p key={b.key} className="flex items-center gap-2 text-sm text-[#232F3E]/70">
+                    <Lock className="h-3.5 w-3.5" />
+                    <span className="font-semibold">{b.title}</span>
+                    <span className="text-[#232F3E]/50">— {b.value}</span>
+                  </p>
+                ))}
+              </div>
+            </>
+          ) : (
+            <>
+              <Badge className="rounded-full bg-[#008296] text-white hover:bg-[#008296]">
+                <Sparkles className="mr-1.5 h-3.5 w-3.5" /> Bonus débloqués
+              </Badge>
+              <h2 className="mt-4 text-2xl font-bold">Vos {CAMPAGNE_BONUSES.length} bonus sont ouverts</h2>
+              <p className="mt-2 text-[#232F3E]/75">
+                Tout est accessible maintenant. Vos 5 niches restent affichées plus haut sur cette page.
+              </p>
+              <div className="mt-6 grid gap-3">
+                {CAMPAGNE_BONUSES.map((b) => (
+                  <div
+                    key={b.key}
+                    className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#008296]/15 p-4"
+                  >
+                    <div className="min-w-[200px] flex-1">
+                      <p className="font-semibold">{b.title}</p>
+                      <p className="text-sm text-[#232F3E]/70">{b.description}</p>
+                    </div>
+                    {b.download ? (
+                      <Button asChild variant="outline" className="rounded-xl border-[#008296] text-[#008296]">
+                        <a href={b.to} target="_blank" rel="noopener noreferrer">Télécharger</a>
+                      </Button>
+                    ) : (
+                      <Button asChild variant="outline" className="rounded-xl border-[#008296] text-[#008296]">
+                        <Link to={b.to}>Ouvrir</Link>
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </Card>
+      </section>
 
-      {/* CTA collant mobile */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-background/95 p-3 backdrop-blur md:hidden">
-        <a
-          href="#form-cadeau"
-          onClick={() => trackCTAClick("sticky_cadeau", "cadeau")}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-3 font-semibold text-white"
-        >
-          <Gift className="h-5 w-5" />
-          Recevoir mes 2 cadeaux
-        </a>
-      </div>
-    </div>
+      {/* 4. L'offre — le seul bouton payant */}
+      <section className="mx-auto mt-16 max-w-3xl px-5">
+        <Card className="rounded-3xl border-2 border-[#FF9E2D]/60 bg-white p-8 text-center shadow-sm">
+          {countdown && (
+            <p className="inline-flex items-center gap-2 rounded-full bg-[#FFF4E3] px-4 py-1.5 text-sm font-bold text-[#B4690E]">
+              <Clock className="h-4 w-4" />
+              Il reste {countdown.days} j {countdown.hours} h {countdown.minutes} min
+            </p>
+          )}
+          <h2 className="mt-5 text-2xl font-bold md:text-3xl">
+            Écrivez ce livre : {CAMPAGNE.price} une fois, accès à vie
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-[#232F3E]/75">
+            Un seul paiement, aucune reconduction. Après le {CAMPAGNE.deadline}, EbookStudio passe en{' '}
+            {CAMPAGNE.afterOffer}.
+          </p>
+          <Button
+            asChild
+            size="lg"
+            className="mt-7 rounded-xl bg-[#FF9E2D] px-10 text-base font-black text-[#232F3E] hover:bg-[#f59015]"
+          >
+            <a href={commander}>
+              Commander — {CAMPAGNE.price} <ArrowRight className="ml-2 h-5 w-5" />
+            </a>
+          </Button>
+          <p className="mt-4 flex flex-wrap items-center justify-center gap-4 text-xs text-[#232F3E]/60">
+            <span className="inline-flex items-center gap-1.5">
+              <ShieldCheck className="h-3.5 w-3.5" /> Garantie 30 jours
+            </span>
+            <span>Carte bancaire ou PayPal</span>
+            <span>Accès immédiat</span>
+          </p>
+        </Card>
+      </section>
+    </main>
   );
-};
-
-export default CadeauPage;
+}
