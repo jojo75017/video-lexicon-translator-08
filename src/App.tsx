@@ -572,7 +572,7 @@ const App = () => {
             <Route path="/masterclass" element={<MasterclassPage />} />
             <Route path="/niches" element={<NichesPage />} />
             <Route path="/niches-600" element={<Niches600Page />} />
-            <Route path="/10-niches-offertes" element={<Niches10OffertesPage />} />
+            <Route path="/10-niches-offertes" element={<Navigate to="/cadeau" replace />} />
             <Route path="/quiz" element={<QuizPage />} />
             <Route path="/signature" element={<SignaturePage />} />
             <Route path="/bd-studio" element={<BDStudioPage />} />
