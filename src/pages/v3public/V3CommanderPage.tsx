@@ -123,6 +123,32 @@ export default function V3CommanderPage() {
     void trackCaptureEvent("commander", "view");
   }, []);
 
+  /**
+   * Paiement PayPal du même produit (47 € une fois).
+   * La commande est enregistrée côté serveur, puis PayPal s'ouvre avec le montant prérempli.
+   */
+  const startPaypal = async () => {
+    const e = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) {
+      toast.error("Merci de saisir un email valide — c'est lui qui ouvrira votre accès.");
+      return;
+    }
+    void trackCaptureEvent("commander", "checkout_click", { leadMagnet: "paypal_47" });
+    setPaypalLoading(true);
+    try {
+      const { error } = await supabase.functions.invoke("funnel-create-order", {
+        body: { email: e, product_key: "v3_lifetime", payment_method: "paypal", ref_code: ref },
+      });
+      if (error) throw new Error(error.message);
+      window.open("https://paypal.me/ebookstudio/47", "_blank", "noopener,noreferrer");
+      toast.success("PayPal est ouvert. Indiquez votre email dans la note du paiement.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "PayPal indisponible pour le moment.");
+    } finally {
+      setPaypalLoading(false);
+    }
+  };
+
   const startPayment = async () => {
     const e = email.trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) {
