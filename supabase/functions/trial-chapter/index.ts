@@ -422,8 +422,9 @@ Deno.serve(async (req) => {
 <p style="margin:0 0 24px;color:#555;font:14px Arial,sans-serif;">${trial.chapter_title ? String(trial.chapter_title).replace(/</g, "&lt;") : "Chapitre 1"} — ${trial.word_count} mots, écrit pour vous.</p>
 ${paragraphs}
 <table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" style="margin:28px auto;">
-<tr><td bgcolor="#064e3b" style="border-radius:8px;"><a href="${SITE}/essai/inscription?trial=${trialId}" style="display:inline-block;padding:15px 30px;font:bold 16px Arial,sans-serif;color:#ffffff;text-decoration:none;">Écrire la suite de mon livre</a></td></tr></table>
-<p style="margin:0 0 12px;">Le premier mois est offert, et votre accès complet s'ouvre le 1er octobre 2026.</p>
+<tr><td bgcolor="#064e3b" style="border-radius:8px;"><a href="${SITE}/commander?src=essai-email" style="display:inline-block;padding:15px 30px;font:bold 16px Arial,sans-serif;color:#ffffff;text-decoration:none;">Écrire la suite de mon livre</a></td></tr></table>
+<p style="margin:0 0 12px;">L'accès à vie est à 47 € jusqu'au 30 septembre 2026 : paiement unique, aucun abonnement.</p>
+
 <p style="margin:24px 0 0;">Bien à vous,<br><strong>Georges Boubet</strong><br>EbookStudio — ${DIRECT_EMAIL}</p>
 </td></tr></table></td></tr></table></body></html>`;
 
