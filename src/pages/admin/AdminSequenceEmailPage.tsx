@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check, Clock, Copy, ExternalLink, Gift, Mail, Target } from 'lucide-react';
+import { ArrowLeft, Check, Clock, Copy, ExternalLink, Gift, Mail, Send, Target } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+
 import {
   BONUS_TOTAL_VALUE,
   CAMPAGNE,
