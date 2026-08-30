@@ -52,14 +52,21 @@ Trois règles : on montre avant de demander, on ne demande qu'un email, on ne pa
    - Les 5 niches restent accessibles, mais en second lien depuis `/essai` et dans les bonus.
    - Emails 4 et 5 gardent `/commander`.
 
-5. **Mesurer chaque marche.**
+5. **Le visiteur ne voit jamais la V3.**
+   - `/essai` reste une page totalement autonome : son propre en-tête, aucun lien vers `/v3`, aucune barre latérale, aucun onglet du studio.
+   - Un seul chemin de sortie : « Écrire la suite » → `/commander`. Le logo renvoie vers la page d'accueil publique, pas vers la V3.
+   - Le visiteur reste dans « son application » : son idée, son sommaire, son chapitre. Rien d'autre à l'écran.
+
+6. **Mesurer chaque marche.**
    - Poser des évènements dans `capture_events` : arrivée sur `/essai`, clic sur générer, sommaire affiché, mur vu, email donné, clic vers `/commander`.
    - Un petit tableau dans l'admin campagnes affiche ces 6 chiffres, pour voir la marche qui casse au lieu de deviner.
 
 ## Détails techniques
 
-- `src/pages/launch/EssaiPage.tsx` : formulaire réduit à un champ, options avancées repliées, exemples pré-remplis, aperçu progressif, chapitre tronqué + mur email, bloc offre après livraison.
+- `src/pages/launch/EssaiPage.tsx` : formulaire réduit à un champ, options avancées repliées, exemples pré-remplis, aperçu progressif, chapitre tronqué + mur email, bloc offre après livraison, et suppression de tout lien V3 (page isolée, hors `V3PublicLayout`).
 - `supabase/functions/trial-chapter/index.ts` : découper `generate` en deux actions (`outline` puis `chapter`) et renvoyer un extrait libre + le texte complet seulement après `claim`. Écriture du lead dans `funnel_leads` au moment du `claim`.
 - `src/data/campagneUnique.ts` : nouveaux `ctaUrl` / `ctaLabel` pour les emails 1 à 3, corps réécrits autour de « votre livre commence en 2 minutes ».
 - Tracking via la table `capture_events` existante (`surface: 'essai'`, `event_type` par marche) ; lecture agrégée dans `AdminSequenceEmailPage` / page campagnes.
 - Aucun changement de tarif ni de logique de paiement : `/commander` reste le paiement unique 47 €.
+- Après implémentation : envoi d'un email de test de l'email 1 (nouveau CTA vers `/essai`) pour vérification.
+
