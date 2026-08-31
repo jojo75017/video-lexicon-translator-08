@@ -311,12 +311,12 @@ export default function V3Sidebar() {
                             {!collapsed && (
                               <>
                                 <span className="truncate flex-1">{it.label}</span>
-                                {it.badge && (
+                                {badgeFor(it) && (
                                   <span
                                     className="text-[9px] font-bold uppercase tracking-[0.15em] px-1.5 py-0.5 rounded"
                                     style={{ background: '#C97A14', color: '#fff' }}
                                   >
-                                    {it.badge}
+                                    {badgeFor(it)}
                                   </span>
                                 )}
                               </>
@@ -357,12 +357,12 @@ export default function V3Sidebar() {
                                 <span className="truncate flex-1">{it.label}</span>
                                 {trialLocked ? (
                                   <Lock className="w-3.5 h-3.5 shrink-0" style={{ color: 'var(--v3-muted)' }} />
-                                ) : it.badge ? (
+                                ) : badgeFor(it) ? (
                                   <span
                                     className="text-[9px] font-bold uppercase tracking-[0.15em] px-1.5 py-0.5 rounded"
                                     style={{ background: '#C97A14', color: '#fff' }}
                                   >
-                                    {it.badge}
+                                    {badgeFor(it)}
                                   </span>
                                 ) : null}
                               </>
