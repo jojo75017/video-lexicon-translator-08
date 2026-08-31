@@ -293,14 +293,17 @@ ${paragraphs}
 
 /** Étapes de paramétrage côté Systeme.io — une seule campagne, un seul tag. */
 export const SYSTEMEIO_SETUP_STEPS: string[] = [
-  `Dans Systeme.io, ouvrez Contacts puis Tags et créez le tag « ${CAMPAGNE.tag} » (un seul tag pour toute la campagne).`,
-  'Allez dans Emails puis Campagnes et créez une campagne nommée « EbookStudio — 5 niches puis accès à vie ».',
-  'Ajoutez 5 emails dans l\'ordre, avec ces délais : 0 jour, 1 jour, 3 jours, 5 jours, 7 jours.',
+  'Expéditeur : contact@ebookstudio-mail.fr (domaine déjà vérifié dans Systeme.io). Ne touchez pas au DNS de ebookstudio.fr.',
+  'Réglages → Pied de page : remplacez le pied de page hérité (trafic-affiliation.com) par « EbookStudio — Georges Boubet — contact@ebookstudio-mail.fr » suivi du lien de désinscription Systeme.io.',
+  `Contacts → Tags : créez « ${CAMPAGNE.tag} » (entrée dans la campagne) et « CLIENT-47 » (acheteurs, posé automatiquement par l'application).`,
+  'Emails → Campagnes : créez « EbookStudio — 5 niches puis accès à vie » avec 5 emails aux délais 0, 1, 3, 5 et 7 jours.',
   'Pour chaque email : collez l\'objet, puis le corps (bouton « Copier le texte » ou « Copier le HTML » pour la version avec bouton).',
-  `Dans Automatisations, créez une règle : déclencheur « Tag ajouté » = ${CAMPAGNE.tag} → action « Inscrire à la campagne ».`,
-  'Envoyez-vous un test sur boubetgeorges@gmail.com avant d\'activer la règle.',
-  'Activez la règle : les nouveaux inscrits partent automatiquement, sans action de votre part.',
+  `Automatisations → règle 1 : déclencheur « Tag ajouté » = ${CAMPAGNE.tag} → action « Inscrire à la campagne ».`,
+  'Automatisations → règle 2 : déclencheur « Tag ajouté » = CLIENT-47 → action « Désinscrire de la campagne » (l\'acheteur ne reçoit plus les emails de vente).',
+  'Envoyez-vous un test sur boubetgeorges@gmail.com, puis activez les deux règles.',
+  'Aucun envoi de masse ne part de l\'application : Resend (offre gratuite) ne sert plus qu\'aux emails de service (codes d\'accès, confirmations de paiement).',
 ];
+
 
 /* ------------- Compatibilité avec les tableaux de bord admin ------------- */
 
