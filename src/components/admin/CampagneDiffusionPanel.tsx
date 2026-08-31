@@ -119,10 +119,14 @@ export function CampagneDiffusionPanel() {
         });
         totalSent += Number(data.sent ?? 0);
         totalFailed += Number(data.failed ?? 0);
-        setProgress(`${totalSent} envoyés · ${totalFailed} erreurs · ${data.remaining ?? 0} restants`);
+        totalSkipped += Number(data.skipped ?? 0);
+        setProgress(
+          `${totalSent} envoyés · ${totalFailed} erreurs · ${totalSkipped} doublons évités · ${data.remaining ?? 0} restants`,
+        );
         if (Number(data.targets ?? 0) === 0 || data.quota_exhausted === true) break;
       }
       toast.success(`${totalSent} emails envoyés${totalFailed ? ` — ${totalFailed} erreurs` : ''}`);
+
       await loadStats();
     } catch (err) {
       toast.error(`Envoi interrompu : ${(err as Error).message}`);
