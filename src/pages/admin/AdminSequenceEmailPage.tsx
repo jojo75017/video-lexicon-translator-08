@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 import { NewsletterClicksPanel } from '@/components/admin/NewsletterClicksPanel';
+import { NewsletterEngagementPanel } from '@/components/admin/NewsletterEngagementPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
