@@ -58,6 +58,11 @@ async function callAI(messages: Array<{ role: string; content: string }>, maxTok
     const text = await res.text();
     console.error("AI gateway error", res.status, text);
     if (res.status === 429) throw new Error("Trop de demandes en même temps, réessayez dans une minute.");
+    if (res.status === 402) {
+      throw new Error(
+        "Le moteur IA est momentanément indisponible (crédits épuisés). Réessayez un peu plus tard.",
+      );
+    }
     throw new Error("La génération a échoué, réessayez.");
   }
   const data = await res.json();
