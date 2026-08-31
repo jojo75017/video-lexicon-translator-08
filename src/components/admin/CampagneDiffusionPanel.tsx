@@ -96,12 +96,18 @@ export function CampagneDiffusionPanel() {
   const sendAll = async (emailId: string) => {
     const email = CAMPAGNE_EMAILS.find((item) => item.id === emailId);
     if (!email) return;
+    if (!tested[emailId]) {
+      toast.error("Envoyez d'abord le test à une seule adresse");
+      return;
+    }
     if (!window.confirm(`Envoyer « ${email.subject} » à tous les prospects actifs ?`)) return;
 
     setBusy(emailId);
     setProgress('Préparation…');
     let totalSent = 0;
     let totalFailed = 0;
+    let totalSkipped = 0;
+
     try {
       for (let batch = 0; batch < 40; batch++) {
         const data = await call({
