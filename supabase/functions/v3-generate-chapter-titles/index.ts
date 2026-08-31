@@ -17,14 +17,58 @@ interface ChapterIn {
   excerpt?: string;
 }
 
+/** Appel Gemini avec la clé de l'abonné (BYOK) — aucun crédit Lovable consommé. */
+async function callGeminiDirect(key: string, prompt: string): Promise<string> {
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(key)}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.8, responseMimeType: "application/json" },
+      }),
+    },
+  );
+  if (!res.ok) throw new Error(`Gemini (${res.status}) : ${(await res.text()).slice(0, 200)}`);
+  const data = await res.json();
+  return String(data?.candidates?.[0]?.content?.parts?.map((p: any) => p?.text ?? "").join("") ?? "");
+}
+
+/** Appel OpenRouter avec la clé de l'abonné (BYOK). */
+async function callOpenRouter(key: string, prompt: string, system: string): Promise<string> {
+  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "google/gemini-2.5-flash",
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: prompt },
+      ],
+    }),
+  });
+  if (!res.ok) throw new Error(`OpenRouter (${res.status}) : ${(await res.text()).slice(0, 200)}`);
+  const data = await res.json();
+  return String(data?.choices?.[0]?.message?.content ?? "");
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { bookTitle = "", genre = "", chapters = [] } = (await req.json()) as {
+    const {
+      bookTitle = "",
+      genre = "",
+      chapters = [],
+      userApiKey = "",
+      openrouterKey = "",
+    } = (await req.json()) as {
       bookTitle?: string;
       genre?: string;
       chapters?: ChapterIn[];
+      userApiKey?: string;
+      openrouterKey?: string;
     };
 
     const list = (chapters || [])
@@ -34,8 +78,8 @@ Deno.serve(async (req) => {
 
     if (list.length === 0) return json(400, { error: "Aucun chapitre à nommer." });
 
-    const apiKey = Deno.env.get("LOVABLE_API_KEY");
-    if (!apiKey) return json(500, { error: "Service IA indisponible." });
+    const system =
+      "Tu es un éditeur littéraire francophone. Tu réponds uniquement en JSON valide.";
 
     const prompt = [
       `Livre : « ${bookTitle || "Sans titre"} »${genre ? ` (${genre})` : ""}.`,
@@ -48,21 +92,46 @@ Deno.serve(async (req) => {
       ...list.map((c) => `--- Chapitre ${c.number} ---\n${c.excerpt}`),
     ].join("\n");
 
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: "Tu es un éditeur littéraire francophone. Tu réponds uniquement en JSON valide." },
-          { role: "user", content: prompt },
-        ],
-      }),
-    });
+    // 1) clé de l'abonné (aucun crédit IA Lovable), 2) repli sur Lovable AI.
+    const ownKey = String(userApiKey || "").trim();
+    const orKey = String(openrouterKey || "").trim();
+    let raw = "";
 
-    if (res.status === 429) return json(429, { error: "Trop de requêtes, réessaie dans un instant." });
-    if (res.status === 402) return json(402, { error: "Crédits IA épuisés." });
-    if (!res.ok) return json(502, { error: `Erreur IA (${res.status}).` });
+    if (orKey.startsWith("sk-or-")) {
+      raw = await callOpenRouter(orKey, prompt, system);
+    } else if (ownKey.startsWith("sk-or-")) {
+      raw = await callOpenRouter(ownKey, prompt, system);
+    } else if (ownKey.length > 20) {
+      raw = await callGeminiDirect(ownKey, prompt);
+    } else {
+      const apiKey = Deno.env.get("LOVABLE_API_KEY");
+      if (!apiKey) return json(500, { error: "Service IA indisponible." });
+
+      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: [
+            { role: "system", content: system },
+            { role: "user", content: prompt },
+          ],
+        }),
+      });
+
+      if (res.status === 429) return json(429, { error: "Trop de requêtes, réessaie dans un instant." });
+      if (res.status === 402) {
+        return json(402, {
+          error:
+            "Crédits IA épuisés côté serveur. Ajoutez votre clé Gemini ou OpenRouter dans « Clés API » : les titres seront générés avec votre propre clé.",
+        });
+      }
+      if (!res.ok) return json(502, { error: `Erreur IA (${res.status}).` });
+
+      const data = await res.json();
+      raw = data?.choices?.[0]?.message?.content ?? "";
+    }
+
 
     const data = await res.json();
     const raw: string = data?.choices?.[0]?.message?.content ?? "";
