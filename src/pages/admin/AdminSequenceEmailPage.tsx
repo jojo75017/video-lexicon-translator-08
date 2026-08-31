@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
+import { NewsletterClicksPanel } from '@/components/admin/NewsletterClicksPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -312,6 +313,8 @@ function NewslettersPanel() {
           ))}
         </div>
       </Card>
+
+      <NewsletterClicksPanel />
 
       {NEWSLETTERS.map((n) => (
         <NewsletterCard key={n.id} newsletter={n} />
