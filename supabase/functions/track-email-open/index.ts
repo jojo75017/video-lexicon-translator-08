@@ -11,7 +11,11 @@ Deno.serve(async (req) => {
     const step = url.searchParams.get("s");
     const template = url.searchParams.get("t");
 
-    if (email && step) {
+    // Les balises de fusion non remplacées ({{contact.email}}) ne sont pas loggées.
+    const decodedEmail = email ? decodeURIComponent(email).trim() : "";
+    const isRealEmail = /^[^@\s{}]+@[^@\s{}]+\.[^@\s{}]+$/.test(decodedEmail);
+
+    if (isRealEmail && step) {
       const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
       const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
       const supabase = createClient(supabaseUrl, serviceKey);
