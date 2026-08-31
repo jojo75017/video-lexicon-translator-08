@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import { RefreshCw, RotateCcw, Send, Users } from 'lucide-react';
+import { MailCheck, RefreshCw, RotateCcw, Send, Users } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { CAMPAGNE_EMAILS, emailToHtml } from '@/data/campagneUnique';
@@ -18,11 +19,22 @@ interface Stats {
 /**
  * Diffusion réelle de la campagne unique : remise à zéro des compteurs
  * puis envoi par lots, email par email, sans doublon.
+ *
+ * Garde-fou : chaque email doit d'abord être envoyé en test à une seule
+ * adresse ; le bouton « Envoyer à tous » ne s'active qu'après ce test.
  */
 export function CampagneDiffusionPanel() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [progress, setProgress] = useState<string>('');
+  const [testTo, setTestTo] = useState('');
+  const [tested, setTested] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user?.email) setTestTo((prev) => prev || data.user!.email!);
+    });
+  }, []);
 
   const call = useCallback(async (body: Record<string, unknown>) => {
     const { data, error } = await supabase.functions.invoke('send-campagne-unique', { body });
@@ -30,6 +42,30 @@ export function CampagneDiffusionPanel() {
     if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);
     return data as Record<string, unknown>;
   }, []);
+
+  const sendTest = async (emailId: string) => {
+    const email = CAMPAGNE_EMAILS.find((item) => item.id === emailId);
+    if (!email) return;
+    const to = testTo.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
+      toast.error('Indiquez une adresse email de test valide');
+      return;
+    }
+    setBusy(`test-${emailId}`);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-campaign-test', {
+        body: { emailId, to, subject: email.subject, html: emailToHtml(email) },
+      });
+      if (error) throw error;
+      if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);
+      setTested((prev) => ({ ...prev, [emailId]: true }));
+      toast.success(`Test envoyé à ${to} — vérifiez avant l'envoi global`);
+    } catch (err) {
+      toast.error(`Test impossible : ${(err as Error).message}`);
+    }
+    setBusy(null);
+  };
+
 
   const loadStats = useCallback(async () => {
     try {
