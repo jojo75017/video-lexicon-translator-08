@@ -312,7 +312,8 @@ export const ACTIVE_EMAIL_CAMPAIGN = {
   id: CAMPAGNE.id,
   name: CAMPAGNE.name,
   status: 'active' as const,
-  sendingBlocked: false,
+  // Plus aucun envoi de masse depuis l'application : tout part de Systeme.io.
+  sendingBlocked: true,
   price: CAMPAGNE.price,
   afterOffer: CAMPAGNE.afterOffer,
   deadline: CAMPAGNE.deadline,
