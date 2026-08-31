@@ -66,10 +66,10 @@ export default function V3NouveautesPage() {
             Les nouveautés du mois en premier, avec le forfait qui les contient et un accès
             direct à l'outil.
           </p>
-          <p className="mt-3 flex items-center justify-center gap-2 text-sm text-slate-500">
+          <div className="mt-3 flex items-center justify-center gap-2 text-sm text-slate-500">
             <Badge className="bg-amber-500 hover:bg-amber-500">NOUVEAU</Badge>
             <span>signale une arrivée de moins de 30 jours.</span>
-          </p>
+          </div>
         </header>
 
         {months.map((month) => (
