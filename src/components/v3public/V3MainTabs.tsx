@@ -144,7 +144,7 @@ export default function V3MainTabs() {
                                   <span className="flex-1 min-w-0">
                                     <span className="flex items-center gap-2 text-[13px] font-semibold">
                                       <span>{l.label}</span>
-                                      {l.badge && <span className="v3-badge">{l.badge}</span>}
+                                      {(isRouteNouveau(l.to) ? 'Nouveau' : l.badge) && <span className="v3-badge">{isRouteNouveau(l.to) ? 'Nouveau' : l.badge}</span>}
                                     </span>
                                     {l.desc && (
                                       <span className="block text-[11.5px] mt-0.5 leading-snug" style={{ color: 'var(--v3-muted)' }}>
@@ -246,7 +246,7 @@ export default function V3MainTabs() {
                       >
                         <span className="flex items-center gap-2">
                           {l.label}
-                          {l.badge && <span className="v3-badge">{l.badge}</span>}
+                          {(isRouteNouveau(l.to) ? 'Nouveau' : l.badge) && <span className="v3-badge">{isRouteNouveau(l.to) ? 'Nouveau' : l.badge}</span>}
                         </span>
                         {l.desc && (
                           <span className="block text-[11px] mt-0.5" style={{ color: 'var(--v3-muted)' }}>
