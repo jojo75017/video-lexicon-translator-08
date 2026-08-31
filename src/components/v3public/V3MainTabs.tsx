@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { ChevronDown, LayoutGrid, Menu, X, ArrowRight } from 'lucide-react';
+import { isRouteNouveau } from '@/data/v3Nouveautes';
 import { V3_HEADER_MENU, type MenuCategory } from '@/data/v3HeaderMenu';
 
 /**
