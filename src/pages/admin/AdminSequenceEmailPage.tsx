@@ -9,6 +9,8 @@ import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import {
   BONUS_TOTAL_VALUE,
   CAMPAGNE,
@@ -18,6 +20,16 @@ import {
   emailToHtml,
   type CampagneEmail,
 } from '@/data/campagneUnique';
+import {
+  NEWSLETTERS,
+  NEWSLETTER_EXCLUDE_TAG,
+  NEWSLETTER_HOWTO,
+  NEWSLETTER_SENDER,
+  NEWSLETTER_TAG,
+  newsletterToHtml,
+  newsletterToText,
+  type Newsletter,
+} from '@/data/newslettersSystemeio';
 
 function CopyButton({
   value,
@@ -207,6 +219,107 @@ function EssaiFunnelPanel() {
   );
 }
 
+function NewsletterCard({ newsletter }: { newsletter: Newsletter }) {
+  const html = newsletterToHtml(newsletter);
+  const text = newsletterToText(newsletter);
+
+  return (
+    <Card className="rounded-2xl border-border bg-card p-5 shadow-sm">
+      <div className="flex flex-wrap items-center gap-2">
+        <Badge className="rounded-full">Newsletter {newsletter.number}</Badge>
+        <Badge variant="outline" className="rounded-full">
+          <Clock className="mr-1.5 h-3 w-3" />
+          {newsletter.sendDate} — {newsletter.sendTime}
+        </Badge>
+        <Badge variant="outline" className="rounded-full">
+          <Target className="mr-1.5 h-3 w-3" />
+          {newsletter.goal}
+        </Badge>
+      </div>
+
+      <h3 className="mt-3 text-lg font-semibold text-foreground">{newsletter.subject}</h3>
+      <p className="mt-1 text-sm text-muted-foreground">Pré-header : {newsletter.preheader}</p>
+      <p className="mt-2 text-sm text-muted-foreground">{newsletter.note}</p>
+
+      <div className="mt-4 rounded-xl border border-border bg-muted/30 p-3 text-sm">
+        <p className="font-medium text-foreground">Boutons de cet email</p>
+        <p className="mt-1 text-muted-foreground">
+          1. « {newsletter.cta.label} » → {newsletter.cta.url}
+        </p>
+        {newsletter.cta2 && (
+          <p className="text-muted-foreground">
+            2. « {newsletter.cta2.label} » → {newsletter.cta2.url}
+          </p>
+        )}
+      </div>
+
+      <pre className="mt-4 max-h-72 overflow-auto whitespace-pre-wrap rounded-xl bg-muted/50 p-4 text-sm leading-relaxed text-foreground">
+        {text}
+      </pre>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <CopyButton value={newsletter.subject} label="Copier l'objet" />
+        <CopyButton value={html} label="Copier le HTML (avec boutons)" variant="default" />
+        <CopyButton value={text} label="Copier le texte" />
+        <CopyButton value={newsletter.preheader} label="Copier le pré-header" />
+        <Button asChild size="sm" variant="ghost" className="rounded-xl">
+          <a href={newsletter.cta.url} target="_blank" rel="noopener noreferrer">
+            <ExternalLink className="mr-2 h-4 w-4" /> Tester le bouton 1
+          </a>
+        </Button>
+        {newsletter.cta2 && (
+          <Button asChild size="sm" variant="ghost" className="rounded-xl">
+            <a href={newsletter.cta2.url} target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="mr-2 h-4 w-4" /> Tester le bouton 2
+            </a>
+          </Button>
+        )}
+      </div>
+    </Card>
+  );
+}
+
+function NewslettersPanel() {
+  return (
+    <div className="space-y-6">
+      <Card className="rounded-2xl border-border bg-card p-6">
+        <Badge className="rounded-full">Nouveaux emails Systeme.io</Badge>
+        <h2 className="mt-3 text-xl font-bold text-foreground">
+          5 newsletters datées — septembre 2026
+        </h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Ce sont des diffusions ponctuelles à programmer aux dates indiquées, en plus de la
+          campagne automatique. Expéditeur : <strong>{NEWSLETTER_SENDER}</strong> · cible :{' '}
+          <strong>{NEWSLETTER_TAG}</strong> · exclusion : <strong>{NEWSLETTER_EXCLUDE_TAG}</strong>.
+        </p>
+        <ul className="mt-4 space-y-1 text-sm text-muted-foreground">
+          {NEWSLETTERS.map((n) => (
+            <li key={n.id}>
+              <strong className="text-foreground">{n.sendDate}</strong> — {n.subject}
+            </li>
+          ))}
+        </ul>
+      </Card>
+
+      <Card className="rounded-2xl border-border bg-card p-6">
+        <h2 className="text-lg font-semibold text-foreground">Mode d'emploi</h2>
+        <div className="mt-4 space-y-3 text-sm">
+          {NEWSLETTER_HOWTO.map((item) => (
+            <div key={item.title}>
+              <p className="font-medium text-foreground">{item.title}</p>
+              <p className="text-muted-foreground">{item.detail}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {NEWSLETTERS.map((n) => (
+        <NewsletterCard key={n.id} newsletter={n} />
+      ))}
+    </div>
+  );
+}
+
 export default function AdminSequenceEmailPage() {
   const navigate = useNavigate();
 
@@ -219,54 +332,72 @@ export default function AdminSequenceEmailPage() {
 
         <AdminPanelNav />
 
-        <Card className="rounded-2xl border-border bg-card p-6">
-          <Badge className="rounded-full">Campagne unique</Badge>
-          <h1 className="mt-3 text-2xl font-bold text-foreground">{CAMPAGNE.name}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Un seul tag Systeme.io : <strong>{CAMPAGNE.tag}</strong>. Un seul lien par email.
-            Les trois premiers emails renvoient sur la page d'essai (idée → titre, sommaire et
-            chapitre 1, puis mur email), les deux derniers sur la commande à {CAMPAGNE.price}.
-          </p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Les envois partent uniquement de Systeme.io (contact@ebookstudio-mail.fr) : ici on copie
-            l'objet et le corps de chaque email. L'application n'envoie plus aucune campagne de masse ;
-            Resend reste réservé aux emails de service (codes d'accès, confirmations de paiement).
-          </p>
-        </Card>
+        <Tabs defaultValue="newsletters" className="space-y-6">
+          <TabsList className="rounded-xl">
+            <TabsTrigger value="newsletters" className="rounded-lg">
+              Nouveaux emails Systeme.io
+            </TabsTrigger>
+            <TabsTrigger value="campagne" className="rounded-lg">
+              Campagne automatique
+            </TabsTrigger>
+          </TabsList>
 
-        <EssaiFunnelPanel />
+          <TabsContent value="newsletters" className="space-y-6">
+            <NewslettersPanel />
+          </TabsContent>
 
+          <TabsContent value="campagne" className="space-y-6">
+            <Card className="rounded-2xl border-border bg-card p-6">
+              <Badge className="rounded-full">Campagne unique</Badge>
+              <h1 className="mt-3 text-2xl font-bold text-foreground">{CAMPAGNE.name}</h1>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Un seul tag Systeme.io : <strong>{CAMPAGNE.tag}</strong>. Un seul lien par email.
+                Les trois premiers emails renvoient sur la page d'essai (idée → titre, sommaire et
+                chapitre 1, puis mur email), les deux derniers sur la commande à {CAMPAGNE.price}.
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Les envois partent uniquement de Systeme.io (contact@ebookstudio-mail.fr) : ici on
+                copie l'objet et le corps de chaque email. L'application n'envoie plus aucune
+                campagne de masse ; Resend reste réservé aux emails de service (codes d'accès,
+                confirmations de paiement).
+              </p>
+            </Card>
 
-        <Card className="rounded-2xl border-border bg-card p-6">
-          <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
-            <Gift className="h-5 w-5" /> Les bonus offerts à l'inscription — {BONUS_TOTAL_VALUE}
-          </h2>
-          <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-            {CAMPAGNE_BONUSES.map((bonus) => (
-              <li key={bonus.key}>
-                <strong className="text-foreground">{bonus.title}</strong> — {bonus.value} · {bonus.to}
-              </li>
-            ))}
-          </ul>
-        </Card>
+            <EssaiFunnelPanel />
 
-        <div className="space-y-4">
-          <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
-            <Mail className="h-5 w-5" /> Les {CAMPAGNE_EMAILS.length} emails, dans l'ordre
-          </h2>
-          {CAMPAGNE_EMAILS.map((email, index) => (
-            <EmailCard key={email.id} email={email} index={index} />
-          ))}
-        </div>
+            <Card className="rounded-2xl border-border bg-card p-6">
+              <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                <Gift className="h-5 w-5" /> Les bonus offerts à l'inscription — {BONUS_TOTAL_VALUE}
+              </h2>
+              <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+                {CAMPAGNE_BONUSES.map((bonus) => (
+                  <li key={bonus.key}>
+                    <strong className="text-foreground">{bonus.title}</strong> — {bonus.value} ·{' '}
+                    {bonus.to}
+                  </li>
+                ))}
+              </ul>
+            </Card>
 
-        <Card className="rounded-2xl border-border bg-card p-6">
-          <h2 className="text-lg font-semibold text-foreground">Paramétrage dans Systeme.io</h2>
-          <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
-            {SYSTEMEIO_SETUP_STEPS.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ol>
-        </Card>
+            <div className="space-y-4">
+              <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                <Mail className="h-5 w-5" /> Les {CAMPAGNE_EMAILS.length} emails, dans l'ordre
+              </h2>
+              {CAMPAGNE_EMAILS.map((email, index) => (
+                <EmailCard key={email.id} email={email} index={index} />
+              ))}
+            </div>
+
+            <Card className="rounded-2xl border-border bg-card p-6">
+              <h2 className="text-lg font-semibold text-foreground">Paramétrage dans Systeme.io</h2>
+              <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
+                {SYSTEMEIO_SETUP_STEPS.map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
+              </ol>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
