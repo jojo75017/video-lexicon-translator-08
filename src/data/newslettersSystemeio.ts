@@ -34,9 +34,20 @@ const cadeau = (src: string) => `${SITE_ORIGIN}/cadeau?src=${src}`;
 export const SYSTEMEIO_EMAIL_MERGE_TAG = '{{contact.email}}';
 
 const TRACK_ENDPOINT = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/track-email-click`;
+const OPEN_ENDPOINT = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/track-email-open`;
 
 /** Préfixe utilisé dans `email_clicks.template_name` pour ces newsletters. */
 export const NEWSLETTER_TRACK_PREFIX = 'newsletter-';
+
+/** Pixel invisible d'ouverture (email fusionné par Systeme.io). */
+export function trackedOpenPixelUrl(n: Pick<Newsletter, 'number'>): string {
+  const params = new URLSearchParams({
+    s: String(n.number),
+    t: `${NEWSLETTER_TRACK_PREFIX}${n.number}-open`,
+  });
+  return `${OPEN_ENDPOINT}?e=${SYSTEMEIO_EMAIL_MERGE_TAG}&${params.toString()}`;
+}
+
 
 /** Regroupe une URL de destination en une catégorie lisible dans les stats. */
 export function newsletterDestination(url: string): string {
