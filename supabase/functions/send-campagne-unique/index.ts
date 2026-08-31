@@ -136,17 +136,17 @@ Deno.serve(async (req) => {
       const limit = Math.min(Math.max(Number(body.batch_size || 100), 1), 300);
       const step = TEMPLATES.indexOf(template as typeof TEMPLATES[number]) + 1;
 
-      // Journal des envois déjà faits — paginé (PostgREST plafonne à 1000 lignes),
-      // sinon la déduplication est incomplète et les mêmes contacts sont renvoyés.
+      // Journal des envois déjà faits — paginé (PostgREST plafonne à 1000 lignes).
+      // Tous les statuts comptent : une tentative enregistrée interdit un second envoi.
       const done = new Set<string>();
       for (let offset = 0; offset < 50000; offset += 1000) {
-        const { data: logRows } = await db
+        const { data: logRows, error: logError } = await db
           .from("email_send_log")
           .select("recipient_email")
           .eq("template_name", template)
-          .in("status", ["sent", "delivered"])
           .order("created_at", { ascending: true })
           .range(offset, offset + 999);
+        if (logError) throw logError;
         if (!logRows || logRows.length === 0) break;
         for (const row of logRows) done.add(normalize(row.recipient_email || ""));
         if (logRows.length < 1000) break;
@@ -162,13 +162,14 @@ Deno.serve(async (req) => {
       let eligible = 0;
       const page = 1000;
       for (let offset = 0; offset < 20000; offset += page) {
-        const { data: rows } = await db
+        const { data: rows, error: rowsError } = await db
           .from("sales_prospects")
           .select("email,first_name")
           .eq("status", "active")
           .eq("unsubscribed", false)
-          .order("created_at", { ascending: true })
+          .order("email", { ascending: true })
           .range(offset, offset + page - 1);
+        if (rowsError) throw rowsError;
         if (!rows || rows.length === 0) break;
         for (const row of rows) {
           const email = normalize(String(row.email || ""));
@@ -185,8 +186,27 @@ Deno.serve(async (req) => {
       if (body.dry_run) return json({ success: true, mode, template, would_send: targets.length, remaining });
 
       let sent = 0;
+      let skipped = 0;
       const failures: Array<{ email: string; error: string }> = [];
       for (const target of targets) {
+        // RÉSERVATION AVANT ENVOI : un index unique (template_name, lower(email))
+        // rend le doublon impossible, même si deux lots partent en parallèle.
+        const { data: claim, error: claimError } = await db
+          .from("email_send_log")
+          .insert({
+            recipient_email: target.email,
+            template_name: template,
+            message_id: `${template}-${target.email}`,
+            status: "sending",
+          })
+          .select("id")
+          .maybeSingle();
+
+        if (claimError || !claim) {
+          skipped++;
+          continue;
+        }
+
         const result = await sendResendEmailThrottled({
           from: FROM_CAMPAIGN,
           to: [target.email],
@@ -195,14 +215,15 @@ Deno.serve(async (req) => {
           reply_to: REPLY_TO,
         });
 
-        await db.from("email_send_log").insert({
-          recipient_email: target.email,
-          template_name: template,
-          message_id: result.id || `${template}-${target.email}`,
-          provider_message_id: result.id || null,
-          status: result.ok ? "sent" : "failed",
-          error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}`,
-        });
+        await db
+          .from("email_send_log")
+          .update({
+            provider_message_id: result.id || null,
+            message_id: result.id || `${template}-${target.email}`,
+            status: result.ok ? "sent" : "failed",
+            error_message: result.ok ? null : `HTTP ${result.status || ""}: ${result.detail || ""}`,
+          })
+          .eq("id", claim.id);
 
         if (!result.ok) {
           failures.push({ email: target.email, error: `HTTP ${result.status || ""}` });
@@ -222,12 +243,15 @@ Deno.serve(async (req) => {
           .eq("email", target.email);
       }
 
+
       return json({
         success: true,
         mode,
         template,
         targets: targets.length,
         sent,
+        skipped,
+
         failed: failures.length,
         failures: failures.slice(0, 20),
         remaining: Math.max(remaining, 0),

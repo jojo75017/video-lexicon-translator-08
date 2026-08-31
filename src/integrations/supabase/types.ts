@@ -2910,6 +2910,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_list_testimonials: {
+        Args: never
+        Returns: {
+          approved: boolean
+          author_name: string
+          book_title: string
+          comment: string
+          consent_publication: boolean
+          created_at: string
+          email: string
+          id: string
+          photo_url: string
+          rating: number
+        }[]
+      }
       can_create_vip: { Args: never; Returns: boolean }
       count_vip_subscribers: { Args: never; Returns: number }
       generate_referral_code: { Args: never; Returns: string }
