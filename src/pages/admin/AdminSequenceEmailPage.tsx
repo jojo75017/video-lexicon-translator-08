@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
-import { CampagneDiffusionPanel } from '@/components/admin/CampagneDiffusionPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -229,11 +228,11 @@ export default function AdminSequenceEmailPage() {
             chapitre 1, puis mur email), les deux derniers sur la commande à {CAMPAGNE.price}.
           </p>
           <p className="mt-2 text-sm text-muted-foreground">
-            Toutes les anciennes campagnes ont été supprimées : il n'y a plus qu'un seul contenu à jour.
+            Les envois partent uniquement de Systeme.io (contact@ebookstudio-mail.fr) : ici on copie
+            l'objet et le corps de chaque email. L'application n'envoie plus aucune campagne de masse ;
+            Resend reste réservé aux emails de service (codes d'accès, confirmations de paiement).
           </p>
         </Card>
-
-        <CampagneDiffusionPanel />
 
         <EssaiFunnelPanel />
 
