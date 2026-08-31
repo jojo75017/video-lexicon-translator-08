@@ -11,6 +11,7 @@ import useV3Entitlement from '@/hooks/useV3Entitlement';
 import useIsAdmin from '@/hooks/useIsAdmin';
 import useTrialAccess from '@/hooks/useTrialAccess';
 import { isTrialLockedPath } from '@/lib/trialLockedPaths';
+import { countUnseenNouveautes, isRouteNouveau } from '@/data/v3Nouveautes';
 import ThemeToggle from './ThemeToggle';
 
 /**
@@ -48,7 +49,7 @@ const NAV: NavSection[] = [
       { to: '/v3', label: 'Accueil V3', icon: Home, end: true },
       { to: '/v3/fonctionnalites', label: 'Fonctionnalités (12 modules)', icon: LayoutGrid, end: true, badge: 'Hub' },
       { to: '/v3/workflow', label: '🤖 Workflow 15 Agents — écrire mon livre', icon: Layers, end: true, badge: 'Pipeline' },
-      { to: '/v3/kit-demarrage', label: '📘 Kit de démarrage (PDF)', icon: GraduationCap, badge: 'NEW' },
+      { to: '/v3/kit-demarrage', label: '📘 Kit de démarrage (PDF)', icon: GraduationCap },
       { to: '/v3/nouveautes', label: '✨ Nouveautés V3', icon: Sparkles },
     ],
   },
@@ -56,13 +57,13 @@ const NAV: NavSection[] = [
     section: 'Créer un livre',
     items: [
       { to: '/v3/lancer', label: '🚀 Lancer mon livre (fiche + 15 agents)', icon: Layers, end: true, badge: 'Direct' },
-      { to: '/v3/biographie', label: '📖 Biographie — Le récit de votre vie', icon: BookOpen, badge: 'NEW' },
+      { to: '/v3/biographie', label: '📖 Biographie — Le récit de votre vie', icon: BookOpen },
       { to: '/v3/create', label: 'Ebookstudio-Génie', icon: Sparkles, badge: 'IA' },
       { to: '/v3/create?sommaire=ia', label: 'Sommaire IA — dialogue (récit / votre vie)', icon: ListTree, badge: 'IA' },
       { to: '/v3/outils/sommaire-ultime', label: 'Table des matières (sommaire seul)', icon: ListTree },
       { to: '/v3/workflow?genre=roman', label: '📕 Roman / Thriller — workflow 15 agents', icon: Layers, badge: 'Workflow' },
       { to: '/v3/studio', label: 'Studio Pro (Gemini + ChatGPT)', icon: Gem, badge: 'Pro' },
-      { to: '/v3/contentstudio', label: '🎬 ContentStudio Engine (livre → vidéo)', icon: Film, badge: 'NEW' },
+      { to: '/v3/contentstudio', label: '🎬 ContentStudio Engine (livre → vidéo)', icon: Film },
       { to: '/v3/livres/jeux-enigmes', label: '🧩 Livres de Jeux & Énigmes', icon: Puzzle, badge: 'Pro' },
       { to: '/v3/livres/cherche-trouve', label: '🔍 Coloriages Cherche & Trouve', icon: Search, badge: 'Pro' },
       { to: '/v3/livres/histoires-illustrees', label: '📖 Histoires Courtes & Contes', icon: BookOpen, badge: 'Pro' },
@@ -113,7 +114,7 @@ const NAV: NavSection[] = [
   {
     section: 'Vendre',
     items: [
-      { to: '/v3/acquisition', label: '🚀 Plan 14 jours — trouver des lecteurs', icon: Megaphone, badge: 'NEW' },
+      { to: '/v3/acquisition', label: '🚀 Plan 14 jours — trouver des lecteurs', icon: Megaphone },
       { to: '/v3/posts', label: '📣 Posts — 30 jours prêts', icon: Megaphone },
       { to: '/v3/avis', label: '⭐ Obtenir des avis clients', icon: Star, badge: 'Marche à suivre' },
       { to: '/mon-parrainage', label: '🤝 Parrainage — 30 % de commission', icon: Gem },
@@ -177,9 +178,20 @@ export default function V3Sidebar() {
 
   const [open, setOpen] = useState<Record<string, boolean>>({ [activeSection]: true });
 
+  // Nouveautés non vues : recalculé à chaque navigation (la page /v3/nouveautes remet à 0).
+  const unseenNouveautes = useMemo(() => countUnseenNouveautes(), [pathname]);
+
+  /** Badge affiché : « NOUVEAU » automatique (< 30 jours) ou badge défini dans NAV. */
+  const badgeFor = (it: NavItem): string | undefined => {
+    if (it.to === '/v3/nouveautes') return unseenNouveautes > 0 ? `${unseenNouveautes} new` : undefined;
+    if (!it.external && isRouteNouveau(it.to)) return 'Nouveau';
+    return it.badge;
+  };
+
   useEffect(() => {
     setOpen((prev) => (prev[activeSection] ? prev : { ...prev, [activeSection]: true }));
   }, [activeSection]);
+
 
   return (
     <aside
@@ -299,12 +311,12 @@ export default function V3Sidebar() {
                             {!collapsed && (
                               <>
                                 <span className="truncate flex-1">{it.label}</span>
-                                {it.badge && (
+                                {badgeFor(it) && (
                                   <span
                                     className="text-[9px] font-bold uppercase tracking-[0.15em] px-1.5 py-0.5 rounded"
                                     style={{ background: '#C97A14', color: '#fff' }}
                                   >
-                                    {it.badge}
+                                    {badgeFor(it)}
                                   </span>
                                 )}
                               </>
@@ -345,12 +357,12 @@ export default function V3Sidebar() {
                                 <span className="truncate flex-1">{it.label}</span>
                                 {trialLocked ? (
                                   <Lock className="w-3.5 h-3.5 shrink-0" style={{ color: 'var(--v3-muted)' }} />
-                                ) : it.badge ? (
+                                ) : badgeFor(it) ? (
                                   <span
                                     className="text-[9px] font-bold uppercase tracking-[0.15em] px-1.5 py-0.5 rounded"
                                     style={{ background: '#C97A14', color: '#fff' }}
                                   >
-                                    {it.badge}
+                                    {badgeFor(it)}
                                   </span>
                                 ) : null}
                               </>

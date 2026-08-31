@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { ChevronDown, LayoutGrid, Menu, X, ArrowRight } from 'lucide-react';
+import { isRouteNouveau } from '@/data/v3Nouveautes';
 import { V3_HEADER_MENU, type MenuCategory } from '@/data/v3HeaderMenu';
 
 /**
@@ -143,7 +144,7 @@ export default function V3MainTabs() {
                                   <span className="flex-1 min-w-0">
                                     <span className="flex items-center gap-2 text-[13px] font-semibold">
                                       <span>{l.label}</span>
-                                      {l.badge && <span className="v3-badge">{l.badge}</span>}
+                                      {(isRouteNouveau(l.to) ? 'Nouveau' : l.badge) && <span className="v3-badge">{isRouteNouveau(l.to) ? 'Nouveau' : l.badge}</span>}
                                     </span>
                                     {l.desc && (
                                       <span className="block text-[11.5px] mt-0.5 leading-snug" style={{ color: 'var(--v3-muted)' }}>
@@ -245,7 +246,7 @@ export default function V3MainTabs() {
                       >
                         <span className="flex items-center gap-2">
                           {l.label}
-                          {l.badge && <span className="v3-badge">{l.badge}</span>}
+                          {(isRouteNouveau(l.to) ? 'Nouveau' : l.badge) && <span className="v3-badge">{isRouteNouveau(l.to) ? 'Nouveau' : l.badge}</span>}
                         </span>
                         {l.desc && (
                           <span className="block text-[11px] mt-0.5" style={{ color: 'var(--v3-muted)' }}>

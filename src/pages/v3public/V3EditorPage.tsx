@@ -40,7 +40,7 @@ export default function V3EditorPage() {
               <Edit3 className="h-6 w-6" />
             </div>
             <div>
-              <Badge className="bg-amber-500 mb-1">NEW · Débutant 9,99€</Badge>
+              <Badge className="bg-amber-500 mb-1">Inclus dans Plume</Badge>
               <h1 className="text-3xl font-bold text-[#232F3E]">Éditeur WYSIWYG</h1>
             </div>
           </div>
