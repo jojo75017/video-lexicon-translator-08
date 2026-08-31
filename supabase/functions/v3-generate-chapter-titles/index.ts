@@ -131,11 +131,8 @@ Deno.serve(async (req) => {
       const data = await res.json();
       raw = data?.choices?.[0]?.message?.content ?? "";
     }
+    const cleaned = String(raw).replace(/```json|```/gi, "").trim();
 
-
-    const data = await res.json();
-    const raw: string = data?.choices?.[0]?.message?.content ?? "";
-    const cleaned = raw.replace(/```json|```/gi, "").trim();
     const match = cleaned.match(/\{[\s\S]*\}/);
 
     let titles: { number: number; title: string }[] = [];
