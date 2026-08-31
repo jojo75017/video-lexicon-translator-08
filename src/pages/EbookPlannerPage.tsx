@@ -2927,10 +2927,26 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                   onImagesUpdate={(imgs) => setEbookImages(imgs as any)}
                   onInsertImageToChapter={(chapterId, url) => {
                     const chapter = chapters.find(c => c.id === chapterId);
-                    if (chapter) {
-                      updateChapterContent(chapterId, (chapter.content || '') + `\n\n![Image](${url})\n\n`);
+                    if (!chapter) {
+                      toast.error("Chapitre introuvable — régénérez l'image depuis la liste des chapitres actuels.");
+                      return;
                     }
+                    if (!url) {
+                      toast.error("Image indisponible : relancez la génération.");
+                      return;
+                    }
+                    // Marqueur reconnu par l'éditeur et par l'export DOCX/PDF.
+                    const marker = url.startsWith('http')
+                      ? `\n\n[IMAGE_URL:${url}]\n\n`
+                      : `\n\n[IMAGE:${Date.now()}:${url}]\n\n`;
+                    if ((chapter.content || '').includes(url)) {
+                      toast.info('Cette image est déjà insérée dans ce chapitre.');
+                      return;
+                    }
+                    updateChapterContent(chapterId, (chapter.content || '') + marker);
+                    toast.success(`Image insérée dans « ${chapter.title || 'ce chapitre'} »`);
                   }}
+
                 />
               </TabsContent>
               <TabsContent value="library" className="mt-6">
