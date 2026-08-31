@@ -6,6 +6,19 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { type StripeEnv, verifyWebhook, stripeRequest } from "../_shared/stripe.ts";
 import { EMAIL_SENDING_ENABLED } from "../_shared/emailSendingGuard.ts";
+import { pushToSystemeIo } from "../_shared/systemeio.ts";
+
+// Marque l'acheteur CLIENT-47 dans Systeme.io : l'automatisation « stop sur tag »
+// sort immédiatement le contact de la campagne de vente.
+async function tagClient47(email: string, firstName?: string | null) {
+  if (!email) return;
+  try {
+    const res = await pushToSystemeIo(email.toLowerCase(), firstName || "", ["CLIENT-47"]);
+    if (!res.ok) console.error("Systeme.io CLIENT-47 tag failed:", res.detail);
+  } catch (e) {
+    console.error("Systeme.io CLIENT-47 tag error:", e);
+  }
+}
 
 let _supabase: ReturnType<typeof createClient> | null = null;
 function getSupabase() {
@@ -99,6 +112,7 @@ async function handleCheckoutCompleted(session: any) {
   }, { onConflict: "email" });
 
   await sendAccessEmail(order.email, order.first_name, accessCode);
+  await tagClient47(order.email as string, order.first_name as string | null);
 }
 
 // ===== Packs à la carte (v3-upsell-checkout) — ex. Livres de Jeux & Énigmes =====
@@ -164,6 +178,7 @@ async function grantV3Lifetime(email: string) {
     plan_tier: "pro",
     expires_at: null,
   }, { onConflict: "email" });
+  await tagClient47(email);
   return accessCode;
 }
 
