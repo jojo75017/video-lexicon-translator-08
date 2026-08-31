@@ -45,7 +45,12 @@ Deno.serve(async (req) => {
       if (isSafeUrl(decoded)) target = rescueKnownBrokenUrl(decoded);
     }
 
-    if (email && dest) {
+    // Les balises de fusion non remplacées ({{contact.email}}) ne sont pas loggées.
+    const decodedEmail = email ? decodeURIComponent(email).trim() : "";
+    const isRealEmail = /^[^@\s{}]+@[^@\s{}]+\.[^@\s{}]+$/.test(decodedEmail);
+
+    if (isRealEmail && dest) {
+
       const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
       const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
       const supabase = createClient(supabaseUrl, serviceKey);
