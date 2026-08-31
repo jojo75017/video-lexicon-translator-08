@@ -1,13 +1,15 @@
 ---
 name: Fournisseurs email — Resend + Systeme.io uniquement
-description: Brevo abandonné ; Resend (app + campagnes) et Systeme.io (marketing) réactivé le 23/08/2026 avec synchro en masse des contacts.
+description: Brevo abandonné ; depuis le 24/08/2026 100 % des campagnes marketing partent de Systeme.io (contact@ebookstudio-mail.fr) et Resend reste en offre gratuite pour les emails de service uniquement.
 type: constraint
 ---
 Brevo est abandonné (août 2026) : ne jamais proposer, brancher ou coder Brevo.
 
-Fournisseurs retenus :
-- **Resend** — tous les emails de l'application et des campagnes envoyées depuis le projet (via `RESEND_API_KEY`).
-- **Systeme.io** — automatisations marketing côté plateforme externe. Désactivé quelques jours en août 2026, puis **réactivé le 23/08/2026** : tous les contacts y sont synchronisés (on nettoie après).
+Répartition définitive (24/08/2026) :
+- **Systeme.io** — 100 % des campagnes marketing, depuis le domaine vérifié `ebookstudio-mail.fr` (expéditeur `contact@ebookstudio-mail.fr`). Aucun réglage DNS à faire chez Hostinger ni chez Lovable : ce domaine est indépendant de `ebookstudio.fr`.
+- **Resend (offre GRATUITE)** — uniquement les emails de service : codes d'accès, confirmations de paiement, tests admin. Jamais d'envoi de masse.
+- **Aucun envoi de masse depuis l'application.** `CampagneDiffusionPanel`, `send-campagne-unique`, `send-sales-email`, `send-closing-47` et leurs tâches cron ont été supprimés. `/admin/sequence-email` sert uniquement à copier-coller les 5 emails dans Systeme.io.
+- Tags Systeme.io de la campagne unique : `PROSPECT-EBS` (entrée) et `CLIENT-47` (posé automatiquement par `payments-webhook` après achat → règle « désinscrire de la campagne »).
 
 Synchronisation Systeme.io (mise en place le 23/08/2026) :
 - Fonction `sync-systemeio-contacts` (admin) : modes `test`, `dry_run`, `sync` (arrière-plan auto-enchaîné ~100 s/lot, verrou anti double-lancement), `retag` (re-tagage des contacts déjà synchronisés, lancé auto à la fin d'une synchro), `status`.
