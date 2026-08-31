@@ -21,7 +21,7 @@ Deno.serve(async (req) => {
       const supabase = createClient(supabaseUrl, serviceKey);
 
       await supabase.from("email_opens").insert({
-        prospect_email: decodeURIComponent(email),
+        prospect_email: decodedEmail,
         email_step: parseInt(step, 10),
         template_name: template ? decodeURIComponent(template) : null,
         user_agent: req.headers.get("user-agent") || null,
