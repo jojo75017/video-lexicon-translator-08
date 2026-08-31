@@ -24,6 +24,57 @@ const essai = (src: string) => `${SITE_ORIGIN}/essai?src=${src}`;
 const bonus = (src: string) => `${SITE_ORIGIN}/bonus?src=${src}`;
 const cadeau = (src: string) => `${SITE_ORIGIN}/cadeau?src=${src}`;
 
+/* ------------------- Traçage des clics Systeme.io ------------------- */
+
+/**
+ * Balise de fusion Systeme.io : remplacée par l'email du contact à l'envoi.
+ * C'est elle qui permet de savoir QUI a cliqué (et donc combien de prospects
+ * uniques ont ouvert /essai ou /commander).
+ */
+export const SYSTEMEIO_EMAIL_MERGE_TAG = '{{contact.email}}';
+
+const TRACK_ENDPOINT = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/track-email-click`;
+
+/** Préfixe utilisé dans `email_clicks.template_name` pour ces newsletters. */
+export const NEWSLETTER_TRACK_PREFIX = 'newsletter-';
+
+/** Regroupe une URL de destination en une catégorie lisible dans les stats. */
+export function newsletterDestination(url: string): string {
+  const path = url.replace(/^https?:\/\/[^/]+/, '');
+  if (path.startsWith('/essai')) return '/essai';
+  if (path.startsWith('/commander')) return '/commander';
+  if (path.startsWith('/cadeau')) return '/cadeau';
+  if (path.startsWith('/bonus')) return '/bonus';
+  return path.split('?')[0] || '/';
+}
+
+/** Ajoute les UTM à la destination finale (lisible dans GA4). */
+function withUtm(url: string, campaign: string, slot: string): string {
+  const sep = url.includes('?') ? '&' : '?';
+  return `${url}${sep}utm_source=systemeio&utm_medium=email&utm_campaign=${campaign}&utm_content=${slot}`;
+}
+
+/**
+ * URL à mettre réellement dans le bouton : passe par la fonction de suivi
+ * (enregistre email + newsletter + destination dans `email_clicks`) puis
+ * redirige immédiatement vers la page.
+ */
+export function trackedCtaUrl(
+  n: Pick<Newsletter, 'id' | 'number'>,
+  cta: NewsletterCta,
+  slot: 'cta1' | 'cta2',
+): string {
+  const dest = withUtm(cta.url, n.id, slot);
+  const params = new URLSearchParams({
+    s: String(n.number),
+    t: `${NEWSLETTER_TRACK_PREFIX}${n.number}-${slot}`,
+    u: dest,
+  });
+  // L'email n'est pas encodé : Systeme.io doit reconnaître la balise de fusion.
+  return `${TRACK_ENDPOINT}?e=${SYSTEMEIO_EMAIL_MERGE_TAG}&${params.toString()}`;
+}
+
+
 export interface NewsletterCta {
   label: string;
   url: string;
