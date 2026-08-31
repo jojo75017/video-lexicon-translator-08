@@ -9,6 +9,8 @@ import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import {
   BONUS_TOTAL_VALUE,
   CAMPAGNE,
@@ -18,6 +20,16 @@ import {
   emailToHtml,
   type CampagneEmail,
 } from '@/data/campagneUnique';
+import {
+  NEWSLETTERS,
+  NEWSLETTER_EXCLUDE_TAG,
+  NEWSLETTER_HOWTO,
+  NEWSLETTER_SENDER,
+  NEWSLETTER_TAG,
+  newsletterToHtml,
+  newsletterToText,
+  type Newsletter,
+} from '@/data/newslettersSystemeio';
 
 function CopyButton({
   value,
