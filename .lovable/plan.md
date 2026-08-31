@@ -47,24 +47,39 @@ que tu voies dans le suivi ce qui vient de Systeme.io.
 
 ## Étape 3 — Ce que tu fais dans Systeme.io (procédure exacte)
 
+Bonne nouvelle : ton domaine d'envoi `ebookstudio-mail.fr` est déjà **Vérifié**
+dans Systeme.io, avec l'expéditeur `contact@ebookstudio-mail.fr` vérifié aussi.
+Comme c'est un domaine **séparé** de `ebookstudio.fr`, il n'y a **rien à
+changer chez Hostinger ni chez Lovable** : le SPF/DKIM d'`ebookstudio.fr`
+(Resend/SES) et celui d'`ebookstudio-mail.fr` (Systeme.io) ne se marchent pas
+dessus. Tes liens dans les emails continuent de pointer vers `ebookstudio.fr`,
+c'est normal et c'est ce qu'il faut.
+
 Un document `docs/systemeio-configuration.md` livré avec le détail, résumé :
 
-1. **Authentifier le domaine** : Systeme.io → Paramètres → Domaines d'envoi →
-   ajouter `ebookstudio.fr`. Il te donne un SPF/DKIM. Ton SPF actuel devient
-   `v=spf1 include:amazonses.com include:_spf.systeme.io ~all` (un seul
-   enregistrement SPF, jamais deux). DKIM en CNAME séparé. Sans ça, tes emails
-   partent en spam.
-2. **Créer les tags** : `PROSPECT-EBS`, `LEAD-CADEAU`, `CLIENT-47`,
-   `DESABONNE`, `ESSAI_EBOOKSTUDIO` (déjà existant).
-3. **Importer la liste** : les contacts sont déjà synchronisés par l'app ;
-   vérifier le compte et supprimer les doublons dans Systeme.io.
-4. **Créer la campagne** (Emails → Campagne « Lancement 47 ») : 5 emails, aux
+1. **Domaine d'envoi** : rien à faire, déjà vérifié. Un seul point à contrôler
+   dans Paramètres → Emails : le lien « Authentifier votre nom de domaine »
+   (affichage de l'en-tête) doit être fait pour `ebookstudio-mail.fr`, sinon
+   Gmail affiche « via systeme.io ».
+2. **Pied de page** : le texte de pied actuel est celui de `trafic-affiliation.com`
+   (liste de sites) — à remplacer par un pied EbookStudio, sinon tes emails de
+   vente EbookStudio affichent les liens d'un autre business.
+3. **Créer les tags** : `PROSPECT-EBS`, `LEAD-CADEAU`, `CLIENT-47`,
+   `ESSAI_EBOOKSTUDIO` (déjà existant).
+4. **Vérifier la liste** : les contacts sont déjà synchronisés par l'app ;
+   contrôler le nombre et nettoyer les doublons dans Systeme.io.
+5. **Créer la campagne** (Emails → Campagne « Lancement 47 ») : 5 emails, aux
    jours 0, 1, 2, 4, 6, déclenchée par le tag `LEAD-CADEAU`.
-5. **Automation** : formulaire d'inscription `/cadeau` → tag `LEAD-CADEAU` →
+6. **Automation** : formulaire d'inscription `/cadeau` → tag `LEAD-CADEAU` →
    campagne. Règle d'arrêt : si tag `CLIENT-47`, sortir de la campagne (on
    n'envoie plus l'offre à quelqu'un qui a acheté).
-6. **Poser le tag `CLIENT-47` à l'achat** : l'app le fera automatiquement après
+7. **Double opt-in** : le laisser désactivé pour cette campagne (le cadeau doit
+   arriver immédiatement après l'inscription).
+8. **Nettoyage automatique** : cocher « désinscrire les contacts qui n'ont
+   ouvert aucun email depuis 10 semaines » pour protéger ta délivrabilité.
+9. **Poser le tag `CLIENT-47` à l'achat** : l'app le fera automatiquement après
    un paiement validé (voir détails techniques).
+
 
 ## Étape 4 — Resend
 
