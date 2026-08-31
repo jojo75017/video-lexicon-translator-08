@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { generateProfessionalDocx, getDocxOutline, validateDocxChapters, isGenericTitle, type DocxExportOptions, type DocxValidationResult } from '@/utils/docxExportEngine';
 import { supabase } from '@/integrations/supabase/client';
+import { getActiveAIKey, getProvider } from '@/services/aiWritingService';
+
 import { toast } from 'sonner';
 
 interface DocxPreviewDialogProps {
