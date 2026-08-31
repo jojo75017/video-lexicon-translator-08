@@ -1133,6 +1133,7 @@ export type Database = {
       ebook_project_versions: {
         Row: {
           author_name: string | null
+          back_cover_data: Json
           book_summary: string | null
           chapter_length: string | null
           chapters: Json | null
@@ -1161,6 +1162,7 @@ export type Database = {
         }
         Insert: {
           author_name?: string | null
+          back_cover_data?: Json
           book_summary?: string | null
           chapter_length?: string | null
           chapters?: Json | null
@@ -1189,6 +1191,7 @@ export type Database = {
         }
         Update: {
           author_name?: string | null
+          back_cover_data?: Json
           book_summary?: string | null
           chapter_length?: string | null
           chapters?: Json | null
@@ -1228,6 +1231,7 @@ export type Database = {
       ebook_projects: {
         Row: {
           author_name: string | null
+          back_cover_data: Json
           book_summary: string | null
           chapter_length: string | null
           chapters: Json | null
@@ -1256,6 +1260,7 @@ export type Database = {
         }
         Insert: {
           author_name?: string | null
+          back_cover_data?: Json
           book_summary?: string | null
           chapter_length?: string | null
           chapters?: Json | null
@@ -1284,6 +1289,7 @@ export type Database = {
         }
         Update: {
           author_name?: string | null
+          back_cover_data?: Json
           book_summary?: string | null
           chapter_length?: string | null
           chapters?: Json | null

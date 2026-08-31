@@ -1,0 +1,3 @@
+ALTER TABLE public.ebook_projects ADD COLUMN IF NOT EXISTS back_cover_data jsonb NOT NULL DEFAULT '{"versions":[],"selectedIndex":null,"selectedText":"","shortVersion":"","authorBio":"","images":[],"selectedImageIndex":null}'::jsonb;
+
+ALTER TABLE public.ebook_project_versions ADD COLUMN IF NOT EXISTS back_cover_data jsonb NOT NULL DEFAULT '{"versions":[],"selectedIndex":null,"selectedText":"","shortVersion":"","authorBio":"","images":[],"selectedImageIndex":null}'::jsonb;
