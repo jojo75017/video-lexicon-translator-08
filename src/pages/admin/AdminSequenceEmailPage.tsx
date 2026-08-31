@@ -323,6 +323,8 @@ function NewslettersPanel() {
 
       <NewsletterClicksPanel />
 
+      <NewsletterEngagementPanel />
+
       {NEWSLETTERS.map((n) => (
         <NewsletterCard key={n.id} newsletter={n} />
       ))}
