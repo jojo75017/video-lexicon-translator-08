@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
-import { CampagneDiffusionPanel } from '@/components/admin/CampagneDiffusionPanel';
+import { supabase } from '@/integrations/supabase/client';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
