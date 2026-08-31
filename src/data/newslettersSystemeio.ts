@@ -339,17 +339,22 @@ export const NEWSLETTER_HOWTO: Array<{ title: string; detail: string }> = [
       `Ciblez le tag ${NEWSLETTER_TAG} et excluez le tag ${NEWSLETTER_EXCLUDE_TAG} (les acheteurs ne doivent jamais recevoir un email de vente). Expéditeur : ${NEWSLETTER_SENDER}.`,
   },
   {
-    title: '3. Comment garder les vrais boutons',
+    title: '3. Suivi des clics (ne pas modifier les URL)',
+    detail:
+      "Chaque bouton du HTML passe par un lien de suivi contenant la balise {{contact.email}} : Systeme.io la remplace par l'email du contact, le clic est enregistré, puis la page (/essai, /commander…) s'ouvre immédiatement. Résultat visible dans le tableau « Clics Systeme.io » plus haut : nombre de prospects uniques par destination et par newsletter. Si vous réécrivez une URL à la main, ce bouton n'est plus compté.",
+  },
+  {
+    title: '4. Comment garder les vrais boutons',
     detail:
       'Dans l\'éditeur, ajoutez un bloc « Texte », ouvrez l\'affichage du code source (icône < >), puis collez le HTML copié ici. Les boutons sont de véritables liens cliquables, testés sur Gmail, Outlook et Apple Mail. Si vous collez la version texte, les liens apparaissent en clair : c\'est le repli, moins performant.',
   },
   {
-    title: '4. Programmation',
+    title: '5. Programmation',
     detail:
       'Pour chaque newsletter, choisissez « Programmer » et saisissez la date et l\'heure indiquées sur la fiche. Les cinq peuvent être programmées d\'avance le même jour.',
   },
   {
-    title: '5. Avant d\'envoyer',
+    title: '6. Avant d\'envoyer',
     detail:
       'Utilisez « Envoyer un test » vers boubetgeorges@gmail.com, cliquez sur chaque bouton dans l\'email reçu et vérifiez que la page s\'ouvre bien. Vérifiez aussi le pied de page EbookStudio (pas celui hérité d\'un autre site).',
   },
