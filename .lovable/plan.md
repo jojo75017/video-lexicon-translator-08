@@ -1,83 +1,70 @@
-# Audit complet V3 avant lancement + repérage des nouveautés
+# Audit V3 — résultat du test réel et corrections avant lancement
 
-Objectif : passer la V3 au crible aujourd'hui pour que vos tests ne tombent pas
-sur des bugs, puis rendre les nouveautés visibles et l'orientation évidente pour
-les abonnés.
+## Ce que le test automatisé a réellement trouvé
 
-## 1. Audit automatisé des routes et des liens
+J'ai ouvert une à une les 58 pages `/v3/*` dans un vrai navigateur, connecté avec un compte admin.
 
-- Extraire la liste réelle des routes `/v3/*` déclarées dans `src/App.tsx`
-  (63 pages V3 recensées) et la comparer à **tous** les liens présents dans
-  le menu d'en-tête, la barre latérale, les cartes d'accueil, les upsells et
-  les boutons d'action après génération.
-- Sortie : un tableau « lien → route existante ? → page qui s'affiche »,
-  avec la liste des liens morts (404 ou redirection vers `/v3`).
-- Test navigateur automatisé : ouverture successive de chaque route V3 en
-  session admin, capture des erreurs console et des pages vides.
-- Correction des liens cassés et des routes manquantes trouvées.
+Bonne nouvelle : **aucune page blanche, aucune 404, aucun plantage.** Les 242 routes
+déclarées répondent, le Hub V3 se charge (98 outils, 8 piliers), le tunnel `/commander`
+affiche bien le paiement unique 47 €.
 
-## 2. Audit des accès (le point le plus sensible)
+Trois vrais problèmes sont ressortis :
 
-- Vérifier pour chaque route V3 le comportement dans 4 situations :
-  visiteur non connecté, essai gratuit, abonné Plume, abonné Édition, admin.
-- Contrôler qu'aucun gate ne redirige sur un statut « inconnu »
-  (cause des éjections vers la page de vente).
-- Vérifier que le verrou de lancement (`V3_LAUNCH_UNLOCKED = false`) laisse
-  bien passer l'admin partout et n'enferme pas un acheteur payant.
+1. **Anciens tarifs encore affichés à plusieurs endroits** (constaté dans le code) :
+   - `/v3/nouveautes` : badges et sections « Plume 17€ » au lieu de 27 €, et le palier
+     supérieur à 27 € au lieu de 47 €.
+   - `/v3/outils/editeur` : badge « NEW · Débutant 9,99€ ».
+   - `/v3/script-heygen` : script vidéo qui annonce 9,99 € / 12,99 € / 59 € par mois.
+   - `/vente-v3` et `/commande` : anciennes offres 197 € et 547 € toujours en ligne,
+     alors que l'offre unique est 47 € à vie jusqu'au 30/09/2026.
+2. **Une page « Nouveautés » qui n'est pas la source de vérité.** Les mentions « NEW »
+   sont écrites à la main dans le menu, la sidebar et les pages : elles ne peuvent pas
+   rester justes dans le temps et l'abonné ne sait pas ce qui vient d'arriver.
+3. **Un défaut d'affichage** sur `/v3/nouveautes` (un badge placé dans un paragraphe)
+   qui génère un avertissement de rendu.
 
-## 3. Audit fonctionnel des modules
+## Ce qu'on corrige
 
-Test réel, un par un, des chaînes qui consomment l'IA ou l'export :
-Sommaire IA / Génie, Studio Pro, rédaction chapitre, correction,
-traduction, humaniseur, couverture (Kindle + broché), ContentStudio,
-audiolivre, exports DOCX/EPUB/PDF/ZIP KDP.
+### 1. Un seul tarif partout
+- `/v3/nouveautes` : Plume 27 €/mois, Édition 47 €/mois.
+- `/v3/outils/editeur` : badge sans tarif obsolète.
+- `/v3/script-heygen` : script réécrit sur l'offre réelle (47 € à vie jusqu'au 30/09,
+  puis Plume 27 € / Édition 47 € par mois).
+- `/vente-v3` et `/commande` : ces deux anciennes pages de vente sont redirigées vers
+  `/commander`. Une seule page de vente, un seul prix, plus de contradiction possible.
 
-Pour chacun : succès, message d'erreur clair si clé manquante ou crédits
-épuisés (jamais « Edge Function returned a non-2xx »), et journalisation.
+### 2. Les nouveautés deviennent automatiques
+- Un fichier unique liste chaque nouveauté : titre, courte phrase, lien, date d'arrivée,
+  forfait concerné.
+- Toute nouveauté datée de moins de 30 jours affiche automatiquement son badge
+  « NOUVEAU » dans le menu et la sidebar, et disparaît ensuite toute seule.
+- `/v3/nouveautes` est reconstruite depuis cette liste, groupée par mois, la plus
+  récente en haut, avec un bouton direct vers l'outil concerné.
+- La sidebar affiche un compteur des nouveautés non vues (remis à zéro à la visite),
+  pour que l'abonné retrouve immédiatement ce qui vient de sortir.
 
-## 4. Audit paiements
+### 3. Le défaut d'affichage
+- Le badge de `/v3/nouveautes` sort du paragraphe : plus d'avertissement de rendu.
 
-- Un seul tarif à vie 47 € en paiement unique, Stripe carte + PayPal.
-- Les 18 upsells : chaque bouton mène au bon produit au bon prix.
-- Vérifier qu'aucun ancien palier (9,99 / 29 / 59 / 197 / 347 / 547) ne
-  subsiste dans les pages ni dans les données de prix.
-
-## 5. Marquage des nouveautés
-
-- Une source unique de vérité pour les nouveautés (liste datée), au lieu des
-  badges « Nouveau » saisis à la main un peu partout : un badge apparaît et
-  disparaît automatiquement après 30 jours.
-- Badge visible aux 3 endroits : menu d'en-tête, barre latérale, tuiles
-  d'accueil — même style, même libellé.
-- Une page **« Quoi de neuf »** listant les nouveautés par date avec le
-  bouton qui ouvre directement l'outil concerné.
-- Un point rouge sur l'entrée « Quoi de neuf » tant que l'abonné n'a pas
-  ouvert la page, puis il disparaît.
-
-## 6. Orientation des abonnés
-
-- Bandeau d'accueil V3 « Par où commencer » en 3 chemins : *je pars d'une
-  idée*, *j'ai déjà un manuscrit*, *je veux vendre plus*.
-- Barre latérale : regroupement clair Plan / Écrire / Habiller / Publier /
-  Vendre, avec l'outil recommandé mis en avant dans chaque groupe.
-- Après génération d'un livre, la barre d'actions doit toujours proposer :
-  Sauvegarder, Corriger, Voir mon livre, Données KDP, Exporter.
-
-## Livrable
-
-Un rapport d'audit dans le chat : ce qui fonctionne, ce qui est cassé, ce qui
-a été corrigé — et la liste des points qui demandent votre décision (tarif,
-libellé, ordre des onglets).
+## Ce qu'on ne touche pas
+Aucune modification des paiements Stripe/PayPal, des droits d'accès, du workflow des
+agents ni des modules de génération. Uniquement l'affichage des tarifs, les redirections
+des deux anciennes pages de vente, et le système de nouveautés.
 
 ## Détails techniques
+- Nouveau `src/data/v3Nouveautes.ts` : type `V3Nouveaute` (`id`, `title`, `desc`,
+  `to`, `date`, `tier`), helper `isRecent(date, days = 30)` et `countUnseen()` basé sur
+  un horodatage en `localStorage` (`v3_nouveautes_seen_at`).
+- `src/pages/v3public/V3NouveautesPage.tsx` : rendu depuis `v3Nouveautes.ts`,
+  `ACCESS_META` aligné sur `src/data/v3Pricing.ts`, badge sorti du `<p>`.
+- `src/data/v3HeaderMenu.ts` + `src/components/v3public/V3Sidebar.tsx` : badge `NOUVEAU`
+  et compteur dérivés de `v3Nouveautes.ts` au lieu de valeurs écrites en dur.
+- `src/App.tsx` : `/vente-v3` et `/commande` → `<Navigate to="/commander" replace />` ;
+  suppression des imports `SalesPageV3Launch` et `V3CommandePage` devenus inutilisés.
+- `V3EditorPage.tsx`, `V3ScriptHeygenPage.tsx` : textes tarifaires corrigés.
 
-- Script d'audit exécuté en local (Playwright + parcours des routes déclarées)
-  pour produire la matrice route × rôle ; aucune donnée de production modifiée.
-- Nouveau fichier de données `v3Nouveautes.ts` (clé, libellé, route, date) ;
-  les badges des menus lisent cette source au lieu de valeurs figées.
-- Page « Quoi de neuf » sous `/v3/nouveautes`, ajoutée au menu et à la barre
-  latérale ; état « vu » conservé côté navigateur.
-- Vérification des gates : `V3Gate`, `V3LockedGate`, `TrialGate`,
-  `V3PublicLayout` — règle commune « statut inconnu = on patiente ».
-- Contrôle des fonctions serveur V3 : clé abonné (Gemini / OpenRouter) prise
-  en compte partout, repli serveur, et message d'erreur lisible.
+## Vérification
+Nouveau passage navigateur sur les pages modifiées : aucun tarif obsolète détecté par
+recherche automatique (`9,99`, `12,99`, `17 €`, `59 €`, `197`, `547`), `/vente-v3` et
+`/commande` arrivent sur `/commander`, `/v3/nouveautes` sans avertissement de rendu et
+badges cohérents avec le menu.
