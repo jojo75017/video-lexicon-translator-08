@@ -68,9 +68,7 @@ const ConfirmationPaiementPage = lazy(() => import('./pages/ConfirmationPaiement
 const PaiementManuelPage = lazy(() => import('./pages/PaiementManuelPage'));
 const UpsellPage = lazy(() => import('./pages/UpsellPage'));
 const UpsellPaiementPage = lazy(() => import('./pages/UpsellPaiementPage'));
-const V3CommandePage = lazy(() => import('./pages/V3CommandePage'));
 const V3PaiementPage = lazy(() => import('./pages/V3PaiementPage'));
-const SalesPageV3Launch = lazy(() => import('./pages/SalesPageV3Launch'));
 const EssaiPage = lazy(() => import('./pages/launch/EssaiPage'));
 const EssaiInscriptionPage = lazy(() => import('./pages/launch/EssaiInscriptionPage'));
 const EssaiGratuit7JoursPage = lazy(() => import('./pages/launch/EssaiGratuit7JoursPage'));
@@ -459,9 +457,9 @@ const App = () => {
             <Route path="/confirmation-paiement" element={<ConfirmationPaiementPage />} />
             <Route path="/upsell" element={<UpsellPage />} />
             <Route path="/upsell-paiement" element={<UpsellPaiementPage />} />
-            <Route path="/commande-v3" element={<V3CommandePage />} />
+            <Route path="/commande-v3" element={<Navigate to="/commander" replace />} />
             <Route path="/v3-paiement" element={<V3PaiementPage />} />
-            <Route path="/vente-v3" element={<SalesPageV3Launch />} />
+            <Route path="/vente-v3" element={<Navigate to="/commander" replace />} />
 
             {/* Promo été */}
             <Route path="/promo" element={<PromoCapturePage />} />
