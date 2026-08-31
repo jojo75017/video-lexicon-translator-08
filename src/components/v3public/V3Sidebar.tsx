@@ -178,9 +178,20 @@ export default function V3Sidebar() {
 
   const [open, setOpen] = useState<Record<string, boolean>>({ [activeSection]: true });
 
+  // Nouveautés non vues : recalculé à chaque navigation (la page /v3/nouveautes remet à 0).
+  const unseenNouveautes = useMemo(() => countUnseenNouveautes(), [pathname]);
+
+  /** Badge affiché : « NOUVEAU » automatique (< 30 jours) ou badge défini dans NAV. */
+  const badgeFor = (it: NavItem): string | undefined => {
+    if (it.to === '/v3/nouveautes') return unseenNouveautes > 0 ? `${unseenNouveautes} new` : undefined;
+    if (!it.external && isRouteNouveau(it.to)) return 'Nouveau';
+    return it.badge;
+  };
+
   useEffect(() => {
     setOpen((prev) => (prev[activeSection] ? prev : { ...prev, [activeSection]: true }));
   }, [activeSection]);
+
 
   return (
     <aside
