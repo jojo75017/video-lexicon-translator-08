@@ -48,7 +48,7 @@ const NAV: NavSection[] = [
       { to: '/v3', label: 'Accueil V3', icon: Home, end: true },
       { to: '/v3/fonctionnalites', label: 'Fonctionnalités (12 modules)', icon: LayoutGrid, end: true, badge: 'Hub' },
       { to: '/v3/workflow', label: '🤖 Workflow 15 Agents — écrire mon livre', icon: Layers, end: true, badge: 'Pipeline' },
-      { to: '/v3/kit-demarrage', label: '📘 Kit de démarrage (PDF)', icon: GraduationCap, badge: 'NEW' },
+      { to: '/v3/kit-demarrage', label: '📘 Kit de démarrage (PDF)', icon: GraduationCap },
       { to: '/v3/nouveautes', label: '✨ Nouveautés V3', icon: Sparkles },
     ],
   },
@@ -56,13 +56,13 @@ const NAV: NavSection[] = [
     section: 'Créer un livre',
     items: [
       { to: '/v3/lancer', label: '🚀 Lancer mon livre (fiche + 15 agents)', icon: Layers, end: true, badge: 'Direct' },
-      { to: '/v3/biographie', label: '📖 Biographie — Le récit de votre vie', icon: BookOpen, badge: 'NEW' },
+      { to: '/v3/biographie', label: '📖 Biographie — Le récit de votre vie', icon: BookOpen },
       { to: '/v3/create', label: 'Ebookstudio-Génie', icon: Sparkles, badge: 'IA' },
       { to: '/v3/create?sommaire=ia', label: 'Sommaire IA — dialogue (récit / votre vie)', icon: ListTree, badge: 'IA' },
       { to: '/v3/outils/sommaire-ultime', label: 'Table des matières (sommaire seul)', icon: ListTree },
       { to: '/v3/workflow?genre=roman', label: '📕 Roman / Thriller — workflow 15 agents', icon: Layers, badge: 'Workflow' },
       { to: '/v3/studio', label: 'Studio Pro (Gemini + ChatGPT)', icon: Gem, badge: 'Pro' },
-      { to: '/v3/contentstudio', label: '🎬 ContentStudio Engine (livre → vidéo)', icon: Film, badge: 'NEW' },
+      { to: '/v3/contentstudio', label: '🎬 ContentStudio Engine (livre → vidéo)', icon: Film },
       { to: '/v3/livres/jeux-enigmes', label: '🧩 Livres de Jeux & Énigmes', icon: Puzzle, badge: 'Pro' },
       { to: '/v3/livres/cherche-trouve', label: '🔍 Coloriages Cherche & Trouve', icon: Search, badge: 'Pro' },
       { to: '/v3/livres/histoires-illustrees', label: '📖 Histoires Courtes & Contes', icon: BookOpen, badge: 'Pro' },
@@ -113,7 +113,7 @@ const NAV: NavSection[] = [
   {
     section: 'Vendre',
     items: [
-      { to: '/v3/acquisition', label: '🚀 Plan 14 jours — trouver des lecteurs', icon: Megaphone, badge: 'NEW' },
+      { to: '/v3/acquisition', label: '🚀 Plan 14 jours — trouver des lecteurs', icon: Megaphone },
       { to: '/v3/posts', label: '📣 Posts — 30 jours prêts', icon: Megaphone },
       { to: '/v3/avis', label: '⭐ Obtenir des avis clients', icon: Star, badge: 'Marche à suivre' },
       { to: '/mon-parrainage', label: '🤝 Parrainage — 30 % de commission', icon: Gem },
