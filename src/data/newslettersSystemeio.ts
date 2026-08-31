@@ -24,6 +24,57 @@ const essai = (src: string) => `${SITE_ORIGIN}/essai?src=${src}`;
 const bonus = (src: string) => `${SITE_ORIGIN}/bonus?src=${src}`;
 const cadeau = (src: string) => `${SITE_ORIGIN}/cadeau?src=${src}`;
 
+/* ------------------- Traçage des clics Systeme.io ------------------- */
+
+/**
+ * Balise de fusion Systeme.io : remplacée par l'email du contact à l'envoi.
+ * C'est elle qui permet de savoir QUI a cliqué (et donc combien de prospects
+ * uniques ont ouvert /essai ou /commander).
+ */
+export const SYSTEMEIO_EMAIL_MERGE_TAG = '{{contact.email}}';
+
+const TRACK_ENDPOINT = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/track-email-click`;
+
+/** Préfixe utilisé dans `email_clicks.template_name` pour ces newsletters. */
+export const NEWSLETTER_TRACK_PREFIX = 'newsletter-';
+
+/** Regroupe une URL de destination en une catégorie lisible dans les stats. */
+export function newsletterDestination(url: string): string {
+  const path = url.replace(/^https?:\/\/[^/]+/, '');
+  if (path.startsWith('/essai')) return '/essai';
+  if (path.startsWith('/commander')) return '/commander';
+  if (path.startsWith('/cadeau')) return '/cadeau';
+  if (path.startsWith('/bonus')) return '/bonus';
+  return path.split('?')[0] || '/';
+}
+
+/** Ajoute les UTM à la destination finale (lisible dans GA4). */
+function withUtm(url: string, campaign: string, slot: string): string {
+  const sep = url.includes('?') ? '&' : '?';
+  return `${url}${sep}utm_source=systemeio&utm_medium=email&utm_campaign=${campaign}&utm_content=${slot}`;
+}
+
+/**
+ * URL à mettre réellement dans le bouton : passe par la fonction de suivi
+ * (enregistre email + newsletter + destination dans `email_clicks`) puis
+ * redirige immédiatement vers la page.
+ */
+export function trackedCtaUrl(
+  n: Pick<Newsletter, 'id' | 'number'>,
+  cta: NewsletterCta,
+  slot: 'cta1' | 'cta2',
+): string {
+  const dest = withUtm(cta.url, n.id, slot);
+  const params = new URLSearchParams({
+    s: String(n.number),
+    t: `${NEWSLETTER_TRACK_PREFIX}${n.number}-${slot}`,
+    u: dest,
+  });
+  // L'email n'est pas encodé : Systeme.io doit reconnaître la balise de fusion.
+  return `${TRACK_ENDPOINT}?e=${SYSTEMEIO_EMAIL_MERGE_TAG}&${params.toString()}`;
+}
+
+
 export interface NewsletterCta {
   label: string;
   url: string;
@@ -226,11 +277,11 @@ ${SIGN}`,
 
 /* --------------------------- Rendu HTML --------------------------- */
 
-function button(cta: NewsletterCta): string {
+function button(cta: NewsletterCta, href: string): string {
   return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0;">
   <tr>
     <td align="center" bgcolor="#0f6b5c" style="border-radius:10px;">
-      <a href="${cta.url}" target="_blank" style="display:inline-block;padding:16px 30px;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:10px;background-color:#0f6b5c;">${cta.label}</a>
+      <a href="${href}" target="_blank" style="display:inline-block;padding:16px 30px;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:10px;background-color:#0f6b5c;">${cta.label}</a>
     </td>
   </tr>
 </table>`;
@@ -242,8 +293,9 @@ export function newsletterToHtml(n: Newsletter): string {
     .split('\n\n')
     .map((raw) => {
       const block = raw.trim();
-      if (block === '[[CTA]]') return button(n.cta);
-      if (block === '[[CTA2]]') return n.cta2 ? button(n.cta2) : '';
+      if (block === '[[CTA]]') return button(n.cta, trackedCtaUrl(n, n.cta, 'cta1'));
+      if (block === '[[CTA2]]')
+        return n.cta2 ? button(n.cta2, trackedCtaUrl(n, n.cta2, 'cta2')) : '';
       if (block.startsWith('- ')) {
         const items = block
           .split('\n')
@@ -263,12 +315,16 @@ ${blocks}
 </div>`;
 }
 
-/** Version texte : les marqueurs deviennent « libellé : url ». */
+/** Version texte : les marqueurs deviennent « libellé : url » (URL tracée). */
 export function newsletterToText(n: Newsletter): string {
   return n.body
-    .replace('[[CTA]]', `>> ${n.cta.label} : ${n.cta.url}`)
-    .replace('[[CTA2]]', n.cta2 ? `>> ${n.cta2.label} : ${n.cta2.url}` : '');
+    .replace('[[CTA]]', `>> ${n.cta.label} : ${trackedCtaUrl(n, n.cta, 'cta1')}`)
+    .replace(
+      '[[CTA2]]',
+      n.cta2 ? `>> ${n.cta2.label} : ${trackedCtaUrl(n, n.cta2, 'cta2')}` : '',
+    );
 }
+
 
 /** Mode d'emploi affiché au-dessus des newsletters. */
 export const NEWSLETTER_HOWTO: Array<{ title: string; detail: string }> = [
@@ -283,22 +339,27 @@ export const NEWSLETTER_HOWTO: Array<{ title: string; detail: string }> = [
       `Ciblez le tag ${NEWSLETTER_TAG} et excluez le tag ${NEWSLETTER_EXCLUDE_TAG} (les acheteurs ne doivent jamais recevoir un email de vente). Expéditeur : ${NEWSLETTER_SENDER}.`,
   },
   {
-    title: '3. Comment garder les vrais boutons',
+    title: '3. Suivi des clics (ne pas modifier les URL)',
+    detail:
+      "Chaque bouton du HTML passe par un lien de suivi contenant la balise {{contact.email}} : Systeme.io la remplace par l'email du contact, le clic est enregistré, puis la page (/essai, /commander…) s'ouvre immédiatement. Résultat visible dans le tableau « Clics Systeme.io » plus haut : nombre de prospects uniques par destination et par newsletter. Si vous réécrivez une URL à la main, ce bouton n'est plus compté.",
+  },
+  {
+    title: '4. Comment garder les vrais boutons',
     detail:
       'Dans l\'éditeur, ajoutez un bloc « Texte », ouvrez l\'affichage du code source (icône < >), puis collez le HTML copié ici. Les boutons sont de véritables liens cliquables, testés sur Gmail, Outlook et Apple Mail. Si vous collez la version texte, les liens apparaissent en clair : c\'est le repli, moins performant.',
   },
   {
-    title: '4. Programmation',
+    title: '5. Programmation',
     detail:
       'Pour chaque newsletter, choisissez « Programmer » et saisissez la date et l\'heure indiquées sur la fiche. Les cinq peuvent être programmées d\'avance le même jour.',
   },
   {
-    title: '5. Avant d\'envoyer',
+    title: '6. Avant d\'envoyer',
     detail:
       'Utilisez « Envoyer un test » vers boubetgeorges@gmail.com, cliquez sur chaque bouton dans l\'email reçu et vérifiez que la page s\'ouvre bien. Vérifiez aussi le pied de page EbookStudio (pas celui hérité d\'un autre site).',
   },
   {
-    title: '6. Ce qu\'on regarde ensuite',
+    title: '7. Ce qu\'on regarde ensuite',
     detail:
       'Le taux de clic compte plus que le taux d\'ouverture. Newsletters 1 à 3 : on veut des clics vers la page d\'essai. Newsletters 4 et 5 : on veut des commandes. Si la 4 ne convertit pas, c\'est le prix ou la date limite qu\'il faut réexpliquer, pas l\'email qu\'il faut rallonger.',
   },

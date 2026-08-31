@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
+import { NewsletterClicksPanel } from '@/components/admin/NewsletterClicksPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -29,6 +30,8 @@ import {
   newsletterToHtml,
   newsletterToText,
   type Newsletter,
+  newsletterDestination,
+  SYSTEMEIO_EMAIL_MERGE_TAG,
 } from '@/data/newslettersSystemeio';
 
 function CopyButton({
@@ -244,13 +247,18 @@ function NewsletterCard({ newsletter }: { newsletter: Newsletter }) {
       <div className="mt-4 rounded-xl border border-border bg-muted/30 p-3 text-sm">
         <p className="font-medium text-foreground">Boutons de cet email</p>
         <p className="mt-1 text-muted-foreground">
-          1. « {newsletter.cta.label} » → {newsletter.cta.url}
+          1. « {newsletter.cta.label} » → {newsletterDestination(newsletter.cta.url)} (clics tracés)
         </p>
         {newsletter.cta2 && (
           <p className="text-muted-foreground">
-            2. « {newsletter.cta2.label} » → {newsletter.cta2.url}
+            2. « {newsletter.cta2.label} » → {newsletterDestination(newsletter.cta2.url)} (clics
+            tracés)
           </p>
         )}
+        <p className="mt-2 text-xs text-muted-foreground">
+          Les boutons du HTML passent par le traceur de clics avec la balise{' '}
+          <code>{SYSTEMEIO_EMAIL_MERGE_TAG}</code> : ne modifiez pas leurs URL dans Systeme.io.
+        </p>
       </div>
 
       <pre className="mt-4 max-h-72 overflow-auto whitespace-pre-wrap rounded-xl bg-muted/50 p-4 text-sm leading-relaxed text-foreground">
@@ -312,6 +320,8 @@ function NewslettersPanel() {
           ))}
         </div>
       </Card>
+
+      <NewsletterClicksPanel />
 
       {NEWSLETTERS.map((n) => (
         <NewsletterCard key={n.id} newsletter={n} />
