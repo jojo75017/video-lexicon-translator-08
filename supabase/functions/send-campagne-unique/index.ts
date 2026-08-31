@@ -250,6 +250,8 @@ Deno.serve(async (req) => {
         template,
         targets: targets.length,
         sent,
+        skipped,
+
         failed: failures.length,
         failures: failures.slice(0, 20),
         remaining: Math.max(remaining, 0),
