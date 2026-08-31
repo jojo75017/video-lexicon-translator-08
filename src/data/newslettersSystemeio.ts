@@ -323,8 +323,10 @@ export function newsletterToHtml(n: Newsletter): string {
 
   return `<div style="font-family:Georgia,'Times New Roman',serif;font-size:16px;color:#1f2937;max-width:580px;margin:0 auto;padding:8px;">
 ${blocks}
+<img src="${trackedOpenPixelUrl(n)}" width="1" height="1" alt="" style="display:block;width:1px;height:1px;border:0;opacity:0;" />
 </div>`;
 }
+
 
 /** Version texte : les marqueurs deviennent « libellé : url » (URL tracée). */
 export function newsletterToText(n: Newsletter): string {
