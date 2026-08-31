@@ -332,54 +332,72 @@ export default function AdminSequenceEmailPage() {
 
         <AdminPanelNav />
 
-        <Card className="rounded-2xl border-border bg-card p-6">
-          <Badge className="rounded-full">Campagne unique</Badge>
-          <h1 className="mt-3 text-2xl font-bold text-foreground">{CAMPAGNE.name}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Un seul tag Systeme.io : <strong>{CAMPAGNE.tag}</strong>. Un seul lien par email.
-            Les trois premiers emails renvoient sur la page d'essai (idée → titre, sommaire et
-            chapitre 1, puis mur email), les deux derniers sur la commande à {CAMPAGNE.price}.
-          </p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Les envois partent uniquement de Systeme.io (contact@ebookstudio-mail.fr) : ici on copie
-            l'objet et le corps de chaque email. L'application n'envoie plus aucune campagne de masse ;
-            Resend reste réservé aux emails de service (codes d'accès, confirmations de paiement).
-          </p>
-        </Card>
+        <Tabs defaultValue="newsletters" className="space-y-6">
+          <TabsList className="rounded-xl">
+            <TabsTrigger value="newsletters" className="rounded-lg">
+              Nouveaux emails Systeme.io
+            </TabsTrigger>
+            <TabsTrigger value="campagne" className="rounded-lg">
+              Campagne automatique
+            </TabsTrigger>
+          </TabsList>
 
-        <EssaiFunnelPanel />
+          <TabsContent value="newsletters" className="space-y-6">
+            <NewslettersPanel />
+          </TabsContent>
 
+          <TabsContent value="campagne" className="space-y-6">
+            <Card className="rounded-2xl border-border bg-card p-6">
+              <Badge className="rounded-full">Campagne unique</Badge>
+              <h1 className="mt-3 text-2xl font-bold text-foreground">{CAMPAGNE.name}</h1>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Un seul tag Systeme.io : <strong>{CAMPAGNE.tag}</strong>. Un seul lien par email.
+                Les trois premiers emails renvoient sur la page d'essai (idée → titre, sommaire et
+                chapitre 1, puis mur email), les deux derniers sur la commande à {CAMPAGNE.price}.
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Les envois partent uniquement de Systeme.io (contact@ebookstudio-mail.fr) : ici on
+                copie l'objet et le corps de chaque email. L'application n'envoie plus aucune
+                campagne de masse ; Resend reste réservé aux emails de service (codes d'accès,
+                confirmations de paiement).
+              </p>
+            </Card>
 
-        <Card className="rounded-2xl border-border bg-card p-6">
-          <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
-            <Gift className="h-5 w-5" /> Les bonus offerts à l'inscription — {BONUS_TOTAL_VALUE}
-          </h2>
-          <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-            {CAMPAGNE_BONUSES.map((bonus) => (
-              <li key={bonus.key}>
-                <strong className="text-foreground">{bonus.title}</strong> — {bonus.value} · {bonus.to}
-              </li>
-            ))}
-          </ul>
-        </Card>
+            <EssaiFunnelPanel />
 
-        <div className="space-y-4">
-          <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
-            <Mail className="h-5 w-5" /> Les {CAMPAGNE_EMAILS.length} emails, dans l'ordre
-          </h2>
-          {CAMPAGNE_EMAILS.map((email, index) => (
-            <EmailCard key={email.id} email={email} index={index} />
-          ))}
-        </div>
+            <Card className="rounded-2xl border-border bg-card p-6">
+              <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                <Gift className="h-5 w-5" /> Les bonus offerts à l'inscription — {BONUS_TOTAL_VALUE}
+              </h2>
+              <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+                {CAMPAGNE_BONUSES.map((bonus) => (
+                  <li key={bonus.key}>
+                    <strong className="text-foreground">{bonus.title}</strong> — {bonus.value} ·{' '}
+                    {bonus.to}
+                  </li>
+                ))}
+              </ul>
+            </Card>
 
-        <Card className="rounded-2xl border-border bg-card p-6">
-          <h2 className="text-lg font-semibold text-foreground">Paramétrage dans Systeme.io</h2>
-          <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
-            {SYSTEMEIO_SETUP_STEPS.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ol>
-        </Card>
+            <div className="space-y-4">
+              <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                <Mail className="h-5 w-5" /> Les {CAMPAGNE_EMAILS.length} emails, dans l'ordre
+              </h2>
+              {CAMPAGNE_EMAILS.map((email, index) => (
+                <EmailCard key={email.id} email={email} index={index} />
+              ))}
+            </div>
+
+            <Card className="rounded-2xl border-border bg-card p-6">
+              <h2 className="text-lg font-semibold text-foreground">Paramétrage dans Systeme.io</h2>
+              <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
+                {SYSTEMEIO_SETUP_STEPS.map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
+              </ol>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
