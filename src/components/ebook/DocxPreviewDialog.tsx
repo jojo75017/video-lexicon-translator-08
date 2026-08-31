@@ -65,10 +65,32 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
 
     setNaming(true);
     try {
+      const provider = getProvider();
+      const ownKey = getActiveAIKey();
       const { data, error: fnError } = await supabase.functions.invoke('v3-generate-chapter-titles', {
-        body: { bookTitle: options.title, chapters: payload },
+        body: {
+          bookTitle: options.title,
+          chapters: payload,
+          // Clé de l'abonné : la génération n'utilise alors aucun crédit serveur.
+          userApiKey: provider === 'openrouter' ? '' : ownKey,
+          openrouterKey: provider === 'openrouter' ? ownKey : '',
+        },
       });
-      if (fnError) throw fnError;
+      if (fnError) {
+        // `invoke` masque le message réel derrière « non-2xx status code ».
+        let detail = fnError.message;
+        const context = (fnError as { context?: Response }).context;
+        if (context && typeof context.text === 'function') {
+          const body = await context.text().catch(() => '');
+          try {
+            const parsed = JSON.parse(body);
+            if (parsed?.error) detail = String(parsed.error);
+          } catch {
+            if (body) detail = body.slice(0, 300);
+          }
+        }
+        throw new Error(detail);
+      }
       const titles: { number: number; title: string }[] = data?.titles || [];
       if (!titles.length) throw new Error("L'IA n'a renvoyé aucun titre");
       setTitleOverrides((prev) => {
@@ -85,6 +107,7 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
       setNaming(false);
     }
   };
+
 
 
   useEffect(() => {
