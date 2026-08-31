@@ -28,14 +28,16 @@ export default function AdminTemoignagesPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("book_testimonials")
-      .select("id, email, author_name, book_title, comment, rating, photo_url, approved, consent_publication, created_at")
-      .order("created_at", { ascending: false });
+    // L'email des clients n'est plus lisible publiquement : il passe par une
+    // fonction réservée aux administrateurs.
+    const { data, error } = await (supabase as unknown as {
+      rpc: (fn: string) => Promise<{ data: unknown; error: { message: string } | null }>;
+    }).rpc("admin_list_testimonials");
     if (error) toast.error("Lecture impossible : " + error.message);
     setRows((data as Row[]) ?? []);
     setLoading(false);
   }, []);
+
 
   useEffect(() => { void load(); }, [load]);
 
