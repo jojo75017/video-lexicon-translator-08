@@ -277,11 +277,11 @@ ${SIGN}`,
 
 /* --------------------------- Rendu HTML --------------------------- */
 
-function button(cta: NewsletterCta): string {
+function button(cta: NewsletterCta, href: string): string {
   return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0;">
   <tr>
     <td align="center" bgcolor="#0f6b5c" style="border-radius:10px;">
-      <a href="${cta.url}" target="_blank" style="display:inline-block;padding:16px 30px;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:10px;background-color:#0f6b5c;">${cta.label}</a>
+      <a href="${href}" target="_blank" style="display:inline-block;padding:16px 30px;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:10px;background-color:#0f6b5c;">${cta.label}</a>
     </td>
   </tr>
 </table>`;
@@ -293,8 +293,9 @@ export function newsletterToHtml(n: Newsletter): string {
     .split('\n\n')
     .map((raw) => {
       const block = raw.trim();
-      if (block === '[[CTA]]') return button(n.cta);
-      if (block === '[[CTA2]]') return n.cta2 ? button(n.cta2) : '';
+      if (block === '[[CTA]]') return button(n.cta, trackedCtaUrl(n, n.cta, 'cta1'));
+      if (block === '[[CTA2]]')
+        return n.cta2 ? button(n.cta2, trackedCtaUrl(n, n.cta2, 'cta2')) : '';
       if (block.startsWith('- ')) {
         const items = block
           .split('\n')
@@ -314,12 +315,16 @@ ${blocks}
 </div>`;
 }
 
-/** Version texte : les marqueurs deviennent « libellé : url ». */
+/** Version texte : les marqueurs deviennent « libellé : url » (URL tracée). */
 export function newsletterToText(n: Newsletter): string {
   return n.body
-    .replace('[[CTA]]', `>> ${n.cta.label} : ${n.cta.url}`)
-    .replace('[[CTA2]]', n.cta2 ? `>> ${n.cta2.label} : ${n.cta2.url}` : '');
+    .replace('[[CTA]]', `>> ${n.cta.label} : ${trackedCtaUrl(n, n.cta, 'cta1')}`)
+    .replace(
+      '[[CTA2]]',
+      n.cta2 ? `>> ${n.cta2.label} : ${trackedCtaUrl(n, n.cta2, 'cta2')}` : '',
+    );
 }
+
 
 /** Mode d'emploi affiché au-dessus des newsletters. */
 export const NEWSLETTER_HOWTO: Array<{ title: string; detail: string }> = [
