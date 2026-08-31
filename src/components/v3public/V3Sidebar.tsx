@@ -11,6 +11,7 @@ import useV3Entitlement from '@/hooks/useV3Entitlement';
 import useIsAdmin from '@/hooks/useIsAdmin';
 import useTrialAccess from '@/hooks/useTrialAccess';
 import { isTrialLockedPath } from '@/lib/trialLockedPaths';
+import { countUnseenNouveautes, isRouteNouveau } from '@/data/v3Nouveautes';
 import ThemeToggle from './ThemeToggle';
 
 /**
