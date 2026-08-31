@@ -7,7 +7,6 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 import { supabase } from '@/integrations/supabase/client';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 import {
@@ -232,8 +231,6 @@ export default function AdminSequenceEmailPage() {
             Toutes les anciennes campagnes ont été supprimées : il n'y a plus qu'un seul contenu à jour.
           </p>
         </Card>
-
-        <CampagneDiffusionPanel />
 
         <EssaiFunnelPanel />
 
