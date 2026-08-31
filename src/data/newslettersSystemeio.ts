@@ -359,7 +359,7 @@ export const NEWSLETTER_HOWTO: Array<{ title: string; detail: string }> = [
       'Utilisez « Envoyer un test » vers boubetgeorges@gmail.com, cliquez sur chaque bouton dans l\'email reçu et vérifiez que la page s\'ouvre bien. Vérifiez aussi le pied de page EbookStudio (pas celui hérité d\'un autre site).',
   },
   {
-    title: '6. Ce qu\'on regarde ensuite',
+    title: '7. Ce qu\'on regarde ensuite',
     detail:
       'Le taux de clic compte plus que le taux d\'ouverture. Newsletters 1 à 3 : on veut des clics vers la page d\'essai. Newsletters 4 et 5 : on veut des commandes. Si la 4 ne convertit pas, c\'est le prix ou la date limite qu\'il faut réexpliquer, pas l\'email qu\'il faut rallonger.',
   },
