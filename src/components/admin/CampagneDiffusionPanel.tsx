@@ -182,9 +182,25 @@ export function CampagneDiffusionPanel() {
             </p>
           )}
 
+          <div className="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-border bg-muted/30 p-3">
+            <MailCheck className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">Adresse de test :</span>
+            <Input
+              type="email"
+              value={testTo}
+              onChange={(e) => setTestTo(e.target.value)}
+              placeholder="votre@email.fr"
+              className="h-9 w-60 rounded-xl"
+            />
+            <span className="text-xs text-muted-foreground">
+              Un test est obligatoire avant l'envoi à tous les prospects.
+            </span>
+          </div>
+
           <ul className="mt-4 space-y-2">
             {CAMPAGNE_EMAILS.map((email, index) => {
               const sent = stats.sent?.[email.id] ?? 0;
+              const isTested = tested[email.id] === true;
               return (
                 <li
                   key={email.id}
@@ -194,22 +210,40 @@ export function CampagneDiffusionPanel() {
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className="rounded-full">Email {index + 1}</Badge>
                       <span className="truncate text-sm font-medium text-foreground">{email.subject}</span>
+                      {isTested && (
+                        <Badge className="rounded-full bg-emerald-600 text-white hover:bg-emerald-600">
+                          Test validé
+                        </Badge>
+                      )}
                     </div>
                     <p className="mt-1 text-xs text-muted-foreground">{sent} déjà envoyés</p>
                   </div>
-                  <Button
-                    size="sm"
-                    className="rounded-xl"
-                    disabled={busy !== null || stats.blocked}
-                    onClick={() => sendAll(email.id)}
-                  >
-                    <Send className="mr-2 h-4 w-4" />
-                    {busy === email.id ? 'Envoi…' : 'Envoyer à tous'}
-                  </Button>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="rounded-xl"
+                      disabled={busy !== null}
+                      onClick={() => sendTest(email.id)}
+                    >
+                      <MailCheck className="mr-2 h-4 w-4" />
+                      {busy === `test-${email.id}` ? 'Test…' : 'Envoyer un test'}
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="rounded-xl"
+                      disabled={busy !== null || stats.blocked || !isTested}
+                      onClick={() => sendAll(email.id)}
+                    >
+                      <Send className="mr-2 h-4 w-4" />
+                      {busy === email.id ? 'Envoi…' : 'Envoyer à tous'}
+                    </Button>
+                  </div>
                 </li>
               );
             })}
           </ul>
+
 
           {busy && progress && (
             <p className="mt-3 text-sm text-muted-foreground">{progress}</p>
