@@ -120,6 +120,8 @@ function TestSender({ email }: { email: CampagneEmail }) {
 }
 
 function EmailCard({ email, index }: { email: CampagneEmail; index: number }) {
+  const shortLink = emailShortUrl(email);
+
   return (
     <Card className="rounded-2xl border-border bg-card p-5 shadow-sm">
       <div className="flex flex-wrap items-center gap-2">
@@ -137,25 +139,61 @@ function EmailCard({ email, index }: { email: CampagneEmail; index: number }) {
       <h3 className="mt-3 text-lg font-semibold text-foreground">{email.subject}</h3>
       <p className="mt-1 text-sm text-muted-foreground">Pré-header : {email.preheader}</p>
 
-      <pre className="mt-4 max-h-72 overflow-auto whitespace-pre-wrap rounded-xl bg-muted/50 p-4 text-sm leading-relaxed text-foreground">
-        {email.body}
-      </pre>
+      {/* 1. L'objet */}
+      <div className="mt-4 rounded-xl border border-border bg-muted/30 p-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          1. Objet
+        </p>
+        <p className="mt-1 text-sm text-foreground">{email.subject}</p>
+        <div className="mt-2">
+          <CopyButton value={email.subject} label="Copier l'objet" />
+        </div>
+      </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        <CopyButton value={email.subject} label="Copier l'objet" />
-        <CopyButton value={email.body} label="Copier le texte" variant="default" />
-        <CopyButton value={emailToHtml(email)} label="Copier le HTML" />
-        <Button asChild size="sm" variant="ghost" className="rounded-xl">
-          <a href={email.ctaUrl} target="_blank" rel="noopener noreferrer">
-            <ExternalLink className="mr-2 h-4 w-4" /> Tester le lien
-          </a>
-        </Button>
+      {/* 2. Le texte du corps */}
+      <div className="mt-3 rounded-xl border border-border bg-muted/30 p-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          2. Texte à coller dans Systeme.io
+        </p>
+        <pre className="mt-2 max-h-72 overflow-auto whitespace-pre-wrap rounded-lg bg-background p-3 text-sm leading-relaxed text-foreground">
+          {email.body}
+        </pre>
+        <div className="mt-2">
+          <CopyButton value={email.body} label="Copier le texte" variant="default" />
+        </div>
+      </div>
+
+      {/* 3. Le bouton */}
+      <div className="mt-3 rounded-xl border border-border bg-muted/30 p-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          3. Bouton Systeme.io
+        </p>
+        <p className="mt-1 text-sm text-foreground">
+          Libellé : <strong>{email.ctaLabel}</strong>
+        </p>
+        <p className="mt-1 break-all text-sm text-muted-foreground">
+          Champ URL : <code>{shortLink}</code>
+        </p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <CopyButton value={email.ctaLabel} label="Copier le libellé" />
+          <CopyButton value={shortLink} label="Copier le lien court" />
+          <Button asChild size="sm" variant="ghost" className="rounded-xl">
+            <a href={`/r/${emailShortKey(email)}`} target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="mr-2 h-4 w-4" /> Tester le lien
+            </a>
+          </Button>
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Ce lien court compte le clic puis redirige aussitôt. Ne le remplacez jamais par un lien
+          direct : le clic ne serait plus mesuré.
+        </p>
       </div>
 
       <TestSender email={email} />
     </Card>
   );
 }
+
 
 
 /** Panneau unique de la campagne email : tout se copie ici, nulle part ailleurs. */
