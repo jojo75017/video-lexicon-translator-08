@@ -335,6 +335,8 @@ export const SYSTEMEIO_SETUP_STEPS: string[] = [
   'Le lien court (https://ebookstudio.fr/r/…) est le seul lien à utiliser : il compte le clic puis redirige en une fraction de seconde. Ne le remplacez jamais par /essai ou /commander en direct, sinon le clic n\'est plus mesuré.',
   `Automatisations → règle 1 : déclencheur « Tag ajouté » = ${CAMPAGNE.tag} → action « Inscrire à la campagne ».`,
   'Automatisations → règle 2 : déclencheur « Tag ajouté » = CLIENT-47 → action « Désinscrire de la campagne » (l\'acheteur ne reçoit plus les emails de vente).',
+  'Segmentation : les emails 1 à 3 (essai gratuit, aucun prix) partent à tout le monde ; les emails 4 et 5 (offre 47 €) uniquement au segment « a cliqué » — dans Systeme.io, condition « a cliqué sur un lien » sur les trois premiers emails.',
+  'Hygiène de liste : les contacts qui n\'ont ouvert ni cliqué après les 5 emails sortent de la campagne (protection de la délivrabilité).',
   'Envoyez-vous un test sur boubetgeorges@gmail.com, puis activez les deux règles.',
   'Aucun envoi de masse ne part de l\'application : Resend (offre gratuite) ne sert plus qu\'aux emails de service (codes d\'accès, confirmations de paiement).',
 ];
