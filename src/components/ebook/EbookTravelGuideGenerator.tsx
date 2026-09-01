@@ -549,6 +549,10 @@ Format JSON strict:
       // Photos des destinations (une par fiche)
       setIsGenerating(false);
       await generateSheetImages(generatedSheets);
+
+      // Rattrapage : toute fiche trop courte est réécrite (introduction + description)
+      await enrichThinTravelSheets(generatedSheets, finalCountry);
+      
       
 
       
