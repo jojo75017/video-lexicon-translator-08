@@ -47,23 +47,31 @@ d'arrivée ne convertit pas.
 ## Le plan
 
 
-### Étape 1 — Rendre les clics mesurables, avec des liens courts et propres
+### Étape 1 — Emails en texte simple, avec un lien court et propre
 
-Tu as raison : un bouton qui affiche une URL technique interminable fait fuir.
-Le suivi ne doit jamais se voir. Donc :
+Systeme.io s'écrit en texte, pas en HTML : on abandonne donc le HTML et on
+livre du texte prêt à coller. Et tu as raison, une URL technique interminable
+fait fuir : le suivi ne doit jamais se voir.
 
 - **Liens courts maison** : chaque lien devient `https://ebookstudio.fr/r/essai1`
-  (la page relais `/r` existe déjà). C'est ce que le lecteur voit et survole —
-  ton domaine, quatre caractères, rien de technique. Le relais enregistre le
-  clic puis renvoie vers `/essai` en un dixième de seconde.
-- **Version HTML** : le bouton affiche uniquement son texte (« Écrire mon
-  chapitre 1 gratuitement »), jamais l'adresse. Un seul bouton par email.
-- **Version texte** (celle qui montrait l'URL en entier) : elle affiche aussi
-  le lien court, une seule fois, en bas.
-- Regénérer le HTML copier-coller de `/admin/sequence-email` avec ces liens.
+  (la page relais `/r` existe déjà). Ton domaine, quelques caractères, rien de
+  technique. Le relais enregistre le clic puis renvoie vers `/essai`
+  instantanément.
+- **Le texte de l'email** ne contient qu'une seule ligne de lien, en bas :
+  `>> Écrire mon chapitre 1 gratuitement : https://ebookstudio.fr/r/essai1`.
+- **Le bouton** est celui de Systeme.io : tu tapes le libellé fourni et tu
+  colles le même lien court dans son champ URL. Le lecteur ne voit que le texte
+  du bouton.
+- `/admin/sequence-email` devient une page « texte » : pour chaque email, objet,
+  texte à coller, libellé du bouton, lien court — chacun avec son bouton
+  « Copier ».
 - Ajouter dans le panneau admin une ligne unique et lisible :
   envoyés → ouvreurs → clics par lien → visites `/essai` → emails captés →
   commandes. Une seule vue, la marche qui bloque devient visible.
+- Note : sans HTML, le pixel d'ouverture disparaît. Les ouvertures seront
+  celles de Systeme.io ; nous, on mesure ce qui compte vraiment — les clics et
+  ce qui suit.
+
 
 
 ### Étape 2 — Réparer la page d'essai (c'est là que tu perds tout)
