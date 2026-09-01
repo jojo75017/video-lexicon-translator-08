@@ -11,11 +11,13 @@ Deno.serve(async (req) => {
     const step = url.searchParams.get("s");
     const template = url.searchParams.get("t");
 
-    // Les balises de fusion non remplacées ({{contact.email}}) ne sont pas loggées.
+    // On enregistre l'ouverture même si la balise de fusion n'a pas été
+    // remplacée par la plateforme d'envoi (sinon 0 statistique).
     const decodedEmail = email ? decodeURIComponent(email).trim() : "";
-    const isRealEmail = /^[^@\s{}]+@[^@\s{}]+\.[^@\s{}]+$/.test(decodedEmail);
+    const isRealEmail = /^[^@\s{}[\]]+@[^@\s{}[\]]+\.[^@\s{}[\]]+$/.test(decodedEmail);
+    const ANONYMOUS = "ouverture-anonyme@systemeio.local";
 
-    if (isRealEmail && step) {
+    if (step) {
       const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
       const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
       const supabase = createClient(supabaseUrl, serviceKey);
