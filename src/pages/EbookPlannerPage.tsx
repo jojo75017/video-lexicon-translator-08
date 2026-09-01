@@ -3201,6 +3201,14 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               }));
               void handleManualSave();
             }}
+            onContentHarmonized={(contents) => {
+              setChapters((prev) => prev.map((ch, idx) => {
+                const found = contents.find((c) => c.number === idx + 1);
+                return found?.content ? { ...ch, content: found.content } : ch;
+              }));
+              void handleManualSave();
+            }}
+
           />
 
         );
