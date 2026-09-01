@@ -53,21 +53,27 @@ export function NewsletterClicksPanel() {
   const byDestination = new Map<string, Bucket>();
   const byNewsletter = new Map<number, Bucket>();
 
+  const isIdentified = (email: string) => !email.endsWith('@systemeio.local');
+
   for (const r of rows) {
+    const email = r.prospect_email.toLowerCase();
     const dest = newsletterDestination(r.clicked_url);
     const d = byDestination.get(dest) ?? emptyBucket();
     d.clicks += 1;
-    d.emails.add(r.prospect_email.toLowerCase());
+    if (isIdentified(email)) d.emails.add(email);
     byDestination.set(dest, d);
 
     const num = r.email_step ?? 0;
     const n = byNewsletter.get(num) ?? emptyBucket();
     n.clicks += 1;
-    n.emails.add(r.prospect_email.toLowerCase());
+    if (isIdentified(email)) n.emails.add(email);
     byNewsletter.set(num, n);
   }
 
-  const totalUnique = new Set(rows.map((r) => r.prospect_email.toLowerCase())).size;
+  const totalUnique = new Set(
+    rows.map((r) => r.prospect_email.toLowerCase()).filter(isIdentified),
+  ).size;
+  const anonymousClicks = rows.filter((r) => !isIdentified(r.prospect_email.toLowerCase())).length;
   const priority = ['/essai', '/commander'];
   const destinations = [...byDestination.entries()].sort(
     (a, b) =>
