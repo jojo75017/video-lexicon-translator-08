@@ -49,7 +49,7 @@ interface EbookProject {
   kdp_keywords?: string;
   kdp_categories?: string;
   project_type?: ProjectType;
-  back_cover_data?: Record<string, unknown>;
+  back_cover_data?: any;
 }
 
 export const useEbookDatabase = () => {

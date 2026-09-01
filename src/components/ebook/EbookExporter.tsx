@@ -80,6 +80,11 @@ interface EbookExporterProps {
   aboutAuthor?: string;
   acknowledgments?: string;
   reviewNote?: string;
+  /** 4ᵉ de couverture validée par l'auteur : ajoutée en dernière page de l'ebook. */
+  backCoverText?: string;
+  /** Titres de chapitres régénérés depuis l'aperçu : remontés au projet pour sauvegarde. */
+  onTitlesGenerated?: (titles: Array<{ number: number; title: string }>) => void | Promise<void>;
+  onContentHarmonized?: (contents: Array<{ number: number; content: string }>) => void | Promise<void>;
 }
 
 export const EbookExporter: React.FC<EbookExporterProps> = ({
@@ -94,7 +99,11 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
   aboutAuthor = '',
   acknowledgments = '',
   reviewNote = '',
+  backCoverText = '',
+  onTitlesGenerated,
+  onContentHarmonized,
 }) => {
+
   const { formatId } = useKdpFormat();
   // ✅ Nettoyage automatique de TOUT le contenu avant export
   const cleanedPreface = useMemo(() => cleanGeneratedText(preface), [preface]);
@@ -1539,7 +1548,9 @@ ${navContent}    </ol>
         includePageNumbers,
         includeCopyrightPage: true,
     pageFormat: '6x9',
+    backCoverText,
   });
+
 
   const exportAsKdpDocx = async () => {
     try {
@@ -2075,7 +2086,10 @@ Paperback: 9.99€ - 19.99€
         open={showDocxPreview}
         onOpenChange={setShowDocxPreview}
         getOptions={buildDocxOptions}
+        onTitlesGenerated={onTitlesGenerated}
+        onContentHarmonized={onContentHarmonized}
       />
+
 
       <EbookExportPreview
         isOpen={showGoogleDocsPreview}

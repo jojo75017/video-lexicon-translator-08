@@ -52,7 +52,7 @@ import { EbookSettings } from '@/components/ebook/EbookSettings';
 import { EbookExporter } from '@/components/ebook/EbookExporter';
 import { EbookKdpTools } from '@/components/ebook/EbookKdpTools';
 import { EbookCoverGenerator } from '@/components/ebook/EbookCoverGenerator';
-import { EbookBackCoverGenerator } from '@/components/ebook/EbookBackCoverGenerator';
+import { EbookBackCoverGenerator, type BackCoverData } from '@/components/ebook/EbookBackCoverGenerator';
 import { UnifiedCoverStudio } from '@/components/ebook/UnifiedCoverStudio';
 import { CalibreStudioEpub } from '@/components/ebook/CalibreStudioEpub';
 import { EbookCharacters, type Character } from '@/components/ebook/EbookCharacters';
@@ -405,6 +405,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const [kdpDescription, setKdpDescription] = useState('');
   const [kdpKeywords, setKdpKeywords] = useState('');
   const [kdpCategories, setKdpCategories] = useState('');
+  // 4ᵉ de couverture : propositions générées + version retenue (persistées avec le projet).
+  const [backCoverData, setBackCoverData] = useState<BackCoverData>({
+    versions: [], selectedIndex: null, selectedText: '', shortVersion: '', authorBio: '',
+  });
+
   
   const [activeTab, setActiveTab] = useState(() => {
     try {
@@ -553,7 +558,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     ebookTitle, authorName, targetAudience, tomeNumber, writingStyle, chapterLength,
     detailLevel, tone, narrativeFormat, preface, conclusion, chapters, characters,
     ebookImages, numberOfChapters, bookSummary, coverConcepts, seoOptimization, bookDescription, genre,
-    kdpDescription, kdpKeywords, kdpCategories
+    kdpDescription, kdpKeywords, kdpCategories, backCoverData
   });
 
   // Mettre à jour la ref quand les données changent
@@ -562,12 +567,13 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       ebookTitle, authorName, targetAudience, tomeNumber, writingStyle, chapterLength,
       detailLevel, tone, narrativeFormat, preface, conclusion, chapters, characters,
       ebookImages, numberOfChapters, bookSummary, coverConcepts, seoOptimization, bookDescription, genre,
-      kdpDescription, kdpKeywords, kdpCategories
+      kdpDescription, kdpKeywords, kdpCategories, backCoverData
     };
   }, [ebookTitle, authorName, targetAudience, tomeNumber, writingStyle, chapterLength,
       detailLevel, tone, narrativeFormat, preface, conclusion, chapters, characters,
       ebookImages, numberOfChapters, bookSummary, coverConcepts, seoOptimization, bookDescription, genre,
-      kdpDescription, kdpKeywords, kdpCategories]);
+      kdpDescription, kdpKeywords, kdpCategories, backCoverData]);
+
 
   // Flag indiquant que le chargement initial du projet cloud est terminé.
   // Tant qu'il est false, on bloque toute sauvegarde pour éviter de créer un doublon
@@ -630,6 +636,18 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           setKdpDescription(dbProject.kdp_description || '');
           setKdpKeywords(dbProject.kdp_keywords || '');
           setKdpCategories(dbProject.kdp_categories || '');
+          // Restauration de la 4ᵉ de couverture retenue (titres inclus dans chapters).
+          const bc = (dbProject as any).back_cover_data;
+          if (bc && typeof bc === 'object') {
+            setBackCoverData({
+              versions: Array.isArray(bc.versions) ? bc.versions : [],
+              selectedIndex: typeof bc.selectedIndex === 'number' ? bc.selectedIndex : null,
+              selectedText: typeof bc.selectedText === 'string' ? bc.selectedText : '',
+              shortVersion: typeof bc.shortVersion === 'string' ? bc.shortVersion : '',
+              authorBio: typeof bc.authorBio === 'string' ? bc.authorBio : '',
+            });
+          }
+
         }
       } finally {
         setInitialLoadDone(true);
@@ -668,7 +686,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             characters: data.characters, ebook_images: data.ebookImages,
             number_of_chapters: data.numberOfChapters, book_summary: data.bookSummary,
             cover_concepts: data.coverConcepts, seo_optimization: data.seoOptimization,
-            kdp_description: data.kdpDescription, kdp_keywords: data.kdpKeywords, kdp_categories: data.kdpCategories,
+            kdp_description: data.kdpDescription, kdp_keywords: data.kdpKeywords, kdp_categories: data.kdpCategories, back_cover_data: data.backCoverData,
           }, false);
           console.log('🔄 [Auto-save 60s] Projet sauvegardé');
         } catch (err) {
@@ -693,7 +711,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             characters: data.characters, ebook_images: data.ebookImages,
             number_of_chapters: data.numberOfChapters, book_summary: data.bookSummary,
             cover_concepts: data.coverConcepts, seo_optimization: data.seoOptimization,
-            kdp_description: data.kdpDescription, kdp_keywords: data.kdpKeywords, kdp_categories: data.kdpCategories,
+            kdp_description: data.kdpDescription, kdp_keywords: data.kdpKeywords, kdp_categories: data.kdpCategories, back_cover_data: data.backCoverData,
           }));
         } catch {}
       }
@@ -1330,7 +1348,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       preface, conclusion, chapters, characters, ebook_images: ebookImages,
       number_of_chapters: numberOfChapters, book_summary: bookSummary,
       cover_concepts: coverConcepts, seo_optimization: seoOptimization,
-      kdp_description: kdpDescription, kdp_keywords: kdpKeywords, kdp_categories: kdpCategories,
+      kdp_description: kdpDescription, kdp_keywords: kdpKeywords, kdp_categories: kdpCategories, back_cover_data: backCoverData,
     };
     
     const result = await saveProject(projectData);
@@ -1369,7 +1387,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         characters: data.characters, ebook_images: data.ebookImages,
         number_of_chapters: data.numberOfChapters, book_summary: data.bookSummary,
         cover_concepts: data.coverConcepts, seo_optimization: data.seoOptimization,
-        kdp_description: data.kdpDescription, kdp_keywords: data.kdpKeywords, kdp_categories: data.kdpCategories,
+        kdp_description: data.kdpDescription, kdp_keywords: data.kdpKeywords, kdp_categories: data.kdpCategories, back_cover_data: data.backCoverData,
       };
       saveProject(projectData).catch((err) => console.error('Erreur sauvegarde après changement onglet:', err));
     }
@@ -3106,7 +3124,13 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 onGenerate={async (tone, audience, highlights) => {
                   return await generateBackCover(ebookTitle, authorName, chapters, tone, audience, highlights);
                 }}
+                initialData={backCoverData}
+                onUseVersion={(data) => {
+                  setBackCoverData(data);
+                  void handleManualSave();
+                }}
               />
+
             </div>
           </div>
         );
@@ -3168,7 +3192,25 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             aboutAuthor={aboutAuthor}
             acknowledgments={acknowledgments}
             reviewNote={reviewNote}
+            backCoverText={backCoverData.selectedText}
+            onTitlesGenerated={(titles) => {
+              // Les titres régénérés depuis l'aperçu sont appliqués au manuscrit puis sauvegardés.
+              setChapters((prev) => prev.map((ch, idx) => {
+                const found = titles.find((t) => t.number === idx + 1);
+                return found?.title ? { ...ch, title: found.title } : ch;
+              }));
+              void handleManualSave();
+            }}
+            onContentHarmonized={(contents) => {
+              setChapters((prev) => prev.map((ch, idx) => {
+                const found = contents.find((c) => c.number === idx + 1);
+                return found?.content ? { ...ch, content: found.content } : ch;
+              }));
+              void handleManualSave();
+            }}
+
           />
+
         );
       
       case 'settings':
