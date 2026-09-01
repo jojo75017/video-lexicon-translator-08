@@ -36,6 +36,33 @@ export const ESSAI_PAGE_URL = `${SITE_ORIGIN}/essai`;
 export const essaiUrl = (src: string) => `${ESSAI_PAGE_URL}?src=${src}`;
 export const bonusUrl = (src: string) => `${BONUS_PAGE_URL}?src=${src}`;
 
+/* --------------------------- LIENS COURTS /r --------------------------- */
+
+/**
+ * Liens courts maison : le lecteur ne voit qu'une adresse propre sur notre
+ * domaine (https://ebookstudio.fr/r/essai1). La page relais /r enregistre le
+ * clic puis redirige immédiatement vers la destination.
+ * Aucune URL technique n'apparaît jamais dans les emails Systeme.io.
+ */
+export interface ShortLink {
+  key: string;
+  destination: string;
+  template: string;
+  label: string;
+}
+
+export const SHORT_LINKS: Record<string, ShortLink> = {
+  essai1: { key: 'essai1', destination: '/essai', template: 'cadeau-1', label: 'Voir mon livre commencer' },
+  essai2: { key: 'essai2', destination: '/essai', template: 'cadeau-2', label: 'Obtenir mon sommaire' },
+  essai3: { key: 'essai3', destination: '/essai', template: 'cadeau-3', label: 'Ouvrir mon livre' },
+  offre1: { key: 'offre1', destination: '/commander', template: 'cadeau-4', label: "Prendre l'accès à vie" },
+  offre2: { key: 'offre2', destination: '/commander', template: 'cadeau-5', label: 'Commander avant ce soir' },
+};
+
+/** URL courte à coller dans le champ « URL » du bouton Systeme.io. */
+export const shortUrl = (key: string) => `${SITE_ORIGIN}/r/${key}`;
+
+
 /* ------------------------------ LES BONUS ------------------------------ */
 
 export interface CampagneBonus {
@@ -129,12 +156,12 @@ export const CAMPAGNE_EMAILS: CampagneEmail[] = [
     preheader: 'Une phrase suffit. Vous lisez le début de votre livre dans deux minutes.',
     goal: "Générer son livre sur la page d'essai",
     ctaLabel: 'Voir mon livre commencer',
-    ctaUrl: essaiUrl('cadeau-1'),
+    ctaUrl: shortUrl('essai1'),
     body: `Bonjour,
 
 Je vous propose quelque chose de très simple : écrivez votre idée de livre en une phrase, et je vous rends le début de ce livre.
 
->> Voir mon livre commencer : ${essaiUrl('cadeau-1')}
+>> Voir mon livre commencer : ${shortUrl('essai1')}
 
 Vous n'avez rien à installer, rien à payer, et vous n'avez même pas besoin de créer un compte pour voir le résultat. Vous tapez votre idée, et en deux minutes vous avez sous les yeux :
 
@@ -146,7 +173,7 @@ Ce n'est pas une démonstration avec un livre d'exemple. C'est votre idée, votr
 
 Si le début vous plaît, vous demandez le chapitre 1 en entier : il s'affiche immédiatement et vous le recevez par email pour le garder.
 
->> Écrire mon chapitre 1 gratuitement : ${essaiUrl('cadeau-1')}
+>> Écrire mon chapitre 1 gratuitement : ${shortUrl('essai1')}
 
 ${SIGN}`,
   },
@@ -158,14 +185,14 @@ ${SIGN}`,
     preheader: 'Le plan chapitre par chapitre de votre livre, écrit à partir de votre idée.',
     goal: "Générer son sommaire sur la page d'essai",
     ctaLabel: 'Obtenir mon sommaire',
-    ctaUrl: essaiUrl('cadeau-2'),
+    ctaUrl: shortUrl('essai2'),
     body: `Bonjour,
 
 Ce qui bloque la plupart des auteurs, ce n'est pas l'écriture. C'est le plan.
 
 On a une idée, on sent qu'il y a un livre dedans, mais on ne sait pas par quoi commencer, dans quel ordre, ni combien de chapitres il faut. Alors on repousse. Parfois pendant des années.
 
->> Obtenir mon sommaire : ${essaiUrl('cadeau-2')}
+>> Obtenir mon sommaire : ${shortUrl('essai2')}
 
 Donnez votre idée en une phrase sur cette page, et vous recevez le sommaire complet de votre livre : chaque chapitre avec son titre et un résumé de deux phrases. Un vrai plan de travail, pas une liste vague.
 
@@ -173,7 +200,7 @@ Vous verrez tout de suite si l'ordre vous convient, ce qui manque, ce que vous v
 
 Et pendant que vous lisez le sommaire, le chapitre 1 s'écrit à côté. Gratuitement, sans carte bancaire.
 
->> Voir mon sommaire et mon chapitre 1 : ${essaiUrl('cadeau-2')}
+>> Voir mon sommaire et mon chapitre 1 : ${shortUrl('essai2')}
 
 ${SIGN}`,
   },
@@ -185,7 +212,7 @@ ${SIGN}`,
     preheader: 'Titre, sommaire, chapitre 1 écrit pour votre idée. Deux minutes.',
     goal: "Générer son livre sur la page d'essai",
     ctaLabel: 'Ouvrir mon livre',
-    ctaUrl: essaiUrl('cadeau-3'),
+    ctaUrl: shortUrl('essai3'),
     body: `Bonjour,
 
 Hier soir, j'ai pris une idée simple, une seule phrase, et j'en ai fait un livre complet. Voilà le trajet exact :
@@ -201,11 +228,11 @@ Ce n'est pas un cours ni une méthode à appliquer plus tard. C'est un livre, à
 
 Et la première étape, celle qui décide de tout, vous pouvez la faire maintenant en deux minutes et sans rien payer : votre titre, votre sommaire, votre chapitre 1.
 
->> Ouvrir mon livre : ${essaiUrl('cadeau-3')}
+>> Ouvrir mon livre : ${shortUrl('essai3')}
 
 Lisez le début. Si ce que vous lisez ressemble à votre livre, la suite se joue en un clic.
 
->> Commencer maintenant : ${essaiUrl('cadeau-3')}
+>> Commencer maintenant : ${shortUrl('essai3')}
 
 ${SIGN}`,
   },
@@ -218,7 +245,7 @@ ${SIGN}`,
     preheader: 'Accès à vie, V3 incluse. Un seul paiement, carte ou PayPal.',
     goal: 'Commander',
     ctaLabel: `Prendre l'accès à vie à ${CAMPAGNE.price}`,
-    ctaUrl: commanderUrl('cadeau-4'),
+    ctaUrl: shortUrl('offre1'),
     body: `Bonjour,
 
 Je pose le calcul en clair, sans détour.
@@ -227,13 +254,13 @@ Aujourd'hui : ${CAMPAGNE.price} une fois, accès à vie, la V3 incluse d'office,
 
 Après le ${CAMPAGNE.deadline} : l'accès à vie disparaît. EbookStudio passe en ${CAMPAGNE.afterOffer}. En trois mois d'abonnement, vous aurez dépassé le prix d'aujourd'hui — et vous continuerez de payer chaque mois.
 
->> Prendre l'accès à vie à ${CAMPAGNE.price} : ${commanderUrl('cadeau-4')}
+>> Prendre l'accès à vie à ${CAMPAGNE.price} : ${shortUrl('offre1')}
 
 Ce que vous ouvrez avec ce paiement : le Sommaire IA, la rédaction chapitre par chapitre, la correction professionnelle, les exports Word et PDF aux normes KDP, les couvertures aux dimensions exactes d'Amazon, la fiche produit, le livre audio et la traduction.
 
 Ceux qui entrent avant la date ne repayeront jamais.
 
->> Commander maintenant : ${commanderUrl('cadeau-4')}
+>> Commander maintenant : ${shortUrl('offre1')}
 
 ${SIGN}`,
   },
@@ -245,20 +272,20 @@ ${SIGN}`,
     preheader: `Dernier jour pour l'accès à vie à ${CAMPAGNE.price}.`,
     goal: 'Commander',
     ctaLabel: `Commander avant ce soir — ${CAMPAGNE.price}`,
-    ctaUrl: commanderUrl('cadeau-5'),
+    ctaUrl: shortUrl('offre2'),
     body: `Bonjour,
 
 C'est mon dernier message sur cette offre.
 
 Ce soir, l'accès à vie à ${CAMPAGNE.price} se termine. Demain, l'entrée se fait uniquement par abonnement mensuel.
 
->> Commander avant ce soir : ${commanderUrl('cadeau-5')}
+>> Commander avant ce soir : ${shortUrl('offre2')}
 
 Vos 5 niches restent à vous, elles ne disparaissent pas. Ce qui disparaît, c'est la possibilité de payer une seule fois pour l'atelier complet.
 
 Si vous hésitez encore, répondez à cet email : c'est moi qui lis, et je réponds avant ce soir.
 
->> Dernier lien : ${commanderUrl('cadeau-5')}
+>> Dernier lien : ${shortUrl('offre2')}
 
 ${SIGN}`,
   },
@@ -291,18 +318,29 @@ ${paragraphs}
 </div>`;
 }
 
+/** Clé du lien court de cet email (essai1, offre2…). */
+export const emailShortKey = (email: CampagneEmail): string =>
+  email.ctaUrl.split('/r/')[1] ?? '';
+
+/** Lien court à coller dans le champ « URL » du bouton Systeme.io. */
+export const emailShortUrl = (email: CampagneEmail): string => email.ctaUrl;
+
 /** Étapes de paramétrage côté Systeme.io — une seule campagne, un seul tag. */
 export const SYSTEMEIO_SETUP_STEPS: string[] = [
   'Expéditeur : contact@ebookstudio-mail.fr (domaine déjà vérifié dans Systeme.io). Ne touchez pas au DNS de ebookstudio.fr.',
   'Réglages → Pied de page : remplacez le pied de page hérité (trafic-affiliation.com) par « EbookStudio — Georges Boubet — contact@ebookstudio-mail.fr » suivi du lien de désinscription Systeme.io.',
   `Contacts → Tags : créez « ${CAMPAGNE.tag} » (entrée dans la campagne) et « CLIENT-47 » (acheteurs, posé automatiquement par l'application).`,
   'Emails → Campagnes : créez « EbookStudio — 5 niches puis accès à vie » avec 5 emails aux délais 0, 1, 3, 5 et 7 jours.',
-  'Pour chaque email : collez l\'objet, puis le corps (bouton « Copier le texte » ou « Copier le HTML » pour la version avec bouton).',
+  'Systeme.io s\'écrit en texte : pour chaque email, trois copier-coller — 1) l\'objet, 2) le texte du corps, 3) le libellé du bouton + son lien court (champ URL du bouton).',
+  'Le lien court (https://ebookstudio.fr/r/…) est le seul lien à utiliser : il compte le clic puis redirige en une fraction de seconde. Ne le remplacez jamais par /essai ou /commander en direct, sinon le clic n\'est plus mesuré.',
   `Automatisations → règle 1 : déclencheur « Tag ajouté » = ${CAMPAGNE.tag} → action « Inscrire à la campagne ».`,
   'Automatisations → règle 2 : déclencheur « Tag ajouté » = CLIENT-47 → action « Désinscrire de la campagne » (l\'acheteur ne reçoit plus les emails de vente).',
+  'Segmentation : les emails 1 à 3 (essai gratuit, aucun prix) partent à tout le monde ; les emails 4 et 5 (offre 47 €) uniquement au segment « a cliqué » — dans Systeme.io, condition « a cliqué sur un lien » sur les trois premiers emails.',
+  'Hygiène de liste : les contacts qui n\'ont ouvert ni cliqué après les 5 emails sortent de la campagne (protection de la délivrabilité).',
   'Envoyez-vous un test sur boubetgeorges@gmail.com, puis activez les deux règles.',
   'Aucun envoi de masse ne part de l\'application : Resend (offre gratuite) ne sert plus qu\'aux emails de service (codes d\'accès, confirmations de paiement).',
 ];
+
 
 
 /* ------------- Compatibilité avec les tableaux de bord admin ------------- */

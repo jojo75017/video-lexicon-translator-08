@@ -335,12 +335,9 @@ export default function EssaiPage() {
               <p className="text-center text-xs text-[#8A8072]">
                 Aucune carte bancaire. Aucun engagement. Votre livre reste le vôtre.
               </p>
-              <p className="text-center text-xs text-[#8A8072]">
-                Vous cherchez plutôt un sujet qui se vend ?{' '}
-                <a href="/cadeau?src=essai" className="font-semibold text-[#0F2E1F] underline underline-offset-2">
-                  Voir les 5 niches Amazon offertes
-                </a>
-              </p>
+              {/* Un seul appel à l'action sur ce premier écran : aucun lien
+                  concurrent ne détourne le visiteur avant sa génération. */}
+
             </div>
           </div>
         ) : (
