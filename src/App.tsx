@@ -553,6 +553,8 @@ const App = () => {
             <Route path="/cadeau" element={<CadeauPage />} />
             <Route path="/bonus" element={<BonusPage />} />
             <Route path="/r" element={<RedirectClickPage />} />
+            <Route path="/r/:shortKey" element={<RedirectClickPage />} />
+
             <Route path="/carte-cadeau" element={<GiftRedeemPage />} />
             <Route path="/carte-cadeau-merci" element={<GiftThankYouPage />} />
             <Route path="/influenceurs" element={<InfluenceursPage />} />
