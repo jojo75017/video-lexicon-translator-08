@@ -53,21 +53,27 @@ export function NewsletterClicksPanel() {
   const byDestination = new Map<string, Bucket>();
   const byNewsletter = new Map<number, Bucket>();
 
+  const isIdentified = (email: string) => !email.endsWith('@systemeio.local');
+
   for (const r of rows) {
+    const email = r.prospect_email.toLowerCase();
     const dest = newsletterDestination(r.clicked_url);
     const d = byDestination.get(dest) ?? emptyBucket();
     d.clicks += 1;
-    d.emails.add(r.prospect_email.toLowerCase());
+    if (isIdentified(email)) d.emails.add(email);
     byDestination.set(dest, d);
 
     const num = r.email_step ?? 0;
     const n = byNewsletter.get(num) ?? emptyBucket();
     n.clicks += 1;
-    n.emails.add(r.prospect_email.toLowerCase());
+    if (isIdentified(email)) n.emails.add(email);
     byNewsletter.set(num, n);
   }
 
-  const totalUnique = new Set(rows.map((r) => r.prospect_email.toLowerCase())).size;
+  const totalUnique = new Set(
+    rows.map((r) => r.prospect_email.toLowerCase()).filter(isIdentified),
+  ).size;
+  const anonymousClicks = rows.filter((r) => !isIdentified(r.prospect_email.toLowerCase())).length;
   const priority = ['/essai', '/commander'];
   const destinations = [...byDestination.entries()].sort(
     (a, b) =>
@@ -100,13 +106,16 @@ export function NewsletterClicksPanel() {
           <p className="mt-1 text-2xl font-bold text-foreground">{rows.length}</p>
         </div>
         <div className="rounded-xl border border-border bg-muted/30 p-4">
-          <p className="text-xs uppercase text-muted-foreground">Prospects uniques</p>
+          <p className="text-xs uppercase text-muted-foreground">Prospects identifiés</p>
           <p className="mt-1 text-2xl font-bold text-foreground">{totalUnique}</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {anonymousClicks} clic(s) sans email identifié
+          </p>
         </div>
         <div className="rounded-xl border border-border bg-muted/30 p-4">
           <p className="text-xs uppercase text-muted-foreground">Vers /commander</p>
           <p className="mt-1 text-2xl font-bold text-foreground">
-            {byDestination.get('/commander')?.emails.size ?? 0}
+            {byDestination.get('/commander')?.clicks ?? 0}
           </p>
         </div>
       </div>
@@ -162,9 +171,9 @@ export function NewsletterClicksPanel() {
       </div>
 
       <p className="mt-5 text-xs text-muted-foreground">
-        Les données n'apparaissent qu'après un envoi réel depuis Systeme.io : sur un email de test,
-        la balise de fusion n'est pas remplacée et le clic n'est volontairement pas compté (la page
-        s'ouvre quand même).
+        Tous les clics sont désormais comptés, même quand Systeme.io ne remplace pas la balise
+        d'email (emails de test, éditeur visuel) : dans ce cas le clic apparaît dans « clic(s) sans
+        email identifié ». Les prospects identifiés restent utilisables pour les relances.
       </p>
     </Card>
   );
