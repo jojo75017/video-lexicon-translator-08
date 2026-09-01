@@ -328,15 +328,32 @@ ${blocks}
 }
 
 
-/** Version texte : les marqueurs deviennent « libellé : url » (URL tracée). */
+/**
+ * Lien court à coller dans le champ « URL » du bouton Systeme.io.
+ * Le lecteur ne voit qu'une adresse propre : https://ebookstudio.fr/r/n1
+ * La page relais compte le clic puis redirige aussitôt.
+ */
+export function newsletterShortKey(n: Pick<Newsletter, 'number'>, slot: 'cta1' | 'cta2'): string {
+  return `n${n.number}${slot === 'cta2' ? 'b' : ''}`;
+}
+
+export function newsletterShortUrl(
+  n: Pick<Newsletter, 'number'>,
+  slot: 'cta1' | 'cta2',
+): string {
+  return `${SITE_ORIGIN}/r/${newsletterShortKey(n, slot)}`;
+}
+
+/** Version texte prête à coller dans Systeme.io : un seul lien court par bouton. */
 export function newsletterToText(n: Newsletter): string {
   return n.body
-    .replace('[[CTA]]', `>> ${n.cta.label} : ${trackedCtaUrl(n, n.cta, 'cta1')}`)
+    .replace('[[CTA]]', `>> ${n.cta.label} : ${newsletterShortUrl(n, 'cta1')}`)
     .replace(
       '[[CTA2]]',
-      n.cta2 ? `>> ${n.cta2.label} : ${trackedCtaUrl(n, n.cta2, 'cta2')}` : '',
+      n.cta2 ? `>> ${n.cta2.label} : ${newsletterShortUrl(n, 'cta2')}` : '',
     );
 }
+
 
 
 /** Mode d'emploi affiché au-dessus des newsletters. */
