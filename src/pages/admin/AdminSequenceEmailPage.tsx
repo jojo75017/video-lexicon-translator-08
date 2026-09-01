@@ -266,8 +266,23 @@ function EssaiFunnelPanel() {
 }
 
 function NewsletterCard({ newsletter }: { newsletter: Newsletter }) {
-  const html = newsletterToHtml(newsletter);
   const text = newsletterToText(newsletter);
+  const buttons: Array<{ slot: 'cta1' | 'cta2'; label: string; url: string; key: string }> = [
+    {
+      slot: 'cta1',
+      label: newsletter.cta.label,
+      url: newsletterShortUrl(newsletter, 'cta1'),
+      key: newsletterShortKey(newsletter, 'cta1'),
+    },
+  ];
+  if (newsletter.cta2) {
+    buttons.push({
+      slot: 'cta2',
+      label: newsletter.cta2.label,
+      url: newsletterShortUrl(newsletter, 'cta2'),
+      key: newsletterShortKey(newsletter, 'cta2'),
+    });
+  }
 
   return (
     <Card className="rounded-2xl border-border bg-card p-5 shadow-sm">
@@ -284,51 +299,67 @@ function NewsletterCard({ newsletter }: { newsletter: Newsletter }) {
       </div>
 
       <h3 className="mt-3 text-lg font-semibold text-foreground">{newsletter.subject}</h3>
-      <p className="mt-1 text-sm text-muted-foreground">Pré-header : {newsletter.preheader}</p>
-      <p className="mt-2 text-sm text-muted-foreground">{newsletter.note}</p>
+      <p className="mt-1 text-sm text-muted-foreground">{newsletter.note}</p>
 
-      <div className="mt-4 rounded-xl border border-border bg-muted/30 p-3 text-sm">
-        <p className="font-medium text-foreground">Boutons de cet email</p>
-        <p className="mt-1 text-muted-foreground">
-          1. « {newsletter.cta.label} » → {newsletterDestination(newsletter.cta.url)} (clics tracés)
+      {/* 1. L'objet */}
+      <div className="mt-4 rounded-xl border border-border bg-muted/30 p-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          1. Objet
         </p>
-        {newsletter.cta2 && (
-          <p className="text-muted-foreground">
-            2. « {newsletter.cta2.label} » → {newsletterDestination(newsletter.cta2.url)} (clics
-            tracés)
-          </p>
-        )}
-        <p className="mt-2 text-xs text-muted-foreground">
-          Les boutons du HTML passent par le traceur de clics avec la balise{' '}
-          <code>{SYSTEMEIO_EMAIL_MERGE_TAG}</code> : ne modifiez pas leurs URL dans Systeme.io.
-        </p>
+        <p className="mt-1 text-sm text-foreground">{newsletter.subject}</p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <CopyButton value={newsletter.subject} label="Copier l'objet" />
+          <CopyButton value={newsletter.preheader} label="Copier le pré-header" />
+        </div>
       </div>
 
-      <pre className="mt-4 max-h-72 overflow-auto whitespace-pre-wrap rounded-xl bg-muted/50 p-4 text-sm leading-relaxed text-foreground">
-        {text}
-      </pre>
+      {/* 2. Le texte du corps */}
+      <div className="mt-3 rounded-xl border border-border bg-muted/30 p-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          2. Texte à coller dans Systeme.io
+        </p>
+        <pre className="mt-2 max-h-72 overflow-auto whitespace-pre-wrap rounded-lg bg-background p-3 text-sm leading-relaxed text-foreground">
+          {text}
+        </pre>
+        <div className="mt-2">
+          <CopyButton value={text} label="Copier le texte" variant="default" />
+        </div>
+      </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        <CopyButton value={newsletter.subject} label="Copier l'objet" />
-        <CopyButton value={html} label="Copier le HTML (avec boutons)" variant="default" />
-        <CopyButton value={text} label="Copier le texte" />
-        <CopyButton value={newsletter.preheader} label="Copier le pré-header" />
-        <Button asChild size="sm" variant="ghost" className="rounded-xl">
-          <a href={newsletter.cta.url} target="_blank" rel="noopener noreferrer">
-            <ExternalLink className="mr-2 h-4 w-4" /> Tester le bouton 1
-          </a>
-        </Button>
-        {newsletter.cta2 && (
-          <Button asChild size="sm" variant="ghost" className="rounded-xl">
-            <a href={newsletter.cta2.url} target="_blank" rel="noopener noreferrer">
-              <ExternalLink className="mr-2 h-4 w-4" /> Tester le bouton 2
-            </a>
-          </Button>
-        )}
+      {/* 3. Les boutons */}
+      <div className="mt-3 rounded-xl border border-border bg-muted/30 p-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          3. Bouton{buttons.length > 1 ? 's' : ''} Systeme.io
+        </p>
+        {buttons.map((btn, i) => (
+          <div key={btn.slot} className={i === 0 ? 'mt-1' : 'mt-4'}>
+            <p className="text-sm text-foreground">
+              Libellé : <strong>{btn.label}</strong>
+            </p>
+            <p className="mt-1 break-all text-sm text-muted-foreground">
+              Champ URL : <code>{btn.url}</code>
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <CopyButton value={btn.label} label="Copier le libellé" />
+              <CopyButton value={btn.url} label="Copier le lien court" />
+              <Button asChild size="sm" variant="ghost" className="rounded-xl">
+                <a href={`/r/${btn.key}`} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="mr-2 h-4 w-4" /> Tester le lien
+                </a>
+              </Button>
+            </div>
+          </div>
+        ))}
+        <p className="mt-3 text-xs text-muted-foreground">
+          Ces liens courts comptent le clic puis redirigent aussitôt vers{' '}
+          {buttons.map((b) => newsletterDestination(b.url)).join(' et ')}. Ne les remplacez jamais
+          par un lien direct : le clic ne serait plus mesuré.
+        </p>
       </div>
     </Card>
   );
 }
+
 
 function NewslettersPanel() {
   return (
