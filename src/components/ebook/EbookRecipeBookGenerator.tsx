@@ -420,21 +420,22 @@ Pour CHAQUE recette, fournis un accord vin PRÉCIS avec:
 - winePairing: L'appellation exacte du vin (ex: "Saint-Émilion Grand Cru 2018" ou "Meursault 1er Cru")
 - wineReason: Explication détaillée de pourquoi cet accord fonctionne (les arômes, la complémentarité, les tanins, l'acidité)
 
-IMPORTANT: Chaque fiche doit être DÉTAILLÉE avec au moins 400 mots de contenu rédigé (description, histoire, étapes, conseils). Ne jamais descendre sous 400 mots.
+IMPORTANT: Chaque fiche doit être DÉTAILLÉE avec au moins 650 mots de contenu rédigé (introduction, description, étapes, conseils). Ne jamais descendre sous 650 mots.
+Écris en français, en phrases complètes terminées par un point. Aucun mot latin, aucun texte de remplissage.
 Retourne UNIQUEMENT du JSON valide, sans texte avant ni après.
 
 Pour CHAQUE recette, fournis OBLIGATOIREMENT:
 - country: "${finalCountry || 'Le pays d\'origine'}"
 - dishName: Le nom authentique et traditionnel du plat
-- description: Description gourmande (3-4 phrases sur saveurs, textures, arômes)
-- history: Histoire du plat (2-3 phrases sur origine et tradition)
-- ingredients: Liste de 8-10 ingrédients avec quantités précises
-- steps: 8-10 étapes de préparation claires et détaillées
-- chefTips: 2-3 conseils de chef pour réussir le plat
-- variations: Variantes régionales (2 phrases)
+- history: INTRODUCTION du plat — 6 à 8 phrases (110 mots minimum) : d'où il vient, quand et par qui on le mange, ce qu'il raconte de la région, comment il est devenu un classique. Jamais une phrase générique.
+- description: DESCRIPTION DÉTAILLÉE de la recette — 6 à 8 phrases (120 mots minimum) : saveurs, textures, arômes, aspect visuel dans l'assiette, ce qui fait la réussite du plat, à quelle occasion le servir.
+- ingredients: Liste de 10 à 12 ingrédients avec quantités précises
+- steps: 10 à 12 étapes de préparation, chacune rédigée en 2 phrases complètes (gestes, températures, durées, indices de réussite)
+- chefTips: 3 à 4 conseils de chef rédigés (60 mots minimum)
+- variations: Variantes régionales détaillées (4 phrases minimum)
 - winePairing: Vin recommandé (appellation précise)
-- wineReason: Explication de l'accord (2 phrases)
-- servingSuggestion: Présentation du plat (1-2 phrases)
+- wineReason: Explication de l'accord (3 phrases)
+- servingSuggestion: Présentation et dressage du plat (3 phrases)
 - cookingTime: Temps détaillé (préparation + repos + cuisson)
 - difficulty: Facile, Moyen ou Difficile
 - portions: Nombre de personnes
