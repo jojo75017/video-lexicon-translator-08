@@ -84,6 +84,7 @@ interface EbookExporterProps {
   backCoverText?: string;
   /** Titres de chapitres régénérés depuis l'aperçu : remontés au projet pour sauvegarde. */
   onTitlesGenerated?: (titles: Array<{ number: number; title: string }>) => void | Promise<void>;
+  onContentHarmonized?: (contents: Array<{ number: number; content: string }>) => void | Promise<void>;
 }
 
 export const EbookExporter: React.FC<EbookExporterProps> = ({
@@ -100,6 +101,7 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
   reviewNote = '',
   backCoverText = '',
   onTitlesGenerated,
+  onContentHarmonized,
 }) => {
 
   const { formatId } = useKdpFormat();
@@ -2085,6 +2087,7 @@ Paperback: 9.99€ - 19.99€
         onOpenChange={setShowDocxPreview}
         getOptions={buildDocxOptions}
         onTitlesGenerated={onTitlesGenerated}
+        onContentHarmonized={onContentHarmonized}
       />
 
 
