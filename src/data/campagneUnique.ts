@@ -36,6 +36,33 @@ export const ESSAI_PAGE_URL = `${SITE_ORIGIN}/essai`;
 export const essaiUrl = (src: string) => `${ESSAI_PAGE_URL}?src=${src}`;
 export const bonusUrl = (src: string) => `${BONUS_PAGE_URL}?src=${src}`;
 
+/* --------------------------- LIENS COURTS /r --------------------------- */
+
+/**
+ * Liens courts maison : le lecteur ne voit qu'une adresse propre sur notre
+ * domaine (https://ebookstudio.fr/r/essai1). La page relais /r enregistre le
+ * clic puis redirige immédiatement vers la destination.
+ * Aucune URL technique n'apparaît jamais dans les emails Systeme.io.
+ */
+export interface ShortLink {
+  key: string;
+  destination: string;
+  template: string;
+  label: string;
+}
+
+export const SHORT_LINKS: Record<string, ShortLink> = {
+  essai1: { key: 'essai1', destination: '/essai', template: 'cadeau-1', label: 'Voir mon livre commencer' },
+  essai2: { key: 'essai2', destination: '/essai', template: 'cadeau-2', label: 'Obtenir mon sommaire' },
+  essai3: { key: 'essai3', destination: '/essai', template: 'cadeau-3', label: 'Ouvrir mon livre' },
+  offre1: { key: 'offre1', destination: '/commander', template: 'cadeau-4', label: "Prendre l'accès à vie" },
+  offre2: { key: 'offre2', destination: '/commander', template: 'cadeau-5', label: 'Commander avant ce soir' },
+};
+
+/** URL courte à coller dans le champ « URL » du bouton Systeme.io. */
+export const shortUrl = (key: string) => `${SITE_ORIGIN}/r/${key}`;
+
+
 /* ------------------------------ LES BONUS ------------------------------ */
 
 export interface CampagneBonus {
