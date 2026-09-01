@@ -37,7 +37,6 @@ import {
   newsletterToText,
   type Newsletter,
   newsletterDestination,
-  SYSTEMEIO_EMAIL_MERGE_TAG,
 } from '@/data/newslettersSystemeio';
 
 function CopyButton({

@@ -371,12 +371,12 @@ export const NEWSLETTER_HOWTO: Array<{ title: string; detail: string }> = [
   {
     title: '3. Suivi des clics (ne pas modifier les URL)',
     detail:
-      "Chaque bouton du HTML passe par un lien de suivi contenant la balise {{contact.email}} : Systeme.io la remplace par l'email du contact, le clic est enregistré, puis la page (/essai, /commander…) s'ouvre immédiatement. Résultat visible dans le tableau « Clics Systeme.io » plus haut : nombre de prospects uniques par destination et par newsletter. Si vous réécrivez une URL à la main, ce bouton n'est plus compté.",
+      "Chaque bouton utilise un lien court maison (https://ebookstudio.fr/r/n1, /r/n1b…). Collez-le tel quel dans le champ « URL » du bouton Systeme.io : le clic est enregistré, puis la page (/essai, /commander…) s'ouvre en une fraction de seconde. Résultat visible dans le tableau « Clics Systeme.io » plus haut. Si vous remplacez ce lien par /essai ou /commander en direct, le clic n'est plus compté.",
   },
   {
-    title: '4. Comment garder les vrais boutons',
+    title: '4. Trois copier-coller par email',
     detail:
-      'Dans l\'éditeur, ajoutez un bloc « Texte », ouvrez l\'affichage du code source (icône < >), puis collez le HTML copié ici. Les boutons sont de véritables liens cliquables, testés sur Gmail, Outlook et Apple Mail. Si vous collez la version texte, les liens apparaissent en clair : c\'est le repli, moins performant.',
+      'Systeme.io s\'écrit en texte : 1) collez l\'objet, 2) collez le texte du corps dans un bloc « Texte », 3) ajoutez un bloc « Bouton », tapez le libellé fourni et collez le lien court dans son champ URL. Rien d\'autre, aucun HTML.',
   },
   {
     title: '5. Programmation',
