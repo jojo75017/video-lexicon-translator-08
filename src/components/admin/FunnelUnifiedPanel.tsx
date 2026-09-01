@@ -44,8 +44,13 @@ export function FunnelUnifiedPanel() {
         const step = row.email_step != null ? String(row.email_step) : '';
         const template = row.template_name ?? '';
         const key = Object.keys(SHORT_LINKS).find(
-          (k) => step === k || template === k || url.includes(`/r/${k}`),
+          (k) =>
+            step === k ||
+            template === k ||
+            template === SHORT_LINKS[k].template ||
+            url.includes(`/r/${k}`),
         );
+
         if (!key) continue;
         clicksByKey[key] = (clicksByKey[key] ?? 0) + 1;
         clicksTotal += 1;
