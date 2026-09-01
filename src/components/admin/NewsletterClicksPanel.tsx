@@ -106,13 +106,16 @@ export function NewsletterClicksPanel() {
           <p className="mt-1 text-2xl font-bold text-foreground">{rows.length}</p>
         </div>
         <div className="rounded-xl border border-border bg-muted/30 p-4">
-          <p className="text-xs uppercase text-muted-foreground">Prospects uniques</p>
+          <p className="text-xs uppercase text-muted-foreground">Prospects identifiés</p>
           <p className="mt-1 text-2xl font-bold text-foreground">{totalUnique}</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {anonymousClicks} clic(s) sans email identifié
+          </p>
         </div>
         <div className="rounded-xl border border-border bg-muted/30 p-4">
           <p className="text-xs uppercase text-muted-foreground">Vers /commander</p>
           <p className="mt-1 text-2xl font-bold text-foreground">
-            {byDestination.get('/commander')?.emails.size ?? 0}
+            {byDestination.get('/commander')?.clicks ?? 0}
           </p>
         </div>
       </div>
