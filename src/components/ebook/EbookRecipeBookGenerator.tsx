@@ -391,10 +391,10 @@ const EbookRecipeBookGenerator: React.FC<EbookRecipeBookGeneratorProps> = ({ ebo
           )}\n- Ne pas remplacer par d'autres plats, ne pas fusionner, ne pas faire de variantes.`
         : '';
 
-      const { data, error } = await supabase.functions.invoke('generate-content', {
-        body: {
-          type: 'recipe-sheets',
-          prompt: `Tu es un chef étoilé Michelin et sommelier expert reconnu mondialement.
+      // Génération par petits lots : une seule requête pour 10 fiches était tronquée
+      // par le modèle, ce qui faisait tomber les fiches sur les textes de secours (54 mots).
+      const buildBatchPrompt = (count: number, requiredDishesInstruction: string) => `Tu es un chef étoilé Michelin et sommelier expert reconnu mondialement.
+
 
 ID DE VARIATION (ne pas afficher, juste pour varier la sélection): ${variationNonce}
 
