@@ -405,7 +405,7 @@ ${customInstructions ? `Instructions spéciales du client: ${customInstructions}
 ${countryInstruction}
 ${finalCountry ? `Tous les ${count} plats DOIVENT être des plats 100% ${finalCountry.toLowerCase() === 'france' ? 'français' : `de ${finalCountry}`}. Aucune exception.` : ''}
 
-Génère exactement ${count} FICHES RECETTES COMPLÈTES ET UNIQUES (minimum 400 mots chacune).
+Génère exactement ${count} FICHES RECETTES COMPLÈTES ET UNIQUES (minimum 650 mots chacune).
 
 🚫 RÈGLE ANTI-DOUBLONS CRITIQUE:
 - CHAQUE recette DOIT être un plat DIFFÉRENT avec un nom UNIQUE
@@ -420,21 +420,22 @@ Pour CHAQUE recette, fournis un accord vin PRÉCIS avec:
 - winePairing: L'appellation exacte du vin (ex: "Saint-Émilion Grand Cru 2018" ou "Meursault 1er Cru")
 - wineReason: Explication détaillée de pourquoi cet accord fonctionne (les arômes, la complémentarité, les tanins, l'acidité)
 
-IMPORTANT: Chaque fiche doit être DÉTAILLÉE avec au moins 400 mots de contenu rédigé (description, histoire, étapes, conseils). Ne jamais descendre sous 400 mots.
+IMPORTANT: Chaque fiche doit être DÉTAILLÉE avec au moins 650 mots de contenu rédigé (introduction, description, étapes, conseils). Ne jamais descendre sous 650 mots.
+Écris en français, en phrases complètes terminées par un point. Aucun mot latin, aucun texte de remplissage.
 Retourne UNIQUEMENT du JSON valide, sans texte avant ni après.
 
 Pour CHAQUE recette, fournis OBLIGATOIREMENT:
 - country: "${finalCountry || 'Le pays d\'origine'}"
 - dishName: Le nom authentique et traditionnel du plat
-- description: Description gourmande (3-4 phrases sur saveurs, textures, arômes)
-- history: Histoire du plat (2-3 phrases sur origine et tradition)
-- ingredients: Liste de 8-10 ingrédients avec quantités précises
-- steps: 8-10 étapes de préparation claires et détaillées
-- chefTips: 2-3 conseils de chef pour réussir le plat
-- variations: Variantes régionales (2 phrases)
+- history: INTRODUCTION du plat — 6 à 8 phrases (110 mots minimum) : d'où il vient, quand et par qui on le mange, ce qu'il raconte de la région, comment il est devenu un classique. Jamais une phrase générique.
+- description: DESCRIPTION DÉTAILLÉE de la recette — 6 à 8 phrases (120 mots minimum) : saveurs, textures, arômes, aspect visuel dans l'assiette, ce qui fait la réussite du plat, à quelle occasion le servir.
+- ingredients: Liste de 10 à 12 ingrédients avec quantités précises
+- steps: 10 à 12 étapes de préparation, chacune rédigée en 2 phrases complètes (gestes, températures, durées, indices de réussite)
+- chefTips: 3 à 4 conseils de chef rédigés (60 mots minimum)
+- variations: Variantes régionales détaillées (4 phrases minimum)
 - winePairing: Vin recommandé (appellation précise)
-- wineReason: Explication de l'accord (2 phrases)
-- servingSuggestion: Présentation du plat (1-2 phrases)
+- wineReason: Explication de l'accord (3 phrases)
+- servingSuggestion: Présentation et dressage du plat (3 phrases)
 - cookingTime: Temps détaillé (préparation + repos + cuisson)
 - difficulty: Facile, Moyen ou Difficile
 - portions: Nombre de personnes
@@ -547,13 +548,99 @@ Format JSON strict:
 
       // Génération d'images en tâche de fond (peut échouer si crédits épuisés)
       void generateSheetImages(generatedSheets);
-      
+
+      // Rattrapage : toute fiche trop courte est réécrite en entier (introduction + description)
+      void enrichThinSheets(generatedSheets, finalCountry);
+
     } catch (error) {
       console.error('Erreur génération:', error);
       toast.error('Erreur lors de la génération');
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  /**
+   * Certaines réponses IA arrivent tronquées : la fiche tombe alors sur les textes
+   * de secours (« Recette traditionnelle transmise de génération en génération »).
+   * On la réécrit fiche par fiche pour garantir une vraie introduction du plat et
+   * une description complète.
+   */
+  const MIN_SHEET_WORDS = 450;
+
+  const enrichThinSheets = async (generated: RecipeSheet[], finalCountry?: string) => {
+    const thin = generated.filter((s) => countSheetWords(s) < MIN_SHEET_WORDS);
+    if (!thin.length) return;
+
+    setCurrentStep(`Enrichissement de ${thin.length} fiche(s) trop courte(s)…`);
+
+    for (const sheet of thin) {
+      try {
+        const { data, error } = await supabase.functions.invoke('generate-content', {
+          body: {
+            type: 'recipe-sheets',
+            prompt: `Tu es un chef étoilé Michelin et sommelier expert.
+
+Rédige UNE fiche recette complète et détaillée, en français, pour le plat : "${sheet.dishName}"${
+              sheet.country && sheet.country !== 'International' ? ` (cuisine de ${sheet.country})` : ''
+            }${finalCountry ? ` — pays imposé : ${finalCountry}` : ''}.
+
+Objectif : 650 mots minimum de contenu rédigé. Phrases complètes terminées par un point.
+Aucun mot latin, aucune phrase générique, aucun texte de remplissage.
+
+Champs obligatoires :
+- history : INTRODUCTION du plat, 6 à 8 phrases (110 mots min) — origine, région, occasions, pourquoi c'est devenu un classique.
+- description : DESCRIPTION DÉTAILLÉE de la recette, 6 à 8 phrases (120 mots min) — saveurs, textures, arômes, aspect dans l'assiette, réussite du plat.
+- ingredients : 10 à 12 ingrédients avec quantités précises.
+- steps : 10 à 12 étapes, chacune en 2 phrases complètes (gestes, températures, durées, indices de réussite).
+- chefTips : 3 à 4 conseils rédigés (60 mots min).
+- variations : variantes régionales, 4 phrases minimum.
+- winePairing : appellation précise. wineReason : 3 phrases.
+- servingSuggestion : dressage et présentation, 3 phrases.
+- cookingTime, difficulty, portions.
+
+Retourne UNIQUEMENT ce JSON, sans texte avant ni après :
+{"recipes":[{"country":"","dishName":"${sheet.dishName}","history":"","description":"","ingredients":[],"steps":[],"chefTips":"","variations":"","winePairing":"","wineReason":"","servingSuggestion":"","cookingTime":"","difficulty":"","portions":""}]}`,
+          },
+        });
+
+        if (error) continue;
+        const parsed = cleanAndParseJSON(data?.content || data?.result || '');
+        const r = parsed?.recipes?.[0];
+        if (!r) continue;
+
+        setSheets((prev) =>
+          prev.map((s) =>
+            s.id !== sheet.id
+              ? s
+              : {
+                  ...s,
+                  country: r.country || s.country,
+                  description: typeof r.description === 'string' && r.description.length > 80 ? r.description : s.description,
+                  history: typeof r.history === 'string' && r.history.length > 80 ? r.history : s.history,
+                  ingredients: Array.isArray(r.ingredients) && r.ingredients.length >= 6 ? r.ingredients : s.ingredients,
+                  steps: Array.isArray(r.steps) && r.steps.length >= 6 ? r.steps : s.steps,
+                  chefTips: typeof r.chefTips === 'string' && r.chefTips.length > 60 ? r.chefTips : s.chefTips,
+                  variations: typeof r.variations === 'string' && r.variations.length > 60 ? r.variations : s.variations,
+                  winePairing: r.winePairing || s.winePairing,
+                  wineReason: typeof r.wineReason === 'string' && r.wineReason.length > 40 ? r.wineReason : s.wineReason,
+                  servingSuggestion:
+                    typeof r.servingSuggestion === 'string' && r.servingSuggestion.length > 40
+                      ? r.servingSuggestion
+                      : s.servingSuggestion,
+                  cookingTime: r.cookingTime || s.cookingTime,
+                  difficulty: r.difficulty || s.difficulty,
+                  portions: r.portions || s.portions,
+                },
+          ),
+        );
+      } catch (e) {
+        console.error('Enrichissement fiche échoué:', e);
+      }
+    }
+
+    setCurrentStep('');
+    toast.success('Fiches courtes enrichies (introduction + description complètes).');
   };
 
   // Fallback recipes generator
@@ -1492,12 +1579,16 @@ ${sheet.servingSuggestion}`;
                       </div>
 
 
-                      {/* Description & History */}
-                      <div className="space-y-2">
-                        <p className="text-muted-foreground leading-relaxed">{sheet.description}</p>
-                        <p className="text-sm text-muted-foreground italic bg-orange-50/50 dark:bg-orange-900/10 p-3 rounded-lg border-l-4 border-orange-300">
-                          📜 {sheet.history}
-                        </p>
+                      {/* Introduction du plat + description détaillée */}
+                      <div className="space-y-3">
+                        <div className="bg-orange-50/50 dark:bg-orange-900/10 p-3 rounded-lg border-l-4 border-orange-300">
+                          <h4 className="font-semibold text-orange-700 dark:text-orange-400 text-sm mb-1">📖 Introduction du plat</h4>
+                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{sheet.history}</p>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-orange-700 dark:text-orange-400 text-sm mb-1">🍲 Description de la recette</h4>
+                          <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{sheet.description}</p>
+                        </div>
                       </div>
 
                       {/* Ingredients */}
