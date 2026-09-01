@@ -435,6 +435,7 @@ Ce sont les fiches ${allDestinations.length + 1} à ${allDestinations.length + b
 ⚠️ RAPPEL: Le contenu DOIT correspondre au titre "${bookTitle}". Analyse le titre et génère des lieux appropriés.
 
 IMPORTANT: Chaque fiche doit être TRÈS DÉTAILLÉE avec au moins 800 mots de contenu riche.
+Écris en français, en phrases complètes terminées par un point. Aucun mot latin, aucune phrase générique, aucun texte de remplissage.
 Retourne UNIQUEMENT du JSON valide, sans texte avant ni après.
 
 Pour CHAQUE destination, fournis OBLIGATOIREMENT:
@@ -446,10 +447,10 @@ Pour CHAQUE destination, fournis OBLIGATOIREMENT:
 - currency: Monnaie locale
 - climate: Type de climat
 - bestSeason: Meilleure période pour visiter
-- description: Description immersive et captivante (4-5 phrases sur l'ambiance, les paysages, l'atmosphère)
-- history: Histoire et contexte culturel (3-4 phrases sur le patrimoine, les traditions)
+- history: INTRODUCTION du lieu — 6 à 8 phrases (120 mots minimum) : origine, patrimoine, traditions, ce qui a façonné son identité, pourquoi on y va aujourd'hui.
+- description: DESCRIPTION DÉTAILLÉE du voyage sur place — 8 à 10 phrases (160 mots minimum) : ambiance, paysages, lumières, sons et odeurs, quartiers ou sites, rythme d'une journée, ce que le voyageur ressent.
 - mainDish: Le plat emblématique local ou du restaurant sur place
-- dishDescription: Description appétissante du plat (3 phrases avec ingrédients et saveurs)
+- dishDescription: Description appétissante du plat (4 phrases avec ingrédients, saveurs et où le goûter)
 - localSpecialties: ["Spécialité 1", "Spécialité 2", "Spécialité 3"] - 3 autres spécialités culinaires
 - accommodations: {"budget": "Hébergement économique proche", "midRange": "Hôtel milieu de gamme à proximité", "luxury": "Hébergement luxe dans la région"}
 - whereToStay: Conseils sur où loger pour visiter ce lieu (3-4 phrases)
