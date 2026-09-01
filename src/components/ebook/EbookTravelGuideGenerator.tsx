@@ -564,6 +564,96 @@ Format JSON strict:
     }
   };
 
+  /**
+   * Les réponses IA tronquées font tomber la fiche sur les textes de secours
+   * (« Une destination magnifique à découvrir »). On la réécrit destination par
+   * destination pour garantir une vraie introduction du lieu et une description
+   * de voyage complète.
+   */
+  const MIN_TRAVEL_WORDS = 450;
+
+  const enrichThinTravelSheets = async (generated: TravelSheet[], finalCountry?: string) => {
+    const thin = generated.filter((s) => countWords(s) < MIN_TRAVEL_WORDS);
+    if (!thin.length) return;
+
+    setCurrentStep(`Enrichissement de ${thin.length} fiche(s) trop courte(s)…`);
+
+    for (const sheet of thin) {
+      try {
+        const { data, error } = await supabase.functions.invoke('generate-content', {
+          body: {
+            type: 'travel-sheets',
+            prompt: `Tu es un guide touristique professionnel et auteur de guides de voyage.
+
+Rédige UNE fiche destination complète et détaillée, en français, pour : "${sheet.destinationName}"${
+              sheet.country ? ` (${sheet.country})` : ''
+            }${finalCountry ? ` — pays imposé : ${finalCountry}` : ''}.
+
+Objectif : 800 mots minimum de contenu rédigé. Phrases complètes terminées par un point.
+Aucun mot latin, aucune phrase générique, aucun texte de remplissage.
+
+Champs obligatoires :
+- history : INTRODUCTION du lieu, 6 à 8 phrases (120 mots min) — origine, patrimoine, traditions, identité, pourquoi on y va aujourd'hui.
+- description : DESCRIPTION DÉTAILLÉE du voyage sur place, 8 à 10 phrases (160 mots min) — ambiance, paysages, lumières, sons et odeurs, quartiers ou sites, rythme d'une journée.
+- mainDish et dishDescription (4 phrases : ingrédients, saveurs, où le goûter).
+- localSpecialties : 3 spécialités. mustSee : 5 à 6 sites avec une phrase chacun.
+- hiddenGems : 3 secrets. activities : 4 activités.
+- whereToStay (4 phrases), travelTips (4 phrases), transportation (3 phrases).
+- faq : exactement 3 questions-réponses réellement utiles.
+- region, population, language, currency, climate, bestSeason.
+
+Retourne UNIQUEMENT ce JSON, sans texte avant ni après :
+{"destinations":[{"destinationName":"${sheet.destinationName}","country":"","region":"","population":"","language":"","currency":"","climate":"","bestSeason":"","history":"","description":"","mainDish":"","dishDescription":"","localSpecialties":[],"accommodations":{"budget":"","midRange":"","luxury":""},"whereToStay":"","mustSee":[],"hiddenGems":[],"activities":[],"travelTips":"","transportation":"","faq":[]}]}`,
+          },
+        });
+
+        if (error) continue;
+        const parsed = cleanAndParseJSON(data?.content || data?.result || '');
+        const d = parsed?.destinations?.[0];
+        if (!d) continue;
+
+        const longText = (v: unknown, min: number) => (typeof v === 'string' && v.trim().length > min ? v.trim() : undefined);
+        const list = (v: unknown, min: number) => (Array.isArray(v) && v.length >= min ? v : undefined);
+
+        setSheets((prev) =>
+          prev.map((s) =>
+            s.id !== sheet.id
+              ? s
+              : {
+                  ...s,
+                  region: longText(d.region, 2) ?? s.region,
+                  population: longText(d.population, 2) ?? s.population,
+                  language: longText(d.language, 2) ?? s.language,
+                  currency: longText(d.currency, 1) ?? s.currency,
+                  climate: longText(d.climate, 2) ?? s.climate,
+                  bestSeason: longText(d.bestSeason, 2) ?? s.bestSeason,
+                  history: longText(d.history, 100) ?? s.history,
+                  description: longText(d.description, 140) ?? s.description,
+                  mainDish: longText(d.mainDish, 2) ?? s.mainDish,
+                  dishDescription: longText(d.dishDescription, 60) ?? s.dishDescription,
+                  localSpecialties: list(d.localSpecialties, 2) ?? s.localSpecialties,
+                  accommodations: d.accommodations && typeof d.accommodations === 'object' ? d.accommodations : s.accommodations,
+                  whereToStay: longText(d.whereToStay, 80) ?? s.whereToStay,
+                  mustSee: list(d.mustSee, 3) ?? s.mustSee,
+                  hiddenGems: list(d.hiddenGems, 2) ?? s.hiddenGems,
+                  activities: list(d.activities, 3) ?? s.activities,
+                  travelTips: longText(d.travelTips, 80) ?? s.travelTips,
+                  transportation: longText(d.transportation, 60) ?? s.transportation,
+                  faq: list(d.faq, 3)?.slice(0, 3) ?? s.faq,
+                },
+          ),
+        );
+      } catch (e) {
+        console.error('Enrichissement fiche voyage échoué:', e);
+      }
+    }
+
+    setCurrentStep('');
+    toast.success('Fiches courtes enrichies (introduction + description complètes).');
+  };
+
+
+
   // Récupérer les destinations déjà utilisées depuis localStorage
   const getUsedDestinations = (country: string): string[] => {
     try {
