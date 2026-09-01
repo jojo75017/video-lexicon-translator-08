@@ -467,40 +467,71 @@ Format JSON strict:
       const batchSize = 2;
       let recipes: any[] = [];
 
+      // Les lots sont lancés EN PARALLÈLE (3 à la fois) : une génération de
+      // 10 fiches passe de ~3 min à ~45 s, l'utilisateur ne croit plus que
+      // l'outil est bloqué.
+      type Batch = { start: number; batchCount: number; dishes: string[] };
+      const batches: Batch[] = [];
       for (let start = 0; start < count; start += batchSize) {
         const batchCount = Math.min(batchSize, count - start);
-        const batchDishes = requiredVietnamDishes.slice(start, start + batchCount);
-        const alreadyDone = recipes
-          .map((r: any) => (typeof r?.dishName === 'string' ? r.dishName.trim() : ''))
+        batches.push({
+          start,
+          batchCount,
+          dishes: requiredVietnamDishes.slice(start, start + batchCount),
+        });
+      }
+
+      const results: any[][] = new Array(batches.length).fill(null).map(() => []);
+      let done = 0;
+      let firstError: unknown = null;
+      const concurrency = 3;
+
+      const runBatch = async (batch: Batch, index: number) => {
+        const others = batches
+          .filter((b) => b !== batch)
+          .flatMap((b) => b.dishes)
           .filter(Boolean);
 
-        const batchInstruction = batchDishes.length
-          ? `\n\n✅ LISTE OBLIGATOIRE (un plat par fiche, dans cet ordre): ${batchDishes.join(', ')}`
-          : requiredDishesInstruction;
-        const batchExclusion = alreadyDone.length
-          ? `\n\n🚫 DÉJÀ GÉNÉRÉS dans ce livre — ne jamais les reprendre: ${alreadyDone.join(', ')}`
+        const batchInstruction = batch.dishes.length
+          ? `\n\n✅ LISTE OBLIGATOIRE (un plat par fiche, dans cet ordre): ${batch.dishes.join(', ')}`
+          : `${requiredDishesInstruction}\n\n📦 Lot n°${index + 1} sur ${batches.length} : propose des plats DIFFÉRENTS des autres lots.`;
+        const batchExclusion = others.length
+          ? `\n\n🚫 Traités dans d'autres lots — ne jamais les reprendre: ${others.join(', ')}`
           : '';
-
-        setCurrentStep(`Rédaction détaillée des fiches ${start + 1}-${start + batchCount} sur ${count}…`);
-        setProgress(10 + Math.round((start / count) * 45));
 
         const { data, error } = await supabase.functions.invoke('generate-content', {
           body: {
             type: 'recipe-sheets',
-            prompt: buildBatchPrompt(batchCount, batchInstruction + batchExclusion),
+            prompt: buildBatchPrompt(batch.batchCount, batchInstruction + batchExclusion),
           },
         });
 
+        done += 1;
+        setCurrentStep(`Rédaction détaillée : ${Math.min(done * batchSize, count)} / ${count} fiches…`);
+        setProgress(10 + Math.round((done / batches.length) * 45));
+
         if (error) {
-          if (!recipes.length) throw error;
           console.error('Lot de recettes échoué:', error);
-          break;
+          if (!firstError) firstError = error;
+          return;
         }
 
         const parsed = cleanAndParseJSON(data?.content || data?.result || '');
         const got = Array.isArray(parsed?.recipes) ? parsed.recipes : [];
-        recipes = [...recipes, ...got.slice(0, batchCount)];
+        results[index] = got.slice(0, batch.batchCount);
+      };
+
+      setCurrentStep(`Rédaction détaillée : 0 / ${count} fiches…`);
+      for (let i = 0; i < batches.length; i += concurrency) {
+        await Promise.all(
+          batches.slice(i, i + concurrency).map((b, j) => runBatch(b, i + j)),
+        );
+
       }
+
+      recipes = results.flat();
+      if (!recipes.length && firstError) throw firstError;
+
 
 
       // Sécurisation: si l'utilisateur a demandé Vietnam, on force les plats et le pays.
