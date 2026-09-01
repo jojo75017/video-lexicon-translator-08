@@ -112,9 +112,10 @@ changer (premier mois offert mis en avant plutôt que 47 € à vie), pas les em
   (table de correspondance clé → destination + gabarit) au lieu de l'URL de
   fonction visible. `src/pages/RedirectClickPage.tsx` gère déjà `/r` : il
   enregistre le clic via `track-email-click` puis redirige.
-- `src/pages/admin/AdminSequenceEmailPage.tsx` : génération HTML des 5 emails
-  `cadeau-*` avec bouton texte seul (aucune URL affichée) + pixel d'ouverture ;
-  version texte avec le lien court uniquement.
+- `src/pages/admin/AdminSequenceEmailPage.tsx` : sortie 100 % texte (objet,
+  corps, libellé de bouton, lien court), un bouton « Copier » par bloc ;
+  suppression de la sortie HTML pour ces 5 emails.
+
 
 - Panneau unifié dans `NewsletterClicksPanel.tsx` : jointure
   `email_opens` / `email_clicks` / `capture_events` (surface `essai`,
