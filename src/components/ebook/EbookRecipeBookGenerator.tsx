@@ -548,13 +548,99 @@ Format JSON strict:
 
       // Génération d'images en tâche de fond (peut échouer si crédits épuisés)
       void generateSheetImages(generatedSheets);
-      
+
+      // Rattrapage : toute fiche trop courte est réécrite en entier (introduction + description)
+      void enrichThinSheets(generatedSheets, finalCountry);
+
     } catch (error) {
       console.error('Erreur génération:', error);
       toast.error('Erreur lors de la génération');
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  /**
+   * Certaines réponses IA arrivent tronquées : la fiche tombe alors sur les textes
+   * de secours (« Recette traditionnelle transmise de génération en génération »).
+   * On la réécrit fiche par fiche pour garantir une vraie introduction du plat et
+   * une description complète.
+   */
+  const MIN_SHEET_WORDS = 450;
+
+  const enrichThinSheets = async (generated: RecipeSheet[], finalCountry?: string) => {
+    const thin = generated.filter((s) => countSheetWords(s) < MIN_SHEET_WORDS);
+    if (!thin.length) return;
+
+    setCurrentStep(`Enrichissement de ${thin.length} fiche(s) trop courte(s)…`);
+
+    for (const sheet of thin) {
+      try {
+        const { data, error } = await supabase.functions.invoke('generate-content', {
+          body: {
+            type: 'recipe-sheets',
+            prompt: `Tu es un chef étoilé Michelin et sommelier expert.
+
+Rédige UNE fiche recette complète et détaillée, en français, pour le plat : "${sheet.dishName}"${
+              sheet.country && sheet.country !== 'International' ? ` (cuisine de ${sheet.country})` : ''
+            }${finalCountry ? ` — pays imposé : ${finalCountry}` : ''}.
+
+Objectif : 650 mots minimum de contenu rédigé. Phrases complètes terminées par un point.
+Aucun mot latin, aucune phrase générique, aucun texte de remplissage.
+
+Champs obligatoires :
+- history : INTRODUCTION du plat, 6 à 8 phrases (110 mots min) — origine, région, occasions, pourquoi c'est devenu un classique.
+- description : DESCRIPTION DÉTAILLÉE de la recette, 6 à 8 phrases (120 mots min) — saveurs, textures, arômes, aspect dans l'assiette, réussite du plat.
+- ingredients : 10 à 12 ingrédients avec quantités précises.
+- steps : 10 à 12 étapes, chacune en 2 phrases complètes (gestes, températures, durées, indices de réussite).
+- chefTips : 3 à 4 conseils rédigés (60 mots min).
+- variations : variantes régionales, 4 phrases minimum.
+- winePairing : appellation précise. wineReason : 3 phrases.
+- servingSuggestion : dressage et présentation, 3 phrases.
+- cookingTime, difficulty, portions.
+
+Retourne UNIQUEMENT ce JSON, sans texte avant ni après :
+{"recipes":[{"country":"","dishName":"${sheet.dishName}","history":"","description":"","ingredients":[],"steps":[],"chefTips":"","variations":"","winePairing":"","wineReason":"","servingSuggestion":"","cookingTime":"","difficulty":"","portions":""}]}`,
+          },
+        });
+
+        if (error) continue;
+        const parsed = cleanAndParseJSON(data?.content || data?.result || '');
+        const r = parsed?.recipes?.[0];
+        if (!r) continue;
+
+        setSheets((prev) =>
+          prev.map((s) =>
+            s.id !== sheet.id
+              ? s
+              : {
+                  ...s,
+                  country: r.country || s.country,
+                  description: typeof r.description === 'string' && r.description.length > 80 ? r.description : s.description,
+                  history: typeof r.history === 'string' && r.history.length > 80 ? r.history : s.history,
+                  ingredients: Array.isArray(r.ingredients) && r.ingredients.length >= 6 ? r.ingredients : s.ingredients,
+                  steps: Array.isArray(r.steps) && r.steps.length >= 6 ? r.steps : s.steps,
+                  chefTips: typeof r.chefTips === 'string' && r.chefTips.length > 60 ? r.chefTips : s.chefTips,
+                  variations: typeof r.variations === 'string' && r.variations.length > 60 ? r.variations : s.variations,
+                  winePairing: r.winePairing || s.winePairing,
+                  wineReason: typeof r.wineReason === 'string' && r.wineReason.length > 40 ? r.wineReason : s.wineReason,
+                  servingSuggestion:
+                    typeof r.servingSuggestion === 'string' && r.servingSuggestion.length > 40
+                      ? r.servingSuggestion
+                      : s.servingSuggestion,
+                  cookingTime: r.cookingTime || s.cookingTime,
+                  difficulty: r.difficulty || s.difficulty,
+                  portions: r.portions || s.portions,
+                },
+          ),
+        );
+      } catch (e) {
+        console.error('Enrichissement fiche échoué:', e);
+      }
+    }
+
+    setCurrentStep('');
+    toast.success('Fiches courtes enrichies (introduction + description complètes).');
   };
 
   // Fallback recipes generator
