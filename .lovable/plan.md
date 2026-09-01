@@ -99,11 +99,14 @@ changer (premier mois offert mis en avant plutôt que 47 € à vie), pas les em
 
 ## Détails techniques
 
-- `src/data/campagneUnique.ts` : remplacer `ctaUrl`/liens texte par des URL
-  passant par `track-email-click` (paramètres `t`, `s`, `u`), sur le modèle de
-  `trackedCtaUrl` dans `src/data/newslettersSystemeio.ts`.
+- `src/data/campagneUnique.ts` : liens courts `https://ebookstudio.fr/r/<clé>`
+  (table de correspondance clé → destination + gabarit) au lieu de l'URL de
+  fonction visible. `src/pages/RedirectClickPage.tsx` gère déjà `/r` : il
+  enregistre le clic via `track-email-click` puis redirige.
 - `src/pages/admin/AdminSequenceEmailPage.tsx` : génération HTML des 5 emails
-  `cadeau-*` avec liens suivis + pixel d'ouverture.
+  `cadeau-*` avec bouton texte seul (aucune URL affichée) + pixel d'ouverture ;
+  version texte avec le lien court uniquement.
+
 - Panneau unifié dans `NewsletterClicksPanel.tsx` : jointure
   `email_opens` / `email_clicks` / `capture_events` (surface `essai`,
   `commander`) / `funnel_leads` / `funnel_orders`.
