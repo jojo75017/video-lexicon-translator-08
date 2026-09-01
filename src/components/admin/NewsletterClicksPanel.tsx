@@ -171,9 +171,9 @@ export function NewsletterClicksPanel() {
       </div>
 
       <p className="mt-5 text-xs text-muted-foreground">
-        Les données n'apparaissent qu'après un envoi réel depuis Systeme.io : sur un email de test,
-        la balise de fusion n'est pas remplacée et le clic n'est volontairement pas compté (la page
-        s'ouvre quand même).
+        Tous les clics sont désormais comptés, même quand Systeme.io ne remplace pas la balise
+        d'email (emails de test, éditeur visuel) : dans ce cas le clic apparaît dans « clic(s) sans
+        email identifié ». Les prospects identifiés restent utilisables pour les relances.
       </p>
     </Card>
   );
