@@ -57,7 +57,19 @@ export const SHORT_LINKS: Record<string, ShortLink> = {
   essai3: { key: 'essai3', destination: '/essai', template: 'cadeau-3', label: 'Ouvrir mon livre' },
   offre1: { key: 'offre1', destination: '/commander', template: 'cadeau-4', label: "Prendre l'accès à vie" },
   offre2: { key: 'offre2', destination: '/commander', template: 'cadeau-5', label: 'Commander avant ce soir' },
+
+  /* Newsletters datées de septembre — un lien court par bouton. */
+  n1: { key: 'n1', destination: '/essai', template: 'newsletter-1-cta1', label: 'Voir mon livre commencer' },
+  n1b: { key: 'n1b', destination: '/essai', template: 'newsletter-1-cta2', label: 'Écrire mon chapitre 1 gratuitement' },
+  n2: { key: 'n2', destination: '/essai', template: 'newsletter-2-cta1', label: 'Obtenir mon sommaire' },
+  n2b: { key: 'n2b', destination: '/cadeau', template: 'newsletter-2-cta2', label: 'Voir mes 5 niches Amazon' },
+  n3: { key: 'n3', destination: '/essai', template: 'newsletter-3-cta1', label: 'Ouvrir mon livre' },
+  n3b: { key: 'n3b', destination: '/bonus', template: 'newsletter-3-cta2', label: 'Récupérer mes bonus' },
+  n4: { key: 'n4', destination: '/commander', template: 'newsletter-4-cta1', label: "Prendre l'accès à vie" },
+  n4b: { key: 'n4b', destination: '/commander', template: 'newsletter-4-cta2', label: 'Voir tout ce qui est inclus' },
+  n5: { key: 'n5', destination: '/commander', template: 'newsletter-5-cta1', label: 'Commander avant demain' },
 };
+
 
 /** URL courte à coller dans le champ « URL » du bouton Systeme.io. */
 export const shortUrl = (key: string) => `${SITE_ORIGIN}/r/${key}`;
