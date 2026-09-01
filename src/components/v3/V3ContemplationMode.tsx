@@ -23,6 +23,11 @@ const ALLOWED_PATHS = [
   '/v3/contact',
   '/v3/script-heygen',
   '/v3/nouveautes',
+  // Pages de présentation ouvertes avant le lancement : elles ne créent
+  // aucun livre, donc les visiteurs peuvent les parcourir librement.
+  '/v3/commence-ici',
+  '/v3/workflow',
+  '/v3/fonctionnalites',
 ];
 
 const ALLOWED_EXTERNAL_HOSTS = [
