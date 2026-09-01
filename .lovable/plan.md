@@ -18,6 +18,12 @@ directement dans l'outil au lieu de rester sur le parcours de vente.
 - Aucun autre lien de connexion n'est ajouté : la page 404 devient purement
   commerciale, elle ne peut plus ouvrir le générateur.
 
+## Ce que tu dois faire
+
+Rien. Je modifie uniquement le code de la page introuvable. Tes emails
+Systeme.io, les liens courts `/r/…`, le tunnel `/commander` et tout le reste
+restent inchangés.
+
 ## Détails techniques
 
 - `src/pages/NotFoundPage.tsx` : retrait du `Link to="/connexion-abonne"` et de
