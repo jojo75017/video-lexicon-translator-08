@@ -391,10 +391,10 @@ const EbookRecipeBookGenerator: React.FC<EbookRecipeBookGeneratorProps> = ({ ebo
           )}\n- Ne pas remplacer par d'autres plats, ne pas fusionner, ne pas faire de variantes.`
         : '';
 
-      const { data, error } = await supabase.functions.invoke('generate-content', {
-        body: {
-          type: 'recipe-sheets',
-          prompt: `Tu es un chef étoilé Michelin et sommelier expert reconnu mondialement.
+      // Génération par petits lots : une seule requête pour 10 fiches était tronquée
+      // par le modèle, ce qui faisait tomber les fiches sur les textes de secours (54 mots).
+      const buildBatchPrompt = (count: number, requiredDishesInstruction: string) => `Tu es un chef étoilé Michelin et sommelier expert reconnu mondialement.
+
 
 ID DE VARIATION (ne pas afficher, juste pour varier la sélection): ${variationNonce}
 
@@ -462,16 +462,46 @@ Format JSON strict:
       "portions": "4 personnes"
     }
   ]
-}`
+}`;
+
+      const batchSize = 2;
+      let recipes: any[] = [];
+
+      for (let start = 0; start < count; start += batchSize) {
+        const batchCount = Math.min(batchSize, count - start);
+        const batchDishes = requiredVietnamDishes.slice(start, start + batchCount);
+        const alreadyDone = recipes
+          .map((r: any) => (typeof r?.dishName === 'string' ? r.dishName.trim() : ''))
+          .filter(Boolean);
+
+        const batchInstruction = batchDishes.length
+          ? `\n\n✅ LISTE OBLIGATOIRE (un plat par fiche, dans cet ordre): ${batchDishes.join(', ')}`
+          : requiredDishesInstruction;
+        const batchExclusion = alreadyDone.length
+          ? `\n\n🚫 DÉJÀ GÉNÉRÉS dans ce livre — ne jamais les reprendre: ${alreadyDone.join(', ')}`
+          : '';
+
+        setCurrentStep(`Rédaction détaillée des fiches ${start + 1}-${start + batchCount} sur ${count}…`);
+        setProgress(10 + Math.round((start / count) * 45));
+
+        const { data, error } = await supabase.functions.invoke('generate-content', {
+          body: {
+            type: 'recipe-sheets',
+            prompt: buildBatchPrompt(batchCount, batchInstruction + batchExclusion),
+          },
+        });
+
+        if (error) {
+          if (!recipes.length) throw error;
+          console.error('Lot de recettes échoué:', error);
+          break;
         }
-      });
 
-      if (error) throw error;
+        const parsed = cleanAndParseJSON(data?.content || data?.result || '');
+        const got = Array.isArray(parsed?.recipes) ? parsed.recipes : [];
+        recipes = [...recipes, ...got.slice(0, batchCount)];
+      }
 
-      const content = data?.content || data?.result || '';
-      const parsed = cleanAndParseJSON(content);
-      
-      let recipes = parsed?.recipes || [];
 
       // Sécurisation: si l'utilisateur a demandé Vietnam, on force les plats et le pays.
       // (évite les sorties hors-sujet + rend la sélection vraiment anti-doublons)
