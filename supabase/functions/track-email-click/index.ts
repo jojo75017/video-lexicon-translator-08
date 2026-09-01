@@ -45,18 +45,20 @@ Deno.serve(async (req) => {
       if (isSafeUrl(decoded)) target = rescueKnownBrokenUrl(decoded);
     }
 
-    // Les balises de fusion non remplacées ({{contact.email}}) ne sont pas loggées.
+    // Un clic est TOUJOURS enregistré, même si la balise de fusion de la
+    // plateforme d'envoi (Systeme.io) n'a pas été remplacée par l'email :
+    // sinon on perdait la totalité des clics des newsletters.
     const decodedEmail = email ? decodeURIComponent(email).trim() : "";
-    const isRealEmail = /^[^@\s{}]+@[^@\s{}]+\.[^@\s{}]+$/.test(decodedEmail);
+    const isRealEmail = /^[^@\s{}[\]]+@[^@\s{}[\]]+\.[^@\s{}[\]]+$/.test(decodedEmail);
+    const ANONYMOUS = "clic-anonyme@systemeio.local";
 
-    if (isRealEmail && dest) {
-
+    if (dest) {
       const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
       const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
       const supabase = createClient(supabaseUrl, serviceKey);
 
       await supabase.from("email_clicks").insert({
-        prospect_email: decodedEmail,
+        prospect_email: isRealEmail ? decodedEmail.toLowerCase() : ANONYMOUS,
         email_step: step ? parseInt(step, 10) : null,
         template_name: template ? decodeURIComponent(template) : null,
         clicked_url: target,
