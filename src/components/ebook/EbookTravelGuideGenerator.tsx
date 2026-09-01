@@ -1758,17 +1758,18 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
 
                     {/* Right column - Detailed content */}
                     <div className="space-y-4">
-                      {/* Description */}
+                      {/* Introduction du lieu */}
                       <div>
-                        <h4 className="font-semibold mb-2">📝 Description</h4>
-                        <p className="text-sm text-muted-foreground leading-relaxed">{sheet.description}</p>
+                        <h4 className="font-semibold mb-2">📖 Introduction du lieu</h4>
+                        <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{sheet.history}</p>
                       </div>
 
-                      {/* History */}
+                      {/* Description du voyage */}
                       <div>
-                        <h4 className="font-semibold mb-2">📜 Histoire & Culture</h4>
-                        <p className="text-sm text-muted-foreground leading-relaxed">{sheet.history}</p>
+                        <h4 className="font-semibold mb-2">📝 Description du voyage</h4>
+                        <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{sheet.description}</p>
                       </div>
+
 
                       {/* Must see */}
                       <div>
