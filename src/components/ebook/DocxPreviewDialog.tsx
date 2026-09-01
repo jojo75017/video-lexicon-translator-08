@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { generateProfessionalDocx, getDocxOutline, validateDocxChapters, isGenericTitle, type DocxExportOptions, type DocxValidationResult } from '@/utils/docxExportEngine';
 import { supabase } from '@/integrations/supabase/client';
 import { getActiveAIKey, getProvider } from '@/services/aiWritingService';
+import { harmonizeParagraphs } from '@/utils/textCleaner';
 
 import { toast } from 'sonner';
 
@@ -16,13 +17,16 @@ interface DocxPreviewDialogProps {
   /** Options d'export : évaluées à l'ouverture du dialogue. */
   getOptions: () => DocxExportOptions;
   onTitlesGenerated?: (titles: Array<{ number: number; title: string }>) => void | Promise<void>;
+  /** Applique la mise en paragraphes lisible au manuscrit (puis sauvegarde). */
+  onContentHarmonized?: (contents: Array<{ number: number; content: string }>) => void | Promise<void>;
 }
+
 
 /**
  * Aperçu fidèle du DOCX (pages, marges, sommaire) avant téléchargement.
  * Le rendu utilise le même fichier que celui qui sera téléchargé.
  */
-export function DocxPreviewDialog({ open, onOpenChange, getOptions, onTitlesGenerated }: DocxPreviewDialogProps) {
+export function DocxPreviewDialog({ open, onOpenChange, getOptions, onTitlesGenerated, onContentHarmonized }: DocxPreviewDialogProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
   const [blob, setBlob] = useState<Blob | null>(null);
@@ -33,19 +37,26 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions, onTitlesGene
   /** Titres générés par l'IA pour les chapitres sans titre (numéro → titre). */
   const [titleOverrides, setTitleOverrides] = useState<Record<number, string>>({});
   const [naming, setNaming] = useState(false);
+  /** Aération automatique : texte livré en bloc → paragraphes lisibles. */
+  const [readable, setReadable] = useState(true);
 
-  /** Options d'export enrichies des titres générés. */
+  /** Options d'export enrichies des titres générés et de la mise en paragraphes. */
   const resolveOptions = useCallback((): DocxExportOptions => {
     const options = getOptions();
-    if (!Object.keys(titleOverrides).length) return options;
+    if (!Object.keys(titleOverrides).length && !readable) return options;
     return {
       ...options,
       chapters: (options.chapters || []).map((chapter, index) => {
         const override = titleOverrides[index + 1];
-        return override ? { ...chapter, title: override } : chapter;
+        return {
+          ...chapter,
+          ...(override ? { title: override } : {}),
+          ...(readable ? { content: harmonizeParagraphs(chapter.content || '') } : {}),
+        };
       }),
     };
-  }, [getOptions, titleOverrides]);
+  }, [getOptions, titleOverrides, readable]);
+
 
   const missingTitles = useMemo(
     () => (audit?.chapters || []).filter((c) => isGenericTitle(c.title)).map((c) => c.number),
@@ -210,14 +221,46 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions, onTitlesGene
                 </Button>
               </div>
             )}
+            <div className="px-3 py-3 border-b space-y-2">
+              <label className="flex items-start gap-2 text-xs">
+                <input
+                  type="checkbox"
+                  className="mt-0.5"
+                  checked={readable}
+                  onChange={(e) => setReadable(e.target.checked)}
+                  disabled={loading}
+                />
+                <span>
+                  <strong>Lecture aérée</strong> — découpe automatiquement les blocs de texte en
+                  paragraphes lisibles (non destructif).
+                </span>
+              </label>
+              {onContentHarmonized && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="w-full"
+                  disabled={loading || !readable}
+                  onClick={async () => {
+                    const chapters = getOptions().chapters || [];
+                    await onContentHarmonized(
+                      chapters.map((c, i) => ({ number: i + 1, content: harmonizeParagraphs(c.content || '') })),
+                    );
+                    toast.success('Mise en paragraphes appliquée au manuscrit');
+                  }}
+                >
+                  Appliquer au manuscrit
+                </Button>
+              )}
+            </div>
             <div className="flex-1 overflow-auto">
-
               <div className="p-3 space-y-2 text-xs">
                 {audit?.chapters.map((chapter) => (
                   <div key={chapter.number} className={`rounded-md border p-2 ${chapter.valid ? 'border-border' : 'border-destructive/40 bg-destructive/5'}`}>
                     <div className="flex items-start justify-between gap-2">
                       <strong className="leading-snug">{chapter.number}. {chapter.title}</strong>
                       <span className="whitespace-nowrap text-muted-foreground">{chapter.wordCount} mots</span>
+
                     </div>
                     {!chapter.valid && <p className="mt-1 text-destructive">{chapter.issues.join(' · ')}</p>}
                   </div>

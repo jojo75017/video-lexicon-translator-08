@@ -69,6 +69,9 @@ export interface DocxExportOptions {
   pageFormat?: '6x9' | 'a4' | 'letter';
   /** Nombre de chapitres demandé par l'auteur : plafond dur du sommaire et de l'export. */
   expectedChapterCount?: number;
+  /** Texte de la 4ᵉ de couverture choisi par l'auteur : ajouté en dernière page. */
+  backCoverText?: string;
+
 
 }
 
@@ -735,8 +738,9 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
     includeCopyrightPage = true,
     pageFormat = '6x9',
     expectedChapterCount,
-
+    backCoverText = '',
   } = options;
+
 
   const audit = validateDocxChapters(chapters);
   if (!audit.valid) {
@@ -1090,6 +1094,21 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
     `Quelques mots suffisent, et chaque retour est reçu avec une profonde gratitude.`,
     `Merci infiniment pour votre lecture et votre bienveillance.`,
   ]);
+
+  // 4/ Quatrième de couverture choisie par l'auteur (dernière page du fichier).
+  // La couverture imprimée KDP complète (avec dos) reste un fichier séparé.
+  const backCoverClean = editorialClean(String(backCoverText || '')).trim();
+  if (backCoverClean.length > 0) {
+    backPage(
+      'QUATRIÈME DE COUVERTURE',
+      backCoverClean
+        .split(/\n{1,}/)
+        .map((p) => p.trim())
+        .filter(Boolean),
+    );
+  }
+
+
 
   // ═══ CONSTRUCTION DU DOCUMENT ═══
   const doc = new Document({

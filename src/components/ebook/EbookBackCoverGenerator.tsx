@@ -13,12 +13,24 @@ import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Checkbox } from '@/components/ui/checkbox';
 
+export interface BackCoverData {
+  versions: string[];
+  selectedIndex: number | null;
+  selectedText: string;
+  shortVersion: string;
+  authorBio: string;
+}
+
 interface EbookBackCoverGeneratorProps {
   ebookTitle: string;
   authorName: string;
   chapters: Chapter[];
   isGenerating: boolean;
   onGenerate: (tone: string, audience: string, highlights: string) => Promise<string | null>;
+  /** Données restaurées depuis le projet (Lovable Cloud) pour ne rien perdre après fermeture. */
+  initialData?: Partial<BackCoverData> | null;
+  /** Remonte la 4ᵉ de couverture retenue au projet (sauvegarde + export). */
+  onUseVersion?: (data: BackCoverData) => void;
 }
 
 export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = ({
@@ -26,21 +38,28 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
   authorName,
   chapters,
   isGenerating,
-  onGenerate
+  onGenerate,
+  initialData,
+  onUseVersion,
 }) => {
   const { hasValidApiKey, getConfig } = useOpenAIConfig();
   const [tone, setTone] = useState<string>('professionnel');
   const [audience, setAudience] = useState<string>('grand-public');
   const [highlights, setHighlights] = useState<string>('');
-  const [generatedVersions, setGeneratedVersions] = useState<string[]>([]);
-  const [selectedVersion, setSelectedVersion] = useState<number | null>(null);
-  const [shortVersion, setShortVersion] = useState<string>('');
-  const [authorBio, setAuthorBio] = useState<string>('');
+  const [generatedVersions, setGeneratedVersions] = useState<string[]>(
+    Array.isArray(initialData?.versions) ? (initialData!.versions as string[]) : [],
+  );
+  const [selectedVersion, setSelectedVersion] = useState<number | null>(
+    typeof initialData?.selectedIndex === 'number' ? initialData!.selectedIndex! : null,
+  );
+  const [shortVersion, setShortVersion] = useState<string>(initialData?.shortVersion || '');
+  const [authorBio, setAuthorBio] = useState<string>(initialData?.authorBio || '');
   const [coverImages, setCoverImages] = useState<string[]>([]);
   const [selectedCover, setSelectedCover] = useState<number | null>(null);
   const [isGeneratingCover, setIsGeneratingCover] = useState(false);
   const [coverStyle, setCoverStyle] = useState<string>('moderne');
   const [showConfig, setShowConfig] = useState(false);
+
   
   // Nouvelles options pour personnalisation avancée
   const [includeAuthorName, setIncludeAuthorName] = useState<boolean>(true);
@@ -491,7 +510,27 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
                     rows={12}
                     className="font-mono text-sm"
                   />
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        if (!selectedText.trim()) {
+                          toast.error('Sélectionnez une version non vide');
+                          return;
+                        }
+                        onUseVersion?.({
+                          versions: generatedVersions,
+                          selectedIndex: selectedVersion,
+                          selectedText,
+                          shortVersion,
+                          authorBio,
+                        });
+                        toast.success('Version retenue : elle sera ajoutée en dernière page de l’ebook');
+                      }}
+                    >
+                      <FileText className="w-4 h-4 mr-2" />
+                      Utiliser cette version
+                    </Button>
                     <Button
                       variant="outline"
                       size="sm"
@@ -509,6 +548,11 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
                       Télécharger
                     </Button>
                   </div>
+                  <p className="text-xs text-muted-foreground">
+                    La version retenue est enregistrée avec le projet et insérée en dernière page à
+                    l’export. La couverture imprimée KDP complète (avec dos) reste un fichier séparé.
+                  </p>
+
                 </div>
 
                 <div className="space-y-2">
