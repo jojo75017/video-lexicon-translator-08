@@ -518,25 +518,33 @@ Réponds avec du texte formaté de manière professionnelle, bien structuré ave
     if (type === 'travel-sheets') {
       console.log('Processing travel-sheets generation (Gemini)...');
       const res = await callGemini(
-        `Tu es un guide touristique. Génère des fiches destinations en JSON.
+        `Tu es un guide touristique professionnel. Tu rédiges des fiches destinations TRÈS DÉTAILLÉES pour des guides de voyage premium.
+
+RÈGLES CRITIQUES DE LONGUEUR:
+- Chaque fiche DOIT contenir AU MINIMUM 300 mots de texte rédigé (objectif 600-800 mots)
+- "history" = introduction du lieu, 6 à 8 phrases (120 mots minimum)
+- "description" = ambiance, paysages, ressentis, quartiers, 8 à 10 phrases (160 mots minimum)
+- "dishDescription", "whereToStay", "travelTips", "transportation" = 3 à 4 phrases complètes chacun
+- Jamais de phrase générique ni de texte de remplissage. Français uniquement, phrases terminées par un point.
+- Réponds UNIQUEMENT en JSON valide, sans markdown ni backticks.
 
 FORMAT JSON STRICT (sans markdown):
 {"destinations": [{
   "destinationName": "Nom", "country": "Pays", "region": "Région", "population": "X habitants",
   "language": "Langue", "currency": "Monnaie", "climate": "Type climat", "bestSeason": "Période",
-  "description": "3-4 phrases sur l'ambiance", "history": "2-3 phrases sur l'histoire",
-  "mainDish": "Plat local", "dishDescription": "2 phrases sur le plat",
+  "description": "160 mots minimum", "history": "120 mots minimum",
+  "mainDish": "Plat local", "dishDescription": "4 phrases sur le plat",
   "localSpecialties": ["Spec1", "Spec2", "Spec3"],
   "accommodations": {"budget": "Hotel eco", "midRange": "Hotel 3*", "luxury": "Hotel 5*"},
-  "whereToStay": "Conseils quartiers",
+  "whereToStay": "Conseils quartiers, 3-4 phrases",
   "mustSee": ["Lieu1", "Lieu2", "Lieu3", "Lieu4", "Lieu5"],
   "hiddenGems": ["Secret1", "Secret2"],
   "activities": ["Activité1", "Activité2", "Activité3"],
-  "travelTips": "Conseils pratiques", "transportation": "Transports locaux",
+  "travelTips": "3-4 phrases", "transportation": "3 phrases",
   "faq": [{"question": "Q1?", "answer": "R1"}, {"question": "Q2?", "answer": "R2"}, {"question": "Q3?", "answer": "R3"}]
 }]}`,
         prompt,
-        { maxOutputTokens: 4000, timeoutMs: 45000 }
+        { maxOutputTokens: 16000, temperature: 0.8, timeoutMs: 120000 }
       );
       if (res.error) return geminiError(res);
       return jsonSuccess({ content: res.text });
@@ -549,17 +557,20 @@ FORMAT JSON STRICT (sans markdown):
         `Tu es un chef étoilé Michelin et sommelier expert. Tu génères des fiches recettes TRÈS DÉTAILLÉES pour des livres de cuisine premium.
 
 RÈGLES CRITIQUES:
-- Chaque recette DOIT contenir MINIMUM 300 MOTS
-- Le champ "description" + "history" doit faire minimum 150 mots combinés
-- Les "steps" doivent être 10-12 étapes détaillées
+- Chaque recette DOIT contenir AU MINIMUM 300 MOTS de texte rédigé (objectif 600-700 mots)
+- "history" (introduction du plat) = 6 à 8 phrases, 110 mots minimum
+- "description" (description de la recette) = 6 à 8 phrases, 120 mots minimum
+- Les "steps" doivent être 10-12 étapes détaillées en phrases complètes
 - Inclure des détails culturels, historiques et gastronomiques riches
+- Jamais de phrase générique ni de texte de remplissage. Français uniquement.
 - Réponds UNIQUEMENT en JSON valide sans markdown ni backticks`,
         prompt,
-        { maxOutputTokens: 8000, temperature: 0.8, timeoutMs: 120000 }
+        { maxOutputTokens: 16000, temperature: 0.8, timeoutMs: 120000 }
       );
       if (res.error) return geminiError(res);
       return jsonSuccess({ content: res.text });
     }
+
 
     // ====== KDP KEYWORD RESEARCH ======
     if (type === 'kdp-keyword-research') {
