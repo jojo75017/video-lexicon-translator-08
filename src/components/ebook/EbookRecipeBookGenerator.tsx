@@ -1579,12 +1579,16 @@ ${sheet.servingSuggestion}`;
                       </div>
 
 
-                      {/* Description & History */}
-                      <div className="space-y-2">
-                        <p className="text-muted-foreground leading-relaxed">{sheet.description}</p>
-                        <p className="text-sm text-muted-foreground italic bg-orange-50/50 dark:bg-orange-900/10 p-3 rounded-lg border-l-4 border-orange-300">
-                          📜 {sheet.history}
-                        </p>
+                      {/* Introduction du plat + description détaillée */}
+                      <div className="space-y-3">
+                        <div className="bg-orange-50/50 dark:bg-orange-900/10 p-3 rounded-lg border-l-4 border-orange-300">
+                          <h4 className="font-semibold text-orange-700 dark:text-orange-400 text-sm mb-1">📖 Introduction du plat</h4>
+                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{sheet.history}</p>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-orange-700 dark:text-orange-400 text-sm mb-1">🍲 Description de la recette</h4>
+                          <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{sheet.description}</p>
+                        </div>
                       </div>
 
                       {/* Ingredients */}
