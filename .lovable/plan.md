@@ -32,11 +32,12 @@ et l'offre, pas la rédaction des emails.
 regénération du HTML prêt à coller, tableau de bord unique, refonte de la page
 d'essai, parrainage, page publique de démonstration.
 
-**Toi, dans Systeme.io — 10 minutes, une seule fois :** quand je te dis que
-c'est prêt, tu ouvres `/admin/sequence-email`, tu copies le HTML des 5 emails
-(bouton « Copier le HTML ») et tu le recolles dans tes 5 emails existants à la
-place de l'ancien contenu. Les dates et la programmation restent inchangées.
-Rien d'autre : pas de DNS, pas de réglage, pas de nouvelle liste.
+**Toi, dans Systeme.io — 10 minutes, une seule fois :** tu travailles en texte,
+pas en HTML, donc je te livre pour chaque email : le texte à coller tel quel,
+le libellé du bouton, et le lien court à coller dans le champ « URL » du bouton
+Systeme.io. Trois copier-coller par email, rien d'autre : pas de HTML, pas de
+DNS, pas de nouvelle liste. Les dates et la programmation restent inchangées.
+
 
 **Tes listes :** on n'en a pas besoin de nouvelles. Les 2 020 prospects et les
 contacts Systeme.io sont déjà en base et déjà synchronisés. Le problème n'est
@@ -46,23 +47,31 @@ d'arrivée ne convertit pas.
 ## Le plan
 
 
-### Étape 1 — Rendre les clics mesurables, avec des liens courts et propres
+### Étape 1 — Emails en texte simple, avec un lien court et propre
 
-Tu as raison : un bouton qui affiche une URL technique interminable fait fuir.
-Le suivi ne doit jamais se voir. Donc :
+Systeme.io s'écrit en texte, pas en HTML : on abandonne donc le HTML et on
+livre du texte prêt à coller. Et tu as raison, une URL technique interminable
+fait fuir : le suivi ne doit jamais se voir.
 
 - **Liens courts maison** : chaque lien devient `https://ebookstudio.fr/r/essai1`
-  (la page relais `/r` existe déjà). C'est ce que le lecteur voit et survole —
-  ton domaine, quatre caractères, rien de technique. Le relais enregistre le
-  clic puis renvoie vers `/essai` en un dixième de seconde.
-- **Version HTML** : le bouton affiche uniquement son texte (« Écrire mon
-  chapitre 1 gratuitement »), jamais l'adresse. Un seul bouton par email.
-- **Version texte** (celle qui montrait l'URL en entier) : elle affiche aussi
-  le lien court, une seule fois, en bas.
-- Regénérer le HTML copier-coller de `/admin/sequence-email` avec ces liens.
+  (la page relais `/r` existe déjà). Ton domaine, quelques caractères, rien de
+  technique. Le relais enregistre le clic puis renvoie vers `/essai`
+  instantanément.
+- **Le texte de l'email** ne contient qu'une seule ligne de lien, en bas :
+  `>> Écrire mon chapitre 1 gratuitement : https://ebookstudio.fr/r/essai1`.
+- **Le bouton** est celui de Systeme.io : tu tapes le libellé fourni et tu
+  colles le même lien court dans son champ URL. Le lecteur ne voit que le texte
+  du bouton.
+- `/admin/sequence-email` devient une page « texte » : pour chaque email, objet,
+  texte à coller, libellé du bouton, lien court — chacun avec son bouton
+  « Copier ».
 - Ajouter dans le panneau admin une ligne unique et lisible :
   envoyés → ouvreurs → clics par lien → visites `/essai` → emails captés →
   commandes. Une seule vue, la marche qui bloque devient visible.
+- Note : sans HTML, le pixel d'ouverture disparaît. Les ouvertures seront
+  celles de Systeme.io ; nous, on mesure ce qui compte vraiment — les clics et
+  ce qui suit.
+
 
 
 ### Étape 2 — Réparer la page d'essai (c'est là que tu perds tout)
@@ -103,9 +112,10 @@ changer (premier mois offert mis en avant plutôt que 47 € à vie), pas les em
   (table de correspondance clé → destination + gabarit) au lieu de l'URL de
   fonction visible. `src/pages/RedirectClickPage.tsx` gère déjà `/r` : il
   enregistre le clic via `track-email-click` puis redirige.
-- `src/pages/admin/AdminSequenceEmailPage.tsx` : génération HTML des 5 emails
-  `cadeau-*` avec bouton texte seul (aucune URL affichée) + pixel d'ouverture ;
-  version texte avec le lien court uniquement.
+- `src/pages/admin/AdminSequenceEmailPage.tsx` : sortie 100 % texte (objet,
+  corps, libellé de bouton, lien court), un bouton « Copier » par bloc ;
+  suppression de la sortie HTML pour ces 5 emails.
+
 
 - Panneau unifié dans `NewsletterClicksPanel.tsx` : jointure
   `email_opens` / `email_clicks` / `capture_events` (surface `essai`,
