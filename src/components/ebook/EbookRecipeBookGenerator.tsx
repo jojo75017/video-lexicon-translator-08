@@ -524,8 +524,9 @@ Format JSON strict:
       setCurrentStep(`Rédaction détaillée : 0 / ${count} fiches…`);
       for (let i = 0; i < batches.length; i += concurrency) {
         await Promise.all(
-          batches.slice(i, i + concurrency).map((b) => runBatch(b, i + batches.indexOf(b) - i + i === 0 ? batches.indexOf(b) : batches.indexOf(b))),
+          batches.slice(i, i + concurrency).map((b, j) => runBatch(b, i + j)),
         );
+
       }
 
       recipes = results.flat();
