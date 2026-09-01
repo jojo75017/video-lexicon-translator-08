@@ -46,13 +46,24 @@ d'arrivée ne convertit pas.
 ## Le plan
 
 
-### Étape 1 — Rendre les clics mesurables (sinon on pilote à l'aveugle)
-- Passer les 5 emails `cadeau-*` sur le même relais de suivi que les newsletters
-  (lien + bouton + second lien), avec le nom du gabarit et la destination.
+### Étape 1 — Rendre les clics mesurables, avec des liens courts et propres
+
+Tu as raison : un bouton qui affiche une URL technique interminable fait fuir.
+Le suivi ne doit jamais se voir. Donc :
+
+- **Liens courts maison** : chaque lien devient `https://ebookstudio.fr/r/essai1`
+  (la page relais `/r` existe déjà). C'est ce que le lecteur voit et survole —
+  ton domaine, quatre caractères, rien de technique. Le relais enregistre le
+  clic puis renvoie vers `/essai` en un dixième de seconde.
+- **Version HTML** : le bouton affiche uniquement son texte (« Écrire mon
+  chapitre 1 gratuitement »), jamais l'adresse. Un seul bouton par email.
+- **Version texte** (celle qui montrait l'URL en entier) : elle affiche aussi
+  le lien court, une seule fois, en bas.
 - Regénérer le HTML copier-coller de `/admin/sequence-email` avec ces liens.
 - Ajouter dans le panneau admin une ligne unique et lisible :
   envoyés → ouvreurs → clics par lien → visites `/essai` → emails captés →
   commandes. Une seule vue, la marche qui bloque devient visible.
+
 
 ### Étape 2 — Réparer la page d'essai (c'est là que tu perds tout)
 - 145 visites → 13 générations : le premier écran demande trop d'efforts.
