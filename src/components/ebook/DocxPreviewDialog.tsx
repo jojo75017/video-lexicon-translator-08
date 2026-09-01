@@ -15,13 +15,14 @@ interface DocxPreviewDialogProps {
   onOpenChange: (open: boolean) => void;
   /** Options d'export : évaluées à l'ouverture du dialogue. */
   getOptions: () => DocxExportOptions;
+  onTitlesGenerated?: (titles: Array<{ number: number; title: string }>) => void | Promise<void>;
 }
 
 /**
  * Aperçu fidèle du DOCX (pages, marges, sommaire) avant téléchargement.
  * Le rendu utilise le même fichier que celui qui sera téléchargé.
  */
-export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPreviewDialogProps) {
+export function DocxPreviewDialog({ open, onOpenChange, getOptions, onTitlesGenerated }: DocxPreviewDialogProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
   const [blob, setBlob] = useState<Blob | null>(null);
@@ -69,31 +70,23 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
     try {
       const provider = getProvider();
       const ownKey = getActiveAIKey();
-      const { data, error: fnError } = await supabase.functions.invoke('v3-generate-chapter-titles', {
-        body: {
-          bookTitle: options.title,
-          chapters: payload,
-          // Clé de l'abonné : la génération n'utilise alors aucun crédit serveur.
-          userApiKey: provider === 'openrouter' ? '' : ownKey,
-          openrouterKey: provider === 'openrouter' ? ownKey : '',
-        },
-      });
-      if (fnError) {
-        // `invoke` masque le message réel derrière « non-2xx status code ».
-        let detail = fnError.message;
-        const context = (fnError as { context?: Response }).context;
-        if (context && typeof context.text === 'function') {
-          const body = await context.text().catch(() => '');
-          try {
-            const parsed = JSON.parse(body);
-            if (parsed?.error) detail = String(parsed.error);
-          } catch {
-            if (body) detail = body.slice(0, 300);
-          }
+      const titles: { number: number; title: string }[] = [];
+      for (const chapter of payload) {
+        const { data, error: fnError } = await supabase.functions.invoke('v3-generate-chapter-titles', {
+          body: {
+            bookTitle: options.title,
+            chapters: [chapter],
+            userApiKey: provider === 'openrouter' ? '' : ownKey,
+            openrouterKey: provider === 'openrouter' ? ownKey : '',
+          },
+        });
+        if (fnError) {
+          console.error(`Titre du chapitre ${chapter.number} non généré`, fnError);
+          continue;
         }
-        throw new Error(detail);
+        const generated = Array.isArray(data?.titles) ? data.titles[0] : null;
+        if (generated?.title) titles.push({ number: chapter.number, title: generated.title });
       }
-      const titles: { number: number; title: string }[] = data?.titles || [];
       if (!titles.length) throw new Error("L'IA n'a renvoyé aucun titre");
       setTitleOverrides((prev) => {
         const next = { ...prev };
@@ -102,7 +95,8 @@ export function DocxPreviewDialog({ open, onOpenChange, getOptions }: DocxPrevie
         });
         return next;
       });
-      toast.success(`${titles.length} titre(s) de chapitre généré(s)`);
+      await onTitlesGenerated?.(titles);
+      toast.success(`${titles.length} titre(s) généré(s) et sauvegardé(s)`);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Génération des titres impossible');
     } finally {

@@ -255,6 +255,31 @@ export function cleanGeneratedText(text: string): string {
 }
 
 /**
+ * Aère sans réécrire : lorsqu'une IA renvoie un pavé continu, crée des
+ * paragraphes de 3 à 5 phrases. Les retours déjà présents sont respectés.
+ */
+export function harmonizeParagraphs(text: string, sentencesPerParagraph = 4): string {
+  const cleaned = cleanGeneratedText(text);
+  if (!cleaned) return '';
+
+  return cleaned
+    .split(/\n{2,}/)
+    .map((block) => {
+      const normalized = block.replace(/\s*\n\s*/g, ' ').trim();
+      if (!normalized || /^(?:[-–—•●▪▸►]|\d+[.)])\s+/.test(normalized)) return normalized;
+      const sentences = normalized.match(/[^.!?…]+(?:[.!?…]+[»”"']?|$)/g)?.map((sentence) => sentence.trim()).filter(Boolean) || [normalized];
+      if (sentences.length <= sentencesPerParagraph + 1) return normalized;
+      const paragraphs: string[] = [];
+      for (let index = 0; index < sentences.length; index += sentencesPerParagraph) {
+        paragraphs.push(sentences.slice(index, index + sentencesPerParagraph).join(' '));
+      }
+      return paragraphs.join('\n\n');
+    })
+    .filter(Boolean)
+    .join('\n\n');
+}
+
+/**
  * Nettoie le texte ET applique la typographie française professionnelle.
  * À utiliser pour les exports (DOCX, EPUB, PDF).
  */

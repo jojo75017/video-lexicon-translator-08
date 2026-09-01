@@ -49,6 +49,7 @@ interface EbookProject {
   kdp_keywords?: string;
   kdp_categories?: string;
   project_type?: ProjectType;
+  back_cover_data?: Record<string, unknown>;
 }
 
 export const useEbookDatabase = () => {
@@ -293,6 +294,7 @@ export const useEbookDatabase = () => {
           chapters: project.chapters,
           characters: project.characters,
           ebook_images: project.ebook_images,
+          back_cover_data: project.back_cover_data || {},
         });
 
       if (error) {
@@ -452,6 +454,7 @@ export const useEbookDatabase = () => {
           chapters: project.chapters,
           characters: project.characters,
           ebook_images: project.ebook_images,
+          back_cover_data: project.back_cover_data || {},
         });
 
       if (error) {
