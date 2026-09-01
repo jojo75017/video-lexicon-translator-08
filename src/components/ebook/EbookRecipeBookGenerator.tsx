@@ -405,7 +405,7 @@ ${customInstructions ? `Instructions spéciales du client: ${customInstructions}
 ${countryInstruction}
 ${finalCountry ? `Tous les ${count} plats DOIVENT être des plats 100% ${finalCountry.toLowerCase() === 'france' ? 'français' : `de ${finalCountry}`}. Aucune exception.` : ''}
 
-Génère exactement ${count} FICHES RECETTES COMPLÈTES ET UNIQUES (minimum 400 mots chacune).
+Génère exactement ${count} FICHES RECETTES COMPLÈTES ET UNIQUES (minimum 650 mots chacune).
 
 🚫 RÈGLE ANTI-DOUBLONS CRITIQUE:
 - CHAQUE recette DOIT être un plat DIFFÉRENT avec un nom UNIQUE
