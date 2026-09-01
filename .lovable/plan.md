@@ -32,11 +32,12 @@ et l'offre, pas la rédaction des emails.
 regénération du HTML prêt à coller, tableau de bord unique, refonte de la page
 d'essai, parrainage, page publique de démonstration.
 
-**Toi, dans Systeme.io — 10 minutes, une seule fois :** quand je te dis que
-c'est prêt, tu ouvres `/admin/sequence-email`, tu copies le HTML des 5 emails
-(bouton « Copier le HTML ») et tu le recolles dans tes 5 emails existants à la
-place de l'ancien contenu. Les dates et la programmation restent inchangées.
-Rien d'autre : pas de DNS, pas de réglage, pas de nouvelle liste.
+**Toi, dans Systeme.io — 10 minutes, une seule fois :** tu travailles en texte,
+pas en HTML, donc je te livre pour chaque email : le texte à coller tel quel,
+le libellé du bouton, et le lien court à coller dans le champ « URL » du bouton
+Systeme.io. Trois copier-coller par email, rien d'autre : pas de HTML, pas de
+DNS, pas de nouvelle liste. Les dates et la programmation restent inchangées.
+
 
 **Tes listes :** on n'en a pas besoin de nouvelles. Les 2 020 prospects et les
 contacts Systeme.io sont déjà en base et déjà synchronisés. Le problème n'est
