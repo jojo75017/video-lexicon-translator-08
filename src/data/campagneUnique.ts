@@ -318,18 +318,27 @@ ${paragraphs}
 </div>`;
 }
 
+/** Clé du lien court de cet email (essai1, offre2…). */
+export const emailShortKey = (email: CampagneEmail): string =>
+  email.ctaUrl.split('/r/')[1] ?? '';
+
+/** Lien court à coller dans le champ « URL » du bouton Systeme.io. */
+export const emailShortUrl = (email: CampagneEmail): string => email.ctaUrl;
+
 /** Étapes de paramétrage côté Systeme.io — une seule campagne, un seul tag. */
 export const SYSTEMEIO_SETUP_STEPS: string[] = [
   'Expéditeur : contact@ebookstudio-mail.fr (domaine déjà vérifié dans Systeme.io). Ne touchez pas au DNS de ebookstudio.fr.',
   'Réglages → Pied de page : remplacez le pied de page hérité (trafic-affiliation.com) par « EbookStudio — Georges Boubet — contact@ebookstudio-mail.fr » suivi du lien de désinscription Systeme.io.',
   `Contacts → Tags : créez « ${CAMPAGNE.tag} » (entrée dans la campagne) et « CLIENT-47 » (acheteurs, posé automatiquement par l'application).`,
   'Emails → Campagnes : créez « EbookStudio — 5 niches puis accès à vie » avec 5 emails aux délais 0, 1, 3, 5 et 7 jours.',
-  'Pour chaque email : collez l\'objet, puis le corps (bouton « Copier le texte » ou « Copier le HTML » pour la version avec bouton).',
+  'Systeme.io s\'écrit en texte : pour chaque email, trois copier-coller — 1) l\'objet, 2) le texte du corps, 3) le libellé du bouton + son lien court (champ URL du bouton).',
+  'Le lien court (https://ebookstudio.fr/r/…) est le seul lien à utiliser : il compte le clic puis redirige en une fraction de seconde. Ne le remplacez jamais par /essai ou /commander en direct, sinon le clic n\'est plus mesuré.',
   `Automatisations → règle 1 : déclencheur « Tag ajouté » = ${CAMPAGNE.tag} → action « Inscrire à la campagne ».`,
   'Automatisations → règle 2 : déclencheur « Tag ajouté » = CLIENT-47 → action « Désinscrire de la campagne » (l\'acheteur ne reçoit plus les emails de vente).',
   'Envoyez-vous un test sur boubetgeorges@gmail.com, puis activez les deux règles.',
   'Aucun envoi de masse ne part de l\'application : Resend (offre gratuite) ne sert plus qu\'aux emails de service (codes d\'accès, confirmations de paiement).',
 ];
+
 
 
 /* ------------- Compatibilité avec les tableaux de bord admin ------------- */
