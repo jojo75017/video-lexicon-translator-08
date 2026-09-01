@@ -26,7 +26,25 @@ après le clic que tout meurt : 145 visites de `/essai` ne produisent que 5
 emails captés, et 0 commande payée n'a jamais existé. Le problème est la page
 et l'offre, pas la rédaction des emails.
 
+## Qui fait quoi (pas d'inquiétude : presque tout est pour moi)
+
+**Moi, dans l'app — tu n'as rien à faire :** suivi des clics des 5 emails,
+regénération du HTML prêt à coller, tableau de bord unique, refonte de la page
+d'essai, parrainage, page publique de démonstration.
+
+**Toi, dans Systeme.io — 10 minutes, une seule fois :** quand je te dis que
+c'est prêt, tu ouvres `/admin/sequence-email`, tu copies le HTML des 5 emails
+(bouton « Copier le HTML ») et tu le recolles dans tes 5 emails existants à la
+place de l'ancien contenu. Les dates et la programmation restent inchangées.
+Rien d'autre : pas de DNS, pas de réglage, pas de nouvelle liste.
+
+**Tes listes :** on n'en a pas besoin de nouvelles. Les 2 020 prospects et les
+contacts Systeme.io sont déjà en base et déjà synchronisés. Le problème n'est
+pas le nombre de contacts, c'est que le clic n'est pas mesuré et que la page
+d'arrivée ne convertit pas.
+
 ## Le plan
+
 
 ### Étape 1 — Rendre les clics mesurables (sinon on pilote à l'aveugle)
 - Passer les 5 emails `cadeau-*` sur le même relais de suivi que les newsletters
