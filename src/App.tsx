@@ -203,6 +203,8 @@ const AdminPaymentsDashboardPage = lazy(() => import('./pages/admin/AdminPayment
 const AdminCleanupPage = lazy(() => import('./pages/admin/AdminCleanupPage'));
 const AdminPlansV3Page = lazy(() => import('./pages/admin/AdminPlansV3Page'));
 const AdminTestPayPalPage = lazy(() => import('./pages/admin/AdminTestPayPalPage'));
+const AdminTestBdPage = lazy(() => import('./pages/admin/AdminTestBdPage'));
+
 const AdminAttentePage = lazy(() => import('./pages/admin/AdminAttentePage'));
 const AdminSequenceEmailPage = lazy(() => import('./pages/admin/AdminSequenceEmailPage'));
 const BonusPage = lazy(() => import('./pages/BonusPage'));
