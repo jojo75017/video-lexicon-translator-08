@@ -53,9 +53,9 @@ Une musique de fond est possible, mais elle n'est pas produite avec l'image : le
 - Aucun changement de tarif, de schéma de base de données ni de tunnel de paiement dans ce lot.
 - Les améliorations V3 sont listées ici comme feuille de route : je n'en implémente que celles que vous choisissez, une par lot, pour rester dans la phase de stabilisation.
 
-## Ce que je vous demande de choisir
+## Ce que je fais dès l'approbation
 
-1. Vidéo longue 7 min sous-titrée, ou 3 vidéos courtes ?
-2. Musique : vous fournissez une piste, ou vidéo muette ?
-3. Quelle amélioration V3 attaque-t-on en premier (1 à 5) ?
+1. La vidéo longue 7 min sous-titrée, muette (musique/voix ajoutées ensuite).
+2. Puis j'attends votre choix d'amélioration V3 (1 à 5) avant de toucher au produit.
+
 
