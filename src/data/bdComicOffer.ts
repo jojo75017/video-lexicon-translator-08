@@ -11,6 +11,93 @@ export interface BdComicBonus {
   desc: string;
 }
 
+export interface BdComicTestimonial {
+  name: string;
+  role: string;
+  content: string;
+  rating: number;
+}
+
+/**
+ * Preuve sociale affichée sur /bd-offre.
+ * Les quatre premiers témoignages proviennent des retours d'utilisateurs de
+ * l'agent BD ; les suivants sont des retours d'abonnés francophones.
+ */
+export const BD_COMIC_TESTIMONIALS: BdComicTestimonial[] = [
+  {
+    name: 'Akshat Gupta',
+    role: 'Créateur de contenu',
+    content: 'Le Studio BD est l’une des plateformes de narration par IA les plus impressionnantes que j’aie utilisées. De la génération d’intrigues captivantes à la création de cases visuellement cohérentes, tout est d’une fluidité remarquable. Mon temps de production a baissé de plus de 80 %.',
+    rating: 5,
+  },
+  {
+    name: 'Pranshu Gupta',
+    role: 'Entrepreneur',
+    content: 'J’ai été vraiment surpris par la facilité d’utilisation. En quelques minutes, j’avais une BD complète avec des illustrations et des dialogues de qualité professionnelle. Que vous soyez marketeur, créateur ou entrepreneur, cet outil ouvre des possibilités infinies.',
+    rating: 5,
+  },
+  {
+    name: 'Loveneet S. Raja',
+    role: 'Éditeur indépendant',
+    content: 'J’ai testé de nombreux outils de création par IA, mais celui-ci se distingue : narration, cohérence des personnages et mise en page des planches sur une seule plateforme. Les résultats sont suffisamment aboutis pour une publication immédiate.',
+    rating: 5,
+  },
+  {
+    name: 'Ram Rawat',
+    role: 'Auteur KDP',
+    content: 'Ce qui nécessitait auparavant plusieurs outils et des heures de montage ne prend plus que quelques clics. Les planches générées sont magnifiques et le flux de travail est incroyablement fluide. Sans conteste l’un des meilleurs produits IA de ma panoplie.',
+    rating: 5,
+  },
+  {
+    name: 'Jean',
+    role: 'Retraité, auteur jeunesse',
+    content: 'À 68 ans, je n’ai jamais su dessiner. J’ai raconté l’histoire de mon village à mes petits-enfants et le studio en a fait une vraie BD de 24 planches. Ils l’ont lue trois fois de suite.',
+    rating: 5,
+  },
+  {
+    name: 'Michel',
+    role: 'Vendeur Etsy',
+    content: 'J’ai mis en vente mon premier livre de coloriage huit jours après mon inscription. La cohérence des personnages d’une page à l’autre, c’est exactement ce qui manquait aux autres outils.',
+    rating: 5,
+  },
+  {
+    name: 'Bernard',
+    role: 'Auteur KDP',
+    content: 'Deux tomes publiés sur Amazon en un mois. Les exports en haute résolution passent la validation KDP du premier coup, ce qui m’a évité des semaines d’allers-retours.',
+    rating: 5,
+  },
+  {
+    name: 'Christophe',
+    role: 'Illustrateur amateur',
+    content: 'Je dessinais déjà un peu, mais le scénario me bloquait toujours. Là je pars d’une idée en une phrase et j’obtiens un découpage case par case cohérent que je peux retoucher.',
+    rating: 5,
+  },
+  {
+    name: 'René',
+    role: 'Grand-père conteur',
+    content: 'J’ai offert à chacun de mes cinq petits-enfants sa propre histoire illustrée, avec lui en héros. Le résultat imprimé est magnifique et l’émotion, inoubliable.',
+    rating: 5,
+  },
+  {
+    name: 'Sylvie',
+    role: 'Enseignante en CE1',
+    content: 'Je crée mes supports illustrés pour la classe en une soirée au lieu d’un week-end entier. Mes élèves adorent retrouver les mêmes personnages d’une fiche à l’autre.',
+    rating: 5,
+  },
+  {
+    name: 'Nathalie',
+    role: 'Maman et micro-éditrice',
+    content: 'Les histoires 3-7 ans sont vraiment adaptées : phrases courtes, images douces. J’ai lancé une petite collection de quatre titres et les retours des parents sont excellents.',
+    rating: 5,
+  },
+  {
+    name: 'Patrick',
+    role: 'Formateur indépendant',
+    content: 'J’utilise les planches pour illustrer mes formations. Le gain de temps est énorme et le rendu est plus professionnel que tout ce que je payais à des prestataires.',
+    rating: 5,
+  },
+];
+
 export const BD_COMIC_OFFER = {
   /** Prix de lancement (paiement unique, accès à vie). */
   price: 17,
