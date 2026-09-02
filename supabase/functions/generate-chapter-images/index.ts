@@ -828,15 +828,26 @@ Instructions de génération:
 
       if (!response || !response.ok) {
         if (!response) {
-          console.error('LOVABLE_API_KEY missing, trying user Gemini key...');
+          console.error('LOVABLE_API_KEY missing, trying user keys...');
+          providerError = providerError || 'LOVABLE_API_KEY manquante';
         } else if (response.status === 429 || response.status === 402) {
-          console.log('Lovable AI credits/rate limit reached, trying user Gemini key...');
+          console.log('Lovable AI credits/rate limit reached, trying user keys...');
+          providerError = response.status === 402
+            ? 'Crédits Lovable AI épuisés'
+            : 'Limite de débit Lovable AI atteinte';
         } else {
           const errorText = await response.text();
           console.error('AI Gateway error:', response.status, errorText);
+          providerError = `Lovable AI ${response.status}`;
         }
-        const geminiImg = await tryGeminiDirect(imagePrompt, userGeminiApiKey);
-        generatedImageUrl = geminiImg || getPlaceholderUrl(chapterTitle, style, colorScheme);
+        providerFallback = true;
+        const img = await tryUserKeys(imagePrompt);
+        if (img) {
+          generatedImageUrl = img;
+        } else {
+          usedProvider = 'placeholder';
+          generatedImageUrl = getPlaceholderUrl(chapterTitle, style, colorScheme);
+        }
       } else {
         // Réponse OK - extraire l'image base64 de la réponse Gemini
         const data = await response.json();
@@ -846,16 +857,25 @@ Instructions de génération:
         
         if (imageData) {
           generatedImageUrl = imageData;
+          usedProvider = 'lovable';
           console.log('Image extracted from Lovable AI response (base64 length:', imageData.length, ')');
         } else {
           // Fallback: vérifier d'autres formats de réponse possibles
           const content = data.choices?.[0]?.message?.content;
           if (typeof content === 'string' && content.startsWith('data:image')) {
             generatedImageUrl = content;
+            usedProvider = 'lovable';
           } else {
             console.error('No image in Lovable AI response:', JSON.stringify(data).substring(0, 500));
-            const geminiImg = await tryGeminiDirect(imagePrompt, userGeminiApiKey);
-            generatedImageUrl = geminiImg || getPlaceholderUrl(chapterTitle, style, colorScheme);
+            providerError = 'Aucune image renvoyée par Lovable AI';
+            providerFallback = true;
+            const img = await tryUserKeys(imagePrompt);
+            if (img) {
+              generatedImageUrl = img;
+            } else {
+              usedProvider = 'placeholder';
+              generatedImageUrl = getPlaceholderUrl(chapterTitle, style, colorScheme);
+            }
           }
         }
       }
@@ -878,16 +898,21 @@ Instructions de génération:
       console.log('Placeholder image detected, skipping storage upload');
     }
 
-    console.log('Image generated successfully');
+    console.log(`Image generated successfully (provider=${usedProvider}, fallback=${providerFallback})`);
     return new Response(
       JSON.stringify({ 
         imageUrl: finalImageUrl,
         chapterTitle,
         seed: typeof generatedSeed !== 'undefined' ? generatedSeed : null,
-        storedInCloud: uploadToStorage && finalImageUrl !== generatedImageUrl
+        storedInCloud: uploadToStorage && finalImageUrl !== generatedImageUrl,
+        provider: usedProvider,
+        fallback: providerFallback,
+        isPlaceholder,
+        providerError,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
+
 
   } catch (error) {
     console.error('Error in generate-chapter-images:', error);
