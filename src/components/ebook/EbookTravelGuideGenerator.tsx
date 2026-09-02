@@ -241,6 +241,29 @@ const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ e
   const [photoStyle, setPhotoStyle] = useState('realistic');
   const [isGeneratingImages, setIsGeneratingImages] = useState(false);
 
+  // Sauvegarde automatique des fiches (IndexedDB + localStorage)
+  const autosave = useSheetsAutosave(
+    'travel_guide_sheets',
+    { bookTitle, authorName, selectedCountry, numberOfSheets, customInstructions, promoLinks, photoStyle, sheets, coverImageUrl },
+    (saved) => {
+      if (saved.sheets?.length) {
+        setSheets(saved.sheets);
+        setActiveTab('sheets');
+        toast.success(`${saved.sheets.length} fiches restaurées depuis votre dernière session`);
+      }
+      if (saved.bookTitle) setBookTitle(saved.bookTitle);
+      if (saved.authorName) setAuthorName(saved.authorName);
+      if (saved.selectedCountry) setSelectedCountry(saved.selectedCountry);
+      if (saved.numberOfSheets) setNumberOfSheets(saved.numberOfSheets);
+      if (saved.customInstructions) setCustomInstructions(saved.customInstructions);
+      if (saved.promoLinks?.length) setPromoLinks(saved.promoLinks);
+      if (saved.photoStyle) setPhotoStyle(saved.photoStyle);
+      if (saved.coverImageUrl) setCoverImageUrl(saved.coverImageUrl);
+    },
+    sheets.length > 0,
+  );
+
+
   // Helper functions for promo links
   const addPromoLink = () => {
     if (newLinkLabel.trim() && newLinkUrl.trim()) {
