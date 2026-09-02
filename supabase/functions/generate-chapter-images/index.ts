@@ -580,6 +580,9 @@ serve(async (req) => {
       useOpenAI = false, 
       openaiApiKey, 
       userGeminiApiKey,
+      openrouterApiKey = null,
+      imageEngine = 'auto',
+
       disableOpenAIFallback = false, 
       forceLovable = false,
       uploadToStorage = true,
