@@ -578,6 +578,10 @@ const App = () => {
             <Route path="/quiz" element={<QuizPage />} />
             <Route path="/signature" element={<SignaturePage />} />
             <Route path="/bd-studio" element={<BDStudioPage />} />
+            {/* Tunnel Studio BD & Jeunesse : vente 17 € → upsell Pro 47 € → studio */}
+            <Route path="/bd-offre" element={<BDOffrePage />} />
+            <Route path="/bd-upsell" element={<BDUpsellPage />} />
+            <Route path="/bd-merci" element={<BDMerciPage />} />
             <Route path="/word-count" element={<WordCountPage />} />
             <Route
               path="/ebook-planner"
