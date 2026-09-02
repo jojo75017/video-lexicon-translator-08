@@ -621,8 +621,67 @@ COHÉRENCE STRICTE ABSOLUE:
 - Les personnages sont des clones visuels parfaits entre les images`
     };
 
-    // Si useOpenAI est true et non forcé à Lovable, utiliser EXCLUSIVEMENT OpenAI
-    if (useOpenAI && openaiApiKey && !forceLovable) {
+    // ===== ROUTAGE PAR FOURNISSEUR (sécurité clés) =====
+    // On classe chaque clé reçue selon son VRAI fournisseur, quel que soit
+    // le champ dans lequel le client l'a envoyée. Une clé Gemini ne partira
+    // donc jamais chez OpenAI (cause des 401 + images vides du Studio BD).
+    const candidateKeys = [openaiApiKey, userGeminiApiKey, openrouterApiKey].filter(
+      (k: unknown): k is string => typeof k === 'string' && k.trim().length > 10
+    );
+    const resolvedKeys: Record<KeyProvider, string | undefined> = {
+      gemini: undefined, openai: undefined, openrouter: undefined, unknown: undefined,
+    };
+    for (const k of candidateKeys) {
+      const p = detectKeyProvider(k);
+      if (!resolvedKeys[p]) resolvedKeys[p] = k.trim();
+    }
+    const engine: string = ['auto', 'gemini', 'openai', 'openrouter', 'lovable'].includes(imageEngine)
+      ? imageEngine
+      : 'auto';
+    console.log('🔑 Clés détectées:', {
+      gemini: !!resolvedKeys.gemini,
+      openai: !!resolvedKeys.openai,
+      openrouter: !!resolvedKeys.openrouter,
+      engine,
+    });
+
+    let usedProvider: string = 'lovable';
+    let providerFallback = false;
+    let providerError: string | null = null;
+
+    const buildFallbackPrompt = () => isColoringBook
+      ? getColoringBookPrompt(chapterTitle, coloringBookAgeGroup)
+      : (customPrompt || `Illustration pour le chapitre "${chapterTitle}" du livre "${ebookTitle}". Style: ${style}.`);
+
+    // Essais BYOK dans l'ordre : fournisseur demandé, puis autres clés valides
+    const tryUserKeys = async (prompt: string, skip?: KeyProvider): Promise<string | null> => {
+      const order: KeyProvider[] = engine === 'gemini'
+        ? ['gemini', 'openrouter']
+        : engine === 'openrouter'
+          ? ['openrouter', 'gemini']
+          : ['gemini', 'openrouter'];
+      for (const p of order) {
+        if (p === skip) continue;
+        const key = resolvedKeys[p];
+        if (!key) continue;
+        const img = p === 'gemini'
+          ? await tryGeminiDirect(prompt, key)
+          : await tryOpenRouterImage(prompt, key);
+        if (img) {
+          usedProvider = p;
+          return img;
+        }
+        providerError = `Échec de génération via ${p}`;
+      }
+      return null;
+    };
+
+    const wantsOpenAI = !forceLovable && engine !== 'lovable' && !!resolvedKeys.openai &&
+      (engine === 'openai' || (engine === 'auto' && useOpenAI));
+    const wantsUserKeyFirst = !forceLovable && engine !== 'lovable' && !!(resolvedKeys.gemini || resolvedKeys.openrouter) &&
+      (engine === 'gemini' || engine === 'openrouter' || (engine === 'auto' && useOpenAI));
+
+    if (wantsOpenAI) {
       try {
         generatedImageUrl = await generateWithOpenAI(
           chapterTitle,
@@ -630,7 +689,7 @@ COHÉRENCE STRICTE ABSOLUE:
           ebookTitle,
           style,
           characters,
-          openaiApiKey,
+          resolvedKeys.openai!,
           ratio,
           quality,
           colorScheme,
@@ -641,15 +700,32 @@ COHÉRENCE STRICTE ABSOLUE:
           coloringBookAgeGroup,
           customPrompt
         );
+        usedProvider = 'openai';
       } catch (err) {
         console.error('OpenAI image generation failed, falling back:', err);
-        const fallbackPrompt = isColoringBook
-          ? getColoringBookPrompt(chapterTitle, coloringBookAgeGroup)
-          : (customPrompt || `Illustration pour le chapitre "${chapterTitle}" du livre "${ebookTitle}". Style: ${style}.`);
-        const geminiImg = await tryGeminiDirect(fallbackPrompt, userGeminiApiKey);
-        generatedImageUrl = geminiImg || getPlaceholderUrl(chapterTitle, style, colorScheme);
+        providerError = err instanceof Error ? err.message : 'Échec OpenAI';
+        providerFallback = true;
+        const img = await tryUserKeys(buildFallbackPrompt());
+        generatedImageUrl = img || getPlaceholderUrl(chapterTitle, style, colorScheme);
+        if (!img) usedProvider = 'placeholder';
+      }
+    } else if (wantsUserKeyFirst) {
+      // L'abonné a une clé Gemini et/ou OpenRouter : on l'utilise directement
+      const prompt = customPrompt || buildFallbackPrompt();
+      const img = await tryUserKeys(prompt);
+      if (img) {
+        generatedImageUrl = img;
+      } else {
+        providerFallback = true;
+        console.error('Clés abonné indisponibles, bascule vers Lovable AI');
+        generatedImageUrl = '';
       }
     } else {
+      generatedImageUrl = '';
+    }
+
+    if (!generatedImageUrl) {
+
       // Utiliser Lovable AI
       const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
