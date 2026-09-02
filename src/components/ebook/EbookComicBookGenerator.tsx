@@ -1526,6 +1526,7 @@ Bubble points to ${panel.character}.` : ''}
               <Label className="text-sm font-medium">Moteur d'images</Label>
               <p className="text-xs text-muted-foreground">
                 Chaque clé est envoyée à son vrai fournisseur (une clé Gemini n'est jamais envoyée à OpenAI).
+                Les images du Studio BD utilisent <strong>uniquement vos clés</strong> : aucun crédit inclus n'est consommé.
               </p>
             </div>
             <Select value={imageEngine} onValueChange={(v) => setImageEngine(v as ImageEngine)}>
