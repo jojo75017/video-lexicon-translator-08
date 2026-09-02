@@ -731,8 +731,8 @@ COHÉRENCE STRICTE ABSOLUE:
 
     if (!generatedImageUrl) {
 
-      // Utiliser Lovable AI
-      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+      // Utiliser Lovable AI (jamais si allowLovable === false : Studio BD)
+      const LOVABLE_API_KEY = allowLovable ? Deno.env.get('LOVABLE_API_KEY') : null;
 
 
       // Ajouter les descriptions de personnages au prompt pour la cohérence
