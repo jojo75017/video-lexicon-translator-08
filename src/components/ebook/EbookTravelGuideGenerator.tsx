@@ -1048,13 +1048,13 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
         };
       });
 
-      const slug = (guideTitle || 'guide-de-voyage')
+      const slug = (bookTitle || 'guide-de-voyage')
         .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
         .replace(/[^a-zA-Z0-9]+/g, '-').replace(/(^-|-$)/g, '').toLowerCase() || 'guide-de-voyage';
 
       await exportEbookToDocx({
         filename: `${slug}.docx`,
-        documentTitle: guideTitle || 'Mon guide de voyage',
+        documentTitle: bookTitle || 'Mon guide de voyage',
         documentSubtitle: authorName ? `par ${authorName}` : undefined,
         sections,
       });
