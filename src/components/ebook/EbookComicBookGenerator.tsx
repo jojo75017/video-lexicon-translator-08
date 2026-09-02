@@ -1518,6 +1518,24 @@ Bubble points to ${panel.character}.` : ''}
         </Card>
       )}
 
+      {/* Aucune clé : les images ne peuvent pas être générées */}
+      {!hasUserImageKey && (
+        <Card className="border-amber-500/50 bg-amber-500/5">
+          <CardContent className="py-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+              <div className="space-y-1">
+                <p className="font-medium">Aucune clé IA enregistrée</p>
+                <p className="text-sm text-muted-foreground">
+                  Les images de BD sont générées avec votre propre clé (Gemini · Nano Banana, OpenAI ou OpenRouter).
+                  Enregistrez une clé dans <strong>Clés API</strong> pour lancer les illustrations.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Moteur d'images + clés détectées */}
       <Card className="border-border/60">
         <CardContent className="py-4 space-y-3">
