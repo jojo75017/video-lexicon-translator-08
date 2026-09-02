@@ -137,6 +137,9 @@ export default function BDOffrePage() {
           </div>
         </section>
 
+        {/* TÉMOIGNAGES */}
+        <BdTestimonials />
+
         {/* FONCTIONNALITÉS */}
         <section className="mt-14">
           <h2 className="text-center text-2xl font-bold sm:text-3xl">Tout ce que le studio fait pour vous</h2>
@@ -192,10 +195,6 @@ export default function BDOffrePage() {
             ))}
           </ul>
         </section>
-
-        {/* TÉMOIGNAGES */}
-        <BdTestimonials />
-
 
         {/* PAIEMENT */}
         <section id="commander" className="mt-14 rounded-2xl border-2 border-primary bg-card p-6">
