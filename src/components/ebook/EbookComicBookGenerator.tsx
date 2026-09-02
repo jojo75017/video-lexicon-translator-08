@@ -828,28 +828,21 @@ Bubble points to ${panelData.character}.` : ''}
             await new Promise(resolve => setTimeout(resolve, 1500));
           }
 
-          const { data: imageData, error: imageError } = await supabase.functions.invoke('generate-chapter-images', {
-            body: {
-              chapterTitle: `Page ${pageIndex + 1} Panel ${panelIndex + 1}`,
-              ebookTitle: title || 'Bande Dessinée',
-              style: artStylePrompt,
-              ratio: 'square',
-              quality: 'hd',
-              colorScheme: colorMode === 'bw' ? 'monochrome' : colorMode,
-              customPrompt: imagePrompt,
-              seed: visualSeed || undefined,
-              useOpenAI,
-              openaiApiKey: useOpenAI ? userApiKey : undefined,
-            }
-          });
+          const result = await requestPanelImage(
+            `Page ${pageIndex + 1} Panel ${panelIndex + 1}`,
+            imagePrompt,
+            artStylePrompt
+          );
 
-          if (imageError) throw imageError;
-
-          const url = imageData?.imageUrl || imageData?.url || '';
+          if (!result.url) {
+            imageFailuresRef.current.count += 1;
+            imageFailuresRef.current.reason = result.error || imageFailuresRef.current.reason;
+            console.error(`Case ${panelIndex + 1} sans image:`, result.error);
+          }
 
           panels.push({
             id: `panel-${pageIndex}-${panelIndex}`,
-            imageUrl: url,
+            imageUrl: result.url,
             dialogue: panelData.dialogue,
             character: panelData.character,
             action: panelData.description,
@@ -860,6 +853,8 @@ Bubble points to ${panelData.character}.` : ''}
 
         } catch (err) {
           console.error(`Erreur panel ${panelIndex + 1}:`, err);
+          imageFailuresRef.current.count += 1;
+          imageFailuresRef.current.reason = err instanceof Error ? err.message : 'Erreur inconnue';
           panels.push({
             id: `panel-${pageIndex}-${panelIndex}`,
             imageUrl: '',
@@ -868,6 +863,7 @@ Bubble points to ${panelData.character}.` : ''}
             action: panelData.description,
           });
         }
+
       }
 
       if (pageIndex === 0 && !visualSeed) {
