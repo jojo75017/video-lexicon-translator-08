@@ -14,6 +14,9 @@ const PRODUCTS: Record<string, { label: string; amount: number }> = {
   main: { label: "EbookStudio — Accès à vie", amount: 47 },
   license_extended: { label: "Licence commerciale étendue", amount: 67 },
   templates_premium: { label: "Pack 50 templates premium", amount: 25 },
+  // Tunnel Studio BD & Jeunesse (nouveauté V4)
+  bd_comic_17: { label: "Studio BD & Jeunesse — accès à vie", amount: 17 },
+  bd_comic_pro_47: { label: "Studio BD & Jeunesse Pro", amount: 47 },
   // Legacy aliases
   upsell_license: { label: "Licence commerciale étendue", amount: 67 },
   upsell_templates: { label: "Pack 50 templates premium", amount: 25 },

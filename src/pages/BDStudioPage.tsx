@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { EbookComicBookGenerator } from '@/components/ebook/EbookComicBookGenerator';
 import { Helmet } from 'react-helmet';
 import { supabase } from '@/integrations/supabase/client';
+import { useBdComicAccess } from '@/hooks/useBdComicAccess';
 import bdHero from '@/assets/bd-studio-hero.jpg';
 
 const fadeUp = {
@@ -42,37 +43,13 @@ const STEPS = [
 const BDStudioPage: React.FC = () => {
   const navigate = useNavigate();
   const [showGenerator, setShowGenerator] = useState(false);
-  const [isPro, setIsPro] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) { setIsPro(false); return; }
-        const { data: sub } = await (supabase as any)
-          .from('subscribers')
-          .select('plan_tier, plan_type, status')
-          .eq('user_id', user.id)
-          .maybeSingle();
-        const tier = (sub?.plan_tier ?? '').toLowerCase();
-        const type = (sub?.plan_type ?? '').toLowerCase();
-        const eligible =
-          type === 'lifetime' ||
-          type === 'vip' ||
-          tier.includes('auteur') ||
-          tier.includes('editeur') ||
-          tier.includes('éditeur') ||
-          tier.includes('vip');
-        setIsPro(eligible);
-      } catch {
-        setIsPro(false);
-      }
-    })();
-  }, []);
+  // Accès : admin, plans inclus, ou achat du Studio BD (17 €) / version Pro (47 €).
+  const { loading: accessLoading, hasAccess } = useBdComicAccess();
+  const isPro = accessLoading ? null : hasAccess;
 
   const handleLaunch = () => {
-    if (!isPro) {
-      navigate('/v3/forfaits?highlight=editeur&from=bd-studio');
+    if (!hasAccess) {
+      navigate('/bd-offre?from=bd-studio');
       return;
     }
     setShowGenerator(true);

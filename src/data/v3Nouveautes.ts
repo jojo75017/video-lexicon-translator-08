@@ -47,6 +47,15 @@ export const V3_TIER_COLOR: Record<V3NouveauteTier, string> = {
 
 /** Liste des nouveautés, ordre libre : l'affichage trie par date décroissante. */
 export const V3_NOUVEAUTES: V3Nouveaute[] = [
+  // --- Septembre 2026 ---
+  {
+    id: 'bd-comic',
+    title: 'Grande nouveauté V4 — Studio BD & Jeunesse',
+    desc: 'Personnages, planches de bande dessinée et histoires illustrées, prêtes pour Amazon KDP.',
+    to: '/bd-offre',
+    date: '2026-09-02',
+    tier: 'edition',
+  },
   // --- Août 2026 ---
   {
     id: 'contentstudio',

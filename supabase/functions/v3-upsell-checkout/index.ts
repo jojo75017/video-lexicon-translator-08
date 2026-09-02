@@ -34,6 +34,9 @@ const PACKS: Record<string, { label: string; amount: number }> = {
   short_stories: { label: "Histoires Courtes & Contes Illustrés — Accès à vie", amount: 2700 },
   "market-research": { label: "Pack Étude de Marché Pro", amount: 9700 },
   "documentation-studio": { label: "Documentation Studio AI", amount: 19700 },
+  // Studio BD & Jeunesse — offre d'entrée 17 € puis upsell Pro 47 €.
+  bd_comic: { label: "Studio BD & Jeunesse — Accès à vie", amount: 1700 },
+  bd_comic_pro: { label: "Studio BD & Jeunesse Pro — Illustrations étendues", amount: 4700 },
 };
 
 Deno.serve(async (req) => {

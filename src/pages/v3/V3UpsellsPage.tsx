@@ -8,6 +8,7 @@ import {
 import { V3_ADDON_LIST, V3_PLANS, formatPrice } from '@/data/v3Pricing';
 import V3UpsellPromoCard from '@/components/v3public/V3UpsellPromoCard';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
+import BdComicNewsBanner from '@/components/bd/BdComicNewsBanner';
 
 /** /v3/upsells — Compléments & options personnifiés, tous inclus dans le forfait Édition. */
 export default function V3UpsellsPage() {
@@ -36,6 +37,11 @@ export default function V3UpsellsPage() {
             est inclus dans le forfait Édition.
           </p>
         </header>
+
+        {/* Grande nouveauté V4 — Studio BD & Jeunesse */}
+        <div className="mb-8">
+          <BdComicNewsBanner compact />
+        </div>
 
         <section className="mb-10 overflow-hidden rounded-lg border" style={{ borderColor: 'var(--v3-line)' }}>
           <div className="px-4 py-3" style={{ background: 'var(--v3-cream)' }}>
