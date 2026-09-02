@@ -15,6 +15,8 @@ import { EbookBookMockup3D } from './EbookBookMockup3D';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
+import { useSheetsAutosave } from '@/hooks/useSheetsAutosave';
+
 
 const RECIPE_HISTORY_STORAGE_KEY = 'recipe_generator:last_dish_names:v1';
 
