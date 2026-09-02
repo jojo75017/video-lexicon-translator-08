@@ -2031,10 +2031,27 @@ Bubble points to ${panel.character}.` : ''}
                               className="w-full aspect-square object-cover rounded-t-md border-2 border-foreground/80 shadow-md"
                             />
                           ) : (
-                            <div className="w-full aspect-square bg-muted flex items-center justify-center rounded-t-md border-2 border-dashed border-foreground/40">
-                              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                            <div className="w-full aspect-square bg-muted flex flex-col items-center justify-center gap-2 rounded-t-md border-2 border-dashed border-destructive/50 p-2 text-center">
+                              {regeneratingPanel === `${index}-${panelIdx}` ? (
+                                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                              ) : (
+                                <>
+                                  <AlertTriangle className="h-5 w-5 text-destructive" />
+                                  <p className="text-[10px] text-muted-foreground leading-tight">Image non générée</p>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="h-7 text-[10px] px-2"
+                                    onClick={() => regeneratePanel(index, panelIdx)}
+                                  >
+                                    <RefreshCw className="h-3 w-3 mr-1" />
+                                    Régénérer cette case
+                                  </Button>
+                                </>
+                              )}
                             </div>
                           )}
+
                           {/* Badge numéro de case */}
                           <div className="absolute top-1 left-1 bg-foreground/70 text-background text-xs px-1.5 py-0.5 rounded">
                             {panelIdx + 1}
