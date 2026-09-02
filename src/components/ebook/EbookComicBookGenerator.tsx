@@ -199,10 +199,12 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
   const hasUserImageKey = Boolean(imageKeys.gemini || imageKeys.openai || imageKeys.openrouter);
   const useOpenAI = hasUserImageKey && isUserKeyValid !== false;
 
-  // Payload de clés envoyé à la fonction d'images
+  // Payload de clés envoyé à la fonction d'images.
+  // allowLovable: false => jamais de bascule sur les crédits inclus Lovable.
   const imageKeyPayload = () => ({
     useOpenAI: hasUserImageKey,
     imageEngine,
+    allowLovable: false,
     openaiApiKey: imageKeys.openai,
     userGeminiApiKey: imageKeys.gemini,
     openrouterApiKey: imageKeys.openrouter,
@@ -216,6 +218,12 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
     prompt: string,
     stylePrompt: string
   ): Promise<{ url: string; error?: string }> => {
+    if (!hasUserImageKey) {
+      return {
+        url: '',
+        error: 'Aucune clé IA enregistrée (Gemini, OpenAI ou OpenRouter) : les images ne peuvent pas être générées.',
+      };
+    }
     try {
       const { data, error } = await supabase.functions.invoke('generate-chapter-images', {
         body: {
@@ -230,10 +238,22 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
           ...imageKeyPayload(),
         },
       });
+      const payloadError: string | undefined =
+        (data as any)?.error ||
+        ((error as any)?.context?.body
+          ? (() => {
+              try {
+                return JSON.parse((error as any).context.body)?.error;
+              } catch {
+                return undefined;
+              }
+            })()
+          : undefined);
+      if (payloadError) return { url: '', error: payloadError };
       if (error) throw error;
       const url: string = data?.imageUrl || data?.url || '';
       if (!url || data?.isPlaceholder) {
-        const reason = data?.providerError || 'Aucune image générée (clé refusée ou crédits épuisés)';
+        const reason = data?.providerError || 'Aucune image générée (clé refusée par le fournisseur)';
         return { url: '', error: reason };
       }
       return { url };
