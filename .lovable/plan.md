@@ -57,4 +57,6 @@ Recommandation : option 1 (vous m'envoyez une piste calme, piano/cordes, sans pe
 ## Ce que je vous demande de choisir
 
 1. Vidéo longue 7 min sous-titrée, ou 3 vidéos courtes ?
-2. Quelle amélioration V3 attaque-t-on en premier (1 à 5) ?
+2. Musique : vous fournissez une piste, ou vidéo muette ?
+3. Quelle amélioration V3 attaque-t-on en premier (1 à 5) ?
+
