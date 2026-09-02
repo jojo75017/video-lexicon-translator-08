@@ -4,3 +4,7 @@
 - [x] Lecture aérée (aperçu + application au manuscrit)
 - [x] 4ᵉ de couverture retenue sauvegardée et insérée à l'export
 - [ ] Signalé par Georges : « je n'ai plus ma page » — vérifié, aucune erreur de build/runtime ; cause probable = session déconnectée (redirection vers /connexion-abonne). À reconfirmer côté abonné.
+
+## Vidéo V3 (02/09/2026)
+- [ ] Vidéo animée 7 min sous-titrée (script docs/video-v3-script.md), muette, rendu Remotion par segments → MP4 /mnt/documents/
+- [ ] Améliorations V3 : attendre le choix de Georges (parcours abonné / fiabilité / clés & coûts / onboarding / vitrine)
