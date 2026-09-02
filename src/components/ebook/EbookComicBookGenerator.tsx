@@ -1534,10 +1534,9 @@ Bubble points to ${panel.character}.` : ''}
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="auto">Auto (recommandé)</SelectItem>
-                <SelectItem value="gemini" disabled={!imageKeys.gemini}>Gemini (clé abonné)</SelectItem>
-                <SelectItem value="openai" disabled={!imageKeys.openai}>OpenAI (clé abonné)</SelectItem>
-                <SelectItem value="openrouter" disabled={!imageKeys.openrouter}>OpenRouter (clé abonné)</SelectItem>
-                <SelectItem value="lovable">Crédits inclus (Lovable AI)</SelectItem>
+                <SelectItem value="gemini" disabled={!imageKeys.gemini}>Gemini · Nano Banana (votre clé)</SelectItem>
+                <SelectItem value="openai" disabled={!imageKeys.openai}>OpenAI (votre clé)</SelectItem>
+                <SelectItem value="openrouter" disabled={!imageKeys.openrouter}>OpenRouter (votre clé)</SelectItem>
               </SelectContent>
             </Select>
           </div>
