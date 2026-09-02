@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { ExternalLink, Eye, EyeOff, Loader2, RefreshCw, ShieldCheck, Trash2 } from 'lucide-react';
+import { Copy, ExternalLink, Eye, EyeOff, Loader2, RefreshCw, ShieldCheck, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +11,7 @@ import {
   isPreviewingAsSubscriber,
   setPreviewingAsSubscriber,
 } from '@/components/v3/V3ContemplationMode';
+import { BD_VSL_SCRIPT, BD_VSL_VOICEOVER_FULL } from '@/data/bdVslScript';
 
 type EntitlementRow = {
   module: string;
