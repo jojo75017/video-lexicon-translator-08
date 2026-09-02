@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
 import { useSheetsAutosave } from '@/hooks/useSheetsAutosave';
+import { exportEbookToDocx, type DocxSection, type DocxBlock } from '@/lib/ebookDocxExporter';
 
 
 const RECIPE_HISTORY_STORAGE_KEY = 'recipe_generator:last_dish_names:v1';
