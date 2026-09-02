@@ -978,7 +978,97 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
     toast.success('Fiche copiée !');
   };
 
+  // Export Word (DOCX)
+  const exportToDocx = async () => {
+    if (sheets.length === 0) {
+      toast.error('Générez d\'abord des fiches');
+      return;
+    }
+    setIsExportingDocx(true);
+    try {
+      const sections: DocxSection[] = sheets.map((sheet) => {
+        const blocks: DocxBlock[] = [];
+        if (sheet.description) blocks.push({ text: sheet.description });
+        if (sheet.history) blocks.push({ heading: 'Histoire et culture', text: sheet.history });
+        blocks.push({
+          heading: 'Informations pratiques',
+          text: [
+            sheet.country && `Pays : ${sheet.country}`,
+            sheet.region && `Région : ${sheet.region}`,
+            sheet.population && `Population : ${sheet.population}`,
+            sheet.language && `Langue : ${sheet.language}`,
+            sheet.currency && `Monnaie : ${sheet.currency}`,
+            sheet.climate && `Climat : ${sheet.climate}`,
+            sheet.bestSeason && `Meilleure saison : ${sheet.bestSeason}`,
+          ].filter(Boolean).join('\n'),
+        });
+        if (sheet.mainDish || sheet.dishDescription || sheet.localSpecialties?.length) {
+          blocks.push({
+            heading: 'Gastronomie',
+            text: [
+              sheet.mainDish && `Plat emblématique : ${sheet.mainDish}`,
+              sheet.dishDescription,
+              sheet.localSpecialties?.length ? sheet.localSpecialties.map((s) => `• ${s}`).join('\n') : '',
+            ].filter(Boolean).join('\n'),
+          });
+        }
+        if (sheet.accommodations || sheet.whereToStay) {
+          blocks.push({
+            heading: 'Où dormir',
+            text: [
+              sheet.accommodations?.budget && `Petit budget : ${sheet.accommodations.budget}`,
+              sheet.accommodations?.midRange && `Milieu de gamme : ${sheet.accommodations.midRange}`,
+              sheet.accommodations?.luxury && `Luxe : ${sheet.accommodations.luxury}`,
+              sheet.whereToStay,
+            ].filter(Boolean).join('\n'),
+          });
+        }
+        if (sheet.mustSee?.length) {
+          blocks.push({ heading: 'À ne pas manquer', text: sheet.mustSee.map((s) => `• ${s}`).join('\n') });
+        }
+        if (sheet.hiddenGems?.length) {
+          blocks.push({ kind: 'callout', variant: 'saviez-vous', title: 'Trésors cachés', body: sheet.hiddenGems.join(' · ') });
+        }
+        if (sheet.activities?.length) {
+          blocks.push({ heading: 'Activités recommandées', text: sheet.activities.map((s) => `• ${s}`).join('\n') });
+        }
+        if (sheet.transportation) blocks.push({ heading: 'Se déplacer', text: sheet.transportation });
+        if (sheet.travelTips) blocks.push({ kind: 'callout', variant: 'conseil', title: 'Conseils de voyage', body: sheet.travelTips });
+        if (sheet.faq?.length) {
+          blocks.push({
+            heading: 'Questions fréquentes',
+            text: sheet.faq.map((f) => `${f.question}\n${f.answer}`).join('\n\n'),
+          });
+        }
+        return {
+          title: sheet.destinationName,
+          subtitle: [sheet.country, sheet.region].filter(Boolean).join(' · ') || undefined,
+          imageUrl: sheet.imageUrl,
+          blocks,
+        };
+      });
+
+      const slug = (guideTitle || 'guide-de-voyage')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9]+/g, '-').replace(/(^-|-$)/g, '').toLowerCase() || 'guide-de-voyage';
+
+      await exportEbookToDocx({
+        filename: `${slug}.docx`,
+        documentTitle: guideTitle || 'Mon guide de voyage',
+        documentSubtitle: authorName ? `par ${authorName}` : undefined,
+        sections,
+      });
+      toast.success('Word (DOCX) téléchargé ✓');
+    } catch (e: any) {
+      console.error('[Voyage] export docx', e);
+      toast.error(e?.message || "L'export Word a échoué");
+    } finally {
+      setIsExportingDocx(false);
+    }
+  };
+
   // Export to PDF - Fixed for emoji support and cross-origin images
+
   const exportToPDF = async () => {
     if (sheets.length === 0) {
       toast.error('Générez d\'abord des fiches');
