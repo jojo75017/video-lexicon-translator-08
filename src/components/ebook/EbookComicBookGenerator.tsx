@@ -892,6 +892,9 @@ Bubble points to ${panelData.character}.` : ''}
     setIsGenerating(true);
     setGeneratedPages([]);
     setCurrentProgress(0);
+    imageFailuresRef.current = { count: 0, reason: '' };
+    setImageErrors(null);
+
 
     const BATCH_SIZE = 3;
     const totalPages = scenario.pages.length;
