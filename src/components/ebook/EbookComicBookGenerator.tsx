@@ -605,87 +605,29 @@ Réponds UNIQUEMENT avec un tableau JSON de 20 strings, sans explication:
       const selectedTemplate = STORY_TEMPLATES.find(t => t.value === storyTemplate);
       const selectedGenre = GENRES.find(g => g.value === genre);
       const selectedAge = AGE_GROUPS.find(a => a.value === ageGroup);
-
       const heroName = (mainCharacter || 'Le héros').trim();
-      
-      // Auto-générer la description si non fournie
       const autoDescription = customPrompt?.trim() || `Une aventure captivante intitulée "${title}" dans un style ${selectedGenre?.label || 'aventure'} pour ${selectedAge?.label || 'enfants'}`;
-
       const selectedLayout = PANEL_LAYOUTS.find(l => l.value === panelLayout);
       const panelCount = selectedLayout?.panelsPerPage || 4;
 
-      const prompt = `Tu es un scénariste de bandes dessinées pour enfants. Crée un scénario de BD en ${numberOfPages} pages, avec EXACTEMENT ${panelCount} cases par page.
-
-INFORMATIONS:
-- Titre: "${title}"
-- Description: ${autoDescription}
-- Genre: ${selectedGenre?.label || genre}
-- Public: ${selectedAge?.label} (${selectedAge?.description})
-- Personnage principal: ${heroName}
-${characterDescription ? `- Description du personnage: ${characterDescription}` : ''}
-${setting ? `- Univers/Décor: ${setting}` : ''}
-- Structure narrative: ${selectedTemplate?.label} - ${selectedTemplate?.structure?.join(' → ')}
-
-MISSION: Invente une histoire complète avec des dialogues pour CHAQUE case.
-
-IMPORTANT:
-- Chaque page DOIT avoir EXACTEMENT ${panelCount} objets dans "panels"
-- Chaque case a sa propre description visuelle ET son dialogue court (max 50 car.)
-- Varier les personnages qui parlent
-
-Réponds en JSON:
-{
-  "pages": [
-    {
-      "panels": [
-        { "description": "Description visuelle...", "character": "Nom", "dialogue": "Ce qu'il dit" }
-      ]
-    }
-  ]
-}`;
-
-      const { data, error } = await supabase.functions.invoke('generate-content', {
-        body: {
-          type: 'comic-scenario',
-          prompt,
-          // Passer la clé Gemini utilisateur pour éviter les limites Lovable AI
-          useOpenAI: useOpenAI,
-          openaiApiKey: userApiKey || undefined,
-        }
+      const pages = await buildComicScenario({
+        title,
+        description: autoDescription,
+        genre: selectedGenre?.label || genre,
+        audience: `${selectedAge?.label || '7-10 ans'} (${selectedAge?.description || ''})`,
+        heroName,
+        characterDescription,
+        setting,
+        structure: selectedTemplate?.structure,
+        numberOfPages,
+        panelCount,
+        useOpenAI,
+        openaiApiKey: userApiKey || undefined,
+        onProgress: (done, total) => toast.info(`Scénario : ${done}/${total} pages écrites`),
       });
 
-      // Fallback sans IA si crédits épuisés / erreur
-      if (error) {
-        const status = (error as any)?.status;
-        const message = (error as any)?.message || '';
-        if (status === 402 || String(message).includes('Crédits')) {
-          const fallback = buildFallbackScenario();
-          setScenario(fallback);
-          toast.warning('Crédits IA épuisés : scénario de base généré automatiquement.');
-          return;
-        }
-        throw error;
-      }
-
-      let parsedScenario;
-      try {
-        const content = data.content || data.text || data;
-        const jsonMatch = String(content).match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          parsedScenario = JSON.parse(jsonMatch[0]);
-        } else {
-          throw new Error('Format JSON invalide');
-        }
-      } catch {
-        // Si l'IA renvoie un JSON imparfait, on ne bloque pas : on génère un scénario de base.
-        const fallback = buildFallbackScenario();
-        setScenario(fallback);
-        toast.warning('Scénario IA difficile à parser : scénario de base généré automatiquement.');
-        return;
-      }
-
-      setScenario(parsedScenario);
-      toast.success(`Scénario de ${parsedScenario.pages.length} pages généré !`);
+      setScenario({ pages });
+      toast.success(`Scénario cohérent de ${pages.length} pages généré !`);
 
     } catch (error: any) {
       console.error('Erreur génération scénario:', error);
@@ -696,6 +638,7 @@ Réponds en JSON:
       setIsGeneratingScenario(false);
     }
   };
+
 
   // Générer une description visuelle cohérente du personnage avec détails précis
   const generateVisualReference = (): string => {
