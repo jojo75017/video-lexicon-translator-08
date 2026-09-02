@@ -21,6 +21,8 @@ import { BDTemplatesSelector } from './BDTemplatesSelector';
 import { BD_ART_STYLES, BD_STORY_TEMPLATES, BDTemplate } from '@/data/bdTemplates';
 import { getProviderKey } from '@/services/aiWritingService';
 import { getOpenRouterImageKey } from '@/lib/ebookExportOptions';
+import { buildComicScenario } from '@/lib/bd/comicScenario';
+
 
 type ImageEngine = 'auto' | 'gemini' | 'openai' | 'openrouter' | 'lovable';
 
