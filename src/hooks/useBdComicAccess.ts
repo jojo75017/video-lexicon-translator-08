@@ -105,7 +105,7 @@ export function useBdComicAccess() {
     } finally {
       setLoading(false);
     }
-  }, [isAdmin, isChecking]);
+  }, [isAdmin, isChecking, previewAsSubscriber]);
 
   useEffect(() => {
     void check();
