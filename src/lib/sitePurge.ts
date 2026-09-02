@@ -8,7 +8,7 @@
  * Runs once per browser thanks to a version flag in localStorage.
  * Bump PURGE_VERSION any time you need to force another global purge.
  */
-export const PURGE_VERSION = "v3-audit-2026-08-14";
+export const PURGE_VERSION = "v4-bd-tunnel-2026-09-02";
 const PURGE_KEY = "ebookstudio_site_purge_version";
 
 export const runSiteWidePurge = async (): Promise<void> => {
