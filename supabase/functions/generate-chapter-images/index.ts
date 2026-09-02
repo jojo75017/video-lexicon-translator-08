@@ -830,8 +830,12 @@ Instructions de génération:
 
       if (!response || !response.ok) {
         if (!response) {
-          console.error('LOVABLE_API_KEY missing, trying user keys...');
-          providerError = providerError || 'LOVABLE_API_KEY manquante';
+          if (!allowLovable) {
+            console.log('allowLovable=false : aucune bascule vers les crédits Lovable');
+          } else {
+            console.error('LOVABLE_API_KEY missing, trying user keys...');
+            providerError = providerError || 'LOVABLE_API_KEY manquante';
+          }
         } else if (response.status === 429 || response.status === 402) {
           console.log('Lovable AI credits/rate limit reached, trying user keys...');
           providerError = response.status === 402
@@ -842,10 +846,27 @@ Instructions de génération:
           console.error('AI Gateway error:', response.status, errorText);
           providerError = `Lovable AI ${response.status}`;
         }
-        providerFallback = true;
+        if (allowLovable) providerFallback = true;
         const img = await tryUserKeys(imagePrompt);
         if (img) {
           generatedImageUrl = img;
+        } else if (!allowLovable) {
+          // Aucune clé abonné n'a fonctionné : échec explicite, pas de placeholder
+          // et surtout aucun crédit Lovable consommé.
+          const hasAnyKey = !!(resolvedKeys.gemini || resolvedKeys.openai || resolvedKeys.openrouter);
+          return new Response(
+            JSON.stringify({
+              error: hasAnyKey
+                ? (providerError || 'Votre clé IA a été refusée pour la génération d\'images.')
+                : 'Aucune clé IA valide enregistrée (Gemini, OpenAI ou OpenRouter).',
+              reason: hasAnyKey ? 'provider_failed' : 'no_key',
+              provider: null,
+              providerError,
+              imageUrl: '',
+              chapterTitle,
+            }),
+            { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
         } else {
           usedProvider = 'placeholder';
           generatedImageUrl = getPlaceholderUrl(chapterTitle, style, colorScheme);
