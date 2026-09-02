@@ -920,6 +920,8 @@ Bubble points to ${panelData.character}.` : ''}
       }
 
       toast.success(`${allPages.length} pages de BD générées avec succès !`);
+      reportImageFailures(allPages);
+
 
     } catch (error) {
       console.error('Erreur génération BD:', error);
