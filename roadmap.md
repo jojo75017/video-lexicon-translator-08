@@ -8,3 +8,5 @@
 ## Vidéo V3 (02/09/2026)
 - [ ] Vidéo animée 7 min sous-titrée (script docs/video-v3-script.md), muette, rendu Remotion par segments → MP4 /mnt/documents/
 - [ ] Améliorations V3 : attendre le choix de Georges (parcours abonné / fiabilité / clés & coûts / onboarding / vitrine)
+
+- [x] Vidéo V3 7 min sous-titrée rendue (/mnt/documents/ebookstudio-v3-presentation.mp4, 6:47, 1080p, muette)
