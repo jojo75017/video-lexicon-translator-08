@@ -1,4 +1,4 @@
-import { Send, BarChart3, BookOpen, Contact, CreditCard, FileText, Gauge, Mail, Megaphone, MessageSquare, Rocket, Shield, Snowflake, Table, Ticket, TrendingUp, User, Users, BookMarked } from 'lucide-react';
+import { Send, BarChart3, BookOpen, Contact, CreditCard, FileText, Gauge, Mail, Megaphone, MessageSquare, Palette, Rocket, Shield, Snowflake, Table, Ticket, TrendingUp, User, Users, BookMarked } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -31,6 +31,7 @@ const adminNavItems: AdminNavItem[] = [
   { label: 'Campagnes', path: '/admin/campagnes', icon: Send, exact: true },
   { label: 'Attente', path: '/admin/attente', icon: Snowflake, exact: true },
   { label: 'Tester PayPal', path: '/admin/tester-paypal', icon: CreditCard, exact: true },
+  { label: 'Tester BD', path: '/admin/tester-bd', icon: Palette, exact: true },
 ];
 
 interface AdminPanelNavProps {
