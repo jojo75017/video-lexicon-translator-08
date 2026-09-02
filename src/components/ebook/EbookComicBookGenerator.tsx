@@ -19,6 +19,22 @@ import { KdpQuickTools } from './KdpQuickTools';
 import SpecializedAmazonPreview from './SpecializedAmazonPreview';
 import { BDTemplatesSelector } from './BDTemplatesSelector';
 import { BD_ART_STYLES, BD_STORY_TEMPLATES, BDTemplate } from '@/data/bdTemplates';
+import { getProviderKey } from '@/services/aiWritingService';
+import { getOpenRouterImageKey } from '@/lib/ebookExportOptions';
+
+type ImageEngine = 'auto' | 'gemini' | 'openai' | 'openrouter' | 'lovable';
+
+// Détecte le VRAI fournisseur d'une clé (évite d'envoyer une clé Gemini chez OpenAI)
+const detectKeyProvider = (key?: string | null): 'gemini' | 'openai' | 'openrouter' | 'unknown' => {
+  const k = (key || '').trim();
+  if (!k) return 'unknown';
+  if (k.startsWith('sk-or-')) return 'openrouter';
+  if (k.startsWith('sk-')) return 'openai';
+  if (k.startsWith('AIza')) return 'gemini';
+  if (/^[A-Za-z0-9_-]{30,}$/.test(k)) return 'gemini';
+  return 'unknown';
+};
+
 
 interface SavedComicBook {
   id: string;
@@ -160,9 +176,89 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
   const [setting, setSetting] = useState('');
   const [customPrompt, setCustomPrompt] = useState('');
 
-  // Clé Gemini utilisateur (fallback fiable si les crédits image internes sont épuisés)
+  // Clés utilisateur (BYOK) — routées vers le BON fournisseur
   const { apiKey: userApiKey, isValid: isUserKeyValid } = useOpenAIConfig();
-  const useOpenAI = Boolean(userApiKey) && isUserKeyValid === true;
+  const [imageEngine, setImageEngine] = useState<ImageEngine>('auto');
+  const [imageErrors, setImageErrors] = useState<{ count: number; reason: string } | null>(null);
+  const [regeneratingPanel, setRegeneratingPanel] = useState<string | null>(null);
+
+  // Clés disponibles, classées par fournisseur réel
+  const imageKeys = React.useMemo(() => {
+    const raw = [userApiKey, getProviderKey('gemini'), getProviderKey('openai'), getOpenRouterImageKey()];
+    try { raw.push(getProviderKey('openrouter' as never)); } catch { /* provider optionnel */ }
+    const found: Record<string, string> = {};
+    for (const k of raw) {
+      const key = (k || '').trim();
+      if (key.length < 10) continue;
+      const p = detectKeyProvider(key);
+      if (p !== 'unknown' && !found[p]) found[p] = key;
+    }
+    return found as { gemini?: string; openai?: string; openrouter?: string };
+  }, [userApiKey]);
+
+  const hasUserImageKey = Boolean(imageKeys.gemini || imageKeys.openai || imageKeys.openrouter);
+  const useOpenAI = hasUserImageKey && isUserKeyValid !== false;
+
+  // Payload de clés envoyé à la fonction d'images
+  const imageKeyPayload = () => ({
+    useOpenAI: hasUserImageKey,
+    imageEngine,
+    openaiApiKey: imageKeys.openai,
+    userGeminiApiKey: imageKeys.gemini,
+    openrouterApiKey: imageKeys.openrouter,
+  });
+
+  // Suivi des échecs d'images (visible pour l'abonné au lieu d'un silence)
+  const imageFailuresRef = React.useRef<{ count: number; reason: string }>({ count: 0, reason: '' });
+
+  const requestPanelImage = async (
+    label: string,
+    prompt: string,
+    stylePrompt: string
+  ): Promise<{ url: string; error?: string }> => {
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-chapter-images', {
+        body: {
+          chapterTitle: label,
+          ebookTitle: title || 'Bande Dessinée',
+          style: stylePrompt,
+          ratio: 'square',
+          quality: 'hd',
+          colorScheme: colorMode === 'bw' ? 'monochrome' : colorMode,
+          customPrompt: prompt,
+          seed: visualSeed || undefined,
+          ...imageKeyPayload(),
+        },
+      });
+      if (error) throw error;
+      const url: string = data?.imageUrl || data?.url || '';
+      if (!url || data?.isPlaceholder) {
+        const reason = data?.providerError || 'Aucune image générée (clé refusée ou crédits épuisés)';
+        return { url: '', error: reason };
+      }
+      return { url };
+    } catch (err) {
+      return { url: '', error: err instanceof Error ? err.message : 'Erreur inconnue' };
+    }
+  };
+
+  // Bilan visible des cases sans image
+  const reportImageFailures = (pages: ComicPage[]) => {
+    const total = pages.reduce((n, p) => n + p.panels.length, 0);
+    const failed = pages.reduce((n, p) => n + p.panels.filter(x => !x.imageUrl).length, 0);
+    if (failed > 0) {
+      const reason = imageFailuresRef.current.reason || 'Fournisseur d\'images indisponible';
+      setImageErrors({ count: failed, reason });
+      toast.error(`${failed} case(s) sur ${total} sans image`, { description: reason });
+    } else {
+      setImageErrors(null);
+    }
+  };
+
+
+
+
+
   
   // Cohérence visuelle
   const [visualSeed, setVisualSeed] = useState<string>('');
@@ -747,28 +843,21 @@ Bubble points to ${panelData.character}.` : ''}
             await new Promise(resolve => setTimeout(resolve, 1500));
           }
 
-          const { data: imageData, error: imageError } = await supabase.functions.invoke('generate-chapter-images', {
-            body: {
-              chapterTitle: `Page ${pageIndex + 1} Panel ${panelIndex + 1}`,
-              ebookTitle: title || 'Bande Dessinée',
-              style: artStylePrompt,
-              ratio: 'square',
-              quality: 'hd',
-              colorScheme: colorMode === 'bw' ? 'monochrome' : colorMode,
-              customPrompt: imagePrompt,
-              seed: visualSeed || undefined,
-              useOpenAI,
-              openaiApiKey: useOpenAI ? userApiKey : undefined,
-            }
-          });
+          const result = await requestPanelImage(
+            `Page ${pageIndex + 1} Panel ${panelIndex + 1}`,
+            imagePrompt,
+            artStylePrompt
+          );
 
-          if (imageError) throw imageError;
-
-          const url = imageData?.imageUrl || imageData?.url || '';
+          if (!result.url) {
+            imageFailuresRef.current.count += 1;
+            imageFailuresRef.current.reason = result.error || imageFailuresRef.current.reason;
+            console.error(`Case ${panelIndex + 1} sans image:`, result.error);
+          }
 
           panels.push({
             id: `panel-${pageIndex}-${panelIndex}`,
-            imageUrl: url,
+            imageUrl: result.url,
             dialogue: panelData.dialogue,
             character: panelData.character,
             action: panelData.description,
@@ -779,6 +868,8 @@ Bubble points to ${panelData.character}.` : ''}
 
         } catch (err) {
           console.error(`Erreur panel ${panelIndex + 1}:`, err);
+          imageFailuresRef.current.count += 1;
+          imageFailuresRef.current.reason = err instanceof Error ? err.message : 'Erreur inconnue';
           panels.push({
             id: `panel-${pageIndex}-${panelIndex}`,
             imageUrl: '',
@@ -787,6 +878,7 @@ Bubble points to ${panelData.character}.` : ''}
             action: panelData.description,
           });
         }
+
       }
 
       if (pageIndex === 0 && !visualSeed) {
@@ -815,6 +907,9 @@ Bubble points to ${panelData.character}.` : ''}
     setIsGenerating(true);
     setGeneratedPages([]);
     setCurrentProgress(0);
+    imageFailuresRef.current = { count: 0, reason: '' };
+    setImageErrors(null);
+
 
     const BATCH_SIZE = 3;
     const totalPages = scenario.pages.length;
@@ -840,6 +935,8 @@ Bubble points to ${panelData.character}.` : ''}
       }
 
       toast.success(`${allPages.length} pages de BD générées avec succès !`);
+      reportImageFailures(allPages);
+
 
     } catch (error) {
       console.error('Erreur génération BD:', error);
@@ -860,7 +957,10 @@ Bubble points to ${panelData.character}.` : ''}
 
     setIsGeneratingAll(true);
     setGenerationStep('scenario');
+    imageFailuresRef.current = { count: 0, reason: '' };
+    setImageErrors(null);
     setGeneratedPages([]);
+
     setCurrentProgress(0);
 
     try {
@@ -953,6 +1053,8 @@ Réponds en JSON:
       }
 
       toast.success(`🎉 BD complète générée : ${allPages.length} pages !`);
+      reportImageFailures(allPages);
+
 
     } catch (error: any) {
       console.error('Erreur génération complète:', error);
@@ -1188,6 +1290,64 @@ Réponds en JSON:
     }
   };
 
+  // Régénérer UNE case précise (utile quand une seule image a échoué)
+  const regeneratePanel = async (pageIndex: number, panelIdx: number) => {
+    const page = generatedPages[pageIndex];
+    const panel = page?.panels?.[panelIdx];
+    if (!panel) return;
+
+    const panelKey = `${pageIndex}-${panelIdx}`;
+    setRegeneratingPanel(panelKey);
+    try {
+      const artStylePrompt = getArtStylePrompt();
+      const colorPrompt = getColorModePrompt();
+      const visualRef = generateVisualReference();
+      const dialogueText = (panel.dialogue || '').substring(0, 60);
+      const prompt = `SINGLE COMIC PANEL - Panel ${panelIdx + 1}, Page ${pageIndex + 1}
+
+=== STYLE ===
+${artStylePrompt}
+${colorPrompt}
+${visualRef}
+
+=== SCENE ===
+${panel.action}
+
+${dialogueText ? `=== SPEECH BUBBLE ===
+Draw a WHITE speech bubble with BLACK outline.
+Inside write: "${dialogueText}"
+Bubble points to ${panel.character}.` : ''}
+
+=== RULES ===
+- Professional comic art, child-friendly
+- Same character design on every panel
+- Clear composition, square format`;
+
+      const result = await requestPanelImage(
+        `Page ${pageIndex + 1} Panel ${panelIdx + 1}`,
+        prompt,
+        artStylePrompt
+      );
+
+      if (!result.url) {
+        toast.error('Case non générée', { description: result.error });
+        return;
+      }
+
+      const updated = [...generatedPages];
+      const panels = [...updated[pageIndex].panels];
+      panels[panelIdx] = { ...panels[panelIdx], imageUrl: result.url };
+      updated[pageIndex] = { ...updated[pageIndex], panels };
+      setGeneratedPages(updated);
+      reportImageFailures(updated);
+      toast.success(`Case ${panelIdx + 1} régénérée !`);
+    } finally {
+      setRegeneratingPanel(null);
+    }
+  };
+
+
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -1337,6 +1497,65 @@ Réponds en JSON:
           </CardContent>
         </Card>
       )}
+
+      {/* Moteur d'images + clés détectées */}
+      <Card className="border-border/60">
+        <CardContent className="py-4 space-y-3">
+          <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
+            <div className="flex-1 space-y-1">
+              <Label className="text-sm font-medium">Moteur d'images</Label>
+              <p className="text-xs text-muted-foreground">
+                Chaque clé est envoyée à son vrai fournisseur (une clé Gemini n'est jamais envoyée à OpenAI).
+              </p>
+            </div>
+            <Select value={imageEngine} onValueChange={(v) => setImageEngine(v as ImageEngine)}>
+              <SelectTrigger className="w-full md:w-64">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="auto">Auto (recommandé)</SelectItem>
+                <SelectItem value="gemini" disabled={!imageKeys.gemini}>Gemini (clé abonné)</SelectItem>
+                <SelectItem value="openai" disabled={!imageKeys.openai}>OpenAI (clé abonné)</SelectItem>
+                <SelectItem value="openrouter" disabled={!imageKeys.openrouter}>OpenRouter (clé abonné)</SelectItem>
+                <SelectItem value="lovable">Crédits inclus (Lovable AI)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Badge variant={imageKeys.gemini ? 'default' : 'outline'} className="text-xs">
+              Gemini {imageKeys.gemini ? '✓' : '—'}
+            </Badge>
+            <Badge variant={imageKeys.openai ? 'default' : 'outline'} className="text-xs">
+              OpenAI {imageKeys.openai ? '✓' : '—'}
+            </Badge>
+            <Badge variant={imageKeys.openrouter ? 'default' : 'outline'} className="text-xs">
+              OpenRouter {imageKeys.openrouter ? '✓' : '—'}
+            </Badge>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Bilan des images échouées */}
+      {imageErrors && imageErrors.count > 0 && (
+        <Card className="border-destructive/50 bg-destructive/5">
+          <CardContent className="py-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-destructive mt-0.5 flex-shrink-0" />
+              <div className="space-y-1">
+                <p className="font-medium text-destructive">
+                  {imageErrors.count} case(s) sans image
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Motif : {imageErrors.reason}. Vérifiez la clé sélectionnée dans « Moteur d'images »,
+                  puis utilisez le bouton <strong>Régénérer cette case</strong> sur chaque case vide.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+
 
       {/* Configuration */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -1812,10 +2031,27 @@ Réponds en JSON:
                               className="w-full aspect-square object-cover rounded-t-md border-2 border-foreground/80 shadow-md"
                             />
                           ) : (
-                            <div className="w-full aspect-square bg-muted flex items-center justify-center rounded-t-md border-2 border-dashed border-foreground/40">
-                              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                            <div className="w-full aspect-square bg-muted flex flex-col items-center justify-center gap-2 rounded-t-md border-2 border-dashed border-destructive/50 p-2 text-center">
+                              {regeneratingPanel === `${index}-${panelIdx}` ? (
+                                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                              ) : (
+                                <>
+                                  <AlertTriangle className="h-5 w-5 text-destructive" />
+                                  <p className="text-[10px] text-muted-foreground leading-tight">Image non générée</p>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="h-7 text-[10px] px-2"
+                                    onClick={() => regeneratePanel(index, panelIdx)}
+                                  >
+                                    <RefreshCw className="h-3 w-3 mr-1" />
+                                    Régénérer cette case
+                                  </Button>
+                                </>
+                              )}
                             </div>
                           )}
+
                           {/* Badge numéro de case */}
                           <div className="absolute top-1 left-1 bg-foreground/70 text-background text-xs px-1.5 py-0.5 rounded">
                             {panelIdx + 1}

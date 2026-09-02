@@ -99,9 +99,62 @@ INSTRUCTIONS CRITIQUES POUR RÉALISME HUMAIN:
   return '';
 };
 
+// Détecte le fournisseur réel d'une clé API d'après son préfixe.
+// Évite d'envoyer une clé Gemini (AIza…) chez OpenAI (erreur 401 systématique).
+type KeyProvider = 'gemini' | 'openai' | 'openrouter' | 'unknown';
+function detectKeyProvider(key?: string | null): KeyProvider {
+  const k = (key || '').trim();
+  if (!k) return 'unknown';
+  if (k.startsWith('sk-or-')) return 'openrouter';
+  if (k.startsWith('sk-')) return 'openai';
+  if (k.startsWith('AIza')) return 'gemini';
+  // Clés Google AI Studio / Cloud récentes : pas de préfixe AIza, mais jamais sk-
+  if (/^[A-Za-z0-9_\-]{30,}$/.test(k)) return 'gemini';
+  return 'unknown';
+}
+
+// Génération d'image via OpenRouter (BYOK abonné) — modèles Gemini image.
+async function tryOpenRouterImage(prompt: string, apiKey?: string): Promise<string | null> {
+  if (!apiKey || !apiKey.startsWith('sk-or-')) return null;
+  const models = ['google/gemini-2.5-flash-image-preview', 'google/gemini-2.0-flash-exp:free'];
+  for (const model of models) {
+    try {
+      const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://ebookstudio.fr',
+          'X-Title': 'EbookStudio',
+        },
+        body: JSON.stringify({
+          model,
+          messages: [{ role: 'user', content: prompt }],
+          modalities: ['image', 'text'],
+        }),
+      });
+      if (!r.ok) {
+        const t = await r.text();
+        console.error(`OpenRouter (${model}) ${r.status}:`, t.substring(0, 300));
+        continue;
+      }
+      const data = await r.json();
+      const url = data?.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+      if (typeof url === 'string' && url.startsWith('data:image')) return url;
+      const content = data?.choices?.[0]?.message?.content;
+      if (typeof content === 'string' && content.startsWith('data:image')) return content;
+      console.error(`OpenRouter (${model}) : aucune image dans la réponse`);
+    } catch (e) {
+      console.error(`OpenRouter (${model}) error:`, e);
+    }
+  }
+  return null;
+}
+
 // Direct call to Google Gemini image generation API using user's BYOK key
 async function tryGeminiDirect(prompt: string, apiKey?: string): Promise<string | null> {
-  if (!apiKey || !apiKey.startsWith('AIza')) return null;
+  if (!apiKey || detectKeyProvider(apiKey) !== 'gemini') return null;
+
   const models = ['gemini-2.5-flash-image', 'gemini-2.5-flash-image-preview'];
   for (const model of models) {
     try {
@@ -527,6 +580,9 @@ serve(async (req) => {
       useOpenAI = false, 
       openaiApiKey, 
       userGeminiApiKey,
+      openrouterApiKey = null,
+      imageEngine = 'auto',
+
       disableOpenAIFallback = false, 
       forceLovable = false,
       uploadToStorage = true,
@@ -568,8 +624,67 @@ COHÉRENCE STRICTE ABSOLUE:
 - Les personnages sont des clones visuels parfaits entre les images`
     };
 
-    // Si useOpenAI est true et non forcé à Lovable, utiliser EXCLUSIVEMENT OpenAI
-    if (useOpenAI && openaiApiKey && !forceLovable) {
+    // ===== ROUTAGE PAR FOURNISSEUR (sécurité clés) =====
+    // On classe chaque clé reçue selon son VRAI fournisseur, quel que soit
+    // le champ dans lequel le client l'a envoyée. Une clé Gemini ne partira
+    // donc jamais chez OpenAI (cause des 401 + images vides du Studio BD).
+    const candidateKeys = [openaiApiKey, userGeminiApiKey, openrouterApiKey].filter(
+      (k: unknown): k is string => typeof k === 'string' && k.trim().length > 10
+    );
+    const resolvedKeys: Record<KeyProvider, string | undefined> = {
+      gemini: undefined, openai: undefined, openrouter: undefined, unknown: undefined,
+    };
+    for (const k of candidateKeys) {
+      const p = detectKeyProvider(k);
+      if (!resolvedKeys[p]) resolvedKeys[p] = k.trim();
+    }
+    const engine: string = ['auto', 'gemini', 'openai', 'openrouter', 'lovable'].includes(imageEngine)
+      ? imageEngine
+      : 'auto';
+    console.log('🔑 Clés détectées:', {
+      gemini: !!resolvedKeys.gemini,
+      openai: !!resolvedKeys.openai,
+      openrouter: !!resolvedKeys.openrouter,
+      engine,
+    });
+
+    let usedProvider: string = 'lovable';
+    let providerFallback = false;
+    let providerError: string | null = null;
+
+    const buildFallbackPrompt = () => isColoringBook
+      ? getColoringBookPrompt(chapterTitle, coloringBookAgeGroup)
+      : (customPrompt || `Illustration pour le chapitre "${chapterTitle}" du livre "${ebookTitle}". Style: ${style}.`);
+
+    // Essais BYOK dans l'ordre : fournisseur demandé, puis autres clés valides
+    const tryUserKeys = async (prompt: string, skip?: KeyProvider): Promise<string | null> => {
+      const order: KeyProvider[] = engine === 'gemini'
+        ? ['gemini', 'openrouter']
+        : engine === 'openrouter'
+          ? ['openrouter', 'gemini']
+          : ['gemini', 'openrouter'];
+      for (const p of order) {
+        if (p === skip) continue;
+        const key = resolvedKeys[p];
+        if (!key) continue;
+        const img = p === 'gemini'
+          ? await tryGeminiDirect(prompt, key)
+          : await tryOpenRouterImage(prompt, key);
+        if (img) {
+          usedProvider = p;
+          return img;
+        }
+        providerError = `Échec de génération via ${p}`;
+      }
+      return null;
+    };
+
+    const wantsOpenAI = !forceLovable && engine !== 'lovable' && !!resolvedKeys.openai &&
+      (engine === 'openai' || (engine === 'auto' && useOpenAI));
+    const wantsUserKeyFirst = !forceLovable && engine !== 'lovable' && !!(resolvedKeys.gemini || resolvedKeys.openrouter) &&
+      (engine === 'gemini' || engine === 'openrouter' || (engine === 'auto' && useOpenAI));
+
+    if (wantsOpenAI) {
       try {
         generatedImageUrl = await generateWithOpenAI(
           chapterTitle,
@@ -577,7 +692,7 @@ COHÉRENCE STRICTE ABSOLUE:
           ebookTitle,
           style,
           characters,
-          openaiApiKey,
+          resolvedKeys.openai!,
           ratio,
           quality,
           colorScheme,
@@ -588,15 +703,32 @@ COHÉRENCE STRICTE ABSOLUE:
           coloringBookAgeGroup,
           customPrompt
         );
+        usedProvider = 'openai';
       } catch (err) {
         console.error('OpenAI image generation failed, falling back:', err);
-        const fallbackPrompt = isColoringBook
-          ? getColoringBookPrompt(chapterTitle, coloringBookAgeGroup)
-          : (customPrompt || `Illustration pour le chapitre "${chapterTitle}" du livre "${ebookTitle}". Style: ${style}.`);
-        const geminiImg = await tryGeminiDirect(fallbackPrompt, userGeminiApiKey);
-        generatedImageUrl = geminiImg || getPlaceholderUrl(chapterTitle, style, colorScheme);
+        providerError = err instanceof Error ? err.message : 'Échec OpenAI';
+        providerFallback = true;
+        const img = await tryUserKeys(buildFallbackPrompt());
+        generatedImageUrl = img || getPlaceholderUrl(chapterTitle, style, colorScheme);
+        if (!img) usedProvider = 'placeholder';
+      }
+    } else if (wantsUserKeyFirst) {
+      // L'abonné a une clé Gemini et/ou OpenRouter : on l'utilise directement
+      const prompt = customPrompt || buildFallbackPrompt();
+      const img = await tryUserKeys(prompt);
+      if (img) {
+        generatedImageUrl = img;
+      } else {
+        providerFallback = true;
+        console.error('Clés abonné indisponibles, bascule vers Lovable AI');
+        generatedImageUrl = '';
       }
     } else {
+      generatedImageUrl = '';
+    }
+
+    if (!generatedImageUrl) {
+
       // Utiliser Lovable AI
       const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
@@ -696,15 +828,26 @@ Instructions de génération:
 
       if (!response || !response.ok) {
         if (!response) {
-          console.error('LOVABLE_API_KEY missing, trying user Gemini key...');
+          console.error('LOVABLE_API_KEY missing, trying user keys...');
+          providerError = providerError || 'LOVABLE_API_KEY manquante';
         } else if (response.status === 429 || response.status === 402) {
-          console.log('Lovable AI credits/rate limit reached, trying user Gemini key...');
+          console.log('Lovable AI credits/rate limit reached, trying user keys...');
+          providerError = response.status === 402
+            ? 'Crédits Lovable AI épuisés'
+            : 'Limite de débit Lovable AI atteinte';
         } else {
           const errorText = await response.text();
           console.error('AI Gateway error:', response.status, errorText);
+          providerError = `Lovable AI ${response.status}`;
         }
-        const geminiImg = await tryGeminiDirect(imagePrompt, userGeminiApiKey);
-        generatedImageUrl = geminiImg || getPlaceholderUrl(chapterTitle, style, colorScheme);
+        providerFallback = true;
+        const img = await tryUserKeys(imagePrompt);
+        if (img) {
+          generatedImageUrl = img;
+        } else {
+          usedProvider = 'placeholder';
+          generatedImageUrl = getPlaceholderUrl(chapterTitle, style, colorScheme);
+        }
       } else {
         // Réponse OK - extraire l'image base64 de la réponse Gemini
         const data = await response.json();
@@ -714,16 +857,25 @@ Instructions de génération:
         
         if (imageData) {
           generatedImageUrl = imageData;
+          usedProvider = 'lovable';
           console.log('Image extracted from Lovable AI response (base64 length:', imageData.length, ')');
         } else {
           // Fallback: vérifier d'autres formats de réponse possibles
           const content = data.choices?.[0]?.message?.content;
           if (typeof content === 'string' && content.startsWith('data:image')) {
             generatedImageUrl = content;
+            usedProvider = 'lovable';
           } else {
             console.error('No image in Lovable AI response:', JSON.stringify(data).substring(0, 500));
-            const geminiImg = await tryGeminiDirect(imagePrompt, userGeminiApiKey);
-            generatedImageUrl = geminiImg || getPlaceholderUrl(chapterTitle, style, colorScheme);
+            providerError = 'Aucune image renvoyée par Lovable AI';
+            providerFallback = true;
+            const img = await tryUserKeys(imagePrompt);
+            if (img) {
+              generatedImageUrl = img;
+            } else {
+              usedProvider = 'placeholder';
+              generatedImageUrl = getPlaceholderUrl(chapterTitle, style, colorScheme);
+            }
           }
         }
       }
@@ -746,16 +898,21 @@ Instructions de génération:
       console.log('Placeholder image detected, skipping storage upload');
     }
 
-    console.log('Image generated successfully');
+    console.log(`Image generated successfully (provider=${usedProvider}, fallback=${providerFallback})`);
     return new Response(
       JSON.stringify({ 
         imageUrl: finalImageUrl,
         chapterTitle,
         seed: typeof generatedSeed !== 'undefined' ? generatedSeed : null,
-        storedInCloud: uploadToStorage && finalImageUrl !== generatedImageUrl
+        storedInCloud: uploadToStorage && finalImageUrl !== generatedImageUrl,
+        provider: usedProvider,
+        fallback: providerFallback,
+        isPlaceholder,
+        providerError,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
+
 
   } catch (error) {
     console.error('Error in generate-chapter-images:', error);
