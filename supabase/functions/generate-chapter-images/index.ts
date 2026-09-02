@@ -155,7 +155,12 @@ async function tryOpenRouterImage(prompt: string, apiKey?: string): Promise<stri
 async function tryGeminiDirect(prompt: string, apiKey?: string): Promise<string | null> {
   if (!apiKey || detectKeyProvider(apiKey) !== 'gemini') return null;
 
-  const models = ['gemini-2.5-flash-image', 'gemini-2.5-flash-image-preview'];
+  // Nano Banana (2.5 flash image) d'abord : rapide et économique.
+  const models = [
+    'gemini-2.5-flash-image',
+    'gemini-2.5-flash-image-preview',
+    'gemini-3-pro-image-preview',
+  ];
   for (const model of models) {
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
@@ -582,6 +587,8 @@ serve(async (req) => {
       userGeminiApiKey,
       openrouterApiKey = null,
       imageEngine = 'auto',
+      // Studio BD : jamais de bascule vers les crédits Lovable inclus.
+      allowLovable = true,
 
       disableOpenAIFallback = false, 
       forceLovable = false,
@@ -729,8 +736,8 @@ COHÉRENCE STRICTE ABSOLUE:
 
     if (!generatedImageUrl) {
 
-      // Utiliser Lovable AI
-      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+      // Utiliser Lovable AI (jamais si allowLovable === false : Studio BD)
+      const LOVABLE_API_KEY = allowLovable ? Deno.env.get('LOVABLE_API_KEY') : null;
 
 
       // Ajouter les descriptions de personnages au prompt pour la cohérence
@@ -828,8 +835,12 @@ Instructions de génération:
 
       if (!response || !response.ok) {
         if (!response) {
-          console.error('LOVABLE_API_KEY missing, trying user keys...');
-          providerError = providerError || 'LOVABLE_API_KEY manquante';
+          if (!allowLovable) {
+            console.log('allowLovable=false : aucune bascule vers les crédits Lovable');
+          } else {
+            console.error('LOVABLE_API_KEY missing, trying user keys...');
+            providerError = providerError || 'LOVABLE_API_KEY manquante';
+          }
         } else if (response.status === 429 || response.status === 402) {
           console.log('Lovable AI credits/rate limit reached, trying user keys...');
           providerError = response.status === 402
@@ -840,10 +851,27 @@ Instructions de génération:
           console.error('AI Gateway error:', response.status, errorText);
           providerError = `Lovable AI ${response.status}`;
         }
-        providerFallback = true;
+        if (allowLovable) providerFallback = true;
         const img = await tryUserKeys(imagePrompt);
         if (img) {
           generatedImageUrl = img;
+        } else if (!allowLovable) {
+          // Aucune clé abonné n'a fonctionné : échec explicite, pas de placeholder
+          // et surtout aucun crédit Lovable consommé.
+          const hasAnyKey = !!(resolvedKeys.gemini || resolvedKeys.openai || resolvedKeys.openrouter);
+          return new Response(
+            JSON.stringify({
+              error: hasAnyKey
+                ? (providerError || 'Votre clé IA a été refusée pour la génération d\'images.')
+                : 'Aucune clé IA valide enregistrée (Gemini, OpenAI ou OpenRouter).',
+              reason: hasAnyKey ? 'provider_failed' : 'no_key',
+              provider: null,
+              providerError,
+              imageUrl: '',
+              chapterTitle,
+            }),
+            { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
         } else {
           usedProvider = 'placeholder';
           generatedImageUrl = getPlaceholderUrl(chapterTitle, style, colorScheme);

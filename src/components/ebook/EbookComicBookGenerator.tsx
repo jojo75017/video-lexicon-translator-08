@@ -199,10 +199,12 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
   const hasUserImageKey = Boolean(imageKeys.gemini || imageKeys.openai || imageKeys.openrouter);
   const useOpenAI = hasUserImageKey && isUserKeyValid !== false;
 
-  // Payload de clés envoyé à la fonction d'images
+  // Payload de clés envoyé à la fonction d'images.
+  // allowLovable: false => jamais de bascule sur les crédits inclus Lovable.
   const imageKeyPayload = () => ({
     useOpenAI: hasUserImageKey,
     imageEngine,
+    allowLovable: false,
     openaiApiKey: imageKeys.openai,
     userGeminiApiKey: imageKeys.gemini,
     openrouterApiKey: imageKeys.openrouter,
@@ -216,6 +218,12 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
     prompt: string,
     stylePrompt: string
   ): Promise<{ url: string; error?: string }> => {
+    if (!hasUserImageKey) {
+      return {
+        url: '',
+        error: 'Aucune clé IA enregistrée (Gemini, OpenAI ou OpenRouter) : les images ne peuvent pas être générées.',
+      };
+    }
     try {
       const { data, error } = await supabase.functions.invoke('generate-chapter-images', {
         body: {
@@ -230,10 +238,22 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
           ...imageKeyPayload(),
         },
       });
+      const payloadError: string | undefined =
+        (data as any)?.error ||
+        ((error as any)?.context?.body
+          ? (() => {
+              try {
+                return JSON.parse((error as any).context.body)?.error;
+              } catch {
+                return undefined;
+              }
+            })()
+          : undefined);
+      if (payloadError) return { url: '', error: payloadError };
       if (error) throw error;
       const url: string = data?.imageUrl || data?.url || '';
       if (!url || data?.isPlaceholder) {
-        const reason = data?.providerError || 'Aucune image générée (clé refusée ou crédits épuisés)';
+        const reason = data?.providerError || 'Aucune image générée (clé refusée par le fournisseur)';
         return { url: '', error: reason };
       }
       return { url };
@@ -1498,6 +1518,24 @@ Bubble points to ${panel.character}.` : ''}
         </Card>
       )}
 
+      {/* Aucune clé : les images ne peuvent pas être générées */}
+      {!hasUserImageKey && (
+        <Card className="border-amber-500/50 bg-amber-500/5">
+          <CardContent className="py-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+              <div className="space-y-1">
+                <p className="font-medium">Aucune clé IA enregistrée</p>
+                <p className="text-sm text-muted-foreground">
+                  Les images de BD sont générées avec votre propre clé (Gemini · Nano Banana, OpenAI ou OpenRouter).
+                  Enregistrez une clé dans <strong>Clés API</strong> pour lancer les illustrations.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Moteur d'images + clés détectées */}
       <Card className="border-border/60">
         <CardContent className="py-4 space-y-3">
@@ -1506,6 +1544,7 @@ Bubble points to ${panel.character}.` : ''}
               <Label className="text-sm font-medium">Moteur d'images</Label>
               <p className="text-xs text-muted-foreground">
                 Chaque clé est envoyée à son vrai fournisseur (une clé Gemini n'est jamais envoyée à OpenAI).
+                Les images du Studio BD utilisent <strong>uniquement vos clés</strong> : aucun crédit inclus n'est consommé.
               </p>
             </div>
             <Select value={imageEngine} onValueChange={(v) => setImageEngine(v as ImageEngine)}>
@@ -1514,10 +1553,9 @@ Bubble points to ${panel.character}.` : ''}
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="auto">Auto (recommandé)</SelectItem>
-                <SelectItem value="gemini" disabled={!imageKeys.gemini}>Gemini (clé abonné)</SelectItem>
-                <SelectItem value="openai" disabled={!imageKeys.openai}>OpenAI (clé abonné)</SelectItem>
-                <SelectItem value="openrouter" disabled={!imageKeys.openrouter}>OpenRouter (clé abonné)</SelectItem>
-                <SelectItem value="lovable">Crédits inclus (Lovable AI)</SelectItem>
+                <SelectItem value="gemini" disabled={!imageKeys.gemini}>Gemini · Nano Banana (votre clé)</SelectItem>
+                <SelectItem value="openai" disabled={!imageKeys.openai}>OpenAI (votre clé)</SelectItem>
+                <SelectItem value="openrouter" disabled={!imageKeys.openrouter}>OpenRouter (votre clé)</SelectItem>
               </SelectContent>
             </Select>
           </div>
