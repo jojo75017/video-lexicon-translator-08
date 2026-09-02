@@ -176,6 +176,61 @@ export default function AdminTestBdPage() {
           </p>
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">5. Script vidéo de vente (VSL /bd-offre)</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Script de 2 min 50 en sept séquences, prêt à enregistrer. Le clip d’accroche animé
+            est déjà intégré sur la page&nbsp;; ce texte sert à produire la version parlée complète.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              size="sm"
+              variant="default"
+              onClick={() => {
+                void navigator.clipboard.writeText(BD_VSL_VOICEOVER_FULL).then(
+                  () => toast.success('Voix-off complète copiée dans le presse-papiers.'),
+                  () => toast.error('Copie impossible dans ce navigateur.'),
+                );
+              }}
+            >
+              <Copy className="mr-1.5 h-4 w-4" /> Copier la voix-off complète
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                const text = BD_VSL_SCRIPT
+                  .map((s) => `[${s.start}] (${s.duration}s)\nVOIX-OFF : ${s.voiceover}\nIMAGE : ${s.storyboard}`)
+                  .join('\n\n---\n\n');
+                void navigator.clipboard.writeText(text).then(
+                  () => toast.success('Storyboard complet copié dans le presse-papiers.'),
+                  () => toast.error('Copie impossible dans ce navigateur.'),
+                );
+              }}
+            >
+              <Copy className="mr-1.5 h-4 w-4" /> Copier le storyboard
+            </Button>
+          </div>
+          <div className="max-h-80 overflow-y-auto rounded-lg border border-border bg-muted/40 p-3">
+            <ul className="space-y-3 text-sm">
+              {BD_VSL_SCRIPT.map((s) => (
+                <li key={s.start} className="space-y-1">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+                    <Badge variant="outline">{s.start}</Badge>
+                    <span>{s.duration}s</span>
+                  </div>
+                  <p className="text-foreground"><span className="font-semibold">Voix-off :</span> {s.voiceover}</p>
+                  <p className="text-muted-foreground"><span className="font-semibold">Image :</span> {s.storyboard}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
