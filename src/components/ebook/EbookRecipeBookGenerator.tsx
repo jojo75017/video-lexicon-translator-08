@@ -1926,6 +1926,26 @@ ${sheet.servingSuggestion}`;
                   </>
                 )}
               </Button>
+
+              <Button
+                onClick={exportToDocx}
+                disabled={isExportingDocx || sheets.length === 0}
+                variant="outline"
+                className="w-full border-orange-300"
+                size="lg"
+              >
+                {isExportingDocx ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Export Word en cours...
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-5 h-5 mr-2" />
+                    Exporter en Word ({sheets.length} fiches)
+                  </>
+                )}
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>
