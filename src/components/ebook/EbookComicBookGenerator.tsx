@@ -1498,6 +1498,65 @@ Bubble points to ${panel.character}.` : ''}
         </Card>
       )}
 
+      {/* Moteur d'images + clés détectées */}
+      <Card className="border-border/60">
+        <CardContent className="py-4 space-y-3">
+          <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
+            <div className="flex-1 space-y-1">
+              <Label className="text-sm font-medium">Moteur d'images</Label>
+              <p className="text-xs text-muted-foreground">
+                Chaque clé est envoyée à son vrai fournisseur (une clé Gemini n'est jamais envoyée à OpenAI).
+              </p>
+            </div>
+            <Select value={imageEngine} onValueChange={(v) => setImageEngine(v as ImageEngine)}>
+              <SelectTrigger className="w-full md:w-64">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="auto">Auto (recommandé)</SelectItem>
+                <SelectItem value="gemini" disabled={!imageKeys.gemini}>Gemini (clé abonné)</SelectItem>
+                <SelectItem value="openai" disabled={!imageKeys.openai}>OpenAI (clé abonné)</SelectItem>
+                <SelectItem value="openrouter" disabled={!imageKeys.openrouter}>OpenRouter (clé abonné)</SelectItem>
+                <SelectItem value="lovable">Crédits inclus (Lovable AI)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Badge variant={imageKeys.gemini ? 'default' : 'outline'} className="text-xs">
+              Gemini {imageKeys.gemini ? '✓' : '—'}
+            </Badge>
+            <Badge variant={imageKeys.openai ? 'default' : 'outline'} className="text-xs">
+              OpenAI {imageKeys.openai ? '✓' : '—'}
+            </Badge>
+            <Badge variant={imageKeys.openrouter ? 'default' : 'outline'} className="text-xs">
+              OpenRouter {imageKeys.openrouter ? '✓' : '—'}
+            </Badge>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Bilan des images échouées */}
+      {imageErrors && imageErrors.count > 0 && (
+        <Card className="border-destructive/50 bg-destructive/5">
+          <CardContent className="py-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-destructive mt-0.5 flex-shrink-0" />
+              <div className="space-y-1">
+                <p className="font-medium text-destructive">
+                  {imageErrors.count} case(s) sans image
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Motif : {imageErrors.reason}. Vérifiez la clé sélectionnée dans « Moteur d'images »,
+                  puis utilisez le bouton <strong>Régénérer cette case</strong> sur chaque case vide.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+
+
       {/* Configuration */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Colonne gauche - Paramètres */}
