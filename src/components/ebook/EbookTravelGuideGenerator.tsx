@@ -18,6 +18,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
 import { useSheetsAutosave } from '@/hooks/useSheetsAutosave';
+import { exportEbookToDocx, type DocxSection, type DocxBlock } from '@/lib/ebookDocxExporter';
 
 
 // Interface pour une fiche destination (800+ mots par fiche)
@@ -230,6 +231,7 @@ const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ e
   const [sheets, setSheets] = useState<TravelSheet[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [isExportingDocx, setIsExportingDocx] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState('');
   const [activeTab, setActiveTab] = useState('config');
@@ -1048,13 +1050,13 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
         };
       });
 
-      const slug = (guideTitle || 'guide-de-voyage')
+      const slug = (bookTitle || 'guide-de-voyage')
         .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
         .replace(/[^a-zA-Z0-9]+/g, '-').replace(/(^-|-$)/g, '').toLowerCase() || 'guide-de-voyage';
 
       await exportEbookToDocx({
         filename: `${slug}.docx`,
-        documentTitle: guideTitle || 'Mon guide de voyage',
+        documentTitle: bookTitle || 'Mon guide de voyage',
         documentSubtitle: authorName ? `par ${authorName}` : undefined,
         sections,
       });
@@ -2001,6 +2003,24 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
                     <>
                       <Download className="mr-2 h-5 w-5" />
                       Télécharger le PDF
+                    </>
+                  )}
+                </Button>
+                <Button
+                  onClick={exportToDocx}
+                  disabled={isExportingDocx || sheets.length === 0}
+                  variant="outline"
+                  className="border-amber-400 px-8 py-3 sm:ml-3"
+                >
+                  {isExportingDocx ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Export Word...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="mr-2 h-5 w-5" />
+                      Télécharger en Word
                     </>
                   )}
                 </Button>
