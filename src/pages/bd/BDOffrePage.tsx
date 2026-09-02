@@ -117,7 +117,7 @@ export default function BDOffrePage() {
             et prépare vos fichiers prêts à publier sur Amazon KDP.
           </p>
 
-          {/* Zone vidéo VSL */}
+          {/* Zone vidéo VSL — clip d'accroche IA en boucle, ou iframe si vslUrl externe. */}
           <div className="mx-auto mt-8 aspect-video w-full max-w-3xl overflow-hidden rounded-2xl border border-border bg-muted">
             {BD_COMIC_OFFER.vslUrl ? (
               <iframe
@@ -128,15 +128,23 @@ export default function BDOffrePage() {
                 allowFullScreen
               />
             ) : (
-              <div className="flex h-full w-full flex-col items-center justify-center gap-3 text-muted-foreground">
-                <Play className="h-10 w-10" />
-                <p className="text-sm font-semibold">Vidéo de présentation — bientôt disponible</p>
-                <p className="max-w-sm text-xs">
-                  En attendant, tout est détaillé juste en dessous : fonctionnalités, bonus et garantie.
-                </p>
-              </div>
+              <video
+                className="h-full w-full object-cover"
+                src={bdVslClipAsset.url}
+                poster=""
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                aria-label="Accroche animée du Studio BD & Jeunesse"
+              />
             )}
           </div>
+          <p className="mx-auto mt-3 max-w-3xl text-center text-xs text-muted-foreground">
+            Accroche visuelle générée par IA — la version parlée complète arrive prochainement.
+            Tout est détaillé juste en dessous.
+          </p>
         </section>
 
         {/* TÉMOIGNAGES */}
