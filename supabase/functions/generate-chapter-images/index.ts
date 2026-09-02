@@ -155,7 +155,12 @@ async function tryOpenRouterImage(prompt: string, apiKey?: string): Promise<stri
 async function tryGeminiDirect(prompt: string, apiKey?: string): Promise<string | null> {
   if (!apiKey || detectKeyProvider(apiKey) !== 'gemini') return null;
 
-  const models = ['gemini-2.5-flash-image', 'gemini-2.5-flash-image-preview'];
+  // Nano Banana (2.5 flash image) d'abord : rapide et économique.
+  const models = [
+    'gemini-2.5-flash-image',
+    'gemini-2.5-flash-image-preview',
+    'gemini-3-pro-image-preview',
+  ];
   for (const model of models) {
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
