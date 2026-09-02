@@ -707,11 +707,12 @@ EXPRESSION STYLE: ${artStyle === 'manga' ? 'Large expressive eyes, anime style' 
       // Normalize scenario data: support both new panel-based and old page-based format
       const scenarioPanels: { description: string; character: string; dialogue: string }[] = [];
       if (pageScenario.panels && pageScenario.panels.length > 0) {
-        // New format: panels array
-        for (let i = 0; i < panelCount; i++) {
-          const p = pageScenario.panels[i % pageScenario.panels.length];
+        // On ne recopie jamais une case pour combler un manque : cela créait
+        // des pages entières identiques.
+        for (const p of pageScenario.panels.slice(0, panelCount)) {
           scenarioPanels.push(p);
         }
+
       } else {
         // Old format: single description + dialogues array
         const desc = pageScenario.description || 'Action scene';
