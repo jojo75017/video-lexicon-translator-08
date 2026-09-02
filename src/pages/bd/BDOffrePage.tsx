@@ -192,6 +192,10 @@ export default function BDOffrePage() {
           </ul>
         </section>
 
+        {/* TÉMOIGNAGES */}
+        <BdTestimonials />
+
+
         {/* PAIEMENT */}
         <section id="commander" className="mt-14 rounded-2xl border-2 border-primary bg-card p-6">
           <div className="grid gap-8 md:grid-cols-2">
