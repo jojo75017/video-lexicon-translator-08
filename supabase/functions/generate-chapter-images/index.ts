@@ -99,9 +99,62 @@ INSTRUCTIONS CRITIQUES POUR RÉALISME HUMAIN:
   return '';
 };
 
+// Détecte le fournisseur réel d'une clé API d'après son préfixe.
+// Évite d'envoyer une clé Gemini (AIza…) chez OpenAI (erreur 401 systématique).
+type KeyProvider = 'gemini' | 'openai' | 'openrouter' | 'unknown';
+function detectKeyProvider(key?: string | null): KeyProvider {
+  const k = (key || '').trim();
+  if (!k) return 'unknown';
+  if (k.startsWith('sk-or-')) return 'openrouter';
+  if (k.startsWith('sk-')) return 'openai';
+  if (k.startsWith('AIza')) return 'gemini';
+  // Clés Google AI Studio / Cloud récentes : pas de préfixe AIza, mais jamais sk-
+  if (/^[A-Za-z0-9_\-]{30,}$/.test(k)) return 'gemini';
+  return 'unknown';
+}
+
+// Génération d'image via OpenRouter (BYOK abonné) — modèles Gemini image.
+async function tryOpenRouterImage(prompt: string, apiKey?: string): Promise<string | null> {
+  if (!apiKey || !apiKey.startsWith('sk-or-')) return null;
+  const models = ['google/gemini-2.5-flash-image-preview', 'google/gemini-2.0-flash-exp:free'];
+  for (const model of models) {
+    try {
+      const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://ebookstudio.fr',
+          'X-Title': 'EbookStudio',
+        },
+        body: JSON.stringify({
+          model,
+          messages: [{ role: 'user', content: prompt }],
+          modalities: ['image', 'text'],
+        }),
+      });
+      if (!r.ok) {
+        const t = await r.text();
+        console.error(`OpenRouter (${model}) ${r.status}:`, t.substring(0, 300));
+        continue;
+      }
+      const data = await r.json();
+      const url = data?.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+      if (typeof url === 'string' && url.startsWith('data:image')) return url;
+      const content = data?.choices?.[0]?.message?.content;
+      if (typeof content === 'string' && content.startsWith('data:image')) return content;
+      console.error(`OpenRouter (${model}) : aucune image dans la réponse`);
+    } catch (e) {
+      console.error(`OpenRouter (${model}) error:`, e);
+    }
+  }
+  return null;
+}
+
 // Direct call to Google Gemini image generation API using user's BYOK key
 async function tryGeminiDirect(prompt: string, apiKey?: string): Promise<string | null> {
-  if (!apiKey || !apiKey.startsWith('AIza')) return null;
+  if (!apiKey || detectKeyProvider(apiKey) !== 'gemini') return null;
+
   const models = ['gemini-2.5-flash-image', 'gemini-2.5-flash-image-preview'];
   for (const model of models) {
     try {
