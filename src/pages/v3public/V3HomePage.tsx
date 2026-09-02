@@ -18,6 +18,7 @@ import Niches10Offer from '@/components/marketing/Niches10Offer';
 import { V3EngineStrip, V3EngineGrid } from '@/components/v3public/V3EngineBanner';
 import V3LaunchBanner from '@/components/v3public/V3LaunchBanner';
 import V3HeroBanner from '@/components/v3public/V3HeroBanner';
+import V3PresentationVideo from '@/components/v3public/V3PresentationVideo';
 import BdComicNewsBanner from '@/components/bd/BdComicNewsBanner';
 import V3MarketProofPanel from '@/components/v3public/V3MarketProofPanel';
 import V3BeforeAfterPanel from '@/components/v3public/V3BeforeAfterPanel';
@@ -69,6 +70,9 @@ export default function V3HomePage() {
 
       {/* BANDEAU D'ACCROCHE — premier module */}
       <V3HeroBanner />
+
+      {/* VIDÉO DE PRÉSENTATION V3 — 7 minutes, sous-titrée */}
+      <V3PresentationVideo />
 
       {/* Grande nouveauté V4 — Studio BD & Jeunesse */}
       <div className="py-6">
