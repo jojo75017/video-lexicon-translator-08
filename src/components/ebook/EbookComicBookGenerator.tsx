@@ -208,6 +208,42 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
     openrouterApiKey: imageKeys.openrouter,
   });
 
+  // Suivi des échecs d'images (visible pour l'abonné au lieu d'un silence)
+  const imageFailuresRef = React.useRef<{ count: number; reason: string }>({ count: 0, reason: '' });
+
+  const requestPanelImage = async (
+    label: string,
+    prompt: string,
+    stylePrompt: string
+  ): Promise<{ url: string; error?: string }> => {
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-chapter-images', {
+        body: {
+          chapterTitle: label,
+          ebookTitle: title || 'Bande Dessinée',
+          style: stylePrompt,
+          ratio: 'square',
+          quality: 'hd',
+          colorScheme: colorMode === 'bw' ? 'monochrome' : colorMode,
+          customPrompt: prompt,
+          seed: visualSeed || undefined,
+          ...imageKeyPayload(),
+        },
+      });
+      if (error) throw error;
+      const url: string = data?.imageUrl || data?.url || '';
+      if (!url || data?.isPlaceholder) {
+        const reason = data?.providerError || 'Aucune image générée (clé refusée ou crédits épuisés)';
+        return { url: '', error: reason };
+      }
+      return { url };
+    } catch (err) {
+      return { url: '', error: err instanceof Error ? err.message : 'Erreur inconnue' };
+    }
+  };
+
+
+
   
   // Cohérence visuelle
   const [visualSeed, setVisualSeed] = useState<string>('');
