@@ -1290,6 +1290,64 @@ Réponds en JSON:
     }
   };
 
+  // Régénérer UNE case précise (utile quand une seule image a échoué)
+  const regeneratePanel = async (pageIndex: number, panelIdx: number) => {
+    const page = generatedPages[pageIndex];
+    const panel = page?.panels?.[panelIdx];
+    if (!panel) return;
+
+    const panelKey = `${pageIndex}-${panelIdx}`;
+    setRegeneratingPanel(panelKey);
+    try {
+      const artStylePrompt = getArtStylePrompt();
+      const colorPrompt = getColorModePrompt();
+      const visualRef = generateVisualReference();
+      const dialogueText = (panel.dialogue || '').substring(0, 60);
+      const prompt = `SINGLE COMIC PANEL - Panel ${panelIdx + 1}, Page ${pageIndex + 1}
+
+=== STYLE ===
+${artStylePrompt}
+${colorPrompt}
+${visualRef}
+
+=== SCENE ===
+${panel.action}
+
+${dialogueText ? `=== SPEECH BUBBLE ===
+Draw a WHITE speech bubble with BLACK outline.
+Inside write: "${dialogueText}"
+Bubble points to ${panel.character}.` : ''}
+
+=== RULES ===
+- Professional comic art, child-friendly
+- Same character design on every panel
+- Clear composition, square format`;
+
+      const result = await requestPanelImage(
+        `Page ${pageIndex + 1} Panel ${panelIdx + 1}`,
+        prompt,
+        artStylePrompt
+      );
+
+      if (!result.url) {
+        toast.error('Case non générée', { description: result.error });
+        return;
+      }
+
+      const updated = [...generatedPages];
+      const panels = [...updated[pageIndex].panels];
+      panels[panelIdx] = { ...panels[panelIdx], imageUrl: result.url };
+      updated[pageIndex] = { ...updated[pageIndex], panels };
+      setGeneratedPages(updated);
+      reportImageFailures(updated);
+      toast.success(`Case ${panelIdx + 1} régénérée !`);
+    } finally {
+      setRegeneratingPanel(null);
+    }
+  };
+
+
+
   return (
     <div className="space-y-6">
       {/* Header */}
