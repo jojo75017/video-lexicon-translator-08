@@ -19,6 +19,22 @@ import { KdpQuickTools } from './KdpQuickTools';
 import SpecializedAmazonPreview from './SpecializedAmazonPreview';
 import { BDTemplatesSelector } from './BDTemplatesSelector';
 import { BD_ART_STYLES, BD_STORY_TEMPLATES, BDTemplate } from '@/data/bdTemplates';
+import { getProviderKey } from '@/services/aiWritingService';
+import { getOpenRouterImageKey } from '@/lib/ebookExportOptions';
+
+type ImageEngine = 'auto' | 'gemini' | 'openai' | 'openrouter' | 'lovable';
+
+// Détecte le VRAI fournisseur d'une clé (évite d'envoyer une clé Gemini chez OpenAI)
+const detectKeyProvider = (key?: string | null): 'gemini' | 'openai' | 'openrouter' | 'unknown' => {
+  const k = (key || '').trim();
+  if (!k) return 'unknown';
+  if (k.startsWith('sk-or-')) return 'openrouter';
+  if (k.startsWith('sk-')) return 'openai';
+  if (k.startsWith('AIza')) return 'gemini';
+  if (/^[A-Za-z0-9_-]{30,}$/.test(k)) return 'gemini';
+  return 'unknown';
+};
+
 
 interface SavedComicBook {
   id: string;
