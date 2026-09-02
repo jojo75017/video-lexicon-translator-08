@@ -1053,6 +1053,8 @@ Réponds en JSON:
       }
 
       toast.success(`🎉 BD complète générée : ${allPages.length} pages !`);
+      reportImageFailures(allPages);
+
 
     } catch (error: any) {
       console.error('Erreur génération complète:', error);
