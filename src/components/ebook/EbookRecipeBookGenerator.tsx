@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
 import { useSheetsAutosave } from '@/hooks/useSheetsAutosave';
+import { exportEbookToDocx, type DocxSection, type DocxBlock } from '@/lib/ebookDocxExporter';
 
 
 const RECIPE_HISTORY_STORAGE_KEY = 'recipe_generator:last_dish_names:v1';
@@ -264,6 +265,7 @@ const EbookRecipeBookGenerator: React.FC<EbookRecipeBookGeneratorProps> = ({ ebo
   const [isGenerating, setIsGenerating] = useState(false);
   const [isGeneratingImages, setIsGeneratingImages] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [isExportingDocx, setIsExportingDocx] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState('');
   const [activeTab, setActiveTab] = useState('config');
@@ -1070,7 +1072,79 @@ ${sheet.servingSuggestion}`;
     }
   };
 
+  // Export Word (DOCX)
+  const exportToDocx = async () => {
+    if (sheets.length === 0) {
+      toast.error('Aucune fiche à exporter');
+      return;
+    }
+    setIsExportingDocx(true);
+    try {
+      const sections: DocxSection[] = sheets.map((sheet) => {
+        const blocks: DocxBlock[] = [];
+        if (sheet.description) blocks.push({ text: sheet.description });
+        if (sheet.history) blocks.push({ heading: 'Histoire et origine', text: sheet.history });
+        blocks.push({
+          heading: 'Fiche technique',
+          text: [
+            sheet.country && `Pays : ${sheet.country}`,
+            sheet.cookingTime && `Temps de préparation : ${sheet.cookingTime}`,
+            sheet.difficulty && `Difficulté : ${sheet.difficulty}`,
+            sheet.portions && `Portions : ${sheet.portions}`,
+          ].filter(Boolean).join('\n'),
+        });
+        if (sheet.ingredients?.length) {
+          blocks.push({
+            heading: 'Ingrédients',
+            text: sheet.ingredients.map((i) => `• ${i}`).join('\n'),
+          });
+        }
+        if (sheet.steps?.length) {
+          blocks.push({
+            heading: 'Préparation',
+            text: sheet.steps.map((s, i) => `${i + 1}. ${s.replace(/^\d+[.)]\s*/, '')}`).join('\n'),
+          });
+        }
+        if (sheet.chefTips) blocks.push({ kind: 'callout', variant: 'conseil', title: 'Conseils du chef', body: sheet.chefTips });
+        if (sheet.variations) blocks.push({ heading: 'Variantes régionales', text: sheet.variations });
+        if (sheet.servingSuggestion) blocks.push({ heading: 'Présentation', text: sheet.servingSuggestion });
+        if (sheet.winePairing) {
+          blocks.push({
+            kind: 'callout',
+            variant: 'saviez-vous',
+            title: 'Accord mets & vin',
+            body: [sheet.winePairing, sheet.wineReason].filter(Boolean).join(' — '),
+          });
+        }
+        return {
+          title: sheet.dishName,
+          subtitle: [sheet.country, sheet.cookingTime].filter(Boolean).join(' · ') || undefined,
+          imageUrl: sheet.imageUrl,
+          blocks,
+        };
+      });
+
+      const slug = (bookTitle || 'livre-de-recettes')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9]+/g, '-').replace(/(^-|-$)/g, '').toLowerCase() || 'livre-de-recettes';
+
+      await exportEbookToDocx({
+        filename: `${slug}.docx`,
+        documentTitle: bookTitle || 'Mon livre de recettes',
+        documentSubtitle: authorName ? `par ${authorName}` : undefined,
+        sections,
+      });
+      toast.success('Word (DOCX) téléchargé ✓');
+    } catch (e: any) {
+      console.error('[Recettes] export docx', e);
+      toast.error(e?.message || "L'export Word a échoué");
+    } finally {
+      setIsExportingDocx(false);
+    }
+  };
+
   // Export to PDF
+
   const exportToPDF = async () => {
     if (sheets.length === 0) {
       toast.error('Aucune fiche à exporter');
@@ -1849,6 +1923,26 @@ ${sheet.servingSuggestion}`;
                   <>
                     <Download className="w-5 h-5 mr-2" />
                     Exporter en PDF ({sheets.length} fiches)
+                  </>
+                )}
+              </Button>
+
+              <Button
+                onClick={exportToDocx}
+                disabled={isExportingDocx || sheets.length === 0}
+                variant="outline"
+                className="w-full border-orange-300"
+                size="lg"
+              >
+                {isExportingDocx ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Export Word en cours...
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-5 h-5 mr-2" />
+                    Exporter en Word ({sheets.length} fiches)
                   </>
                 )}
               </Button>
