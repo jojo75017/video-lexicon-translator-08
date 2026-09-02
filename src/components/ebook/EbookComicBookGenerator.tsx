@@ -242,6 +242,21 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
     }
   };
 
+  // Bilan visible des cases sans image
+  const reportImageFailures = (pages: ComicPage[]) => {
+    const total = pages.reduce((n, p) => n + p.panels.length, 0);
+    const failed = pages.reduce((n, p) => n + p.panels.filter(x => !x.imageUrl).length, 0);
+    if (failed > 0) {
+      const reason = imageFailuresRef.current.reason || 'Fournisseur d\'images indisponible';
+      setImageErrors({ count: failed, reason });
+      toast.error(`${failed} case(s) sur ${total} sans image`, { description: reason });
+    } else {
+      setImageErrors(null);
+    }
+  };
+
+
+
 
 
   
