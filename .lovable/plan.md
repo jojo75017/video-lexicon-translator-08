@@ -11,17 +11,16 @@ Ce que je peux livrer :
 - Sans voix : le texte défile en sous-titres synchronisés, avec captures/visuels animés. La voix-off reste à enregistrer par vous (ou une voix IA plus tard) et se pose par-dessus.
 - Identité V3 : fond clair, or/émeraude, une seule police d'affichage, rythme posé.
 
-Alternative plus rapide si vous préférez : **3 vidéos courtes de 60 à 90 secondes** (Le problème / Le studio / Les formules), plus efficaces en publicité qu'un format long.
+**Choix retenu : la vidéo longue de 7 minutes sous-titrée.** Les formats courts pourront être découpés plus tard dans le même projet.
 
 ### Et la musique ?
 
-Oui, une musique de fond est possible, mais elle n'est pas générée en même temps que l'image : le rendu sort en vidéo muette, puis j'y colle une piste audio en post-traitement. Trois options :
+Une musique de fond est possible, mais elle n'est pas produite avec l'image : le rendu sort muet, puis j'y colle une piste audio en post-traitement.
 
-1. **Vous fournissez la musique** (fichier libre de droits, ou celle de vos autres vidéos) : je la mixe, avec fondu d'entrée/sortie et baisse de volume automatique si une voix arrive ensuite. C'est l'option la plus sûre côté droits.
-2. **Aucune musique** : sous-titres seuls, prêts à recevoir votre voix-off. Une musique posée sous une voix enregistrée plus tard sonne souvent mieux si elle est ajoutée à la fin, en même temps que la voix.
-3. **Musique générée** : possible mais peu maîtrisable en ambiance et en durée sur 7 minutes ; je ne la recommande pas pour une vidéo de vente.
+- **Par défaut je livre la vidéo muette** : sous-titres seuls, prête à recevoir votre voix-off. La musique sera posée à la fin, en même temps que la voix — c'est ce qui sonne le mieux.
+- **Si vous m'envoyez une piste libre de droits** (calme, piano/cordes, sans percussions marquées), je la mixe directement avec fondu d'entrée/sortie.
+- Musique générée par IA : non recommandée ici (ambiance et durée mal maîtrisées sur 7 minutes).
 
-Recommandation : option 1 (vous m'envoyez une piste calme, piano/cordes, sans percussions marquées) ou option 2 si vous préférez tout monter à la fin avec la voix.
 
 
 ## Idées d'amélioration V3 (par priorité)
