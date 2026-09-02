@@ -582,6 +582,8 @@ serve(async (req) => {
       userGeminiApiKey,
       openrouterApiKey = null,
       imageEngine = 'auto',
+      // Studio BD : jamais de bascule vers les crédits Lovable inclus.
+      allowLovable = true,
 
       disableOpenAIFallback = false, 
       forceLovable = false,
