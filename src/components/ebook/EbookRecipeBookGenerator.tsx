@@ -271,6 +271,28 @@ const EbookRecipeBookGenerator: React.FC<EbookRecipeBookGeneratorProps> = ({ ebo
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
   const [isGeneratingCover, setIsGeneratingCover] = useState(false);
 
+  // Sauvegarde automatique des fiches (IndexedDB + localStorage)
+  const autosave = useSheetsAutosave(
+    'recipe_book_sheets',
+    { bookTitle, authorName, selectedCountry, numberOfSheets, photoStyle, customInstructions, sheets, coverImageUrl },
+    (saved) => {
+      if (saved.sheets?.length) {
+        setSheets(saved.sheets);
+        setActiveTab('sheets');
+        toast.success(`${saved.sheets.length} fiches restaurées depuis votre dernière session`);
+      }
+      if (saved.bookTitle) setBookTitle(saved.bookTitle);
+      if (saved.authorName) setAuthorName(saved.authorName);
+      if (saved.selectedCountry) setSelectedCountry(saved.selectedCountry);
+      if (saved.numberOfSheets) setNumberOfSheets(saved.numberOfSheets);
+      if (saved.photoStyle) setPhotoStyle(saved.photoStyle);
+      if (saved.customInstructions) setCustomInstructions(saved.customInstructions);
+      if (saved.coverImageUrl) setCoverImageUrl(saved.coverImageUrl);
+    },
+    sheets.length > 0,
+  );
+
+
   // Get all countries as a flat array
   const getAllCountries = (): string[] => {
     return Object.values(worldCountries).flat();
