@@ -731,7 +731,7 @@ EXPRESSION STYLE: ${artStyle === 'manga' ? 'Large expressive eyes, anime style' 
 
       const panels: ComicPanel[] = [];
       
-      for (let panelIndex = 0; panelIndex < panelCount; panelIndex++) {
+      for (let panelIndex = 0; panelIndex < scenarioPanels.length; panelIndex++) {
         const panelData = scenarioPanels[panelIndex];
         const dialogueText = (panelData.dialogue || '').substring(0, 60);
         const hasSpeechBubble = dialogueText.length > 0;
