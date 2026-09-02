@@ -121,6 +121,8 @@ const UPSELL_PACK_MODULES: Record<string, string> = {
   puzzle_book: "puzzle-book",
   cherche_trouve: "cherche-trouve",
   short_stories: "short-stories",
+  bd_comic: "bd-comic",
+  bd_comic_pro: "bd-comic-pro",
 };
 
 async function handleV3UpsellPackCompleted(session: any, env: StripeEnv) {
