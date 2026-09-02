@@ -890,59 +890,26 @@ Bubble points to ${panelData.character}.` : ''}
       const heroName = (mainCharacter || 'Le héros').trim();
       const autoDescription = customPrompt?.trim() || `Une aventure captivante intitulée "${title}" dans un style ${selectedGenre?.label || 'aventure'} pour ${selectedAge?.label || 'enfants'}`;
 
-      const prompt = `Tu es un scénariste de bandes dessinées pour enfants. Crée un scénario de BD en ${numberOfPages} pages, avec EXACTEMENT ${panelCount} cases par page.
-
-INFORMATIONS:
-- Titre: "${title}"
-- Description: ${autoDescription}
-- Genre: ${selectedGenre?.label || genre}
-- Public: ${selectedAge?.label} (${selectedAge?.description})
-- Personnage principal: ${heroName}
-${characterDescription ? `- Description du personnage: ${characterDescription}` : ''}
-${setting ? `- Univers/Décor: ${setting}` : ''}
-- Structure narrative: ${selectedTemplate?.label} - ${selectedTemplate?.structure?.join(' → ')}
-
-IMPORTANT: Chaque page DOIT avoir EXACTEMENT ${panelCount} cases avec description + dialogue court.
-
-Réponds en JSON:
-{
-  "pages": [
-    {
-      "panels": [
-        { "description": "Description visuelle...", "character": "Nom", "dialogue": "Ce qu'il dit" }
-      ]
-    }
-  ]
-}`;
-
-      const { data, error } = await supabase.functions.invoke('generate-content', {
-        body: { type: 'comic-scenario', prompt }
+      const pages = await buildComicScenario({
+        title,
+        description: autoDescription,
+        genre: selectedGenre?.label || genre,
+        audience: `${selectedAge?.label || '7-10 ans'} (${selectedAge?.description || ''})`,
+        heroName,
+        characterDescription,
+        setting,
+        structure: selectedTemplate?.structure,
+        numberOfPages,
+        panelCount,
+        useOpenAI,
+        openaiApiKey: userApiKey || undefined,
+        onProgress: (done, total) => setCurrentProgress(Math.round((done / total) * 40)),
       });
 
-      let generatedScenario: typeof scenario;
-
-      if (error || !data?.content) {
-        console.warn('Scénario IA échoué, utilisation du fallback');
-        generatedScenario = buildFallbackScenario();
-      } else {
-        try {
-          let content = data.content;
-          const jsonMatch = content.match(/```json\s*([\s\S]*?)```/) || content.match(/\{[\s\S]*"pages"[\s\S]*\}/);
-          if (jsonMatch) {
-            content = jsonMatch[1] || jsonMatch[0];
-          }
-          generatedScenario = JSON.parse(content);
-        } catch {
-          generatedScenario = buildFallbackScenario();
-        }
-      }
-
-      if (!generatedScenario?.pages?.length) {
-        generatedScenario = buildFallbackScenario();
-      }
-
+      const generatedScenario = { pages };
       setScenario(generatedScenario);
-      toast.success(`✅ Scénario de ${generatedScenario.pages.length} pages prêt !`);
+      toast.success(`✅ Scénario cohérent de ${pages.length} pages prêt !`);
+
 
       // Étape 2: Générer les images
       setGenerationStep('images');
