@@ -7,7 +7,7 @@ import videoAsset from '@/assets/v3-presentation.mp4.asset.json';
  */
 export default function V3PresentationVideo() {
   return (
-    <section id="video-v3" className="max-w-7xl mx-auto px-5 md:px-8 py-8">
+    <section id="video-v3" className="max-w-3xl mx-auto px-5 md:px-8 py-6">
       <div className="rounded-2xl border border-[#c9a84c]/35 bg-[#064e3b] p-5 md:p-7 text-white">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -26,7 +26,7 @@ export default function V3PresentationVideo() {
           </span>
         </div>
 
-        <div className="mt-4 overflow-hidden rounded-xl bg-black/40">
+        <div className="mt-3 overflow-hidden rounded-lg bg-black/40">
           <video
             src={videoAsset.url}
             controls
