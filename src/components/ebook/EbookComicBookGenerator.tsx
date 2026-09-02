@@ -957,7 +957,10 @@ Bubble points to ${panelData.character}.` : ''}
 
     setIsGeneratingAll(true);
     setGenerationStep('scenario');
+    imageFailuresRef.current = { count: 0, reason: '' };
+    setImageErrors(null);
     setGeneratedPages([]);
+
     setCurrentProgress(0);
 
     try {
