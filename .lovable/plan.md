@@ -1,8 +1,10 @@
 # Studio BD : réparer les images des cases (4 par page)
 
-## Ce qui se passe réellement
+## Où est le problème exactement
 
-Les logs de la fonction d'images le montrent clairement : votre clé **Gemini** (`AIzaSy…`) est envoyée à **OpenAI**, qui la refuse.
+Vous avez bien deux clés (Gemini et OpenAI), mais le Studio BD n'envoie **qu'une seule clé, dans le mauvais tuyau**.
+
+Le générateur BD envoie toujours `useOpenAI: true` + `openaiApiKey = <la clé du provider actif>`. Or ce provider actif est votre clé **Gemini** (`AIzaSy…`). La fonction l'envoie donc à OpenAI, qui la rejette :
 
 ```text
 OpenAI error (final): 401 — "Incorrect API key provided: AIzaSyAJ***…"
@@ -10,28 +12,33 @@ OpenAI image generation failed, falling back
 Placeholder image detected, skipping storage upload
 ```
 
-Résultat : chaque case retombe sur une image « placeholder » (ou une URL vide), et le générateur BD avale l'erreur en silence (`catch` → `imageUrl: ''`). Le scénario est bien créé avec 8 cases par page, mais aucune illustration n'arrive. Vous ne voyez donc ni image ni message d'erreur.
+Ensuite le générateur avale l'erreur en silence (`catch` → `imageUrl: ''`) : le scénario est bien créé avec toutes les cases, mais aucune illustration n'arrive et aucun message ne vous prévient. Votre clé OpenAI, elle, n'est jamais utilisée par la BD ; et la clé **OpenRouter** (déjà présente dans l'app pour les images) n'est pas branchée sur la BD du tout.
 
 ## Corrections prévues
 
-1. **Router la clé selon son type** (`supabase/functions/generate-chapter-images/index.ts`)
-   - Une clé commençant par `AIza` part vers Gemini direct (fonction déjà présente dans le fichier), jamais vers OpenAI.
-   - Une clé `sk-…` part vers OpenAI comme aujourd'hui.
-   - Si aucune clé valide : génération via Lovable AI (crédits inclus).
+1. **Choisir le bon fournisseur selon la clé**
+   - `AIza…` ou clé Google AI Studio → Gemini direct (déjà implémenté dans la fonction).
+   - `sk-…` → OpenAI.
+   - `sk-or-…` → OpenRouter (nouveau pour la BD, via le helper `invokeImageFunction` déjà utilisé ailleurs).
+   - Détection côté client **et** côté serveur (sécurité : une clé mal typée ne partira plus chez le mauvais fournisseur).
 
-2. **Chaîne de secours réelle**
-   - Ordre : clé de l'abonné (bon fournisseur) → Lovable AI → et seulement en dernier recours un placeholder.
-   - Le placeholder ne sera plus renvoyé silencieusement : la réponse portera un indicateur `fallback` + le motif.
+2. **Ajouter OpenRouter dans le Studio BD**
+   - Lecture de la clé OpenRouter images (`getOpenRouterImageKey`) et transmission à `generate-chapter-images`.
+   - Petit sélecteur « Moteur d'images » dans les réglages avancés BD : Auto (recommandé) / Gemini / OpenAI / OpenRouter, avec indication des clés détectées.
 
-3. **Rendre les échecs visibles dans le Studio BD** (`src/components/ebook/EbookComicBookGenerator.tsx`)
-   - Compter les cases échouées et afficher un toast explicite (« 6 cases sur 8 non générées — clé Gemini refusée »).
-   - Sur chaque case sans image : encart « Image non générée » + bouton **Régénérer cette case**.
+3. **Vraie chaîne de secours**
+   - Ordre : clé de l'abonné (bon fournisseur) → autre clé disponible → Lovable AI (crédits inclus) → placeholder en dernier recours seulement.
+   - La réponse portera un indicateur explicite (`provider`, `fallback`, motif) au lieu d'un placeholder muet.
 
-4. **Vérification**
-   - Test direct de la fonction avec une clé `AIza` puis sans clé, et lecture des logs pour confirmer qu'une vraie image (et non un placeholder) est renvoyée.
+4. **Rendre les échecs visibles**
+   - Comptage des cases échouées + toast explicite (« 6 cases sur 8 non générées — clé Gemini refusée par OpenAI »).
+   - Sur chaque case vide : encart « Image non générée » + bouton **Régénérer cette case**.
+
+5. **Vérification**
+   - Test de la fonction avec une clé `AIza`, une clé `sk-or-`, puis sans clé, et lecture des logs pour confirmer qu'une vraie image (et non un placeholder) revient.
 
 ## Détails techniques
 
-- Le générateur envoie aujourd'hui `useOpenAI: true` + `openaiApiKey: <clé Gemini>` : ce couple sera remplacé par `userGeminiApiKey` / `openaiApiKey` selon le préfixe détecté côté client, et la fonction fera aussi la détection défensivement côté serveur.
-- Aucun changement de tarif, de prompt de style, ni de mise en page des planches. Nombre de cases par page inchangé (réglage `panelLayout`).
+- Fichiers concernés : `supabase/functions/generate-chapter-images/index.ts` (routage par préfixe + branche OpenRouter + réponse enrichie) et `src/components/ebook/EbookComicBookGenerator.tsx` (envoi des bonnes clés, sélecteur de moteur, gestion d'erreurs, régénération unitaire).
+- Aucun changement de tarif, de prompt de style, ni du nombre de cases par page (réglage `panelLayout` conservé).
 - Pas de `npm run build` — uniquement l'aperçu de développement.
