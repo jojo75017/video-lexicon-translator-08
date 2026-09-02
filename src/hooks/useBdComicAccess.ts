@@ -2,12 +2,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { getStripeEnvironment } from '@/lib/stripe';
 import { useAdminAccess } from '@/contexts/AdminAccessContext';
+import { isPreviewingAsSubscriber } from '@/components/v3/V3ContemplationMode';
 
 /**
  * Droits d'accès au Studio BD & Jeunesse (ex-ebook_comic_agent).
  *
  * Accès accordé si :
- *  - Admin
+ *  - Admin (sauf si l'aperçu « Voir comme un abonné » est activé)
  *  - Abonné plan Pro / Édition (plan_tier : editeur, auteur, lifetime, vip)
  *  - Achat one-shot 17 € du module (module_entitlements, module = 'bd-comic')
  *
@@ -23,17 +24,27 @@ export function useBdComicAccess() {
   const [reason, setReason] = useState<'admin' | 'plan' | 'purchased' | null>(null);
   const [userEmail, setUserEmail] = useState<string>('');
   const { isAdmin, isChecking } = useAdminAccess();
+  const [previewAsSubscriber, setPreviewAsSubscriber] = useState(isPreviewingAsSubscriber);
+
+  // L'interrupteur admin « Voir comme un abonné » neutralise le raccourci admin :
+  // le parcours réel (page de vente, verrou) devient testable.
+  useEffect(() => {
+    const sync = () => setPreviewAsSubscriber(isPreviewingAsSubscriber());
+    window.addEventListener('v3-admin-preview-change', sync);
+    return () => window.removeEventListener('v3-admin-preview-change', sync);
+  }, []);
 
   const check = useCallback(async () => {
     setLoading(true);
     try {
       if (isChecking) return;
-      if (isAdmin) {
+      if (isAdmin && !previewAsSubscriber) {
         setHasAccess(true);
         setIsPro(true);
         setReason('admin');
         return;
       }
+
 
       const { data: { user } } = await supabase.auth.getUser();
       const email = user?.email?.toLowerCase() ?? '';
