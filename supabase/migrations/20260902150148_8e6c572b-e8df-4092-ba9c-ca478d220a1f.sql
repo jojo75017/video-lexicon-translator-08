@@ -1,0 +1,3 @@
+ALTER TABLE public.funnel_orders DROP CONSTRAINT IF EXISTS funnel_orders_product_key_check;
+ALTER TABLE public.funnel_orders ADD CONSTRAINT funnel_orders_product_key_check
+CHECK (product_key IN ('main','v3_lifetime','license_extended','templates_premium','upsell_license','upsell_templates','coaching_vip'));
