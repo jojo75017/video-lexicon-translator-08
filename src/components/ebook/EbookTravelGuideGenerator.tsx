@@ -17,6 +17,8 @@ import {
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
+import { useSheetsAutosave } from '@/hooks/useSheetsAutosave';
+
 
 // Interface pour une fiche destination (800+ mots par fiche)
 interface TravelSheet {
