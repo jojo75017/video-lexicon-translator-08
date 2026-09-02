@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { EbookComicBookGenerator } from '@/components/ebook/EbookComicBookGenerator';
 import { Helmet } from 'react-helmet';
 import { supabase } from '@/integrations/supabase/client';
+import { useBdComicAccess } from '@/hooks/useBdComicAccess';
 import bdHero from '@/assets/bd-studio-hero.jpg';
 
 const fadeUp = {
