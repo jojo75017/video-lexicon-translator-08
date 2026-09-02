@@ -21,6 +21,8 @@ import { BDTemplatesSelector } from './BDTemplatesSelector';
 import { BD_ART_STYLES, BD_STORY_TEMPLATES, BDTemplate } from '@/data/bdTemplates';
 import { getProviderKey } from '@/services/aiWritingService';
 import { getOpenRouterImageKey } from '@/lib/ebookExportOptions';
+import { buildComicScenario } from '@/lib/bd/comicScenario';
+
 
 type ImageEngine = 'auto' | 'gemini' | 'openai' | 'openrouter' | 'lovable';
 
@@ -492,57 +494,9 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
     return layouts[layout] || '4 cases';
   };
 
-  // Fallback amélioré avec vraie narration
-  const buildFallbackScenario = () => {
-    const selectedTemplate = STORY_TEMPLATES.find(t => t.value === storyTemplate);
-    const selectedGenre = GENRES.find(g => g.value === genre);
-    const heroName = (mainCharacter || 'Le héros').trim();
-    const baseDesc = (customPrompt || setting || '').trim();
-    const bookTitle = title || 'L\'Aventure';
-    const selectedLayout = PANEL_LAYOUTS.find(l => l.value === panelLayout);
-    const panelCount = selectedLayout?.panelsPerPage || 4;
+  // Plus de scénario de secours générique : il produisait les mêmes cases
+  // page après page. En cas d'échec IA, on remonte une erreur explicite.
 
-    const dialogueBank = [
-      "Allons-y !", "Regarde là-bas !", "Incroyable !", "Attention !",
-      "Je n'abandonnerai pas !", "Ensemble, on peut y arriver !",
-      "Quelle découverte !", "En avant !", "C'est notre chance !",
-      "Vite, par ici !", "Tu as vu ça ?", "Mission accomplie !",
-      "Quel mystère...", "Suivez-moi !", "On a réussi !",
-      "C'est parti !", "Ne baisse pas les bras !", "Fantastique !"
-    ];
-
-    const actionBank = [
-      "arrive dans un nouveau lieu mystérieux",
-      "découvre un indice important",
-      "rencontre un nouvel allié",
-      "fait face à un obstacle",
-      "trouve une solution ingénieuse",
-      "court vers l'aventure",
-      "observe quelque chose d'étonnant",
-      "se prépare pour l'action",
-    ];
-
-    const defaultSteps = ['Introduction du héros', 'Appel à l\'aventure', 'Défis et alliés', 'Épreuve finale', 'Victoire et retour'];
-    const steps = selectedTemplate?.structure?.length ? selectedTemplate.structure : defaultSteps;
-
-    const pages = Array.from({ length: numberOfPages }, (_, pageIdx) => {
-      const stepIndex = Math.min(steps.length - 1, Math.floor((pageIdx / Math.max(1, numberOfPages - 1)) * steps.length));
-      const step = steps[stepIndex];
-
-      const panels = Array.from({ length: panelCount }, (_, panelIdx) => {
-        const globalIdx = pageIdx * panelCount + panelIdx;
-        return {
-          description: `${step} - ${heroName} ${actionBank[globalIdx % actionBank.length]}. ${baseDesc ? `(${baseDesc})` : ''} [Style: ${selectedGenre?.label || 'Aventure'}]`.trim(),
-          character: panelIdx % 3 === 2 ? 'Ami' : heroName,
-          dialogue: dialogueBank[globalIdx % dialogueBank.length],
-        };
-      });
-
-      return { panels };
-    });
-
-    return { pages };
-  };
 
   // Générer 20 idées de titres via IA
   const generateTitleIdeas = async () => {
@@ -653,87 +607,29 @@ Réponds UNIQUEMENT avec un tableau JSON de 20 strings, sans explication:
       const selectedTemplate = STORY_TEMPLATES.find(t => t.value === storyTemplate);
       const selectedGenre = GENRES.find(g => g.value === genre);
       const selectedAge = AGE_GROUPS.find(a => a.value === ageGroup);
-
       const heroName = (mainCharacter || 'Le héros').trim();
-      
-      // Auto-générer la description si non fournie
       const autoDescription = customPrompt?.trim() || `Une aventure captivante intitulée "${title}" dans un style ${selectedGenre?.label || 'aventure'} pour ${selectedAge?.label || 'enfants'}`;
-
       const selectedLayout = PANEL_LAYOUTS.find(l => l.value === panelLayout);
       const panelCount = selectedLayout?.panelsPerPage || 4;
 
-      const prompt = `Tu es un scénariste de bandes dessinées pour enfants. Crée un scénario de BD en ${numberOfPages} pages, avec EXACTEMENT ${panelCount} cases par page.
-
-INFORMATIONS:
-- Titre: "${title}"
-- Description: ${autoDescription}
-- Genre: ${selectedGenre?.label || genre}
-- Public: ${selectedAge?.label} (${selectedAge?.description})
-- Personnage principal: ${heroName}
-${characterDescription ? `- Description du personnage: ${characterDescription}` : ''}
-${setting ? `- Univers/Décor: ${setting}` : ''}
-- Structure narrative: ${selectedTemplate?.label} - ${selectedTemplate?.structure?.join(' → ')}
-
-MISSION: Invente une histoire complète avec des dialogues pour CHAQUE case.
-
-IMPORTANT:
-- Chaque page DOIT avoir EXACTEMENT ${panelCount} objets dans "panels"
-- Chaque case a sa propre description visuelle ET son dialogue court (max 50 car.)
-- Varier les personnages qui parlent
-
-Réponds en JSON:
-{
-  "pages": [
-    {
-      "panels": [
-        { "description": "Description visuelle...", "character": "Nom", "dialogue": "Ce qu'il dit" }
-      ]
-    }
-  ]
-}`;
-
-      const { data, error } = await supabase.functions.invoke('generate-content', {
-        body: {
-          type: 'comic-scenario',
-          prompt,
-          // Passer la clé Gemini utilisateur pour éviter les limites Lovable AI
-          useOpenAI: useOpenAI,
-          openaiApiKey: userApiKey || undefined,
-        }
+      const pages = await buildComicScenario({
+        title,
+        description: autoDescription,
+        genre: selectedGenre?.label || genre,
+        audience: `${selectedAge?.label || '7-10 ans'} (${selectedAge?.description || ''})`,
+        heroName,
+        characterDescription,
+        setting,
+        structure: selectedTemplate?.structure,
+        numberOfPages,
+        panelCount,
+        useOpenAI,
+        openaiApiKey: userApiKey || undefined,
+        onProgress: (done, total) => toast.info(`Scénario : ${done}/${total} pages écrites`),
       });
 
-      // Fallback sans IA si crédits épuisés / erreur
-      if (error) {
-        const status = (error as any)?.status;
-        const message = (error as any)?.message || '';
-        if (status === 402 || String(message).includes('Crédits')) {
-          const fallback = buildFallbackScenario();
-          setScenario(fallback);
-          toast.warning('Crédits IA épuisés : scénario de base généré automatiquement.');
-          return;
-        }
-        throw error;
-      }
-
-      let parsedScenario;
-      try {
-        const content = data.content || data.text || data;
-        const jsonMatch = String(content).match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          parsedScenario = JSON.parse(jsonMatch[0]);
-        } else {
-          throw new Error('Format JSON invalide');
-        }
-      } catch {
-        // Si l'IA renvoie un JSON imparfait, on ne bloque pas : on génère un scénario de base.
-        const fallback = buildFallbackScenario();
-        setScenario(fallback);
-        toast.warning('Scénario IA difficile à parser : scénario de base généré automatiquement.');
-        return;
-      }
-
-      setScenario(parsedScenario);
-      toast.success(`Scénario de ${parsedScenario.pages.length} pages généré !`);
+      setScenario({ pages });
+      toast.success(`Scénario cohérent de ${pages.length} pages généré !`);
 
     } catch (error: any) {
       console.error('Erreur génération scénario:', error);
@@ -744,6 +640,7 @@ Réponds en JSON:
       setIsGeneratingScenario(false);
     }
   };
+
 
   // Générer une description visuelle cohérente du personnage avec détails précis
   const generateVisualReference = (): string => {
@@ -810,11 +707,12 @@ EXPRESSION STYLE: ${artStyle === 'manga' ? 'Large expressive eyes, anime style' 
       // Normalize scenario data: support both new panel-based and old page-based format
       const scenarioPanels: { description: string; character: string; dialogue: string }[] = [];
       if (pageScenario.panels && pageScenario.panels.length > 0) {
-        // New format: panels array
-        for (let i = 0; i < panelCount; i++) {
-          const p = pageScenario.panels[i % pageScenario.panels.length];
+        // On ne recopie jamais une case pour combler un manque : cela créait
+        // des pages entières identiques.
+        for (const p of pageScenario.panels.slice(0, panelCount)) {
           scenarioPanels.push(p);
         }
+
       } else {
         // Old format: single description + dialogues array
         const desc = pageScenario.description || 'Action scene';
@@ -833,7 +731,7 @@ EXPRESSION STYLE: ${artStyle === 'manga' ? 'Large expressive eyes, anime style' 
 
       const panels: ComicPanel[] = [];
       
-      for (let panelIndex = 0; panelIndex < panelCount; panelIndex++) {
+      for (let panelIndex = 0; panelIndex < scenarioPanels.length; panelIndex++) {
         const panelData = scenarioPanels[panelIndex];
         const dialogueText = (panelData.dialogue || '').substring(0, 60);
         const hasSpeechBubble = dialogueText.length > 0;
@@ -995,59 +893,26 @@ Bubble points to ${panelData.character}.` : ''}
       const heroName = (mainCharacter || 'Le héros').trim();
       const autoDescription = customPrompt?.trim() || `Une aventure captivante intitulée "${title}" dans un style ${selectedGenre?.label || 'aventure'} pour ${selectedAge?.label || 'enfants'}`;
 
-      const prompt = `Tu es un scénariste de bandes dessinées pour enfants. Crée un scénario de BD en ${numberOfPages} pages, avec EXACTEMENT ${panelCount} cases par page.
-
-INFORMATIONS:
-- Titre: "${title}"
-- Description: ${autoDescription}
-- Genre: ${selectedGenre?.label || genre}
-- Public: ${selectedAge?.label} (${selectedAge?.description})
-- Personnage principal: ${heroName}
-${characterDescription ? `- Description du personnage: ${characterDescription}` : ''}
-${setting ? `- Univers/Décor: ${setting}` : ''}
-- Structure narrative: ${selectedTemplate?.label} - ${selectedTemplate?.structure?.join(' → ')}
-
-IMPORTANT: Chaque page DOIT avoir EXACTEMENT ${panelCount} cases avec description + dialogue court.
-
-Réponds en JSON:
-{
-  "pages": [
-    {
-      "panels": [
-        { "description": "Description visuelle...", "character": "Nom", "dialogue": "Ce qu'il dit" }
-      ]
-    }
-  ]
-}`;
-
-      const { data, error } = await supabase.functions.invoke('generate-content', {
-        body: { type: 'comic-scenario', prompt }
+      const pages = await buildComicScenario({
+        title,
+        description: autoDescription,
+        genre: selectedGenre?.label || genre,
+        audience: `${selectedAge?.label || '7-10 ans'} (${selectedAge?.description || ''})`,
+        heroName,
+        characterDescription,
+        setting,
+        structure: selectedTemplate?.structure,
+        numberOfPages,
+        panelCount,
+        useOpenAI,
+        openaiApiKey: userApiKey || undefined,
+        onProgress: (done, total) => setCurrentProgress(Math.round((done / total) * 40)),
       });
 
-      let generatedScenario: typeof scenario;
-
-      if (error || !data?.content) {
-        console.warn('Scénario IA échoué, utilisation du fallback');
-        generatedScenario = buildFallbackScenario();
-      } else {
-        try {
-          let content = data.content;
-          const jsonMatch = content.match(/```json\s*([\s\S]*?)```/) || content.match(/\{[\s\S]*"pages"[\s\S]*\}/);
-          if (jsonMatch) {
-            content = jsonMatch[1] || jsonMatch[0];
-          }
-          generatedScenario = JSON.parse(content);
-        } catch {
-          generatedScenario = buildFallbackScenario();
-        }
-      }
-
-      if (!generatedScenario?.pages?.length) {
-        generatedScenario = buildFallbackScenario();
-      }
-
+      const generatedScenario = { pages };
       setScenario(generatedScenario);
-      toast.success(`✅ Scénario de ${generatedScenario.pages.length} pages prêt !`);
+      toast.success(`✅ Scénario cohérent de ${pages.length} pages prêt !`);
+
 
       // Étape 2: Générer les images
       setGenerationStep('images');
