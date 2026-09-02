@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import SeoHead from '@/components/funnel/SeoHead';
 import { PaymentTestModeBanner } from '@/components/PaymentTestModeBanner';
 import { BD_COMIC_OFFER } from '@/data/bdComicOffer';
+import BdTestimonials from '@/components/bd/BdTestimonials';
 
 /** Page de vente du Studio BD & Jeunesse — offre d'entrée 17 €, puis upsell Pro 47 €. */
 export default function BDOffrePage() {
