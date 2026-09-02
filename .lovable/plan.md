@@ -13,6 +13,17 @@ Ce que je peux livrer :
 
 Alternative plus rapide si vous préférez : **3 vidéos courtes de 60 à 90 secondes** (Le problème / Le studio / Les formules), plus efficaces en publicité qu'un format long.
 
+### Et la musique ?
+
+Oui, une musique de fond est possible, mais elle n'est pas générée en même temps que l'image : le rendu sort en vidéo muette, puis j'y colle une piste audio en post-traitement. Trois options :
+
+1. **Vous fournissez la musique** (fichier libre de droits, ou celle de vos autres vidéos) : je la mixe, avec fondu d'entrée/sortie et baisse de volume automatique si une voix arrive ensuite. C'est l'option la plus sûre côté droits.
+2. **Aucune musique** : sous-titres seuls, prêts à recevoir votre voix-off. Une musique posée sous une voix enregistrée plus tard sonne souvent mieux si elle est ajoutée à la fin, en même temps que la voix.
+3. **Musique générée** : possible mais peu maîtrisable en ambiance et en durée sur 7 minutes ; je ne la recommande pas pour une vidéo de vente.
+
+Recommandation : option 1 (vous m'envoyez une piste calme, piano/cordes, sans percussions marquées) ou option 2 si vous préférez tout monter à la fin avec la voix.
+
+
 ## Idées d'amélioration V3 (par priorité)
 
 ### 1. Finir le parcours abonné (priorité haute)
@@ -46,4 +57,6 @@ Alternative plus rapide si vous préférez : **3 vidéos courtes de 60 à 90 sec
 ## Ce que je vous demande de choisir
 
 1. Vidéo longue 7 min sous-titrée, ou 3 vidéos courtes ?
-2. Quelle amélioration V3 attaque-t-on en premier (1 à 5) ?
+2. Musique : vous fournissez une piste, ou vidéo muette ?
+3. Quelle amélioration V3 attaque-t-on en premier (1 à 5) ?
+
