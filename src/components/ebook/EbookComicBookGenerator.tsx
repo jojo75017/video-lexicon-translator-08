@@ -492,57 +492,9 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
     return layouts[layout] || '4 cases';
   };
 
-  // Fallback amélioré avec vraie narration
-  const buildFallbackScenario = () => {
-    const selectedTemplate = STORY_TEMPLATES.find(t => t.value === storyTemplate);
-    const selectedGenre = GENRES.find(g => g.value === genre);
-    const heroName = (mainCharacter || 'Le héros').trim();
-    const baseDesc = (customPrompt || setting || '').trim();
-    const bookTitle = title || 'L\'Aventure';
-    const selectedLayout = PANEL_LAYOUTS.find(l => l.value === panelLayout);
-    const panelCount = selectedLayout?.panelsPerPage || 4;
+  // Plus de scénario de secours générique : il produisait les mêmes cases
+  // page après page. En cas d'échec IA, on remonte une erreur explicite.
 
-    const dialogueBank = [
-      "Allons-y !", "Regarde là-bas !", "Incroyable !", "Attention !",
-      "Je n'abandonnerai pas !", "Ensemble, on peut y arriver !",
-      "Quelle découverte !", "En avant !", "C'est notre chance !",
-      "Vite, par ici !", "Tu as vu ça ?", "Mission accomplie !",
-      "Quel mystère...", "Suivez-moi !", "On a réussi !",
-      "C'est parti !", "Ne baisse pas les bras !", "Fantastique !"
-    ];
-
-    const actionBank = [
-      "arrive dans un nouveau lieu mystérieux",
-      "découvre un indice important",
-      "rencontre un nouvel allié",
-      "fait face à un obstacle",
-      "trouve une solution ingénieuse",
-      "court vers l'aventure",
-      "observe quelque chose d'étonnant",
-      "se prépare pour l'action",
-    ];
-
-    const defaultSteps = ['Introduction du héros', 'Appel à l\'aventure', 'Défis et alliés', 'Épreuve finale', 'Victoire et retour'];
-    const steps = selectedTemplate?.structure?.length ? selectedTemplate.structure : defaultSteps;
-
-    const pages = Array.from({ length: numberOfPages }, (_, pageIdx) => {
-      const stepIndex = Math.min(steps.length - 1, Math.floor((pageIdx / Math.max(1, numberOfPages - 1)) * steps.length));
-      const step = steps[stepIndex];
-
-      const panels = Array.from({ length: panelCount }, (_, panelIdx) => {
-        const globalIdx = pageIdx * panelCount + panelIdx;
-        return {
-          description: `${step} - ${heroName} ${actionBank[globalIdx % actionBank.length]}. ${baseDesc ? `(${baseDesc})` : ''} [Style: ${selectedGenre?.label || 'Aventure'}]`.trim(),
-          character: panelIdx % 3 === 2 ? 'Ami' : heroName,
-          dialogue: dialogueBank[globalIdx % dialogueBank.length],
-        };
-      });
-
-      return { panels };
-    });
-
-    return { pages };
-  };
 
   // Générer 20 idées de titres via IA
   const generateTitleIdeas = async () => {
