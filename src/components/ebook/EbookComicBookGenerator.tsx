@@ -176,9 +176,38 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
   const [setting, setSetting] = useState('');
   const [customPrompt, setCustomPrompt] = useState('');
 
-  // Clé Gemini utilisateur (fallback fiable si les crédits image internes sont épuisés)
+  // Clés utilisateur (BYOK) — routées vers le BON fournisseur
   const { apiKey: userApiKey, isValid: isUserKeyValid } = useOpenAIConfig();
-  const useOpenAI = Boolean(userApiKey) && isUserKeyValid === true;
+  const [imageEngine, setImageEngine] = useState<ImageEngine>('auto');
+  const [imageErrors, setImageErrors] = useState<{ count: number; reason: string } | null>(null);
+  const [regeneratingPanel, setRegeneratingPanel] = useState<string | null>(null);
+
+  // Clés disponibles, classées par fournisseur réel
+  const imageKeys = React.useMemo(() => {
+    const raw = [userApiKey, getProviderKey('gemini'), getProviderKey('openai'), getOpenRouterImageKey()];
+    try { raw.push(getProviderKey('openrouter' as never)); } catch { /* provider optionnel */ }
+    const found: Record<string, string> = {};
+    for (const k of raw) {
+      const key = (k || '').trim();
+      if (key.length < 10) continue;
+      const p = detectKeyProvider(key);
+      if (p !== 'unknown' && !found[p]) found[p] = key;
+    }
+    return found as { gemini?: string; openai?: string; openrouter?: string };
+  }, [userApiKey]);
+
+  const hasUserImageKey = Boolean(imageKeys.gemini || imageKeys.openai || imageKeys.openrouter);
+  const useOpenAI = hasUserImageKey && isUserKeyValid !== false;
+
+  // Payload de clés envoyé à la fonction d'images
+  const imageKeyPayload = () => ({
+    useOpenAI: hasUserImageKey,
+    imageEngine,
+    openaiApiKey: imageKeys.openai,
+    userGeminiApiKey: imageKeys.gemini,
+    openrouterApiKey: imageKeys.openrouter,
+  });
+
   
   // Cohérence visuelle
   const [visualSeed, setVisualSeed] = useState<string>('');
