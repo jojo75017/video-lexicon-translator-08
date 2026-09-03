@@ -143,9 +143,15 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
   const [bgUrl, setBgUrl] = useState<string | null>(null);
   const [guides, setGuides] = useState(false);
 
-  /* ---- export JPEG Kindle (local, sans IA ni crédit) --------------------- */
+  /* ---- exports (100 % local, sans IA ni crédit) -------------------------- */
   const [exportState, setExportState] = useState<'idle' | 'working' | 'done'>('idle');
   const [exportError, setExportError] = useState<string | null>(null);
+  const [exportLabel, setExportLabel] = useState<string | null>(null);
+
+  /** Les polices du modèle sont chargées dès l'ouverture de l'éditeur. */
+  useEffect(() => {
+    loadAllCoverFonts();
+  }, []);
 
   /** Réservé au format eBook Kindle avec une composition texte réellement remplie. */
   const canExportKindle =
@@ -153,12 +159,19 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
     composition.canvas.width > 0 &&
     composition.layers.some((l) => l.text.trim().length > 0);
 
-  const exportKindle = async () => {
+  const hasText = composition.layers.some((l) => l.text.trim().length > 0);
+
+  const runExport = async (
+    label: string,
+    task: () => Promise<{ blob: Blob; fileName: string }>,
+  ) => {
     if (exportState === 'working') return; // anti double-clic
     setExportState('working');
+    setExportLabel(label);
     setExportError(null);
     try {
-      const result = await renderKindleCoverJpeg(composition, bgUrl, project.book_title);
+      await ensureFontsReady(composition.layers.map((l) => l.fontFamily));
+      const result = await task();
       downloadBlob(result.blob, result.fileName);
       setExportState('done');
       window.setTimeout(() => setExportState('idle'), 6000);
@@ -167,6 +180,21 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
       setExportError(e instanceof Error ? e.message : 'rendu impossible');
     }
   };
+
+  const exportKindle = () =>
+    runExport('Kindle', () => renderKindleCoverJpeg(composition, bgUrl, project.book_title));
+
+  const exportPng = () =>
+    runExport('PNG', () => exportFrontPng(composition, bgUrl, project.book_title));
+
+  const exportPdf = () =>
+    runExport('PDF', () =>
+      exportFrontPdf(composition, bgUrl, { bookTitle: project.book_title }),
+    );
+
+  const exportMockup = () =>
+    runExport('Mockup', () => exportFrontMockup(composition, bgUrl, project.book_title));
+
 
   const [past, setPast] = useState<FrontComposition[]>([]);
   const [future, setFuture] = useState<FrontComposition[]>([]);
