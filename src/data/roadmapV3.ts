@@ -5,7 +5,7 @@
 export type V3Pillar = 'publier' | 'monetiser' | 'marketing' | 'ia' | 'edition' | 'distribution' | 'promotion' | 'data';
 export type V3Status = 'todo' | 'in_progress' | 'done';
 export type V3Tier = 'core' | 'upsell';
-export type V3PackId = 'cover' | 'marketing' | 'social' | 'monetisation' | 'editorial' | 'distribution' | 'promotion' | 'transcription' | 'market-research' | 'documentation-studio' | 'boost_lancement' | 'puzzle_book' | 'cherche_trouve' | 'short_stories';
+export type V3PackId = 'cover' | 'marketing' | 'social' | 'monetisation' | 'editorial' | 'distribution' | 'promotion' | 'transcription' | 'market-research' | 'documentation-studio' | 'boost_lancement' | 'puzzle_book' | 'cherche_trouve' | 'short_stories' | 'cover_studio_pro';
 
 export interface V3Module {
   id: string;
