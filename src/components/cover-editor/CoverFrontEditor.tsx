@@ -155,10 +155,13 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
   );
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedShapeId, setSelectedShapeId] = useState<string | null>(null);
   const [status, setStatus] = useState<SaveStatus>('idle');
   const [saveError, setSaveError] = useState<string | null>(null);
   const [bgUrl, setBgUrl] = useState<string | null>(null);
+  const [bgImage, setBgImage] = useState<HTMLImageElement | null>(null);
   const [guides, setGuides] = useState(false);
+
 
   /* ---- exports (100 % local, sans IA ni crédit) -------------------------- */
   const [exportState, setExportState] = useState<'idle' | 'working' | 'done'>('idle');
