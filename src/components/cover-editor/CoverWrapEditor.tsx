@@ -156,6 +156,8 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
 
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [activeZone, setActiveZone] = useState<'front' | 'spine' | 'back'>('front');
+
   const [status, setStatus] = useState<SaveStatus>('idle');
   const [saveError, setSaveError] = useState<string | null>(null);
   const [bgUrl, setBgUrl] = useState<string | null>(null);
