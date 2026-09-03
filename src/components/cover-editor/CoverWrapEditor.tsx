@@ -174,6 +174,12 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
 
   const pxPerIn = fitPxPerIn * zoom;
   const selected = composition.elements.find((e) => e.id === selectedId) ?? null;
+
+  // L'onglet de zone suit l'élément sélectionné sur le canevas.
+  useEffect(() => {
+    if (selected) setActiveZone(selected.zone);
+  }, [selected]);
+
   const spine = geometry ? spineTextConform(geometry) : null;
 
   /* ------------------ illustration privée (URL signée éphémère) ------------ */
