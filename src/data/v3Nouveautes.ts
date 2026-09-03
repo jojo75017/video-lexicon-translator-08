@@ -49,6 +49,15 @@ export const V3_TIER_COLOR: Record<V3NouveauteTier, string> = {
 export const V3_NOUVEAUTES: V3Nouveaute[] = [
   // --- Septembre 2026 ---
   {
+    id: 'mes-couvertures',
+    title: 'Vos couvertures comme un pro',
+    desc: 'Éditeur de couverture complète KDP : première, dos calculé et quatrième, avec repères de fond perdu et zone de sécurité.',
+    to: '/v3/mes-couvertures',
+    date: '2026-09-03',
+    tier: 'edition',
+  },
+  {
+
     id: 'bd-comic',
     title: 'Grande nouveauté V4 — Studio BD & Jeunesse',
     desc: 'Personnages, planches de bande dessinée et histoires illustrées, prêtes pour Amazon KDP.',
