@@ -182,6 +182,11 @@ export default function CoverProIllustrationPanel({ remaining, hasKey, onGenerat
               {preview.width} × {preview.height} px ·{' '}
               {preview.funding === 'ebookstudio' ? 'génération incluse' : 'votre clé OpenAI'} · fichier privé
             </p>
+            {projectId && (
+              <div className="flex justify-center pt-1">
+                <ContinueInEditorButton projectId={projectId} />
+              </div>
+            )}
           </div>
         )}
       </CardContent>
