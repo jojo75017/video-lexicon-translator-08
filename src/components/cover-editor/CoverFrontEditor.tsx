@@ -932,6 +932,7 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
             )}
 
             {composition.layers.map((layer) => {
+              if (layer.hidden) return null;
               const active = layer.id === selectedId;
               const padY = layer.band?.enabled ? (layer.band.padY ?? 0) * scale : 0;
               return (
@@ -939,7 +940,16 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
                   key={layer.id}
                   role="button"
                   tabIndex={0}
-                  onPointerDown={(e) => startDrag(e, layer)}
+                  onPointerDown={(e) => {
+                    setSelectedShapeId(null);
+                    if (layer.locked) {
+                      e.stopPropagation();
+                      setSelectedId(layer.id);
+                      return;
+                    }
+                    startDrag(e, layer);
+                  }}
+
                   className={cn(
                     'absolute cursor-move select-none',
                     active ? 'ring-2 ring-primary' : 'ring-1 ring-transparent hover:ring-primary/40',
