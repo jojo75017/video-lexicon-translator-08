@@ -1,34 +1,86 @@
-# Générer l'illustration directement dans l'éditeur de couverture
+# Audit Cover Studio Pro — du prototype à l'outil vendable 67 €
 
-## Le problème constaté
+Vous avez raison : dans l'état actuel, la composition est amateur. L'audit ci-dessous répond aux 12 points demandés, sans aucune modification de code, de base, de paiement ni de fonction sécurisée.
 
-Dans l'éditeur (`/v3/mes-couvertures/:id`), le bouton « Générer une illustration » renvoie vers `/v3/cover-studio-pro`, une ancienne page de présentation — pas vers le module de génération qui se trouve en réalité sur `/v3/cover-pro`. Résultat : on tourne en rond, aucune image n'arrive jamais dans le canevas, et l'abonné doit tout saisir à la main.
+## Constat vérifié
 
-La génération elle-même existe et fonctionne côté serveur (`cover-pro-generate`, OpenAI `gpt-image-2` en 1024×1536, image privée rattachée au projet), mais elle n'est atteignable que depuis une page séparée où il faut re-choisir son projet et remplir cinq champs.
+Le modèle de composition actuel (`frontComposition.ts`, version 1) ne contient que : position, largeur, police, taille, couleur, alignement, gras, italique, interligne. Il **n'a pas** de champ pour ombre, contour, voile, opacité, bandeau, verrouillage, ni ordre de calques. Aucun fichier de modèles professionnels n'existe (recherche « template » dans `src/lib/cover-editor/` et `src/components/cover-editor/` : zéro résultat). Aucun export n'est branché sur le nouvel éditeur. C'est la cause exacte du rendu amateur : il n'y a pas de règles typographiques, seulement des champs libres.
 
-## Ce qui va changer
+## Réponses aux 12 points d'audit
 
-1. **Un panneau « Illustration IA » directement dans l'éditeur**, au-dessus des outils de texte, sans quitter la page :
-   - un bouton principal « Générer l'illustration » qui marche en un clic ;
-   - le brief est pré-rempli automatiquement à partir du projet (titre du livre, genre, ambiance) ; l'abonné peut l'ajuster mais n'est jamais obligé de le faire ;
-   - un choix de moteur visible : **OpenAI** (3 générations incluses puis clé perso) ou **Gemini / Nano Banana** (clé perso, moins cher) ;
-   - pendant la génération : bouton en attente + message clair ; à la fin, l'image apparaît immédiatement en fond du canevas, sans rechargement ;
-   - messages d'erreur explicites : accès non débloqué, plus de générations incluses, clé manquante, refus du fournisseur.
+**1. Tables et champs des livres EbookStudio**
 
-2. **Lien cassé corrigé** : plus aucun renvoi vers `/v3/cover-studio-pro` depuis l'éditeur.
+Deux systèmes coexistent réellement :
 
-3. **Regénérer / remplacer** : si une illustration existe déjà, le bouton devient « Régénérer une autre illustration » (l'ancienne reste remplacée par la nouvelle sur le projet).
+- `ebook_projects` (45 lignes) — **la table réellement utilisée par le parcours V3**. Champs utiles pour une couverture : `title`, `author_name`, `book_summary`, `chapters`, `cover_concepts`, `ebook_images`, `kdp_description`, `kdp_keywords`, `kdp_categories`, `target_audience`, `tone`, `writing_style`, `back_cover_data`. Versionnée par `ebook_project_versions`.
+- `book_projects` (1 ligne) — parcours Studio Pro hybride, avec `title`, `subtitle`, `genre`, `target_audience`, `tone`, `era`, `places`, `main_characters`. Contenu dans `book_chapters`, `book_chapter_versions`, `book_bibles`.
+- `cover_projects` (3 lignes) — cible des couvertures. **Aucune colonne ne relie aujourd'hui une couverture à un livre.**
 
-4. **Accès** : la génération reste réservée à Cover Studio KDP Pro (67 €). Sans achat, le panneau affiche un encart clair avec le bouton de déblocage — mais les outils de texte restent utilisables.
+Conséquence : le sélecteur « choisir un livre » doit lire `ebook_projects` en priorité, et `book_projects` en second.
 
-## Détails techniques
+**2. Routes et composants du parcours de rédaction**
 
-- `src/components/cover-editor/CoverFrontEditor.tsx` : nouveau bloc de génération (brief pliable, sélecteur de moteur, appel `supabase.functions.invoke('cover-pro-generate')`, rafraîchissement du chemin d'illustration et de l'URL signée en mémoire). Même bloc réutilisé dans `CoverWrapEditor.tsx` pour la première de couverture d'un broché.
-- Nouveau composant partagé `src/components/cover-editor/IllustrationGeneratorPanel.tsx` pour éviter la duplication ; il lit l'accès et les crédits via `useCoverProAccess`.
-- `supabase/functions/cover-pro-generate/index.ts` : ajout du paramètre `provider` (`openai` par défaut, `gemini` en option). Branche Gemini = appel direct à l'API Google avec la clé personnelle de l'abonné (aucun crédit Lovable, aucune passerelle). Les crédits inclus restent réservés à OpenAI, la logique de réservation/restitution de crédit est inchangée.
-- `supabase/functions/cover-pro-key/index.ts` + `CoverProKeyVault.tsx` : la colonne `provider` existe déjà en base mais est figée sur `openai` ; on autorise l'enregistrement d'une clé `gemini` (validation du préfixe `AIza`), chiffrement AES-GCM identique.
-- Base de données, RLS, calculs KDP et paiements : aucune modification.
+- `src/components/v3public/V3CreateWizard.tsx` — le wizard complet ; il lit et écrit `ebook_projects` (lignes 466, 1014, 1029) et `ebook_project_versions` (487).
+- Routes couverture existantes dans `App.tsx` : `/v3/mes-couvertures` (612), `/v3/mes-couvertures/:id` (613), `/v3/cover-pro` (615), `/admin/cover-pro` (616).
 
-## Vérification
+**3. Où se trouve l'option actuelle de génération de couverture**
 
-Test navigateur complet : ouvrir un projet depuis la bibliothèque, cliquer « Générer l'illustration », vérifier que l'image s'affiche dans le canevas, ajouter un titre par-dessus, recharger la page et confirmer que l'illustration et les textes sont conservés. Captures d'écran fournies.
+Il n'y a pas de case à cocher : dans `V3CreateWizard.tsx`, la couverture est déclenchée **automatiquement** à la fin du livre (`coverTriggeredRef`, ligne 303) via l'ancienne fonction `generate-front-cover` (ligne 280), et le résultat est stocké en URL dans `ebook_projects.ebook_images` / `cover_concepts` (984, 990). Le libellé visible dit déjà « Générée automatiquement après la fin du livre » (1540). Ce chemin est totalement déconnecté de `cover_projects`.
+
+**4. Fichiers à modifier pour relier un livre à `cover_projects`**
+
+- migration : ajouter `source_kind`, `source_book_id`, `brief` (jsonb) à `cover_projects` ;
+- `src/lib/coverProjects.ts` : création d'un projet depuis un livre ;
+- `src/components/v3public/V3CreateWizard.tsx` : remplacer l'appel `generate-front-cover` par la création d'un projet `cover_projects` + redirection ;
+- `src/pages/v3/mes-couvertures/MesCouverturesPage.tsx` : les 3 sources à la création.
+
+L'ancien `/v3/cover-studio-pro` n'est pas touché.
+
+**5. Extraction PDF et DOCX**
+
+Tout existe déjà côté client, aucune nouvelle dépendance : `pdfjs-dist` via `src/lib/import/importFromPdf.ts` (`extractTextFromPdf`) et `mammoth` via `src/lib/bookperfect/importManuscript.ts` (ligne 75). L'extraction se fait dans le navigateur : le fichier n'est jamais téléversé, donc aucun document n'est stockable ni accessible par un autre compte, et il n'y a pas de fichier temporaire à supprimer. Seul un extrait de texte (début + table des matières, plafonné) partirait à l'analyse.
+
+**6. Modèle IA d'analyse et coût**
+
+`google/gemini-3.6-flash` par la passerelle Lovable pour produire le brief JSON (analyse de texte uniquement, pas d'image). Entrée plafonnée à ~8 000 caractères, sortie ~800 tokens : coût par livre négligeable, de l'ordre du millième d'euro. La génération d'image reste sur le circuit sécurisé existant `cover-pro-generate` (OpenAI `gpt-image-2`, crédits `cover_pro_credits`, BYOK au-delà) — inchangé.
+
+**7. Modèles professionnels**
+
+Nouveau fichier `src/lib/cover-editor/coverTemplates.ts` : 6 modèles (Roman, Thriller, Romance, Développement personnel, Guide pratique, Livre jeunesse), chacun décrivant zones en pourcentage, hiérarchie de tailles, marges de sécurité, interligne, espacement, ombre/contour, voile, et 3 variantes de couleurs. Cela impose d'étendre le modèle de composition en **version 2** avec les champs manquants (ombre, contour, opacité, voile, verrouillage, ordre) et une migration v1→v2 non destructive, comme celle déjà faite pour le wrap. Un ajustement automatique de la taille du titre selon sa longueur, borné par le modèle, supprime le titre mal dimensionné.
+
+**8. JPEG Kindle compressé**
+
+Rendu sur un `<canvas>` hors écran aux dimensions réelles 1600 × 2560, illustration + calques redessinés sans aucun élément d'interface, puis `canvas.toBlob('image/jpeg', q)` avec baisse progressive de la qualité jusqu'à passer sous 5 Mo. Aucune bibliothèque nouvelle.
+
+**9. PDF KDP broché (étape ultérieure)**
+
+`jspdf` est déjà installé et `src/lib/kdpCoverPdf.ts` génère déjà un wrap une page en pouces à 300 DPI avec fond perdu. Il sera réutilisé en le branchant sur la géométrie déjà validée de `kdpPaperbackSpecs.ts`, textes aplatis dans l'image pour éviter tout problème de polices.
+
+**10. Migrations nécessaires**
+
+Une seule, additive : `cover_projects` reçoit `source_kind` (text), `source_book_id` (uuid), `template_id` (text), `brief` (jsonb). Aucune colonne supprimée, RLS et grants existants inchangés.
+
+**11. Risques de régression**
+
+- Passage composition v1 → v2 : les 3 projets existants doivent continuer à s'ouvrir (migration au parsing, comme le wrap).
+- Le wizard : couper l'ancien déclenchement automatique peut priver les livres de leur image actuelle ; on conserve la valeur `ebook_images` existante.
+- Crédits : aucun changement, le compteur reste sur `cover-pro-generate` (vos 3 inclus sont déjà consommés — il faudra soit recréditer pour tester, soit l'écran de clé OpenAI perso, qui n'existe pas encore).
+- Ne pas dupliquer un second système de couverture : les anciens modules restent en place mais ne sont pas branchés au nouvel éditeur.
+
+**12. Découpage en étapes testables**
+
+- **A** — Modèles professionnels : composition v2 + 6 modèles + auto-taille du titre + contraste. Test : ouvrir un projet existant, appliquer chaque modèle, vérifier lisibilité et aucune régression.
+- **B** — Export JPEG Kindle : bouton « Télécharger la couverture Kindle ». Test : fichier 1600 × 2560, sous 5 Mo, sans repères.
+- **C** — Interface pro : barre supérieure Enregistrer / Aperçu / Exporter, colonne gauche Contenu · Image · Modèles · Calques, canevas central, colonne droite propriétés.
+- **D** — Les 3 sources + brief IA modifiable (livre EbookStudio, import PDF/DOCX, résumé manuel) + migration.
+- **E** — Liaison avec la rédaction : le wizard crée un projet `cover_projects` et ouvre le nouvel éditeur.
+- **F** — Outils avancés : ombre, contour, opacité, bandeau, verrouillage, ordre des calques, aperçu sans repères.
+- **G** — PDF KDP broché 300 DPI.
+
+## Note
+
+`roadmap.md` n'est pas modifié dans ce mode ; l'étape A y sera ajoutée dès la validation.
+
+## Question ouverte
+
+Je commence par l'étape A (modèles professionnels, ce qui corrige directement l'aspect amateur), ou vous préférez que je démarre par l'export JPEG Kindle ?
