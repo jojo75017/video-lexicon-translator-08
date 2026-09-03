@@ -127,6 +127,15 @@ export default function CoverProIllustrationPanel({ remaining, hasKey, onGenerat
           </select>
         </div>
 
+        {projectId && (
+          <div className="flex flex-wrap items-center gap-2">
+            <ContinueInEditorButton projectId={projectId} />
+            <span className="text-xs text-muted-foreground">
+              Ouvre l&rsquo;éditeur pour ajouter vos titres et finaliser la couverture.
+            </span>
+          </div>
+        )}
+
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="cp-genre">Genre</Label>
