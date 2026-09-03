@@ -72,6 +72,9 @@ import {
   computeWrapWarnings,
   createWrapComposition,
   defaultElement,
+  fitSpineElements,
+  fitSpineFontSize,
+
   elementBoxIn,
   inToPt,
   isWrapComposition,
