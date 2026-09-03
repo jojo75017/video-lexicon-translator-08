@@ -11,3 +11,5 @@
 
 - [x] Vidéo V3 7 min sous-titrée rendue (/mnt/documents/ebookstudio-v3-presentation.mp4, 6:47, 1080p, muette)
 - [x] Étape 1 couvertures : table cover_projects + bucket privé covers + couche d'accès isolée (tests RLS)
+- [x] Étape 2 couvertures : page « Mes couvertures » (/v3/mes-couvertures + fiche projet), duplication métadonnées seules, tests réels
+- [ ] Étape 3 couvertures : brancher l'éditeur graphique (en attente de validation)
