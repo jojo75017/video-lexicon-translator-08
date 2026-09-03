@@ -820,9 +820,228 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
                   </div>
                 </div>
 
+                <div className="space-y-1.5">
+                  <Label>Interligne : {selected.lineHeight.toFixed(2)}</Label>
+                  <Slider
+                    min={0.9}
+                    max={2}
+                    step={0.02}
+                    value={[selected.lineHeight]}
+                    onValueChange={([v]) => patchLayer(selected.id, { lineHeight: v }, false)}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label>Espacement des lettres : {selected.letterSpacing ?? 0} px</Label>
+                  <Slider
+                    min={-10}
+                    max={40}
+                    step={1}
+                    value={[selected.letterSpacing ?? 0]}
+                    onValueChange={([v]) => patchLayer(selected.id, { letterSpacing: v }, false)}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label>Opacité : {Math.round((selected.opacity ?? 1) * 100)} %</Label>
+                  <Slider
+                    min={0.1}
+                    max={1}
+                    step={0.05}
+                    value={[selected.opacity ?? 1]}
+                    onValueChange={([v]) => patchLayer(selected.id, { opacity: v }, false)}
+                  />
+                </div>
+
+                {/* ombre */}
+                <div className="space-y-2 rounded-lg border border-border p-3">
+                  <div className="flex items-center justify-between">
+                    <Label>Ombre portée</Label>
+                    <Switch
+                      checked={!!selected.shadow?.enabled}
+                      onCheckedChange={(on) =>
+                        patchLayer(selected.id, {
+                          shadow: {
+                            enabled: on,
+                            color: selected.shadow?.color ?? '#000000',
+                            blur: selected.shadow?.blur ?? 30,
+                            offsetY: selected.shadow?.offsetY ?? 6,
+                          },
+                        })
+                      }
+                    />
+                  </div>
+                  {selected.shadow?.enabled && (
+                    <>
+                      <Label className="text-xs">Flou : {selected.shadow.blur} px</Label>
+                      <Slider
+                        min={0}
+                        max={80}
+                        step={2}
+                        value={[selected.shadow.blur]}
+                        onValueChange={([v]) =>
+                          patchLayer(selected.id, { shadow: { ...selected.shadow!, blur: v } }, false)
+                        }
+                      />
+                      <Input
+                        type="color"
+                        className="h-9 w-16 p-1"
+                        value={selected.shadow.color}
+                        onChange={(e) =>
+                          patchLayer(selected.id, {
+                            shadow: { ...selected.shadow!, color: e.target.value },
+                          })
+                        }
+                      />
+                    </>
+                  )}
+                </div>
+
+                {/* contour */}
+                <div className="space-y-2 rounded-lg border border-border p-3">
+                  <div className="flex items-center justify-between">
+                    <Label>Contour</Label>
+                    <Switch
+                      checked={!!selected.outline?.enabled}
+                      onCheckedChange={(on) =>
+                        patchLayer(selected.id, {
+                          outline: {
+                            enabled: on,
+                            color: selected.outline?.color ?? '#000000',
+                            width: selected.outline?.width ?? 6,
+                          },
+                        })
+                      }
+                    />
+                  </div>
+                  {selected.outline?.enabled && (
+                    <>
+                      <Label className="text-xs">Épaisseur : {selected.outline.width} px</Label>
+                      <Slider
+                        min={1}
+                        max={24}
+                        step={1}
+                        value={[selected.outline.width]}
+                        onValueChange={([v]) =>
+                          patchLayer(
+                            selected.id,
+                            { outline: { ...selected.outline!, width: v } },
+                            false,
+                          )
+                        }
+                      />
+                      <Input
+                        type="color"
+                        className="h-9 w-16 p-1"
+                        value={selected.outline.color}
+                        onChange={(e) =>
+                          patchLayer(selected.id, {
+                            outline: { ...selected.outline!, color: e.target.value },
+                          })
+                        }
+                      />
+                    </>
+                  )}
+                </div>
+
+                {/* bandeau */}
+                <div className="space-y-2 rounded-lg border border-border p-3">
+                  <div className="flex items-center justify-between">
+                    <Label>Bandeau derrière le texte</Label>
+                    <Switch
+                      checked={!!selected.band?.enabled}
+                      onCheckedChange={(on) =>
+                        patchLayer(selected.id, {
+                          band: {
+                            enabled: on,
+                            color: selected.band?.color ?? '#000000',
+                            opacity: selected.band?.opacity ?? 0.45,
+                            padY: selected.band?.padY ?? Math.round(size.height * 0.02),
+                          },
+                        })
+                      }
+                    />
+                  </div>
+                  {selected.band?.enabled && (
+                    <>
+                      <Label className="text-xs">
+                        Opacité du bandeau : {Math.round(selected.band.opacity * 100)} %
+                      </Label>
+                      <Slider
+                        min={0.05}
+                        max={1}
+                        step={0.05}
+                        value={[selected.band.opacity]}
+                        onValueChange={([v]) =>
+                          patchLayer(selected.id, { band: { ...selected.band!, opacity: v } }, false)
+                        }
+                      />
+                      <Input
+                        type="color"
+                        className="h-9 w-16 p-1"
+                        value={selected.band.color}
+                        onChange={(e) =>
+                          patchLayer(selected.id, {
+                            band: { ...selected.band!, color: e.target.value },
+                          })
+                        }
+                      />
+                    </>
+                  )}
+                </div>
+
+                {/* voile global */}
+                <div className="space-y-2 rounded-lg border border-border p-3">
+                  <Label>Voile global sur l'illustration</Label>
+                  <Select
+                    value={composition.overlay?.type ?? 'none'}
+                    onValueChange={(v) =>
+                      commit((prev) => ({
+                        ...prev,
+                        overlay: {
+                          type: v as NonNullable<FrontComposition['overlay']>['type'],
+                          color: prev.overlay?.color ?? '#000000',
+                          opacity: prev.overlay?.opacity ?? 0.4,
+                        },
+                      }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Aucun</SelectItem>
+                      <SelectItem value="top">Haut</SelectItem>
+                      <SelectItem value="bottom">Bas</SelectItem>
+                      <SelectItem value="both">Haut et bas</SelectItem>
+                      <SelectItem value="full">Uniforme</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {composition.overlay && composition.overlay.type !== 'none' && (
+                    <>
+                      <Label className="text-xs">
+                        Intensité : {Math.round(composition.overlay.opacity * 100)} %
+                      </Label>
+                      <Slider
+                        min={0.05}
+                        max={0.9}
+                        step={0.05}
+                        value={[composition.overlay.opacity]}
+                        onValueChange={([v]) =>
+                          commit((prev) => ({
+                            ...prev,
+                            overlay: { ...prev.overlay!, opacity: v },
+                          }))
+                        }
+                      />
+                    </>
+                  )}
+                </div>
+
                 <Button variant="outline" className="w-full" onClick={() => centerLayer(selected)}>
                   Centrer horizontalement
                 </Button>
+
               </>
             )}
           </CardContent>
