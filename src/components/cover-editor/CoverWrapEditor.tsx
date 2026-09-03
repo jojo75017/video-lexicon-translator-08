@@ -493,7 +493,22 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
           <div className="flex items-center gap-2">
             <Switch id="wrap-guides" checked={showGuides} onCheckedChange={setShowGuides} />
             <Label htmlFor="wrap-guides" className="text-sm">Repères</Label>
+          <span className="mx-1 h-6 w-px bg-border" />
+          <div className="flex items-center gap-1 rounded-lg border border-border p-0.5">
+            {(['front', 'spine', 'back'] as const).map((zone) => (
+              <Button
+                key={zone}
+                size="sm"
+                variant={activeZone === zone ? 'default' : 'ghost'}
+                className="h-7 px-2 text-xs"
+                onClick={() => setActiveZone(zone)}
+              >
+                {ZONE_LABEL[zone]}
+              </Button>
+            ))}
           </div>
+        </div>
+
         </div>
         <StatusPill status={status} error={saveError} />
       </div>
