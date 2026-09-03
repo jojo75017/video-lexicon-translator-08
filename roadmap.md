@@ -16,5 +16,7 @@
 - [x] Étape 3 validée par Georges (03/09/2026)
 - [ ] BLOQUANT avant mise en production : paiement sandbox complet du produit 67 € avec un compte neuf → vérifier le webhook, l'attribution du droit `cover_studio_pro`, l'accès réel à l'éditeur et l'absence de droit avant paiement
 - [x] Étape 4A couvertures : socle sécurisé de l'éditeur de première de couverture (canevas aux dimensions réelles, fond privé par URL signée, 3 textes, annuler/rétablir, autosave `fabric_json`, miniature privée)
-- [ ] Étape 4B couvertures : dos + 4ᵉ de couverture, calcul KDP, fond perdu, exports PDF/JPEG (en attente de validation)
+- [x] Étape 4A validée par Georges (03/09/2026)
+- [x] Étape 4B (partie 1) : moteur de calcul + configuration KDP broché (`src/lib/cover-editor/kdpPaperbackSpecs.ts`, panneau « Configuration KDP », persistance `kdp_config`/`kdp_geometry`/`kdp_rules_version`, 21 tests unitaires)
+- [ ] Étape 4C couvertures (en attente de validation) : dos éditable, 4ᵉ de couverture, canevas couverture complète, exports PDF/JPEG, couverture rigide
 
