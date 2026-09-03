@@ -39,8 +39,12 @@ export interface FrontComposition {
   /** Chemin privé stable (bucket `covers`) — JAMAIS une URL signée. */
   illustrationPath: string | null;
   canvas: { width: number; height: number };
+  /** Couleur de fond visible sous l'illustration (ou seule si aucune image). */
+  backgroundColor: string;
   layers: FrontTextLayer[];
 }
+
+export const DEFAULT_FRONT_BACKGROUND = '#111827';
 
 /* ------------------------------------------------------------------ */
 /* Dimensions réelles (première de couverture uniquement)             */
@@ -143,6 +147,7 @@ export function createComposition(params: {
     version: FRONT_COMPOSITION_VERSION,
     illustrationPath: params.illustrationPath ?? null,
     canvas: { width: size.width, height: size.height },
+    backgroundColor: DEFAULT_FRONT_BACKGROUND,
     layers: [
       defaultLayer('title', size, params.bookTitle?.trim() || 'Titre du livre'),
       defaultLayer('subtitle', size, 'Sous-titre'),
@@ -216,6 +221,10 @@ export function parseComposition(
     version: FRONT_COMPOSITION_VERSION,
     illustrationPath,
     canvas,
+    backgroundColor:
+      typeof obj.backgroundColor === 'string' && /^#[0-9a-fA-F]{6}$/.test(obj.backgroundColor)
+        ? obj.backgroundColor
+        : DEFAULT_FRONT_BACKGROUND,
     layers: layers.length ? layers : createComposition(fallback).layers,
   };
 }
@@ -229,6 +238,9 @@ export function serializeComposition(
     version: FRONT_COMPOSITION_VERSION,
     illustrationPath: illustrationPath && !looksLikeUrl(illustrationPath) ? illustrationPath : null,
     canvas: { ...composition.canvas },
+    backgroundColor: /^#[0-9a-fA-F]{6}$/.test(composition.backgroundColor ?? '')
+      ? composition.backgroundColor
+      : DEFAULT_FRONT_BACKGROUND,
     layers: composition.layers.map((l) => ({
       ...l,
       text: looksLikeUrl(l.text) ? '' : l.text,
@@ -283,7 +295,7 @@ export async function renderCompositionThumbnail(
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Canevas indisponible dans ce navigateur.');
 
-  ctx.fillStyle = '#111827';
+  ctx.fillStyle = composition.backgroundColor || DEFAULT_FRONT_BACKGROUND;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   if (backgroundUrl) {
