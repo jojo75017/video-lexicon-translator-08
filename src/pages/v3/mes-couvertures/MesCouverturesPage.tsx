@@ -265,18 +265,18 @@ export default function MesCouverturesPage() {
       )}
 
       {!loading && !error && projects.length > 0 && (
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid justify-items-start gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {projects.map((project) => {
             const meta = TYPE_META[project.cover_type] ?? TYPE_META.ebook;
             const Icon = meta.icon;
             const thumb = thumbs[project.id];
             return (
-              <Card key={project.id} className="flex flex-col overflow-hidden">
+              <Card key={project.id} className="flex w-full max-w-[240px] flex-col overflow-hidden">
                 <Link
                   to={`/v3/mes-couvertures/${project.id}`}
                   aria-label={`Ouvrir l’éditeur de ${project.project_name}`}
-                  className="block bg-muted transition-opacity hover:opacity-90"
-                  style={{ maxWidth: 220, height: 330 }}
+                  className="block w-full bg-muted transition-opacity hover:opacity-90"
+                  style={{ height: 330 }}
                 >
                   {thumb ? (
                     <img
