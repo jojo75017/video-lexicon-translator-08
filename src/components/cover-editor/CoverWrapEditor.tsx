@@ -393,7 +393,16 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
     window.addEventListener('pointerup', up);
   };
 
-  const addElement = (role: WrapRole) => commit((prev) => ({ ...prev, elements: [...prev.elements, defaultElement(role)] }));
+  const addElement = (role: WrapRole) =>
+    commit((prev) => {
+      const fresh = defaultElement(role);
+      // Un nouvel élément de dos est créé à une taille conforme (jamais sous 7 pt).
+      if (fresh.zone === 'spine' && geometry) {
+        fresh.fontSizeIn = fitSpineFontSize(geometry, fresh.fontSizeIn);
+      }
+      return { ...prev, elements: [...prev.elements, fresh] };
+    });
+
 
   const removeElement = (id: string) => {
     commit((prev) => ({ ...prev, elements: prev.elements.filter((e) => e.id !== id) }));
