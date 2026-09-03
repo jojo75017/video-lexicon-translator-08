@@ -30,6 +30,8 @@ import {
 } from 'lucide-react';
 
 import IllustrationGeneratorPanel from '@/components/cover-editor/IllustrationGeneratorPanel';
+import CoverProAccessBar from '@/components/cover-editor/CoverProAccessBar';
+
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
