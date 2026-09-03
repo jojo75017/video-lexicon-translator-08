@@ -385,10 +385,25 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
 
   /* ---------------- modèles professionnels ---------------------------------- */
   const [templateBackup, setTemplateBackup] = useState<FrontComposition | null>(null);
+  const [genreFilter, setGenreFilter] = useState<CoverGenre | 'all'>('all');
+  const [templateVariant, setTemplateVariant] = useState(0);
 
-  const useTemplate = (id: CoverTemplateId) => {
+  const visibleTemplates = useMemo(
+    () =>
+      genreFilter === 'all'
+        ? COVER_TEMPLATES
+        : COVER_TEMPLATES.filter((t) => t.genre === genreFilter),
+    [genreFilter],
+  );
+
+  const useTemplate = (id: CoverTemplateId, variantIndex = 0) => {
     setTemplateBackup(composition);
-    commit((prev) => applyTemplate(prev, id));
+    setTemplateVariant(variantIndex);
+    const tpl = COVER_TEMPLATES.find((t) => t.id === id);
+    if (tpl) {
+      void ensureFontsReady([tpl.title.fontFamily, tpl.subtitle.fontFamily, tpl.author.fontFamily]);
+    }
+    commit((prev) => applyTemplate(prev, id, variantIndex));
   };
 
   const cancelTemplate = () => {
@@ -397,6 +412,7 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
     setTemplateBackup(null);
     commit(() => restore);
   };
+
 
   const missingRoles = ROLES.filter((r) => !composition.layers.some((l) => l.role === r));
 
