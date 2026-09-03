@@ -135,10 +135,12 @@ export default function MesCouverturesPage() {
         format_id: TYPE_META[newType].formatId,
         page_count: Number.isFinite(pages as number) ? (pages as number) : null,
       });
-      toast.success('Couverture créée.');
+      toast.success('Couverture créée — ouverture de l’éditeur.');
       setCreateOpen(false);
       resetCreateForm();
       setProjects((prev) => [created, ...prev]);
+      navigate(`/v3/mes-couvertures/${created.id}`);
+
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Création impossible.');
     } finally {
