@@ -21,3 +21,5 @@
 - [ ] Étape 4C couvertures (en attente de validation) : dos éditable, 4ᵉ de couverture, canevas couverture complète, exports PDF/JPEG, couverture rigide
 
 - [x] Correction interface éditeur de couverture (03/09/2026) : bouton orange « Modifier cette couverture », outils toujours visibles (titre, sous-titre, auteur, couleur de fond, générer illustration), panneau propriétés (police, taille, couleur, gras/italique/alignement), bouton Enregistrer, textes de zone visibles pour le broché — testé et persistant après rechargement
+
+- [x] Génération d’illustration branchée DANS le nouvel éditeur (/v3/mes-couvertures/:id) : panneau 5 champs (genre, ambiance, palette, à éviter, sujet), appel `cover-pro-generate` (OpenAI gpt-image-2 + crédits cover_pro_credits + clé chiffrée), image privée affichée immédiatement, plus aucun renvoi vers /v3/cover-studio-pro depuis l’éditeur
