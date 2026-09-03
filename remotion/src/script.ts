@@ -11,6 +11,10 @@ export interface Scene {
   title: string;
   chips: string[];
   lines: string[];
+  /** Capture réelle affichée à droite (dans public/images). */
+  shot?: string;
+  /** Légende de la capture. */
+  shotCaption?: string;
   /** Visuel dominant de la séquence. */
   motif: "opening" | "problem" | "outline" | "writing" | "proof" | "publish" | "pricing" | "closing";
 }
@@ -31,6 +35,8 @@ export const SCENES: Scene[] = [
     chapter: "Séquence 1",
     title: "Un livre, jusqu'au bout",
     motif: "opening",
+    shot: "studio.jpg",
+    shotCaption: "Écran réel : la fiche de départ du livre.",
     chips: ["Ebookstudio V3", "Amazon KDP", "Français"],
     lines: [
       "Bonjour, je suis Georges Boubet, auteur sur Amazon KDP et créateur d'Ebookstudio.",
@@ -60,6 +66,8 @@ export const SCENES: Scene[] = [
     chapter: "Séquence 3",
     title: "On construit le sommaire ensemble",
     motif: "outline",
+    shot: "sommaire.jpg",
+    shotCaption: "Écran réel : le sommaire construit avec vous.",
     chips: ["Mode Copilot", "Validation par 3", "Vos mots"],
     lines: [
       "Première étape, et c'est celle qui change tout : le sommaire.",
@@ -76,6 +84,8 @@ export const SCENES: Scene[] = [
     chapter: "Séquence 4",
     title: "L'écriture, avec mémoire du livre",
     motif: "writing",
+    shot: "workflow.jpg",
+    shotCaption: "Écran réel : le pipeline des agents.",
     chips: ["2 500 à 3 500 mots", "Mémoire", "Reprise"],
     lines: [
       "Ensuite, l'écriture.",
@@ -91,6 +101,8 @@ export const SCENES: Scene[] = [
     chapter: "Séquence 5",
     title: "La correction, en quatre passes",
     motif: "proof",
+    shot: "correction.jpg",
+    shotCaption: "Écran réel : la correction, avant / après.",
     chips: ["Dictée", "Répétitions", "Cohérence", "Typographie"],
     lines: [
       "Un manuscrit brut n'est pas un livre. Il faut le corriger comme une maison d'édition le ferait.",
@@ -106,6 +118,8 @@ export const SCENES: Scene[] = [
     chapter: "Séquence 6",
     title: "Habiller, publier, vendre",
     motif: "publish",
+    shot: "cover.jpg",
+    shotCaption: "Écran réel : la couverture aux gabarits Amazon.",
     chips: ["Couverture 300 dpi", "PDF · DOCX · EPUB", "Données KDP", "Audio"],
     lines: [
       "Le livre est écrit et corrigé. Il reste à l'habiller et à le publier.",
@@ -140,6 +154,8 @@ export const SCENES: Scene[] = [
     chapter: "Séquence 8",
     title: "Votre cadeau de départ",
     motif: "closing",
+    shot: "livres.jpg",
+    shotCaption: "Écran réel : vos livres, prêts à publier.",
     chips: ["10 niches analysées", "Kit de démarrage", "Sans carte bancaire"],
     lines: [
       "Avant de partir, prenez le cadeau :",
