@@ -832,23 +832,32 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label>Police</Label>
+                  <Label>Police professionnelle</Label>
                   <Select
                     value={selected.fontFamily}
-                    onValueChange={(v) => patchLayer(selected.id, { fontFamily: v })}
+                    onValueChange={(v) => {
+                      void ensureFontsReady([v]);
+                      patchLayer(selected.id, { fontFamily: v });
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
-                      {FRONT_FONTS.map((f) => (
-                        <SelectItem key={f.value} value={f.value}>
-                          {f.label}
-                        </SelectItem>
+                    <SelectContent className="max-h-80">
+                      {(['serif', 'sans', 'display'] as FontCategory[]).map((cat) => (
+                        <SelectGroup key={cat}>
+                          <SelectLabel>{FONT_CATEGORY_LABEL[cat]}</SelectLabel>
+                          {COVER_FONTS.filter((f) => f.category === cat).map((f) => (
+                            <SelectItem key={f.value} value={f.value}>
+                              <span style={{ fontFamily: f.value }}>{f.label}</span>
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
+
 
                 <div className="space-y-1.5">
                   <Label>Taille : {selected.fontSize} px</Label>
