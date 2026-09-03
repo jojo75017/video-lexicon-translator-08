@@ -111,7 +111,13 @@ export default function V3CoverProBanner() {
           </div>
 
           {/* Visuel */}
-          <div className="relative min-h-[240px] lg:min-h-[380px]">
+          <div
+            className="relative min-h-[240px] lg:min-h-[380px]"
+            style={{
+              maskImage: 'linear-gradient(90deg, transparent 0%, #000 30%)',
+              WebkitMaskImage: 'linear-gradient(90deg, transparent 0%, #000 30%)',
+            }}
+          >
             <img
               src={coverProBanner}
               alt="Trois couvertures de livres haut de gamme aux ornements dorés, générées avec Cover Studio KDP Pro"
@@ -125,7 +131,7 @@ export default function V3CoverProBanner() {
               className="absolute inset-0"
               style={{
                 background:
-                  'linear-gradient(90deg, #101731 0%, rgba(16,23,49,0.72) 22%, rgba(7,10,24,0.18) 55%, rgba(7,10,24,0) 100%)',
+                  'linear-gradient(90deg, rgba(16,23,49,0.5) 0%, rgba(7,10,24,0.12) 45%, rgba(7,10,24,0) 100%)',
               }}
             />
             <div
