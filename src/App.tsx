@@ -46,6 +46,8 @@ const AmbiancesPage = lazy(() => import('./pages/AmbiancesPage'));
 const CouvertureKdpPage = lazy(() => import('./pages/CouvertureKdpPage'));
 const CoverStudioProHubPage = lazy(() => import('./pages/v3/cover-studio-pro/CoverStudioProHubPage'));
 const CoverEditorPage = lazy(() => import('./pages/v3/cover-studio-pro/CoverEditorPage'));
+const MesCouverturesPage = lazy(() => import('./pages/v3/mes-couvertures/MesCouverturesPage'));
+const CouvertureProjetPage = lazy(() => import('./pages/v3/mes-couvertures/CouvertureProjetPage'));
 const Niches600Page = lazy(() => import('./pages/Niches600Page'));
 const NichesPage = lazy(() => import('./pages/NichesPage'));
 const BookPerfectPage = lazy(() => import('./pages/BookPerfectPage'));
@@ -605,6 +607,8 @@ const App = () => {
             <Route path="/couverture-kdp" element={gated(<CouvertureKdpPage />)} />
             <Route path="/v3/cover-studio-pro" element={gated(<TrialGate label="Cover Studio Pro"><CoverStudioProHubPage /></TrialGate>)} />
             <Route path="/v3/cover-studio-pro/edit" element={gated(<TrialGate label="Cover Studio Pro"><CoverEditorPage /></TrialGate>)} />
+            <Route path="/v3/mes-couvertures" element={gated(<TrialGate label="Mes couvertures"><MesCouverturesPage /></TrialGate>)} />
+            <Route path="/v3/mes-couvertures/:id" element={gated(<TrialGate label="Mes couvertures"><CouvertureProjetPage /></TrialGate>)} />
 
             <Route path="/series-tomes" element={gated(<SeriesTomesPage />)} />
             <Route path="/fiches-pratiques" element={gated(<PracticalSheetsGeneratorPage />)} />
