@@ -13,8 +13,25 @@
 
 export const FRONT_COMPOSITION_VERSION = 1 as const;
 
+/**
+ * Version des STYLES (indépendante de `version`, déjà utilisée par la
+ * composition brochée). Permet d'ajouter ombre / contour / opacité / voile
+ * sans casser les deux types de documents.
+ */
+export const FRONT_STYLE_VERSION = 1 as const;
+
 export type TextRole = 'title' | 'subtitle' | 'author';
 export type TextAlign = 'left' | 'center' | 'right';
+
+/** Voile (bandeau) dessiné derrière un texte pour garantir la lisibilité. */
+export interface LayerBand {
+  enabled: boolean;
+  color: string;
+  /** 0 → 1 */
+  opacity: number;
+  /** marge intérieure verticale, en pixels du canevas */
+  padY: number;
+}
 
 export interface FrontTextLayer {
   id: string;
@@ -32,19 +49,41 @@ export interface FrontTextLayer {
   bold: boolean;
   italic: boolean;
   lineHeight: number;
+  /* ---- styles optionnels (styleVersion 1) ---- */
+  /** 0 → 1 */
+  opacity?: number;
+  /** espacement des lettres en pixels du canevas */
+  letterSpacing?: number;
+  shadow?: { enabled: boolean; color: string; blur: number; offsetY: number };
+  outline?: { enabled: boolean; color: string; width: number };
+  band?: LayerBand;
+}
+
+/** Voile global appliqué au-dessus de l'illustration. */
+export interface FrontOverlay {
+  type: 'none' | 'top' | 'bottom' | 'both' | 'full';
+  color: string;
+  /** 0 → 1 */
+  opacity: number;
 }
 
 export interface FrontComposition {
   version: typeof FRONT_COMPOSITION_VERSION;
+  /** Version des styles, sans lien avec `version`. */
+  styleVersion?: typeof FRONT_STYLE_VERSION;
   /** Chemin privé stable (bucket `covers`) — JAMAIS une URL signée. */
   illustrationPath: string | null;
   canvas: { width: number; height: number };
   /** Couleur de fond visible sous l'illustration (ou seule si aucune image). */
   backgroundColor: string;
+  overlay?: FrontOverlay;
+  /** Identifiant du dernier modèle appliqué (informatif). */
+  templateId?: string | null;
   layers: FrontTextLayer[];
 }
 
 export const DEFAULT_FRONT_BACKGROUND = '#111827';
+
 
 /* ------------------------------------------------------------------ */
 /* Dimensions réelles (première de couverture uniquement)             */
@@ -192,6 +231,9 @@ export function parseComposition(
         : 'title';
       const base = defaultLayer(role, canvas);
       const text = str(l.text, base.text);
+      const shadowRaw = (l.shadow ?? null) as Record<string, unknown> | null;
+      const outlineRaw = (l.outline ?? null) as Record<string, unknown> | null;
+      const bandRaw = (l.band ?? null) as Record<string, unknown> | null;
       return {
         ...base,
         id: str(l.id, base.id),
@@ -209,6 +251,31 @@ export function parseComposition(
         bold: Boolean(l.bold),
         italic: Boolean(l.italic),
         lineHeight: num(l.lineHeight, base.lineHeight),
+        opacity: clamp01(num(l.opacity, 1)),
+        letterSpacing: num(l.letterSpacing, 0),
+        shadow: shadowRaw
+          ? {
+              enabled: Boolean(shadowRaw.enabled),
+              color: str(shadowRaw.color as string, '#000000'),
+              blur: num(shadowRaw.blur, 24),
+              offsetY: num(shadowRaw.offsetY, 8),
+            }
+          : undefined,
+        outline: outlineRaw
+          ? {
+              enabled: Boolean(outlineRaw.enabled),
+              color: str(outlineRaw.color as string, '#000000'),
+              width: num(outlineRaw.width, 4),
+            }
+          : undefined,
+        band: bandRaw
+          ? {
+              enabled: Boolean(bandRaw.enabled),
+              color: str(bandRaw.color as string, '#000000'),
+              opacity: clamp01(num(bandRaw.opacity, 0.45)),
+              padY: num(bandRaw.padY, 24),
+            }
+          : undefined,
       };
     });
 
@@ -217,10 +284,25 @@ export function parseComposition(
       ? obj.illustrationPath
       : fallback.illustrationPath ?? null;
 
+  const overlayRaw = (obj.overlay ?? null) as Record<string, unknown> | null;
+
   return {
     version: FRONT_COMPOSITION_VERSION,
+    styleVersion: FRONT_STYLE_VERSION,
     illustrationPath,
     canvas,
+    templateId: typeof obj.templateId === 'string' ? obj.templateId : null,
+    overlay: overlayRaw
+      ? {
+          type: (['none', 'top', 'bottom', 'both', 'full'] as const).includes(
+            overlayRaw.type as FrontOverlay['type'],
+          )
+            ? (overlayRaw.type as FrontOverlay['type'])
+            : 'none',
+          color: str(overlayRaw.color as string, '#000000'),
+          opacity: clamp01(num(overlayRaw.opacity, 0.35)),
+        }
+      : undefined,
     backgroundColor:
       typeof obj.backgroundColor === 'string' && /^#[0-9a-fA-F]{6}$/.test(obj.backgroundColor)
         ? obj.backgroundColor
@@ -236,8 +318,11 @@ export function serializeComposition(
 ): FrontComposition {
   return {
     version: FRONT_COMPOSITION_VERSION,
+    styleVersion: FRONT_STYLE_VERSION,
     illustrationPath: illustrationPath && !looksLikeUrl(illustrationPath) ? illustrationPath : null,
     canvas: { ...composition.canvas },
+    templateId: composition.templateId ?? null,
+    overlay: composition.overlay ? { ...composition.overlay } : undefined,
     backgroundColor: /^#[0-9a-fA-F]{6}$/.test(composition.backgroundColor ?? '')
       ? composition.backgroundColor
       : DEFAULT_FRONT_BACKGROUND,
@@ -248,9 +333,12 @@ export function serializeComposition(
   };
 }
 
+
 /* ------------------------------------------------------------------ */
-/* Rendu canevas (miniature privée)                                   */
+/* Rendu canevas partagé (miniature ET export Kindle)                 */
 /* ------------------------------------------------------------------ */
+
+export const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 
 const wrapLines = (
   ctx: CanvasRenderingContext2D,
@@ -278,6 +366,152 @@ const wrapLines = (
   return lines;
 };
 
+const hexToRgba = (hex: string, alpha: number) => {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return `rgba(0,0,0,${alpha})`;
+  const n = parseInt(m[1], 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${alpha})`;
+};
+
+const drawOverlay = (
+  ctx: CanvasRenderingContext2D,
+  overlay: FrontOverlay | undefined,
+  w: number,
+  h: number,
+) => {
+  if (!overlay || overlay.type === 'none' || overlay.opacity <= 0) return;
+  const color = overlay.color || '#000000';
+  const a = clamp01(overlay.opacity);
+  if (overlay.type === 'full') {
+    ctx.fillStyle = hexToRgba(color, a);
+    ctx.fillRect(0, 0, w, h);
+    return;
+  }
+  if (overlay.type === 'top' || overlay.type === 'both') {
+    const g = ctx.createLinearGradient(0, 0, 0, h * 0.55);
+    g.addColorStop(0, hexToRgba(color, a));
+    g.addColorStop(1, hexToRgba(color, 0));
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h * 0.55);
+  }
+  if (overlay.type === 'bottom' || overlay.type === 'both') {
+    const g = ctx.createLinearGradient(0, h, 0, h * 0.45);
+    g.addColorStop(0, hexToRgba(color, a));
+    g.addColorStop(1, hexToRgba(color, 0));
+    ctx.fillStyle = g;
+    ctx.fillRect(0, h * 0.45, w, h * 0.55);
+  }
+};
+
+/**
+ * Dessine fond + voile + textes (avec ombre, contour, opacité, bandeau,
+ * interligne et espacement des lettres). Utilisé à l'identique par l'aperçu
+ * miniature et par l'export JPEG Kindle : ce qui est visible est exporté.
+ */
+export function drawFrontComposition(
+  ctx: CanvasRenderingContext2D,
+  composition: FrontComposition,
+  image: HTMLImageElement | null,
+  scaleX: number,
+  scaleY: number = scaleX,
+): void {
+  const w = composition.canvas.width * scaleX;
+  const h = composition.canvas.height * scaleY;
+
+  ctx.fillStyle = composition.backgroundColor || DEFAULT_FRONT_BACKGROUND;
+  ctx.fillRect(0, 0, w, h);
+
+  if (image) {
+    const ratio = Math.max(w / image.width, h / image.height);
+    const iw = image.width * ratio;
+    const ih = image.height * ratio;
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(image, (w - iw) / 2, (h - ih) / 2, iw, ih);
+  }
+
+  drawOverlay(ctx, composition.overlay, w, h);
+
+  ctx.textBaseline = 'top';
+  for (const layer of composition.layers) {
+    if (!layer.text.trim()) continue;
+    const fontSize = layer.fontSize * scaleY;
+    const weight = layer.bold ? '700' : '400';
+    const style = layer.italic ? 'italic' : 'normal';
+    ctx.save();
+    ctx.font = `${style} ${weight} ${fontSize}px ${layer.fontFamily}`;
+    const spacing = (layer.letterSpacing ?? 0) * scaleX;
+    try {
+      (ctx as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing =
+        `${spacing}px`;
+    } catch {
+      /* navigateur sans letterSpacing : ignoré */
+    }
+    ctx.globalAlpha = clamp01(layer.opacity ?? 1);
+    ctx.textAlign =
+      layer.align === 'center' ? 'center' : layer.align === 'right' ? 'right' : 'left';
+
+    const boxX = layer.x * scaleX;
+    const boxWidth = layer.width * scaleX;
+    const anchorX =
+      layer.align === 'center'
+        ? boxX + boxWidth / 2
+        : layer.align === 'right'
+          ? boxX + boxWidth
+          : boxX;
+
+    const lines = wrapLines(ctx, layer.text, boxWidth);
+    const top = layer.y * scaleY;
+    const lineStep = fontSize * layer.lineHeight;
+
+    // bandeau / voile derrière le texte
+    if (layer.band?.enabled && layer.band.opacity > 0) {
+      const padY = (layer.band.padY ?? 24) * scaleY;
+      const bandH = lines.length * lineStep + padY * 2;
+      ctx.fillStyle = hexToRgba(layer.band.color || '#000000', clamp01(layer.band.opacity));
+      ctx.fillRect(boxX - 8 * scaleX, top - padY, boxWidth + 16 * scaleX, bandH);
+    }
+
+    let y = top;
+    for (const line of lines) {
+      if (layer.shadow?.enabled) {
+        ctx.shadowColor = hexToRgba(layer.shadow.color || '#000000', 0.85);
+        ctx.shadowBlur = (layer.shadow.blur ?? 24) * scaleY;
+        ctx.shadowOffsetY = (layer.shadow.offsetY ?? 8) * scaleY;
+      } else {
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetY = 0;
+      }
+      if (layer.outline?.enabled && (layer.outline.width ?? 0) > 0) {
+        ctx.lineJoin = 'round';
+        ctx.strokeStyle = layer.outline.color || '#000000';
+        ctx.lineWidth = (layer.outline.width ?? 4) * scaleY;
+        ctx.strokeText(line, anchorX, y);
+      }
+      ctx.fillStyle = layer.color;
+      ctx.fillText(line, anchorX, y);
+      y += lineStep;
+    }
+    ctx.restore();
+  }
+}
+
+const loadImageSafe = async (url: string | null): Promise<HTMLImageElement | null> => {
+  if (!url) return null;
+  try {
+    return await new Promise<HTMLImageElement>((resolve, reject) => {
+      const el = new Image();
+      el.crossOrigin = 'anonymous';
+      el.onload = () => resolve(el);
+      el.onerror = () => reject(new Error('image'));
+      el.src = url;
+    });
+  } catch {
+    return null;
+  }
+};
+
 /**
  * Dessine la composition (fond + textes) puis renvoie un JPEG de miniature.
  * `backgroundUrl` est une URL signée temporaire utilisée uniquement en mémoire.
@@ -295,50 +529,9 @@ export async function renderCompositionThumbnail(
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Canevas indisponible dans ce navigateur.');
 
-  ctx.fillStyle = composition.backgroundColor || DEFAULT_FRONT_BACKGROUND;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const img = await loadImageSafe(backgroundUrl);
+  drawFrontComposition(ctx, composition, img, scale, scale);
 
-  if (backgroundUrl) {
-    try {
-      const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-        const el = new Image();
-        el.crossOrigin = 'anonymous';
-        el.onload = () => resolve(el);
-        el.onerror = () => reject(new Error('image'));
-        el.src = backgroundUrl;
-      });
-      // couverture façon object-fit: cover
-      const ratio = Math.max(canvas.width / img.width, canvas.height / img.height);
-      const w = img.width * ratio;
-      const h = img.height * ratio;
-      ctx.drawImage(img, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
-    } catch {
-      /* fond uni conservé si l'image n'est pas lisible */
-    }
-  }
-
-  ctx.textBaseline = 'top';
-  for (const layer of composition.layers) {
-    if (!layer.text.trim()) continue;
-    const fontSize = layer.fontSize * scale;
-    const weight = layer.bold ? '700' : '400';
-    const style = layer.italic ? 'italic' : 'normal';
-    ctx.font = `${style} ${weight} ${fontSize}px ${layer.fontFamily}`;
-    ctx.fillStyle = layer.color;
-    ctx.textAlign = layer.align === 'center' ? 'center' : layer.align === 'right' ? 'right' : 'left';
-
-    const boxX = layer.x * scale;
-    const boxWidth = layer.width * scale;
-    const anchorX =
-      layer.align === 'center' ? boxX + boxWidth / 2 : layer.align === 'right' ? boxX + boxWidth : boxX;
-
-    const lines = wrapLines(ctx, layer.text, boxWidth);
-    let y = layer.y * scale;
-    for (const line of lines) {
-      ctx.fillText(line, anchorX, y);
-      y += fontSize * layer.lineHeight;
-    }
-  }
 
   return new Promise<Blob>((resolve, reject) => {
     canvas.toBlob(

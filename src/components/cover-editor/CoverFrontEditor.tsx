@@ -72,11 +72,30 @@ import {
   downloadBlob,
   renderKindleCoverJpeg,
 } from '@/lib/cover-editor/kindleExport';
+import {
+  COVER_TEMPLATES,
+  applyTemplate,
+  type CoverTemplateId,
+} from '@/lib/cover-editor/coverTemplates';
+import { Switch } from '@/components/ui/switch';
 
 type SaveStatus = 'idle' | 'dirty' | 'saving' | 'saved' | 'error';
 
+/** Convertit une couleur hexadécimale + opacité en rgba() pour l'aperçu. */
+function hexWithAlpha(hex: string, opacity: number): string {
+  const clean = hex.replace('#', '');
+  const full = clean.length === 3 ? clean.split('').map((c) => c + c).join('') : clean;
+  const n = Number.parseInt(full.slice(0, 6) || '000000', 16);
+  const r = (n >> 16) & 255;
+  const g = (n >> 8) & 255;
+  const b = n & 255;
+  return `rgba(${r}, ${g}, ${b}, ${Math.max(0, Math.min(1, opacity))})`;
+}
+
 const AUTOSAVE_DELAY_MS = 1500;
+
 const ROLES: TextRole[] = ['title', 'subtitle', 'author'];
+
 
 interface Props {
   project: CoverProject;
@@ -364,7 +383,23 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
     patchLayer(layer.id, { ...fresh, id: layer.id });
   };
 
+  /* ---------------- modèles professionnels ---------------------------------- */
+  const [templateBackup, setTemplateBackup] = useState<FrontComposition | null>(null);
+
+  const useTemplate = (id: CoverTemplateId) => {
+    setTemplateBackup(composition);
+    commit((prev) => applyTemplate(prev, id));
+  };
+
+  const cancelTemplate = () => {
+    if (!templateBackup) return;
+    const restore = templateBackup;
+    setTemplateBackup(null);
+    commit(() => restore);
+  };
+
   const missingRoles = ROLES.filter((r) => !composition.layers.some((l) => l.role === r));
+
 
   /* ---------------- rendu -------------------------------------------------- */
   return (
@@ -419,6 +454,75 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
           Export impossible : {exportError}
         </p>
       )}
+
+      {/* modèles professionnels */}
+      <Card>
+        <CardContent className="space-y-3 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className="text-sm font-semibold text-foreground">Modèles professionnels</p>
+              <p className="text-xs text-muted-foreground">
+                Le modèle conserve votre illustration et vos textes : il ne change que la mise en
+                page et les styles. Tous les réglages restent modifiables ensuite.
+              </p>
+            </div>
+            {templateBackup && (
+              <Button variant="outline" size="sm" onClick={cancelTemplate} className="gap-1">
+                <RotateCcw className="h-4 w-4" /> Annuler le modèle
+              </Button>
+            )}
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            {COVER_TEMPLATES.map((tpl) => {
+              const active = composition.templateId === tpl.id;
+              return (
+                <button
+                  key={tpl.id}
+                  type="button"
+                  onClick={() => useTemplate(tpl.id)}
+                  data-cover-template={tpl.id}
+                  className={cn(
+                    'rounded-xl border p-2 text-left transition hover:border-primary',
+                    active ? 'border-primary ring-2 ring-primary/40' : 'border-border',
+                  )}
+                >
+                  <div
+                    className={cn(
+                      'relative mb-2 flex h-40 w-full flex-col items-center overflow-hidden rounded-lg px-3 py-4 text-white',
+                      tpl.preview.gradient,
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        'w-full rounded px-1 text-center',
+                        tpl.preview.bandClass,
+                        tpl.preview.titleClass,
+                      )}
+                    >
+                      Titre du livre
+                    </div>
+                    <div className={cn('mt-2 w-full text-center', tpl.preview.subtitleClass)}>
+                      Sous-titre
+                    </div>
+                    <div
+                      className={cn(
+                        'absolute bottom-3 left-0 w-full text-center',
+                        tpl.preview.authorClass,
+                      )}
+                    >
+                      Georges Boubet
+                    </div>
+                  </div>
+                  <p className="text-sm font-semibold text-foreground">{tpl.label}</p>
+                  <p className="text-xs text-muted-foreground">{tpl.description}</p>
+                </button>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
 
       <div className="grid gap-4 lg:grid-cols-[280px_1fr_320px]">
         {/* outils toujours visibles */}
@@ -508,6 +612,23 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
               </div>
             )}
 
+            {composition.overlay && composition.overlay.type !== 'none' && (
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background:
+                    composition.overlay.type === 'full'
+                      ? composition.overlay.color
+                      : composition.overlay.type === 'top'
+                        ? `linear-gradient(to bottom, ${composition.overlay.color} 0%, transparent 55%)`
+                        : composition.overlay.type === 'bottom'
+                          ? `linear-gradient(to top, ${composition.overlay.color} 0%, transparent 55%)`
+                          : `linear-gradient(to bottom, ${composition.overlay.color} 0%, transparent 40%, transparent 60%, ${composition.overlay.color} 100%)`,
+                  opacity: composition.overlay.opacity,
+                }}
+              />
+            )}
+
             {guides && (
               <>
                 <div className="pointer-events-none absolute left-1/2 top-0 h-full w-px bg-primary/70" />
@@ -517,6 +638,7 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
 
             {composition.layers.map((layer) => {
               const active = layer.id === selectedId;
+              const padY = layer.band?.enabled ? (layer.band.padY ?? 0) * scale : 0;
               return (
                 <div
                   key={layer.id}
@@ -529,8 +651,10 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
                   )}
                   style={{
                     left: layer.x * scale,
-                    top: layer.y * scale,
+                    top: layer.y * scale - padY,
                     width: layer.width * scale,
+                    paddingTop: padY,
+                    paddingBottom: padY,
                     fontFamily: layer.fontFamily,
                     fontSize: layer.fontSize * scale,
                     lineHeight: layer.lineHeight,
@@ -538,12 +662,25 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
                     textAlign: layer.align,
                     fontWeight: layer.bold ? 700 : 400,
                     fontStyle: layer.italic ? 'italic' : 'normal',
+                    opacity: layer.opacity ?? 1,
+                    letterSpacing: (layer.letterSpacing ?? 0) * scale,
+                    backgroundColor: layer.band?.enabled
+                      ? hexWithAlpha(layer.band.color, layer.band.opacity)
+                      : undefined,
+                    textShadow: layer.shadow?.enabled
+                      ? `0 ${(layer.shadow.offsetY ?? 0) * scale}px ${(layer.shadow.blur ?? 0) * scale}px ${layer.shadow.color}`
+                      : undefined,
+                    WebkitTextStrokeWidth: layer.outline?.enabled
+                      ? (layer.outline.width ?? 0) * scale
+                      : undefined,
+                    WebkitTextStrokeColor: layer.outline?.enabled ? layer.outline.color : undefined,
                     whiteSpace: 'pre-wrap',
                     wordBreak: 'break-word',
                   }}
                   data-cover-layer={layer.role}
                 >
                   {layer.text}
+
                   {active && (
                     <span
                       onPointerDown={(e) => startResize(e, layer)}
@@ -683,9 +820,228 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
                   </div>
                 </div>
 
+                <div className="space-y-1.5">
+                  <Label>Interligne : {selected.lineHeight.toFixed(2)}</Label>
+                  <Slider
+                    min={0.9}
+                    max={2}
+                    step={0.02}
+                    value={[selected.lineHeight]}
+                    onValueChange={([v]) => patchLayer(selected.id, { lineHeight: v }, false)}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label>Espacement des lettres : {selected.letterSpacing ?? 0} px</Label>
+                  <Slider
+                    min={-10}
+                    max={40}
+                    step={1}
+                    value={[selected.letterSpacing ?? 0]}
+                    onValueChange={([v]) => patchLayer(selected.id, { letterSpacing: v }, false)}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label>Opacité : {Math.round((selected.opacity ?? 1) * 100)} %</Label>
+                  <Slider
+                    min={0.1}
+                    max={1}
+                    step={0.05}
+                    value={[selected.opacity ?? 1]}
+                    onValueChange={([v]) => patchLayer(selected.id, { opacity: v }, false)}
+                  />
+                </div>
+
+                {/* ombre */}
+                <div className="space-y-2 rounded-lg border border-border p-3">
+                  <div className="flex items-center justify-between">
+                    <Label>Ombre portée</Label>
+                    <Switch
+                      checked={!!selected.shadow?.enabled}
+                      onCheckedChange={(on) =>
+                        patchLayer(selected.id, {
+                          shadow: {
+                            enabled: on,
+                            color: selected.shadow?.color ?? '#000000',
+                            blur: selected.shadow?.blur ?? 30,
+                            offsetY: selected.shadow?.offsetY ?? 6,
+                          },
+                        })
+                      }
+                    />
+                  </div>
+                  {selected.shadow?.enabled && (
+                    <>
+                      <Label className="text-xs">Flou : {selected.shadow.blur} px</Label>
+                      <Slider
+                        min={0}
+                        max={80}
+                        step={2}
+                        value={[selected.shadow.blur]}
+                        onValueChange={([v]) =>
+                          patchLayer(selected.id, { shadow: { ...selected.shadow!, blur: v } }, false)
+                        }
+                      />
+                      <Input
+                        type="color"
+                        className="h-9 w-16 p-1"
+                        value={selected.shadow.color}
+                        onChange={(e) =>
+                          patchLayer(selected.id, {
+                            shadow: { ...selected.shadow!, color: e.target.value },
+                          })
+                        }
+                      />
+                    </>
+                  )}
+                </div>
+
+                {/* contour */}
+                <div className="space-y-2 rounded-lg border border-border p-3">
+                  <div className="flex items-center justify-between">
+                    <Label>Contour</Label>
+                    <Switch
+                      checked={!!selected.outline?.enabled}
+                      onCheckedChange={(on) =>
+                        patchLayer(selected.id, {
+                          outline: {
+                            enabled: on,
+                            color: selected.outline?.color ?? '#000000',
+                            width: selected.outline?.width ?? 6,
+                          },
+                        })
+                      }
+                    />
+                  </div>
+                  {selected.outline?.enabled && (
+                    <>
+                      <Label className="text-xs">Épaisseur : {selected.outline.width} px</Label>
+                      <Slider
+                        min={1}
+                        max={24}
+                        step={1}
+                        value={[selected.outline.width]}
+                        onValueChange={([v]) =>
+                          patchLayer(
+                            selected.id,
+                            { outline: { ...selected.outline!, width: v } },
+                            false,
+                          )
+                        }
+                      />
+                      <Input
+                        type="color"
+                        className="h-9 w-16 p-1"
+                        value={selected.outline.color}
+                        onChange={(e) =>
+                          patchLayer(selected.id, {
+                            outline: { ...selected.outline!, color: e.target.value },
+                          })
+                        }
+                      />
+                    </>
+                  )}
+                </div>
+
+                {/* bandeau */}
+                <div className="space-y-2 rounded-lg border border-border p-3">
+                  <div className="flex items-center justify-between">
+                    <Label>Bandeau derrière le texte</Label>
+                    <Switch
+                      checked={!!selected.band?.enabled}
+                      onCheckedChange={(on) =>
+                        patchLayer(selected.id, {
+                          band: {
+                            enabled: on,
+                            color: selected.band?.color ?? '#000000',
+                            opacity: selected.band?.opacity ?? 0.45,
+                            padY: selected.band?.padY ?? Math.round(size.height * 0.02),
+                          },
+                        })
+                      }
+                    />
+                  </div>
+                  {selected.band?.enabled && (
+                    <>
+                      <Label className="text-xs">
+                        Opacité du bandeau : {Math.round(selected.band.opacity * 100)} %
+                      </Label>
+                      <Slider
+                        min={0.05}
+                        max={1}
+                        step={0.05}
+                        value={[selected.band.opacity]}
+                        onValueChange={([v]) =>
+                          patchLayer(selected.id, { band: { ...selected.band!, opacity: v } }, false)
+                        }
+                      />
+                      <Input
+                        type="color"
+                        className="h-9 w-16 p-1"
+                        value={selected.band.color}
+                        onChange={(e) =>
+                          patchLayer(selected.id, {
+                            band: { ...selected.band!, color: e.target.value },
+                          })
+                        }
+                      />
+                    </>
+                  )}
+                </div>
+
+                {/* voile global */}
+                <div className="space-y-2 rounded-lg border border-border p-3">
+                  <Label>Voile global sur l'illustration</Label>
+                  <Select
+                    value={composition.overlay?.type ?? 'none'}
+                    onValueChange={(v) =>
+                      commit((prev) => ({
+                        ...prev,
+                        overlay: {
+                          type: v as NonNullable<FrontComposition['overlay']>['type'],
+                          color: prev.overlay?.color ?? '#000000',
+                          opacity: prev.overlay?.opacity ?? 0.4,
+                        },
+                      }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Aucun</SelectItem>
+                      <SelectItem value="top">Haut</SelectItem>
+                      <SelectItem value="bottom">Bas</SelectItem>
+                      <SelectItem value="both">Haut et bas</SelectItem>
+                      <SelectItem value="full">Uniforme</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {composition.overlay && composition.overlay.type !== 'none' && (
+                    <>
+                      <Label className="text-xs">
+                        Intensité : {Math.round(composition.overlay.opacity * 100)} %
+                      </Label>
+                      <Slider
+                        min={0.05}
+                        max={0.9}
+                        step={0.05}
+                        value={[composition.overlay.opacity]}
+                        onValueChange={([v]) =>
+                          commit((prev) => ({
+                            ...prev,
+                            overlay: { ...prev.overlay!, opacity: v },
+                          }))
+                        }
+                      />
+                    </>
+                  )}
+                </div>
+
                 <Button variant="outline" className="w-full" onClick={() => centerLayer(selected)}>
                   Centrer horizontalement
                 </Button>
+
               </>
             )}
           </CardContent>

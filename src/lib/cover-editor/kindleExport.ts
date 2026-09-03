@@ -10,9 +10,10 @@
  *  - l'URL signée du fond n'est utilisée qu'en mémoire, jamais persistée.
  */
 import {
-  DEFAULT_FRONT_BACKGROUND,
+  drawFrontComposition,
   type FrontComposition,
 } from '@/lib/cover-editor/frontComposition';
+
 
 /** Dimensions imposées par Amazon pour une couverture Kindle. */
 export const KINDLE_EXPORT_WIDTH = 1600;
@@ -46,32 +47,6 @@ const loadImage = (url: string): Promise<HTMLImageElement> =>
     el.src = url;
   });
 
-const wrapLines = (
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  maxWidth: number,
-): string[] => {
-  const lines: string[] = [];
-  for (const paragraph of text.split('\n')) {
-    const words = paragraph.split(/\s+/).filter(Boolean);
-    if (!words.length) {
-      lines.push('');
-      continue;
-    }
-    let current = words[0];
-    for (let i = 1; i < words.length; i += 1) {
-      const candidate = `${current} ${words[i]}`;
-      if (ctx.measureText(candidate).width <= maxWidth) current = candidate;
-      else {
-        lines.push(current);
-        current = words[i];
-      }
-    }
-    lines.push(current);
-  }
-  return lines;
-};
-
 const toBlob = (canvas: HTMLCanvasElement, quality: number): Promise<Blob> =>
   new Promise((resolve, reject) => {
     canvas.toBlob(
@@ -93,6 +68,8 @@ export interface KindleExportResult {
 /**
  * Compose la couverture aux dimensions Kindle exactes et renvoie un JPEG aplati.
  * `backgroundUrl` est une URL signée temporaire, utilisée uniquement en mémoire.
+ * Le rendu passe par le moteur partagé : le JPEG reproduit exactement le modèle,
+ * le voile, les ombres, les contours, l'opacité, l'interligne et l'espacement.
  */
 export async function renderKindleCoverJpeg(
   composition: FrontComposition,
@@ -105,51 +82,14 @@ export async function renderKindleCoverJpeg(
   const ctx = canvas.getContext('2d', { alpha: false });
   if (!ctx) throw new Error('Canevas indisponible dans ce navigateur.');
 
-  // Fond opaque : garantit une image aplatie, jamais de transparence.
-  ctx.fillStyle = composition.backgroundColor || DEFAULT_FRONT_BACKGROUND;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  if (backgroundUrl) {
-    const img = await loadImage(backgroundUrl);
-    // object-fit: cover, identique à l'aperçu de l'éditeur
-    const ratio = Math.max(canvas.width / img.width, canvas.height / img.height);
-    const w = img.width * ratio;
-    const h = img.height * ratio;
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(img, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
-  }
+  const img = backgroundUrl ? await loadImage(backgroundUrl) : null;
 
   // Mise à l'échelle depuis les coordonnées de composition vers 1600 × 2560.
   const sx = canvas.width / (composition.canvas.width || KINDLE_EXPORT_WIDTH);
   const sy = canvas.height / (composition.canvas.height || KINDLE_EXPORT_HEIGHT);
 
-  ctx.textBaseline = 'top';
-  for (const layer of composition.layers) {
-    if (!layer.text.trim()) continue;
-    const fontSize = layer.fontSize * sy;
-    const weight = layer.bold ? '700' : '400';
-    const style = layer.italic ? 'italic' : 'normal';
-    ctx.font = `${style} ${weight} ${fontSize}px ${layer.fontFamily}`;
-    ctx.fillStyle = layer.color;
-    ctx.textAlign = layer.align === 'center' ? 'center' : layer.align === 'right' ? 'right' : 'left';
+  drawFrontComposition(ctx, composition, img, sx, sy);
 
-    const boxX = layer.x * sx;
-    const boxWidth = layer.width * sx;
-    const anchorX =
-      layer.align === 'center'
-        ? boxX + boxWidth / 2
-        : layer.align === 'right'
-          ? boxX + boxWidth
-          : boxX;
-
-    const lines = wrapLines(ctx, layer.text, boxWidth);
-    let y = layer.y * sy;
-    for (const line of lines) {
-      ctx.fillText(line, anchorX, y);
-      y += fontSize * layer.lineHeight;
-    }
-  }
 
   // Qualité dégradée progressivement seulement si nécessaire.
   let blob = await toBlob(canvas, QUALITY_STEPS[0]);
