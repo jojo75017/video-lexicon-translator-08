@@ -806,7 +806,8 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
           <Card>
             <CardContent className="space-y-2 p-4">
               <p className="text-sm font-semibold text-foreground">Éléments</p>
-              {(['front', 'spine', 'back'] as const).map((zone) => (
+              {([activeZone] as const).map((zone) => (
+
                 <div key={zone} className="space-y-1">
                   <p className="text-xs uppercase tracking-wide text-muted-foreground">
                     {ZONE_LABEL[zone]}
