@@ -321,8 +321,9 @@ const buildNonfiction = ({ composition, title, subtitle, author }: BuildInput): 
       shadow: { enabled: true, color: '#000000', blur: Math.round(W * 0.02), offsetY: Math.round(W * 0.004) },
       outline: { enabled: true, color: '#0A1F14', width: Math.round(W * 0.006) },
     }),
-    text('custom', 'Titre — ligne 2', {
-      text: (line2 || 'la méthode complète').toLocaleUpperCase('fr-FR'),
+    text('title', 'Titre — ligne 2', {
+      text: (line2 || '').toLocaleUpperCase('fr-FR'),
+      hidden: !line2,
       x: m,
       y: bandY[1] + Math.round(bandH * 0.14),
       width: Math.round(box * 0.92),
@@ -335,6 +336,7 @@ const buildNonfiction = ({ composition, title, subtitle, author }: BuildInput): 
       shadow: { enabled: true, color: '#000000', blur: Math.round(W * 0.02), offsetY: Math.round(W * 0.004) },
       outline: { enabled: true, color: '#0A1F14', width: Math.round(W * 0.006) },
     }),
+
     text('subtitle', 'Sous-titre', {
       text: subtitle || 'Tout ce qu’il faut savoir, étape par étape',
       x: m,
