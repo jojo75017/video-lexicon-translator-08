@@ -20,8 +20,49 @@ export const FRONT_COMPOSITION_VERSION = 1 as const;
  */
 export const FRONT_STYLE_VERSION = 1 as const;
 
-export type TextRole = 'title' | 'subtitle' | 'author';
+export type TextRole = 'title' | 'subtitle' | 'author' | 'custom';
 export type TextAlign = 'left' | 'center' | 'right';
+
+/* ------------------------------------------------------------------ */
+/* Calques graphiques (formes, cadres, ornements, bandeaux, photo)     */
+/* ------------------------------------------------------------------ */
+
+export type ShapeKind =
+  | 'rect'
+  | 'diagonal'
+  | 'frame'
+  | 'ornament'
+  | 'photo';
+
+export type ShapeCorner = 'tl' | 'tr' | 'bl' | 'br';
+
+export interface FrontShapeLayer {
+  id: string;
+  kind: ShapeKind;
+  /** Nom affiché dans le panneau des calques. */
+  name: string;
+  /** Coordonnées en pixels du canevas réel. */
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  color: string;
+  /** 0 → 1 */
+  opacity: number;
+  /** Rayon des angles (rect / photo). */
+  radius?: number;
+  /** Épaisseur du trait (frame / ornament). */
+  strokeWidth?: number;
+  /** Cadre double : second trait intérieur. */
+  double?: boolean;
+  /** Écart entre les deux traits d'un cadre double. */
+  gap?: number;
+  /** Angle concerné (diagonal / ornament). */
+  corner?: ShapeCorner;
+  hidden?: boolean;
+  locked?: boolean;
+}
+
 
 /** Voile (bandeau) dessiné derrière un texte pour garantir la lisibilité. */
 export interface LayerBand {
@@ -57,6 +98,10 @@ export interface FrontTextLayer {
   shadow?: { enabled: boolean; color: string; blur: number; offsetY: number };
   outline?: { enabled: boolean; color: string; width: number };
   band?: LayerBand;
+  /** Nom libre affiché dans le panneau des calques. */
+  name?: string;
+  hidden?: boolean;
+  locked?: boolean;
 }
 
 /** Voile global appliqué au-dessus de l'illustration. */
@@ -79,8 +124,16 @@ export interface FrontComposition {
   overlay?: FrontOverlay;
   /** Identifiant du dernier modèle appliqué (informatif). */
   templateId?: string | null;
+  /**
+   * `cover` : illustration plein écran (par défaut).
+   * `slot` : illustration cadrée dans le calque photo du modèle.
+   */
+  illustrationMode?: 'cover' | 'slot';
+  /** Calques graphiques dessinés sous les textes, dans l'ordre du tableau. */
+  shapes?: FrontShapeLayer[];
   layers: FrontTextLayer[];
 }
+
 
 export const DEFAULT_FRONT_BACKGROUND = '#111827';
 
@@ -122,7 +175,9 @@ export const ROLE_LABEL: Record<TextRole, string> = {
   title: 'Titre',
   subtitle: 'Sous-titre',
   author: 'Nom de l’auteur',
+  custom: 'Texte libre',
 };
+
 
 /* ------------------------------------------------------------------ */
 /* Création / normalisation                                           */
@@ -157,7 +212,14 @@ export function defaultLayer(
       fontSize: Math.round(canvas.width * 0.055),
       fontFamily: 'Georgia, serif',
     },
+    custom: {
+      y: Math.round(canvas.height * 0.6),
+      fontSize: Math.round(canvas.width * 0.035),
+      fontFamily: 'Arial, Helvetica, sans-serif',
+      align: 'left',
+    },
   };
+
   return {
     id: newId(),
     role,
@@ -226,9 +288,12 @@ export function parseComposition(
   const layers: FrontTextLayer[] = layersRaw
     .filter((l): l is Record<string, unknown> => Boolean(l) && typeof l === 'object')
     .map((l) => {
-      const role = (['title', 'subtitle', 'author'] as TextRole[]).includes(l.role as TextRole)
+      const role = (['title', 'subtitle', 'author', 'custom'] as TextRole[]).includes(
+        l.role as TextRole,
+      )
         ? (l.role as TextRole)
         : 'title';
+
       const base = defaultLayer(role, canvas);
       const text = str(l.text, base.text);
       const shadowRaw = (l.shadow ?? null) as Record<string, unknown> | null;
@@ -276,8 +341,40 @@ export function parseComposition(
               padY: num(bandRaw.padY, 24),
             }
           : undefined,
+        name: typeof l.name === 'string' ? l.name : undefined,
+        hidden: Boolean(l.hidden),
+        locked: Boolean(l.locked),
       };
     });
+
+  const shapesRaw = Array.isArray(obj.shapes) ? obj.shapes : [];
+  const shapes: FrontShapeLayer[] = shapesRaw
+    .filter((s): s is Record<string, unknown> => Boolean(s) && typeof s === 'object')
+    .map((s, index) => ({
+      id: str(s.id, `s-${index}`),
+      kind: (['rect', 'diagonal', 'frame', 'ornament', 'photo'] as ShapeKind[]).includes(
+        s.kind as ShapeKind,
+      )
+        ? (s.kind as ShapeKind)
+        : 'rect',
+      name: str(s.name, 'Forme'),
+      x: num(s.x, 0),
+      y: num(s.y, 0),
+      width: num(s.width, Math.round(canvas.width * 0.5)),
+      height: num(s.height, Math.round(canvas.height * 0.1)),
+      color: str(s.color, '#000000'),
+      opacity: clamp01(num(s.opacity, 1)),
+      radius: num(s.radius, 0),
+      strokeWidth: num(s.strokeWidth, 0),
+      double: Boolean(s.double),
+      gap: num(s.gap, 0),
+      corner: (['tl', 'tr', 'bl', 'br'] as ShapeCorner[]).includes(s.corner as ShapeCorner)
+        ? (s.corner as ShapeCorner)
+        : undefined,
+      hidden: Boolean(s.hidden),
+      locked: Boolean(s.locked),
+    }));
+
 
   const illustrationPath =
     typeof obj.illustrationPath === 'string' && !looksLikeUrl(obj.illustrationPath)
@@ -307,6 +404,8 @@ export function parseComposition(
       typeof obj.backgroundColor === 'string' && /^#[0-9a-fA-F]{6}$/.test(obj.backgroundColor)
         ? obj.backgroundColor
         : DEFAULT_FRONT_BACKGROUND,
+    illustrationMode: obj.illustrationMode === 'slot' ? 'slot' : 'cover',
+    shapes,
     layers: layers.length ? layers : createComposition(fallback).layers,
   };
 }
@@ -326,11 +425,14 @@ export function serializeComposition(
     backgroundColor: /^#[0-9a-fA-F]{6}$/.test(composition.backgroundColor ?? '')
       ? composition.backgroundColor
       : DEFAULT_FRONT_BACKGROUND,
+    illustrationMode: composition.illustrationMode === 'slot' ? 'slot' : 'cover',
+    shapes: (composition.shapes ?? []).map((s) => ({ ...s })),
     layers: composition.layers.map((l) => ({
       ...l,
       text: looksLikeUrl(l.text) ? '' : l.text,
     })),
   };
+
 }
 
 
@@ -403,12 +505,180 @@ const drawOverlay = (
   }
 };
 
+/** Trace un rectangle (éventuellement arrondi) sur le contexte courant. */
+const pathRoundedRect = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+) => {
+  const radius = Math.max(0, Math.min(r, Math.min(w, h) / 2));
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + w - radius, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+  ctx.lineTo(x + w, y + h - radius);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+  ctx.lineTo(x + radius, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+};
+
+/** Dessine l'image en mode « couvrir » à l'intérieur d'une boîte. */
+const drawImageCover = (
+  ctx: CanvasRenderingContext2D,
+  image: HTMLImageElement,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+) => {
+  const ratio = Math.max(w / image.width, h / image.height);
+  const iw = image.width * ratio;
+  const ih = image.height * ratio;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(image, x + (w - iw) / 2, y + (h - ih) / 2, iw, ih);
+};
+
+/** Ornement d'angle : volutes fines dessinées au trait. */
+const drawOrnament = (
+  ctx: CanvasRenderingContext2D,
+  shape: FrontShapeLayer,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  stroke: number,
+) => {
+  const corner = shape.corner ?? 'tl';
+  const flipX = corner === 'tr' || corner === 'br' ? -1 : 1;
+  const flipY = corner === 'bl' || corner === 'br' ? -1 : 1;
+  ctx.save();
+  ctx.translate(flipX === 1 ? x : x + w, flipY === 1 ? y : y + h);
+  ctx.scale(flipX, flipY);
+  ctx.strokeStyle = shape.color;
+  ctx.lineWidth = stroke;
+  ctx.lineCap = 'round';
+
+  ctx.beginPath();
+  ctx.moveTo(0, h * 0.9);
+  ctx.lineTo(0, 0);
+  ctx.lineTo(w * 0.9, 0);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(w * 0.12, h * 0.55);
+  ctx.quadraticCurveTo(w * 0.12, h * 0.12, w * 0.55, h * 0.12);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(w * 0.34, h * 0.34, Math.min(w, h) * 0.1, Math.PI * 0.6, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(w * 0.06, h * 0.06, stroke * 1.2, 0, Math.PI * 2);
+  ctx.fillStyle = shape.color;
+  ctx.fill();
+  ctx.restore();
+};
+
+/** Dessine tous les calques graphiques dans l'ordre du tableau. */
+const drawShapes = (
+  ctx: CanvasRenderingContext2D,
+  composition: FrontComposition,
+  image: HTMLImageElement | null,
+  scaleX: number,
+  scaleY: number,
+) => {
+  for (const shape of composition.shapes ?? []) {
+    if (shape.hidden) continue;
+    const x = shape.x * scaleX;
+    const y = shape.y * scaleY;
+    const w = shape.width * scaleX;
+    const h = shape.height * scaleY;
+    const stroke = Math.max(1, (shape.strokeWidth ?? 6) * scaleX);
+    ctx.save();
+    ctx.globalAlpha = clamp01(shape.opacity ?? 1);
+
+    if (shape.kind === 'rect') {
+      pathRoundedRect(ctx, x, y, w, h, (shape.radius ?? 0) * scaleX);
+      ctx.fillStyle = shape.color;
+      ctx.fill();
+    } else if (shape.kind === 'diagonal') {
+      const corner = shape.corner ?? 'br';
+      ctx.beginPath();
+      if (corner === 'br') {
+        ctx.moveTo(x, y + h);
+        ctx.lineTo(x + w, y);
+        ctx.lineTo(x + w, y + h);
+      } else if (corner === 'bl') {
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + w, y + h);
+        ctx.lineTo(x, y + h);
+      } else if (corner === 'tl') {
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + w, y);
+        ctx.lineTo(x, y + h);
+      } else {
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + w, y);
+        ctx.lineTo(x + w, y + h);
+      }
+      ctx.closePath();
+      ctx.fillStyle = shape.color;
+      ctx.fill();
+    } else if (shape.kind === 'frame') {
+      ctx.strokeStyle = shape.color;
+      ctx.lineWidth = stroke;
+      pathRoundedRect(ctx, x, y, w, h, (shape.radius ?? 0) * scaleX);
+      ctx.stroke();
+      if (shape.double) {
+        const gap = (shape.gap ?? 18) * scaleX;
+        ctx.lineWidth = Math.max(1, stroke * 0.45);
+        pathRoundedRect(
+          ctx,
+          x + gap,
+          y + gap,
+          Math.max(0, w - gap * 2),
+          Math.max(0, h - gap * 2),
+          Math.max(0, (shape.radius ?? 0) * scaleX - gap),
+        );
+        ctx.stroke();
+      }
+    } else if (shape.kind === 'ornament') {
+      drawOrnament(ctx, shape, x, y, w, h, stroke);
+    } else if (shape.kind === 'photo') {
+      pathRoundedRect(ctx, x, y, w, h, (shape.radius ?? 0) * scaleX);
+      ctx.save();
+      ctx.clip();
+      if (image) drawImageCover(ctx, image, x, y, w, h);
+      else {
+        ctx.fillStyle = shape.color;
+        ctx.fillRect(x, y, w, h);
+      }
+      ctx.restore();
+      if ((shape.strokeWidth ?? 0) > 0) {
+        ctx.strokeStyle = shape.color;
+        ctx.lineWidth = stroke;
+        pathRoundedRect(ctx, x, y, w, h, (shape.radius ?? 0) * scaleX);
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+};
+
 /**
- * Dessine fond + voile + textes (avec ombre, contour, opacité, bandeau,
- * interligne et espacement des lettres). Utilisé à l'identique par l'aperçu
- * miniature et par l'export JPEG Kindle : ce qui est visible est exporté.
+ * Dessine uniquement le décor : fond, illustration, voile et calques
+ * graphiques. Utilisé par l'aperçu de l'éditeur (les textes y restent en DOM
+ * pour rester déplaçables) et réutilisé par l'export.
  */
-export function drawFrontComposition(
+export function drawFrontBackdrop(
   ctx: CanvasRenderingContext2D,
   composition: FrontComposition,
   image: HTMLImageElement | null,
@@ -418,23 +688,40 @@ export function drawFrontComposition(
   const w = composition.canvas.width * scaleX;
   const h = composition.canvas.height * scaleY;
 
+  ctx.clearRect(0, 0, w, h);
   ctx.fillStyle = composition.backgroundColor || DEFAULT_FRONT_BACKGROUND;
   ctx.fillRect(0, 0, w, h);
 
-  if (image) {
-    const ratio = Math.max(w / image.width, h / image.height);
-    const iw = image.width * ratio;
-    const ih = image.height * ratio;
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(image, (w - iw) / 2, (h - ih) / 2, iw, ih);
+  if (image && composition.illustrationMode !== 'slot') {
+    drawImageCover(ctx, image, 0, 0, w, h);
   }
 
   drawOverlay(ctx, composition.overlay, w, h);
+  drawShapes(ctx, composition, image, scaleX, scaleY);
+}
+
+/**
+ * Dessine fond + illustration + calques graphiques + textes (avec ombre,
+ * contour, opacité, bandeau, interligne et espacement des lettres). Utilisé à
+ * l'identique par l'aperçu, la miniature et l'export : ce qui est visible est
+ * exporté.
+ */
+export function drawFrontComposition(
+  ctx: CanvasRenderingContext2D,
+  composition: FrontComposition,
+  image: HTMLImageElement | null,
+  scaleX: number,
+  scaleY: number = scaleX,
+): void {
+  drawFrontBackdrop(ctx, composition, image, scaleX, scaleY);
+
+
 
   ctx.textBaseline = 'top';
   for (const layer of composition.layers) {
+    if (layer.hidden) continue;
     if (!layer.text.trim()) continue;
+
     const fontSize = layer.fontSize * scaleY;
     const weight = layer.bold ? '700' : '400';
     const style = layer.italic ? 'italic' : 'normal';
