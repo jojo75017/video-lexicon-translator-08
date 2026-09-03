@@ -81,7 +81,19 @@ import { Switch } from '@/components/ui/switch';
 
 type SaveStatus = 'idle' | 'dirty' | 'saving' | 'saved' | 'error';
 
+/** Convertit une couleur hexadécimale + opacité en rgba() pour l'aperçu. */
+function hexWithAlpha(hex: string, opacity: number): string {
+  const clean = hex.replace('#', '');
+  const full = clean.length === 3 ? clean.split('').map((c) => c + c).join('') : clean;
+  const n = Number.parseInt(full.slice(0, 6) || '000000', 16);
+  const r = (n >> 16) & 255;
+  const g = (n >> 8) & 255;
+  const b = n & 255;
+  return `rgba(${r}, ${g}, ${b}, ${Math.max(0, Math.min(1, opacity))})`;
+}
+
 const AUTOSAVE_DELAY_MS = 1500;
+
 const ROLES: TextRole[] = ['title', 'subtitle', 'author'];
 
 
