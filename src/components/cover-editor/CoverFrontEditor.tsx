@@ -68,11 +68,20 @@ import {
   parseComposition,
   renderCompositionThumbnail,
   serializeComposition,
+  drawFrontBackdrop,
   type FrontComposition,
+  type FrontShapeLayer,
   type FrontTextLayer,
   type TextAlign,
   type TextRole,
 } from '@/lib/cover-editor/frontComposition';
+import ReferenceTemplateGallery from '@/components/cover-editor/ReferenceTemplateGallery';
+import ShapeLayersPanel from '@/components/cover-editor/ShapeLayersPanel';
+import {
+  applyReferenceTemplate,
+  type ReferenceTemplateId,
+} from '@/lib/cover-editor/referenceTemplates';
+
 import {
   downloadBlob,
   renderKindleCoverJpeg,
@@ -146,10 +155,13 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
   );
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedShapeId, setSelectedShapeId] = useState<string | null>(null);
   const [status, setStatus] = useState<SaveStatus>('idle');
   const [saveError, setSaveError] = useState<string | null>(null);
   const [bgUrl, setBgUrl] = useState<string | null>(null);
+  const [bgImage, setBgImage] = useState<HTMLImageElement | null>(null);
   const [guides, setGuides] = useState(false);
+
 
   /* ---- exports (100 % local, sans IA ni crédit) -------------------------- */
   const [exportState, setExportState] = useState<'idle' | 'working' | 'done'>('idle');
@@ -210,7 +222,9 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
   const thumbPathRef = useRef<string | null>(project.thumbnail_path);
   const timerRef = useRef<number | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
+  const backdropRef = useRef<HTMLCanvasElement | null>(null);
   const [scale, setScale] = useState(0.2);
+
 
   const selected = composition.layers.find((l) => l.id === selectedId) ?? null;
 
@@ -239,6 +253,42 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [composition.illustrationPath, project.illustration_path]);
+
+  /* ---------------- image en mémoire pour le décor de l'aperçu -------------- */
+  useEffect(() => {
+    let active = true;
+    if (!bgUrl) {
+      setBgImage(null);
+      return;
+    }
+    const el = new Image();
+    el.crossOrigin = 'anonymous';
+    el.onload = () => {
+      if (active) setBgImage(el);
+    };
+    el.onerror = () => {
+      if (active) setBgImage(null);
+    };
+    el.src = bgUrl;
+    return () => {
+      active = false;
+    };
+  }, [bgUrl]);
+
+  /* ---------------- décor de l'aperçu (même moteur que l'export) ------------- */
+  useEffect(() => {
+    const canvas = backdropRef.current;
+    if (!canvas) return;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const w = Math.max(1, Math.round(size.width * scale));
+    const h = Math.max(1, Math.round(size.height * scale));
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    drawFrontBackdrop(ctx, composition, bgImage, scale * dpr, scale * dpr);
+  }, [composition, bgImage, scale, size.width, size.height]);
+
 
   /* ---------------- réduction visuelle adaptée à l'écran -------------------- */
   useLayoutEffect(() => {
@@ -437,6 +487,58 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
     patchLayer(layer.id, { ...fresh, id: layer.id });
   };
 
+  /* ---------------- calques graphiques -------------------------------------- */
+  const shapes = composition.shapes ?? [];
+  const selectedShape = shapes.find((s) => s.id === selectedShapeId) ?? null;
+
+  const patchShape = useCallback(
+    (id: string, patch: Partial<FrontShapeLayer>, snapshot = true) => {
+      commit(
+        (prev) => ({
+          ...prev,
+          shapes: (prev.shapes ?? []).map((s) =>
+            s.id === id && !(s.locked && patch.locked === undefined) ? { ...s, ...patch } : s,
+          ),
+        }),
+        snapshot,
+      );
+    },
+    [commit],
+  );
+
+  const removeShape = useCallback(
+    (id: string) => {
+      commit((prev) => ({
+        ...prev,
+        shapes: (prev.shapes ?? []).filter((s) => s.id !== id || s.locked),
+      }));
+      setSelectedShapeId(null);
+    },
+    [commit],
+  );
+
+  const moveShape = useCallback(
+    (id: string, direction: -1 | 1) => {
+      commit((prev) => {
+        const list = [...(prev.shapes ?? [])];
+        const index = list.findIndex((s) => s.id === id);
+        const target = index + direction;
+        if (index < 0 || target < 0 || target >= list.length) return prev;
+        [list[index], list[target]] = [list[target], list[index]];
+        return { ...prev, shapes: list };
+      });
+    },
+    [commit],
+  );
+
+  /* ---------------- modèles de référence (3 maquettes pro) ------------------ */
+  const useReferenceTemplate = (id: ReferenceTemplateId) => {
+    setTemplateBackup(composition);
+    setSelectedId(null);
+    setSelectedShapeId(null);
+    commit((prev) => applyReferenceTemplate(prev, id));
+  };
+
   /* ---------------- modèles professionnels ---------------------------------- */
   const [templateBackup, setTemplateBackup] = useState<FrontComposition | null>(null);
   const [genreFilter, setGenreFilter] = useState<CoverGenre | 'all'>('all');
@@ -579,7 +681,29 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
         </p>
       )}
 
+      {/* 3 maquettes de référence professionnelles */}
+      <ReferenceTemplateGallery
+        activeId={(composition.templateId as ReferenceTemplateId | null) ?? null}
+        onApply={useReferenceTemplate}
+      />
+
+      {shapes.length > 0 && (
+        <ShapeLayersPanel
+          shapes={shapes}
+          canvas={composition.canvas}
+          selectedId={selectedShapeId}
+          onSelect={(id) => {
+            setSelectedShapeId(id);
+            setSelectedId(null);
+          }}
+          onPatch={patchShape}
+          onRemove={removeShape}
+          onMove={moveShape}
+        />
+      )}
+
       {/* modèles professionnels */}
+
       <Card>
         <CardContent className="space-y-3 p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -781,38 +905,24 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
               height: size.height * scale,
               backgroundColor: composition.backgroundColor || DEFAULT_FRONT_BACKGROUND,
             }}
-            onPointerDown={() => setSelectedId(null)}
+            onPointerDown={() => {
+              setSelectedId(null);
+              setSelectedShapeId(null);
+            }}
           >
-            {bgUrl ? (
-              <img
-                src={bgUrl}
-                alt=""
-                aria-hidden
-                className="absolute inset-0 h-full w-full object-cover"
-                draggable={false}
-              />
-            ) : (
+            {/* décor identique à l'export : fond, illustration, voile, calques graphiques */}
+            <canvas
+              ref={backdropRef}
+              aria-hidden
+              className="pointer-events-none absolute inset-0 h-full w-full"
+            />
+
+            {!bgUrl && (
               <div className="absolute inset-0 flex items-center justify-center px-4 text-center text-xs text-white/70">
                 Aucune illustration privée pour ce projet
               </div>
             )}
 
-            {composition.overlay && composition.overlay.type !== 'none' && (
-              <div
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  background:
-                    composition.overlay.type === 'full'
-                      ? composition.overlay.color
-                      : composition.overlay.type === 'top'
-                        ? `linear-gradient(to bottom, ${composition.overlay.color} 0%, transparent 55%)`
-                        : composition.overlay.type === 'bottom'
-                          ? `linear-gradient(to top, ${composition.overlay.color} 0%, transparent 55%)`
-                          : `linear-gradient(to bottom, ${composition.overlay.color} 0%, transparent 40%, transparent 60%, ${composition.overlay.color} 100%)`,
-                  opacity: composition.overlay.opacity,
-                }}
-              />
-            )}
 
             {guides && (
               <>
@@ -822,6 +932,7 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
             )}
 
             {composition.layers.map((layer) => {
+              if (layer.hidden) return null;
               const active = layer.id === selectedId;
               const padY = layer.band?.enabled ? (layer.band.padY ?? 0) * scale : 0;
               return (
@@ -829,7 +940,16 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
                   key={layer.id}
                   role="button"
                   tabIndex={0}
-                  onPointerDown={(e) => startDrag(e, layer)}
+                  onPointerDown={(e) => {
+                    setSelectedShapeId(null);
+                    if (layer.locked) {
+                      e.stopPropagation();
+                      setSelectedId(layer.id);
+                      return;
+                    }
+                    startDrag(e, layer);
+                  }}
+
                   className={cn(
                     'absolute cursor-move select-none',
                     active ? 'ring-2 ring-primary' : 'ring-1 ring-transparent hover:ring-primary/40',
