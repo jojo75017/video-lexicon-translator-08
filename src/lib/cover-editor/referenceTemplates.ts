@@ -183,6 +183,15 @@ const buildGuidePro = ({ composition, title, subtitle, author }: BuildInput): Fr
     }),
   );
 
+  const guideTitleY = Math.round(H * 0.13);
+  const guideTitleW = box - Math.round(W * 0.08);
+  const guideTitleSize = fitTitleSize(Math.round(W * 0.105), title);
+  const guideTitleLines = estimateLines(title, guideTitleW, guideTitleSize);
+  const guideSubtitleY = Math.max(
+    Math.round(H * 0.24),
+    guideTitleY + Math.round(guideTitleLines * guideTitleSize * 1.02 + H * 0.025),
+  );
+
   const layers: FrontTextLayer[] = [
     text('custom', 'Surtitre', {
       text: 'GUIDE PROFESSIONNEL',
@@ -198,9 +207,9 @@ const buildGuidePro = ({ composition, title, subtitle, author }: BuildInput): Fr
     text('title', 'Titre', {
       text: title,
       x: m + Math.round(W * 0.04),
-      y: Math.round(H * 0.13),
-      width: box - Math.round(W * 0.08),
-      fontSize: fitTitleSize(Math.round(W * 0.105), title),
+      y: guideTitleY,
+      width: guideTitleW,
+      fontSize: guideTitleSize,
       fontFamily: SANS_ALT,
       color: '#FFFFFF',
       bold: true,
@@ -209,7 +218,7 @@ const buildGuidePro = ({ composition, title, subtitle, author }: BuildInput): Fr
     text('subtitle', 'Sous-titre', {
       text: subtitle || 'Le sous-titre qui promet un résultat clair',
       x: m + Math.round(W * 0.04),
-      y: Math.round(H * 0.305),
+      y: guideSubtitleY,
       width: box - Math.round(W * 0.08),
       fontSize: Math.round(W * 0.038),
       fontFamily: SANS,
