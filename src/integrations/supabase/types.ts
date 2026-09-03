@@ -992,6 +992,9 @@ export type Database = {
           illustration_path: string | null
           illustration_provider: string | null
           illustration_width: number | null
+          kdp_config: Json | null
+          kdp_geometry: Json | null
+          kdp_rules_version: string | null
           page_count: number | null
           project_name: string
           schema_version: number
@@ -1013,6 +1016,9 @@ export type Database = {
           illustration_path?: string | null
           illustration_provider?: string | null
           illustration_width?: number | null
+          kdp_config?: Json | null
+          kdp_geometry?: Json | null
+          kdp_rules_version?: string | null
           page_count?: number | null
           project_name: string
           schema_version?: number
@@ -1034,6 +1040,9 @@ export type Database = {
           illustration_path?: string | null
           illustration_provider?: string | null
           illustration_width?: number | null
+          kdp_config?: Json | null
+          kdp_geometry?: Json | null
+          kdp_rules_version?: string | null
           page_count?: number | null
           project_name?: string
           schema_version?: number
