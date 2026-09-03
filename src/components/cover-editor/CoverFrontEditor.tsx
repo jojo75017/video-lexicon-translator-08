@@ -472,7 +472,10 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
   /* ---------------- rendu -------------------------------------------------- */
   return (
     <div className="space-y-4">
+      <CoverProAccessBar />
+
       {/* barre d'état */}
+
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card p-3">
         <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" size="sm" onClick={undo} disabled={!past.length} className="gap-1">
