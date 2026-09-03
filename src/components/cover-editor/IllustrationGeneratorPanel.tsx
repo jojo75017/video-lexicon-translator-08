@@ -82,6 +82,8 @@ export default function IllustrationGeneratorPanel({
   const [palette, setPalette] = useState('');
   const [avoid, setAvoid] = useState('');
   const [summary, setSummary] = useState('');
+  const [artStyle, setArtStyle] = useState('illustration-editoriale');
+
 
   const [books, setBooks] = useState<BookOption[]>([]);
   const [bookId, setBookId] = useState<string>('');
