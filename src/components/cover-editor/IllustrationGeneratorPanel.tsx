@@ -147,7 +147,7 @@ export default function IllustrationGeneratorPanel({
       for (let i = 0; i < count; i += 1) {
         setProgress({ done: i, total: count });
         const { data, error: fnError } = await supabase.functions.invoke('cover-pro-generate', {
-          body: { projectId, genre, mood, palette, avoid, summary },
+          body: { projectId, genre, mood, palette, avoid, summary, artStyle },
         });
         if (fnError) throw fnError;
         if (data?.error) throw new Error(data.error);
