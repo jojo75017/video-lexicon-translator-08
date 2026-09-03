@@ -878,6 +878,54 @@ export type Database = {
         }
         Relationships: []
       }
+      cover_projects: {
+        Row: {
+          book_title: string | null
+          cover_type: string
+          created_at: string
+          fabric_json: Json | null
+          format_id: string
+          id: string
+          illustration_path: string | null
+          page_count: number | null
+          project_name: string
+          schema_version: number
+          thumbnail_path: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          book_title?: string | null
+          cover_type?: string
+          created_at?: string
+          fabric_json?: Json | null
+          format_id?: string
+          id?: string
+          illustration_path?: string | null
+          page_count?: number | null
+          project_name: string
+          schema_version?: number
+          thumbnail_path?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          book_title?: string | null
+          cover_type?: string
+          created_at?: string
+          fabric_json?: Json | null
+          format_id?: string
+          id?: string
+          illustration_path?: string | null
+          page_count?: number | null
+          project_name?: string
+          schema_version?: number
+          thumbnail_path?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       crm_activities: {
         Row: {
           activity_type: string
