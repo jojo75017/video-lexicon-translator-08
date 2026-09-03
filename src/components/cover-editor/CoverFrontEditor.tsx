@@ -472,6 +472,58 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
     patchLayer(layer.id, { ...fresh, id: layer.id });
   };
 
+  /* ---------------- calques graphiques -------------------------------------- */
+  const shapes = composition.shapes ?? [];
+  const selectedShape = shapes.find((s) => s.id === selectedShapeId) ?? null;
+
+  const patchShape = useCallback(
+    (id: string, patch: Partial<FrontShapeLayer>, snapshot = true) => {
+      commit(
+        (prev) => ({
+          ...prev,
+          shapes: (prev.shapes ?? []).map((s) =>
+            s.id === id && !(s.locked && patch.locked === undefined) ? { ...s, ...patch } : s,
+          ),
+        }),
+        snapshot,
+      );
+    },
+    [commit],
+  );
+
+  const removeShape = useCallback(
+    (id: string) => {
+      commit((prev) => ({
+        ...prev,
+        shapes: (prev.shapes ?? []).filter((s) => s.id !== id || s.locked),
+      }));
+      setSelectedShapeId(null);
+    },
+    [commit],
+  );
+
+  const moveShape = useCallback(
+    (id: string, direction: -1 | 1) => {
+      commit((prev) => {
+        const list = [...(prev.shapes ?? [])];
+        const index = list.findIndex((s) => s.id === id);
+        const target = index + direction;
+        if (index < 0 || target < 0 || target >= list.length) return prev;
+        [list[index], list[target]] = [list[target], list[index]];
+        return { ...prev, shapes: list };
+      });
+    },
+    [commit],
+  );
+
+  /* ---------------- modèles de référence (3 maquettes pro) ------------------ */
+  const useReferenceTemplate = (id: ReferenceTemplateId) => {
+    setTemplateBackup(composition);
+    setSelectedId(null);
+    setSelectedShapeId(null);
+    commit((prev) => applyReferenceTemplate(prev, id));
+  };
+
   /* ---------------- modèles professionnels ---------------------------------- */
   const [templateBackup, setTemplateBackup] = useState<FrontComposition | null>(null);
   const [genreFilter, setGenreFilter] = useState<CoverGenre | 'all'>('all');
