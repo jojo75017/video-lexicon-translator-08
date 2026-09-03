@@ -75,7 +75,11 @@ const text = (
  */
 /** Estime le nombre de lignes d'un texte dans une largeur donnée. */
 const estimateLines = (textValue: string, width: number, fontSize: number): number => {
-  const perLine = Math.max(4, Math.floor(width / (fontSize * 0.52)));
+  // largeur moyenne d'un caractère : les capitales et les serif sont plus larges
+  const upperRatio =
+    textValue.replace(/[^A-ZÀ-Ý]/g, '').length / Math.max(1, textValue.replace(/\s/g, '').length);
+  const charWidth = fontSize * (0.56 + upperRatio * 0.12);
+  const perLine = Math.max(4, Math.floor(width / charWidth));
   const words = textValue.trim().split(/\s+/).filter(Boolean);
   let lines = 1;
   let current = 0;
