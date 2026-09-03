@@ -1,10 +1,12 @@
 /**
- * Étape 2 — fiche d'un projet de couverture (lecture seule).
- * L'éditeur graphique n'est pas branché à ce stade.
+ * Étape 4A — espace d'édition d'un projet de couverture (première de couverture).
+ * Propriétaire vérifié via RLS + `getCoverProject`. Aucun appel IA ici.
  */
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, ImageIcon, Loader2, Wand2 } from 'lucide-react';
+import { ArrowLeft, ImageIcon, Loader2 } from 'lucide-react';
+
+import CoverFrontEditor from '@/components/cover-editor/CoverFrontEditor';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -159,16 +161,11 @@ export default function CouvertureProjetPage() {
             </Card>
           </div>
 
-          <Card className="border-dashed">
-            <CardContent className="flex flex-col items-center gap-3 p-10 text-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                <Wand2 className="h-6 w-6 text-muted-foreground" />
-              </div>
-              <p className="text-foreground">
-                L'éditeur professionnel sera disponible à l'étape suivante.
-              </p>
-            </CardContent>
-          </Card>
+          <section className="space-y-3">
+            <h2 className="text-lg font-semibold text-foreground">Éditeur de première de couverture</h2>
+            <CoverFrontEditor project={project} onProjectUpdated={setProject} />
+          </section>
+
         </>
       )}
     </main>
