@@ -530,8 +530,19 @@ export const REFERENCE_TEMPLATES: ReferenceTemplate[] = [
   },
 ];
 
-const textOf = (composition: FrontComposition, role: TextRole, fallback: string) =>
-  composition.layers.find((l) => l.role === role)?.text?.trim() || fallback;
+/**
+ * Récupère le texte d'un rôle. Un titre peut être réparti sur plusieurs
+ * calques `title` (modèle bicolore) : on les rassemble pour ne jamais perdre
+ * de mots en passant d'un modèle à l'autre.
+ */
+const textOf = (composition: FrontComposition, role: TextRole, fallback: string) => {
+  const parts = composition.layers
+    .filter((l) => l.role === role)
+    .map((l) => l.text?.trim() ?? '')
+    .filter(Boolean);
+  return parts.join(' ') || fallback;
+};
+
 
 /**
  * Applique un modèle de référence : les textes existants sont conservés,
