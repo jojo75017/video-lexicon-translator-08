@@ -460,10 +460,12 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
         <CardContent className="space-y-3 p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <p className="text-sm font-semibold text-foreground">Modèles professionnels</p>
+              <p className="text-sm font-semibold text-foreground">
+                Modèles professionnels <Badge variant="secondary">{COVER_TEMPLATES.length} modèles</Badge>
+              </p>
               <p className="text-xs text-muted-foreground">
                 Le modèle conserve votre illustration et vos textes : il ne change que la mise en
-                page et les styles. Tous les réglages restent modifiables ensuite.
+                page, les polices et les styles. Tous les réglages restent modifiables ensuite.
               </p>
             </div>
             {templateBackup && (
@@ -473,55 +475,113 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
             )}
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-3">
-            {COVER_TEMPLATES.map((tpl) => {
+          {/* filtre par genre */}
+          <div className="flex flex-wrap gap-1.5">
+            <button
+              type="button"
+              onClick={() => setGenreFilter('all')}
+              className={cn(
+                'rounded-full border px-3 py-1 text-xs transition',
+                genreFilter === 'all'
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border hover:border-primary',
+              )}
+            >
+              Tous
+            </button>
+            {AVAILABLE_GENRES.map((genre) => (
+              <button
+                key={genre}
+                type="button"
+                onClick={() => setGenreFilter(genre)}
+                className={cn(
+                  'rounded-full border px-3 py-1 text-xs transition',
+                  genreFilter === genre
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'border-border hover:border-primary',
+                )}
+              >
+                {GENRE_LABEL[genre]}
+              </button>
+            ))}
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {visibleTemplates.map((tpl) => {
               const active = composition.templateId === tpl.id;
+              const variantIndex = active ? templateVariant : 0;
+              const variant = tpl.variants[variantIndex] ?? tpl.variants[0];
               return (
-                <button
+                <div
                   key={tpl.id}
-                  type="button"
-                  onClick={() => useTemplate(tpl.id)}
-                  data-cover-template={tpl.id}
                   className={cn(
-                    'rounded-xl border p-2 text-left transition hover:border-primary',
-                    active ? 'border-primary ring-2 ring-primary/40' : 'border-border',
+                    'rounded-xl border p-2 text-left transition',
+                    active ? 'border-primary ring-2 ring-primary/40' : 'border-border hover:border-primary',
                   )}
                 >
-                  <div
-                    className={cn(
-                      'relative mb-2 flex h-40 w-full flex-col items-center overflow-hidden rounded-lg px-3 py-4 text-white',
-                      tpl.preview.gradient,
-                    )}
+                  <button
+                    type="button"
+                    onClick={() => useTemplate(tpl.id, variantIndex)}
+                    data-cover-template={tpl.id}
+                    className="w-full text-left"
                   >
                     <div
                       className={cn(
-                        'w-full rounded px-1 text-center',
-                        tpl.preview.bandClass,
-                        tpl.preview.titleClass,
+                        'relative mb-2 flex h-40 w-full flex-col items-center overflow-hidden rounded-lg px-3 py-4 text-white',
+                        variant.gradient,
                       )}
                     >
-                      Titre du livre
+                      <div
+                        className={cn(
+                          'w-full rounded px-1 text-center',
+                          tpl.preview.bandClass,
+                          tpl.preview.titleClass,
+                        )}
+                      >
+                        Titre du livre
+                      </div>
+                      <div className={cn('mt-2 w-full text-center', tpl.preview.subtitleClass)}>
+                        Sous-titre
+                      </div>
+                      <div
+                        className={cn(
+                          'absolute bottom-3 left-0 w-full text-center',
+                          tpl.preview.authorClass,
+                        )}
+                      >
+                        Georges Boubet
+                      </div>
                     </div>
-                    <div className={cn('mt-2 w-full text-center', tpl.preview.subtitleClass)}>
-                      Sous-titre
-                    </div>
-                    <div
-                      className={cn(
-                        'absolute bottom-3 left-0 w-full text-center',
-                        tpl.preview.authorClass,
-                      )}
-                    >
-                      Georges Boubet
-                    </div>
+                    <p className="text-sm font-semibold text-foreground">{tpl.label}</p>
+                    <p className="text-xs text-muted-foreground">{tpl.description}</p>
+                  </button>
+
+                  {/* variantes de couleurs */}
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {tpl.variants.map((v, index) => (
+                      <button
+                        key={v.label}
+                        type="button"
+                        title={`Variante ${v.label}`}
+                        onClick={() => useTemplate(tpl.id, index)}
+                        className={cn(
+                          'rounded border px-2 py-0.5 text-[11px] transition',
+                          active && variantIndex === index
+                            ? 'border-primary bg-primary/10 text-primary'
+                            : 'border-border text-muted-foreground hover:border-primary',
+                        )}
+                      >
+                        {v.label}
+                      </button>
+                    ))}
                   </div>
-                  <p className="text-sm font-semibold text-foreground">{tpl.label}</p>
-                  <p className="text-xs text-muted-foreground">{tpl.description}</p>
-                </button>
+                </div>
               );
             })}
           </div>
         </CardContent>
       </Card>
+
 
 
       <div className="grid gap-4 lg:grid-cols-[280px_1fr_320px]">
