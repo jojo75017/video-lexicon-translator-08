@@ -4,6 +4,7 @@ import { THEME } from "../theme";
 import type { Scene } from "../script";
 import Subtitles from "../components/Subtitles";
 import Motif from "../components/Motif";
+import ScreenShot from "../components/ScreenShot";
 
 interface Props {
   scene: Scene;
@@ -23,52 +24,58 @@ export const SceneView: React.FC<Props> = ({ scene, index, total, fontFamily, di
 
   return (
     <AbsoluteFill>
-      {/* Chapitre */}
+      {/* Bloc titre sur fond clair, pour une lecture nette */}
       <div
         style={{
           position: "absolute",
-          left: 150,
-          top: 132,
-          opacity: chapterSpring,
-          transform: `translateX(${interpolate(chapterSpring, [0, 1], [-24, 0])}px)`,
-          display: "flex",
-          alignItems: "center",
-          gap: 16,
+          left: 120,
+          top: 118,
+          width: 760,
+          background: "rgba(255,255,255,0.96)",
+          boxShadow: "0 22px 54px rgba(30,42,50,0.14)",
+          borderLeft: `6px solid ${THEME.gold}`,
+          padding: "30px 38px 34px",
         }}
       >
-        <span style={{ width: 46, height: 2, background: THEME.gold }} />
-        <span
+        <div
           style={{
-            fontFamily,
-            fontSize: 22,
-            letterSpacing: "0.22em",
-            textTransform: "uppercase",
-            color: THEME.inkSoft,
+            opacity: chapterSpring,
+            transform: `translateX(${interpolate(chapterSpring, [0, 1], [-18, 0])}px)`,
+            display: "flex",
+            alignItems: "center",
+            gap: 14,
           }}
         >
-          {scene.chapter}
-        </span>
-      </div>
+          <span style={{ width: 40, height: 2, background: THEME.gold }} />
+          <span
+            style={{
+              fontFamily,
+              fontSize: 22,
+              letterSpacing: "0.22em",
+              textTransform: "uppercase",
+              color: THEME.emerald,
+              fontWeight: 500,
+            }}
+          >
+            {scene.chapter}
+          </span>
+        </div>
 
-      {/* Titre */}
-      <h1
-        style={{
-          position: "absolute",
-          left: 150,
-          top: 178,
-          margin: 0,
-          maxWidth: 760,
-          fontFamily: displayFont,
-          fontSize: 88,
-          lineHeight: 1.02,
-          letterSpacing: "-0.025em",
-          color: THEME.ink,
-          opacity: titleSpring,
-          transform: `translateY(${interpolate(titleSpring, [0, 1], [34, 0])}px)`,
-        }}
-      >
-        {scene.title}
-      </h1>
+        <h1
+          style={{
+            margin: "16px 0 0",
+            fontFamily: displayFont,
+            fontSize: 72,
+            lineHeight: 1.06,
+            letterSpacing: "-0.02em",
+            color: "#132029",
+            opacity: titleSpring,
+            transform: `translateY(${interpolate(titleSpring, [0, 1], [26, 0])}px)`,
+          }}
+        >
+          {scene.title}
+        </h1>
+      </div>
 
       {/* Puces clés */}
       <div
@@ -79,7 +86,7 @@ export const SceneView: React.FC<Props> = ({ scene, index, total, fontFamily, di
           display: "flex",
           flexWrap: "wrap",
           gap: 12,
-          maxWidth: 760,
+          maxWidth: 700,
         }}
       >
         {scene.chips.map((chip, i) => {
@@ -103,7 +110,11 @@ export const SceneView: React.FC<Props> = ({ scene, index, total, fontFamily, di
         })}
       </div>
 
-      <Motif motif={scene.motif} fontFamily={fontFamily} displayFont={displayFont} />
+      {scene.shot ? (
+        <ScreenShot file={scene.shot} caption={scene.shotCaption ?? ""} fontFamily={fontFamily} />
+      ) : (
+        <Motif motif={scene.motif} fontFamily={fontFamily} displayFont={displayFont} />
+      )}
 
       <Subtitles lines={scene.lines} startAt={30} fontFamily={fontFamily} />
 
