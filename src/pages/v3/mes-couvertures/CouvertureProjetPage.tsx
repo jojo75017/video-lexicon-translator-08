@@ -7,7 +7,9 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, ImageIcon, Loader2 } from 'lucide-react';
 
 import CoverFrontEditor from '@/components/cover-editor/CoverFrontEditor';
+import CoverWrapEditor from '@/components/cover-editor/CoverWrapEditor';
 import KdpPaperbackConfigPanel from '@/components/cover-editor/KdpPaperbackConfigPanel';
+
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -74,7 +76,7 @@ export default function CouvertureProjetPage() {
   }, [id]);
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-8 space-y-6">
+    <main className="mx-auto w-full max-w-7xl px-4 py-8 space-y-6">
       <Button variant="ghost" className="gap-2" onClick={() => navigate('/v3/mes-couvertures')}>
         <ArrowLeft className="h-4 w-4" /> Mes couvertures
       </Button>
@@ -162,16 +164,26 @@ export default function CouvertureProjetPage() {
             </Card>
           </div>
 
-          {project.cover_type === 'paperback' && (
+          {project.cover_type === 'paperback' ? (
+            <>
+              <section className="space-y-3">
+                <KdpPaperbackConfigPanel project={project} onProjectUpdated={setProject} />
+              </section>
+
+              <section className="space-y-3">
+                <h2 className="text-lg font-semibold text-foreground">
+                  Éditeur de couverture complète · Quatrième | Dos | Première
+                </h2>
+                <CoverWrapEditor project={project} onProjectUpdated={setProject} />
+              </section>
+            </>
+          ) : (
             <section className="space-y-3">
-              <KdpPaperbackConfigPanel project={project} onProjectUpdated={setProject} />
+              <h2 className="text-lg font-semibold text-foreground">Éditeur de première de couverture</h2>
+              <CoverFrontEditor project={project} onProjectUpdated={setProject} />
             </section>
           )}
 
-          <section className="space-y-3">
-            <h2 className="text-lg font-semibold text-foreground">Éditeur de première de couverture</h2>
-            <CoverFrontEditor project={project} onProjectUpdated={setProject} />
-          </section>
 
         </>
       )}
