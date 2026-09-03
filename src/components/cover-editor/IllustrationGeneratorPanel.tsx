@@ -402,11 +402,25 @@ export default function IllustrationGeneratorPanel({
               </div>
             )}
 
+            {noFunding && (
+              <div className="space-y-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm">
+                <p className="font-semibold text-foreground">
+                  Vos {credits.granted} générations incluses sont épuisées
+                </p>
+                <p className="text-muted-foreground">
+                  Pour continuer à générer des illustrations, ajoutez votre clé OpenAI personnelle
+                  (bouton « Ajouter ma clé OpenAI » dans le bandeau en haut de l’éditeur). Vos
+                  images déjà générées, vos modèles et vos exports restent disponibles.
+                </p>
+              </div>
+            )}
+
             {error && (
               <p className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
                 {error}
               </p>
             )}
+
 
             <DialogFooter className="gap-2 sm:justify-between">
               <Button variant="ghost" onClick={() => setOpen(false)} disabled={busy}>
