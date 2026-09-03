@@ -16,6 +16,7 @@ import {
   AlignRight,
   Bold,
   Check,
+  Download,
   Italic,
   Loader2,
   Plus,
@@ -67,6 +68,10 @@ import {
   type TextAlign,
   type TextRole,
 } from '@/lib/cover-editor/frontComposition';
+import {
+  downloadBlob,
+  renderKindleCoverJpeg,
+} from '@/lib/cover-editor/kindleExport';
 
 type SaveStatus = 'idle' | 'dirty' | 'saving' | 'saved' | 'error';
 
