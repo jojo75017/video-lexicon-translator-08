@@ -600,6 +600,23 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
               </div>
             )}
 
+            {composition.overlay && composition.overlay.type !== 'none' && (
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background:
+                    composition.overlay.type === 'full'
+                      ? composition.overlay.color
+                      : composition.overlay.type === 'top'
+                        ? `linear-gradient(to bottom, ${composition.overlay.color} 0%, transparent 55%)`
+                        : composition.overlay.type === 'bottom'
+                          ? `linear-gradient(to top, ${composition.overlay.color} 0%, transparent 55%)`
+                          : `linear-gradient(to bottom, ${composition.overlay.color} 0%, transparent 40%, transparent 60%, ${composition.overlay.color} 100%)`,
+                  opacity: composition.overlay.opacity,
+                }}
+              />
+            )}
+
             {guides && (
               <>
                 <div className="pointer-events-none absolute left-1/2 top-0 h-full w-px bg-primary/70" />
@@ -609,6 +626,7 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
 
             {composition.layers.map((layer) => {
               const active = layer.id === selectedId;
+              const padY = layer.band?.enabled ? (layer.band.padY ?? 0) * scale : 0;
               return (
                 <div
                   key={layer.id}
@@ -621,8 +639,10 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
                   )}
                   style={{
                     left: layer.x * scale,
-                    top: layer.y * scale,
+                    top: layer.y * scale - padY,
                     width: layer.width * scale,
+                    paddingTop: padY,
+                    paddingBottom: padY,
                     fontFamily: layer.fontFamily,
                     fontSize: layer.fontSize * scale,
                     lineHeight: layer.lineHeight,
@@ -630,12 +650,25 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
                     textAlign: layer.align,
                     fontWeight: layer.bold ? 700 : 400,
                     fontStyle: layer.italic ? 'italic' : 'normal',
+                    opacity: layer.opacity ?? 1,
+                    letterSpacing: (layer.letterSpacing ?? 0) * scale,
+                    backgroundColor: layer.band?.enabled
+                      ? hexWithAlpha(layer.band.color, layer.band.opacity)
+                      : undefined,
+                    textShadow: layer.shadow?.enabled
+                      ? `0 ${(layer.shadow.offsetY ?? 0) * scale}px ${(layer.shadow.blur ?? 0) * scale}px ${layer.shadow.color}`
+                      : undefined,
+                    WebkitTextStrokeWidth: layer.outline?.enabled
+                      ? (layer.outline.width ?? 0) * scale
+                      : undefined,
+                    WebkitTextStrokeColor: layer.outline?.enabled ? layer.outline.color : undefined,
                     whiteSpace: 'pre-wrap',
                     wordBreak: 'break-word',
                   }}
                   data-cover-layer={layer.role}
                 >
                   {layer.text}
+
                   {active && (
                     <span
                       onPointerDown={(e) => startResize(e, layer)}
