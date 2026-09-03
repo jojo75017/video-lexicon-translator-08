@@ -68,11 +68,20 @@ import {
   parseComposition,
   renderCompositionThumbnail,
   serializeComposition,
+  drawFrontBackdrop,
   type FrontComposition,
+  type FrontShapeLayer,
   type FrontTextLayer,
   type TextAlign,
   type TextRole,
 } from '@/lib/cover-editor/frontComposition';
+import ReferenceTemplateGallery from '@/components/cover-editor/ReferenceTemplateGallery';
+import ShapeLayersPanel from '@/components/cover-editor/ShapeLayersPanel';
+import {
+  applyReferenceTemplate,
+  type ReferenceTemplateId,
+} from '@/lib/cover-editor/referenceTemplates';
+
 import {
   downloadBlob,
   renderKindleCoverJpeg,
