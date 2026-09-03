@@ -76,6 +76,12 @@ import {
   renderKindleCoverJpeg,
 } from '@/lib/cover-editor/kindleExport';
 import {
+  exportFrontMockup,
+  exportFrontPdf,
+  exportFrontPng,
+} from '@/lib/cover-editor/coverExports';
+
+import {
   COVER_TEMPLATES,
   GENRE_LABEL,
   applyTemplate,
