@@ -72,11 +72,18 @@ import {
   downloadBlob,
   renderKindleCoverJpeg,
 } from '@/lib/cover-editor/kindleExport';
+import {
+  COVER_TEMPLATES,
+  applyTemplate,
+  type CoverTemplateId,
+} from '@/lib/cover-editor/coverTemplates';
+import { Switch } from '@/components/ui/switch';
 
 type SaveStatus = 'idle' | 'dirty' | 'saving' | 'saved' | 'error';
 
 const AUTOSAVE_DELAY_MS = 1500;
 const ROLES: TextRole[] = ['title', 'subtitle', 'author'];
+
 
 interface Props {
   project: CoverProject;
