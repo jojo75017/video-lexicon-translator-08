@@ -231,6 +231,9 @@ export function parseComposition(
         : 'title';
       const base = defaultLayer(role, canvas);
       const text = str(l.text, base.text);
+      const shadowRaw = (l.shadow ?? null) as Record<string, unknown> | null;
+      const outlineRaw = (l.outline ?? null) as Record<string, unknown> | null;
+      const bandRaw = (l.band ?? null) as Record<string, unknown> | null;
       return {
         ...base,
         id: str(l.id, base.id),
@@ -248,6 +251,31 @@ export function parseComposition(
         bold: Boolean(l.bold),
         italic: Boolean(l.italic),
         lineHeight: num(l.lineHeight, base.lineHeight),
+        opacity: clamp01(num(l.opacity, 1)),
+        letterSpacing: num(l.letterSpacing, 0),
+        shadow: shadowRaw
+          ? {
+              enabled: Boolean(shadowRaw.enabled),
+              color: str(shadowRaw.color as string, '#000000'),
+              blur: num(shadowRaw.blur, 24),
+              offsetY: num(shadowRaw.offsetY, 8),
+            }
+          : undefined,
+        outline: outlineRaw
+          ? {
+              enabled: Boolean(outlineRaw.enabled),
+              color: str(outlineRaw.color as string, '#000000'),
+              width: num(outlineRaw.width, 4),
+            }
+          : undefined,
+        band: bandRaw
+          ? {
+              enabled: Boolean(bandRaw.enabled),
+              color: str(bandRaw.color as string, '#000000'),
+              opacity: clamp01(num(bandRaw.opacity, 0.45)),
+              padY: num(bandRaw.padY, 24),
+            }
+          : undefined,
       };
     });
 
@@ -256,10 +284,25 @@ export function parseComposition(
       ? obj.illustrationPath
       : fallback.illustrationPath ?? null;
 
+  const overlayRaw = (obj.overlay ?? null) as Record<string, unknown> | null;
+
   return {
     version: FRONT_COMPOSITION_VERSION,
+    styleVersion: FRONT_STYLE_VERSION,
     illustrationPath,
     canvas,
+    templateId: typeof obj.templateId === 'string' ? obj.templateId : null,
+    overlay: overlayRaw
+      ? {
+          type: (['none', 'top', 'bottom', 'both', 'full'] as const).includes(
+            overlayRaw.type as FrontOverlay['type'],
+          )
+            ? (overlayRaw.type as FrontOverlay['type'])
+            : 'none',
+          color: str(overlayRaw.color as string, '#000000'),
+          opacity: clamp01(num(overlayRaw.opacity, 0.35)),
+        }
+      : undefined,
     backgroundColor:
       typeof obj.backgroundColor === 'string' && /^#[0-9a-fA-F]{6}$/.test(obj.backgroundColor)
         ? obj.backgroundColor
@@ -275,8 +318,11 @@ export function serializeComposition(
 ): FrontComposition {
   return {
     version: FRONT_COMPOSITION_VERSION,
+    styleVersion: FRONT_STYLE_VERSION,
     illustrationPath: illustrationPath && !looksLikeUrl(illustrationPath) ? illustrationPath : null,
     canvas: { ...composition.canvas },
+    templateId: composition.templateId ?? null,
+    overlay: composition.overlay ? { ...composition.overlay } : undefined,
     backgroundColor: /^#[0-9a-fA-F]{6}$/.test(composition.backgroundColor ?? '')
       ? composition.backgroundColor
       : DEFAULT_FRONT_BACKGROUND,
@@ -286,6 +332,7 @@ export function serializeComposition(
     })),
   };
 }
+
 
 /* ------------------------------------------------------------------ */
 /* Rendu canevas (miniature privée)                                   */
