@@ -22,7 +22,7 @@ import {
   Redo2,
   RotateCcw,
   Save,
-  Sparkles,
+  
   Trash2,
   TriangleAlert,
   Undo2,
