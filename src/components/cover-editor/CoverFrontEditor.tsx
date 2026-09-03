@@ -443,6 +443,75 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
         </p>
       )}
 
+      {/* modèles professionnels */}
+      <Card>
+        <CardContent className="space-y-3 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className="text-sm font-semibold text-foreground">Modèles professionnels</p>
+              <p className="text-xs text-muted-foreground">
+                Le modèle conserve votre illustration et vos textes : il ne change que la mise en
+                page et les styles. Tous les réglages restent modifiables ensuite.
+              </p>
+            </div>
+            {templateBackup && (
+              <Button variant="outline" size="sm" onClick={cancelTemplate} className="gap-1">
+                <RotateCcw className="h-4 w-4" /> Annuler le modèle
+              </Button>
+            )}
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            {COVER_TEMPLATES.map((tpl) => {
+              const active = composition.templateId === tpl.id;
+              return (
+                <button
+                  key={tpl.id}
+                  type="button"
+                  onClick={() => useTemplate(tpl.id)}
+                  data-cover-template={tpl.id}
+                  className={cn(
+                    'rounded-xl border p-2 text-left transition hover:border-primary',
+                    active ? 'border-primary ring-2 ring-primary/40' : 'border-border',
+                  )}
+                >
+                  <div
+                    className={cn(
+                      'relative mb-2 flex h-40 w-full flex-col items-center overflow-hidden rounded-lg px-3 py-4 text-white',
+                      tpl.preview.gradient,
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        'w-full rounded px-1 text-center',
+                        tpl.preview.bandClass,
+                        tpl.preview.titleClass,
+                      )}
+                    >
+                      Titre du livre
+                    </div>
+                    <div className={cn('mt-2 w-full text-center', tpl.preview.subtitleClass)}>
+                      Sous-titre
+                    </div>
+                    <div
+                      className={cn(
+                        'absolute bottom-3 left-0 w-full text-center',
+                        tpl.preview.authorClass,
+                      )}
+                    >
+                      Georges Boubet
+                    </div>
+                  </div>
+                  <p className="text-sm font-semibold text-foreground">{tpl.label}</p>
+                  <p className="text-xs text-muted-foreground">{tpl.description}</p>
+                </button>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+
       <div className="grid gap-4 lg:grid-cols-[280px_1fr_320px]">
         {/* outils toujours visibles */}
         <Card className="h-fit">
