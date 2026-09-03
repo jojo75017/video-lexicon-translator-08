@@ -36,7 +36,7 @@ export default function V3CoverProBanner() {
         />
         <style>{`@keyframes v3CoverProSheen{0%{transform:translateX(0)}100%{transform:translateX(340%)}}`}</style>
 
-        <div className="relative grid items-center gap-0 lg:grid-cols-[1.05fr_1fr]">
+        <div className="relative grid items-stretch gap-0 lg:grid-cols-[1.05fr_1fr]">
           {/* Texte */}
           <div className="p-7 sm:p-10 lg:p-12">
             <span
