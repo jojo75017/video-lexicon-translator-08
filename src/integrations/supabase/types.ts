@@ -981,6 +981,7 @@ export type Database = {
         Row: {
           ai_generated: boolean
           book_title: string | null
+          brief: Json | null
           cover_type: string
           created_at: string
           fabric_json: Json | null
@@ -998,6 +999,9 @@ export type Database = {
           page_count: number | null
           project_name: string
           schema_version: number
+          source_book_id: string | null
+          source_kind: string | null
+          template_id: string | null
           thumbnail_path: string | null
           updated_at: string
           user_id: string
@@ -1005,6 +1009,7 @@ export type Database = {
         Insert: {
           ai_generated?: boolean
           book_title?: string | null
+          brief?: Json | null
           cover_type?: string
           created_at?: string
           fabric_json?: Json | null
@@ -1022,6 +1027,9 @@ export type Database = {
           page_count?: number | null
           project_name: string
           schema_version?: number
+          source_book_id?: string | null
+          source_kind?: string | null
+          template_id?: string | null
           thumbnail_path?: string | null
           updated_at?: string
           user_id?: string
@@ -1029,6 +1037,7 @@ export type Database = {
         Update: {
           ai_generated?: boolean
           book_title?: string | null
+          brief?: Json | null
           cover_type?: string
           created_at?: string
           fabric_json?: Json | null
@@ -1046,6 +1055,9 @@ export type Database = {
           page_count?: number | null
           project_name?: string
           schema_version?: number
+          source_book_id?: string | null
+          source_kind?: string | null
+          template_id?: string | null
           thumbnail_path?: string | null
           updated_at?: string
           user_id?: string

@@ -30,6 +30,8 @@ import {
 } from 'lucide-react';
 
 import IllustrationGeneratorPanel from '@/components/cover-editor/IllustrationGeneratorPanel';
+import CoverProAccessBar from '@/components/cover-editor/CoverProAccessBar';
+
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -41,10 +43,13 @@ import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+
 import { cn } from '@/lib/utils';
 import {
   getSignedCoverUrl,
@@ -73,11 +78,32 @@ import {
   renderKindleCoverJpeg,
 } from '@/lib/cover-editor/kindleExport';
 import {
+  exportFrontMockup,
+  exportFrontPdf,
+  exportFrontPng,
+} from '@/lib/cover-editor/coverExports';
+
+import {
   COVER_TEMPLATES,
+  GENRE_LABEL,
   applyTemplate,
+  type CoverGenre,
   type CoverTemplateId,
 } from '@/lib/cover-editor/coverTemplates';
+import {
+  COVER_FONTS,
+  FONT_CATEGORY_LABEL,
+  ensureFontsReady,
+  loadAllCoverFonts,
+  type FontCategory,
+} from '@/lib/cover-editor/coverFonts';
 import { Switch } from '@/components/ui/switch';
+
+/** Genres réellement présents dans la bibliothèque de modèles. */
+const AVAILABLE_GENRES = Array.from(
+  new Set(COVER_TEMPLATES.map((t) => t.genre)),
+) as CoverGenre[];
+
 
 type SaveStatus = 'idle' | 'dirty' | 'saving' | 'saved' | 'error';
 
@@ -125,9 +151,15 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
   const [bgUrl, setBgUrl] = useState<string | null>(null);
   const [guides, setGuides] = useState(false);
 
-  /* ---- export JPEG Kindle (local, sans IA ni crédit) --------------------- */
+  /* ---- exports (100 % local, sans IA ni crédit) -------------------------- */
   const [exportState, setExportState] = useState<'idle' | 'working' | 'done'>('idle');
   const [exportError, setExportError] = useState<string | null>(null);
+  const [exportLabel, setExportLabel] = useState<string | null>(null);
+
+  /** Les polices du modèle sont chargées dès l'ouverture de l'éditeur. */
+  useEffect(() => {
+    loadAllCoverFonts();
+  }, []);
 
   /** Réservé au format eBook Kindle avec une composition texte réellement remplie. */
   const canExportKindle =
@@ -135,12 +167,19 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
     composition.canvas.width > 0 &&
     composition.layers.some((l) => l.text.trim().length > 0);
 
-  const exportKindle = async () => {
+  const hasText = composition.layers.some((l) => l.text.trim().length > 0);
+
+  const runExport = async (
+    label: string,
+    task: () => Promise<{ blob: Blob; fileName: string }>,
+  ) => {
     if (exportState === 'working') return; // anti double-clic
     setExportState('working');
+    setExportLabel(label);
     setExportError(null);
     try {
-      const result = await renderKindleCoverJpeg(composition, bgUrl, project.book_title);
+      await ensureFontsReady(composition.layers.map((l) => l.fontFamily));
+      const result = await task();
       downloadBlob(result.blob, result.fileName);
       setExportState('done');
       window.setTimeout(() => setExportState('idle'), 6000);
@@ -149,6 +188,21 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
       setExportError(e instanceof Error ? e.message : 'rendu impossible');
     }
   };
+
+  const exportKindle = () =>
+    runExport('Kindle', () => renderKindleCoverJpeg(composition, bgUrl, project.book_title));
+
+  const exportPng = () =>
+    runExport('PNG', () => exportFrontPng(composition, bgUrl, project.book_title));
+
+  const exportPdf = () =>
+    runExport('PDF', () =>
+      exportFrontPdf(composition, bgUrl, { bookTitle: project.book_title }),
+    );
+
+  const exportMockup = () =>
+    runExport('Mockup', () => exportFrontMockup(composition, bgUrl, project.book_title));
+
 
   const [past, setPast] = useState<FrontComposition[]>([]);
   const [future, setFuture] = useState<FrontComposition[]>([]);
@@ -385,10 +439,25 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
 
   /* ---------------- modèles professionnels ---------------------------------- */
   const [templateBackup, setTemplateBackup] = useState<FrontComposition | null>(null);
+  const [genreFilter, setGenreFilter] = useState<CoverGenre | 'all'>('all');
+  const [templateVariant, setTemplateVariant] = useState(0);
 
-  const useTemplate = (id: CoverTemplateId) => {
+  const visibleTemplates = useMemo(
+    () =>
+      genreFilter === 'all'
+        ? COVER_TEMPLATES
+        : COVER_TEMPLATES.filter((t) => t.genre === genreFilter),
+    [genreFilter],
+  );
+
+  const useTemplate = (id: CoverTemplateId, variantIndex = 0) => {
     setTemplateBackup(composition);
-    commit((prev) => applyTemplate(prev, id));
+    setTemplateVariant(variantIndex);
+    const tpl = COVER_TEMPLATES.find((t) => t.id === id);
+    if (tpl) {
+      void ensureFontsReady([tpl.title.fontFamily, tpl.subtitle.fontFamily, tpl.author.fontFamily]);
+    }
+    commit((prev) => applyTemplate(prev, id, variantIndex));
   };
 
   const cancelTemplate = () => {
@@ -398,13 +467,17 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
     commit(() => restore);
   };
 
+
   const missingRoles = ROLES.filter((r) => !composition.layers.some((l) => l.role === r));
 
 
   /* ---------------- rendu -------------------------------------------------- */
   return (
     <div className="space-y-4">
+      <CoverProAccessBar />
+
       {/* barre d'état */}
+
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card p-3">
         <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" size="sm" onClick={undo} disabled={!past.length} className="gap-1">
@@ -431,11 +504,11 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
               disabled={exportState === 'working'}
               className="gap-1 bg-[#f47920] text-white hover:bg-[#d96a15]"
             >
-              {exportState === 'working' ? (
+              {exportState === 'working' && exportLabel === 'Kindle' ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" /> Préparation…
                 </>
-              ) : exportState === 'done' ? (
+              ) : exportState === 'done' && exportLabel === 'Kindle' ? (
                 <>
                   <Check className="h-4 w-4" /> Couverture téléchargée
                 </>
@@ -446,6 +519,57 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
               )}
             </Button>
           )}
+
+          {hasText && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1"
+                disabled={exportState === 'working'}
+                onClick={() => void exportPng()}
+                title="PNG haute définition"
+              >
+                {exportState === 'working' && exportLabel === 'PNG' ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4" />
+                )}{' '}
+                PNG HD
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1"
+                disabled={exportState === 'working'}
+                onClick={() => void exportPdf()}
+                title="PDF 300 DPI avec fond perdu"
+              >
+                {exportState === 'working' && exportLabel === 'PDF' ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4" />
+                )}{' '}
+                PDF 300 DPI
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1"
+                disabled={exportState === 'working'}
+                onClick={() => void exportMockup()}
+                title="Mockup de présentation pour vos pages de vente"
+              >
+                {exportState === 'working' && exportLabel === 'Mockup' ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4" />
+                )}{' '}
+                Mockup
+              </Button>
+            </>
+          )}
+
         </div>
       </div>
 
@@ -460,9 +584,10 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
         <CardContent className="space-y-3 p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <p className="text-sm font-semibold text-foreground">
+              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
                 Modèles professionnels <Badge variant="secondary">{COVER_TEMPLATES.length} modèles</Badge>
-              </p>
+              </div>
+
               <p className="text-xs text-muted-foreground">
                 Le modèle conserve votre illustration et vos textes : il ne change que la mise en
                 page, les polices et les styles. Tous les réglages restent modifiables ensuite.
@@ -801,23 +926,32 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label>Police</Label>
+                  <Label>Police professionnelle</Label>
                   <Select
                     value={selected.fontFamily}
-                    onValueChange={(v) => patchLayer(selected.id, { fontFamily: v })}
+                    onValueChange={(v) => {
+                      void ensureFontsReady([v]);
+                      patchLayer(selected.id, { fontFamily: v });
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
-                      {FRONT_FONTS.map((f) => (
-                        <SelectItem key={f.value} value={f.value}>
-                          {f.label}
-                        </SelectItem>
+                    <SelectContent className="max-h-80">
+                      {(['serif', 'sans', 'display'] as FontCategory[]).map((cat) => (
+                        <SelectGroup key={cat}>
+                          <SelectLabel>{FONT_CATEGORY_LABEL[cat]}</SelectLabel>
+                          {COVER_FONTS.filter((f) => f.category === cat).map((f) => (
+                            <SelectItem key={f.value} value={f.value}>
+                              <span style={{ fontFamily: f.value }}>{f.label}</span>
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
+
 
                 <div className="space-y-1.5">
                   <Label>Taille : {selected.fontSize} px</Label>
