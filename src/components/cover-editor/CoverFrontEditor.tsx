@@ -499,11 +499,11 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
               disabled={exportState === 'working'}
               className="gap-1 bg-[#f47920] text-white hover:bg-[#d96a15]"
             >
-              {exportState === 'working' ? (
+              {exportState === 'working' && exportLabel === 'Kindle' ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" /> Préparation…
                 </>
-              ) : exportState === 'done' ? (
+              ) : exportState === 'done' && exportLabel === 'Kindle' ? (
                 <>
                   <Check className="h-4 w-4" /> Couverture téléchargée
                 </>
@@ -514,6 +514,57 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
               )}
             </Button>
           )}
+
+          {hasText && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1"
+                disabled={exportState === 'working'}
+                onClick={() => void exportPng()}
+                title="PNG haute définition"
+              >
+                {exportState === 'working' && exportLabel === 'PNG' ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4" />
+                )}{' '}
+                PNG HD
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1"
+                disabled={exportState === 'working'}
+                onClick={() => void exportPdf()}
+                title="PDF 300 DPI avec fond perdu"
+              >
+                {exportState === 'working' && exportLabel === 'PDF' ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4" />
+                )}{' '}
+                PDF 300 DPI
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1"
+                disabled={exportState === 'working'}
+                onClick={() => void exportMockup()}
+                title="Mockup de présentation pour vos pages de vente"
+              >
+                {exportState === 'working' && exportLabel === 'Mockup' ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4" />
+                )}{' '}
+                Mockup
+              </Button>
+            </>
+          )}
+
         </div>
       </div>
 
