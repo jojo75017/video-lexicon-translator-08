@@ -7,6 +7,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, ImageIcon, Loader2 } from 'lucide-react';
 
 import CoverFrontEditor from '@/components/cover-editor/CoverFrontEditor';
+import KdpPaperbackConfigPanel from '@/components/cover-editor/KdpPaperbackConfigPanel';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -160,6 +161,12 @@ export default function CouvertureProjetPage() {
               </CardContent>
             </Card>
           </div>
+
+          {project.cover_type === 'paperback' && (
+            <section className="space-y-3">
+              <KdpPaperbackConfigPanel project={project} onProjectUpdated={setProject} />
+            </section>
+          )}
 
           <section className="space-y-3">
             <h2 className="text-lg font-semibold text-foreground">Éditeur de première de couverture</h2>

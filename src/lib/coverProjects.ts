@@ -31,6 +31,10 @@ export interface CoverProject {
   fabric_json: unknown | null;
   illustration_path: string | null;
   thumbnail_path: string | null;
+  /** Étape 4B — configuration KDP broché (pouces = source de vérité). */
+  kdp_config: unknown | null;
+  kdp_geometry: unknown | null;
+  kdp_rules_version: string | null;
   schema_version: number;
   created_at: string;
   updated_at: string;
@@ -45,6 +49,9 @@ export interface CoverProjectInput {
   fabric_json?: unknown | null;
   illustration_path?: string | null;
   thumbnail_path?: string | null;
+  kdp_config?: unknown | null;
+  kdp_geometry?: unknown | null;
+  kdp_rules_version?: string | null;
 }
 
 export class CoverAuthRequiredError extends Error {
