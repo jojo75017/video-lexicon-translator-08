@@ -44,7 +44,17 @@ import useCoverProAccess from '@/hooks/useCoverProAccess';
 import { getSignedCoverUrl } from '@/lib/coverProjects';
 import { cn } from '@/lib/utils';
 
+/** Directions artistiques disponibles (doivent rester alignées sur cover-pro-generate). */
+const ART_STYLES = [
+  { value: 'illustration-editoriale', label: 'Illustration peinte best-seller (recommandé)' },
+  { value: 'fantasy-doree', label: 'Fantasy / historique doré (peinture à l’huile)' },
+  { value: 'photo-cinema', label: 'Photo cinématographique hyperréaliste' },
+  { value: 'non-fiction-pro', label: 'Non-fiction pro (photo + aplats graphiques)' },
+  { value: 'minimal-graphique', label: 'Minimaliste graphique premium' },
+] as const;
+
 interface Props {
+
   projectId: string;
   /** Chemin privé de la nouvelle illustration après une génération réussie. */
   onGenerated: (illustrationPath: string) => void | Promise<void>;
