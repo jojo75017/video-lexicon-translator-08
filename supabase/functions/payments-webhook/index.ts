@@ -123,6 +123,7 @@ const UPSELL_PACK_MODULES: Record<string, string> = {
   short_stories: "short-stories",
   bd_comic: "bd-comic",
   bd_comic_pro: "bd-comic-pro",
+  cover_studio_pro: "cover_studio_pro",
 };
 
 async function handleV3UpsellPackCompleted(session: any, env: StripeEnv) {
