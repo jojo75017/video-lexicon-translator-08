@@ -36,7 +36,7 @@ export default function V3CoverProBanner() {
         />
         <style>{`@keyframes v3CoverProSheen{0%{transform:translateX(0)}100%{transform:translateX(340%)}}`}</style>
 
-        <div className="relative grid items-stretch gap-0 lg:grid-cols-[1.05fr_1fr]">
+        <div className="relative grid items-stretch gap-0 lg:grid-cols-[1fr_1.08fr]">
           {/* Texte */}
           <div className="p-7 sm:p-10 lg:p-12">
             <span
@@ -111,21 +111,21 @@ export default function V3CoverProBanner() {
           </div>
 
           {/* Visuel */}
-          <div className="relative min-h-[240px] lg:min-h-[420px]">
+          <div className="relative min-h-[240px] lg:min-h-[380px]">
             <img
               src={coverProBanner}
               alt="Trois couvertures de livres haut de gamme aux ornements dorés, générées avec Cover Studio KDP Pro"
               loading="lazy"
               width={1536}
               height={1024}
-              className="h-full w-full object-cover transition-transform duration-[1200ms] group-hover:scale-[1.04]"
+              className="h-full w-full object-cover object-center transition-transform duration-[1200ms] group-hover:scale-[1.04]"
             />
             <div
               aria-hidden
               className="absolute inset-0"
               style={{
                 background:
-                  'linear-gradient(90deg, #070a18 0%, rgba(7,10,24,0.55) 28%, rgba(7,10,24,0) 62%)',
+                  'linear-gradient(90deg, #101731 0%, rgba(16,23,49,0.72) 22%, rgba(7,10,24,0.18) 55%, rgba(7,10,24,0) 100%)',
               }}
             />
             <div
