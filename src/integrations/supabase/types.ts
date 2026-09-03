@@ -878,15 +878,120 @@ export type Database = {
         }
         Relationships: []
       }
+      cover_pro_api_keys: {
+        Row: {
+          created_at: string
+          key_cipher: string
+          key_iv: string
+          key_mask: string
+          last_test_ok: boolean | null
+          last_tested_at: string | null
+          provider: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          key_cipher: string
+          key_iv: string
+          key_mask: string
+          last_test_ok?: boolean | null
+          last_tested_at?: string | null
+          provider?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          key_cipher?: string
+          key_iv?: string
+          key_mask?: string
+          last_test_ok?: boolean | null
+          last_tested_at?: string | null
+          provider?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      cover_pro_credit_events: {
+        Row: {
+          created_at: string
+          detail: string | null
+          event_type: string
+          funding: string | null
+          id: string
+          model: string | null
+          project_id: string | null
+          provider: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          detail?: string | null
+          event_type: string
+          funding?: string | null
+          id?: string
+          model?: string | null
+          project_id?: string | null
+          provider?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          detail?: string | null
+          event_type?: string
+          funding?: string | null
+          id?: string
+          model?: string | null
+          project_id?: string | null
+          provider?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      cover_pro_credits: {
+        Row: {
+          created_at: string
+          granted: number
+          granted_once: boolean
+          updated_at: string
+          used: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          granted?: number
+          granted_once?: boolean
+          updated_at?: string
+          used?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          granted?: number
+          granted_once?: boolean
+          updated_at?: string
+          used?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       cover_projects: {
         Row: {
+          ai_generated: boolean
           book_title: string | null
           cover_type: string
           created_at: string
           fabric_json: Json | null
           format_id: string
           id: string
+          illustration_generated_at: string | null
+          illustration_height: number | null
+          illustration_model: string | null
           illustration_path: string | null
+          illustration_provider: string | null
+          illustration_width: number | null
           page_count: number | null
           project_name: string
           schema_version: number
@@ -895,13 +1000,19 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          ai_generated?: boolean
           book_title?: string | null
           cover_type?: string
           created_at?: string
           fabric_json?: Json | null
           format_id?: string
           id?: string
+          illustration_generated_at?: string | null
+          illustration_height?: number | null
+          illustration_model?: string | null
           illustration_path?: string | null
+          illustration_provider?: string | null
+          illustration_width?: number | null
           page_count?: number | null
           project_name: string
           schema_version?: number
@@ -910,13 +1021,19 @@ export type Database = {
           user_id?: string
         }
         Update: {
+          ai_generated?: boolean
           book_title?: string | null
           cover_type?: string
           created_at?: string
           fabric_json?: Json | null
           format_id?: string
           id?: string
+          illustration_generated_at?: string | null
+          illustration_height?: number | null
+          illustration_model?: string | null
           illustration_path?: string | null
+          illustration_provider?: string | null
+          illustration_width?: number | null
           page_count?: number | null
           project_name?: string
           schema_version?: number
@@ -2981,6 +3098,22 @@ export type Database = {
       }
       can_create_vip: { Args: never; Returns: boolean }
       count_vip_subscribers: { Args: never; Returns: number }
+      cover_pro_grant_included_credits: {
+        Args: { _amount?: number; _user_id: string }
+        Returns: {
+          granted: number
+          remaining: number
+          used: number
+        }[]
+      }
+      cover_pro_reserve_credit: {
+        Args: { _project_id?: string; _user_id: string }
+        Returns: boolean
+      }
+      cover_pro_restore_credit: {
+        Args: { _detail?: string; _project_id?: string; _user_id: string }
+        Returns: undefined
+      }
       generate_referral_code: { Args: never; Returns: string }
       get_my_funnel_orders: {
         Args: never

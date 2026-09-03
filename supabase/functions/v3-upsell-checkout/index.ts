@@ -37,6 +37,8 @@ const PACKS: Record<string, { label: string; amount: number }> = {
   // Studio BD & Jeunesse — offre d'entrée 17 € puis upsell Pro 47 €.
   bd_comic: { label: "Studio BD & Jeunesse — Accès à vie", amount: 1700 },
   bd_comic_pro: { label: "Studio BD & Jeunesse Pro — Illustrations étendues", amount: 4700 },
+  // Cover Studio KDP Pro — upsell indépendant (3 générations IA incluses une seule fois).
+  cover_studio_pro: { label: "Cover Studio KDP Pro — Accès à vie", amount: 6700 },
 };
 
 Deno.serve(async (req) => {

@@ -48,6 +48,8 @@ const CoverStudioProHubPage = lazy(() => import('./pages/v3/cover-studio-pro/Cov
 const CoverEditorPage = lazy(() => import('./pages/v3/cover-studio-pro/CoverEditorPage'));
 const MesCouverturesPage = lazy(() => import('./pages/v3/mes-couvertures/MesCouverturesPage'));
 const CouvertureProjetPage = lazy(() => import('./pages/v3/mes-couvertures/CouvertureProjetPage'));
+const CoverProPage = lazy(() => import('./pages/v3/cover-studio-pro/CoverProPage'));
+const AdminCoverProPage = lazy(() => import('./pages/admin/AdminCoverProPage'));
 const Niches600Page = lazy(() => import('./pages/Niches600Page'));
 const NichesPage = lazy(() => import('./pages/NichesPage'));
 const BookPerfectPage = lazy(() => import('./pages/BookPerfectPage'));
@@ -609,6 +611,9 @@ const App = () => {
             <Route path="/v3/cover-studio-pro/edit" element={gated(<TrialGate label="Cover Studio Pro"><CoverEditorPage /></TrialGate>)} />
             <Route path="/v3/mes-couvertures" element={gated(<TrialGate label="Mes couvertures"><MesCouverturesPage /></TrialGate>)} />
             <Route path="/v3/mes-couvertures/:id" element={gated(<TrialGate label="Mes couvertures"><CouvertureProjetPage /></TrialGate>)} />
+            {/* Cover Studio KDP Pro — upsell indépendant 67 € (étape 3). */}
+            <Route path="/v3/cover-pro" element={gated(<TrialGate label="Cover Studio KDP Pro"><CoverProPage /></TrialGate>)} />
+            <Route path="/admin/cover-pro" element={<AdminGate><AdminCoverProPage /></AdminGate>} />
 
             <Route path="/series-tomes" element={gated(<SeriesTomesPage />)} />
             <Route path="/fiches-pratiques" element={gated(<PracticalSheetsGeneratorPage />)} />
