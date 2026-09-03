@@ -156,6 +156,8 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
 
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [activeZone, setActiveZone] = useState<'front' | 'spine' | 'back'>('front');
+
   const [status, setStatus] = useState<SaveStatus>('idle');
   const [saveError, setSaveError] = useState<string | null>(null);
   const [bgUrl, setBgUrl] = useState<string | null>(null);
@@ -172,6 +174,12 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
 
   const pxPerIn = fitPxPerIn * zoom;
   const selected = composition.elements.find((e) => e.id === selectedId) ?? null;
+
+  // L'onglet de zone suit l'élément sélectionné sur le canevas.
+  useEffect(() => {
+    if (selected) setActiveZone(selected.zone);
+  }, [selected]);
+
   const spine = geometry ? spineTextConform(geometry) : null;
 
   /* ------------------ illustration privée (URL signée éphémère) ------------ */
@@ -491,7 +499,22 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
           <div className="flex items-center gap-2">
             <Switch id="wrap-guides" checked={showGuides} onCheckedChange={setShowGuides} />
             <Label htmlFor="wrap-guides" className="text-sm">Repères</Label>
+          <span className="mx-1 h-6 w-px bg-border" />
+          <div className="flex items-center gap-1 rounded-lg border border-border p-0.5">
+            {(['front', 'spine', 'back'] as const).map((zone) => (
+              <Button
+                key={zone}
+                size="sm"
+                variant={activeZone === zone ? 'default' : 'ghost'}
+                className="h-7 px-2 text-xs"
+                onClick={() => setActiveZone(zone)}
+              >
+                {ZONE_LABEL[zone]}
+              </Button>
+            ))}
           </div>
+        </div>
+
         </div>
         <StatusPill status={status} error={saveError} />
       </div>
@@ -789,7 +812,8 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
           <Card>
             <CardContent className="space-y-2 p-4">
               <p className="text-sm font-semibold text-foreground">Éléments</p>
-              {(['front', 'spine', 'back'] as const).map((zone) => (
+              {([activeZone] as const).map((zone) => (
+
                 <div key={zone} className="space-y-1">
                   <p className="text-xs uppercase tracking-wide text-muted-foreground">
                     {ZONE_LABEL[zone]}

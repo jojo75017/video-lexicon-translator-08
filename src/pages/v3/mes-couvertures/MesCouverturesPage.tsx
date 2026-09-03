@@ -6,7 +6,7 @@
  * Aucun appel IA, aucun calcul de dimensions, aucun ISBN.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
   BookOpen,
@@ -135,10 +135,12 @@ export default function MesCouverturesPage() {
         format_id: TYPE_META[newType].formatId,
         page_count: Number.isFinite(pages as number) ? (pages as number) : null,
       });
-      toast.success('Couverture créée.');
+      toast.success('Couverture créée — ouverture de l’éditeur.');
       setCreateOpen(false);
       resetCreateForm();
       setProjects((prev) => [created, ...prev]);
+      navigate(`/v3/mes-couvertures/${created.id}`);
+
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Création impossible.');
     } finally {
@@ -263,14 +265,19 @@ export default function MesCouverturesPage() {
       )}
 
       {!loading && !error && projects.length > 0 && (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid justify-items-start gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {projects.map((project) => {
             const meta = TYPE_META[project.cover_type] ?? TYPE_META.ebook;
             const Icon = meta.icon;
             const thumb = thumbs[project.id];
             return (
-              <Card key={project.id} className="flex flex-col overflow-hidden">
-                <div className="aspect-[3/4] w-full bg-muted">
+              <Card key={project.id} className="flex w-full max-w-[240px] flex-col overflow-hidden">
+                <Link
+                  to={`/v3/mes-couvertures/${project.id}`}
+                  aria-label={`Ouvrir l’éditeur de ${project.project_name}`}
+                  className="block w-full bg-muted transition-opacity hover:opacity-90"
+                  style={{ height: 330 }}
+                >
                   {thumb ? (
                     <img
                       src={thumb}
@@ -280,30 +287,34 @@ export default function MesCouverturesPage() {
                     />
                   ) : (
                     <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-muted-foreground">
-                      <Icon className="h-8 w-8" />
+                      <Icon className="h-7 w-7" />
                       <span className="text-xs">Pas encore d'illustration</span>
                     </div>
                   )}
-                </div>
-                <CardHeader className="space-y-1 pb-2">
-                  <CardTitle className="text-base leading-tight">{project.project_name}</CardTitle>
-                  <p className="text-sm text-muted-foreground">
+                </Link>
+
+                <div className="space-y-1 px-3 pt-3">
+                  <p className="truncate text-sm font-semibold leading-tight text-foreground">
+                    {project.project_name}
+                  </p>
+                  <p className="truncate text-xs text-muted-foreground">
                     {project.book_title || 'Titre du livre non renseigné'}
                   </p>
-                  <div className="flex flex-wrap items-center gap-2 pt-1">
-                    <Badge variant="outline">{meta.label}</Badge>
-                    <Badge variant="secondary">Brouillon</Badge>
+                  <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                    <Badge variant="outline" className="text-[10px]">{meta.label}</Badge>
+                    <span className="text-[10px] text-muted-foreground">
+                      {formatDate(project.updated_at)}
+                    </span>
                   </div>
-                </CardHeader>
-                <CardContent className="pb-2 text-xs text-muted-foreground">
-                  Modifié le {formatDate(project.updated_at)}
-                </CardContent>
-                <CardFooter className="mt-auto flex flex-wrap gap-2">
+                </div>
+
+                <div className="mt-auto grid grid-cols-2 gap-2 p-3">
                   <Button
                     size="sm"
+                    className="col-span-2 gap-1"
                     onClick={() => navigate(`/v3/mes-couvertures/${project.id}`)}
                   >
-                    Ouvrir
+                    <Pencil className="h-3.5 w-3.5" /> Ouvrir l’éditeur
                   </Button>
                   <Button
                     size="sm"
@@ -333,17 +344,18 @@ export default function MesCouverturesPage() {
                   <Button
                     size="sm"
                     variant="ghost"
-                    className="gap-1 text-destructive hover:text-destructive"
+                    className="col-span-2 gap-1 text-destructive hover:text-destructive"
                     onClick={() => setDeleteTarget(project)}
                   >
                     <Trash2 className="h-3.5 w-3.5" /> Supprimer
                   </Button>
-                </CardFooter>
+                </div>
               </Card>
             );
           })}
         </div>
       )}
+
 
       {/* Création */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
