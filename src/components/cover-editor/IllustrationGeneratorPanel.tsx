@@ -310,6 +310,29 @@ export default function IllustrationGeneratorPanel({
               </div>
             </div>
 
+            {/* Direction artistique (qualité best-seller) */}
+            <div className="space-y-1.5">
+              <Label>Style de rendu</Label>
+              <Select value={artStyle} onValueChange={setArtStyle}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {ART_STYLES.map((s) => (
+                    <SelectItem key={s.value} value={s.value}>
+                      {s.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Chaque style applique une direction artistique professionnelle (lumière, matières,
+                niveau de détail) pour un rendu de couverture vendue en librairie.
+              </p>
+            </div>
+
+
+
             <div className="space-y-1.5">
               <Label htmlFor="ill-summary">Sujet du livre et scène souhaitée</Label>
               <Textarea
