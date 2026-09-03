@@ -106,6 +106,31 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
   const [bgUrl, setBgUrl] = useState<string | null>(null);
   const [guides, setGuides] = useState(false);
 
+  /* ---- export JPEG Kindle (local, sans IA ni crédit) --------------------- */
+  const [exportState, setExportState] = useState<'idle' | 'working' | 'done'>('idle');
+  const [exportError, setExportError] = useState<string | null>(null);
+
+  /** Réservé au format eBook Kindle avec une composition texte réellement remplie. */
+  const canExportKindle =
+    project.cover_type === 'ebook' &&
+    composition.canvas.width > 0 &&
+    composition.layers.some((l) => l.text.trim().length > 0);
+
+  const exportKindle = async () => {
+    if (exportState === 'working') return; // anti double-clic
+    setExportState('working');
+    setExportError(null);
+    try {
+      const result = await renderKindleCoverJpeg(composition, bgUrl, project.book_title);
+      downloadBlob(result.blob, result.fileName);
+      setExportState('done');
+      window.setTimeout(() => setExportState('idle'), 6000);
+    } catch (e) {
+      setExportState('idle');
+      setExportError(e instanceof Error ? e.message : 'rendu impossible');
+    }
+  };
+
   const [past, setPast] = useState<FrontComposition[]>([]);
   const [future, setFuture] = useState<FrontComposition[]>([]);
 
