@@ -252,6 +252,29 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [composition.illustrationPath, project.illustration_path]);
 
+  /* ---------------- image en mémoire pour le décor de l'aperçu -------------- */
+  useEffect(() => {
+    let active = true;
+    if (!bgUrl) {
+      setBgImage(null);
+      return;
+    }
+    const el = new Image();
+    el.crossOrigin = 'anonymous';
+    el.onload = () => {
+      if (active) setBgImage(el);
+    };
+    el.onerror = () => {
+      if (active) setBgImage(null);
+    };
+    el.src = bgUrl;
+    return () => {
+      active = false;
+    };
+  }, [bgUrl]);
+
+
+
   /* ---------------- réduction visuelle adaptée à l'écran -------------------- */
   useLayoutEffect(() => {
     const compute = () => {
