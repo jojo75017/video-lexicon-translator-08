@@ -666,7 +666,29 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
         </p>
       )}
 
+      {/* 3 maquettes de référence professionnelles */}
+      <ReferenceTemplateGallery
+        activeId={(composition.templateId as ReferenceTemplateId | null) ?? null}
+        onApply={useReferenceTemplate}
+      />
+
+      {shapes.length > 0 && (
+        <ShapeLayersPanel
+          shapes={shapes}
+          canvas={composition.canvas}
+          selectedId={selectedShapeId}
+          onSelect={(id) => {
+            setSelectedShapeId(id);
+            setSelectedId(null);
+          }}
+          onPatch={patchShape}
+          onRemove={removeShape}
+          onMove={moveShape}
+        />
+      )}
+
       {/* modèles professionnels */}
+
       <Card>
         <CardContent className="space-y-3 p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
