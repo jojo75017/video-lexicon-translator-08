@@ -311,11 +311,12 @@ export default function MesCouverturesPage() {
                 <div className="mt-auto grid grid-cols-2 gap-2 p-3">
                   <Button
                     size="sm"
-                    className="col-span-2 gap-1"
+                    className="col-span-2 gap-1 bg-[#FF9E2D] font-semibold text-[#232F3E] hover:bg-[#FF8C00]"
                     onClick={() => navigate(`/v3/mes-couvertures/${project.id}`)}
                   >
-                    <Pencil className="h-3.5 w-3.5" /> Ouvrir l’éditeur
+                    <Pencil className="h-3.5 w-3.5" /> Modifier cette couverture
                   </Button>
+
                   <Button
                     size="sm"
                     variant="outline"
