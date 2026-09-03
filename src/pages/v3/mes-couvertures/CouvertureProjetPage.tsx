@@ -5,11 +5,12 @@
  */
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, ChevronDown, ImageIcon, Loader2, Sparkles } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ImageIcon, Loader2 } from 'lucide-react';
 
 import CoverFrontEditor from '@/components/cover-editor/CoverFrontEditor';
 import CoverWrapEditor from '@/components/cover-editor/CoverWrapEditor';
 import KdpPaperbackConfigPanel from '@/components/cover-editor/KdpPaperbackConfigPanel';
+import IllustrationGeneratorPanel from '@/components/cover-editor/IllustrationGeneratorPanel';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
