@@ -20,3 +20,4 @@
 - [x] Étape 4B (partie 1) : moteur de calcul + configuration KDP broché (`src/lib/cover-editor/kdpPaperbackSpecs.ts`, panneau « Configuration KDP », persistance `kdp_config`/`kdp_geometry`/`kdp_rules_version`, 21 tests unitaires)
 - [ ] Étape 4C couvertures (en attente de validation) : dos éditable, 4ᵉ de couverture, canevas couverture complète, exports PDF/JPEG, couverture rigide
 
+- [x] Correction interface éditeur de couverture (03/09/2026) : bouton orange « Modifier cette couverture », outils toujours visibles (titre, sous-titre, auteur, couleur de fond, générer illustration), panneau propriétés (police, taille, couleur, gras/italique/alignement), bouton Enregistrer, textes de zone visibles pour le broché — testé et persistant après rechargement
