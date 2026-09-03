@@ -404,11 +404,14 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
             </div>
 
             <div className="space-y-2 border-t border-border pt-3">
-              <Button asChild className="w-full gap-2">
-                <Link to="/v3/cover-studio-pro">
-                  <Sparkles className="h-4 w-4" /> Générer une illustration
-                </Link>
-              </Button>
+              <IllustrationGeneratorPanel
+                projectId={project.id}
+                hasIllustration={Boolean(composition.illustrationPath ?? project.illustration_path)}
+                className="w-full gap-2"
+                onGenerated={(path) => {
+                  commit((prev) => ({ ...prev, illustrationPath: path }));
+                }}
+              />
               <div className="overflow-hidden rounded-lg border border-border bg-muted" style={{ height: 150 }}>
                 {bgUrl ? (
                   <img src={bgUrl} alt="Illustration du projet" className="h-full w-full object-cover" />
