@@ -69,6 +69,17 @@ const text = (
   ...t,
 });
 
+/**
+ * Réduit la taille d'un grand titre pour qu'il tienne dans sa zone,
+ * en tenant compte du mot le plus long et de la longueur totale.
+ */
+const fitTitleSize = (base: number, title: string): number => {
+  const words = title.trim().split(/\s+/).filter(Boolean);
+  const longest = words.reduce((m, w) => Math.max(m, w.length), 1);
+  const factor = Math.min(1, 10 / longest, 30 / Math.max(title.trim().length, 1));
+  return Math.max(Math.round(base * 0.45), Math.round(base * factor));
+};
+
 /* ------------------------------------------------------------------ */
 /* Modèle 1 — Guide professionnel                                     */
 /* ------------------------------------------------------------------ */
