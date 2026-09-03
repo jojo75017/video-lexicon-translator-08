@@ -21,10 +21,14 @@ import {
   Plus,
   Redo2,
   RotateCcw,
+  Save,
+  Sparkles,
   Trash2,
   TriangleAlert,
   Undo2,
 } from 'lucide-react';
+
+import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -49,6 +53,7 @@ import {
   type CoverProject,
 } from '@/lib/coverProjects';
 import {
+  DEFAULT_FRONT_BACKGROUND,
   FRONT_FONTS,
   ROLE_LABEL,
   createComposition,
@@ -105,6 +110,15 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
   const [scale, setScale] = useState(0.2);
 
   const selected = composition.layers.find((l) => l.id === selectedId) ?? null;
+
+  // Le panneau de propriétés ne doit jamais être vide à l'ouverture.
+  useEffect(() => {
+    if (selectedId) return;
+    const first =
+      composition.layers.find((l) => l.role === 'title') ?? composition.layers[0] ?? null;
+    if (first) setSelectedId(first.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [composition.layers.length]);
 
   /* ---------------- fond privé : URL signée recréée à chaque ouverture ------- */
   useEffect(() => {
@@ -340,10 +354,74 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
             </Button>
           ))}
         </div>
-        <StatusPill status={status} error={saveError} />
+        <div className="flex items-center gap-3">
+          <StatusPill status={status} error={saveError} />
+          <Button size="sm" className="gap-1" onClick={() => void save()} disabled={status === 'saving'}>
+            <Save className="h-4 w-4" /> Enregistrer
+          </Button>
+        </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
+      <div className="grid gap-4 lg:grid-cols-[280px_1fr_320px]">
+        {/* outils toujours visibles */}
+        <Card className="h-fit">
+          <CardContent className="space-y-4 p-4">
+            <p className="text-sm font-semibold text-foreground">Première de couverture</p>
+
+            {ROLES.map((role) => {
+              const layer = composition.layers.find((l) => l.role === role);
+              return (
+                <div key={role} className="space-y-1.5">
+                  <Label htmlFor={`tool-${role}`}>{ROLE_LABEL[role]}</Label>
+                  {layer ? (
+                    <Input
+                      id={`tool-${role}`}
+                      value={layer.text}
+                      placeholder={ROLE_LABEL[role]}
+                      onFocus={() => setSelectedId(layer.id)}
+                      onChange={(e) => patchLayer(layer.id, { text: e.target.value })}
+                    />
+                  ) : (
+                    <Button variant="outline" size="sm" className="w-full gap-1" onClick={() => addLayer(role)}>
+                      <Plus className="h-4 w-4" /> Ajouter {ROLE_LABEL[role].toLowerCase()}
+                    </Button>
+                  )}
+                </div>
+              );
+            })}
+
+            <div className="space-y-1.5">
+              <Label htmlFor="tool-bg">Couleur de fond</Label>
+              <Input
+                id="tool-bg"
+                type="color"
+                className="h-9 w-16 p-1"
+                value={composition.backgroundColor || DEFAULT_FRONT_BACKGROUND}
+                onChange={(e) =>
+                  commit((prev) => ({ ...prev, backgroundColor: e.target.value }))
+                }
+              />
+            </div>
+
+            <div className="space-y-2 border-t border-border pt-3">
+              <Button asChild className="w-full gap-2">
+                <Link to="/v3/cover-studio-pro">
+                  <Sparkles className="h-4 w-4" /> Générer une illustration
+                </Link>
+              </Button>
+              <div className="overflow-hidden rounded-lg border border-border bg-muted" style={{ height: 150 }}>
+                {bgUrl ? (
+                  <img src={bgUrl} alt="Illustration du projet" className="h-full w-full object-cover" />
+                ) : (
+                  <p className="flex h-full items-center justify-center px-2 text-center text-xs text-muted-foreground">
+                    Aucune illustration pour l’instant
+                  </p>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* canevas */}
         <div ref={wrapRef} className="min-w-0">
           <div
@@ -351,6 +429,7 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
             style={{
               width: size.width * scale,
               height: size.height * scale,
+              backgroundColor: composition.backgroundColor || DEFAULT_FRONT_BACKGROUND,
             }}
             onPointerDown={() => setSelectedId(null)}
           >
@@ -363,7 +442,7 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
                 draggable={false}
               />
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center bg-slate-900 text-xs text-slate-300">
+              <div className="absolute inset-0 flex items-center justify-center px-4 text-center text-xs text-white/70">
                 Aucune illustration privée pour ce projet
               </div>
             )}
