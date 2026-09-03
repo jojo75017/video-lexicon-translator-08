@@ -275,6 +275,19 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
     };
   }, [bgUrl]);
 
+  /* ---------------- décor de l'aperçu (même moteur que l'export) ------------- */
+  useEffect(() => {
+    const canvas = backdropRef.current;
+    if (!canvas) return;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const w = Math.max(1, Math.round(size.width * scale));
+    const h = Math.max(1, Math.round(size.height * scale));
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    drawFrontBackdrop(ctx, composition, bgImage, scale * dpr, scale * dpr);
+  }, [composition, bgImage, scale, size.width, size.height]);
 
 
   /* ---------------- réduction visuelle adaptée à l'écran -------------------- */
