@@ -354,13 +354,41 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
             </Button>
           ))}
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <StatusPill status={status} error={saveError} />
           <Button size="sm" className="gap-1" onClick={() => void save()} disabled={status === 'saving'}>
             <Save className="h-4 w-4" /> Enregistrer
           </Button>
+          {canExportKindle && (
+            <Button
+              size="sm"
+              onClick={() => void exportKindle()}
+              disabled={exportState === 'working'}
+              className="gap-1 bg-[#f47920] text-white hover:bg-[#d96a15]"
+            >
+              {exportState === 'working' ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" /> Préparation…
+                </>
+              ) : exportState === 'done' ? (
+                <>
+                  <Check className="h-4 w-4" /> Couverture téléchargée
+                </>
+              ) : (
+                <>
+                  <Download className="h-4 w-4" /> Télécharger la couverture Kindle
+                </>
+              )}
+            </Button>
+          )}
         </div>
       </div>
+
+      {exportError && (
+        <p className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          Export impossible : {exportError}
+        </p>
+      )}
 
       <div className="grid gap-4 lg:grid-cols-[280px_1fr_320px]">
         {/* outils toujours visibles */}
