@@ -74,10 +74,25 @@ import {
 } from '@/lib/cover-editor/kindleExport';
 import {
   COVER_TEMPLATES,
+  GENRE_LABEL,
   applyTemplate,
+  type CoverGenre,
   type CoverTemplateId,
 } from '@/lib/cover-editor/coverTemplates';
+import {
+  COVER_FONTS,
+  FONT_CATEGORY_LABEL,
+  ensureFontsReady,
+  loadAllCoverFonts,
+  type FontCategory,
+} from '@/lib/cover-editor/coverFonts';
 import { Switch } from '@/components/ui/switch';
+
+/** Genres réellement présents dans la bibliothèque de modèles. */
+const AVAILABLE_GENRES = Array.from(
+  new Set(COVER_TEMPLATES.map((t) => t.genre)),
+) as CoverGenre[];
+
 
 type SaveStatus = 'idle' | 'dirty' | 'saving' | 'saved' | 'error';
 
