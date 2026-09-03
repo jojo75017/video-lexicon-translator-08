@@ -10,9 +10,10 @@
  *  - l'URL signée du fond n'est utilisée qu'en mémoire, jamais persistée.
  */
 import {
-  DEFAULT_FRONT_BACKGROUND,
+  drawFrontComposition,
   type FrontComposition,
 } from '@/lib/cover-editor/frontComposition';
+
 
 /** Dimensions imposées par Amazon pour une couverture Kindle. */
 export const KINDLE_EXPORT_WIDTH = 1600;
