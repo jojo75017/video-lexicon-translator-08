@@ -514,6 +514,35 @@ export function recenterSpineElements(composition: WrapComposition): WrapComposi
   };
 }
 
+/**
+ * Taille de police de dos par défaut : jamais sous 7 points, jamais plus large
+ * que la zone réellement disponible. Utilisée uniquement à la création d'un
+ * élément de dos, jamais pour corriger un choix explicite de l'abonné.
+ */
+export function fitSpineFontSize(
+  geometry: KdpPaperbackGeometry,
+  desiredIn: number,
+): number {
+  const usable = spineUsableWidthIn(geometry);
+  if (usable < MIN_SPINE_FONT_IN) return MIN_SPINE_FONT_IN;
+  return Math.max(MIN_SPINE_FONT_IN, Math.min(desiredIn, usable));
+}
+
+/** Applique `fitSpineFontSize` aux éléments de dos nouvellement créés. */
+export function fitSpineElements(
+  composition: WrapComposition,
+  geometry: KdpPaperbackGeometry,
+): WrapComposition {
+  return {
+    ...composition,
+    elements: composition.elements.map((e) =>
+      e.zone === 'spine' ? { ...e, fontSizeIn: fitSpineFontSize(geometry, e.fontSizeIn) } : e,
+    ),
+  };
+}
+
+
+
 /* ------------------------------------------------------------------ */
 /* Avertissements de conformité (non bloquants)                        */
 /* ------------------------------------------------------------------ */
