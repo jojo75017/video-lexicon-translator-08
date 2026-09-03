@@ -890,38 +890,24 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
               height: size.height * scale,
               backgroundColor: composition.backgroundColor || DEFAULT_FRONT_BACKGROUND,
             }}
-            onPointerDown={() => setSelectedId(null)}
+            onPointerDown={() => {
+              setSelectedId(null);
+              setSelectedShapeId(null);
+            }}
           >
-            {bgUrl ? (
-              <img
-                src={bgUrl}
-                alt=""
-                aria-hidden
-                className="absolute inset-0 h-full w-full object-cover"
-                draggable={false}
-              />
-            ) : (
+            {/* décor identique à l'export : fond, illustration, voile, calques graphiques */}
+            <canvas
+              ref={backdropRef}
+              aria-hidden
+              className="pointer-events-none absolute inset-0 h-full w-full"
+            />
+
+            {!bgUrl && (
               <div className="absolute inset-0 flex items-center justify-center px-4 text-center text-xs text-white/70">
                 Aucune illustration privée pour ce projet
               </div>
             )}
 
-            {composition.overlay && composition.overlay.type !== 'none' && (
-              <div
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  background:
-                    composition.overlay.type === 'full'
-                      ? composition.overlay.color
-                      : composition.overlay.type === 'top'
-                        ? `linear-gradient(to bottom, ${composition.overlay.color} 0%, transparent 55%)`
-                        : composition.overlay.type === 'bottom'
-                          ? `linear-gradient(to top, ${composition.overlay.color} 0%, transparent 55%)`
-                          : `linear-gradient(to bottom, ${composition.overlay.color} 0%, transparent 40%, transparent 60%, ${composition.overlay.color} 100%)`,
-                  opacity: composition.overlay.opacity,
-                }}
-              />
-            )}
 
             {guides && (
               <>
