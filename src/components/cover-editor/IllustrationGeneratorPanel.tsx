@@ -44,7 +44,17 @@ import useCoverProAccess from '@/hooks/useCoverProAccess';
 import { getSignedCoverUrl } from '@/lib/coverProjects';
 import { cn } from '@/lib/utils';
 
+/** Directions artistiques disponibles (doivent rester alignées sur cover-pro-generate). */
+const ART_STYLES = [
+  { value: 'illustration-editoriale', label: 'Illustration peinte best-seller (recommandé)' },
+  { value: 'fantasy-doree', label: 'Fantasy / historique doré (peinture à l’huile)' },
+  { value: 'photo-cinema', label: 'Photo cinématographique hyperréaliste' },
+  { value: 'non-fiction-pro', label: 'Non-fiction pro (photo + aplats graphiques)' },
+  { value: 'minimal-graphique', label: 'Minimaliste graphique premium' },
+] as const;
+
 interface Props {
+
   projectId: string;
   /** Chemin privé de la nouvelle illustration après une génération réussie. */
   onGenerated: (illustrationPath: string) => void | Promise<void>;
@@ -82,6 +92,8 @@ export default function IllustrationGeneratorPanel({
   const [palette, setPalette] = useState('');
   const [avoid, setAvoid] = useState('');
   const [summary, setSummary] = useState('');
+  const [artStyle, setArtStyle] = useState('illustration-editoriale');
+
 
   const [books, setBooks] = useState<BookOption[]>([]);
   const [bookId, setBookId] = useState<string>('');
@@ -145,7 +157,7 @@ export default function IllustrationGeneratorPanel({
       for (let i = 0; i < count; i += 1) {
         setProgress({ done: i, total: count });
         const { data, error: fnError } = await supabase.functions.invoke('cover-pro-generate', {
-          body: { projectId, genre, mood, palette, avoid, summary },
+          body: { projectId, genre, mood, palette, avoid, summary, artStyle },
         });
         if (fnError) throw fnError;
         if (data?.error) throw new Error(data.error);
@@ -307,6 +319,29 @@ export default function IllustrationGeneratorPanel({
                 />
               </div>
             </div>
+
+            {/* Direction artistique (qualité best-seller) */}
+            <div className="space-y-1.5">
+              <Label>Style de rendu</Label>
+              <Select value={artStyle} onValueChange={setArtStyle}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {ART_STYLES.map((s) => (
+                    <SelectItem key={s.value} value={s.value}>
+                      {s.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Chaque style applique une direction artistique professionnelle (lumière, matières,
+                niveau de détail) pour un rendu de couverture vendue en librairie.
+              </p>
+            </div>
+
+
 
             <div className="space-y-1.5">
               <Label htmlFor="ill-summary">Sujet du livre et scène souhaitée</Label>

@@ -31,31 +31,51 @@ interface Brief {
   scene?: string;
   palette?: string;
   style?: string;
+  artStyle?: string;
   include?: string;
   avoid?: string;
   bookTitle?: string;
 }
 
+/** Directions artistiques « qualité best-seller » proposées dans l'éditeur. */
+const ART_DIRECTIONS: Record<string, string> = {
+  "illustration-editoriale":
+    "Illustration peinte numériquement de très haute qualité, style best-seller international : rendu pictural riche, textures détaillées, lumière chaude rasante de fin de journée, profondeur de champ marquée, sujet principal net et expressif au premier plan, décor foisonnant et lisible en arrière-plan, couleurs saturées et harmonieuses, finition brillante de couverture imprimée.",
+  "fantasy-doree":
+    "Peinture à l'huile numérique fantasy haut de gamme : éclairage clair-obscur théâtral, accents dorés et cuivrés lumineux, matières précieuses (velours, pierres, laiton, bois sombre), niveau de détail extrême, atmosphère magique et mystérieuse, encadrement ornemental subtil suggéré par le décor, rendu digne d'une couverture de grand éditeur.",
+  "photo-cinema":
+    "Photographie cinématographique hyperréaliste, objectif 50 mm, ouverture f/1.8, étalonnage contrasté type long métrage, lumière naturelle directionnelle, grain fin, netteté professionnelle, ambiance dramatique, aucun aspect cartoon, aucun artefact numérique.",
+  "non-fiction-pro":
+    "Couverture non-fiction professionnelle : photographie corporate nette et lumineuse comme visuel principal, grands aplats de couleur profonde (bleu nuit, blanc, or) en composition géométrique nette, formes diagonales élégantes, espaces vides très propres réservés à la typographie, rendu premium et rassurant.",
+  "minimal-graphique":
+    "Illustration graphique minimaliste premium : formes simples et fortes, aplats de couleur maîtrisés, symbole central mémorable, contraste élevé, grande respiration, esthétique de collection design contemporaine.",
+};
+
 /** Construit le prompt : illustration éditoriale STRICTEMENT sans aucun texte. */
 function buildPrompt(b: Brief): string {
+  const direction =
+    (b.artStyle && ART_DIRECTIONS[b.artStyle]) ?? ART_DIRECTIONS["illustration-editoriale"];
   const lines = [
-    "Illustration de couverture de livre professionnelle, qualité édition, cadrage portrait vertical.",
+    "Illustration de couverture de livre professionnelle destinée à une publication réelle (niveau best-seller Amazon KDP), cadrage portrait vertical, qualité maximale.",
+    direction,
     b.genre ? `Genre du livre : ${b.genre}.` : "",
     b.summary ? `Contexte / résumé : ${b.summary}.` : "",
     b.mood ? `Ambiance recherchée : ${b.mood}.` : "",
     b.scene ? `Scène principale : ${b.scene}.` : "",
     b.palette ? `Palette de couleurs : ${b.palette}.` : "",
-    b.style ? `Style graphique : ${b.style}.` : "",
+    b.style ? `Style graphique complémentaire : ${b.style}.` : "",
     b.include ? `Éléments souhaités : ${b.include}.` : "",
     b.avoid ? `Éléments à éviter absolument : ${b.avoid}.` : "",
     b.bookTitle
       ? `Le livre s'intitule « ${b.bookTitle} » : cette information sert uniquement à comprendre le sujet et ne doit JAMAIS apparaître dans l'image.`
       : "",
+    "QUALITÉ EXIGÉE : composition claire avec un point focal fort, hiérarchie visuelle nette, anatomie et perspective justes, mains et visages corrects, éclairage cohérent, finition léchée. Interdits : rendu amateur, flou involontaire, membres déformés, personnages difformes, collage grossier, banque d'images générique, aspect brouillon.",
     "INTERDICTIONS ABSOLUES : aucun titre, aucun sous-titre, aucun nom d'auteur, aucune lettre, aucun mot, aucun chiffre, aucun logo, aucun filigrane, aucun code-barres, aucun ISBN, aucun faux caractère typographique, aucune signature.",
-    "Composition : image purement visuelle, avec des zones calmes en haut et en bas permettant d'ajouter plus tard le titre, le sous-titre et le nom de l'auteur dans des calques séparés.",
+    "Composition : image purement visuelle, avec des zones calmes en haut (environ 30 % de la hauteur) et en bas permettant d'ajouter plus tard le titre, le sous-titre et le nom de l'auteur dans des calques séparés.",
   ];
   return lines.filter(Boolean).join("\n");
 }
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
