@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Loader2, Sparkles, Wand2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, Loader2, Pencil, Sparkles, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getSignedCoverUrl, listCoverProjects, type CoverProject } from '@/lib/coverProjects';
+
+/** Bouton orange toujours visible pour ouvrir l'éditeur du projet sélectionné. */
+function ContinueInEditorButton({ projectId }: { projectId: string }) {
+  return (
+    <Button asChild className="gap-1 bg-[#FF9E2D] font-semibold text-[#232F3E] hover:bg-[#FF8C00]">
+      <Link to={`/v3/mes-couvertures/${projectId}`}>
+        <Pencil className="h-4 w-4" /> Continuer dans l&rsquo;éditeur <ArrowRight className="h-4 w-4" />
+      </Link>
+    </Button>
+  );
+}
 
 interface Props {
   remaining: number;
@@ -115,6 +127,15 @@ export default function CoverProIllustrationPanel({ remaining, hasKey, onGenerat
           </select>
         </div>
 
+        {projectId && (
+          <div className="flex flex-wrap items-center gap-2">
+            <ContinueInEditorButton projectId={projectId} />
+            <span className="text-xs text-muted-foreground">
+              Ouvre l&rsquo;éditeur pour ajouter vos titres et finaliser la couverture.
+            </span>
+          </div>
+        )}
+
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="cp-genre">Genre</Label>
@@ -161,6 +182,11 @@ export default function CoverProIllustrationPanel({ remaining, hasKey, onGenerat
               {preview.width} × {preview.height} px ·{' '}
               {preview.funding === 'ebookstudio' ? 'génération incluse' : 'votre clé OpenAI'} · fichier privé
             </p>
+            {projectId && (
+              <div className="flex justify-center pt-1">
+                <ContinueInEditorButton projectId={projectId} />
+              </div>
+            )}
           </div>
         )}
       </CardContent>
