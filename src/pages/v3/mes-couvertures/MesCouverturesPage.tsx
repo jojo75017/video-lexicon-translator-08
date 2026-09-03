@@ -25,7 +25,6 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Skeleton } from '@/components/ui/skeleton';
 import {
   Dialog,
   DialogContent,
@@ -230,7 +229,7 @@ export default function MesCouverturesPage() {
       {loading && (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[0, 1, 2].map((i) => (
-            <Skeleton key={i} className="h-64 w-full rounded-xl" />
+            <div key={i} className="h-64 w-full animate-pulse rounded-xl bg-muted" />
           ))}
         </div>
       )}
