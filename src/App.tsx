@@ -613,7 +613,7 @@ const App = () => {
             <Route path="/v3/mes-couvertures/:id" element={gated(<TrialGate label="Mes couvertures"><CouvertureProjetPage /></TrialGate>)} />
             {/* Cover Studio KDP Pro — upsell indépendant 67 € (étape 3). */}
             <Route path="/v3/cover-pro" element={gated(<TrialGate label="Cover Studio KDP Pro"><CoverProPage /></TrialGate>)} />
-            <Route path="/admin/cover-pro" element={gated(<AdminCoverProPage />)} />
+            <Route path="/admin/cover-pro" element={<AdminGate><AdminCoverProPage /></AdminGate>} />
 
             <Route path="/series-tomes" element={gated(<SeriesTomesPage />)} />
             <Route path="/fiches-pratiques" element={gated(<PracticalSheetsGeneratorPage />)} />
