@@ -13,8 +13,25 @@
 
 export const FRONT_COMPOSITION_VERSION = 1 as const;
 
+/**
+ * Version des STYLES (indépendante de `version`, déjà utilisée par la
+ * composition brochée). Permet d'ajouter ombre / contour / opacité / voile
+ * sans casser les deux types de documents.
+ */
+export const FRONT_STYLE_VERSION = 1 as const;
+
 export type TextRole = 'title' | 'subtitle' | 'author';
 export type TextAlign = 'left' | 'center' | 'right';
+
+/** Voile (bandeau) dessiné derrière un texte pour garantir la lisibilité. */
+export interface LayerBand {
+  enabled: boolean;
+  color: string;
+  /** 0 → 1 */
+  opacity: number;
+  /** marge intérieure verticale, en pixels du canevas */
+  padY: number;
+}
 
 export interface FrontTextLayer {
   id: string;
@@ -32,19 +49,41 @@ export interface FrontTextLayer {
   bold: boolean;
   italic: boolean;
   lineHeight: number;
+  /* ---- styles optionnels (styleVersion 1) ---- */
+  /** 0 → 1 */
+  opacity?: number;
+  /** espacement des lettres en pixels du canevas */
+  letterSpacing?: number;
+  shadow?: { enabled: boolean; color: string; blur: number; offsetY: number };
+  outline?: { enabled: boolean; color: string; width: number };
+  band?: LayerBand;
+}
+
+/** Voile global appliqué au-dessus de l'illustration. */
+export interface FrontOverlay {
+  type: 'none' | 'top' | 'bottom' | 'both' | 'full';
+  color: string;
+  /** 0 → 1 */
+  opacity: number;
 }
 
 export interface FrontComposition {
   version: typeof FRONT_COMPOSITION_VERSION;
+  /** Version des styles, sans lien avec `version`. */
+  styleVersion?: typeof FRONT_STYLE_VERSION;
   /** Chemin privé stable (bucket `covers`) — JAMAIS une URL signée. */
   illustrationPath: string | null;
   canvas: { width: number; height: number };
   /** Couleur de fond visible sous l'illustration (ou seule si aucune image). */
   backgroundColor: string;
+  overlay?: FrontOverlay;
+  /** Identifiant du dernier modèle appliqué (informatif). */
+  templateId?: string | null;
   layers: FrontTextLayer[];
 }
 
 export const DEFAULT_FRONT_BACKGROUND = '#111827';
+
 
 /* ------------------------------------------------------------------ */
 /* Dimensions réelles (première de couverture uniquement)             */
