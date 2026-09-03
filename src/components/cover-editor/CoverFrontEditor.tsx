@@ -28,7 +28,7 @@ import {
   Undo2,
 } from 'lucide-react';
 
-import { Link } from 'react-router-dom';
+import IllustrationGeneratorPanel from '@/components/cover-editor/IllustrationGeneratorPanel';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
