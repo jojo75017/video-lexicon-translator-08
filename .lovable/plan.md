@@ -1,68 +1,34 @@
-# Étape 2 — Interface « Mes couvertures »
+# Générer l'illustration directement dans l'éditeur de couverture
 
-Nouvelle page indépendante, branchée uniquement sur `cover_projects` via `src/lib/coverProjects.ts`. Aucun ancien module de couverture, aucun éditeur Fabric, aucune fonction IA, aucun calcul KDP, aucun export, aucun abonnement/crédit, aucun ISBN, aucune modification du bucket `ebook-images`. Aucun appel IA donc aucun crédit Lovable.
+## Le problème constaté
 
-## Rappel sécurité étape 1 (résultats réellement observés)
+Dans l'éditeur (`/v3/mes-couvertures/:id`), le bouton « Générer une illustration » renvoie vers `/v3/cover-studio-pro`, une ancienne page de présentation — pas vers le module de génération qui se trouve en réalité sur `/v3/cover-pro`. Résultat : on tourne en rond, aucune image n'arrive jamais dans le canevas, et l'abonné doit tout saisir à la main.
 
-- Compte A et compte B : chacun crée, lit, modifie et supprime ses propres projets → réussi.
-- Lecture d'un projet de B par A via son `id` → 0 ligne renvoyée.
-- Modification / suppression d'un projet de B par A → refusé par RLS (0 ligne affectée).
-- Insertion en usurpant le `user_id` d'un autre compte → refusée.
-- Upload par B dans le dossier de A → refusé ; listage du dossier de A par B → vide.
-- Visiteur non connecté : lecture table vide, upload refusé, accès direct au bucket privé refusé.
-- URL signée 60 s : 200 immédiatement, puis 400 `InvalidJWT — "exp" claim timestamp check failed` après expiration.
-- Comptes de test `rlstest-a…` / `rlstest-b…` supprimés, aucune donnée résiduelle.
+La génération elle-même existe et fonctionne côté serveur (`cover-pro-generate`, OpenAI `gpt-image-2` en 1024×1536, image privée rattachée au projet), mais elle n'est atteignable que depuis une page séparée où il faut re-choisir son projet et remplir cinq champs.
 
-## Nouvelles routes
+## Ce qui va changer
 
-| Route | Contenu |
-|---|---|
-| `/v3/mes-couvertures` | Liste des projets + création |
-| `/v3/mes-couvertures/:id` | Fiche projet (lecture seule + emplacement réservé éditeur) |
+1. **Un panneau « Illustration IA » directement dans l'éditeur**, au-dessus des outils de texte, sans quitter la page :
+   - un bouton principal « Générer l'illustration » qui marche en un clic ;
+   - le brief est pré-rempli automatiquement à partir du projet (titre du livre, genre, ambiance) ; l'abonné peut l'ajuster mais n'est jamais obligé de le faire ;
+   - un choix de moteur visible : **OpenAI** (3 générations incluses puis clé perso) ou **Gemini / Nano Banana** (clé perso, moins cher) ;
+   - pendant la génération : bouton en attente + message clair ; à la fin, l'image apparaît immédiatement en fond du canevas, sans rechargement ;
+   - messages d'erreur explicites : accès non débloqué, plus de générations incluses, clé manquante, refus du fournisseur.
 
-Les deux routes reprennent la protection existante (`gated(...)` + `TrialGate`), comme les routes couverture actuelles. Visiteur non connecté → redirection d'authentification standard d'EbookStudio.
+2. **Lien cassé corrigé** : plus aucun renvoi vers `/v3/cover-studio-pro` depuis l'éditeur.
 
-## Page liste « Mes couvertures »
+3. **Regénérer / remplacer** : si une illustration existe déjà, le bouton devient « Régénérer une autre illustration » (l'ancienne reste remplacée par la nouvelle sur le projet).
 
-Chaque carte affiche : nom du projet, titre du livre, type lisible (eBook Kindle / Broché / Relié), miniature privée via **URL signée temporaire** (jamais d'URL publique) ou visuel neutre à défaut, date de dernière modification, badge « Brouillon ».
-
-Actions par carte :
-- **Ouvrir** → fiche projet
-- **Renommer** → petite boîte de dialogue, champ nom
-- **Dupliquer** → nouvelle ligne, nouvel identifiant, nom suffixé « (copie) », mêmes métadonnées et même Fabric JSON ; le fichier illustration n'est pas recopié à cette étape (chemins laissés vides sur la copie)
-- **Supprimer** → confirmation obligatoire avant suppression
-
-États : chargement (squelettes), liste vide avec message d'invitation, message d'erreur clair, notification de confirmation après création / renommage / duplication / suppression. Grille responsive 1 / 2 / 3 colonnes, style cockpit EbookStudio existant (cartes shadcn, accents teal/or).
-
-## Création d'un projet
-
-Bouton « Créer une couverture » ouvrant un formulaire :
-- nom du projet (obligatoire)
-- titre du livre (facultatif)
-- type de couverture : eBook Kindle / Broché / Relié
-- nombre de pages (facultatif, affiché seulement pour Broché et Relié)
-
-Un identifiant de format est enregistré selon le type choisi (`ebook-kindle`, `broche-wrap`, `hardcover`) sans exécuter aucun calcul de dimensions. Aucun champ ISBN.
-
-## Fiche projet
-
-Affiche les informations enregistrées (nom, titre, type, format, pages, dates) et un emplacement réservé avec le texte exact : « L'éditeur professionnel sera disponible à l'étape suivante. » Aucun éditeur graphique branché.
-
-## Accès dans l'espace abonné
-
-Ajout d'une entrée « Mes couvertures » dans le menu abonné existant, groupe « Habiller » (`src/data/v3HeaderMenu.ts`), à côté des entrées couverture actuelles, sans modifier ces entrées.
+4. **Accès** : la génération reste réservée à Cover Studio KDP Pro (67 €). Sans achat, le panneau affiche un encart clair avec le bouton de déblocage — mais les outils de texte restent utilisables.
 
 ## Détails techniques
 
-- Nouveaux fichiers : `src/pages/v3/mes-couvertures/MesCouverturesPage.tsx`, `src/pages/v3/mes-couvertures/CouvertureProjetPage.tsx`, plus un composant carte et une boîte de dialogue de création.
-- Fichiers modifiés : `src/App.tsx` (2 routes ajoutées), `src/data/v3HeaderMenu.ts` (1 lien ajouté).
-- Toutes les lectures/écritures passent par `listCoverProjects`, `getCoverProject`, `createCoverProject`, `updateCoverProject`, `deleteCoverProject`, `getSignedCoverUrl`. Une petite fonction de duplication réutilise ces mêmes helpers.
-- Les miniatures sont signées à la demande (TTL court) et jamais mises en cache sous forme d'URL persistée.
+- `src/components/cover-editor/CoverFrontEditor.tsx` : nouveau bloc de génération (brief pliable, sélecteur de moteur, appel `supabase.functions.invoke('cover-pro-generate')`, rafraîchissement du chemin d'illustration et de l'URL signée en mémoire). Même bloc réutilisé dans `CoverWrapEditor.tsx` pour la première de couverture d'un broché.
+- Nouveau composant partagé `src/components/cover-editor/IllustrationGeneratorPanel.tsx` pour éviter la duplication ; il lit l'accès et les crédits via `useCoverProAccess`.
+- `supabase/functions/cover-pro-generate/index.ts` : ajout du paramètre `provider` (`openai` par défaut, `gemini` en option). Branche Gemini = appel direct à l'API Google avec la clé personnelle de l'abonné (aucun crédit Lovable, aucune passerelle). Les crédits inclus restent réservés à OpenAI, la logique de réservation/restitution de crédit est inchangée.
+- `supabase/functions/cover-pro-key/index.ts` + `CoverProKeyVault.tsx` : la colonne `provider` existe déjà en base mais est figée sur `openai` ; on autorise l'enregistrement d'une clé `gemini` (validation du préfixe `AIza`), chiffrement AES-GCM identique.
+- Base de données, RLS, calculs KDP et paiements : aucune modification.
 
-## Tests réalisés avant compte rendu
+## Vérification
 
-Sessions navigateur réelles avec deux comptes : A ne voit que ses projets, B que les siens ; création, renommage, duplication (nouvel identifiant vérifié), suppression avec confirmation ; persistance après déconnexion/reconnexion ; miniature de A inaccessible depuis B ; visiteur non connecté redirigé et incapable d'ouvrir la page.
-
-## Livrable final
-
-Routes créées, composants ajoutés/modifiés, résultats réellement observés des tests, confirmation qu'aucun ancien module n'a été modifié, qu'aucun appel IA n'a eu lieu et qu'aucun crédit Lovable n'a été consommé. Arrêt ensuite, en attente de validation avant de brancher l'éditeur graphique.
+Test navigateur complet : ouvrir un projet depuis la bibliothèque, cliquer « Générer l'illustration », vérifier que l'image s'affiche dans le canevas, ajouter un titre par-dessus, recharger la page et confirmer que l'illustration et les textes sont conservés. Captures d'écran fournies.
