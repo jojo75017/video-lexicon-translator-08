@@ -73,6 +73,22 @@ const text = (
  * Réduit la taille d'un grand titre pour qu'il tienne dans sa zone,
  * en tenant compte du mot le plus long et de la longueur totale.
  */
+/** Estime le nombre de lignes d'un texte dans une largeur donnée. */
+const estimateLines = (textValue: string, width: number, fontSize: number): number => {
+  const perLine = Math.max(4, Math.floor(width / (fontSize * 0.52)));
+  const words = textValue.trim().split(/\s+/).filter(Boolean);
+  let lines = 1;
+  let current = 0;
+  for (const word of words) {
+    const add = current ? current + 1 + word.length : word.length;
+    if (add > perLine && current) {
+      lines += 1;
+      current = word.length;
+    } else current = add;
+  }
+  return lines;
+};
+
 const fitTitleSize = (base: number, title: string): number => {
   const words = title.trim().split(/\s+/).filter(Boolean);
   const longest = words.reduce((m, w) => Math.max(m, w.length), 1);
@@ -461,14 +477,19 @@ const buildRomanPremium = ({ composition, title, subtitle, author }: BuildInput)
 
   const boxX = Math.round(W * 0.12);
   const boxW = W - boxX * 2;
+  const romanTitleY = Math.round(H * 0.13);
+  const romanTitleSize = fitTitleSize(Math.round(W * 0.115), title);
+  const romanTitleLines = estimateLines(title, boxW, romanTitleSize);
+  const romanSubtitleY =
+    romanTitleY + Math.round(romanTitleLines * romanTitleSize * 1.06 + H * 0.035);
 
   const layers: FrontTextLayer[] = [
     text('title', 'Titre', {
       text: title,
       x: boxX,
-      y: Math.round(H * 0.13),
+      y: romanTitleY,
       width: boxW,
-      fontSize: fitTitleSize(Math.round(W * 0.115), title),
+      fontSize: romanTitleSize,
       fontFamily: SERIF,
       color: '#F0D79A',
       align: 'center',
@@ -480,7 +501,7 @@ const buildRomanPremium = ({ composition, title, subtitle, author }: BuildInput)
     text('subtitle', 'Sous-titre', {
       text: subtitle || 'Roman',
       x: boxX,
-      y: Math.round(H * 0.33),
+      y: romanSubtitleY,
       width: boxW,
       fontSize: Math.round(W * 0.036),
       fontFamily: SERIF,
