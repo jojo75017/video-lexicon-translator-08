@@ -121,29 +121,36 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
       illustrationPath: project.illustration_path,
       bookTitle: project.book_title,
     };
+    const initialGeometry = computePaperbackGeometry(
+      project.kdp_config
+        ? parsePaperbackConfig(project.kdp_config, project.page_count ?? 120)
+        : defaultPaperbackConfig(project.page_count ?? 120),
+    ).geometry;
+
     if (isWrapComposition(project.fabric_json)) {
+      // Composition existante : restaurée à l'identique, sans ajustement.
       return parseWrapComposition(project.fabric_json, fallback);
     }
-    if (project.fabric_json) {
-      // Migration défensive version 1 (première seule) → version 2.
-      const front = parseComposition(project.fabric_json, {
-        formatId: project.format_id,
-        illustrationPath: project.illustration_path,
-        bookTitle: project.book_title,
-      });
-      const trimWidthIn = computePaperbackGeometry(
-        project.kdp_config
-          ? parsePaperbackConfig(project.kdp_config, project.page_count ?? 120)
-          : defaultPaperbackConfig(project.page_count ?? 120),
-      ).geometry?.trimWidthIn ?? 6;
-      return migrateFrontToWrap(front, {
-        formatId: project.format_id,
-        trimWidthIn,
-        bookTitle: project.book_title,
-      });
-    }
-    return createWrapComposition(fallback);
+
+    const fresh = project.fabric_json
+      ? // Migration défensive version 1 (première seule) → version 2.
+        migrateFrontToWrap(
+          parseComposition(project.fabric_json, {
+            formatId: project.format_id,
+            illustrationPath: project.illustration_path,
+            bookTitle: project.book_title,
+          }),
+          {
+            formatId: project.format_id,
+            trimWidthIn: initialGeometry?.trimWidthIn ?? 6,
+            bookTitle: project.book_title,
+          },
+        )
+      : createWrapComposition(fallback);
+
+    return initialGeometry ? fitSpineElements(fresh, initialGeometry) : fresh;
   });
+
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [status, setStatus] = useState<SaveStatus>('idle');
