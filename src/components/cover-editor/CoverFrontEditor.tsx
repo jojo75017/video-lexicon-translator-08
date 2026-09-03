@@ -584,9 +584,10 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
         <CardContent className="space-y-3 p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <p className="text-sm font-semibold text-foreground">
+              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
                 Modèles professionnels <Badge variant="secondary">{COVER_TEMPLATES.length} modèles</Badge>
-              </p>
+              </div>
+
               <p className="text-xs text-muted-foreground">
                 Le modèle conserve votre illustration et vos textes : il ne change que la mise en
                 page, les polices et les styles. Tous les réglages restent modifiables ensuite.
