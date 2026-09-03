@@ -1,98 +1,71 @@
-# Audit technique — Module Couvertures EbookStudio
+# Étape 1 validée — Base privée des projets de couverture
 
-Aucun fichier n'a été modifié. Voici uniquement le constat, puis un plan par étapes.
+Périmètre strict : base de données + bucket privé + petite couche d'accès. **Aucune interface, aucun éditeur, aucun ancien module, aucune fonction IA, aucun crédit Lovable.**
 
-## 1. Un générateur existe-t-il déjà ?
+## 1. Table `cover_projects`
 
-Oui, et il en existe **plusieurs, en doublon** :
+Colonnes créées :
 
-- `/v3/cover-studio-pro` (hub) + `/v3/cover-studio-pro/edit` — éditeur canvas Fabric.js, le plus proche de l'objectif (calques texte, formats, export PNG/PDF).
-- `/couverture-kdp` — `KdpCoverStudio.tsx` (732 lignes), wrap KDP + PDF exact via `src/lib/kdpCoverPdf.ts`.
-- `EbookAICoverStudio.tsx` (1 574 lignes) — génération IA + sauvegarde bibliothèque.
-- `UnifiedCoverStudio.tsx`, `CoverDesignEditor.tsx`, `EbookCoverGenerator.tsx`, `EbookBackCoverGenerator.tsx`, `CoverPdfExact.tsx` (wrapper), `CoverStudioPro.tsx` (admin).
+| Colonne | Type | Notes |
+|---|---|---|
+| `id` | uuid PK | `gen_random_uuid()` |
+| `user_id` | uuid NOT NULL | propriétaire, défaut `auth.uid()` |
+| `project_name` | text NOT NULL | nom du projet |
+| `book_title` | text | titre du livre |
+| `cover_type` | text NOT NULL | `ebook` / `paperback` / `hardcover` |
+| `format_id` | text NOT NULL | ex. `ebook-kindle`, `broche-wrap`, `hardcover` |
+| `page_count` | integer | nullable (imprimé uniquement) |
+| `fabric_json` | jsonb | calques complets de l'éditeur |
+| `illustration_path` | text | chemin bucket, jamais une URL |
+| `thumbnail_path` | text | chemin bucket, jamais une URL |
+| `schema_version` | integer NOT NULL défaut 1 | migration future |
+| `created_at` / `updated_at` | timestamptz | `updated_at` via trigger existant `update_updated_at_column` |
 
-Côté serveur : **7 fonctions de couverture** coexistent (`generate-front-cover`, `generate-premium-cover`, `generate-ai-cover`, `generate-cover-image`, `generate-cover-prompt`, `generate-series-cover`, `cs-generate-cover`).
+Index sur `(user_id, updated_at desc)`. **Aucun champ ISBN.**
 
-## 2. Modèles d'image et API utilisés
+## 2. RLS stricte
 
-Pas de stratégie unique — chaque fonction a sa propre cascade :
+- `ENABLE ROW LEVEL SECURITY`
+- 4 politiques `to authenticated` : SELECT / INSERT / UPDATE / DELETE, toutes avec `user_id = auth.uid()` (et `WITH CHECK` identique sur INSERT/UPDATE).
+- GRANT `SELECT, INSERT, UPDATE, DELETE` à `authenticated`, `ALL` à `service_role`. **Aucun GRANT à `anon`** → un visiteur non connecté ne voit rien, même avec l'`id` exact.
 
-| Fonction | Cascade actuelle |
-|---|---|
-| `generate-front-cover` | OpenAI `gpt-image-1` → `dall-e-3` → passerelle Lovable `google/gemini-3-pro-image` |
-| `generate-premium-cover` | `gpt-image-2` → `gpt-image-1` → `dall-e-3`, sinon `gemini-2.5-flash-image`, sinon OpenRouter (BYOK) |
-| `generate-cover-image` | OpenAI `gpt-image-1`, ou OpenRouter si clé abonné |
-| `cs-generate-cover` | passerelle Lovable `openai/gpt-image-2` (consomme des crédits Lovable) |
+## 3. Bucket privé `covers`
 
-## 3. Résolution réellement disponible
+- Créé via l'outil storage en `public: false`, limite de taille par fichier 25 Mo.
+- 4 politiques sur `storage.objects` limitées à `bucket_id = 'covers'` et `(storage.foldername(name))[1] = auth.uid()::text`.
+- `ebook-images` n'est **pas** touché (ni ses politiques, ni son caractère public) : les images des ebooks existants continuent de fonctionner.
 
-- Génération IA : **1024 × 1536 px** (portrait) ou 1536 × 1024 (paysage) — plafond des modèles OpenAI ; `dall-e-3` monte à 1024 × 1792.
-- Pas de sur-échantillonnage : `normalizeCoverToKdp` recadre vers 1600 × 2560 (Kindle), donc l'image IA est **étirée** depuis 1024 px de large.
-- L'éditeur Fabric travaille en revanche bien en **300 DPI réels** (ex. wrap 6×9″ ≈ 3 900 × 2 775 px) : c'est le texte et les calques qui sont nets, pas le fond IA.
+## 4. Couche d'accès `src/lib/coverProjects.ts` (nouveau fichier isolé)
 
-## 4. Coût / crédits par génération
+- CRUD sur `cover_projects` (liste, lecture, création, mise à jour, suppression).
+- Upload illustration/miniature dans `covers/<user_id>/<project_id>/…`.
+- **Refus propre si aucune session** : erreur explicite, jamais de repli sur l'email.
+- Ne renvoie que des **URL signées temporaires** (durée courte, ~1 h) générées à la demande ; aucune URL permanente n'est enregistrée.
+- Ce fichier n'est importé par aucun composant à cette étape.
 
-- Si `OPENAI_API_KEY` est présente : facturé sur **votre compte OpenAI** (hors crédits Lovable).
-- Si clé abonné OpenRouter (BYOK, `aiImageInvoke.ts`) : facturé à l'abonné.
-- Sinon repli sur la **passerelle Lovable → consomme vos crédits** (`generate-front-cover`, `cs-generate-cover`). C'est exactement le comportement que vous avez fait retirer pour la BD, il subsiste ici.
+## 5. Tests réalisés (avant de vous rendre la main)
 
-## 5. Enregistrement et sécurité des projets
+Sessions réelles côté navigateur avec deux comptes distincts + un visiteur :
+- A crée / lit / modifie / supprime ses projets → OK attendu.
+- B fait de même sur les siens → OK attendu.
+- A tente de lire, modifier et supprimer un projet de B par son `id` → 0 ligne / refus.
+- B tente d'ouvrir un fichier du dossier de A → refus storage.
+- Visiteur non connecté : `select` sur `cover_projects` → 0 ligne, upload refusé.
+- URL signée expirée : ouverture refusée après expiration.
 
-- Aucune table de projets de couverture (`select ... ilike '%cover%'` → **0 table**). Rien n'est versionné, rien n'est réouvrable.
-- Sauvegarde = fichiers image dans le bucket `ebook-images`, dossier `<user_id>/Couvertures/` (`src/lib/coverLibrary.ts`).
-- Les politiques RLS storage sont correctes (lecture/écriture limitées au dossier `auth.uid()`), **mais le bucket `ebook-images` est public** : toute personne connaissant l'URL peut ouvrir la couverture d'un autre abonné. Risque de confidentialité réel.
-- Repli de chemin sur l'email si pas de session → dossiers orphelins possibles.
+## 6. Livrables de fin d'étape
 
-## 6. Plusieurs couvertures privées par abonné ?
+Schéma exact, politiques RLS, politiques du bucket, résultats de tests détaillés, liste des fichiers modifiés (un seul nouveau fichier + une migration), confirmation qu'aucun ancien module n'est touché, confirmation qu'aucun crédit Lovable n'est consommé (aucun appel IA dans cette étape).
 
-Plusieurs **fichiers** oui (listing 100 max). Plusieurs **projets éditables** non : le JSON Fabric n'est jamais sauvegardé (`exportJSON`/`loadJSON` existent mais ne sont branchés sur aucun stockage).
-
-## 7. Texte séparé de l'image ?
-
-- Dans l'éditeur Pro : **oui**, `AiBackgroundPanel` demande un fond « sans texte, sans lettres » et le texte est ajouté en calques Fabric.
-- Dans les autres modules (`generate-front-cover`, `generate-premium-cover`) : **non**, le titre est demandé à l'IA dans l'image → fautes d'orthographe typiques.
-
-## 8. Dimensions exactes KDP broché / relié ?
-
-- Broché : oui. `computeWrapFormat` applique 0,002252 in/page, fond perdu 0,125″, zones dos/tranche/recto, et `kdpCoverPdf.ts` produit un PDF aux dimensions exactes.
-- Relié (hardcover) : **non**. Le format existe dans `coverFormats.ts` mais réutilise le calcul broché — pas de rabats, pas de charnière, pas d'épaisseur de carton, pas de facteur papier hardcover.
-- Import d'un gabarit officiel KDP : **inexistant**.
-- Aucun champ ISBN nulle part : conforme à votre exigence.
-
-## 9. Composants à modifier (le moment venu)
-
-`src/config/coverFormats.ts`, `src/components/cover-studio-pro/*` (Canvas, Toolbar, Templates, AiBackgroundPanel), `src/pages/v3/cover-studio-pro/*`, `src/lib/coverLibrary.ts`, `src/lib/kdpCoverPdf.ts`, `src/lib/kdpCoverNormalize.ts`, + une nouvelle table `cover_projects` et une fonction unique de génération de fond.
-
-## 10. Risques pour l'existant
-
-- Les 6 modules de couverture partagent `coverLibrary` et les fonctions serveur : toucher une fonction impacte le workflow V3, la Maison d'édition et ContentStudio.
-- Passer `ebook-images` en privé casserait toutes les URLs publiques déjà enregistrées dans les ebooks → nécessite des URLs signées partout.
-- `TrialGate` protège déjà les routes Cover Studio Pro : à conserver.
-- `CoverPdfExact.tsx` est un simple wrapper de `KdpCoverStudio` : consolider sans casser cette entrée du cockpit.
+Puis arrêt, et j'attends votre validation avant de brancher l'interface.
 
 ---
 
-# Plan de développement (étapes sécurisées, à valider)
+## Rappel — étapes suivantes (non lancées)
 
-**Étape 1 — Base projets privés (sans toucher l'UI)**
-Table `cover_projects` (RLS `auth.uid()`, GRANTs) stockant le JSON Fabric, le format, le nombre de pages, les miniatures. Nouveau bucket privé `covers` + URLs signées. Aucune régression : rien n'est encore branché.
-
-**Étape 2 — Onglet « Couverture Pro » unique**
-Nouvel onglet dédié (Kindle / Broché / Relié), liste des projets de l'abonné, ouverture/duplication/suppression. Les anciens modules restent accessibles en parallèle.
-
-**Étape 3 — Fond IA sans texte, qualité maximale**
-Une seule fonction de génération, prompt strictement « aucun texte », BYOK Gemini/OpenAI/OpenRouter, `allowLovable: false` (plus de consommation de vos crédits), agrandissement propre vers 300 DPI.
-
-**Étape 4 — Calques texte pro**
-Titre, sous-titre, auteur en calques : polices éditoriales, interlettrage, ombre, voile dégradé pour la lisibilité, presets « thriller », « romance », « non-fiction ».
-
-**Étape 5 — Géométrie imprimée exacte**
-Recto + tranche + verso pour broché ; formule hardcover réelle (rabats, charnière, carton) ; import du gabarit officiel KDP en calque de repère verrouillé.
-
-**Étape 6 — Exports**
-JPEG haute qualité pour Kindle, PDF/X print-ready pour broché et relié, contrôle avant export (DPI, texte hors zone sûre, tranche trop fine). Toujours sans ISBN.
-
-**Étape 7 — Nettoyage progressif**
-Une fois le nouvel onglet validé par vous, redirection des anciens modules en doublon vers celui-ci, puis suppression.
-
-Je n'ai rien développé ni modifié — dis-moi si je lance à partir de l'étape 1.
+2. Onglet « Couverture Pro » unique (Kindle / Broché / Relié) + liste de projets.
+3. Fond IA sans texte, BYOK uniquement, jamais de crédits Lovable.
+4. Calques texte pro (titre / sous-titre / auteur).
+5. Géométrie imprimée exacte + import du gabarit officiel KDP.
+6. Exports JPEG (Kindle) et PDF print-ready (broché / relié), sans ISBN.
+7. Nettoyage des anciens modules en doublon.
