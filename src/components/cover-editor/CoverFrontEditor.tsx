@@ -16,6 +16,7 @@ import {
   AlignRight,
   Bold,
   Check,
+  Download,
   Italic,
   Loader2,
   Plus,
@@ -67,6 +68,10 @@ import {
   type TextAlign,
   type TextRole,
 } from '@/lib/cover-editor/frontComposition';
+import {
+  downloadBlob,
+  renderKindleCoverJpeg,
+} from '@/lib/cover-editor/kindleExport';
 
 type SaveStatus = 'idle' | 'dirty' | 'saving' | 'saved' | 'error';
 
@@ -100,6 +105,31 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [bgUrl, setBgUrl] = useState<string | null>(null);
   const [guides, setGuides] = useState(false);
+
+  /* ---- export JPEG Kindle (local, sans IA ni crédit) --------------------- */
+  const [exportState, setExportState] = useState<'idle' | 'working' | 'done'>('idle');
+  const [exportError, setExportError] = useState<string | null>(null);
+
+  /** Réservé au format eBook Kindle avec une composition texte réellement remplie. */
+  const canExportKindle =
+    project.cover_type === 'ebook' &&
+    composition.canvas.width > 0 &&
+    composition.layers.some((l) => l.text.trim().length > 0);
+
+  const exportKindle = async () => {
+    if (exportState === 'working') return; // anti double-clic
+    setExportState('working');
+    setExportError(null);
+    try {
+      const result = await renderKindleCoverJpeg(composition, bgUrl, project.book_title);
+      downloadBlob(result.blob, result.fileName);
+      setExportState('done');
+      window.setTimeout(() => setExportState('idle'), 6000);
+    } catch (e) {
+      setExportState('idle');
+      setExportError(e instanceof Error ? e.message : 'rendu impossible');
+    }
+  };
 
   const [past, setPast] = useState<FrontComposition[]>([]);
   const [future, setFuture] = useState<FrontComposition[]>([]);
@@ -354,13 +384,41 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
             </Button>
           ))}
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <StatusPill status={status} error={saveError} />
           <Button size="sm" className="gap-1" onClick={() => void save()} disabled={status === 'saving'}>
             <Save className="h-4 w-4" /> Enregistrer
           </Button>
+          {canExportKindle && (
+            <Button
+              size="sm"
+              onClick={() => void exportKindle()}
+              disabled={exportState === 'working'}
+              className="gap-1 bg-[#f47920] text-white hover:bg-[#d96a15]"
+            >
+              {exportState === 'working' ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" /> Préparation…
+                </>
+              ) : exportState === 'done' ? (
+                <>
+                  <Check className="h-4 w-4" /> Couverture téléchargée
+                </>
+              ) : (
+                <>
+                  <Download className="h-4 w-4" /> Télécharger la couverture Kindle
+                </>
+              )}
+            </Button>
+          )}
         </div>
       </div>
+
+      {exportError && (
+        <p className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          Export impossible : {exportError}
+        </p>
+      )}
 
       <div className="grid gap-4 lg:grid-cols-[280px_1fr_320px]">
         {/* outils toujours visibles */}
