@@ -222,7 +222,9 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
   const thumbPathRef = useRef<string | null>(project.thumbnail_path);
   const timerRef = useRef<number | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
+  const backdropRef = useRef<HTMLCanvasElement | null>(null);
   const [scale, setScale] = useState(0.2);
+
 
   const selected = composition.layers.find((l) => l.id === selectedId) ?? null;
 
