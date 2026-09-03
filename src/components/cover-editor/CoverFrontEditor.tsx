@@ -371,7 +371,23 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
     patchLayer(layer.id, { ...fresh, id: layer.id });
   };
 
+  /* ---------------- modèles professionnels ---------------------------------- */
+  const [templateBackup, setTemplateBackup] = useState<FrontComposition | null>(null);
+
+  const useTemplate = (id: CoverTemplateId) => {
+    setTemplateBackup(composition);
+    commit((prev) => applyTemplate(prev, id));
+  };
+
+  const cancelTemplate = () => {
+    if (!templateBackup) return;
+    const restore = templateBackup;
+    setTemplateBackup(null);
+    commit(() => restore);
+  };
+
   const missingRoles = ROLES.filter((r) => !composition.layers.some((l) => l.role === r));
+
 
   /* ---------------- rendu -------------------------------------------------- */
   return (
