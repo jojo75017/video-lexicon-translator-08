@@ -5,11 +5,12 @@
  */
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, ChevronDown, ImageIcon, Loader2, Sparkles } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ImageIcon, Loader2 } from 'lucide-react';
 
 import CoverFrontEditor from '@/components/cover-editor/CoverFrontEditor';
 import CoverWrapEditor from '@/components/cover-editor/CoverWrapEditor';
 import KdpPaperbackConfigPanel from '@/components/cover-editor/KdpPaperbackConfigPanel';
+import IllustrationGeneratorPanel from '@/components/cover-editor/IllustrationGeneratorPanel';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -94,11 +95,23 @@ export default function CouvertureProjetPage() {
         <Button variant="outline" size="sm" className="gap-2" onClick={() => navigate('/v3/mes-couvertures')}>
           <ArrowLeft className="h-4 w-4" /> Retour à mes couvertures
         </Button>
-        <Button asChild size="sm" className="gap-2">
-          <Link to="/v3/cover-studio-pro">
-            <Sparkles className="h-4 w-4" /> Générer l’illustration
-          </Link>
-        </Button>
+        {project && (
+          <IllustrationGeneratorPanel
+            projectId={project.id}
+            size="sm"
+            className="gap-2"
+            hasIllustration={Boolean(project.illustration_path)}
+            onGenerated={async () => {
+              const fresh = await getCoverProject(project.id);
+              if (fresh) {
+                setProject(fresh);
+                if (fresh.thumbnail_path) {
+                  setThumb(await getSignedCoverUrl(fresh.thumbnail_path));
+                }
+              }
+            }}
+          />
+        )}
         {project && (
           <>
             <span className="ml-1 truncate text-sm font-semibold text-foreground">
