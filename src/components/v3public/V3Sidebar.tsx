@@ -95,10 +95,7 @@ const NAV: NavSection[] = [
   {
     section: 'Habiller & exporter',
     items: [
-      { to: '/v3/mes-couvertures', label: 'Mes couvertures', icon: ImageIcon },
-      { to: '/v3/cover-studio-pro', label: 'Cover Studio Pro', icon: ImageIcon, badge: 'PRO' },
-
-      { to: '/couverture-kdp', label: 'Couverture KDP', icon: ImageIcon },
+      { to: '/v3/mes-couvertures', label: 'Studio de couverture', icon: ImageIcon, badge: 'V4' },
       { to: '/v3/outils/mockup-3d', label: 'Mockups 3D', icon: ImageIcon },
       { to: '/v3/outils/audiobook', label: 'Audiobook TTS', icon: Video },
       { to: '/v3/outils/royalties', label: 'Calculateur royalties', icon: BarChart3 },
