@@ -621,7 +621,106 @@ const drawOrnament = (
 };
 
 /** Dessine tous les calques graphiques dans l'ordre du tableau. */
+/** Pictogramme vectoriel dessiné dans sa boîte (jeu fermé de 6 glyphes). */
+const drawIcon = (
+  ctx: CanvasRenderingContext2D,
+  shape: FrontShapeLayer,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  stroke: number,
+) => {
+  const s = Math.min(w, h);
+  const cx = x + w / 2;
+  const cy = y + h / 2;
+  ctx.save();
+  ctx.strokeStyle = shape.color;
+  ctx.fillStyle = shape.color;
+  ctx.lineWidth = Math.max(1, stroke || s * 0.1);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  switch (shape.icon ?? 'check') {
+    case 'check': {
+      ctx.beginPath();
+      ctx.arc(cx, cy, s * 0.42, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx - s * 0.2, cy);
+      ctx.lineTo(cx - s * 0.04, cy + s * 0.16);
+      ctx.lineTo(cx + s * 0.22, cy - s * 0.18);
+      ctx.stroke();
+      break;
+    }
+    case 'star': {
+      ctx.beginPath();
+      for (let i = 0; i < 10; i += 1) {
+        const r = i % 2 === 0 ? s * 0.45 : s * 0.19;
+        const a = -Math.PI / 2 + (i * Math.PI) / 5;
+        const px = cx + Math.cos(a) * r;
+        const py = cy + Math.sin(a) * r;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      ctx.fill();
+      break;
+    }
+    case 'target': {
+      [0.44, 0.28, 0.12].forEach((r, i) => {
+        ctx.beginPath();
+        ctx.arc(cx, cy, s * r, 0, Math.PI * 2);
+        if (i === 2) ctx.fill();
+        else ctx.stroke();
+      });
+      break;
+    }
+    case 'bolt': {
+      ctx.beginPath();
+      ctx.moveTo(cx + s * 0.16, cy - s * 0.46);
+      ctx.lineTo(cx - s * 0.24, cy + s * 0.06);
+      ctx.lineTo(cx - s * 0.02, cy + s * 0.06);
+      ctx.lineTo(cx - s * 0.14, cy + s * 0.46);
+      ctx.lineTo(cx + s * 0.26, cy - s * 0.08);
+      ctx.lineTo(cx + s * 0.03, cy - s * 0.08);
+      ctx.closePath();
+      ctx.fill();
+      break;
+    }
+    case 'book': {
+      ctx.beginPath();
+      ctx.moveTo(cx - s * 0.36, cy - s * 0.32);
+      ctx.lineTo(cx - s * 0.02, cy - s * 0.24);
+      ctx.lineTo(cx - s * 0.02, cy + s * 0.36);
+      ctx.lineTo(cx - s * 0.36, cy + s * 0.26);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx + s * 0.36, cy - s * 0.32);
+      ctx.lineTo(cx + s * 0.02, cy - s * 0.24);
+      ctx.lineTo(cx + s * 0.02, cy + s * 0.36);
+      ctx.lineTo(cx + s * 0.36, cy + s * 0.26);
+      ctx.closePath();
+      ctx.stroke();
+      break;
+    }
+    default: {
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - s * 0.42);
+      ctx.lineTo(cx + s * 0.34, cy);
+      ctx.lineTo(cx, cy + s * 0.42);
+      ctx.lineTo(cx - s * 0.34, cy);
+      ctx.closePath();
+      ctx.fill();
+      break;
+    }
+  }
+  ctx.restore();
+};
+
 const drawShapes = (
+
   ctx: CanvasRenderingContext2D,
   composition: FrontComposition,
   image: HTMLImageElement | null,
