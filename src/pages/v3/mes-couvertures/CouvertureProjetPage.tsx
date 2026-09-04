@@ -33,12 +33,32 @@ const TYPE_LABEL: Record<CoverType, string> = {
   hardcover: 'Relié',
 };
 
-const STEPS = [
-  '1. Illustration',
-  '2. Textes',
-  '3. Dos et quatrième',
-  '4. Export',
-] as const;
+type StepKey = 'illustration' | 'textes' | 'dos' | 'export';
+
+const STEPS: { key: StepKey; label: string }[] = [
+  { key: 'illustration', label: '1. Illustration' },
+  { key: 'textes', label: '2. Textes' },
+  { key: 'dos', label: '3. Dos et quatrième' },
+  { key: 'export', label: '4. Export' },
+];
+
+/** Fait défiler vers le premier sélecteur trouvé et le met brièvement en évidence. */
+const focusSection = (selectors: string[]) => {
+  for (const sel of selectors) {
+    const el = document.querySelector<HTMLElement>(sel);
+    if (!el) continue;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.add('ring-2', 'ring-[#f47920]', 'ring-offset-2', 'rounded-lg');
+    window.setTimeout(
+      () => el.classList.remove('ring-2', 'ring-[#f47920]', 'ring-offset-2', 'rounded-lg'),
+      1800,
+    );
+    if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) el.focus();
+    return true;
+  }
+  return false;
+};
+
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString('fr-FR', {
