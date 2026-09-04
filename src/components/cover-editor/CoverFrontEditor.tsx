@@ -580,7 +580,7 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
 
       {/* barre d'état */}
 
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card p-3">
+      <div id="etape-export" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card p-3">
         <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" size="sm" onClick={undo} disabled={!past.length} className="gap-1">
             <Undo2 className="h-4 w-4" /> Annuler

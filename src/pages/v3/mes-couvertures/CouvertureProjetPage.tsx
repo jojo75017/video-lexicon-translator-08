@@ -6,6 +6,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, ChevronDown, ImageIcon, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 import CoverFrontEditor from '@/components/cover-editor/CoverFrontEditor';
 import CoverWrapEditor from '@/components/cover-editor/CoverWrapEditor';
@@ -33,12 +34,32 @@ const TYPE_LABEL: Record<CoverType, string> = {
   hardcover: 'Relié',
 };
 
-const STEPS = [
-  '1. Illustration',
-  '2. Textes',
-  '3. Dos et quatrième',
-  '4. Export',
-] as const;
+type StepKey = 'illustration' | 'textes' | 'dos' | 'export';
+
+const STEPS: { key: StepKey; label: string }[] = [
+  { key: 'illustration', label: '1. Illustration' },
+  { key: 'textes', label: '2. Textes' },
+  { key: 'dos', label: '3. Dos et quatrième' },
+  { key: 'export', label: '4. Export' },
+];
+
+/** Fait défiler vers le premier sélecteur trouvé et le met brièvement en évidence. */
+const focusSection = (selectors: string[]) => {
+  for (const sel of selectors) {
+    const el = document.querySelector<HTMLElement>(sel);
+    if (!el) continue;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.add('ring-2', 'ring-[#f47920]', 'ring-offset-2', 'rounded-lg');
+    window.setTimeout(
+      () => el.classList.remove('ring-2', 'ring-[#f47920]', 'ring-offset-2', 'rounded-lg'),
+      1800,
+    );
+    if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) el.focus();
+    return true;
+  }
+  return false;
+};
+
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString('fr-FR', {
@@ -88,6 +109,18 @@ export default function CouvertureProjetPage() {
     };
   }, [id]);
 
+  const goToStep = (key: StepKey) => {
+    const targets: Record<StepKey, string[]> = {
+      illustration: ['#etape-illustration'],
+      textes: ['#cover-text', '#wrap-text'],
+      dos: ['#etape-dos'],
+      export: ['#etape-export'],
+    };
+    if (!focusSection(targets[key])) {
+      toast.info('Cette étape sera disponible dès que l’éditeur sera chargé.');
+    }
+  };
+
   return (
     <main className="mx-auto w-full max-w-7xl px-4 py-4 space-y-4">
       {/* barre d'action toujours visible, sans défilement */}
@@ -96,6 +129,7 @@ export default function CouvertureProjetPage() {
           <ArrowLeft className="h-4 w-4" /> Retour à mes couvertures
         </Button>
         {project && (
+          <span id="etape-illustration" className="inline-flex">
           <IllustrationGeneratorPanel
             projectId={project.id}
             size="sm"
@@ -111,6 +145,7 @@ export default function CouvertureProjetPage() {
               }
             }}
           />
+          </span>
         )}
         {project && (
           <>
@@ -122,22 +157,36 @@ export default function CouvertureProjetPage() {
         )}
       </div>
 
-      {/* parcours */}
+      {/* parcours cliquable */}
       <div className="flex flex-wrap items-center gap-1.5 text-xs">
-        {STEPS.map((step, i) => (
-          <span
-            key={step}
-            className={
-              i === STEPS.length - 1
-                ? 'rounded-full border border-dashed border-border px-2.5 py-1 text-muted-foreground'
-                : 'rounded-full bg-muted px-2.5 py-1 font-medium text-foreground'
-            }
-          >
-            {step}
-            {i === STEPS.length - 1 && ' · bientôt disponible'}
-          </span>
-        ))}
+        {STEPS.map((step) => {
+          const isDos = step.key === 'dos';
+          const dosDisponible = project?.cover_type !== 'ebook';
+          const disabled = !project || (isDos && !dosDisponible);
+          return (
+            <button
+              key={step.key}
+              type="button"
+              disabled={disabled}
+              onClick={() => goToStep(step.key)}
+              className={
+                disabled
+                  ? 'cursor-not-allowed rounded-full border border-dashed border-border px-2.5 py-1 text-muted-foreground'
+                  : 'rounded-full bg-muted px-2.5 py-1 font-medium text-foreground transition hover:bg-[#f47920] hover:text-white'
+              }
+              title={
+                isDos && !dosDisponible
+                  ? 'Réservé aux couvertures brochées ou reliées'
+                  : `Aller à l’étape ${step.label}`
+              }
+            >
+              {step.label}
+              {isDos && !dosDisponible && ' · broché uniquement'}
+            </button>
+          );
+        })}
       </div>
+
 
       {loading && (
         <div className="flex min-h-[40vh] items-center justify-center">
