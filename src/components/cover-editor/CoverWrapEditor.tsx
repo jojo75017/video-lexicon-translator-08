@@ -465,7 +465,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
   return (
     <div className="space-y-4">
       {/* barre d'outils */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card p-3">
+      <div id="etape-export" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card p-3">
         <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" size="sm" onClick={undo} disabled={!past.length} className="gap-1">
             <Undo2 className="h-4 w-4" /> Annuler
@@ -501,7 +501,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
             <Switch id="wrap-guides" checked={showGuides} onCheckedChange={setShowGuides} />
             <Label htmlFor="wrap-guides" className="text-sm">Repères</Label>
           <span className="mx-1 h-6 w-px bg-border" />
-          <div className="flex items-center gap-1 rounded-lg border border-border p-0.5">
+          <div id="etape-dos" className="flex items-center gap-1 rounded-lg border border-border p-0.5">
             {(['front', 'spine', 'back'] as const).map((zone) => (
               <Button
                 key={zone}
