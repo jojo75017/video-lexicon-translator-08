@@ -90,7 +90,7 @@ export default function V3CoverProBanner() {
 
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
-                to="/v3/cover-pro"
+                to="/v3/cover-pro?checkout=1"
                 className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-lg transition-transform duration-200 hover:-translate-y-0.5"
                 style={{
                   background: 'linear-gradient(96deg, #e8c86a 0%, #c9a227 100%)',

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowRight, Crown, Loader2, Lock, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -30,6 +30,12 @@ const COVER_PRO_PACK: V3UpsellPack = {
 export default function CoverProPage() {
   const { hasAccess, reason, credits, key, loading, error, refresh } = useCoverProAccess();
   const [checkout, setCheckout] = useState(false);
+  const [params] = useSearchParams();
+
+  // Ouverture directe du tunnel de paiement (lien « Voir l'offre 67 € »).
+  useEffect(() => {
+    if (params.get('checkout') === '1' && !loading && !hasAccess) setCheckout(true);
+  }, [params, loading, hasAccess]);
 
   if (loading) {
     return (
