@@ -315,6 +315,8 @@ export function parseComposition(
       const shadowRaw = (l.shadow ?? null) as Record<string, unknown> | null;
       const outlineRaw = (l.outline ?? null) as Record<string, unknown> | null;
       const bandRaw = (l.band ?? null) as Record<string, unknown> | null;
+      const glowRaw = (l.glow ?? null) as Record<string, unknown> | null;
+
       return {
         ...base,
         id: str(l.id, base.id),
