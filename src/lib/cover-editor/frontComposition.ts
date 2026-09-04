@@ -111,6 +111,9 @@ export interface FrontTextLayer {
   shadow?: { enabled: boolean; color: string; blur: number; offsetY: number };
   outline?: { enabled: boolean; color: string; width: number };
   band?: LayerBand;
+  /** Halo lumineux léger (titres dorés). */
+  glow?: { enabled: boolean; color: string; blur: number };
+
   /** Nom libre affiché dans le panneau des calques. */
   name?: string;
   hidden?: boolean;
