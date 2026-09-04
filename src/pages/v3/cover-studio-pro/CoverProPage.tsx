@@ -108,7 +108,14 @@ export default function CoverProPage() {
         </>
       )}
 
-      {checkout && <V3UpsellCheckout pack={COVER_PRO_PACK} onClose={closeCheckout} />}
+      {checkout && (
+        <V3UpsellCheckout
+          pack={COVER_PRO_PACK}
+          onClose={closeCheckout}
+          autoStart={params.get('checkout') === '1'}
+          dismissible={params.get('checkout') !== '1'}
+        />
+      )}
     </div>
   );
 }
