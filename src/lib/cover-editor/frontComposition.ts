@@ -32,9 +32,15 @@ export type ShapeKind =
   | 'diagonal'
   | 'frame'
   | 'ornament'
-  | 'photo';
+  | 'photo'
+  | 'icon';
 
 export type ShapeCorner = 'tl' | 'tr' | 'bl' | 'br';
+
+/** Jeu fermé de pictogrammes vectoriels dessinés au canevas. */
+export type IconGlyph = 'check' | 'star' | 'target' | 'bolt' | 'book' | 'diamond';
+
+export const ICON_GLYPHS: IconGlyph[] = ['check', 'star', 'target', 'bolt', 'book', 'diamond'];
 
 export interface FrontShapeLayer {
   id: string;
@@ -51,7 +57,7 @@ export interface FrontShapeLayer {
   opacity: number;
   /** Rayon des angles (rect / photo). */
   radius?: number;
-  /** Épaisseur du trait (frame / ornament). */
+  /** Épaisseur du trait (frame / ornament / icon). */
   strokeWidth?: number;
   /** Cadre double : second trait intérieur. */
   double?: boolean;
@@ -59,9 +65,16 @@ export interface FrontShapeLayer {
   gap?: number;
   /** Angle concerné (diagonal / ornament). */
   corner?: ShapeCorner;
+  /** Dégradé optionnel (rect) : `color` → `gradientTo`. */
+  gradientTo?: string;
+  /** Sens du dégradé. */
+  gradientDirection?: 'vertical' | 'horizontal';
+  /** Pictogramme dessiné (icon). */
+  icon?: IconGlyph;
   hidden?: boolean;
   locked?: boolean;
 }
+
 
 
 /** Voile (bandeau) dessiné derrière un texte pour garantir la lisibilité. */
