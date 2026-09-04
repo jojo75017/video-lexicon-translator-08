@@ -20,6 +20,8 @@ const KIND_LABEL: Record<FrontShapeLayer['kind'], string> = {
   frame: 'Cadre',
   ornament: 'Ornement',
   photo: 'Photographie',
+  icon: 'Pictogramme',
+
 };
 
 interface Props {
