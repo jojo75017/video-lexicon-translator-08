@@ -84,7 +84,7 @@ export default function V3CoverStudioBanner() {
                 Ouvrir le studio de couverture <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                to="/v3/cover-pro"
+                to="/v3/cover-pro?checkout=1"
                 className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold"
                 style={{
                   background: 'rgba(255,255,255,0.08)',
