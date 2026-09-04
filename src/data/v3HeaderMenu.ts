@@ -60,9 +60,7 @@ export const V3_HEADER_MENU: MenuCategory[] = [
     color: '#c9a84c',
     tagline: 'Le livre-objet',
     links: [
-      { label: 'Cover Studio KDP', to: '/couverture-kdp', badge: 'Populaire', desc: 'Couvertures Kindle et poche prêtes à publier' },
-      { label: 'Cover Studio Pro V3', to: '/v3/cover-studio-pro', badge: 'Pro', desc: 'Direction artistique IA + variations premium' },
-      { label: 'Mes couvertures', to: '/v3/mes-couvertures', desc: 'Vos projets de couverture privés, enregistrés' },
+      { label: 'Studio de couverture', to: '/v3/mes-couvertures', badge: 'V4', desc: 'Illustration IA, modèles, dos calculé et export KDP — tout en un' },
       { label: 'BD Studio', to: '/bd-studio', desc: 'Bandes dessinées et albums illustrés' },
       { label: 'Illustrations intérieures', to: '/v3/create/illustre', desc: 'Images cohérentes pour chapitres et sections' },
       { label: 'Documentation Studio', to: '/v3/hub?tab=documentation', desc: 'Docs, annexes, glossaires' },

@@ -12,8 +12,7 @@ import V3PaletteModule from '@/components/v3public/V3PaletteModule';
 import KdpPilotPromoBanner from '@/components/ebook/KdpPilotPromoBanner';
 import V3ContentStudioPromo from '@/components/v3public/V3ContentStudioPromo';
 import V3UpsellRotator from '@/components/v3public/V3UpsellRotator';
-import V3CoverProBanner from '@/components/v3public/V3CoverProBanner';
-import V3MesCouverturesBanner from '@/components/v3public/V3MesCouverturesBanner';
+import V3CoverStudioBanner from '@/components/v3public/V3CoverStudioBanner';
 import AgentAvatar from '@/components/v3public/AgentAvatar';
 import { V3_AGENTS } from '@/data/v3Agents';
 import Niches10Offer from '@/components/marketing/Niches10Offer';
@@ -67,6 +66,9 @@ export default function V3HomePage() {
 
   return (
     <>
+      {/* MODULE VEDETTE — Maison d'édition de couvertures (nouveauté V4 en avance) */}
+      <V3CoverStudioBanner />
+
       {/* LANCEMENT — fin du 47 € le 30 septembre, V3 le 1er octobre */}
       <V3LaunchBanner />
 
@@ -289,11 +291,6 @@ export default function V3HomePage() {
         <V3CapabilitiesPanel />
       </div>
 
-      {/* Nouveauté : éditeur de couverture complète KDP */}
-      <V3MesCouverturesBanner />
-
-      {/* Bannière vedette : Cover Studio KDP Pro (67 €) */}
-      <V3CoverProBanner />
 
       {/* Bandeau rotatif d'upsells personnifiés — 1 promesse = 1 encart */}
       <V3UpsellRotator />
