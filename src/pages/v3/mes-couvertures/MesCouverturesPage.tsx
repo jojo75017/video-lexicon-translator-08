@@ -223,9 +223,14 @@ export default function MesCouverturesPage() {
             Vos projets de couverture privés : Kindle, broché et relié. Vous seul y avez accès.
           </p>
         </div>
-        <Button onClick={() => setCreateOpen(true)} className="gap-2">
-          <Plus className="h-4 w-4" /> Créer une couverture
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button asChild variant="outline" className="gap-2">
+            <Link to="/v3/paiements">Mes paiements</Link>
+          </Button>
+          <Button onClick={() => setCreateOpen(true)} className="gap-2">
+            <Plus className="h-4 w-4" /> Créer une couverture
+          </Button>
+        </div>
       </header>
 
       {loading && (
