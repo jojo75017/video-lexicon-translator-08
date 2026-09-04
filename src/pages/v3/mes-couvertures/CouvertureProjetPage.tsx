@@ -142,22 +142,36 @@ export default function CouvertureProjetPage() {
         )}
       </div>
 
-      {/* parcours */}
+      {/* parcours cliquable */}
       <div className="flex flex-wrap items-center gap-1.5 text-xs">
-        {STEPS.map((step, i) => (
-          <span
-            key={step}
-            className={
-              i === STEPS.length - 1
-                ? 'rounded-full border border-dashed border-border px-2.5 py-1 text-muted-foreground'
-                : 'rounded-full bg-muted px-2.5 py-1 font-medium text-foreground'
-            }
-          >
-            {step}
-            {i === STEPS.length - 1 && ' · bientôt disponible'}
-          </span>
-        ))}
+        {STEPS.map((step) => {
+          const isDos = step.key === 'dos';
+          const dosDisponible = project?.cover_type !== 'ebook';
+          const disabled = !project || (isDos && !dosDisponible);
+          return (
+            <button
+              key={step.key}
+              type="button"
+              disabled={disabled}
+              onClick={() => goToStep(step.key)}
+              className={
+                disabled
+                  ? 'cursor-not-allowed rounded-full border border-dashed border-border px-2.5 py-1 text-muted-foreground'
+                  : 'rounded-full bg-muted px-2.5 py-1 font-medium text-foreground transition hover:bg-[#f47920] hover:text-white'
+              }
+              title={
+                isDos && !dosDisponible
+                  ? 'Réservé aux couvertures brochées ou reliées'
+                  : `Aller à l’étape ${step.label}`
+              }
+            >
+              {step.label}
+              {isDos && !dosDisponible && ' · broché uniquement'}
+            </button>
+          );
+        })}
       </div>
+
 
       {loading && (
         <div className="flex min-h-[40vh] items-center justify-center">
