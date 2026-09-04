@@ -32,9 +32,15 @@ export type ShapeKind =
   | 'diagonal'
   | 'frame'
   | 'ornament'
-  | 'photo';
+  | 'photo'
+  | 'icon';
 
 export type ShapeCorner = 'tl' | 'tr' | 'bl' | 'br';
+
+/** Jeu fermé de pictogrammes vectoriels dessinés au canevas. */
+export type IconGlyph = 'check' | 'star' | 'target' | 'bolt' | 'book' | 'diamond';
+
+export const ICON_GLYPHS: IconGlyph[] = ['check', 'star', 'target', 'bolt', 'book', 'diamond'];
 
 export interface FrontShapeLayer {
   id: string;
@@ -51,7 +57,7 @@ export interface FrontShapeLayer {
   opacity: number;
   /** Rayon des angles (rect / photo). */
   radius?: number;
-  /** Épaisseur du trait (frame / ornament). */
+  /** Épaisseur du trait (frame / ornament / icon). */
   strokeWidth?: number;
   /** Cadre double : second trait intérieur. */
   double?: boolean;
@@ -59,9 +65,16 @@ export interface FrontShapeLayer {
   gap?: number;
   /** Angle concerné (diagonal / ornament). */
   corner?: ShapeCorner;
+  /** Dégradé optionnel (rect) : `color` → `gradientTo`. */
+  gradientTo?: string;
+  /** Sens du dégradé. */
+  gradientDirection?: 'vertical' | 'horizontal';
+  /** Pictogramme dessiné (icon). */
+  icon?: IconGlyph;
   hidden?: boolean;
   locked?: boolean;
 }
+
 
 
 /** Voile (bandeau) dessiné derrière un texte pour garantir la lisibilité. */
@@ -98,6 +111,9 @@ export interface FrontTextLayer {
   shadow?: { enabled: boolean; color: string; blur: number; offsetY: number };
   outline?: { enabled: boolean; color: string; width: number };
   band?: LayerBand;
+  /** Halo lumineux léger (titres dorés). */
+  glow?: { enabled: boolean; color: string; blur: number };
+
   /** Nom libre affiché dans le panneau des calques. */
   name?: string;
   hidden?: boolean;
@@ -299,6 +315,8 @@ export function parseComposition(
       const shadowRaw = (l.shadow ?? null) as Record<string, unknown> | null;
       const outlineRaw = (l.outline ?? null) as Record<string, unknown> | null;
       const bandRaw = (l.band ?? null) as Record<string, unknown> | null;
+      const glowRaw = (l.glow ?? null) as Record<string, unknown> | null;
+
       return {
         ...base,
         id: str(l.id, base.id),
@@ -341,6 +359,14 @@ export function parseComposition(
               padY: num(bandRaw.padY, 24),
             }
           : undefined,
+        glow: glowRaw
+          ? {
+              enabled: Boolean(glowRaw.enabled),
+              color: str(glowRaw.color as string, '#F0D79A'),
+              blur: num(glowRaw.blur, 30),
+            }
+          : undefined,
+
         name: typeof l.name === 'string' ? l.name : undefined,
         hidden: Boolean(l.hidden),
         locked: Boolean(l.locked),
@@ -352,7 +378,7 @@ export function parseComposition(
     .filter((s): s is Record<string, unknown> => Boolean(s) && typeof s === 'object')
     .map((s, index) => ({
       id: str(s.id, `s-${index}`),
-      kind: (['rect', 'diagonal', 'frame', 'ornament', 'photo'] as ShapeKind[]).includes(
+      kind: (['rect', 'diagonal', 'frame', 'ornament', 'photo', 'icon'] as ShapeKind[]).includes(
         s.kind as ShapeKind,
       )
         ? (s.kind as ShapeKind)
@@ -371,6 +397,13 @@ export function parseComposition(
       corner: (['tl', 'tr', 'bl', 'br'] as ShapeCorner[]).includes(s.corner as ShapeCorner)
         ? (s.corner as ShapeCorner)
         : undefined,
+      gradientTo:
+        typeof s.gradientTo === 'string' && /^#[0-9a-fA-F]{6}$/.test(s.gradientTo)
+          ? s.gradientTo
+          : undefined,
+      gradientDirection: s.gradientDirection === 'horizontal' ? 'horizontal' : undefined,
+      icon: ICON_GLYPHS.includes(s.icon as IconGlyph) ? (s.icon as IconGlyph) : undefined,
+
       hidden: Boolean(s.hidden),
       locked: Boolean(s.locked),
     }));
@@ -588,7 +621,106 @@ const drawOrnament = (
 };
 
 /** Dessine tous les calques graphiques dans l'ordre du tableau. */
+/** Pictogramme vectoriel dessiné dans sa boîte (jeu fermé de 6 glyphes). */
+const drawIcon = (
+  ctx: CanvasRenderingContext2D,
+  shape: FrontShapeLayer,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  stroke: number,
+) => {
+  const s = Math.min(w, h);
+  const cx = x + w / 2;
+  const cy = y + h / 2;
+  ctx.save();
+  ctx.strokeStyle = shape.color;
+  ctx.fillStyle = shape.color;
+  ctx.lineWidth = Math.max(1, stroke || s * 0.1);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  switch (shape.icon ?? 'check') {
+    case 'check': {
+      ctx.beginPath();
+      ctx.arc(cx, cy, s * 0.42, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx - s * 0.2, cy);
+      ctx.lineTo(cx - s * 0.04, cy + s * 0.16);
+      ctx.lineTo(cx + s * 0.22, cy - s * 0.18);
+      ctx.stroke();
+      break;
+    }
+    case 'star': {
+      ctx.beginPath();
+      for (let i = 0; i < 10; i += 1) {
+        const r = i % 2 === 0 ? s * 0.45 : s * 0.19;
+        const a = -Math.PI / 2 + (i * Math.PI) / 5;
+        const px = cx + Math.cos(a) * r;
+        const py = cy + Math.sin(a) * r;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      ctx.fill();
+      break;
+    }
+    case 'target': {
+      [0.44, 0.28, 0.12].forEach((r, i) => {
+        ctx.beginPath();
+        ctx.arc(cx, cy, s * r, 0, Math.PI * 2);
+        if (i === 2) ctx.fill();
+        else ctx.stroke();
+      });
+      break;
+    }
+    case 'bolt': {
+      ctx.beginPath();
+      ctx.moveTo(cx + s * 0.16, cy - s * 0.46);
+      ctx.lineTo(cx - s * 0.24, cy + s * 0.06);
+      ctx.lineTo(cx - s * 0.02, cy + s * 0.06);
+      ctx.lineTo(cx - s * 0.14, cy + s * 0.46);
+      ctx.lineTo(cx + s * 0.26, cy - s * 0.08);
+      ctx.lineTo(cx + s * 0.03, cy - s * 0.08);
+      ctx.closePath();
+      ctx.fill();
+      break;
+    }
+    case 'book': {
+      ctx.beginPath();
+      ctx.moveTo(cx - s * 0.36, cy - s * 0.32);
+      ctx.lineTo(cx - s * 0.02, cy - s * 0.24);
+      ctx.lineTo(cx - s * 0.02, cy + s * 0.36);
+      ctx.lineTo(cx - s * 0.36, cy + s * 0.26);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx + s * 0.36, cy - s * 0.32);
+      ctx.lineTo(cx + s * 0.02, cy - s * 0.24);
+      ctx.lineTo(cx + s * 0.02, cy + s * 0.36);
+      ctx.lineTo(cx + s * 0.36, cy + s * 0.26);
+      ctx.closePath();
+      ctx.stroke();
+      break;
+    }
+    default: {
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - s * 0.42);
+      ctx.lineTo(cx + s * 0.34, cy);
+      ctx.lineTo(cx, cy + s * 0.42);
+      ctx.lineTo(cx - s * 0.34, cy);
+      ctx.closePath();
+      ctx.fill();
+      break;
+    }
+  }
+  ctx.restore();
+};
+
 const drawShapes = (
+
   ctx: CanvasRenderingContext2D,
   composition: FrontComposition,
   image: HTMLImageElement | null,
@@ -607,8 +739,19 @@ const drawShapes = (
 
     if (shape.kind === 'rect') {
       pathRoundedRect(ctx, x, y, w, h, (shape.radius ?? 0) * scaleX);
-      ctx.fillStyle = shape.color;
+      if (shape.gradientTo) {
+        const g =
+          shape.gradientDirection === 'horizontal'
+            ? ctx.createLinearGradient(x, y, x + w, y)
+            : ctx.createLinearGradient(x, y, x, y + h);
+        g.addColorStop(0, shape.color);
+        g.addColorStop(1, shape.gradientTo);
+        ctx.fillStyle = g;
+      } else ctx.fillStyle = shape.color;
       ctx.fill();
+    } else if (shape.kind === 'icon') {
+      drawIcon(ctx, shape, x, y, w, h, stroke);
+
     } else if (shape.kind === 'diagonal') {
       const corner = shape.corner ?? 'br';
       ctx.beginPath();
@@ -777,7 +920,18 @@ export function drawFrontComposition(
         ctx.strokeText(line, anchorX, y);
       }
       ctx.fillStyle = layer.color;
+      if (layer.glow?.enabled) {
+        // halo lumineux léger : deux passes douces avant le texte net
+        ctx.save();
+        ctx.shadowColor = hexToRgba(layer.glow.color || '#F0D79A', 0.55);
+        ctx.shadowBlur = (layer.glow.blur ?? 30) * scaleY;
+        ctx.shadowOffsetY = 0;
+        ctx.fillText(line, anchorX, y);
+        ctx.fillText(line, anchorX, y);
+        ctx.restore();
+      }
       ctx.fillText(line, anchorX, y);
+
       y += lineStep;
     }
     ctx.restore();

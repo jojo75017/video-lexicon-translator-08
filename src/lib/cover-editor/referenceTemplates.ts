@@ -18,6 +18,7 @@ import {
   type FrontComposition,
   type FrontShapeLayer,
   type FrontTextLayer,
+  type IconGlyph,
   type TextRole,
 } from '@/lib/cover-editor/frontComposition';
 
@@ -104,14 +105,41 @@ const fitTitleSize = (base: number, title: string): number => {
 /* Modèle 1 — Guide professionnel                                     */
 /* ------------------------------------------------------------------ */
 
+const GUIDE_BULLETS: Array<{ label: string; icon: IconGlyph }> = [
+  { label: 'Méthode pas à pas', icon: 'check' },
+  { label: 'Modèles prêts à l’emploi', icon: 'book' },
+  { label: 'Cas concrets détaillés', icon: 'target' },
+  { label: 'Résultats mesurables', icon: 'bolt' },
+];
+
 const buildGuidePro = ({ composition, title, subtitle, author }: BuildInput): FrontComposition => {
   const { width: W, height: H } = composition.canvas;
   const m = Math.round(W * 0.07);
   const box = W - m * 2;
 
-  const bullets = ['Méthode pas à pas', 'Modèles prêts à l’emploi', 'Cas concrets détaillés', 'Résultats mesurables'];
-
   const shapes: FrontShapeLayer[] = [
+    shape({
+      kind: 'rect',
+      name: 'Fond dégradé bleu nuit',
+      x: 0,
+      y: 0,
+      width: W,
+      height: H,
+      color: '#0B1B33',
+      gradientTo: '#16375F',
+      opacity: 1,
+    }),
+    shape({
+      kind: 'rect',
+      name: 'Halo lumineux',
+      x: Math.round(-W * 0.15),
+      y: Math.round(H * 0.42),
+      width: Math.round(W * 1.3),
+      height: Math.round(H * 0.3),
+      color: '#1B4E86',
+      gradientTo: '#0B1B33',
+      opacity: 0.55,
+    }),
     shape({
       kind: 'rect',
       name: 'Zone géométrique du titre',
@@ -119,18 +147,31 @@ const buildGuidePro = ({ composition, title, subtitle, author }: BuildInput): Fr
       y: Math.round(H * 0.05),
       width: box,
       height: Math.round(H * 0.33),
-      color: '#123A63',
+      color: '#0E2C50',
+      gradientTo: '#17456F',
       opacity: 1,
-      radius: Math.round(W * 0.01),
+      radius: Math.round(W * 0.012),
+    }),
+    shape({
+      kind: 'rect',
+      name: 'Barre dorée verticale',
+      x: m,
+      y: Math.round(H * 0.05),
+      width: Math.round(W * 0.014),
+      height: Math.round(H * 0.33),
+      color: '#E0B457',
+      opacity: 1,
     }),
     shape({
       kind: 'rect',
       name: 'Filet doré du titre',
       x: m,
-      y: Math.round(H * 0.38),
+      y: Math.round(H * 0.385),
       width: box,
-      height: Math.round(H * 0.006),
+      height: Math.round(H * 0.005),
       color: '#E0B457',
+      gradientTo: '#8C6B21',
+      gradientDirection: 'horizontal',
       opacity: 1,
     }),
     shape({
@@ -139,37 +180,62 @@ const buildGuidePro = ({ composition, title, subtitle, author }: BuildInput): Fr
       x: 0,
       y: Math.round(H * 0.4),
       width: W,
-      height: Math.round(H * 0.09),
-      color: '#0E2544',
-      opacity: 1,
+      height: Math.round(H * 0.1),
+      color: '#071626',
+      opacity: 0.95,
       corner: 'br',
+    }),
+    shape({
+      kind: 'rect',
+      name: 'Cadre doré de la photographie',
+      x: Math.round(W * 0.335) - Math.round(W * 0.008),
+      y: Math.round(H * 0.5) - Math.round(W * 0.008),
+      width: Math.round(W * 0.6) + Math.round(W * 0.016),
+      height: Math.round(H * 0.315) + Math.round(W * 0.016),
+      color: '#E0B457',
+      opacity: 0.9,
+      radius: Math.round(W * 0.018),
     }),
     shape({
       kind: 'photo',
       name: 'Photographie',
-      x: Math.round(W * 0.34),
+      x: Math.round(W * 0.335),
       y: Math.round(H * 0.5),
-      width: Math.round(W * 0.59),
-      height: Math.round(H * 0.31),
+      width: Math.round(W * 0.6),
+      height: Math.round(H * 0.315),
       color: '#0B1B33',
       opacity: 1,
       radius: Math.round(W * 0.015),
-      strokeWidth: Math.round(W * 0.004),
+      strokeWidth: 0,
     }),
   ];
 
-  bullets.forEach((_, index) => {
+  GUIDE_BULLETS.forEach((bullet, index) => {
+    const by = Math.round(H * (0.5 + index * 0.079));
     shapes.push(
       shape({
         kind: 'rect',
         name: `Bloc ${index + 1}`,
         x: m,
-        y: Math.round(H * (0.5 + index * 0.078)),
-        width: Math.round(W * 0.24),
-        height: Math.round(H * 0.062),
-        color: '#173F69',
-        opacity: 1,
+        y: by,
+        width: Math.round(W * 0.245),
+        height: Math.round(H * 0.064),
+        color: '#153C66',
+        gradientTo: '#0D2846',
+        opacity: 0.96,
         radius: Math.round(W * 0.008),
+      }),
+      shape({
+        kind: 'icon',
+        name: `Pictogramme ${index + 1}`,
+        icon: bullet.icon,
+        x: m + Math.round(W * 0.014),
+        y: by + Math.round(H * 0.014),
+        width: Math.round(W * 0.036),
+        height: Math.round(W * 0.036),
+        color: '#E0B457',
+        opacity: 1,
+        strokeWidth: Math.round(W * 0.0045),
       }),
     );
   });
@@ -182,35 +248,47 @@ const buildGuidePro = ({ composition, title, subtitle, author }: BuildInput): Fr
       y: Math.round(H * 0.87),
       width: W,
       height: Math.round(H * 0.13),
-      color: '#E0B457',
+      color: '#E5BD62',
+      gradientTo: '#C79A3C',
       opacity: 1,
+    }),
+    shape({
+      kind: 'rect',
+      name: 'Filet du bandeau',
+      x: 0,
+      y: Math.round(H * 0.87),
+      width: W,
+      height: Math.round(H * 0.004),
+      color: '#FFF0C6',
+      opacity: 0.9,
     }),
   );
 
-  const guideTitleY = Math.round(H * 0.13);
-  const guideTitleW = box - Math.round(W * 0.08);
+  const guideTitleY = Math.round(H * 0.132);
+  const guideTitleX = m + Math.round(W * 0.05);
+  const guideTitleW = box - Math.round(W * 0.09);
   const guideTitleSize = fitTitleSize(Math.round(W * 0.105), title);
   const guideTitleLines = estimateLines(title, guideTitleW, guideTitleSize);
   const guideSubtitleY = Math.max(
-    Math.round(H * 0.24),
+    Math.round(H * 0.245),
     guideTitleY + Math.round(guideTitleLines * guideTitleSize * 1.02 + H * 0.025),
   );
 
   const layers: FrontTextLayer[] = [
     text('custom', 'Surtitre', {
       text: 'GUIDE PROFESSIONNEL',
-      x: m + Math.round(W * 0.04),
+      x: guideTitleX,
       y: Math.round(H * 0.085),
-      width: box - Math.round(W * 0.08),
-      fontSize: Math.round(W * 0.033),
+      width: guideTitleW,
+      fontSize: Math.round(W * 0.032),
       fontFamily: SANS,
       color: '#E0B457',
       bold: true,
-      letterSpacing: Math.round(W * 0.008),
+      letterSpacing: Math.round(W * 0.009),
     }),
     text('title', 'Titre', {
       text: title,
-      x: m + Math.round(W * 0.04),
+      x: guideTitleX,
       y: guideTitleY,
       width: guideTitleW,
       fontSize: guideTitleSize,
@@ -218,39 +296,37 @@ const buildGuidePro = ({ composition, title, subtitle, author }: BuildInput): Fr
       color: '#FFFFFF',
       bold: true,
       lineHeight: 1.02,
+      shadow: {
+        enabled: true,
+        color: '#04101E',
+        blur: Math.round(W * 0.014),
+        offsetY: Math.round(W * 0.003),
+      },
     }),
     text('subtitle', 'Sous-titre', {
       text: subtitle || 'Le sous-titre qui promet un résultat clair',
-      x: m + Math.round(W * 0.04),
+      x: guideTitleX,
       y: guideSubtitleY,
-      width: box - Math.round(W * 0.08),
-      fontSize: Math.round(W * 0.038),
+      width: guideTitleW,
+      fontSize: Math.round(W * 0.037),
       fontFamily: SANS,
-      color: '#CFE1F5',
+      color: '#F3D89A',
       lineHeight: 1.25,
     }),
   ];
 
-  bullets.forEach((label, index) => {
+  GUIDE_BULLETS.forEach((bullet, index) => {
     layers.push(
-      text('custom', `Pictogramme ${index + 1}`, {
-        text: '◆',
-        x: m + Math.round(W * 0.015),
-        y: Math.round(H * (0.5 + index * 0.078) + H * 0.015),
-        width: Math.round(W * 0.05),
-        fontSize: Math.round(W * 0.028),
-        fontFamily: SANS,
-        color: '#E0B457',
-      }),
       text('custom', `Texte bloc ${index + 1}`, {
-        text: label,
-        x: m + Math.round(W * 0.06),
-        y: Math.round(H * (0.5 + index * 0.078) + H * 0.017),
-        width: Math.round(W * 0.18),
-        fontSize: Math.round(W * 0.021),
+        text: bullet.label,
+        x: m + Math.round(W * 0.062),
+        y: Math.round(H * (0.5 + index * 0.079)) + Math.round(H * 0.019),
+        width: Math.round(W * 0.175),
+        fontSize: Math.round(W * 0.02),
         fontFamily: SANS,
         color: '#FFFFFF',
         bold: true,
+        lineHeight: 1.1,
       }),
     );
   });
@@ -266,7 +342,7 @@ const buildGuidePro = ({ composition, title, subtitle, author }: BuildInput): Fr
       color: '#0B1B33',
       align: 'center',
       bold: true,
-      letterSpacing: Math.round(W * 0.004),
+      letterSpacing: Math.round(W * 0.005),
     }),
   );
 
@@ -287,51 +363,83 @@ const buildGuidePro = ({ composition, title, subtitle, author }: BuildInput): Fr
 /* Modèle 2 — Non-fiction spectaculaire                               */
 /* ------------------------------------------------------------------ */
 
+/** Découpe le titre en trois lignes équilibrées (au plus). */
+const splitInThree = (value: string): string[] => {
+  const words = value.trim().split(/\s+/).filter(Boolean);
+  if (words.length <= 1) return [value.trim()];
+  if (words.length === 2) return words;
+  const target = Math.ceil(words.length / 3);
+  const lines: string[] = [];
+  for (let i = 0; i < words.length; i += target) lines.push(words.slice(i, i + target).join(' '));
+  return lines.slice(0, 3);
+};
+
 const buildNonfiction = ({ composition, title, subtitle, author }: BuildInput): FrontComposition => {
   const { width: W, height: H } = composition.canvas;
   const m = Math.round(W * 0.06);
   const box = W - m * 2;
 
-  const words = title.trim().split(/\s+/).filter(Boolean);
-  const cut = Math.max(1, Math.ceil(words.length / 2));
-  const line1 = words.slice(0, cut).join(' ') || title;
-  const line2 = words.slice(cut).join(' ');
-
-  const bandH = Math.round(H * 0.085);
-  const bandY = [0.06, 0.155, 0.25].map((r) => Math.round(H * r));
+  const lines = splitInThree(title);
+  const bandH = Math.round(H * 0.082);
+  const bandTop = Math.round(H * 0.055);
+  const bandGap = Math.round(bandH * 1.06);
+  const bandWidths = [box, Math.round(box * 0.93), Math.round(box * 0.84)];
+  const lineColors = ['#FFFFFF', '#F6C244', '#FFFFFF'];
 
   const shapes: FrontShapeLayer[] = [
     shape({
       kind: 'rect',
-      name: 'Bandeau 1',
-      x: m,
-      y: bandY[0],
-      width: box,
-      height: bandH,
-      color: '#0F2C1E',
-      opacity: 0.82,
-      radius: Math.round(W * 0.006),
+      name: 'Voile dégradé haut',
+      x: 0,
+      y: 0,
+      width: W,
+      height: Math.round(H * 0.5),
+      color: '#04120A',
+      gradientTo: '#04120A',
+      opacity: 0.42,
     }),
     shape({
       kind: 'rect',
-      name: 'Bandeau 2',
-      x: m,
-      y: bandY[1],
-      width: Math.round(box * 0.92),
-      height: bandH,
-      color: '#0F2C1E',
-      opacity: 0.82,
-      radius: Math.round(W * 0.006),
+      name: 'Voile dégradé bas',
+      x: 0,
+      y: Math.round(H * 0.62),
+      width: W,
+      height: Math.round(H * 0.38),
+      color: '#04120A',
+      gradientTo: '#04120A',
+      opacity: 0.35,
     }),
+  ];
+
+  lines.forEach((_, index) => {
+    shapes.push(
+      shape({
+        kind: 'rect',
+        name: `Bandeau ${index + 1}`,
+        x: m,
+        y: bandTop + index * bandGap,
+        width: bandWidths[index] ?? box,
+        height: bandH,
+        color: index === 1 ? '#0C2418' : '#0F2C1E',
+        gradientTo: index === 1 ? '#123726' : '#08190F',
+        opacity: 0.88,
+        radius: Math.round(W * 0.006),
+      }),
+    );
+  });
+
+  const subtitleBandY = bandTop + lines.length * bandGap + Math.round(H * 0.012);
+  shapes.push(
     shape({
       kind: 'rect',
-      name: 'Bandeau 3',
+      name: 'Bandeau du sous-titre',
       x: m,
-      y: bandY[2],
-      width: Math.round(box * 0.78),
-      height: Math.round(bandH * 0.78),
+      y: subtitleBandY,
+      width: Math.round(box * 0.76),
+      height: Math.round(bandH * 0.7),
       color: '#C7412F',
-      opacity: 0.95,
+      gradientTo: '#8E2A1D',
+      opacity: 0.96,
       radius: Math.round(W * 0.006),
     }),
     shape({
@@ -342,65 +450,69 @@ const buildNonfiction = ({ composition, title, subtitle, author }: BuildInput): 
       width: W,
       height: Math.round(H * 0.1),
       color: '#0F2C1E',
-      opacity: 0.88,
+      gradientTo: '#061309',
+      opacity: 0.9,
     }),
-  ];
-
-  const layers: FrontTextLayer[] = [
-    text('title', 'Titre — ligne 1', {
-      text: line1.toLocaleUpperCase('fr-FR'),
-      x: m,
-      y: bandY[0] + Math.round(bandH * 0.14),
-      width: box,
-      fontSize: fitTitleSize(Math.round(W * 0.108), line1),
-      fontFamily: SANS_ALT,
-      color: '#FFFFFF',
-      align: 'center',
-      bold: true,
-      lineHeight: 1,
-      shadow: { enabled: true, color: '#000000', blur: Math.round(W * 0.02), offsetY: Math.round(W * 0.004) },
-      outline: { enabled: true, color: '#0A1F14', width: Math.round(W * 0.006) },
-    }),
-    text('title', 'Titre — ligne 2', {
-      text: (line2 || '').toLocaleUpperCase('fr-FR'),
-      hidden: !line2,
-      x: m,
-      y: bandY[1] + Math.round(bandH * 0.14),
-      width: Math.round(box * 0.92),
-      fontSize: fitTitleSize(Math.round(W * 0.098), line2 || line1),
-      fontFamily: SANS_ALT,
+    shape({
+      kind: 'rect',
+      name: 'Filet doré auteur',
+      x: 0,
+      y: Math.round(H * 0.9),
+      width: W,
+      height: Math.round(H * 0.0035),
       color: '#F6C244',
+      opacity: 0.95,
+    }),
+  );
+
+  const layers: FrontTextLayer[] = lines.map((line, index) =>
+    text('title', `Titre — ligne ${index + 1}`, {
+      text: line.toLocaleUpperCase('fr-FR'),
+      x: m,
+      y: bandTop + index * bandGap + Math.round(bandH * 0.13),
+      width: bandWidths[index] ?? box,
+      fontSize: fitTitleSize(Math.round(W * 0.108), line),
+      fontFamily: SANS_ALT,
+      color: lineColors[index] ?? '#FFFFFF',
       align: 'center',
       bold: true,
       lineHeight: 1,
-      shadow: { enabled: true, color: '#000000', blur: Math.round(W * 0.02), offsetY: Math.round(W * 0.004) },
-      outline: { enabled: true, color: '#0A1F14', width: Math.round(W * 0.006) },
+      shadow: {
+        enabled: true,
+        color: '#000000',
+        blur: Math.round(W * 0.022),
+        offsetY: Math.round(W * 0.004),
+      },
+      outline: { enabled: true, color: '#08190F', width: Math.round(W * 0.006) },
     }),
+  );
 
+  layers.push(
     text('subtitle', 'Sous-titre', {
       text: subtitle || 'Tout ce qu’il faut savoir, étape par étape',
       x: m,
-      y: bandY[2] + Math.round(bandH * 0.16),
-      width: Math.round(box * 0.78),
-      fontSize: Math.round(W * 0.036),
+      y: subtitleBandY + Math.round(bandH * 0.16),
+      width: Math.round(box * 0.76),
+      fontSize: Math.round(W * 0.034),
       fontFamily: SANS,
       color: '#FFFFFF',
       align: 'center',
       bold: true,
+      letterSpacing: Math.round(W * 0.002),
     }),
     text('author', 'Auteur', {
       text: author || 'Nom de l’auteur',
       x: m,
-      y: Math.round(H * 0.925),
+      y: Math.round(H * 0.928),
       width: box,
       fontSize: Math.round(W * 0.044),
       fontFamily: SANS,
       color: '#FFFFFF',
       align: 'center',
       bold: true,
-      letterSpacing: Math.round(W * 0.004),
+      letterSpacing: Math.round(W * 0.005),
     }),
-  ];
+  );
 
   return {
     ...composition,
@@ -409,7 +521,7 @@ const buildNonfiction = ({ composition, title, subtitle, author }: BuildInput): 
     templateId: 'ref-nonfiction',
     illustrationMode: 'cover',
     backgroundColor: '#123322',
-    overlay: { type: 'top', color: '#04120A', opacity: 0.35 },
+    overlay: { type: 'both', color: '#04120A', opacity: 0.32 },
     shapes,
     layers,
   };
@@ -421,10 +533,45 @@ const buildNonfiction = ({ composition, title, subtitle, author }: BuildInput): 
 
 const buildRomanPremium = ({ composition, title, subtitle, author }: BuildInput): FrontComposition => {
   const { width: W, height: H } = composition.canvas;
-  const inset = Math.round(W * 0.055);
-  const orn = Math.round(W * 0.14);
+  const inset = Math.round(W * 0.05);
+  const orn = Math.round(W * 0.15);
+  const gold = '#D8B86A';
+
+  const cornerShape = (
+    name: string,
+    corner: 'tl' | 'tr' | 'bl' | 'br',
+  ): FrontShapeLayer =>
+    shape({
+      kind: 'ornament',
+      name,
+      x:
+        corner === 'tl' || corner === 'bl'
+          ? inset + Math.round(W * 0.028)
+          : W - inset - Math.round(W * 0.028) - orn,
+      y:
+        corner === 'tl' || corner === 'tr'
+          ? inset + Math.round(W * 0.028)
+          : H - inset - Math.round(W * 0.028) - orn,
+      width: orn,
+      height: orn,
+      color: gold,
+      opacity: 0.95,
+      strokeWidth: Math.round(W * 0.0035),
+      corner,
+    });
 
   const shapes: FrontShapeLayer[] = [
+    shape({
+      kind: 'rect',
+      name: 'Voile général assombrissant',
+      x: 0,
+      y: 0,
+      width: W,
+      height: H,
+      color: '#020704',
+      gradientTo: '#0B1710',
+      opacity: 0.42,
+    }),
     shape({
       kind: 'frame',
       name: 'Double cadre doré',
@@ -432,69 +579,70 @@ const buildRomanPremium = ({ composition, title, subtitle, author }: BuildInput)
       y: inset,
       width: W - inset * 2,
       height: H - inset * 2,
-      color: '#D8B86A',
+      color: gold,
       opacity: 0.95,
-      strokeWidth: Math.round(W * 0.006),
+      strokeWidth: Math.round(W * 0.007),
       double: true,
-      gap: Math.round(W * 0.018),
+      gap: Math.round(W * 0.016),
     }),
     shape({
-      kind: 'ornament',
-      name: 'Ornement haut gauche',
-      x: inset + Math.round(W * 0.03),
-      y: inset + Math.round(W * 0.03),
-      width: orn,
-      height: orn,
-      color: '#D8B86A',
-      opacity: 0.95,
-      strokeWidth: Math.round(W * 0.004),
-      corner: 'tl',
+      kind: 'frame',
+      name: 'Filet intérieur',
+      x: inset + Math.round(W * 0.045),
+      y: inset + Math.round(W * 0.045),
+      width: W - (inset + Math.round(W * 0.045)) * 2,
+      height: H - (inset + Math.round(W * 0.045)) * 2,
+      color: gold,
+      opacity: 0.35,
+      strokeWidth: Math.round(W * 0.0022),
+    }),
+    cornerShape('Ornement haut gauche', 'tl'),
+    cornerShape('Ornement haut droit', 'tr'),
+    cornerShape('Ornement bas gauche', 'bl'),
+    cornerShape('Ornement bas droit', 'br'),
+    shape({
+      kind: 'rect',
+      name: 'Voile derrière le titre',
+      x: Math.round(W * 0.1),
+      y: Math.round(H * 0.1),
+      width: Math.round(W * 0.8),
+      height: Math.round(H * 0.24),
+      color: '#04100A',
+      gradientTo: '#04100A',
+      opacity: 0.35,
+      radius: Math.round(W * 0.01),
     }),
     shape({
-      kind: 'ornament',
-      name: 'Ornement haut droit',
-      x: W - inset - Math.round(W * 0.03) - orn,
-      y: inset + Math.round(W * 0.03),
-      width: orn,
-      height: orn,
-      color: '#D8B86A',
-      opacity: 0.95,
-      strokeWidth: Math.round(W * 0.004),
-      corner: 'tr',
+      kind: 'rect',
+      name: 'Filet doré central',
+      x: Math.round(W * 0.36),
+      y: Math.round(H * 0.815),
+      width: Math.round(W * 0.28),
+      height: Math.round(H * 0.0028),
+      color: gold,
+      opacity: 0.9,
     }),
     shape({
-      kind: 'ornament',
-      name: 'Ornement bas gauche',
-      x: inset + Math.round(W * 0.03),
-      y: H - inset - Math.round(W * 0.03) - orn,
-      width: orn,
-      height: orn,
-      color: '#D8B86A',
-      opacity: 0.95,
-      strokeWidth: Math.round(W * 0.004),
-      corner: 'bl',
-    }),
-    shape({
-      kind: 'ornament',
-      name: 'Ornement bas droit',
-      x: W - inset - Math.round(W * 0.03) - orn,
-      y: H - inset - Math.round(W * 0.03) - orn,
-      width: orn,
-      height: orn,
-      color: '#D8B86A',
-      opacity: 0.95,
-      strokeWidth: Math.round(W * 0.004),
-      corner: 'br',
+      kind: 'icon',
+      name: 'Losange décoratif',
+      icon: 'diamond',
+      x: Math.round(W * 0.475),
+      y: Math.round(H * 0.788),
+      width: Math.round(W * 0.05),
+      height: Math.round(W * 0.05),
+      color: gold,
+      opacity: 0.9,
+      strokeWidth: Math.round(W * 0.003),
     }),
   ];
 
   const boxX = Math.round(W * 0.12);
   const boxW = W - boxX * 2;
-  const romanTitleY = Math.round(H * 0.13);
+  const romanTitleY = Math.round(H * 0.135);
   const romanTitleSize = fitTitleSize(Math.round(W * 0.115), title);
   const romanTitleLines = estimateLines(title, boxW, romanTitleSize);
   const romanSubtitleY =
-    romanTitleY + Math.round(romanTitleLines * romanTitleSize * 1.06 + H * 0.035);
+    romanTitleY + Math.round(romanTitleLines * romanTitleSize * 1.06 + H * 0.03);
 
   const layers: FrontTextLayer[] = [
     text('title', 'Titre', {
@@ -504,36 +652,45 @@ const buildRomanPremium = ({ composition, title, subtitle, author }: BuildInput)
       width: boxW,
       fontSize: romanTitleSize,
       fontFamily: SERIF,
-      color: '#F0D79A',
+      color: '#F3DCA4',
       align: 'center',
       lineHeight: 1.06,
       letterSpacing: Math.round(W * 0.003),
-      shadow: { enabled: true, color: '#000000', blur: Math.round(W * 0.03), offsetY: Math.round(W * 0.003) },
-      band: { enabled: true, color: '#08110C', opacity: 0.4, padY: Math.round(H * 0.02) },
+      shadow: {
+        enabled: true,
+        color: '#000000',
+        blur: Math.round(W * 0.028),
+        offsetY: Math.round(W * 0.003),
+      },
+      glow: { enabled: true, color: '#E9C877', blur: Math.round(W * 0.03) },
     }),
     text('subtitle', 'Sous-titre', {
-      text: subtitle || 'Roman',
+      text: (subtitle || 'Roman').toLocaleUpperCase('fr-FR'),
       x: boxX,
       y: romanSubtitleY,
       width: boxW,
-      fontSize: Math.round(W * 0.036),
+      fontSize: Math.round(W * 0.03),
       fontFamily: SERIF,
       color: '#EADFC8',
       align: 'center',
-      italic: true,
-      letterSpacing: Math.round(W * 0.006),
+      letterSpacing: Math.round(W * 0.012),
     }),
     text('author', 'Auteur', {
       text: author || 'Nom de l’auteur',
       x: boxX,
-      y: Math.round(H * 0.855),
+      y: Math.round(H * 0.845),
       width: boxW,
       fontSize: Math.round(W * 0.05),
       fontFamily: SERIF,
-      color: '#F0D79A',
+      color: '#F3DCA4',
       align: 'center',
       letterSpacing: Math.round(W * 0.008),
-      band: { enabled: true, color: '#08110C', opacity: 0.35, padY: Math.round(H * 0.014) },
+      shadow: {
+        enabled: true,
+        color: '#000000',
+        blur: Math.round(W * 0.02),
+        offsetY: Math.round(W * 0.002),
+      },
     }),
   ];
 
@@ -544,7 +701,7 @@ const buildRomanPremium = ({ composition, title, subtitle, author }: BuildInput)
     templateId: 'ref-roman-premium',
     illustrationMode: 'cover',
     backgroundColor: '#0A140F',
-    overlay: { type: 'full', color: '#040A07', opacity: 0.4 },
+    overlay: { type: 'full', color: '#040A07', opacity: 0.32 },
     shapes,
     layers,
   };
