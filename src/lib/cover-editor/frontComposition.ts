@@ -920,7 +920,18 @@ export function drawFrontComposition(
         ctx.strokeText(line, anchorX, y);
       }
       ctx.fillStyle = layer.color;
+      if (layer.glow?.enabled) {
+        // halo lumineux léger : deux passes douces avant le texte net
+        ctx.save();
+        ctx.shadowColor = hexToRgba(layer.glow.color || '#F0D79A', 0.55);
+        ctx.shadowBlur = (layer.glow.blur ?? 30) * scaleY;
+        ctx.shadowOffsetY = 0;
+        ctx.fillText(line, anchorX, y);
+        ctx.fillText(line, anchorX, y);
+        ctx.restore();
+      }
       ctx.fillText(line, anchorX, y);
+
       y += lineStep;
     }
     ctx.restore();
