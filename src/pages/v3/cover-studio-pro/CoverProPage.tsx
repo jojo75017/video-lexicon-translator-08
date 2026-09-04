@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowRight, Crown, Loader2, Lock, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -31,6 +31,12 @@ export default function CoverProPage() {
   const { hasAccess, reason, credits, key, loading, error, refresh } = useCoverProAccess();
   const [checkout, setCheckout] = useState(false);
   const [params] = useSearchParams();
+  const navigate = useNavigate();
+
+  const closeCheckout = () => {
+    setCheckout(false);
+    if (params.get('checkout') === '1') navigate('/v3', { replace: true });
+  };
 
   // Le lien d'achat doit toujours ouvrir le tunnel, y compris pour un compte
   // administrateur qui possède déjà l'accès et souhaite tester le paiement.
@@ -102,7 +108,7 @@ export default function CoverProPage() {
         </>
       )}
 
-      {checkout && <V3UpsellCheckout pack={COVER_PRO_PACK} onClose={() => setCheckout(false)} />}
+      {checkout && <V3UpsellCheckout pack={COVER_PRO_PACK} onClose={closeCheckout} />}
     </div>
   );
 }
