@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from '@stripe/react-stripe-js';
 import { X, Loader2 } from 'lucide-react';
 import { getStripe, getStripeEnvironment } from '@/lib/stripe';
@@ -12,10 +12,23 @@ const AMBER_SOFT = '#FFF3DF';
 const INK = '#2A2118';
 
 /** Modale d'achat d'un pack premium à la carte (paiement unique, checkout embarqué). */
-const V3UpsellCheckout: React.FC<{ pack: V3UpsellPack | null; onClose: () => void }> = ({ pack, onClose }) => {
+interface V3UpsellCheckoutProps {
+  pack: V3UpsellPack | null;
+  onClose: () => void;
+  autoStart?: boolean;
+  dismissible?: boolean;
+}
+
+const V3UpsellCheckout: React.FC<V3UpsellCheckoutProps> = ({
+  pack,
+  onClose,
+  autoStart = false,
+  dismissible = true,
+}) => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const autoStartAttempted = useRef(false);
 
   const reset = useCallback(() => {
     setClientSecret(null);
@@ -25,9 +38,9 @@ const V3UpsellCheckout: React.FC<{ pack: V3UpsellPack | null; onClose: () => voi
 
   const handleClose = () => { reset(); onClose(); };
 
-  const startPayment = async () => {
+  const startPayment = useCallback(async (emailOverride?: string) => {
     if (!pack) return;
-    const e = email.trim().toLowerCase();
+    const e = (emailOverride ?? email).trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) {
       toast.error('Merci de saisir un email valide.');
       return;
@@ -51,23 +64,45 @@ const V3UpsellCheckout: React.FC<{ pack: V3UpsellPack | null; onClose: () => voi
     } finally {
       setLoading(false);
     }
-  };
+  }, [email, pack]);
+
+  useEffect(() => {
+    if (!autoStart || !pack || autoStartAttempted.current) return;
+    autoStartAttempted.current = true;
+    void supabase.auth.getUser().then(({ data }) => {
+      const accountEmail = data.user?.email;
+      if (accountEmail) {
+        setEmail(accountEmail);
+        void startPayment(accountEmail);
+      }
+    });
+  }, [autoStart, pack, startPayment]);
 
   if (!pack) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={handleClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+      onClick={dismissible ? handleClose : undefined}
+    >
       <div
         className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border p-6 bg-white"
         style={{ borderColor: `${AMBER}55` }}
         onClick={(ev) => ev.stopPropagation()}
       >
-        <button onClick={handleClose} className="absolute right-4 top-4 text-black/40 hover:text-black">
-          <X className="h-5 w-5" />
-        </button>
+        {dismissible && (
+          <button onClick={handleClose} className="absolute right-4 top-4 text-black/40 hover:text-black">
+            <X className="h-5 w-5" />
+          </button>
+        )}
 
         {!clientSecret ? (
           <>
+            {autoStart && loading ? (
+              <div className="flex min-h-48 items-center justify-center gap-3" style={{ color: AMBER_DEEP }}>
+                <Loader2 className="h-5 w-5 animate-spin" /> Ouverture du paiement Stripe…
+              </div>
+            ) : <>
             <h3 className="text-xl font-black mb-1" style={{ color: AMBER_DEEP }}>{pack.title}</h3>
             <p className="text-sm mb-4" style={{ color: '#6f5e47' }}>{pack.desc}</p>
             <div className="flex items-end gap-2 mb-5">
@@ -86,7 +121,7 @@ const V3UpsellCheckout: React.FC<{ pack: V3UpsellPack | null; onClose: () => voi
             />
 
             <button
-              onClick={startPayment}
+              onClick={() => void startPayment()}
               disabled={loading}
               className="w-full inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm font-bold transition-transform hover:-translate-y-0.5 disabled:opacity-60"
               style={{ background: `linear-gradient(90deg, ${AMBER}, #FFB44D)`, color: '#fff' }}
@@ -96,6 +131,7 @@ const V3UpsellCheckout: React.FC<{ pack: V3UpsellPack | null; onClose: () => voi
             <p className="text-center text-[10px] mt-3" style={{ color: '#a18a6c' }}>
               Paiement sécurisé.
             </p>
+            </>}
           </>
         ) : (
           <EmbeddedCheckoutProvider stripe={getStripe()} options={{ clientSecret }}>
