@@ -640,8 +640,19 @@ const drawShapes = (
 
     if (shape.kind === 'rect') {
       pathRoundedRect(ctx, x, y, w, h, (shape.radius ?? 0) * scaleX);
-      ctx.fillStyle = shape.color;
+      if (shape.gradientTo) {
+        const g =
+          shape.gradientDirection === 'horizontal'
+            ? ctx.createLinearGradient(x, y, x + w, y)
+            : ctx.createLinearGradient(x, y, x, y + h);
+        g.addColorStop(0, shape.color);
+        g.addColorStop(1, shape.gradientTo);
+        ctx.fillStyle = g;
+      } else ctx.fillStyle = shape.color;
       ctx.fill();
+    } else if (shape.kind === 'icon') {
+      drawIcon(ctx, shape, x, y, w, h, stroke);
+
     } else if (shape.kind === 'diagonal') {
       const corner = shape.corner ?? 'br';
       ctx.beginPath();
