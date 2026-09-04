@@ -32,10 +32,11 @@ export default function CoverProPage() {
   const [checkout, setCheckout] = useState(false);
   const [params] = useSearchParams();
 
-  // Ouverture directe du tunnel de paiement (lien « Voir l'offre 67 € »).
+  // Le lien d'achat doit toujours ouvrir le tunnel, y compris pour un compte
+  // administrateur qui possède déjà l'accès et souhaite tester le paiement.
   useEffect(() => {
-    if (params.get('checkout') === '1' && !loading && !hasAccess) setCheckout(true);
-  }, [params, loading, hasAccess]);
+    if (params.get('checkout') === '1' && !loading) setCheckout(true);
+  }, [params, loading]);
 
   if (loading) {
     return (
