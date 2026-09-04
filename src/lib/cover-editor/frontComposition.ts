@@ -378,7 +378,7 @@ export function parseComposition(
     .filter((s): s is Record<string, unknown> => Boolean(s) && typeof s === 'object')
     .map((s, index) => ({
       id: str(s.id, `s-${index}`),
-      kind: (['rect', 'diagonal', 'frame', 'ornament', 'photo'] as ShapeKind[]).includes(
+      kind: (['rect', 'diagonal', 'frame', 'ornament', 'photo', 'icon'] as ShapeKind[]).includes(
         s.kind as ShapeKind,
       )
         ? (s.kind as ShapeKind)
@@ -397,6 +397,13 @@ export function parseComposition(
       corner: (['tl', 'tr', 'bl', 'br'] as ShapeCorner[]).includes(s.corner as ShapeCorner)
         ? (s.corner as ShapeCorner)
         : undefined,
+      gradientTo:
+        typeof s.gradientTo === 'string' && /^#[0-9a-fA-F]{6}$/.test(s.gradientTo)
+          ? s.gradientTo
+          : undefined,
+      gradientDirection: s.gradientDirection === 'horizontal' ? 'horizontal' : undefined,
+      icon: ICON_GLYPHS.includes(s.icon as IconGlyph) ? (s.icon as IconGlyph) : undefined,
+
       hidden: Boolean(s.hidden),
       locked: Boolean(s.locked),
     }));
