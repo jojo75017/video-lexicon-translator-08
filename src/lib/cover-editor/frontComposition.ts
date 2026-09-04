@@ -359,6 +359,14 @@ export function parseComposition(
               padY: num(bandRaw.padY, 24),
             }
           : undefined,
+        glow: glowRaw
+          ? {
+              enabled: Boolean(glowRaw.enabled),
+              color: str(glowRaw.color as string, '#F0D79A'),
+              blur: num(glowRaw.blur, 30),
+            }
+          : undefined,
+
         name: typeof l.name === 'string' ? l.name : undefined,
         hidden: Boolean(l.hidden),
         locked: Boolean(l.locked),
