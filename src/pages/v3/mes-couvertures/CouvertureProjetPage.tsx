@@ -6,6 +6,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, ChevronDown, ImageIcon, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 import CoverFrontEditor from '@/components/cover-editor/CoverFrontEditor';
 import CoverWrapEditor from '@/components/cover-editor/CoverWrapEditor';
@@ -108,6 +109,18 @@ export default function CouvertureProjetPage() {
     };
   }, [id]);
 
+  const goToStep = (key: StepKey) => {
+    const targets: Record<StepKey, string[]> = {
+      illustration: ['#etape-illustration'],
+      textes: ['#cover-text', '#wrap-text'],
+      dos: ['#etape-dos'],
+      export: ['#etape-export'],
+    };
+    if (!focusSection(targets[key])) {
+      toast.info('Cette étape sera disponible dès que l’éditeur sera chargé.');
+    }
+  };
+
   return (
     <main className="mx-auto w-full max-w-7xl px-4 py-4 space-y-4">
       {/* barre d'action toujours visible, sans défilement */}
@@ -116,6 +129,7 @@ export default function CouvertureProjetPage() {
           <ArrowLeft className="h-4 w-4" /> Retour à mes couvertures
         </Button>
         {project && (
+          <span id="etape-illustration" className="inline-flex">
           <IllustrationGeneratorPanel
             projectId={project.id}
             size="sm"
@@ -131,6 +145,7 @@ export default function CouvertureProjetPage() {
               }
             }}
           />
+          </span>
         )}
         {project && (
           <>
