@@ -54,7 +54,12 @@ import {
   getExpressGenre,
   proposalOrder,
 } from '@/lib/cover-editor/expressCover';
-import { renderFrontCanvas, exportFrontPdf } from '@/lib/cover-editor/coverExports';
+import {
+  renderFrontCanvas,
+  exportFrontPdf,
+  exportFrontPng,
+  safeFileName,
+} from '@/lib/cover-editor/coverExports';
 import { downloadBlob, renderKindleCoverJpeg } from '@/lib/cover-editor/kindleExport';
 import { cn } from '@/lib/utils';
 
