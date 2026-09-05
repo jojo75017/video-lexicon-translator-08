@@ -162,6 +162,8 @@ const ReferralKitPage = lazy(() => import('./pages/ReferralKitPage'));
 const GoKdpPilotPage = lazy(() => import('./pages/GoKdpPilotPage'));
 const ContentStudioPage = lazy(() => import('./pages/v3public/ContentStudioPage'));
 const ContentStudioProjectPage = lazy(() => import('./pages/v3public/ContentStudioProjectPage'));
+const VersionLongueLibraryPage = lazy(() => import('./pages/v3/version-longue/VersionLongueLibraryPage'));
+const VersionLongueProjectPage = lazy(() => import('./pages/v3/version-longue/VersionLongueProjectPage'));
 
 
 const V3TemoignagePage = lazy(() => import('./pages/v3public/V3TemoignagePage'));
@@ -676,6 +678,8 @@ const App = () => {
               <Route path="commence-ici" element={<V3StartHerePage />} />
               <Route path="contentstudio" element={<V3LockedGate><TrialGate label="ContentStudio Engine"><ContentStudioPage /></TrialGate></V3LockedGate>} />
               <Route path="contentstudio/:id" element={<V3LockedGate><TrialGate label="ContentStudio Engine"><ContentStudioProjectPage /></TrialGate></V3LockedGate>} />
+              <Route path="version-longue" element={<V3LockedGate><VersionLongueLibraryPage /></V3LockedGate>} />
+              <Route path="version-longue/:id" element={<V3LockedGate><VersionLongueProjectPage /></V3LockedGate>} />
 
 
 

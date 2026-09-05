@@ -11,6 +11,8 @@ interface WriteRequest {
   tone: string;
   language_code: string;
   previous_context?: string;
+  /** 'long' allonge les chapitres (outil Ebook Version Longue). */
+  target_length?: 'standard' | 'long';
 }
 
 serve(async (req) => {
@@ -35,7 +37,9 @@ serve(async (req) => {
     'Rédige le chapitre complet en Markdown strict. ' +
     `Langue : ${body.language_code}. Ton : ${body.tone}. ` +
     'Inclus des sections claires, des exemples concrets et un encadré « À retenir » à la fin. ' +
-    'Le chapitre doit faire entre 1500 et 3000 mots. ' +
+    (body.target_length === 'long'
+      ? 'Le chapitre doit faire entre 2500 et 4000 mots. '
+      : 'Le chapitre doit faire entre 1500 et 3000 mots. ') +
     'Termine toujours par une phrase complète se terminant par un point.';
 
   const userPrompt =
