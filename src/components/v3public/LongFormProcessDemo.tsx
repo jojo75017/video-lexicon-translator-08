@@ -94,20 +94,21 @@ export default function LongFormProcessDemo() {
 
             </div>
             <div className="mt-6 border-l-2 border-primary pl-5">
-              <p className="text-xs font-bold uppercase tracking-widest text-primary">{active.eyebrow}</p>
+              <p className="text-sm font-bold uppercase tracking-widest text-primary">{active.eyebrow}</p>
               <h3 className="mt-2 text-2xl font-black text-foreground">{active.title}</h3>
               <p className="mt-2 max-w-lg text-sm leading-6 text-muted-foreground">{active.description}</p>
             </div>
             <div className="mt-7 space-y-3">
               {active.preview.map((line, index) => (
-                <div key={line} className="flex items-center gap-3 border border-border bg-card px-4 py-3 text-sm text-foreground">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/15 text-accent">
+                <div key={line} className="flex items-center gap-3 border border-border bg-background px-4 py-3 text-sm text-foreground">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-bold text-accent-foreground">
                     {index === active.preview.length - 1 ? <Check className="h-3.5 w-3.5" /> : index + 1}
                   </span>
                   {line}
                 </div>
               ))}
             </div>
+
             <div className="mt-7 flex items-center justify-between border-t border-border pt-4 text-xs text-muted-foreground">
               <span>Projet complet</span>
               <strong className="text-foreground">104 pages estimées</strong>
