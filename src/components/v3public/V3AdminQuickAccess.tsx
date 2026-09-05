@@ -64,7 +64,10 @@ export default function V3AdminQuickAccess({ isAdmin, isAdminChecking }: V3Admin
 
         {ACCESS_LINKS.map(({ label, path, icon: Icon }) => {
           const display = label === 'Admin' ? 'Dashboard admin' : label;
-          if (preview) {
+          // En aperçu abonné, seul le retour en V2 reste accessible
+          // (l'abonné a le choix entre V2 et V3). Les outils internes sont grisés.
+          const isSubscriberAllowed = path === '/ebook-planner';
+          if (preview && !isSubscriberAllowed) {
             return (
               <Button
                 key={path}
@@ -86,7 +89,7 @@ export default function V3AdminQuickAccess({ isAdmin, isAdminChecking }: V3Admin
               key={path}
               type="button"
               size="sm"
-              variant={path === '/ebook-planner' ? 'default' : 'outline'}
+              variant={isSubscriberAllowed ? 'default' : 'outline'}
               className="shrink-0"
               onClick={() => navigate(path)}
             >
