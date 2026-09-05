@@ -423,16 +423,33 @@ export default function CouvertureExpressPage() {
               <Badge variant={credits.remaining > 0 ? 'default' : 'secondary'}>
                 {credits.remaining} image(s) incluse(s) restante(s)
               </Badge>
-              {credits.remaining <= 0 && !key && (
+              {generating && (
+                <span className="flex items-center gap-2 text-[#232F3E]">
+                  <Loader2 className="h-4 w-4 animate-spin" /> Votre illustration est en cours de
+                  création (environ 30 secondes)…
+                </span>
+              )}
+              {!generating && illustrationPath && (
                 <span className="text-muted-foreground">
-                  Vous pouvez continuer sans image, ou ajouter votre clé personnelle depuis{' '}
+                  Illustration appliquée aux trois propositions.
+                </span>
+              )}
+              {!generating && !illustrationPath && credits.remaining > 0 && (
+                <span className="text-muted-foreground">
+                  Aucune illustration pour l’instant : cliquez sur « Créer mon illustration ».
+                </span>
+              )}
+              {!generating && !illustrationPath && credits.remaining <= 0 && !key && (
+                <span className="text-muted-foreground">
+                  Vous n’avez plus d’image incluse. Ajoutez votre clé personnelle depuis{' '}
                   <Link to="/v3/cover-pro" className="underline">
                     cette page
-                  </Link>
-                  .
+                  </Link>{' '}
+                  pour obtenir une illustration.
                 </span>
               )}
             </div>
+
 
             <div className="grid gap-4 sm:grid-cols-3">
               {proposals.map((p) => (
