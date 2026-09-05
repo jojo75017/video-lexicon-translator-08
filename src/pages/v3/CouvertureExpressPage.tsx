@@ -54,7 +54,12 @@ import {
   getExpressGenre,
   proposalOrder,
 } from '@/lib/cover-editor/expressCover';
-import { renderFrontCanvas, exportFrontPdf } from '@/lib/cover-editor/coverExports';
+import {
+  renderFrontCanvas,
+  exportFrontPdf,
+  exportFrontPng,
+  safeFileName,
+} from '@/lib/cover-editor/coverExports';
 import { downloadBlob, renderKindleCoverJpeg } from '@/lib/cover-editor/kindleExport';
 import { cn } from '@/lib/utils';
 
@@ -276,6 +281,40 @@ export default function CouvertureExpressPage() {
       setDownloaded(true);
       await persist(chosen).catch(() => undefined);
       toast.success(`Fichier téléchargé : ${result.fileName}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Téléchargement impossible.');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  /** Image PNG haute définition de la couverture complète (rendu local). */
+  const downloadPng = async () => {
+    if (!chosen) return;
+    setExporting(true);
+    try {
+      const composition = compositionFor(chosen, lightness);
+      const result = await exportFrontPng(composition, illustrationUrl, title.trim());
+      downloadBlob(result.blob, result.fileName);
+      toast.success(`Image téléchargée : ${result.fileName}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Téléchargement impossible.');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  /** Illustration seule, sans les textes. */
+  const downloadIllustration = async () => {
+    if (!illustrationUrl) return;
+    setExporting(true);
+    try {
+      const response = await fetch(illustrationUrl);
+      if (!response.ok) throw new Error('Illustration inaccessible.');
+      const blob = await response.blob();
+      const ext = blob.type.includes('jpeg') ? 'jpg' : 'png';
+      downloadBlob(blob, safeFileName(title.trim(), 'illustration', ext));
+      toast.success('Illustration téléchargée.');
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Téléchargement impossible.');
     } finally {
@@ -545,6 +584,24 @@ export default function CouvertureExpressPage() {
                   : downloaded
                     ? 'Couverture téléchargée'
                     : 'Télécharger ma couverture'}
+              </Button>
+
+              <Button
+                variant="outline"
+                className="w-full"
+                disabled={exporting}
+                onClick={() => void downloadPng()}
+              >
+                <Download className="mr-2 h-4 w-4" /> Télécharger l’image (PNG)
+              </Button>
+
+              <Button
+                variant="outline"
+                className="w-full"
+                disabled={exporting || !illustrationUrl}
+                onClick={() => void downloadIllustration()}
+              >
+                <Download className="mr-2 h-4 w-4" /> Télécharger l’illustration seule
               </Button>
 
               <Button variant="outline" className="w-full" onClick={() => void saveForLater()}>
