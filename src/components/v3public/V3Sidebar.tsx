@@ -228,7 +228,7 @@ export default function V3Sidebar() {
       </div>
 
       {/* Accès prioritaire : reste visible au-dessus des longues rubriques. */}
-      <div className="px-2 pt-2">
+      <div className="sticky top-[49px] z-10 bg-background px-2 py-2">
         <NavLink
           to="/v3/couverture-express"
           title="Créer ma couverture — assistant guidé en 3 étapes"

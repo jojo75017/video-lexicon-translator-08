@@ -52,7 +52,7 @@ export default function V3CoverStudioBanner() {
               height={1024}
               className="h-full w-full object-cover object-center"
             />
-            <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-transparent to-emerald-950/70" />
+            <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-transparent to-background/70" />
           </div>
 
           <div className="p-5 sm:p-6">
