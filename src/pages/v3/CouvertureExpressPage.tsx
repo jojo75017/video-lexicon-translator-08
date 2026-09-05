@@ -478,14 +478,19 @@ export default function CouvertureExpressPage() {
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-2">
-              <Button variant="outline" disabled={generating} onClick={() => void generateIllustration()}>
+              <Button
+                disabled={generating}
+                onClick={() => void generateIllustration()}
+                className="bg-[#f47920] text-white hover:bg-[#d96812]"
+              >
                 {generating ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
                   <Sparkles className="mr-2 h-4 w-4" />
                 )}
-                Changer l’illustration
+                {illustrationPath ? 'Changer l’illustration' : 'Créer mon illustration'}
               </Button>
+
               <Button variant="outline" onClick={() => setVariantSeed((v) => v + 1)}>
                 <RefreshCw className="mr-2 h-4 w-4" /> Autres propositions
               </Button>
