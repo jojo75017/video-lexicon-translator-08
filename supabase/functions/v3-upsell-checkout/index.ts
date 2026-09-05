@@ -39,6 +39,8 @@ const PACKS: Record<string, { label: string; amount: number }> = {
   bd_comic_pro: { label: "Studio BD & Jeunesse Pro — Illustrations étendues", amount: 4700 },
   // Cover Studio KDP Pro — upsell indépendant (3 générations IA incluses une seule fois).
   cover_studio_pro: { label: "Cover Studio KDP Pro — Accès à vie", amount: 6700 },
+  // Ebook Version Longue — accès anticipé V4, paiement unique.
+  ebook_version_longue: { label: "Ebook Version Longue V4 — Accès à vie", amount: 4700 },
 };
 
 Deno.serve(async (req) => {

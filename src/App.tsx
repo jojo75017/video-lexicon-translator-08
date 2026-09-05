@@ -96,6 +96,7 @@ const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 const V3HubPage = lazy(() => import('./pages/V3HubPage'));
 const V3PublicLayout = lazy(() => import('./components/v3public/V3PublicLayout'));
 const V3HomePage = lazy(() => import('./pages/v3public/V3HomePage'));
+const EbookLongFormOfferPage = lazy(() => import('./pages/v3public/EbookLongFormOfferPage'));
 const V3AuthPage = lazy(() => import('./pages/v3public/V3AuthPage'));
 const V3CreatePage = lazy(() => import('./pages/v3public/V3CreatePage'));
 const V3LaunchBookPage = lazy(() => import('./pages/v3public/V3LaunchBookPage'));
@@ -664,6 +665,7 @@ const App = () => {
               <Route path="realite-kdp" element={<V3RealiteKdpPage />} />
               <Route path="contact" element={<ContactSupportPage subscriberEmail={subscriberEmail || ''} />} />
               <Route path="offre-couverture-v4" element={<V3CoverOfferPage />} />
+              <Route path="offre-version-longue" element={<EbookLongFormOfferPage />} />
               <Route path="fonctionnalites" element={<V3FeaturesPage />} />
               <Route path="fonctionnalites/cles" element={<V3ApiKeysPage />} />
               <Route path="fonctionnalites/coordonnees" element={<V3CoordonneesPage />} />
