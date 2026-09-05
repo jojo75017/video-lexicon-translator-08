@@ -93,7 +93,11 @@ export default function V3LaunchBanner({ compact = false }: { compact?: boolean 
             <Link to="/commander" className="px-2 text-[10.5px] font-semibold text-primary-foreground/80 underline underline-offset-4">
               Accès à vie 47 €
             </Link>
-            {video && <a href={video} target="_blank" rel="noopener noreferrer" className="sr-only">Voir la vidéo de lancement</a>}
+            {video && (
+              <a href={video} target="_blank" rel="noopener noreferrer" className="px-2 text-[10.5px] font-semibold text-primary-foreground/80 underline underline-offset-4">
+                Voir la vidéo
+              </a>
+            )}
           </div>
         </div>
       </div>
