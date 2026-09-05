@@ -225,6 +225,18 @@ export default function CouvertureExpressPage() {
     }
   };
 
+  /* Première illustration lancée automatiquement dès l'arrivée à l'étape 2. */
+  const autoTried = useRef(false);
+  useEffect(() => {
+    if (step !== 2 || autoTried.current) return;
+    if (!projectId || illustrationPath || generating) return;
+    if (credits.remaining <= 0 && !key) return;
+    autoTried.current = true;
+    void generateIllustration();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, projectId, illustrationPath, generating, credits.remaining, key]);
+
+
   /* ---- enregistrement ---------------------------------------------------- */
   const persist = useCallback(
     async (templateId: ReferenceTemplateId) => {
