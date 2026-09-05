@@ -227,7 +227,12 @@ export default function MesCouverturesPage() {
           <Button asChild variant="outline" className="gap-2">
             <Link to="/v3/paiements">Mes paiements</Link>
           </Button>
-          <Button onClick={() => setCreateOpen(true)} className="gap-2">
+          <Button asChild className="gap-2 bg-[#f47920] text-white hover:bg-[#d96812]">
+            <Link to="/v3/couverture-express">
+              <Plus className="h-4 w-4" /> Créer avec l’assistant
+            </Link>
+          </Button>
+          <Button onClick={() => setCreateOpen(true)} variant="outline" className="gap-2">
             <Plus className="h-4 w-4" /> Créer une couverture
           </Button>
         </div>
