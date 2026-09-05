@@ -25,3 +25,4 @@
 - [x] Génération d’illustration branchée DANS le nouvel éditeur (/v3/mes-couvertures/:id) : panneau 5 champs (genre, ambiance, palette, à éviter, sujet), appel `cover-pro-generate` (OpenAI gpt-image-2 + crédits cover_pro_credits + clé chiffrée), image privée affichée immédiatement, plus aucun renvoi vers /v3/cover-studio-pro depuis l’éditeur
 - [x] Navigation Studio couverture V4 clarifiée (05/09/2026) : bouton spécial permanent dans la barre latérale, bannière d’accueil compacte avec trois choix expliqués, accès « Mes couvertures » renommé et actions de création clarifiées
 - [x] Page d’offre Studio couverture V4 (05/09/2026) : route dédiée `/v3/offre-couverture-v4`, description, objectifs, offre fixe 67 €, demande de devis, FAQ et accès distincts au paiement et à l’assistant
+- [x] Accueil V3 rééquilibré (05/09/2026) : moins d’aplats verts, lancement compact encre/or, introduction papier et vidéo encadrée façon édition — module V4 inchangé

@@ -89,7 +89,7 @@ export default function V3WhatsNewPanel() {
       >
         <div
           className="px-6 md:px-10 py-6"
-          style={{ background: 'linear-gradient(135deg,#064e3b 0%,#0a5a45 100%)' }}
+          style={{ background: 'var(--v3-editorial-ink)' }}
         >
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4" style={{ color: 'var(--v3-gold)' }} />

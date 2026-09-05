@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Rocket, PlayCircle, Crown } from 'lucide-react';
+import { Rocket, Crown } from 'lucide-react';
 import useLaunchSettings from '@/hooks/useLaunchSettings';
 
 /** Fin de l'offre 47 € à vie : 30 septembre 2026, 23h59 heure de Paris. */
@@ -45,86 +45,60 @@ export default function V3LaunchBanner({ compact = false }: { compact?: boolean 
     <section
       className="w-full"
       style={{
-        background: 'linear-gradient(120deg,#064e3b 0%,#075e4a 55%,#0b3b2f 100%)',
-        borderBottom: '2px solid #C9A84C',
+        background: 'var(--v3-editorial-ink)',
+        borderBottom: '1px solid var(--v3-gold)',
       }}
       aria-label="Lancement EbookStudio V3"
     >
-      <div className={`mx-auto max-w-6xl px-5 ${compact ? 'py-4' : 'py-6'}`}>
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="min-w-0 flex-1 sm:min-w-[260px]">
+      <div className={`mx-auto max-w-7xl px-5 md:px-8 ${compact ? 'py-2' : 'py-2.5'}`}>
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
             <span
-              className="inline-flex items-center gap-1.5 rounded px-2 py-1 text-[10px] font-bold uppercase tracking-[0.18em]"
-              style={{ background: '#C9A84C', color: '#0b2b22' }}
+              className="inline-flex items-center gap-1.5 border-r pr-3 text-[9px] font-bold uppercase tracking-[0.18em]"
+              style={{ color: 'var(--v3-gold)', borderColor: 'color-mix(in srgb, var(--v3-gold) 45%, transparent)' }}
             >
               <Crown className="h-3 w-3" /> Lancement V3
             </span>
-            <h2 className="mt-2 text-[19px] font-bold leading-snug text-white sm:text-[22px]">
-              47 € à vie jusqu’au 30 septembre —{' '}
-              <span style={{ color: '#F1DFA6' }}>la V3 ouvre le 1er octobre, 1<sup>er</sup> mois offert</span>
+            <h2 className="text-[13px] font-semibold leading-snug text-primary-foreground sm:text-[14px]">
+              <strong style={{ color: 'var(--v3-gold)' }}>47 € à vie jusqu’au 30 septembre</strong>
+              <span className="hidden sm:inline"> — ouverture V3 le 1<sup>er</sup> octobre, 1<sup>er</sup> mois offert</span>
             </h2>
-            {!compact && (
-              <p className="mt-1 text-[13px] leading-relaxed text-white/80">
-                Après le 30 septembre, plus de paiement unique : uniquement l’abonnement. La V3 ouvre le
-                1<sup>er</sup> octobre.
-              </p>
-            )}
           </div>
 
-          <div className="flex items-center gap-2" aria-label="Temps restant">
+          <div className="flex flex-wrap items-center gap-1.5" aria-label="Temps restant">
             {t.over ? (
-              <span className="rounded bg-white/10 px-3 py-2 text-[13px] font-semibold text-white">
+              <span className="rounded px-2 py-1 text-[11px] font-semibold text-primary-foreground/90" style={{ background: 'color-mix(in srgb, var(--v3-gold) 12%, transparent)' }}>
                 Offre 47 € terminée — rendez-vous le 1<sup>er</sup> octobre
               </span>
             ) : (
               cells.map((c) => (
                 <div
                   key={c.label}
-                  className="min-w-[54px] rounded-lg px-2 py-1.5 text-center"
-                  style={{ background: 'rgba(255,255,255,0.10)', border: '1px solid rgba(201,168,76,0.45)' }}
+                  className="min-w-[38px] rounded px-1.5 py-1 text-center"
+                  style={{ background: 'color-mix(in srgb, var(--v3-gold) 8%, transparent)', border: '1px solid color-mix(in srgb, var(--v3-gold) 35%, transparent)' }}
                 >
-                  <div className="text-[19px] font-bold leading-none" style={{ color: '#F1DFA6' }}>
+                  <div className="text-[13px] font-bold leading-none" style={{ color: 'var(--v3-gold)' }}>
                     {String(c.value).padStart(2, '0')}
                   </div>
-                  <div className="mt-1 text-[9px] uppercase tracking-[0.14em] text-white/70">{c.label}</div>
+                  <div className="mt-0.5 text-[7px] uppercase tracking-[0.12em] text-primary-foreground/60">{c.label}</div>
                 </div>
               ))
             )}
+            <Link to="/essai" className="ml-1 inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-[11px] font-bold" style={{ background: 'var(--v3-gold)', color: 'var(--v3-editorial-ink)' }}>
+              <Rocket className="h-3.5 w-3.5" /> Essayer gratuitement
+            </Link>
+            <Link to="/v3/attente" className="px-2 text-[10.5px] font-semibold text-primary-foreground/80 underline underline-offset-4">
+              Réserver ma place
+            </Link>
+            <Link to="/commander" className="px-2 text-[10.5px] font-semibold text-primary-foreground/80 underline underline-offset-4">
+              Accès à vie 47 €
+            </Link>
+            {video && (
+              <a href={video} target="_blank" rel="noopener noreferrer" className="px-2 text-[10.5px] font-semibold text-primary-foreground/80 underline underline-offset-4">
+                Voir la vidéo
+              </a>
+            )}
           </div>
-        </div>
-
-        <div className="mt-4 flex flex-wrap items-center gap-2.5">
-          <Link
-            to="/essai"
-            className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-[14px] font-bold"
-            style={{ background: '#C9A84C', color: '#0b2b22' }}
-          >
-            <Rocket className="h-4 w-4" /> Essayer le chapitre 1 gratuit
-          </Link>
-          <Link
-            to="/v3/attente"
-            className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-[14px] font-semibold text-white"
-            style={{ border: '1px solid rgba(255,255,255,0.45)' }}
-          >
-            <Crown className="h-4 w-4" /> Réserver ma place (1<sup>er</sup> mois offert)
-          </Link>
-          <Link
-            to="/commander"
-            className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-[14px] font-semibold text-white/90 underline decoration-[#C9A84C] underline-offset-4"
-          >
-            Accès à vie 47 € avant le 30 septembre
-          </Link>
-          {video && (
-            <a
-              href={video}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-[14px] font-semibold text-white"
-              style={{ border: '1px solid rgba(201,168,76,0.6)' }}
-            >
-              <PlayCircle className="h-4 w-4" /> Voir la vidéo (2 min)
-            </a>
-          )}
         </div>
       </div>
     </section>

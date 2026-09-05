@@ -146,7 +146,7 @@ export default function V3HomePage() {
       <section
         className="relative"
         style={{
-          background: 'linear-gradient(90deg, #064e3b 0%, #0a5a45 100%)',
+          background: 'var(--v3-editorial-ink-soft)',
           borderBottom: '1px solid rgba(201,168,76,0.4)',
         }}
       >
@@ -314,9 +314,9 @@ export default function V3HomePage() {
           rel="noopener noreferrer"
           className="group relative block overflow-hidden rounded-3xl transition-all"
           style={{
-            background: 'linear-gradient(135deg, #064e3b 0%, #053e2f 60%, #0a5a45 100%)',
+            background: 'var(--v3-editorial-ink)',
             border: '1px solid rgba(201,168,76,0.45)',
-            boxShadow: '0 30px 60px -30px rgba(6,78,59,0.5)',
+            boxShadow: '0 30px 60px -30px color-mix(in srgb, var(--v3-editorial-ink) 55%, transparent)',
           }}
         >
           <div className="absolute inset-x-0 top-0 h-[3px]" style={{ background: 'linear-gradient(90deg, transparent, var(--v3-gold), transparent)' }} />

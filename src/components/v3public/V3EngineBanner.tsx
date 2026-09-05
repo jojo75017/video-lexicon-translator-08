@@ -107,7 +107,7 @@ export function V3EngineStrip({ className = '' }: { className?: string }) {
       href="#moteurs-ia-v3"
       className={`block w-full group ${className}`}
       style={{
-        background: `linear-gradient(90deg, ${EMERALD} 0%, #053e2f 50%, ${EMERALD} 100%)`,
+        background: 'var(--v3-editorial-ink)',
         borderTop: `1px solid ${GOLD}55`,
         borderBottom: `1px solid ${GOLD}55`,
       }}
