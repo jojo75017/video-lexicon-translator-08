@@ -196,11 +196,15 @@ export const LINE_DURATIONS: number[][] = SCENES.map((scene, i) => {
 /**
  * Durée de chaque séquence : la voix + le silence de respiration, plus la
  * frame de transition (les transitions se chevauchent dans TransitionSeries).
+ * La première séquence intègre en plus le silence d'amorce de la piste voix,
+ * sinon toutes les séquences suivantes seraient en avance de 1,5 s sur la voix.
  */
 export const SCENE_DURATIONS = VOICE_DURATIONS.map((d, i) =>
   i < VOICE_DURATIONS.length - 1
-    ? Math.round((d + VOICE_GAP_SECONDS) * FPS) + TRANSITION_FRAMES
+    ? Math.round((d + VOICE_GAP_SECONDS + (i === 0 ? VOICE_LEAD_SECONDS : 0)) * FPS) +
+      TRANSITION_FRAMES
     : Math.round((d + VOICE_TAIL_SECONDS) * FPS),
 );
+
 
 export const TOTAL_DURATION = SCENE_DURATIONS.reduce((a, b) => a + b, 0);
