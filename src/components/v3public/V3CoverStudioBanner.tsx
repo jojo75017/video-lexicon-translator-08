@@ -34,13 +34,16 @@ const ACTIONS = [
  */
 export default function V3CoverStudioBanner() {
   return (
-    <section className="mx-auto max-w-7xl px-5 pt-5 md:px-8">
+    <section
+      className="w-full overflow-hidden"
+      style={{
+        background: 'var(--v3-emerald)',
+        borderTop: '1px solid var(--v3-gold)',
+        borderBottom: '1px solid var(--v3-gold)',
+      }}
+    >
       <div
-        className="relative overflow-hidden rounded-lg shadow-lg"
-        style={{
-          background: 'var(--v3-emerald)',
-          border: '1px solid var(--v3-gold)',
-        }}
+        className="relative mx-auto w-full max-w-[1480px] overflow-hidden"
       >
         <div className="grid items-stretch lg:grid-cols-[220px_minmax(0,1fr)]">
           <div className="relative hidden min-h-[260px] overflow-hidden lg:block">
