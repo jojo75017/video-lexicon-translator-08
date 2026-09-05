@@ -2,7 +2,7 @@ import { Play, Subtitles } from 'lucide-react';
 import videoAsset from '@/assets/v3-presentation.mp4.asset.json';
 
 /**
- * Vidéo de présentation V3 (6 min 47, sous-titrée en français, sans voix).
+ * Vidéo de présentation V3 (6 min 07, voix française, musique douce, sous-titrée).
  * Mise en avant sur la page d'accueil V3, dans un écrin « maison d'édition » :
  * fond éditorial profond (encre / émeraude / filets or), largeur élargie sans
  * occuper toute la largeur de la page.
@@ -48,14 +48,14 @@ export default function V3PresentationVideo() {
                 <Play className="h-3.5 w-3.5" /> Collection EbookStudio · Présentation V3
               </p>
               <h2 className="mt-2 text-2xl md:text-3xl font-bold v3-serif" style={{ color: 'var(--v3-editorial-ink)' }}>
-                Découvrez EbookStudio V3 en 7 minutes
+                Découvrez EbookStudio V3 en 6 minutes
               </h2>
               <p className="mt-1 max-w-2xl text-sm leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
                 Le parcours complet : du sommaire construit avec l'IA au fichier prêt pour Amazon.
               </p>
             </div>
             <span className="inline-flex items-center gap-1.5 border-l pl-4 text-[11px] font-semibold" style={{ color: 'var(--v3-editorial-ink-soft)', borderColor: 'var(--v3-gold)' }}>
-              <Subtitles className="h-3 w-3" /> 7 minutes · Sous-titrée en français
+              <Subtitles className="h-3 w-3" /> 6 minutes · Voix française et sous-titres
             </span>
           </div>
 
