@@ -16,6 +16,9 @@
   --v3-cream: #f5f3ee;
   --v3-ink: #0a1f18;
   --v3-ink-2: #1a2e26;
+  --v3-editorial-ink: #232f3e;
+  --v3-editorial-ink-soft: #344456;
+  --v3-ivory: #f8f5ed;
   --v3-muted: #5b6b64;
   --v3-line: rgba(6, 78, 59, 0.10);
   --v3-border: rgba(6, 78, 59, 0.10);
@@ -222,6 +225,9 @@
   --v3-surface: #12201c;
   --v3-ink: #f2f6f4;
   --v3-ink-2: #dbe6e1;
+  --v3-editorial-ink: #18222d;
+  --v3-editorial-ink-soft: #263443;
+  --v3-ivory: #101a17;
   --v3-muted: #9db3ab;
   --v3-line: rgba(217, 187, 99, 0.18);
   --v3-border: rgba(217, 187, 99, 0.18);
