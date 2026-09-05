@@ -223,18 +223,24 @@ export default function MesCouverturesPage() {
             Vos projets de couverture privés : Kindle, broché et relié. Vous seul y avez accès.
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-start gap-3">
           <Button asChild variant="outline" className="gap-2">
             <Link to="/v3/paiements">Mes paiements</Link>
           </Button>
-          <Button asChild className="gap-2 bg-[#f47920] text-white hover:bg-[#d96812]">
-            <Link to="/v3/couverture-express">
-              <Plus className="h-4 w-4" /> Créer avec l’assistant
-            </Link>
-          </Button>
-          <Button onClick={() => setCreateOpen(true)} variant="outline" className="gap-2">
-            <Plus className="h-4 w-4" /> Créer une couverture
-          </Button>
+          <div className="max-w-[230px]">
+            <Button asChild className="w-full gap-2 bg-orange-500 text-primary-foreground hover:bg-orange-600">
+              <Link to="/v3/couverture-express">
+                <Plus className="h-4 w-4" /> Créer ma couverture
+              </Link>
+            </Button>
+            <p className="mt-1 text-xs text-muted-foreground">Assistant simple, guidé en 3 étapes.</p>
+          </div>
+          <div className="max-w-[230px]">
+            <Button onClick={() => setCreateOpen(true)} variant="outline" className="w-full gap-2">
+              <Plus className="h-4 w-4" /> Créer un projet manuellement
+            </Button>
+            <p className="mt-1 text-xs text-muted-foreground">Pour régler vous-même chaque détail.</p>
+          </div>
         </div>
       </header>
 
