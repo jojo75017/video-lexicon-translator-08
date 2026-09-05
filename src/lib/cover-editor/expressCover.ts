@@ -152,7 +152,11 @@ export function buildExpressComposition(input: ExpressInput): FrontComposition {
     }
     composed.shapes = (composed.shapes ?? []).map((s) => ({
       ...s,
-      fill: s.fill && /^#[0-9a-fA-F]{6}$/.test(s.fill) ? shiftColor(s.fill, step) : s.fill,
+      color: /^#[0-9a-fA-F]{6}$/.test(s.color) ? shiftColor(s.color, step) : s.color,
+      gradientTo:
+        s.gradientTo && /^#[0-9a-fA-F]{6}$/.test(s.gradientTo)
+          ? shiftColor(s.gradientTo, step)
+          : s.gradientTo,
     }));
   }
 
