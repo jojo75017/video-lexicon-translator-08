@@ -1,10 +1,18 @@
 /**
- * Script de la vidéo Ebookstudio V3 (≈7 minutes).
+ * Script de la vidéo Ebookstudio V3 (≈6 min 10 avec voix off).
  * Source texte : docs/video-v3-script.md
  *
- * Chaque ligne devient un sous-titre. La durée d'un sous-titre est calculée
- * à partir du nombre de mots (≈145 mots/minute de lecture calme).
+ * Chaque ligne devient un sous-titre. Les durées sont calées sur la voix off
+ * réellement générée (voir voiceTiming.ts), pas sur une vitesse de lecture
+ * théorique.
  */
+import {
+  VOICE_DURATIONS,
+  VOICE_GAP_SECONDS,
+  VOICE_LEAD_SECONDS,
+  VOICE_TAIL_SECONDS,
+} from "./voiceTiming";
+import { TRANSITION_FRAMES } from "./theme";
 
 export interface Scene {
   chapter: string;
@@ -167,8 +175,32 @@ export const SCENES: Scene[] = [
   },
 ];
 
-export const SCENE_DURATIONS = SCENES.map((scene) =>
-  scene.lines.reduce((total, line) => total + lineDuration(line), 90),
+/** Frame à laquelle le premier sous-titre d'une séquence apparaît (= début de la voix). */
+export const SUBTITLE_START = Math.round(VOICE_LEAD_SECONDS * FPS);
+
+/**
+ * Durée des sous-titres d'une séquence, répartie au prorata du nombre de mots
+ * sur la durée réellement parlée par la voix off.
+ */
+export const LINE_DURATIONS: number[][] = SCENES.map((scene, i) => {
+  const total = Math.round(VOICE_DURATIONS[i] * FPS);
+  const weights = scene.lines.map((l) => l.trim().split(/\s+/).length);
+  const sum = weights.reduce((a, b) => a + b, 0);
+  const frames = weights.map((w) => Math.max(60, Math.round((w / sum) * total)));
+  // Ajuste la dernière ligne pour retomber exactement sur la durée parlée.
+  const drift = total - frames.reduce((a, b) => a + b, 0);
+  frames[frames.length - 1] = Math.max(60, frames[frames.length - 1] + drift);
+  return frames;
+});
+
+/**
+ * Durée de chaque séquence : la voix + le silence de respiration, plus la
+ * frame de transition (les transitions se chevauchent dans TransitionSeries).
+ */
+export const SCENE_DURATIONS = VOICE_DURATIONS.map((d, i) =>
+  i < VOICE_DURATIONS.length - 1
+    ? Math.round((d + VOICE_GAP_SECONDS) * FPS) + TRANSITION_FRAMES
+    : Math.round((d + VOICE_TAIL_SECONDS) * FPS),
 );
 
 export const TOTAL_DURATION = SCENE_DURATIONS.reduce((a, b) => a + b, 0);

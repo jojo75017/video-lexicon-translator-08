@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig } from "remotion";
 import { THEME } from "../theme";
-import type { Scene } from "../script";
+import { LINE_DURATIONS, SUBTITLE_START, type Scene } from "../script";
 import Subtitles from "../components/Subtitles";
 import Motif from "../components/Motif";
 import ScreenShot from "../components/ScreenShot";
@@ -116,7 +116,12 @@ export const SceneView: React.FC<Props> = ({ scene, index, total, fontFamily, di
         <Motif motif={scene.motif} fontFamily={fontFamily} displayFont={displayFont} />
       )}
 
-      <Subtitles lines={scene.lines} startAt={30} fontFamily={fontFamily} />
+      <Subtitles
+        lines={scene.lines}
+        lineFrames={LINE_DURATIONS[index]}
+        startAt={SUBTITLE_START}
+        fontFamily={fontFamily}
+      />
 
       {/* Progression globale */}
       <div style={{ position: "absolute", left: 150, right: 120, bottom: 54 }}>

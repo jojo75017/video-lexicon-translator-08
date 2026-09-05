@@ -1,17 +1,19 @@
 import React from "react";
 import { useCurrentFrame, interpolate, spring, useVideoConfig } from "remotion";
 import { THEME } from "../theme";
-import { lineDuration } from "../script";
+
 
 interface Props {
   lines: string[];
+  /** Durée en frames de chaque sous-titre (calée sur la voix off). */
+  lineFrames: number[];
   /** Frame à laquelle le premier sous-titre apparaît. */
   startAt: number;
   fontFamily: string;
 }
 
 /** Bande de sous-titres incrustés, une réplique à la fois. */
-export const Subtitles: React.FC<Props> = ({ lines, startAt, fontFamily }) => {
+export const Subtitles: React.FC<Props> = ({ lines, lineFrames, startAt, fontFamily }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
@@ -21,7 +23,7 @@ export const Subtitles: React.FC<Props> = ({ lines, startAt, fontFamily }) => {
   let activeDuration = 0;
 
   for (let i = 0; i < lines.length; i += 1) {
-    const dur = lineDuration(lines[i]);
+    const dur = lineFrames[i] ?? 90;
     if (frame >= cursor && frame < cursor + dur) {
       active = i;
       localFrame = frame - cursor;
