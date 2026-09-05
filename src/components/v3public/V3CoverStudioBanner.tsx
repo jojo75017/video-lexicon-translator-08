@@ -19,9 +19,9 @@ const ACTIONS = [
     primary: false,
   },
   {
-    to: '/v3/cover-pro?checkout=1',
+    to: '/v3/offre-couverture-v4',
     title: 'Découvrir l’offre 67 €',
-    description: 'Consultez ce qui est inclus avant votre achat unique.',
+    description: 'Description, objectifs, devis et paiement sur une page dédiée.',
     icon: ShoppingBag,
     primary: false,
   },
