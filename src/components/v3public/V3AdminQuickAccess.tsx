@@ -62,19 +62,39 @@ export default function V3AdminQuickAccess({ isAdmin, isAdminChecking }: V3Admin
           {preview ? 'Aperçu abonné (admin)' : 'Mode admin — test complet V3'}
         </span>
 
-        {!preview && ACCESS_LINKS.map(({ label, path, icon: Icon }) => (
-          <Button
-            key={path}
-            type="button"
-            size="sm"
-            variant={path === '/ebook-planner' ? 'default' : 'outline'}
-            className="shrink-0"
-            onClick={() => navigate(path)}
-          >
-            <Icon className="mr-1.5 h-4 w-4" />
-            {label === 'Admin' ? 'Dashboard admin' : label}
-          </Button>
-        ))}
+        {ACCESS_LINKS.map(({ label, path, icon: Icon }) => {
+          const display = label === 'Admin' ? 'Dashboard admin' : label;
+          if (preview) {
+            return (
+              <Button
+                key={path}
+                type="button"
+                size="sm"
+                variant="outline"
+                disabled
+                title="Réservé à l’administrateur"
+                className="shrink-0 cursor-not-allowed opacity-40 grayscale"
+                onClick={(e) => e.preventDefault()}
+              >
+                <Icon className="mr-1.5 h-4 w-4" />
+                {display}
+              </Button>
+            );
+          }
+          return (
+            <Button
+              key={path}
+              type="button"
+              size="sm"
+              variant={path === '/ebook-planner' ? 'default' : 'outline'}
+              className="shrink-0"
+              onClick={() => navigate(path)}
+            >
+              <Icon className="mr-1.5 h-4 w-4" />
+              {display}
+            </Button>
+          );
+        })}
 
         <Button type="button" size="sm" variant="ghost" className="shrink-0" onClick={togglePreview}>
           {preview ? <EyeOff className="mr-1.5 h-4 w-4" /> : <Eye className="mr-1.5 h-4 w-4" />}
