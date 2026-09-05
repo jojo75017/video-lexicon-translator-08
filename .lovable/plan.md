@@ -19,21 +19,27 @@ Approche 100 % locale, post-traitement sur le fichier existant — aucun re-rend
 ## La musique proposée (quoi mettre)
 Direction : **ambiance éditoriale « maison d'édition », neutre, rassurante**. Pas d'influence émotionnelle forte, pas de manipulation.
 
-Cahier des charges du morceau :
-- **Instrumental uniquement** — aucun instrument à vent solo expressif, aucune voix, aucun effet dramatique.
-- **Piano doux + nappe ambiante légère** (cordes très atténuées), éventuellement un peu de vibraphone/celesta discret.
-- **Tempo lent** (~60-70 BPM), sans percussions marquées (aucune batterie/caisse claire).
-- **Ton chaud mais plat** — montée nulle, pas de crescendo, pour ne pas suggérer « achetez ».
-- **Volume mixé bas** : on doit pouvoir lire les sous-titres sans être entraîné par la musique.
+Cahier des charges du morceau (règles strictes) :
+- **Instrumental uniquement** — aucune voix, aucun effet dramatique.
+- **Piano doux seul + nappe ambiante très légère** ; rien d'autre.
+- **Aucune percussion, aucun rythme, aucune pulsation** : ni batterie, ni caisse, ni shaker, ni basse rythmique, ni arpège rapide. Notes tenues et espacées.
+- **Très lent** (~55-65 BPM ressenti), aucun crescendo, aucune montée.
+- **Ton chaud et plat**, volume mixé bas : la musique reste sous les sous-titres.
 - Bouclable sans couture audible.
 
-Prompt de génération proposé (ElevenLabs Music) :
-> « Calm minimalist instrumental, soft solo piano with very subtle ambient pad, slow tempo around 65 BPM, warm and understated, no percussion, no drums, no vocals, documentary editorial mood, neutral and unobtrusive, seamless and loopable, gentle, no crescendo. »
+Prompt de génération (version douce, sans percussions) :
+> « Extremely gentle ambient piano, sparse sustained notes, soft felt piano with a faint warm string pad underneath, very slow and still, absolutely no percussion, no drums, no beat, no rhythm, no bass line, no arpeggios, no vocals, no build-up, no crescendo, calm library atmosphere, seamless and loopable, quiet background music. »
+
+## Contrôle qualité de la musique avant mixage
+Le morceau généré est vérifié avant d'être posé sur la vidéo :
+- Écoute et analyse du fichier (détection d'attaques rythmiques / transitoires régulières).
+- Si une percussion ou une pulsation est détectée, le morceau est **rejeté et régénéré** avec un prompt encore plus restrictif ; au bout de 2 échecs, je vous propose la solution piste fournie.
+- Aucun mixage n'est fait sur un morceau rythmé.
 
 ## Choix à valider
-**Recommandé : génération IA (ElevenLabs Music)** — clé déjà en place, rapide, rights-cleared pour le projet, conforme au cahier des charges ci-dessus.
+**Recommandé : génération IA (ElevenLabs Music)** avec le prompt ci-dessus + contrôle qualité.
 
-Alternative : vous fournissez une piste libre de droits (piano/cordes, calme) et je la mixe directement sans génération.
+Alternative : vous fournissez une piste libre de droits (piano/cordes, calme, sans percussions) et je la mixe directement sans génération.
 
 ## Livrables et vérification
 - Nouveau MP4 : `/mnt/documents/ebookstudio-v3-presentation-musique.mp4` (6 min 47, vidéo identique + 1 piste audio).
