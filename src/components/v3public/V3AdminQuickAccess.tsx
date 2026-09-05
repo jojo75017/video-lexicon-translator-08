@@ -55,14 +55,14 @@ export default function V3AdminQuickAccess({ isAdmin, isAdminChecking }: V3Admin
     >
       <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 overflow-x-auto">
         <span
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11.5px] font-semibold"
-          style={{ borderColor: 'rgba(212,175,55,0.5)', background: 'rgba(15,46,31,0.92)', color: '#D4AF37' }}
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1 text-[12px] font-bold"
+          style={{ borderColor: '#D4AF37', background: '#0B2A1C', color: '#FFF3D0' }}
         >
-          <ShieldCheck className="h-3.5 w-3.5" />
+          <ShieldCheck className="h-3.5 w-3.5" style={{ color: '#D4AF37' }} />
           {preview ? 'Aperçu abonné (admin)' : 'Mode admin — test complet V3'}
         </span>
 
-        {ACCESS_LINKS.map(({ label, path, icon: Icon }) => (
+        {!preview && ACCESS_LINKS.map(({ label, path, icon: Icon }) => (
           <Button
             key={path}
             type="button"
