@@ -39,10 +39,11 @@ export default function LongFormProcessDemo() {
   const active = STEPS[activeStep];
 
   return (
-    <section aria-labelledby="long-form-demo-title" className="border-y border-border bg-card/60 py-16 sm:py-20">
+    <section aria-labelledby="long-form-demo-title" className="border-y border-border bg-secondary py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-xs font-bold uppercase tracking-widest text-accent">Le parcours Version Longue</p>
+          <p className="text-sm font-bold uppercase tracking-widest text-accent">Le parcours Version Longue</p>
+
           <h2 id="long-form-demo-title" className="mt-3 text-3xl font-black text-foreground sm:text-4xl">
             D'une idée à un livre complet et structuré
           </h2>
