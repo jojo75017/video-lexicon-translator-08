@@ -1,65 +1,112 @@
-# Page de vente Ebook Comic Agent — version sombre haute conversion
+# Page d’upsell — Ebook Version Longue V4
 
-Objectif : refondre la page d'offre unique 47 € du Studio BD en page de vente sombre, très lisible, orientée conversion, avec l'annonce V4 incluse.
+Objectif : créer une page de vente sombre à haute conversion pour l’offre **Ebook Version Longue**, distincte du Studio BD et de la couverture V4.
 
-## Emplacement retenu
+## Position dans le parcours
 
-La page garde son adresse actuelle `/bd-upsell` : c'est déjà l'étape « offre unique » du tunnel BD (17 € puis 47 €), elle est déjà reliée au paiement Stripe et PayPal qui fonctionne, et les emails et liens existants continuent donc de marcher. Aucune nouvelle route, aucun doublon.
+Nouvelle adresse dédiée : **`/v3/offre-version-longue`**.
 
-Le bouton de refus mène à `/bd-studio` (l'espace de travail BD), qui est la destination logique juste après l'achat de base.
-
-## Contenu de la page, dans l'ordre
+Cette adresse évite tout mélange avec `/bd-upsell`, `/v3/cover-pro` et `/v3/offre-couverture-v4`. Le bouton de refus ramène vers **`/v3`**, l’espace membre général.
 
 ```text
-┌──────────────────────────────────────────────┐
-│ BANDEAU  OFFRE SPÉCIALE UNIQUE — NE FERMEZ   │
-│          PAS CETTE PAGE                      │
-├──────────────────────────────────────────────┤
-│ BADGE   PROCHAINEMENT V4 — MISE À JOUR       │
-│         INCLUSE GRATUITEMENT                 │
-│ TITRE   Débloquez l'Agent IA de création de  │
-│         BD & livres illustrés automatisé     │
-├──────────────────────────────────────────────┤
-│ MOTEUR DE COHÉRENCE                          │
-│  [fiche perso] [case 1] [case 2] [couv.]     │
-│  « Fini les visages qui changent… »          │
-├──────────────────────────────────────────────┤
-│ 5 CARTES MODULES (fond sombre, accent néon)  │
-├──────────────────────────────────────────────┤
-│ OFFRE  197 € barré → 47 €                    │
-│  ▸ OUI ! AJOUTER À MA COMMANDE (47 €)        │
-│  ▸ Non merci, je passe à mon espace membre   │
-│  Stripe · PayPal · Garantie 30 jours         │
-└──────────────────────────────────────────────┘
+Commande principale
+       │
+       ▼
+/v3/offre-version-longue
+       ├── OUI, ajouter 47 € ──► paiement intégré ──► espace membre
+       └── Non merci ───────────────────────────────► /v3
 ```
 
-1. Bandeau d'urgence en haut, pleine largeur.
-2. Badge V4 « mise à jour incluse gratuitement » + titre percutant + une phrase de promesse.
-3. Bloc « Moteur de cohérence » : une rangée de 4 vignettes montrant le même héros sur une fiche personnage, deux cases de BD et une couverture, avec la phrase « Fini les visages qui changent à chaque case : le Moteur de Cohérence verrouille vos héros du début à la fin. » Les visuels seront des exemples de démonstration que je génère, portant la mention « exemple de démonstration » pour rester honnête.
-4. Cinq cartes de modules : Moteur de Cohérence Personnages, Créateur de Couvertures KDP/Etsy, Studio de Coloriage, Packs d'Activités Enfants, Suite Marketing. Chaque carte dit en une phrase ce que l'abonné obtient, sans promettre de fonction inexistante ; ce qui arrive en V4 est marqué « V4 ».
-5. Bloc offre : 197 € barré, 47 € en évidence, liste de ce qui est inclus, gros bouton « OUI ! AJOUTER EBOOK COMIC AGENT À MA COMMANDE (47 €) », paiement Stripe intégré sur la page, alternative PayPal, puis le lien discret « Non merci, je refuse cette offre unique et je passe à mon espace membre. »
-6. Rappels de confiance : Stripe, PayPal, garantie 30 jours satisfait ou remboursé.
+## Structure de la page
 
-## Design
+```text
+┌──────────────────────────────────────────────────┐
+│ OFFRE SPÉCIALE UNIQUE — NE FERMEZ PAS CETTE PAGE │
+├──────────────────────────────────────────────────┤
+│ PROCHAINEMENT V4 — MISE À JOUR INCLUSE           │
+│                                                  │
+│ Générez des Ebooks Complets et Longs Format      │
+│ (100+ pages) en quelques clics                   │
+│                                                  │
+│ [Aperçu visuel d'un vrai livre structuré]        │
+├──────────────────────────────────────────────────┤
+│ PLAN H2/H3 → CHAPITRES → EXEMPLES → COUVERTURE   │
+│              → FAQ                               │
+├──────────────────────────────────────────────────┤
+│ 5 MODULES CLÉS                                   │
+├──────────────────────────────────────────────────┤
+│ 197 € barré       47 € paiement unique           │
+│ [OUI ! AJOUTER EBOOK VERSION LONGUE — 47 €]      │
+│ Stripe · PayPal · Garantie 30 jours              │
+│ [Non merci, je passe à mon espace membre]        │
+└──────────────────────────────────────────────────┘
+```
 
-- Fond ultra-sombre proche de `slate-950`, texte clair très lisible, boutons d'action lumineux orange/néon avec léger halo.
-- Hiérarchie nette : titres larges, paragraphes courts, listes à puces coche.
-- Entièrement lisible sur mobile : une colonne, boutons pleine largeur, bandeau et badge qui ne débordent pas.
-- Pas d'animation agressive, pas de compte à rebours faux.
+### 1. En-tête d’urgence
 
-## Détails techniques
+- Bandeau pleine largeur : **« OFFRE SPÉCIALE UNIQUE — NE FERMEZ PAS CETTE PAGE »**.
+- Badge lumineux : **« PROCHAINEMENT V4 — MISE À JOUR INCLUSE GRATUITEMENT »**.
+- Titre : **« Générez des Ebooks Complets et Longs Format (100+ pages) en quelques clics »**.
+- Sous-titre : **« Fini les textes superficiels de 5 pages : créez de véritables livres d’autorité, romans et guides pratiques prêts à publier. »**
 
-- Fichier réécrit : `src/pages/bd/BDUpsellPage.tsx` (présentation uniquement).
-- Textes et liste des modules ajoutés dans `src/data/bdComicOffer.ts` (`proUpsell`), qui reste la source unique d'affichage. Le prix affiché barré 197 € y sera ajouté comme simple libellé.
-- Paiement inchangé : appel existant à `v3-upsell-checkout` avec `packId: 'bd_comic_pro'` (Stripe embarqué) et `funnel-create-order` avec `bd_comic_pro_47` pour PayPal. Aucun montant, produit, prix ni fonction serveur modifié.
-- Visuels de démonstration générés dans `src/assets/` puis importés normalement.
-- Nouvelle feuille de style limitée à cette page via classes Tailwind ; aucune variable globale modifiée.
-- Aucune modification de la base, des règles de sécurité, des calculs KDP, des autres modules ou du module couverture V4.
+### 2. Démonstration du module Version Longue
 
-## Vérification
+Créer un bloc interactif en quatre étapes :
 
-- Typage TypeScript.
-- Contrôle navigateur en 1 280 px et en 390 px : bandeau, badge, bloc cohérence, 5 cartes, prix 47 €, bouton principal et lien de refus tous visibles, sans débordement horizontal.
-- Clic sur le bouton principal : le formulaire de paiement Stripe s'ouvre bien sur la page.
-- Clic sur le lien de refus : arrivée sur `/bd-studio`.
-- Deux captures fournies : version bureau et version mobile.
+1. **Plan détaillé H2/H3** — sommaire hiérarchisé visible.
+2. **Rédaction approfondie** — progression chapitre par chapitre.
+3. **Exemples et analogies** — enrichissement des passages trop généraux.
+4. **Couverture et FAQ** — finalisation éditoriale du livre.
+
+Au clic ou au survol, chaque étape devient active et montre un petit aperçu réaliste du résultat. Sur mobile, les étapes deviennent une liste verticale tactile.
+
+Le visuel reste une démonstration de parcours, sans lancer de génération ni consommer de crédit.
+
+### 3. Modules clés
+
+Cinq cartes sombres avec accent orange/néon :
+
+- **Moteur de Rédaction Longue Durée**
+- **Générateur de Plans SEO & Sommaires**
+- **Créateur de Couvertures HD**
+- **Export Multi-formats** — PDF, EPUB et Word
+- **Suite Marketing** — e-mails et pages de vente
+
+Les capacités déjà disponibles seront présentées comme incluses. Toute capacité encore en préparation sera clairement marquée **« Disponible avec la V4 »**, afin de ne pas vendre comme active une fonction qui ne l’est pas encore.
+
+### 4. Offre à 47 €
+
+- Prix de référence **197 €** barré et prix spécial **47 €** très visible.
+- Mention **paiement unique**, sans abonnement.
+- Bouton principal exact : **« OUI ! AJOUTER EBOOK-VERSION_LONGUE À MA COMMANDE (47 €) »**.
+- Après le clic, le paiement Stripe s’ouvre directement dans la page, sans redirection vers une présentation intermédiaire.
+- Alternative PayPal sous le bouton.
+- Bouton secondaire : **« Non merci, je refuse cette offre unique et je passe à mon espace membre. »**, vers `/v3`.
+- Bloc confiance : Stripe, PayPal et garantie 30 jours satisfait ou remboursé.
+
+## Direction visuelle
+
+- Fond ultra-sombre utilisant les couleurs sémantiques du site, avec contraste proche de `slate-950`.
+- Orange lumineux réservé aux actions et aux étapes actives ; touches cyan discrètes pour les informations V4.
+- Typographie très lisible, grands titres, textes courts, aucun effet agressif.
+- Cartes compactes, angles sobres, fins contours lumineux ; pas de surcharge ni de faux compte à rebours.
+- Mise en page responsive : deux colonnes sur ordinateur quand utile, une colonne et boutons pleine largeur sur mobile.
+
+## Réalisation technique
+
+- Nouvelle page dédiée et nouvelle route `/v3/offre-version-longue`.
+- Petit composant isolé pour la démonstration interactive des quatre étapes.
+- Contenu de l’offre centralisé dans une source unique, séparée des offres BD et couverture.
+- Ajout du pack `ebook_version_longue` à 47 € au catalogue de paiement existant, avec paiement Stripe intégré et suivi de commande identique aux autres packs.
+- PayPal relié au même produit et au même prix.
+- Aucun changement aux offres BD, couverture, abonnements, calculs KDP ou autres modules.
+
+## Contrôles avant livraison
+
+- Vérifier la page en ordinateur et mobile, sans débordement ni texte coupé.
+- Vérifier les quatre étapes interactives du module de démonstration.
+- Vérifier que le bouton principal ouvre bien le paiement intégré à 47 €.
+- Vérifier que PayPal utilise bien l’offre Ebook Version Longue.
+- Vérifier que « Non merci » mène à `/v3`.
+- Vérifier que la page ne consomme aucun crédit IA.
+- Fournir une capture ordinateur et une capture mobile.
