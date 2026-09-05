@@ -225,6 +225,18 @@ export default function CouvertureExpressPage() {
     }
   };
 
+  /* Première illustration lancée automatiquement dès l'arrivée à l'étape 2. */
+  const autoTried = useRef(false);
+  useEffect(() => {
+    if (step !== 2 || autoTried.current) return;
+    if (!projectId || illustrationPath || generating) return;
+    if (credits.remaining <= 0 && !key) return;
+    autoTried.current = true;
+    void generateIllustration();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, projectId, illustrationPath, generating, credits.remaining, key]);
+
+
   /* ---- enregistrement ---------------------------------------------------- */
   const persist = useCallback(
     async (templateId: ReferenceTemplateId) => {
@@ -411,16 +423,33 @@ export default function CouvertureExpressPage() {
               <Badge variant={credits.remaining > 0 ? 'default' : 'secondary'}>
                 {credits.remaining} image(s) incluse(s) restante(s)
               </Badge>
-              {credits.remaining <= 0 && !key && (
+              {generating && (
+                <span className="flex items-center gap-2 text-[#232F3E]">
+                  <Loader2 className="h-4 w-4 animate-spin" /> Votre illustration est en cours de
+                  création (environ 30 secondes)…
+                </span>
+              )}
+              {!generating && illustrationPath && (
                 <span className="text-muted-foreground">
-                  Vous pouvez continuer sans image, ou ajouter votre clé personnelle depuis{' '}
+                  Illustration appliquée aux trois propositions.
+                </span>
+              )}
+              {!generating && !illustrationPath && credits.remaining > 0 && (
+                <span className="text-muted-foreground">
+                  Aucune illustration pour l’instant : cliquez sur « Créer mon illustration ».
+                </span>
+              )}
+              {!generating && !illustrationPath && credits.remaining <= 0 && !key && (
+                <span className="text-muted-foreground">
+                  Vous n’avez plus d’image incluse. Ajoutez votre clé personnelle depuis{' '}
                   <Link to="/v3/cover-pro" className="underline">
                     cette page
-                  </Link>
-                  .
+                  </Link>{' '}
+                  pour obtenir une illustration.
                 </span>
               )}
             </div>
+
 
             <div className="grid gap-4 sm:grid-cols-3">
               {proposals.map((p) => (
@@ -449,14 +478,19 @@ export default function CouvertureExpressPage() {
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-2">
-              <Button variant="outline" disabled={generating} onClick={() => void generateIllustration()}>
+              <Button
+                disabled={generating}
+                onClick={() => void generateIllustration()}
+                className="bg-[#f47920] text-white hover:bg-[#d96812]"
+              >
                 {generating ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
                   <Sparkles className="mr-2 h-4 w-4" />
                 )}
-                Changer l’illustration
+                {illustrationPath ? 'Changer l’illustration' : 'Créer mon illustration'}
               </Button>
+
               <Button variant="outline" onClick={() => setVariantSeed((v) => v + 1)}>
                 <RefreshCw className="mr-2 h-4 w-4" /> Autres propositions
               </Button>
