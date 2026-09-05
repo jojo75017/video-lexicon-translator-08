@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react';
-import { ArrowUp } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 
 /**
  * Bouton « Retour en haut » global.
  *
- * Placé en bas à droite pour ne pas chevaucher :
- *  - le CTA flottant (FloatingToolCTA, en bas à gauche),
- *  - la barre d'inscription collante (StickySignupBar, barre haute / basse),
- *  - une éventuelle bannière de cookies (généralement en bas à gauche ou en
- *    barre pleine : le bouton reste visible après défilement, avec un z-index
- *    modéré pour rester sous les bannières de consentement).
+ * Positionné en bas à droite, juste à gauche du bouton assistant flottant
+ * (AssistantFloatingButton, bottom-5 right-4, z-[60]) et du bouton clés API
+ * (bottom-32 right-5), afin de rester visible sans jamais les recouvrir.
+ *  - le CTA flottant (FloatingToolCTA) et la barre d'inscription collante
+ *    (StickySignupBar) sont en bas à gauche / pleine largeur ;
+ *  - une éventuelle bannière de cookies reste au-dessus grâce à un z-index
+ *    modéré (z-[55]).
  *
  * N'apparaît qu'après un défilement suffisant (≥ 500 px), ce qui évite tout
- * conflit visuel au chargement de la page avec un bandeau cookie.
+ * conflit visuel au chargement avec un bandeau cookie.
  */
 export default function BackToTopButton() {
   const [visible, setVisible] = useState(false);
@@ -38,14 +39,17 @@ export default function BackToTopButton() {
       onClick={scrollTop}
       aria-label="Revenir en haut de la page"
       title="Revenir en haut"
-      className="fixed bottom-5 right-5 z-40 grid h-12 w-12 place-items-center rounded-full shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+      className="group fixed bottom-5 right-20 z-[55] flex h-12 items-center gap-2 rounded-full px-3 shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
       style={{
         background: 'var(--v3-emerald, #0d7a5f)',
         color: '#fff',
         border: '1px solid rgba(201,168,76,0.55)',
       }}
     >
-      <ArrowUp className="h-5 w-5" />
+      <BookOpen className="h-5 w-5" style={{ color: 'rgba(201,168,76,0.95)' }} />
+      <span className="max-w-0 overflow-hidden whitespace-nowrap text-sm font-medium tracking-wide opacity-0 transition-all duration-300 group-hover:max-w-[140px] group-hover:opacity-100 group-hover:pr-1">
+        Retour en haut
+      </span>
     </button>
   );
 }
