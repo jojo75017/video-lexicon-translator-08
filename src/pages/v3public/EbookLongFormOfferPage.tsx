@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { EBOOK_LONG_FORM_OFFER } from '@/data/ebookLongFormOffer';
 import { supabase } from '@/integrations/supabase/client';
 import { getStripe, getStripeEnvironment } from '@/lib/stripe';
+import useEbookLongFormAccess from '@/hooks/useEbookLongFormAccess';
 
 const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
@@ -30,6 +31,8 @@ export default function EbookLongFormOfferPage() {
   }, []);
 
   const normalizedEmail = () => email.trim().toLowerCase();
+
+  const { hasAccess } = useEbookLongFormAccess();
 
   const startStripePayment = async () => {
     const checkoutEmail = normalizedEmail();
@@ -117,12 +120,20 @@ export default function EbookLongFormOfferPage() {
                   <span className="text-4xl font-black text-primary">{EBOOK_LONG_FORM_OFFER.price} €</span>
                   <span className="pb-1 text-sm font-semibold text-muted-foreground">paiement unique</span>
                 </div>
-                <Button asChild size="lg" className="h-auto min-h-12 w-full whitespace-normal px-5 py-3 text-sm font-black uppercase leading-5 sm:w-auto">
-                  <a href="#offre">Voir l'offre à 47 € <ArrowRight /></a>
-                </Button>
+                {hasAccess ? (
+                  <Button asChild size="lg" className="h-auto min-h-12 w-full whitespace-normal px-5 py-3 text-sm font-black uppercase leading-5 sm:w-auto">
+                    <Link to="/v3/version-longue">Ouvrir l'outil Version Longue <ArrowRight /></Link>
+                  </Button>
+                ) : (
+                  <Button asChild size="lg" className="h-auto min-h-12 w-full whitespace-normal px-5 py-3 text-sm font-black uppercase leading-5 sm:w-auto">
+                    <a href="#offre">Voir l'offre à 47 € <ArrowRight /></a>
+                  </Button>
+                )}
               </div>
               <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-                Accès anticipé : l'outil Version Longue complet arrive avec la V4, et la mise à jour est incluse sans supplément.
+                {hasAccess
+                  ? 'Votre accès est actif : plan, rédaction chapitre par chapitre, couverture et exports Word, PDF et Markdown sont disponibles dès maintenant.'
+                  : 'Inclus : plan détaillé, rédaction chapitre par chapitre, couverture et exports Word, PDF et Markdown. Les améliorations V4 sont offertes.'}
               </p>
             </div>
 
