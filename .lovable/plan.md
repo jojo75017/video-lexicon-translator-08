@@ -18,7 +18,11 @@ Trois couches audio :
 - Texte lu : exactement les lignes déjà écrites dans le script (aucune réécriture du contenu), avec une **phrase d'ouverture ajoutée** dans le même esprit, par exemple :
   > « Prenez sept minutes. Je vous montre comment un manuscrit devient un livre publié. »
 - Génération séquence par séquence (8 fichiers) plutôt qu'un seul bloc : meilleure qualité, reprise facile si une séquence sonne mal.
-- Réglages : stabilité élevée, peu d'expressivité, vitesse légèrement ralentie.
+
+### Moteur de voix (sans payer ElevenLabs à part)
+ElevenLabs réclame un abonnement (~11 €) séparé. On évite donc le coût supplémentaire :
+- **Par défaut : passerelle IA intégrée (Lovable AI Gateway)**, déjà câblée dans `supabase/functions/cs-video-voice` (`openai/gpt-4o-mini-tts`, voix `alloy`, instructions « formation professionnelle, chaleureuse, rythme posé, en français »). Aucun paiement ElevenLabs.
+- Si vous activez/reprenez un compte ElevenLabs plus tard, on bascule automatiquement dessus (le code détecte une clé `sk_` valide) pour une voix plus naturelle, sans rien changer d'autre.
 
 ## La musique (rôle secondaire)
 - Piano feutré + nappe chaude très légère, notes tenues et espacées.
