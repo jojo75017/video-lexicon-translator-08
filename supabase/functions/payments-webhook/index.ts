@@ -124,6 +124,8 @@ const UPSELL_PACK_MODULES: Record<string, string> = {
   bd_comic: "bd-comic",
   bd_comic_pro: "bd-comic-pro",
   cover_studio_pro: "cover_studio_pro",
+  ebook_version_longue: "ebook-version-longue",
+  ebook_version_longue_47: "ebook-version-longue",
 };
 
 async function handleV3UpsellPackCompleted(session: any, env: StripeEnv) {
