@@ -656,6 +656,7 @@ const App = () => {
             {/* V3 public site */}
             <Route path="/v3/offre" element={v3Standalone(<V3OffrePage />)} />
             <Route path="/v3/temoignage" element={v3Standalone(<V3TemoignagePage />)} />
+            <Route path="/v3/offre-version-longue" element={<EbookLongFormOfferPage />} />
 
 
             <Route path="/v3" element={<V3PublicLayout isAdmin={isAdmin} isAdminChecking={!isAdminChecked} isSubscriber={isAuthenticated} />}>
@@ -665,7 +666,6 @@ const App = () => {
               <Route path="realite-kdp" element={<V3RealiteKdpPage />} />
               <Route path="contact" element={<ContactSupportPage subscriberEmail={subscriberEmail || ''} />} />
               <Route path="offre-couverture-v4" element={<V3CoverOfferPage />} />
-              <Route path="offre-version-longue" element={<EbookLongFormOfferPage />} />
               <Route path="fonctionnalites" element={<V3FeaturesPage />} />
               <Route path="fonctionnalites/cles" element={<V3ApiKeysPage />} />
               <Route path="fonctionnalites/coordonnees" element={<V3CoordonneesPage />} />
