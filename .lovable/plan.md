@@ -47,8 +47,8 @@ Les sous-titres actuels sont minutés d'après le nombre de mots (~145 mots/minu
 - L'asset du projet mis à jour pour que `/v3` lise cette version.
 
 ## Détails techniques
-- Voix : ElevenLabs TTS (voix française) via appel serveur, 8 fichiers MP3 assemblés avec pauses par `ffmpeg`.
-- Musique : ElevenLabs Music, bouclage `aloop` + `acrossfade`.
+- Voix : passerelle IA intégrée (`openai/gpt-4o-mini-tts`) par défaut, sans paiement ElevenLabs ; 8 fichiers MP3 assemblés avec pauses par `ffmpeg`. Bascule auto vers ElevenLabs si une clé `sk_` valide est présente plus tard.
+- Musique : ElevenLabs Music si la clé est valide, sinon piste douce que vous fournissez (ou je propose une alternative libre de droits).
 - Mixage : `amix` avec pondération voix/musique, `afade`, sortie AAC 192 k, vidéo recopiée sans réencodage quand le re-rendu n'est pas nécessaire.
 - Re-rendu Remotion uniquement pour recaler les sous-titres (script texte inchangé, seul le minutage bouge).
 
