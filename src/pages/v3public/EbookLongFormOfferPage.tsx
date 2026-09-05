@@ -101,7 +101,7 @@ export default function EbookLongFormOfferPage() {
         <section className="overflow-hidden border-b border-border px-4 py-14 sm:px-6 sm:py-20">
           <div className="mx-auto max-w-6xl">
             <div className="mx-auto max-w-4xl text-center">
-              <span className="inline-flex items-center gap-2 border border-accent/50 bg-accent/10 px-4 py-2 text-xs font-black uppercase tracking-widest text-accent">
+              <span className="inline-flex items-center gap-2 border border-accent/40 bg-accent/10 px-4 py-2 text-xs font-black uppercase tracking-widest text-accent">
                 <Sparkles className="h-4 w-4" /> Prochainement V4 — mise à jour incluse gratuitement
               </span>
               <h1 className="mt-7 text-4xl font-black leading-tight text-foreground sm:text-5xl lg:text-6xl">
@@ -110,18 +110,33 @@ export default function EbookLongFormOfferPage() {
               <p className="mx-auto mt-6 max-w-3xl text-base leading-8 text-muted-foreground sm:text-lg">
                 Passez d'une simple idée à un manuscrit organisé, approfondi et prêt pour sa dernière étape éditoriale — sans perdre la cohérence au fil des chapitres.
               </p>
+
+              <div className="mx-auto mt-8 flex max-w-2xl flex-col items-center gap-3 border border-primary/50 bg-card p-5 shadow-[0_10px_30px_-18px_hsl(var(--foreground)/0.35)] sm:flex-row sm:justify-between sm:text-left">
+                <div className="flex items-end gap-3">
+                  <span className="pb-1 text-lg font-bold text-muted-foreground line-through">{EBOOK_LONG_FORM_OFFER.referencePrice} €</span>
+                  <span className="text-4xl font-black text-primary">{EBOOK_LONG_FORM_OFFER.price} €</span>
+                  <span className="pb-1 text-sm font-semibold text-muted-foreground">paiement unique</span>
+                </div>
+                <Button asChild size="lg" className="h-auto min-h-12 w-full whitespace-normal px-5 py-3 text-sm font-black uppercase leading-5 sm:w-auto">
+                  <a href="#offre">Voir l'offre à 47 € <ArrowRight /></a>
+                </Button>
+              </div>
+              <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+                Accès anticipé : l'outil Version Longue complet arrive avec la V4, et la mise à jour est incluse sans supplément.
+              </p>
             </div>
 
             <div className="mx-auto mt-10 grid max-w-4xl grid-cols-2 border border-border bg-card sm:grid-cols-4">
               {['Plan H2/H3', 'Chapitres', 'Exemples', 'Couverture + FAQ'].map((label, index) => (
                 <div key={label} className="border-b border-r border-border px-3 py-4 text-center last:border-r-0 sm:border-b-0">
-                  <span className="block text-xs font-black text-primary">0{index + 1}</span>
-                  <span className="mt-1 block text-xs font-bold text-foreground sm:text-sm">{label}</span>
+                  <span className="block text-sm font-black text-primary">0{index + 1}</span>
+                  <span className="mt-1 block text-sm font-bold text-foreground">{label}</span>
                 </div>
               ))}
             </div>
           </div>
         </section>
+
 
         <LongFormProcessDemo />
 
