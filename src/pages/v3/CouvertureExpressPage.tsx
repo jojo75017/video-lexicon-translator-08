@@ -586,6 +586,24 @@ export default function CouvertureExpressPage() {
                     : 'Télécharger ma couverture'}
               </Button>
 
+              <Button
+                variant="outline"
+                className="w-full"
+                disabled={exporting}
+                onClick={() => void downloadPng()}
+              >
+                <Download className="mr-2 h-4 w-4" /> Télécharger l’image (PNG)
+              </Button>
+
+              <Button
+                variant="outline"
+                className="w-full"
+                disabled={exporting || !illustrationUrl}
+                onClick={() => void downloadIllustration()}
+              >
+                <Download className="mr-2 h-4 w-4" /> Télécharger l’illustration seule
+              </Button>
+
               <Button variant="outline" className="w-full" onClick={() => void saveForLater()}>
                 Enregistrer et continuer plus tard
               </Button>
