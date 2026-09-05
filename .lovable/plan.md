@@ -1,52 +1,53 @@
-# Ajouter une musique douce à la vidéo V3 (7 min)
+# Voix-off « maison d'édition » + musique douce sur la vidéo V3
 
 ## État actuel confirmé
 - Vidéo de présentation V3 : `ebookstudio-v3-presentation-v2.mp4`, **407 s (6 min 47 s)**, H264, **sans aucune piste audio** (confirmé par `ffprobe`).
-- Vidéo rendue par Remotion (muette par construction) et hébergée comme asset du projet, lue par `<video>` sur `/v3`.
-- `ffmpeg` disponible ; clé `ELEVENLABS_API_KEY` déjà configurée (génération musicale possible sans frais IA image/crédit abonné).
+- Le texte complet du script existe déjà, découpé en 8 séquences et en lignes de sous-titres (`remotion/src/script.ts`, source `docs/video-v3-script.md`).
+- `ffmpeg` disponible ; clé ElevenLabs déjà configurée (voix + musique), aucun crédit abonné ni appel IA image.
 
-## La méthode (comment mettre le son)
-Approche 100 % locale, post-traitement sur le fichier existant — aucun re-rendu Remotion, aucun appel IA image, aucun débit de crédit abonné :
+## Le principe
+Sans voix, 7 minutes de sous-titres sur musique douce endorment. On ajoute donc **une voix française posée** qui lit le script — le ton d'un directeur de collection qui présente un ouvrage — avec la musique **très en retrait dessous**.
 
-1. **Produire une musique douce** (voir choix ci-dessous) — un lit instrumental ~60-90 s, en boucle.
-2. **Étendre** le lit à la durée exacte (407 s) par bouclage avec fondu entrecroisé (`ffmpeg` `aloop` / concaténation crossfade) pour éviter la coupure.
-3. **Mixage** sur la vidéo :
-   - Volume musique très bas : ~0,22 (≈ -13 dB), pour rester un « tapis » discret sous les sous-titres.
-   - Fondu entrée 3 s / sortie 4 s (`afade`).
-   - Encodage AAC 192 k, H264 vidéo recopié (`-c:v copy`), MP4 final.
-4. **Remplacer l'asset** et vérifier la lecture (le lecteur `<video>` a `controls` : le son démarre au clic utilisateur, pas d'autoplay → aucune restriction navigateur).
+Trois couches audio :
+1. **Voix-off** (premier plan, claire, rythme calme mais vivant).
+2. **Musique** (arrière-plan, ~15 % du volume de la voix, jamais concurrente).
+3. **Silences respirés** entre les séquences (petites pauses, comme une page qui se tourne).
 
-## La musique proposée (quoi mettre)
-Direction : **ambiance éditoriale « maison d'édition », neutre, rassurante**. Pas d'influence émotionnelle forte, pas de manipulation.
+## La voix
+- Voix **française naturelle**, grave et chaleureuse, débit posé, articulation nette — registre « maison d'édition », pas commercial, pas dynamique-marketing.
+- Texte lu : exactement les lignes déjà écrites dans le script (aucune réécriture du contenu), avec une **phrase d'ouverture ajoutée** dans le même esprit, par exemple :
+  > « Prenez sept minutes. Je vous montre comment un manuscrit devient un livre publié. »
+- Génération séquence par séquence (8 fichiers) plutôt qu'un seul bloc : meilleure qualité, reprise facile si une séquence sonne mal.
+- Réglages : stabilité élevée, peu d'expressivité, vitesse légèrement ralentie.
 
-Cahier des charges du morceau (règles strictes) :
-- **Instrumental uniquement** — aucune voix, aucun effet dramatique.
-- **Piano doux seul + nappe ambiante très légère** ; rien d'autre.
-- **Aucune percussion, aucun rythme, aucune pulsation** : ni batterie, ni caisse, ni shaker, ni basse rythmique, ni arpège rapide. Notes tenues et espacées.
-- **Très lent** (~55-65 BPM ressenti), aucun crescendo, aucune montée.
-- **Ton chaud et plat**, volume mixé bas : la musique reste sous les sous-titres.
-- Bouclable sans couture audible.
+## La musique (rôle secondaire)
+- Piano feutré + nappe chaude très légère, notes tenues et espacées.
+- **Aucune percussion, aucun rythme, aucune pulsation, aucun arpège rapide, aucune montée.**
+- Bouclée jusqu'à 407 s avec fondu entrecroisé, fondu d'entrée 3 s / de sortie 4 s.
+- Prompt de génération :
+  > « Extremely gentle ambient piano, sparse sustained notes, soft felt piano with a faint warm string pad underneath, very slow and still, absolutely no percussion, no drums, no beat, no rhythm, no bass line, no arpeggios, no vocals, no build-up, no crescendo, calm library atmosphere, seamless and loopable, quiet background music. »
 
-Prompt de génération (version douce, sans percussions) :
-> « Extremely gentle ambient piano, sparse sustained notes, soft felt piano with a faint warm string pad underneath, very slow and still, absolutely no percussion, no drums, no beat, no rhythm, no bass line, no arpeggios, no vocals, no build-up, no crescendo, calm library atmosphere, seamless and loopable, quiet background music. »
+## Synchronisation avec les sous-titres
+Les sous-titres actuels sont minutés d'après le nombre de mots (~145 mots/minute). La voix générée ne tombera pas exactement dessus.
+- Je mesure la durée réelle de chaque séquence parlée, puis **j'ajuste le minutage du script Remotion** (une constante de vitesse de lecture + les pauses entre séquences) et je **re-rends la vidéo** avec Remotion pour que sous-titres et voix soient alignés.
+- Contrôle sur les 8 débuts de séquence : le sous-titre apparaît au plus tard au moment où la phrase est dite.
 
-## Contrôle qualité de la musique avant mixage
-Le morceau généré est vérifié avant d'être posé sur la vidéo :
-- Écoute et analyse du fichier (détection d'attaques rythmiques / transitoires régulières).
-- Si une percussion ou une pulsation est détectée, le morceau est **rejeté et régénéré** avec un prompt encore plus restrictif ; au bout de 2 échecs, je vous propose la solution piste fournie.
-- Aucun mixage n'est fait sur un morceau rythmé.
+## Contrôle qualité avant livraison
+- Voix : écoute des 8 séquences, vérification française (aucun mot mal prononcé, aucun anglicisme de lecture), aucune coupure de phrase.
+- Musique : vérification qu'aucune attaque rythmique régulière n'est présente ; sinon régénération, et au bout de 2 échecs je vous propose de fournir votre propre piste.
+- Mixage : voix intelligible partout, musique jamais devant, pas de saturation.
+- `ffprobe` final : 1 flux vidéo + 1 flux audio AAC, durées identiques.
 
-## Choix à valider
-**Recommandé : génération IA (ElevenLabs Music)** avec le prompt ci-dessus + contrôle qualité.
+## Livrables
+- `/mnt/documents/ebookstudio-v3-presentation-voix.mp4` — vidéo complète, voix-off + musique.
+- L'asset du projet mis à jour pour que `/v3` lise cette version.
 
-Alternative : vous fournissez une piste libre de droits (piano/cordes, calme, sans percussions) et je la mixe directement sans génération.
-
-## Livrables et vérification
-- Nouveau MP4 : `/mnt/documents/ebookstudio-v3-presentation-musique.mp4` (6 min 47, vidéo identique + 1 piste audio).
-- `ffprobe` : 1 flux audio AAC, durée 407 s.
-- Test lecture dans le navigateur sur `/v3` : son audible au clic, fondus propres, pas de coupure à la boucle.
-- Asset du projet mis à jour pour pointer vers la version musicée.
+## Détails techniques
+- Voix : ElevenLabs TTS (voix française) via appel serveur, 8 fichiers MP3 assemblés avec pauses par `ffmpeg`.
+- Musique : ElevenLabs Music, bouclage `aloop` + `acrossfade`.
+- Mixage : `amix` avec pondération voix/musique, `afade`, sortie AAC 192 k, vidéo recopiée sans réencodage quand le re-rendu n'est pas nécessaire.
+- Re-rendu Remotion uniquement pour recaler les sous-titres (script texte inchangé, seul le minutage bouge).
 
 ## Ce que je ne touche pas
-- Rien côté base de données, sécurité, paiements, crédits, calculs KDP, tarifs, ni le module V4.
-- Le script/sous-titres Remotion inchangés. La voix-off reste à part (non incluse ici).
+- Base de données, sécurité, paiements, crédits, calculs KDP, tarifs, module V4 : aucun changement.
+- Le contenu du script n'est pas réécrit, seulement lu (plus la phrase d'ouverture).
