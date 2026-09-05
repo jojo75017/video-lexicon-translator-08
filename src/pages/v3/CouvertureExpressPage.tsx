@@ -283,6 +283,40 @@ export default function CouvertureExpressPage() {
     }
   };
 
+  /** Image PNG haute définition de la couverture complète (rendu local). */
+  const downloadPng = async () => {
+    if (!chosen) return;
+    setExporting(true);
+    try {
+      const composition = compositionFor(chosen, lightness);
+      const result = await exportFrontPng(composition, illustrationUrl, title.trim());
+      downloadBlob(result.blob, result.fileName);
+      toast.success(`Image téléchargée : ${result.fileName}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Téléchargement impossible.');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  /** Illustration seule, sans les textes. */
+  const downloadIllustration = async () => {
+    if (!illustrationUrl) return;
+    setExporting(true);
+    try {
+      const response = await fetch(illustrationUrl);
+      if (!response.ok) throw new Error('Illustration inaccessible.');
+      const blob = await response.blob();
+      const ext = blob.type.includes('jpeg') ? 'jpg' : 'png';
+      downloadBlob(blob, safeFileName(title.trim(), 'illustration', ext));
+      toast.success('Illustration téléchargée.');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Téléchargement impossible.');
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const saveForLater = async () => {
     if (!chosen || !projectId) return;
     try {
