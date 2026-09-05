@@ -775,6 +775,7 @@ const App = () => {
           {!isAdminAuthRoute && !isAuthenticated && <LeadCapturePopup />}
           {!isAdminAuthRoute && !isAuthenticated && <FloatingToolCTA />}
           {!isAdminAuthRoute && !isAuthenticated && <StickySignupBar />}
+          <BackToTopButton />
           <Toaster />
         </div>
       </TooltipProvider>
