@@ -1,10 +1,18 @@
 /**
- * Script de la vidéo Ebookstudio V3 (≈7 minutes).
+ * Script de la vidéo Ebookstudio V3 (≈6 min 10 avec voix off).
  * Source texte : docs/video-v3-script.md
  *
- * Chaque ligne devient un sous-titre. La durée d'un sous-titre est calculée
- * à partir du nombre de mots (≈145 mots/minute de lecture calme).
+ * Chaque ligne devient un sous-titre. Les durées sont calées sur la voix off
+ * réellement générée (voir voiceTiming.ts), pas sur une vitesse de lecture
+ * théorique.
  */
+import {
+  VOICE_DURATIONS,
+  VOICE_GAP_SECONDS,
+  VOICE_LEAD_SECONDS,
+  VOICE_TAIL_SECONDS,
+} from "./voiceTiming";
+import { TRANSITION_FRAMES } from "./theme";
 
 export interface Scene {
   chapter: string;
