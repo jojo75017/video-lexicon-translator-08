@@ -154,6 +154,7 @@ const V3MockupPage = lazy(() => import('./pages/v3public/V3MockupPage'));
 const V3AudiobookPage = lazy(() => import('./pages/v3public/V3AudiobookPage'));
 const V3EditorPage = lazy(() => import('./pages/v3public/V3EditorPage'));
 const V3OffrePage = lazy(() => import('./pages/v3public/V3OffrePage'));
+const V3CoverOfferPage = lazy(() => import('./pages/v3public/V3CoverOfferPage'));
 const V3CommanderPage = lazy(() => import('./pages/v3public/V3CommanderPage'));
 const ReferralKitPage = lazy(() => import('./pages/ReferralKitPage'));
 const GoKdpPilotPage = lazy(() => import('./pages/GoKdpPilotPage'));
@@ -661,6 +662,7 @@ const App = () => {
               <Route path="pourquoi" element={<V3PourquoiPage />} />
               <Route path="realite-kdp" element={<V3RealiteKdpPage />} />
               <Route path="contact" element={<ContactSupportPage subscriberEmail={subscriberEmail || ''} />} />
+              <Route path="offre-couverture-v4" element={<V3CoverOfferPage />} />
               <Route path="fonctionnalites" element={<V3FeaturesPage />} />
               <Route path="fonctionnalites/cles" element={<V3ApiKeysPage />} />
               <Route path="fonctionnalites/coordonnees" element={<V3CoordonneesPage />} />
