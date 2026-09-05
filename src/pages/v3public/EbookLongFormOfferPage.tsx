@@ -143,17 +143,17 @@ export default function EbookLongFormOfferPage() {
         <section className="px-4 py-16 sm:px-6 sm:py-20" aria-labelledby="modules-title">
           <div className="mx-auto max-w-6xl">
             <div className="max-w-2xl">
-              <p className="text-xs font-bold uppercase tracking-widest text-accent">Une chaîne éditoriale complète</p>
+              <p className="text-sm font-bold uppercase tracking-widest text-accent">Une chaîne éditoriale complète</p>
               <h2 id="modules-title" className="mt-3 text-3xl font-black text-foreground sm:text-4xl">Cinq modules pour aller au-delà d'un texte court</h2>
             </div>
             <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {EBOOK_LONG_FORM_OFFER.modules.map(({ icon: Icon, title, description, status }) => (
-                <article key={title} className="border border-border bg-card p-6 transition-colors hover:border-primary/60">
+                <article key={title} className="border border-border bg-card p-6 shadow-[0_10px_28px_-22px_hsl(var(--foreground)/0.4)] transition-colors hover:border-primary/60">
                   <div className="flex items-start justify-between gap-4">
                     <span className="flex h-11 w-11 items-center justify-center rounded-md border border-primary/40 bg-primary/10 text-primary">
                       <Icon className="h-5 w-5" />
                     </span>
-                    <span className="border border-accent/30 bg-accent/10 px-2 py-1 text-[10px] font-black uppercase text-accent">{status}</span>
+                    <span className="border border-accent/40 bg-accent/10 px-2 py-1 text-xs font-black uppercase text-accent">{status}</span>
                   </div>
                   <h3 className="mt-5 text-xl font-black text-foreground">{title}</h3>
                   <p className="mt-3 text-sm leading-6 text-muted-foreground">{description}</p>
@@ -163,22 +163,22 @@ export default function EbookLongFormOfferPage() {
           </div>
         </section>
 
-        <section id="offre" className="border-y border-border bg-card/70 px-4 py-16 sm:px-6 sm:py-20" aria-labelledby="offer-title">
+        <section id="offre" className="scroll-mt-16 border-y border-border bg-secondary px-4 py-16 sm:px-6 sm:py-20" aria-labelledby="offer-title">
           <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
             <div className="pt-3">
-              <p className="text-xs font-bold uppercase tracking-widest text-accent">Accès anticipé V4</p>
+              <p className="text-sm font-bold uppercase tracking-widest text-accent">Accès anticipé V4</p>
               <h2 id="offer-title" className="mt-3 text-3xl font-black text-foreground sm:text-4xl">Ajoutez la Version Longue à votre espace</h2>
-              <ul className="mt-7 space-y-3 text-sm text-muted-foreground">
+              <ul className="mt-7 space-y-3 text-base text-foreground">
                 {['Paiement unique, sans abonnement', 'Mise à jour V4 incluse gratuitement', 'Garantie 30 jours satisfait ou remboursé', 'Accès depuis votre espace EbookStudio'].map((item) => (
                   <li key={item} className="flex items-center gap-3">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-accent/15 text-accent"><Check className="h-3.5 w-3.5" /></span>
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground"><Check className="h-3.5 w-3.5" /></span>
                     {item}
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div className="border-2 border-primary bg-background p-5 shadow-[0_0_45px_hsl(var(--primary)/0.16)] sm:p-8">
+            <div className="border-2 border-primary bg-card p-5 shadow-[0_18px_45px_-28px_hsl(var(--foreground)/0.5)] sm:p-8">
               {!clientSecret ? (
                 <>
                   <div className="flex flex-wrap items-end gap-x-4 gap-y-1">
@@ -186,30 +186,34 @@ export default function EbookLongFormOfferPage() {
                     <span className="text-5xl font-black text-primary">{EBOOK_LONG_FORM_OFFER.price} €</span>
                     <span className="pb-1 text-sm font-semibold text-muted-foreground">paiement unique</span>
                   </div>
-                  <label htmlFor="longform-email" className="mt-7 block text-xs font-bold uppercase tracking-widest text-muted-foreground">E-mail de votre commande</label>
+                  <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                    Accès anticipé : l'outil Version Longue complet arrive avec la V4, mise à jour incluse sans supplément.
+                  </p>
+                  <label htmlFor="longform-email" className="mt-6 block text-sm font-bold uppercase tracking-widest text-foreground">E-mail de votre commande</label>
                   <Input
                     id="longform-email"
                     type="email"
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                     placeholder="vous@exemple.fr"
-                    className="mt-2 h-12 border-input bg-card text-foreground placeholder:text-muted-foreground"
+                    className="mt-2 h-12 border-input bg-background text-foreground placeholder:text-muted-foreground"
                   />
-                  <Button type="button" size="lg" onClick={startStripePayment} disabled={loading} className="mt-4 h-auto min-h-14 w-full whitespace-normal px-5 py-4 text-center text-sm font-black uppercase leading-5 shadow-[0_0_28px_hsl(var(--primary)/0.3)] sm:text-base">
+                  <Button type="button" size="lg" onClick={startStripePayment} disabled={loading} className="mt-4 h-auto min-h-14 w-full whitespace-normal px-5 py-4 text-center text-sm font-black uppercase leading-5 sm:text-base">
                     {loading ? <><Loader2 className="animate-spin" /> Préparation du paiement…</> : <><CreditCard /> Oui ! Ajouter Ebook-Version_Longue à ma commande (47 €)</>}
                   </Button>
-                  <Button type="button" variant="outline" size="lg" onClick={startPaypalPayment} disabled={paypalLoading} className="mt-3 h-12 w-full border-border bg-card text-foreground hover:bg-muted hover:text-foreground">
+                  <Button type="button" variant="outline" size="lg" onClick={startPaypalPayment} disabled={paypalLoading} className="mt-3 h-12 w-full border-border bg-background text-foreground hover:bg-muted hover:text-foreground">
                     {paypalLoading ? <><Loader2 className="animate-spin" /> Ouverture…</> : 'Payer avec PayPal'}
                   </Button>
-                  <div className="mt-5 grid grid-cols-3 gap-2 border-t border-border pt-5 text-center text-[10px] font-bold uppercase text-muted-foreground sm:text-xs">
+                  <div className="mt-5 grid grid-cols-3 gap-2 border-t border-border pt-5 text-center text-xs font-bold uppercase text-foreground">
                     <span className="flex items-center justify-center gap-1"><LockKeyhole className="h-3.5 w-3.5 text-accent" /> Stripe</span>
                     <span className="flex items-center justify-center gap-1"><CreditCard className="h-3.5 w-3.5 text-accent" /> PayPal</span>
                     <span className="flex items-center justify-center gap-1"><ShieldCheck className="h-3.5 w-3.5 text-accent" /> 30 jours</span>
                   </div>
-                  <Button asChild variant="link" className="mt-5 h-auto w-full whitespace-normal text-center text-xs leading-5 text-muted-foreground hover:text-foreground">
+                  <Button asChild variant="link" className="mt-5 h-auto w-full whitespace-normal text-center text-sm leading-5 text-muted-foreground hover:text-foreground">
                     <Link to="/v3">Non merci, je refuse cette offre unique et je passe à mon espace membre. <ArrowRight /></Link>
                   </Button>
                 </>
+
               ) : (
                 <div aria-label="Paiement sécurisé Ebook Version Longue">
                   <EmbeddedCheckoutProvider stripe={getStripe()} options={{ clientSecret }}>
