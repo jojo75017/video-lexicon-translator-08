@@ -47,6 +47,7 @@ const CouvertureKdpPage = lazy(() => import('./pages/CouvertureKdpPage'));
 const CoverStudioProHubPage = lazy(() => import('./pages/v3/cover-studio-pro/CoverStudioProHubPage'));
 const CoverEditorPage = lazy(() => import('./pages/v3/cover-studio-pro/CoverEditorPage'));
 const MesCouverturesPage = lazy(() => import('./pages/v3/mes-couvertures/MesCouverturesPage'));
+const CouvertureExpressPage = lazy(() => import('./pages/v3/CouvertureExpressPage'));
 const CouvertureProjetPage = lazy(() => import('./pages/v3/mes-couvertures/CouvertureProjetPage'));
 const PaiementsCouverturesPage = lazy(() => import('./pages/v3/PaiementsCouverturesPage'));
 const CoverProPage = lazy(() => import('./pages/v3/cover-studio-pro/CoverProPage'));
