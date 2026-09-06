@@ -1,9 +1,9 @@
 import { type ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { Loader2 } from "lucide-react";
-import { V3_LAUNCH_UNLOCKED } from "@/config/v3Launch";
 import { isLegacyUnlockedPath } from "@/data/v2LegacyAccess";
 import useV3Entitlement from "@/hooks/useV3Entitlement";
+import useV3Open from "@/hooks/useV3Open";
 import { useAdminAccess } from "@/contexts/AdminAccessContext";
 import AccessPendingFallback from "@/components/auth/AccessPendingFallback";
 
