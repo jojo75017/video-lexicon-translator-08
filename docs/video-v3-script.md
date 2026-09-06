@@ -99,27 +99,28 @@ clients honnêtement.
 
 ## Séquence 7 — 6:30 → 7:20 · Les formules
 
-Trois formules, et elles sont simples.
+Deux formules, et elles sont simples.
 
 Plume, vingt-sept euros par mois : trente livres par mois, quarante chapitres, tous les onglets du
 studio, dix langues, la couverture complète, l'audiolivre et la correction professionnelle.
 
-Édition, quarante-sept euros par mois : livres illimités, soixante chapitres, Cover Studio Pro, le
-mode recherche approfondie, les outils d'analyse Amazon et le pack KDP prêt à publier.
+Édition, quarante-sept euros par mois : des livres illimités, soixante chapitres, le studio de
+couvertures professionnel, le mode recherche approfondie, les outils d'analyse Amazon et le pack KDP
+prêt à publier.
 
-Studio Pro, quatre-vingt-dix-sept euros par mois : absolument tout est inclus, y compris les séries
-multi-tomes et tous les compléments — plus rien à acheter, jamais.
+En annuel, deux mois vous sont offerts : deux cent soixante-dix euros pour Plume, quatre cent
+soixante-dix euros pour Édition. L'ouverture a lieu le 1er octobre.
 
-En annuel, deux mois vous sont offerts. Et au lancement, le 1er octobre : le premier mois est
-offert.
+## Séquence 8 — 7:20 → 8:00 · Conclusion
 
-## Séquence 8 — 7:20 → 8:00 · Conclusion et cadeau
+Vous avez vu l'essentiel : on construit le plan ensemble, on écrit chapitre par chapitre avec la
+mémoire du livre, on corrige comme une maison d'édition, puis on habille et on publie.
 
-Avant de partir, prenez le cadeau : dix niches Amazon à fort potentiel, analysées, et le kit de
-démarrage complet de la V3. C'est gratuit, sans carte bancaire, sur la page cadeau.
-
-Lisez-les. Si vous vous dites « je pourrais écrire ce livre-là », c'est que le moment est venu.
+Le pack de bienvenue — les dix niches Amazon analysées et le kit de démarrage — est déjà là, sur la
+page d'accueil, sans carte bancaire. Prenez-le, lisez-le, et écrivez votre premier chapitre pour
+voir ce que cela donne avec votre sujet.
 
 Ebookstudio V3 ouvre le 1er octobre. À très bientôt, et bonne écriture.
 
-*À l'écran : la page cadeau, puis l'adresse du site.*
+*À l'écran : le premier chapitre en cours d'écriture, puis l'adresse du site.*
+
