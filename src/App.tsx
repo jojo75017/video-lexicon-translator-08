@@ -399,7 +399,7 @@ const App = () => {
    */
   const v3Standalone = (node: React.ReactNode) => {
     if (!isAdminChecked) return <PageLoader />;
-    if (!isAdmin && isAuthenticated) return <Navigate to={SUBSCRIBER_HOME_PATH} replace />;
+    if (v3Open === false && !isAdmin && isAuthenticated) return <Navigate to={SUBSCRIBER_HOME_PATH} replace />;
     return <>{node}</>;
   };
 

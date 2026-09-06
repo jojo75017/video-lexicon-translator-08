@@ -6,6 +6,7 @@ import useV3Entitlement from "@/hooks/useV3Entitlement";
 import useV3Open from "@/hooks/useV3Open";
 import { useAdminAccess } from "@/contexts/AdminAccessContext";
 import AccessPendingFallback from "@/components/auth/AccessPendingFallback";
+import V3ModuleLockCard from "@/components/v3/V3ModuleLockCard";
 
 /**
  * Verrouille une route V3 tant que `V3_LAUNCH_UNLOCKED = false`.
@@ -41,6 +42,9 @@ export function V3LockedGate({ children }: { children: ReactNode }) {
     );
   }
   if (hasV2 && isLegacyUnlockedPath(location.pathname)) return <>{children}</>;
+  // Ancien client V2 : on explique le verrou et on propose l'offre remisée,
+  // jamais une redirection surprise vers la connexion.
+  if (hasV2) return <V3ModuleLockCard />;
   return <Navigate to="/v3/auth" replace state={{ from: location.pathname }} />;
 }
 
