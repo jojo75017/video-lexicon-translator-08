@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { V3_LAUNCH_UNLOCKED } from '@/config/v3Launch';
+import useV3Open from '@/hooks/useV3Open';
 import useIsAdmin from '@/hooks/useIsAdmin';
 import { toast } from 'sonner';
 
@@ -76,6 +76,7 @@ function isAllowedTarget(href: string | null): boolean {
 
 export default function V3ContemplationMode({ children }: { children: ReactNode }) {
   const { isAdmin } = useIsAdmin();
+  const { open: v3Open } = useV3Open();
   const [previewAsSubscriber, setPreviewAsSubscriber] = useState(isPreviewingAsSubscriber);
 
   // L'aperçu « comme un abonné » peut être basculé depuis la barre admin.
@@ -90,7 +91,7 @@ export default function V3ContemplationMode({ children }: { children: ReactNode 
   }, []);
 
   // Verrou uniquement quand le statut est CONNU et non admin (ou aperçu volontaire).
-  const locked = !V3_LAUNCH_UNLOCKED && (isAdmin === false || (isAdmin === true && previewAsSubscriber));
+  const locked = v3Open === false && (isAdmin === false || (isAdmin === true && previewAsSubscriber));
 
   useEffect(() => {
     if (!locked) return;
