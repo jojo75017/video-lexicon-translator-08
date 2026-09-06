@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import {
   BookOpen, Film, Loader2, Sparkles, FileText, Download, Image as ImageIcon,
   Wand2, Play, Mic, Video, Lock, CheckCircle2, AlertCircle,
@@ -7,6 +7,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import type { CsProject, CsChapter, CsVideoLesson, Slide } from '@/types/contentStudio';
 import V3AgentReturnBar from '@/components/v3public/V3AgentReturnBar';
+import { isLongFormProject } from '@/lib/longform/longFormProjects';
 
 type Tab = 'ebook' | 'video';
 
@@ -56,6 +57,8 @@ export default function ContentStudioProjectPage() {
   }, [id]);
 
   useEffect(() => { loadData(); }, [loadData]);
+  // Un manuscrit « Version Longue » s'ouvre dans son propre outil.
+  const isLongForm = project ? isLongFormProject(project) : false;
   useEffect(() => { if (tab === 'video' && project?.video_unlocked) loadVideoLessons(); }, [tab, project?.video_unlocked, loadVideoLessons]);
 
   const handleWriteChapter = async (ch: CsChapter) => {
