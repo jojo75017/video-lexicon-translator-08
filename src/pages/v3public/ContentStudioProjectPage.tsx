@@ -236,6 +236,10 @@ export default function ContentStudioProjectPage() {
   if (!project) {
     return <div className="container mx-auto max-w-4xl py-12 text-center text-muted-foreground">Projet introuvable.</div>;
   }
+  if (isLongForm) {
+    return <Navigate to={`/v3/version-longue/${project.id}`} replace />;
+  }
+
 
   return (
     <div className="container mx-auto max-w-6xl px-4 py-6 space-y-6">
