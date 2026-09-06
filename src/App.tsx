@@ -362,7 +362,7 @@ const App = () => {
       : isAuthenticated
         ? 'subscriber'
         : 'visitor';
-  const homePath = getHomePath(accessState);
+  const rawHomePath = getHomePath(accessType => accessType as never) as never; // placeholder
   const isAdminAuthRoute = pathname === ADMIN_LOGIN_PATH || pathname === '/admin-direct';
 
   if (isCheckingAuth) return <PageLoader />;
