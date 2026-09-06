@@ -52,13 +52,24 @@ serve(async (req) => {
   try {
     const result = await callLovableAIJson<KdpMeta>(systemPrompt, userPrompt, 2048);
 
+    // Conserve le marqueur interne des manuscrits « Version Longue »
+    const LONG_FORM_MARKER = '__version_longue';
+    const { data: existing } = await supabase
+      .from('cs_projects')
+      .select('kdp_categories')
+      .eq('id', body.project_id)
+      .maybeSingle();
+    const categories = (existing?.kdp_categories ?? []).includes(LONG_FORM_MARKER)
+      ? [LONG_FORM_MARKER, ...(result.kdp_categories ?? []).filter((c) => c !== LONG_FORM_MARKER)]
+      : result.kdp_categories;
+
     // Persiste les métadonnées sur le projet
     await supabase
       .from('cs_projects')
       .update({
         kdp_description: result.kdp_description,
         kdp_keywords: result.kdp_keywords,
-        kdp_categories: result.kdp_categories,
+        kdp_categories: categories,
         updated_at: new Date().toISOString(),
       })
       .eq('id', body.project_id);
