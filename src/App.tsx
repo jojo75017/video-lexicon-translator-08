@@ -100,6 +100,7 @@ const V3PublicLayout = lazy(() => import('./components/v3public/V3PublicLayout')
 const V3HomePage = lazy(() => import('./pages/v3public/V3HomePage'));
 const EbookLongFormOfferPage = lazy(() => import('./pages/v3public/EbookLongFormOfferPage'));
 const V3AuthPage = lazy(() => import('./pages/v3public/V3AuthPage'));
+const V3BienvenuePage = lazy(() => import('./pages/v3public/V3BienvenuePage'));
 const V3CreatePage = lazy(() => import('./pages/v3public/V3CreatePage'));
 const V3LaunchBookPage = lazy(() => import('./pages/v3public/V3LaunchBookPage'));
 const V3KidsBookCreatePage = lazy(() => import('./pages/v3public/V3KidsBookCreatePage'));
@@ -676,6 +677,7 @@ const App = () => {
             <Route path="/v3" element={<V3PublicLayout isAdmin={isAdmin} isAdminChecking={!isAdminChecked} isSubscriber={isAuthenticated} />}>
               <Route index element={<V3HomePage />} />
               <Route path="auth" element={<V3AuthPage />} />
+              <Route path="bienvenue" element={<V3BienvenuePage />} />
               <Route path="pourquoi" element={<V3PourquoiPage />} />
               <Route path="realite-kdp" element={<V3RealiteKdpPage />} />
               <Route path="contact" element={<ContactSupportPage subscriberEmail={subscriberEmail || ''} />} />

@@ -3,6 +3,7 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import '@/styles/v3-public.css';
 import { SUBSCRIBER_HOME_PATH } from '@/lib/authDestination';
+import useV3Open from '@/hooks/useV3Open';
 import V3Header from './V3Header';
 import V3MainTabs from './V3MainTabs';
 import V3Footer from './V3Footer';
@@ -21,11 +22,12 @@ type V3PublicLayoutProps = {
 };
 
 /** Seule page V3 ouverte aux abonnés V2 : leur offre « Ancien client V2 ». */
-const SUBSCRIBER_ALLOWED_V3_PATHS = new Set(['/v3/migration']);
+const SUBSCRIBER_ALLOWED_V3_PATHS = new Set(['/v3/migration', '/v3/bienvenue']);
 
 export default function V3PublicLayout({ isAdmin, isAdminChecking, isSubscriber = false }: V3PublicLayoutProps) {
   const [isAuthed, setIsAuthed] = useState(false);
   const location = useLocation();
+  const { open: v3Open } = useV3Open();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setIsAuthed(!!data.session));
@@ -45,7 +47,9 @@ export default function V3PublicLayout({ isAdmin, isAdminChecking, isSubscriber 
   // dont la session se restaure). Une fois le statut connu, un abonné non-admin
   // repart sur sa V2, sauf sur la page « Ancien client V2 ».
   const currentPath = location.pathname.replace(/\/+$/, '') || '/v3';
-  if (!isAdminChecking && !isAdmin && isSubscriber && !SUBSCRIBER_ALLOWED_V3_PATHS.has(currentPath)) {
+  // V3 ouverte : l'abonné reste dans la V3 (il l'a choisie). Fermée : il repart
+  // sur sa V2, sauf sur les pages qui lui sont ouvertes.
+  if (v3Open === false && !isAdminChecking && !isAdmin && isSubscriber && !SUBSCRIBER_ALLOWED_V3_PATHS.has(currentPath)) {
     return <Navigate to={SUBSCRIBER_HOME_PATH} replace />;
   }
 
