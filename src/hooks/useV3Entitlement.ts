@@ -62,8 +62,21 @@ export function useV3Entitlement() {
         const full = paid.some((r: any) => (r.plan ?? '').startsWith('full'));
         setHasFull(full);
         setHasBase(full || paid.some((r: any) => (r.plan ?? '').startsWith('base')));
-        // Acheteur V2 (accès à vie) : plans `v2_1x` / `v2_3x` réglés.
-        setHasV2(paid.some((r: any) => (r.plan ?? '').startsWith('v2')));
+        // Ancien client V2 : soit un plan `v2_*` réglé, soit un abonné V2 déjà
+        // présent en base (offre à vie ou abonnement actif) — reconnu sans achat.
+        let legacyV2 = paid.some((r: any) => (r.plan ?? '').startsWith('v2'));
+        if (!legacyV2) {
+          const { data: sub } = await supabase
+            .from('subscribers')
+            .select('status, plan_tier')
+            .ilike('email', email)
+            .maybeSingle();
+          const status = (sub?.status ?? '').toLowerCase();
+          legacyV2 = status === 'active' || status === 'lifetime' || (sub?.plan_tier ?? '') === 'lifetime';
+        }
+        if (cancelled) return;
+        setHasV2(legacyV2);
+
 
       } catch {
         if (!cancelled) {
