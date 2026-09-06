@@ -251,6 +251,7 @@ const queryClient = new QueryClient();
 const App = () => {
   useBrandTitle();
   const { pathname } = useLocation();
+  const { open: v3Open } = useV3Open();
   const { isAdmin, isChecking: isAdminChecking, refresh: refreshAdminAccess } = useAdminAccess();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [subscriberEmail, setSubscriberEmail] = useState('');
