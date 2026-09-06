@@ -540,8 +540,11 @@ export default function AdminSequenceEmailPage() {
 
         <AdminPanelNav />
 
-        <Tabs defaultValue="newsletters" className="space-y-6">
+        <Tabs defaultValue="lancement-v3" className="space-y-6">
           <TabsList className="rounded-xl">
+            <TabsTrigger value="lancement-v3" className="rounded-lg">
+              Lancement V3 Systeme.io
+            </TabsTrigger>
             <TabsTrigger value="newsletters" className="rounded-lg">
               Nouveaux emails Systeme.io
             </TabsTrigger>
@@ -550,9 +553,14 @@ export default function AdminSequenceEmailPage() {
             </TabsTrigger>
           </TabsList>
 
+          <TabsContent value="lancement-v3" className="space-y-6">
+            <LancementV3Panel />
+          </TabsContent>
+
           <TabsContent value="newsletters" className="space-y-6">
             <NewslettersPanel />
           </TabsContent>
+
 
           <TabsContent value="campagne" className="space-y-6">
             <Card className="rounded-2xl border-border bg-card p-6">
