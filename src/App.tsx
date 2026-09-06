@@ -34,6 +34,8 @@ import V3LaunchGlobalBanner from '@/components/V3LaunchGlobalBanner';
 import { captureUtmParams } from '@/lib/utmTracking';
 import { ADMIN_HOME_PATH, ADMIN_LOGIN_PATH } from '@/config/adminRoutes';
 import { getHomePath, SUBSCRIBER_HOME_PATH, type AccessState } from '@/lib/authDestination';
+import { SUBSCRIBER_CHOICE_PATH, getSpaceChoice } from '@/lib/v3OpenState';
+import useV3Open from '@/hooks/useV3Open';
 import { useAdminAccess } from '@/contexts/AdminAccessContext';
 import AdminQuickNav from '@/components/admin/AdminQuickNav';
 import { hasPersistedAdminHint } from '@/lib/adminAccess';
@@ -363,6 +365,7 @@ const App = () => {
         ? 'subscriber'
         : 'visitor';
   const basePath = getHomePath(accessState);
+  const spaceChoice = getSpaceChoice();
   // Après l'ouverture de la V3, l'abonné choisit lui-même son espace.
   const subscriberDestination =
     v3Open === null
