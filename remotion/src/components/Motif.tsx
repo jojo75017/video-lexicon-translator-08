@@ -308,8 +308,9 @@ export const Motif: React.FC<Props> = ({ motif, fontFamily, displayFont }) => {
   const plans = [
     ["Plume", "27 €", "30 livres / mois · 40 chapitres"],
     ["Édition", "47 €", "Livres illimités · 60 chapitres"],
-    ["Studio Pro", "97 €", "Tout inclus · séries multi-tomes"],
+    ["En annuel", "2 mois offerts", "270 € Plume · 470 € Édition"],
   ];
+
   return (
     <div style={{ position: "absolute", right: 130, top: 190, display: "grid", gap: 16 }}>
       {plans.map(([name, price, detail], i) => {
@@ -358,12 +359,14 @@ export const Motif: React.FC<Props> = ({ motif, fontFamily, displayFont }) => {
               style={{
                 margin: 0,
                 fontFamily: displayFont,
-                fontSize: 46,
+                fontSize: price.length > 6 ? 28 : 46,
+                whiteSpace: "nowrap",
                 color: featured ? THEME.gold : THEME.emerald,
               }}
             >
               {price}
             </p>
+
           </div>
         );
       })}
