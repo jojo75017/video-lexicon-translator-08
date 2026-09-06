@@ -53,8 +53,8 @@ export default function V3BienvenuePage() {
           style={{ borderColor: 'rgba(201,168,76,0.55)', background: 'linear-gradient(160deg,#0f2e1f 0%,#123a27 100%)', color: '#fffdf8' }}
         >
           <Sparkles className="h-7 w-7" style={{ color: '#c9a84c' }} />
-          <h2 className="mt-4 text-xl font-semibold">Découvrir la nouvelle version</h2>
-          <p className="mt-2 text-sm opacity-85">
+          <h2 className="mt-4 text-xl font-semibold" style={{ color: '#fffdf8' }}>Découvrir la nouvelle version</h2>
+          <p className="mt-2 text-sm" style={{ color: 'rgba(255,253,248,0.88)' }}>
             Trois nouveautés vous sont offertes à vie : l'assistant d'idée avec sommaire,
             le correcteur de livre et l'export premium. Le reste est visible, avec
             −20&nbsp;% à vie réservés aux anciens clients.
