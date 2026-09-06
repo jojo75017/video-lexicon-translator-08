@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig } from "remotion";
 import { THEME } from "../theme";
-import { LINE_DURATIONS, SUBTITLE_START, type Scene } from "../script";
+import { type Scene } from "../script";
 import Subtitles from "../components/Subtitles";
 import Motif from "../components/Motif";
 import ScreenShot from "../components/ScreenShot";
@@ -12,9 +12,21 @@ interface Props {
   total: number;
   fontFamily: string;
   displayFont: string;
+  /** Durée de chaque sous-titre de la séquence, en frames. */
+  lineFrames: number[];
+  /** Décalage du premier sous-titre (silence d'amorce de la voix). */
+  startAt: number;
 }
 
-export const SceneView: React.FC<Props> = ({ scene, index, total, fontFamily, displayFont }) => {
+export const SceneView: React.FC<Props> = ({
+  scene,
+  index,
+  total,
+  fontFamily,
+  displayFont,
+  lineFrames,
+  startAt,
+}) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
 
@@ -118,8 +130,8 @@ export const SceneView: React.FC<Props> = ({ scene, index, total, fontFamily, di
 
       <Subtitles
         lines={scene.lines}
-        lineFrames={LINE_DURATIONS[index]}
-        startAt={index === 0 ? SUBTITLE_START : 0}
+        lineFrames={lineFrames}
+        startAt={startAt}
         fontFamily={fontFamily}
       />
 
