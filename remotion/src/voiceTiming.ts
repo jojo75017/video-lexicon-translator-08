@@ -11,6 +11,6 @@ export const VOICE_TAIL_SECONDS = 3.0;
 
 /** Durée parlée de chaque séquence, en secondes. */
 export const VOICE_DURATIONS = [
-  45.672, 33.792, 51.264, 38.832, 38.256, 56.88, 42.648, 31.848,
+  51.312, 36.744, 47.64, 38.424, 39.576, 56.688, 44.04, 31.152,
 ];
 
