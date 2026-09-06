@@ -27,6 +27,16 @@ import {
 } from '@/data/campagneUnique';
 
 import {
+  LANCEMENT_V3_DATE,
+  LANCEMENT_V3_EMAILS,
+  LANCEMENT_V3_HOWTO,
+  LANCEMENT_V3_SENDER,
+  LANCEMENT_V3_TAG,
+  lancementV3ToText,
+  type LancementV3Email,
+} from '@/data/lancementV3Systemeio';
+
+import {
   NEWSLETTERS,
   NEWSLETTER_EXCLUDE_TAG,
   NEWSLETTER_HOWTO,
