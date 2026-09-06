@@ -27,6 +27,16 @@ import {
 } from '@/data/campagneUnique';
 
 import {
+  LANCEMENT_V3_DATE,
+  LANCEMENT_V3_EMAILS,
+  LANCEMENT_V3_HOWTO,
+  LANCEMENT_V3_SENDER,
+  LANCEMENT_V3_TAG,
+  lancementV3ToText,
+  type LancementV3Email,
+} from '@/data/lancementV3Systemeio';
+
+import {
   NEWSLETTERS,
   NEWSLETTER_EXCLUDE_TAG,
   NEWSLETTER_HOWTO,
@@ -406,6 +416,118 @@ function NewslettersPanel() {
   );
 }
 
+function LancementV3Card({ email }: { email: LancementV3Email }) {
+  const text = lancementV3ToText(email);
+
+  return (
+    <Card className="rounded-2xl border-border bg-card p-5 shadow-sm">
+      <div className="flex flex-wrap items-center gap-2">
+        <Badge className="rounded-full">{email.step}</Badge>
+        <Badge variant="outline" className="rounded-full">
+          <Clock className="mr-1.5 h-3 w-3" />
+          {email.sendDate} — {email.sendTime}
+        </Badge>
+        <Badge variant="outline" className="rounded-full">
+          <Target className="mr-1.5 h-3 w-3" />
+          {email.goal}
+        </Badge>
+      </div>
+
+      <h3 className="mt-3 text-lg font-semibold text-foreground">{email.subject}</h3>
+      <p className="mt-1 text-sm text-muted-foreground">{email.note}</p>
+
+      <div className="mt-4 rounded-xl border border-border bg-muted/30 p-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          1. Objet
+        </p>
+        <p className="mt-1 text-sm text-foreground">{email.subject}</p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <CopyButton value={email.subject} label="Copier l'objet" />
+          <CopyButton value={email.preheader} label="Copier le pré-header" />
+        </div>
+      </div>
+
+      <div className="mt-3 rounded-xl border border-border bg-muted/30 p-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          2. Texte à coller dans Systeme.io
+        </p>
+        <pre className="mt-2 max-h-72 overflow-auto whitespace-pre-wrap rounded-lg bg-background p-3 text-sm leading-relaxed text-foreground">
+          {email.body}
+        </pre>
+        <div className="mt-2">
+          <CopyButton value={text} label="Copier le texte" variant="default" />
+        </div>
+      </div>
+
+      <div className="mt-3 rounded-xl border border-border bg-muted/30 p-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          3. Bouton Systeme.io
+        </p>
+        <p className="mt-1 text-sm text-foreground">
+          Libellé : <strong>{email.ctaLabel}</strong>
+        </p>
+        <p className="mt-1 break-all text-sm text-muted-foreground">
+          Champ URL : <code>{email.ctaUrl}</code>
+        </p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <CopyButton value={email.ctaLabel} label="Copier le libellé" />
+          <CopyButton value={email.ctaUrl} label="Copier le lien" />
+          <Button asChild size="sm" variant="ghost" className="rounded-xl">
+            <a href={email.ctaUrl} target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="mr-2 h-4 w-4" /> Tester le lien
+            </a>
+          </Button>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function LancementV3Panel() {
+  return (
+    <div className="space-y-6">
+      <Card className="rounded-2xl border-border bg-card p-6">
+        <Badge className="rounded-full">Lancement V3</Badge>
+        <h2 className="mt-3 text-xl font-bold text-foreground">
+          4 emails pour l'ouverture du {LANCEMENT_V3_DATE}
+        </h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Diffusions à programmer dans Systeme.io. Expéditeur :{' '}
+          <strong>{LANCEMENT_V3_SENDER}</strong> · cible : <strong>{LANCEMENT_V3_TAG}</strong> (vos
+          clients actuels). L'application n'envoie rien : ici on copie et on colle.
+        </p>
+        <ul className="mt-4 space-y-1 text-sm text-muted-foreground">
+          {LANCEMENT_V3_EMAILS.map((e) => (
+            <li key={e.id}>
+              <strong className="text-foreground">
+                {e.step} — {e.sendDate}
+              </strong>{' '}
+              · {e.subject}
+            </li>
+          ))}
+        </ul>
+      </Card>
+
+      <Card className="rounded-2xl border-border bg-card p-6">
+        <h2 className="text-lg font-semibold text-foreground">Mode d'emploi</h2>
+        <div className="mt-4 space-y-3 text-sm">
+          {LANCEMENT_V3_HOWTO.map((item) => (
+            <div key={item.title}>
+              <p className="font-medium text-foreground">{item.title}</p>
+              <p className="text-muted-foreground">{item.detail}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {LANCEMENT_V3_EMAILS.map((e) => (
+        <LancementV3Card key={e.id} email={e} />
+      ))}
+    </div>
+  );
+}
+
+
 export default function AdminSequenceEmailPage() {
   const navigate = useNavigate();
 
@@ -418,8 +540,11 @@ export default function AdminSequenceEmailPage() {
 
         <AdminPanelNav />
 
-        <Tabs defaultValue="newsletters" className="space-y-6">
+        <Tabs defaultValue="lancement-v3" className="space-y-6">
           <TabsList className="rounded-xl">
+            <TabsTrigger value="lancement-v3" className="rounded-lg">
+              Lancement V3 Systeme.io
+            </TabsTrigger>
             <TabsTrigger value="newsletters" className="rounded-lg">
               Nouveaux emails Systeme.io
             </TabsTrigger>
@@ -428,9 +553,14 @@ export default function AdminSequenceEmailPage() {
             </TabsTrigger>
           </TabsList>
 
+          <TabsContent value="lancement-v3" className="space-y-6">
+            <LancementV3Panel />
+          </TabsContent>
+
           <TabsContent value="newsletters" className="space-y-6">
             <NewslettersPanel />
           </TabsContent>
+
 
           <TabsContent value="campagne" className="space-y-6">
             <Card className="rounded-2xl border-border bg-card p-6">
