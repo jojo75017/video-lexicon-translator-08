@@ -362,7 +362,15 @@ const App = () => {
       : isAuthenticated
         ? 'subscriber'
         : 'visitor';
-  const rawHomePath = getHomePath(accessType => accessType as never) as never; // placeholder
+  const basePath = getHomePath(accessState);
+  // Après l'ouverture de la V3, l'abonné choisit lui-même son espace.
+  const subscriberDestination =
+    v3Open === null
+      ? null
+      : v3Open === true
+        ? (spaceChoice === 'v2' ? SUBSCRIBER_HOME_PATH : spaceChoice === 'v3' ? '/v3' : SUBSCRIBER_CHOICE_PATH)
+        : SUBSCRIBER_HOME_PATH;
+  const homePath = accessState === 'subscriber' ? subscriberDestination : basePath;
   const isAdminAuthRoute = pathname === ADMIN_LOGIN_PATH || pathname === '/admin-direct';
 
   if (isCheckingAuth) return <PageLoader />;
