@@ -130,8 +130,8 @@ export const SceneView: React.FC<Props> = ({
 
       <Subtitles
         lines={scene.lines}
-        lineFrames={LINE_DURATIONS[index]}
-        startAt={index === 0 ? SUBTITLE_START : 0}
+        lineFrames={lineFrames}
+        startAt={startAt}
         fontFamily={fontFamily}
       />
 
