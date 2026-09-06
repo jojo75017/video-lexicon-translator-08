@@ -13,6 +13,8 @@ import useTrialAccess from '@/hooks/useTrialAccess';
 import { isTrialLockedPath } from '@/lib/trialLockedPaths';
 import { countUnseenNouveautes, isRouteNouveau } from '@/data/v3Nouveautes';
 import ThemeToggle from './ThemeToggle';
+import { setSpaceChoice } from '@/lib/v3OpenState';
+import { SUBSCRIBER_HOME_PATH } from '@/lib/authDestination';
 
 /**
  * Sidebar V3 — espace personnel, organisée en sections repliables.
@@ -400,6 +402,20 @@ export default function V3Sidebar() {
           );
         })}
       </nav>
+
+      {/* Retour vers l'espace habituel : le choix reste réversible à tout moment. */}
+      <div className="px-2 pt-2">
+        <a
+          href={SUBSCRIBER_HOME_PATH}
+          onClick={() => setSpaceChoice('v2')}
+          className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold"
+          style={{ border: '1px solid var(--v3-line)', color: 'var(--v3-ink)' }}
+          title="Revenir à mon espace habituel"
+        >
+          <ChevronLeft className="w-4 h-4 shrink-0" />
+          {!collapsed && <span className="truncate">Mon espace habituel</span>}
+        </a>
+      </div>
 
       {/* Thème clair / sombre / automatique, toujours accessible. */}
       <div className="px-2 pb-4 pt-1" style={{ borderTop: '1px solid var(--v3-line)' }}>

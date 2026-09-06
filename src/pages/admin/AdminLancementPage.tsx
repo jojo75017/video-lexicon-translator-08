@@ -66,7 +66,7 @@ const SWITCHES: Array<{ key: LaunchSettingKey; label: string; help: string }> = 
   {
     key: 'v3_open',
     label: 'Studio V3 ouvert',
-    help: 'Ouvre l’accès complet : la salle d’attente laisse place au studio.',
+    help: 'Interrupteur d’ouverture de la V3 : dès qu’il est allumé, les abonnés voient l’écran de choix « mon espace habituel ou la V3 ». Aucun besoin de republier le site.',
   },
 ];
 

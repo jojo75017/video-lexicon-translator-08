@@ -34,6 +34,8 @@ import V3LaunchGlobalBanner from '@/components/V3LaunchGlobalBanner';
 import { captureUtmParams } from '@/lib/utmTracking';
 import { ADMIN_HOME_PATH, ADMIN_LOGIN_PATH } from '@/config/adminRoutes';
 import { getHomePath, SUBSCRIBER_HOME_PATH, type AccessState } from '@/lib/authDestination';
+import { SUBSCRIBER_CHOICE_PATH, getSpaceChoice } from '@/lib/v3OpenState';
+import useV3Open from '@/hooks/useV3Open';
 import { useAdminAccess } from '@/contexts/AdminAccessContext';
 import AdminQuickNav from '@/components/admin/AdminQuickNav';
 import { hasPersistedAdminHint } from '@/lib/adminAccess';
@@ -98,6 +100,7 @@ const V3PublicLayout = lazy(() => import('./components/v3public/V3PublicLayout')
 const V3HomePage = lazy(() => import('./pages/v3public/V3HomePage'));
 const EbookLongFormOfferPage = lazy(() => import('./pages/v3public/EbookLongFormOfferPage'));
 const V3AuthPage = lazy(() => import('./pages/v3public/V3AuthPage'));
+const V3BienvenuePage = lazy(() => import('./pages/v3public/V3BienvenuePage'));
 const V3CreatePage = lazy(() => import('./pages/v3public/V3CreatePage'));
 const V3LaunchBookPage = lazy(() => import('./pages/v3public/V3LaunchBookPage'));
 const V3KidsBookCreatePage = lazy(() => import('./pages/v3public/V3KidsBookCreatePage'));
@@ -249,6 +252,7 @@ const queryClient = new QueryClient();
 const App = () => {
   useBrandTitle();
   const { pathname } = useLocation();
+  const { open: v3Open } = useV3Open();
   const { isAdmin, isChecking: isAdminChecking, refresh: refreshAdminAccess } = useAdminAccess();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [subscriberEmail, setSubscriberEmail] = useState('');
@@ -362,7 +366,16 @@ const App = () => {
       : isAuthenticated
         ? 'subscriber'
         : 'visitor';
-  const homePath = getHomePath(accessState);
+  const basePath = getHomePath(accessState);
+  const spaceChoice = getSpaceChoice();
+  // Après l'ouverture de la V3, l'abonné choisit lui-même son espace.
+  const subscriberDestination =
+    v3Open === null
+      ? null
+      : v3Open === true
+        ? (spaceChoice === 'v2' ? SUBSCRIBER_HOME_PATH : spaceChoice === 'v3' ? '/v3' : SUBSCRIBER_CHOICE_PATH)
+        : SUBSCRIBER_HOME_PATH;
+  const homePath = accessState === 'subscriber' ? subscriberDestination : basePath;
   const isAdminAuthRoute = pathname === ADMIN_LOGIN_PATH || pathname === '/admin-direct';
 
   if (isCheckingAuth) return <PageLoader />;
@@ -386,7 +399,7 @@ const App = () => {
    */
   const v3Standalone = (node: React.ReactNode) => {
     if (!isAdminChecked) return <PageLoader />;
-    if (!isAdmin && isAuthenticated) return <Navigate to={SUBSCRIBER_HOME_PATH} replace />;
+    if (v3Open === false && !isAdmin && isAuthenticated) return <Navigate to={SUBSCRIBER_HOME_PATH} replace />;
     return <>{node}</>;
   };
 
@@ -664,6 +677,7 @@ const App = () => {
             <Route path="/v3" element={<V3PublicLayout isAdmin={isAdmin} isAdminChecking={!isAdminChecked} isSubscriber={isAuthenticated} />}>
               <Route index element={<V3HomePage />} />
               <Route path="auth" element={<V3AuthPage />} />
+              <Route path="bienvenue" element={<V3BienvenuePage />} />
               <Route path="pourquoi" element={<V3PourquoiPage />} />
               <Route path="realite-kdp" element={<V3RealiteKdpPage />} />
               <Route path="contact" element={<ContactSupportPage subscriberEmail={subscriberEmail || ''} />} />
