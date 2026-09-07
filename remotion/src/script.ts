@@ -60,6 +60,8 @@ export const SCENES: Scene[] = [
     chapter: "Séquence 2",
     title: "Le vrai problème",
     motif: "problem",
+    shot: "accueil.jpg",
+    shotCaption: "Écran réel : tout le studio au même endroit.",
     chips: ["Terminer", "Cohérence", "Publier"],
     lines: [
       "Le problème n'a jamais été de trouver une idée. Le problème, c'est de terminer.",
@@ -146,6 +148,8 @@ export const SCENES: Scene[] = [
     chapter: "Séquence 7",
     title: "Les formules",
     motif: "pricing",
+    shot: "vitrine.jpg",
+    shotCaption: "Des couvertures dignes d'une maison d'édition.",
     chips: ["Plume 27 €/mois", "Édition 47 €/mois", "2 mois offerts en annuel"],
     lines: [
       "Deux formules, et elles sont simples.",
