@@ -162,6 +162,7 @@ const V3OffrePage = lazy(() => import('./pages/v3public/V3OffrePage'));
 const V3CoverOfferPage = lazy(() => import('./pages/v3public/V3CoverOfferPage'));
 const V3CommanderPage = lazy(() => import('./pages/v3public/V3CommanderPage'));
 const ReferralKitPage = lazy(() => import('./pages/ReferralKitPage'));
+const PartenairesPage = lazy(() => import('./pages/PartenairesPage'));
 const GoKdpPilotPage = lazy(() => import('./pages/GoKdpPilotPage'));
 const ContentStudioPage = lazy(() => import('./pages/v3public/ContentStudioPage'));
 const ContentStudioProjectPage = lazy(() => import('./pages/v3public/ContentStudioProjectPage'));
@@ -508,6 +509,8 @@ const App = () => {
             <Route path="/coaching-vip" element={<Navigate to="/offres" replace />} />
             <Route path="/parrainage" element={<Navigate to="/mon-parrainage" replace />} />
             <Route path="/mon-parrainage" element={<ReferralKitPage />} />
+            <Route path="/partenaires" element={<PartenairesPage />} />
+            <Route path="/partenariat" element={<Navigate to="/partenaires" replace />} />
             <Route path="/affiliation" element={<Navigate to="/offres" replace />} />
             <Route path="/webinaire" element={<Navigate to="/offres" replace />} />
             <Route path="/nouveautes-2026" element={<Navigate to="/offres" replace />} />
