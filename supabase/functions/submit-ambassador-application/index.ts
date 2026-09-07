@@ -9,7 +9,17 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const PLATFORMS = ['instagram', 'tiktok', 'youtube', 'autre'];
+// Réseaux acceptés — élargis au programme partenaires V3 (médias écrits et audio).
+const PLATFORMS = [
+  'instagram',
+  'tiktok',
+  'youtube',
+  'blog',
+  'newsletter',
+  'groupe',
+  'podcast',
+  'autre',
+];
 
 function buildHtml(name: string, kitUrl: string, joinUrl: string, pdfUrl: string) {
   const hello = name ? `Salut ${name} 👋` : 'Salut 👋';
