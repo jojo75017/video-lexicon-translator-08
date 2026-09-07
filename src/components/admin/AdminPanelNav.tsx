@@ -23,6 +23,7 @@ const adminNavItems: AdminNavItem[] = [
   { label: 'Emails', path: '/apercu-emails', icon: Mail, exact: true },
   { label: 'Posts', path: '/admin/kit-publication', icon: MessageSquare, exact: true },
   { label: 'Marketing', path: '/dashboard-marketing', icon: BarChart3, exact: true },
+  { label: 'Partenaires', path: '/admin/partenaires', icon: Handshake, exact: true },
   { label: 'Influenceurs', path: '/influenceurs', icon: Megaphone, exact: true },
   { label: 'Guide Ebook', path: '/guide-ebook', icon: BookMarked, exact: true },
   { label: 'CRM', path: '/crm', icon: Contact, exact: true },
