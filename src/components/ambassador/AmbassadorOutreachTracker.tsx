@@ -47,15 +47,20 @@ const STATUSES = [
 ];
 
 const statusMeta = (s: string) => STATUSES.find((x) => x.value === s) || STATUSES[0];
-const platformLabel = (p: string) => PLATFORMS.find((x) => x.value === p)?.label || p;
 
 const DAY = 86_400_000;
 
-const AmbassadorOutreachTracker: React.FC = () => {
+const AmbassadorOutreachTracker: React.FC<AmbassadorOutreachTrackerProps> = ({
+  platforms,
+  addLabel,
+}) => {
+  const PLATFORMS = platforms && platforms.length > 0 ? platforms : DEFAULT_PLATFORMS;
+  const platformLabel = (p: string) => PLATFORMS.find((x) => x.value === p)?.label || p;
+
   const [rows, setRows] = useState<Outreach[]>([]);
   const [loading, setLoading] = useState(true);
   const [handle, setHandle] = useState('');
-  const [platform, setPlatform] = useState('instagram');
+  const [platform, setPlatform] = useState(PLATFORMS[0].value);
   const [niche, setNiche] = useState('');
   const [adding, setAdding] = useState(false);
 
