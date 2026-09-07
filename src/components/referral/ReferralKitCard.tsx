@@ -3,18 +3,24 @@ import { Copy, Check, Gift, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useReferral } from '@/hooks/useReferral';
 import { Button } from '@/components/ui/button';
+import {
+  COMMISSION_FIRST_PAYMENT_RATE,
+  buildPartnerLink,
+  formatEuro,
+} from '@/data/partnerProgram';
 
 /**
  * Kit de parrainage prêt à copier pour les abonnés.
- * Commission : 15 % sur l'accès à vie (47 € → 7,05 € par vente),
- * 20 % sur les abonnements V3 (Plume 27 €/mois → 5,40 € ; Édition 47 €/mois → 9,40 €).
+ * La commission est de 15 % du PREMIER paiement de chaque abonnement
+ * parrainé (Plume mensuel/annuel, Édition mensuel/annuel).
+ * Source unique : src/data/partnerProgram.ts
  */
-const LIFETIME_PRICE = 47;
-const LIFETIME_RATE = 0.15;
-const PLUME_PRICE = 27;
-const PLUME_RATE = 0.20;
-const EDITION_PRICE = 47;
-const EDITION_RATE = 0.20;
+const RATE_PCT = Math.round(COMMISSION_FIRST_PAYMENT_RATE * 100);
+
+const Plume_MONTHLY = 27;
+const PLUME_YEARLY = 270;
+const EDITION_MONTHLY = 47;
+const EDITION_YEARLY = 470;
 
 const ReferralKitCard = () => {
   const { code, stats, loading } = useReferral();
@@ -22,26 +28,26 @@ const ReferralKitCard = () => {
 
   const link = useMemo(() => {
     if (!code) return '';
-    return `https://ebookstudio.fr/commander?ref=${code}&utm_source=parrainage`;
+    return `${buildPartnerLink(code)}&utm_source=parrainage`;
   }, [code]);
 
-  const lifetimeCommission = (LIFETIME_PRICE * LIFETIME_RATE).toFixed(2).replace('.', ',');
-  const plumeCommission = (PLUME_PRICE * PLUME_RATE).toFixed(2).replace('.', ',');
-  const editionCommission = (EDITION_PRICE * EDITION_RATE).toFixed(2).replace('.', ',');
+  const plumeMonthlyCommission = formatEuro(Plume_MONTHLY * COMMISSION_FIRST_PAYMENT_RATE);
+  const editionMonthlyCommission = formatEuro(EDITION_MONTHLY * COMMISSION_FIRST_PAYMENT_RATE);
+  const editionYearlyCommission = formatEuro(EDITION_YEARLY * COMMISSION_FIRST_PAYMENT_RATE);
 
   const posts = useMemo(
     () => [
       {
         label: 'Message court (SMS, WhatsApp)',
-        text: `J'écris mes livres et je les publie sur Amazon avec EbookStudio : plan, chapitres, couverture et fichiers prêts pour KDP. L'accès à vie est à 47 € jusqu'au 30 septembre, après ce sera un abonnement mensuel. Le lien : ${link}`,
+        text: `J'écris mes livres et je les publie sur Amazon avec EbookStudio : plan, chapitres, couverture et fichiers prêts pour KDP. La V3 ouvre le 1er octobre avec l'abonnement Plume à 27 €/mois ou Édition à 47 €/mois. Le lien : ${link}`,
       },
       {
         label: 'Publication Facebook / groupe KDP',
-        text: `Je partage l'outil que j'utilise pour écrire et publier mes livres sur Amazon KDP.\n\nEn pratique : je donne mon sujet, j'obtiens un sommaire que je corrige, les chapitres sont rédigés en français, la couverture est calculée au format exact de KDP (dos compris) et j'exporte un Word + PDF prêts à téléverser.\n\nL'accès à vie est à 47 € jusqu'au 30 septembre (ensuite ce sera un abonnement mensuel). Si ça vous intéresse : ${link}`,
+        text: `Je partage l'outil que j'utilise pour écrire et publier mes livres sur Amazon KDP.\n\nEn pratique : je donne mon sujet, j'obtiens un sommaire que je corrige, les chapitres sont rédigés en français, la couverture est calculée au format exact de KDP (dos compris) et j'exporte un Word + PDF prêts à téléverser.\n\nLa V3 ouvre le 1er octobre (Plume 27 €/mois, Édition 47 €/mois, 2 mois offerts en annuel). Si ça vous intéresse : ${link}`,
       },
       {
-        label: 'Post Pinterest / description courte',
-        text: `Écrire un livre et le publier sur Amazon KDP sans savoir écrire ni maquetter : sommaire, chapitres, couverture et fichiers prêts. Accès à vie 47 € jusqu'au 30/09. ${link}`,
+        label: 'Description de vidéo YouTube',
+        text: `Vous voulez écrire et publier un livre sur Amazon sans savoir écrire ni maquetter ? EbookStudio fait le sommaire, rédige les chapitres en français, calcule la couverture au format KDP et exporte Word + PDF.\n\nLa V3 ouvre le 1er octobre : Plume 27 €/mois ou Édition 47 €/mois. Lien (je touche une commission si vous vous abonnez) : ${link}`,
       },
     ],
     [link],
@@ -67,11 +73,11 @@ const ReferralKitCard = () => {
         <div>
           <h2 className="text-lg font-bold">Votre kit de parrainage</h2>
           <p className="text-sm text-muted-foreground">
-            <strong>15 %</strong> sur l'accès à vie ({LIFETIME_PRICE} €), soit{' '}
-            <strong>{lifetimeCommission} €</strong> par vente. Sur les abonnements V3,{' '}
-            <strong>20 %</strong> : {plumeCommission} €/mois (Plume {PLUME_PRICE} €) ou{' '}
-            {editionCommission} €/mois (Édition {EDITION_PRICE} €). Votre lien suit automatiquement
-            les personnes que vous envoyez.
+            <strong>{RATE_PCT} %</strong> de commission sur le premier paiement de chaque abonnement
+            parrainé. Exemples : {plumeMonthlyCommission} sur Plume mensuel ({Plume_MONTHLY} €),
+            {editionMonthlyCommission} sur Édition mensuel ({EDITION_MONTHLY} €), jusqu'à{' '}
+            <strong>{editionYearlyCommission}</strong> sur Édition annuel ({EDITION_YEARLY} €). Votre
+            lien suit automatiquement les personnes que vous envoyez.
           </p>
         </div>
       </div>
