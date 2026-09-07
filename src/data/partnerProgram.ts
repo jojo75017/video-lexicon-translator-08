@@ -12,7 +12,7 @@ import { V3_PLANS, type V3Plan } from './v3Pricing';
  */
 
 /** Commission versée sur le premier paiement encaissé. */
-export const COMMISSION_FIRST_PAYMENT_RATE = 0.3;
+export const COMMISSION_FIRST_PAYMENT_RATE = 0.15;
 
 /** Ouverture officielle de la V3. */
 export const V3_OPENING_LABEL = '1er octobre 2026';
@@ -318,8 +318,31 @@ Sans réponse de votre part, je ne vous écrirai plus — bonne continuation dan
 Georges Boubet`,
     },
     {
+      key: 'abonnes-tous',
+      label: 'Email à TOUS vos abonnés actuels (à copier dans Systeme.io)',
+      hint: "L'envoi se fait depuis Systeme.io, jamais depuis l'application. Un seul email, une seule idée : leur lien.",
+      body: `Objet : votre lien de parrainage EbookStudio est prêt
+
+Bonjour,
+
+Vous utilisez déjà EbookStudio. Il arrive donc souvent qu'on vous demande avec quoi vous écrivez vos livres. À partir d'aujourd'hui, cette réponse peut vous rapporter quelque chose.
+
+Le programme de parrainage est ouvert : ${rate} % de commission sur le premier paiement de chaque abonnement souscrit avec votre lien, soit jusqu'à ${formatEuro(
+        BEST_COMMISSION,
+      )} pour une formule annuelle. Aucune démarche compliquée, aucun engagement.
+
+Vous créez votre lien en une minute ici : ${kitUrl}
+
+Vous y trouverez aussi des textes prêts à copier : un email pour votre liste, une description de vidéo, une publication courte, une réponse à donner en commentaire. Vous copiez, vous collez, votre lien est déjà dedans.
+
+La version 3 ouvre le ${V3_OPENING_LABEL} : c'est le meilleur moment pour en parler.
+
+À très vite,
+Georges`,
+    },
+    {
       key: 'abonne',
-      label: 'Message à un abonné satisfait',
+      label: 'Message individuel à un abonné satisfait',
       body: `Bonjour,
 
 Vous utilisez EbookStudio et j'ai le sentiment que le studio vous sert vraiment — c'est exactement le profil que je cherche.
