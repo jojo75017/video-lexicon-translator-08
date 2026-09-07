@@ -91,6 +91,7 @@ const FichePreuvePage = lazy(() => import('./pages/launch/FichePreuvePage'));
 const FicheDernierJourPage = lazy(() => import('./pages/launch/FicheDernierJourPage'));
 const MethodePage = lazy(() => import('./pages/launch/MethodePage'));
 const AdminLancementPage = lazy(() => import('./pages/admin/AdminLancementPage'));
+const AdminPartenairesPage = lazy(() => import('./pages/admin/AdminPartenairesPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 
@@ -658,6 +659,7 @@ const App = () => {
             <Route path="/admin/plans-v3" element={<AdminGate><AdminPlansV3Page /></AdminGate>} />
             <Route path="/admin/attente" element={<AdminGate><AdminAttentePage /></AdminGate>} />
             <Route path="/admin/lancement" element={<AdminGate><AdminLancementPage /></AdminGate>} />
+            <Route path="/admin/partenaires" element={<AdminGate><AdminPartenairesPage /></AdminGate>} />
             <Route path="/admin/campagnes" element={<AdminGate><AdminSequenceEmailPage /></AdminGate>} />
             <Route path="/admin/sequence-email" element={<Navigate to="/admin/campagnes" replace />} />
 
