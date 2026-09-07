@@ -184,10 +184,13 @@ const AmbassadorOutreachTracker: React.FC<AmbassadorOutreachTrackerProps> = ({
 
       {/* Add */}
       <div className="bg-white border border-[#232F3E]/10 rounded-xl p-4">
+        {addLabel && (
+          <p className="text-sm font-semibold text-[#232F3E] mb-3">{addLabel}</p>
+        )}
         <div className="grid sm:grid-cols-[1fr_140px_1fr_auto] gap-2 items-end">
           <div>
-            <label className="text-xs text-[#232F3E]/60 mb-1 block">Pseudo / @handle</label>
-            <Input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder="@compte" />
+            <label className="text-xs text-[#232F3E]/60 mb-1 block">Nom / compte</label>
+            <Input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder="ex : Écrire et publier" />
           </div>
           <div>
             <label className="text-xs text-[#232F3E]/60 mb-1 block">Réseau</label>
