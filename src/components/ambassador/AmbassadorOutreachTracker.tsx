@@ -24,12 +24,19 @@ interface Outreach {
   source: string;
 }
 
-const PLATFORMS = [
+const DEFAULT_PLATFORMS = [
   { value: 'instagram', label: 'Instagram' },
   { value: 'tiktok', label: 'TikTok' },
   { value: 'youtube', label: 'YouTube' },
   { value: 'autre', label: 'Autre' },
 ];
+
+interface AmbassadorOutreachTrackerProps {
+  /** Réseaux proposés à la saisie (par défaut : réseaux influenceurs V2). */
+  platforms?: { value: string; label: string }[];
+  /** Libellé de la zone d'ajout. */
+  addLabel?: string;
+}
 
 const STATUSES = [
   { value: 'a_contacter', label: 'À contacter', color: 'bg-[#232F3E]/10 text-[#232F3E]' },
@@ -40,15 +47,20 @@ const STATUSES = [
 ];
 
 const statusMeta = (s: string) => STATUSES.find((x) => x.value === s) || STATUSES[0];
-const platformLabel = (p: string) => PLATFORMS.find((x) => x.value === p)?.label || p;
 
 const DAY = 86_400_000;
 
-const AmbassadorOutreachTracker: React.FC = () => {
+const AmbassadorOutreachTracker: React.FC<AmbassadorOutreachTrackerProps> = ({
+  platforms,
+  addLabel,
+}) => {
+  const PLATFORMS = platforms && platforms.length > 0 ? platforms : DEFAULT_PLATFORMS;
+  const platformLabel = (p: string) => PLATFORMS.find((x) => x.value === p)?.label || p;
+
   const [rows, setRows] = useState<Outreach[]>([]);
   const [loading, setLoading] = useState(true);
   const [handle, setHandle] = useState('');
-  const [platform, setPlatform] = useState('instagram');
+  const [platform, setPlatform] = useState(PLATFORMS[0].value);
   const [niche, setNiche] = useState('');
   const [adding, setAdding] = useState(false);
 
@@ -172,10 +184,13 @@ const AmbassadorOutreachTracker: React.FC = () => {
 
       {/* Add */}
       <div className="bg-white border border-[#232F3E]/10 rounded-xl p-4">
+        {addLabel && (
+          <p className="text-sm font-semibold text-[#232F3E] mb-3">{addLabel}</p>
+        )}
         <div className="grid sm:grid-cols-[1fr_140px_1fr_auto] gap-2 items-end">
           <div>
-            <label className="text-xs text-[#232F3E]/60 mb-1 block">Pseudo / @handle</label>
-            <Input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder="@compte" />
+            <label className="text-xs text-[#232F3E]/60 mb-1 block">Nom / compte</label>
+            <Input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder="ex : Écrire et publier" />
           </div>
           <div>
             <label className="text-xs text-[#232F3E]/60 mb-1 block">Réseau</label>
