@@ -1,4 +1,4 @@
-import { BookOpen, Crown, LayoutDashboard, Mail, Rocket, Users } from 'lucide-react';
+import { BookOpen, Crown, Handshake, LayoutDashboard, Mail, Rocket, Users } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ADMIN_HOME_PATH } from '@/config/adminRoutes';
