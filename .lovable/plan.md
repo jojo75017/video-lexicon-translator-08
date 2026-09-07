@@ -1,24 +1,27 @@
-# Rapports DMARC : rien à changer
+# Corriger le son de la longue vidéo de présentation
 
-Vous gardez les rapports tels quels. Aucune modification n'est nécessaire dans l'application, dans le DNS ou dans vos envois : ces emails sont un signe que votre domaine d'envoi `ebookstudio-mail.fr` est bien surveillé.
+## Ce que j'ai constaté
 
-## Ce que sont ces emails
+La vidéo longue actuellement en ligne sur la page de présentation contient bien une piste sonore, mais son niveau est identique du début à la fin (environ -19 dB partout) : le morceau de piano n'est jamais audible et il reste un souffle continu, hérité de l'ancien fond sonore fabriqué artificiellement. Résultat : on entend un bruit de fond, pas de la musique.
 
-- Envoyés automatiquement chaque jour par Microsoft, Google, Yahoo et d'autres.
-- Ils résument les emails envoyés en votre nom et si l'authentification est passée.
-- Ils arrivent chez vous parce que votre adresse figure dans la balise `rua` du DMARC de `ebookstudio-mail.fr`.
+## Ce que je vais faire
 
-## Pour qu'ils ne gênent plus votre boîte (à faire dans Gmail, 1 minute)
+1. Supprimer complètement l'ancien fond sonore artificiel (c'est lui, le souffle).
+2. Refaire la narration française (même voix féminine que celle validée pour la vidéo de vente), sans changer une ligne du script ni les images.
+3. Utiliser uniquement votre morceau `Ardie Son - Venture` comme musique de fond, en boucle douce, avec un léger fondu au début et à la fin.
+4. Régler l'équilibre : la voix reste au premier plan, la musique clairement audible entre les phrases et pendant les silences, sans jamais couvrir la voix.
+5. Remonter cette nouvelle bande-son sur la vidéo existante : aucune image, aucun texte, aucun sous-titre n'est modifié, donc pas de long re-rendu.
+6. Vérifier le résultat (niveaux mesurés, écoute de plusieurs passages : début, milieu, fin) avant de le publier.
+7. Publier la nouvelle version sur la page de présentation et vous fournir le fichier à télécharger.
 
-1. Ouvrir Gmail, cliquer sur la flèche de la barre de recherche.
-2. Champ « De » : `dmarcreport@microsoft.com OR noreply-dmarc-support@google.com OR dmarc`
-3. Cliquer sur « Créer un filtre ».
-4. Cocher « Ne jamais envoyer dans le dossier Spam », « Appliquer le libellé » → nouveau libellé `DMARC`, et « Ignorer la boîte de réception ».
-5. Enregistrer.
+## Précisions
 
-Les rapports continueront d'arriver, rangés dans le libellé `DMARC`, consultables si un jour vous suspectez une usurpation de votre domaine.
+- La courte vidéo de bienvenue n'est pas touchée ; si vous entendez le même défaut dessus, je l'applique ensuite de la même manière.
+- Seule la narration nécessite de l'IA (voix de synthèse). Le reste (musique, mixage, montage) se fait localement, sans crédits.
+- Aucun autre module, page, paiement ou réglage du site n'est modifié.
 
-## Aucune action côté projet
+## Détails techniques
 
-- Pas de changement de code, de base, de fonction d'envoi ni de DNS.
-- Si un jour vous voulez arrêter ces rapports, il suffira de retirer l'adresse de la balise `rua` chez le service qui gère le DNS de `ebookstudio-mail.fr`.
+- Narration régénérée segment par segment via l'AI Gateway (`openai/gpt-4o-mini-tts`), en respectant les durées déjà définies dans `remotion/src/voiceTiming.ts` pour garder la synchronisation avec les sous-titres.
+- Mixage ffmpeg : `aloop` sur la musique, `sidechaincompress` calibré (ratio modéré, release plus long) piloté par la narration, puis `loudnorm` cible -16 LUFS et vérification `volumedetect` sur plusieurs fenêtres.
+- Remux sans réencodage vidéo (`-c:v copy`, audio AAC), nouvel artefact versionné dans `/mnt/documents`, puis mise à jour du pointeur `src/assets/v3-presentation.mp4.asset.json`.
