@@ -126,8 +126,11 @@ Deno.serve(async (req) => {
     const systemeio = { ok: false, detail: 'disabled' };
 
     const origin = req.headers.get('origin') || 'https://ebookstudio.fr';
-    const kitUrl = `${origin}/influenceurs`;
-    const joinUrl = `${origin}/influenceurs`;
+    // Les candidatures des médias écrits/audio viennent du programme partenaires V3.
+    const isPartnerProgram = ['blog', 'newsletter', 'groupe', 'podcast'].includes(platform);
+    const landing = isPartnerProgram ? '/partenaires' : '/influenceurs';
+    const kitUrl = `${origin}${landing}`;
+    const joinUrl = `${origin}${landing}`;
     const pdfUrl = `${origin}/kit-influenceurs.pdf`;
 
     const resendKey = Deno.env.get('RESEND_API_KEY');
