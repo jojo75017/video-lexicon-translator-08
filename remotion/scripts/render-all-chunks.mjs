@@ -44,6 +44,7 @@ for (let from = 0; from < total; from += CHUNK) {
     outputLocation: out,
     puppeteerInstance: browser,
     muted: true,
+    scale: Number(process.env.SCALE ?? 1),
     concurrency: Number(process.env.CONC ?? 8),
     timeoutInMilliseconds: 120000,
   });
