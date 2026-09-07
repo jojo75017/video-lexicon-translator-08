@@ -24,12 +24,19 @@ interface Outreach {
   source: string;
 }
 
-const PLATFORMS = [
+const DEFAULT_PLATFORMS = [
   { value: 'instagram', label: 'Instagram' },
   { value: 'tiktok', label: 'TikTok' },
   { value: 'youtube', label: 'YouTube' },
   { value: 'autre', label: 'Autre' },
 ];
+
+interface AmbassadorOutreachTrackerProps {
+  /** Réseaux proposés à la saisie (par défaut : réseaux influenceurs V2). */
+  platforms?: { value: string; label: string }[];
+  /** Libellé de la zone d'ajout. */
+  addLabel?: string;
+}
 
 const STATUSES = [
   { value: 'a_contacter', label: 'À contacter', color: 'bg-[#232F3E]/10 text-[#232F3E]' },
