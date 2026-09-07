@@ -8,6 +8,7 @@ const LINKS = [
   { label: 'V3 — Tester', path: '/v3', icon: Rocket },
   { label: 'Dashboard admin', path: ADMIN_HOME_PATH, icon: LayoutDashboard },
   { label: 'Lancement V3', path: '/admin/lancement', icon: Crown },
+  { label: 'Partenaires', path: '/admin/partenaires', icon: Handshake },
   { label: 'Prospects', path: '/gestion-prospects', icon: Users },
   { label: 'Emails', path: '/apercu-emails', icon: Mail },
 ];
