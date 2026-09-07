@@ -11,6 +11,6 @@ export const VOICE_TAIL_SECONDS = 3.0;
 
 /** Durée parlée de chaque séquence, en secondes (voix « ash », vitesse 0,95). */
 export const VOICE_DURATIONS = [
-  54.792, 40.008, 56.112, 42.408, 43.944, 63.168, 46.728, 36.12,
+  52.488, 36.12, 48.936, 43.248, 45.264, 60.384, 44.496, 36.312,
 ];
 

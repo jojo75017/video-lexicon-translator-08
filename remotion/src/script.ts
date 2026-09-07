@@ -27,7 +27,7 @@ export interface Scene {
   motif: "opening" | "problem" | "outline" | "writing" | "proof" | "publish" | "pricing" | "closing";
 }
 
-export const FPS = 30;
+export const FPS = 15;
 const WORDS_PER_MINUTE = 145;
 
 /** Durée d'un sous-titre en frames, jamais moins de 2,6 s. */
