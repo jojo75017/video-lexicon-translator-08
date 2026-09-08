@@ -154,8 +154,12 @@ Deno.serve(async (req) => {
     const systemeio = { ok: false, detail: 'disabled' };
 
     const origin = req.headers.get('origin') || 'https://ebookstudio.fr';
-    // Les candidatures des médias écrits/audio viennent du programme partenaires V3.
-    const isPartnerProgram = ['blog', 'newsletter', 'groupe', 'podcast'].includes(platform);
+    // Programme partenaires V3 : soit la page /partenaires l'indique explicitement,
+    // soit la candidature vient d'un média écrit/audio.
+    const program = String(body?.program ?? '').trim().toLowerCase();
+    const isPartnerProgram =
+      program === 'partenaires' ||
+      ['blog', 'newsletter', 'groupe', 'podcast'].includes(platform);
     const landing = isPartnerProgram ? '/partenaires' : '/influenceurs';
     const kitUrl = `${origin}${landing}`;
     const joinUrl = `${origin}${landing}`;
@@ -167,8 +171,12 @@ Deno.serve(async (req) => {
       await resend.emails.send({
         from: 'Ebookstudio <noreply@ebookstudio.fr>',
         to: [email],
-        subject: 'Bienvenue ambassadeur Ebookstudio — active ton lien 🚀',
-        html: buildHtml(name || handle, kitUrl, joinUrl, pdfUrl),
+        subject: isPartnerProgram
+          ? `Bienvenue partenaire EbookStudio — ${PARTNER_COMMISSION_PCT} % sur le premier paiement`
+          : 'Bienvenue ambassadeur Ebookstudio — active ton lien 🚀',
+        html: isPartnerProgram
+          ? buildPartnerHtml(name || handle, `${origin}/partenaires`)
+          : buildHtml(name || handle, kitUrl, joinUrl, pdfUrl),
       });
     }
 
