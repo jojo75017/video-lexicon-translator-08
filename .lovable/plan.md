@@ -1,6 +1,6 @@
 # Ebook Comic Agent — page exclusive 47 € (au lieu de 97 €)
 
-Offre **externe**, indépendante de vos produits EbookStudio : la page présente Ebook Comic Agent et envoie vers votre lien de vente `trafic-affiliation.com/comic_agent_ia`. Aucun paiement n'est encaissé par EbookStudio, aucun accès n'est déverrouillé dans l'application.
+Offre **externe**, indépendante de vos produits EbookStudio : la page présente Ebook Comic Agent et envoie vers votre vrai tunnel de vente `https://www.trafic-affiliation.com/comic_agent_ia-5f0cc13e`. Aucun paiement n'est encaissé par EbookStudio, aucun accès n'est déverrouillé dans l'application.
 
 ## 1. Nouvelle page `/comic-agent`
 
