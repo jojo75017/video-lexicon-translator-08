@@ -27,10 +27,11 @@ Palette et typographie du site (émeraude & or, éditoriale premium), pas de cou
 
 Utilisées en héros, en galerie « exemples de rendus » et dans les cartes de modules. Aucun texte inventé dans les images.
 
-## 3. Page d'accueil — encart discret
+## 3. Page d'accueil — encart discret avec badge « NOUVEAU »
 
-Petit encart sobre (une ligne + une vignette), placé sous le bloc principal, sans casser la mise en page :
-« Très grosse nouveauté pour vos enfants — Ebook Comic Agent, 47 € au lieu de 97 € » + lien vers `/comic-agent`.
+Petit encart sobre (une ligne + une vignette + un badge « NOUVEAU »), placé sous le bloc principal, **sans surcharger la page** : pas d'animation lourde, pas de couleur flashy, juste le ton éditorial émeraude/or existant.
+« NOUVEAU — Ebook Comic Agent pour vos enfants, 47 € au lieu de 97 € » + lien vers `/comic-agent`.
+L'encart reste compact et ne déborde pas sur les sections existantes.
 
 ## 4. Nouveautés
 
