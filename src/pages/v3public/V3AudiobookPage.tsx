@@ -66,6 +66,14 @@ export default function V3AudiobookPage() {
           }}
         />
 
+        <AudiobookBookPicker
+          onLoaded={({ title: bookTitle, manuscript: text }) => {
+            setManuscript(text);
+            if (bookTitle) setTitle(bookTitle);
+            window.scrollTo({ top: window.scrollY + 300, behavior: 'smooth' });
+          }}
+        />
+
         <Card className="p-5 mb-6 grid gap-4 sm:grid-cols-2">
           <div>
             <Label htmlFor="ab-title">Titre du livre</Label>
