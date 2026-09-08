@@ -21,6 +21,7 @@ import V3LaunchBanner from '@/components/v3public/V3LaunchBanner';
 import V3HeroBanner from '@/components/v3public/V3HeroBanner';
 import V3PresentationVideo from '@/components/v3public/V3PresentationVideo';
 import BdComicNewsBanner from '@/components/bd/BdComicNewsBanner';
+import ComicAgentTeaser from '@/components/comic/ComicAgentTeaser';
 import V3MarketProofPanel from '@/components/v3public/V3MarketProofPanel';
 import V3BeforeAfterPanel from '@/components/v3public/V3BeforeAfterPanel';
 import V3AudiencePanel from '@/components/v3public/V3AudiencePanel';
@@ -82,6 +83,9 @@ export default function V3HomePage() {
       <div className="py-6">
         <BdComicNewsBanner />
       </div>
+
+      {/* NOUVEAU — Ebook Comic Agent (offre partenaire), encart discret */}
+      <ComicAgentTeaser />
 
       {/* CE QUI A CHANGÉ — Sommaire IA + 25 agents en vedette */}
       <V3WhatsNewPanel />

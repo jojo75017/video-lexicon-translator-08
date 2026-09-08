@@ -65,6 +65,14 @@ export const V3_NOUVEAUTES: V3Nouveaute[] = [
     date: '2026-09-02',
     tier: 'edition',
   },
+  {
+    id: 'comic-agent',
+    title: 'Ebook Comic Agent — 47 € au lieu de 97 €',
+    desc: 'Suite IA partenaire : créez et vendez des bandes dessinées et livres illustrés enfants sans savoir dessiner. Offre partenaire indépendante.',
+    to: '/comic-agent',
+    date: '2026-09-08',
+    tier: 'offert',
+  },
   // --- Août 2026 ---
   {
     id: 'contentstudio',

@@ -66,6 +66,7 @@ const BDStudioPage = lazy(() => import('./pages/BDStudioPage'));
 const BDOffrePage = lazy(() => import('./pages/bd/BDOffrePage'));
 const BDUpsellPage = lazy(() => import('./pages/bd/BDUpsellPage'));
 const BDMerciPage = lazy(() => import('./pages/bd/BDMerciPage'));
+const ComicAgentPage = lazy(() => import('./pages/comic/ComicAgentPage'));
 const KdpKeywordResearchPage = lazy(() => import('./pages/KdpKeywordResearchPage'));
 const MasterclassPage = lazy(() => import('./pages/MasterclassPage'));
 const QuizPage = lazy(() => import('./pages/QuizPage'));
@@ -612,6 +613,7 @@ const App = () => {
             <Route path="/bd-offre" element={<BDOffrePage />} />
             <Route path="/bd-upsell" element={<BDUpsellPage />} />
             <Route path="/bd-merci" element={<BDMerciPage />} />
+            <Route path="/comic-agent" element={<ComicAgentPage />} />
             <Route path="/word-count" element={<WordCountPage />} />
             <Route
               path="/ebook-planner"
