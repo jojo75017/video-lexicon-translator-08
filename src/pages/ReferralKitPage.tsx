@@ -1,8 +1,16 @@
+import { useEffect } from 'react';
 import ReferralKitCard from '@/components/referral/ReferralKitCard';
 import SeoHead from '@/components/funnel/SeoHead';
+import { trackCaptureEvent } from '@/lib/captureTracking';
 
 /** Espace parrainage de l'abonné : lien, statistiques et textes prêts à publier. */
 export default function ReferralKitPage() {
+  useEffect(() => {
+    // Origine de la visite (ex. lien de l'email : /mon-parrainage?src=email-parrainage)
+    const src = new URLSearchParams(window.location.search).get('src');
+    void trackCaptureEvent('parrainage', 'view', { leadMagnet: src || 'direct' });
+  }, []);
+
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
       <SeoHead
