@@ -18,86 +18,21 @@ const GOLD_DEEP = '#8a6d16';
 const CREAM = '#fbf6ec';
 const LINE = 'rgba(6,78,59,0.14)';
 
-type Engine = {
-  role: string;
-  title: string;
-  engine: string;
-  desc: string;
-  icon: typeof Search;
-  to?: string;
+const ICONS: Record<string, typeof Search> = {
+  recherche: Search,
+  manuscrit: PenTool,
+  correction: PenTool,
+  visuels: ImageIcon,
+  'mise-en-page': LayoutTemplate,
+  audio: AudioLines,
+  metadonnees: Tags,
+  traduction: Languages,
 };
 
-const ENGINES: Engine[] = [
-  {
-    role: 'Recherche',
-    title: 'Recherche & niche',
-    engine: 'Gemini — recherche approfondie',
-    desc: 'Niche, concurrence et angle éditorial analysés avant la première ligne.',
-    icon: Search,
-    to: '/v3/outils/espion-concurrents',
-  },
-  {
-    role: 'Rédaction',
-    title: 'Rédaction du manuscrit',
-    engine: 'ChatGPT — la plume',
-    desc: 'Chapitre par chapitre, avec mémoire de la bible du livre.',
-    icon: PenTool,
-    to: '/v3/studio',
-  },
-  {
-    role: 'Visuels',
-    title: 'Visuels de couverture',
-    engine: 'Génération d’images IA',
-    desc: 'Directions artistiques photoréalistes, déclinables à volonté.',
-    icon: ImageIcon,
-    to: '/v3/hub?tab=cover-pro',
-  },
-  {
-    role: 'Mise en page',
-    title: 'Couverture & mise en page',
-    engine: 'Cover Studio Pro — 300 DPI',
-    desc: 'Dos calculé, 4e de couverture et fonds perdus conformes KDP.',
-    icon: LayoutTemplate,
-    to: '/v3/hub?tab=cover-pro',
-  },
-  {
-    role: 'Narration',
-    title: 'Livre audio',
-    engine: 'Synthèse vocale premium',
-    desc: 'Votre manuscrit lu au format audio, prêt à publier.',
-    icon: AudioLines,
-    to: '/v3/outils/audiobook',
-  },
-  {
-    role: 'Métadonnées',
-    title: 'Métadonnées Amazon',
-    engine: 'Optimisation KDP',
-    desc: 'Titre, sous-titre, 7 mots-clés et catégories choisis pour être trouvés.',
-    icon: Tags,
-    to: '/kdp-keywords',
-  },
-  {
-    role: 'International',
-    title: 'Portée mondiale',
-    engine: 'Traduction 10 langues',
-    desc: 'Le même livre publié sur les marchés Amazon étrangers.',
-    icon: Languages,
-    to: '/v3/outils/traduction',
-  },
-  {
-    role: 'Partenariat',
-    title: 'KDP Pilot',
-    engine: 'Suivi des ventes & concurrence',
-    desc: 'Historique des positions, ventes estimées et analyse de niche, chaque jour.',
-    icon: LineChart,
-    to: '/go/kdp-pilot',
-  },
-];
-
 const BENEFITS = [
-  'Une vraie autonomie de l’IA : recherche, rédaction, couverture, audio et métadonnées.',
-  'Des fichiers prêts pour KDP, pas des brouillons à retravailler pendant des semaines.',
-  'Un seul enchaînement, de l’idée au fichier publiable.',
+  'Chaque module travaille en 2 temps : Gemini analyse, ChatGPT rédige.',
+  'Vous relisez le brief du temps 1 avant que le texte soit écrit.',
+  'Vos clés Gemini et OpenRouter restent les vôtres, dans votre navigateur.',
 ];
 
 /** Bandeau fin pleine largeur — accroche « moteur multi-modèles ». */
