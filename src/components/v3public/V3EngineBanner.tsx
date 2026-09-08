@@ -116,11 +116,28 @@ export function V3EngineGrid({ className = '' }: { className?: string }) {
                     </div>
                   </div>
                 </div>
-                <div className="mt-3 text-[12px] font-semibold" style={{ color: GOLD_DEEP }}>
-                  {e.engine}
+                <div className="mt-3 space-y-1.5">
+                  <div className="text-[11.5px] leading-snug" style={{ color: '#334155' }}>
+                    <strong style={{ color: GOLD_DEEP }}>Temps 1 · {e.temps1.label}</strong>
+                    <br />
+                    {e.temps1.output}
+                  </div>
+                  <div className="text-[11.5px] leading-snug" style={{ color: '#334155' }}>
+                    <strong style={{ color: GOLD_DEEP }}>Temps 2 · {e.temps2.label}</strong>
+                    <br />
+                    {e.temps2.output}
+                  </div>
                 </div>
-                <p className="mt-1.5 text-[12.5px] leading-relaxed" style={{ color: '#334155' }}>{e.desc}</p>
-                {e.to && (
+                <p className="mt-2 text-[12.5px] leading-relaxed" style={{ color: '#334155' }}>{e.desc}</p>
+                {!e.live && (
+                  <span
+                    className="mt-2 inline-block text-[11px] font-semibold rounded-full px-2 py-0.5"
+                    style={{ color: GOLD_DEEP, background: `${GOLD}22`, border: `1px solid ${GOLD}66` }}
+                  >
+                    2 temps en cours de branchement
+                  </span>
+                )}
+                {e.route && (
                   <span
                     className="mt-3 inline-flex items-center gap-1 text-[12.5px] font-semibold"
                     style={{ color: EMERALD }}
