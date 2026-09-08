@@ -806,6 +806,29 @@ const CoverStudioPro: React.FC = () => {
                       <Eye className="h-3 w-3" /> Test miniature Amazon — le titre reste-t-il lisible ?
                     </div>
                   </div>
+                  <Button
+                    size="sm"
+                    onClick={() => saveToLibrary(c.url, idx)}
+                    disabled={savingIdx === idx}
+                    className="w-full"
+                    style={{ background: '#c2410c', color: '#fff' }}
+                  >
+                    {savingIdx === idx ? (
+                      <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Enregistrement…</>
+                    ) : (
+                      <><Save className="h-4 w-4 mr-2" /> Enregistrer cette image</>
+                    )}
+                  </Button>
+                  {savedIds[idx] && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => navigate(`/v3/mes-couvertures/${savedIds[idx]}`)}
+                    >
+                      <ExternalLink className="h-4 w-4 mr-2" /> Ouvrir dans l'éditeur
+                    </Button>
+                  )}
                   {textMode === 'app' && (
                     <Button
                       size="sm"
