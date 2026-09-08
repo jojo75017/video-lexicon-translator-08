@@ -21,6 +21,11 @@ export interface EditionAgent {
   mission: string;
   /** Module ouvert quand on lance l'agent (clé de v3ModuleRegistry). */
   moduleId: string;
+  /**
+   * Page dédiée à ouvrir à la place du module (priorité sur `moduleId`).
+   * Utilisé pour les métiers de couverture, qui ont leur propre parcours guidé.
+   */
+  route?: string;
   /** Offre minimale requise. */
   tier: EditionTier;
 }
@@ -118,7 +123,7 @@ export const EDITION_AGENTS: EditionAgent[] = [
     moduleId: 'p23-universe-bible', tier: 'v3' },
   { order: 10, department: 'Enrichissement du livre', role: "L'Illustrateur",
     mission: 'V4 : illustrations intérieures IA insérées dans vos chapitres.',
-    moduleId: 'cover-studio-pro', tier: 'v4' },
+    moduleId: 'cover-studio-pro', route: '/v3/couverture-express', tier: 'v4' },
   { order: 11, department: 'Enrichissement du livre', role: 'Le Traducteur',
     mission: 'V4 : traduit votre livre pour les marchés étrangers.',
     moduleId: 'translation-markets', tier: 'v4' },
@@ -152,7 +157,7 @@ export const EDITION_AGENTS: EditionAgent[] = [
     moduleId: 'back-matter-builder', tier: 'v3' },
   { order: 20, department: 'Fabrication', role: 'Le Directeur Artistique',
     mission: 'Crée la couverture pro (dos + 4e + bleed).',
-    moduleId: 'cover-studio-pro', tier: 'v3' },
+    moduleId: 'cover-studio-pro', route: '/v3/couverture-express', tier: 'v3' },
   { order: 21, department: 'Fabrication', role: "Le Correcteur d'épreuves",
     mission: 'Vérifie le bon à tirer (BAT) du broché avant impression.',
     moduleId: 'print-proof-checker', tier: 'v3' },
