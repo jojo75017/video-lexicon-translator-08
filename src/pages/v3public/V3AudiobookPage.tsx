@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Headphones } from 'lucide-react';
 import AudiobookCoverPicker from '@/components/v3public/AudiobookCoverPicker';
+import AudiobookBookPicker from '@/components/v3public/AudiobookBookPicker';
 import { EbookAudioGenerator } from '@/components/ebook/EbookAudioGenerator';
 import { parseManuscript } from '@/lib/manuscriptParser';
 
