@@ -21,6 +21,34 @@ const PLATFORMS = [
   'autre',
 ];
 
+/** Commission partenaires V3 : % du PREMIER paiement (source : src/data/partnerProgram.ts). */
+const PARTNER_COMMISSION_PCT = 15;
+
+/** Email du programme Partenaires V3 (abonnements Plume 27 €/mois, Édition 47 €/mois). */
+function buildPartnerHtml(name: string, partnerUrl: string) {
+  const hello = name ? `Bonjour ${name},` : 'Bonjour,';
+  return `
+  <!DOCTYPE html>
+  <html lang="fr"><head><meta charset="utf-8" /></head>
+  <body style="margin:0;background:#FAFAFA;font-family:Arial,Helvetica,sans-serif;color:#232F3E;">
+    <div style="max-width:600px;margin:0 auto;padding:24px;">
+      <div style="background:#0F342E;color:#fff;padding:28px 24px;border-radius:12px 12px 0 0;text-align:center;">
+        <h1 style="margin:0;font-size:22px;">Bienvenue dans le programme Partenaires EbookStudio</h1>
+      </div>
+      <div style="background:#fff;padding:28px 24px;border:1px solid #e6e6e6;border-top:none;border-radius:0 0 12px 12px;">
+        <p>${hello}</p>
+        <p>Merci pour votre candidature : vous faites désormais partie des partenaires <strong>EbookStudio V3</strong>.</p>
+        <p>Vous touchez <strong>${PARTNER_COMMISSION_PCT} % du premier paiement</strong> de chaque abonnement souscrit grâce à votre lien (Plume 27 €/mois ou 270 €/an, Édition 47 €/mois ou 470 €/an), soit jusqu'à <strong>70,50 €</strong> pour un abonnement Édition annuel.</p>
+        <div style="text-align:center;margin:24px 0;">
+          <a href="${partnerUrl}" style="display:inline-block;background:#B08D3F;color:#fff;font-weight:bold;padding:14px 32px;border-radius:8px;text-decoration:none;">Voir le programme et activer mon lien</a>
+        </div>
+        <p>Vous y trouverez les textes prêts à publier, le calcul de vos gains et la marche à suivre pour votre lien de suivi.</p>
+        <p style="margin-top:24px;">À très vite,<br/>Georges — EbookStudio</p>
+      </div>
+    </div>
+  </body></html>`;
+}
+
 function buildHtml(name: string, kitUrl: string, joinUrl: string, pdfUrl: string) {
   const hello = name ? `Salut ${name} 👋` : 'Salut 👋';
   return `
@@ -126,8 +154,12 @@ Deno.serve(async (req) => {
     const systemeio = { ok: false, detail: 'disabled' };
 
     const origin = req.headers.get('origin') || 'https://ebookstudio.fr';
-    // Les candidatures des médias écrits/audio viennent du programme partenaires V3.
-    const isPartnerProgram = ['blog', 'newsletter', 'groupe', 'podcast'].includes(platform);
+    // Programme partenaires V3 : soit la page /partenaires l'indique explicitement,
+    // soit la candidature vient d'un média écrit/audio.
+    const program = String(body?.program ?? '').trim().toLowerCase();
+    const isPartnerProgram =
+      program === 'partenaires' ||
+      ['blog', 'newsletter', 'groupe', 'podcast'].includes(platform);
     const landing = isPartnerProgram ? '/partenaires' : '/influenceurs';
     const kitUrl = `${origin}${landing}`;
     const joinUrl = `${origin}${landing}`;
@@ -139,8 +171,12 @@ Deno.serve(async (req) => {
       await resend.emails.send({
         from: 'Ebookstudio <noreply@ebookstudio.fr>',
         to: [email],
-        subject: 'Bienvenue ambassadeur Ebookstudio — active ton lien 🚀',
-        html: buildHtml(name || handle, kitUrl, joinUrl, pdfUrl),
+        subject: isPartnerProgram
+          ? `Bienvenue partenaire EbookStudio — ${PARTNER_COMMISSION_PCT} % sur le premier paiement`
+          : 'Bienvenue ambassadeur Ebookstudio — active ton lien 🚀',
+        html: isPartnerProgram
+          ? buildPartnerHtml(name || handle, `${origin}/partenaires`)
+          : buildHtml(name || handle, kitUrl, joinUrl, pdfUrl),
       });
     }
 
