@@ -66,7 +66,7 @@ export function V3EngineStrip({ className = '' }: { className?: string }) {
   );
 }
 
-/** Section détaillée — les 7 moteurs IA de la V3. */
+/** Section détaillée — les modules de la V3, tous en 2 temps. */
 export function V3EngineGrid({ className = '' }: { className?: string }) {
   return (
     <section id="moteurs-ia-v3" className={`max-w-7xl mx-auto px-5 md:px-8 py-8 ${className}`}>
@@ -82,17 +82,18 @@ export function V3EngineGrid({ className = '' }: { className?: string }) {
             className="v3-serif mt-2 text-2xl md:text-3xl font-semibold leading-tight"
             style={{ color: EMERALD }}
           >
-            Les moteurs IA de la V3
+            Chaque module travaille en 2 temps
           </h2>
           <p className="mt-2.5 text-[14px] leading-relaxed" style={{ color: '#334155' }}>
-            Un moteur de publication <strong>multi-modèles</strong> : là où les autres outils font tout
-            passer par une seule IA généraliste, la V3 confie chaque tâche au modèle le plus doué pour elle.
+            <strong>Temps 1 : Gemini analyse</strong> et prépare le travail.{' '}
+            <strong>Temps 2 : ChatGPT rédige</strong> à partir de cette préparation. Vous voyez les deux
+            temps, et vous pouvez relire le brief avant que le texte soit écrit.
           </p>
         </div>
 
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-          {ENGINES.map((e) => {
-            const Icon = e.icon;
+          {TWO_STEP_ENGINES.map((e) => {
+            const Icon = ICONS[e.id] ?? Search;
             const inner = (
               <>
                 <div className="flex items-start gap-3">
