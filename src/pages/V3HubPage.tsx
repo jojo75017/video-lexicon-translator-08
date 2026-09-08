@@ -246,6 +246,15 @@ const V3HubPage: React.FC = () => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const { hasBase, hasFull, isAdmin } = useV3Entitlement();
 
+  // Permet aux entrées « Habiller » et aux agents d'ouvrir directement
+  // le vrai Cover Studio Pro affiché dans le Hub (et non une page d'offre).
+  useEffect(() => {
+    const moduleId = new URLSearchParams(window.location.search).get('module');
+    if (!moduleId) return;
+    const moduleToOpen = getModuleById(moduleId);
+    if (moduleToOpen) setSelected(moduleToOpen);
+  }, []);
+
   // Persiste l'état réduit de la sidebar.
   useEffect(() => {
     localStorage.setItem('v3hub_sidebar_collapsed', sidebarCollapsed ? '1' : '0');
@@ -527,7 +536,7 @@ const V3HubPage: React.FC = () => {
               style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}>
               <Save className="h-4 w-4" /> Mes sauvegardes
             </button>
-            <button onClick={() => navigate('/v3/couverture-express')}
+            <button onClick={() => navigate('/v3/hub?tab=parcours&module=cover-studio-pro')}
               className="inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-sm font-bold border transition-all duration-300 ease-out hover:bg-[#FFF8F0] hover:border-[#E8951E] hover:-translate-y-1 hover:shadow-md active:translate-y-0 active:scale-[0.99]"
               style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}>
               <ImageIcon className="h-4 w-4" /> Image / Couverture

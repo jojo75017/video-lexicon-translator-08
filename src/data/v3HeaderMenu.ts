@@ -60,7 +60,7 @@ export const V3_HEADER_MENU: MenuCategory[] = [
     color: '#c9a84c',
     tagline: 'Le livre-objet',
     links: [
-      { label: 'Studio de couverture', to: '/v3/mes-couvertures', badge: 'V4', desc: 'Illustration IA, modèles, dos calculé et export KDP — tout en un' },
+      { label: 'Studio de couverture', to: '/v3/hub?tab=parcours&module=cover-studio-pro', badge: 'V4', desc: 'Le studio professionnel visible dans votre maison d’édition : titres, styles, images et variantes' },
       { label: 'BD Studio', to: '/bd-studio', desc: 'Bandes dessinées et albums illustrés' },
       { label: 'Illustrations intérieures', to: '/v3/create/illustre', desc: 'Images cohérentes pour chapitres et sections' },
       { label: 'Documentation Studio', to: '/v3/hub?tab=documentation', desc: 'Docs, annexes, glossaires' },
