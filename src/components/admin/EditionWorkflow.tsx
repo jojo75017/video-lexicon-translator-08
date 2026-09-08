@@ -337,9 +337,11 @@ const EditionWorkflow: React.FC<{ onOpenModule: (m: V3Module, opts?: { autoRun?:
   const chapterGoalPages = estimatePages(chapterGoalTotal);
 
   const openAgent = useCallback((agent: EditionAgent) => {
+    // Les métiers de couverture ouvrent leur parcours guidé dédié.
+    if (agent.route) { navigate(agent.route); return; }
     const mod = getModuleById(agent.moduleId);
     if (mod) onOpenModule(mod, { autoRun: true });
-  }, [onOpenModule]);
+  }, [navigate, onOpenModule]);
 
 
 
