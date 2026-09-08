@@ -18,7 +18,9 @@
  */
 
 const RELOAD_FLAG = "chunk_reload_attempt";
-const RELOAD_WINDOW_MS = 30_000; // anti-boucle : 1 rechargement / 30s max
+const RELOAD_COUNT = "chunk_reload_count";
+const RELOAD_WINDOW_MS = 30_000; // fenêtre anti-boucle
+const MAX_ATTEMPTS = 2; // 2 tentatives max dans la fenêtre
 
 const CHUNK_ERROR_PATTERNS = [
   "Failed to fetch dynamically imported module",
@@ -63,23 +65,30 @@ async function clearCaches(): Promise<void> {
 }
 
 function recover(reason: string): void {
+  let attempt = 0;
   try {
     const now = Date.now();
     const last = Number(sessionStorage.getItem(RELOAD_FLAG) || "0");
-    // Garde-fou anti-boucle : si on a déjà rechargé récemment, on n'insiste pas.
-    if (last && now - last < RELOAD_WINDOW_MS) {
-      console.warn("[chunk-recovery] rechargement déjà tenté, on n'insiste pas.", reason);
+    attempt = Number(sessionStorage.getItem(RELOAD_COUNT) || "0");
+
+    if (last && now - last < RELOAD_WINDOW_MS && attempt >= MAX_ATTEMPTS) {
+      console.warn("[chunk-recovery] plusieurs tentatives échouées, on n'insiste pas.", reason);
       return;
     }
+    if (!last || now - last >= RELOAD_WINDOW_MS) attempt = 0;
     sessionStorage.setItem(RELOAD_FLAG, String(now));
+    sessionStorage.setItem(RELOAD_COUNT, String(attempt + 1));
   } catch {
     /* sessionStorage indisponible : on recharge quand même une fois */
   }
 
   console.warn("[chunk-recovery] erreur de module détectée, rechargement…", reason);
   void clearCaches().finally(() => {
-    // reload(true) est déprécié ; on force via l'URL pour casser le cache.
-    window.location.reload();
+    // reload() peut resservir le HTML en cache (donc les mêmes anciens hash de
+    // chunks) : on force une vraie requête réseau via un paramètre d'URL.
+    const url = new URL(window.location.href);
+    url.searchParams.set("v", String(Date.now()));
+    window.location.replace(url.toString());
   });
 }
 
