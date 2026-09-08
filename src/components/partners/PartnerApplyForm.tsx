@@ -36,7 +36,7 @@ export default function PartnerApplyForm() {
     setSending(true);
     try {
       const { data, error } = await supabase.functions.invoke('submit-ambassador-application', {
-        body: { name, email, handle, platform, niche },
+        body: { name, email, handle, platform, niche, program: 'partenaires' },
       });
       if (error) throw error;
       if (!(data as { success?: boolean } | null)?.success) {
