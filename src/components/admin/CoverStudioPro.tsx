@@ -845,7 +845,7 @@ const CoverStudioPro: React.FC = () => {
                   {textMode === 'app' && (
                     <Button
                       size="sm"
-                      onClick={() => downloadComposed(c.url)}
+                      onClick={() => downloadComposed(c.url, idx)}
                       className="w-full"
                       style={{ background: GOLD, color: '#fff' }}
                     >
