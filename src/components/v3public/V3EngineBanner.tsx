@@ -11,6 +11,7 @@ import {
   Check,
   ArrowRight,
 } from 'lucide-react';
+import { TWO_STEP_ENGINES } from '@/data/v3TwoStepEngines';
 
 const EMERALD = '#064e3b';
 const GOLD = '#c9a84c';
