@@ -148,10 +148,10 @@ export function V3EngineGrid({ className = '' }: { className?: string }) {
               </>
             );
 
-            return e.to ? (
+            return e.route ? (
               <Link
-                key={e.title}
-                to={e.to}
+                key={e.id}
+                to={e.route}
                 className="rounded-2xl bg-white p-4 transition-shadow hover:shadow-[0_18px_40px_-28px_rgba(6,78,59,0.55)]"
                 style={{ border: `1px solid ${LINE}` }}
               >
