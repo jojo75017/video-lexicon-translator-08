@@ -17,6 +17,7 @@ import ChapterWriter from '@/components/v3/studio/ChapterWriter';
 import StudioProExport from '@/components/v3/studio/StudioProExport';
 import StudioProBudgetPanel from '@/components/v3/studio/StudioProBudgetPanel';
 import EngineBadge from '@/components/v3/studio/EngineBadge';
+import V3TwoStepBadge from '@/components/v3public/V3TwoStepBadge';
 import { BibleContent, EMPTY_BIBLE, MasterSheetDraft, emptyMasterSheet } from '@/types/studioPro';
 
 
@@ -156,7 +157,9 @@ const V3StudioProPage: React.FC = () => {
           chronologie, indices. Vous la corrigez librement, puis vous validez : rien n’est rédigé
           avant votre accord.
         </p>
+        <V3TwoStepBadge engineId="manuscrit" />
       </header>
+
 
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="mb-5">
