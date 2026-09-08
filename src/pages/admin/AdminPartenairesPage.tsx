@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ExternalLink, Target, Users } from 'lucide-react';
 import AmbassadorOutreachTracker from '@/components/ambassador/AmbassadorOutreachTracker';
 import CopyBlockList from '@/components/partners/CopyBlockList';
+import ReferralTrackingPanel from '@/components/admin/ReferralTrackingPanel';
 import {
   BEST_COMMISSION,
   COMMISSION_FIRST_PAYMENT_RATE,
@@ -69,6 +70,7 @@ export default function AdminPartenairesPage() {
             <TabsTrigger value="messages">Messages à envoyer</TabsTrigger>
             <TabsTrigger value="cibles">Qui contacter</TabsTrigger>
             <TabsTrigger value="suivi">Suivi des contacts</TabsTrigger>
+            <TabsTrigger value="stats">Clics & inscriptions</TabsTrigger>
           </TabsList>
 
           <TabsContent value="messages" className="mt-5">
@@ -106,6 +108,10 @@ export default function AdminPartenairesPage() {
               platforms={PARTNER_PLATFORMS}
               addLabel="Ajouter une cible à contacter"
             />
+          </TabsContent>
+
+          <TabsContent value="stats" className="mt-5">
+            <ReferralTrackingPanel />
           </TabsContent>
         </Tabs>
       </div>
