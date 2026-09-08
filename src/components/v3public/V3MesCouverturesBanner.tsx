@@ -67,7 +67,7 @@ export default function V3MesCouverturesBanner() {
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </Link>
             <Link
-              to="/v3/cover-studio-pro"
+              to="/v3/mes-couvertures"
               className="inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold"
               style={{ background: 'rgba(255,255,255,0.1)', color: '#F7F3E8', border: '1px solid rgba(255,255,255,0.25)' }}
             >

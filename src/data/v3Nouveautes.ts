@@ -116,9 +116,9 @@ export const V3_NOUVEAUTES: V3Nouveaute[] = [
   },
   {
     id: 'cover-studio-pro',
-    title: 'Cover Studio Pro',
+    title: 'Studio de couverture',
     desc: 'Couverture complète 300 DPI : recto, tranche calculée et 4e de couverture.',
-    to: '/v3/cover-studio-pro',
+    to: '/v3/mes-couvertures',
     date: '2026-08-10',
     tier: 'edition',
   },

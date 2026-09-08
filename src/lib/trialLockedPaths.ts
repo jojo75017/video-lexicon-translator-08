@@ -4,7 +4,7 @@
  * des fonctionnalités (le blocage réel est fait par `TrialGate` sur les routes).
  */
 export const TRIAL_LOCKED_PATHS = [
-  '/v3/cover-studio-pro',
+  
   '/v3/outils/audiobook',
   '/v3/outils/traduction',
   '/v3/outils/humanizer',

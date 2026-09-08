@@ -1610,11 +1610,11 @@ Règles :
                   <Copy className="h-4 w-4" /> Copier l’URL
                 </button>
                 <Link
-                  to={`/v3/cover-studio-pro/edit?title=${encodeURIComponent(finalTitle)}&subtitle=${encodeURIComponent(subtitle || '')}&author=${encodeURIComponent(authorName)}${coverUrl ? `&image=${encodeURIComponent(coverUrl)}` : ''}`}
+                  to={`/v3/couverture-express?title=${encodeURIComponent(finalTitle)}&subtitle=${encodeURIComponent(subtitle || '')}&author=${encodeURIComponent(authorName)}${coverUrl ? `&image=${encodeURIComponent(coverUrl)}` : ''}`}
                   className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold"
                   style={{ background: 'var(--v3-ink)', color: '#fff' }}
                 >
-                  <Palette className="h-4 w-4" /> Ouvrir Cover Studio Pro
+                  <Palette className="h-4 w-4" /> Créer ma couverture
                 </Link>
                 <Link
                   to="/couverture-kdp"

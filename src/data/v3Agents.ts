@@ -82,7 +82,7 @@ export const V3_AGENTS: V3Agent[] = [
     id: 'iris', num: '09', name: 'Iris', role: 'Directrice artistique',
     mission: 'Couvertures pro, dos, quatrième de couverture, mockups.',
     deliverables: ['Couverture KDP', 'Dos calculé', 'Mockup 3D'],
-    filter: 'publier', route: '/v3/cover-studio-pro', accent: '#BE123C',
+    filter: 'publier', route: '/v3/mes-couvertures', accent: '#BE123C',
   },
   {
     id: 'aurele', num: '10', name: 'Aurèle', role: 'Correcteur éditorial',

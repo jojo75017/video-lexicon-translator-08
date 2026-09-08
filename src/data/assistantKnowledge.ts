@@ -137,10 +137,10 @@ export const ASSISTANT_FAQ: AssistantFaqEntry[] = [
     question: 'Comment faire une couverture professionnelle ?',
     keywords: ['couverture', 'cover', 'dos', 'tranche', 'kdp cover', 'illustration'],
     answer:
-      "**Cover Studio KDP** pour une couverture Kindle ou poche prête à publier, et **Cover Studio Pro V3** pour une direction artistique premium avec variations et dos calculé.",
+      "**Cover Studio KDP** pour calculer le gabarit exact (dos, fonds perdus), et **Mes couvertures** pour créer, illustrer et enregistrer votre couverture dans l'éditeur.",
     actions: [
       { label: 'Cover Studio KDP', route: '/couverture-kdp' },
-      { label: 'Cover Studio Pro V3', route: '/v3/cover-studio-pro' },
+      { label: 'Mes couvertures', route: '/v3/mes-couvertures' },
     ],
   },
   {
