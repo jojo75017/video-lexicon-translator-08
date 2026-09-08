@@ -121,6 +121,7 @@ export function installChunkErrorRecovery(): void {
       const last = Number(sessionStorage.getItem(RELOAD_FLAG) || "0");
       if (last && Date.now() - last >= RELOAD_WINDOW_MS) {
         sessionStorage.removeItem(RELOAD_FLAG);
+        sessionStorage.removeItem(RELOAD_COUNT);
       }
     } catch {
       /* ignore */
