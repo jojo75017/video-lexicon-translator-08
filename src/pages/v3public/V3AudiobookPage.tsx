@@ -8,8 +8,10 @@ import { Badge } from '@/components/ui/badge';
 import { Headphones } from 'lucide-react';
 import AudiobookCoverPicker from '@/components/v3public/AudiobookCoverPicker';
 import AudiobookBookPicker from '@/components/v3public/AudiobookBookPicker';
+import { Button } from '@/components/ui/button';
 import { EbookAudioGenerator } from '@/components/ebook/EbookAudioGenerator';
 import { parseManuscript } from '@/lib/manuscriptParser';
+import { cleanPastedManuscript } from '@/lib/audiobook/cleanPastedManuscript';
 
 /**
  * Studio livre audio professionnel — reprend l'outil complet déjà en service
@@ -23,15 +25,19 @@ export default function V3AudiobookPage() {
   const [manuscript, setManuscript] = useState('');
   const [cover, setCover] = useState<{ title: string | null; url: string | null } | null>(null);
 
+  const cleaned = useMemo(() => cleanPastedManuscript(manuscript), [manuscript]);
+
   const chapters = useMemo(() => {
-    const sections = parseManuscript(manuscript, 'Chapitre 1');
-    return sections.map((s, i) => ({
-      id: `ch-${i + 1}`,
-      title: s.title,
-      content: s.blocks.map((b) => b.text).join('\n\n'),
-      subChapters: [],
-    }));
-  }, [manuscript]);
+    const sections = parseManuscript(cleaned.text, 'Chapitre 1');
+    return sections
+      .map((s, i) => ({
+        id: `ch-${i + 1}`,
+        title: s.title,
+        content: s.blocks.map((b) => b.text).join('\n\n'),
+        subChapters: [],
+      }))
+      .filter((c) => c.content.trim().length > 0);
+  }, [cleaned.text]);
 
   const totalWords = useMemo(
     () => chapters.reduce((n, c) => n + (c.content?.split(/\s+/).filter(Boolean).length || 0), 0),
@@ -132,6 +138,27 @@ export default function V3AudiobookPage() {
             {chapters.length} chapitre(s) détecté(s) · {totalWords.toLocaleString('fr-FR')} mots ·
             ≈ {Math.max(1, Math.round(totalWords / 150))} min d'écoute
           </div>
+
+          {cleaned.changed && (
+            <div className="mt-3 rounded-md border border-amber-200 bg-amber-50 p-3">
+              <p className="text-xs text-amber-900">
+                Texte remis au propre automatiquement :
+                {cleaned.removedHeader ? ' titre répété en haut de chaque page retiré,' : ''}
+                {cleaned.removedToc ? ' sommaire retiré,' : ''} numéros de page enlevés, titres de
+                chapitre remis en place et mots coupés recollés. La lecture audio utilise déjà cette
+                version propre.
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="mt-2"
+                onClick={() => setManuscript(cleaned.text)}
+              >
+                Voir le texte nettoyé ici
+              </Button>
+            </div>
+          )}
         </Card>
 
         <EbookAudioGenerator
