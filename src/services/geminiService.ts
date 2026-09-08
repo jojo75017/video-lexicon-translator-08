@@ -33,6 +33,8 @@ interface GeminiCallOptions {
   maxTokens?: number;
   timeout?: number;
   jsonMode?: boolean;
+  /** Force l'appel Gemini, sans routage vers un autre provider (moteur 2 temps). */
+  skipProviderRouting?: boolean;
 }
 
 function extractGeminiText(data: any): string {
@@ -55,6 +57,7 @@ async function maybeRouteToOtherProvider(
   options: GeminiCallOptions
 ): Promise<string | null> {
   if (typeof window === 'undefined') return null;
+  if (options.skipProviderRouting) return null;
   try {
     const provider = localStorage.getItem('ai_writing_provider');
     if (provider !== 'claude' && provider !== 'openai' && provider !== 'openrouter') return null;
