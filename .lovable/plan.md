@@ -45,6 +45,6 @@ Ajout dans la source unique des nouveautés : « Ebook Comic Agent — 47 € au
 - Métadonnées de page (titre, description) pour le référencement.
 - Aucune modification des offres existantes (`/bd-offre` 17 €, option Pro 47 €), de la base, des paiements ni de la sécurité.
 
-## À me confirmer ensuite
+## Date de fin
 
-- La date de fin exacte de l'exclusivité de lancement (sinon je mets le 30 septembre 2026).
+Exclusivité de lancement jusqu'au **31 décembre 2026** (compte à rebours et bandeau basés sur cette date).
