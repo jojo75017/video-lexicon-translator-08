@@ -21,6 +21,11 @@ export interface EditionAgent {
   mission: string;
   /** Module ouvert quand on lance l'agent (clé de v3ModuleRegistry). */
   moduleId: string;
+  /**
+   * Page dédiée à ouvrir à la place du module (priorité sur `moduleId`).
+   * Utilisé pour les métiers de couverture, qui ont leur propre parcours guidé.
+   */
+  route?: string;
   /** Offre minimale requise. */
   tier: EditionTier;
 }
