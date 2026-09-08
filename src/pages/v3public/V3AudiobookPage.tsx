@@ -25,15 +25,19 @@ export default function V3AudiobookPage() {
   const [manuscript, setManuscript] = useState('');
   const [cover, setCover] = useState<{ title: string | null; url: string | null } | null>(null);
 
+  const cleaned = useMemo(() => cleanPastedManuscript(manuscript), [manuscript]);
+
   const chapters = useMemo(() => {
-    const sections = parseManuscript(manuscript, 'Chapitre 1');
-    return sections.map((s, i) => ({
-      id: `ch-${i + 1}`,
-      title: s.title,
-      content: s.blocks.map((b) => b.text).join('\n\n'),
-      subChapters: [],
-    }));
-  }, [manuscript]);
+    const sections = parseManuscript(cleaned.text, 'Chapitre 1');
+    return sections
+      .map((s, i) => ({
+        id: `ch-${i + 1}`,
+        title: s.title,
+        content: s.blocks.map((b) => b.text).join('\n\n'),
+        subChapters: [],
+      }))
+      .filter((c) => c.content.trim().length > 0);
+  }, [cleaned.text]);
 
   const totalWords = useMemo(
     () => chapters.reduce((n, c) => n + (c.content?.split(/\s+/).filter(Boolean).length || 0), 0),
