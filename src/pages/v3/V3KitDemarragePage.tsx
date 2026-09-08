@@ -1,4 +1,4 @@
-import { Download, BookOpen, CheckCircle2, Mail } from 'lucide-react';
+import { Download, BookOpen, CheckCircle2, Mail, ExternalLink } from 'lucide-react';
 
 const PDF_URL = '/kit-demarrage-ebookstudio-v3.pdf';
 
@@ -17,7 +17,15 @@ const SOMMAIRE = [
   'Vos cadeaux et les 8 questions les plus posées',
 ];
 
+/** Les navigateurs mobiles n'affichent pas les PDF dans un cadre : on propose alors des boutons. */
+const canEmbedPdf = () => {
+  if (typeof navigator === 'undefined') return true;
+  return !/iphone|ipad|ipod|android/i.test(navigator.userAgent);
+};
+
 export default function V3KitDemarragePage() {
+  const canEmbed = canEmbedPdf();
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
       <header className="rounded-2xl border border-[#c9a84c]/40 bg-[#064e3b] p-6 text-white">
