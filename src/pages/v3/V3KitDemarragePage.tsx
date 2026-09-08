@@ -60,7 +60,26 @@ export default function V3KitDemarragePage() {
       </section>
 
       <section className="mt-6 rounded-2xl border bg-card p-6">
-        <h2 className="font-serif text-xl text-[#064e3b]">Lire en ligne</h2>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-serif text-xl text-[#064e3b]">Lire en ligne</h2>
+          <div className="flex flex-wrap items-center gap-2">
+            <a
+              href={PDF_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg border border-[#064e3b] px-4 py-2 text-sm font-semibold text-[#064e3b]"
+            >
+              <ExternalLink className="h-4 w-4" /> Ouvrir dans un nouvel onglet
+            </a>
+            <a
+              href={PDF_URL}
+              download
+              className="inline-flex items-center gap-2 rounded-lg bg-[#064e3b] px-4 py-2 text-sm font-semibold text-white"
+            >
+              <Download className="h-4 w-4" /> Télécharger
+            </a>
+          </div>
+        </div>
         {canEmbed ? (
           <div className="mt-4 overflow-hidden rounded-xl border">
             <iframe
