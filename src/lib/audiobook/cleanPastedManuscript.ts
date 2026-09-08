@@ -74,6 +74,18 @@ export function cleanPastedManuscript(raw: string): CleanResult {
   const removedToc = tocIndexes.length > 0;
   if (removedToc) {
     const skip = new Set(tocIndexes);
+    // Le sommaire peut continuer sur les pages suivantes : on suit la trace
+    // des lignes truffées de numéros de section (« 4.2 … 5.1 … »).
+    const looksLikeToc = (l: string) =>
+      (l.match(/\b\d+\.\d+\b/g) || []).length >= 3 ||
+      (l.match(/\bChapitre\s+\d+\s*:/gi) || []).length >= 2;
+    for (const start of tocIndexes) {
+      for (let i = start + 1; i < lines.length; i += 1) {
+        if (!lines[i].trim()) continue;
+        if (!looksLikeToc(lines[i])) break;
+        skip.add(i);
+      }
+    }
     lines = lines.filter((_, i) => !skip.has(i));
   }
 
