@@ -301,17 +301,70 @@ const CoverStudioPro: React.FC = () => {
     }
   };
 
+  /**
+   * Enregistre l'image dans « Mes couvertures » (stockage privé + projet).
+   * Renvoie aussi un lien signé, utilisable pour le téléchargement.
+   */
+  const saveToLibrary = async (
+    url: string,
+    idx: number,
+    opts?: { silent?: boolean },
+  ): Promise<{ projectId: string; signedUrl: string | null } | null> => {
+    setSavingIdx(idx);
+    try {
+      const { data, error } = await supabase.functions.invoke('cover-studio-save-image', {
+        body: {
+          imageUrl: url,
+          projectId: savedIds[idx] || undefined,
+          bookTitle: title.trim(),
+          projectName: title.trim() || `Couverture premium ${idx + 1}`,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const projectId = data?.projectId as string;
+      setSavedIds((prev) => ({ ...prev, [idx]: projectId }));
+      if (!opts?.silent) toast.success('Image enregistrée dans « Mes couvertures ».');
+      return { projectId, signedUrl: (data?.signedUrl as string) || null };
+    } catch (e) {
+      if (!opts?.silent) {
+        toast.error((e as Error).message || "L'image n'a pas pu être enregistrée.");
+      }
+      return null;
+    } finally {
+      setSavingIdx(null);
+    }
+  };
+
   /** Illustration seule, telle que produite par le moteur. */
   const downloadIllustration = async (url: string, idx: number) => {
+    const fileName = `illustration-couverture-${idx + 1}.png`;
     try {
       const res = await fetch(url, { mode: 'cors', cache: 'no-store' });
       if (!res.ok) throw new Error('fetch failed');
-      triggerDownload(await res.blob(), `illustration-couverture-${idx + 1}.png`);
+      triggerDownload(await res.blob(), fileName);
+      return;
     } catch {
-      window.open(url, '_blank');
-      toast.info("Ouverture dans un nouvel onglet — clic droit puis « Enregistrer l'image ».");
+      /* lien du moteur inaccessible : on passe par une copie enregistrée */
     }
+    const saved = await saveToLibrary(url, idx, { silent: true });
+    if (saved?.signedUrl) {
+      try {
+        const res = await fetch(saved.signedUrl, { cache: 'no-store' });
+        if (!res.ok) throw new Error('fetch failed');
+        triggerDownload(await res.blob(), fileName);
+        toast.success('Image téléchargée et enregistrée dans « Mes couvertures ».');
+        return;
+      } catch {
+        /* on tente l'ouverture directe ci-dessous */
+      }
+      window.open(saved.signedUrl, '_blank');
+      toast.info("Ouverture dans un nouvel onglet — clic droit puis « Enregistrer l'image ».");
+      return;
+    }
+    toast.error("L'image n'a pas pu être récupérée. Relancez la génération.");
   };
+
 
   /** Couverture finale : illustration + titre, sous-titre et auteur en typographie nette. */
   const downloadComposed = async (url: string) => {
