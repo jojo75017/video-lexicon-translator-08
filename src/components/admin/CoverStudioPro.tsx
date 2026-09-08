@@ -121,6 +121,10 @@ const CoverStudioPro: React.FC = () => {
   const [composing, setComposing] = useState(false);
   const [composeError, setComposeError] = useState('');
   const [orCredits, setOrCredits] = useState<string>('');
+  const [savedIds, setSavedIds] = useState<Record<number, string>>({});
+  const [savingIdx, setSavingIdx] = useState<number | null>(null);
+  const navigate = useNavigate();
+
 
   /** URLs locales des illustrations, pour composer et exporter sans CORS. */
   const localUrls = useRef<Record<string, string>>({});
