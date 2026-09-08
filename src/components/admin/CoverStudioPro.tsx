@@ -367,16 +367,29 @@ const CoverStudioPro: React.FC = () => {
 
 
   /** Couverture finale : illustration + titre, sous-titre et auteur en typographie nette. */
-  const downloadComposed = async (url: string) => {
-    try {
-      const local = await ensureLocalUrl(url);
+  const downloadComposed = async (url: string, idx = 0) => {
+    const compose = async (source: string) => {
       const composition = buildStudioComposition({ title, subtitle, author, placement });
-      const result = await exportFrontPng(composition, local, title);
+      const result = await exportFrontPng(composition, source, title);
       triggerDownload(result.blob, safeFileName(title, 'couverture-premium', 'png'));
       toast.success(`Couverture téléchargée · ${result.width} × ${result.height} px`);
+    };
+    try {
+      await compose(await ensureLocalUrl(url));
+      return;
     } catch {
-      toast.error("Le fichier n'a pas pu être créé. Téléchargez l'illustration seule.");
+      /* image du moteur inaccessible : on passe par une copie enregistrée */
     }
+    const saved = await saveToLibrary(url, idx, { silent: true });
+    if (saved?.signedUrl) {
+      try {
+        await compose(await ensureLocalUrl(saved.signedUrl));
+        return;
+      } catch {
+        /* échec final */
+      }
+    }
+    toast.error("Le fichier n'a pas pu être créé. Téléchargez l'illustration seule.");
   };
 
   return (
