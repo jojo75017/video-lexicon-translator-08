@@ -99,6 +99,7 @@ const NAV: NavSection[] = [
   {
     section: 'Habiller & exporter',
     items: [
+      { to: '/v3/hub?tab=parcours&module=cover-studio-pro', label: 'Studio de couverture', icon: ImageIcon, badge: 'V4' },
       { to: '/v3/mes-couvertures', label: 'Mes couvertures', icon: ImageIcon },
       { to: '/v3/outils/mockup-3d', label: 'Mockups 3D', icon: ImageIcon },
       { to: '/v3/outils/audiobook', label: 'Audiobook TTS', icon: Video },
@@ -234,9 +235,9 @@ export default function V3Sidebar() {
       {/* Accès prioritaire : reste visible au-dessus des longues rubriques. */}
       <div className="sticky top-[49px] z-10 bg-background px-2 py-2">
         <NavLink
-          to="/v3/couverture-express"
-          title="Créer ma couverture — assistant guidé en 3 étapes"
-          aria-label="Créer ma couverture — assistant guidé en 3 étapes"
+          to="/v3/hub?tab=parcours&module=cover-studio-pro"
+          title="Créer ma couverture — Cover Studio Pro"
+          aria-label="Créer ma couverture — Cover Studio Pro"
           className="relative flex min-h-12 items-center gap-2.5 rounded-md bg-orange-500 px-2.5 py-2 text-sm font-bold text-primary-foreground shadow-sm transition-colors hover:bg-orange-600"
         >
           <ImageIcon className="h-5 w-5 shrink-0" />
@@ -244,7 +245,7 @@ export default function V3Sidebar() {
             <>
               <span className="min-w-0 flex-1">
                 <span className="block truncate">Créer ma couverture</span>
-                <span className="block truncate text-[10px] font-medium opacity-90">Assistant guidé en 3 étapes</span>
+                 <span className="block truncate text-[10px] font-medium opacity-90">Cover Studio Pro</span>
               </span>
               <span className="rounded bg-primary-foreground/20 px-1.5 py-0.5 text-[9px] font-bold uppercase">V4</span>
             </>
