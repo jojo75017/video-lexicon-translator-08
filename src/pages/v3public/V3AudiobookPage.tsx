@@ -138,6 +138,27 @@ export default function V3AudiobookPage() {
             {chapters.length} chapitre(s) détecté(s) · {totalWords.toLocaleString('fr-FR')} mots ·
             ≈ {Math.max(1, Math.round(totalWords / 150))} min d'écoute
           </div>
+
+          {cleaned.changed && (
+            <div className="mt-3 rounded-md border border-amber-200 bg-amber-50 p-3">
+              <p className="text-xs text-amber-900">
+                Texte remis au propre automatiquement :
+                {cleaned.removedHeader ? ' titre répété en haut de chaque page retiré,' : ''}
+                {cleaned.removedToc ? ' sommaire retiré,' : ''} numéros de page enlevés, titres de
+                chapitre remis en place et mots coupés recollés. La lecture audio utilise déjà cette
+                version propre.
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="mt-2"
+                onClick={() => setManuscript(cleaned.text)}
+              >
+                Voir le texte nettoyé ici
+              </Button>
+            </div>
+          )}
         </Card>
 
         <EbookAudioGenerator
