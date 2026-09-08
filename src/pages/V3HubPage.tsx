@@ -527,7 +527,7 @@ const V3HubPage: React.FC = () => {
               style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}>
               <Save className="h-4 w-4" /> Mes sauvegardes
             </button>
-            <button onClick={() => openModule('cover-studio-pro')}
+            <button onClick={() => navigate('/v3/couverture-express')}
               className="inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-sm font-bold border transition-all duration-300 ease-out hover:bg-[#FFF8F0] hover:border-[#E8951E] hover:-translate-y-1 hover:shadow-md active:translate-y-0 active:scale-[0.99]"
               style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}>
               <ImageIcon className="h-4 w-4" /> Image / Couverture
