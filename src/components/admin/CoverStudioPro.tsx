@@ -6,8 +6,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Loader2, Sparkles, Download, Crown, Wand2, Eye, BookOpen, CheckCircle2, KeyRound,
-  Type, ImageIcon, AlertTriangle,
+  Type, ImageIcon, AlertTriangle, Save, ExternalLink,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -120,6 +121,10 @@ const CoverStudioPro: React.FC = () => {
   const [composing, setComposing] = useState(false);
   const [composeError, setComposeError] = useState('');
   const [orCredits, setOrCredits] = useState<string>('');
+  const [savedIds, setSavedIds] = useState<Record<number, string>>({});
+  const [savingIdx, setSavingIdx] = useState<number | null>(null);
+  const navigate = useNavigate();
+
 
   /** URLs locales des illustrations, pour composer et exporter sans CORS. */
   const localUrls = useRef<Record<string, string>>({});
@@ -296,29 +301,95 @@ const CoverStudioPro: React.FC = () => {
     }
   };
 
-  /** Illustration seule, telle que produite par le moteur. */
-  const downloadIllustration = async (url: string, idx: number) => {
+  /**
+   * Enregistre l'image dans « Mes couvertures » (stockage privé + projet).
+   * Renvoie aussi un lien signé, utilisable pour le téléchargement.
+   */
+  const saveToLibrary = async (
+    url: string,
+    idx: number,
+    opts?: { silent?: boolean },
+  ): Promise<{ projectId: string; signedUrl: string | null } | null> => {
+    setSavingIdx(idx);
     try {
-      const res = await fetch(url, { mode: 'cors', cache: 'no-store' });
-      if (!res.ok) throw new Error('fetch failed');
-      triggerDownload(await res.blob(), `illustration-couverture-${idx + 1}.png`);
-    } catch {
-      window.open(url, '_blank');
-      toast.info("Ouverture dans un nouvel onglet — clic droit puis « Enregistrer l'image ».");
+      const { data, error } = await supabase.functions.invoke('cover-studio-save-image', {
+        body: {
+          imageUrl: url,
+          projectId: savedIds[idx] || undefined,
+          bookTitle: title.trim(),
+          projectName: title.trim() || `Couverture premium ${idx + 1}`,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const projectId = data?.projectId as string;
+      setSavedIds((prev) => ({ ...prev, [idx]: projectId }));
+      if (!opts?.silent) toast.success('Image enregistrée dans « Mes couvertures ».');
+      return { projectId, signedUrl: (data?.signedUrl as string) || null };
+    } catch (e) {
+      if (!opts?.silent) {
+        toast.error((e as Error).message || "L'image n'a pas pu être enregistrée.");
+      }
+      return null;
+    } finally {
+      setSavingIdx(null);
     }
   };
 
-  /** Couverture finale : illustration + titre, sous-titre et auteur en typographie nette. */
-  const downloadComposed = async (url: string) => {
+  /** Illustration seule, telle que produite par le moteur. */
+  const downloadIllustration = async (url: string, idx: number) => {
+    const fileName = `illustration-couverture-${idx + 1}.png`;
     try {
-      const local = await ensureLocalUrl(url);
+      const res = await fetch(url, { mode: 'cors', cache: 'no-store' });
+      if (!res.ok) throw new Error('fetch failed');
+      triggerDownload(await res.blob(), fileName);
+      return;
+    } catch {
+      /* lien du moteur inaccessible : on passe par une copie enregistrée */
+    }
+    const saved = await saveToLibrary(url, idx, { silent: true });
+    if (saved?.signedUrl) {
+      try {
+        const res = await fetch(saved.signedUrl, { cache: 'no-store' });
+        if (!res.ok) throw new Error('fetch failed');
+        triggerDownload(await res.blob(), fileName);
+        toast.success('Image téléchargée et enregistrée dans « Mes couvertures ».');
+        return;
+      } catch {
+        /* on tente l'ouverture directe ci-dessous */
+      }
+      window.open(saved.signedUrl, '_blank');
+      toast.info("Ouverture dans un nouvel onglet — clic droit puis « Enregistrer l'image ».");
+      return;
+    }
+    toast.error("L'image n'a pas pu être récupérée. Relancez la génération.");
+  };
+
+
+  /** Couverture finale : illustration + titre, sous-titre et auteur en typographie nette. */
+  const downloadComposed = async (url: string, idx = 0) => {
+    const compose = async (source: string) => {
       const composition = buildStudioComposition({ title, subtitle, author, placement });
-      const result = await exportFrontPng(composition, local, title);
+      const result = await exportFrontPng(composition, source, title);
       triggerDownload(result.blob, safeFileName(title, 'couverture-premium', 'png'));
       toast.success(`Couverture téléchargée · ${result.width} × ${result.height} px`);
+    };
+    try {
+      await compose(await ensureLocalUrl(url));
+      return;
     } catch {
-      toast.error("Le fichier n'a pas pu être créé. Téléchargez l'illustration seule.");
+      /* image du moteur inaccessible : on passe par une copie enregistrée */
     }
+    const saved = await saveToLibrary(url, idx, { silent: true });
+    if (saved?.signedUrl) {
+      try {
+        await compose(await ensureLocalUrl(saved.signedUrl));
+        return;
+      } catch {
+        /* échec final */
+      }
+    }
+    toast.error("Le fichier n'a pas pu être créé. Téléchargez l'illustration seule.");
   };
 
   return (
@@ -748,10 +819,33 @@ const CoverStudioPro: React.FC = () => {
                       <Eye className="h-3 w-3" /> Test miniature Amazon — le titre reste-t-il lisible ?
                     </div>
                   </div>
+                  <Button
+                    size="sm"
+                    onClick={() => saveToLibrary(c.url, idx)}
+                    disabled={savingIdx === idx}
+                    className="w-full"
+                    style={{ background: '#c2410c', color: '#fff' }}
+                  >
+                    {savingIdx === idx ? (
+                      <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Enregistrement…</>
+                    ) : (
+                      <><Save className="h-4 w-4 mr-2" /> Enregistrer cette image</>
+                    )}
+                  </Button>
+                  {savedIds[idx] && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => navigate(`/v3/mes-couvertures/${savedIds[idx]}`)}
+                    >
+                      <ExternalLink className="h-4 w-4 mr-2" /> Ouvrir dans l'éditeur
+                    </Button>
+                  )}
                   {textMode === 'app' && (
                     <Button
                       size="sm"
-                      onClick={() => downloadComposed(c.url)}
+                      onClick={() => downloadComposed(c.url, idx)}
                       className="w-full"
                       style={{ background: GOLD, color: '#fff' }}
                     >
