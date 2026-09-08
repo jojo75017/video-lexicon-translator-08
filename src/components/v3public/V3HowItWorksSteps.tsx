@@ -44,11 +44,11 @@ const STEPS = [
     n: 4,
     title: 'Vous habillez le livre',
     text:
-      "Cover Studio Pro compose la couverture : formats Kindle, broché avec dos et tranche, carré illustré, hardcover avec rabats. Export PDF print-ready avec bleed 3 mm, prêt pour l'impression Amazon.",
+      "Le studio de couverture compose la couverture : format Kindle, broché avec dos et tranche calculés. Vos projets sont enregistrés et modifiables à tout moment, avec export local.",
     img: shotCover,
-    alt: 'Cover Studio Pro : choix des formats Kindle, broché KDP, carré Kids et hardcover',
-    to: '/v3/cover-studio-pro',
-    cta: 'Ouvrir Cover Studio Pro',
+    alt: 'Studio de couverture : format Kindle et broché KDP avec dos calculé',
+    to: '/v3/mes-couvertures',
+    cta: 'Ouvrir le studio de couverture',
   },
   {
     n: 5,
