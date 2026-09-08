@@ -53,17 +53,39 @@ export default function V3KitDemarragePage() {
 
       <section className="mt-6 rounded-2xl border bg-card p-6">
         <h2 className="font-serif text-xl text-[#064e3b]">Lire en ligne</h2>
-        <div className="mt-4 overflow-hidden rounded-xl border">
-          <object data={PDF_URL} type="application/pdf" className="h-[720px] w-full">
-            <p className="p-6 text-sm text-muted-foreground">
-              Votre navigateur n'affiche pas les PDF.{' '}
-              <a href={PDF_URL} download className="font-semibold text-[#064e3b] underline">
-                Téléchargez le kit ici
-              </a>
-              .
+        {canEmbed ? (
+          <div className="mt-4 overflow-hidden rounded-xl border">
+            <iframe
+              src={PDF_URL}
+              title="Kit de démarrage Ebookstudio V3"
+              className="h-[70vh] min-h-[520px] w-full"
+            />
+          </div>
+        ) : (
+          <div className="mt-4 rounded-xl border bg-[#fdf6e3] p-6 text-center">
+            <p className="text-sm text-[#3a3a3a]">
+              Votre navigateur ne peut pas afficher le PDF directement. Ouvrez-le ou
+              téléchargez-le, il s'agit du même document.
             </p>
-          </object>
-        </div>
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+              <a
+                href={PDF_URL}
+                download
+                className="inline-flex items-center gap-2 rounded-xl bg-[#064e3b] px-5 py-2.5 text-sm font-semibold text-white"
+              >
+                <Download className="h-4 w-4" /> Télécharger le kit
+              </a>
+              <a
+                href={PDF_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-xl border border-[#064e3b] px-5 py-2.5 text-sm font-semibold text-[#064e3b]"
+              >
+                <ExternalLink className="h-4 w-4" /> Ouvrir dans un nouvel onglet
+              </a>
+            </div>
+          </div>
+        )}
       </section>
 
       <section className="mt-6 rounded-2xl border border-[#c9a84c]/50 bg-[#fdf6e3] p-6">
