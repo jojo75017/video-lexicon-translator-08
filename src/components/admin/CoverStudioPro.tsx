@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Sparkles, Download, Crown, Wand2, Eye, BookOpen, CheckCircle2, KeyRound } from 'lucide-react';
+import {
+  Loader2, Sparkles, Download, Crown, Wand2, Eye, BookOpen, CheckCircle2, KeyRound,
+  Type, ImageIcon, AlertTriangle,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -13,16 +16,28 @@ import {
   getIdeogramKey,
   setIdeogramKey,
 } from '@/lib/ebookExportOptions';
-
+import {
+  buildStudioComposition,
+  COVER_IMAGE_STYLES,
+  getImageStyle,
+  TEXT_PLACEMENTS,
+  type TextPlacement,
+} from '@/lib/cover-editor/studioProCover';
+import { exportFrontPng, renderFrontCanvas, safeFileName } from '@/lib/cover-editor/coverExports';
 
 const GOLD = '#a8842c';
 
 const NICHES = [
   { value: 'auto', label: '✨ Auto (IA décide)', prompt: '' },
   { value: 'thriller', label: '🔪 Thriller / Suspense', prompt: 'Cinematic thriller cover — moody chiaroscuro, deep shadows, single dramatic light source, fog or rain, desaturated cold palette with one accent (blood red, neon blue), sense of dread, Fincher / Villeneuve cinematography.' },
+  { value: 'policier', label: '🕵️ Policier / Enquête', prompt: 'Crime and detective novel cover — nocturnal city street or clue-laden object, wet asphalt reflections, street-lamp glow, cold blue-grey palette with a single warm accent, investigative tension, classic Série Noire elegance.' },
   { value: 'business', label: '💼 Business / Productivité', prompt: 'Modern business book cover — sleek minimalist object photography, clean white or deep navy background, high-end editorial typography à la HBR / Penguin Business, premium matte texture, gold or copper accents, Atomic Habits / Sapiens energy.' },
+  { value: 'devperso', label: '🚀 Développement personnel', prompt: 'Personal-growth book cover — luminous uplifting composition, single strong metaphorical symbol (path, sunrise, open door), bright confident palette with gold accent, large calm areas for typography, best-seller self-help clarity.' },
   { value: 'fantasy', label: '🐉 Fantasy / SF', prompt: 'Epic fantasy cover — sweeping painted landscape, ancient ruins or ethereal forest, magical luminescence, dramatic sky, heroic silhouette, ornate medallion foreground, Brandon Sanderson / Tolkien edition style.' },
+  { value: 'historique', label: '🏛️ Historique', prompt: 'Historical novel cover — period-accurate setting and costume, museum-quality painted rendering, aged parchment and sepia tones with deep crimson or navy accent, monumental architecture or landscape, dignified literary atmosphere.' },
+  { value: 'jeunesse', label: '🧒 Jeunesse / album enfants', prompt: 'Children picture-book cover — endearing expressive character, warm cheerful palette, soft rounded shapes, gentle depth, wonder and safety, ages 3 to 8, absolutely no frightening element.' },
   { value: 'wellness', label: '🌿 Wellness / Spiritualité', prompt: 'Wellness book cover — serene natural photography, soft golden hour light, organic textures, warm earthy palette (sage, terracotta, cream), zen composition with breathing whitespace, Goop / Mindful aesthetic.' },
+  { value: 'sante', label: '💪 Santé / Sport', prompt: 'Health and fitness book cover — energetic clean composition, healthy natural light, fresh vivid palette (green, white, deep blue), motion or vitality suggested, modern sports-science credibility, no clutter.' },
   { value: 'romance', label: '💕 Romance', prompt: 'Romance cover — soft cinematic portrait or evocative object, warm dusky lighting, dreamy bokeh, pastel pink/gold/burgundy palette, elegant script accent typography, intimate atmosphere.' },
   { value: 'memoir', label: '📖 Mémoire / Récit de vie', prompt: 'Literary memoir cover — single iconic photographic object or vintage portrait, faded film grain, muted nostalgic palette, classic serif typography, NYT bestseller feel.' },
   { value: 'cuisine', label: '🍴 Cuisine', prompt: 'Cookbook cover — top-down food photography, natural daylight, rustic surface, fresh ingredients, warm appetizing tones, Ottolenghi / Bon Appétit editorial style.' },
@@ -31,14 +46,19 @@ const NICHES = [
 
 // Modèles d'images disponibles via OpenRouter (BYOK).
 const OR_IMAGE_MODELS = [
-  { id: 'google/gemini-2.5-flash-image-preview', label: '⭐ Gemini 2.5 Flash Image (recommandé)' },
-  { id: 'google/gemini-2.0-flash-exp:free', label: '🆓 Gemini 2.0 Flash (gratuit)' },
-  { id: 'openai/gpt-4o', label: '🎨 OpenAI GPT-4o' },
+  { id: 'google/gemini-3-pro-image', label: '⭐ Gemini 3 Pro Image (meilleure qualité)' },
+  { id: 'google/gemini-3.1-flash-image', label: '⚡ Gemini 3.1 Flash Image (rapide, très bon)' },
+  { id: 'google/gemini-3.1-flash-lite-image', label: '💸 Gemini 3.1 Flash Lite Image (le moins cher)' },
 ];
 const OR_MODEL_LS = 'openrouter_image_model';
+const isKnownOrModel = (id: string) => OR_IMAGE_MODELS.some((m) => m.id === id);
+
+type TextMode = 'app' | 'ai';
 
 interface PremiumCover {
   url: string;
+  /** Aperçu composé localement (illustration + textes nets). */
+  composedPreview?: string;
 }
 
 interface BookRow {
@@ -51,6 +71,25 @@ interface BookRow {
   kdp_categories: string | null;
 }
 
+/** Récupère l'image en local pour pouvoir dessiner dessus sans blocage CORS. */
+const toLocalUrl = async (url: string): Promise<string> => {
+  if (url.startsWith('blob:')) return url;
+  const res = await fetch(url, { mode: 'cors', cache: 'no-store' });
+  if (!res.ok) throw new Error('illustration inaccessible');
+  return URL.createObjectURL(await res.blob());
+};
+
+const triggerDownload = (blob: Blob, fileName: string) => {
+  const href = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = href;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  setTimeout(() => URL.revokeObjectURL(href), 4000);
+};
+
 const CoverStudioPro: React.FC = () => {
   const [books, setBooks] = useState<BookRow[]>([]);
   const [selectedBookId, setSelectedBookId] = useState<string>('');
@@ -61,6 +100,9 @@ const CoverStudioPro: React.FC = () => {
   const [author, setAuthor] = useState('');
   const [genre, setGenre] = useState('');
   const [niche, setNiche] = useState('auto');
+  const [imageStyle, setImageStyle] = useState('photo');
+  const [textMode, setTextMode] = useState<TextMode>('app');
+  const [placement, setPlacement] = useState<TextPlacement>('top');
   const [customPrompt, setCustomPrompt] = useState('');
   const [count, setCount] = useState(2);
   const [loading, setLoading] = useState(false);
@@ -68,15 +110,21 @@ const CoverStudioPro: React.FC = () => {
   const [artDirection, setArtDirection] = useState('');
   const [orKey, setOrKey] = useState(getOpenRouterImageKey());
   const [useOpenRouter, setUseOpenRouter] = useState(!!getOpenRouterImageKey());
-  const [orModel, setOrModel] = useState<string>(
-    () => localStorage.getItem(OR_MODEL_LS) || OR_IMAGE_MODELS[0].id,
-  );
+  const [orModel, setOrModel] = useState<string>(() => {
+    const saved = localStorage.getItem(OR_MODEL_LS) || '';
+    return isKnownOrModel(saved) ? saved : OR_IMAGE_MODELS[0].id;
+  });
   const [orStatus, setOrStatus] = useState<'idle' | 'testing' | 'valid' | 'invalid'>('idle');
   const [ideoKey, setIdeoKey] = useState(getIdeogramKey());
-  const [noText, setNoText] = useState(false);
   const [engineUsed, setEngineUsed] = useState('');
-
+  const [composing, setComposing] = useState(false);
+  const [composeError, setComposeError] = useState('');
   const [orCredits, setOrCredits] = useState<string>('');
+
+  /** URLs locales des illustrations, pour composer et exporter sans CORS. */
+  const localUrls = useRef<Record<string, string>>({});
+
+  const noText = textMode === 'app';
 
   const testOpenRouterKey = async () => {
     const key = orKey.trim();
@@ -111,7 +159,6 @@ const CoverStudioPro: React.FC = () => {
       toast.error('Impossible de vérifier la clé (réseau).');
     }
   };
-
 
   const applyBook = (b: BookRow) => {
     setTitle(b.title || '');
@@ -151,6 +198,54 @@ const CoverStudioPro: React.FC = () => {
     if (b) applyBook(b);
   };
 
+  /** Illustration locale (mémorisée) pour composer et exporter. */
+  const ensureLocalUrl = useCallback(async (url: string): Promise<string> => {
+    const cached = localUrls.current[url];
+    if (cached) return cached;
+    const local = await toLocalUrl(url);
+    localUrls.current[url] = local;
+    return local;
+  }, []);
+
+  /** Recompose les aperçus (illustration + textes nets) en mode « texte posé par l'app ». */
+  useEffect(() => {
+    if (covers.length === 0) return;
+    if (textMode !== 'app') {
+      setCovers((prev) => prev.map((c) => ({ url: c.url })));
+      setComposeError('');
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      setComposing(true);
+      setComposeError('');
+      try {
+        const composition = buildStudioComposition({ title, subtitle, author, placement });
+        const previews = await Promise.all(
+          covers.map(async (c) => {
+            const local = await ensureLocalUrl(c.url);
+            const canvas = await renderFrontCanvas(composition, local, 600, 960);
+            return canvas.toDataURL('image/jpeg', 0.9);
+          }),
+        );
+        if (cancelled) return;
+        setCovers((prev) => prev.map((c, i) => ({ ...c, composedPreview: previews[i] })));
+      } catch {
+        if (!cancelled) {
+          setComposeError(
+            "L'aperçu avec les textes n'a pas pu être calculé. Téléchargez l'illustration seule, puis posez les textes dans l'éditeur de couverture.",
+          );
+        }
+      } finally {
+        if (!cancelled) setComposing(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [covers.length, textMode, placement, title, subtitle, author, ensureLocalUrl]);
+
   const generate = async () => {
     if (!title.trim()) {
       toast.error('Renseigne au moins le titre du livre.');
@@ -159,8 +254,11 @@ const CoverStudioPro: React.FC = () => {
     setLoading(true);
     setCovers([]);
     setArtDirection('');
+    setComposeError('');
     try {
       const selected = NICHES.find((n) => n.value === niche);
+      const style = getImageStyle(imageStyle);
+      const registrePrompt = [selected?.prompt || '', style.prompt].filter(Boolean).join(' ');
       const { data, error } = await supabase.functions.invoke('generate-premium-cover', {
         body: {
           title: title.trim(),
@@ -168,7 +266,7 @@ const CoverStudioPro: React.FC = () => {
           author: author.trim(),
           genre,
           niche,
-          registrePrompt: selected?.prompt || '',
+          registrePrompt,
           customPrompt: customPrompt.trim(),
           count,
           showAuthor: !!author.trim(),
@@ -177,7 +275,6 @@ const CoverStudioPro: React.FC = () => {
           ideogramKey: ideoKey.trim() || undefined,
           noText,
         },
-
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -191,7 +288,6 @@ const CoverStudioPro: React.FC = () => {
           ? `${urls.length} couverture(s) générée(s) en qualité pro (Ideogram) !`
           : `${urls.length} couverture(s) premium générée(s) !`,
       );
-
     } catch (e) {
       console.error(e);
       toast.error((e as Error).message || 'Erreur lors de la génération.');
@@ -200,33 +296,28 @@ const CoverStudioPro: React.FC = () => {
     }
   };
 
-  const download = async (url: string, idx: number) => {
+  /** Illustration seule, telle que produite par le moteur. */
+  const downloadIllustration = async (url: string, idx: number) => {
     try {
-      let href = url;
-      let isBlob = false;
-      if (url.startsWith('http')) {
-        // Ajoute un cache-buster pour éviter les soucis de cache CORS.
-        const res = await fetch(url, { mode: 'cors', cache: 'no-store' });
-        if (!res.ok) throw new Error('fetch failed');
-        const blob = await res.blob();
-        href = URL.createObjectURL(blob);
-        isBlob = true;
-      } else if (url.startsWith('data:')) {
-        const res = await fetch(url);
-        const blob = await res.blob();
-        href = URL.createObjectURL(blob);
-        isBlob = true;
-      }
-      const link = document.createElement('a');
-      link.href = href;
-      link.download = `couverture-premium-${idx + 1}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      if (isBlob) setTimeout(() => URL.revokeObjectURL(href), 4000);
+      const res = await fetch(url, { mode: 'cors', cache: 'no-store' });
+      if (!res.ok) throw new Error('fetch failed');
+      triggerDownload(await res.blob(), `illustration-couverture-${idx + 1}.png`);
     } catch {
       window.open(url, '_blank');
       toast.info("Ouverture dans un nouvel onglet — clic droit puis « Enregistrer l'image ».");
+    }
+  };
+
+  /** Couverture finale : illustration + titre, sous-titre et auteur en typographie nette. */
+  const downloadComposed = async (url: string) => {
+    try {
+      const local = await ensureLocalUrl(url);
+      const composition = buildStudioComposition({ title, subtitle, author, placement });
+      const result = await exportFrontPng(composition, local, title);
+      triggerDownload(result.blob, safeFileName(title, 'couverture-premium', 'png'));
+      toast.success(`Couverture téléchargée · ${result.width} × ${result.height} px`);
+    } catch {
+      toast.error("Le fichier n'a pas pu être créé. Téléchargez l'illustration seule.");
     }
   };
 
@@ -240,26 +331,30 @@ const CoverStudioPro: React.FC = () => {
           </h3>
         </div>
         <p className="text-xs text-muted-foreground">
-          Direction artistique automatique + génération photoréaliste haut de gamme (OpenAI gpt-image-2).
-          Plusieurs variations d'un coup, qualité « maison d'édition ».
+          L'IA dessine l'illustration, l'application pose votre titre, votre sous-titre et votre nom
+          d'auteur en typographie parfaitement nette. Plusieurs variations d'un coup, qualité
+          « maison d'édition ».
         </p>
       </div>
 
-      {/* Sélecteur de livre — données pré-remplies automatiquement */}
-      <div className="rounded-xl border border-border bg-card p-4 space-y-3">
-        <Label className="text-xs font-medium flex items-center gap-1.5">
-          <BookOpen className="h-3.5 w-3.5" style={{ color: GOLD }} />
-          Livre à habiller — les informations sont récupérées automatiquement
+      {/* 1. Textes du livre — bien visibles, en premier */}
+      <div className="rounded-xl border-2 p-4 space-y-4" style={{ borderColor: GOLD }}>
+        <Label className="text-sm font-semibold flex items-center gap-1.5" style={{ color: GOLD }}>
+          <Type className="h-4 w-4" /> 1. Les textes de votre couverture
         </Label>
+
         {loadingBooks ? (
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Loader2 className="h-3.5 w-3.5 animate-spin" /> Chargement de tes livres…
+            <Loader2 className="h-3.5 w-3.5 animate-spin" /> Chargement de vos livres…
           </div>
         ) : books.length > 0 ? (
-          <>
+          <div className="space-y-1.5">
+            <Label className="text-xs flex items-center gap-1.5">
+              <BookOpen className="h-3.5 w-3.5" style={{ color: GOLD }} /> Livre à habiller
+            </Label>
             <Select value={selectedBookId} onValueChange={onSelectBook}>
               <SelectTrigger>
-                <SelectValue placeholder="Choisis un livre" />
+                <SelectValue placeholder="Choisissez un livre" />
               </SelectTrigger>
               <SelectContent>
                 {books.map((b) => (
@@ -268,50 +363,194 @@ const CoverStudioPro: React.FC = () => {
               </SelectContent>
             </Select>
             <p className="text-[11px] text-emerald-600 flex items-center gap-1">
-              <CheckCircle2 className="h-3 w-3" /> Titre, genre et résumé chargés. Vérifie juste le nom de l'auteur.
+              <CheckCircle2 className="h-3 w-3" /> Titre, genre et résumé chargés automatiquement.
             </p>
-          </>
+          </div>
         ) : (
           <p className="text-xs text-muted-foreground">
-            Aucun livre trouvé — saisis les informations manuellement ci-dessous.
+            Aucun livre trouvé — saisissez les informations ci-dessous.
           </p>
         )}
-      </div>
 
-      {/* Ideogram BYOK — rendu typographique professionnel */}
-      <div
-        className="rounded-xl border p-4 space-y-3"
-        style={{ borderColor: GOLD, background: 'rgba(168,132,44,0.06)' }}
-      >
-        <div className="flex items-start gap-2">
-          <Crown className="h-4 w-4 mt-0.5 shrink-0" style={{ color: GOLD }} />
-          <div className="space-y-1">
-            <p className="text-sm font-semibold" style={{ color: GOLD }}>
-              Pour un rendu vraiment professionnel : ajoutez votre clé Ideogram
-            </p>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Ideogram v3 est aujourd'hui le seul moteur qui compose un <strong>titre net et
-              parfaitement lisible</strong> directement sur la couverture (les autres déforment les
-              lettres). Comptez environ <strong>0,06 € par couverture</strong>.
-              <br />
-              Créez un compte sur{' '}
-              <a
-                href="https://ideogram.ai/manage-api"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline font-medium"
-                style={{ color: GOLD }}
-              >
-                ideogram.ai (API)
-              </a>
-              , copiez votre clé, collez-la ci-dessous : elle reste enregistrée sur votre appareil et
-              n'est jamais partagée. Sans clé, la génération continue de fonctionner avec les
-              moteurs inclus — la qualité typographique sera simplement moins fine.
-            </p>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium">Titre du livre *</Label>
+            <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Le secret des marées" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium">Sous-titre</Label>
+            <Input value={subtitle} onChange={(e) => setSubtitle(e.target.value)} placeholder="(optionnel)" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium">Nom de l'auteur</Label>
+            <Input value={author} onChange={(e) => setAuthor(e.target.value)} placeholder="Georges Boubet" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium">Genre</Label>
+            <Input value={genre} onChange={(e) => setGenre(e.target.value)} placeholder="Thriller, Business, Romance…" />
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="space-y-2">
+          <Label className="text-xs font-medium">Qui écrit les textes sur l'image ?</Label>
+          <div className="grid sm:grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => setTextMode('app')}
+              className={`text-left rounded-xl px-3 py-2.5 text-xs border transition-all ${
+                textMode === 'app' ? 'border-transparent' : 'border-border bg-muted/40 hover:bg-muted'
+              }`}
+              style={textMode === 'app' ? { background: `${GOLD}1f`, borderColor: GOLD } : undefined}
+            >
+              <span className="font-semibold block">Texte posé par l'app (recommandé)</span>
+              <span className="text-muted-foreground">
+                Typographie nette, jamais déformée. Aperçu et téléchargement immédiats.
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setTextMode('ai')}
+              className={`text-left rounded-xl px-3 py-2.5 text-xs border transition-all ${
+                textMode === 'ai' ? 'border-transparent' : 'border-border bg-muted/40 hover:bg-muted'
+              }`}
+              style={textMode === 'ai' ? { background: `${GOLD}1f`, borderColor: GOLD } : undefined}
+            >
+              <span className="font-semibold block">Texte dessiné par l'IA</span>
+              <span className="text-muted-foreground">
+                Les lettres sont souvent tordues, sauf avec une clé Ideogram.
+              </span>
+            </button>
+          </div>
+          {textMode === 'ai' && (
+            <p className="text-[11px] flex items-start gap-1.5 text-amber-600">
+              <AlertTriangle className="h-3.5 w-3.5 mt-px shrink-0" />
+              En mode « texte dessiné par l'IA », les lettres peuvent être fausses ou illisibles.
+              Ideogram est le seul moteur fiable pour ce mode.
+            </p>
+          )}
+        </div>
+
+        {textMode === 'app' && (
+          <div className="space-y-2">
+            <Label className="text-xs font-medium">Mise en place des textes</Label>
+            <div className="flex gap-2 flex-wrap">
+              {TEXT_PLACEMENTS.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => setPlacement(p.id)}
+                  className={`rounded-xl px-3 py-2 text-xs border transition-all ${
+                    placement === p.id ? 'border-transparent' : 'border-border bg-muted/40 text-muted-foreground hover:bg-muted'
+                  }`}
+                  style={placement === p.id ? { background: `${GOLD}1f`, borderColor: GOLD, color: GOLD } : undefined}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 2. Catégorie + sorte d'image */}
+      <div className="rounded-xl border border-border bg-card p-4 space-y-4">
+        <Label className="text-sm font-semibold flex items-center gap-1.5" style={{ color: GOLD }}>
+          <ImageIcon className="h-4 w-4" /> 2. Univers du livre et style de dessin
+        </Label>
+
+        <div className="space-y-2">
+          <Label className="text-xs">Catégorie du livre</Label>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {NICHES.map((n) => (
+              <button
+                key={n.value}
+                onClick={() => setNiche(n.value)}
+                className={`text-left rounded-xl px-3 py-2 text-xs border transition-all ${
+                  niche === n.value
+                    ? 'border-transparent'
+                    : 'border-border bg-muted/40 text-muted-foreground hover:bg-muted'
+                }`}
+                style={
+                  niche === n.value
+                    ? { background: `${GOLD}1f`, borderColor: GOLD, color: GOLD }
+                    : undefined
+                }
+              >
+                {n.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label className="text-xs">Sorte d'image</Label>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {COVER_IMAGE_STYLES.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => setImageStyle(s.id)}
+                className={`text-left rounded-xl px-3 py-2 text-xs border transition-all ${
+                  imageStyle === s.id
+                    ? 'border-transparent'
+                    : 'border-border bg-muted/40 text-muted-foreground hover:bg-muted'
+                }`}
+                style={
+                  imageStyle === s.id
+                    ? { background: `${GOLD}1f`, borderColor: GOLD, color: GOLD }
+                    : undefined
+                }
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            La catégorie décrit l'univers du livre, la sorte d'image décrit le style de dessin.
+          </p>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label className="text-xs flex items-center gap-1">
+            <Wand2 className="h-3.5 w-3.5" /> Résumé / précisions créatives
+          </Label>
+          <Textarea
+            value={customPrompt}
+            onChange={(e) => setCustomPrompt(e.target.value)}
+            placeholder="Ex: ambiance bord de mer breton, brume, phare au loin…"
+            rows={3}
+            className="resize-none"
+          />
+        </div>
+      </div>
+
+      {/* 3. Moteurs d'images — une clé par moteur */}
+      <div className="rounded-xl border border-border bg-card p-4 space-y-4">
+        <div>
+          <Label className="text-sm font-semibold flex items-center gap-1.5" style={{ color: GOLD }}>
+            <KeyRound className="h-4 w-4" /> 3. Moteurs d'images
+          </Label>
+          <p className="text-[11px] text-muted-foreground mt-1">
+            Ordre de priorité : Ideogram si une clé est enregistrée, sinon OpenRouter si activé,
+            sinon le moteur inclus. Vos clés restent sur votre appareil et ne sont jamais partagées.
+          </p>
+        </div>
+
+        {/* Ideogram */}
+        <div className="rounded-lg border p-3 space-y-2" style={{ borderColor: GOLD, background: 'rgba(168,132,44,0.06)' }}>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs font-semibold" style={{ color: GOLD }}>
+              1 · Ideogram — écrit un titre net dans l'image (≈ 0,06 € / couverture)
+            </p>
+            {ideoKey.trim().length > 20 ? (
+              <span className="text-[11px] text-emerald-600 flex items-center gap-1 whitespace-nowrap">
+                <CheckCircle2 className="h-3.5 w-3.5" /> Clé enregistrée
+              </span>
+            ) : (
+              <span className="text-[11px] text-muted-foreground flex items-center gap-1 whitespace-nowrap">
+                <KeyRound className="h-3.5 w-3.5" /> Aucune clé
+              </span>
+            )}
+          </div>
           <Input
             type="password"
             value={ideoKey}
@@ -319,200 +558,126 @@ const CoverStudioPro: React.FC = () => {
               setIdeoKey(e.target.value);
               setIdeogramKey(e.target.value);
             }}
-            placeholder="Collez votre clé Ideogram ici pour un rendu pro"
+            placeholder="Clé Ideogram (ideogram.ai/manage-api)"
             autoComplete="off"
-            className="flex-1"
           />
-          {ideoKey.trim().length > 20 ? (
-            <span className="text-[11px] text-emerald-600 flex items-center gap-1 whitespace-nowrap">
-              <CheckCircle2 className="h-3.5 w-3.5" /> Clé enregistrée
-            </span>
-          ) : (
-            <span className="text-[11px] text-muted-foreground flex items-center gap-1 whitespace-nowrap">
-              <KeyRound className="h-3.5 w-3.5" /> Aucune clé
-            </span>
+          <p className="text-[11px] text-muted-foreground">
+            Utile surtout en mode « texte dessiné par l'IA ».{' '}
+            <a
+              href="https://ideogram.ai/manage-api"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline font-medium"
+              style={{ color: GOLD }}
+            >
+              Obtenir une clé
+            </a>
+          </p>
+        </div>
+
+        {/* OpenRouter */}
+        <div className="rounded-lg border border-border p-3 space-y-2">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs font-semibold">2 · OpenRouter — le plus économique</p>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={useOpenRouter}
+              onClick={() => setUseOpenRouter((v) => !v)}
+              className={`relative h-6 w-11 rounded-full transition-colors shrink-0 ${useOpenRouter ? '' : 'bg-muted'}`}
+              style={useOpenRouter ? { background: GOLD } : undefined}
+            >
+              <span
+                className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                  useOpenRouter ? 'translate-x-[22px]' : 'translate-x-0.5'
+                }`}
+              />
+            </button>
+          </div>
+          {useOpenRouter && (
+            <>
+              <div className="space-y-1.5">
+                <Label className="text-[11px] text-muted-foreground">Modèle d'image</Label>
+                <Select
+                  value={orModel}
+                  onValueChange={(v) => {
+                    setOrModel(v);
+                    localStorage.setItem(OR_MODEL_LS, v);
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choisissez un modèle" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {OR_IMAGE_MODELS.map((m) => (
+                      <SelectItem key={m.id} value={m.id}>{m.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Input
+                  type="password"
+                  value={orKey}
+                  onChange={(e) => {
+                    setOrKey(e.target.value);
+                    setOpenRouterImageKey(e.target.value);
+                    setOrStatus('idle');
+                  }}
+                  placeholder="sk-or-..."
+                  autoComplete="off"
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={testOpenRouterKey}
+                  disabled={orStatus === 'testing'}
+                  className="shrink-0"
+                >
+                  {orStatus === 'testing' ? (
+                    <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Test…</>
+                  ) : (
+                    <>Tester</>
+                  )}
+                </Button>
+              </div>
+
+              {orStatus === 'valid' && (
+                <p className="text-[11px] text-emerald-600 flex items-center gap-1.5 font-medium">
+                  <span className="inline-block h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                  Clé valide {orCredits && `· ${orCredits}`}
+                </p>
+              )}
+              {orStatus === 'invalid' && (
+                <p className="text-[11px] text-red-600 flex items-center gap-1.5 font-medium">
+                  <span className="inline-block h-2.5 w-2.5 rounded-full bg-red-500" />
+                  Clé invalide ou refusée
+                </p>
+              )}
+            </>
           )}
         </div>
 
-        <label className="flex items-start gap-2 text-xs text-muted-foreground cursor-pointer">
-          <input
-            type="checkbox"
-            checked={noText}
-            onChange={(e) => setNoText(e.target.checked)}
-            className="mt-0.5"
-          />
-          <span>
-            <strong>Illustration seule, sans texte</strong> (recommandé pour un résultat maison
-            d'édition) : l'IA génère uniquement le visuel, et vous posez le titre en typographie
-            nette 300 DPI dans l'éditeur de couverture.
-          </span>
-        </label>
-
-        {engineUsed && (
-          <p className="text-[11px] text-muted-foreground">
-            Dernière génération :{' '}
-            <strong>{engineUsed === 'ideogram' ? 'Ideogram v3 (qualité pro)' : engineUsed}</strong>
+        {/* Moteur inclus */}
+        <div className="rounded-lg border border-border p-3">
+          <p className="text-xs font-semibold">3 · Moteur inclus — aucune clé nécessaire</p>
+          <p className="text-[11px] text-muted-foreground mt-1">
+            Sans clé personnelle, la génération fonctionne avec le moteur inclus dans votre
+            abonnement.
           </p>
-        )}
-      </div>
-
-
-
-      {/* OpenRouter BYOK — génération d'images plus économique */}
-      <div className="rounded-xl border border-border bg-card p-4 space-y-3">
-        <div className="flex items-center justify-between gap-3">
-          <Label className="text-xs font-medium flex items-center gap-1.5">
-            <KeyRound className="h-3.5 w-3.5" style={{ color: GOLD }} />
-            Générer via OpenRouter (recommandé — plus économique)
-          </Label>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={useOpenRouter}
-            onClick={() => setUseOpenRouter((v) => !v)}
-            className={`relative h-6 w-11 rounded-full transition-colors ${useOpenRouter ? '' : 'bg-muted'}`}
-            style={useOpenRouter ? { background: GOLD } : undefined}
-          >
-            <span
-              className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
-                useOpenRouter ? 'translate-x-[22px]' : 'translate-x-0.5'
-              }`}
-            />
-          </button>
-        </div>
-        {useOpenRouter && (
-          <>
-            <div className="space-y-1.5">
-              <Label className="text-[11px] text-muted-foreground">Modèle d'image</Label>
-              <Select
-                value={orModel}
-                onValueChange={(v) => {
-                  setOrModel(v);
-                  localStorage.setItem(OR_MODEL_LS, v);
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Choisis un modèle" />
-                </SelectTrigger>
-                <SelectContent>
-                  {OR_IMAGE_MODELS.map((m) => (
-                    <SelectItem key={m.id} value={m.id}>{m.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Input
-                type="password"
-                value={orKey}
-                onChange={(e) => {
-                  setOrKey(e.target.value);
-                  setOpenRouterImageKey(e.target.value);
-                  setOrStatus('idle');
-                }}
-                placeholder="sk-or-..."
-                autoComplete="off"
-                className="flex-1"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={testOpenRouterKey}
-                disabled={orStatus === 'testing'}
-                className="shrink-0"
-              >
-                {orStatus === 'testing' ? (
-                  <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Test…</>
-                ) : (
-                  <>Tester</>
-                )}
-              </Button>
-            </div>
-
-            {orStatus === 'valid' && (
-              <p className="text-[11px] text-emerald-600 flex items-center gap-1.5 font-medium">
-                <span className="inline-block h-2.5 w-2.5 rounded-full bg-emerald-500 shadow-[0_0_6px] shadow-emerald-400" />
-                Clé valide {orCredits && `· ${orCredits}`}
-              </p>
-            )}
-            {orStatus === 'invalid' && (
-              <p className="text-[11px] text-red-600 flex items-center gap-1.5 font-medium">
-                <span className="inline-block h-2.5 w-2.5 rounded-full bg-red-500" />
-                Clé invalide ou refusée
-              </p>
-            )}
-            <p className="text-[11px] text-muted-foreground">
-              Colle ta clé OpenRouter (commence par <code>sk-or-</code>) puis clique sur <b>Tester</b> pour
-              voir le voyant vert. Elle est enregistrée sur cet appareil et utilisée en priorité pour tes couvertures.
+          {engineUsed && (
+            <p className="text-[11px] text-muted-foreground mt-2">
+              Dernière génération :{' '}
+              <strong>{engineUsed === 'ideogram' ? 'Ideogram (qualité pro)' : engineUsed}</strong>
             </p>
-          </>
-        )}
-      </div>
-
-      <div className="grid sm:grid-cols-2 gap-4">
-        <div className="space-y-1.5">
-          <Label className="text-xs">Titre du livre *</Label>
-          <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Le secret des marées" />
-        </div>
-        <div className="space-y-1.5">
-          <Label className="text-xs">Sous-titre</Label>
-          <Input value={subtitle} onChange={(e) => setSubtitle(e.target.value)} placeholder="(optionnel)" />
-        </div>
-        <div className="space-y-1.5">
-          <Label className="text-xs flex items-center gap-1">
-            Nom de l'auteur
-            <span className="text-[10px]" style={{ color: GOLD }}>← à compléter</span>
-          </Label>
-          <Input value={author} onChange={(e) => setAuthor(e.target.value)} placeholder="Ton nom d'auteur" />
-        </div>
-        <div className="space-y-1.5">
-          <Label className="text-xs">Genre</Label>
-          <Input value={genre} onChange={(e) => setGenre(e.target.value)} placeholder="Thriller, Business, Romance…" />
+          )}
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label className="text-xs">Direction artistique (preset bestseller)</Label>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-          {NICHES.map((n) => (
-            <button
-              key={n.value}
-              onClick={() => setNiche(n.value)}
-              className={`text-left rounded-xl px-3 py-2 text-xs border transition-all ${
-                niche === n.value
-                  ? 'border-transparent'
-                  : 'border-border bg-muted/40 text-muted-foreground hover:bg-muted'
-              }`}
-              style={
-                niche === n.value
-                  ? { background: `${GOLD}1f`, borderColor: GOLD, color: GOLD }
-                  : undefined
-              }
-            >
-              {n.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="space-y-1.5">
-        <Label className="text-xs flex items-center gap-1">
-          <Wand2 className="h-3.5 w-3.5" /> Résumé / précisions créatives
-        </Label>
-        <Textarea
-          value={customPrompt}
-          onChange={(e) => setCustomPrompt(e.target.value)}
-          placeholder="Ex: ambiance bord de mer breton, brume, phare au loin…"
-          rows={3}
-          className="resize-none"
-        />
-        <p className="text-[11px] text-muted-foreground">
-          Pré-rempli avec le résumé de ton livre — l'IA s'en sert pour la direction artistique.
-        </p>
-      </div>
-
+      {/* 4. Génération */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="space-y-1.5">
           <Label className="text-xs">Nombre de variations</Label>
@@ -553,29 +718,59 @@ const CoverStudioPro: React.FC = () => {
         </div>
       )}
 
+      {composing && (
+        <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+          <Loader2 className="h-3.5 w-3.5 animate-spin" /> Mise en place des textes…
+        </p>
+      )}
+      {composeError && (
+        <p className="text-[11px] text-amber-600 flex items-start gap-1.5">
+          <AlertTriangle className="h-3.5 w-3.5 mt-px shrink-0" /> {composeError}
+        </p>
+      )}
+
       {covers.length > 0 && (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {covers.map((c, idx) => (
-            <div key={idx} className="rounded-xl overflow-hidden border border-border bg-card">
-              <img src={c.url} alt={`Couverture premium ${idx + 1}`} className="w-full aspect-[2/3] object-cover" loading="lazy" />
-              <div className="p-3 space-y-3">
-                <div className="flex items-center gap-3">
-                  <img src={c.url} alt="Miniature Amazon" className="w-[60px] h-[90px] object-cover rounded shadow" />
-                  <div className="text-[10px] text-muted-foreground flex items-center gap-1">
-                    <Eye className="h-3 w-3" /> Test miniature Amazon — le titre reste-t-il lisible ?
+          {covers.map((c, idx) => {
+            const display = textMode === 'app' && c.composedPreview ? c.composedPreview : c.url;
+            return (
+              <div key={idx} className="rounded-xl overflow-hidden border border-border bg-card">
+                <img
+                  src={display}
+                  alt={`Couverture premium ${idx + 1}`}
+                  className="w-full aspect-[2/3] object-cover"
+                  loading="lazy"
+                />
+                <div className="p-3 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <img src={display} alt="Miniature Amazon" className="w-[60px] h-[90px] object-cover rounded shadow" />
+                    <div className="text-[10px] text-muted-foreground flex items-center gap-1">
+                      <Eye className="h-3 w-3" /> Test miniature Amazon — le titre reste-t-il lisible ?
+                    </div>
                   </div>
+                  {textMode === 'app' && (
+                    <Button
+                      size="sm"
+                      onClick={() => downloadComposed(c.url)}
+                      className="w-full"
+                      style={{ background: GOLD, color: '#fff' }}
+                    >
+                      <Download className="h-4 w-4 mr-2" /> Télécharger la couverture
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => downloadIllustration(c.url, idx)}
+                    className="w-full"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    {textMode === 'app' ? "Télécharger l'illustration seule" : 'Télécharger'}
+                  </Button>
                 </div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => download(c.url, idx)}
-                  className="w-full"
-                >
-                  <Download className="h-4 w-4 mr-2" /> Télécharger
-                </Button>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
