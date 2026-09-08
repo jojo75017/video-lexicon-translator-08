@@ -61,20 +61,25 @@ function Countdown({ endISO }: { endISO: string }) {
     );
   }
   const box = (value: number, label: string) => (
-    <span className="inline-flex flex-col items-center rounded-lg bg-foreground px-3 py-1.5 text-background min-w-[52px]">
-      <span className="text-xl font-black tabular-nums leading-none">{pad(value)}</span>
-      <span className="mt-0.5 text-[9px] uppercase tracking-wide opacity-70">{label}</span>
+    <span className="inline-flex min-w-[64px] flex-col items-center rounded-lg border border-primary-foreground/30 bg-primary-foreground px-3 py-2 text-primary shadow-sm">
+      <span className="text-2xl font-black leading-none tabular-nums">{pad(value)}</span>
+      <span className="mt-1 text-[10px] font-semibold uppercase tracking-wide opacity-80">{label}</span>
     </span>
   );
   return (
-    <div className="flex items-center justify-center gap-2">
-      {box(t.days, 'jours')}
-      <span className="font-black text-foreground/40">:</span>
-      {box(t.hours, 'heures')}
-      <span className="font-black text-foreground/40">:</span>
-      {box(t.minutes, 'min')}
-      <span className="font-black text-foreground/40">:</span>
-      {box(t.seconds, 'sec')}
+    <div className="flex flex-col items-center gap-1.5">
+      <div className="flex items-center justify-center gap-2">
+        {box(t.days, 'jours')}
+        <span className="font-black text-primary-foreground/60">:</span>
+        {box(t.hours, 'heures')}
+        <span className="font-black text-primary-foreground/60">:</span>
+        {box(t.minutes, 'min')}
+        <span className="font-black text-primary-foreground/60">:</span>
+        {box(t.seconds, 'sec')}
+      </div>
+      <span className="text-[11px] font-semibold text-primary-foreground/90">
+        Fin de l’offre : 31 décembre 2026
+      </span>
     </div>
   );
 }
