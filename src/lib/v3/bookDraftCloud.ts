@@ -1,6 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { readBookBrief, writeBookBrief, type BookBrief } from '@/lib/v3/bookBrief';
 import type { GenieMessage } from '@/lib/v3/genieThread';
+import { readLocalThread } from '@/lib/v3/genieThread';
 
 export const BOOK_DRAFT_STATUS_EVENT = 'v3:book-draft-status';
 export type BookDraftStatus = { state: 'local' | 'saving' | 'saved' | 'error'; at?: string; message?: string; projectId?: string };
@@ -25,7 +26,7 @@ export async function saveBookDraftToCloud(
   const draftState = {
     version: 1,
     brief: { ...brief, title },
-    messages: options.messages || [],
+    messages: options.messages || readLocalThread(),
     activeStep: options.activeStep || (brief.outlineValidated ? 3 : (brief.outline || []).length ? 2 : 1),
     savedAt: new Date().toISOString(),
   };

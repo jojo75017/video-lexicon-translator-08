@@ -1,5 +1,7 @@
 
 ## Récit V3 fidèle et reprenable (09/09/2026)
+- [x] Livre en cours visible sous la saisie avec correction automatique et indices respectés
+- [x] Sauvegarde/reprise visible au même endroit avec relance manuelle
 - [x] Texte original modifiable avant correction et passage oublié insérable
 - [x] Garde-fou sur les prénoms, dates et liens familiaux
 - [x] Brouillon privé créé dès le premier texte et lié aux conversations

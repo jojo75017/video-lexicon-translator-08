@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Check, ListOrdered, Loader2, Plus, RefreshCw, Save, ShieldCheck, Sparkles, Undo2, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -30,6 +30,8 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
   const [addition, setAddition] = useState('');
   const [editingCorrection, setEditingCorrection] = useState<number | null>(null);
   const [correctedDraft, setCorrectedDraft] = useState('');
+  const [autoState, setAutoState] = useState<'idle' | 'working' | 'error'>('idle');
+  const attemptedAuto = useRef<Set<number>>(new Set());
 
 
   useEffect(() => {
@@ -94,10 +96,11 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
   };
 
   /** Demande au Génie la version corrigée d'un passage (jamais moins de mots). */
-  const correct = async (index: number): Promise<boolean> => {
+  const correct = useCallback(async (index: number, automatic = false): Promise<boolean> => {
     const original = passages[index - 1];
     if (!original) return false;
     setBusy(index);
+    if (automatic) setAutoState('working');
     try {
       const provider = getProvider();
       const userApiKey = provider === 'gemini' ? getProviderKey('gemini') : '';
@@ -121,19 +124,37 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
       const missing = missingProtectedTerms(original, corrected);
       if (missing.length) throw new Error(`Correction refusée : le Génie a oublié ${missing.join(', ')}.`);
       const current = readBookBrief() || {};
-      const next = patch({ polished: upsertPolished(current, { index, original, corrected }) });
+      const next = patch({
+        polished: upsertPolished(current, { index, original, corrected }),
+        pendingPolishIndex: current.pendingPolishIndex === index ? undefined : current.pendingPolishIndex,
+      });
       void persist(next);
+      if (automatic) setAutoState('idle');
       if ((data as any)?.shorter) {
         toast.warning(`Texte ${index} : la version corrigée est plus courte, relancez la correction.`);
       }
       return true;
     } catch (e: any) {
+      if (automatic) {
+        const current = readBookBrief() || {};
+        const next = { ...current, pendingPolishIndex: undefined };
+        patch(next);
+        void persist(next);
+        setAutoState('error');
+      }
       toast.error(e?.message || 'Le Génie est indisponible pour le moment.');
       return false;
     } finally {
       setBusy(null);
     }
-  };
+  }, [brief.author, brief.category, brief.factMemory, brief.language, brief.title, brief.tone, mode, passages]);
+
+  useEffect(() => {
+    const pending = Number(brief.pendingPolishIndex) || 0;
+    if (!pending || busy !== null || entryFor(pending)?.corrected || attemptedAuto.current.has(pending)) return;
+    attemptedAuto.current.add(pending);
+    void correct(pending, true);
+  }, [brief.pendingPolishIndex, busy, correct, polished]);
 
   const correctAll = async () => {
     setRunningAll(true);
@@ -198,16 +219,25 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
   }
 
   return (
-    <div className="rounded-[22px] border p-4" style={{ borderColor: 'rgba(201,168,76,0.55)', background: '#fff' }}>
+    <div className="mt-4 rounded-[22px] border p-4" style={{ borderColor: 'rgba(201,168,76,0.55)', background: '#fff' }}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="v3-chip v3-chip-orange text-[11px]">
-          <Wand2 className="h-3 w-3" /> Mes envois — dans l’ordre, aucun perdu
+          <Wand2 className="h-3 w-3" /> Votre livre en cours
         </span>
         <span className="text-[11px]" style={{ color: 'var(--v3-muted)' }}>
           {validatedCount}/{passages.length} texte(s) validé(s) · {originalWords.toLocaleString('fr-FR')} mots écrits →{' '}
           <strong style={{ color: '#0f6b4a' }}>{bookWords.toLocaleString('fr-FR')} mots dans le livre</strong>
         </span>
       </div>
+
+      {autoState === 'working' && (
+        <p className="mt-3 inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs" style={{ borderColor: 'rgba(201,168,76,0.5)', color: '#8a6d1f' }}>
+          <Loader2 className="h-3.5 w-3.5 animate-spin" /> Votre dernier texte est enregistré. Le Génie prépare maintenant sa version corrigée…
+        </p>
+      )}
+      {autoState === 'error' && (
+        <p className="mt-3 text-xs" style={{ color: '#b45309' }}>La correction automatique n’a pas abouti. Votre texte est conservé : utilisez « Corriger ce texte » pour réessayer.</p>
+      )}
 
       <p className="mt-2 text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
         Vous écrivez comme vous parlez. Le Génie corrige l’orthographe, la ponctuation et développe

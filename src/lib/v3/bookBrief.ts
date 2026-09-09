@@ -58,6 +58,8 @@ export type BookBrief = {
    * conservé mot pour mot, la version corrigée n'est utilisée qu'après validation.
    */
   polished?: PolishedPassage[];
+  /** Dernier texte qui doit être corrigé automatiquement après son enregistrement. */
+  pendingPolishIndex?: number;
   title?: string;
   subtitle?: string;
   author?: string;

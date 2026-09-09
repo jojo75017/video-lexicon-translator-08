@@ -19,6 +19,13 @@ type Book = {
   draft_state?: unknown;
 };
 
+const draftMode = (value: unknown): 'book' | 'biography' => {
+  if (!value || typeof value !== 'object') return 'book';
+  const draft = value as Record<string, unknown>;
+  const brief = draft.brief && typeof draft.brief === 'object' ? draft.brief as Record<string, unknown> : {};
+  return brief.mode === 'biography' ? 'biography' : 'book';
+};
+
 
 const hasChapterContent = (chapters: unknown): chapters is Record<string, unknown>[] =>
   Array.isArray(chapters) && chapters.some((raw) => {
@@ -236,7 +243,7 @@ export default function V3BookManagerPage() {
                 <button onClick={() => nav(`/v3/donnees-kdp?projectId=${b.id}`)} className="v3-btn v3-btn-outline text-xs">
                   <BarChart3 className="w-3.5 h-3.5" /> Données KDP
                 </button>
-                <button onClick={() => nav(`/v3/create?projectId=${b.id}`)} className="v3-btn v3-btn-primary text-xs">
+                <button onClick={() => nav(`${draftMode(b.draft_state) === 'biography' ? '/v3/biographie' : '/v3/create'}?projectId=${b.id}`)} className="v3-btn v3-btn-primary text-xs">
                   <BookOpen className="w-3.5 h-3.5" /> Ouvrir le livre
                 </button>
                 <button onClick={() => setEditing(b)} className="v3-btn v3-btn-outline text-xs"><Pencil className="w-3.5 h-3.5" /></button>

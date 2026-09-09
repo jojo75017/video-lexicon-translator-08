@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Sparkles, Wand2, ArrowRight, Check, Upload, FileText, RotateCcw, Loader2, Mic, Pencil, MessageSquare, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import {
-  appendSourceText, mergeRespectingLocks, readBookBrief, resetBookProject, writeBookBrief, type BookBrief,
+  appendSourceText, listSourcePassages, mergeRespectingLocks, readBookBrief, resetBookProject, writeBookBrief, type BookBrief,
 } from '@/lib/v3/bookBrief';
 import { saveBookDraftToCloud } from '@/lib/v3/bookDraftCloud';
 import { currentInterviewStep } from '@/lib/v3/genieInterview';
@@ -52,9 +52,11 @@ type Props = {
   onReady: () => void;
   /** 'biography' = entretien « Le récit de votre vie » (chronologie stricte). */
   mode?: 'book' | 'biography';
+  /** Le livre en cours et son état de sauvegarde, affichés juste sous la saisie. */
+  progressContent?: ReactNode;
 };
 
-export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book' }: Props) {
+export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book', progressContent }: Props) {
   const [brief, setBrief] = useState<BookBrief>({});
   const [input, setInput] = useState(initialIdea);
   const [loading, setLoading] = useState(false);
@@ -146,7 +148,13 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
     const userMessage = makeMessage('user', text);
     setMessages((prev) => [...prev, userMessage]);
     const draftResult = await saveBookDraftToCloud(briefWithSource, { messages: [...messages, userMessage], activeStep: 1 });
-    const linkedBrief = { ...briefWithSource, projectId: draftResult.projectId || briefWithSource.projectId };
+    const linkedBrief = {
+      ...briefWithSource,
+      projectId: draftResult.projectId || briefWithSource.projectId,
+      pendingPolishIndex: listSourcePassages(nextSourceText).length,
+    };
+    setBrief(linkedBrief);
+    writeBookBrief(linkedBrief);
     if (draftResult.error && draftResult.error !== 'not-authenticated') {
       toast.error('Votre texte reste sur cet appareil. La sauvegarde du compte sera retentée.');
     }
@@ -175,8 +183,9 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
         chapters: b.chapters || previousBrief.chapters || 20,
         wordsPerChapter: b.wordsPerChapter || previousBrief.wordsPerChapter || 2500,
       });
+      const latestBrief = readBookBrief() || linkedBrief;
       const nextBrief: BookBrief = {
-        ...linkedBrief,
+        ...latestBrief,
         author: b.author || brief.author || '',
         category: b.category || previousBrief.category || '',
         tone: b.tone || previousBrief.tone || 'Inspirant',
@@ -186,7 +195,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
         wantsIllustrations: Boolean(b.wantsIllustrations),
         cibleProfil: b.cibleProfil || brief.cibleProfil || '',
         promesseCentrale: b.promesseCentrale || brief.promesseCentrale || '',
-        factMemory: Array.from(new Set([...(brief.factMemory || []), ...(Array.isArray(b.factMemory) ? b.factMemory.map(String) : [])])),
+        factMemory: Array.from(new Set([...(latestBrief.factMemory || []), ...(Array.isArray(b.factMemory) ? b.factMemory.map(String) : [])])),
         outlineValidated: false,
         ...proposed,
       };
@@ -379,6 +388,23 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
         </div>
       </div>
 
+      {progressContent}
+
+      {(brief.factMemory || []).length > 0 && (
+        <div className="mt-4 rounded-2xl border bg-white p-3" style={{ borderColor: 'rgba(15,107,74,0.35)' }}>
+          <div className="text-[11px] font-bold uppercase tracking-wider" style={{ color: '#0f6b4a' }}>Indices que le Génie doit respecter</div>
+          <p className="mt-1 text-[11px]" style={{ color: 'var(--v3-muted)' }}>Prénoms, liens familiaux, lieux et dates restent attachés à votre récit.</p>
+          <div className="mt-2 space-y-1.5">
+            {(brief.factMemory || []).map((fact, index) => (
+              <input key={`${index}-${fact}`} value={fact} onChange={(event) => {
+                const facts = [...(brief.factMemory || [])]; facts[index] = event.target.value; patch({ factMemory: facts });
+              }} onBlur={() => void saveBookDraftToCloud(readBookBrief() || brief, { messages, activeStep: 1 })}
+                className="w-full rounded-lg border px-2.5 py-1.5 text-xs" style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }} />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* La question du Génie : elle vient de votre texte, jamais d'un questionnaire */}
       {askedQuestions.length > 0 && (
         <div className="mt-4 space-y-2">
@@ -402,20 +428,6 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
               {ex.length > 62 ? `${ex.slice(0, 62)}…` : ex}
             </button>
           ))}
-        </div>
-      )}
-
-      {(brief.factMemory || []).length > 0 && (
-        <div className="mt-3 rounded-2xl border bg-white p-3" style={{ borderColor: 'rgba(15,107,74,0.35)' }}>
-          <div className="text-[11px] font-bold uppercase tracking-wider" style={{ color: '#0f6b4a' }}>Ce que le Génie doit respecter</div>
-          <div className="mt-2 space-y-1.5">
-            {(brief.factMemory || []).map((fact, index) => (
-              <input key={`${index}-${fact}`} value={fact} onChange={(event) => {
-                const facts = [...(brief.factMemory || [])]; facts[index] = event.target.value; patch({ factMemory: facts });
-              }} onBlur={() => void saveBookDraftToCloud(readBookBrief() || brief, { messages, activeStep: 1 })}
-                className="w-full rounded-lg border px-2.5 py-1.5 text-xs" style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }} />
-            ))}
-          </div>
         </div>
       )}
 

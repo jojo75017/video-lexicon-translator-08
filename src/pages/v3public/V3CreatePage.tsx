@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Sparkles, Loader2, ImageIcon, ArrowRight, BookOpen } from 'lucide-react';
+import { Sparkles, Loader2, ImageIcon, ArrowRight, BookOpen, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { BackButton } from '@/components/v3/BackButton';
@@ -18,7 +18,7 @@ import V3OutlineCoBuilder from '@/components/v3public/V3OutlineCoBuilder';
 import V3PassageCorrector from '@/components/v3public/V3PassageCorrector';
 
 import { BOOK_BRIEF_EVENT, readBookBrief, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
-import { restoreDraftState, BOOK_DRAFT_STATUS_EVENT, type BookDraftStatus } from '@/lib/v3/bookDraftCloud';
+import { restoreDraftState, saveBookDraftToCloud, BOOK_DRAFT_STATUS_EVENT, type BookDraftStatus } from '@/lib/v3/bookDraftCloud';
 import { writeLocalThread } from '@/lib/v3/genieThread';
 
 
@@ -334,13 +334,16 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                   mode={biography ? 'biography' : 'book'}
                   initialIdea={idea || ''}
                   onReady={() => setDesk(2)}
+                  progressContent={(
+                    <>
+                      <V3PassageCorrector
+                        mode={biography ? 'biography' : 'book'}
+                        onDone={() => setDesk(2)}
+                      />
+                      <SaveStatusLine />
+                    </>
+                  )}
                 />
-                <div className="mt-4">
-                  <V3PassageCorrector
-                    mode={biography ? 'biography' : 'book'}
-                    onDone={() => setDesk(2)}
-                  />
-                </div>
                 <div className="mt-4 flex flex-wrap justify-end gap-2">
                   <button type="button" onClick={() => setDesk(2)} className="v3-btn v3-btn-outline text-xs">
                     Passer au sommaire <ArrowRight className="w-3.5 h-3.5" />
@@ -437,7 +440,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
           </details>
         )}
 
-        <SaveStatusLine />
+        {desk !== 1 && <SaveStatusLine />}
 
 
 
@@ -465,8 +468,22 @@ function SaveStatusLine() {
     : status.state === 'error' ? 'Conservé sur cet appareil : la sauvegarde du compte a échoué, elle sera retentée.'
     : 'Conservé sur cet appareil — connectez-vous pour reprendre ailleurs.';
   return (
-    <p className="mt-5 text-center text-[12px]" style={{ color: status.state === 'error' ? '#b45309' : 'var(--v3-muted)' }}>
-      {text}
-    </p>
+    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-white px-3 py-3" style={{ borderColor: status.state === 'error' ? 'rgba(180,83,9,0.45)' : 'rgba(15,107,74,0.35)' }}>
+      <p className="inline-flex items-center gap-2 text-[12px]" style={{ color: status.state === 'error' ? '#b45309' : 'var(--v3-muted)' }}>
+        {status.state === 'saving' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}{text}
+      </p>
+      <div className="flex flex-wrap gap-2">
+        <button type="button" disabled={status.state === 'saving'} onClick={() => void saveCurrentDraft(setStatus)} className="v3-btn v3-btn-outline text-[11px] disabled:opacity-50">
+          <Save className="h-3 w-3" /> Enregistrer maintenant
+        </button>
+        <Link to="/v3/mes-livres" className="v3-btn v3-btn-ghost text-[11px]">Reprendre ce livre plus tard</Link>
+      </div>
+    </div>
   );
+}
+
+async function saveCurrentDraft(setStatus: (status: BookDraftStatus) => void) {
+  const brief = readBookBrief() || {};
+  setStatus({ state: 'saving', projectId: brief.projectId || undefined });
+  await saveBookDraftToCloud(brief, { activeStep: brief.outlineValidated ? 3 : (brief.outline || []).length ? 2 : 1 });
 }
