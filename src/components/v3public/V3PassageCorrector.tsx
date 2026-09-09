@@ -4,11 +4,13 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import {
-  BOOK_BRIEF_EVENT, countWords, dedupeFactMemory, hasEmojis, insertSourcePassage, listSourcePassages, missingProtectedTerms,
-  narrativeForBook, passageForBook, readBookBrief, removeSourcePassage, replaceSourcePassage, stripEmojis, upsertPolished,
-  updateCorrectedPassage, writeBookBrief, type BookBrief,
+  BOOK_BRIEF_EVENT, bookTypography, countWords, dedupeFactMemory, hasEmojis, insertSourcePassage, listSourcePassages,
+  missingProtectedTerms, narrativeForBook, readBookBrief, removeSourcePassage, replaceSourcePassage, stripEmojis,
+  upsertPolished, updateCorrectedPassage, writeBookBrief, type BookBrief,
 } from '@/lib/v3/bookBrief';
 import { saveBookDraftToCloud } from '@/lib/v3/bookDraftCloud';
+import V3TypographyBar from '@/components/v3public/V3TypographyBar';
+import V3NextStepCard from '@/components/v3public/V3NextStepCard';
 
 
 /** Papier crème : la couleur du livre, à l'écran comme dans l'aperçu. */
