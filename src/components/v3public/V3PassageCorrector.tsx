@@ -44,6 +44,8 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
   const [undoBrief, setUndoBrief] = useState<BookBrief | null>(null);
   /** Passage dont la correction est revenue plus courte que les mots de l'auteur. */
   const [shortWarning, setShortWarning] = useState<number | null>(null);
+  /** Le nettoyage automatique des réponses courtes n'a lieu qu'une fois par ouverture. */
+  const cleanedRef = useRef(false);
 
 
   useEffect(() => {
