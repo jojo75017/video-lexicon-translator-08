@@ -56,13 +56,15 @@ Repères à respecter (replié) : Michel = frère · Anne = sœur…
 - Ne pas afficher ces repères au milieu du livre : ils servent seulement de garde-fou pendant la correction.
 - Conserver la possibilité de corriger un repère erroné, sans modifier le récit automatiquement.
 
-## 4. Laisser les emojis entièrement à l’auteur
+## 4. Les emojis, au choix, jamais en excès
 
-- Retirer l’option demandant au Génie de placer automatiquement des emojis.
-- Le Génie ne mettra donc aucun emoji de lui-même.
-- Ajouter un petit bouton **« Ajouter un emoji »** uniquement lorsque l’auteur modifie son texte ou la proposition corrigée.
-- Proposer une sélection courte et sobre ; l’emoji choisi est inséré à l’endroit du curseur et reste modifiable comme du texte normal.
-- Les emojis ajoutés manuellement apparaissent dans le livre crème et dans les exports.
+- Garder un interrupteur clair, mémorisé par livre : **« Quelques emojis dans mon texte »**.
+- Quand il est allumé, le Génie peut en placer lui-même, car il sait où ils tombent bien : **au maximum un par passage**, jamais plusieurs de suite, jamais dans un passage grave (deuil, maladie, accident), jamais en début de phrase.
+- Quand il est éteint, aucun emoji n'est ajouté par le Génie.
+- Ajouter aussi un bouton **« Retirer les emojis de ce texte »** sur chaque passage, pour les enlever d'un clic sans relancer de correction.
+- Ajouter un petit bouton **« Ajouter un emoji »** dans les zones de modification, pour en placer soi-même où l'on veut.
+- Tout emoji conservé apparaît dans le livre crème et dans les exports.
+
 
 ## 5. Ne rien perdre et reprendre au même endroit
 
