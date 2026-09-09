@@ -69,7 +69,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
   const [briefKey, setBriefKey] = useState(0);
   const wizardRef = useRef<HTMLDivElement | null>(null);
 
-  // Bureau ouvert : on reprend là où l'auteur en était.
+  // Étape ouverte : on reprend là où l'auteur en était.
   const [desk, setDesk] = useState<DeskId>(() => {
     const b = readBookBrief() || {};
     if ((b.outline?.length ?? 0) > 0 && b.outlineValidated) return 3;
@@ -77,6 +77,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
     return 1;
   });
   useEffect(() => { if (showWizard) setDesk(3); }, [showWizard]);
+
 
   useEffect(() => { seedHubConfig(idea, genre, type); }, [idea, genre, type]);
 
