@@ -166,7 +166,10 @@ export function rebuildSourceText(messages: GenieMessage[], existing?: string): 
   for (const m of messages) {
     if (m.role !== 'user') continue;
     const text = stripAuthorPrefix(m.content);
-    if (text.length < 40) continue;
+    // Seuls les clics de choix (un ou deux mots : « Roman », « Inspirant ») sont ignorés.
+    // Un premier texte court reste un texte de l'auteur : il ne doit jamais disparaître.
+    if (countTextWords(text) < 4) continue;
+
     out = appendSourceText(out, text);
   }
   return out;

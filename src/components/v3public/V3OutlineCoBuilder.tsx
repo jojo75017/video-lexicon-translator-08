@@ -4,9 +4,11 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import {
-  BOOK_BRIEF_EVENT, listSourcePassages, normalizeOutline, readBookBrief, writeBookBrief,
+  BOOK_BRIEF_EVENT, countWords, listSourcePassages, normalizeOutline, readBookBrief,
+  suggestChapterCount, uncoveredPassages, writeBookBrief,
   type BookBrief, type BriefOutlineChapter,
 } from '@/lib/v3/bookBrief';
+
 import { saveOutlineVersion } from '@/lib/v3/genieThread';
 
 type Proposal = { titre: string; objectif: string; sources: number[] };
@@ -31,12 +33,26 @@ export default function V3OutlineCoBuilder() {
   }, []);
 
   const outline = brief.outline || [];
-  const target = Math.min(40, Math.max(3, Number(brief.chapters) || 12));
   /** Récit de l'auteur découpé en passages numérotés : le sommaire doit les suivre. */
   const passages = listSourcePassages(brief.sourceText || '');
-  const coveredCount = new Set(
+  const sourceWords = passages.reduce((total, p) => total + countWords(p), 0);
+  /**
+   * Le nombre de chapitres n'est plus une valeur saisie d'avance : il est déduit
+   * de ce que l'auteur a réellement écrit (et se réajuste s'il écrit plus).
+   */
+  const suggested = suggestChapterCount(sourceWords, brief.wordsPerChapter);
+  const target = sourceWords > 0
+    ? suggested
+    : Math.min(40, Math.max(3, Number(brief.chapters) || 12));
+  const covered = new Set(
     outline.flatMap((c) => (Array.isArray(c.sources) ? c.sources : [])),
-  ).size;
+  );
+  const coveredCount = covered.size;
+  /** Textes envoyés après la construction du sommaire : matière à rattacher. */
+  const pending = uncoveredPassages(brief);
+  const pendingWords = pending.reduce((total, n) => total + countWords(passages[n - 1] || ''), 0);
+  const missingChapters = Math.max(0, suggested - outline.length);
+
 
   const patch = (values: Partial<BookBrief>) => {
     const next = { ...(readBookBrief() || {}), ...values };
@@ -138,8 +154,9 @@ export default function V3OutlineCoBuilder() {
       </div>
 
       <p className="mt-2 text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
-        Le Génie propose 3 chapitres à la fois, en suivant votre récit dans l’ordre. Vous gardez,
-        reformulez ou retirez — le sommaire n’est validé que par votre clic.
+        Vous avez écrit d’abord : le sommaire se construit maintenant à partir de votre texte, jamais
+        à l’avance. Le Génie propose 3 chapitres à la fois, en suivant votre récit dans l’ordre. Vous
+        gardez, reformulez ou retirez — le sommaire n’est validé que par votre clic.
       </p>
 
       {brief.mode === 'biography' && (
@@ -150,13 +167,42 @@ export default function V3OutlineCoBuilder() {
         </p>
       )}
 
-      {passages.length > 0 && (
+      {sourceWords > 0 ? (
         <p className="mt-2 rounded-xl border px-2.5 py-2 text-[11.5px]"
           style={{ borderColor: 'rgba(15,107,74,0.35)', background: 'rgba(15,107,74,0.06)', color: 'var(--v3-ink)' }}>
-          Votre récit compte <strong>{passages.length} passage(s)</strong> — {coveredCount} déjà rattaché(s) à un
-          chapitre. Chaque chapitre proposé indique les passages qu’il raconte.
+          Vous avez écrit <strong>{sourceWords.toLocaleString('fr-FR')} mots</strong> en{' '}
+          {passages.length} texte(s) : je propose <strong>{suggested} chapitre(s)</strong>.
+          {coveredCount > 0 ? ` ${coveredCount} de vos textes sont déjà rattachés à un chapitre.` : ''}{' '}
+          Chaque chapitre proposé indique de quels textes il vient — rien n’est jeté.
+        </p>
+      ) : (
+        <p className="mt-2 rounded-xl border px-2.5 py-2 text-[11.5px]"
+          style={{ borderColor: 'rgba(201,168,76,0.45)', background: 'rgba(201,168,76,0.08)', color: 'var(--v3-ink)' }}>
+          Continuez à raconter à l’étape ① : je m’occupe du plan quand vous aurez fini. Le nombre de
+          chapitres sera calculé sur ce que vous aurez vraiment écrit.
         </p>
       )}
+
+      {outline.length > 0 && pending.length > 0 && (
+        <div className="mt-2 rounded-xl border px-2.5 py-2 text-[11.5px]"
+          style={{ borderColor: 'rgba(201,168,76,0.55)', background: 'rgba(201,168,76,0.10)', color: 'var(--v3-ink)' }}>
+          Vous avez ajouté <strong>{pendingWords.toLocaleString('fr-FR')} mots</strong> depuis la
+          construction du sommaire (texte{pending.length > 1 ? 's' : ''} {pending.join(', ')})
+          {missingChapters > 0 ? ` : environ ${missingChapters} chapitre(s) s’ajoutent à la fin.` : '.'}
+          <div className="mt-2">
+            <button type="button" disabled={loading}
+              onClick={() => propose(
+                `J'ai ajouté de la matière : mes textes ${pending.join(', ')} ne sont rattachés à aucun chapitre. `
+                + `Ne touche PAS aux chapitres déjà gardés. Propose uniquement les chapitres qui manquent à la fin `
+                + `pour couvrir ces textes, dans l'ordre, et indique pour chacun les numéros de textes qu'il raconte.`,
+              )}
+              className="v3-btn v3-btn-outline text-[11px] disabled:opacity-50">
+              <RefreshCw className="h-3 w-3" /> Mettre à jour le sommaire
+            </button>
+          </div>
+        </div>
+      )}
+
 
       {proposals.length > 0 && (
         <div className="mt-3 space-y-2">
@@ -179,7 +225,7 @@ export default function V3OutlineCoBuilder() {
               {passages.length > 0 && (
                 p.sources.length ? (
                   <p className="mt-1 text-[11px] font-semibold" style={{ color: '#0f6b4a' }}>
-                    D’après votre récit — passage(s) {p.sources.join(', ')} :
+                    D’après votre récit — texte(s) {p.sources.join(', ')} :
                     <span className="ml-1 font-normal" style={{ color: 'var(--v3-muted)' }}>
                       « {String(passages[p.sources[0] - 1] || '').slice(0, 120)}… »
                     </span>

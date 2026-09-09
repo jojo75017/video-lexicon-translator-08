@@ -39,14 +39,14 @@ function seedHubConfig(idea: string | null, genre: string | null, type: string |
   } catch { /* ignore */ }
 }
 
-/** Les 4 bureaux de la maison d'édition : un seul chemin, dans l'ordre. */
+/** Trois étapes seulement : on raconte, le sommaire se déduit, le livre se monte. */
 const DESKS = [
-  { id: 1 as const, label: 'Mon récit', hint: 'Vous racontez, le Génie corrige votre texte sans le résumer.' },
-  { id: 2 as const, label: 'Sommaire', hint: 'On construit le sommaire ensemble, 3 chapitres à la fois, puis vous le validez.' },
-  { id: 3 as const, label: 'Rédaction', hint: 'Le Génie écrit chapitre par chapitre et les range à leur place.' },
-  { id: 4 as const, label: 'Livre & couverture', hint: 'Relecture, export Word ou PDF, couverture, KDP, traduction et audio.' },
+  { id: 1 as const, label: 'J’écris', hint: 'Vous racontez comme vous parlez. Le Génie corrige chaque texte sans jamais le résumer. Aucun plan à faire.' },
+  { id: 2 as const, label: 'Mon sommaire', hint: 'Le sommaire est déduit de ce que vous avez vraiment écrit : le nombre de chapitres suit votre volume de texte.' },
+  { id: 3 as const, label: 'Mon livre', hint: 'Rédaction chapitre par chapitre, relecture, export Word ou PDF, couverture, KDP, traduction et audio.' },
 ];
-type DeskId = 1 | 2 | 3 | 4;
+type DeskId = 1 | 2 | 3;
+
 
 type PageProps = {
   /** 'biography' = onglet « Biographie — Le récit de votre vie ». */
@@ -69,7 +69,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
   const [briefKey, setBriefKey] = useState(0);
   const wizardRef = useRef<HTMLDivElement | null>(null);
 
-  // Bureau ouvert : on reprend là où l'auteur en était.
+  // Étape ouverte : on reprend là où l'auteur en était.
   const [desk, setDesk] = useState<DeskId>(() => {
     const b = readBookBrief() || {};
     if ((b.outline?.length ?? 0) > 0 && b.outlineValidated) return 3;
@@ -77,6 +77,17 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
     return 1;
   });
   useEffect(() => { if (showWizard) setDesk(3); }, [showWizard]);
+
+  // L'explication d'accueil reste ouverte tant que rien n'est écrit, puis s'efface.
+  const [hasStory, setHasStory] = useState(() => Boolean((readBookBrief()?.sourceText || '').trim()));
+  useEffect(() => {
+    const sync = () => setHasStory(Boolean((readBookBrief()?.sourceText || '').trim()));
+    sync();
+    window.addEventListener(BOOK_BRIEF_EVENT, sync);
+    return () => window.removeEventListener(BOOK_BRIEF_EVENT, sync);
+  }, []);
+
+
 
   useEffect(() => { seedHubConfig(idea, genre, type); }, [idea, genre, type]);
 
@@ -211,22 +222,69 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
           </div>
         )}
 
-        {/* Hero « Ebookstudio-Génie » */}
+        {/* Ma maison d'édition : on explique avant de faire */}
         {!openedBook && (
-        <div className="mt-6 text-center">
-          <span className="v3-chip v3-chip-orange">
-            <Sparkles className="w-3.5 h-3.5" /> {biography ? 'Biographie — Le récit de votre vie' : 'Ebookstudio-Génie'}
-          </span>
-          <h1 className="v3-serif text-4xl md:text-5xl font-bold mt-4 leading-tight" style={{ color: 'var(--v3-ink)' }}>
-            {biography ? 'Racontez votre vie, nous en faisons un livre' : 'Commencez à créer votre livre'}
-          </h1>
-          <p className="mt-3 text-sm md:text-base" style={{ color: 'var(--v3-muted)' }}>
-            {biography
-              ? 'Une question à la fois, période après période. Vos mots sont conservés et corrigés, jamais résumés, et le sommaire suit l’ordre réel de votre vie.'
-              : 'Parlez de votre projet à Ebookstudio-Génie. Il construit le sommaire avec vous, rédige les chapitres, puis va jusqu’à l’export et la couverture.'}
-          </p>
+        <div className="mt-6">
+          <div className="text-center">
+            <span className="v3-chip v3-chip-orange">
+              <Sparkles className="w-3.5 h-3.5" /> {biography ? 'Biographie — Le récit de votre vie' : 'Ma maison d’édition'}
+            </span>
+            <h1 className="v3-serif text-4xl md:text-5xl font-bold mt-4 leading-tight" style={{ color: 'var(--v3-ink)' }}>
+              {biography ? 'Racontez votre vie, nous en faisons un livre' : 'Ici, vous racontez. Nous fabriquons le livre.'}
+            </h1>
+            <p className="mt-3 text-sm md:text-base" style={{ color: 'var(--v3-muted)' }}>
+              Vous n’avez ni plan à préparer, ni mise en page à faire, ni peur de mal écrire.
+              Vous écrivez comme vous parlez, et tout le reste se fabrique ici.
+            </p>
+          </div>
+
+          {!hasStory && (
+            <>
+              <div className="mt-5 grid gap-3 md:grid-cols-3">
+                {[
+                  {
+                    n: '1', t: 'Vous racontez',
+                    d: 'Vos mots, vos souvenirs, vos idées, dans l’ordre qui vous vient. Fautes et phrases longues : aucune importance. Aucun plan à faire à l’avance.',
+                  },
+                  {
+                    n: '2', t: 'Le Génie corrige',
+                    d: 'Il réécrit proprement, sans jamais résumer ni raccourcir : jamais moins de mots que vous. Vos mots d’origine restent visibles et récupérables.',
+                  },
+                  {
+                    n: '3', t: 'Le livre se monte',
+                    d: 'Le sommaire est déduit de VOTRE texte — pas l’inverse. Puis la rédaction, l’export Word ou PDF, la couverture, les données Amazon et l’audio.',
+                  },
+                ].map((c) => (
+                  <div key={c.n} className="rounded-[22px] border p-4" style={{ borderColor: 'rgba(201,168,76,0.5)', background: '#fff' }}>
+                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold"
+                      style={{ background: 'var(--v3-gold, #c9a84c)', color: '#1a1408' }}>{c.n}</span>
+                    <h2 className="v3-serif mt-2 text-lg font-bold" style={{ color: 'var(--v3-ink)' }}>{c.t}</h2>
+                    <p className="mt-1 text-[12.5px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>{c.d}</p>
+                  </div>
+                ))}
+              </div>
+
+              <p className="mt-4 rounded-[22px] border px-4 py-3 text-[12.5px] leading-relaxed"
+                style={{ borderColor: 'rgba(15,107,74,0.35)', background: 'rgba(15,107,74,0.06)', color: 'var(--v3-ink)' }}>
+                <strong>Vous pouvez arrêter à tout moment.</strong> Chaque texte envoyé est enregistré
+                aussitôt, avec l’heure du dernier enregistrement affichée sous « Votre livre ». Vous
+                fermez la page, vous revenez demain ou depuis un autre ordinateur, et vous reprenez
+                exactement où vous en étiez. Vous n’avez rien à sauvegarder vous-même.
+              </p>
+
+              <div className="mt-4 flex flex-wrap justify-center gap-2">
+                <Link to="/v3/create" className={`v3-btn text-xs ${biography ? 'v3-btn-outline' : 'v3-btn-primary'}`}>
+                  <BookOpen className="w-3.5 h-3.5" /> Je raconte un livre
+                </Link>
+                <Link to="/v3/biographie" className={`v3-btn text-xs ${biography ? 'v3-btn-primary' : 'v3-btn-outline'}`}>
+                  <Sparkles className="w-3.5 h-3.5" /> Je raconte ma vie
+                </Link>
+              </div>
+            </>
+          )}
         </div>
         )}
+
 
         {/* Reprendre un livre déjà commencé */}
         {!openedBook && (
@@ -259,9 +317,9 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
           </p>
         </div>
 
-        <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_380px] items-start">
+        <div className="mt-5">
           <div className="min-w-0 v3-ambiance">
-            {/* ① Mon récit : j'écris, le Génie corrige */}
+            {/* ① J'écris : je raconte, le Génie corrige */}
             {desk === 1 && !openedBook && (
               <>
                 <V3GenieDialog
@@ -270,46 +328,40 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                   onReady={() => setDesk(2)}
                 />
                 <div className="mt-4">
-                  <V3PassageCorrector mode={biography ? 'biography' : 'book'} />
+                  <V3PassageCorrector
+                    mode={biography ? 'biography' : 'book'}
+                    onDone={() => setDesk(2)}
+                  />
                 </div>
               </>
             )}
 
-            {/* ② Sommaire : 3 chapitres à la fois */}
+            {/* ② Mon sommaire : déduit de ce qui a été écrit, 3 chapitres à la fois */}
             {desk === 2 && <V3OutlineCoBuilder />}
 
-            {/* ③ Rédaction : le Génie écrit et range chaque chapitre */}
+            {/* ③ Mon livre : rédaction, relecture, export, couverture, KDP, audio */}
             {desk === 3 && (
-              showWizard ? (
-                <div ref={wizardRef} className="v3-card">
-                  <Suspense fallback={<div className="py-16 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-[var(--v3-orange)]" /></div>}>
-                    <V3CreateWizard />
-                  </Suspense>
-                </div>
-              ) : (
-                <div className="v3-card">
-                  <h2 className="v3-serif text-xl font-bold" style={{ color: 'var(--v3-ink)' }}>La rédaction</h2>
-                  <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>
-                    Validez votre sommaire, puis cliquez sur « Commencer la rédaction » : chaque chapitre
-                    écrit se range tout seul à sa place, déjà corrigé.
-                  </p>
-                  <button type="button" onClick={launchWorkflow} className="v3-btn v3-btn-primary mt-4 text-xs">
-                    <Sparkles className="w-3.5 h-3.5" /> Commencer la rédaction
-                  </button>
-                </div>
-              )
-            )}
-
-            {/* ④ Livre & couverture : lire, corriger, exporter, couvrir */}
-            {desk === 4 && (
               <div className="space-y-4">
-                <div className="v3-card">
-                  <h2 className="v3-serif text-xl font-bold" style={{ color: 'var(--v3-ink)' }}>Votre livre, prêt à publier</h2>
-                  <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>
-                    Relisez chaque chapitre dans la colonne de droite, puis servez-vous des boutons
-                    ci-dessous : correction, export Word ou PDF, couverture, données KDP, traduction et audio.
-                  </p>
-                </div>
+                {showWizard ? (
+                  <div ref={wizardRef} className="v3-card">
+                    <Suspense fallback={<div className="py-16 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-[var(--v3-orange)]" /></div>}>
+                      <V3CreateWizard />
+                    </Suspense>
+                  </div>
+                ) : (
+                  <div className="v3-card">
+                    <h2 className="v3-serif text-xl font-bold" style={{ color: 'var(--v3-ink)' }}>Votre livre</h2>
+                    <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>
+                      Validez votre sommaire, puis cliquez sur « Commencer la rédaction » : chaque chapitre
+                      écrit se range tout seul à sa place, déjà corrigé. Ensuite, les boutons ci-dessous
+                      vous donnent l’export Word ou PDF, la couverture, les données Amazon, la traduction
+                      et l’audio.
+                    </p>
+                    <button type="button" onClick={launchWorkflow} className="v3-btn v3-btn-primary mt-4 text-xs">
+                      <Sparkles className="w-3.5 h-3.5" /> Commencer la rédaction
+                    </button>
+                  </div>
+                )}
                 <V3AmbiancePicker />
                 <V3KeyHint />
                 <V3PipelinePanel />
@@ -324,7 +376,12 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
               </div>
             )}
 
-            {/* Vos actions : toujours visibles, quel que soit le bureau */}
+            {/* Votre livre : replié sous l'étape en cours, jamais dans une colonne perdue */}
+            <div id="sommaire-ia" className="mt-5">
+              <V3GenieOutlinePanel key={briefKey} outlineMode={sommaireIa ? 'guided' : undefined} />
+            </div>
+
+            {/* Vos actions : toujours visibles, quelle que soit l'étape */}
             <div className="mt-5">
               <V3BookActionsBar onLaunch={launchWorkflow} />
             </div>
@@ -339,12 +396,8 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
               </Link>
             </div>
           </div>
-
-          {/* Colonne « Votre livre en direct » : sommaire unique + texte écrit */}
-          <aside id="sommaire-ia" className="order-first min-w-0 lg:order-last lg:sticky lg:top-24">
-            <V3GenieOutlinePanel key={briefKey} outlineMode={sommaireIa ? 'guided' : undefined} />
-          </aside>
         </div>
+
 
 
 

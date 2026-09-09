@@ -1,22 +1,28 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Check, Loader2, RefreshCw, ShieldCheck, Sparkles, Undo2, Wand2 } from 'lucide-react';
+import { Check, ListOrdered, Loader2, RefreshCw, ShieldCheck, Sparkles, Undo2, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import {
   BOOK_BRIEF_EVENT, countWords, listSourcePassages, narrativeForBook, readBookBrief,
-  upsertPolished, writeBookBrief, type BookBrief,
+  suggestChapterCount, upsertPolished, writeBookBrief, type BookBrief,
 } from '@/lib/v3/bookBrief';
+
 
 /**
  * « Comme Copilot » : l'auteur écrit ses idées telles qu'elles viennent, le Génie
  * les lui rend corrigées et développées, et chaque passage validé est enregistré
  * pour finir dans le livre. L'original n'est jamais écrasé.
  */
-export default function V3PassageCorrector({ mode = 'book' }: { mode?: 'book' | 'biography' }) {
+export default function V3PassageCorrector({ mode = 'book', onDone }: {
+  mode?: 'book' | 'biography';
+  /** « J'ai fini de raconter » : ouvre l'étape ② Mon sommaire. */
+  onDone?: () => void;
+}) {
   const [brief, setBrief] = useState<BookBrief>({});
   const [busy, setBusy] = useState<number | null>(null);
   const [runningAll, setRunningAll] = useState(false);
+
 
   useEffect(() => {
     const sync = () => setBrief(readBookBrief() || {});
@@ -67,7 +73,7 @@ export default function V3PassageCorrector({ mode = 'book' }: { mode?: 'book' | 
       const current = readBookBrief() || {};
       patch({ polished: upsertPolished(current, { index, original, corrected }) });
       if ((data as any)?.shorter) {
-        toast.warning(`Passage ${index} : la version corrigée est plus courte, relancez la correction.`);
+        toast.warning(`Texte ${index} : la version corrigée est plus courte, relancez la correction.`);
       }
       return true;
     } catch (e: any) {
@@ -99,13 +105,13 @@ export default function V3PassageCorrector({ mode = 'book' }: { mode?: 'book' | 
       return;
     }
     patch({ polished: upsertPolished(current, { ...entry, validatedAt: new Date().toISOString() }) });
-    toast.success(`Passage ${index} validé — il entrera dans le livre ainsi.`);
+    toast.success(`Texte ${index} validé — il entrera dans le livre ainsi.`);
   };
 
   const keepOriginal = (index: number) => {
     const current = readBookBrief() || {};
     patch({ polished: (current.polished || []).filter((p) => p.index !== index) });
-    toast.success(`Passage ${index} : vos mots d’origine sont conservés.`);
+    toast.success(`Texte ${index} : vos mots d’origine sont conservés.`);
   };
 
   const validateAll = () => {
@@ -120,16 +126,18 @@ export default function V3PassageCorrector({ mode = 'book' }: { mode?: 'book' | 
     toast.success('Toutes les corrections prêtes sont validées.');
   };
 
+  const suggested = suggestChapterCount(originalWords, brief.wordsPerChapter);
+
   if (!passages.length) {
     return (
       <div className="rounded-[22px] border p-4" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
         <span className="v3-chip v3-chip-orange text-[11px]">
-          <Wand2 className="h-3 w-3" /> Vos idées, corrigées et enregistrées
+          <Wand2 className="h-3 w-3" /> Mes envois — rien ne s’efface
         </span>
         <p className="mt-2 text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
-          Écrivez vos souvenirs ou vos idées dans le dialogue, même avec des fautes : ils apparaîtront
-          ici passage par passage, et le Génie vous rendra chaque passage corrigé, développé et prêt
-          pour le livre. Vos mots d’origine sont toujours conservés.
+          Écrivez vos souvenirs ou vos idées ci-dessus, même avec des fautes : chaque envoi apparaîtra
+          ici sous le nom « Texte 1 », « Texte 2 »… et le Génie vous le rendra corrigé et développé,
+          jamais résumé. N’essayez pas de faire un plan : le sommaire viendra tout seul après.
         </p>
       </div>
     );
@@ -139,30 +147,43 @@ export default function V3PassageCorrector({ mode = 'book' }: { mode?: 'book' | 
     <div className="rounded-[22px] border p-4" style={{ borderColor: 'rgba(201,168,76,0.55)', background: '#fff' }}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="v3-chip v3-chip-orange text-[11px]">
-          <Wand2 className="h-3 w-3" /> Vos idées, corrigées et enregistrées
+          <Wand2 className="h-3 w-3" /> Mes envois — dans l’ordre, aucun perdu
         </span>
         <span className="text-[11px]" style={{ color: 'var(--v3-muted)' }}>
-          {validatedCount}/{passages.length} passage(s) validé(s) · {originalWords} mots écrits →{' '}
-          <strong style={{ color: '#0f6b4a' }}>{bookWords} mots dans le livre</strong>
+          {validatedCount}/{passages.length} texte(s) validé(s) · {originalWords.toLocaleString('fr-FR')} mots écrits →{' '}
+          <strong style={{ color: '#0f6b4a' }}>{bookWords.toLocaleString('fr-FR')} mots dans le livre</strong>
         </span>
       </div>
 
       <p className="mt-2 text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
         Vous écrivez comme vous parlez. Le Génie corrige l’orthographe, la ponctuation et développe
-        vos phrases sans jamais retirer un fait ni écrire moins de mots que vous. Chaque passage
-        validé est enregistré et servira à la rédaction du livre.
+        vos phrases sans jamais retirer un fait ni écrire moins de mots que vous. Chaque texte validé
+        est enregistré et servira à la rédaction du livre.
+      </p>
+
+      <p className="mt-2 rounded-xl border px-2.5 py-2 text-[11.5px]"
+        style={{ borderColor: 'rgba(15,107,74,0.35)', background: 'rgba(15,107,74,0.06)', color: 'var(--v3-ink)' }}>
+        Ce ne sont pas encore des chapitres : les chapitres viennent à l’étape ② Mon sommaire.
+        Avec {originalWords.toLocaleString('fr-FR')} mots écrits, cela fera environ{' '}
+        <strong>{suggested} chapitre(s)</strong> — et ce nombre s’ajustera tout seul si vous écrivez plus.
       </p>
 
       <div className="mt-3 flex flex-wrap gap-2">
         <button type="button" onClick={correctAll} disabled={runningAll || busy !== null}
           className="v3-btn v3-btn-primary text-xs disabled:opacity-50">
           {runningAll ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
-          Corriger tous mes passages
+          Corriger tous mes textes
         </button>
         <button type="button" onClick={validateAll} className="v3-btn v3-btn-outline text-xs">
           <ShieldCheck className="h-3.5 w-3.5" /> Tout valider
         </button>
+        {onDone && (
+          <button type="button" onClick={onDone} className="v3-btn v3-btn-outline text-xs">
+            <ListOrdered className="h-3.5 w-3.5" /> J’ai fini de raconter → construire mon sommaire
+          </button>
+        )}
       </div>
+
 
       <div className="mt-4 space-y-3">
         {passages.map((original, i) => {
@@ -177,8 +198,9 @@ export default function V3PassageCorrector({ mode = 'book' }: { mode?: 'book' | 
               }}>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: '#8a6d1f' }}>
-                  Passage {index}
+                  Texte {index}
                 </span>
+
                 <span className="text-[11px]" style={{ color: validated ? '#0f6b4a' : 'var(--v3-muted)' }}>
                   {validated
                     ? 'Validé — entre dans le livre'
@@ -217,7 +239,7 @@ export default function V3PassageCorrector({ mode = 'book' }: { mode?: 'book' | 
                 <button type="button" onClick={() => correct(index)} disabled={busy === index || runningAll}
                   className="v3-btn v3-btn-outline text-[11px] disabled:opacity-50">
                   {busy === index ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
-                  {entry?.corrected ? 'Recorriger' : 'Corriger ce passage'}
+                  {entry?.corrected ? 'Recorriger' : 'Corriger ce texte'}
                 </button>
                 {entry?.corrected && !validated && (
                   <button type="button" onClick={() => validate(index)} className="v3-btn v3-btn-primary text-[11px]">
