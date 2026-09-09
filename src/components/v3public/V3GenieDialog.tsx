@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import {
-  appendSourceText, listSourcePassages, mergeRespectingLocks, readBookBrief, resetBookProject, writeBookBrief, type BookBrief,
+  appendSourceText, dedupeFactMemory, listSourcePassages, mergeRespectingLocks, readBookBrief, resetBookProject, writeBookBrief, type BookBrief,
 } from '@/lib/v3/bookBrief';
 import { saveBookDraftToCloud } from '@/lib/v3/bookDraftCloud';
 import { currentInterviewStep } from '@/lib/v3/genieInterview';
