@@ -365,7 +365,7 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
         </div>
       </div>
 
-      {/* Le livre : un seul affichage, sur papier crème, avec ses actions. */}
+      {/* Le livre : un seul texte continu, sur papier crème, avec ses actions. */}
       {shortWarning !== null && (
         <p className="mt-3 rounded-xl border px-3 py-2 text-[12px]" style={{ borderColor: '#b45309', color: '#8a4b09', background: '#fff7ed' }}>
           Passage {shortWarning} : la version rendue était plus courte que vos mots. Vos mots d’origine
