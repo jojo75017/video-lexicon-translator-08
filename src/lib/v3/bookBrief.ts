@@ -126,6 +126,25 @@ export function countWords(text: string): number {
   return String(text || '').trim().split(/\s+/).filter(Boolean).length;
 }
 
+/**
+ * Retire les emojis d'un texte sans toucher aux mots : l'auteur peut les
+ * enlever d'un clic, sans relancer la moindre correction IA.
+ */
+export function stripEmojis(text: string): string {
+  return String(text || '')
+    .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}\u{2B00}-\u{2BFF}]/gu, '')
+    .replace(/[ \t]{2,}/g, ' ')
+    .replace(/[ \t]+([.,;:!?])/g, '$1')
+    .split('\n')
+    .map((line) => line.replace(/[ \t]+$/g, ''))
+    .join('\n');
+}
+
+/** Vrai si le texte contient au moins un emoji. */
+export function hasEmojis(text: string): boolean {
+  return stripEmojis(text) !== String(text || '');
+}
+
 /** Le passage corrigé s'il est validé, sinon les mots d'origine de l'auteur. */
 export function passageForBook(brief: BookBrief | null | undefined, index: number, original: string): string {
   const entry = (brief?.polished || []).find((p) => p.index === index);

@@ -1,4 +1,10 @@
 
+## Livre visible en permanence (09/09/2026)
+- [x] Livre crème toujours affiché avec les 5 textes, validés ou non, et ascenseur
+- [x] Liste d'édition des textes avec ascenseur (livres longs)
+- [x] Repères (factMemory) repliés, renommés et expliqués
+- [x] Emojis au choix : IA limitée à un seul par passage, retrait en un clic, ajout manuel
+
 ## Récit V3 fidèle et reprenable (09/09/2026)
 - [x] Livre en cours visible sous la saisie avec correction automatique et indices respectés
 - [x] Sauvegarde/reprise visible au même endroit avec relance manuelle
