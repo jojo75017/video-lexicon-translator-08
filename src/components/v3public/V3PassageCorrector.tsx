@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BookOpen, Check, ListOrdered, Loader2, Plus, RefreshCw, Save, ShieldCheck, Sparkles, Trash2, Undo2, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -40,7 +40,8 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
   const [autoState, setAutoState] = useState<'idle' | 'working' | 'error'>('idle');
   const [showBook, setShowBook] = useState(false);
   const [undoBrief, setUndoBrief] = useState<BookBrief | null>(null);
-  const attemptedAuto = useRef<Set<number>>(new Set());
+  /** Passage dont la correction est revenue plus courte que les mots de l'auteur. */
+  const [shortWarning, setShortWarning] = useState<number | null>(null);
 
 
   useEffect(() => {
@@ -79,19 +80,19 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
   };
 
   /**
-   * Passage oublié : il est inséré à sa place, puis corrigé tout seul et raccordé
-   * au texte qui le précède (voir `pendingPolishIndex`).
+   * Passage oublié : il est inséré à sa place, immédiatement enregistré.
+   * La correction n'est jamais lancée toute seule : c'est un clic de l'auteur.
    */
   const addPassage = (afterIndex: number) => {
     if (!addition.trim()) return;
     const inserted = insertSourcePassage(readBookBrief() || {}, afterIndex, addition);
     const newIndex = afterIndex + 1;
-    attemptedAuto.current.delete(newIndex);
-    const next = patch({ ...inserted, pendingPolishIndex: newIndex });
+    const next = patch({ ...inserted, pendingPolishIndex: undefined });
     void persist(next);
     setAddingAfter(null);
     setAddition('');
-    toast.success('Passage ajouté. Le Génie le corrige et le raccorde à votre récit…');
+    setSelected(newIndex);
+    toast.success(`Passage ${newIndex} ajouté et enregistré. Cliquez sur « Corriger ce passage » quand vous voulez.`);
   };
 
   const saveCorrectedEdit = (index: number) => {
@@ -131,7 +132,7 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
           factMemory: brief.factMemory || [],
           // Raccord : le passage doit s'enchaîner avec le texte qui le précède.
           previousPassage: index > 1 ? (passages[index - 2] || '').slice(-3000) : '',
-          emojis: brief.emojis === true,
+          emojis: brief.emojis !== false,
           userApiKey,
         },
       });
@@ -149,7 +150,10 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
       void persist(next);
       if (automatic) setAutoState('idle');
       if ((data as any)?.shorter) {
-        toast.warning(`Passage ${index} : la version corrigée est plus courte, relancez la correction.`);
+        setShortWarning(index);
+        toast.warning(`Passage ${index} : le Génie a rendu un texte plus court que le vôtre. Vos mots restent intacts.`);
+      } else {
+        setShortWarning((value) => (value === index ? null : value));
       }
       return true;
     } catch (e: any) {
@@ -166,13 +170,6 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
       setBusy(null);
     }
   }, [brief.author, brief.category, brief.emojis, brief.factMemory, brief.language, brief.title, brief.tone, mode, passages]);
-
-  useEffect(() => {
-    const pending = Number(brief.pendingPolishIndex) || 0;
-    if (!pending || busy !== null || entryFor(pending)?.corrected || attemptedAuto.current.has(pending)) return;
-    attemptedAuto.current.add(pending);
-    void correct(pending, true);
-  }, [brief.pendingPolishIndex, busy, correct, polished]);
 
   const correctAll = async () => {
     setRunningAll(true);
@@ -348,7 +345,7 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
         </p>
         <div className="flex flex-wrap items-center gap-2">
           <label className="inline-flex items-center gap-1.5 text-[11.5px]" style={{ color: 'var(--v3-ink)' }}>
-            <input type="checkbox" checked={brief.emojis === true}
+            <input type="checkbox" checked={brief.emojis !== false}
               onChange={(event) => {
                 const next = patch({ emojis: event.target.checked });
                 void persist(next);
@@ -365,7 +362,14 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
       </div>
 
       {/* Le livre : un seul affichage, sur papier crème, avec ses actions. */}
-      <div className={`mt-3 space-y-5 overflow-y-auto rounded-2xl border p-4 ${showBook ? 'max-h-[85vh]' : 'max-h-[34rem]'}`}
+      {shortWarning !== null && (
+        <p className="mt-3 rounded-xl border px-3 py-2 text-[12px]" style={{ borderColor: '#b45309', color: '#8a4b09', background: '#fff7ed' }}>
+          Passage {shortWarning} : la version rendue était plus courte que vos mots. Vos mots d’origine
+          sont conservés — relancez « Corriger ce passage » ou complétez-le vous-même avec « Modifier mes mots ».
+        </p>
+      )}
+
+      <div className={`mt-3 space-y-5 overflow-y-auto rounded-2xl border p-4 ${showBook ? 'max-h-[85vh]' : 'max-h-[46rem]'}`}
         style={{ borderColor: 'rgba(201,168,76,0.5)', background: CREAM }}>
         {passages.map((original, i) => {
           const index = i + 1;

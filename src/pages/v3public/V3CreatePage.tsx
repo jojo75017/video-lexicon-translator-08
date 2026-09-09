@@ -327,23 +327,25 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
 
         <div className="mt-5">
           <div className="min-w-0 v3-ambiance">
-            {/* ① J'écris : je raconte, le Génie corrige. Rien d'autre à l'écran. */}
+            {/* ① J'écris : à gauche je parle, à droite mon livre se remplit. */}
             {desk === 1 && (
               <>
-                <V3GenieDialog
-                  mode={biography ? 'biography' : 'book'}
-                  initialIdea={idea || ''}
-                  onReady={() => setDesk(2)}
-                  progressContent={(
-                    <>
-                      <V3PassageCorrector
-                        mode={biography ? 'biography' : 'book'}
-                        onDone={() => setDesk(2)}
-                      />
-                      <SaveStatusLine />
-                    </>
-                  )}
-                />
+                <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
+                  <div className="min-w-0">
+                    <V3GenieDialog
+                      mode={biography ? 'biography' : 'book'}
+                      initialIdea={idea || ''}
+                      onReady={() => setDesk(2)}
+                    />
+                  </div>
+                  <div className="min-w-0 lg:sticky lg:top-4">
+                    <V3PassageCorrector
+                      mode={biography ? 'biography' : 'book'}
+                      onDone={() => setDesk(2)}
+                    />
+                    <SaveStatusLine />
+                  </div>
+                </div>
                 <div className="mt-4 flex flex-wrap justify-end gap-2">
                   <button type="button" onClick={() => setDesk(2)} className="v3-btn v3-btn-outline text-xs">
                     Passer au sommaire <ArrowRight className="w-3.5 h-3.5" />
