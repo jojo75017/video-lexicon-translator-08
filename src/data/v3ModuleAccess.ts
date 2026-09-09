@@ -124,6 +124,22 @@ export const V3_PAID_MODULES: V3PaidModule[] = [
     packId: 'boost_lancement',
   },
   {
+    key: 'publishers',
+    title: "Sélection maisons d'édition",
+    price: 27,
+    pitch: "Liste ciblée d'éditeurs et lettre d'accompagnement personnalisée.",
+    routes: [],
+    priceId: 'v3_addon_publishers_once',
+  },
+  {
+    key: 'serenity',
+    title: 'Pack Sérénité',
+    price: 27,
+    pitch: 'Session Zoom 1-à-1, support prioritaire et audit complet de votre ebook.',
+    routes: [],
+    priceId: 'v3_addon_serenity_once',
+  },
+  {
     key: 'puzzle-book',
     title: 'Livres de Jeux & Énigmes',
     price: 27,
@@ -165,9 +181,6 @@ const CARD_TO_MODULE_KEY: Record<string, string> = {
   short_stories: 'short-stories',
   // Addons tarifaires (key v3Pricing) → module
   audio_single: 'audio_premium',
-  // Compléments sans outil verrouillé : pas de module dédié
-  publishers: '',
-  serenity: '',
 };
 
 /** Clé d'entitlement d'une carte upsell (id de pack ou clé d'addon). */
