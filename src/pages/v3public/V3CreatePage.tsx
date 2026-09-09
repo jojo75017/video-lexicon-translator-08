@@ -18,7 +18,7 @@ import V3OutlineCoBuilder from '@/components/v3public/V3OutlineCoBuilder';
 import V3PassageCorrector from '@/components/v3public/V3PassageCorrector';
 
 import { BOOK_BRIEF_EVENT, readBookBrief, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
-import { restoreDraftState, BOOK_DRAFT_STATUS_EVENT, type BookDraftStatus } from '@/lib/v3/bookDraftCloud';
+import { restoreDraftState, saveBookDraftToCloud, BOOK_DRAFT_STATUS_EVENT, type BookDraftStatus } from '@/lib/v3/bookDraftCloud';
 import { writeLocalThread } from '@/lib/v3/genieThread';
 
 
@@ -485,6 +485,5 @@ function SaveStatusLine() {
 async function saveCurrentDraft(setStatus: (status: BookDraftStatus) => void) {
   const brief = readBookBrief() || {};
   setStatus({ state: 'saving', projectId: brief.projectId || undefined });
-  const { saveBookDraftToCloud } = await import('@/lib/v3/bookDraftCloud');
   await saveBookDraftToCloud(brief, { activeStep: brief.outlineValidated ? 3 : (brief.outline || []).length ? 2 : 1 });
 }

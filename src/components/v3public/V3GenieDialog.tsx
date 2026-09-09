@@ -142,14 +142,19 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
       mode: isBiography ? 'biography' : previousBrief.mode,
       biographySteps: toldSteps,
       sourceText: nextSourceText,
-      pendingPolishIndex: listSourcePassages(nextSourceText).length,
     };
     setBrief(briefWithSource);
     writeBookBrief(briefWithSource);
     const userMessage = makeMessage('user', text);
     setMessages((prev) => [...prev, userMessage]);
     const draftResult = await saveBookDraftToCloud(briefWithSource, { messages: [...messages, userMessage], activeStep: 1 });
-    const linkedBrief = { ...briefWithSource, projectId: draftResult.projectId || briefWithSource.projectId };
+    const linkedBrief = {
+      ...briefWithSource,
+      projectId: draftResult.projectId || briefWithSource.projectId,
+      pendingPolishIndex: listSourcePassages(nextSourceText).length,
+    };
+    setBrief(linkedBrief);
+    writeBookBrief(linkedBrief);
     if (draftResult.error && draftResult.error !== 'not-authenticated') {
       toast.error('Votre texte reste sur cet appareil. La sauvegarde du compte sera retentée.');
     }
@@ -178,8 +183,9 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
         chapters: b.chapters || previousBrief.chapters || 20,
         wordsPerChapter: b.wordsPerChapter || previousBrief.wordsPerChapter || 2500,
       });
+      const latestBrief = readBookBrief() || linkedBrief;
       const nextBrief: BookBrief = {
-        ...linkedBrief,
+        ...latestBrief,
         author: b.author || brief.author || '',
         category: b.category || previousBrief.category || '',
         tone: b.tone || previousBrief.tone || 'Inspirant',
@@ -189,7 +195,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
         wantsIllustrations: Boolean(b.wantsIllustrations),
         cibleProfil: b.cibleProfil || brief.cibleProfil || '',
         promesseCentrale: b.promesseCentrale || brief.promesseCentrale || '',
-        factMemory: Array.from(new Set([...(brief.factMemory || []), ...(Array.isArray(b.factMemory) ? b.factMemory.map(String) : [])])),
+        factMemory: Array.from(new Set([...(latestBrief.factMemory || []), ...(Array.isArray(b.factMemory) ? b.factMemory.map(String) : [])])),
         outlineValidated: false,
         ...proposed,
       };
