@@ -174,6 +174,12 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
           </span>
         </div>
 
+        {savedAt && (
+          <p className="mt-1 text-[10.5px]" style={{ color: '#0f766e' }}>
+            Enregistré à {savedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} — vous pourrez reprendre quand vous voulez.
+          </p>
+        )}
+
         <h3 className="v3-serif mt-2 text-xl font-bold" style={{ color: 'var(--v3-ink)' }}>
           {brief.title?.trim() || 'Projet sans titre'}
         </h3>
