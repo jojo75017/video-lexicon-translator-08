@@ -205,6 +205,22 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
     toast.success(`Texte ${index} : vos mots d’origine sont conservés.`);
   };
 
+  /** Retire les emojis d'un passage, sans appel IA ni crédit. */
+  const removeEmojis = (index: number) => {
+    const current = readBookBrief() || {};
+    const entry = (current.polished || []).find((p) => p.index === index);
+    if (entry?.corrected) {
+      const cleaned = stripEmojis(entry.corrected);
+      const next = patch({ polished: upsertPolished(current, { ...entry, corrected: cleaned }) });
+      void persist(next);
+    } else {
+      const original = passages[index - 1] || '';
+      const next = patch(replaceSourcePassage(current, index, stripEmojis(original)));
+      void persist(next);
+    }
+    toast.success(`Texte ${index} : emojis retirés.`);
+  };
+
   const validateAll = () => {
     const current = readBookBrief() || {};
     const now = new Date().toISOString();
