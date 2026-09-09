@@ -102,6 +102,11 @@ export type BookBrief = {
   lockedFields?: LockableField[];
   /** Faits confirmés que la correction, le sommaire et la rédaction doivent respecter. */
   factMemory?: string[];
+  /**
+   * L'auteur accepte quelques emojis discrets dans le texte corrigé (donc aussi
+   * dans le livre imprimé). Absent ou faux = aucun emoji.
+   */
+  emojis?: boolean;
 };
 
 /** Champs que l'auteur peut verrouiller depuis la colonne « Réglages du livre ». */
