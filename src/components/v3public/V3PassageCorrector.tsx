@@ -267,6 +267,17 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
     toast.success('Vos réponses courtes quittent le livre : le Génie les garde en mémoire.');
   };
 
+  /**
+   * Les réponses très courtes sortent du livre toutes seules, une seule fois par
+   * livre : elles deviennent des informations retenues, annulable d'un clic.
+   */
+  useEffect(() => {
+    if (!shortAnswers.length || cleanedRef.current) return;
+    cleanedRef.current = true;
+    cleanShortAnswers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shortAnswers.length]);
+
   const undoClean = () => {
     if (!undoBrief) return;
     const next = patch(undoBrief);
