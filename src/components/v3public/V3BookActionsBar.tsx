@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, Rocket, Save, Wand2, BookOpen, BarChart3, Languages, Headphones, Star } from 'lucide-react';
+import { Check, Rocket, Save, Wand2, BookOpen, BarChart3, Languages, Headphones, Star, Download, Palette } from 'lucide-react';
 import { toast } from 'sonner';
 import V3UpsellPromoCard from '@/components/v3public/V3UpsellPromoCard';
 import { BOOK_BRIEF_EVENT, readBookBrief, writeBookBrief, type BookBrief } from '@/lib/v3/bookBrief';
 import { readWrittenProgress, WRITTEN_CHAPTERS_EVENT } from '@/lib/v3/writtenChapters';
 import { saveOutlineVersion } from '@/lib/v3/genieThread';
+import { exportDocx, exportPdf, type LongFormBook } from '@/lib/longform/longFormExport';
 
 /**
  * Barre d'actions unique sous le dialogue : l'abonné voit tout de suite le
