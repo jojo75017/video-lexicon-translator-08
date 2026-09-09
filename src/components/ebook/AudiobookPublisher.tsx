@@ -434,8 +434,11 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
                     <p className="text-xs text-muted-foreground mt-1">Laisser vide = gratuit</p>
                   </div>
                   <div>
-                    <Label>Lien PayPal</Label>
-                    <Input value={paypalLink} onChange={(e) => setPaypalLink(e.target.value)} placeholder="https://paypal.me/..." />
+                    <Label>Lien PayPal (jamais votre e-mail)</Label>
+                    <Input value={paypalLink} onChange={(e) => setPaypalLink(e.target.value)} placeholder="https://paypal.me/votrenom" />
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      La page de vente est publique : mettez votre lien paypal.me, pas votre adresse e-mail.
+                    </p>
                   </div>
                 </div>
                 <div>
