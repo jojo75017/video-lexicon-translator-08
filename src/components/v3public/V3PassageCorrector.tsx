@@ -13,10 +13,15 @@ import {
  * les lui rend corrigées et développées, et chaque passage validé est enregistré
  * pour finir dans le livre. L'original n'est jamais écrasé.
  */
-export default function V3PassageCorrector({ mode = 'book' }: { mode?: 'book' | 'biography' }) {
+export default function V3PassageCorrector({ mode = 'book', onDone }: {
+  mode?: 'book' | 'biography';
+  /** « J'ai fini de raconter » : ouvre l'étape ② Mon sommaire. */
+  onDone?: () => void;
+}) {
   const [brief, setBrief] = useState<BookBrief>({});
   const [busy, setBusy] = useState<number | null>(null);
   const [runningAll, setRunningAll] = useState(false);
+
 
   useEffect(() => {
     const sync = () => setBrief(readBookBrief() || {});
