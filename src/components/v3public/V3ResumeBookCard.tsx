@@ -35,7 +35,7 @@ export default function V3ResumeBookCard({ compact = false }: { compact?: boolea
     return '1. Fiche du livre';
   }, [brief]);
 
-  if (!brief || !(brief.title || '').trim()) return null;
+  if (!brief || !((brief.title || '').trim() || (brief.sourceText || '').trim())) return null;
 
   return (
     <div
@@ -48,7 +48,7 @@ export default function V3ResumeBookCard({ compact = false }: { compact?: boolea
             style={{ background: 'var(--v3-emerald, #064e3b)', color: '#fff' }}>
             <History className="h-3 w-3" /> Reprendre mon livre
           </span>
-          <div className="v3-serif mt-2 truncate text-xl font-bold" style={{ color: 'var(--v3-ink)' }}>{brief.title}</div>
+          <div className="v3-serif mt-2 truncate text-xl font-bold" style={{ color: 'var(--v3-ink)' }}>{brief.title || 'Mon récit en cours'}</div>
           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]" style={{ color: 'var(--v3-muted)' }}>
             <span>Étape en cours : <strong>{step}</strong></span>
             <span className="inline-flex items-center gap-1"><ListOrdered className="h-3 w-3" /> {(brief.outline || []).length} chapitres au sommaire</span>
@@ -58,7 +58,7 @@ export default function V3ResumeBookCard({ compact = false }: { compact?: boolea
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link to="/v3/create" className="v3-btn v3-btn-primary text-xs">
+          <Link to={brief.projectId ? `/v3/create?projectId=${brief.projectId}` : '/v3/create'} className="v3-btn v3-btn-primary text-xs">
             <BookOpen className="h-3.5 w-3.5" /> Reprendre où je m’étais arrêté <ArrowRight className="h-3.5 w-3.5" />
           </Link>
           {!compact && (
@@ -68,8 +68,9 @@ export default function V3ResumeBookCard({ compact = false }: { compact?: boolea
       </div>
       {!compact && (
         <p className="mt-3 text-[11px]" style={{ color: 'var(--v3-muted)' }}>
-          Votre conversation avec Ebookstudio-Génie et chaque version de votre sommaire sont enregistrées :
-          vous pouvez écrire votre livre sur plusieurs semaines, depuis n’importe quel appareil, sans rien perdre.
+          {brief.projectId
+            ? 'Ce brouillon est lié à votre compte : vous pouvez le reprendre depuis un autre appareil.'
+            : 'Ce brouillon est conservé sur cet appareil. Connectez-vous pour le retrouver partout.'}
         </p>
       )}
     </div>

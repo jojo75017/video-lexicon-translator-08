@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Check, ListOrdered, Loader2, RefreshCw, ShieldCheck, Sparkles, Undo2, Wand2 } from 'lucide-react';
+import { Check, ListOrdered, Loader2, Plus, RefreshCw, Save, ShieldCheck, Sparkles, Undo2, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import {
-  BOOK_BRIEF_EVENT, countWords, listSourcePassages, narrativeForBook, readBookBrief,
-  suggestChapterCount, upsertPolished, writeBookBrief, type BookBrief,
+  BOOK_BRIEF_EVENT, countWords, insertSourcePassage, listSourcePassages, missingProtectedTerms,
+  narrativeForBook, readBookBrief, replaceSourcePassage, suggestChapterCount, upsertPolished,
+  updateCorrectedPassage, writeBookBrief, type BookBrief,
 } from '@/lib/v3/bookBrief';
+import { saveBookDraftToCloud } from '@/lib/v3/bookDraftCloud';
 
 
 /**
@@ -22,6 +24,12 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
   const [brief, setBrief] = useState<BookBrief>({});
   const [busy, setBusy] = useState<number | null>(null);
   const [runningAll, setRunningAll] = useState(false);
+  const [editing, setEditing] = useState<number | null>(null);
+  const [draftText, setDraftText] = useState('');
+  const [addingAfter, setAddingAfter] = useState<number | null>(null);
+  const [addition, setAddition] = useState('');
+  const [editingCorrection, setEditingCorrection] = useState<number | null>(null);
+  const [correctedDraft, setCorrectedDraft] = useState('');
 
 
   useEffect(() => {
@@ -46,6 +54,45 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
     return next;
   };
 
+  const persist = async (next: BookBrief) => {
+    const result = await saveBookDraftToCloud(next);
+    if (result.error && result.error !== 'not-authenticated') toast.error('Le texte reste sur cet appareil, mais la sauvegarde du compte a échoué.');
+  };
+
+  const saveOriginalEdit = (index: number) => {
+    const next = replaceSourcePassage(readBookBrief() || {}, index, draftText);
+    patch(next);
+    void persist(next);
+    setEditing(null);
+    toast.success(`Texte ${index} modifié et enregistré. L’ancienne correction a été retirée.`);
+  };
+
+  const addPassage = (afterIndex: number) => {
+    if (!addition.trim()) return;
+    const next = insertSourcePassage(readBookBrief() || {}, afterIndex, addition);
+    patch(next);
+    void persist(next);
+    setAddingAfter(null);
+    setAddition('');
+    toast.success('Le passage oublié a été ajouté au récit.');
+  };
+
+  const saveCorrectedEdit = (index: number) => {
+    const current = readBookBrief() || {};
+    const entry = (current.polished || []).find((passage) => passage.index === index);
+    if (!entry) return;
+    const missing = missingProtectedTerms(entry.original, correctedDraft);
+    if (missing.length) {
+      toast.error(`Impossible d’enregistrer : il manque ${missing.join(', ')}.`);
+      return;
+    }
+    const next = updateCorrectedPassage(current, index, correctedDraft);
+    patch(next);
+    void persist(next);
+    setEditingCorrection(null);
+    toast.success('Votre version corrigée est enregistrée et reste à valider.');
+  };
+
   /** Demande au Génie la version corrigée d'un passage (jamais moins de mots). */
   const correct = async (index: number): Promise<boolean> => {
     const original = passages[index - 1];
@@ -63,6 +110,7 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
           bookTitle: brief.title || '',
           tone: brief.tone || '',
           language: brief.language || 'fr',
+          factMemory: brief.factMemory || [],
           userApiKey,
         },
       });
@@ -70,8 +118,11 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
       if ((data as any)?.error) throw new Error((data as any).error);
       const corrected = String((data as any)?.corrected || '').trim();
       if (!corrected) throw new Error('Réponse illisible, réessayez.');
+      const missing = missingProtectedTerms(original, corrected);
+      if (missing.length) throw new Error(`Correction refusée : le Génie a oublié ${missing.join(', ')}.`);
       const current = readBookBrief() || {};
-      patch({ polished: upsertPolished(current, { index, original, corrected }) });
+      const next = patch({ polished: upsertPolished(current, { index, original, corrected }) });
+      void persist(next);
       if ((data as any)?.shorter) {
         toast.warning(`Texte ${index} : la version corrigée est plus courte, relancez la correction.`);
       }
@@ -104,13 +155,15 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
       toast.error('Cette version contient moins de mots que votre texte : relancez la correction.');
       return;
     }
-    patch({ polished: upsertPolished(current, { ...entry, validatedAt: new Date().toISOString() }) });
+    const next = patch({ polished: upsertPolished(current, { ...entry, validatedAt: new Date().toISOString() }) });
+    void persist(next);
     toast.success(`Texte ${index} validé — il entrera dans le livre ainsi.`);
   };
 
   const keepOriginal = (index: number) => {
     const current = readBookBrief() || {};
-    patch({ polished: (current.polished || []).filter((p) => p.index !== index) });
+    const next = patch({ polished: (current.polished || []).filter((p) => p.index !== index) });
+    void persist(next);
     toast.success(`Texte ${index} : vos mots d’origine sont conservés.`);
   };
 
@@ -122,7 +175,8 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
         ? { ...p, validatedAt: p.validatedAt || now }
         : p,
     );
-    patch({ polished: next });
+    const saved = patch({ polished: next });
+    void persist(saved);
     toast.success('Toutes les corrections prêtes sont validées.');
   };
 
@@ -215,18 +269,24 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
                   <div className="text-[10.5px] font-semibold uppercase tracking-wider" style={{ color: 'var(--v3-muted)' }}>
                     Vos mots ({countWords(original)})
                   </div>
-                  <p className="mt-1 whitespace-pre-wrap text-[12.5px] leading-relaxed" style={{ color: 'var(--v3-ink)' }}>
-                    {original}
-                  </p>
+                  {editing === index ? (
+                    <textarea value={draftText} onChange={(event) => setDraftText(event.target.value)} rows={7}
+                      className="mt-1 w-full rounded-lg border px-2 py-2 text-[12.5px] leading-relaxed outline-none"
+                      style={{ borderColor: 'rgba(201,168,76,0.6)', color: 'var(--v3-ink)' }} />
+                  ) : (
+                    <p className="mt-1 whitespace-pre-wrap text-[12.5px] leading-relaxed" style={{ color: 'var(--v3-ink)' }}>{original}</p>
+                  )}
                 </div>
                 <div className="rounded-xl border bg-white p-2.5" style={{ borderColor: 'rgba(201,168,76,0.5)' }}>
                   <div className="text-[10.5px] font-semibold uppercase tracking-wider" style={{ color: '#8a6d1f' }}>
                     Version corrigée {entry?.corrected ? `(${countWords(entry.corrected)})` : ''}
                   </div>
-                  {entry?.corrected ? (
-                    <p className="mt-1 whitespace-pre-wrap text-[12.5px] leading-relaxed" style={{ color: 'var(--v3-ink)' }}>
-                      {entry.corrected}
-                    </p>
+                  {entry?.corrected ? editingCorrection === index ? (
+                    <textarea value={correctedDraft} onChange={(event) => setCorrectedDraft(event.target.value)} rows={7}
+                      className="mt-1 w-full rounded-lg border px-2 py-2 text-[12.5px] leading-relaxed outline-none"
+                      style={{ borderColor: 'rgba(201,168,76,0.6)', color: 'var(--v3-ink)' }} />
+                  ) : (
+                    <p className="mt-1 whitespace-pre-wrap text-[12.5px] leading-relaxed" style={{ color: 'var(--v3-ink)' }}>{entry.corrected}</p>
                   ) : (
                     <p className="mt-1 text-[12px]" style={{ color: 'var(--v3-muted)' }}>
                       Pas encore corrigé.
@@ -236,6 +296,15 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
               </div>
 
               <div className="mt-2 flex flex-wrap gap-2">
+                {editing === index ? (
+                  <button type="button" onClick={() => saveOriginalEdit(index)} className="v3-btn v3-btn-primary text-[11px]">
+                    <Save className="h-3 w-3" /> Enregistrer mes modifications
+                  </button>
+                ) : (
+                  <button type="button" onClick={() => { setEditing(index); setDraftText(original); }} className="v3-btn v3-btn-outline text-[11px]">
+                    Modifier mes mots
+                  </button>
+                )}
                 <button type="button" onClick={() => correct(index)} disabled={busy === index || runningAll}
                   className="v3-btn v3-btn-outline text-[11px] disabled:opacity-50">
                   {busy === index ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
@@ -246,12 +315,34 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
                     <Check className="h-3 w-3" /> Valider pour le livre
                   </button>
                 )}
+                {entry?.corrected && (editingCorrection === index ? (
+                  <button type="button" onClick={() => saveCorrectedEdit(index)} className="v3-btn v3-btn-primary text-[11px]">
+                    <Save className="h-3 w-3" /> Enregistrer ma correction
+                  </button>
+                ) : (
+                  <button type="button" onClick={() => { setEditingCorrection(index); setCorrectedDraft(entry.corrected); }} className="v3-btn v3-btn-outline text-[11px]">
+                    Modifier la proposition
+                  </button>
+                ))}
                 {(entry?.corrected || validated) && (
                   <button type="button" onClick={() => keepOriginal(index)} className="v3-btn v3-btn-ghost text-[11px]">
                     <Undo2 className="h-3 w-3" /> Garder mon texte original
                   </button>
                 )}
+                <button type="button" onClick={() => setAddingAfter(addingAfter === index ? null : index)} className="v3-btn v3-btn-ghost text-[11px]">
+                  <Plus className="h-3 w-3" /> Ajouter un passage ici
+                </button>
               </div>
+              {addingAfter === index && (
+                <div className="mt-2 rounded-xl border bg-white p-2.5" style={{ borderColor: 'rgba(201,168,76,0.5)' }}>
+                  <textarea value={addition} onChange={(event) => setAddition(event.target.value)} rows={4}
+                    placeholder="Écrivez le souvenir ou le détail oublié…"
+                    className="w-full resize-y bg-transparent text-[12.5px] outline-none" style={{ color: 'var(--v3-ink)' }} />
+                  <button type="button" disabled={!addition.trim()} onClick={() => addPassage(index)} className="v3-btn v3-btn-primary mt-2 text-[11px] disabled:opacity-50">
+                    <Plus className="h-3 w-3" /> Ajouter au récit
+                  </button>
+                </div>
+              )}
             </div>
           );
         })}

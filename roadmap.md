@@ -1,4 +1,11 @@
 
+## Récit V3 fidèle et reprenable (09/09/2026)
+- [x] Texte original modifiable avant correction et passage oublié insérable
+- [x] Garde-fou sur les prénoms, dates et liens familiaux
+- [x] Brouillon privé créé dès le premier texte et lié aux conversations
+- [x] Reprise complète depuis « Mes livres » avec état de sauvegarde réel
+- [x] Vérification finale sans génération IA payante
+
 ## Suivi Paceto (01/09/2026)
 - [x] Titres de chapitres persistés + relance individuelle
 - [x] Lecture aérée (aperçu + application au manuscrit)
