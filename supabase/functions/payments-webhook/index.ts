@@ -128,6 +128,46 @@ const UPSELL_PACK_MODULES: Record<string, string> = {
   ebook_version_longue_47: "ebook-version-longue",
 };
 
+// Compléments achetés à l'unité via `v3-subscription-checkout`
+// (metadata.plan = lookup_key du prix) → module (module_entitlements).
+const ADDON_PRICE_MODULES: Record<string, string> = {
+  v3_addon_bookperfect_once: "bookperfect",
+  v3_addon_translations_once: "translations",
+  v3_addon_audio_premium_once: "audio_premium",
+  v3_audio_single: "audio_premium",
+  v3_addon_publishers_once: "publishers",
+  v3_addon_serenity_once: "serenity",
+  v3_upsell_relecture_once: "editorial",
+  v3_upsell_docstudio_once: "documentation-studio",
+};
+
+/** Accorde le droit d'accès d'un complément acheté à l'unité (idempotent). */
+async function grantAddonEntitlement(session: any, plan: string, env: StripeEnv) {
+  const module = ADDON_PRICE_MODULES[plan];
+  if (!module) return;
+  const email = (session.customer_email || session.customer_details?.email || "").toLowerCase();
+  if (!email) {
+    console.warn("Addon purchase without email, no entitlement granted:", plan);
+    return;
+  }
+  const supabase = getSupabase();
+  const { data: existing } = await supabase.from("module_entitlements")
+    .select("id").eq("stripe_session_id", session.id).maybeSingle();
+  if (existing) return;
+  const amount = typeof session.amount_total === "number" ? session.amount_total / 100 : null;
+  const { error } = await supabase.from("module_entitlements").insert({
+    email,
+    module,
+    status: "active",
+    amount,
+    currency: session.currency || "eur",
+    environment: env,
+    stripe_session_id: session.id,
+  });
+  if (error) console.error("Addon entitlement insert failed:", error);
+  else console.log("Granted addon module", module, "to", email);
+}
+
 async function handleV3UpsellPackCompleted(session: any, env: StripeEnv) {
   const orderId = session.metadata?.order_id;
   const packId = String(session.metadata?.pack_id || "");
@@ -417,6 +457,10 @@ Deno.serve(async (req) => {
       case "checkout.session.completed": {
         const session = event.data.object;
         const plan = session.metadata?.plan;
+        // Complément acheté à l'unité (BookPerfect, audio, traductions…)
+        if (typeof plan === "string" && ADDON_PRICE_MODULES[plan]) {
+          await grantAddonEntitlement(session, plan, env);
+        }
         if (plan === "bookperfect_launch_once") {
           const email = (session.customer_email || session.customer_details?.email || "").toLowerCase();
           if (email) {
