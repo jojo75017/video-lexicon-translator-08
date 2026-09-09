@@ -238,7 +238,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
     setBrief({});
     setQuestions([]);
     setInput('');
-    setShowExample(false);
+    
     toast.success('Nouveau départ : la fiche, le sommaire et la conversation sont vides.');
     setTimeout(() => inputRef.current?.focus(), 80);
   };
@@ -255,7 +255,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
         </span>
         <div className="flex items-center gap-2">
           <span className="text-[11px]" style={{ color: 'var(--v3-muted)' }}>
-            {mode === 'biography' ? 'Entretien biographique en 9 étapes · vos mots, dans l’ordre de votre vie' : 'Entretien guidé en 6 étapes · une question à la fois'}
+            Étape 1 sur 3 · J’écris{sourceWordCount > 0 ? ` · ${sourceWordCount} mots conservés` : ''}
           </span>
           <button type="button" onClick={eraseEverything} className="v3-btn v3-btn-ghost text-[11px]">
             <RotateCcw className="h-3 w-3" /> Effacer ce livre
