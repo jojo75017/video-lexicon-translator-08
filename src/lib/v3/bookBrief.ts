@@ -409,9 +409,24 @@ export function protectedTerms(text: string): string[] {
   return Array.from(new Set([...names, ...dates, ...family]));
 }
 
+/**
+ * Comparaison souple : « sœur » = « soeur », « Michèle » = « Michele »,
+ * et le pluriel compte comme le singulier. Sans cela, une simple ligature
+ * faisait refuser une correction pourtant fidèle.
+ */
+function normalizeForCompare(value: string): string {
+  return String(value || '')
+    .toLocaleLowerCase('fr-FR')
+    .replace(/œ/g, 'oe')
+    .replace(/æ/g, 'ae')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/s\b/g, '');
+}
+
 export function missingProtectedTerms(original: string, corrected: string): string[] {
-  const haystack = corrected.toLocaleLowerCase('fr-FR');
-  return protectedTerms(original).filter((term) => !haystack.includes(term.toLocaleLowerCase('fr-FR')));
+  const haystack = normalizeForCompare(corrected);
+  return protectedTerms(original).filter((term) => !haystack.includes(normalizeForCompare(term)));
 }
 
 

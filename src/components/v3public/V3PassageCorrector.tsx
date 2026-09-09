@@ -141,7 +141,6 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
       const corrected = String((data as any)?.corrected || '').trim();
       if (!corrected) throw new Error('Réponse illisible, réessayez.');
       const missing = missingProtectedTerms(original, corrected);
-      if (missing.length) throw new Error(`Correction refusée : le Génie a oublié ${missing.join(', ')}.`);
       const current = readBookBrief() || {};
       const next = patch({
         polished: upsertPolished(current, { index, original, corrected }),
@@ -154,6 +153,11 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
         toast.warning(`Passage ${index} : le Génie a rendu un texte plus court que le vôtre. Vos mots restent intacts.`);
       } else {
         setShortWarning((value) => (value === index ? null : value));
+      }
+      if (missing.length) {
+        toast.warning(
+          `Passage ${index} : vérifiez ${missing.join(', ')} dans la proposition. Vos mots d’origine restent intacts.`,
+        );
       }
       return true;
     } catch (e: any) {
