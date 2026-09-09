@@ -79,19 +79,19 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
   };
 
   /**
-   * Passage oublié : il est inséré à sa place, puis corrigé tout seul et raccordé
-   * au texte qui le précède (voir `pendingPolishIndex`).
+   * Passage oublié : il est inséré à sa place, immédiatement enregistré.
+   * La correction n'est jamais lancée toute seule : c'est un clic de l'auteur.
    */
   const addPassage = (afterIndex: number) => {
     if (!addition.trim()) return;
     const inserted = insertSourcePassage(readBookBrief() || {}, afterIndex, addition);
     const newIndex = afterIndex + 1;
-    attemptedAuto.current.delete(newIndex);
-    const next = patch({ ...inserted, pendingPolishIndex: newIndex });
+    const next = patch({ ...inserted, pendingPolishIndex: undefined });
     void persist(next);
     setAddingAfter(null);
     setAddition('');
-    toast.success('Passage ajouté. Le Génie le corrige et le raccorde à votre récit…');
+    setSelected(newIndex);
+    toast.success(`Passage ${newIndex} ajouté et enregistré. Cliquez sur « Corriger ce passage » quand vous voulez.`);
   };
 
   const saveCorrectedEdit = (index: number) => {
@@ -131,7 +131,7 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
           factMemory: brief.factMemory || [],
           // Raccord : le passage doit s'enchaîner avec le texte qui le précède.
           previousPassage: index > 1 ? (passages[index - 2] || '').slice(-3000) : '',
-          emojis: brief.emojis === true,
+          emojis: brief.emojis !== false,
           userApiKey,
         },
       });
