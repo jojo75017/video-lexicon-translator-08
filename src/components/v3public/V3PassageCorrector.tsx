@@ -471,17 +471,6 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
           Cliquez sur un passage pour le modifier, le corriger ou le supprimer.
         </p>
         <div className="flex flex-wrap items-center gap-2">
-          <label className="inline-flex items-center gap-1.5 text-[11.5px]" style={{ color: 'var(--v3-ink)' }}>
-            <input type="checkbox" checked={brief.emojis !== false}
-              onChange={(event) => {
-                const next = patch({ emojis: event.target.checked });
-                void persist(next);
-                toast.success(event.target.checked
-                  ? 'Le Génie pourra glisser au maximum un emoji discret par passage.'
-                  : 'Le Génie n’ajoutera plus aucun emoji.');
-              }} />
-            Quelques emojis dans mon texte
-          </label>
           <button type="button" onClick={() => setShowBook((value) => !value)} className="v3-btn v3-btn-outline text-[11px]">
             <BookOpen className="h-3 w-3" /> {showBook ? 'Réduire la lecture' : 'Agrandir la lecture'}
           </button>
