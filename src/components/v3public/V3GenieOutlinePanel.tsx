@@ -229,7 +229,7 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
           <p className="mt-2 text-[10.5px]" style={{ color: 'var(--v3-muted)' }}>
             Dès que vous saisissez une valeur, elle est verrouillée : le Génie ne la remplacera plus.
           </p>
-        </div>
+        </details>
 
         {/* Vos souvenirs : version corrigée validée par défaut, mots d'origine à un clic */}
         {sourceText ? (
