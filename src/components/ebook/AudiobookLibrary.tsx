@@ -11,6 +11,7 @@ import {
   Headphones, Search, Download, Trash2, Play,
   Calendar, Music, RefreshCw, Clock, Volume2, Globe, Lock, Pencil
 } from 'lucide-react';
+import { sanitizePaypalLink } from '@/lib/audiobookPaymentLink';
 
 interface LibraryAudiobook {
   id: string;
@@ -177,11 +178,17 @@ export const AudiobookLibrary: React.FC = () => {
       ? (editDialog.slug.trim() || editDialog.book.slug || generateSlug(editDialog.book.title))
       : (editDialog.slug.trim() || editDialog.book.slug || null);
 
+    const paypal = sanitizePaypalLink(editDialog.paypalLink);
+    if (paypal.error) {
+      toast.error(paypal.error);
+      return;
+    }
+
     const { error } = await supabase
       .from('audiobooks')
       .update({
         cover_url: editDialog.coverUrl.trim() || null,
-        paypal_link: editDialog.paypalLink.trim() || null,
+        paypal_link: paypal.value,
         excerpt_url: editDialog.excerptUrl.trim() || null,
         price: parsedPrice,
         is_public: shouldBePublic,
@@ -401,10 +408,13 @@ export const AudiobookLibrary: React.FC = () => {
               <div>
                 <p className="text-sm font-medium mb-1">Lien PayPal (livre complet)</p>
                 <Input
-                  placeholder="https://paypal.me/..."
+                  placeholder="https://paypal.me/votrenom"
                   value={editDialog.paypalLink}
                   onChange={(e) => setEditDialog({ ...editDialog, paypalLink: e.target.value })}
                 />
+                <p className="mt-1 text-xs text-muted-foreground">
+                  La fiche est publique : mettez votre lien paypal.me, jamais votre adresse e-mail.
+                </p>
               </div>
 
               <div>

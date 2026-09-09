@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { downloadAudiobookHtml } from '@/utils/generateAudiobookHtml';
+import { sanitizePaypalLink } from '@/lib/audiobookPaymentLink';
 
 interface AudiobookPublisherProps {
   ebookTitle?: string;
@@ -238,6 +239,13 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
 
       const slug = generateSlug(title);
 
+      const paypal = sanitizePaypalLink(paypalLink);
+      if (paypal.error) {
+        toast.error(paypal.error);
+        setUploading(false);
+        return;
+      }
+
       const { error } = await supabase.from('audiobooks').insert({
         user_id: user.id,
         title: title.trim(),
@@ -249,7 +257,7 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
         cover_url: coverUrl || null,
         is_public: isPublic,
         price: price ? parseFloat(price) : null,
-        paypal_link: paypalLink.trim() || null,
+        paypal_link: paypal.value,
         stripe_link: stripeLink.trim() || null,
         slug,
         status: audioUrl ? 'published' : 'draft'
@@ -426,8 +434,11 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
                     <p className="text-xs text-muted-foreground mt-1">Laisser vide = gratuit</p>
                   </div>
                   <div>
-                    <Label>Lien PayPal</Label>
-                    <Input value={paypalLink} onChange={(e) => setPaypalLink(e.target.value)} placeholder="https://paypal.me/..." />
+                    <Label>Lien PayPal (jamais votre e-mail)</Label>
+                    <Input value={paypalLink} onChange={(e) => setPaypalLink(e.target.value)} placeholder="https://paypal.me/votrenom" />
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      La page de vente est publique : mettez votre lien paypal.me, pas votre adresse e-mail.
+                    </p>
                   </div>
                 </div>
                 <div>
