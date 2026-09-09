@@ -80,6 +80,32 @@ export default function V3BookActionsBar({ onLaunch }: { onLaunch: () => void })
 
   const soon = 'Disponible après la rédaction de votre livre';
 
+  /** Export local du livre écrit (Word ou PDF) — aucun appel IA, aucun crédit. */
+  const exportBook = async (format: 'docx' | 'pdf') => {
+    const chapters = readWrittenProgress().chapters;
+    if (chapters.length === 0) {
+      toast.info('Écrivez au moins un chapitre : l’export s’active ensuite.');
+      return;
+    }
+    const book: LongFormBook = {
+      title: brief.title?.trim() || 'Mon livre',
+      subtitle: brief.subtitle || null,
+      author: brief.author || null,
+      chapters: chapters.map((c, i) => ({
+        chapter_number: i + 1,
+        title: c.title || `Chapitre ${i + 1}`,
+        content_markdown: c.content,
+      })),
+    };
+    try {
+      if (format === 'docx') await exportDocx(book);
+      else exportPdf(book);
+      toast.success(format === 'docx' ? 'Fichier Word téléchargé.' : 'Fichier PDF téléchargé.');
+    } catch {
+      toast.error('Export impossible pour le moment.');
+    }
+  };
+
   return (
     <div className="rounded-[22px] border p-4 md:p-5" style={{ borderColor: 'var(--v3-gold, #c9a84c)', background: '#fff' }}>
       <div className="flex flex-wrap items-center justify-between gap-2">
