@@ -320,6 +320,28 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
         </span>
       </div>
 
+      {shortAnswers.length > 0 && (
+        <div className="mt-3 rounded-2xl border p-3" style={{ borderColor: 'rgba(201,168,76,0.6)', background: '#FBF6E8' }}>
+          <p className="text-[12.5px]" style={{ color: 'var(--v3-ink)' }}>
+            {shortAnswers.length} réponse(s) très courte(s) se trouvent dans votre livre
+            (passage{shortAnswers.length > 1 ? 's' : ''} {shortAnswers.map((p) => p.index).join(', ')}).
+            Ce sont des précisions données au Génie, pas du récit.
+          </p>
+          <button type="button" onClick={cleanShortAnswers} className="v3-btn v3-btn-primary mt-2 text-[11.5px]">
+            Sortir ces réponses du livre
+          </button>
+        </div>
+      )}
+
+      {undoBrief && (
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-[12px]" style={{ color: 'var(--v3-muted)' }}>
+          Vos réponses courtes ont quitté le livre.
+          <button type="button" onClick={undoClean} className="v3-btn v3-btn-ghost text-[11.5px]">Annuler</button>
+        </div>
+      )}
+
+
+
       <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
         <p className="text-[12px]" style={{ color: 'var(--v3-muted)' }}>
           Cliquez sur un passage pour le modifier, le corriger ou le supprimer.
