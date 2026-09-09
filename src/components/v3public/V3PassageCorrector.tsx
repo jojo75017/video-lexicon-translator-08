@@ -440,10 +440,32 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
                     <Undo2 className="h-3 w-3" /> Garder mon texte original
                   </button>
                 )}
+                {hasEmojis(passageForBook(brief, index, original)) && (
+                  <button type="button" onClick={() => removeEmojis(index)} className="v3-btn v3-btn-ghost text-[11px]">
+                    Retirer les emojis de ce texte
+                  </button>
+                )}
                 <button type="button" onClick={() => setAddingAfter(addingAfter === index ? null : index)} className="v3-btn v3-btn-ghost text-[11px]">
                   <Plus className="h-3 w-3" /> Ajouter un passage ici
                 </button>
               </div>
+
+              {(editing === index || editingCorrection === index) && (
+                <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                  <span className="text-[11px]" style={{ color: 'var(--v3-muted)' }}>Ajouter un emoji :</span>
+                  {MANUAL_EMOJIS.map((emoji) => (
+                    <button key={emoji} type="button" className="rounded-lg border px-2 py-1 text-[13px]"
+                      style={{ borderColor: 'rgba(201,168,76,0.5)', background: '#fff' }}
+                      onClick={() => {
+                        if (editingCorrection === index) setCorrectedDraft((value) => `${value} ${emoji}`);
+                        else setDraftText((value) => `${value} ${emoji}`);
+                      }}>
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               {addingAfter === index && (
                 <div className="mt-2 rounded-xl border bg-white p-2.5" style={{ borderColor: 'rgba(201,168,76,0.5)' }}>
                   <textarea value={addition} onChange={(event) => setAddition(event.target.value)} rows={4}
