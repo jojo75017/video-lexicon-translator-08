@@ -350,6 +350,51 @@ export function insertSourcePassage(brief: BookBrief, afterIndex: number, value:
   return { ...brief, sourceText: passages.join('\n\n'), polished, outlineValidated: false };
 }
 
+/**
+ * Sort un passage du livre (une réponse courte rangée par erreur dans le récit)
+ * et décale les corrections suivantes sans les perdre.
+ */
+export function removeSourcePassage(brief: BookBrief, index: number): BookBrief {
+  const passages = listSourcePassages(brief.sourceText || '');
+  if (!passages[index - 1]) return brief;
+  passages.splice(index - 1, 1);
+  const polished = (brief.polished || [])
+    .filter((entry) => entry.index !== index)
+    .map((entry) => (entry.index > index ? { ...entry, index: entry.index - 1 } : entry));
+  return { ...brief, sourceText: passages.join('\n\n'), polished, outlineValidated: false };
+}
+
+/**
+ * Dédoublonne les informations retenues par le Génie : la même naissance ou le
+ * même orphelinat répétés cinq fois ne laissent qu'une seule ligne lisible.
+ */
+export function dedupeFactMemory(facts: Array<string | null | undefined>): string[] {
+  const normalize = (fact: string) => fact
+    .toLocaleLowerCase('fr-FR')
+    .replace(/[\s\u00A0]+/g, ' ')
+    .replace(/[^\p{L}\p{N} ]/gu, '')
+    .trim();
+  const kept: string[] = [];
+  const keys: string[] = [];
+  for (const raw of facts) {
+    const fact = String(raw || '').trim();
+    if (!fact) continue;
+    const key = normalize(fact);
+    if (!key) continue;
+    // Doublon exact, ou information déjà contenue dans une ligne plus complète.
+    const containedIn = keys.findIndex((existing) => existing.includes(key));
+    if (containedIn >= 0) continue;
+    // La nouvelle ligne est plus complète : elle remplace les anciennes qu'elle contient.
+    for (let i = keys.length - 1; i >= 0; i--) {
+      if (key.includes(keys[i])) { keys.splice(i, 1); kept.splice(i, 1); }
+    }
+    keys.push(key);
+    kept.push(fact);
+  }
+  return kept;
+}
+
+
 /** Noms, dates et liens familiaux qui ne doivent jamais disparaître d'une correction. */
 export function protectedTerms(text: string): string[] {
   const ignoredSentenceWords = new Set([

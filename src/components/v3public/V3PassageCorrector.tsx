@@ -1,26 +1,26 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { BookOpen, Check, ListOrdered, Loader2, Plus, RefreshCw, Save, ShieldCheck, Sparkles, Undo2, Wand2 } from 'lucide-react';
+import { BookOpen, Check, ListOrdered, Loader2, Plus, RefreshCw, Save, ShieldCheck, Sparkles, Trash2, Undo2, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import {
-  BOOK_BRIEF_EVENT, countWords, hasEmojis, insertSourcePassage, listSourcePassages, missingProtectedTerms,
-  narrativeForBook, passageForBook, readBookBrief, replaceSourcePassage, stripEmojis, suggestChapterCount, upsertPolished,
+  BOOK_BRIEF_EVENT, countWords, dedupeFactMemory, hasEmojis, insertSourcePassage, listSourcePassages, missingProtectedTerms,
+  narrativeForBook, passageForBook, readBookBrief, removeSourcePassage, replaceSourcePassage, stripEmojis, upsertPolished,
   updateCorrectedPassage, writeBookBrief, type BookBrief,
 } from '@/lib/v3/bookBrief';
 import { saveBookDraftToCloud } from '@/lib/v3/bookDraftCloud';
 
 
-/** Papier crème : la couleur du livre validé, à l'écran comme dans l'aperçu. */
+/** Papier crème : la couleur du livre, à l'écran comme dans l'aperçu. */
 const CREAM = '#FBF6E8';
 
 /** Emojis sobres proposés à l'auteur pour en placer lui-même. */
 const MANUAL_EMOJIS = ['🙂', '❤️', '✨', '🌿', '📖', '🎶', '☀️', '🕊️'];
 
 /**
- * « Comme Copilot » : l'auteur écrit ses idées telles qu'elles viennent, le Génie
- * les lui rend corrigées et développées, et chaque passage validé est enregistré
- * pour finir dans le livre. L'original n'est jamais écrasé.
+ * Un seul livre à l'écran : chaque passage est lisible sur papier crème, et les
+ * actions (modifier, corriger, valider, supprimer) apparaissent sous le passage
+ * choisi. L'original de l'auteur n'est jamais écrasé.
  */
 export default function V3PassageCorrector({ mode = 'book', onDone }: {
   mode?: 'book' | 'biography';
@@ -30,6 +30,7 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
   const [brief, setBrief] = useState<BookBrief>({});
   const [busy, setBusy] = useState<number | null>(null);
   const [runningAll, setRunningAll] = useState(false);
+  const [selected, setSelected] = useState<number | null>(null);
   const [editing, setEditing] = useState<number | null>(null);
   const [draftText, setDraftText] = useState('');
   const [addingAfter, setAddingAfter] = useState<number | null>(null);
@@ -38,6 +39,7 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
   const [correctedDraft, setCorrectedDraft] = useState('');
   const [autoState, setAutoState] = useState<'idle' | 'working' | 'error'>('idle');
   const [showBook, setShowBook] = useState(false);
+  const [undoBrief, setUndoBrief] = useState<BookBrief | null>(null);
   const attemptedAuto = useRef<Set<number>>(new Set());
 
 
@@ -51,11 +53,7 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
   const passages = useMemo(() => listSourcePassages(brief.sourceText || ''), [brief.sourceText]);
   const polished = brief.polished || [];
   const entryFor = (index: number) => polished.find((p) => p.index === index);
-  const validatedList = polished
-    .filter((p) => Boolean(p.validatedAt) && Boolean(p.corrected?.trim()))
-    .slice()
-    .sort((a, b) => a.index - b.index);
-  const validatedCount = validatedList.length;
+  const validatedCount = polished.filter((p) => Boolean(p.validatedAt) && Boolean(p.corrected?.trim())).length;
 
   const originalWords = passages.reduce((t, p) => t + countWords(p), 0);
   const bookWords = countWords(narrativeForBook(brief));
@@ -77,7 +75,7 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
     patch(next);
     void persist(next);
     setEditing(null);
-    toast.success(`Texte ${index} modifié et enregistré. L’ancienne correction a été retirée.`);
+    toast.success(`Passage ${index} modifié et enregistré.`);
   };
 
   /**
@@ -151,7 +149,7 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
       void persist(next);
       if (automatic) setAutoState('idle');
       if ((data as any)?.shorter) {
-        toast.warning(`Texte ${index} : la version corrigée est plus courte, relancez la correction.`);
+        toast.warning(`Passage ${index} : la version corrigée est plus courte, relancez la correction.`);
       }
       return true;
     } catch (e: any) {
@@ -198,14 +196,14 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
     }
     const next = patch({ polished: upsertPolished(current, { ...entry, validatedAt: new Date().toISOString() }) });
     void persist(next);
-    toast.success(`Texte ${index} validé — il entrera dans le livre ainsi.`);
+    toast.success(`Passage ${index} validé — il entrera dans le livre ainsi.`);
   };
 
   const keepOriginal = (index: number) => {
     const current = readBookBrief() || {};
     const next = patch({ polished: (current.polished || []).filter((p) => p.index !== index) });
     void persist(next);
-    toast.success(`Texte ${index} : vos mots d’origine sont conservés.`);
+    toast.success(`Passage ${index} : vos mots d’origine sont conservés.`);
   };
 
   /** Retire les emojis d'un passage, sans appel IA ni crédit. */
@@ -221,7 +219,65 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
       const next = patch(replaceSourcePassage(current, index, stripEmojis(original)));
       void persist(next);
     }
-    toast.success(`Texte ${index} : emojis retirés.`);
+    toast.success(`Passage ${index} : emojis retirés.`);
+  };
+
+  /**
+   * Sort une réponse courte du livre : elle devient une information retenue par
+   * le Génie, sans jamais être perdue.
+   */
+  const moveToFacts = (index: number) => {
+    const current = readBookBrief() || {};
+    const text = (listSourcePassages(current.sourceText || '')[index - 1] || '').trim();
+    if (!text) return;
+    const withoutPassage = removeSourcePassage(current, index);
+    const next = patch({
+      ...withoutPassage,
+      factMemory: dedupeFactMemory([...(current.factMemory || []), text]),
+    });
+    void persist(next);
+    setSelected(null);
+    toast.success('Cette réponse quitte le livre : le Génie la garde comme information à respecter.');
+  };
+
+  /**
+   * Les réponses très courtes rangées par erreur dans le livre : on les sort
+   * toutes d'un clic, avec possibilité d'annuler.
+   */
+  const shortAnswers = passages
+    .map((text, i) => ({ index: i + 1, words: countWords(text) }))
+    .filter((p) => p.words > 0 && p.words < 25);
+
+  const cleanShortAnswers = () => {
+    const before = readBookBrief() || {};
+    let current: BookBrief = before;
+    const facts: string[] = [...(before.factMemory || [])];
+    for (const { index } of [...shortAnswers].reverse()) {
+      const text = (listSourcePassages(current.sourceText || '')[index - 1] || '').trim();
+      if (text) facts.push(text);
+      current = removeSourcePassage(current, index);
+    }
+    const next = patch({ ...current, factMemory: dedupeFactMemory(facts) });
+    void persist(next);
+    setSelected(null);
+    setUndoBrief(before);
+    toast.success('Vos réponses courtes quittent le livre : le Génie les garde en mémoire.');
+  };
+
+  const undoClean = () => {
+    if (!undoBrief) return;
+    const next = patch(undoBrief);
+    void persist(next);
+    setUndoBrief(null);
+    toast.success('C’est revenu comme avant.');
+  };
+
+  const deletePassage = (index: number) => {
+    if (!window.confirm(`Supprimer définitivement le passage ${index} de votre livre ?`)) return;
+    const next = patch(removeSourcePassage(readBookBrief() || {}, index));
+    void persist(next);
+    setSelected(null);
+    toast.success(`Passage ${index} supprimé.`);
   };
 
   const validateAll = () => {
@@ -237,18 +293,15 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
     toast.success('Toutes les corrections prêtes sont validées.');
   };
 
-  const suggested = suggestChapterCount(originalWords, brief.wordsPerChapter);
-
   if (!passages.length) {
     return (
       <div className="rounded-[22px] border p-4" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
         <span className="v3-chip v3-chip-orange text-[11px]">
-          <Wand2 className="h-3 w-3" /> Mes envois — rien ne s’efface
+          <Wand2 className="h-3 w-3" /> Votre livre — rien ne s’efface
         </span>
         <p className="mt-2 text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
-          Écrivez vos souvenirs ou vos idées ci-dessus, même avec des fautes : chaque envoi apparaîtra
-          ici sous le nom « Texte 1 », « Texte 2 »… et le Génie vous le rendra corrigé et développé,
-          jamais résumé. N’essayez pas de faire un plan : le sommaire viendra tout seul après.
+          Écrivez ou collez votre texte ci-dessus, même avec des fautes. Chaque envoi devient un
+          passage de votre livre, que le Génie vous rend corrigé et développé, jamais résumé.
         </p>
       </div>
     );
@@ -258,85 +311,207 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
     <div className="mt-4 rounded-[22px] border p-4" style={{ borderColor: 'rgba(201,168,76,0.55)', background: '#fff' }}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="v3-chip v3-chip-orange text-[11px]">
-          <Wand2 className="h-3 w-3" /> Votre livre en cours
+          <Wand2 className="h-3 w-3" /> Votre livre
         </span>
         <span className="text-[11px]" style={{ color: 'var(--v3-muted)' }}>
-          {validatedCount}/{passages.length} texte(s) validé(s) · {originalWords.toLocaleString('fr-FR')} mots écrits →{' '}
+          {passages.length} passage(s) · {originalWords.toLocaleString('fr-FR')} mots écrits →{' '}
           <strong style={{ color: '#0f6b4a' }}>{bookWords.toLocaleString('fr-FR')} mots dans le livre</strong>
+          {validatedCount > 0 ? ` · ${validatedCount} corrigé(s) et validé(s)` : ''}
         </span>
       </div>
 
-      {/* Le livre, toujours visible : chaque texte y figure, validé ou non. */}
-      <div className="mt-3 rounded-2xl border p-3" style={{ borderColor: 'rgba(201,168,76,0.5)', background: CREAM }}>
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="text-[12.5px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
-            Votre livre : {passages.length} texte(s) · {bookWords.toLocaleString('fr-FR')} mots · {validatedCount} validé(s)
-          </span>
-          <div className="flex flex-wrap items-center gap-2">
-            <label className="inline-flex items-center gap-1.5 text-[11.5px]" style={{ color: 'var(--v3-ink)' }}>
-              <input type="checkbox" checked={brief.emojis === true}
-                onChange={(event) => {
-                  const next = patch({ emojis: event.target.checked });
-                  void persist(next);
-                  toast.success(event.target.checked
-                    ? 'Le Génie pourra glisser au maximum un emoji discret par texte.'
-                    : 'Le Génie n’ajoutera plus aucun emoji.');
-                }} />
-              Quelques emojis dans mon texte
-            </label>
-            <button type="button" onClick={() => setShowBook((value) => !value)} className="v3-btn v3-btn-outline text-[11px]">
-              <BookOpen className="h-3 w-3" /> {showBook ? 'Replier la lecture' : 'Agrandir la lecture'}
-            </button>
-          </div>
+      {shortAnswers.length > 0 && (
+        <div className="mt-3 rounded-2xl border p-3" style={{ borderColor: 'rgba(201,168,76,0.6)', background: '#FBF6E8' }}>
+          <p className="text-[12.5px]" style={{ color: 'var(--v3-ink)' }}>
+            {shortAnswers.length} réponse(s) très courte(s) se trouvent dans votre livre
+            (passage{shortAnswers.length > 1 ? 's' : ''} {shortAnswers.map((p) => p.index).join(', ')}).
+            Ce sont des précisions données au Génie, pas du récit.
+          </p>
+          <button type="button" onClick={cleanShortAnswers} className="v3-btn v3-btn-primary mt-2 text-[11.5px]">
+            Sortir ces réponses du livre
+          </button>
         </div>
+      )}
 
-        <div className={`mt-3 space-y-4 overflow-y-auto rounded-xl border p-4 ${showBook ? 'max-h-[80vh]' : 'max-h-[26rem]'}`}
-          style={{ borderColor: 'rgba(201,168,76,0.45)', background: '#fffdf6' }}>
-          {passages.map((original, i) => {
-            const index = i + 1;
-            const entry = entryFor(index);
-            const validated = Boolean(entry?.validatedAt);
-            const text = passageForBook(brief, index, original);
-            return (
-              <div key={`book-${index}`}>
-                <div className="text-[10.5px] font-semibold uppercase tracking-wider" style={{ color: validated ? '#0f6b4a' : 'var(--v3-muted)' }}>
-                  Texte {index} — {validated ? 'Validé dans le livre' : entry?.corrected ? 'Correction à valider' : 'Vos mots'}
-                </div>
-                <p className="mt-1 whitespace-pre-wrap text-[13.5px] leading-7" style={{ color: 'var(--v3-ink)' }}>{text}</p>
-              </div>
-            );
-          })}
+      {undoBrief && (
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-[12px]" style={{ color: 'var(--v3-muted)' }}>
+          Vos réponses courtes ont quitté le livre.
+          <button type="button" onClick={undoClean} className="v3-btn v3-btn-ghost text-[11.5px]">Annuler</button>
+        </div>
+      )}
+
+
+
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+        <p className="text-[12px]" style={{ color: 'var(--v3-muted)' }}>
+          Cliquez sur un passage pour le modifier, le corriger ou le supprimer.
+        </p>
+        <div className="flex flex-wrap items-center gap-2">
+          <label className="inline-flex items-center gap-1.5 text-[11.5px]" style={{ color: 'var(--v3-ink)' }}>
+            <input type="checkbox" checked={brief.emojis === true}
+              onChange={(event) => {
+                const next = patch({ emojis: event.target.checked });
+                void persist(next);
+                toast.success(event.target.checked
+                  ? 'Le Génie pourra glisser au maximum un emoji discret par passage.'
+                  : 'Le Génie n’ajoutera plus aucun emoji.');
+              }} />
+            Quelques emojis dans mon texte
+          </label>
+          <button type="button" onClick={() => setShowBook((value) => !value)} className="v3-btn v3-btn-outline text-[11px]">
+            <BookOpen className="h-3 w-3" /> {showBook ? 'Réduire la lecture' : 'Agrandir la lecture'}
+          </button>
         </div>
       </div>
 
+      {/* Le livre : un seul affichage, sur papier crème, avec ses actions. */}
+      <div className={`mt-3 space-y-5 overflow-y-auto rounded-2xl border p-4 ${showBook ? 'max-h-[85vh]' : 'max-h-[34rem]'}`}
+        style={{ borderColor: 'rgba(201,168,76,0.5)', background: CREAM }}>
+        {passages.map((original, i) => {
+          const index = i + 1;
+          const entry = entryFor(index);
+          const validated = Boolean(entry?.validatedAt);
+          const isOpen = selected === index;
+          const text = passageForBook(brief, index, original);
+          return (
+            <div key={`passage-${index}`} className="rounded-xl border p-3"
+              style={{
+                borderColor: isOpen ? 'rgba(201,168,76,0.9)' : 'rgba(201,168,76,0.28)',
+                background: isOpen ? '#fffdf6' : 'transparent',
+              }}>
+              <button type="button" onClick={() => setSelected(isOpen ? null : index)}
+                className="flex w-full items-center justify-between gap-2 text-left">
+                <span className="text-[10.5px] font-semibold uppercase tracking-wider"
+                  style={{ color: validated ? '#0f6b4a' : 'var(--v3-muted)' }}>
+                  Passage {index} — {validated ? 'corrigé et validé' : entry?.corrected ? 'correction à valider' : 'vos mots'}
+                </span>
+                <span className="text-[10.5px]" style={{ color: 'var(--v3-muted)' }}>
+                  {countWords(text)} mots {isOpen ? '▲' : '▼'}
+                </span>
+              </button>
+
+              {editing === index ? (
+                <textarea value={draftText} onChange={(event) => setDraftText(event.target.value)} rows={10}
+                  className="mt-2 w-full rounded-lg border px-2 py-2 text-[13.5px] leading-7 outline-none"
+                  style={{ borderColor: 'rgba(201,168,76,0.6)', color: 'var(--v3-ink)', background: '#fff' }} />
+              ) : editingCorrection === index ? (
+                <textarea value={correctedDraft} onChange={(event) => setCorrectedDraft(event.target.value)} rows={10}
+                  className="mt-2 w-full rounded-lg border px-2 py-2 text-[13.5px] leading-7 outline-none"
+                  style={{ borderColor: 'rgba(201,168,76,0.6)', color: 'var(--v3-ink)', background: '#fff' }} />
+              ) : (
+                <p className="mt-1 whitespace-pre-wrap text-[13.5px] leading-7" style={{ color: 'var(--v3-ink)' }}>
+                  {entry?.corrected && !validated && isOpen ? entry.corrected : text}
+                </p>
+              )}
+
+              {entry?.corrected && !validated && isOpen && (
+                <p className="mt-1 text-[11px]" style={{ color: '#8a6d1f' }}>
+                  Voici la version corrigée proposée par le Génie ({countWords(entry.corrected)} mots) — vos mots
+                  d’origine sont conservés tant que vous ne la validez pas.
+                </p>
+              )}
+
+              {isOpen && (
+                <>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {editing === index ? (
+                      <button type="button" onClick={() => saveOriginalEdit(index)} className="v3-btn v3-btn-primary text-[11px]">
+                        <Save className="h-3 w-3" /> Enregistrer mes modifications
+                      </button>
+                    ) : (
+                      <button type="button" onClick={() => { setEditingCorrection(null); setEditing(index); setDraftText(original); }}
+                        className="v3-btn v3-btn-outline text-[11px]">
+                        Modifier mes mots
+                      </button>
+                    )}
+                    <button type="button" onClick={() => correct(index)} disabled={busy === index || runningAll}
+                      className="v3-btn v3-btn-outline text-[11px] disabled:opacity-50">
+                      {busy === index ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
+                      {entry?.corrected ? 'Recorriger' : 'Corriger ce passage'}
+                    </button>
+                    {entry?.corrected && !validated && (
+                      <button type="button" onClick={() => validate(index)} className="v3-btn v3-btn-primary text-[11px]">
+                        <Check className="h-3 w-3" /> Valider pour le livre
+                      </button>
+                    )}
+                    {entry?.corrected && (editingCorrection === index ? (
+                      <button type="button" onClick={() => saveCorrectedEdit(index)} className="v3-btn v3-btn-primary text-[11px]">
+                        <Save className="h-3 w-3" /> Enregistrer ma correction
+                      </button>
+                    ) : (
+                      <button type="button" onClick={() => { setEditing(null); setEditingCorrection(index); setCorrectedDraft(entry.corrected); }}
+                        className="v3-btn v3-btn-outline text-[11px]">
+                        Modifier la correction
+                      </button>
+                    ))}
+                    {(entry?.corrected || validated) && (
+                      <button type="button" onClick={() => keepOriginal(index)} className="v3-btn v3-btn-ghost text-[11px]">
+                        <Undo2 className="h-3 w-3" /> Garder mes mots d’origine
+                      </button>
+                    )}
+                    {hasEmojis(text) && (
+                      <button type="button" onClick={() => removeEmojis(index)} className="v3-btn v3-btn-ghost text-[11px]">
+                        Retirer les emojis
+                      </button>
+                    )}
+                    <button type="button" onClick={() => setAddingAfter(addingAfter === index ? null : index)} className="v3-btn v3-btn-ghost text-[11px]">
+                      <Plus className="h-3 w-3" /> Ajouter un passage ici
+                    </button>
+                    <button type="button" onClick={() => moveToFacts(index)} className="v3-btn v3-btn-ghost text-[11px]">
+                      Ce n’est pas du récit → information à retenir
+                    </button>
+                    <button type="button" onClick={() => deletePassage(index)} className="v3-btn v3-btn-ghost text-[11px]" style={{ color: '#b42318' }}>
+                      <Trash2 className="h-3 w-3" /> Supprimer
+                    </button>
+                  </div>
+
+                  {(editing === index || editingCorrection === index) && (
+                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                      <span className="text-[11px]" style={{ color: 'var(--v3-muted)' }}>Ajouter un emoji :</span>
+                      {MANUAL_EMOJIS.map((emoji) => (
+                        <button key={emoji} type="button" className="rounded-lg border px-2 py-1 text-[13px]"
+                          style={{ borderColor: 'rgba(201,168,76,0.5)', background: '#fff' }}
+                          onClick={() => {
+                            if (editingCorrection === index) setCorrectedDraft((value) => `${value} ${emoji}`);
+                            else setDraftText((value) => `${value} ${emoji}`);
+                          }}>
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {addingAfter === index && (
+                    <div className="mt-2 rounded-xl border bg-white p-2.5" style={{ borderColor: 'rgba(201,168,76,0.5)' }}>
+                      <textarea value={addition} onChange={(event) => setAddition(event.target.value)} rows={4}
+                        placeholder="Écrivez le souvenir ou le détail oublié…"
+                        className="w-full resize-y bg-transparent text-[12.5px] outline-none" style={{ color: 'var(--v3-ink)' }} />
+                      <button type="button" disabled={!addition.trim()} onClick={() => addPassage(index)} className="v3-btn v3-btn-primary mt-2 text-[11px] disabled:opacity-50">
+                        <Plus className="h-3 w-3" /> Ajouter au récit
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          );
+        })}
+      </div>
 
       {autoState === 'working' && (
         <p className="mt-3 inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs" style={{ borderColor: 'rgba(201,168,76,0.5)', color: '#8a6d1f' }}>
-          <Loader2 className="h-3.5 w-3.5 animate-spin" /> Votre dernier texte est enregistré. Le Génie prépare maintenant sa version corrigée…
+          <Loader2 className="h-3.5 w-3.5 animate-spin" /> Votre dernier passage est enregistré. Le Génie prépare sa version corrigée…
         </p>
       )}
       {autoState === 'error' && (
-        <p className="mt-3 text-xs" style={{ color: '#b45309' }}>La correction automatique n’a pas abouti. Votre texte est conservé : utilisez « Corriger ce texte » pour réessayer.</p>
+        <p className="mt-3 text-xs" style={{ color: '#b45309' }}>La correction automatique n’a pas abouti. Votre texte est conservé : ouvrez le passage et utilisez « Corriger ce passage ».</p>
       )}
-
-      <p className="mt-2 text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
-        Vous écrivez comme vous parlez. Le Génie corrige l’orthographe, la ponctuation et développe
-        vos phrases sans jamais retirer un fait ni écrire moins de mots que vous. Chaque texte validé
-        est enregistré et servira à la rédaction du livre.
-      </p>
-
-      <p className="mt-2 rounded-xl border px-2.5 py-2 text-[11.5px]"
-        style={{ borderColor: 'rgba(15,107,74,0.35)', background: 'rgba(15,107,74,0.06)', color: 'var(--v3-ink)' }}>
-        Ce ne sont pas encore des chapitres : les chapitres viennent à l’étape ② Mon sommaire.
-        Avec {originalWords.toLocaleString('fr-FR')} mots écrits, cela fera environ{' '}
-        <strong>{suggested} chapitre(s)</strong> — et ce nombre s’ajustera tout seul si vous écrivez plus.
-      </p>
 
       <div className="mt-3 flex flex-wrap gap-2">
         <button type="button" onClick={correctAll} disabled={runningAll || busy !== null}
           className="v3-btn v3-btn-primary text-xs disabled:opacity-50">
           {runningAll ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
-          Corriger tous mes textes
+          Corriger tout mon livre
         </button>
         <button type="button" onClick={validateAll} className="v3-btn v3-btn-outline text-xs">
           <ShieldCheck className="h-3.5 w-3.5" /> Tout valider
@@ -346,142 +521,6 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
             <ListOrdered className="h-3.5 w-3.5" /> J’ai fini de raconter → construire mon sommaire
           </button>
         )}
-      </div>
-
-
-      <p className="mt-4 text-[11px]" style={{ color: 'var(--v3-muted)' }}>
-        Modifier, corriger et valider chaque texte, un par un :
-      </p>
-      <div className="mt-2 max-h-[60vh] space-y-3 overflow-y-auto pr-1">
-
-        {passages.map((original, i) => {
-          const index = i + 1;
-          const entry = entryFor(index);
-          const validated = Boolean(entry?.validatedAt);
-          return (
-            <div key={index} className="rounded-2xl border p-3"
-              style={{
-                borderColor: validated ? 'rgba(201,168,76,0.75)' : 'rgba(201,168,76,0.35)',
-                background: validated ? CREAM : entry?.corrected ? 'rgba(201,168,76,0.06)' : '#fff',
-              }}>
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: '#8a6d1f' }}>
-                  Texte {index}
-                </span>
-
-                <span className="text-[11px]" style={{ color: validated ? '#0f6b4a' : 'var(--v3-muted)' }}>
-                  {validated
-                    ? 'Validé — entre dans le livre'
-                    : entry?.corrected
-                      ? 'Correction proposée, à valider'
-                      : `${countWords(original)} mots écrits`}
-                </span>
-              </div>
-
-              <div className="mt-2 grid gap-2 md:grid-cols-2">
-                <div className="rounded-xl border bg-white p-2.5" style={{ borderColor: 'rgba(0,0,0,0.1)' }}>
-                  <div className="text-[10.5px] font-semibold uppercase tracking-wider" style={{ color: 'var(--v3-muted)' }}>
-                    Vos mots ({countWords(original)})
-                  </div>
-                  {editing === index ? (
-                    <textarea value={draftText} onChange={(event) => setDraftText(event.target.value)} rows={7}
-                      className="mt-1 w-full rounded-lg border px-2 py-2 text-[12.5px] leading-relaxed outline-none"
-                      style={{ borderColor: 'rgba(201,168,76,0.6)', color: 'var(--v3-ink)' }} />
-                  ) : (
-                    <p className="mt-1 whitespace-pre-wrap text-[12.5px] leading-relaxed" style={{ color: 'var(--v3-ink)' }}>{original}</p>
-                  )}
-                </div>
-                <div className="rounded-xl border bg-white p-2.5" style={{ borderColor: 'rgba(201,168,76,0.5)' }}>
-                  <div className="text-[10.5px] font-semibold uppercase tracking-wider" style={{ color: '#8a6d1f' }}>
-                    Version corrigée {entry?.corrected ? `(${countWords(entry.corrected)})` : ''}
-                  </div>
-                  {entry?.corrected ? editingCorrection === index ? (
-                    <textarea value={correctedDraft} onChange={(event) => setCorrectedDraft(event.target.value)} rows={7}
-                      className="mt-1 w-full rounded-lg border px-2 py-2 text-[12.5px] leading-relaxed outline-none"
-                      style={{ borderColor: 'rgba(201,168,76,0.6)', color: 'var(--v3-ink)' }} />
-                  ) : (
-                    <p className="mt-1 whitespace-pre-wrap text-[12.5px] leading-relaxed" style={{ color: 'var(--v3-ink)' }}>{entry.corrected}</p>
-                  ) : (
-                    <p className="mt-1 text-[12px]" style={{ color: 'var(--v3-muted)' }}>
-                      Pas encore corrigé.
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="mt-2 flex flex-wrap gap-2">
-                {editing === index ? (
-                  <button type="button" onClick={() => saveOriginalEdit(index)} className="v3-btn v3-btn-primary text-[11px]">
-                    <Save className="h-3 w-3" /> Enregistrer mes modifications
-                  </button>
-                ) : (
-                  <button type="button" onClick={() => { setEditing(index); setDraftText(original); }} className="v3-btn v3-btn-outline text-[11px]">
-                    Modifier mes mots
-                  </button>
-                )}
-                <button type="button" onClick={() => correct(index)} disabled={busy === index || runningAll}
-                  className="v3-btn v3-btn-outline text-[11px] disabled:opacity-50">
-                  {busy === index ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
-                  {entry?.corrected ? 'Recorriger' : 'Corriger ce texte'}
-                </button>
-                {entry?.corrected && !validated && (
-                  <button type="button" onClick={() => validate(index)} className="v3-btn v3-btn-primary text-[11px]">
-                    <Check className="h-3 w-3" /> Valider pour le livre
-                  </button>
-                )}
-                {entry?.corrected && (editingCorrection === index ? (
-                  <button type="button" onClick={() => saveCorrectedEdit(index)} className="v3-btn v3-btn-primary text-[11px]">
-                    <Save className="h-3 w-3" /> Enregistrer ma correction
-                  </button>
-                ) : (
-                  <button type="button" onClick={() => { setEditingCorrection(index); setCorrectedDraft(entry.corrected); }} className="v3-btn v3-btn-outline text-[11px]">
-                    Modifier la proposition
-                  </button>
-                ))}
-                {(entry?.corrected || validated) && (
-                  <button type="button" onClick={() => keepOriginal(index)} className="v3-btn v3-btn-ghost text-[11px]">
-                    <Undo2 className="h-3 w-3" /> Garder mon texte original
-                  </button>
-                )}
-                {hasEmojis(passageForBook(brief, index, original)) && (
-                  <button type="button" onClick={() => removeEmojis(index)} className="v3-btn v3-btn-ghost text-[11px]">
-                    Retirer les emojis de ce texte
-                  </button>
-                )}
-                <button type="button" onClick={() => setAddingAfter(addingAfter === index ? null : index)} className="v3-btn v3-btn-ghost text-[11px]">
-                  <Plus className="h-3 w-3" /> Ajouter un passage ici
-                </button>
-              </div>
-
-              {(editing === index || editingCorrection === index) && (
-                <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                  <span className="text-[11px]" style={{ color: 'var(--v3-muted)' }}>Ajouter un emoji :</span>
-                  {MANUAL_EMOJIS.map((emoji) => (
-                    <button key={emoji} type="button" className="rounded-lg border px-2 py-1 text-[13px]"
-                      style={{ borderColor: 'rgba(201,168,76,0.5)', background: '#fff' }}
-                      onClick={() => {
-                        if (editingCorrection === index) setCorrectedDraft((value) => `${value} ${emoji}`);
-                        else setDraftText((value) => `${value} ${emoji}`);
-                      }}>
-                      {emoji}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {addingAfter === index && (
-                <div className="mt-2 rounded-xl border bg-white p-2.5" style={{ borderColor: 'rgba(201,168,76,0.5)' }}>
-                  <textarea value={addition} onChange={(event) => setAddition(event.target.value)} rows={4}
-                    placeholder="Écrivez le souvenir ou le détail oublié…"
-                    className="w-full resize-y bg-transparent text-[12.5px] outline-none" style={{ color: 'var(--v3-ink)' }} />
-                  <button type="button" disabled={!addition.trim()} onClick={() => addPassage(index)} className="v3-btn v3-btn-primary mt-2 text-[11px] disabled:opacity-50">
-                    <Plus className="h-3 w-3" /> Ajouter au récit
-                  </button>
-                </div>
-              )}
-            </div>
-          );
-        })}
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import {
-  appendSourceText, listSourcePassages, mergeRespectingLocks, readBookBrief, resetBookProject, writeBookBrief, type BookBrief,
+  appendSourceText, dedupeFactMemory, listSourcePassages, mergeRespectingLocks, readBookBrief, resetBookProject, writeBookBrief, type BookBrief,
 } from '@/lib/v3/bookBrief';
 import { saveBookDraftToCloud } from '@/lib/v3/bookDraftCloud';
 import { currentInterviewStep } from '@/lib/v3/genieInterview';
@@ -195,7 +195,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
         wantsIllustrations: Boolean(b.wantsIllustrations),
         cibleProfil: b.cibleProfil || brief.cibleProfil || '',
         promesseCentrale: b.promesseCentrale || brief.promesseCentrale || '',
-        factMemory: Array.from(new Set([...(latestBrief.factMemory || []), ...(Array.isArray(b.factMemory) ? b.factMemory.map(String) : [])])),
+        factMemory: dedupeFactMemory([...(latestBrief.factMemory || []), ...(Array.isArray(b.factMemory) ? b.factMemory.map(String) : [])]),
         outlineValidated: false,
         ...proposed,
       };
@@ -232,6 +232,26 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
     // La réponse reste un vrai passage du récit, sans préfixe technique ajouté au livre.
     await ask(extra.trim());
   };
+
+  /**
+   * Réponse à une question du Génie : par défaut elle NE va PAS dans le livre.
+   * Elle rejoint les informations que le Génie doit respecter.
+   */
+  const rememberAnswer = async (answer: string) => {
+    const text = answer.trim();
+    if (!text) return;
+    const current = readBookBrief() || brief;
+    const next: BookBrief = {
+      ...current,
+      factMemory: dedupeFactMemory([...(current.factMemory || []), text]),
+    };
+    setBrief(next);
+    writeBookBrief(next);
+    setQuestions([]);
+    await saveBookDraftToCloud(next, { messages, activeStep: 1 });
+    toast.success('C’est noté : le Génie retient cette information, sans l’ajouter à votre livre.');
+  };
+
 
   // Les questions du Génie viennent uniquement du texte de l'auteur : deux au maximum.
   const askedQuestions = questions.slice(0, 2);
@@ -393,10 +413,11 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
       {(brief.factMemory || []).length > 0 && (
         <details className="mt-4 rounded-2xl border bg-white p-3" style={{ borderColor: 'rgba(15,107,74,0.35)' }}>
           <summary className="cursor-pointer text-[11px] font-bold uppercase tracking-wider" style={{ color: '#0f6b4a' }}>
-            Voir les {(brief.factMemory || []).length} repères que le Génie doit respecter
+            Ce que le Génie retient de vous ({(brief.factMemory || []).length} informations)
           </summary>
           <p className="mt-1 text-[11px]" style={{ color: 'var(--v3-muted)' }}>
-            Ils empêchent le Génie de changer ou d’oublier vos prénoms, liens familiaux, lieux, dates et faits.
+            Ces informations ne sont pas dans votre livre : elles empêchent simplement le Génie de changer
+            ou d’oublier vos prénoms, liens familiaux, lieux, dates et faits.
           </p>
           <div className="mt-2 max-h-64 space-y-1.5 overflow-y-auto pr-1">
             {(brief.factMemory || []).map((fact, index) => (
@@ -416,10 +437,12 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
             Le Génie a lu votre texte et vous demande
           </div>
           {askedQuestions.map((q) => (
-            <RefineRow key={q} question={q} disabled={loading} onSend={refine} onSkip={() => setQuestions((prev) => prev.filter((item) => item !== q))} />
+            <RefineRow key={q} question={q} disabled={loading} onRemember={rememberAnswer} onSend={refine}
+              onSkip={() => setQuestions((prev) => prev.filter((item) => item !== q))} />
           ))}
         </div>
       )}
+
 
 
 
@@ -435,7 +458,12 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
         </div>
       )}
 
-      {/* Autres voies */}
+      {/* La fiche du livre et les autres voies : repliées, elles servent à l'étape 2. */}
+      <details className="mt-4 rounded-2xl border bg-white/92 p-3" style={{ borderColor: 'rgba(0,0,0,0.10)' }}>
+        <summary className="cursor-pointer text-[12px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+          La fiche de mon livre et les autres façons de commencer
+        </summary>
+
       <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]" style={{ color: 'var(--v3-muted)' }}>
         Ou choisissez une autre voie :
         <Link to="/v3/create?import=1" className="v3-btn v3-btn-ghost text-xs">
@@ -502,24 +530,27 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
           )}
         </div>
       )}
+      </details>
     </div>
   );
 }
 
-function RefineRow({ question, disabled, onSend, onSkip }: {
-  question: string; disabled?: boolean; onSend: (v: string) => void; onSkip?: () => void;
+function RefineRow({ question, disabled, onRemember, onSend, onSkip }: {
+  question: string; disabled?: boolean; onRemember: (v: string) => void; onSend: (v: string) => void; onSkip?: () => void;
 }) {
   const [value, setValue] = useState('');
   return (
     <div className="rounded-2xl border bg-white p-3" style={{ borderColor: 'rgba(201,168,76,0.55)' }}>
       <p className="text-[13px] leading-relaxed" style={{ color: 'var(--v3-ink)' }}>🧞 {question}</p>
       <textarea value={value} onChange={(e) => setValue(e.target.value)} rows={3}
-        placeholder="Votre réponse — elle entre directement dans votre livre, avec vos mots."
+        placeholder="Votre réponse — un prénom, une date, une précision. Elle n’entre pas dans votre livre."
         className="mt-2 w-full resize-none rounded-xl border bg-white px-2.5 py-2 text-[13px] outline-none"
         style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }} />
       <div className="mt-2 flex flex-wrap items-center gap-2">
+        <button type="button" disabled={disabled || value.trim().length < 2} onClick={() => onRemember(value)}
+          className="v3-btn v3-btn-primary text-xs disabled:opacity-50">Le Génie retient ma réponse</button>
         <button type="button" disabled={disabled || value.trim().length < 10} onClick={() => onSend(value)}
-          className="v3-btn v3-btn-primary text-xs disabled:opacity-50">Ajouter au récit</button>
+          className="v3-btn v3-btn-outline text-xs disabled:opacity-50">Ajouter aussi à mon récit</button>
         {onSkip && (
           <button type="button" onClick={onSkip} className="v3-btn v3-btn-ghost text-xs">Je n’ai rien à ajouter</button>
         )}
