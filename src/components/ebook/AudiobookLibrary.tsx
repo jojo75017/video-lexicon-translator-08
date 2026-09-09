@@ -408,10 +408,13 @@ export const AudiobookLibrary: React.FC = () => {
               <div>
                 <p className="text-sm font-medium mb-1">Lien PayPal (livre complet)</p>
                 <Input
-                  placeholder="https://paypal.me/..."
+                  placeholder="https://paypal.me/votrenom"
                   value={editDialog.paypalLink}
                   onChange={(e) => setEditDialog({ ...editDialog, paypalLink: e.target.value })}
                 />
+                <p className="mt-1 text-xs text-muted-foreground">
+                  La fiche est publique : mettez votre lien paypal.me, jamais votre adresse e-mail.
+                </p>
               </div>
 
               <div>
