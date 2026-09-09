@@ -66,7 +66,7 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
   const autoSwitched = useRef(false);
 
   useEffect(() => {
-    const sync = () => setBrief(readBookBrief() || {});
+    const sync = () => { setBrief(readBookBrief() || {}); setSavedAt(new Date()); };
     sync();
     window.addEventListener(BOOK_BRIEF_EVENT, sync);
     return () => window.removeEventListener(BOOK_BRIEF_EVENT, sync);
