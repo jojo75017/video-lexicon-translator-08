@@ -458,7 +458,12 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
         </div>
       )}
 
-      {/* Autres voies */}
+      {/* La fiche du livre et les autres voies : repliées, elles servent à l'étape 2. */}
+      <details className="mt-4 rounded-2xl border bg-white/92 p-3" style={{ borderColor: 'rgba(0,0,0,0.10)' }}>
+        <summary className="cursor-pointer text-[12px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+          La fiche de mon livre et les autres façons de commencer
+        </summary>
+
       <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]" style={{ color: 'var(--v3-muted)' }}>
         Ou choisissez une autre voie :
         <Link to="/v3/create?import=1" className="v3-btn v3-btn-ghost text-xs">
