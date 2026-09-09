@@ -263,11 +263,11 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
         </span>
       </div>
 
-      {/* Le livre tel qu'il est aujourd'hui : passages validés, sur papier crème. */}
+      {/* Le livre, toujours visible : chaque texte y figure, validé ou non. */}
       <div className="mt-3 rounded-2xl border p-3" style={{ borderColor: 'rgba(201,168,76,0.5)', background: CREAM }}>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="text-[12.5px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
-            Votre livre : {validatedCount} texte(s) validé(s) · {bookWords.toLocaleString('fr-FR')} mots
+            Votre livre : {passages.length} texte(s) · {bookWords.toLocaleString('fr-FR')} mots · {validatedCount} validé(s)
           </span>
           <div className="flex flex-wrap items-center gap-2">
             <label className="inline-flex items-center gap-1.5 text-[11.5px]" style={{ color: 'var(--v3-ink)' }}>
@@ -276,30 +276,36 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
                   const next = patch({ emojis: event.target.checked });
                   void persist(next);
                   toast.success(event.target.checked
-                    ? 'Le Génie pourra glisser un ou deux emojis discrets par texte.'
-                    : 'Plus aucun emoji dans votre texte.');
+                    ? 'Le Génie pourra glisser au maximum un emoji discret par texte.'
+                    : 'Le Génie n’ajoutera plus aucun emoji.');
                 }} />
               Quelques emojis dans mon texte
             </label>
             <button type="button" onClick={() => setShowBook((value) => !value)} className="v3-btn v3-btn-outline text-[11px]">
-              <BookOpen className="h-3 w-3" /> {showBook ? 'Fermer la lecture' : 'Lire mon livre'}
+              <BookOpen className="h-3 w-3" /> {showBook ? 'Replier la lecture' : 'Agrandir la lecture'}
             </button>
           </div>
         </div>
-        {showBook && (
-          <div className="mt-3 rounded-xl border p-4" style={{ borderColor: 'rgba(201,168,76,0.45)', background: '#fffdf6' }}>
-            {validatedCount ? (
-              <p className="whitespace-pre-wrap text-[13.5px] leading-7" style={{ color: 'var(--v3-ink)' }}>
-                {validatedList.map((p) => p.corrected.trim()).join('\n\n')}
-              </p>
-            ) : (
-              <p className="text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
-                Aucun texte validé pour l’instant. Validez une correction et elle apparaîtra ici, sur papier crème.
-              </p>
-            )}
-          </div>
-        )}
+
+        <div className={`mt-3 space-y-4 overflow-y-auto rounded-xl border p-4 ${showBook ? 'max-h-[80vh]' : 'max-h-[26rem]'}`}
+          style={{ borderColor: 'rgba(201,168,76,0.45)', background: '#fffdf6' }}>
+          {passages.map((original, i) => {
+            const index = i + 1;
+            const entry = entryFor(index);
+            const validated = Boolean(entry?.validatedAt);
+            const text = passageForBook(brief, index, original);
+            return (
+              <div key={`book-${index}`}>
+                <div className="text-[10.5px] font-semibold uppercase tracking-wider" style={{ color: validated ? '#0f6b4a' : 'var(--v3-muted)' }}>
+                  Texte {index} — {validated ? 'Validé dans le livre' : entry?.corrected ? 'Correction à valider' : 'Vos mots'}
+                </div>
+                <p className="mt-1 whitespace-pre-wrap text-[13.5px] leading-7" style={{ color: 'var(--v3-ink)' }}>{text}</p>
+              </div>
+            );
+          })}
+        </div>
       </div>
+
 
       {autoState === 'working' && (
         <p className="mt-3 inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs" style={{ borderColor: 'rgba(201,168,76,0.5)', color: '#8a6d1f' }}>
