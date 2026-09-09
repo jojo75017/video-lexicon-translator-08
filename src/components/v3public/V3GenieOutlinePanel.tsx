@@ -81,7 +81,6 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
 
   useEffect(() => {
     const showWritten = () => {
-      setTab('written');
       const current = readWrittenProgress();
       const latest = current.chapters[current.chapters.length - 1];
       if (latest) setOpenIndex(latest.index);
