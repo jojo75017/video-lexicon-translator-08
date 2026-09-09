@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Loader2, Lock, ShoppingBag, ArrowLeft } from 'lucide-react';
 import { V3_UPSELL_PACKS } from '@/data/roadmapV3';
-import { findPaidModuleForPath, type V3PaidModule } from '@/data/v3ModuleAccess';
+import { findPaidModuleForPath, V3_PAID_MODULE_BY_KEY, type V3PaidModule } from '@/data/v3ModuleAccess';
 import useModuleAccess from '@/hooks/useModuleAccess';
 import V3UpsellCheckout from '@/components/admin/V3UpsellCheckout';
 import V3SubscribeCheckout from '@/components/v3public/V3SubscribeCheckout';
@@ -23,7 +23,7 @@ export function V3ModulePaywall({
 }) {
   const location = useLocation();
   const mod: V3PaidModule | null = moduleKey
-    ? findPaidModuleForPath(location.pathname) ?? null
+    ? V3_PAID_MODULE_BY_KEY[moduleKey] ?? null
     : findPaidModuleForPath(location.pathname);
   const { loading, hasAccess } = useModuleAccess(mod?.key ?? null);
   const [checkout, setCheckout] = useState<'pack' | 'price' | null>(null);
@@ -89,11 +89,16 @@ export function V3ModulePaywall({
               type="button"
               onClick={() => setCheckout(pack ? 'pack' : 'price')}
               disabled={!pack && !mod.priceId}
-              className="v3-btn v3-btn-gold"
+              className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold text-white transition-transform hover:-translate-y-0.5 disabled:opacity-50"
+              style={{ background: 'var(--v3-gold-600, #B4841F)' }}
             >
               <ShoppingBag className="h-4 w-4" /> Débloquer — {price} €
             </button>
-            <Link to="/v3/upsells" className="v3-btn v3-btn-ghost">
+            <Link
+              to="/v3/upsells"
+              className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold"
+              style={{ border: '1px solid var(--v3-line, #E7E1D8)', color: 'var(--v3-ink)' }}
+            >
               <ArrowLeft className="h-4 w-4" /> Tous les compléments
             </Link>
           </div>
