@@ -233,6 +233,26 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
     await ask(extra.trim());
   };
 
+  /**
+   * Réponse à une question du Génie : par défaut elle NE va PAS dans le livre.
+   * Elle rejoint les informations que le Génie doit respecter.
+   */
+  const rememberAnswer = async (answer: string) => {
+    const text = answer.trim();
+    if (!text) return;
+    const current = readBookBrief() || brief;
+    const next: BookBrief = {
+      ...current,
+      factMemory: dedupeFactMemory([...(current.factMemory || []), text]),
+    };
+    setBrief(next);
+    writeBookBrief(next);
+    setQuestions([]);
+    await saveBookDraftToCloud(next, { messages, activeStep: 1 });
+    toast.success('C’est noté : le Génie retient cette information, sans l’ajouter à votre livre.');
+  };
+
+
   // Les questions du Génie viennent uniquement du texte de l'auteur : deux au maximum.
   const askedQuestions = questions.slice(0, 2);
   const sourceWordCount = countTextWords(brief.sourceText || '');
