@@ -444,6 +444,8 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
         </span>
       </div>
 
+      <V3BookProgressBar brief={brief} onResume={resumeBook} />
+
       {shortAnswers.length > 0 && (
         <div className="mt-3 rounded-2xl border p-3" style={{ borderColor: 'rgba(201,168,76,0.6)', background: '#FBF6E8' }}>
           <p className="text-[12.5px]" style={{ color: 'var(--v3-ink)' }}>
