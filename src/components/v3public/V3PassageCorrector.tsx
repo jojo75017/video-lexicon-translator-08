@@ -11,6 +11,7 @@ import {
 import { saveBookDraftToCloud } from '@/lib/v3/bookDraftCloud';
 import V3TypographyBar from '@/components/v3public/V3TypographyBar';
 import V3NextStepCard from '@/components/v3public/V3NextStepCard';
+import V3BookProgressBar from '@/components/v3public/V3BookProgressBar';
 
 
 /** Papier crème : la couleur du livre, à l'écran comme dans l'aperçu. */
@@ -62,6 +63,20 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
 
   const originalWords = passages.reduce((t, p) => t + countWords(p), 0);
   const bookWords = countWords(narrativeForBook(brief));
+
+  /** « Reprendre mon livre » : ouvre le premier passage qui attend encore une action. */
+  const resumeBook = () => {
+    const next = passages.findIndex((_, i) => {
+      const entry = entryFor(i + 1);
+      return !entry?.corrected?.trim() || !entry?.validatedAt;
+    });
+    const index = next >= 0 ? next + 1 : passages.length;
+    if (!index) return;
+    setSelected(index);
+    window.setTimeout(() => {
+      document.getElementById(`v3-passage-${index}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 60);
+  };
 
   const patch = (values: Partial<BookBrief>) => {
     const next = { ...(readBookBrief() || {}), ...values };
