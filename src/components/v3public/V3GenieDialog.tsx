@@ -391,10 +391,14 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
       {progressContent}
 
       {(brief.factMemory || []).length > 0 && (
-        <div className="mt-4 rounded-2xl border bg-white p-3" style={{ borderColor: 'rgba(15,107,74,0.35)' }}>
-          <div className="text-[11px] font-bold uppercase tracking-wider" style={{ color: '#0f6b4a' }}>Indices que le Génie doit respecter</div>
-          <p className="mt-1 text-[11px]" style={{ color: 'var(--v3-muted)' }}>Prénoms, liens familiaux, lieux et dates restent attachés à votre récit.</p>
-          <div className="mt-2 space-y-1.5">
+        <details className="mt-4 rounded-2xl border bg-white p-3" style={{ borderColor: 'rgba(15,107,74,0.35)' }}>
+          <summary className="cursor-pointer text-[11px] font-bold uppercase tracking-wider" style={{ color: '#0f6b4a' }}>
+            Voir les {(brief.factMemory || []).length} repères que le Génie doit respecter
+          </summary>
+          <p className="mt-1 text-[11px]" style={{ color: 'var(--v3-muted)' }}>
+            Ils empêchent le Génie de changer ou d’oublier vos prénoms, liens familiaux, lieux, dates et faits.
+          </p>
+          <div className="mt-2 max-h-64 space-y-1.5 overflow-y-auto pr-1">
             {(brief.factMemory || []).map((fact, index) => (
               <input key={`${index}-${fact}`} value={fact} onChange={(event) => {
                 const facts = [...(brief.factMemory || [])]; facts[index] = event.target.value; patch({ factMemory: facts });
@@ -402,7 +406,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
                 className="w-full rounded-lg border px-2.5 py-1.5 text-xs" style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }} />
             ))}
           </div>
-        </div>
+        </details>
       )}
 
       {/* La question du Génie : elle vient de votre texte, jamais d'un questionnaire */}
