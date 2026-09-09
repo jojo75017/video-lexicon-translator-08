@@ -239,6 +239,38 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
     toast.success('Cette réponse quitte le livre : le Génie la garde comme information à respecter.');
   };
 
+  /**
+   * Les réponses très courtes rangées par erreur dans le livre : on les sort
+   * toutes d'un clic, avec possibilité d'annuler.
+   */
+  const shortAnswers = passages
+    .map((text, i) => ({ index: i + 1, words: countWords(text) }))
+    .filter((p) => p.words > 0 && p.words < 25);
+
+  const cleanShortAnswers = () => {
+    const before = readBookBrief() || {};
+    let current: BookBrief = before;
+    const facts: string[] = [...(before.factMemory || [])];
+    for (const { index } of [...shortAnswers].reverse()) {
+      const text = (listSourcePassages(current.sourceText || '')[index - 1] || '').trim();
+      if (text) facts.push(text);
+      current = removeSourcePassage(current, index);
+    }
+    const next = patch({ ...current, factMemory: dedupeFactMemory(facts) });
+    void persist(next);
+    setSelected(null);
+    setUndoBrief(before);
+    toast.success('Vos réponses courtes quittent le livre : le Génie les garde en mémoire.');
+  };
+
+  const undoClean = () => {
+    if (!undoBrief) return;
+    const next = patch(undoBrief);
+    void persist(next);
+    setUndoBrief(null);
+    toast.success('C’est revenu comme avant.');
+  };
+
   const deletePassage = (index: number) => {
     if (!window.confirm(`Supprimer définitivement le passage ${index} de votre livre ?`)) return;
     const next = patch(removeSourcePassage(readBookBrief() || {}, index));
