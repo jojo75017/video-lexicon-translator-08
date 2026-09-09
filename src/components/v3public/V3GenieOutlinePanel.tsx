@@ -52,9 +52,11 @@ function SettingField({
 export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'full' | 'guided' }) {
   const [brief, setBrief] = useState<BookBrief>({});
   const [versions, setVersions] = useState<OutlineVersion[]>([]);
-  const [tab, setTab] = useState<'outline' | 'written'>('outline');
   const [progress, setProgress] = useState<WrittenProgress>({ chapters: [], total: 0, activeIndex: -1 });
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  // Heure du dernier enregistrement : l'auteur voit que rien n'est perdu.
+  const [savedAt, setSavedAt] = useState<Date | null>(null);
+  
   
   // Le récit doit être visible immédiatement : ne jamais donner l'impression
   // qu'il a été remplacé par le court synopsis de l'IA.
@@ -64,7 +66,7 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
   const autoSwitched = useRef(false);
 
   useEffect(() => {
-    const sync = () => setBrief(readBookBrief() || {});
+    const sync = () => { setBrief(readBookBrief() || {}); setSavedAt(new Date()); };
     sync();
     window.addEventListener(BOOK_BRIEF_EVENT, sync);
     return () => window.removeEventListener(BOOK_BRIEF_EVENT, sync);
@@ -79,7 +81,6 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
 
   useEffect(() => {
     const showWritten = () => {
-      setTab('written');
       const current = readWrittenProgress();
       const latest = current.chapters[current.chapters.length - 1];
       if (latest) setOpenIndex(latest.index);
@@ -93,7 +94,6 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
   useEffect(() => {
     if (autoSwitched.current || progress.chapters.length === 0) return;
     autoSwitched.current = true;
-    setTab('written');
     setOpenIndex(progress.chapters[progress.chapters.length - 1].index);
   }, [progress.chapters.length]);
 
@@ -174,6 +174,12 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
           </span>
         </div>
 
+        {savedAt && (
+          <p className="mt-1 text-[10.5px]" style={{ color: '#0f766e' }}>
+            Enregistré à {savedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} — vous pourrez reprendre quand vous voulez.
+          </p>
+        )}
+
         <h3 className="v3-serif mt-2 text-xl font-bold" style={{ color: 'var(--v3-ink)' }}>
           {brief.title?.trim() || 'Projet sans titre'}
         </h3>
@@ -185,16 +191,16 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
           ))}
         </div>
 
-        {/* Réglages du livre : c'est l'auteur qui décide, l'IA ne les touche plus */}
-        <div className="mt-3 rounded-2xl border p-3" style={{ borderColor: 'rgba(201,168,76,0.45)', background: 'rgba(201,168,76,0.06)' }}>
-          <div className="flex items-center justify-between gap-2">
+        {/* Réglages du livre : repliés, l'auteur les ouvre quand il veut */}
+        <details className="mt-3 rounded-2xl border p-3" style={{ borderColor: 'rgba(201,168,76,0.45)', background: 'rgba(201,168,76,0.06)' }}>
+          <summary className="flex cursor-pointer items-center justify-between gap-2">
             <span className="inline-flex items-center gap-1.5 text-[11.5px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
               <SlidersHorizontal className="h-3.5 w-3.5" /> Réglages du livre
             </span>
             <span className="text-[10.5px]" style={{ color: 'var(--v3-muted)' }}>
               ≈ {estimatedTotal.toLocaleString('fr-FR')} mots au total
             </span>
-          </div>
+          </summary>
 
           <div className="mt-2 space-y-2">
             <SettingField label="Titre" field="title" locked={isFieldLocked(brief, 'title')} onUnlock={unlock}>
@@ -229,7 +235,7 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
           <p className="mt-2 text-[10.5px]" style={{ color: 'var(--v3-muted)' }}>
             Dès que vous saisissez une valeur, elle est verrouillée : le Génie ne la remplacera plus.
           </p>
-        </div>
+        </details>
 
         {/* Vos souvenirs : version corrigée validée par défaut, mots d'origine à un clic */}
         {sourceText ? (
@@ -293,46 +299,33 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
           </div>
         )}
 
-        {/* Onglets */}
-        <div className="mt-3 flex gap-2">
-          {([['outline', 'Sommaire'], ['written', `Mon livre${written.length ? ` (${written.length})` : ''}`]] as const).map(([id, label]) => (
-            <button key={id} type="button" onClick={() => setTab(id)}
-              className="rounded-full border px-3 py-1.5 text-[11.5px] transition"
-              style={{
-                borderColor: tab === id ? 'var(--v3-gold, #c9a84c)' : 'rgba(0,0,0,0.12)',
-                background: tab === id ? 'rgba(201,168,76,0.12)' : '#fff',
-                color: 'var(--v3-ink)',
-              }}>
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {tab === 'outline' ? (
-          outline.length > 0 ? (
-            <ol className="mt-3 max-h-72 space-y-1 overflow-y-auto pr-1 text-[13px]" style={{ color: 'var(--v3-ink)' }}>
-              {outline.map((c, i) => {
-                const done = writtenTitles.has(String(c.titre || '').toLowerCase().trim()) || i < written.length;
-                const inProgress = !done && writing && i === written.length;
-                return (
-                  <li key={`${c.numero}-${i}`} className="rounded-xl border px-3 py-2" style={{ borderColor: 'rgba(0,0,0,0.08)' }}>
-                    <strong>{i + 1}.</strong> {c.titre}
-                    <span className="ml-1 text-[10.5px]" style={{ color: done ? '#0f766e' : 'var(--v3-muted)' }}>
-                      · {done ? 'écrit' : inProgress ? 'en cours…' : 'à écrire'}
-                    </span>
-                    {c.objectif ? <span className="block text-[11px]" style={{ color: 'var(--v3-muted)' }}>{c.objectif}</span> : null}
-                  </li>
-                );
-              })}
-            </ol>
-          ) : (
-            <p className="mt-3 text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
-              Dites au Génie de quoi parle votre livre : vous construisez le sommaire ensemble, 3 chapitres à la fois.
-            </p>
-          )
-        ) : (
+        {/* Une seule liste : les chapitres écrits, puis ceux qui restent à écrire */}
+        {written.length > 0 && (
           <V3WrittenBookTab progress={progress} brief={brief} openIndex={openIndex} onToggle={setOpenIndex} />
         )}
+
+        {outline.length > 0 ? (
+          <ol className="mt-3 max-h-72 space-y-1 overflow-y-auto pr-1 text-[13px]" style={{ color: 'var(--v3-ink)' }}>
+            {outline.map((c, i) => {
+              const done = writtenTitles.has(String(c.titre || '').toLowerCase().trim()) || i < written.length;
+              if (done) return null;
+              const inProgress = writing && i === written.length;
+              return (
+                <li key={`${c.numero}-${i}`} className="rounded-xl border px-3 py-2" style={{ borderColor: 'rgba(0,0,0,0.08)' }}>
+                  <strong>{i + 1}.</strong> {c.titre}
+                  <span className="ml-1 text-[10.5px]" style={{ color: 'var(--v3-muted)' }}>
+                    · {inProgress ? 'en cours…' : 'à écrire'}
+                  </span>
+                  {c.objectif ? <span className="block text-[11px]" style={{ color: 'var(--v3-muted)' }}>{c.objectif}</span> : null}
+                </li>
+              );
+            })}
+          </ol>
+        ) : written.length === 0 ? (
+          <p className="mt-3 text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
+            Dites au Génie de quoi parle votre livre : vous construisez le sommaire ensemble, 3 chapitres à la fois.
+          </p>
+        ) : null}
 
 
 

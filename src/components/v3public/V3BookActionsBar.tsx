@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, Rocket, Save, Wand2, BookOpen, BarChart3, Languages, Headphones, Star } from 'lucide-react';
+import { Check, Rocket, Save, Wand2, BookOpen, BarChart3, Languages, Headphones, Star, Download, Palette } from 'lucide-react';
 import { toast } from 'sonner';
 import V3UpsellPromoCard from '@/components/v3public/V3UpsellPromoCard';
 import { BOOK_BRIEF_EVENT, readBookBrief, writeBookBrief, type BookBrief } from '@/lib/v3/bookBrief';
 import { readWrittenProgress, WRITTEN_CHAPTERS_EVENT } from '@/lib/v3/writtenChapters';
 import { saveOutlineVersion } from '@/lib/v3/genieThread';
+import { exportDocx, exportPdf, type LongFormBook } from '@/lib/longform/longFormExport';
 
 /**
  * Barre d'actions unique sous le dialogue : l'abonné voit tout de suite le
@@ -79,6 +80,32 @@ export default function V3BookActionsBar({ onLaunch }: { onLaunch: () => void })
 
   const soon = 'Disponible après la rédaction de votre livre';
 
+  /** Export local du livre écrit (Word ou PDF) — aucun appel IA, aucun crédit. */
+  const exportBook = async (format: 'docx' | 'pdf') => {
+    const chapters = readWrittenProgress().chapters;
+    if (chapters.length === 0) {
+      toast.info('Écrivez au moins un chapitre : l’export s’active ensuite.');
+      return;
+    }
+    const book: LongFormBook = {
+      title: brief.title?.trim() || 'Mon livre',
+      subtitle: brief.subtitle || null,
+      author: brief.author || null,
+      chapters: chapters.map((c, i) => ({
+        chapter_number: i + 1,
+        title: c.title || `Chapitre ${i + 1}`,
+        content_markdown: c.content,
+      })),
+    };
+    try {
+      if (format === 'docx') await exportDocx(book);
+      else exportPdf(book);
+      toast.success(format === 'docx' ? 'Fichier Word téléchargé.' : 'Fichier PDF téléchargé.');
+    } catch {
+      toast.error('Export impossible pour le moment.');
+    }
+  };
+
   return (
     <div className="rounded-[22px] border p-4 md:p-5" style={{ borderColor: 'var(--v3-gold, #c9a84c)', background: '#fff' }}>
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -122,6 +149,23 @@ export default function V3BookActionsBar({ onLaunch }: { onLaunch: () => void })
           title={projectId ? 'Description, mots-clés et catégories KDP' : 'Enregistrez votre livre pour obtenir ses données KDP'}
         >
           <BarChart3 className="h-3.5 w-3.5" /> Données KDP
+        </Link>
+
+        <button type="button" onClick={() => exportBook('docx')} disabled={writtenCount === 0}
+          title={writtenCount === 0 ? 'Disponible après le premier chapitre écrit' : 'Télécharger le manuscrit au format Word'}
+          className="v3-btn v3-btn-outline justify-center text-xs disabled:opacity-50">
+          <Download className="h-3.5 w-3.5" /> Exporter en Word
+        </button>
+
+        <button type="button" onClick={() => exportBook('pdf')} disabled={writtenCount === 0}
+          title={writtenCount === 0 ? 'Disponible après le premier chapitre écrit' : 'Télécharger le manuscrit au format PDF'}
+          className="v3-btn v3-btn-outline justify-center text-xs disabled:opacity-50">
+          <Download className="h-3.5 w-3.5" /> Exporter en PDF
+        </button>
+
+        <Link to="/v3/hub?tab=parcours&module=cover-studio-pro" className="v3-btn v3-btn-gold justify-center text-xs"
+          title="Créer la couverture de votre livre">
+          <Palette className="h-3.5 w-3.5" /> Faire ma couverture
         </Link>
 
         <Link to={projectId ? `/v3/outils/traduction?projectId=${projectId}` : '/v3/outils/traduction'} className="v3-btn v3-btn-outline justify-center text-xs">
