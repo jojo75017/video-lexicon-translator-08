@@ -490,17 +490,23 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
   );
 }
 
-function RefineRow({ question, disabled, onSend }: { question: string; disabled?: boolean; onSend: (v: string) => void }) {
+function RefineRow({ question, disabled, onSend, onSkip }: {
+  question: string; disabled?: boolean; onSend: (v: string) => void; onSkip?: () => void;
+}) {
   const [value, setValue] = useState('');
   return (
-    <div className="rounded-2xl border bg-white/80 p-2.5" style={{ borderColor: 'rgba(0,0,0,0.10)' }}>
-      <p className="text-xs" style={{ color: 'var(--v3-muted)' }}>🧞 {question}</p>
-      <div className="mt-2 flex gap-2">
-        <input value={value} onChange={(e) => setValue(e.target.value)} placeholder="Votre réponse…"
-          className="flex-1 rounded-xl border bg-white px-2.5 py-1.5 text-xs outline-none"
-          style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }} />
-        <button type="button" disabled={disabled || !value.trim()} onClick={() => onSend(value)}
-          className="v3-btn v3-btn-outline text-xs disabled:opacity-50">Enregistrer ma réponse</button>
+    <div className="rounded-2xl border bg-white p-3" style={{ borderColor: 'rgba(201,168,76,0.55)' }}>
+      <p className="text-[13px] leading-relaxed" style={{ color: 'var(--v3-ink)' }}>🧞 {question}</p>
+      <textarea value={value} onChange={(e) => setValue(e.target.value)} rows={3}
+        placeholder="Votre réponse — elle entre directement dans votre livre, avec vos mots."
+        className="mt-2 w-full resize-none rounded-xl border bg-white px-2.5 py-2 text-[13px] outline-none"
+        style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }} />
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        <button type="button" disabled={disabled || value.trim().length < 10} onClick={() => onSend(value)}
+          className="v3-btn v3-btn-primary text-xs disabled:opacity-50">Ajouter au récit</button>
+        {onSkip && (
+          <button type="button" onClick={onSkip} className="v3-btn v3-btn-ghost text-xs">Je n’ai rien à ajouter</button>
+        )}
       </div>
     </div>
   );
