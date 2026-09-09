@@ -436,8 +436,12 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
       {askedQuestions.length > 0 && (
         <div className="mt-4 space-y-2">
           <div className="text-[11px] font-bold uppercase tracking-wider" style={{ color: '#8a6d1f' }}>
-            Le Génie a lu votre texte et vous demande
+            Le Génie a lu votre texte et vous demande — facultatif
           </div>
+          <p className="text-[11.5px]" style={{ color: 'var(--v3-muted)' }}>
+            Votre texte est déjà dans le livre, à droite. Vous pouvez répondre maintenant, plus tard, ou pas du tout.
+          </p>
+
           {askedQuestions.map((q) => (
             <RefineRow key={q} question={q} disabled={loading} onRemember={rememberAnswer} onSend={refine}
               onSkip={() => setQuestions((prev) => prev.filter((item) => item !== q))} />
@@ -554,7 +558,7 @@ function RefineRow({ question, disabled, onRemember, onSend, onSkip }: {
         <button type="button" disabled={disabled || value.trim().length < 10} onClick={() => onSend(value)}
           className="v3-btn v3-btn-outline text-xs disabled:opacity-50">Ajouter aussi à mon récit</button>
         {onSkip && (
-          <button type="button" onClick={onSkip} className="v3-btn v3-btn-ghost text-xs">Je n’ai rien à ajouter</button>
+          <button type="button" onClick={onSkip} className="v3-btn v3-btn-ghost text-xs">Plus tard</button>
         )}
       </div>
     </div>
