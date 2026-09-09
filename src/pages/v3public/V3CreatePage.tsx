@@ -217,72 +217,98 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
           </div>
         )}
 
-        {/* Le Sommaire IA mène tout : il passe en premier, en évidence */}
-        <div className="mt-7 grid gap-5 lg:grid-cols-[420px_1fr] items-start">
-          {/* Colonne sommaire : en tête sur mobile, collée en haut sur desktop */}
-          <aside id="sommaire-ia" className="order-first min-w-0 lg:sticky lg:top-24">
-            <div className="v3-card mb-3" style={{ borderColor: 'var(--v3-orange)' }}>
-              <span className="v3-chip v3-chip-orange">
-                <Sparkles className="w-3.5 h-3.5" /> Étape 1 — Sommaire IA
-              </span>
-              <p className="mt-2 text-xs" style={{ color: 'var(--v3-muted)' }}>
-                C’est le sommaire qui mène tout : on le construit ensemble, vous le validez,
-                puis la rédaction, la correction et l’export en découlent.
-              </p>
-            </div>
-            <V3GenieOutlinePanel key={briefKey} outlineMode={sommaireIa ? 'guided' : undefined} />
-          </aside>
+        {/* Ma maison d'édition : 4 bureaux, un seul chemin */}
+        <div className="mt-7 v3-card" style={{ borderColor: 'var(--v3-gold, #c9a84c)' }}>
+          <div className="flex flex-wrap items-center gap-2">
+            {DESKS.map((d) => (
+              <button
+                key={d.id}
+                type="button"
+                onClick={() => setDesk(d.id)}
+                className="rounded-full border px-3 py-1.5 text-[12px] font-semibold transition"
+                style={{
+                  borderColor: desk === d.id ? 'var(--v3-gold, #c9a84c)' : 'rgba(0,0,0,0.12)',
+                  background: desk === d.id ? 'rgba(201,168,76,0.14)' : '#fff',
+                  color: 'var(--v3-ink)',
+                }}
+              >
+                {d.id}. {d.label}
+              </button>
+            ))}
+          </div>
+          <p className="mt-2 text-xs" style={{ color: 'var(--v3-muted)' }}>
+            {DESKS.find((d) => d.id === desk)?.hint}
+          </p>
+        </div>
 
-          <div className="min-w-0 v3-ambiance order-last">
-
-
-            {!openedBook && (
-              <V3GenieDialog
-                mode={biography ? 'biography' : 'book'}
-                initialIdea={idea || ''}
-                onReady={() => document.getElementById('sommaire-ia')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-              />
+        <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_380px] items-start">
+          <div className="min-w-0 v3-ambiance">
+            {/* ① Mon récit : j'écris, le Génie corrige */}
+            {desk === 1 && !openedBook && (
+              <>
+                <V3GenieDialog
+                  mode={biography ? 'biography' : 'book'}
+                  initialIdea={idea || ''}
+                  onReady={() => setDesk(2)}
+                />
+                <div className="mt-4">
+                  <V3PassageCorrector mode={biography ? 'biography' : 'book'} />
+                </div>
+              </>
             )}
 
-            {/* Vos idées rendues corrigées, validées puis enregistrées pour le livre */}
-            {!openedBook && (
-              <div className="mt-4">
-                <V3PassageCorrector mode={biography ? 'biography' : 'book'} />
+            {/* ② Sommaire : 3 chapitres à la fois */}
+            {desk === 2 && <V3OutlineCoBuilder />}
+
+            {/* ③ Rédaction : le Génie écrit et range chaque chapitre */}
+            {desk === 3 && (
+              showWizard ? (
+                <div ref={wizardRef} className="v3-card">
+                  <Suspense fallback={<div className="py-16 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-[var(--v3-orange)]" /></div>}>
+                    <V3CreateWizard />
+                  </Suspense>
+                </div>
+              ) : (
+                <div className="v3-card">
+                  <h2 className="v3-serif text-xl font-bold" style={{ color: 'var(--v3-ink)' }}>La rédaction</h2>
+                  <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>
+                    Validez votre sommaire, puis cliquez sur « Commencer la rédaction » : chaque chapitre
+                    écrit se range tout seul à sa place, déjà corrigé.
+                  </p>
+                  <button type="button" onClick={launchWorkflow} className="v3-btn v3-btn-primary mt-4 text-xs">
+                    <Sparkles className="w-3.5 h-3.5" /> Commencer la rédaction
+                  </button>
+                </div>
+              )
+            )}
+
+            {/* ④ Livre & couverture : lire, corriger, exporter, couvrir */}
+            {desk === 4 && (
+              <div className="space-y-4">
+                <div className="v3-card">
+                  <h2 className="v3-serif text-xl font-bold" style={{ color: 'var(--v3-ink)' }}>Votre livre, prêt à publier</h2>
+                  <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>
+                    Relisez chaque chapitre dans la colonne de droite, puis servez-vous des boutons
+                    ci-dessous : correction, export Word ou PDF, couverture, données KDP, traduction et audio.
+                  </p>
+                </div>
+                <V3AmbiancePicker />
+                <V3KeyHint />
+                <V3PipelinePanel />
+                <details className="rounded-[22px] border p-4" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
+                  <summary className="cursor-pointer text-xs font-semibold" style={{ color: 'var(--v3-muted)' }}>
+                    Modifier la fiche à la main (titre, auteur, catégorie, synopsis…)
+                  </summary>
+                  <div className="mt-4">
+                    <V3BriefRecap key={briefKey} variant="full" formOnly hideBookForm={false} />
+                  </div>
+                </details>
               </div>
             )}
 
-            {/* On construit le sommaire ensemble, 3 chapitres à la fois */}
-            <div className="mt-4">
-              <V3OutlineCoBuilder />
-            </div>
-
-            {/* Ambiance — repliée, modifiable à tout moment */}
-            <div className="mt-4">
-              <V3AmbiancePicker />
-            </div>
-
-            {/* Tous les boutons au même endroit (grisés avant validation) */}
-            <div className="mt-4">
+            {/* Vos actions : toujours visibles, quel que soit le bureau */}
+            <div className="mt-5">
               <V3BookActionsBar onLaunch={launchWorkflow} />
-            </div>
-
-            {/* Workflow : dans la colonne de gauche pour garder le sommaire visible */}
-            {showWizard && (
-              <div ref={wizardRef} className="v3-card mt-6">
-                <Suspense fallback={<div className="py-16 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-[var(--v3-orange)]" /></div>}>
-                  <V3CreateWizard />
-                </Suspense>
-              </div>
-            )}
-
-            {/* Rappel clé IA : uniquement si aucune clé enregistrée */}
-            <div className="mt-4">
-              <V3KeyHint />
-            </div>
-
-            {/* Les passes réelles : Gemini architecte + ChatGPT plume + agents */}
-            <div className="mt-4">
-              <V3PipelinePanel />
             </div>
 
             {/* Modes illustrés — liens discrets */}
@@ -294,18 +320,12 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                 <ImageIcon className="w-3.5 h-3.5" /> Histoires du soir 3-7 ans <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
-
-            {/* Réglage manuel — replié, jamais imposé */}
-            <details className="mt-6 rounded-[22px] border p-4" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
-              <summary className="cursor-pointer text-xs font-semibold" style={{ color: 'var(--v3-muted)' }}>
-                Modifier la fiche à la main (titre, auteur, catégorie, synopsis…)
-              </summary>
-              <div className="mt-4">
-                <V3BriefRecap key={briefKey} variant="full" formOnly hideBookForm={false} />
-              </div>
-            </details>
           </div>
 
+          {/* Colonne « Votre livre en direct » : sommaire unique + texte écrit */}
+          <aside id="sommaire-ia" className="order-first min-w-0 lg:order-last lg:sticky lg:top-24">
+            <V3GenieOutlinePanel key={briefKey} outlineMode={sommaireIa ? 'guided' : undefined} />
+          </aside>
         </div>
 
 
