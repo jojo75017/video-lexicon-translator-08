@@ -39,6 +39,7 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
   const [correctedDraft, setCorrectedDraft] = useState('');
   const [autoState, setAutoState] = useState<'idle' | 'working' | 'error'>('idle');
   const [showBook, setShowBook] = useState(false);
+  const [undoBrief, setUndoBrief] = useState<BookBrief | null>(null);
   const attemptedAuto = useRef<Set<number>>(new Set());
 
 
