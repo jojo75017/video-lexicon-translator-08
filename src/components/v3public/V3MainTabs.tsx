@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { ChevronDown, LayoutGrid, Menu, X, ArrowRight } from 'lucide-react';
+import { ChevronDown, LayoutGrid, Menu, X, ArrowRight, Sparkles } from 'lucide-react';
 import { isRouteNouveau } from '@/data/v3Nouveautes';
 import { V3_HEADER_MENU, type MenuCategory } from '@/data/v3HeaderMenu';
 
@@ -79,6 +79,23 @@ export default function V3MainTabs() {
             <span aria-hidden>✨</span>
             <span>Offre V3 · 1er oct.</span>
           </NavLink>
+          <NavLink
+            to="/v3/upsells"
+            className="v3-btn text-[12px] mr-1"
+            style={({ isActive }) => ({
+              background: isActive ? 'var(--v3-gold)' : 'var(--v3-gold-soft)',
+              color: 'var(--v3-emerald)',
+              border: '1px solid var(--v3-gold)',
+              fontWeight: 700,
+              textShadow: 'none',
+            })}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>UPSELLS</span>
+            <span className="v3-badge">18 tarifs</span>
+          </NavLink>
+
+
 
 
 
