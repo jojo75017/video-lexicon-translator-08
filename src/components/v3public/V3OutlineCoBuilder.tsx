@@ -4,9 +4,11 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import {
-  BOOK_BRIEF_EVENT, listSourcePassages, normalizeOutline, readBookBrief, writeBookBrief,
+  BOOK_BRIEF_EVENT, countWords, listSourcePassages, normalizeOutline, readBookBrief,
+  suggestChapterCount, uncoveredPassages, writeBookBrief,
   type BookBrief, type BriefOutlineChapter,
 } from '@/lib/v3/bookBrief';
+
 import { saveOutlineVersion } from '@/lib/v3/genieThread';
 
 type Proposal = { titre: string; objectif: string; sources: number[] };
