@@ -149,7 +149,10 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
       void persist(next);
       if (automatic) setAutoState('idle');
       if ((data as any)?.shorter) {
-        toast.warning(`Passage ${index} : la version corrigée est plus courte, relancez la correction.`);
+        setShortWarning(index);
+        toast.warning(`Passage ${index} : le Génie a rendu un texte plus court que le vôtre. Vos mots restent intacts.`);
+      } else {
+        setShortWarning((value) => (value === index ? null : value));
       }
       return true;
     } catch (e: any) {
@@ -166,13 +169,6 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
       setBusy(null);
     }
   }, [brief.author, brief.category, brief.emojis, brief.factMemory, brief.language, brief.title, brief.tone, mode, passages]);
-
-  useEffect(() => {
-    const pending = Number(brief.pendingPolishIndex) || 0;
-    if (!pending || busy !== null || entryFor(pending)?.corrected || attemptedAuto.current.has(pending)) return;
-    attemptedAuto.current.add(pending);
-    void correct(pending, true);
-  }, [brief.pendingPolishIndex, busy, correct, polished]);
 
   const correctAll = async () => {
     setRunningAll(true);
