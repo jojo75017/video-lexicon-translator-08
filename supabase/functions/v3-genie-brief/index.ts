@@ -189,9 +189,9 @@ Règles absolues :
 ${String(body.previousPassage || "").trim()
   ? `- RACCORD OBLIGATOIRE : ce passage vient juste après le texte ci-dessous. Commence par une transition naturelle (un mot, une phrase) pour que la lecture soit continue, sans répéter le contenu de ce texte précédent, sans le réécrire et sans le résumer :\n"""${String(body.previousPassage).slice(-3000)}"""`
   : ""}
-${body.emojis === true
-  ? "- l'auteur accepte les emojis : place AU MAXIMUM UN SEUL emoji discret dans tout le passage, jamais deux à la suite, jamais en début de phrase, jamais dans un passage grave (deuil, maladie, accident, violence) ; si le passage est grave, n'en mets aucun ;"
-  : "- AUCUN emoji, aucun pictogramme, aucun symbole décoratif ;"}
+${body.emojis === false
+  ? "- AUCUN emoji, aucun pictogramme, aucun symbole décoratif ;"
+  : "- l'auteur accepte les emojis : place AU MAXIMUM UN SEUL emoji discret dans tout le passage, jamais deux à la suite, jamais en début de phrase, jamais dans un passage grave (deuil, maladie, accident, violence) ; si le passage est grave, n'en mets aucun ;"}
 - "notes" : une phrase disant ce que tu as corrigé (facultatif).`;
 
       const rp = await askAI(polishPrompt);
@@ -207,12 +207,40 @@ ${body.emojis === true
         });
       }
       const parsedPolish = parseJson(String(rp.text || ""));
-      const corrected = String(parsedPolish?.corrected || "").trim();
+      let corrected = String(parsedPolish?.corrected || "").trim();
       if (!corrected) return json(502, { error: "Réponse IA illisible. Réessayez." });
-      const words = corrected.split(/\s+/).filter(Boolean).length;
+      let notes = String(parsedPolish?.notes || "").trim();
+      const countWordsOf = (text: string) => text.split(/\s+/).filter(Boolean).length;
+      let words = countWordsOf(corrected);
+
+      // Le passage a été raccourci : UNE seule relance, avec consigne d'expansion.
+      // Il s'agit de compléter le texte de l'auteur, jamais de le résumer.
+      if (words < floor) {
+        const expandPrompt = `Tu as rendu ce passage PLUS COURT que le texte de l'auteur : c'est interdit.
+
+TEXTE DE L'AUTEUR (${floor} mots, à conserver intégralement) :
+"""${passage.slice(0, 20000)}"""
+
+TA VERSION TROP COURTE (${words} mots) :
+"""${corrected.slice(0, 20000)}"""
+
+Reprends la version corrigée en COMPLÉTANT : garde chaque fait, chaque phrase et chaque nuance de l'auteur, développe les phrases inachevées, ne supprime rien, ne résume rien. Le résultat doit contenir AU MOINS ${Math.round(floor * 1.2)} mots.
+Réponds STRICTEMENT en JSON valide, sans markdown : {"corrected":"","notes":""}`;
+        const retry = await askAI(expandPrompt);
+        if (retry?.ok) {
+          const parsedRetry = parseJson(String(retry.text || ""));
+          const expanded = String(parsedRetry?.corrected || "").trim();
+          if (expanded && countWordsOf(expanded) > words) {
+            corrected = expanded;
+            words = countWordsOf(expanded);
+            notes = String(parsedRetry?.notes || notes).trim();
+          }
+        }
+      }
+
       return json(200, {
         corrected,
-        notes: String(parsedPolish?.notes || "").trim(),
+        notes,
         words,
         originalWords: floor,
         // Garde-fou visible côté écran : jamais moins de mots que l'auteur.
