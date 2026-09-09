@@ -190,7 +190,7 @@ ${String(body.previousPassage || "").trim()
   ? `- RACCORD OBLIGATOIRE : ce passage vient juste après le texte ci-dessous. Commence par une transition naturelle (un mot, une phrase) pour que la lecture soit continue, sans répéter le contenu de ce texte précédent, sans le réécrire et sans le résumer :\n"""${String(body.previousPassage).slice(-3000)}"""`
   : ""}
 ${body.emojis === true
-  ? "- l'auteur accepte les emojis : place AU MAXIMUM un ou deux emojis discrets dans tout le passage, jamais en début de phrase, jamais dans un passage grave (deuil, maladie, accident, violence) ; si le passage est grave, n'en mets aucun ;"
+  ? "- l'auteur accepte les emojis : place AU MAXIMUM UN SEUL emoji discret dans tout le passage, jamais deux à la suite, jamais en début de phrase, jamais dans un passage grave (deuil, maladie, accident, violence) ; si le passage est grave, n'en mets aucun ;"
   : "- AUCUN emoji, aucun pictogramme, aucun symbole décoratif ;"}
 - "notes" : une phrase disant ce que tu as corrigé (facultatif).`;
 
