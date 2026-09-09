@@ -101,6 +101,10 @@ Deno.serve(async (req) => {
       passage?: string;
       /** Contexte : numéro du passage et titre du livre. */
       passageIndex?: number;
+      /** Texte qui précède : le passage corrigé doit s'y raccorder naturellement. */
+      previousPassage?: string;
+      /** L'auteur accepte un ou deux emojis discrets dans le texte. */
+      emojis?: boolean;
     };
     const message = String(body.message || "").trim();
     const mode = String(body.mode || "brief");
