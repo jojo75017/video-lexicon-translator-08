@@ -107,7 +107,15 @@ serve(async (req) => {
     if (session.mode === "subscription") {
       const subscriptionId = (session as any).subscription as string;
       if (subscriptionId) {
-        const sub = await stripe.subscriptions.retrieve(subscriptionId);
+        const sub = await retrieveWithFallback<any>(
+          `/subscriptions/${subscriptionId}`,
+          envName,
+          async () => {
+            if (!legacyStripe) throw new Error("Stripe non configuré");
+            return await legacyStripe.subscriptions.retrieve(subscriptionId) as any;
+          },
+        );
+
         if (sub.trial_end) {
           trialEndsAt = new Date(sub.trial_end * 1000).toISOString();
           subscriberStatus = "trialing";
