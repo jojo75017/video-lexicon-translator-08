@@ -346,7 +346,11 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
       </div>
 
 
-      <div className="mt-4 space-y-3">
+      <p className="mt-4 text-[11px]" style={{ color: 'var(--v3-muted)' }}>
+        Modifier, corriger et valider chaque texte, un par un :
+      </p>
+      <div className="mt-2 max-h-[60vh] space-y-3 overflow-y-auto pr-1">
+
         {passages.map((original, i) => {
           const index = i + 1;
           const entry = entryFor(index);
