@@ -212,22 +212,69 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
           </div>
         )}
 
-        {/* Hero « Ebookstudio-Génie » */}
+        {/* Ma maison d'édition : on explique avant de faire */}
         {!openedBook && (
-        <div className="mt-6 text-center">
-          <span className="v3-chip v3-chip-orange">
-            <Sparkles className="w-3.5 h-3.5" /> {biography ? 'Biographie — Le récit de votre vie' : 'Ebookstudio-Génie'}
-          </span>
-          <h1 className="v3-serif text-4xl md:text-5xl font-bold mt-4 leading-tight" style={{ color: 'var(--v3-ink)' }}>
-            {biography ? 'Racontez votre vie, nous en faisons un livre' : 'Commencez à créer votre livre'}
-          </h1>
-          <p className="mt-3 text-sm md:text-base" style={{ color: 'var(--v3-muted)' }}>
-            {biography
-              ? 'Une question à la fois, période après période. Vos mots sont conservés et corrigés, jamais résumés, et le sommaire suit l’ordre réel de votre vie.'
-              : 'Parlez de votre projet à Ebookstudio-Génie. Il construit le sommaire avec vous, rédige les chapitres, puis va jusqu’à l’export et la couverture.'}
-          </p>
+        <div className="mt-6">
+          <div className="text-center">
+            <span className="v3-chip v3-chip-orange">
+              <Sparkles className="w-3.5 h-3.5" /> {biography ? 'Biographie — Le récit de votre vie' : 'Ma maison d’édition'}
+            </span>
+            <h1 className="v3-serif text-4xl md:text-5xl font-bold mt-4 leading-tight" style={{ color: 'var(--v3-ink)' }}>
+              {biography ? 'Racontez votre vie, nous en faisons un livre' : 'Ici, vous racontez. Nous fabriquons le livre.'}
+            </h1>
+            <p className="mt-3 text-sm md:text-base" style={{ color: 'var(--v3-muted)' }}>
+              Vous n’avez ni plan à préparer, ni mise en page à faire, ni peur de mal écrire.
+              Vous écrivez comme vous parlez, et tout le reste se fabrique ici.
+            </p>
+          </div>
+
+          {!hasStory && (
+            <>
+              <div className="mt-5 grid gap-3 md:grid-cols-3">
+                {[
+                  {
+                    n: '1', t: 'Vous racontez',
+                    d: 'Vos mots, vos souvenirs, vos idées, dans l’ordre qui vous vient. Fautes et phrases longues : aucune importance. Aucun plan à faire à l’avance.',
+                  },
+                  {
+                    n: '2', t: 'Le Génie corrige',
+                    d: 'Il réécrit proprement, sans jamais résumer ni raccourcir : jamais moins de mots que vous. Vos mots d’origine restent visibles et récupérables.',
+                  },
+                  {
+                    n: '3', t: 'Le livre se monte',
+                    d: 'Le sommaire est déduit de VOTRE texte — pas l’inverse. Puis la rédaction, l’export Word ou PDF, la couverture, les données Amazon et l’audio.',
+                  },
+                ].map((c) => (
+                  <div key={c.n} className="rounded-[22px] border p-4" style={{ borderColor: 'rgba(201,168,76,0.5)', background: '#fff' }}>
+                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold"
+                      style={{ background: 'var(--v3-gold, #c9a84c)', color: '#1a1408' }}>{c.n}</span>
+                    <h2 className="v3-serif mt-2 text-lg font-bold" style={{ color: 'var(--v3-ink)' }}>{c.t}</h2>
+                    <p className="mt-1 text-[12.5px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>{c.d}</p>
+                  </div>
+                ))}
+              </div>
+
+              <p className="mt-4 rounded-[22px] border px-4 py-3 text-[12.5px] leading-relaxed"
+                style={{ borderColor: 'rgba(15,107,74,0.35)', background: 'rgba(15,107,74,0.06)', color: 'var(--v3-ink)' }}>
+                <strong>Vous pouvez arrêter à tout moment.</strong> Chaque texte envoyé est enregistré
+                aussitôt, avec l’heure du dernier enregistrement affichée sous « Votre livre ». Vous
+                fermez la page, vous revenez demain ou depuis un autre ordinateur, et vous reprenez
+                exactement où vous en étiez. Vous n’avez rien à sauvegarder vous-même.
+              </p>
+
+              <div className="mt-4 flex flex-wrap justify-center gap-2">
+                <Link to="/v3/create" className={`v3-btn text-xs ${biography ? 'v3-btn-outline' : 'v3-btn-primary'}`}>
+                  <BookOpen className="w-3.5 h-3.5" /> Je raconte un livre
+                </Link>
+                <Link to="/v3/biographie" className={`v3-btn text-xs ${biography ? 'v3-btn-primary' : 'v3-btn-outline'}`}>
+                  <Sparkles className="w-3.5 h-3.5" /> Je raconte ma vie
+                </Link>
+              </div>
+            </>
+          )}
         </div>
         )}
+
 
         {/* Reprendre un livre déjà commencé */}
         {!openedBook && (
