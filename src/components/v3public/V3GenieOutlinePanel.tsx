@@ -185,16 +185,16 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
           ))}
         </div>
 
-        {/* Réglages du livre : c'est l'auteur qui décide, l'IA ne les touche plus */}
-        <div className="mt-3 rounded-2xl border p-3" style={{ borderColor: 'rgba(201,168,76,0.45)', background: 'rgba(201,168,76,0.06)' }}>
-          <div className="flex items-center justify-between gap-2">
+        {/* Réglages du livre : repliés, l'auteur les ouvre quand il veut */}
+        <details className="mt-3 rounded-2xl border p-3" style={{ borderColor: 'rgba(201,168,76,0.45)', background: 'rgba(201,168,76,0.06)' }}>
+          <summary className="flex cursor-pointer items-center justify-between gap-2">
             <span className="inline-flex items-center gap-1.5 text-[11.5px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
               <SlidersHorizontal className="h-3.5 w-3.5" /> Réglages du livre
             </span>
             <span className="text-[10.5px]" style={{ color: 'var(--v3-muted)' }}>
               ≈ {estimatedTotal.toLocaleString('fr-FR')} mots au total
             </span>
-          </div>
+          </summary>
 
           <div className="mt-2 space-y-2">
             <SettingField label="Titre" field="title" locked={isFieldLocked(brief, 'title')} onUnlock={unlock}>
