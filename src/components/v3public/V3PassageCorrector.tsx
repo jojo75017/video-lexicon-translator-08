@@ -4,8 +4,8 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import {
-  BOOK_BRIEF_EVENT, countWords, insertSourcePassage, listSourcePassages, missingProtectedTerms,
-  narrativeForBook, readBookBrief, replaceSourcePassage, suggestChapterCount, upsertPolished,
+  BOOK_BRIEF_EVENT, countWords, hasEmojis, insertSourcePassage, listSourcePassages, missingProtectedTerms,
+  narrativeForBook, passageForBook, readBookBrief, replaceSourcePassage, stripEmojis, suggestChapterCount, upsertPolished,
   updateCorrectedPassage, writeBookBrief, type BookBrief,
 } from '@/lib/v3/bookBrief';
 import { saveBookDraftToCloud } from '@/lib/v3/bookDraftCloud';
