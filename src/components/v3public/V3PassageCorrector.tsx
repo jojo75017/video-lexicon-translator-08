@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Check, ListOrdered, Loader2, Plus, RefreshCw, Save, ShieldCheck, Sparkles, Undo2, Wand2 } from 'lucide-react';
+import { BookOpen, Check, ListOrdered, Loader2, Plus, RefreshCw, Save, ShieldCheck, Sparkles, Undo2, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
@@ -10,6 +10,9 @@ import {
 } from '@/lib/v3/bookBrief';
 import { saveBookDraftToCloud } from '@/lib/v3/bookDraftCloud';
 
+
+/** Papier crème : la couleur du livre validé, à l'écran comme dans l'aperçu. */
+const CREAM = '#FBF6E8';
 
 /**
  * « Comme Copilot » : l'auteur écrit ses idées telles qu'elles viennent, le Génie
@@ -31,6 +34,7 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
   const [editingCorrection, setEditingCorrection] = useState<number | null>(null);
   const [correctedDraft, setCorrectedDraft] = useState('');
   const [autoState, setAutoState] = useState<'idle' | 'working' | 'error'>('idle');
+  const [showBook, setShowBook] = useState(false);
   const attemptedAuto = useRef<Set<number>>(new Set());
 
 
@@ -44,7 +48,11 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
   const passages = useMemo(() => listSourcePassages(brief.sourceText || ''), [brief.sourceText]);
   const polished = brief.polished || [];
   const entryFor = (index: number) => polished.find((p) => p.index === index);
-  const validatedCount = polished.filter((p) => p.validatedAt).length;
+  const validatedList = polished
+    .filter((p) => Boolean(p.validatedAt) && Boolean(p.corrected?.trim()))
+    .slice()
+    .sort((a, b) => a.index - b.index);
+  const validatedCount = validatedList.length;
 
   const originalWords = passages.reduce((t, p) => t + countWords(p), 0);
   const bookWords = countWords(narrativeForBook(brief));
@@ -69,14 +77,20 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
     toast.success(`Texte ${index} modifié et enregistré. L’ancienne correction a été retirée.`);
   };
 
+  /**
+   * Passage oublié : il est inséré à sa place, puis corrigé tout seul et raccordé
+   * au texte qui le précède (voir `pendingPolishIndex`).
+   */
   const addPassage = (afterIndex: number) => {
     if (!addition.trim()) return;
-    const next = insertSourcePassage(readBookBrief() || {}, afterIndex, addition);
-    patch(next);
+    const inserted = insertSourcePassage(readBookBrief() || {}, afterIndex, addition);
+    const newIndex = afterIndex + 1;
+    attemptedAuto.current.delete(newIndex);
+    const next = patch({ ...inserted, pendingPolishIndex: newIndex });
     void persist(next);
     setAddingAfter(null);
     setAddition('');
-    toast.success('Le passage oublié a été ajouté au récit.');
+    toast.success('Passage ajouté. Le Génie le corrige et le raccorde à votre récit…');
   };
 
   const saveCorrectedEdit = (index: number) => {
@@ -114,6 +128,9 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
           tone: brief.tone || '',
           language: brief.language || 'fr',
           factMemory: brief.factMemory || [],
+          // Raccord : le passage doit s'enchaîner avec le texte qui le précède.
+          previousPassage: index > 1 ? (passages[index - 2] || '').slice(-3000) : '',
+          emojis: brief.emojis === true,
           userApiKey,
         },
       });
@@ -147,7 +164,7 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
     } finally {
       setBusy(null);
     }
-  }, [brief.author, brief.category, brief.factMemory, brief.language, brief.title, brief.tone, mode, passages]);
+  }, [brief.author, brief.category, brief.emojis, brief.factMemory, brief.language, brief.title, brief.tone, mode, passages]);
 
   useEffect(() => {
     const pending = Number(brief.pendingPolishIndex) || 0;
@@ -230,6 +247,44 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
         </span>
       </div>
 
+      {/* Le livre tel qu'il est aujourd'hui : passages validés, sur papier crème. */}
+      <div className="mt-3 rounded-2xl border p-3" style={{ borderColor: 'rgba(201,168,76,0.5)', background: CREAM }}>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="text-[12.5px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+            Votre livre : {validatedCount} texte(s) validé(s) · {bookWords.toLocaleString('fr-FR')} mots
+          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <label className="inline-flex items-center gap-1.5 text-[11.5px]" style={{ color: 'var(--v3-ink)' }}>
+              <input type="checkbox" checked={brief.emojis === true}
+                onChange={(event) => {
+                  const next = patch({ emojis: event.target.checked });
+                  void persist(next);
+                  toast.success(event.target.checked
+                    ? 'Le Génie pourra glisser un ou deux emojis discrets par texte.'
+                    : 'Plus aucun emoji dans votre texte.');
+                }} />
+              Quelques emojis dans mon texte
+            </label>
+            <button type="button" onClick={() => setShowBook((value) => !value)} className="v3-btn v3-btn-outline text-[11px]">
+              <BookOpen className="h-3 w-3" /> {showBook ? 'Fermer la lecture' : 'Lire mon livre'}
+            </button>
+          </div>
+        </div>
+        {showBook && (
+          <div className="mt-3 rounded-xl border p-4" style={{ borderColor: 'rgba(201,168,76,0.45)', background: '#fffdf6' }}>
+            {validatedCount ? (
+              <p className="whitespace-pre-wrap text-[13.5px] leading-7" style={{ color: 'var(--v3-ink)' }}>
+                {validatedList.map((p) => p.corrected.trim()).join('\n\n')}
+              </p>
+            ) : (
+              <p className="text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
+                Aucun texte validé pour l’instant. Validez une correction et elle apparaîtra ici, sur papier crème.
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+
       {autoState === 'working' && (
         <p className="mt-3 inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs" style={{ borderColor: 'rgba(201,168,76,0.5)', color: '#8a6d1f' }}>
           <Loader2 className="h-3.5 w-3.5 animate-spin" /> Votre dernier texte est enregistré. Le Génie prépare maintenant sa version corrigée…
@@ -277,8 +332,8 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
           return (
             <div key={index} className="rounded-2xl border p-3"
               style={{
-                borderColor: validated ? 'rgba(15,107,74,0.45)' : 'rgba(201,168,76,0.45)',
-                background: validated ? 'rgba(15,107,74,0.05)' : 'rgba(201,168,76,0.05)',
+                borderColor: validated ? 'rgba(201,168,76,0.75)' : 'rgba(201,168,76,0.35)',
+                background: validated ? CREAM : entry?.corrected ? 'rgba(201,168,76,0.06)' : '#fff',
               }}>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: '#8a6d1f' }}>
