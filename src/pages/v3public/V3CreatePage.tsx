@@ -18,7 +18,7 @@ import V3OutlineCoBuilder from '@/components/v3public/V3OutlineCoBuilder';
 import V3PassageCorrector from '@/components/v3public/V3PassageCorrector';
 
 import { BOOK_BRIEF_EVENT, readBookBrief, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
-import { restoreDraftState } from '@/lib/v3/bookDraftCloud';
+import { restoreDraftState, BOOK_DRAFT_STATUS_EVENT, type BookDraftStatus } from '@/lib/v3/bookDraftCloud';
 import { writeLocalThread } from '@/lib/v3/genieThread';
 
 
@@ -420,5 +420,28 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
 
       </div>
     </section>
+  );
+}
+
+/** Une seule ligne de vérité sur la sauvegarde : compte, appareil, ou échec. */
+function SaveStatusLine() {
+  const [status, setStatus] = useState<BookDraftStatus>(() => {
+    const at = readBookBrief()?.cloudSavedAt;
+    return at ? { state: 'saved', at } : { state: 'local' };
+  });
+  useEffect(() => {
+    const onStatus = (event: Event) => setStatus((event as CustomEvent<BookDraftStatus>).detail);
+    window.addEventListener(BOOK_DRAFT_STATUS_EVENT, onStatus);
+    return () => window.removeEventListener(BOOK_DRAFT_STATUS_EVENT, onStatus);
+  }, []);
+  const hour = status.at ? new Date(status.at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '';
+  const text = status.state === 'saving' ? 'Enregistrement en cours…'
+    : status.state === 'saved' ? `Enregistré sur votre compte à ${hour} — vous pouvez reprendre depuis un autre ordinateur.`
+    : status.state === 'error' ? 'Conservé sur cet appareil : la sauvegarde du compte a échoué, elle sera retentée.'
+    : 'Conservé sur cet appareil — connectez-vous pour reprendre ailleurs.';
+  return (
+    <p className="mt-5 text-center text-[12px]" style={{ color: status.state === 'error' ? '#b45309' : 'var(--v3-muted)' }}>
+      {text}
+    </p>
   );
 }
