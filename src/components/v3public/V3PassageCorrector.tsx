@@ -5,8 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import {
   BOOK_BRIEF_EVENT, countWords, listSourcePassages, narrativeForBook, readBookBrief,
-  upsertPolished, writeBookBrief, type BookBrief,
+  suggestChapterCount, upsertPolished, writeBookBrief, type BookBrief,
 } from '@/lib/v3/bookBrief';
+
 
 /**
  * « Comme Copilot » : l'auteur écrit ses idées telles qu'elles viennent, le Génie
@@ -72,7 +73,7 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
       const current = readBookBrief() || {};
       patch({ polished: upsertPolished(current, { index, original, corrected }) });
       if ((data as any)?.shorter) {
-        toast.warning(`Passage ${index} : la version corrigée est plus courte, relancez la correction.`);
+        toast.warning(`Texte ${index} : la version corrigée est plus courte, relancez la correction.`);
       }
       return true;
     } catch (e: any) {
@@ -104,13 +105,13 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
       return;
     }
     patch({ polished: upsertPolished(current, { ...entry, validatedAt: new Date().toISOString() }) });
-    toast.success(`Passage ${index} validé — il entrera dans le livre ainsi.`);
+    toast.success(`Texte ${index} validé — il entrera dans le livre ainsi.`);
   };
 
   const keepOriginal = (index: number) => {
     const current = readBookBrief() || {};
     patch({ polished: (current.polished || []).filter((p) => p.index !== index) });
-    toast.success(`Passage ${index} : vos mots d’origine sont conservés.`);
+    toast.success(`Texte ${index} : vos mots d’origine sont conservés.`);
   };
 
   const validateAll = () => {
@@ -182,8 +183,9 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
               }}>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: '#8a6d1f' }}>
-                  Passage {index}
+                  Texte {index}
                 </span>
+
                 <span className="text-[11px]" style={{ color: validated ? '#0f6b4a' : 'var(--v3-muted)' }}>
                   {validated
                     ? 'Validé — entre dans le livre'
