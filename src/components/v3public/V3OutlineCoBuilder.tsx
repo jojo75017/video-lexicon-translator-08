@@ -225,7 +225,7 @@ export default function V3OutlineCoBuilder() {
               {passages.length > 0 && (
                 p.sources.length ? (
                   <p className="mt-1 text-[11px] font-semibold" style={{ color: '#0f6b4a' }}>
-                    D’après votre récit — passage(s) {p.sources.join(', ')} :
+                    D’après votre récit — texte(s) {p.sources.join(', ')} :
                     <span className="ml-1 font-normal" style={{ color: 'var(--v3-muted)' }}>
                       « {String(passages[p.sources[0] - 1] || '').slice(0, 120)}… »
                     </span>
