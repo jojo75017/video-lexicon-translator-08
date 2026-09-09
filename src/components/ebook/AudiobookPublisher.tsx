@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { downloadAudiobookHtml } from '@/utils/generateAudiobookHtml';
+import { sanitizePaypalLink } from '@/lib/audiobookPaymentLink';
 
 interface AudiobookPublisherProps {
   ebookTitle?: string;
@@ -241,7 +242,7 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
       const paypal = sanitizePaypalLink(paypalLink);
       if (paypal.error) {
         toast.error(paypal.error);
-        setIsPublishing(false);
+        setUploading(false);
         return;
       }
 
