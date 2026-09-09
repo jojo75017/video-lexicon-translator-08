@@ -154,8 +154,9 @@ export default function V3OutlineCoBuilder() {
       </div>
 
       <p className="mt-2 text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
-        Le Génie propose 3 chapitres à la fois, en suivant votre récit dans l’ordre. Vous gardez,
-        reformulez ou retirez — le sommaire n’est validé que par votre clic.
+        Vous avez écrit d’abord : le sommaire se construit maintenant à partir de votre texte, jamais
+        à l’avance. Le Génie propose 3 chapitres à la fois, en suivant votre récit dans l’ordre. Vous
+        gardez, reformulez ou retirez — le sommaire n’est validé que par votre clic.
       </p>
 
       {brief.mode === 'biography' && (
@@ -166,13 +167,42 @@ export default function V3OutlineCoBuilder() {
         </p>
       )}
 
-      {passages.length > 0 && (
+      {sourceWords > 0 ? (
         <p className="mt-2 rounded-xl border px-2.5 py-2 text-[11.5px]"
           style={{ borderColor: 'rgba(15,107,74,0.35)', background: 'rgba(15,107,74,0.06)', color: 'var(--v3-ink)' }}>
-          Votre récit compte <strong>{passages.length} passage(s)</strong> — {coveredCount} déjà rattaché(s) à un
-          chapitre. Chaque chapitre proposé indique les passages qu’il raconte.
+          Vous avez écrit <strong>{sourceWords.toLocaleString('fr-FR')} mots</strong> en{' '}
+          {passages.length} texte(s) : je propose <strong>{suggested} chapitre(s)</strong>.
+          {coveredCount > 0 ? ` ${coveredCount} de vos textes sont déjà rattachés à un chapitre.` : ''}{' '}
+          Chaque chapitre proposé indique de quels textes il vient — rien n’est jeté.
+        </p>
+      ) : (
+        <p className="mt-2 rounded-xl border px-2.5 py-2 text-[11.5px]"
+          style={{ borderColor: 'rgba(201,168,76,0.45)', background: 'rgba(201,168,76,0.08)', color: 'var(--v3-ink)' }}>
+          Continuez à raconter à l’étape ① : je m’occupe du plan quand vous aurez fini. Le nombre de
+          chapitres sera calculé sur ce que vous aurez vraiment écrit.
         </p>
       )}
+
+      {outline.length > 0 && pending.length > 0 && (
+        <div className="mt-2 rounded-xl border px-2.5 py-2 text-[11.5px]"
+          style={{ borderColor: 'rgba(201,168,76,0.55)', background: 'rgba(201,168,76,0.10)', color: 'var(--v3-ink)' }}>
+          Vous avez ajouté <strong>{pendingWords.toLocaleString('fr-FR')} mots</strong> depuis la
+          construction du sommaire (texte{pending.length > 1 ? 's' : ''} {pending.join(', ')})
+          {missingChapters > 0 ? ` : environ ${missingChapters} chapitre(s) s’ajoutent à la fin.` : '.'}
+          <div className="mt-2">
+            <button type="button" disabled={loading}
+              onClick={() => propose(
+                `J'ai ajouté de la matière : mes textes ${pending.join(', ')} ne sont rattachés à aucun chapitre. `
+                + `Ne touche PAS aux chapitres déjà gardés. Propose uniquement les chapitres qui manquent à la fin `
+                + `pour couvrir ces textes, dans l'ordre, et indique pour chacun les numéros de textes qu'il raconte.`,
+              )}
+              className="v3-btn v3-btn-outline text-[11px] disabled:opacity-50">
+              <RefreshCw className="h-3 w-3" /> Mettre à jour le sommaire
+            </button>
+          </div>
+        </div>
+      )}
+
 
       {proposals.length > 0 && (
         <div className="mt-3 space-y-2">
