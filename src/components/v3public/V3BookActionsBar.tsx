@@ -151,6 +151,23 @@ export default function V3BookActionsBar({ onLaunch }: { onLaunch: () => void })
           <BarChart3 className="h-3.5 w-3.5" /> Données KDP
         </Link>
 
+        <button type="button" onClick={() => exportBook('docx')} disabled={writtenCount === 0}
+          title={writtenCount === 0 ? 'Disponible après le premier chapitre écrit' : 'Télécharger le manuscrit au format Word'}
+          className="v3-btn v3-btn-outline justify-center text-xs disabled:opacity-50">
+          <Download className="h-3.5 w-3.5" /> Exporter en Word
+        </button>
+
+        <button type="button" onClick={() => exportBook('pdf')} disabled={writtenCount === 0}
+          title={writtenCount === 0 ? 'Disponible après le premier chapitre écrit' : 'Télécharger le manuscrit au format PDF'}
+          className="v3-btn v3-btn-outline justify-center text-xs disabled:opacity-50">
+          <Download className="h-3.5 w-3.5" /> Exporter en PDF
+        </button>
+
+        <Link to="/v3/hub?tab=parcours&module=cover-studio-pro" className="v3-btn v3-btn-gold justify-center text-xs"
+          title="Créer la couverture de votre livre">
+          <Palette className="h-3.5 w-3.5" /> Faire ma couverture
+        </Link>
+
         <Link to={projectId ? `/v3/outils/traduction?projectId=${projectId}` : '/v3/outils/traduction'} className="v3-btn v3-btn-outline justify-center text-xs">
           <Languages className="h-3.5 w-3.5" /> Traduire (10 langues)
         </Link>
