@@ -274,7 +274,7 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
           <div className="mt-3 rounded-xl border p-4" style={{ borderColor: 'rgba(201,168,76,0.45)', background: '#fffdf6' }}>
             {validatedCount ? (
               <p className="whitespace-pre-wrap text-[13.5px] leading-7" style={{ color: 'var(--v3-ink)' }}>
-                {validated.map((p) => p.corrected.trim()).join('\n\n')}
+                {validatedList.map((p) => p.corrected.trim()).join('\n\n')}
               </p>
             ) : (
               <p className="text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
