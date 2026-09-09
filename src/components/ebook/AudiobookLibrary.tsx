@@ -11,6 +11,7 @@ import {
   Headphones, Search, Download, Trash2, Play,
   Calendar, Music, RefreshCw, Clock, Volume2, Globe, Lock, Pencil
 } from 'lucide-react';
+import { sanitizePaypalLink } from '@/lib/audiobookPaymentLink';
 
 interface LibraryAudiobook {
   id: string;
