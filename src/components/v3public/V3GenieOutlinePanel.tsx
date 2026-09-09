@@ -94,7 +94,6 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
   useEffect(() => {
     if (autoSwitched.current || progress.chapters.length === 0) return;
     autoSwitched.current = true;
-    setTab('written');
     setOpenIndex(progress.chapters[progress.chapters.length - 1].index);
   }, [progress.chapters.length]);
 
