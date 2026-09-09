@@ -73,6 +73,9 @@ export default function V3HomePage() {
       {/* LANCEMENT — fin du 47 € le 30 septembre, V3 le 1er octobre */}
       <V3LaunchBanner />
 
+      {/* SUPERBE PROMO — Ebook Comic Agent (offre partenaire), grand bandeau */}
+      <ComicAgentTeaser variant="large" />
+
       {/* BANDEAU D'ACCROCHE — premier module */}
       <V3HeroBanner />
 
@@ -84,8 +87,6 @@ export default function V3HomePage() {
         <BdComicNewsBanner />
       </div>
 
-      {/* NOUVEAU — Ebook Comic Agent (offre partenaire), encart discret */}
-      <ComicAgentTeaser />
 
       {/* CE QUI A CHANGÉ — Sommaire IA + 25 agents en vedette */}
       <V3WhatsNewPanel />
