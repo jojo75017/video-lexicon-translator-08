@@ -11,6 +11,9 @@ import {
 import { saveBookDraftToCloud } from '@/lib/v3/bookDraftCloud';
 
 
+/** Papier crème : la couleur du livre validé, à l'écran comme dans l'aperçu. */
+const CREAM = '#FBF6E8';
+
 /**
  * « Comme Copilot » : l'auteur écrit ses idées telles qu'elles viennent, le Génie
  * les lui rend corrigées et développées, et chaque passage validé est enregistré
@@ -45,7 +48,11 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
   const passages = useMemo(() => listSourcePassages(brief.sourceText || ''), [brief.sourceText]);
   const polished = brief.polished || [];
   const entryFor = (index: number) => polished.find((p) => p.index === index);
-  const validatedCount = polished.filter((p) => p.validatedAt).length;
+  const validatedList = polished
+    .filter((p) => Boolean(p.validatedAt) && Boolean(p.corrected?.trim()))
+    .slice()
+    .sort((a, b) => a.index - b.index);
+  const validatedCount = validatedList.length;
 
   const originalWords = passages.reduce((t, p) => t + countWords(p), 0);
   const bookWords = countWords(narrativeForBook(brief));
