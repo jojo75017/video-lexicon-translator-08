@@ -239,7 +239,7 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
                 <button type="button" onClick={() => correct(index)} disabled={busy === index || runningAll}
                   className="v3-btn v3-btn-outline text-[11px] disabled:opacity-50">
                   {busy === index ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
-                  {entry?.corrected ? 'Recorriger' : 'Corriger ce passage'}
+                  {entry?.corrected ? 'Recorriger' : 'Corriger ce texte'}
                 </button>
                 {entry?.corrected && !validated && (
                   <button type="button" onClick={() => validate(index)} className="v3-btn v3-btn-primary text-[11px]">
