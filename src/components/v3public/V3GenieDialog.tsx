@@ -148,10 +148,12 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
     const userMessage = makeMessage('user', text);
     setMessages((prev) => [...prev, userMessage]);
     const draftResult = await saveBookDraftToCloud(briefWithSource, { messages: [...messages, userMessage], activeStep: 1 });
+    // Aucune correction automatique : elle part uniquement d'un clic de l'auteur,
+    // pour ne jamais consommer de crédits sans qu'il l'ait demandé.
     const linkedBrief = {
       ...briefWithSource,
       projectId: draftResult.projectId || briefWithSource.projectId,
-      pendingPolishIndex: listSourcePassages(nextSourceText).length,
+      pendingPolishIndex: undefined,
     };
     setBrief(linkedBrief);
     writeBookBrief(linkedBrief);
