@@ -268,13 +268,24 @@ export function appendSourceText(previous: string | undefined, addition: string)
   const addedKey = passageKey(clean);
   if (!addedKey) return base;
 
-  // Déjà présent à l'identique, ou déjà contenu dans un passage plus complet.
-  if (existingKeys.some((key) => key === addedKey || key.includes(addedKey))) return base;
+  // Déjà présent à l'identique : on n'ajoute rien.
+  if (existingKeys.includes(addedKey)) return base;
+
+  /** Un passage n'est « absorbé » que s'il est assez long pour ne pas être
+   *  une phrase d'ouverture réutilisée par hasard (au moins 12 mots). */
+  const substantial = (key: string) => key.split(' ').filter(Boolean).length >= 12;
+
+  // Le nouvel envoi est déjà contenu, mot pour mot, dans un passage plus complet.
+  if (substantial(addedKey) && existingKeys.some((key) => key.includes(addedKey))) return base;
 
   // Le nouvel envoi est une version enrichie d'un passage déjà là : il le remplace.
-  const kept = existing.filter((_, i) => !addedKey.includes(existingKeys[i]));
+  // Les textes courts (première réponse, précision d'une ligne) ne sont jamais effacés.
+  const kept = existing.filter(
+    (_, i) => !(substantial(existingKeys[i]) && addedKey.includes(existingKeys[i])),
+  );
   return [...kept, clean].join('\n\n');
 }
+
 
 /** Nettoie une matière brute déjà enregistrée : supprime les répétitions. */
 export function dedupeSourceText(text: string): string {
@@ -444,6 +455,44 @@ export function normalizeOutline(items: BriefOutlineChapter[]): BriefOutlineChap
 export function listSourcePassages(text: string): string[] {
   return splitPassages(dedupeSourceText(String(text || '')));
 }
+
+/** Nombre de mots réellement écrits par l'auteur (matière brute, sans doublon). */
+export function sourceWordCount(brief: BookBrief | null | undefined): number {
+  return listSourcePassages(brief?.sourceText || '').reduce((total, p) => total + countWords(p), 0);
+}
+
+export const CHAPTER_MIN = 3;
+export const CHAPTER_MAX = 40;
+export const CHAPTER_WARN = 30;
+/** Longueur de chapitre par défaut quand l'auteur n'a rien réglé. */
+export const DEFAULT_WORDS_PER_CHAPTER = 3000;
+
+/**
+ * Nombre de chapitres déduit de ce que l'auteur a VRAIMENT écrit.
+ * On ne demande plus le nombre de chapitres à l'avance : il se calcule à
+ * partir du volume réel de récit, borné entre 3 et 40 chapitres.
+ */
+export function suggestChapterCount(sourceWords: number, wordsPerChapter?: number): number {
+  const per = Math.min(3500, Math.max(1200, Number(wordsPerChapter) || DEFAULT_WORDS_PER_CHAPTER));
+  const words = Math.max(0, Number(sourceWords) || 0);
+  const raw = Math.round(words / per);
+  return Math.min(CHAPTER_MAX, Math.max(CHAPTER_MIN, raw || CHAPTER_MIN));
+}
+
+/**
+ * Passages du récit qui ne sont encore rattachés à aucun chapitre du sommaire :
+ * c'est la matière ajoutée après la construction du sommaire.
+ */
+export function uncoveredPassages(brief: BookBrief | null | undefined): number[] {
+  const total = listSourcePassages(brief?.sourceText || '').length;
+  const covered = new Set(
+    (brief?.outline || []).flatMap((c) => (Array.isArray(c.sources) ? c.sources : [])),
+  );
+  const out: number[] = [];
+  for (let i = 1; i <= total; i++) if (!covered.has(i)) out.push(i);
+  return out;
+}
+
 
 /* ------------------------------------------------------------------ */
 /* Historique des titres sauvegardés (accueil V3)                      */
