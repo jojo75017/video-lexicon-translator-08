@@ -457,6 +457,10 @@ Deno.serve(async (req) => {
       case "checkout.session.completed": {
         const session = event.data.object;
         const plan = session.metadata?.plan;
+        // Complément acheté à l'unité (BookPerfect, audio, traductions…)
+        if (typeof plan === "string" && ADDON_PRICE_MODULES[plan]) {
+          await grantAddonEntitlement(session, plan, env);
+        }
         if (plan === "bookperfect_launch_once") {
           const email = (session.customer_email || session.customer_details?.email || "").toLowerCase();
           if (email) {
