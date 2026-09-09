@@ -354,6 +354,8 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
           </div>
         )}
         </details>
+      </div>
+
 
 
       {/* Aperçu réel du livre, juste sous la fiche du projet */}
