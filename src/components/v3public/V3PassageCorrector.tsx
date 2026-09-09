@@ -40,7 +40,8 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
   const [autoState, setAutoState] = useState<'idle' | 'working' | 'error'>('idle');
   const [showBook, setShowBook] = useState(false);
   const [undoBrief, setUndoBrief] = useState<BookBrief | null>(null);
-  const attemptedAuto = useRef<Set<number>>(new Set());
+  /** Passage dont la correction est revenue plus courte que les mots de l'auteur. */
+  const [shortWarning, setShortWarning] = useState<number | null>(null);
 
 
   useEffect(() => {
