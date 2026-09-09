@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Check, ListOrdered, Loader2, Plus, RefreshCw, Save, ShieldCheck, Sparkles, Undo2, Wand2 } from 'lucide-react';
+import { BookOpen, Check, ListOrdered, Loader2, Plus, RefreshCw, Save, ShieldCheck, Sparkles, Undo2, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
@@ -31,6 +31,7 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
   const [editingCorrection, setEditingCorrection] = useState<number | null>(null);
   const [correctedDraft, setCorrectedDraft] = useState('');
   const [autoState, setAutoState] = useState<'idle' | 'working' | 'error'>('idle');
+  const [showBook, setShowBook] = useState(false);
   const attemptedAuto = useRef<Set<number>>(new Set());
 
 
