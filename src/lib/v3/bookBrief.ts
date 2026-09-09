@@ -107,7 +107,53 @@ export type BookBrief = {
    * dans le livre imprimé). Absent ou faux = aucun emoji.
    */
   emojis?: boolean;
+  /** Police du livre (lecture à l'écran et export). */
+  bookFont?: BookFontId;
+  /** Confort de lecture : taille du texte. */
+  bookSize?: 'small' | 'medium' | 'large';
+  /** Confort de lecture : interligne. */
+  bookLeading?: 'tight' | 'normal' | 'airy';
+  /** Texte justifié comme un livre imprimé (par défaut : oui). */
+  justify?: boolean;
+  /** Dédicace imprimée après la page de titre. */
+  dedication?: string;
+  /** Préface facultative imprimée avant le premier chapitre. */
+  preface?: string;
+  /** Mot de la fin imprimé après le dernier chapitre. */
+  afterword?: string;
 };
+
+/** Polices de livre proposées à l'auteur. */
+export type BookFontId = 'garamond' | 'baskerville' | 'lora';
+
+export const BOOK_FONTS: Array<{ id: BookFontId; label: string; stack: string }> = [
+  { id: 'garamond', label: 'Garamond', stack: '"EB Garamond", Garamond, "Times New Roman", serif' },
+  { id: 'baskerville', label: 'Baskerville', stack: 'Baskerville, "Libre Baskerville", Georgia, serif' },
+  { id: 'lora', label: 'Lora', stack: 'Lora, Georgia, "Times New Roman", serif' },
+];
+
+/**
+ * Réglages de lecture appliqués au livre crème : la même typographie est reprise
+ * par les exports Word et PDF, sans nouveau moteur d'export.
+ */
+export function bookTypography(brief: BookBrief | null | undefined) {
+  const font = BOOK_FONTS.find((f) => f.id === (brief?.bookFont || 'garamond')) || BOOK_FONTS[0];
+  const size = brief?.bookSize === 'small' ? 13 : brief?.bookSize === 'large' ? 17 : 15;
+  const leading = brief?.bookLeading === 'tight' ? 1.55 : brief?.bookLeading === 'airy' ? 2.1 : 1.8;
+  return {
+    fontId: font.id,
+    fontFamily: font.stack,
+    fontLabel: font.label,
+    fontSize: size,
+    lineHeight: leading,
+    justify: brief?.justify !== false,
+  };
+}
+
+/** Estimation du nombre de pages imprimées (environ 280 mots par page). */
+export function estimatedPages(words: number): number {
+  return Math.max(1, Math.round(words / 280));
+}
 
 /** Champs que l'auteur peut verrouiller depuis la colonne « Réglages du livre ». */
 /** Un passage de l'auteur, sa version corrigée et son état de validation. */
