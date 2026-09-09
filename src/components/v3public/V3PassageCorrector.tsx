@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BookOpen, Check, ListOrdered, Loader2, Plus, RefreshCw, Save, ShieldCheck, Sparkles, Trash2, Undo2, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -345,7 +345,7 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
         </p>
         <div className="flex flex-wrap items-center gap-2">
           <label className="inline-flex items-center gap-1.5 text-[11.5px]" style={{ color: 'var(--v3-ink)' }}>
-            <input type="checkbox" checked={brief.emojis === true}
+            <input type="checkbox" checked={brief.emojis !== false}
               onChange={(event) => {
                 const next = patch({ emojis: event.target.checked });
                 void persist(next);
@@ -362,7 +362,14 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
       </div>
 
       {/* Le livre : un seul affichage, sur papier crème, avec ses actions. */}
-      <div className={`mt-3 space-y-5 overflow-y-auto rounded-2xl border p-4 ${showBook ? 'max-h-[85vh]' : 'max-h-[34rem]'}`}
+      {shortWarning !== null && (
+        <p className="mt-3 rounded-xl border px-3 py-2 text-[12px]" style={{ borderColor: '#b45309', color: '#8a4b09', background: '#fff7ed' }}>
+          Passage {shortWarning} : la version rendue était plus courte que vos mots. Vos mots d’origine
+          sont conservés — relancez « Corriger ce passage » ou complétez-le vous-même avec « Modifier mes mots ».
+        </p>
+      )}
+
+      <div className={`mt-3 space-y-5 overflow-y-auto rounded-2xl border p-4 ${showBook ? 'max-h-[85vh]' : 'max-h-[46rem]'}`}
         style={{ borderColor: 'rgba(201,168,76,0.5)', background: CREAM }}>
         {passages.map((original, i) => {
           const index = i + 1;
