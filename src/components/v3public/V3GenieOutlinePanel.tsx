@@ -191,7 +191,14 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
           ))}
         </div>
 
+        {/* Tout le détail du livre est replié : un seul clic pour l'ouvrir */}
+        <details className="mt-3">
+          <summary className="cursor-pointer text-[12px] font-semibold underline" style={{ color: '#8a6d1f' }}>
+            Voir mon sommaire, mes chapitres et mes réglages
+          </summary>
+
         {/* Réglages du livre : repliés, l'auteur les ouvre quand il veut */}
+
         <details className="mt-3 rounded-2xl border p-3" style={{ borderColor: 'rgba(201,168,76,0.45)', background: 'rgba(201,168,76,0.06)' }}>
           <summary className="flex cursor-pointer items-center justify-between gap-2">
             <span className="inline-flex items-center gap-1.5 text-[11.5px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
