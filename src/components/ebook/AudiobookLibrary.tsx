@@ -177,11 +177,17 @@ export const AudiobookLibrary: React.FC = () => {
       ? (editDialog.slug.trim() || editDialog.book.slug || generateSlug(editDialog.book.title))
       : (editDialog.slug.trim() || editDialog.book.slug || null);
 
+    const paypal = sanitizePaypalLink(editDialog.paypalLink);
+    if (paypal.error) {
+      toast.error(paypal.error);
+      return;
+    }
+
     const { error } = await supabase
       .from('audiobooks')
       .update({
         cover_url: editDialog.coverUrl.trim() || null,
-        paypal_link: editDialog.paypalLink.trim() || null,
+        paypal_link: paypal.value,
         excerpt_url: editDialog.excerptUrl.trim() || null,
         price: parsedPrice,
         is_public: shouldBePublic,

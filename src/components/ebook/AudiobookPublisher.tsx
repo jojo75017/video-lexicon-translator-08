@@ -238,6 +238,13 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
 
       const slug = generateSlug(title);
 
+      const paypal = sanitizePaypalLink(paypalLink);
+      if (paypal.error) {
+        toast.error(paypal.error);
+        setIsPublishing(false);
+        return;
+      }
+
       const { error } = await supabase.from('audiobooks').insert({
         user_id: user.id,
         title: title.trim(),
@@ -249,7 +256,7 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
         cover_url: coverUrl || null,
         is_public: isPublic,
         price: price ? parseFloat(price) : null,
-        paypal_link: paypalLink.trim() || null,
+        paypal_link: paypal.value,
         stripe_link: stripeLink.trim() || null,
         slug,
         status: audioUrl ? 'published' : 'draft'
