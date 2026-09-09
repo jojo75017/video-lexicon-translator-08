@@ -186,6 +186,12 @@ Règles absolues :
 - n'invente rien : pas de dialogue, pas de détail sensoriel qui ne soit pas déjà suggéré par l'auteur ;
 - développe en phrases complètes et en paragraphes lisibles : le résultat doit contenir AU MOINS ${floor} mots, idéalement 1,5 fois plus ;
 - garde la voix de l'auteur à la première personne, sans style journalistique ;
+${String(body.previousPassage || "").trim()
+  ? `- RACCORD OBLIGATOIRE : ce passage vient juste après le texte ci-dessous. Commence par une transition naturelle (un mot, une phrase) pour que la lecture soit continue, sans répéter le contenu de ce texte précédent, sans le réécrire et sans le résumer :\n"""${String(body.previousPassage).slice(-3000)}"""`
+  : ""}
+${body.emojis === true
+  ? "- l'auteur accepte les emojis : place AU MAXIMUM un ou deux emojis discrets dans tout le passage, jamais en début de phrase, jamais dans un passage grave (deuil, maladie, accident, violence) ; si le passage est grave, n'en mets aucun ;"
+  : "- AUCUN emoji, aucun pictogramme, aucun symbole décoratif ;"}
 - "notes" : une phrase disant ce que tu as corrigé (facultatif).`;
 
       const rp = await askAI(polishPrompt);
