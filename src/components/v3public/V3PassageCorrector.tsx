@@ -14,6 +14,9 @@ import { saveBookDraftToCloud } from '@/lib/v3/bookDraftCloud';
 /** Papier crème : la couleur du livre validé, à l'écran comme dans l'aperçu. */
 const CREAM = '#FBF6E8';
 
+/** Emojis sobres proposés à l'auteur pour en placer lui-même. */
+const MANUAL_EMOJIS = ['🙂', '❤️', '✨', '🌿', '📖', '🎶', '☀️', '🕊️'];
+
 /**
  * « Comme Copilot » : l'auteur écrit ses idées telles qu'elles viennent, le Génie
  * les lui rend corrigées et développées, et chaque passage validé est enregistré
