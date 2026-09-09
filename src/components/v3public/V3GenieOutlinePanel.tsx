@@ -68,7 +68,13 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
   const autoSwitched = useRef(false);
 
   useEffect(() => {
-    const sync = () => { setBrief(readBookBrief() || {}); setSavedAt(new Date()); };
+    // Seule la sauvegarde du compte fait foi : un simple changement local
+    // ne doit jamais afficher « enregistré ».
+    const sync = () => {
+      const next = readBookBrief() || {};
+      setBrief(next);
+      setSavedAt(next.cloudSavedAt ? new Date(next.cloudSavedAt) : null);
+    };
     sync();
     window.addEventListener(BOOK_BRIEF_EVENT, sync);
     return () => window.removeEventListener(BOOK_BRIEF_EVENT, sync);
@@ -182,14 +188,15 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
           </span>
         </div>
 
-        {(savedAt || saveStatus.at) && (
-          <p className="mt-1 text-[10.5px]" style={{ color: '#0f766e' }}>
-            {saveStatus.state === 'saving' && 'Enregistrement dans votre compte…'}
-            {saveStatus.state === 'saved' && `Sauvegardé dans votre compte à ${new Date(saveStatus.at || Date.now()).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}.`}
-            {saveStatus.state === 'error' && 'Échec de la sauvegarde du compte — votre copie reste sur cet appareil.'}
-            {saveStatus.state === 'local' && `Conservé sur cet appareil à ${(savedAt || new Date()).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}. Connectez-vous pour le retrouver partout.`}
-          </p>
-        )}
+        <p className="mt-1 text-[10.5px]" style={{ color: saveStatus.state === 'error' ? '#b45309' : '#0f766e' }}>
+          {saveStatus.state === 'saving' && 'Enregistrement dans votre compte…'}
+          {saveStatus.state === 'error' && 'Échec de la sauvegarde du compte — votre copie reste sur cet appareil.'}
+          {saveStatus.state !== 'saving' && saveStatus.state !== 'error' && (
+            saveStatus.at || savedAt
+              ? `Sauvegardé dans votre compte à ${new Date(saveStatus.at || savedAt!).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}.`
+              : 'Conservé sur cet appareil — connectez-vous pour le retrouver partout.'
+          )}
+        </p>
 
         <h3 className="v3-serif mt-2 text-xl font-bold" style={{ color: 'var(--v3-ink)' }}>
           {brief.title?.trim() || 'Projet sans titre'}

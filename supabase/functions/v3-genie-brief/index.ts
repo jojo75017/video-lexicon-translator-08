@@ -351,7 +351,7 @@ ${biographyRules}
 - "wantsIllustrations" : true si le sujet appelle des images (enfants, cuisine, voyage, pratique) ;
 - "author" : reprends le nom si l'auteur le donne, sinon "" ;
 - "factMemory" : liste courte et fidèle des personnes avec leurs liens familiaux, dates, lieux et événements explicitement donnés. N'invente rien et ne fusionne jamais deux personnes ;
-- "questions" : 0 à 2 questions courtes qui invitent l'auteur à donner PLUS de détails, de scènes et de souvenirs.`;
+- "questions" : 0 à 2 questions courtes qui suivent EXACTEMENT ce que l'auteur vient d'écrire. Chaque question doit citer littéralement un élément présent dans son texte (un prénom, un lieu, une date, un objet, une scène) et demander la suite ou un détail concret de CE souvenir. INTERDIT de poser une question de cadrage marketing (public visé, promesse, ton, style, nombre de chapitres) ou une question générale qui pourrait s'appliquer à n'importe quel livre.`;
 
 
     const userKey = sanitizeApiKey(body.userApiKey);
@@ -402,11 +402,32 @@ ${biographyRules}
       wantsIllustrations: Boolean(parsed.wantsIllustrations),
       cibleProfil: String(parsed.audience || "").trim(),
       promesseCentrale: String(parsed.promesseCentrale || "").trim(),
+      factMemory: (Array.isArray(parsed.factMemory) ? parsed.factMemory : [])
+        .map((f: unknown) => String(f || "").trim())
+        .filter(Boolean)
+        .slice(0, 24),
     };
 
+    // Filtre déterministe : une question n'est retenue que si elle reprend un mot
+    // du récit de l'auteur, et jamais si c'est une question de cadrage marketing.
+    const authorWords = new Set(
+      `${sourceText} ${message}`
+        .toLocaleLowerCase("fr-FR")
+        .split(/[^\p{L}\p{N}]+/u)
+        .filter((w) => w.length >= 4),
+    );
+    const banned = /(public|cible|lecteur idéal|promesse|ton |style|marketing|catégorie|nombre de chapitres|combien de chapitres|titre)/i;
     const questions = (Array.isArray(parsed.questions) ? parsed.questions : [])
       .map((q: unknown) => String(q || "").trim())
       .filter(Boolean)
+      .filter((q: string) => !banned.test(q))
+      .filter((q: string) => {
+        if (!authorWords.size) return true;
+        return q
+          .toLocaleLowerCase("fr-FR")
+          .split(/[^\p{L}\p{N}]+/u)
+          .some((w) => w.length >= 4 && authorWords.has(w));
+      })
       .slice(0, 2);
 
     return json(200, { brief, questions });

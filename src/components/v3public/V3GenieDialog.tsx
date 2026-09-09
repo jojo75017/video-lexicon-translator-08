@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Sparkles, Wand2, ArrowRight, Check, Upload, FileText, RotateCcw, Loader2, Mic, Pencil, MessageSquare, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -8,7 +8,7 @@ import {
   appendSourceText, mergeRespectingLocks, readBookBrief, resetBookProject, writeBookBrief, type BookBrief,
 } from '@/lib/v3/bookBrief';
 import { saveBookDraftToCloud } from '@/lib/v3/bookDraftCloud';
-import { currentInterviewStep, stepLabel, type InterviewStep } from '@/lib/v3/genieInterview';
+import { currentInterviewStep } from '@/lib/v3/genieInterview';
 
 import {
   clearLocalThread,
@@ -61,7 +61,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
   const [questions, setQuestions] = useState<string[]>([]);
   const [editing, setEditing] = useState(false);
   const [messages, setMessages] = useState<GenieMessage[]>([]);
-  const [showThread, setShowThread] = useState(true);
+  const [showThread, setShowThread] = useState(false);
   const [collapseOld, setCollapseOld] = useState(true);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const resultRef = useRef<HTMLDivElement | null>(null);
@@ -224,32 +224,10 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
     await ask(extra.trim());
   };
 
-  const steps = useMemo(() => ([
-    { label: '1. Votre idée', done: ready },
-    { label: '2. Sommaire IA validé', done: Boolean(brief.outlineValidated) },
-    { label: '3. Rédaction (workflow)', done: false },
-    { label: '4. Export + couverture', done: false },
-  ]), [ready, brief.outlineValidated]);
+  // Les questions du Génie viennent uniquement du texte de l'auteur : deux au maximum.
+  const askedQuestions = questions.slice(0, 2);
+  const sourceWordCount = countTextWords(brief.sourceText || '');
 
-  const step = currentInterviewStep(brief);
-  const [showExample, setShowExample] = useState(false);
-
-  const answerChoice = (current: InterviewStep, option: { value: string; label: string }) => {
-    if (!current.choice) return;
-    const next: BookBrief = { ...brief, [current.choice.field]: option.value } as BookBrief;
-    setBrief(next);
-    writeBookBrief(next);
-    pushMessage(makeMessage('user', option.label), next);
-    setShowExample(false);
-  };
-
-  const skipStep = (current: InterviewStep) => {
-    const skipped = Array.from(new Set([...(brief.interviewSkipped || []), current.id]));
-    const next = { ...brief, interviewSkipped: skipped };
-    setBrief(next);
-    writeBookBrief(next);
-    setShowExample(false);
-  };
 
   const eraseEverything = () => {
     if (!window.confirm('Effacer ce livre et repartir de zéro ? Vos livres déjà enregistrés ne sont pas supprimés.')) return;
@@ -260,7 +238,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
     setBrief({});
     setQuestions([]);
     setInput('');
-    setShowExample(false);
+    
     toast.success('Nouveau départ : la fiche, le sommaire et la conversation sont vides.');
     setTimeout(() => inputRef.current?.focus(), 80);
   };
@@ -277,7 +255,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
         </span>
         <div className="flex items-center gap-2">
           <span className="text-[11px]" style={{ color: 'var(--v3-muted)' }}>
-            {mode === 'biography' ? 'Entretien biographique en 9 étapes · vos mots, dans l’ordre de votre vie' : 'Entretien guidé en 6 étapes · une question à la fois'}
+            Étape 1 sur 3 · J’écris{sourceWordCount > 0 ? ` · ${sourceWordCount} mots conservés` : ''}
           </span>
           <button type="button" onClick={eraseEverything} className="v3-btn v3-btn-ghost text-[11px]">
             <RotateCcw className="h-3 w-3" /> Effacer ce livre
@@ -285,72 +263,12 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
         </div>
       </div>
 
-      <ol className="mt-3 flex flex-wrap gap-2 text-[11px]">
-        {steps.map((s) => (
-          <li key={s.label} className="inline-flex items-center gap-1 rounded-full border px-2.5 py-1"
-            style={{ borderColor: s.done ? 'var(--v3-gold, #c9a84c)' : 'rgba(0,0,0,0.12)', color: 'var(--v3-muted)' }}>
-            {s.done ? <Check className="h-3 w-3" /> : null} {s.label}
-          </li>
-        ))}
-      </ol>
+      <p className="mt-3 text-[12.5px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
+        {mode === 'biography'
+          ? 'Racontez votre vie dans l’ordre qui vous vient. Le Génie lit ce que vous écrivez, le corrige sans jamais le résumer, puis vous pose une question née de vos propres phrases.'
+          : 'Écrivez ou collez votre texte. Le Génie le corrige sans jamais le résumer, puis vous pose une question née de vos propres phrases.'}
+      </p>
 
-      {/* Entretien guidé : l'étape en cours, une seule question */}
-      <div className="mt-4 rounded-3xl border bg-white/88 p-3 md:p-4" style={{ borderColor: 'rgba(201,168,76,0.55)' }}>
-        <div className="flex items-center gap-2">
-          <span className="h-px flex-1" style={{ background: 'rgba(201,168,76,0.45)' }} />
-          <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: '#8a6d1f' }}>
-            {stepLabel(step, brief)}
-          </span>
-          <span className="h-px flex-1" style={{ background: 'rgba(201,168,76,0.45)' }} />
-        </div>
-
-        <p className="mt-3 text-sm leading-relaxed" style={{ color: 'var(--v3-ink)' }}>
-          <Sparkles className="mr-1.5 inline h-3.5 w-3.5" style={{ color: '#8a6d1f' }} />
-          {step.question}
-        </p>
-        {step.hint && (
-          <p className="mt-1 text-[12px]" style={{ color: 'var(--v3-muted)' }}>{step.hint}</p>
-        )}
-
-        <button type="button" onClick={() => setShowExample((v) => !v)}
-          className="mt-2 text-[11px] underline" style={{ color: '#8a6d1f' }}>
-          {showExample ? 'Masquer l’exemple' : 'Montrer un exemple'}
-        </button>
-        {showExample && (
-          <p className="mt-2 rounded-2xl border px-3 py-2 text-[12px] leading-relaxed"
-            style={{ borderColor: 'rgba(201,168,76,0.5)', color: 'var(--v3-muted)' }}>
-            {step.example}
-          </p>
-        )}
-
-        {step.choice && (
-          <div className="mt-3">
-            <div className="text-[11px] font-semibold" style={{ color: 'var(--v3-ink)' }}>{step.choice.label}</div>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {step.choice.options.map((option) => {
-                const active = String((brief as any)[step.choice!.field] || '') === option.value;
-                return (
-                  <button key={option.value} type="button" onClick={() => answerChoice(step, option)}
-                    className="rounded-full border px-3 py-1.5 text-[12px] transition hover:opacity-85"
-                    style={{
-                      borderColor: active ? 'var(--v3-gold, #c9a84c)' : 'rgba(0,0,0,0.12)',
-                      background: active ? 'rgba(201,168,76,0.12)' : '#fff',
-                      color: 'var(--v3-ink)',
-                    }}>
-                    {option.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {step.skippable && (
-          <button type="button" onClick={() => skipStep(step)} className="v3-btn v3-btn-outline mt-3 text-xs">
-            Passer cette question
-          </button>
-        )}
-      </div>
 
 
       {/* Fil de conversation : tout ce que vous avez dit et ce que le Génie a corrigé */}
@@ -461,6 +379,20 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
         </div>
       </div>
 
+      {/* La question du Génie : elle vient de votre texte, jamais d'un questionnaire */}
+      {askedQuestions.length > 0 && (
+        <div className="mt-4 space-y-2">
+          <div className="text-[11px] font-bold uppercase tracking-wider" style={{ color: '#8a6d1f' }}>
+            Le Génie a lu votre texte et vous demande
+          </div>
+          {askedQuestions.map((q) => (
+            <RefineRow key={q} question={q} disabled={loading} onSend={refine} onSkip={() => setQuestions((prev) => prev.filter((item) => item !== q))} />
+          ))}
+        </div>
+      )}
+
+
+
       {!ready && (
         <div className="mt-3 flex flex-wrap gap-2">
           {EXAMPLES.map((ex) => (
@@ -520,13 +452,6 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
             ))}
           </div>
 
-          {questions.length > 0 && (
-            <div className="mt-3 space-y-2">
-              {questions.map((q) => (
-                <RefineRow key={q} question={q} disabled={loading} onSend={refine} />
-              ))}
-            </div>
-          )}
 
           <div className="mt-4 flex flex-wrap gap-2">
             <button type="button" onClick={onReady} className="v3-btn v3-btn-primary">
@@ -565,17 +490,23 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
   );
 }
 
-function RefineRow({ question, disabled, onSend }: { question: string; disabled?: boolean; onSend: (v: string) => void }) {
+function RefineRow({ question, disabled, onSend, onSkip }: {
+  question: string; disabled?: boolean; onSend: (v: string) => void; onSkip?: () => void;
+}) {
   const [value, setValue] = useState('');
   return (
-    <div className="rounded-2xl border bg-white/80 p-2.5" style={{ borderColor: 'rgba(0,0,0,0.10)' }}>
-      <p className="text-xs" style={{ color: 'var(--v3-muted)' }}>🧞 {question}</p>
-      <div className="mt-2 flex gap-2">
-        <input value={value} onChange={(e) => setValue(e.target.value)} placeholder="Votre réponse…"
-          className="flex-1 rounded-xl border bg-white px-2.5 py-1.5 text-xs outline-none"
-          style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }} />
-        <button type="button" disabled={disabled || !value.trim()} onClick={() => onSend(value)}
-          className="v3-btn v3-btn-outline text-xs disabled:opacity-50">Enregistrer ma réponse</button>
+    <div className="rounded-2xl border bg-white p-3" style={{ borderColor: 'rgba(201,168,76,0.55)' }}>
+      <p className="text-[13px] leading-relaxed" style={{ color: 'var(--v3-ink)' }}>🧞 {question}</p>
+      <textarea value={value} onChange={(e) => setValue(e.target.value)} rows={3}
+        placeholder="Votre réponse — elle entre directement dans votre livre, avec vos mots."
+        className="mt-2 w-full resize-none rounded-xl border bg-white px-2.5 py-2 text-[13px] outline-none"
+        style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }} />
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        <button type="button" disabled={disabled || value.trim().length < 10} onClick={() => onSend(value)}
+          className="v3-btn v3-btn-primary text-xs disabled:opacity-50">Ajouter au récit</button>
+        {onSkip && (
+          <button type="button" onClick={onSkip} className="v3-btn v3-btn-ghost text-xs">Je n’ai rien à ajouter</button>
+        )}
       </div>
     </div>
   );
