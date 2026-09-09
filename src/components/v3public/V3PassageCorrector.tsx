@@ -156,7 +156,7 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
     } finally {
       setBusy(null);
     }
-  }, [brief.author, brief.category, brief.factMemory, brief.language, brief.title, brief.tone, mode, passages]);
+  }, [brief.author, brief.category, brief.emojis, brief.factMemory, brief.language, brief.title, brief.tone, mode, passages]);
 
   useEffect(() => {
     const pending = Number(brief.pendingPolishIndex) || 0;
@@ -239,6 +239,44 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
         </span>
       </div>
 
+      {/* Le livre tel qu'il est aujourd'hui : passages validés, sur papier crème. */}
+      <div className="mt-3 rounded-2xl border p-3" style={{ borderColor: 'rgba(201,168,76,0.5)', background: CREAM }}>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="text-[12.5px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+            Votre livre : {validatedCount} texte(s) validé(s) · {bookWords.toLocaleString('fr-FR')} mots
+          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <label className="inline-flex items-center gap-1.5 text-[11.5px]" style={{ color: 'var(--v3-ink)' }}>
+              <input type="checkbox" checked={brief.emojis === true}
+                onChange={(event) => {
+                  const next = patch({ emojis: event.target.checked });
+                  void persist(next);
+                  toast.success(event.target.checked
+                    ? 'Le Génie pourra glisser un ou deux emojis discrets par texte.'
+                    : 'Plus aucun emoji dans votre texte.');
+                }} />
+              Quelques emojis dans mon texte
+            </label>
+            <button type="button" onClick={() => setShowBook((value) => !value)} className="v3-btn v3-btn-outline text-[11px]">
+              <BookOpen className="h-3 w-3" /> {showBook ? 'Fermer la lecture' : 'Lire mon livre'}
+            </button>
+          </div>
+        </div>
+        {showBook && (
+          <div className="mt-3 rounded-xl border p-4" style={{ borderColor: 'rgba(201,168,76,0.45)', background: '#fffdf6' }}>
+            {validatedCount ? (
+              <p className="whitespace-pre-wrap text-[13.5px] leading-7" style={{ color: 'var(--v3-ink)' }}>
+                {validated.map((p) => p.corrected.trim()).join('\n\n')}
+              </p>
+            ) : (
+              <p className="text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
+                Aucun texte validé pour l’instant. Validez une correction et elle apparaîtra ici, sur papier crème.
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+
       {autoState === 'working' && (
         <p className="mt-3 inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs" style={{ borderColor: 'rgba(201,168,76,0.5)', color: '#8a6d1f' }}>
           <Loader2 className="h-3.5 w-3.5 animate-spin" /> Votre dernier texte est enregistré. Le Génie prépare maintenant sa version corrigée…
@@ -286,8 +324,8 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
           return (
             <div key={index} className="rounded-2xl border p-3"
               style={{
-                borderColor: validated ? 'rgba(15,107,74,0.45)' : 'rgba(201,168,76,0.45)',
-                background: validated ? 'rgba(15,107,74,0.05)' : 'rgba(201,168,76,0.05)',
+                borderColor: validated ? 'rgba(201,168,76,0.75)' : 'rgba(201,168,76,0.35)',
+                background: validated ? CREAM : entry?.corrected ? 'rgba(201,168,76,0.06)' : '#fff',
               }}>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: '#8a6d1f' }}>
