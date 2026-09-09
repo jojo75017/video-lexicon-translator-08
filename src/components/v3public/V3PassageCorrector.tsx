@@ -1,14 +1,16 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BookOpen, Check, ListOrdered, Loader2, Plus, RefreshCw, Save, ShieldCheck, Sparkles, Trash2, Undo2, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import {
-  BOOK_BRIEF_EVENT, countWords, dedupeFactMemory, hasEmojis, insertSourcePassage, listSourcePassages, missingProtectedTerms,
-  narrativeForBook, passageForBook, readBookBrief, removeSourcePassage, replaceSourcePassage, stripEmojis, upsertPolished,
-  updateCorrectedPassage, writeBookBrief, type BookBrief,
+  BOOK_BRIEF_EVENT, bookTypography, countWords, dedupeFactMemory, hasEmojis, insertSourcePassage, listSourcePassages,
+  missingProtectedTerms, narrativeForBook, readBookBrief, removeSourcePassage, replaceSourcePassage, stripEmojis,
+  upsertPolished, updateCorrectedPassage, writeBookBrief, type BookBrief,
 } from '@/lib/v3/bookBrief';
 import { saveBookDraftToCloud } from '@/lib/v3/bookDraftCloud';
+import V3TypographyBar from '@/components/v3public/V3TypographyBar';
+import V3NextStepCard from '@/components/v3public/V3NextStepCard';
 
 
 /** Papier crème : la couleur du livre, à l'écran comme dans l'aperçu. */
@@ -42,6 +44,8 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
   const [undoBrief, setUndoBrief] = useState<BookBrief | null>(null);
   /** Passage dont la correction est revenue plus courte que les mots de l'auteur. */
   const [shortWarning, setShortWarning] = useState<number | null>(null);
+  /** Le nettoyage automatique des réponses courtes n'a lieu qu'une fois par ouverture. */
+  const cleanedRef = useRef(false);
 
 
   useEffect(() => {
@@ -265,6 +269,17 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
     toast.success('Vos réponses courtes quittent le livre : le Génie les garde en mémoire.');
   };
 
+  /**
+   * Les réponses très courtes sortent du livre toutes seules, une seule fois par
+   * livre : elles deviennent des informations retenues, annulable d'un clic.
+   */
+  useEffect(() => {
+    if (!shortAnswers.length || cleanedRef.current) return;
+    cleanedRef.current = true;
+    cleanShortAnswers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shortAnswers.length]);
+
   const undoClean = () => {
     if (!undoBrief) return;
     const next = patch(undoBrief);
@@ -280,6 +295,114 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
     setSelected(null);
     toast.success(`Passage ${index} supprimé.`);
   };
+
+  /** Le livre lisible : uniquement ce que le Génie a corrigé (validé ou proposé). */
+  const readable = passages
+    .map((original, i) => {
+      const index = i + 1;
+      const entry = entryFor(index);
+      return { index, original, entry, validated: Boolean(entry?.validatedAt), text: entry?.corrected?.trim() || '' };
+    })
+    .filter((item) => Boolean(item.text));
+
+  /** Ce qui n'est pas encore corrigé : rangé sous le livre, jamais perdu. */
+  const todo = passages
+    .map((original, i) => ({ index: i + 1, original }))
+    .filter(({ index }) => !entryFor(index)?.corrected?.trim());
+  const todoWords = todo.reduce((total, item) => total + countWords(item.original), 0);
+
+  const typography = bookTypography(brief);
+  const bookStyle = {
+    fontFamily: typography.fontFamily,
+    fontSize: `${typography.fontSize}px`,
+    lineHeight: typography.lineHeight,
+    textAlign: (typography.justify ? 'justify' : 'left') as 'justify' | 'left',
+    hyphens: 'auto' as const,
+  };
+
+  /** Les actions d'un morceau : identiques dans le livre et dans « À corriger ». */
+  const actionsPanel = (index: number, original: string, entry: ReturnType<typeof entryFor>, validated: boolean) => (
+    <>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {editing === index ? (
+          <button type="button" onClick={() => saveOriginalEdit(index)} className="v3-btn v3-btn-primary text-[11px]">
+            <Save className="h-3 w-3" /> Enregistrer mes modifications
+          </button>
+        ) : (
+          <button type="button" onClick={() => { setEditingCorrection(null); setEditing(index); setDraftText(original); }}
+            className="v3-btn v3-btn-outline text-[11px]">
+            Modifier mes mots
+          </button>
+        )}
+        <button type="button" onClick={() => correct(index)} disabled={busy === index || runningAll}
+          className="v3-btn v3-btn-outline text-[11px] disabled:opacity-50">
+          {busy === index ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
+          {entry?.corrected ? 'Recorriger' : 'Corriger ce morceau'}
+        </button>
+        {entry?.corrected && !validated && (
+          <button type="button" onClick={() => validate(index)} className="v3-btn v3-btn-primary text-[11px]">
+            <Check className="h-3 w-3" /> Valider pour le livre
+          </button>
+        )}
+        {entry?.corrected && (editingCorrection === index ? (
+          <button type="button" onClick={() => saveCorrectedEdit(index)} className="v3-btn v3-btn-primary text-[11px]">
+            <Save className="h-3 w-3" /> Enregistrer ma correction
+          </button>
+        ) : (
+          <button type="button" onClick={() => { setEditing(null); setEditingCorrection(index); setCorrectedDraft(entry.corrected); }}
+            className="v3-btn v3-btn-outline text-[11px]">
+            Modifier ce texte
+          </button>
+        ))}
+        {(entry?.corrected || validated) && (
+          <button type="button" onClick={() => keepOriginal(index)} className="v3-btn v3-btn-ghost text-[11px]">
+            <Undo2 className="h-3 w-3" /> Garder mes mots d’origine
+          </button>
+        )}
+        {hasEmojis(entry?.corrected || original) && (
+          <button type="button" onClick={() => removeEmojis(index)} className="v3-btn v3-btn-ghost text-[11px]">
+            Retirer les emojis
+          </button>
+        )}
+        <button type="button" onClick={() => setAddingAfter(addingAfter === index ? null : index)} className="v3-btn v3-btn-ghost text-[11px]">
+          <Plus className="h-3 w-3" /> Ajouter un passage ici
+        </button>
+        <button type="button" onClick={() => moveToFacts(index)} className="v3-btn v3-btn-ghost text-[11px]">
+          Ce n’est pas du récit → information à retenir
+        </button>
+        <button type="button" onClick={() => deletePassage(index)} className="v3-btn v3-btn-ghost text-[11px]" style={{ color: '#b42318' }}>
+          <Trash2 className="h-3 w-3" /> Supprimer
+        </button>
+      </div>
+
+      {(editing === index || editingCorrection === index) && (
+        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          <span className="text-[11px]" style={{ color: 'var(--v3-muted)' }}>Ajouter un emoji :</span>
+          {MANUAL_EMOJIS.map((emoji) => (
+            <button key={emoji} type="button" className="rounded-lg border px-2 py-1 text-[13px]"
+              style={{ borderColor: 'rgba(201,168,76,0.5)', background: '#fff' }}
+              onClick={() => {
+                if (editingCorrection === index) setCorrectedDraft((value) => `${value} ${emoji}`);
+                else setDraftText((value) => `${value} ${emoji}`);
+              }}>
+              {emoji}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {addingAfter === index && (
+        <div className="mt-2 rounded-xl border bg-white p-2.5" style={{ borderColor: 'rgba(201,168,76,0.5)' }}>
+          <textarea value={addition} onChange={(event) => setAddition(event.target.value)} rows={4}
+            placeholder="Écrivez le souvenir ou le détail oublié…"
+            className="w-full resize-y bg-transparent text-[12.5px] outline-none" style={{ color: 'var(--v3-ink)' }} />
+          <button type="button" disabled={!addition.trim()} onClick={() => addPassage(index)} className="v3-btn v3-btn-primary mt-2 text-[11px] disabled:opacity-50">
+            <Plus className="h-3 w-3" /> Ajouter au récit
+          </button>
+        </div>
+      )}
+    </>
+  );
 
   const validateAll = () => {
     const current = readBookBrief() || {};
@@ -348,17 +471,6 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
           Cliquez sur un passage pour le modifier, le corriger ou le supprimer.
         </p>
         <div className="flex flex-wrap items-center gap-2">
-          <label className="inline-flex items-center gap-1.5 text-[11.5px]" style={{ color: 'var(--v3-ink)' }}>
-            <input type="checkbox" checked={brief.emojis !== false}
-              onChange={(event) => {
-                const next = patch({ emojis: event.target.checked });
-                void persist(next);
-                toast.success(event.target.checked
-                  ? 'Le Génie pourra glisser au maximum un emoji discret par passage.'
-                  : 'Le Génie n’ajoutera plus aucun emoji.');
-              }} />
-            Quelques emojis dans mon texte
-          </label>
           <button type="button" onClick={() => setShowBook((value) => !value)} className="v3-btn v3-btn-outline text-[11px]">
             <BookOpen className="h-3 w-3" /> {showBook ? 'Réduire la lecture' : 'Agrandir la lecture'}
           </button>
