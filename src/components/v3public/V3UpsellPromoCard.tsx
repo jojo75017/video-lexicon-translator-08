@@ -49,6 +49,9 @@ export default function V3UpsellPromoCard({
 }: V3UpsellPromoCardProps) {
   const navigate = useNavigate();
   const { hasFull } = useV3Entitlement();
+  // Droit réel d'après les achats (module_entitlements) : un abonné sans achat
+  // voit « Acheter », un acheteur voit « Ouvrir ».
+  const { hasAccess } = useModuleAccess(resolveModuleKey(packId ?? figureId));
   const [checkout, setCheckout] = useState(false);
   const packForCheckout: V3UpsellPack | null = packId ? {
     id: packId,
@@ -67,8 +70,8 @@ export default function V3UpsellPromoCard({
   const withReturn = (path: string) =>
     path.startsWith('http') ? path : `${path}${path.includes('?') ? '&' : '?'}from=upsells`;
 
-  // Forfait Édition = tout inclus : on affiche « Ouvrir ».
-  const isIncluded = included || hasFull;
+  // Forfait Édition, achat du complément ou inclusion explicite → « Ouvrir ».
+  const isIncluded = included || hasFull || hasAccess;
 
   const handleOpen = () => {
     if (isIncluded) {
