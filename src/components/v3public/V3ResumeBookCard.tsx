@@ -58,7 +58,7 @@ export default function V3ResumeBookCard({ compact = false }: { compact?: boolea
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link to={brief.projectId ? `/v3/create?projectId=${brief.projectId}` : '/v3/create'} className="v3-btn v3-btn-primary text-xs">
+          <Link to={`${brief.mode === 'biography' ? '/v3/biographie' : '/v3/create'}${brief.projectId ? `?projectId=${brief.projectId}` : ''}`} className="v3-btn v3-btn-primary text-xs">
             <BookOpen className="h-3.5 w-3.5" /> Reprendre où je m’étais arrêté <ArrowRight className="h-3.5 w-3.5" />
           </Link>
           {!compact && (
