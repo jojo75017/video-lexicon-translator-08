@@ -11,6 +11,7 @@ import {
 import { saveBookDraftToCloud } from '@/lib/v3/bookDraftCloud';
 import V3TypographyBar from '@/components/v3public/V3TypographyBar';
 import V3NextStepCard from '@/components/v3public/V3NextStepCard';
+import V3BookProgressBar from '@/components/v3public/V3BookProgressBar';
 
 
 /** Papier crème : la couleur du livre, à l'écran comme dans l'aperçu. */
@@ -62,6 +63,20 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
 
   const originalWords = passages.reduce((t, p) => t + countWords(p), 0);
   const bookWords = countWords(narrativeForBook(brief));
+
+  /** « Reprendre mon livre » : ouvre le premier passage qui attend encore une action. */
+  const resumeBook = () => {
+    const next = passages.findIndex((_, i) => {
+      const entry = entryFor(i + 1);
+      return !entry?.corrected?.trim() || !entry?.validatedAt;
+    });
+    const index = next >= 0 ? next + 1 : passages.length;
+    if (!index) return;
+    setSelected(index);
+    window.setTimeout(() => {
+      document.getElementById(`v3-passage-${index}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 60);
+  };
 
   const patch = (values: Partial<BookBrief>) => {
     const next = { ...(readBookBrief() || {}), ...values };
@@ -444,6 +459,8 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
         </span>
       </div>
 
+      <V3BookProgressBar brief={brief} onResume={resumeBook} />
+
       {shortAnswers.length > 0 && (
         <div className="mt-3 rounded-2xl border p-3" style={{ borderColor: 'rgba(201,168,76,0.6)', background: '#FBF6E8' }}>
           <p className="text-[12.5px]" style={{ color: 'var(--v3-ink)' }}>
@@ -497,7 +514,7 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
           </p>
         ) : (
           readable.map(({ index, text, entry, validated }) => (
-            <section key={`book-${index}`} className="mb-4 rounded-lg px-2 py-1"
+            <section key={`book-${index}`} id={`v3-passage-${index}`} className="mb-4 rounded-lg px-2 py-1"
               style={{ background: selected === index ? '#fffdf6' : 'transparent' }}>
               <div role="button" tabIndex={0}
                 onClick={() => setSelected(selected === index ? null : index)}
@@ -538,7 +555,7 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
           </button>
           <div className="mt-3 space-y-3">
             {todo.map(({ index, original }) => (
-              <div key={`todo-${index}`} className="rounded-xl border p-3" style={{ borderColor: 'rgba(201,168,76,0.3)', background: CREAM }}>
+              <div key={`todo-${index}`} id={`v3-passage-${index}`} className="rounded-xl border p-3" style={{ borderColor: 'rgba(201,168,76,0.3)', background: CREAM }}>
                 {editing === index ? (
                   <textarea value={draftText} onChange={(event) => setDraftText(event.target.value)} rows={10}
                     className="w-full rounded-lg border px-2 py-2 outline-none"
