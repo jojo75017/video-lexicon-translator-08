@@ -353,7 +353,8 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
             </div>
           </div>
         )}
-      </div>
+        </details>
+
 
       {/* Aperçu réel du livre, juste sous la fiche du projet */}
       <V3BookLivePreview brief={brief} />
