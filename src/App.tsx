@@ -9,6 +9,7 @@ import { SubscriberGate } from '@/components/auth/SubscriberGate';
 import { AdminGate } from '@/components/auth/AdminGate';
 import { V3Gate } from '@/components/auth/V3Gate';
 import { V3LockedGate } from '@/components/v3/V3LockedGate';
+import V3ModulePaywall from '@/components/v3/V3ModulePaywall';
 import { TrialGate } from '@/components/auth/TrialGate';
 import { TrialBookLimitGate } from '@/components/auth/TrialBookLimitGate';
 
