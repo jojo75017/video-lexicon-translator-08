@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { EMAIL_SENDING_ENABLED } from "../_shared/emailSendingGuard.ts";
+import { type StripeEnv, stripeRequest } from "../_shared/stripe.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -12,15 +13,36 @@ type VerifyRequest = {
   sessionId: string;
 };
 
+/**
+ * Retrieve a Stripe resource. Lovable Payments (gateway) is the source of truth:
+ * the environment is derived from the session id prefix (cs_live_ / cs_test_),
+ * so a live session is always read with a live-mode key. The legacy
+ * STRIPE_SECRET_KEY is only used as a last-resort fallback.
+ */
+async function retrieveWithFallback<T>(
+  path: string,
+  envName: StripeEnv,
+  legacy: () => Promise<T>,
+): Promise<T> {
+  const gatewayKey = envName === "live"
+    ? Deno.env.get("STRIPE_LIVE_API_KEY")
+    : Deno.env.get("STRIPE_SANDBOX_API_KEY");
+  if (gatewayKey && Deno.env.get("LOVABLE_API_KEY")) {
+    try {
+      return await stripeRequest<T>(envName, "GET", path);
+    } catch (e) {
+      console.error(`Gateway retrieve failed for ${path} (${envName}):`, (e as Error).message);
+    }
+  }
+  return await legacy();
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey) throw new Error("STRIPE_SECRET_KEY not configured");
-
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -33,9 +55,20 @@ serve(async (req) => {
       });
     }
 
-    const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
+    const envName: StripeEnv = sessionId.startsWith("cs_test_") ? "sandbox" : "live";
 
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    const legacyStripe = stripeKey ? new Stripe(stripeKey, { apiVersion: "2023-10-16" }) : null;
+
+    const session = await retrieveWithFallback<any>(
+      `/checkout/sessions/${sessionId}`,
+      envName,
+      async () => {
+        if (!legacyStripe) throw new Error("Stripe non configuré pour cet environnement de paiement");
+        return await legacyStripe.checkout.sessions.retrieve(sessionId) as any;
+      },
+    );
+
 
     // For subscription with trial, payment_status can be "no_payment_required" 
     const paymentStatus = (session as any).payment_status;
@@ -74,7 +107,15 @@ serve(async (req) => {
     if (session.mode === "subscription") {
       const subscriptionId = (session as any).subscription as string;
       if (subscriptionId) {
-        const sub = await stripe.subscriptions.retrieve(subscriptionId);
+        const sub = await retrieveWithFallback<any>(
+          `/subscriptions/${subscriptionId}`,
+          envName,
+          async () => {
+            if (!legacyStripe) throw new Error("Stripe non configuré");
+            return await legacyStripe.subscriptions.retrieve(subscriptionId) as any;
+          },
+        );
+
         if (sub.trial_end) {
           trialEndsAt = new Date(sub.trial_end * 1000).toISOString();
           subscriberStatus = "trialing";
