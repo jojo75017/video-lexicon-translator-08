@@ -78,6 +78,16 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
   });
   useEffect(() => { if (showWizard) setDesk(3); }, [showWizard]);
 
+  // L'explication d'accueil reste ouverte tant que rien n'est écrit, puis s'efface.
+  const [hasStory, setHasStory] = useState(() => Boolean((readBookBrief()?.sourceText || '').trim()));
+  useEffect(() => {
+    const sync = () => setHasStory(Boolean((readBookBrief()?.sourceText || '').trim()));
+    sync();
+    window.addEventListener(BOOK_BRIEF_EVENT, sync);
+    return () => window.removeEventListener(BOOK_BRIEF_EVENT, sync);
+  }, []);
+
+
 
   useEffect(() => { seedHubConfig(idea, genre, type); }, [idea, genre, type]);
 
