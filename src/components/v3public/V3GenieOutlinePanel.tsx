@@ -16,6 +16,7 @@ import {
 import V3OutlinePanel from './V3OutlinePanel';
 import V3WrittenBookTab from './V3WrittenBookTab';
 import V3BookLivePreview from './V3BookLivePreview';
+import { BOOK_DRAFT_STATUS_EVENT, type BookDraftStatus } from '@/lib/v3/bookDraftCloud';
 
 
 /** Une ligne de réglage : le champ, et le cadenas quand l'auteur a décidé. */
@@ -56,6 +57,7 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   // Heure du dernier enregistrement : l'auteur voit que rien n'est perdu.
   const [savedAt, setSavedAt] = useState<Date | null>(null);
+  const [saveStatus, setSaveStatus] = useState<BookDraftStatus>({ state: 'local' });
   
   
   // Le récit doit être visible immédiatement : ne jamais donner l'impression
@@ -70,6 +72,12 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
     sync();
     window.addEventListener(BOOK_BRIEF_EVENT, sync);
     return () => window.removeEventListener(BOOK_BRIEF_EVENT, sync);
+  }, []);
+
+  useEffect(() => {
+    const onStatus = (event: Event) => setSaveStatus((event as CustomEvent<BookDraftStatus>).detail);
+    window.addEventListener(BOOK_DRAFT_STATUS_EVENT, onStatus);
+    return () => window.removeEventListener(BOOK_DRAFT_STATUS_EVENT, onStatus);
   }, []);
 
   useEffect(() => {
@@ -174,9 +182,12 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
           </span>
         </div>
 
-        {savedAt && (
+        {(savedAt || saveStatus.at) && (
           <p className="mt-1 text-[10.5px]" style={{ color: '#0f766e' }}>
-            Enregistré à {savedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} — vous pourrez reprendre quand vous voulez.
+            {saveStatus.state === 'saving' && 'Enregistrement dans votre compte…'}
+            {saveStatus.state === 'saved' && `Sauvegardé dans votre compte à ${new Date(saveStatus.at || Date.now()).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}.`}
+            {saveStatus.state === 'error' && 'Échec de la sauvegarde du compte — votre copie reste sur cet appareil.'}
+            {saveStatus.state === 'local' && `Conservé sur cet appareil à ${(savedAt || new Date()).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}. Connectez-vous pour le retrouver partout.`}
           </p>
         )}
 
@@ -190,6 +201,13 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
               style={{ borderColor: 'rgba(201,168,76,0.6)', color: 'var(--v3-ink)' }}>{chip}</span>
           ))}
         </div>
+
+        {sourceText ? (
+          <div className="mt-3 rounded-2xl border p-3" style={{ borderColor: 'rgba(15,107,74,0.3)', background: 'rgba(15,107,74,0.04)' }}>
+            <div className="text-[11.5px] font-semibold" style={{ color: 'var(--v3-ink)' }}>Mon livre en cours — contenu réellement retenu</div>
+            <p className="mt-1 max-h-64 overflow-y-auto whitespace-pre-wrap text-[12px] leading-relaxed" style={{ color: 'var(--v3-ink)' }}>{correctedStory}</p>
+          </div>
+        ) : null}
 
         {/* Tout le détail du livre est replié : un seul clic pour l'ouvrir */}
         <details className="mt-3">

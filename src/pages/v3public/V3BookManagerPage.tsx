@@ -16,6 +16,7 @@ type Book = {
   chapters?: unknown;
   number_of_chapters?: number | null;
   updated_at?: string | null;
+  draft_state?: unknown;
 };
 
 
@@ -51,7 +52,7 @@ export default function V3BookManagerPage() {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) { nav('/v3/auth'); return; }
     let query = supabase.from('ebook_projects')
-      .select('id,title,author_name,kdp_description,chapters,number_of_chapters,project_type,updated_at')
+      .select('id,title,author_name,kdp_description,chapters,number_of_chapters,project_type,updated_at,draft_state')
       .eq('user_id', auth.user.id);
     if (correctedOnly) query = query.eq('project_type', 'corrected');
     const { data, error } = await query.order('updated_at', { ascending: false });
@@ -216,7 +217,7 @@ export default function V3BookManagerPage() {
                 </div>
                 {b.author_name && <div className="text-xs text-[var(--v3-muted)]">par {b.author_name}</div>}
                 <div className="mt-1 text-xs font-semibold text-[var(--v3-muted)]">
-                  {chapterCount > 0 ? `${chapterCount} chapitre${chapterCount > 1 ? 's' : ''} · Export disponible` : 'Brouillon · récupération des sauvegardes à l’ouverture'}
+                  {chapterCount > 0 ? `${chapterCount} chapitre${chapterCount > 1 ? 's' : ''} · Export disponible` : b.draft_state ? 'Brouillon sauvegardé · reprendre l’écriture' : 'Brouillon · récupération des sauvegardes à l’ouverture'}
                 </div>
               </div>
               <div className="flex flex-wrap justify-end gap-2">

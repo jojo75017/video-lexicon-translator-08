@@ -45,6 +45,7 @@ export type BriefOutlineChapter = {
 
 export type BookBrief = {
   savedAt?: string;
+  cloudSavedAt?: string;
   /**
    * Nature du projet : livre classique ou biographie (« Le récit de votre vie »).
    * En biographie, la chronologie et les mots de l'auteur sont intouchables.
@@ -97,6 +98,8 @@ export type BookBrief = {
    * Ex. ['title', 'subtitle', 'chapters', 'wordsPerChapter'].
    */
   lockedFields?: LockableField[];
+  /** Faits confirmés que la correction, le sommaire et la rédaction doivent respecter. */
+  factMemory?: string[];
 };
 
 /** Champs que l'auteur peut verrouiller depuis la colonne « Réglages du livre ». */
@@ -126,6 +129,15 @@ export function passageForBook(brief: BookBrief | null | undefined, index: numbe
 export function upsertPolished(brief: BookBrief, entry: PolishedPassage): PolishedPassage[] {
   const list = (brief.polished || []).filter((p) => p.index !== entry.index);
   return [...list, entry].sort((a, b) => a.index - b.index);
+}
+
+export function updateCorrectedPassage(brief: BookBrief, index: number, corrected: string): BookBrief {
+  const entry = (brief.polished || []).find((passage) => passage.index === index);
+  if (!entry || !corrected.trim()) return brief;
+  return {
+    ...brief,
+    polished: upsertPolished(brief, { ...entry, corrected: corrected.trim(), validatedAt: undefined }),
+  };
 }
 
 /**
@@ -284,6 +296,51 @@ export function appendSourceText(previous: string | undefined, addition: string)
     (_, i) => !(substantial(existingKeys[i]) && addedKey.includes(existingKeys[i])),
   );
   return [...kept, clean].join('\n\n');
+}
+
+/** Remplace explicitement un texte. Cette action de l'auteur ne passe jamais par le dédoublonnage. */
+export function replaceSourcePassage(brief: BookBrief, index: number, value: string): BookBrief {
+  const passages = listSourcePassages(brief.sourceText || '');
+  if (!passages[index - 1] || !value.trim()) return brief;
+  passages[index - 1] = stripAuthorPrefix(value);
+  return {
+    ...brief,
+    sourceText: passages.join('\n\n'),
+    polished: (brief.polished || []).filter((entry) => entry.index !== index),
+    outlineValidated: false,
+  };
+}
+
+/** Insère un oubli à l'endroit choisi et décale les corrections suivantes sans les perdre. */
+export function insertSourcePassage(brief: BookBrief, afterIndex: number, value: string): BookBrief {
+  const clean = stripAuthorPrefix(value);
+  if (!clean) return brief;
+  const passages = listSourcePassages(brief.sourceText || '');
+  const position = Math.min(passages.length, Math.max(0, afterIndex));
+  passages.splice(position, 0, clean);
+  const polished = (brief.polished || []).map((entry) =>
+    entry.index > position ? { ...entry, index: entry.index + 1 } : entry,
+  );
+  return { ...brief, sourceText: passages.join('\n\n'), polished, outlineValidated: false };
+}
+
+/** Noms, dates et liens familiaux qui ne doivent jamais disparaître d'une correction. */
+export function protectedTerms(text: string): string[] {
+  const ignoredSentenceWords = new Set([
+    'Alors', 'Après', 'Avant', 'Avec', 'Cette', 'Comme', 'Dans', 'Depuis', 'Elle', 'Encore',
+    'Ensuite', 'Il', 'Lorsque', 'Mais', 'Mon', 'Nous', 'Puis', 'Quand', 'Reste', 'Sans',
+    'Son', 'Sous', 'Sur', 'Tous', 'Une', 'Votre', 'Vous', 'Né', 'Née',
+  ].map((word) => word.toLocaleLowerCase('fr-FR')));
+  const names = (String(text || '').match(/\b[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ]{2,}(?:-[A-ZÀ-ÖØ-Ýa-zà-öø-ÿ]+)*\b/g) || [])
+    .filter((word) => !ignoredSentenceWords.has(word.toLocaleLowerCase('fr-FR')));
+  const dates = String(text || '').match(/\b(?:18|19|20)\d{2}\b|\b\d{1,2}[/-]\d{1,2}(?:[/-]\d{2,4})?\b/g) || [];
+  const family = String(text || '').match(/\b(?:frère|sœur|soeur|mère|père|grand-mère|grand-père|fils|fille|mari|femme)\b/gi) || [];
+  return Array.from(new Set([...names, ...dates, ...family]));
+}
+
+export function missingProtectedTerms(original: string, corrected: string): string[] {
+  const haystack = corrected.toLocaleLowerCase('fr-FR');
+  return protectedTerms(original).filter((term) => !haystack.includes(term.toLocaleLowerCase('fr-FR')));
 }
 
 

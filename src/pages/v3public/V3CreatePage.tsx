@@ -18,6 +18,8 @@ import V3OutlineCoBuilder from '@/components/v3public/V3OutlineCoBuilder';
 import V3PassageCorrector from '@/components/v3public/V3PassageCorrector';
 
 import { BOOK_BRIEF_EVENT, readBookBrief, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
+import { restoreDraftState } from '@/lib/v3/bookDraftCloud';
+import { writeLocalThread } from '@/lib/v3/genieThread';
 
 
 const V3CreateWizard = lazy(() => import('@/components/v3public/V3CreateWizard'));
@@ -106,7 +108,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
       setOpeningBook(true);
       const { data, error } = await supabase
         .from('ebook_projects')
-        .select('id,title,author_name,kdp_description,kdp_categories,tone,chapters,number_of_chapters')
+        .select('id,title,author_name,kdp_description,kdp_categories,tone,chapters,number_of_chapters,draft_state')
         .eq('id', projectId)
         .maybeSingle();
       if (cancelled) return;
@@ -115,6 +117,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
         toast.error("Ce livre est introuvable ou n'est plus accessible.");
         return;
       }
+      const restored = restoreDraftState((data as any).draft_state);
       const rawChapters = Array.isArray(data.chapters) ? (data.chapters as any[]) : [];
       const outline: BriefOutlineChapter[] = rawChapters.map((c, i) => ({
         numero: i + 1,
@@ -125,8 +128,9 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
         ? String(data.kdp_categories[0] || '')
         : String(data.kdp_categories || '');
       const prev = readBookBrief() || {};
+      const restoredBrief = restored?.brief || {};
       writeBookBrief({
-        ...prev,
+        ...prev, ...restoredBrief,
         projectId: data.id,
         title: data.title || prev.title || '',
         author: data.author_name || prev.author || '',
@@ -137,10 +141,14 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
         outline: outline.length ? outline : prev.outline,
         outlineValidated: outline.length ? true : prev.outlineValidated,
       });
+      if (restored?.messages?.length) writeLocalThread(restored.messages);
+      if (restored?.activeStep && [1, 2, 3].includes(restored.activeStep)) setDesk(restored.activeStep as DeskId);
+      else if (!outline.length) setDesk(1);
 
       setOpenedBook({ id: data.id, title: data.title || 'Livre sans titre', chapters: outline.length });
       setBriefKey((k) => k + 1);
-      setShowWizard(true);
+      const shouldOpenWriting = Boolean(restoredBrief.outlineValidated || rawChapters.some((chapter) => String(chapter?.content || chapter?.contenu || '').trim()));
+      setShowWizard(shouldOpenWriting);
       setTimeout(() => wizardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
     })();
     return () => { cancelled = true; };
@@ -266,10 +274,10 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
 
               <p className="mt-4 rounded-[22px] border px-4 py-3 text-[12.5px] leading-relaxed"
                 style={{ borderColor: 'rgba(15,107,74,0.35)', background: 'rgba(15,107,74,0.06)', color: 'var(--v3-ink)' }}>
-                <strong>Vous pouvez arrêter à tout moment.</strong> Chaque texte envoyé est enregistré
-                aussitôt, avec l’heure du dernier enregistrement affichée sous « Votre livre ». Vous
-                fermez la page, vous revenez demain ou depuis un autre ordinateur, et vous reprenez
-                exactement où vous en étiez. Vous n’avez rien à sauvegarder vous-même.
+                <strong>Vous pouvez arrêter à tout moment.</strong> Chaque texte est d’abord conservé sur
+                cet appareil. Si vous êtes connecté, un vrai brouillon apparaît aussi dans « Mes livres »
+                et peut être repris depuis un autre ordinateur. L’écran indique clairement si la sauvegarde
+                du compte a réussi ou si elle doit être retentée.
               </p>
 
               <div className="mt-4 flex flex-wrap justify-center gap-2">
@@ -320,7 +328,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
         <div className="mt-5">
           <div className="min-w-0 v3-ambiance">
             {/* ① J'écris : je raconte, le Génie corrige */}
-            {desk === 1 && !openedBook && (
+            {desk === 1 && (
               <>
                 <V3GenieDialog
                   mode={biography ? 'biography' : 'book'}

@@ -7,6 +7,7 @@ import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import {
   appendSourceText, mergeRespectingLocks, readBookBrief, resetBookProject, writeBookBrief, type BookBrief,
 } from '@/lib/v3/bookBrief';
+import { saveBookDraftToCloud } from '@/lib/v3/bookDraftCloud';
 import { currentInterviewStep, stepLabel, type InterviewStep } from '@/lib/v3/genieInterview';
 
 import {
@@ -142,7 +143,14 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
     };
     setBrief(briefWithSource);
     writeBookBrief(briefWithSource);
-    pushMessage(makeMessage('user', text), briefWithSource);
+    const userMessage = makeMessage('user', text);
+    setMessages((prev) => [...prev, userMessage]);
+    const draftResult = await saveBookDraftToCloud(briefWithSource, { messages: [...messages, userMessage], activeStep: 1 });
+    const linkedBrief = { ...briefWithSource, projectId: draftResult.projectId || briefWithSource.projectId };
+    if (draftResult.error && draftResult.error !== 'not-authenticated') {
+      toast.error('Votre texte reste sur cet appareil. La sauvegarde du compte sera retentée.');
+    }
+    void saveRemoteMessage(userMessage, linkedBrief, linkedBrief.projectId || null);
     setInput('');
     try {
       const provider = getProvider();
@@ -168,7 +176,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
         wordsPerChapter: b.wordsPerChapter || previousBrief.wordsPerChapter || 2500,
       });
       const nextBrief: BookBrief = {
-        ...briefWithSource,
+        ...linkedBrief,
         author: b.author || brief.author || '',
         category: b.category || previousBrief.category || '',
         tone: b.tone || previousBrief.tone || 'Inspirant',
@@ -178,6 +186,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
         wantsIllustrations: Boolean(b.wantsIllustrations),
         cibleProfil: b.cibleProfil || brief.cibleProfil || '',
         promesseCentrale: b.promesseCentrale || brief.promesseCentrale || '',
+        factMemory: Array.from(new Set([...(brief.factMemory || []), ...(Array.isArray(b.factMemory) ? b.factMemory.map(String) : [])])),
         outlineValidated: false,
         ...proposed,
       };
@@ -194,7 +203,9 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
         nextQuestions.length ? `Question : ${nextQuestions[0]}` : '',
       ].filter(Boolean).join('\n\n');
 
-      pushMessage(makeMessage('assistant', reply, { changes: changes || undefined, outline: nextBrief.outline }), nextBrief);
+      const assistantMessage = makeMessage('assistant', reply, { changes: changes || undefined, outline: nextBrief.outline });
+      pushMessage(assistantMessage, nextBrief);
+      void saveBookDraftToCloud(nextBrief, { messages: [...messages, userMessage, assistantMessage], activeStep: 1 });
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 120);
     } catch (e: any) {
       toast.error(e?.message || 'Le Génie est indisponible pour le moment.');
@@ -209,8 +220,8 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
 
 
   const refine = async (extra: string) => {
-    // On n'envoie que la nouvelle précision : l'historique porte déjà le récit.
-    await ask(`Précision de l'auteur : ${extra.trim()}`);
+    // La réponse reste un vrai passage du récit, sans préfixe technique ajouté au livre.
+    await ask(extra.trim());
   };
 
   const steps = useMemo(() => ([
@@ -444,7 +455,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
           <button type="button" onClick={() => ask(input)} disabled={loading || input.trim().length < 10}
             className="v3-btn v3-btn-primary disabled:opacity-50">
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-            {loading ? 'Le Génie prépare votre fiche…' : 'Envoyer au Génie'}
+            {loading ? 'Enregistrement et analyse…' : 'Enregistrer mon texte'}
             {!loading && <ArrowRight className="h-4 w-4" />}
           </button>
         </div>
@@ -459,6 +470,20 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
               {ex.length > 62 ? `${ex.slice(0, 62)}…` : ex}
             </button>
           ))}
+        </div>
+      )}
+
+      {(brief.factMemory || []).length > 0 && (
+        <div className="mt-3 rounded-2xl border bg-white p-3" style={{ borderColor: 'rgba(15,107,74,0.35)' }}>
+          <div className="text-[11px] font-bold uppercase tracking-wider" style={{ color: '#0f6b4a' }}>Ce que le Génie doit respecter</div>
+          <div className="mt-2 space-y-1.5">
+            {(brief.factMemory || []).map((fact, index) => (
+              <input key={`${index}-${fact}`} value={fact} onChange={(event) => {
+                const facts = [...(brief.factMemory || [])]; facts[index] = event.target.value; patch({ factMemory: facts });
+              }} onBlur={() => void saveBookDraftToCloud(readBookBrief() || brief, { messages, activeStep: 1 })}
+                className="w-full rounded-lg border px-2.5 py-1.5 text-xs" style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }} />
+            ))}
+          </div>
         </div>
       )}
 
@@ -550,7 +575,7 @@ function RefineRow({ question, disabled, onSend }: { question: string; disabled?
           className="flex-1 rounded-xl border bg-white px-2.5 py-1.5 text-xs outline-none"
           style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }} />
         <button type="button" disabled={disabled || !value.trim()} onClick={() => onSend(value)}
-          className="v3-btn v3-btn-outline text-xs disabled:opacity-50">Affiner</button>
+          className="v3-btn v3-btn-outline text-xs disabled:opacity-50">Enregistrer ma réponse</button>
       </div>
     </div>
   );

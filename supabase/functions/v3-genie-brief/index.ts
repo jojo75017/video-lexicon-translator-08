@@ -163,11 +163,13 @@ Deno.serve(async (req) => {
       const passage = String(body.passage || "").trim();
       if (passage.length < 20) return json(400, { error: "Écrivez d'abord quelques phrases à corriger." });
       const floor = passage.trim().split(/\s+/).filter(Boolean).length;
+      const factMemory = Array.isArray(body.factMemory) ? body.factMemory.map(String).filter(Boolean).slice(0, 100) : [];
       const polishPrompt = `Tu es correcteur et plume d'une maison d'édition francophone. L'auteur t'a écrit un passage de son livre au fil de la plume, avec des fautes, des abréviations et une ponctuation approximative.
 
 PASSAGE DE L'AUTEUR (ses faits sont la vérité absolue) :
 """${passage.slice(0, 20000)}"""
 ${body.bookTitle ? `Livre : « ${String(body.bookTitle).slice(0, 200)} »` : ""}
+${factMemory.length ? `FAITS CONFIRMÉS À RESPECTER MOT POUR MOT :\n- ${factMemory.join("\n- ")}` : ""}
 Ton souhaité : ${String(body.tone || "Émotionnel")}
 ${biographyRules}
 Rends ce passage prêt à imprimer. Réponds STRICTEMENT en JSON valide, sans markdown :
@@ -335,7 +337,7 @@ Dernier message de l'auteur :
 """${message.slice(0, 5000)}"""
 
 Déduis la fiche complète du livre. Réponds STRICTEMENT en JSON valide, sans markdown :
-{"title":"","subtitle":"","author":"","category":"","tone":"","description":"","chapters":20,"wordsPerChapter":2500,"wantsIllustrations":false,"audience":"","promesseCentrale":"","questions":[""]}
+{"title":"","subtitle":"","author":"","category":"","tone":"","description":"","chapters":20,"wordsPerChapter":2500,"wantsIllustrations":false,"audience":"","promesseCentrale":"","factMemory":[""],"questions":[""]}
 
 Règles :
 - 100 % français : aucun latin, aucune langue étrangère décorative, aucun mot inventé ;
@@ -348,6 +350,7 @@ ${biographyRules}
 - "chapters" : entre 8 et 30 selon l'ambition du projet ; "wordsPerChapter" entre 2200 et 3500 (2500 par défaut) ;
 - "wantsIllustrations" : true si le sujet appelle des images (enfants, cuisine, voyage, pratique) ;
 - "author" : reprends le nom si l'auteur le donne, sinon "" ;
+- "factMemory" : liste courte et fidèle des personnes avec leurs liens familiaux, dates, lieux et événements explicitement donnés. N'invente rien et ne fusionne jamais deux personnes ;
 - "questions" : 0 à 2 questions courtes qui invitent l'auteur à donner PLUS de détails, de scènes et de souvenirs.`;
 
 

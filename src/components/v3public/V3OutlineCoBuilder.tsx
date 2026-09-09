@@ -4,12 +4,13 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import {
-  BOOK_BRIEF_EVENT, countWords, listSourcePassages, normalizeOutline, readBookBrief,
+  BOOK_BRIEF_EVENT, countWords, listSourcePassages, narrativeForBook, normalizeOutline, readBookBrief,
   suggestChapterCount, uncoveredPassages, writeBookBrief,
   type BookBrief, type BriefOutlineChapter,
 } from '@/lib/v3/bookBrief';
 
 import { saveOutlineVersion } from '@/lib/v3/genieThread';
+import { saveBookDraftToCloud } from '@/lib/v3/bookDraftCloud';
 
 type Proposal = { titre: string; objectif: string; sources: number[] };
 
@@ -81,7 +82,8 @@ export default function V3OutlineCoBuilder() {
           bookTitle: brief.title || '',
           bookDescription: brief.description || '',
           // Le récit intégral de l'auteur : les chapitres doivent suivre ses faits.
-          sourceText: brief.sourceText || '',
+          sourceText: narrativeForBook(brief) || brief.sourceText || '',
+          factMemory: brief.factMemory || [],
           tone: brief.tone || '',
           language: brief.language || 'fr',
         },
@@ -134,6 +136,7 @@ export default function V3OutlineCoBuilder() {
       return;
     }
     patch({ outline: normalizeOutline(outline), chapters: outline.length, outlineValidated: true });
+    void saveBookDraftToCloud({ ...brief, outline: normalizeOutline(outline), chapters: outline.length, outlineValidated: true }, { activeStep: 3 });
     toast.success(`Sommaire validé — ${outline.length} chapitres ✓`);
     const saved = await saveOutlineVersion(normalizeOutline(outline), {
       projectId: brief.projectId || null,

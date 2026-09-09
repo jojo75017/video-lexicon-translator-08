@@ -1426,6 +1426,7 @@ export type Database = {
           cover_concepts: string | null
           created_at: string
           detail_level: string | null
+          draft_state: Json
           ebook_images: Json | null
           id: string
           kdp_categories: string | null
@@ -1455,6 +1456,7 @@ export type Database = {
           cover_concepts?: string | null
           created_at?: string
           detail_level?: string | null
+          draft_state?: Json
           ebook_images?: Json | null
           id?: string
           kdp_categories?: string | null
@@ -1484,6 +1486,7 @@ export type Database = {
           cover_concepts?: string | null
           created_at?: string
           detail_level?: string | null
+          draft_state?: Json
           ebook_images?: Json | null
           id?: string
           kdp_categories?: string | null

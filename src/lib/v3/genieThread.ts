@@ -118,12 +118,12 @@ export async function saveRemoteMessage(
   message: GenieMessage,
   brief: BookBrief,
   projectId?: string | null,
-) {
+) : Promise<{ ok: boolean; error?: string }> {
   try {
     const { data: auth } = await supabase.auth.getUser();
     const userId = auth?.user?.id;
-    if (!userId) return;
-    await db.from('book_conversations').insert({
+    if (!userId) return { ok: false, error: 'not-authenticated' };
+    const { error } = await db.from('book_conversations').insert({
       user_id: userId,
       project_id: projectId || null,
       role: message.role,
@@ -132,8 +132,10 @@ export async function saveRemoteMessage(
       brief_snapshot: brief || {},
       outline_snapshot: message.outline || brief.outline || [],
     });
-  } catch {
-    /* on n'interrompt jamais le dialogue pour une erreur d'enregistrement */
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : 'Enregistrement impossible' };
   }
 }
 
