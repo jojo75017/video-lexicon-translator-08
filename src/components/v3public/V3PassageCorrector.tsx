@@ -69,14 +69,20 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
     toast.success(`Texte ${index} modifié et enregistré. L’ancienne correction a été retirée.`);
   };
 
+  /**
+   * Passage oublié : il est inséré à sa place, puis corrigé tout seul et raccordé
+   * au texte qui le précède (voir `pendingPolishIndex`).
+   */
   const addPassage = (afterIndex: number) => {
     if (!addition.trim()) return;
-    const next = insertSourcePassage(readBookBrief() || {}, afterIndex, addition);
-    patch(next);
+    const inserted = insertSourcePassage(readBookBrief() || {}, afterIndex, addition);
+    const newIndex = afterIndex + 1;
+    attemptedAuto.current.delete(newIndex);
+    const next = patch({ ...inserted, pendingPolishIndex: newIndex });
     void persist(next);
     setAddingAfter(null);
     setAddition('');
-    toast.success('Le passage oublié a été ajouté au récit.');
+    toast.success('Passage ajouté. Le Génie le corrige et le raccorde à votre récit…');
   };
 
   const saveCorrectedEdit = (index: number) => {
