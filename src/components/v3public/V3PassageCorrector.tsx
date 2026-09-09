@@ -154,6 +154,11 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
       } else {
         setShortWarning((value) => (value === index ? null : value));
       }
+      if (missing.length) {
+        toast.warning(
+          `Passage ${index} : vérifiez ${missing.join(', ')} dans la proposition. Vos mots d’origine restent intacts.`,
+        );
+      }
       return true;
     } catch (e: any) {
       if (automatic) {
