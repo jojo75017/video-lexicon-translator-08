@@ -120,6 +120,9 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
           tone: brief.tone || '',
           language: brief.language || 'fr',
           factMemory: brief.factMemory || [],
+          // Raccord : le passage doit s'enchaîner avec le texte qui le précède.
+          previousPassage: index > 1 ? (passages[index - 2] || '').slice(-3000) : '',
+          emojis: brief.emojis === true,
           userApiKey,
         },
       });
