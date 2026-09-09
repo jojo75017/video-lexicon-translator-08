@@ -373,138 +373,75 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
         </p>
       )}
 
-      <div className={`mt-3 space-y-5 overflow-y-auto rounded-2xl border p-4 ${showBook ? 'max-h-[85vh]' : 'max-h-[46rem]'}`}
+      <V3TypographyBar brief={brief} onChange={setBrief} />
+
+      {/* Le livre : un seul texte continu, sans numéro ni étiquette. */}
+      <div className={`mt-3 overflow-y-auto rounded-2xl border px-5 py-4 ${showBook ? 'max-h-[85vh]' : 'max-h-[46rem]'}`}
         style={{ borderColor: 'rgba(201,168,76,0.5)', background: CREAM }}>
-        {passages.map((original, i) => {
-          const index = i + 1;
-          const entry = entryFor(index);
-          const validated = Boolean(entry?.validatedAt);
-          const isOpen = selected === index;
-          const text = passageForBook(brief, index, original);
-          return (
-            <div key={`passage-${index}`} className="rounded-xl border p-3"
-              style={{
-                borderColor: isOpen ? 'rgba(201,168,76,0.9)' : 'rgba(201,168,76,0.28)',
-                background: isOpen ? '#fffdf6' : 'transparent',
-              }}>
-              <button type="button" onClick={() => setSelected(isOpen ? null : index)}
-                className="flex w-full items-center justify-between gap-2 text-left">
-                <span className="text-[10.5px] font-semibold uppercase tracking-wider"
-                  style={{ color: validated ? '#0f6b4a' : 'var(--v3-muted)' }}>
-                  Passage {index} — {validated ? 'corrigé et validé' : entry?.corrected ? 'correction à valider' : 'vos mots'}
-                </span>
-                <span className="text-[10.5px]" style={{ color: 'var(--v3-muted)' }}>
-                  {countWords(text)} mots {isOpen ? '▲' : '▼'}
-                </span>
-              </button>
-
-              {editing === index ? (
-                <textarea value={draftText} onChange={(event) => setDraftText(event.target.value)} rows={10}
-                  className="mt-2 w-full rounded-lg border px-2 py-2 text-[13.5px] leading-7 outline-none"
-                  style={{ borderColor: 'rgba(201,168,76,0.6)', color: 'var(--v3-ink)', background: '#fff' }} />
-              ) : editingCorrection === index ? (
-                <textarea value={correctedDraft} onChange={(event) => setCorrectedDraft(event.target.value)} rows={10}
-                  className="mt-2 w-full rounded-lg border px-2 py-2 text-[13.5px] leading-7 outline-none"
-                  style={{ borderColor: 'rgba(201,168,76,0.6)', color: 'var(--v3-ink)', background: '#fff' }} />
-              ) : (
-                <p className="mt-1 whitespace-pre-wrap text-[13.5px] leading-7" style={{ color: 'var(--v3-ink)' }}>
-                  {entry?.corrected && !validated && isOpen ? entry.corrected : text}
-                </p>
-              )}
-
-              {entry?.corrected && !validated && isOpen && (
-                <p className="mt-1 text-[11px]" style={{ color: '#8a6d1f' }}>
-                  Voici la version corrigée proposée par le Génie ({countWords(entry.corrected)} mots) — vos mots
-                  d’origine sont conservés tant que vous ne la validez pas.
-                </p>
-              )}
-
-              {isOpen && (
-                <>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {editing === index ? (
-                      <button type="button" onClick={() => saveOriginalEdit(index)} className="v3-btn v3-btn-primary text-[11px]">
-                        <Save className="h-3 w-3" /> Enregistrer mes modifications
-                      </button>
-                    ) : (
-                      <button type="button" onClick={() => { setEditingCorrection(null); setEditing(index); setDraftText(original); }}
-                        className="v3-btn v3-btn-outline text-[11px]">
-                        Modifier mes mots
-                      </button>
-                    )}
-                    <button type="button" onClick={() => correct(index)} disabled={busy === index || runningAll}
-                      className="v3-btn v3-btn-outline text-[11px] disabled:opacity-50">
-                      {busy === index ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
-                      {entry?.corrected ? 'Recorriger' : 'Corriger ce passage'}
-                    </button>
-                    {entry?.corrected && !validated && (
-                      <button type="button" onClick={() => validate(index)} className="v3-btn v3-btn-primary text-[11px]">
-                        <Check className="h-3 w-3" /> Valider pour le livre
-                      </button>
-                    )}
-                    {entry?.corrected && (editingCorrection === index ? (
-                      <button type="button" onClick={() => saveCorrectedEdit(index)} className="v3-btn v3-btn-primary text-[11px]">
-                        <Save className="h-3 w-3" /> Enregistrer ma correction
-                      </button>
-                    ) : (
-                      <button type="button" onClick={() => { setEditing(null); setEditingCorrection(index); setCorrectedDraft(entry.corrected); }}
-                        className="v3-btn v3-btn-outline text-[11px]">
-                        Modifier la correction
-                      </button>
-                    ))}
-                    {(entry?.corrected || validated) && (
-                      <button type="button" onClick={() => keepOriginal(index)} className="v3-btn v3-btn-ghost text-[11px]">
-                        <Undo2 className="h-3 w-3" /> Garder mes mots d’origine
-                      </button>
-                    )}
-                    {hasEmojis(text) && (
-                      <button type="button" onClick={() => removeEmojis(index)} className="v3-btn v3-btn-ghost text-[11px]">
-                        Retirer les emojis
-                      </button>
-                    )}
-                    <button type="button" onClick={() => setAddingAfter(addingAfter === index ? null : index)} className="v3-btn v3-btn-ghost text-[11px]">
-                      <Plus className="h-3 w-3" /> Ajouter un passage ici
-                    </button>
-                    <button type="button" onClick={() => moveToFacts(index)} className="v3-btn v3-btn-ghost text-[11px]">
-                      Ce n’est pas du récit → information à retenir
-                    </button>
-                    <button type="button" onClick={() => deletePassage(index)} className="v3-btn v3-btn-ghost text-[11px]" style={{ color: '#b42318' }}>
-                      <Trash2 className="h-3 w-3" /> Supprimer
-                    </button>
-                  </div>
-
-                  {(editing === index || editingCorrection === index) && (
-                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                      <span className="text-[11px]" style={{ color: 'var(--v3-muted)' }}>Ajouter un emoji :</span>
-                      {MANUAL_EMOJIS.map((emoji) => (
-                        <button key={emoji} type="button" className="rounded-lg border px-2 py-1 text-[13px]"
-                          style={{ borderColor: 'rgba(201,168,76,0.5)', background: '#fff' }}
-                          onClick={() => {
-                            if (editingCorrection === index) setCorrectedDraft((value) => `${value} ${emoji}`);
-                            else setDraftText((value) => `${value} ${emoji}`);
-                          }}>
-                          {emoji}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  {addingAfter === index && (
-                    <div className="mt-2 rounded-xl border bg-white p-2.5" style={{ borderColor: 'rgba(201,168,76,0.5)' }}>
-                      <textarea value={addition} onChange={(event) => setAddition(event.target.value)} rows={4}
-                        placeholder="Écrivez le souvenir ou le détail oublié…"
-                        className="w-full resize-y bg-transparent text-[12.5px] outline-none" style={{ color: 'var(--v3-ink)' }} />
-                      <button type="button" disabled={!addition.trim()} onClick={() => addPassage(index)} className="v3-btn v3-btn-primary mt-2 text-[11px] disabled:opacity-50">
-                        <Plus className="h-3 w-3" /> Ajouter au récit
-                      </button>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          );
-        })}
+        {readable.length === 0 ? (
+          <p className="text-[13px]" style={{ color: 'var(--v3-muted)' }}>
+            Votre livre se remplira ici dès la première correction. Vos textes sont enregistrés :
+            ouvrez « À corriger » juste en dessous et cliquez sur « Tout corriger ».
+          </p>
+        ) : (
+          readable.map(({ index, text, entry, validated }) => (
+            <section key={`book-${index}`} className="mb-4 rounded-lg px-2 py-1"
+              style={{ background: selected === index ? '#fffdf6' : 'transparent' }}>
+              <div role="button" tabIndex={0}
+                onClick={() => setSelected(selected === index ? null : index)}
+                onKeyDown={(event) => { if (event.key === 'Enter') setSelected(selected === index ? null : index); }}
+                className="cursor-pointer">
+                {editingCorrection === index ? (
+                  <textarea value={correctedDraft} onChange={(event) => setCorrectedDraft(event.target.value)} rows={12}
+                    onClick={(event) => event.stopPropagation()}
+                    className="w-full rounded-lg border px-2 py-2 outline-none"
+                    style={{ borderColor: 'rgba(201,168,76,0.6)', color: 'var(--v3-ink)', background: '#fff', ...bookStyle }} />
+                ) : (
+                  <p className="whitespace-pre-wrap" style={{ color: 'var(--v3-ink)', ...bookStyle }}>{text}</p>
+                )}
+                {!validated && (
+                  <p className="mt-1 text-[11px]" style={{ color: '#8a6d1f' }}>
+                    Correction proposée par le Génie ({countWords(entry?.corrected || '')} mots) — à valider.
+                  </p>
+                )}
+              </div>
+              {selected === index && actionsPanel(index, passages[index - 1] || '', entry, validated)}
+            </section>
+          ))
+        )}
       </div>
+
+      {todo.length > 0 && (
+        <details className="mt-3 rounded-2xl border p-3" open style={{ borderColor: 'rgba(201,168,76,0.5)', background: '#fff' }}>
+          <summary className="cursor-pointer text-[12.5px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+            À corriger — {todo.length} morceau{todo.length > 1 ? 'x' : ''} de votre récit ({todoWords.toLocaleString('fr-FR')} mots)
+          </summary>
+          <p className="mt-1 text-[12px]" style={{ color: 'var(--v3-muted)' }}>
+            Ces textes sont enregistrés mot pour mot. Ils entreront dans le livre dès qu'ils seront corrigés.
+          </p>
+          <button type="button" onClick={correctAll} disabled={runningAll || busy !== null}
+            className="v3-btn v3-btn-primary mt-2 text-[11.5px] disabled:opacity-50">
+            {runningAll ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+            Tout corriger
+          </button>
+          <div className="mt-3 space-y-3">
+            {todo.map(({ index, original }) => (
+              <div key={`todo-${index}`} className="rounded-xl border p-3" style={{ borderColor: 'rgba(201,168,76,0.3)', background: CREAM }}>
+                {editing === index ? (
+                  <textarea value={draftText} onChange={(event) => setDraftText(event.target.value)} rows={10}
+                    className="w-full rounded-lg border px-2 py-2 outline-none"
+                    style={{ borderColor: 'rgba(201,168,76,0.6)', color: 'var(--v3-ink)', background: '#fff', ...bookStyle }} />
+                ) : (
+                  <p className="whitespace-pre-wrap" style={{ color: 'var(--v3-ink)', ...bookStyle }}>{original}</p>
+                )}
+                {actionsPanel(index, original, entryFor(index), false)}
+              </div>
+            ))}
+          </div>
+        </details>
+      )}
+
+      <V3NextStepCard brief={brief} onOutline={onDone} />
 
       {autoState === 'working' && (
         <p className="mt-3 inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs" style={{ borderColor: 'rgba(201,168,76,0.5)', color: '#8a6d1f' }}>
