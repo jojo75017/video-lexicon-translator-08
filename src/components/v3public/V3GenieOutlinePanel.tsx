@@ -52,9 +52,11 @@ function SettingField({
 export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'full' | 'guided' }) {
   const [brief, setBrief] = useState<BookBrief>({});
   const [versions, setVersions] = useState<OutlineVersion[]>([]);
-  const [tab, setTab] = useState<'outline' | 'written'>('outline');
   const [progress, setProgress] = useState<WrittenProgress>({ chapters: [], total: 0, activeIndex: -1 });
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  // Heure du dernier enregistrement : l'auteur voit que rien n'est perdu.
+  const [savedAt, setSavedAt] = useState<Date | null>(null);
+  
   
   // Le récit doit être visible immédiatement : ne jamais donner l'impression
   // qu'il a été remplacé par le court synopsis de l'IA.
