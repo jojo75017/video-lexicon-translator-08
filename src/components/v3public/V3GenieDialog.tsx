@@ -530,6 +530,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
           )}
         </div>
       )}
+      </details>
     </div>
   );
 }
