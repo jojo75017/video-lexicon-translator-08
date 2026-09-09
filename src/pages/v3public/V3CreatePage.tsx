@@ -317,9 +317,9 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
           </p>
         </div>
 
-        <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_380px] items-start">
+        <div className="mt-5">
           <div className="min-w-0 v3-ambiance">
-            {/* ① Mon récit : j'écris, le Génie corrige */}
+            {/* ① J'écris : je raconte, le Génie corrige */}
             {desk === 1 && !openedBook && (
               <>
                 <V3GenieDialog
@@ -328,46 +328,40 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                   onReady={() => setDesk(2)}
                 />
                 <div className="mt-4">
-                  <V3PassageCorrector mode={biography ? 'biography' : 'book'} />
+                  <V3PassageCorrector
+                    mode={biography ? 'biography' : 'book'}
+                    onDone={() => setDesk(2)}
+                  />
                 </div>
               </>
             )}
 
-            {/* ② Sommaire : 3 chapitres à la fois */}
+            {/* ② Mon sommaire : déduit de ce qui a été écrit, 3 chapitres à la fois */}
             {desk === 2 && <V3OutlineCoBuilder />}
 
-            {/* ③ Rédaction : le Génie écrit et range chaque chapitre */}
+            {/* ③ Mon livre : rédaction, relecture, export, couverture, KDP, audio */}
             {desk === 3 && (
-              showWizard ? (
-                <div ref={wizardRef} className="v3-card">
-                  <Suspense fallback={<div className="py-16 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-[var(--v3-orange)]" /></div>}>
-                    <V3CreateWizard />
-                  </Suspense>
-                </div>
-              ) : (
-                <div className="v3-card">
-                  <h2 className="v3-serif text-xl font-bold" style={{ color: 'var(--v3-ink)' }}>La rédaction</h2>
-                  <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>
-                    Validez votre sommaire, puis cliquez sur « Commencer la rédaction » : chaque chapitre
-                    écrit se range tout seul à sa place, déjà corrigé.
-                  </p>
-                  <button type="button" onClick={launchWorkflow} className="v3-btn v3-btn-primary mt-4 text-xs">
-                    <Sparkles className="w-3.5 h-3.5" /> Commencer la rédaction
-                  </button>
-                </div>
-              )
-            )}
-
-            {/* ④ Livre & couverture : lire, corriger, exporter, couvrir */}
-            {desk === 4 && (
               <div className="space-y-4">
-                <div className="v3-card">
-                  <h2 className="v3-serif text-xl font-bold" style={{ color: 'var(--v3-ink)' }}>Votre livre, prêt à publier</h2>
-                  <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>
-                    Relisez chaque chapitre dans la colonne de droite, puis servez-vous des boutons
-                    ci-dessous : correction, export Word ou PDF, couverture, données KDP, traduction et audio.
-                  </p>
-                </div>
+                {showWizard ? (
+                  <div ref={wizardRef} className="v3-card">
+                    <Suspense fallback={<div className="py-16 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-[var(--v3-orange)]" /></div>}>
+                      <V3CreateWizard />
+                    </Suspense>
+                  </div>
+                ) : (
+                  <div className="v3-card">
+                    <h2 className="v3-serif text-xl font-bold" style={{ color: 'var(--v3-ink)' }}>Votre livre</h2>
+                    <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>
+                      Validez votre sommaire, puis cliquez sur « Commencer la rédaction » : chaque chapitre
+                      écrit se range tout seul à sa place, déjà corrigé. Ensuite, les boutons ci-dessous
+                      vous donnent l’export Word ou PDF, la couverture, les données Amazon, la traduction
+                      et l’audio.
+                    </p>
+                    <button type="button" onClick={launchWorkflow} className="v3-btn v3-btn-primary mt-4 text-xs">
+                      <Sparkles className="w-3.5 h-3.5" /> Commencer la rédaction
+                    </button>
+                  </div>
+                )}
                 <V3AmbiancePicker />
                 <V3KeyHint />
                 <V3PipelinePanel />
@@ -382,7 +376,12 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
               </div>
             )}
 
-            {/* Vos actions : toujours visibles, quel que soit le bureau */}
+            {/* Votre livre : replié sous l'étape en cours, jamais dans une colonne perdue */}
+            <div id="sommaire-ia" className="mt-5">
+              <V3GenieOutlinePanel key={briefKey} outlineMode={sommaireIa ? 'guided' : undefined} />
+            </div>
+
+            {/* Vos actions : toujours visibles, quelle que soit l'étape */}
             <div className="mt-5">
               <V3BookActionsBar onLaunch={launchWorkflow} />
             </div>
@@ -397,12 +396,8 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
               </Link>
             </div>
           </div>
-
-          {/* Colonne « Votre livre en direct » : sommaire unique + texte écrit */}
-          <aside id="sommaire-ia" className="order-first min-w-0 lg:order-last lg:sticky lg:top-24">
-            <V3GenieOutlinePanel key={briefKey} outlineMode={sommaireIa ? 'guided' : undefined} />
-          </aside>
         </div>
+
 
 
 
