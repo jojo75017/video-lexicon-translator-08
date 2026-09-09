@@ -33,12 +33,26 @@ export default function V3OutlineCoBuilder() {
   }, []);
 
   const outline = brief.outline || [];
-  const target = Math.min(40, Math.max(3, Number(brief.chapters) || 12));
   /** Récit de l'auteur découpé en passages numérotés : le sommaire doit les suivre. */
   const passages = listSourcePassages(brief.sourceText || '');
-  const coveredCount = new Set(
+  const sourceWords = passages.reduce((total, p) => total + countWords(p), 0);
+  /**
+   * Le nombre de chapitres n'est plus une valeur saisie d'avance : il est déduit
+   * de ce que l'auteur a réellement écrit (et se réajuste s'il écrit plus).
+   */
+  const suggested = suggestChapterCount(sourceWords, brief.wordsPerChapter);
+  const target = sourceWords > 0
+    ? suggested
+    : Math.min(40, Math.max(3, Number(brief.chapters) || 12));
+  const covered = new Set(
     outline.flatMap((c) => (Array.isArray(c.sources) ? c.sources : [])),
-  ).size;
+  );
+  const coveredCount = covered.size;
+  /** Textes envoyés après la construction du sommaire : matière à rattacher. */
+  const pending = uncoveredPassages(brief);
+  const pendingWords = pending.reduce((total, n) => total + countWords(passages[n - 1] || ''), 0);
+  const missingChapters = Math.max(0, suggested - outline.length);
+
 
   const patch = (values: Partial<BookBrief>) => {
     const next = { ...(readBookBrief() || {}), ...values };
