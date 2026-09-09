@@ -61,7 +61,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
   const [questions, setQuestions] = useState<string[]>([]);
   const [editing, setEditing] = useState(false);
   const [messages, setMessages] = useState<GenieMessage[]>([]);
-  const [showThread, setShowThread] = useState(true);
+  const [showThread, setShowThread] = useState(false);
   const [collapseOld, setCollapseOld] = useState(true);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const resultRef = useRef<HTMLDivElement | null>(null);
@@ -379,6 +379,20 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
         </div>
       </div>
 
+      {/* La question du Génie : elle vient de votre texte, jamais d'un questionnaire */}
+      {askedQuestions.length > 0 && (
+        <div className="mt-4 space-y-2">
+          <div className="text-[11px] font-bold uppercase tracking-wider" style={{ color: '#8a6d1f' }}>
+            Le Génie a lu votre texte et vous demande
+          </div>
+          {askedQuestions.map((q) => (
+            <RefineRow key={q} question={q} disabled={loading} onSend={refine} onSkip={() => setQuestions((prev) => prev.filter((item) => item !== q))} />
+          ))}
+        </div>
+      )}
+
+
+
       {!ready && (
         <div className="mt-3 flex flex-wrap gap-2">
           {EXAMPLES.map((ex) => (
@@ -438,13 +452,6 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
             ))}
           </div>
 
-          {questions.length > 0 && (
-            <div className="mt-3 space-y-2">
-              {questions.map((q) => (
-                <RefineRow key={q} question={q} disabled={loading} onSend={refine} />
-              ))}
-            </div>
-          )}
 
           <div className="mt-4 flex flex-wrap gap-2">
             <button type="button" onClick={onReady} className="v3-btn v3-btn-primary">
