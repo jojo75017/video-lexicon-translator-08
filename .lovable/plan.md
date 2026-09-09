@@ -77,8 +77,9 @@ Repères à respecter (replié) : Michel = frère · Anne = sœur…
 - `V3PassageCorrector` affichera `narrativeForBook()` en permanence, avec une zone crème à défilement vertical ; les passages non validés resteront inclus grâce à leur version source.
 - La liste d’édition des textes recevra elle aussi une hauteur maximale et un défilement pour éviter une page interminable.
 - Les `factMemory` seront déplacés dans un panneau replié et renommés sans changer leur rôle dans les demandes envoyées au Génie.
-- Le champ `emojis` existant sera ignoré/désactivé dans l’interface ; aucune nouvelle correction IA ne sera lancée pour ajouter un emoji.
-- L’insertion manuelle se fera dans les zones de modification existantes et sera sauvegardée comme le reste du texte.
+- Le champ `emojis` existant reste la source unique de ce choix ; la consigne envoyée au Génie sera resserrée à un emoji maximum par passage.
+- Le retrait d'emojis se fait localement sur le texte, sans nouvel appel IA ni crédit.
+- L'insertion manuelle se fera dans les zones de modification existantes et sera sauvegardée comme le reste du texte.
 - Aucun changement de base, sécurité, paiement, tarif, calcul KDP ou crédit IA.
 
 ## Vérification
@@ -86,5 +87,5 @@ Repères à respecter (replié) : Michel = frère · Anne = sœur…
 - Ouvrir le projet actuel et confirmer que ses 5 textes apparaissent immédiatement sur fond crème.
 - Faire défiler le livre et la liste des textes avec leurs ascenseurs respectifs.
 - Vérifier que les 34 repères sont repliés et que leur utilité est expliquée.
-- Ajouter manuellement un emoji dans un texte, enregistrer, recharger puis reprendre le livre.
-- Confirmer que le Génie n’ajoute aucun emoji automatiquement.
+- Activer puis désactiver les emojis, en retirer d'un texte, en ajouter un à la main, enregistrer et recharger.
+
