@@ -39,6 +39,15 @@ function seedHubConfig(idea: string | null, genre: string | null, type: string |
   } catch { /* ignore */ }
 }
 
+/** Les 4 bureaux de la maison d'édition : un seul chemin, dans l'ordre. */
+const DESKS = [
+  { id: 1 as const, label: 'Mon récit', hint: 'Vous racontez, le Génie corrige votre texte sans le résumer.' },
+  { id: 2 as const, label: 'Sommaire', hint: 'On construit le sommaire ensemble, 3 chapitres à la fois, puis vous le validez.' },
+  { id: 3 as const, label: 'Rédaction', hint: 'Le Génie écrit chapitre par chapitre et les range à leur place.' },
+  { id: 4 as const, label: 'Livre & couverture', hint: 'Relecture, export Word ou PDF, couverture, KDP, traduction et audio.' },
+];
+type DeskId = 1 | 2 | 3 | 4;
+
 type PageProps = {
   /** 'biography' = onglet « Biographie — Le récit de votre vie ». */
   mode?: 'book' | 'biography';
