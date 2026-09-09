@@ -327,7 +327,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
 
         <div className="mt-5">
           <div className="min-w-0 v3-ambiance">
-            {/* ① J'écris : je raconte, le Génie corrige */}
+            {/* ① J'écris : je raconte, le Génie corrige. Rien d'autre à l'écran. */}
             {desk === 1 && (
               <>
                 <V3GenieDialog
@@ -341,11 +341,23 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                     onDone={() => setDesk(2)}
                   />
                 </div>
+                <div className="mt-4 flex flex-wrap justify-end gap-2">
+                  <button type="button" onClick={() => setDesk(2)} className="v3-btn v3-btn-outline text-xs">
+                    Passer au sommaire <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </>
             )}
 
-            {/* ② Mon sommaire : déduit de ce qui a été écrit, 3 chapitres à la fois */}
-            {desk === 2 && <V3OutlineCoBuilder />}
+            {/* ② Mon sommaire : déduit de ce qui a été écrit */}
+            {desk === 2 && (
+              <>
+                <V3OutlineCoBuilder />
+                <div id="sommaire-ia" className="mt-5">
+                  <V3GenieOutlinePanel key={briefKey} outlineMode={sommaireIa ? 'guided' : undefined} />
+                </div>
+              </>
+            )}
 
             {/* ③ Mon livre : rédaction, relecture, export, couverture, KDP, audio */}
             {desk === 3 && (
@@ -370,41 +382,38 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                     </button>
                   </div>
                 )}
-                <V3AmbiancePicker />
-                <V3KeyHint />
-                <V3PipelinePanel />
+
+                <V3GenieOutlinePanel key={briefKey} />
+                <V3BookActionsBar onLaunch={launchWorkflow} />
+
                 <details className="rounded-[22px] border p-4" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
                   <summary className="cursor-pointer text-xs font-semibold" style={{ color: 'var(--v3-muted)' }}>
-                    Modifier la fiche à la main (titre, auteur, catégorie, synopsis…)
+                    Réglages du livre (titre, auteur, catégorie, ambiance, clés IA, agents)
                   </summary>
-                  <div className="mt-4">
+                  <div className="mt-4 space-y-4">
                     <V3BriefRecap key={briefKey} variant="full" formOnly hideBookForm={false} />
+                    <V3AmbiancePicker />
+                    <V3KeyHint />
+                    <V3PipelinePanel />
                   </div>
                 </details>
+
+                {/* Modes illustrés — liens discrets */}
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Link to="/v3/create/illustre" className="v3-btn v3-btn-ghost text-xs">
+                    <ImageIcon className="w-3.5 h-3.5" /> Album maternelle 3-6 ans <ArrowRight className="w-3 h-3" />
+                  </Link>
+                  <Link to="/v3/create/illustre?preset=histoires-du-soir-3-7" className="v3-btn v3-btn-ghost text-xs">
+                    <ImageIcon className="w-3.5 h-3.5" /> Histoires du soir 3-7 ans <ArrowRight className="w-3 h-3" />
+                  </Link>
+                </div>
               </div>
             )}
-
-            {/* Votre livre : replié sous l'étape en cours, jamais dans une colonne perdue */}
-            <div id="sommaire-ia" className="mt-5">
-              <V3GenieOutlinePanel key={briefKey} outlineMode={sommaireIa ? 'guided' : undefined} />
-            </div>
-
-            {/* Vos actions : toujours visibles, quelle que soit l'étape */}
-            <div className="mt-5">
-              <V3BookActionsBar onLaunch={launchWorkflow} />
-            </div>
-
-            {/* Modes illustrés — liens discrets */}
-            <div className="mt-5 flex flex-wrap justify-center gap-2">
-              <Link to="/v3/create/illustre" className="v3-btn v3-btn-ghost text-xs">
-                <ImageIcon className="w-3.5 h-3.5" /> Album maternelle 3-6 ans <ArrowRight className="w-3 h-3" />
-              </Link>
-              <Link to="/v3/create/illustre?preset=histoires-du-soir-3-7" className="v3-btn v3-btn-ghost text-xs">
-                <ImageIcon className="w-3.5 h-3.5" /> Histoires du soir 3-7 ans <ArrowRight className="w-3 h-3" />
-              </Link>
-            </div>
           </div>
         </div>
+
+        <SaveStatusLine />
+
 
 
 
