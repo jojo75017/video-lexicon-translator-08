@@ -242,6 +242,21 @@ export default function V3MainTabs() {
             >
               ✨ Offre V3 · 1er octobre
             </NavLink>
+            <NavLink
+              to="/v3/upsells"
+              onClick={() => setMobileOpen(false)}
+              className="v3-btn w-full justify-center text-[13px]"
+              style={{
+                background: 'var(--v3-gold-soft)',
+                color: 'var(--v3-emerald)',
+                border: '1px solid var(--v3-gold)',
+                fontWeight: 700,
+                textShadow: 'none',
+              }}
+            >
+              <Sparkles className="w-4 h-4" /> UPSELLS — packs &amp; compléments
+            </NavLink>
+
 
             {V3_HEADER_MENU.map((cat) => (
               <details key={cat.key} className="rounded-xl" style={{ border: '1px solid var(--v3-line)' }}>
