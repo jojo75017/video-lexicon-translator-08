@@ -195,7 +195,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
         wantsIllustrations: Boolean(b.wantsIllustrations),
         cibleProfil: b.cibleProfil || brief.cibleProfil || '',
         promesseCentrale: b.promesseCentrale || brief.promesseCentrale || '',
-        factMemory: Array.from(new Set([...(latestBrief.factMemory || []), ...(Array.isArray(b.factMemory) ? b.factMemory.map(String) : [])])),
+        factMemory: dedupeFactMemory([...(latestBrief.factMemory || []), ...(Array.isArray(b.factMemory) ? b.factMemory.map(String) : [])]),
         outlineValidated: false,
         ...proposed,
       };
