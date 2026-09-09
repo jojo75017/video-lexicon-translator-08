@@ -39,14 +39,14 @@ function seedHubConfig(idea: string | null, genre: string | null, type: string |
   } catch { /* ignore */ }
 }
 
-/** Les 4 bureaux de la maison d'édition : un seul chemin, dans l'ordre. */
+/** Trois étapes seulement : on raconte, le sommaire se déduit, le livre se monte. */
 const DESKS = [
-  { id: 1 as const, label: 'Mon récit', hint: 'Vous racontez, le Génie corrige votre texte sans le résumer.' },
-  { id: 2 as const, label: 'Sommaire', hint: 'On construit le sommaire ensemble, 3 chapitres à la fois, puis vous le validez.' },
-  { id: 3 as const, label: 'Rédaction', hint: 'Le Génie écrit chapitre par chapitre et les range à leur place.' },
-  { id: 4 as const, label: 'Livre & couverture', hint: 'Relecture, export Word ou PDF, couverture, KDP, traduction et audio.' },
+  { id: 1 as const, label: 'J’écris', hint: 'Vous racontez comme vous parlez. Le Génie corrige chaque texte sans jamais le résumer. Aucun plan à faire.' },
+  { id: 2 as const, label: 'Mon sommaire', hint: 'Le sommaire est déduit de ce que vous avez vraiment écrit : le nombre de chapitres suit votre volume de texte.' },
+  { id: 3 as const, label: 'Mon livre', hint: 'Rédaction chapitre par chapitre, relecture, export Word ou PDF, couverture, KDP, traduction et audio.' },
 ];
-type DeskId = 1 | 2 | 3 | 4;
+type DeskId = 1 | 2 | 3;
+
 
 type PageProps = {
   /** 'biography' = onglet « Biographie — Le récit de votre vie ». */
