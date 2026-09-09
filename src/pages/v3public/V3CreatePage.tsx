@@ -412,6 +412,31 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
           </div>
         </div>
 
+        {/* Tous vos outils restent accessibles, à chaque étape, dans un seul volet. */}
+        {desk !== 3 && (
+          <details className="mt-5 rounded-[22px] border p-4" style={{ borderColor: 'var(--v3-gold, #c9a84c)', background: '#fff' }}>
+            <summary className="cursor-pointer text-[13px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+              Tous mes outils et réglages (export, couverture, Amazon, traduction, audio, clés IA)
+            </summary>
+            <div className="mt-4 space-y-4">
+              <V3BookActionsBar onLaunch={launchWorkflow} />
+              {desk === 1 && <V3GenieOutlinePanel key={briefKey} />}
+              <V3BriefRecap key={`recap-${briefKey}`} variant="full" formOnly hideBookForm={false} />
+              <V3AmbiancePicker />
+              <V3KeyHint />
+              <V3PipelinePanel />
+              <div className="flex flex-wrap justify-center gap-2">
+                <Link to="/v3/create/illustre" className="v3-btn v3-btn-ghost text-xs">
+                  <ImageIcon className="w-3.5 h-3.5" /> Album maternelle 3-6 ans <ArrowRight className="w-3 h-3" />
+                </Link>
+                <Link to="/v3/create/illustre?preset=histoires-du-soir-3-7" className="v3-btn v3-btn-ghost text-xs">
+                  <ImageIcon className="w-3.5 h-3.5" /> Histoires du soir 3-7 ans <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+            </div>
+          </details>
+        )}
+
         <SaveStatusLine />
 
 
