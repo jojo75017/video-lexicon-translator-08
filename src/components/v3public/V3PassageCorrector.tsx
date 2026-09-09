@@ -141,7 +141,6 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
       const corrected = String((data as any)?.corrected || '').trim();
       if (!corrected) throw new Error('Réponse illisible, réessayez.');
       const missing = missingProtectedTerms(original, corrected);
-      if (missing.length) throw new Error(`Correction refusée : le Génie a oublié ${missing.join(', ')}.`);
       const current = readBookBrief() || {};
       const next = patch({
         polished: upsertPolished(current, { index, original, corrected }),
