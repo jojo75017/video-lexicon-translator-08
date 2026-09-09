@@ -393,10 +393,11 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
       {(brief.factMemory || []).length > 0 && (
         <details className="mt-4 rounded-2xl border bg-white p-3" style={{ borderColor: 'rgba(15,107,74,0.35)' }}>
           <summary className="cursor-pointer text-[11px] font-bold uppercase tracking-wider" style={{ color: '#0f6b4a' }}>
-            Voir les {(brief.factMemory || []).length} repères que le Génie doit respecter
+            Ce que le Génie retient de vous ({(brief.factMemory || []).length} informations)
           </summary>
           <p className="mt-1 text-[11px]" style={{ color: 'var(--v3-muted)' }}>
-            Ils empêchent le Génie de changer ou d’oublier vos prénoms, liens familiaux, lieux, dates et faits.
+            Ces informations ne sont pas dans votre livre : elles empêchent simplement le Génie de changer
+            ou d’oublier vos prénoms, liens familiaux, lieux, dates et faits.
           </p>
           <div className="mt-2 max-h-64 space-y-1.5 overflow-y-auto pr-1">
             {(brief.factMemory || []).map((fact, index) => (
@@ -416,10 +417,12 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
             Le Génie a lu votre texte et vous demande
           </div>
           {askedQuestions.map((q) => (
-            <RefineRow key={q} question={q} disabled={loading} onSend={refine} onSkip={() => setQuestions((prev) => prev.filter((item) => item !== q))} />
+            <RefineRow key={q} question={q} disabled={loading} onRemember={rememberAnswer} onSend={refine}
+              onSkip={() => setQuestions((prev) => prev.filter((item) => item !== q))} />
           ))}
         </div>
       )}
+
 
 
 
