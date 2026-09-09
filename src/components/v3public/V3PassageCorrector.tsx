@@ -514,7 +514,7 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
           </p>
         ) : (
           readable.map(({ index, text, entry, validated }) => (
-            <section key={`book-${index}`} className="mb-4 rounded-lg px-2 py-1"
+            <section key={`book-${index}`} id={`v3-passage-${index}`} className="mb-4 rounded-lg px-2 py-1"
               style={{ background: selected === index ? '#fffdf6' : 'transparent' }}>
               <div role="button" tabIndex={0}
                 onClick={() => setSelected(selected === index ? null : index)}
@@ -555,7 +555,7 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
           </button>
           <div className="mt-3 space-y-3">
             {todo.map(({ index, original }) => (
-              <div key={`todo-${index}`} className="rounded-xl border p-3" style={{ borderColor: 'rgba(201,168,76,0.3)', background: CREAM }}>
+              <div key={`todo-${index}`} id={`v3-passage-${index}`} className="rounded-xl border p-3" style={{ borderColor: 'rgba(201,168,76,0.3)', background: CREAM }}>
                 {editing === index ? (
                   <textarea value={draftText} onChange={(event) => setDraftText(event.target.value)} rows={10}
                     className="w-full rounded-lg border px-2 py-2 outline-none"
