@@ -717,7 +717,7 @@ const App = () => {
               <Route path="u/:slug" element={<V3LockedGate><TrialGate label="Profil auteur public"><V3AuthorProfilePage /></TrialGate></V3LockedGate>} />
               <Route path="mes-livres" element={<V3LockedGate><V3BookManagerPage /></V3LockedGate>} />
               <Route path="livres-corriges" element={<V3LockedGate><V3BookManagerPage /></V3LockedGate>} />
-              <Route path="donnees-kdp" element={<V3LockedGate><TrialGate label="Données KDP"><V3KdpDataPage /></TrialGate></V3LockedGate>} />
+              <Route path="donnees-kdp" element={<V3LockedGate><TrialGate label="Données KDP"><V3ModulePaywall><V3KdpDataPage /></V3ModulePaywall></TrialGate></V3LockedGate>} />
               <Route path="parametres" element={<V3LockedGate><V3AuthorSettingsPage /></V3LockedGate>} />
               <Route path="livres/:type" element={<V3LockedGate><TrialGate label="Livres spéciaux"><V3SpecialBookPage /></TrialGate></V3LockedGate>} />
 
@@ -728,11 +728,11 @@ const App = () => {
               <Route path="outils" element={<V3LockedGate><V3ToolsIndexPage /></V3LockedGate>} />
               <Route path="assistant" element={<V3LockedGate><V3AssistantPage /></V3LockedGate>} />
               <Route path="outils/sommaire-ultime" element={<V3LockedGate><V3TocUltimatePage /></V3LockedGate>} />
-              <Route path="outils/traduction" element={<V3LockedGate><TrialGate label="Traduction 10 langues"><V3TranslatorPage /></TrialGate></V3LockedGate>} />
-              <Route path="corriger" element={<V3LockedGate><V3CorrecteurPage /></V3LockedGate>} />
+              <Route path="outils/traduction" element={<V3LockedGate><TrialGate label="Traduction 10 langues"><V3ModulePaywall><V3TranslatorPage /></V3ModulePaywall></TrialGate></V3LockedGate>} />
+              <Route path="corriger" element={<V3LockedGate><V3ModulePaywall><V3CorrecteurPage /></V3ModulePaywall></V3LockedGate>} />
               <Route path="avis" element={<V3LockedGate><TrialGate label="Avis clients"><V3AvisClientsPage /></TrialGate></V3LockedGate>} />
-              <Route path="posts" element={<V3LockedGate><TrialGate label="Publications sociales"><V3PostsPage /></TrialGate></V3LockedGate>} />
-              <Route path="acquisition" element={<V3LockedGate><TrialGate label="Acquisition"><V3AcquisitionPage /></TrialGate></V3LockedGate>} />
+              <Route path="posts" element={<V3LockedGate><TrialGate label="Publications sociales"><V3ModulePaywall><V3PostsPage /></V3ModulePaywall></TrialGate></V3LockedGate>} />
+              <Route path="acquisition" element={<V3LockedGate><TrialGate label="Acquisition"><V3ModulePaywall><V3AcquisitionPage /></V3ModulePaywall></TrialGate></V3LockedGate>} />
               <Route path="kit-demarrage" element={<V3LockedGate><V3KitDemarragePage /></V3LockedGate>} />
               <Route path="studio" element={<V3LockedGate><TrialGate label="Studio Pro"><V3StudioProPage /></TrialGate></V3LockedGate>} />
 
@@ -750,14 +750,14 @@ const App = () => {
               <Route path="script-heygen" element={<V3LockedGate><V3ScriptHeygenPage /></V3LockedGate>} />
               <Route path="upsell-17" element={<V3LockedGate><V3Upsell17Page /></V3LockedGate>} />
               <Route path="outils/ams-keywords" element={<V3LockedGate><TrialGate label="Mots-clés AMS"><V3AmsKeywordsPage /></TrialGate></V3LockedGate>} />
-              <Route path="outils/espion-concurrents" element={<V3LockedGate><TrialGate label="Espion concurrents"><V3CompetitorSpyPage /></TrialGate></V3LockedGate>} />
+              <Route path="outils/espion-concurrents" element={<V3LockedGate><TrialGate label="Espion concurrents"><V3ModulePaywall><V3CompetitorSpyPage /></V3ModulePaywall></TrialGate></V3LockedGate>} />
               <Route path="outils/categories" element={<V3LockedGate><TrialGate label="Catégories KDP"><V3CategoryFinderPage /></TrialGate></V3LockedGate>} />
               <Route path="outils/offerts" element={<V3LockedGate><V3OutilsOffertsPage /></V3LockedGate>} />
               <Route path="nouveautes" element={<V3LockedGate><V3NouveautesPage /></V3LockedGate>} />
-              <Route path="outils/royalties" element={<V3LockedGate><TrialGate label="Royalties"><V3RoyaltiesPage /></TrialGate></V3LockedGate>} />
+              <Route path="outils/royalties" element={<V3LockedGate><TrialGate label="Royalties"><V3ModulePaywall><V3RoyaltiesPage /></V3ModulePaywall></TrialGate></V3LockedGate>} />
               <Route path="outils/humanizer" element={<V3LockedGate><TrialGate label="Humanizer IA"><V3HumanizerPage /></TrialGate></V3LockedGate>} />
               <Route path="outils/mockup-3d" element={<V3LockedGate><TrialGate label="Mockup 3D"><V3MockupPage /></TrialGate></V3LockedGate>} />
-              <Route path="outils/audiobook" element={<V3LockedGate><TrialGate label="Livre audio"><V3AudiobookPage /></TrialGate></V3LockedGate>} />
+              <Route path="outils/audiobook" element={<V3LockedGate><TrialGate label="Livre audio"><V3ModulePaywall><V3AudiobookPage /></V3ModulePaywall></TrialGate></V3LockedGate>} />
               <Route path="outils/editeur" element={<V3LockedGate><V3EditorPage /></V3LockedGate>} />
 
               <Route path="hub" element={<V3LockedGate><V3Gate><V3HubPage /></V3Gate></V3LockedGate>} />
