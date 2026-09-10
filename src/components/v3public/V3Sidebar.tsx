@@ -92,6 +92,7 @@ const NAV: NavSection[] = [
       { to: '/v3/recherche?tab=bio', label: 'Bio auteur', icon: User },
       { to: '/v3/recherche?tab=aplus', label: 'Contenu A+ Amazon', icon: Award, badge: 'Pro' },
       { to: '/audit-pilot', label: 'KDP Pilot — Audit', icon: Award },
+      { to: '/v3/kdp-pilot', label: 'KDP Pilot — aller plus loin', icon: BarChart3, badge: '-15 %' },
       { to: '/niches', label: 'Niches rentables', icon: BarChart3 },
       { to: '/niches-600', label: '600 niches', icon: BarChart3 },
     ],

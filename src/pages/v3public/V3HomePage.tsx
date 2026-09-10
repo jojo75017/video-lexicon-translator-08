@@ -9,7 +9,7 @@ import V3StartBookBar from '@/components/v3public/V3StartBookBar';
 import V3ResumeBookCard from '@/components/v3public/V3ResumeBookCard';
 import V3QuickActionsBar from '@/components/v3public/V3QuickActionsBar';
 import V3PaletteModule from '@/components/v3public/V3PaletteModule';
-import KdpPilotPromoBanner from '@/components/ebook/KdpPilotPromoBanner';
+
 import V3ContentStudioPromo from '@/components/v3public/V3ContentStudioPromo';
 import V3UpsellRotator from '@/components/v3public/V3UpsellRotator';
 import V3CoverStudioBanner from '@/components/v3public/V3CoverStudioBanner';
@@ -235,9 +235,14 @@ export default function V3HomePage() {
         </Link>
       </section>
 
-      {/* KDP Pilot — outil partenaire payant + code abonnés (compact, avant les champs) */}
+      {/* KDP Pilot — une seule ligne discrète, la page dédiée porte le détail */}
       <section className="max-w-7xl mx-auto px-5 md:px-8 pt-2">
-        <KdpPilotPromoBanner variant="light" compact />
+        <p className="text-[13px]" style={{ color: 'var(--v3-muted)' }}>
+          Vous voulez suivre vos ventes réelles sur Amazon ?{' '}
+          <Link to="/v3/kdp-pilot" className="font-semibold underline" style={{ color: '#0d7a5f' }}>
+            KDP Pilot — outil partenaire, code abonné −15 %
+          </Link>
+        </p>
       </section>
 
       {/* (ContentStudio déplacé hors du Reading Gate, sous l'encart de démarrage) */}
