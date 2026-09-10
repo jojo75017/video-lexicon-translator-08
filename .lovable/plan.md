@@ -50,9 +50,9 @@ Pour que l'IA comprenne l'image à créer, le champ actuel « Sujet du livre » 
 
 ## Détails techniques
 
-- Modifications uniquement dans `src/pages/v3/cover-studio-pro/CoverProPage.tsx` (en-tête, parcours 3 étapes, intitulé de la carte verrouillée) et, mineure, dans `src/components/cover-studio-pro/CoverProIllustrationPanel.tsx` (ligne de rappel du parcours).
-- Aucune modification du tunnel de paiement, du prix 67 €, du `priceId`, des crédits, de la sécurité, du chiffrement des clés, de la base, des calculs KDP, ni de l'ancien `/v3/cover-studio-pro`.
-- Vérification navigateur sur `/v3/cover-pro` : titre et sous-titre affichés, parcours visible à 3 étapes, bouton 67 € toujours fonctionnel, état déverrouillé intact.
+- Modifications uniquement dans `src/pages/v3/cover-studio-pro/CoverProPage.tsx` (en-tête, parcours 3 étapes, intitulé de la carte verrouillée) et dans `src/components/cover-studio-pro/CoverProIllustrationPanel.tsx` (rappel du parcours + champ « Synopsis du livre (ou courte biographie) » renommé, avec aide ; la valeur est envoyée au champ `summary` déjà existant de `cover-pro-generate`).
+- Aucune modification du tunnel de paiement, du prix 67 €, du `priceId`, des crédits, de la sécurité, du chiffrement des clés, de la base, des calculs KDP, de la fonction serveur, ni de l'ancien `/v3/cover-studio-pro`.
+- Vérification navigateur sur `/v3/cover-pro` : titre et sous-titre affichés, parcours 3 étapes visible, champ Synopsis avec son explication, bouton 67 € toujours fonctionnel, état déverrouillé intact. Aucune génération payante lancée pour le test.
 
 ## Ce qui ne change pas
 
