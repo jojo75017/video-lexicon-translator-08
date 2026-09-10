@@ -75,6 +75,7 @@ export const V3_HEADER_MENU: MenuCategory[] = [
     tagline: 'Le lancement Amazon',
     links: [
       { label: 'KDP Pilot / Audit', to: '/audit-pilot', badge: 'Pro', desc: 'Audit complet avant publication Kindle/poche' },
+      { label: 'KDP Pilot — aller plus loin', to: '/v3/kdp-pilot', badge: '-15 %', desc: 'Suivi des ventes réelles et de la niche sur Amazon — outil partenaire payant, code abonné inclus' },
       { label: 'Mots-clés Amazon (KDSpy)', to: '/kdp-keywords', badge: 'Offert', desc: 'Recherche de mots-clés KDP à fort volume — 7 mots-clés rentables en quelques minutes' },
       { label: '600 Niches', to: '/niches-600', badge: 'Nouveau', desc: 'Base élargie de 600 niches Amazon analysées' },
       { label: 'Analyser les catégories KDP', to: '/v3/outils/categories', badge: 'Offert', desc: '📂 Explorez 19 000+ catégories Amazon — doublez vos chances de best-seller' },

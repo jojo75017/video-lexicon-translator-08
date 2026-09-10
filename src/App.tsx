@@ -112,6 +112,7 @@ const V3GuestAuthorPage = lazy(() => import('./pages/v3public/V3GuestAuthorPage'
 const V3AuthorProfilePage = lazy(() => import('./pages/v3public/V3AuthorProfilePage'));
 const V3BookManagerPage = lazy(() => import('./pages/v3public/V3BookManagerPage'));
 const V3KdpDataPage = lazy(() => import('./pages/v3public/V3KdpDataPage'));
+const V3KdpPilotPage = lazy(() => import('./pages/v3public/V3KdpPilotPage'));
 const V3SpecialBookPage = lazy(() => import('./pages/v3public/V3SpecialBookPage'));
 const V3AuthorSettingsPage = lazy(() => import('./pages/v3public/V3AuthorSettingsPage'));
 // Archived V3 pages (no inbound links) — routes redirect to /v3/forfaits.
@@ -721,6 +722,7 @@ const App = () => {
               <Route path="mes-livres" element={<V3LockedGate><V3BookManagerPage /></V3LockedGate>} />
               <Route path="livres-corriges" element={<V3LockedGate><V3BookManagerPage /></V3LockedGate>} />
               <Route path="donnees-kdp" element={<V3PaidModuleRoute><V3KdpDataPage /></V3PaidModuleRoute>} />
+              <Route path="kdp-pilot" element={<V3KdpPilotPage />} />
               <Route path="parametres" element={<V3LockedGate><V3AuthorSettingsPage /></V3LockedGate>} />
               <Route path="livres/:type" element={<V3LockedGate><TrialGate label="Livres spéciaux"><V3SpecialBookPage /></TrialGate></V3LockedGate>} />
 
