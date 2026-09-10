@@ -96,7 +96,23 @@ export interface WrapComposition {
   illustrationPath: string | null;
   background: WrapBackground;
   elements: WrapTextElement[];
+  /** Luminosité appliquée à l'illustration (1 = original), réversible. */
+  imageBrightness?: number;
+  /** Voile noir sur la première pour la lisibilité des textes (0 = aucun). */
+  overlayOpacity?: number;
 }
+
+/** Luminosité bornée : jamais de valeur extrême qui détruirait l'image. */
+export const clampBrightness = (value: unknown): number => {
+  const n = typeof value === 'number' && Number.isFinite(value) ? value : 1;
+  return Math.min(1.6, Math.max(0.6, n));
+};
+
+/** Voile de contraste borné. */
+export const clampOverlay = (value: unknown): number => {
+  const n = typeof value === 'number' && Number.isFinite(value) ? value : 0;
+  return Math.min(0.75, Math.max(0, n));
+};
 
 export const ROLE_LABEL_WRAP: Record<WrapRole, string> = {
   title: 'Titre',
@@ -302,6 +318,8 @@ export function createWrapComposition(params: {
       defaultElement('back-blurb'),
       defaultElement('back-about'),
     ],
+    imageBrightness: 1,
+    overlayOpacity: 0,
   };
 }
 
@@ -362,6 +380,8 @@ export function migrateFrontToWrap(
       defaultElement('back-blurb'),
       defaultElement('back-about'),
     ],
+    imageBrightness: 1,
+    overlayOpacity: 0,
   };
 }
 
@@ -447,6 +467,8 @@ export function parseWrapComposition(
     illustrationPath,
     background,
     elements: elements.length ? elements : fresh.elements,
+    imageBrightness: clampBrightness(o.imageBrightness),
+    overlayOpacity: clampOverlay(o.overlayOpacity),
   };
 }
 
@@ -465,6 +487,8 @@ export function serializeWrapComposition(
       ...e,
       text: containsUrl(e.text) ? '' : e.text,
     })),
+    imageBrightness: clampBrightness(composition.imageBrightness),
+    overlayOpacity: clampOverlay(composition.overlayOpacity),
   };
 }
 
@@ -797,10 +821,20 @@ export async function renderWrapFrontThumbnail(
       const cover = Math.max(canvas.width / img.width, canvas.height / img.height);
       const w = img.width * cover;
       const h = img.height * cover;
+      const brightness = clampBrightness(composition.imageBrightness);
+      ctx.save();
+      if (brightness !== 1) ctx.filter = `brightness(${brightness})`;
       ctx.drawImage(img, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+      ctx.restore();
     } catch {
       /* fond uni conservé */
     }
+  }
+
+  const overlay = clampOverlay(composition.overlayOpacity);
+  if (overlay > 0) {
+    ctx.fillStyle = `rgba(0,0,0,${overlay})`;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
   ctx.textBaseline = 'top';

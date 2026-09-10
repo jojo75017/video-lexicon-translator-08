@@ -18,6 +18,7 @@ import {
   AlignRight,
   Bold,
   Check,
+  Download,
   Eye,
   EyeOff,
   Italic,
@@ -49,7 +50,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import {
+  downloadExport,
+  exportWrapFrontJpeg,
+  exportWrapMockup,
+  exportWrapPdf,
+  exportWrapPng,
+} from '@/lib/cover-editor/wrapExports';
 import {
   getSignedCoverUrl,
   updateCoverProject,
@@ -70,6 +79,8 @@ import {
   ROLE_LABEL_WRAP,
   SPINE_SIDE_MARGIN_IN,
   ZONE_LABEL,
+  clampBrightness,
+  clampOverlay,
   computeWrapWarnings,
   createWrapComposition,
   defaultElement,
@@ -162,6 +173,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
   const [status, setStatus] = useState<SaveStatus>('idle');
   const [saveError, setSaveError] = useState<string | null>(null);
   const [bgUrl, setBgUrl] = useState<string | null>(null);
+  const [exporting, setExporting] = useState<null | 'pdf' | 'png' | 'front' | 'mockup'>(null);
   const [bgSize, setBgSize] = useState<{ width: number; height: number } | null>(null);
   const [showGuides, setShowGuides] = useState(true);
   const [past, setPast] = useState<WrapComposition[]>([]);
@@ -431,12 +443,45 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
   const setBackground = (patch: Partial<WrapComposition['background']>) =>
     commit((prev) => ({ ...prev, background: { ...prev.background, ...patch } }));
 
+  const setImageBrightness = (value: number) =>
+    commit((prev) => ({ ...prev, imageBrightness: clampBrightness(value) }), false);
+  const setOverlayOpacity = (value: number) =>
+    commit((prev) => ({ ...prev, overlayOpacity: clampOverlay(value) }), false);
+  const resetImageLook = () =>
+    commit((prev) => ({ ...prev, imageBrightness: 1, overlayOpacity: 0 }));
+
   /* ------------------ avertissements -------------------------------------- */
   const warnings = useMemo(
     () => (geometry ? computeWrapWarnings(composition, geometry, bgSize) : []),
     [composition, geometry, bgSize],
   );
   const warningFor = (id: string) => warnings.filter((w) => w.elementId === id);
+
+  /**
+   * Téléchargements : rendu local dans le navigateur, aucun appel IA,
+   * aucun crédit débité, aucune copie publique du fichier.
+   */
+  const runExport = async (kind: 'pdf' | 'png' | 'front' | 'mockup') => {
+    if (!geometry) return;
+    setExporting(kind);
+    try {
+      const title = project.project_name;
+      const result =
+        kind === 'pdf'
+          ? await exportWrapPdf(composition, geometry, bgUrl, title)
+          : kind === 'png'
+            ? await exportWrapPng(composition, geometry, bgUrl, title)
+            : kind === 'front'
+              ? await exportWrapFrontJpeg(composition, geometry, bgUrl, title)
+              : await exportWrapMockup(composition, geometry, bgUrl, title);
+      downloadExport(result);
+      toast.success(`Téléchargé : ${result.fileName}`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Téléchargement impossible.');
+    } finally {
+      setExporting(null);
+    }
+  };
 
   if (!geometry) {
     return (
@@ -517,7 +562,28 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
         </div>
 
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            size="sm"
+            className="gap-1 bg-[#FF9E2D] text-[#232F3E] hover:bg-[#f59021]"
+            onClick={() => void runExport('pdf')}
+            disabled={exporting !== null}
+          >
+            {exporting === 'pdf' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+            PDF couverture complète (300 DPI)
+          </Button>
+          <Button variant="outline" size="sm" className="gap-1" onClick={() => void runExport('front')} disabled={exporting !== null}>
+            {exporting === 'front' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+            Première seule (JPEG)
+          </Button>
+          <Button variant="outline" size="sm" className="gap-1" onClick={() => void runExport('png')} disabled={exporting !== null}>
+            {exporting === 'png' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+            PNG haute définition
+          </Button>
+          <Button variant="outline" size="sm" className="gap-1" onClick={() => void runExport('mockup')} disabled={exporting !== null}>
+            {exporting === 'mockup' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+            Visuel de présentation
+          </Button>
           <StatusPill status={status} error={saveError} />
           <Button size="sm" className="gap-1" onClick={() => void save()} disabled={status === 'saving'}>
             <Save className="h-4 w-4" /> Enregistrer
@@ -573,6 +639,20 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
                     top: 0,
                     width: inPx(geometry.trimWidthIn + geometry.bleedIn),
                     height: canvasH,
+                    filter: `brightness(${clampBrightness(composition.imageBrightness)})`,
+                  }}
+                />
+              )}
+
+              {/* voile de contraste sur la première (lisibilité des textes) */}
+              {clampOverlay(composition.overlayOpacity) > 0 && (
+                <div
+                  className="pointer-events-none absolute top-0"
+                  style={{
+                    left: inPx(geometry.zones.front.xIn),
+                    width: inPx(geometry.trimWidthIn + geometry.bleedIn),
+                    height: canvasH,
+                    backgroundColor: `rgba(0,0,0,${clampOverlay(composition.overlayOpacity)})`,
                   }}
                 />
               )}
@@ -789,6 +869,46 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
               )}
             </CardContent>
           </Card>
+          {/* réglages de l'illustration */}
+          <Card>
+            <CardContent className="space-y-4 p-4">
+              <p className="text-sm font-semibold text-foreground">Réglages de l’illustration</p>
+              <div className="space-y-1.5">
+                <Label className="text-xs">
+                  Luminosité de l’image · {Math.round(clampBrightness(composition.imageBrightness) * 100)} %
+                </Label>
+                <Slider
+                  min={0.6}
+                  max={1.6}
+                  step={0.02}
+                  value={[clampBrightness(composition.imageBrightness)]}
+                  onValueChange={([v]) => setImageBrightness(v)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Vers la gauche : image plus sombre. Vers la droite : image plus claire.
+                </p>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">
+                  Voile pour la lisibilité · {Math.round(clampOverlay(composition.overlayOpacity) * 100)} %
+                </Label>
+                <Slider
+                  min={0}
+                  max={0.75}
+                  step={0.05}
+                  value={[clampOverlay(composition.overlayOpacity)]}
+                  onValueChange={([v]) => setOverlayOpacity(v)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Assombrit légèrement la première pour que le titre reste bien lisible.
+                </p>
+              </div>
+              <Button variant="outline" size="sm" className="w-full gap-1" onClick={resetImageLook}>
+                <RotateCcw className="h-4 w-4" /> Revenir à l’image d’origine
+              </Button>
+            </CardContent>
+          </Card>
+
           {/* fonds */}
           <Card>
             <CardContent className="space-y-3 p-4">
