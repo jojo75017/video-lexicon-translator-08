@@ -96,7 +96,23 @@ export interface WrapComposition {
   illustrationPath: string | null;
   background: WrapBackground;
   elements: WrapTextElement[];
+  /** Luminosité appliquée à l'illustration (1 = original), réversible. */
+  imageBrightness?: number;
+  /** Voile noir sur la première pour la lisibilité des textes (0 = aucun). */
+  overlayOpacity?: number;
 }
+
+/** Luminosité bornée : jamais de valeur extrême qui détruirait l'image. */
+export const clampBrightness = (value: unknown): number => {
+  const n = typeof value === 'number' && Number.isFinite(value) ? value : 1;
+  return Math.min(1.6, Math.max(0.6, n));
+};
+
+/** Voile de contraste borné. */
+export const clampOverlay = (value: unknown): number => {
+  const n = typeof value === 'number' && Number.isFinite(value) ? value : 0;
+  return Math.min(0.75, Math.max(0, n));
+};
 
 export const ROLE_LABEL_WRAP: Record<WrapRole, string> = {
   title: 'Titre',
