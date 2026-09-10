@@ -39,11 +39,20 @@ Intitulé harmonisé avec la nouvelle identité :
 - Le panneau d'illustration (`CoverProIllustrationPanel.tsx`) conserve son titre fonctionnel « Illustration IA sans texte », mais une courte ligne sous le titre rappelle le parcours : « 1. Illustration · 2. Textes dans l'éditeur · 3. Téléchargement ».
 - Le coffre de clés (`CoverProKeyVault`) reste inchangé.
 
+### 5. Synopsis du livre pour guider l'image
+
+Pour que l'IA comprenne l'image à créer, le champ actuel « Sujet du livre » devient un vrai champ de direction artistique :
+
+- Libellé : **« Synopsis du livre (ou courte biographie) »**.
+- Explication sous le champ : « Résumez l'histoire, les personnages, le lieu, l'époque et l'ambiance — ce texte guide l'IA vers une illustration fidèle à votre livre. »
+- Placeholder adapté : « Ex. : Biographie d'un chef de famille né en 1952, entre l'Algérie et la France, souvenirs d'enfance… ».
+- Ce synopsis est transmis tel quel à la génération existante (`cover-pro-generate`, champ `summary` déjà câblé) — aucun appel supplémentaire, aucun crédit supplémentaire, aucune modification serveur.
+
 ## Détails techniques
 
-- Modifications uniquement dans `src/pages/v3/cover-studio-pro/CoverProPage.tsx` (en-tête, parcours 3 étapes, intitulé de la carte verrouillée) et, mineure, dans `src/components/cover-studio-pro/CoverProIllustrationPanel.tsx` (ligne de rappel du parcours).
-- Aucune modification du tunnel de paiement, du prix 67 €, du `priceId`, des crédits, de la sécurité, du chiffrement des clés, de la base, des calculs KDP, ni de l'ancien `/v3/cover-studio-pro`.
-- Vérification navigateur sur `/v3/cover-pro` : titre et sous-titre affichés, parcours visible à 3 étapes, bouton 67 € toujours fonctionnel, état déverrouillé intact.
+- Modifications uniquement dans `src/pages/v3/cover-studio-pro/CoverProPage.tsx` (en-tête, parcours 3 étapes, intitulé de la carte verrouillée) et dans `src/components/cover-studio-pro/CoverProIllustrationPanel.tsx` (rappel du parcours + champ « Synopsis du livre (ou courte biographie) » renommé, avec aide ; la valeur est envoyée au champ `summary` déjà existant de `cover-pro-generate`).
+- Aucune modification du tunnel de paiement, du prix 67 €, du `priceId`, des crédits, de la sécurité, du chiffrement des clés, de la base, des calculs KDP, de la fonction serveur, ni de l'ancien `/v3/cover-studio-pro`.
+- Vérification navigateur sur `/v3/cover-pro` : titre et sous-titre affichés, parcours 3 étapes visible, champ Synopsis avec son explication, bouton 67 € toujours fonctionnel, état déverrouillé intact. Aucune génération payante lancée pour le test.
 
 ## Ce qui ne change pas
 
