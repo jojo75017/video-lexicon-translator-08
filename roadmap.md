@@ -1,4 +1,9 @@
 
+## Maison d’édition de couvertures (10/09/2026)
+- [x] Présenter clairement le Studio comme « Votre maison d’édition de couvertures »
+- [x] Utiliser un synopsis explicite pour guider la couverture
+- [x] Ajouter un éclaircissement local, réversible et repris dans l’export final
+
 ## Accueil V3 — visibilité KDP Pilot et vidéo (10/09/2026)
 - [x] Afficher un bandeau KDP Pilot clairement visible avec le code PROMO15
 - [x] Expliquer près de la vidéo qu’elle présente les onglets et fait gagner du temps
