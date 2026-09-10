@@ -28,6 +28,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -91,6 +92,7 @@ export default function CouvertureExpressPage() {
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
   const [author, setAuthor] = useState('');
+  const [synopsis, setSynopsis] = useState('');
   const [genreId, setGenreId] = useState('roman');
   const [format, setFormat] = useState<FormatChoice>('ebook');
 
@@ -211,7 +213,9 @@ export default function CouvertureExpressPage() {
           mood: genre.brief.mood,
           palette: genre.brief.palette,
           avoid: 'texte, lettres, logo',
-          summary: [title.trim(), subtitle.trim()].filter(Boolean).join(' — '),
+          summary:
+            [title.trim(), subtitle.trim()].filter(Boolean).join(' — ') +
+            (synopsis.trim() ? `\n\nSynopsis du livre : ${synopsis.trim()}` : ''),
           artStyle: genre.brief.artStyle,
         },
       });
@@ -400,6 +404,20 @@ export default function CouvertureExpressPage() {
                   onChange={(e) => setAuthor(e.target.value)}
                   placeholder="Georges Boubet"
                 />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ex-synopsis">Synopsis du livre (ou courte biographie)</Label>
+                <Textarea
+                  id="ex-synopsis"
+                  rows={5}
+                  value={synopsis}
+                  onChange={(e) => setSynopsis(e.target.value)}
+                  placeholder="Ex. : Biographie d’un chef de famille né en 1952, entre l’Algérie et la France, souvenirs d’enfance, ambiance chaleureuse et nostalgique…"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Résumez l’histoire, les personnages, le lieu, l’époque et l’ambiance : ce texte
+                  guide l’image vers une couverture fidèle à votre livre.
+                </p>
               </div>
               <div className="space-y-1.5">
                 <Label>Genre du livre</Label>
