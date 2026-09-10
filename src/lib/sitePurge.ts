@@ -16,6 +16,10 @@ export const runSiteWidePurge = async (): Promise<void> => {
   try {
     if (localStorage.getItem(PURGE_KEY) === PURGE_VERSION) return;
 
+    // Page affichée au démarrage : si l'utilisateur a déjà navigué ailleurs
+    // pendant le nettoyage, on ne le renvoie pas en arrière.
+    const bootPath = window.location.pathname;
+
     if ("serviceWorker" in navigator) {
       const regs = await navigator.serviceWorker.getRegistrations();
       await Promise.all(regs.map((r) => r.unregister().catch(() => false)));
@@ -28,6 +32,8 @@ export const runSiteWidePurge = async (): Promise<void> => {
 
     localStorage.setItem(PURGE_KEY, PURGE_VERSION);
 
+    if (window.location.pathname !== bootPath) return;
+
     const url = new URL(window.location.href);
     if (url.searchParams.get("v") !== PURGE_VERSION) {
       url.searchParams.set("v", PURGE_VERSION);
@@ -37,3 +43,4 @@ export const runSiteWidePurge = async (): Promise<void> => {
     // best-effort — never block boot
   }
 };
+
