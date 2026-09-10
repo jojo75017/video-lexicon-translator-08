@@ -48,10 +48,10 @@ export default function V3PresentationVideo() {
                 <Play className="h-3.5 w-3.5" /> Collection EbookStudio · Présentation V3
               </p>
               <h2 className="mt-2 text-2xl md:text-3xl font-bold v3-serif" style={{ color: 'var(--v3-editorial-ink)' }}>
-                EbookStudio V3 : du manuscrit au livre publiable
+                Voilà ce que vous trouverez dans les onglets
               </h2>
               <p className="mt-1 max-w-2xl text-sm leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
-                Le parcours complet : du sommaire construit avec l'IA au fichier prêt pour Amazon.
+                Suivez aussi cette vidéo : elle vous fera gagner du temps et vous montrera le parcours complet, du manuscrit au livre prêt pour Amazon.
               </p>
             </div>
             <span className="inline-flex items-center gap-1.5 border-l pl-4 text-[11px] font-semibold" style={{ color: 'var(--v3-editorial-ink-soft)', borderColor: 'var(--v3-gold)' }}>

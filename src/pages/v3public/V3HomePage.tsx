@@ -35,6 +35,7 @@ import V3HowItWorksSteps from '@/components/v3public/V3HowItWorksSteps';
 import V3BenefitsPanel from '@/components/v3public/V3BenefitsPanel';
 import V3DifferenceTable from '@/components/v3public/V3DifferenceTable';
 import ReadingGate from '@/components/marketing/ReadingGate';
+import { KDP_PILOT_PROMO_CODE } from '@/data/externalLinks';
 
 
 
@@ -75,6 +76,42 @@ export default function V3HomePage() {
 
       {/* SUPERBE PROMO — Ebook Comic Agent (offre partenaire), grand bandeau */}
       <ComicAgentTeaser variant="large" />
+
+      {/* KDP PILOT — accès visible sans alourdir le reste de l'accueil */}
+      <section
+        className="border-y"
+        style={{ background: 'var(--v3-editorial-ink)', borderColor: 'var(--v3-gold)' }}
+      >
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-5 md:flex-row md:items-center md:justify-between md:px-8">
+          <div className="flex items-start gap-4">
+            <span
+              className="grid h-11 w-11 shrink-0 place-items-center rounded-md text-xl"
+              style={{ background: 'var(--v3-gold-soft)', color: 'var(--v3-editorial-ink)' }}
+              aria-hidden="true"
+            >
+              📊
+            </span>
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: 'var(--v3-gold)' }}>
+                Pour aller plus loin sur Amazon KDP
+              </p>
+              <h2 className="mt-1 text-xl font-bold text-white v3-serif md:text-2xl">
+                KDP Pilot : suivez vos ventes, votre classement et vos concurrents
+              </h2>
+              <p className="mt-1 text-sm leading-relaxed text-white/80">
+                Outil partenaire indépendant et payant. Votre code abonné <strong className="text-white">{KDP_PILOT_PROMO_CODE}</strong> vous offre 15 % de réduction.
+              </p>
+            </div>
+          </div>
+          <Link
+            to="/v3/kdp-pilot"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-md px-5 py-2.5 text-sm font-bold transition-transform hover:-translate-y-0.5"
+            style={{ background: 'var(--v3-gold)', color: 'var(--v3-editorial-ink)' }}
+          >
+            Voir KDP Pilot et mon code <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </section>
 
       {/* BANDEAU D'ACCROCHE — premier module */}
       <V3HeroBanner />
