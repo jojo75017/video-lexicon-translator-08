@@ -30,6 +30,7 @@ const adminNavItems: AdminNavItem[] = [
   { label: 'Plans V3', path: '/admin/plans-v3', icon: Table, exact: true },
   { label: 'Lancement V3', path: '/admin/lancement', icon: Rocket, exact: true },
   { label: 'Campagnes', path: '/admin/campagnes', icon: Send, exact: true },
+  { label: 'Script vidéo V3', path: '/admin/script-video', icon: Video, exact: true },
   { label: 'Attente', path: '/admin/attente', icon: Snowflake, exact: true },
   { label: 'Tester PayPal', path: '/admin/tester-paypal', icon: CreditCard, exact: true },
   { label: 'Tester BD', path: '/admin/tester-bd', icon: Palette, exact: true },
