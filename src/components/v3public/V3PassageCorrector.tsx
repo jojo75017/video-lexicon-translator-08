@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BookOpen, Check, ListOrdered, Loader2, Plus, RefreshCw, Save, ShieldCheck, Sparkles, Trash2, Undo2, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -45,8 +45,6 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
   const [undoBrief, setUndoBrief] = useState<BookBrief | null>(null);
   /** Passage dont la correction est revenue plus courte que les mots de l'auteur. */
   const [shortWarning, setShortWarning] = useState<number | null>(null);
-  /** Le nettoyage automatique des réponses courtes n'a lieu qu'une fois par ouverture. */
-  const cleanedRef = useRef(false);
 
 
   useEffect(() => {
@@ -284,16 +282,12 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
     toast.success('Vos réponses courtes quittent le livre : le Génie les garde en mémoire.');
   };
 
-  /**
-   * Les réponses très courtes sortent du livre toutes seules, une seule fois par
-   * livre : elles deviennent des informations retenues, annulable d'un clic.
+  /*
+   * Rien n'est jamais retiré du livre sans votre accord : les passages courts
+   * restent affichés et ne sortent du livre que si vous cliquez sur le bouton
+   * proposé plus bas (un passage court peut être un vrai paragraphe oublié).
    */
-  useEffect(() => {
-    if (!shortAnswers.length || cleanedRef.current) return;
-    cleanedRef.current = true;
-    cleanShortAnswers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shortAnswers.length]);
+
 
   const undoClean = () => {
     if (!undoBrief) return;

@@ -224,7 +224,8 @@ const V3HubPage: React.FC = () => {
   const navigate = useNavigate();
   // Quand le Hub est monté sous /v3/hub (site public), la V3Sidebar externe existe déjà :
   // on masque la sidebar interne pour laisser le contenu prendre toute la largeur.
-  const embedded = useLocation().pathname.startsWith('/v3/');
+  const location = useLocation();
+  const embedded = location.pathname.startsWith('/v3/');
   const [query, setQuery] = useState('');
   const [pillar, setPillar] = useState<V3Pillar | 'all' | 'mine'>('all');
   const [activeTab, setActiveTab] = useState<HubTab>(() => {
@@ -249,11 +250,19 @@ const V3HubPage: React.FC = () => {
   // Permet aux entrées « Habiller » et aux agents d'ouvrir directement
   // le vrai Cover Studio Pro affiché dans le Hub (et non une page d'offre).
   useEffect(() => {
-    const moduleId = new URLSearchParams(window.location.search).get('module');
+    const params = new URLSearchParams(location.search);
+    const moduleId = params.get('module');
     if (!moduleId) return;
+    const tabFromUrl = params.get('tab') as HubTab | null;
+    if (tabFromUrl && HUB_TABS.some((t) => t.id === tabFromUrl)) setActiveTab(tabFromUrl);
     const moduleToOpen = getModuleById(moduleId);
     if (moduleToOpen) setSelected(moduleToOpen);
-  }, []);
+    // On retire « module » de l'URL pour qu'un nouveau clic sur le même
+    // lien déclenche à nouveau l'ouverture (même route, même paramètre).
+    params.delete('module');
+    const search = params.toString();
+    navigate({ pathname: location.pathname, search: search ? `?${search}` : '' }, { replace: true });
+  }, [location.pathname, location.search, navigate]);
 
   // Persiste l'état réduit de la sidebar.
   useEffect(() => {
