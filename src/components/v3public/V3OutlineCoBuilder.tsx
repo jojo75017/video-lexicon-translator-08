@@ -22,7 +22,8 @@ type Proposal = { titre: string; objectif: string; sources: number[] };
 export default function V3OutlineCoBuilder() {
   const [brief, setBrief] = useState<BookBrief>({});
   const [proposals, setProposals] = useState<Proposal[]>([]);
-  const [question, setQuestion] = useState('');
+  const [questions, setQuestions] = useState<string[]>([]);
+  const [answer, setAnswer] = useState('');
   const [loading, setLoading] = useState(false);
   const [note, setNote] = useState('');
 
@@ -96,13 +97,38 @@ export default function V3OutlineCoBuilder() {
         objectif: String(c.objectif || ''),
         sources: Array.isArray(c.sources) ? c.sources.map((n: any) => Number(n)).filter(Boolean) : [],
       })));
-      setQuestion(String((data as any)?.question || ''));
+      const rawQuestions = Array.isArray((data as any)?.questions)
+        ? (data as any).questions
+        : [(data as any)?.question];
+      setQuestions(
+        rawQuestions.map((q: unknown) => String(q || '').trim()).filter(Boolean).slice(0, 2),
+      );
+      setAnswer('');
       setNote('');
     } catch (e: any) {
       toast.error(e?.message || 'Le Génie est indisponible pour le moment.');
     } finally {
       setLoading(false);
     }
+  };
+
+  /**
+   * L'auteur répond aux questions du Génie : sa réponse repart avec la demande
+   * suivante et rejoint la mémoire des faits (prénoms, lieux, dates) pour que
+   * les chapitres suivants en tiennent compte. Les chapitres gardés ne bougent pas.
+   */
+  const answerGenie = async () => {
+    const text = answer.trim();
+    if (!text) return;
+    const current = readBookBrief() || {};
+    const memory = Array.from(new Set([...(current.factMemory || []), text])).slice(-120);
+    patch({ factMemory: memory });
+    setQuestions([]);
+    setAnswer('');
+    await propose(
+      `Mes réponses à tes questions : """${text}"""\n`
+      + `Tiens-en compte pour les chapitres suivants. Ne modifie pas les chapitres déjà gardés.`,
+    );
   };
 
   const keep = (index: number) => {
@@ -207,13 +233,44 @@ export default function V3OutlineCoBuilder() {
       )}
 
 
+      {questions.length > 0 && (
+        <div className="mt-3 rounded-2xl border p-2.5"
+          style={{ borderColor: 'rgba(201,168,76,0.55)', background: 'rgba(201,168,76,0.10)' }}>
+          <p className="text-[12.5px] font-medium" style={{ color: 'var(--v3-ink)' }}>
+            <Sparkles className="mr-1 inline h-3.5 w-3.5" style={{ color: '#8a6d1f' }} /> Le Génie
+            vous demande :
+          </p>
+          <ol className="mt-1 list-decimal space-y-1 pl-5 text-[12.5px]" style={{ color: 'var(--v3-ink)' }}>
+            {questions.map((q, i) => <li key={i}>{q}</li>)}
+          </ol>
+          <textarea
+            value={answer}
+            onChange={(e) => setAnswer(e.target.value)}
+            rows={3}
+            placeholder="Votre réponse, avec vos mots (prénoms, lieux, dates…)"
+            className="mt-2 w-full rounded-xl border bg-white px-2.5 py-2 text-[12.5px] outline-none"
+            style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }}
+          />
+          <div className="mt-2 flex flex-wrap gap-2">
+            <button type="button" disabled={loading || !answer.trim()} onClick={answerGenie}
+              className="v3-btn v3-btn-primary text-[11px] disabled:opacity-50">
+              {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
+              Répondre au Génie
+            </button>
+            <button type="button" onClick={() => { setQuestions([]); setAnswer(''); }}
+              className="v3-btn v3-btn-ghost text-[11px]">
+              Plus tard
+            </button>
+          </div>
+          <p className="mt-1 text-[11px]" style={{ color: 'var(--v3-muted)' }}>
+            Votre réponse est reprise dans les chapitres suivants. Les chapitres déjà gardés ne
+            changent pas.
+          </p>
+        </div>
+      )}
+
       {proposals.length > 0 && (
         <div className="mt-3 space-y-2">
-          {question && (
-            <p className="text-[12.5px]" style={{ color: 'var(--v3-ink)' }}>
-              <Sparkles className="mr-1 inline h-3.5 w-3.5" style={{ color: '#8a6d1f' }} /> {question}
-            </p>
-          )}
           {proposals.map((p, i) => (
             <div key={i} className="rounded-2xl border p-2.5" style={{ borderColor: 'rgba(201,168,76,0.45)', background: 'rgba(201,168,76,0.06)' }}>
               <input
