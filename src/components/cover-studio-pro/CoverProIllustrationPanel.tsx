@@ -96,8 +96,9 @@ export default function CoverProIllustrationPanel({ remaining, hasKey, onGenerat
           <Wand2 className="h-4 w-4 text-primary" /> Illustration IA sans texte
         </CardTitle>
         <CardDescription>
-          Le titre, le sous-titre et le nom d'auteur seront ajoutés plus tard en calques modifiables :
-          l'image générée ne contient volontairement aucun mot.
+          1. Illustration · 2. Textes dans l&rsquo;éditeur · 3. Téléchargement — le titre, le sous-titre et
+          le nom d&rsquo;auteur sont ajoutés ensuite en calques modifiables : l&rsquo;image générée ne
+          contient volontairement aucun mot.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
