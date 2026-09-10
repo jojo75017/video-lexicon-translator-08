@@ -318,6 +318,8 @@ export function createWrapComposition(params: {
       defaultElement('back-blurb'),
       defaultElement('back-about'),
     ],
+    imageBrightness: 1,
+    overlayOpacity: 0,
   };
 }
 
@@ -378,6 +380,8 @@ export function migrateFrontToWrap(
       defaultElement('back-blurb'),
       defaultElement('back-about'),
     ],
+    imageBrightness: 1,
+    overlayOpacity: 0,
   };
 }
 
@@ -463,6 +467,8 @@ export function parseWrapComposition(
     illustrationPath,
     background,
     elements: elements.length ? elements : fresh.elements,
+    imageBrightness: clampBrightness(o.imageBrightness),
+    overlayOpacity: clampOverlay(o.overlayOpacity),
   };
 }
 
@@ -481,6 +487,8 @@ export function serializeWrapComposition(
       ...e,
       text: containsUrl(e.text) ? '' : e.text,
     })),
+    imageBrightness: clampBrightness(composition.imageBrightness),
+    overlayOpacity: clampOverlay(composition.overlayOpacity),
   };
 }
 
