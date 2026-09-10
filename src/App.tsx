@@ -225,6 +225,7 @@ const AdminAttentePage = lazy(() => import('./pages/admin/AdminAttentePage'));
 const AdminSequenceEmailPage = lazy(() => import('./pages/admin/AdminSequenceEmailPage'));
 const BonusPage = lazy(() => import('./pages/BonusPage'));
 const AdminPublishingKitPage = lazy(() => import('./pages/admin/AdminPublishingKitPage'));
+const AdminScriptVideoPage = lazy(() => import('./pages/admin/AdminScriptVideoPage'));
 const DemoGeniePage = lazy(() => import('./pages/DemoGeniePage'));
 const CrmPage = lazy(() => import('./pages/CrmPage'));
 const ProspectManagerPage = lazy(() => import('./pages/ProspectManagerPage'));
@@ -665,6 +666,7 @@ const App = () => {
             <Route path="/admin/sequence-email" element={<Navigate to="/admin/campagnes" replace />} />
 
             <Route path="/admin/kit-publication" element={<AdminGate><AdminPublishingKitPage /></AdminGate>} />
+            <Route path="/admin/script-video" element={<AdminGate><AdminScriptVideoPage /></AdminGate>} />
             <Route path="/admin/tester-paypal" element={<AdminGate><AdminTestPayPalPage /></AdminGate>} />
             {/* Test du tunnel Studio BD & Jeunesse (accès de test sans paiement) */}
             <Route path="/admin/tester-bd" element={<AdminGate><AdminTestBdPage /></AdminGate>} />
