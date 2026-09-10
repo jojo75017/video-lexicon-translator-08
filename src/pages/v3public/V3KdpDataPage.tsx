@@ -121,6 +121,12 @@ export default function V3KdpDataPage() {
         <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>
           Description commerciale, mots-clés, catégories BISAC et dossier prêt à téléverser sur KDP.
         </p>
+        <p className="mt-2 text-[13px]" style={{ color: 'var(--v3-muted)' }}>
+          Après publication, pour suivre vos ventes réelles :{' '}
+          <Link to="/v3/kdp-pilot" className="font-semibold underline" style={{ color: '#0d7a5f' }}>
+            KDP Pilot — code abonné −15 %
+          </Link>
+        </p>
       </header>
 
       {loading ? (
