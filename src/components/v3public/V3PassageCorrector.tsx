@@ -284,16 +284,12 @@ export default function V3PassageCorrector({ mode = 'book', onDone }: {
     toast.success('Vos réponses courtes quittent le livre : le Génie les garde en mémoire.');
   };
 
-  /**
-   * Les réponses très courtes sortent du livre toutes seules, une seule fois par
-   * livre : elles deviennent des informations retenues, annulable d'un clic.
+  /*
+   * Rien n'est jamais retiré du livre sans votre accord : les passages courts
+   * restent affichés et ne sortent du livre que si vous cliquez sur le bouton
+   * proposé plus bas (un passage court peut être un vrai paragraphe oublié).
    */
-  useEffect(() => {
-    if (!shortAnswers.length || cleanedRef.current) return;
-    cleanedRef.current = true;
-    cleanShortAnswers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shortAnswers.length]);
+
 
   const undoClean = () => {
     if (!undoBrief) return;
