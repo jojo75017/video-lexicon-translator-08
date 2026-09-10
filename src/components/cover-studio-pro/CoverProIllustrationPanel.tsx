@@ -157,15 +157,20 @@ export default function CoverProIllustrationPanel({ remaining, hasKey, onGenerat
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="cp-summary">Sujet du livre</Label>
+          <Label htmlFor="cp-summary">Synopsis du livre (ou courte biographie)</Label>
           <Textarea
             id="cp-summary"
-            rows={3}
+            rows={5}
             value={summary}
             onChange={(e) => setSummary(e.target.value)}
-            placeholder="Décrivez en quelques phrases le sujet et la scène souhaitée."
+            placeholder="Ex. : Biographie d'un chef de famille né en 1952, entre l'Algérie et la France, souvenirs d'enfance…"
           />
+          <p className="text-xs text-muted-foreground">
+            Résumez l&rsquo;histoire, les personnages, le lieu, l&rsquo;époque et l&rsquo;ambiance — ce texte
+            guide l&rsquo;IA vers une illustration fidèle à votre livre.
+          </p>
         </div>
+
 
         <Button onClick={generate} disabled={busy || blocked || !projectId} className="w-full">
           {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
