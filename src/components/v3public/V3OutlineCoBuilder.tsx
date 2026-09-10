@@ -97,13 +97,38 @@ export default function V3OutlineCoBuilder() {
         objectif: String(c.objectif || ''),
         sources: Array.isArray(c.sources) ? c.sources.map((n: any) => Number(n)).filter(Boolean) : [],
       })));
-      setQuestion(String((data as any)?.question || ''));
+      const rawQuestions = Array.isArray((data as any)?.questions)
+        ? (data as any).questions
+        : [(data as any)?.question];
+      setQuestions(
+        rawQuestions.map((q: unknown) => String(q || '').trim()).filter(Boolean).slice(0, 2),
+      );
+      setAnswer('');
       setNote('');
     } catch (e: any) {
       toast.error(e?.message || 'Le Génie est indisponible pour le moment.');
     } finally {
       setLoading(false);
     }
+  };
+
+  /**
+   * L'auteur répond aux questions du Génie : sa réponse repart avec la demande
+   * suivante et rejoint la mémoire des faits (prénoms, lieux, dates) pour que
+   * les chapitres suivants en tiennent compte. Les chapitres gardés ne bougent pas.
+   */
+  const answerGenie = async () => {
+    const text = answer.trim();
+    if (!text) return;
+    const current = readBookBrief() || {};
+    const memory = Array.from(new Set([...(current.factMemory || []), text])).slice(-120);
+    patch({ factMemory: memory });
+    setQuestions([]);
+    setAnswer('');
+    await propose(
+      `Mes réponses à tes questions : """${text}"""\n`
+      + `Tiens-en compte pour les chapitres suivants. Ne modifie pas les chapitres déjà gardés.`,
+    );
   };
 
   const keep = (index: number) => {
