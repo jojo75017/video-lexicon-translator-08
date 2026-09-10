@@ -54,13 +54,22 @@ export default function CoverProPage() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-6 px-4 py-8">
-      <header className="space-y-2">
-        <Badge className="gap-1"><Crown className="h-3 w-3" /> Cover Studio KDP Pro</Badge>
-        <h1 className="text-2xl font-bold sm:text-3xl">Une couverture digne d'une maison d'édition</h1>
+      <header className="space-y-3">
+        <Badge className="gap-1"><Crown className="h-3 w-3" /> Votre maison d&rsquo;édition de couvertures</Badge>
+        <h1 className="text-2xl font-bold sm:text-3xl">Votre maison d&rsquo;édition de couvertures</h1>
         <p className="text-muted-foreground">
-          Illustration générée par IA en portrait haute résolution, sans titre ni logo, enregistrée
-          dans votre espace privé. Aucun numéro ISBN n'est demandé.
+          Créez l&rsquo;illustration, ajoutez vos textes et téléchargez une couverture prête pour Kindle
+          et Amazon. Illustration haute résolution sans titre ni logo, enregistrée dans votre espace
+          privé. Aucun numéro ISBN n&rsquo;est demandé.
         </p>
+        <ol className="flex flex-wrap items-center gap-2 text-xs font-medium">
+          {['1. Illustration', '2. Textes', '3. Téléchargement'].map((step, i) => (
+            <li key={step} className="flex items-center gap-2">
+              <span className="rounded-full border bg-muted/40 px-3 py-1">{step}</span>
+              {i < 2 && <span className="text-muted-foreground">→</span>}
+            </li>
+          ))}
+        </ol>
       </header>
 
       {error && (
