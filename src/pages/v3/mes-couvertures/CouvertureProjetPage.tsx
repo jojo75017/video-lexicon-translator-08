@@ -211,14 +211,34 @@ export default function CouvertureProjetPage() {
           {project.cover_type === 'paperback' ? (
             <>
               <CoverWrapEditor project={project} onProjectUpdated={setProject} />
-              <Collapsible>
+              <Collapsible defaultOpen>
                 <CollapsibleTrigger asChild>
                   <Button variant="outline" size="sm" className="gap-2">
                     <ChevronDown className="h-4 w-4" /> Réglages KDP (pages, papier, dos)
                   </Button>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="pt-3">
-                  <KdpPaperbackConfigPanel project={project} onProjectUpdated={setProject} />
+                  <div className="grid gap-4 lg:grid-cols-[220px,1fr]">
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-foreground">Aperçu de la couverture</p>
+                      <div
+                        className="overflow-hidden rounded-xl border border-border bg-muted"
+                        style={{ maxWidth: 220, height: 330 }}
+                      >
+                        {thumb ? (
+                          <img src={thumb} alt="Aperçu de la couverture" className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="flex h-full items-center justify-center p-3 text-center text-xs text-muted-foreground">
+                            L’aperçu apparaît dès le premier enregistrement.
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Première de couverture telle qu’elle sera imprimée.
+                      </p>
+                    </div>
+                    <KdpPaperbackConfigPanel project={project} onProjectUpdated={setProject} />
+                  </div>
                 </CollapsibleContent>
               </Collapsible>
             </>
