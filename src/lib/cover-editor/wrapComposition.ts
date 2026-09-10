@@ -821,10 +821,20 @@ export async function renderWrapFrontThumbnail(
       const cover = Math.max(canvas.width / img.width, canvas.height / img.height);
       const w = img.width * cover;
       const h = img.height * cover;
+      const brightness = clampBrightness(composition.imageBrightness);
+      ctx.save();
+      if (brightness !== 1) ctx.filter = `brightness(${brightness})`;
       ctx.drawImage(img, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+      ctx.restore();
     } catch {
       /* fond uni conservé */
     }
+  }
+
+  const overlay = clampOverlay(composition.overlayOpacity);
+  if (overlay > 0) {
+    ctx.fillStyle = `rgba(0,0,0,${overlay})`;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
   ctx.textBaseline = 'top';
