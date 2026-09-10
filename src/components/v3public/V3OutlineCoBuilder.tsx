@@ -22,7 +22,8 @@ type Proposal = { titre: string; objectif: string; sources: number[] };
 export default function V3OutlineCoBuilder() {
   const [brief, setBrief] = useState<BookBrief>({});
   const [proposals, setProposals] = useState<Proposal[]>([]);
-  const [question, setQuestion] = useState('');
+  const [questions, setQuestions] = useState<string[]>([]);
+  const [answer, setAnswer] = useState('');
   const [loading, setLoading] = useState(false);
   const [note, setNote] = useState('');
 
