@@ -1,4 +1,8 @@
 
+## Accueil V3 — visibilité KDP Pilot et vidéo (10/09/2026)
+- [x] Afficher un bandeau KDP Pilot clairement visible avec le code PROMO15
+- [x] Expliquer près de la vidéo qu’elle présente les onglets et fait gagner du temps
+
 ## Livre visible en permanence (09/09/2026)
 - [x] Livre crème toujours affiché avec les 5 textes, validés ou non, et ascenseur
 - [x] Liste d'édition des textes avec ascenseur (livres longs)
