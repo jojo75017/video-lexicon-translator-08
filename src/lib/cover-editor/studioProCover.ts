@@ -73,6 +73,7 @@ export interface StudioCompositionInput {
   subtitle: string;
   author: string;
   placement: TextPlacement;
+  imageBrightness?: number;
   formatId?: string;
 }
 
@@ -95,6 +96,7 @@ export function buildStudioComposition(input: StudioCompositionInput): FrontComp
   });
 
   const { height } = composition.canvas;
+  composition.imageBrightness = Math.min(1.5, Math.max(0.7, input.imageBrightness ?? 1));
   const ratios = RATIOS[input.placement] ?? RATIOS.top;
 
   const shadow = { enabled: true, color: 'rgba(0,0,0,0.75)', blur: Math.round(height * 0.012), offsetY: Math.round(height * 0.004) };

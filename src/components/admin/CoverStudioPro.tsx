@@ -3,10 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Loader2, Sparkles, Download, Crown, Wand2, Eye, BookOpen, CheckCircle2, KeyRound,
-  Type, ImageIcon, AlertTriangle, Save, ExternalLink,
+  Type, ImageIcon, AlertTriangle, Save, ExternalLink, SunMedium, RotateCcw,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -108,6 +109,7 @@ const CoverStudioPro: React.FC = () => {
   const [count, setCount] = useState(2);
   const [loading, setLoading] = useState(false);
   const [covers, setCovers] = useState<PremiumCover[]>([]);
+  const [brightnessByCover, setBrightnessByCover] = useState<Record<number, number>>({});
   const [artDirection, setArtDirection] = useState('');
   const [orKey, setOrKey] = useState(getOpenRouterImageKey());
   const [useOpenRouter, setUseOpenRouter] = useState(!!getOpenRouterImageKey());
@@ -225,9 +227,15 @@ const CoverStudioPro: React.FC = () => {
       setComposing(true);
       setComposeError('');
       try {
-        const composition = buildStudioComposition({ title, subtitle, author, placement });
         const previews = await Promise.all(
-          covers.map(async (c) => {
+          covers.map(async (c, index) => {
+            const composition = buildStudioComposition({
+              title,
+              subtitle,
+              author,
+              placement,
+              imageBrightness: brightnessByCover[index] ?? 1,
+            });
             const local = await ensureLocalUrl(c.url);
             const canvas = await renderFrontCanvas(composition, local, 600, 960);
             return canvas.toDataURL('image/jpeg', 0.9);
@@ -249,7 +257,7 @@ const CoverStudioPro: React.FC = () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [covers.length, textMode, placement, title, subtitle, author, ensureLocalUrl]);
+  }, [covers.length, textMode, placement, title, subtitle, author, brightnessByCover, ensureLocalUrl]);
 
   const generate = async () => {
     if (!title.trim()) {
@@ -258,6 +266,7 @@ const CoverStudioPro: React.FC = () => {
     }
     setLoading(true);
     setCovers([]);
+    setBrightnessByCover({});
     setArtDirection('');
     setComposeError('');
     try {
@@ -369,7 +378,13 @@ const CoverStudioPro: React.FC = () => {
   /** Couverture finale : illustration + titre, sous-titre et auteur en typographie nette. */
   const downloadComposed = async (url: string, idx = 0) => {
     const compose = async (source: string) => {
-      const composition = buildStudioComposition({ title, subtitle, author, placement });
+      const composition = buildStudioComposition({
+        title,
+        subtitle,
+        author,
+        placement,
+        imageBrightness: brightnessByCover[idx] ?? 1,
+      });
       const result = await exportFrontPng(composition, source, title);
       triggerDownload(result.blob, safeFileName(title, 'couverture-premium', 'png'));
       toast.success(`Couverture téléchargée · ${result.width} × ${result.height} px`);
@@ -398,13 +413,12 @@ const CoverStudioPro: React.FC = () => {
         <div className="flex items-center gap-2 mb-1">
           <Crown className="h-5 w-5" style={{ color: GOLD }} />
           <h3 className="text-base font-semibold" style={{ color: GOLD }}>
-            Cover Studio Pro — Couvertures Premium IA
+            Votre maison d’édition de couvertures
           </h3>
         </div>
         <p className="text-xs text-muted-foreground">
-          L'IA dessine l'illustration, l'application pose votre titre, votre sous-titre et votre nom
-          d'auteur en typographie parfaitement nette. Plusieurs variations d'un coup, qualité
-          « maison d'édition ».
+          À partir de l’histoire réelle de votre livre, le Studio construit une direction visuelle
+          professionnelle. L’IA crée l’illustration, puis l’application pose des textes parfaitement nets.
         </p>
       </div>
 
@@ -582,15 +596,19 @@ const CoverStudioPro: React.FC = () => {
 
         <div className="space-y-1.5">
           <Label className="text-xs flex items-center gap-1">
-            <Wand2 className="h-3.5 w-3.5" /> Résumé / précisions créatives
+            <Wand2 className="h-3.5 w-3.5" /> Synopsis du livre
           </Label>
           <Textarea
             value={customPrompt}
             onChange={(e) => setCustomPrompt(e.target.value)}
-            placeholder="Ex: ambiance bord de mer breton, brume, phare au loin…"
-            rows={3}
-            className="resize-none"
+            placeholder="Résumez l’histoire, les personnages principaux, le lieu, l’époque et l’ambiance importante…"
+            rows={5}
+            className="resize-y"
           />
+          <p className="text-[11px] leading-relaxed text-muted-foreground">
+            Ce synopsis guide l’IA vers une couverture fidèle : il l’aide à choisir la scène, les personnages,
+            le décor, l’époque et l’atmosphère. Vous pouvez le modifier avant de générer l’image.
+          </p>
         </div>
       </div>
 
@@ -804,20 +822,58 @@ const CoverStudioPro: React.FC = () => {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {covers.map((c, idx) => {
             const display = textMode === 'app' && c.composedPreview ? c.composedPreview : c.url;
+            const brightness = brightnessByCover[idx] ?? 1;
+            const previewFilter = textMode === 'app' && c.composedPreview
+              ? undefined
+              : { filter: `brightness(${brightness})` };
             return (
               <div key={idx} className="rounded-xl overflow-hidden border border-border bg-card">
                 <img
                   src={display}
                   alt={`Couverture premium ${idx + 1}`}
                   className="w-full aspect-[2/3] object-cover"
+                  style={previewFilter}
                   loading="lazy"
                 />
                 <div className="p-3 space-y-3">
                   <div className="flex items-center gap-3">
-                    <img src={display} alt="Miniature Amazon" className="w-[60px] h-[90px] object-cover rounded shadow" />
+                    <img src={display} alt="Miniature Amazon" className="w-[60px] h-[90px] object-cover rounded shadow" style={previewFilter} />
                     <div className="text-[10px] text-muted-foreground flex items-center gap-1">
                       <Eye className="h-3 w-3" /> Test miniature Amazon — le titre reste-t-il lisible ?
                     </div>
+                  </div>
+                  <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-2">
+                    <div className="flex items-center justify-between gap-3">
+                      <Label className="flex items-center gap-1.5 text-xs font-semibold">
+                        <SunMedium className="h-3.5 w-3.5" /> Luminosité de l’image
+                      </Label>
+                      <span className="text-[11px] font-medium text-muted-foreground">
+                        {brightness === 1 ? 'Originale' : `${Math.round(brightness * 100)} %`}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-[10px] text-muted-foreground">Plus sombre</span>
+                      <Slider
+                        value={[brightness]}
+                        min={0.7}
+                        max={1.5}
+                        step={0.05}
+                        onValueChange={([value]) => setBrightnessByCover((current) => ({ ...current, [idx]: value }))}
+                        aria-label={`Luminosité de la couverture ${idx + 1}`}
+                        className="flex-1"
+                      />
+                      <span className="text-[10px] text-muted-foreground">Plus claire</span>
+                    </div>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 px-2 text-xs"
+                      disabled={brightness === 1}
+                      onClick={() => setBrightnessByCover((current) => ({ ...current, [idx]: 1 }))}
+                    >
+                      <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Réinitialiser
+                    </Button>
                   </div>
                   <Button
                     size="sm"

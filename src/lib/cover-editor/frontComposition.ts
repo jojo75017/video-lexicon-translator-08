@@ -137,6 +137,8 @@ export interface FrontComposition {
   canvas: { width: number; height: number };
   /** Couleur de fond visible sous l'illustration (ou seule si aucune image). */
   backgroundColor: string;
+  /** Réglage local de l'illustration : 1 = original, 1.5 = plus claire. */
+  imageBrightness?: number;
   overlay?: FrontOverlay;
   /** Identifiant du dernier modèle appliqué (informatif). */
   templateId?: string | null;
@@ -265,6 +267,7 @@ export function createComposition(params: {
     illustrationPath: params.illustrationPath ?? null,
     canvas: { width: size.width, height: size.height },
     backgroundColor: DEFAULT_FRONT_BACKGROUND,
+    imageBrightness: 1,
     layers: [
       defaultLayer('title', size, params.bookTitle?.trim() || 'Titre du livre'),
       defaultLayer('subtitle', size, 'Sous-titre'),
@@ -437,6 +440,7 @@ export function parseComposition(
       typeof obj.backgroundColor === 'string' && /^#[0-9a-fA-F]{6}$/.test(obj.backgroundColor)
         ? obj.backgroundColor
         : DEFAULT_FRONT_BACKGROUND,
+    imageBrightness: Math.min(1.5, Math.max(0.7, num(obj.imageBrightness, 1))),
     illustrationMode: obj.illustrationMode === 'slot' ? 'slot' : 'cover',
     shapes,
     layers: layers.length ? layers : createComposition(fallback).layers,
@@ -458,6 +462,7 @@ export function serializeComposition(
     backgroundColor: /^#[0-9a-fA-F]{6}$/.test(composition.backgroundColor ?? '')
       ? composition.backgroundColor
       : DEFAULT_FRONT_BACKGROUND,
+    imageBrightness: Math.min(1.5, Math.max(0.7, composition.imageBrightness ?? 1)),
     illustrationMode: composition.illustrationMode === 'slot' ? 'slot' : 'cover',
     shapes: (composition.shapes ?? []).map((s) => ({ ...s })),
     layers: composition.layers.map((l) => ({
@@ -799,7 +804,10 @@ const drawShapes = (
       pathRoundedRect(ctx, x, y, w, h, (shape.radius ?? 0) * scaleX);
       ctx.save();
       ctx.clip();
-      if (image) drawImageCover(ctx, image, x, y, w, h);
+      if (image) {
+        ctx.filter = `brightness(${Math.min(1.5, Math.max(0.7, composition.imageBrightness ?? 1))})`;
+        drawImageCover(ctx, image, x, y, w, h);
+      }
       else {
         ctx.fillStyle = shape.color;
         ctx.fillRect(x, y, w, h);
@@ -836,7 +844,10 @@ export function drawFrontBackdrop(
   ctx.fillRect(0, 0, w, h);
 
   if (image && composition.illustrationMode !== 'slot') {
+    ctx.save();
+    ctx.filter = `brightness(${Math.min(1.5, Math.max(0.7, composition.imageBrightness ?? 1))})`;
     drawImageCover(ctx, image, 0, 0, w, h);
+    ctx.restore();
   }
 
   drawOverlay(ctx, composition.overlay, w, h);
