@@ -82,7 +82,7 @@ export default function CoverProPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <Lock className="h-4 w-4" /> Module à débloquer — 67 €, paiement unique
+              <Lock className="h-4 w-4" /> Débloquer votre maison d&rsquo;édition — 67 €, paiement unique
             </CardTitle>
             <CardDescription>
               Comprend 3 générations offertes, une seule fois. Ensuite, vous connectez votre propre
