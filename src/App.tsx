@@ -666,6 +666,7 @@ const App = () => {
             <Route path="/admin/sequence-email" element={<Navigate to="/admin/campagnes" replace />} />
 
             <Route path="/admin/kit-publication" element={<AdminGate><AdminPublishingKitPage /></AdminGate>} />
+            <Route path="/admin/script-video" element={<AdminGate><AdminScriptVideoPage /></AdminGate>} />
             <Route path="/admin/tester-paypal" element={<AdminGate><AdminTestPayPalPage /></AdminGate>} />
             {/* Test du tunnel Studio BD & Jeunesse (accès de test sans paiement) */}
             <Route path="/admin/tester-bd" element={<AdminGate><AdminTestBdPage /></AdminGate>} />
