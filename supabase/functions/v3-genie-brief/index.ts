@@ -319,13 +319,14 @@ ${message ? `Dernière demande de l'auteur : """${message.slice(0, 1500)}"""` : 
 
 Propose au maximum ${count} nouveaux chapitres qui suivent la suite du récit.
 Réponds STRICTEMENT en JSON valide, sans markdown :
-{"chapters":[{"titre":"","objectif":"","sources":[1]}],"question":""}
+{"chapters":[{"titre":"","objectif":"","sources":[1]}],"questions":[""]}
 
 Règles :
 - 100 % français : aucun latin, aucune langue étrangère, aucun mot inventé ;
 ${biographyRules}${anchorRules}
 - jamais plus de ${count} chapitres, jamais de doublon avec les chapitres acceptés ;
-- "question" : une seule question courte pour faire valider ces chapitres à l'auteur.`;
+- "questions" : 1 à 2 questions courtes MAXIMUM, ancrées dans ce que l'auteur a réellement écrit. Chaque question doit citer littéralement un élément présent dans ses passages ou dans un chapitre proposé (un prénom, un lieu, une date, un objet, une scène) et demander un détail concret ou la suite de CE souvenir${numbered.length ? "" : " (ou, faute de récit, un détail précis du sujet indiqué)"} ;
+- INTERDIT de poser une question de cadrage marketing (public visé, promesse, ton, style, nombre de chapitres), une question générale applicable à n'importe quel livre, ou une simple demande de validation du type « on garde ces chapitres ? ».`;
 
       const r = await askAI(stepPrompt);
       if (!r?.ok) {
