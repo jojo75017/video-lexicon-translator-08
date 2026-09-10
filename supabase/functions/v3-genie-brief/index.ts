@@ -355,11 +355,20 @@ ${biographyRules}${anchorRules}
         .filter((c: any) => c.titre.length > 2)
         .slice(0, count);
       if (!chapters.length) return json(502, { error: "Réponse IA illisible. Réessayez." });
+      // Questions ancrées dans le récit : 2 au maximum, jamais une demande de validation.
+      const rawQuestions = Array.isArray(parsedStep?.questions)
+        ? parsedStep.questions
+        : [parsedStep?.question];
+      const questions = rawQuestions
+        .map((q: unknown) => String(q || "").trim())
+        .filter((q: string) => q.length > 8 && !/^on garde/i.test(q))
+        .slice(0, 2);
       return json(200, {
         chapters,
         totalPassages: passages.length,
         nextPassage,
-        question: String(parsedStep?.question || "On garde ces chapitres ?").trim(),
+        questions,
+        question: questions[0] || "",
         remaining: Math.max(0, remaining - chapters.length),
       });
     }
