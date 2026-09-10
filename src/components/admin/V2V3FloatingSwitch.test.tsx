@@ -45,14 +45,15 @@ describe('V2V3FloatingSwitch (E2E interaction)', () => {
     expect(screen.getByTestId('location')).toHaveTextContent('/');
   });
 
-  it('bascule V2 → V3 : route /hub-v3, label V3, état persistant', async () => {
+  it('bascule V2 → V3 : route /v3, label V3, état persistant', async () => {
     const user = userEvent.setup();
     renderAt('/');
     const btn = await screen.findByRole('button', { name: /Ouvrir EbookStudio V3/i });
 
     await user.click(btn);
 
-    expect(screen.getByTestId('location')).toHaveTextContent('/hub-v3');
+    expect(screen.getByTestId('location')).toHaveTextContent('/v3');
+
     const btnV3 = screen.getByRole('button', { name: /Ouvrir EbookStudio V2/i });
     expect(btnV3).toHaveTextContent('Ouvrir V2');
     expect(localStorage.getItem('ebookstudio_v3_mode')).toBe('1');

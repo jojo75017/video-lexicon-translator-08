@@ -21,8 +21,9 @@ describe('V3Header + V3MainTabs', () => {
   it('affiche la marque, la ligne 2 et les CTA principaux', () => {
     renderHeader(false);
     expect(screen.getByRole('link', { name: /Ebookstudio/i })).toBeInTheDocument();
-    // "S'inscrire" existe (soit dans la nav desktop, soit dans le CTA rapide mobile).
-    expect(screen.getAllByRole('link', { name: /S'inscrire/i }).length).toBeGreaterThan(0);
+    // Le CTA d'inscription : « Commencer gratuitement » (desktop ou CTA rapide mobile).
+    expect(screen.getAllByRole('link', { name: /Commencer gratuitement/i }).length).toBeGreaterThan(0);
+
     // Les 6 catégories de la ligne 2 sont présentes (au moins dans le drawer mobile).
     ['Créer', 'Écrire', 'Habiller', 'Publier', 'Vendre'].forEach((label) => {
       expect(screen.getAllByText(new RegExp(`^${label}$`, 'i')).length).toBeGreaterThan(0);
@@ -64,10 +65,11 @@ describe('V3Header + V3MainTabs', () => {
     expect(summaries.length).toBeGreaterThan(0);
   });
 
-  it("n'affiche jamais deux libellés « S'inscrire » simultanément visibles au même endroit (pas de doublon)", () => {
+  it("chaque CTA d'inscription pointe vers une destination réelle (pas de lien mort)", () => {
     renderHeader(false);
-    // On tolère plusieurs liens (nav desktop + CTA mobile), mais chacun doit avoir un href distinct ou identique — ce test empêche surtout un run/render cassé.
-    const links = screen.getAllByRole('link', { name: /S'inscrire/i });
+    // On tolère plusieurs liens (nav desktop + CTA mobile), mais chacun doit avoir une destination.
+    const links = screen.getAllByRole('link', { name: /Commencer gratuitement/i });
     links.forEach((l) => expect(l).toHaveAttribute('href'));
   });
+
 });

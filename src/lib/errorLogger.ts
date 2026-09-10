@@ -32,6 +32,9 @@ const NOISE_PATTERNS = [
   "Objet introuvable correspondant",
   "getPageStructure",
   "Non-Error promise rejection captured",
+  "signal is aborted without reason",
+  "The user aborted a request",
+
 ];
 
 
