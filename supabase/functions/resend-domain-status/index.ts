@@ -41,6 +41,7 @@ Deno.serve(async (req) => {
     const ebook = arr.filter((d) => (d.name || "").includes("ebookstudio"));
 
     // Optionnel : relancer la vérification DNS chez Resend.
+    const verifyResults: Record<string, unknown> = {};
     if (wantVerify) {
       await Promise.all(
         ebook.map(async (d) => {
@@ -51,8 +52,9 @@ Deno.serve(async (req) => {
             });
             const vt = await vr.text();
             console.log(`verify ${d.name} [${vr.status}]: ${vt}`);
+            verifyResults[d.name] = { status: vr.status, body: vt };
           } catch (e) {
-            console.error("verify error", (e as Error).message);
+            verifyResults[d.name] = { error: (e as Error).message };
           }
         }),
       );
