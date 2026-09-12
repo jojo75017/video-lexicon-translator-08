@@ -51,7 +51,7 @@ export default function AdminLancementEmailsPage() {
   }, [logs]);
 
   const perStep = useMemo(() => STEPS.map((s) => {
-    const rows = latest.failed ? [] : latest.filter((r) => r.template_name === s.template);
+    const rows = latest.filter((r) => r.template_name === s.template);
     const failed = rows.filter((r) => ['failed', 'dlq', 'bounced', 'complained'].includes(r.status)).length;
     const clicked = new Set(clicks.filter((c) => c.template_name === s.template).map((c) => c.prospect_email)).size;
     return { ...s, total: rows.length, sent: rows.length - failed, failed, clicked };
