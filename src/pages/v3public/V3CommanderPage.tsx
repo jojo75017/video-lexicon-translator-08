@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { Loader2 } from "lucide-react";
@@ -86,8 +86,24 @@ export default function V3CommanderPage() {
   const [paypalLoading, setPaypalLoading] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [now, setNow] = useState(() => Date.now());
 
-  const offerOver = Date.now() > OFFER_END.getTime();
+  const offerOver = now > OFFER_END.getTime();
+
+  /** Compte à rebours honnête vers la fin de l'offre 47 € (30 sept. minuit Paris). */
+  const countdown = useMemo(() => {
+    const diff = Math.max(0, OFFER_END.getTime() - now);
+    const d = Math.floor(diff / 86_400_000);
+    const h = Math.floor((diff % 86_400_000) / 3_600_000);
+    const m = Math.floor((diff % 3_600_000) / 60_000);
+    const s = Math.floor((diff % 60_000) / 1000);
+    return { d, h, m, s };
+  }, [now]);
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, []);
 
   // Email du prospect connecté récupéré automatiquement s'il n'est pas dans l'URL.
   useEffect(() => {
