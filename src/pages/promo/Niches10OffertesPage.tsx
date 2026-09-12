@@ -197,6 +197,9 @@ const Niches10OffertesPage: React.FC = () => {
 
           {unlocked && (
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <p className="w-full text-center text-sm font-semibold" style={{ color: EMERALD }}>
+                Vous avez cliqué : voici votre PDF des 10 niches, à garder.
+              </p>
               <Button
                 onClick={handleDownloadPdf}
                 disabled={downloading}
