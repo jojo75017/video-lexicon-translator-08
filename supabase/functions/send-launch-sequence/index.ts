@@ -142,6 +142,25 @@ function isInternalEmail(email: string): boolean {
   return false;
 }
 
+/**
+ * Boîtes grand public : ce sont les personnes qui peuvent réellement
+ * vouloir écrire un livre. Les adresses d'entreprises, mairies,
+ * associations et cabinets sont écartées de ce segment.
+ */
+const PERSONAL_DOMAINS = new Set([
+  "gmail.com", "googlemail.com", "hotmail.fr", "hotmail.com", "hotmail.be",
+  "outlook.fr", "outlook.com", "live.fr", "live.com", "msn.com",
+  "yahoo.fr", "yahoo.com", "ymail.com",
+  "orange.fr", "wanadoo.fr", "free.fr", "sfr.fr", "neuf.fr", "laposte.net",
+  "bbox.fr", "numericable.fr", "aliceadsl.fr", "club-internet.fr",
+  "icloud.com", "me.com", "mac.com", "protonmail.com", "proton.me", "gmx.fr", "aol.com",
+]);
+
+function isPersonalAddress(email: string): boolean {
+  const domain = email.split("@")[1]?.toLowerCase() ?? "";
+  return PERSONAL_DOMAINS.has(domain);
+}
+
 async function isAdmin(req: Request, baseUrl: string): Promise<boolean> {
   const authorization = req.headers.get("Authorization");
   if (!authorization?.startsWith("Bearer ")) return false;
@@ -226,7 +245,7 @@ Deno.serve(async (req) => {
     const mode = String(body.mode || "status"); // status | preview | send
     const stepNum = Number(body.step) || 1;
     const email = LAUNCH_EMAILS.find((e) => e.step === stepNum) ?? LAUNCH_EMAILS[0];
-    const segment = String(body.segment || "hot"); // hot | all | cold
+    const segment = String(body.segment || "hot"); // hot | all | cold | personal
     const limit = Math.max(1, Math.min(300, Number(body.limit) || 100));
     // Pour test : rediriger tous les envois vers une seule adresse.
     const overrideTestTo = typeof body.overrideTestTo === "string" && /.+@.+\..+/.test(body.overrideTestTo)
@@ -298,11 +317,18 @@ Deno.serve(async (req) => {
       if (segment === "hot" && !hot.has(raw)) continue;
       // Segment « non-cliqueurs » : jamais de clic identifié, jamais entré dans le tunnel.
       if (segment === "cold" && hot.has(raw)) continue;
+      // Segment « personnel » : uniquement les boîtes grand public (futurs auteurs),
+      // pas les adresses d'entreprises, mairies, associations ou cabinets.
+      if (segment === "personal" && !isPersonalAddress(raw)) continue;
       seen.add(raw);
       recipients.push({ email: raw, first_name: (p as any).first_name ?? null, source: String((p as any).source ?? "") });
     }
 
+    // Les adresses personnelles passent toujours en premier dans le lot.
+    recipients.sort((a, b) => Number(isPersonalAddress(b.email)) - Number(isPersonalAddress(a.email)));
+
     const totalEligible = recipients.length;
+    const personalEligible = recipients.filter((r) => isPersonalAddress(r.email)).length;
     const targets = recipients.slice(0, limit);
 
     if (mode === "status" || mode === "preview") {
@@ -320,6 +346,7 @@ Deno.serve(async (req) => {
         },
         segment,
         total_eligible: totalEligible,
+        personal_eligible: personalEligible,
         batch_limit: limit,
         targets_in_batch: targets.length,
         sample: targets.slice(0, 12).map((t) => ({

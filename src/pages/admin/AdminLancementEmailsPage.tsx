@@ -63,7 +63,7 @@ export default function AdminLancementEmailsPage() {
     return latest.filter((r) => new Date(r.created_at) >= start).length;
   }, [latest]);
 
-  const runSend = async (step: number, segment: 'hot' | 'all' | 'cold', limit: number) => {
+  const runSend = async (step: number, segment: 'hot' | 'all' | 'cold' | 'personal', limit: number) => {
     const key = `${step}-${segment}`;
     setSending(key);
     const { data, error } = await supabase.functions.invoke('send-launch-sequence', { body: { mode: 'send', step, segment, limit } });
@@ -125,6 +125,10 @@ export default function AdminLancementEmailsPage() {
                 <Button size="sm" variant="outline" disabled={sending !== null} onClick={() => runSend(s.step, 'cold', 100)}>
                   <Send className="mr-1.5 h-4 w-4" />
                   {sending === `${s.step}-cold` ? 'Envoi…' : 'Envoyer aux non-cliqueurs (100)'}
+                </Button>
+                <Button size="sm" variant="outline" disabled={sending !== null} onClick={() => runSend(s.step, 'personal', 100)}>
+                  <Send className="mr-1.5 h-4 w-4" />
+                  {sending === `${s.step}-personal` ? 'Envoi…' : 'Adresses personnelles (100)'}
                 </Button>
                 <Button size="sm" disabled={sending !== null} onClick={() => runSend(s.step, 'all', 100)}>
                   <Send className="mr-1.5 h-4 w-4" />
