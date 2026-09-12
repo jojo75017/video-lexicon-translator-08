@@ -13,11 +13,13 @@ const json = (body: unknown, status = 200) =>
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const url = new URL(req.url);
+  const wantVerify = url.searchParams.get("action") === "verify";
   try {
-    const url = Deno.env.get("SUPABASE_URL")!;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const anon = Deno.env.get("SUPABASE_ANON_KEY")!;
     const authHeader = req.headers.get("Authorization") ?? "";
-    const supabase = createClient(url, anon, { global: { headers: { Authorization: authHeader } } });
+    const supabase = createClient(supabaseUrl, anon, { global: { headers: { Authorization: authHeader } } });
     const { data: auth } = await supabase.auth.getUser();
     if (!auth?.user) return json({ error: "Non authentifié" }, 401);
     const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: auth.user.id, _role: "admin" });
