@@ -34,11 +34,27 @@ Deno.serve(async (req) => {
       console.error(`Resend domains failed [${res.status}]: ${text}`);
       return json({ error: "Resend a refusé", status: res.status, details: text }, res.status);
     }
-    let domains = JSON.parse(text);
-    if (Array.isArray(domains)) {
-      domains = domains.filter((d) => (d.name || "").includes("ebookstudio"));
-    }
-    return json({ domains });
+    const listBody = JSON.parse(text);
+    const arr: any[] = listBody?.data ?? listBody ?? [];
+    const ebook = arr.filter((d) => (d.name || "").includes("ebookstudio"));
+
+    // Pour chaque domaine, on récupère le détail (inclut les enregistrements DNS).
+    const detailed = await Promise.all(
+      ebook.map(async (d) => {
+        try {
+          const r = await fetch(`https://api.resend.com/domains/${d.id}`, {
+            headers: { Authorization: `Bearer ${key}` },
+          });
+          const t = await r.text();
+          if (!r.ok) return { ...d, records_error: { status: r.status, details: t } };
+          return JSON.parse(t);
+        } catch (e) {
+          return { ...d, records_error: (e as Error).message };
+        }
+      }),
+    );
+
+    return json({ domains: detailed });
   } catch (err) {
     console.error("resend-domain-status error", err);
     return json({ error: (err as Error).message ?? "Erreur inconnue" }, 500);
