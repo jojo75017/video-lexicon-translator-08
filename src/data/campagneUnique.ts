@@ -68,6 +68,12 @@ export const SHORT_LINKS: Record<string, ShortLink> = {
   n4: { key: 'n4', destination: '/commander', template: 'newsletter-4-cta1', label: "Prendre l'accès à vie" },
   n4b: { key: 'n4b', destination: '/commander', template: 'newsletter-4-cta2', label: 'Voir tout ce qui est inclus' },
   n5: { key: 'n5', destination: '/commander', template: 'newsletter-5-cta1', label: 'Commander avant demain' },
+
+  /* Séquence de lancement V3 — calée sur le 1er octobre 2026. */
+  l1: { key: 'l1', destination: '/essai', template: 'v3l-essai-J18', label: 'Écrire mon chapitre 1 gratuitement' },
+  l2: { key: 'l2', destination: '/essai', template: 'v3l-livre-J10', label: "Voir comment j'ai écrit un livre" },
+  l3: { key: 'l3', destination: '/commander', template: 'v3l-changement-J4', label: "Profiter de l'accès à vie 47 €" },
+  l4: { key: 'l4', destination: '/commander', template: 'v3l-dernier-J1', label: 'Commander avant ce soir' },
 };
 
 
