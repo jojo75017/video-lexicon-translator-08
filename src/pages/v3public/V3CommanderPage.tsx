@@ -230,6 +230,20 @@ export default function V3CommanderPage() {
           </a>
         </header>
 
+        {/* ESSAI GRATUIT — promesse non payante mise tout en haut */}
+        <a
+          className="trial-banner"
+          href="/essai"
+          onClick={() => void trackCaptureEvent("commander", "trial_click", { leadMagnet: "free_trial_essai" })}
+        >
+          <span className="trial-badge">GRATUIT</span>
+          <span className="trial-text">
+            <b>Écrivez votre premier chapitre gratuitement</b>
+            <em> sans carte bancaire, avant de décider.</em>
+          </span>
+          <span className="trial-arrow">Essayer →</span>
+        </a>
+
         {/* HERO */}
         <section className="hero">
           <div>
