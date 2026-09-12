@@ -234,7 +234,7 @@ export default function V3CommanderPage() {
         <a
           className="trial-banner"
           href="/essai"
-          onClick={() => void trackCaptureEvent("commander", "trial_click", { leadMagnet: "free_trial_essai" })}
+          onClick={() => void trackCaptureEvent("commander", "click", { leadMagnet: "free_trial_essai" })}
         >
           <span className="trial-badge">GRATUIT</span>
           <span className="trial-text">
