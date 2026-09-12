@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { Loader2 } from "lucide-react";
@@ -86,8 +86,24 @@ export default function V3CommanderPage() {
   const [paypalLoading, setPaypalLoading] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [now, setNow] = useState(() => Date.now());
 
-  const offerOver = Date.now() > OFFER_END.getTime();
+  const offerOver = now > OFFER_END.getTime();
+
+  /** Compte à rebours honnête vers la fin de l'offre 47 € (30 sept. minuit Paris). */
+  const countdown = useMemo(() => {
+    const diff = Math.max(0, OFFER_END.getTime() - now);
+    const d = Math.floor(diff / 86_400_000);
+    const h = Math.floor((diff % 86_400_000) / 3_600_000);
+    const m = Math.floor((diff % 3_600_000) / 60_000);
+    const s = Math.floor((diff % 60_000) / 1000);
+    return { d, h, m, s };
+  }, [now]);
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, []);
 
   // Email du prospect connecté récupéré automatiquement s'il n'est pas dans l'URL.
   useEffect(() => {
@@ -214,6 +230,20 @@ export default function V3CommanderPage() {
           </a>
         </header>
 
+        {/* ESSAI GRATUIT — promesse non payante mise tout en haut */}
+        <a
+          className="trial-banner"
+          href="/essai"
+          onClick={() => void trackCaptureEvent("commander", "click", { leadMagnet: "free_trial_essai" })}
+        >
+          <span className="trial-badge">GRATUIT</span>
+          <span className="trial-text">
+            <b>Écrivez votre premier chapitre gratuitement</b>
+            <em> sans carte bancaire, avant de décider.</em>
+          </span>
+          <span className="trial-arrow">Essayer →</span>
+        </a>
+
         {/* HERO */}
         <section className="hero">
           <div>
@@ -312,7 +342,25 @@ export default function V3CommanderPage() {
           <div className="checkout" id="paiement">
             {!clientSecret ? (
               <>
-                <div className="deadline">● Accès à vie disponible jusqu'au 30 septembre</div>
+                <div className="deadline">
+                  {offerOver
+                    ? "● L'offre 47 € à vie est terminée"
+                    : "● Accès à vie à 47 € — disponible jusqu'au 30 septembre"}
+                </div>
+
+                {!offerOver && (
+                  <div className="countdown" aria-live="polite">
+                    <span><b>{countdown.d}</b><i>jours</i></span>
+                    <span><b>{String(countdown.h).padStart(2, "0")}</b><i>heures</i></span>
+                    <span><b>{String(countdown.m).padStart(2, "0")}</b><i>min</i></span>
+                    <span><b>{String(countdown.s).padStart(2, "0")}</b><i>sec</i></span>
+                  </div>
+                )}
+
+                <div className="proof-strip">
+                  <strong>71</strong>
+                  <span>livres publiés par Georges Boubet, auteur indépendant — EbookStudio est né d'un parcours réel, pas d'une maquette.</span>
+                </div>
 
                 <div className="checkout-price">
                   <b>47 €</b>
@@ -343,7 +391,9 @@ export default function V3CommanderPage() {
                 </div>
 
                 <p className="guarantee">
-                  🛡 <b>Garantie 30 jours</b> — remboursement sur simple demande.
+                  🛡 <b>Garantie 30 jours, sans justification</b> — essayez, et si l'outil ne
+                  vous convient pas, un simple message au support suffit pour être remboursé
+                  intégralement.
                 </p>
 
                 <button
@@ -377,6 +427,33 @@ export default function V3CommanderPage() {
                 </button>
 
                 <p className="secure">🔒 Carte bancaire ou PayPal · paiement sécurisé</p>
+
+                {/* RÉPONSES AUX 5 OBJECTIONS, juste sous le bouton */}
+                <div className="objections">
+                  <small>Vous hésitez encore ?</small>
+                  <ul>
+                    <li>
+                      <b>« Je n'écris pas bien. »</b>
+                      <span>L'IA rédige à partir de vos idées. Vous validez, vous corrigez si vous voulez — le style vous appartient.</span>
+                    </li>
+                    <li>
+                      <b>« Je ne sais pas quoi écrire. »</b>
+                      <span>Le parcours part de votre idée et la structure en plan, chapitre par chapitre. Un guide vous accompagne à chaque étape.</span>
+                    </li>
+                    <li>
+                      <b>« C'est de l'IA, Amazon va refuser. »</b>
+                      <span>Les textes et fichiers sont à votre nom, exportés au format attendu par Amazon KDP. Vous restez l'auteur et l'éditeur.</span>
+                    </li>
+                    <li>
+                      <b>« Je n'ai pas de clé API. »</b>
+                      <span>Les modules qui demandent une clé personnelle l'expliquent pas à pas. Beaucoup de fonctions fonctionnent sans aucune clé.</span>
+                    </li>
+                    <li>
+                      <b>« Et après le 1ᵉʳ octobre ? »</b>
+                      <span>En commandant maintenant, votre accès à vie est conservé. Après cette date, EbookStudio passe en abonnement uniquement.</span>
+                    </li>
+                  </ul>
+                </div>
               </>
             ) : (
               <div>
