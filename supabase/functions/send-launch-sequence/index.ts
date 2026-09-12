@@ -142,6 +142,25 @@ function isInternalEmail(email: string): boolean {
   return false;
 }
 
+/**
+ * Boîtes grand public : ce sont les personnes qui peuvent réellement
+ * vouloir écrire un livre. Les adresses d'entreprises, mairies,
+ * associations et cabinets sont écartées de ce segment.
+ */
+const PERSONAL_DOMAINS = new Set([
+  "gmail.com", "googlemail.com", "hotmail.fr", "hotmail.com", "hotmail.be",
+  "outlook.fr", "outlook.com", "live.fr", "live.com", "msn.com",
+  "yahoo.fr", "yahoo.com", "ymail.com",
+  "orange.fr", "wanadoo.fr", "free.fr", "sfr.fr", "neuf.fr", "laposte.net",
+  "bbox.fr", "numericable.fr", "aliceadsl.fr", "club-internet.fr",
+  "icloud.com", "me.com", "mac.com", "protonmail.com", "proton.me", "gmx.fr", "aol.com",
+]);
+
+function isPersonalAddress(email: string): boolean {
+  const domain = email.split("@")[1]?.toLowerCase() ?? "";
+  return PERSONAL_DOMAINS.has(domain);
+}
+
 async function isAdmin(req: Request, baseUrl: string): Promise<boolean> {
   const authorization = req.headers.get("Authorization");
   if (!authorization?.startsWith("Bearer ")) return false;
