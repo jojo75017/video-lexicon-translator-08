@@ -14,6 +14,7 @@ const STEPS = [
   { step: 2, template: 'v3l-livre-J10', title: 'Email 2 — Un livre écrit sous vos yeux', when: 'J-10' },
   { step: 3, template: 'v3l-changement-J4', title: 'Email 3 — Ce qui change le 1er octobre', when: 'J-4' },
   { step: 4, template: 'v3l-dernier-J1', title: 'Email 4 — Dernier jour à 47 €', when: 'J-1' },
+  { step: 5, template: 'v3l-niches-offertes', title: 'Lettre cadeau — 10 niches offertes', when: 'À tout moment' },
 ];
 
 type LogRow = { message_id: string | null; id: string; template_name: string | null; recipient_email: string; status: string; error_message: string | null; created_at: string };
@@ -62,7 +63,7 @@ export default function AdminLancementEmailsPage() {
     return latest.filter((r) => new Date(r.created_at) >= start).length;
   }, [latest]);
 
-  const runSend = async (step: number, segment: 'hot' | 'all', limit: number) => {
+  const runSend = async (step: number, segment: 'hot' | 'all' | 'cold', limit: number) => {
     const key = `${step}-${segment}`;
     setSending(key);
     const { data, error } = await supabase.functions.invoke('send-launch-sequence', { body: { mode: 'send', step, segment, limit } });
@@ -85,7 +86,7 @@ export default function AdminLancementEmailsPage() {
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="flex items-center gap-2 text-2xl font-bold"><Mail className="h-6 w-6 text-primary" /> Séquence de lancement V3</h1>
-            <p className="text-sm text-muted-foreground">Les 4 emails envoyés avant le 1er octobre, avec le nombre d’envois et de clics.</p>
+            <p className="text-sm text-muted-foreground">Les emails envoyés avant le 1er octobre et la lettre cadeau « 10 niches », avec les envois et les clics.</p>
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="outline">{sentToday} envoyé(s) aujourd’hui</Badge>
@@ -120,6 +121,10 @@ export default function AdminLancementEmailsPage() {
                 <Button size="sm" variant="outline" disabled={sending !== null} onClick={() => runSend(s.step, 'hot', 20)}>
                   <Send className="mr-1.5 h-4 w-4" />
                   {sending === `${s.step}-hot` ? 'Envoi…' : 'Envoyer aux plus engagés'}
+                </Button>
+                <Button size="sm" variant="outline" disabled={sending !== null} onClick={() => runSend(s.step, 'cold', 100)}>
+                  <Send className="mr-1.5 h-4 w-4" />
+                  {sending === `${s.step}-cold` ? 'Envoi…' : 'Envoyer aux non-cliqueurs (100)'}
                 </Button>
                 <Button size="sm" disabled={sending !== null} onClick={() => runSend(s.step, 'all', 100)}>
                   <Send className="mr-1.5 h-4 w-4" />
