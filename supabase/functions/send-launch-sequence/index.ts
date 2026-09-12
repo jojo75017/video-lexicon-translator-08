@@ -106,6 +106,24 @@ const LAUNCH_EMAILS: LaunchEmail[] = [
       "Garantie 30 jours, sans justification. Aucune question, aucun formulaire.",
     ],
   },
+  {
+    step: 5,
+    template: "v3l-niches-offertes",
+    shortKey: "l5",
+    subject: "10 niches Amazon rentables, offertes",
+    preheader: "Le mot-clé exact, le BSR à viser, la concurrence. Sans rien acheter.",
+    ctaLabel: "Recevoir mes 10 niches",
+    goal: "Ouvrir la page cadeau /10-niches-offertes",
+    paragraphs: [
+      "Avant d'écrire quoi que ce soit, il y a une question à trancher : est-ce que quelqu'un cherche ce livre sur Amazon ?",
+      "Je vous offre la réponse pour 10 sujets. Une niche par grande catégorie (romance, thriller, développement personnel, finances, santé, cuisine, jeunesse, parascolaire, carnets, pratique), avec pour chacune :",
+      "- le mot-clé exact tapé par les lecteurs sur Amazon ;",
+      "- le BSR à viser pour être visible ;",
+      "- le niveau de concurrence et le prix de vente constaté.",
+      "C'est offert, sans condition d'achat. Vous voyez les 10 niches directement sur la page, et vous pouvez aussi télécharger le PDF pour le garder.",
+      `Et si l'envie d'écrire vous prend : l'accès à vie à EbookStudio reste à 47 € une seule fois jusqu'au ${DEADLINE}. Après cette date, l'entrée se fera par ${AFTER_OFFER}.`,
+    ],
+  },
 ];
 
 const SIGN = `Georges Boubet\nFondateur d'EbookStudio\n${DIRECT_EMAIL}`;
@@ -208,7 +226,7 @@ Deno.serve(async (req) => {
     const mode = String(body.mode || "status"); // status | preview | send
     const stepNum = Number(body.step) || 1;
     const email = LAUNCH_EMAILS.find((e) => e.step === stepNum) ?? LAUNCH_EMAILS[0];
-    const segment = String(body.segment || "hot"); // hot | all
+    const segment = String(body.segment || "hot"); // hot | all | cold
     const limit = Math.max(1, Math.min(300, Number(body.limit) || 100));
     // Pour test : rediriger tous les envois vers une seule adresse.
     const overrideTestTo = typeof body.overrideTestTo === "string" && /.+@.+\..+/.test(body.overrideTestTo)
@@ -278,6 +296,8 @@ Deno.serve(async (req) => {
       if (alreadySent.has(raw)) continue;
       if (seen.has(raw)) continue;
       if (segment === "hot" && !hot.has(raw)) continue;
+      // Segment « non-cliqueurs » : jamais de clic identifié, jamais entré dans le tunnel.
+      if (segment === "cold" && hot.has(raw)) continue;
       seen.add(raw);
       recipients.push({ email: raw, first_name: (p as any).first_name ?? null, source: String((p as any).source ?? "") });
     }
