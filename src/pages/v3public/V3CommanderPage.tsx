@@ -427,6 +427,33 @@ export default function V3CommanderPage() {
                 </button>
 
                 <p className="secure">🔒 Carte bancaire ou PayPal · paiement sécurisé</p>
+
+                {/* RÉPONSES AUX 5 OBJECTIONS, juste sous le bouton */}
+                <div className="objections">
+                  <small>Vous hésitez encore ?</small>
+                  <ul>
+                    <li>
+                      <b>« Je n'écris pas bien. »</b>
+                      <span>L'IA rédige à partir de vos idées. Vous validez, vous corrigez si vous voulez — le style vous appartient.</span>
+                    </li>
+                    <li>
+                      <b>« Je ne sais pas quoi écrire. »</b>
+                      <span>Le parcours part de votre idée et la structure en plan, chapitre par chapitre. Un guide vous accompagne à chaque étape.</span>
+                    </li>
+                    <li>
+                      <b>« C'est de l'IA, Amazon va refuser. »</b>
+                      <span>Les textes et fichiers sont à votre nom, exportés au format attendu par Amazon KDP. Vous restez l'auteur et l'éditeur.</span>
+                    </li>
+                    <li>
+                      <b>« Je n'ai pas de clé API. »</b>
+                      <span>Les modules qui demandent une clé personnelle l'expliquent pas à pas. Beaucoup de fonctions fonctionnent sans aucune clé.</span>
+                    </li>
+                    <li>
+                      <b>« Et après le 1ᵉʳ octobre ? »</b>
+                      <span>En commandant maintenant, votre accès à vie est conservé. Après cette date, EbookStudio passe en abonnement uniquement.</span>
+                    </li>
+                  </ul>
+                </div>
               </>
             ) : (
               <div>
