@@ -5,7 +5,7 @@ import { Download, ArrowRight, PenLine, ShieldCheck, Gift } from 'lucide-react';
 import { toast } from 'sonner';
 import SeoHead from '@/components/funnel/SeoHead';
 import Niches10Offer from '@/components/marketing/Niches10Offer';
-import { getNiches10Pack, readNiches10Email, remainingNichesCount } from '@/lib/niches10Pack';
+import { getNiches10Pack, readNiches10Email, remainingNichesCount, NICHES_10_DRIVE_PDF } from '@/lib/niches10Pack';
 import { writeBookBrief } from '@/lib/v3/bookBrief';
 import { trackCaptureEvent } from '@/lib/captureTracking';
 

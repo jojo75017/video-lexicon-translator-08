@@ -33,6 +33,10 @@ export const NICHES_10_LEAD_MAGNET = '10-niches-offertes';
 export const NICHES_10_EMAIL_KEY = 'ebs_niches10_email';
 export const NICHES_10_PATH = '/10-niches-offertes';
 
+/** PDF officiel des 10 niches (Google Drive, téléchargement direct). */
+export const NICHES_10_DRIVE_PDF =
+  'https://drive.google.com/uc?export=download&id=16QCOAqSsDbGR0A4KYfzkagjDl40wrqax';
+
 export interface Niche10 extends Niche600 {
   /** Libellé lisible de la catégorie, ex. « 💕 Romance ». */
   categoryLabel: string;
