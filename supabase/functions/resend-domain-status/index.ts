@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
       }),
     );
 
-    return json({ domains: detailed });
+    return json({ domains: detailed, verifyResults });
   } catch (err) {
     console.error("resend-domain-status error", err);
     return json({ error: (err as Error).message ?? "Erreur inconnue" }, 500);
