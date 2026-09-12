@@ -342,7 +342,25 @@ export default function V3CommanderPage() {
           <div className="checkout" id="paiement">
             {!clientSecret ? (
               <>
-                <div className="deadline">● Accès à vie disponible jusqu'au 30 septembre</div>
+                <div className="deadline">
+                  {offerOver
+                    ? "● L'offre 47 € à vie est terminée"
+                    : "● Accès à vie à 47 € — disponible jusqu'au 30 septembre"}
+                </div>
+
+                {!offerOver && (
+                  <div className="countdown" aria-live="polite">
+                    <span><b>{countdown.d}</b><i>jours</i></span>
+                    <span><b>{String(countdown.h).padStart(2, "0")}</b><i>heures</i></span>
+                    <span><b>{String(countdown.m).padStart(2, "0")}</b><i>min</i></span>
+                    <span><b>{String(countdown.s).padStart(2, "0")}</b><i>sec</i></span>
+                  </div>
+                )}
+
+                <div className="proof-strip">
+                  <strong>71</strong>
+                  <span>livres publiés par Georges Boubet, auteur indépendant — EbookStudio est né d'un parcours réel, pas d'une maquette.</span>
+                </div>
 
                 <div className="checkout-price">
                   <b>47 €</b>
