@@ -40,6 +40,26 @@ Deno.serve(async (req) => {
     const arr: any[] = listBody?.data ?? listBody ?? [];
     const ebook = arr.filter((d) => (d.name || "").includes("ebookstudio"));
 
+    // Optionnel : relancer la vérification DNS chez Resend.
+    const verifyResults: Record<string, unknown> = {};
+    if (wantVerify) {
+      await Promise.all(
+        ebook.map(async (d) => {
+          try {
+            const vr = await fetch(`https://api.resend.com/domains/${d.id}/verify`, {
+              method: "POST",
+              headers: { Authorization: `Bearer ${key}` },
+            });
+            const vt = await vr.text();
+            console.log(`verify ${d.name} [${vr.status}]: ${vt}`);
+            verifyResults[d.name] = { status: vr.status, body: vt };
+          } catch (e) {
+            verifyResults[d.name] = { error: (e as Error).message };
+          }
+        }),
+      );
+    }
+
     // Pour chaque domaine, on récupère le détail (inclut les enregistrements DNS).
     const detailed = await Promise.all(
       ebook.map(async (d) => {
@@ -56,7 +76,7 @@ Deno.serve(async (req) => {
       }),
     );
 
-    return json({ domains: detailed });
+    return json({ domains: detailed, verifyResults });
   } catch (err) {
     console.error("resend-domain-status error", err);
     return json({ error: (err as Error).message ?? "Erreur inconnue" }, 500);
