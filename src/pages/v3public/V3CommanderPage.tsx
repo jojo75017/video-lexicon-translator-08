@@ -391,7 +391,9 @@ export default function V3CommanderPage() {
                 </div>
 
                 <p className="guarantee">
-                  🛡 <b>Garantie 30 jours</b> — remboursement sur simple demande.
+                  🛡 <b>Garantie 30 jours, sans justification</b> — essayez, et si l'outil ne
+                  vous convient pas, un simple message au support suffit pour être remboursé
+                  intégralement.
                 </p>
 
                 <button
