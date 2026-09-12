@@ -207,6 +207,16 @@ const Niches10OffertesPage: React.FC = () => {
                 <Download className="w-4 h-4 mr-2" />
                 {downloading ? 'Création du PDF…' : 'Télécharger en PDF'}
               </Button>
+              <a
+                href={NICHES_10_DRIVE_PDF}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackCaptureEvent('cadeau', 'click', { leadMagnet: '10-niches-offertes-drive' })}
+              >
+                <Button className="h-12 font-bold" style={{ background: GOLD, color: '#1a1a1a' }}>
+                  <Download className="w-4 h-4 mr-2" /> Télécharger le PDF des 10 niches
+                </Button>
+              </a>
               <p className="text-xs text-muted-foreground">
                 Cette page reste accessible à vie depuis ce navigateur.
               </p>
