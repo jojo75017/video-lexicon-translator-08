@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Mail, RefreshCw, Send } from 'lucide-react';
+import { ArrowLeft, CalendarDays, Mail, RefreshCw, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,43 @@ const STEPS = [
 
 type LogRow = { message_id: string | null; id: string; template_name: string | null; recipient_email: string; status: string; error_message: string | null; created_at: string };
 type ClickRow = { prospect_email: string; template_name: string | null; clicked_at: string };
+
+/** Calendrier de la séquence de lancement V3 (lancement le 1er octobre 2026). */
+const CALENDAR = [
+  {
+    startDay: 13, endDay: 20, monthLabel: 'Septembre 2026',
+    emailLabel: 'Email 1 — L’essai gratuit (J-18)',
+    action: 'Envoyer l’Email 1 par lots de 100 par jour (priorité : plus engagés puis adresses personnelles).',
+    step: 1, when: '13 → 20 sept.',
+  },
+  {
+    startDay: 21, endDay: 26, monthLabel: 'Septembre 2026',
+    emailLabel: 'Email 2 — Un livre écrit sous vos yeux (J-10)',
+    action: 'Commencer l’Email 2 le 21 septembre. Continuer les lots de 100 par jour.',
+    step: 2, when: '21 → 26 sept.',
+  },
+  {
+    startDay: 27, endDay: 29, monthLabel: 'Septembre 2026',
+    emailLabel: 'Email 3 — Ce qui change le 1er octobre (J-4)',
+    action: 'Envoyer l’Email 3. Finit les lots restants de l’Email 2 si besoin.',
+    step: 3, when: '27 → 29 sept.',
+  },
+  {
+    startDay: 30, endDay: 30, monthLabel: 'Septembre 2026',
+    emailLabel: 'Email 4 — Dernier jour à 47 € (J-1)',
+    action: 'Dernier rappel : envoyer l’Email 4 à tous ceux qui ne l’ont pas encore reçu.',
+    step: 4, when: '30 sept. uniquement',
+  },
+  {
+    startDay: 1, endDay: 1, monthLabel: 'Octobre 2026',
+    emailLabel: 'Lancement V3 — 1er octobre',
+    action: 'Ouverture V3. Plus d’envois de la séquence : l’offre à 47 € est terminée.',
+    step: null, when: '1er oct.',
+  },
+];
+
+const SEPTEMBER_DAYS = 30;
+const CAL_START = 13; // calendrier affiché du 13 septembre au 1er octobre
 
 export default function AdminLancementEmailsPage() {
   const navigate = useNavigate();
@@ -102,6 +139,73 @@ export default function AdminLancementEmailsPage() {
           engagés, puis un lot de 100 par jour à l’ensemble de la liste. Les clients, les désinscrits et les
           personnes déjà destinataires du même email sont exclus automatiquement.
         </p>
+
+        <Card className="mb-6 p-4">
+          <h2 className="mb-1 flex items-center gap-2 text-lg font-semibold">
+            <CalendarDays className="h-5 w-5 text-primary" /> Calendrier de la séquence
+          </h2>
+          <p className="mb-4 text-xs text-muted-foreground">
+            Ordre obligatoire : ne jamais mélanger ni tirer les emails au hasard. Chaque email part dans
+            l’ordre, par lots de 100 par jour. La lettre cadeau « 10 niches » part à tout moment, en priorité
+            aux personnes ayant cliqué.
+          </p>
+          <div className="overflow-x-auto">
+            <div className="min-w-[760px]">
+              {/* En-tête des jours : 13 sept. → 1er oct. */}
+              <div className="mb-1 grid" style={{ gridTemplateColumns: `180px repeat(${SEPTEMBER_DAYS - CAL_START + 2}, 1fr)` }}>
+                <div />
+                {Array.from({ length: SEPTEMBER_DAYS - CAL_START + 2 }, (_, i) => {
+                  const day = CAL_START + i;
+                  const label = day <= SEPTEMBER_DAYS ? `${day}` : '1/10';
+                  const isToday = day === new Date().getDate() && new Date().getMonth() === 8;
+                  return (
+                    <div key={i} className={`text-center text-[10px] ${isToday ? 'font-bold text-primary' : 'text-muted-foreground'}`}>
+                      {label}
+                    </div>
+                  );
+                })}
+              </div>
+              {CALENDAR.map((row) => {
+                const startCol = row.monthLabel.startsWith('Octobre')
+                  ? SEPTEMBER_DAYS - CAL_START + 2
+                  : row.startDay - CAL_START + 1;
+                const span = row.monthLabel.startsWith('Octobre')
+                  ? 1
+                  : row.endDay - row.startDay + 1;
+                return (
+                  <div key={row.emailLabel} className="mb-2 grid items-center" style={{ gridTemplateColumns: `180px repeat(${SEPTEMBER_DAYS - CAL_START + 2}, 1fr)` }}>
+                    <div className="pr-2 text-xs font-medium leading-tight">{row.when}</div>
+                    {Array.from({ length: SEPTEMBER_DAYS - CAL_START + 2 }, (_, i) => {
+                      const col = i + 1;
+                      const inRange = col >= startCol && col < startCol + span;
+                      return (
+                        <div key={i} className="px-px">
+                          {inRange && (
+                            <div
+                              className={`h-6 rounded ${row.step === null ? 'bg-primary' : 'bg-primary/25'} ${col === startCol ? 'rounded-l-md' : ''} ${col === startCol + span - 1 ? 'rounded-r-md' : ''}`}
+                              title={row.emailLabel}
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="mt-4 space-y-2">
+            {CALENDAR.map((row) => (
+              <div key={row.emailLabel} className="flex flex-wrap items-start gap-2 rounded-md border bg-muted/30 p-2 text-sm">
+                <Badge variant="outline" className="shrink-0">{row.when}</Badge>
+                <div>
+                  <p className="font-medium">{row.emailLabel}</p>
+                  <p className="text-xs text-muted-foreground">{row.action}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
 
         <div className="space-y-4">
           {perStep.map((s) => (
