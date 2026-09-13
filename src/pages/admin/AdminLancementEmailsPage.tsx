@@ -140,6 +140,73 @@ export default function AdminLancementEmailsPage() {
           personnes déjà destinataires du même email sont exclus automatiquement.
         </p>
 
+        <Card className="mb-6 p-4">
+          <h2 className="mb-1 flex items-center gap-2 text-lg font-semibold">
+            <CalendarDays className="h-5 w-5 text-primary" /> Calendrier de la séquence
+          </h2>
+          <p className="mb-4 text-xs text-muted-foreground">
+            Ordre obligatoire : ne jamais mélanger ni tirer les emails au hasard. Chaque email part dans
+            l’ordre, par lots de 100 par jour. La lettre cadeau « 10 niches » part à tout moment, en priorité
+            aux personnes ayant cliqué.
+          </p>
+          <div className="overflow-x-auto">
+            <div className="min-w-[760px]">
+              {/* En-tête des jours : 13 sept. → 1er oct. */}
+              <div className="mb-1 grid" style={{ gridTemplateColumns: `180px repeat(${SEPTEMBER_DAYS - CAL_START + 2}, 1fr)` }}>
+                <div />
+                {Array.from({ length: SEPTEMBER_DAYS - CAL_START + 2 }, (_, i) => {
+                  const day = CAL_START + i;
+                  const label = day <= SEPTEMBER_DAYS ? `${day}` : '1/10';
+                  const isToday = day === new Date().getDate() && new Date().getMonth() === 8;
+                  return (
+                    <div key={i} className={`text-center text-[10px] ${isToday ? 'font-bold text-primary' : 'text-muted-foreground'}`}>
+                      {label}
+                    </div>
+                  );
+                })}
+              </div>
+              {CALENDAR.map((row) => {
+                const startCol = row.monthLabel.startsWith('Octobre')
+                  ? SEPTEMBER_DAYS - CAL_START + 2
+                  : row.startDay - CAL_START + 1;
+                const span = row.monthLabel.startsWith('Octobre')
+                  ? 1
+                  : row.endDay - row.startDay + 1;
+                return (
+                  <div key={row.emailLabel} className="mb-2 grid items-center" style={{ gridTemplateColumns: `180px repeat(${SEPTEMBER_DAYS - CAL_START + 2}, 1fr)` }}>
+                    <div className="pr-2 text-xs font-medium leading-tight">{row.when}</div>
+                    {Array.from({ length: SEPTEMBER_DAYS - CAL_START + 2 }, (_, i) => {
+                      const col = i + 1;
+                      const inRange = col >= startCol && col < startCol + span;
+                      return (
+                        <div key={i} className="px-px">
+                          {inRange && (
+                            <div
+                              className={`h-6 rounded ${row.step === null ? 'bg-primary' : 'bg-primary/25'} ${col === startCol ? 'rounded-l-md' : ''} ${col === startCol + span - 1 ? 'rounded-r-md' : ''}`}
+                              title={row.emailLabel}
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="mt-4 space-y-2">
+            {CALENDAR.map((row) => (
+              <div key={row.emailLabel} className="flex flex-wrap items-start gap-2 rounded-md border bg-muted/30 p-2 text-sm">
+                <Badge variant="outline" className="shrink-0">{row.when}</Badge>
+                <div>
+                  <p className="font-medium">{row.emailLabel}</p>
+                  <p className="text-xs text-muted-foreground">{row.action}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
         <div className="space-y-4">
           {perStep.map((s) => (
             <Card key={s.step} className="p-4">
