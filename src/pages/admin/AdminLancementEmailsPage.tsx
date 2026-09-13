@@ -20,6 +20,43 @@ const STEPS = [
 type LogRow = { message_id: string | null; id: string; template_name: string | null; recipient_email: string; status: string; error_message: string | null; created_at: string };
 type ClickRow = { prospect_email: string; template_name: string | null; clicked_at: string };
 
+/** Calendrier de la séquence de lancement V3 (lancement le 1er octobre 2026). */
+const CALENDAR = [
+  {
+    startDay: 13, endDay: 20, monthLabel: 'Septembre 2026',
+    emailLabel: 'Email 1 — L’essai gratuit (J-18)',
+    action: 'Envoyer l’Email 1 par lots de 100 par jour (priorité : plus engagés puis adresses personnelles).',
+    step: 1, when: '13 → 20 sept.',
+  },
+  {
+    startDay: 21, endDay: 26, monthLabel: 'Septembre 2026',
+    emailLabel: 'Email 2 — Un livre écrit sous vos yeux (J-10)',
+    action: 'Commencer l’Email 2 le 21 septembre. Continuer les lots de 100 par jour.',
+    step: 2, when: '21 → 26 sept.',
+  },
+  {
+    startDay: 27, endDay: 29, monthLabel: 'Septembre 2026',
+    emailLabel: 'Email 3 — Ce qui change le 1er octobre (J-4)',
+    action: 'Envoyer l’Email 3. Finit les lots restants de l’Email 2 si besoin.',
+    step: 3, when: '27 → 29 sept.',
+  },
+  {
+    startDay: 30, endDay: 30, monthLabel: 'Septembre 2026',
+    emailLabel: 'Email 4 — Dernier jour à 47 € (J-1)',
+    action: 'Dernier rappel : envoyer l’Email 4 à tous ceux qui ne l’ont pas encore reçu.',
+    step: 4, when: '30 sept. uniquement',
+  },
+  {
+    startDay: 1, endDay: 1, monthLabel: 'Octobre 2026',
+    emailLabel: 'Lancement V3 — 1er octobre',
+    action: 'Ouverture V3. Plus d’envois de la séquence : l’offre à 47 € est terminée.',
+    step: null, when: '1er oct.',
+  },
+];
+
+const SEPTEMBER_DAYS = 30;
+const CAL_START = 13; // calendrier affiché du 13 septembre au 1er octobre
+
 export default function AdminLancementEmailsPage() {
   const navigate = useNavigate();
   const [logs, setLogs] = useState<LogRow[]>([]);
