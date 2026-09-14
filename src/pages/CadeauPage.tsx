@@ -39,8 +39,9 @@ function useCountdown(target: Date) {
 
 /**
  * Page cadeau — le seul lien des emails.
- * Les 5 niches sont visibles tout de suite, l'inscription débloque les bonus,
- * et le seul appel à l'action payant est le bouton « Commander ».
+ * La première niche est offerte en clair pour prouver la qualité ; les quatre
+ * autres et les bonus se débloquent avec l'email, et l'offre payante enchaîne
+ * immédiatement après le déblocage.
  */
 export default function CadeauPage() {
   useReferralTracking();
@@ -86,9 +87,9 @@ export default function CadeauPage() {
       trackFormSubmit('cadeau_5_niches', value);
       trackSignUp('page_cadeau', NICHES_5_LEAD_MAGNET);
       setUnlocked(true);
-      toast.success('Vos bonus sont débloqués juste en dessous.');
+      toast.success('Vos 5 niches et vos bonus sont ouverts.');
       setTimeout(() => {
-        document.getElementById('bonus')?.scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('niches')?.scrollIntoView({ behavior: 'smooth' });
       }, 150);
     } catch (err) {
       console.error(err);
@@ -98,6 +99,137 @@ export default function CadeauPage() {
       setSubmitting(false);
     }
   };
+
+  /** Formulaire de capture, réutilisé en haut de page et au niveau des bonus. */
+  const captureForm = (idSuffix: string) => (
+    <form onSubmit={handleSubmit} className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+      <Input
+        id={`prenom-${idSuffix}`}
+        value={firstName}
+        onChange={(e) => setFirstName(e.target.value)}
+        placeholder="Votre prénom"
+        className="h-12 rounded-xl"
+        autoComplete="given-name"
+      />
+      <Input
+        id={`email-${idSuffix}`}
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="vous@email.fr"
+        className="h-12 rounded-xl"
+        autoComplete="email"
+        required
+      />
+      <Button
+        type="submit"
+        disabled={submitting}
+        className="h-12 rounded-xl bg-[#008296] px-6 font-bold text-white hover:bg-[#00707f]"
+      >
+        {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Voir mes 5 niches'}
+      </Button>
+    </form>
+  );
+
+  const nicheCard = (n: (typeof niches)[number], i: number, locked: boolean) => (
+    <Card
+      key={n.id}
+      className={`relative overflow-hidden rounded-2xl border-[#008296]/15 bg-white p-6 shadow-sm ${
+        locked ? 'select-none' : ''
+      }`}
+    >
+      <div className={locked ? 'pointer-events-none blur-[6px]' : ''} aria-hidden={locked}>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#008296]">
+              Niche n°{i + 1} · {n.categoryLabel}
+            </p>
+            <h2 className="mt-1.5 text-lg font-bold">{n.niche}</h2>
+          </div>
+          <Badge variant="outline" className="shrink-0 border-[#FF9E2D] text-[#B4690E]">
+            Potentiel {n.potentiel}/5
+          </Badge>
+        </div>
+
+        <dl className="mt-4 space-y-2 text-sm">
+          <div className="flex justify-between gap-3">
+            <dt className="text-[#232F3E]/60">Mot-clé Amazon</dt>
+            <dd className="text-right font-semibold">{n.motCleAmazon}</dd>
+          </div>
+          <div className="flex justify-between gap-3">
+            <dt className="text-[#232F3E]/60">Concurrence</dt>
+            <dd className="text-right font-semibold">{n.concurrence}</dd>
+          </div>
+          <div className="flex justify-between gap-3">
+            <dt className="text-[#232F3E]/60">BSR cible</dt>
+            <dd className="text-right font-semibold">{n.bsrCible.toLocaleString('fr-FR')}</dd>
+          </div>
+          <div className="flex justify-between gap-3">
+            <dt className="text-[#232F3E]/60">Prix constaté</dt>
+            <dd className="text-right font-semibold">{n.exemplePrix.toFixed(2)} €</dd>
+          </div>
+        </dl>
+
+        <p className="mt-4 rounded-xl bg-[#F3FAFA] p-3 text-sm text-[#232F3E]/80">
+          <TrendingUp className="mr-1.5 inline h-4 w-4 text-[#008296]" />
+          {n.angle}
+        </p>
+      </div>
+
+      {locked && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-white/70 px-6 text-center">
+          <Lock className="h-6 w-6 text-[#008296]" />
+          <p className="text-sm font-bold">
+            Niche n°{i + 1} · {n.categoryLabel}
+          </p>
+          <a
+            href="#formulaire"
+            className="text-sm font-semibold underline"
+            style={{ color: TEAL }}
+          >
+            Débloquez les {niches.length - 1} niches restantes
+          </a>
+        </div>
+      )}
+    </Card>
+  );
+
+  /** Bloc offre payante, affiché en enchaînement direct après le déblocage. */
+  const offerCard = (
+    <Card className="rounded-3xl border-2 border-[#FF9E2D]/60 bg-white p-8 text-center shadow-sm">
+      {countdown && (
+        <p className="inline-flex items-center gap-2 rounded-full bg-[#FFF4E3] px-4 py-1.5 text-sm font-bold text-[#B4690E]">
+          <Clock className="h-4 w-4" />
+          Il reste {countdown.days} j {countdown.hours} h {countdown.minutes} min
+        </p>
+      )}
+      <h2 className="mt-5 text-2xl font-bold md:text-3xl">
+        {unlocked
+          ? 'Vous avez la niche. Voici comment écrire le livre.'
+          : `Écrivez ce livre : ${CAMPAGNE.price} une fois, accès à vie`}
+      </h2>
+      <p className="mx-auto mt-4 max-w-xl text-[#232F3E]/75">
+        {CAMPAGNE.price} une fois, accès à vie. Un seul paiement, aucune reconduction. Après le{' '}
+        {CAMPAGNE.deadline}, EbookStudio passe en {CAMPAGNE.afterOffer}.
+      </p>
+      <Button
+        asChild
+        size="lg"
+        className="mt-7 rounded-xl bg-[#FF9E2D] px-10 text-base font-black text-[#232F3E] hover:bg-[#f59015]"
+      >
+        <a href={commander}>
+          Commander — {CAMPAGNE.price} <ArrowRight className="ml-2 h-5 w-5" />
+        </a>
+      </Button>
+      <p className="mt-4 flex flex-wrap items-center justify-center gap-4 text-xs text-[#232F3E]/60">
+        <span className="inline-flex items-center gap-1.5">
+          <ShieldCheck className="h-3.5 w-3.5" /> Garantie 30 jours
+        </span>
+        <span>Carte bancaire ou PayPal</span>
+        <span>Accès immédiat</span>
+      </p>
+    </Card>
+  );
 
   return (
     <main className="min-h-screen bg-[#FAFAFA] pb-24" style={{ color: INK }}>
@@ -122,64 +254,59 @@ export default function CadeauPage() {
         </div>
       </div>
 
-      {/* 1. Les 5 niches, immédiatement */}
-      <section className="mx-auto max-w-5xl px-5 pt-12">
+      {/* 1. La première niche, offerte en clair */}
+      <section id="niches" className="mx-auto max-w-5xl px-5 pt-10">
         <Badge className="rounded-full bg-[#008296] px-4 py-1 text-white hover:bg-[#008296]">
           <Gift className="mr-2 h-3.5 w-3.5" /> Votre cadeau, sans rien télécharger
         </Badge>
-        <h1 className="mt-5 text-3xl font-bold leading-tight md:text-4xl">
+        <h1 className="mt-4 text-3xl font-bold leading-tight md:text-4xl">
           Vos 5 niches Amazon où la demande existe déjà
         </h1>
-        <p className="mt-4 max-w-2xl text-lg text-[#232F3E]/75">
+        <p className="mt-3 max-w-2xl text-lg text-[#232F3E]/75">
           Pour chaque niche : le sujet exact, le mot-clé Amazon à viser, le niveau de concurrence
           et le prix constaté. Extraites de notre base de 600 niches réelles.
+          {!unlocked && ' La première est offerte tout de suite, ci-dessous.'}
         </p>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
-          {niches.map((n, i) => (
-            <Card key={n.id} className="rounded-2xl border-[#008296]/15 bg-white p-6 shadow-sm">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#008296]">
-                    Niche n°{i + 1} · {n.categoryLabel}
-                  </p>
-                  <h2 className="mt-1.5 text-lg font-bold">{n.niche}</h2>
-                </div>
-                <Badge variant="outline" className="shrink-0 border-[#FF9E2D] text-[#B4690E]">
-                  Potentiel {n.potentiel}/5
-                </Badge>
-              </div>
-
-              <dl className="mt-4 space-y-2 text-sm">
-                <div className="flex justify-between gap-3">
-                  <dt className="text-[#232F3E]/60">Mot-clé Amazon</dt>
-                  <dd className="text-right font-semibold">{n.motCleAmazon}</dd>
-                </div>
-                <div className="flex justify-between gap-3">
-                  <dt className="text-[#232F3E]/60">Concurrence</dt>
-                  <dd className="text-right font-semibold">{n.concurrence}</dd>
-                </div>
-                <div className="flex justify-between gap-3">
-                  <dt className="text-[#232F3E]/60">BSR cible</dt>
-                  <dd className="text-right font-semibold">{n.bsrCible.toLocaleString('fr-FR')}</dd>
-                </div>
-                <div className="flex justify-between gap-3">
-                  <dt className="text-[#232F3E]/60">Prix constaté</dt>
-                  <dd className="text-right font-semibold">{n.exemplePrix.toFixed(2)} €</dd>
-                </div>
-              </dl>
-
-              <p className="mt-4 rounded-xl bg-[#F3FAFA] p-3 text-sm text-[#232F3E]/80">
-                <TrendingUp className="mr-1.5 inline h-4 w-4 text-[#008296]" />
-                {n.angle}
-              </p>
-            </Card>
-          ))}
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          {niches.map((n, i) => nicheCard(n, i, !unlocked && i > 0))}
         </div>
       </section>
 
-      {/* 2. Ce que vous pouvez en faire ce soir */}
-      <section className="mx-auto mt-16 max-w-5xl px-5">
+      {/* 2. Le formulaire, juste sous la niche offerte */}
+      {!unlocked && (
+        <section id="formulaire" className="mx-auto mt-8 max-w-3xl px-5">
+          <Card className="rounded-3xl border-[#008296]/25 bg-white p-8 shadow-sm">
+            <h2 className="text-2xl font-bold">
+              Débloquez les {niches.length - 1} autres niches et vos {CAMPAGNE_BONUSES.length} bonus
+            </h2>
+            <p className="mt-3 text-[#232F3E]/75">
+              Laissez votre email : les niches restantes s'affichent en clair sur cette page, les{' '}
+              {CAMPAGNE_BONUSES.length} bonus ({BONUS_TOTAL_VALUE} de valeur) s'ouvrent
+              immédiatement, et vous recevez vos 5 niches par email. Sans carte bancaire,
+              désabonnement en un clic.
+            </p>
+            <div className="mt-6">{captureForm('haut')}</div>
+            <div className="mt-5 grid gap-2">
+              {CAMPAGNE_BONUSES.map((b) => (
+                <p key={b.key} className="flex items-center gap-2 text-sm text-[#232F3E]/70">
+                  <Lock className="h-3.5 w-3.5" />
+                  <span className="font-semibold">{b.title}</span>
+                  <span className="text-[#232F3E]/50">— {b.value}</span>
+                </p>
+              ))}
+            </div>
+          </Card>
+        </section>
+      )}
+
+      {/* 3. L'offre enchaîne dès que les niches sont débloquées */}
+      {unlocked && (
+        <section className="mx-auto mt-10 max-w-3xl px-5">{offerCard}</section>
+      )}
+
+      {/* 4. Ce que vous pouvez en faire ce soir — argument, pas barrage */}
+      <section className="mx-auto mt-14 max-w-5xl px-5">
         <div className="rounded-3xl border border-[#008296]/20 bg-white p-8">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#008296]">
             Ce que vous pouvez en faire ce soir
@@ -205,51 +332,17 @@ export default function CadeauPage() {
         </div>
       </section>
 
-      {/* 3. Le formulaire qui débloque les bonus */}
-      <section id="bonus" className="mx-auto mt-16 max-w-3xl px-5">
+      {/* 5. Les bonus */}
+      <section id="bonus" className="mx-auto mt-14 max-w-3xl px-5">
         <Card className="rounded-3xl border-[#008296]/25 bg-white p-8 shadow-sm">
           {!unlocked ? (
             <>
               <h2 className="text-2xl font-bold">Débloquez vos bonus maintenant</h2>
               <p className="mt-3 text-[#232F3E]/75">
-                Laissez votre email : les {CAMPAGNE_BONUSES.length} bonus ({BONUS_TOTAL_VALUE} de valeur)
-                s'ouvrent immédiatement sur cette page, et vous recevez vos 5 niches par email.
-                Sans carte bancaire, désabonnement en un clic.
+                Le même email ouvre les {CAMPAGNE_BONUSES.length} bonus ({BONUS_TOTAL_VALUE} de
+                valeur) et les niches restantes. Sans carte bancaire.
               </p>
-              <form onSubmit={handleSubmit} className="mt-6 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
-                <Input
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  placeholder="Votre prénom"
-                  className="h-12 rounded-xl"
-                  autoComplete="given-name"
-                />
-                <Input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="vous@email.fr"
-                  className="h-12 rounded-xl"
-                  autoComplete="email"
-                  required
-                />
-                <Button
-                  type="submit"
-                  disabled={submitting}
-                  className="h-12 rounded-xl bg-[#008296] px-6 font-bold text-white hover:bg-[#00707f]"
-                >
-                  {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Débloquer'}
-                </Button>
-              </form>
-              <div className="mt-5 grid gap-2">
-                {CAMPAGNE_BONUSES.map((b) => (
-                  <p key={b.key} className="flex items-center gap-2 text-sm text-[#232F3E]/70">
-                    <Lock className="h-3.5 w-3.5" />
-                    <span className="font-semibold">{b.title}</span>
-                    <span className="text-[#232F3E]/50">— {b.value}</span>
-                  </p>
-                ))}
-              </div>
+              <div className="mt-6">{captureForm('bonus')}</div>
             </>
           ) : (
             <>
@@ -287,40 +380,8 @@ export default function CadeauPage() {
         </Card>
       </section>
 
-      {/* 4. L'offre — le seul bouton payant */}
-      <section className="mx-auto mt-16 max-w-3xl px-5">
-        <Card className="rounded-3xl border-2 border-[#FF9E2D]/60 bg-white p-8 text-center shadow-sm">
-          {countdown && (
-            <p className="inline-flex items-center gap-2 rounded-full bg-[#FFF4E3] px-4 py-1.5 text-sm font-bold text-[#B4690E]">
-              <Clock className="h-4 w-4" />
-              Il reste {countdown.days} j {countdown.hours} h {countdown.minutes} min
-            </p>
-          )}
-          <h2 className="mt-5 text-2xl font-bold md:text-3xl">
-            Écrivez ce livre : {CAMPAGNE.price} une fois, accès à vie
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-[#232F3E]/75">
-            Un seul paiement, aucune reconduction. Après le {CAMPAGNE.deadline}, EbookStudio passe en{' '}
-            {CAMPAGNE.afterOffer}.
-          </p>
-          <Button
-            asChild
-            size="lg"
-            className="mt-7 rounded-xl bg-[#FF9E2D] px-10 text-base font-black text-[#232F3E] hover:bg-[#f59015]"
-          >
-            <a href={commander}>
-              Commander — {CAMPAGNE.price} <ArrowRight className="ml-2 h-5 w-5" />
-            </a>
-          </Button>
-          <p className="mt-4 flex flex-wrap items-center justify-center gap-4 text-xs text-[#232F3E]/60">
-            <span className="inline-flex items-center gap-1.5">
-              <ShieldCheck className="h-3.5 w-3.5" /> Garantie 30 jours
-            </span>
-            <span>Carte bancaire ou PayPal</span>
-            <span>Accès immédiat</span>
-          </p>
-        </Card>
-      </section>
+      {/* 6. L'offre en bas de page pour les visiteurs non débloqués */}
+      {!unlocked && <section className="mx-auto mt-14 max-w-3xl px-5">{offerCard}</section>}
     </main>
   );
 }
