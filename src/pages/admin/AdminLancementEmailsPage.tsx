@@ -140,10 +140,9 @@ export default function AdminLancementEmailsPage() {
         </div>
 
         <p className="mb-4 rounded-lg border bg-muted/40 p-3 text-sm text-muted-foreground">
-          Option transactionnelle activée : vous pouvez envoyer au-delà du quota (0,90 $ / 1 000 emails).
+          Envoi limité à 100 emails par lot, pour rester dans le quota gratuit de Resend.
           Envoyez d’abord aux contacts les plus engagés, puis aux adresses personnelles, puis au reste.
-          Les clients, les désinscrits et les
-          personnes déjà destinataires du même email sont exclus automatiquement.
+          Les clients, les désinscrits et les personnes déjà destinataires du même email sont exclus automatiquement.
         </p>
 
         <Card className="mb-6 p-4">
@@ -232,17 +231,17 @@ export default function AdminLancementEmailsPage() {
                   <Send className="mr-1.5 h-4 w-4" />
                   {sending === `${s.step}-hot` ? 'Envoi…' : 'Envoyer aux plus engagés'}
                 </Button>
-                <Button size="sm" variant="outline" disabled={sending !== null} onClick={() => runSend(s.step, 'cold', 600)}>
+                <Button size="sm" variant="outline" disabled={sending !== null} onClick={() => runSend(s.step, 'cold', 100)}>
                   <Send className="mr-1.5 h-4 w-4" />
                   {sending === `${s.step}-cold` ? 'Envoi…' : 'Envoyer aux non-cliqueurs'}
                 </Button>
-                <Button size="sm" variant="outline" disabled={sending !== null} onClick={() => runSend(s.step, 'personal', 600)}>
+                <Button size="sm" variant="outline" disabled={sending !== null} onClick={() => runSend(s.step, 'personal', 100)}>
                   <Send className="mr-1.5 h-4 w-4" />
-                  {sending === `${s.step}-personal` ? 'Envoi…' : 'Adresses personnelles (max)'}
+                  {sending === `${s.step}-personal` ? 'Envoi…' : 'Adresses personnelles'}
                 </Button>
-                <Button size="sm" disabled={sending !== null} onClick={() => runSend(s.step, 'all', 600)}>
+                <Button size="sm" disabled={sending !== null} onClick={() => runSend(s.step, 'all', 100)}>
                   <Send className="mr-1.5 h-4 w-4" />
-                  {sending === `${s.step}-all` ? 'Envoi…' : 'Envoyer un lot large'}
+                  {sending === `${s.step}-all` ? 'Envoi…' : 'Envoyer un lot de 100'}
                 </Button>
               </div>
             </Card>

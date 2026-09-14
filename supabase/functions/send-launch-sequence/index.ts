@@ -246,7 +246,7 @@ Deno.serve(async (req) => {
     const stepNum = Number(body.step) || 1;
     const email = LAUNCH_EMAILS.find((e) => e.step === stepNum) ?? LAUNCH_EMAILS[0];
     const segment = String(body.segment || "hot"); // hot | all | cold | personal
-    const limit = Math.max(1, Math.min(600, Number(body.limit) || 100));
+    const limit = Math.max(1, Math.min(100, Number(body.limit) || 100));
     // Pour test : rediriger tous les envois vers une seule adresse.
     const overrideTestTo = typeof body.overrideTestTo === "string" && /.+@.+\..+/.test(body.overrideTestTo)
       ? body.overrideTestTo.trim().toLowerCase()
