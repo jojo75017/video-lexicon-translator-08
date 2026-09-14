@@ -1,4 +1,10 @@
 
+## Conversion des visiteurs (14/09/2026)
+- [x] Page /decouverte + liens courts /r/short1…short10 pour les vidéos
+- [x] Filtre francophone (langue du navigateur enregistrée) et panneau « Le tunnel en chiffres » dans Emails lancement
+- [x] Email pré-rempli essai → commande, lien démo, avis réels sur /essai, vidéo de présentation sur /commander
+- [x] Emails prêts à copier : demande d'avis + relance des 15 contacts (docs/emails-avis-et-relance.md)
+
 ## Maison d’édition de couvertures (10/09/2026)
 - [x] Présenter clairement le Studio comme « Votre maison d’édition de couvertures »
 - [x] Utiliser un synopsis explicite pour guider la couverture
