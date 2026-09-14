@@ -232,17 +232,17 @@ export default function AdminLancementEmailsPage() {
                   <Send className="mr-1.5 h-4 w-4" />
                   {sending === `${s.step}-hot` ? 'Envoi…' : 'Envoyer aux plus engagés'}
                 </Button>
-                <Button size="sm" variant="outline" disabled={sending !== null} onClick={() => runSend(s.step, 'cold', 100)}>
+                <Button size="sm" variant="outline" disabled={sending !== null} onClick={() => runSend(s.step, 'cold', 600)}>
                   <Send className="mr-1.5 h-4 w-4" />
-                  {sending === `${s.step}-cold` ? 'Envoi…' : 'Envoyer aux non-cliqueurs (100)'}
+                  {sending === `${s.step}-cold` ? 'Envoi…' : 'Envoyer aux non-cliqueurs'}
                 </Button>
-                <Button size="sm" variant="outline" disabled={sending !== null} onClick={() => runSend(s.step, 'personal', 100)}>
+                <Button size="sm" variant="outline" disabled={sending !== null} onClick={() => runSend(s.step, 'personal', 600)}>
                   <Send className="mr-1.5 h-4 w-4" />
-                  {sending === `${s.step}-personal` ? 'Envoi…' : 'Adresses personnelles (100)'}
+                  {sending === `${s.step}-personal` ? 'Envoi…' : 'Adresses personnelles (max)'}
                 </Button>
-                <Button size="sm" disabled={sending !== null} onClick={() => runSend(s.step, 'all', 100)}>
+                <Button size="sm" disabled={sending !== null} onClick={() => runSend(s.step, 'all', 600)}>
                   <Send className="mr-1.5 h-4 w-4" />
-                  {sending === `${s.step}-all` ? 'Envoi…' : 'Envoyer un lot de 100'}
+                  {sending === `${s.step}-all` ? 'Envoi…' : 'Envoyer un lot large'}
                 </Button>
               </div>
             </Card>
