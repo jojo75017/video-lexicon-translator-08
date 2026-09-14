@@ -59,6 +59,7 @@ const LOCKED = [
 /** Chaque marche du tunnel est enregistrée pour voir précisément où ça casse. */
 async function track(eventType: string, params: URLSearchParams) {
   try {
+    // `as never` : la colonne locale (langue du navigateur) est additive.
     await supabase.from('capture_events').insert({
       event_type: eventType,
       surface: 'essai',
@@ -66,7 +67,8 @@ async function track(eventType: string, params: URLSearchParams) {
       utm_source: params.get('utm_source'),
       utm_medium: params.get('utm_medium'),
       utm_campaign: params.get('utm_campaign'),
-    });
+      locale: navigator.language || null,
+    } as never);
   } catch {
     /* le tracking ne doit jamais bloquer le visiteur */
   }
