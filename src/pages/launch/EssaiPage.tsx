@@ -496,13 +496,68 @@ export default function EssaiPage() {
                     Paiement unique de 47 € · aucun abonnement. Après le 30 septembre 2026 :
                     abonnement mensuel 27 € ou 47 €, sans engagement.
                   </p>
+                  <p className="mt-3 text-center text-xs">
+                    <a href="/demo" className="font-semibold text-[#0F2E1F] underline underline-offset-2 hover:text-[#14532D]">
+                      Voir la démo (2 min) avant de décider
+                    </a>
+                  </p>
                 </div>
               )}
 
             </aside>
           </div>
         )}
+        <EssaiTestimonials />
       </main>
     </div>
+  );
+}
+
+/** Avis réels et approuvés uniquement — jamais de témoignage fabriqué. */
+function EssaiTestimonials() {
+  const [items, setItems] = useState<Array<{ id: string; author_name: string; book_title: string | null; comment: string; rating: number | null }>>([]);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const { data } = await supabase
+        .from('book_testimonials')
+        .select('id,author_name,book_title,comment,rating')
+        .eq('approved', true)
+        .order('created_at', { ascending: false })
+        .limit(3);
+      if (active && data) setItems(data as never);
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (items.length === 0) return null;
+
+  return (
+    <section className="mx-auto mt-12 max-w-2xl">
+      <h2 className="v3-serif text-center text-xl font-bold" style={{ color: 'var(--v3-ink, #2A2118)' }}>
+        Ce qu'en disent les auteurs
+      </h2>
+      <div className="mt-5 space-y-4">
+        {items.map((t) => (
+          <figure key={t.id} className="rounded-xl border border-black/5 bg-white p-5 shadow-sm">
+            {t.rating ? (
+              <div className="flex gap-0.5 text-[#D4AF37]" aria-label={`${t.rating} étoiles`}>
+                {Array.from({ length: t.rating }).map((_, i) => (
+                  <Star key={i} className="h-4 w-4 fill-current" />
+                ))}
+              </div>
+            ) : null}
+            <blockquote className="mt-2 text-sm leading-relaxed text-[#2A2118]">« {t.comment} »</blockquote>
+            <figcaption className="mt-2 text-xs font-semibold text-[#5B5245]">
+              {t.author_name}
+              {t.book_title ? ` — ${t.book_title}` : ''}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </section>
   );
 }
