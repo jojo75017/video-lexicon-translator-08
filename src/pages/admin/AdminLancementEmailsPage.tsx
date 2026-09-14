@@ -140,8 +140,9 @@ export default function AdminLancementEmailsPage() {
         </div>
 
         <p className="mb-4 rounded-lg border bg-muted/40 p-3 text-sm text-muted-foreground">
-          Limite de la boîte d’envoi : environ 100 emails par jour. Envoyez d’abord aux contacts les plus
-          engagés, puis un lot de 100 par jour à l’ensemble de la liste. Les clients, les désinscrits et les
+          Option transactionnelle activée : vous pouvez envoyer au-delà du quota (0,90 $ / 1 000 emails).
+          Envoyez d’abord aux contacts les plus engagés, puis aux adresses personnelles, puis au reste.
+          Les clients, les désinscrits et les
           personnes déjà destinataires du même email sont exclus automatiquement.
         </p>
 
