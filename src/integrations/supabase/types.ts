@@ -786,6 +786,7 @@ export type Database = {
           event_type: string
           id: string
           lead_magnet: string | null
+          locale: string | null
           page_path: string | null
           surface: string
           utm_campaign: string | null
@@ -798,6 +799,7 @@ export type Database = {
           event_type: string
           id?: string
           lead_magnet?: string | null
+          locale?: string | null
           page_path?: string | null
           surface: string
           utm_campaign?: string | null
@@ -810,6 +812,7 @@ export type Database = {
           event_type?: string
           id?: string
           lead_magnet?: string | null
+          locale?: string | null
           page_path?: string | null
           surface?: string
           utm_campaign?: string | null
