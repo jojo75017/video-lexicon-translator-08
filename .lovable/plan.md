@@ -11,15 +11,23 @@ Direction retenue : ne pas chercher plus de trafic pour l'instant, mais convainc
 
 Conclusion : très peu de visiteurs réellement humains et français, et ceux qui arrivent sur la commande ne vont pas jusqu'au paiement. Le travail utile est donc : voir précisément où ils s'arrêtent, puis enlever ce qui les arrête.
 
-## 1. Voir où les visiteurs s'arrêtent
+## 1. Francophone uniquement
 
-Un tableau simple dans votre espace admin, alimenté par le suivi déjà en place :
+Vous ne vendez qu'en français : les visites américaines n'ont donc aucune valeur ici.
+
+- Les chiffres de suivi n'affichent que les visites francophones (France, Belgique, Suisse, Canada, Luxembourg, Maroc, Afrique francophone) ; le reste est mis à part, sans être compté comme prospect.
+- Les emails collectés hors francophonie sont marqués « hors cible » et exclus des envois.
+- Les pages publiques déclarent clairement le français comme langue, pour que Google les propose aux lecteurs francophones.
+
+## 2. Voir où les visiteurs s'arrêtent
+
+Un tableau simple dans votre espace admin, alimenté par le suivi déjà en place, uniquement sur les visites francophones :
 
 ```text
 Vus la page  →  Email laissé  →  Chapitre lu  →  Commande ouverte  →  Paiement lancé  →  Payé
 ```
 
-Chiffres réels par jour et par provenance, avec les visites hors France séparées pour ne plus être trompé par les robots. Aucune donnée inventée : uniquement ce qui est déjà enregistré.
+Chiffres réels par jour et par provenance. Aucune donnée inventée : uniquement ce qui est déjà enregistré.
 
 ## 2. Relier l'essai gratuit à la commande
 
