@@ -29,7 +29,7 @@ Vus la page  →  Email laissé  →  Chapitre lu  →  Commande ouverte  →  P
 
 Chiffres réels par jour et par provenance. Aucune donnée inventée : uniquement ce qui est déjà enregistré.
 
-## 2. Relier l'essai gratuit à la commande
+## 3. Relier l'essai gratuit à la commande
 
 Aujourd'hui le visiteur lit son chapitre 1 gratuit et… rien ne l'emmène plus loin. On ajoute, juste après le chapitre :
 
@@ -37,7 +37,7 @@ Aujourd'hui le visiteur lit son chapitre 1 gratuit et… rien ne l'emmène plus 
 - un rappel de la fin de l'offre le 30 septembre ;
 - un lien discret vers la démo pour ceux qui hésitent.
 
-## 3. Simplifier la page de commande
+## 4. Simplifier la page de commande
 
 - Un seul bouton principal en haut, visible sans faire défiler, et le paiement qui s'ouvre dès le clic.
 - PayPal annoncé à côté de la carte bancaire (il existe déjà mais ne se voit pas).
@@ -45,7 +45,7 @@ Aujourd'hui le visiteur lit son chapitre 1 gratuit et… rien ne l'emmène plus 
 - Les questions/réponses déplacées plus bas pour ne pas noyer le bouton.
 - La vidéo de présentation courte placée au-dessus des questions.
 
-## 4. De la vraie preuve
+## 5. De la vraie preuve
 
 Trois témoignages, c'est trop peu pour un achat à 47 €. Je prépare :
 
@@ -54,14 +54,14 @@ Trois témoignages, c'est trop peu pour un achat à 47 €. Je prépare :
 
 Vous restez maître de l'envoi : rien ne part automatiquement.
 
-## 5. Réutiliser vos 10 shorts
+## 6. Réutiliser vos 10 shorts
 
 Vos 10 shorts YouTube/TikTok ne servent à rien s'ils ne mènent nulle part. Je prépare :
 
 - une page courte d'arrivée pour les réseaux, avec le même chapitre gratuit et un seul bouton ;
 - les liens suivis à mettre en bio et en description, pour savoir enfin quelle vidéo amène des visiteurs.
 
-## 6. Relancer les 15 personnes déjà intéressées
+## 7. Relancer les 15 personnes déjà intéressées
 
 9 emails laissés + 6 essais démarrés : ce sont les contacts les plus chauds que vous avez. Un email personnel, court, prêt à copier, qui demande simplement où ils en sont dans leur livre.
 
@@ -70,4 +70,5 @@ Vos 10 shorts YouTube/TikTok ne servent à rien s'ils ne mènent nulle part. Je 
 - Nouveau panneau admin lisant `capture_events`, `funnel_leads`, `free_trials`, `funnel_orders` en lecture seule.
 - Ajout d'évènements de suivi manquants entre `/essai` et `/commander` (mêmes surfaces existantes, aucun nouveau schéma).
 - Modifications limitées à `src/pages/launch/EssaiPage.tsx`, `src/pages/v3public/V3CommanderPage.tsx`, une nouvelle page réseaux et un nouveau panneau admin.
+- Filtre francophone déduit du pays et de la langue déjà enregistrés dans le suivi, sans nouveau schéma.
 - Aucun changement de prix, de paiement, de base, de sécurité, de calcul KDP ni de crédits IA. Aucun envoi d'email de masse.
