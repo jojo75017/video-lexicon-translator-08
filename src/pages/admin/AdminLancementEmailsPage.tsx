@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
+import { FunnelConversionPanel } from '@/components/admin/FunnelConversionPanel';
 import { supabase } from '@/integrations/supabase/client';
 
 /** Les 4 emails de la séquence de lancement V3 (1er octobre 2026). */
@@ -119,6 +120,10 @@ export default function AdminLancementEmailsPage() {
           <ArrowLeft className="mr-1.5 h-4 w-4" />
           Retour au dashboard
         </Button>
+
+        <div className="mb-6">
+          <FunnelConversionPanel />
+        </div>
 
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div>
