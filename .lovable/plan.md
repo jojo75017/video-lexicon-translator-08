@@ -54,12 +54,13 @@ Trois témoignages, c'est trop peu pour un achat à 47 €. Je prépare :
 
 Vous restez maître de l'envoi : rien ne part automatiquement.
 
-## 6. Réutiliser vos 10 shorts
+## 6. Corriger la destination de vos 10 shorts
 
-Vos 10 shorts YouTube/TikTok ne servent à rien s'ils ne mènent nulle part. Je prépare :
+Vos 10 shorts mènent tous directement vers `/commander` : c'est demander 47 € à quelqu'un qui vous découvre depuis 30 secondes. C'est une cause probable du « rien de concluant ».
 
-- une page courte d'arrivée pour les réseaux, avec le même chapitre gratuit et un seul bouton ;
-- les liens suivis à mettre en bio et en description, pour savoir enfin quelle vidéo amène des visiteurs.
+- Nouvelle page courte d'arrivée pour les réseaux (`/decouverte`), qui offre le chapitre gratuit avant de parler du prix, avec un seul bouton vers `/essai` puis l'offre.
+- Liens suivis par vidéo (`ebookstudio.fr/r/short1` … `short10`) à mettre en bio et en description, pour savoir enfin quelle vidéo amène des visiteurs réels.
+- Rien à refaire côté vidéos : vous changez juste le lien dans les descriptions et bios.
 
 ## 7. Relancer les 15 personnes déjà intéressées
 
