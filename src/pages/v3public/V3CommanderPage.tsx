@@ -11,7 +11,28 @@ import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { COMMANDER_URL, BLOG_URL } from "@/data/externalLinks";
 import { V3_LAUNCH_BONUSES } from "@/data/v3Launch";
 import { trackCaptureEvent } from "@/lib/captureTracking";
+import { useLaunchSettings } from "@/hooks/useLaunchSettings";
 import "@/styles/commander-maquette.css";
+
+/** Vidéo de présentation (réglée dans l'admin) : affichée seulement si un lien est enregistré. */
+function CommanderVideo() {
+  const { settings } = useLaunchSettings();
+  const url = settings.launch_video?.url;
+  if (!settings.launch_video?.enabled || !url) return null;
+  return (
+    <section style={{ maxWidth: 720, margin: "2rem auto", padding: "0 1rem" }}>
+      <h2 style={{ textAlign: "center", fontSize: "1.25rem", fontWeight: 700, marginBottom: "0.75rem" }}>
+        Voyez comment ça fonctionne (2 minutes)
+      </h2>
+      <video
+        controls
+        preload="metadata"
+        src={url}
+        style={{ width: "100%", borderRadius: 16, boxShadow: "0 12px 32px rgba(0,0,0,0.18)" }}
+      />
+    </section>
+  );
+}
 
 /** Paiement unique uniquement : plus de 2× ni 3×. */
 const PLAN_ID = "v2_1x" as const;
@@ -502,6 +523,9 @@ export default function V3CommanderPage() {
             </div>
           </section>
         )}
+
+        {/* Vidéo de présentation : elle répond aux dernières questions avant l'achat. */}
+        <CommanderVideo />
 
         {/* FAQ */}
         <section className="faq" id="faq">

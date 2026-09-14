@@ -1,0 +1,1 @@
+alter table public.capture_events add column if not exists locale text;
