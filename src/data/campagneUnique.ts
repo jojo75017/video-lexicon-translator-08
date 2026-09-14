@@ -75,6 +75,19 @@ export const SHORT_LINKS: Record<string, ShortLink> = {
   l3: { key: 'l3', destination: '/commander', template: 'v3l-changement-J4', label: "Profiter de l'accès à vie 47 €" },
   l4: { key: 'l4', destination: '/commander', template: 'v3l-dernier-J1', label: 'Commander avant ce soir' },
   l5: { key: 'l5', destination: '/10-niches-offertes', template: 'v3l-niches-offertes', label: 'Recevoir mes 10 niches' },
+
+  /* Vidéos courtes (shorts YouTube / TikTok) — une page de découverte douce,
+   * l'essai gratuit d'abord, jamais le paiement en premier. */
+  short1: { key: 'short1', destination: '/decouverte', template: 'short-video-1', label: 'Vidéo 1 — Voir mon livre commencer' },
+  short2: { key: 'short2', destination: '/decouverte', template: 'short-video-2', label: 'Vidéo 2 — Voir mon livre commencer' },
+  short3: { key: 'short3', destination: '/decouverte', template: 'short-video-3', label: 'Vidéo 3 — Voir mon livre commencer' },
+  short4: { key: 'short4', destination: '/decouverte', template: 'short-video-4', label: 'Vidéo 4 — Voir mon livre commencer' },
+  short5: { key: 'short5', destination: '/decouverte', template: 'short-video-5', label: 'Vidéo 5 — Voir mon livre commencer' },
+  short6: { key: 'short6', destination: '/decouverte', template: 'short-video-6', label: 'Vidéo 6 — Voir mon livre commencer' },
+  short7: { key: 'short7', destination: '/decouverte', template: 'short-video-7', label: 'Vidéo 7 — Voir mon livre commencer' },
+  short8: { key: 'short8', destination: '/decouverte', template: 'short-video-8', label: 'Vidéo 8 — Voir mon livre commencer' },
+  short9: { key: 'short9', destination: '/decouverte', template: 'short-video-9', label: 'Vidéo 9 — Voir mon livre commencer' },
+  short10: { key: 'short10', destination: '/decouverte', template: 'short-video-10', label: 'Vidéo 10 — Voir mon livre commencer' },
 };
 
 
