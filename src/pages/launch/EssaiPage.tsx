@@ -198,6 +198,8 @@ export default function EssaiPage() {
   const commanderUrl = (() => {
     const q = new URLSearchParams(params);
     q.set('src', 'essai');
+    const cleanEmail = email.trim().toLowerCase();
+    if (cleanEmail && cleanEmail.includes('@')) q.set('email', cleanEmail);
     return `/commander?${q.toString()}`;
   })();
 
