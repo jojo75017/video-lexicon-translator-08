@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Loader2, Sparkles, Lock, BookOpen, Mail, CheckCircle2, PenLine, Rocket, ChevronDown } from 'lucide-react';
+import { Loader2, Sparkles, Lock, BookOpen, Mail, CheckCircle2, PenLine, Rocket, ChevronDown, Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import useLaunchSettings from '@/hooks/useLaunchSettings';
