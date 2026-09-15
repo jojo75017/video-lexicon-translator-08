@@ -308,7 +308,8 @@ export function imageAdjustFilter(composition: FrontComposition): string {
   const c = clampRange(composition.imageContrast, 0.7, 1.4, 1);
   const s = clampRange(composition.imageSaturation, 0, 1.6, 1);
   const w = clampRange(composition.imageWarmth, -20, 20, 0);
-  return `brightness(${b}) contrast(${c}) saturate(${s})${w ? ` sepia(${Math.min(0.4, Math.abs(w) / 60)}) hue-rotate(${w < 0 ? 200 : 0}deg)` : ''}`;
+  const warmth = w > 0 ? ` sepia(${(w / 60).toFixed(3)})` : w < 0 ? ` hue-rotate(${w}deg)` : '';
+  return `brightness(${b}) contrast(${c}) saturate(${s})${warmth}`;
 }
 
 /** Interdit toute URL (signée ou non) dans les valeurs textuelles persistées. */
