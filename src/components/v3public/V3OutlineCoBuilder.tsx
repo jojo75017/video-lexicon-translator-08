@@ -88,6 +88,7 @@ export default function V3OutlineCoBuilder({ outlineFirst }: Props = {}) {
       return;
     }
     setLoading(true);
+    const indication = (extra || note || '').trim();
     try {
       const provider = getProvider();
       const userApiKey = provider === 'gemini' ? getProviderKey('gemini') : '';
