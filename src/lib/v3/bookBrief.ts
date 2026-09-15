@@ -85,7 +85,7 @@ export type BookBrief = {
   creationPath?: 'story' | 'biography' | 'existing-outline';
   /** L'abonné souhaite des illustrations IA à l'intérieur du livre. */
   wantsIllustrations?: boolean;
-  characters?: Array<{ name?: string; role?: string; description?: string; traits?: string }>;
+  characters?: Array<{ name?: string; role?: string; description?: string; traits?: string; age?: string }>;
   cibleProfil?: string;
   cibleNiveau?: string;
   cibleBesoins?: string;
