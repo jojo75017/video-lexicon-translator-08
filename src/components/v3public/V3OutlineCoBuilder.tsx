@@ -210,9 +210,20 @@ export default function V3OutlineCoBuilder({ outlineFirst }: Props = {}) {
       </div>
 
       <p className="mt-2 text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
-        Vous avez écrit d’abord : le sommaire se construit maintenant à partir de votre texte, jamais
-        à l’avance. Le Génie propose 3 chapitres à la fois, en suivant votre récit dans l’ordre. Vous
-        gardez, reformulez ou retirez — le sommaire n’est validé que par votre clic.
+        {useOutlineFirst ? (
+          <>
+            Chemin sommaire-d’abord : décrivez votre projet puis donnez vos{' '}
+            <strong>indications de chapitre au fur et à mesure</strong>. Le Génie les prend en
+            compte pour proposer les chapitres suivants. Vous gardez, reformulez ou retirez — le
+            sommaire n’est validé que par votre clic.
+          </>
+        ) : (
+          <>
+            Vous avez écrit d’abord : le sommaire se construit maintenant à partir de votre texte,
+            jamais à l’avance. Le Génie propose 3 chapitres à la fois, en suivant votre récit dans
+            l’ordre. Vous gardez, reformulez ou retirez — le sommaire n’est validé que par votre clic.
+          </>
+        )}
       </p>
 
       {brief.mode === 'biography' && (
