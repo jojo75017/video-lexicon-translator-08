@@ -65,6 +65,8 @@ import {
   safeFileName,
 } from '@/lib/cover-editor/coverExports';
 import { downloadBlob, renderKindleCoverJpeg } from '@/lib/cover-editor/kindleExport';
+import SuggestInput from '@/components/cover-editor/SuggestInput';
+import { coverDetailSuggestions } from '@/data/coverDetailSuggestions';
 import { cn } from '@/lib/utils';
 
 type Step = 1 | 2 | 3;
