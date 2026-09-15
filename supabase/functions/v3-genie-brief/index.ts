@@ -295,6 +295,13 @@ Réponds STRICTEMENT en JSON valide, sans markdown : {"corrected":"","notes":""}
         ? `\nRÉCIT DE L'AUTEUR DÉCOUPÉ EN PASSAGES NUMÉROTÉS (ses mots exacts, dans son ordre) :\n"""\n${numbered.join("\n\n")}\n"""\nNombre total de passages : ${passages.length}. Premier passage encore à couvrir : ${nextPassage}.\n`
         : "";
 
+      // Mode « sommaire d'abord » : l'auteur part du sommaire et donne ses
+      // indications de chapitre au fur et à mesure, sans récit préalable.
+      const outlineFirst = Boolean(body.outlineFirst);
+      const outlineFirstBlock = (outlineFirst && !numbered.length)
+        ? `\nMODE SOMMAIRE D'ABORD : l'auteur construit son livre à partir du sommaire, sans récit préalable. Ses indications de chapitre figurent dans « Dernière demande de l'auteur ». Respecte SCRUPULEUSEMENT ces indications : chaque chapitre proposé doit refléter ce que l'auteur a demandé et suivre l'ordre indiqué. N'invente aucun contenu qui contredirait ses indications.\n`
+        : "";
+
       const anchorRules = numbered.length
         ? `- Chaque chapitre proposé doit couvrir des passages RÉELS du récit, en commençant au passage ${nextPassage} et en avançant dans l'ordre du récit ;
 - "sources" : la liste des numéros de passages couverts par le chapitre (obligatoire, jamais vide, jamais un passage déjà couvert) ;
