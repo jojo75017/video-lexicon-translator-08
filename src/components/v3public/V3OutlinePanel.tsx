@@ -193,8 +193,10 @@ export default function V3OutlinePanel({ brief, onChange, initialMode }: Props) 
       toast.error('Renseignez d’abord le titre du livre.');
       return;
     }
+    if (!confirmReplace()) return;
     const provider = resolveProvider();
-    const count = Math.min(60, Math.max(3, Number(brief.chapters) || 12));
+    const count = Math.min(60, Math.max(3, Number(brief.chapters) || outline.length || 12));
+    setHistory((prev) => [...prev.slice(-24), outline]);
 
     // Aucune clé personnelle : on passe directement par le serveur (aucun blocage).
     if (!provider) {
@@ -202,6 +204,7 @@ export default function V3OutlinePanel({ brief, onChange, initialMode }: Props) 
       try {
         const chapters = await generateOnServer(count);
         onChange({ outline: normalizeOutline(chapters), chapters: chapters.length, outlineValidated: false });
+
         toast.success(`Sommaire généré (${chapters.length} chapitres) — relisez puis validez-le.`, {
           description: 'Astuce : branchez votre clé Gemini gratuite pour générer plus vite et sans limite.',
         });
