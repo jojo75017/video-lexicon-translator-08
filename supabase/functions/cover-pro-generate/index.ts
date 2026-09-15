@@ -40,6 +40,8 @@ interface Brief {
 /** Directions artistiques « qualité best-seller » proposées dans l'éditeur. */
 const ART_DIRECTIONS: Record<string, string> = {
   "illustration-editoriale":
+    "Rendu de couverture de très haut niveau commercial, comparable aux meilleures ventes des grandes maisons d'édition : image principale traitée comme une photographie de cinéma retouchée en studio ou une peinture numérique d'illustrateur professionnel, matières et textures crédibles, lumière rasante sculptant le sujet, contraste maîtrisé, étalonnage colorimétrique cohérent, profondeur de champ réelle, sujet principal parfaitement net et expressif, arrière-plan riche mais subordonné, finition impeccable digne d'une impression papier haut de gamme. Aucun rendu 3D bon marché, aucun aspect illustration automatique, aucune image de banque générique.",
+  "illustration-editoriale-classique":
     "Illustration peinte numériquement de très haute qualité, style best-seller international : rendu pictural riche, textures détaillées, lumière chaude rasante de fin de journée, profondeur de champ marquée, sujet principal net et expressif au premier plan, décor foisonnant et lisible en arrière-plan, couleurs saturées et harmonieuses, finition brillante de couverture imprimée.",
   "fantasy-doree":
     "Peinture à l'huile numérique fantasy haut de gamme : éclairage clair-obscur théâtral, accents dorés et cuivrés lumineux, matières précieuses (velours, pierres, laiton, bois sombre), niveau de détail extrême, atmosphère magique et mystérieuse, encadrement ornemental subtil suggéré par le décor, rendu digne d'une couverture de grand éditeur.",
