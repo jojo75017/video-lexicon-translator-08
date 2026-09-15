@@ -434,10 +434,56 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
               </>
             )}
 
-            {/* ② Mon sommaire : déduit de ce qui a été écrit */}
+            {/* ② Mon sommaire : déduit du récit OU construit d'abord (outlineFirst) */}
             {desk === 2 && (
               <>
-                <V3OutlineCoBuilder />
+                {outlineFirstActive && !(bookBrief.title?.trim() && bookBrief.description?.trim()) && (
+                  <div className="v3-card mb-4" style={{ borderColor: 'rgba(0,130,150,0.4)' }}>
+                    <p className="text-[13px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+                      Décrivez votre livre en deux mots
+                    </p>
+                    <p className="mt-1 text-[11.5px]" style={{ color: 'var(--v3-muted)' }}>
+                      Le Génie a besoin d’un titre et d’un sujet pour proposer vos premiers chapitres.
+                    </p>
+                    <div className="mt-3 space-y-2">
+                      <input
+                        value={subjectTitle}
+                        onChange={(e) => setSubjectTitle(e.target.value)}
+                        placeholder="Titre de votre livre"
+                        className="w-full rounded-xl border bg-white px-3 py-2 text-[13px] outline-none"
+                        style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }}
+                      />
+                      <textarea
+                        value={subjectDesc}
+                        onChange={(e) => setSubjectDesc(e.target.value)}
+                        rows={3}
+                        placeholder="De quoi parle votre livre ? Pour qui ? Quel message principal ?"
+                        className="w-full rounded-xl border bg-white px-3 py-2 text-[12.5px] outline-none"
+                        style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }}
+                      />
+                      <div className="flex flex-wrap items-center gap-2 text-[12px]" style={{ color: 'var(--v3-ink)' }}>
+                        <span>Nombre de chapitres visé</span>
+                        <input
+                          type="number"
+                          min={3}
+                          max={40}
+                          value={subjectChapters}
+                          onChange={(e) => setSubjectChapters(Math.min(40, Math.max(3, Number(e.target.value) || 3)))}
+                          className="w-20 rounded-lg border bg-white px-2 py-1 text-[12px] outline-none"
+                          style={{ borderColor: 'rgba(0,0,0,0.12)' }}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={confirmSubject}
+                        className="v3-btn v3-btn-primary text-xs"
+                      >
+                        Confirmer mon projet
+                      </button>
+                    </div>
+                  </div>
+                )}
+                <V3OutlineCoBuilder outlineFirst={outlineFirstActive} />
                 <div id="sommaire-ia" className="mt-5">
                   <V3GenieOutlinePanel key={briefKey} outlineMode={sommaireIa ? 'guided' : undefined} />
                 </div>
