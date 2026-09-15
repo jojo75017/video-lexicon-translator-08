@@ -93,8 +93,20 @@ export default function V3OutlinePanel({ brief, onChange, initialMode }: Props) 
 
   const outline = brief.outline || [];
   const validated = Boolean(brief.outlineValidated) && outline.length > 0;
-  const target = Math.min(60, Math.max(3, Number(brief.chapters) || 12));
+  const target = Math.min(60, Math.max(3, Number(brief.chapters) || 0, outline.length, 12));
 
+
+  /**
+   * Un sommaire déjà construit ne peut jamais être remplacé sans un accord
+   * explicite de l'auteur : le livre ouvert fait foi.
+   */
+  const confirmReplace = () => {
+    if (outline.length < 3) return true;
+    return window.confirm(
+      `Remplacer le sommaire de ${outline.length} chapitres de « ${brief.title || 'ce livre'} » ?\n\n`
+      + 'Les titres actuels seront remplacés. Vous pourrez annuler juste après.',
+    );
+  };
 
   const applyOutline = (chapters: BriefOutlineChapter[], source: string) => {
     const normalized = normalizeOutline(chapters).slice(0, 60);
@@ -102,9 +114,12 @@ export default function V3OutlinePanel({ brief, onChange, initialMode }: Props) 
       toast.error('Aucun chapitre détecté dans ce sommaire.');
       return;
     }
+    if (!confirmReplace()) return;
+    setHistory((prev) => [...prev.slice(-24), outline]);
     onChange({ outline: normalized, chapters: normalized.length, outlineValidated: false });
     toast.success(`${normalized.length} chapitres importés (${source}) — validez le sommaire.`);
   };
+
 
   /** Bascule automatiquement sur un provider réellement configuré (clé valide). */
   const resolveProvider = (): AIProvider | null => {
@@ -178,8 +193,10 @@ export default function V3OutlinePanel({ brief, onChange, initialMode }: Props) 
       toast.error('Renseignez d’abord le titre du livre.');
       return;
     }
+    if (!confirmReplace()) return;
     const provider = resolveProvider();
-    const count = Math.min(60, Math.max(3, Number(brief.chapters) || 12));
+    const count = Math.min(60, Math.max(3, Number(brief.chapters) || outline.length || 12));
+    setHistory((prev) => [...prev.slice(-24), outline]);
 
     // Aucune clé personnelle : on passe directement par le serveur (aucun blocage).
     if (!provider) {
@@ -187,6 +204,7 @@ export default function V3OutlinePanel({ brief, onChange, initialMode }: Props) 
       try {
         const chapters = await generateOnServer(count);
         onChange({ outline: normalizeOutline(chapters), chapters: chapters.length, outlineValidated: false });
+
         toast.success(`Sommaire généré (${chapters.length} chapitres) — relisez puis validez-le.`, {
           description: 'Astuce : branchez votre clé Gemini gratuite pour générer plus vite et sans limite.',
         });
