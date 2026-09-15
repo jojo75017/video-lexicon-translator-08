@@ -258,6 +258,8 @@ export default function CouvertureExpressPage() {
             [title.trim(), subtitle.trim()].filter(Boolean).join(' — ') +
             (synopsis.trim() ? `\n\nSynopsis du livre : ${synopsis.trim()}` : ''),
           artStyle: genre.brief.artStyle,
+          // Par défaut une image claire : les rendus sombres étaient le principal défaut.
+          lighting: 'bright',
         },
       });
       if (error) throw error;

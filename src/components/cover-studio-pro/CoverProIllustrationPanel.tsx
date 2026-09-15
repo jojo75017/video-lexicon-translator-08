@@ -62,7 +62,7 @@ export default function CoverProIllustrationPanel({ remaining, hasKey, onGenerat
     setPreview(null);
     try {
       const { data, error } = await supabase.functions.invoke('cover-pro-generate', {
-        body: { projectId, genre, summary, mood, palette, avoid },
+        body: { projectId, genre, summary, mood, palette, avoid, lighting: 'bright' },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
