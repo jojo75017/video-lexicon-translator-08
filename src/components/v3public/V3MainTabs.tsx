@@ -10,9 +10,16 @@ import { V3_HEADER_MENU, type MenuCategory } from '@/data/v3HeaderMenu';
  */
 export default function V3MainTabs() {
   const [openKey, setOpenKey] = useState<string | null>(null);
+  const [anchorLeft, setAnchorLeft] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
   const closeTimer = useRef<number | null>(null);
   const { pathname, search } = useLocation();
+
+  const openCat = (key: string, el: HTMLElement) => {
+    if (closeTimer.current) window.clearTimeout(closeTimer.current);
+    setAnchorLeft(el.getBoundingClientRect().left);
+    setOpenKey(key);
+  };
 
   const scheduleClose = () => {
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
@@ -39,22 +46,30 @@ export default function V3MainTabs() {
     return Array.from({ length: cols }, (_, i) => links.slice(i * rows, (i + 1) * rows));
   };
 
+  // Panneau ouvert : positionné hors de la rangée scrollable, jamais coupé à droite
+  const openCatData = openKey ? V3_HEADER_MENU.find((c) => c.key === openKey) ?? null : null;
+  const openCols = openCatData ? (openCatData.links.length > 8 ? 3 : openCatData.links.length > 4 ? 2 : 1) : 1;
+  const openPanelWidth = openCols === 1 ? 320 : openCols === 2 ? 560 : 780;
+  const viewportW = typeof window !== 'undefined' ? window.innerWidth : 1600;
+  const panelLeft = Math.max(8, Math.min(anchorLeft, viewportW - openPanelWidth - 16));
+
+
   return (
     <div
-      className="sticky top-16 z-30 overflow-x-clip"
+      className="sticky top-16 z-30 relative overflow-x-clip"
       style={{
         background: 'var(--v3-paper)',
         borderBottom: '1px solid var(--v3-line)',
       }}
     >
-      <div className="max-w-7xl mx-auto px-5 md:px-8 h-14 flex items-center gap-1">
-        {/* Desktop (≥ lg) */}
-        <nav className="hidden lg:flex items-center gap-0.5 flex-1 min-w-0">
+      <div className="max-w-7xl mx-auto pl-5 md:pl-8 pr-2 md:pr-4 h-14 flex items-center gap-1">
+        {/* Desktop (≥ xl) — rangée scrollable : aucun onglet n'est coupé */}
+        <nav className="hidden xl:flex items-center gap-0.5 flex-1 min-w-0 overflow-x-auto v3-no-scrollbar">
           <NavLink
             to="/v3"
             end
             className={({ isActive }) =>
-              `v3-btn text-[12px] ml-1 mr-1 ${isActive ? 'v3-btn-gold' : 'v3-btn-outline'}`
+              `v3-btn text-[12px] ml-1 mr-1 shrink-0 ${isActive ? 'v3-btn-gold' : 'v3-btn-outline'}`
             }
             style={({ isActive }) =>
               isActive ? {} : { borderColor: 'var(--v3-gold)', color: 'var(--v3-emerald)' }
@@ -66,7 +81,7 @@ export default function V3MainTabs() {
           <NavLink
             to="/v3/offre"
             className={({ isActive }) =>
-              `v3-btn text-[12px] mr-1 ${isActive ? 'v3-btn-gold' : ''}`
+              `v3-btn text-[12px] mr-1 shrink-0 ${isActive ? 'v3-btn-gold' : ''}`
             }
             style={{
               background: 'linear-gradient(135deg,#FF9E2D 0%,#fbbf24 100%)',
@@ -81,7 +96,7 @@ export default function V3MainTabs() {
           </NavLink>
           <NavLink
             to="/v3/upsells"
-            className="v3-btn text-[12px] mr-1"
+            className="v3-btn text-[12px] mr-1 shrink-0"
             style={({ isActive }) => ({
               background: isActive ? 'var(--v3-gold)' : 'var(--v3-gold-soft)',
               color: 'var(--v3-emerald)',
@@ -101,102 +116,47 @@ export default function V3MainTabs() {
 
           {V3_HEADER_MENU.map((cat) => {
             const active = openKey === cat.key || isCatActive(cat);
-            const cols = cat.links.length > 8 ? 3 : cat.links.length > 4 ? 2 : 1;
-            const columns = columnize(cat.links, cols);
 
             return (
               <div
                 key={cat.key}
-                className="relative"
-                onMouseEnter={() => { cancelClose(); setOpenKey(cat.key); }}
+                className="shrink-0"
+                onMouseEnter={(e) => openCat(cat.key, e.currentTarget)}
                 onMouseLeave={scheduleClose}
               >
                 <button
                   type="button"
-                  onClick={() => setOpenKey((k) => (k === cat.key ? null : cat.key))}
+                  onClick={(e) => {
+                    if (openKey === cat.key) setOpenKey(null);
+                    else openCat(cat.key, e.currentTarget);
+                  }}
                   data-active={active ? 'true' : 'false'}
-                  className="v3-nav-item flex items-center gap-1.5 px-3 py-2 text-[13.5px] v3-serif font-semibold"
+                  className="v3-nav-item flex items-center gap-1.5 px-3 py-2 text-[13.5px] v3-serif font-semibold whitespace-nowrap"
                   style={{ color: active ? 'var(--v3-emerald)' : 'var(--v3-ink)' }}
                 >
                   <span aria-hidden className="text-[15px]">{cat.emoji}</span>
                   <span>{cat.label}</span>
                   <ChevronDown className="w-3.5 h-3.5 opacity-60" />
                 </button>
-
-                {openKey === cat.key && (
-                  <div
-                    className="absolute left-0 top-full pt-2"
-                    onMouseEnter={cancelClose}
-                    onMouseLeave={scheduleClose}
-                  >
-                    <div
-                      className="rounded-2xl bg-white overflow-hidden"
-                      style={{
-                        minWidth: cols === 1 ? 320 : cols === 2 ? 560 : 780,
-                        boxShadow: 'var(--v3-shadow-menu)',
-                        border: '1px solid var(--v3-line)',
-                      }}
-                    >
-                      <div className="v3-gold-rule" />
-                      <div className="px-5 pt-4 pb-2">
-                        <div className="text-[10px] uppercase tracking-[0.22em] font-semibold" style={{ color: 'var(--v3-gold-600)' }}>
-                          {cat.tagline ?? cat.label}
-                        </div>
-                        <div className="v3-serif text-[18px] font-semibold mt-0.5" style={{ color: 'var(--v3-emerald)' }}>
-                          {cat.emoji} {cat.label}
-                        </div>
-                      </div>
-                      <div className={`px-3 pb-3 grid gap-1`} style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
-                        {columns.map((col, ci) => (
-                          <ul key={ci} className="space-y-0.5">
-                            {col.map((l) => (
-                              <li key={l.to + l.label}>
-                                <NavLink
-                                  to={l.to}
-                                  className="flex items-start gap-3 rounded-lg px-3 py-2.5 transition-colors group"
-                                  style={{ color: 'var(--v3-ink)' }}
-                                  onMouseOver={(e) => (e.currentTarget as HTMLElement).style.background = 'var(--v3-gold-soft)'}
-                                  onMouseOut={(e) => (e.currentTarget as HTMLElement).style.background = ''}
-                                >
-                                  <span className="flex-1 min-w-0">
-                                    <span className="flex items-center gap-2 text-[13px] font-semibold">
-                                      <span>{l.label}</span>
-                                      {(isRouteNouveau(l.to) ? 'Nouveau' : l.badge) && <span className="v3-badge">{isRouteNouveau(l.to) ? 'Nouveau' : l.badge}</span>}
-                                    </span>
-                                    {l.desc && (
-                                      <span className="block text-[11.5px] mt-0.5 leading-snug" style={{ color: 'var(--v3-muted)' }}>
-                                        {l.desc}
-                                      </span>
-                                    )}
-                                  </span>
-                                  <ArrowRight className="w-3.5 h-3.5 mt-1 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: 'var(--v3-emerald)' }} />
-                                </NavLink>
-                              </li>
-                            ))}
-                          </ul>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             );
           })}
-
-          <div className="ml-auto">
-            <Link
-              to="/v3/outils"
-              className="v3-btn v3-btn-primary text-[12.5px]"
-              style={{ padding: '8px 16px' }}
-            >
-              <LayoutGrid className="w-3.5 h-3.5" />
-              Tous les outils
-            </Link>
-          </div>
         </nav>
 
-        {/* Mobile & tablette (< lg) — wrapper qui applique bien lg:hidden */}
-        <div className="lg:hidden flex items-center gap-2 flex-1">
+        {/* « Tous les outils » reste visible à droite, hors de la zone scrollable */}
+        <div className="hidden xl:block shrink-0 pl-2 ml-1" style={{ borderLeft: '1px solid var(--v3-line)' }}>
+          <Link
+            to="/v3/outils"
+            className="v3-btn v3-btn-primary text-[12.5px] whitespace-nowrap"
+            style={{ padding: '8px 16px' }}
+          >
+            <LayoutGrid className="w-3.5 h-3.5" />
+            Tous les outils
+          </Link>
+        </div>
+
+        {/* Mobile & tablette (< xl) — menu « Catégories » */}
+        <div className="xl:hidden flex items-center gap-2 flex-1">
           <button
             onClick={() => setMobileOpen((o) => !o)}
             className="flex items-center gap-2 px-3 py-2 rounded-md text-[13px] font-semibold"
@@ -216,9 +176,68 @@ export default function V3MainTabs() {
         </div>
       </div>
 
+      {/* Mega-panneau desktop — rendu hors de la rangée scrollable */}
+      {openCatData && (
+        <div
+          className="hidden xl:block absolute top-full pt-2 z-50"
+          style={{ left: panelLeft }}
+          onMouseEnter={cancelClose}
+          onMouseLeave={scheduleClose}
+        >
+          <div
+            className="rounded-2xl bg-white overflow-hidden"
+            style={{
+              minWidth: openPanelWidth,
+              boxShadow: 'var(--v3-shadow-menu)',
+              border: '1px solid var(--v3-line)',
+            }}
+          >
+            <div className="v3-gold-rule" />
+            <div className="px-5 pt-4 pb-2">
+              <div className="text-[10px] uppercase tracking-[0.22em] font-semibold" style={{ color: 'var(--v3-gold-600)' }}>
+                {openCatData.tagline ?? openCatData.label}
+              </div>
+              <div className="v3-serif text-[18px] font-semibold mt-0.5" style={{ color: 'var(--v3-emerald)' }}>
+                {openCatData.emoji} {openCatData.label}
+              </div>
+            </div>
+            <div className="px-3 pb-3 grid gap-1" style={{ gridTemplateColumns: `repeat(${openCols}, minmax(0, 1fr))` }}>
+              {columnize(openCatData.links, openCols).map((col, ci) => (
+                <ul key={ci} className="space-y-0.5">
+                  {col.map((l) => (
+                    <li key={l.to + l.label}>
+                      <NavLink
+                        to={l.to}
+                        className="flex items-start gap-3 rounded-lg px-3 py-2.5 transition-colors group"
+                        style={{ color: 'var(--v3-ink)' }}
+                        onMouseOver={(e) => (e.currentTarget as HTMLElement).style.background = 'var(--v3-gold-soft)'}
+                        onMouseOut={(e) => (e.currentTarget as HTMLElement).style.background = ''}
+                      >
+                        <span className="flex-1 min-w-0">
+                          <span className="flex items-center gap-2 text-[13px] font-semibold">
+                            <span>{l.label}</span>
+                            {(isRouteNouveau(l.to) ? 'Nouveau' : l.badge) && <span className="v3-badge">{isRouteNouveau(l.to) ? 'Nouveau' : l.badge}</span>}
+                          </span>
+                          {l.desc && (
+                            <span className="block text-[11.5px] mt-0.5 leading-snug" style={{ color: 'var(--v3-muted)' }}>
+                              {l.desc}
+                            </span>
+                          )}
+                        </span>
+                        <ArrowRight className="w-3.5 h-3.5 mt-1 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: 'var(--v3-emerald)' }} />
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Accordéon mobile & tablette */}
       {mobileOpen && (
-        <div className="lg:hidden border-t bg-white max-h-[70vh] overflow-y-auto" style={{ borderColor: 'var(--v3-line)' }}>
+        <div className="xl:hidden border-t bg-white max-h-[70vh] overflow-y-auto" style={{ borderColor: 'var(--v3-line)' }}>
           <div className="px-4 py-3 space-y-2">
             <NavLink
               to="/v3"

@@ -52,7 +52,7 @@ export default function V3Header({ isAuthed = false, isAdmin = false }: { isAuth
         </Link>
 
         {/* Search — desktop */}
-        <form onSubmit={submitSearch} className="hidden lg:flex flex-1 max-w-md relative">
+        <form onSubmit={submitSearch} className="hidden xl:flex flex-1 max-w-md relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--v3-gold)' }} />
           <input
             value={q}
@@ -67,7 +67,7 @@ export default function V3Header({ isAuthed = false, isAdmin = false }: { isAuth
         </form>
 
         {/* Actions droite (≥ lg) */}
-        <nav className="hidden lg:flex items-center gap-1 ml-auto">
+        <nav className="hidden xl:flex items-center gap-1 ml-auto">
           <ThemeToggle variant="onDark" />
           <BlogExternalLink variant="headerDark" />
           <Link to="/formation" className="v3-btn v3-btn-on-dark" title="Formation">
@@ -109,7 +109,7 @@ export default function V3Header({ isAuthed = false, isAdmin = false }: { isAuth
         </nav>
 
         {/* CTA rapide + trigger mobile & tablette (< lg) */}
-        <div className="lg:hidden ml-auto flex items-center gap-2">
+        <div className="xl:hidden ml-auto flex items-center gap-2">
           <Link
             to={isAuthed ? '/v3/create' : '/cadeau'}
             className="v3-btn v3-btn-gold text-[12px] whitespace-nowrap"
@@ -133,7 +133,7 @@ export default function V3Header({ isAuthed = false, isAdmin = false }: { isAuth
 
       {/* Drawer mobile & tablette */}
       {open && (
-        <div className="lg:hidden" style={{ background: '#053e2f' }}>
+        <div className="xl:hidden" style={{ background: '#053e2f' }}>
           <div className="px-5 py-4 space-y-2">
             <form onSubmit={submitSearch} className="relative">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--v3-gold)' }} />
