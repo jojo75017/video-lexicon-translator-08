@@ -153,6 +153,30 @@ export default function IllustrationGeneratorPanel({
     }
   };
 
+  /* ---- consigne visuelle depuis la description (aucun crédit image) ----- */
+  const proposeVisualPrompt = async () => {
+    setVisualBusy(true);
+    setError(null);
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke('cover-visual-prompt', {
+        body: { summary, genre, mood, palette },
+      });
+      if (fnError) throw fnError;
+      if (data?.error) throw new Error(data.error);
+      const proposed = data?.visualPrompt as string | undefined;
+      if (!proposed) throw new Error('Consigne visuelle indisponible.');
+      setVisualPrompt(proposed);
+      toast.success('Consigne visuelle proposée : modifiez-la si besoin, puis générez.');
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Consigne visuelle indisponible pour le moment.';
+      setError(message);
+      toast.error(message);
+    } finally {
+      setVisualBusy(false);
+    }
+  };
+
   /* ---- génération d'illustration(s) ------------------------------------- */
   const generate = async () => {
     setBusy(true);
