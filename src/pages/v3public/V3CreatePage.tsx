@@ -89,6 +89,52 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
     return () => window.removeEventListener(BOOK_BRIEF_EVENT, sync);
   }, []);
 
+  // Fiche livre synchronisée (titre, description, drapeau outlineFirst…).
+  const [bookBrief, setBookBrief] = useState<BookBrief>(() => readBookBrief() || {});
+  useEffect(() => {
+    const sync = () => setBookBrief(readBookBrief() || {});
+    sync();
+    window.addEventListener(BOOK_BRIEF_EVENT, sync);
+    return () => window.removeEventListener(BOOK_BRIEF_EVENT, sync);
+  }, []);
+
+  // Chemin « sommaire d'abord » : l'auteur construit son livre à partir du sommaire.
+  const outlineFirstActive = Boolean(bookBrief.outlineFirst);
+  const [subjectTitle, setSubjectTitle] = useState('');
+  const [subjectDesc, setSubjectDesc] = useState('');
+  const [subjectChapters, setSubjectChapters] = useState(10);
+  useEffect(() => {
+    if (!outlineFirstActive) return;
+    const b = readBookBrief() || {};
+    setSubjectTitle(b.title || '');
+    setSubjectDesc(b.description || '');
+    setSubjectChapters(Math.min(40, Math.max(3, Number(b.chapters) || 10)));
+  }, [outlineFirstActive]);
+
+  const startOutlineFirst = () => {
+    const next = { ...(readBookBrief() || {}), outlineFirst: true };
+    writeBookBrief(next);
+    window.dispatchEvent(new Event(BOOK_BRIEF_EVENT));
+    setDesk(2);
+  };
+
+  const confirmSubject = () => {
+    const t = subjectTitle.trim();
+    const d = subjectDesc.trim();
+    if (t.length < 3) { toast.error('Donnez un titre à votre livre.'); return; }
+    if (d.length < 12) { toast.error('Décrivez votre projet en au moins une phrase complète.'); return; }
+    const next = {
+      ...(readBookBrief() || {}),
+      title: t,
+      description: d,
+      chapters: Math.min(40, Math.max(3, subjectChapters)),
+      outlineFirst: true,
+    };
+    writeBookBrief(next);
+    window.dispatchEvent(new Event(BOOK_BRIEF_EVENT));
+    toast.success('Votre projet est prêt : donnez maintenant vos indications de chapitre.');
+  };
+
 
 
   useEffect(() => { seedHubConfig(idea, genre, type); }, [idea, genre, type]);
