@@ -133,7 +133,7 @@ export default function V3Header({ isAuthed = false, isAdmin = false }: { isAuth
 
       {/* Drawer mobile & tablette */}
       {open && (
-        <div className="xl:hidden" style={{ background: #053e2f }}>
+        <div className="xl:hidden" style={{ background: '#053e2f' }}>
           <div className="px-5 py-4 space-y-2">
             <form onSubmit={submitSearch} className="relative">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--v3-gold)' }} />
