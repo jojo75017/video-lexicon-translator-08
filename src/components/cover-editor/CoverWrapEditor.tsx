@@ -33,6 +33,7 @@ import {
   Undo2,
   ZoomIn,
   ZoomOut,
+  FlipHorizontal2,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -80,7 +81,13 @@ import {
   SPINE_SIDE_MARGIN_IN,
   ZONE_LABEL,
   clampBrightness,
+  clampImageContrast,
+  clampImageOffset,
+  clampImageSaturation,
+  clampImageScale,
+  clampImageWarmth,
   clampOverlay,
+  wrapImageFilter,
   computeWrapWarnings,
   createWrapComposition,
   defaultElement,
@@ -448,7 +455,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
   const setOverlayOpacity = (value: number) =>
     commit((prev) => ({ ...prev, overlayOpacity: clampOverlay(value) }), false);
   const resetImageLook = () =>
-    commit((prev) => ({ ...prev, imageBrightness: 1, overlayOpacity: 0 }));
+    commit((prev) => ({ ...prev, imageBrightness: 1, imageContrast: 1, imageSaturation: 1, imageWarmth: 0, imageScale: 1, imageOffsetX: 0, imageOffsetY: 0, imageFlipX: false, overlayOpacity: 0 }));
 
   /* ------------------ avertissements -------------------------------------- */
   const warnings = useMemo(
@@ -463,6 +470,12 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
    */
   const runExport = async (kind: 'pdf' | 'png' | 'front' | 'mockup') => {
     if (!geometry) return;
+    if (warnings.length > 0) {
+      const confirmed = window.confirm(
+        `${warnings.length} avertissement(s) KDP sont encore présents. Voulez-vous télécharger malgré tout ?`,
+      );
+      if (!confirmed) return;
+    }
     setExporting(kind);
     try {
       const title = project.project_name;
@@ -639,7 +652,8 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
                     top: 0,
                     width: inPx(geometry.trimWidthIn + geometry.bleedIn),
                     height: canvasH,
-                    filter: `brightness(${clampBrightness(composition.imageBrightness)})`,
+                    filter: wrapImageFilter(composition),
+                    transform: `translate(${clampImageOffset(composition.imageOffsetX) * 12}%, ${clampImageOffset(composition.imageOffsetY) * 12}%) scale(${clampImageScale(composition.imageScale)}) scaleX(${composition.imageFlipX ? -1 : 1})`,
                   }}
                 />
               )}
@@ -874,6 +888,25 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
             <CardContent className="space-y-4 p-4">
               <p className="text-sm font-semibold text-foreground">Réglages de l’illustration</p>
               <div className="space-y-1.5">
+                <Label className="text-xs">Zoom · {Math.round(clampImageScale(composition.imageScale) * 100)} %</Label>
+                <Slider min={1} max={2.5} step={0.05} value={[clampImageScale(composition.imageScale)]} onValueChange={([v]) => commit((prev) => ({ ...prev, imageScale: v }), false)} />
+              </div>
+              {clampImageScale(composition.imageScale) > 1 && (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">Déplacement horizontal</Label>
+                    <Slider min={-1} max={1} step={0.05} value={[clampImageOffset(composition.imageOffsetX)]} onValueChange={([v]) => commit((prev) => ({ ...prev, imageOffsetX: v }), false)} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">Déplacement vertical</Label>
+                    <Slider min={-1} max={1} step={0.05} value={[clampImageOffset(composition.imageOffsetY)]} onValueChange={([v]) => commit((prev) => ({ ...prev, imageOffsetY: v }), false)} />
+                  </div>
+                </div>
+              )}
+              <Button variant={composition.imageFlipX ? 'default' : 'outline'} size="sm" className="w-full gap-1" onClick={() => commit((prev) => ({ ...prev, imageFlipX: !prev.imageFlipX }))}>
+                <FlipHorizontal2 className="h-4 w-4" /> Retourner horizontalement
+              </Button>
+              <div className="space-y-1.5">
                 <Label className="text-xs">
                   Luminosité de l’image · {Math.round(clampBrightness(composition.imageBrightness) * 100)} %
                 </Label>
@@ -887,6 +920,18 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
                 <p className="text-xs text-muted-foreground">
                   Vers la gauche : image plus sombre. Vers la droite : image plus claire.
                 </p>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Contraste · {Math.round(clampImageContrast(composition.imageContrast) * 100)} %</Label>
+                <Slider min={0.7} max={1.4} step={0.02} value={[clampImageContrast(composition.imageContrast)]} onValueChange={([v]) => commit((prev) => ({ ...prev, imageContrast: v }), false)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Saturation · {Math.round(clampImageSaturation(composition.imageSaturation) * 100)} %</Label>
+                <Slider min={0} max={1.6} step={0.02} value={[clampImageSaturation(composition.imageSaturation)]} onValueChange={([v]) => commit((prev) => ({ ...prev, imageSaturation: v }), false)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Chaleur · {clampImageWarmth(composition.imageWarmth) > 0 ? 'chaude' : clampImageWarmth(composition.imageWarmth) < 0 ? 'froide' : 'neutre'}</Label>
+                <Slider min={-20} max={20} step={1} value={[clampImageWarmth(composition.imageWarmth)]} onValueChange={([v]) => commit((prev) => ({ ...prev, imageWarmth: v }), false)} />
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs">
