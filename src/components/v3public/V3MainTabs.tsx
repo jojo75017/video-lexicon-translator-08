@@ -155,8 +155,8 @@ export default function V3MainTabs() {
           </Link>
         </div>
 
-        {/* Mobile & tablette (< lg) — wrapper qui applique bien lg:hidden */}
-        <div className="lg:hidden flex items-center gap-2 flex-1">
+        {/* Mobile & tablette (< xl) — menu « Catégories » */}
+        <div className="xl:hidden flex items-center gap-2 flex-1">
           <button
             onClick={() => setMobileOpen((o) => !o)}
             className="flex items-center gap-2 px-3 py-2 rounded-md text-[13px] font-semibold"
@@ -176,9 +176,68 @@ export default function V3MainTabs() {
         </div>
       </div>
 
+      {/* Mega-panneau desktop — rendu hors de la rangée scrollable */}
+      {openCatData && (
+        <div
+          className="hidden xl:block absolute top-full pt-2 z-50"
+          style={{ left: panelLeft }}
+          onMouseEnter={cancelClose}
+          onMouseLeave={scheduleClose}
+        >
+          <div
+            className="rounded-2xl bg-white overflow-hidden"
+            style={{
+              minWidth: openPanelWidth,
+              boxShadow: 'var(--v3-shadow-menu)',
+              border: '1px solid var(--v3-line)',
+            }}
+          >
+            <div className="v3-gold-rule" />
+            <div className="px-5 pt-4 pb-2">
+              <div className="text-[10px] uppercase tracking-[0.22em] font-semibold" style={{ color: 'var(--v3-gold-600)' }}>
+                {openCatData.tagline ?? openCatData.label}
+              </div>
+              <div className="v3-serif text-[18px] font-semibold mt-0.5" style={{ color: 'var(--v3-emerald)' }}>
+                {openCatData.emoji} {openCatData.label}
+              </div>
+            </div>
+            <div className="px-3 pb-3 grid gap-1" style={{ gridTemplateColumns: `repeat(${openCols}, minmax(0, 1fr))` }}>
+              {columnize(openCatData.links, openCols).map((col, ci) => (
+                <ul key={ci} className="space-y-0.5">
+                  {col.map((l) => (
+                    <li key={l.to + l.label}>
+                      <NavLink
+                        to={l.to}
+                        className="flex items-start gap-3 rounded-lg px-3 py-2.5 transition-colors group"
+                        style={{ color: 'var(--v3-ink)' }}
+                        onMouseOver={(e) => (e.currentTarget as HTMLElement).style.background = 'var(--v3-gold-soft)'}
+                        onMouseOut={(e) => (e.currentTarget as HTMLElement).style.background = ''}
+                      >
+                        <span className="flex-1 min-w-0">
+                          <span className="flex items-center gap-2 text-[13px] font-semibold">
+                            <span>{l.label}</span>
+                            {(isRouteNouveau(l.to) ? 'Nouveau' : l.badge) && <span className="v3-badge">{isRouteNouveau(l.to) ? 'Nouveau' : l.badge}</span>}
+                          </span>
+                          {l.desc && (
+                            <span className="block text-[11.5px] mt-0.5 leading-snug" style={{ color: 'var(--v3-muted)' }}>
+                              {l.desc}
+                            </span>
+                          )}
+                        </span>
+                        <ArrowRight className="w-3.5 h-3.5 mt-1 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: 'var(--v3-emerald)' }} />
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Accordéon mobile & tablette */}
       {mobileOpen && (
-        <div className="lg:hidden border-t bg-white max-h-[70vh] overflow-y-auto" style={{ borderColor: 'var(--v3-line)' }}>
+        <div className="xl:hidden border-t bg-white max-h-[70vh] overflow-y-auto" style={{ borderColor: 'var(--v3-line)' }}>
           <div className="px-4 py-3 space-y-2">
             <NavLink
               to="/v3"
