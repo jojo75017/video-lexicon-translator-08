@@ -291,6 +291,26 @@ const num = (v: unknown, fallback: number) =>
 const str = (v: unknown, fallback: string) =>
   typeof v === 'string' && v.length ? v : fallback;
 
+const clampRange = (v: unknown, min: number, max: number, fallback: number) =>
+  Math.min(max, Math.max(min, num(v, fallback)));
+
+/** Bornes des réglages locaux de l'image (aucune IA, aucun crédit). */
+export const IMAGE_ADJUST_LIMITS = {
+  brightness: { min: 0.7, max: 1.5, default: 1 },
+  contrast: { min: 0.7, max: 1.4, default: 1 },
+  saturation: { min: 0, max: 1.6, default: 1 },
+  warmth: { min: -20, max: 20, default: 0 },
+} as const;
+
+/** Filtre canvas/CSS correspondant aux réglages locaux de l'illustration. */
+export function imageAdjustFilter(composition: FrontComposition): string {
+  const b = clampRange(composition.imageBrightness, 0.7, 1.5, 1);
+  const c = clampRange(composition.imageContrast, 0.7, 1.4, 1);
+  const s = clampRange(composition.imageSaturation, 0, 1.6, 1);
+  const w = clampRange(composition.imageWarmth, -20, 20, 0);
+  return `brightness(${b}) contrast(${c}) saturate(${s})${w ? ` sepia(${Math.min(0.4, Math.abs(w) / 60)}) hue-rotate(${w < 0 ? 200 : 0}deg)` : ''}`;
+}
+
 /** Interdit toute URL (signée ou non) dans les valeurs textuelles persistées. */
 const looksLikeUrl = (value: string) => /https?:\/\//i.test(value) || /token=/i.test(value);
 
