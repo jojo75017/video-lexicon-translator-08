@@ -135,9 +135,22 @@ export default function ShapeLayersPanel({
 
         {selected && (
           <div className="space-y-3 rounded-lg border border-border p-3">
-            <p className="text-xs font-semibold text-foreground">
-              {selected.name} {selected.locked && '· verrouillé'}
-            </p>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs font-semibold text-foreground">
+                {selected.name} {selected.locked && '· verrouillé'}
+              </p>
+              {selected.locked && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-8 gap-1 border-primary text-xs text-primary"
+                  onClick={() => onPatch(selected.id, { locked: false })}
+                >
+                  <LockOpen className="h-3.5 w-3.5" /> Déverrouiller pour modifier
+                </Button>
+              )}
+            </div>
 
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">

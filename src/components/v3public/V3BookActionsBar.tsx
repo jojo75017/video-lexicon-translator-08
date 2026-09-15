@@ -38,6 +38,13 @@ export default function V3BookActionsBar({ onLaunch }: { onLaunch: () => void })
   const validated = Boolean(brief.outlineValidated) && hasOutline;
   const projectId = brief.projectId || '';
   const written = writtenCount > 0 || Boolean(projectId);
+  const coverSearch = new URLSearchParams();
+  if (brief.title?.trim()) coverSearch.set('title', brief.title.trim());
+  if (brief.subtitle?.trim()) coverSearch.set('subtitle', brief.subtitle.trim());
+  if (brief.author?.trim()) coverSearch.set('author', brief.author.trim());
+  if (brief.synopsis?.trim()) coverSearch.set('synopsis', brief.synopsis.trim());
+  if (brief.genre?.trim()) coverSearch.set('genre', brief.genre.trim());
+  const coverPath = `/v3/couverture-express${coverSearch.size ? `?${coverSearch.toString()}` : ''}`;
 
   const requireOutline = (action: () => void) => {
     if (!validated) {
@@ -163,7 +170,7 @@ export default function V3BookActionsBar({ onLaunch }: { onLaunch: () => void })
           <Download className="h-3.5 w-3.5" /> Exporter en PDF
         </button>
 
-        <Link to="/v3/hub?tab=parcours&module=cover-studio-pro" className="v3-btn v3-btn-gold justify-center text-xs"
+        <Link to={coverPath} className="v3-btn v3-btn-gold justify-center text-xs"
           title="Créer la couverture de votre livre">
           <Palette className="h-3.5 w-3.5" /> Faire ma couverture
         </Link>

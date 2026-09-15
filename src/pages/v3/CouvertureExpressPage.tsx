@@ -10,7 +10,7 @@
  * Aucun changement de base, de sécurité, de calcul KDP ni de paiement.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   ArrowLeft,
   ArrowRight,
@@ -86,6 +86,7 @@ const FORMAT_ID: Record<FormatChoice, string> = {
 
 export default function CouvertureExpressPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { credits, key, refresh } = useCoverProAccess();
 
   const [step, setStep] = useState<Step>(1);
@@ -111,8 +112,33 @@ export default function CouvertureExpressPage() {
   const [previews, setPreviews] = useState<Record<string, string>>({});
   const [bigPreview, setBigPreview] = useState<string | null>(null);
   const renderToken = useRef(0);
+  const prefilled = useRef(false);
 
   const formatId = FORMAT_ID[format];
+
+  useEffect(() => {
+    if (prefilled.current) return;
+    prefilled.current = true;
+
+    const queryTitle = searchParams.get('title')?.trim();
+    const querySubtitle = searchParams.get('subtitle')?.trim();
+    const queryAuthor = searchParams.get('author')?.trim();
+    const querySynopsis = searchParams.get('synopsis')?.trim();
+    const queryGenre = searchParams.get('genre')?.trim().toLocaleLowerCase('fr');
+
+    if (queryTitle) setTitle(queryTitle);
+    if (querySubtitle) setSubtitle(querySubtitle);
+    if (queryAuthor) setAuthor(queryAuthor);
+    if (querySynopsis) setSynopsis(querySynopsis);
+    if (queryGenre) {
+      const match = EXPRESS_GENRES.find((item) =>
+        item.id === queryGenre ||
+        item.label.toLocaleLowerCase('fr').includes(queryGenre) ||
+        queryGenre.includes(item.id),
+      );
+      if (match) setGenreId(match.id);
+    }
+  }, [searchParams]);
 
   /** Trois propositions : le modèle conseillé pour le genre, puis les autres. */
   const proposals = useMemo(() => {
