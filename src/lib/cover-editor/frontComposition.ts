@@ -139,6 +139,12 @@ export interface FrontComposition {
   backgroundColor: string;
   /** Réglage local de l'illustration : 1 = original, 1.5 = plus claire. */
   imageBrightness?: number;
+  /** Contraste local : 1 = original (0.7 → 1.4). */
+  imageContrast?: number;
+  /** Saturation locale : 1 = original (0 → 1.6). */
+  imageSaturation?: number;
+  /** Chaleur locale en degrés de rotation de teinte : 0 = original (-20 → 20). */
+  imageWarmth?: number;
   overlay?: FrontOverlay;
   /** Identifiant du dernier modèle appliqué (informatif). */
   templateId?: string | null;
@@ -268,6 +274,9 @@ export function createComposition(params: {
     canvas: { width: size.width, height: size.height },
     backgroundColor: DEFAULT_FRONT_BACKGROUND,
     imageBrightness: 1,
+    imageContrast: 1,
+    imageSaturation: 1,
+    imageWarmth: 0,
     layers: [
       defaultLayer('title', size, params.bookTitle?.trim() || 'Titre du livre'),
       defaultLayer('subtitle', size, 'Sous-titre'),
@@ -281,6 +290,27 @@ const num = (v: unknown, fallback: number) =>
 
 const str = (v: unknown, fallback: string) =>
   typeof v === 'string' && v.length ? v : fallback;
+
+const clampRange = (v: unknown, min: number, max: number, fallback: number) =>
+  Math.min(max, Math.max(min, num(v, fallback)));
+
+/** Bornes des réglages locaux de l'image (aucune IA, aucun crédit). */
+export const IMAGE_ADJUST_LIMITS = {
+  brightness: { min: 0.7, max: 1.5, default: 1 },
+  contrast: { min: 0.7, max: 1.4, default: 1 },
+  saturation: { min: 0, max: 1.6, default: 1 },
+  warmth: { min: -20, max: 20, default: 0 },
+} as const;
+
+/** Filtre canvas/CSS correspondant aux réglages locaux de l'illustration. */
+export function imageAdjustFilter(composition: FrontComposition): string {
+  const b = clampRange(composition.imageBrightness, 0.7, 1.5, 1);
+  const c = clampRange(composition.imageContrast, 0.7, 1.4, 1);
+  const s = clampRange(composition.imageSaturation, 0, 1.6, 1);
+  const w = clampRange(composition.imageWarmth, -20, 20, 0);
+  const warmth = w > 0 ? ` sepia(${(w / 60).toFixed(3)})` : w < 0 ? ` hue-rotate(${w}deg)` : '';
+  return `brightness(${b}) contrast(${c}) saturate(${s})${warmth}`;
+}
 
 /** Interdit toute URL (signée ou non) dans les valeurs textuelles persistées. */
 const looksLikeUrl = (value: string) => /https?:\/\//i.test(value) || /token=/i.test(value);
@@ -440,7 +470,10 @@ export function parseComposition(
       typeof obj.backgroundColor === 'string' && /^#[0-9a-fA-F]{6}$/.test(obj.backgroundColor)
         ? obj.backgroundColor
         : DEFAULT_FRONT_BACKGROUND,
-    imageBrightness: Math.min(1.5, Math.max(0.7, num(obj.imageBrightness, 1))),
+    imageBrightness: clampRange(obj.imageBrightness, 0.7, 1.5, 1),
+    imageContrast: clampRange(obj.imageContrast, 0.7, 1.4, 1),
+    imageSaturation: clampRange(obj.imageSaturation, 0, 1.6, 1),
+    imageWarmth: clampRange(obj.imageWarmth, -20, 20, 0),
     illustrationMode: obj.illustrationMode === 'slot' ? 'slot' : 'cover',
     shapes,
     layers: layers.length ? layers : createComposition(fallback).layers,
@@ -462,7 +495,10 @@ export function serializeComposition(
     backgroundColor: /^#[0-9a-fA-F]{6}$/.test(composition.backgroundColor ?? '')
       ? composition.backgroundColor
       : DEFAULT_FRONT_BACKGROUND,
-    imageBrightness: Math.min(1.5, Math.max(0.7, composition.imageBrightness ?? 1)),
+    imageBrightness: clampRange(composition.imageBrightness, 0.7, 1.5, 1),
+    imageContrast: clampRange(composition.imageContrast, 0.7, 1.4, 1),
+    imageSaturation: clampRange(composition.imageSaturation, 0, 1.6, 1),
+    imageWarmth: clampRange(composition.imageWarmth, -20, 20, 0),
     illustrationMode: composition.illustrationMode === 'slot' ? 'slot' : 'cover',
     shapes: (composition.shapes ?? []).map((s) => ({ ...s })),
     layers: composition.layers.map((l) => ({
@@ -805,7 +841,7 @@ const drawShapes = (
       ctx.save();
       ctx.clip();
       if (image) {
-        ctx.filter = `brightness(${Math.min(1.5, Math.max(0.7, composition.imageBrightness ?? 1))})`;
+        ctx.filter = imageAdjustFilter(composition);
         drawImageCover(ctx, image, x, y, w, h);
       }
       else {
@@ -845,7 +881,7 @@ export function drawFrontBackdrop(
 
   if (image && composition.illustrationMode !== 'slot') {
     ctx.save();
-    ctx.filter = `brightness(${Math.min(1.5, Math.max(0.7, composition.imageBrightness ?? 1))})`;
+    ctx.filter = imageAdjustFilter(composition);
     drawImageCover(ctx, image, 0, 0, w, h);
     ctx.restore();
   }

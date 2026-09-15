@@ -95,6 +95,9 @@ export default function IllustrationGeneratorPanel({
   const [artStyle, setArtStyle] = useState('illustration-editoriale');
   /** Exposition demandée : par défaut une image claire, jamais trop sombre. */
   const [lighting, setLighting] = useState('bright');
+  /** Consigne visuelle issue de la description, modifiable avant génération. */
+  const [visualPrompt, setVisualPrompt] = useState('');
+  const [visualBusy, setVisualBusy] = useState(false);
 
 
   const [books, setBooks] = useState<BookOption[]>([]);
@@ -150,6 +153,30 @@ export default function IllustrationGeneratorPanel({
     }
   };
 
+  /* ---- consigne visuelle depuis la description (aucun crédit image) ----- */
+  const proposeVisualPrompt = async () => {
+    setVisualBusy(true);
+    setError(null);
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke('cover-visual-prompt', {
+        body: { summary, genre, mood, palette },
+      });
+      if (fnError) throw fnError;
+      if (data?.error) throw new Error(data.error);
+      const proposed = data?.visualPrompt as string | undefined;
+      if (!proposed) throw new Error('Consigne visuelle indisponible.');
+      setVisualPrompt(proposed);
+      toast.success('Consigne visuelle proposée : modifiez-la si besoin, puis générez.');
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Consigne visuelle indisponible pour le moment.';
+      setError(message);
+      toast.error(message);
+    } finally {
+      setVisualBusy(false);
+    }
+  };
+
   /* ---- génération d'illustration(s) ------------------------------------- */
   const generate = async () => {
     setBusy(true);
@@ -159,7 +186,17 @@ export default function IllustrationGeneratorPanel({
       for (let i = 0; i < count; i += 1) {
         setProgress({ done: i, total: count });
         const { data, error: fnError } = await supabase.functions.invoke('cover-pro-generate', {
-          body: { projectId, genre, mood, palette, avoid, summary, artStyle, lighting },
+          body: {
+            projectId,
+            genre,
+            mood,
+            palette,
+            avoid,
+            summary,
+            artStyle,
+            lighting,
+            visualPrompt: visualPrompt.trim() || undefined,
+          },
         });
         if (fnError) throw fnError;
         if (data?.error) throw new Error(data.error);
@@ -373,6 +410,39 @@ export default function IllustrationGeneratorPanel({
                 onChange={(e) => setSummary(e.target.value)}
                 placeholder="Décrivez en quelques phrases le sujet et la scène souhaitée."
               />
+            </div>
+
+            {/* Consigne visuelle : traduit votre description en instruction d'image */}
+            <div className="space-y-2 rounded-lg border border-border bg-muted/30 p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <Label htmlFor="ill-visual">Ce que l’image va représenter</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="gap-2"
+                  disabled={visualBusy || busy || summary.trim().length < 12}
+                  onClick={() => void proposeVisualPrompt()}
+                >
+                  {visualBusy ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Wand2 className="h-4 w-4" />
+                  )}
+                  {visualPrompt ? 'Régénérer la description visuelle' : 'Proposer la description visuelle'}
+                </Button>
+              </div>
+              <Textarea
+                id="ill-visual"
+                rows={4}
+                value={visualPrompt}
+                onChange={(e) => setVisualPrompt(e.target.value)}
+                placeholder="Consigne visuelle : sujet principal, décor, époque, cadrage, lumière…"
+              />
+              <p className="text-xs text-muted-foreground">
+                Cette consigne est ce que l’image suivra vraiment. Vous pouvez la corriger mot à mot.
+                Si vous la laissez vide, elle est déduite automatiquement de votre description.
+                Cette étape ne consomme aucune génération.
+              </p>
             </div>
 
             {/* 3. Nombre de propositions */}
