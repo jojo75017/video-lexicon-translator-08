@@ -134,6 +134,46 @@ export default function BdComicNewsBanner({ compact = false }: Props) {
             </ul>
           </div>
         </div>
+
+        <div
+          className="border-t px-6 py-6 md:px-8"
+          style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}
+        >
+          <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+            <h3 className="v3-serif text-lg font-bold" style={{ color: 'var(--v3-ink)' }}>
+              Zone Kids — jouer et apprendre
+            </h3>
+            <span
+              className="text-[11px] font-bold uppercase tracking-[0.18em]"
+              style={{ color: 'var(--v3-gold-600)' }}
+            >
+              Bientôt disponible
+            </span>
+          </div>
+          <p className="mt-1 max-w-3xl text-sm" style={{ color: 'var(--v3-muted)' }}>
+            Un espace de jeux pour accompagner vos livres jeunesse : quiz, memory, création
+            d’histoires et couleurs.
+          </p>
+          <div className="mt-5 grid gap-px overflow-hidden rounded-xl border sm:grid-cols-2 lg:grid-cols-4"
+            style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-border)' }}
+          >
+            {[
+              { title: 'Quiz des animaux', desc: 'Questions illustrées' },
+              { title: 'Memory', desc: 'Paires à retrouver' },
+              { title: 'Crée ton histoire', desc: 'Récits à composer' },
+              { title: 'Jeu des couleurs', desc: 'Palettes à deviner' },
+            ].map(({ title, desc }) => (
+              <div key={title} className="px-4 py-4" style={{ background: 'var(--v3-ivory)' }}>
+                <p className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>
+                  {title}
+                </p>
+                <p className="mt-0.5 text-xs" style={{ color: 'var(--v3-muted)' }}>
+                  {desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );
