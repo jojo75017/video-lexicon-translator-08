@@ -98,6 +98,47 @@ export default function BdComicNewsBanner({ compact = false }: Props) {
                 ))}
               </ul>
             </div>
+
+            <div
+              className="mt-5 rounded-xl border p-4"
+              style={{
+                borderColor: 'var(--v3-border)',
+                background: 'var(--v3-paper)',
+              }}
+            >
+              <p
+                className="text-xs font-bold uppercase tracking-wider"
+                style={{ color: 'var(--v3-gold-600)' }}
+              >
+                Bientôt — Zone Kids
+              </p>
+              <p className="mt-1 text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>
+                Joue et apprends !
+              </p>
+              <p className="mt-1 text-sm" style={{ color: 'var(--v3-muted)' }}>
+                Des jeux fun pour les enfants : quiz, memory, création d’histoires et couleurs.
+              </p>
+              <ul className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
+                {[
+                  'Quiz des animaux',
+                  'Memory',
+                  'Crée ton histoire',
+                  'Jeu des couleurs',
+                ].map((game) => (
+                  <li
+                    key={game}
+                    className="rounded-lg border px-2.5 py-2 font-semibold"
+                    style={{
+                      borderColor: 'var(--v3-border)',
+                      background: 'var(--v3-ivory)',
+                      color: 'var(--v3-ink-2)',
+                    }}
+                  >
+                    {game}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
           <div className="flex flex-col gap-4">
