@@ -17,7 +17,7 @@ import V3BookActionsBar from '@/components/v3public/V3BookActionsBar';
 import V3OutlineCoBuilder from '@/components/v3public/V3OutlineCoBuilder';
 import V3PassageCorrector from '@/components/v3public/V3PassageCorrector';
 
-import { BOOK_BRIEF_EVENT, clearBookBrief, readBookBrief, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
+import { BOOK_BRIEF_EVENT, clearBookBrief, readBookBrief, writeBookBrief, type BriefOutlineChapter, type BookBrief } from '@/lib/v3/bookBrief';
 import { restoreDraftState, saveBookDraftToCloud, BOOK_DRAFT_STATUS_EVENT, type BookDraftStatus } from '@/lib/v3/bookDraftCloud';
 import { writeLocalThread } from '@/lib/v3/genieThread';
 
