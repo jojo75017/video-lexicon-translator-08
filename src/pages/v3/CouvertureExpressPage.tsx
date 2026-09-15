@@ -127,6 +127,7 @@ export default function CouvertureExpressPage() {
   const [bigPreview, setBigPreview] = useState<string | null>(null);
   const renderToken = useRef(0);
   const prefilled = useRef(false);
+  const titleInputRef = useRef<HTMLInputElement>(null);
 
   const formatId = FORMAT_ID[format];
 
@@ -214,17 +215,19 @@ export default function CouvertureExpressPage() {
 
   /* ---- étape 1 → 2 : création du projet -------------------------------- */
   const goToStyles = async () => {
-    if (!title.trim()) {
+    const visibleTitle = (titleInputRef.current?.value ?? title).trim();
+    if (!visibleTitle) {
       toast.error('Indiquez au moins le titre de votre livre.');
       return;
     }
+    if (visibleTitle !== title) setTitle(visibleTitle);
     if (projectId) {
       setDownloaded(false);
       setStep(2);
       const composition = chosen ? compositionFor(chosen, lightness) : null;
       void updateCoverProject(projectId, {
-        project_name: title.trim().slice(0, 80),
-        book_title: title.trim(),
+        project_name: visibleTitle.slice(0, 80),
+        book_title: visibleTitle,
         cover_type: format,
         format_id: formatId,
         page_count: format === 'paperback' ? 120 : null,
@@ -239,8 +242,8 @@ export default function CouvertureExpressPage() {
     setCreating(true);
     try {
       const created = await createCoverProject({
-        project_name: title.trim().slice(0, 80),
-        book_title: title.trim(),
+        project_name: visibleTitle.slice(0, 80),
+        book_title: visibleTitle,
         cover_type: format,
         format_id: formatId,
         page_count: format === 'paperback' ? 120 : null,
@@ -496,6 +499,7 @@ export default function CouvertureExpressPage() {
                 <Label htmlFor="ex-title">Titre de votre livre</Label>
                 <Input
                   id="ex-title"
+                  ref={titleInputRef}
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Les Flammes du Passé"
