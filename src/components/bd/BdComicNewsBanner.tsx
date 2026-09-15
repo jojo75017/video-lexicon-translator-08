@@ -67,16 +67,18 @@ export default function BdComicNewsBanner({ compact = false }: Props) {
             </Link>
           </div>
 
-          <div className="relative min-h-[260px] overflow-hidden rounded-xl">
-            <img
-              src={studioJeunesseHero}
-              alt="Main d'enfant choisissant un crayon de couleur dans un pot"
-              loading="lazy"
-              width={1280}
-              height={960}
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-            <ul className="absolute inset-x-3 bottom-3 space-y-2 text-sm">
+          <div className="flex flex-col gap-4">
+            <div className="relative h-[260px] overflow-hidden rounded-xl md:h-[300px]">
+              <img
+                src={studioJeunesseHero}
+                alt="Main d'enfant choisissant un crayon de couleur dans un pot"
+                loading="lazy"
+                width={1280}
+                height={960}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            </div>
+            <ul className="space-y-2 text-sm">
               {[
                 { icon: Users, text: 'Personnages cohérents d’une case à l’autre' },
                 { icon: Palette, text: 'Planches, coloriages et histoires illustrées' },
@@ -84,10 +86,10 @@ export default function BdComicNewsBanner({ compact = false }: Props) {
               ].map(({ icon: Icon, text }) => (
                 <li
                   key={text}
-                  className="flex items-start gap-3 rounded-xl border p-2.5 backdrop-blur-sm"
+                  className="flex items-start gap-3 rounded-xl border p-2.5"
                   style={{
                     borderColor: 'var(--v3-border)',
-                    background: 'color-mix(in srgb, var(--v3-paper) 88%, transparent)',
+                    background: 'var(--v3-paper)',
                     color: 'var(--v3-ink-2)',
                   }}
                 >
