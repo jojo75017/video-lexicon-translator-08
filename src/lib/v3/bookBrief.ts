@@ -298,7 +298,10 @@ export function readBookBrief(): BookBrief | null {
     (brief.title || '').trim()
     || (brief.description || '').trim()
     || (brief.sourceText || '').trim()
-    || (brief.outline || []).length,
+    || (brief.outline || []).length
+    // Un brief « sommaire d'abord » sans récit est légitime et doit rester
+    // accessible tant que l'auteur n'a pas rempli le sujet du livre.
+    || brief.outlineFirst,
   );
   return hasSomething ? brief : null;
 }
