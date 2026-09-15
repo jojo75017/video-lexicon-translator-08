@@ -1,11 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Gem } from 'lucide-react';
-import {
-  V3_ESSENTIAL_PACKS,
-  V3_ALACARTE_PACKS,
-  V3_ALL_PACKS_TOTAL,
-} from '@/data/roadmapV3';
-import { V3_ADDON_LIST, V3_PLANS, formatPrice } from '@/data/v3Pricing';
+import { V3_ADDON_LIST, V3_ADDONS_TOTAL_VALUE, V3_PLANS, formatPrice } from '@/data/v3Pricing';
 import V3UpsellPromoCard from '@/components/v3public/V3UpsellPromoCard';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
 import BdComicNewsBanner from '@/components/bd/BdComicNewsBanner';

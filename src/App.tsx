@@ -80,7 +80,7 @@ const ConfirmationPaiementPage = lazy(() => import('./pages/ConfirmationPaiement
 const PaiementManuelPage = lazy(() => import('./pages/PaiementManuelPage'));
 const UpsellPage = lazy(() => import('./pages/UpsellPage'));
 const UpsellPaiementPage = lazy(() => import('./pages/UpsellPaiementPage'));
-const V3PaiementPage = lazy(() => import('./pages/V3PaiementPage'));
+
 const EssaiPage = lazy(() => import('./pages/launch/EssaiPage'));
 const DecouvertePage = lazy(() => import('./pages/launch/DecouvertePage'));
 const EssaiInscriptionPage = lazy(() => import('./pages/launch/EssaiInscriptionPage'));
@@ -521,7 +521,8 @@ const App = () => {
             <Route path="/upsell" element={<UpsellPage />} />
             <Route path="/upsell-paiement" element={<UpsellPaiementPage />} />
             <Route path="/commande-v3" element={<Navigate to="/commander" replace />} />
-            <Route path="/v3-paiement" element={<V3PaiementPage />} />
+            {/* Ancienne page 197€/547€ retirée : un seul tunnel de commande officiel */}
+            <Route path="/v3-paiement" element={<Navigate to="/commander" replace />} />
             <Route path="/vente-v3" element={<Navigate to="/commander" replace />} />
 
             {/* Promo été */}
