@@ -12,9 +12,31 @@ export interface VisualPromptInput {
   palette?: string;
   bookTitle?: string;
   subtitle?: string;
+  targetAudience?: string;
+  era?: string;
+  location?: string;
+  focalSubject?: string;
+  emotion?: string;
+  symbol?: string;
+  include?: string;
+  avoid?: string;
 }
 
 const clean = (v?: string) => (typeof v === "string" ? v.trim() : "");
+
+function buildFaithfulFallback(input: VisualPromptInput): string {
+  const subject = clean(input.focalSubject) || "le sujet principal décrit dans le synopsis";
+  const setting = [clean(input.location), clean(input.era)].filter(Boolean).join(", ");
+  const details = [
+    setting ? `dans ${setting}` : "dans le décor exact décrit par l'auteur",
+    clean(input.symbol) ? `avec ${clean(input.symbol)} intégré naturellement` : "",
+    clean(input.include) ? `Les éléments obligatoires sont : ${clean(input.include)}.` : "",
+    clean(input.emotion) ? `L'image doit provoquer ${clean(input.emotion)}.` : "",
+    clean(input.palette) ? `Palette : ${clean(input.palette)}.` : "",
+    clean(input.avoid) ? `Ne pas représenter : ${clean(input.avoid)}.` : "",
+  ].filter(Boolean).join(" ");
+  return `Composition verticale de couverture centrée sur ${subject}, ${details} Cadrage éditorial précis, profondeur naturelle, lumière cohérente et point focal immédiatement identifiable. Rendu photoréaliste ou pictural haut de gamme selon le genre, anatomie crédible, matières détaillées, sans texte, logo, cadre, bandeau, cartouche ni zone sombre ajoutée. Rester strictement fidèle au synopsis, sans inventer de personnage, de lieu, d'époque, d'objet ou d'événement absent.`;
+}
 
 /**
  * Renvoie une consigne visuelle en français (sujet, décor, époque, action,
@@ -34,6 +56,14 @@ export async function buildVisualPrompt(input: VisualPromptInput): Promise<strin
     input.genre ? `Genre : ${clean(input.genre)}` : "",
     input.mood ? `Ambiance : ${clean(input.mood)}` : "",
     input.palette ? `Palette : ${clean(input.palette)}` : "",
+    input.targetAudience ? `Lecteurs visés : ${clean(input.targetAudience)}` : "",
+    input.era ? `Époque : ${clean(input.era)}` : "",
+    input.location ? `Lieu : ${clean(input.location)}` : "",
+    input.focalSubject ? `Sujet principal demandé : ${clean(input.focalSubject)}` : "",
+    input.emotion ? `Émotion à provoquer : ${clean(input.emotion)}` : "",
+    input.symbol ? `Symbole important : ${clean(input.symbol)}` : "",
+    input.include ? `Éléments obligatoires : ${clean(input.include)}` : "",
+    input.avoid ? `Éléments interdits : ${clean(input.avoid)}` : "",
     `Description fournie par l'auteur : ${summary}`,
   ]
     .filter(Boolean)
@@ -41,7 +71,8 @@ export async function buildVisualPrompt(input: VisualPromptInput): Promise<strin
     .slice(0, 6000);
 
   try {
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -55,22 +86,33 @@ export async function buildVisualPrompt(input: VisualPromptInput): Promise<strin
               "informations d'un livre, tu écris UNE SEULE consigne visuelle en français, de 60 à " +
               "120 mots, décrivant précisément l'illustration de couverture à produire : sujet " +
               "principal, décor, époque, action ou instant choisi, cadrage, angle, lumière, " +
-              "matières, palette. Reste strictement fidèle à la description de l'auteur : " +
-              "n'invente aucun élément d'histoire absent. Interdits dans ta réponse : listes, " +
+              "matières, palette et point focal. Reste strictement fidèle à la description de l'auteur : " +
+              "n'invente aucun personnage, lieu, époque, objet ou événement absent. Respecte mot pour mot " +
+              "les éléments obligatoires et interdits. Interdits dans ta réponse : listes, " +
               "titres, guillemets, mentions de texte, de titre, de logo ou de typographie, mots " +
               "latins ou inventés. Réponds uniquement par la consigne visuelle.",
           },
-          { role: "user", content: context },
+          {
+            role: "user",
+            content:
+              context +
+              (attempt === 0
+                ? ""
+                : "\n\nLa réponse précédente était incomplète. Écris cette fois une phrase complète de 60 à 120 mots terminée par un point."),
+          },
         ],
       }),
-    });
+      });
 
-    if (!res.ok) return null;
-    const payload = await res.json();
-    const text: string = payload?.choices?.[0]?.message?.content ?? "";
-    const result = text.replace(/```/g, "").replace(/\s+/g, " ").trim();
-    return result.length >= 40 ? result.slice(0, 1200) : null;
+      if (!res.ok) return null;
+      const payload = await res.json();
+      const text: string = payload?.choices?.[0]?.message?.content ?? "";
+      const result = text.replace(/```/g, "").replace(/\s+/g, " ").trim();
+      const wordCount = result.split(/\s+/).filter(Boolean).length;
+      if (wordCount >= 45 && /[.!?]$/.test(result)) return result.slice(0, 1200);
+    }
+    return buildFaithfulFallback(input);
   } catch {
-    return null;
+    return buildFaithfulFallback(input);
   }
 }

@@ -22,6 +22,7 @@ import {
   RefreshCw,
   Sparkles,
   Sun,
+  Wand2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -31,6 +32,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Select,
@@ -75,9 +77,9 @@ const STEP_LABELS: Record<Step, string> = {
 };
 
 const STEP_HELP: Record<Step, string> = {
-  1: 'Dites-nous simplement de quel livre il s’agit. Rien à régler, cinq réponses suffisent.',
-  2: 'Choisissez la couverture qui vous plaît le plus. Elle est déjà complète, votre titre est dedans.',
-  3: 'Votre couverture est prête. Téléchargez le fichier, c’est celui que vous déposerez sur Amazon.',
+  1: 'Décrivez le livre, son public et les éléments indispensables : cette base empêchera l’image de partir sur une autre histoire.',
+  2: 'Validez d’abord la scène proposée, puis créez l’illustration et choisissez une composition éditoriale.',
+  3: 'Vérifiez la lisibilité, puis téléchargez ou ouvrez l’éditeur complet pour les retouches finales.',
 };
 
 const FORMAT_ID: Record<FormatChoice, string> = {
@@ -97,6 +99,17 @@ export default function CouvertureExpressPage() {
   const [synopsis, setSynopsis] = useState('');
   const [genreId, setGenreId] = useState('roman');
   const [format, setFormat] = useState<FormatChoice>('ebook');
+  const [targetAudience, setTargetAudience] = useState('');
+  const [era, setEra] = useState('');
+  const [location, setLocation] = useState('');
+  const [focalSubject, setFocalSubject] = useState('');
+  const [emotion, setEmotion] = useState('');
+  const [mustInclude, setMustInclude] = useState('');
+  const [mustAvoid, setMustAvoid] = useState('');
+  const [visualPrompt, setVisualPrompt] = useState('');
+  const [directionBusy, setDirectionBusy] = useState(false);
+  const [directionConfirmed, setDirectionConfirmed] = useState(false);
+  const [lighting, setLighting] = useState('bright');
 
   const [projectId, setProjectId] = useState<string | null>(null);
   const [illustrationPath, setIllustrationPath] = useState<string | null>(null);
@@ -241,9 +254,50 @@ export default function CouvertureExpressPage() {
     }
   };
 
+  const prepareDirection = async () => {
+    if (synopsis.trim().length < 20) {
+      toast.error('Ajoutez un synopsis assez précis pour obtenir une image fidèle.');
+      return;
+    }
+    const genre = getExpressGenre(genreId);
+    setDirectionBusy(true);
+    setDirectionConfirmed(false);
+    try {
+      const { data, error } = await supabase.functions.invoke('cover-visual-prompt', {
+        body: {
+          summary: synopsis,
+          genre: genre.brief.genre,
+          mood: emotion || genre.brief.mood,
+          palette: genre.brief.palette,
+          bookTitle: title,
+          subtitle,
+          targetAudience,
+          era,
+          location,
+          focalSubject,
+          emotion,
+          include: mustInclude,
+          avoid: mustAvoid,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setVisualPrompt(data?.visualPrompt ?? '');
+      toast.success('Direction artistique prête : relisez-la avant de générer.');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Direction artistique indisponible.');
+    } finally {
+      setDirectionBusy(false);
+    }
+  };
+
   /* ---- illustration (fonction sécurisée existante) --------------------- */
   const generateIllustration = async () => {
     if (!projectId) return;
+    if (!visualPrompt.trim() || !directionConfirmed) {
+      toast.error('Préparez puis validez d’abord la direction artistique.');
+      return;
+    }
     const genre = getExpressGenre(genreId);
     setGenerating(true);
     try {
@@ -253,13 +307,20 @@ export default function CouvertureExpressPage() {
           genre: genre.brief.genre,
           mood: genre.brief.mood,
           palette: genre.brief.palette,
-          avoid: 'texte, lettres, logo',
+          avoid: [mustAvoid, 'texte, lettres, logo, bandeau, encart sombre'].filter(Boolean).join(', '),
+          include: mustInclude,
           summary:
             [title.trim(), subtitle.trim()].filter(Boolean).join(' — ') +
             (synopsis.trim() ? `\n\nSynopsis du livre : ${synopsis.trim()}` : ''),
           artStyle: genre.brief.artStyle,
           // Par défaut une image claire : les rendus sombres étaient le principal défaut.
-          lighting: 'bright',
+          lighting,
+          visualPrompt,
+          targetAudience,
+          era,
+          location,
+          focalSubject,
+          emotion,
         },
       });
       if (error) throw error;
@@ -276,18 +337,6 @@ export default function CouvertureExpressPage() {
       setGenerating(false);
     }
   };
-
-  /* Première illustration lancée automatiquement dès l'arrivée à l'étape 2. */
-  const autoTried = useRef(false);
-  useEffect(() => {
-    if (step !== 2 || autoTried.current) return;
-    if (!projectId || illustrationPath || generating) return;
-    if (credits.remaining <= 0 && !key) return;
-    autoTried.current = true;
-    void generateIllustration();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step, projectId, illustrationPath, generating, credits.remaining, key]);
-
 
   /* ---- enregistrement ---------------------------------------------------- */
   const persist = useCallback(
@@ -452,6 +501,36 @@ export default function CouvertureExpressPage() {
                   placeholder="Les Flammes du Passé"
                 />
               </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <Label htmlFor="ex-audience">Lecteurs visés</Label>
+                  <Input id="ex-audience" value={targetAudience} onChange={(e) => setTargetAudience(e.target.value)} placeholder="Adultes, enfants de 8 à 12 ans…" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="ex-era">Époque</Label>
+                  <Input id="ex-era" value={era} onChange={(e) => setEra(e.target.value)} placeholder="Aujourd’hui, années 1940…" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="ex-location">Lieu principal</Label>
+                  <Input id="ex-location" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Paris, bord de mer, forêt…" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="ex-focus">Personnage ou objet central</Label>
+                  <Input id="ex-focus" value={focalSubject} onChange={(e) => setFocalSubject(e.target.value)} placeholder="Une femme de dos, une clé ancienne…" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="ex-emotion">Émotion recherchée</Label>
+                  <Input id="ex-emotion" value={emotion} onChange={(e) => setEmotion(e.target.value)} placeholder="Curiosité, tension, espoir…" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="ex-include">Éléments obligatoires</Label>
+                  <Input id="ex-include" value={mustInclude} onChange={(e) => setMustInclude(e.target.value)} placeholder="Ce qui doit apparaître" />
+                </div>
+                <div className="space-y-1.5 sm:col-span-2">
+                  <Label htmlFor="ex-avoid">Éléments interdits</Label>
+                  <Input id="ex-avoid" value={mustAvoid} onChange={(e) => setMustAvoid(e.target.value)} placeholder="Ce qui ne doit surtout pas apparaître" />
+                </div>
+              </div>
               <div className="space-y-1.5">
                 <Label htmlFor="ex-subtitle">Sous-titre (facultatif)</Label>
                 <Input
@@ -541,6 +620,33 @@ export default function CouvertureExpressPage() {
         {/* ------------------------- Étape 2 ------------------------------ */}
         {step === 2 && (
           <div className="space-y-4">
+            <Card>
+              <CardContent className="space-y-4 p-5">
+                <div>
+                  <h2 className="text-lg font-semibold text-[#232F3E]">Direction artistique de votre couverture</h2>
+                  <p className="text-sm text-muted-foreground">Cette préparation ne consomme aucune génération. L’image ne sera créée qu’après votre confirmation.</p>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-[1fr_220px]">
+                  <Button variant="outline" onClick={() => void prepareDirection()} disabled={directionBusy || synopsis.trim().length < 20} className="gap-2">
+                    {directionBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+                    {visualPrompt ? 'Repréparer la direction' : 'Préparer la direction artistique'}
+                  </Button>
+                  <Select value={lighting} onValueChange={setLighting}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="bright">Lumineuse</SelectItem>
+                      <SelectItem value="balanced">Équilibrée</SelectItem>
+                      <SelectItem value="dark">Dramatique lisible</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Textarea rows={5} value={visualPrompt} onChange={(e) => { setVisualPrompt(e.target.value); setDirectionConfirmed(false); }} placeholder="La scène précise, le cadrage, la lumière et le point focal apparaîtront ici avant la génération." />
+                <div className="flex items-start gap-2 rounded-lg border border-[#008296]/30 bg-[#008296]/5 p-3">
+                  <Checkbox id="express-direction-confirm" checked={directionConfirmed} onCheckedChange={(value) => setDirectionConfirmed(value === true)} />
+                  <Label htmlFor="express-direction-confirm" className="cursor-pointer leading-5">Oui, cette scène correspond bien à mon livre. Je peux utiliser une génération.</Label>
+                </div>
+              </CardContent>
+            </Card>
             <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-white p-3 text-sm">
               <Badge variant={credits.remaining > 0 ? 'default' : 'secondary'}>
                 {credits.remaining} image(s) incluse(s) restante(s)
@@ -601,7 +707,7 @@ export default function CouvertureExpressPage() {
 
             <div className="flex flex-wrap items-center justify-center gap-2">
               <Button
-                disabled={generating}
+                disabled={generating || !directionConfirmed || !visualPrompt.trim()}
                 onClick={() => void generateIllustration()}
                 className="bg-[#f47920] text-white hover:bg-[#d96812]"
               >
@@ -610,7 +716,7 @@ export default function CouvertureExpressPage() {
                 ) : (
                   <Sparkles className="mr-2 h-4 w-4" />
                 )}
-                {illustrationPath ? 'Changer l’illustration' : 'Créer mon illustration'}
+                {illustrationPath ? 'Créer une autre illustration fidèle' : 'Créer mon illustration validée'}
               </Button>
 
               <Button variant="outline" onClick={() => setVariantSeed((v) => v + 1)}>

@@ -100,6 +100,13 @@ export interface WrapComposition {
   imageBrightness?: number;
   /** Voile noir sur la première pour la lisibilité des textes (0 = aucun). */
   overlayOpacity?: number;
+  imageContrast?: number;
+  imageSaturation?: number;
+  imageWarmth?: number;
+  imageScale?: number;
+  imageOffsetX?: number;
+  imageOffsetY?: number;
+  imageFlipX?: boolean;
 }
 
 /** Luminosité bornée : jamais de valeur extrême qui détruirait l'image. */
@@ -113,6 +120,21 @@ export const clampOverlay = (value: unknown): number => {
   const n = typeof value === 'number' && Number.isFinite(value) ? value : 0;
   return Math.min(0.75, Math.max(0, n));
 };
+
+export const clampImageContrast = (value: unknown): number => Math.min(1.4, Math.max(0.7, numValue(value, 1)));
+export const clampImageSaturation = (value: unknown): number => Math.min(1.6, Math.max(0, numValue(value, 1)));
+export const clampImageWarmth = (value: unknown): number => Math.min(20, Math.max(-20, numValue(value, 0)));
+export const clampImageScale = (value: unknown): number => Math.min(2.5, Math.max(1, numValue(value, 1)));
+export const clampImageOffset = (value: unknown): number => Math.min(1, Math.max(-1, numValue(value, 0)));
+
+const numValue = (value: unknown, fallback: number): number =>
+  typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+
+export function wrapImageFilter(composition: WrapComposition): string {
+  const warmth = clampImageWarmth(composition.imageWarmth);
+  const warmthFilter = warmth > 0 ? ` sepia(${(warmth / 60).toFixed(3)})` : warmth < 0 ? ` hue-rotate(${warmth}deg)` : '';
+  return `brightness(${clampBrightness(composition.imageBrightness)}) contrast(${clampImageContrast(composition.imageContrast)}) saturate(${clampImageSaturation(composition.imageSaturation)})${warmthFilter}`;
+}
 
 export const ROLE_LABEL_WRAP: Record<WrapRole, string> = {
   title: 'Titre',
@@ -320,6 +342,13 @@ export function createWrapComposition(params: {
     ],
     imageBrightness: 1,
     overlayOpacity: 0,
+    imageContrast: 1,
+    imageSaturation: 1,
+    imageWarmth: 0,
+    imageScale: 1,
+    imageOffsetX: 0,
+    imageOffsetY: 0,
+    imageFlipX: false,
   };
 }
 
@@ -382,6 +411,13 @@ export function migrateFrontToWrap(
     ],
     imageBrightness: 1,
     overlayOpacity: 0,
+    imageContrast: front.imageContrast ?? 1,
+    imageSaturation: front.imageSaturation ?? 1,
+    imageWarmth: front.imageWarmth ?? 0,
+    imageScale: front.imageScale ?? 1,
+    imageOffsetX: front.imageOffsetX ?? 0,
+    imageOffsetY: front.imageOffsetY ?? 0,
+    imageFlipX: front.imageFlipX ?? false,
   };
 }
 
@@ -469,6 +505,13 @@ export function parseWrapComposition(
     elements: elements.length ? elements : fresh.elements,
     imageBrightness: clampBrightness(o.imageBrightness),
     overlayOpacity: clampOverlay(o.overlayOpacity),
+    imageContrast: clampImageContrast(o.imageContrast),
+    imageSaturation: clampImageSaturation(o.imageSaturation),
+    imageWarmth: clampImageWarmth(o.imageWarmth),
+    imageScale: clampImageScale(o.imageScale),
+    imageOffsetX: clampImageOffset(o.imageOffsetX),
+    imageOffsetY: clampImageOffset(o.imageOffsetY),
+    imageFlipX: Boolean(o.imageFlipX),
   };
 }
 
@@ -489,6 +532,13 @@ export function serializeWrapComposition(
     })),
     imageBrightness: clampBrightness(composition.imageBrightness),
     overlayOpacity: clampOverlay(composition.overlayOpacity),
+    imageContrast: clampImageContrast(composition.imageContrast),
+    imageSaturation: clampImageSaturation(composition.imageSaturation),
+    imageWarmth: clampImageWarmth(composition.imageWarmth),
+    imageScale: clampImageScale(composition.imageScale),
+    imageOffsetX: clampImageOffset(composition.imageOffsetX),
+    imageOffsetY: clampImageOffset(composition.imageOffsetY),
+    imageFlipX: Boolean(composition.imageFlipX),
   };
 }
 

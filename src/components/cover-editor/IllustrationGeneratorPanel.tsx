@@ -15,7 +15,7 @@
  * Aucun autre moteur, aucune clé locale, aucune navigation vers un ancien module.
  */
 import { useCallback, useEffect, useState } from 'react';
-import { BookOpen, Loader2, Sparkles, Wand2 } from 'lucide-react';
+import { BookOpen, CheckCircle2, History, Loader2, Sparkles, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { supabase } from '@/integrations/supabase/client';
@@ -23,6 +23,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Dialog,
@@ -41,7 +42,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import useCoverProAccess from '@/hooks/useCoverProAccess';
-import { getSignedCoverUrl } from '@/lib/coverProjects';
+import { getSignedCoverUrl, listCoverIllustrationHistory } from '@/lib/coverProjects';
 import { cn } from '@/lib/utils';
 
 /** Directions artistiques disponibles (doivent rester alignées sur cover-pro-generate). */
@@ -98,6 +99,14 @@ export default function IllustrationGeneratorPanel({
   /** Consigne visuelle issue de la description, modifiable avant génération. */
   const [visualPrompt, setVisualPrompt] = useState('');
   const [visualBusy, setVisualBusy] = useState(false);
+  const [directionConfirmed, setDirectionConfirmed] = useState(false);
+  const [targetAudience, setTargetAudience] = useState('');
+  const [era, setEra] = useState('');
+  const [location, setLocation] = useState('');
+  const [focalSubject, setFocalSubject] = useState('');
+  const [emotion, setEmotion] = useState('');
+  const [symbol, setSymbol] = useState('');
+  const [include, setInclude] = useState('');
 
 
   const [books, setBooks] = useState<BookOption[]>([]);
@@ -120,8 +129,30 @@ export default function IllustrationGeneratorPanel({
   }, []);
 
   useEffect(() => {
-    if (open) void loadBooks();
-  }, [open, loadBooks]);
+    if (!open) return;
+    void loadBooks();
+    const saved = window.localStorage.getItem(`cover-creative-brief:${projectId}`);
+    if (saved) {
+      try {
+        const brief = JSON.parse(saved) as Record<string, string>;
+        setGenre(brief.genre ?? ''); setMood(brief.mood ?? ''); setPalette(brief.palette ?? '');
+        setAvoid(brief.avoid ?? ''); setSummary(brief.summary ?? ''); setArtStyle(brief.artStyle ?? 'illustration-editoriale');
+        setLighting(brief.lighting ?? 'bright'); setVisualPrompt(brief.visualPrompt ?? '');
+        setTargetAudience(brief.targetAudience ?? ''); setEra(brief.era ?? ''); setLocation(brief.location ?? '');
+        setFocalSubject(brief.focalSubject ?? ''); setEmotion(brief.emotion ?? ''); setSymbol(brief.symbol ?? '');
+        setInclude(brief.include ?? '');
+      } catch { /* ancienne donnée locale illisible : ignorée */ }
+    }
+    void listCoverIllustrationHistory(projectId).then((items) => setProposals(items));
+  }, [open, loadBooks, projectId]);
+
+  useEffect(() => {
+    if (!open) return;
+    window.localStorage.setItem(`cover-creative-brief:${projectId}`, JSON.stringify({
+      genre, mood, palette, avoid, summary, artStyle, lighting, visualPrompt,
+      targetAudience, era, location, focalSubject, emotion, symbol, include,
+    }));
+  }, [open, projectId, genre, mood, palette, avoid, summary, artStyle, lighting, visualPrompt, targetAudience, era, location, focalSubject, emotion, symbol, include]);
 
   /* ---- brief proposé par IA (aucun crédit image) ------------------------ */
   const proposeBrief = async () => {
@@ -159,13 +190,14 @@ export default function IllustrationGeneratorPanel({
     setError(null);
     try {
       const { data, error: fnError } = await supabase.functions.invoke('cover-visual-prompt', {
-        body: { summary, genre, mood, palette },
+        body: { summary, genre, mood, palette, targetAudience, era, location, focalSubject, emotion, symbol, include, avoid },
       });
       if (fnError) throw fnError;
       if (data?.error) throw new Error(data.error);
       const proposed = data?.visualPrompt as string | undefined;
       if (!proposed) throw new Error('Consigne visuelle indisponible.');
       setVisualPrompt(proposed);
+      setDirectionConfirmed(false);
       toast.success('Consigne visuelle proposée : modifiez-la si besoin, puis générez.');
     } catch (err) {
       const message =
@@ -179,6 +211,14 @@ export default function IllustrationGeneratorPanel({
 
   /* ---- génération d'illustration(s) ------------------------------------- */
   const generate = async () => {
+    if (!visualPrompt.trim()) {
+      setError('Faites d’abord préparer la direction visuelle à partir du synopsis.');
+      return;
+    }
+    if (!directionConfirmed) {
+      setError('Confirmez que la direction visuelle correspond bien à votre livre.');
+      return;
+    }
     setBusy(true);
     setError(null);
     const created: Proposal[] = [];
@@ -192,10 +232,17 @@ export default function IllustrationGeneratorPanel({
             mood,
             palette,
             avoid,
+            include,
             summary,
             artStyle,
             lighting,
             visualPrompt: visualPrompt.trim() || undefined,
+            targetAudience,
+            era,
+            location,
+            focalSubject,
+            emotion,
+            symbol,
           },
         });
         if (fnError) throw fnError;
@@ -204,7 +251,7 @@ export default function IllustrationGeneratorPanel({
         if (!path) throw new Error('Aucune image renvoyée.');
         const url = await getSignedCoverUrl(path);
         created.push({ path, url });
-        setProposals((prev) => [...created, ...prev.filter((p) => !created.some((c) => c.path === p.path))]);
+        setProposals((prev) => [...created, ...prev.filter((p) => !created.some((c) => c.path === p.path))].slice(0, 12));
       }
 
       // La dernière image générée devient l'illustration active ; les autres
@@ -233,7 +280,7 @@ export default function IllustrationGeneratorPanel({
   };
 
   const noFunding = !loading && credits.remaining <= 0 && !key;
-  const maxCount = key ? 4 : Math.max(1, Math.min(4, credits.remaining));
+  const maxCount = key ? 3 : Math.max(1, Math.min(3, credits.remaining));
 
   return (
     <Dialog open={open} onOpenChange={(v) => !busy && setOpen(v)}>
@@ -357,6 +404,34 @@ export default function IllustrationGeneratorPanel({
                   placeholder="Visages, animaux…"
                 />
               </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ill-audience">Lecteurs visés</Label>
+                <Input id="ill-audience" value={targetAudience} onChange={(e) => setTargetAudience(e.target.value)} placeholder="Adultes, enfants de 8 à 12 ans…" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ill-era">Époque</Label>
+                <Input id="ill-era" value={era} onChange={(e) => setEra(e.target.value)} placeholder="Aujourd’hui, années 1940…" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ill-location">Lieu principal</Label>
+                <Input id="ill-location" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Paris, bord de mer, château…" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ill-focus">Personnage ou objet central</Label>
+                <Input id="ill-focus" value={focalSubject} onChange={(e) => setFocalSubject(e.target.value)} placeholder="Une femme de dos, une montre ancienne…" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ill-emotion">Émotion à provoquer</Label>
+                <Input id="ill-emotion" value={emotion} onChange={(e) => setEmotion(e.target.value)} placeholder="Curiosité, tension, espoir…" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ill-symbol">Symbole important</Label>
+                <Input id="ill-symbol" value={symbol} onChange={(e) => setSymbol(e.target.value)} placeholder="Une lettre brûlée, une clé…" />
+              </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label htmlFor="ill-include">Éléments obligatoires</Label>
+                <Input id="ill-include" value={include} onChange={(e) => setInclude(e.target.value)} placeholder="Ce qui doit absolument apparaître" />
+              </div>
             </div>
 
             {/* Direction artistique (qualité best-seller) */}
@@ -435,7 +510,7 @@ export default function IllustrationGeneratorPanel({
                 id="ill-visual"
                 rows={4}
                 value={visualPrompt}
-                onChange={(e) => setVisualPrompt(e.target.value)}
+                onChange={(e) => { setVisualPrompt(e.target.value); setDirectionConfirmed(false); }}
                 placeholder="Consigne visuelle : sujet principal, décor, époque, cadrage, lumière…"
               />
               <p className="text-xs text-muted-foreground">
@@ -443,12 +518,18 @@ export default function IllustrationGeneratorPanel({
                 Si vous la laissez vide, elle est déduite automatiquement de votre description.
                 Cette étape ne consomme aucune génération.
               </p>
+              <div className="flex items-start gap-2 rounded-md border border-primary/30 bg-primary/5 p-3">
+                <Checkbox id="ill-confirm-direction" checked={directionConfirmed} onCheckedChange={(value) => setDirectionConfirmed(value === true)} />
+                <Label htmlFor="ill-confirm-direction" className="cursor-pointer leading-5">
+                  Oui, c’est bien l’image de mon livre. Les éléments indiqués sont fidèles au synopsis.
+                </Label>
+              </div>
             </div>
 
             {/* 3. Nombre de propositions */}
             <div className="flex flex-wrap items-center gap-2">
               <Label className="text-sm">Nombre de propositions :</Label>
-              {[1, 2, 3, 4].map((n) => (
+              {[1, 2, 3].map((n) => (
                 <button
                   key={n}
                   type="button"
@@ -463,14 +544,14 @@ export default function IllustrationGeneratorPanel({
                 </button>
               ))}
               <span className="text-xs text-muted-foreground">
-                Chaque proposition consomme une génération.
+                {count} proposition{count > 1 ? 's' : ''} = {count} génération{count > 1 ? 's' : ''}.
               </span>
             </div>
 
             {/* Propositions déjà générées */}
             {proposals.length > 0 && (
               <div className="space-y-2">
-                <Label className="text-sm">Propositions de cette session</Label>
+                <Label className="flex items-center gap-2 text-sm"><History className="h-4 w-4" /> Illustrations privées de ce projet</Label>
                 <div className="grid grid-cols-4 gap-2">
                   {proposals.map((p) => (
                     <button
@@ -517,7 +598,7 @@ export default function IllustrationGeneratorPanel({
               <Button variant="ghost" onClick={() => setOpen(false)} disabled={busy}>
                 Fermer et continuer l’édition
               </Button>
-              <Button onClick={() => void generate()} disabled={busy || noFunding}>
+              <Button onClick={() => void generate()} disabled={busy || noFunding || !visualPrompt.trim() || !directionConfirmed}>
                 {busy ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -526,7 +607,8 @@ export default function IllustrationGeneratorPanel({
                 ) : (
                   <>
                     <Sparkles className="mr-2 h-4 w-4" />
-                    {count > 1 ? `Générer ${count} propositions` : 'Générer l’image'}
+                    <CheckCircle2 className="mr-2 h-4 w-4" />
+                    {count > 1 ? `Générer ${count} propositions validées` : 'Générer l’image validée'}
                   </>
                 )}
               </Button>

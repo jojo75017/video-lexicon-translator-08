@@ -27,6 +27,7 @@ import {
   Trash2,
   TriangleAlert,
   Undo2,
+  FlipHorizontal2,
 } from 'lucide-react';
 
 import IllustrationGeneratorPanel from '@/components/cover-editor/IllustrationGeneratorPanel';
@@ -77,6 +78,7 @@ import {
 } from '@/lib/cover-editor/frontComposition';
 import ReferenceTemplateGallery from '@/components/cover-editor/ReferenceTemplateGallery';
 import CoverTemplateThumb from '@/components/cover-editor/CoverTemplateThumb';
+import CoverQualityPanel from '@/components/cover-editor/CoverQualityPanel';
 import ShapeLayersPanel from '@/components/cover-editor/ShapeLayersPanel';
 import {
   applyReferenceTemplate,
@@ -260,6 +262,10 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
         imageContrast: 1,
         imageSaturation: 1,
         imageWarmth: 0,
+        imageScale: 1,
+        imageOffsetX: 0,
+        imageOffsetY: 0,
+        imageFlipX: false,
       }),
       false,
     );
@@ -718,6 +724,8 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
         </p>
       )}
 
+      <CoverQualityPanel composition={composition} hasIllustration={Boolean(bgUrl)} />
+
       {/* 3 maquettes de référence professionnelles */}
       <ReferenceTemplateGallery
         activeId={(composition.templateId as ReferenceTemplateId | null) ?? null}
@@ -1004,6 +1012,9 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
                     WebkitTextStrokeColor: layer.outline?.enabled ? layer.outline.color : undefined,
                     whiteSpace: 'pre-wrap',
                     wordBreak: 'break-word',
+                    filter: layer.glow?.enabled
+                      ? `drop-shadow(0 0 ${(layer.glow.blur ?? 30) * scale}px ${layer.glow.color})`
+                      : undefined,
                   }}
                   data-cover-layer={layer.role}
                 >
@@ -1037,6 +1048,34 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
               </div>
 
               <div className="mt-3 space-y-3">
+                <div>
+                  <Label className="text-xs text-muted-foreground">
+                    Zoom et recadrage · {Math.round((composition.imageScale ?? 1) * 100)} %
+                  </Label>
+                  <Slider
+                    className="mt-1"
+                    min={1}
+                    max={2.5}
+                    step={0.05}
+                    value={[composition.imageScale ?? 1]}
+                    onValueChange={([v]) => commit((prev) => ({ ...prev, imageScale: v }), false)}
+                  />
+                </div>
+                {(composition.imageScale ?? 1) > 1 && (
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Déplacer horizontalement</Label>
+                      <Slider min={-1} max={1} step={0.05} value={[composition.imageOffsetX ?? 0]} onValueChange={([v]) => commit((prev) => ({ ...prev, imageOffsetX: v }), false)} />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Déplacer verticalement</Label>
+                      <Slider min={-1} max={1} step={0.05} value={[composition.imageOffsetY ?? 0]} onValueChange={([v]) => commit((prev) => ({ ...prev, imageOffsetY: v }), false)} />
+                    </div>
+                  </div>
+                )}
+                <Button variant={composition.imageFlipX ? 'default' : 'outline'} size="sm" onClick={() => commit((prev) => ({ ...prev, imageFlipX: !prev.imageFlipX }))} className="gap-1">
+                  <FlipHorizontal2 className="h-4 w-4" /> Retourner horizontalement
+                </Button>
                 <div>
                   <Label className="text-xs text-muted-foreground">
                     Luminosité · {Math.round(frontBrightness * 100)} %

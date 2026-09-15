@@ -54,6 +54,12 @@ export interface CoverProjectInput {
   kdp_rules_version?: string | null;
 }
 
+export interface CoverIllustrationHistoryItem {
+  path: string;
+  url: string | null;
+  createdAt: number;
+}
+
 export class CoverAuthRequiredError extends Error {
   constructor() {
     super('Connexion requise : impossible d’enregistrer une couverture sans session authentifiée.');
@@ -191,6 +197,38 @@ export async function getSignedCoverUrl(
     .createSignedUrl(path, expiresInSeconds);
   if (error) return null;
   return data?.signedUrl ?? null;
+}
+
+/**
+ * Relit les illustrations déjà créées pour ce projet dans le dossier privé.
+ * Aucun fichier n'est copié ou rendu public : seules des URL temporaires sont créées.
+ */
+export async function listCoverIllustrationHistory(
+  projectId: string,
+  limit = 12,
+): Promise<CoverIllustrationHistoryItem[]> {
+  const userId = await requireUserId();
+  const folder = `${userId}/${projectId}`;
+  const { data, error } = await supabase.storage
+    .from(COVERS_BUCKET)
+    .list(folder, { limit: 100, sortBy: { column: 'created_at', order: 'desc' } });
+  if (error) return [];
+
+  const files = (data ?? [])
+    .filter((file) => /^illustration-\d+\.(png|jpe?g|webp)$/i.test(file.name))
+    .slice(0, Math.max(1, limit));
+
+  return Promise.all(
+    files.map(async (file) => {
+      const path = `${folder}/${file.name}`;
+      const stamp = Number(file.name.match(/illustration-(\d+)/)?.[1] ?? 0);
+      return {
+        path,
+        url: await getSignedCoverUrl(path),
+        createdAt: stamp,
+      };
+    }),
+  );
 }
 
 export async function removeCoverFile(path: string): Promise<boolean> {
