@@ -85,7 +85,7 @@ export type BookBrief = {
   creationPath?: 'story' | 'biography' | 'existing-outline';
   /** L'abonné souhaite des illustrations IA à l'intérieur du livre. */
   wantsIllustrations?: boolean;
-  characters?: Array<{ name?: string; role?: string; description?: string; traits?: string }>;
+  characters?: Array<{ name?: string; role?: string; description?: string; traits?: string; age?: string }>;
   cibleProfil?: string;
   cibleNiveau?: string;
   cibleBesoins?: string;
@@ -127,6 +127,32 @@ export type BookBrief = {
   preface?: string;
   /** Mot de la fin imprimé après le dernier chapitre. */
   afterword?: string;
+
+  /* ——— Fiche complète du livre (parcours « J'ai déjà mon sommaire ») ——— */
+  /** Genre littéraire tel que l'auteur l'écrit (ex. « Drame d'époque, suspense »). */
+  genre?: string;
+  /** Format visé (ex. « Roman grand format ou Ebook »). */
+  format?: string;
+  /** Nombre de pages visé (texte libre : « 250 à 300 »). */
+  targetPages?: string;
+  /** Nombre de mots visé (texte libre : « 60 000 à 75 000 »). */
+  targetWords?: string;
+  /** Accroche commerciale / quatrième de couverture. */
+  hook?: string;
+  /** Synopsis long. */
+  synopsis?: string;
+  /** Traducteur crédité. */
+  translator?: string;
+  /** Épilogue : résumé ou contenu voulu par l'auteur. */
+  epilogue?: string;
+  /** Les 3 pages auteur imprimées en fin de livre. */
+  authorPages?: { about?: string; otherBooks?: string; contact?: string };
+  /** Remerciements. */
+  acknowledgements?: string;
+  /** Note invitant le lecteur à laisser un avis. */
+  reviewNote?: string;
+  /** Lien encodé dans le QR code des avis (page auteur ou fiche du livre). */
+  reviewQrUrl?: string;
 };
 
 /** Polices de livre proposées à l'auteur. */
@@ -630,6 +656,129 @@ export function parseTocText(text: string): BriefOutlineChapter[] {
     });
   }
   return normalizeOutline(chapters);
+}
+
+/** Champs reconnus dans une fiche de livre collée par l'auteur. */
+export type ParsedBookSheet = Partial<Pick<BookBrief,
+  'title' | 'subtitle' | 'genre' | 'format' | 'targetPages' | 'targetWords' | 'hook' | 'synopsis'
+  | 'author' | 'translator' | 'category' | 'epilogue' | 'acknowledgements'>> & {
+  characters?: NonNullable<BookBrief['characters']>;
+  outline?: BriefOutlineChapter[];
+};
+
+const SHEET_LABELS: Array<[RegExp, keyof ParsedBookSheet]> = [
+  [/^titre$/i, 'title'],
+  [/^sous[- ]titre$/i, 'subtitle'],
+  [/^genre$/i, 'genre'],
+  [/^format(\s+vis[ée]|\s+souhait[ée])?$/i, 'format'],
+  [/^accroche(\s+commerciale)?$/i, 'hook'],
+  [/^(synopsis|r[ée]sum[ée])$/i, 'synopsis'],
+  [/^(auteur|nom d.auteur)$/i, 'author'],
+  [/^traducteur$/i, 'translator'],
+  [/^cat[ée]gorie(s)?$/i, 'category'],
+  [/^remerciements$/i, 'acknowledgements'],
+];
+
+/** Nettoie une ligne de fiche : puces, emojis décoratifs, tabulations. */
+function sheetLine(raw: string): string {
+  return String(raw || '')
+    .replace(/^[\s•●▪◦*+\-–—\u2022]+/, '')
+    .replace(/^[\u{1F300}-\u{1FAFF}\u2600-\u27BF]\s*/u, '')
+    .replace(/_{3,}|-{3,}/g, '')
+    .replace(/\t+/g, ' ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
+/**
+ * Analyse une fiche complète collée par l'auteur (titre, sous-titre, genre,
+ * accroche, personnages, plan en actes, épilogue). Rien n'est reformulé :
+ * chaque valeur reconnue est reprise mot pour mot.
+ */
+export function parseBookSheet(text: string): ParsedBookSheet {
+  const result: ParsedBookSheet = {};
+  const lines = String(text || '').split(/\r?\n/);
+  const characters: NonNullable<BookBrief['characters']> = [];
+  let section: 'none' | 'characters' | 'plan' = 'none';
+  let current: NonNullable<BookBrief['characters']>[number] | null = null;
+
+  const pushCharacter = () => {
+    if (current && (current.name || '').length > 1) characters.push(current);
+    current = null;
+  };
+
+  for (const rawLine of lines) {
+    const line = sheetLine(rawLine);
+    if (!line) continue;
+
+    if (/personnages/i.test(line) && line.length < 60) { pushCharacter(); section = 'characters'; continue; }
+    if (/(plan d[ée]taill|plan de l.histoire|sommaire|table des mati|d[ée]coupage)/i.test(line) && line.length < 80) {
+      pushCharacter(); section = 'plan'; continue;
+    }
+    if (/^(fiche du livre|prochaine [ée]tape)/i.test(line)) { pushCharacter(); section = 'none'; continue; }
+
+    // « Libellé : valeur »
+    const labelled = line.match(/^([A-Za-zÀ-ÿ' -]{3,30})\s*:\s*(.+)$/);
+    if (labelled && section !== 'plan') {
+      const label = labelled[1].trim();
+      const value = labelled[2].trim();
+      const found = SHEET_LABELS.find(([re]) => re.test(label));
+      if (found) { (result as Record<string, string>)[found[1] as string] = value; continue; }
+      if (section === 'characters' && current) {
+        if (/^[âa]ge$/i.test(label)) { current.age = value; continue; }
+        if (/^r[ôo]le$/i.test(label)) { current.role = value; continue; }
+        if (/^personnalit[ée]$/i.test(label)) { current.traits = value; continue; }
+        if (/^(enjeu|probl[èe]me|dynamique|description)$/i.test(label)) {
+          current.description = [current.description, `${label} : ${value}`].filter(Boolean).join(' ');
+          continue;
+        }
+      }
+    }
+
+    if (section === 'characters') {
+      // « 1. Hélène Mercier (alias …) – L'héroïne »
+      const head = line.match(/^\d+[.)]\s*(.+)$/);
+      if (head) {
+        pushCharacter();
+        const [name, ...rest] = head[1].split(/\s+[–—-]\s+/);
+        current = { name: name.trim(), role: rest.join(' — ').trim() || undefined };
+        continue;
+      }
+      if (current) current.description = [current.description, line].filter(Boolean).join(' ');
+      continue;
+    }
+
+    if (section === 'plan') {
+      const epilogue = line.match(/^[•\s]*(?:épilogue|epilogue)\s*[:.)-]*\s*(.+)$/i);
+      if (epilogue) result.epilogue = [result.epilogue, epilogue[1].trim()].filter(Boolean).join(' ');
+      continue;
+    }
+
+    // Pages visées / mots visés hors libellés stricts
+    if (!result.targetPages) {
+      const pages = line.match(/(\d[\d\s]{1,6}(?:\s*[àa]\s*\d[\d\s]{1,6})?)\s*pages/i);
+      if (pages) result.targetPages = pages[1].replace(/\s+/g, ' ').trim();
+    }
+    if (!result.targetWords) {
+      const words = line.match(/(\d[\d\s]{1,9}(?:\s*[àa]\s*\d[\d\s]{1,9})?)\s*mots/i);
+      if (words) result.targetWords = words[1].replace(/\s+/g, ' ').trim();
+    }
+  }
+  pushCharacter();
+
+  if (!result.targetPages || !result.targetWords) {
+    const format = result.format || '';
+    const pages = format.match(/(\d[\d\s]{1,6}(?:\s*[àa]\s*\d[\d\s]{1,6})?)\s*pages/i);
+    const words = format.match(/(\d[\d\s]{1,9}(?:\s*[àa]\s*\d[\d\s]{1,9})?)\s*mots/i);
+    if (pages && !result.targetPages) result.targetPages = pages[1].replace(/\s+/g, ' ').trim();
+    if (words && !result.targetWords) result.targetWords = words[1].replace(/\s+/g, ' ').trim();
+  }
+
+  if (characters.length) result.characters = characters;
+  const outline = parseTocText(text);
+  if (outline.length) result.outline = outline;
+  if (result.title) result.title = result.title.replace(/^«\s*|\s*»$/g, '').trim();
+  return result;
 }
 
 export function normalizeOutline(items: BriefOutlineChapter[]): BriefOutlineChapter[] {

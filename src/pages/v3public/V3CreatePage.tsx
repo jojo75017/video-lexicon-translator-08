@@ -16,6 +16,7 @@ import V3GenieOutlinePanel from '@/components/v3public/V3GenieOutlinePanel';
 import V3BookActionsBar from '@/components/v3public/V3BookActionsBar';
 import V3OutlineCoBuilder from '@/components/v3public/V3OutlineCoBuilder';
 import V3PassageCorrector from '@/components/v3public/V3PassageCorrector';
+import V3BookSheetForm from '@/components/v3public/V3BookSheetForm';
 
 import { BOOK_BRIEF_EVENT, clearBookBrief, parseTocText, readBookBrief, writeBookBrief, type BriefOutlineChapter, type BookBrief } from '@/lib/v3/bookBrief';
 import { restoreDraftState, saveBookDraftToCloud, BOOK_DRAFT_STATUS_EVENT, type BookDraftStatus } from '@/lib/v3/bookDraftCloud';
@@ -559,6 +560,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                     </div>
                   </div>
                 )}
+                {existingOutlineActive && <V3BookSheetForm />}
                 {existingOutlineActive && (
                   <div className="v3-card mb-4" style={{ borderColor: 'var(--v3-gold, #c9a84c)' }}>
                     <p className="text-[13px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
