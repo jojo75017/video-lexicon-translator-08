@@ -16,7 +16,27 @@ const KEYS = [
   "mustAvoid",
 ] as const;
 
-const str = (value: unknown) => (typeof value === "string" ? value.trim().slice(0, 200) : "");
+const str = (value: unknown): string => {
+  if (typeof value === "string") return value.trim().slice(0, 200);
+  if (Array.isArray(value)) return value.map((v) => str(v)).filter(Boolean).join(", ").slice(0, 200);
+  if (value && typeof value === "object") {
+    return Object.values(value as Record<string, unknown>).map((v) => str(v)).filter(Boolean).join(", ").slice(0, 200);
+  }
+  return "";
+};
+
+/** Récupère une clé quel que soit son emballage (details, data, casse). */
+function pick(source: Record<string, unknown>, key: string): string {
+  const direct = str(source[key]);
+  if (direct) return direct;
+  for (const value of Object.values(source)) {
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      const nested = str((value as Record<string, unknown>)[key]);
+      if (nested) return nested;
+    }
+  }
+  return "";
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
