@@ -76,6 +76,7 @@ import {
   type TextRole,
 } from '@/lib/cover-editor/frontComposition';
 import ReferenceTemplateGallery from '@/components/cover-editor/ReferenceTemplateGallery';
+import CoverTemplateThumb from '@/components/cover-editor/CoverTemplateThumb';
 import ShapeLayersPanel from '@/components/cover-editor/ShapeLayersPanel';
 import {
   applyReferenceTemplate,
@@ -709,13 +710,21 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                Modèles professionnels <Badge variant="secondary">{COVER_TEMPLATES.length} modèles</Badge>
+                Modèles de couverture <Badge variant="secondary">{COVER_TEMPLATES.length} mises en page</Badge>
               </div>
 
               <p className="text-xs text-muted-foreground">
-                Le modèle conserve votre illustration et vos textes : il ne change que la mise en
-                page, les polices et les styles. Tous les réglages restent modifiables ensuite.
+                Chaque aperçu est une vraie couverture rendue avec votre illustration, votre titre et
+                votre nom : le modèle ne change que la mise en page, les polices et les styles. Tous
+                les réglages restent modifiables ensuite.
               </p>
+              {!bgImage && (
+                <p className="mt-1 text-xs font-medium text-[#c1600f]">
+                  Aucune illustration pour le moment : les aperçus utilisent une image de
+                  démonstration. Générez votre illustration en haut de page pour voir votre vraie
+                  couverture.
+                </p>
+              )}
             </div>
             {templateBackup && (
               <Button variant="outline" size="sm" onClick={cancelTemplate} className="gap-1">
@@ -759,7 +768,6 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
             {visibleTemplates.map((tpl) => {
               const active = composition.templateId === tpl.id;
               const variantIndex = active ? templateVariant : 0;
-              const variant = tpl.variants[variantIndex] ?? tpl.variants[0];
               return (
                 <div
                   key={tpl.id}
@@ -774,33 +782,12 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
                     data-cover-template={tpl.id}
                     className="w-full text-left"
                   >
-                    <div
-                      className={cn(
-                        'relative mb-2 flex h-40 w-full flex-col items-center overflow-hidden rounded-lg px-3 py-4 text-white',
-                        variant.gradient,
-                      )}
-                    >
-                      <div
-                        className={cn(
-                          'w-full rounded px-1 text-center',
-                          tpl.preview.bandClass,
-                          tpl.preview.titleClass,
-                        )}
-                      >
-                        Titre du livre
-                      </div>
-                      <div className={cn('mt-2 w-full text-center', tpl.preview.subtitleClass)}>
-                        Sous-titre
-                      </div>
-                      <div
-                        className={cn(
-                          'absolute bottom-3 left-0 w-full text-center',
-                          tpl.preview.authorClass,
-                        )}
-                      >
-                        Georges Boubet
-                      </div>
-                    </div>
+                    <CoverTemplateThumb
+                      template={tpl}
+                      variantIndex={variantIndex}
+                      composition={composition}
+                      projectImage={bgImage}
+                    />
                     <p className="text-sm font-semibold text-foreground">{tpl.label}</p>
                     <p className="text-xs text-muted-foreground">{tpl.description}</p>
                   </button>
