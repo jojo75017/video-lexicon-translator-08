@@ -10,9 +10,16 @@ import { V3_HEADER_MENU, type MenuCategory } from '@/data/v3HeaderMenu';
  */
 export default function V3MainTabs() {
   const [openKey, setOpenKey] = useState<string | null>(null);
+  const [anchorLeft, setAnchorLeft] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
   const closeTimer = useRef<number | null>(null);
   const { pathname, search } = useLocation();
+
+  const openCat = (key: string, el: HTMLElement) => {
+    if (closeTimer.current) window.clearTimeout(closeTimer.current);
+    setAnchorLeft(el.getBoundingClientRect().left);
+    setOpenKey(key);
+  };
 
   const scheduleClose = () => {
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
