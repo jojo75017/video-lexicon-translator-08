@@ -101,8 +101,8 @@ export default function V3HomePage() {
         <V3ResumeBookCard compact />
       </div>
 
-      </div>
       <V3StartBookBar />
+
       <V3BriefRecap />
 
       {/* 8. POUR ALLER PLUS LOIN — agents, workflow, KDP Pilot */}
