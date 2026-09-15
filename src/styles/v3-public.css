@@ -347,3 +347,17 @@
   background: var(--amb-surface, #fff) !important;
   color: var(--amb-text, inherit);
 }
+
+/* Anti-débordement horizontal : aucun élément large ne décale l'en-tête */
+.v3pub {
+  overflow-x: clip;
+}
+
+/* Zone scrollable sans barre de défilement visible */
+.v3-no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.v3-no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
