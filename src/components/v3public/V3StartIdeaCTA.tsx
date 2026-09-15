@@ -26,7 +26,7 @@ export default function V3StartIdeaCTA({ variant = 'full' }: Props) {
               Pas encore d’idée ? Parlez-en avec l’IA
             </span>
             <span className="mt-1 block text-xs leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
-              Quelques questions simples, et vous repartez avec un sujet précis.
+              Une vraie discussion libre, comme avec ChatGPT : posez vos questions, elle répond.
             </span>
           </span>
         </Link>
