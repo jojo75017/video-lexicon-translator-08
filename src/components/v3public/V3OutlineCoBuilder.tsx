@@ -96,7 +96,7 @@ export default function V3OutlineCoBuilder({ outlineFirst }: Props = {}) {
           mode: 'outline-step',
           // Biographie : chapitres = périodes de vie dans l'ordre chronologique.
           kind: brief.mode === 'biography' ? 'biography' : 'book',
-          message: (extra || note || '').trim(),
+          message: indication,
           userApiKey,
           accepted: outline.map((c) => ({ titre: c.titre, objectif: c.objectif, sources: c.sources || [] })),
           target,
@@ -107,10 +107,16 @@ export default function V3OutlineCoBuilder({ outlineFirst }: Props = {}) {
           factMemory: brief.factMemory || [],
           tone: brief.tone || '',
           language: brief.language || 'fr',
+          outlineFirst: useOutlineFirst,
         },
       });
       if (error) throw error;
       if ((data as any)?.error) throw new Error((data as any).error);
+      // En mode sommaire-d'abord, on mémorise l'indication donnée pour que les
+      // propositions suivantes en tiennent compte (comme les réponses aux questions).
+      if (useOutlineFirst && indication) {
+        patch({ factMemory: [...(brief.factMemory || []), `Indication chapitre : ${indication}`] });
+      }
       const list = Array.isArray((data as any)?.chapters) ? (data as any).chapters : [];
       setProposals(list.map((c: any) => ({
         titre: String(c.titre || ''),
