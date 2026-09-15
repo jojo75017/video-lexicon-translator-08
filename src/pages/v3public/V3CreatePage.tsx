@@ -135,6 +135,38 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
     toast.success('Votre projet est prêt : donnez maintenant vos indications de chapitre.');
   };
 
+  // Sommaire déjà écrit par l'auteur : une ligne = un chapitre.
+  const [pastedOutline, setPastedOutline] = useState('');
+  const importPastedOutline = () => {
+    const lines = pastedOutline
+      .split('\n')
+      .map((l) => l.replace(/^\s*(chapitre\s*)?\d+\s*[.)\-–:]*\s*/i, '').trim())
+      .filter((l) => l.length >= 2);
+    if (lines.length < 1) { toast.error('Collez votre sommaire : une ligne par chapitre.'); return; }
+    if (lines.length > 40) { toast.error('40 chapitres maximum.'); return; }
+    const chapters: BriefOutlineChapter[] = lines.slice(0, 40).map((line, i) => {
+      const [titre, ...rest] = line.split(/\s*[—–|:]\s*/);
+      return {
+        numero: i + 1,
+        titre: (titre || line).slice(0, 160),
+        objectif: rest.join(' — ').trim() || undefined,
+      };
+    });
+    const current = readBookBrief() || {};
+    writeBookBrief({
+      ...current,
+      outline: chapters,
+      chapters: chapters.length,
+      outlineValidated: false,
+      outlineFirst: true,
+    });
+    window.dispatchEvent(new Event(BOOK_BRIEF_EVENT));
+    setPastedOutline('');
+    toast.success(`${chapters.length} chapitre(s) enregistrés — relisez puis validez le sommaire.`);
+  };
+
+
+
 
 
   useEffect(() => { seedHubConfig(idea, genre, type); }, [idea, genre, type]);
@@ -362,10 +394,10 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                 <button
                   type="button"
                   onClick={startOutlineFirst}
-                  className="v3-btn text-xs"
-                  style={{ background: 'var(--v3-orange, #FF9E2D)', color: '#232F3E', fontWeight: 600 }}
+                  className="v3-btn v3-btn-gold text-xs"
                 >
-                  <BookOpen className="w-3.5 h-3.5" /> Je pars d’un sommaire
+                  <BookOpen className="w-3.5 h-3.5" /> J’ai déjà mon sommaire
+
                 </button>
               </div>
             </>
@@ -483,7 +515,31 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                     </div>
                   </div>
                 )}
+                {outlineFirstActive && (
+                  <div className="v3-card mb-4" style={{ borderColor: 'var(--v3-gold, #c9a84c)' }}>
+                    <p className="text-[13px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+                      Mon sommaire existe déjà — je le colle ici
+                    </p>
+                    <p className="mt-1 text-[11.5px]" style={{ color: 'var(--v3-muted)' }}>
+                      Une ligne par chapitre. Vous pouvez ajouter une précision après un tiret :
+                      « Chapitre 3 — le jour où tout a changé ». Rien n’est réécrit : vos titres sont
+                      enregistrés tels quels, puis vous validez le sommaire juste en dessous.
+                    </p>
+                    <textarea
+                      value={pastedOutline}
+                      onChange={(e) => setPastedOutline(e.target.value)}
+                      rows={8}
+                      placeholder={'1. Le départ — pourquoi je quitte tout\n2. La ville inconnue\n3. La rencontre'}
+                      className="mt-3 w-full rounded-xl border bg-white px-3 py-2 text-[12.5px] outline-none"
+                      style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }}
+                    />
+                    <button type="button" onClick={importPastedOutline} className="v3-btn v3-btn-gold mt-3 text-xs">
+                      Enregistrer mon sommaire
+                    </button>
+                  </div>
+                )}
                 <V3OutlineCoBuilder outlineFirst={outlineFirstActive} />
+
                 <div id="sommaire-ia" className="mt-5">
                   <V3GenieOutlinePanel key={briefKey} outlineMode={sommaireIa ? 'guided' : undefined} />
                 </div>
