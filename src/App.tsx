@@ -159,6 +159,7 @@ const V3FeaturesPage = lazy(() => import('./pages/v3public/V3FeaturesPage'));
 const V3WorkflowPage = lazy(() => import('./pages/v3public/V3WorkflowPage'));
 const V3StartHerePage = lazy(() => import('./pages/v3public/V3StartHerePage'));
 const V3ApiKeysPage = lazy(() => import('./pages/v3public/V3ApiKeysPage'));
+const V3ByokChatPage = lazy(() => import('./pages/v3public/V3ByokChatPage'));
 const V3CoordonneesPage = lazy(() => import('./pages/v3public/V3CoordonneesPage'));
 const V3ReseauxPage = lazy(() => import('./pages/v3public/V3ReseauxPage'));
 const V3IntegrationsPage = lazy(() => import('./pages/v3public/V3IntegrationsPage'));
@@ -725,6 +726,7 @@ const App = () => {
               <Route path="offre-couverture-v4" element={<V3CoverOfferPage />} />
               <Route path="fonctionnalites" element={<V3FeaturesPage />} />
               <Route path="fonctionnalites/cles" element={<V3ApiKeysPage />} />
+              <Route path="discuter-ia" element={<V3ByokChatPage />} />
               <Route path="fonctionnalites/coordonnees" element={<V3CoordonneesPage />} />
               <Route path="fonctionnalites/reseaux" element={<V3ReseauxPage />} />
               <Route path="fonctionnalites/integrations" element={<V3IntegrationsPage />} />
