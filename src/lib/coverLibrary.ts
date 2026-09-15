@@ -170,6 +170,20 @@ const listCoversInRoot = async (storageRoot: string): Promise<SavedCover[]> => {
   }
 };
 
+/** Toutes les couvertures sauvegardées, espaces historiques inclus (plus récentes d'abord). */
+export const listSavedCovers = async (): Promise<SavedCover[]> => {
+  const storageRoot = await resolveCoverRoot();
+  const roots = [storageRoot, ...(await legacyRoots())].filter(
+    (r, i, arr): r is string => Boolean(r) && arr.indexOf(r) === i,
+  );
+  if (roots.length === 0) return [];
+
+  const lists = await Promise.all(roots.map((root) => listCoversInRoot(root)));
+  return lists
+    .flat()
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+};
+
 export const deleteSavedCover = async (path: string): Promise<boolean> => {
   const { error } = await supabase.storage.from('ebook-images').remove([path]);
   return !error;
