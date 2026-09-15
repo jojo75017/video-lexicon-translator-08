@@ -67,7 +67,7 @@ Deno.serve(async (req) => {
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 900,
+        max_tokens: 2500,
         
         messages: [
           {
