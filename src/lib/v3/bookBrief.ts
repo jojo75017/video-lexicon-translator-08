@@ -77,6 +77,9 @@ export type BookBrief = {
   outline?: BriefOutlineChapter[];
   /** Vrai quand l'auteur a explicitement validé le sommaire utilisé par le workflow. */
   outlineValidated?: boolean;
+  /** L'auteur construit son livre à partir du sommaire (chemin inverse :
+   *  indications de chapitre au fur et à mesure, sans récit préalable). */
+  outlineFirst?: boolean;
   /** L'abonné souhaite des illustrations IA à l'intérieur du livre. */
   wantsIllustrations?: boolean;
   characters?: Array<{ name?: string; role?: string; description?: string; traits?: string }>;
@@ -295,7 +298,10 @@ export function readBookBrief(): BookBrief | null {
     (brief.title || '').trim()
     || (brief.description || '').trim()
     || (brief.sourceText || '').trim()
-    || (brief.outline || []).length,
+    || (brief.outline || []).length
+    // Un brief « sommaire d'abord » sans récit est légitime et doit rester
+    // accessible tant que l'auteur n'a pas rempli le sujet du livre.
+    || brief.outlineFirst,
   );
   return hasSomething ? brief : null;
 }

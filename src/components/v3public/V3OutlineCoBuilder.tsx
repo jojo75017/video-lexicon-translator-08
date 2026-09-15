@@ -19,7 +19,13 @@ type Proposal = { titre: string; objectif: string; sources: number[] };
  * sommaire d'un coup — 3 chapitres à la fois, que l'auteur garde, reformule
  * ou retire. Le sommaire n'est validé que par l'auteur.
  */
-export default function V3OutlineCoBuilder() {
+type Props = {
+  /** Chemin sommaire-d'abord : l'auteur construit le sommaire à partir
+   *  d'indications de chapitre, sans récit préalable. */
+  outlineFirst?: boolean;
+};
+
+export default function V3OutlineCoBuilder({ outlineFirst }: Props = {}) {
   const [brief, setBrief] = useState<BookBrief>({});
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [questions, setQuestions] = useState<string[]>([]);
@@ -34,10 +40,15 @@ export default function V3OutlineCoBuilder() {
     return () => window.removeEventListener(BOOK_BRIEF_EVENT, sync);
   }, []);
 
+  /** Chemin sommaire-d'abord actif (drapeau brief ou prop externe). */
+  const isOutlineFirst = Boolean(outlineFirst || brief.outlineFirst);
+
   const outline = brief.outline || [];
   /** Récit de l'auteur découpé en passages numérotés : le sommaire doit les suivre. */
   const passages = listSourcePassages(brief.sourceText || '');
   const sourceWords = passages.reduce((total, p) => total + countWords(p), 0);
+  /** Chemin sommaire-d'abord utilisable : drapeau actif (prop externe ou brief). */
+  const useOutlineFirst = isOutlineFirst;
   /**
    * Le nombre de chapitres n'est plus une valeur saisie d'avance : il est déduit
    * de ce que l'auteur a réellement écrit (et se réajuste s'il écrit plus).
@@ -75,6 +86,7 @@ export default function V3OutlineCoBuilder() {
       return;
     }
     setLoading(true);
+    const indication = (extra || note || '').trim();
     try {
       const provider = getProvider();
       const userApiKey = provider === 'gemini' ? getProviderKey('gemini') : '';
@@ -83,7 +95,7 @@ export default function V3OutlineCoBuilder() {
           mode: 'outline-step',
           // Biographie : chapitres = périodes de vie dans l'ordre chronologique.
           kind: brief.mode === 'biography' ? 'biography' : 'book',
-          message: (extra || note || '').trim(),
+          message: indication,
           userApiKey,
           accepted: outline.map((c) => ({ titre: c.titre, objectif: c.objectif, sources: c.sources || [] })),
           target,
@@ -94,10 +106,16 @@ export default function V3OutlineCoBuilder() {
           factMemory: brief.factMemory || [],
           tone: brief.tone || '',
           language: brief.language || 'fr',
+          outlineFirst: useOutlineFirst,
         },
       });
       if (error) throw error;
       if ((data as any)?.error) throw new Error((data as any).error);
+      // En mode sommaire-d'abord, on mémorise l'indication donnée pour que les
+      // propositions suivantes en tiennent compte (comme les réponses aux questions).
+      if (useOutlineFirst && indication) {
+        patch({ factMemory: [...(brief.factMemory || []), `Indication chapitre : ${indication}`] });
+      }
       const list = Array.isArray((data as any)?.chapters) ? (data as any).chapters : [];
       setProposals(list.map((c: any) => ({
         titre: String(c.titre || ''),
@@ -190,9 +208,20 @@ export default function V3OutlineCoBuilder() {
       </div>
 
       <p className="mt-2 text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
-        Vous avez écrit d’abord : le sommaire se construit maintenant à partir de votre texte, jamais
-        à l’avance. Le Génie propose 3 chapitres à la fois, en suivant votre récit dans l’ordre. Vous
-        gardez, reformulez ou retirez — le sommaire n’est validé que par votre clic.
+        {useOutlineFirst ? (
+          <>
+            Chemin sommaire-d’abord : décrivez votre projet puis donnez vos{' '}
+            <strong>indications de chapitre au fur et à mesure</strong>. Le Génie les prend en
+            compte pour proposer les chapitres suivants. Vous gardez, reformulez ou retirez — le
+            sommaire n’est validé que par votre clic.
+          </>
+        ) : (
+          <>
+            Vous avez écrit d’abord : le sommaire se construit maintenant à partir de votre texte,
+            jamais à l’avance. Le Génie propose 3 chapitres à la fois, en suivant votre récit dans
+            l’ordre. Vous gardez, reformulez ou retirez — le sommaire n’est validé que par votre clic.
+          </>
+        )}
       </p>
 
       {brief.mode === 'biography' && (
@@ -244,8 +273,18 @@ export default function V3OutlineCoBuilder() {
       ) : outline.length === 0 && (
         <p className="mt-2 rounded-xl border px-2.5 py-2 text-[11.5px]"
           style={{ borderColor: 'rgba(201,168,76,0.45)', background: 'rgba(201,168,76,0.08)', color: 'var(--v3-ink)' }}>
-          Continuez à raconter à l’étape ① : je m’occupe du plan quand vous aurez fini. Le nombre de
-          chapitres sera calculé sur ce que vous aurez vraiment écrit.
+          {useOutlineFirst ? (
+            <>
+              Donnez une première indication de chapitre ci-dessous (ex. : « Chapitre 1 — pourquoi je
+              veux raconter cela »), puis cliquez sur <strong>Proposer les 3 premiers chapitres</strong>.
+              Vous pourrez préciser la suite au fur et à mesure.
+            </>
+          ) : (
+            <>
+              Continuez à raconter à l’étape ① : je m’occupe du plan quand vous aurez fini. Le nombre de
+              chapitres sera calculé sur ce que vous aurez vraiment écrit.
+            </>
+          )}
         </p>
       )}
 
@@ -356,15 +395,37 @@ export default function V3OutlineCoBuilder() {
         </div>
       )}
 
-      <div className="mt-3">
-        <input
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          placeholder="Une précision pour les prochains chapitres (facultatif)…"
-          className="w-full rounded-xl border bg-white px-2.5 py-2 text-[12.5px] outline-none"
-          style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }}
-        />
-      </div>
+      {useOutlineFirst ? (
+        <div className="mt-3 rounded-2xl border p-2.5"
+          style={{ borderColor: 'rgba(0,130,150,0.4)', background: 'rgba(0,130,150,0.06)' }}>
+          <label htmlFor="v3-outline-indication"
+            className="mb-1 block text-[12.5px] font-medium" style={{ color: 'var(--v3-ink)' }}>
+            Mes indications pour les prochains chapitres
+          </label>
+          <textarea
+            id="v3-outline-indication"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            rows={3}
+            placeholder="Ex. : Chapitre 3 — le moment où j’ai compris que tout allait changer. J’y tiens, il doit rester entier."
+            className="w-full rounded-xl border bg-white px-2.5 py-2 text-[12.5px] outline-none"
+            style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }}
+          />
+          <p className="mt-1 text-[11px]" style={{ color: 'var(--v3-muted)' }}>
+            Chaque indication est mémorisée par le Génie et guide les chapitres suivants.
+          </p>
+        </div>
+      ) : (
+        <div className="mt-3">
+          <input
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="Une précision pour les prochains chapitres (facultatif)…"
+            className="w-full rounded-xl border bg-white px-2.5 py-2 text-[12.5px] outline-none"
+            style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }}
+          />
+        </div>
+      )}
 
       <div className="mt-3 flex flex-wrap gap-2">
         <button type="button" onClick={() => propose()} disabled={loading} className="v3-btn v3-btn-primary text-xs disabled:opacity-50">

@@ -17,7 +17,7 @@ import V3BookActionsBar from '@/components/v3public/V3BookActionsBar';
 import V3OutlineCoBuilder from '@/components/v3public/V3OutlineCoBuilder';
 import V3PassageCorrector from '@/components/v3public/V3PassageCorrector';
 
-import { BOOK_BRIEF_EVENT, clearBookBrief, readBookBrief, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
+import { BOOK_BRIEF_EVENT, clearBookBrief, readBookBrief, writeBookBrief, type BriefOutlineChapter, type BookBrief } from '@/lib/v3/bookBrief';
 import { restoreDraftState, saveBookDraftToCloud, BOOK_DRAFT_STATUS_EVENT, type BookDraftStatus } from '@/lib/v3/bookDraftCloud';
 import { writeLocalThread } from '@/lib/v3/genieThread';
 
@@ -88,6 +88,52 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
     window.addEventListener(BOOK_BRIEF_EVENT, sync);
     return () => window.removeEventListener(BOOK_BRIEF_EVENT, sync);
   }, []);
+
+  // Fiche livre synchronisée (titre, description, drapeau outlineFirst…).
+  const [bookBrief, setBookBrief] = useState<BookBrief>(() => readBookBrief() || {});
+  useEffect(() => {
+    const sync = () => setBookBrief(readBookBrief() || {});
+    sync();
+    window.addEventListener(BOOK_BRIEF_EVENT, sync);
+    return () => window.removeEventListener(BOOK_BRIEF_EVENT, sync);
+  }, []);
+
+  // Chemin « sommaire d'abord » : l'auteur construit son livre à partir du sommaire.
+  const outlineFirstActive = Boolean(bookBrief.outlineFirst);
+  const [subjectTitle, setSubjectTitle] = useState('');
+  const [subjectDesc, setSubjectDesc] = useState('');
+  const [subjectChapters, setSubjectChapters] = useState(10);
+  useEffect(() => {
+    if (!outlineFirstActive) return;
+    const b = readBookBrief() || {};
+    setSubjectTitle(b.title || '');
+    setSubjectDesc(b.description || '');
+    setSubjectChapters(Math.min(40, Math.max(3, Number(b.chapters) || 10)));
+  }, [outlineFirstActive]);
+
+  const startOutlineFirst = () => {
+    const next = { ...(readBookBrief() || {}), outlineFirst: true };
+    writeBookBrief(next);
+    window.dispatchEvent(new Event(BOOK_BRIEF_EVENT));
+    setDesk(2);
+  };
+
+  const confirmSubject = () => {
+    const t = subjectTitle.trim();
+    const d = subjectDesc.trim();
+    if (t.length < 3) { toast.error('Donnez un titre à votre livre.'); return; }
+    if (d.length < 12) { toast.error('Décrivez votre projet en au moins une phrase complète.'); return; }
+    const next = {
+      ...(readBookBrief() || {}),
+      title: t,
+      description: d,
+      chapters: Math.min(40, Math.max(3, subjectChapters)),
+      outlineFirst: true,
+    };
+    writeBookBrief(next);
+    window.dispatchEvent(new Event(BOOK_BRIEF_EVENT));
+    toast.success('Votre projet est prêt : donnez maintenant vos indications de chapitre.');
+  };
 
 
 
@@ -313,6 +359,14 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                 <Link to="/v3/biographie" className={`v3-btn text-xs ${biography ? 'v3-btn-primary' : 'v3-btn-outline'}`}>
                   <Sparkles className="w-3.5 h-3.5" /> Je raconte ma vie
                 </Link>
+                <button
+                  type="button"
+                  onClick={startOutlineFirst}
+                  className="v3-btn text-xs"
+                  style={{ background: 'var(--v3-orange, #FF9E2D)', color: '#232F3E', fontWeight: 600 }}
+                >
+                  <BookOpen className="w-3.5 h-3.5" /> Je pars d’un sommaire
+                </button>
               </div>
             </>
           )}
@@ -380,10 +434,56 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
               </>
             )}
 
-            {/* ② Mon sommaire : déduit de ce qui a été écrit */}
+            {/* ② Mon sommaire : déduit du récit OU construit d'abord (outlineFirst) */}
             {desk === 2 && (
               <>
-                <V3OutlineCoBuilder />
+                {outlineFirstActive && !(bookBrief.title?.trim() && bookBrief.description?.trim()) && (
+                  <div className="v3-card mb-4" style={{ borderColor: 'rgba(0,130,150,0.4)' }}>
+                    <p className="text-[13px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+                      Décrivez votre livre en deux mots
+                    </p>
+                    <p className="mt-1 text-[11.5px]" style={{ color: 'var(--v3-muted)' }}>
+                      Le Génie a besoin d’un titre et d’un sujet pour proposer vos premiers chapitres.
+                    </p>
+                    <div className="mt-3 space-y-2">
+                      <input
+                        value={subjectTitle}
+                        onChange={(e) => setSubjectTitle(e.target.value)}
+                        placeholder="Titre de votre livre"
+                        className="w-full rounded-xl border bg-white px-3 py-2 text-[13px] outline-none"
+                        style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }}
+                      />
+                      <textarea
+                        value={subjectDesc}
+                        onChange={(e) => setSubjectDesc(e.target.value)}
+                        rows={3}
+                        placeholder="De quoi parle votre livre ? Pour qui ? Quel message principal ?"
+                        className="w-full rounded-xl border bg-white px-3 py-2 text-[12.5px] outline-none"
+                        style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }}
+                      />
+                      <div className="flex flex-wrap items-center gap-2 text-[12px]" style={{ color: 'var(--v3-ink)' }}>
+                        <span>Nombre de chapitres visé</span>
+                        <input
+                          type="number"
+                          min={3}
+                          max={40}
+                          value={subjectChapters}
+                          onChange={(e) => setSubjectChapters(Math.min(40, Math.max(3, Number(e.target.value) || 3)))}
+                          className="w-20 rounded-lg border bg-white px-2 py-1 text-[12px] outline-none"
+                          style={{ borderColor: 'rgba(0,0,0,0.12)' }}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={confirmSubject}
+                        className="v3-btn v3-btn-primary text-xs"
+                      >
+                        Confirmer mon projet
+                      </button>
+                    </div>
+                  </div>
+                )}
+                <V3OutlineCoBuilder outlineFirst={outlineFirstActive} />
                 <div id="sommaire-ia" className="mt-5">
                   <V3GenieOutlinePanel key={briefKey} outlineMode={sommaireIa ? 'guided' : undefined} />
                 </div>
