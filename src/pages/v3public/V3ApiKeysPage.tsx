@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet';
+import { Link } from 'react-router-dom';
 import { KeyRound, Lock } from 'lucide-react';
 import BackButton from '@/components/v3/BackButton';
 import { EbookSettingsPanel } from '@/components/ebook/EbookSettingsPanel';
@@ -33,6 +34,18 @@ export default function V3ApiKeysPage() {
           <Lock className="h-3.5 w-3.5" /> Vos clés restent dans votre navigateur : personne d'autre ne les voit.
         </p>
       </header>
+
+      <div
+        className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-card p-4"
+        style={{ borderColor: 'rgba(0,0,0,0.10)' }}
+      >
+        <p className="text-sm" style={{ color: 'var(--v3-muted)' }}>
+          Votre clé est enregistrée ? Vous pouvez discuter tout de suite avec votre IA.
+        </p>
+        <Link to="/v3/discuter-ia" className="v3-btn v3-btn-primary text-[13px]">
+          Discuter avec mon IA
+        </Link>
+      </div>
 
       <EbookSettingsPanel />
     </div>

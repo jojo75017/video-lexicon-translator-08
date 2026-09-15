@@ -64,7 +64,7 @@ export default function V3StartIdeaCTA({ variant = 'full' }: Props) {
         </Link>
 
         <Link
-          to="/v3/fonctionnalites/cles"
+          to="/v3/discuter-ia"
           className="group flex items-start gap-3 rounded-xl border bg-card p-4 transition hover:shadow-sm"
           style={{ borderColor: 'rgba(0,0,0,0.10)' }}
         >
@@ -74,7 +74,7 @@ export default function V3StartIdeaCTA({ variant = 'full' }: Props) {
               Parler avec ChatGPT ou Gemini
             </span>
             <span className="mt-1 block text-xs leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
-              Selon votre clé : ajoutez votre clé OpenAI, Gemini ou OpenRouter pour utiliser votre propre moteur IA.
+              Discussion libre avec votre propre clé (OpenAI, Gemini, Claude ou OpenRouter).
             </span>
           </span>
         </Link>
