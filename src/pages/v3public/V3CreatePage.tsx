@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Sparkles, Loader2, ImageIcon, ArrowRight, BookOpen, Save } from 'lucide-react';
+import { Sparkles, Loader2, ImageIcon, ArrowRight, BookOpen, Save, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { BackButton } from '@/components/v3/BackButton';
@@ -32,7 +32,7 @@ function seedHubConfig(idea: string | null, genre: string | null, type: string |
   try {
     const raw = localStorage.getItem('edition_book_config_v1');
     const prev = raw ? JSON.parse(raw) : {};
-    const next = {
+    const next: BookBrief = {
       ...prev,
       description: idea || prev.description || '',
       genre: genre || type || prev.genre || '',
@@ -116,7 +116,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
     writeLocalThread([]);
     const next: BookBrief = {
       mode: 'book',
-      creationPath: 'existing-outline',
+      creationPath: 'existing-outline' as const,
       outlineFirst: true,
       outline: [],
       outlineValidated: false,
@@ -196,8 +196,17 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
   useEffect(() => {
     const current = readBookBrief() || {};
     const wanted: 'book' | 'biography' = biography ? 'biography' : 'book';
+    if (projectId) return;
+    if (current.mode && current.mode !== wanted) {
+      clearBookBrief();
+      writeLocalThread([]);
+      writeBookBrief({ mode: wanted, creationPath: biography ? 'biography' : 'story' });
+      setDesk(1);
+      setOpenedBook(null);
+      return;
+    }
     if (current.mode !== wanted) writeBookBrief({ ...current, mode: wanted });
-  }, [biography]);
+  }, [biography, projectId]);
 
   // Ouverture d'un livre existant depuis « Mes livres » (?projectId=...)
   useEffect(() => {
