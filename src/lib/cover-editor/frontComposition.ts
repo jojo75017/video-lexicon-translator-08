@@ -470,7 +470,10 @@ export function parseComposition(
       typeof obj.backgroundColor === 'string' && /^#[0-9a-fA-F]{6}$/.test(obj.backgroundColor)
         ? obj.backgroundColor
         : DEFAULT_FRONT_BACKGROUND,
-    imageBrightness: Math.min(1.5, Math.max(0.7, num(obj.imageBrightness, 1))),
+    imageBrightness: clampRange(obj.imageBrightness, 0.7, 1.5, 1),
+    imageContrast: clampRange(obj.imageContrast, 0.7, 1.4, 1),
+    imageSaturation: clampRange(obj.imageSaturation, 0, 1.6, 1),
+    imageWarmth: clampRange(obj.imageWarmth, -20, 20, 0),
     illustrationMode: obj.illustrationMode === 'slot' ? 'slot' : 'cover',
     shapes,
     layers: layers.length ? layers : createComposition(fallback).layers,
