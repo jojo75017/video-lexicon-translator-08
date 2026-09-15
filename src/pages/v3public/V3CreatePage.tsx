@@ -104,6 +104,21 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
   const [subjectTitle, setSubjectTitle] = useState('');
   const [subjectDesc, setSubjectDesc] = useState('');
   const [subjectChapters, setSubjectChapters] = useState(10);
+
+  const clearPreviousWritingSession = () => {
+    try {
+      [
+        'edition_book_config_v1',
+        'edition_chapter_target_words_v1',
+        'v3_create_current_project_id_v1',
+        'ebook_workflow_progress',
+        'ebook_workflow_results',
+        'ebook_workflow_sync_data',
+      ].forEach((key) => localStorage.removeItem(key));
+    } catch {
+      // Le nouveau sommaire reste utilisable si le stockage du navigateur est indisponible.
+    }
+  };
   useEffect(() => {
     if (!existingOutlineActive) return;
     const b = readBookBrief() || {};
@@ -114,6 +129,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
 
   const startExistingOutline = () => {
     clearBookBrief();
+    clearPreviousWritingSession();
     writeLocalThread([]);
     const next: BookBrief = {
       mode: 'book',
@@ -181,6 +197,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
     const chapters = current.outline || [];
     if (chapters.length < 3) { toast.error('Le sommaire doit contenir au moins 3 chapitres.'); return; }
     const validated = { ...current, chapters: chapters.length, outlineValidated: true, outlineFirst: true, creationPath: 'existing-outline' as const };
+    clearPreviousWritingSession();
     writeBookBrief(validated);
     void saveBookDraftToCloud(validated, { activeStep: 3 });
     setDesk(3);
