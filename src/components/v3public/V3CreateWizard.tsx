@@ -243,6 +243,8 @@ export default function V3CreateWizard() {
   const [searchParams] = useSearchParams();
   const requestedProjectId = searchParams.get('projectId');
   const hub = useMemo(readHubConfig, []);
+  const startingBrief = useMemo(() => readBookBrief() || {}, []);
+  const startsFromExistingOutline = startingBrief.creationPath === 'existing-outline';
   const [step, setStep] = useState(0);
   const [launched, setLaunched] = useState(false);
   const [completedBook, setCompletedBook] = useState<any>(null);
@@ -266,6 +268,8 @@ export default function V3CreateWizard() {
   const [outlineLoading, setOutlineLoading] = useState(false);
   const [showTocTool, setShowTocTool] = useState(false);
   const [projectId, setProjectId] = useState<string | null>(() => {
+    if (startingBrief.projectId) return startingBrief.projectId;
+    if (startsFromExistingOutline) return null;
     try { return localStorage.getItem(PROJECT_ID_KEY); } catch { return null; }
   });
   const projectIdRef = useRef<string | null>(projectId);
@@ -317,6 +321,7 @@ export default function V3CreateWizard() {
       const wizRaw = localStorage.getItem(WIZARD_KEY);
       const progRaw = localStorage.getItem('ebook_workflow_progress');
       const resRaw = localStorage.getItem('ebook_workflow_results');
+      if (startsFromExistingOutline) return;
       if (!wizRaw) return;
       const w = JSON.parse(wizRaw);
 
@@ -391,13 +396,13 @@ export default function V3CreateWizard() {
     } catch (e) {
       console.warn('V3 wizard restore skipped:', e);
     }
-  }, [requestedProjectId]);
+  }, [requestedProjectId, startsFromExistingOutline]);
 
 
-  const [title, setTitle] = useState(hub.title || '');
-  const [description, setDescription] = useState(hub.description || '');
+  const [title, setTitle] = useState(startingBrief.title || hub.title || '');
+  const [description, setDescription] = useState(startingBrief.synopsis || startingBrief.description || hub.description || '');
   /** Mots exacts de l'auteur (souvenirs, récit) : transmis aux agents, jamais résumés. */
-  const [sourceText, setSourceText] = useState<string>((hub as any).sourceText || '');
+  const [sourceText, setSourceText] = useState<string>(startingBrief.sourceText || (hub as any).sourceText || '');
 
   // Une validation Copilot peut arriver pendant que le wizard reste ouvert.
   // On reprend alors immédiatement le récit retenu, sans attendre un rechargement.
@@ -411,16 +416,33 @@ export default function V3CreateWizard() {
     return () => window.removeEventListener(BOOK_BRIEF_EVENT, syncValidatedNarrative);
   }, []);
 
-  const [category, setCategory] = useState(hub.genre || 'Roman');
+  const [category, setCategory] = useState(startingBrief.category || startingBrief.genre || hub.genre || 'Roman');
   const [customCategory, setCustomCategory] = useState('');
   const [tone, setTone] = useState('Inspirant');
-  const [chapters, setChapters] = useState(clampNumber(Number(hub.numberOfChapters), 3, 60, 12));
+  const [chapters, setChapters] = useState(clampNumber(Number(startingBrief.chapters || hub.numberOfChapters), 3, 60, 12));
   const [wordsPerChapter, setWordsPerChapter] = useState(2500);
-  const [characters, setCharacters] = useState<WizardCharacter[]>([makeCharacter()]);
-  const [outline, setOutline] = useState<OutlineChapter[]>(() => buildFallbackOutline(hub.title || '', hub.genre || 'Roman', clampNumber(Number(hub.numberOfChapters), 3, 60, 12)));
-  const [finalTitle, setFinalTitle] = useState(hub.title || '');
-  const [subtitle, setSubtitle] = useState(hub.subtitle || '');
-  const [authorName, setAuthorName] = useState(hub.author || 'Auteur Ebookstudio');
+  const [characters, setCharacters] = useState<WizardCharacter[]>(() => {
+    const supplied = startingBrief.characters || [];
+    return supplied.length ? supplied.map((character) => ({
+      id: makeId(),
+      name: character.name || '',
+      role: character.role || 'Personnage principal',
+      traits: character.traits || character.description || '',
+    })) : [makeCharacter()];
+  });
+  const [outline, setOutline] = useState<OutlineChapter[]>(() => {
+    const supplied = startingBrief.outline || [];
+    if (supplied.length) return supplied.map((chapter, index) => ({
+      id: makeId(),
+      numero: chapter.numero || index + 1,
+      titre: chapter.titre,
+      objectif: chapter.objectif || '',
+    }));
+    return buildFallbackOutline(hub.title || '', hub.genre || 'Roman', clampNumber(Number(hub.numberOfChapters), 3, 60, 12));
+  });
+  const [finalTitle, setFinalTitle] = useState(startingBrief.title || hub.title || '');
+  const [subtitle, setSubtitle] = useState(startingBrief.subtitle || hub.subtitle || '');
+  const [authorName, setAuthorName] = useState(startingBrief.author || hub.author || 'Auteur Ebookstudio');
 
   // Cible & Promesse (parité V2 — améliore drastiquement les résultats des agents)
   const [cibleProfil, setCibleProfil] = useState('');
