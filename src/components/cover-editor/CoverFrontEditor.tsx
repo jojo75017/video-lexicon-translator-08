@@ -229,6 +229,15 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
 
   const selected = composition.layers.find((l) => l.id === selectedId) ?? null;
 
+  /** Luminosité de l'illustration (rattrapage local d'une image trop sombre). */
+  const frontBrightness = Math.min(1.5, Math.max(0.7, composition.imageBrightness ?? 1));
+  const setBrightness = (value: number) => {
+    commit(
+      (prev) => ({ ...prev, imageBrightness: Math.min(1.5, Math.max(0.7, value)) }),
+      false,
+    );
+  };
+
   // Le panneau de propriétés ne doit jamais être vide à l'ouverture.
   useEffect(() => {
     if (selectedId) return;
