@@ -41,7 +41,7 @@ const ROWS: Array<{ point: string; others: string; v3: string }> = [
 export default function V3DifferenceTable() {
   return (
     <section id="v3-difference" className="v3-section-dark scroll-mt-24">
-      <div className="max-w-7xl mx-auto px-5 md:px-8 py-16">
+      <div className="v3-shell py-16">
         <div className="max-w-3xl">
           <span
             className="v3-chip"

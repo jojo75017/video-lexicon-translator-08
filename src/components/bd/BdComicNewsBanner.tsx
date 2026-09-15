@@ -31,7 +31,7 @@ export default function BdComicNewsBanner({ compact = false }: Props) {
   }
 
   return (
-    <section className="mx-auto w-full max-w-[1280px] px-4">
+    <section className="v3-shell">
       <div
         className="overflow-hidden rounded-2xl border"
         style={{

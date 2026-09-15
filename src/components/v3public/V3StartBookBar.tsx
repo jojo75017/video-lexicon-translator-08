@@ -68,7 +68,7 @@ export default function V3StartBookBar() {
 
 
   return (
-    <section className="max-w-7xl mx-auto px-5 md:px-8 pt-4">
+    <section className="v3-shell pt-4">
       <div
         className="rounded-2xl border p-3 md:p-4"
         style={{

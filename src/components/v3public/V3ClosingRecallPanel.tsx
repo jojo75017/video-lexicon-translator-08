@@ -14,7 +14,7 @@ const LINKS = [
 /** Module de clôture de l'accueil V3 — rappel de tout ce qui est déjà disponible. */
 export default function V3ClosingRecallPanel({ className = '' }: { className?: string }) {
   return (
-    <section className={`max-w-7xl mx-auto px-5 md:px-8 py-12 ${className}`}>
+    <section className={`v3-shell py-12 ${className}`}>
       <div
         className="rounded-3xl p-7 md:p-10 text-center"
         style={{

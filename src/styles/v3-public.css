@@ -361,3 +361,27 @@
 .v3-no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* ── Rythme éditorial de l'accueil V3 ───────────────────────────── */
+/* Largeur unique pour toutes les sections de la page d'accueil. */
+.v3pub .v3-shell {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+@media (min-width: 768px) {
+  .v3pub .v3-shell { padding-inline: 32px; }
+}
+/* Espacement vertical constant entre les blocs de l'accueil. */
+.v3pub .v3-home > * + * { margin-top: 40px; }
+@media (min-width: 768px) {
+  .v3pub .v3-home > * + * { margin-top: 56px; }
+}
+/* Encadré ivoire à filet or — remplace les bandes or pleines. */
+.v3pub .v3-note {
+  background: var(--v3-ivory);
+  border: 1px solid rgba(201, 168, 76, 0.45);
+  border-radius: 18px;
+  padding: 20px 22px;
+}

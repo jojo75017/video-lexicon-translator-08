@@ -20,7 +20,7 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
     >
       <div className="absolute inset-x-0 top-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, var(--v3-gold), transparent)' }} />
 
-      <div className="relative max-w-5xl mx-auto px-5 md:px-8 py-10 md:py-14 text-center">
+      <div className="relative v3-shell py-10 md:py-14 text-center">
         <span
           className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em]"
           style={{ color: 'var(--v3-gold-600)', background: 'var(--v3-gold-soft)', border: '1px solid color-mix(in srgb, var(--v3-gold) 45%, transparent)' }}

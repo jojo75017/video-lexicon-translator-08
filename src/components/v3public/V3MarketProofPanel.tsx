@@ -17,7 +17,7 @@ const STATS = [
 /** Section « Voici ce que prouve le marché » — informative, non cliquable. */
 export default function V3MarketProofPanel({ className = '' }: { className?: string }) {
   return (
-    <section className={`max-w-7xl mx-auto px-5 md:px-8 py-12 ${className}`}>
+    <section className={`v3-shell py-12 ${className}`}>
       <div className="rounded-3xl p-7 md:p-10" style={{ background: CREAM, border: `1px solid ${LINE}` }}>
         <div className="text-center max-w-3xl mx-auto">
           <div className="text-[10px] uppercase tracking-[0.24em] font-bold" style={{ color: GOLD_DEEP }}>

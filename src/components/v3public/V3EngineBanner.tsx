@@ -48,7 +48,7 @@ export function V3EngineStrip({ className = '' }: { className?: string }) {
         borderBottom: `1px solid ${GOLD}55`,
       }}
     >
-      <div className="mx-auto max-w-7xl px-5 md:px-8 py-3 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 text-center">
+      <div className="v3-shell py-3 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 text-center">
         <span
           className="text-[10px] font-bold uppercase tracking-[0.2em] rounded-full px-2.5 py-1 whitespace-nowrap"
           style={{ color: GOLD, background: `${GOLD}1A`, border: `1px solid ${GOLD}66` }}
@@ -70,7 +70,7 @@ export function V3EngineStrip({ className = '' }: { className?: string }) {
 /** Section détaillée — les modules de la V3, tous en 2 temps. */
 export function V3EngineGrid({ className = '' }: { className?: string }) {
   return (
-    <section id="moteurs-ia-v3" className={`max-w-7xl mx-auto px-5 md:px-8 py-8 ${className}`}>
+    <section id="moteurs-ia-v3" className={`v3-shell py-8 ${className}`}>
       <div
         className="rounded-3xl p-6 md:p-8"
         style={{ background: CREAM, border: `1px solid ${LINE}` }}

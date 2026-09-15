@@ -18,7 +18,7 @@ const TRIALS = [
 /** Section « Garantie 30 jours » — informative, non cliquable. */
 export default function V3GuaranteePanel({ className = '' }: { className?: string }) {
   return (
-    <section className={`max-w-7xl mx-auto px-5 md:px-8 py-12 ${className}`}>
+    <section className={`v3-shell py-12 ${className}`}>
       <div
         className="rounded-3xl p-7 md:p-10"
         style={{ background: 'linear-gradient(160deg,#ffffff 0%,#fbf6ec 100%)', border: `1px solid ${GOLD}55` }}

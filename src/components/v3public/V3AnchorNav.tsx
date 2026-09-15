@@ -8,7 +8,7 @@ const LINKS = [
 /** Sommaire ancré : permet de naviguer dans la page longue de présentation. */
 export default function V3AnchorNav() {
   return (
-    <nav aria-label="Découvrir la V3" className="max-w-7xl mx-auto px-5 md:px-8 pt-6">
+    <nav aria-label="Découvrir la V3" className="v3-shell pt-6">
       <div
         className="rounded-2xl px-5 py-4 flex flex-wrap items-center gap-3"
         style={{ background: 'var(--v3-cream)', border: '1px solid var(--v3-line)' }}

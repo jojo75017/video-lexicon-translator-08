@@ -94,7 +94,7 @@ export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMod
   /* ---------------------------- Variante compacte ---------------------------- */
   if (variant === 'compact') {
     return (
-      <section className="max-w-7xl mx-auto px-5 md:px-8 py-6">
+      <section className="v3-shell py-6">
         <div className="rounded-[24px] border p-4 md:p-5" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="min-w-0">

@@ -82,7 +82,7 @@ export default function V3WhatsNewPanel() {
   const avatars = ['margaux', 'leandre', 'noemie', 'zoe', 'victor'];
 
   return (
-    <section className="max-w-7xl mx-auto px-5 md:px-8 pt-8" id="nouveautes">
+    <section className="v3-shell pt-8" id="nouveautes">
       <div
         className="rounded-3xl overflow-hidden"
         style={{ border: '1px solid var(--v3-line)', background: 'var(--v3-cream)' }}
