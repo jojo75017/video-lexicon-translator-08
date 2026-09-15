@@ -30,7 +30,7 @@ const BENEFITS = [
 
 export default function V3BenefitsPanel() {
   return (
-    <section id="v3-benefices" className="max-w-7xl mx-auto px-5 md:px-8 py-16 scroll-mt-24">
+    <section id="v3-benefices" className="v3-shell py-16 scroll-mt-24">
       <div className="max-w-3xl">
         <div className="text-[10px] uppercase tracking-[0.24em] font-semibold" style={{ color: 'var(--v3-gold-600)' }}>
           Le résultat pour vous

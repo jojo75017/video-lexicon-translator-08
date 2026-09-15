@@ -75,7 +75,7 @@ const STEPS = [
 export default function V3HowItWorksSteps() {
   return (
     <section id="v3-etapes" className="scroll-mt-24" style={{ background: 'var(--v3-cream)' }}>
-      <div className="max-w-7xl mx-auto px-5 md:px-8 py-16">
+      <div className="v3-shell py-16">
         <div className="max-w-3xl">
           <div className="text-[10px] uppercase tracking-[0.24em] font-semibold" style={{ color: 'var(--v3-gold-600)' }}>
             Le parcours complet

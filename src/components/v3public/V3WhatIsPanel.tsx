@@ -50,7 +50,7 @@ const BLOCS = [
 
 export default function V3WhatIsPanel() {
   return (
-    <section id="v3-quoi" className="max-w-7xl mx-auto px-5 md:px-8 py-14 scroll-mt-24">
+    <section id="v3-quoi" className="v3-shell py-14 scroll-mt-24">
       <div className="max-w-3xl">
         <div className="text-[10px] uppercase tracking-[0.24em] font-semibold" style={{ color: 'var(--v3-gold-600)' }}>
           La V3, sans jargon

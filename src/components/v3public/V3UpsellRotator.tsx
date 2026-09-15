@@ -28,7 +28,7 @@ export default function V3UpsellRotator() {
   });
 
   return (
-    <section className="max-w-7xl mx-auto px-5 md:px-8 pt-8">
+    <section className="v3-shell pt-8">
       <div className="mb-4 flex items-end justify-between gap-3">
         <div>
           <p
