@@ -139,6 +139,12 @@ export interface FrontComposition {
   backgroundColor: string;
   /** Réglage local de l'illustration : 1 = original, 1.5 = plus claire. */
   imageBrightness?: number;
+  /** Contraste local : 1 = original (0.7 → 1.4). */
+  imageContrast?: number;
+  /** Saturation locale : 1 = original (0 → 1.6). */
+  imageSaturation?: number;
+  /** Chaleur locale en degrés de rotation de teinte : 0 = original (-20 → 20). */
+  imageWarmth?: number;
   overlay?: FrontOverlay;
   /** Identifiant du dernier modèle appliqué (informatif). */
   templateId?: string | null;
