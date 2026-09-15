@@ -47,9 +47,7 @@ export default function V3OutlineCoBuilder({ outlineFirst }: Props = {}) {
   /** Récit de l'auteur découpé en passages numérotés : le sommaire doit les suivre. */
   const passages = listSourcePassages(brief.sourceText || '');
   const sourceWords = passages.reduce((total, p) => total + countWords(p), 0);
-  /** L'auteur a déjà écrit un récit : on reste sur le comportement habituel. */
-  const hasSource = passages.length > 0;
-  /** Chemin sommaire-d'abord utilisable : drapeau actif et pas (encore) de récit. */
+  /** Chemin sommaire-d'abord utilisable : drapeau actif (prop externe ou brief). */
   const useOutlineFirst = isOutlineFirst;
   /**
    * Le nombre de chapitres n'est plus une valeur saisie d'avance : il est déduit
