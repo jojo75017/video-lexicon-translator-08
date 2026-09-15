@@ -38,6 +38,20 @@ export default function V3LibraryPage() {
   const [audioModal, setAudioModal] = useState<{ id: string; title: string } | null>(null);
   const [dedup, setDedup] = useState<boolean>(() => localStorage.getItem('v3_lib_dedup') !== '0');
   const [rawRows, setRawRows] = useState<Row[]>([]);
+  const [studioCovers, setStudioCovers] = useState<StudioCover[]>([]);
+  const [pickerFor, setPickerFor] = useState<Row | null>(null);
+
+  // Couvertures déjà créées dans le studio : chargées une seule fois pour toute la page.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const covers = await loadStudioCovers();
+      if (!cancelled) setStudioCovers(covers);
+    })();
+    return () => { cancelled = true; };
+  }, [refreshTick]);
+
+  const coverIndex = useMemo(() => indexCoversByTitle(studioCovers), [studioCovers]);
 
   useEffect(() => {
     let cancelled = false;
