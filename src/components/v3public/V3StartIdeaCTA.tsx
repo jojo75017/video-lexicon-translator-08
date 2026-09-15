@@ -11,10 +11,10 @@ type Props = {
  * Composant de présentation : aucune donnée, aucun appel réseau.
  */
 export default function V3StartIdeaCTA({ variant = 'full' }: Props) {
-  /* Accueil : deux encarts sobres, sans aplat coloré ni gros bouton. */
+  /* Accueil : trois encarts sobres, sans aplat coloré ni gros bouton. */
   if (variant === 'discreet') {
     return (
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-3">
         <Link
           to="/assistant"
           className="group flex items-start gap-3 rounded-xl border bg-card p-4 transition hover:shadow-sm"
@@ -23,10 +23,26 @@ export default function V3StartIdeaCTA({ variant = 'full' }: Props) {
           <MessagesSquare className="mt-0.5 h-4 w-4 shrink-0" style={{ color: 'var(--v3-gold-600)' }} />
           <span className="min-w-0">
             <span className="block text-sm font-semibold" style={{ color: 'var(--v3-emerald)' }}>
-              Pas encore d’idée ? Parlez-en avec l’IA
+              Parler avec l’IA
             </span>
             <span className="mt-1 block text-xs leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
-              Une vraie discussion libre, comme avec ChatGPT : posez vos questions, elle répond.
+              Comme sur la V2 : une vraie discussion libre, posez vos questions, elle répond.
+            </span>
+          </span>
+        </Link>
+
+        <Link
+          to="/v3/create"
+          className="group flex items-start gap-3 rounded-xl border bg-card p-4 transition hover:shadow-sm"
+          style={{ borderColor: 'rgba(0,0,0,0.10)' }}
+        >
+          <Sparkles className="mt-0.5 h-4 w-4 shrink-0" style={{ color: 'var(--v3-gold-600)' }} />
+          <span className="min-w-0">
+            <span className="block text-sm font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+              Construire mon sommaire
+            </span>
+            <span className="mt-1 block text-xs leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
+              Le génie vous pose des questions et bâtit le plan de votre livre avec vous.
             </span>
           </span>
         </Link>
@@ -39,7 +55,7 @@ export default function V3StartIdeaCTA({ variant = 'full' }: Props) {
           <BarChart3 className="mt-0.5 h-4 w-4 shrink-0" style={{ color: 'var(--v3-emerald)' }} />
           <span className="min-w-0">
             <span className="block text-sm font-semibold" style={{ color: 'var(--v3-emerald)' }}>
-              Ou partez d’une niche déjà repérée
+              Partir d’une niche repérée
             </span>
             <span className="mt-1 block text-xs leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
               Des sujets qui se vendent sur Amazon, classés par thème.
