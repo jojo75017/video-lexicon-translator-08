@@ -1,4 +1,5 @@
 import { Download, BookOpen, CheckCircle2, Mail, ExternalLink } from 'lucide-react';
+import V3StartIdeaCTA from '@/components/v3public/V3StartIdeaCTA';
 
 const PDF_URL = '/kit-demarrage-ebookstudio-v3.pdf';
 
@@ -28,6 +29,10 @@ export default function V3KitDemarragePage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
+      <div className="mb-8">
+        <V3StartIdeaCTA />
+      </div>
+
       <header className="rounded-2xl border border-[#c9a84c]/40 bg-[#064e3b] p-6 text-white">
         <p className="text-xs uppercase tracking-[0.2em] text-[#e7cf8c]">Pour bien démarrer</p>
         <h1 className="mt-2 font-serif text-3xl">Kit de démarrage Ebookstudio V3</h1>
@@ -127,6 +132,10 @@ export default function V3KitDemarragePage() {
           . Je réponds personnellement.
         </p>
       </section>
+
+      <div className="mt-6">
+        <V3StartIdeaCTA variant="compact" />
+      </div>
     </div>
   );
 }
