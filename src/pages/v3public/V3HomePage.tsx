@@ -100,8 +100,7 @@ export default function V3HomePage() {
       <div className="v3-shell">
         <V3ResumeBookCard compact />
       </div>
-      <div className="v3-shell">
-        <V3StartIdeaCTA variant="discreet" />
+
       </div>
       <V3StartBookBar />
       <V3BriefRecap />
