@@ -997,32 +997,76 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
             {size.label} · affichage à {Math.round(scale * 100)} %
           </p>
 
-          {/* rattrapage d'une image trop sombre : 100 % local, sans IA ni crédit */}
+          {/* retouche simple de l'image : 100 % local, sans IA ni crédit */}
           {bgUrl && (
             <div className="mt-3 rounded-xl border border-border bg-card p-3">
               <div className="flex items-center justify-between gap-2">
                 <Label className="text-sm font-semibold text-foreground">
-                  Éclaircir l'image · {Math.round(frontBrightness * 100)} %
+                  Retoucher l'image (sans regénérer)
                 </Label>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setBrightness(1)}
-                  className="gap-1"
-                >
-                  <RotateCcw className="h-4 w-4" /> Remettre à zéro
+                <Button variant="outline" size="sm" onClick={resetImageAdjust} className="gap-1">
+                  <RotateCcw className="h-4 w-4" /> Tout remettre à zéro
                 </Button>
               </div>
-              <Slider
-                className="mt-2"
-                min={0.7}
-                max={1.5}
-                step={0.02}
-                value={[frontBrightness]}
-                onValueChange={([v]) => setBrightness(v)}
-              />
-              <p className="mt-1 text-xs text-muted-foreground">
-                Votre image est trop sombre ? Éclaircissez-la ici, sans regénérer et sans crédit.
+
+              <div className="mt-3 space-y-3">
+                <div>
+                  <Label className="text-xs text-muted-foreground">
+                    Luminosité · {Math.round(frontBrightness * 100)} %
+                  </Label>
+                  <Slider
+                    className="mt-1"
+                    min={0.7}
+                    max={1.5}
+                    step={0.02}
+                    value={[frontBrightness]}
+                    onValueChange={([v]) => setImageAdjust('imageBrightness', v)}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">
+                    Contraste · {Math.round(frontContrast * 100)} %
+                  </Label>
+                  <Slider
+                    className="mt-1"
+                    min={0.7}
+                    max={1.4}
+                    step={0.02}
+                    value={[frontContrast]}
+                    onValueChange={([v]) => setImageAdjust('imageContrast', v)}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">
+                    Saturation · {Math.round(frontSaturation * 100)} %
+                  </Label>
+                  <Slider
+                    className="mt-1"
+                    min={0}
+                    max={1.6}
+                    step={0.02}
+                    value={[frontSaturation]}
+                    onValueChange={([v]) => setImageAdjust('imageSaturation', v)}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">
+                    Chaleur · {frontWarmth > 0 ? 'chaude' : frontWarmth < 0 ? 'froide' : 'neutre'}
+                  </Label>
+                  <Slider
+                    className="mt-1"
+                    min={-20}
+                    max={20}
+                    step={1}
+                    value={[frontWarmth]}
+                    onValueChange={([v]) => setImageAdjust('imageWarmth', v)}
+                  />
+                </div>
+              </div>
+
+              <p className="mt-2 text-xs text-muted-foreground">
+                Image trop sombre, trop grise ou trop froide ? Corrigez-la ici : c'est immédiat,
+                réversible, sans IA et sans crédit. Les réglages sont repris dans vos exports.
               </p>
             </div>
           )}
