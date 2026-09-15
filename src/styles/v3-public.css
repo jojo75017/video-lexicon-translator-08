@@ -214,9 +214,9 @@
    sur <html> (bouton clair/sombre du header et de la barre latérale).
    ───────────────────────────────────────────────────────────── */
 .dark .v3pub {
-  --v3-emerald: #0f8a68;
-  --v3-emerald-600: #16a97f;
-  --v3-emerald-50: rgba(22, 169, 127, 0.12);
+  --v3-emerald: #5d8570;
+  --v3-emerald-600: #74a088;
+  --v3-emerald-50: rgba(93, 133, 112, 0.14);
   --v3-gold: #d9bb63;
   --v3-gold-600: #c9a84c;
   --v3-gold-soft: rgba(217, 187, 99, 0.14);

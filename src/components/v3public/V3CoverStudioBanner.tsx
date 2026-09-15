@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, BookOpen, Crown, FolderOpen, ShoppingBag } from 'lucide-react';
-import coverProBanner from '@/assets/cover-pro-banner.jpg';
 import { Button } from '@/components/ui/button';
 
 const ACTIONS = [
@@ -29,79 +28,92 @@ const ACTIONS = [
 
 /**
  * Module unique « Maison d'Édition Couverture » (fusion des anciennes bannières
- * Cover Studio Pro + Mes couvertures). Purement présentationnel : aucun appel IA,
- * aucun crédit consommé, aucune logique de paiement ici.
+ * Cover Studio Pro + Mes couvertures). Carte ivoire éditoriale sur fond papier,
+ * sobre et reposante. Purement présentationnel : aucun appel IA, aucun crédit
+ * consommé, aucune logique de paiement ici.
  */
 export default function V3CoverStudioBanner() {
   return (
     <section
-      className="w-full overflow-hidden"
+      className="w-full"
       style={{
-        background: 'var(--v3-emerald)',
-        borderTop: '1px solid var(--v3-gold)',
-        borderBottom: '1px solid var(--v3-gold)',
+        background: 'var(--v3-paper)',
+        borderBottom: '1px solid var(--v3-line)',
       }}
     >
-      <div
-        className="relative mx-auto w-full max-w-[1480px] overflow-hidden"
-      >
-        <div className="grid items-stretch lg:grid-cols-[220px_minmax(0,1fr)]">
-          <div className="relative hidden min-h-[260px] overflow-hidden lg:block">
-            <img
-              src={coverProBanner}
-              alt="Couvertures professionnelles créées avec le Studio de couverture EbookStudio"
-              loading="lazy"
-              width={1536}
-              height={1024}
-              className="h-full w-full object-cover object-center"
-            />
-            <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-transparent to-background/70" />
+      <div className="mx-auto w-full max-w-[1100px] px-5 py-8 md:px-8 md:py-10">
+        <div
+          className="relative overflow-hidden rounded-md px-5 py-6 sm:px-8 sm:py-7"
+          style={{
+            background: 'var(--v3-ivory)',
+            border: '1px solid color-mix(in srgb, var(--v3-gold) 45%, var(--v3-border))',
+            boxShadow: 'var(--v3-shadow-card)',
+          }}
+        >
+          {/* Filet or supérieur discret */}
+          <div
+            aria-hidden
+            className="absolute inset-x-0 top-0 h-px"
+            style={{ background: 'linear-gradient(90deg, transparent, var(--v3-gold), transparent)' }}
+          />
+
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex items-start gap-3">
+              <span
+                aria-hidden
+                className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
+                style={{ background: 'var(--v3-gold-soft)', border: '1px solid color-mix(in srgb, var(--v3-gold) 50%, transparent)' }}
+              >
+                <BookOpen className="h-5 w-5" style={{ color: 'var(--v3-gold-600)' }} />
+              </span>
+              <div>
+                <span
+                  className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em]"
+                  style={{ color: 'var(--v3-gold-600)' }}
+                >
+                  <Crown className="h-3.5 w-3.5" /> Studio de couverture V4 — Nouveauté en avance
+                </span>
+                <h2
+                  className="v3-serif mt-1 text-2xl font-bold leading-tight sm:text-3xl"
+                  style={{ color: 'var(--v3-editorial-ink)' }}
+                >
+                  Votre maison d’édition de couvertures
+                </h2>
+              </div>
+            </div>
+            <p className="max-w-sm text-sm leading-relaxed sm:text-right" style={{ color: 'var(--v3-muted)' }}>
+              Créez l’illustration, ajoutez vos textes et téléchargez une couverture prête pour Amazon KDP.
+            </p>
           </div>
 
-          <div className="p-5 sm:p-6">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-            <span
-                  className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em]"
-              style={{
-                    color: 'var(--v3-gold)',
-              }}
-            >
-                  <Crown className="h-3.5 w-3.5" /> Studio de couverture V4
-            </span>
-            <h2
-                  className="v3-serif mt-1 text-2xl font-bold leading-tight text-primary-foreground sm:text-3xl"
-            >
-                  Votre maison d’édition de couvertures
-            </h2>
-              </div>
-              <p className="max-w-xl text-sm leading-relaxed text-primary-foreground/80 sm:text-right">
-                Créez l’illustration, ajoutez vos textes et téléchargez une couverture prête pour Amazon KDP.
-            </p>
-            </div>
-
-            <div className="mt-5 grid gap-2 md:grid-cols-3">
-              {ACTIONS.map(({ to, title, description, icon: Icon, primary }) => (
-                <div key={to} className="flex min-h-[118px] flex-col rounded-md border border-primary-foreground/20 bg-primary-foreground/5 p-3">
-                  <div className="flex items-center gap-2 text-sm font-bold text-primary-foreground">
-                    <Icon className="h-4 w-4 text-orange-400" /> {title}
-                  </div>
-                  <p className="mt-1 flex-1 text-xs leading-relaxed text-primary-foreground/70">{description}</p>
-                  <Button
-                    asChild
-                    size="sm"
-                    variant={primary ? 'default' : 'outline'}
-                    className={primary
-                      ? 'mt-3 w-full bg-orange-500 text-primary-foreground hover:bg-orange-600'
-                      : 'mt-3 w-full border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground'}
-                  >
-                    <Link to={to}>
-                      {primary ? 'Commencer' : 'Ouvrir'} <ArrowRight className="h-4 w-4" />
-                    </Link>
-                  </Button>
+          <div className="mt-6 grid gap-3 md:grid-cols-3">
+            {ACTIONS.map(({ to, title, description, icon: Icon, primary }) => (
+              <div
+                key={to}
+                className="flex min-h-[112px] flex-col rounded-md p-3"
+                style={{ border: '1px solid var(--v3-border)', background: 'var(--v3-paper)' }}
+              >
+                <div className="flex items-center gap-2 text-sm font-bold" style={{ color: 'var(--v3-editorial-ink)' }}>
+                  <Icon className="h-4 w-4" style={{ color: 'var(--v3-gold-600)' }} /> {title}
                 </div>
-              ))}
-            </div>
+                <p className="mt-1 flex-1 text-xs leading-relaxed" style={{ color: 'var(--v3-muted)' }}>{description}</p>
+                <Button
+                  asChild
+                  size="sm"
+                  variant={primary ? 'default' : 'outline'}
+                  className={primary
+                    ? 'mt-3 w-full'
+                    : 'mt-3 w-full bg-transparent'}
+                  style={primary
+                    ? { background: 'var(--v3-emerald)', color: '#f8f5ed' }
+                    : { borderColor: 'color-mix(in srgb, var(--v3-emerald) 45%, transparent)', color: 'var(--v3-emerald)' }}
+                >
+                  <Link to={to}>
+                    {primary ? 'Commencer' : 'Ouvrir'} <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+            ))}
           </div>
         </div>
       </div>
