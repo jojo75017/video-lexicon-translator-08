@@ -381,6 +381,15 @@ function BookCard({ r, done, studioCover, hasStudioCovers, onPickCover, onAudio,
           {nbChap > 0 ? `${nbChap} chap.` : 'Brouillon'} · {date}
         </div>
       </div>
+      {hasStudioCovers && (
+        <button
+          onClick={onPickCover}
+          className="mt-2 inline-flex items-center justify-center gap-1.5 rounded-full border border-[color:var(--v3-orange)]/40 bg-white hover:bg-[#FFF6E8] text-[11px] font-bold text-[var(--v3-orange-600)] py-1.5 px-2 transition"
+          title="Utiliser une couverture déjà créée dans le studio"
+        >
+          <Images className="w-3.5 h-3.5" /> Choisir une couverture
+        </button>
+      )}
       {!cover && (
         <button
           onClick={generateCover}
