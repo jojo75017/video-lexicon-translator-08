@@ -50,7 +50,7 @@ export default function V3LaunchBanner({ compact = false }: { compact?: boolean 
       }}
       aria-label="Lancement EbookStudio V3"
     >
-      <div className={`mx-auto max-w-7xl px-5 md:px-8 ${compact ? 'py-2' : 'py-2.5'}`}>
+      <div className={`v3-shell ${compact ? 'py-2' : 'py-2.5'}`}>
         <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
             <span

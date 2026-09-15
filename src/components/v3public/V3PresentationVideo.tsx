@@ -32,7 +32,7 @@ export default function V3PresentationVideo() {
         style={{ background: 'linear-gradient(180deg, var(--v3-gold-soft), transparent)' }}
       />
 
-      <div className="relative max-w-6xl mx-auto px-5 md:px-10 py-10 md:py-14">
+      <div className="relative v3-shell py-10 md:py-14">
         <div
           className="relative rounded-md p-2 md:p-3"
           style={{

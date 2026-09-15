@@ -41,7 +41,7 @@ export default function V3CoverStudioBanner() {
         borderBottom: '1px solid var(--v3-line)',
       }}
     >
-      <div className="mx-auto w-full max-w-[1100px] px-5 py-8 md:px-8 md:py-10">
+      <div className="v3-shell py-8 md:py-10">
         <div
           className="relative overflow-hidden rounded-md px-5 py-6 sm:px-8 sm:py-7"
           style={{
