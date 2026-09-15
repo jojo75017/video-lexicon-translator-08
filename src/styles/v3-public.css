@@ -20,8 +20,8 @@
   --v3-editorial-ink-soft: #344456;
   --v3-ivory: #f8f5ed;
   --v3-muted: #5b6b64;
-  --v3-line: rgba(6, 78, 59, 0.10);
-  --v3-border: rgba(6, 78, 59, 0.10);
+  --v3-line: rgba(45, 62, 51, 0.10);
+  --v3-border: rgba(45, 62, 51, 0.10);
 
   /* Alias historiques (compatibilité descendante — mapent vers émeraude/or) */
   --v3-orange: var(--v3-emerald);
@@ -30,8 +30,8 @@
   --v3-cloud: var(--v3-cream);
 
   /* Ombres éditoriales */
-  --v3-shadow-card: 0 1px 2px rgba(6,78,59,.04), 0 12px 32px -18px rgba(6,78,59,.18);
-  --v3-shadow-menu: 0 20px 60px -20px rgba(6,78,59,.28), 0 2px 6px rgba(6,78,59,.06);
+  --v3-shadow-card: 0 1px 2px rgba(45,62,51,.04), 0 12px 32px -18px rgba(45,62,51,.18);
+  --v3-shadow-menu: 0 20px 60px -20px rgba(45,62,51,.28), 0 2px 6px rgba(45,62,51,.06);
 
   font-family: 'Inter', system-ui, -apple-system, Segoe UI, sans-serif;
   color: var(--v3-ink);
@@ -79,12 +79,12 @@
 .v3pub .v3-btn-primary {
   background: var(--v3-emerald);
   color: #fff;
-  box-shadow: 0 10px 26px -12px rgba(6, 78, 59, 0.55);
+  box-shadow: 0 10px 26px -12px rgba(45, 62, 51, 0.55);
 }
 .v3pub .v3-btn-primary:hover {
   background: var(--v3-emerald-600);
   transform: translateY(-1px);
-  box-shadow: 0 14px 30px -12px rgba(6, 78, 59, 0.6);
+  box-shadow: 0 14px 30px -12px rgba(45, 62, 51, 0.6);
 }
 .v3pub .v3-btn-gold {
   background: var(--v3-gold);
@@ -102,7 +102,7 @@
   color: var(--v3-ink);
   background: transparent;
 }
-.v3pub .v3-btn-ghost:hover { color: var(--v3-emerald); background: rgba(6,78,59,0.04); }
+.v3pub .v3-btn-ghost:hover { color: var(--v3-emerald); background: rgba(45,62,51,0.04); }
 .v3pub .v3-btn-on-dark {
   color: #f5f0e0;
   background: transparent;
@@ -205,9 +205,9 @@
 .v3pub .v3-nav-item[data-active="true"]::after { transform: scaleX(1); }
 
 /* Scrollbar horizontal discret */
-.v3pub .v3-scroll-x { scrollbar-width: thin; scrollbar-color: rgba(6,78,59,0.2) transparent; }
+.v3pub .v3-scroll-x { scrollbar-width: thin; scrollbar-color: rgba(45,62,51,0.2) transparent; }
 .v3pub .v3-scroll-x::-webkit-scrollbar { height: 6px; }
-.v3pub .v3-scroll-x::-webkit-scrollbar-thumb { background: rgba(6,78,59,0.2); border-radius: 6px; }
+.v3pub .v3-scroll-x::-webkit-scrollbar-thumb { background: rgba(45,62,51,0.2); border-radius: 6px; }
 
 /* ─────────────────────────────────────────────────────────────
    Thème sombre — Émeraude nuit. Activé par la classe `dark`
