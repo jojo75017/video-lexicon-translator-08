@@ -42,9 +42,6 @@ export default function V3OutlineCoBuilder({ outlineFirst }: Props = {}) {
 
   /** Chemin sommaire-d'abord actif (drapeau brief ou prop externe). */
   const isOutlineFirst = Boolean(outlineFirst || brief.outlineFirst);
-  /** L'auteur a déjà écrit un récit : on reste sur le comportement habituel. */
-  const hasSource = passages.length > 0;
-  const useOutlineFirst = isOutlineFirst;
 
   const outline = brief.outline || [];
   /** Récit de l'auteur découpé en passages numérotés : le sommaire doit les suivre. */
