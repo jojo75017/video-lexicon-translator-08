@@ -76,6 +76,7 @@ import {
   type TextRole,
 } from '@/lib/cover-editor/frontComposition';
 import ReferenceTemplateGallery from '@/components/cover-editor/ReferenceTemplateGallery';
+import CoverTemplateThumb from '@/components/cover-editor/CoverTemplateThumb';
 import ShapeLayersPanel from '@/components/cover-editor/ShapeLayersPanel';
 import {
   applyReferenceTemplate,
