@@ -32,6 +32,7 @@ interface Brief {
   palette?: string;
   style?: string;
   artStyle?: string;
+  lighting?: string;
   include?: string;
   avoid?: string;
   bookTitle?: string;
@@ -53,13 +54,26 @@ const ART_DIRECTIONS: Record<string, string> = {
     "Illustration graphique minimaliste premium : formes simples et fortes, aplats de couleur maîtrisés, symbole central mémorable, contraste élevé, grande respiration, esthétique de collection design contemporaine.",
 };
 
+/** Consignes d'exposition : par défaut une image claire, jamais bouchée. */
+const LIGHTING_DIRECTIONS: Record<string, string> = {
+  bright:
+    "LUMIÈRE : image claire et lumineuse, exposition correcte et généreuse, hautes lumières présentes, sujet principal (visage, corps, objet) nettement éclairé, ombres douces et détaillées, aucune zone noire bouchée, aucun rendu sous-exposé ou terne.",
+  balanced:
+    "LUMIÈRE : exposition naturelle et équilibrée, contraste maîtrisé, sujet principal clairement lisible, ombres détaillées sans zones noires bouchées.",
+  dark:
+    "LUMIÈRE : ambiance sombre et dramatique assumée, mais le sujet principal reste parfaitement lisible et éclairé par une source directionnelle forte ; aucune image globalement noire ni illisible.",
+};
+
 /** Construit le prompt : illustration éditoriale STRICTEMENT sans aucun texte. */
 function buildPrompt(b: Brief): string {
   const direction =
     (b.artStyle && ART_DIRECTIONS[b.artStyle]) ?? ART_DIRECTIONS["illustration-editoriale"];
+  const lighting =
+    (b.lighting && LIGHTING_DIRECTIONS[b.lighting]) ?? LIGHTING_DIRECTIONS["bright"];
   const lines = [
     "Illustration de couverture de livre professionnelle destinée à une publication réelle (niveau best-seller Amazon KDP), cadrage portrait vertical, qualité maximale.",
     direction,
+    lighting,
     b.genre ? `Genre du livre : ${b.genre}.` : "",
     b.summary ? `Contexte / résumé : ${b.summary}.` : "",
     b.mood ? `Ambiance recherchée : ${b.mood}.` : "",
@@ -71,6 +85,7 @@ function buildPrompt(b: Brief): string {
     b.bookTitle
       ? `Le livre s'intitule « ${b.bookTitle} » : cette information sert uniquement à comprendre le sujet et ne doit JAMAIS apparaître dans l'image.`
       : "",
+    "QUALITÉ EXIGÉE : rendu comparable aux meilleures couvertures vendues en librairie et sur Amazon, sujet net et bien éclairé, visages et mains anatomiquement corrects, regard expressif, lumière cohérente entre le sujet et le décor, matières crédibles, finition professionnelle prête à imprimer. Interdits : rendu terne, plat, gris, sous-exposé, délavé, aspect image de banque générique, brouillon ou amateur.",
     "QUALITÉ EXIGÉE : composition claire avec un point focal fort, hiérarchie visuelle nette, anatomie et perspective justes, mains et visages corrects, éclairage cohérent, finition léchée. Interdits : rendu amateur, flou involontaire, membres déformés, personnages difformes, collage grossier, banque d'images générique, aspect brouillon.",
     "INTERDICTIONS ABSOLUES : aucun titre, aucun sous-titre, aucun nom d'auteur, aucune lettre, aucun mot, aucun chiffre, aucun logo, aucun filigrane, aucun code-barres, aucun ISBN, aucun faux caractère typographique, aucune signature.",
     "Composition : image purement visuelle, avec des zones calmes en haut (environ 30 % de la hauteur) et en bas permettant d'ajouter plus tard le titre, le sous-titre et le nom de l'auteur dans des calques séparés.",
@@ -115,6 +130,8 @@ Deno.serve(async (req) => {
     const brief: Brief = {
       genre: body?.genre, summary: body?.summary, mood: body?.mood, scene: body?.scene,
       palette: body?.palette, style: body?.style, include: body?.include, avoid: body?.avoid,
+      artStyle: typeof body?.artStyle === "string" ? body.artStyle : undefined,
+      lighting: typeof body?.lighting === "string" ? body.lighting : undefined,
       bookTitle: project.book_title ?? undefined,
     };
     const prompt = buildPrompt(brief);
