@@ -17,7 +17,7 @@ import V3BookActionsBar from '@/components/v3public/V3BookActionsBar';
 import V3OutlineCoBuilder from '@/components/v3public/V3OutlineCoBuilder';
 import V3PassageCorrector from '@/components/v3public/V3PassageCorrector';
 
-import { BOOK_BRIEF_EVENT, readBookBrief, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
+import { BOOK_BRIEF_EVENT, clearBookBrief, readBookBrief, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
 import { restoreDraftState, saveBookDraftToCloud, BOOK_DRAFT_STATUS_EVENT, type BookDraftStatus } from '@/lib/v3/bookDraftCloud';
 import { writeLocalThread } from '@/lib/v3/genieThread';
 
@@ -127,23 +127,48 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
       const category = Array.isArray(data.kdp_categories)
         ? String(data.kdp_categories[0] || '')
         : String(data.kdp_categories || '');
-      const prev = readBookBrief() || {};
-      const restoredBrief = restored?.brief || {};
+
+      // Le brouillon affiché à l'écran peut appartenir à un AUTRE livre :
+      // on ne conserve la fiche locale que si c'est bien le même projet.
+      const previous = readBookBrief() || {};
+      const samePreviousBook = previous.projectId === data.id;
+      const prev = samePreviousBook ? previous : {};
+
+      // Un récit non enregistré d'un autre livre : on propose de le sauver avant de basculer.
+      if (!samePreviousBook && previous.projectId && (previous.sourceText || '').trim() && !previous.cloudSavedAt) {
+        const otherTitle = (previous.title || 'votre livre précédent').trim();
+        toast.warning(`Le récit de « ${otherTitle} » n’était pas encore enregistré.`, {
+          action: {
+            label: 'Enregistrer',
+            onClick: () => { void saveBookDraftToCloud(previous as any); },
+          },
+          duration: 12000,
+        });
+      }
+
+      // On repart d'une fiche propre : aucun passage, aucune correction et
+      // aucune information d'un autre livre ne peut rester à l'écran.
+      clearBookBrief();
+      const restoredBrief = (samePreviousBook || restored?.brief?.projectId === data.id || !restored?.brief?.projectId)
+        ? (restored?.brief || {})
+        : {};
       writeBookBrief({
         ...prev, ...restoredBrief,
+        mode: biography ? 'biography' : 'book',
         projectId: data.id,
-        title: data.title || prev.title || '',
-        author: data.author_name || prev.author || '',
-        description: data.kdp_description || prev.description || '',
-        category: category || prev.category || '',
-        tone: data.tone || prev.tone || '',
-        chapters: outline.length || Number(data.number_of_chapters) || prev.chapters,
-        outline: outline.length ? outline : prev.outline,
-        outlineValidated: outline.length ? true : prev.outlineValidated,
+        title: data.title || restoredBrief.title || '',
+        author: data.author_name || restoredBrief.author || '',
+        description: data.kdp_description || restoredBrief.description || '',
+        category: category || restoredBrief.category || '',
+        tone: data.tone || restoredBrief.tone || '',
+        chapters: outline.length || Number(data.number_of_chapters) || restoredBrief.chapters,
+        outline: outline.length ? outline : restoredBrief.outline,
+        outlineValidated: outline.length ? true : restoredBrief.outlineValidated,
       });
-      if (restored?.messages?.length) writeLocalThread(restored.messages);
+      writeLocalThread(restored?.messages || []);
+      const dataStep: DeskId = outline.length ? (restoredBrief.outlineValidated === false ? 2 : 3) : 1;
       if (restored?.activeStep && [1, 2, 3].includes(restored.activeStep)) setDesk(restored.activeStep as DeskId);
-      else if (!outline.length) setDesk(1);
+      else setDesk(dataStep);
 
       setOpenedBook({ id: data.id, title: data.title || 'Livre sans titre', chapters: outline.length });
       setBriefKey((k) => k + 1);
@@ -152,7 +177,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
       setTimeout(() => wizardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
     })();
     return () => { cancelled = true; };
-  }, [projectId]);
+  }, [projectId, biography]);
 
   // Arrivée depuis « Sommaire IA » : on descend directement sur le panneau.
   useEffect(() => {
@@ -217,7 +242,8 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                 <div className="text-xs uppercase tracking-wider" style={{ color: 'var(--v3-muted)' }}>Livre ouvert</div>
                 <div className="v3-serif text-xl font-bold truncate">{openedBook.title}</div>
                 <div className="text-xs mt-1" style={{ color: 'var(--v3-muted)' }}>
-                  {openedBook.chapters > 0 ? `${openedBook.chapters} chapitre(s) chargé(s) dans le workflow` : 'Aucun chapitre enregistré pour le moment'}
+                  {openedBook.chapters > 0 ? `${openedBook.chapters} chapitre(s) avec leurs titres` : 'Aucun chapitre enregistré pour le moment'}
+                  {' · '}Vous reprenez à l’étape {desk}. {DESKS.find((d) => d.id === desk)?.label}
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
