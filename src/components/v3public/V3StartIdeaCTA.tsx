@@ -16,7 +16,7 @@ export default function V3StartIdeaCTA({ variant = 'full' }: Props) {
     return (
       <div className="grid gap-3 sm:grid-cols-2">
         <Link
-          to="/v3/create"
+          to="/assistant"
           className="group flex items-start gap-3 rounded-xl border bg-card p-4 transition hover:shadow-sm"
           style={{ borderColor: 'rgba(0,0,0,0.10)' }}
         >
@@ -59,7 +59,7 @@ export default function V3StartIdeaCTA({ variant = 'full' }: Props) {
           </p>
           <div className="flex flex-wrap items-center gap-2">
             <Link
-              to="/v3/create"
+              to="/assistant"
               className="inline-flex items-center gap-2 rounded-xl bg-[#c9a84c] px-5 py-2.5 text-sm font-semibold text-[#1a1a1a] transition hover:bg-[#e7cf8c]"
             >
               <Sparkles className="h-4 w-4" /> Parler avec l'IA
@@ -96,7 +96,7 @@ export default function V3StartIdeaCTA({ variant = 'full' }: Props) {
             faire, à qui vous voulez parler — et vous repartez avec un sujet précis.
           </p>
           <Link
-            to="/v3/create"
+            to="/assistant"
             className="mt-4 inline-flex items-center justify-center gap-2 rounded-xl bg-[#c9a84c] px-6 py-3.5 text-base font-semibold text-[#1a1a1a] transition hover:bg-[#e7cf8c]"
           >
             <Sparkles className="h-5 w-5" /> Commencer la discussion
