@@ -242,7 +242,8 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                 <div className="text-xs uppercase tracking-wider" style={{ color: 'var(--v3-muted)' }}>Livre ouvert</div>
                 <div className="v3-serif text-xl font-bold truncate">{openedBook.title}</div>
                 <div className="text-xs mt-1" style={{ color: 'var(--v3-muted)' }}>
-                  {openedBook.chapters > 0 ? `${openedBook.chapters} chapitre(s) chargé(s) dans le workflow` : 'Aucun chapitre enregistré pour le moment'}
+                  {openedBook.chapters > 0 ? `${openedBook.chapters} chapitre(s) avec leurs titres` : 'Aucun chapitre enregistré pour le moment'}
+                  {' · '}Vous reprenez à l’étape {desk}. {DESKS.find((d) => d.id === desk)?.label}
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
