@@ -12,6 +12,7 @@ import V3QuickActionsBar from '@/components/v3public/V3QuickActionsBar';
 
 import V3UpsellRotator from '@/components/v3public/V3UpsellRotator';
 import V3CoverStudioBanner from '@/components/v3public/V3CoverStudioBanner';
+import BdComicNewsBanner from '@/components/bd/BdComicNewsBanner';
 import AgentAvatar from '@/components/v3public/AgentAvatar';
 import { V3_AGENTS } from '@/data/v3Agents';
 import Niches10Offer from '@/components/marketing/Niches10Offer';
@@ -68,7 +69,10 @@ export default function V3HomePage() {
       {/* LANCEMENT — fin du 47 € le 30 septembre, V3 le 1er octobre */}
       <V3LaunchBanner />
 
-      {/* KDP Pilot et le studio BD vivent désormais sur leurs pages dédiées :
+      {/* GRANDE NOUVEAUTÉ V4 — Studio BD & Jeunesse (47 € à vie) */}
+      <BdComicNewsBanner />
+
+      {/* KDP Pilot vit désormais sur sa page dédiée :
           l'accueil garde une seule ligne discrète (plus bas). */}
 
       {/* BANDEAU D'ACCROCHE — premier module */}
