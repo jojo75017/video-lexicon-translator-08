@@ -65,6 +65,39 @@ export default function BdComicNewsBanner({ compact = false }: Props) {
             >
               Découvrir l’offre — {BD_COMIC_OFFER.price} € à vie <ArrowRight className="h-4 w-4" />
             </Link>
+
+            <div className="mt-4">
+              <p
+                className="text-xs font-bold uppercase tracking-wider"
+                style={{ color: 'var(--v3-gold-600)' }}
+              >
+                Pas seulement des livres numériques
+              </p>
+              <ul className="mt-2 flex flex-wrap gap-2 text-xs">
+                {[
+                  'Bandes dessinées',
+                  'Livres de coloriage',
+                  'Histoires illustrées 3-7 et 8-12 ans',
+                  'Planches à imprimer',
+                  'Supports illustrés pour la classe',
+                  'Cadeaux personnalisés',
+                  'Séries en plusieurs tomes',
+                  'Couvertures et exports KDP',
+                ].map((item) => (
+                  <li
+                    key={item}
+                    className="rounded-full border px-2.5 py-1"
+                    style={{
+                      borderColor: 'var(--v3-border)',
+                      background: 'var(--v3-paper)',
+                      color: 'var(--v3-ink-2)',
+                    }}
+                  >
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
           <div className="flex flex-col gap-4">
