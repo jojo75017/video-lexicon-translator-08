@@ -57,7 +57,8 @@ export async function buildVisualPrompt(input: VisualPromptInput): Promise<strin
     .slice(0, 6000);
 
   try {
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -77,16 +78,26 @@ export async function buildVisualPrompt(input: VisualPromptInput): Promise<strin
               "titres, guillemets, mentions de texte, de titre, de logo ou de typographie, mots " +
               "latins ou inventés. Réponds uniquement par la consigne visuelle.",
           },
-          { role: "user", content: context },
+          {
+            role: "user",
+            content:
+              context +
+              (attempt === 0
+                ? ""
+                : "\n\nLa réponse précédente était incomplète. Écris cette fois une phrase complète de 60 à 120 mots terminée par un point."),
+          },
         ],
       }),
-    });
+      });
 
-    if (!res.ok) return null;
-    const payload = await res.json();
-    const text: string = payload?.choices?.[0]?.message?.content ?? "";
-    const result = text.replace(/```/g, "").replace(/\s+/g, " ").trim();
-    return result.length >= 40 ? result.slice(0, 1200) : null;
+      if (!res.ok) return null;
+      const payload = await res.json();
+      const text: string = payload?.choices?.[0]?.message?.content ?? "";
+      const result = text.replace(/```/g, "").replace(/\s+/g, " ").trim();
+      const wordCount = result.split(/\s+/).filter(Boolean).length;
+      if (wordCount >= 45 && /[.!?]$/.test(result)) return result.slice(0, 1200);
+    }
+    return null;
   } catch {
     return null;
   }
