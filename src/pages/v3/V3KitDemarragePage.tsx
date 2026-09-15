@@ -132,6 +132,10 @@ export default function V3KitDemarragePage() {
           . Je réponds personnellement.
         </p>
       </section>
+
+      <div className="mt-6">
+        <V3StartIdeaCTA variant="compact" />
+      </div>
     </div>
   );
 }
