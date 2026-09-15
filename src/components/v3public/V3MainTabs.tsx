@@ -62,7 +62,7 @@ export default function V3MainTabs() {
         borderBottom: '1px solid var(--v3-line)',
       }}
     >
-      <div className="max-w-[1440px] mx-auto pl-5 md:pl-8 pr-2 md:pr-4 h-14 flex items-center gap-1">
+      <div className="max-w-[1440px] mx-auto pl-4 md:pl-6 pr-2 md:pr-3 h-14 flex items-center gap-1">
         {/* Desktop (≥ xl) — rangée scrollable : aucun onglet n'est coupé */}
         <nav className="hidden xl:flex items-center gap-0.5 flex-1 min-w-0 overflow-x-auto v3-no-scrollbar">
           <NavLink
@@ -71,9 +71,10 @@ export default function V3MainTabs() {
             className={({ isActive }) =>
               `v3-btn text-[12px] ml-1 mr-1 shrink-0 ${isActive ? 'v3-btn-gold' : 'v3-btn-outline'}`
             }
-            style={({ isActive }) =>
-              isActive ? {} : { borderColor: 'var(--v3-gold)', color: 'var(--v3-emerald)' }
-            }
+            style={({ isActive }) => ({
+              padding: '8px 13px', gap: 6,
+              ...(isActive ? {} : { borderColor: 'var(--v3-gold)', color: 'var(--v3-emerald)' }),
+            })}
           >
             <span aria-hidden className="text-[15px]">🏠</span>
             <span>Accueil</span>
@@ -89,6 +90,8 @@ export default function V3MainTabs() {
               border: '1px solid #f59e0b',
               fontWeight: 700,
               textShadow: 'none',
+              padding: '8px 13px',
+              gap: 6,
             }}
           >
             <span aria-hidden>✨</span>
@@ -103,6 +106,8 @@ export default function V3MainTabs() {
               border: '1px solid var(--v3-gold)',
               fontWeight: 700,
               textShadow: 'none',
+              padding: '8px 13px',
+              gap: 6,
             })}
           >
             <Sparkles className="w-3.5 h-3.5" />
@@ -131,7 +136,7 @@ export default function V3MainTabs() {
                     else openCat(cat.key, e.currentTarget);
                   }}
                   data-active={active ? 'true' : 'false'}
-                  className="v3-nav-item flex items-center gap-1.5 px-2 py-2 text-[13px] v3-serif font-semibold whitespace-nowrap"
+                  className="v3-nav-item flex items-center gap-1 px-1.5 py-2 text-[13px] v3-serif font-semibold whitespace-nowrap"
                   style={{ color: active ? 'var(--v3-emerald)' : 'var(--v3-ink)' }}
                 >
                   <span aria-hidden className="text-[15px]">{cat.emoji}</span>
