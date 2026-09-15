@@ -397,15 +397,37 @@ export default function V3OutlineCoBuilder({ outlineFirst }: Props = {}) {
         </div>
       )}
 
-      <div className="mt-3">
-        <input
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          placeholder="Une précision pour les prochains chapitres (facultatif)…"
-          className="w-full rounded-xl border bg-white px-2.5 py-2 text-[12.5px] outline-none"
-          style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }}
-        />
-      </div>
+      {useOutlineFirst ? (
+        <div className="mt-3 rounded-2xl border p-2.5"
+          style={{ borderColor: 'rgba(0,130,150,0.4)', background: 'rgba(0,130,150,0.06)' }}>
+          <label htmlFor="v3-outline-indication"
+            className="mb-1 block text-[12.5px] font-medium" style={{ color: 'var(--v3-ink)' }}>
+            Mes indications pour les prochains chapitres
+          </label>
+          <textarea
+            id="v3-outline-indication"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            rows={3}
+            placeholder="Ex. : Chapitre 3 — le moment où j’ai compris que tout allait changer. J’y tiens, il doit rester entier."
+            className="w-full rounded-xl border bg-white px-2.5 py-2 text-[12.5px] outline-none"
+            style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }}
+          />
+          <p className="mt-1 text-[11px]" style={{ color: 'var(--v3-muted)' }}>
+            Chaque indication est mémorisée par le Génie et guide les chapitres suivants.
+          </p>
+        </div>
+      ) : (
+        <div className="mt-3">
+          <input
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="Une précision pour les prochains chapitres (facultatif)…"
+            className="w-full rounded-xl border bg-white px-2.5 py-2 text-[12.5px] outline-none"
+            style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }}
+          />
+        </div>
+      )}
 
       <div className="mt-3 flex flex-wrap gap-2">
         <button type="button" onClick={() => propose()} disabled={loading} className="v3-btn v3-btn-primary text-xs disabled:opacity-50">
