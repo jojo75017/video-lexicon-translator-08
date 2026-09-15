@@ -841,7 +841,7 @@ const drawShapes = (
       ctx.save();
       ctx.clip();
       if (image) {
-        ctx.filter = `brightness(${Math.min(1.5, Math.max(0.7, composition.imageBrightness ?? 1))})`;
+        ctx.filter = imageAdjustFilter(composition);
         drawImageCover(ctx, image, x, y, w, h);
       }
       else {
