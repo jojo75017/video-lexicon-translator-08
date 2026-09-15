@@ -579,8 +579,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                       className="mt-3 w-full rounded-xl border bg-white px-3 py-2 text-[12.5px] outline-none"
                       style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }}
                     />
-                     <button type="button" onClick={importPastedOutline} className="v3-btn mt-3 text-xs"
-                       style={{ background: 'var(--v3-orange)', color: 'var(--v3-ink)', fontWeight: 700 }}>
+                     <button type="button" onClick={importPastedOutline} className="v3-btn v3-btn-action-orange mt-3 text-xs">
                        Faire lire mon vrai sommaire au Génie
                     </button>
                   </div>
@@ -600,8 +599,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                           </li>
                         ))}
                       </ol>
-                      <button type="button" onClick={validateExistingOutline} className="v3-btn mt-4 text-xs"
-                        style={{ background: 'var(--v3-orange)', color: 'var(--v3-ink)', fontWeight: 700 }}>
+                      <button type="button" onClick={validateExistingOutline} className="v3-btn v3-btn-action-orange mt-4 text-xs">
                         <Check className="h-3.5 w-3.5" /> Le Génie vérifie et valide mon sommaire
                       </button>
                     </div>
