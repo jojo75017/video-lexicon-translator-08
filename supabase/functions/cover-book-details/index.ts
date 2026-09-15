@@ -101,13 +101,42 @@ Deno.serve(async (req) => {
       parsed = JSON.parse(cleaned);
     } catch {
       const match = cleaned.match(/\{[\s\S]*\}/);
-      if (match) parsed = JSON.parse(match[0]);
+      if (match) {
+        try {
+          parsed = JSON.parse(match[0]);
+        } catch {
+          parsed = {};
+        }
+      }
     }
 
     const details: Record<string, string> = {};
-    for (const key of KEYS) details[key] = str(parsed?.[key]);
+    for (const key of KEYS) details[key] = pick(parsed, key);
+
+    // Repli ligne par ligne si le modèle a répondu en texte simple.
+    if (!Object.values(details).some(Boolean) && cleaned) {
+      const labels: Record<string, RegExp> = {
+        targetAudience: /(targetAudience|lecteurs?|public)/i,
+        era: /(era|époque|epoque)/i,
+        location: /(location|lieu)/i,
+        focalSubject: /(focalSubject|sujet|personnage)/i,
+        emotion: /(emotion|émotion)/i,
+        mustInclude: /(mustInclude|obligatoire|inclure)/i,
+        mustAvoid: /(mustAvoid|interdit|éviter|eviter)/i,
+      };
+      for (const line of cleaned.split(/\n+/)) {
+        const parts = line.split(/\s*[:：]\s*/);
+        if (parts.length < 2) continue;
+        const value = str(parts.slice(1).join(": ").replace(/^["'“]|["'”],?$/g, ""));
+        if (!value) continue;
+        for (const key of KEYS) {
+          if (!details[key] && labels[key].test(parts[0])) details[key] = value;
+        }
+      }
+    }
+
     if (!Object.values(details).some(Boolean)) {
-      return json({ error: "Analyse illisible, réessayez." }, 502);
+      return json({ error: "Analyse illisible, réessayez dans un instant." }, 502);
     }
     if (!details.mustAvoid) details.mustAvoid = "Aucun texte ni logo dans l'image";
 
