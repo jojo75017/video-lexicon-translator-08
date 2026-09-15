@@ -412,6 +412,39 @@ export default function IllustrationGeneratorPanel({
               />
             </div>
 
+            {/* Consigne visuelle : traduit votre description en instruction d'image */}
+            <div className="space-y-2 rounded-lg border border-border bg-muted/30 p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <Label htmlFor="ill-visual">Ce que l’image va représenter</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="gap-2"
+                  disabled={visualBusy || busy || summary.trim().length < 12}
+                  onClick={() => void proposeVisualPrompt()}
+                >
+                  {visualBusy ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Wand2 className="h-4 w-4" />
+                  )}
+                  {visualPrompt ? 'Régénérer la description visuelle' : 'Proposer la description visuelle'}
+                </Button>
+              </div>
+              <Textarea
+                id="ill-visual"
+                rows={4}
+                value={visualPrompt}
+                onChange={(e) => setVisualPrompt(e.target.value)}
+                placeholder="Consigne visuelle : sujet principal, décor, époque, cadrage, lumière…"
+              />
+              <p className="text-xs text-muted-foreground">
+                Cette consigne est ce que l’image suivra vraiment. Vous pouvez la corriger mot à mot.
+                Si vous la laissez vide, elle est déduite automatiquement de votre description.
+                Cette étape ne consomme aucune génération.
+              </p>
+            </div>
+
             {/* 3. Nombre de propositions */}
             <div className="flex flex-wrap items-center gap-2">
               <Label className="text-sm">Nombre de propositions :</Label>
