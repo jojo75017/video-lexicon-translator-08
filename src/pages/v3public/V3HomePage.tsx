@@ -10,7 +10,7 @@ import V3ResumeBookCard from '@/components/v3public/V3ResumeBookCard';
 import V3QuickActionsBar from '@/components/v3public/V3QuickActionsBar';
 import V3PaletteModule from '@/components/v3public/V3PaletteModule';
 
-import V3ContentStudioPromo from '@/components/v3public/V3ContentStudioPromo';
+
 import V3UpsellRotator from '@/components/v3public/V3UpsellRotator';
 import V3CoverStudioBanner from '@/components/v3public/V3CoverStudioBanner';
 import AgentAvatar from '@/components/v3public/AgentAvatar';
@@ -135,11 +135,8 @@ export default function V3HomePage() {
       {/* Encart de démarrage — immédiatement après les moteurs IA */}
       <V3ClosingRecallPanel />
 
-      {/* ContentStudio Engine — encart premium HORS Reading Gate, accès direct
-          vers /v3/contentstudio visible même pour les visiteurs non débloqués */}
-      <section className="max-w-7xl mx-auto px-5 md:px-8 pt-3">
-        <V3ContentStudioPromo />
-      </section>
+
+
 
       {/* PRÉSENTATION LONGUE — comprendre la V3 (sommaire ancré + 4 sections) */}
       <V3AnchorNav />
