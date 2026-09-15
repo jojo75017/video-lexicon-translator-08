@@ -60,7 +60,7 @@ export default function V3OutlineCoBuilder() {
   /** Textes envoyés après la construction du sommaire : matière à rattacher. */
   const pending = uncoveredPassages(brief);
   const pendingWords = pending.reduce((total, n) => total + countWords(passages[n - 1] || ''), 0);
-  const missingChapters = Math.max(0, suggested - outline.length);
+  const missingChapters = Math.max(0, target - outline.length);
 
 
   const patch = (values: Partial<BookBrief>) => {
@@ -203,21 +203,52 @@ export default function V3OutlineCoBuilder() {
         </p>
       )}
 
+      {outline.length > 0 && (
+        <p className="mt-2 rounded-xl border px-2.5 py-2 text-[11.5px]"
+          style={{ borderColor: 'rgba(15,107,74,0.35)', background: 'rgba(15,107,74,0.06)', color: 'var(--v3-ink)' }}>
+          Livre ouvert : <strong>{brief.title || 'votre livre'}</strong> —{' '}
+          <strong>{outline.length} chapitre(s)</strong> déjà enregistrés dans votre sommaire.
+        </p>
+      )}
+
+      {/* Le nombre de chapitres reste réglable à la main : le calcul automatique
+          ne peut jamais réduire un livre déjà écrit. */}
+      <div className="mt-2 flex flex-wrap items-center gap-2 text-[12px]" style={{ color: 'var(--v3-ink)' }}>
+        <label htmlFor="v3-outline-target">Nombre de chapitres visé</label>
+        <input
+          id="v3-outline-target"
+          type="number"
+          min={3}
+          max={40}
+          value={target}
+          onChange={(e) => {
+            const value = Math.min(40, Math.max(3, Number(e.target.value) || 3));
+            patch({ chapters: value });
+          }}
+          className="w-20 rounded-lg border bg-white px-2 py-1 text-[12px] outline-none"
+          style={{ borderColor: 'rgba(0,0,0,0.12)' }}
+        />
+        {target > 30 && (
+          <span style={{ color: '#8a6d1f' }}>Au-delà de 30 chapitres, la rédaction devient longue.</span>
+        )}
+      </div>
+
       {sourceWords > 0 ? (
         <p className="mt-2 rounded-xl border px-2.5 py-2 text-[11.5px]"
           style={{ borderColor: 'rgba(15,107,74,0.35)', background: 'rgba(15,107,74,0.06)', color: 'var(--v3-ink)' }}>
           Vous avez écrit <strong>{sourceWords.toLocaleString('fr-FR')} mots</strong> en{' '}
-          {passages.length} texte(s) : je propose <strong>{suggested} chapitre(s)</strong>.
+          {passages.length} texte(s) : je propose <strong>{target} chapitre(s)</strong>.
           {coveredCount > 0 ? ` ${coveredCount} de vos textes sont déjà rattachés à un chapitre.` : ''}{' '}
           Chaque chapitre proposé indique de quels textes il vient — rien n’est jeté.
         </p>
-      ) : (
+      ) : outline.length === 0 && (
         <p className="mt-2 rounded-xl border px-2.5 py-2 text-[11.5px]"
           style={{ borderColor: 'rgba(201,168,76,0.45)', background: 'rgba(201,168,76,0.08)', color: 'var(--v3-ink)' }}>
           Continuez à raconter à l’étape ① : je m’occupe du plan quand vous aurez fini. Le nombre de
           chapitres sera calculé sur ce que vous aurez vraiment écrit.
         </p>
       )}
+
 
       {outline.length > 0 && pending.length > 0 && (
         <div className="mt-2 rounded-xl border px-2.5 py-2 text-[11.5px]"
