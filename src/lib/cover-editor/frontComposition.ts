@@ -495,7 +495,10 @@ export function serializeComposition(
     backgroundColor: /^#[0-9a-fA-F]{6}$/.test(composition.backgroundColor ?? '')
       ? composition.backgroundColor
       : DEFAULT_FRONT_BACKGROUND,
-    imageBrightness: Math.min(1.5, Math.max(0.7, composition.imageBrightness ?? 1)),
+    imageBrightness: clampRange(composition.imageBrightness, 0.7, 1.5, 1),
+    imageContrast: clampRange(composition.imageContrast, 0.7, 1.4, 1),
+    imageSaturation: clampRange(composition.imageSaturation, 0, 1.6, 1),
+    imageWarmth: clampRange(composition.imageWarmth, -20, 20, 0),
     illustrationMode: composition.illustrationMode === 'slot' ? 'slot' : 'cover',
     shapes: (composition.shapes ?? []).map((s) => ({ ...s })),
     layers: composition.layers.map((l) => ({
