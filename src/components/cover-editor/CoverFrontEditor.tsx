@@ -78,6 +78,7 @@ import {
 } from '@/lib/cover-editor/frontComposition';
 import ReferenceTemplateGallery from '@/components/cover-editor/ReferenceTemplateGallery';
 import CoverTemplateThumb from '@/components/cover-editor/CoverTemplateThumb';
+import CoverQualityPanel from '@/components/cover-editor/CoverQualityPanel';
 import ShapeLayersPanel from '@/components/cover-editor/ShapeLayersPanel';
 import {
   applyReferenceTemplate,
@@ -722,6 +723,8 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
           Export impossible : {exportError}
         </p>
       )}
+
+      <CoverQualityPanel composition={composition} hasIllustration={Boolean(bgUrl)} />
 
       {/* 3 maquettes de référence professionnelles */}
       <ReferenceTemplateGallery
