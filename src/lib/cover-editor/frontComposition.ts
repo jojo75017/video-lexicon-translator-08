@@ -145,6 +145,11 @@ export interface FrontComposition {
   imageSaturation?: number;
   /** Chaleur locale en degrés de rotation de teinte : 0 = original (-20 → 20). */
   imageWarmth?: number;
+  /** Cadrage local, sans altérer le fichier privé d'origine. */
+  imageScale?: number;
+  imageOffsetX?: number;
+  imageOffsetY?: number;
+  imageFlipX?: boolean;
   overlay?: FrontOverlay;
   /** Identifiant du dernier modèle appliqué (informatif). */
   templateId?: string | null;
@@ -277,6 +282,10 @@ export function createComposition(params: {
     imageContrast: 1,
     imageSaturation: 1,
     imageWarmth: 0,
+    imageScale: 1,
+    imageOffsetX: 0,
+    imageOffsetY: 0,
+    imageFlipX: false,
     layers: [
       defaultLayer('title', size, params.bookTitle?.trim() || 'Titre du livre'),
       defaultLayer('subtitle', size, 'Sous-titre'),
@@ -474,6 +483,10 @@ export function parseComposition(
     imageContrast: clampRange(obj.imageContrast, 0.7, 1.4, 1),
     imageSaturation: clampRange(obj.imageSaturation, 0, 1.6, 1),
     imageWarmth: clampRange(obj.imageWarmth, -20, 20, 0),
+    imageScale: clampRange(obj.imageScale, 1, 2.5, 1),
+    imageOffsetX: clampRange(obj.imageOffsetX, -1, 1, 0),
+    imageOffsetY: clampRange(obj.imageOffsetY, -1, 1, 0),
+    imageFlipX: Boolean(obj.imageFlipX),
     illustrationMode: obj.illustrationMode === 'slot' ? 'slot' : 'cover',
     shapes,
     layers: layers.length ? layers : createComposition(fallback).layers,
@@ -499,6 +512,10 @@ export function serializeComposition(
     imageContrast: clampRange(composition.imageContrast, 0.7, 1.4, 1),
     imageSaturation: clampRange(composition.imageSaturation, 0, 1.6, 1),
     imageWarmth: clampRange(composition.imageWarmth, -20, 20, 0),
+    imageScale: clampRange(composition.imageScale, 1, 2.5, 1),
+    imageOffsetX: clampRange(composition.imageOffsetX, -1, 1, 0),
+    imageOffsetY: clampRange(composition.imageOffsetY, -1, 1, 0),
+    imageFlipX: Boolean(composition.imageFlipX),
     illustrationMode: composition.illustrationMode === 'slot' ? 'slot' : 'cover',
     shapes: (composition.shapes ?? []).map((s) => ({ ...s })),
     layers: composition.layers.map((l) => ({
@@ -610,13 +627,27 @@ const drawImageCover = (
   y: number,
   w: number,
   h: number,
+  composition?: Pick<FrontComposition, 'imageScale' | 'imageOffsetX' | 'imageOffsetY' | 'imageFlipX'>,
 ) => {
-  const ratio = Math.max(w / image.width, h / image.height);
+  const zoom = clampRange(composition?.imageScale, 1, 2.5, 1);
+  const offsetX = clampRange(composition?.imageOffsetX, -1, 1, 0);
+  const offsetY = clampRange(composition?.imageOffsetY, -1, 1, 0);
+  const ratio = Math.max(w / image.width, h / image.height) * zoom;
   const iw = image.width * ratio;
   const ih = image.height * ratio;
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
-  ctx.drawImage(image, x + (w - iw) / 2, y + (h - ih) / 2, iw, ih);
+  const drawX = x + (w - iw) / 2 + offsetX * Math.max(0, iw - w) * 0.5;
+  const drawY = y + (h - ih) / 2 + offsetY * Math.max(0, ih - h) * 0.5;
+  if (composition?.imageFlipX) {
+    ctx.save();
+    ctx.translate(x + w, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(image, x + (w - iw) / 2 - offsetX * Math.max(0, iw - w) * 0.5, drawY, iw, ih);
+    ctx.restore();
+  } else {
+    ctx.drawImage(image, drawX, drawY, iw, ih);
+  }
 };
 
 /** Ornement d'angle : volutes fines dessinées au trait. */
@@ -842,7 +873,7 @@ const drawShapes = (
       ctx.clip();
       if (image) {
         ctx.filter = imageAdjustFilter(composition);
-        drawImageCover(ctx, image, x, y, w, h);
+        drawImageCover(ctx, image, x, y, w, h, composition);
       }
       else {
         ctx.fillStyle = shape.color;
@@ -882,7 +913,7 @@ export function drawFrontBackdrop(
   if (image && composition.illustrationMode !== 'slot') {
     ctx.save();
     ctx.filter = imageAdjustFilter(composition);
-    drawImageCover(ctx, image, 0, 0, w, h);
+    drawImageCover(ctx, image, 0, 0, w, h, composition);
     ctx.restore();
   }
 

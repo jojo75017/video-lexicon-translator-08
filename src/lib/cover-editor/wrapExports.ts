@@ -14,7 +14,10 @@ import { safeFileName, type CoverExportResult } from '@/lib/cover-editor/coverEx
 import type { KdpPaperbackGeometry } from '@/lib/cover-editor/kdpPaperbackSpecs';
 import {
   clampBrightness,
+  clampImageOffset,
+  clampImageScale,
   clampOverlay,
+  wrapImageFilter,
   zoneBox,
   type WrapComposition,
 } from '@/lib/cover-editor/wrapComposition';
@@ -79,7 +82,6 @@ export async function renderWrapCanvas(
   if (!ctx) throw new Error('Canevas indisponible dans ce navigateur.');
 
   const px = (inches: number) => inches * dpi;
-  const brightness = clampBrightness(composition.imageBrightness);
   const overlay = clampOverlay(composition.overlayOpacity);
 
   // 1. fond continu
@@ -99,15 +101,23 @@ export async function renderWrapCanvas(
   if (backgroundUrl) {
     try {
       const img = await loadImage(backgroundUrl);
-      const cover = Math.max(frontW / img.width, canvas.height / img.height);
+       const cover = Math.max(frontW / img.width, canvas.height / img.height) * clampImageScale(composition.imageScale);
       const w = img.width * cover;
       const h = img.height * cover;
+       const offsetX = clampImageOffset(composition.imageOffsetX) * Math.max(0, w - frontW) * 0.5;
+       const offsetY = clampImageOffset(composition.imageOffsetY) * Math.max(0, h - canvas.height) * 0.5;
       ctx.save();
       ctx.beginPath();
       ctx.rect(frontX, 0, frontW, canvas.height);
       ctx.clip();
-      if (brightness !== 1) ctx.filter = `brightness(${brightness})`;
-      ctx.drawImage(img, frontX + (frontW - w) / 2, (canvas.height - h) / 2, w, h);
+       ctx.filter = wrapImageFilter(composition);
+       if (composition.imageFlipX) {
+         ctx.translate(frontX + frontW, 0);
+         ctx.scale(-1, 1);
+         ctx.drawImage(img, (frontW - w) / 2 - offsetX, (canvas.height - h) / 2 + offsetY, w, h);
+       } else {
+         ctx.drawImage(img, frontX + (frontW - w) / 2 + offsetX, (canvas.height - h) / 2 + offsetY, w, h);
+       }
       ctx.restore();
     } catch {
       /* fond uni conservé */
