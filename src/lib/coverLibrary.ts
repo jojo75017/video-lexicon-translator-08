@@ -114,12 +114,26 @@ export const persistCoverToLibrary = async ({
 };
 
 
-/** Racines historiques éventuelles (anciens espaces de stockage), en lecture seule. */
-const legacyRoots = (): string[] => {
+/**
+ * Racines historiques (anciens espaces de stockage), en lecture seule :
+ *  - liste éventuelle enregistrée localement ;
+ *  - variante dérivée de l'email, utilisée par d'anciennes versions.
+ */
+const legacyRoots = async (): Promise<string[]> => {
   const roots = new Set<string>();
   try {
     const legacy = localStorage.getItem('ebook_storage_root_legacy');
     if (legacy) legacy.split(',').forEach((r) => r.trim() && roots.add(r.trim()));
+  } catch {
+    // ignore
+  }
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    const email = user?.email;
+    if (email) {
+      const sanitized = email.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 60);
+      if (sanitized) roots.add(sanitized);
+    }
   } catch {
     // ignore
   }
