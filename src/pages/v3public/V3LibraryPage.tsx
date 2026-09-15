@@ -289,10 +289,14 @@ export default function V3LibraryPage() {
   );
 }
 
-function BookCard({ r, done, onAudio, onUpdated, onDelete }: { r: Row; done?: boolean; onAudio: () => void; onUpdated: () => void; onDelete: () => void }) {
-  const [cover, setCover] = useState<string | undefined>(
-    (Array.isArray(r.ebook_images) && r.ebook_images[0]?.url) || undefined,
-  );
+function BookCard({ r, done, studioCover, hasStudioCovers, onPickCover, onAudio, onUpdated, onDelete }: { r: Row; done?: boolean; studioCover?: StudioCover; hasStudioCovers?: boolean; onPickCover: () => void; onAudio: () => void; onUpdated: () => void; onDelete: () => void }) {
+  const ownImage = (Array.isArray(r.ebook_images) && r.ebook_images[0]?.url) || undefined;
+  const [cover, setCover] = useState<string | undefined>(ownImage || studioCover?.thumbUrl || undefined);
+
+  // La couverture du studio arrive après le premier rendu : on l'applique si le livre n'a rien.
+  useEffect(() => {
+    if (!ownImage && studioCover?.thumbUrl) setCover(studioCover.thumbUrl);
+  }, [ownImage, studioCover?.thumbUrl]);
   const [genLoading, setGenLoading] = useState(false);
   const nbChap = Array.isArray(r.chapters) ? r.chapters.length : 0;
   const date = new Date(r.updated_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
