@@ -1,10 +1,19 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, Sparkles, Settings, Headphones, AlertCircle, RefreshCw, ImageIcon, Loader2, Trash2, Filter } from 'lucide-react';
+import { BookOpen, Sparkles, Settings, Headphones, AlertCircle, RefreshCw, ImageIcon, Loader2, Trash2, Filter, Images } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import AudiobookOfferCard from '@/components/v3public/AudiobookOfferCard';
 import { toast } from 'sonner';
 import { BackButton } from "@/components/v3/BackButton";
+import {
+  fallbackGradientFor,
+  indexCoversByTitle,
+  loadStudioCovers,
+  normalizeTitle,
+  LONG_SIGNED_TTL,
+  type StudioCover,
+} from '@/lib/studioCovers';
+import { getSignedCoverUrl } from '@/lib/coverProjects';
 
 type Row = {
   id: string;
