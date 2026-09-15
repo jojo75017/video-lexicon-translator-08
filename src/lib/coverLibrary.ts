@@ -114,11 +114,19 @@ export const persistCoverToLibrary = async ({
 };
 
 
-/** Récupère toutes les couvertures déjà générées et sauvegardées (les plus récentes d'abord). */
-export const listSavedCovers = async (): Promise<SavedCover[]> => {
-  const storageRoot = await resolveCoverRoot();
-  if (!storageRoot) return [];
+/** Racines historiques éventuelles (anciens espaces de stockage), en lecture seule. */
+const legacyRoots = (): string[] => {
+  const roots = new Set<string>();
+  try {
+    const legacy = localStorage.getItem('ebook_storage_root_legacy');
+    if (legacy) legacy.split(',').forEach((r) => r.trim() && roots.add(r.trim()));
+  } catch {
+    // ignore
+  }
+  return [...roots];
+};
 
+const listCoversInRoot = async (storageRoot: string): Promise<SavedCover[]> => {
   try {
     const { data, error } = await supabase.storage
       .from('ebook-images')
