@@ -33,6 +33,8 @@ interface Brief {
   style?: string;
   artStyle?: string;
   lighting?: string;
+  /** Consigne visuelle prête à l'emploi (issue de la description du livre). */
+  visualPrompt?: string;
   include?: string;
   avoid?: string;
   bookTitle?: string;
