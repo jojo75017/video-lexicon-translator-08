@@ -112,6 +112,7 @@ export default function CouvertureExpressPage() {
   const [directionBusy, setDirectionBusy] = useState(false);
   const [directionConfirmed, setDirectionConfirmed] = useState(false);
   const [lighting, setLighting] = useState('bright');
+  const [detailsBusy, setDetailsBusy] = useState(false);
 
   const [projectId, setProjectId] = useState<string | null>(null);
   const [illustrationPath, setIllustrationPath] = useState<string | null>(null);
