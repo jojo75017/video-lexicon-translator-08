@@ -15,7 +15,7 @@ import BdTestimonials from '@/components/bd/BdTestimonials';
 // Clip d'accroche VSL généré par IA (pointeur d'asset CDN).
 import bdVslClipAsset from '@/assets/bd-vsl-clip.mp4.asset.json';
 
-/** Page de vente du Studio BD & Jeunesse — offre d'entrée 17 €, puis upsell Pro 47 €. */
+/** Page de vente du Studio BD & Jeunesse — accès à vie 47 €, puis upsell Pro 47 €. */
 export default function BDOffrePage() {
   const [params] = useSearchParams();
   const [email, setEmail] = useState(() => (params.get('email') || '').trim().toLowerCase());
@@ -90,8 +90,8 @@ export default function BDOffrePage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SeoHead
-        title="Studio BD & Jeunesse — créez vos BD et livres illustrés en IA (17 €)"
-        description="Créez des bandes dessinées et des livres illustrés pour enfants avec l'IA : personnages, planches, histoires et export prêt pour Amazon KDP. Accès à vie pour 17 €."
+        title="Studio BD & Jeunesse — créez vos BD et livres illustrés en IA (47 €)"
+        description="Créez des bandes dessinées et des livres illustrés pour enfants avec l'IA : personnages, planches, histoires et export prêt pour Amazon KDP. Accès à vie pour 47 €."
         canonical="/bd-offre"
       />
       <PaymentTestModeBanner />

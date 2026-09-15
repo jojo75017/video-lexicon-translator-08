@@ -1,7 +1,7 @@
 /**
  * SOURCE UNIQUE DE VÉRITÉ de l'offre Studio BD & Jeunesse.
  *
- * Tunnel : /bd-offre (17 €) → /bd-upsell (47 €, offre unique) → /bd-studio (dashboard).
+ * Tunnel : /bd-offre (47 €, accès à vie) → /bd-upsell (Pro 47 €, offre unique) → /bd-studio (dashboard).
  * Les montants réels sont définis côté serveur (v3-upsell-checkout, packs
  * `bd_comic` et `bd_comic_pro`) : ce fichier ne sert qu'à l'affichage.
  */
@@ -100,15 +100,15 @@ export const BD_COMIC_TESTIMONIALS: BdComicTestimonial[] = [
 
 export const BD_COMIC_OFFER = {
   /** Prix de lancement (paiement unique, accès à vie). */
-  price: 17,
+  price: 47,
   /** Prix affiché après la période de lancement. */
-  regularPrice: 27,
+  regularPrice: 97,
   /** Fin de l'offre de lancement, en clair. */
   endLabel: '30 septembre 2026',
   /** Lien PayPal du montant exact. */
-  paypalUrl: 'https://paypal.me/ebookstudio/17',
-  /** URL d'intégration de la vidéo de vente (laisser vide affiche un encart d'attente). */
-  vslUrl: '' as string,
+  paypalUrl: 'https://paypal.me/ebookstudio/47',
+  /** Vidéo de démonstration (YouTube intégré). */
+  vslUrl: 'https://www.youtube.com/embed/S9v5QrqHU9c' as string,
 
   included: [
     'Studio BD complet : personnages, scénario, cases illustrées',
@@ -130,7 +130,7 @@ export const BD_COMIC_OFFER = {
       a: 'Non. Vous décrivez vos personnages et votre histoire, le studio génère les illustrations et la mise en page des cases.',
     },
     {
-      q: 'Que comprend exactement le paiement de 17 € ?',
+      q: 'Que comprend exactement le paiement de 47 € ?',
       a: 'Un accès à vie au Studio BD & Jeunesse : création de personnages, planches de BD, histoires illustrées et exports. Aucune mensualité.',
     },
     {
