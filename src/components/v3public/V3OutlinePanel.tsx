@@ -93,7 +93,7 @@ export default function V3OutlinePanel({ brief, onChange, initialMode }: Props) 
 
   const outline = brief.outline || [];
   const validated = Boolean(brief.outlineValidated) && outline.length > 0;
-  const target = Math.min(60, Math.max(3, Number(brief.chapters) || 12));
+  const target = Math.min(60, Math.max(3, Number(brief.chapters) || 0, outline.length, 12));
 
 
   /**
