@@ -881,7 +881,7 @@ export function drawFrontBackdrop(
 
   if (image && composition.illustrationMode !== 'slot') {
     ctx.save();
-    ctx.filter = `brightness(${Math.min(1.5, Math.max(0.7, composition.imageBrightness ?? 1))})`;
+    ctx.filter = imageAdjustFilter(composition);
     drawImageCover(ctx, image, 0, 0, w, h);
     ctx.restore();
   }
