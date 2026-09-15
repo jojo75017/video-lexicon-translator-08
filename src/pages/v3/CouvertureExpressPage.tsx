@@ -206,27 +206,21 @@ export default function CouvertureExpressPage() {
       return;
     }
     if (projectId) {
-      setCreating(true);
-      try {
-        const composition = chosen ? compositionFor(chosen, lightness) : null;
-        await updateCoverProject(projectId, {
-          project_name: title.trim().slice(0, 80),
-          book_title: title.trim(),
-          cover_type: format,
-          format_id: formatId,
-          page_count: format === 'paperback' ? 120 : null,
-          ...(composition
-            ? { fabric_json: serializeComposition(composition, illustrationPath) }
-            : {}),
-        });
-        setDownloaded(false);
-        setStep(2);
-        toast.success('Les informations et la couverture ont été actualisées.');
-      } catch (e) {
-        toast.error(e instanceof Error ? e.message : 'Impossible d’enregistrer les modifications.');
-      } finally {
-        setCreating(false);
-      }
+      setDownloaded(false);
+      setStep(2);
+      const composition = chosen ? compositionFor(chosen, lightness) : null;
+      void updateCoverProject(projectId, {
+        project_name: title.trim().slice(0, 80),
+        book_title: title.trim(),
+        cover_type: format,
+        format_id: formatId,
+        page_count: format === 'paperback' ? 120 : null,
+        ...(composition
+          ? { fabric_json: serializeComposition(composition, illustrationPath) }
+          : {}),
+      })
+        .then(() => toast.success('Les informations et la couverture ont été actualisées.'))
+        .catch(() => toast.error('La couverture est actualisée à l’écran, mais son enregistrement a échoué.'));
       return;
     }
     setCreating(true);
