@@ -135,6 +135,38 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
     toast.success('Votre projet est prêt : donnez maintenant vos indications de chapitre.');
   };
 
+  // Sommaire déjà écrit par l'auteur : une ligne = un chapitre.
+  const [pastedOutline, setPastedOutline] = useState('');
+  const importPastedOutline = () => {
+    const lines = pastedOutline
+      .split('\n')
+      .map((l) => l.replace(/^\s*(chapitre\s*)?\d+\s*[.)\-–:]*\s*/i, '').trim())
+      .filter((l) => l.length >= 2);
+    if (lines.length < 1) { toast.error('Collez votre sommaire : une ligne par chapitre.'); return; }
+    if (lines.length > 40) { toast.error('40 chapitres maximum.'); return; }
+    const chapters: BriefOutlineChapter[] = lines.slice(0, 40).map((line, i) => {
+      const [titre, ...rest] = line.split(/\s*[—–|:]\s*/);
+      return {
+        numero: i + 1,
+        titre: (titre || line).slice(0, 160),
+        objectif: rest.join(' — ').trim() || undefined,
+      };
+    });
+    const current = readBookBrief() || {};
+    writeBookBrief({
+      ...current,
+      outline: chapters,
+      chapters: chapters.length,
+      outlineValidated: false,
+      outlineFirst: true,
+    });
+    window.dispatchEvent(new Event(BOOK_BRIEF_EVENT));
+    setPastedOutline('');
+    toast.success(`${chapters.length} chapitre(s) enregistrés — relisez puis validez le sommaire.`);
+  };
+
+
+
 
 
   useEffect(() => { seedHubConfig(idea, genre, type); }, [idea, genre, type]);
