@@ -8,7 +8,6 @@ import V3CapabilitiesPanel from '@/components/v3public/V3CapabilitiesPanel';
 import V3StartBookBar from '@/components/v3public/V3StartBookBar';
 import V3ResumeBookCard from '@/components/v3public/V3ResumeBookCard';
 import V3QuickActionsBar from '@/components/v3public/V3QuickActionsBar';
-import V3PaletteModule from '@/components/v3public/V3PaletteModule';
 
 
 import V3UpsellRotator from '@/components/v3public/V3UpsellRotator';
@@ -20,13 +19,8 @@ import { V3EngineStrip, V3EngineGrid } from '@/components/v3public/V3EngineBanne
 import V3LaunchBanner from '@/components/v3public/V3LaunchBanner';
 import V3HeroBanner from '@/components/v3public/V3HeroBanner';
 import V3PresentationVideo from '@/components/v3public/V3PresentationVideo';
-import BdComicNewsBanner from '@/components/bd/BdComicNewsBanner';
-import ComicAgentTeaser from '@/components/comic/ComicAgentTeaser';
 import V3MarketProofPanel from '@/components/v3public/V3MarketProofPanel';
-import V3BeforeAfterPanel from '@/components/v3public/V3BeforeAfterPanel';
-import V3AudiencePanel from '@/components/v3public/V3AudiencePanel';
 import V3GuaranteePanel from '@/components/v3public/V3GuaranteePanel';
-import V3CommercialLicensePanel from '@/components/v3public/V3CommercialLicensePanel';
 import V3ClosingRecallPanel from '@/components/v3public/V3ClosingRecallPanel';
 import V3AnchorNav from '@/components/v3public/V3AnchorNav';
 import V3WhatIsPanel from '@/components/v3public/V3WhatIsPanel';
