@@ -39,6 +39,12 @@ interface Brief {
   include?: string;
   avoid?: string;
   bookTitle?: string;
+  targetAudience?: string;
+  era?: string;
+  location?: string;
+  focalSubject?: string;
+  emotion?: string;
+  symbol?: string;
 }
 
 /** Directions artistiques « qualité best-seller » proposées dans l'éditeur. */
@@ -82,6 +88,12 @@ function buildPrompt(b: Brief): string {
     direction,
     lighting,
     b.genre ? `Genre du livre : ${b.genre}.` : "",
+    b.targetAudience ? `Lecteurs visés : ${b.targetAudience}.` : "",
+    b.era ? `Époque à respecter : ${b.era}.` : "",
+    b.location ? `Lieu à respecter : ${b.location}.` : "",
+    b.focalSubject ? `Point focal obligatoire : ${b.focalSubject}.` : "",
+    b.emotion ? `Émotion à provoquer chez le lecteur : ${b.emotion}.` : "",
+    b.symbol ? `Symbole narratif à intégrer naturellement : ${b.symbol}.` : "",
     !visual && b.summary ? `Contexte / résumé : ${b.summary}.` : "",
     b.mood ? `Ambiance recherchée : ${b.mood}.` : "",
     b.scene ? `Scène principale : ${b.scene}.` : "",
@@ -94,7 +106,8 @@ function buildPrompt(b: Brief): string {
       : "",
     "QUALITÉ EXIGÉE : rendu comparable aux meilleures couvertures vendues en librairie et sur Amazon, point focal fort, sujet net et bien éclairé, visages et mains anatomiquement corrects, perspective juste, lumière cohérente entre le sujet et le décor, matières crédibles, finition professionnelle prête à imprimer. Interdits : rendu terne, plat, gris, sous-exposé, délavé, flou involontaire, membres déformés, collage grossier, banque d'images générique, aspect brouillon ou amateur.",
     "INTERDICTIONS ABSOLUES : aucun titre, aucun sous-titre, aucun nom d'auteur, aucune lettre, aucun mot, aucun chiffre, aucun logo, aucun filigrane, aucun code-barres, aucun ISBN, aucun faux caractère typographique, aucune signature.",
-    "AUCUN ENCART : l'image est une illustration pleine page, sans aucun bandeau, cartouche, plaque, rectangle, bloc de couleur, cadre, vignette, dégradé noir ni voile sombre ajouté, et sans zone assombrie ou vide réservée à du texte. Toute la surface est de l'illustration, jusqu'aux bords, avec une composition naturellement lisible en haut et en bas.",
+    "FIDÉLITÉ ABSOLUE : ne créer aucun personnage, lieu, époque, objet narratif ou événement qui ne figure pas dans le sujet imposé. Les éléments demandés doivent être visibles et les éléments à éviter doivent être absents.",
+    "AUCUN ENCART : l'image est une illustration pleine page, sans aucun bandeau, cartouche, plaque, rectangle, bloc de couleur, cadre, vignette, dégradé noir ni voile sombre ajouté, et sans zone assombrie ou vide réservée à du texte. Toute la surface est de l'illustration, jusqu'aux bords.",
   ];
   return lines.filter(Boolean).join("\n");
 }
@@ -140,6 +153,12 @@ Deno.serve(async (req) => {
       lighting: typeof body?.lighting === "string" ? body.lighting : undefined,
       bookTitle: project.book_title ?? undefined,
       visualPrompt: typeof body?.visualPrompt === "string" ? body.visualPrompt : undefined,
+      targetAudience: typeof body?.targetAudience === "string" ? body.targetAudience : undefined,
+      era: typeof body?.era === "string" ? body.era : undefined,
+      location: typeof body?.location === "string" ? body.location : undefined,
+      focalSubject: typeof body?.focalSubject === "string" ? body.focalSubject : undefined,
+      emotion: typeof body?.emotion === "string" ? body.emotion : undefined,
+      symbol: typeof body?.symbol === "string" ? body.symbol : undefined,
     };
 
     // Si l'abonné n'a pas validé de consigne visuelle, on traduit sa description
@@ -152,6 +171,14 @@ Deno.serve(async (req) => {
           mood: brief.mood,
           palette: brief.palette,
           bookTitle: brief.bookTitle,
+          targetAudience: brief.targetAudience,
+          era: brief.era,
+          location: brief.location,
+          focalSubject: brief.focalSubject,
+          emotion: brief.emotion,
+          symbol: brief.symbol,
+          include: brief.include,
+          avoid: brief.avoid,
         })) ?? undefined;
     }
 

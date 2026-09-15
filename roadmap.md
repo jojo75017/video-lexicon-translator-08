@@ -10,6 +10,13 @@
 - [x] Utiliser un synopsis explicite pour guider la couverture
 - [x] Ajouter un éclaircissement local, réversible et repris dans l’export final
 
+## Cover Studio 67 € haut de gamme (15/09/2026)
+- [ ] Faire valider la direction visuelle avant toute génération payante
+- [ ] Conserver et réutiliser les anciennes propositions privées du projet
+- [ ] Ajouter cadrage, zoom, retournement et retouches identiques en Kindle et broché
+- [ ] Ajouter une vérification de lisibilité et de conformité avant export
+- [ ] Vérifier le parcours réel Kindle et broché
+
 ## Accueil V3 — visibilité KDP Pilot et vidéo (10/09/2026)
 - [x] Afficher un bandeau KDP Pilot clairement visible avec le code PROMO15
 - [x] Expliquer près de la vidéo qu’elle présente les onglets et fait gagner du temps

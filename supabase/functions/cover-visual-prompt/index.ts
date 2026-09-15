@@ -20,6 +20,14 @@ Deno.serve(async (req) => {
       palette: typeof body?.palette === "string" ? body.palette : "",
       bookTitle: typeof body?.bookTitle === "string" ? body.bookTitle : "",
       subtitle: typeof body?.subtitle === "string" ? body.subtitle : "",
+      targetAudience: typeof body?.targetAudience === "string" ? body.targetAudience : "",
+      era: typeof body?.era === "string" ? body.era : "",
+      location: typeof body?.location === "string" ? body.location : "",
+      focalSubject: typeof body?.focalSubject === "string" ? body.focalSubject : "",
+      emotion: typeof body?.emotion === "string" ? body.emotion : "",
+      symbol: typeof body?.symbol === "string" ? body.symbol : "",
+      include: typeof body?.include === "string" ? body.include : "",
+      avoid: typeof body?.avoid === "string" ? body.avoid : "",
     });
 
     if (!visualPrompt) {

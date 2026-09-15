@@ -12,6 +12,14 @@ export interface VisualPromptInput {
   palette?: string;
   bookTitle?: string;
   subtitle?: string;
+  targetAudience?: string;
+  era?: string;
+  location?: string;
+  focalSubject?: string;
+  emotion?: string;
+  symbol?: string;
+  include?: string;
+  avoid?: string;
 }
 
 const clean = (v?: string) => (typeof v === "string" ? v.trim() : "");
@@ -34,6 +42,14 @@ export async function buildVisualPrompt(input: VisualPromptInput): Promise<strin
     input.genre ? `Genre : ${clean(input.genre)}` : "",
     input.mood ? `Ambiance : ${clean(input.mood)}` : "",
     input.palette ? `Palette : ${clean(input.palette)}` : "",
+    input.targetAudience ? `Lecteurs visés : ${clean(input.targetAudience)}` : "",
+    input.era ? `Époque : ${clean(input.era)}` : "",
+    input.location ? `Lieu : ${clean(input.location)}` : "",
+    input.focalSubject ? `Sujet principal demandé : ${clean(input.focalSubject)}` : "",
+    input.emotion ? `Émotion à provoquer : ${clean(input.emotion)}` : "",
+    input.symbol ? `Symbole important : ${clean(input.symbol)}` : "",
+    input.include ? `Éléments obligatoires : ${clean(input.include)}` : "",
+    input.avoid ? `Éléments interdits : ${clean(input.avoid)}` : "",
     `Description fournie par l'auteur : ${summary}`,
   ]
     .filter(Boolean)
@@ -55,8 +71,9 @@ export async function buildVisualPrompt(input: VisualPromptInput): Promise<strin
               "informations d'un livre, tu écris UNE SEULE consigne visuelle en français, de 60 à " +
               "120 mots, décrivant précisément l'illustration de couverture à produire : sujet " +
               "principal, décor, époque, action ou instant choisi, cadrage, angle, lumière, " +
-              "matières, palette. Reste strictement fidèle à la description de l'auteur : " +
-              "n'invente aucun élément d'histoire absent. Interdits dans ta réponse : listes, " +
+              "matières, palette et point focal. Reste strictement fidèle à la description de l'auteur : " +
+              "n'invente aucun personnage, lieu, époque, objet ou événement absent. Respecte mot pour mot " +
+              "les éléments obligatoires et interdits. Interdits dans ta réponse : listes, " +
               "titres, guillemets, mentions de texte, de titre, de logo ou de typographie, mots " +
               "latins ou inventés. Réponds uniquement par la consigne visuelle.",
           },
