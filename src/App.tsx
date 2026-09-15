@@ -80,7 +80,7 @@ const ConfirmationPaiementPage = lazy(() => import('./pages/ConfirmationPaiement
 const PaiementManuelPage = lazy(() => import('./pages/PaiementManuelPage'));
 const UpsellPage = lazy(() => import('./pages/UpsellPage'));
 const UpsellPaiementPage = lazy(() => import('./pages/UpsellPaiementPage'));
-const V3PaiementPage = lazy(() => import('./pages/V3PaiementPage'));
+
 const EssaiPage = lazy(() => import('./pages/launch/EssaiPage'));
 const DecouvertePage = lazy(() => import('./pages/launch/DecouvertePage'));
 const EssaiInscriptionPage = lazy(() => import('./pages/launch/EssaiInscriptionPage'));
@@ -116,8 +116,8 @@ const V3KdpDataPage = lazy(() => import('./pages/v3public/V3KdpDataPage'));
 const V3KdpPilotPage = lazy(() => import('./pages/v3public/V3KdpPilotPage'));
 const V3SpecialBookPage = lazy(() => import('./pages/v3public/V3SpecialBookPage'));
 const V3AuthorSettingsPage = lazy(() => import('./pages/v3public/V3AuthorSettingsPage'));
-// Archived V3 pages (no inbound links) — routes redirect to /v3/forfaits.
-// Files kept in src/pages/v3public/ for reference; remove after Oct 2026 launch if unused.
+// Outils V3 actifs et liés depuis le menu / la sidebar
+// (sommaire ultime, traduction, correcteur, avis clients…).
 const V3TocUltimatePage = lazy(() => import('./pages/v3public/V3TocUltimatePage'));
 const V3TranslatorPage = lazy(() => import('./pages/v3public/V3TranslatorPage'));
 const V3CorrecteurPage = lazy(() => import('./pages/v3public/V3CorrecteurPage'));
@@ -128,6 +128,33 @@ const V3KitDemarragePage = lazy(() => import('./pages/v3/V3KitDemarragePage'));
 const V3StudioProPage = lazy(() => import('./pages/v3public/V3StudioProPage'));
 
 const V3ToolsIndexPage = lazy(() => import('./pages/v3public/V3ToolsIndexPage'));
+
+/**
+ * Alias historiques /v3/* → route canonique.
+ * Une seule liste : aucun ancien lien (email, blog, favori) ne tombe en 404.
+ */
+const V3_LEGACY_ALIASES: Array<[string, string]> = [
+  ['offres', '/v3/forfaits'],
+  ['offres/merci', '/v3/forfaits'],
+  ['tarifs', '/v3/forfaits'],
+  ['complements', '/v3/upsells'],
+  ['correcteur', '/v3/corriger'],
+  ['avis-clients', '/v3/avis'],
+  ['toc-ultime', '/v3/outils/sommaire-ultime'],
+  ['outils/correcteur', '/v3/corriger'],
+  ['outils/detection-ia', '/v3/outils/humanizer'],
+  ['outils/anti-plagiat', '/v3/corriger'],
+  ['outils/coherence-personnages', '/v3/studio'],
+  ['outils/book-trailer', '/v3/contentstudio'],
+  ['outils/reels', '/v3/contentstudio'],
+  ['outils/epub', '/v3/outils/editeur'],
+  ['outils/print-ready', '/v3/donnees-kdp'],
+  ['outils/suivi-ventes', '/v3/outils/royalties'],
+  ['outils/landing-auteur', '/v3/auteur'],
+  ['outils/logo-auteur', '/v3/upsells'],
+  ['outils/sequences-emails', '/v3/acquisition'],
+  ['outils/arc', '/v3/avis'],
+];
 const V3FeaturesPage = lazy(() => import('./pages/v3public/V3FeaturesPage'));
 const V3WorkflowPage = lazy(() => import('./pages/v3public/V3WorkflowPage'));
 const V3StartHerePage = lazy(() => import('./pages/v3public/V3StartHerePage'));
@@ -494,7 +521,8 @@ const App = () => {
             <Route path="/upsell" element={<UpsellPage />} />
             <Route path="/upsell-paiement" element={<UpsellPaiementPage />} />
             <Route path="/commande-v3" element={<Navigate to="/commander" replace />} />
-            <Route path="/v3-paiement" element={<V3PaiementPage />} />
+            {/* Ancienne page 197€/547€ retirée : un seul tunnel de commande officiel */}
+            <Route path="/v3-paiement" element={<Navigate to="/commander" replace />} />
             <Route path="/vente-v3" element={<Navigate to="/commander" replace />} />
 
             {/* Promo été */}
@@ -730,8 +758,6 @@ const App = () => {
               <Route path="parametres" element={<V3LockedGate><V3AuthorSettingsPage /></V3LockedGate>} />
               <Route path="livres/:type" element={<V3LockedGate><TrialGate label="Livres spéciaux"><V3SpecialBookPage /></TrialGate></V3LockedGate>} />
 
-              <Route path="offres" element={<Navigate to="/v3/forfaits" replace />} />
-              <Route path="offres/merci" element={<Navigate to="/v3/forfaits" replace />} />
 
               <Route path="recherche" element={<V3LockedGate><V3RecherchePage /></V3LockedGate>} />
               <Route path="outils" element={<V3LockedGate><V3ToolsIndexPage /></V3LockedGate>} />
@@ -745,14 +771,10 @@ const App = () => {
               <Route path="kit-demarrage" element={<V3LockedGate><V3KitDemarragePage /></V3LockedGate>} />
               <Route path="studio" element={<V3LockedGate><TrialGate label="Studio Pro"><V3StudioProPage /></TrialGate></V3LockedGate>} />
 
-              <Route path="correcteur" element={<Navigate to="/v3/corriger" replace />} />
-
               <Route path="compte" element={<V3LockedGate><V3ComptePage /></V3LockedGate>} />
               {/* Page des 2 forfaits : toujours visible (vitrine tarifaire) */}
               <Route path="forfaits" element={<V3ForfaitsPage />} />
               <Route path="upsells" element={<V3UpsellsPage />} />
-              <Route path="complements" element={<Navigate to="/v3/upsells" replace />} />
-              <Route path="tarifs" element={<Navigate to="/v3/forfaits" replace />} />
               {/* Onglet ancien client V2 : visible sans attendre l'ouverture publique */}
               <Route path="migration" element={<V3MigrationPage />} />
               <Route path="paypal-retour" element={<V3LockedGate><V3PayPalReturnPage /></V3LockedGate>} />
@@ -772,21 +794,9 @@ const App = () => {
               <Route path="hub" element={<V3LockedGate><V3Gate><V3HubPage /></V3Gate></V3LockedGate>} />
 
               {/* Alias historiques : plus aucun lien V3 ne doit tomber en 404 */}
-              <Route path="avis-clients" element={<Navigate to="/v3/avis" replace />} />
-              <Route path="toc-ultime" element={<Navigate to="/v3/outils/sommaire-ultime" replace />} />
-              <Route path="outils/correcteur" element={<Navigate to="/v3/corriger" replace />} />
-              <Route path="outils/detection-ia" element={<Navigate to="/v3/outils/humanizer" replace />} />
-              <Route path="outils/anti-plagiat" element={<Navigate to="/v3/corriger" replace />} />
-              <Route path="outils/coherence-personnages" element={<Navigate to="/v3/studio" replace />} />
-              <Route path="outils/book-trailer" element={<Navigate to="/v3/contentstudio" replace />} />
-              <Route path="outils/reels" element={<Navigate to="/v3/contentstudio" replace />} />
-              <Route path="outils/epub" element={<Navigate to="/v3/outils/editeur" replace />} />
-              <Route path="outils/print-ready" element={<Navigate to="/v3/donnees-kdp" replace />} />
-              <Route path="outils/suivi-ventes" element={<Navigate to="/v3/outils/royalties" replace />} />
-              <Route path="outils/landing-auteur" element={<Navigate to="/v3/auteur" replace />} />
-              <Route path="outils/logo-auteur" element={<Navigate to="/v3/upsells" replace />} />
-              <Route path="outils/sequences-emails" element={<Navigate to="/v3/acquisition" replace />} />
-              <Route path="outils/arc" element={<Navigate to="/v3/avis" replace />} />
+              {V3_LEGACY_ALIASES.map(([from, to]) => (
+                <Route key={from} path={from} element={<Navigate to={to} replace />} />
+              ))}
 
               {/* Toute autre URL /v3/* inconnue revient sur l'accueil V3 (jamais de 404),
                   et le layout renvoie l'abonné V2 sur /ebook-planner. */}

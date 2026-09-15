@@ -1,11 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Gem } from 'lucide-react';
-import {
-  V3_ESSENTIAL_PACKS,
-  V3_ALACARTE_PACKS,
-  V3_ALL_PACKS_TOTAL,
-} from '@/data/roadmapV3';
-import { V3_ADDON_LIST, V3_PLANS, formatPrice } from '@/data/v3Pricing';
+import { V3_ADDON_LIST, V3_ADDONS_TOTAL_VALUE, V3_PLANS, formatPrice } from '@/data/v3Pricing';
 import V3UpsellPromoCard from '@/components/v3public/V3UpsellPromoCard';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
 import BdComicNewsBanner from '@/components/bd/BdComicNewsBanner';
@@ -49,15 +44,16 @@ export default function V3UpsellsPage() {
             <p className="text-xs" style={{ color: 'var(--v3-muted)' }}>Chaque complément peut être acheté séparément, en paiement unique et sans abonnement.</p>
           </div>
           <div className="grid gap-px sm:grid-cols-2 lg:grid-cols-3" style={{ background: 'var(--v3-line)' }}>
-            {[...V3_ADDON_LIST, ...V3_ESSENTIAL_PACKS, ...V3_ALACARTE_PACKS].map((item) => (
-              <div key={'key' in item ? item.key : item.id} className="flex items-center justify-between gap-3 px-4 py-3" style={{ background: 'var(--v3-surface)' }}>
+            {V3_ADDON_LIST.map((item) => (
+              <div key={item.key} className="flex items-center justify-between gap-3 px-4 py-3" style={{ background: 'var(--v3-surface)' }}>
                 <span className="text-xs font-semibold" style={{ color: 'var(--v3-ink)' }}>{item.title}</span>
                 <strong className="shrink-0 text-sm" style={{ color: 'var(--v3-gold-600)' }}>{formatPrice(item.price)}</strong>
               </div>
             ))}
           </div>
           <p className="px-4 py-3 text-xs font-semibold" style={{ color: 'var(--v3-muted)', background: 'var(--v3-cream)' }}>
-            Valeur cumulée des packs premium : {formatPrice(V3_ALL_PACKS_TOTAL)}. Les anciens clients V2 conservent leur remise de 20 % à vie.
+            Valeur cumulée des compléments : {formatPrice(V3_ADDONS_TOTAL_VALUE)} — tous inclus dans le forfait Édition.
+            Les anciens clients V2 conservent leur remise de 20 % à vie.
           </p>
         </section>
 
@@ -83,50 +79,6 @@ export default function V3UpsellsPage() {
           })}
         </div>
 
-        {/* Packs premium — disponibles séparément */}
-        <h2 className="v3-serif mb-4 mt-12 text-xl font-bold" style={{ color: 'var(--v3-ink)' }}>
-          Packs premium à l'unité
-        </h2>
-        <p className="mb-4 text-[13px]" style={{ color: 'var(--v3-muted)' }}>
-          Choisissez uniquement le pack utile à votre livre. Chaque tarif est un paiement unique.
-        </p>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {V3_ESSENTIAL_PACKS.map((pack) => (
-            <V3UpsellPromoCard
-              key={pack.id}
-              figureId={pack.id}
-              title={pack.title}
-              price={pack.price}
-              description={pack.desc}
-              to={pack.to}
-              priceId={pack.priceId}
-              packId={pack.id}
-              badge={pack.badge}
-              included={hasFull}
-            />
-          ))}
-        </div>
-
-        {/* Options à la carte (roadmap) */}
-        <h2 className="v3-serif mb-4 mt-12 text-xl font-bold" style={{ color: 'var(--v3-ink)' }}>
-          Options spécialistes
-        </h2>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {V3_ALACARTE_PACKS.map((pack) => (
-            <V3UpsellPromoCard
-              key={pack.id}
-              figureId={pack.id}
-              title={pack.title}
-              price={pack.price}
-              description={pack.desc}
-              to={pack.to}
-              priceId={pack.priceId}
-              packId={pack.id}
-              badge={pack.badge}
-              included={hasFull}
-            />
-          ))}
-        </div>
 
         {/* Bandeau forfait Édition — tout inclus */}
         <section
