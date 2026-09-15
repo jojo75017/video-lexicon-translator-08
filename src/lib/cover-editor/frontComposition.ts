@@ -274,6 +274,9 @@ export function createComposition(params: {
     canvas: { width: size.width, height: size.height },
     backgroundColor: DEFAULT_FRONT_BACKGROUND,
     imageBrightness: 1,
+    imageContrast: 1,
+    imageSaturation: 1,
+    imageWarmth: 0,
     layers: [
       defaultLayer('title', size, params.bookTitle?.trim() || 'Titre du livre'),
       defaultLayer('subtitle', size, 'Sous-titre'),
