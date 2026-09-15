@@ -31,7 +31,7 @@ export default function BdComicNewsBanner({ compact = false }: Props) {
   }
 
   return (
-    <section className="mx-auto max-w-5xl px-4">
+    <section className="mx-auto w-full max-w-[1280px] px-4">
       <div
         className="overflow-hidden rounded-2xl border"
         style={{
@@ -147,7 +147,7 @@ export default function BdComicNewsBanner({ compact = false }: Props) {
               className="text-[11px] font-bold uppercase tracking-[0.18em]"
               style={{ color: 'var(--v3-gold-600)' }}
             >
-              Bientôt disponible
+              Inclus dans l’offre {BD_COMIC_OFFER.price} €
             </span>
           </div>
           <p className="mt-1 max-w-3xl text-sm" style={{ color: 'var(--v3-muted)' }}>
