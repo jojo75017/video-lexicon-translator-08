@@ -515,7 +515,31 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                     </div>
                   </div>
                 )}
+                {outlineFirstActive && (
+                  <div className="v3-card mb-4" style={{ borderColor: 'var(--v3-gold, #c9a84c)' }}>
+                    <p className="text-[13px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+                      Mon sommaire existe déjà — je le colle ici
+                    </p>
+                    <p className="mt-1 text-[11.5px]" style={{ color: 'var(--v3-muted)' }}>
+                      Une ligne par chapitre. Vous pouvez ajouter une précision après un tiret :
+                      « Chapitre 3 — le jour où tout a changé ». Rien n’est réécrit : vos titres sont
+                      enregistrés tels quels, puis vous validez le sommaire juste en dessous.
+                    </p>
+                    <textarea
+                      value={pastedOutline}
+                      onChange={(e) => setPastedOutline(e.target.value)}
+                      rows={8}
+                      placeholder={'1. Le départ — pourquoi je quitte tout\n2. La ville inconnue\n3. La rencontre'}
+                      className="mt-3 w-full rounded-xl border bg-white px-3 py-2 text-[12.5px] outline-none"
+                      style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }}
+                    />
+                    <button type="button" onClick={importPastedOutline} className="v3-btn v3-btn-gold mt-3 text-xs">
+                      Enregistrer mon sommaire
+                    </button>
+                  </div>
+                )}
                 <V3OutlineCoBuilder outlineFirst={outlineFirstActive} />
+
                 <div id="sommaire-ia" className="mt-5">
                   <V3GenieOutlinePanel key={briefKey} outlineMode={sommaireIa ? 'guided' : undefined} />
                 </div>
