@@ -129,6 +129,31 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
     setSubjectChapters(Math.min(40, Math.max(3, Number(b.chapters) || 10)));
   }, [existingOutlineActive]);
 
+  // Auto-répare l'état déjà corrompu dans le navigateur par l'ancienne fusion
+  // fiche/session (ex. le long chapitre « Lupo… » suivi de titres génériques).
+  useEffect(() => {
+    if (!existingOutlineActive || !(bookBrief.outline?.length)) return;
+    const titles = bookBrief.outline.map((chapter) => String(chapter.titre || '').trim());
+    const genericCount = titles.filter((title) => /^chapitre\s*\d+$/i.test(title)).length;
+    const containsSerializedText = titles.some((title) => /elementsCles|table des matières.*progression|pourquoi cette aventure/i.test(title));
+    const hasOversizedTitle = titles.some((title) => title.length > 220);
+    if (!containsSerializedText && !hasOversizedTitle && genericCount < Math.ceil(titles.length / 2)) return;
+
+    const repaired: BookBrief = {
+      ...bookBrief,
+      outline: [],
+      chapters: undefined,
+      outlineValidated: false,
+      factMemory: [],
+    };
+    clearPreviousWritingSession();
+    writeBookBrief(repaired);
+    setPastedOutline('');
+    setDesk(2);
+    setShowWizard(false);
+    toast.warning('L’ancien sommaire mélangé a été retiré. Collez maintenant le vrai sommaire des « Flammes du passé ».');
+  }, [bookBrief, existingOutlineActive]);
+
   const startExistingOutline = () => {
     clearBookBrief();
     clearPreviousWritingSession();

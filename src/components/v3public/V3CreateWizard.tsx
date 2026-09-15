@@ -796,12 +796,14 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
       description: character.traits.trim() || 'Personnage à développer pendant le workflow.',
     }));
 
-  const normalizedOutline = outline
-    .concat(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters).slice(outline.length))
-    .slice(0, chapters)
+  const normalizedOutline = (startsFromExistingOutline
+    ? outline
+    : outline.concat(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters).slice(outline.length)).slice(0, chapters))
     .map((item, index) => {
       const cleanedTitle = cleanText(item.titre);
-      const fallbackTitle = cleanedTitle && !isGenericTitle(cleanedTitle)
+      const fallbackTitle = startsFromExistingOutline
+        ? (cleanedTitle || `Chapitre ${index + 1}`)
+        : cleanedTitle && !isGenericTitle(cleanedTitle)
         ? cleanedTitle
         : buildFallbackOutline(finalTitle || title, effectiveCategory, chapters)[index]?.titre || `Chapitre ${index + 1} — ${cleanText(finalTitle || title || effectiveCategory)}`;
       return { ...item, numero: index + 1, titre: fallbackTitle, objectif: cleanText(item.objectif) };
@@ -924,10 +926,11 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
   }, []);
 
   useEffect(() => {
+    if (startsFromExistingOutline) return;
     if (hasRepeatedFallbackTitles(outline, chapters)) {
       setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
     }
-  }, [chapters, effectiveCategory, finalTitle, title, outline]);
+  }, [chapters, effectiveCategory, finalTitle, title, outline, startsFromExistingOutline]);
 
   const targetPromiseBlock = () => {
     const cibleLines = [
