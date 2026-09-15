@@ -1,10 +1,19 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, Sparkles, Settings, Headphones, AlertCircle, RefreshCw, ImageIcon, Loader2, Trash2, Filter } from 'lucide-react';
+import { BookOpen, Sparkles, Settings, Headphones, AlertCircle, RefreshCw, ImageIcon, Loader2, Trash2, Filter, Images } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import AudiobookOfferCard from '@/components/v3public/AudiobookOfferCard';
 import { toast } from 'sonner';
 import { BackButton } from "@/components/v3/BackButton";
+import {
+  fallbackGradientFor,
+  indexCoversByTitle,
+  loadStudioCovers,
+  normalizeTitle,
+  LONG_SIGNED_TTL,
+  type StudioCover,
+} from '@/lib/studioCovers';
+import { getSignedCoverUrl } from '@/lib/coverProjects';
 
 type Row = {
   id: string;
@@ -29,6 +38,20 @@ export default function V3LibraryPage() {
   const [audioModal, setAudioModal] = useState<{ id: string; title: string } | null>(null);
   const [dedup, setDedup] = useState<boolean>(() => localStorage.getItem('v3_lib_dedup') !== '0');
   const [rawRows, setRawRows] = useState<Row[]>([]);
+  const [studioCovers, setStudioCovers] = useState<StudioCover[]>([]);
+  const [pickerFor, setPickerFor] = useState<Row | null>(null);
+
+  // Couvertures déjà créées dans le studio : chargées une seule fois pour toute la page.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const covers = await loadStudioCovers();
+      if (!cancelled) setStudioCovers(covers);
+    })();
+    return () => { cancelled = true; };
+  }, [refreshTick]);
+
+  const coverIndex = useMemo(() => indexCoversByTitle(studioCovers), [studioCovers]);
 
   useEffect(() => {
     let cancelled = false;
@@ -90,6 +113,21 @@ export default function V3LibraryPage() {
     toast.success(`${toDelete.length} doublon(s) supprimé(s).`);
     setRefreshTick((t) => t + 1);
   };
+
+  /** Rattache durablement une couverture du studio à un livre (aucune IA, aucun crédit). */
+  const attachCover = useCallback(async (book: Row, cover: StudioCover) => {
+    if (!cover.thumbPath) { toast.error("Cette couverture n'a pas encore de visuel."); return; }
+    const url = await getSignedCoverUrl(cover.thumbPath, LONG_SIGNED_TTL);
+    if (!url) { toast.error('Couverture illisible pour le moment.'); return; }
+    const { error } = await supabase
+      .from('ebook_projects')
+      .update({ ebook_images: [{ type: 'front_cover', url, title: book.title }] as any })
+      .eq('id', book.id);
+    if (error) { toast.error(error.message); return; }
+    toast.success('Couverture rattachée à ce livre.');
+    setPickerFor(null);
+    setRefreshTick((t) => t + 1);
+  }, []);
 
   const deleteOne = async (id: string) => {
     if (!confirm('Supprimer ce livre définitivement ?')) return;
@@ -180,7 +218,7 @@ export default function V3LibraryPage() {
                 <span className="text-xs text-[var(--v3-muted)]">Chaque livre peut être converti en audio (option 9,99 €)</span>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-                {done.map((r) => <BookCard key={r.id} r={r} done onAudio={() => setAudioModal({ id: r.id, title: r.title })} onUpdated={() => setRefreshTick((t) => t + 1)} onDelete={() => deleteOne(r.id)} />)}
+                {done.map((r) => <BookCard key={r.id} r={r} done studioCover={coverIndex[normalizeTitle(r.title)]} onPickCover={() => setPickerFor(r)} hasStudioCovers={studioCovers.length > 0} onAudio={() => setAudioModal({ id: r.id, title: r.title })} onUpdated={() => setRefreshTick((t) => t + 1)} onDelete={() => deleteOne(r.id)} />)}
               </div>
             </div>
           )}
@@ -188,11 +226,53 @@ export default function V3LibraryPage() {
             <div className="mt-12">
               <h2 className="text-lg font-bold mb-4">En cours <span className="text-sm font-normal text-[var(--v3-muted)]">· {started.length}</span></h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-                {started.map((r) => <BookCard key={r.id} r={r} onAudio={() => setAudioModal({ id: r.id, title: r.title })} onUpdated={() => setRefreshTick((t) => t + 1)} onDelete={() => deleteOne(r.id)} />)}
+                {started.map((r) => <BookCard key={r.id} r={r} studioCover={coverIndex[normalizeTitle(r.title)]} onPickCover={() => setPickerFor(r)} hasStudioCovers={studioCovers.length > 0} onAudio={() => setAudioModal({ id: r.id, title: r.title })} onUpdated={() => setRefreshTick((t) => t + 1)} onDelete={() => deleteOne(r.id)} />)}
               </div>
             </div>
           )}
         </>
+      )}
+
+      {pickerFor && (
+        <div className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4" onClick={() => setPickerFor(null)}>
+          <div className="v3-card max-w-3xl w-full max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <h3 className="v3-serif text-2xl font-bold">Choisir une couverture</h3>
+            <p className="text-sm text-[var(--v3-muted)] mt-1">
+              Pour « {pickerFor.title} ». Vos couvertures créées dans le studio.
+            </p>
+            {studioCovers.filter((c) => c.thumbUrl).length === 0 ? (
+              <div className="mt-6 text-sm text-[var(--v3-muted)]">
+                Aucune couverture enregistrée pour l'instant.
+                <Link to="/v3/couverture-express" className="ml-1 underline font-semibold text-[var(--v3-orange-600)]">
+                  Créer ma couverture
+                </Link>
+              </div>
+            ) : (
+              <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {studioCovers.filter((c) => c.thumbUrl).map((c) => (
+                  <button
+                    key={c.id}
+                    onClick={() => void attachCover(pickerFor, c)}
+                    className="text-left group"
+                    title="Utiliser cette couverture pour ce livre"
+                  >
+                    <img
+                      src={c.thumbUrl as string}
+                      alt={c.bookTitle || c.projectName}
+                      loading="lazy"
+                      className="w-full aspect-[3/4] object-cover rounded-lg border border-[color:var(--v3-orange)]/25 group-hover:border-[var(--v3-orange)] shadow-sm"
+                    />
+                    <div className="mt-1 text-[11px] font-semibold line-clamp-2">{c.bookTitle || c.projectName}</div>
+                  </button>
+                ))}
+              </div>
+            )}
+            <div className="mt-6 flex justify-end gap-2">
+              <Link to="/v3/mes-couvertures" className="v3-btn v3-btn-outline">Ouvrir le studio</Link>
+              <button onClick={() => setPickerFor(null)} className="v3-btn v3-btn-outline">Fermer</button>
+            </div>
+          </div>
+        </div>
       )}
 
       {audioModal && (
@@ -209,10 +289,14 @@ export default function V3LibraryPage() {
   );
 }
 
-function BookCard({ r, done, onAudio, onUpdated, onDelete }: { r: Row; done?: boolean; onAudio: () => void; onUpdated: () => void; onDelete: () => void }) {
-  const [cover, setCover] = useState<string | undefined>(
-    (Array.isArray(r.ebook_images) && r.ebook_images[0]?.url) || undefined,
-  );
+function BookCard({ r, done, studioCover, hasStudioCovers, onPickCover, onAudio, onUpdated, onDelete }: { r: Row; done?: boolean; studioCover?: StudioCover; hasStudioCovers?: boolean; onPickCover: () => void; onAudio: () => void; onUpdated: () => void; onDelete: () => void }) {
+  const ownImage = (Array.isArray(r.ebook_images) && r.ebook_images[0]?.url) || undefined;
+  const [cover, setCover] = useState<string | undefined>(ownImage || studioCover?.thumbUrl || undefined);
+
+  // La couverture du studio arrive après le premier rendu : on l'applique si le livre n'a rien.
+  useEffect(() => {
+    if (!ownImage && studioCover?.thumbUrl) setCover(studioCover.thumbUrl);
+  }, [ownImage, studioCover?.thumbUrl]);
   const [genLoading, setGenLoading] = useState(false);
   const nbChap = Array.isArray(r.chapters) ? r.chapters.length : 0;
   const date = new Date(r.updated_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
@@ -261,10 +345,7 @@ function BookCard({ r, done, onAudio, onUpdated, onDelete }: { r: Row; done?: bo
           style={
             cover
               ? { backgroundImage: `url(${cover})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-              : {
-                  background:
-                    'linear-gradient(160deg, #2A1810 0%, #4A2818 45%, #6B3820 100%)',
-                }
+              : { background: fallbackGradientFor(r.id) }
           }
         >
           {done && (
@@ -300,6 +381,15 @@ function BookCard({ r, done, onAudio, onUpdated, onDelete }: { r: Row; done?: bo
           {nbChap > 0 ? `${nbChap} chap.` : 'Brouillon'} · {date}
         </div>
       </div>
+      {hasStudioCovers && (
+        <button
+          onClick={onPickCover}
+          className="mt-2 inline-flex items-center justify-center gap-1.5 rounded-full border border-[color:var(--v3-orange)]/40 bg-white hover:bg-[#FFF6E8] text-[11px] font-bold text-[var(--v3-orange-600)] py-1.5 px-2 transition"
+          title="Utiliser une couverture déjà créée dans le studio"
+        >
+          <Images className="w-3.5 h-3.5" /> Choisir une couverture
+        </button>
+      )}
       {!cover && (
         <button
           onClick={generateCover}

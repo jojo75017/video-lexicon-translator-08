@@ -114,11 +114,33 @@ export const persistCoverToLibrary = async ({
 };
 
 
-/** Récupère toutes les couvertures déjà générées et sauvegardées (les plus récentes d'abord). */
-export const listSavedCovers = async (): Promise<SavedCover[]> => {
-  const storageRoot = await resolveCoverRoot();
-  if (!storageRoot) return [];
+/**
+ * Racines historiques (anciens espaces de stockage), en lecture seule :
+ *  - liste éventuelle enregistrée localement ;
+ *  - variante dérivée de l'email, utilisée par d'anciennes versions.
+ */
+const legacyRoots = async (): Promise<string[]> => {
+  const roots = new Set<string>();
+  try {
+    const legacy = localStorage.getItem('ebook_storage_root_legacy');
+    if (legacy) legacy.split(',').forEach((r) => r.trim() && roots.add(r.trim()));
+  } catch {
+    // ignore
+  }
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    const email = user?.email;
+    if (email) {
+      const sanitized = email.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 60);
+      if (sanitized) roots.add(sanitized);
+    }
+  } catch {
+    // ignore
+  }
+  return [...roots];
+};
 
+const listCoversInRoot = async (storageRoot: string): Promise<SavedCover[]> => {
   try {
     const { data, error } = await supabase.storage
       .from('ebook-images')
@@ -146,6 +168,20 @@ export const listSavedCovers = async (): Promise<SavedCover[]> => {
   } catch {
     return [];
   }
+};
+
+/** Toutes les couvertures sauvegardées, espaces historiques inclus (plus récentes d'abord). */
+export const listSavedCovers = async (): Promise<SavedCover[]> => {
+  const storageRoot = await resolveCoverRoot();
+  const roots = [storageRoot, ...(await legacyRoots())].filter(
+    (r, i, arr): r is string => Boolean(r) && arr.indexOf(r) === i,
+  );
+  if (roots.length === 0) return [];
+
+  const lists = await Promise.all(roots.map((root) => listCoversInRoot(root)));
+  return lists
+    .flat()
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 };
 
 export const deleteSavedCover = async (path: string): Promise<boolean> => {
