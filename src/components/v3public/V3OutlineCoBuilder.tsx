@@ -275,8 +275,18 @@ export default function V3OutlineCoBuilder({ outlineFirst }: Props = {}) {
       ) : outline.length === 0 && (
         <p className="mt-2 rounded-xl border px-2.5 py-2 text-[11.5px]"
           style={{ borderColor: 'rgba(201,168,76,0.45)', background: 'rgba(201,168,76,0.08)', color: 'var(--v3-ink)' }}>
-          Continuez à raconter à l’étape ① : je m’occupe du plan quand vous aurez fini. Le nombre de
-          chapitres sera calculé sur ce que vous aurez vraiment écrit.
+          {useOutlineFirst ? (
+            <>
+              Donnez une première indication de chapitre ci-dessous (ex. : « Chapitre 1 — pourquoi je
+              veux raconter cela »), puis cliquez sur <strong>Proposer les 3 premiers chapitres</strong>.
+              Vous pourrez préciser la suite au fur et à mesure.
+            </>
+          ) : (
+            <>
+              Continuez à raconter à l’étape ① : je m’occupe du plan quand vous aurez fini. Le nombre de
+              chapitres sera calculé sur ce que vous aurez vraiment écrit.
+            </>
+          )}
         </p>
       )}
 
