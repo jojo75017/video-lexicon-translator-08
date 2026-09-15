@@ -218,7 +218,7 @@ export default function V3LibraryPage() {
                 <span className="text-xs text-[var(--v3-muted)]">Chaque livre peut être converti en audio (option 9,99 €)</span>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-                {done.map((r) => <BookCard key={r.id} r={r} done onAudio={() => setAudioModal({ id: r.id, title: r.title })} onUpdated={() => setRefreshTick((t) => t + 1)} onDelete={() => deleteOne(r.id)} />)}
+                {done.map((r) => <BookCard key={r.id} r={r} done studioCover={coverIndex[normalizeTitle(r.title)]} onPickCover={() => setPickerFor(r)} hasStudioCovers={studioCovers.length > 0} onAudio={() => setAudioModal({ id: r.id, title: r.title })} onUpdated={() => setRefreshTick((t) => t + 1)} onDelete={() => deleteOne(r.id)} />)}
               </div>
             </div>
           )}
@@ -226,11 +226,53 @@ export default function V3LibraryPage() {
             <div className="mt-12">
               <h2 className="text-lg font-bold mb-4">En cours <span className="text-sm font-normal text-[var(--v3-muted)]">· {started.length}</span></h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-                {started.map((r) => <BookCard key={r.id} r={r} onAudio={() => setAudioModal({ id: r.id, title: r.title })} onUpdated={() => setRefreshTick((t) => t + 1)} onDelete={() => deleteOne(r.id)} />)}
+                {started.map((r) => <BookCard key={r.id} r={r} studioCover={coverIndex[normalizeTitle(r.title)]} onPickCover={() => setPickerFor(r)} hasStudioCovers={studioCovers.length > 0} onAudio={() => setAudioModal({ id: r.id, title: r.title })} onUpdated={() => setRefreshTick((t) => t + 1)} onDelete={() => deleteOne(r.id)} />)}
               </div>
             </div>
           )}
         </>
+      )}
+
+      {pickerFor && (
+        <div className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4" onClick={() => setPickerFor(null)}>
+          <div className="v3-card max-w-3xl w-full max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <h3 className="v3-serif text-2xl font-bold">Choisir une couverture</h3>
+            <p className="text-sm text-[var(--v3-muted)] mt-1">
+              Pour « {pickerFor.title} ». Vos couvertures créées dans le studio.
+            </p>
+            {studioCovers.filter((c) => c.thumbUrl).length === 0 ? (
+              <div className="mt-6 text-sm text-[var(--v3-muted)]">
+                Aucune couverture enregistrée pour l'instant.
+                <Link to="/v3/couverture-express" className="ml-1 underline font-semibold text-[var(--v3-orange-600)]">
+                  Créer ma couverture
+                </Link>
+              </div>
+            ) : (
+              <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {studioCovers.filter((c) => c.thumbUrl).map((c) => (
+                  <button
+                    key={c.id}
+                    onClick={() => void attachCover(pickerFor, c)}
+                    className="text-left group"
+                    title="Utiliser cette couverture pour ce livre"
+                  >
+                    <img
+                      src={c.thumbUrl as string}
+                      alt={c.bookTitle || c.projectName}
+                      loading="lazy"
+                      className="w-full aspect-[3/4] object-cover rounded-lg border border-[color:var(--v3-orange)]/25 group-hover:border-[var(--v3-orange)] shadow-sm"
+                    />
+                    <div className="mt-1 text-[11px] font-semibold line-clamp-2">{c.bookTitle || c.projectName}</div>
+                  </button>
+                ))}
+              </div>
+            )}
+            <div className="mt-6 flex justify-end gap-2">
+              <Link to="/v3/mes-couvertures" className="v3-btn v3-btn-outline">Ouvrir le studio</Link>
+              <button onClick={() => setPickerFor(null)} className="v3-btn v3-btn-outline">Fermer</button>
+            </div>
+          </div>
+        </div>
       )}
 
       {audioModal && (
