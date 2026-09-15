@@ -12,6 +12,9 @@
   --v3-gold: #c9a84c;
   --v3-gold-600: #b0902f;
   --v3-gold-soft: #f5f0e0;
+  --v3-action-orange: #d95f18;
+  --v3-action-orange-hover: #b9480f;
+  --v3-action-orange-text: #ffffff;
   --v3-paper: #fbfaf6;
   --v3-cream: #f5f3ee;
   --v3-ink: #0a1f18;
@@ -92,6 +95,18 @@
   box-shadow: 0 10px 24px -12px rgba(201, 168, 76, 0.5);
 }
 .v3pub .v3-btn-gold:hover { background: var(--v3-gold-600); color: #fff; transform: translateY(-1px); }
+.v3pub .v3-btn-action-orange {
+  background: var(--v3-action-orange);
+  color: var(--v3-action-orange-text);
+  border: 2px solid var(--v3-action-orange);
+  box-shadow: 0 12px 26px -10px rgba(217, 95, 24, 0.7);
+}
+.v3pub .v3-btn-action-orange:hover {
+  background: var(--v3-action-orange-hover);
+  border-color: var(--v3-action-orange-hover);
+  color: var(--v3-action-orange-text);
+  transform: translateY(-1px);
+}
 .v3pub .v3-btn-outline {
   border: 1px solid var(--v3-emerald);
   color: var(--v3-emerald);
