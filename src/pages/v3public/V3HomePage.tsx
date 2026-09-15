@@ -29,6 +29,7 @@ import V3BenefitsPanel from '@/components/v3public/V3BenefitsPanel';
 import V3DifferenceTable from '@/components/v3public/V3DifferenceTable';
 import V3BeforeYouStartPanel from '@/components/v3public/V3BeforeYouStartPanel';
 import V3GoFurtherPanel from '@/components/v3public/V3GoFurtherPanel';
+import V3StartIdeaCTA from '@/components/v3public/V3StartIdeaCTA';
 import ReadingGate from '@/components/marketing/ReadingGate';
 
 const FEATURED_TOOLS = [
@@ -92,6 +93,9 @@ export default function V3HomePage() {
       </div>
       <div className="v3-shell">
         <V3ResumeBookCard compact />
+      </div>
+      <div className="v3-shell">
+        <V3StartIdeaCTA variant="discreet" />
       </div>
       <V3StartBookBar />
       <V3BriefRecap />
