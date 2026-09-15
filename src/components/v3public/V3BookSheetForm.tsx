@@ -185,8 +185,7 @@ export default function V3BookSheetForm() {
                     <button
                       type="button"
                       onClick={importSheet}
-                      className="v3-btn text-xs"
-                      style={{ background: 'var(--v3-orange)', color: 'var(--v3-ink)', fontWeight: 700 }}
+                      className="v3-btn v3-btn-action-orange text-xs"
                     >
                       Lire ma fiche et remplir les champs
                     </button>
@@ -250,7 +249,7 @@ export default function V3BookSheetForm() {
                         <button
                           type="button"
                           onClick={() => set({ characters: characters.filter((_, i) => i !== index) })}
-                          className="v3-btn mt-2 text-[11px]"
+                          className="v3-btn v3-btn-outline mt-2 text-[11px]"
                         >
                           <Trash2 className="h-3.5 w-3.5" /> Retirer ce personnage
                         </button>
@@ -259,7 +258,7 @@ export default function V3BookSheetForm() {
                     <button
                       type="button"
                       onClick={() => set({ characters: [...characters, { name: '' }] })}
-                      className="v3-btn text-xs"
+                      className="v3-btn v3-btn-action-orange text-xs"
                     >
                       <Plus className="h-3.5 w-3.5" /> Ajouter un personnage
                     </button>
@@ -309,7 +308,7 @@ export default function V3BookSheetForm() {
                     {qr ? (
                       <div className="flex flex-wrap items-center gap-3">
                         <img src={qr} alt="QR code vers vos livres pour laisser un avis" className="h-32 w-32 rounded-lg border bg-white p-1" />
-                        <button type="button" onClick={downloadQr} className="v3-btn text-xs">
+                        <button type="button" onClick={downloadQr} className="v3-btn v3-btn-action-orange text-xs">
                           <Download className="h-3.5 w-3.5" /> Télécharger le QR code (PNG)
                         </button>
                       </div>
@@ -329,8 +328,7 @@ export default function V3BookSheetForm() {
       <button
         type="button"
         onClick={save}
-        className="v3-btn mt-4 text-xs"
-        style={{ background: 'var(--v3-orange)', color: 'var(--v3-ink)', fontWeight: 700 }}
+        className="v3-btn v3-btn-action-orange mt-4 min-h-12 px-6 text-sm font-bold"
       >
         <Save className="h-3.5 w-3.5" /> Enregistrer ma fiche
       </button>
