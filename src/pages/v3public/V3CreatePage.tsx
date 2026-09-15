@@ -359,6 +359,14 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                 <Link to="/v3/biographie" className={`v3-btn text-xs ${biography ? 'v3-btn-primary' : 'v3-btn-outline'}`}>
                   <Sparkles className="w-3.5 h-3.5" /> Je raconte ma vie
                 </Link>
+                <button
+                  type="button"
+                  onClick={startOutlineFirst}
+                  className="v3-btn text-xs"
+                  style={{ background: 'var(--v3-orange, #FF9E2D)', color: '#232F3E', fontWeight: 600 }}
+                >
+                  <BookOpen className="w-3.5 h-3.5" /> Je pars d’un sommaire
+                </button>
               </div>
             </>
           )}
