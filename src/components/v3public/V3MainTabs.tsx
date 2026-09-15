@@ -92,7 +92,7 @@ export default function V3MainTabs() {
           >
             <Sparkles className="w-3.5 h-3.5" />
             <span>UPSELLS</span>
-            <span className="v3-badge">18 tarifs</span>
+            <span className="v3-badge">6 compléments</span>
           </NavLink>
 
 
