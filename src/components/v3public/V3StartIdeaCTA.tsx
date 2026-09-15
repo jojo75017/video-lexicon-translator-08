@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BarChart3, MessagesSquare, Sparkles } from 'lucide-react';
+import { BarChart3, Bot, MessagesSquare, Sparkles } from 'lucide-react';
 
 type Props = {
   variant?: 'full' | 'compact' | 'discreet';
@@ -14,7 +14,7 @@ export default function V3StartIdeaCTA({ variant = 'full' }: Props) {
   /* Accueil : trois encarts sobres, sans aplat coloré ni gros bouton. */
   if (variant === 'discreet') {
     return (
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Link
           to="/assistant"
           className="group flex items-start gap-3 rounded-xl border bg-card p-4 transition hover:shadow-sm"
@@ -59,6 +59,22 @@ export default function V3StartIdeaCTA({ variant = 'full' }: Props) {
             </span>
             <span className="mt-1 block text-xs leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
               Des sujets qui se vendent sur Amazon, classés par thème.
+            </span>
+          </span>
+        </Link>
+
+        <Link
+          to="/assistant"
+          className="group flex items-start gap-3 rounded-xl border bg-card p-4 transition hover:shadow-sm"
+          style={{ borderColor: 'rgba(0,0,0,0.10)' }}
+        >
+          <Bot className="mt-0.5 h-4 w-4 shrink-0" style={{ color: 'var(--v3-gold-600)' }} />
+          <span className="min-w-0">
+            <span className="block text-sm font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+              Ecoboost
+            </span>
+            <span className="mt-1 block text-xs leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
+              Votre assistant IA EbookStudio : parlez-lui comme à un conseiller, il vous aide à avancer.
             </span>
           </span>
         </Link>
