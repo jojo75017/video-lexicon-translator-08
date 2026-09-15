@@ -767,7 +767,6 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
             {visibleTemplates.map((tpl) => {
               const active = composition.templateId === tpl.id;
               const variantIndex = active ? templateVariant : 0;
-              const variant = tpl.variants[variantIndex] ?? tpl.variants[0];
               return (
                 <div
                   key={tpl.id}
@@ -782,33 +781,12 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
                     data-cover-template={tpl.id}
                     className="w-full text-left"
                   >
-                    <div
-                      className={cn(
-                        'relative mb-2 flex h-40 w-full flex-col items-center overflow-hidden rounded-lg px-3 py-4 text-white',
-                        variant.gradient,
-                      )}
-                    >
-                      <div
-                        className={cn(
-                          'w-full rounded px-1 text-center',
-                          tpl.preview.bandClass,
-                          tpl.preview.titleClass,
-                        )}
-                      >
-                        Titre du livre
-                      </div>
-                      <div className={cn('mt-2 w-full text-center', tpl.preview.subtitleClass)}>
-                        Sous-titre
-                      </div>
-                      <div
-                        className={cn(
-                          'absolute bottom-3 left-0 w-full text-center',
-                          tpl.preview.authorClass,
-                        )}
-                      >
-                        Georges Boubet
-                      </div>
-                    </div>
+                    <CoverTemplateThumb
+                      template={tpl}
+                      variantIndex={variantIndex}
+                      composition={composition}
+                      projectImage={bgImage}
+                    />
                     <p className="text-sm font-semibold text-foreground">{tpl.label}</p>
                     <p className="text-xs text-muted-foreground">{tpl.description}</p>
                   </button>
