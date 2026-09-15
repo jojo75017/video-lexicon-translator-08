@@ -641,9 +641,9 @@ const drawImageCover = (
   const drawY = y + (h - ih) / 2 + offsetY * Math.max(0, ih - h) * 0.5;
   if (composition?.imageFlipX) {
     ctx.save();
-    ctx.translate(x + w, 0);
+    ctx.translate(x * 2 + w, 0);
     ctx.scale(-1, 1);
-    ctx.drawImage(image, x + (w - iw) / 2 - offsetX * Math.max(0, iw - w) * 0.5, drawY, iw, ih);
+    ctx.drawImage(image, x + (w - iw) / 2 + offsetX * Math.max(0, iw - w) * 0.5, drawY, iw, ih);
     ctx.restore();
   } else {
     ctx.drawImage(image, drawX, drawY, iw, ih);

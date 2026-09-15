@@ -77,9 +77,9 @@ const STEP_LABELS: Record<Step, string> = {
 };
 
 const STEP_HELP: Record<Step, string> = {
-  1: 'Dites-nous simplement de quel livre il s’agit. Rien à régler, cinq réponses suffisent.',
-  2: 'Choisissez la couverture qui vous plaît le plus. Elle est déjà complète, votre titre est dedans.',
-  3: 'Votre couverture est prête. Téléchargez le fichier, c’est celui que vous déposerez sur Amazon.',
+  1: 'Décrivez le livre, son public et les éléments indispensables : cette base empêchera l’image de partir sur une autre histoire.',
+  2: 'Validez d’abord la scène proposée, puis créez l’illustration et choisissez une composition éditoriale.',
+  3: 'Vérifiez la lisibilité, puis téléchargez ou ouvrez l’éditeur complet pour les retouches finales.',
 };
 
 const FORMAT_ID: Record<FormatChoice, string> = {
@@ -314,7 +314,7 @@ export default function CouvertureExpressPage() {
             (synopsis.trim() ? `\n\nSynopsis du livre : ${synopsis.trim()}` : ''),
           artStyle: genre.brief.artStyle,
           // Par défaut une image claire : les rendus sombres étaient le principal défaut.
-          lighting: 'bright',
+          lighting,
           visualPrompt,
           targetAudience,
           era,
