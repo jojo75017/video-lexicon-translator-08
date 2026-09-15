@@ -93,6 +93,8 @@ export default function IllustrationGeneratorPanel({
   const [avoid, setAvoid] = useState('');
   const [summary, setSummary] = useState('');
   const [artStyle, setArtStyle] = useState('illustration-editoriale');
+  /** Exposition demandée : par défaut une image claire, jamais trop sombre. */
+  const [lighting, setLighting] = useState('bright');
 
 
   const [books, setBooks] = useState<BookOption[]>([]);
@@ -157,7 +159,7 @@ export default function IllustrationGeneratorPanel({
       for (let i = 0; i < count; i += 1) {
         setProgress({ done: i, total: count });
         const { data, error: fnError } = await supabase.functions.invoke('cover-pro-generate', {
-          body: { projectId, genre, mood, palette, avoid, summary, artStyle },
+          body: { projectId, genre, mood, palette, avoid, summary, artStyle, lighting },
         });
         if (fnError) throw fnError;
         if (data?.error) throw new Error(data.error);
@@ -342,6 +344,25 @@ export default function IllustrationGeneratorPanel({
             </div>
 
 
+
+            {/* Lumière de l'image (évite les rendus trop sombres) */}
+            <div className="space-y-1.5">
+              <Label>Lumière de l'image</Label>
+              <Select value={lighting} onValueChange={setLighting}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="bright">Lumineuse (recommandé)</SelectItem>
+                  <SelectItem value="balanced">Équilibrée</SelectItem>
+                  <SelectItem value="dark">Sombre et dramatique</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                « Lumineuse » demande une image claire et bien exposée : c'est le réglage à garder si
+                vos images sortent trop sombres.
+              </p>
+            </div>
 
             <div className="space-y-1.5">
               <Label htmlFor="ill-summary">Sujet du livre et scène souhaitée</Label>
