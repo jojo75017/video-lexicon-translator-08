@@ -60,8 +60,14 @@ export default function V3HomePage() {
       {/* 1. LANCEMENT — bande fine */}
       <V3LaunchBanner />
 
-      {/* 2. PROMESSE PRINCIPALE */}
+      {/* 2. DEUX ENCARTS DISCRETS — juste au-dessus de la promesse */}
+      <div className="v3-shell">
+        <V3StartIdeaCTA variant="discreet" />
+      </div>
+
+      {/* 3. PROMESSE PRINCIPALE */}
       <V3HeroBanner />
+
 
       {/* 3. VIDÉO DE PRÉSENTATION */}
       <V3PresentationVideo />
@@ -94,10 +100,9 @@ export default function V3HomePage() {
       <div className="v3-shell">
         <V3ResumeBookCard compact />
       </div>
-      <div className="v3-shell">
-        <V3StartIdeaCTA variant="discreet" />
-      </div>
+
       <V3StartBookBar />
+
       <V3BriefRecap />
 
       {/* 8. POUR ALLER PLUS LOIN — agents, workflow, KDP Pilot */}
