@@ -345,10 +345,7 @@ function BookCard({ r, done, studioCover, hasStudioCovers, onPickCover, onAudio,
           style={
             cover
               ? { backgroundImage: `url(${cover})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-              : {
-                  background:
-                    'linear-gradient(160deg, #2A1810 0%, #4A2818 45%, #6B3820 100%)',
-                }
+              : { background: fallbackGradientFor(r.id) }
           }
         >
           {done && (
