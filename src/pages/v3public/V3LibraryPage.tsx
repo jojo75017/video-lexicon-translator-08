@@ -114,6 +114,21 @@ export default function V3LibraryPage() {
     setRefreshTick((t) => t + 1);
   };
 
+  /** Rattache durablement une couverture du studio à un livre (aucune IA, aucun crédit). */
+  const attachCover = useCallback(async (book: Row, cover: StudioCover) => {
+    if (!cover.thumbPath) { toast.error("Cette couverture n'a pas encore de visuel."); return; }
+    const url = await getSignedCoverUrl(cover.thumbPath, LONG_SIGNED_TTL);
+    if (!url) { toast.error('Couverture illisible pour le moment.'); return; }
+    const { error } = await supabase
+      .from('ebook_projects')
+      .update({ ebook_images: [{ type: 'front_cover', url, title: book.title }] as any })
+      .eq('id', book.id);
+    if (error) { toast.error(error.message); return; }
+    toast.success('Couverture rattachée à ce livre.');
+    setPickerFor(null);
+    setRefreshTick((t) => t + 1);
+  }, []);
+
   const deleteOne = async (id: string) => {
     if (!confirm('Supprimer ce livre définitivement ?')) return;
     const { error } = await supabase.from('ebook_projects').delete().eq('id', id);
