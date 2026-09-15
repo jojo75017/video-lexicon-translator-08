@@ -60,8 +60,14 @@ export default function V3HomePage() {
       {/* 1. LANCEMENT — bande fine */}
       <V3LaunchBanner />
 
-      {/* 2. PROMESSE PRINCIPALE */}
+      {/* 2. DEUX ENCARTS DISCRETS — juste au-dessus de la promesse */}
+      <div className="v3-shell">
+        <V3StartIdeaCTA variant="discreet" />
+      </div>
+
+      {/* 3. PROMESSE PRINCIPALE */}
       <V3HeroBanner />
+
 
       {/* 3. VIDÉO DE PRÉSENTATION */}
       <V3PresentationVideo />
