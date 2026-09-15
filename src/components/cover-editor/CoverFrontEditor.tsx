@@ -987,6 +987,36 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
           <p className="mt-2 text-center text-xs text-muted-foreground">
             {size.label} · affichage à {Math.round(scale * 100)} %
           </p>
+
+          {/* rattrapage d'une image trop sombre : 100 % local, sans IA ni crédit */}
+          {bgUrl && (
+            <div className="mt-3 rounded-xl border border-border bg-card p-3">
+              <div className="flex items-center justify-between gap-2">
+                <Label className="text-sm font-semibold text-foreground">
+                  Éclaircir l'image · {Math.round(frontBrightness * 100)} %
+                </Label>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setBrightness(1)}
+                  className="gap-1"
+                >
+                  <RotateCcw className="h-4 w-4" /> Remettre à zéro
+                </Button>
+              </div>
+              <Slider
+                className="mt-2"
+                min={0.7}
+                max={1.5}
+                step={0.02}
+                value={[frontBrightness]}
+                onValueChange={([v]) => setBrightness(v)}
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Votre image est trop sombre ? Éclaircissez-la ici, sans regénérer et sans crédit.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* panneau d'édition */}
