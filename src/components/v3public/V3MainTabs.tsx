@@ -48,20 +48,20 @@ export default function V3MainTabs() {
 
   return (
     <div
-      className="sticky top-16 z-30 overflow-x-clip"
+      className="sticky top-16 z-30 relative overflow-x-clip"
       style={{
         background: 'var(--v3-paper)',
         borderBottom: '1px solid var(--v3-line)',
       }}
     >
-      <div className="max-w-7xl mx-auto px-5 md:px-8 h-14 flex items-center gap-1">
-        {/* Desktop (≥ lg) */}
-        <nav className="hidden lg:flex items-center gap-0.5 flex-1 min-w-0">
+      <div className="max-w-7xl mx-auto pl-5 md:pl-8 pr-2 md:pr-4 h-14 flex items-center gap-1">
+        {/* Desktop (≥ xl) — rangée scrollable : aucun onglet n'est coupé */}
+        <nav className="hidden xl:flex items-center gap-0.5 flex-1 min-w-0 overflow-x-auto v3-no-scrollbar">
           <NavLink
             to="/v3"
             end
             className={({ isActive }) =>
-              `v3-btn text-[12px] ml-1 mr-1 ${isActive ? 'v3-btn-gold' : 'v3-btn-outline'}`
+              `v3-btn text-[12px] ml-1 mr-1 shrink-0 ${isActive ? 'v3-btn-gold' : 'v3-btn-outline'}`
             }
             style={({ isActive }) =>
               isActive ? {} : { borderColor: 'var(--v3-gold)', color: 'var(--v3-emerald)' }
