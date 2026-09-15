@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Sparkles, ArrowRight, Palette, Users, Download } from 'lucide-react';
 import { BD_COMIC_OFFER } from '@/data/bdComicOffer';
+import studioJeunesseHero from '@/assets/studio-jeunesse-hero.jpg';
 
 interface Props {
   /** Version compacte pour les pages de listes (upsells). */
@@ -66,26 +67,36 @@ export default function BdComicNewsBanner({ compact = false }: Props) {
             </Link>
           </div>
 
-          <ul className="space-y-3 self-center text-sm">
-            {[
-              { icon: Users, text: 'Personnages cohérents d’une case à l’autre' },
-              { icon: Palette, text: 'Planches, coloriages et histoires illustrées' },
-              { icon: Download, text: 'Exports PDF et images prêts pour KDP' },
-            ].map(({ icon: Icon, text }) => (
-              <li
-                key={text}
-                className="flex items-start gap-3 rounded-xl border p-3"
-                style={{
-                  borderColor: 'var(--v3-border)',
-                  background: 'var(--v3-paper)',
-                  color: 'var(--v3-ink-2)',
-                }}
-              >
-                <Icon className="mt-0.5 h-4 w-4 shrink-0" style={{ color: 'var(--v3-gold-600)' }} />
-                <span>{text}</span>
-              </li>
-            ))}
-          </ul>
+          <div className="relative min-h-[260px] overflow-hidden rounded-xl">
+            <img
+              src={studioJeunesseHero}
+              alt="Main d'enfant choisissant un crayon de couleur dans un pot"
+              loading="lazy"
+              width={1280}
+              height={960}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <ul className="absolute inset-x-3 bottom-3 space-y-2 text-sm">
+              {[
+                { icon: Users, text: 'Personnages cohérents d’une case à l’autre' },
+                { icon: Palette, text: 'Planches, coloriages et histoires illustrées' },
+                { icon: Download, text: 'Exports PDF et images prêts pour KDP' },
+              ].map(({ icon: Icon, text }) => (
+                <li
+                  key={text}
+                  className="flex items-start gap-3 rounded-xl border p-2.5 backdrop-blur-sm"
+                  style={{
+                    borderColor: 'var(--v3-border)',
+                    background: 'color-mix(in srgb, var(--v3-paper) 88%, transparent)',
+                    color: 'var(--v3-ink-2)',
+                  }}
+                >
+                  <Icon className="mt-0.5 h-4 w-4 shrink-0" style={{ color: 'var(--v3-gold-600)' }} />
+                  <span>{text}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </section>
