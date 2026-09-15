@@ -11,6 +11,45 @@ type Props = {
  * Composant de présentation : aucune donnée, aucun appel réseau.
  */
 export default function V3StartIdeaCTA({ variant = 'full' }: Props) {
+  /* Accueil : deux encarts sobres, sans aplat coloré ni gros bouton. */
+  if (variant === 'discreet') {
+    return (
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Link
+          to="/v3/create"
+          className="group flex items-start gap-3 rounded-xl border bg-card p-4 transition hover:shadow-sm"
+          style={{ borderColor: 'rgba(0,0,0,0.10)' }}
+        >
+          <MessagesSquare className="mt-0.5 h-4 w-4 shrink-0" style={{ color: 'var(--v3-gold-600)' }} />
+          <span className="min-w-0">
+            <span className="block text-sm font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+              Pas encore d’idée ? Parlez-en avec l’IA
+            </span>
+            <span className="mt-1 block text-xs leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
+              Quelques questions simples, et vous repartez avec un sujet précis.
+            </span>
+          </span>
+        </Link>
+
+        <Link
+          to="/niches"
+          className="group flex items-start gap-3 rounded-xl border bg-card p-4 transition hover:shadow-sm"
+          style={{ borderColor: 'rgba(0,0,0,0.10)' }}
+        >
+          <BarChart3 className="mt-0.5 h-4 w-4 shrink-0" style={{ color: 'var(--v3-emerald)' }} />
+          <span className="min-w-0">
+            <span className="block text-sm font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+              Ou partez d’une niche déjà repérée
+            </span>
+            <span className="mt-1 block text-xs leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
+              Des sujets qui se vendent sur Amazon, classés par thème.
+            </span>
+          </span>
+        </Link>
+      </div>
+    );
+  }
+
   if (variant === 'compact') {
     return (
       <section className="rounded-2xl border border-[#c9a84c]/50 bg-[#fdf6e3] p-5">
