@@ -73,7 +73,7 @@ export default function V3MainTabs() {
           <NavLink
             to="/v3/offre"
             className={({ isActive }) =>
-              `v3-btn text-[12px] mr-1 ${isActive ? 'v3-btn-gold' : ''}`
+              `v3-btn text-[12px] mr-1 shrink-0 ${isActive ? 'v3-btn-gold' : ''}`
             }
             style={{
               background: 'linear-gradient(135deg,#FF9E2D 0%,#fbbf24 100%)',
@@ -88,7 +88,7 @@ export default function V3MainTabs() {
           </NavLink>
           <NavLink
             to="/v3/upsells"
-            className="v3-btn text-[12px] mr-1"
+            className="v3-btn text-[12px] mr-1 shrink-0"
             style={({ isActive }) => ({
               background: isActive ? 'var(--v3-gold)' : 'var(--v3-gold-soft)',
               color: 'var(--v3-emerald)',
