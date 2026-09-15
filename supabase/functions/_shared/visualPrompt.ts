@@ -24,6 +24,20 @@ export interface VisualPromptInput {
 
 const clean = (v?: string) => (typeof v === "string" ? v.trim() : "");
 
+function buildFaithfulFallback(input: VisualPromptInput): string {
+  const subject = clean(input.focalSubject) || "le sujet principal décrit dans le synopsis";
+  const setting = [clean(input.location), clean(input.era)].filter(Boolean).join(", ");
+  const details = [
+    setting ? `dans ${setting}` : "dans le décor exact décrit par l'auteur",
+    clean(input.symbol) ? `avec ${clean(input.symbol)} intégré naturellement` : "",
+    clean(input.include) ? `Les éléments obligatoires sont : ${clean(input.include)}.` : "",
+    clean(input.emotion) ? `L'image doit provoquer ${clean(input.emotion)}.` : "",
+    clean(input.palette) ? `Palette : ${clean(input.palette)}.` : "",
+    clean(input.avoid) ? `Ne pas représenter : ${clean(input.avoid)}.` : "",
+  ].filter(Boolean).join(" ");
+  return `Composition verticale de couverture centrée sur ${subject}, ${details} Cadrage éditorial précis, profondeur naturelle, lumière cohérente et point focal immédiatement identifiable. Rendu photoréaliste ou pictural haut de gamme selon le genre, anatomie crédible, matières détaillées, sans texte, logo, cadre, bandeau, cartouche ni zone sombre ajoutée. Rester strictement fidèle au synopsis, sans inventer de personnage, de lieu, d'époque, d'objet ou d'événement absent.`;
+}
+
 /**
  * Renvoie une consigne visuelle en français (sujet, décor, époque, action,
  * cadrage, lumière, palette) ou `null` si l'analyse n'est pas possible.
@@ -97,8 +111,8 @@ export async function buildVisualPrompt(input: VisualPromptInput): Promise<strin
       const wordCount = result.split(/\s+/).filter(Boolean).length;
       if (wordCount >= 45 && /[.!?]$/.test(result)) return result.slice(0, 1200);
     }
-    return null;
+    return buildFaithfulFallback(input);
   } catch {
-    return null;
+    return buildFaithfulFallback(input);
   }
 }
