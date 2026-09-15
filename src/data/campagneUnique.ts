@@ -88,6 +88,10 @@ export const SHORT_LINKS: Record<string, ShortLink> = {
   short8: { key: 'short8', destination: '/decouverte', template: 'short-video-8', label: 'Vidéo 8 — Voir mon livre commencer' },
   short9: { key: 'short9', destination: '/decouverte', template: 'short-video-9', label: 'Vidéo 9 — Voir mon livre commencer' },
   short10: { key: 'short10', destination: '/decouverte', template: 'short-video-10', label: 'Vidéo 10 — Voir mon livre commencer' },
+
+  /* Visite libre de la V3 avant l'ouverture du 1er octobre : on regarde, on ne
+   * touche à rien (mode contemplation). Aucun paiement au bout du lien. */
+  v3: { key: 'v3', destination: '/v3', template: 'v3-visite-vitrine', label: 'Visiter la V3 en avant-première' },
 };
 
 
