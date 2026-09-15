@@ -32,9 +32,13 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
           className="v3-serif mt-5 font-semibold leading-[1.1] text-[28px] md:text-[40px]"
           style={{ color: 'var(--v3-editorial-ink)' }}
         >
-          Votre agent d'édition IA{' '}
-          <span className="italic" style={{ color: 'var(--v3-emerald)' }}>multi-modèle</span>
+          Votre maison d'édition{' '}
+          <span className="italic" style={{ color: 'var(--v3-emerald)' }}>IA</span>
         </h1>
+
+        <p className="v3-serif mt-3 text-lg italic" style={{ color: 'var(--v3-gold-600)' }}>
+          Écrivez. Publiez. Rayonnez.
+        </p>
 
         <p className="mt-4 mx-auto max-w-2xl text-[15px] md:text-[16.5px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
           Transformez une simple idée de livre en un package complet prêt pour Amazon :

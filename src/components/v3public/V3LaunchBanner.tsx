@@ -59,7 +59,7 @@ export default function V3LaunchBanner({ compact = false }: { compact?: boolean 
             >
               <Crown className="h-3 w-3" /> Lancement V3
             </span>
-            <h2 className="text-[13px] font-semibold leading-snug text-primary-foreground sm:text-[14px]">
+            <h2 className="text-[13px] font-semibold leading-snug sm:text-[14px]" style={{ color: 'var(--v3-gold-soft)' }}>
               <strong style={{ color: 'var(--v3-gold)' }}>47 € à vie jusqu’au 30 septembre</strong>
               <span className="hidden sm:inline"> — ouverture V3 le 1<sup>er</sup> octobre, 1<sup>er</sup> mois offert</span>
             </h2>
