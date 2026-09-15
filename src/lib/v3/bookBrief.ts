@@ -80,6 +80,9 @@ export type BookBrief = {
   /** L'auteur construit son livre à partir du sommaire (chemin inverse :
    *  indications de chapitre au fur et à mesure, sans récit préalable). */
   outlineFirst?: boolean;
+  /** Parcours choisi sur l'écran de création. Évite de mélanger livre, biographie
+   *  et sommaire déjà écrit dans une même fiche locale. */
+  creationPath?: 'story' | 'biography' | 'existing-outline';
   /** L'abonné souhaite des illustrations IA à l'intérieur du livre. */
   wantsIllustrations?: boolean;
   characters?: Array<{ name?: string; role?: string; description?: string; traits?: string }>;
@@ -606,12 +609,25 @@ export function parseTocText(text: string): BriefOutlineChapter[] {
     const line = rawLine.trim();
     if (!line) continue;
     if (/^table des mati|^sommaire\b/i.test(line)) continue;
+    if (/^(?:acte|partie)\s+[ivxlcdm\d]+\b/i.test(line)) continue;
     if (/^-{3,}$/.test(line)) continue;
 
-    const [head, ...rest] = line.split(/\s*[|]\s*|\s+—\s+|\s+–\s+/);
+    const withoutBullet = line.replace(/^[•●▪◦*+-]\s*/, '');
+    const chapterMatch = withoutBullet.match(/^(?:chapitre\s+\d+|épilogue)\s*[:.)-]*\s*(.+)$/i);
+    if (!chapterMatch) continue;
+    const chapterText = chapterMatch[1].trim();
+    const sentenceBreak = chapterText.match(/^(.+?[.!?])(?:\s+)(.+)$/);
+    const titlePart = sentenceBreak?.[1]?.replace(/[.!?]+$/, '').trim() || chapterText;
+    const objectivePart = sentenceBreak?.[2]?.trim() || '';
+    const [head, ...rest] = titlePart.split(/\s*[|]\s*|\s+—\s+|\s+–\s+/);
     const titre = cleanLine(head);
     if (!titre || titre.length < 2) continue;
-    chapters.push({ numero: chapters.length + 1, titre, objectif: rest.join(' — ').trim() });
+    chapters.push({
+      numero: chapters.length + 1,
+      titre,
+      objectif: [rest.join(' — ').trim(), objectivePart].filter(Boolean).join('. '),
+      locked: true,
+    });
   }
   return normalizeOutline(chapters);
 }

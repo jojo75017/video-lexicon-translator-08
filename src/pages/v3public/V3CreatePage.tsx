@@ -17,7 +17,7 @@ import V3BookActionsBar from '@/components/v3public/V3BookActionsBar';
 import V3OutlineCoBuilder from '@/components/v3public/V3OutlineCoBuilder';
 import V3PassageCorrector from '@/components/v3public/V3PassageCorrector';
 
-import { BOOK_BRIEF_EVENT, clearBookBrief, readBookBrief, writeBookBrief, type BriefOutlineChapter, type BookBrief } from '@/lib/v3/bookBrief';
+import { BOOK_BRIEF_EVENT, clearBookBrief, parseTocText, readBookBrief, writeBookBrief, type BriefOutlineChapter, type BookBrief } from '@/lib/v3/bookBrief';
 import { restoreDraftState, saveBookDraftToCloud, BOOK_DRAFT_STATUS_EVENT, type BookDraftStatus } from '@/lib/v3/bookDraftCloud';
 import { writeLocalThread } from '@/lib/v3/genieThread';
 
@@ -98,24 +98,43 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
     return () => window.removeEventListener(BOOK_BRIEF_EVENT, sync);
   }, []);
 
-  // Chemin « sommaire d'abord » : l'auteur construit son livre à partir du sommaire.
-  const outlineFirstActive = Boolean(bookBrief.outlineFirst);
+  // Parcours séparé : le sommaire existe déjà et ne doit jamais être réécrit par l'IA.
+  const existingOutlineActive = bookBrief.creationPath === 'existing-outline';
   const [subjectTitle, setSubjectTitle] = useState('');
   const [subjectDesc, setSubjectDesc] = useState('');
   const [subjectChapters, setSubjectChapters] = useState(10);
   useEffect(() => {
-    if (!outlineFirstActive) return;
+    if (!existingOutlineActive) return;
     const b = readBookBrief() || {};
     setSubjectTitle(b.title || '');
     setSubjectDesc(b.description || '');
     setSubjectChapters(Math.min(40, Math.max(3, Number(b.chapters) || 10)));
-  }, [outlineFirstActive]);
+  }, [existingOutlineActive]);
 
-  const startOutlineFirst = () => {
-    const next = { ...(readBookBrief() || {}), outlineFirst: true };
+  const startExistingOutline = () => {
+    clearBookBrief();
+    writeLocalThread([]);
+    const next: BookBrief = {
+      mode: 'book',
+      creationPath: 'existing-outline',
+      outlineFirst: true,
+      outline: [],
+      outlineValidated: false,
+      factMemory: [],
+    };
     writeBookBrief(next);
-    window.dispatchEvent(new Event(BOOK_BRIEF_EVENT));
+    setBookBrief(next);
+    setSubjectTitle('');
+    setSubjectDesc('');
+    setSubjectChapters(10);
+    setPastedOutline('');
     setDesk(2);
+  };
+
+  const startFreshStory = (nextMode: 'book' | 'biography') => {
+    clearBookBrief();
+    writeLocalThread([]);
+    writeBookBrief({ mode: nextMode, creationPath: nextMode === 'biography' ? 'biography' : 'story' });
   };
 
   const confirmSubject = () => {
@@ -129,29 +148,19 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
       description: d,
       chapters: Math.min(40, Math.max(3, subjectChapters)),
       outlineFirst: true,
+      creationPath: 'existing-outline',
     };
     writeBookBrief(next);
     window.dispatchEvent(new Event(BOOK_BRIEF_EVENT));
     toast.success('Votre projet est prêt : donnez maintenant vos indications de chapitre.');
   };
 
-  // Sommaire déjà écrit par l'auteur : une ligne = un chapitre.
+  // Sommaire déjà écrit par l'auteur : les titres et informations font foi.
   const [pastedOutline, setPastedOutline] = useState('');
   const importPastedOutline = () => {
-    const lines = pastedOutline
-      .split('\n')
-      .map((l) => l.replace(/^\s*(chapitre\s*)?\d+\s*[.)\-–:]*\s*/i, '').trim())
-      .filter((l) => l.length >= 2);
-    if (lines.length < 1) { toast.error('Collez votre sommaire : une ligne par chapitre.'); return; }
-    if (lines.length > 40) { toast.error('40 chapitres maximum.'); return; }
-    const chapters: BriefOutlineChapter[] = lines.slice(0, 40).map((line, i) => {
-      const [titre, ...rest] = line.split(/\s*[—–|:]\s*/);
-      return {
-        numero: i + 1,
-        titre: (titre || line).slice(0, 160),
-        objectif: rest.join(' — ').trim() || undefined,
-      };
-    });
+    const chapters = parseTocText(pastedOutline);
+    if (chapters.length < 1) { toast.error('Aucun chapitre reconnu. Commencez chaque ligne par « Chapitre 1 : »'); return; }
+    if (chapters.length > 40) { toast.error('40 chapitres maximum.'); return; }
     const current = readBookBrief() || {};
     writeBookBrief({
       ...current,
@@ -159,10 +168,22 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
       chapters: chapters.length,
       outlineValidated: false,
       outlineFirst: true,
+      creationPath: 'existing-outline',
+      factMemory: chapters.map((chapter) => `Chapitre ${chapter.numero} — ${chapter.titre} : ${chapter.objectif || ''}`),
     });
-    window.dispatchEvent(new Event(BOOK_BRIEF_EVENT));
     setPastedOutline('');
-    toast.success(`${chapters.length} chapitre(s) enregistrés — relisez puis validez le sommaire.`);
+    toast.success(`${chapters.length} chapitre(s) reconnus sans réécriture — vérifiez puis validez.`);
+  };
+
+  const validateExistingOutline = async () => {
+    const current = readBookBrief() || {};
+    const chapters = current.outline || [];
+    if (chapters.length < 3) { toast.error('Le sommaire doit contenir au moins 3 chapitres.'); return; }
+    const validated = { ...current, chapters: chapters.length, outlineValidated: true, outlineFirst: true, creationPath: 'existing-outline' as const };
+    writeBookBrief(validated);
+    void saveBookDraftToCloud(validated, { activeStep: 3 });
+    setDesk(3);
+    toast.success(`Le Génie a vérifié votre sommaire : ${chapters.length} chapitres conservés tels quels.`);
   };
 
 
@@ -385,16 +406,17 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
               </p>
 
               <div className="mt-4 flex flex-wrap justify-center gap-2">
-                <Link to="/v3/create" className={`v3-btn text-xs ${biography ? 'v3-btn-outline' : 'v3-btn-primary'}`}>
+                <Link to="/v3/create" onClick={() => startFreshStory('book')} className={`v3-btn text-xs ${biography ? 'v3-btn-outline' : 'v3-btn-primary'}`}>
                   <BookOpen className="w-3.5 h-3.5" /> Je raconte un livre
                 </Link>
-                <Link to="/v3/biographie" className={`v3-btn text-xs ${biography ? 'v3-btn-primary' : 'v3-btn-outline'}`}>
+                <Link to="/v3/biographie" onClick={() => startFreshStory('biography')} className={`v3-btn text-xs ${biography ? 'v3-btn-primary' : 'v3-btn-outline'}`}>
                   <Sparkles className="w-3.5 h-3.5" /> Je raconte ma vie
                 </Link>
                 <button
                   type="button"
-                  onClick={startOutlineFirst}
-                  className="v3-btn v3-btn-gold text-xs"
+                  onClick={startExistingOutline}
+                  className="v3-btn text-xs"
+                  style={{ background: 'var(--v3-orange)', color: 'var(--v3-ink)', fontWeight: 700 }}
                 >
                   <BookOpen className="w-3.5 h-3.5" /> J’ai déjà mon sommaire
 
@@ -469,13 +491,13 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
             {/* ② Mon sommaire : déduit du récit OU construit d'abord (outlineFirst) */}
             {desk === 2 && (
               <>
-                {outlineFirstActive && !(bookBrief.title?.trim() && bookBrief.description?.trim()) && (
+                {existingOutlineActive && !(bookBrief.title?.trim() && bookBrief.description?.trim()) && (
                   <div className="v3-card mb-4" style={{ borderColor: 'rgba(0,130,150,0.4)' }}>
                     <p className="text-[13px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
                       Décrivez votre livre en deux mots
                     </p>
                     <p className="mt-1 text-[11.5px]" style={{ color: 'var(--v3-muted)' }}>
-                      Le Génie a besoin d’un titre et d’un sujet pour proposer vos premiers chapitres.
+                      Indiquez le titre et le sujet. Le Génie utilisera ensuite votre sommaire sans le réécrire.
                     </p>
                     <div className="mt-3 space-y-2">
                       <input
@@ -515,15 +537,15 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                     </div>
                   </div>
                 )}
-                {outlineFirstActive && (
+                {existingOutlineActive && (
                   <div className="v3-card mb-4" style={{ borderColor: 'var(--v3-gold, #c9a84c)' }}>
                     <p className="text-[13px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
                       Mon sommaire existe déjà — je le colle ici
                     </p>
                     <p className="mt-1 text-[11.5px]" style={{ color: 'var(--v3-muted)' }}>
-                      Une ligne par chapitre. Vous pouvez ajouter une précision après un tiret :
-                      « Chapitre 3 — le jour où tout a changé ». Rien n’est réécrit : vos titres sont
-                      enregistrés tels quels, puis vous validez le sommaire juste en dessous.
+                       Collez le document complet, avec ses ACTES, ses chapitres et leurs explications.
+                       Le Génie reconnaît les lignes « Chapitre 1 : … » et l’épilogue. Il conserve vos
+                       titres et vos informations : il ne propose pas un autre sommaire.
                     </p>
                     <textarea
                       value={pastedOutline}
@@ -533,16 +555,41 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                       className="mt-3 w-full rounded-xl border bg-white px-3 py-2 text-[12.5px] outline-none"
                       style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }}
                     />
-                    <button type="button" onClick={importPastedOutline} className="v3-btn v3-btn-gold mt-3 text-xs">
-                      Enregistrer mon sommaire
+                     <button type="button" onClick={importPastedOutline} className="v3-btn mt-3 text-xs"
+                       style={{ background: 'var(--v3-orange)', color: 'var(--v3-ink)', fontWeight: 700 }}>
+                       Faire lire mon vrai sommaire au Génie
                     </button>
                   </div>
                 )}
-                <V3OutlineCoBuilder outlineFirst={outlineFirstActive} />
-
-                <div id="sommaire-ia" className="mt-5">
-                  <V3GenieOutlinePanel key={briefKey} outlineMode={sommaireIa ? 'guided' : undefined} />
-                </div>
+                {existingOutlineActive ? (
+                  (bookBrief.outline?.length || 0) > 0 && (
+                    <div id="sommaire-ia" className="v3-card" style={{ borderColor: 'var(--v3-gold)' }}>
+                      <h2 className="v3-serif text-xl font-bold" style={{ color: 'var(--v3-ink)' }}>Votre vrai sommaire</h2>
+                      <p className="mt-1 text-xs" style={{ color: 'var(--v3-muted)' }}>
+                        {bookBrief.outline?.length} chapitres reconnus. Ils seront transmis tels quels à la rédaction.
+                      </p>
+                      <ol className="mt-3 space-y-2">
+                        {bookBrief.outline?.map((chapter) => (
+                          <li key={chapter.numero} className="rounded-lg border bg-white px-3 py-2 text-sm">
+                            <strong>Chapitre {chapter.numero} : {chapter.titre}</strong>
+                            {chapter.objectif && <p className="mt-1 text-xs" style={{ color: 'var(--v3-muted)' }}>{chapter.objectif}</p>}
+                          </li>
+                        ))}
+                      </ol>
+                      <button type="button" onClick={validateExistingOutline} className="v3-btn mt-4 text-xs"
+                        style={{ background: 'var(--v3-orange)', color: 'var(--v3-ink)', fontWeight: 700 }}>
+                        <Check className="h-3.5 w-3.5" /> Le Génie vérifie et valide mon sommaire
+                      </button>
+                    </div>
+                  )
+                ) : (
+                  <>
+                    <V3OutlineCoBuilder />
+                    <div id="sommaire-ia" className="mt-5">
+                      <V3GenieOutlinePanel key={briefKey} outlineMode={sommaireIa ? 'guided' : undefined} />
+                    </div>
+                  </>
+                )}
               </>
             )}
 
