@@ -78,7 +78,9 @@ type HubConfig = {
 
 const CONFIG_KEY = 'edition_book_config_v1';
 const TARGET_WORDS_KEY = 'edition_chapter_target_words_v1';
-const WIZARD_KEY = 'v3_create_wizard_config_v1';
+// Ne jamais partager cette clé avec la fiche auteur (`BookBrief`) : l'ancien
+// nom identique permettait à une session précédente d'écraser le vrai livre.
+const WIZARD_KEY = 'v3_create_workflow_config_v2';
 const PROJECT_ID_KEY = 'v3_create_current_project_id_v1';
 
 const CATEGORIES = [
@@ -794,12 +796,14 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
       description: character.traits.trim() || 'Personnage à développer pendant le workflow.',
     }));
 
-  const normalizedOutline = outline
-    .concat(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters).slice(outline.length))
-    .slice(0, chapters)
+  const normalizedOutline = (startsFromExistingOutline
+    ? outline
+    : outline.concat(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters).slice(outline.length)).slice(0, chapters))
     .map((item, index) => {
       const cleanedTitle = cleanText(item.titre);
-      const fallbackTitle = cleanedTitle && !isGenericTitle(cleanedTitle)
+      const fallbackTitle = startsFromExistingOutline
+        ? (cleanedTitle || `Chapitre ${index + 1}`)
+        : cleanedTitle && !isGenericTitle(cleanedTitle)
         ? cleanedTitle
         : buildFallbackOutline(finalTitle || title, effectiveCategory, chapters)[index]?.titre || `Chapitre ${index + 1} — ${cleanText(finalTitle || title || effectiveCategory)}`;
       return { ...item, numero: index + 1, titre: fallbackTitle, objectif: cleanText(item.objectif) };
@@ -922,10 +926,11 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
   }, []);
 
   useEffect(() => {
+    if (startsFromExistingOutline) return;
     if (hasRepeatedFallbackTitles(outline, chapters)) {
       setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
     }
-  }, [chapters, effectiveCategory, finalTitle, title, outline]);
+  }, [chapters, effectiveCategory, finalTitle, title, outline, startsFromExistingOutline]);
 
   const targetPromiseBlock = () => {
     const cibleLines = [
@@ -1535,7 +1540,7 @@ Règles :
           <div className="space-y-5">
             <V3LiveBookProgress />
             <EbookCompleteWorkflow
-              key={`${finalTitle}-${chapters}-${wordsPerChapter}`}
+              key={`${finalTitle}-${chapters}-${wordsPerChapter}-${normalizedOutline.map((chapter) => chapter.titre).join('|')}`}
               autoStart
               hideInputForm
               initialTitle={finalTitle.trim()}
@@ -1546,6 +1551,7 @@ Règles :
               initialWordsPerChapter={wordsPerChapter}
               initialTone={tone}
               characters={workflowCharacters}
+              initialOutline={startsFromExistingOutline ? normalizedOutline : undefined}
               initialBookIntroduction={buildWorkflowDescription()}
               onComplete={handleWorkflowComplete}
             />

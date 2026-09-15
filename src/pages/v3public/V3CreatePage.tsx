@@ -109,11 +109,13 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
     try {
       [
         'edition_book_config_v1',
+        'v3_create_workflow_config_v2',
         'edition_chapter_target_words_v1',
         'v3_create_current_project_id_v1',
         'ebook_workflow_progress',
         'ebook_workflow_results',
         'ebook_workflow_sync_data',
+        'editorial_memory',
       ].forEach((key) => localStorage.removeItem(key));
     } catch {
       // Le nouveau sommaire reste utilisable si le stockage du navigateur est indisponible.
@@ -126,6 +128,31 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
     setSubjectDesc(b.description || '');
     setSubjectChapters(Math.min(40, Math.max(3, Number(b.chapters) || 10)));
   }, [existingOutlineActive]);
+
+  // Auto-répare l'état déjà corrompu dans le navigateur par l'ancienne fusion
+  // fiche/session (ex. le long chapitre « Lupo… » suivi de titres génériques).
+  useEffect(() => {
+    if (!existingOutlineActive || !(bookBrief.outline?.length)) return;
+    const titles = bookBrief.outline.map((chapter) => String(chapter.titre || '').trim());
+    const genericCount = titles.filter((title) => /^chapitre\s*\d+$/i.test(title)).length;
+    const containsSerializedText = titles.some((title) => /elementsCles|table des matières.*progression|pourquoi cette aventure/i.test(title));
+    const hasOversizedTitle = titles.some((title) => title.length > 220);
+    if (!containsSerializedText && !hasOversizedTitle && genericCount < Math.ceil(titles.length / 2)) return;
+
+    const repaired: BookBrief = {
+      ...bookBrief,
+      outline: [],
+      chapters: undefined,
+      outlineValidated: false,
+      factMemory: [],
+    };
+    clearPreviousWritingSession();
+    writeBookBrief(repaired);
+    setPastedOutline('');
+    setDesk(2);
+    setShowWizard(false);
+    toast.warning('L’ancien sommaire mélangé a été retiré. Collez maintenant le vrai sommaire des « Flammes du passé ».');
+  }, [bookBrief, existingOutlineActive]);
 
   const startExistingOutline = () => {
     clearBookBrief();

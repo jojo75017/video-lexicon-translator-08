@@ -61,6 +61,15 @@ interface EbookCompleteWorkflowProps {
   initialNumberOfChapters?: number;
   initialWordsPerChapter?: number;
   initialTone?: string;
+  /** Sommaire fourni et validé par l'auteur : P3 doit le conserver mot pour mot. */
+  initialOutline?: Array<{
+    numero: number;
+    titre: string;
+    objectif?: string;
+    points?: string[];
+    note?: string;
+    wordsTarget?: number;
+  }>;
   onNavigateToSettings?: () => void;
 }
 
@@ -122,6 +131,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
   initialNumberOfChapters = 8,
   initialWordsPerChapter = 3500,
   initialTone = '',
+  initialOutline = [],
   onNavigateToSettings,
 }) => {
   // Hook pour sauvegarder les résultats P1-P14 globalement
@@ -1289,7 +1299,31 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
             setExpandedSteps(prev => ({ ...prev, [prevStep.id]: false }));
           }
         } else {
-          const result = await runStepWithRetry(step.id, context, {}, {}, step.id === 'P3' ? 2 : 1);
+          // Dans le parcours « J'ai déjà mon sommaire », P3 ne doit surtout pas
+          // inventer un autre plan. Le sommaire validé devient directement la
+          // structure officielle transmise à la rédaction chapitre par chapitre.
+          const result = step.id === 'P3' && initialOutline.length >= 3
+            ? {
+                result: {
+                  structureGlobale: `Sommaire fourni et validé par l'auteur pour « ${title} ».`,
+                  chapitres: initialOutline.map((chapter, index) => ({
+                    numero: Number(chapter.numero) || index + 1,
+                    titre: sanitizeWorkflowChapterTitle(chapter.titre, `Chapitre ${index + 1}`),
+                    objectif: String(chapter.objectif || chapter.note || '').trim(),
+                    pointsCles: Array.isArray(chapter.points) ? chapter.points : [],
+                    nombreMotsPrevu: Number(chapter.wordsTarget) || wordsPerChapter,
+                    locked: true,
+                  })),
+                  personnages: externalCharacters.map((character) => ({
+                    name: character.name,
+                    role: character.role || 'secondary',
+                    description: character.description,
+                    arc: character.arc || '',
+                  })),
+                },
+                displayContent: `Sommaire validé conservé tel quel : ${initialOutline.length} chapitres prêts à rédiger.`,
+              }
+            : await runStepWithRetry(step.id, context, {}, {}, step.id === 'P3' ? 2 : 1);
 
           // APRÈS P1 : ne plus bloquer les abonnés sur une validation manuelle.
           // On conserve les suggestions et l'intro/conclusion, puis le workflow enchaîne P2 automatiquement.
