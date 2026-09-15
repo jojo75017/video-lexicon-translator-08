@@ -1,4 +1,5 @@
 import { Download, BookOpen, CheckCircle2, Mail, ExternalLink } from 'lucide-react';
+import V3StartIdeaCTA from '@/components/v3public/V3StartIdeaCTA';
 
 const PDF_URL = '/kit-demarrage-ebookstudio-v3.pdf';
 
