@@ -294,12 +294,21 @@ Retourne le JSON avec le texte corrigé et la liste exhaustive des corrections e
     };
 
     const runCall = async (call: Call) => {
-      const response = await fetch(call.endpoint, {
-        method: 'POST',
-        headers: call.headers,
-        body: JSON.stringify(call.body),
-        signal: controller.signal,
-      });
+      let response: Response;
+      try {
+        response = await fetch(call.endpoint, {
+          method: 'POST',
+          headers: call.headers,
+          body: JSON.stringify(call.body),
+          signal: controller.signal,
+        });
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return { ok: false as const, status: 504 };
+        }
+        console.error(`AI network error (${call.engine}):`, error);
+        return { ok: false as const, status: 503 };
+      }
       if (!response.ok) {
         const errorText = await response.text();
         console.error(`AI error (${call.engine}):`, response.status, errorText);
@@ -344,7 +353,16 @@ Retourne le JSON avec le texte corrigé et la liste exhaustive des corrections e
           { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-      throw new Error(`AI error: ${attempt.status}`);
+      if (attempt.status >= 500) {
+        return new Response(
+          JSON.stringify({ error: "Le service IA est momentanément indisponible. Le texte original reste intact ; réessayez dans quelques instants." }),
+          { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      return new Response(
+        JSON.stringify({ error: `La correction a été refusée par le fournisseur IA (erreur ${attempt.status}).` }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const content = attempt.content;

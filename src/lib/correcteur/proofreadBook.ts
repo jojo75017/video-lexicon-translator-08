@@ -170,6 +170,26 @@ export function looksDictated(text: string): boolean {
 
 const BACKOFF_MS = [5000, 15000];
 
+async function readFunctionError(error: unknown): Promise<string> {
+  const fallback = error instanceof Error ? error.message : String(error || 'Erreur de correction');
+  if (!error || typeof error !== 'object' || !('context' in error)) return fallback;
+
+  const context = (error as { context?: Response }).context;
+  if (!context || typeof context.clone !== 'function') return fallback;
+  try {
+    const payload = await context.clone().json();
+    if (payload && typeof payload.error === 'string' && payload.error.trim()) return payload.error.trim();
+  } catch {
+    try {
+      const text = (await context.clone().text()).trim();
+      if (text) return text;
+    } catch {
+      // La réponse du serveur n'est plus lisible : on conserve le message initial.
+    }
+  }
+  return fallback;
+}
+
 async function waitWithNotice(ms: number, reason: string) {
   waitNotifier?.({ seconds: Math.round(ms / 1000), reason });
   await sleep(ms);
@@ -221,7 +241,7 @@ async function callProofread(
       };
     }
 
-    const message = String(data?.error || error?.message || 'Erreur de correction');
+    const message = String(data?.error || await readFunctionError(error));
     lastError = message;
 
     // Seule une limite de débit temporaire justifie un nouvel appel payant.
@@ -233,6 +253,14 @@ async function callProofread(
       const wait = BACKOFF_MS[Math.min(attempt, BACKOFF_MS.length - 1)];
       await waitWithNotice(wait, 'Limite de requêtes atteinte');
       continue;
+    }
+    if (/internal server error|erreur interne|ai error: 5\d\d|service unavailable|bad gateway|timeout|temporarily unavailable|functionshttperror/i.test(message) && attempt < 2) {
+      const wait = BACKOFF_MS[Math.min(attempt, BACKOFF_MS.length - 1)];
+      await waitWithNotice(wait, 'Service de correction momentanément indisponible');
+      continue;
+    }
+    if (/internal server error|erreur interne|ai error: 5\d\d|service unavailable|bad gateway|timeout|temporarily unavailable|functionshttperror/i.test(message)) {
+      throw new Error('Le service IA est momentanément indisponible. Ce chapitre a été conservé intact ; utilisez « Reprendre les chapitres en échec » dans quelques instants.');
     }
     throw new Error(message);
   }
