@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import '@/styles/v3-public.css';
 import { SUBSCRIBER_HOME_PATH } from '@/lib/authDestination';
@@ -91,8 +92,22 @@ export default function V3PublicLayout({ isAdmin, isAdminChecking, isSubscriber 
         <V3MainTabs />
         <V3AdminQuickAccess isAdmin={isAdmin} isAdminChecking={isAdminChecking} />
 
+        {/* Interrupteur du menu latéral : toujours visible en haut de page. */}
+        <div className="hidden border-b px-3 py-2 md:block" style={{ borderColor: 'var(--v3-line)', background: 'var(--v3-cream)' }}>
+          <button
+            type="button"
+            onClick={toggleSidebar}
+            aria-expanded={showSidebar}
+            className="inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-semibold transition-colors"
+            style={{ borderColor: 'var(--v3-line)', background: 'var(--v3-surface)', color: 'var(--v3-ink)' }}
+          >
+            {showSidebar ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeftOpen className="h-4 w-4" />}
+            {showSidebar ? 'Masquer le menu' : 'Afficher le menu'}
+          </button>
+        </div>
+
         <div className="flex flex-1 w-full">
-          <V3Sidebar />
+          {showSidebar && <V3Sidebar />}
           <main className="flex-1 min-w-0">
             <V3UpsellReturnBar />
             <Outlet />
