@@ -127,6 +127,32 @@ export type BookBrief = {
   preface?: string;
   /** Mot de la fin imprimé après le dernier chapitre. */
   afterword?: string;
+
+  /* ——— Fiche complète du livre (parcours « J'ai déjà mon sommaire ») ——— */
+  /** Genre littéraire tel que l'auteur l'écrit (ex. « Drame d'époque, suspense »). */
+  genre?: string;
+  /** Format visé (ex. « Roman grand format ou Ebook »). */
+  format?: string;
+  /** Nombre de pages visé (texte libre : « 250 à 300 »). */
+  targetPages?: string;
+  /** Nombre de mots visé (texte libre : « 60 000 à 75 000 »). */
+  targetWords?: string;
+  /** Accroche commerciale / quatrième de couverture. */
+  hook?: string;
+  /** Synopsis long. */
+  synopsis?: string;
+  /** Traducteur crédité. */
+  translator?: string;
+  /** Épilogue : résumé ou contenu voulu par l'auteur. */
+  epilogue?: string;
+  /** Les 3 pages auteur imprimées en fin de livre. */
+  authorPages?: { about?: string; otherBooks?: string; contact?: string };
+  /** Remerciements. */
+  acknowledgements?: string;
+  /** Note invitant le lecteur à laisser un avis. */
+  reviewNote?: string;
+  /** Lien encodé dans le QR code des avis (page auteur ou fiche du livre). */
+  reviewQrUrl?: string;
 };
 
 /** Polices de livre proposées à l'auteur. */
