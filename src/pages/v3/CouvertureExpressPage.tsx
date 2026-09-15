@@ -18,6 +18,7 @@ import {
   Download,
   Loader2,
   Moon,
+  Pencil,
   RefreshCw,
   Sparkles,
   Sun,
@@ -205,7 +206,21 @@ export default function CouvertureExpressPage() {
       return;
     }
     if (projectId) {
+      setDownloaded(false);
       setStep(2);
+      const composition = chosen ? compositionFor(chosen, lightness) : null;
+      void updateCoverProject(projectId, {
+        project_name: title.trim().slice(0, 80),
+        book_title: title.trim(),
+        cover_type: format,
+        format_id: formatId,
+        page_count: format === 'paperback' ? 120 : null,
+        ...(composition
+          ? { fabric_json: serializeComposition(composition, illustrationPath) }
+          : {}),
+      })
+        .then(() => toast.success('Les informations et la couverture ont été actualisées.'))
+        .catch(() => toast.error('La couverture est actualisée à l’écran, mais son enregistrement a échoué.'));
       return;
     }
     setCreating(true);
@@ -369,16 +384,26 @@ export default function CouvertureExpressPage() {
     navigate(`/v3/mes-couvertures/${projectId}`);
   };
 
+  const goBack = () => {
+    if (step === 3) {
+      setStep(2);
+      return;
+    }
+    if (step === 2) {
+      setStep(1);
+      return;
+    }
+    navigate(-1);
+  };
+
   /* ---------------------------------------------------------------------- */
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] pb-16">
       <header className="border-b bg-white">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-3 px-4 py-3">
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/v3">
-              <ArrowLeft className="mr-1 h-4 w-4" /> Retour
-            </Link>
+          <Button variant="ghost" size="sm" onClick={goBack}>
+            <ArrowLeft className="mr-1 h-4 w-4" /> Retour
           </Button>
           <h1 className="text-lg font-semibold text-[#232F3E]">Ma couverture en 3 étapes</h1>
           <div className="ml-auto flex flex-wrap items-center gap-1.5 text-xs">
@@ -399,6 +424,18 @@ export default function CouvertureExpressPage() {
 
       <main className="mx-auto max-w-5xl px-4 py-6">
         <p className="mb-5 text-sm text-muted-foreground">{STEP_HELP[step]}</p>
+
+        {step > 1 && (
+          <div className="mb-5 flex justify-start">
+            <Button
+              type="button"
+              className="v3-btn-action-orange gap-2"
+              onClick={() => setStep(1)}
+            >
+              <Pencil className="h-4 w-4" /> Modifier les informations du livre
+            </Button>
+          </div>
+        )}
 
         {/* ------------------------- Étape 1 ------------------------------ */}
         {step === 1 && (
@@ -585,14 +622,14 @@ export default function CouvertureExpressPage() {
               </Button>
             </div>
 
-            <div className="text-center">
-              <button
+            <div className="flex justify-center">
+              <Button
                 type="button"
+                className="v3-btn-action-orange gap-2"
                 onClick={() => void openAdvanced()}
-                className="text-xs text-muted-foreground underline hover:text-[#f47920]"
               >
-                Régler chaque détail moi-même
-              </button>
+                <Pencil className="h-4 w-4" /> Ouvrir l’éditeur complet
+              </Button>
             </div>
           </div>
         )}
@@ -663,8 +700,8 @@ export default function CouvertureExpressPage() {
                 <Button variant="ghost" size="sm" onClick={() => setStep(2)}>
                   <ArrowLeft className="mr-1 h-4 w-4" /> Changer de style
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => void openAdvanced()}>
-                  Régler chaque détail
+                <Button className="v3-btn-action-orange gap-2" onClick={() => void openAdvanced()}>
+                  <Pencil className="h-4 w-4" /> Ouvrir l’éditeur complet
                 </Button>
               </div>
             </div>
