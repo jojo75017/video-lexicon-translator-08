@@ -43,9 +43,16 @@ export default function V3OutlineCoBuilder() {
    * de ce que l'auteur a réellement écrit (et se réajuste s'il écrit plus).
    */
   const suggested = suggestChapterCount(sourceWords, brief.wordsPerChapter);
-  const target = sourceWords > 0
-    ? suggested
-    : Math.min(40, Math.max(3, Number(brief.chapters) || 12));
+  /**
+   * Le livre ouvert fait foi : on ne descend jamais sous le nombre de chapitres
+   * déjà enregistrés (ni sous le nombre prévu dans la fiche), même si le texte
+   * source affiché à l'écran est vide.
+   */
+  const target = Math.min(
+    40,
+    Math.max(3, suggested, outline.length, Number(brief.chapters) || 0),
+  );
+
   const covered = new Set(
     outline.flatMap((c) => (Array.isArray(c.sources) ? c.sources : [])),
   );
