@@ -95,6 +95,9 @@ export default function IllustrationGeneratorPanel({
   const [artStyle, setArtStyle] = useState('illustration-editoriale');
   /** Exposition demandée : par défaut une image claire, jamais trop sombre. */
   const [lighting, setLighting] = useState('bright');
+  /** Consigne visuelle issue de la description, modifiable avant génération. */
+  const [visualPrompt, setVisualPrompt] = useState('');
+  const [visualBusy, setVisualBusy] = useState(false);
 
 
   const [books, setBooks] = useState<BookOption[]>([]);
