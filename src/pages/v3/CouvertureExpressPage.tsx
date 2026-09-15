@@ -260,6 +260,56 @@ export default function CouvertureExpressPage() {
     }
   };
 
+  /** Déduit les détails du livre à partir du titre et du synopsis (texte seul). */
+  const autoFillDetails = async () => {
+    if (synopsis.trim().length < 20) {
+      toast.error('Écrivez d’abord quelques phrases de synopsis (20 caractères minimum).');
+      return;
+    }
+    setDetailsBusy(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('cover-book-details', {
+        body: {
+          title: titleInputRef.current?.value?.trim() || title,
+          subtitle,
+          genre: getExpressGenre(genreId).brief.genre,
+          synopsis,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const details = data?.details ?? {};
+      if (details.targetAudience) setTargetAudience(details.targetAudience);
+      if (details.era) setEra(details.era);
+      if (details.location) setLocation(details.location);
+      if (details.focalSubject) setFocalSubject(details.focalSubject);
+      if (details.emotion) setEmotion(details.emotion);
+      if (details.mustInclude) setMustInclude(details.mustInclude);
+      if (details.mustAvoid) setMustAvoid(details.mustAvoid);
+      setVisualPrompt('');
+      setDirectionConfirmed(false);
+      toast.success('Champs remplis : relisez-les et modifiez ce que vous voulez.');
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : 'Remplissage automatique indisponible pour l’instant.',
+      );
+    } finally {
+      setDetailsBusy(false);
+    }
+  };
+
+  const clearDetails = () => {
+    setTargetAudience('');
+    setEra('');
+    setLocation('');
+    setFocalSubject('');
+    setEmotion('');
+    setMustInclude('');
+    setMustAvoid('');
+    setVisualPrompt('');
+    setDirectionConfirmed(false);
+  };
+
   const prepareDirection = async () => {
     if (synopsis.trim().length < 20) {
       toast.error('Ajoutez un synopsis assez précis pour obtenir une image fidèle.');
