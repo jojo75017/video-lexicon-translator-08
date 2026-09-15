@@ -138,7 +138,22 @@ Deno.serve(async (req) => {
       artStyle: typeof body?.artStyle === "string" ? body.artStyle : undefined,
       lighting: typeof body?.lighting === "string" ? body.lighting : undefined,
       bookTitle: project.book_title ?? undefined,
+      visualPrompt: typeof body?.visualPrompt === "string" ? body.visualPrompt : undefined,
     };
+
+    // Si l'abonné n'a pas validé de consigne visuelle, on traduit sa description
+    // en consigne précise (analyse de texte seule, aucun crédit image).
+    if (!brief.visualPrompt?.trim() && typeof brief.summary === "string") {
+      brief.visualPrompt =
+        (await buildVisualPrompt({
+          summary: brief.summary,
+          genre: brief.genre,
+          mood: brief.mood,
+          palette: brief.palette,
+          bookTitle: brief.bookTitle,
+        })) ?? undefined;
+    }
+
     const prompt = buildPrompt(brief);
 
     // --- Choix du financement ---------------------------------------------
