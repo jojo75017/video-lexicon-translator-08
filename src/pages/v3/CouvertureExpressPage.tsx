@@ -558,36 +558,6 @@ export default function CouvertureExpressPage() {
                   placeholder="Les Flammes du Passé"
                 />
               </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="space-y-1.5">
-                  <Label htmlFor="ex-audience">Lecteurs visés</Label>
-                  <Input id="ex-audience" value={targetAudience} onChange={(e) => setTargetAudience(e.target.value)} placeholder="Adultes, enfants de 8 à 12 ans…" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="ex-era">Époque</Label>
-                  <Input id="ex-era" value={era} onChange={(e) => setEra(e.target.value)} placeholder="Aujourd’hui, années 1940…" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="ex-location">Lieu principal</Label>
-                  <Input id="ex-location" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Paris, bord de mer, forêt…" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="ex-focus">Personnage ou objet central</Label>
-                  <Input id="ex-focus" value={focalSubject} onChange={(e) => setFocalSubject(e.target.value)} placeholder="Une femme de dos, une clé ancienne…" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="ex-emotion">Émotion recherchée</Label>
-                  <Input id="ex-emotion" value={emotion} onChange={(e) => setEmotion(e.target.value)} placeholder="Curiosité, tension, espoir…" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="ex-include">Éléments obligatoires</Label>
-                  <Input id="ex-include" value={mustInclude} onChange={(e) => setMustInclude(e.target.value)} placeholder="Ce qui doit apparaître" />
-                </div>
-                <div className="space-y-1.5 sm:col-span-2">
-                  <Label htmlFor="ex-avoid">Éléments interdits</Label>
-                  <Input id="ex-avoid" value={mustAvoid} onChange={(e) => setMustAvoid(e.target.value)} placeholder="Ce qui ne doit surtout pas apparaître" />
-                </div>
-              </div>
               <div className="space-y-1.5">
                 <Label htmlFor="ex-subtitle">Sous-titre (facultatif)</Label>
                 <Input
@@ -619,6 +589,108 @@ export default function CouvertureExpressPage() {
                   Résumez l’histoire, les personnages, le lieu, l’époque et l’ambiance : ce texte
                   guide l’image vers une couverture fidèle à votre livre.
                 </p>
+              </div>
+
+              <div className="space-y-2 rounded-lg border border-[#f47920]/30 bg-[#f47920]/5 p-3">
+                <p className="text-sm font-medium text-[#232F3E]">
+                  Détails du livre : laissez l’IA les deviner
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  À partir de votre titre et de votre synopsis, les champs ci-dessous se
+                  remplissent tout seuls. Aucune image n’est créée, aucune image incluse n’est
+                  utilisée. Vous pouvez ensuite tout modifier.
+                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    type="button"
+                    className="v3-btn-action-orange gap-2"
+                    disabled={detailsBusy}
+                    onClick={() => void autoFillDetails()}
+                  >
+                    {detailsBusy ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Wand2 className="h-4 w-4" />
+                    )}
+                    Remplir automatiquement à partir de mon titre et de mon synopsis
+                  </Button>
+                  <Button type="button" variant="ghost" size="sm" onClick={clearDetails}>
+                    Tout effacer
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <Label htmlFor="ex-audience">Lecteurs visés</Label>
+                  <SuggestInput
+                    id="ex-audience"
+                    value={targetAudience}
+                    onChange={setTargetAudience}
+                    suggestions={coverDetailSuggestions('targetAudience', genreId)}
+                    placeholder="Adultes, enfants de 8 à 12 ans…"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="ex-era">Époque</Label>
+                  <SuggestInput
+                    id="ex-era"
+                    value={era}
+                    onChange={setEra}
+                    suggestions={coverDetailSuggestions('era', genreId)}
+                    placeholder="Aujourd’hui, années 1940…"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="ex-location">Lieu principal</Label>
+                  <SuggestInput
+                    id="ex-location"
+                    value={location}
+                    onChange={setLocation}
+                    suggestions={coverDetailSuggestions('location', genreId)}
+                    placeholder="Paris, bord de mer, forêt…"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="ex-focus">Personnage ou objet central</Label>
+                  <SuggestInput
+                    id="ex-focus"
+                    value={focalSubject}
+                    onChange={setFocalSubject}
+                    suggestions={coverDetailSuggestions('focalSubject', genreId)}
+                    placeholder="Une femme de dos, une clé ancienne…"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="ex-emotion">Émotion recherchée</Label>
+                  <SuggestInput
+                    id="ex-emotion"
+                    value={emotion}
+                    onChange={setEmotion}
+                    suggestions={coverDetailSuggestions('emotion', genreId)}
+                    placeholder="Curiosité, tension, espoir…"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="ex-include">Éléments obligatoires</Label>
+                  <SuggestInput
+                    id="ex-include"
+                    value={mustInclude}
+                    onChange={setMustInclude}
+                    suggestions={coverDetailSuggestions('mustInclude', genreId)}
+                    placeholder="Ce qui doit apparaître"
+                  />
+                </div>
+                <div className="space-y-1.5 sm:col-span-2">
+                  <Label htmlFor="ex-avoid">Éléments interdits</Label>
+                  <SuggestInput
+                    id="ex-avoid"
+                    value={mustAvoid}
+                    onChange={setMustAvoid}
+                    suggestions={coverDetailSuggestions('mustAvoid', genreId)}
+                    placeholder="Ce qui ne doit surtout pas apparaître"
+                  />
+                </div>
               </div>
               <div className="space-y-1.5">
                 <Label>Genre du livre</Label>
