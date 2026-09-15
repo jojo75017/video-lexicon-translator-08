@@ -46,6 +46,14 @@ export default function V3MainTabs() {
     return Array.from({ length: cols }, (_, i) => links.slice(i * rows, (i + 1) * rows));
   };
 
+  // Panneau ouvert : positionné hors de la rangée scrollable, jamais coupé à droite
+  const openCatData = openKey ? V3_HEADER_MENU.find((c) => c.key === openKey) ?? null : null;
+  const openCols = openCatData ? (openCatData.links.length > 8 ? 3 : openCatData.links.length > 4 ? 2 : 1) : 1;
+  const openPanelWidth = openCols === 1 ? 320 : openCols === 2 ? 560 : 780;
+  const viewportW = typeof window !== 'undefined' ? window.innerWidth : 1600;
+  const panelLeft = Math.max(8, Math.min(anchorLeft, viewportW - openPanelWidth - 16));
+
+
   return (
     <div
       className="sticky top-16 z-30 relative overflow-x-clip"
