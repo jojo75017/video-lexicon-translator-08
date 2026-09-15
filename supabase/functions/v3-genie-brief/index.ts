@@ -318,7 +318,7 @@ Réponds STRICTEMENT en JSON valide, sans markdown : {"corrected":"","notes":""}
 Livre : « ${String(body.bookTitle || "").slice(0, 200)}${String(body.bookTitle || "") ? "" : ""}»
 Ton souhaité : ${String(body.tone || "Inspirant")}
 Nombre total de chapitres visé : ${target}
-${numbered.length ? "" : `Sujet indiqué : """${String(body.bookDescription || message).slice(0, 2000)}"""\n`}${stepSourceBlock}${historyBlock}
+${numbered.length ? "" : `Sujet indiqué : """${String(body.bookDescription || message).slice(0, 2000)}"""\n`}${stepSourceBlock}${outlineFirstBlock}${historyBlock}
 Chapitres DÉJÀ acceptés par l'auteur (ne les répète jamais, ne les modifie pas) :
 """${accepted || "aucun pour le moment"}"""
 
