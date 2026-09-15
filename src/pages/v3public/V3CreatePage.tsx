@@ -142,7 +142,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
     const d = subjectDesc.trim();
     if (t.length < 3) { toast.error('Donnez un titre à votre livre.'); return; }
     if (d.length < 12) { toast.error('Décrivez votre projet en au moins une phrase complète.'); return; }
-    const next = {
+    const next: BookBrief = {
       ...(readBookBrief() || {}),
       title: t,
       description: d,
