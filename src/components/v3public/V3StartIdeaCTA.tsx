@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { BarChart3, MessagesSquare, Sparkles } from 'lucide-react';
 
 type Props = {
-  variant?: 'full' | 'compact';
+  variant?: 'full' | 'compact' | 'discreet';
 };
 
 /**
