@@ -326,7 +326,11 @@ Retourne le JSON avec le texte corrigé et la liste exhaustive des corrections e
 
     const primary = buildByoCall();
     if (!primary) {
-      throw new Error("Aucune clé IA : configurez votre clé Gemini, ChatGPT, Claude ou OpenRouter dans Paramètres > Clés API.");
+      clearTimeout(timeoutId);
+      return new Response(
+        JSON.stringify({ error: "Aucune clé IA : configurez votre clé Gemini, ChatGPT, Claude ou OpenRouter dans Paramètres > Clés API." }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const engine = primary.engine;
