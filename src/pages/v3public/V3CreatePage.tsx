@@ -394,10 +394,10 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                 <button
                   type="button"
                   onClick={startOutlineFirst}
-                  className="v3-btn text-xs"
-                  style={{ background: 'var(--v3-orange, #FF9E2D)', color: '#232F3E', fontWeight: 600 }}
+                  className="v3-btn v3-btn-gold text-xs"
                 >
-                  <BookOpen className="w-3.5 h-3.5" /> Je pars d’un sommaire
+                  <BookOpen className="w-3.5 h-3.5" /> J’ai déjà mon sommaire
+
                 </button>
               </div>
             </>
