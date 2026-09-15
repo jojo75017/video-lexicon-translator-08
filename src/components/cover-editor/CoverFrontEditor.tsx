@@ -229,11 +229,38 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
 
   const selected = composition.layers.find((l) => l.id === selectedId) ?? null;
 
-  /** Luminosité de l'illustration (rattrapage local d'une image trop sombre). */
-  const frontBrightness = Math.min(1.5, Math.max(0.7, composition.imageBrightness ?? 1));
-  const setBrightness = (value: number) => {
+  /** Retouche locale de l'illustration (aucune IA, aucun crédit, réversible). */
+  const clampAdjust = (
+    key: 'imageBrightness' | 'imageContrast' | 'imageSaturation' | 'imageWarmth',
+    value: number,
+  ) => {
+    const limits = {
+      imageBrightness: [0.7, 1.5],
+      imageContrast: [0.7, 1.4],
+      imageSaturation: [0, 1.6],
+      imageWarmth: [-20, 20],
+    }[key];
+    return Math.min(limits[1], Math.max(limits[0], value));
+  };
+  const frontBrightness = clampAdjust('imageBrightness', composition.imageBrightness ?? 1);
+  const frontContrast = clampAdjust('imageContrast', composition.imageContrast ?? 1);
+  const frontSaturation = clampAdjust('imageSaturation', composition.imageSaturation ?? 1);
+  const frontWarmth = clampAdjust('imageWarmth', composition.imageWarmth ?? 0);
+  const setImageAdjust = (
+    key: 'imageBrightness' | 'imageContrast' | 'imageSaturation' | 'imageWarmth',
+    value: number,
+  ) => {
+    commit((prev) => ({ ...prev, [key]: clampAdjust(key, value) }), false);
+  };
+  const resetImageAdjust = () => {
     commit(
-      (prev) => ({ ...prev, imageBrightness: Math.min(1.5, Math.max(0.7, value)) }),
+      (prev) => ({
+        ...prev,
+        imageBrightness: 1,
+        imageContrast: 1,
+        imageSaturation: 1,
+        imageWarmth: 0,
+      }),
       false,
     );
   };
