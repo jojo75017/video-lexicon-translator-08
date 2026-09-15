@@ -208,6 +208,18 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
     if (current.mode !== wanted) writeBookBrief({ ...current, mode: wanted });
   }, [biography, projectId]);
 
+  // Le lien dédié « Sommaire IA » est désormais le troisième parcours :
+  // l'auteur apporte son sommaire existant, sans retrouver le livre précédent.
+  useEffect(() => {
+    if (!sommaireIa || projectId) return;
+    const current = readBookBrief();
+    if (current?.creationPath === 'existing-outline') {
+      setDesk(2);
+      return;
+    }
+    startExistingOutline();
+  }, [sommaireIa, projectId]);
+
   // Ouverture d'un livre existant depuis « Mes livres » (?projectId=...)
   useEffect(() => {
     if (!projectId) { setOpenedBook(null); return; }
@@ -380,8 +392,8 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
             </p>
           </div>
 
-          {!hasStory && (
-            <>
+          <>
+              {!hasStory && (
               <div className="mt-5 grid gap-3 md:grid-cols-3">
                 {[
                   {
@@ -405,7 +417,9 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                   </div>
                 ))}
               </div>
+              )}
 
+              {!hasStory && (
               <p className="mt-4 rounded-[22px] border px-4 py-3 text-[12.5px] leading-relaxed"
                 style={{ borderColor: 'rgba(15,107,74,0.35)', background: 'rgba(15,107,74,0.06)', color: 'var(--v3-ink)' }}>
                 <strong>Vous pouvez arrêter à tout moment.</strong> Chaque texte est d’abord conservé sur
@@ -413,6 +427,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                 et peut être repris depuis un autre ordinateur. L’écran indique clairement si la sauvegarde
                 du compte a réussi ou si elle doit être retentée.
               </p>
+              )}
 
               <div className="mt-4 flex flex-wrap justify-center gap-2">
                 <Link to="/v3/create" onClick={() => startFreshStory('book')} className={`v3-btn text-xs ${biography ? 'v3-btn-outline' : 'v3-btn-primary'}`}>
@@ -431,8 +446,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
 
                 </button>
               </div>
-            </>
-          )}
+          </>
         </div>
         )}
 
