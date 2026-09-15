@@ -96,15 +96,30 @@ export default function V3OutlinePanel({ brief, onChange, initialMode }: Props) 
   const target = Math.min(60, Math.max(3, Number(brief.chapters) || 12));
 
 
+  /**
+   * Un sommaire déjà construit ne peut jamais être remplacé sans un accord
+   * explicite de l'auteur : le livre ouvert fait foi.
+   */
+  const confirmReplace = () => {
+    if (outline.length < 3) return true;
+    return window.confirm(
+      `Remplacer le sommaire de ${outline.length} chapitres de « ${brief.title || 'ce livre'} » ?\n\n`
+      + 'Les titres actuels seront remplacés. Vous pourrez annuler juste après.',
+    );
+  };
+
   const applyOutline = (chapters: BriefOutlineChapter[], source: string) => {
     const normalized = normalizeOutline(chapters).slice(0, 60);
     if (!normalized.length) {
       toast.error('Aucun chapitre détecté dans ce sommaire.');
       return;
     }
+    if (!confirmReplace()) return;
+    setHistory((prev) => [...prev.slice(-24), outline]);
     onChange({ outline: normalized, chapters: normalized.length, outlineValidated: false });
     toast.success(`${normalized.length} chapitres importés (${source}) — validez le sommaire.`);
   };
+
 
   /** Bascule automatiquement sur un provider réellement configuré (clé valide). */
   const resolveProvider = (): AIProvider | null => {
