@@ -19,7 +19,13 @@ type Proposal = { titre: string; objectif: string; sources: number[] };
  * sommaire d'un coup — 3 chapitres à la fois, que l'auteur garde, reformule
  * ou retire. Le sommaire n'est validé que par l'auteur.
  */
-export default function V3OutlineCoBuilder() {
+type Props = {
+  /** Chemin sommaire-d'abord : l'auteur construit le sommaire à partir
+   *  d'indications de chapitre, sans récit préalable. */
+  outlineFirst?: boolean;
+};
+
+export default function V3OutlineCoBuilder({ outlineFirst }: Props = {}) {
   const [brief, setBrief] = useState<BookBrief>({});
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [questions, setQuestions] = useState<string[]>([]);
@@ -33,6 +39,12 @@ export default function V3OutlineCoBuilder() {
     window.addEventListener(BOOK_BRIEF_EVENT, sync);
     return () => window.removeEventListener(BOOK_BRIEF_EVENT, sync);
   }, []);
+
+  /** Chemin sommaire-d'abord actif (drapeau brief ou prop externe). */
+  const isOutlineFirst = Boolean(outlineFirst || brief.outlineFirst);
+  /** L'auteur a déjà écrit un récit : on reste sur le comportement habituel. */
+  const hasSource = passages.length > 0;
+  const useOutlineFirst = isOutlineFirst;
 
   const outline = brief.outline || [];
   /** Récit de l'auteur découpé en passages numérotés : le sommaire doit les suivre. */
