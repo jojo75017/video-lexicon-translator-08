@@ -62,7 +62,7 @@ export default function V3MainTabs() {
         borderBottom: '1px solid var(--v3-line)',
       }}
     >
-      <div className="max-w-7xl mx-auto pl-5 md:pl-8 pr-2 md:pr-4 h-14 flex items-center gap-1">
+      <div className="max-w-[1440px] mx-auto pl-5 md:pl-8 pr-2 md:pr-4 h-14 flex items-center gap-1">
         {/* Desktop (≥ xl) — rangée scrollable : aucun onglet n'est coupé */}
         <nav className="hidden xl:flex items-center gap-0.5 flex-1 min-w-0 overflow-x-auto v3-no-scrollbar">
           <NavLink
@@ -107,7 +107,7 @@ export default function V3MainTabs() {
           >
             <Sparkles className="w-3.5 h-3.5" />
             <span>UPSELLS</span>
-            <span className="v3-badge">6 compléments</span>
+            <span className="v3-badge">6</span>
           </NavLink>
 
 
@@ -131,7 +131,7 @@ export default function V3MainTabs() {
                     else openCat(cat.key, e.currentTarget);
                   }}
                   data-active={active ? 'true' : 'false'}
-                  className="v3-nav-item flex items-center gap-1.5 px-3 py-2 text-[13.5px] v3-serif font-semibold whitespace-nowrap"
+                  className="v3-nav-item flex items-center gap-1.5 px-2 py-2 text-[13px] v3-serif font-semibold whitespace-nowrap"
                   style={{ color: active ? 'var(--v3-emerald)' : 'var(--v3-ink)' }}
                 >
                   <span aria-hidden className="text-[15px]">{cat.emoji}</span>
