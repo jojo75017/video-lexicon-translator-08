@@ -109,11 +109,13 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
     try {
       [
         'edition_book_config_v1',
+        'v3_create_workflow_config_v2',
         'edition_chapter_target_words_v1',
         'v3_create_current_project_id_v1',
         'ebook_workflow_progress',
         'ebook_workflow_results',
         'ebook_workflow_sync_data',
+        'editorial_memory',
       ].forEach((key) => localStorage.removeItem(key));
     } catch {
       // Le nouveau sommaire reste utilisable si le stockage du navigateur est indisponible.

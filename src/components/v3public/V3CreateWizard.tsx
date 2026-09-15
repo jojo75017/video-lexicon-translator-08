@@ -78,7 +78,9 @@ type HubConfig = {
 
 const CONFIG_KEY = 'edition_book_config_v1';
 const TARGET_WORDS_KEY = 'edition_chapter_target_words_v1';
-const WIZARD_KEY = 'v3_create_wizard_config_v1';
+// Ne jamais partager cette clé avec la fiche auteur (`BookBrief`) : l'ancien
+// nom identique permettait à une session précédente d'écraser le vrai livre.
+const WIZARD_KEY = 'v3_create_workflow_config_v2';
 const PROJECT_ID_KEY = 'v3_create_current_project_id_v1';
 
 const CATEGORIES = [
@@ -1535,7 +1537,7 @@ Règles :
           <div className="space-y-5">
             <V3LiveBookProgress />
             <EbookCompleteWorkflow
-              key={`${finalTitle}-${chapters}-${wordsPerChapter}`}
+              key={`${finalTitle}-${chapters}-${wordsPerChapter}-${normalizedOutline.map((chapter) => chapter.titre).join('|')}`}
               autoStart
               hideInputForm
               initialTitle={finalTitle.trim()}
@@ -1546,6 +1548,7 @@ Règles :
               initialWordsPerChapter={wordsPerChapter}
               initialTone={tone}
               characters={workflowCharacters}
+              initialOutline={startsFromExistingOutline ? normalizedOutline : undefined}
               initialBookIntroduction={buildWorkflowDescription()}
               onComplete={handleWorkflowComplete}
             />
