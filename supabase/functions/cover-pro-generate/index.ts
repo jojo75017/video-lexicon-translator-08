@@ -70,12 +70,16 @@ function buildPrompt(b: Brief): string {
     (b.artStyle && ART_DIRECTIONS[b.artStyle]) ?? ART_DIRECTIONS["illustration-editoriale"];
   const lighting =
     (b.lighting && LIGHTING_DIRECTIONS[b.lighting]) ?? LIGHTING_DIRECTIONS["bright"];
+  const visual = (b.visualPrompt ?? "").trim();
   const lines = [
     "Illustration de couverture de livre professionnelle destinée à une publication réelle (niveau best-seller Amazon KDP), cadrage portrait vertical, qualité maximale.",
+    visual
+      ? `SUJET IMPOSÉ — l'image doit représenter exactement ceci, sans y ajouter d'autre sujet : ${visual}`
+      : "",
     direction,
     lighting,
     b.genre ? `Genre du livre : ${b.genre}.` : "",
-    b.summary ? `Contexte / résumé : ${b.summary}.` : "",
+    !visual && b.summary ? `Contexte / résumé : ${b.summary}.` : "",
     b.mood ? `Ambiance recherchée : ${b.mood}.` : "",
     b.scene ? `Scène principale : ${b.scene}.` : "",
     b.palette ? `Palette de couleurs : ${b.palette}.` : "",
@@ -85,10 +89,9 @@ function buildPrompt(b: Brief): string {
     b.bookTitle
       ? `Le livre s'intitule « ${b.bookTitle} » : cette information sert uniquement à comprendre le sujet et ne doit JAMAIS apparaître dans l'image.`
       : "",
-    "QUALITÉ EXIGÉE : rendu comparable aux meilleures couvertures vendues en librairie et sur Amazon, sujet net et bien éclairé, visages et mains anatomiquement corrects, regard expressif, lumière cohérente entre le sujet et le décor, matières crédibles, finition professionnelle prête à imprimer. Interdits : rendu terne, plat, gris, sous-exposé, délavé, aspect image de banque générique, brouillon ou amateur.",
-    "QUALITÉ EXIGÉE : composition claire avec un point focal fort, hiérarchie visuelle nette, anatomie et perspective justes, mains et visages corrects, éclairage cohérent, finition léchée. Interdits : rendu amateur, flou involontaire, membres déformés, personnages difformes, collage grossier, banque d'images générique, aspect brouillon.",
+    "QUALITÉ EXIGÉE : rendu comparable aux meilleures couvertures vendues en librairie et sur Amazon, point focal fort, sujet net et bien éclairé, visages et mains anatomiquement corrects, perspective juste, lumière cohérente entre le sujet et le décor, matières crédibles, finition professionnelle prête à imprimer. Interdits : rendu terne, plat, gris, sous-exposé, délavé, flou involontaire, membres déformés, collage grossier, banque d'images générique, aspect brouillon ou amateur.",
     "INTERDICTIONS ABSOLUES : aucun titre, aucun sous-titre, aucun nom d'auteur, aucune lettre, aucun mot, aucun chiffre, aucun logo, aucun filigrane, aucun code-barres, aucun ISBN, aucun faux caractère typographique, aucune signature.",
-    "Composition : image purement visuelle, avec des zones calmes en haut (environ 30 % de la hauteur) et en bas permettant d'ajouter plus tard le titre, le sous-titre et le nom de l'auteur dans des calques séparés.",
+    "AUCUN ENCART : l'image est une illustration pleine page, sans aucun bandeau, cartouche, plaque, rectangle, bloc de couleur, cadre, vignette, dégradé noir ni voile sombre ajouté, et sans zone assombrie ou vide réservée à du texte. Toute la surface est de l'illustration, jusqu'aux bords, avec une composition naturellement lisible en haut et en bas.",
   ];
   return lines.filter(Boolean).join("\n");
 }
