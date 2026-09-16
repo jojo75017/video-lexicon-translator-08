@@ -345,13 +345,44 @@ const CoverStudioPro: React.FC = () => {
     }
   };
 
-  /** Illustration seule, telle que produite par le moteur. */
+  /**
+   * Réapplique localement la luminosité choisie à l'écran sur le fichier
+   * téléchargé, afin que l'image obtenue ne soit plus plus sombre que l'aperçu.
+   */
+  const applyBrightnessToBlob = async (blob: Blob, brightness: number): Promise<Blob> => {
+    if (!(brightness > 0) || Math.abs(brightness - 1) < 0.01) return blob;
+    const objectUrl = URL.createObjectURL(blob);
+    try {
+      const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error('image illisible'));
+        img.src = objectUrl;
+      });
+      const canvas = document.createElement('canvas');
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return blob;
+      ctx.filter = `brightness(${brightness})`;
+      ctx.drawImage(image, 0, 0);
+      const out = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
+      return out ?? blob;
+    } catch {
+      return blob;
+    } finally {
+      URL.revokeObjectURL(objectUrl);
+    }
+  };
+
+  /** Illustration seule, avec la luminosité réglée à l'écran. */
   const downloadIllustration = async (url: string, idx: number) => {
     const fileName = `illustration-couverture-${idx + 1}.png`;
+    const brightness = brightnessByCover[idx] ?? 1;
     try {
       const res = await fetch(url, { mode: 'cors', cache: 'no-store' });
       if (!res.ok) throw new Error('fetch failed');
-      triggerDownload(await res.blob(), fileName);
+      triggerDownload(await applyBrightnessToBlob(await res.blob(), brightness), fileName);
       return;
     } catch {
       /* lien du moteur inaccessible : on passe par une copie enregistrée */
@@ -361,7 +392,7 @@ const CoverStudioPro: React.FC = () => {
       try {
         const res = await fetch(saved.signedUrl, { cache: 'no-store' });
         if (!res.ok) throw new Error('fetch failed');
-        triggerDownload(await res.blob(), fileName);
+        triggerDownload(await applyBrightnessToBlob(await res.blob(), brightness), fileName);
         toast.success('Image téléchargée et enregistrée dans « Mes couvertures ».');
         return;
       } catch {

@@ -272,6 +272,7 @@ const PromoDecouvertePage = lazy(() => import('./pages/promo/PromoDecouvertePage
 const PromoCommandePage = lazy(() => import('./pages/promo/PromoCommandePage'));
 const PromoPaiementPage = lazy(() => import('./pages/promo/PromoPaiementPage'));
 const PromoBonusPage = lazy(() => import('./pages/promo/PromoBonusPage'));
+const Niches10OffertesPage = lazy(() => import('./pages/promo/Niches10OffertesPage'));
 const PromoEspacePage = lazy(() => import('./pages/promo/PromoEspacePage'));
 const PromoAffiliePage = lazy(() => import('./pages/promo/PromoAffiliePage'));
 
@@ -639,7 +640,7 @@ const App = () => {
             <Route path="/masterclass" element={<MasterclassPage />} />
             <Route path="/niches" element={<NichesPage />} />
             <Route path="/niches-600" element={<Niches600Page />} />
-            <Route path="/10-niches-offertes" element={<Navigate to="/cadeau" replace />} />
+            <Route path="/10-niches-offertes" element={<Niches10OffertesPage />} />
             <Route path="/quiz" element={<QuizPage />} />
             <Route path="/signature" element={<SignaturePage />} />
             <Route path="/bd-studio" element={<BDStudioPage />} />

@@ -639,9 +639,11 @@ export function parseTocText(text: string): BriefOutlineChapter[] {
     if (/^-{3,}$/.test(line)) continue;
 
     const withoutBullet = line.replace(/^[•●▪◦*+-]\s*/, '');
-    const chapterMatch = withoutBullet.match(/^(?:chapitre\s+\d+|épilogue)\s*[:.)-]*\s*(.+)$/i);
-    if (!chapterMatch) continue;
-    const chapterText = chapterMatch[1].trim();
+    // Une ligne = un chapitre. Le préfixe éventuel (« Chapitre 3 : », « 3. »,
+    // « Épilogue — ») est retiré, mais un simple titre est accepté tel quel.
+    const chapterMatch = withoutBullet.match(/^(?:chapitre\s+\d+|épilogue|\d+)\s*[:.)\-–—]+\s*(.+)$/i)
+      ?? withoutBullet.match(/^(?:chapitre\s+\d+|épilogue)\s+(.+)$/i);
+    const chapterText = (chapterMatch?.[1] ?? withoutBullet).trim();
     const sentenceBreak = chapterText.match(/^(.+?[.!?])(?:\s+)(.+)$/);
     const titlePart = sentenceBreak?.[1]?.replace(/[.!?]+$/, '').trim() || chapterText;
     const objectivePart = sentenceBreak?.[2]?.trim() || '';
