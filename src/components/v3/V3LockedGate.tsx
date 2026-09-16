@@ -40,12 +40,14 @@ export function V3LockedGate({ children }: { children: ReactNode }) {
       </div>
     );
   }
-  // Seuls les acheteurs V3 entrent dans les modules. Un abonné V2 reste sur sa V2,
-  // même après l'ouverture publique de la V3.
+  // Acheteurs V3 : accès complet, avant et après l'ouverture.
   if (hasBase || hasFull) return <>{children}</>;
+  // Ancien client V2 :
+  //  — les 3 modules offerts (Génie, Correcteur, Export) sont à vie ;
+  //  — après l'ouverture (1er octobre), l'abonné entre dans toute la V3 ;
+  //  — avant l'ouverture, on affiche le verrou « bientôt disponible ».
   if (hasV2 && isLegacyUnlockedPath(location.pathname)) return <>{children}</>;
-  // Ancien client V2 : on explique le verrou et on propose l'offre remisée,
-  // jamais une redirection surprise vers la connexion.
+  if (hasV2 && v3Open) return <>{children}</>;
   if (hasV2) return <V3ModuleLockCard />;
   return <Navigate to="/v3/auth" replace state={{ from: location.pathname }} />;
 
