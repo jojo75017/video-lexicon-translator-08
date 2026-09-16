@@ -15,6 +15,9 @@ import { Badge } from '@/components/ui/badge';
 import { ebookThemes } from '@/data/ebookIdeas';
 import { Crown } from 'lucide-react';
 import BestSellersTab from '@/components/niches/BestSellersTab';
+import NicheStartDialog from '@/components/v3public/NicheStartDialog';
+import { nicheFromLabel } from '@/lib/v3/nicheToBrief';
+import type { Niche600 } from '@/data/niches600';
 
 const categoryIcons: Record<string, any> = {
   'Santé et bien-être': Heart,
@@ -117,10 +120,9 @@ const NichesPage = () => {
     ).filter(theme => theme.ideas.length > 0 || searchQuery === '');
   }, [searchQuery, activeCategory]);
 
-  // Handle using a niche
+  // Handle using a niche : ouvre la fiche du livre V3 déjà remplie
   const handleUseNiche = (niche: string, category: string) => {
-    // Navigate to ebook-planner with the niche as title
-    navigate(`/ebook-planner?niche=${encodeURIComponent(niche)}&category=${encodeURIComponent(category)}`);
+    setStartNiche(nicheFromLabel(niche, category));
   };
 
   const totalNiches = ebookThemes.reduce((acc, theme) => acc + theme.ideas.length, 0);
