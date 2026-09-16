@@ -17,7 +17,7 @@ import V3ModuleLockCard from "@/components/v3/V3ModuleLockCard";
  */
 export function V3LockedGate({ children }: { children: ReactNode }) {
   const location = useLocation();
-  const { loading, isAdmin, hasV2 } = useV3Entitlement();
+  const { loading, isAdmin, hasV2, hasBase, hasFull } = useV3Entitlement();
   const adminAccess = useAdminAccess();
   const { open: v3Open } = useV3Open();
 
@@ -29,7 +29,6 @@ export function V3LockedGate({ children }: { children: ReactNode }) {
       </div>
     );
   }
-  if (v3Open) return <>{children}</>;
   if (isAdmin) return <>{children}</>;
   if (adminAccess.isChecking) {
     return <AccessPendingFallback timedOut={false} onRetry={() => { void adminAccess.refresh(); }} />;
@@ -41,11 +40,15 @@ export function V3LockedGate({ children }: { children: ReactNode }) {
       </div>
     );
   }
+  // Seuls les acheteurs V3 entrent dans les modules. Un abonné V2 reste sur sa V2,
+  // même après l'ouverture publique de la V3.
+  if (hasBase || hasFull) return <>{children}</>;
   if (hasV2 && isLegacyUnlockedPath(location.pathname)) return <>{children}</>;
   // Ancien client V2 : on explique le verrou et on propose l'offre remisée,
   // jamais une redirection surprise vers la connexion.
   if (hasV2) return <V3ModuleLockCard />;
   return <Navigate to="/v3/auth" replace state={{ from: location.pathname }} />;
+
 }
 
 export default V3LockedGate;
