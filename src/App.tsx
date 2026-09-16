@@ -169,6 +169,7 @@ const V3AssistantPage = lazy(() => import('./pages/v3/V3AssistantPage'));
 const AssistantPublicPage = lazy(() => import('./pages/AssistantPublicPage'));
 const V3ComptePage = lazy(() => import('./pages/v3public/V3ComptePage'));
 const V3PourquoiPage = lazy(() => import('./pages/v3public/V3PourquoiPage'));
+const V3CalendrierPage = lazy(() => import('./pages/v3public/V3CalendrierPage'));
 const V3RealiteKdpPage = lazy(() => import('./pages/v3public/V3RealiteKdpPage'));
 const V3CommunautePage = lazy(() => import('./pages/v3public/V3CommunautePage'));
 const V3CommunautePostPage = lazy(() => import('./pages/v3public/V3CommunautePostPage'));
