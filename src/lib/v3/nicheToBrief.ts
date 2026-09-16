@@ -32,8 +32,8 @@ const CATEGORY_MAP: Record<string, string> = {
   parascolaire: 'Éducation / Pédagogie',
   fantasy: 'Fantasy / Fantastique',
   spiritualite: 'Spiritualité',
-  carnets: 'Loisirs créatifs',
-  pratique: 'Guide pratique',
+  carnets: 'Carnet / Journal / Cahier',
+  pratique: 'Loisirs créatifs / DIY',
 };
 
 export function isFictionNiche(niche: Niche600): boolean {
