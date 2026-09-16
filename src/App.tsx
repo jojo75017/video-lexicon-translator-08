@@ -722,6 +722,7 @@ const App = () => {
               <Route path="auth" element={<V3AuthPage />} />
               <Route path="bienvenue" element={<V3BienvenuePage />} />
               <Route path="pourquoi" element={<V3PourquoiPage />} />
+              <Route path="calendrier" element={<V3CalendrierPage />} />
               <Route path="realite-kdp" element={<V3RealiteKdpPage />} />
               <Route path="contact" element={<ContactSupportPage subscriberEmail={subscriberEmail || ''} />} />
               <Route path="offre-couverture-v4" element={<V3CoverOfferPage />} />
