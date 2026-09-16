@@ -22,15 +22,16 @@ const PLAN_ICONS = {
 
 const COMPARISON = [
   { label: "Livres par mois", legacy: "2", plume: "50", edition: "Illimités" },
-  { label: "Chapitres par livre", legacy: "20", plume: "40", edition: "60" },
-  { label: "Mots par chapitre", legacy: "3 000", plume: "5 000", edition: "8 000" },
+  { label: "Chapitres par livre", legacy: "40", plume: "40", edition: "60" },
+  { label: "Mots par chapitre", legacy: "5 000", plume: "5 000", edition: "8 000" },
   { label: "Génie et sommaire", legacy: "Inclus", plume: "Guidé", edition: "Avancé + séries" },
   { label: "Correction et exports", legacy: "Inclus", plume: "Complets", edition: "Professionnels" },
-  { label: "Couvertures", legacy: "—", plume: "Kindle + broché", edition: "Cover Studio Pro" },
-  { label: "Audiolivre", legacy: "—", plume: "Standard", edition: "Studio professionnel" },
-  { label: "BD Studio Pro", legacy: "—", plume: "—", edition: "Inclus" },
-  { label: "Recherche Amazon avancée", legacy: "—", plume: "—", edition: "Inclus" },
-  { label: "Gros compléments premium", legacy: "À la carte", plume: "À la carte", edition: "À la carte" },
+  { label: "Recherche avancée", legacy: "Incluse", plume: "Incluse", edition: "Incluse + Amazon Spy" },
+  { label: "Couvertures", legacy: "Simple (comme la V2)", plume: "Kindle + broché", edition: "Cover Studio Pro + relié" },
+  { label: "Audiolivre", legacy: "—", plume: "Standard", edition: "Premium inclus" },
+  { label: "Traductions 10 langues", legacy: "—", plume: "À la carte", edition: "Incluses" },
+  { label: "Sélection maisons d'édition", legacy: "—", plume: "À la carte", edition: "Incluse" },
+  { label: "BD Studio Pro et Studio Jeunesse", legacy: "—", plume: "—", edition: "Inclus" },
 ] as const;
 
 export default function V3ForfaitsPage() {
