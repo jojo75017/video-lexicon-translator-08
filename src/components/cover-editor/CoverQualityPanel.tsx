@@ -7,10 +7,20 @@ import { cn } from '@/lib/utils';
 interface Props {
   composition: FrontComposition;
   hasIllustration: boolean;
+  /** Support visé : le contrôle des marges est plus strict en broché et en relié. */
+  coverType?: 'ebook' | 'paperback' | 'hardcover';
+  /** Dimensions réelles de l'illustration, si elles sont connues. */
+  imageSize?: { width: number; height: number } | null;
   className?: string;
 }
 
-export default function CoverQualityPanel({ composition, hasIllustration, className }: Props) {
+export default function CoverQualityPanel({
+  composition,
+  hasIllustration,
+  coverType = 'ebook',
+  imageSize = null,
+  className,
+}: Props) {
   const title = composition.layers.find((layer) => layer.role === 'title' && !layer.hidden);
   const author = composition.layers.find((layer) => layer.role === 'author' && !layer.hidden);
   const margin = composition.canvas.width * 0.04;
