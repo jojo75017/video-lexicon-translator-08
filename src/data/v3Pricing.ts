@@ -173,7 +173,7 @@ export const V3_ADDON_LIST: V3Addon[] = [
     description: "Traduction de votre livre en 10 langues, relue et harmonisée.",
     price: 27,
     to: "/v3/outils/traduction",
-    inEdition: false,
+    inEdition: true,
   },
   {
     key: "audio_premium",
