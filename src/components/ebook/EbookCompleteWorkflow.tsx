@@ -31,6 +31,7 @@ import { useV3Entitlement } from '@/hooks/useV3Entitlement';
 import useProBookTier from '@/hooks/useProBookTier';
 import WritingEngineBadge from './WritingEngineBadge';
 import { WORKFLOW_STEPS, WORKFLOW_STEP_COUNT } from './workflow/workflowAgents';
+import WorkflowFinalProofread, { type FinalProofreadOutcome } from './workflow/WorkflowFinalProofread';
 import { ensureFreshAccessToken, isAuthError } from '@/lib/auth/ensureFreshSession';
 
 interface Character {
@@ -2545,6 +2546,14 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
           </div>
         </CardContent>
       </Card>
+
+      {/* Agent 16 · Lior — relecture automatique du livre entier avant l'export */}
+      {finalProofreadChapters.length > 0 && Boolean(stepResults.P15) && !isGenerating && (
+        <WorkflowFinalProofread
+          chapters={finalProofreadChapters}
+          onApply={applyFinalProofread}
+        />
+      )}
 
       {/* Workflow Steps Card - Always visible */}
       <Card className="border border-primary/30">
