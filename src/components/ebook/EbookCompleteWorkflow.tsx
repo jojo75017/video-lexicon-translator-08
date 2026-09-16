@@ -661,6 +661,40 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
       .filter(Boolean);
   };
 
+  // Agent 16 (Lior) : chapitres rédigés à relire, puis application au livre.
+  const finalProofreadChapters: Array<{ titre?: string; contenu?: string }> = React.useMemo(() => {
+    const raw = (stepResults.P4?.result?.chapitres || allContext.P4?.chapitres || []) as any[];
+    return Array.isArray(raw)
+      ? raw
+          .map((c, i) => ({
+            titre: String(c?.titre ?? c?.title ?? `Chapitre ${i + 1}`),
+            contenu: String(c?.contenu ?? c?.content ?? ''),
+          }))
+          .filter((c) => c.contenu.trim().length > 0)
+      : [];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stepResults.P4, allContext.P4]);
+
+  const applyFinalProofread = useCallback((corrected: FinalProofreadOutcome[]) => {
+    const baseChapters = (stepResults.P4?.result?.chapitres || allContext.P4?.chapitres || []) as any[];
+    if (!Array.isArray(baseChapters) || baseChapters.length === 0) return;
+    const merged = baseChapters.map((chapter, i) => {
+      const fix = corrected[i];
+      if (!fix || !fix.text.trim()) return chapter;
+      return { ...chapter, contenu: fix.text, content: fix.text };
+    });
+    const correctionsCount = corrected.reduce((sum, c) => sum + (c.corrections || 0), 0);
+    const displayContent = `**📄 Chapitres rédigés : ${merged.length}** · Relecture finale Lior appliquée (${correctionsCount} correction(s))`;
+    setStepResults(prev => ({
+      ...prev,
+      P4: { result: { chapitres: merged, nombreChapitres: merged.length }, displayContent },
+    }));
+    setAllContext(prev => ({ ...prev, P4: { ...(prev.P4 || {}), chapitres: merged } }));
+    saveStepResult('P4', { chapitres: merged, nombreChapitres: merged.length }, displayContent);
+    publishWrittenChapters(merged, { total: merged.length, activeIndex: merged.length });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stepResults.P4, allContext.P4, saveStepResult]);
+
   const p3Structure = normalizeP3Structure((allContext.P3 || stepResults.P3?.result || {})?.chapitres || []);
   const persistedP3Structure = normalizeP3Structure((savedProgressSnapshot?.allContext?.P3 || savedProgressSnapshot?.stepResults?.P3?.result || {})?.chapitres || []);
   const effectiveP3Structure = p3Structure.length > 0 ? p3Structure : persistedP3Structure;
