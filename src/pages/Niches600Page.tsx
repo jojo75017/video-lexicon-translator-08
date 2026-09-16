@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Sparkles, Search, Download, ArrowLeft, Target, TrendingUp } from 'lucide-react';
-import { niches600, niches600Categories } from '@/data/niches600';
+import { niches600, niches600Categories, type Niche600 } from '@/data/niches600';
+import NicheStartDialog from '@/components/v3public/NicheStartDialog';
 
 const PAGE_SIZE = 50;
 
@@ -19,6 +20,7 @@ export default function Niches600Page() {
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<'bsr' | 'potentiel'>('potentiel');
   const [page, setPage] = useState(1);
+  const [startNiche, setStartNiche] = useState<Niche600 | null>(null);
 
   const filtered = useMemo(() => {
     let list = niches600;
@@ -178,6 +180,14 @@ export default function Niches600Page() {
                 <span>Prix exemple</span>
                 <strong className="text-[#232F3E]">{n.exemplePrix.toFixed(2)} €</strong>
               </div>
+
+              <Button
+                onClick={() => setStartNiche(n)}
+                className="mt-3 w-full bg-[#FF9E2D] hover:bg-[#f08d16] text-[#232F3E] font-bold"
+                size="sm"
+              >
+                <Sparkles className="w-4 h-4 mr-2" /> Commencer mon livre
+              </Button>
             </div>
           ))}
         </div>
@@ -198,6 +208,8 @@ export default function Niches600Page() {
           Liste actualisée — Mai 2026 — Ebookstudio Pro V2
         </div>
       </div>
+
+      <NicheStartDialog niche={startNiche} onClose={() => setStartNiche(null)} />
     </div>
   );
 }

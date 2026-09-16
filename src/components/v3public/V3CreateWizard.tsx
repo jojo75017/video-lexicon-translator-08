@@ -422,7 +422,9 @@ export default function V3CreateWizard() {
   const [customCategory, setCustomCategory] = useState('');
   const [tone, setTone] = useState('Inspirant');
   const [chapters, setChapters] = useState(clampNumber(Number(startingBrief.chapters || hub.numberOfChapters), 3, 60, 12));
-  const [wordsPerChapter, setWordsPerChapter] = useState(2500);
+  const [wordsPerChapter, setWordsPerChapter] = useState(
+    clampNumber(Number(startingBrief.wordsPerChapter), 500, 5000, 2500),
+  );
   const [characters, setCharacters] = useState<WizardCharacter[]>(() => {
     const supplied = startingBrief.characters || [];
     return supplied.length ? supplied.map((character) => ({
