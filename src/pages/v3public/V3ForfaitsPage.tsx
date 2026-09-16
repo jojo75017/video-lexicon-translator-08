@@ -8,7 +8,12 @@ import {
   getYearlySavingsPercent,
   type V3BillingInterval,
 } from "@/data/v3Pricing";
-import { V2_LEGACY_MODULES, V2_LEGACY_QUOTAS } from "@/data/v2LegacyAccess";
+import {
+  V2_LEGACY_MODULES,
+  V2_LEGACY_EXTRA_FEATURES,
+  V2_ACCESS_NOTE,
+  V2_ACCESS_UNTIL_LABEL,
+} from "@/data/v2LegacyAccess";
 import { BackButton } from "@/components/v3/BackButton";
 import { PayPalSubscribeButton } from "@/components/v3/PayPalSubscribeButton";
 import V3SubscribeCheckout from "@/components/v3public/V3SubscribeCheckout";
@@ -21,6 +26,12 @@ const PLAN_ICONS = {
 } as const;
 
 const COMPARISON = [
+  {
+    label: `Accès V2 (jusqu'au ${V2_ACCESS_UNTIL_LABEL})`,
+    legacy: "Inclus",
+    plume: "Inclus",
+    edition: "Inclus",
+  },
   { label: "Livres par mois", legacy: "2", plume: "50", edition: "Illimités" },
   { label: "Chapitres par livre", legacy: "40", plume: "40", edition: "60" },
   { label: "Mots par chapitre", legacy: "5 000", plume: "5 000", edition: "8 000" },
@@ -69,14 +80,17 @@ export default function V3ForfaitsPage() {
               <span className="grid h-10 w-10 place-items-center rounded-md" style={{ background: "var(--v3-gold-soft)", color: "var(--v3-gold-600)" }}><Gift size={19} /></span>
               <div><p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: "var(--v3-gold-600)" }}>Offre fidélité</p><h2 className="v3-serif text-2xl">Déjà abonné</h2></div>
             </div>
-            <p className="mt-5 text-2xl font-bold" style={{ color: "var(--v3-emerald)" }}>Votre V2 reste à vie</p>
-            <p className="mt-1 text-sm" style={{ color: "var(--v3-muted)" }}>Aucun nouvel achat obligatoire</p>
+            <p className="mt-5 text-2xl font-bold" style={{ color: "var(--v3-emerald)" }}>Vous ne perdez rien</p>
+            <p className="mt-1 text-sm" style={{ color: "var(--v3-muted)" }}>Vous gagnez la V3 essentielle, sans nouvel achat obligatoire</p>
             <ul className="mt-5 flex-1 space-y-2.5">
               {V2_LEGACY_MODULES.map((module) => <li key={module.key} className="flex gap-2 text-sm"><Check className="mt-0.5 h-4 w-4 shrink-0" style={{ color: "var(--v3-emerald)" }} />{module.title}</li>)}
-              <li className="flex gap-2 text-sm"><Check className="mt-0.5 h-4 w-4 shrink-0" style={{ color: "var(--v3-emerald)" }} />{V2_LEGACY_QUOTAS.booksPerMonth} livres/mois · {V2_LEGACY_QUOTAS.chaptersMax} chapitres</li>
+              {V2_LEGACY_EXTRA_FEATURES.map((feat) => <li key={feat} className="flex gap-2 text-sm"><Check className="mt-0.5 h-4 w-4 shrink-0" style={{ color: "var(--v3-emerald)" }} />{feat}</li>)}
             </ul>
             <p className="mt-3 rounded-md px-3 py-2 text-xs font-semibold" style={{ background: "var(--v3-cream)", color: "var(--v3-emerald)" }}>
-              Même confort d'écriture que Plume — sans couverture Kindle/broché ni audiolivre (disponibles en option).
+              {V2_ACCESS_NOTE}
+            </p>
+            <p className="mt-2 rounded-md px-3 py-2 text-xs" style={{ background: "var(--v3-cream)", color: "var(--v3-muted)" }}>
+              Non inclus : couverture Kindle/broché prête pour KDP, audiolivre, traductions et studios pro — disponibles avec Plume ou Édition.
             </p>
             <Button asChild variant="outline" className="mt-6"><Link to={hasV2 ? "/v3/migration" : "/v3/auth"}>{hasV2 ? "Voir mes avantages" : "Me connecter"}</Link></Button>
           </article>
@@ -110,8 +124,11 @@ export default function V3ForfaitsPage() {
                   {!hasV2 && interval === "year" && <p className="mt-1 text-xs" style={{ color: "var(--v3-gold-600)" }}>Économisez {savings}%</p>}
                 </div>
 
-                <p className="mb-4 rounded-md px-3 py-2 text-xs font-semibold" style={{ background: "var(--v3-cream)", color: "var(--v3-emerald)" }}>
+                <p className="mb-2 rounded-md px-3 py-2 text-xs font-semibold" style={{ background: "var(--v3-cream)", color: "var(--v3-emerald)" }}>
                   {plan.aiSummary} · 10 langues incluses
+                </p>
+                <p className="mb-4 rounded-md px-3 py-2 text-xs font-semibold" style={{ background: "var(--v3-gold-soft)", color: "var(--v3-gold-600)" }}>
+                  {V2_ACCESS_NOTE}
                 </p>
 
                 <ul className="mb-5 flex-1 space-y-2.5">

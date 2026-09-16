@@ -25,6 +25,15 @@ export interface V3Plan {
 /** Remise à vie accordée aux acheteurs de la V2. */
 export const V2_LEGACY_DISCOUNT = 0.2;
 
+/**
+ * Fermeture annoncée de la V2 (affichage seul) : la V2 reste utilisable par
+ * tout le monde — anciens abonnés, Plume et Édition — jusqu'à cette date,
+ * en attendant la V4. Aucun verrou technique n'est posé ici.
+ */
+export const V2_ACCESS_UNTIL_ISO = "2026-12-31T23:59:59+01:00";
+export const V2_ACCESS_UNTIL_LABEL = "31 décembre 2026";
+export const V2_ACCESS_NOTE = `Accès V2 conservé jusqu'au ${V2_ACCESS_UNTIL_LABEL}, en attendant la V4.`;
+
 export const legacyPrice = (amount: number): number =>
   Math.round(amount * (1 - V2_LEGACY_DISCOUNT) * 100) / 100;
 
@@ -51,9 +60,10 @@ export const V3_PLANS: V3Plan[] = [
     allAddonsIncluded: false,
     idealFor: "Les auteurs qui publient régulièrement et veulent un atelier complet, simple et maîtrisé.",
     features: [
+      "Accès V2 inclus jusqu'au 31 décembre 2026 (vous avez les deux)",
       "50 livres / mois",
       "Tous les onglets : Plan, Écrire, Habiller, Publier, Vendre",
-      "40 chapitres max · 5 000 mots/ch",
+      "40 chapitres max · 5 000 mots/ch · 8 personnages",
       "Création guidée ou travail à partir de votre propre sommaire",
       "Rédaction chapitre par chapitre avec le Génie",
       "10 langues incluses (choix dès l'étape 1)",
@@ -62,6 +72,11 @@ export const V3_PLANS: V3Plan[] = [
       "Audiolivre standard inclus",
       "Import de manuscrit (DOCX / PDF / URL)",
       "Correction professionnelle du livre",
+      "Recherche avancée pour documenter votre sujet",
+      "Mockups et visuels de présentation du livre",
+      "Fiche produit KDP : titre, description, mots-clés",
+      "Calendrier de publication",
+      "Discussion libre avec l'IA (votre propre clé)",
       "Support email 24 h",
     ],
   },
@@ -81,10 +96,11 @@ export const V3_PLANS: V3Plan[] = [
     allAddonsIncluded: false,
     idealFor: "Les auteurs et éditeurs qui produisent sans limite et utilisent les studios professionnels.",
     features: [
+      "Accès V2 inclus jusqu'au 31 décembre 2026 (vous avez les deux)",
       "Livres illimités",
       "Tout ce que contient Plume, en version professionnelle",
       "Mode Recherche Approfondie (workflow renforcé)",
-      "60 chapitres max · 8 000 mots/ch",
+      "60 chapitres max · 8 000 mots/ch · personnages illimités",
       "Sommaire IA avancé + ambiances de sommaire",
       "Séries multi-tomes (Bible d'univers + mémoire de série)",
       "10 langues incluses",
@@ -96,6 +112,9 @@ export const V3_PLANS: V3Plan[] = [
       "Inclus (valeur 81 €) : Pack Traductions relues 10 langues",
       "Inclus : Audiolivre Premium (voix premium, chapitrage, master)",
       "Inclus : Sélection maisons d'édition + lettre d'accompagnement",
+      "Inclus : BookPerfect AI — direction éditoriale approfondie",
+      "Inclus : Pack Sérénité (audit complet + support prioritaire)",
+      "Priorité sur les nouveautés V4 dès leur sortie",
       "Tous les modules professionnels V3 inclus",
       "Support prioritaire",
     ],
@@ -164,7 +183,7 @@ export const V3_ADDON_LIST: V3Addon[] = [
     description: "Analyse éditoriale complète + export Word corrigé, chapitre par chapitre.",
     price: 47,
     to: "/v3/corriger",
-    inEdition: false,
+    inEdition: true,
   },
   {
     key: "translations",
@@ -209,7 +228,7 @@ export const V3_ADDON_LIST: V3Addon[] = [
     description: "Session Zoom 1-à-1 + support prioritaire + audit complet de votre ebook.",
     price: 27,
     to: "/contact-support?sujet=pack-serenite",
-    inEdition: false,
+    inEdition: true,
   },
 ];
 

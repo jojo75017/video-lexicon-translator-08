@@ -10,6 +10,9 @@
 /** Date d'ouverture générale de la V3 pour les abonnés. */
 export const V3_OPENING_ISO = '2026-10-01T08:00:00+02:00';
 
+/** Fermeture annoncée de la V2, pour tout le monde, en attendant la V4. */
+export { V2_ACCESS_UNTIL_ISO, V2_ACCESS_UNTIL_LABEL, V2_ACCESS_NOTE } from '@/data/v3Pricing';
+
 export type V3CalendarStatus = 'libre' | 'ouverture' | 'complement';
 
 export interface V3CalendarEntry {
@@ -107,6 +110,21 @@ export const V3_LAUNCH_CALENDAR: V3CalendarGroup[] = [
     label: 'Compléments — ouverts dès l’achat',
     intro: 'Pas de date d’attente : l’accès est immédiat après le paiement.',
     entries: COMPLEMENTS,
+  },
+  {
+    key: 'v2-fermeture',
+    label: 'Fermeture de la V2 — 31 décembre 2026',
+    intro:
+      'La V2 reste utilisable par tout le monde — anciens abonnés, Plume et Édition — jusqu’à cette date, en attendant la V4.',
+    entries: [
+      {
+        title: 'Accès V2 (ancien tableau de bord)',
+        to: '/ebook-planner',
+        status: 'libre',
+        opensAt: '2026-12-31T23:59:00+01:00',
+        note: 'Utilisable jusqu’au 31 décembre 2026 inclus. Rien n’est coupé avant cette date.',
+      },
+    ],
   },
 ];
 
