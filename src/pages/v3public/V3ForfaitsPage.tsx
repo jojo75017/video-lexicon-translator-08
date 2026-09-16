@@ -6,7 +6,6 @@ import {
   formatPrice,
   getV3PriceId,
   getYearlySavingsPercent,
-  legacyPrice,
   type V3BillingInterval,
 } from "@/data/v3Pricing";
 import { V2_LEGACY_MODULES, V2_LEGACY_QUOTAS } from "@/data/v2LegacyAccess";
@@ -74,7 +73,6 @@ export default function V3ForfaitsPage() {
             <ul className="mt-5 flex-1 space-y-2.5">
               {V2_LEGACY_MODULES.map((module) => <li key={module.key} className="flex gap-2 text-sm"><Check className="mt-0.5 h-4 w-4 shrink-0" style={{ color: "var(--v3-emerald)" }} />{module.title}</li>)}
               <li className="flex gap-2 text-sm"><Check className="mt-0.5 h-4 w-4 shrink-0" style={{ color: "var(--v3-emerald)" }} />{V2_LEGACY_QUOTAS.booksPerMonth} livres/mois · {V2_LEGACY_QUOTAS.chaptersMax} chapitres</li>
-              <li className="flex gap-2 text-sm"><Check className="mt-0.5 h-4 w-4 shrink-0" style={{ color: "var(--v3-emerald)" }} />−20 % à vie sur Plume ou Édition</li>
             </ul>
             <Button asChild variant="outline" className="mt-6"><Link to={hasV2 ? "/v3/migration" : "/v3/auth"}>{hasV2 ? "Voir mes avantages" : "Me connecter"}</Link></Button>
           </article>
@@ -82,7 +80,6 @@ export default function V3ForfaitsPage() {
           {V3_PLANS.map((plan) => {
             const Icon = PLAN_ICONS[plan.id];
             const publicPrice = interval === "month" ? plan.monthlyPrice : plan.yearlyPrice;
-            const price = hasV2 ? legacyPrice(publicPrice) : publicPrice;
             const savings = getYearlySavingsPercent(plan);
             const featured = plan.id === "plume";
 
@@ -106,11 +103,6 @@ export default function V3ForfaitsPage() {
                     <span className="text-4xl font-bold" style={{ color: "var(--v3-emerald)" }}>{formatPrice(publicPrice)}</span>
                     <span className="text-sm" style={{ color: "var(--v3-muted)" }}>/{interval === "month" ? "mois" : "an"}</span>
                   </div>
-                  {hasV2 && (
-                    <p className="mt-1 rounded-md px-2 py-1 text-xs font-semibold" style={{ background: "var(--v3-cream)", color: "var(--v3-gold-600)" }}>
-                      Votre tarif fidélité ancien client : <strong>{formatPrice(price)}</strong> (-20 % à vie, appliqué au paiement)
-                    </p>
-                  )}
                   {!hasV2 && interval === "year" && <p className="mt-1 text-xs" style={{ color: "var(--v3-gold-600)" }}>Économisez {savings}%</p>}
                 </div>
 
@@ -128,13 +120,13 @@ export default function V3ForfaitsPage() {
                 </ul>
 
                 <div className="mb-4 rounded-md p-3 text-xs" style={{ background: "var(--v3-cream)", color: "var(--v3-muted)" }}><strong style={{ color: "var(--v3-ink)" }}>Idéal pour :</strong> {plan.idealFor}</div>
-                <Button onClick={() => setCheckout({ priceId: getV3PriceId(plan.id, interval, hasV2), planName: `${plan.name}${hasV2 ? " — tarif fidélité" : ""}` })}>Choisir {plan.name} · {formatPrice(publicPrice)}{hasV2 ? ` (votre prix : ${formatPrice(price)})` : ""}</Button>
+                <Button onClick={() => setCheckout({ priceId: getV3PriceId(plan.id, interval, hasV2), planName: plan.name })}>Choisir {plan.name} · {formatPrice(publicPrice)}</Button>
                 <div className="mt-2">
                   <PayPalSubscribeButton
                     planId={plan.id}
                     interval={interval}
                     planName={plan.name}
-                    amount={price}
+                    amount={publicPrice}
                     accent="var(--v3-emerald)"
                     legacyV2={hasV2}
                   />
