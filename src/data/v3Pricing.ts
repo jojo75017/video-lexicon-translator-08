@@ -25,6 +25,15 @@ export interface V3Plan {
 /** Remise à vie accordée aux acheteurs de la V2. */
 export const V2_LEGACY_DISCOUNT = 0.2;
 
+/**
+ * Fermeture annoncée de la V2 (affichage seul) : la V2 reste utilisable par
+ * tout le monde — anciens abonnés, Plume et Édition — jusqu'à cette date,
+ * en attendant la V4. Aucun verrou technique n'est posé ici.
+ */
+export const V2_ACCESS_UNTIL_ISO = "2026-12-31T23:59:59+01:00";
+export const V2_ACCESS_UNTIL_LABEL = "31 décembre 2026";
+export const V2_ACCESS_NOTE = `Accès V2 conservé jusqu'au ${V2_ACCESS_UNTIL_LABEL}, en attendant la V4.`;
+
 export const legacyPrice = (amount: number): number =>
   Math.round(amount * (1 - V2_LEGACY_DISCOUNT) * 100) / 100;
 
@@ -51,9 +60,10 @@ export const V3_PLANS: V3Plan[] = [
     allAddonsIncluded: false,
     idealFor: "Les auteurs qui publient régulièrement et veulent un atelier complet, simple et maîtrisé.",
     features: [
+      "Accès V2 inclus jusqu'au 31 décembre 2026 (vous avez les deux)",
       "50 livres / mois",
       "Tous les onglets : Plan, Écrire, Habiller, Publier, Vendre",
-      "40 chapitres max · 5 000 mots/ch",
+      "40 chapitres max · 5 000 mots/ch · 8 personnages",
       "Création guidée ou travail à partir de votre propre sommaire",
       "Rédaction chapitre par chapitre avec le Génie",
       "10 langues incluses (choix dès l'étape 1)",
@@ -62,6 +72,11 @@ export const V3_PLANS: V3Plan[] = [
       "Audiolivre standard inclus",
       "Import de manuscrit (DOCX / PDF / URL)",
       "Correction professionnelle du livre",
+      "Recherche avancée pour documenter votre sujet",
+      "Mockups et visuels de présentation du livre",
+      "Fiche produit KDP : titre, description, mots-clés",
+      "Calendrier de publication",
+      "Discussion libre avec l'IA (votre propre clé)",
       "Support email 24 h",
     ],
   },
