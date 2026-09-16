@@ -15,6 +15,9 @@ import { Badge } from '@/components/ui/badge';
 import { ebookThemes } from '@/data/ebookIdeas';
 import { Crown } from 'lucide-react';
 import BestSellersTab from '@/components/niches/BestSellersTab';
+import NicheStartDialog from '@/components/v3public/NicheStartDialog';
+import { nicheFromLabel } from '@/lib/v3/nicheToBrief';
+import type { Niche600 } from '@/data/niches600';
 
 const categoryIcons: Record<string, any> = {
   'Santé et bien-être': Heart,
@@ -98,6 +101,7 @@ const NichesPage = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
+  const [startNiche, setStartNiche] = useState<Niche600 | null>(null);
 
   // Get all unique categories from ebookThemes
   const allCategories = useMemo(() => {
@@ -117,10 +121,9 @@ const NichesPage = () => {
     ).filter(theme => theme.ideas.length > 0 || searchQuery === '');
   }, [searchQuery, activeCategory]);
 
-  // Handle using a niche
+  // Handle using a niche : ouvre la fiche du livre V3 déjà remplie
   const handleUseNiche = (niche: string, category: string) => {
-    // Navigate to ebook-planner with the niche as title
-    navigate(`/ebook-planner?niche=${encodeURIComponent(niche)}&category=${encodeURIComponent(category)}`);
+    setStartNiche(nicheFromLabel(niche, category));
   };
 
   const totalNiches = ebookThemes.reduce((acc, theme) => acc + theme.ideas.length, 0);
@@ -293,11 +296,11 @@ const NichesPage = () => {
                               </span>
                               <Button
                                 size="sm"
-                                variant="ghost"
                                 onClick={() => handleUseNiche(idea, theme.category)}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 bg-primary/10 hover:bg-primary hover:text-primary-foreground"
+                                className="shrink-0 bg-[#FF9E2D] hover:bg-[#f08d16] text-[#232F3E] font-bold"
                               >
-                                <ArrowRight className="w-4 h-4" />
+                                <Sparkles className="w-4 h-4 mr-1" />
+                                Commencer
                               </Button>
                             </motion.div>
                           ))}
@@ -368,6 +371,8 @@ const NichesPage = () => {
         <ArrowLeft className="w-5 h-5 mr-2" />
         <span className="hidden sm:inline">Générateur</span>
       </Button>
+
+      <NicheStartDialog niche={startNiche} onClose={() => setStartNiche(null)} />
     </div>
   );
 };

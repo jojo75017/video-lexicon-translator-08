@@ -97,6 +97,43 @@ function nonFictionSynopsis(niche: Niche600, chapters: number): string {
   ].join('\n');
 }
 
+/** Mots-clés de catégorie pour reconnaître une niche venue d'une autre liste. */
+const LABEL_KEYS: Array<{ key: string; words: string[] }> = [
+  { key: 'romance', words: ['romance', 'amour', 'relation', 'rencontre', 'séduction'] },
+  { key: 'thriller', words: ['thriller', 'polar', 'policier', 'suspense', 'enquête'] },
+  { key: 'fantasy', words: ['fantasy', 'fantastique', 'science-fiction', 'sf', 'imaginaire'] },
+  { key: 'jeunesse', words: ['enfant', 'jeunesse', 'kids', 'ado'] },
+  { key: 'parascolaire', words: ['éducation', 'education', 'pédagogie', 'scolaire', 'apprentissage'] },
+  { key: 'devperso', words: ['développement personnel', 'developpement personnel', 'confiance', 'productivité', 'motivation'] },
+  { key: 'finance', words: ['finance', 'argent', 'business', 'entrepreneur', 'carrière', 'investissement'] },
+  { key: 'sante', words: ['santé', 'sante', 'bien-être', 'bien etre', 'fitness', 'sport', 'nutrition'] },
+  { key: 'cuisine', words: ['cuisine', 'recette', 'gastronomie'] },
+  { key: 'spiritualite', words: ['spiritualité', 'spiritualite', 'méditation', 'philosophie', 'éveil'] },
+  { key: 'carnets', words: ['carnet', 'journal', 'cahier', 'planner'] },
+];
+
+/**
+ * Construit une niche exploitable à partir d'un simple intitulé et d'une
+ * catégorie libre (bibliothèque de niches, best-sellers…). Aucune donnée de
+ * marché n'est inventée : les repères chiffrés restent neutres.
+ */
+export function nicheFromLabel(label: string, category: string): Niche600 {
+  const haystack = `${category} ${label}`.toLowerCase();
+  const match = LABEL_KEYS.find((entry) => entry.words.some((w) => haystack.includes(w)));
+  return {
+    id: 0,
+    niche: label.trim(),
+    sousNiche: category.trim() || 'Niche',
+    motCleAmazon: label.trim().toLowerCase(),
+    bsrCible: 0,
+    concurrence: 'Modérée',
+    potentiel: 3,
+    exemplePrix: 0,
+    category: match?.key || 'pratique',
+    emoji: '📗',
+  };
+}
+
 /** Brouillon complet de fiche, modifiable par l'auteur avant lancement. */
 export function nicheToDraft(niche: Niche600, authorName: string): NicheStartDraft {
   const format = nicheFormat(niche);
