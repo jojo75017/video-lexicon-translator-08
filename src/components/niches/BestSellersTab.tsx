@@ -5,19 +5,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { bestSellers2026, bestSellerCategories } from '@/data/bestSellers2026';
-import { useNavigate } from 'react-router-dom';
+import NicheStartDialog from '@/components/v3public/NicheStartDialog';
+import { nicheFromLabel } from '@/lib/v3/nicheToBrief';
+import type { Niche600 } from '@/data/niches600';
 
 const BestSellersTab = () => {
-  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState('all');
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [startNiche, setStartNiche] = useState<Niche600 | null>(null);
 
   const filtered = activeFilter === 'all'
     ? bestSellers2026
     : bestSellers2026.filter(b => b.category === activeFilter);
 
-  const handleUseNiche = (title: string) => {
-    navigate(`/ebook-planner?niche=${encodeURIComponent(title)}&category=${encodeURIComponent('Best-Sellers 2026')}`);
+  const handleUseNiche = (title: string, category?: string) => {
+    setStartNiche(nicheFromLabel(title, category || 'Best-Sellers 2026'));
   };
 
   return (
