@@ -120,7 +120,9 @@ export default function KdpPaperbackConfigPanel({ project, onProjectUpdated }: P
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between gap-3">
-        <CardTitle className="text-lg">Configuration KDP (livre broché)</CardTitle>
+        <CardTitle className="text-lg">
+          {isHardcover ? 'Configuration KDP (livre relié)' : 'Configuration KDP (livre broché)'}
+        </CardTitle>
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="text-xs">
             Règles Amazon du {KDP_RULES_VERSION.split('-').reverse().join('/')}
@@ -139,14 +141,19 @@ export default function KdpPaperbackConfigPanel({ project, onProjectUpdated }: P
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {KDP_TRIM_SIZES.map((t) => (
+                {trimOptions.map((t) => (
                   <SelectItem key={t.id} value={t.id}>
                     {t.label}
                   </SelectItem>
                 ))}
-                <SelectItem value="custom">Format personnalisé</SelectItem>
+                {!isHardcover && <SelectItem value="custom">Format personnalisé</SelectItem>}
               </SelectContent>
             </Select>
+            {isHardcover && (
+              <p className="text-xs text-muted-foreground">
+                Le relié n’accepte que ces cinq formats chez Amazon.
+              </p>
+            )}
           </div>
 
           <div className="space-y-1.5">
@@ -154,10 +161,17 @@ export default function KdpPaperbackConfigPanel({ project, onProjectUpdated }: P
             <Input
               id="kdp-pages"
               type="number"
-              min={1}
+              min={isHardcover ? HARDCOVER_MIN_PAGES : 1}
+              max={isHardcover ? HARDCOVER_MAX_PAGES : undefined}
               value={config.pageCount}
               onChange={(e) => patch({ pageCount: Math.round(Number(e.target.value) || 0) })}
             />
+            {isHardcover && (
+              <p className="text-xs text-muted-foreground">
+                De {HARDCOVER_MIN_PAGES} à {HARDCOVER_MAX_PAGES} pages, et le dos suit les paliers
+                de carton d’Amazon.
+              </p>
+            )}
           </div>
 
           {trimIsCustom && (
