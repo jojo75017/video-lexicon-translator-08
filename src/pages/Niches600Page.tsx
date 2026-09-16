@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Sparkles, Search, Download, ArrowLeft, Target, TrendingUp } from 'lucide-react';
-import { niches600, niches600Categories } from '@/data/niches600';
+import { niches600, niches600Categories, type Niche600 } from '@/data/niches600';
+import NicheStartDialog from '@/components/v3public/NicheStartDialog';
 
 const PAGE_SIZE = 50;
 
@@ -19,6 +20,7 @@ export default function Niches600Page() {
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<'bsr' | 'potentiel'>('potentiel');
   const [page, setPage] = useState(1);
+  const [startNiche, setStartNiche] = useState<Niche600 | null>(null);
 
   const filtered = useMemo(() => {
     let list = niches600;
