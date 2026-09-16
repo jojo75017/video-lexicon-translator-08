@@ -9,6 +9,23 @@
 /** Remise permanente réservée aux acheteurs V2. */
 export { V2_LEGACY_DISCOUNT, legacyPrice } from '@/data/v3Pricing';
 
+/** Date de fermeture annoncée de la V2 (affichage seul). */
+export {
+  V2_ACCESS_UNTIL_ISO,
+  V2_ACCESS_UNTIL_LABEL,
+  V2_ACCESS_NOTE,
+} from '@/data/v3Pricing';
+
+/** Avantages d'écriture inclus, en plus des modules listés ci-dessous. */
+export const V2_LEGACY_EXTRA_FEATURES = [
+  '40 chapitres · 5 000 mots par chapitre',
+  'Rédaction chapitre par chapitre avec le Génie',
+  'Travail à partir de votre propre sommaire',
+  'Exports PDF, DOCX et EPUB',
+  'Bibliothèque de vos couvertures',
+  '2 livres par mois',
+] as const;
+
 /** Les nouveautés V3 offertes à vie aux acheteurs V2. */
 export const V2_LEGACY_MODULES = [
   {
