@@ -124,8 +124,11 @@ export default function V3ForfaitsPage() {
                   {!hasV2 && interval === "year" && <p className="mt-1 text-xs" style={{ color: "var(--v3-gold-600)" }}>Économisez {savings}%</p>}
                 </div>
 
-                <p className="mb-4 rounded-md px-3 py-2 text-xs font-semibold" style={{ background: "var(--v3-cream)", color: "var(--v3-emerald)" }}>
+                <p className="mb-2 rounded-md px-3 py-2 text-xs font-semibold" style={{ background: "var(--v3-cream)", color: "var(--v3-emerald)" }}>
                   {plan.aiSummary} · 10 langues incluses
+                </p>
+                <p className="mb-4 rounded-md px-3 py-2 text-xs font-semibold" style={{ background: "var(--v3-gold-soft)", color: "var(--v3-gold-600)" }}>
+                  {V2_ACCESS_NOTE}
                 </p>
 
                 <ul className="mb-5 flex-1 space-y-2.5">
