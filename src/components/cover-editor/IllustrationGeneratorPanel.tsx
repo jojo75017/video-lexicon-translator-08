@@ -554,23 +554,37 @@ export default function IllustrationGeneratorPanel({
                 <Label className="flex items-center gap-2 text-sm"><History className="h-4 w-4" /> Illustrations privées de ce projet</Label>
                 <div className="grid grid-cols-4 gap-2">
                   {proposals.map((p) => (
-                    <button
-                      key={p.path}
-                      type="button"
-                      onClick={() => void chooseProposal(p)}
-                      className="overflow-hidden rounded-lg border border-border transition hover:border-primary"
-                      title="Utiliser cette illustration"
-                    >
-                      {p.url ? (
-                        <img src={p.url} alt="Proposition d’illustration" className="h-32 w-full object-cover" />
-                      ) : (
-                        <span className="flex h-32 items-center justify-center text-xs text-muted-foreground">
-                          Aperçu indisponible
-                        </span>
-                      )}
-                    </button>
+                    <div key={p.path} className="space-y-1">
+                      <button
+                        type="button"
+                        onClick={() => void chooseProposal(p)}
+                        className="w-full overflow-hidden rounded-lg border border-border transition hover:border-primary"
+                        title="Utiliser cette illustration"
+                      >
+                        {p.url ? (
+                          <img src={p.url} alt="Proposition d’illustration" className="h-32 w-full object-cover" />
+                        ) : (
+                          <span className="flex h-32 items-center justify-center text-xs text-muted-foreground">
+                            Aperçu indisponible
+                          </span>
+                        )}
+                      </button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-7 w-full gap-1 px-1 text-[11px]"
+                        onClick={() => void saveImageToLibrary(p)}
+                      >
+                        <Download className="h-3 w-3" /> Télécharger
+                      </Button>
+                    </div>
                   ))}
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  Chaque image est déjà enregistrée dans votre espace privé. « Télécharger »
+                  récupère l’image seule, sans titre ni texte par-dessus.
+                </p>
               </div>
             )}
 
