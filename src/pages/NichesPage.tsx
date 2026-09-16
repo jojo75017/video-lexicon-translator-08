@@ -101,6 +101,7 @@ const NichesPage = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
+  const [startNiche, setStartNiche] = useState<Niche600 | null>(null);
 
   // Get all unique categories from ebookThemes
   const allCategories = useMemo(() => {
