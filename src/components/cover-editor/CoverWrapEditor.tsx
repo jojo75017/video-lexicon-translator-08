@@ -149,10 +149,13 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
       illustrationPath: project.illustration_path,
       bookTitle: project.book_title,
     };
-    const initialGeometry = computePaperbackGeometry(
+    const initialGeometry = computeCoverGeometry(
       project.kdp_config
         ? parsePaperbackConfig(project.kdp_config, project.page_count ?? 120)
-        : defaultPaperbackConfig(project.page_count ?? 120),
+        : project.cover_type === 'hardcover'
+          ? defaultHardcoverConfig(project.page_count ?? 150)
+          : defaultPaperbackConfig(project.page_count ?? 120),
+      project.cover_type,
     ).geometry;
 
     if (isWrapComposition(project.fabric_json)) {
