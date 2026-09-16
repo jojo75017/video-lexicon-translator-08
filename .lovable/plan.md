@@ -6,8 +6,7 @@ Aujourd'hui, quand le livre est rédigé, il faut aller soi-même dans le correc
 
 ## Le nom de l'agent
 
-Proposition retenue : **Agent 16 — Lior, Le Relecteur final** (les 15 agents existants ont déjà un prénom court : Zyro, Kiro, Alia, Orin…). Autres options si tu préfères : **CorrectAgent**, **Nolan**, **Sacha**.
-Dis-moi le nom voulu, je l'applique.
+Nom validé : **Agent 16 — Lior, Le Relecteur final** (dans la continuité des prénoms courts des 15 agents : Zyro, Kiro, Alia, Orin…).
 
 ## Ce que verra l'abonné
 
