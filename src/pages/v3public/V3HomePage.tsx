@@ -63,6 +63,9 @@ export default function V3HomePage() {
 
       {/* 2. DEUX ENCARTS DISCRETS — juste au-dessus de la promesse */}
       <div className="v3-shell">
+        <p className="mb-3 text-center font-serif text-lg" style={{ color: 'var(--v3-ink)' }}>
+          Vous ne savez pas par où commencer ? Cliquez sur un des encarts ci-dessous et vous serez redirigé vers vos besoins ou infos.
+        </p>
         <V3StartIdeaCTA variant="discreet" />
       </div>
 
