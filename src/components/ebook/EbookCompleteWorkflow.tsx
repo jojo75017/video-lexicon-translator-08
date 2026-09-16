@@ -2613,7 +2613,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            Les 15 agents éditoriaux au travail
+            Les 15 agents éditoriaux au travail, puis Lior pour la correction finale
           </CardTitle>
 
           {/* Bannière d'agent en cours - très visible */}
