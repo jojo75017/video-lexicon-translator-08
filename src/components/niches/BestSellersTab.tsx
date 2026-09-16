@@ -146,6 +146,8 @@ const BestSellersTab = () => {
           })}
         </AnimatePresence>
       </div>
+
+      <NicheStartDialog niche={startNiche} onClose={() => setStartNiche(null)} />
     </div>
   );
 };
