@@ -21,6 +21,13 @@ import {
 } from '@/components/ui/select';
 import { updateCoverProject, type CoverProject } from '@/lib/coverProjects';
 import {
+  HARDCOVER_MAX_PAGES,
+  HARDCOVER_MIN_PAGES,
+  HARDCOVER_TRIM_SIZES,
+  computeCoverGeometry,
+  defaultHardcoverConfig,
+} from '@/lib/cover-editor/kdpHardcoverSpecs';
+import {
   FINISH_LABEL,
   INK_LABEL,
   KDP_CUSTOM_TRIM_LIMITS,
@@ -52,16 +59,20 @@ interface Props {
 }
 
 export default function KdpPaperbackConfigPanel({ project, onProjectUpdated }: Props) {
+  const isHardcover = project.cover_type === 'hardcover';
   const [config, setConfig] = useState<KdpPaperbackConfig>(() =>
     project.kdp_config
-      ? parsePaperbackConfig(project.kdp_config, project.page_count ?? 120)
-      : defaultPaperbackConfig(project.page_count ?? 120),
+      ? parsePaperbackConfig(project.kdp_config, project.page_count ?? (isHardcover ? 150 : 120))
+      : isHardcover
+        ? defaultHardcoverConfig(project.page_count ?? 150)
+        : defaultPaperbackConfig(project.page_count ?? 120),
   );
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const timer = useRef<number | null>(null);
   const firstRender = useRef(true);
 
-  const result = useMemo(() => computePaperbackGeometry(config), [config]);
+  const trimOptions = isHardcover ? HARDCOVER_TRIM_SIZES : KDP_TRIM_SIZES;
+  const result = useMemo(() => computeCoverGeometry(config, project.cover_type), [config, project.cover_type]);
   const geometry = result.geometry;
 
   const patch = useCallback((next: Partial<KdpPaperbackConfig>) => {
@@ -109,7 +120,9 @@ export default function KdpPaperbackConfigPanel({ project, onProjectUpdated }: P
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between gap-3">
-        <CardTitle className="text-lg">Configuration KDP (livre broché)</CardTitle>
+        <CardTitle className="text-lg">
+          {isHardcover ? 'Configuration KDP (livre relié)' : 'Configuration KDP (livre broché)'}
+        </CardTitle>
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="text-xs">
             Règles Amazon du {KDP_RULES_VERSION.split('-').reverse().join('/')}
@@ -128,14 +141,19 @@ export default function KdpPaperbackConfigPanel({ project, onProjectUpdated }: P
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {KDP_TRIM_SIZES.map((t) => (
+                {trimOptions.map((t) => (
                   <SelectItem key={t.id} value={t.id}>
                     {t.label}
                   </SelectItem>
                 ))}
-                <SelectItem value="custom">Format personnalisé</SelectItem>
+                {!isHardcover && <SelectItem value="custom">Format personnalisé</SelectItem>}
               </SelectContent>
             </Select>
+            {isHardcover && (
+              <p className="text-xs text-muted-foreground">
+                Le relié n’accepte que ces cinq formats chez Amazon.
+              </p>
+            )}
           </div>
 
           <div className="space-y-1.5">
@@ -143,10 +161,17 @@ export default function KdpPaperbackConfigPanel({ project, onProjectUpdated }: P
             <Input
               id="kdp-pages"
               type="number"
-              min={1}
+              min={isHardcover ? HARDCOVER_MIN_PAGES : 1}
+              max={isHardcover ? HARDCOVER_MAX_PAGES : undefined}
               value={config.pageCount}
               onChange={(e) => patch({ pageCount: Math.round(Number(e.target.value) || 0) })}
             />
+            {isHardcover && (
+              <p className="text-xs text-muted-foreground">
+                De {HARDCOVER_MIN_PAGES} à {HARDCOVER_MAX_PAGES} pages, et le dos suit les paliers
+                de carton d’Amazon.
+              </p>
+            )}
           </div>
 
           {trimIsCustom && (

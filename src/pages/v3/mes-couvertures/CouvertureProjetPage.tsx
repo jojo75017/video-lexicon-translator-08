@@ -5,7 +5,7 @@
  */
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, ChevronDown, ImageIcon, Loader2 } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Download, ImageIcon, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import CoverFrontEditor from '@/components/cover-editor/CoverFrontEditor';
@@ -22,11 +22,20 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   getCoverProject,
   getSignedCoverUrl,
+  updateCoverProject,
   type CoverProject,
   type CoverType,
 } from '@/lib/coverProjects';
+import { downloadIllustration } from '@/lib/cover-editor/illustrationDownload';
 
 const TYPE_LABEL: Record<CoverType, string> = {
   ebook: 'eBook Kindle',
@@ -77,6 +86,7 @@ export default function CouvertureProjetPage() {
   const [thumb, setThumb] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -108,6 +118,35 @@ export default function CouvertureProjetPage() {
       active = false;
     };
   }, [id]);
+
+  /** Téléchargement local de l'illustration seule (aucun crédit, aucune copie publique). */
+  const downloadImage = async () => {
+    if (!project?.illustration_path) return;
+    setDownloading(true);
+    try {
+      const fileName = await downloadIllustration(
+        project.illustration_path,
+        project.book_title || project.project_name,
+      );
+      toast.success(`Image téléchargée : ${fileName}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Téléchargement impossible.');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  /** Changement de support : Kindle, broché ou relié. */
+  const changeCoverType = async (next: CoverType) => {
+    if (!project || next === project.cover_type) return;
+    try {
+      const updated = await updateCoverProject(project.id, { cover_type: next });
+      setProject(updated);
+      toast.success(`Support changé : ${TYPE_LABEL[next]}.`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Changement impossible.');
+    }
+  };
 
   const goToStep = (key: StepKey) => {
     const targets: Record<StepKey, string[]> = {
@@ -147,12 +186,33 @@ export default function CouvertureProjetPage() {
           />
           </span>
         )}
+        {project?.illustration_path && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-2 border-[#f47920] text-[#f47920] hover:bg-[#f47920] hover:text-white"
+            disabled={downloading}
+            onClick={() => void downloadImage()}
+          >
+            {downloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+            Télécharger l’image
+          </Button>
+        )}
         {project && (
           <>
             <span className="ml-1 truncate text-sm font-semibold text-foreground">
               {project.project_name}
             </span>
-            <Badge variant="outline">{TYPE_LABEL[project.cover_type] ?? project.cover_type}</Badge>
+            <Select value={project.cover_type} onValueChange={(v) => void changeCoverType(v as CoverType)}>
+              <SelectTrigger className="h-8 w-[170px] text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ebook">eBook Kindle</SelectItem>
+                <SelectItem value="paperback">Broché (dos + 4ᵉ)</SelectItem>
+                <SelectItem value="hardcover">Relié (dos + 4ᵉ)</SelectItem>
+              </SelectContent>
+            </Select>
           </>
         )}
       </div>
@@ -208,13 +268,14 @@ export default function CouvertureProjetPage() {
       {!loading && project && (
         <>
           {/* éditeur immédiatement visible */}
-          {project.cover_type === 'paperback' ? (
+          {project.cover_type !== 'ebook' ? (
             <>
               <CoverWrapEditor project={project} onProjectUpdated={setProject} />
               <Collapsible defaultOpen>
                 <CollapsibleTrigger asChild>
                   <Button variant="outline" size="sm" className="gap-2">
-                    <ChevronDown className="h-4 w-4" /> Réglages KDP (pages, papier, dos)
+                    <ChevronDown className="h-4 w-4" /> Réglages KDP{' '}
+                    {project.cover_type === 'hardcover' ? '(relié : pages, dos, charnières)' : '(pages, papier, dos)'}
                   </Button>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="pt-3">

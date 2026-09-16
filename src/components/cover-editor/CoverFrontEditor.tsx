@@ -724,7 +724,14 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
         </p>
       )}
 
-      <CoverQualityPanel composition={composition} hasIllustration={Boolean(bgUrl)} />
+      <CoverQualityPanel
+        composition={composition}
+        hasIllustration={Boolean(bgUrl)}
+        coverType={project.cover_type === 'ebook' ? 'ebook' : project.cover_type}
+        imageSize={
+          bgImage ? { width: bgImage.naturalWidth, height: bgImage.naturalHeight } : null
+        }
+      />
 
       {/* 3 maquettes de référence professionnelles */}
       <ReferenceTemplateGallery

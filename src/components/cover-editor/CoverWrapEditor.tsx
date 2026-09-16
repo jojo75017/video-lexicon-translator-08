@@ -69,11 +69,14 @@ import {
 } from '@/lib/coverProjects';
 import { FRONT_FONTS, parseComposition, type TextAlign } from '@/lib/cover-editor/frontComposition';
 import {
-  computePaperbackGeometry,
   defaultPaperbackConfig,
   formatIn,
   parsePaperbackConfig,
 } from '@/lib/cover-editor/kdpPaperbackSpecs';
+import {
+  computeCoverGeometry,
+  defaultHardcoverConfig,
+} from '@/lib/cover-editor/kdpHardcoverSpecs';
 import {
   MIN_SPINE_FONT_PT,
   OPTIONAL_ROLES,
@@ -131,10 +134,15 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
     () =>
       project.kdp_config
         ? parsePaperbackConfig(project.kdp_config, project.page_count ?? 120)
-        : defaultPaperbackConfig(project.page_count ?? 120),
-    [project.kdp_config, project.page_count],
+        : project.cover_type === 'hardcover'
+          ? defaultHardcoverConfig(project.page_count ?? 150)
+          : defaultPaperbackConfig(project.page_count ?? 120),
+    [project.kdp_config, project.page_count, project.cover_type],
   );
-  const result = useMemo(() => computePaperbackGeometry(config), [config]);
+  const result = useMemo(
+    () => computeCoverGeometry(config, project.cover_type),
+    [config, project.cover_type],
+  );
   const geometry = result.geometry;
 
   /* ------------------ composition version 2 -------------------------------- */
@@ -143,10 +151,13 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
       illustrationPath: project.illustration_path,
       bookTitle: project.book_title,
     };
-    const initialGeometry = computePaperbackGeometry(
+    const initialGeometry = computeCoverGeometry(
       project.kdp_config
         ? parsePaperbackConfig(project.kdp_config, project.page_count ?? 120)
-        : defaultPaperbackConfig(project.page_count ?? 120),
+        : project.cover_type === 'hardcover'
+          ? defaultHardcoverConfig(project.page_count ?? 150)
+          : defaultPaperbackConfig(project.page_count ?? 120),
+      project.cover_type,
     ).geometry;
 
     if (isWrapComposition(project.fabric_json)) {
