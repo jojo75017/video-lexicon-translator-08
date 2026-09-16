@@ -23,8 +23,16 @@ export default function CoverQualityPanel({
 }: Props) {
   const title = composition.layers.find((layer) => layer.role === 'title' && !layer.hidden);
   const author = composition.layers.find((layer) => layer.role === 'author' && !layer.hidden);
-  const margin = composition.canvas.width * 0.04;
+  const isPrint = coverType !== 'ebook';
+  const margin = composition.canvas.width * (isPrint ? 0.06 : 0.04);
+  const minPixels = isPrint ? 2550 : 1600;
   const issues = [
+    imageSize && Math.min(imageSize.width, imageSize.height) < minPixels
+      ? `L’illustration est un peu petite pour ce support (${imageSize.width} × ${imageSize.height} px). Régénérez-la pour une impression nette.`
+      : null,
+    isPrint
+      ? 'En broché et en relié, gardez le titre à distance des bords : la découpe et le pli mangent quelques millimètres.'
+      : null,
     !hasIllustration ? 'Ajoutez une illustration avant le téléchargement.' : null,
     !title?.text.trim() ? 'Le titre du livre est manquant.' : null,
     title && title.fontSize < composition.canvas.width * 0.055 ? 'Le titre risque d’être trop petit en miniature Amazon.' : null,
