@@ -208,6 +208,8 @@ export default function Niches600Page() {
           Liste actualisée — Mai 2026 — Ebookstudio Pro V2
         </div>
       </div>
+
+      <NicheStartDialog niche={startNiche} onClose={() => setStartNiche(null)} />
     </div>
   );
 }
