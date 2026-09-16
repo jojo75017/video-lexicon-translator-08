@@ -134,8 +134,10 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
     () =>
       project.kdp_config
         ? parsePaperbackConfig(project.kdp_config, project.page_count ?? 120)
-        : defaultPaperbackConfig(project.page_count ?? 120),
-    [project.kdp_config, project.page_count],
+        : project.cover_type === 'hardcover'
+          ? defaultHardcoverConfig(project.page_count ?? 150)
+          : defaultPaperbackConfig(project.page_count ?? 120),
+    [project.kdp_config, project.page_count, project.cover_type],
   );
   const result = useMemo(
     () => computeCoverGeometry(config, project.cover_type),
