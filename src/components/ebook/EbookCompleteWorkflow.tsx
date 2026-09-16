@@ -31,6 +31,7 @@ import { useV3Entitlement } from '@/hooks/useV3Entitlement';
 import useProBookTier from '@/hooks/useProBookTier';
 import WritingEngineBadge from './WritingEngineBadge';
 import { WORKFLOW_STEPS, WORKFLOW_STEP_COUNT } from './workflow/workflowAgents';
+import WorkflowFinalProofread, { type FinalProofreadOutcome } from './workflow/WorkflowFinalProofread';
 import { ensureFreshAccessToken, isAuthError } from '@/lib/auth/ensureFreshSession';
 
 interface Character {
@@ -659,6 +660,58 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
       })
       .filter(Boolean);
   };
+
+  // Dernier livre transmis à la page : sert à renvoyer la version corrigée par Lior.
+  const lastBookDataRef = useRef<any>(null);
+
+  // Agent 16 (Lior) : chapitres rédigés à relire, puis application au livre.
+  const finalProofreadChapters: Array<{ titre?: string; contenu?: string }> = React.useMemo(() => {
+    const raw = (stepResults.P4?.result?.chapitres || allContext.P4?.chapitres || []) as any[];
+    return Array.isArray(raw)
+      ? raw
+          .map((c, i) => ({
+            titre: String(c?.titre ?? c?.title ?? `Chapitre ${i + 1}`),
+            contenu: String(c?.contenu ?? c?.content ?? ''),
+          }))
+          .filter((c) => c.contenu.trim().length > 0)
+      : [];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stepResults.P4, allContext.P4]);
+
+  const applyFinalProofread = useCallback((corrected: FinalProofreadOutcome[]) => {
+    const baseChapters = (stepResults.P4?.result?.chapitres || allContext.P4?.chapitres || []) as any[];
+    if (!Array.isArray(baseChapters) || baseChapters.length === 0) return;
+    const merged = baseChapters.map((chapter, i) => {
+      const fix = corrected[i];
+      if (!fix || !fix.text.trim()) return chapter;
+      return { ...chapter, contenu: fix.text, content: fix.text };
+    });
+    const correctionsCount = corrected.reduce((sum, c) => sum + (c.corrections || 0), 0);
+    const displayContent = `**📄 Chapitres rédigés : ${merged.length}** · Relecture finale Lior appliquée (${correctionsCount} correction(s))`;
+    setStepResults(prev => ({
+      ...prev,
+      P4: { result: { chapitres: merged, nombreChapitres: merged.length }, displayContent },
+    }));
+    setAllContext(prev => ({ ...prev, P4: { ...(prev.P4 || {}), chapitres: merged } }));
+    saveStepResult('P4', { chapitres: merged, nombreChapitres: merged.length }, displayContent);
+    publishWrittenChapters(merged, { total: merged.length, activeIndex: merged.length });
+
+    // Le livre corrigé remplace le brouillon côté page (onglet Rédaction, exports, KDP).
+    const previous = lastBookDataRef.current;
+    if (previous) {
+      const nextBookData = {
+        ...previous,
+        chapters: normalizeManuscript(merged, {
+          expectedCount: merged.length,
+          outline: Array.isArray(allContext.P3?.chapitres) ? allContext.P3.chapitres : [],
+          bookTitle: title,
+        }),
+      };
+      lastBookDataRef.current = nextBookData;
+      onComplete(nextBookData);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stepResults.P4, allContext.P4, allContext.P3, title, saveStepResult, onComplete]);
 
   const p3Structure = normalizeP3Structure((allContext.P3 || stepResults.P3?.result || {})?.chapitres || []);
   const persistedP3Structure = normalizeP3Structure((savedProgressSnapshot?.allContext?.P3 || savedProgressSnapshot?.stepResults?.P3?.result || {})?.chapitres || []);
@@ -1447,6 +1500,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
       autoResumeCountRef.current = 0;
 
       toast.success('✅ Livre généré ! Le contenu a été importé dans l\'onglet "Rédaction".');
+      lastBookDataRef.current = bookData;
       onComplete(bookData);
 
     } catch (err: any) {
@@ -2546,12 +2600,20 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
         </CardContent>
       </Card>
 
+      {/* Agent 16 · Lior — relecture automatique du livre entier avant l'export */}
+      {finalProofreadChapters.length > 0 && Boolean(stepResults.P15) && !isGenerating && (
+        <WorkflowFinalProofread
+          chapters={finalProofreadChapters}
+          onApply={applyFinalProofread}
+        />
+      )}
+
       {/* Workflow Steps Card - Always visible */}
       <Card className="border border-primary/30">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            Les 15 agents éditoriaux au travail
+            Les 15 agents éditoriaux au travail, puis Lior pour la correction finale
           </CardTitle>
 
           {/* Bannière d'agent en cours - très visible */}

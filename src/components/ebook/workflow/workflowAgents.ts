@@ -15,6 +15,7 @@ import {
   Award,
   BadgeCheck,
   Shield,
+  ShieldCheck,
 } from 'lucide-react';
 
 export interface WorkflowStepDefinition {
@@ -217,4 +218,24 @@ export const WORKFLOW_STEPS: WorkflowStepDefinition[] = ([
 ] as Omit<WorkflowStepDefinition, 'codename'>[]).map((step) => ({ ...step, codename: ROBOT_CODENAMES[step.id] || '' }));
 
 export const WORKFLOW_STEP_COUNT = WORKFLOW_STEPS.length;
+
+/**
+ * Agent 16 — Lior, Le Relecteur final.
+ * Étape automatique après P15 : il relit et corrige le livre entier avant l'export.
+ * Volontairement hors de WORKFLOW_STEPS : il ne passe pas par le moteur P1→P15,
+ * il utilise la chaîne de correction (strict-proofread) côté navigateur.
+ */
+export const FINAL_PROOFREAD_AGENT: WorkflowStepDefinition = {
+  id: 'P16',
+  name: 'Le Relecteur final',
+  codename: 'Lior',
+  description: 'Correction intégrale du livre, chapitre par chapitre, avant export',
+  icon: ShieldCheck,
+  agentTitle: 'Agent 16 - Lior, Le Relecteur final',
+  agentSubtitle: 'Correction Automatique',
+  agentMission: 'Relit le manuscrit terminé et corrige orthographe, grammaire, accords et tournures sans intervention.',
+  agentRole: 'Corriger le livre entier',
+  agentAction: 'Relecture automatique avec barre de progression, puis livre corrigé affiché',
+};
+
 export { ROBOT_CODENAMES };
