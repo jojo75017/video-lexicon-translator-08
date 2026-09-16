@@ -93,5 +93,7 @@ export const V2_LEGACY_EXCLUSIONS = [
 ];
 
 export function isLegacyUnlockedPath(pathname: string): boolean {
-  return V2_LEGACY_UNLOCKED_PATHS.has(pathname);
+  if (V2_LEGACY_UNLOCKED_PATHS.has(pathname)) return true;
+  // Projets de couverture : /v3/mes-couvertures/:id
+  return pathname.startsWith('/v3/mes-couvertures/');
 }
