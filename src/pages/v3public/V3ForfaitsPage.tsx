@@ -8,7 +8,12 @@ import {
   getYearlySavingsPercent,
   type V3BillingInterval,
 } from "@/data/v3Pricing";
-import { V2_LEGACY_MODULES, V2_LEGACY_QUOTAS } from "@/data/v2LegacyAccess";
+import {
+  V2_LEGACY_MODULES,
+  V2_LEGACY_EXTRA_FEATURES,
+  V2_ACCESS_NOTE,
+  V2_ACCESS_UNTIL_LABEL,
+} from "@/data/v2LegacyAccess";
 import { BackButton } from "@/components/v3/BackButton";
 import { PayPalSubscribeButton } from "@/components/v3/PayPalSubscribeButton";
 import V3SubscribeCheckout from "@/components/v3public/V3SubscribeCheckout";
@@ -21,6 +26,12 @@ const PLAN_ICONS = {
 } as const;
 
 const COMPARISON = [
+  {
+    label: `Accès V2 (jusqu'au ${V2_ACCESS_UNTIL_LABEL})`,
+    legacy: "Inclus",
+    plume: "Inclus",
+    edition: "Inclus",
+  },
   { label: "Livres par mois", legacy: "2", plume: "50", edition: "Illimités" },
   { label: "Chapitres par livre", legacy: "40", plume: "40", edition: "60" },
   { label: "Mots par chapitre", legacy: "5 000", plume: "5 000", edition: "8 000" },
