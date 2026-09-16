@@ -268,13 +268,14 @@ export default function CouvertureProjetPage() {
       {!loading && project && (
         <>
           {/* éditeur immédiatement visible */}
-          {project.cover_type === 'paperback' ? (
+          {project.cover_type !== 'ebook' ? (
             <>
               <CoverWrapEditor project={project} onProjectUpdated={setProject} />
               <Collapsible defaultOpen>
                 <CollapsibleTrigger asChild>
                   <Button variant="outline" size="sm" className="gap-2">
-                    <ChevronDown className="h-4 w-4" /> Réglages KDP (pages, papier, dos)
+                    <ChevronDown className="h-4 w-4" /> Réglages KDP{' '}
+                    {project.cover_type === 'hardcover' ? '(relié : pages, dos, charnières)' : '(pages, papier, dos)'}
                   </Button>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="pt-3">
