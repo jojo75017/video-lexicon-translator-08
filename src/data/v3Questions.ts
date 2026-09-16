@@ -1,13 +1,9 @@
 import { V2_TOOLS, type V2ToolCategory } from './v2ToolsRegistry';
 import { ASSISTANT_FAQ } from './assistantKnowledge';
+import { EXTRA_CURATED } from './v3QuestionsExtra';
+import type { QuestionEntry } from './v3Questions.types';
 
-export interface QuestionEntry {
-  id: string;
-  question: string;
-  answer: string;
-  theme: string;
-  action: { label: string; route: string };
-}
+export type { QuestionEntry };
 
 const THEME_BY_CATEGORY: Record<V2ToolCategory, string> = {
   ecriture: 'Écrire mon livre',
