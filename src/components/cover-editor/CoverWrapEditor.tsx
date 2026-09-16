@@ -69,11 +69,14 @@ import {
 } from '@/lib/coverProjects';
 import { FRONT_FONTS, parseComposition, type TextAlign } from '@/lib/cover-editor/frontComposition';
 import {
-  computePaperbackGeometry,
   defaultPaperbackConfig,
   formatIn,
   parsePaperbackConfig,
 } from '@/lib/cover-editor/kdpPaperbackSpecs';
+import {
+  computeCoverGeometry,
+  defaultHardcoverConfig,
+} from '@/lib/cover-editor/kdpHardcoverSpecs';
 import {
   MIN_SPINE_FONT_PT,
   OPTIONAL_ROLES,
