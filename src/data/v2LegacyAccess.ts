@@ -46,6 +46,20 @@ export const V2_LEGACY_MODULES = [
     description:
       "Trouvez une idée, explorez les niches proposées et préparez le démarrage de votre prochain livre.",
   },
+  {
+    key: 'couverture-simple',
+    title: 'Couverture simple (comme votre V2)',
+    to: '/v3/couverture-express',
+    description:
+      "Créez la couverture de votre livre en 3 étapes, dans la qualité de votre V2. Le Cover Studio Pro premium reste réservé au forfait Édition.",
+  },
+  {
+    key: 'recherche-avancee',
+    title: 'Recherche avancée',
+    to: '/v3/recherche',
+    description:
+      "Documentez votre sujet et vérifiez vos informations avec la recherche avancée intégrée.",
+  },
 ] as const;
 
 /** Routes débloquées pour un ancien client V2 (hors forfait payant). */
@@ -55,23 +69,26 @@ export const V2_LEGACY_UNLOCKED_PATHS = new Set<string>([
   '/v3/corriger',
   '/v3/discuter-ia',
   '/v3/kit-demarrage',
+  '/v3/couverture-express',
+  '/v3/mes-couvertures',
+  '/v3/recherche',
   '/niches',
 ]);
 
-/** Quotas de la version offerte. */
+/** Quotas de la version offerte (alignés sur Plume). */
 export const V2_LEGACY_QUOTAS = {
   booksPerMonth: 2,
-  chaptersMax: 20,
-  wordsPerChapter: 3000,
+  chaptersMax: 40,
+  wordsPerChapter: 5000,
 };
 
 /** Ce qui reste réservé aux forfaits payants. */
 export const V2_LEGACY_EXCLUSIONS = [
+  'Couvertures Kindle et broché prêtes pour KDP (forfait Plume)',
+  'Cover Studio Pro premium (300 DPI, gabarits KDP)',
   'Audiolivre',
-  'Cover Studio Pro (300 DPI)',
   'Traductions 10 langues',
   'BD Studio Pro',
-  'Mode Recherche Approfondie',
   'Amazon Spy · Audit ASIN · 600 niches',
 ];
 
