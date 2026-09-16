@@ -9,6 +9,7 @@ import useV3Entitlement from '@/hooks/useV3Entitlement';
  *
  * Accès accordé si :
  *  - Admin (préparation / démonstration) ;
+ *  - Formule Édition (tous les modules professionnels sont annoncés inclus) ;
  *  - Achat du complément (module_entitlements, même environnement Stripe).
  *
  * Aucun accès gratuit par défaut : un abonné sans achat voit l'outil grisé.
@@ -22,13 +23,15 @@ export function useModuleAccess(moduleKey: string | null | undefined) {
   const [hasAccess, setHasAccess] = useState(false);
   const [reason, setReason] = useState<ModuleAccessReason>(null);
   const { isAdmin, isChecking } = useAdminAccess();
-  const { loading: entLoading } = useV3Entitlement();
+  const { loading: entLoading, hasFull } = useV3Entitlement();
 
   const check = useCallback(async () => {
     if (!moduleKey) { setHasAccess(true); setReason('plan'); setLoading(false); return; }
     if (isChecking) { setLoading(true); return; }
     if (isAdmin) { setHasAccess(true); setReason('admin'); setLoading(false); return; }
     if (entLoading) { setLoading(true); return; }
+    // Formule Édition : les modules professionnels sont inclus, sans achat séparé.
+    if (hasFull) { setHasAccess(true); setReason('plan'); setLoading(false); return; }
 
     setLoading(true);
     try {

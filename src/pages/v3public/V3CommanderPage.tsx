@@ -14,22 +14,32 @@ import { trackCaptureEvent } from "@/lib/captureTracking";
 import { useLaunchSettings } from "@/hooks/useLaunchSettings";
 import "@/styles/commander-maquette.css";
 
-/** Vidéo de présentation (réglée dans l'admin) : affichée seulement si un lien est enregistré. */
+/**
+ * Média de présentation (réglé dans l'admin) : affiché seulement si un lien est
+ * enregistré. Un fichier audio est lu dans un lecteur audio, jamais dans un
+ * lecteur vidéo (qui afficherait un cadre noir vide).
+ */
 function CommanderVideo() {
   const { settings } = useLaunchSettings();
-  const url = settings.launch_video?.url;
-  if (!settings.launch_video?.enabled || !url) return null;
+  const media = settings.launch_video;
+  const url = media?.url;
+  if (!media?.enabled || !url) return null;
+  const isAudio = media.kind === "audio" || /\.(mp3|m4a|wav|ogg)(\?|$)/i.test(url);
   return (
     <section style={{ maxWidth: 720, margin: "2rem auto", padding: "0 1rem" }}>
       <h2 style={{ textAlign: "center", fontSize: "1.25rem", fontWeight: 700, marginBottom: "0.75rem" }}>
-        Voyez comment ça fonctionne (2 minutes)
+        {isAudio ? "Écoutez comment ça fonctionne (2 minutes)" : "Voyez comment ça fonctionne (2 minutes)"}
       </h2>
-      <video
-        controls
-        preload="metadata"
-        src={url}
-        style={{ width: "100%", borderRadius: 16, boxShadow: "0 12px 32px rgba(0,0,0,0.18)" }}
-      />
+      {isAudio ? (
+        <audio controls preload="metadata" src={url} style={{ width: "100%" }} />
+      ) : (
+        <video
+          controls
+          preload="metadata"
+          src={url}
+          style={{ width: "100%", borderRadius: 16, boxShadow: "0 12px 32px rgba(0,0,0,0.18)" }}
+        />
+      )}
     </section>
   );
 }
