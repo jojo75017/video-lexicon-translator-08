@@ -21,6 +21,7 @@ export const MARKETING_EXCLUDED_PREFIXES = [
   '/v3',
   '/10-niches-offertes',
   '/methode',
+  '/avant-premiere',
 ];
 
 export const isMarketingExcluded = (pathname: string): boolean =>

@@ -83,6 +83,7 @@ const UpsellPaiementPage = lazy(() => import('./pages/UpsellPaiementPage'));
 
 const EssaiPage = lazy(() => import('./pages/launch/EssaiPage'));
 const DecouvertePage = lazy(() => import('./pages/launch/DecouvertePage'));
+const AvantPremiereV3Page = lazy(() => import('./pages/AvantPremiereV3Page'));
 const EssaiInscriptionPage = lazy(() => import('./pages/launch/EssaiInscriptionPage'));
 const EssaiGratuit7JoursPage = lazy(() => import('./pages/launch/EssaiGratuit7JoursPage'));
 const V3WaitingRoomPage = lazy(() => import('./pages/launch/V3WaitingRoomPage'));
@@ -497,6 +498,8 @@ const App = () => {
             <Route path="/essai" element={<EssaiPage />} />
             <Route path="/essai/inscription" element={<EssaiInscriptionPage />} />
             <Route path="/decouverte" element={<DecouvertePage />} />
+            {/* Avant-première V3 : visite vitrine + liste d'attente, aucun outil actif. */}
+            <Route path="/avant-premiere" element={<AvantPremiereV3Page />} />
             {/* Essai gratuit 7 jours : inscription publique + envoi Systeme.io */}
             <Route path="/essai-gratuit-7-jours" element={<EssaiGratuit7JoursPage />} />
             <Route path="/v3/attente" element={v3Standalone(<V3WaitingRoomPage />)} />
