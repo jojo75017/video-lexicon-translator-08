@@ -169,6 +169,7 @@ const V3AssistantPage = lazy(() => import('./pages/v3/V3AssistantPage'));
 const AssistantPublicPage = lazy(() => import('./pages/AssistantPublicPage'));
 const V3ComptePage = lazy(() => import('./pages/v3public/V3ComptePage'));
 const V3PourquoiPage = lazy(() => import('./pages/v3public/V3PourquoiPage'));
+const V3CalendrierPage = lazy(() => import('./pages/v3public/V3CalendrierPage'));
 const V3RealiteKdpPage = lazy(() => import('./pages/v3public/V3RealiteKdpPage'));
 const V3CommunautePage = lazy(() => import('./pages/v3public/V3CommunautePage'));
 const V3CommunautePostPage = lazy(() => import('./pages/v3public/V3CommunautePostPage'));
@@ -721,6 +722,7 @@ const App = () => {
               <Route path="auth" element={<V3AuthPage />} />
               <Route path="bienvenue" element={<V3BienvenuePage />} />
               <Route path="pourquoi" element={<V3PourquoiPage />} />
+              <Route path="calendrier" element={<V3CalendrierPage />} />
               <Route path="realite-kdp" element={<V3RealiteKdpPage />} />
               <Route path="contact" element={<ContactSupportPage subscriberEmail={subscriberEmail || ''} />} />
               <Route path="offre-couverture-v4" element={<V3CoverOfferPage />} />

@@ -128,6 +128,7 @@ export const V3_HEADER_MENU: MenuCategory[] = [
       { label: 'Édition — 47 €/mois ⭐', to: '/v3/outils?plan=edition', badge: 'Recommandé · illimité', desc: '👑 Version pro : Recherche Approfondie, Sommaire IA avancé, Cover Studio Pro, BD Studio Pro' },
       { label: 'Ancien client V2', to: '/v3/migration', badge: '-20 % à vie', desc: 'Votre V2 reste à vie + 3 nouveautés V3 offertes, et -20 % à vie sur Plume ou Édition' },
       { label: 'Mensuel ou annuel (2 mois offerts)', to: '/v3/forfaits', desc: 'Plume 270 €/an · Édition 470 €/an · Studio Pro 970 €/an' },
+      { label: 'Calendrier des ouvertures', to: '/v3/calendrier', badge: 'Dates exactes', desc: 'Ce qui est déjà libre et la date d’ouverture de chaque module' },
     ],
   },
 
