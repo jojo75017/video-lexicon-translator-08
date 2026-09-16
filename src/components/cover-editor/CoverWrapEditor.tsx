@@ -134,7 +134,10 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
         : defaultPaperbackConfig(project.page_count ?? 120),
     [project.kdp_config, project.page_count],
   );
-  const result = useMemo(() => computePaperbackGeometry(config), [config]);
+  const result = useMemo(
+    () => computeCoverGeometry(config, project.cover_type),
+    [config, project.cover_type],
+  );
   const geometry = result.geometry;
 
   /* ------------------ composition version 2 -------------------------------- */
