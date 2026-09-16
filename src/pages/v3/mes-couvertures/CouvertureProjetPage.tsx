@@ -5,7 +5,7 @@
  */
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, ChevronDown, ImageIcon, Loader2 } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Download, ImageIcon, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import CoverFrontEditor from '@/components/cover-editor/CoverFrontEditor';
@@ -22,11 +22,20 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   getCoverProject,
   getSignedCoverUrl,
+  updateCoverProject,
   type CoverProject,
   type CoverType,
 } from '@/lib/coverProjects';
+import { downloadIllustration } from '@/lib/cover-editor/illustrationDownload';
 
 const TYPE_LABEL: Record<CoverType, string> = {
   ebook: 'eBook Kindle',
