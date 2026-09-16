@@ -149,7 +149,41 @@ const FROM_ASSISTANT: QuestionEntry[] = ASSISTANT_FAQ.map((f) => ({
   action: f.actions[0] ?? { label: 'Ouvrir l’assistant', route: '/v3/assistant' },
 }));
 
-/** Deux questions par outil du registre : « à quoi ça sert » et « où le trouver ». */
+/** Gain de temps concret, par famille d'outils. */
+const GAIN_BY_CATEGORY: Record<V2ToolCategory, string> = {
+  ecriture:
+    'Dès que vous devez produire du texte long : il évite la page blanche et vous rend un contenu structuré, que vous relisez au lieu de l’écrire.',
+  visuel:
+    'Dès que vous devez présenter votre livre : vous obtenez un visuel propre sans passer par un logiciel de retouche.',
+  audio:
+    'Dès que vous voulez une version écoutable de votre travail, sans studio ni micro.',
+  kdp: 'Au moment de la mise en vente : il vous évite les allers-retours et les refus de publication.',
+  analyse:
+    'Avant d’écrire : vous vérifiez que le sujet intéresse des lecteurs avant d’y passer des heures.',
+  marketing:
+    'Après la publication : vous avez les textes de promotion prêts, au lieu de repartir d’une page vide.',
+  business:
+    'Quand vous voulez piloter vos revenus : les chiffres et les priorités sont réunis au même endroit.',
+  espace:
+    'Au quotidien : vos informations, vos projets et vos réglages restent centralisés.',
+  formation:
+    'Quand vous bloquez sur une étape : la marche à suivre est expliquée dans l’ordre.',
+};
+
+/** Ce qu'il faut préparer avant d'ouvrir l'outil, par famille. */
+const PREPARE_BY_CATEGORY: Record<V2ToolCategory, string> = {
+  ecriture: 'Votre sujet, le public visé et, si vous l’avez déjà, votre sommaire.',
+  visuel: 'Votre titre, votre nom d’auteur et deux lignes décrivant l’ambiance voulue.',
+  audio: 'Votre manuscrit terminé, ou au moins le chapitre à faire lire.',
+  kdp: 'Titre, description, prix envisagé et nombre de pages de votre livre.',
+  analyse: 'Une idée de thème ou de rayon, même approximative.',
+  marketing: 'Le titre du livre, sa promesse principale et la date de mise en vente.',
+  business: 'Vos ventes ou vos objectifs du mois, pour comparer.',
+  espace: 'Rien de particulier : vos informations de compte suffisent.',
+  formation: 'Un moment calme, et la question précise qui vous bloque.',
+};
+
+/** Cinq questions par outil du registre : rôle, accès, prise en main, utilité, préparation. */
 const FROM_TOOLS: QuestionEntry[] = V2_TOOLS.flatMap((tool) => {
   const theme = THEME_BY_CATEGORY[tool.category] ?? 'Outils';
   const action = { label: `Ouvrir ${tool.label}`, route: tool.route };
@@ -168,12 +202,38 @@ const FROM_TOOLS: QuestionEntry[] = V2_TOOLS.flatMap((tool) => {
       theme,
       action,
     },
+    {
+      id: `tool-${tool.id}-usage`,
+      question: `Comment utiliser « ${tool.label} » pas à pas ?`,
+      answer: `Ouvrez l’outil, remplissez les champs demandés, lancez, puis relisez et ajustez le résultat avant de le télécharger ou de l’enregistrer. Rien n’est publié à votre place.`,
+      theme,
+      action,
+    },
+    {
+      id: `tool-${tool.id}-gain`,
+      question: `Dans quel cas « ${tool.label} » me fait-il gagner du temps ?`,
+      answer: GAIN_BY_CATEGORY[tool.category] ?? 'Dès que la tâche vous prend plus de temps à la main qu’à la relecture.',
+      theme,
+      action,
+    },
+    {
+      id: `tool-${tool.id}-prepa`,
+      question: `Que faut-il préparer avant d’ouvrir « ${tool.label} » ?`,
+      answer: PREPARE_BY_CATEGORY[tool.category] ?? 'Votre sujet et votre titre suffisent pour démarrer.',
+      theme,
+      action,
+    },
   ];
 });
 
 const seen = new Set<string>();
 
-export const V3_QUESTIONS: QuestionEntry[] = [...CURATED, ...FROM_ASSISTANT, ...FROM_TOOLS].filter(
+export const V3_QUESTIONS: QuestionEntry[] = [
+  ...CURATED,
+  ...EXTRA_CURATED,
+  ...FROM_ASSISTANT,
+  ...FROM_TOOLS,
+].filter(
   (q) => {
     const key = q.question.toLowerCase().trim();
     if (seen.has(key)) return false;
