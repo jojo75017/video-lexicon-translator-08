@@ -695,8 +695,23 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
     setAllContext(prev => ({ ...prev, P4: { ...(prev.P4 || {}), chapitres: merged } }));
     saveStepResult('P4', { chapitres: merged, nombreChapitres: merged.length }, displayContent);
     publishWrittenChapters(merged, { total: merged.length, activeIndex: merged.length });
+
+    // Le livre corrigé remplace le brouillon côté page (onglet Rédaction, exports, KDP).
+    const previous = lastBookDataRef.current;
+    if (previous) {
+      const nextBookData = {
+        ...previous,
+        chapters: normalizeManuscript(merged, {
+          expectedCount: merged.length,
+          outline: Array.isArray(allContext.P3?.chapitres) ? allContext.P3.chapitres : [],
+          bookTitle: title,
+        }),
+      };
+      lastBookDataRef.current = nextBookData;
+      onComplete(nextBookData);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stepResults.P4, allContext.P4, saveStepResult]);
+  }, [stepResults.P4, allContext.P4, allContext.P3, title, saveStepResult, onComplete]);
 
   const p3Structure = normalizeP3Structure((allContext.P3 || stepResults.P3?.result || {})?.chapitres || []);
   const persistedP3Structure = normalizeP3Structure((savedProgressSnapshot?.allContext?.P3 || savedProgressSnapshot?.stepResults?.P3?.result || {})?.chapitres || []);
