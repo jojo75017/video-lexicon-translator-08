@@ -15,7 +15,7 @@
  * Aucun autre moteur, aucune clé locale, aucune navigation vers un ancien module.
  */
 import { useCallback, useEffect, useState } from 'react';
-import { BookOpen, CheckCircle2, History, Loader2, Sparkles, Wand2 } from 'lucide-react';
+import { BookOpen, CheckCircle2, Download, History, Loader2, Sparkles, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { supabase } from '@/integrations/supabase/client';
@@ -43,6 +43,7 @@ import {
 } from '@/components/ui/select';
 import useCoverProAccess from '@/hooks/useCoverProAccess';
 import { getSignedCoverUrl, listCoverIllustrationHistory } from '@/lib/coverProjects';
+import { downloadIllustration } from '@/lib/cover-editor/illustrationDownload';
 import { cn } from '@/lib/utils';
 
 /** Directions artistiques disponibles (doivent rester alignées sur cover-pro-generate). */
@@ -277,6 +278,16 @@ export default function IllustrationGeneratorPanel({
   const chooseProposal = async (proposal: Proposal) => {
     await onGenerated(proposal.path);
     toast.success('Illustration appliquée à la couverture.');
+  };
+
+  /** Téléchargement local de l'image seule : aucun crédit, aucune copie publique. */
+  const saveImageToLibrary = async (proposal: Proposal) => {
+    try {
+      const fileName = await downloadIllustration(proposal.path);
+      toast.success(`Image téléchargée : ${fileName}`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Téléchargement impossible.');
+    }
   };
 
   const noFunding = !loading && credits.remaining <= 0 && !key;
