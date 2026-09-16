@@ -10,6 +10,9 @@
 /** Date d'ouverture générale de la V3 pour les abonnés. */
 export const V3_OPENING_ISO = '2026-10-01T08:00:00+02:00';
 
+/** Fermeture annoncée de la V2, pour tout le monde, en attendant la V4. */
+export { V2_ACCESS_UNTIL_ISO, V2_ACCESS_UNTIL_LABEL, V2_ACCESS_NOTE } from '@/data/v3Pricing';
+
 export type V3CalendarStatus = 'libre' | 'ouverture' | 'complement';
 
 export interface V3CalendarEntry {

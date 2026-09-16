@@ -1,6 +1,6 @@
 import { ArrowRight, Check, Crown, Feather, Gift } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { V3_PLANS, formatPrice } from '@/data/v3Pricing';
+import { V3_PLANS, formatPrice, V2_ACCESS_NOTE } from '@/data/v3Pricing';
 import { V2_LEGACY_MODULES } from '@/data/v2LegacyAccess';
 import { Button } from '@/components/ui/button';
 
@@ -9,9 +9,15 @@ const cards = [
     key: 'legacy',
     title: 'Déjà abonné',
     price: 'Votre V2 reste acquise',
-    note: `${V2_LEGACY_MODULES.length} modules V3 inclus`,
-    description: 'Une entrée essentielle dans la V3, sans nouvel achat obligatoire.',
-    items: ['Génie et sommaire', 'Correcteur et exports', 'Discussion IA et idées'],
+    note: `${V2_LEGACY_MODULES.length} modules V3 inclus, sans nouvel achat`,
+    description: 'Vous ne perdez rien : vous gagnez la V3 essentielle, offerte à vie.',
+    items: [
+      '40 chapitres · 5 000 mots par chapitre',
+      'Génie, sommaire IA et rédaction chapitre par chapitre',
+      'Correcteur du livre et exports PDF, DOCX, EPUB',
+      'Discussion libre avec l’IA (votre clé)',
+      'Couverture simple (qualité V2) et recherche avancée',
+    ],
     to: '/v3/migration',
     icon: Gift,
   },
@@ -19,9 +25,15 @@ const cards = [
     key: 'plume',
     title: 'Plume',
     price: `${formatPrice(V3_PLANS[0].monthlyPrice)} / mois`,
-    note: `${V3_PLANS[0].booksPerMonth} livres par mois`,
+    note: `${V3_PLANS[0].booksPerMonth} livres par mois · V2 incluse`,
     description: V3_PLANS[0].idealFor,
-    items: ['40 chapitres · 5 000 mots', 'Kindle, KDP et audiolivre', '10 langues incluses'],
+    items: [
+      '40 chapitres · 5 000 mots · 8 personnages',
+      'Couverture Kindle et broché KDP',
+      'Audiolivre standard et 10 langues',
+      'Import de manuscrit et correction pro',
+      'Mockups, fiche produit KDP et calendrier',
+    ],
     to: '/v3/forfaits',
     icon: Feather,
   },
@@ -29,9 +41,15 @@ const cards = [
     key: 'edition',
     title: 'Édition',
     price: `${formatPrice(V3_PLANS[1].monthlyPrice)} / mois`,
-    note: 'Livres illimités',
+    note: 'Livres illimités · V2 incluse',
     description: V3_PLANS[1].idealFor,
-    items: ['Cover Studio Pro', 'BD Studio Pro', 'Recherche et KDP avancés'],
+    items: [
+      '60 chapitres · 8 000 mots · personnages illimités',
+      'Cover Studio Pro : Kindle, broché et relié',
+      'BD Studio Pro et Studio Jeunesse',
+      'Traductions, audiolivre premium et maisons d’édition inclus',
+      'Amazon Spy, KDP avancé et priorité aux nouveautés V4',
+    ],
     to: '/v3/forfaits',
     icon: Crown,
   },
