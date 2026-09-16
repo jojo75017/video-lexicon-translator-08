@@ -54,7 +54,7 @@ export function useModuleAccess(moduleKey: string | null | undefined) {
     } finally {
       setLoading(false);
     }
-  }, [moduleKey, isAdmin, isChecking, entLoading]);
+  }, [moduleKey, isAdmin, isChecking, entLoading, hasFull]);
 
   useEffect(() => { void check(); }, [check]);
 
