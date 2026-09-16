@@ -21,6 +21,13 @@ import {
 } from '@/components/ui/select';
 import { updateCoverProject, type CoverProject } from '@/lib/coverProjects';
 import {
+  HARDCOVER_MAX_PAGES,
+  HARDCOVER_MIN_PAGES,
+  HARDCOVER_TRIM_SIZES,
+  computeCoverGeometry,
+  defaultHardcoverConfig,
+} from '@/lib/cover-editor/kdpHardcoverSpecs';
+import {
   FINISH_LABEL,
   INK_LABEL,
   KDP_CUSTOM_TRIM_LIMITS,
@@ -52,16 +59,20 @@ interface Props {
 }
 
 export default function KdpPaperbackConfigPanel({ project, onProjectUpdated }: Props) {
+  const isHardcover = project.cover_type === 'hardcover';
   const [config, setConfig] = useState<KdpPaperbackConfig>(() =>
     project.kdp_config
-      ? parsePaperbackConfig(project.kdp_config, project.page_count ?? 120)
-      : defaultPaperbackConfig(project.page_count ?? 120),
+      ? parsePaperbackConfig(project.kdp_config, project.page_count ?? (isHardcover ? 150 : 120))
+      : isHardcover
+        ? defaultHardcoverConfig(project.page_count ?? 150)
+        : defaultPaperbackConfig(project.page_count ?? 120),
   );
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const timer = useRef<number | null>(null);
   const firstRender = useRef(true);
 
-  const result = useMemo(() => computePaperbackGeometry(config), [config]);
+  const trimOptions = isHardcover ? HARDCOVER_TRIM_SIZES : KDP_TRIM_SIZES;
+  const result = useMemo(() => computeCoverGeometry(config, project.cover_type), [config, project.cover_type]);
   const geometry = result.geometry;
 
   const patch = useCallback((next: Partial<KdpPaperbackConfig>) => {
