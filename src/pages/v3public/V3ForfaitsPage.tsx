@@ -128,7 +128,7 @@ export default function V3ForfaitsPage() {
                 </ul>
 
                 <div className="mb-4 rounded-md p-3 text-xs" style={{ background: "var(--v3-cream)", color: "var(--v3-muted)" }}><strong style={{ color: "var(--v3-ink)" }}>Idéal pour :</strong> {plan.idealFor}</div>
-                <Button onClick={() => setCheckout({ priceId: getV3PriceId(plan.id, interval, hasV2), planName: `${plan.name}${hasV2 ? " — tarif fidélité" : ""}` })}>Choisir {plan.name} · {formatPrice(price)}</Button>
+                <Button onClick={() => setCheckout({ priceId: getV3PriceId(plan.id, interval, hasV2), planName: `${plan.name}${hasV2 ? " — tarif fidélité" : ""}` })}>Choisir {plan.name} · {formatPrice(publicPrice)}{hasV2 ? ` (votre prix : ${formatPrice(price)})` : ""}</Button>
                 <div className="mt-2">
                   <PayPalSubscribeButton
                     planId={plan.id}
