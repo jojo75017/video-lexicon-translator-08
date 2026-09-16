@@ -661,6 +661,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
       .filter(Boolean);
   };
 
+  // Dernier livre transmis à la page : sert à renvoyer la version corrigée par Lior.
+  const lastBookDataRef = useRef<any>(null);
+
   // Agent 16 (Lior) : chapitres rédigés à relire, puis application au livre.
   const finalProofreadChapters: Array<{ titre?: string; contenu?: string }> = React.useMemo(() => {
     const raw = (stepResults.P4?.result?.chapitres || allContext.P4?.chapitres || []) as any[];
