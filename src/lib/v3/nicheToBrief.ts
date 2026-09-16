@@ -105,7 +105,7 @@ export function nicheToDraft(niche: Niche600, authorName: string): NicheStartDra
     title: fiction ? fictionTitle(niche) : nonFictionTitle(niche),
     subtitle: fiction ? fictionSubtitle(niche) : nonFictionSubtitle(niche),
     author: authorName || 'Auteur Ebookstudio',
-    category: CATEGORY_MAP[niche.category] || 'Guide pratique',
+    category: CATEGORY_MAP[niche.category] || 'Autre',
     synopsis: fiction
       ? fictionSynopsis(niche, format.chapters)
       : nonFictionSynopsis(niche, format.chapters),
