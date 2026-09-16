@@ -86,6 +86,7 @@ export default function CouvertureProjetPage() {
   const [thumb, setThumb] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     let active = true;
