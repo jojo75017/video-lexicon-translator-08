@@ -30,9 +30,6 @@ export default function CoverQualityPanel({
     imageSize && Math.min(imageSize.width, imageSize.height) < minPixels
       ? `L’illustration est un peu petite pour ce support (${imageSize.width} × ${imageSize.height} px). Régénérez-la pour une impression nette.`
       : null,
-    isPrint
-      ? 'En broché et en relié, gardez le titre à distance des bords : la découpe et le pli mangent quelques millimètres.'
-      : null,
     !hasIllustration ? 'Ajoutez une illustration avant le téléchargement.' : null,
     !title?.text.trim() ? 'Le titre du livre est manquant.' : null,
     title && title.fontSize < composition.canvas.width * 0.055 ? 'Le titre risque d’être trop petit en miniature Amazon.' : null,
