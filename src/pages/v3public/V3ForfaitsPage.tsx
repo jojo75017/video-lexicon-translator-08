@@ -103,10 +103,14 @@ export default function V3ForfaitsPage() {
 
                 <div className="my-5">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold" style={{ color: "var(--v3-emerald)" }}>{formatPrice(price)}</span>
+                    <span className="text-4xl font-bold" style={{ color: "var(--v3-emerald)" }}>{formatPrice(publicPrice)}</span>
                     <span className="text-sm" style={{ color: "var(--v3-muted)" }}>/{interval === "month" ? "mois" : "an"}</span>
                   </div>
-                  {hasV2 && <p className="mt-1 text-xs font-semibold" style={{ color: "var(--v3-gold-600)" }}>Remise fidélité appliquée · prix public <span className="line-through">{formatPrice(publicPrice)}</span></p>}
+                  {hasV2 && (
+                    <p className="mt-1 rounded-md px-2 py-1 text-xs font-semibold" style={{ background: "var(--v3-cream)", color: "var(--v3-gold-600)" }}>
+                      Votre tarif fidélité ancien client : <strong>{formatPrice(price)}</strong> (-20 % à vie, appliqué au paiement)
+                    </p>
+                  )}
                   {!hasV2 && interval === "year" && <p className="mt-1 text-xs" style={{ color: "var(--v3-gold-600)" }}>Économisez {savings}%</p>}
                 </div>
 
