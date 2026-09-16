@@ -118,6 +118,35 @@ export default function CouvertureProjetPage() {
     };
   }, [id]);
 
+  /** Téléchargement local de l'illustration seule (aucun crédit, aucune copie publique). */
+  const downloadImage = async () => {
+    if (!project?.illustration_path) return;
+    setDownloading(true);
+    try {
+      const fileName = await downloadIllustration(
+        project.illustration_path,
+        project.book_title || project.project_name,
+      );
+      toast.success(`Image téléchargée : ${fileName}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Téléchargement impossible.');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  /** Changement de support : Kindle, broché ou relié. */
+  const changeCoverType = async (next: CoverType) => {
+    if (!project || next === project.cover_type) return;
+    try {
+      const updated = await updateCoverProject(project.id, { cover_type: next });
+      setProject(updated);
+      toast.success(`Support changé : ${TYPE_LABEL[next]}.`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Changement impossible.');
+    }
+  };
+
   const goToStep = (key: StepKey) => {
     const targets: Record<StepKey, string[]> = {
       illustration: ['#etape-illustration'],
@@ -156,12 +185,33 @@ export default function CouvertureProjetPage() {
           />
           </span>
         )}
+        {project?.illustration_path && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-2 border-[#f47920] text-[#f47920] hover:bg-[#f47920] hover:text-white"
+            disabled={downloading}
+            onClick={() => void downloadImage()}
+          >
+            {downloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+            Télécharger l’image
+          </Button>
+        )}
         {project && (
           <>
             <span className="ml-1 truncate text-sm font-semibold text-foreground">
               {project.project_name}
             </span>
-            <Badge variant="outline">{TYPE_LABEL[project.cover_type] ?? project.cover_type}</Badge>
+            <Select value={project.cover_type} onValueChange={(v) => void changeCoverType(v as CoverType)}>
+              <SelectTrigger className="h-8 w-[170px] text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ebook">eBook Kindle</SelectItem>
+                <SelectItem value="paperback">Broché (dos + 4ᵉ)</SelectItem>
+                <SelectItem value="hardcover">Relié (dos + 4ᵉ)</SelectItem>
+              </SelectContent>
+            </Select>
           </>
         )}
       </div>
