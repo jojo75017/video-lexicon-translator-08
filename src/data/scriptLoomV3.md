@@ -321,7 +321,7 @@ L'onglet Upsells liste les packs et compléments avec leur prix à l'unité, si 
 
 *À l'écran : `/v3/migration`.*
 
-Si vous êtes déjà client de la version 2 : votre accès reste acquis à vie, trois nouveautés V3 vous sont offertes, et vous avez moins vingt pour cent à vie sur Plume ou Édition.
+Si vous êtes déjà client de la version 2 : votre accès reste acquis à vie, cinq modules V3 vous sont offerts, et vous avez moins vingt pour cent à vie sur Plume ou Édition.
 
 ---
 

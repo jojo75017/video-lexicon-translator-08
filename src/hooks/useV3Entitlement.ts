@@ -6,8 +6,8 @@ import useIsAdmin from './useIsAdmin';
 /**
  * Droits d'accès V3 d'après les commandes réellement payées (v3_installment_orders).
  *
- * - `hasBase`  : a réglé l'offre Base 197€ (plan `base_*`, statut actif/terminé/payé).
- * - `hasFull`  : a réglé le Pack Tout Complet 547€ (plan `full_*`, statut actif/terminé/payé).
+ * - `hasBase`  : possède Plume, Édition ou un ancien pack Base/Full.
+ * - `hasFull`  : possède Édition ou un ancien pack Full.
  * - L'admin a accès à tout (préparation / démonstration).
  *
  * Tant que rien n'est réglé, le parcours Pro 547€ reste verrouillé : impossible
@@ -59,9 +59,25 @@ export function useV3Entitlement() {
         const env = getStripeEnvironment();
         const rows = (data ?? []).filter((r: any) => r.environment === env);
         const paid = rows.filter((r: any) => PAID_STATUSES.has((r.status ?? '').toLowerCase()));
-        const full = paid.some((r: any) => (r.plan ?? '').startsWith('full'));
+        const full = paid.some((r: any) => {
+          const plan = String(r.plan ?? '');
+          return plan.startsWith('full') || plan.startsWith('v3_edition_');
+        });
         setHasFull(full);
-        setHasBase(full || paid.some((r: any) => (r.plan ?? '').startsWith('base')));
+        let base = full || paid.some((r: any) => {
+          const plan = String(r.plan ?? '');
+          return plan.startsWith('base') || plan.startsWith('v3_plume_');
+        });
+        const { data: paypalRows } = await supabase
+          .from('paypal_subscriptions')
+          .select('plan_id, status')
+          .ilike('email', email)
+          .eq('status', 'active');
+        const paypalEdition = (paypalRows ?? []).some((r: any) => r.plan_id === 'edition');
+        const paypalPlume = (paypalRows ?? []).some((r: any) => r.plan_id === 'plume');
+        if (paypalEdition) setHasFull(true);
+        base = base || paypalEdition || paypalPlume;
+        setHasBase(base);
         // Ancien client V2 : soit un plan `v2_*` réglé, soit un abonné V2 déjà
         // présent en base (offre à vie ou abonnement actif) — reconnu sans achat.
         let legacyV2 = paid.some((r: any) => (r.plan ?? '').startsWith('v2'));
@@ -72,7 +88,9 @@ export function useV3Entitlement() {
             .ilike('email', email)
             .maybeSingle();
           const status = (sub?.status ?? '').toLowerCase();
-          legacyV2 = status === 'active' || status === 'lifetime' || (sub?.plan_tier ?? '') === 'lifetime';
+          const tier = String(sub?.plan_tier ?? '').toLowerCase();
+          legacyV2 = tier !== 'plume' && tier !== 'edition' &&
+            (status === 'active' || status === 'lifetime' || tier === 'lifetime');
         }
         if (cancelled) return;
         setHasV2(legacyV2);

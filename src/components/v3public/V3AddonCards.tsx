@@ -28,8 +28,7 @@ export default function V3AddonCards({ title = 'Compléments & options', compact
   const { hasBase, hasFull } = useV3Entitlement();
   const [checkout, setCheckout] = useState<{ priceId: string; planName: string } | null>(null);
 
-  // hasFull = formule tout inclus : aucun complément à acheter.
-  const isIncluded = (addon: V3Addon) => hasFull || (hasBase && addon.inEdition);
+  const isIncluded = (addon: V3Addon) => addon.inEdition && (hasFull || hasBase);
 
   const open = (addon: V3Addon) => {
     if (isIncluded(addon)) {
@@ -55,13 +54,13 @@ export default function V3AddonCards({ title = 'Compléments & options', compact
               {title}
             </h2>
           </div>
-          {!hasFull && (
+          {(!hasFull || V3_ADDON_LIST.some((addon) => !addon.inEdition)) && (
             <Link
               to="/v3/forfaits"
               className="v3-btn v3-btn-outline text-[12.5px]"
-              title="Tout est inclus dans le forfait Édition"
+              title="Comparer les forfaits et les compléments"
             >
-              <Gem className="h-4 w-4" /> Tout inclus dès Édition
+              <Gem className="h-4 w-4" /> Comparer les forfaits
             </Link>
           )}
         </div>
@@ -73,9 +72,8 @@ export default function V3AddonCards({ title = 'Compléments & options', compact
           style={{ background: 'var(--v3-gold-soft)', border: '1px solid var(--v3-line)' }}
         >
           <p className="text-sm" style={{ color: 'var(--v3-ink)' }}>
-            <strong>Valeur totale des compléments : {formatPrice(V3_ADDONS_TOTAL_VALUE)}.</strong>{' '}
-            Le forfait Édition (47 €/mois) les inclut tous — vous n'avez alors plus rien à acheter
-            à l'unité.
+            <strong>Compléments premium disponibles à la carte : {formatPrice(V3_ADDONS_TOTAL_VALUE)} au total.</strong>{' '}
+            Ils restent séparés des forfaits afin que vous ne payiez que l'accompagnement renforcé dont vous avez besoin.
           </p>
         </div>
       )}

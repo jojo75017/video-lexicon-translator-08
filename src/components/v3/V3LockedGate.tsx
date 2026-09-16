@@ -43,7 +43,7 @@ export function V3LockedGate({ children }: { children: ReactNode }) {
   // Acheteurs V3 : accès complet, avant et après l'ouverture.
   if (hasBase || hasFull) return <>{children}</>;
   // Ancien client V2 :
-  //  — les 3 modules offerts (Génie, Correcteur, Export) sont à vie ;
+  //  — les 5 modules offerts sont à vie ;
   //  — après l'ouverture (1er octobre), l'abonné entre dans toute la V3 ;
   //  — avant l'ouverture, on affiche le verrou « bientôt disponible ».
   if (hasV2 && isLegacyUnlockedPath(location.pathname)) return <>{children}</>;

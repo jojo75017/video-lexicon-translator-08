@@ -106,10 +106,10 @@ Pas d'abonnement, pas de mensualité, toutes les mises à jour incluses.
 À partir du 1er octobre, EbookStudio passe en abonnement, avec deux forfaits seulement :
 
 PLUME — 27 € par mois (ou 270 € par an, deux mois offerts).
-30 livres par mois, 22 agents IA, tous les onglets, Sommaire IA guidé, 10 langues incluses, audiolivre inclus.
+50 livres par mois, 22 agents IA, tous les onglets, Sommaire IA guidé, 10 langues incluses, audiolivre inclus.
 
 ÉDITION — 47 € par mois (ou 470 € par an, deux mois offerts). Notre forfait le plus recommandé.
-Livres illimités, 30 agents IA, Recherche Approfondie, Sommaire IA avancé, séries multi-tomes, Cover Studio Pro, BD Studio Pro, et tous les compléments inclus — plus rien à acheter.
+Livres illimités, 30 agents IA, Recherche Approfondie, Sommaire IA avancé, séries multi-tomes, Cover Studio Pro, BD Studio Pro et outils KDP avancés. Les gros compléments premium restent disponibles à la carte.
 
 Ancien client de la V2 ? Vous gardez votre V2 à vie et vous obtenez -20 % à vie sur Plume ou Édition.
 

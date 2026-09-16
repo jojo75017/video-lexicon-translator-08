@@ -56,13 +56,15 @@ export function PayPalSubscribeButton({ planId, interval, planName, amount, acce
 
   return (
     <>
-      <button
+      <Button
+        type="button"
+        variant="outline"
         onClick={() => setOpen(true)}
-        className="block w-full text-center py-2.5 rounded-lg font-semibold text-sm border-2 transition hover:opacity-90"
-        style={{ borderColor: accent, color: accent, background: "#fff" }}
+        className="w-full"
+        style={{ borderColor: accent, color: accent }}
       >
         Payer avec PayPal
-      </button>
+      </Button>
 
       <Dialog open={open} onOpenChange={(o) => !loading && setOpen(o)}>
         <DialogContent className="max-w-md">
