@@ -9,7 +9,7 @@
 /** Remise permanente réservée aux acheteurs V2. */
 export { V2_LEGACY_DISCOUNT, legacyPrice } from '@/data/v3Pricing';
 
-/** Les 5 nouveautés V3 offertes à vie aux acheteurs V2. */
+/** Les nouveautés V3 offertes à vie aux acheteurs V2. */
 export const V2_LEGACY_MODULES = [
   {
     key: 'genie',
