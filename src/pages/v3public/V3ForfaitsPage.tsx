@@ -75,6 +75,9 @@ export default function V3ForfaitsPage() {
               {V2_LEGACY_MODULES.map((module) => <li key={module.key} className="flex gap-2 text-sm"><Check className="mt-0.5 h-4 w-4 shrink-0" style={{ color: "var(--v3-emerald)" }} />{module.title}</li>)}
               <li className="flex gap-2 text-sm"><Check className="mt-0.5 h-4 w-4 shrink-0" style={{ color: "var(--v3-emerald)" }} />{V2_LEGACY_QUOTAS.booksPerMonth} livres/mois · {V2_LEGACY_QUOTAS.chaptersMax} chapitres</li>
             </ul>
+            <p className="mt-3 rounded-md px-3 py-2 text-xs font-semibold" style={{ background: "var(--v3-cream)", color: "var(--v3-emerald)" }}>
+              Même confort d'écriture que Plume — sans couverture Kindle/broché ni audiolivre (disponibles en option).
+            </p>
             <Button asChild variant="outline" className="mt-6"><Link to={hasV2 ? "/v3/migration" : "/v3/auth"}>{hasV2 ? "Voir mes avantages" : "Me connecter"}</Link></Button>
           </article>
 
