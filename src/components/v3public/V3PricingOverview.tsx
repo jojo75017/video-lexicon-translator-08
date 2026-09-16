@@ -71,6 +71,12 @@ export default function V3PricingOverview() {
           </Button>
         </div>
 
+        <div className="mt-3">
+          <p className="rounded-md px-3 py-2 text-xs font-semibold" style={{ background: 'var(--v3-gold-soft)', color: 'var(--v3-gold-600)' }}>
+            {V2_ACCESS_NOTE} Dans les trois offres, vous gardez votre ancien espace en plus de la V3.
+          </p>
+        </div>
+
         <div className="mt-5 grid gap-3 md:grid-cols-3">
           {cards.map(({ icon: Icon, ...card }) => (
             <article key={card.key} className="flex flex-col rounded-lg bg-background p-5" style={{ border: card.key === 'plume' ? '2px solid var(--v3-gold)' : '1px solid var(--v3-line)' }}>
