@@ -178,6 +178,14 @@ export default function Niches600Page() {
                 <span>Prix exemple</span>
                 <strong className="text-[#232F3E]">{n.exemplePrix.toFixed(2)} €</strong>
               </div>
+
+              <Button
+                onClick={() => setStartNiche(n)}
+                className="mt-3 w-full bg-[#FF9E2D] hover:bg-[#f08d16] text-[#232F3E] font-bold"
+                size="sm"
+              >
+                <Sparkles className="w-4 h-4 mr-2" /> Commencer mon livre
+              </Button>
             </div>
           ))}
         </div>
