@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import {
   Sparkles, BookOpen, Library, ArrowRight,
-  Wand2, Feather, Rocket, Palette, ListTree, PenLine,
+  Wand2, Feather, Rocket, Palette, ListTree, PenLine, HelpCircle,
 } from 'lucide-react';
 
 import V3BriefRecap from '@/components/v3public/V3BriefRecap';
@@ -67,6 +67,18 @@ export default function V3HomePage() {
           Vous ne savez pas par où commencer ? Cliquez sur un des encarts ci-dessous et vous serez redirigé vers vos besoins ou infos.
         </p>
         <V3StartIdeaCTA variant="discreet" />
+        {/* Lien vers la foire aux questions — 539 réponses qui ouvrent le bon outil */}
+        <div className="mt-4 flex justify-center">
+          <Link
+            to="/v3/fonctionnalites/questions"
+            className="group inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition-all hover:-translate-y-0.5 hover:shadow-sm"
+            style={{ borderColor: 'var(--v3-gold-600)', color: 'var(--v3-emerald)', background: 'var(--v3-gold-soft)' }}
+          >
+            <HelpCircle className="h-4 w-4" style={{ color: 'var(--v3-gold-600)' }} />
+            Une question sur la création, la couverture, le KDP ou les forfaits&nbsp;? Voir les 539 questions-réponses
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </div>
       </div>
 
       {/* 3. PROMESSE PRINCIPALE */}
