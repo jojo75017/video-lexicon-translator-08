@@ -48,6 +48,12 @@ export default function CoverQualityPanel({
           <p className="text-xs text-muted-foreground">Titre, auteur, illustration et marges principales sont prêts pour l’export.</p>
         )}
         <p className="text-xs text-muted-foreground">Regardez aussi la couverture en petite taille : le sujet et le titre doivent rester immédiatement reconnaissables.</p>
+        {isPrint && (
+          <p className="text-xs text-muted-foreground">
+            Support imprimé : gardez le titre à distance des bords, la découpe et le pli mangent
+            quelques millimètres.
+          </p>
+        )}
       </CardContent>
     </Card>
   );
