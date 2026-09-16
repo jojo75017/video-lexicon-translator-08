@@ -182,7 +182,7 @@ export const V3_ADDON_LIST: V3Addon[] = [
     description: "Voix premium, chapitrage, master audio prêt pour la distribution.",
     price: 27,
     to: "/v3/outils/audiobook",
-    inEdition: false,
+    inEdition: true,
   },
   {
     key: "audio_single",
