@@ -398,7 +398,7 @@ async function handleV3InvoicePaid(invoice: any, env: StripeEnv) {
   if (String(order.plan ?? "").startsWith("v3_plume_") || String(order.plan ?? "").startsWith("v3_edition_")) {
     await supabase.from("v3_installment_orders").update({
       status: "active",
-      installments_paid: (order.installments_paid as number) + 1,
+      installments_paid: 1,
       grace_until: null,
     }).eq("id", order.id);
     return;
