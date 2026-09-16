@@ -183,7 +183,7 @@ export const V3_ADDON_LIST: V3Addon[] = [
     description: "Analyse éditoriale complète + export Word corrigé, chapitre par chapitre.",
     price: 47,
     to: "/v3/corriger",
-    inEdition: false,
+    inEdition: true,
   },
   {
     key: "translations",
@@ -228,7 +228,7 @@ export const V3_ADDON_LIST: V3Addon[] = [
     description: "Session Zoom 1-à-1 + support prioritaire + audit complet de votre ebook.",
     price: 27,
     to: "/contact-support?sujet=pack-serenite",
-    inEdition: false,
+    inEdition: true,
   },
 ];
 
