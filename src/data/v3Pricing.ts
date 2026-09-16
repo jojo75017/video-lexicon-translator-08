@@ -96,6 +96,7 @@ export const V3_PLANS: V3Plan[] = [
     allAddonsIncluded: false,
     idealFor: "Les auteurs et éditeurs qui produisent sans limite et utilisent les studios professionnels.",
     features: [
+      "Accès V2 inclus jusqu'au 31 décembre 2026 (vous avez les deux)",
       "Livres illimités",
       "Tout ce que contient Plume, en version professionnelle",
       "Mode Recherche Approfondie (workflow renforcé)",
