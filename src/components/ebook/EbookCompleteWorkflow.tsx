@@ -1482,6 +1482,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
       autoResumeCountRef.current = 0;
 
       toast.success('✅ Livre généré ! Le contenu a été importé dans l\'onglet "Rédaction".');
+      lastBookDataRef.current = bookData;
       onComplete(bookData);
 
     } catch (err: any) {
