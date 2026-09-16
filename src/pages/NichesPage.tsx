@@ -296,11 +296,11 @@ const NichesPage = () => {
                               </span>
                               <Button
                                 size="sm"
-                                variant="ghost"
                                 onClick={() => handleUseNiche(idea, theme.category)}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 bg-primary/10 hover:bg-primary hover:text-primary-foreground"
+                                className="shrink-0 bg-[#FF9E2D] hover:bg-[#f08d16] text-[#232F3E] font-bold"
                               >
-                                <ArrowRight className="w-4 h-4" />
+                                <Sparkles className="w-4 h-4 mr-1" />
+                                Commencer
                               </Button>
                             </motion.div>
                           ))}
