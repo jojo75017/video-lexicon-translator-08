@@ -111,6 +111,21 @@ export const V3_LAUNCH_CALENDAR: V3CalendarGroup[] = [
     intro: 'Pas de date d’attente : l’accès est immédiat après le paiement.',
     entries: COMPLEMENTS,
   },
+  {
+    key: 'v2-fermeture',
+    label: 'Fermeture de la V2 — 31 décembre 2026',
+    intro:
+      'La V2 reste utilisable par tout le monde — anciens abonnés, Plume et Édition — jusqu’à cette date, en attendant la V4.',
+    entries: [
+      {
+        title: 'Accès V2 (ancien tableau de bord)',
+        to: '/ebook-planner',
+        status: 'libre',
+        opensAt: '2026-12-31T23:59:00+01:00',
+        note: 'Utilisable jusqu’au 31 décembre 2026 inclus. Rien n’est coupé avant cette date.',
+      },
+    ],
+  },
 ];
 
 const DATE_FORMAT = new Intl.DateTimeFormat('fr-FR', {
