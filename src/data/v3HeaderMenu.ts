@@ -124,10 +124,10 @@ export const V3_HEADER_MENU: MenuCategory[] = [
     color: '#c9a84c',
     tagline: 'Ce que débloque chaque plan',
     links: [
-      { label: 'Plume — 27 €/mois', to: '/v3/outils?plan=plume', badge: '30 livres/mois', desc: '✍️ J’écris et je publie : tous les onglets, Sommaire IA guidé, 10 langues, audiolivre inclus' },
+      { label: 'Plume — 27 €/mois', to: '/v3/forfaits', badge: '50 livres/mois', desc: 'J’écris et je publie : création guidée, exports Kindle/KDP, 10 langues et audiolivre standard' },
       { label: 'Édition — 47 €/mois ⭐', to: '/v3/outils?plan=edition', badge: 'Recommandé · illimité', desc: '👑 Version pro : Recherche Approfondie, Sommaire IA avancé, Cover Studio Pro, BD Studio Pro' },
-      { label: 'Ancien client V2', to: '/v3/migration', badge: '-20 % à vie', desc: 'Votre V2 reste à vie + 3 nouveautés V3 offertes, et -20 % à vie sur Plume ou Édition' },
-      { label: 'Mensuel ou annuel (2 mois offerts)', to: '/v3/forfaits', desc: 'Plume 270 €/an · Édition 470 €/an · Studio Pro 970 €/an' },
+      { label: 'Ancien client V2', to: '/v3/migration', badge: '-20 % à vie', desc: 'Votre V2 reste à vie + 5 modules V3 offerts, et -20 % à vie sur Plume ou Édition' },
+      { label: 'Mensuel ou annuel (2 mois offerts)', to: '/v3/forfaits', desc: 'Plume 270 €/an · Édition 470 €/an' },
       { label: 'Calendrier des ouvertures', to: '/v3/calendrier', badge: 'Dates exactes', desc: 'Ce qui est déjà libre et la date d’ouverture de chaque module' },
     ],
   },

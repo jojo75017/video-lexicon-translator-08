@@ -57,7 +57,16 @@ async function isLegacyV2Buyer(email?: string, userId?: string): Promise<boolean
     .select("plan, status")
     .ilike("email", target)
     .in("status", ["active", "completed", "paid"]);
-  return (data ?? []).some((r: any) => String(r.plan ?? "").startsWith("v2"));
+  if ((data ?? []).some((r: any) => String(r.plan ?? "").startsWith("v2"))) return true;
+  const { data: subscriber } = await supabase
+    .from("subscribers")
+    .select("status, plan_tier")
+    .ilike("email", target)
+    .maybeSingle();
+  const status = String(subscriber?.status ?? "").toLowerCase();
+  const tier = String(subscriber?.plan_tier ?? "").toLowerCase();
+  return tier !== "plume" && tier !== "edition" &&
+    (status === "active" || status === "lifetime" || tier === "lifetime");
 }
 
 async function resolveOrCreateCustomer(
@@ -145,15 +154,46 @@ Deno.serve(async (req) => {
       firstMonthFree === true && isRecurring && TRIAL_END_UNIX > Math.floor(Date.now() / 1000);
 
     const subscriptionData: Record<string, unknown> = {};
-    const subMeta: Record<string, string> = {};
-    if (userId) { subMeta.userId = userId; subMeta.plan = priceId; }
+    const subMeta: Record<string, string> = { plan: priceId };
+    if (userId) subMeta.userId = userId;
     if (cleanRefCode) subMeta.ref_code = cleanRefCode;
     if (Object.keys(subMeta).length > 0) subscriptionData.metadata = subMeta;
     if (wantsTrial) subscriptionData.trial_end = TRIAL_END_UNIX;
 
-    const sessionMeta: Record<string, string> = {};
-    if (userId) { sessionMeta.userId = userId; sessionMeta.plan = priceId; }
+    const sessionMeta: Record<string, string> = { plan: priceId };
+    if (userId) sessionMeta.userId = userId;
     if (cleanRefCode) sessionMeta.ref_code = cleanRefCode;
+
+    const isV3Plan = priceId.startsWith("v3_plume_") || priceId.startsWith("v3_edition_");
+    let orderId: string | null = null;
+    if (isV3Plan) {
+      const supabase = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+      );
+      const amount = Number(stripePrice.unit_amount ?? 0) / 100;
+      const { data: order, error: orderError } = await supabase
+        .from("v3_installment_orders")
+        .insert({
+          email: String(email ?? "").toLowerCase(),
+          plan: priceId,
+          installments_total: 1,
+          installments_paid: 0,
+          amount_total: amount,
+          currency: String(stripePrice.currency ?? "eur").toUpperCase(),
+          status: "pending",
+          environment: env,
+          metadata: { user_id: userId ?? null, recurring: true },
+        })
+        .select("id")
+        .single();
+      if (orderError || !order?.id) throw new Error("Impossible d'enregistrer l'abonnement");
+      orderId = order.id as string;
+      sessionMeta.order_id = orderId;
+      sessionMeta.kind = "v3_subscription";
+      subMeta.order_id = orderId;
+      subMeta.kind = "v3_subscription";
+    }
 
     const session = await stripeRequest<any>(env, "POST", "/checkout/sessions", {
       mode: isRecurring ? "subscription" : "payment",
@@ -166,6 +206,14 @@ Deno.serve(async (req) => {
         subscription_data: subscriptionData,
       }),
     });
+
+    if (orderId) {
+      const supabase = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+      );
+      await supabase.from("v3_installment_orders").update({ stripe_session_id: session.id }).eq("id", orderId);
+    }
 
 
     return new Response(

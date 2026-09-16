@@ -231,7 +231,7 @@ export default function V3PourquoiPage() {
             name="Plume"
             price="27 €"
             per="/ mois"
-            highlights={['270 € / an (2 mois offerts)', '30 livres / mois', 'Exports KDP', 'Correcteur IA']}
+            highlights={['270 € / an (2 mois offerts)', '50 livres / mois', 'Exports Kindle / KDP', 'Correcteur IA']}
           />
           <PlanCard
             name="Édition"
@@ -242,7 +242,7 @@ export default function V3PourquoiPage() {
           />
         </div>
         <p className="text-xs text-[#6B7280] mt-4">
-          Deux forfaits seulement : Plume et Édition (tous les compléments inclus). Les abonnements
+          Deux forfaits seulement : Plume et Édition. Les gros compléments premium restent proposés séparément. Les abonnements
           démarrent le 1<sup>er</sup> octobre 2026, avec le premier mois offert.
         </p>
 

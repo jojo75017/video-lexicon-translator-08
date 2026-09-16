@@ -135,10 +135,10 @@ export default function V3ContemplationMode({ children }: { children: ReactNode 
     <>
       {locked && (
         <div
-          className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[9999] pointer-events-none select-none"
+          className="fixed bottom-4 left-4 right-20 z-[9999] pointer-events-none select-none sm:left-1/2 sm:right-auto sm:-translate-x-1/2"
           aria-hidden
         >
-          <div className="px-4 py-2 rounded-full text-xs font-semibold tracking-wide shadow-lg backdrop-blur"
+          <div className="mx-auto w-fit max-w-full px-4 py-2 rounded-full text-center text-xs font-semibold tracking-wide shadow-lg backdrop-blur"
                style={{
                  background: 'rgba(15,46,31,0.92)',
                  color: '#D4AF37',

@@ -15,8 +15,10 @@ export interface V3Plan {
   proModulesIncluded: boolean;
   /** Sommaire IA : niveau proposé par le forfait. */
   aiSummary: string;
-  /** Tous les compléments (upsells) sont-ils inclus ? */
+  /** Les gros compléments premium sont-ils inclus ? */
   allAddonsIncluded: boolean;
+  /** À qui cette formule convient le mieux. */
+  idealFor: string;
   features: string[];
 }
 
@@ -29,8 +31,8 @@ export const legacyPrice = (amount: number): number =>
 /**
  * Deux forfaits V3 uniquement (activation octobre 2026).
  * Socle identique pour les deux — dont les 10 langues et le Sommaire IA.
- * Édition ajoute la puissance professionnelle ET inclut TOUS les
- * compléments (aucun achat supplémentaire, jamais).
+ * Édition ajoute les studios professionnels. Les gros compléments à la carte
+ * restent séparés dans les deux forfaits.
  */
 export const V3_PLANS: V3Plan[] = [
   {
@@ -39,7 +41,7 @@ export const V3_PLANS: V3Plan[] = [
     tagline: "J'écris et je publie mes livres, avec tous les outils du studio",
     monthlyPrice: 27,
     yearlyPrice: 270,
-    booksPerMonth: 30,
+    booksPerMonth: 50,
     chaptersMax: 40,
     wordsPerChapter: 5000,
     charactersMax: 8,
@@ -47,15 +49,17 @@ export const V3_PLANS: V3Plan[] = [
     proModulesIncluded: false,
     aiSummary: "Sommaire IA guidé (dialogue)",
     allAddonsIncluded: false,
+    idealFor: "Les auteurs qui publient régulièrement et veulent un atelier complet, simple et maîtrisé.",
     features: [
-      "30 livres / mois",
+      "50 livres / mois",
       "Tous les onglets : Plan, Écrire, Habiller, Publier, Vendre",
       "40 chapitres max · 5 000 mots/ch",
-      "Sommaire IA guidé : vous construisez le plan avec l'IA",
+      "Création guidée ou travail à partir de votre propre sommaire",
+      "Rédaction chapitre par chapitre avec le Génie",
       "10 langues incluses (choix dès l'étape 1)",
-      "Export PDF / DOCX / EPUB + sommaire stylé",
-      "Couverture complète (recto + tranche + 4e)",
-      "Audiolivre inclus",
+      "Mise en page et exports PDF / DOCX / EPUB / Kindle",
+      "Couverture standard Kindle et KDP broché",
+      "Audiolivre standard inclus",
       "Import de manuscrit (DOCX / PDF / URL)",
       "Correction professionnelle du livre",
       "Support email 24 h",
@@ -74,7 +78,8 @@ export const V3_PLANS: V3Plan[] = [
     agentsCount: 30,
     proModulesIncluded: true,
     aiSummary: "Sommaire IA avancé + architecture de série multi-tomes",
-    allAddonsIncluded: true,
+    allAddonsIncluded: false,
+    idealFor: "Les auteurs et éditeurs qui produisent sans limite et utilisent les studios professionnels.",
     features: [
       "Livres illimités",
       "Tout ce que contient Plume, en version professionnelle",
@@ -87,11 +92,8 @@ export const V3_PLANS: V3Plan[] = [
       "BD Studio Pro",
       "Amazon Spy / Audit ASIN / mots-clés avancés",
       "Pack KDP prêt à publier (ZIP) + checklist",
-      "BookPerfect AI inclus (valeur 97 €)",
-      "Pack Traductions relues inclus (valeur 97 €)",
-      "Audiolivre Premium inclus (valeur 67 €)",
-      "Sélection maisons d'édition incluse (valeur 77 €)",
-      "Pack Sérénité — Zoom 1-à-1 inclus (valeur 30 €)",
+      "Tous les modules professionnels V3 inclus",
+      "Gros compléments premium disponibles séparément",
       "Support prioritaire",
     ],
   },
@@ -150,7 +152,7 @@ export interface V3Addon {
   inEdition: boolean;
 }
 
-/** Catalogue unique des compléments — tous inclus dans Studio Pro. */
+/** Catalogue unique des gros compléments premium, vendus séparément. */
 export const V3_ADDON_LIST: V3Addon[] = [
   {
     key: "bookperfect",
@@ -159,7 +161,7 @@ export const V3_ADDON_LIST: V3Addon[] = [
     description: "Analyse éditoriale complète + export Word corrigé, chapitre par chapitre.",
     price: 47,
     to: "/v3/corriger",
-    inEdition: true,
+    inEdition: false,
   },
   {
     key: "translations",
@@ -208,7 +210,7 @@ export const V3_ADDON_LIST: V3Addon[] = [
   },
 ];
 
-/** Valeur totale des compléments inclus dans Studio Pro. */
+/** Valeur totale des compléments premium proposés à la carte. */
 export const V3_ADDONS_TOTAL_VALUE = Math.round(
   V3_ADDON_LIST.reduce((sum, a) => sum + a.price, 0),
 );

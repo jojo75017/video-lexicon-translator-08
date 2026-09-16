@@ -5,7 +5,7 @@ import V3UpsellPromoCard from '@/components/v3public/V3UpsellPromoCard';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
 import BdComicNewsBanner from '@/components/bd/BdComicNewsBanner';
 
-/** /v3/upsells — Compléments & options personnifiés, tous inclus dans le forfait Édition. */
+/** /v3/upsells — Gros compléments premium proposés séparément des forfaits. */
 export default function V3UpsellsPage() {
   const edition = V3_PLANS[V3_PLANS.length - 1];
   const { hasFull, hasBase } = useV3Entitlement();
@@ -15,7 +15,7 @@ export default function V3UpsellsPage() {
       <title>Compléments & options V3 — Ebookstudio</title>
       <meta
         name="description"
-        content="Ajoutez la correction BookPerfect, les traductions relues, l'audiolivre ou le pack Sérénité à votre livre. Tout est inclus dans le forfait Édition."
+        content="Ajoutez la direction éditoriale, les traductions relues, l'audiolivre premium ou l'accompagnement à votre forfait."
       />
 
       <div className="mx-auto max-w-6xl px-4 py-10">
@@ -28,8 +28,7 @@ export default function V3UpsellsPage() {
           </h1>
           <p className="mt-2 max-w-2xl text-[15px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
             Renforcez un livre précis sans changer de forfait : correction professionnelle, traductions
-            relues, version audio, accompagnement. Chaque option s'ajoute en un paiement unique — et tout
-            est inclus dans le forfait Édition.
+            relues, version audio premium, accompagnement. Chaque option s'ajoute en un paiement unique.
           </p>
         </header>
 
@@ -52,7 +51,7 @@ export default function V3UpsellsPage() {
             ))}
           </div>
           <p className="px-4 py-3 text-xs font-semibold" style={{ color: 'var(--v3-muted)', background: 'var(--v3-cream)' }}>
-            Valeur cumulée des compléments : {formatPrice(V3_ADDONS_TOTAL_VALUE)} — tous inclus dans le forfait Édition.
+            Valeur cumulée des compléments : {formatPrice(V3_ADDONS_TOTAL_VALUE)} — proposés séparément des forfaits.
             Les anciens clients V2 conservent leur remise de 20 % à vie.
           </p>
         </section>
@@ -63,7 +62,7 @@ export default function V3UpsellsPage() {
         </h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {V3_ADDON_LIST.map((addon) => {
-            const included = hasFull || (hasBase && addon.inEdition);
+            const included = addon.inEdition && (hasFull || hasBase);
             return (
               <V3UpsellPromoCard
                 key={addon.key}
@@ -80,7 +79,7 @@ export default function V3UpsellsPage() {
         </div>
 
 
-        {/* Bandeau forfait Édition — tout inclus */}
+        {/* Rappel du forfait Édition */}
         <section
           className="mt-12 rounded-3xl p-6 md:p-8"
           style={{ background: 'var(--v3-cream)', border: '1px solid var(--v3-line)' }}
@@ -88,11 +87,11 @@ export default function V3UpsellsPage() {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <h2 className="v3-serif text-2xl font-bold" style={{ color: 'var(--v3-ink)' }}>
-                Tout inclus : {edition?.name ?? 'Édition'}
+                Les studios professionnels : {edition?.name ?? 'Édition'}
               </h2>
               <p className="mt-1 text-sm" style={{ color: 'var(--v3-muted)' }}>
-                {edition ? `${formatPrice(edition.monthlyPrice)} / mois` : '47 € / mois'} — l'ensemble des
-                compléments ci-dessus. Achat séparé toujours possible au tarif affiché.
+                {edition ? `${formatPrice(edition.monthlyPrice)} / mois` : '47 € / mois'} — livres illimités,
+                Cover Studio Pro, BD Studio Pro et outils KDP avancés. Les compléments ci-dessus restent à la carte.
               </p>
             </div>
             <Link to="/v3/forfaits" className="v3-btn v3-btn-gold">

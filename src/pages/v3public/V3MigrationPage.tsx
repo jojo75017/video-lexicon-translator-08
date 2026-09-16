@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { Check, Crown, Feather, Gift, Infinity as InfinityIcon, Lock, Sparkles } from "lucide-react";
+import { Check, Crown, Feather, Gift, Infinity as InfinityIcon, Lock } from "lucide-react";
 import {
   V3_PLANS,
   formatPrice,
@@ -61,12 +61,12 @@ export default function V3MigrationPage() {
           </h1>
           <p className="text-lg max-w-2xl mx-auto" style={{ color: "#4b5563" }}>
             Vous avez acheté EbookStudio V2 : rien ne change, votre accès reste acquis à vie.
-            En plus, trois nouveautés V3 vous sont offertes, et vous gardez
+             En plus, cinq modules V3 vous sont offerts, et vous gardez
             <strong> -20 % à vie</strong> si vous voulez la version complète.
           </p>
         </header>
 
-        {/* 3 nouveautés offertes */}
+        {/* 5 modules offerts */}
         <section
           className="rounded-2xl bg-white p-8 mb-10"
           style={{ border: "1px solid #e5e7eb", boxShadow: "0 4px 12px rgba(0,0,0,0.04)" }}
@@ -77,7 +77,7 @@ export default function V3MigrationPage() {
             </div>
             <div>
               <h2 className="text-2xl font-serif" style={{ color: "#232F3E" }}>
-                Offert à vie : 3 nouveautés V3
+                Offert à vie : 5 modules V3
               </h2>
               <p className="text-sm" style={{ color: "#6b7280" }}>
                 Déjà actives dans votre compte, sans rien payer.

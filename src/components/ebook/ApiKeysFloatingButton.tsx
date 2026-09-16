@@ -31,7 +31,7 @@ const VISIBLE_PREFIXES = [
   '/v3',
 
 ];
-const HIDDEN_PREFIXES = ['/auth', '/logout-total', '/ebookbot'];
+const HIDDEN_PREFIXES = ['/auth', '/logout-total', '/ebookbot', '/v3/forfaits', '/v3/migration', '/v3/calendrier'];
 
 const ApiKeysFloatingButton = () => {
   const [open, setOpen] = useState(false);

@@ -32,7 +32,7 @@ const planRows: PlanRow[] = [
   { letter: "N", domain: "Niches & Étude de marché", plume: "20/mois", edition: "Illimité + comparateur multi-niches" },
   { letter: "O", domain: "Outils annexes", plume: "Sommaire, Word Count, Idées, Quiz, Keywords", edition: "Tous les outils incl. Pro" },
   { letter: "P", domain: "Personnages & Bibles", plume: "8 pers., bible étendue", edition: "Illimité + générateur d'univers" },
-  { letter: "Q", domain: "Quotas & Compteurs", plume: "30 livres/mois", edition: "Illimité" },
+  { letter: "Q", domain: "Quotas & Compteurs", plume: "50 livres/mois", edition: "Illimité" },
   { letter: "R", domain: "Résiliation / Portail client", plume: "✅", edition: "✅" },
   { letter: "S", domain: "Sélection éditeurs (P26 Pro)", plume: "🔒", edition: "Moteur maisons d'édition FR" },
   { letter: "T", domain: "TOC / Sommaire Ultime", plume: "40 chapitres", edition: "60 chapitres + éditeur avancé" },

@@ -369,6 +369,18 @@ async function handleV3CheckoutCompleted(session: any) {
   }
 }
 
+async function handleV3SubscriptionCompleted(session: any) {
+  const orderId = session.metadata?.order_id;
+  if (!orderId) return;
+  await getSupabase().from("v3_installment_orders").update({
+    status: "active",
+    installments_paid: 1,
+    stripe_subscription_id: session.subscription || null,
+    stripe_customer_id: session.customer || null,
+    grace_until: null,
+  }).eq("id", orderId);
+}
+
 
 async function handleV3InvoicePaid(invoice: any, env: StripeEnv) {
   const subscriptionId = invoice.subscription;
@@ -376,10 +388,21 @@ async function handleV3InvoicePaid(invoice: any, env: StripeEnv) {
   const supabase = getSupabase();
   const { data: order } = await supabase
     .from("v3_installment_orders")
-    .select("id, email, installments_total, installments_paid, status")
+    .select("id, email, plan, installments_total, installments_paid, status")
     .eq("stripe_subscription_id", subscriptionId)
     .maybeSingle();
   if (!order) return;
+
+  // Les abonnements Plume/Édition sont récurrents sans nombre d'échéances :
+  // chaque facture payée maintient simplement l'accès actif.
+  if (String(order.plan ?? "").startsWith("v3_plume_") || String(order.plan ?? "").startsWith("v3_edition_")) {
+    await supabase.from("v3_installment_orders").update({
+      status: "active",
+      installments_paid: 1,
+      grace_until: null,
+    }).eq("id", order.id);
+    return;
+  }
 
   // La 1re échéance est déjà comptée au checkout ; on ignore la facture initiale.
   if (invoice.billing_reason === "subscription_create") return;
@@ -483,7 +506,9 @@ Deno.serve(async (req) => {
         if (typeof plan === "string" && (plan.startsWith("v3_plume_") || plan.startsWith("v3_edition_"))) {
           await handleV3SubscriptionReferral(session);
         }
-        if (session.metadata?.kind === "v3_full_pack") {
+        if (session.metadata?.kind === "v3_subscription") {
+          await handleV3SubscriptionCompleted(session);
+        } else if (session.metadata?.kind === "v3_full_pack") {
           await handleV3CheckoutCompleted(session);
         } else if (session.metadata?.kind === "v3_upsell_pack") {
           await handleV3UpsellPackCompleted(session, env);

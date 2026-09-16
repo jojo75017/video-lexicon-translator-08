@@ -31,6 +31,7 @@ import V3BeforeYouStartPanel from '@/components/v3public/V3BeforeYouStartPanel';
 import V3GoFurtherPanel from '@/components/v3public/V3GoFurtherPanel';
 import V3StartIdeaCTA from '@/components/v3public/V3StartIdeaCTA';
 import ReadingGate from '@/components/marketing/ReadingGate';
+import V3PricingOverview from '@/components/v3public/V3PricingOverview';
 
 const FEATURED_TOOLS = [
   { icon: Wand2, title: 'Sommaire IA — le meneur', desc: 'Dialogue avec l’IA : vos idées sont corrigées et deviennent le plan qui guide tout le livre.', to: '/v3/create?sommaire=ia', badge: 'Commencer ici' },
@@ -67,6 +68,9 @@ export default function V3HomePage() {
 
       {/* 3. PROMESSE PRINCIPALE */}
       <V3HeroBanner />
+
+      {/* Trois offres — aperçu discret, détail sur /v3/forfaits */}
+      <V3PricingOverview />
 
 
       {/* 3. VIDÉO DE PRÉSENTATION */}
