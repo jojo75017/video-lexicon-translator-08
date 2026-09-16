@@ -200,7 +200,7 @@ export const V3_ADDON_LIST: V3Addon[] = [
     description: "Liste ciblée d'éditeurs + lettre d'accompagnement personnalisée.",
     price: 27,
     to: "/v3/outils",
-    inEdition: false,
+    inEdition: true,
   },
   {
     key: "serenity",
