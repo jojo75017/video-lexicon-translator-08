@@ -92,6 +92,10 @@ export const SHORT_LINKS: Record<string, ShortLink> = {
   /* Visite libre de la V3 avant l'ouverture du 1er octobre : on regarde, on ne
    * touche à rien (mode contemplation). Aucun paiement au bout du lien. */
   v3: { key: 'v3', destination: '/v3', template: 'v3-visite-vitrine', label: 'Visiter la V3 en avant-première' },
+
+  /* Avant-première : page vitrine avec la vidéo + liste d'attente, puis l'offre
+   * en second. C'est le lien à coller dans Systeme.io. */
+  apv3: { key: 'apv3', destination: '/avant-premiere', template: 'v3-avant-premiere', label: 'Voir la V3 en avant-première' },
 };
 
 

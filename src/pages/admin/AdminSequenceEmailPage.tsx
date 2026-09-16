@@ -37,6 +37,12 @@ import {
 } from '@/data/lancementV3Systemeio';
 
 import {
+  AVANT_PREMIERE_EMAIL,
+  AVANT_PREMIERE_SUBJECTS,
+  AVANT_PREMIERE_URL,
+} from '@/data/avantPremiereSystemeio';
+
+import {
   NEWSLETTERS,
   NEWSLETTER_EXCLUDE_TAG,
   NEWSLETTER_HOWTO,
@@ -486,6 +492,31 @@ function LancementV3Card({ email }: { email: LancementV3Email }) {
 function LancementV3Panel() {
   return (
     <div className="space-y-6">
+      <Card className="rounded-2xl border-2 border-primary/40 bg-card p-6">
+        <Badge className="rounded-full">Avant-première</Badge>
+        <h2 className="mt-3 text-xl font-bold text-foreground">
+          L'email « venez voir la V3 » — à envoyer maintenant
+        </h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Le lecteur arrive sur la page vitrine, regarde la vidéo, laisse son email pour être
+          prévenu le 1er octobre, et trouve l'offre 47 € en second. Lien tracé :{' '}
+          <code>{AVANT_PREMIERE_URL}</code>
+        </p>
+        <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          3 objets au choix
+        </p>
+        <div className="mt-2 space-y-2">
+          {AVANT_PREMIERE_SUBJECTS.map((s) => (
+            <div key={s} className="flex flex-wrap items-center gap-2">
+              <span className="text-sm text-foreground">{s}</span>
+              <CopyButton value={s} label="Copier" />
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      <LancementV3Card email={AVANT_PREMIERE_EMAIL} />
+
       <Card className="rounded-2xl border-border bg-card p-6">
         <Badge className="rounded-full">Lancement V3</Badge>
         <h2 className="mt-3 text-xl font-bold text-foreground">
