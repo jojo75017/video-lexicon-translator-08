@@ -221,6 +221,7 @@ export default function PartnerTargetList() {
                     href={targetContactUrl(t)}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={(e) => { e.preventDefault(); openExternal(targetContactUrl(t)); }}
                     className="inline-flex items-center gap-1.5 rounded-lg border border-[#008296] px-3 py-2 text-sm font-semibold text-[#008296]"
                   >
                     <ExternalLink className="h-4 w-4" /> Ouvrir la page pour trouver l’adresse
