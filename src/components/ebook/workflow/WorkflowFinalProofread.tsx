@@ -212,6 +212,7 @@ export default function WorkflowFinalProofread({
     itemsRef.current = next;
     setItems(next);
     setApplied(false);
+    writeStored(signatureRef.current, { items: next, finished, applied: false });
   };
 
   const acceptAll = () => {
