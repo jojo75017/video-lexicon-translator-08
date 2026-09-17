@@ -12,7 +12,7 @@ import { Loader2, RefreshCw, Send, Eye, MessageSquareQuote, ShoppingCart } from 
  * contacté deux fois.
  */
 
-type ActionKey = 'temoignage' | 'panier';
+type ActionKey = 'temoignage' | 'panier' | 'leadsNiches';
 
 const ACTIONS: Array<{
   key: ActionKey;
@@ -34,6 +34,13 @@ const ACTIONS: Array<{
     title: 'Relancer les paniers abandonnés',
     desc: "Commandes en attente depuis plus de 2 h (et moins de 14 jours) : rappel du 47 €, garantie 30 jours, PayPal et paiement en plusieurs fois. Une seule relance par commande.",
     icon: ShoppingCart,
+  },
+  {
+    key: 'leadsNiches',
+    fn: 'relance-leads-niches',
+    title: 'Relancer ceux qui ont pris les niches gratuites',
+    desc: "Personnes qui ont demandé un pack de niches (5 ou 10) sans jamais commander : lien vers la présentation vidéo, puis l'accès à vie 47 € jusqu'au 30 septembre. Clients, abonnés et adresses de test exclus. Une seule relance par adresse.",
+    icon: MessageSquareQuote,
   },
 ];
 
