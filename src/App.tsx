@@ -193,6 +193,7 @@ const V3AudiobookPage = lazy(() => import('./pages/v3public/V3AudiobookPage'));
 const V3EditorPage = lazy(() => import('./pages/v3public/V3EditorPage'));
 const V3OffrePage = lazy(() => import('./pages/v3public/V3OffrePage'));
 const V3CoverOfferPage = lazy(() => import('./pages/v3public/V3CoverOfferPage'));
+const PrestationKdpPage = lazy(() => import('./pages/PrestationKdpPage'));
 const V3CommanderPage = lazy(() => import('./pages/v3public/V3CommanderPage'));
 const ReferralKitPage = lazy(() => import('./pages/ReferralKitPage'));
 const PartenairesPage = lazy(() => import('./pages/PartenairesPage'));
