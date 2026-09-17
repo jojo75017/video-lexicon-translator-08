@@ -88,7 +88,7 @@ async function sendInstructions(email: string, firstName: string, productKey: st
     method: "POST",
     headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      from: "EbookStudio <contact@ebookstudio.fr>",
+      from: "EbookStudio <noreply@ebookstudio.fr>",
       to: [email],
       subject: `Instructions de paiement — ${product.label}`,
       html,

@@ -550,7 +550,7 @@ export default function V3CommanderPage() {
             </details>
           ))}
           <p className="secure" style={{ marginTop: 22, fontSize: 11 }}>
-            Une autre question ? <a href="mailto:contact@ebookstudio.fr" style={{ textDecoration: "underline" }}>contact@ebookstudio.fr</a> — réponse sous 24 h ouvrées.
+            Une autre question ? <a href="mailto:boubetgeorges@gmail.com" style={{ textDecoration: "underline" }}>boubetgeorges@gmail.com</a> — réponse sous 24 h ouvrées.
           </p>
         </section>
 
@@ -578,7 +578,7 @@ export default function V3CommanderPage() {
             {" · "}
             <a href="/politique-confidentialite">Confidentialité</a>
             {" · "}
-            <a href="mailto:contact@ebookstudio.fr">contact@ebookstudio.fr</a>
+            <a href="mailto:boubetgeorges@gmail.com">boubetgeorges@gmail.com</a>
           </span>
         </footer>
       </div>

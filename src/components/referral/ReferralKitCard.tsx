@@ -143,7 +143,7 @@ const ReferralKitCard = () => {
 
           <p className="text-xs text-muted-foreground">
             Les commissions sont réglées par virement ou PayPal une fois le délai de garantie de
-            30 jours écoulé. Écrivez à contact@ebookstudio.fr pour demander votre versement.
+            30 jours écoulé. Écrivez à boubetgeorges@gmail.com pour demander votre versement.
           </p>
         </>
       )}

@@ -31,7 +31,7 @@ const NEVER_OPENED_MIN_SENDS = 5;
 
 const SEND_DOMAIN = "ebookstudio.fr";
 const FROM_ADDRESS = `noreply@${SEND_DOMAIN}`;
-const REPLY_TO_ADDRESS = "support@georgesboubet.com";
+const REPLY_TO_ADDRESS = "boubetgeorges@gmail.com";
 
 /** Lit un enregistrement TXT public (résolveur DNS de Google). */
 async function txtRecord(name: string): Promise<string> {

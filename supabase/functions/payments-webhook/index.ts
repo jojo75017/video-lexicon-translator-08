@@ -64,7 +64,7 @@ async function sendAccessEmail(email: string, firstName: string | null, accessCo
       method: "POST",
       headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: "EbookStudio <contact@ebookstudio.fr>",
+        from: "EbookStudio <noreply@ebookstudio.fr>",
         to: [email],
         subject: "🎉 Paiement reçu — Votre accès EbookStudio",
         html,
@@ -262,7 +262,7 @@ async function sendLifetimeAccessEmail(email: string, planLabel: string, accessC
       method: "POST",
       headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: "EbookStudio <contact@ebookstudio.fr>",
+        from: "EbookStudio <noreply@ebookstudio.fr>",
         to: [email],
         subject: "🎉 Votre accès à vie EbookStudio Pro est actif",
         html,

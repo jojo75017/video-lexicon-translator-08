@@ -59,7 +59,7 @@ serve(async (req) => {
 
     for (const email of recipients) {
       const r = await sendResendEmailThrottled({
-        from: "Georges - EbookStudio <contact@ebookstudio.fr>",
+        from: "Georges - EbookStudio <noreply@ebookstudio.fr>",
         to: [email],
         reply_to: "boubetgeorges@gmail.com",
         subject,

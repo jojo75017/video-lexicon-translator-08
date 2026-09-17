@@ -115,7 +115,7 @@ Deno.serve(async (req) => {
       const res = await sendResendEmailThrottled({
         from: "Georges Boubet <noreply@ebookstudio.fr>",
         to: [email],
-        reply_to: "contact@ebookstudio.fr",
+        reply_to: "boubetgeorges@gmail.com",
         subject: "Comment nettoyer un livre déjà écrit (mode d'emploi)",
         html: html(),
       });

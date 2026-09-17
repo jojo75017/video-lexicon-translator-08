@@ -63,7 +63,7 @@ async function sendAccessEmail(email: string, firstName: string, accessCode: str
     method: "POST",
     headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      from: "EbookStudio <contact@ebookstudio.fr>",
+      from: "EbookStudio <noreply@ebookstudio.fr>",
       to: [email],
       subject: "🎉 Votre accès gratuit EbookStudio Pro + votre guide offert",
       html,

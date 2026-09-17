@@ -46,7 +46,7 @@ export default function BDMerciPage() {
 
         <p className="mt-6 inline-flex items-center gap-2 text-xs text-muted-foreground">
           <Mail className="h-3.5 w-3.5" />
-          Une question ? Écrivez à contact@ebookstudio.fr
+          Une question ? Écrivez à boubetgeorges@gmail.com
         </p>
       </main>
     </div>
