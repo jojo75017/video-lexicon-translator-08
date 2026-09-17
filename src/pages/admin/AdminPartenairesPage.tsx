@@ -69,6 +69,7 @@ export default function AdminPartenairesPage() {
         <Tabs defaultValue="messages">
           <TabsList>
             <TabsTrigger value="messages">Messages à envoyer</TabsTrigger>
+            <TabsTrigger value="liste">Ma liste de créateurs</TabsTrigger>
             <TabsTrigger value="cibles">Qui contacter</TabsTrigger>
             <TabsTrigger value="suivi">Suivi des contacts</TabsTrigger>
             <TabsTrigger value="stats">Clics & inscriptions</TabsTrigger>
