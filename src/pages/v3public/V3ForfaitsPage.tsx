@@ -170,6 +170,21 @@ export default function V3ForfaitsPage() {
           </div>
         </section>
 
+        <section className="mt-10 overflow-hidden rounded-lg" style={{ background: "var(--v3-emerald)", color: "var(--v3-paper)" }}>
+          <div className="flex flex-col items-start justify-between gap-4 p-6 md:flex-row md:items-center">
+            <div>
+              <h2 className="v3-serif text-2xl font-semibold">Vous voulez que tout soit fait pour vous ?</h2>
+              <p className="mt-1 max-w-2xl text-sm opacity-90">
+                Service clé en main : correction, mise en page intérieure, couverture complète (Kindle, broché, relié)
+                et accompagnement KDP. À partir de 149 € — sans abonnement.
+              </p>
+            </div>
+            <Button asChild variant="secondary" className="shrink-0">
+              <Link to="/prestation-kdp">Voir la prestation KDP</Link>
+            </Button>
+          </div>
+        </section>
+
         <p className="mt-8 text-center text-sm" style={{ color: "var(--v3-muted)" }}>Une question ? <Link to="/contact-support" className="underline" style={{ color: "var(--v3-emerald)" }}>Contactez-nous</Link> — réponse sous 24 h.</p>
       </div>
     </div>
