@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ExternalLink, Target, Users } from 'lucide-react';
 import AmbassadorOutreachTracker from '@/components/ambassador/AmbassadorOutreachTracker';
 import CopyBlockList from '@/components/partners/CopyBlockList';
+import PartnerTargetList from '@/components/partners/PartnerTargetList';
 import ReferralTrackingPanel from '@/components/admin/ReferralTrackingPanel';
 import {
   BEST_COMMISSION,
@@ -68,6 +69,7 @@ export default function AdminPartenairesPage() {
         <Tabs defaultValue="messages">
           <TabsList>
             <TabsTrigger value="messages">Messages à envoyer</TabsTrigger>
+            <TabsTrigger value="liste">Ma liste de créateurs</TabsTrigger>
             <TabsTrigger value="cibles">Qui contacter</TabsTrigger>
             <TabsTrigger value="suivi">Suivi des contacts</TabsTrigger>
             <TabsTrigger value="stats">Clics & inscriptions</TabsTrigger>
@@ -80,6 +82,10 @@ export default function AdminPartenairesPage() {
               mieux que cent envois identiques.
             </div>
             <CopyBlockList blocks={messages} tone="admin" />
+          </TabsContent>
+
+          <TabsContent value="liste" className="mt-5">
+            <PartnerTargetList />
           </TabsContent>
 
           <TabsContent value="cibles" className="mt-5">
