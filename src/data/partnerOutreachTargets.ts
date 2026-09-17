@@ -191,3 +191,10 @@ export const PARTNER_TARGETS: PartnerTarget[] = [
 /** Rappel affiché au-dessus de la liste. */
 export const PARTNER_TARGETS_RULE =
   'Un seul message par cible, puis une seule relance à cinq jours. On vérifie la chaîne ou le compte avant d\u2019écrire.';
+
+/** Cibles volontairement écartées : elles vendent déjà un outil du même genre. */
+export const PARTNER_EXCLUDED_TARGETS: { name: string; reason: string }[] = [
+  { name: 'Quentin Haguet', reason: 'lié à Rocket KDP / Bookhag' },
+  { name: 'Antonin — KDP Pilot', reason: 'vend son propre logiciel KDP' },
+  { name: 'Sébastien — Ebook-Création', reason: 'vend sa propre solution de création d’ebooks' },
+];
