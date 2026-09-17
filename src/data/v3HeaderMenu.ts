@@ -129,6 +129,7 @@ export const V3_HEADER_MENU: MenuCategory[] = [
       { label: 'Ancien client V2', to: '/v3/migration', badge: '-20 % à vie', desc: 'Votre V2 reste à vie + 5 modules V3 offerts, et -20 % à vie sur Plume ou Édition' },
       { label: 'Mensuel ou annuel (2 mois offerts)', to: '/v3/forfaits', desc: 'Plume 270 €/an · Édition 470 €/an' },
       { label: 'Calendrier des ouvertures', to: '/v3/calendrier', badge: 'Dates exactes', desc: 'Ce qui est déjà libre et la date d’ouverture de chaque module' },
+      { label: 'Prestation KDP clé en main', to: '/prestation-kdp', badge: 'À partir de 149 €', desc: 'Vous voulez que tout soit fait pour vous : correction, mise en page, couverture et accompagnement KDP' },
     ],
   },
 
