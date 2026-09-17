@@ -62,7 +62,7 @@ const ConversionBoostersPanel = () => {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const next: Record<ActionKey, number | null> = { temoignage: null, panier: null };
+    const next: Record<ActionKey, number | null> = { temoignage: null, panier: null, leadsNiches: null };
     for (const action of ACTIONS) {
       try {
         const data = await call(action.fn, { mode: 'status' });
