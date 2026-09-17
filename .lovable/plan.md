@@ -1,28 +1,43 @@
-# Toucher des abonnés avec 50 € — que vaut Google Ads, et quoi d'autre
+# Prestation « clé en main » KDP : réponse au client + page de service
 
-## Mon avis honnête (d'abord)
+## Le contexte
 
-Vos données réelles : 10 clics → 0 vente, 27 paniers abandonnés, 1 commande payée depuis le début. Payer pour envoyer encore plus de visiteurs sur une page qui ne convertit pas, c'est risquer de brûler 50 € pour zéro retour. Google Ads n'est pas une mauvaise idée en soi, mais **ce n'est pas la priorité** tant que la conversion n'est pas réparée.
+Une personne demande une prestation complète pour un manuel de français A1 de 107 pages : correction, mise en page intérieure, couverture complète, fichier Kindle, fichiers conformes KDP, titre/description/catégories/mots-clés, et publication sur son propre compte KDP, en 5 à 7 jours.
 
-## Trois options, classées par rendement réel pour 50 €
+Ce n'est pas un abonnement : c'est votre temps de travail. L'abonnement Édition 47 €/mois sert à ceux qui font le travail eux-mêmes. Il faut donc une grille de prestation à part, sans jamais toucher aux tarifs 27 € / 47 € affichés.
 
-### 1. Récupérer les 27 paniers abandonnés (gratuit, le plus chaud)
-27 personnes sont déjà allées jusqu'au paiement sans finir. Un email humain et individuel à chacun (« votre accès est resté en attente — une question ? Répondez-moi ») coûte 0 € et touche le public le plus chaud qui existe. C'est là que 50 € rapporteraient le plus — sauf qu'ici, ça ne coûte rien.
+## Tarif conseillé (à valider par vous)
 
-### 2. Affiliation YouTubeurs KDP (0 € d'avance, on ne paie qu'à la vente)
-2 à 3 créateurs YouTube/formateurs français de la niche auto-édition/KDP, commission 30-40 % sur chaque vente. Leur audience leur fait déjà confiance — un lien dans une description de vidéo convertit 10 à 50 fois mieux qu'un email froid. Vous ne sortez un centime que lorsqu'une vente est faite. C'est le levier le moins contraignant et le plus rentable pour un petit budget.
+Une grille en trois formules, pensée pour un livre de 100 à 150 pages :
 
-### 3. Google Search Ads (test payant, à condition de corriger la page)
-Votre annonce s'affiche quand quelqu'un tape « écrire un livre avec l'IA » ou « publier sur Amazon KDP » — public chaud. Mais à ~1-2 € le clic, 50 € = 25 à 50 visiteurs seulement, et au taux actuel (0/10) ça donnerait probablement 0 vente. À faire **uniquement après** avoir amélioré la page d'atterrissage, comme un test court pour mesurer.
+| Formule | Contenu | Prix |
+| --- | --- | --- |
+| Essentiel | Couverture complète (1re, dos, 4e) + fichiers conformes KDP | 149 € |
+| Complète | Essentiel + relecture-correction + mise en page intérieure + version Kindle | 349 € |
+| Clé en main | Complète + titre, description, catégories, mots-clés + accompagnement à la publication | 449 € |
 
-## Ce que je recommande concrètement
+Options :
+- Délai express 5 à 7 jours : +20 %
+- Au-delà de 150 pages : +1 € par page supplémentaire
 
-Commencer par les deux leviers gratuits (paniers abandonnés + affiliation), qui touchent déjà des gens chauds sans risque. Garder Google Ads comme test possible plus tard, une fois qu'on aura vu au moins une vente sortir des leviers gratuits.
+Pour ce manuel de 107 pages en 5 à 7 jours, la réponse à lui envoyer sera donc **449 € + 90 € d'urgence = 539 €**, couverture comprise.
 
-## Ce qui n'est pas touché
+La publication directe sur son compte KDP reste **à décider** : la page annoncera « accompagnement à la publication (visio ou pas à pas) », et la question des accès sera traitée au cas par cas dans le devis. Rien n'affirmera que vous publiez à sa place.
 
-Prix, paiements, base de données, sécurité, calculs KDP, crédits IA, V4, page d'accueil. Aucun envoi d'email sans votre accord.
+## Ce que je vais créer
 
-## Décision à prendre
+1. **Une nouvelle page publique `/prestation-kdp`** : présentation du service, les trois formules avec leurs prix, les options, le délai, ce qui est inclus et ce qui n'est pas inclus, puis un formulaire de demande de devis (nom, e-mail, type de livre, nombre de pages, délai souhaité, description du besoin). Style éditorial ivoire / encre / émeraude / or, comme le reste du site.
+2. **Le formulaire réutilise l'envoi existant** utilisé par la page d'offre couverture : la demande arrive dans votre boîte, sans nouvelle table ni nouveau réglage.
+3. **Un message prêt à copier** : je le mets dans un encadré de la page d'administration existante des devis si elle s'y prête, sinon je vous le donne directement en réponse ici, avec le prix, le délai, le détail de ce qui est inclus et la mention claire sur la publication KDP.
+4. **Un lien discret** vers `/prestation-kdp` depuis la page d'offre couverture, pour les visiteurs qui veulent une prestation plutôt que l'outil.
 
-Souhaitez-vous que je prépare : (a) la relance des 27 paniers abandonnés, (b) le kit d'approche affiliation pour YouTubeurs KDP, (c) le test Google Ads quand même, ou plusieurs à la fois ?
+## Ce que je ne touche pas
+
+Les tarifs 27 € et 47 €, les paiements, la base de données, la sécurité, les calculs KDP, les crédits, le module V4, la page d'accueil V3 et l'ouverture du 1er octobre restent inchangés.
+
+## Détails techniques
+
+- Nouvelle page `src/pages/PrestationKdpPage.tsx`, route publique `/prestation-kdp` déclarée dans `src/App.tsx`, `SeoHead` avec titre et description dédiés.
+- Grille tarifaire dans un fichier de données dédié `src/data/prestationKdp.ts` (source unique), séparé de `v3Pricing.ts` pour ne pas mélanger prestation et abonnements.
+- Formulaire branché sur la fonction existante `send-subscriber-contact` avec `category: 'Devis prestation KDP'` : aucune migration, aucune fonction à déployer.
+- Le texte de réponse client est stocké comme constante dans `src/data/prestationKdp.ts` et affiché avec un bouton « Copier » réservé à l'administrateur.
