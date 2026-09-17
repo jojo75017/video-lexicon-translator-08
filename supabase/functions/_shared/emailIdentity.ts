@@ -12,5 +12,5 @@
 
 export const FROM_CAMPAIGN = "Georges Boubet <noreply@ebookstudio.fr>";
 export const FROM_APP = "EbookStudio <noreply@ebookstudio.fr>";
-export const REPLY_TO = "support@georgesboubet.com";
+export const REPLY_TO = "boubetgeorges@gmail.com";
 export const DIRECT_EMAIL = "boubetgeorges@gmail.com";

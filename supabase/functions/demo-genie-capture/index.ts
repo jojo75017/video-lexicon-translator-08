@@ -65,7 +65,7 @@ async function sendSummaryEmail(
     method: "POST",
     headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      from: "EbookStudio <contact@ebookstudio.fr>",
+      from: "EbookStudio <noreply@ebookstudio.fr>",
       to: [email],
       subject: `Votre sommaire : ${title}`.slice(0, 120),
       html,

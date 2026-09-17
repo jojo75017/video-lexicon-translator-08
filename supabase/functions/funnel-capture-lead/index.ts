@@ -129,7 +129,7 @@ async function sendLeadMagnetEmail(email: string, firstName: string, magnetKey: 
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "EbookStudio <contact@ebookstudio.fr>",
+      from: "EbookStudio <noreply@ebookstudio.fr>",
       to: [email],
       subject: magnet.subject,
       html,

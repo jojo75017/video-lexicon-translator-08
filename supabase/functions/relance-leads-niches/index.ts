@@ -144,7 +144,7 @@ Deno.serve(async (req) => {
       const res = await sendResendEmailThrottled({
         from: "Georges Boubet <noreply@ebookstudio.fr>",
         to: [lead.email],
-        reply_to: "contact@ebookstudio.fr",
+        reply_to: "boubetgeorges@gmail.com",
         subject: "Vous aviez demandé mes niches KDP — et depuis ?",
         html: html(lead.first_name),
       });

@@ -84,7 +84,7 @@ const PromoPaiementPage = () => {
                 </Button>
               </Link>
               <p className="text-xs text-gray-500">
-                Une question ? Écrivez-nous à <a href="mailto:contact@ebookstudio.fr" className="text-[#008296]">contact@ebookstudio.fr</a>
+                Une question ? Écrivez-nous à <a href="mailto:boubetgeorges@gmail.com" className="text-[#008296]">boubetgeorges@gmail.com</a>
               </p>
             </div>
           </div>

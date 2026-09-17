@@ -401,7 +401,7 @@ Plus besoin de bricoler 10 outils. ${link}` : '';
                       Bannières 1200×630 (post Facebook/LinkedIn), 1080×1080 (Instagram), 1080×1920 (Story/Reel) - disponibles très bientôt.
                     </p>
                     <p className="text-xs text-gray-500">
-                      En attendant, contactez-nous : <strong>contact@ebookstudio.fr</strong>
+                      En attendant, contactez-nous : <strong>boubetgeorges@gmail.com</strong>
                     </p>
                   </div>
                 </TabsContent>

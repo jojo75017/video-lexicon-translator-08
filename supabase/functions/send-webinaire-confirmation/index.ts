@@ -68,7 +68,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "EbookStudio <contact@ebookstudio.fr>",
+        from: "EbookStudio <noreply@ebookstudio.fr>",
         to: [cleanEmail],
         subject: "🎉 Votre place au webinaire est confirmée !",
         html,

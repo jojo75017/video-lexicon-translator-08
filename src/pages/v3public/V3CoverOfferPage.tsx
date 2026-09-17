@@ -112,7 +112,7 @@ export default function V3CoverOfferPage() {
       toast.success('Votre demande de devis a bien été envoyée.');
     } catch (error) {
       console.error(error);
-      toast.error('Envoi impossible. Vous pouvez écrire à contact@ebookstudio.fr.');
+      toast.error('Envoi impossible. Vous pouvez écrire à boubetgeorges@gmail.com.');
     } finally {
       setSending(false);
     }
@@ -304,7 +304,7 @@ export default function V3CoverOfferPage() {
             <p className="mt-5 leading-7 text-[var(--v3-muted)]">Pour plusieurs couvertures ou une demande qui dépasse le cadre du Studio, décrivez votre projet. Vous recevrez une réponse personnelle avant tout engagement.</p>
             <div className="mt-8 flex items-start gap-3 text-sm text-[var(--v3-muted)]">
               <Mail className="mt-0.5 h-5 w-5 text-[var(--v3-emerald)]" />
-              <span>Vous pouvez aussi écrire directement à <a href="mailto:contact@ebookstudio.fr" className="font-bold text-[var(--v3-emerald)] underline">contact@ebookstudio.fr</a>.</span>
+              <span>Vous pouvez aussi écrire directement à <a href="mailto:boubetgeorges@gmail.com" className="font-bold text-[var(--v3-emerald)] underline">boubetgeorges@gmail.com</a>.</span>
             </div>
           </div>
 

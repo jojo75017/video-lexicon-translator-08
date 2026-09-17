@@ -71,7 +71,7 @@ serve(async (req) => {
     const sent = await resend.emails.send({
       from: "Georges Boubet <noreply@ebookstudio.fr>",
       to: [email],
-      reply_to: "contact@ebookstudio.fr",
+      reply_to: "boubetgeorges@gmail.com",
       subject,
       html,
     });

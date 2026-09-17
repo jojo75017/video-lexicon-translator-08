@@ -187,7 +187,7 @@ Deno.serve(async (req) => {
       const res = await sendResendEmailThrottled({
         from: "Georges Boubet <noreply@ebookstudio.fr>",
         to: [email],
-        reply_to: "contact@ebookstudio.fr",
+        reply_to: "boubetgeorges@gmail.com",
         subject: "Votre commande EbookStudio n'a pas été finalisée",
         html: html(order.first_name, link),
       });
