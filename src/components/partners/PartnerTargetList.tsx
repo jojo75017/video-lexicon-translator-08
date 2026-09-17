@@ -17,6 +17,23 @@ const platformLabel = (v: string) =>
   PARTNER_PLATFORMS.find((p) => p.value === v)?.label ?? v;
 
 /**
+ * Ouvre un lien externe même quand l'aperçu bloque les nouveaux onglets :
+ * on tente l'onglet, puis la fenêtre parente, sinon on copie l'adresse.
+ */
+const openExternal = (url: string) => {
+  try {
+    const win = window.open(url, '_blank', 'noopener,noreferrer');
+    if (win) return;
+  } catch { /* bloqué par l'aperçu */ }
+  try {
+    (window.top ?? window).location.href = url;
+    return;
+  } catch { /* iframe cloisonnée */ }
+  void navigator.clipboard?.writeText(url);
+  toast.info('Adresse copiée : collez-la dans un nouvel onglet.');
+};
+
+/**
  * Liste de cibles prête à travailler : chaque ligne indique l'endroit de contact
  * le plus probable et peut être ajoutée en un clic au suivi des contacts.
  * Lecture seule côté données métier — seule la table de suivi est alimentée.
@@ -221,6 +238,7 @@ export default function PartnerTargetList() {
                     href={targetContactUrl(t)}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={(e) => { e.preventDefault(); openExternal(targetContactUrl(t)); }}
                     className="inline-flex items-center gap-1.5 rounded-lg border border-[#008296] px-3 py-2 text-sm font-semibold text-[#008296]"
                   >
                     <ExternalLink className="h-4 w-4" /> Ouvrir la page pour trouver l’adresse
