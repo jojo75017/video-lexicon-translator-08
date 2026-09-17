@@ -100,6 +100,59 @@ export default function PartnerTargetList() {
     if (n > 0) toast.success(`${n} cible(s) ajoutée(s) au suivi`);
   };
 
+  /**
+   * Envoi du premier message à une cible dont l'adresse a été trouvée.
+   * L'adresse est saisie à la main : rien n'est deviné, aucun envoi de masse.
+   */
+  const sendTo = async (t: PartnerTarget) => {
+    const to = (emails[t.name] ?? '').trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(to)) {
+      toast.error('Collez d’abord une adresse e-mail valide.');
+      return;
+    }
+    setSending(t.name);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-partner-outreach', {
+        body: { to, name: t.name, niche: t.niche },
+      });
+      if (error) throw error;
+      if (!data?.success) {
+        toast.error(data?.error ?? "L'envoi n'a pas abouti.");
+        return;
+      }
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        const patch = {
+          email: to,
+          status: 'message1',
+          last_contact_at: new Date().toISOString(),
+          follow_up_at: new Date(Date.now() + 5 * 86_400_000).toISOString(),
+        };
+        if (existing.has(t.name)) {
+          await supabase.from('ambassador_outreach').update(patch).eq('handle', t.name);
+        } else {
+          await supabase.from('ambassador_outreach').insert({
+            owner_id: user.id,
+            handle: t.name,
+            platform: t.platform,
+            niche: t.niche,
+            source: 'manual',
+            ...patch,
+          });
+          setExisting((prev) => new Set(prev).add(t.name));
+        }
+      }
+      setSent((prev) => new Set(prev).add(t.name));
+      toast.success(`Message envoyé à ${t.name}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "L'envoi a échoué.");
+    } finally {
+      setSending(null);
+    }
+  };
+
   const remaining = useMemo(
     () => PARTNER_TARGETS.filter((t) => !existing.has(t.name)).length,
     [existing],
