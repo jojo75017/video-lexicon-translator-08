@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { AlertTriangle, CheckCircle2, Mail, Plus } from 'lucide-react';
 import {
+  PARTNER_EXCLUDED_TARGETS,
   PARTNER_TARGETS,
   PARTNER_TARGETS_RULE,
   type PartnerTarget,
@@ -92,6 +93,18 @@ export default function PartnerTargetList() {
       <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-[#232F3E]/80">
         <strong>La règle :</strong> {PARTNER_TARGETS_RULE}
       </div>
+
+      <div className="rounded-xl border border-[#232F3E]/10 bg-white p-4 text-sm text-[#232F3E]/75">
+        <strong>Écartés volontairement</strong> (ils vendent déjà un outil du même genre) :
+        <ul className="mt-2 space-y-1">
+          {PARTNER_EXCLUDED_TARGETS.map((e) => (
+            <li key={e.name}>
+              • <span className="font-semibold">{e.name}</span> — {e.reason}
+            </li>
+          ))}
+        </ul>
+      </div>
+
 
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm text-[#232F3E]/70">

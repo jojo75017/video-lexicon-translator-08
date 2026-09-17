@@ -5,7 +5,9 @@
  * `verified: false` = le nom circule dans la niche mais la chaîne ou le compte
  * exact doit être vérifié avant tout envoi. Aucun envoi automatique.
  *
- * Exclusion volontaire : Quentin Haguet (lié à Rocket KDP / Bookhag).
+ * Exclusions volontaires : voir PARTNER_EXCLUDED_TARGETS ci-dessous. On ne
+ * démarche pas quelqu'un qui vend déjà un outil concurrent : il ne recommandera
+ * pas EbookStudio, et le message donne des informations à un concurrent.
  */
 
 export interface PartnerTarget {
@@ -54,14 +56,6 @@ export const PARTNER_TARGETS: PartnerTarget[] = [
     niche: 'Outils numériques / IA',
     contact: 'Formulaire du site jeanviet.info',
     where: 'jeanviet.info → page Contact',
-    verified: true,
-  },
-  {
-    name: 'Antonin — KDP Pilot',
-    platform: 'youtube',
-    niche: 'Logiciel KDP',
-    contact: 'E-mail support du site',
-    where: 'Site KDP Pilot → Contact / mentions légales',
     verified: true,
   },
   {
@@ -153,14 +147,6 @@ export const PARTNER_TARGETS: PartnerTarget[] = [
     verified: true,
   },
   {
-    name: 'Sébastien — Ebook-Création',
-    platform: 'blog',
-    niche: 'Création d\u2019ebooks',
-    contact: 'E-mail du site',
-    where: 'Site → Contact',
-    verified: false,
-  },
-  {
     name: 'Jérôme — Écrire et être Lu',
     platform: 'podcast',
     niche: 'Écriture / publication',
@@ -205,3 +191,10 @@ export const PARTNER_TARGETS: PartnerTarget[] = [
 /** Rappel affiché au-dessus de la liste. */
 export const PARTNER_TARGETS_RULE =
   'Un seul message par cible, puis une seule relance à cinq jours. On vérifie la chaîne ou le compte avant d\u2019écrire.';
+
+/** Cibles volontairement écartées : elles vendent déjà un outil du même genre. */
+export const PARTNER_EXCLUDED_TARGETS: { name: string; reason: string }[] = [
+  { name: 'Quentin Haguet', reason: 'lié à Rocket KDP / Bookhag' },
+  { name: 'Antonin — KDP Pilot', reason: 'vend son propre logiciel KDP' },
+  { name: 'Sébastien — Ebook-Création', reason: 'vend sa propre solution de création d’ebooks' },
+];
