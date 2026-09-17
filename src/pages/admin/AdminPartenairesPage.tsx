@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ExternalLink, Target, Users } from 'lucide-react';
 import AmbassadorOutreachTracker from '@/components/ambassador/AmbassadorOutreachTracker';
 import CopyBlockList from '@/components/partners/CopyBlockList';
+import PartnerTargetList from '@/components/partners/PartnerTargetList';
 import ReferralTrackingPanel from '@/components/admin/ReferralTrackingPanel';
 import {
   BEST_COMMISSION,
