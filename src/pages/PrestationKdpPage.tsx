@@ -135,6 +135,28 @@ export default function PrestationKdpPage() {
         canonical="/prestation-kdp"
       />
 
+      {/* Retour */}
+      <div className="sticky top-0 z-30 border-b border-[var(--v3-line)] bg-[var(--v3-paper)]/90 px-5 py-3 backdrop-blur sm:px-8">
+        <div className="mx-auto flex max-w-6xl items-center justify-between">
+          <button
+            type="button"
+            onClick={() => {
+              if (window.history.length > 1) navigate(-1);
+              else navigate('/v3');
+            }}
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--v3-line)] px-4 py-2 text-sm font-medium text-[var(--v3-ink)] transition hover:border-[var(--v3-emerald)] hover:text-[var(--v3-emerald)]"
+          >
+            <ArrowLeft className="h-4 w-4" /> Retour
+          </button>
+          <Link
+            to="/v3/forfaits"
+            className="text-sm font-medium text-[var(--v3-emerald)] transition hover:underline"
+          >
+            Voir les forfaits
+          </Link>
+        </div>
+      </div>
+
       {/* Hero */}
       <section className="border-b border-[var(--v3-line)] px-5 py-16 sm:px-8 lg:py-24">
         <div className="mx-auto max-w-5xl">
