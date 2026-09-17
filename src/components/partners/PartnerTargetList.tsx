@@ -25,10 +25,25 @@ export default function PartnerTargetList() {
   const [existing, setExisting] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState<string | null>(null);
   const [bulk, setBulk] = useState(false);
+  const [emails, setEmails] = useState<Record<string, string>>({});
+  const [sent, setSent] = useState<Set<string>>(new Set());
+  const [sending, setSending] = useState<string | null>(null);
 
   const loadExisting = async () => {
-    const { data } = await supabase.from('ambassador_outreach').select('handle');
-    if (data) setExisting(new Set(data.map((r) => (r.handle ?? '').trim())));
+    const { data } = await supabase
+      .from('ambassador_outreach')
+      .select('handle, email, status');
+    if (!data) return;
+    setExisting(new Set(data.map((r) => (r.handle ?? '').trim())));
+    const known: Record<string, string> = {};
+    const done = new Set<string>();
+    data.forEach((r) => {
+      const h = (r.handle ?? '').trim();
+      if (r.email) known[h] = r.email;
+      if (r.status && r.status !== 'a_contacter') done.add(h);
+    });
+    setEmails((prev) => ({ ...known, ...prev }));
+    setSent(done);
   };
 
   useEffect(() => {
