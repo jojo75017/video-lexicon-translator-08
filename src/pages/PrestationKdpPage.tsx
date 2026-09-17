@@ -22,6 +22,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import useIsAdmin from '@/hooks/useIsAdmin';
+import '@/styles/v3-public.css';
 import { supabase } from '@/integrations/supabase/client';
 import {
   PRESTATION_DELAY,
