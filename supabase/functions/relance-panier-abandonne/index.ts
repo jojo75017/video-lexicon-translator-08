@@ -57,7 +57,7 @@ Votre commande est restée en attente
 <p style="margin:0 0 16px">${hello}</p>
 <p style="margin:0 0 16px">Vous avez commencé votre commande d'EbookStudio, mais le paiement n'est pas allé au bout. C'est peut-être un détail technique — ou une hésitation légitime. Dans les deux cas, voici de quoi trancher.</p>
 <ul style="margin:0 0 18px;padding-left:22px">
-<li style="margin-bottom:8px"><strong>47 € une seule fois</strong>, accès conservé à vie. À partir du 1<sup>er</sup> octobre, ce sera un abonnement à 17 € par mois, soit 204 € la première année.</li>
+<li style="margin-bottom:8px"><strong>47 € une seule fois</strong>, accès conservé à vie, jusqu'au 30 septembre. À partir du 1<sup>er</sup> octobre, l'accès passe en abonnement : 27 € par mois (formule Plume) ou 47 € par mois (formule Édition).</li>
 <li style="margin-bottom:8px"><strong>Garantie 30 jours</strong> : si l'outil ne vous convient pas, vous êtes remboursé sur simple demande, sans justification.</li>
 <li style="margin-bottom:8px"><strong>Carte bancaire ou PayPal</strong>, en 1, 2 ou 3 fois.</li>
 <li>Aucun abonnement, rien à résilier.</li>
