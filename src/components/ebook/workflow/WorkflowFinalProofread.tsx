@@ -46,6 +46,43 @@ interface WorkflowFinalProofreadProps {
   onApply?: (chapters: FinalProofreadOutcome[]) => void;
 }
 
+/** Mémoire locale : une relecture déjà payée ne doit jamais être relancée toute seule. */
+const STORE_PREFIX = 'v3:lior-proofread:';
+
+function storeKey(signature: string): string {
+  let hash = 0;
+  for (let i = 0; i < signature.length; i++) {
+    hash = (hash * 31 + signature.charCodeAt(i)) | 0;
+  }
+  return `${STORE_PREFIX}${hash.toString(36)}-${signature.length}`;
+}
+
+type StoredProofread = { items: ChapterProofread[]; finished: boolean; applied: boolean };
+
+function readStored(signature: string): StoredProofread | null {
+  try {
+    const raw = localStorage.getItem(storeKey(signature));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || !Array.isArray(parsed.items) || parsed.items.length === 0) return null;
+    return { items: parsed.items, finished: Boolean(parsed.finished), applied: Boolean(parsed.applied) };
+  } catch {
+    return null;
+  }
+}
+
+function writeStored(signature: string, data: StoredProofread) {
+  try {
+    localStorage.setItem(storeKey(signature), JSON.stringify(data));
+  } catch {
+    /* stockage plein : la relecture reste utilisable pour cette session. */
+  }
+}
+
+function signatureOf(pairs: Array<{ title: string; length: number }>): string {
+  return pairs.map((p) => `${p.title}:${p.length}`).join('|');
+}
+
 function toProofreadChapters(sources: FinalProofreadChapterSource[]): ChapterProofread[] {
   return sources.map((raw, i) => ({
     chapterId: `p16-${i}`,
@@ -65,22 +102,43 @@ export default function WorkflowFinalProofread({
   autoStart = true,
   onApply,
 }: WorkflowFinalProofreadProps) {
-  const [items, setItems] = useState<ChapterProofread[]>(() => toProofreadChapters(chapters));
-  const [running, setRunning] = useState(false);
-  const [finished, setFinished] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(-1);
-  const [applied, setApplied] = useState(false);
-  const [openChapter, setOpenChapter] = useState<number | null>(null);
-  const stopRef = useRef(false);
-  const startedRef = useRef(false);
-  const itemsRef = useRef<ChapterProofread[]>(items);
-
   // Le manuscrit change (nouveau projet) : on repart d'une relecture vierge.
   const signature = useMemo(
     () => chapters.map((c) => `${c?.titre ?? c?.title ?? ''}:${(c?.contenu ?? c?.content ?? '').length}`).join('|'),
     [chapters],
   );
+  const initial = useMemo(() => readStored(signature), [signature]);
+
+  const [items, setItems] = useState<ChapterProofread[]>(() => initial?.items ?? toProofreadChapters(chapters));
+  const [running, setRunning] = useState(false);
+  const [finished, setFinished] = useState(Boolean(initial?.finished));
+  const [currentIndex, setCurrentIndex] = useState(-1);
+  const [applied, setApplied] = useState(Boolean(initial?.applied));
+  const [openChapter, setOpenChapter] = useState<number | null>(null);
+  const stopRef = useRef(false);
+  const startedRef = useRef(Boolean(initial));
+  const itemsRef = useRef<ChapterProofread[]>(items);
+  const signatureRef = useRef(signature);
+  /** Signature attendue après application au livre : ne doit pas effacer la relecture. */
+  const skipSignatureRef = useRef<string | null>(null);
+
   useEffect(() => {
+    if (signatureRef.current === signature) return;
+    signatureRef.current = signature;
+    if (skipSignatureRef.current === signature) {
+      skipSignatureRef.current = null;
+      return;
+    }
+    const saved = readStored(signature);
+    if (saved) {
+      itemsRef.current = saved.items;
+      setItems(saved.items);
+      setFinished(saved.finished);
+      setApplied(saved.applied);
+      setCurrentIndex(-1);
+      startedRef.current = true;
+      return;
+    }
     const fresh = toProofreadChapters(chapters);
     itemsRef.current = fresh;
     setItems(fresh);
@@ -132,6 +190,8 @@ export default function WorkflowFinalProofread({
         toast.success(`Lior a relu votre livre : ${ok} chapitre(s) corrigé(s).`);
       }
       setFinished(!stopRef.current);
+      itemsRef.current = working;
+      writeStored(signatureRef.current, { items: working, finished: !stopRef.current, applied: false });
     } catch (e: any) {
       toast.error(e?.message || 'La relecture finale a échoué.');
     } finally {
@@ -152,6 +212,7 @@ export default function WorkflowFinalProofread({
     itemsRef.current = next;
     setItems(next);
     setApplied(false);
+    writeStored(signatureRef.current, { items: next, finished, applied: false });
   };
 
   const acceptAll = () => {
@@ -163,17 +224,26 @@ export default function WorkflowFinalProofread({
 
   const applyToBook = (source: ChapterProofread[]) => {
     if (!onApply) return;
-    onApply(
-      source.map((c, i) => ({
-        index: i,
-        title: c.title,
-        text: c.accepted && c.corrected ? effectiveText(c) : c.original,
-        corrections: c.accepted ? c.corrections?.length || 0 : 0,
-        quality: c.quality || 0,
-        accepted: Boolean(c.accepted && c.corrected),
-      })),
-    );
+    const outcomes = source.map((c, i) => ({
+      index: i,
+      title: c.title,
+      text: c.accepted && c.corrected ? effectiveText(c) : c.original,
+      corrections: c.accepted ? c.corrections?.length || 0 : 0,
+      quality: c.quality || 0,
+      accepted: Boolean(c.accepted && c.corrected),
+    }));
+
+    // Le livre va changer de longueur : on mémorise la relecture sous l'ancienne
+    // et la nouvelle signature, et on demande à ne pas réinitialiser l'affichage.
+    const nextSignature = signatureOf(outcomes.map((o) => ({ title: o.title, length: o.text.length })));
+    const record = { items: source, finished: true, applied: true };
+    writeStored(signatureRef.current, record);
+    writeStored(nextSignature, record);
+    skipSignatureRef.current = nextSignature;
+
+    onApply(outcomes);
     setApplied(true);
+    setFinished(true);
     toast.success('Version corrigée appliquée au livre : les exports utiliseront ce texte.');
   };
 
