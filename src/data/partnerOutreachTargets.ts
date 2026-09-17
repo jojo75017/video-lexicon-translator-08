@@ -188,6 +188,26 @@ export const PARTNER_TARGETS: PartnerTarget[] = [
   },
 ];
 
+/**
+ * Lien direct vers l'endroit où trouver le point de contact de la cible.
+ * On ne devine aucune adresse : on ouvre la recherche ou le réseau concerné.
+ */
+export const targetContactUrl = (t: PartnerTarget): string => {
+  const q = encodeURIComponent(t.name);
+  switch (t.platform) {
+    case 'youtube':
+      return `https://www.youtube.com/results?search_query=${q}`;
+    case 'instagram':
+      return `https://www.instagram.com/explore/search/keyword/?q=${q}`;
+    case 'tiktok':
+      return `https://www.tiktok.com/search?q=${q}`;
+    case 'groupe':
+      return `https://www.facebook.com/search/groups/?q=${q}`;
+    default:
+      return `https://duckduckgo.com/?q=${q}+contact`;
+  }
+};
+
 /** Rappel affiché au-dessus de la liste. */
 export const PARTNER_TARGETS_RULE =
   'Un seul message par cible, puis une seule relance à cinq jours. On vérifie la chaîne ou le compte avant d\u2019écrire.';
