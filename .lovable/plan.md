@@ -1,30 +1,28 @@
-# Première publicité payante pour EbookStudio (budget 50 €)
+# Toucher des abonnés avec 50 € — que vaut Google Ads, et quoi d'autre
 
-## Avertissement honnête avant de dépenser
+## Mon avis honnête (d'abord)
 
-Vos 10 derniers clics n'ont donné aucune vente. En règle générale, le trafic payant convertit environ **deux fois moins** que le trafic naturel. Avec 50 €, on parle de quelques dizaines de visiteurs : c'est un **test**, pas un robinet d'abonnés. Rien ne sera dépensé sans votre accord explicite, et le budget reste le vôtre, modifiable à tout moment.
+Vos données réelles : 10 clics → 0 vente, 27 paniers abandonnés, 1 commande payée depuis le début. Payer pour envoyer encore plus de visiteurs sur une page qui ne convertit pas, c'est risquer de brûler 50 € pour zéro retour. Google Ads n'est pas une mauvaise idée en soi, mais **ce n'est pas la priorité** tant que la conversion n'est pas réparée.
 
-## Recommandation : Google Ads, pas Facebook
+## Trois options, classées par rendement réel pour 50 €
 
-- **Google Search** (recommandé) : votre annonce s'affiche quand quelqu'un tape « écrire un livre avec l'IA » ou « publier un livre sur Amazon KDP ». La personne cherche déjà une solution — c'est le public le plus chaud possible pour 50 €.
-- **Boost Facebook** : touche des gens qui ne cherchent rien, bon pour la notoriété, mauvais pour des ventes immédiates avec un petit budget. Déconseillé ici.
+### 1. Récupérer les 27 paniers abandonnés (gratuit, le plus chaud)
+27 personnes sont déjà allées jusqu'au paiement sans finir. Un email humain et individuel à chacun (« votre accès est resté en attente — une question ? Répondez-moi ») coûte 0 € et touche le public le plus chaud qui existe. C'est là que 50 € rapporteraient le plus — sauf qu'ici, ça ne coûte rien.
 
-## Étapes du plan
+### 2. Affiliation YouTubeurs KDP (0 € d'avance, on ne paie qu'à la vente)
+2 à 3 créateurs YouTube/formateurs français de la niche auto-édition/KDP, commission 30-40 % sur chaque vente. Leur audience leur fait déjà confiance — un lien dans une description de vidéo convertit 10 à 50 fois mieux qu'un email froid. Vous ne sortez un centime que lorsqu'une vente est faite. C'est le levier le moins contraignant et le plus rentable pour un petit budget.
 
-1. **Recherche rapide (gratuite, avant tout achat)** — je vérifie ce que les gens tapent vraiment sur Google dans votre niche (volumes, prix par clic) et ce que font les concurrents. Cela décide des mots-clés de l'annonce.
-2. **Connexion du compte Google Ads** — je vous ouvre la carte de connexion ; vous choisissez ou créez le compte. Aucune campagne n'est créée à ce stade.
-3. **Page de destination** — l'annonce pointera vers `https://ebookstudio.fr/avant-premiere` (déjà publiée, avec le formulaire d'inscription et le lien 47 €).
-4. **Suivi des résultats** — on mesure combien de visiteurs de l'annonce s'inscrivent ou achètent, pour savoir si les 50 € ont rapporté quelque chose.
-5. **Création de la campagne** — annonce texte simple (titres + descriptions), mots-clés validés ensemble, budget quotidien que VOUS confirmez (ex. 5 €/jour sur 10 jours = 50 €). Rien ne part en ligne sans votre validation finale sur la carte d'approbation.
+### 3. Google Search Ads (test payant, à condition de corriger la page)
+Votre annonce s'affiche quand quelqu'un tape « écrire un livre avec l'IA » ou « publier sur Amazon KDP » — public chaud. Mais à ~1-2 € le clic, 50 € = 25 à 50 visiteurs seulement, et au taux actuel (0/10) ça donnerait probablement 0 vente. À faire **uniquement après** avoir amélioré la page d'atterrissage, comme un test court pour mesurer.
+
+## Ce que je recommande concrètement
+
+Commencer par les deux leviers gratuits (paniers abandonnés + affiliation), qui touchent déjà des gens chauds sans risque. Garder Google Ads comme test possible plus tard, une fois qu'on aura vu au moins une vente sortir des leviers gratuits.
 
 ## Ce qui n'est pas touché
 
-Prix, paiements, base de données, sécurité, calculs KDP, crédits IA, V4, page d'accueil. Aucun envoi d'email.
-
-## Alternative sans budget (si vous préférez attendre)
-
-Continuer les leviers gratuits déjà en place : blog ebookstudio.blog (2 articles/semaine), affiliation YouTubeurs KDP (40 % de commission), témoignages. Plus lent, mais zéro risque financier.
+Prix, paiements, base de données, sécurité, calculs KDP, crédits IA, V4, page d'accueil. Aucun envoi d'email sans votre accord.
 
 ## Décision à prendre
 
-Lancer la recherche Google Ads (étape 1, gratuite) ou rester sur les leviers gratuits pour l'instant.
+Souhaitez-vous que je prépare : (a) la relance des 27 paniers abandonnés, (b) le kit d'approche affiliation pour YouTubeurs KDP, (c) le test Google Ads quand même, ou plusieurs à la fois ?
