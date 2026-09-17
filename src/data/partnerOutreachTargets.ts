@@ -59,14 +59,6 @@ export const PARTNER_TARGETS: PartnerTarget[] = [
     verified: true,
   },
   {
-    name: 'Antonin — KDP Pilot',
-    platform: 'youtube',
-    niche: 'Logiciel KDP',
-    contact: 'E-mail support du site',
-    where: 'Site KDP Pilot → Contact / mentions légales',
-    verified: true,
-  },
-  {
     name: 'Stan Juliann',
     platform: 'youtube',
     niche: 'Auto-édition',
