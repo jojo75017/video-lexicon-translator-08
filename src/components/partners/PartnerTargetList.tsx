@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { AlertTriangle, CheckCircle2, ExternalLink, Mail, Plus, Send } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Copy, Mail, Plus, Send } from 'lucide-react';
 import {
   PARTNER_EXCLUDED_TARGETS,
   PARTNER_TARGETS,
@@ -16,18 +16,25 @@ import { PARTNER_PLATFORMS } from '@/data/partnerProgram';
 const platformLabel = (v: string) =>
   PARTNER_PLATFORMS.find((p) => p.value === v)?.label ?? v;
 
-/**
- * Ouvre un lien externe dans un nouvel onglet. Jamais dans l'aperçu lui-même :
- * YouTube/Google refusent d'être affichés dans un cadre (ERR_BLOCKED_BY_RESPONSE).
- * Si l'onglet est bloqué, on copie l'adresse pour la coller manuellement.
- */
-const openExternal = (url: string) => {
+const copyExternalUrl = async (url: string) => {
   try {
-    const win = window.open(url, '_blank', 'noopener,noreferrer');
-    if (win) return;
-  } catch { /* bloqué par l'aperçu */ }
-  void navigator.clipboard?.writeText(url);
-  toast.info('Adresse copiée : collez-la dans un nouvel onglet de votre navigateur.');
+    await navigator.clipboard.writeText(url);
+    toast.success('Lien copié. Ouvrez un nouvel onglet, puis collez-le dans la barre d’adresse.');
+  } catch {
+    const field = document.createElement('textarea');
+    field.value = url;
+    field.style.position = 'fixed';
+    field.style.opacity = '0';
+    document.body.appendChild(field);
+    field.select();
+    const copied = document.execCommand('copy');
+    field.remove();
+    if (copied) {
+      toast.success('Lien copié. Ouvrez un nouvel onglet, puis collez-le dans la barre d’adresse.');
+    } else {
+      toast.error('La copie est bloquée par votre navigateur.');
+    }
+  }
 };
 
 /**
@@ -231,15 +238,14 @@ export default function PartnerTargetList() {
                 <p className="text-xs text-[#232F3E]/50">Niche : {t.niche}</p>
 
                 <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <a
-                    href={targetContactUrl(t)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => { e.preventDefault(); openExternal(targetContactUrl(t)); }}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-[#008296] px-3 py-2 text-sm font-semibold text-[#008296]"
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => void copyExternalUrl(targetContactUrl(t))}
+                    className="border-[#008296] text-[#008296]"
                   >
-                    <ExternalLink className="h-4 w-4" /> Ouvrir la page pour trouver l’adresse
-                  </a>
+                    <Copy className="mr-1 h-4 w-4" /> Copier le lien de recherche
+                  </Button>
                   <Input
                     type="email"
                     value={emails[t.name] ?? ''}
