@@ -102,22 +102,43 @@ export default function WorkflowFinalProofread({
   autoStart = true,
   onApply,
 }: WorkflowFinalProofreadProps) {
-  const [items, setItems] = useState<ChapterProofread[]>(() => toProofreadChapters(chapters));
-  const [running, setRunning] = useState(false);
-  const [finished, setFinished] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(-1);
-  const [applied, setApplied] = useState(false);
-  const [openChapter, setOpenChapter] = useState<number | null>(null);
-  const stopRef = useRef(false);
-  const startedRef = useRef(false);
-  const itemsRef = useRef<ChapterProofread[]>(items);
-
   // Le manuscrit change (nouveau projet) : on repart d'une relecture vierge.
   const signature = useMemo(
     () => chapters.map((c) => `${c?.titre ?? c?.title ?? ''}:${(c?.contenu ?? c?.content ?? '').length}`).join('|'),
     [chapters],
   );
+  const initial = useMemo(() => readStored(signature), [signature]);
+
+  const [items, setItems] = useState<ChapterProofread[]>(() => initial?.items ?? toProofreadChapters(chapters));
+  const [running, setRunning] = useState(false);
+  const [finished, setFinished] = useState(Boolean(initial?.finished));
+  const [currentIndex, setCurrentIndex] = useState(-1);
+  const [applied, setApplied] = useState(Boolean(initial?.applied));
+  const [openChapter, setOpenChapter] = useState<number | null>(null);
+  const stopRef = useRef(false);
+  const startedRef = useRef(Boolean(initial));
+  const itemsRef = useRef<ChapterProofread[]>(items);
+  const signatureRef = useRef(signature);
+  /** Signature attendue après application au livre : ne doit pas effacer la relecture. */
+  const skipSignatureRef = useRef<string | null>(null);
+
   useEffect(() => {
+    if (signatureRef.current === signature) return;
+    signatureRef.current = signature;
+    if (skipSignatureRef.current === signature) {
+      skipSignatureRef.current = null;
+      return;
+    }
+    const saved = readStored(signature);
+    if (saved) {
+      itemsRef.current = saved.items;
+      setItems(saved.items);
+      setFinished(saved.finished);
+      setApplied(saved.applied);
+      setCurrentIndex(-1);
+      startedRef.current = true;
+      return;
+    }
     const fresh = toProofreadChapters(chapters);
     itemsRef.current = fresh;
     setItems(fresh);
