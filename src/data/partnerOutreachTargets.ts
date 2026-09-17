@@ -155,14 +155,6 @@ export const PARTNER_TARGETS: PartnerTarget[] = [
     verified: true,
   },
   {
-    name: 'Sébastien — Ebook-Création',
-    platform: 'blog',
-    niche: 'Création d\u2019ebooks',
-    contact: 'E-mail du site',
-    where: 'Site → Contact',
-    verified: false,
-  },
-  {
     name: 'Jérôme — Écrire et être Lu',
     platform: 'podcast',
     niche: 'Écriture / publication',
