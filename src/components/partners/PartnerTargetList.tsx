@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { AlertTriangle, CheckCircle2, Mail, Plus } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, ExternalLink, Mail, Plus, Send } from 'lucide-react';
 import {
   PARTNER_EXCLUDED_TARGETS,
   PARTNER_TARGETS,
   PARTNER_TARGETS_RULE,
+  targetContactUrl,
   type PartnerTarget,
 } from '@/data/partnerOutreachTargets';
 import { PARTNER_PLATFORMS } from '@/data/partnerProgram';
