@@ -224,17 +224,26 @@ export default function WorkflowFinalProofread({
 
   const applyToBook = (source: ChapterProofread[]) => {
     if (!onApply) return;
-    onApply(
-      source.map((c, i) => ({
-        index: i,
-        title: c.title,
-        text: c.accepted && c.corrected ? effectiveText(c) : c.original,
-        corrections: c.accepted ? c.corrections?.length || 0 : 0,
-        quality: c.quality || 0,
-        accepted: Boolean(c.accepted && c.corrected),
-      })),
-    );
+    const outcomes = source.map((c, i) => ({
+      index: i,
+      title: c.title,
+      text: c.accepted && c.corrected ? effectiveText(c) : c.original,
+      corrections: c.accepted ? c.corrections?.length || 0 : 0,
+      quality: c.quality || 0,
+      accepted: Boolean(c.accepted && c.corrected),
+    }));
+
+    // Le livre va changer de longueur : on mémorise la relecture sous l'ancienne
+    // et la nouvelle signature, et on demande à ne pas réinitialiser l'affichage.
+    const nextSignature = signatureOf(outcomes.map((o) => ({ title: o.title, length: o.text.length })));
+    const record = { items: source, finished: true, applied: true };
+    writeStored(signatureRef.current, record);
+    writeStored(nextSignature, record);
+    skipSignatureRef.current = nextSignature;
+
+    onApply(outcomes);
     setApplied(true);
+    setFinished(true);
     toast.success('Version corrigée appliquée au livre : les exports utiliseront ce texte.');
   };
 
