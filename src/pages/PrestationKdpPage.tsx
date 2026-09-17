@@ -124,7 +124,7 @@ export default function PrestationKdpPage() {
 
   return (
     <div
-      className="min-h-screen bg-[var(--v3-paper)] text-[var(--v3-ink)]"
+      className="v3pub min-h-screen bg-[var(--v3-paper)] text-[var(--v3-ink)]"
       style={{ fontFamily: "'Work Sans', system-ui, sans-serif" }}
     >
       <SeoHead
