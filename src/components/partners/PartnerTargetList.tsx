@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { AlertTriangle, CheckCircle2, Mail, Plus } from 'lucide-react';
 import {
+  PARTNER_EXCLUDED_TARGETS,
   PARTNER_TARGETS,
   PARTNER_TARGETS_RULE,
   type PartnerTarget,
