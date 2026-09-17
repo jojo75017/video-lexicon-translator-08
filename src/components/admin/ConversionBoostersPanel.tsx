@@ -45,7 +45,7 @@ const ACTIONS: Array<{
 ];
 
 const ConversionBoostersPanel = () => {
-  const [counts, setCounts] = useState<Record<ActionKey, number | null>>({ temoignage: null, panier: null });
+  const [counts, setCounts] = useState<Record<ActionKey, number | null>>({ temoignage: null, panier: null, leadsNiches: null });
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState<ActionKey | null>(null);
 
