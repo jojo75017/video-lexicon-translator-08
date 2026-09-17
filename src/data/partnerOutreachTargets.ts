@@ -5,7 +5,9 @@
  * `verified: false` = le nom circule dans la niche mais la chaîne ou le compte
  * exact doit être vérifié avant tout envoi. Aucun envoi automatique.
  *
- * Exclusion volontaire : Quentin Haguet (lié à Rocket KDP / Bookhag).
+ * Exclusions volontaires : voir PARTNER_EXCLUDED_TARGETS ci-dessous. On ne
+ * démarche pas quelqu'un qui vend déjà un outil concurrent : il ne recommandera
+ * pas EbookStudio, et le message donne des informations à un concurrent.
  */
 
 export interface PartnerTarget {
