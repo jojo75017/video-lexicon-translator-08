@@ -55,6 +55,7 @@ const STEPS = [
 
 export default function PrestationKdpPage() {
   const { isAdmin } = useIsAdmin();
+  const navigate = useNavigate();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
