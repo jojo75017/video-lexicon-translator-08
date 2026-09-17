@@ -17,20 +17,17 @@ const platformLabel = (v: string) =>
   PARTNER_PLATFORMS.find((p) => p.value === v)?.label ?? v;
 
 /**
- * Ouvre un lien externe même quand l'aperçu bloque les nouveaux onglets :
- * on tente l'onglet, puis la fenêtre parente, sinon on copie l'adresse.
+ * Ouvre un lien externe dans un nouvel onglet. Jamais dans l'aperçu lui-même :
+ * YouTube/Google refusent d'être affichés dans un cadre (ERR_BLOCKED_BY_RESPONSE).
+ * Si l'onglet est bloqué, on copie l'adresse pour la coller manuellement.
  */
 const openExternal = (url: string) => {
   try {
     const win = window.open(url, '_blank', 'noopener,noreferrer');
     if (win) return;
   } catch { /* bloqué par l'aperçu */ }
-  try {
-    (window.top ?? window).location.href = url;
-    return;
-  } catch { /* iframe cloisonnée */ }
   void navigator.clipboard?.writeText(url);
-  toast.info('Adresse copiée : collez-la dans un nouvel onglet.');
+  toast.info('Adresse copiée : collez-la dans un nouvel onglet de votre navigateur.');
 };
 
 /**
