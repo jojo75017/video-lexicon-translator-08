@@ -376,6 +376,13 @@ export default function V3CoverOfferPage() {
             <a href="#devis">J’ai besoin d’un devis</a>
           </Button>
         </div>
+        <p className="mx-auto mt-6 max-w-xl text-sm leading-6 text-primary-foreground/60">
+          Vous préférez que tout soit fait pour vous ?{' '}
+          <Link to="/prestation-kdp" className="underline underline-offset-4 hover:text-primary-foreground">
+            Découvrez la prestation KDP clé en main
+          </Link>
+          .
+        </p>
       </section>
     </div>
   );
