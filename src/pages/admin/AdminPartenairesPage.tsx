@@ -84,6 +84,10 @@ export default function AdminPartenairesPage() {
             <CopyBlockList blocks={messages} tone="admin" />
           </TabsContent>
 
+          <TabsContent value="liste" className="mt-5">
+            <PartnerTargetList />
+          </TabsContent>
+
           <TabsContent value="cibles" className="mt-5">
             <div className="space-y-3">
               {PARTNER_TARGET_TYPES.map((t) => (
