@@ -46,6 +46,43 @@ interface WorkflowFinalProofreadProps {
   onApply?: (chapters: FinalProofreadOutcome[]) => void;
 }
 
+/** Mémoire locale : une relecture déjà payée ne doit jamais être relancée toute seule. */
+const STORE_PREFIX = 'v3:lior-proofread:';
+
+function storeKey(signature: string): string {
+  let hash = 0;
+  for (let i = 0; i < signature.length; i++) {
+    hash = (hash * 31 + signature.charCodeAt(i)) | 0;
+  }
+  return `${STORE_PREFIX}${hash.toString(36)}-${signature.length}`;
+}
+
+type StoredProofread = { items: ChapterProofread[]; finished: boolean; applied: boolean };
+
+function readStored(signature: string): StoredProofread | null {
+  try {
+    const raw = localStorage.getItem(storeKey(signature));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || !Array.isArray(parsed.items) || parsed.items.length === 0) return null;
+    return { items: parsed.items, finished: Boolean(parsed.finished), applied: Boolean(parsed.applied) };
+  } catch {
+    return null;
+  }
+}
+
+function writeStored(signature: string, data: StoredProofread) {
+  try {
+    localStorage.setItem(storeKey(signature), JSON.stringify(data));
+  } catch {
+    /* stockage plein : la relecture reste utilisable pour cette session. */
+  }
+}
+
+function signatureOf(pairs: Array<{ title: string; length: number }>): string {
+  return pairs.map((p) => `${p.title}:${p.length}`).join('|');
+}
+
 function toProofreadChapters(sources: FinalProofreadChapterSource[]): ChapterProofread[] {
   return sources.map((raw, i) => ({
     chapterId: `p16-${i}`,
