@@ -190,6 +190,8 @@ export default function WorkflowFinalProofread({
         toast.success(`Lior a relu votre livre : ${ok} chapitre(s) corrigé(s).`);
       }
       setFinished(!stopRef.current);
+      itemsRef.current = working;
+      writeStored(signatureRef.current, { items: working, finished: !stopRef.current, applied: false });
     } catch (e: any) {
       toast.error(e?.message || 'La relecture finale a échoué.');
     } finally {
