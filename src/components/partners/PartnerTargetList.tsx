@@ -215,6 +215,41 @@ export default function PartnerTargetList() {
                   <span className="font-semibold">{t.contact}</span> — {t.where}
                 </p>
                 <p className="text-xs text-[#232F3E]/50">Niche : {t.niche}</p>
+
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <a
+                    href={targetContactUrl(t)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-[#008296] px-3 py-2 text-sm font-semibold text-[#008296]"
+                  >
+                    <ExternalLink className="h-4 w-4" /> Ouvrir la page pour trouver l’adresse
+                  </a>
+                  <Input
+                    type="email"
+                    value={emails[t.name] ?? ''}
+                    onChange={(e) =>
+                      setEmails((prev) => ({ ...prev, [t.name]: e.target.value }))
+                    }
+                    placeholder="coller l’adresse e-mail trouvée"
+                    className="h-10 w-[240px]"
+                  />
+                  {sent.has(t.name) ? (
+                    <span className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-700">
+                      <CheckCircle2 className="h-4 w-4" /> Message envoyé
+                    </span>
+                  ) : (
+                    <Button
+                      onClick={() => sendTo(t)}
+                      disabled={sending === t.name}
+                      style={{ background: '#FF9E2D', color: '#232F3E' }}
+                      className="font-semibold"
+                    >
+                      <Send className="mr-1 h-4 w-4" />
+                      {sending === t.name ? 'Envoi…' : 'Envoyer le message'}
+                    </Button>
+                  )}
+                </div>
               </div>
               {added ? (
                 <span className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-700">
