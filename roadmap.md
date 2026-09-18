@@ -12,3 +12,7 @@
 - [x] Relancer les paniers abandonnés réellement en attente
 - [ ] Kit d'approche affiliation YouTubeurs KDP (à décider)
 - [ ] Test Google Ads 50 € (reporté : à revoir après une première vente)
+
+## KDP — Fiche Audit
+
+- [ ] Ajouter la génération et le téléchargement d’images aux normes A+ pour les 4 modules
