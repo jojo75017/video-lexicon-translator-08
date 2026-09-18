@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { MARKETPLACES, fetchAmazonBook, fmtEur, fmtNum, type MarketBook } from '@/components/admin/market/marketShared';
-import { callAIWriting, hasValidActiveKey } from '@/services/aiWritingService';
+import { callAIWriting, isAIConfigured } from '@/services/aiWritingService';
 
 interface AplusModule {
   titre: string;
