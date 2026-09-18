@@ -27,10 +27,10 @@
   --v3-line: rgba(45, 62, 51, 0.10);
   --v3-border: rgba(45, 62, 51, 0.10);
 
-  /* Alias historiques (compatibilité descendante — mapent vers émeraude/or) */
-  --v3-orange: var(--v3-emerald);
-  --v3-orange-600: var(--v3-emerald-600);
-  --v3-orange-50: var(--v3-emerald-50);
+  /* Orange réel (boutons lisibles, texte blanc) */
+  --v3-orange: #c2410c;
+  --v3-orange-600: #9a3412;
+  --v3-orange-50: #fff7ed;
   --v3-cloud: var(--v3-cream);
 
   /* Ombres éditoriales */
