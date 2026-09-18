@@ -1040,6 +1040,7 @@ export const AdminPage = () => {
                             {subscriber.status}
                           </Badge>
                           <Badge variant="outline">{subscriber.plan_type}</Badge>
+                          <SeniorityBadge dateStr={subscriber.created_at} />
                         </div>
                         <div className="mt-2 text-sm text-muted-foreground">
                           Code: <span className="font-mono font-bold">{subscriber.access_code}</span>
