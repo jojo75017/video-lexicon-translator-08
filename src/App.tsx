@@ -266,6 +266,7 @@ const AdminSequenceEmailPage = lazy(() => import('./pages/admin/AdminSequenceEma
 const BonusPage = lazy(() => import('./pages/BonusPage'));
 const AdminPublishingKitPage = lazy(() => import('./pages/admin/AdminPublishingKitPage'));
 const AdminScriptVideoPage = lazy(() => import('./pages/admin/AdminScriptVideoPage'));
+const AdminScriptsTutorielsPage = lazy(() => import('./pages/admin/AdminScriptsTutorielsPage'));
 const AdminLancementEmailsPage = lazy(() => import('./pages/admin/AdminLancementEmailsPage'));
 const DemoGeniePage = lazy(() => import('./pages/DemoGeniePage'));
 const CrmPage = lazy(() => import('./pages/CrmPage'));

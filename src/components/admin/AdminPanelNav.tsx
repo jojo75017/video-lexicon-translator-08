@@ -32,6 +32,7 @@ const adminNavItems: AdminNavItem[] = [
   { label: 'Campagnes', path: '/admin/campagnes', icon: Send, exact: true },
   { label: 'Emails lancement', path: '/admin/emails-lancement', icon: Mail, exact: true },
   { label: 'Script vidéo V3', path: '/admin/script-video', icon: Video, exact: true },
+  { label: 'Scripts tutoriels Loom', path: '/admin/scripts-tutoriels', icon: Video, exact: true },
   { label: 'Attente', path: '/admin/attente', icon: Snowflake, exact: true },
   { label: 'Tester PayPal', path: '/admin/tester-paypal', icon: CreditCard, exact: true },
   { label: 'Tester BD', path: '/admin/tester-bd', icon: Palette, exact: true },
