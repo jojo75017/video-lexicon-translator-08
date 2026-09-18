@@ -803,6 +803,17 @@ export const AdminPage = () => {
             <Badge variant="outline" className="text-lg px-4 py-1">
               {subscribers.filter(s => s.status === 'active').length} actifs
             </Badge>
+            {(() => {
+              const actifs = subscribers.filter(s => s.status === 'active');
+              const jours = actifs.map(s => daysSince(s.created_at)).filter((d): d is number => d !== null);
+              if (jours.length === 0) return null;
+              const moyenne = Math.round(jours.reduce((a, b) => a + b, 0) / jours.length);
+              return (
+                <span className="text-sm text-muted-foreground">
+                  · ancienneté moyenne : {moyenne} j
+                </span>
+              );
+            })()}
           </div>
           
           <div className="bg-background rounded-lg border overflow-hidden">
