@@ -832,6 +832,9 @@ export const AdminPage = () => {
                       <td className="p-3">
                         <Badge variant="outline">{subscriber.plan_type}</Badge>
                       </td>
+                      <td className="p-3">
+                        <SeniorityBadge dateStr={subscriber.created_at} />
+                      </td>
                       <td className="p-3 text-center">
                         <div className="flex justify-center gap-2 flex-wrap">
                           <Button
