@@ -912,6 +912,7 @@ export const AdminPage = () => {
                     <th className="text-left p-3 font-semibold">Email</th>
                     <th className="text-left p-3 font-semibold">Code d'accès</th>
                     <th className="text-left p-3 font-semibold">Plan</th>
+                    <th className="text-left p-3 font-semibold">Inscrit depuis</th>
                     <th className="text-center p-3 font-semibold">Actions</th>
                   </tr>
                 </thead>
