@@ -23,8 +23,13 @@ const RelanceDevisV3Panel = () => {
   const [count, setCount] = useState<number | null>(null);
   const [targets, setTargets] = useState<Target[]>([]);
   const [loading, setLoading] = useState(false);
-  const [busy, setBusy] = useState<'test' | 'send' | 'preview' | null>(null);
+  const [busy, setBusy] = useState<
+    'test' | 'send' | 'preview' | 'suivi-status' | 'suivi-test' | 'suivi-send' | null
+  >(null);
   const [lastSent, setLastSent] = useState<number | null>(null);
+  const [suiviCount, setSuiviCount] = useState<number | null>(null);
+  const [suiviClickers, setSuiviClickers] = useState<number | null>(null);
+  const [suiviDone, setSuiviDone] = useState<number | null>(null);
 
   const call = useCallback(async (body: Record<string, unknown>) => {
     const { data: session } = await supabase.auth.getSession();
