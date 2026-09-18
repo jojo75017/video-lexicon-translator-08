@@ -97,6 +97,7 @@ function readConversation(id: AgentId): ChatMessage[] {
 }
 
 export default function V3KdpAgentsPage() {
+  const [parametres] = useSearchParams();
   const [agentActif, setAgentActif] = useState<AgentId | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [question, setQuestion] = useState('');
@@ -105,6 +106,13 @@ export default function V3KdpAgentsPage() {
   const champRef = useRef<HTMLTextAreaElement | null>(null);
 
   const agent = AGENTS.find((a) => a.id === agentActif) ?? null;
+  /** Livre mis en avant quand on arrive depuis une carte de la bibliothèque. */
+  const livreCible = parametres.get('livre');
+
+  useEffect(() => {
+    const demande = parametres.get('agent');
+    if (demande && AGENTS.some((a) => a.id === demande)) setAgentActif(demande as AgentId);
+  }, [parametres]);
 
   useEffect(() => {
     if (!agentActif) return;
