@@ -73,6 +73,9 @@ export default function V3Header({ isAuthed = false, isAdmin = false }: { isAuth
           <Link to="/formation" className="v3-btn v3-btn-on-dark" title="Formation">
             <GraduationCap className="w-4 h-4" /> Formation
           </Link>
+          <Link to="/v3/fonctionnalites/questions" className="v3-btn v3-btn-on-dark" title="FAQ — 539 questions-réponses">
+            <HelpCircle className="w-4 h-4" /> FAQ
+          </Link>
           <Link to="/v3/contact" className="v3-btn v3-btn-on-dark" title="Support">
             <Mail className="w-4 h-4" /> Support
           </Link>
