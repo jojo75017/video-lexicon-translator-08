@@ -3,6 +3,9 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { ChevronDown, LayoutGrid, Menu, X, ArrowRight, Sparkles } from 'lucide-react';
 import { isRouteNouveau } from '@/data/v3Nouveautes';
 import { V3_HEADER_MENU, type MenuCategory } from '@/data/v3HeaderMenu';
+import useV3Open from '@/hooks/useV3Open';
+import useIsAdmin from '@/hooks/useIsAdmin';
+import { isPreviewingAsSubscriber } from '@/components/v3/V3ContemplationMode';
 
 /**
  * Ligne 2 du header — mega-menu premium.
@@ -14,6 +17,11 @@ export default function V3MainTabs() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const closeTimer = useRef<number | null>(null);
   const { pathname, search } = useLocation();
+  const { open: v3Open } = useV3Open();
+  const { isAdmin } = useIsAdmin();
+  // Avant l'ouverture, un visiteur (non admin) contemple la V3 sans pouvoir
+  // ouvrir les onglets : la barre reste visible mais totalement inactive.
+  const tabsLocked = v3Open === false && (isAdmin === false || (isAdmin === true && isPreviewingAsSubscriber()));
 
   const openCat = (key: string, el: HTMLElement) => {
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
