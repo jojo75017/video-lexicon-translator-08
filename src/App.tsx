@@ -21,6 +21,7 @@ import AccessPendingFallback from '@/components/auth/AccessPendingFallback';
 import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup';
 import { FirstEbookOnboarding } from '@/components/onboarding/FirstEbookOnboarding';
 import AssistantFloatingButton from '@/components/assistant/AssistantFloatingButton';
+import ScrollToTopButton from '@/components/shared/ScrollToTopButton';
 import ApiKeysFloatingButton from '@/components/ebook/ApiKeysFloatingButton';
 import GeminiKeyAlertBanner from '@/components/ebook/GeminiKeyAlertBanner';
 import AISosModal from '@/components/shared/AISosModal';
@@ -836,6 +837,7 @@ const App = () => {
           {!isAdminAuthRoute && <SubscriberActivityPopup />}
           {isAuthenticated && <FirstEbookOnboarding subscriberEmail={subscriberEmail} />}
           {!isAdminAuthRoute && <AssistantFloatingButton />}
+          {!isAdminAuthRoute && <ScrollToTopButton />}
           {!isAdminAuthRoute && <ApiKeysFloatingButton />}
           {!isAdminAuthRoute && <GeminiKeyAlertBanner />}
           {!isAdminAuthRoute && (isAuthenticated || isAdmin) && (
