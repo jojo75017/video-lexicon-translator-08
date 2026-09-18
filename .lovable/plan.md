@@ -4,16 +4,15 @@
 
 - 1 935 prospects (hors désinscrits) et 33 leads de tunnel : de quoi toucher largement plus de 100 personnes.
 - Seulement 2 paniers réellement abandonnés en base : ce n'est pas une source suffisante, ils seront intégrés en priorité mais pas comme socle.
-- 3 910 envois sur les 30 derniers jours pour 2 042 destinataires : l'offre gratuite (3 000 emails/mois) est dépassée, d'où l'impression de n'avoir « plus que 5 emails ». C'est le vrai blocage, pas la liste.
+- 3 910 envois sur les 30 derniers jours : l'ancienne limite gratuite était dépassée, d'où l'impression de n'avoir « plus que 5 emails ».
 
-## Le point à trancher sur l'envoi
+## L'envoi est maintenant débloqué
 
-Sur l'offre gratuite, l'envoi repart au prochain cycle mensuel, environ 100 par jour. Deux chemins :
+Vous venez de passer à l'offre payante (20 $/mois, 50 000 emails) : la contrainte de quota disparaît.
 
-- **Attendre le nouveau cycle** : envoi étalé, 100 par jour, gratuit, la centaine de contacts est touchée le premier jour.
-- **Passer à l'offre payante (~20 $/mois)** : 50 000 emails, la liste complète part en un ou deux jours.
-
-Je prépare tout pour que ce soit prêt à partir dès que le quota le permet, sans envoi automatique.
+- Envoi par lots de 200 maximum, avec pause automatique entre chaque email pour rester dans la cadence autorisée.
+- Toute la liste (paniers abandonnés, prospects actifs, leads) peut être traitée en une seule journée.
+- Rien ne part tout seul : chaque lot est déclenché par votre clic.
 
 ## L'email (un seul, direct et ferme)
 
@@ -33,7 +32,7 @@ Un onglet **Relance devis + V3** dans l'espace admin :
 - Comptage en direct des destinataires éligibles (paniers abandonnés d'abord, puis prospects actifs, puis leads).
 - Aperçu du texte exact avant tout envoi.
 - Bouton **Test vers ma boîte** (boubetgeorges@gmail.com) pour valider.
-- Bouton **Envoyer le lot du jour**, plafonné à 100, jamais deux fois la même adresse, arrêt net si le quota est atteint avec le message exact.
+- Bouton **Envoyer le lot**, par paquets de 200, jamais deux fois la même adresse, arrêt net avec message exact en cas de refus de la plateforme.
 - Tableau de suivi : envoyés, restants, clics par lien.
 
 ## Détails techniques
