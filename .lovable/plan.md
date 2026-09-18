@@ -32,7 +32,7 @@ Un onglet **Relance devis + V3** dans l'espace admin :
 - Comptage en direct des destinataires éligibles (paniers abandonnés d'abord, puis prospects actifs, puis leads).
 - Aperçu du texte exact avant tout envoi.
 - Bouton **Test vers ma boîte** (boubetgeorges@gmail.com) pour valider.
-- Bouton **Envoyer le lot du jour**, plafonné à 100, jamais deux fois la même adresse, arrêt net si le quota est atteint avec le message exact.
+- Bouton **Envoyer le lot**, par paquets de 200, jamais deux fois la même adresse, arrêt net avec message exact en cas de refus de la plateforme.
 - Tableau de suivi : envoyés, restants, clics par lien.
 
 ## Détails techniques
