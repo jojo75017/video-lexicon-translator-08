@@ -24,6 +24,8 @@ const corsHeaders = {
 
 const TEMPLATE = "relance-devis-v3";
 const SUBJECT = "Votre livre est écrit. Il n'est pas encore publiable.";
+const TEMPLATE_SUIVI = "relance-devis-v3-suivi";
+const SUBJECT_SUIVI = "Il reste peu de jours avant le 1er octobre";
 const LINK_DEVIS = "https://ebookstudio.fr/r/devis1";
 const LINK_V3 = "https://ebookstudio.fr/r/v3insc";
 const BATCH_MAX = 200;
