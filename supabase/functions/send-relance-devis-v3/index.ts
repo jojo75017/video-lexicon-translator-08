@@ -151,6 +151,124 @@ Deno.serve(async (req) => {
         : respond({ success: false, mode, sent: 0, error: res?.detail || "envoi refusé" });
     }
 
+    if (mode === "suivi-test") {
+      if (!EMAIL_SENDING_ENABLED) return respond(emailSendingBlockedResult(), 423);
+      const res = await sendResendEmailThrottled({
+        from: FROM_CAMPAIGN,
+        to: [REPLY_TO],
+        reply_to: REPLY_TO,
+        subject: `[TEST] ${SUBJECT_SUIVI}`,
+        html: htmlSuivi("Georges"),
+      });
+      return res?.ok
+        ? respond({ success: true, mode, sent: 1, to: REPLY_TO })
+        : respond({ success: false, mode, sent: 0, error: res?.detail || "envoi refusé" });
+    }
+
+    /* ---------------- Relance nº2 : non-cliqueurs ---------------- */
+    if (mode === "suivi-status" || mode === "suivi-send") {
+      const readAll = async (
+        table: string,
+        columns: string,
+        apply: (q: ReturnType<typeof db.from>) => unknown,
+      ) => {
+        const rows: Record<string, unknown>[] = [];
+        for (let from = 0; from < 40000; from += 1000) {
+          // deno-lint-ignore no-explicit-any
+          const q: any = (apply as any)(db.from(table).select(columns)).range(from, from + 999);
+          const { data } = await q;
+          if (!data?.length) break;
+          rows.push(...(data as Record<string, unknown>[]));
+          if (data.length < 1000) break;
+        }
+        return rows;
+      };
+
+      // Adresses ayant reçu la relance nº1.
+      const received = new Set<string>();
+      for (const r of await readAll("email_send_log", "recipient_email,template_name", (q) =>
+        // deno-lint-ignore no-explicit-any
+        (q as any).eq("template_name", TEMPLATE))) {
+        received.add(String(r.recipient_email || "").toLowerCase());
+      }
+      // Déjà relancés une seconde fois : jamais deux fois.
+      const alreadySuivi = new Set<string>();
+      for (const r of await readAll("email_send_log", "recipient_email,template_name", (q) =>
+        // deno-lint-ignore no-explicit-any
+        (q as any).eq("template_name", TEMPLATE_SUIVI))) {
+        alreadySuivi.add(String(r.recipient_email || "").toLowerCase());
+      }
+      // Cliqueurs : engagés, on ne les relance pas.
+      const clickers = new Set<string>();
+      for (const r of await readAll("email_clicks", "prospect_email,clicked_url", (q) => q)) {
+        const url = String(r.clicked_url || "");
+        if (url.includes("devis1") || url.includes("v3insc")) {
+          clickers.add(String(r.prospect_email || "").toLowerCase());
+        }
+      }
+
+      const paidSet = new Set<string>();
+      const { data: paidO } = await db.from("funnel_orders").select("email").eq("status", "paid").limit(5000);
+      for (const r of paidO || []) paidSet.add(String((r as Record<string, unknown>).email || "").toLowerCase());
+      const { data: activeSubs } = await db.from("subscribers").select("email").eq("status", "active").limit(5000);
+      for (const r of activeSubs || []) paidSet.add(String((r as Record<string, unknown>).email || "").toLowerCase());
+
+      const suiviTargets = [...received].filter(
+        (e) => !clickers.has(e) && !alreadySuivi.has(e) && !paidSet.has(e) && !isInternalEmail(e),
+      );
+
+      if (mode === "suivi-status") {
+        return respond({
+          success: true,
+          mode,
+          template: TEMPLATE_SUIVI,
+          subject: SUBJECT_SUIVI,
+          received: received.size,
+          clickers: clickers.size,
+          already_sent: alreadySuivi.size,
+          would_send: suiviTargets.length,
+          batch_max: BATCH_MAX,
+          targets: suiviTargets.slice(0, 50).map((email) => ({ email, source: "non-cliqueur" })),
+        });
+      }
+
+      if (!EMAIL_SENDING_ENABLED) return respond(emailSendingBlockedResult(), 423);
+      const suiviBatch = suiviTargets.slice(0, limit);
+      let suiviSent = 0;
+      const suiviErrors: string[] = [];
+      for (const email of suiviBatch) {
+        const res = await sendResendEmailThrottled({
+          from: FROM_CAMPAIGN,
+          to: [email],
+          reply_to: REPLY_TO,
+          subject: SUBJECT_SUIVI,
+          html: htmlSuivi(null),
+          tags: [{ name: "template", value: TEMPLATE_SUIVI }],
+        });
+        if (res?.ok) {
+          suiviSent++;
+          await db.from("email_send_log").insert({
+            message_id: res.id ?? null,
+            template_name: TEMPLATE_SUIVI,
+            recipient_email: email,
+            status: "sent",
+          });
+        } else {
+          suiviErrors.push(`${email}: ${res?.detail || "envoi refusé"}`);
+          if (res?.quotaExhausted || res?.status === 429 || res?.status === 401 || res?.status === 403) break;
+        }
+      }
+      return respond({
+        success: true,
+        mode,
+        template: TEMPLATE_SUIVI,
+        targets: suiviTargets.length,
+        sent: suiviSent,
+        remaining: Math.max(0, suiviTargets.length - suiviSent),
+        errors: suiviErrors,
+      });
+    }
+
     /* ---------------- Exclusions ---------------- */
     const excluded = new Set<string>();
     const { data: paidOrders } = await db.from("funnel_orders").select("email").eq("status", "paid").limit(5000);
