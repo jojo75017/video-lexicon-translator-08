@@ -20,6 +20,13 @@ export const KDP_TAB_PAGES: KdpTabPage[] = [
     maison: true,
   },
   {
+    label: 'Plan de lancement — vos 30 premiers jours',
+    to: '/v3/kdp/lancement',
+    desc: 'Décrivez votre livre ou collez un ASIN : une action par jour pendant 30 jours, avec les messages prêts à publier',
+    badge: 'Nouveau',
+    maison: true,
+  },
+  {
     label: 'Audit avant publication',
     to: '/audit-pilot',
     desc: 'Vérification complète de votre fiche avant la mise en vente Kindle ou poche',
