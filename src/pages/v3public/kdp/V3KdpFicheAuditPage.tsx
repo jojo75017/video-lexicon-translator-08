@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Copy, Download, ExternalLink, Loader2, Search, Sparkles } from 'lucide-react';
+import { ArrowLeft, Copy, Download, ExternalLink, Image as ImageIcon, Loader2, RefreshCw, Search, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { supabase } from '@/integrations/supabase/client';
+import { downloadAplusImage, generateAplusImage } from '@/lib/kdpAplusImage';
 import { MARKETPLACES, fetchAmazonBook, fmtEur, fmtNum, type MarketBook } from '@/components/admin/market/marketShared';
 import { callAIWriting, isAIConfigured } from '@/services/aiWritingService';
 
@@ -24,6 +26,20 @@ interface FicheAudit {
 
 const HISTORY_KEY = 'v3:kdp:fiche-audit:historique';
 const DESC_LIMIT = 4000;
+
+const APLUS_IMAGE_FORMATS = [
+  { label: 'Bannière standard A+', width: 970, height: 600 },
+  { label: 'Image de bénéfice', width: 300, height: 300 },
+  { label: 'Texte enrichi avec image', width: 300, height: 300 },
+  { label: 'Image du tableau comparatif', width: 150, height: 300 },
+] as const;
+
+type GeneratedAplusImage = {
+  dataUrl?: string;
+  loading: boolean;
+  final: boolean;
+  error?: string;
+};
 
 type HistoryEntry = { asin: string; marketplace: string; titre: string; date: string };
 
@@ -76,6 +92,7 @@ export default function V3KdpFicheAuditPage() {
   const [livre, setLivre] = useState<MarketBook | null>(null);
   const [fiche, setFiche] = useState<FicheAudit | null>(null);
   const [historique, setHistorique] = useState<HistoryEntry[]>([]);
+  const [imagesAplus, setImagesAplus] = useState<Record<number, GeneratedAplusImage>>({});
 
   useEffect(() => { setHistorique(readHistory()); }, []);
 
@@ -95,6 +112,7 @@ export default function V3KdpFicheAuditPage() {
 
     setErreur(null);
     setFiche(null);
+    setImagesAplus({});
     setAsin(code);
     setMarketplace(market);
 
@@ -179,6 +197,46 @@ Réponds uniquement avec ce JSON :
     setFiche((f) => (f ? { ...f, keywords: f.keywords.map((k, j) => (j === i ? valeur : k)) } : f));
   const majModule = (i: number, champ: keyof AplusModule, valeur: string) =>
     setFiche((f) => (f ? { ...f, aplus: f.aplus.map((m, j) => (j === i ? { ...m, [champ]: valeur } : m)) } : f));
+
+  const creerImageAplus = async (i: number) => {
+    if (!livre || !fiche?.aplus[i]) return;
+    const module = fiche.aplus[i];
+    const format = APLUS_IMAGE_FORMATS[i] ?? APLUS_IMAGE_FORMATS[1];
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      setImagesAplus((prev) => ({ ...prev, [i]: { loading: false, final: false, error: 'Connectez-vous pour créer cette image.' } }));
+      return;
+    }
+
+    setImagesAplus((prev) => ({ ...prev, [i]: { ...prev[i], loading: true, final: false, error: undefined } }));
+    try {
+      await generateAplusImage({
+        bookTitle: livre.title,
+        moduleTitle: module.titre || `Module ${i + 1}`,
+        moduleText: module.texte,
+        visualSuggestion: module.visuel,
+        width: format.width,
+        height: format.height,
+      }, session.access_token, (dataUrl, final) => {
+        setImagesAplus((prev) => ({ ...prev, [i]: { dataUrl, loading: !final, final } }));
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Création de l’image impossible.';
+      setImagesAplus((prev) => ({ ...prev, [i]: { ...prev[i], loading: false, final: false, error: message } }));
+    }
+  };
+
+  const telechargerImageAplus = async (i: number) => {
+    const image = imagesAplus[i]?.dataUrl;
+    const format = APLUS_IMAGE_FORMATS[i] ?? APLUS_IMAGE_FORMATS[1];
+    if (!image || !livre) return;
+    try {
+      await downloadAplusImage(image, format.width, format.height, `a-plus-${livre.asin}-module-${i + 1}-${format.width}x${format.height}.jpg`);
+      toast.success(`Image ${format.width} × ${format.height} px téléchargée`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Téléchargement impossible.');
+    }
+  };
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6">
@@ -378,7 +436,7 @@ Réponds uniquement avec ce JSON :
             )}
           </Bloc>
 
-          <Bloc titre="Contenu A+ — 4 modules" sous="Textes prêts à coller module par module dans le gestionnaire A+ d'Amazon. Le visuel reste à ajouter de votre côté.">
+          <Bloc titre="Contenu A+ — 4 modules" sous="Textes modifiables et images générées aux dimensions de chaque module Amazon A+.">
             <div className="space-y-4">
               {fiche.aplus.map((m, i) => (
                 <div key={i} className="rounded-xl border p-4" style={{ borderColor: 'var(--v3-line)', background: 'var(--v3-cream)' }}>
@@ -395,6 +453,58 @@ Réponds uniquement avec ce JSON :
                   <div className="mt-2">
                     <Label className="text-[11px]">Suggestion de visuel</Label>
                     <Input value={m.visuel} onChange={(e) => majModule(i, 'visuel', e.target.value)} className="text-[12.5px]" />
+                  </div>
+
+                  <div className="mt-4 border-t pt-4" style={{ borderColor: 'var(--v3-line)' }}>
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <p className="text-[12.5px] font-bold" style={{ color: 'var(--v3-ink)' }}>
+                          Image aux normes KDP A+
+                        </p>
+                        <p className="text-[11.5px]" style={{ color: 'var(--v3-muted)' }}>
+                          {APLUS_IMAGE_FORMATS[i]?.label ?? 'Module A+'} · {APLUS_IMAGE_FORMATS[i]?.width ?? 300} × {APLUS_IMAGE_FORMATS[i]?.height ?? 300} px · JPG RVB · moins de 2 Mo
+                        </p>
+                      </div>
+                      <Button
+                        type="button"
+                        onClick={() => void creerImageAplus(i)}
+                        disabled={imagesAplus[i]?.loading || !m.visuel.trim()}
+                        className="v3-btn h-10 [background:var(--v3-action-orange)!important] [color:var(--v3-action-orange-text)!important] hover:[background:var(--v3-action-orange-hover)!important] disabled:opacity-60"
+                      >
+                        {imagesAplus[i]?.loading ? <Loader2 className="h-4 w-4 animate-spin" /> : imagesAplus[i]?.dataUrl ? <RefreshCw className="h-4 w-4" /> : <ImageIcon className="h-4 w-4" />}
+                        {imagesAplus[i]?.loading ? 'Création en cours…' : imagesAplus[i]?.dataUrl ? 'Recréer l’image' : 'Créer l’image'}
+                      </Button>
+                    </div>
+
+                    {imagesAplus[i]?.dataUrl && (
+                      <div className="mt-3 grid gap-3 sm:grid-cols-[minmax(0,1fr),auto] sm:items-end">
+                        <div className="overflow-hidden rounded-lg border bg-white" style={{ borderColor: 'var(--v3-line)', aspectRatio: `${APLUS_IMAGE_FORMATS[i]?.width ?? 300} / ${APLUS_IMAGE_FORMATS[i]?.height ?? 300}` }}>
+                          <img
+                            src={imagesAplus[i]?.dataUrl}
+                            alt={`Aperçu du module A+ ${i + 1}`}
+                            className={`h-full w-full object-cover transition duration-500 ${imagesAplus[i]?.final ? 'blur-0' : 'scale-105 blur-xl'}`}
+                          />
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          disabled={!imagesAplus[i]?.final}
+                          onClick={() => void telechargerImageAplus(i)}
+                          className="gap-1.5 border-[var(--v3-emerald)] [background:var(--v3-paper)!important] [color:var(--v3-ink)!important] hover:[background:var(--v3-emerald-50)!important] hover:[color:var(--v3-ink)!important]"
+                        >
+                          <Download className="h-4 w-4" /> Télécharger le JPG KDP
+                        </Button>
+                      </div>
+                    )}
+
+                    {imagesAplus[i]?.error && (
+                      <p className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12.5px] font-medium text-red-800" role="alert">
+                        {imagesAplus[i]?.error}
+                      </p>
+                    )}
+                    <p className="mt-2 text-[10.5px]" style={{ color: 'var(--v3-muted)' }}>
+                      Sans texte, prix, avis, logo, lien ni marque Amazon. Vérifiez toujours l’aperçu avant de l’envoyer à Amazon.
+                    </p>
                   </div>
                 </div>
               ))}
