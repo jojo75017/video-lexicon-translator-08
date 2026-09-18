@@ -231,7 +231,11 @@ Réponds uniquement avec ce JSON :
               {MARKETPLACES.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}
             </select>
           </div>
-          <Button onClick={() => analyser()} disabled={occupe} className="v3-btn v3-btn-primary h-10">
+          <Button
+            onClick={() => analyser()}
+            disabled={occupe}
+            className="v3-btn v3-btn-primary h-10 [background:var(--v3-emerald)!important] [color:var(--v3-on-emerald)!important] hover:[background:var(--v3-emerald-600)!important]"
+          >
             {occupe ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
             <span className="ml-1.5">Analyser la fiche</span>
           </Button>
@@ -318,7 +322,7 @@ Réponds uniquement avec ce JSON :
       {fiche && (
         <div className="space-y-5">
           <div className="flex justify-end">
-            <Button variant="outline" onClick={exporter} className="gap-1.5">
+            <Button variant="outline" onClick={exporter} className="gap-1.5 border-[var(--v3-emerald)] [background:var(--v3-paper)!important] [color:var(--v3-ink)!important] hover:[background:var(--v3-emerald-50)!important] hover:[color:var(--v3-ink)!important]">
               <Download className="h-4 w-4" /> Tout exporter
             </Button>
           </div>
@@ -327,7 +331,7 @@ Réponds uniquement avec ce JSON :
             titre="Description de vente"
             sous={`${fiche.description.length} / ${DESC_LIMIT} caractères`}
             action={
-              <Button variant="outline" size="sm" className="gap-1.5" onClick={() => copy(fiche.description, 'Description copiée')}>
+              <Button variant="outline" size="sm" className="gap-1.5 border-[var(--v3-emerald)] [background:var(--v3-paper)!important] [color:var(--v3-ink)!important] hover:[background:var(--v3-emerald-50)!important] hover:[color:var(--v3-ink)!important]" onClick={() => copy(fiche.description, 'Description copiée')}>
                 <Copy className="h-3.5 w-3.5" /> Copier
               </Button>
             }
@@ -345,7 +349,7 @@ Réponds uniquement avec ce JSON :
             titre="7 mots-clés à saisir en coulisses"
             sous="Ces mots-clés se saisissent dans votre interface KDP : ils n'apparaissent pas sur la page du livre."
             action={
-              <Button variant="outline" size="sm" className="gap-1.5" onClick={() => copy(fiche.keywords.join('\n'), 'Mots-clés copiés')}>
+              <Button variant="outline" size="sm" className="gap-1.5 border-[var(--v3-emerald)] [background:var(--v3-paper)!important] [color:var(--v3-ink)!important] hover:[background:var(--v3-emerald-50)!important] hover:[color:var(--v3-ink)!important]" onClick={() => copy(fiche.keywords.join('\n'), 'Mots-clés copiés')}>
                 <Copy className="h-3.5 w-3.5" /> Tout copier
               </Button>
             }
@@ -361,7 +365,7 @@ Réponds uniquement avec ce JSON :
                   </span>
                   <Input value={k} onChange={(e) => majMot(i, e.target.value)} maxLength={50} className="font-mono text-[13px]" />
                   <span className="w-16 shrink-0 text-right text-[11px]" style={{ color: 'var(--v3-muted)' }}>{k.length} car.</span>
-                  <Button variant="ghost" size="sm" onClick={() => copy(k)} aria-label={`Copier le mot-clé ${i + 1}`}>
+                    <Button variant="ghost" size="sm" className="[color:var(--v3-ink)!important] hover:[background:var(--v3-emerald-50)!important]" onClick={() => copy(k)} aria-label={`Copier le mot-clé ${i + 1}`}>
                     <Copy className="h-3.5 w-3.5" />
                   </Button>
                 </li>
@@ -382,7 +386,7 @@ Réponds uniquement avec ce JSON :
                     <span className="inline-flex items-center gap-2 text-[13px] font-semibold" style={{ color: 'var(--v3-emerald)' }}>
                       <Sparkles className="h-3.5 w-3.5" /> Module {i + 1}
                     </span>
-                    <Button variant="outline" size="sm" className="gap-1.5" onClick={() => copy(`${m.titre}\n\n${m.texte}\n\n[Visuel : ${m.visuel}]`, `Module ${i + 1} copié`)}>
+                    <Button variant="outline" size="sm" className="gap-1.5 border-[var(--v3-emerald)] [background:var(--v3-paper)!important] [color:var(--v3-ink)!important] hover:[background:var(--v3-emerald-50)!important] hover:[color:var(--v3-ink)!important]" onClick={() => copy(`${m.titre}\n\n${m.texte}\n\n[Visuel : ${m.visuel}]`, `Module ${i + 1} copié`)}>
                       <Copy className="h-3.5 w-3.5" /> Copier ce module
                     </Button>
                   </div>
