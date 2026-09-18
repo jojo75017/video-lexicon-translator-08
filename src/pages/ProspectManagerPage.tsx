@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ConversionBoostersPanel from '@/components/admin/ConversionBoostersPanel';
+import RelanceDevisV3Panel from '@/components/admin/RelanceDevisV3Panel';
 import ChannelPerformancePanel from '@/components/admin/ChannelPerformancePanel';
 import SystemeIoSyncPanel from '@/components/admin/SystemeIoSyncPanel';
 
@@ -781,6 +782,7 @@ const ProspectManagerPage = () => {
 
           {/* CAMPAGNE TAB — plus aucun envoi depuis ici */}
           <TabsContent value="send" className="space-y-4">
+            <RelanceDevisV3Panel />
             <SystemeIoSyncPanel />
             <Card className="bg-card border-border">
               <CardHeader>
