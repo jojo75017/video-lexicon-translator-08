@@ -151,7 +151,8 @@ const NAV: NavSection[] = [
     section: 'Support',
     items: [
       { to: '/v3/contact', label: 'Contact', icon: Mail },
-      { to: '/faq', label: 'FAQ / Aide', icon: HelpCircle },
+      { to: '/v3/fonctionnalites/questions', label: 'FAQ — 539 questions', icon: HelpCircle, badge: '539' },
+      { to: '/faq', label: 'FAQ / Aide (V2)', icon: HelpCircle },
       { to: '/assistance', label: 'Assistance', icon: LifeBuoy },
     ],
   },
