@@ -147,8 +147,16 @@ export default function V3KdpAgentsPage() {
         .slice(-12)
         .map((m) => `${m.role === 'auteur' ? 'AUTEUR' : agent.prenom.toUpperCase()} : ${m.texte}`)
         .join('\n\n');
+      let contexte = '';
+      if (agent.id === 'biblio') {
+        const liste = listerLivres();
+        const focus = livreCible ? liste.find((l) => l.id === livreCible) : null;
+        contexte =
+          `BIBLIOTHÈQUE DE L'AUTEUR (seuls livres dont tu peux parler) :\n${resumeBibliotheque(liste)}\n\n` +
+          (focus ? `L'auteur travaille en priorité sur « ${focus.titre} » (ASIN ${focus.asin}).\n\n` : '');
+      }
       const reponse = await callAIWriting(
-        `Conversation en cours entre un auteur indépendant et toi.\n\n${historique}\n\nRéponds maintenant à la dernière question de l'auteur, en français, sans répéter la question.`,
+        `${contexte}Conversation en cours entre un auteur indépendant et toi.\n\n${historique}\n\nRéponds maintenant à la dernière question de l'auteur, en français, sans répéter la question.`,
         { systemPrompt: agent.systeme, temperature: 0.7, maxTokens: 1400 },
       );
       const propreReponse = (reponse || '').trim();
