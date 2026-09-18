@@ -93,6 +93,7 @@ export default function V3KdpFicheAuditPage() {
   const [fiche, setFiche] = useState<FicheAudit | null>(null);
   const [historique, setHistorique] = useState<HistoryEntry[]>([]);
   const [imagesAplus, setImagesAplus] = useState<Record<number, GeneratedAplusImage>>({});
+  const [couverture, setCouverture] = useState<string | null>(null);
 
   useEffect(() => { setHistorique(readHistory()); }, []);
 
