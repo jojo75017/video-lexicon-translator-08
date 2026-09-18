@@ -185,10 +185,10 @@ export default function V3KdpAgentsPage() {
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6">
       <Helmet>
-        <title>Parler avec l’IA — vos deux conseillers KDP | Ebookstudio</title>
+        <title>Parler avec l’IA — vos trois conseillers KDP | Ebookstudio</title>
         <meta
           name="description"
-          content="Deux conseillers IA pour vos livres Amazon KDP : Hector, direct et orienté ventes, et Margaux, pédagogue pour les débutants. Posez votre question, la réponse arrive en français."
+          content="Trois conseillers IA pour vos livres Amazon KDP : Hector, direct et orienté ventes, Margaux, pédagogue pour les débutants, et Biblio, qui connaît votre bibliothèque de livres."
         />
       </Helmet>
 
@@ -200,7 +200,7 @@ export default function V3KdpAgentsPage() {
         Parler avec l’IA : choisissez votre conseiller
       </h1>
       <p className="mt-2 max-w-3xl text-[14px]" style={{ color: 'var(--v3-muted)' }}>
-        Deux façons d’être aidé sur vos livres Amazon. Le même savoir-faire, deux manières de vous parler.
+        Trois façons d’être aidé sur vos livres Amazon : deux conseillers généraux, et Biblio qui connaît votre bibliothèque.
         Vos échanges restent dans ce navigateur, rien n’est publié.
       </p>
 

@@ -782,6 +782,7 @@ const App = () => {
               <Route path="kdp/publicite" element={<V3LockedGate><V3KdpPublicitePage /></V3LockedGate>} />
               <Route path="kdp/radar-niches" element={<V3LockedGate><V3KdpRadarNichesPage /></V3LockedGate>} />
               <Route path="kdp/agents" element={<V3LockedGate><V3KdpAgentsPage /></V3LockedGate>} />
+              <Route path="kdp/bibliotheque" element={<V3LockedGate><V3KdpBibliothequePage /></V3LockedGate>} />
               <Route path="parametres" element={<V3LockedGate><V3AuthorSettingsPage /></V3LockedGate>} />
               <Route path="livres/:type" element={<V3LockedGate><TrialGate label="Livres spéciaux"><V3SpecialBookPage /></TrialGate></V3LockedGate>} />
 
