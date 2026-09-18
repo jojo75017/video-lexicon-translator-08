@@ -13,6 +13,13 @@ export interface KdpTabPage {
 
 export const KDP_TAB_PAGES: KdpTabPage[] = [
   {
+    label: 'Ma bibliothèque — vos livres par ASIN',
+    to: '/v3/kdp/bibliotheque',
+    desc: 'Enregistrez vos livres une fois avec leur ASIN : vous les retrouvez ensuite dans toutes les pages KDP, et Biblio vous aide à les travailler',
+    badge: 'Nouveau',
+    maison: true,
+  },
+  {
     label: 'Fiche Audit — un ASIN, tout le contenu',
     to: '/v3/kdp/fiche-audit',
     desc: 'Collez un ASIN : description de vente, 7 mots-clés backend et contenu A+ en 4 modules, prêts à coller dans KDP',

@@ -1,15 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Copy, Loader2, MessageCircle, RotateCcw, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { callAIWriting, isAIConfigured } from '@/services/aiWritingService';
+import { listerLivres, resumeBibliotheque } from '@/lib/kdp/bibliotheque';
 import hectorImg from '@/assets/agent-kdp-hector.png';
 import margauxImg from '@/assets/agent-kdp-margaux.png';
+import biblioImg from '@/assets/agent-kdp-biblio.png';
 
-type AgentId = 'hector' | 'margaux';
+type AgentId = 'hector' | 'margaux' | 'biblio';
 
 interface Agent {
   id: AgentId;
@@ -58,6 +60,23 @@ const AGENTS: Agent[] = [
     systeme:
       "Tu es Margaux, accompagnatrice Amazon KDP d'Ebookstudio. Tu écris uniquement en français simple, sans jargon, sans mot latin ni mot inventé. Ton style est pédagogue : tu expliques pas à pas, tu donnes un exemple court, puis la prochaine action à faire. Tu n'inventes jamais de chiffre de ventes, de volume de recherche, de pourcentage ni de classement : quand une donnée est inconnue, tu le dis et tu proposes comment la vérifier. Tu restes sur les sujets KDP : écriture, fiche produit, mots-clés, couverture, prix, publicité, lancement, catégories. Tes réponses tiennent en moins de 250 mots.",
   },
+  {
+    id: 'biblio',
+    prenom: 'Biblio',
+    role: 'Gardien de votre catalogue',
+    ton: 'Posé, organisé, méthodique',
+    presentation:
+      'Biblio connaît les livres enregistrés dans votre bibliothèque. Il vous dit lequel travailler en premier, ce qui manque sur une fiche, et dans quel ordre avancer sur votre catalogue.',
+    accroche: 'Vous avez plusieurs livres en ligne : Biblio met de l’ordre dans le travail à faire.',
+    image: biblioImg,
+    exemples: [
+      'Par quel livre de ma bibliothèque devrais-je commencer cette semaine ?',
+      'Mes titres se ressemblent-ils trop entre eux ?',
+      'Quel livre mérite une nouvelle description en priorité ?',
+    ],
+    systeme:
+      "Tu es Biblio, le gardien du catalogue d'un auteur indépendant sur Ebookstudio. Tu écris uniquement en français simple, sans jargon, sans mot latin ni mot inventé. Tu raisonnes uniquement sur les livres listés dans la bibliothèque de l'auteur, telle qu'elle t'est fournie : tu ne parles jamais d'un livre absent de cette liste. Tu n'inventes jamais de chiffre de ventes, de volume de recherche, de pourcentage ni de classement : tu n'utilises que les données fournies, et quand une donnée manque tu le dis et proposes comment la vérifier. Tu organises : quel livre travailler en premier, ce qui manque sur une fiche, les répétitions ou incohérences entre les titres, l'ordre des actions. Tes réponses tiennent en moins de 250 mots.",
+  },
 ];
 
 interface ChatMessage {
@@ -78,6 +97,7 @@ function readConversation(id: AgentId): ChatMessage[] {
 }
 
 export default function V3KdpAgentsPage() {
+  const [parametres] = useSearchParams();
   const [agentActif, setAgentActif] = useState<AgentId | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [question, setQuestion] = useState('');
@@ -86,6 +106,13 @@ export default function V3KdpAgentsPage() {
   const champRef = useRef<HTMLTextAreaElement | null>(null);
 
   const agent = AGENTS.find((a) => a.id === agentActif) ?? null;
+  /** Livre mis en avant quand on arrive depuis une carte de la bibliothèque. */
+  const livreCible = parametres.get('livre');
+
+  useEffect(() => {
+    const demande = parametres.get('agent');
+    if (demande && AGENTS.some((a) => a.id === demande)) setAgentActif(demande as AgentId);
+  }, [parametres]);
 
   useEffect(() => {
     if (!agentActif) return;
@@ -120,8 +147,16 @@ export default function V3KdpAgentsPage() {
         .slice(-12)
         .map((m) => `${m.role === 'auteur' ? 'AUTEUR' : agent.prenom.toUpperCase()} : ${m.texte}`)
         .join('\n\n');
+      let contexte = '';
+      if (agent.id === 'biblio') {
+        const liste = listerLivres();
+        const focus = livreCible ? liste.find((l) => l.id === livreCible) : null;
+        contexte =
+          `BIBLIOTHÈQUE DE L'AUTEUR (seuls livres dont tu peux parler) :\n${resumeBibliotheque(liste)}\n\n` +
+          (focus ? `L'auteur travaille en priorité sur « ${focus.titre} » (ASIN ${focus.asin}).\n\n` : '');
+      }
       const reponse = await callAIWriting(
-        `Conversation en cours entre un auteur indépendant et toi.\n\n${historique}\n\nRéponds maintenant à la dernière question de l'auteur, en français, sans répéter la question.`,
+        `${contexte}Conversation en cours entre un auteur indépendant et toi.\n\n${historique}\n\nRéponds maintenant à la dernière question de l'auteur, en français, sans répéter la question.`,
         { systemPrompt: agent.systeme, temperature: 0.7, maxTokens: 1400 },
       );
       const propreReponse = (reponse || '').trim();
@@ -150,10 +185,10 @@ export default function V3KdpAgentsPage() {
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6">
       <Helmet>
-        <title>Parler avec l’IA — vos deux conseillers KDP | Ebookstudio</title>
+        <title>Parler avec l’IA — vos trois conseillers KDP | Ebookstudio</title>
         <meta
           name="description"
-          content="Deux conseillers IA pour vos livres Amazon KDP : Hector, direct et orienté ventes, et Margaux, pédagogue pour les débutants. Posez votre question, la réponse arrive en français."
+          content="Trois conseillers IA pour vos livres Amazon KDP : Hector, direct et orienté ventes, Margaux, pédagogue pour les débutants, et Biblio, qui connaît votre bibliothèque de livres."
         />
       </Helmet>
 
@@ -165,7 +200,7 @@ export default function V3KdpAgentsPage() {
         Parler avec l’IA : choisissez votre conseiller
       </h1>
       <p className="mt-2 max-w-3xl text-[14px]" style={{ color: 'var(--v3-muted)' }}>
-        Deux façons d’être aidé sur vos livres Amazon. Le même savoir-faire, deux manières de vous parler.
+        Trois façons d’être aidé sur vos livres Amazon : deux conseillers généraux, et Biblio qui connaît votre bibliothèque.
         Vos échanges restent dans ce navigateur, rien n’est publié.
       </p>
 

@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, CalendarCheck, Copy, Download, Loader2, Rocket, Search } from 'lucide-react';
 import { toast } from 'sonner';
+import SelecteurLivreBiblio from '@/components/kdp/SelecteurLivreBiblio';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -246,6 +247,21 @@ Réponds uniquement avec ce JSON :
           Vous pouvez partir d'un ASIN ou décrire votre livre à la main.
         </p>
       </header>
+
+      <SelecteurLivreBiblio
+        asinSaisi={asin}
+        marketplaceSaisi={marketplace}
+        onChoisir={(l) => {
+          setAsin(l.asin);
+          setMarketplace(l.marketplace);
+          setBrief((b) => ({
+            ...b,
+            titre: l.titre || b.titre,
+            genre: l.genre || b.genre,
+            resume: l.description || b.resume,
+          }));
+        }}
+      />
 
       {/* Départ par ASIN */}
       <section className="mb-4 rounded-2xl border p-5" style={{ borderColor: 'var(--v3-line)', background: 'var(--v3-cream)' }}>

@@ -3,6 +3,8 @@ import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Copy, Download, Loader2, Megaphone, Sparkles, Tags } from 'lucide-react';
 import { toast } from 'sonner';
+import SelecteurLivreBiblio from '@/components/kdp/SelecteurLivreBiblio';
+import ConcurrentsBibliotheque from '@/components/kdp/ConcurrentsBibliotheque';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -308,6 +310,24 @@ Réponds uniquement avec ce JSON :
           Aucun chiffre de performance n'est inventé : les budgets sont des fourchettes prudentes à ajuster.
         </p>
       </header>
+
+      <SelecteurLivreBiblio
+        asinSaisi={asin}
+        marketplaceSaisi={marche}
+        onChoisir={(l) => {
+          setAsin(l.asin);
+          setMarche(l.marketplace);
+          setTitre(l.titre || '');
+          setGenre(l.genre || '');
+          setDescription(l.description || '');
+        }}
+      />
+
+      <ConcurrentsBibliotheque
+        marche={marche}
+        valeur={concurrents}
+        onChange={setConcurrents}
+      />
 
       <section className="mb-4 rounded-2xl border p-5" style={{ borderColor: 'var(--v3-line)', background: 'var(--v3-cream)' }}>
         <div className="mb-3 flex flex-wrap gap-2">

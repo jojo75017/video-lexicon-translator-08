@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Copy, Download, Loader2, Search, Sparkles, Tags } from 'lucide-react';
 import { toast } from 'sonner';
+import SelecteurLivreBiblio from '@/components/kdp/SelecteurLivreBiblio';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -277,6 +278,17 @@ Réponds uniquement avec ce JSON :
           des titres et sous-titres, et ce qu'il faut éviter. Aucun chiffre inventé : les niveaux de concurrence sont des estimations.
         </p>
       </header>
+
+      <SelecteurLivreBiblio
+        asinSaisi={asin}
+        marketplaceSaisi={marche}
+        onChoisir={(l) => {
+          setAsin(l.asin);
+          setMarche(l.marketplace);
+          setMode('asin');
+          setContexte(`${l.titre}${l.genre ? ` — ${l.genre}` : ''}\n${l.description || ''}`.trim().slice(0, 1200));
+        }}
+      />
 
       {/* Recherche */}
       <section className="mb-4 rounded-2xl border p-5" style={{ borderColor: 'var(--v3-line)', background: 'var(--v3-cream)' }}>

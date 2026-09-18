@@ -206,6 +206,7 @@ const V3KdpMotsClesPage = lazy(() => import('./pages/v3public/kdp/V3KdpMotsClesP
 const V3KdpPublicitePage = lazy(() => import('./pages/v3public/kdp/V3KdpPublicitePage'));
 const V3KdpRadarNichesPage = lazy(() => import('./pages/v3public/kdp/V3KdpRadarNichesPage'));
 const V3KdpAgentsPage = lazy(() => import('./pages/v3public/kdp/V3KdpAgentsPage'));
+const V3KdpBibliothequePage = lazy(() => import('./pages/v3public/kdp/V3KdpBibliothequePage'));
 const ContentStudioPage = lazy(() => import('./pages/v3public/ContentStudioPage'));
 const ContentStudioProjectPage = lazy(() => import('./pages/v3public/ContentStudioProjectPage'));
 const VersionLongueLibraryPage = lazy(() => import('./pages/v3/version-longue/VersionLongueLibraryPage'));
@@ -782,6 +783,7 @@ const App = () => {
               <Route path="kdp/publicite" element={<V3LockedGate><V3KdpPublicitePage /></V3LockedGate>} />
               <Route path="kdp/radar-niches" element={<V3LockedGate><V3KdpRadarNichesPage /></V3LockedGate>} />
               <Route path="kdp/agents" element={<V3LockedGate><V3KdpAgentsPage /></V3LockedGate>} />
+              <Route path="kdp/bibliotheque" element={<V3LockedGate><V3KdpBibliothequePage /></V3LockedGate>} />
               <Route path="parametres" element={<V3LockedGate><V3AuthorSettingsPage /></V3LockedGate>} />
               <Route path="livres/:type" element={<V3LockedGate><TrialGate label="Livres spéciaux"><V3SpecialBookPage /></TrialGate></V3LockedGate>} />
 

@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Copy, Download, ExternalLink, Image as ImageIcon, Loader2, RefreshCw, Search, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
+import SelecteurLivreBiblio from '@/components/kdp/SelecteurLivreBiblio';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -307,6 +308,12 @@ Réponds uniquement avec ce JSON :
           et les 4 modules de contenu A+ — tout est modifiable avant de copier.
         </p>
       </header>
+
+      <SelecteurLivreBiblio
+        asinSaisi={asin}
+        marketplaceSaisi={marketplace}
+        onChoisir={(l) => { setAsin(l.asin); setMarketplace(l.marketplace); }}
+      />
 
       <section className="mb-5 rounded-2xl border p-5" style={{ borderColor: 'var(--v3-line)', background: 'var(--v3-cream)' }}>
         <div className="grid gap-3 sm:grid-cols-[1fr,200px,auto] sm:items-end">
