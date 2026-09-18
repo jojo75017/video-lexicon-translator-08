@@ -278,6 +278,17 @@ Réponds uniquement avec ce JSON :
         </p>
       </header>
 
+      <SelecteurLivreBiblio
+        asinSaisi={asin}
+        marketplaceSaisi={marche}
+        onChoisir={(l) => {
+          setAsin(l.asin);
+          setMarche(l.marketplace);
+          setMode('asin');
+          setContexte(`${l.titre}${l.genre ? ` — ${l.genre}` : ''}\n${l.description || ''}`.trim().slice(0, 1200));
+        }}
+      />
+
       {/* Recherche */}
       <section className="mb-4 rounded-2xl border p-5" style={{ borderColor: 'var(--v3-line)', background: 'var(--v3-cream)' }}>
         <div className="mb-3 flex flex-wrap gap-2">

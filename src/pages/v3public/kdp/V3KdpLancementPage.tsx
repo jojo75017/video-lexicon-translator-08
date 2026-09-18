@@ -247,6 +247,21 @@ Réponds uniquement avec ce JSON :
         </p>
       </header>
 
+      <SelecteurLivreBiblio
+        asinSaisi={asin}
+        marketplaceSaisi={marketplace}
+        onChoisir={(l) => {
+          setAsin(l.asin);
+          setMarketplace(l.marketplace);
+          setBrief((b) => ({
+            ...b,
+            titre: l.titre || b.titre,
+            genre: l.genre || b.genre,
+            resume: l.description || b.resume,
+          }));
+        }}
+      />
+
       {/* Départ par ASIN */}
       <section className="mb-4 rounded-2xl border p-5" style={{ borderColor: 'var(--v3-line)', background: 'var(--v3-cream)' }}>
         <p className="mb-2 text-[13px] font-semibold" style={{ color: 'var(--v3-emerald)' }}>

@@ -308,6 +308,12 @@ Réponds uniquement avec ce JSON :
         </p>
       </header>
 
+      <SelecteurLivreBiblio
+        asinSaisi={asin}
+        marketplaceSaisi={marketplace}
+        onChoisir={(l) => { setAsin(l.asin); setMarketplace(l.marketplace); }}
+      />
+
       <section className="mb-5 rounded-2xl border p-5" style={{ borderColor: 'var(--v3-line)', background: 'var(--v3-cream)' }}>
         <div className="grid gap-3 sm:grid-cols-[1fr,200px,auto] sm:items-end">
           <div>
