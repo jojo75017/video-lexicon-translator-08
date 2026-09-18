@@ -27,6 +27,13 @@ export const KDP_TAB_PAGES: KdpTabPage[] = [
     maison: true,
   },
   {
+    label: 'Mots-clés percutants — un sujet, 7 mots-clés KDP',
+    to: '/v3/kdp/mots-cles',
+    desc: 'Un sujet ou un ASIN : les 7 mots-clés à coller dans KDP, les expressions à viser, des titres et sous-titres',
+    badge: 'Nouveau',
+    maison: true,
+  },
+  {
     label: 'Audit avant publication',
     to: '/audit-pilot',
     desc: 'Vérification complète de votre fiche avant la mise en vente Kindle ou poche',
