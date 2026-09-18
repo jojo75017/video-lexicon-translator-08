@@ -436,7 +436,7 @@ Réponds uniquement avec ce JSON :
             )}
           </Bloc>
 
-          <Bloc titre="Contenu A+ — 4 modules" sous="Textes prêts à coller module par module dans le gestionnaire A+ d'Amazon. Le visuel reste à ajouter de votre côté.">
+          <Bloc titre="Contenu A+ — 4 modules" sous="Textes modifiables et images générées aux dimensions de chaque module Amazon A+.">
             <div className="space-y-4">
               {fiche.aplus.map((m, i) => (
                 <div key={i} className="rounded-xl border p-4" style={{ borderColor: 'var(--v3-line)', background: 'var(--v3-cream)' }}>
