@@ -24,6 +24,8 @@ const corsHeaders = {
 
 const TEMPLATE = "relance-devis-v3";
 const SUBJECT = "Votre livre est écrit. Il n'est pas encore publiable.";
+const TEMPLATE_SUIVI = "relance-devis-v3-suivi";
+const SUBJECT_SUIVI = "Il reste peu de jours avant le 1er octobre";
 const LINK_DEVIS = "https://ebookstudio.fr/r/devis1";
 const LINK_V3 = "https://ebookstudio.fr/r/v3insc";
 const BATCH_MAX = 200;
@@ -78,6 +80,36 @@ Un manuscrit n'est pas un livre publiable
 </table></td></tr></table></body></html>`;
 }
 
+/** Relance nº2 : uniquement pour ceux qui n'ont cliqué sur aucun des deux liens. */
+function htmlSuivi(firstName: string | null): string {
+  const hello = firstName ? `Bonjour ${firstName},` : "Bonjour,";
+  return `<!DOCTYPE html><html lang="fr"><body style="margin:0;background:#FAFAFA">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FAFAFA;padding:24px 12px">
+<tr><td align="center">
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden">
+<tr><td style="background:#232F3E;padding:22px 26px;color:#ffffff;font:700 20px/1.35 Arial,Helvetica,sans-serif">
+Le 1<sup>er</sup> octobre, c'est dans quelques jours
+</td></tr>
+<tr><td style="padding:26px;color:#232F3E;font:16px/1.6 Arial,Helvetica,sans-serif">
+<p style="margin:0 0 16px">${hello}</p>
+<p style="margin:0 0 16px">Je vous ai écrit il y a peu au sujet de votre manuscrit. Vous n'avez pas encore choisi, et je comprends : on remet toujours à plus tard ce qui demande une décision.</p>
+<p style="margin:0 0 16px">Mais un manuscrit qui dort ne rapporte rien. Ni lecteur, ni euro, ni retour. Le 1<sup>er</sup> octobre, EbookStudio V3 ouvre et les places d'accompagnement de la rentrée partent dans l'ordre d'arrivée.</p>
+<p style="margin:0 0 20px">Deux chemins, un seul clic.</p>
+
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 14px"><tr>
+<td style="background:#FF9E2D;border-radius:8px"><a href="${LINK_DEVIS}" style="display:inline-block;padding:13px 24px;color:#232F3E;text-decoration:none;font:700 15px Arial,Helvetica,sans-serif">Je veux qu'on s'en occupe (devis dès 149 €)</a></td>
+</tr></table>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px"><tr>
+<td style="background:#232F3E;border-radius:8px"><a href="${LINK_V3}" style="display:inline-block;padding:13px 24px;color:#ffffff;text-decoration:none;font:700 15px Arial,Helvetica,sans-serif">Je le fais moi-même avec la V3 (27 € / 47 €)</a></td>
+</tr></table>
+
+<p style="margin:0 0 8px;font-size:14px;color:#555">Si aucun des deux ne vous convient, répondez-moi en une ligne pour me dire pourquoi : ça m'aide vraiment.</p>
+<p style="margin:18px 0 0">Georges Boubet<br><span style="color:#555;font-size:14px">EbookStudio</span></p>
+<p style="margin:18px 0 0;font-size:12px;color:#888">Répondez « STOP » et je vous retire définitivement de la liste.</p>
+</td></tr>
+</table></td></tr></table></body></html>`;
+}
+
 async function isAdmin(req: Request, baseUrl: string) {
   const authorization = req.headers.get("Authorization");
   if (!authorization?.startsWith("Bearer ")) return false;
@@ -117,6 +149,124 @@ Deno.serve(async (req) => {
       return res?.ok
         ? respond({ success: true, mode, sent: 1, to: REPLY_TO })
         : respond({ success: false, mode, sent: 0, error: res?.detail || "envoi refusé" });
+    }
+
+    if (mode === "suivi-test") {
+      if (!EMAIL_SENDING_ENABLED) return respond(emailSendingBlockedResult(), 423);
+      const res = await sendResendEmailThrottled({
+        from: FROM_CAMPAIGN,
+        to: [REPLY_TO],
+        reply_to: REPLY_TO,
+        subject: `[TEST] ${SUBJECT_SUIVI}`,
+        html: htmlSuivi("Georges"),
+      });
+      return res?.ok
+        ? respond({ success: true, mode, sent: 1, to: REPLY_TO })
+        : respond({ success: false, mode, sent: 0, error: res?.detail || "envoi refusé" });
+    }
+
+    /* ---------------- Relance nº2 : non-cliqueurs ---------------- */
+    if (mode === "suivi-status" || mode === "suivi-send") {
+      const readAll = async (
+        table: string,
+        columns: string,
+        apply: (q: ReturnType<typeof db.from>) => unknown,
+      ) => {
+        const rows: Record<string, unknown>[] = [];
+        for (let from = 0; from < 40000; from += 1000) {
+          // deno-lint-ignore no-explicit-any
+          const q: any = (apply as any)(db.from(table).select(columns)).range(from, from + 999);
+          const { data } = await q;
+          if (!data?.length) break;
+          rows.push(...(data as Record<string, unknown>[]));
+          if (data.length < 1000) break;
+        }
+        return rows;
+      };
+
+      // Adresses ayant reçu la relance nº1.
+      const received = new Set<string>();
+      for (const r of await readAll("email_send_log", "recipient_email,template_name", (q) =>
+        // deno-lint-ignore no-explicit-any
+        (q as any).eq("template_name", TEMPLATE))) {
+        received.add(String(r.recipient_email || "").toLowerCase());
+      }
+      // Déjà relancés une seconde fois : jamais deux fois.
+      const alreadySuivi = new Set<string>();
+      for (const r of await readAll("email_send_log", "recipient_email,template_name", (q) =>
+        // deno-lint-ignore no-explicit-any
+        (q as any).eq("template_name", TEMPLATE_SUIVI))) {
+        alreadySuivi.add(String(r.recipient_email || "").toLowerCase());
+      }
+      // Cliqueurs : engagés, on ne les relance pas.
+      const clickers = new Set<string>();
+      for (const r of await readAll("email_clicks", "prospect_email,clicked_url", (q) => q)) {
+        const url = String(r.clicked_url || "");
+        if (url.includes("devis1") || url.includes("v3insc")) {
+          clickers.add(String(r.prospect_email || "").toLowerCase());
+        }
+      }
+
+      const paidSet = new Set<string>();
+      const { data: paidO } = await db.from("funnel_orders").select("email").eq("status", "paid").limit(5000);
+      for (const r of paidO || []) paidSet.add(String((r as Record<string, unknown>).email || "").toLowerCase());
+      const { data: activeSubs } = await db.from("subscribers").select("email").eq("status", "active").limit(5000);
+      for (const r of activeSubs || []) paidSet.add(String((r as Record<string, unknown>).email || "").toLowerCase());
+
+      const suiviTargets = [...received].filter(
+        (e) => !clickers.has(e) && !alreadySuivi.has(e) && !paidSet.has(e) && !isInternalEmail(e),
+      );
+
+      if (mode === "suivi-status") {
+        return respond({
+          success: true,
+          mode,
+          template: TEMPLATE_SUIVI,
+          subject: SUBJECT_SUIVI,
+          received: received.size,
+          clickers: clickers.size,
+          already_sent: alreadySuivi.size,
+          would_send: suiviTargets.length,
+          batch_max: BATCH_MAX,
+          targets: suiviTargets.slice(0, 50).map((email) => ({ email, source: "non-cliqueur" })),
+        });
+      }
+
+      if (!EMAIL_SENDING_ENABLED) return respond(emailSendingBlockedResult(), 423);
+      const suiviBatch = suiviTargets.slice(0, limit);
+      let suiviSent = 0;
+      const suiviErrors: string[] = [];
+      for (const email of suiviBatch) {
+        const res = await sendResendEmailThrottled({
+          from: FROM_CAMPAIGN,
+          to: [email],
+          reply_to: REPLY_TO,
+          subject: SUBJECT_SUIVI,
+          html: htmlSuivi(null),
+          tags: [{ name: "template", value: TEMPLATE_SUIVI }],
+        });
+        if (res?.ok) {
+          suiviSent++;
+          await db.from("email_send_log").insert({
+            message_id: res.id ?? null,
+            template_name: TEMPLATE_SUIVI,
+            recipient_email: email,
+            status: "sent",
+          });
+        } else {
+          suiviErrors.push(`${email}: ${res?.detail || "envoi refusé"}`);
+          if (res?.quotaExhausted || res?.status === 429 || res?.status === 401 || res?.status === 403) break;
+        }
+      }
+      return respond({
+        success: true,
+        mode,
+        template: TEMPLATE_SUIVI,
+        targets: suiviTargets.length,
+        sent: suiviSent,
+        remaining: Math.max(0, suiviTargets.length - suiviSent),
+        errors: suiviErrors,
+      });
     }
 
     /* ---------------- Exclusions ---------------- */

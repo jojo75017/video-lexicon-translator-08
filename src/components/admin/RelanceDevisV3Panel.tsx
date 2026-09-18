@@ -23,8 +23,13 @@ const RelanceDevisV3Panel = () => {
   const [count, setCount] = useState<number | null>(null);
   const [targets, setTargets] = useState<Target[]>([]);
   const [loading, setLoading] = useState(false);
-  const [busy, setBusy] = useState<'test' | 'send' | 'preview' | null>(null);
+  const [busy, setBusy] = useState<
+    'test' | 'send' | 'preview' | 'suivi-status' | 'suivi-test' | 'suivi-send' | null
+  >(null);
   const [lastSent, setLastSent] = useState<number | null>(null);
+  const [suiviCount, setSuiviCount] = useState<number | null>(null);
+  const [suiviClickers, setSuiviClickers] = useState<number | null>(null);
+  const [suiviDone, setSuiviDone] = useState<number | null>(null);
 
   const call = useCallback(async (body: Record<string, unknown>) => {
     const { data: session } = await supabase.auth.getSession();
@@ -95,6 +100,49 @@ const RelanceDevisV3Panel = () => {
     setBusy(null);
   };
 
+  const loadSuivi = async () => {
+    setBusy('suivi-status');
+    try {
+      const data = await call({ mode: 'suivi-status' });
+      setSuiviCount(Number(data.would_send ?? 0));
+      setSuiviClickers(Number(data.clickers ?? 0));
+      setSuiviDone(Number(data.already_sent ?? 0));
+      toast.success(`${data.would_send} non-cliqueur(s) à relancer`);
+    } catch (err) {
+      toast.error('Comptage impossible : ' + ((err as Error).message || ''));
+    }
+    setBusy(null);
+  };
+
+  const sendSuiviTest = async () => {
+    setBusy('suivi-test');
+    try {
+      const data = await call({ mode: 'suivi-test' });
+      if (data.success) toast.success(`Test relance nº2 envoyé à ${data.to}`);
+      else toast.error('Test refusé : ' + String(data.error || ''));
+    } catch (err) {
+      toast.error('Test impossible : ' + ((err as Error).message || ''));
+    }
+    setBusy(null);
+  };
+
+  const sendSuiviBatch = async () => {
+    if (!window.confirm(`Envoyer la relance nº2 à ${BATCH} non-cliqueurs maintenant ?`)) return;
+    setBusy('suivi-send');
+    try {
+      const data = await call({ mode: 'suivi-send', limit: BATCH });
+      const errors = (data.errors as string[]) || [];
+      toast.success(`${data.sent} email(s) envoyé(s)${errors.length ? ` · ${errors.length} refus` : ''}`);
+      if (errors.length) console.warn('Refus d’envoi :', errors);
+      setSuiviCount(Number(data.remaining ?? 0));
+    } catch (err) {
+      toast.error('Envoi impossible : ' + ((err as Error).message || ''));
+    }
+    setBusy(null);
+  };
+
+
+
   return (
     <section className="rounded-2xl border border-border bg-card p-5">
       <header className="flex flex-wrap items-center justify-between gap-3">
@@ -144,6 +192,63 @@ const RelanceDevisV3Panel = () => {
           {busy === 'send' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
           Envoyer le lot de {BATCH}
         </Button>
+      </div>
+
+      <div className="mt-5 rounded-xl border border-dashed border-border p-4">
+        <p className="text-sm font-semibold text-foreground">
+          Relance nº2 — uniquement les non-cliqueurs
+        </p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Autre texte, autre objet (« Il reste peu de jours avant le 1<sup>er</sup> octobre »).
+          Envoyée seulement aux adresses qui ont reçu le 1<sup>er</sup> email sans cliquer sur
+          aucun des deux liens. Ceux qui ont cliqué ne sont jamais relancés.
+        </p>
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          <div className="rounded-lg border border-border p-3">
+            <p className="text-xs text-muted-foreground">Non-cliqueurs à relancer</p>
+            <p className="mt-1 text-xl font-bold text-foreground">
+              {suiviCount === null ? '—' : suiviCount}
+            </p>
+          </div>
+          <div className="rounded-lg border border-border p-3">
+            <p className="text-xs text-muted-foreground">Ont cliqué (exclus)</p>
+            <p className="mt-1 text-xl font-bold text-foreground">
+              {suiviClickers === null ? '—' : suiviClickers}
+            </p>
+          </div>
+          <div className="rounded-lg border border-border p-3">
+            <p className="text-xs text-muted-foreground">Déjà relancés</p>
+            <p className="mt-1 text-xl font-bold text-foreground">
+              {suiviDone === null ? '—' : suiviDone}
+            </p>
+          </div>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Button variant="outline" size="sm" onClick={loadSuivi} disabled={busy !== null}>
+            {busy === 'suivi-status' ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="mr-2 h-4 w-4" />
+            )}
+            Compter les non-cliqueurs
+          </Button>
+          <Button variant="outline" size="sm" onClick={sendSuiviTest} disabled={busy !== null}>
+            {busy === 'suivi-test' ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Mail className="mr-2 h-4 w-4" />
+            )}
+            Test relance nº2 vers ma boîte
+          </Button>
+          <Button size="sm" variant="secondary" onClick={sendSuiviBatch} disabled={busy !== null || suiviCount === 0}>
+            {busy === 'suivi-send' ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="mr-2 h-4 w-4" />
+            )}
+            Envoyer la relance nº2 (lot de {BATCH})
+          </Button>
+        </div>
       </div>
 
       {targets.length > 0 && (
