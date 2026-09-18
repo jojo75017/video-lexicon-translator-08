@@ -12,6 +12,10 @@ export interface AplusImageRequest {
   visualSuggestion: string;
   width: number;
   height: number;
+  /** Contexte du livre (genre, sujet) pour que l'image reste dans son univers. */
+  bookContext?: string;
+  /** Couverture du livre en data URL : sert de référence visuelle. */
+  coverImage?: string;
 }
 
 function dataUrlFromPayload(payload: ImagePayload): string | null {
