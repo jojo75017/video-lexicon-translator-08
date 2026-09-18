@@ -1,4 +1,5 @@
 import { SPECIAL_BOOK_TABS } from './specialBookTabs';
+import { KDP_TAB_PAGES } from './kdpTabPages';
 
 export type MenuLink = { label: string; to: string; badge?: string; desc?: string };
 export type MenuCategory = {
@@ -65,6 +66,17 @@ export const V3_HEADER_MENU: MenuCategory[] = [
       { label: 'Illustrations intérieures', to: '/v3/create/illustre', desc: 'Images cohérentes pour chapitres et sections' },
       { label: 'Documentation Studio', to: '/v3/hub?tab=documentation', desc: 'Docs, annexes, glossaires' },
       { label: 'Signature auteur', to: '/signature', desc: 'Blocs signature et biographies prêts à coller' },
+    ],
+  },
+  {
+    key: 'kdp',
+    label: 'KDP',
+    emoji: '📦',
+    color: '#064e3b',
+    tagline: 'Votre fiche Amazon',
+    links: [
+      { label: 'Espace KDP', to: '/v3/kdp', desc: 'Toutes les pages KDP réunies au même endroit' },
+      ...KDP_TAB_PAGES.map((p) => ({ label: p.label, to: p.to, badge: p.badge, desc: p.desc })),
     ],
   },
   {
