@@ -80,6 +80,36 @@ Un manuscrit n'est pas un livre publiable
 </table></td></tr></table></body></html>`;
 }
 
+/** Relance nº2 : uniquement pour ceux qui n'ont cliqué sur aucun des deux liens. */
+function htmlSuivi(firstName: string | null): string {
+  const hello = firstName ? `Bonjour ${firstName},` : "Bonjour,";
+  return `<!DOCTYPE html><html lang="fr"><body style="margin:0;background:#FAFAFA">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FAFAFA;padding:24px 12px">
+<tr><td align="center">
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden">
+<tr><td style="background:#232F3E;padding:22px 26px;color:#ffffff;font:700 20px/1.35 Arial,Helvetica,sans-serif">
+Le 1<sup>er</sup> octobre, c'est dans quelques jours
+</td></tr>
+<tr><td style="padding:26px;color:#232F3E;font:16px/1.6 Arial,Helvetica,sans-serif">
+<p style="margin:0 0 16px">${hello}</p>
+<p style="margin:0 0 16px">Je vous ai écrit il y a peu au sujet de votre manuscrit. Vous n'avez pas encore choisi, et je comprends : on remet toujours à plus tard ce qui demande une décision.</p>
+<p style="margin:0 0 16px">Mais un manuscrit qui dort ne rapporte rien. Ni lecteur, ni euro, ni retour. Le 1<sup>er</sup> octobre, EbookStudio V3 ouvre et les places d'accompagnement de la rentrée partent dans l'ordre d'arrivée.</p>
+<p style="margin:0 0 20px">Deux chemins, un seul clic.</p>
+
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 14px"><tr>
+<td style="background:#FF9E2D;border-radius:8px"><a href="${LINK_DEVIS}" style="display:inline-block;padding:13px 24px;color:#232F3E;text-decoration:none;font:700 15px Arial,Helvetica,sans-serif">Je veux qu'on s'en occupe (devis dès 149 €)</a></td>
+</tr></table>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px"><tr>
+<td style="background:#232F3E;border-radius:8px"><a href="${LINK_V3}" style="display:inline-block;padding:13px 24px;color:#ffffff;text-decoration:none;font:700 15px Arial,Helvetica,sans-serif">Je le fais moi-même avec la V3 (27 € / 47 €)</a></td>
+</tr></table>
+
+<p style="margin:0 0 8px;font-size:14px;color:#555">Si aucun des deux ne vous convient, répondez-moi en une ligne pour me dire pourquoi : ça m'aide vraiment.</p>
+<p style="margin:18px 0 0">Georges Boubet<br><span style="color:#555;font-size:14px">EbookStudio</span></p>
+<p style="margin:18px 0 0;font-size:12px;color:#888">Répondez « STOP » et je vous retire définitivement de la liste.</p>
+</td></tr>
+</table></td></tr></table></body></html>`;
+}
+
 async function isAdmin(req: Request, baseUrl: string) {
   const authorization = req.headers.get("Authorization");
   if (!authorization?.startsWith("Bearer ")) return false;
