@@ -1,5 +1,6 @@
 /**
- * Scripts Loom — la présentation (vidéo 0) + les 20 tutoriels prioritaires.
+ * Scripts Loom — la présentation (vidéo 0), les 20 tutoriels prioritaires
+ * et la vidéo de clôture (vidéo 21).
  * Contenu rédigé à la main, français uniquement, aucune donnée inventée.
  * Durée visée : 5 minutes maximum par vidéo (débit calme, ~140 mots/minute).
  */
@@ -636,6 +637,47 @@ export const SCRIPTS_TUTORIELS: ScriptTutoriel[] = [
         ecran: '/v3/forfaits.',
         texte:
           "Vous avez vu l'atelier en entier. L'ouverture publique a lieu le 1er octobre. Prenez l'onglet qui vous concerne aujourd'hui, et commencez par là. À bientôt.",
+      },
+    ],
+  },
+  {
+    numero: 21,
+    titre: "Mot de la fin — où trouver de l'aide et l'accompagnement Zoom",
+    duree: 4,
+    type: 'visage+ecran',
+    route: 'Caméra, puis Ecobot, la FAQ et la page contact',
+    objectif:
+      "Le spectateur sait où trouver de l'aide (Ecobot, outils, FAQ, message direct) et connaît l'offre d'accompagnement Zoom.",
+    sections: [
+      {
+        titre: '1. Clôture de la visite (≈ 40 s)',
+        ecran: 'Caméra, plan fixe.',
+        texte:
+          "Voilà, vous avez vu les onglets principaux de l'atelier. Et je vous le dis franchement : il y en a beaucoup d'autres à découvrir.\n\nNe cherchez pas à tout voir d'un coup. Prenez le temps d'ouvrir les onglets un par un, au rythme de votre livre. Chacun s'explique en l'ouvrant.",
+      },
+      {
+        titre: "2. En cas de question, trois portes (≈ 1 min)",
+        ecran: "Montrer Ecobot, puis un onglet, puis la FAQ.",
+        texte:
+          "Si vous avez la moindre question, vous avez trois portes.\n\nLa première : Ecobot. C'est le petit robot en bas de l'écran. Discutez avec lui directement dans l'atelier, il répond aux questions d'usage, à toute heure.\n\nLa deuxième : les outils eux-mêmes. Chaque onglet affiche des explications et des exemples au moment où vous en avez besoin.\n\nLa troisième : les cinq cents questions. C'est la foire aux questions de l'atelier. Tapez un mot, et vous trouverez sûrement ce que vous recherchez.",
+      },
+      {
+        titre: '3. Si vous êtes bloqué (≈ 40 s)',
+        ecran: 'Montrer la page contact.',
+        texte:
+          "Et si malgré tout cela vous êtes bloqué, c'est très simple : envoyez-moi un message depuis la page contact, et je vous débloque. Je lis tout, et je réponds personnellement.",
+      },
+      {
+        titre: "4. L'accompagnement individuel (≈ 1 min)",
+        ecran: 'Caméra.',
+        texte:
+          "Enfin, si vous voulez aller plus vite, je propose un accompagnement individuel en visioconférence.\n\nPour démarrer, trente minutes avec moi sont offertes : on fait le point sur votre projet, vos réglages, votre première publication. Une séance par personne.\n\nEnsuite, si vous voulez continuer, c'est vingt-sept euros les trente minutes, sur réservation.\n\nJe le dis clairement : c'est une option, pas une obligation. L'atelier se suffit à lui-même. Mais si un rendez-vous peut vous faire gagner des semaines, il est là.",
+      },
+      {
+        titre: '5. Mot de la fin (≈ 30 s)',
+        ecran: 'Caméra.',
+        texte:
+          "Merci d'avoir suivi cette visite jusqu'au bout. Maintenant, ouvrez l'onglet qui vous concerne aujourd'hui, et commencez par là. Je vous souhaite un beau livre. À très bientôt.",
       },
     ],
   },
