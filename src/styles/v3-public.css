@@ -402,3 +402,44 @@
   border-radius: 18px;
   padding: 20px 22px;
 }
+
+/* ============================================================
+   Boutons lisibles partout : fond orange, texte blanc
+   ============================================================ */
+.v3pub button:not(:disabled),
+.v3pub [role="button"]:not([aria-disabled="true"]),
+.v3pub a.v3-btn,
+.v3pub .v3-btn,
+.v3pub .v3-btn-primary,
+.v3pub .v3-btn-gold,
+.v3pub .v3-btn-action-orange,
+.v3pub .v3-btn-outline,
+.v3pub .v3-btn-ghost,
+.v3pub .v3-btn-on-dark {
+  background: #c2410c !important;
+  color: #ffffff !important;
+  border-color: #c2410c !important;
+}
+.v3pub button:not(:disabled):hover,
+.v3pub [role="button"]:not([aria-disabled="true"]):hover,
+.v3pub a.v3-btn:hover,
+.v3pub .v3-btn:hover,
+.v3pub .v3-btn-primary:hover,
+.v3pub .v3-btn-gold:hover,
+.v3pub .v3-btn-action-orange:hover,
+.v3pub .v3-btn-outline:hover,
+.v3pub .v3-btn-ghost:hover,
+.v3pub .v3-btn-on-dark:hover {
+  background: #9a3412 !important;
+  color: #ffffff !important;
+  border-color: #9a3412 !important;
+}
+.v3pub button:not(:disabled) *,
+.v3pub [role="button"]:not([aria-disabled="true"]) *,
+.v3pub .v3-btn * {
+  color: #ffffff !important;
+}
+.v3pub button:disabled,
+.v3pub [aria-disabled="true"] {
+  opacity: 0.55;
+}
