@@ -15,4 +15,4 @@
 
 ## KDP — Fiche Audit
 
-- [ ] Ajouter la génération et le téléchargement d’images aux normes A+ pour les 4 modules
+- [x] Ajouter la génération et le téléchargement d’images aux normes A+ pour les 4 modules
