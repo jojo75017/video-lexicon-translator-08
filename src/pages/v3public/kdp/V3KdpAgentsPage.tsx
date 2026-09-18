@@ -1,15 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Copy, Loader2, MessageCircle, RotateCcw, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { callAIWriting, isAIConfigured } from '@/services/aiWritingService';
+import { listerLivres, resumeBibliotheque } from '@/lib/kdp/bibliotheque';
 import hectorImg from '@/assets/agent-kdp-hector.png';
 import margauxImg from '@/assets/agent-kdp-margaux.png';
+import biblioImg from '@/assets/agent-kdp-biblio.png';
 
-type AgentId = 'hector' | 'margaux';
+type AgentId = 'hector' | 'margaux' | 'biblio';
 
 interface Agent {
   id: AgentId;
