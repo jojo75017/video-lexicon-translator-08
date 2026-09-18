@@ -24,12 +24,23 @@ const RelanceDevisV3Panel = () => {
   const [targets, setTargets] = useState<Target[]>([]);
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState<
-    'test' | 'send' | 'preview' | 'suivi-status' | 'suivi-test' | 'suivi-send' | null
+    | 'test'
+    | 'send'
+    | 'preview'
+    | 'suivi-status'
+    | 'suivi-test'
+    | 'suivi-send'
+    | 'derniere-chance-status'
+    | 'derniere-chance-test'
+    | 'derniere-chance-send'
+    | null
   >(null);
   const [lastSent, setLastSent] = useState<number | null>(null);
   const [suiviCount, setSuiviCount] = useState<number | null>(null);
   const [suiviClickers, setSuiviClickers] = useState<number | null>(null);
   const [suiviDone, setSuiviDone] = useState<number | null>(null);
+  const [derniereChanceCount, setDerniereChanceCount] = useState<number | null>(null);
+  const [derniereChanceDone, setDerniereChanceDone] = useState<number | null>(null);
 
   const call = useCallback(async (body: Record<string, unknown>) => {
     const { data: session } = await supabase.auth.getSession();
@@ -135,6 +146,46 @@ const RelanceDevisV3Panel = () => {
       toast.success(`${data.sent} email(s) envoyé(s)${errors.length ? ` · ${errors.length} refus` : ''}`);
       if (errors.length) console.warn('Refus d’envoi :', errors);
       setSuiviCount(Number(data.remaining ?? 0));
+    } catch (err) {
+      toast.error('Envoi impossible : ' + ((err as Error).message || ''));
+    }
+    setBusy(null);
+  };
+
+  const loadDerniereChance = async () => {
+    setBusy('derniere-chance-status');
+    try {
+      const data = await call({ mode: 'derniere-chance-status' });
+      setDerniereChanceCount(Number(data.would_send ?? 0));
+      setDerniereChanceDone(Number(data.already_sent ?? 0));
+      toast.success(`${data.would_send} non-cliqueur(s) pour la dernière chance`);
+    } catch (err) {
+      toast.error('Comptage impossible : ' + ((err as Error).message || ''));
+    }
+    setBusy(null);
+  };
+
+  const sendDerniereChanceTest = async () => {
+    setBusy('derniere-chance-test');
+    try {
+      const data = await call({ mode: 'derniere-chance-test' });
+      if (data.success) toast.success(`Test email 3 envoyé à ${data.to}`);
+      else toast.error('Test refusé : ' + String(data.error || ''));
+    } catch (err) {
+      toast.error('Test impossible : ' + ((err as Error).message || ''));
+    }
+    setBusy(null);
+  };
+
+  const sendDerniereChanceBatch = async () => {
+    if (!window.confirm(`Envoyer l'email 3 à ${BATCH} non-cliqueurs maintenant ?`)) return;
+    setBusy('derniere-chance-send');
+    try {
+      const data = await call({ mode: 'derniere-chance-send', limit: BATCH });
+      const errors = (data.errors as string[]) || [];
+      toast.success(`${data.sent} email(s) envoyé(s)${errors.length ? ` · ${errors.length} refus` : ''}`);
+      if (errors.length) console.warn('Refus d’envoi :', errors);
+      setDerniereChanceCount(Number(data.remaining ?? 0));
     } catch (err) {
       toast.error('Envoi impossible : ' + ((err as Error).message || ''));
     }
@@ -247,6 +298,62 @@ const RelanceDevisV3Panel = () => {
               <Send className="mr-2 h-4 w-4" />
             )}
             Envoyer la relance nº2 (lot de {BATCH})
+          </Button>
+        </div>
+      </div>
+
+      <div className="mt-5 rounded-xl border border-destructive/40 bg-destructive/5 p-4">
+        <p className="text-sm font-semibold text-foreground">
+          Email nº3 — dernière chance
+        </p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Message final plus ferme : « voici ce que vous perdez ». Il part uniquement aux personnes
+          ayant reçu la relance nº2 sans cliquer. Il précise qu'aucune autre relance ne suivra et que,
+          si l'offre ne les intéresse pas, elles peuvent ignorer cet email.
+        </p>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <div className="rounded-lg border border-border bg-card p-3">
+            <p className="text-xs text-muted-foreground">Dernières chances à envoyer</p>
+            <p className="mt-1 text-xl font-bold text-foreground">
+              {derniereChanceCount === null ? '—' : derniereChanceCount}
+            </p>
+          </div>
+          <div className="rounded-lg border border-border bg-card p-3">
+            <p className="text-xs text-muted-foreground">Déjà envoyées</p>
+            <p className="mt-1 text-xl font-bold text-foreground">
+              {derniereChanceDone === null ? '—' : derniereChanceDone}
+            </p>
+          </div>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Button variant="outline" size="sm" onClick={loadDerniereChance} disabled={busy !== null}>
+            {busy === 'derniere-chance-status' ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="mr-2 h-4 w-4" />
+            )}
+            Compter les non-cliqueurs
+          </Button>
+          <Button variant="outline" size="sm" onClick={sendDerniereChanceTest} disabled={busy !== null}>
+            {busy === 'derniere-chance-test' ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Mail className="mr-2 h-4 w-4" />
+            )}
+            Test email nº3 vers ma boîte
+          </Button>
+          <Button
+            size="sm"
+            variant="destructive"
+            onClick={sendDerniereChanceBatch}
+            disabled={busy !== null || derniereChanceCount === 0}
+          >
+            {busy === 'derniere-chance-send' ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="mr-2 h-4 w-4" />
+            )}
+            Envoyer l'email nº3 (lot de {BATCH})
           </Button>
         </div>
       </div>

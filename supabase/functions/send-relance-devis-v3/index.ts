@@ -26,6 +26,8 @@ const TEMPLATE = "relance-devis-v3";
 const SUBJECT = "Votre livre est écrit. Il n'est pas encore publiable.";
 const TEMPLATE_SUIVI = "relance-devis-v3-suivi";
 const SUBJECT_SUIVI = "Il reste peu de jours avant le 1er octobre";
+const TEMPLATE_DERNIERE_CHANCE = "relance-devis-v3-derniere-chance";
+const SUBJECT_DERNIERE_CHANCE = "Dernière chance : voici ce que vous perdez";
 const LINK_DEVIS = "https://ebookstudio.fr/r/devis1";
 const LINK_V3 = "https://ebookstudio.fr/r/v3insc";
 const BATCH_MAX = 200;
@@ -110,6 +112,49 @@ Le 1<sup>er</sup> octobre, c'est dans quelques jours
 </table></td></tr></table></body></html>`;
 }
 
+/** Relance nº3 : dernier message, uniquement après la relance nº2 et sans clic. */
+function htmlDerniereChance(firstName: string | null): string {
+  const hello = firstName ? `Bonjour ${firstName},` : "Bonjour,";
+  return `<!DOCTYPE html><html lang="fr"><body style="margin:0;background:#FAFAFA">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FAFAFA;padding:24px 12px">
+<tr><td align="center">
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden">
+<tr><td style="background:#232F3E;padding:22px 26px;color:#ffffff;font:700 20px/1.35 Arial,Helvetica,sans-serif">
+Dernière chance : voici ce que vous perdez
+</td></tr>
+<tr><td style="padding:26px;color:#232F3E;font:16px/1.6 Arial,Helvetica,sans-serif">
+<p style="margin:0 0 16px">${hello}</p>
+<p style="margin:0 0 16px">Je vais être direct : c'est mon dernier message à ce sujet.</p>
+<p style="margin:0 0 12px">En laissant votre manuscrit de côté, vous perdez :</p>
+<ul style="margin:0 0 18px;padding-left:22px">
+<li style="margin-bottom:8px">le temps déjà consacré à l'écrire ;</li>
+<li style="margin-bottom:8px">la possibilité d'en faire un livre propre et publiable ;</li>
+<li style="margin-bottom:8px">des lecteurs, des avis et des ventes qui ne peuvent pas arriver tant que le livre reste dans un dossier ;</li>
+<li>l'accompagnement de rentrée et l'accès à EbookStudio V3 dès son ouverture le 1<sup>er</sup> octobre.</li>
+</ul>
+<p style="margin:0 0 20px"><strong>Vous avez deux choix. Après cet email, je ne vous relancerai plus.</strong></p>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 14px;border:1px solid #e5e7eb;border-radius:10px">
+<tr><td style="padding:18px 20px">
+<p style="margin:0 0 10px;font:700 17px Arial,Helvetica,sans-serif;color:#0f5132">Je confie mon livre à un professionnel</p>
+<p style="margin:0 0 12px;font-size:15px">Correction, mise en forme, couverture et accompagnement KDP. Devis à partir de 149 €.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="background:#FF9E2D;border-radius:8px"><a href="${LINK_DEVIS}" style="display:inline-block;padding:13px 24px;color:#232F3E;text-decoration:none;font:700 15px Arial,Helvetica,sans-serif">Demander mon devis</a></td></tr></table>
+</td></tr></table>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;border:1px solid #e5e7eb;border-radius:10px">
+<tr><td style="padding:18px 20px">
+<p style="margin:0 0 10px;font:700 17px Arial,Helvetica,sans-serif;color:#0f5132">Je publie moi-même avec la V3</p>
+<p style="margin:0 0 12px;font-size:15px">Plume à 27 € par mois ou Édition à 47 € par mois, sans engagement.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="background:#232F3E;border-radius:8px"><a href="${LINK_V3}" style="display:inline-block;padding:13px 24px;color:#ffffff;text-decoration:none;font:700 15px Arial,Helvetica,sans-serif">Voir les offres V3</a></td></tr></table>
+</td></tr></table>
+
+<p style="margin:0 0 8px;font-size:14px;color:#555"><strong>Si cela ne vous intéresse pas, ne tenez pas compte de cet email.</strong> Vous ne recevrez pas d'autre relance sur cette offre.</p>
+<p style="margin:18px 0 0">Georges Boubet<br><span style="color:#555;font-size:14px">EbookStudio</span></p>
+<p style="margin:18px 0 0;font-size:12px;color:#888">Répondez « STOP » et je vous retire définitivement de la liste.</p>
+</td></tr>
+</table></td></tr></table></body></html>`;
+}
+
 async function isAdmin(req: Request, baseUrl: string) {
   const authorization = req.headers.get("Authorization");
   if (!authorization?.startsWith("Bearer ")) return false;
@@ -163,6 +208,108 @@ Deno.serve(async (req) => {
       return res?.ok
         ? respond({ success: true, mode, sent: 1, to: REPLY_TO })
         : respond({ success: false, mode, sent: 0, error: res?.detail || "envoi refusé" });
+    }
+
+    if (mode === "derniere-chance-test") {
+      if (!EMAIL_SENDING_ENABLED) return respond(emailSendingBlockedResult(), 423);
+      const res = await sendResendEmailThrottled({
+        from: FROM_CAMPAIGN,
+        to: [REPLY_TO],
+        reply_to: REPLY_TO,
+        subject: `[TEST] ${SUBJECT_DERNIERE_CHANCE}`,
+        html: htmlDerniereChance("Georges"),
+      });
+      return res?.ok
+        ? respond({ success: true, mode, sent: 1, to: REPLY_TO })
+        : respond({ success: false, mode, sent: 0, error: res?.detail || "envoi refusé" });
+    }
+
+    /* ---------------- Relance nº3 : dernière chance ---------------- */
+    if (mode === "derniere-chance-status" || mode === "derniere-chance-send") {
+      const readEmails = async (templateName: string) => {
+        const emails = new Set<string>();
+        for (let from = 0; from < 40000; from += 1000) {
+          const { data } = await db.from("email_send_log").select("recipient_email")
+            .eq("template_name", templateName).range(from, from + 999);
+          if (!data?.length) break;
+          for (const row of data) emails.add(String(row.recipient_email || "").toLowerCase());
+          if (data.length < 1000) break;
+        }
+        return emails;
+      };
+
+      const receivedSuivi = await readEmails(TEMPLATE_SUIVI);
+      const alreadyFinal = await readEmails(TEMPLATE_DERNIERE_CHANCE);
+      const clickers = new Set<string>();
+      for (let from = 0; from < 40000; from += 1000) {
+        const { data } = await db.from("email_clicks").select("prospect_email,clicked_url").range(from, from + 999);
+        if (!data?.length) break;
+        for (const row of data) {
+          const url = String(row.clicked_url || "");
+          if (url.includes("devis1") || url.includes("v3insc")) {
+            clickers.add(String(row.prospect_email || "").toLowerCase());
+          }
+        }
+        if (data.length < 1000) break;
+      }
+      const excludedPaid = new Set<string>();
+      const { data: paidO } = await db.from("funnel_orders").select("email").eq("status", "paid").limit(5000);
+      for (const row of paidO || []) excludedPaid.add(String(row.email || "").toLowerCase());
+      const { data: activeSubs } = await db.from("subscribers").select("email").eq("status", "active").limit(5000);
+      for (const row of activeSubs || []) excludedPaid.add(String(row.email || "").toLowerCase());
+
+      const finalTargets = [...receivedSuivi].filter(
+        (email) => !clickers.has(email) && !alreadyFinal.has(email) && !excludedPaid.has(email) && !isInternalEmail(email),
+      );
+
+      if (mode === "derniere-chance-status") {
+        return respond({
+          success: true,
+          mode,
+          template: TEMPLATE_DERNIERE_CHANCE,
+          subject: SUBJECT_DERNIERE_CHANCE,
+          received_followup: receivedSuivi.size,
+          clickers: clickers.size,
+          already_sent: alreadyFinal.size,
+          would_send: finalTargets.length,
+          batch_max: BATCH_MAX,
+        });
+      }
+
+      if (!EMAIL_SENDING_ENABLED) return respond(emailSendingBlockedResult(), 423);
+      let finalSent = 0;
+      const finalErrors: string[] = [];
+      for (const email of finalTargets.slice(0, limit)) {
+        const res = await sendResendEmailThrottled({
+          from: FROM_CAMPAIGN,
+          to: [email],
+          reply_to: REPLY_TO,
+          subject: SUBJECT_DERNIERE_CHANCE,
+          html: htmlDerniereChance(null),
+          tags: [{ name: "template", value: TEMPLATE_DERNIERE_CHANCE }],
+        });
+        if (res?.ok) {
+          finalSent++;
+          await db.from("email_send_log").insert({
+            message_id: res.id ?? null,
+            template_name: TEMPLATE_DERNIERE_CHANCE,
+            recipient_email: email,
+            status: "sent",
+          });
+        } else {
+          finalErrors.push(`${email}: ${res?.detail || "envoi refusé"}`);
+          if (res?.quotaExhausted || res?.status === 429 || res?.status === 401 || res?.status === 403) break;
+        }
+      }
+      return respond({
+        success: true,
+        mode,
+        template: TEMPLATE_DERNIERE_CHANCE,
+        targets: finalTargets.length,
+        sent: finalSent,
+        remaining: Math.max(0, finalTargets.length - finalSent),
+        errors: finalErrors,
+      });
     }
 
     /* ---------------- Relance nº2 : non-cliqueurs ---------------- */
