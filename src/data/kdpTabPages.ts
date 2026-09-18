@@ -48,6 +48,13 @@ export const KDP_TAB_PAGES: KdpTabPage[] = [
     maison: true,
   },
   {
+    label: 'Parler avec l’IA — Hector ou Margaux',
+    to: '/v3/kdp/agents',
+    desc: 'Deux conseillers IA à votre écoute : Hector, direct et orienté ventes, ou Margaux, pédagogue pour les débutants',
+    badge: 'Nouveau',
+    maison: true,
+  },
+  {
     label: 'Audit avant publication',
     to: '/audit-pilot',
     desc: 'Vérification complète de votre fiche avant la mise en vente Kindle ou poche',
