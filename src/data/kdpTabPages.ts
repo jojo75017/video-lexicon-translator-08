@@ -41,6 +41,13 @@ export const KDP_TAB_PAGES: KdpTabPage[] = [
     maison: true,
   },
   {
+    label: 'Radar de niches — un thème, 10 idées de livres',
+    to: '/v3/kdp/radar-niches',
+    desc: 'Partez d\'un thème large : 10 niches centrées sur un vrai problème de lecteur, avec demande, concurrence et angle de différenciation',
+    badge: 'Nouveau',
+    maison: true,
+  },
+  {
     label: 'Audit avant publication',
     to: '/audit-pilot',
     desc: 'Vérification complète de votre fiche avant la mise en vente Kindle ou poche',
