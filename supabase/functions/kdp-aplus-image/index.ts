@@ -16,6 +16,8 @@ const BodySchema = z.object({
   visualSuggestion: z.string().trim().min(1).max(1200),
   width: z.number().int().min(150).max(970),
   height: z.number().int().min(180).max(600),
+  bookContext: z.string().trim().max(2000).optional(),
+  coverImage: z.string().trim().max(8_000_000).optional(),
   stream: z.boolean().default(true),
 });
 
@@ -50,7 +52,7 @@ Deno.serve(async (req) => {
     const key = Deno.env.get("LOVABLE_API_KEY");
     if (!key) return json({ error: "La création d’images IA n’est pas configurée." }, 500);
 
-    const { bookTitle, moduleTitle, moduleText, visualSuggestion, width, height, stream } = parsed.data;
+    const { bookTitle, moduleTitle, moduleText, visualSuggestion, width, height, stream, bookContext, coverImage } = parsed.data;
     const landscape = width >= height;
     const size = width === height ? "1024x1024" : landscape ? "1536x1024" : "1024x1536";
     const prompt = [
@@ -59,6 +61,13 @@ Deno.serve(async (req) => {
       `Module : « ${moduleTitle} ».`,
       `Idée du module : ${moduleText.slice(0, 1800)}.`,
       `Scène visuelle demandée : ${visualSuggestion}.`,
+      ...(bookContext ? [`Contexte du livre (genre, sujet, public) : ${bookContext.slice(0, 1200)}.`] : []),
+      ...(coverImage
+        ? [
+            "Une image de référence est fournie : c’est la couverture du livre. L’image A+ doit appartenir au même univers visuel que cette couverture : mêmes couleurs dominantes, même ambiance lumineuse, même style graphique, mêmes sujets et mêmes personnages s’il y en a.",
+            "Ne reproduis jamais la couverture telle quelle, ne recopie aucun de ses textes ni son titre : crée une nouvelle scène cohérente avec elle.",
+          ]
+        : []),
       `Composition prévue pour un recadrage final exact en ${width} × ${height} pixels (${landscape ? "horizontal" : "vertical"}).`,
       "Rendu photoréaliste ou illustration éditoriale premium selon le sujet, lumineux, net, équilibré, digne d’une grande maison d’édition.",
       "Le sujet essentiel doit rester au centre et conserver des marges sûres pour le recadrage.",
@@ -66,22 +75,42 @@ Deno.serve(async (req) => {
       "Aucun cadre, bouton, faux écran, encart publicitaire ou bandeau sombre. Image seule, jusqu’aux bords.",
     ].join("\n");
 
-    const upstream = await fetch("https://ai.gateway.lovable.dev/v1/images/generations", {
-      method: "POST",
-      headers: {
-        "Lovable-API-Key": key,
-        "X-Lovable-AIG-SDK": "edge-function-direct",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        prompt,
-        size,
-        quality: "high",
-        background: "opaque",
-        ...(stream ? { stream: true, partial_images: 1 } : {}),
-      }),
-    });
+    const baseHeaders = {
+      "Lovable-API-Key": key,
+      "X-Lovable-AIG-SDK": "edge-function-direct",
+    };
+
+    let upstream: Response;
+    if (coverImage) {
+      const match = /^data:(image\/[a-zA-Z+]+);base64,(.+)$/.exec(coverImage);
+      if (!match) return json({ error: "La couverture de référence est illisible. Renvoyez un fichier JPG ou PNG." }, 400);
+      const bytes = Uint8Array.from(atob(match[2]), (c) => c.charCodeAt(0));
+      const form = new FormData();
+      form.append("model", MODEL);
+      form.append("prompt", prompt);
+      form.append("size", size);
+      form.append("quality", "high");
+      form.append("background", "opaque");
+      form.append("image", new Blob([bytes], { type: match[1] }), "couverture.png");
+      upstream = await fetch("https://ai.gateway.lovable.dev/v1/images/edits", {
+        method: "POST",
+        headers: baseHeaders,
+        body: form,
+      });
+    } else {
+      upstream = await fetch("https://ai.gateway.lovable.dev/v1/images/generations", {
+        method: "POST",
+        headers: { ...baseHeaders, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: MODEL,
+          prompt,
+          size,
+          quality: "high",
+          background: "opaque",
+          ...(stream ? { stream: true, partial_images: 1 } : {}),
+        }),
+      });
+    }
 
     return new Response(upstream.body, {
       status: upstream.status,

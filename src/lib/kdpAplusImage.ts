@@ -12,6 +12,10 @@ export interface AplusImageRequest {
   visualSuggestion: string;
   width: number;
   height: number;
+  /** Contexte du livre (genre, sujet) pour que l'image reste dans son univers. */
+  bookContext?: string;
+  /** Couverture du livre en data URL : sert de référence visuelle. */
+  coverImage?: string;
 }
 
 function dataUrlFromPayload(payload: ImagePayload): string | null {
@@ -46,6 +50,17 @@ export async function generateAplusImage(
     headers,
     body: JSON.stringify({ ...request, stream }),
   });
+
+  // Avec une couverture de référence, l'image est composée en une seule passe (pas d'aperçu progressif).
+  if (request.coverImage) {
+    const single = await send(false);
+    if (!single.ok) throw new Error(await readError(single));
+    const body = await single.json() as ImagePayload;
+    const only = dataUrlFromPayload(body);
+    if (!only) throw new Error(body.error?.message ?? "Aucune image n’a été reçue.");
+    onFrame(only, true);
+    return;
+  }
 
   const response = await send(true);
   if (!response.ok || !response.body) throw new Error(await readError(response));
