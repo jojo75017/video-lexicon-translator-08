@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, LogIn, User, Mail, GraduationCap, Menu, X } from 'lucide-react';
+import { Search, LogIn, User, Mail, GraduationCap, Menu, X, HelpCircle } from 'lucide-react';
 import BlogExternalLink from './BlogExternalLink';
 import ThemeToggle from './ThemeToggle';
 import { ADMIN_HOME_PATH } from '@/config/adminRoutes';
