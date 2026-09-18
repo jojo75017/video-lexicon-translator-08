@@ -483,7 +483,7 @@ const ProspectManagerPage = () => {
               <CheckCircle className="h-4 w-4 mr-2" /> Inscrits
             </TabsTrigger>
             <TabsTrigger value="send" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
-              <Send className="h-4 w-4 mr-2" /> Campagne
+              <Send className="h-4 w-4 mr-2" /> Envoi
             </TabsTrigger>
             <TabsTrigger value="templates" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold-light">
               <Mail className="h-4 w-4 mr-2" /> Templates
