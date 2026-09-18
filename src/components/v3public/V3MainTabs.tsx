@@ -24,6 +24,7 @@ export default function V3MainTabs() {
   const tabsLocked = v3Open === false && (isAdmin === false || (isAdmin === true && isPreviewingAsSubscriber()));
 
   const openCat = (key: string, el: HTMLElement) => {
+    if (tabsLocked) return;
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
     setAnchorLeft(el.getBoundingClientRect().left);
     setOpenKey(key);
@@ -69,8 +70,17 @@ export default function V3MainTabs() {
         background: 'var(--v3-paper)',
         borderBottom: '1px solid var(--v3-line)',
       }}
+      aria-disabled={tabsLocked || undefined}
     >
-      <div className="max-w-[1440px] mx-auto pl-4 md:pl-6 pr-2 md:pr-3 h-14 flex items-center gap-1">
+      {tabsLocked && (
+        <div
+          className="text-center text-[11px] font-semibold py-1"
+          style={{ background: 'var(--v3-gold-soft)', color: 'var(--v3-emerald)', borderBottom: '1px solid var(--v3-line)' }}
+        >
+          🔒 Aperçu de la V3 — les onglets s'ouvrent le 1ᵉʳ octobre 2026
+        </div>
+      )}
+      <div className={`max-w-[1440px] mx-auto pl-4 md:pl-6 pr-2 md:pr-3 h-14 flex items-center gap-1 ${tabsLocked ? 'pointer-events-none select-none opacity-70' : ''}`}>
         {/* Desktop (≥ xl) — rangée scrollable : aucun onglet n'est coupé */}
         <nav className="hidden xl:flex items-center gap-0.5 flex-1 min-w-0 overflow-x-auto v3-no-scrollbar">
           <NavLink

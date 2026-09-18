@@ -107,7 +107,13 @@ export default function V3PublicLayout({ isAdmin, isAdminChecking, isSubscriber 
         </div>
 
         <div className="flex flex-1 w-full">
-          {showSidebar && <V3Sidebar />}
+          {showSidebar && (
+            // Avant l'ouverture, le menu latéral reste visible mais inactif
+            // pour les visiteurs : ils contemplent, ils ne cliquent pas.
+            <div className={v3Open === false && !isAdmin ? 'pointer-events-none select-none opacity-70' : ''}>
+              <V3Sidebar />
+            </div>
+          )}
           <main className="flex-1 min-w-0">
             <V3UpsellReturnBar />
             <Outlet />
