@@ -88,7 +88,7 @@ export default function V3KdpFicheAuditPage() {
       setErreur("L'ASIN doit contenir 10 caractères (lettres et chiffres), par exemple B08HFDFKRFG sans espace.");
       return;
     }
-    if (!hasValidActiveKey()) {
+    if (!isAIConfigured()) {
       setErreur("Aucune clé IA valide enregistrée. Ouvrez « Paramétrage des clés » puis revenez ici.");
       return;
     }
