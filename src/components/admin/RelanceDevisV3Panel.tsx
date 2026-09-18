@@ -100,6 +100,49 @@ const RelanceDevisV3Panel = () => {
     setBusy(null);
   };
 
+  const loadSuivi = async () => {
+    setBusy('suivi-status');
+    try {
+      const data = await call({ mode: 'suivi-status' });
+      setSuiviCount(Number(data.would_send ?? 0));
+      setSuiviClickers(Number(data.clickers ?? 0));
+      setSuiviDone(Number(data.already_sent ?? 0));
+      toast.success(`${data.would_send} non-cliqueur(s) à relancer`);
+    } catch (err) {
+      toast.error('Comptage impossible : ' + ((err as Error).message || ''));
+    }
+    setBusy(null);
+  };
+
+  const sendSuiviTest = async () => {
+    setBusy('suivi-test');
+    try {
+      const data = await call({ mode: 'suivi-test' });
+      if (data.success) toast.success(`Test relance nº2 envoyé à ${data.to}`);
+      else toast.error('Test refusé : ' + String(data.error || ''));
+    } catch (err) {
+      toast.error('Test impossible : ' + ((err as Error).message || ''));
+    }
+    setBusy(null);
+  };
+
+  const sendSuiviBatch = async () => {
+    if (!window.confirm(`Envoyer la relance nº2 à ${BATCH} non-cliqueurs maintenant ?`)) return;
+    setBusy('suivi-send');
+    try {
+      const data = await call({ mode: 'suivi-send', limit: BATCH });
+      const errors = (data.errors as string[]) || [];
+      toast.success(`${data.sent} email(s) envoyé(s)${errors.length ? ` · ${errors.length} refus` : ''}`);
+      if (errors.length) console.warn('Refus d’envoi :', errors);
+      setSuiviCount(Number(data.remaining ?? 0));
+    } catch (err) {
+      toast.error('Envoi impossible : ' + ((err as Error).message || ''));
+    }
+    setBusy(null);
+  };
+
+
+
   return (
     <section className="rounded-2xl border border-border bg-card p-5">
       <header className="flex flex-wrap items-center justify-between gap-3">
