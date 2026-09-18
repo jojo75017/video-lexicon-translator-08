@@ -770,6 +770,7 @@ const App = () => {
               <Route path="kdp-pilot" element={<V3KdpPilotPage />} />
               <Route path="kdp" element={<V3LockedGate><V3KdpHubPage /></V3LockedGate>} />
               <Route path="kdp/fiche-audit" element={<V3LockedGate><V3KdpFicheAuditPage /></V3LockedGate>} />
+              <Route path="kdp/lancement" element={<V3LockedGate><V3KdpLancementPage /></V3LockedGate>} />
               <Route path="parametres" element={<V3LockedGate><V3AuthorSettingsPage /></V3LockedGate>} />
               <Route path="livres/:type" element={<V3LockedGate><TrialGate label="Livres spéciaux"><V3SpecialBookPage /></TrialGate></V3LockedGate>} />
 
