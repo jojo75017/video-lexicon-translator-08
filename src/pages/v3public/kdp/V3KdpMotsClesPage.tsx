@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Copy, Download, Loader2, Search, Sparkles, Tags } from 'lucide-react';
 import { toast } from 'sonner';
+import SelecteurLivreBiblio from '@/components/kdp/SelecteurLivreBiblio';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
