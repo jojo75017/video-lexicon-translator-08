@@ -146,6 +146,63 @@ const RelanceDevisV3Panel = () => {
         </Button>
       </div>
 
+      <div className="mt-5 rounded-xl border border-dashed border-border p-4">
+        <p className="text-sm font-semibold text-foreground">
+          Relance nº2 — uniquement les non-cliqueurs
+        </p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Autre texte, autre objet (« Il reste peu de jours avant le 1<sup>er</sup> octobre »).
+          Envoyée seulement aux adresses qui ont reçu le 1<sup>er</sup> email sans cliquer sur
+          aucun des deux liens. Ceux qui ont cliqué ne sont jamais relancés.
+        </p>
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          <div className="rounded-lg border border-border p-3">
+            <p className="text-xs text-muted-foreground">Non-cliqueurs à relancer</p>
+            <p className="mt-1 text-xl font-bold text-foreground">
+              {suiviCount === null ? '—' : suiviCount}
+            </p>
+          </div>
+          <div className="rounded-lg border border-border p-3">
+            <p className="text-xs text-muted-foreground">Ont cliqué (exclus)</p>
+            <p className="mt-1 text-xl font-bold text-foreground">
+              {suiviClickers === null ? '—' : suiviClickers}
+            </p>
+          </div>
+          <div className="rounded-lg border border-border p-3">
+            <p className="text-xs text-muted-foreground">Déjà relancés</p>
+            <p className="mt-1 text-xl font-bold text-foreground">
+              {suiviDone === null ? '—' : suiviDone}
+            </p>
+          </div>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Button variant="outline" size="sm" onClick={loadSuivi} disabled={busy !== null}>
+            {busy === 'suivi-status' ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="mr-2 h-4 w-4" />
+            )}
+            Compter les non-cliqueurs
+          </Button>
+          <Button variant="outline" size="sm" onClick={sendSuiviTest} disabled={busy !== null}>
+            {busy === 'suivi-test' ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Mail className="mr-2 h-4 w-4" />
+            )}
+            Test relance nº2 vers ma boîte
+          </Button>
+          <Button size="sm" variant="secondary" onClick={sendSuiviBatch} disabled={busy !== null || suiviCount === 0}>
+            {busy === 'suivi-send' ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="mr-2 h-4 w-4" />
+            )}
+            Envoyer la relance nº2 (lot de {BATCH})
+          </Button>
+        </div>
+      </div>
+
       {targets.length > 0 && (
         <div className="mt-4 rounded-xl border border-border p-4">
           <p className="text-xs font-semibold text-muted-foreground">
