@@ -19,6 +19,36 @@ import { ErrorLogsViewer } from '@/components/admin/ErrorLogsViewer';
 import { ADMIN_LOGIN_PATH } from '@/config/adminRoutes';
 import { useAdminAccess } from '@/contexts/AdminAccessContext';
 
+/** Jours entiers écoulés depuis une date (paiement/inscription). */
+const daysSince = (dateStr?: string | null): number | null => {
+  if (!dateStr) return null;
+  const t = new Date(dateStr).getTime();
+  if (Number.isNaN(t)) return null;
+  return Math.max(0, Math.floor((Date.now() - t) / 86_400_000));
+};
+
+/** Badge « Inscrit depuis X j » : vert < 7 j (nouveau), neutre 7-30 j, gris au-delà. */
+const SeniorityBadge = ({ dateStr }: { dateStr?: string | null }) => {
+  const days = daysSince(dateStr);
+  if (days === null) return <span className="text-muted-foreground text-xs">—</span>;
+  const cls =
+    days < 7
+      ? 'bg-emerald-100 text-emerald-700 border-emerald-300'
+      : days <= 30
+        ? 'bg-blue-50 text-blue-700 border-blue-200'
+        : 'bg-gray-100 text-gray-600 border-gray-200';
+  return (
+    <div className="flex flex-col gap-0.5">
+      <Badge variant="outline" className={`${cls} font-bold`}>
+        {days === 0 ? "aujourd'hui" : `${days} j`}
+      </Badge>
+      <span className="text-[11px] text-muted-foreground">
+        depuis le {format(new Date(dateStr!), 'dd/MM/yyyy')}
+      </span>
+    </div>
+  );
+};
+
 export const AdminPage = () => {
   const [email, setEmail] = useState('');
   const [planType, setPlanType] = useState('lifetime');
