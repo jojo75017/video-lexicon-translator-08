@@ -249,7 +249,7 @@ Réponds uniquement avec ce JSON :
         <Link to="/v3/kdp" className="inline-flex items-center gap-2 text-[13px] font-semibold" style={{ color: 'var(--v3-emerald)' }}>
           <ArrowLeft className="h-4 w-4" /> Retour à l'espace KDP
         </Link>
-        <Link to="/v3/fonctionnalites/cles-api" className="text-[12.5px] underline" style={{ color: 'var(--v3-muted)' }}>
+        <Link to="/v3/fonctionnalites/cles" className="text-[12.5px] underline" style={{ color: 'var(--v3-muted)' }}>
           Paramétrage des clés
         </Link>
       </div>
