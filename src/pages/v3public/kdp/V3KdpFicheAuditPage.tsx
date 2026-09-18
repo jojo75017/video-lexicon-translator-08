@@ -218,6 +218,8 @@ Réponds uniquement avec ce JSON :
         visualSuggestion: module.visuel,
         width: format.width,
         height: format.height,
+        bookContext: [livre.categories?.slice(0, 3).join(' · '), livre.description?.slice(0, 700)].filter(Boolean).join(' — '),
+        coverImage: couverture ?? undefined,
       }, session.access_token, (dataUrl, final) => {
         setImagesAplus((prev) => ({ ...prev, [i]: { dataUrl, loading: !final, final } }));
       });
@@ -225,6 +227,46 @@ Réponds uniquement avec ce JSON :
       const message = error instanceof Error ? error.message : 'Création de l’image impossible.';
       setImagesAplus((prev) => ({ ...prev, [i]: { ...prev[i], loading: false, final: false, error: message } }));
     }
+  };
+
+  const chargerCouverture = async (file: File | null) => {
+    if (!file) return;
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) {
+      toast.error('Ajoutez la couverture en JPG, PNG ou WEBP.');
+      return;
+    }
+    if (file.size > 6 * 1024 * 1024) {
+      toast.error('La couverture doit peser moins de 6 Mo.');
+      return;
+    }
+    const lecture = await new Promise<string | null>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : null);
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(file);
+    });
+    if (!lecture) {
+      toast.error('Cette couverture n’a pas pu être lue.');
+      return;
+    }
+    // Le serveur attend une image JPG ou PNG : on reconvertit toujours en PNG.
+    try {
+      const image = new Image();
+      image.src = lecture;
+      await new Promise((resolve, reject) => { image.onload = resolve; image.onerror = reject; });
+      const cote = 1024;
+      const echelle = Math.min(1, cote / Math.max(image.naturalWidth, image.naturalHeight));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(image.naturalWidth * echelle);
+      canvas.height = Math.round(image.naturalHeight * echelle);
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('canvas');
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+      setCouverture(canvas.toDataURL('image/png'));
+    } catch {
+      setCouverture(lecture);
+    }
+    toast.success('Couverture prise en compte : les images A+ suivront son univers.');
   };
 
   const telechargerImageAplus = async (i: number) => {
@@ -438,6 +480,28 @@ Réponds uniquement avec ce JSON :
           </Bloc>
 
           <Bloc titre="Contenu A+ — 4 modules" sous="Textes modifiables et images générées aux dimensions de chaque module Amazon A+.">
+            <div className="mb-4 rounded-xl border p-4" style={{ borderColor: 'var(--v3-line)', background: 'var(--v3-paper)' }}>
+              <p className="text-[13px] font-bold" style={{ color: 'var(--v3-ink)' }}>Couverture du livre (recommandé)</p>
+              <p className="mt-1 text-[12px]" style={{ color: 'var(--v3-muted)' }}>
+                Ajoutez votre couverture : les images des 4 modules reprendront ses couleurs, son ambiance et ses personnages, sans recopier son texte.
+              </p>
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                {couverture && (
+                  <img src={couverture} alt="Couverture ajoutée" className="h-24 w-auto rounded-md border" style={{ borderColor: 'var(--v3-line)' }} />
+                )}
+                <Input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={(e) => { void chargerCouverture(e.target.files?.[0] ?? null); e.target.value = ''; }}
+                  className="max-w-xs text-[12.5px]"
+                />
+                {couverture && (
+                  <Button type="button" variant="outline" size="sm" onClick={() => setCouverture(null)} className="border-[var(--v3-emerald)] [background:var(--v3-paper)!important] [color:var(--v3-ink)!important]">
+                    Retirer la couverture
+                  </Button>
+                )}
+              </div>
+            </div>
             <div className="space-y-4">
               {fiche.aplus.map((m, i) => (
                 <div key={i} className="rounded-xl border p-4" style={{ borderColor: 'var(--v3-line)', background: 'var(--v3-cream)' }}>
