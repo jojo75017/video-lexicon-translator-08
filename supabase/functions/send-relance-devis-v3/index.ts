@@ -57,7 +57,7 @@ Un manuscrit n'est pas un livre publiable
 <p style="margin:0 0 8px;font:700 17px Arial,Helvetica,sans-serif;color:#0f5132">1. Je le fais pour vous</p>
 <p style="margin:0 0 12px;font-size:15px">Correction complète, mise en forme aux normes KDP, couverture professionnelle, accompagnement jusqu'au dépôt sur votre compte. Devis à partir de 149 €, réponse sous 24 h.</p>
 <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
-<td style="background:#008296;border-radius:8px"><a href="${LINK_DEVIS}" style="display:inline-block;padding:13px 24px;color:#ffffff;text-decoration:none;font:700 15px Arial,Helvetica,sans-serif">Demander mon devis</a></td>
+<td style="background:#FF9E2D;border-radius:8px"><a href="${LINK_DEVIS}" style="display:inline-block;padding:13px 24px;color:#232F3E;text-decoration:none;font:700 15px Arial,Helvetica,sans-serif">Demander mon devis (à partir de 149 €)</a></td>
 </tr></table>
 </td></tr></table>
 
