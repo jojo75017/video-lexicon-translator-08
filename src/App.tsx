@@ -202,6 +202,7 @@ const V3KdpHubPage = lazy(() => import('./pages/v3public/kdp/V3KdpHubPage'));
 const V3KdpFicheAuditPage = lazy(() => import('./pages/v3public/kdp/V3KdpFicheAuditPage'));
 const V3KdpLancementPage = lazy(() => import('./pages/v3public/kdp/V3KdpLancementPage'));
 const V3KdpMotsClesPage = lazy(() => import('./pages/v3public/kdp/V3KdpMotsClesPage'));
+const V3KdpPublicitePage = lazy(() => import('./pages/v3public/kdp/V3KdpPublicitePage'));
 const ContentStudioPage = lazy(() => import('./pages/v3public/ContentStudioPage'));
 const ContentStudioProjectPage = lazy(() => import('./pages/v3public/ContentStudioProjectPage'));
 const VersionLongueLibraryPage = lazy(() => import('./pages/v3/version-longue/VersionLongueLibraryPage'));
