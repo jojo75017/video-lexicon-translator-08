@@ -48,6 +48,13 @@ interface Prospect {
   relance_round?: number | null;
 }
 
+const NICHES_EMAIL = {
+  subject: 'Je vous offre 10 niches pour débuter votre prochain ebook',
+  preheader: 'Dix idées concrètes pour choisir votre sujet sans partir au hasard.',
+  button: 'Découvrir mes 10 niches offertes',
+  url: 'https://www.trafic-affiliation.com/niches_ebookstudio/',
+};
+
 const STEPS = ACTIVE_EMAIL_CAMPAIGN.steps;
 const EMAIL_SENDING_BLOCKED = ACTIVE_EMAIL_CAMPAIGN.sendingBlocked;
 
@@ -413,11 +420,10 @@ const ProspectManagerPage = () => {
         <div className="mb-6 flex items-start gap-3 rounded-md border border-emerald-500/40 bg-emerald-500/10 p-4 text-emerald-500">
           <Zap className="mt-0.5 h-5 w-5 shrink-0" />
           <div>
-            <p className="font-semibold">100 % Systeme.io</p>
+            <p className="font-semibold">Campagnes habituelles : Systeme.io</p>
             <p className="text-sm text-muted-foreground">
-              Toutes les campagnes {ACTIVE_EMAIL_CAMPAIGN.price} partent de Systeme.io
-              (contact@ebookstudio-mail.fr). Cette page sert uniquement à consulter, segmenter et
-              exporter les contacts — plus aucun envoi de masse depuis l'application.
+              Les campagnes habituelles partent de Systeme.io. La lettre cadeau « 10 niches »
+              dispose exceptionnellement d'un envoi Resend contrôlé depuis l'onglet Envoi.
             </p>
           </div>
         </div>
@@ -601,13 +607,13 @@ const ProspectManagerPage = () => {
             <Card className="bg-card border-border">
               <CardContent className="flex flex-wrap items-center justify-between gap-3 py-4">
                 <div>
-                  <p className="text-sm font-medium text-foreground">Une seule campagne email</p>
+                  <p className="text-sm font-medium text-foreground">Lettre cadeau — 10 niches offertes</p>
                   <p className="text-xs text-muted-foreground">
-                    Les 5 emails se copient depuis la page Campagnes, avec un envoi de test.
+                    Objet : {NICHES_EMAIL.subject} · un seul bouton dans l'email.
                   </p>
                 </div>
-                <Button size="sm" onClick={() => navigate('/admin/campagnes')} className="rounded-xl">
-                  <Mail className="mr-2 h-4 w-4" /> Ouvrir Campagnes
+                <Button size="sm" onClick={() => setActiveManagerTab('send')}>
+                  <Mail className="mr-2 h-4 w-4" /> Voir la lettre
                 </Button>
               </CardContent>
             </Card>
@@ -782,6 +788,34 @@ const ProspectManagerPage = () => {
 
           {/* CAMPAGNE TAB — plus aucun envoi depuis ici */}
           <TabsContent value="send" className="space-y-4">
+            <Card className="border-primary/30 bg-card">
+              <CardHeader>
+                <CardTitle className="text-lg">Lettre cadeau — 10 niches offertes</CardTitle>
+                <p className="text-sm text-muted-foreground">Objet : {NICHES_EMAIL.subject}</p>
+                <p className="text-xs text-muted-foreground">{NICHES_EMAIL.preheader}</p>
+              </CardHeader>
+              <CardContent className="space-y-4 text-sm">
+                <div className="mx-auto max-w-2xl space-y-4 rounded-md border bg-background p-5 text-foreground">
+                  <p>Bonjour,</p>
+                  <p>Vous voulez créer un ebook, mais vous ne savez pas encore quel sujet choisir ? C'est souvent là que tout se bloque : une idée trop large, trop concurrentielle ou sans lecteur clairement identifié.</p>
+                  <p>Pour vous aider à démarrer sur de bonnes bases, je vous offre une sélection de 10 niches EbookStudio. Elles vous permettront de repérer des sujets précis et de choisir plus facilement l'angle de votre prochain livre.</p>
+                  <p>Vous pourrez parcourir les 10 propositions, comparer leurs possibilités et retenir celle qui correspond le mieux à vos connaissances et au public que vous souhaitez aider.</p>
+                  <p>Ce cadeau est gratuit, sans achat et sans engagement. Cliquez simplement sur le bouton ci-dessous pour le découvrir.</p>
+                  <div>
+                    <Button asChild>
+                      <a href={NICHES_EMAIL.url} target="_blank" rel="noreferrer">{NICHES_EMAIL.button}</a>
+                    </Button>
+                  </div>
+                  <p>Ne cherchez pas tout de suite l'idée parfaite. Choisissez d'abord une niche qui vous parle, puis commencez à construire votre livre autour d'un problème précis à résoudre pour le lecteur.</p>
+                  <p>Georges Boubet<br />Fondateur d'EbookStudio</p>
+                </div>
+                <div className="flex justify-end">
+                  <Button onClick={() => navigate('/admin/emails-lancement')}>
+                    <Send className="mr-2 h-4 w-4" /> Ouvrir l'envoi Resend
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
             <RelanceDevisV3Panel />
             <SystemeIoSyncPanel />
             <Card className="bg-card border-border">
