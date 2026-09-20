@@ -33,13 +33,18 @@ const RedirectClickPage = () => {
     const template = params.get('t') || short?.template || shortKey;
     const raw = params.get('u') || short?.destination || '';
 
-    // Destination : URL interne ou absolue sur notre domaine uniquement
+    // Destination : URL interne, domaine EbookStudio ou page partenaire
+    // explicitement autorisée pour le cadeau des 10 niches.
     let destination = DEFAULT_DESTINATION;
     try {
       if (raw) {
         const url = new URL(raw, window.location.origin);
-        if (url.origin === window.location.origin || url.hostname.endsWith('ebookstudio.fr')) {
+        const isInternal = url.origin === window.location.origin || url.hostname.endsWith('ebookstudio.fr');
+        const isTrustedGiftPage = url.hostname === 'www.trafic-affiliation.com' && url.pathname === '/niches_ebookstudio/';
+        if (isInternal) {
           destination = url.pathname + url.search + url.hash;
+        } else if (isTrustedGiftPage) {
+          destination = url.toString();
         }
       }
     } catch {
@@ -57,7 +62,8 @@ const RedirectClickPage = () => {
     // sendBeacon survit à la navigation : avec fetch(), la redirection
     // annulait l'appel et une partie des clics n'était jamais comptée.
     if (SUPABASE_URL) {
-      const trackUrl = `${SUPABASE_URL}/functions/v1/track-email-click?e=${encodeURIComponent(email)}&s=${encodeURIComponent(step)}&t=${encodeURIComponent(template)}&u=${encodeURIComponent('https://ebookstudio.fr' + finalUrl)}&noredirect=1`;
+      const trackedDestination = finalUrl.startsWith('http') ? finalUrl : `https://ebookstudio.fr${finalUrl}`;
+      const trackUrl = `${SUPABASE_URL}/functions/v1/track-email-click?e=${encodeURIComponent(email)}&s=${encodeURIComponent(step)}&t=${encodeURIComponent(template)}&u=${encodeURIComponent(trackedDestination)}&noredirect=1`;
       try {
         const sent = navigator.sendBeacon?.(trackUrl);
         if (!sent) fetch(trackUrl, { mode: 'no-cors', keepalive: true }).catch(() => {});
