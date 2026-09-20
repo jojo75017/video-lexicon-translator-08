@@ -15,7 +15,7 @@ const STEPS = [
   { step: 2, template: 'v3l-livre-J10', title: 'Email 2 — Un livre écrit sous vos yeux', when: 'J-10' },
   { step: 3, template: 'v3l-changement-J4', title: 'Email 3 — Ce qui change le 1er octobre', when: 'J-4' },
   { step: 4, template: 'v3l-dernier-J1', title: 'Email 4 — Dernier jour à 47 €', when: 'J-1' },
-  { step: 5, template: 'v3l-niches-offertes', title: 'Lettre cadeau — 10 niches (PDF débloqué uniquement après clic)', when: 'À tout moment' },
+  { step: 5, template: 'v3l-niches-offertes', title: 'Lettre cadeau — 10 niches (un seul bouton)', when: 'À tout moment' },
 ];
 
 type LogRow = { message_id: string | null; id: string; template_name: string | null; recipient_email: string; status: string; error_message: string | null; created_at: string };
@@ -128,7 +128,7 @@ export default function AdminLancementEmailsPage() {
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="flex items-center gap-2 text-2xl font-bold"><Mail className="h-6 w-6 text-primary" /> Séquence de lancement V3</h1>
-            <p className="text-sm text-muted-foreground">Les emails envoyés avant le 1er octobre et la lettre cadeau « 10 niches », avec les envois et les clics. Pour la lettre cadeau, le PDF n'est jamais dans l'email : il n'est délivré qu'à ceux qui cliquent.</p>
+            <p className="text-sm text-muted-foreground">Les emails envoyés avant le 1er octobre et la lettre cadeau « 10 niches », avec les envois et les clics. La lettre contient un seul bouton vers la page cadeau.</p>
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="outline">{sentToday} envoyé(s) aujourd’hui</Badge>
