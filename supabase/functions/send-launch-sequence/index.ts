@@ -7,7 +7,7 @@ import { FROM_CAMPAIGN, REPLY_TO, DIRECT_EMAIL } from "../_shared/emailIdentity.
 /**
  * Séquence de lancement V3 (calée sur le 1er octobre 2026).
  *
- * 4 emails :
+ * 6 emails :
  *  1. J-18  l'essai gratuit           → /essai      (v3l-essai-J18)
  *  2. J-10  un livre écrit sous vos yeux → /essai   (v3l-livre-J10)
  *  3. J-4   ce qui change au 1er octobre → /commander (v3l-changement-J4)
@@ -120,6 +120,22 @@ const LAUNCH_EMAILS: LaunchEmail[] = [
       "Vous pourrez parcourir les 10 propositions, comparer leurs possibilités et retenir celle qui correspond le mieux à vos connaissances et au public que vous souhaitez aider.",
       "Ce cadeau est gratuit, sans achat et sans engagement. Cliquez simplement sur le bouton ci-dessous pour le découvrir.",
       "Ne cherchez pas tout de suite l'idée parfaite. Choisissez d'abord une niche qui vous parle, puis commencez à construire votre livre autour d'un problème précis à résoudre pour le lecteur.",
+    ],
+  },
+  {
+    step: 6,
+    template: "v3l-niches-offertes-relance-2",
+    shortKey: "l6",
+    subject: "Votre prochain ebook peut commencer par l'une de ces 10 niches",
+    preheader: "Le sujet est souvent le premier blocage. Voici 10 pistes offertes pour avancer.",
+    ctaLabel: "Choisir une niche pour mon prochain ebook",
+    goal: "Ouvrir la sélection de 10 niches EbookStudio sur Trafic Affiliation",
+    paragraphs: [
+      "Vous avez peut-être envie de publier un ebook, mais une question vous retient encore : sur quel sujet partir pour intéresser de vrais lecteurs ?",
+      "Un bon livre ne commence pas par des dizaines de pages. Il commence par une niche claire, un lecteur précis et un problème concret à résoudre.",
+      "C'est pour vous éviter de rester bloqué devant une page blanche que je vous offre 10 niches sélectionnées pour démarrer. Vous pourrez les parcourir, repérer les angles qui vous correspondent et choisir une première direction pour votre prochain ebook.",
+      "Vous n'avez rien à acheter et aucun engagement à prendre. Le cadeau est disponible immédiatement en cliquant sur l'unique bouton ci-dessous.",
+      "Même si vous ne retenez qu'une seule idée, elle peut devenir le point de départ du livre que vous repoussez depuis trop longtemps.",
     ],
   },
 ];
