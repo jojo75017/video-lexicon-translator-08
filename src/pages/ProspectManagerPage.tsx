@@ -49,9 +49,9 @@ interface Prospect {
 }
 
 const NICHES_EMAIL = {
-  subject: 'Je vous offre 10 niches pour débuter votre prochain ebook',
-  preheader: 'Dix idées concrètes pour choisir votre sujet sans partir au hasard.',
-  button: 'Découvrir mes 10 niches offertes',
+  subject: 'Votre prochain ebook peut commencer par l’une de ces 10 niches',
+  preheader: 'Le sujet est souvent le premier blocage. Voici 10 pistes offertes pour avancer.',
+  button: 'Choisir une niche pour mon prochain ebook',
   url: 'https://www.trafic-affiliation.com/niches_ebookstudio/',
 };
 
