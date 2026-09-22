@@ -2373,9 +2373,35 @@ Règles :
                         {idea.pourquoi && <p className="text-xs" style={{ color: 'var(--v3-muted)' }}><strong>Pourquoi :</strong> {idea.pourquoi}</p>}
                         {idea.lisibilite && <p className="text-xs" style={{ color: 'var(--v3-muted)' }}><strong>Lisibilité :</strong> {idea.lisibilite}</p>}
                         {idea.categories.length > 0 && <p className="text-xs" style={{ color: 'var(--v3-muted)' }}><strong>Catégories :</strong> {idea.categories.join(' · ')}</p>}
-                        <button type="button" onClick={() => applyIdea(idea)} className="v3-btn v3-btn-primary w-full justify-center">
-                          <Check className="h-4 w-4" /> Choisir cette proposition
-                        </button>
+                        <div className="flex flex-col gap-2">
+                          <button type="button" onClick={() => applyIdea(idea)} className="v3-btn v3-btn-primary w-full justify-center">
+                            <Check className="h-4 w-4" /> Choisir cette proposition
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setRefineIdeaId(refineIdeaId === idea.id ? null : idea.id);
+                              setRefineInstruction('');
+                            }}
+                            className="v3-btn v3-btn-outline w-full justify-center"
+                          >
+                            <Wand2 className="h-4 w-4" /> Ajuster cette proposition
+                          </button>
+                        </div>
+                        {refineIdeaId === idea.id && (
+                          <div className="space-y-2 border-t pt-3" style={{ borderColor: 'var(--v3-border)' }}>
+                            <input
+                              value={refineInstruction}
+                              onChange={(event) => setRefineInstruction(event.target.value.slice(0, 160))}
+                              placeholder="Ex : titre plus court, ton plus émotionnel…"
+                              className="w-full rounded-xl border px-3 py-2 text-xs outline-none"
+                              style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+                            />
+                            <button type="button" onClick={() => refineIdea(idea)} disabled={refineLoading} className="v3-btn v3-btn-primary w-full justify-center">
+                              {refineLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />} Régénérer cette proposition
+                            </button>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
