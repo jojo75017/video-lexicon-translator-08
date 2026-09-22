@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import {
   ArrowRight,
   Wand2, Feather, Rocket, Palette, ListTree, PenLine,
 } from 'lucide-react';
+import { trackCaptureEvent } from '@/lib/captureTracking';
 
 import V3CapabilitiesPanel from '@/components/v3public/V3CapabilitiesPanel';
 import V3ReserveCtaBand from '@/components/v3public/V3ReserveCtaBand';
