@@ -342,11 +342,19 @@ export default function V3CreateWizard() {
   const autoWriteRef = useRef(false);
   useEffect(() => {
     if (autoWriteRef.current) return;
+    // Raccourci « Commencer par le sommaire » : on ouvre l'étape Sommaire.
+    const sommaire = searchParams.get('sommaire');
+    if (sommaire === '1' || sommaire === 'ia') {
+      autoWriteRef.current = true;
+      setStep(2);
+      return;
+    }
     if (searchParams.get('ecrire') !== '1') return;
     autoWriteRef.current = true;
     void startWritingNow();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   useEffect(() => {
     if (completedBook && !coverUrl && !coverTriggeredRef.current) {
