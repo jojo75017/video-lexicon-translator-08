@@ -250,7 +250,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
       clearBookBrief();
       writeLocalThread([]);
       writeBookBrief({ mode: wanted, creationPath: biography ? 'biography' : 'story' });
-      setDesk(1);
+      if (!directWriting) setDesk(1);
       setOpenedBook(null);
       return;
     }
