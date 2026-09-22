@@ -1610,7 +1610,7 @@ Règles :
     if (finalTitle.trim() !== safeTitle) setFinalTitle(safeTitle);
     const merged = completedOutline();
     if (JSON.stringify(merged) !== JSON.stringify(outline)) setOutline(merged);
-    await launchWorkflow();
+    await launchWorkflow(merged);
   };
 
   if (launched) {
