@@ -4,11 +4,8 @@ import {
   Wand2, Feather, Rocket, Palette, ListTree, PenLine,
 } from 'lucide-react';
 
-import V3BriefRecap from '@/components/v3public/V3BriefRecap';
 import V3CapabilitiesPanel from '@/components/v3public/V3CapabilitiesPanel';
-import V3StartBookBar from '@/components/v3public/V3StartBookBar';
-import V3ResumeBookCard from '@/components/v3public/V3ResumeBookCard';
-import V3QuickActionsBar from '@/components/v3public/V3QuickActionsBar';
+import V3ReserveCtaBand from '@/components/v3public/V3ReserveCtaBand';
 
 import V3UpsellRotator from '@/components/v3public/V3UpsellRotator';
 import V3CoverStudioBanner from '@/components/v3public/V3CoverStudioBanner';
@@ -27,18 +24,17 @@ import V3WhatsNewPanel from '@/components/v3public/V3WhatsNewPanel';
 import V3HowItWorksSteps from '@/components/v3public/V3HowItWorksSteps';
 import V3BenefitsPanel from '@/components/v3public/V3BenefitsPanel';
 import V3DifferenceTable from '@/components/v3public/V3DifferenceTable';
-import V3BeforeYouStartPanel from '@/components/v3public/V3BeforeYouStartPanel';
 import V3GoFurtherPanel from '@/components/v3public/V3GoFurtherPanel';
 import ReadingGate from '@/components/marketing/ReadingGate';
 import V3PricingOverview from '@/components/v3public/V3PricingOverview';
 
 const FEATURED_TOOLS = [
-  { icon: Wand2, title: 'Sommaire IA — le meneur', desc: 'Dialogue avec l’IA : vos idées sont corrigées et deviennent le plan qui guide tout le livre.', to: '/v3/create?sommaire=ia', badge: 'Commencer ici' },
-  { icon: Feather, title: 'Biographie — Le récit de votre vie', desc: 'Racontez votre vie période par période : vos mots sont gardés, jamais résumés.', to: '/v3/biographie', badge: 'Nouveau' },
-  { icon: PenLine, title: 'Lancer mon livre', desc: 'Fiche + 15 agents, en 4 étapes guidées.', to: '/v3/lancer', badge: 'V3' },
-  { icon: Palette, title: 'Cover Studio Pro', desc: 'Couverture haut de gamme, direction artistique IA.', to: '/v3/hub?tab=cover-pro', badge: 'Pro' },
-  { icon: Rocket, title: 'KDP Pilot', desc: 'Audit complet avant publication Amazon.', to: '/audit-pilot', badge: 'Populaire' },
-  { icon: ListTree, title: 'Sommaire Ultime', desc: 'Table des matières éditable et exportable.', to: '/v3/outils/sommaire-ultime', badge: 'Nouveau' },
+  { icon: Wand2, title: 'Sommaire IA — le meneur', desc: 'Dialogue avec l’IA : vos idées sont corrigées et deviennent le plan qui guide tout le livre.', badge: 'Commencer ici' },
+  { icon: Feather, title: 'Biographie — Le récit de votre vie', desc: 'Racontez votre vie période par période : vos mots sont gardés, jamais résumés.', badge: 'Nouveau' },
+  { icon: PenLine, title: 'Lancer mon livre', desc: 'Fiche + 15 agents, en 4 étapes guidées.', badge: 'V3' },
+  { icon: Palette, title: 'Cover Studio Pro', desc: 'Couverture haut de gamme, direction artistique IA.', badge: 'Pro' },
+  { icon: Rocket, title: 'KDP Pilot', desc: 'Audit complet avant publication Amazon.', badge: 'Populaire' },
+  { icon: ListTree, title: 'Sommaire Ultime', desc: 'Table des matières éditable et exportable.', badge: 'Nouveau' },
 ];
 
 const AUTHOR_AMAZON_URL = 'https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7';
@@ -132,26 +128,14 @@ export default function V3HomePage() {
       <V3CoverStudioBanner />
       <BdComicNewsBanner />
 
-      {/* 5. AVANT DE COMMENCER — clé Gemini + migration V2 */}
-      <V3BeforeYouStartPanel />
-
       {/* 6. CE QUI A CHANGÉ + MOTEURS IA */}
       <V3WhatsNewPanel />
       <V3EngineStrip />
       <V3EngineGrid />
       <V3ClosingRecallPanel />
 
-      {/* 7. COMMENCER SON LIVRE */}
-      <div className="v3-shell">
-        <V3QuickActionsBar />
-      </div>
-      <div className="v3-shell">
-        <V3ResumeBookCard compact />
-      </div>
-
-      <V3StartBookBar />
-
-      <V3BriefRecap />
+      {/* RAPPEL DE RÉSERVATION — milieu de page */}
+      <V3ReserveCtaBand />
 
       {/* 8. POUR ALLER PLUS LOIN — agents, workflow, KDP Pilot */}
       <V3GoFurtherPanel />
@@ -196,10 +180,9 @@ export default function V3HomePage() {
               </div>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {FEATURED_TOOLS.map(({ icon: Icon, ...t }) => (
-                  <Link
+                  <div
                     key={t.title}
-                    to={t.to}
-                    className="group block rounded-2xl bg-white p-5 transition-all hover:-translate-y-0.5"
+                    className="block rounded-2xl bg-white p-5"
                     style={{ border: '1px solid var(--v3-line)' }}
                   >
                     <div className="flex items-center justify-between">
@@ -215,10 +198,10 @@ export default function V3HomePage() {
                       {t.title}
                     </div>
                     <p className="mt-1 text-[12.5px] leading-snug" style={{ color: 'var(--v3-muted)' }}>{t.desc}</p>
-                    <div className="mt-3 flex items-center gap-1 text-[12px] font-semibold" style={{ color: 'var(--v3-gold-600)' }}>
-                      Ouvrir <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                    <div className="mt-3 text-[12px] font-semibold" style={{ color: 'var(--v3-muted)' }}>
+                      Disponible à l'ouverture · 1er octobre
                     </div>
-                  </Link>
+                  </div>
                 ))}
               </div>
             </div>
@@ -268,28 +251,10 @@ export default function V3HomePage() {
             </a>
           </section>
 
-          {/* CTA final */}
-          <section className="v3-shell pb-20 text-center">
-            <div className="v3-card mx-auto max-w-3xl">
-              <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl" style={{ background: 'var(--v3-gold-soft)' }}>
-                <Library className="h-6 w-6" style={{ color: 'var(--v3-emerald)' }} />
-              </div>
-              <h2 className="v3-serif mt-4 text-3xl font-semibold" style={{ color: 'var(--v3-emerald)' }}>
-                Vos sauvegardes vous attendent
-              </h2>
-              <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>
-                Retrouvez tous les livres que vous avez créés, mis en favori ou en cours de rédaction.
-              </p>
-              <div className="mt-6 flex flex-wrap justify-center gap-3">
-                <Link to="/v3/create" className="v3-btn v3-btn-gold">
-                  <Sparkles className="h-4 w-4" /> Ebookstudio-Génie — créer mon livre
-                </Link>
-                <Link to="/v3/library" className="text-sm font-semibold underline" style={{ color: 'var(--v3-emerald)' }}>
-                  <BookOpen className="mr-1 inline h-4 w-4" /> Ma bibliothèque
-                </Link>
-              </div>
-            </div>
-          </section>
+          {/* CTA final — réservation */}
+          <div className="pb-12">
+            <V3ReserveCtaBand />
+          </div>
         </div>
       </ReadingGate>
     </div>
