@@ -463,10 +463,17 @@ export default function V3CreateWizard() {
   const [arbreNarratif, setArbreNarratif] = useState('');
 
 
-  // Assistant IA — trouve titre / sous-titre / synopsis / catégories à partir d'une idée ou d'une niche.
+  // Assistant IA — plusieurs propositions complètes (titre / sous-titre / synopsis / catégories)
+  // à partir d'une idée ou d'une niche. L'abonné choisit celle qui lui parle.
   const [aiTopic, setAiTopic] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
-  const [aiResult, setAiResult] = useState<{ title: string; subtitle: string; synopsis: string; categories: string[] } | null>(null);
+  const [aiSeries, setAiSeries] = useState<TitleIdea[][]>([]);
+  const [aiConseils, setAiConseils] = useState<string[]>([]);
+  const [activeSerie, setActiveSerie] = useState(0);
+  const [chosenIdeaId, setChosenIdeaId] = useState<string | null>(null);
+  const [refineIdeaId, setRefineIdeaId] = useState<string | null>(null);
+  const [refineInstruction, setRefineInstruction] = useState('');
+  const [refineLoading, setRefineLoading] = useState(false);
   // Proposition complète : l'abonné n'a qu'une idée à donner, les agents remplissent le reste.
   const [proposalLoading, setProposalLoading] = useState(false);
   const [proposedFields, setProposedFields] = useState<string[]>([]);
