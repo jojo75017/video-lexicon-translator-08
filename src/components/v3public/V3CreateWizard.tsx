@@ -1969,27 +1969,136 @@ Règles :
             ))}
           </div>
         )}
-        {aiResult && (
-
-          <div className="mt-4 rounded-xl border p-4 text-sm space-y-2" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)', color: 'var(--v3-ink)' }}>
-            <div><strong>Titre :</strong> {aiResult.title}</div>
-            {aiResult.subtitle && <div><strong>Sous-titre :</strong> {aiResult.subtitle}</div>}
-            <div><strong>Synopsis :</strong> {aiResult.synopsis}</div>
-            {aiResult.categories.length > 0 && (
+        {aiSeries.length > 0 && (
+          <div className="mt-4 space-y-3">
+            {aiSeries.length > 1 && (
               <div className="flex flex-wrap items-center gap-2">
-                <strong>Catégories :</strong>
-                {aiResult.categories.map((c) => (
-                  <span key={c} className="rounded-full border px-2 py-0.5 text-xs" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-muted)' }}>{c}</span>
+                {aiSeries.map((_, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => setActiveSerie(index)}
+                    className="rounded-full border px-3 py-1 text-xs font-bold"
+                    style={index === activeSerie
+                      ? { background: 'var(--v3-orange-600)', color: '#fff', borderColor: 'var(--v3-orange-600)' }
+                      : { borderColor: 'var(--v3-border)', color: 'var(--v3-muted)', background: 'var(--v3-paper)' }}
+                  >
+                    Série {index + 1}
+                  </button>
                 ))}
               </div>
             )}
+
+            {aiConseils[activeSerie] && (
+              <div className="rounded-xl border p-3 text-sm" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)', color: 'var(--v3-ink)' }}>
+                <strong>Conseil de l’agent :</strong> {aiConseils[activeSerie]}
+              </div>
+            )}
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              {(aiSeries[activeSerie] || []).map((idea) => {
+                const retenu = chosenIdeaId === idea.id;
+                return (
+                  <div
+                    key={idea.id}
+                    className="rounded-2xl border p-4 text-sm space-y-2"
+                    style={{
+                      borderColor: retenu ? 'var(--v3-orange-600)' : 'var(--v3-border)',
+                      background: 'var(--v3-paper)',
+                      color: 'var(--v3-ink)',
+                    }}
+                  >
+                    <div className="flex flex-wrap items-center gap-2">
+                      {idea.angle && (
+                        <span className="rounded-full border px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-muted)' }}>
+                          {idea.angle}
+                        </span>
+                      )}
+                      {retenu && (
+                        <span className="rounded-full px-2 py-0.5 text-[11px] font-bold" style={{ background: 'var(--v3-orange-600)', color: '#fff' }}>
+                          Titre retenu
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="font-bold">{idea.title}</div>
+                    {idea.subtitle && <div style={{ color: 'var(--v3-muted)' }}>{idea.subtitle}</div>}
+                    {idea.synopsis && <p className="text-[13px] leading-relaxed">{idea.synopsis}</p>}
+                    {idea.pourquoi && (
+                      <p className="text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
+                        <strong>Pourquoi ce titre :</strong> {idea.pourquoi}
+                      </p>
+                    )}
+                    {idea.lisibilite && (
+                      <p className="text-[12px]" style={{ color: 'var(--v3-muted)' }}>
+                        <strong>Lisibilité :</strong> {idea.lisibilite} · {idea.title.length} caractères
+                      </p>
+                    )}
+                    {idea.categories.length > 0 && (
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {idea.categories.map((c) => (
+                          <span key={c} className="rounded-full border px-2 py-0.5 text-[11px]" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-muted)' }}>{c}</span>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="flex flex-wrap items-center gap-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => applyIdea(idea)}
+                        className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold"
+                        style={{ background: 'var(--v3-orange-600)', color: '#fff' }}
+                      >
+                        <Check className="h-3.5 w-3.5" /> Choisir ce titre
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setRefineIdeaId(refineIdeaId === idea.id ? null : idea.id);
+                          setRefineInstruction('');
+                        }}
+                        className="rounded-full border px-3 py-1.5 text-xs font-bold"
+                        style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)' }}
+                      >
+                        Ajuster ce titre
+                      </button>
+                    </div>
+
+                    {refineIdeaId === idea.id && (
+                      <div className="flex flex-col gap-2 pt-1 sm:flex-row">
+                        <input
+                          value={refineInstruction}
+                          onChange={(e) => setRefineInstruction(e.target.value.slice(0, 160))}
+                          placeholder="Ex : plus court, plus émotionnel, garde le mot méditation…"
+                          className="flex-1 rounded-xl border px-3 py-2 text-xs outline-none"
+                          style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-ivory, #fff)' }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => refineIdea(idea)}
+                          disabled={refineLoading}
+                          className="inline-flex items-center justify-center gap-2 rounded-full px-3 py-2 text-xs font-bold disabled:opacity-60"
+                          style={{ background: 'var(--v3-orange-600)', color: '#fff' }}
+                        >
+                          {refineLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Wand2 className="h-3.5 w-3.5" />}
+                          Régénérer
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
             <button
               type="button"
-              onClick={applyAIResult}
-              className="mt-2 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold"
+              onClick={runMoreTitles}
+              disabled={aiLoading}
+              className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold disabled:opacity-60"
               style={{ background: 'var(--v3-orange-600)', color: '#fff' }}
             >
-              <Check className="h-3.5 w-3.5" /> Appliquer au formulaire
+              {aiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              Chercher d’autres titres (recherche plus poussée)
             </button>
           </div>
         )}
