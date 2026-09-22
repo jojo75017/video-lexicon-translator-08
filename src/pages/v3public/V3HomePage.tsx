@@ -1,6 +1,5 @@
-import { Link } from 'react-router-dom';
 import {
-  Sparkles, BookOpen, Library, ArrowRight,
+  ArrowRight,
   Wand2, Feather, Rocket, Palette, ListTree, PenLine,
 } from 'lucide-react';
 
