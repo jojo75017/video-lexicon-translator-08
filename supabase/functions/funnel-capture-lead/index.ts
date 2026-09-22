@@ -1,8 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { EMAIL_SENDING_ENABLED } from "../_shared/emailSendingGuard.ts";
-// Systeme.io désactivé — tous les leads restent dans la base interne.
 import { pushToSystemeIo } from "../_shared/systemeio.ts";
+
+// Synchro Systeme.io : ACTIVE uniquement si SYSTEMEIO_API_KEY est présente.
+// Sinon le lead est conservé en base interne (funnel_leads) uniquement — il
+// n'est jamais perdu, et la synchro peut être réactivée en ajoutant la clé.
+const SYSTEMEIO_SYNC_ENABLED = !!Deno.env.get("SYSTEMEIO_API_KEY");
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
