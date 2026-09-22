@@ -19,6 +19,6 @@
 
 ## Accueil V3 — avant-première
 
-- [ ] Recentrer le haut de `/v3` sur la réservation email
-- [ ] Remonter la preuve auteur sous le hero
-- [ ] Vérifier le parcours sur ordinateur et mobile
+- [x] Recentrer le haut de `/v3` sur la réservation email
+- [x] Remonter la preuve auteur sous le hero
+- [x] Vérifier le parcours sur ordinateur et mobile
