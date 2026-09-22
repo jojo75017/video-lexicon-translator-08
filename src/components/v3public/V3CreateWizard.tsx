@@ -2266,6 +2266,21 @@ Règles :
               <p className="mt-1 text-sm" style={{ color: 'var(--v3-ink)' }}>✨ {promesseCentrale}</p>
             </div>
           )}
+
+          {/* Raccourci : écrire tout de suite, sans passer par les étapes ni le sommaire. */}
+          <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
+            <button
+              type="button"
+              onClick={() => { void startWritingNow(); }}
+              className="v3-btn v3-btn-primary w-full justify-center py-4 text-base"
+            >
+              <Rocket className="h-5 w-5" /> Écrire maintenant — les agents s’occupent du reste
+            </button>
+            <p className="mt-2 text-xs" style={{ color: 'var(--v3-muted)' }}>
+              Vous pourrez relire et modifier le sommaire à tout moment.
+              {outlineWasEdited && ' Votre sommaire modifié sera utilisé.'}
+            </p>
+          </div>
         </div>
       )}
 
