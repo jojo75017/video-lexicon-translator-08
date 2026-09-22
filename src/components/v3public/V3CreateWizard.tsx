@@ -2657,7 +2657,7 @@ Règles :
             </div>
           )}
 
-          <button type="button" onClick={launchWorkflow} className="v3-btn v3-btn-primary w-full justify-center py-5 text-base">
+          <button type="button" onClick={() => { void launchWorkflow(); }} className="v3-btn v3-btn-primary w-full justify-center py-5 text-base">
             <Rocket className="h-5 w-5" /> Générer mon livre avec le workflow complet
           </button>
         </div>
