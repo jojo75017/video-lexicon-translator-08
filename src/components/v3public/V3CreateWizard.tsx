@@ -592,43 +592,88 @@ export default function V3CreateWizard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestedProjectId]);
 
-  const runAIAssistant = async () => {
-    if (aiTopic.trim().length < 4) {
-      toast.error('Décris ton idée, ton sujet ou ta niche (au moins quelques mots).');
-      return;
-    }
+  /** Toutes les idées déjà proposées, toutes séries confondues. */
+  const allIdeas = aiSeries.flat();
+
+  const requireAiKey = () => {
     const provider = getProvider();
     const key = getProviderKey(provider);
     if (!key || !validateKeyFormat(provider, key)) {
       toast.error('Ajoute et valide ta clé IA en haut de la page avant de lancer l’assistant.');
+      return false;
+    }
+    return true;
+  };
+
+  const parseJsonLoose = (raw: string): any => {
+    try { return JSON.parse(raw); } catch {
+      const m = raw.match(/\{[\s\S]*\}/);
+      if (m) { try { return JSON.parse(m[0]); } catch { /* ignoré */ } }
+    }
+    return null;
+  };
+
+  /**
+   * Génère une série de 5 propositions complètes (titre, sous-titre, synopsis,
+   * catégories) avec l'angle et le conseil de l'agent. `deeper` élargit la
+   * recherche et exclut les titres déjà proposés.
+   */
+  const generateTitleSerie = async (deeper: boolean) => {
+    if (aiTopic.trim().length < 4) {
+      toast.error('Décris ton idée, ton sujet ou ta niche (au moins quelques mots).');
       return;
     }
+    if (!requireAiKey()) return;
     setAiLoading(true);
     try {
-      const prompt = `Tu es un éditeur senior spécialisé Amazon KDP. À partir de l'idée / niche ci-dessous, propose UN livre commercial percutant.
+      const dejaVus = allIdeas.map((idea) => `- ${idea.title}`).join('\n');
+      const prompt = `Tu es un éditeur senior spécialisé Amazon KDP. À partir de l'idée / niche ci-dessous, propose CINQ livres commerciaux différents (angles réellement distincts : méthode, promesse émotionnelle, pas-à-pas, récit, guide express…).
 Idée / niche : "${aiTopic.trim()}"
+${deeper ? `\nRecherche plus poussée : explore des angles, des promesses et des formats que l'on ne trouve pas dans les titres suivants, déjà proposés. Ne les reprends pas, ne les reformule pas :\n${dejaVus}\n` : ''}
+Règles :
+- Tout en français courant. Aucun mot latin, inventé ou étranger décoratif.
+- N'invente AUCUNE donnée mesurée : pas de volume de recherche, pas de chiffre de ventes, pas de pourcentage.
+- Le champ "pourquoi" explique en une ou deux phrases pourquoi ce titre peut fonctionner (clarté, promesse, lecteur visé).
 
 Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce schéma :
 {
-  "title": "titre principal court et vendeur (max 70 caractères)",
-  "subtitle": "sous-titre bénéfice/promesse (max 120 caractères)",
-  "synopsis": "synopsis complet de 150 à 200 mots, style vendeur, en français, décrivant le contenu, le lecteur visé et la transformation obtenue",
-  "categories": ["3 à 5 catégories Amazon FR pertinentes, en français, séparées ici sous forme de tableau"]
+  "conseil": "en une phrase, laquelle des cinq tu recommandes et pourquoi",
+  "propositions": [
+    {
+      "title": "titre principal court et vendeur (max 70 caractères)",
+      "subtitle": "sous-titre bénéfice/promesse (max 120 caractères)",
+      "synopsis": "synopsis de 150 à 200 mots, style vendeur, contenu, lecteur visé et transformation obtenue",
+      "categories": ["3 à 5 catégories Amazon FR en français"],
+      "angle": "l'angle en 2 à 4 mots",
+      "pourquoi": "1 à 2 phrases de conseil éditorial",
+      "lisibilite": "repère de lisibilité en couverture : longueur du titre et mots-clés visibles"
+    }
+  ]
 }`;
-      const raw = await callAIWriting(prompt, { jsonMode: true, temperature: 0.8, maxTokens: 4096 });
-      let parsed: any = null;
-      try { parsed = JSON.parse(raw); } catch {
-        const m = raw.match(/\{[\s\S]*\}/);
-        if (m) { try { parsed = JSON.parse(m[0]); } catch {} }
-      }
-      if (!parsed?.title) throw new Error('Réponse IA invalide.');
-      setAiResult({
-        title: String(parsed.title || '').slice(0, 120),
-        subtitle: String(parsed.subtitle || '').slice(0, 160),
-        synopsis: String(parsed.synopsis || '').trim(),
-        categories: Array.isArray(parsed.categories) ? parsed.categories.map(String).slice(0, 6) : [],
+      const raw = await callAIWriting(prompt, { jsonMode: true, temperature: 0.9, maxTokens: 8192 });
+      const parsed = parseJsonLoose(raw);
+      const list = Array.isArray(parsed?.propositions) ? parsed.propositions : [];
+      const ideas: TitleIdea[] = list
+        .filter((item: any) => String(item?.title || '').trim())
+        .slice(0, 5)
+        .map((item: any) => ({
+          id: makeId(),
+          title: cleanText(String(item.title || '')).slice(0, 120),
+          subtitle: cleanText(String(item.subtitle || '')).slice(0, 160),
+          synopsis: cleanText(String(item.synopsis || '')).trim(),
+          categories: Array.isArray(item.categories) ? item.categories.map(String).slice(0, 6) : [],
+          angle: cleanText(String(item.angle || '')).slice(0, 60),
+          pourquoi: cleanText(String(item.pourquoi || '')).trim(),
+          lisibilite: cleanText(String(item.lisibilite || '')).trim(),
+        }));
+      if (!ideas.length) throw new Error('Réponse IA invalide.');
+      setAiSeries((prev) => {
+        const next = [...prev, ideas];
+        setActiveSerie(next.length - 1);
+        return next;
       });
-      toast.success('Propositions IA prêtes — clique « Appliquer » pour remplir le formulaire.');
+      setAiConseils((prev) => [...prev, cleanText(String(parsed?.conseil || '')).trim()]);
+      toast.success(`${ideas.length} propositions prêtes — choisis le titre qui te parle.`);
     } catch (e: any) {
       toast.error(e?.message || 'Impossible de générer les propositions.');
     } finally {
@@ -636,19 +681,66 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
     }
   };
 
-  const applyAIResult = () => {
-    if (!aiResult) return;
-    setTitle(aiResult.title);
-    setFinalTitle(aiResult.title);
-    setSubtitle(aiResult.subtitle);
-    setDescription(aiResult.synopsis);
-    const firstCat = aiResult.categories[0];
-    if (firstCat) {
-      const match = CATEGORIES.find((c) => c.toLowerCase() === firstCat.toLowerCase());
-      if (match) setCategory(match);
-      else { setCategory('Autre'); setCustomCategory(firstCat); }
+  const runAIAssistant = () => generateTitleSerie(false);
+  const runMoreTitles = () => generateTitleSerie(true);
+
+  /** Remplace le titre, le sous-titre et le synopsis du livre par l'idée choisie. */
+  const applyIdea = (idea: TitleIdea) => {
+    setTitle(idea.title);
+    setFinalTitle(idea.title);
+    setSubtitle(idea.subtitle);
+    setDescription(idea.synopsis);
+    if (!category || category === 'Roman') {
+      const firstCat = idea.categories[0];
+      if (firstCat) {
+        const match = CATEGORIES.find((c) => c.toLowerCase() === firstCat.toLowerCase());
+        if (match) setCategory(match);
+        else { setCategory('Autre'); setCustomCategory(firstCat); }
+      }
     }
-    toast.success('Formulaire rempli — vérifie et continue vers l’étape suivante.');
+    setChosenIdeaId(idea.id);
+    setRefineIdeaId(null);
+    setRefineInstruction('');
+    toast.success('Titre retenu — titre, sous-titre et synopsis sont remplacés.');
+  };
+
+  /** Ajuste une proposition selon une consigne libre (plus court, plus émotionnel…). */
+  const refineIdea = async (idea: TitleIdea) => {
+    const consigne = refineInstruction.trim();
+    if (consigne.length < 3) {
+      toast.error('Indique ton ajustement (ex : plus court, plus émotionnel).');
+      return;
+    }
+    if (!requireAiKey()) return;
+    setRefineLoading(true);
+    try {
+      const prompt = `Tu es un éditeur senior Amazon KDP. Ajuste la proposition de livre ci-dessous selon la consigne de l'auteur.
+Consigne : "${consigne}"
+
+Titre actuel : ${idea.title}
+Sous-titre actuel : ${idea.subtitle}
+Synopsis actuel : ${idea.synopsis}
+
+Règles : tout en français courant, aucun mot latin ou inventé, aucune donnée chiffrée inventée.
+Réponds STRICTEMENT en JSON valide : {"title": "...", "subtitle": "...", "synopsis": "synopsis de 150 à 200 mots"}`;
+      const raw = await callAIWriting(prompt, { jsonMode: true, temperature: 0.85, maxTokens: 4096 });
+      const parsed = parseJsonLoose(raw);
+      if (!parsed?.title) throw new Error('Réponse IA invalide.');
+      const updated: TitleIdea = {
+        ...idea,
+        title: cleanText(String(parsed.title || '')).slice(0, 120),
+        subtitle: cleanText(String(parsed.subtitle || idea.subtitle)).slice(0, 160),
+        synopsis: cleanText(String(parsed.synopsis || idea.synopsis)).trim(),
+      };
+      setAiSeries((prev) => prev.map((serie) => serie.map((item) => (item.id === idea.id ? updated : item))));
+      if (chosenIdeaId === idea.id) applyIdea(updated);
+      else toast.success('Proposition ajustée — clique « Choisir ce titre » pour l’appliquer.');
+      setRefineInstruction('');
+    } catch (e: any) {
+      toast.error(e?.message || 'Impossible d’ajuster cette proposition.');
+    } finally {
+      setRefineLoading(false);
+    }
   };
 
   /**
