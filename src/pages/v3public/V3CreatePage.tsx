@@ -65,8 +65,11 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
   const type = params.get('type');
   const sommaireIa = params.get('sommaire') === 'ia';
   const projectId = params.get('projectId');
+  /** « Écrire mon livre maintenant » : la fiche du livre s'ouvre tout de suite,
+   *  sans passer par le récit ni par le sommaire. */
+  const directWriting = params.get('ecrire') === '1';
 
-  const [showWizard, setShowWizard] = useState(false);
+  const [showWizard, setShowWizard] = useState(directWriting);
   const [openedBook, setOpenedBook] = useState<{ id: string; title: string; chapters: number } | null>(null);
   const [openingBook, setOpeningBook] = useState(false);
   const [briefKey, setBriefKey] = useState(0);
@@ -74,6 +77,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
 
   // Étape ouverte : on reprend là où l'auteur en était.
   const [desk, setDesk] = useState<DeskId>(() => {
+    if (directWriting) return 3;
     const b = readBookBrief() || {};
     if ((b.outline?.length ?? 0) > 0 && b.outlineValidated) return 3;
     if ((b.outline?.length ?? 0) > 0) return 2;
