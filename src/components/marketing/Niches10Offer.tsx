@@ -18,6 +18,8 @@ import {
 
 const EMERALD = '#064e3b';
 const GOLD = '#c9a84c';
+/** File locale de secours des captures échouées (jamais perdues sans trace). */
+const FAILED_CAPTURES_KEY = 'niches10_failed_captures';
 
 export const NICHES_10_HOOKS: Record<string, { title: string; subtitle: string }> = {
   commander: {
