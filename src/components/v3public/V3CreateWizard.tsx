@@ -1067,9 +1067,10 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
 
   useEffect(() => {
     if (startsFromExistingOutline) return;
-    if (hasRepeatedFallbackTitles(outline, chapters)) {
-      setOutline(mergeOutlineWithFallback(outline, buildFallbackOutline(finalTitle || title, effectiveCategory, chapters)));
-    }
+    if (!hasRepeatedFallbackTitles(outline, chapters)) return;
+    const merged = mergeOutlineWithFallback(outline, buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
+    // Comparaison pour éviter une boucle si le sommaire de l'auteur est déjà stable.
+    if (JSON.stringify(merged) !== JSON.stringify(outline)) setOutline(merged);
   }, [chapters, effectiveCategory, finalTitle, title, outline, startsFromExistingOutline]);
 
   const targetPromiseBlock = () => {
