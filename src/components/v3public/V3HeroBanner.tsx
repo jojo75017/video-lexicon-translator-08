@@ -128,7 +128,7 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
       </section>
 
       <Dialog open={captureOpen} onOpenChange={setCaptureOpen}>
-        <DialogContent className="max-h-[90vh] max-w-xl overflow-y-auto p-4 sm:p-6">
+        <DialogContent data-contemplation-allow="true" className="max-h-[90vh] max-w-xl overflow-y-auto p-4 sm:p-6">
           <DialogHeader className="sr-only">
             <DialogTitle>Réserver ma place pour EbookStudio V3</DialogTitle>
             <DialogDescription>
