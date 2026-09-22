@@ -1595,6 +1595,23 @@ Règles :
 
   };
 
+  /**
+   * « Écrire maintenant » : on part de la simple idée du livre, les réglages
+   * laissés vides gardent leurs valeurs par défaut et le sommaire est complété
+   * en coulisse sans écraser les chapitres déjà retouchés par l'auteur.
+   */
+  const startWritingNow = async () => {
+    if (!canStepOne) {
+      toast.error('Décris ton idée de livre en une phrase — les agents remplissent le reste.');
+      return;
+    }
+    const safeTitle = finalTitle.trim() || title.trim() || cleanText(aiTopic).slice(0, 70) || 'Mon livre';
+    if (finalTitle.trim() !== safeTitle) setFinalTitle(safeTitle);
+    const merged = completedOutline();
+    if (JSON.stringify(merged) !== JSON.stringify(outline)) setOutline(merged);
+    await launchWorkflow();
+  };
+
   if (launched) {
     return (
       <div className="space-y-6">
