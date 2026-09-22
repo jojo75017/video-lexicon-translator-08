@@ -76,6 +76,18 @@ type HubConfig = {
   numberOfChapters?: number;
 };
 
+/** Une proposition complète de livre issue de l'assistant (titre + sous-titre + synopsis). */
+type TitleIdea = {
+  id: string;
+  title: string;
+  subtitle: string;
+  synopsis: string;
+  categories: string[];
+  angle: string;
+  pourquoi: string;
+  lisibilite: string;
+};
+
 const CONFIG_KEY = 'edition_book_config_v1';
 const TARGET_WORDS_KEY = 'edition_chapter_target_words_v1';
 // Ne jamais partager cette clé avec la fiche auteur (`BookBrief`) : l'ancien
