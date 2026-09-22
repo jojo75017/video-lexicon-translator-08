@@ -1058,10 +1058,17 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  /** Sommaire complet, en gardant intacts les chapitres déjà retouchés. */
+  const completedOutline = () =>
+    mergeOutlineWithFallback(outline, buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
+
+  /** Vrai si l'auteur a déjà modifié au moins un titre de chapitre. */
+  const outlineWasEdited = hasEditedOutlineTitles(outline);
+
   useEffect(() => {
     if (startsFromExistingOutline) return;
     if (hasRepeatedFallbackTitles(outline, chapters)) {
-      setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
+      setOutline(mergeOutlineWithFallback(outline, buildFallbackOutline(finalTitle || title, effectiveCategory, chapters)));
     }
   }, [chapters, effectiveCategory, finalTitle, title, outline, startsFromExistingOutline]);
 
