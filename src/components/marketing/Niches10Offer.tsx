@@ -61,6 +61,8 @@ interface Props {
   /** Email déjà connu (abonné connecté) : le formulaire est remplacé par un bouton direct. */
   knownEmail?: string | null;
   onDone?: () => void;
+  /** Indicateur de source transmis à funnel-capture-lead (ex. "v3-reservation"). */
+  source?: string;
 }
 
 /**
@@ -75,6 +77,7 @@ const Niches10Offer: React.FC<Props> = ({
   className = '',
   knownEmail = null,
   onDone,
+  source,
 }) => {
   const navigate = useNavigate();
   const copy = NICHES_10_HOOKS[hook] || NICHES_10_HOOKS.default;
@@ -98,6 +101,7 @@ const Niches10Offer: React.FC<Props> = ({
       utm_campaign: utm.utm_campaign || null,
       landing_url:
         utm.landing_url || (typeof window !== 'undefined' ? window.location.href : null),
+      ...(source ? { source } : {}),
     };
   };
 

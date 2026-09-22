@@ -152,7 +152,7 @@ export default function V3HomePage() {
 
           {/* Pack de 10 niches, inclus dans l'accès */}
           <div className="v3-shell">
-            <Niches10Offer surface="inline" hook="v3" variant="compact" />
+            <Niches10Offer surface="inline" hook="v3" variant="compact" source="v3-reservation" />
           </div>
 
           {/* Ce que l'outil produit */}
