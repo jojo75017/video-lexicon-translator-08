@@ -62,7 +62,7 @@ export default function V3ReserveCtaBand() {
               Inscrivez votre email pour recevoir le kit de démarrage et les 10 niches offertes.
             </DialogDescription>
           </DialogHeader>
-          <Niches10Offer surface="inline" hook="v3" variant="hero" />
+          <Niches10Offer surface="inline" hook="v3" variant="hero" source="v3-reservation" />
         </DialogContent>
       </Dialog>
     </>
