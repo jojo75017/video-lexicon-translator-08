@@ -337,6 +337,17 @@ export default function V3CreateWizard() {
     }
   };
 
+  // Arrivée depuis l'onglet « Écrire maintenant » du Hub : lance le workflow
+  // directement (ou guide vers la phrase d'idée si le formulaire est vide).
+  const autoWriteRef = useRef(false);
+  useEffect(() => {
+    if (autoWriteRef.current) return;
+    if (searchParams.get('ecrire') !== '1') return;
+    autoWriteRef.current = true;
+    void startWritingNow();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     if (completedBook && !coverUrl && !coverTriggeredRef.current) {
       coverTriggeredRef.current = true;
