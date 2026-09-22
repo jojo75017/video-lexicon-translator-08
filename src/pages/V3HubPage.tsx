@@ -618,6 +618,56 @@ const V3HubPage: React.FC = () => {
       </nav>
 
       <main className={`mx-auto px-4 md:px-8 py-8 ${activeTab === 'outils' || activeTab === 'guides' ? 'max-w-none' : 'max-w-7xl'}`}>
+        {/* Choix de départ toujours visible : écrire tout de suite ou passer par le sommaire. */}
+        <section className="mb-8 rounded-3xl border-2 p-5 shadow-sm md:p-7" style={{ background: '#fffdf8', borderColor: `${AMBER}66` }}>
+          <h2 className="text-2xl font-semibold" style={{ fontFamily: SERIF, color: INK }}>Par quoi voulez-vous commencer ?</h2>
+          <p className="mt-1 text-sm" style={{ color: '#8a7860' }}>
+            Deux façons d’écrire votre livre. Choisissez, vous pourrez tout modifier ensuite.
+          </p>
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            <button
+              onClick={() => navigate('/v3/create?ecrire=1')}
+              className="group flex flex-col justify-between gap-4 rounded-2xl border-2 p-5 text-left transition-all hover:-translate-y-0.5 hover:shadow-lg"
+              style={{ background: AMBER_SOFT, borderColor: AMBER }}
+            >
+              <span>
+                <span className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-bold uppercase text-white" style={{ background: AMBER_DEEP }}>
+                  <Rocket className="h-3.5 w-3.5" /> Le plus rapide
+                </span>
+                <span className="mt-3 block text-lg font-bold" style={{ color: INK }}>Écrire mon livre maintenant</span>
+                <span className="mt-1 block text-sm leading-relaxed" style={{ color: '#8a7860' }}>
+                  Les agents écrivent tout : titre, sommaire, chapitres, relecture.
+                </span>
+              </span>
+              <span className="inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold text-white" style={{ background: `linear-gradient(90deg, ${AMBER}, #FFB44D)` }}>
+                <Rocket className="h-4 w-4" /> Lancer l’écriture
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </span>
+            </button>
+
+            <button
+              onClick={() => navigate('/v3/create?sommaire=1')}
+              className="group flex flex-col justify-between gap-4 rounded-2xl border-2 p-5 text-left transition-all hover:-translate-y-0.5 hover:shadow-lg"
+              style={{ background: '#fff', borderColor: '#eadfc9' }}
+            >
+              <span>
+                <span className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-bold uppercase" style={{ borderColor: `${AMBER}66`, color: AMBER_DEEP }}>
+                  <Layers className="h-3.5 w-3.5" /> Je garde la main
+                </span>
+                <span className="mt-3 block text-lg font-bold" style={{ color: INK }}>Commencer par le sommaire IA</span>
+                <span className="mt-1 block text-sm leading-relaxed" style={{ color: '#8a7860' }}>
+                  Vous construisez les chapitres avec l’IA, les agents suivent votre plan.
+                </span>
+              </span>
+              <span className="inline-flex w-full items-center justify-center gap-2 rounded-full border-2 px-6 py-3 text-sm font-bold" style={{ borderColor: AMBER, color: AMBER_DEEP }}>
+                <Layers className="h-4 w-4" /> Ouvrir le sommaire
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </span>
+            </button>
+          </div>
+        </section>
+
+
         {/* ===================== ONGLET ÉCRIRE MAINTENANT ===================== */}
         {activeTab === 'ecrire' && (
           <div className="mx-auto max-w-3xl rounded-3xl border p-8 text-center shadow-lg" style={{ background: '#fffdf8', borderColor: `${AMBER}55` }}>
