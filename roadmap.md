@@ -16,3 +16,9 @@
 ## KDP — Fiche Audit
 
 - [x] Ajouter la génération et le téléchargement d’images aux normes A+ pour les 4 modules
+
+## Accueil V3 — avant-première
+
+- [x] Recentrer le haut de `/v3` sur la réservation email
+- [x] Remonter la preuve auteur sous le hero
+- [x] Vérifier le parcours sur ordinateur et mobile
