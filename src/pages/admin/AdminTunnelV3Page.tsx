@@ -146,13 +146,21 @@ export default function AdminTunnelV3Page() {
           <p className="text-sm text-muted-foreground">
             Où ça bloque entre le trafic de la page /v3 et les réservations. Lecture seule.
           </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {loading
+              ? 'Calcul en cours…'
+              : majLe
+                ? `Dernière mise à jour à ${majLe.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`
+                : 'Pas encore de mise à jour.'}
+          </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-4 w-4" /> Retour
           </Button>
           <Button onClick={() => void charger()} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Rafraîchir
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{' '}
+            {loading ? 'Calcul…' : 'Rafraîchir'}
           </Button>
         </div>
       </div>
