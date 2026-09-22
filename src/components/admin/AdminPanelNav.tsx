@@ -15,6 +15,7 @@ const adminNavItems: AdminNavItem[] = [
   { label: 'Tableau de bord admin', path: ADMIN_HOME_PATH, icon: BarChart3, exact: true },
   { label: 'Business Center', path: '/business-center', icon: Gauge, exact: true },
   { label: 'Tunnel', path: '/admin/funnel', icon: TrendingUp, exact: true },
+  { label: 'Tunnel V3 (avant-première)', path: '/admin/tunnel-v3', icon: TrendingUp, exact: true },
   { label: 'Cadeaux PDF', path: '/admin/cadeaux-pdf', icon: FileText, exact: true },
   { label: 'Codes Bêta', path: '/admin/codes-beta', icon: Ticket, exact: true },
   { label: 'Bêta-testeurs', path: '/admin/beta-testeurs', icon: Users, exact: true },

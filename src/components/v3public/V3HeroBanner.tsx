@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import Niches10Offer from '@/components/marketing/Niches10Offer';
+import { trackCaptureEvent } from '@/lib/captureTracking';
 
 const PILLS = [
   { label: 'Kindle', icon: BookOpen },
@@ -118,7 +119,10 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
             type="button"
             size="lg"
             data-contemplation-allow="true"
-            onClick={() => setCaptureOpen(true)}
+            onClick={() => {
+              void trackCaptureEvent('v3', 'reserve_open', { leadMagnet: '10-niches-offertes' });
+              setCaptureOpen(true);
+            }}
             className="mt-7 h-auto min-h-12 max-w-full whitespace-normal px-6 py-3 text-center text-[14px] font-bold sm:text-[15px]"
           >
             <Gift className="h-4 w-4 shrink-0" />

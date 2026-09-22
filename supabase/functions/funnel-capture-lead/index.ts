@@ -244,6 +244,7 @@ serve(async (req) => {
           first_name: first_name || null,
           ref_code: ref_code,
           lead_magnet: magnetKey,
+          source: source || null,
           // On conserve la variante A/B d'origine si elle existe déjà
           ab_variant: existing?.ab_variant || ab_variant,
           utm_source: body.utm_source || null,
@@ -262,6 +263,7 @@ serve(async (req) => {
           first_name: first_name || null,
           ref_code,
           lead_magnet: magnetKey,
+          source: source || null,
           ab_variant,
           utm_source: body.utm_source || null,
           utm_medium: body.utm_medium || null,

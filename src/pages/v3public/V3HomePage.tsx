@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import {
   ArrowRight,
   Wand2, Feather, Rocket, Palette, ListTree, PenLine,
 } from 'lucide-react';
+import { trackCaptureEvent } from '@/lib/captureTracking';
 
 import V3CapabilitiesPanel from '@/components/v3public/V3CapabilitiesPanel';
 import V3ReserveCtaBand from '@/components/v3public/V3ReserveCtaBand';
@@ -50,6 +52,11 @@ const fallbackCoverUrl = (asin: string) => `https://m.media-amazon.com/images/P/
 const amazonBookUrl = (asin: string) => `https://www.amazon.fr/dp/${asin}/`;
 
 export default function V3HomePage() {
+  // Visite de la page d'avant-première : alimente le tableau de bord admin du tunnel.
+  useEffect(() => {
+    void trackCaptureEvent('v3', 'page_view');
+  }, []);
+
   return (
     <div className="v3-home pb-4">
       {/* 1. LANCEMENT — bande fine */}
