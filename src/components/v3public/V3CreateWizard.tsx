@@ -1324,16 +1324,14 @@ Règles :
       return;
     }
 
-    if (step === 1 && outline.length !== chapters) {
-      setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
-    }
-    if (step === 1 && hasRepeatedFallbackTitles(outline, chapters)) {
-      setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
-      toast.warning('Ancien sommaire répétitif remplacé par un plan complet.');
+    // Les chapitres déjà retouchés par l'auteur sont toujours conservés :
+    // on ne remplit que les entrées manquantes ou encore génériques.
+    if (step === 1 && (outline.length !== chapters || hasRepeatedFallbackTitles(outline, chapters))) {
+      setOutline(completedOutline());
     }
     if (step === 2 && !canStepOutline) {
       // Non bloquant : on complète le plan et on avance.
-      setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
+      setOutline(completedOutline());
       toast.info('Sommaire complété automatiquement — tu peux le modifier à tout moment.');
     }
     if (step === 3 && !finalTitle.trim()) setFinalTitle(title);
