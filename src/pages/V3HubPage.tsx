@@ -636,7 +636,7 @@ const V3HubPage: React.FC = () => {
                 </span>
                 <span className="mt-3 block text-lg font-bold" style={{ color: INK }}>Écrire mon livre maintenant</span>
                 <span className="mt-1 block text-sm leading-relaxed" style={{ color: '#8a7860' }}>
-                  Les agents écrivent tout : titre, sommaire, chapitres, relecture.
+                  Remplissez la fiche, comparez 5 propositions réalistes, puis choisissez celle que les agents rédigeront.
                 </span>
               </span>
               <span className="inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold text-white" style={{ background: `linear-gradient(90deg, ${AMBER}, #FFB44D)` }}>
@@ -676,14 +676,14 @@ const V3HubPage: React.FC = () => {
             </span>
             <h2 className="text-3xl font-semibold" style={{ fontFamily: SERIF, color: INK }}>Écrire votre livre maintenant</h2>
             <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed" style={{ color: '#8a7860' }}>
-              Décrivez votre idée en une phrase : les agents s'occupent du reste — titre, sommaire, chapitres, relecture. Aucune étape obligatoire, vous pourrez relire et modifier le sommaire à tout moment.
+              Renseignez votre projet, puis comparez plusieurs titres, angles et synopsis élaborés depuis vos propres informations. La rédaction ne démarre qu’après votre choix.
             </p>
             <button
               onClick={() => navigate('/v3/create?ecrire=1')}
               className="mt-6 inline-flex items-center gap-2 rounded-full px-8 py-4 text-base font-bold text-white transition-all hover:-translate-y-0.5"
               style={{ background: `linear-gradient(90deg, ${AMBER}, #FFB44D)` }}
             >
-              <Rocket className="h-5 w-5" /> Lancer l'écriture — les agents s'occupent du reste
+              <Rocket className="h-5 w-5" /> Ouvrir la fiche de mon livre
             </button>
             <p className="mt-3 text-xs" style={{ color: '#b29a72' }}>
               Vous préférez avancer pas à pas ? Ouvrez l'onglet <span className="font-semibold">Parcours</span>.
